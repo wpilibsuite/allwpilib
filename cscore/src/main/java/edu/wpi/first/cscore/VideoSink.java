@@ -43,14 +43,12 @@ public class VideoSink implements AutoCloseable {
    * @return The kind
    */
   public static Kind getKindFromInt(int kind) {
-    switch (kind) {
-      case 2:
-        return Kind.kMjpeg;
-      case 4:
-        return Kind.kCv;
-      default:
-        return Kind.kUnknown;
-    }
+    return switch (kind) {
+      case 2 -> Kind.kMjpeg;
+      case 4 -> Kind.kCv;
+      case 8 -> Kind.kRaw;
+      default -> Kind.kUnknown;
+    };
   }
 
   /**
@@ -96,11 +94,7 @@ public class VideoSink implements AutoCloseable {
     if (other == null) {
       return false;
     }
-    if (getClass() != other.getClass()) {
-      return false;
-    }
-    VideoSink sink = (VideoSink) other;
-    return m_handle == sink.m_handle;
+    return other instanceof VideoSink sink && m_handle == sink.m_handle;
   }
 
   @Override

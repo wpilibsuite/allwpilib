@@ -39,7 +39,18 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   units::radians_per_second_t omega = 0_rad_per_s;
 
   /**
-   * Disretizes a continuous-time chassis speed.
+   * Creates a Twist2d from ChassisSpeeds.
+   *
+   * @param dt The duration of the timestep.
+   *
+   * @return Twist2d.
+   */
+  Twist2d ToTwist2d(units::second_t dt) const {
+    return Twist2d{vx * dt, vy * dt, omega * dt};
+  }
+
+  /**
+   * Discretizes a continuous-time chassis speed.
    *
    * This function converts a continuous-time chassis speed into a discrete-time
    * one such that when the discrete-time chassis speed is applied for one
@@ -61,13 +72,20 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
                                   units::meters_per_second_t vy,
                                   units::radians_per_second_t omega,
                                   units::second_t dt) {
+    // Construct the desired pose after a timestep, relative to the current
+    // pose. The desired pose has decoupled translation and rotation.
     Pose2d desiredDeltaPose{vx * dt, vy * dt, omega * dt};
+
+    // Find the chassis translation/rotation deltas in the robot frame that move
+    // the robot from its current pose to the desired pose
     auto twist = Pose2d{}.Log(desiredDeltaPose);
+
+    // Turn the chassis translation/rotation deltas into average velocities
     return {twist.dx / dt, twist.dy / dt, twist.dtheta / dt};
   }
 
   /**
-   * Disretizes a continuous-time chassis speed.
+   * Discretizes a continuous-time chassis speed.
    *
    * This function converts a continuous-time chassis speed into a discrete-time
    * one such that when the discrete-time chassis speed is applied for one
@@ -249,8 +267,19 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   constexpr ChassisSpeeds operator/(double scalar) const {
     return operator*(1.0 / scalar);
   }
+
+  /**
+   * Compares the ChassisSpeeds with another ChassisSpeed.
+   *
+   * @param other The other ChassisSpeeds.
+   *
+   * @return The result of the comparison. Is true if they are the same.
+   */
+  constexpr bool operator==(const ChassisSpeeds& other) const = default;
 };
 }  // namespace frc
 
+#ifndef NO_PROTOBUF
 #include "frc/kinematics/proto/ChassisSpeedsProto.h"
+#endif
 #include "frc/kinematics/struct/ChassisSpeedsStruct.h"

@@ -1,0 +1,22 @@
+cppHeaderFileInclude {
+  \.hpp$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+modifiableFileExclude {
+  \.patch$
+  \.png$
+  \.svg$
+  jormungandr/cpp/Docstrings\.hpp$
+  jormungandr/py\.typed$
+}
+
+includeOtherLibs {
+  ^Eigen/
+  ^catch2/
+  ^nanobind/
+  ^sleipnir/
+}

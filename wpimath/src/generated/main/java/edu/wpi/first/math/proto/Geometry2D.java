@@ -18,7 +18,7 @@ import us.hebi.quickbuf.ProtoUtil;
 import us.hebi.quickbuf.RepeatedByte;
 
 public final class Geometry2D {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(1256,
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(1889,
     "ChBnZW9tZXRyeTJkLnByb3RvEgl3cGkucHJvdG8iMwoVUHJvdG9idWZUcmFuc2xhdGlvbjJkEgwKAXgY" + 
     "ASABKAFSAXgSDAoBeRgCIAEoAVIBeSIqChJQcm90b2J1ZlJvdGF0aW9uMmQSFAoFdmFsdWUYASABKAFS" + 
     "BXZhbHVlIo8BCg5Qcm90b2J1ZlBvc2UyZBJCCgt0cmFuc2xhdGlvbhgBIAEoCzIgLndwaS5wcm90by5Q" + 
@@ -27,19 +27,30 @@ public final class Geometry2D {
     "dHJhbnNsYXRpb24YASABKAsyIC53cGkucHJvdG8uUHJvdG9idWZUcmFuc2xhdGlvbjJkUgt0cmFuc2xh" + 
     "dGlvbhI5Cghyb3RhdGlvbhgCIAEoCzIdLndwaS5wcm90by5Qcm90b2J1ZlJvdGF0aW9uMmRSCHJvdGF0" + 
     "aW9uIkkKD1Byb3RvYnVmVHdpc3QyZBIOCgJkeBgBIAEoAVICZHgSDgoCZHkYAiABKAFSAmR5EhYKBmR0" + 
-    "aGV0YRgDIAEoAVIGZHRoZXRhQhoKGGVkdS53cGkuZmlyc3QubWF0aC5wcm90b0rPBQoGEgQAAB0BCggK" + 
-    "AQwSAwAAEgoICgECEgMCABIKCAoBCBIDBAAxCgkKAggBEgMEADEKCgoCBAASBAYACQEKCgoDBAABEgMG" + 
-    "CB0KCwoEBAACABIDBwIPCgwKBQQAAgAFEgMHAggKDAoFBAACAAESAwcJCgoMCgUEAAIAAxIDBw0OCgsK" + 
-    "BAQAAgESAwgCDwoMCgUEAAIBBRIDCAIICgwKBQQAAgEBEgMICQoKDAoFBAACAQMSAwgNDgoKCgIEARIE" + 
-    "CwANAQoKCgMEAQESAwsIGgoLCgQEAQIAEgMMAhMKDAoFBAECAAUSAwwCCAoMCgUEAQIAARIDDAkOCgwK" + 
-    "BQQBAgADEgMMERIKCgoCBAISBA8AEgEKCgoDBAIBEgMPCBYKCwoEBAICABIDEAIoCgwKBQQCAgAGEgMQ" + 
-    "AhcKDAoFBAICAAESAxAYIwoMCgUEAgIAAxIDECYnCgsKBAQCAgESAxECIgoMCgUEAgIBBhIDEQIUCgwK" + 
-    "BQQCAgEBEgMRFR0KDAoFBAICAQMSAxEgIQoKCgIEAxIEFAAXAQoKCgMEAwESAxQIGwoLCgQEAwIAEgMV" + 
-    "AigKDAoFBAMCAAYSAxUCFwoMCgUEAwIAARIDFRgjCgwKBQQDAgADEgMVJicKCwoEBAMCARIDFgIiCgwK" + 
-    "BQQDAgEGEgMWAhQKDAoFBAMCAQESAxYVHQoMCgUEAwIBAxIDFiAhCgoKAgQEEgQZAB0BCgoKAwQEARID" + 
-    "GQgXCgsKBAQEAgASAxoCEAoMCgUEBAIABRIDGgIICgwKBQQEAgABEgMaCQsKDAoFBAQCAAMSAxoODwoL" + 
-    "CgQEBAIBEgMbAhAKDAoFBAQCAQUSAxsCCAoMCgUEBAIBARIDGwkLCgwKBQQEAgEDEgMbDg8KCwoEBAQC",
-    "AhIDHAIUCgwKBQQEAgIFEgMcAggKDAoFBAQCAgESAxwJDwoMCgUEBAICAxIDHBITYgZwcm90bzM=");
+    "aGV0YRgDIAEoAVIGZHRoZXRhIngKE1Byb3RvYnVmUmVjdGFuZ2xlMmQSMQoGY2VudGVyGAEgASgLMhku" + 
+    "d3BpLnByb3RvLlByb3RvYnVmUG9zZTJkUgZjZW50ZXISFgoGeFdpZHRoGAIgASgBUgZ4V2lkdGgSFgoG" + 
+    "eVdpZHRoGAMgASgBUgZ5V2lkdGgiggEKEVByb3RvYnVmRWxsaXBzZTJkEjEKBmNlbnRlchgBIAEoCzIZ" + 
+    "LndwaS5wcm90by5Qcm90b2J1ZlBvc2UyZFIGY2VudGVyEhwKCXhTZW1pQXhpcxgCIAEoAVIJeFNlbWlB" + 
+    "eGlzEhwKCXlTZW1pQXhpcxgDIAEoAVIJeVNlbWlBeGlzQhoKGGVkdS53cGkuZmlyc3QubWF0aC5wcm90" + 
+    "b0rJCAoGEgQAACkBCggKAQwSAwAAEgoICgECEgMCABIKCAoBCBIDBAAxCgkKAggBEgMEADEKCgoCBAAS" + 
+    "BAYACQEKCgoDBAABEgMGCB0KCwoEBAACABIDBwIPCgwKBQQAAgAFEgMHAggKDAoFBAACAAESAwcJCgoM" + 
+    "CgUEAAIAAxIDBw0OCgsKBAQAAgESAwgCDwoMCgUEAAIBBRIDCAIICgwKBQQAAgEBEgMICQoKDAoFBAAC" + 
+    "AQMSAwgNDgoKCgIEARIECwANAQoKCgMEAQESAwsIGgoLCgQEAQIAEgMMAhMKDAoFBAECAAUSAwwCCAoM" + 
+    "CgUEAQIAARIDDAkOCgwKBQQBAgADEgMMERIKCgoCBAISBA8AEgEKCgoDBAIBEgMPCBYKCwoEBAICABID" + 
+    "EAIoCgwKBQQCAgAGEgMQAhcKDAoFBAICAAESAxAYIwoMCgUEAgIAAxIDECYnCgsKBAQCAgESAxECIgoM" + 
+    "CgUEAgIBBhIDEQIUCgwKBQQCAgEBEgMRFR0KDAoFBAICAQMSAxEgIQoKCgIEAxIEFAAXAQoKCgMEAwES",
+    "AxQIGwoLCgQEAwIAEgMVAigKDAoFBAMCAAYSAxUCFwoMCgUEAwIAARIDFRgjCgwKBQQDAgADEgMVJicK" + 
+    "CwoEBAMCARIDFgIiCgwKBQQDAgEGEgMWAhQKDAoFBAMCAQESAxYVHQoMCgUEAwIBAxIDFiAhCgoKAgQE" + 
+    "EgQZAB0BCgoKAwQEARIDGQgXCgsKBAQEAgASAxoCEAoMCgUEBAIABRIDGgIICgwKBQQEAgABEgMaCQsK" + 
+    "DAoFBAQCAAMSAxoODwoLCgQEBAIBEgMbAhAKDAoFBAQCAQUSAxsCCAoMCgUEBAIBARIDGwkLCgwKBQQE" + 
+    "AgEDEgMbDg8KCwoEBAQCAhIDHAIUCgwKBQQEAgIFEgMcAggKDAoFBAQCAgESAxwJDwoMCgUEBAICAxID" + 
+    "HBITCgoKAgQFEgQfACMBCgoKAwQFARIDHwgbCgsKBAQFAgASAyACHAoMCgUEBQIABhIDIAIQCgwKBQQF" + 
+    "AgABEgMgERcKDAoFBAUCAAMSAyAaGwoLCgQEBQIBEgMhAhQKDAoFBAUCAQUSAyECCAoMCgUEBQIBARID" + 
+    "IQkPCgwKBQQFAgEDEgMhEhMKCwoEBAUCAhIDIgIUCgwKBQQFAgIFEgMiAggKDAoFBAUCAgESAyIJDwoM" + 
+    "CgUEBQICAxIDIhITCgoKAgQGEgQlACkBCgoKAwQGARIDJQgZCgsKBAQGAgASAyYCHAoMCgUEBgIABhID" + 
+    "JgIQCgwKBQQGAgABEgMmERcKDAoFBAYCAAMSAyYaGwoLCgQEBgIBEgMnAhcKDAoFBAYCAQUSAycCCAoM" + 
+    "CgUEBgIBARIDJwkSCgwKBQQGAgEDEgMnFRYKCwoEBAYCAhIDKAIXCgwKBQQGAgIFEgMoAggKDAoFBAYC" + 
+    "AgESAygJEgoMCgUEBgICAxIDKBUWYgZwcm90bzM=");
 
   static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("geometry2d.proto", "wpi.proto", descriptorData);
 
@@ -52,6 +63,10 @@ public final class Geometry2D {
   static final Descriptors.Descriptor wpi_proto_ProtobufTransform2d_descriptor = descriptor.internalContainedType(275, 148, "ProtobufTransform2d", "wpi.proto.ProtobufTransform2d");
 
   static final Descriptors.Descriptor wpi_proto_ProtobufTwist2d_descriptor = descriptor.internalContainedType(425, 73, "ProtobufTwist2d", "wpi.proto.ProtobufTwist2d");
+
+  static final Descriptors.Descriptor wpi_proto_ProtobufRectangle2d_descriptor = descriptor.internalContainedType(500, 120, "ProtobufRectangle2d", "wpi.proto.ProtobufRectangle2d");
+
+  static final Descriptors.Descriptor wpi_proto_ProtobufEllipse2d_descriptor = descriptor.internalContainedType(623, 130, "ProtobufEllipse2d", "wpi.proto.ProtobufEllipse2d");
 
   /**
    * @return this proto file's descriptor.
@@ -1801,6 +1816,872 @@ public final class Geometry2D {
       static final FieldName dy = FieldName.forField("dy");
 
       static final FieldName dtheta = FieldName.forField("dtheta");
+    }
+  }
+
+  /**
+   * Protobuf type {@code ProtobufRectangle2d}
+   */
+  public static final class ProtobufRectangle2d extends ProtoMessage<ProtobufRectangle2d> implements Cloneable {
+    private static final long serialVersionUID = 0L;
+
+    /**
+     * <code>optional double xWidth = 2;</code>
+     */
+    private double xWidth;
+
+    /**
+     * <code>optional double yWidth = 3;</code>
+     */
+    private double yWidth;
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d center = 1;</code>
+     */
+    private final ProtobufPose2d center = ProtobufPose2d.newInstance();
+
+    private ProtobufRectangle2d() {
+    }
+
+    /**
+     * @return a new empty instance of {@code ProtobufRectangle2d}
+     */
+    public static ProtobufRectangle2d newInstance() {
+      return new ProtobufRectangle2d();
+    }
+
+    /**
+     * <code>optional double xWidth = 2;</code>
+     * @return whether the xWidth field is set
+     */
+    public boolean hasXWidth() {
+      return (bitField0_ & 0x00000001) != 0;
+    }
+
+    /**
+     * <code>optional double xWidth = 2;</code>
+     * @return this
+     */
+    public ProtobufRectangle2d clearXWidth() {
+      bitField0_ &= ~0x00000001;
+      xWidth = 0D;
+      return this;
+    }
+
+    /**
+     * <code>optional double xWidth = 2;</code>
+     * @return the xWidth
+     */
+    public double getXWidth() {
+      return xWidth;
+    }
+
+    /**
+     * <code>optional double xWidth = 2;</code>
+     * @param value the xWidth to set
+     * @return this
+     */
+    public ProtobufRectangle2d setXWidth(final double value) {
+      bitField0_ |= 0x00000001;
+      xWidth = value;
+      return this;
+    }
+
+    /**
+     * <code>optional double yWidth = 3;</code>
+     * @return whether the yWidth field is set
+     */
+    public boolean hasYWidth() {
+      return (bitField0_ & 0x00000002) != 0;
+    }
+
+    /**
+     * <code>optional double yWidth = 3;</code>
+     * @return this
+     */
+    public ProtobufRectangle2d clearYWidth() {
+      bitField0_ &= ~0x00000002;
+      yWidth = 0D;
+      return this;
+    }
+
+    /**
+     * <code>optional double yWidth = 3;</code>
+     * @return the yWidth
+     */
+    public double getYWidth() {
+      return yWidth;
+    }
+
+    /**
+     * <code>optional double yWidth = 3;</code>
+     * @param value the yWidth to set
+     * @return this
+     */
+    public ProtobufRectangle2d setYWidth(final double value) {
+      bitField0_ |= 0x00000002;
+      yWidth = value;
+      return this;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d center = 1;</code>
+     * @return whether the center field is set
+     */
+    public boolean hasCenter() {
+      return (bitField0_ & 0x00000004) != 0;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d center = 1;</code>
+     * @return this
+     */
+    public ProtobufRectangle2d clearCenter() {
+      bitField0_ &= ~0x00000004;
+      center.clear();
+      return this;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d center = 1;</code>
+     *
+     * This method returns the internal storage object without modifying any has state.
+     * The returned object should not be modified and be treated as read-only.
+     *
+     * Use {@link #getMutableCenter()} if you want to modify it.
+     *
+     * @return internal storage object for reading
+     */
+    public ProtobufPose2d getCenter() {
+      return center;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d center = 1;</code>
+     *
+     * This method returns the internal storage object and sets the corresponding
+     * has state. The returned object will become part of this message and its
+     * contents may be modified as long as the has state is not cleared.
+     *
+     * @return internal storage object for modifications
+     */
+    public ProtobufPose2d getMutableCenter() {
+      bitField0_ |= 0x00000004;
+      return center;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d center = 1;</code>
+     * @param value the center to set
+     * @return this
+     */
+    public ProtobufRectangle2d setCenter(final ProtobufPose2d value) {
+      bitField0_ |= 0x00000004;
+      center.copyFrom(value);
+      return this;
+    }
+
+    @Override
+    public ProtobufRectangle2d copyFrom(final ProtobufRectangle2d other) {
+      cachedSize = other.cachedSize;
+      if ((bitField0_ | other.bitField0_) != 0) {
+        bitField0_ = other.bitField0_;
+        xWidth = other.xWidth;
+        yWidth = other.yWidth;
+        center.copyFrom(other.center);
+      }
+      return this;
+    }
+
+    @Override
+    public ProtobufRectangle2d mergeFrom(final ProtobufRectangle2d other) {
+      if (other.isEmpty()) {
+        return this;
+      }
+      cachedSize = -1;
+      if (other.hasXWidth()) {
+        setXWidth(other.xWidth);
+      }
+      if (other.hasYWidth()) {
+        setYWidth(other.yWidth);
+      }
+      if (other.hasCenter()) {
+        getMutableCenter().mergeFrom(other.center);
+      }
+      return this;
+    }
+
+    @Override
+    public ProtobufRectangle2d clear() {
+      if (isEmpty()) {
+        return this;
+      }
+      cachedSize = -1;
+      bitField0_ = 0;
+      xWidth = 0D;
+      yWidth = 0D;
+      center.clear();
+      return this;
+    }
+
+    @Override
+    public ProtobufRectangle2d clearQuick() {
+      if (isEmpty()) {
+        return this;
+      }
+      cachedSize = -1;
+      bitField0_ = 0;
+      center.clearQuick();
+      return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o == this) {
+        return true;
+      }
+      if (!(o instanceof ProtobufRectangle2d)) {
+        return false;
+      }
+      ProtobufRectangle2d other = (ProtobufRectangle2d) o;
+      return bitField0_ == other.bitField0_
+        && (!hasXWidth() || ProtoUtil.isEqual(xWidth, other.xWidth))
+        && (!hasYWidth() || ProtoUtil.isEqual(yWidth, other.yWidth))
+        && (!hasCenter() || center.equals(other.center));
+    }
+
+    @Override
+    public void writeTo(final ProtoSink output) throws IOException {
+      if ((bitField0_ & 0x00000001) != 0) {
+        output.writeRawByte((byte) 17);
+        output.writeDoubleNoTag(xWidth);
+      }
+      if ((bitField0_ & 0x00000002) != 0) {
+        output.writeRawByte((byte) 25);
+        output.writeDoubleNoTag(yWidth);
+      }
+      if ((bitField0_ & 0x00000004) != 0) {
+        output.writeRawByte((byte) 10);
+        output.writeMessageNoTag(center);
+      }
+    }
+
+    @Override
+    protected int computeSerializedSize() {
+      int size = 0;
+      if ((bitField0_ & 0x00000001) != 0) {
+        size += 9;
+      }
+      if ((bitField0_ & 0x00000002) != 0) {
+        size += 9;
+      }
+      if ((bitField0_ & 0x00000004) != 0) {
+        size += 1 + ProtoSink.computeMessageSizeNoTag(center);
+      }
+      return size;
+    }
+
+    @Override
+    @SuppressWarnings("fallthrough")
+    public ProtobufRectangle2d mergeFrom(final ProtoSource input) throws IOException {
+      // Enabled Fall-Through Optimization (QuickBuffers)
+      int tag = input.readTag();
+      while (true) {
+        switch (tag) {
+          case 17: {
+            // xWidth
+            xWidth = input.readDouble();
+            bitField0_ |= 0x00000001;
+            tag = input.readTag();
+            if (tag != 25) {
+              break;
+            }
+          }
+          case 25: {
+            // yWidth
+            yWidth = input.readDouble();
+            bitField0_ |= 0x00000002;
+            tag = input.readTag();
+            if (tag != 10) {
+              break;
+            }
+          }
+          case 10: {
+            // center
+            input.readMessage(center);
+            bitField0_ |= 0x00000004;
+            tag = input.readTag();
+            if (tag != 0) {
+              break;
+            }
+          }
+          case 0: {
+            return this;
+          }
+          default: {
+            if (!input.skipField(tag)) {
+              return this;
+            }
+            tag = input.readTag();
+            break;
+          }
+        }
+      }
+    }
+
+    @Override
+    public void writeTo(final JsonSink output) throws IOException {
+      output.beginObject();
+      if ((bitField0_ & 0x00000001) != 0) {
+        output.writeDouble(FieldNames.xWidth, xWidth);
+      }
+      if ((bitField0_ & 0x00000002) != 0) {
+        output.writeDouble(FieldNames.yWidth, yWidth);
+      }
+      if ((bitField0_ & 0x00000004) != 0) {
+        output.writeMessage(FieldNames.center, center);
+      }
+      output.endObject();
+    }
+
+    @Override
+    public ProtobufRectangle2d mergeFrom(final JsonSource input) throws IOException {
+      if (!input.beginObject()) {
+        return this;
+      }
+      while (!input.isAtEnd()) {
+        switch (input.readFieldHash()) {
+          case -775894994: {
+            if (input.isAtField(FieldNames.xWidth)) {
+              if (!input.trySkipNullValue()) {
+                xWidth = input.readDouble();
+                bitField0_ |= 0x00000001;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case -747265843: {
+            if (input.isAtField(FieldNames.yWidth)) {
+              if (!input.trySkipNullValue()) {
+                yWidth = input.readDouble();
+                bitField0_ |= 0x00000002;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case -1364013995: {
+            if (input.isAtField(FieldNames.center)) {
+              if (!input.trySkipNullValue()) {
+                input.readMessage(center);
+                bitField0_ |= 0x00000004;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          default: {
+            input.skipUnknownField();
+            break;
+          }
+        }
+      }
+      input.endObject();
+      return this;
+    }
+
+    @Override
+    public ProtobufRectangle2d clone() {
+      return new ProtobufRectangle2d().copyFrom(this);
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return ((bitField0_) == 0);
+    }
+
+    public static ProtobufRectangle2d parseFrom(final byte[] data) throws
+        InvalidProtocolBufferException {
+      return ProtoMessage.mergeFrom(new ProtobufRectangle2d(), data).checkInitialized();
+    }
+
+    public static ProtobufRectangle2d parseFrom(final ProtoSource input) throws IOException {
+      return ProtoMessage.mergeFrom(new ProtobufRectangle2d(), input).checkInitialized();
+    }
+
+    public static ProtobufRectangle2d parseFrom(final JsonSource input) throws IOException {
+      return ProtoMessage.mergeFrom(new ProtobufRectangle2d(), input).checkInitialized();
+    }
+
+    /**
+     * @return factory for creating ProtobufRectangle2d messages
+     */
+    public static MessageFactory<ProtobufRectangle2d> getFactory() {
+      return ProtobufRectangle2dFactory.INSTANCE;
+    }
+
+    /**
+     * @return this type's descriptor.
+     */
+    public static Descriptors.Descriptor getDescriptor() {
+      return Geometry2D.wpi_proto_ProtobufRectangle2d_descriptor;
+    }
+
+    private enum ProtobufRectangle2dFactory implements MessageFactory<ProtobufRectangle2d> {
+      INSTANCE;
+
+      @Override
+      public ProtobufRectangle2d create() {
+        return ProtobufRectangle2d.newInstance();
+      }
+    }
+
+    /**
+     * Contains name constants used for serializing JSON
+     */
+    static class FieldNames {
+      static final FieldName xWidth = FieldName.forField("xWidth");
+
+      static final FieldName yWidth = FieldName.forField("yWidth");
+
+      static final FieldName center = FieldName.forField("center");
+    }
+  }
+
+  /**
+   * Protobuf type {@code ProtobufEllipse2d}
+   */
+  public static final class ProtobufEllipse2d extends ProtoMessage<ProtobufEllipse2d> implements Cloneable {
+    private static final long serialVersionUID = 0L;
+
+    /**
+     * <code>optional double xSemiAxis = 2;</code>
+     */
+    private double xSemiAxis;
+
+    /**
+     * <code>optional double ySemiAxis = 3;</code>
+     */
+    private double ySemiAxis;
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d center = 1;</code>
+     */
+    private final ProtobufPose2d center = ProtobufPose2d.newInstance();
+
+    private ProtobufEllipse2d() {
+    }
+
+    /**
+     * @return a new empty instance of {@code ProtobufEllipse2d}
+     */
+    public static ProtobufEllipse2d newInstance() {
+      return new ProtobufEllipse2d();
+    }
+
+    /**
+     * <code>optional double xSemiAxis = 2;</code>
+     * @return whether the xSemiAxis field is set
+     */
+    public boolean hasXSemiAxis() {
+      return (bitField0_ & 0x00000001) != 0;
+    }
+
+    /**
+     * <code>optional double xSemiAxis = 2;</code>
+     * @return this
+     */
+    public ProtobufEllipse2d clearXSemiAxis() {
+      bitField0_ &= ~0x00000001;
+      xSemiAxis = 0D;
+      return this;
+    }
+
+    /**
+     * <code>optional double xSemiAxis = 2;</code>
+     * @return the xSemiAxis
+     */
+    public double getXSemiAxis() {
+      return xSemiAxis;
+    }
+
+    /**
+     * <code>optional double xSemiAxis = 2;</code>
+     * @param value the xSemiAxis to set
+     * @return this
+     */
+    public ProtobufEllipse2d setXSemiAxis(final double value) {
+      bitField0_ |= 0x00000001;
+      xSemiAxis = value;
+      return this;
+    }
+
+    /**
+     * <code>optional double ySemiAxis = 3;</code>
+     * @return whether the ySemiAxis field is set
+     */
+    public boolean hasYSemiAxis() {
+      return (bitField0_ & 0x00000002) != 0;
+    }
+
+    /**
+     * <code>optional double ySemiAxis = 3;</code>
+     * @return this
+     */
+    public ProtobufEllipse2d clearYSemiAxis() {
+      bitField0_ &= ~0x00000002;
+      ySemiAxis = 0D;
+      return this;
+    }
+
+    /**
+     * <code>optional double ySemiAxis = 3;</code>
+     * @return the ySemiAxis
+     */
+    public double getYSemiAxis() {
+      return ySemiAxis;
+    }
+
+    /**
+     * <code>optional double ySemiAxis = 3;</code>
+     * @param value the ySemiAxis to set
+     * @return this
+     */
+    public ProtobufEllipse2d setYSemiAxis(final double value) {
+      bitField0_ |= 0x00000002;
+      ySemiAxis = value;
+      return this;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d center = 1;</code>
+     * @return whether the center field is set
+     */
+    public boolean hasCenter() {
+      return (bitField0_ & 0x00000004) != 0;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d center = 1;</code>
+     * @return this
+     */
+    public ProtobufEllipse2d clearCenter() {
+      bitField0_ &= ~0x00000004;
+      center.clear();
+      return this;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d center = 1;</code>
+     *
+     * This method returns the internal storage object without modifying any has state.
+     * The returned object should not be modified and be treated as read-only.
+     *
+     * Use {@link #getMutableCenter()} if you want to modify it.
+     *
+     * @return internal storage object for reading
+     */
+    public ProtobufPose2d getCenter() {
+      return center;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d center = 1;</code>
+     *
+     * This method returns the internal storage object and sets the corresponding
+     * has state. The returned object will become part of this message and its
+     * contents may be modified as long as the has state is not cleared.
+     *
+     * @return internal storage object for modifications
+     */
+    public ProtobufPose2d getMutableCenter() {
+      bitField0_ |= 0x00000004;
+      return center;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d center = 1;</code>
+     * @param value the center to set
+     * @return this
+     */
+    public ProtobufEllipse2d setCenter(final ProtobufPose2d value) {
+      bitField0_ |= 0x00000004;
+      center.copyFrom(value);
+      return this;
+    }
+
+    @Override
+    public ProtobufEllipse2d copyFrom(final ProtobufEllipse2d other) {
+      cachedSize = other.cachedSize;
+      if ((bitField0_ | other.bitField0_) != 0) {
+        bitField0_ = other.bitField0_;
+        xSemiAxis = other.xSemiAxis;
+        ySemiAxis = other.ySemiAxis;
+        center.copyFrom(other.center);
+      }
+      return this;
+    }
+
+    @Override
+    public ProtobufEllipse2d mergeFrom(final ProtobufEllipse2d other) {
+      if (other.isEmpty()) {
+        return this;
+      }
+      cachedSize = -1;
+      if (other.hasXSemiAxis()) {
+        setXSemiAxis(other.xSemiAxis);
+      }
+      if (other.hasYSemiAxis()) {
+        setYSemiAxis(other.ySemiAxis);
+      }
+      if (other.hasCenter()) {
+        getMutableCenter().mergeFrom(other.center);
+      }
+      return this;
+    }
+
+    @Override
+    public ProtobufEllipse2d clear() {
+      if (isEmpty()) {
+        return this;
+      }
+      cachedSize = -1;
+      bitField0_ = 0;
+      xSemiAxis = 0D;
+      ySemiAxis = 0D;
+      center.clear();
+      return this;
+    }
+
+    @Override
+    public ProtobufEllipse2d clearQuick() {
+      if (isEmpty()) {
+        return this;
+      }
+      cachedSize = -1;
+      bitField0_ = 0;
+      center.clearQuick();
+      return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o == this) {
+        return true;
+      }
+      if (!(o instanceof ProtobufEllipse2d)) {
+        return false;
+      }
+      ProtobufEllipse2d other = (ProtobufEllipse2d) o;
+      return bitField0_ == other.bitField0_
+        && (!hasXSemiAxis() || ProtoUtil.isEqual(xSemiAxis, other.xSemiAxis))
+        && (!hasYSemiAxis() || ProtoUtil.isEqual(ySemiAxis, other.ySemiAxis))
+        && (!hasCenter() || center.equals(other.center));
+    }
+
+    @Override
+    public void writeTo(final ProtoSink output) throws IOException {
+      if ((bitField0_ & 0x00000001) != 0) {
+        output.writeRawByte((byte) 17);
+        output.writeDoubleNoTag(xSemiAxis);
+      }
+      if ((bitField0_ & 0x00000002) != 0) {
+        output.writeRawByte((byte) 25);
+        output.writeDoubleNoTag(ySemiAxis);
+      }
+      if ((bitField0_ & 0x00000004) != 0) {
+        output.writeRawByte((byte) 10);
+        output.writeMessageNoTag(center);
+      }
+    }
+
+    @Override
+    protected int computeSerializedSize() {
+      int size = 0;
+      if ((bitField0_ & 0x00000001) != 0) {
+        size += 9;
+      }
+      if ((bitField0_ & 0x00000002) != 0) {
+        size += 9;
+      }
+      if ((bitField0_ & 0x00000004) != 0) {
+        size += 1 + ProtoSink.computeMessageSizeNoTag(center);
+      }
+      return size;
+    }
+
+    @Override
+    @SuppressWarnings("fallthrough")
+    public ProtobufEllipse2d mergeFrom(final ProtoSource input) throws IOException {
+      // Enabled Fall-Through Optimization (QuickBuffers)
+      int tag = input.readTag();
+      while (true) {
+        switch (tag) {
+          case 17: {
+            // xSemiAxis
+            xSemiAxis = input.readDouble();
+            bitField0_ |= 0x00000001;
+            tag = input.readTag();
+            if (tag != 25) {
+              break;
+            }
+          }
+          case 25: {
+            // ySemiAxis
+            ySemiAxis = input.readDouble();
+            bitField0_ |= 0x00000002;
+            tag = input.readTag();
+            if (tag != 10) {
+              break;
+            }
+          }
+          case 10: {
+            // center
+            input.readMessage(center);
+            bitField0_ |= 0x00000004;
+            tag = input.readTag();
+            if (tag != 0) {
+              break;
+            }
+          }
+          case 0: {
+            return this;
+          }
+          default: {
+            if (!input.skipField(tag)) {
+              return this;
+            }
+            tag = input.readTag();
+            break;
+          }
+        }
+      }
+    }
+
+    @Override
+    public void writeTo(final JsonSink output) throws IOException {
+      output.beginObject();
+      if ((bitField0_ & 0x00000001) != 0) {
+        output.writeDouble(FieldNames.xSemiAxis, xSemiAxis);
+      }
+      if ((bitField0_ & 0x00000002) != 0) {
+        output.writeDouble(FieldNames.ySemiAxis, ySemiAxis);
+      }
+      if ((bitField0_ & 0x00000004) != 0) {
+        output.writeMessage(FieldNames.center, center);
+      }
+      output.endObject();
+    }
+
+    @Override
+    public ProtobufEllipse2d mergeFrom(final JsonSource input) throws IOException {
+      if (!input.beginObject()) {
+        return this;
+      }
+      while (!input.isAtEnd()) {
+        switch (input.readFieldHash()) {
+          case -858640185: {
+            if (input.isAtField(FieldNames.xSemiAxis)) {
+              if (!input.trySkipNullValue()) {
+                xSemiAxis = input.readDouble();
+                bitField0_ |= 0x00000001;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case 1628872648: {
+            if (input.isAtField(FieldNames.ySemiAxis)) {
+              if (!input.trySkipNullValue()) {
+                ySemiAxis = input.readDouble();
+                bitField0_ |= 0x00000002;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case -1364013995: {
+            if (input.isAtField(FieldNames.center)) {
+              if (!input.trySkipNullValue()) {
+                input.readMessage(center);
+                bitField0_ |= 0x00000004;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          default: {
+            input.skipUnknownField();
+            break;
+          }
+        }
+      }
+      input.endObject();
+      return this;
+    }
+
+    @Override
+    public ProtobufEllipse2d clone() {
+      return new ProtobufEllipse2d().copyFrom(this);
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return ((bitField0_) == 0);
+    }
+
+    public static ProtobufEllipse2d parseFrom(final byte[] data) throws
+        InvalidProtocolBufferException {
+      return ProtoMessage.mergeFrom(new ProtobufEllipse2d(), data).checkInitialized();
+    }
+
+    public static ProtobufEllipse2d parseFrom(final ProtoSource input) throws IOException {
+      return ProtoMessage.mergeFrom(new ProtobufEllipse2d(), input).checkInitialized();
+    }
+
+    public static ProtobufEllipse2d parseFrom(final JsonSource input) throws IOException {
+      return ProtoMessage.mergeFrom(new ProtobufEllipse2d(), input).checkInitialized();
+    }
+
+    /**
+     * @return factory for creating ProtobufEllipse2d messages
+     */
+    public static MessageFactory<ProtobufEllipse2d> getFactory() {
+      return ProtobufEllipse2dFactory.INSTANCE;
+    }
+
+    /**
+     * @return this type's descriptor.
+     */
+    public static Descriptors.Descriptor getDescriptor() {
+      return Geometry2D.wpi_proto_ProtobufEllipse2d_descriptor;
+    }
+
+    private enum ProtobufEllipse2dFactory implements MessageFactory<ProtobufEllipse2d> {
+      INSTANCE;
+
+      @Override
+      public ProtobufEllipse2d create() {
+        return ProtobufEllipse2d.newInstance();
+      }
+    }
+
+    /**
+     * Contains name constants used for serializing JSON
+     */
+    static class FieldNames {
+      static final FieldName xSemiAxis = FieldName.forField("xSemiAxis");
+
+      static final FieldName ySemiAxis = FieldName.forField("ySemiAxis");
+
+      static final FieldName center = FieldName.forField("center");
     }
   }
 }

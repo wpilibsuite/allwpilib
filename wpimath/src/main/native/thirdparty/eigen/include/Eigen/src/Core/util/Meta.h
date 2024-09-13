@@ -303,30 +303,30 @@ class noncopyable {
  */
 template <typename T, typename EnableIf = void>
 struct array_size {
-  enum { value = Dynamic };
+  static constexpr Index value = Dynamic;
 };
 
 template <typename T>
 struct array_size<T, std::enable_if_t<((T::SizeAtCompileTime & 0) == 0)>> {
-  enum { value = T::SizeAtCompileTime };
+  static constexpr Index value = T::SizeAtCompileTime;
 };
 
 template <typename T, int N>
 struct array_size<const T (&)[N]> {
-  enum { value = N };
+  static constexpr Index value = N;
 };
 template <typename T, int N>
 struct array_size<T (&)[N]> {
-  enum { value = N };
+  static constexpr Index value = N;
 };
 
 template <typename T, std::size_t N>
 struct array_size<const std::array<T, N>> {
-  enum { value = N };
+  static constexpr Index value = N;
 };
 template <typename T, std::size_t N>
 struct array_size<std::array<T, N>> {
-  enum { value = N };
+  static constexpr Index value = N;
 };
 
 /** \internal
@@ -638,19 +638,23 @@ EIGEN_STRONG_INLINE bool is_identically_zero(const Scalar& s) {
 template <typename A>
 constexpr bool is_int_or_enum_v = std::is_enum<A>::value || std::is_integral<A>::value;
 
+template <typename A, typename B>
+inline constexpr void plain_enum_asserts(A, B) {
+  static_assert(is_int_or_enum_v<A>, "Argument a must be an integer or enum");
+  static_assert(is_int_or_enum_v<B>, "Argument b must be an integer or enum");
+}
+
 /// \internal Gets the minimum of two values which may be integers or enums
 template <typename A, typename B>
 inline constexpr int plain_enum_min(A a, B b) {
-  static_assert(is_int_or_enum_v<A>, "Argument a must be an integer or enum");
-  static_assert(is_int_or_enum_v<B>, "Argument b must be an integer or enum");
+  plain_enum_asserts(a, b);
   return ((int)a <= (int)b) ? (int)a : (int)b;
 }
 
 /// \internal Gets the maximum of two values which may be integers or enums
 template <typename A, typename B>
 inline constexpr int plain_enum_max(A a, B b) {
-  static_assert(is_int_or_enum_v<A>, "Argument a must be an integer or enum");
-  static_assert(is_int_or_enum_v<B>, "Argument b must be an integer or enum");
+  plain_enum_asserts(a, b);
   return ((int)a >= (int)b) ? (int)a : (int)b;
 }
 
@@ -662,8 +666,7 @@ inline constexpr int plain_enum_max(A a, B b) {
  */
 template <typename A, typename B>
 inline constexpr int min_size_prefer_dynamic(A a, B b) {
-  static_assert(is_int_or_enum_v<A>, "Argument a must be an integer or enum");
-  static_assert(is_int_or_enum_v<B>, "Argument b must be an integer or enum");
+  plain_enum_asserts(a, b);
   if ((int)a == 0 || (int)b == 0) return 0;
   if ((int)a == 1 || (int)b == 1) return 1;
   if ((int)a == Dynamic || (int)b == Dynamic) return Dynamic;
@@ -678,8 +681,7 @@ inline constexpr int min_size_prefer_dynamic(A a, B b) {
  */
 template <typename A, typename B>
 inline constexpr int min_size_prefer_fixed(A a, B b) {
-  static_assert(is_int_or_enum_v<A>, "Argument a must be an integer or enum");
-  static_assert(is_int_or_enum_v<B>, "Argument b must be an integer or enum");
+  plain_enum_asserts(a, b);
   if ((int)a == 0 || (int)b == 0) return 0;
   if ((int)a == 1 || (int)b == 1) return 1;
   if ((int)a == Dynamic && (int)b == Dynamic) return Dynamic;
@@ -691,10 +693,44 @@ inline constexpr int min_size_prefer_fixed(A a, B b) {
 /// \internal see `min_size_prefer_fixed`. No need for a separate variant for MaxSizes here.
 template <typename A, typename B>
 inline constexpr int max_size_prefer_dynamic(A a, B b) {
-  static_assert(is_int_or_enum_v<A>, "Argument a must be an integer or enum");
-  static_assert(is_int_or_enum_v<B>, "Argument b must be an integer or enum");
+  plain_enum_asserts(a, b);
   if ((int)a == Dynamic || (int)b == Dynamic) return Dynamic;
   return plain_enum_max(a, b);
+}
+
+template <typename A, typename B>
+inline constexpr bool enum_eq_not_dynamic(A a, B b) {
+  plain_enum_asserts(a, b);
+  if ((int)a == Dynamic || (int)b == Dynamic) return false;
+  return (int)a == (int)b;
+}
+
+template <typename A, typename B>
+inline constexpr bool enum_lt_not_dynamic(A a, B b) {
+  plain_enum_asserts(a, b);
+  if ((int)a == Dynamic || (int)b == Dynamic) return false;
+  return (int)a < (int)b;
+}
+
+template <typename A, typename B>
+inline constexpr bool enum_le_not_dynamic(A a, B b) {
+  plain_enum_asserts(a, b);
+  if ((int)a == Dynamic || (int)b == Dynamic) return false;
+  return (int)a <= (int)b;
+}
+
+template <typename A, typename B>
+inline constexpr bool enum_gt_not_dynamic(A a, B b) {
+  plain_enum_asserts(a, b);
+  if ((int)a == Dynamic || (int)b == Dynamic) return false;
+  return (int)a > (int)b;
+}
+
+template <typename A, typename B>
+inline constexpr bool enum_ge_not_dynamic(A a, B b) {
+  plain_enum_asserts(a, b);
+  if ((int)a == Dynamic || (int)b == Dynamic) return false;
+  return (int)a >= (int)b;
 }
 
 /// \internal Calculate logical XOR at compile time

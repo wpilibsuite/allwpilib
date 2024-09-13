@@ -36,7 +36,7 @@ TEST(HolonomicDriveControllerTest, ReachesReference) {
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       waypoints, {8.0_mps, 4.0_mps_sq});
 
-  constexpr auto kDt = 0.02_s;
+  constexpr units::second_t kDt = 20_ms;
   auto totalTime = trajectory.TotalTime();
   for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
     auto state = trajectory.Sample(kDt * i);

@@ -17,8 +17,8 @@ public class Pose2dStruct implements Struct<Pose2d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Pose2d";
+  public String getTypeName() {
+    return "Pose2d";
   }
 
   @Override
@@ -47,5 +47,10 @@ public class Pose2dStruct implements Struct<Pose2d> {
   public void pack(ByteBuffer bb, Pose2d value) {
     Translation2d.struct.pack(bb, value.getTranslation());
     Rotation2d.struct.pack(bb, value.getRotation());
+  }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
   }
 }

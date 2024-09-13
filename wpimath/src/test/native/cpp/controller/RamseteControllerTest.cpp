@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
+#include <wpi/deprecated.h>
 
 #include "frc/MathUtil.h"
 #include "frc/controller/RamseteController.h"
@@ -16,6 +17,8 @@ static constexpr units::meter_t kTolerance{1 / 12.0};
 static constexpr units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
                                                    180.0};
 
+WPI_IGNORE_DEPRECATED
+
 TEST(RamseteControllerTest, ReachesReference) {
   frc::RamseteController controller{2.0 * 1_rad * 1_rad / (1_m * 1_m),
                                     0.7 / 1_rad};
@@ -26,7 +29,7 @@ TEST(RamseteControllerTest, ReachesReference) {
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
-  constexpr auto kDt = 0.02_s;
+  constexpr units::second_t kDt = 20_ms;
   auto totalTime = trajectory.TotalTime();
   for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
     auto state = trajectory.Sample(kDt * i);
@@ -43,3 +46,5 @@ TEST(RamseteControllerTest, ReachesReference) {
                                       robotPose.Rotation().Radians()),
                     0_rad, kAngularTolerance);
 }
+
+WPI_UNIGNORE_DEPRECATED

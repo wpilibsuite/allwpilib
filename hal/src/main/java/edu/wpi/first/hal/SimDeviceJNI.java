@@ -4,9 +4,19 @@
 
 package edu.wpi.first.hal;
 
+/**
+ * SimDevice JNI Functions.
+ *
+ * @see "hal/SimDevice.h"
+ */
 public class SimDeviceJNI extends JNIWrapper {
+  /** Input to user code from the simulator. */
   public static final int kInput = 0;
+
+  /** Output from user code to the simulator. */
   public static final int kOutput = 1;
+
+  /** Bidirectional between user code and simulator. */
   public static final int kBidir = 2;
 
   /**
@@ -15,6 +25,9 @@ public class SimDeviceJNI extends JNIWrapper {
    * <p>The device name must be unique. 0 is returned if the device name already exists. If multiple
    * instances of the same device are desired, recommend appending the instance/unique identifier in
    * brackets to the base name, e.g. "device[1]".
+   *
+   * <p>Using a device name of the form "Type:Name" will create a WebSockets node with a type value
+   * of "Type" and a device value of "Name"
    *
    * <p>0 is returned if not in simulation.
    *

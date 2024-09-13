@@ -5,6 +5,7 @@
 #pragma once
 
 #include <frc/AnalogPotentiometer.h>
+#include <frc/RobotBase.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/PIDSubsystem.h>
 
@@ -49,13 +50,11 @@ class Elevator : public frc2::PIDSubsystem {
 
 // Conversion value of potentiometer varies between the real world and
 // simulation
-#ifndef SIMULATION
-  frc::AnalogPotentiometer m_pot{ElevatorConstants::kPotentiometerPort,
+  frc::AnalogPotentiometer m_pot =
+      frc::RobotBase::IsReal()
+          ? frc::AnalogPotentiometer{ElevatorConstants::kPotentiometerPort,
                                  -2.0 / 5};
-#else
-  frc::AnalogPotentiometer m_pot{
-      ElevatorConstants::kPotentiometerPort};  // Defaults to meters
-#endif
+          : frc::AnalogPotentiometer{ElevatorConstants::kPotentiometerPort};  // Defaults to meters
 
   static constexpr double kP_real = ElevatorConstants::kP_real;
   static constexpr double kI_real = ElevatorConstants::kI_real;

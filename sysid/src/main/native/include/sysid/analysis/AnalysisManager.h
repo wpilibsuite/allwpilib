@@ -254,7 +254,7 @@ class AnalysisManager {
   std::string_view GetUnit() const { return m_data.distanceUnit; }
 
   /**
-   * Returns a reference to the iterator of the currently selected raw datset.
+   * Returns a reference to the iterator of the currently selected raw dataset.
    * Unfortunately, due to ImPlot internals, the reference cannot be const so
    * the user should be careful not to change any data.
    *
@@ -264,7 +264,7 @@ class AnalysisManager {
 
   /**
    * Returns a reference to the iterator of the currently selected filtered
-   * datset. Unfortunately, due to ImPlot internals, the reference cannot be
+   * dataset. Unfortunately, due to ImPlot internals, the reference cannot be
    * const so the user should be careful not to change any data.
    *
    * @return A reference to the filtered internal data.

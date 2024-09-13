@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:48:59 -0400
-Subject: [PATCH 11/34] Add vectors to raw_ostream
+Subject: [PATCH 11/37] Add vectors to raw_ostream
 
 ---
  llvm/include/llvm/Support/raw_ostream.h | 115 ++++++++++++++++++++++++
@@ -155,10 +155,10 @@ index 95019180a9deb406ed4f2991c664a4cc4e956dac..e7526e016a858ad728feb7cf1c5014b9
  class raw_null_ostream : public raw_pwrite_stream {
    /// See raw_ostream::write_impl.
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 76c32155b4296fbbf3f4b164cd58d63f472ccd5e..dcdfdfd7a8e3fcc4019538a4fc9e158aeda0a8b8 100644
+index c65fb70a4d22db51f4140b910c308333289b6248..57d3091fd5cc5b416e814f9f33811f0fa7afe9cf 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -670,6 +670,53 @@ void raw_svector_ostream::pwrite_impl(const char *Ptr, size_t Size,
+@@ -668,6 +668,53 @@ void raw_svector_ostream::pwrite_impl(const char *Ptr, size_t Size,
    memcpy(OS.data() + Offset, Ptr, Size);
  }
  

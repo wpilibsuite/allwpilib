@@ -6,6 +6,7 @@ package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.controller.proto.ArmFeedforwardProto;
 import edu.wpi.first.math.controller.struct.ArmFeedforwardStruct;
+import edu.wpi.first.math.jni.ArmFeedforwardJNI;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
@@ -15,16 +16,16 @@ import edu.wpi.first.util.struct.StructSerializable;
  */
 public class ArmFeedforward implements ProtobufSerializable, StructSerializable {
   /** The static gain, in volts. */
-  public final double ks;
+  private final double ks;
 
   /** The gravity gain, in volts. */
-  public final double kg;
+  private final double kg;
 
-  /** The velocity gain, in volt seconds per radian. */
-  public final double kv;
+  /** The velocity gain, in V/(rad/s). */
+  private final double kv;
 
-  /** The acceleration gain, in volt seconds² per radian. */
-  public final double ka;
+  /** The acceleration gain, in V/(rad/s²). */
+  private final double ka;
 
   /** Arm feedforward protobuf for serialization. */
   public static final ArmFeedforwardProto proto = new ArmFeedforwardProto();
@@ -69,6 +70,42 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
+   * Returns the static gain.
+   *
+   * @return The static gain, in volts.
+   */
+  public double getKs() {
+    return ks;
+  }
+
+  /**
+   * Returns the gravity gain.
+   *
+   * @return The gravity gain, in volts.
+   */
+  public double getKg() {
+    return kg;
+  }
+
+  /**
+   * Returns the velocity gain.
+   *
+   * @return The velocity gain, in V/(rad/s).
+   */
+  public double getKv() {
+    return kv;
+  }
+
+  /**
+   * Returns the acceleration gain.
+   *
+   * @return The acceleration gain, in V/(rad/s²).
+   */
+  public double getKa() {
+    return ka;
+  }
+
+  /**
    * Calculates the feedforward from the gains and setpoints.
    *
    * @param positionRadians The position (angle) setpoint. This angle should be measured from the
@@ -98,6 +135,23 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    */
   public double calculate(double positionRadians, double velocity) {
     return calculate(positionRadians, velocity, 0);
+  }
+
+  /**
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * @param currentAngle The current angle in radians. This angle should be measured from the
+   *     horizontal (i.e. if the provided angle is 0, the arm should be parallel to the floor). If
+   *     your encoder does not follow this convention, an offset should be added.
+   * @param currentVelocity The current velocity setpoint in radians per second.
+   * @param nextVelocity The next velocity setpoint in radians per second.
+   * @param dt Time between velocity setpoints in seconds.
+   * @return The computed feedforward in volts.
+   */
+  public double calculate(
+      double currentAngle, double currentVelocity, double nextVelocity, double dt) {
+    return ArmFeedforwardJNI.calculate(
+        ks, kv, ka, kg, currentAngle, currentVelocity, nextVelocity, dt);
   }
 
   // Rearranging the main equation from the calculate() method yields the

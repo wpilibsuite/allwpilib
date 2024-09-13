@@ -4,50 +4,73 @@
 
 package edu.wpi.first.hal;
 
+/** Faults for a REV PH. These faults are only active while the condition is active. */
 @SuppressWarnings("MemberName")
 public class REVPHFaults {
+  /** Fault on channel 0. */
   public final boolean Channel0Fault;
 
+  /** Fault on channel 1. */
   public final boolean Channel1Fault;
 
+  /** Fault on channel 2. */
   public final boolean Channel2Fault;
 
+  /** Fault on channel 3. */
   public final boolean Channel3Fault;
 
+  /** Fault on channel 4. */
   public final boolean Channel4Fault;
 
+  /** Fault on channel 5. */
   public final boolean Channel5Fault;
 
+  /** Fault on channel 6. */
   public final boolean Channel6Fault;
 
+  /** Fault on channel 7. */
   public final boolean Channel7Fault;
 
+  /** Fault on channel 8. */
   public final boolean Channel8Fault;
 
+  /** Fault on channel 9. */
   public final boolean Channel9Fault;
 
+  /** Fault on channel 10. */
   public final boolean Channel10Fault;
 
+  /** Fault on channel 11. */
   public final boolean Channel11Fault;
 
+  /** Fault on channel 12. */
   public final boolean Channel12Fault;
 
+  /** Fault on channel 13. */
   public final boolean Channel13Fault;
 
+  /** Fault on channel 14. */
   public final boolean Channel14Fault;
 
+  /** Fault on channel 15. */
   public final boolean Channel15Fault;
 
+  /** An overcurrent event occurred on the compressor output. */
   public final boolean CompressorOverCurrent;
 
+  /** The compressor output has an open circuit. */
   public final boolean CompressorOpen;
 
+  /** An overcurrent event occurred on a solenoid output. */
   public final boolean SolenoidOverCurrent;
 
+  /** The input voltage is below the minimum voltage. */
   public final boolean Brownout;
 
+  /** A warning was raised by the device's CAN controller. */
   public final boolean CanWarning;
 
+  /** The hardware on the device has malfunctioned. */
   public final boolean HardwareFault;
 
   /**
@@ -59,42 +82,25 @@ public class REVPHFaults {
    *     the hardware.
    */
   public final boolean getChannelFault(int channel) {
-    switch (channel) {
-      case 0:
-        return Channel0Fault;
-      case 1:
-        return Channel1Fault;
-      case 2:
-        return Channel2Fault;
-      case 3:
-        return Channel3Fault;
-      case 4:
-        return Channel4Fault;
-      case 5:
-        return Channel5Fault;
-      case 6:
-        return Channel6Fault;
-      case 7:
-        return Channel7Fault;
-      case 8:
-        return Channel8Fault;
-      case 9:
-        return Channel9Fault;
-      case 10:
-        return Channel10Fault;
-      case 11:
-        return Channel11Fault;
-      case 12:
-        return Channel12Fault;
-      case 13:
-        return Channel13Fault;
-      case 14:
-        return Channel14Fault;
-      case 15:
-        return Channel15Fault;
-      default:
-        throw new IndexOutOfBoundsException("Pneumatics fault channel out of bounds!");
-    }
+    return switch (channel) {
+      case 0 -> Channel0Fault;
+      case 1 -> Channel1Fault;
+      case 2 -> Channel2Fault;
+      case 3 -> Channel3Fault;
+      case 4 -> Channel4Fault;
+      case 5 -> Channel5Fault;
+      case 6 -> Channel6Fault;
+      case 7 -> Channel7Fault;
+      case 8 -> Channel8Fault;
+      case 9 -> Channel9Fault;
+      case 10 -> Channel10Fault;
+      case 11 -> Channel11Fault;
+      case 12 -> Channel12Fault;
+      case 13 -> Channel13Fault;
+      case 14 -> Channel14Fault;
+      case 15 -> Channel15Fault;
+      default -> throw new IndexOutOfBoundsException("Pneumatics fault channel out of bounds!");
+    };
   }
 
   /**

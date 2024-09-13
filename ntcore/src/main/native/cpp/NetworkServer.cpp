@@ -224,8 +224,8 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
   wpi::SmallString<128> nameBuf;
   std::string_view name;
   bool err = false;
-  if (wpi::starts_with(path, "/nt/")) {
-    name = wpi::UnescapeURI(wpi::drop_front(path, 4), nameBuf, &err);
+  if (auto uri = wpi::remove_prefix(path, "/nt/")) {
+    name = wpi::UnescapeURI(*uri, nameBuf, &err);
   }
   if (err || name.empty()) {
     INFO("invalid path '{}' (from {}), must match /nt/[clientId], closing",
@@ -323,8 +323,7 @@ NetworkServer::NetworkServer(std::string_view persistentFilename,
     HandleLocal();
 
     // load persistent file first, then initialize
-    uv::QueueWork(
-        m_loop, [this] { LoadPersistent(); }, [this] { Init(); });
+    uv::QueueWork(m_loop, [this] { LoadPersistent(); }, [this] { Init(); });
   });
 }
 
@@ -352,14 +351,16 @@ void NetworkServer::HandleLocal() {
 }
 
 void NetworkServer::LoadPersistent() {
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(m_persistentFilename, ec);
-  if (fileBuffer == nullptr || ec.value() != 0) {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(m_persistentFilename);
+  if (!fileBuffer) {
     INFO(
         "could not open persistent file '{}': {} "
         "(this can be ignored if you aren't expecting persistent values)",
-        m_persistentFilename, ec.message());
+        m_persistentFilename, fileBuffer.error().message());
+    // backup file
+    std::error_code ec;
+    fs::copy_file(m_persistentFilename, m_persistentFilename + ".bak",
+                  std::filesystem::copy_options::overwrite_existing, ec);
     // try to write an empty file so it doesn't happen again
     wpi::raw_fd_ostream os{m_persistentFilename, ec, fs::F_Text};
     if (ec.value() == 0) {
@@ -368,7 +369,8 @@ void NetworkServer::LoadPersistent() {
     }
     return;
   }
-  m_persistentData = std::string{fileBuffer->begin(), fileBuffer->end()};
+  m_persistentData =
+      std::string{fileBuffer.value()->begin(), fileBuffer.value()->end()};
   DEBUG4("read data: {}", m_persistentData);
 }
 

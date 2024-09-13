@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <wpi/deprecated.h>
-
 #include "units/time.h"
 #include "wpimath/MathShared.h"
 
@@ -104,43 +102,10 @@ class TrapezoidProfile {
    * @param constraints The constraints on the profile, like maximum velocity.
    */
   TrapezoidProfile(Constraints constraints);  // NOLINT
-
-  /**
-   * Constructs a TrapezoidProfile.
-   *
-   * @param constraints The constraints on the profile, like maximum velocity.
-   * @param goal        The desired state when the profile is complete.
-   * @param initial     The initial state (usually the current state).
-   * @deprecated Pass the desired and current state into calculate instead of
-   * constructing a new TrapezoidProfile with the desired and current state
-   */
-  WPI_DEPRECATED(
-      "Pass the desired and current state into calculate instead of "
-      "constructing a new TrapezoidProfile with the desired and current "
-      "state")
-  TrapezoidProfile(Constraints constraints, State goal,
-                   State initial = State{Distance_t{0}, Velocity_t{0}});
-
   TrapezoidProfile(const TrapezoidProfile&) = default;
   TrapezoidProfile& operator=(const TrapezoidProfile&) = default;
   TrapezoidProfile(TrapezoidProfile&&) = default;
   TrapezoidProfile& operator=(TrapezoidProfile&&) = default;
-
-  /**
-   * Calculates the position and velocity for the profile at a time t where the
-   * current state is at time t = 0.
-   *
-   * @param t How long to advance from the current state toward the desired
-   *     state.
-   * @return The position and velocity of the profile at time t.
-   * @deprecated Pass the desired and current state into calculate instead of
-   * constructing a new TrapezoidProfile with the desired and current state
-   */
-  [[deprecated(
-      "Pass the desired and current state into calculate instead of "
-      "constructing a new TrapezoidProfile with the desired and current "
-      "state")]]
-  State Calculate(units::second_t t) const;
 
   /**
    * Calculates the position and velocity for the profile at a time t where the
@@ -167,7 +132,7 @@ class TrapezoidProfile {
    *
    * @return The total time the profile takes to reach the goal.
    */
-  units::second_t TotalTime() const { return m_endDeccel; }
+  units::second_t TotalTime() const { return m_endDecel; }
 
   /**
    * Returns true if the profile has reached the goal.
@@ -206,12 +171,10 @@ class TrapezoidProfile {
 
   Constraints m_constraints;
   State m_current;
-  State m_goal;   // TODO: remove
-  bool m_newAPI;  // TODO: remove
 
   units::second_t m_endAccel;
   units::second_t m_endFullSpeed;
-  units::second_t m_endDeccel;
+  units::second_t m_endDecel;
 };
 }  // namespace frc
 

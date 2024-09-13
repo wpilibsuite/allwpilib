@@ -6,9 +6,6 @@ buildscript {
             url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
         }
     }
-    dependencies {
-        classpath 'com.hubspot.jinjava:jinjava:2.7.1'
-    }
 }
 
 plugins {
@@ -114,8 +111,8 @@ subprojects {
 
     plugins.withType(JavaPlugin) {
         java {
-            sourceCompatibility = 11
-            targetCompatibility = 11
+            sourceCompatibility = 17
+            targetCompatibility = 17
         }
     }
 

@@ -8,12 +8,10 @@
 
 #include <hal/SimDevice.h>
 #include <hal/Types.h>
-#include <units/angle.h>
+#include <units/frequency.h>
+#include <units/time.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
-
-#include "frc/AnalogTrigger.h"
-#include "frc/Counter.h"
 
 namespace frc {
 class DutyCycle;
@@ -30,12 +28,16 @@ class DutyCycleEncoder : public wpi::Sendable,
   /**
    * Construct a new DutyCycleEncoder on a specific channel.
    *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   *
    * @param channel the channel to attach to
    */
   explicit DutyCycleEncoder(int channel);
 
   /**
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
+   *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
    *
    * @param dutyCycle the duty cycle to attach to
    */
@@ -44,12 +46,16 @@ class DutyCycleEncoder : public wpi::Sendable,
   /**
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
    *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   *
    * @param dutyCycle the duty cycle to attach to
    */
   explicit DutyCycleEncoder(DutyCycle* dutyCycle);
 
   /**
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
+   *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
    *
    * @param dutyCycle the duty cycle to attach to
    */
@@ -58,12 +64,16 @@ class DutyCycleEncoder : public wpi::Sendable,
   /**
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   *
    * @param digitalSource the digital source to attach to
    */
   explicit DutyCycleEncoder(DigitalSource& digitalSource);
 
   /**
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
+   *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
    *
    * @param digitalSource the digital source to attach to
    */
@@ -72,9 +82,78 @@ class DutyCycleEncoder : public wpi::Sendable,
   /**
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   *
    * @param digitalSource the digital source to attach to
    */
   explicit DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource);
+
+  /**
+   * Construct a new DutyCycleEncoder on a specific channel.
+   *
+   * @param channel the channel to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
+   */
+  DutyCycleEncoder(int channel, double fullRange, double expectedZero);
+
+  /**
+   * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
+   *
+   * @param dutyCycle the duty cycle to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
+   */
+  DutyCycleEncoder(DutyCycle& dutyCycle, double fullRange, double expectedZero);
+
+  /**
+   * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
+   *
+   * @param dutyCycle the duty cycle to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
+   */
+  DutyCycleEncoder(DutyCycle* dutyCycle, double fullRange, double expectedZero);
+
+  /**
+   * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
+   *
+   * @param dutyCycle the duty cycle to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
+   */
+  DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle, double fullRange,
+                   double expectedZero);
+
+  /**
+   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
+   *
+   * @param digitalSource the digital source to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
+   */
+  DutyCycleEncoder(DigitalSource& digitalSource, double fullRange,
+                   double expectedZero);
+
+  /**
+   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
+   *
+   * @param digitalSource the digital source to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
+   */
+  DutyCycleEncoder(DigitalSource* digitalSource, double fullRange,
+                   double expectedZero);
+
+  /**
+   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
+   *
+   * @param digitalSource the digital source to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
+   */
+  DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource,
+                   double fullRange, double expectedZero);
 
   ~DutyCycleEncoder() override = default;
 
@@ -108,52 +187,11 @@ class DutyCycleEncoder : public wpi::Sendable,
   void SetConnectedFrequencyThreshold(int frequency);
 
   /**
-   * Reset the Encoder distance to zero.
+   * Get the encoder value.
+   *
+   * @return the encoder value scaled by the full range input
    */
-  void Reset();
-
-  /**
-   * Get the encoder value since the last reset.
-   *
-   * This is reported in rotations since the last reset.
-   *
-   * @return the encoder value in rotations
-   */
-  units::turn_t Get() const;
-
-  /**
-   * Get the absolute position of the duty cycle encoder encoder.
-   *
-   * <p>GetAbsolutePosition() - GetPositionOffset() will give an encoder
-   * absolute position relative to the last reset. This could potentially be
-   * negative, which needs to be accounted for.
-   *
-   * <p>This will not account for rollovers, and will always be just the raw
-   * absolute position.
-   *
-   * @return the absolute position
-   */
-  double GetAbsolutePosition() const;
-
-  /**
-   * Get the offset of position relative to the last reset.
-   *
-   * GetAbsolutePosition() - GetPositionOffset() will give an encoder absolute
-   * position relative to the last reset. This could potentially be negative,
-   * which needs to be accounted for.
-   *
-   * @return the position offset
-   */
-  double GetPositionOffset() const;
-
-  /**
-   * Set the position offset.
-   *
-   * <p>This must be in the range of 0-1.
-   *
-   * @param offset the offset
-   */
-  void SetPositionOffset(double offset);
+  double Get() const;
 
   /**
    * Set the encoder duty cycle range. As the encoder needs to maintain a duty
@@ -171,32 +209,24 @@ class DutyCycleEncoder : public wpi::Sendable,
   void SetDutyCycleRange(double min, double max);
 
   /**
-   * Set the distance per rotation of the encoder. This sets the multiplier used
-   * to determine the distance driven based on the rotation value from the
-   * encoder. Set this value based on the how far the mechanism travels in 1
-   * rotation of the encoder, and factor in gearing reductions following the
-   * encoder shaft. This distance can be in any units you like, linear or
-   * angular.
+   * Sets the assumed frequency of the connected device.
    *
-   * @param distancePerRotation the distance per rotation of the encoder
+   * <p>By default, the DutyCycle engine has to compute the frequency of the
+   * input signal. This can result in both delayed readings and jumpy readings.
+   * To solve this, you can pass the expected frequency of the sensor to this
+   * function. This will use that frequency to compute the DutyCycle percentage,
+   * rather than the computed frequency.
+   *
+   * @param frequency the assumed frequency of the sensor
    */
-  void SetDistancePerRotation(double distancePerRotation);
+  void SetAssumedFrequency(units::hertz_t frequency);
 
   /**
-   * Get the distance per rotation for this encoder.
+   * Set if this encoder is inverted.
    *
-   * @return The scale factor that will be used to convert rotation to useful
-   * units.
+   * @param inverted true to invert the encoder, false otherwise
    */
-  double GetDistancePerRotation() const;
-
-  /**
-   * Get the distance the sensor has driven since the last reset as scaled by
-   * the value from SetDistancePerRotation.
-   *
-   * @return The distance driven since the last reset
-   */
-  double GetDistance() const;
+  void SetInverted(bool inverted);
 
   /**
    * Get the FPGA index for the DutyCycleEncoder.
@@ -215,23 +245,20 @@ class DutyCycleEncoder : public wpi::Sendable,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  void Init();
+  void Init(double fullRange, double expectedZero);
   double MapSensorRange(double pos) const;
 
   std::shared_ptr<DutyCycle> m_dutyCycle;
-  std::unique_ptr<AnalogTrigger> m_analogTrigger;
-  std::unique_ptr<Counter> m_counter;
   int m_frequencyThreshold = 100;
-  double m_positionOffset = 0;
-  double m_distancePerRotation = 1.0;
-  mutable units::turn_t m_lastPosition{0.0};
-  double m_sensorMin = 0;
-  double m_sensorMax = 1;
+  double m_fullRange;
+  double m_expectedZero;
+  units::second_t m_period{0_s};
+  double m_sensorMin{0.0};
+  double m_sensorMax{1.0};
+  bool m_isInverted{false};
 
   hal::SimDevice m_simDevice;
   hal::SimDouble m_simPosition;
-  hal::SimDouble m_simAbsolutePosition;
-  hal::SimDouble m_simDistancePerRotation;
   hal::SimBoolean m_simIsConnected;
 };
 }  // namespace frc

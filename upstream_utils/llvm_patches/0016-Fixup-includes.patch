@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:38:11 -0400
-Subject: [PATCH 16/34] Fixup includes
+Subject: [PATCH 16/37] Fixup includes
 
 ---
  llvm/include/llvm/ADT/StringMap.h                 |  4 ++++
@@ -91,7 +91,7 @@ index 0b87b375de67dc18647e3ebe646bf323dd05e8c5..3a88178cfbbcf7062a958c7de820247b
  
  using namespace llvm;
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index b2a726633b48b179abfd24a5de110a2301e0f877..3b7d8d6db5f0df31e18b91be716a4fd21e7e3549 100644
+index 5bec803ccc76ce287b7ff3ea037d5e490a7af20c..ae5428825f7f62ad8e742490448d40aea7506990 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -15,6 +15,8 @@
@@ -102,8 +102,8 @@ index b2a726633b48b179abfd24a5de110a2301e0f877..3b7d8d6db5f0df31e18b91be716a4fd2
 +#include "wpi/SmallVector.h"
  #include "llvm/ADT/StringExtras.h"
  #include "llvm/Config/config.h"
- #include "llvm/Support/Compiler.h"
-@@ -32,12 +34,11 @@
+ #include "llvm/Support/AutoConvert.h"
+@@ -33,12 +35,11 @@
  #include <sys/stat.h>
  
  // <fcntl.h> may provide O_BINARY.
@@ -119,7 +119,7 @@ index b2a726633b48b179abfd24a5de110a2301e0f877..3b7d8d6db5f0df31e18b91be716a4fd2
  #endif
  
  #if defined(__CYGWIN__)
-@@ -60,7 +61,7 @@
+@@ -61,7 +62,7 @@
  #ifdef _WIN32
  #include "llvm/Support/ConvertUTF.h"
  #include "llvm/Support/Signals.h"

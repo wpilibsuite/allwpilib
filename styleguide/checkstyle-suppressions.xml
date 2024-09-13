@@ -12,4 +12,8 @@ suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
     checks="(EmptyLineSeparator|LineLength|MissingJavadocMethod|ParameterName)" />
   <suppress files=".*math[/\\]proto.*"
     checks="(CustomImportOrder|EmptyLineSeparator|LineLength|JavadocParagraph|MissingJavadocMethod|OverloadMethodsDeclarationOrder|SummaryJavadoc|UnnecessaryParentheses|OperatorWrap|JavadocMethod|JavadocTagContinuationIndentation)" />
+  <suppress files="wpilibj[/\\]src[/\\]generated.*"
+    checks="MethodName" />
+  <!-- Disable checkstyle for generated unit files -->
+  <suppress files="wpiunits[/\\]src[/\\]generated.*" checks=".*"/>
 </suppressions>

@@ -123,6 +123,11 @@ public class DIOJNI extends JNIWrapper {
    */
   public static native boolean isAnyPulsing();
 
+  /**
+   * Gets the loop timing of the PWM system.
+   *
+   * @return the loop time in clock ticks
+   */
   public static native short getLoopTiming();
 
   /**

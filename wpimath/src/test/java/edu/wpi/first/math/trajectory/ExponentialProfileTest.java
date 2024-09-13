@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.trajectory;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.Test;
 class ExponentialProfileTest {
   private static final double kDt = 0.01;
   private static final SimpleMotorFeedforward feedforward =
-      new SimpleMotorFeedforward(0, 2.5629, 0.43277);
+      new SimpleMotorFeedforward(0, 2.5629, 0.43277, kDt);
   private static final ExponentialProfile.Constraints constraints =
       ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
 
@@ -43,10 +44,11 @@ class ExponentialProfileTest {
   private static ExponentialProfile.State checkDynamics(
       ExponentialProfile profile, ExponentialProfile.State current, ExponentialProfile.State goal) {
     var next = profile.calculate(kDt, current, goal);
+    var currentVelocity = RadiansPerSecond.mutable(current.velocity);
+    var nextVelocity = RadiansPerSecond.mutable(next.velocity);
+    var signal = feedforward.calculate(currentVelocity, nextVelocity);
 
-    var signal = feedforward.calculate(current.velocity, next.velocity, kDt);
-
-    assertTrue(Math.abs(signal) < constraints.maxInput + 1e-9);
+    assertTrue(Math.abs(signal.magnitude()) < constraints.maxInput + 1e-9);
 
     return next;
   }

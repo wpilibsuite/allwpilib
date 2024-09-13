@@ -8,7 +8,7 @@ Subject: [PATCH 2/2] Add hypot(x, y, z)
  1 file changed, 82 insertions(+), 3 deletions(-)
 
 diff --git a/include/gcem_incl/hypot.hpp b/include/gcem_incl/hypot.hpp
-index 00e10f899ace8f0da925fa9e46fa3f79f7e83aa0..13ea80c49d374c23434c1f9859bb6474184dc420 100644
+index 22a402066430f4fde68f9d622ccdf7c646a3cbd6..4e7523ab85b75e5daf34a2ea34e1d98f79703ac9 100644
 --- a/include/gcem_incl/hypot.hpp
 +++ b/include/gcem_incl/hypot.hpp
 @@ -27,6 +27,7 @@

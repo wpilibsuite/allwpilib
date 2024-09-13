@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 10 Aug 2022 22:35:00 -0700
-Subject: [PATCH 27/34] Remove StringMap test for llvm::sort()
+Subject: [PATCH 27/37] Remove StringMap test for llvm::sort()
 
 ---
  llvm/unittests/ADT/StringMapTest.cpp | 14 --------------

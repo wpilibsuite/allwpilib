@@ -272,10 +272,10 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     std::string_view locationRef{location};
     std::string_view callStackRef{callStack};
 
-    // 1 tag, 4 timestamp, 2 seqnum
+    // 2 size, 1 tag, 4 timestamp, 2 seqnum
     // 2 numOccur, 4 error code, 1 flags, 6 strlen
     // 1 extra needed for padding on Netcomm end.
-    size_t baseLength = 21;
+    size_t baseLength = 23;
 
     if (baseLength + detailsRef.size() + locationRef.size() +
             callStackRef.size() <=
@@ -424,22 +424,15 @@ int32_t HAL_GetJoystickType(int32_t joystickNum) {
   }
 }
 
-char* HAL_GetJoystickName(int32_t joystickNum) {
+void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
+  const char* cName = joystickDesc.name;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
-    char* name = static_cast<char*>(std::malloc(1));
-    name[0] = '\0';
-    return name;
-  } else {
-    const size_t len = std::strlen(joystickDesc.name) + 1;
-    char* name = static_cast<char*>(std::malloc(len));
-    std::memcpy(name, joystickDesc.name, len);
-    return name;
+    cName = "";
   }
-}
-
-void HAL_FreeJoystickName(char* name) {
-  std::free(name);
+  auto len = std::strlen(cName);
+  auto write = WPI_AllocateString(name, len);
+  std::memcpy(write, cName, len);
 }
 
 int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {

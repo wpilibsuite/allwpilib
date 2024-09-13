@@ -44,9 +44,6 @@ import java.util.function.DoubleConsumer;
  * positive Z axis points up. Rotations follow the right-hand rule, so counterclockwise rotation
  * around the Z axis is positive.
  *
- * <p>Note: the axis conventions used in this class differ from DifferentialDrive. This may change
- * in a future year's WPILib release.
- *
  * <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#kDefaultDeadband} will
  * be set to 0, and larger values will be scaled so that the full range is still used. This deadband
  * value can be changed with {@link #setDeadband}.
@@ -181,7 +178,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    *     positive.
    */
   public void driveCartesian(double xSpeed, double ySpeed, double zRotation) {
-    driveCartesian(xSpeed, ySpeed, zRotation, new Rotation2d());
+    driveCartesian(xSpeed, ySpeed, zRotation, Rotation2d.kZero);
   }
 
   /**
@@ -240,7 +237,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     }
 
     driveCartesian(
-        magnitude * angle.getCos(), magnitude * angle.getSin(), zRotation, new Rotation2d());
+        magnitude * angle.getCos(), magnitude * angle.getSin(), zRotation, Rotation2d.kZero);
   }
 
   /**
@@ -256,7 +253,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * @return Wheel speeds [-1.0..1.0].
    */
   public static WheelSpeeds driveCartesianIK(double xSpeed, double ySpeed, double zRotation) {
-    return driveCartesianIK(xSpeed, ySpeed, zRotation, new Rotation2d());
+    return driveCartesianIK(xSpeed, ySpeed, zRotation, Rotation2d.kZero);
   }
 
   /**

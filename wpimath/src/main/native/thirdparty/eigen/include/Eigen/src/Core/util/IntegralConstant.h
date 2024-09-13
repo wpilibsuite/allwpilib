@@ -54,65 +54,60 @@ class VariableAndFixedInt;
 template <int N>
 class FixedInt {
  public:
-  static const int value = N;
-  EIGEN_CONSTEXPR operator int() const { return value; }
+  static constexpr int value = N;
+  constexpr operator int() const { return N; }
 
-  EIGEN_CONSTEXPR
-  FixedInt() = default;
+  constexpr FixedInt() = default;
+  constexpr FixedInt(std::integral_constant<int, N>) {}
 
-  EIGEN_CONSTEXPR
-  FixedInt(std::integral_constant<int, N>) {}
-
-  EIGEN_CONSTEXPR
-  FixedInt(VariableAndFixedInt<N> other) {
+  constexpr FixedInt(VariableAndFixedInt<N> other) {
 #ifndef EIGEN_INTERNAL_DEBUGGING
     EIGEN_UNUSED_VARIABLE(other);
 #endif
     eigen_internal_assert(int(other) == N);
   }
 
-  EIGEN_CONSTEXPR
-  FixedInt<-N> operator-() const { return FixedInt<-N>(); }
+  constexpr FixedInt<-N> operator-() const { return FixedInt<-N>(); }
 
   template <int M>
-  EIGEN_CONSTEXPR FixedInt<N + M> operator+(FixedInt<M>) const {
+  constexpr FixedInt<N + M> operator+(FixedInt<M>) const {
     return FixedInt<N + M>();
   }
 
   template <int M>
-  EIGEN_CONSTEXPR FixedInt<N - M> operator-(FixedInt<M>) const {
+  constexpr FixedInt<N - M> operator-(FixedInt<M>) const {
     return FixedInt<N - M>();
   }
 
   template <int M>
-  EIGEN_CONSTEXPR FixedInt<N * M> operator*(FixedInt<M>) const {
+  constexpr FixedInt<N * M> operator*(FixedInt<M>) const {
     return FixedInt<N * M>();
   }
 
   template <int M>
-  EIGEN_CONSTEXPR FixedInt<N / M> operator/(FixedInt<M>) const {
+  constexpr FixedInt<N / M> operator/(FixedInt<M>) const {
     return FixedInt<N / M>();
   }
 
   template <int M>
-  EIGEN_CONSTEXPR FixedInt<N % M> operator%(FixedInt<M>) const {
+  constexpr FixedInt<N % M> operator%(FixedInt<M>) const {
     return FixedInt<N % M>();
   }
 
   template <int M>
-  EIGEN_CONSTEXPR FixedInt<N | M> operator|(FixedInt<M>) const {
+  constexpr FixedInt<N | M> operator|(FixedInt<M>) const {
     return FixedInt<N | M>();
   }
 
   template <int M>
-  EIGEN_CONSTEXPR FixedInt<N & M> operator&(FixedInt<M>) const {
+  constexpr FixedInt<N & M> operator&(FixedInt<M>) const {
     return FixedInt<N & M>();
   }
 
   // Needed in C++14 to allow fix<N>():
-  EIGEN_CONSTEXPR FixedInt operator()() const { return *this; }
+  constexpr FixedInt operator()() const { return *this; }
 
-  VariableAndFixedInt<N> operator()(int val) const { return VariableAndFixedInt<N>(val); }
+  constexpr VariableAndFixedInt<N> operator()(int val) const { return VariableAndFixedInt<N>(val); }
 };
 
 /** \internal
@@ -268,8 +263,8 @@ static const auto fix();
  * }
  * \endcode
  * In this example, the function Eigen::seqN knows that the second argument is expected to be a size.
- * If the passed compile-time value N equals Eigen::Dynamic, then the proxy object returned by fix will be dissmissed,
- * and converted to an Eigen::Index of value \c n. Otherwise, the runtime-value \c n will be dissmissed, and the
+ * If the passed compile-time value N equals Eigen::Dynamic, then the proxy object returned by fix will be dismissed,
+ * and converted to an Eigen::Index of value \c n. Otherwise, the runtime-value \c n will be dismissed, and the
  * returned ArithmeticSequence will be of the exact same type as <tt> seqN(0,fix<N>) </tt>.
  *
  * \sa fix, seqN, class ArithmeticSequence

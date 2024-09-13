@@ -99,12 +99,8 @@ public class AprilTagDetector implements AutoCloseable {
 
     @Override
     public boolean equals(Object obj) {
-      if (!(obj instanceof Config)) {
-        return false;
-      }
-
-      Config other = (Config) obj;
-      return numThreads == other.numThreads
+      return obj instanceof Config other
+          && numThreads == other.numThreads
           && quadDecimate == other.quadDecimate
           && quadSigma == other.quadSigma
           && refineEdges == other.refineEdges
@@ -116,8 +112,8 @@ public class AprilTagDetector implements AutoCloseable {
   /** Quad threshold parameters. */
   @SuppressWarnings("MemberName")
   public static class QuadThresholdParameters {
-    /** Threshold used to reject quads containing too few pixels. Default is 5 pixels. */
-    public int minClusterPixels = 5;
+    /** Threshold used to reject quads containing too few pixels. Default is 300 pixels. */
+    public int minClusterPixels = 300;
 
     /**
      * How many corner candidates to consider when segmenting a group of pixels into a quad. Default
@@ -128,9 +124,9 @@ public class AprilTagDetector implements AutoCloseable {
     /**
      * Critical angle, in radians. The detector will reject quads where pairs of edges have angles
      * that are close to straight or close to 180 degrees. Zero means that no quads are rejected.
-     * Default is 10 degrees.
+     * Default is 45 degrees.
      */
-    public double criticalAngle = 10 * Math.PI / 180.0;
+    public double criticalAngle = 45 * Math.PI / 180.0;
 
     /**
      * When fitting lines to the contours, the maximum mean squared error allowed. This is useful in
@@ -194,12 +190,8 @@ public class AprilTagDetector implements AutoCloseable {
 
     @Override
     public boolean equals(Object obj) {
-      if (!(obj instanceof QuadThresholdParameters)) {
-        return false;
-      }
-
-      QuadThresholdParameters other = (QuadThresholdParameters) obj;
-      return minClusterPixels == other.minClusterPixels
+      return obj instanceof QuadThresholdParameters other
+          && minClusterPixels == other.minClusterPixels
           && maxNumMaxima == other.maxNumMaxima
           && criticalAngle == other.criticalAngle
           && maxLineFitMSE == other.maxLineFitMSE
@@ -209,8 +201,10 @@ public class AprilTagDetector implements AutoCloseable {
   }
 
   /** Constructs an AprilTagDetector. */
+  @SuppressWarnings("this-escape")
   public AprilTagDetector() {
     m_native = AprilTagJNI.createDetector();
+    setQuadThresholdParameters(new QuadThresholdParameters());
   }
 
   @Override

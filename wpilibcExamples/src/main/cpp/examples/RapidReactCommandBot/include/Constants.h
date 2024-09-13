@@ -24,7 +24,7 @@ inline constexpr bool kLeftEncoderReversed = false;
 inline constexpr bool kRightEncoderReversed = true;
 
 inline constexpr double kEncoderCPR = 1024;
-inline constexpr units::meter_t kWheelDiameter = 6.0_in;
+inline constexpr units::meter_t kWheelDiameter = 6_in;
 inline constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
     ((kWheelDiameter * std::numbers::pi) / kEncoderCPR).value();
@@ -45,9 +45,8 @@ namespace ShooterConstants {
 inline constexpr int kEncoderPorts[]{4, 5};
 inline constexpr bool kEncoderReversed = false;
 inline constexpr double kEncoderCPR = 1024;
-inline constexpr double kEncoderDistancePerPulse =
-    // Distance units will be rotations
-    1.0 / kEncoderCPR;
+// Distance units will be rotations
+inline constexpr double kEncoderDistancePerPulse = 1.0 / kEncoderCPR;
 
 inline constexpr int kShooterMotorPort = 4;
 inline constexpr int kFeederMotorPort = 5;
@@ -61,9 +60,8 @@ inline constexpr auto kShooterTolerance = 50_tps;
 inline constexpr double kP = 1;
 
 inline constexpr units::volt_t kS = 0.05_V;
-inline constexpr auto kV =
-    // Should have value 12V at free speed...
-    12.0_V / kShooterFree;
+// Should have value 12V at free speed
+inline constexpr auto kV = 12_V / kShooterFree;
 
 inline constexpr double kFeederSpeed = 0.5;
 }  // namespace ShooterConstants
@@ -73,7 +71,7 @@ inline constexpr int kDriverControllerPort = 0;
 }  // namespace OIConstants
 
 namespace AutoConstants {
-constexpr units::second_t kTimeout = 3.0_s;
-constexpr units::meter_t kDriveDistance = 2.0_m;
+constexpr units::second_t kTimeout = 3_s;
+constexpr units::meter_t kDriveDistance = 2_m;
 constexpr double kDriveSpeed = 0.5;
 }  // namespace AutoConstants

@@ -12,10 +12,13 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
+import edu.wpi.first.math.kinematics.proto.SwerveDriveKinematicsProto;
+import edu.wpi.first.math.kinematics.struct.SwerveDriveKinematicsStruct;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
 
@@ -39,33 +42,18 @@ import org.ejml.simple.SimpleMatrix;
  * <p>Forward kinematics is also used for odometry -- determining the position of the robot on the
  * field using encoders and a gyro.
  */
+@SuppressWarnings("overrides")
 public class SwerveDriveKinematics
-    implements Kinematics<SwerveDriveKinematics.SwerveDriveWheelStates, SwerveDriveWheelPositions> {
-  /** Wrapper class for swerve module states. */
-  public static class SwerveDriveWheelStates {
-    /** Swerve module states. */
-    public SwerveModuleState[] states;
-
-    /**
-     * Creates a new SwerveDriveWheelStates instance.
-     *
-     * @param states The swerve module states. This will be deeply copied.
-     */
-    public SwerveDriveWheelStates(SwerveModuleState[] states) {
-      this.states = new SwerveModuleState[states.length];
-      for (int i = 0; i < states.length; i++) {
-        this.states[i] = new SwerveModuleState(states[i].speedMetersPerSecond, states[i].angle);
-      }
-    }
-  }
-
+    implements Kinematics<SwerveModuleState[], SwerveModulePosition[]>,
+        ProtobufSerializable,
+        StructSerializable {
   private final SimpleMatrix m_inverseKinematics;
   private final SimpleMatrix m_forwardKinematics;
 
   private final int m_numModules;
   private final Translation2d[] m_modules;
   private Rotation2d[] m_moduleHeadings;
-  private Translation2d m_prevCoR = new Translation2d();
+  private Translation2d m_prevCoR = Translation2d.kZero;
 
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable number of module
@@ -84,7 +72,7 @@ public class SwerveDriveKinematics
     m_numModules = moduleTranslationsMeters.length;
     m_modules = Arrays.copyOf(moduleTranslationsMeters, m_numModules);
     m_moduleHeadings = new Rotation2d[m_numModules];
-    Arrays.fill(m_moduleHeadings, new Rotation2d());
+    Arrays.fill(m_moduleHeadings, Rotation2d.kZero);
     m_inverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
 
     for (int i = 0; i < m_numModules; i++) {
@@ -196,12 +184,12 @@ public class SwerveDriveKinematics
    * @return An array containing the module states.
    */
   public SwerveModuleState[] toSwerveModuleStates(ChassisSpeeds chassisSpeeds) {
-    return toSwerveModuleStates(chassisSpeeds, new Translation2d());
+    return toSwerveModuleStates(chassisSpeeds, Translation2d.kZero);
   }
 
   @Override
-  public SwerveDriveWheelStates toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
-    return new SwerveDriveWheelStates(toSwerveModuleStates(chassisSpeeds));
+  public SwerveModuleState[] toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
+    return toSwerveModuleStates(chassisSpeeds);
   }
 
   /**
@@ -214,6 +202,7 @@ public class SwerveDriveKinematics
    *     passed into the constructor of this class.
    * @return The resulting chassis speed.
    */
+  @Override
   public ChassisSpeeds toChassisSpeeds(SwerveModuleState... moduleStates) {
     if (moduleStates.length != m_numModules) {
       throw new IllegalArgumentException(
@@ -233,11 +222,6 @@ public class SwerveDriveKinematics
         chassisSpeedsVector.get(0, 0),
         chassisSpeedsVector.get(1, 0),
         chassisSpeedsVector.get(2, 0));
-  }
-
-  @Override
-  public ChassisSpeeds toChassisSpeeds(SwerveDriveWheelStates wheelStates) {
-    return toChassisSpeeds(wheelStates.states);
   }
 
   /**
@@ -270,17 +254,14 @@ public class SwerveDriveKinematics
   }
 
   @Override
-  public Twist2d toTwist2d(SwerveDriveWheelPositions start, SwerveDriveWheelPositions end) {
-    if (start.positions.length != end.positions.length) {
+  public Twist2d toTwist2d(SwerveModulePosition[] start, SwerveModulePosition[] end) {
+    if (start.length != end.length) {
       throw new IllegalArgumentException("Inconsistent number of modules!");
     }
-    var newPositions = new SwerveModulePosition[start.positions.length];
-    for (int i = 0; i < start.positions.length; i++) {
-      var startModule = start.positions[i];
-      var endModule = end.positions[i];
+    var newPositions = new SwerveModulePosition[start.length];
+    for (int i = 0; i < start.length; i++) {
       newPositions[i] =
-          new SwerveModulePosition(
-              endModule.distanceMeters - startModule.distanceMeters, endModule.angle);
+          new SwerveModulePosition(end[i].distanceMeters - start[i].distanceMeters, end[i].angle);
     }
     return toTwist2d(newPositions);
   }
@@ -324,7 +305,7 @@ public class SwerveDriveKinematics
    * @param attainableMaxSpeed The absolute max speed that a module can reach.
    */
   public static void desaturateWheelSpeeds(
-      SwerveModuleState[] moduleStates, Measure<Velocity<Distance>> attainableMaxSpeed) {
+      SwerveModuleState[] moduleStates, LinearVelocity attainableMaxSpeed) {
     desaturateWheelSpeeds(moduleStates, attainableMaxSpeed.in(MetersPerSecond));
   }
 
@@ -396,14 +377,71 @@ public class SwerveDriveKinematics
   public static void desaturateWheelSpeeds(
       SwerveModuleState[] moduleStates,
       ChassisSpeeds desiredChassisSpeed,
-      Measure<Velocity<Distance>> attainableMaxModuleSpeed,
-      Measure<Velocity<Distance>> attainableMaxTranslationalSpeed,
-      Measure<Velocity<Angle>> attainableMaxRotationalVelocity) {
+      LinearVelocity attainableMaxModuleSpeed,
+      LinearVelocity attainableMaxTranslationalSpeed,
+      AngularVelocity attainableMaxRotationalVelocity) {
     desaturateWheelSpeeds(
         moduleStates,
         desiredChassisSpeed,
         attainableMaxModuleSpeed.in(MetersPerSecond),
         attainableMaxTranslationalSpeed.in(MetersPerSecond),
         attainableMaxRotationalVelocity.in(RadiansPerSecond));
+  }
+
+  @Override
+  public SwerveModulePosition[] copy(SwerveModulePosition[] positions) {
+    var newPositions = new SwerveModulePosition[positions.length];
+    for (int i = 0; i < positions.length; ++i) {
+      newPositions[i] = positions[i].copy();
+    }
+    return newPositions;
+  }
+
+  @Override
+  public void copyInto(SwerveModulePosition[] positions, SwerveModulePosition[] output) {
+    if (positions.length != output.length) {
+      throw new IllegalArgumentException("Inconsistent number of modules!");
+    }
+    for (int i = 0; i < positions.length; ++i) {
+      output[i].distanceMeters = positions[i].distanceMeters;
+      output[i].angle = positions[i].angle;
+    }
+  }
+
+  @Override
+  public SwerveModulePosition[] interpolate(
+      SwerveModulePosition[] startValue, SwerveModulePosition[] endValue, double t) {
+    if (endValue.length != startValue.length) {
+      throw new IllegalArgumentException("Inconsistent number of modules!");
+    }
+    var newPositions = new SwerveModulePosition[startValue.length];
+    for (int i = 0; i < startValue.length; ++i) {
+      newPositions[i] = startValue[i].interpolate(endValue[i], t);
+    }
+    return newPositions;
+  }
+
+  /**
+   * Gets the locations of the modules relative to the center of rotation.
+   *
+   * @return The locations of the modules relative to the center of rotation. This array should not
+   *     be modified.
+   */
+  @SuppressWarnings("PMD.MethodReturnsInternalArray")
+  public Translation2d[] getModules() {
+    return m_modules;
+  }
+
+  /** SwerveDriveKinematics protobuf for serialization. */
+  public static final SwerveDriveKinematicsProto proto = new SwerveDriveKinematicsProto();
+
+  /**
+   * Creates an implementation of the {@link Struct} interface for swerve drive kinematics objects.
+   *
+   * @param numModules The number of modules of the kinematics objects this serializer processes.
+   * @return The struct implementation.
+   */
+  public static final SwerveDriveKinematicsStruct getStruct(int numModules) {
+    return new SwerveDriveKinematicsStruct(numModules);
   }
 }

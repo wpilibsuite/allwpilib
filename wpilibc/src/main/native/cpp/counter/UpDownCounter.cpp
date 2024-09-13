@@ -55,11 +55,6 @@ UpDownCounter::UpDownCounter(std::shared_ptr<DigitalSource> upSource,
   wpi::SendableRegistry::AddLW(this, "UpDown Counter", m_index);
 }
 
-UpDownCounter::~UpDownCounter() {
-  int32_t status = 0;
-  HAL_FreeCounter(m_handle, &status);
-}
-
 int UpDownCounter::GetCount() const {
   int32_t status = 0;
   int val = HAL_GetCounter(m_handle, &status);
@@ -101,6 +96,5 @@ void UpDownCounter::SetDownEdgeConfiguration(EdgeConfiguration configuration) {
 
 void UpDownCounter::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("UpDown Counter");
-  builder.AddDoubleProperty(
-      "Count", [&] { return GetCount(); }, nullptr);
+  builder.AddDoubleProperty("Count", [&] { return GetCount(); }, nullptr);
 }

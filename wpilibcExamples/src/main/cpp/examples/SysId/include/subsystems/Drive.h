@@ -39,8 +39,7 @@ class Drive : public frc2::SubsystemBase {
                               constants::drive::kRightEncoderReversed};
 
   frc2::sysid::SysIdRoutine m_sysIdRoutine{
-      frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt,
-                          std::nullopt},
+      frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
       frc2::sysid::Mechanism{
           [this](units::volt_t driveVoltage) {
             m_leftMotor.SetVoltage(driveVoltage);

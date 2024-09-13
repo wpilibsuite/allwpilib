@@ -25,8 +25,7 @@ class TrajectoryGeneratorTest {
     final double maxAccel = feetToMeters(12);
 
     // 2018 cross scale auto waypoints.
-    var sideStart =
-        new Pose2d(feetToMeters(1.54), feetToMeters(23.23), Rotation2d.fromDegrees(-180));
+    var sideStart = new Pose2d(feetToMeters(1.54), feetToMeters(23.23), Rotation2d.kPi);
     var crossScale =
         new Pose2d(feetToMeters(23.7), feetToMeters(6.8), Rotation2d.fromDegrees(-160));
 
@@ -35,12 +34,11 @@ class TrajectoryGeneratorTest {
     waypoints.add(
         sideStart.plus(
             new Transform2d(
-                new Translation2d(feetToMeters(-13), feetToMeters(0)), new Rotation2d())));
+                new Translation2d(feetToMeters(-13), feetToMeters(0)), Rotation2d.kZero)));
     waypoints.add(
         sideStart.plus(
             new Transform2d(
-                new Translation2d(feetToMeters(-19.5), feetToMeters(5)),
-                Rotation2d.fromDegrees(-90))));
+                new Translation2d(feetToMeters(-19.5), feetToMeters(5)), Rotation2d.kCW_Pi_2)));
     waypoints.add(crossScale);
 
     TrajectoryConfig config =
@@ -72,9 +70,7 @@ class TrajectoryGeneratorTest {
   void testMalformedTrajectory() {
     var traj =
         TrajectoryGenerator.generateTrajectory(
-            List.of(
-                new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-                new Pose2d(1, 0, Rotation2d.fromDegrees(180))),
+            List.of(Pose2d.kZero, new Pose2d(1, 0, Rotation2d.kPi)),
             new TrajectoryConfig(feetToMeters(12), feetToMeters(12)));
 
     assertEquals(traj.getStates().size(), 1);
@@ -86,11 +82,11 @@ class TrajectoryGeneratorTest {
     Trajectory t =
         TrajectoryGenerator.generateTrajectory(
             List.of(
-                new Pose2d(1, 0, Rotation2d.fromDegrees(90)),
-                new Pose2d(0, 1, Rotation2d.fromDegrees(180)),
-                new Pose2d(-1, 0, Rotation2d.fromDegrees(270)),
-                new Pose2d(0, -1, Rotation2d.fromDegrees(360)),
-                new Pose2d(1, 0, Rotation2d.fromDegrees(90))),
+                new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
+                new Pose2d(0, 1, Rotation2d.kPi),
+                new Pose2d(-1, 0, Rotation2d.kCW_Pi_2),
+                new Pose2d(0, -1, Rotation2d.kZero),
+                new Pose2d(1, 0, Rotation2d.kCCW_Pi_2)),
             new TrajectoryConfig(2, 2));
 
     for (int i = 1; i < t.getStates().size() - 1; ++i) {

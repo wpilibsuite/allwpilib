@@ -11,8 +11,8 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::ElevatorFeedforward> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:ElevatorFeedforward";
+  static constexpr std::string_view GetTypeName() {
+    return "ElevatorFeedforward";
   }
   static constexpr size_t GetSize() { return 32; }
   static constexpr std::string_view GetSchema() {

@@ -4,62 +4,100 @@
 
 package edu.wpi.first.hal;
 
+/**
+ * Sticky faults for a PowerDistribution device. These faults will remain active until they are
+ * reset by the user.
+ */
 @SuppressWarnings("MemberName")
 public class PowerDistributionStickyFaults {
+  /** Breaker fault on channel 0. */
   public final boolean Channel0BreakerFault;
 
+  /** Breaker fault on channel 1. */
   public final boolean Channel1BreakerFault;
 
+  /** Breaker fault on channel 2. */
   public final boolean Channel2BreakerFault;
 
+  /** Breaker fault on channel 3. */
   public final boolean Channel3BreakerFault;
 
+  /** Breaker fault on channel 4. */
   public final boolean Channel4BreakerFault;
 
+  /** Breaker fault on channel 5. */
   public final boolean Channel5BreakerFault;
 
+  /** Breaker fault on channel 6. */
   public final boolean Channel6BreakerFault;
 
+  /** Breaker fault on channel 7. */
   public final boolean Channel7BreakerFault;
 
+  /** Breaker fault on channel 8. */
   public final boolean Channel8BreakerFault;
 
+  /** Breaker fault on channel 9. */
   public final boolean Channel9BreakerFault;
 
+  /** Breaker fault on channel 10. */
   public final boolean Channel10BreakerFault;
 
+  /** Breaker fault on channel 11. */
   public final boolean Channel11BreakerFault;
 
+  /** Breaker fault on channel 12. */
   public final boolean Channel12BreakerFault;
 
+  /** Breaker fault on channel 13. */
   public final boolean Channel13BreakerFault;
 
+  /** Breaker fault on channel 14. */
   public final boolean Channel14BreakerFault;
 
+  /** Breaker fault on channel 15. */
   public final boolean Channel15BreakerFault;
 
+  /** Breaker fault on channel 16. */
   public final boolean Channel16BreakerFault;
 
+  /** Breaker fault on channel 17. */
   public final boolean Channel17BreakerFault;
 
+  /** Breaker fault on channel 18. */
   public final boolean Channel18BreakerFault;
 
+  /** Breaker fault on channel 19. */
   public final boolean Channel19BreakerFault;
 
+  /** Breaker fault on channel 20. */
   public final boolean Channel20BreakerFault;
 
+  /** Breaker fault on channel 21. */
   public final boolean Channel21BreakerFault;
 
+  /** Breaker fault on channel 22. */
   public final boolean Channel22BreakerFault;
 
+  /** Breaker fault on channel 23. */
   public final boolean Channel23BreakerFault;
 
+  /** The input voltage was below the minimum voltage. */
   public final boolean Brownout;
 
+  /** A warning was raised by the device's CAN controller. */
   public final boolean CanWarning;
 
+  /** The device's CAN controller experienced a "Bus Off" event. */
   public final boolean CanBusOff;
 
+  /** The hardware on the device has malfunctioned. */
+  public final boolean HardwareFault;
+
+  /** The firmware on the device has malfunctioned. */
+  public final boolean FirmwareFault;
+
+  /** The device has rebooted. */
   public final boolean HasReset;
 
   /**
@@ -71,58 +109,34 @@ public class PowerDistributionStickyFaults {
    *     the hardware.
    */
   public final boolean getBreakerFault(int channel) {
-    switch (channel) {
-      case 0:
-        return Channel0BreakerFault;
-      case 1:
-        return Channel1BreakerFault;
-      case 2:
-        return Channel2BreakerFault;
-      case 3:
-        return Channel3BreakerFault;
-      case 4:
-        return Channel4BreakerFault;
-      case 5:
-        return Channel5BreakerFault;
-      case 6:
-        return Channel6BreakerFault;
-      case 7:
-        return Channel7BreakerFault;
-      case 8:
-        return Channel8BreakerFault;
-      case 9:
-        return Channel9BreakerFault;
-      case 10:
-        return Channel10BreakerFault;
-      case 11:
-        return Channel11BreakerFault;
-      case 12:
-        return Channel12BreakerFault;
-      case 13:
-        return Channel13BreakerFault;
-      case 14:
-        return Channel14BreakerFault;
-      case 15:
-        return Channel15BreakerFault;
-      case 16:
-        return Channel16BreakerFault;
-      case 17:
-        return Channel17BreakerFault;
-      case 18:
-        return Channel18BreakerFault;
-      case 19:
-        return Channel19BreakerFault;
-      case 20:
-        return Channel20BreakerFault;
-      case 21:
-        return Channel21BreakerFault;
-      case 22:
-        return Channel22BreakerFault;
-      case 23:
-        return Channel23BreakerFault;
-      default:
-        throw new IndexOutOfBoundsException("Power distribution fault channel out of bounds!");
-    }
+    return switch (channel) {
+      case 0 -> Channel0BreakerFault;
+      case 1 -> Channel1BreakerFault;
+      case 2 -> Channel2BreakerFault;
+      case 3 -> Channel3BreakerFault;
+      case 4 -> Channel4BreakerFault;
+      case 5 -> Channel5BreakerFault;
+      case 6 -> Channel6BreakerFault;
+      case 7 -> Channel7BreakerFault;
+      case 8 -> Channel8BreakerFault;
+      case 9 -> Channel9BreakerFault;
+      case 10 -> Channel10BreakerFault;
+      case 11 -> Channel11BreakerFault;
+      case 12 -> Channel12BreakerFault;
+      case 13 -> Channel13BreakerFault;
+      case 14 -> Channel14BreakerFault;
+      case 15 -> Channel15BreakerFault;
+      case 16 -> Channel16BreakerFault;
+      case 17 -> Channel17BreakerFault;
+      case 18 -> Channel18BreakerFault;
+      case 19 -> Channel19BreakerFault;
+      case 20 -> Channel20BreakerFault;
+      case 21 -> Channel21BreakerFault;
+      case 22 -> Channel22BreakerFault;
+      case 23 -> Channel23BreakerFault;
+      default -> throw new IndexOutOfBoundsException(
+          "Power distribution fault channel out of bounds!");
+    };
   }
 
   /**
@@ -158,6 +172,8 @@ public class PowerDistributionStickyFaults {
     Brownout = (faults & 0x1000000) != 0;
     CanWarning = (faults & 0x2000000) != 0;
     CanBusOff = (faults & 0x4000000) != 0;
-    HasReset = (faults & 0x8000000) != 0;
+    HardwareFault = (faults & 0x8000000) != 0;
+    FirmwareFault = (faults & 0x10000000) != 0;
+    HasReset = (faults & 0x20000000) != 0;
   }
 }

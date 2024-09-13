@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:42:09 -0400
-Subject: [PATCH 17/34] Use std::is_trivially_copy_constructible
+Subject: [PATCH 17/37] Use std::is_trivially_copy_constructible
 
 ---
  llvm/include/llvm/Support/type_traits.h | 16 ----------------

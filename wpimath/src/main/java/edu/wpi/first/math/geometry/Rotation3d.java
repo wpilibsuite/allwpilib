@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -18,6 +20,7 @@ import edu.wpi.first.math.geometry.proto.Rotation3dProto;
 import edu.wpi.first.math.geometry.struct.Rotation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -28,9 +31,16 @@ import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation3d
     implements Interpolatable<Rotation3d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Rotation3d representing no rotation.
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation3d kZero = new Rotation3d();
+
   private final Quaternion m_q;
 
-  /** Constructs a Rotation3d with a default angle of 0 degrees. */
+  /** Constructs a Rotation3d representing no rotation. */
   public Rotation3d() {
     m_q = new Quaternion();
   }
@@ -79,6 +89,24 @@ public class Rotation3d
   }
 
   /**
+   * Constructs a Rotation3d from extrinsic roll, pitch, and yaw.
+   *
+   * <p>Extrinsic rotations occur in that order around the axes in the fixed global frame rather
+   * than the body frame.
+   *
+   * <p>Angles are measured counterclockwise with the rotation axis pointing "out of the page". If
+   * you point your right thumb along the positive axis direction, your fingers curl in the
+   * direction of positive rotation.
+   *
+   * @param roll The counterclockwise rotation angle around the X axis (roll).
+   * @param pitch The counterclockwise rotation angle around the Y axis (pitch).
+   * @param yaw The counterclockwise rotation angle around the Z axis (yaw).
+   */
+  public Rotation3d(Angle roll, Angle pitch, Angle yaw) {
+    this(roll.in(Radians), pitch.in(Radians), yaw.in(Radians));
+  }
+
+  /**
    * Constructs a Rotation3d with the given rotation vector representation. This representation is
    * equivalent to axis-angle, where the normalized axis is multiplied by the rotation around the
    * axis in radians.
@@ -106,6 +134,17 @@ public class Rotation3d
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Definition
     var v = axis.times(1.0 / norm).times(Math.sin(angleRadians / 2.0));
     m_q = new Quaternion(Math.cos(angleRadians / 2.0), v.get(0, 0), v.get(1, 0), v.get(2, 0));
+  }
+
+  /**
+   * Constructs a Rotation3d with the given axis-angle representation. The axis doesn't have to be
+   * normalized.
+   *
+   * @param axis The rotation axis.
+   * @param angle The rotation around the axis.
+   */
+  public Rotation3d(Vector<N3> axis, Angle angle) {
+    this(axis, angle.in(Radians));
   }
 
   /**
@@ -368,6 +407,33 @@ public class Rotation3d
   }
 
   /**
+   * Returns the counterclockwise rotation angle around the X axis (roll) in a measure.
+   *
+   * @return The counterclockwise rotation angle around the x axis (roll) in a measure.
+   */
+  public Angle getMeasureX() {
+    return Radians.of(getX());
+  }
+
+  /**
+   * Returns the counterclockwise rotation angle around the Y axis (pitch) in a measure.
+   *
+   * @return The counterclockwise rotation angle around the y axis (pitch) in a measure.
+   */
+  public Angle getMeasureY() {
+    return Radians.of(getY());
+  }
+
+  /**
+   * Returns the counterclockwise rotation angle around the Z axis (yaw) in a measure.
+   *
+   * @return The counterclockwise rotation angle around the z axis (yaw) in a measure.
+   */
+  public Angle getMeasureZ() {
+    return Radians.of(getZ());
+  }
+
+  /**
    * Returns the axis in the axis-angle representation of this rotation.
    *
    * @return The axis in the axis-angle representation.
@@ -394,6 +460,15 @@ public class Rotation3d
   }
 
   /**
+   * Returns the angle in a measure in the axis-angle representation of this rotation.
+   *
+   * @return The angle in a measure in the axis-angle representation of this rotation.
+   */
+  public Angle getMeasureAngle() {
+    return Radians.of(getAngle());
+  }
+
+  /**
    * Returns a Rotation2d representing this Rotation3d projected into the X-Y plane.
    *
    * @return A Rotation2d representing this Rotation3d projected into the X-Y plane.
@@ -415,11 +490,8 @@ public class Rotation3d
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Rotation3d) {
-      var other = (Rotation3d) obj;
-      return Math.abs(Math.abs(m_q.dot(other.m_q)) - m_q.norm() * other.m_q.norm()) < 1e-9;
-    }
-    return false;
+    return obj instanceof Rotation3d other
+        && Math.abs(Math.abs(m_q.dot(other.m_q)) - m_q.norm() * other.m_q.norm()) < 1e-9;
   }
 
   @Override

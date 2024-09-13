@@ -4,18 +4,17 @@
 
 package edu.wpi.first.wpilibj.examples.sysid.subsystems;
 
-import static edu.wpi.first.units.MutableMeasure.mutable;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.examples.sysid.Constants.ShooterConstants;
@@ -40,11 +39,11 @@ public class Shooter extends SubsystemBase {
           ShooterConstants.kEncoderReversed);
 
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
-  private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
+  private final MutVoltage m_appliedVoltage = Volts.mutable(0);
   // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-  private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
+  private final MutAngle m_angle = Radians.mutable(0);
   // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-  private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
+  private final MutAngularVelocity m_velocity = RadiansPerSecond.mutable(0);
 
   // Create a new SysId routine for characterizing the shooter.
   private final SysIdRoutine m_sysIdRoutine =
@@ -53,9 +52,7 @@ public class Shooter extends SubsystemBase {
           new SysIdRoutine.Config(),
           new SysIdRoutine.Mechanism(
               // Tell SysId how to plumb the driving voltage to the motor(s).
-              (Measure<Voltage> volts) -> {
-                m_shooterMotor.setVoltage(volts.in(Volts));
-              },
+              m_shooterMotor::setVoltage,
               // Tell SysId how to record a frame of data for each motor on the mechanism being
               // characterized.
               log -> {
@@ -98,7 +95,9 @@ public class Shooter extends SubsystemBase {
     return run(() -> {
           m_shooterMotor.setVoltage(
               m_shooterFeedback.calculate(m_shooterEncoder.getRate(), shooterSpeed.getAsDouble())
-                  + m_shooterFeedforward.calculate(shooterSpeed.getAsDouble()));
+                  + m_shooterFeedforward
+                      .calculate(RotationsPerSecond.of(shooterSpeed.getAsDouble()))
+                      .in(Volts));
           m_feederMotor.set(ShooterConstants.kFeederSpeed);
         })
         .finallyDo(

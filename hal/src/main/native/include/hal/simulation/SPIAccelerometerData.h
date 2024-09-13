@@ -50,7 +50,7 @@ void HALSIM_CancelSPIAccelerometerZCallback(int32_t index, int32_t uid);
 double HALSIM_GetSPIAccelerometerZ(int32_t index);
 void HALSIM_SetSPIAccelerometerZ(int32_t index, double z);
 
-void HALSIM_RegisterSPIAccelerometerAllCallbcaks(int32_t index,
+void HALSIM_RegisterSPIAccelerometerAllCallbacks(int32_t index,
                                                  HAL_NotifyCallback callback,
                                                  void* param,
                                                  HAL_Bool initialNotify);

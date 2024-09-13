@@ -40,8 +40,7 @@ class Robot : public frc::TimedRobot {
     m_motor.SetSetpoint(
         ExampleSmartMotorController::PIDMode::kPosition,
         m_setpoint.position.value(),
-        m_feedforward.Calculate(m_setpoint.velocity, next.velocity, kDt) /
-            12_V);
+        m_feedforward.Calculate(m_setpoint.velocity, next.velocity) / 12_V);
 
     m_setpoint = next;
   }

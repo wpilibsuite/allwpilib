@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:09:43 -0400
-Subject: [PATCH 3/9] Fix warnings
+Subject: [PATCH 03/10] Fix warnings
 
 ---
  include/uv/win.h    |  5 +++++
@@ -21,7 +21,7 @@ Subject: [PATCH 3/9] Fix warnings
  14 files changed, 47 insertions(+), 14 deletions(-)
 
 diff --git a/include/uv/win.h b/include/uv/win.h
-index eb74776978340a4910194bae35a9da6493e8c0a6..6d0afe69e7dd4caf4c9459e548fe75cf0c51b501 100644
+index 518b17606c3b0c114845594e6be9c3c4d95f1776..9a8c990c1b182633f23890cb5f4532b6bee2b22c 100644
 --- a/include/uv/win.h
 +++ b/include/uv/win.h
 @@ -201,11 +201,16 @@ typedef int (WSAAPI* LPFN_WSARECVFROM)
@@ -42,7 +42,7 @@ index eb74776978340a4910194bae35a9da6493e8c0a6..6d0afe69e7dd4caf4c9459e548fe75cf
    typedef PVOID CONDITION_VARIABLE, *PCONDITION_VARIABLE;
  #endif
 diff --git a/src/idna.c b/src/idna.c
-index 0c952cf605a88136ed9035f9385f9b1080c30c28..fe60fb59bea59986a612cfa1747802b0636482d9 100644
+index 765e12e8f2e030cffa9d498f381c0640aa43a647..17a0e7e74c0204c662594198c1f5b545534ee85e 100644
 --- a/src/idna.c
 +++ b/src/idna.c
 @@ -153,7 +153,7 @@ static int uv__idna_toascii_label(const char* s, const char* se,
@@ -54,7 +54,7 @@ index 0c952cf605a88136ed9035f9385f9b1080c30c28..fe60fb59bea59986a612cfa1747802b0
    unsigned h;
    unsigned k;
    unsigned n;
-@@ -382,7 +382,7 @@ ssize_t uv_wtf8_length_as_utf16(const char* source_ptr) {
+@@ -386,7 +386,7 @@ ssize_t uv_wtf8_length_as_utf16(const char* source_ptr) {
  
  void uv_wtf8_to_utf16(const char* source_ptr,
                        uint16_t* w_target,
@@ -94,10 +94,10 @@ index f572de5aaf1a1b150e58c7b989949441cac279c4..aa282af468935b680140295a175e503c
  
  static uv_once_t once = UV_ONCE_INIT;
 diff --git a/src/unix/core.c b/src/unix/core.c
-index 28c036f94f3e76717afa651451969f128c5a573c..268fc9652f437eb0d0cda2a9e0b06b9e91eb9742 100644
+index 8c08d607884335a2da5cb49f35e3108cb833da32..4bc870214afa1e08da2f7b335c031d67d221fdd6 100644
 --- a/src/unix/core.c
 +++ b/src/unix/core.c
-@@ -575,6 +575,16 @@ int uv__accept(int sockfd) {
+@@ -576,6 +576,16 @@ int uv__accept(int sockfd) {
    return peerfd;
  }
  
@@ -114,7 +114,7 @@ index 28c036f94f3e76717afa651451969f128c5a573c..268fc9652f437eb0d0cda2a9e0b06b9e
  
  /* close() on macos has the "interesting" quirk that it fails with EINTR
   * without closing the file descriptor when a thread is in the cancel state.
-@@ -589,10 +599,8 @@ int uv__close_nocancel(int fd) {
+@@ -590,10 +600,8 @@ int uv__close_nocancel(int fd) {
  #pragma GCC diagnostic push
  #pragma GCC diagnostic ignored "-Wdollar-in-identifier-extension"
  #if defined(__LP64__) || TARGET_OS_IPHONE
@@ -126,7 +126,7 @@ index 28c036f94f3e76717afa651451969f128c5a573c..268fc9652f437eb0d0cda2a9e0b06b9e
  #endif
  #pragma GCC diagnostic pop
 diff --git a/src/unix/internal.h b/src/unix/internal.h
-index fe5885136039d5332623467b86bf52cd4b32ca0f..98c437dcadec5b5106d697e82d5394d459f55e47 100644
+index bcb3be577e584925d4bf4a20d2429ce13aad0584..4c167f5e529cb38a7418fc35dbbafc2a2cea626c 100644
 --- a/src/unix/internal.h
 +++ b/src/unix/internal.h
 @@ -384,8 +384,8 @@ UV_UNUSED(static void uv__update_time(uv_loop_t* loop)) {
@@ -184,7 +184,7 @@ index 69e95801a18104ea910abf86db236d85f62afb66..49126e50f07bac16d198775454b731f4
  static uv_loop_t default_loop_struct;
  static uv_loop_t* default_loop_ptr;
 diff --git a/src/win/fs-event.c b/src/win/fs-event.c
-index 5a07acfe54efe90cf2ab0bca5b5998a961e72ebd..381220bf241d9572ff64576cf25700d9746d2806 100644
+index dba981c68821ece88e0beb80422b214b77e84b79..2f566f796a55c68329d5aed19bd5bb392d0082fa 100644
 --- a/src/win/fs-event.c
 +++ b/src/win/fs-event.c
 @@ -19,6 +19,8 @@
@@ -197,7 +197,7 @@ index 5a07acfe54efe90cf2ab0bca5b5998a961e72ebd..381220bf241d9572ff64576cf25700d9
  #include <errno.h>
  #include <stdio.h>
 diff --git a/src/win/fs.c b/src/win/fs.c
-index d9c2a4f728c7fb491995c6153b2a63a835b206b7..7df1df2b9ba23c0ecb96e82a6cfcaae824826b69 100644
+index 7e2367e8c1c6ad96af55a2cc370142104cc0de77..b812293048e60264f3e849367b7a129c306f8502 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
 @@ -19,6 +19,8 @@
@@ -210,7 +210,7 @@ index d9c2a4f728c7fb491995c6153b2a63a835b206b7..7df1df2b9ba23c0ecb96e82a6cfcaae8
  #include <stdlib.h>
  #include <direct.h>
 diff --git a/src/win/pipe.c b/src/win/pipe.c
-index 0f045a873073cf9b07feb457ea199990df521e5f..b2348bd0430aada98ff10313f6f926ea2f1c4491 100644
+index 27868221455dcbb90c00066fd8b716d2c0a4d371..d747dc72362a0b21077fa7b9beb57234ca62baad 100644
 --- a/src/win/pipe.c
 +++ b/src/win/pipe.c
 @@ -19,6 +19,8 @@
@@ -223,7 +223,7 @@ index 0f045a873073cf9b07feb457ea199990df521e5f..b2348bd0430aada98ff10313f6f926ea
  #include <io.h>
  #include <stdio.h>
 diff --git a/src/win/process.c b/src/win/process.c
-index 0103004c565bb09b7b9c150e874f9c68486ab26c..eeb0f6a984bb0f61b956cb4b907fbfdb3b4ac7e2 100644
+index 25f1075745267785cdd7d7de83d9c62750305852..e4bf93d707da3d22b747300775e8c96a34039ddb 100644
 --- a/src/win/process.c
 +++ b/src/win/process.c
 @@ -19,6 +19,8 @@
@@ -251,7 +251,7 @@ index 57f1698f595e2410a51044f7f228b5a235206819..03b33e9b4de6fe2532095d717a8639e8
          return UV_EINVAL;
      }
 diff --git a/src/win/tty.c b/src/win/tty.c
-index 3aacaaf0b514ba71755dc51f1bd7263de5cbc308..c90995afb6166a7cab0a267f5eb513705ce05148 100644
+index 0b51b6c82fad711480c28ad6cee7125ddb72ca87..67df01396ab50260b986fc9e7aff0368f6ceb308 100644
 --- a/src/win/tty.c
 +++ b/src/win/tty.c
 @@ -19,6 +19,8 @@

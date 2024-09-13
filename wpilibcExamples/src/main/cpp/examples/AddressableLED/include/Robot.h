@@ -7,12 +7,12 @@
 #include <array>
 
 #include <frc/AddressableLED.h>
+#include <frc/LEDPattern.h>
 #include <frc/TimedRobot.h>
 
 class Robot : public frc::TimedRobot {
  public:
-  void Rainbow();
-  void RobotInit() override;
+  Robot();
   void RobotPeriodic() override;
 
  private:
@@ -23,6 +23,16 @@ class Robot : public frc::TimedRobot {
   frc::AddressableLED m_led{9};
   std::array<frc::AddressableLED::LEDData, kLength>
       m_ledBuffer;  // Reuse the buffer
-  // Store what the last hue of the first pixel is
-  int firstPixelHue = 0;
+
+  // Our LED strip has a density of 120 LEDs per meter
+  units::meter_t kLedSpacing{1 / 120.0};
+
+  // Create an LED pattern that will display a rainbow across
+  // all hues at maximum saturation and half brightness
+  frc::LEDPattern m_rainbow = frc::LEDPattern::Rainbow(255, 128);
+
+  // Create a new pattern that scrolls the rainbow pattern across the LED
+  // strip, moving at a speed of 1 meter per second.
+  frc::LEDPattern m_scrollingRainbow =
+      m_rainbow.ScrollAtAbsoluteSpeed(1_mps, kLedSpacing);
 };

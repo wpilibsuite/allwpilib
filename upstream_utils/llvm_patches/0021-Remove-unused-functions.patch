@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:16:51 -0400
-Subject: [PATCH 21/34] Remove unused functions
+Subject: [PATCH 21/37] Remove unused functions
 
 ---
  llvm/include/llvm/Support/raw_ostream.h |  5 +-
@@ -35,7 +35,7 @@ index d56999186f719f8d91f3a047a19960caf62a066c..9a9a1f688313a5784a58a70f2cb4cc0d
    /// Tie this stream to the specified stream. Replaces any existing tied-to
    /// stream. Specifying a nullptr unties the stream.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 54137a331ca9e752b02c0f16ae996094a6f2fafa..e253d6f7a5ca3aee75823efdb9717dcd93fff5dc 100644
+index 4d992442d153d088f6a7a1fc13e3c84012c45a06..e19a38256ce714359b85076cf49056f379764d8d 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -181,22 +181,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
@@ -62,10 +62,10 @@ index 54137a331ca9e752b02c0f16ae996094a6f2fafa..e253d6f7a5ca3aee75823efdb9717dcd
  
  #include <winerror.h>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 4769d34a14f3f2cbaaa4df50ea7111fe9fa2792f..f9928ac969932b6baea60a80750477d78b6a5b02 100644
+index 9ea41cad8fed864b53e2e463450c066fb4e00131..44149e85876f089756dcce151670a6060eadfee1 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -175,16 +175,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
+@@ -176,16 +176,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
    return *this;
  }
  
@@ -82,7 +82,7 @@ index 4769d34a14f3f2cbaaa4df50ea7111fe9fa2792f..f9928ac969932b6baea60a80750477d7
  void raw_ostream::flush_nonempty() {
    assert(OutBufCur > OutBufStart && "Invalid call to flush_nonempty.");
    size_t Length = OutBufCur - OutBufStart;
-@@ -327,15 +317,22 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+@@ -328,15 +318,22 @@ static int getFD(std::string_view Filename, std::error_code &EC,
    if (Filename == "-") {
      EC = std::error_code();
      // Change stdout's text/binary mode based on the Flags.
@@ -110,7 +110,7 @@ index 4769d34a14f3f2cbaaa4df50ea7111fe9fa2792f..f9928ac969932b6baea60a80750477d7
    if (EC)
      return -1;
  
-@@ -395,12 +392,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+@@ -396,12 +393,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
  
    // Get the starting position.
    off_t loc = ::lseek(FD, 0, SEEK_CUR);
@@ -124,7 +124,7 @@ index 4769d34a14f3f2cbaaa4df50ea7111fe9fa2792f..f9928ac969932b6baea60a80750477d7
  #else
    SupportsSeeking = !EC && loc != (off_t)-1;
  #endif
-@@ -413,10 +406,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+@@ -414,10 +407,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
  raw_fd_ostream::~raw_fd_ostream() {
    if (FD >= 0) {
      flush();
@@ -137,7 +137,7 @@ index 4769d34a14f3f2cbaaa4df50ea7111fe9fa2792f..f9928ac969932b6baea60a80750477d7
    }
  
  #ifdef __MINGW32__
-@@ -511,7 +502,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+@@ -512,7 +503,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
  
    do {
      size_t ChunkSize = std::min(Size, MaxWriteSize);
@@ -149,7 +149,7 @@ index 4769d34a14f3f2cbaaa4df50ea7111fe9fa2792f..f9928ac969932b6baea60a80750477d7
  
      if (ret < 0) {
        // If it's a recoverable error, swallow it and retry the write.
-@@ -554,8 +549,8 @@ void raw_fd_ostream::close() {
+@@ -555,8 +550,8 @@ void raw_fd_ostream::close() {
    assert(ShouldClose);
    ShouldClose = false;
    flush();

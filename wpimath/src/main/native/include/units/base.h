@@ -81,6 +81,8 @@
 	#include <fmt/format.h>
 #endif
 
+#include <gcem.hpp>
+
 //------------------------------
 //	STRING FORMATTER
 //------------------------------
@@ -173,7 +175,7 @@ namespace units
  * @param		namespaceName namespace in which the new units will be encapsulated.
  * @param		nameSingular singular version of the unit name, e.g. 'meter'
  * @param		abbrev - abbreviated unit name, e.g. 'm'
- * @note		When UNIT_LIB_ENABLE_IOSTREAM isn't defined, the macro does not generate any code
+ * @note		When UNIT_LIB_DISABLE_FMT is defined and UNIT_LIB_ENABLE_IOSTREAM isn't defined, the macro does not generate any code
  */
 #if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)\
@@ -182,9 +184,10 @@ namespace units
 	struct fmt::formatter<units::namespaceName::nameSingular ## _t> \
 		: fmt::formatter<double> \
 	{\
-		template <typename FormatContext>\
-		auto format(const units::namespaceName::nameSingular ## _t& obj,\
-								FormatContext& ctx) -> decltype(ctx.out()) \
+		template <typename FmtContext>\
+		auto format(\
+				const units::namespaceName::nameSingular ## _t& obj,\
+				FmtContext& ctx) const\
 		{\
 			auto out = ctx.out();\
 			out = fmt::formatter<double>::format(obj(), ctx);\
@@ -200,8 +203,7 @@ namespace units
 			return units::detail::to_string(obj()) + std::string(" "#abbrev);\
 		}\
 	}
-#endif
-#if defined(UNIT_LIB_ENABLE_IOSTREAM)
+#elif defined(UNIT_LIB_ENABLE_IOSTREAM)
 	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)\
 	namespace namespaceName\
 	{\
@@ -214,6 +216,8 @@ namespace units
 			return units::detail::to_string(obj()) + std::string(" "#abbrev);\
 		}\
 	}
+#else
+    #define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)
 #endif
 
  /**
@@ -2803,10 +2807,10 @@ namespace units
 		 * @returns		new unit_t, raised to the given exponent
 		 */
 		template<int power, class UnitType, class = typename std::enable_if<traits::has_linear_scale<UnitType>::value, int>>
-		inline auto pow(const UnitType& value) noexcept -> unit_t<typename units::detail::power_of_unit<power, typename units::traits::unit_t_traits<UnitType>::unit_type>::type, typename units::traits::unit_t_traits<UnitType>::underlying_type, linear_scale>
+		inline constexpr auto pow(const UnitType& value) noexcept -> unit_t<typename units::detail::power_of_unit<power, typename units::traits::unit_t_traits<UnitType>::unit_type>::type, typename units::traits::unit_t_traits<UnitType>::underlying_type, linear_scale>
 		{
 			return unit_t<typename units::detail::power_of_unit<power, typename units::traits::unit_t_traits<UnitType>::unit_type>::type, typename units::traits::unit_t_traits<UnitType>::underlying_type, linear_scale>
-				(std::pow(value(), power));
+				(gcem::pow(value(), power));
 		}
 
 		/**
@@ -2879,9 +2883,10 @@ namespace units
 template <>
 struct fmt::formatter<units::dimensionless::dB_t> : fmt::formatter<double>
 {
-	template <typename FormatContext>
-	auto format(const units::dimensionless::dB_t& obj,
-							FormatContext& ctx) -> decltype(ctx.out())
+	template <typename FmtContext>
+	auto format(
+			const units::dimensionless::dB_t& obj,
+			FmtContext& ctx) const
 	{
 		auto out = ctx.out();
 		out = fmt::formatter<double>::format(obj(), ctx);
@@ -3406,7 +3411,7 @@ namespace units {
 		// the "_min" user-defined literal in time.h.
 
 		template<class UnitTypeLhs, class UnitTypeRhs>
-		UnitTypeLhs (min)(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs)
+		constexpr UnitTypeLhs (min)(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs)
 		{
 			static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value, "Unit types are not compatible.");
 			UnitTypeLhs r(rhs);
@@ -3414,7 +3419,7 @@ namespace units {
 		}
 
 		template<class UnitTypeLhs, class UnitTypeRhs>
-		UnitTypeLhs (max)(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs)
+		constexpr UnitTypeLhs (max)(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs)
 		{
 			static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value, "Unit types are not compatible.");
 			UnitTypeLhs r(rhs);

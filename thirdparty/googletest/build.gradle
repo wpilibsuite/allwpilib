@@ -1,0 +1,30 @@
+
+
+apply plugin: 'cpp'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+
+ext {
+    nativeName = 'googletest'
+}
+
+apply from: "${rootDir}/shared/config.gradle"
+
+
+model {
+    components {
+        "${nativeName}"(NativeLibrarySpec) {
+            sources.cpp {
+                source {
+                    srcDirs "src/googlemock/src", "src/googletest/src"
+                    include '*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'include', 'src/googletest', 'src/googlemock'
+                }
+            }
+        }
+    }
+}
+
+apply from: 'publish.gradle'

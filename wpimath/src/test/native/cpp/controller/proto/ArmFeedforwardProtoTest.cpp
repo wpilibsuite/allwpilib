@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
 
-#include "controller.pb.h"
 #include "frc/controller/ArmFeedforward.h"
 
 using namespace frc;
@@ -26,8 +26,8 @@ TEST(ArmFeedforwardProtoTest, Roundtrip) {
   ProtoType::Pack(proto, kExpectedData);
 
   ArmFeedforward unpacked_data = ProtoType::Unpack(*proto);
-  EXPECT_EQ(kExpectedData.kS.value(), unpacked_data.kS.value());
-  EXPECT_EQ(kExpectedData.kG.value(), unpacked_data.kG.value());
-  EXPECT_EQ(kExpectedData.kV.value(), unpacked_data.kV.value());
-  EXPECT_EQ(kExpectedData.kA.value(), unpacked_data.kA.value());
+  EXPECT_EQ(kExpectedData.GetKs().value(), unpacked_data.GetKs().value());
+  EXPECT_EQ(kExpectedData.GetKg().value(), unpacked_data.GetKg().value());
+  EXPECT_EQ(kExpectedData.GetKv().value(), unpacked_data.GetKv().value());
+  EXPECT_EQ(kExpectedData.GetKa().value(), unpacked_data.GetKa().value());
 }

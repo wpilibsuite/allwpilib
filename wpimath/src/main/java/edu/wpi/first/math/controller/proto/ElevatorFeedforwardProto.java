@@ -33,9 +33,9 @@ public class ElevatorFeedforwardProto
 
   @Override
   public void pack(ProtobufElevatorFeedforward msg, ElevatorFeedforward value) {
-    msg.setKs(value.ks);
-    msg.setKg(value.kg);
-    msg.setKv(value.kv);
-    msg.setKa(value.ka);
+    msg.setKs(value.getKs());
+    msg.setKg(value.getKg());
+    msg.setKv(value.getKv());
+    msg.setKa(value.getKa());
   }
 }

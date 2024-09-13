@@ -4,18 +4,33 @@
 
 package edu.wpi.first.wpilibj.examples.addressableled;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 public class Robot extends TimedRobot {
-  private AddressableLED m_led;
-  private AddressableLEDBuffer m_ledBuffer;
-  // Store what the last hue of the first pixel is
-  private int m_rainbowFirstPixelHue;
+  private final AddressableLED m_led;
+  private final AddressableLEDBuffer m_ledBuffer;
 
-  @Override
-  public void robotInit() {
+  // Create an LED pattern that will display a rainbow across
+  // all hues at maximum saturation and half brightness
+  private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
+
+  // Our LED strip has a density of 120 LEDs per meter
+  private static final Distance kLedSpacing = Meters.of(1 / 120.0);
+
+  // Create a new pattern that scrolls the rainbow pattern across the LED strip, moving at a speed
+  // of 1 meter per second.
+  private final LEDPattern m_scrollingRainbow =
+      m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
+
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     // PWM port 9
     // Must be a PWM header, not MXP or DIO
     m_led = new AddressableLED(9);
@@ -33,24 +48,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    // Fill the buffer with a rainbow
-    rainbow();
+    // Update the buffer with the rainbow animation
+    m_scrollingRainbow.applyTo(m_ledBuffer);
     // Set the LEDs
     m_led.setData(m_ledBuffer);
-  }
-
-  private void rainbow() {
-    // For every pixel
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      // Calculate the hue - hue is easier for rainbows because the color
-      // shape is a circle so only one value needs to precess
-      final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180;
-      // Set the value
-      m_ledBuffer.setHSV(i, hue, 255, 128);
-    }
-    // Increase by to make the rainbow "move"
-    m_rainbowFirstPixelHue += 3;
-    // Check bounds
-    m_rainbowFirstPixelHue %= 180;
   }
 }

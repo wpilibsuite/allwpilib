@@ -31,6 +31,7 @@ public final class EventLoop {
   }
 
   /** Poll all bindings. */
+  @SuppressWarnings("PMD.UnusedAssignment")
   public void poll() {
     try {
       m_running = true;

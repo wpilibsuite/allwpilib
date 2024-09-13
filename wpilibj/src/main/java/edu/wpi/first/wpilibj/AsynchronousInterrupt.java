@@ -127,14 +127,29 @@ public class AsynchronousInterrupt implements AutoCloseable {
 
   private void threadMain() {
     while (m_keepRunning.get()) {
-      var result = m_interrupt.waitForInterruptRaw(10, false);
+      var result = m_interrupt.waitForInterrupt(10, false);
       if (!m_keepRunning.get()) {
         break;
       }
-      if (result == 0) {
-        continue;
+      boolean rising = false;
+      boolean falling = false;
+      switch (result) {
+        case kBoth -> {
+          rising = true;
+          falling = true;
+        }
+        case kFallingEdge -> {
+          falling = true;
+        }
+        case kRisingEdge -> {
+          rising = true;
+        }
+        default -> {
+          continue;
+        }
       }
-      m_callback.accept((result & 0x1) != 0, (result & 0x100) != 0);
+
+      m_callback.accept(rising, falling);
     }
   }
 }

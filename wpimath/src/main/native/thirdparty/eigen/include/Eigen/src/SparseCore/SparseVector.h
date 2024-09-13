@@ -109,7 +109,7 @@ class SparseVector : public SparseCompressedBase<SparseVector<Scalar_, Options_,
   }
 
   /** \returns a reference to the coefficient value at given index \a i
-   * This operation involes a log(rho*size) binary search. If the coefficient does not
+   * This operation involves a log(rho*size) binary search. If the coefficient does not
    * exist yet, then a sorted insertion into a sequential buffer is performed.
    *
    * This insertion might be very costly if the number of nonzeros above \a i is large.
@@ -301,6 +301,24 @@ class SparseVector : public SparseCompressedBase<SparseVector<Scalar_, Options_,
     SparseVector tmp(other.size());
     internal::sparse_vector_assign_selector<SparseVector, OtherDerived>::run(tmp, other.derived());
     this->swap(tmp);
+    return *this;
+  }
+
+  inline SparseVector(SparseVector&& other) : SparseVector() { this->swap(other); }
+
+  template <typename OtherDerived>
+  inline SparseVector(SparseCompressedBase<OtherDerived>&& other) : SparseVector() {
+    *this = other.derived().markAsRValue();
+  }
+
+  inline SparseVector& operator=(SparseVector&& other) {
+    this->swap(other);
+    return *this;
+  }
+
+  template <typename OtherDerived>
+  inline SparseVector& operator=(SparseCompressedBase<OtherDerived>&& other) {
+    *this = other.derived().markAsRValue();
     return *this;
   }
 

@@ -21,6 +21,8 @@ import java.util.function.BiConsumer;
 
 /** Helper class used to generate trajectories with various constraints. */
 public final class TrajectoryGenerator {
+  private static final Transform2d kFlip = new Transform2d(Translation2d.kZero, Rotation2d.kPi);
+
   private static final Trajectory kDoNothingTrajectory =
       new Trajectory(List.of(new Trajectory.State()));
   private static BiConsumer<String, StackTraceElement[]> errorFunc;
@@ -62,8 +64,6 @@ public final class TrajectoryGenerator {
       List<Translation2d> interiorWaypoints,
       Spline.ControlVector end,
       TrajectoryConfig config) {
-    final var flip = new Transform2d(new Translation2d(), Rotation2d.fromDegrees(180.0));
-
     // Clone the control vectors.
     var newInitial = new Spline.ControlVector(initial.x, initial.y);
     var newEnd = new Spline.ControlVector(end.x, end.y);
@@ -91,7 +91,7 @@ public final class TrajectoryGenerator {
     // Change the points back to their original orientation.
     if (config.isReversed()) {
       for (var point : points) {
-        point.poseMeters = point.poseMeters.plus(flip);
+        point.poseMeters = point.poseMeters.plus(kFlip);
         point.curvatureRadPerMeter *= -1;
       }
     }
@@ -140,7 +140,6 @@ public final class TrajectoryGenerator {
    */
   public static Trajectory generateTrajectory(
       ControlVectorList controlVectors, TrajectoryConfig config) {
-    final var flip = new Transform2d(new Translation2d(), Rotation2d.fromDegrees(180.0));
     final var newControlVectors = new ArrayList<Spline.ControlVector>(controlVectors.size());
 
     // Create a new control vector list, flipping the orientation if reversed.
@@ -168,7 +167,7 @@ public final class TrajectoryGenerator {
     // Change the points back to their original orientation.
     if (config.isReversed()) {
       for (var point : points) {
-        point.poseMeters = point.poseMeters.plus(flip);
+        point.poseMeters = point.poseMeters.plus(kFlip);
         point.curvatureRadPerMeter *= -1;
       }
     }
@@ -194,12 +193,10 @@ public final class TrajectoryGenerator {
    * @return The generated trajectory.
    */
   public static Trajectory generateTrajectory(List<Pose2d> waypoints, TrajectoryConfig config) {
-    final var flip = new Transform2d(new Translation2d(), Rotation2d.fromDegrees(180.0));
-
     List<Pose2d> newWaypoints = new ArrayList<>();
     if (config.isReversed()) {
       for (Pose2d originalWaypoint : waypoints) {
-        newWaypoints.add(originalWaypoint.plus(flip));
+        newWaypoints.add(originalWaypoint.plus(kFlip));
       }
     } else {
       newWaypoints.addAll(waypoints);
@@ -220,7 +217,7 @@ public final class TrajectoryGenerator {
     // Change the points back to their original orientation.
     if (config.isReversed()) {
       for (var point : points) {
-        point.poseMeters = point.poseMeters.plus(flip);
+        point.poseMeters = point.poseMeters.plus(kFlip);
         point.curvatureRadPerMeter *= -1;
       }
     }
@@ -249,7 +246,7 @@ public final class TrajectoryGenerator {
     var splinePoints = new ArrayList<PoseWithCurvature>();
 
     // Add the first point to the vector.
-    splinePoints.add(splines[0].getPoint(0.0));
+    splinePoints.add(splines[0].getPoint(0.0).get());
 
     // Iterate through the vector and parameterize each spline, adding the
     // parameterized points to the final vector.

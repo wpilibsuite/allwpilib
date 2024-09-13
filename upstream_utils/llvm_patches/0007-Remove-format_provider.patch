@@ -1,16 +1,16 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:53:50 -0400
-Subject: [PATCH 07/34] Remove format_provider
+Subject: [PATCH 07/37] Remove format_provider
 
 ---
- llvm/include/llvm/Support/Chrono.h      | 109 ------------------------
+ llvm/include/llvm/Support/Chrono.h      | 114 ------------------------
  llvm/include/llvm/Support/raw_ostream.h |   6 --
- llvm/unittests/Support/Chrono.cpp       |  67 ---------------
- 3 files changed, 182 deletions(-)
+ llvm/unittests/Support/Chrono.cpp       |  67 --------------
+ 3 files changed, 187 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index a7dea19d9193bcff4bc6b553b80a10b2bc7b64af..9f9a2b5cab270327898cee3f97d9ae7cf77eb564 100644
+index 9c9ba7002310eba5113c14957f769702c61f4326..b269ff8bb5db7bb3c62c3a87daf255b18ece4cd7 100644
 --- a/llvm/include/llvm/Support/Chrono.h
 +++ b/llvm/include/llvm/Support/Chrono.h
 @@ -10,7 +10,6 @@
@@ -21,9 +21,9 @@ index a7dea19d9193bcff4bc6b553b80a10b2bc7b64af..9f9a2b5cab270327898cee3f97d9ae7c
  
  #include <chrono>
  #include <ctime>
-@@ -59,114 +58,6 @@ toTimePoint(std::time_t T, uint32_t nsec) {
- 
+@@ -80,119 +79,6 @@ toTimePoint(std::time_t T, uint32_t nsec) {
  raw_ostream &operator<<(raw_ostream &OS, sys::TimePoint<> TP);
+ raw_ostream &operator<<(raw_ostream &OS, sys::UtcTime<> TP);
  
 -/// Format provider for TimePoint<>
 -///
@@ -37,6 +37,11 @@ index a7dea19d9193bcff4bc6b553b80a10b2bc7b64af..9f9a2b5cab270327898cee3f97d9ae7c
 -struct format_provider<sys::TimePoint<>> {
 -  static void format(const sys::TimePoint<> &TP, llvm::raw_ostream &OS,
 -                     std::string_view Style);
+-};
+-
+-template <> struct format_provider<sys::UtcTime<std::chrono::seconds>> {
+-  static void format(const sys::UtcTime<std::chrono::seconds> &TP,
+-                     llvm::raw_ostream &OS, StringRef Style);
 -};
 -
 -namespace detail {
@@ -137,7 +142,7 @@ index a7dea19d9193bcff4bc6b553b80a10b2bc7b64af..9f9a2b5cab270327898cee3f97d9ae7c
  
  #endif // LLVM_SUPPORT_CHRONO_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 2463f1af612a78cafafe3c0e16d496e607cdc322..5d08596b4cf6bf9e9b8e2c2c1aef731bb8832da5 100644
+index 9345348d9ba555022b31f94299684316ffa15939..862a1db876e9b8467a8839dae8f6632f18d5e7a0 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -27,12 +27,6 @@
@@ -154,10 +159,10 @@ index 2463f1af612a78cafafe3c0e16d496e607cdc322..5d08596b4cf6bf9e9b8e2c2c1aef731b
  
  namespace sys {
 diff --git a/llvm/unittests/Support/Chrono.cpp b/llvm/unittests/Support/Chrono.cpp
-index daf8a8a350f08c748ba05af44f43f3faca8e2c61..3c049de18c0a80465f4b0a8c054df2602d5e9b1c 100644
+index 7dfc5dd2c29348ea8df9ce87c80f357aaad1a73b..a4d166d435d6d679f773dcf3eab985f0631e12d2 100644
 --- a/llvm/unittests/Support/Chrono.cpp
 +++ b/llvm/unittests/Support/Chrono.cpp
-@@ -30,43 +30,6 @@ TEST(Chrono, TimeTConversion) {
+@@ -29,43 +29,6 @@ TEST(Chrono, TimeTConversion) {
    EXPECT_EQ(TP, toTimePoint(toTimeT(TP)));
  }
  
@@ -201,7 +206,7 @@ index daf8a8a350f08c748ba05af44f43f3faca8e2c61..3c049de18c0a80465f4b0a8c054df260
  // Test that toTimePoint and toTimeT can be called with a arguments with varying
  // precisions.
  TEST(Chrono, ImplicitConversions) {
-@@ -84,34 +47,4 @@ TEST(Chrono, ImplicitConversions) {
+@@ -83,34 +46,4 @@ TEST(Chrono, ImplicitConversions) {
    EXPECT_EQ(TimeT, toTimeT(Nano));
  }
  

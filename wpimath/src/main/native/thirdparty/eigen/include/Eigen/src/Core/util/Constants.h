@@ -29,9 +29,9 @@ const int Dynamic = -1;
  */
 const int DynamicIndex = 0xffffff;
 
-/** This value means that the increment to go from one value to another in a sequence is not constant for each step.
+/** This value means that the requested value is not defined.
  */
-const int UndefinedIncr = 0xfffffe;
+const int Undefined = 0xfffffe;
 
 /** This value means +Infinity; it is currently used only as the p parameter to MatrixBase::lpNorm<int>().
  * The value Infinity there means the L-infinity norm.
@@ -152,7 +152,7 @@ const unsigned int LvalueBit = 0x20;
  * Means that the underlying array of coefficients can be directly accessed as a plain strided array. The memory layout
  * of the array of coefficients must be exactly the natural one suggested by rows(), cols(),
  * outerStride(), innerStride(), and the RowMajorBit. This rules out expressions such as Diagonal, whose coefficients,
- * though referencable, do not have such a regular memory layout.
+ * though referenceable, do not have such a regular memory layout.
  *
  * See the comment on LvalueBit for an explanation of how LvalueBit and DirectAccessBit are mutually orthogonal.
  */

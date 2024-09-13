@@ -36,10 +36,6 @@ inline NetworkTableType NetworkTableEntry::GetType() const {
   return static_cast<NetworkTableType>(GetEntryType(m_handle));
 }
 
-inline unsigned int NetworkTableEntry::GetFlags() const {
-  return GetEntryFlags(m_handle);
-}
-
 inline int64_t NetworkTableEntry::GetLastChange() const {
   return GetEntryLastChange(m_handle);
 }
@@ -216,14 +212,6 @@ inline bool NetworkTableEntry::SetStringArray(
   return nt::SetStringArray(m_handle, value, time);
 }
 
-inline void NetworkTableEntry::SetFlags(unsigned int flags) {
-  SetEntryFlags(m_handle, GetEntryFlags(m_handle) | flags);
-}
-
-inline void NetworkTableEntry::ClearFlags(unsigned int flags) {
-  SetEntryFlags(m_handle, GetEntryFlags(m_handle) & ~flags);
-}
-
 inline void NetworkTableEntry::SetPersistent() {
   nt::SetTopicPersistent(nt::GetTopicFromHandle(m_handle), true);
 }
@@ -238,10 +226,6 @@ inline bool NetworkTableEntry::IsPersistent() const {
 
 inline void NetworkTableEntry::Unpublish() {
   return nt::Unpublish(m_handle);
-}
-
-inline void NetworkTableEntry::Delete() {
-  Unpublish();
 }
 
 }  // namespace nt

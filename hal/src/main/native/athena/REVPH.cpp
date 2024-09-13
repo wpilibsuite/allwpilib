@@ -737,6 +737,8 @@ void HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
   stickyFaults->brownout = status1.sticky_brownout_fault;
   stickyFaults->canWarning = status1.sticky_can_warning_fault;
   stickyFaults->canBusOff = status1.sticky_can_bus_off_fault;
+  stickyFaults->hardwareFault = status1.sticky_hardware_fault;
+  stickyFaults->firmwareFault = status1.sticky_firmware_fault;
   stickyFaults->hasReset = status1.sticky_has_reset_fault;
 }
 
@@ -750,4 +752,36 @@ void HAL_ClearREVPHStickyFaults(HAL_REVPHHandle handle, int32_t* status) {
   uint8_t packedData[8] = {0};
   HAL_WriteCANPacket(ph->hcan, packedData, PH_CLEAR_FAULTS_LENGTH,
                      PH_CLEAR_FAULTS_FRAME_API, status);
+}
+
+int32_t HAL_GetREVPHSolenoidDisabledList(HAL_REVPHHandle handle,
+                                         int32_t* status) {
+  auto ph = REVPHHandles->Get(handle);
+  if (ph == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return false;
+  }
+
+  PH_status_0_t status0 = HAL_ReadREVPHStatus0(ph->hcan, status);
+  if (*status != 0) {
+    return 0;
+  }
+
+  uint32_t solenoidFaults = status0.channel_0_fault;
+  solenoidFaults |= status0.channel_1_fault << 1;
+  solenoidFaults |= status0.channel_2_fault << 2;
+  solenoidFaults |= status0.channel_3_fault << 3;
+  solenoidFaults |= status0.channel_4_fault << 4;
+  solenoidFaults |= status0.channel_5_fault << 5;
+  solenoidFaults |= status0.channel_6_fault << 6;
+  solenoidFaults |= status0.channel_7_fault << 7;
+  solenoidFaults |= status0.channel_8_fault << 8;
+  solenoidFaults |= status0.channel_9_fault << 9;
+  solenoidFaults |= status0.channel_10_fault << 10;
+  solenoidFaults |= status0.channel_11_fault << 11;
+  solenoidFaults |= status0.channel_12_fault << 12;
+  solenoidFaults |= status0.channel_13_fault << 13;
+  solenoidFaults |= status0.channel_14_fault << 14;
+  solenoidFaults |= status0.channel_15_fault << 15;
+  return solenoidFaults;
 }

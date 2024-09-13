@@ -10,7 +10,6 @@
 #include <fmt/format.h>
 #include <units/angle.h>
 #include <wpi/MathExtras.h>
-#include <wpi/MemoryBuffer.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 
@@ -172,7 +171,7 @@ AnalysisManager::AnalysisManager(TestData data, Settings& settings,
                                  wpi::Logger& logger)
     : m_data{std::move(data)}, m_logger{logger}, m_settings{settings} {
   // Reset settings for Dynamic Test Limits
-  m_settings.stepTestDuration = units::second_t{0.0};
+  m_settings.stepTestDuration = 0_s;
   m_settings.velocityThreshold = std::numeric_limits<double>::infinity();
 }
 

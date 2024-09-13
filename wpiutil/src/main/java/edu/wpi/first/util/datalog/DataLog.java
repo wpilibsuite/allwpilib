@@ -14,11 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * A data log. The log file is created immediately upon construction with a temporary filename. The
- * file may be renamed at any time using the setFilename() function.
- *
- * <p>The data log is periodically flushed to disk. It can also be explicitly flushed to disk by
- * using the flush() function.
+ * A data log for high-speed writing of data values.
  *
  * <p>The finish() function is needed only to indicate in the log that a particular entry is no
  * longer being used (it releases the name to ID mapping). The finish() function is not required to
@@ -31,66 +27,14 @@ import java.util.concurrent.ConcurrentMap;
  * For this reason (as well as the fact that timestamps can be set to arbitrary values), records in
  * the log are not guaranteed to be sorted by timestamp.
  */
-public final class DataLog implements AutoCloseable {
+public class DataLog implements AutoCloseable {
   /**
-   * Construct a new Data Log. The log will be initially created with a temporary filename.
+   * Constructs.
    *
-   * @param dir directory to store the log
-   * @param filename filename to use; if none provided, a random filename is generated of the form
-   *     "wpilog_{}.wpilog"
-   * @param period time between automatic flushes to disk, in seconds; this is a time/storage
-   *     tradeoff
-   * @param extraHeader extra header data
+   * @param impl implementation handle
    */
-  public DataLog(String dir, String filename, double period, String extraHeader) {
-    m_impl = DataLogJNI.create(dir, filename, period, extraHeader);
-  }
-
-  /**
-   * Construct a new Data Log. The log will be initially created with a temporary filename.
-   *
-   * @param dir directory to store the log
-   * @param filename filename to use; if none provided, a random filename is generated of the form
-   *     "wpilog_{}.wpilog"
-   * @param period time between automatic flushes to disk, in seconds; this is a time/storage
-   *     tradeoff
-   */
-  public DataLog(String dir, String filename, double period) {
-    this(dir, filename, period, "");
-  }
-
-  /**
-   * Construct a new Data Log. The log will be initially created with a temporary filename.
-   *
-   * @param dir directory to store the log
-   * @param filename filename to use; if none provided, a random filename is generated of the form
-   *     "wpilog_{}.wpilog"
-   */
-  public DataLog(String dir, String filename) {
-    this(dir, filename, 0.25);
-  }
-
-  /**
-   * Construct a new Data Log. The log will be initially created with a temporary filename.
-   *
-   * @param dir directory to store the log
-   */
-  public DataLog(String dir) {
-    this(dir, "", 0.25);
-  }
-
-  /** Construct a new Data Log. The log will be initially created with a temporary filename. */
-  public DataLog() {
-    this("");
-  }
-
-  /**
-   * Change log filename.
-   *
-   * @param filename filename
-   */
-  public void setFilename(String filename) {
-    DataLogJNI.setFilename(m_impl, filename);
+  protected DataLog(long impl) {
+    m_impl = impl;
   }
 
   /** Explicitly flushes the log data to disk. */
@@ -106,11 +50,7 @@ public final class DataLog implements AutoCloseable {
     DataLogJNI.pause(m_impl);
   }
 
-  /**
-   * Resumes appending of data records to the log. If called after stop(), opens a new file (with
-   * random name if SetFilename was not called after stop()) and appends Start records and schema
-   * data values for all previously started entries and schemas.
-   */
+  /** Resumes appending of data records to the log. */
   public void resume() {
     DataLogJNI.resume(m_impl);
   }
@@ -329,6 +269,12 @@ public final class DataLog implements AutoCloseable {
     setMetadata(entry, metadata, 0);
   }
 
+  @Override
+  public void close() {
+    DataLogJNI.close(m_impl);
+    m_impl = 0;
+  }
+
   /**
    * Appends a raw record to the log.
    *
@@ -376,12 +322,6 @@ public final class DataLog implements AutoCloseable {
    */
   public void appendRaw(int entry, ByteBuffer data, int start, int len, long timestamp) {
     DataLogJNI.appendRaw(m_impl, entry, data, start, len, timestamp);
-  }
-
-  @Override
-  public void close() {
-    DataLogJNI.close(m_impl);
-    m_impl = 0;
   }
 
   /**
@@ -518,6 +458,8 @@ public final class DataLog implements AutoCloseable {
     seen.remove(typeString);
   }
 
-  private long m_impl;
+  /** Implementation handle. */
+  protected long m_impl;
+
   private final ConcurrentMap<String, Integer> m_schemaMap = new ConcurrentHashMap<>();
 }

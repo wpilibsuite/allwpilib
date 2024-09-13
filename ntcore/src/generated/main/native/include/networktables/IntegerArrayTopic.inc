@@ -15,7 +15,7 @@
 namespace nt {
 
 inline IntegerArraySubscriber::IntegerArraySubscriber(
-    NT_Subscriber handle, std::span<const int64_t> defaultValue)
+    NT_Subscriber handle, ParamType defaultValue)
     : Subscriber{handle},
       m_defaultValue{defaultValue.begin(), defaultValue.end()} {}
 
@@ -24,7 +24,7 @@ inline std::vector<int64_t> IntegerArraySubscriber::Get() const {
 }
 
 inline std::vector<int64_t> IntegerArraySubscriber::Get(
-    std::span<const int64_t> defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetIntegerArray(m_subHandle, defaultValue);
 }
 
@@ -32,7 +32,7 @@ inline std::span<int64_t> IntegerArraySubscriber::Get(wpi::SmallVectorImpl<int64
   return Get(buf, m_defaultValue);
 }
 
-inline std::span<int64_t> IntegerArraySubscriber::Get(wpi::SmallVectorImpl<int64_t>& buf, std::span<const int64_t> defaultValue) const {
+inline std::span<int64_t> IntegerArraySubscriber::Get(wpi::SmallVectorImpl<int64_t>& buf, ParamType defaultValue) const {
   return nt::GetIntegerArray(m_subHandle, buf, defaultValue);
 }
 
@@ -41,7 +41,7 @@ inline TimestampedIntegerArray IntegerArraySubscriber::GetAtomic() const {
 }
 
 inline TimestampedIntegerArray IntegerArraySubscriber::GetAtomic(
-    std::span<const int64_t> defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetAtomicIntegerArray(m_subHandle, defaultValue);
 }
 
@@ -49,7 +49,7 @@ inline TimestampedIntegerArrayView IntegerArraySubscriber::GetAtomic(wpi::SmallV
   return GetAtomic(buf, m_defaultValue);
 }
 
-inline TimestampedIntegerArrayView IntegerArraySubscriber::GetAtomic(wpi::SmallVectorImpl<int64_t>& buf, std::span<const int64_t> defaultValue) const {
+inline TimestampedIntegerArrayView IntegerArraySubscriber::GetAtomic(wpi::SmallVectorImpl<int64_t>& buf, ParamType defaultValue) const {
   return nt::GetAtomicIntegerArray(m_subHandle, buf, defaultValue);
 }
 
@@ -65,12 +65,12 @@ inline IntegerArrayTopic IntegerArraySubscriber::GetTopic() const {
 inline IntegerArrayPublisher::IntegerArrayPublisher(NT_Publisher handle)
     : Publisher{handle} {}
 
-inline void IntegerArrayPublisher::Set(std::span<const int64_t> value,
+inline void IntegerArrayPublisher::Set(ParamType value,
                                          int64_t time) {
   ::nt::SetIntegerArray(m_pubHandle, value, time);
 }
 
-inline void IntegerArrayPublisher::SetDefault(std::span<const int64_t> value) {
+inline void IntegerArrayPublisher::SetDefault(ParamType value) {
   ::nt::SetDefaultIntegerArray(m_pubHandle, value);
 }
 
@@ -79,7 +79,7 @@ inline IntegerArrayTopic IntegerArrayPublisher::GetTopic() const {
 }
 
 inline IntegerArrayEntry::IntegerArrayEntry(
-    NT_Entry handle, std::span<const int64_t> defaultValue)
+    NT_Entry handle, ParamType defaultValue)
     : IntegerArraySubscriber{handle, defaultValue},
       IntegerArrayPublisher{handle} {}
 

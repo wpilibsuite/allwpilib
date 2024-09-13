@@ -23,11 +23,6 @@ public class Transform3dProto implements Protobuf<Transform3d, ProtobufTransform
   }
 
   @Override
-  public Protobuf<?, ?>[] getNested() {
-    return new Protobuf<?, ?>[] {Translation3d.proto, Rotation3d.proto};
-  }
-
-  @Override
   public ProtobufTransform3d createMessage() {
     return ProtobufTransform3d.newInstance();
   }
@@ -43,5 +38,10 @@ public class Transform3dProto implements Protobuf<Transform3d, ProtobufTransform
   public void pack(ProtobufTransform3d msg, Transform3d value) {
     Translation3d.proto.pack(msg.getMutableTranslation(), value.getTranslation());
     Rotation3d.proto.pack(msg.getMutableRotation(), value.getRotation());
+  }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
   }
 }

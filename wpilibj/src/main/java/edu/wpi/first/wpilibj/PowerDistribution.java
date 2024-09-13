@@ -27,7 +27,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
 
   /** Power distribution module type. */
   public enum ModuleType {
-    /** CTRE (Cross The Road Electronics) CTRE Power Distribution Panel (PDP). */
+    /** CTRE (Cross The Road Electronics) Power Distribution Panel (PDP). */
     kCTRE(PowerDistributionJNI.CTRE_TYPE),
     /** REV Power Distribution Hub (PDH). */
     kRev(PowerDistributionJNI.REV_TYPE);
@@ -111,6 +111,17 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    */
   public double getCurrent(int channel) {
     return PowerDistributionJNI.getChannelCurrent(m_handle, channel);
+  }
+
+  /**
+   * Query all currents of the PDP.
+   *
+   * @return The current of each channel in Amperes
+   */
+  public double[] getAllCurrents() {
+    double[] currents = new double[getNumChannels()];
+    PowerDistributionJNI.getAllCurrents(m_handle, currents);
+    return currents;
   }
 
   /**
@@ -211,6 +222,8 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   /**
    * Returns the power distribution faults.
    *
+   * <p>On a CTRE PDP, this will return an object with no faults active.
+   *
    * @return The power distribution faults.
    */
   public PowerDistributionFaults getFaults() {
@@ -219,6 +232,8 @@ public class PowerDistribution implements Sendable, AutoCloseable {
 
   /**
    * Returns the power distribution sticky faults.
+   *
+   * <p>On a CTRE PDP, this will return an object with no faults active.
    *
    * @return The power distribution sticky faults.
    */

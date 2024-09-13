@@ -11,10 +11,10 @@
 #include <cstdio>
 
 #include <cameraserver/CameraServerShared.h>
-#include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/print.h>
 #include <wpi/timestamp.h>
 #include <wpimath/MathShared.h>
 
@@ -47,8 +47,7 @@ int frc::RunHALInitialization() {
              HALUsageReporting::kLanguage_CPlusPlus, 0, GetWPILibVersion());
 
   if (!frc::Notifier::SetHALThreadPriority(true, 40)) {
-    FRC_ReportError(warn::Warning,
-                    "Setting HAL Notifier RT priority to 40 failed\n");
+    FRC_ReportWarning("Setting HAL Notifier RT priority to 40 failed\n");
   }
 
   std::puts("\n********** Robot program starting **********");
@@ -244,7 +243,7 @@ RobotBase::RobotBase() {
     std::this_thread::sleep_for(10ms);
     ++count;
     if (count > 100) {
-      fmt::print(stderr, "timed out while waiting for NT server to start\n");
+      wpi::print(stderr, "timed out while waiting for NT server to start\n");
       break;
     }
   }

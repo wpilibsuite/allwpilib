@@ -1,40 +1,40 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:09:18 -0400
-Subject: [PATCH 01/34] Remove StringRef, ArrayRef, and Optional
+Subject: [PATCH 01/37] Remove StringRef, ArrayRef, and Optional
 
 ---
- llvm/include/llvm/ADT/PointerUnion.h          |  1 -
- llvm/include/llvm/ADT/SmallSet.h              |  2 +-
- llvm/include/llvm/ADT/SmallString.h           | 77 ++++++++++---------
- llvm/include/llvm/ADT/SmallVector.h           |  7 +-
- llvm/include/llvm/ADT/StringMap.h             | 38 ++++-----
- llvm/include/llvm/ADT/StringMapEntry.h        | 20 ++---
- llvm/include/llvm/Support/Chrono.h            | 10 +--
- llvm/include/llvm/Support/Compiler.h          |  2 +-
- llvm/include/llvm/Support/ConvertUTF.h        | 31 ++++----
- llvm/include/llvm/Support/ErrorHandling.h     |  9 +--
- .../llvm/Support/SmallVectorMemoryBuffer.h    |  6 +-
- llvm/include/llvm/Support/VersionTuple.h      |  6 --
- .../llvm/Support/Windows/WindowsSupport.h     |  4 +-
- llvm/include/llvm/Support/raw_ostream.h       | 46 ++++++-----
- llvm/include/llvm/Support/xxhash.h            | 16 ++--
- llvm/lib/Support/ConvertUTFWrapper.cpp        | 38 ++++-----
- llvm/lib/Support/ErrorHandling.cpp            | 13 ++--
- llvm/lib/Support/SmallVector.cpp              |  5 +-
- llvm/lib/Support/StringMap.cpp                | 12 +--
- llvm/lib/Support/raw_ostream.cpp              | 25 +++---
- llvm/lib/Support/xxhash.cpp                   | 10 +--
- llvm/unittests/ADT/DenseMapTest.cpp           | 29 +------
- llvm/unittests/ADT/FunctionExtrasTest.cpp     | 12 +--
- llvm/unittests/ADT/HashingTest.cpp            |  2 +-
- llvm/unittests/ADT/SmallPtrSetTest.cpp        |  1 -
- llvm/unittests/ADT/SmallStringTest.cpp        | 50 ++++++------
- llvm/unittests/ADT/SmallVectorTest.cpp        | 30 ++------
- llvm/unittests/ADT/StringMapTest.cpp          | 32 ++++----
- llvm/unittests/Support/ConvertUTFTest.cpp     | 41 +++++-----
- llvm/unittests/Support/xxhashTest.cpp         |  4 +-
- 30 files changed, 264 insertions(+), 315 deletions(-)
+ llvm/include/llvm/ADT/PointerUnion.h          |   1 -
+ llvm/include/llvm/ADT/SmallSet.h              |   2 +-
+ llvm/include/llvm/ADT/SmallString.h           | 103 ++++++++++--------
+ llvm/include/llvm/ADT/SmallVector.h           |   7 +-
+ llvm/include/llvm/ADT/StringMap.h             |  38 +++----
+ llvm/include/llvm/ADT/StringMapEntry.h        |  20 ++--
+ llvm/include/llvm/Support/Chrono.h            |  10 +-
+ llvm/include/llvm/Support/Compiler.h          |   2 +-
+ llvm/include/llvm/Support/ConvertUTF.h        |  31 +++---
+ llvm/include/llvm/Support/ErrorHandling.h     |   9 +-
+ .../llvm/Support/SmallVectorMemoryBuffer.h    |   6 +-
+ llvm/include/llvm/Support/VersionTuple.h      |   6 -
+ .../llvm/Support/Windows/WindowsSupport.h     |   4 +-
+ llvm/include/llvm/Support/raw_ostream.h       |  46 +++++---
+ llvm/include/llvm/Support/xxhash.h            |  16 +--
+ llvm/lib/Support/ConvertUTFWrapper.cpp        |  38 +++----
+ llvm/lib/Support/ErrorHandling.cpp            |  13 +--
+ llvm/lib/Support/SmallVector.cpp              |   5 +-
+ llvm/lib/Support/StringMap.cpp                |  12 +-
+ llvm/lib/Support/raw_ostream.cpp              |  25 ++---
+ llvm/lib/Support/xxhash.cpp                   |  10 +-
+ llvm/unittests/ADT/DenseMapTest.cpp           |  29 +----
+ llvm/unittests/ADT/FunctionExtrasTest.cpp     |  12 +-
+ llvm/unittests/ADT/HashingTest.cpp            |   2 +-
+ llvm/unittests/ADT/SmallPtrSetTest.cpp        |   1 -
+ llvm/unittests/ADT/SmallStringTest.cpp        |  50 ++++-----
+ llvm/unittests/ADT/SmallVectorTest.cpp        |  30 +----
+ llvm/unittests/ADT/StringMapTest.cpp          |  32 +++---
+ llvm/unittests/Support/ConvertUTFTest.cpp     |  41 ++++---
+ llvm/unittests/Support/xxhashTest.cpp         |   4 +-
+ 30 files changed, 282 insertions(+), 323 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
 index 7d4ed02b622626bb8043acb57b8ce7ed97a5f949..8ac68dbc0a791b8ac0e0ca865e69024cb642aa70 100644
@@ -67,7 +67,7 @@ index a16e8ac6f07552d98250e808190b00ee270f12b3..aeee5f97799aea7e7588d7afba1e47b4
  #include <type_traits>
  #include <utility>
 diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
-index 0052c86fb37b82dcdf577a7acf06e3a47f54da61..4d673cc8b1c49cf8a3f19653de53881cd12662ee 100644
+index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413b0e36e0f 100644
 --- a/llvm/include/llvm/ADT/SmallString.h
 +++ b/llvm/include/llvm/ADT/SmallString.h
 @@ -15,8 +15,9 @@
@@ -141,155 +141,176 @@ index 0052c86fb37b82dcdf577a7acf06e3a47f54da61..4d673cc8b1c49cf8a3f19653de53881c
        std::copy(Ref.begin(), Ref.end(), this->begin() + CurrentSize);
        CurrentSize += Ref.size();
      }
-@@ -89,30 +90,30 @@ public:
+@@ -89,26 +90,30 @@ public:
  
    /// Check for string equality.  This is more efficient than compare() when
    /// the relative ordering of inequal strings isn't needed.
--  bool equals(StringRef RHS) const {
-+  bool equals(std::string_view RHS) const {
-     return str().equals(RHS);
-   }
+-  [[nodiscard]] bool equals(StringRef RHS) const { return str().equals(RHS); }
++  [[nodiscard]] bool equals(std::string_view RHS) const {
++    return str().equals(RHS);
++  }
  
    /// Check for string equality, ignoring case.
--  bool equals_insensitive(StringRef RHS) const {
-+  bool equals_insensitive(std::string_view RHS) const {
+-  [[nodiscard]] bool equals_insensitive(StringRef RHS) const {
++  [[nodiscard]] bool equals_insensitive(std::string_view RHS) const {
      return str().equals_insensitive(RHS);
    }
  
    /// compare - Compare two strings; the result is negative, zero, or positive
    /// if this string is lexicographically less than, equal to, or greater than
    /// the \p RHS.
--  int compare(StringRef RHS) const {
-+  int compare(std::string_view RHS) const {
-     return str().compare(RHS);
-   }
+-  [[nodiscard]] int compare(StringRef RHS) const { return str().compare(RHS); }
++  [[nodiscard]] int compare(std::string_view RHS) const {
++    return str().compare(RHS);
++  }
  
    /// compare_insensitive - Compare two strings, ignoring case.
--  int compare_insensitive(StringRef RHS) const {
-+  int compare_insensitive(std::string_view RHS) const {
+-  [[nodiscard]] int compare_insensitive(StringRef RHS) const {
++  [[nodiscard]] int compare_insensitive(std::string_view RHS) const {
      return str().compare_insensitive(RHS);
    }
  
    /// compare_numeric - Compare two strings, treating sequences of digits as
    /// numbers.
--  int compare_numeric(StringRef RHS) const {
-+  int compare_numeric(std::string_view RHS) const {
+-  [[nodiscard]] int compare_numeric(StringRef RHS) const {
++  [[nodiscard]] int compare_numeric(std::string_view RHS) const {
      return str().compare_numeric(RHS);
    }
  
-@@ -121,12 +122,12 @@ public:
+@@ -116,14 +121,14 @@ public:
+   /// @name String Predicates
    /// @{
  
-   /// startswith - Check if this string starts with the given \p Prefix.
--  bool startswith(StringRef Prefix) const {
-+  bool startswith(std::string_view Prefix) const {
-     return str().startswith(Prefix);
+-  /// starts_with - Check if this string starts with the given \p Prefix.
+-  [[nodiscard]] bool starts_with(StringRef Prefix) const {
+-    return str().starts_with(Prefix);
++  /// startswith - Check if this string starts with the given \p Prefix.
++  [[nodiscard]] bool startswith(std::string_view Prefix) const {
++    return str().startswith(Prefix);
    }
  
-   /// endswith - Check if this string ends with the given \p Suffix.
--  bool endswith(StringRef Suffix) const {
-+  bool endswith(std::string_view Suffix) const {
-     return str().endswith(Suffix);
+-  /// ends_with - Check if this string ends with the given \p Suffix.
+-  [[nodiscard]] bool ends_with(StringRef Suffix) const {
+-    return str().ends_with(Suffix);
++  /// endswith - Check if this string ends with the given \p Suffix.
++  [[nodiscard]] bool endswith(std::string_view Suffix) const {
++    return str().endswith(Suffix);
    }
  
-@@ -146,7 +147,7 @@ public:
+   /// @}
+@@ -142,7 +147,7 @@ public:
    ///
    /// \returns The index of the first occurrence of \p Str, or npos if not
    /// found.
--  size_t find(StringRef Str, size_t From = 0) const {
-+  size_t find(std::string_view Str, size_t From = 0) const {
+-  [[nodiscard]] size_t find(StringRef Str, size_t From = 0) const {
++  [[nodiscard]] size_t find(std::string_view Str, size_t From = 0) const {
      return str().find(Str, From);
    }
  
-@@ -154,7 +155,7 @@ public:
+@@ -150,7 +155,8 @@ public:
    ///
    /// \returns The index of the last occurrence of \p C, or npos if not
    /// found.
--  size_t rfind(char C, size_t From = StringRef::npos) const {
-+  size_t rfind(char C, size_t From = std::string_view::npos) const {
+-  [[nodiscard]] size_t rfind(char C, size_t From = StringRef::npos) const {
++  [[nodiscard]] size_t rfind(char C,
++                             size_t From = std::string_view::npos) const {
      return str().rfind(C, From);
    }
  
-@@ -162,7 +163,7 @@ public:
+@@ -158,7 +164,9 @@ public:
    ///
    /// \returns The index of the last occurrence of \p Str, or npos if not
    /// found.
--  size_t rfind(StringRef Str) const {
-+  size_t rfind(std::string_view Str) const {
-     return str().rfind(Str);
-   }
+-  [[nodiscard]] size_t rfind(StringRef Str) const { return str().rfind(Str); }
++  [[nodiscard]] size_t rfind(std::string_view Str) const {
++    return str().rfind(Str);
++  }
  
-@@ -176,7 +177,7 @@ public:
+   /// Find the first character in the string that is \p C, or npos if not
+   /// found. Same as find.
+@@ -170,7 +178,8 @@ public:
    /// not found.
    ///
    /// Complexity: O(size() + Chars.size())
--  size_t find_first_of(StringRef Chars, size_t From = 0) const {
-+  size_t find_first_of(std::string_view Chars, size_t From = 0) const {
+-  [[nodiscard]] size_t find_first_of(StringRef Chars, size_t From = 0) const {
++  [[nodiscard]] size_t find_first_of(std::string_view Chars,
++                                     size_t From = 0) const {
      return str().find_first_of(Chars, From);
    }
  
-@@ -190,13 +191,13 @@ public:
+@@ -184,15 +193,15 @@ public:
    /// \p Chars, or npos if not found.
    ///
    /// Complexity: O(size() + Chars.size())
--  size_t find_first_not_of(StringRef Chars, size_t From = 0) const {
-+  size_t find_first_not_of(std::string_view Chars, size_t From = 0) const {
+-  [[nodiscard]] size_t find_first_not_of(StringRef Chars,
++  [[nodiscard]] size_t find_first_not_of(std::string_view Chars,
+                                          size_t From = 0) const {
      return str().find_first_not_of(Chars, From);
    }
  
    /// Find the last character in the string that is \p C, or npos if not
    /// found.
--  size_t find_last_of(char C, size_t From = StringRef::npos) const {
-+  size_t find_last_of(char C, size_t From = std::string_view::npos) const {
+-  [[nodiscard]] size_t find_last_of(char C,
+-                                    size_t From = StringRef::npos) const {
++  [[nodiscard]] size_t find_last_of(
++      char C, size_t From = std::string_view::npos) const {
      return str().find_last_of(C, From);
    }
  
-@@ -205,7 +206,7 @@ public:
+@@ -200,8 +209,8 @@ public:
+   /// found.
    ///
    /// Complexity: O(size() + Chars.size())
-   size_t find_last_of(
--      StringRef Chars, size_t From = StringRef::npos) const {
+-  [[nodiscard]] size_t find_last_of(StringRef Chars,
+-                                    size_t From = StringRef::npos) const {
++  [[nodiscard]] size_t find_last_of(
 +      std::string_view Chars, size_t From = std::string_view::npos) const {
      return str().find_last_of(Chars, From);
    }
  
-@@ -220,7 +221,7 @@ public:
+@@ -214,7 +223,9 @@ public:
  
    /// Return the number of non-overlapped occurrences of \p Str in the
    /// string.
--  size_t count(StringRef Str) const {
-+  size_t count(std::string_view Str) const {
-     return str().count(Str);
-   }
+-  [[nodiscard]] size_t count(StringRef Str) const { return str().count(Str); }
++  [[nodiscard]] size_t count(std::string_view Str) const {
++    return str().count(Str);
++  }
  
-@@ -237,7 +238,7 @@ public:
+   /// @}
+   /// @name Substring Operations
+@@ -229,8 +240,8 @@ public:
    /// \param N The number of characters to included in the substring. If \p N
    /// exceeds the number of characters remaining in the string, the string
    /// suffix (starting with \p Start) will be returned.
--  StringRef substr(size_t Start, size_t N = StringRef::npos) const {
-+  std::string_view substr(size_t Start, size_t N = std::string_view::npos) const {
+-  [[nodiscard]] StringRef substr(size_t Start,
+-                                 size_t N = StringRef::npos) const {
++  [[nodiscard]] std::string_view substr(
++      size_t Start, size_t N = std::string_view::npos) const {
      return str().substr(Start, N);
    }
  
-@@ -251,14 +252,14 @@ public:
+@@ -244,15 +255,15 @@ public:
    /// substring. If this is npos, or less than \p Start, or exceeds the
    /// number of characters remaining in the string, the string suffix
    /// (starting with \p Start) will be returned.
--  StringRef slice(size_t Start, size_t End) const {
-+  std::string_view slice(size_t Start, size_t End) const {
+-  [[nodiscard]] StringRef slice(size_t Start, size_t End) const {
++  [[nodiscard]] std::string_view slice(size_t Start, size_t End) const {
      return str().slice(Start, End);
    }
  
    // Extra methods.
  
 -  /// Explicit conversion to StringRef.
--  StringRef str() const { return StringRef(this->data(), this->size()); }
+-  [[nodiscard]] StringRef str() const {
+-    return StringRef(this->data(), this->size());
 +  /// Explicit conversion to std::string_view.
-+  std::string_view str() const { return std::string_view(this->begin(), this->size()); }
++  [[nodiscard]] std::string_view str() const {
++    return std::string_view(this->begin(), this->size());
+   }
  
    // TODO: Make this const, if it's safe...
-   const char* c_str() {
-@@ -267,20 +268,20 @@ public:
+@@ -262,20 +273,20 @@ public:
      return this->data();
    }
  
@@ -315,7 +336,7 @@ index 0052c86fb37b82dcdf577a7acf06e3a47f54da61..4d673cc8b1c49cf8a3f19653de53881c
      return *this;
    }
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 53a107b1574c6a35c66c7fe3c61deb2ffc84b991..4559864ed231206b098936dae4fc378bfa986371 100644
+index 09676d792dfebd88e5c8eace666b3ab0044a962e..c96fd0e4956ee6d586f85dc79623de137e781ce0 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -27,13 +27,12 @@
@@ -333,7 +354,7 @@ index 53a107b1574c6a35c66c7fe3c61deb2ffc84b991..4559864ed231206b098936dae4fc378b
  template <typename IteratorT> class iterator_range;
  
  template <class Iterator>
-@@ -117,7 +116,7 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
+@@ -127,7 +126,7 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
  };
  
  /// This is the part of SmallVectorTemplateBase which does not depend on whether
@@ -342,7 +363,7 @@ index 53a107b1574c6a35c66c7fe3c61deb2ffc84b991..4559864ed231206b098936dae4fc378b
  /// to avoid unnecessarily requiring T to be complete.
  template <typename T, typename = void>
  class SmallVectorTemplateCommon
-@@ -1233,7 +1232,7 @@ public:
+@@ -1242,7 +1241,7 @@ public:
  
    template <typename U,
              typename = std::enable_if_t<std::is_convertible<U, T>::value>>
@@ -576,10 +597,10 @@ index 98b51cc1aebd59eba20076e6d8a4eebc0eebb982..388e81c361642113937f7d5680de73a5
  
  #endif // LLVM_ADT_STRINGMAPENTRY_H
 diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index 9c2bd45d2803e56ed316d8552d899d87f2fbbb07..a7dea19d9193bcff4bc6b553b80a10b2bc7b64af 100644
+index 71859af7c7e4a595140475daf356744f52d14d24..9c9ba7002310eba5113c14957f769702c61f4326 100644
 --- a/llvm/include/llvm/Support/Chrono.h
 +++ b/llvm/include/llvm/Support/Chrono.h
-@@ -70,7 +70,7 @@ raw_ostream &operator<<(raw_ostream &OS, sys::TimePoint<> TP);
+@@ -91,7 +91,7 @@ raw_ostream &operator<<(raw_ostream &OS, sys::UtcTime<> TP);
  template <>
  struct format_provider<sys::TimePoint<>> {
    static void format(const sys::TimePoint<> &TP, llvm::raw_ostream &OS,
@@ -587,8 +608,8 @@ index 9c2bd45d2803e56ed316d8552d899d87f2fbbb07..a7dea19d9193bcff4bc6b553b80a10b2
 +                     std::string_view Style);
  };
  
- namespace detail {
-@@ -122,7 +122,7 @@ private:
+ template <> struct format_provider<sys::UtcTime<std::chrono::seconds>> {
+@@ -148,7 +148,7 @@ private:
      return duration_cast<duration<InternalRep, AsPeriod>>(D).count();
    }
  
@@ -597,7 +618,7 @@ index 9c2bd45d2803e56ed316d8552d899d87f2fbbb07..a7dea19d9193bcff4bc6b553b80a10b2
                                                          const Dur &D) {
      using namespace std::chrono;
      if (Style.consume_front("ns"))
-@@ -140,7 +140,7 @@ private:
+@@ -166,7 +166,7 @@ private:
      return {D.count(), detail::unit<Period>::value};
    }
  
@@ -606,7 +627,7 @@ index 9c2bd45d2803e56ed316d8552d899d87f2fbbb07..a7dea19d9193bcff4bc6b553b80a10b2
      if (Style.empty())
        return true;
      if (Style.consume_front("-"))
-@@ -152,9 +152,9 @@ private:
+@@ -178,9 +178,9 @@ private:
    }
  
  public:
@@ -619,10 +640,10 @@ index 9c2bd45d2803e56ed316d8552d899d87f2fbbb07..a7dea19d9193bcff4bc6b553b80a10b2
      bool show_unit = consumeShowUnit(Style);
  
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index 10d5cec231a523c943c37a5464cb3943627239a9..92376629c607461061bc60597a47aed1e535af52 100644
+index 8c315d255bb772d9e3c100adbd2c07b61283219b..6789f0413d8dc94cb465b6e66506b036449ee186 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
-@@ -300,7 +300,7 @@
+@@ -319,7 +319,7 @@
  #endif
  
  /// LLVM_GSL_POINTER - Apply this to non-owning classes like
@@ -800,18 +821,18 @@ index f7f2d4e54e705d6f29812dc93d1fb0a3ca2dee12..b5e321b5f74ce35940649b9d1342b3cd
    BufferKind getBufferKind() const override { return MemoryBuffer_Malloc; }
  
 diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
-index 828a6db54708dfa9a1a4b4456a92945a92ad80cb..953b40701dc934c1a356b5413c9c6c692d5f5679 100644
+index 0a4623f049d28825530bf50c8acfe85deaed96ba..e1cdce77ce8659305c99a21e01f9b3cc3481a5fd 100644
 --- a/llvm/include/llvm/Support/VersionTuple.h
 +++ b/llvm/include/llvm/Support/VersionTuple.h
-@@ -25,7 +25,6 @@ namespace llvm {
- template <typename HasherT, support::endianness Endianness>
- class HashBuilderImpl;
+@@ -23,7 +23,6 @@
+ namespace llvm {
+ template <typename HasherT, llvm::endianness Endianness> class HashBuilder;
  class raw_ostream;
 -class StringRef;
  
  /// Represents a version number in the form major[.minor[.subminor[.build]]].
  class VersionTuple {
-@@ -182,11 +181,6 @@ public:
+@@ -180,11 +179,6 @@ public:
  
    /// Retrieve a string representation of the version number.
    std::string getAsString() const;
@@ -846,7 +867,7 @@ index d3aacd14b2097b1e7e13c1003987c1fd52e0cf76..aabdb2f14668a990329b57f5454a0d7d
  
  template <typename HandleTraits>
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 1e01eb9ea19c4187302a91457b6d34fbe5b67584..2463f1af612a78cafafe3c0e16d496e607cdc322 100644
+index 42663a9adf2e51ae36209faf7d465094adbf0943..9345348d9ba555022b31f94299684316ffa15939 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -14,13 +14,12 @@
@@ -944,9 +965,9 @@ index 1e01eb9ea19c4187302a91457b6d34fbe5b67584..2463f1af612a78cafafe3c0e16d496e6
 -  raw_fd_stream(StringRef Filename, std::error_code &EC);
 +  raw_fd_stream(std::string_view Filename, std::error_code &EC);
  
-   /// This reads the \p Size bytes into a buffer pointed by \p Ptr.
-   ///
-@@ -693,8 +703,8 @@ public:
+   raw_fd_stream(int fd, bool shouldClose);
+ 
+@@ -695,8 +705,8 @@ public:
  
    void flush() = delete;
  
@@ -957,7 +978,7 @@ index 1e01eb9ea19c4187302a91457b6d34fbe5b67584..2463f1af612a78cafafe3c0e16d496e6
  
    void reserveExtraSpace(uint64_t ExtraSize) override {
      OS.reserve(tell() + ExtraSize);
-@@ -751,7 +761,7 @@ class Error;
+@@ -753,7 +763,7 @@ class Error;
  /// for other names. For raw_fd_ostream instances, the stream writes to
  /// a temporary file. The final output file is atomically replaced with the
  /// temporary file after the \p Write function is finished.
@@ -1178,7 +1199,7 @@ index b8b3b7424ac6b1de782e739782f9671194ce77a1..0aa13a0f78eb370b2a673ca4a773f268
      (void)written; // If something went wrong, we deliberately just give up.
    }
 diff --git a/llvm/lib/Support/SmallVector.cpp b/llvm/lib/Support/SmallVector.cpp
-index f7e7e80332cc337f6dfa388d1e218e6f3ec95cf2..6cefdff7c28060ca18b522acf5279af3a206e23a 100644
+index b6ce37842040b36fc79770ca0296255f2bb42a1a..4f6fee18b659adcbfd79822832f914170cbb1635 100644
 --- a/llvm/lib/Support/SmallVector.cpp
 +++ b/llvm/lib/Support/SmallVector.cpp
 @@ -11,7 +11,6 @@
@@ -1265,10 +1286,10 @@ index 67c05a87959cf0c243d17646ae2f28f6c9f0d708..7be219323f6d76f32a9a841115f2f146
    if (Bucket == -1)
      return nullptr;
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index a4fc605019c211f93dde009e89e7a79b07400aa3..9966a0056ae4f24a7a38346ee1c2f5d83ac20248 100644
+index 3d3a564af51d120786b358b96a3c90e2b7fbf9f3..220d850b9bc69f8fc2fba7cd23629eca487cde23 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -166,7 +166,7 @@ raw_ostream &raw_ostream::write_uuid(const uuid_t UUID) {
+@@ -167,7 +167,7 @@ raw_ostream &raw_ostream::write_uuid(const uuid_t UUID) {
  }
  
  
@@ -1277,7 +1298,7 @@ index a4fc605019c211f93dde009e89e7a79b07400aa3..9966a0056ae4f24a7a38346ee1c2f5d8
                                          bool UseHexEscapes) {
    for (unsigned char c : Str) {
      switch (c) {
-@@ -569,7 +569,7 @@ void format_object_base::home() {
+@@ -570,7 +570,7 @@ void format_object_base::home() {
  //  raw_fd_ostream
  //===----------------------------------------------------------------------===//
  
@@ -1286,7 +1307,7 @@ index a4fc605019c211f93dde009e89e7a79b07400aa3..9966a0056ae4f24a7a38346ee1c2f5d8
                   sys::fs::CreationDisposition Disp, sys::fs::FileAccess Access,
                   sys::fs::OpenFlags Flags) {
    assert((Access & sys::fs::FA_Write) &&
-@@ -595,25 +595,25 @@ static int getFD(StringRef Filename, std::error_code &EC,
+@@ -596,25 +596,25 @@ static int getFD(StringRef Filename, std::error_code &EC,
    return FD;
  }
  
@@ -1317,7 +1338,7 @@ index a4fc605019c211f93dde009e89e7a79b07400aa3..9966a0056ae4f24a7a38346ee1c2f5d8
                                 sys::fs::CreationDisposition Disp,
                                 sys::fs::FileAccess Access,
                                 sys::fs::OpenFlags Flags)
-@@ -685,8 +685,7 @@ raw_fd_ostream::~raw_fd_ostream() {
+@@ -686,8 +686,7 @@ raw_fd_ostream::~raw_fd_ostream() {
    // has_error() and clear the error flag with clear_error() before
    // destructing raw_ostream objects which may have errors.
    if (has_error())
@@ -1327,7 +1348,7 @@ index a4fc605019c211f93dde009e89e7a79b07400aa3..9966a0056ae4f24a7a38346ee1c2f5d8
                         /*gen_crash_diag=*/false);
  }
  
-@@ -705,7 +704,7 @@ raw_fd_ostream::~raw_fd_ostream() {
+@@ -706,7 +705,7 @@ raw_fd_ostream::~raw_fd_ostream() {
  // the input is UTF-8 or transcode from the local codepage to UTF-8 before
  // quoting it. If they don't, this may mess up the encoding, but this is still
  // probably the best compromise we can make.
@@ -1336,7 +1357,7 @@ index a4fc605019c211f93dde009e89e7a79b07400aa3..9966a0056ae4f24a7a38346ee1c2f5d8
    SmallVector<wchar_t, 256> WideText;
  
    // Fall back to ::write if it wasn't valid UTF-8.
-@@ -748,7 +747,7 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+@@ -749,7 +748,7 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
    // If this is a Windows console device, try re-encoding from UTF-8 to UTF-16
    // and using WriteConsoleW. If that fails, fall back to plain write().
    if (IsWindowsConsole)
@@ -1345,7 +1366,7 @@ index a4fc605019c211f93dde009e89e7a79b07400aa3..9966a0056ae4f24a7a38346ee1c2f5d8
        return;
  #endif
  
-@@ -919,7 +918,7 @@ raw_ostream &llvm::nulls() {
+@@ -925,7 +924,7 @@ raw_ostream &llvm::nulls() {
  // File Streams
  //===----------------------------------------------------------------------===//
  
@@ -1354,7 +1375,7 @@ index a4fc605019c211f93dde009e89e7a79b07400aa3..9966a0056ae4f24a7a38346ee1c2f5d8
      : raw_fd_ostream(getFD(Filename, EC, sys::fs::CD_CreateAlways,
                             sys::fs::FA_Write | sys::fs::FA_Read,
                             sys::fs::OF_None),
-@@ -997,7 +996,7 @@ void buffer_ostream::anchor() {}
+@@ -998,7 +997,7 @@ void buffer_ostream::anchor() {}
  
  void buffer_unique_ostream::anchor() {}
  
@@ -1493,7 +1514,7 @@ index fc856a976946bf6decda9b6724cac66afc7bdcd6..aff9d61c7f0d48834123b04b74a2e4f7
  TEST(UniqueFunctionTest, SFINAE) {
    EXPECT_EQ("not a function", returns("boo!"));
 diff --git a/llvm/unittests/ADT/HashingTest.cpp b/llvm/unittests/ADT/HashingTest.cpp
-index 01a8a962b8e2e33ca8f189c049e9548ced42ec3a..62aff9c3b21eea785ca71c6e290c9c4f3a20ae00 100644
+index ab13ee833ce556945fb9526fd13d8bd5f3e5c95a..3e80467ebd0efddcf2cbbe003bb91f1475ca9cb3 100644
 --- a/llvm/unittests/ADT/HashingTest.cpp
 +++ b/llvm/unittests/ADT/HashingTest.cpp
 @@ -295,7 +295,7 @@ TEST(HashingTest, HashCombineRangeGoldenTest) {

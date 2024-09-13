@@ -29,17 +29,17 @@ class AprilTagDetectorTest {
   @SuppressWarnings("MemberName")
   AprilTagDetector detector;
 
-  static RuntimeLoader<Core> loader;
-
   @BeforeAll
   static void beforeAll() {
     try {
-      loader =
-          new RuntimeLoader<>(
-              Core.NATIVE_LIBRARY_NAME, RuntimeLoader.getDefaultExtractionRoot(), Core.class);
-      loader.loadLibrary();
-    } catch (IOException ex) {
-      fail(ex);
+      RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    } catch (IOException e) {
+      try {
+        // Try adding a debug postfix
+        RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME + "d");
+      } catch (IOException ex) {
+        fail(ex);
+      }
     }
   }
 
@@ -88,11 +88,6 @@ class AprilTagDetectorTest {
     assertDoesNotThrow(() -> detector.addFamily("tag16h5"));
     // duplicate addition is also okay
     assertDoesNotThrow(() -> detector.addFamily("tag16h5"));
-  }
-
-  @Test
-  void testAdd25h9() {
-    assertDoesNotThrow(() -> detector.addFamily("tag25h9"));
   }
 
   @Test
@@ -158,7 +153,7 @@ class AprilTagDetectorTest {
       var estimator =
           new AprilTagPoseEstimator(new AprilTagPoseEstimator.Config(0.2, 500, 500, 320, 240));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
-      assertEquals(new Transform3d(), est.pose2);
+      assertEquals(Transform3d.kZero, est.pose2);
       Transform3d pose = estimator.estimate(results[0]);
       assertEquals(est.pose1, pose);
     } finally {

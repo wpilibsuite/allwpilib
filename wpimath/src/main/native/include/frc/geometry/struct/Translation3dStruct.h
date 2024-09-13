@@ -11,9 +11,7 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::Translation3d> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:Translation3d";
-  }
+  static constexpr std::string_view GetTypeName() { return "Translation3d"; }
   static constexpr size_t GetSize() { return 24; }
   static constexpr std::string_view GetSchema() {
     return "double x;double y;double z";

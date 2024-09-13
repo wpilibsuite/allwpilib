@@ -45,13 +45,13 @@ class WPILIB_DLLEXPORT ArmFeedforward {
     if (kV.value() < 0) {
       wpi::math::MathSharedStore::ReportError(
           "kV must be a non-negative number, got {}!", kV.value());
-      kV = units::unit_t<kv_unit>{0};
+      this->kV = units::unit_t<kv_unit>{0};
       wpi::math::MathSharedStore::ReportWarning("kV defaulted to 0.");
     }
     if (kA.value() < 0) {
       wpi::math::MathSharedStore::ReportError(
           "kA must be a non-negative number, got {}!", kA.value());
-      kA = units::unit_t<ka_unit>{0};
+      this->kA = units::unit_t<ka_unit>{0};
       wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0;");
     }
   }
@@ -75,6 +75,23 @@ class WPILIB_DLLEXPORT ArmFeedforward {
     return kS * wpi::sgn(velocity) + kG * units::math::cos(angle) +
            kV * velocity + kA * acceleration;
   }
+
+  /**
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * @param currentAngle The current angle in radians. This angle should be
+   *   measured from the horizontal (i.e. if the provided angle is 0, the arm
+   *   should be parallel to the floor). If your encoder does not follow this
+   *   convention, an offset should be added.
+   * @param currentVelocity The current velocity setpoint in radians per second.
+   * @param nextVelocity The next velocity setpoint in radians per second.
+   * @param dt Time between velocity setpoints in seconds.
+   * @return The computed feedforward in volts.
+   */
+  units::volt_t Calculate(units::unit_t<Angle> currentAngle,
+                          units::unit_t<Velocity> currentVelocity,
+                          units::unit_t<Velocity> nextVelocity,
+                          units::second_t dt) const;
 
   // Rearranging the main equation from the calculate() method yields the
   // formulas for the methods below:
@@ -175,19 +192,50 @@ class WPILIB_DLLEXPORT ArmFeedforward {
     return MaxAchievableAcceleration(-maxVoltage, angle, velocity);
   }
 
+  /**
+   * Returns the static gain.
+   *
+   * @return The static gain.
+   */
+  units::volt_t GetKs() const { return kS; }
+
+  /**
+   * Returns the gravity gain.
+   *
+   * @return The gravity gain.
+   */
+  units::volt_t GetKg() const { return kG; }
+
+  /**
+   * Returns the velocity gain.
+   *
+   * @return The velocity gain.
+   */
+  units::unit_t<kv_unit> GetKv() const { return kV; }
+
+  /**
+   * Returns the acceleration gain.
+   *
+   * @return The acceleration gain.
+   */
+  units::unit_t<ka_unit> GetKa() const { return kA; }
+
+ private:
   /// The static gain, in volts.
-  const units::volt_t kS;
+  units::volt_t kS;
 
   /// The gravity gain, in volts.
-  const units::volt_t kG;
+  units::volt_t kG;
 
-  /// The velocity gain, in volt seconds per radian.
-  const units::unit_t<kv_unit> kV;
+  /// The velocity gain, in V/(rad/s)volt seconds per radian.
+  units::unit_t<kv_unit> kV;
 
-  /// The acceleration gain, in volt seconds² per radian.
-  const units::unit_t<ka_unit> kA;
+  /// The acceleration gain, in V/(rad/s²).
+  units::unit_t<ka_unit> kA;
 };
 }  // namespace frc
 
+#ifndef NO_PROTOBUF
 #include "frc/controller/proto/ArmFeedforwardProto.h"
+#endif
 #include "frc/controller/struct/ArmFeedforwardStruct.h"

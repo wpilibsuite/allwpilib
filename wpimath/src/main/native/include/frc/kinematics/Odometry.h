@@ -7,8 +7,9 @@
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Rotation2d.h"
+#include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/Kinematics.h"
-#include "frc/kinematics/WheelPositions.h"
 
 namespace frc {
 /**
@@ -24,7 +25,7 @@ namespace frc {
  * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelPositions Wheel positions type.
  */
-template <typename WheelSpeeds, WheelPositions WheelPositions>
+template <typename WheelSpeeds, typename WheelPositions>
 class WPILIB_DLLEXPORT Odometry {
  public:
   /**
@@ -56,6 +57,37 @@ class WPILIB_DLLEXPORT Odometry {
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;
     m_previousWheelPositions = wheelPositions;
+  }
+
+  /**
+   * Resets the pose.
+   *
+   * @param pose The pose to reset to.
+   */
+  void ResetPose(const Pose2d& pose) {
+    m_gyroOffset = m_gyroOffset + (pose.Rotation() - m_pose.Rotation());
+    m_pose = pose;
+    m_previousAngle = pose.Rotation();
+  }
+
+  /**
+   * Resets the translation of the pose.
+   *
+   * @param translation The translation to reset to.
+   */
+  void ResetTranslation(const Translation2d& translation) {
+    m_pose = Pose2d{translation, m_pose.Rotation()};
+  }
+
+  /**
+   * Resets the rotation of the pose.
+   *
+   * @param rotation The rotation to reset to.
+   */
+  void ResetRotation(const Rotation2d& rotation) {
+    m_gyroOffset = m_gyroOffset + (rotation - m_pose.Rotation());
+    m_pose = Pose2d{m_pose.Translation(), rotation};
+    m_previousAngle = rotation;
   }
 
   /**

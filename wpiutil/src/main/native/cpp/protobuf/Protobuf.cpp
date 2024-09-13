@@ -10,6 +10,7 @@
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/message.h>
 
+#include "wpi/ProtoHelper.h"
 #include "wpi/SmallVector.h"
 
 using namespace wpi;
@@ -170,7 +171,7 @@ static void ForEachProtobufDescriptorImpl(
                                   descproto);
   }
   if (!*descproto) {
-    *descproto = Arena::CreateMessage<FileDescriptorProto>(arena);
+    *descproto = wpi::CreateMessage<FileDescriptorProto>(arena);
   }
   (*descproto)->Clear();
   desc->CopyTo(*descproto);

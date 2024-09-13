@@ -111,7 +111,7 @@ public class AnalogGyroJNI extends JNIWrapper {
    * <p>Can be used to not repeat a calibration but reconstruct the gyro object.
    *
    * @param handle the gyro handle
-   * @return the gryo offset
+   * @return the gyro offset
    * @see "HAL_GetAnalogGyroOffset"
    */
   public static native double getAnalogGyroOffset(int handle);

@@ -41,22 +41,22 @@ class SwerveControllerCommandTest {
   }
 
   private final Timer m_timer = new Timer();
-  private Rotation2d m_angle = new Rotation2d(0);
+  private Rotation2d m_angle = Rotation2d.kZero;
 
   private SwerveModuleState[] m_moduleStates =
       new SwerveModuleState[] {
-        new SwerveModuleState(0, new Rotation2d(0)),
-        new SwerveModuleState(0, new Rotation2d(0)),
-        new SwerveModuleState(0, new Rotation2d(0)),
-        new SwerveModuleState(0, new Rotation2d(0))
+        new SwerveModuleState(0, Rotation2d.kZero),
+        new SwerveModuleState(0, Rotation2d.kZero),
+        new SwerveModuleState(0, Rotation2d.kZero),
+        new SwerveModuleState(0, Rotation2d.kZero)
       };
 
-  private SwerveModulePosition[] m_modulePositions =
+  private final SwerveModulePosition[] m_modulePositions =
       new SwerveModulePosition[] {
-        new SwerveModulePosition(0, new Rotation2d(0)),
-        new SwerveModulePosition(0, new Rotation2d(0)),
-        new SwerveModulePosition(0, new Rotation2d(0)),
-        new SwerveModulePosition(0, new Rotation2d(0))
+        new SwerveModulePosition(0, Rotation2d.kZero),
+        new SwerveModulePosition(0, Rotation2d.kZero),
+        new SwerveModulePosition(0, Rotation2d.kZero),
+        new SwerveModulePosition(0, Rotation2d.kZero)
       };
 
   private final ProfiledPIDController m_rotController =
@@ -77,8 +77,7 @@ class SwerveControllerCommandTest {
           new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
   private final SwerveDriveOdometry m_odometry =
-      new SwerveDriveOdometry(
-          m_kinematics, new Rotation2d(0), m_modulePositions, new Pose2d(0, 0, new Rotation2d(0)));
+      new SwerveDriveOdometry(m_kinematics, Rotation2d.kZero, m_modulePositions, Pose2d.kZero);
 
   @SuppressWarnings("PMD.ArrayIsStoredDirectly")
   public void setModuleStates(SwerveModuleState[] moduleStates) {
@@ -96,7 +95,7 @@ class SwerveControllerCommandTest {
     final var subsystem = new Subsystem() {};
 
     final var waypoints = new ArrayList<Pose2d>();
-    waypoints.add(new Pose2d(0, 0, new Rotation2d(0)));
+    waypoints.add(Pose2d.kZero);
     waypoints.add(new Pose2d(1, 5, new Rotation2d(3)));
     var config = new TrajectoryConfig(8.8, 0.1);
     final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);

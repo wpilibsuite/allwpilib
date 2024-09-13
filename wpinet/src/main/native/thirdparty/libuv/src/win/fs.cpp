@@ -410,8 +410,8 @@ void fs__open(uv_fs_t* req) {
 
   /* Obtain the active umask. umask() never fails and returns the previous
    * umask. */
-  current_umask = umask(0);
-  umask(current_umask);
+  current_umask = _umask(0);
+  _umask(current_umask);
 
   /* convert flags and mode to CreateFile parameters */
   switch (flags & (UV_FS_O_RDONLY | UV_FS_O_WRONLY | UV_FS_O_RDWR)) {
@@ -1704,7 +1704,7 @@ INLINE static int fs__stat_handle(HANDLE handle, uv_stat_t* statbuf,
    * impossible to delete the file afterwards, since read-only files can't be
    * deleted.
    *
-   * IOW it's all just a clusterfuck and we should think of something that
+   * IOW it's all just a mess and we should think of something that
    * makes slightly more sense.
    *
    * And uv_fs_chmod should probably just fail on windows or be a total no-op.

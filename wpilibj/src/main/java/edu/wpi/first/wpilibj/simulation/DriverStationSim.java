@@ -22,8 +22,7 @@ public final class DriverStationSim {
    *
    * @param callback the callback that will be called whenever the enabled state is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public static CallbackStore registerEnabledCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -54,8 +53,7 @@ public final class DriverStationSim {
    *
    * @param callback the callback that will be called on autonomous mode entrance/exit
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public static CallbackStore registerAutonomousCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -86,8 +84,7 @@ public final class DriverStationSim {
    *
    * @param callback the callback that will be called whenever the test mode is entered or left
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public static CallbackStore registerTestCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerTestCallback(callback, initialNotify);
@@ -117,8 +114,7 @@ public final class DriverStationSim {
    *
    * @param callback the callback that will be called whenever the eStop state changes
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public static CallbackStore registerEStopCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -149,8 +145,7 @@ public final class DriverStationSim {
    *
    * @param callback the callback that will be called whenever the FMS connection changes
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public static CallbackStore registerFmsAttachedCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -181,8 +176,7 @@ public final class DriverStationSim {
    *
    * @param callback the callback that will be called whenever the DS connection changes
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public static CallbackStore registerDsAttachedCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -213,8 +207,7 @@ public final class DriverStationSim {
    *
    * @param callback the callback that will be called whenever the alliance station changes
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public static CallbackStore registerAllianceStationIdCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -228,24 +221,16 @@ public final class DriverStationSim {
    * @return the alliance station color and number
    */
   public static AllianceStationID getAllianceStationId() {
-    switch (DriverStationDataJNI.getAllianceStationId()) {
-      case DriverStationJNI.kUnknownAllianceStation:
-        return AllianceStationID.Unknown;
-      case DriverStationJNI.kRed1AllianceStation:
-        return AllianceStationID.Red1;
-      case DriverStationJNI.kRed2AllianceStation:
-        return AllianceStationID.Red2;
-      case DriverStationJNI.kRed3AllianceStation:
-        return AllianceStationID.Red3;
-      case DriverStationJNI.kBlue1AllianceStation:
-        return AllianceStationID.Blue1;
-      case DriverStationJNI.kBlue2AllianceStation:
-        return AllianceStationID.Blue2;
-      case DriverStationJNI.kBlue3AllianceStation:
-        return AllianceStationID.Blue3;
-      default:
-        return AllianceStationID.Unknown;
-    }
+    return switch (DriverStationDataJNI.getAllianceStationId()) {
+      case DriverStationJNI.kUnknownAllianceStation -> AllianceStationID.Unknown;
+      case DriverStationJNI.kRed1AllianceStation -> AllianceStationID.Red1;
+      case DriverStationJNI.kRed2AllianceStation -> AllianceStationID.Red2;
+      case DriverStationJNI.kRed3AllianceStation -> AllianceStationID.Red3;
+      case DriverStationJNI.kBlue1AllianceStation -> AllianceStationID.Blue1;
+      case DriverStationJNI.kBlue2AllianceStation -> AllianceStationID.Blue2;
+      case DriverStationJNI.kBlue3AllianceStation -> AllianceStationID.Blue3;
+      default -> AllianceStationID.Unknown;
+    };
   }
 
   /**
@@ -254,32 +239,16 @@ public final class DriverStationSim {
    * @param allianceStationId the new alliance station
    */
   public static void setAllianceStationId(AllianceStationID allianceStationId) {
-    int allianceStation;
-    switch (allianceStationId) {
-      case Unknown:
-        allianceStation = DriverStationJNI.kUnknownAllianceStation;
-        break;
-      case Red1:
-        allianceStation = DriverStationJNI.kRed1AllianceStation;
-        break;
-      case Red2:
-        allianceStation = DriverStationJNI.kRed2AllianceStation;
-        break;
-      case Red3:
-        allianceStation = DriverStationJNI.kRed3AllianceStation;
-        break;
-      case Blue1:
-        allianceStation = DriverStationJNI.kBlue1AllianceStation;
-        break;
-      case Blue2:
-        allianceStation = DriverStationJNI.kBlue2AllianceStation;
-        break;
-      case Blue3:
-        allianceStation = DriverStationJNI.kBlue3AllianceStation;
-        break;
-      default:
-        return;
-    }
+    int allianceStation =
+        switch (allianceStationId) {
+          case Unknown -> DriverStationJNI.kUnknownAllianceStation;
+          case Red1 -> DriverStationJNI.kRed1AllianceStation;
+          case Red2 -> DriverStationJNI.kRed2AllianceStation;
+          case Red3 -> DriverStationJNI.kRed3AllianceStation;
+          case Blue1 -> DriverStationJNI.kBlue1AllianceStation;
+          case Blue2 -> DriverStationJNI.kBlue2AllianceStation;
+          case Blue3 -> DriverStationJNI.kBlue3AllianceStation;
+        };
     DriverStationDataJNI.setAllianceStationId(allianceStation);
   }
 
@@ -288,8 +257,7 @@ public final class DriverStationSim {
    *
    * @param callback the callback that will be called whenever match time changes
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public static CallbackStore registerMatchTimeCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -507,23 +475,13 @@ public final class DriverStationSim {
    * @param type the match type
    */
   public static void setMatchType(DriverStation.MatchType type) {
-    int matchType;
-    switch (type) {
-      case Practice:
-        matchType = 1;
-        break;
-      case Qualification:
-        matchType = 2;
-        break;
-      case Elimination:
-        matchType = 3;
-        break;
-      case None:
-        matchType = 0;
-        break;
-      default:
-        return;
-    }
+    int matchType =
+        switch (type) {
+          case Practice -> 1;
+          case Qualification -> 2;
+          case Elimination -> 3;
+          case None -> 0;
+        };
     DriverStationDataJNI.setMatchType(matchType);
   }
 

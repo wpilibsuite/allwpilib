@@ -4,12 +4,24 @@
 
 package edu.wpi.first.hal;
 
+/** Represents a HAL entry value. */
 public final class HALValue {
+  /** Unassigned type. */
   public static final int kUnassigned = 0;
+
+  /** Boolean. */
   public static final int kBoolean = 0x01;
+
+  /** Double. */
   public static final int kDouble = 0x02;
+
+  /** Enum. */
   public static final int kEnum = 0x04;
+
+  /** Int. */
   public static final int kInt = 0x08;
+
+  /** Long. */
   public static final int kLong = 0x10;
 
   private int m_type;
@@ -132,6 +144,11 @@ public final class HALValue {
     return new HALValue(value, kDouble);
   }
 
+  /**
+   * Build a HAL unassigned value.
+   *
+   * @return HAL value
+   */
   public static HALValue makeUnassigned() {
     return new HALValue();
   }
@@ -145,19 +162,13 @@ public final class HALValue {
    * @return HAL value
    */
   public static HALValue fromNative(int type, long value1, double value2) {
-    switch (type) {
-      case kBoolean:
-        return makeBoolean(value1 != 0);
-      case kDouble:
-        return makeDouble(value2);
-      case kEnum:
-        return makeEnum((int) value1);
-      case kInt:
-        return makeInt((int) value1);
-      case kLong:
-        return makeLong(value1);
-      default:
-        return makeUnassigned();
-    }
+    return switch (type) {
+      case kBoolean -> makeBoolean(value1 != 0);
+      case kDouble -> makeDouble(value2);
+      case kEnum -> makeEnum((int) value1);
+      case kInt -> makeInt((int) value1);
+      case kLong -> makeLong(value1);
+      default -> makeUnassigned();
+    };
   }
 }

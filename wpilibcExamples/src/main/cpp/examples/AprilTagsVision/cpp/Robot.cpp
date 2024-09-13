@@ -32,13 +32,29 @@
  * solution!
  */
 class Robot : public frc::TimedRobot {
+ public:
+  Robot() {
+    // We need to run our vision program in a separate thread. If not, our robot
+    // program will not run.
+#if defined(__linux__) || defined(_WIN32)
+    std::thread visionThread(VisionThread);
+    visionThread.detach();
+#else
+    std::fputs("Vision only available on Linux or Windows.\n", stderr);
+    std::fflush(stderr);
+#endif
+  }
+
 #if defined(__linux__) || defined(_WIN32)
 
  private:
   static void VisionThread() {
     frc::AprilTagDetector detector;
-    // look for tag36h11, correct 3 error bits
-    detector.AddFamily("tag36h11", 3);
+    // look for tag36h11, correct 1 error bit
+    // hamming 1 allocates 781KB, 2 allocates 27.4 MB, 3 allocates 932 MB
+    // max of 1 recommended for RoboRIO 1, while hamming 2 is feasible on the
+    // RoboRIO 2
+    detector.AddFamily("tag36h11", 1);
 
     // Set up Pose Estimator - parameters are for a Microsoft Lifecam HD-3000
     // (https://www.chiefdelphi.com/t/wpilib-apriltagdetector-sample-code/421411/21)
@@ -144,18 +160,6 @@ class Robot : public frc::TimedRobot {
     }
   }
 #endif
-
-  void RobotInit() override {
-    // We need to run our vision program in a separate thread. If not, our robot
-    // program will not run.
-#if defined(__linux__) || defined(_WIN32)
-    std::thread visionThread(VisionThread);
-    visionThread.detach();
-#else
-    std::fputs("Vision only available on Linux or Windows.\n", stderr);
-    std::fflush(stderr);
-#endif
-  }
 };
 
 #ifndef RUNNING_FRC_TESTS

@@ -110,6 +110,10 @@ double PIDController::GetVelocityTolerance() const {
   return m_velocityTolerance;
 }
 
+double PIDController::GetAccumulatedError() const {
+  return m_totalError;
+}
+
 void PIDController::SetSetpoint(double setpoint) {
   m_setpoint = setpoint;
   m_haveSetpoint = true;

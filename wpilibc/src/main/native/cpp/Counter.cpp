@@ -89,10 +89,6 @@ Counter::~Counter() {
   } catch (const RuntimeError& e) {
     e.Report();
   }
-
-  int32_t status = 0;
-  HAL_FreeCounter(m_counter, &status);
-  FRC_ReportError(status, "Counter destructor");
 }
 
 void Counter::SetUpSource(int channel) {
@@ -320,6 +316,5 @@ bool Counter::GetDirection() const {
 
 void Counter::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Counter");
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return Get(); }, nullptr);
+  builder.AddDoubleProperty("Value", [=, this] { return Get(); }, nullptr);
 }

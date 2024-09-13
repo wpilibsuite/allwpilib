@@ -81,7 +81,7 @@ class Rotation3dTest {
     // No rotation
     final var R1 = Matrix.eye(Nat.N3());
     final var rot1 = new Rotation3d(R1);
-    assertEquals(new Rotation3d(), rot1);
+    assertEquals(Rotation3d.kZero, rot1);
 
     // 90 degree CCW rotation around z-axis
     final var R2 = new Matrix<>(Nat.N3(), Nat.N3());
@@ -119,15 +119,15 @@ class Rotation3dTest {
 
     // 0 degree rotation of x-axes
     final var rot3 = new Rotation3d(xAxis, xAxis);
-    assertEquals(new Rotation3d(), rot3);
+    assertEquals(Rotation3d.kZero, rot3);
 
     // 0 degree rotation of y-axes
     final var rot4 = new Rotation3d(yAxis, yAxis);
-    assertEquals(new Rotation3d(), rot4);
+    assertEquals(Rotation3d.kZero, rot4);
 
     // 0 degree rotation of z-axes
     final var rot5 = new Rotation3d(zAxis, zAxis);
-    assertEquals(new Rotation3d(), rot5);
+    assertEquals(Rotation3d.kZero, rot5);
 
     // 180 degree rotation tests. For 180 degree rotations, any quaternion with
     // an orthogonal rotation axis is acceptable. The rotation axis and initial
@@ -194,7 +194,7 @@ class Rotation3dTest {
 
   @Test
   void testRotationLoop() {
-    var rot = new Rotation3d();
+    var rot = Rotation3d.kZero;
 
     rot = rot.plus(new Rotation3d(Units.degreesToRadians(90.0), 0.0, 0.0));
     var expected = new Rotation3d(Units.degreesToRadians(90.0), 0.0, 0.0);
@@ -212,14 +212,14 @@ class Rotation3dTest {
     assertEquals(expected, rot);
 
     rot = rot.plus(new Rotation3d(0.0, Units.degreesToRadians(-90.0), 0.0));
-    assertEquals(new Rotation3d(), rot);
+    assertEquals(Rotation3d.kZero, rot);
   }
 
   @Test
   void testRotateByFromZeroX() {
     final var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
 
-    final var zero = new Rotation3d();
+    final var zero = Rotation3d.kZero;
     var rotated = zero.rotateBy(new Rotation3d(xAxis, Units.degreesToRadians(90.0)));
 
     var expected = new Rotation3d(xAxis, Units.degreesToRadians(90.0));
@@ -230,7 +230,7 @@ class Rotation3dTest {
   void testRotateByFromZeroY() {
     final var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
 
-    final var zero = new Rotation3d();
+    final var zero = Rotation3d.kZero;
     var rotated = zero.rotateBy(new Rotation3d(yAxis, Units.degreesToRadians(90.0)));
 
     var expected = new Rotation3d(yAxis, Units.degreesToRadians(90.0));
@@ -241,7 +241,7 @@ class Rotation3dTest {
   void testRotateByFromZeroZ() {
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
-    final var zero = new Rotation3d();
+    final var zero = Rotation3d.kZero;
     var rotated = zero.rotateBy(new Rotation3d(zAxis, Units.degreesToRadians(90.0)));
 
     var expected = new Rotation3d(zAxis, Units.degreesToRadians(90.0));

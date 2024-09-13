@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:13:55 -0400
-Subject: [PATCH 03/34] Change unique_function storage size
+Subject: [PATCH 03/37] Change unique_function storage size
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 4cf1de488c7bde2692d4878ccb4c4d60241e3a66..9d10b16e3cbe9c0df818a3254fcd3a6032d54b39 100644
+index c0bc30c7450fe4b2bc6b9b448824eedc8b132e52..5641a913d0a35ee2911cf872ad90c3dc864f20f5 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
-@@ -78,7 +78,7 @@ using EnableIfCallable = std::enable_if_t<std::disjunction<
+@@ -79,7 +79,7 @@ using EnableIfCallable = std::enable_if_t<std::disjunction<
  
  template <typename ReturnT, typename... ParamTs> class UniqueFunctionBase {
  protected:
@@ -20,7 +20,7 @@ index 4cf1de488c7bde2692d4878ccb4c4d60241e3a66..9d10b16e3cbe9c0df818a3254fcd3a60
  
    template <typename T, class = void>
    struct IsSizeLessThanThresholdT : std::false_type {};
-@@ -157,7 +157,7 @@ protected:
+@@ -158,7 +158,7 @@ protected:
          "Should always use all of the out-of-line storage for inline storage!");
  
      // For in-line storage, we just provide an aligned character buffer. We

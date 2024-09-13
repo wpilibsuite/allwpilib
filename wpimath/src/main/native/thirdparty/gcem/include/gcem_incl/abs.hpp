@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2023 Keith O'Hara
+  ##   Copyright (C) 2016-2024 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -31,7 +31,7 @@ namespace gcem
  * Compile-time absolute value function
  *
  * @param x a real-valued input.
- * @return the absolute value of \c x, \f$ |x| \f$.
+ * @return the absolute value of \c x, \f$ |x| \f$, where the return type is the same as the input type.
  */
 
 template<typename T>

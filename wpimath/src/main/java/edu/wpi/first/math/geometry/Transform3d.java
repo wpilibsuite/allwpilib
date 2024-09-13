@@ -4,14 +4,24 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.geometry.proto.Transform3dProto;
 import edu.wpi.first.math.geometry.struct.Transform3dStruct;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /** Represents a transformation for a Pose3d in the pose's frame. */
 public class Transform3d implements ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Transform3d representing no transformation.
+   *
+   * <p>This exists to avoid allocations for common transformations.
+   */
+  public static final Transform3d kZero = new Transform3d();
+
   private final Translation3d m_translation;
   private final Rotation3d m_rotation;
 
@@ -57,10 +67,23 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
     m_rotation = rotation;
   }
 
+  /**
+   * Constructs a transform with x, y, and z translations instead of a separate Translation3d. The
+   * X, Y, and Z translations will be converted to and tracked as meters.
+   *
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param z The z component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  public Transform3d(Distance x, Distance y, Distance z, Rotation3d rotation) {
+    this(x.in(Meters), y.in(Meters), z.in(Meters), rotation);
+  }
+
   /** Constructs the identity transform -- maps an initial pose to itself. */
   public Transform3d() {
-    m_translation = new Translation3d();
-    m_rotation = new Rotation3d();
+    m_translation = Translation3d.kZero;
+    m_rotation = Rotation3d.kZero;
   }
 
   /**
@@ -91,7 +114,7 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
    * @return The composition of the two transformations.
    */
   public Transform3d plus(Transform3d other) {
-    return new Transform3d(new Pose3d(), new Pose3d().transformBy(this).transformBy(other));
+    return new Transform3d(Pose3d.kZero, Pose3d.kZero.transformBy(this).transformBy(other));
   }
 
   /**
@@ -131,6 +154,33 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
+   * Returns the X component of the transformation's translation in a measure.
+   *
+   * @return The x component of the transformation's translation in a measure.
+   */
+  public Distance getMeasureX() {
+    return m_translation.getMeasureX();
+  }
+
+  /**
+   * Returns the Y component of the transformation's translation in a measure.
+   *
+   * @return The y component of the transformation's translation in a measure.
+   */
+  public Distance getMeasureY() {
+    return m_translation.getMeasureY();
+  }
+
+  /**
+   * Returns the Z component of the transformation's translation in a measure.
+   *
+   * @return The z component of the transformation's translation in a measure.
+   */
+  public Distance getMeasureZ() {
+    return m_translation.getMeasureZ();
+  }
+
+  /**
    * Returns the rotational component of the transformation.
    *
    * @return Reference to the rotational component of the transform.
@@ -166,11 +216,9 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Transform3d) {
-      return ((Transform3d) obj).m_translation.equals(m_translation)
-          && ((Transform3d) obj).m_rotation.equals(m_rotation);
-    }
-    return false;
+    return obj instanceof Transform3d other
+        && other.m_translation.equals(m_translation)
+        && other.m_rotation.equals(m_rotation);
   }
 
   @Override

@@ -32,17 +32,19 @@ namespace Eigen {
  *
  * \implsparsesolverconcept
  *
- * It performs the following incomplete factorization: \f$ S P A P' S \approx L L' \f$
- * where L is a lower triangular factor, S is a diagonal scaling matrix, and P is a
- * fill-in reducing permutation as computed by the ordering method.
+ * It performs the following incomplete factorization: \f$ S P A P' S + \sigma I \approx L L' \f$
+ * where L is a lower triangular factor, S is a diagonal scaling matrix, P is a
+ * fill-in reducing permutation as computed by the ordering method, and \f$ \sigma \f$ is a shift
+ * for ensuring the decomposed matrix is positive definite.
  *
  * \b Shifting \b strategy: Let \f$ B = S P A P' S \f$  be the scaled matrix on which the factorization is carried out,
  * and \f$ \beta \f$ be the minimum value of the diagonal. If \f$ \beta > 0 \f$ then, the factorization is directly
- * performed on the matrix B. Otherwise, the factorization is performed on the shifted matrix \f$ B + (\sigma+|\beta| I
- * \f$ where \f$ \sigma \f$ is the initial shift value as returned and set by setInitialShift() method. The default
- * value is \f$ \sigma = 10^{-3} \f$. If the factorization fails, then the shift in doubled until it succeed or a
- * maximum of ten attempts. If it still fails, as returned by the info() method, then you can either increase the
- * initial shift, or better use another preconditioning technique.
+ * performed on the matrix B, and \sigma = 0. Otherwise, the factorization is performed on the shifted matrix \f$ B +
+ * \sigma I \f$ for a shifting factor  \f$ \sigma \f$.  We start with \f$ \sigma = \sigma_0 - \beta \f$, where \f$
+ * \sigma_0 \f$ is the initial shift value as returned and set by setInitialShift() method. The default value is \f$
+ * \sigma_0 = 10^{-3} \f$. If the factorization fails, then the shift in doubled until it succeed or a maximum of ten
+ * attempts. If it still fails, as returned by the info() method, then you can either increase the initial shift, or
+ * better use another preconditioning technique.
  *
  */
 template <typename Scalar, int UpLo_ = Lower, typename OrderingType_ = AMDOrdering<int> >
@@ -176,6 +178,9 @@ class IncompleteCholesky : public SparseSolverBase<IncompleteCholesky<Scalar, Up
     return m_perm;
   }
 
+  /** \returns the final shift parameter from the computation */
+  RealScalar shift() const { return m_shift; }
+
  protected:
   FactorType m_L;             // The lower part stored in CSC
   VectorRx m_scale;           // The vector for scaling the matrix
@@ -184,6 +189,7 @@ class IncompleteCholesky : public SparseSolverBase<IncompleteCholesky<Scalar, Up
   bool m_factorizationIsOk;
   ComputationInfo m_info;
   PermutationType m_perm;
+  RealScalar m_shift;  // The final shift parameter.
 
  private:
   inline void updateList(Ref<const VectorIx> colPtr, Ref<VectorIx> rowIdx, Ref<VectorSx> vals, const Index& col,
@@ -213,6 +219,20 @@ void IncompleteCholesky<Scalar, UpLo_, OrderingType>::factorize(const MatrixType
   } else {
     m_L.template selfadjointView<Lower>() = mat.template selfadjointView<UpLo_>();
   }
+
+  // The algorithm will insert increasingly large shifts on the diagonal until
+  // factorization succeeds. Therefore we have to make sure that there is a
+  // space in the datastructure to store such values, even if the original
+  // matrix has a zero on the diagonal.
+  bool modified = false;
+  for (Index i = 0; i < mat.cols(); ++i) {
+    bool inserted = false;
+    m_L.findOrInsertCoeff(i, i, &inserted);
+    if (inserted) {
+      modified = true;
+    }
+  }
+  if (modified) m_L.makeCompressed();
 
   Index n = m_L.cols();
   Index nnz = m_L.nonZeros();
@@ -257,8 +277,8 @@ void IncompleteCholesky<Scalar, UpLo_, OrderingType>::factorize(const MatrixType
 
   FactorType L_save = m_L;
 
-  RealScalar shift = 0;
-  if (mindiag <= RealScalar(0.)) shift = m_initialShift - mindiag;
+  m_shift = RealScalar(0);
+  if (mindiag <= RealScalar(0.)) m_shift = m_initialShift - mindiag;
 
   m_info = NumericalIssue;
 
@@ -266,7 +286,7 @@ void IncompleteCholesky<Scalar, UpLo_, OrderingType>::factorize(const MatrixType
   int iter = 0;
   do {
     // Apply the shift to the diagonal elements of the matrix
-    for (Index j = 0; j < n; j++) vals[colPtr[j]] += shift;
+    for (Index j = 0; j < n; j++) vals[colPtr[j]] += m_shift;
 
     // jki version of the Cholesky factorization
     Index j = 0;
@@ -310,7 +330,7 @@ void IncompleteCholesky<Scalar, UpLo_, OrderingType>::factorize(const MatrixType
         if (++iter >= 10) return;
 
         // increase shift
-        shift = numext::maxi(m_initialShift, RealScalar(2) * shift);
+        m_shift = numext::maxi(m_initialShift, RealScalar(2) * m_shift);
         // restore m_L, col_pattern, and listCol
         vals = Map<const VectorSx>(L_save.valuePtr(), nnz);
         rowIdx = Map<const VectorIx>(L_save.innerIndexPtr(), nnz);

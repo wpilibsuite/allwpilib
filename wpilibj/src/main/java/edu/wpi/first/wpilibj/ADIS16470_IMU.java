@@ -2,55 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package edu.wpi.first.wpilibj;
 
-// import java.lang.FdLibm.Pow;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 // CHECKSTYLE.OFF: TypeName
 // CHECKSTYLE.OFF: MemberName
-// CHECKSTYLE.OFF: SummaryJavadoc
-// CHECKSTYLE.OFF: UnnecessaryParentheses
-// CHECKSTYLE.OFF: OverloadMethodsDeclarationOrder
-// CHECKSTYLE.OFF: NonEmptyAtclauseDescription
-// CHECKSTYLE.OFF: MissingOverride
-// CHECKSTYLE.OFF: AtclauseOrder
 // CHECKSTYLE.OFF: LocalVariableName
-// CHECKSTYLE.OFF: RedundantModifier
-// CHECKSTYLE.OFF: AbbreviationAsWordInName
 // CHECKSTYLE.OFF: ParameterName
 // CHECKSTYLE.OFF: EmptyCatchBlock
-// CHECKSTYLE.OFF: MissingJavadocMethod
-// CHECKSTYLE.OFF: MissingSwitchDefault
-// CHECKSTYLE.OFF: VariableDeclarationUsageDistance
-// CHECKSTYLE.OFF: ArrayTypeStyle
 
 /** This class is for the ADIS16470 IMU that connects to the RoboRIO SPI port. */
-@SuppressWarnings({
-  "unused",
-  "PMD.RedundantFieldInitializer",
-  "PMD.ImmutableField",
-  "PMD.SingularField",
-  "PMD.CollapsibleIfStatements",
-  "PMD.MissingOverride",
-  "PMD.EmptyIfStmt",
-  "PMD.EmptyStatementNotInLoop"
-})
+@SuppressWarnings("PMD.RedundantFieldInitializer")
 public class ADIS16470_IMU implements AutoCloseable, Sendable {
   /* ADIS16470 Register Map Declaration */
   private static final int FLASH_CNT = 0x00; // Flash memory write count
@@ -157,29 +127,29 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
 
   /** ADIS16470 calibration times. */
   public enum CalibrationTime {
-    /** 32 ms calibration time */
+    /** 32 ms calibration time. */
     _32ms(0),
-    /** 64 ms calibration time */
+    /** 64 ms calibration time. */
     _64ms(1),
-    /** 128 ms calibration time */
+    /** 128 ms calibration time. */
     _128ms(2),
-    /** 256 ms calibration time */
+    /** 256 ms calibration time. */
     _256ms(3),
-    /** 512 ms calibration time */
+    /** 512 ms calibration time. */
     _512ms(4),
-    /** 1 s calibration time */
+    /** 1 s calibration time. */
     _1s(5),
-    /** 2 s calibration time */
+    /** 2 s calibration time. */
     _2s(6),
-    /** 4 s calibration time */
+    /** 4 s calibration time. */
     _4s(7),
-    /** 8 s calibration time */
+    /** 8 s calibration time. */
     _8s(8),
-    /** 16 s calibration time */
+    /** 16 s calibration time. */
     _16s(9),
-    /** 32 s calibration time */
+    /** 32 s calibration time. */
     _32s(10),
-    /** 64 s calibration time */
+    /** 64 s calibration time. */
     _64s(11);
 
     private final int value;
@@ -196,25 +166,23 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * configured by the user to refer to an X, Y, or Z axis.
    */
   public enum IMUAxis {
-    /** The IMU's X axis */
+    /** The IMU's X axis. */
     kX,
-    /** The IMU's Y axis */
+    /** The IMU's Y axis. */
     kY,
-    /** The IMU's Z axis */
+    /** The IMU's Z axis. */
     kZ,
-    /** The user-configured yaw axis */
+    /** The user-configured yaw axis. */
     kYaw,
-    /** The user-configured pitch axis */
+    /** The user-configured pitch axis. */
     kPitch,
-    /** The user-configured roll axis */
+    /** The user-configured roll axis. */
     kRoll,
   }
 
   // Static Constants
-  private static final double delta_angle_sf = 2160.0 / 2147483648.0; /* 2160 / (2^31) */
-  private static final double rad_to_deg = 57.2957795;
-  private static final double deg_to_rad = 0.0174532;
-  private static final double grav = 9.81;
+  private static final double kDeltaAngleSf = 2160.0 / 2147483648.0; // 2160 / (2^31)
+  private static final double kGrav = 9.81;
 
   // User-specified axes
   private IMUAxis m_yaw_axis;
@@ -225,9 +193,6 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   private double m_gyro_rate_x = 0.0;
   private double m_gyro_rate_y = 0.0;
   private double m_gyro_rate_z = 0.0;
-  private double m_average_gyro_rate_x = 0.0;
-  private double m_average_gyro_rate_y = 0.0;
-  private double m_average_gyro_rate_z = 0.0;
   private double m_accel_x = 0.0;
   private double m_accel_y = 0.0;
   private double m_accel_z = 0.0;
@@ -240,7 +205,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   // Complementary filter variables
   private double m_dt = 0.0;
   private double m_alpha = 0.0;
-  private double m_tau = 1.0;
+  private static final double kTau = 1.0;
   private double m_compAngleX = 0.0;
   private double m_compAngleY = 0.0;
   private double m_accelAngleX = 0.0;
@@ -258,7 +223,6 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   private SPI m_spi;
   private SPI.Port m_spi_port;
   private DigitalInput m_auto_interrupt;
-  private DigitalOutput m_reset_out;
   private DigitalInput m_reset_in;
   private DigitalOutput m_status_led;
   private Thread m_acquire_task;
@@ -276,33 +240,20 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   private SimDouble m_simAccelY;
   private SimDouble m_simAccelZ;
 
-  private static class AcquireTask implements Runnable {
-    private ADIS16470_IMU imu;
-
-    public AcquireTask(ADIS16470_IMU imu) {
-      this.imu = imu;
-    }
-
-    @Override
-    public void run() {
-      imu.acquire();
-    }
-  }
-
   /**
    * Creates a new ADIS16740 IMU object.
    *
-   * <p>The default setup is the onboard SPI port with a calibration time of 4 seconds. Yaw, pitch,
+   * <p>The default setup is the onboard SPI port with a calibration time of 1 second. Yaw, pitch,
    * and roll are kZ, kX, and kY respectively.
    */
   public ADIS16470_IMU() {
-    this(IMUAxis.kZ, IMUAxis.kX, IMUAxis.kY, SPI.Port.kOnboardCS0, CalibrationTime._4s);
+    this(IMUAxis.kZ, IMUAxis.kX, IMUAxis.kY, SPI.Port.kOnboardCS0, CalibrationTime._1s);
   }
 
   /**
    * Creates a new ADIS16740 IMU object.
    *
-   * <p>The default setup is the onboard SPI port with a calibration time of 4 seconds.
+   * <p>The default setup is the onboard SPI port with a calibration time of 1 second.
    *
    * <p><b><i>Input axes limited to kX, kY and kZ. Specifying kYaw, kPitch,or kRoll will result in
    * an error.</i></b>
@@ -312,7 +263,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @param roll_axis The axis that measures the roll
    */
   public ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis, IMUAxis roll_axis) {
-    this(yaw_axis, pitch_axis, roll_axis, SPI.Port.kOnboardCS0, CalibrationTime._4s);
+    this(yaw_axis, pitch_axis, roll_axis, SPI.Port.kOnboardCS0, CalibrationTime._1s);
   }
 
   /**
@@ -360,7 +311,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     m_calibration_time = cal_time.value;
     m_spi_port = port;
 
-    m_acquire_task = new Thread(new AcquireTask(this));
+    m_acquire_task = new Thread(this::acquire);
 
     m_simDevice = SimDevice.create("Gyro:ADIS16470", port.value);
     if (m_simDevice != null) {
@@ -381,33 +332,65 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       // Relies on the RIO hardware by default configuring an output as low
       // and configuring an input as high Z. The 10k pull-up resistor internal to the
       // IMU then forces the reset line high for normal operation.
-      m_reset_out = new DigitalOutput(27); // Drive SPI CS2 (IMU RST) low
-      Timer.delay(0.01); // Wait 10ms
-      m_reset_out.close();
+      var reset_out = new DigitalOutput(27); // Drive SPI CS2 (IMU RST) low
+      Timer.delay(0.01);
+      reset_out.close();
       m_reset_in = new DigitalInput(27); // Set SPI CS2 (IMU RST) high
-      Timer.delay(0.25); // Wait 250ms for reset to complete
+      Timer.delay(0.25); // Wait for reset to complete
 
+      m_spi = new SPI(m_spi_port);
+      m_spi.setClockRate(2000000);
+      m_spi.setMode(SPI.Mode.kMode3);
+      m_spi.setChipSelectActiveLow();
       if (!switchToStandardSPI()) {
         return;
       }
+      boolean needsFlash = false;
+      // Set IMU internal decimation to 4 (ODR = 2000 SPS / (4 + 1) = 400Hz), BW = 200Hz
+      if (readRegister(DEC_RATE) != 0x0004) {
+        writeRegister(DEC_RATE, 0x0004);
+        needsFlash = true;
+        DriverStation.reportWarning(
+            "ADIS16470: DEC_RATE register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
 
-      // Set IMU internal decimation to 4 (output data rate of 2000 SPS / (4 + 1) =
-      // 400Hz)
-      writeRegister(DEC_RATE, 4);
+      // Set data ready polarity (HIGH = Good Data), Disable gSense Compensation and PoP
+      if (readRegister(MSC_CTRL) != 0x0001) {
+        writeRegister(MSC_CTRL, 0x0001);
+        needsFlash = true;
+        DriverStation.reportWarning(
+            "ADIS16470: MSC_CTRL register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
 
-      // Set data ready polarity (HIGH = Good Data), Disable gSense Compensation and
-      // PoP
-      writeRegister(MSC_CTRL, 1);
+      // Disable IMU internal Bartlett filter (200Hz bandwidth is sufficient)
+      if (readRegister(FILT_CTRL) != 0x0000) {
+        writeRegister(FILT_CTRL, 0x0000);
+        needsFlash = true;
+        DriverStation.reportWarning(
+            "ADIS16470: FILT_CTRL register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
 
-      // Configure IMU internal Bartlett filter
-      writeRegister(FILT_CTRL, 0);
+      // If any registers on the IMU don't match the config, trigger a flash update
+      if (needsFlash) {
+        DriverStation.reportWarning(
+            "ADIS16470: Register configuration changed! Starting IMU flash update.", false);
+        writeRegister(GLOB_CMD, 0x0008);
+        // Wait long enough for the flash update to finish (72ms minimum as per the datasheet)
+        Timer.delay(0.3);
+        DriverStation.reportWarning("ADIS16470: Flash update finished!", false);
+      } else {
+        DriverStation.reportWarning(
+            "ADIS16470: Flash and RAM configuration consistent. No flash update required!", false);
+      }
 
       // Configure continuous bias calibration time based on user setting
-      writeRegister(NULL_CNFG, (m_calibration_time | 0x0700));
+      writeRegister(NULL_CNFG, m_calibration_time | 0x0700);
 
       // Notify DS that IMU calibration delay is active
-      DriverStation.reportWarning(
-          "ADIS16470 IMU Detected. Starting initial calibration delay.", false);
+      DriverStation.reportWarning("ADIS16470: Starting initial calibration delay.", false);
 
       // Wait for samples to accumulate internal to the IMU (110% of user-defined
       // time)
@@ -419,12 +402,14 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       // Write offset calibration command to IMU
       writeRegister(GLOB_CMD, 0x0001);
 
+      // Configure interrupt on SPI CS1
+      m_auto_interrupt = new DigitalInput(26);
       // Configure and enable auto SPI
       if (!switchToAutoSPI()) {
         return;
       }
 
-      // Let the user know the IMU was initiallized successfully
+      // Let the user know the IMU was initialized successfully
       DriverStation.reportWarning("ADIS16470 IMU Successfully Initialized!", false);
 
       // Drive "Ready" LED low
@@ -448,36 +433,12 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     return m_connected;
   }
 
-  /**
-   * @param buf
-   * @return
-   */
-  private static int toUShort(ByteBuffer buf) {
-    return buf.getShort(0) & 0xFFFF;
+  private static int toShort(int upper, int lower) {
+    return (short) (((upper & 0xFF) << 8) + (lower & 0xFF));
   }
 
-  /**
-   * @param sint
-   * @return
-   */
-  private static long toULong(int sint) {
-    return sint & 0x00000000FFFFFFFFL;
-  }
-
-  /**
-   * @param buf
-   * @return
-   */
-  private static int toShort(int... buf) {
-    return (short) (((buf[0] & 0xFF) << 8) + (buf[1] & 0xFF));
-  }
-
-  /**
-   * @param buf
-   * @return
-   */
-  private static int toInt(int... buf) {
-    return (buf[0] & 0xFF) << 24 | (buf[1] & 0xFF) << 16 | (buf[2] & 0xFF) << 8 | (buf[3] & 0xFF);
+  private static int toInt(int msb, int byte2, int byte3, int lsb) {
+    return (msb & 0xFF) << 24 | (byte2 & 0xFF) << 16 | (byte3 & 0xFF) << 8 | (lsb & 0xFF);
   }
 
   /**
@@ -498,13 +459,12 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       }
       System.out.println("Paused the IMU processing thread successfully!");
       // Maybe we're in auto SPI mode? If so, kill auto SPI, and then SPI.
-      if (m_spi != null && m_auto_configured) {
+      if (m_auto_configured) {
         m_spi.stopAuto();
         // We need to get rid of all the garbage left in the auto SPI buffer after
         // stopping it.
         // Sometimes data magically reappears, so we have to check the buffer size a
-        // couple of times
-        // to be sure we got it all. Yuck.
+        // couple of times to be sure we got it all. Yuck.
         int[] trashBuffer = new int[200];
         try {
           Thread.sleep(100);
@@ -518,34 +478,14 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
         System.out.println("Paused auto SPI successfully.");
       }
     }
-    // There doesn't seem to be a SPI port active. Let's try to set one up
-    if (m_spi == null) {
-      System.out.println("Setting up a new SPI port.");
-      m_spi = new SPI(m_spi_port);
-      m_spi.setClockRate(2000000);
-      m_spi.setMode(SPI.Mode.kMode3);
-      m_spi.setChipSelectActiveLow();
-      readRegister(PROD_ID); // Dummy read
-
-      // Validate the product ID
-      if (readRegister(PROD_ID) != 16982) {
-        DriverStation.reportError("Could not find ADIS16470", false);
-        close();
-        return false;
-      }
-      return true;
-    } else {
-      // Maybe the SPI port is active, but not in auto SPI mode? Try to read the
-      // product ID.
-      readRegister(PROD_ID); // dummy read
-      if (readRegister(PROD_ID) != 16982) {
-        DriverStation.reportError("Could not find an ADIS16470", false);
-        close();
-        return false;
-      } else {
-        return true;
-      }
+    readRegister(PROD_ID); // Dummy read
+    // Validate the product ID
+    if (readRegister(PROD_ID) != 16982) {
+      DriverStation.reportError("Could not find an ADIS16470", false);
+      close();
+      return false;
     }
+    return true;
   }
 
   /**
@@ -554,18 +494,6 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return True if successful, false otherwise.
    */
   boolean switchToAutoSPI() {
-    // No SPI port has been set up. Go set one up first.
-    if (m_spi == null) {
-      if (!switchToStandardSPI()) {
-        DriverStation.reportError("Failed to start/restart auto SPI", false);
-        return false;
-      }
-    }
-    // Only set up the interrupt if needed.
-    if (m_auto_interrupt == null) {
-      // Configure interrupt on SPI CS1
-      m_auto_interrupt = new DigitalInput(26);
-    }
     // The auto SPI controller gets angry if you try to set up two instances on one
     // bus.
     if (!m_auto_configured) {
@@ -580,7 +508,6 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     // activated)
     // DR High = Data good (data capture should be triggered on the rising edge)
     m_spi.startAutoTrigger(m_auto_interrupt, true, false);
-
     // Check to see if the acquire thread is running. If not, kick one off.
     if (!m_acquire_task.isAlive()) {
       m_first_run = true;
@@ -603,10 +530,10 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * Configures calibration time
+   * Configures calibration time.
    *
    * @param new_cal_time New calibration time
-   * @return 1 if the new calibration time is the same as the current one else 0
+   * @return 0 if success, 1 if no change, 2 if error.
    */
   public int configCalTime(CalibrationTime new_cal_time) {
     if (m_calibration_time == new_cal_time.value) {
@@ -617,7 +544,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       return 2;
     }
     m_calibration_time = new_cal_time.value;
-    writeRegister(NULL_CNFG, (m_calibration_time | 0x700));
+    writeRegister(NULL_CNFG, m_calibration_time | 0x700);
     if (!switchToAutoSPI()) {
       DriverStation.reportError("Failed to configure/reconfigure auto SPI.", false);
       return 2;
@@ -632,11 +559,8 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return 0 if success, 1 if no change, 2 if error.
    */
   public int configDecRate(int decimationRate) {
-    // Switches the active SPI port to standard SPI mode, writes a new value to
-    // the DECIMATE register in the IMU, and re-enables auto SPI.
-    //
-    // This function enters standard SPI mode, writes a new DECIMATE setting to
-    // the IMU, adjusts the sample scale factor, and re-enters auto SPI mode.
+    // Switches the active SPI port to standard SPI mode, writes a new value to the DECIMATE
+    // register in the IMU, adjusts the sample scale factor, and re-enables auto SPI.
     if (!switchToStandardSPI()) {
       DriverStation.reportError("Failed to configure/reconfigure standard SPI.", false);
       return 2;
@@ -645,7 +569,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       DriverStation.reportError("Attempted to write an invalid decimation value.", false);
       decimationRate = 1999;
     }
-    m_scaled_sample_rate = (((decimationRate + 1.0) / 2000.0) * 1000000.0);
+    m_scaled_sample_rate = (decimationRate + 1.0) / 2000.0 * 1000000.0;
     writeRegister(DEC_RATE, decimationRate);
     System.out.println("Decimation register: " + readRegister(DEC_RATE));
     if (!switchToAutoSPI()) {
@@ -670,35 +594,22 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     }
   }
 
-  /**
-   * @param reg
-   * @return
-   */
   private int readRegister(int reg) {
-    ByteBuffer buf = ByteBuffer.allocateDirect(2);
-    buf.order(ByteOrder.BIG_ENDIAN);
-    buf.put(0, (byte) (reg & 0x7f));
-    buf.put(1, (byte) 0);
+    final byte[] buf = {(byte) (reg & 0x7f), 0};
 
     m_spi.write(buf, 2);
     m_spi.read(false, buf, 2);
 
-    return toUShort(buf);
+    return (buf[0] << 8) & buf[1];
   }
 
-  /**
-   * @param reg
-   * @param val
-   */
   private void writeRegister(int reg, int val) {
-    ByteBuffer buf = ByteBuffer.allocateDirect(2);
     // low byte
-    buf.put(0, (byte) (0x80 | reg));
-    buf.put(1, (byte) (val & 0xff));
+    final byte[] buf = {(byte) (0x80 | reg), (byte) (val & 0xff)};
     m_spi.write(buf, 2);
     // high byte
-    buf.put(0, (byte) (0x81 | reg));
-    buf.put(1, (byte) (val >> 8));
+    buf[0] = (byte) (0x81 | reg);
+    buf[1] = (byte) (val >> 8);
     m_spi.write(buf, 2);
   }
 
@@ -734,7 +645,6 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     System.out.println("Finished cleaning up after the IMU driver.");
   }
 
-  /** */
   private void acquire() {
     // Set data packet length
     final int dataset_len = 27; // 26 data points + timestamp
@@ -742,32 +652,11 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
 
     // Set up buffers and variables
     int[] buffer = new int[BUFFER_SIZE];
-    int data_count = 0;
-    int data_remainder = 0;
-    int data_to_read = 0;
     double previous_timestamp = 0.0;
-    double delta_angle_x = 0.0;
-    double delta_angle_y = 0.0;
-    double delta_angle_z = 0.0;
-    double gyro_rate_x = 0.0;
-    double gyro_rate_y = 0.0;
-    double gyro_rate_z = 0.0;
-    double accel_x = 0.0;
-    double accel_y = 0.0;
-    double accel_z = 0.0;
-    double gyro_rate_x_si = 0.0;
-    double gyro_rate_y_si = 0.0;
-    double gyro_rate_z_si = 0.0;
-    double accel_x_si = 0.0;
-    double accel_y_si = 0.0;
-    double accel_z_si = 0.0;
     double compAngleX = 0.0;
     double compAngleY = 0.0;
-    double accelAngleX = 0.0;
-    double accelAngleY = 0.0;
-
     while (true) {
-      // Sleep loop for 10ms
+      // Wait for data
       try {
         Thread.sleep(10);
       } catch (InterruptedException e) {
@@ -776,108 +665,70 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       if (m_thread_active) {
         m_thread_idle = false;
 
-        data_count =
-            m_spi.readAutoReceivedData(
-                buffer, 0, 0); // Read number of bytes currently stored in the buffer
-
-        data_remainder =
-            data_count % dataset_len; // Check if frame is incomplete. Add 1 because of timestamp
-        data_to_read = data_count - data_remainder; // Remove incomplete data from read count
-        /* Want to cap the data to read in a single read at the buffer size */
+        // Read number of bytes currently stored in the buffer
+        int data_count = m_spi.readAutoReceivedData(buffer, 0, 0);
+        // Check if frame is incomplete
+        int data_remainder = data_count % dataset_len;
+        // Remove incomplete data from read count
+        int data_to_read = data_count - data_remainder;
+        // Want to cap the data to read in a single read at the buffer size
         if (data_to_read > BUFFER_SIZE) {
           DriverStation.reportWarning(
               "ADIS16470 data processing thread overrun has occurred!", false);
           data_to_read = BUFFER_SIZE - (BUFFER_SIZE % dataset_len);
         }
-        m_spi.readAutoReceivedData(
-            buffer, data_to_read, 0); // Read data from DMA buffer (only complete sets)
+        // Read data from DMA buffer (only complete sets)
+        m_spi.readAutoReceivedData(buffer, data_to_read, 0);
 
         // Could be multiple data sets in the buffer. Handle each one.
         for (int i = 0; i < data_to_read; i += dataset_len) {
           // Timestamp is at buffer[i]
-          m_dt = ((double) buffer[i] - previous_timestamp) / 1000000.0;
+          m_dt = (buffer[i] - previous_timestamp) / 1000000.0;
+          // Get delta angle value for all 3 axes and scale by the elapsed time
+          // (based on timestamp)
+          double elapsed_time = m_scaled_sample_rate / (buffer[i] - previous_timestamp);
+          double delta_angle_x =
+              toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5], buffer[i + 6])
+                  * kDeltaAngleSf
+                  / elapsed_time;
+          double delta_angle_y =
+              toInt(buffer[i + 7], buffer[i + 8], buffer[i + 9], buffer[i + 10])
+                  * kDeltaAngleSf
+                  / elapsed_time;
+          double delta_angle_z =
+              toInt(buffer[i + 11], buffer[i + 12], buffer[i + 13], buffer[i + 14])
+                  * kDeltaAngleSf
+                  / elapsed_time;
 
-          /*
-           * System.out.println(((toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5],
-           * buffer[i + 6]))*delta_angle_sf) / ((10000.0 / (buffer[i] -
-           * previous_timestamp)) / 100.0));
-           * // DEBUG: Plot Sub-Array Data in Terminal
-           * for (int j = 0; j < data_to_read; j++) {
-           * System.out.print(buffer[j]);
-           * System.out.print(" ,");
-           * }
-           * System.out.println(" ");
-           * //System.out.println(((toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5],
-           * buffer[i + 6]))*delta_angle_sf) / ((10000.0 / (buffer[i] -
-           * previous_timestamp)) / 100.0) + "," + buffer[3] + "," + buffer[4] + "," +
-           * buffer[5] + "," + buffer[6]
-           * /*toShort(buffer[7], buffer[8]) + "," +
-           * toShort(buffer[9], buffer[10]) + "," +
-           * toShort(buffer[11], buffer[12]) + "," +
-           * toShort(buffer[13], buffer[14]) + "," +
-           * toShort(buffer[15], buffer[16]) + ","
-           * + toShort(buffer[17], buffer[18]));
-           */
+          double gyro_rate_x = toShort(buffer[i + 15], buffer[i + 16]) / 10.0;
+          double gyro_rate_y = toShort(buffer[i + 17], buffer[i + 18]) / 10.0;
+          double gyro_rate_z = toShort(buffer[i + 19], buffer[i + 20]) / 10.0;
 
-          /*
-           * Get delta angle value for all 3 axes and scale by the elapsed time
-           * (based on timestamp)
-           */
-          delta_angle_x =
-              (toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5], buffer[i + 6]) * delta_angle_sf)
-                  / (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
-          delta_angle_y =
-              (toInt(buffer[i + 7], buffer[i + 8], buffer[i + 9], buffer[i + 10]) * delta_angle_sf)
-                  / (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
-          delta_angle_z =
-              (toInt(buffer[i + 11], buffer[i + 12], buffer[i + 13], buffer[i + 14])
-                      * delta_angle_sf)
-                  / (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
-
-          gyro_rate_x = (toShort(buffer[i + 15], buffer[i + 16]) / 10.0);
-          gyro_rate_y = (toShort(buffer[i + 17], buffer[i + 18]) / 10.0);
-          gyro_rate_z = (toShort(buffer[i + 19], buffer[i + 20]) / 10.0);
-
-          accel_x = (toShort(buffer[i + 21], buffer[i + 22]) / 800.0);
-          accel_y = (toShort(buffer[i + 23], buffer[i + 24]) / 800.0);
-          accel_z = (toShort(buffer[i + 25], buffer[i + 26]) / 800.0);
+          double accel_x = toShort(buffer[i + 21], buffer[i + 22]) / 800.0;
+          double accel_y = toShort(buffer[i + 23], buffer[i + 24]) / 800.0;
+          double accel_z = toShort(buffer[i + 25], buffer[i + 26]) / 800.0;
 
           // Convert scaled sensor data to SI units (for tilt calculations)
           // TODO: Should the unit outputs be selectable?
-          gyro_rate_x_si = gyro_rate_x * deg_to_rad;
-          gyro_rate_y_si = gyro_rate_y * deg_to_rad;
-          gyro_rate_z_si = gyro_rate_z * deg_to_rad;
-          accel_x_si = accel_x * grav;
-          accel_y_si = accel_y * grav;
-          accel_z_si = accel_z * grav;
+          double gyro_rate_x_si = Math.toRadians(gyro_rate_x);
+          double gyro_rate_y_si = Math.toRadians(gyro_rate_y);
+          // double gyro_rate_z_si = Math.toRadians(gyro_rate_z);
+          double accel_x_si = accel_x * kGrav;
+          double accel_y_si = accel_y * kGrav;
+          double accel_z_si = accel_z * kGrav;
 
           // Store timestamp for next iteration
           previous_timestamp = buffer[i];
 
-          m_alpha = m_tau / (m_tau + m_dt);
+          m_alpha = kTau / (kTau + m_dt);
 
+          // Run inclinometer calculations
+          double accelAngleX = Math.atan2(accel_x_si, Math.hypot(accel_y_si, accel_z_si));
+          double accelAngleY = Math.atan2(accel_y_si, Math.hypot(accel_x_si, accel_z_si));
           if (m_first_run) {
-            // Set up inclinometer calculations for first run
-            accelAngleX =
-                Math.atan2(
-                    accel_x_si, Math.sqrt((accel_y_si * accel_y_si) + (accel_z_si * accel_z_si)));
-            accelAngleY =
-                Math.atan2(
-                    accel_y_si, Math.sqrt((accel_x_si * accel_x_si) + (accel_z_si * accel_z_si)));
             compAngleX = accelAngleX;
             compAngleY = accelAngleY;
-
-            m_average_gyro_rate_x = 0.0;
-            m_average_gyro_rate_y = 0.0;
-            m_average_gyro_rate_z = 0.0;
           } else {
-            // Run inclinometer calculations
-            accelAngleX =
-                Math.atan2(
-                    accel_x_si, Math.sqrt((accel_y_si * accel_y_si) + (accel_z_si * accel_z_si)));
-            accelAngleY =
-                Math.atan2(
-                    accel_y_si, Math.sqrt((accel_x_si * accel_x_si) + (accel_z_si * accel_z_si)));
             accelAngleX = formatAccelRange(accelAngleX, accel_z_si);
             accelAngleY = formatAccelRange(accelAngleY, accel_z_si);
             compAngleX = compFilterProcess(compAngleX, accelAngleX, -gyro_rate_y_si);
@@ -885,15 +736,11 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
           }
 
           synchronized (this) {
-            /* Push data to global variables */
+            // Push data to global variables
             if (m_first_run) {
-              /*
-               * Don't accumulate first run. previous_timestamp will be "very" old and the
-               * integration will end up way off
-               */
-              m_integ_angle_x = 0.0;
-              m_integ_angle_y = 0.0;
-              m_integ_angle_z = 0.0;
+              // Don't accumulate first run. previous_timestamp will be "very" old and the
+              // integration will end up way off
+              reset();
             } else {
               m_integ_angle_x += delta_angle_x;
               m_integ_angle_y += delta_angle_y;
@@ -905,57 +752,22 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
             m_accel_x = accel_x;
             m_accel_y = accel_y;
             m_accel_z = accel_z;
-            m_compAngleX = compAngleX * rad_to_deg;
-            m_compAngleY = compAngleY * rad_to_deg;
-            m_accelAngleX = accelAngleX * rad_to_deg;
-            m_accelAngleY = accelAngleY * rad_to_deg;
-            m_average_gyro_rate_x += gyro_rate_x;
-            m_average_gyro_rate_y += gyro_rate_y;
-            m_average_gyro_rate_z += gyro_rate_z;
+            m_compAngleX = Math.toDegrees(compAngleX);
+            m_compAngleY = Math.toDegrees(compAngleY);
+            m_accelAngleX = Math.toDegrees(accelAngleX);
+            m_accelAngleY = Math.toDegrees(accelAngleY);
           }
           m_first_run = false;
         }
-
-        // The inverse of data to read divided by dataset length, his is the number of iterations
-        // of the for loop inverted (so multiplication can be used instead of division)
-        double invTotalIterations = (double) dataset_len / data_to_read;
-        m_average_gyro_rate_x *= invTotalIterations;
-        m_average_gyro_rate_y *= invTotalIterations;
-        m_average_gyro_rate_z *= invTotalIterations;
       } else {
         m_thread_idle = true;
-        data_count = 0;
-        data_remainder = 0;
-        data_to_read = 0;
         previous_timestamp = 0.0;
-        delta_angle_x = 0.0;
-        delta_angle_y = 0.0;
-        delta_angle_z = 0.0;
-        gyro_rate_x = 0.0;
-        gyro_rate_y = 0.0;
-        gyro_rate_z = 0.0;
-        accel_x = 0.0;
-        accel_y = 0.0;
-        accel_z = 0.0;
-        gyro_rate_x_si = 0.0;
-        gyro_rate_y_si = 0.0;
-        gyro_rate_z_si = 0.0;
-        accel_x_si = 0.0;
-        accel_y_si = 0.0;
-        accel_z_si = 0.0;
         compAngleX = 0.0;
         compAngleY = 0.0;
-        accelAngleX = 0.0;
-        accelAngleY = 0.0;
       }
     }
   }
 
-  /**
-   * @param compAngle
-   * @param accAngle
-   * @return
-   */
   private double formatFastConverge(double compAngle, double accAngle) {
     if (compAngle > accAngle + Math.PI) {
       compAngle = compAngle - 2.0 * Math.PI;
@@ -965,25 +777,6 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     return compAngle;
   }
 
-  /**
-   * @param compAngle
-   * @return
-   */
-  private double formatRange0to2PI(double compAngle) {
-    while (compAngle >= 2 * Math.PI) {
-      compAngle = compAngle - 2.0 * Math.PI;
-    }
-    while (compAngle < 0.0) {
-      compAngle = compAngle + 2.0 * Math.PI;
-    }
-    return compAngle;
-  }
-
-  /**
-   * @param accelAngle
-   * @param accelZ
-   * @return
-   */
   private double formatAccelRange(double accelAngle, double accelZ) {
     if (accelZ < 0.0) {
       accelAngle = Math.PI - accelAngle;
@@ -993,20 +786,10 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     return accelAngle;
   }
 
-  /**
-   * @param compAngle
-   * @param accelAngle
-   * @param omega
-   * @return
-   */
   private double compFilterProcess(double compAngle, double accelAngle, double omega) {
     compAngle = formatFastConverge(compAngle, accelAngle);
     compAngle = m_alpha * (compAngle + omega * m_dt) + (1.0 - m_alpha) * accelAngle;
-    compAngle = formatRange0to2PI(compAngle);
-    if (compAngle > Math.PI) {
-      compAngle = compAngle - 2.0 * Math.PI;
-    }
-    return compAngle;
+    return MathUtil.angleModulus(compAngle);
   }
 
   /**
@@ -1031,30 +814,21 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @param angle A double in degrees (CCW positive)
    */
   public void setGyroAngle(IMUAxis axis, double angle) {
-    switch (axis) {
-      case kYaw:
-        axis = m_yaw_axis;
-        break;
-      case kPitch:
-        axis = m_pitch_axis;
-        break;
-      case kRoll:
-        axis = m_roll_axis;
-        break;
-      default:
-    }
+    axis =
+        switch (axis) {
+          case kYaw -> m_yaw_axis;
+          case kPitch -> m_pitch_axis;
+          case kRoll -> m_roll_axis;
+          default -> axis;
+        };
 
     switch (axis) {
-      case kX:
-        this.setGyroAngleX(angle);
-        break;
-      case kY:
-        this.setGyroAngleY(angle);
-        break;
-      case kZ:
-        this.setGyroAngleZ(angle);
-        break;
-      default:
+      case kX -> setGyroAngleX(angle);
+      case kY -> setGyroAngleY(angle);
+      case kZ -> setGyroAngleZ(angle);
+      default -> {
+        // NOP
+      }
     }
   }
 
@@ -1101,39 +875,35 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return The axis angle in degrees (CCW positive).
    */
   public synchronized double getAngle(IMUAxis axis) {
-    switch (axis) {
-      case kYaw:
-        axis = m_yaw_axis;
-        break;
-      case kPitch:
-        axis = m_pitch_axis;
-        break;
-      case kRoll:
-        axis = m_roll_axis;
-        break;
-      default:
-    }
+    axis =
+        switch (axis) {
+          case kYaw -> m_yaw_axis;
+          case kPitch -> m_pitch_axis;
+          case kRoll -> m_roll_axis;
+          default -> axis;
+        };
 
-    switch (axis) {
-      case kX:
+    return switch (axis) {
+      case kX -> {
         if (m_simGyroAngleX != null) {
-          return m_simGyroAngleX.get();
+          yield m_simGyroAngleX.get();
         }
-        return m_integ_angle_x;
-      case kY:
+        yield m_integ_angle_x;
+      }
+      case kY -> {
         if (m_simGyroAngleY != null) {
-          return m_simGyroAngleY.get();
+          yield m_simGyroAngleY.get();
         }
-        return m_integ_angle_y;
-      case kZ:
+        yield m_integ_angle_y;
+      }
+      case kZ -> {
         if (m_simGyroAngleZ != null) {
-          return m_simGyroAngleZ.get();
+          yield m_simGyroAngleZ.get();
         }
-        return m_integ_angle_z;
-      default:
-    }
-
-    return 0.0;
+        yield m_integ_angle_z;
+      }
+      default -> 0.0;
+    };
   }
 
   /**
@@ -1142,25 +912,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return The Yaw axis angle in degrees (CCW positive).
    */
   public synchronized double getAngle() {
-    switch (m_yaw_axis) {
-      case kX:
-        if (m_simGyroAngleX != null) {
-          return m_simGyroAngleX.get();
-        }
-        return m_integ_angle_x;
-      case kY:
-        if (m_simGyroAngleY != null) {
-          return m_simGyroAngleY.get();
-        }
-        return m_integ_angle_y;
-      case kZ:
-        if (m_simGyroAngleZ != null) {
-          return m_simGyroAngleZ.get();
-        }
-        return m_integ_angle_z;
-      default:
-    }
-    return 0.0;
+    return getAngle(m_yaw_axis);
   }
 
   /**
@@ -1170,38 +922,35 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return Axis angular rate in degrees per second (CCW positive).
    */
   public synchronized double getRate(IMUAxis axis) {
-    switch (axis) {
-      case kYaw:
-        axis = m_yaw_axis;
-        break;
-      case kPitch:
-        axis = m_pitch_axis;
-        break;
-      case kRoll:
-        axis = m_roll_axis;
-        break;
-      default:
-    }
+    axis =
+        switch (axis) {
+          case kYaw -> m_yaw_axis;
+          case kPitch -> m_pitch_axis;
+          case kRoll -> m_roll_axis;
+          default -> axis;
+        };
 
-    switch (axis) {
-      case kX:
+    return switch (axis) {
+      case kX -> {
         if (m_simGyroRateX != null) {
-          return m_simGyroRateX.get();
+          yield m_simGyroRateX.get();
         }
-        return m_gyro_rate_x;
-      case kY:
+        yield m_gyro_rate_x;
+      }
+      case kY -> {
         if (m_simGyroRateY != null) {
-          return m_simGyroRateY.get();
+          yield m_simGyroRateY.get();
         }
-        return m_gyro_rate_y;
-      case kZ:
+        yield m_gyro_rate_y;
+      }
+      case kZ -> {
         if (m_simGyroRateZ != null) {
-          return m_simGyroRateZ.get();
+          yield m_simGyroRateZ.get();
         }
-        return m_gyro_rate_z;
-      default:
-    }
-    return 0.0;
+        yield m_gyro_rate_z;
+      }
+      default -> 0.0;
+    };
   }
 
   /**
@@ -1210,25 +959,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return Yaw axis angular rate in degrees per second (CCW positive).
    */
   public synchronized double getRate() {
-    switch (m_yaw_axis) {
-      case kX:
-        if (m_simGyroRateX != null) {
-          return m_simGyroRateX.get();
-        }
-        return m_gyro_rate_x;
-      case kY:
-        if (m_simGyroRateY != null) {
-          return m_simGyroRateY.get();
-        }
-        return m_gyro_rate_y;
-      case kZ:
-        if (m_simGyroRateZ != null) {
-          return m_simGyroRateZ.get();
-        }
-        return m_gyro_rate_z;
-      default:
-    }
-    return 0.0;
+    return getRate(m_yaw_axis);
   }
 
   /**
@@ -1264,7 +995,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return The acceleration in the X axis in meters per second squared.
    */
   public synchronized double getAccelX() {
-    return m_accel_x * 9.81;
+    return m_accel_x * kGrav;
   }
 
   /**
@@ -1273,7 +1004,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return The acceleration in the Y axis in meters per second squared.
    */
   public synchronized double getAccelY() {
-    return m_accel_y * 9.81;
+    return m_accel_y * kGrav;
   }
 
   /**
@@ -1282,7 +1013,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return The acceleration in the Z axis in meters per second squared.
    */
   public synchronized double getAccelZ() {
-    return m_accel_z * 9.81;
+    return m_accel_z * kGrav;
   }
 
   /**

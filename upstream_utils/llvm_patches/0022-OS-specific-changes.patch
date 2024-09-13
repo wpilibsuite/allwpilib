@@ -1,18 +1,18 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:30:43 -0400
-Subject: [PATCH 22/34] OS-specific changes
+Subject: [PATCH 22/37] OS-specific changes
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 16 +++++++---------
  1 file changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index e253d6f7a5ca3aee75823efdb9717dcd93fff5dc..5c08e469e2e44b27e69f4aa974bc59deb8217c9b 100644
+index e19a38256ce714359b85076cf49056f379764d8d..54b1c09d61d43a936373da8d3bb69b9b1325bf48 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -96,15 +96,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
-     fmt::print(stderr, "LLVM ERROR: {}\n", Reason);
+     wpi::print(stderr, "LLVM ERROR: {}\n", Reason);
    }
  
 -  // If we reached here, we are failing ungracefully. Run the interrupt handlers

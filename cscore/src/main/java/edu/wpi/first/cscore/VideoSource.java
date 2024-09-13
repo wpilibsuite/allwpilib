@@ -79,16 +79,13 @@ public class VideoSource implements AutoCloseable {
    * @return The kind
    */
   public static Kind getKindFromInt(int kind) {
-    switch (kind) {
-      case 1:
-        return Kind.kUsb;
-      case 2:
-        return Kind.kHttp;
-      case 4:
-        return Kind.kCv;
-      default:
-        return Kind.kUnknown;
-    }
+    return switch (kind) {
+      case 1 -> Kind.kUsb;
+      case 2 -> Kind.kHttp;
+      case 4 -> Kind.kCv;
+      case 8 -> Kind.kRaw;
+      default -> Kind.kUnknown;
+    };
   }
 
   /**
@@ -134,11 +131,7 @@ public class VideoSource implements AutoCloseable {
     if (other == null) {
       return false;
     }
-    if (getClass() != other.getClass()) {
-      return false;
-    }
-    VideoSource source = (VideoSource) other;
-    return m_handle == source.m_handle;
+    return other instanceof VideoSource source && m_handle == source.m_handle;
   }
 
   @Override

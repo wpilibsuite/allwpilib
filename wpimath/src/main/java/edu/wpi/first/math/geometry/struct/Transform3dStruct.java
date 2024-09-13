@@ -17,8 +17,8 @@ public class Transform3dStruct implements Struct<Transform3d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Transform3d";
+  public String getTypeName() {
+    return "Transform3d";
   }
 
   @Override
@@ -47,5 +47,10 @@ public class Transform3dStruct implements Struct<Transform3d> {
   public void pack(ByteBuffer bb, Transform3d value) {
     Translation3d.struct.pack(bb, value.getTranslation());
     Rotation3d.struct.pack(bb, value.getRotation());
+  }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
   }
 }

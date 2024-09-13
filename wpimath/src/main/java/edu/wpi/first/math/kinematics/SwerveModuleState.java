@@ -9,9 +9,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.proto.SwerveModuleStateProto;
 import edu.wpi.first.math.kinematics.struct.SwerveModuleStateStruct;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -23,7 +21,7 @@ public class SwerveModuleState
   public double speedMetersPerSecond;
 
   /** Angle of the module. */
-  public Rotation2d angle = Rotation2d.fromDegrees(0);
+  public Rotation2d angle = Rotation2d.kZero;
 
   /** SwerveModuleState protobuf for serialization. */
   public static final SwerveModuleStateProto proto = new SwerveModuleStateProto();
@@ -51,18 +49,15 @@ public class SwerveModuleState
    * @param speed The speed of the wheel of the module.
    * @param angle The angle of the module.
    */
-  public SwerveModuleState(Measure<Velocity<Distance>> speed, Rotation2d angle) {
+  public SwerveModuleState(LinearVelocity speed, Rotation2d angle) {
     this(speed.in(MetersPerSecond), angle);
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof SwerveModuleState) {
-      SwerveModuleState other = (SwerveModuleState) obj;
-      return Math.abs(other.speedMetersPerSecond - speedMetersPerSecond) < 1E-9
-          && angle.equals(other.angle);
-    }
-    return false;
+    return obj instanceof SwerveModuleState other
+        && Math.abs(other.speedMetersPerSecond - speedMetersPerSecond) < 1E-9
+        && angle.equals(other.angle);
   }
 
   @Override
@@ -102,8 +97,7 @@ public class SwerveModuleState
     var delta = desiredState.angle.minus(currentAngle);
     if (Math.abs(delta.getDegrees()) > 90.0) {
       return new SwerveModuleState(
-          -desiredState.speedMetersPerSecond,
-          desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
+          -desiredState.speedMetersPerSecond, desiredState.angle.rotateBy(Rotation2d.kPi));
     } else {
       return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
     }

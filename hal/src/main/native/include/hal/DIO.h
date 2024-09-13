@@ -68,9 +68,8 @@ HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status);
  * Frees the resource associated with a DO PWM generator.
  *
  * @param[in] pwmGenerator the digital PWM handle
- * @param[out] status Error status variable. 0 on success.
  */
-void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status);
+void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator);
 
 /**
  * Changes the frequency of the DO PWM generator.

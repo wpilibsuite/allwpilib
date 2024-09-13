@@ -13,7 +13,7 @@ checkstyle {
 apply plugin: 'pmd'
 
 pmd {
-    toolVersion = '6.55.0'
+    toolVersion = '7.2.0'
     consoleOutput = true
     reportsDir = file("$project.buildDir/reports/pmd")
     ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
@@ -48,7 +48,7 @@ spotless {
         target fileTree('.') {
             include '**/*.json'
             exclude '**/build/**', '**/build-*/**', '**/bin/**'
-            exclude '**/simgui-ds.json', '**/simgui-window.json', '**/simgui.json', '**/networktables.json'
+            exclude '**/simgui-ds.json', '**/simgui-window.json', '**/simgui.json', '**/networktables.json', '**/*test.json'
         }
         gson()
           .indentWithSpaces(2)

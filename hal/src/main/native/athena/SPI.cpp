@@ -16,6 +16,7 @@
 
 #include <fmt/format.h>
 #include <wpi/mutex.h>
+#include <wpi/print.h>
 
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
@@ -125,7 +126,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       // CS0 is not a DIO port, so nothing to allocate
       handle = open("/dev/spidev0.0", O_RDWR);
       if (handle < 0) {
-        fmt::print("Failed to open SPI port {}: {}\n",
+        wpi::print("Failed to open SPI port {}: {}\n",
                    static_cast<int32_t>(port), std::strerror(errno));
         CommonSPIPortFree();
         return;
@@ -147,7 +148,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       }
       handle = open("/dev/spidev0.1", O_RDWR);
       if (handle < 0) {
-        fmt::print("Failed to open SPI port {}: {}\n",
+        wpi::print("Failed to open SPI port {}: {}\n",
                    static_cast<int32_t>(port), std::strerror(errno));
         CommonSPIPortFree();
         HAL_FreeDIOPort(digitalHandles[0]);
@@ -170,7 +171,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       }
       handle = open("/dev/spidev0.2", O_RDWR);
       if (handle < 0) {
-        fmt::print("Failed to open SPI port {}: {}\n",
+        wpi::print("Failed to open SPI port {}: {}\n",
                    static_cast<int32_t>(port), std::strerror(errno));
         CommonSPIPortFree();
         HAL_FreeDIOPort(digitalHandles[1]);
@@ -193,7 +194,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       }
       handle = open("/dev/spidev0.3", O_RDWR);
       if (handle < 0) {
-        fmt::print("Failed to open SPI port {}: {}\n",
+        wpi::print("Failed to open SPI port {}: {}\n",
                    static_cast<int32_t>(port), std::strerror(errno));
         CommonSPIPortFree();
         HAL_FreeDIOPort(digitalHandles[2]);
@@ -240,7 +241,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
           digitalSystem->readEnableMXPSpecialFunction(status) | 0x00F0, status);
       handle = open("/dev/spidev1.0", O_RDWR);
       if (handle < 0) {
-        fmt::print("Failed to open SPI port {}: {}\n",
+        wpi::print("Failed to open SPI port {}: {}\n",
                    static_cast<int32_t>(port), std::strerror(errno));
         HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated
         HAL_FreeDIOPort(digitalHandles[6]);  // free the second port allocated

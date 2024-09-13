@@ -50,6 +50,32 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
+   * Starts the command when the condition changes.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger onChange(Command command) {
+    requireNonNullParam(command, "command", "onChange");
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (m_pressedLast != pressed) {
+              command.schedule();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
+    return this;
+  }
+
+  /**
    * Starts the given command whenever the condition changes from `false` to `true`.
    *
    * @param command the command to start

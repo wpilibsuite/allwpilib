@@ -70,7 +70,7 @@ public class ExponentialProfile {
   }
 
   /** Profile constraints. */
-  public static class Constraints {
+  public static final class Constraints {
     /** Maximum unsigned input voltage. */
     public final double maxInput;
 
@@ -96,7 +96,7 @@ public class ExponentialProfile {
     /**
      * Computes the max achievable velocity for an Exponential Profile.
      *
-     * @return The seady-state velocity achieved by this profile.
+     * @return The steady-state velocity achieved by this profile.
      */
     public double maxVelocity() {
       return -maxInput * B / A;
@@ -151,12 +151,9 @@ public class ExponentialProfile {
 
     @Override
     public boolean equals(Object other) {
-      if (other instanceof State) {
-        State rhs = (State) other;
-        return this.position == rhs.position && this.velocity == rhs.velocity;
-      } else {
-        return false;
-      }
+      return other instanceof State rhs
+          && this.position == rhs.position
+          && this.velocity == rhs.velocity;
     }
 
     @Override

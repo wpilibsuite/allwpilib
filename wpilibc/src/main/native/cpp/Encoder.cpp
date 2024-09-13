@@ -59,12 +59,6 @@ Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
   InitEncoder(reverseDirection, encodingType);
 }
 
-Encoder::~Encoder() {
-  int32_t status = 0;
-  HAL_FreeEncoder(m_encoder, &status);
-  FRC_ReportError(status, "FreeEncoder");
-}
-
 int Encoder::Get() const {
   int32_t status = 0;
   int value = HAL_GetEncoder(m_encoder, &status);
@@ -216,8 +210,7 @@ void Encoder::InitSendable(wpi::SendableBuilder& builder) {
     builder.SetSmartDashboardType("Encoder");
   }
 
-  builder.AddDoubleProperty(
-      "Speed", [=, this] { return GetRate(); }, nullptr);
+  builder.AddDoubleProperty("Speed", [=, this] { return GetRate(); }, nullptr);
   builder.AddDoubleProperty(
       "Distance", [=, this] { return GetDistance(); }, nullptr);
   builder.AddDoubleProperty(

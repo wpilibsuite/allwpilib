@@ -82,7 +82,8 @@ public final class HAL extends JNIWrapper {
 
   private static final List<Runnable> s_simPeriodicBefore = new ArrayList<>();
 
-  public static class SimPeriodicBeforeCallback implements AutoCloseable {
+  /** A callback to be run by IterativeRobotBase prior to the user's simulationPeriodic code. */
+  public static final class SimPeriodicBeforeCallback implements AutoCloseable {
     private SimPeriodicBeforeCallback(Runnable r) {
       m_run = r;
     }
@@ -128,7 +129,8 @@ public final class HAL extends JNIWrapper {
 
   private static final List<Runnable> s_simPeriodicAfter = new ArrayList<>();
 
-  public static class SimPeriodicAfterCallback implements AutoCloseable {
+  /** A callback to be run by IterativeRobotBase after the user's simulationPeriodic code. */
+  public static final class SimPeriodicAfterCallback implements AutoCloseable {
     private SimPeriodicAfterCallback(Runnable r) {
       m_run = r;
     }
@@ -192,6 +194,14 @@ public final class HAL extends JNIWrapper {
    * @see "HAL_GetRSLState"
    */
   public static native boolean getRSLState();
+
+  /**
+   * Gets the number of times the system has been disabled due to communication errors with the
+   * Driver Station.
+   *
+   * @return number of disables due to communication errors.
+   */
+  public static native int getCommsDisableCount();
 
   /**
    * Gets if the system time is valid.

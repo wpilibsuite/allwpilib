@@ -35,10 +35,6 @@ DigitalInput::DigitalInput(int channel) {
   wpi::SendableRegistry::AddLW(this, "DigitalInput", channel);
 }
 
-DigitalInput::~DigitalInput() {
-  HAL_FreeDIOPort(m_handle);
-}
-
 bool DigitalInput::Get() const {
   int32_t status = 0;
   bool value = HAL_GetDIO(m_handle, &status);
@@ -68,6 +64,5 @@ int DigitalInput::GetChannel() const {
 
 void DigitalInput::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Input");
-  builder.AddBooleanProperty(
-      "Value", [=, this] { return Get(); }, nullptr);
+  builder.AddBooleanProperty("Value", [=, this] { return Get(); }, nullptr);
 }

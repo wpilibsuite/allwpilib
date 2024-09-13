@@ -5,6 +5,7 @@
 #pragma once
 
 #include <frc/AnalogPotentiometer.h>
+#include <frc/RobotBase.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/PIDSubsystem.h>
 
@@ -43,16 +44,14 @@ class Wrist : public frc2::PIDSubsystem {
 
  private:
   frc::PWMSparkMax m_motor{WristConstants::kMotorPort};
-
-// Conversion value of potentiometer varies between the real world and
-// simulation
-#ifndef SIMULATION
-  frc::AnalogPotentiometer m_pot{WristConstants::kPotentiometerPort,
-                                 -270.0 / 5};
-#else
-  frc::AnalogPotentiometer m_pot{
+  // Conversion value of potentiometer varies between the real world and
+  // simulation
+  frc::AnalogPotentiometer m_pot =
+      frc::RobotBase::IsReal()
+          ? frc::AnalogPotentiometer{WristConstants::kPotentiometerPort,
+                                 -270.0 / 5}
+          : frc::AnalogPotentiometer{
       WristConstants::kPotentiometerPort};  // Defaults to degrees
-#endif
 
   static constexpr double kP = WristConstants::kP;
   static constexpr double kI = WristConstants::kI;

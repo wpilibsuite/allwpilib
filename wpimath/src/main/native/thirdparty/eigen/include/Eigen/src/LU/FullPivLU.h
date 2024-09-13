@@ -622,7 +622,7 @@ struct kernel_retval<FullPivLU<MatrixType_, PermutationIndex_> >
     // permuting the rows and cols to bring the nonnegligible pivots to the top of
     // the main diagonal. We need that to be able to apply our triangular solvers.
     // FIXME when we get triangularView-for-rectangular-matrices, this can be simplified
-    Matrix<typename MatrixType::Scalar, Dynamic, Dynamic, MatrixType::Options, MaxSmallDimAtCompileTime,
+    Matrix<typename MatrixType::Scalar, Dynamic, Dynamic, traits<MatrixType>::Options, MaxSmallDimAtCompileTime,
            MatrixType::MaxColsAtCompileTime>
         m(dec().matrixLU().block(0, 0, rank(), cols));
     for (Index i = 0; i < rank(); ++i) {

@@ -5,6 +5,7 @@
 package edu.wpi.first.util.datalog;
 
 import edu.wpi.first.util.WPIUtilJNI;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
@@ -14,7 +15,8 @@ import java.nio.ByteBuffer;
  */
 public class DataLogJNI extends WPIUtilJNI {
   /**
-   * Create a new Data Log. The log will be initially created with a temporary filename.
+   * Create a new Data Log background writer. The log will be initially created with a temporary
+   * filename.
    *
    * @param dir directory to store the log
    * @param filename filename to use; if none provided, a random filename is generated of the form
@@ -22,30 +24,58 @@ public class DataLogJNI extends WPIUtilJNI {
    * @param period time between automatic flushes to disk, in seconds; this is a time/storage
    *     tradeoff
    * @param extraHeader extra header data
-   * @return data log implementation handle
+   * @return data log background writer implementation handle
    */
-  static native long create(String dir, String filename, double period, String extraHeader);
+  static native long bgCreate(String dir, String filename, double period, String extraHeader);
 
   /**
    * Change log filename.
    *
-   * @param impl data log implementation handle
+   * @param impl data log background writer implementation handle
    * @param filename filename
    */
-  static native void setFilename(long impl, String filename);
+  static native void bgSetFilename(long impl, String filename);
+
+  /**
+   * Create a new Data Log foreground writer.
+   *
+   * @param filename filename to use
+   * @param extraHeader extra header data
+   * @return data log writer implementation handle
+   * @throws IOException if file cannot be opened
+   */
+  static native long fgCreate(String filename, String extraHeader) throws IOException;
+
+  /**
+   * Create a new Data Log foreground writer to a memory buffer.
+   *
+   * @param extraHeader extra header data
+   * @return data log writer implementation handle
+   */
+  static native long fgCreateMemory(String extraHeader);
 
   /**
    * Explicitly flushes the log data to disk.
    *
-   * @param impl data log implementation handle
+   * @param impl data log background writer implementation handle
    */
   static native void flush(long impl);
+
+  /**
+   * Flushes the log data to a memory buffer (only valid with fgCreateMemory data logs).
+   *
+   * @param impl data log background writer implementation handle
+   * @param buf output data buffer
+   * @param pos position in write buffer to start copying from
+   * @return Number of bytes written to buffer; 0 if no more to copy
+   */
+  static native int copyWriteBuffer(long impl, byte[] buf, int pos);
 
   /**
    * Pauses appending of data records to the log. While paused, no data records are saved (e.g.
    * AppendX is a no-op). Has no effect on entry starts / finishes / metadata changes.
    *
-   * @param impl data log implementation handle
+   * @param impl data log background writer implementation handle
    */
   static native void pause(long impl);
 
@@ -54,14 +84,14 @@ public class DataLogJNI extends WPIUtilJNI {
    * random name if SetFilename was not called after Stop()) and appends Start records and schema
    * data values for all previously started entries and schemas.
    *
-   * @param impl data log implementation handle
+   * @param impl data log background writer implementation handle
    */
   static native void resume(long impl);
 
   /**
    * Stops appending all records to the log, and closes the log file.
    *
-   * @param impl data log implementation handle
+   * @param impl data log background writer implementation handle
    */
   static native void stop(long impl);
 
@@ -223,7 +253,7 @@ public class DataLogJNI extends WPIUtilJNI {
    *
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
-   * @param arr Boolean array to record
+   * @param value Boolean array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   static native void appendBooleanArray(long impl, int entry, boolean[] value, long timestamp);
@@ -233,7 +263,7 @@ public class DataLogJNI extends WPIUtilJNI {
    *
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
-   * @param arr Integer array to record
+   * @param value Integer array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   static native void appendIntegerArray(long impl, int entry, long[] value, long timestamp);
@@ -243,7 +273,7 @@ public class DataLogJNI extends WPIUtilJNI {
    *
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
-   * @param arr Float array to record
+   * @param value Float array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   static native void appendFloatArray(long impl, int entry, float[] value, long timestamp);
@@ -253,7 +283,7 @@ public class DataLogJNI extends WPIUtilJNI {
    *
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
-   * @param arr Double array to record
+   * @param value Double array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   static native void appendDoubleArray(long impl, int entry, double[] value, long timestamp);
@@ -263,7 +293,7 @@ public class DataLogJNI extends WPIUtilJNI {
    *
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
-   * @param arr String array to record
+   * @param value String array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   static native void appendStringArray(long impl, int entry, String[] value, long timestamp);

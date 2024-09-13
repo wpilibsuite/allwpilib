@@ -37,6 +37,10 @@ double PWMMotorController::Get() const {
   return m_pwm.GetSpeed() * (m_isInverted ? -1.0 : 1.0);
 }
 
+units::volt_t PWMMotorController::GetVoltage() const {
+  return Get() * RobotController::GetBatteryVoltage();
+}
+
 void PWMMotorController::SetInverted(bool isInverted) {
   m_isInverted = isInverted;
 }
@@ -47,11 +51,25 @@ bool PWMMotorController::GetInverted() const {
 
 void PWMMotorController::Disable() {
   m_pwm.SetDisabled();
+
+  for (auto& follower : m_nonowningFollowers) {
+    follower->Disable();
+  }
+  for (auto& follower : m_owningFollowers) {
+    follower->Disable();
+  }
 }
 
 void PWMMotorController::StopMotor() {
   // Don't use Set(0) as that will feed the watch kitty
   m_pwm.SetSpeed(0);
+
+  for (auto& follower : m_nonowningFollowers) {
+    follower->StopMotor();
+  }
+  for (auto& follower : m_owningFollowers) {
+    follower->StopMotor();
+  }
 }
 
 std::string PWMMotorController::GetDescription() const {

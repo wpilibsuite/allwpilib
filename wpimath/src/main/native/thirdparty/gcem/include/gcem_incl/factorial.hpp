@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2023 Keith O'Hara
+  ##   Copyright (C) 2016-2024 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -38,19 +38,24 @@ constexpr
 T
 factorial_table(const T x)
 noexcept
-{   // table for x! when x = {2,...,16}
-    return( x == T(2)  ? T(2)     : x == T(3)  ? T(6)      :
+{   // table for x! when x = {0, ..., 20}
+    return( x == T(0)  ? T(1)     : x == T(1)  ? T(1)      :
+            x == T(2)  ? T(2)     : x == T(3)  ? T(6)      :
             x == T(4)  ? T(24)    : x == T(5)  ? T(120)    :
             x == T(6)  ? T(720)   : x == T(7)  ? T(5040)   :
             x == T(8)  ? T(40320) : x == T(9)  ? T(362880) :
             //
-            x == T(10) ? T(3628800)       : 
-            x == T(11) ? T(39916800)      :
-            x == T(12) ? T(479001600)     :
-            x == T(13) ? T(6227020800)    : 
-            x == T(14) ? T(87178291200)   : 
-            x == T(15) ? T(1307674368000) : 
-                         T(20922789888000) );
+            x == T(10) ? T(3628800)             : 
+            x == T(11) ? T(39916800)            :
+            x == T(12) ? T(479001600)           :
+            x == T(13) ? T(6227020800)          : 
+            x == T(14) ? T(87178291200)         : 
+            x == T(15) ? T(1307674368000)       : 
+            x == T(16) ? T(20922789888000)      :
+            x == T(17) ? T(355687428096000)     :
+            x == T(18) ? T(6402373705728000)    :
+            x == T(19) ? T(121645100408832000)  :
+                         T(2432902008176640000) );
 }
 
 template<typename T, typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
@@ -59,14 +64,11 @@ T
 factorial_recur(const T x)
 noexcept
 {
-    return( x == T(0) ? T(1) :
-            x == T(1) ? x :
-            //
-            x < T(17) ? \
+    return( x < T(21) ? \
                 // if
                 factorial_table(x) :
-                // else
-                x*factorial_recur(x-1) );
+                // else (but overflow is almost guaranteed here)
+                x * factorial_recur(x - 1) );
 }
 
 template<typename T, typename std::enable_if<!std::is_integral<T>::value>::type* = nullptr>

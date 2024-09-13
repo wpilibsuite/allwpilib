@@ -4,11 +4,9 @@
 
 package edu.wpi.first.math.trajectory;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.constraint.MaxVelocityConstraint;
 import edu.wpi.first.math.trajectory.constraint.RectangularRegionConstraint;
@@ -19,43 +17,26 @@ import org.junit.jupiter.api.Test;
 class RectangularRegionConstraintTest {
   @Test
   void testConstraint() {
-    // Create constraints
-    double maxVelocity = Units.feetToMeters(3.0);
-    var maxVelocityConstraint = new MaxVelocityConstraint(maxVelocity);
-    var regionConstraint =
-        new RectangularRegionConstraint(
+    double maxVelocity = Units.feetToMeters(2.0);
+    var rectangle =
+        new Rectangle2d(
             new Translation2d(Units.feetToMeters(1.0), Units.feetToMeters(1.0)),
-            new Translation2d(Units.feetToMeters(7.0), Units.feetToMeters(27.0)),
-            maxVelocityConstraint);
+            new Translation2d(Units.feetToMeters(5.0), Units.feetToMeters(27.0)));
 
-    // Get trajectory
-    var trajectory = TrajectoryGeneratorTest.getTrajectory(List.of(regionConstraint));
+    var trajectory =
+        TrajectoryGeneratorTest.getTrajectory(
+            List.of(
+                new RectangularRegionConstraint(
+                    rectangle, new MaxVelocityConstraint(maxVelocity))));
 
-    // Iterate through trajectory and check constraints
     boolean exceededConstraintOutsideRegion = false;
     for (var point : trajectory.getStates()) {
-      if (regionConstraint.isPoseInRegion(point.poseMeters)) {
+      if (rectangle.contains(point.poseMeters.getTranslation())) {
         assertTrue(Math.abs(point.velocityMetersPerSecond) < maxVelocity + 0.05);
       } else if (Math.abs(point.velocityMetersPerSecond) >= maxVelocity + 0.05) {
         exceededConstraintOutsideRegion = true;
       }
     }
     assertTrue(exceededConstraintOutsideRegion);
-  }
-
-  @Test
-  void testIsPoseWithinRegion() {
-    double maxVelocity = Units.feetToMeters(3.0);
-    var maxVelocityConstraint = new MaxVelocityConstraint(maxVelocity);
-    var regionConstraint =
-        new RectangularRegionConstraint(
-            new Translation2d(Units.feetToMeters(1.0), Units.feetToMeters(1.0)),
-            new Translation2d(Units.feetToMeters(7.0), Units.feetToMeters(27.0)),
-            maxVelocityConstraint);
-
-    assertFalse(regionConstraint.isPoseInRegion(new Pose2d()));
-    assertTrue(
-        regionConstraint.isPoseInRegion(
-            new Pose2d(Units.feetToMeters(3.0), Units.feetToMeters(14.5), new Rotation2d())));
   }
 }

@@ -18,16 +18,16 @@ import edu.wpi.first.util.struct.StructSerializable;
  */
 public class ElevatorFeedforward implements ProtobufSerializable, StructSerializable {
   /** The static gain. */
-  public final double ks;
+  private final double ks;
 
   /** The gravity gain. */
-  public final double kg;
+  private final double kg;
 
   /** The velocity gain. */
-  public final double kv;
+  private final double kv;
 
   /** The acceleration gain. */
-  public final double ka;
+  private final double ka;
 
   /** ElevatorFeedforward protobuf for serialization. */
   public static final ElevatorFeedforwardProto proto = new ElevatorFeedforwardProto();
@@ -69,6 +69,42 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    */
   public ElevatorFeedforward(double ks, double kg, double kv) {
     this(ks, kg, kv, 0);
+  }
+
+  /**
+   * Returns the static gain.
+   *
+   * @return The static gain.
+   */
+  public double getKs() {
+    return ks;
+  }
+
+  /**
+   * Returns the gravity gain.
+   *
+   * @return The gravity gain.
+   */
+  public double getKg() {
+    return kg;
+  }
+
+  /**
+   * Returns the velocity gain.
+   *
+   * @return The velocity gain.
+   */
+  public double getKv() {
+    return kv;
+  }
+
+  /**
+   * Returns the acceleration gain.
+   *
+   * @return The acceleration gain.
+   */
+  public double getKa() {
+    return ka;
   }
 
   /**

@@ -30,7 +30,7 @@ namespace frc {
  *                     vectors using a given set of weights.
  * @param residualFunc A function that computes the residual of two state
  *                     vectors (i.e. it subtracts them.)
- * @param squareRootR  Square-root of the noise covaraince of the sigma points.
+ * @param squareRootR  Square-root of the noise covariance of the sigma points.
  *
  * @return Tuple of x, mean of sigma points; S, square-root covariance of
  * sigmas.

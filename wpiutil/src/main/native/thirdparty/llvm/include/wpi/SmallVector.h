@@ -61,7 +61,7 @@ protected:
   void *BeginX;
   unsigned Size = 0, Capacity;
 
-  /// The maximum value of the Size_T used.
+  /// The maximum value of the unsigned used.
   static constexpr size_t SizeTypeMax() {
     return (std::numeric_limits<unsigned>::max)();
   }
@@ -106,8 +106,18 @@ protected:
   ///
   /// This does not construct or destroy any elements in the vector.
   void set_size(size_t N) {
-    assert(N <= capacity());
+    assert(N <= capacity()); // implies no overflow in assignment
     Size = static_cast<unsigned>(N);
+  }
+
+  /// Set the array data pointer to \p Begin and capacity to \p N.
+  ///
+  /// This does not construct or destroy any elements in the vector.
+  //  This does not clean up any existing allocation.
+  void set_allocation_range(void *Begin, size_t N) {
+    assert(N <= SizeTypeMax());
+    BeginX = Begin;
+    Capacity = static_cast<unsigned>(N);
   }
 };
 
@@ -469,8 +479,7 @@ void SmallVectorTemplateBase<T, TriviallyCopyable>::takeAllocationForGrow(
   if (!this->isSmall())
     free(this->begin());
 
-  this->BeginX = NewElts;
-  this->Capacity = static_cast<unsigned>(NewCapacity);
+  this->set_allocation_range(NewElts, NewCapacity);
 }
 
 /// SmallVectorTemplateBase<TriviallyCopyable = true> - This is where we put
@@ -603,15 +612,15 @@ protected:
     RHS.resetToSmall();
   }
 
-public:
-  SmallVectorImpl(const SmallVectorImpl &) = delete;
-
   ~SmallVectorImpl() {
     // Subclass has already destructed this vector's elements.
     // If this wasn't grown from the inline copy, deallocate the old space.
     if (!this->isSmall())
       free(this->begin());
   }
+
+public:
+  SmallVectorImpl(const SmallVectorImpl &) = delete;
 
   void clear() {
     this->destroy_range(this->begin(), this->end());
@@ -1317,6 +1326,14 @@ SmallVector<Out, Size> to_vector_of(R &&Range) {
 
 template <typename Out, typename R> SmallVector<Out> to_vector_of(R &&Range) {
   return {std::begin(Range), std::end(Range)};
+}
+
+template <typename T, typename Pred>
+typename SmallVectorImpl<T>::size_type erase_if(
+    SmallVectorImpl<T>& c, Pred pred) {
+  const auto original_size = c.size();
+  c.erase(std::remove_if(c.begin(), c.end(), pred), c.end());
+  return original_size - c.size();
 }
 
 } // end namespace wpi

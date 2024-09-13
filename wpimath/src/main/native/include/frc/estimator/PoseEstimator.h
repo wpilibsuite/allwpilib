@@ -4,16 +4,21 @@
 
 #pragma once
 
+#include <map>
+#include <optional>
+#include <utility>
+#include <vector>
+
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
+#include "frc/geometry/Translation2d.h"
 #include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/Kinematics.h"
 #include "frc/kinematics/Odometry.h"
-#include "frc/kinematics/WheelPositions.h"
 #include "units/time.h"
 #include "wpimath/MathShared.h"
 
@@ -34,7 +39,7 @@ namespace frc {
  * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelPositions Wheel positions type.
  */
-template <typename WheelSpeeds, WheelPositions WheelPositions>
+template <typename WheelSpeeds, typename WheelPositions>
 class WPILIB_DLLEXPORT PoseEstimator {
  public:
   /**
@@ -83,11 +88,41 @@ class WPILIB_DLLEXPORT PoseEstimator {
                      const WheelPositions& wheelPositions, const Pose2d& pose);
 
   /**
+   * Resets the robot's pose.
+   *
+   * @param pose The pose to reset to.
+   */
+  void ResetPose(const Pose2d& pose);
+
+  /**
+   * Resets the robot's translation.
+   *
+   * @param translation The pose to translation to.
+   */
+  void ResetTranslation(const Translation2d& translation);
+
+  /**
+   * Resets the robot's rotation.
+   *
+   * @param rotation The rotation to reset to.
+   */
+  void ResetRotation(const Rotation2d& rotation);
+
+  /**
    * Gets the estimated robot pose.
    *
    * @return The estimated robot pose in meters.
    */
   Pose2d GetEstimatedPosition() const;
+
+  /**
+   * Return the pose at a given timestamp, if the buffer is not empty.
+   *
+   * @param timestamp The pose's timestamp.
+   * @return The pose at the given timestamp (or std::nullopt if the buffer is
+   * empty).
+   */
+  std::optional<Pose2d> SampleAt(units::second_t timestamp) const;
 
   /**
    * Adds a vision measurement to the Kalman Filter. This will correct
@@ -174,57 +209,46 @@ class WPILIB_DLLEXPORT PoseEstimator {
                         const WheelPositions& wheelPositions);
 
  private:
-  struct InterpolationRecord {
-    // The pose observed given the current sensor inputs and the previous pose.
-    Pose2d pose;
+  /**
+   * Removes stale vision updates that won't affect sampling.
+   */
+  void CleanUpVisionUpdates();
 
-    // The current gyroscope angle.
-    Rotation2d gyroAngle;
+  struct VisionUpdate {
+    // The vision-compensated pose estimate
+    Pose2d visionPose;
 
-    // The distances traveled by the wheels.
-    WheelPositions wheelPositions;
-
-    /**
-     * Checks equality between this InterpolationRecord and another object.
-     *
-     * @param other The other object.
-     * @return Whether the two objects are equal.
-     */
-    bool operator==(const InterpolationRecord& other) const = default;
+    // The pose estimated based solely on odometry
+    Pose2d odometryPose;
 
     /**
-     * Checks inequality between this InterpolationRecord and another object.
+     * Returns the vision-compensated version of the pose. Specifically, changes
+     * the pose from being relative to this record's odometry pose to being
+     * relative to this record's vision pose.
      *
-     * @param other The other object.
-     * @return Whether the two objects are not equal.
+     * @param pose The pose to compensate.
+     * @return The compensated pose.
      */
-    bool operator!=(const InterpolationRecord& other) const = default;
-
-    /**
-     * Interpolates between two InterpolationRecords.
-     *
-     * @param endValue The end value for the interpolation.
-     * @param i The interpolant (fraction).
-     *
-     * @return The interpolated state.
-     */
-    InterpolationRecord Interpolate(
-        Kinematics<WheelSpeeds, WheelPositions>& kinematics,
-        InterpolationRecord endValue, double i) const;
+    Pose2d Compensate(const Pose2d& pose) const {
+      auto delta = pose - odometryPose;
+      return visionPose + delta;
+    }
   };
 
   static constexpr units::second_t kBufferDuration = 1.5_s;
 
-  Kinematics<WheelSpeeds, WheelPositions>& m_kinematics;
   Odometry<WheelSpeeds, WheelPositions>& m_odometry;
   wpi::array<double, 3> m_q{wpi::empty_array};
   Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
 
-  TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{
-      kBufferDuration, [this](const InterpolationRecord& start,
-                              const InterpolationRecord& end, double t) {
-        return start.Interpolate(this->m_kinematics, end, t);
-      }};
+  // Maps timestamps to odometry-only pose estimates
+  TimeInterpolatableBuffer<Pose2d> m_odometryPoseBuffer{kBufferDuration};
+  // Maps timestamps to vision updates
+  // Always contains one entry before the oldest entry in m_odometryPoseBuffer,
+  // unless there have been no vision measurements after the last reset
+  std::map<units::second_t, VisionUpdate> m_visionUpdates;
+
+  Pose2d m_poseEstimate;
 };
 }  // namespace frc
 

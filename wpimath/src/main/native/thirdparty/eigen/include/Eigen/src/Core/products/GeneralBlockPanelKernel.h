@@ -140,7 +140,7 @@ void evaluateProductBlockingSizesHeuristic(Index& k, Index& m, Index& n, Index n
     typedef typename Traits::ResScalar ResScalar;
     enum {
       kdiv = KcFactor * (Traits::mr * sizeof(LhsScalar) + Traits::nr * sizeof(RhsScalar)),
-      ksub = Traits::mr * Traits::nr * sizeof(ResScalar),
+      ksub = Traits::mr * (Traits::nr * sizeof(ResScalar)),
       kr = 8,
       mr = Traits::mr,
       nr = Traits::nr
@@ -197,7 +197,7 @@ void evaluateProductBlockingSizesHeuristic(Index& k, Index& m, Index& n, Index n
     enum {
       k_peeling = 8,
       k_div = KcFactor * (Traits::mr * sizeof(LhsScalar) + Traits::nr * sizeof(RhsScalar)),
-      k_sub = Traits::mr * Traits::nr * sizeof(ResScalar)
+      k_sub = Traits::mr * (Traits::nr * sizeof(ResScalar))
     };
 
     // ---- 1st level of blocking on L1, yields kc ----
@@ -718,10 +718,10 @@ class gebp_traits<std::complex<RealScalar>, std::complex<RealScalar>, ConjLhs_, 
     LhsPacketSize = Vectorizable ? unpacket_traits<LhsPacket_>::size : 1,
     RhsPacketSize = Vectorizable ? unpacket_traits<RhsScalar>::size : 1,
     RealPacketSize = Vectorizable ? unpacket_traits<RealPacket>::size : 1,
+    NumberOfRegisters = EIGEN_ARCH_DEFAULT_NUMBER_OF_REGISTERS,
 
-    // FIXME: should depend on NumberOfRegisters
     nr = 4,
-    mr = ResPacketSize,
+    mr = (plain_enum_min(16, NumberOfRegisters) / 2 / nr) * ResPacketSize,
 
     LhsProgress = ResPacketSize,
     RhsProgress = 1
@@ -795,8 +795,8 @@ class gebp_traits<std::complex<RealScalar>, std::complex<RealScalar>, ConjLhs_, 
                                                                                          DoublePacket<ResPacketType>& c,
                                                                                          TmpType& /*tmp*/,
                                                                                          const LaneIdType&) const {
-    c.first = padd(pmul(a, b.first), c.first);
-    c.second = padd(pmul(a, b.second), c.second);
+    c.first = pmadd(a, b.first, c.first);
+    c.second = pmadd(a, b.second, c.second);
   }
 
   template <typename LaneIdType>
@@ -1257,7 +1257,7 @@ struct lhs_process_one_packet {
         traits.initAcc(C3);
         // To improve instruction pipelining, let's double the accumulation registers:
         //  even k will accumulate in C*, while odd k will accumulate in D*.
-        // This trick is crutial to get good performance with FMA, otherwise it is
+        // This trick is crucial to get good performance with FMA, otherwise it is
         // actually faster to perform separated MUL+ADD because of a naturally
         // better instruction-level parallelism.
         AccPacket D0, D1, D2, D3;
@@ -2399,7 +2399,7 @@ EIGEN_DONT_INLINE void gebp_kernel<LhsScalar, RhsScalar, Index, DataMapper, mr, 
         // fails, drop down to the scalar path.
         constexpr bool kCanLoadSRhsQuad =
             (unpacket_traits<SLhsPacket>::size < 4) ||
-            (unpacket_traits<SRhsPacket>::size % (unpacket_traits<SLhsPacket>::size / 4)) == 0;
+            (unpacket_traits<SRhsPacket>::size % ((std::max<int>)(unpacket_traits<SLhsPacket>::size, 4) / 4)) == 0;
         if (kCanLoadSRhsQuad && (SwappedTraits::LhsProgress % 4) == 0 && (SwappedTraits::LhsProgress <= 16) &&
             (SwappedTraits::LhsProgress != 8 || SResPacketHalfSize == nr) &&
             (SwappedTraits::LhsProgress != 16 || SResPacketQuarterSize == nr)) {
@@ -3130,9 +3130,8 @@ inline std::ptrdiff_t l2CacheSize() {
   return l2;
 }
 
-/** \returns the currently set level 3 cpu cache size (in bytes) used to estimate the ideal blocking size paramete\
-rs.
-* \sa setCpuCacheSize */
+/** \returns the currently set level 3 cpu cache size (in bytes) used to estimate the ideal blocking size parameters.
+ * \sa setCpuCacheSize */
 inline std::ptrdiff_t l3CacheSize() {
   std::ptrdiff_t l1, l2, l3;
   internal::manage_caching_sizes(GetAction, &l1, &l2, &l3);

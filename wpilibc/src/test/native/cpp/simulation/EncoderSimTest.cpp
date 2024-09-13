@@ -114,7 +114,7 @@ TEST(EncoderSimTest, SetMaxPeriod) {
   auto cb = sim.RegisterMaxPeriodCallback(callback.GetCallback(), false);
 
   WPI_IGNORE_DEPRECATED
-  encoder.SetMaxPeriod(units::second_t{123.456});
+  encoder.SetMaxPeriod(123.456_s);
   WPI_UNIGNORE_DEPRECATED
   EXPECT_EQ(123.456, sim.GetMaxPeriod());
 

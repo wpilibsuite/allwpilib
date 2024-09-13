@@ -30,10 +30,6 @@ DMA::DMA() {
   FRC_CheckErrorStatus(status, "InitializeDMA");
 }
 
-DMA::~DMA() {
-  HAL_FreeDMA(dmaHandle);
-}
-
 void DMA::SetPause(bool pause) {
   int32_t status = 0;
   HAL_SetDMAPause(dmaHandle, pause, &status);

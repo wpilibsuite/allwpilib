@@ -52,15 +52,16 @@ public class Robot extends TimedRobot {
   // States: [position, velocity], in radians and radians per second.
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in radians.
-  private final LinearSystem<N2, N1, N1> m_armPlant =
+  private final LinearSystem<N2, N1, N2> m_armPlant =
       LinearSystemId.createSingleJointedArmSystem(DCMotor.getNEO(2), kArmMOI, kArmGearing);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
+  @SuppressWarnings("unchecked")
   private final KalmanFilter<N2, N1, N1> m_observer =
       new KalmanFilter<>(
           Nat.N2(),
           Nat.N1(),
-          m_armPlant,
+          (LinearSystem<N2, N1, N1>) m_armPlant.slice(0),
           VecBuilder.fill(0.015, 0.17), // How accurate we
           // think our model is, in radians and radians/sec
           VecBuilder.fill(0.01), // How accurate we think our encoder position
@@ -68,9 +69,10 @@ public class Robot extends TimedRobot {
           0.020);
 
   // A LQR uses feedback to create voltage commands.
+  @SuppressWarnings("unchecked")
   private final LinearQuadraticRegulator<N2, N1, N1> m_controller =
       new LinearQuadraticRegulator<>(
-          m_armPlant,
+          (LinearSystem<N2, N1, N1>) m_armPlant.slice(0),
           VecBuilder.fill(Units.degreesToRadians(1.0), Units.degreesToRadians(10.0)), // qelms.
           // Position and velocity error tolerances, in radians and radians per second. Decrease
           // this
@@ -82,11 +84,14 @@ public class Robot extends TimedRobot {
           // heavily penalize control effort, or make the controller less aggressive. 12 is a good
           // starting point because that is the (approximate) maximum voltage of a battery.
           0.020); // Nominal time between loops. 0.020 for TimedRobot, but can be
+
   // lower if using notifiers.
 
   // The state-space loop combines a controller, observer, feedforward and plant for easy control.
+  @SuppressWarnings("unchecked")
   private final LinearSystemLoop<N2, N1, N1> m_loop =
-      new LinearSystemLoop<>(m_armPlant, m_controller, m_observer, 12.0, 0.020);
+      new LinearSystemLoop<>(
+          (LinearSystem<N2, N1, N1>) m_armPlant.slice(0), m_controller, m_observer, 12.0, 0.020);
 
   // An encoder set up to measure arm position in radians.
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
@@ -96,8 +101,7 @@ public class Robot extends TimedRobot {
   // A joystick to read the trigger from.
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
-  @Override
-  public void robotInit() {
+  public Robot() {
     // We go 2 pi radians in 1 rotation, or 4096 counts.
     m_encoder.setDistancePerPulse(Math.PI * 2 / 4096.0);
   }

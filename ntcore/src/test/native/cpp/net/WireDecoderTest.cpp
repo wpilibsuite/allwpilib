@@ -67,8 +67,9 @@ TEST_F(WireDecodeTextClientTest, ErrorEmpty) {
       logger,
       Call(_, _, _,
            "could not decode JSON message: [json.exception.parse_error.101] "
-           "parse error at line 1, column 1: syntax error while parsing value "
-           "- unexpected end of input; expected '[', '{', or a literal"sv));
+           "parse error at line 1, column 1: attempting to parse an empty "
+           "input; check that your input string or stream contains the "
+           "expected JSON"sv));
   net::WireDecodeText("", handler, logger);
 }
 

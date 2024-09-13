@@ -4,14 +4,17 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.geometry.proto.Pose3dProto;
 import edu.wpi.first.math.geometry.struct.Pose3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.jni.Pose3dJNI;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -20,13 +23,20 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Pose3d representing the origin.
+   *
+   * <p>This exists to avoid allocations for common poses.
+   */
+  public static final Pose3d kZero = new Pose3d();
+
   private final Translation3d m_translation;
   private final Rotation3d m_rotation;
 
   /** Constructs a pose at the origin facing toward the positive X axis. */
   public Pose3d() {
-    m_translation = new Translation3d();
-    m_rotation = new Rotation3d();
+    m_translation = Translation3d.kZero;
+    m_rotation = Rotation3d.kZero;
   }
 
   /**
@@ -54,6 +64,19 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   public Pose3d(double x, double y, double z, Rotation3d rotation) {
     m_translation = new Translation3d(x, y, z);
     m_rotation = rotation;
+  }
+
+  /**
+   * Constructs a pose with x, y, and z translations instead of a separate Translation3d. The X, Y,
+   * and Z translations will be converted to and tracked as meters.
+   *
+   * @param x The x component of the translational component of the pose.
+   * @param y The y component of the translational component of the pose.
+   * @param z The z component of the translational component of the pose.
+   * @param rotation The rotational component of the pose.
+   */
+  public Pose3d(Distance x, Distance y, Distance z, Rotation3d rotation) {
+    this(x.in(Meters), y.in(Meters), z.in(Meters), rotation);
   }
 
   /**
@@ -125,6 +148,33 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    */
   public double getZ() {
     return m_translation.getZ();
+  }
+
+  /**
+   * Returns the X component of the pose's translation in a measure.
+   *
+   * @return The x component of the pose's translation in a measure.
+   */
+  public Distance getMeasureX() {
+    return m_translation.getMeasureX();
+  }
+
+  /**
+   * Returns the Y component of the pose's translation in a measure.
+   *
+   * @return The y component of the pose's translation in a measure.
+   */
+  public Distance getMeasureY() {
+    return m_translation.getMeasureY();
+  }
+
+  /**
+   * Returns the Z component of the pose's translation in a measure.
+   *
+   * @return The z component of the pose's translation in a measure.
+   */
+  public Distance getMeasureZ() {
+    return m_translation.getMeasureZ();
   }
 
   /**
@@ -217,7 +267,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   public Pose3d exp(Twist3d twist) {
     var quaternion = this.getRotation().getQuaternion();
     double[] resultArray =
-        WPIMathJNI.expPose3d(
+        Pose3dJNI.exp(
             this.getX(),
             this.getY(),
             this.getZ(),
@@ -250,7 +300,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
     var thisQuaternion = this.getRotation().getQuaternion();
     var endQuaternion = end.getRotation().getQuaternion();
     double[] resultArray =
-        WPIMathJNI.logPose3d(
+        Pose3dJNI.log(
             this.getX(),
             this.getY(),
             this.getZ(),
@@ -296,11 +346,9 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Pose3d) {
-      return ((Pose3d) obj).m_translation.equals(m_translation)
-          && ((Pose3d) obj).m_rotation.equals(m_rotation);
-    }
-    return false;
+    return obj instanceof Pose3d pose
+        && m_translation.equals(pose.m_translation)
+        && m_rotation.equals(pose.m_rotation);
   }
 
   @Override

@@ -3,11 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstdlib>
+#include <cstring>
 #include <thread>
 
-#include <fmt/core.h>
 #include <gtest/gtest.h>
 #include <hal/HAL.h>
+#include <wpi/print.h>
 
 #include "mockds/MockDS.h"
 
@@ -27,7 +28,7 @@ class TestEnvironment : public testing::Environment {
     m_alreadySetUp = true;
 
     if (!HAL_Initialize(500, 0)) {
-      fmt::print(stderr, "FATAL ERROR: HAL could not be initialized\n");
+      wpi::print(stderr, "FATAL ERROR: HAL could not be initialized\n");
       std::exit(-1);
     }
 
@@ -39,7 +40,7 @@ class TestEnvironment : public testing::Environment {
     // able to run on the hardware.
     HAL_ObserveUserProgramStarting();
 
-    fmt::print("Started coms\n");
+    wpi::print("Started coms\n");
 
     int enableCounter = 0;
 
@@ -54,13 +55,13 @@ class TestEnvironment : public testing::Environment {
       if (enableCounter > 50) {
         // Robot did not enable properly after 5 seconds.
         // Force exit
-        fmt::print(stderr, " Failed to enable. Aborting\n");
+        wpi::print(stderr, " Failed to enable. Aborting\n");
         std::terminate();
       }
 
       std::this_thread::sleep_for(100ms);
 
-      fmt::print("Waiting for enable: {}\n", enableCounter++);
+      wpi::print("Waiting for enable: {}\n", enableCounter++);
       HAL_RefreshDSData();
     }
     std::this_thread::sleep_for(500ms);

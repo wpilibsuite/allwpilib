@@ -10,7 +10,7 @@
 #include <memory>
 #include <type_traits>
 
-#include <fmt/format.h>
+#include <wpi/print.h>
 
 #include "AnalogInternal.h"
 #include "ConstantsInternal.h"
@@ -159,8 +159,8 @@ void HAL_SetDMAPause(HAL_DMAHandle handle, HAL_Bool pause, int32_t* status) {
 
 void HAL_SetDMATimedTrigger(HAL_DMAHandle handle, double seconds,
                             int32_t* status) {
-  constexpr double baseMultipler = kSystemClockTicksPerMicrosecond * 1000000;
-  uint32_t cycles = static_cast<uint32_t>(baseMultipler * seconds);
+  constexpr double baseMultiplier = kSystemClockTicksPerMicrosecond * 1000000;
+  uint32_t cycles = static_cast<uint32_t>(baseMultiplier * seconds);
   HAL_SetDMATimedTriggerCycles(handle, cycles, status);
 }
 
@@ -564,7 +564,7 @@ int32_t HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
   if (!success) {
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(status,
-                      "Digital Source unabled to be mapped properly. Likely "
+                      "Digital Source unable to be mapped properly. Likely "
                       "invalid handle passed.");
     return 0;
   }
@@ -737,7 +737,7 @@ enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
                      &remainingBytes, status);
 
   if ((remainingBytes % dma->captureStore.captureSize) != 0) {
-    fmt::print(
+    wpi::print(
         "Remaining bytes {} is not a multiple of capture size {}. This is "
         "likely a "
         "bug in WPILib. Please report this issue with a copy of your code.\n",

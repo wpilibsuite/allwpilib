@@ -12,7 +12,7 @@ class Robot : public frc::TimedRobot {
   frc::DutyCycle m_dutyCycle{m_input};  // Duty cycle input
 
  public:
-  void RobotInit() override {}
+  Robot() {}
 
   void RobotPeriodic() override {
     // Duty Cycle Frequency in Hz

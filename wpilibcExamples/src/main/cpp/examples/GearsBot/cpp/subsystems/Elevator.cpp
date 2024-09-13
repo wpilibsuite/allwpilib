@@ -9,11 +9,13 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 Elevator::Elevator()
-    : frc2::PIDSubsystem{frc::PIDController{kP_real, kI_real, kD}} {
-#ifdef SIMULATION
-  GetPIDController()->SetPID(kP_simulation, kI_simulation, kD, 0);
-#endif
-  m_controller.SetTolerance(ElevatorConstants::kTolerance);
+    : frc2::PIDSubsystem{frc::PIDController{kP_real, kI_real, 0}} {
+  if constexpr (frc::RobotBase::IsSimulation()) {
+    // Check for simulation and update PID values
+    GetController().SetPID(kP_simulation, kI_simulation, 0);
+  }
+
+  m_controller.SetTolerance(0.005);
 
   SetName("Elevator");
   // Let's show everything on the LiveWindow

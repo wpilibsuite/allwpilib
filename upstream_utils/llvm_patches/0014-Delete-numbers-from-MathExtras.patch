@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 18:09:45 -0400
-Subject: [PATCH 14/34] Delete numbers from MathExtras
+Subject: [PATCH 14/37] Delete numbers from MathExtras
 
 ---
  llvm/include/llvm/Support/MathExtras.h | 36 --------------------------
  1 file changed, 36 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index cd5a64a746b2eb7491e9b6cf8570bdf436d94a6d..cdf859ccfaca22a04b08a351d7c2c9789a70627e 100644
+index 7541447fa2db5e1634d952b1f39957eb725611f4..60b3b9012a32dda5e7c3ba1dc5923ffa68df8215 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -24,42 +24,6 @@

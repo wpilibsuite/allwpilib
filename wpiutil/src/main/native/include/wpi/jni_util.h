@@ -15,15 +15,15 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/core.h>
-
 #include "wpi/ConvertUTF.h"
 #include "wpi/SafeThread.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
 #include "wpi/mutex.h"
+#include "wpi/print.h"
 #include "wpi/raw_ostream.h"
+#include "wpi/string.h"
 
 /** Java Native Interface (JNI) utility functions */
 namespace wpi::java {
@@ -160,7 +160,7 @@ class JStringRef {
         env->ReleaseStringCritical(str, chars);
       }
     } else {
-      fmt::print(stderr, "JStringRef was passed a null pointer at\n",
+      wpi::print(stderr, "JStringRef was passed a null pointer at\n",
                  GetJavaStackTrace(env));
     }
     // Ensure str is null-terminated.
@@ -172,6 +172,7 @@ class JStringRef {
   std::string_view str() const { return m_str.str(); }
   const char* c_str() const { return m_str.data(); }
   size_t size() const { return m_str.size(); }
+  WPI_String wpi_str() const { return wpi::make_string(str()); }
 
  private:
   SmallString<128> m_str;
@@ -225,8 +226,8 @@ using copy_cv_t = typename copy_cv<CvSrc, Dest>::type;
 
 template <typename From, typename To>
 constexpr bool is_qualification_convertible_v =
-    !(std::is_const_v<From> && !std::is_const_v<To>)&&!(
-        std::is_volatile_v<From> && !std::is_volatile_v<To>);
+    !(std::is_const_v<From> && !std::is_const_v<To>) &&
+    !(std::is_volatile_v<From> && !std::is_volatile_v<To>);
 
 /**
  * Helper class for working with JNI arrays.
@@ -283,7 +284,7 @@ class JSpanBase {
         m_elements{static_cast<std::remove_cv_t<T>*>(
             bb ? env->GetDirectBufferAddress(bb) : nullptr)} {
     if (!bb) {
-      fmt::print(stderr, "JSpan was passed a null pointer at\n",
+      wpi::print(stderr, "JSpan was passed a null pointer at\n",
                  GetJavaStackTrace(env));
     }
   }
@@ -302,7 +303,7 @@ class JSpanBase {
         m_elements = ArrHelper::GetArrayElements(env, jarr);
       }
     } else {
-      fmt::print(stderr, "JSpan was passed a null pointer at\n",
+      wpi::print(stderr, "JSpan was passed a null pointer at\n",
                  GetJavaStackTrace(env));
     }
   }
@@ -398,12 +399,15 @@ class JSpanBase {
     return {reinterpret_cast<U*>(arr.data()), arr.size()};
   }
 
+  // FIXME doxygen gives error parsing initializer list
+  //! @cond Doxygen_Suppress
  private:
   bool m_valid;
   JNIEnv* m_env;
   jarray_type m_jarr = nullptr;
   size_t m_size;
   std::remove_cv_t<T>* m_elements;
+  //! @endcond
 };
 
 }  // namespace detail

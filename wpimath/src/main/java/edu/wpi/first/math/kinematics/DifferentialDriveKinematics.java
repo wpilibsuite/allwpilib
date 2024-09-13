@@ -11,8 +11,7 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.proto.DifferentialDriveKinematicsProto;
 import edu.wpi.first.math.kinematics.struct.DifferentialDriveKinematicsStruct;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
@@ -58,7 +57,7 @@ public class DifferentialDriveKinematics
    *     between the left wheels and right wheels. However, the empirical value may be larger than
    *     the physical measured value due to scrubbing effects.
    */
-  public DifferentialDriveKinematics(Measure<Distance> trackWidth) {
+  public DifferentialDriveKinematics(Distance trackWidth) {
     this(trackWidth.in(Meters));
   }
 
@@ -112,5 +111,25 @@ public class DifferentialDriveKinematics
         (leftDistanceMeters + rightDistanceMeters) / 2,
         0,
         (rightDistanceMeters - leftDistanceMeters) / trackWidthMeters);
+  }
+
+  @Override
+  public DifferentialDriveWheelPositions copy(DifferentialDriveWheelPositions positions) {
+    return new DifferentialDriveWheelPositions(positions.leftMeters, positions.rightMeters);
+  }
+
+  @Override
+  public void copyInto(
+      DifferentialDriveWheelPositions positions, DifferentialDriveWheelPositions output) {
+    output.leftMeters = positions.leftMeters;
+    output.rightMeters = positions.rightMeters;
+  }
+
+  @Override
+  public DifferentialDriveWheelPositions interpolate(
+      DifferentialDriveWheelPositions startValue,
+      DifferentialDriveWheelPositions endValue,
+      double t) {
+    return startValue.interpolate(endValue, t);
   }
 }

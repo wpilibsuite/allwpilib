@@ -46,7 +46,7 @@ public class MecanumDriveKinematics
   private final Translation2d m_rearLeftWheelMeters;
   private final Translation2d m_rearRightWheelMeters;
 
-  private Translation2d m_prevCoR = new Translation2d();
+  private Translation2d m_prevCoR = Translation2d.kZero;
 
   /** MecanumDriveKinematics protobuf for serialization. */
   public static final MecanumDriveKinematicsProto proto = new MecanumDriveKinematicsProto();
@@ -140,7 +140,7 @@ public class MecanumDriveKinematics
    */
   @Override
   public MecanumDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
-    return toWheelSpeeds(chassisSpeeds, new Translation2d());
+    return toWheelSpeeds(chassisSpeeds, Translation2d.kZero);
   }
 
   /**
@@ -254,5 +254,28 @@ public class MecanumDriveKinematics
    */
   public Translation2d getRearRight() {
     return m_rearRightWheelMeters;
+  }
+
+  @Override
+  public MecanumDriveWheelPositions copy(MecanumDriveWheelPositions positions) {
+    return new MecanumDriveWheelPositions(
+        positions.frontLeftMeters,
+        positions.frontRightMeters,
+        positions.rearLeftMeters,
+        positions.rearRightMeters);
+  }
+
+  @Override
+  public void copyInto(MecanumDriveWheelPositions positions, MecanumDriveWheelPositions output) {
+    output.frontLeftMeters = positions.frontLeftMeters;
+    output.frontRightMeters = positions.frontRightMeters;
+    output.rearLeftMeters = positions.rearLeftMeters;
+    output.rearRightMeters = positions.rearRightMeters;
+  }
+
+  @Override
+  public MecanumDriveWheelPositions interpolate(
+      MecanumDriveWheelPositions startValue, MecanumDriveWheelPositions endValue, double t) {
+    return startValue.interpolate(endValue, t);
   }
 }

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:17:19 -0400
-Subject: [PATCH 04/34] Threading updates
+Subject: [PATCH 04/37] Threading updates
 
 - Remove guards for threads and exception
 - Prefer scope gaurd over lock gaurd
@@ -12,10 +12,10 @@ Subject: [PATCH 04/34] Threading updates
  3 files changed, 11 insertions(+), 43 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index 92376629c607461061bc60597a47aed1e535af52..2662839b27bf368cd5da0668099c4b44cbc6435d 100644
+index 6789f0413d8dc94cb465b6e66506b036449ee186..e608f8ea3a837a04d9c29c8bb7a1fab527d512bb 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
-@@ -530,7 +530,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -555,7 +555,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  /// initialize to some constant value. In almost all circumstances this is most
  /// appropriate for use with a pointer, integer, or small aggregation of
  /// pointers and integers.
@@ -23,7 +23,7 @@ index 92376629c607461061bc60597a47aed1e535af52..2662839b27bf368cd5da0668099c4b44
  #if __has_feature(cxx_thread_local) || defined(_MSC_VER)
  #define LLVM_THREAD_LOCAL thread_local
  #else
-@@ -538,11 +537,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -563,11 +562,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  // we only need the restricted functionality that provides.
  #define LLVM_THREAD_LOCAL __thread
  #endif

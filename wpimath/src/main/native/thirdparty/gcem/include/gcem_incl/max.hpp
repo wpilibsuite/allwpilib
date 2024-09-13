@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2023 Keith O'Hara
+  ##   Copyright (C) 2016-2024 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -21,7 +21,7 @@
 #ifndef _gcem_max_HPP
 #define _gcem_max_HPP
 
-#include <cmath>
+#include <algorithm>
 #include <type_traits>
 
 namespace gcem

@@ -14,6 +14,8 @@
 
 #endif
 
+#include <wpi/string.h>
+
 #include "hal/Types.h"
 
 /**
@@ -22,9 +24,15 @@
  * @{
  */
 
+/**
+ * Runtime type.
+ */
 HAL_ENUM(HAL_RuntimeType) {
+  /** roboRIO 1.0 */
   HAL_Runtime_RoboRIO,
+  /** roboRIO 2.0 */
   HAL_Runtime_RoboRIO2,
+  /** Simulation runtime */
   HAL_Runtime_Simulation
 };
 
@@ -79,20 +87,16 @@ int64_t HAL_GetFPGARevision(int32_t* status);
 /**
  * Returns the roboRIO serial number.
  *
- * @param[out] buffer The roboRIO serial number.
- * @param size The maximum characters to copy into buffer.
- * @return Number of characters copied into buffer.
+ * @param[out] serialNumber The roboRIO serial number. Free with WPI_FreeString
  */
-size_t HAL_GetSerialNumber(char* buffer, size_t size);
+void HAL_GetSerialNumber(struct WPI_String* serialNumber);
 
 /**
  * Returns the comments from the roboRIO web interface.
  *
- * @param[out] buffer The comments string.
- * @param size The maximum characters to copy into buffer.
- * @return Number of characters copied into buffer.
+ * @param[out] comments The comments string. Free with WPI_FreeString
  */
-size_t HAL_GetComments(char* buffer, size_t size);
+void HAL_GetComments(struct WPI_String* comments);
 
 /**
  * Returns the team number configured for the robot controller.
@@ -134,6 +138,13 @@ HAL_Bool HAL_GetSystemActive(int32_t* status);
  * @return true if the system is in a low voltage brown out, false otherwise
  */
 HAL_Bool HAL_GetBrownedOut(int32_t* status);
+
+/**
+ * Gets the number of times the system has been disabled due to communication
+ * errors with the Driver Station.
+ * @return number of disables due to communication errors.
+ */
+int32_t HAL_GetCommsDisableCount(int32_t* status);
 
 /**
  * Gets a port handle for a specific channel.

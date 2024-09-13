@@ -7,7 +7,7 @@ package edu.wpi.first.hal;
 /**
  * Addressable LED HAL JNI Methods.
  *
- * @see "hal/AdressableLED.h"
+ * @see "hal/AddressableLED.h"
  */
 public class AddressableLEDJNI extends JNIWrapper {
   /**
