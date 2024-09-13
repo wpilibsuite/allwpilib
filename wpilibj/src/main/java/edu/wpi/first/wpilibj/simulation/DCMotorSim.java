@@ -136,7 +136,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @return The DC motor's gearbox.
    */
-  public DCMotor getGearBox() {
+  public DCMotor getGearbox() {
     return m_gearbox;
   }
 
