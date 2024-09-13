@@ -152,7 +152,6 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    * @param accelRadPerSecSquared The acceleration setpoint.
    * @return The computed feedforward.
    */
-  @SuppressWarnings("removal")
   @Deprecated(forRemoval = true, since = "2025")
   public double calculate(
       double positionRadians, double velocityRadPerSec, double accelRadPerSecSquared) {
