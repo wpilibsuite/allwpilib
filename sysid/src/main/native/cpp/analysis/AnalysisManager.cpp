@@ -10,7 +10,6 @@
 #include <fmt/format.h>
 #include <units/angle.h>
 #include <wpi/MathExtras.h>
-#include <wpi/MemoryBuffer.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 

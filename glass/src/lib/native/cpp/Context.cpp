@@ -128,50 +128,44 @@ static bool JsonToWindow(const wpi::json& jfile, const char* filename) {
 }
 
 static bool LoadWindowStorageImpl(const std::string& filename) {
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(filename, ec);
-  if (fileBuffer == nullptr || ec) {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(filename);
+  if (!fileBuffer) {
     ImGui::LogText("error opening %s: %s", filename.c_str(),
-                   ec.message().c_str());
+                   fileBuffer.error().message().c_str());
     return false;
-  } else {
-    try {
-      return JsonToWindow(wpi::json::parse(fileBuffer->GetCharBuffer()),
-                          filename.c_str());
-    } catch (wpi::json::parse_error& e) {
-      ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());
-      return false;
-    }
+  }
+  try {
+    return JsonToWindow(wpi::json::parse(fileBuffer.value()->GetCharBuffer()),
+                        filename.c_str());
+  } catch (wpi::json::parse_error& e) {
+    ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());
+    return false;
   }
 }
 
 static bool LoadStorageRootImpl(Context* ctx, const std::string& filename,
                                 std::string_view rootName) {
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(filename, ec);
-  if (fileBuffer == nullptr || ec) {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(filename);
+  if (!fileBuffer) {
     ImGui::LogText("error opening %s: %s", filename.c_str(),
-                   ec.message().c_str());
+                   fileBuffer.error().message().c_str());
     return false;
-  } else {
-    auto& storage = ctx->storageRoots[rootName];
-    bool createdStorage = false;
-    if (!storage) {
-      storage = std::make_unique<Storage>();
-      createdStorage = true;
+  }
+  auto& storage = ctx->storageRoots[rootName];
+  bool createdStorage = false;
+  if (!storage) {
+    storage = std::make_unique<Storage>();
+    createdStorage = true;
+  }
+  try {
+    storage->FromJson(wpi::json::parse(fileBuffer.value()->GetCharBuffer()),
+                      filename.c_str());
+  } catch (wpi::json::parse_error& e) {
+    ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());
+    if (createdStorage) {
+      ctx->storageRoots.erase(rootName);
     }
-    try {
-      storage->FromJson(wpi::json::parse(fileBuffer->GetCharBuffer()),
-                        filename.c_str());
-    } catch (wpi::json::parse_error& e) {
-      ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());
-      if (createdStorage) {
-        ctx->storageRoots.erase(rootName);
-      }
-      return false;
-    }
+    return false;
   }
   return true;
 }
