@@ -143,7 +143,6 @@ if(WITH_PROTOBUF)
     )
 else()
     add_library(wpimath ${wpimath_native_src})
-    target_compile_definitions(wpimath PUBLIC NO_PROTOBUF)
 endif()
 
 if(MSVC)

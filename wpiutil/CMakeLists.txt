@@ -150,6 +150,7 @@ if(WITH_PROTOBUF)
     target_link_libraries(wpiutil protobuf::libprotobuf Threads::Threads ${CMAKE_DL_LIBS})
 else()
     target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS})
+    target_compile_definitions(wpiutil PUBLIC NO_PROTOBUF)
 endif()
 
 if(ATOMIC)
