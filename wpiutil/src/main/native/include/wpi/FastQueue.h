@@ -368,8 +368,13 @@ public:
 		return true;
 	}
 
-	// Returns the approximate number of items currently in the queue.
-	inline size_t size_approx() const
+	// Returns if the queue is empty
+	inline bool empty() const {
+		return size() == 0;
+	}
+
+	// Returns the number of items currently in the queue.
+	inline size_t size() const
 	{
 		size_t result = 0;
 		Block* frontBlock_ = frontBlock;
