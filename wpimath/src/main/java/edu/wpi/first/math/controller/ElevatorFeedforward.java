@@ -35,7 +35,7 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
   /** The period, in seconds. */
   private final double m_dt;
 
-  // ** The calculated output voltage measure */
+  /** The calculated output voltage measure */
   private final MutVoltage output = Volts.mutable(0.0);
 
   /**
