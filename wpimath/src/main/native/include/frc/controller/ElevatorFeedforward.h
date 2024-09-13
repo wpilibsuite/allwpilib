@@ -134,7 +134,7 @@ class ElevatorFeedforward {
    *                        second.
    * @return The computed feedforward, in volts.
    */
-  constexpr units::volt_t Calculate(units::unit_t<Velocity> setpoint) const {
+  constexpr units::volt_t Calculate(units::unit_t<Velocity> currentVelocity) const {
     return Calculate(setpoint, setpoint);
   }
 
