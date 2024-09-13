@@ -12,6 +12,7 @@
 #include <wpi/SmallVector.h>
 #include <wpinet/raw_uv_ostream.h>
 #include <wpinet/uv/Buffer.h>
+#include <wpinet/uv/Stream.h>
 
 #include "net3/WireConnection3.h"
 
@@ -39,6 +40,9 @@ class UvStreamConnection3 final
   void Flush() final;
 
   uint64_t GetLastFlushTime() const final { return m_lastFlushTime; }
+
+  void StopRead() final { m_stream.StopRead(); }
+  void StartRead() final { m_stream.StartRead(); }
 
   void Disconnect(std::string_view reason) final;
 

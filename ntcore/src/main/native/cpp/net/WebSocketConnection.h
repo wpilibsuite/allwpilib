@@ -12,6 +12,7 @@
 #include <wpi/function_ref.h>
 #include <wpinet/WebSocket.h>
 #include <wpinet/uv/Buffer.h>
+#include <wpinet/uv/Stream.h>
 
 #include "WireConnection.h"
 
@@ -57,6 +58,9 @@ class WebSocketConnection final
   uint64_t GetLastReceivedTime() const final {
     return m_ws.GetLastReceivedTime();
   }
+
+  void StopRead() final { m_ws.GetStream().StopRead(); }
+  void StartRead() final { m_ws.GetStream().StartRead(); }
 
   void Disconnect(std::string_view reason) final;
 
