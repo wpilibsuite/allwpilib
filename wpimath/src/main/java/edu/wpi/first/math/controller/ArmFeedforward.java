@@ -197,7 +197,8 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints.
+   * Calculates the feedforward from the gains and setpoints assuming discrete control when the
+   * setpoint does not change.
    *
    * @param currentAngle The current angle. This angle should be measured from the horizontal (i.e.
    *     if the provided angle is 0, the arm should be parallel to the floor). If your encoder does
@@ -215,7 +216,7 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints.
+   * Calculates the feedforward from the gains and setpoints assuming discrete control.
    *
    * @param currentAngle The current angle. This angle should be measured from the horizontal (i.e.
    *     if the provided angle is 0, the arm should be parallel to the floor). If your encoder does
