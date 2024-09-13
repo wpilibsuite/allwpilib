@@ -42,8 +42,8 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
    * @param angularPosition The new position
    * @param angularVelocity The new velocity
    */
-  void SetState(units::radian_t angularPosition = 0_rad,
-                units::radians_per_second_t angularVelocity = 0_rad_per_s);
+  void SetState(units::radian_t angularPosition,
+                units::radians_per_second_t angularVelocity);
 
   /**
    * Returns the DC motor position.
