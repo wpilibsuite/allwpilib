@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated flywheel mechanism. */
 public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
-  // GearBox for the flywheel.
+  // Gearbox for the flywheel.
   private final DCMotor m_gearbox;
 
   // The gearing from the motors to the output.
@@ -106,7 +106,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel's gearbox.
    */
-  public DCMotor getGearBox() {
+  public DCMotor getGearbox() {
     return m_gearbox;
   }
 
