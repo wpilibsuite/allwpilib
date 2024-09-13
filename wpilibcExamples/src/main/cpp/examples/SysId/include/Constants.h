@@ -60,9 +60,8 @@ inline constexpr units::turns_per_second_t kShooterTolerance = 50_tps;
 inline constexpr double kP = 1.0;
 
 inline constexpr units::volt_t kS = 0.05_V;
-inline constexpr kv_unit_t kV =
-    (12_V) / units::radians_per_second_t{kShooterFreeSpeed};
-inline constexpr ka_unit_t kA = 0_V * 1_s * 1_s / units::radian_t{1_tr};
+inline constexpr kv_unit_t kV = 12_V / kShooterFreeSpeed;
+inline constexpr ka_unit_t kA = 0_V * 1_s * 1_s / 1_tr;
 
 inline constexpr double kFeederSpeed = 0.5;
 }  // namespace shooter
