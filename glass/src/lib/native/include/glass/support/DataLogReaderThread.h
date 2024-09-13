@@ -17,8 +17,11 @@
 #include <wpi/DenseMap.h>
 #include <wpi/Signal.h>
 #include <wpi/mutex.h>
-#include <wpi/protobuf/ProtobufMessageDatabase.h>
 #include <wpi/struct/DynamicStruct.h>
+
+#ifndef NO_PROTOBUF
+#include <wpi/protobuf/ProtobufMessageDatabase.h>
+#endif
 
 namespace glass {
 
@@ -75,7 +78,9 @@ class DataLogReaderThread {
   }
 
   wpi::StructDescriptorDatabase& GetStructDatabase() { return m_structDb; }
+#ifndef NO_PROTOBUF
   wpi::ProtobufMessageDatabase& GetProtobufDatabase() { return m_protoDb; }
+#endif
 
   const wpi::log::DataLogReader& GetReader() const { return m_reader; }
 
@@ -94,7 +99,9 @@ class DataLogReaderThread {
   std::map<std::string, DataLogReaderEntry, std::less<>> m_entriesByName;
   wpi::DenseMap<int, DataLogReaderEntry*> m_entriesById;
   wpi::StructDescriptorDatabase m_structDb;
+#ifndef NO_PROTOBUF
   wpi::ProtobufMessageDatabase m_protoDb;
+#endif
   std::thread m_thread;
 };
 

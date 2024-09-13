@@ -4,14 +4,9 @@
 
 #pragma once
 
+#include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
 #include <wpi/protobuf/Protobuf.h>
-
-#include "controller.pb.h"
-#include "kinematics.pb.h"
-#include "spline.pb.h"
-#include "system.pb.h"
-#include "wpimath.pb.h"
 
 template <typename T>
 class ProtoTest : public testing::Test {};

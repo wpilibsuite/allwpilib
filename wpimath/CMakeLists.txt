@@ -6,9 +6,11 @@ include(AddTest)
 include(DownloadAndCheck)
 include(WpiProtobuf)
 
-# workaround for makefiles - for some reason parent directories aren't created.
-file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
-file(GLOB wpimath_proto_src src/main/proto/*.proto)
+if(WITH_PROTOBUF)
+    # workaround for makefiles - for some reason parent directories aren't created.
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
+    file(GLOB wpimath_proto_src src/main/proto/*.proto)
+endif()
 
 file(
     GLOB wpimath_jni_src
@@ -120,21 +122,28 @@ file(
     src/main/native/thirdparty/sleipnir/src/*.cpp
 )
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
+if(NOT WITH_PROTOBUF)
+    list(FILTER wpimath_native_src EXCLUDE REGEX "/proto/")
+endif()
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
 
-add_library(protobuf OBJECT)
-target_link_libraries(protobuf wpiutil)
+if(WITH_PROTOBUF)
+    add_library(protobuf OBJECT)
+    target_link_libraries(protobuf wpiutil)
 
-add_library(wpimath ${wpimath_native_src} $<TARGET_OBJECTS:protobuf>)
+    add_library(wpimath ${wpimath_native_src} $<TARGET_OBJECTS:protobuf>)
 
-wpi_protobuf_generate(
-    TARGET
-    protobuf
-    PROTOS ${wpimath_proto_src}
-    PLUGIN ${PROTOC_WPILIB_PLUGIN}
-    PROTOC_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/protobuf"
-)
+    wpi_protobuf_generate(
+        TARGET
+        protobuf
+        PROTOS ${wpimath_proto_src}
+        PLUGIN ${PROTOC_WPILIB_PLUGIN}
+        PROTOC_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/protobuf"
+    )
+else()
+    add_library(wpimath ${wpimath_native_src})
+endif()
 
 if(MSVC)
     get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
@@ -164,12 +173,18 @@ set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
 target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS SLEIPNIR_EXPORTS)
 
-target_compile_features(protobuf PUBLIC cxx_std_20)
 target_compile_features(wpimath PUBLIC cxx_std_20)
 if(MSVC)
     target_compile_options(wpimath PUBLIC /utf-8 /bigobj)
-    target_compile_options(protobuf PUBLIC /utf-8 /bigobj)
 endif()
+
+if(WITH_PROTOBUF)
+    target_compile_features(protobuf PUBLIC cxx_std_20)
+    if(MSVC)
+        target_compile_options(protobuf PUBLIC /utf-8 /bigobj)
+    endif()
+endif()
+
 wpilib_target_warnings(wpimath)
 target_link_libraries(wpimath wpiutil)
 
