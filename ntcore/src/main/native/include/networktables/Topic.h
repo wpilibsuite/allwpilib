@@ -11,13 +11,11 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/json_fwd.h>
+
 #include "networktables/NetworkTableType.h"
 #include "ntcore_c.h"
 #include "ntcore_cpp.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace nt {
 
@@ -105,6 +103,21 @@ class Topic {
   bool IsRetained() const;
 
   /**
+   * Allow storage of the topic's last value, allowing the value to be read (and
+   * not just accessed through event queues and listeners).
+   *
+   * @param cached True for cached, false for not cached.
+   */
+  void SetCached(bool cached);
+
+  /**
+   * Returns whether the topic's last value is stored.
+   *
+   * @return True if the topic is cached.
+   */
+  bool IsCached() const;
+
+  /**
    * Determines if the topic is currently being published.
    *
    * @return True if the topic exists, false otherwise.
@@ -169,7 +182,8 @@ class Topic {
    * @param options subscribe options
    * @return subscriber
    */
-  [[nodiscard]] GenericSubscriber GenericSubscribe(
+  [[nodiscard]]
+  GenericSubscriber GenericSubscribe(
       const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**
@@ -186,7 +200,8 @@ class Topic {
    * @param options subscribe options
    * @return subscriber
    */
-  [[nodiscard]] GenericSubscriber GenericSubscribe(
+  [[nodiscard]]
+  GenericSubscriber GenericSubscribe(
       std::string_view typeString,
       const PubSubOptions& options = kDefaultPubSubOptions);
 
@@ -206,7 +221,8 @@ class Topic {
    * @param options publish options
    * @return publisher
    */
-  [[nodiscard]] GenericPublisher GenericPublish(
+  [[nodiscard]]
+  GenericPublisher GenericPublish(
       std::string_view typeString,
       const PubSubOptions& options = kDefaultPubSubOptions);
 
@@ -228,7 +244,8 @@ class Topic {
    * @param options publish options
    * @return publisher
    */
-  [[nodiscard]] GenericPublisher GenericPublishEx(
+  [[nodiscard]]
+  GenericPublisher GenericPublishEx(
       std::string_view typeString, const wpi::json& properties,
       const PubSubOptions& options = kDefaultPubSubOptions);
 
@@ -250,7 +267,8 @@ class Topic {
    * @param options publish and/or subscribe options
    * @return entry
    */
-  [[nodiscard]] GenericEntry GetGenericEntry(
+  [[nodiscard]]
+  GenericEntry GetGenericEntry(
       const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**
@@ -272,7 +290,8 @@ class Topic {
    * @param options publish and/or subscribe options
    * @return entry
    */
-  [[nodiscard]] GenericEntry GetGenericEntry(
+  [[nodiscard]]
+  GenericEntry GetGenericEntry(
       std::string_view typeString,
       const PubSubOptions& options = kDefaultPubSubOptions);
 
@@ -377,6 +396,7 @@ class Publisher {
   Publisher() = default;
   explicit Publisher(NT_Publisher handle) : m_pubHandle{handle} {}
 
+  /// NetworkTables handle.
   NT_Publisher m_pubHandle{0};
 };
 

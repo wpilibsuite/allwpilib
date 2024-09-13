@@ -6,15 +6,3 @@ cppHeaderFileInclude {
 cppSrcFileInclude {
   \.cpp$
 }
-
-modifiableFileExclude {
-}
-
-generatedFileExclude {
-}
-
-repoRootNameOverride {
-}
-
-includeOtherLibs {
-}

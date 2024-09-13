@@ -16,10 +16,7 @@
 
 #include <wpi/StringMap.h>
 #include <wpi/iterator_range.h>
-
-namespace wpi {
-class json;
-}  // namespace wpi
+#include <wpi/json_fwd.h>
 
 namespace glass {
 

@@ -10,6 +10,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 
 /** A mock sendable that marks itself as an actuator. */
 public class MockActuatorSendable implements Sendable {
+  @SuppressWarnings("this-escape")
   public MockActuatorSendable(String name) {
     SendableRegistry.add(this, name);
   }

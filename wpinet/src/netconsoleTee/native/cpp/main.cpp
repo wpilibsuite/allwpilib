@@ -8,6 +8,7 @@
 #include <wpi/MathExtras.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
+#include <wpi/bit.h>
 #include <wpi/timestamp.h>
 
 #include "wpinet/raw_uv_ostream.h"
@@ -38,7 +39,8 @@ static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
   std::string_view toCopy = wpi::slice(str, 0, idx + 1);
   if (tcp) {
     // Header is 2 byte len, 1 byte type, 4 byte timestamp, 2 byte sequence num
-    uint32_t ts = wpi::FloatToBits((wpi::Now() - startTime) * 1.0e-6);
+    uint32_t ts =
+        wpi::bit_cast<uint32_t, float>((wpi::Now() - startTime) * 1.0e-6);
     uint16_t len = rem.size() + toCopy.size() + 1 + 4 + 2;
     const uint8_t header[] = {static_cast<uint8_t>((len >> 8) & 0xff),
                               static_cast<uint8_t>(len & 0xff),
@@ -58,6 +60,10 @@ static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
   return true;
 }
 
+// FIXME: clang-tidy reports a false positive for leaking a captured shared_ptr
+//        (clang-analyzer-cplusplus.NewDeleteLeaks)
+
+// NOLINTBEGIN
 static void CopyUdp(uv::Stream& in, std::shared_ptr<uv::Udp> out, int port,
                     bool broadcast) {
   sockaddr_in addr;
@@ -110,6 +116,7 @@ static void CopyTcp(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
       },
       out);
 }
+// NOLINTEND
 
 static void CopyStream(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
   in.data.connect([out](uv::Buffer& buf, size_t len) {

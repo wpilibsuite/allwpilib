@@ -23,21 +23,24 @@ import org.ejml.simple.SimpleMatrix;
  *
  * <p>Set simulated sensor readings with the simulated positions in {@link #getOutput()}
  *
- * @param <States> The number of states of the system.
- * @param <Inputs> The number of inputs to the system.
- * @param <Outputs> The number of outputs of the system.
+ * @param <States> Number of states of the system.
+ * @param <Inputs> Number of inputs to the system.
+ * @param <Outputs> Number of outputs of the system.
  */
 public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs extends Num> {
-  // The plant that represents the linear system.
+  /** The plant that represents the linear system. */
   protected final LinearSystem<States, Inputs, Outputs> m_plant;
 
-  // Variables for state, output, and input.
+  /** State vector. */
   protected Matrix<States, N1> m_x;
-  protected Matrix<Outputs, N1> m_y;
+
+  /** Input vector. */
   protected Matrix<Inputs, N1> m_u;
 
-  // The standard deviations of measurements, used for adding noise
-  // to the measurements.
+  /** Output vector. */
+  protected Matrix<Outputs, N1> m_y;
+
+  /** The standard deviations of measurements, used for adding noise to the measurements. */
   protected final Matrix<Outputs, N1> m_measurementStdDevs;
 
   /**
@@ -134,6 +137,26 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
           "Malformed input! Got " + u.length + " elements instead of " + m_u.getNumRows());
     }
     m_u = new Matrix<>(new SimpleMatrix(m_u.getNumRows(), 1, true, u));
+    m_u = clampInput(m_u);
+  }
+
+  /**
+   * Returns the current input of the plant.
+   *
+   * @return The current input of the plant.
+   */
+  public Matrix<Inputs, N1> getInput() {
+    return m_u;
+  }
+
+  /**
+   * Returns an element of the current input of the plant.
+   *
+   * @param row The row to return.
+   * @return An element of the current input of the plant.
+   */
+  public double getInput(int row) {
+    return m_u.get(row, 0);
   }
 
   /**

@@ -15,7 +15,7 @@ import java.util.function.BooleanSupplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class WaitUntilCommand extends CommandBase {
+public class WaitUntilCommand extends Command {
   private final BooleanSupplier m_condition;
 
   /**

@@ -260,6 +260,18 @@ int Counter::GetFPGAIndex() const {
   return m_index;
 }
 
+void Counter::SetDistancePerPulse(double distancePerPulse) {
+  m_distancePerPulse = distancePerPulse;
+}
+
+double Counter::GetDistance() const {
+  return Get() * m_distancePerPulse;
+}
+
+double Counter::GetRate() const {
+  return m_distancePerPulse / GetPeriod().value();
+}
+
 int Counter::Get() const {
   int32_t status = 0;
   int value = HAL_GetCounter(m_counter, &status);

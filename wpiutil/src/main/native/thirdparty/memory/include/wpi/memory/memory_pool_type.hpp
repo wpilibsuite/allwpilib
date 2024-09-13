@@ -1,6 +1,5 @@
-// Copyright (C) 2015-2021 Müller <jonathanmueller.dev@gmail.com>
-// This file is subject to the license terms in the LICENSE file
-// found in the top-level directory of this distribution.
+// Copyright (C) 2015-2023 Jonathan Müller and foonathan/memory contributors
+// SPDX-License-Identifier: Zlib
 
 #ifndef WPI_MEMORY_MEMORY_POOL_TYPE_HPP_INCLUDED
 #define WPI_MEMORY_MEMORY_POOL_TYPE_HPP_INCLUDED
@@ -28,7 +27,7 @@ namespace wpi
         };
 
         /// Tag type defining a memory pool optimized for arrays.
-        /// It keeps the nodes oredered inside the free list and searches the list for an appropriate memory block.
+        /// It keeps the nodes ordered inside the free list and searches the list for an appropriate memory block.
         /// Array allocations are still pretty slow, if the array gets big enough it can get slower than \c new.
         /// Node allocations are still fast, unless there is deallocation in random order.
         /// \note Use this tag type only if you really need to have a memory pool!

@@ -15,6 +15,7 @@ public class JoystickSim extends GenericHIDSim {
    *
    * @param joystick joystick to simulate
    */
+  @SuppressWarnings("this-escape")
   public JoystickSim(Joystick joystick) {
     super(joystick);
     m_joystick = joystick;
@@ -29,6 +30,7 @@ public class JoystickSim extends GenericHIDSim {
    *
    * @param port port number
    */
+  @SuppressWarnings("this-escape")
   public JoystickSim(int port) {
     super(port);
     // default to a reasonable joystick configuration

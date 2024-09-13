@@ -4,10 +4,12 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <string>
 
 #include <units/angle.h>
+#include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -63,20 +65,48 @@ class MecanumDrive : public RobotDriveBase,
    * Uses normalized voltage [-1.0..1.0].
    */
   struct WheelSpeeds {
+    /// Front-left wheel speed.
     double frontLeft = 0.0;
+    /// Front-right wheel speed.
     double frontRight = 0.0;
+    /// Rear-left wheel speed.
     double rearLeft = 0.0;
+    /// Rear-right wheel speed.
     double rearRight = 0.0;
   };
+
+  WPI_IGNORE_DEPRECATED
 
   /**
    * Construct a MecanumDrive.
    *
    * If a motor needs to be inverted, do so before passing it in.
+   *
+   * @param frontLeftMotor Front-left motor.
+   * @param rearLeftMotor Rear-left motor.
+   * @param frontRightMotor Front-right motor.
+   * @param rearRightMotor Rear-right motor.
    */
   MecanumDrive(MotorController& frontLeftMotor, MotorController& rearLeftMotor,
                MotorController& frontRightMotor,
                MotorController& rearRightMotor);
+
+  WPI_UNIGNORE_DEPRECATED
+
+  /**
+   * Construct a MecanumDrive.
+   *
+   * If a motor needs to be inverted, do so before passing it in.
+   *
+   * @param frontLeftMotor Front-left motor setter.
+   * @param rearLeftMotor Rear-left motor setter.
+   * @param frontRightMotor Front-right motor setter.
+   * @param rearRightMotor Rear-right motor setter.
+   */
+  MecanumDrive(std::function<void(double)> frontLeftMotor,
+               std::function<void(double)> rearLeftMotor,
+               std::function<void(double)> frontRightMotor,
+               std::function<void(double)> rearRightMotor);
 
   ~MecanumDrive() override = default;
 
@@ -141,10 +171,16 @@ class MecanumDrive : public RobotDriveBase,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  MotorController* m_frontLeftMotor;
-  MotorController* m_rearLeftMotor;
-  MotorController* m_frontRightMotor;
-  MotorController* m_rearRightMotor;
+  std::function<void(double)> m_frontLeftMotor;
+  std::function<void(double)> m_rearLeftMotor;
+  std::function<void(double)> m_frontRightMotor;
+  std::function<void(double)> m_rearRightMotor;
+
+  // Used for Sendable property getters
+  double m_frontLeftOutput = 0.0;
+  double m_rearLeftOutput = 0.0;
+  double m_frontRightOutput = 0.0;
+  double m_rearRightOutput = 0.0;
 
   bool reported = false;
 };

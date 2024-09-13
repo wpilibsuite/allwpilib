@@ -4,8 +4,6 @@
 
 #include "Downloader.h"
 
-#include <libssh/sftp.h>
-
 #ifdef _WIN32
 #include <fcntl.h>
 #include <io.h>
@@ -20,6 +18,7 @@
 #include <glass/Storage.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
+#include <libssh/sftp.h>
 #include <portable-file-dialogs.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
@@ -28,7 +27,7 @@
 
 Downloader::Downloader(glass::Storage& storage)
     : m_serverTeam{storage.GetString("serverTeam")},
-      m_remoteDir{storage.GetString("remoteDir", "/home/lvuser")},
+      m_remoteDir{storage.GetString("remoteDir", "/home/lvuser/logs")},
       m_username{storage.GetString("username", "lvuser")},
       m_localDir{storage.GetString("localDir")},
       m_deleteAfter{storage.GetBool("deleteAfter", true)},
@@ -77,15 +76,15 @@ void Downloader::DisplayRemoteDirSelector() {
 
   ImGui::SameLine();
   if (ImGui::Button("Deselect All")) {
-    for (auto&& download : m_downloadList) {
-      download.enabled = false;
+    for (auto&& download : m_fileList) {
+      download.selected = false;
     }
   }
 
   ImGui::SameLine();
   if (ImGui::Button("Select All")) {
-    for (auto&& download : m_downloadList) {
-      download.enabled = true;
+    for (auto&& download : m_fileList) {
+      download.selected = true;
     }
   }
 
@@ -138,6 +137,27 @@ void Downloader::DisplayLocalDirSelector() {
       m_cv.notify_all();
     }
   }
+
+  ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(180, 0, 0, 255));
+  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(210, 0, 0, 255));
+  ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(255, 0, 0, 255));
+  if (ImGui::Button("Delete WITHOUT Downloading")) {
+    ImGui::OpenPopup("DeleteConfirm");
+  }
+  ImGui::PopStyleColor(3);
+  if (ImGui::BeginPopup("DeleteConfirm")) {
+    ImGui::TextUnformatted("Are you sure? This will NOT download the files");
+    if (ImGui::Button("DELETE")) {
+      m_state = kDelete;
+      m_cv.notify_all();
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel")) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
 }
 
 size_t Downloader::DisplayFiles() {
@@ -148,11 +168,15 @@ size_t Downloader::DisplayFiles() {
           ImGuiTableFlags_Borders | ImGuiTableFlags_SizingStretchProp)) {
     ImGui::TableSetupColumn("File");
     ImGui::TableSetupColumn("Size");
-    ImGui::TableSetupColumn("Download");
+    ImGui::TableSetupColumn((m_state == kDownload || m_state == kDownloadDone ||
+                             m_state == kDelete || m_state == kDeleteDone)
+                                ? "Status"
+                                : "Selected");
     ImGui::TableHeadersRow();
-    for (auto&& download : m_downloadList) {
-      if ((m_state == kDownload || m_state == kDownloadDone) &&
-          !download.enabled) {
+    for (auto&& file : m_fileList) {
+      if ((m_state == kDownload || m_state == kDownloadDone ||
+           m_state == kDelete || m_state == kDeleteDone) &&
+          !file.selected) {
         continue;
       }
 
@@ -160,20 +184,24 @@ size_t Downloader::DisplayFiles() {
 
       ImGui::TableNextRow();
       ImGui::TableNextColumn();
-      ImGui::TextUnformatted(download.name.c_str());
+      ImGui::TextUnformatted(file.name.c_str());
       ImGui::TableNextColumn();
-      auto sizeText = fmt::format("{}", download.size);
+      auto sizeText = fmt::format("{}", file.size);
       ImGui::TextUnformatted(sizeText.c_str());
       ImGui::TableNextColumn();
       if (m_state == kDownload || m_state == kDownloadDone) {
-        if (!download.status.empty()) {
-          ImGui::TextUnformatted(download.status.c_str());
+        if (!file.status.empty()) {
+          ImGui::TextUnformatted(file.status.c_str());
         } else {
-          ImGui::ProgressBar(download.complete);
+          ImGui::ProgressBar(file.complete);
+        }
+      } else if (m_state == kDelete || m_state == kDeleteDone) {
+        if (!file.status.empty()) {
+          ImGui::TextUnformatted(file.status.c_str());
         }
       } else {
-        auto checkboxLabel = fmt::format("##{}", download.name);
-        ImGui::Checkbox(checkboxLabel.c_str(), &download.enabled);
+        auto checkboxLabel = fmt::format("##{}", file.name);
+        ImGui::Checkbox(checkboxLabel.c_str(), &file.selected);
       }
     }
     ImGui::EndTable();
@@ -219,6 +247,17 @@ void Downloader::Display() {
       DisplayFiles();
       if (m_state == kDownloadDone) {
         if (ImGui::Button("Download complete!")) {
+          m_state = kGetFiles;
+          m_cv.notify_all();
+        }
+      }
+      break;
+    case kDelete:
+    case kDeleteDone:
+      DisplayDisconnectButton();
+      DisplayFiles();
+      if (m_state == kDeleteDone) {
+        if (ImGui::Button("Deletion complete!")) {
           m_state = kGetFiles;
           m_cv.notify_all();
         }
@@ -274,7 +313,7 @@ void Downloader::ThreadMain() {
             }
             m_error = ex.what();
             m_dirList.clear();
-            m_downloadList.clear();
+            m_fileList.clear();
             m_state = kConnected;
             break;
           }
@@ -284,7 +323,7 @@ void Downloader::ThreadMain() {
           lock.lock();
 
           m_dirList.clear();
-          m_downloadList.clear();
+          m_fileList.clear();
           for (auto&& attr : fileList) {
             if (attr.type == SSH_FILEXFER_TYPE_DIRECTORY) {
               if (attr.name != ".") {
@@ -293,7 +332,7 @@ void Downloader::ThreadMain() {
             } else if (attr.type == SSH_FILEXFER_TYPE_REGULAR &&
                        (attr.flags & SSH_FILEXFER_ATTR_SIZE) != 0 &&
                        wpi::ends_with(attr.name, ".wpilog")) {
-              m_downloadList.emplace_back(attr.name, attr.size);
+              m_fileList.emplace_back(attr.name, attr.size);
             }
           }
 
@@ -305,20 +344,20 @@ void Downloader::ThreadMain() {
           m_state = kDisconnected;
           break;
         case kDownload: {
-          for (auto&& download : m_downloadList) {
+          for (auto&& file : m_fileList) {
             if (m_state != kDownload) {
               // user aborted
               break;
             }
-            if (!download.enabled) {
+            if (!file.selected) {
               continue;
             }
 
             auto remoteFilename = fmt::format(
                 "{}{}{}", m_remoteDir,
-                wpi::ends_with(m_remoteDir, '/') ? "" : "/", download.name);
-            auto localFilename = fs::path{m_localDir} / download.name;
-            uint64_t fileSize = download.size;
+                wpi::ends_with(m_remoteDir, '/') ? "" : "/", file.name);
+            auto localFilename = fs::path{m_localDir} / file.name;
+            uint64_t fileSize = file.size;
 
             lock.unlock();
 
@@ -329,14 +368,14 @@ void Downloader::ThreadMain() {
             if (ec) {
               // failed to open
               lock.lock();
-              download.status = ec.message();
+              file.status = ec.message();
               continue;
             }
             int ofd = fs::FileToFd(of, ec, fs::OF_None);
             if (ofd == -1 || ec) {
               // failed to convert to fd
               lock.lock();
-              download.status = ec.message();
+              file.status = ec.message();
               continue;
             }
 
@@ -356,12 +395,12 @@ void Downloader::ThreadMain() {
                   close(ofd);
                   fs::remove(localFilename, ec);
                   lock.lock();
-                  download.status = "error writing local file";
+                  file.status = "error writing local file";
                   goto err;
                 }
                 total += copied;
                 lock.lock();
-                download.complete = static_cast<float>(total) / fileSize;
+                file.complete = static_cast<float>(total) / fileSize;
                 lock.unlock();
               }
 
@@ -381,17 +420,50 @@ void Downloader::ThreadMain() {
                 fs::remove(localFilename, ec);
               }
               lock.lock();
-              download.status = ex.what();
+              file.status = ex.what();
               if (ex.err == SSH_FX_OK || ex.err == SSH_FX_CONNECTION_LOST) {
                 throw;
               }
               continue;
             }
             lock.lock();
-          err : {}
+          err: {}
           }
           if (m_state == kDownload) {
             m_state = kDownloadDone;
+          }
+          break;
+        }
+        case kDelete: {
+          for (auto&& file : m_fileList) {
+            if (m_state != kDelete) {
+              // user aborted
+              break;
+            }
+            if (!file.selected) {
+              continue;
+            }
+
+            auto remoteFilename = fmt::format(
+                "{}{}{}", m_remoteDir,
+                wpi::ends_with(m_remoteDir, '/') ? "" : "/", file.name);
+
+            lock.unlock();
+            try {
+              session->Unlink(remoteFilename);
+            } catch (sftp::Exception& ex) {
+              lock.lock();
+              file.status = ex.what();
+              if (ex.err == SSH_FX_OK || ex.err == SSH_FX_CONNECTION_LOST) {
+                throw;
+              }
+              continue;
+            }
+            lock.lock();
+            file.status = "Deleted";
+          }
+          if (m_state == kDelete) {
+            m_state = kDeleteDone;
           }
           break;
         }

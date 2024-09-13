@@ -5,26 +5,20 @@
 #pragma once
 
 #include <functional>
-#include <initializer_list>
 #include <memory>
-#include <span>
+#include <optional>
 #include <string>
 
 #include <units/time.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
-#include <wpi/deprecated.h>
+#include <wpi/StackTrace.h>
+#include <wpi/sendable/Sendable.h>
 
+#include "frc2/command/Requirements.h"
 #include "frc2/command/Subsystem.h"
 
 namespace frc2 {
-
-template <typename T>
-std::string GetTypeName(const T& type) {
-  return wpi::Demangle(typeid(type).name());
-}
-
-class PerpetualCommand;
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -44,10 +38,9 @@ class PerpetualCommand;
  * @see CommandScheduler
  * @see CommandHelper
  */
-class Command {
+class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
  public:
-  Command() = default;
-  virtual ~Command();
+  ~Command() override;
 
   Command(const Command&) = default;
   Command& operator=(const Command& rhs);
@@ -95,7 +88,83 @@ class Command {
    * @return the set of subsystems that are required
    * @see InterruptionBehavior
    */
-  virtual wpi::SmallSet<Subsystem*, 4> GetRequirements() const = 0;
+  virtual wpi::SmallSet<Subsystem*, 4> GetRequirements() const;
+
+  /**
+   * Adds the specified Subsystem requirements to the command.
+   *
+   * The scheduler will prevent two commands that require the same subsystem
+   * from being scheduled simultaneously.
+   *
+   * Note that the scheduler determines the requirements of a command when it
+   * is scheduled, so this method should normally be called from the command's
+   * constructor.
+   *
+   * While this overload can be used with {@code AddRequirements({&subsystem1,
+   * &subsystem2})}, {@code AddRequirements({&subsystem})} selects the {@code
+   * AddRequirements(Subsystem*)} overload, which will function identically but
+   * may cause warnings about redundant braces.
+   *
+   * @param requirements the Subsystem requirements to add, which can be
+   * implicitly constructed from an initializer list or a span
+   */
+  void AddRequirements(Requirements requirements);
+
+  /**
+   * Adds the specified Subsystem requirements to the command.
+   *
+   * The scheduler will prevent two commands that require the same subsystem
+   * from being scheduled simultaneously.
+   *
+   * Note that the scheduler determines the requirements of a command when it
+   * is scheduled, so this method should normally be called from the command's
+   * constructor.
+   *
+   * @param requirements the Subsystem requirements to add
+   */
+  void AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements);
+
+  /**
+   * Adds the specified Subsystem requirement to the command.
+   *
+   * The scheduler will prevent two commands that require the same subsystem
+   * from being scheduled simultaneously.
+   *
+   * Note that the scheduler determines the requirements of a command when it
+   * is scheduled, so this method should normally be called from the command's
+   * constructor.
+   *
+   * @param requirement the Subsystem requirement to add
+   */
+  void AddRequirements(Subsystem* requirement);
+
+  /**
+   * Gets the name of this Command.
+   *
+   * @return Name
+   */
+  std::string GetName() const;
+
+  /**
+   * Sets the name of this Command.
+   *
+   * @param name name
+   */
+  void SetName(std::string_view name);
+
+  /**
+   * Gets the subsystem name of this Command.
+   *
+   * @return Subsystem name
+   */
+  std::string GetSubsystem() const;
+
+  /**
+   * Sets the subsystem name of this Command.
+   *
+   * @param subsystem subsystem name
+   */
+  void SetSubsystem(std::string_view subsystem);
 
   /**
    * An enum describing the command's behavior when another command with a
@@ -116,39 +185,37 @@ class Command {
   friend class CommandPtr;
 
   /**
-   * Decorates this command with a timeout.  If the specified timeout is
+   * Decorates this command with a timeout. If the specified timeout is
    * exceeded before the command finishes normally, the command will be
-   * interrupted and un-scheduled.  Note that the timeout only applies to the
-   * command returned by this method; the calling command is not itself changed.
+   * interrupted and un-scheduled.
    *
    * @param duration the timeout duration
    * @return the command with the timeout added
    */
-  [[nodiscard]] CommandPtr WithTimeout(units::second_t duration) &&;
+  [[nodiscard]]
+  CommandPtr WithTimeout(units::second_t duration) &&;
 
   /**
-   * Decorates this command with an interrupt condition.  If the specified
+   * Decorates this command with an interrupt condition. If the specified
    * condition becomes true before the command finishes normally, the command
-   * will be interrupted and un-scheduled. Note that this only applies to the
-   * command returned by this method; the calling command is not itself changed.
+   * will be interrupted and un-scheduled.
    *
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  [[nodiscard]] CommandPtr Until(std::function<bool()> condition) &&;
+  [[nodiscard]]
+  CommandPtr Until(std::function<bool()> condition) &&;
 
   /**
-   * Decorates this command with an interrupt condition.  If the specified
-   * condition becomes true before the command finishes normally, the command
-   * will be interrupted and un-scheduled. Note that this only applies to the
-   * command returned by this method; the calling command is not itself changed.
+   * Decorates this command with a run condition. If the specified condition
+   * becomes false before the command finishes normally, the command will be
+   * interrupted and un-scheduled.
    *
-   * @param condition the interrupt condition
-   * @return the command with the interrupt condition added
-   * @deprecated Replace with Until()
+   * @param condition the run condition
+   * @return the command with the run condition added
    */
-  WPI_DEPRECATED("Replace with Until()")
-  [[nodiscard]] CommandPtr WithInterrupt(std::function<bool()> condition) &&;
+  [[nodiscard]]
+  CommandPtr OnlyWhile(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command with a runnable to run before this command starts.
@@ -157,20 +224,9 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr BeforeStarting(
-      std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements) &&;
-
-  /**
-   * Decorates this command with a runnable to run before this command starts.
-   *
-   * @param toRun the Runnable to run
-   * @param requirements the required subsystems
-   * @return the decorated command
-   */
-  [[nodiscard]] CommandPtr BeforeStarting(
-      std::function<void()> toRun,
-      std::span<Subsystem* const> requirements = {}) &&;
+  [[nodiscard]]
+  CommandPtr BeforeStarting(std::function<void()> toRun,
+                            Requirements requirements = {}) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -179,40 +235,9 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr AndThen(
-      std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements) &&;
-
-  /**
-   * Decorates this command with a runnable to run after the command finishes.
-   *
-   * @param toRun the Runnable to run
-   * @param requirements the required subsystems
-   * @return the decorated command
-   */
-  [[nodiscard]] CommandPtr AndThen(
-      std::function<void()> toRun,
-      std::span<Subsystem* const> requirements = {}) &&;
-
-  /**
-   * Decorates this command to run perpetually, ignoring its ordinary end
-   * conditions.  The decorated command can still be interrupted or canceled.
-   *
-   * @return the decorated command
-   * @deprecated PerpetualCommand violates the assumption that execute() doesn't
-get called after isFinished() returns true -- an assumption that should be
-valid. This was unsafe/undefined behavior from the start, and RepeatCommand
-provides an easy way to achieve similar end results with slightly different (and
-safe) semantics.
-   */
-  WPI_DEPRECATED(
-      "PerpetualCommand violates the assumption that execute() doesn't get "
-      "called after isFinished() returns true -- an assumption that should be "
-      "valid."
-      "This was unsafe/undefined behavior from the start, and RepeatCommand "
-      "provides an easy way to achieve similar end results with slightly "
-      "different (and safe) semantics.")
-  PerpetualCommand Perpetually() &&;
+  [[nodiscard]]
+  CommandPtr AndThen(std::function<void()> toRun,
+                     Requirements requirements = {}) &&;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until
@@ -220,7 +245,8 @@ safe) semantics.
    *
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr Repeatedly() &&;
+  [[nodiscard]]
+  CommandPtr Repeatedly() &&;
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a
@@ -232,7 +258,8 @@ safe) semantics.
    *
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr AsProxy() &&;
+  [[nodiscard]]
+  CommandPtr AsProxy() &&;
 
   /**
    * Decorates this command to only run if this condition is not met. If the
@@ -243,7 +270,20 @@ safe) semantics.
    * @param condition the condition that will prevent the command from running
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr Unless(std::function<bool()> condition) &&;
+  [[nodiscard]]
+  CommandPtr Unless(std::function<bool()> condition) &&;
+
+  /**
+   * Decorates this command to only run if this condition is met. If the command
+   * is already running and the condition changes to false, the command will not
+   * stop running. The requirements of this command will be kept for the new
+   * conditional command.
+   *
+   * @param condition the condition that will allow the command to run
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr OnlyIf(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command to run or stop when disabled.
@@ -251,15 +291,17 @@ safe) semantics.
    * @param doesRunWhenDisabled true to run when disabled.
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr IgnoringDisable(bool doesRunWhenDisabled) &&;
+  [[nodiscard]]
+  CommandPtr IgnoringDisable(bool doesRunWhenDisabled) &&;
 
   /**
-   * Decorates this command to run or stop when disabled.
+   * Decorates this command to have a different interrupt behavior.
    *
-   * @param interruptBehavior true to run when disabled.
+   * @param interruptBehavior the desired interrupt behavior
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr WithInterruptBehavior(
+  [[nodiscard]]
+  CommandPtr WithInterruptBehavior(
       Command::InterruptionBehavior interruptBehavior) &&;
 
   /**
@@ -270,7 +312,20 @@ safe) semantics.
    * command was interrupted.
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr FinallyDo(std::function<void(bool)> end) &&;
+  [[nodiscard]]
+  CommandPtr FinallyDo(std::function<void(bool)> end) &&;
+
+  /**
+   * Decorates this command with a lambda to call on interrupt or end, following
+   * the command's inherent Command::End(bool) method. The provided lambda will
+   * run identically in both interrupt and end cases.
+   *
+   * @param end a lambda to run when the command ends, whether or not it was
+   * interrupted.
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr FinallyDo(std::function<void()> end) &&;
 
   /**
    * Decorates this command with a lambda to call on interrupt, following the
@@ -279,7 +334,8 @@ safe) semantics.
    * @param handler a lambda to run when the command is interrupted
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr HandleInterrupt(std::function<void()> handler) &&;
+  [[nodiscard]]
+  CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
    * Decorates this Command with a name.
@@ -287,7 +343,8 @@ safe) semantics.
    * @param name name
    * @return the decorated Command
    */
-  [[nodiscard]] CommandPtr WithName(std::string_view name) &&;
+  [[nodiscard]]
+  CommandPtr WithName(std::string_view name) &&;
 
   /**
    * Schedules this command.
@@ -333,23 +390,12 @@ safe) semantics.
   void SetComposed(bool isComposed);
 
   /**
-   * Whether the command is currently grouped in a command group.  Used as extra
-   * insurance to prevent accidental independent use of grouped commands.
+   * Get the stacktrace of where this command was composed, or an empty
+   * optional. Intended for internal use.
    *
-   * @deprecated Moved to IsComposed()
+   * @return optional string representation of the composition site stack trace.
    */
-  WPI_DEPRECATED("Moved to IsComposed()")
-  bool IsGrouped() const;
-
-  /**
-   * Sets whether the command is currently grouped in a command group.  Can be
-   * used to "reclaim" a command if a group is no longer going to use it.  NOT
-   * ADVISED!
-   *
-   * @deprecated Moved to SetComposed()
-   */
-  WPI_DEPRECATED("Moved to SetComposed()")
-  void SetGrouped(bool grouped);
+  std::optional<std::string> GetPreviousCompositionSite() const;
 
   /**
    * Whether the given command should run when the robot is disabled.  Override
@@ -370,34 +416,27 @@ safe) semantics.
   }
 
   /**
-   * Gets the name of this Command. Defaults to the simple class name if not
-   * overridden.
-   *
-   * @return The display name of the Command
-   */
-  virtual std::string GetName() const;
-
-  /**
-   * Sets the name of this Command. Nullop if not overridden.
-   *
-   * @param name The display name of the Command.
-   */
-  virtual void SetName(std::string_view name);
-
-  /**
    * Transfers ownership of this command to a unique pointer.  Used for
    * decorator methods.
    */
   virtual CommandPtr ToPtr() && = 0;
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  protected:
+  Command();
+
+  /// Requirements set.
+  wpi::SmallSet<Subsystem*, 4> m_requirements;
+
   /**
    * Transfers ownership of this command to a unique pointer.  Used for
    * decorator methods.
    */
+  [[deprecated("Use ToPtr() instead")]]
   virtual std::unique_ptr<Command> TransferOwnership() && = 0;
 
-  bool m_isComposed = false;
+  std::optional<std::string> m_previousComposition;
 };
 
 /**

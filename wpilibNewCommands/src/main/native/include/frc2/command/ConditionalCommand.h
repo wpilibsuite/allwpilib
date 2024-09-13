@@ -4,11 +4,12 @@
 
 #pragma once
 
+#include <concepts>
 #include <functional>
 #include <memory>
 #include <utility>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -25,8 +26,7 @@ namespace frc2 {
  *
  * @see ScheduleCommand
  */
-class ConditionalCommand
-    : public CommandHelper<CommandBase, ConditionalCommand> {
+class ConditionalCommand : public CommandHelper<Command, ConditionalCommand> {
  public:
   /**
    * Creates a new ConditionalCommand.
@@ -35,16 +35,14 @@ class ConditionalCommand
    * @param onFalse   the command to run if the condition is false
    * @param condition the condition to determine which command to run
    */
-  template <class T1, class T2,
-            typename = std::enable_if_t<
-                std::is_base_of_v<Command, std::remove_reference_t<T1>>>,
-            typename = std::enable_if_t<
-                std::is_base_of_v<Command, std::remove_reference_t<T2>>>>
-  ConditionalCommand(T1&& onTrue, T2&& onFalse, std::function<bool()> condition)
-      : ConditionalCommand(std::make_unique<std::remove_reference_t<T1>>(
-                               std::forward<T1>(onTrue)),
-                           std::make_unique<std::remove_reference_t<T2>>(
-                               std::forward<T2>(onFalse)),
+  template <std::derived_from<Command> Command1,
+            std::derived_from<Command> Command2>
+  ConditionalCommand(Command1&& onTrue, Command2&& onFalse,
+                     std::function<bool()> condition)
+      : ConditionalCommand(std::make_unique<std::decay_t<Command1>>(
+                               std::forward<Command1>(onTrue)),
+                           std::make_unique<std::decay_t<Command2>>(
+                               std::forward<Command2>(onFalse)),
                            condition) {}
 
   /**
@@ -72,6 +70,8 @@ class ConditionalCommand
   bool IsFinished() override;
 
   bool RunsWhenDisabled() const override;
+
+  InterruptionBehavior GetInterruptionBehavior() const override;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 

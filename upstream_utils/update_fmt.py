@@ -13,7 +13,7 @@ from upstream_utils import (
 
 
 def main():
-    upstream_root = clone_repo("https://github.com/fmtlib/fmt", "9.1.0")
+    upstream_root = clone_repo("https://github.com/fmtlib/fmt", "10.1.1")
     wpilib_root = get_repo_root()
     wpiutil = os.path.join(wpilib_root, "wpiutil")
 
@@ -21,7 +21,8 @@ def main():
     os.chdir(upstream_root)
     for f in [
         "0001-Don-t-throw-on-write-failure.patch",
-        "0002-Suppress-C-20-clang-tidy-warning-false-positive.patch",
+        "0002-Suppress-warnings-we-can-t-fix.patch",
+        "0003-Remove-this-from-decltype.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/fmt_patches", f))
 
@@ -34,13 +35,13 @@ def main():
 
     # Copy fmt source files into allwpilib
     src_files = walk_cwd_and_copy_if(
-        lambda dp, f: dp.endswith("src") and f.endswith(".cc") and f != "fmt.cc",
+        lambda dp, f: dp.startswith("./src") and f.endswith(".cc") and f != "fmt.cc",
         os.path.join(wpiutil, "src/main/native/thirdparty/fmtlib"),
     )
 
     # Copy fmt header files into allwpilib
     include_files = walk_cwd_and_copy_if(
-        lambda dp, f: dp.endswith("include/fmt"),
+        lambda dp, f: dp.startswith("./include/fmt"),
         os.path.join(wpiutil, "src/main/native/thirdparty/fmtlib"),
     )
 

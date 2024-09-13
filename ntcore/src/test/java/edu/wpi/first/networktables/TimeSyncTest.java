@@ -34,29 +34,30 @@ class TimeSyncTest {
 
   @Test
   void testServer() {
-    var poller = new NetworkTableListenerPoller(m_inst);
-    poller.addTimeSyncListener(false);
+    try (var poller = new NetworkTableListenerPoller(m_inst)) {
+      poller.addTimeSyncListener(false);
 
-    m_inst.startServer("timesynctest.json", "127.0.0.1", 0, 10030);
-    var offset = m_inst.getServerTimeOffset();
-    assertTrue(offset.isPresent());
-    assertEquals(0L, offset.getAsLong());
+      m_inst.startServer("timesynctest.json", "127.0.0.1", 0, 10030);
+      var offset = m_inst.getServerTimeOffset();
+      assertTrue(offset.isPresent());
+      assertEquals(0L, offset.getAsLong());
 
-    NetworkTableEvent[] events = poller.readQueue();
-    assertEquals(1, events.length);
-    assertNotNull(events[0].timeSyncData);
-    assertTrue(events[0].timeSyncData.valid);
-    assertEquals(0L, events[0].timeSyncData.serverTimeOffset);
-    assertEquals(0L, events[0].timeSyncData.rtt2);
+      NetworkTableEvent[] events = poller.readQueue();
+      assertEquals(1, events.length);
+      assertNotNull(events[0].timeSyncData);
+      assertTrue(events[0].timeSyncData.valid);
+      assertEquals(0L, events[0].timeSyncData.serverTimeOffset);
+      assertEquals(0L, events[0].timeSyncData.rtt2);
 
-    m_inst.stopServer();
-    offset = m_inst.getServerTimeOffset();
-    assertFalse(offset.isPresent());
+      m_inst.stopServer();
+      offset = m_inst.getServerTimeOffset();
+      assertFalse(offset.isPresent());
 
-    events = poller.readQueue();
-    assertEquals(1, events.length);
-    assertNotNull(events[0].timeSyncData);
-    assertFalse(events[0].timeSyncData.valid);
+      events = poller.readQueue();
+      assertEquals(1, events.length);
+      assertNotNull(events[0].timeSyncData);
+      assertFalse(events[0].timeSyncData.valid);
+    }
   }
 
   @Test

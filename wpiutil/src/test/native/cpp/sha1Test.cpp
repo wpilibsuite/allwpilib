@@ -21,7 +21,8 @@
 
 #include <string>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
 #include "wpi/sha1.h"
 
 namespace wpi {

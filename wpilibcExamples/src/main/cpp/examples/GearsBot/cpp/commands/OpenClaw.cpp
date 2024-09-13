@@ -9,7 +9,7 @@
 OpenClaw::OpenClaw(Claw& claw)
     : frc2::CommandHelper<frc2::WaitCommand, OpenClaw>(1_s), m_claw(&claw) {
   SetName("OpenClaw");
-  AddRequirements({m_claw});
+  AddRequirements(m_claw);
 }
 
 // Called just before this Command runs the first time

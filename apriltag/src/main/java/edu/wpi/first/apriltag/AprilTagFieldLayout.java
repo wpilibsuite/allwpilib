@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,8 +45,11 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class AprilTagFieldLayout {
+  /** Common origin positions for the AprilTag coordinate system. */
   public enum OriginPosition {
+    /** Blue alliance wall, right side. */
     kBlueAllianceWallRightSide,
+    /** Red alliance wall, right side. */
     kRedAllianceWallRightSide,
   }
 
@@ -114,6 +118,26 @@ public class AprilTagFieldLayout {
   }
 
   /**
+   * Returns the length of the field the layout is representing in meters.
+   *
+   * @return length, in meters
+   */
+  @JsonIgnore
+  public double getFieldLength() {
+    return m_fieldDimensions.fieldLength;
+  }
+
+  /**
+   * Returns the length of the field the layout is representing in meters.
+   *
+   * @return width, in meters
+   */
+  @JsonIgnore
+  public double getFieldWidth() {
+    return m_fieldDimensions.fieldWidth;
+  }
+
+  /**
    * Sets the origin based on a predefined enumeration of coordinate frame origins. The origins are
    * calculated from the field dimensions.
    *
@@ -123,7 +147,7 @@ public class AprilTagFieldLayout {
    * @param origin The predefined origin
    */
   @JsonIgnore
-  public void setOrigin(OriginPosition origin) {
+  public final void setOrigin(OriginPosition origin) {
     switch (origin) {
       case kBlueAllianceWallRightSide:
         setOrigin(new Pose3d());
@@ -148,8 +172,18 @@ public class AprilTagFieldLayout {
    * @param origin The new origin for tag transformations
    */
   @JsonIgnore
-  public void setOrigin(Pose3d origin) {
+  public final void setOrigin(Pose3d origin) {
     m_origin = origin;
+  }
+
+  /**
+   * Returns the origin used for tag pose transformation.
+   *
+   * @return the origin
+   */
+  @JsonIgnore
+  public Pose3d getOrigin() {
+    return m_origin;
   }
 
   /**
@@ -189,6 +223,22 @@ public class AprilTagFieldLayout {
   }
 
   /**
+   * Get an official {@link AprilTagFieldLayout}.
+   *
+   * @param field The loadable AprilTag field layout.
+   * @return AprilTagFieldLayout of the field.
+   * @throws UncheckedIOException If the layout does not exist.
+   */
+  public static AprilTagFieldLayout loadField(AprilTagFields field) {
+    try {
+      return loadFromResource(field.m_resourceFile);
+    } catch (IOException e) {
+      throw new UncheckedIOException(
+          "Could not load AprilTagFieldLayout from " + field.m_resourceFile, e);
+    }
+  }
+
+  /**
    * Deserializes a field layout from a resource within a internal jar file.
    *
    * <p>Users should use {@link AprilTagFields#loadAprilTagLayoutField()} to load official layouts
@@ -199,9 +249,16 @@ public class AprilTagFieldLayout {
    * @throws IOException If the resource could not be loaded
    */
   public static AprilTagFieldLayout loadFromResource(String resourcePath) throws IOException {
-    try (InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(resourcePath);
-        InputStreamReader reader = new InputStreamReader(stream)) {
+    InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(resourcePath);
+    if (stream == null) {
+      // Class.getResourceAsStream() returns null if the resource does not exist.
+      throw new IOException("Could not locate resource: " + resourcePath);
+    }
+    InputStreamReader reader = new InputStreamReader(stream);
+    try {
       return new ObjectMapper().readerFor(AprilTagFieldLayout.class).readValue(reader);
+    } catch (IOException e) {
+      throw new IOException("Failed to load AprilTagFieldLayout: " + resourcePath);
     }
   }
 

@@ -15,7 +15,6 @@
  * @{
  */
 
-// clang-format off
 /**
  * The type of index pulse for the encoder.
  */
@@ -34,7 +33,6 @@ HAL_ENUM(HAL_EncoderEncodingType) {
   HAL_Encoder_k2X,
   HAL_Encoder_k4X
 };
-// clang-format on
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,7 +81,7 @@ void HAL_SetEncoderSimDevice(HAL_EncoderHandle handle,
 /**
  * Gets the current counts of the encoder after encoding type scaling.
  *
- * This is scaled by the value passed duing initialization to encodingType.
+ * This is scaled by the value passed during initialization to encodingType.
  *
  * @param[in] encoderHandle the encoder handle
  * @param[out] status Error status variable. 0 on success.
@@ -125,7 +123,7 @@ int32_t HAL_GetEncoderEncodingScale(HAL_EncoderHandle encoderHandle,
  */
 void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status);
 
-/*
+/**
  * Gets the Period of the most recent count.
  *
  * Returns the time interval of the most recent count. This can be used for

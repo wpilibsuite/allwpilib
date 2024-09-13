@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.differentialdriveposeestimator;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.ComputerVisionUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -30,15 +31,12 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.io.IOException;
 
 /** Represents a differential drive style drivetrain. */
 public class Drivetrain {
@@ -49,18 +47,13 @@ public class Drivetrain {
   private static final double kWheelRadius = 0.0508; // meters
   private static final int kEncoderResolution = 4096;
 
-  private final MotorController m_leftLeader = new PWMSparkMax(1);
-  private final MotorController m_leftFollower = new PWMSparkMax(2);
-  private final MotorController m_rightLeader = new PWMSparkMax(3);
-  private final MotorController m_rightFollower = new PWMSparkMax(4);
+  private final PWMSparkMax m_leftLeader = new PWMSparkMax(1);
+  private final PWMSparkMax m_leftFollower = new PWMSparkMax(2);
+  private final PWMSparkMax m_rightLeader = new PWMSparkMax(3);
+  private final PWMSparkMax m_rightFollower = new PWMSparkMax(4);
 
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
-
-  private final MotorControllerGroup m_leftGroup =
-      new MotorControllerGroup(m_leftLeader, m_leftFollower);
-  private final MotorControllerGroup m_rightGroup =
-      new MotorControllerGroup(m_rightLeader, m_rightFollower);
 
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
@@ -114,10 +107,13 @@ public class Drivetrain {
   public Drivetrain(DoubleArrayTopic cameraToObjectTopic) {
     m_gyro.reset();
 
+    m_leftLeader.addFollower(m_leftFollower);
+    m_rightLeader.addFollower(m_rightFollower);
+
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightGroup.setInverted(true);
+    m_rightLeader.setInverted(true);
 
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
@@ -130,13 +126,8 @@ public class Drivetrain {
 
     m_cameraToObjectEntry = cameraToObjectTopic.getEntry(m_defaultVal);
 
-    try {
-      m_objectInField =
-          AprilTagFields.k2022RapidReact.loadAprilTagLayoutField().getTagPose(0).get();
-    } catch (IOException e) {
-      e.printStackTrace();
-      throw new RuntimeException();
-    }
+    m_objectInField =
+        AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo).getTagPose(0).get();
 
     SmartDashboard.putData("Field", m_fieldSim);
     SmartDashboard.putData("FieldEstimation", m_fieldApproximation);
@@ -155,8 +146,8 @@ public class Drivetrain {
         m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.leftMetersPerSecond);
     final double rightOutput =
         m_rightPIDController.calculate(m_rightEncoder.getRate(), speeds.rightMetersPerSecond);
-    m_leftGroup.setVoltage(leftOutput + leftFeedforward);
-    m_rightGroup.setVoltage(rightOutput + rightFeedforward);
+    m_leftLeader.setVoltage(leftOutput + leftFeedforward);
+    m_rightLeader.setVoltage(rightOutput + rightFeedforward);
   }
 
   /**
@@ -258,8 +249,8 @@ public class Drivetrain {
     // simulation, and write the simulated positions and velocities to our
     // simulated encoder and gyro.
     m_drivetrainSimulator.setInputs(
-        m_leftGroup.get() * RobotController.getInputVoltage(),
-        m_rightGroup.get() * RobotController.getInputVoltage());
+        m_leftLeader.get() * RobotController.getInputVoltage(),
+        m_rightLeader.get() * RobotController.getInputVoltage());
     m_drivetrainSimulator.update(0.02);
 
     m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPositionMeters());

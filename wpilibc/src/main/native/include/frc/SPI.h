@@ -11,7 +11,6 @@
 
 #include <hal/SPITypes.h>
 #include <units/time.h>
-#include <wpi/deprecated.h>
 
 namespace frc {
 
@@ -26,11 +25,33 @@ class DigitalSource;
  */
 class SPI {
  public:
-  enum Port { kOnboardCS0 = 0, kOnboardCS1, kOnboardCS2, kOnboardCS3, kMXP };
+  /**
+   * SPI port.
+   */
+  enum Port {
+    /// Onboard SPI bus port CS0.
+    kOnboardCS0 = 0,
+    /// Onboard SPI bus port CS1.
+    kOnboardCS1,
+    /// Onboard SPI bus port CS2.
+    kOnboardCS2,
+    /// Onboard SPI bus port CS3.
+    kOnboardCS3,
+    /// MXP (roboRIO MXP) SPI bus port.
+    kMXP
+  };
+
+  /**
+   * SPI mode.
+   */
   enum Mode {
+    /// Clock idle low, data sampled on rising edge.
     kMode0 = HAL_SPI_kMode0,
+    /// Clock idle low, data sampled on falling edge.
     kMode1 = HAL_SPI_kMode1,
+    /// Clock idle high, data sampled on falling edge.
     kMode2 = HAL_SPI_kMode2,
+    /// Clock idle high, data sampled on rising edge.
     kMode3 = HAL_SPI_kMode3
   };
 
@@ -46,6 +67,11 @@ class SPI {
   SPI(SPI&&) = default;
   SPI& operator=(SPI&&) = default;
 
+  /**
+   * Returns the SPI port.
+   *
+   * @return The SPI port.
+   */
   Port GetPort() const;
 
   /**
@@ -57,60 +83,6 @@ class SPI {
    * @param hz The clock rate in Hertz.
    */
   void SetClockRate(int hz);
-
-  /**
-   * Configure the order that bits are sent and received on the wire
-   * to be most significant bit first.
-   *
-   * @deprecated Does not work, will be removed.
-   */
-  WPI_DEPRECATED("Not supported by roboRIO.")
-  void SetMSBFirst();
-
-  /**
-   * Configure the order that bits are sent and received on the wire
-   * to be least significant bit first.
-   *
-   * @deprecated Does not work, will be removed.
-   */
-  WPI_DEPRECATED("Not supported by roboRIO.")
-  void SetLSBFirst();
-
-  /**
-   * Configure that the data is stable on the leading edge and the data
-   * changes on the trailing edge.
-   *
-   * @deprecated Use SetMode() instead.
-   */
-  WPI_DEPRECATED("Use SetMode() instead")
-  void SetSampleDataOnLeadingEdge();
-
-  /**
-   * Configure that the data is stable on the trailing edge and the data
-   * changes on the leading edge.
-   *
-   * @deprecated Use SetMode() instead.
-   */
-  WPI_DEPRECATED("Use SetMode() instead")
-  void SetSampleDataOnTrailingEdge();
-
-  /**
-   * Configure the clock output line to be active low.
-   * This is sometimes called clock polarity high or clock idle high.
-   *
-   * @deprecated Use SetMode() instead.
-   */
-  WPI_DEPRECATED("Use SetMode() instead")
-  void SetClockActiveLow();
-
-  /**
-   * Configure the clock output line to be active high.
-   * This is sometimes called clock polarity low or clock idle low.
-   *
-   * @deprecated Use SetMode() instead.
-   */
-  WPI_DEPRECATED("Use SetMode() instead")
-  void SetClockActiveHigh();
 
   /**
    * Sets the mode for the SPI device.

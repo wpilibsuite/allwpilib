@@ -89,6 +89,7 @@ void NetworkListener::Impl::Thread::Main() {
   std::memset(&addr, 0, sizeof(addr));
   addr.nl_family = AF_NETLINK;
   addr.nl_groups = RTMGRP_LINK | RTMGRP_IPV4_IFADDR;
+  // NOLINTNEXTLINE(modernize-avoid-bind)
   if (bind(sd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) < 0) {
     ERROR("NetworkListener: could not create socket: {}", std::strerror(errno));
     ::close(sd);

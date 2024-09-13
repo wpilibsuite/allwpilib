@@ -5,14 +5,15 @@
 #include <algorithm>
 #include <string_view>
 
+#include <gtest/gtest.h>
+
 #include "TestPrinters.h"
 #include "Value_internal.h"
-#include "gtest/gtest.h"
 #include "networktables/NetworkTableValue.h"
 
 using namespace std::string_view_literals;
 
-namespace std {  // NOLINT (clang-tidy.cert-dcl58-cpp)
+namespace std {  // NOLINT(clang-tidy.cert-dcl58-cpp)
 template <typename T, typename U>
 inline bool operator==(std::span<T> lhs, std::span<U> rhs) {
   if (lhs.size() != rhs.size()) {
@@ -336,6 +337,58 @@ TEST_F(ValueTest, BooleanArrayComparison) {
   vec = {1, 0};
   v2 = Value::MakeBooleanArray(vec);
   ASSERT_NE(v1, v2);
+
+  // empty
+  vec = {};
+  v1 = Value::MakeBooleanArray(vec);
+  v2 = Value::MakeBooleanArray(vec);
+  ASSERT_EQ(v1, v2);
+}
+
+TEST_F(ValueTest, IntegerArrayComparison) {
+  std::vector<int64_t> vec{-42, 0, 1};
+  auto v1 = Value::MakeIntegerArray(vec);
+  auto v2 = Value::MakeIntegerArray(vec);
+  ASSERT_EQ(v1, v2);
+
+  // different contents
+  vec = {-42, 1, 1};
+  v2 = Value::MakeIntegerArray(vec);
+  ASSERT_NE(v1, v2);
+
+  // different size
+  vec = {-42, 0};
+  v2 = Value::MakeIntegerArray(vec);
+  ASSERT_NE(v1, v2);
+
+  // empty
+  vec = {};
+  v1 = Value::MakeIntegerArray(vec);
+  v2 = Value::MakeIntegerArray(vec);
+  ASSERT_EQ(v1, v2);
+}
+
+TEST_F(ValueTest, FloatArrayComparison) {
+  std::vector<float> vec{0.5, 0.25, 0.5};
+  auto v1 = Value::MakeFloatArray(vec);
+  auto v2 = Value::MakeFloatArray(vec);
+  ASSERT_EQ(v1, v2);
+
+  // different contents
+  vec = {0.5, 0.5, 0.5};
+  v2 = Value::MakeFloatArray(vec);
+  ASSERT_NE(v1, v2);
+
+  // different size
+  vec = {0.5, 0.25};
+  v2 = Value::MakeFloatArray(vec);
+  ASSERT_NE(v1, v2);
+
+  // empty
+  vec = {};
+  v1 = Value::MakeFloatArray(vec);
+  v2 = Value::MakeFloatArray(vec);
+  ASSERT_EQ(v1, v2);
 }
 
 TEST_F(ValueTest, DoubleArrayComparison) {
@@ -353,6 +406,12 @@ TEST_F(ValueTest, DoubleArrayComparison) {
   vec = {0.5, 0.25};
   v2 = Value::MakeDoubleArray(vec);
   ASSERT_NE(v1, v2);
+
+  // empty
+  vec = {};
+  v1 = Value::MakeDoubleArray(vec);
+  v2 = Value::MakeDoubleArray(vec);
+  ASSERT_EQ(v1, v2);
 }
 
 TEST_F(ValueTest, StringArrayComparison) {
@@ -390,6 +449,12 @@ TEST_F(ValueTest, StringArrayComparison) {
   vec.push_back("goodbye");
   v2 = Value::MakeStringArray(std::move(vec));
   ASSERT_NE(v1, v2);
+
+  // empty
+  vec.clear();
+  v1 = Value::MakeStringArray(vec);
+  v2 = Value::MakeStringArray(std::move(vec));
+  ASSERT_EQ(v1, v2);
 }
 
 }  // namespace nt

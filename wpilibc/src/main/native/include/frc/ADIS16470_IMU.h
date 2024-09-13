@@ -16,21 +16,19 @@
 #include <stdint.h>
 
 #include <atomic>
-#include <memory>
 #include <thread>
 
 #include <hal/SimDevice.h>
-#include <networktables/NTSendable.h>
 #include <units/acceleration.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"
-#include "frc/DigitalSource.h"
 #include "frc/SPI.h"
 
 namespace frc {
@@ -50,58 +48,112 @@ namespace frc {
  * available on the RoboRIO.
  */
 
-class ADIS16470_IMU : public nt::NTSendable,
+class ADIS16470_IMU : public wpi::Sendable,
                       public wpi::SendableHelper<ADIS16470_IMU> {
  public:
-  /* ADIS16470 Calibration Time Enum Class */
+  /**
+   * ADIS16470 calibration times.
+   */
   enum class CalibrationTime {
+    /// 32 ms calibration time.
     _32ms = 0,
+    /// 64 ms calibration time.
     _64ms = 1,
+    /// 128 ms calibration time.
     _128ms = 2,
+    /// 256 ms calibration time.
     _256ms = 3,
+    /// 512 ms calibration time.
     _512ms = 4,
+    /// 1 s calibration time.
     _1s = 5,
+    /// 2 s calibration time.
     _2s = 6,
+    /// 4 s calibration time.
     _4s = 7,
+    /// 8 s calibration time.
     _8s = 8,
+    /// 16 s calibration time.
     _16s = 9,
+    /// 32 s calibration time.
     _32s = 10,
+    /// 64 s calibration time.
     _64s = 11
   };
 
-  enum IMUAxis { kX, kY, kZ };
+  /**
+   * IMU axes.
+   *
+   * kX, kY, and kZ refer to the IMU's X, Y, and Z axes respectively. kYaw,
+   * kPitch, and kRoll are configured by the user to refer to an X, Y, or Z
+   * axis.
+   */
+  enum IMUAxis {
+    /// The IMU's X axis.
+    kX,
+    /// The IMU's Y axis.
+    kY,
+    /// The IMU's Z axis.
+    kZ,
+    /// The user-configured yaw axis.
+    kYaw,
+    /// The user-configured pitch axis.
+    kPitch,
+    /// The user-configured roll axis.
+    kRoll
+  };
 
   /**
-   * @brief Default constructor. Uses CS0 on the 10-pin SPI port, the yaw axis
-   * is set to the IMU Z axis, and calibration time is defaulted to 4 seconds.
+   * Creates a new ADIS16740 IMU object.
+   *
+   * The default setup is the onboard SPI port with a calibration time of 4
+   * seconds. Yaw, pitch, and roll are kZ, kX, and kY respectively.
    */
   ADIS16470_IMU();
 
   /**
-   * @brief Customizable constructor. Allows the SPI port and CS to be
-   * customized, the yaw axis used for GetAngle() is adjustable, and initial
-   * calibration time can be modified.
+   * Creates a new ADIS16740 IMU object.
    *
-   * @param yaw_axis Selects the "default" axis to use for GetAngle() and
-   * GetRate()
+   * The default setup is the onboard SPI port with a calibration time of 4
+   * seconds.
    *
-   * @param port The SPI port and CS where the IMU is connected.
+   * <b><i>Input axes limited to kX, kY and kZ. Specifying kYaw, kPitch,or kRoll
+   * will result in an error.</i></b>
    *
-   * @param cal_time The calibration time that should be used on start-up.
+   * @param yaw_axis The axis that measures the yaw
+   * @param pitch_axis The axis that measures the pitch
+   * @param roll_axis The axis that measures the roll
    */
-  explicit ADIS16470_IMU(IMUAxis yaw_axis, SPI::Port port,
-                         CalibrationTime cal_time);
+  ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis, IMUAxis roll_axis);
 
   /**
-   * @brief Destructor. Kills the acquisition loop and closes the SPI
-   * peripheral.
+   * Creates a new ADIS16740 IMU object.
+   *
+   * <b><i>Input axes limited to kX, kY and kZ. Specifying kYaw, kPitch, or
+   * kRoll will result in an error.</i></b>
+   *
+   * @param yaw_axis The axis that measures the yaw
+   * @param pitch_axis The axis that measures the pitch
+   * @param roll_axis The axis that measures the roll
+   * @param port The SPI Port the gyro is plugged into
+   * @param cal_time Calibration time
    */
+  explicit ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
+                         IMUAxis roll_axis, frc::SPI::Port port,
+                         CalibrationTime cal_time);
+
   ~ADIS16470_IMU() override;
 
-  ADIS16470_IMU(ADIS16470_IMU&&) = default;
-  ADIS16470_IMU& operator=(ADIS16470_IMU&&) = default;
+  ADIS16470_IMU(ADIS16470_IMU&& other);
+  ADIS16470_IMU& operator=(ADIS16470_IMU&& other);
 
-  int ConfigDecRate(uint16_t reg);
+  /**
+   * Configures the decimation rate of the IMU.
+   *
+   * @param decimationRate The new decimation value.
+   * @return 0 if success, 1 if no change, 2 if error.
+   */
+  int ConfigDecRate(uint16_t decimationRate);
 
   /**
    * @brief Switches the active SPI port to standard SPI mode, writes the
@@ -116,22 +168,68 @@ class ADIS16470_IMU : public nt::NTSendable,
   int ConfigCalTime(CalibrationTime new_cal_time);
 
   /**
-   * @brief Resets (zeros) the xgyro, ygyro, and zgyro angle integrations.
+   * Reset the gyro.
    *
    * Resets the gyro accumulations to a heading of zero. This can be used if
-   * the "zero" orientation of the sensor needs to be changed in runtime.
+   * there is significant drift in the gyro and it needs to be recalibrated
+   * after running.
    */
   void Reset();
 
   /**
-   * Returns the yaw axis angle in degrees (CCW positive).
+   * Allow the designated gyro angle to be set to a given value. This may happen
+   * with unread values in the buffer, it is suggested that the IMU is not
+   * moving when this method is run.
+   *
+   * @param axis IMUAxis that will be changed
+   * @param angle The new angle (CCW positive)
    */
-  units::degree_t GetAngle() const;
+  void SetGyroAngle(IMUAxis axis, units::degree_t angle);
 
   /**
-   * Returns the yaw axis angular rate in degrees per second (CCW positive).
+   * Allow the gyro angle X to be set to a given value. This may happen with
+   * unread values in the buffer, it is suggested that the IMU is not moving
+   * when this method is run.
+   *
+   * @param angle The new angle (CCW positive)
    */
-  units::degrees_per_second_t GetRate() const;
+  void SetGyroAngleX(units::degree_t angle);
+
+  /**
+   * Allow the gyro angle Y to be set to a given value. This may happen with
+   * unread values in the buffer, it is suggested that the IMU is not moving
+   * when this method is run.
+   *
+   * @param angle The new angle (CCW positive)
+   */
+  void SetGyroAngleY(units::degree_t angle);
+
+  /**
+   * Allow the gyro angle Z to be set to a given value. This may happen with
+   * unread values in the buffer, it is suggested that the IMU is not moving
+   * when this method is run.
+   *
+   * @param angle The new angle (CCW positive)
+   */
+  void SetGyroAngleZ(units::degree_t angle);
+
+  /**
+   * Returns the axis angle (CCW positive).
+   *
+   * @param axis The IMUAxis whose angle to return. Defaults to user configured
+   * Yaw.
+   * @return The axis angle (CCW positive).
+   */
+  units::degree_t GetAngle(IMUAxis axis = IMUAxis::kYaw) const;
+
+  /**
+   * Returns the axis angular rate (CCW positive).
+   *
+   * @param axis The IMUAxis whose rate to return. Defaults to user configured
+   * Yaw.
+   * @return Axis angular rate (CCW positive).
+   */
+  units::degrees_per_second_t GetRate(IMUAxis axis = IMUAxis::kYaw) const;
 
   /**
    * Returns the acceleration in the X axis.
@@ -148,34 +246,69 @@ class ADIS16470_IMU : public nt::NTSendable,
    */
   units::meters_per_second_squared_t GetAccelZ() const;
 
+  /**
+   * Returns the X-axis complementary angle.
+   */
   units::degree_t GetXComplementaryAngle() const;
 
+  /**
+   * Returns the Y-axis complementary angle.
+   */
   units::degree_t GetYComplementaryAngle() const;
 
+  /**
+   * Returns the X-axis filtered acceleration angle.
+   */
   units::degree_t GetXFilteredAccelAngle() const;
 
+  /**
+   * Returns the Y-axis filtered acceleration angle.
+   */
   units::degree_t GetYFilteredAccelAngle() const;
 
+  /**
+   * Returns which axis, kX, kY, or kZ, is set to the yaw axis.
+   *
+   * @return IMUAxis Yaw Axis
+   */
   IMUAxis GetYawAxis() const;
 
-  int SetYawAxis(IMUAxis yaw_axis);
-
-  bool IsConnected() const;
-
-  // IMU yaw axis
-  IMUAxis m_yaw_axis;
+  /**
+   * Returns which axis, kX, kY, or kZ, is set to the pitch axis.
+   *
+   * @return IMUAxis Pitch Axis
+   */
+  IMUAxis GetPitchAxis() const;
 
   /**
-   * Get the SPI port number.
+   * Returns which axis, kX, kY, or kZ, is set to the roll axis.
+   *
+   * @return IMUAxis Roll Axis
+   */
+  IMUAxis GetRollAxis() const;
+
+  /**
+   * Checks the connection status of the IMU.
+   *
+   * @return True if the IMU is connected, false otherwise.
+   */
+  bool IsConnected() const;
+
+  IMUAxis m_yaw_axis;
+  IMUAxis m_pitch_axis;
+  IMUAxis m_roll_axis;
+
+  /**
+   * Gets the SPI port number.
    *
    * @return The SPI port number.
    */
   int GetPort() const;
 
-  void InitSendable(nt::NTSendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  /* ADIS16470 Register Map Declaration */
+  // Register Map Declaration
   static constexpr uint8_t FLASH_CNT = 0x00;  // Flash memory write count
   static constexpr uint8_t DIAG_STAT =
       0x02;  // Diagnostic and operational status
@@ -276,32 +409,22 @@ class ADIS16470_IMU : public nt::NTSendable,
   static constexpr uint8_t FLSHCNT_HIGH =
       0x7E;  // Flash update count, upper word
 
-  /* ADIS16470 Auto SPI Data Packets */
-  static constexpr uint8_t m_autospi_x_packet[16] = {
-      X_DELTANG_OUT, FLASH_CNT, X_DELTANG_LOW, FLASH_CNT, X_GYRO_OUT, FLASH_CNT,
-      Y_GYRO_OUT,    FLASH_CNT, Z_GYRO_OUT,    FLASH_CNT, X_ACCL_OUT, FLASH_CNT,
-      Y_ACCL_OUT,    FLASH_CNT, Z_ACCL_OUT,    FLASH_CNT};
+  // Auto SPI Data Packet to read all thrre gyro axes.
+  static constexpr uint8_t m_autospi_allangle_packet[24] = {
+      X_DELTANG_OUT, FLASH_CNT,     X_DELTANG_LOW, FLASH_CNT,     Y_DELTANG_OUT,
+      FLASH_CNT,     Y_DELTANG_LOW, FLASH_CNT,     Z_DELTANG_OUT, FLASH_CNT,
+      Z_DELTANG_LOW, FLASH_CNT,     X_GYRO_OUT,    FLASH_CNT,     Y_GYRO_OUT,
+      FLASH_CNT,     Z_GYRO_OUT,    FLASH_CNT,     X_ACCL_OUT,    FLASH_CNT,
+      Y_ACCL_OUT,    FLASH_CNT,     Z_ACCL_OUT,    FLASH_CNT};
 
-  static constexpr uint8_t m_autospi_y_packet[16] = {
-      Y_DELTANG_OUT, FLASH_CNT, Y_DELTANG_LOW, FLASH_CNT, X_GYRO_OUT, FLASH_CNT,
-      Y_GYRO_OUT,    FLASH_CNT, Z_GYRO_OUT,    FLASH_CNT, X_ACCL_OUT, FLASH_CNT,
-      Y_ACCL_OUT,    FLASH_CNT, Z_ACCL_OUT,    FLASH_CNT};
-
-  static constexpr uint8_t m_autospi_z_packet[16] = {
-      Z_DELTANG_OUT, FLASH_CNT, Z_DELTANG_LOW, FLASH_CNT, X_GYRO_OUT, FLASH_CNT,
-      Y_GYRO_OUT,    FLASH_CNT, Z_GYRO_OUT,    FLASH_CNT, X_ACCL_OUT, FLASH_CNT,
-      Y_ACCL_OUT,    FLASH_CNT, Z_ACCL_OUT,    FLASH_CNT};
-
-  /* ADIS16470 Constants */
-  static constexpr double delta_angle_sf =
-      2160.0 / 2147483648.0; /* 2160 / (2^31) */
+  static constexpr double delta_angle_sf = 2160.0 / 2147483648.0;
   static constexpr double rad_to_deg = 57.2957795;
   static constexpr double deg_to_rad = 0.0174532;
   static constexpr double grav = 9.81;
 
   /** @brief Resources **/
-  DigitalInput* m_reset_in;
-  DigitalOutput* m_status_led;
+  DigitalInput* m_reset_in = nullptr;
+  DigitalOutput* m_status_led = nullptr;
 
   /**
    * @brief Switches to standard SPI operation. Primarily used when exiting auto
@@ -350,8 +473,10 @@ class ADIS16470_IMU : public nt::NTSendable,
 
   void Close();
 
-  // Integrated gyro value
-  double m_integ_angle = 0.0;
+  // Integrated gyro angles.
+  double m_integ_angle_x = 0.0;
+  double m_integ_angle_y = 0.0;
+  double m_integ_angle_z = 0.0;
 
   // Instant raw outputs
   double m_gyro_rate_x = 0.0;
@@ -376,9 +501,9 @@ class ADIS16470_IMU : public nt::NTSendable,
   double CompFilterProcess(double compAngle, double accelAngle, double omega);
 
   // State and resource variables
-  volatile bool m_thread_active = false;
-  volatile bool m_first_run = true;
-  volatile bool m_thread_idle = false;
+  std::atomic<bool> m_thread_active = false;
+  std::atomic<bool> m_first_run = true;
+  std::atomic<bool> m_thread_idle = false;
   bool m_auto_configured = false;
   SPI::Port m_spi_port;
   uint16_t m_calibration_time = 0;

@@ -5,6 +5,7 @@
 #ifndef CSCORE_CSCORE_OO_INC_
 #define CSCORE_CSCORE_OO_INC_
 
+#include <functional>
 #include <string>
 #include <string_view>
 #include <utility>

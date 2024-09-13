@@ -1,14 +1,15 @@
 include(FetchContent)
 
-FetchContent_Declare(
+fetchcontent_declare(
     googletest
-    GIT_REPOSITORY  https://github.com/google/googletest.git
-    GIT_TAG         58d77fa8070e8cec2dc1ed015d66b454c8d78850 # 1.12.1
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG
+        58d77fa8070e8cec2dc1ed015d66b454c8d78850 # 1.12.1
 )
 
-FetchContent_GetProperties(googletest)
+fetchcontent_getproperties(googletest)
 if(NOT googletest_POPULATED)
-    FetchContent_Populate(googletest)
+    fetchcontent_populate(googletest)
 
     # Prevent overriding the parent project's compiler/linker
     # settings on Windows
@@ -19,3 +20,5 @@ endif()
 
 target_compile_features(gtest PUBLIC cxx_std_20)
 target_compile_features(gtest_main PUBLIC cxx_std_20)
+target_compile_features(gmock PUBLIC cxx_std_20)
+target_compile_features(gmock_main PUBLIC cxx_std_20)

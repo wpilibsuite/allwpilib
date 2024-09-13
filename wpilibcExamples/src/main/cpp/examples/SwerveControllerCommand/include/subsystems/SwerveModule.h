@@ -47,10 +47,7 @@ class SwerveModule {
   frc::Encoder m_driveEncoder;
   frc::Encoder m_turningEncoder;
 
-  bool m_reverseDriveEncoder;
-  bool m_reverseTurningEncoder;
-
-  frc2::PIDController m_drivePIDController{
+  frc::PIDController m_drivePIDController{
       ModuleConstants::kPModuleDriveController, 0, 0};
   frc::ProfiledPIDController<units::radians> m_turningPIDController{
       ModuleConstants::kPModuleTurningController,

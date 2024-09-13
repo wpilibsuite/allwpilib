@@ -227,8 +227,6 @@ bool gui::Initialize(const char* title, int width, int height,
   }
 
   // Set initial window settings
-  glfwWindowHint(GLFW_MAXIMIZED, gContext->maximized ? GLFW_TRUE : GLFW_FALSE);
-
   if (gContext->width == 0 || gContext->height == 0) {
     gContext->width = gContext->defaultWidth;
     gContext->height = gContext->defaultHeight;
@@ -301,6 +299,10 @@ bool gui::Initialize(const char* title, int width, int height,
       glfwSetWindowPos(gContext->window, gContext->xPos, gContext->yPos);
     }
     glfwShowWindow(gContext->window);
+  }
+
+  if (gContext->maximized) {
+    glfwMaximizeWindow(gContext->window);
   }
 
   // Set window callbacks

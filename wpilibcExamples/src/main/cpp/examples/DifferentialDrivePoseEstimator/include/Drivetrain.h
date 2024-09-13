@@ -21,7 +21,6 @@
 #include <frc/geometry/Quaternion.h>
 #include <frc/geometry/Transform3d.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
-#include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/simulation/AnalogGyroSim.h>
 #include <frc/simulation/DifferentialDrivetrainSim.h>
@@ -132,7 +131,7 @@ class Drivetrain {
   nt::DoubleArrayEntry& m_cameraToObjectEntryRef = m_cameraToObjectEntry;
 
   frc::AprilTagFieldLayout m_aprilTagFieldLayout{
-      frc::LoadAprilTagLayoutField(frc::AprilTagField::k2022RapidReact)};
+      frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2024Crescendo)};
   frc::Pose3d m_objectInField{m_aprilTagFieldLayout.GetTagPose(0).value()};
 
   frc::PWMSparkMax m_leftLeader{1};
@@ -140,14 +139,11 @@ class Drivetrain {
   frc::PWMSparkMax m_rightLeader{3};
   frc::PWMSparkMax m_rightFollower{4};
 
-  frc::MotorControllerGroup m_leftGroup{m_leftLeader, m_leftFollower};
-  frc::MotorControllerGroup m_rightGroup{m_rightLeader, m_rightFollower};
-
   frc::Encoder m_leftEncoder{0, 1};
   frc::Encoder m_rightEncoder{2, 3};
 
-  frc2::PIDController m_leftPIDController{1.0, 0.0, 0.0};
-  frc2::PIDController m_rightPIDController{1.0, 0.0, 0.0};
+  frc::PIDController m_leftPIDController{1.0, 0.0, 0.0};
+  frc::PIDController m_rightPIDController{1.0, 0.0, 0.0};
 
   frc::AnalogGyro m_gyro{0};
 

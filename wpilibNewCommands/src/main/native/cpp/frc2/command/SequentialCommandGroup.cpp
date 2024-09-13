@@ -62,7 +62,7 @@ Command::InterruptionBehavior SequentialCommandGroup::GetInterruptionBehavior()
 
 void SequentialCommandGroup::AddCommands(
     std::vector<std::unique_ptr<Command>>&& commands) {
-  CommandScheduler::GetInstance().RequireUngrouped(commands);
+  CommandScheduler::GetInstance().RequireUngroupedAndUnscheduled(commands);
 
   if (m_currentCommandIndex != invalid_index) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
@@ -83,7 +83,7 @@ void SequentialCommandGroup::AddCommands(
 }
 
 void SequentialCommandGroup::InitSendable(wpi::SendableBuilder& builder) {
-  CommandBase::InitSendable(builder);
+  Command::InitSendable(builder);
   builder.AddIntegerProperty(
       "index", [this] { return m_currentCommandIndex; }, nullptr);
 }

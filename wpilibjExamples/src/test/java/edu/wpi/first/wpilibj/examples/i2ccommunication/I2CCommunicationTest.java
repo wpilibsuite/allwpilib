@@ -73,6 +73,9 @@ class I2CCommunicationTest {
 
     String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> m_future.get());
     char expected = alliance.name().startsWith("Red") ? 'R' : 'B';
+    if (alliance.name().startsWith("Unknown")) {
+      expected = 'U';
+    }
 
     assertEquals(expected, str.charAt(0));
   }

@@ -11,6 +11,7 @@
 #include <string_view>
 #include <utility>
 
+#include <fields/fields.h>
 #include <fmt/format.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
@@ -23,12 +24,12 @@
 #include <portable-file-dialogs.h>
 #include <units/angle.h>
 #include <units/length.h>
+#include <wpi/MemoryBuffer.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 #include <wpi/fs.h>
 #include <wpi/json.h>
-#include <wpi/raw_istream.h>
 #include <wpigui.h>
 
 #include "glass/Context.h"
@@ -221,8 +222,8 @@ class ObjectInfo {
 
 class FieldInfo {
  public:
-  static constexpr auto kDefaultWidth = 15.98_m;
-  static constexpr auto kDefaultHeight = 8.21_m;
+  static constexpr auto kDefaultWidth = 16.541052_m;
+  static constexpr auto kDefaultHeight = 8.211_m;
 
   explicit FieldInfo(Storage& storage);
 
@@ -237,10 +238,12 @@ class FieldInfo {
  private:
   void Reset();
   bool LoadImageImpl(const std::string& fn);
-  void LoadJson(std::string_view jsonfile);
+  bool LoadJson(std::span<const char> is, std::string_view filename);
+  void LoadJsonFile(std::string_view jsonfile);
 
   std::unique_ptr<pfd::open_file> m_fileOpener;
 
+  std::string& m_builtin;
   std::string& m_filename;
   gui::Texture m_texture;
 
@@ -340,7 +343,8 @@ static bool InputPose(frc::Pose2d* pose) {
 }
 
 FieldInfo::FieldInfo(Storage& storage)
-    : m_filename{storage.GetString("image")},
+    : m_builtin{storage.GetString("builtin", "2024 Crescendo")},
+      m_filename{storage.GetString("image")},
       m_width{storage.GetFloat("width", kDefaultWidth.to<float>())},
       m_height{storage.GetFloat("height", kDefaultHeight.to<float>())},
       m_top{storage.GetInt("top", 0)},
@@ -349,7 +353,25 @@ FieldInfo::FieldInfo(Storage& storage)
       m_right{storage.GetInt("right", -1)} {}
 
 void FieldInfo::DisplaySettings() {
-  if (ImGui::Button("Choose image...")) {
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 10);
+  if (ImGui::BeginCombo("Image",
+                        m_builtin.empty() ? "Custom" : m_builtin.c_str())) {
+    if (ImGui::Selectable("Custom", m_builtin.empty())) {
+      Reset();
+    }
+    for (auto&& field : fields::GetFields()) {
+      bool selected = field.name == m_builtin;
+      if (ImGui::Selectable(field.name, selected)) {
+        Reset();
+        m_builtin = field.name;
+      }
+      if (selected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+  if (m_builtin.empty() && ImGui::Button("Load image...")) {
     m_fileOpener = std::make_unique<pfd::open_file>(
         "Choose field image", "",
         std::vector<std::string>{"Image File",
@@ -370,6 +392,7 @@ void FieldInfo::DisplaySettings() {
 
 void FieldInfo::Reset() {
   m_texture = gui::Texture{};
+  m_builtin.clear();
   m_filename.clear();
   m_imageWidth = 0;
   m_imageHeight = 0;
@@ -384,7 +407,7 @@ void FieldInfo::LoadImage() {
     auto result = m_fileOpener->result();
     if (!result.empty()) {
       if (wpi::ends_with(result[0], ".json")) {
-        LoadJson(result[0]);
+        LoadJsonFile(result[0]);
       } else {
         LoadImageImpl(result[0].c_str());
         m_top = 0;
@@ -395,33 +418,46 @@ void FieldInfo::LoadImage() {
     }
     m_fileOpener.reset();
   }
-  if (!m_texture && !m_filename.empty()) {
-    if (!LoadImageImpl(m_filename)) {
-      m_filename.clear();
+  if (!m_texture) {
+    if (!m_builtin.empty()) {
+      for (auto&& field : fields::GetFields()) {
+        if (field.name == m_builtin) {
+          auto jsonstr = field.getJson();
+          auto imagedata = field.getImage();
+          auto texture = gui::Texture::CreateFromImage(
+              reinterpret_cast<const unsigned char*>(imagedata.data()),
+              imagedata.size());
+          if (texture && LoadJson({jsonstr.data(), jsonstr.size()}, {})) {
+            m_texture = std::move(texture);
+            m_imageWidth = m_texture.GetWidth();
+            m_imageHeight = m_texture.GetHeight();
+          } else {
+            m_builtin.clear();
+          }
+        }
+      }
+    } else if (!m_filename.empty()) {
+      if (!LoadImageImpl(m_filename)) {
+        m_filename.clear();
+      }
     }
   }
 }
 
-void FieldInfo::LoadJson(std::string_view jsonfile) {
-  std::error_code ec;
-  wpi::raw_fd_istream f(jsonfile, ec);
-  if (ec) {
-    std::fputs("GUI: could not open field JSON file\n", stderr);
-    return;
-  }
-
+bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   // parse file
   wpi::json j;
   try {
-    j = wpi::json::parse(f);
+    j = wpi::json::parse(is);
   } catch (const wpi::json::parse_error& e) {
     fmt::print(stderr, "GUI: JSON: could not parse: {}\n", e.what());
+    return false;
   }
 
   // top level must be an object
   if (!j.is_object()) {
     std::fputs("GUI: JSON: does not contain a top object\n", stderr);
-    return;
+    return false;
   }
 
   // image filename
@@ -430,7 +466,7 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
     image = j.at("field-image").get<std::string>();
   } catch (const wpi::json::exception& e) {
     fmt::print(stderr, "GUI: JSON: could not read field-image: {}\n", e.what());
-    return;
+    return false;
   }
 
   // corners
@@ -443,7 +479,7 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
   } catch (const wpi::json::exception& e) {
     fmt::print(stderr, "GUI: JSON: could not read field-corners: {}\n",
                e.what());
-    return;
+    return false;
   }
 
   // size
@@ -454,7 +490,7 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
     height = j.at("field-size").at(1).get<float>();
   } catch (const wpi::json::exception& e) {
     fmt::print(stderr, "GUI: JSON: could not read field-size: {}\n", e.what());
-    return;
+    return false;
   }
 
   // units for size
@@ -463,7 +499,7 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
     unit = j.at("field-unit").get<std::string>();
   } catch (const wpi::json::exception& e) {
     fmt::print(stderr, "GUI: JSON: could not read field-unit: {}\n", e.what());
-    return;
+    return false;
   }
 
   // convert size units to meters
@@ -472,22 +508,48 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
     height = units::convert<units::feet, units::meters>(height);
   }
 
-  // the image filename is relative to the json file
-  auto pathname = fs::path{jsonfile}.replace_filename(image).string();
+  // check scaling
+  int fieldWidth = m_right - m_left;
+  int fieldHeight = m_bottom - m_top;
+  if (std::abs((fieldWidth / width) - (fieldHeight / height)) > 0.3) {
+    fmt::print(stderr,
+               "GUI: Field X and Y scaling substantially different: "
+               "xscale={} yscale={}\n",
+               (fieldWidth / width), (fieldHeight / height));
+  }
 
-  // load field image
-  if (!LoadImageImpl(pathname.c_str())) {
-    return;
+  if (!filename.empty()) {
+    // the image filename is relative to the json file
+    auto pathname = fs::path{filename}.replace_filename(image).string();
+
+    // load field image
+    if (!LoadImageImpl(pathname.c_str())) {
+      return false;
+    }
+    m_filename = pathname;
   }
 
   // save to field info
-  m_filename = pathname;
   m_top = top;
   m_left = left;
   m_bottom = bottom;
   m_right = right;
   m_width = width;
   m_height = height;
+  return true;
+}
+
+void FieldInfo::LoadJsonFile(std::string_view jsonfile) {
+  std::error_code ec;
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+      wpi::MemoryBuffer::GetFile(jsonfile, ec);
+  if (fileBuffer == nullptr || ec) {
+    std::fputs("GUI: could not open field JSON file\n", stderr);
+    return;
+  }
+  LoadJson(
+      {reinterpret_cast<const char*>(fileBuffer->begin()), fileBuffer->size()},
+      jsonfile);
 }
 
 bool FieldInfo::LoadImageImpl(const std::string& fn) {
@@ -508,22 +570,28 @@ FieldFrameData FieldInfo::GetFrameData(ImVec2 min, ImVec2 max) const {
   // fit the image into the window
   if (m_texture && m_imageHeight != 0 && m_imageWidth != 0) {
     gui::MaxFit(&min, &max, m_imageWidth, m_imageHeight);
+  } else {
+    gui::MaxFit(&min, &max, m_width, m_height);
   }
 
   FieldFrameData ffd;
   ffd.imageMin = min;
   ffd.imageMax = max;
 
-  // size down the box by the image corners (if any)
-  if (m_bottom > 0 && m_right > 0) {
-    min.x += m_left * (max.x - min.x) / m_imageWidth;
-    min.y += m_top * (max.y - min.y) / m_imageHeight;
-    max.x -= (m_imageWidth - m_right) * (max.x - min.x) / m_imageWidth;
-    max.y -= (m_imageHeight - m_bottom) * (max.y - min.y) / m_imageHeight;
+  if (m_bottom > 0 && m_right > 0 && m_imageWidth != 0) {
+    // size down the box by the image corners
+    float scale = (max.x - min.x) / m_imageWidth;
+    min.x += m_left * scale;
+    min.y += m_top * scale;
+    max.x -= (m_imageWidth - m_right) * scale;
+    max.y -= (m_imageHeight - m_bottom) * scale;
+  } else if ((max.x - min.x) > 40 && (max.y - min.y > 40)) {
+    // ensure there's some padding
+    min.x += 20;
+    max.x -= 20;
+    min.y += 20;
+    max.y -= 20;
   }
-
-  // draw the field "active area" as a yellow boundary box
-  gui::MaxFit(&min, &max, m_width, m_height);
 
   ffd.min = min;
   ffd.max = max;

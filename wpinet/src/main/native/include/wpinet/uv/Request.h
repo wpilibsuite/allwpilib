@@ -9,6 +9,7 @@
 
 #include <functional>
 #include <memory>
+#include <utility>
 
 #include "wpinet/uv/Error.h"
 
@@ -92,8 +93,12 @@ class Request : public std::enable_shared_from_this<Request> {
    *
    * Derived classes can override this method for different memory management
    * approaches (e.g. pooled storage of requests).
+   *
+   * @return Previous shared pointer
    */
-  virtual void Release() noexcept { m_self.reset(); }
+  virtual std::shared_ptr<Request> Release() noexcept {
+    return std::move(m_self);
+  }
 
   /**
    * Error callback.  By default, this is set up to report errors to the handle
@@ -130,11 +135,11 @@ template <typename T, typename U>
 class RequestImpl : public Request {
  public:
   std::shared_ptr<T> shared_from_this() {
-    return std::static_pointer_cast<T>(this->shared_from_this());
+    return std::static_pointer_cast<T>(Request::shared_from_this());
   }
 
   std::shared_ptr<const T> shared_from_this() const {
-    return std::static_pointer_cast<const T>(this->shared_from_this());
+    return std::static_pointer_cast<const T>(Request::shared_from_this());
   }
 
   /**

@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for duty cycle data. */
 public class DutyCycleDataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -37,4 +38,7 @@ public class DutyCycleDataJNI extends JNIWrapper {
   public static native void resetData(int index);
 
   public static native int findForChannel(int channel);
+
+  /** Utility class. */
+  private DutyCycleDataJNI() {}
 }

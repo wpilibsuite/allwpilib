@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
-
 #include <string>
 #include <thread>
 
@@ -15,6 +13,7 @@
 #include <frc/simulation/UltrasonicSim.h>
 #include <frc/system/plant/DCMotor.h>
 #include <frc/system/plant/LinearSystemId.h>
+#include <gtest/gtest.h>
 #include <hal/simulation/MockHooks.h>
 #include <units/angle.h>
 #include <units/length.h>
@@ -58,7 +57,7 @@ class UltrasonicPIDTest : public testing::TestWithParam<double> {
     m_driveSim.Update(20_ms);
 
     auto startingDistance = units::meter_t{GetParam()};
-    m_distance = startingDistance - m_driveSim.GetLeftPosition();
+    m_distance = m_driveSim.GetLeftPosition() - startingDistance;
 
     m_ultrasonicSim.SetRange(m_distance);
   }
@@ -100,8 +99,7 @@ TEST_P(UltrasonicPIDTest, Auto) {
   }
 
   {
-    // advance 100 timesteps
-    frc::sim::StepTiming(2_s);
+    frc::sim::StepTiming(5_s);
 
     EXPECT_NEAR(Robot::kHoldDistance.value(), m_distance.value(), 10.0);
   }

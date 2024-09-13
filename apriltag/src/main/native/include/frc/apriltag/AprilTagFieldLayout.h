@@ -11,13 +11,11 @@
 
 #include <units/length.h>
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
 #include "frc/apriltag/AprilTag.h"
+#include "frc/apriltag/AprilTagFields.h"
 #include "frc/geometry/Pose3d.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 /**
@@ -41,10 +39,23 @@ namespace frc {
  * towards the opposing alliance). */
 class WPILIB_DLLEXPORT AprilTagFieldLayout {
  public:
+  /**
+   * Common origin positions for the AprilTag coordinate system.
+   */
   enum class OriginPosition {
+    /// Blue alliance wall, right side.
     kBlueAllianceWallRightSide,
+    /// Red alliance wall, right side.
     kRedAllianceWallRightSide,
   };
+
+  /**
+   * Loads an AprilTagFieldLayout from a predefined field
+   *
+   * @param field The predefined field
+   * @return AprilTagFieldLayout of the field
+   */
+  static AprilTagFieldLayout LoadField(AprilTagField field);
 
   AprilTagFieldLayout() = default;
 
@@ -66,6 +77,24 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
                       units::meter_t fieldLength, units::meter_t fieldWidth);
 
   /**
+   * Returns the length of the field the layout is representing.
+   * @return length
+   */
+  units::meter_t GetFieldLength() const;
+
+  /**
+   * Returns the length of the field the layout is representing.
+   * @return width
+   */
+  units::meter_t GetFieldWidth() const;
+
+  /**
+   * Returns a vector of all the april tags used in this layout.
+   * @return list of tags
+   */
+  std::vector<AprilTag> GetTags() const;
+
+  /**
    * Sets the origin based on a predefined enumeration of coordinate frame
    * origins. The origins are calculated from the field dimensions.
    *
@@ -85,6 +114,12 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    * @param origin The new origin for tag transformations
    */
   void SetOrigin(const Pose3d& origin);
+
+  /**
+   * Returns the origin used for tag pose transformation.
+   * @return the origin
+   */
+  Pose3d GetOrigin() const;
 
   /**
    * Gets an AprilTag pose by its ID.
@@ -125,5 +160,14 @@ void to_json(wpi::json& json, const AprilTagFieldLayout& layout);
 
 WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, AprilTagFieldLayout& layout);
+
+/**
+ * Loads an AprilTagFieldLayout from a predefined field
+ *
+ * @param field The predefined field
+ * @return AprilTagFieldLayout of the field
+ */
+WPILIB_DLLEXPORT AprilTagFieldLayout
+LoadAprilTagLayoutField(AprilTagField field);
 
 }  // namespace frc

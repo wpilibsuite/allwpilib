@@ -83,6 +83,18 @@ void NetworkTablesProvider::DisplayMenu() {
       // FIXME: enabled?
       // data is the last item, so is guaranteed to be null-terminated
       ImGui::MenuItem(path.back().data(), nullptr, &visible, true);
+      // Add type label to smartdashboard sendables
+      if (wpi::starts_with(entry->name, "/SmartDashboard/")) {
+        auto typeEntry = m_typeCache.FindValue(entry->name);
+        if (typeEntry) {
+          ImGui::SameLine();
+          ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+          ImGui::Text("%s", typeEntry->stringVal.c_str());
+          ImGui::PopStyleColor();
+          ImGui::SameLine();
+          ImGui::Dummy(ImVec2(10.0f, 0.0f));
+        }
+      }
       if (!wasVisible && visible) {
         Show(entry.get(), entry->window);
       } else if (wasVisible && !visible && entry->window) {

@@ -4,11 +4,11 @@
 
 #pragma once
 
+#include <concepts>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <utility>
 
 #include <networktables/NetworkTable.h>
@@ -62,9 +62,8 @@ class MechanismObject2d {
    * assignments and call chaining.
    * @throw if an object with the given name already exists.
    */
-  template <typename T, typename... Args,
-            typename =
-                std::enable_if_t<std::is_convertible_v<T*, MechanismObject2d*>>>
+  template <typename T, typename... Args>
+    requires std::convertible_to<T*, MechanismObject2d*>
   T* Append(std::string_view name, Args&&... args) {
     std::scoped_lock lock(m_mutex);
     auto& obj = m_objects[name];

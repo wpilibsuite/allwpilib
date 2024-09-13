@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -21,6 +21,9 @@
 /*
  * Gauss-Legendre quadrature: 30 points
  */
+
+namespace gcem
+{
 
 static const long double gauss_legendre_30_points[30] = \
 {
@@ -89,3 +92,5 @@ static const long double gauss_legendre_30_weights[30] = \
     0.00796819249616660561546588347467L,
     0.00796819249616660561546588347467L\
 };
+
+}

@@ -121,8 +121,8 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
 
   std::vector<SplineParameterizer::PoseWithCurvature> points;
   try {
-    points = SplinePointsFromSplines(
-        SplineHelper::QuinticSplinesFromWaypoints(newWaypoints));
+    points = SplinePointsFromSplines(SplineHelper::OptimizeCurvature(
+        SplineHelper::QuinticSplinesFromWaypoints(newWaypoints)));
   } catch (SplineParameterizer::MalformedSplineException& e) {
     ReportError(e.what());
     return kDoNothingTrajectory;

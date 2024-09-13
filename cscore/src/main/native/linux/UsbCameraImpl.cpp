@@ -486,7 +486,7 @@ void UsbCameraImpl::CameraThreadMain() {
         // If the name is what we expect...
         std::string_view name{raw_name.c_str()};
         SDEBUG4("got event on '{}' ({}) compare to '{}' ({}) mask {}", name,
-                name.size(), base, base.size(), event.mask);
+                name.size(), base.str(), base.size(), event.mask);
         if (name == base) {
           if ((event.mask & IN_DELETE) != 0) {
             wasStreaming = m_streaming;
@@ -595,7 +595,7 @@ void UsbCameraImpl::DeviceConnect() {
   }
 
   if (m_connectVerbose) {
-    SINFO("Connecting to USB camera on {}", m_path);
+    SINFO("Attempting to connect to USB camera on {}", m_path);
   }
 
   // Try to open the device
@@ -605,6 +605,10 @@ void UsbCameraImpl::DeviceConnect() {
     return;
   }
   m_fd = fd;
+
+  if (m_connectVerbose) {
+    SINFO("Connected to USB camera on {}", m_path);
+  }
 
   // Get capabilities
   SDEBUG3("getting capabilities");

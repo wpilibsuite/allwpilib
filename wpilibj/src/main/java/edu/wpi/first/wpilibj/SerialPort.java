@@ -13,13 +13,20 @@ import java.nio.charset.StandardCharsets;
 public class SerialPort implements AutoCloseable {
   private int m_portHandle;
 
+  /** Serial port. */
   public enum Port {
+    /** Onboard serial port on the roboRIO. */
     kOnboard(0),
+    /** MXP (roboRIO MXP) serial port. */
     kMXP(1),
+    /** USB serial port (same as KUSB1). */
     kUSB(2),
+    /** USB serial port 1. */
     kUSB1(2),
+    /** USB serial port 2. */
     kUSB2(3);
 
+    /** Port value. */
     public final int value;
 
     Port(int value) {
@@ -29,12 +36,18 @@ public class SerialPort implements AutoCloseable {
 
   /** Represents the parity to use for serial communications. */
   public enum Parity {
+    /** No parity. */
     kNone(0),
+    /** Odd parity. */
     kOdd(1),
+    /** Even parity. */
     kEven(2),
+    /** Parity bit always on. */
     kMark(3),
+    /** Parity bit always off. */
     kSpace(4);
 
+    /** Parity value. */
     public final int value;
 
     Parity(int value) {
@@ -44,10 +57,14 @@ public class SerialPort implements AutoCloseable {
 
   /** Represents the number of stop bits to use for Serial Communication. */
   public enum StopBits {
+    /** One stop bit. */
     kOne(10),
+    /** One and a half stop bits. */
     kOnePointFive(15),
+    /** Two stop bits. */
     kTwo(20);
 
+    /** StopBits value. */
     public final int value;
 
     StopBits(int value) {
@@ -57,11 +74,16 @@ public class SerialPort implements AutoCloseable {
 
   /** Represents what type of flow control to use for serial communication. */
   public enum FlowControl {
+    /** No flow control. */
     kNone(0),
+    /** XON/XOFF flow control. */
     kXonXoff(1),
+    /** RTS/CTS flow control. */
     kRtsCts(2),
+    /** DTS/DSR flow control. */
     kDtsDsr(4);
 
+    /** FlowControl value. */
     public final int value;
 
     FlowControl(int value) {
@@ -71,9 +93,12 @@ public class SerialPort implements AutoCloseable {
 
   /** Represents which type of buffer mode to use when writing to a serial port. */
   public enum WriteBufferMode {
+    /** Flush the buffer on each access. */
     kFlushOnAccess(1),
+    /** Flush the buffer when it is full. */
     kFlushWhenFull(2);
 
+    /** WriteBufferMode value. */
     public final int value;
 
     WriteBufferMode(int value) {
@@ -186,7 +211,7 @@ public class SerialPort implements AutoCloseable {
   }
 
   /** Disable termination behavior. */
-  public void disableTermination() {
+  public final void disableTermination() {
     SerialPortJNI.serialDisableTermination(m_portHandle);
   }
 
@@ -216,7 +241,7 @@ public class SerialPort implements AutoCloseable {
    */
   public String readString(int count) {
     byte[] out = read(count);
-    return new String(out, 0, out.length, StandardCharsets.US_ASCII);
+    return new String(out, StandardCharsets.US_ASCII);
   }
 
   /**
@@ -268,7 +293,7 @@ public class SerialPort implements AutoCloseable {
    *
    * @param timeout The number of seconds to wait for I/O.
    */
-  public void setTimeout(double timeout) {
+  public final void setTimeout(double timeout) {
     SerialPortJNI.serialSetTimeout(m_portHandle, timeout);
   }
 
@@ -283,7 +308,7 @@ public class SerialPort implements AutoCloseable {
    *
    * @param size The read buffer size.
    */
-  public void setReadBufferSize(int size) {
+  public final void setReadBufferSize(int size) {
     SerialPortJNI.serialSetReadBufferSize(m_portHandle, size);
   }
 
@@ -309,7 +334,7 @@ public class SerialPort implements AutoCloseable {
    *
    * @param mode The write buffer mode.
    */
-  public void setWriteBufferMode(WriteBufferMode mode) {
+  public final void setWriteBufferMode(WriteBufferMode mode) {
     SerialPortJNI.serialSetWriteMode(m_portHandle, (byte) mode.value);
   }
 

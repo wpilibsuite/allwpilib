@@ -7,8 +7,6 @@
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
-#include "frc/interfaces/Accelerometer.h"
-
 namespace frc {
 
 /**
@@ -16,10 +14,21 @@ namespace frc {
  *
  * This class allows access to the roboRIO's internal accelerometer.
  */
-class BuiltInAccelerometer : public Accelerometer,
-                             public wpi::Sendable,
+class BuiltInAccelerometer : public wpi::Sendable,
                              public wpi::SendableHelper<BuiltInAccelerometer> {
  public:
+  /**
+   * Accelerometer range.
+   */
+  enum Range {
+    /// 2 Gs max.
+    kRange_2G = 0,
+    /// 4 Gs max.
+    kRange_4G = 1,
+    /// 8 Gs max.
+    kRange_8G = 2
+  };
+
   /**
    * Constructor.
    *
@@ -30,30 +39,28 @@ class BuiltInAccelerometer : public Accelerometer,
   BuiltInAccelerometer(BuiltInAccelerometer&&) = default;
   BuiltInAccelerometer& operator=(BuiltInAccelerometer&&) = default;
 
-  // Accelerometer interface
   /**
    * Set the measuring range of the accelerometer.
    *
    * @param range The maximum acceleration, positive or negative, that the
-   *              accelerometer will measure. Not all accelerometers support all
-   *              ranges.
+   *     accelerometer will measure.
    */
-  void SetRange(Range range) final;
+  void SetRange(Range range);
 
   /**
    * @return The acceleration of the roboRIO along the X axis in g-forces
    */
-  double GetX() override;
+  double GetX();
 
   /**
    * @return The acceleration of the roboRIO along the Y axis in g-forces
    */
-  double GetY() override;
+  double GetY();
 
   /**
    * @return The acceleration of the roboRIO along the Z axis in g-forces
    */
-  double GetZ() override;
+  double GetZ();
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 };

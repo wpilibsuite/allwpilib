@@ -4,6 +4,14 @@
 
 package edu.wpi.first.hal.simulation;
 
+/** Interface for simulation buffer callbacks. */
 public interface BufferCallback {
+  /**
+   * Simulation buffer callback function.
+   *
+   * @param name Buffer name.
+   * @param buffer Buffer.
+   * @param count Buffer size.
+   */
   void callback(String name, byte[] buffer, int count);
 }

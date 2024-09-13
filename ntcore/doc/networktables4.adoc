@@ -1,16 +1,37 @@
-= Network Tables Protocol Specification, Version 4.0
+= Network Tables Protocol Specification, Version 4.1
 WPILib Developers <wpilib@wpi.edu>
-Protocol Revision 4.0, 2/14/2021
+Protocol Revision 4.1, 10/1/2023
 :toc:
 :toc-placement: preamble
 :sectanchors:
 
 A pub/sub WebSockets protocol based on NetworkTables concepts.
 
-[[motivation]]
-== Motivation
+[[motivation4.1]]
+== Motivation for Version 4.1
 
-Currently in NetworkTables there is no way to synchronize user value updates and NT update sweeps, and if user value updates occur more frequently than NT update sweeps, the intermediate values are lost.  This prevents NetworkTables from being a viable transport layer for seeing all value changes (e.g. for plotting) at rates higher than the NetworkTables update rate (e.g. for capturing high frequency PID changes).  While custom code can work around the second issue, it is more difficult to work around the first issue (unless full timestamps are also sent).
+While NetworkTables 4.0 made a large number of improvements to the 3.0 protocol, a few weaknesses have been discovered in "real world" use:
+
+* Keep alives are not required. This can result in very long timeframes before a disconnect is detected.
+* Periodic synchronization of timestamps is impacted by high variability of round trip time measurements on a stream connection shared with other data (due to network queueing in adverse network connections), resulting in values being "too old" even if actually more recent due to a change in base time
+* Disconnect loops can be caused by large amounts of data values being sent in response to a "subscribe all" type of message (e.g. subscribe with empty or `$` prefix), resulting in data transmission being blocked for an excessive amount of time
+* Publishing operations are not clearly subscriber-driven; the information is available via metatopics but not automatically sent to clients when clients publish
+
+Version 4.1 makes the following key changes to address these weaknesses:
+
+* Mandate the server and client send periodic WebSockets PING messages and track PONG responses
+* Recommend that timestamp synchronization occur immediately following connection establishment and prior to any other control messages
+* Recommend text and binary combining into a single WebSockets frame be limited to the network MTU (unless necessary to transport the message)
+* Recommend WebSockets fragmentation be used on large frames to enable rapid handling of PING messages
+* Add a (default true) option for topics to be marked cached (in which case the last value is retained by the server and sent to clients on initial subscription)
+* Recommend clients subscribe to the `$sub$<topic>` meta-topic for each topic published by the client, and use this information to control what value updates are sent over the network to the server
+
+Version 4.1 uses a different WebSockets subprotocol string than version 4.0, so it is easy for both clients and servers to simultaneously support both versions 4.0 and 4.1. Due to WebSockets implementation bugs in version 4.0, version 4.1 implementations must not send WebSockets PING messages on version 4.0 connections.
+
+[[motivation]]
+== Motivation for Version 4.0
+
+In <<networktables3,NetworkTables 3.0>>, there is no way to synchronize user value updates and NT update sweeps, and if user value updates occur more frequently than NT update sweeps, the intermediate values are lost.  This prevents NetworkTables from being a viable transport layer for seeing all value changes (e.g. for plotting) at rates higher than the NetworkTables update rate (e.g. for capturing high frequency PID changes).  While custom code can work around the second issue, it is more difficult to work around the first issue (unless full timestamps are also sent).
 
 Adding built-in support for capturing and communicating all timestamped data value changes with minimal additional user code changes will make it much easier for inexperienced teams to get high resolution, accurate data to dashboard displays with the minimal possible bandwidth and airtime usage.  Assuming the dashboard performs record and playback of NT updates, this also meets the desire to provide teams a robust data capture and playback mechanism.
 
@@ -67,10 +88,19 @@ When the client receives an -1 ID message from the server, it shall compute the 
 
 Due to the fact there can be multiple publishers for a single topic and unpredictable network delays / clock drift, there is no global total order for timestamps either globally or on a per-topic basis.  While single publishers for real-time data will be the norm, and in that case the timestamps will usually be in order, applications that use timestamps need to be able to handle out-of-order timestamps.
 
+[[aliveness]]
+=== Connection Aliveness Checking
+
+With a version 4.1 connection, both the client and the server should send periodic WebSockets PING messages and look for a PONG response within a reasonable period of time. On version 4.0 connections, or if this is not possible (e.g. the underlying WebSockets implementation does not have the ability to send PING messages), the client should use timestamp messages for aliveness testing. If no response is received after an appropriate amount of time, the client or server shall disconnect the WebSockets connection and try to re-establish a new connection.
+
+As the WebSockets protocol allows PONG responses to be sent in the middle of another message stream, WebSockets PING messages are preferred, as this allows for a shorter timeout period that is not dependent on the size of the transmitted messages. Sending a ping every 200 ms with a timeout of 1 second is recommended in this case.
+
+If using timestamp messages for aliveness checking on the primary connection, the client should use a timeout long enough to account for the largest expected message size (as the server can only respond after such a message has been completely transmitted). Sending a ping every 1 second with a timeout of 3 seconds is recommended in this case. If provided by the server, the <<rtt-subprotocol>> can be used in addition to the primary connection for aliveness testing with a shorter timeout.
+
 [[reconnection]]
 === Caching and Reconnection Handling
 
-Servers shall keep a retained value for each topic for the purposes of <<msg-subscribe>> requests; the retained value shall be the value in the largest timestamp (greater-than or equal-to) message received for that topic.  This retained value is deleted if the topic is deleted (e.g. there are no more publishers).
+Servers shall keep a retained value for each cached topic for the purposes of <<msg-subscribe>> requests; the retained value shall be the value in the largest timestamp (greater-than or equal-to) message received for that topic.  This retained value is deleted if the topic is deleted (e.g. there are no more publishers).
 
 Clients may similarly keep a retained value for each topic for ease of use by user code.  If this is done, this retained value shall be updated by both locally published values and received messages for that topic with greater-than/equal-to timestamps, and the retained value shall be deleted when a <<msg-unannounce>> is received.
 
@@ -127,9 +157,11 @@ The server may operate in-process to an application (e.g. a robot program).  In 
 
 Clients are responsible for keeping server connections established (e.g. via retries when a connection is lost).  Topic IDs must be treated as connection-specific; if the connection to the server is lost, the client is responsible for sending new <<msg-publish,`publish`>> and <<msg-subscribe,`subscribe`>> messages as required for the application when a new connection is established, and not using old topic IDs, but rather waiting for new <<msg-announce,`announce`>> messages to be received.
 
-Except for offline-published values with timestamps of 0, the client shall not send any other published values to the server until its clock is synchronized with the server per the <<timestamps>> section.
+Except for offline-published values with timestamps of 0, the client shall not send any other published values to the server until its clock is synchronized with the server per the <<timestamps>> section. Clients should measure RTT prior to sending any control messages (to avoid other traffic disrupting the measurement).
 
 Clients may publish a value at any time following clock synchronization.  Clients may subscribe to meta-topics to determine whether or not to publish a value change (e.g. based on whether there are any subscribers, or based on specific <<sub-options>>).
+
+Clients should subscribe to the `$sub$<topic>` meta topic for each topic published and use this metadata to determine how frequently to send updates to the network. However, this is not required--clients may choose to ignore this and send updates at any time.
 
 [[meta-topics]]
 === Server-Published Meta Topics
@@ -300,9 +332,21 @@ Both clients and servers shall support unsecure connections (`ws:`) and may supp
 
 Servers shall support a resource name of `/nt/<name>`, where `<name>` is an arbitrary string representing the client name.  The client name does not need to be unique; multiple connections to the same name are allowed; the server shall ensure the name is unique (for the purposes of meta-topics) by appending a '@' and a unique number (if necessary).  To support this, the name provided by the client should not contain an embedded '@'.  Clients should provide a way to specify the resource name (in particular, the client name portion).
 
-Both clients and servers shall support/use subprotocol `networktables.first.wpi.edu` for this protocol. Clients and servers shall terminate the connection in accordance with the WebSocket protocol unless both sides support this subprotocol.
+Both clients and servers should support/use subprotocol `v4.1.networktables.first.wpi.edu` (for version 4.1) and `networktables.first.wpi.edu` (for version 4.0). Version 4.1 should be preferred, with version 4.0 as a fallback, using standard WebSockets subprotocol negotiation. Clients and servers shall terminate the connection in accordance with the WebSocket protocol unless both sides support a common subprotocol.
 
 The unsecure standard server port number shall be 5810, the secure standard port number shall be 5811.
+
+[[fragmentation]]
+=== Fragmentation
+
+Combining multiple text or binary messages into a single WebSockets frame should be limited such that the WebSockets frame does not exceed the MTU unless otherwise required to fit the total binary data size.
+
+Client and server implementations should fragment WebSockets messages to roughly the network MTU in order to facilitate rapid handling of PING and PONG messages.
+
+[[rtt-subprotocol]]
+=== RTT Subprotocol
+
+Servers should provide subprotocol `rtt.networktables.first.wpi.edu` for RTT-only messages. This subprotocol provides a separate channel that can be used for RTT messages to avoid delays caused by other value transmissions. Clients that cannot send WebSocket PING messages are recommended to use this subprotocol (if available) for aliveness testing. Connections using this subprotocol do not appear in the client connections list. No text frames are used; only <<binary-frames>> with Topic ID of -1 (RTT measurement) should be sent by the client and responded to by the server.
 
 [[data-types]]
 == Supported Data Types
@@ -375,6 +419,7 @@ Each published topic may also have properties associated to it.  Properties are 
 |Property|Type|Description|Notes
 |`persistent`|boolean|Persistent Flag|If true, the last set value will be periodically saved to persistent storage on the server and be restored during server startup.  Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
 |`retained`|boolean|Retained Flag|Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
+|`cached`|boolean|Cached Flag|If false, the server and clients will not store the value of the topic.  This means that only value updates will be available for the topic.
 |===
 
 [[sub-options]]
@@ -575,7 +620,7 @@ If a property is not included in the update map, its value is not changed.  If a
 [[msg-subscribe]]
 ==== Subscribe Message (`subscribe`)
 
-Sent from a client to the server to indicate the client wants to subscribe to value changes for the specified topics / groups of topics.  The server shall send MessagePack messages containing the current values for any existing topics upon receipt, and continue sending MessagePack messages for future value changes.  If a topic does not yet exist, no message is sent until it is created (via a publish), at which point a <<msg-announce>> will be sent and MessagePack messages will automatically follow as they are published.
+Sent from a client to the server to indicate the client wants to subscribe to value changes for the specified topics / groups of topics.  The server shall send MessagePack messages containing the current values for any existing cached topics upon receipt, and continue sending MessagePack messages for future value changes.  If a topic does not yet exist, no message is sent until it is created (via a publish), at which point a <<msg-announce>> will be sent and MessagePack messages will automatically follow as they are published.
 
 Subscriptions may overlap; only one MessagePack message is sent per value change regardless of the number of subscriptions.  Sending a `subscribe` message with the same subscription UID as a previous `subscribe` message results in updating the subscription (replacing the array of identifiers and updating any specified options).
 

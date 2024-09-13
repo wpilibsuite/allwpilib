@@ -4,8 +4,9 @@
 
 #include <numbers>
 
+#include <gtest/gtest.h>
+
 #include "frc/controller/ProfiledPIDController.h"
-#include "gtest/gtest.h"
 #include "units/angle.h"
 #include "units/angular_acceleration.h"
 #include "units/angular_velocity.h"

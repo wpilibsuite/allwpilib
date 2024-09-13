@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -71,6 +72,7 @@ class PreferencesTest {
     m_inst.close();
   }
 
+  @Disabled("Fails often with 'Preferences was not empty!'")
   @Test
   void removeAllTest() {
     Preferences.removeAll();

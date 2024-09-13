@@ -32,21 +32,21 @@ import org.opencv.imgproc.Imgproc;
 public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
-    var visionThread = new Thread(() -> apriltagVisionThreadProc());
+    var visionThread = new Thread(this::apriltagVisionThreadProc);
     visionThread.setDaemon(true);
     visionThread.start();
   }
 
   void apriltagVisionThreadProc() {
     var detector = new AprilTagDetector();
-    // look for tag16h5, don't correct any error bits
-    detector.addFamily("tag16h5", 0);
+    // look for tag36h11, correct 3 error bits
+    detector.addFamily("tag36h11", 3);
 
     // Set up Pose Estimator - parameters are for a Microsoft Lifecam HD-3000
     // (https://www.chiefdelphi.com/t/wpilib-apriltagdetector-sample-code/421411/21)
     var poseEstConfig =
         new AprilTagPoseEstimator.Config(
-            0.1524, 699.3778103158814, 677.7161226393544, 345.6059345433618, 207.12741326228522);
+            0.1651, 699.3778103158814, 677.7161226393544, 345.6059345433618, 207.12741326228522);
     var estimator = new AprilTagPoseEstimator(poseEstConfig);
 
     // Get the UsbCamera from CameraServer

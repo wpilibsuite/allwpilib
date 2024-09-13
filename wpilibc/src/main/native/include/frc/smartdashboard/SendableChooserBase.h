@@ -7,11 +7,8 @@
 #include <atomic>
 #include <string>
 
-#include <networktables/IntegerTopic.h>
-#include <networktables/NTSendable.h>
-#include <networktables/StringTopic.h>
-#include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
+#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
@@ -22,7 +19,7 @@ namespace frc {
  * It contains static, non-templated variables to avoid their duplication in the
  * template class.
  */
-class SendableChooserBase : public nt::NTSendable,
+class SendableChooserBase : public wpi::Sendable,
                             public wpi::SendableHelper<SendableChooserBase> {
  public:
   SendableChooserBase();
@@ -41,10 +38,9 @@ class SendableChooserBase : public nt::NTSendable,
   std::string m_defaultChoice;
   std::string m_selected;
   bool m_haveSelected = false;
-  wpi::SmallVector<nt::IntegerPublisher, 2> m_instancePubs;
-  wpi::SmallVector<nt::StringPublisher, 2> m_activePubs;
-  wpi::mutex m_mutex;
+  mutable wpi::mutex m_mutex;
   int m_instance;
+  std::string m_previousVal;
   static std::atomic_int s_instances;
 };
 

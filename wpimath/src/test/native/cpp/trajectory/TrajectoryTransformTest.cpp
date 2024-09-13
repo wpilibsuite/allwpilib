@@ -4,10 +4,11 @@
 
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/TrajectoryConfig.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "gtest/gtest.h"
 
 void TestSameShapedTrajectory(std::vector<frc::Trajectory::State> statesA,
                               std::vector<frc::Trajectory::State> statesB) {

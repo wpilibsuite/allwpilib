@@ -1,0 +1,133 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Wed, 20 Sep 2023 02:23:10 -0400
+Subject: [PATCH 4/4] Add llvm stream support
+
+---
+ .../detail/output/output_adapters.hpp         | 26 +++++++++++++++++++
+ include/nlohmann/detail/output/serializer.hpp | 11 ++++++--
+ include/nlohmann/json.hpp                     | 24 +++++++++++++++++
+ 3 files changed, 59 insertions(+), 2 deletions(-)
+
+diff --git a/include/nlohmann/detail/output/output_adapters.hpp b/include/nlohmann/detail/output/output_adapters.hpp
+index 630bd8f73f38b7bf18be571217873f6215e6e31a..78addc557eec3b2a31cde78fb4c6f7f6efc7e777 100644
+--- a/include/nlohmann/detail/output/output_adapters.hpp
++++ b/include/nlohmann/detail/output/output_adapters.hpp
+@@ -22,6 +22,8 @@
+ 
+ #include <nlohmann/detail/macro_scope.hpp>
+ 
++#include <wpi/raw_ostream.h>
++
+ NLOHMANN_JSON_NAMESPACE_BEGIN
+ namespace detail
+ {
+@@ -118,6 +120,27 @@ class output_string_adapter : public output_adapter_protocol<CharType>
+     StringType& str;
+ };
+ 
++template<typename CharType>
++class raw_ostream_adapter : public output_adapter_protocol<CharType>
++{
++  public:
++    explicit raw_ostream_adapter(raw_ostream& s) noexcept
++        : os(s) {}
++
++
++    void write_character(CharType c) override {
++        os << c;
++    }
++
++    JSON_HEDLEY_NON_NULL(2)
++    void write_characters(const CharType* s, std::size_t length) override {
++        os.write(s, length);
++    }
++
++  private:
++    raw_ostream& os;
++};
++
+ template<typename CharType, typename StringType = std::basic_string<CharType>>
+ class output_adapter
+ {
+@@ -134,6 +157,9 @@ class output_adapter
+     output_adapter(StringType& s)
+         : oa(std::make_shared<output_string_adapter<CharType, StringType>>(s)) {}
+ 
++    output_adapter(raw_ostream& os)
++        : oa(std::make_shared<raw_ostream_adapter<CharType>>(os)) {}
++
+     operator output_adapter_t<CharType>()
+     {
+         return oa;
+diff --git a/include/nlohmann/detail/output/serializer.hpp b/include/nlohmann/detail/output/serializer.hpp
+index ecc4f7d500b9e0bc15917503061a4db100391366..bb392a985b57b79020c949593c155052a4271d6b 100644
+--- a/include/nlohmann/detail/output/serializer.hpp
++++ b/include/nlohmann/detail/output/serializer.hpp
+@@ -65,15 +65,22 @@ class serializer
+     @param[in] error_handler_  how to react on decoding errors
+     */
+     serializer(output_adapter_t<char> s, const char ichar,
+-               error_handler_t error_handler_ = error_handler_t::strict)
++               error_handler_t error_handler_ = error_handler_t::strict,
++               size_t indent_init_len = 512)
+         : o(std::move(s))
+         , loc(std::localeconv())
+         , thousands_sep(loc->thousands_sep == nullptr ? '\0' : std::char_traits<char>::to_char_type(* (loc->thousands_sep)))
+         , decimal_point(loc->decimal_point == nullptr ? '\0' : std::char_traits<char>::to_char_type(* (loc->decimal_point)))
+         , indent_char(ichar)
+-        , indent_string(512, indent_char)
++        , indent_string(indent_init_len, indent_char)
+         , error_handler(error_handler_)
+     {}
++    
++    serializer(raw_ostream& os, const char ichar,
++               size_t indent_init_len = 512,
++               error_handler_t error_handler_ = error_handler_t::strict)
++        : serializer(output_adapter<char>(os), ichar, error_handler_, indent_init_len)
++    {}
+ 
+     // delete because of pointer members
+     serializer(const serializer&) = delete;
+diff --git a/include/nlohmann/json.hpp b/include/nlohmann/json.hpp
+index c462cade8a7167a00697f6f940be35c5609a283c..ad98956ba880f844ed1a17765266880f6ea08b2f 100644
+--- a/include/nlohmann/json.hpp
++++ b/include/nlohmann/json.hpp
+@@ -1275,6 +1275,24 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+         return result;
+     }
+ 
++    void dump(raw_ostream& os, const int indent = -1,
++                  const char indent_char = ' ',
++                  const bool ensure_ascii = false,
++                  const error_handler_t error_handler = error_handler_t::strict) const {
++      serializer s(os, indent_char);
++
++      if (indent >= 0)
++      {
++          s.dump(*this, true, ensure_ascii, static_cast<unsigned int>(indent));
++      }
++      else
++      {
++          s.dump(*this, false, ensure_ascii, 0);
++      }
++
++      os.flush();
++    }
++
+     /// @brief return the type of the JSON value (explicit)
+     /// @sa https://json.nlohmann.me/api/basic_json/type/
+     constexpr value_t type() const noexcept
+@@ -3990,6 +4008,12 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+         return o << j;
+     }
+ #endif  // JSON_NO_IO
++    
++    friend raw_ostream& operator<<(raw_ostream& o, const basic_json& j)
++    {
++        j.dump(o, 0);
++        return o;
++    }
+     /// @}
+ 
+ 

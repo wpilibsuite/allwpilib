@@ -17,8 +17,12 @@ import org.ejml.simple.SimpleMatrix;
  * <p>The feedforward is calculated as <strong> u_ff = B<sup>+</sup> (r_k+1 - A r_k) </strong>,
  * where <strong> B<sup>+</sup> </strong> is the pseudoinverse of B.
  *
- * <p>For more on the underlying math, read
- * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ * <p>For more on the underlying math, read <a
+ * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>.
+ *
+ * @param <States> Number of states.
+ * @param <Inputs> Number of inputs.
+ * @param <Outputs> Number of outputs.
  */
 public class LinearPlantInversionFeedforward<
     States extends Num, Inputs extends Num, Outputs extends Num> {
@@ -105,13 +109,13 @@ public class LinearPlantInversionFeedforward<
    *
    * @param initialState The initial state vector.
    */
-  public void reset(Matrix<States, N1> initialState) {
+  public final void reset(Matrix<States, N1> initialState) {
     m_r = initialState;
     m_uff.fill(0.0);
   }
 
   /** Resets the feedforward with a zero initial state vector. */
-  public void reset() {
+  public final void reset() {
     m_r.fill(0.0);
     m_uff.fill(0.0);
   }
@@ -139,6 +143,9 @@ public class LinearPlantInversionFeedforward<
    * @return The calculated feedforward.
    */
   public Matrix<Inputs, N1> calculate(Matrix<States, N1> r, Matrix<States, N1> nextR) {
+    // rₖ₊₁ = Arₖ + Buₖ
+    // Buₖ = rₖ₊₁ − Arₖ
+    // uₖ = B⁺(rₖ₊₁ − Arₖ)
     m_uff = new Matrix<>(m_B.solve(nextR.minus(m_A.times(r))));
 
     m_r = nextR;

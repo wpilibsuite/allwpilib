@@ -34,6 +34,7 @@ class Stream;
 class WebSocket : public std::enable_shared_from_this<WebSocket> {
   struct private_init {};
 
+ public:
   static constexpr uint8_t kOpCont = 0x00;
   static constexpr uint8_t kOpText = 0x01;
   static constexpr uint8_t kOpBinary = 0x02;
@@ -42,8 +43,8 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   static constexpr uint8_t kOpPong = 0x0A;
   static constexpr uint8_t kOpMask = 0x0F;
   static constexpr uint8_t kFlagFin = 0x80;
+  static constexpr uint8_t kFlagControl = 0x08;
 
- public:
   WebSocket(uv::Stream& stream, bool server, const private_init&);
   WebSocket(const WebSocket&) = delete;
   WebSocket(WebSocket&&) = delete;
@@ -93,7 +94,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
     static constexpr uint8_t kPing = kFlagFin | kOpPing;
     static constexpr uint8_t kPong = kFlagFin | kOpPong;
 
-    Frame(uint8_t opcode, std::span<const uv::Buffer> data)
+    constexpr Frame(uint8_t opcode, std::span<const uv::Buffer> data)
         : opcode{opcode}, data{data} {}
 
     uint8_t opcode;
@@ -339,7 +340,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendPing(
       std::span<const uv::Buffer> data,
       std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
-    Send(kFlagFin | kOpPing, data, std::move(callback));
+    SendControl(kFlagFin | kOpPing, data, std::move(callback));
   }
 
   /**
@@ -376,7 +377,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendPong(
       std::span<const uv::Buffer> data,
       std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
-    Send(kFlagFin | kOpPong, data, std::move(callback));
+    SendControl(kFlagFin | kOpPong, data, std::move(callback));
   }
 
   /**
@@ -400,6 +401,31 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendFrames(
       std::span<const Frame> frames,
       std::function<void(std::span<uv::Buffer>, uv::Error)> callback);
+
+  /**
+   * Try to send multiple frames. Tries to send as many frames as possible
+   * immediately, and only queues the "last" frame it can (as the network queue
+   * will almost always fill partway through a frame). The frames following
+   * the last frame will NOT be queued for transmission; the caller is
+   * responsible for how to handle (e.g. re-send) those frames (e.g. when the
+   * callback is called).
+   *
+   * @param frames Frame type/data pairs
+   * @param callback Callback which is invoked when the write completes of the
+   *                 last frame that is not returned.
+   * @return Remaining frames that will not be sent
+   */
+  std::span<const Frame> TrySendFrames(
+      std::span<const Frame> frames,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback);
+
+  /**
+   * Returns whether or not a previous TrySendFrames is still in progress.
+   * Calling TrySendFrames if this returns true will return all frames.
+   *
+   * @return True if a TryWrite is in progress
+   */
+  bool IsWriteInProgress() const { return m_writeInProgress; }
 
   /**
    * Fail the connection.
@@ -432,6 +458,12 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void Shutdown();
 
   /**
+   * Gets the last time data was received on the stream.
+   * @return Timestamp
+   */
+  uint64_t GetLastReceivedTime() const { return m_lastReceivedTime; }
+
+  /**
    * Open event.  Emitted when the connection is open and ready to communicate.
    * The parameter is the selected subprotocol.
    */
@@ -460,7 +492,8 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   sig::Signal<std::span<const uint8_t>, bool> binary;
 
   /**
-   * Ping event.  Emitted when a ping message is received.
+   * Ping event.  Emitted when a ping message is received.  A pong message is
+   * automatically sent in response, so this is simply a notification.
    */
   sig::Signal<std::span<const uint8_t>> ping;
 
@@ -484,13 +517,21 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   size_t m_maxMessageSize = 128 * 1024;
   bool m_combineFragments = true;
 
+  // outgoing write request
+  bool m_writeInProgress = false;
+  class WriteReq;
+  std::weak_ptr<WriteReq> m_curWriteReq;
+  std::weak_ptr<WriteReq> m_lastWriteReq;
+
   // operating state
   State m_state = CONNECTING;
 
   // incoming message buffers/state
+  uint64_t m_lastReceivedTime = 0;
   SmallVector<uint8_t, 14> m_header;
   size_t m_headerSize = 0;
   SmallVector<uint8_t, 1024> m_payload;
+  SmallVector<uint8_t, 64> m_controlPayload;
   size_t m_frameStart = 0;
   uint64_t m_frameSize = UINT64_MAX;
   uint8_t m_fragmentOpcode = 0;
@@ -507,10 +548,16 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendClose(uint16_t code, std::string_view reason);
   void SetClosed(uint16_t code, std::string_view reason, bool failed = false);
   void HandleIncoming(uv::Buffer& buf, size_t size);
+  void SendControl(
+      uint8_t opcode, std::span<const uv::Buffer> data,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback);
   void Send(uint8_t opcode, std::span<const uv::Buffer> data,
             std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     SendFrames({{Frame{opcode, data}}}, std::move(callback));
   }
+  void SendError(
+      std::span<const Frame> frames,
+      const std::function<void(std::span<uv::Buffer>, uv::Error)>& callback);
 };
 
 }  // namespace wpi

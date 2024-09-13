@@ -15,24 +15,21 @@ jobs:
     name: "Update"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Fetch all history and metadata
         run: |
-          git fetch --prune --unshallow
           git checkout -b pr
           git branch -f main origin/main
       - name: Set up Python 3.9
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Configure committer identity
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
-      - name: Run update_drake.py
-        run: |
-          cd upstream_utils
-          ./update_drake.py
       - name: Run update_eigen.py
         run: |
           cd upstream_utils
@@ -41,6 +38,14 @@ jobs:
         run: |
           cd upstream_utils
           ./update_fmt.py
+      - name: Run update_gcem.py
+        run: |
+          cd upstream_utils
+          ./update_gcem.py
+      - name: Run update_json.py
+        run: |
+          cd upstream_utils
+          ./update_json.py
       - name: Run update_libuv.py
         run: |
           cd upstream_utils
@@ -61,6 +66,10 @@ jobs:
         run: |
           cd upstream_utils
           ./update_memory.py
+      - name: Run update_protobuf.py
+        run: |
+          cd upstream_utils
+          ./update_protobuf.py
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output

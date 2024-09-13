@@ -164,7 +164,10 @@ void DutyCycleEncoder::Reset() {
   if (m_counter) {
     m_counter->Reset();
   }
-  m_positionOffset = m_dutyCycle->GetOutput();
+  if (m_simPosition) {
+    m_simPosition.Set(0);
+  }
+  m_positionOffset = GetAbsolutePosition();
 }
 
 bool DutyCycleEncoder::IsConnected() const {

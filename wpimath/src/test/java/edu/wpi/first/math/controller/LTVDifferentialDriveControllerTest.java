@@ -87,9 +87,14 @@ class LTVDifferentialDriveControllerTest {
     final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
 
     var x =
-        new MatBuilder<>(Nat.N5(), Nat.N1())
-            .fill(
-                robotPose.getX(), robotPose.getY(), robotPose.getRotation().getRadians(), 0.0, 0.0);
+        MatBuilder.fill(
+            Nat.N5(),
+            Nat.N1(),
+            robotPose.getX(),
+            robotPose.getY(),
+            robotPose.getRotation().getRadians(),
+            0.0,
+            0.0);
 
     final var totalTime = trajectory.getTotalTimeSeconds();
     for (int i = 0; i < (totalTime / kDt); ++i) {
@@ -105,7 +110,7 @@ class LTVDifferentialDriveControllerTest {
           NumericalIntegration.rkdp(
               LTVDifferentialDriveControllerTest::dynamics,
               x,
-              new MatBuilder<>(Nat.N2(), Nat.N1()).fill(output.left, output.right),
+              VecBuilder.fill(output.left, output.right),
               kDt);
     }
 

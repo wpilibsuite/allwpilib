@@ -4,15 +4,13 @@
 
 #pragma once
 
+#include <Eigen/Core>
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
-#include "Rotation3d.h"
-#include "Translation2d.h"
+#include "frc/geometry/Rotation3d.h"
+#include "frc/geometry/Translation2d.h"
 #include "units/length.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 
@@ -51,6 +49,14 @@ class WPILIB_DLLEXPORT Translation3d {
   Translation3d(units::meter_t distance, const Rotation3d& angle);
 
   /**
+   * Constructs a Translation3d from the provided translation vector's X, Y, and
+   * Z components. The values are assumed to be in meters.
+   *
+   * @param vector The translation vector to represent.
+   */
+  explicit Translation3d(const Eigen::Vector3d& vector);
+
+  /**
    * Calculates the distance between two translations in 3D space.
    *
    * The distance between translations is defined as
@@ -82,6 +88,13 @@ class WPILIB_DLLEXPORT Translation3d {
    * @return The Z component of the translation.
    */
   constexpr units::meter_t Z() const { return m_z; }
+
+  /**
+   * Returns a vector representation of this translation.
+   *
+   * @return A Vector representation of this translation.
+   */
+  constexpr Eigen::Vector3d ToVector() const;
 
   /**
    * Returns the norm, or distance from the origin to the translation.
@@ -186,4 +199,6 @@ void from_json(const wpi::json& json, Translation3d& state);
 
 }  // namespace frc
 
-#include "Translation3d.inc"
+#include "frc/geometry/proto/Translation3dProto.h"
+#include "frc/geometry/struct/Translation3dStruct.h"
+#include "frc/geometry/Translation3d.inc"

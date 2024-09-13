@@ -13,13 +13,16 @@ from upstream_utils import (
 
 
 def main():
-    upstream_root = clone_repo("https://github.com/kthohr/gcem.git", "v1.16.0")
+    upstream_root = clone_repo("https://github.com/kthohr/gcem.git", "v1.17.0")
     wpilib_root = get_repo_root()
     wpimath = os.path.join(wpilib_root, "wpimath")
 
     # Apply patches to upstream Git repo
     os.chdir(upstream_root)
-    for f in []:
+    for f in [
+        "0001-Call-std-functions-if-not-constant-evaluated.patch",
+        "0002-Add-hypot-x-y-z.patch",
+    ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/gcem_patches", f))
 
     # Delete old install
@@ -30,9 +33,7 @@ def main():
 
     # Copy gcem include files into allwpilib
     include_files = walk_cwd_and_copy_if(
-        lambda dp, f: dp.endswith("include")
-        or dp.endswith("gcem_incl")
-        or dp.endswith("quadrature"),
+        lambda dp, f: dp.startswith("./include"),
         os.path.join(wpimath, "src/main/native/thirdparty/gcem"),
     )
 

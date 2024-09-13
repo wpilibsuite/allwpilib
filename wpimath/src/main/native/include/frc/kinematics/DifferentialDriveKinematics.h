@@ -8,7 +8,9 @@
 
 #include "frc/geometry/Twist2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "frc/kinematics/DifferentialDriveWheelPositions.h"
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
+#include "frc/kinematics/Kinematics.h"
 #include "units/angle.h"
 #include "units/length.h"
 #include "wpimath/MathShared.h"
@@ -22,7 +24,9 @@ namespace frc {
  * velocity components whereas forward kinematics converts left and right
  * component velocities into a linear and angular chassis speed.
  */
-class WPILIB_DLLEXPORT DifferentialDriveKinematics {
+class WPILIB_DLLEXPORT DifferentialDriveKinematics
+    : public Kinematics<DifferentialDriveWheelSpeeds,
+                        DifferentialDriveWheelPositions> {
  public:
   /**
    * Constructs a differential drive kinematics object.
@@ -46,7 +50,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics {
    * @return The chassis speed.
    */
   constexpr ChassisSpeeds ToChassisSpeeds(
-      const DifferentialDriveWheelSpeeds& wheelSpeeds) const {
+      const DifferentialDriveWheelSpeeds& wheelSpeeds) const override {
     return {(wheelSpeeds.left + wheelSpeeds.right) / 2.0, 0_mps,
             (wheelSpeeds.right - wheelSpeeds.left) / trackWidth * 1_rad};
   }
@@ -60,7 +64,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics {
    * @return The left and right velocities.
    */
   constexpr DifferentialDriveWheelSpeeds ToWheelSpeeds(
-      const ChassisSpeeds& chassisSpeeds) const {
+      const ChassisSpeeds& chassisSpeeds) const override {
     return {chassisSpeeds.vx - trackWidth / 2 * chassisSpeeds.omega / 1_rad,
             chassisSpeeds.vx + trackWidth / 2 * chassisSpeeds.omega / 1_rad};
   }
@@ -79,6 +83,15 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics {
             (rightDistance - leftDistance) / trackWidth * 1_rad};
   }
 
+  Twist2d ToTwist2d(const DifferentialDriveWheelPositions& start,
+                    const DifferentialDriveWheelPositions& end) const override {
+    return ToTwist2d(end.left - start.left, end.right - start.right);
+  }
+
+  /// Differential drive trackwidth.
   units::meter_t trackWidth;
 };
 }  // namespace frc
+
+#include "frc/kinematics/proto/DifferentialDriveKinematicsProto.h"
+#include "frc/kinematics/struct/DifferentialDriveKinematicsStruct.h"

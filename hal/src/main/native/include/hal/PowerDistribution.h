@@ -15,16 +15,14 @@
  * @{
  */
 
-// clang-format off
 /**
- * The acceptable accelerometer ranges.
+ * The types of power distribution devices.
  */
 HAL_ENUM(HAL_PowerDistributionType) {
   HAL_PowerDistributionType_kAutomatic = 0,
   HAL_PowerDistributionType_kCTRE = 1,
   HAL_PowerDistributionType_kRev = 2,
 };
-// clang-format on
 
 #define HAL_DEFAULT_POWER_DISTRIBUTION_MODULE -1
 
@@ -39,7 +37,7 @@ extern "C" {
  * @param[in] type               the type of module to initialize
  * @param[in] allocationLocation the location where the allocation is occurring
  * @param[out] status            Error status variable. 0 on success.
- * @return the created PowerDistribution
+ * @return the created PowerDistribution handle
  */
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     int32_t moduleNumber, HAL_PowerDistributionType type,
@@ -103,7 +101,9 @@ int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,
                                             int32_t* status);
 
 /**
- * Gets the temperature of the PowerDistribution.
+ * Gets the temperature of the Power Distribution Panel.
+ *
+ * Not supported on the Rev PDH and returns 0.
  *
  * @param[in] handle the module handle
  * @param[out] status Error status variable. 0 on success.
@@ -134,7 +134,7 @@ double HAL_GetPowerDistributionChannelCurrent(
     HAL_PowerDistributionHandle handle, int32_t channel, int32_t* status);
 
 /**
- * Gets the current of all 24 channels on the PowerDistribution.
+ * Gets the current of all channels on the PowerDistribution.
  *
  * The array must be large enough to hold all channels.
  *
@@ -158,7 +158,9 @@ double HAL_GetPowerDistributionTotalCurrent(HAL_PowerDistributionHandle handle,
                                             int32_t* status);
 
 /**
- * Gets the total power of the PowerDistribution.
+ * Gets the total power of the Power Distribution Panel.
+ *
+ * Not supported on the Rev PDH and returns 0.
  *
  * @param[in] handle the module handle
  * @param[out] status Error status variable. 0 on success.
@@ -168,7 +170,9 @@ double HAL_GetPowerDistributionTotalPower(HAL_PowerDistributionHandle handle,
                                           int32_t* status);
 
 /**
- * Gets the total energy of the PowerDistribution.
+ * Gets the total energy of the Power Distribution Panel.
+ *
+ * Not supported on the Rev PDH and returns 0.
  *
  * @param[in] handle the module handle
  * @param[out] status Error status variable. 0 on success.
@@ -179,6 +183,8 @@ double HAL_GetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle,
 
 /**
  * Resets the PowerDistribution accumulated energy.
+ *
+ * Not supported on the Rev PDH and does nothing.
  *
  * @param[in] handle the module handle
  * @param[out] status Error status variable. 0 on success.
@@ -214,16 +220,26 @@ void HAL_SetPowerDistributionSwitchableChannel(
  *
  * @param[in] handle the module handle
  * @param[out] status Error status variable. 0 on success.
+ * @return the state of the switchable channel
  */
 HAL_Bool HAL_GetPowerDistributionSwitchableChannel(
     HAL_PowerDistributionHandle handle, int32_t* status);
 
+/**
+ * Power distribution version.
+ */
 struct HAL_PowerDistributionVersion {
+  /// Firmware major version number.
   uint32_t firmwareMajor;
+  /// Firmware minor version number.
   uint32_t firmwareMinor;
+  /// Firmware fix version number.
   uint32_t firmwareFix;
+  /// Hardware minor version number.
   uint32_t hardwareMinor;
+  /// Hardware major version number.
   uint32_t hardwareMajor;
+  /// Unique ID.
   uint32_t uniqueId;
 };
 
@@ -291,15 +307,55 @@ struct HAL_PowerDistributionStickyFaults {
   uint32_t hasReset : 1;
 };
 
+/**
+ * Get the version of the PowerDistribution.
+ *
+ * @param[in] handle the module handle
+ * @param[out] version the HAL_PowerDistributionVersion to populate
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle,
                                      HAL_PowerDistributionVersion* version,
                                      int32_t* status);
+/**
+ * Get the current faults of the PowerDistribution.
+ *
+ * @param[in] handle the module handle
+ * @param[out] faults the HAL_PowerDistributionFaults to populate
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle,
                                     HAL_PowerDistributionFaults* faults,
                                     int32_t* status);
+
+/**
+ * Gets the sticky faults of the PowerDistribution.
+ *
+ * @param[in] handle the module handle
+ * @param[out] stickyFaults the HAL_PowerDistributionStickyFaults to populate
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_GetPowerDistributionStickyFaults(
     HAL_PowerDistributionHandle handle,
     HAL_PowerDistributionStickyFaults* stickyFaults, int32_t* status);
+
+void HAL_StartPowerDistributionStream(HAL_PowerDistributionHandle handle,
+                                      int32_t* status);
+
+typedef struct HAL_PowerDistributionChannelData {
+  float current;
+  int32_t channel;
+  uint32_t timestamp;
+} HAL_PowerDistributionChannelData;
+
+HAL_PowerDistributionChannelData* HAL_GetPowerDistributionStreamData(
+    HAL_PowerDistributionHandle handle, int32_t* count, int32_t* status);
+
+void HAL_FreePowerDistributionStreamData(HAL_PowerDistributionChannelData* data,
+                                         int32_t count);
+
+void HAL_StopPowerDistributionStream(HAL_PowerDistributionHandle handle,
+                                     int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

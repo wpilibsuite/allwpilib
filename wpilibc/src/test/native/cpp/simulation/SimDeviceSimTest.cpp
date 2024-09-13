@@ -4,10 +4,10 @@
 
 #include <string_view>
 
+#include <gtest/gtest.h>
 #include <hal/SimDevice.h>
 
 #include "frc/simulation/SimDeviceSim.h"
-#include "gtest/gtest.h"
 
 using namespace frc::sim;
 

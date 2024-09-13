@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -24,6 +24,12 @@
 
 #ifndef _gcem_expm1_HPP
 #define _gcem_expm1_HPP
+
+#include <cmath>
+#include <type_traits>
+
+namespace gcem
+{
 
 namespace internal
 {
@@ -70,7 +76,13 @@ return_t<T>
 expm1(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::expm1_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::expm1(x);
+  }
+}
+
 }
 
 #endif

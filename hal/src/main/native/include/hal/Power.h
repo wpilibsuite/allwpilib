@@ -67,6 +67,14 @@ HAL_Bool HAL_GetUserActive6V(int32_t* status);
 int32_t HAL_GetUserCurrentFaults6V(int32_t* status);
 
 /**
+ * Enables or disables the 6V rail.
+ *
+ * @param enabled whether the rail should be enabled
+ * @param[out] status the error code, or 0 for success
+ */
+void HAL_SetUserRailEnabled6V(HAL_Bool enabled, int32_t* status);
+
+/**
  * Gets the 5V rail voltage.
  *
  * @param[out] status the error code, or 0 for success
@@ -97,6 +105,14 @@ HAL_Bool HAL_GetUserActive5V(int32_t* status);
  * @return the number of 5V fault counts
  */
 int32_t HAL_GetUserCurrentFaults5V(int32_t* status);
+
+/**
+ * Enables or disables the 5V rail.
+ *
+ * @param enabled whether the rail should be enabled
+ * @param[out] status the error code, or 0 for success
+ */
+void HAL_SetUserRailEnabled5V(HAL_Bool enabled, int32_t* status);
 
 /**
  * Gets the 3V3 rail voltage.
@@ -131,6 +147,14 @@ HAL_Bool HAL_GetUserActive3V3(int32_t* status);
 int32_t HAL_GetUserCurrentFaults3V3(int32_t* status);
 
 /**
+ * Enables or disables the 3V3 rail.
+ *
+ * @param enabled whether the rail should be enabled
+ * @param[out] status the error code, or 0 for success
+ */
+void HAL_SetUserRailEnabled3V3(HAL_Bool enabled, int32_t* status);
+
+/**
  * Get the current brownout voltage setting.
  *
  * @param[out] status the error code, or 0 for success
@@ -148,6 +172,14 @@ double HAL_GetBrownoutVoltage(int32_t* status);
  * @param[out] status the error code, or 0 for success
  */
 void HAL_SetBrownoutVoltage(double voltage, int32_t* status);
+
+/**
+ * Get the current CPU temperature in degrees Celsius
+ *
+ * @param[out] status the error code, or 0 for success
+ * @return current CPU temperature in degrees Celsius
+ */
+double HAL_GetCPUTemp(int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

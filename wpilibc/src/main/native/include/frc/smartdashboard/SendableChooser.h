@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <concepts>
+#include <functional>
 #include <memory>
 #include <string_view>
 
@@ -27,23 +29,19 @@ namespace frc {
  * @see SmartDashboard
  */
 template <class T>
+  requires std::copy_constructible<T> && std::default_initializable<T>
 class SendableChooser : public SendableChooserBase {
   wpi::StringMap<T> m_choices;
-  static_assert(std::is_copy_constructible_v<T>,
-                "T must be copy-constructible!");
-  static_assert(std::is_default_constructible_v<T>,
-                "T must be default-constructible!");
-
+  std::function<void(T)> m_listener;
   template <class U>
   static U _unwrap_smart_ptr(const U& value);
-
-  template <class U>
-  static U* _unwrap_smart_ptr(const std::unique_ptr<U>& value);
 
   template <class U>
   static std::weak_ptr<U> _unwrap_smart_ptr(const std::shared_ptr<U>& value);
 
  public:
+  using CopyType = decltype(_unwrap_smart_ptr(m_choices.lookup("")));
+
   SendableChooser() = default;
   ~SendableChooser() override = default;
   SendableChooser(SendableChooser&& rhs) = default;
@@ -72,8 +70,8 @@ class SendableChooser : public SendableChooserBase {
   void SetDefaultOption(std::string_view name, T object);
 
   /**
-   * Returns a copy of the selected option (a raw pointer U* if T =
-   * std::unique_ptr<U> or a std::weak_ptr<U> if T = std::shared_ptr<U>).
+   * Returns a copy of the selected option (a std::weak_ptr<U> if T =
+   * std::shared_ptr<U>).
    *
    * If there is none selected, it will return the default. If there is none
    * selected and no default, then it will return a value-initialized instance.
@@ -82,9 +80,17 @@ class SendableChooser : public SendableChooserBase {
    *
    * @return The option selected
    */
-  auto GetSelected() -> decltype(_unwrap_smart_ptr(m_choices[""]));
+  CopyType GetSelected() const;
 
-  void InitSendable(nt::NTSendableBuilder& builder) override;
+  /**
+   * Bind a listener that's called when the selected value changes.
+   * Only one listener can be bound. Calling this function will replace the
+   * previous listener.
+   * @param listener The function to call that accepts the new value
+   */
+  void OnChange(std::function<void(T)>);
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };
 
 }  // namespace frc

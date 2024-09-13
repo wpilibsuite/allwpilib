@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -24,6 +24,9 @@
 
 #ifndef _gcem_lmgamma_HPP
 #define _gcem_lmgamma_HPP
+
+namespace gcem
+{
 
 namespace internal
 {
@@ -68,6 +71,8 @@ lmgamma(const T1 a, const T2 p)
 noexcept
 {
     return internal::lmgamma_recur(static_cast<return_t<T1>>(a),p);
+}
+
 }
 
 #endif

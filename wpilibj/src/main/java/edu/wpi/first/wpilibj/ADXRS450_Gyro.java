@@ -9,10 +9,10 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -26,21 +26,21 @@ import java.nio.ByteOrder;
  * <p>This class is for the digital ADXRS450 gyro sensor that connects via SPI. Only one instance of
  * an ADXRS Gyro is supported.
  */
-@SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXRS450_Gyro implements Gyro, Sendable {
+@SuppressWarnings("TypeName")
+public class ADXRS450_Gyro implements Sendable, AutoCloseable {
   private static final double kSamplePeriod = 0.0005;
   private static final double kCalibrationSampleTime = 5.0;
   private static final double kDegreePerSecondPerLSB = 0.0125;
 
-  private static final int kRateRegister = 0x00;
-  private static final int kTemRegister = 0x02;
-  private static final int kLoCSTRegister = 0x04;
-  private static final int kHiCSTRegister = 0x06;
-  private static final int kQuadRegister = 0x08;
-  private static final int kFaultRegister = 0x0A;
+  // private static final int kRateRegister = 0x00;
+  // private static final int kTemRegister = 0x02;
+  // private static final int kLoCSTRegister = 0x04;
+  // private static final int kHiCSTRegister = 0x06;
+  // private static final int kQuadRegister = 0x08;
+  // private static final int kFaultRegister = 0x0A;
   private static final int kPIDRegister = 0x0C;
-  private static final int kSNHighRegister = 0x0E;
-  private static final int kSNLowRegister = 0x10;
+  // private static final int kSNHighRegister = 0x0E;
+  // private static final int kSNLowRegister = 0x10;
 
   private SPI m_spi;
 
@@ -59,6 +59,7 @@ public class ADXRS450_Gyro implements Gyro, Sendable {
    *
    * @param port The SPI port that the gyro is connected to
    */
+  @SuppressWarnings("this-escape")
   public ADXRS450_Gyro(SPI.Port port) {
     m_spi = new SPI(port);
 
@@ -105,8 +106,15 @@ public class ADXRS450_Gyro implements Gyro, Sendable {
     return m_spi != null;
   }
 
-  @Override
-  public void calibrate() {
+  /**
+   * Calibrate the gyro by running for a number of samples and computing the center value. Then use
+   * the center value as the Accumulator center value for subsequent measurements.
+   *
+   * <p>It's important to make sure that the robot is not moving while the centering calculations
+   * are in progress, this is typically done when the robot is first turned on while it's sitting at
+   * rest before the competition starts.
+   */
+  public final void calibrate() {
     if (m_spi == null) {
       return;
     }
@@ -160,7 +168,12 @@ public class ADXRS450_Gyro implements Gyro, Sendable {
     return (buf.getInt(0) >> 5) & 0xffff;
   }
 
-  @Override
+  /**
+   * Reset the gyro.
+   *
+   * <p>Resets the gyro to a heading of zero. This can be used if there is significant drift in the
+   * gyro, and it needs to be recalibrated after it has been running.
+   */
   public void reset() {
     if (m_simAngle != null) {
       m_simAngle.reset();
@@ -184,7 +197,20 @@ public class ADXRS450_Gyro implements Gyro, Sendable {
     }
   }
 
-  @Override
+  /**
+   * Return the heading of the robot in degrees.
+   *
+   * <p>The angle is continuous, that is it will continue from 360 to 361 degrees. This allows
+   * algorithms that wouldn't want to see a discontinuity in the gyro output as it sweeps past from
+   * 360 to 0 on the second time around.
+   *
+   * <p>The angle is expected to increase as the gyro turns clockwise when looked at from the top.
+   * It needs to follow the NED axis convention.
+   *
+   * <p>This heading is based on integration of the returned rate from the gyro.
+   *
+   * @return the current heading of the robot in degrees.
+   */
   public double getAngle() {
     if (m_simAngle != null) {
       return m_simAngle.get();
@@ -195,7 +221,16 @@ public class ADXRS450_Gyro implements Gyro, Sendable {
     return m_spi.getAccumulatorIntegratedValue() * kDegreePerSecondPerLSB;
   }
 
-  @Override
+  /**
+   * Return the rate of rotation of the gyro.
+   *
+   * <p>The rate is based on the most recent reading of the gyro analog value
+   *
+   * <p>The rate is expected to be positive as the gyro turns clockwise when looked at from the top.
+   * It needs to follow the NED axis convention.
+   *
+   * @return the current rate in degrees per second
+   */
   public double getRate() {
     if (m_simRate != null) {
       return m_simRate.get();
@@ -204,6 +239,24 @@ public class ADXRS450_Gyro implements Gyro, Sendable {
       return 0.0;
     }
     return m_spi.getAccumulatorLastValue() * kDegreePerSecondPerLSB;
+  }
+
+  /**
+   * Return the heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
+   *
+   * <p>The angle is continuous, that is it will continue from 360 to 361 degrees. This allows
+   * algorithms that wouldn't want to see a discontinuity in the gyro output as it sweeps past from
+   * 360 to 0 on the second time around.
+   *
+   * <p>The angle is expected to increase as the gyro turns counterclockwise when looked at from the
+   * top. It needs to follow the NWU axis convention.
+   *
+   * <p>This heading is based on integration of the returned rate from the gyro.
+   *
+   * @return the current heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
+   */
+  public Rotation2d getRotation2d() {
+    return Rotation2d.fromDegrees(-getAngle());
   }
 
   @Override

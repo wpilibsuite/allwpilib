@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
-
 #include <string>
 #include <thread>
 
@@ -15,6 +13,7 @@
 #include <frc/simulation/PWMSim.h>
 #include <frc/simulation/SimHooks.h>
 #include <frc/system/plant/DCMotor.h>
+#include <gtest/gtest.h>
 #include <hal/simulation/MockHooks.h>
 #include <units/length.h>
 #include <units/mass.h>
@@ -38,7 +37,8 @@ class PotentiometerPIDTest : public testing::Test {
                                       kElevatorDrumRadius,
                                       0.0_m,
                                       Robot::kFullHeight,
-                                      true};
+                                      true,
+                                      0.0_m};
   frc::sim::PWMSim m_motorSim{Robot::kMotorChannel};
   frc::sim::AnalogInputSim m_analogSim{Robot::kPotChannel};
   frc::sim::JoystickSim m_joystickSim{Robot::kJoystickChannel};

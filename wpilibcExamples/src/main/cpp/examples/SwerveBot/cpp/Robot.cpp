@@ -50,7 +50,7 @@ class Robot : public frc::TimedRobot {
                          frc::ApplyDeadband(m_controller.GetRightX(), 0.02)) *
                      Drivetrain::kMaxAngularSpeed;
 
-    m_swerve.Drive(xSpeed, ySpeed, rot, fieldRelative);
+    m_swerve.Drive(xSpeed, ySpeed, rot, fieldRelative, GetPeriod());
   }
 };
 

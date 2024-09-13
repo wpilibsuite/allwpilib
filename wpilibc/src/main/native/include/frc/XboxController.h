@@ -16,6 +16,10 @@ namespace frc {
  * value is requested the most recent value is returned. There is a single class
  * instance for each controller and the mapping of ports to hardware buttons
  * depends on the code in the Driver Station.
+ *
+ * Only first party controllers from Microsoft are guaranteed to have the
+ * correct mapping, and only through the official NI DS. Sim is not guaranteed
+ * to have the same mapping, as well as any 3rd party controllers.
  */
 class XboxController : public GenericHID {
  public:
@@ -36,63 +40,87 @@ class XboxController : public GenericHID {
 
   /**
    * Get the X axis value of left side of the controller.
+   *
+   * @return the axis value
    */
   double GetLeftX() const;
 
   /**
    * Get the X axis value of right side of the controller.
+   *
+   * @return the axis value
    */
   double GetRightX() const;
 
   /**
    * Get the Y axis value of left side of the controller.
+   *
+   * @return the axis value
    */
   double GetLeftY() const;
 
   /**
    * Get the Y axis value of right side of the controller.
+   *
+   * @return the axis value
    */
   double GetRightY() const;
 
   /**
    * Get the left trigger (LT) axis value of the controller. Note that this axis
    * is bound to the range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * @return the axis value
    */
   double GetLeftTriggerAxis() const;
 
   /**
    * Get the right trigger (RT) axis value of the controller. Note that this
    * axis is bound to the range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * @return the axis value
    */
   double GetRightTriggerAxis() const;
 
   /**
    * Read the value of the left bumper (LB) button on the controller.
+   *
+   * @return the state of the button
    */
   bool GetLeftBumper() const;
 
   /**
    * Read the value of the right bumper (RB) button on the controller.
+   *
+   * @return the state of the button
    */
   bool GetRightBumper() const;
 
   /**
    * Whether the left bumper (LB) was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check
    */
   bool GetLeftBumperPressed();
 
   /**
    * Whether the right bumper (RB) was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check
    */
   bool GetRightBumperPressed();
 
   /**
    * Whether the left bumper (LB) was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
    */
   bool GetLeftBumperReleased();
 
   /**
    * Whether the right bumper (RB) was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
    */
   bool GetRightBumperReleased();
 
@@ -116,31 +144,43 @@ class XboxController : public GenericHID {
 
   /**
    * Read the value of the left stick button (LSB) on the controller.
+   *
+   * @return the state of the button
    */
   bool GetLeftStickButton() const;
 
   /**
    * Read the value of the right stick button (RSB) on the controller.
+   *
+   * @return the state of the button
    */
   bool GetRightStickButton() const;
 
   /**
    * Whether the left stick button (LSB) was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check.
    */
   bool GetLeftStickButtonPressed();
 
   /**
    * Whether the right stick button (RSB) was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check
    */
   bool GetRightStickButtonPressed();
 
   /**
    * Whether the left stick button (LSB) was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
    */
   bool GetLeftStickButtonReleased();
 
   /**
    * Whether the right stick button (RSB) was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
    */
   bool GetRightStickButtonReleased();
 
@@ -386,25 +426,43 @@ class XboxController : public GenericHID {
    */
   BooleanEvent RightTrigger(EventLoop* loop) const;
 
+  /** Represents a digital button on an XboxController. */
   struct Button {
+    /// Left bumper.
     static constexpr int kLeftBumper = 5;
+    /// Right bumper.
     static constexpr int kRightBumper = 6;
+    /// Left stick.
     static constexpr int kLeftStick = 9;
+    /// Right stick.
     static constexpr int kRightStick = 10;
+    /// A.
     static constexpr int kA = 1;
+    /// B.
     static constexpr int kB = 2;
+    /// X.
     static constexpr int kX = 3;
+    /// Y.
     static constexpr int kY = 4;
+    /// Back.
     static constexpr int kBack = 7;
+    /// Start.
     static constexpr int kStart = 8;
   };
 
+  /** Represents an axis on an XboxController. */
   struct Axis {
+    /// Left X.
     static constexpr int kLeftX = 0;
+    /// Right X.
     static constexpr int kRightX = 4;
+    /// Left Y.
     static constexpr int kLeftY = 1;
+    /// Right Y.
     static constexpr int kRightY = 5;
+    /// Left trigger.
     static constexpr int kLeftTrigger = 2;
+    /// Right trigger.
     static constexpr int kRightTrigger = 3;
   };
 };

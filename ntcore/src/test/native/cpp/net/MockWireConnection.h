@@ -20,37 +20,52 @@ namespace nt::net {
 
 class MockWireConnection : public WireConnection {
  public:
-  MockWireConnection() : m_text_os{m_text}, m_binary_os{m_binary} {}
+  MOCK_METHOD(unsigned int, GetVersion, (), (const, override));
+
+  MOCK_METHOD(void, SendPing, (uint64_t time), (override));
 
   MOCK_METHOD(bool, Ready, (), (const, override));
 
-  TextWriter SendText() override { return {m_text_os, *this}; }
-  BinaryWriter SendBinary() override { return {m_binary_os, *this}; }
-
-  MOCK_METHOD(void, Text, (std::string_view contents));
-  MOCK_METHOD(void, Binary, (std::span<const uint8_t> contents));
-
-  MOCK_METHOD(void, Flush, (), (override));
-
-  MOCK_METHOD(uint64_t, GetLastFlushTime, (), (const, override));
-
-  MOCK_METHOD(void, Disconnect, (std::string_view reason), (override));
-
- protected:
-  void StartSendText() override;
-  void FinishSendText() override;
-  void StartSendBinary() override {}
-  void FinishSendBinary() override {
-    Binary(m_binary);
-    m_binary.resize(0);
+  int WriteText(wpi::function_ref<void(wpi::raw_ostream& os)> writer) override {
+    std::string text;
+    wpi::raw_string_ostream os{text};
+    writer(os);
+    return DoWriteText(text);
+  }
+  int WriteBinary(
+      wpi::function_ref<void(wpi::raw_ostream& os)> writer) override {
+    std::vector<uint8_t> binary;
+    wpi::raw_uvector_ostream os{binary};
+    writer(os);
+    return DoWriteBinary(binary);
   }
 
- private:
-  std::string m_text;
-  wpi::raw_string_ostream m_text_os;
-  std::vector<uint8_t> m_binary;
-  wpi::raw_uvector_ostream m_binary_os;
-  bool m_in_text{false};
+  void SendText(wpi::function_ref<void(wpi::raw_ostream& os)> writer) override {
+    std::string text;
+    wpi::raw_string_ostream os{text};
+    writer(os);
+    DoSendText(text);
+  }
+  void SendBinary(
+      wpi::function_ref<void(wpi::raw_ostream& os)> writer) override {
+    std::vector<uint8_t> binary;
+    wpi::raw_uvector_ostream os{binary};
+    writer(os);
+    DoSendBinary(binary);
+  }
+
+  MOCK_METHOD(int, DoWriteText, (std::string_view contents));
+  MOCK_METHOD(int, DoWriteBinary, (std::span<const uint8_t> contents));
+
+  MOCK_METHOD(void, DoSendText, (std::string_view contents));
+  MOCK_METHOD(void, DoSendBinary, (std::span<const uint8_t> contents));
+
+  MOCK_METHOD(int, Flush, (), (override));
+
+  MOCK_METHOD(uint64_t, GetLastFlushTime, (), (const, override));
+  MOCK_METHOD(uint64_t, GetLastReceivedTime, (), (const, override));
+
+  MOCK_METHOD(void, Disconnect, (std::string_view reason), (override));
 };
 
 }  // namespace nt::net

@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Inches;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -14,6 +15,15 @@ import org.junit.jupiter.api.Test;
 
 class Translation3dTest {
   private static final double kEpsilon = 1E-9;
+
+  @Test
+  void testNewWithMeasures() {
+    var translation = new Translation3d(Inches.of(6), Inches.of(8), Inches.of(16));
+
+    assertEquals(0.1524, translation.getX(), kEpsilon);
+    assertEquals(0.2032, translation.getY(), kEpsilon);
+    assertEquals(0.4064, translation.getZ(), kEpsilon);
+  }
 
   @Test
   void testSum() {
@@ -149,5 +159,17 @@ class Translation3dTest {
         () -> assertEquals(1.0, two.getX(), kEpsilon),
         () -> assertEquals(Math.sqrt(3.0), two.getY(), kEpsilon),
         () -> assertEquals(0.0, two.getZ(), kEpsilon));
+  }
+
+  @Test
+  void testToVector() {
+    var vec = VecBuilder.fill(1.0, 2.0, 3.0);
+    var translation = new Translation3d(vec);
+
+    assertEquals(vec.get(0), translation.getX());
+    assertEquals(vec.get(1), translation.getY());
+    assertEquals(vec.get(2), translation.getZ());
+
+    assertEquals(vec, translation.toVector());
   }
 }

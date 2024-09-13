@@ -14,6 +14,7 @@
 #include <vector>
 
 #include <wpi/StringMap.h>
+#include <wpi/json_fwd.h>
 #include <wpi/mutex.h>
 
 #include "PropertyImpl.h"
@@ -23,7 +24,6 @@ namespace wpi {
 class Logger;
 template <typename T>
 class SmallVectorImpl;
-class json;
 }  // namespace wpi
 
 namespace cs {

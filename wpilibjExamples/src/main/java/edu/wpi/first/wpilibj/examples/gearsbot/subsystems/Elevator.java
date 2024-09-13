@@ -24,9 +24,7 @@ public class Elevator extends PIDSubsystem {
   public Elevator() {
     super(
         new PIDController(
-            ElevatorConstants.kP_real,
-            ElevatorConstants.kI_real,
-            ElevatorConstants.kD));
+            ElevatorConstants.kP_real, ElevatorConstants.kI_real, ElevatorConstants.kD));
 
     if (Robot.isSimulation()) { // Check for simulation and update PID values
       getController()

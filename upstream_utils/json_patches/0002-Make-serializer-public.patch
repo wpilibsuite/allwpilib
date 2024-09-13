@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Thu, 7 Sep 2023 22:02:27 -0700
+Subject: [PATCH 2/4] Make serializer public
+
+---
+ include/nlohmann/detail/output/serializer.hpp | 4 +++-
+ include/nlohmann/json.hpp                     | 3 +--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/include/nlohmann/detail/output/serializer.hpp b/include/nlohmann/detail/output/serializer.hpp
+index 500fc55ec5e5895ead2b372a6fe79ae941d88d83..7674d134a4d9f230aa4e432294c19dac8dd366b1 100644
+--- a/include/nlohmann/detail/output/serializer.hpp
++++ b/include/nlohmann/detail/output/serializer.hpp
+@@ -373,7 +373,7 @@ class serializer
+         }
+     }
+ 
+-  JSON_PRIVATE_UNLESS_TESTED:
++  public:
+     /*!
+     @brief dump escaped string
+ 
+@@ -696,6 +696,7 @@ class serializer
+         return false;
+     }
+ 
++  public:
+     /*!
+     @brief dump an integer
+ 
+@@ -876,6 +877,7 @@ class serializer
+         }
+     }
+ 
++  private:
+     /*!
+     @brief check whether a string is UTF-8 encoded
+ 
+diff --git a/include/nlohmann/json.hpp b/include/nlohmann/json.hpp
+index 18a7c875774527a2e08c5ab72e5564aa50381608..c462cade8a7167a00697f6f940be35c5609a283c 100644
+--- a/include/nlohmann/json.hpp
++++ b/include/nlohmann/json.hpp
+@@ -153,10 +153,9 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+     using binary_reader = ::nlohmann::detail::binary_reader<basic_json, InputType>;
+     template<typename CharType> using binary_writer = ::nlohmann::detail::binary_writer<basic_json, CharType>;
+ 
+-  JSON_PRIVATE_UNLESS_TESTED:
++  public:
+     using serializer = ::nlohmann::detail::serializer<basic_json>;
+ 
+-  public:
+     using value_t = detail::value_t;
+     /// JSON Pointer, see @ref nlohmann::json_pointer
+     using json_pointer = ::nlohmann::json_pointer<StringType>;

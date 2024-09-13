@@ -6,10 +6,10 @@ package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
 /** Closes the claw until the limit switch is tripped. */
-public class CloseClaw extends CommandBase {
+public class CloseClaw extends Command {
   private final Claw m_claw;
 
   public CloseClaw(Claw claw) {

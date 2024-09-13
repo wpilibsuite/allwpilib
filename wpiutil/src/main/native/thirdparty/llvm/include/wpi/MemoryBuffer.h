@@ -62,6 +62,11 @@ class MemoryBuffer {
 
   std::span<const uint8_t> GetBuffer() const { return {begin(), end()}; }
 
+  std::span<const char> GetCharBuffer() const {
+    return {reinterpret_cast<const char*>(begin()),
+            reinterpret_cast<const char*>(end())};
+  }
+
   /// Return an identifier for this buffer, typically the filename it was read
   /// from.
   virtual std::string_view GetBufferIdentifier() const {
@@ -145,6 +150,10 @@ class WritableMemoryBuffer : public MemoryBuffer {
   uint8_t* begin() { return const_cast<uint8_t*>(MemoryBuffer::begin()); }
   uint8_t* end() { return const_cast<uint8_t*>(MemoryBuffer::end()); }
   std::span<uint8_t> GetBuffer() { return {begin(), end()}; }
+  std::span<char> GetCharBuffer() const {
+    return {reinterpret_cast<char*>(const_cast<uint8_t*>(begin())),
+            reinterpret_cast<char*>(const_cast<uint8_t*>(end()))};
+  }
 
   static std::unique_ptr<WritableMemoryBuffer> GetFile(
       std::string_view filename, std::error_code& ec, int64_t fileSize = -1);
@@ -196,6 +205,10 @@ class WriteThroughMemoryBuffer : public MemoryBuffer {
   uint8_t* begin() { return const_cast<uint8_t*>(MemoryBuffer::begin()); }
   uint8_t* end() { return const_cast<uint8_t*>(MemoryBuffer::end()); }
   std::span<uint8_t> GetBuffer() { return {begin(), end()}; }
+  std::span<char> GetCharBuffer() const {
+    return {reinterpret_cast<char*>(const_cast<uint8_t*>(begin())),
+            reinterpret_cast<char*>(const_cast<uint8_t*>(end()))};
+  }
 
   static std::unique_ptr<WriteThroughMemoryBuffer> GetFile(
       std::string_view filename, std::error_code& ec, int64_t fileSize = -1);

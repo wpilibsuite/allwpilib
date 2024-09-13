@@ -12,8 +12,8 @@ void Drivetrain::SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds) {
   const double rightOutput = m_rightPIDController.Calculate(
       m_rightEncoder.GetRate(), speeds.right.value());
 
-  m_leftGroup.SetVoltage(units::volt_t{leftOutput} + leftFeedforward);
-  m_rightGroup.SetVoltage(units::volt_t{rightOutput} + rightFeedforward);
+  m_leftLeader.SetVoltage(units::volt_t{leftOutput} + leftFeedforward);
+  m_rightLeader.SetVoltage(units::volt_t{rightOutput} + rightFeedforward);
 }
 
 void Drivetrain::Drive(units::meters_per_second_t xSpeed,

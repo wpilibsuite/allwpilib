@@ -7,8 +7,9 @@ package edu.wpi.first.math.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
@@ -20,13 +21,13 @@ class ImplicitModelFollowerTest {
 
     var plant = LinearSystemId.identifyDrivetrainSystem(1.0, 1.0, 1.0, 1.0);
 
-    var imf = new ImplicitModelFollower<N2, N2, N2>(plant, plant);
+    var imf = new ImplicitModelFollower<>(plant, plant);
 
-    var x = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0.0, 0.0);
-    var xImf = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0.0, 0.0);
+    Matrix<N2, N1> x = VecBuilder.fill(0.0, 0.0);
+    Matrix<N2, N1> xImf = VecBuilder.fill(0.0, 0.0);
 
     // Forward
-    var u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(12.0, 12.0);
+    var u = VecBuilder.fill(12.0, 12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
       xImf = plant.calculateX(xImf, imf.calculate(xImf, u), dt);
@@ -36,7 +37,7 @@ class ImplicitModelFollowerTest {
     }
 
     // Backward
-    u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(-12.0, -12.0);
+    u = VecBuilder.fill(-12.0, -12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
       xImf = plant.calculateX(xImf, imf.calculate(xImf, u), dt);
@@ -46,7 +47,7 @@ class ImplicitModelFollowerTest {
     }
 
     // Rotate CCW
-    u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(-12.0, 12.0);
+    u = VecBuilder.fill(-12.0, 12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
       xImf = plant.calculateX(xImf, imf.calculate(xImf, u), dt);
@@ -65,13 +66,13 @@ class ImplicitModelFollowerTest {
     // Linear acceleration is slower, but angular acceleration is the same
     var plantRef = LinearSystemId.identifyDrivetrainSystem(1.0, 2.0, 1.0, 1.0);
 
-    var imf = new ImplicitModelFollower<N2, N2, N2>(plant, plantRef);
+    var imf = new ImplicitModelFollower<>(plant, plantRef);
 
-    var x = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0.0, 0.0);
-    var xImf = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0.0, 0.0);
+    Matrix<N2, N1> x = VecBuilder.fill(0.0, 0.0);
+    Matrix<N2, N1> xImf = VecBuilder.fill(0.0, 0.0);
 
     // Forward
-    var u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(12.0, 12.0);
+    var u = VecBuilder.fill(12.0, 12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
       xImf = plant.calculateX(xImf, imf.calculate(xImf, u), dt);
@@ -83,7 +84,7 @@ class ImplicitModelFollowerTest {
     // Backward
     x.fill(0.0);
     xImf.fill(0.0);
-    u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(-12.0, -12.0);
+    u = VecBuilder.fill(-12.0, -12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
       xImf = plant.calculateX(xImf, imf.calculate(xImf, u), dt);
@@ -95,7 +96,7 @@ class ImplicitModelFollowerTest {
     // Rotate CCW
     x.fill(0.0);
     xImf.fill(0.0);
-    u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(-12.0, 12.0);
+    u = VecBuilder.fill(-12.0, 12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
       xImf = plant.calculateX(xImf, imf.calculate(xImf, u), dt);

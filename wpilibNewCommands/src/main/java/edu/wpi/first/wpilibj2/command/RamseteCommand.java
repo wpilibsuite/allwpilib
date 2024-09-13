@@ -33,7 +33,7 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class RamseteCommand extends CommandBase {
+public class RamseteCommand extends Command {
   private final Timer m_timer = new Timer();
   private final boolean m_usePID;
   private final Trajectory m_trajectory;
@@ -70,6 +70,7 @@ public class RamseteCommand extends CommandBase {
    *     the robot drive.
    * @param requirements The subsystems to require.
    */
+  @SuppressWarnings("this-escape")
   public RamseteCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -109,6 +110,7 @@ public class RamseteCommand extends CommandBase {
    * @param outputMetersPerSecond A function that consumes the computed left and right wheel speeds.
    * @param requirements The subsystems to require.
    */
+  @SuppressWarnings("this-escape")
   public RamseteCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,

@@ -60,6 +60,8 @@ model {
                     return
                 }
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
+                lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -89,6 +91,8 @@ model {
                 targetBuildTypes 'debug'
                 binaries.all { binary ->
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                    lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
+                    lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -138,6 +142,8 @@ model {
                 targetBuildTypes 'debug'
                 binaries.all { binary ->
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                    lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
+                    lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -204,6 +210,8 @@ model {
     binaries {
         withType(GoogleTestTestSuiteBinarySpec) {
             lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+            lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
+            lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
             lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'

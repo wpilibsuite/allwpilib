@@ -6,6 +6,7 @@
 #define WPIUTIL_WPI_PRIORITY_QUEUE_H_
 
 #include <algorithm>
+#include <concepts>
 #include <functional>
 #include <utility>
 #include <vector>
@@ -22,11 +23,9 @@ namespace wpi {
  */
 template <typename T, typename Sequence = std::vector<T>,
           typename Compare = std::less<typename Sequence::value_type>>
+  requires std::same_as<T, typename Sequence::value_type>
 class priority_queue {
  public:
-  static_assert(std::is_same_v<T, typename Sequence::value_type>,
-                "value_type must be the same as the underlying container");
-
   using value_type = typename Sequence::value_type;
   using reference = typename Sequence::reference;
   using const_reference = typename Sequence::const_reference;
@@ -34,10 +33,9 @@ class priority_queue {
   using container_type = Sequence;
   using value_compare = Compare;
 
-  template <typename Seq = Sequence,
-            typename Requires = typename std::enable_if_t<
-                std::is_default_constructible<Compare>{} &&
-                std::is_default_constructible<Seq>{}>>
+  template <typename Seq = Sequence>
+    requires std::default_initializable<Compare> &&
+             std::default_initializable<Seq>
   priority_queue() {}
 
   priority_queue(const Compare& comp, const Sequence& c) : c(c), comp(comp) {
@@ -65,7 +63,10 @@ class priority_queue {
     std::make_heap(c.begin(), c.end(), comp);
   }
 
-  [[nodiscard]] bool empty() const { return c.empty(); }
+  [[nodiscard]]
+  bool empty() const {
+    return c.empty();
+  }
 
   size_type size() const { return c.size(); }
 

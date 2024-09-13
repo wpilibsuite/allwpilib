@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -20,6 +20,9 @@
 
 #ifndef _gcem_log_binomial_coef_HPP
 #define _gcem_log_binomial_coef_HPP
+
+namespace gcem
+{
 
 namespace internal
 {
@@ -60,6 +63,8 @@ log_binomial_coef(const T1 n, const T2 k)
 noexcept
 {
     return internal::log_binomial_coef_type_check(n,k);
+}
+
 }
 
 #endif

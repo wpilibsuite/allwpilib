@@ -9,14 +9,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.ADXL362;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 class ADXL362SimTest {
   @ParameterizedTest
-  @EnumSource(Accelerometer.Range.class)
-  void testAccel(Accelerometer.Range range) {
+  @EnumSource(ADXL362.Range.class)
+  void testAccel(ADXL362.Range range) {
     HAL.initialize(500, 0);
 
     try (ADXL362 accel = new ADXL362(SPI.Port.kMXP, range)) {

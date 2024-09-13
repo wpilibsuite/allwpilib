@@ -11,11 +11,12 @@ import edu.wpi.first.math.numbers.N4;
 import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 
+/** State-space utilities. */
 public final class StateSpaceUtil {
   private static Random rand = new Random();
 
   private StateSpaceUtil() {
-    // Utility class
+    throw new UnsupportedOperationException("This is a utility class!");
   }
 
   /**
@@ -79,7 +80,7 @@ public final class StateSpaceUtil {
       if (tolerances.get(i, 0) == Double.POSITIVE_INFINITY) {
         result.set(i, i, 0.0);
       } else {
-        result.set(i, i, 1.0 / (Math.pow(tolerances.get(i, 0), 2)));
+        result.set(i, i, 1.0 / Math.pow(tolerances.get(i, 0), 2));
       }
     }
 
@@ -90,7 +91,7 @@ public final class StateSpaceUtil {
    * Returns true if (A, B) is a stabilizable pair.
    *
    * <p>(A, B) is stabilizable if and only if the uncontrollable eigenvalues of A, if any, have
-   * absolute values less than one, where an eigenvalue is uncontrollable if rank(λI - A, B) %3C n
+   * absolute values less than one, where an eigenvalue is uncontrollable if rank([λI - A, B]) %3C n
    * where n is the number of states.
    *
    * @param <States> Num representing the size of A.
@@ -108,7 +109,7 @@ public final class StateSpaceUtil {
    * Returns true if (A, C) is a detectable pair.
    *
    * <p>(A, C) is detectable if and only if the unobservable eigenvalues of A, if any, have absolute
-   * values less than one, where an eigenvalue is unobservable if rank(λI - A; C) %3C n where n is
+   * values less than one, where an eigenvalue is unobservable if rank([λI - A; C]) %3C n where n is
    * the number of states.
    *
    * @param <States> Num representing the size of A.
@@ -139,7 +140,7 @@ public final class StateSpaceUtil {
    * @param u The input to clamp.
    * @param umin The minimum input magnitude.
    * @param umax The maximum input magnitude.
-   * @param <I> The number of inputs.
+   * @param <I> Number of inputs.
    * @return The clamped input.
    */
   public static <I extends Num> Matrix<I, N1> clampInputMaxMagnitude(
@@ -157,7 +158,7 @@ public final class StateSpaceUtil {
    *
    * @param u The input vector.
    * @param maxMagnitude The maximum magnitude any input can have.
-   * @param <I> The number of inputs.
+   * @param <I> Number of inputs.
    * @return The normalizedInput
    */
   public static <I extends Num> Matrix<I, N1> desaturateInputVector(

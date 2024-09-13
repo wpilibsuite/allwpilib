@@ -4,11 +4,11 @@
 
 #include <thread>
 
+#include <gtest/gtest.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
 #include "frc/Threads.h"
-#include "gtest/gtest.h"
 
 TEST(PriorityTest, SetThreadPriority) {
   bool exited = false;

@@ -26,18 +26,13 @@ ext {
                     srcDirs 'src/main/native/thirdparty/fmtlib/include'
                 }
             }
-            ghcCpp(CppSourceSet) {
-                exportedHeaders {
-                    srcDirs 'src/main/native/thirdparty/ghc/include'
-                }
-            }
             jsonCpp(CppSourceSet) {
                 source {
                     srcDirs 'src/main/native/thirdparty/json/cpp'
                     include '*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/fmtlib/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/fmtlib/include'
                 }
             }
             llvmCpp(CppSourceSet) {
@@ -46,7 +41,7 @@ ext {
                     include '**/*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/ghc/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include'
                 }
             }
             mpackCpp(CppSourceSet) {
@@ -67,11 +62,6 @@ ext {
                     srcDirs 'src/main/native/thirdparty/sigslot/include'
                 }
             }
-            tcbSpanCpp(CppSourceSet) {
-                exportedHeaders {
-                    srcDirs 'src/main/native/thirdparty/tcb_span/include'
-                }
-            }
             memoryCpp(CppSourceSet) {
                 source {
                     srcDirs 'src/main/native/thirdparty/memory/src', 'src/main/native/thirdparty/memory/include/wpi/memory'
@@ -80,6 +70,15 @@ ext {
                 exportedHeaders {
                     srcDirs 'src/main/native/thirdparty/memory/include'
                     include '**/*.hpp'
+                }
+            }
+            protobufCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/protobuf/src'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/protobuf/include'
                 }
             }
             resourcesCpp(CppSourceSet) {
@@ -101,7 +100,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/mpack/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/mpack/include'
                         include '**/*.h'
                     }
                 }
@@ -115,7 +114,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/mpack/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include'
                         include '**/*.h'
                     }
                 }
@@ -128,7 +127,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/mpack/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include'
                         include '**/*.h'
                     }
                 }
@@ -141,7 +140,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/mpack/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include'
                         include '**/*.h'
                     }
                 }
@@ -181,10 +180,10 @@ nativeUtils.exportsConfigs {
 }
 
 cppHeadersZip {
-    from('src/main/native/thirdparty/fmtlib/include') {
+    from('src/main/native/thirdparty/expected/include') {
         into '/'
     }
-    from('src/main/native/thirdparty/ghc/include') {
+    from('src/main/native/thirdparty/fmtlib/include') {
         into '/'
     }
     from('src/main/native/thirdparty/json/include') {
@@ -199,10 +198,10 @@ cppHeadersZip {
     from('src/main/native/thirdparty/sigslot/include') {
         into '/'
     }
-    from('src/main/native/thirdparty/tcb_span/include') {
+    from('src/main/native/thirdparty/memory/include') {
         into '/'
     }
-    from('src/main/native/thirdparty/memory/include') {
+    from('src/main/native/thirdparty/protobuf/include') {
         into '/'
     }
 }
@@ -223,6 +222,9 @@ cppSourcesZip {
     from('src/main/native/thirdparty/mpack/src') {
         into '/'
     }
+    from('src/main/native/thirdparty/protobuf/src') {
+        into '/'
+    }
     from('src/main/native/thirdparty/sigslot/src') {
         into '/'
     }
@@ -233,7 +235,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/ghc/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include'
                 }
             }
         }
@@ -261,6 +263,17 @@ model {
     }
 }
 
+model {
+    binaries {
+        all {
+            if (!(it instanceof NativeBinarySpec)) return
+                if (it.component.name != 'wpiutil' && it.component.name != 'wpiutilBase') return
+                if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) return
+                nativeUtils.useRequiredLibrary(it, 'chipobject_headers')
+        }
+    }
+}
+
 sourceSets {
     printlog
 }
@@ -272,9 +285,10 @@ task runPrintLog(type: JavaExec) {
 }
 
 dependencies {
-    api "com.fasterxml.jackson.core:jackson-annotations:2.12.4"
-    api "com.fasterxml.jackson.core:jackson-core:2.12.4"
-    api "com.fasterxml.jackson.core:jackson-databind:2.12.4"
+    api "com.fasterxml.jackson.core:jackson-annotations:2.15.2"
+    api "com.fasterxml.jackson.core:jackson-core:2.15.2"
+    api "com.fasterxml.jackson.core:jackson-databind:2.15.2"
+    api 'us.hebi.quickbuf:quickbuf-runtime:1.3.3'
 
     printlogImplementation sourceSets.main.output
 }

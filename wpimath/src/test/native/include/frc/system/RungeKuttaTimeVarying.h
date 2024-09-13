@@ -6,7 +6,6 @@
 
 #include <array>
 
-#include "frc/EigenCore.h"
 #include "units/time.h"
 
 namespace frc {

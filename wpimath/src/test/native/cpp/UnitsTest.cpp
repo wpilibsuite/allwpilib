@@ -7,10 +7,12 @@
 #include <string>
 #include <type_traits>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
 #include "units/acceleration.h"
 #include "units/angle.h"
 #include "units/angular_acceleration.h"
+#include "units/angular_jerk.h"
 #include "units/angular_velocity.h"
 #include "units/area.h"
 #include "units/capacitance.h"
@@ -51,6 +53,7 @@
 using namespace units::acceleration;
 using namespace units::angle;
 using namespace units::angular_acceleration;
+using namespace units::angular_jerk;
 using namespace units::angular_velocity;
 using namespace units::area;
 using namespace units::capacitance;
@@ -1420,7 +1423,7 @@ TEST_F(UnitContainer, cout) {
 }
 #endif
 
-#if !defined(UNIT_LIB_DISABLE_FMT)
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 TEST_F(UnitContainer, fmtlib) {
   testing::internal::CaptureStdout();
   fmt::print("{}", degree_t(349.87));
@@ -2000,6 +2003,23 @@ TEST_F(UnitConversion, angular_velocity) {
   EXPECT_NEAR(0.10471975512, test, 5.0e-13);
   test = convert<milliarcseconds_per_year, radians_per_second>(1.0);
   EXPECT_NEAR(1.537e-16, test, 5.0e-20);
+}
+
+TEST_F(UnitConversion, angular_jerk) {
+  double test;
+  bool same;
+
+  same =
+      std::is_same_v<radians_per_second_cubed,
+                   unit<std::ratio<1>, category::angular_jerk_unit>>;
+  EXPECT_TRUE(same);
+  same = traits::is_convertible_unit_v<deg_per_s_cu, radians_per_second_cubed>;
+  EXPECT_TRUE(same);
+
+  test = convert<degrees_per_second_cubed, radians_per_second_cubed>(1.0);
+  EXPECT_NEAR(0.0174533, test, 5.0e-8);
+  test = convert<turns_per_second_cubed, radians_per_second_cubed>(1.0);
+  EXPECT_NEAR(6.283185307, test, 5.0e-6);
 }
 
 TEST_F(UnitConversion, acceleration) {

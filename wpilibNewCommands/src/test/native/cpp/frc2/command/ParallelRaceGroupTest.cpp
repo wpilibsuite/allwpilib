@@ -23,7 +23,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceSchedule) {
   MockCommand* command2 = command2Holder.get();
   MockCommand* command3 = command3Holder.get();
 
-  ParallelRaceGroup group{tcb::make_vector<std::unique_ptr<Command>>(
+  ParallelRaceGroup group{make_vector<std::unique_ptr<Command>>(
       std::move(command1Holder), std::move(command2Holder),
       std::move(command3Holder))};
 
@@ -59,7 +59,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceInterrupt) {
   MockCommand* command2 = command2Holder.get();
   MockCommand* command3 = command3Holder.get();
 
-  ParallelRaceGroup group{tcb::make_vector<std::unique_ptr<Command>>(
+  ParallelRaceGroup group{make_vector<std::unique_ptr<Command>>(
       std::move(command1Holder), std::move(command2Holder),
       std::move(command3Holder))};
 
@@ -164,7 +164,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTwice) {
   MockCommand* command2 = command2Holder.get();
   MockCommand* command3 = command3Holder.get();
 
-  ParallelRaceGroup group{tcb::make_vector<std::unique_ptr<Command>>(
+  ParallelRaceGroup group{make_vector<std::unique_ptr<Command>>(
       std::move(command1Holder), std::move(command2Holder),
       std::move(command3Holder))};
 

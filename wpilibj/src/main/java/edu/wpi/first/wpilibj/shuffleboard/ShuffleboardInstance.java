@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 
 final class ShuffleboardInstance implements ShuffleboardRoot {
   private final Map<String, ShuffleboardTab> m_tabs = new LinkedHashMap<>();
-
+  private boolean m_reported = false; // NOPMD redundant field initializer
   private boolean m_tabsChanged = false; // NOPMD redundant field initializer
   private final NetworkTable m_rootTable;
   private final NetworkTable m_rootMetaTable;
@@ -35,12 +35,15 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
     m_rootMetaTable = m_rootTable.getSubTable(".metadata");
     m_selectedTabPub =
         m_rootMetaTable.getStringTopic("Selected").publish(PubSubOption.keepDuplicates(true));
-    HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
   }
 
   @Override
   public ShuffleboardTab getTab(String title) {
     requireNonNullParam(title, "title", "getTab");
+    if (!m_reported) {
+      HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
+      m_reported = true;
+    }
     if (!m_tabs.containsKey(title)) {
       m_tabs.put(title, new ShuffleboardTab(this, title));
       m_tabsChanged = true;

@@ -12,7 +12,7 @@ ConditionalCommand::ConditionalCommand(std::unique_ptr<Command>&& onTrue,
                                        std::unique_ptr<Command>&& onFalse,
                                        std::function<bool()> condition)
     : m_condition{std::move(condition)} {
-  CommandScheduler::GetInstance().RequireUngrouped(
+  CommandScheduler::GetInstance().RequireUngroupedAndUnscheduled(
       {onTrue.get(), onFalse.get()});
 
   m_onTrue = std::move(onTrue);
@@ -53,8 +53,20 @@ bool ConditionalCommand::RunsWhenDisabled() const {
   return m_runsWhenDisabled;
 }
 
+Command::InterruptionBehavior ConditionalCommand::GetInterruptionBehavior()
+    const {
+  if (m_onTrue->GetInterruptionBehavior() ==
+          InterruptionBehavior::kCancelSelf ||
+      m_onFalse->GetInterruptionBehavior() ==
+          InterruptionBehavior::kCancelSelf) {
+    return InterruptionBehavior::kCancelSelf;
+  } else {
+    return InterruptionBehavior::kCancelIncoming;
+  }
+}
+
 void ConditionalCommand::InitSendable(wpi::SendableBuilder& builder) {
-  CommandBase::InitSendable(builder);
+  Command::InitSendable(builder);
   builder.AddStringProperty(
       "onTrue", [this] { return m_onTrue->GetName(); }, nullptr);
   builder.AddStringProperty(

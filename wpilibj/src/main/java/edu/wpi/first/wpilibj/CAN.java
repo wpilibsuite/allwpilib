@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.CANAPIJNI;
+import edu.wpi.first.hal.CANAPITypes;
 import edu.wpi.first.hal.CANData;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -21,8 +22,11 @@ import java.io.Closeable;
  * calls.
  */
 public class CAN implements Closeable {
-  public static final int kTeamManufacturer = 8;
-  public static final int kTeamDeviceType = 10;
+  /** Team manufacturer. */
+  public static final int kTeamManufacturer = CANAPITypes.CANManufacturer.kTeamUse.id;
+
+  /** Team device type. */
+  public static final int kTeamDeviceType = CANAPITypes.CANDeviceType.kMiscellaneous.id;
 
   private final int m_handle;
 
@@ -171,5 +175,16 @@ public class CAN implements Closeable {
    */
   public boolean readPacketTimeout(int apiId, int timeoutMs, CANData data) {
     return CANAPIJNI.readCANPacketTimeout(m_handle, apiId, timeoutMs, data);
+  }
+
+  /**
+   * Reads the current value of the millisecond-resolution timer that {@link CANData} timestamps are
+   * based on.
+   *
+   * @return Current value of timer used as a base time for {@link CANData} timestamps in
+   *     milliseconds
+   */
+  public static long getTimestampBaseTime() {
+    return CANAPIJNI.getCANPacketBaseTime();
   }
 }

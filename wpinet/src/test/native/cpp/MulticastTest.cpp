@@ -12,9 +12,8 @@
 #include <thread>
 #include <utility>
 
+#include <gtest/gtest.h>
 #include <wpi/timestamp.h>
-
-#include "gtest/gtest.h"
 
 TEST(MulticastServiceAnnouncerTest, EmptyText) {
   const std::string_view serviceName = "TestServiceNoText";

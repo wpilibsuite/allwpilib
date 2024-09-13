@@ -30,11 +30,11 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp'
-                        include '**/*.cpp'
+                        srcDirs 'src/main/native/cpp', "$buildDir/generated/source/proto/main/cpp"
+                        include '**/*.cpp', '**/*.cc'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDirs 'src/main/native/include', "$buildDir/generated/source/proto/main/cpp"
                     }
                 }
             }
@@ -42,6 +42,9 @@ model {
                 if (it instanceof SharedLibraryBinarySpec) {
                     it.buildable = false
                     return
+                }
+                it.tasks.withType(CppCompile) {
+                    it.dependsOn generateProto
                 }
                 if (project.hasProperty('extraSetup')) {
                     extraSetup(it)
@@ -78,6 +81,31 @@ model {
                     }
                 }
             }
+            binaries.all {
+                lib library: nativeName, linkage: 'shared'
+                if (!project.hasProperty('noWpiutil')) {
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+                    }
+                }
+                if (project.hasProperty('exeSplitSetup')) {
+                    exeSplitSetup(it)
+                }
+            }
+        }
+        "${nativeName}TestLib"(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/testlib/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/test/native/include'
+                    }
+                }
+            }
         }
     }
     testSuites {
@@ -104,6 +132,17 @@ model {
     binaries {
         withType(GoogleTestTestSuiteBinarySpec) {
             lib library: nativeName, linkage: 'shared'
+            lib library: "${nativeName}TestLib", linkage: 'shared'
+            if (!project.hasProperty('noWpiutil')) {
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutilTestLib', linkage: 'shared'
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+                }
+            }
+            if (project.hasProperty('exeSplitSetup')) {
+                exeSplitSetup(it)
+            }
         }
     }
     tasks {
@@ -125,10 +164,12 @@ model {
                                 test.dependsOn it.tasks.install
                                 test.systemProperty 'java.library.path', filePath
                                 test.environment 'LD_LIBRARY_PATH', filePath
+                                test.environment 'DYLD_LIBRARY_PATH', filePath
                                 test.workingDir filePath
                                 run.dependsOn it.tasks.install
                                 run.systemProperty 'java.library.path', filePath
                                 run.environment 'LD_LIBRARY_PATH', filePath
+                                run.environment 'DYLD_LIBRARY_PATH', filePath
                                 run.workingDir filePath
 
                                 found = true
@@ -141,8 +182,7 @@ model {
     }
 }
 
-apply from: "${rootDir}/shared/cppDesktopTestTask.gradle"
-apply from: "${rootDir}/shared/javaDesktopTestTask.gradle"
+apply from: "${rootDir}/shared/cppJavaDesktopTestTask.gradle"
 
 tasks.withType(RunTestExecutable) {
     args "--gtest_output=xml:test_detail.xml"

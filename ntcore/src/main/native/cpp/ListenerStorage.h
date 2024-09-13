@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/DenseMap.h>
 #include <wpi/SafeThread.h>
 #include <wpi/SmallVector.h>
 #include <wpi/Synchronization.h>
@@ -19,16 +20,16 @@
 #include "Handle.h"
 #include "HandleMap.h"
 #include "IListenerStorage.h"
+#include "VectorSet.h"
 #include "ntcore_cpp.h"
 
 namespace nt {
 
 class ListenerStorage final : public IListenerStorage {
  public:
-  explicit ListenerStorage(int inst);
+  explicit ListenerStorage(int inst) : m_inst{inst} {}
   ListenerStorage(const ListenerStorage&) = delete;
   ListenerStorage& operator=(const ListenerStorage&) = delete;
-  ~ListenerStorage() final;
 
   // IListenerStorage interface
   void Activate(NT_Listener listenerHandle, unsigned int mask,
@@ -50,14 +51,16 @@ class ListenerStorage final : public IListenerStorage {
   NT_ListenerPoller CreateListenerPoller();
 
   // returns listener handle and mask for each listener that was destroyed
-  [[nodiscard]] std::vector<std::pair<NT_Listener, unsigned int>>
-  DestroyListenerPoller(NT_ListenerPoller pollerHandle);
+  [[nodiscard]]
+  std::vector<std::pair<NT_Listener, unsigned int>> DestroyListenerPoller(
+      NT_ListenerPoller pollerHandle);
 
   std::vector<Event> ReadListenerQueue(NT_ListenerPoller pollerHandle);
 
   // returns listener handle and mask for each listener that was destroyed
-  [[nodiscard]] std::vector<std::pair<NT_Listener, unsigned int>>
-  RemoveListener(NT_Listener listenerHandle);
+  [[nodiscard]]
+  std::vector<std::pair<NT_Listener, unsigned int>> RemoveListener(
+      NT_Listener listenerHandle);
 
   bool WaitForListenerQueue(double timeout);
 
@@ -95,21 +98,23 @@ class ListenerStorage final : public IListenerStorage {
   };
   HandleMap<ListenerData, 8> m_listeners;
 
-  // Utility wrapper for making a set-like vector
-  template <typename T>
-  class VectorSet : public std::vector<T> {
-   public:
-    void Add(T value) { this->push_back(value); }
-    void Remove(T value) { std::erase(*this, value); }
-  };
-
   VectorSet<ListenerData*> m_connListeners;
   VectorSet<ListenerData*> m_topicListeners;
   VectorSet<ListenerData*> m_valueListeners;
   VectorSet<ListenerData*> m_logListeners;
   VectorSet<ListenerData*> m_timeSyncListeners;
 
-  class Thread;
+  class Thread final : public wpi::SafeThreadEvent {
+   public:
+    explicit Thread(NT_ListenerPoller poller) : m_poller{poller} {}
+
+    void Main() final;
+
+    NT_ListenerPoller m_poller;
+    wpi::DenseMap<NT_Listener, ListenerCallback> m_callbacks;
+    wpi::Event m_waitQueueWakeup;
+    wpi::Event m_waitQueueWaiter;
+  };
   wpi::SafeThreadOwner<Thread> m_thread;
 };
 

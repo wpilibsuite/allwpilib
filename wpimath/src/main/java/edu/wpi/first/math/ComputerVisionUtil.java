@@ -7,6 +7,7 @@ package edu.wpi.first.math;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
+/** Computer vision utility functions. */
 public final class ComputerVisionUtil {
   private ComputerVisionUtil() {
     throw new AssertionError("utility class");

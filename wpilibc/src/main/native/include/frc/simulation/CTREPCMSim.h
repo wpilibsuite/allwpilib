@@ -33,21 +33,24 @@ class CTREPCMSim : public PneumaticsBaseSim {
 
   ~CTREPCMSim() override = default;
 
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify) override;
 
   bool GetInitialized() const override;
 
   void SetInitialized(bool initialized) override;
 
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterSolenoidOutputCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterSolenoidOutputCallback(
       int channel, NotifyCallback callback, bool initialNotify) override;
 
   bool GetSolenoidOutput(int channel) const override;
 
   void SetSolenoidOutput(int channel, bool solenoidOutput) override;
 
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterCompressorOnCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterCompressorOnCallback(
       NotifyCallback callback, bool initialNotify) override;
 
   bool GetCompressorOn() const override;
@@ -62,9 +65,9 @@ class CTREPCMSim : public PneumaticsBaseSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterClosedLoopEnabledCallback(NotifyCallback callback,
-                                    bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterClosedLoopEnabledCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Check whether the closed loop compressor control is active.
@@ -88,7 +91,8 @@ class CTREPCMSim : public PneumaticsBaseSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterPressureSwitchCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterPressureSwitchCallback(
       NotifyCallback callback, bool initialNotify) override;
 
   /**
@@ -112,9 +116,9 @@ class CTREPCMSim : public PneumaticsBaseSim {
    * @param initialNotify whether to call the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterCompressorCurrentCallback(NotifyCallback callback,
-                                    bool initialNotify) override;
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterCompressorCurrentCallback(
+      NotifyCallback callback, bool initialNotify) override;
 
   /**
    * Read the compressor current.

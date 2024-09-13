@@ -31,7 +31,9 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-mainClassName = 'frc.robot.Main'
+application {
+    mainClass = 'frc.robot.Main'
+}
 
 apply plugin: 'com.github.johnrengelman.shadow'
 
@@ -51,6 +53,7 @@ dependencies {
     implementation project(':cscore')
     implementation project(':cameraserver')
     implementation project(':wpilibNewCommands')
+    implementation project(':apriltag')
 }
 
 tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
@@ -127,7 +130,7 @@ deploy {
                 myRobotJava(JavaArtifact) {
                     jarTask = shadowJar
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseG1GC -XX:MaxGCPauseMillis=1 -XX:GCTimeRatio=1 -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/lvuser/myRobot-all.jar' > /home/lvuser/robotCommand")
+                        ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseSerialGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/lvuser/myRobot-all.jar' > /home/lvuser/robotCommand")
                         ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
                     }
                 }
@@ -182,6 +185,7 @@ model {
                         deploy.targets.roborio.artifacts.myRobotCppJava.binary = binary
                     }
                 }
+                lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -230,6 +234,7 @@ model {
                         deploy.targets.roborio.artifacts.myRobotCppStatic.binary = binary
                     }
                 }
+                lib project: ':apriltag', library: 'apriltag', linkage: 'static'
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
@@ -265,6 +270,7 @@ model {
                                 run.dependsOn it.tasks.install
                                 run.systemProperty 'java.library.path', filePath
                                 run.environment 'LD_LIBRARY_PATH', filePath
+                                run.environment 'DYLD_LIBRARY_PATH', filePath
 
                                 def installTask = it.tasks.install
 

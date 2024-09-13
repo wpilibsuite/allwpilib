@@ -5,10 +5,32 @@
 package edu.wpi.first.math;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.wpilibj.UtilityClassTest;
 import org.junit.jupiter.api.Test;
 
-class MathUtilTest {
+class MathUtilTest extends UtilityClassTest<MathUtil> {
+  MathUtilTest() {
+    super(MathUtil.class);
+  }
+
+  @Test
+  void testClamp() {
+    // int
+    assertEquals(5, MathUtil.clamp(10, 1, 5));
+
+    // double
+    assertEquals(5.5, MathUtil.clamp(10.5, 1.5, 5.5));
+
+    // negative int
+    assertEquals(-5, MathUtil.clamp(-10, -5, -1));
+
+    // negative double
+    assertEquals(-5.5, MathUtil.clamp(-10.5, -5.5, -1.5));
+  }
+
   @Test
   void testApplyDeadbandUnityScale() {
     // < 0
@@ -87,5 +109,62 @@ class MathUtilTest {
     assertEquals(MathUtil.angleModulus(-5 * Math.PI), Math.PI);
     assertEquals(MathUtil.angleModulus(Math.PI / 2), Math.PI / 2);
     assertEquals(MathUtil.angleModulus(-Math.PI / 2), -Math.PI / 2);
+  }
+
+  @Test
+  void testInterpolate() {
+    assertEquals(50, MathUtil.interpolate(0, 100, 0.5));
+    assertEquals(-50, MathUtil.interpolate(0, -100, 0.5));
+    assertEquals(0, MathUtil.interpolate(-50, 50, 0.5));
+    assertEquals(-25, MathUtil.interpolate(-50, 50, 0.25));
+    assertEquals(25, MathUtil.interpolate(-50, 50, 0.75));
+
+    assertEquals(0, MathUtil.interpolate(0, -100, -0.5));
+  }
+
+  @Test
+  void testIsNear() {
+    // The answer is always 42
+    // Positive integer checks
+    assertTrue(MathUtil.isNear(42, 42, 1));
+    assertTrue(MathUtil.isNear(42, 41, 2));
+    assertTrue(MathUtil.isNear(42, 43, 2));
+    assertFalse(MathUtil.isNear(42, 44, 1));
+
+    // Negative integer checks
+    assertTrue(MathUtil.isNear(-42, -42, 1));
+    assertTrue(MathUtil.isNear(-42, -41, 2));
+    assertTrue(MathUtil.isNear(-42, -43, 2));
+    assertFalse(MathUtil.isNear(-42, -44, 1));
+
+    // Mixed sign integer checks
+    assertFalse(MathUtil.isNear(-42, 42, 1));
+    assertFalse(MathUtil.isNear(-42, 41, 2));
+    assertFalse(MathUtil.isNear(-42, 43, 2));
+    assertFalse(MathUtil.isNear(42, -42, 1));
+    assertFalse(MathUtil.isNear(42, -41, 2));
+    assertFalse(MathUtil.isNear(42, -43, 2));
+
+    // Floating point checks
+    assertTrue(MathUtil.isNear(42, 41.5, 1));
+    assertTrue(MathUtil.isNear(42, 42.5, 1));
+    assertTrue(MathUtil.isNear(42, 41.5, 0.75));
+    assertTrue(MathUtil.isNear(42, 42.5, 0.75));
+
+    // Wraparound checks
+    assertTrue(MathUtil.isNear(0, 356, 5, 0, 360));
+    assertTrue(MathUtil.isNear(0, -356, 5, 0, 360));
+    assertTrue(MathUtil.isNear(0, 4, 5, 0, 360));
+    assertTrue(MathUtil.isNear(0, -4, 5, 0, 360));
+    assertTrue(MathUtil.isNear(400, 41, 5, 0, 360));
+    assertTrue(MathUtil.isNear(400, -319, 5, 0, 360));
+    assertTrue(MathUtil.isNear(400, 401, 5, 0, 360));
+    assertFalse(MathUtil.isNear(0, 356, 2.5, 0, 360));
+    assertFalse(MathUtil.isNear(0, -356, 2.5, 0, 360));
+    assertFalse(MathUtil.isNear(0, 4, 2.5, 0, 360));
+    assertFalse(MathUtil.isNear(0, -4, 2.5, 0, 360));
+    assertFalse(MathUtil.isNear(400, 35, 5, 0, 360));
+    assertFalse(MathUtil.isNear(400, -315, 5, 0, 360));
+    assertFalse(MathUtil.isNear(400, 395, 5, 0, 360));
   }
 }

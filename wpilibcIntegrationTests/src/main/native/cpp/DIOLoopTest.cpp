@@ -6,6 +6,7 @@
 
 #include "frc/DigitalOutput.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <units/math.h>
 #include <units/time.h>
 
@@ -14,7 +15,6 @@
 #include "frc/Counter.h"
 #include "frc/SynchronousInterrupt.h"
 #include "frc/Timer.h"
-#include "gtest/gtest.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)

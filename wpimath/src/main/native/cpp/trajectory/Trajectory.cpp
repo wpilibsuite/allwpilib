@@ -5,6 +5,7 @@
 #include "frc/trajectory/Trajectory.h"
 
 #include <algorithm>
+#include <stdexcept>
 
 #include <wpi/MathExtras.h>
 #include <wpi/json.h>
@@ -54,10 +55,20 @@ Trajectory::State Trajectory::State::Interpolate(State endValue,
 }
 
 Trajectory::Trajectory(const std::vector<State>& states) : m_states(states) {
+  if (m_states.empty()) {
+    throw std::invalid_argument(
+        "Trajectory manually initialized with no states.");
+  }
+
   m_totalTime = states.back().t;
 }
 
 Trajectory::State Trajectory::Sample(units::second_t t) const {
+  if (m_states.empty()) {
+    throw std::runtime_error(
+        "Trajectory cannot be sampled if it has no states.");
+  }
+
   if (t <= m_states.front().t) {
     return m_states.front();
   }

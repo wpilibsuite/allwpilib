@@ -12,6 +12,7 @@
 
 #include "wpi/SmallSet.h"
 #include "gtest/gtest.h"
+#include <algorithm>
 #include <string>
 
 using namespace wpi;
@@ -20,11 +21,17 @@ TEST(SmallSetTest, Insert) {
 
   SmallSet<int, 4> s1;
 
-  for (int i = 0; i < 4; i++)
-    s1.insert(i);
+  for (int i = 0; i < 4; i++) {
+    auto InsertResult = s1.insert(i);
+    EXPECT_EQ(*InsertResult.first, i);
+    EXPECT_EQ(InsertResult.second, true);
+  }
 
-  for (int i = 0; i < 4; i++)
-    s1.insert(i);
+  for (int i = 0; i < 4; i++) {
+    auto InsertResult = s1.insert(i);
+    EXPECT_EQ(*InsertResult.first, i);
+    EXPECT_EQ(InsertResult.second, false);
+  }
 
   EXPECT_EQ(4u, s1.size());
 
@@ -37,8 +44,17 @@ TEST(SmallSetTest, Insert) {
 TEST(SmallSetTest, Grow) {
   SmallSet<int, 4> s1;
 
-  for (int i = 0; i < 8; i++)
-    s1.insert(i);
+  for (int i = 0; i < 8; i++) {
+    auto InsertResult = s1.insert(i);
+    EXPECT_EQ(*InsertResult.first, i);
+    EXPECT_EQ(InsertResult.second, true);
+  }
+
+  for (int i = 0; i < 8; i++) {
+    auto InsertResult = s1.insert(i);
+    EXPECT_EQ(*InsertResult.first, i);
+    EXPECT_EQ(InsertResult.second, false);
+  }
 
   EXPECT_EQ(8u, s1.size());
 

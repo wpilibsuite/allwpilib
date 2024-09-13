@@ -20,9 +20,8 @@ namespace frc {
 class WPILIB_DLLEXPORT DifferentialDriveKinematicsConstraint
     : public TrajectoryConstraint {
  public:
-  DifferentialDriveKinematicsConstraint(
-      const DifferentialDriveKinematics& kinematics,
-      units::meters_per_second_t maxSpeed);
+  DifferentialDriveKinematicsConstraint(DifferentialDriveKinematics kinematics,
+                                        units::meters_per_second_t maxSpeed);
 
   units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,

@@ -10,8 +10,11 @@
 
 namespace frc {
 struct CANData {
+  /** Contents of the CAN packet. */
   uint8_t data[8];
+  /** Length of packet in bytes. */
   int32_t length;
+  /** CAN frame timestamp in milliseconds. */
   uint64_t timestamp;
 };
 
@@ -158,7 +161,19 @@ class CAN {
    */
   bool ReadPacketTimeout(int apiId, int timeoutMs, CANData* data);
 
+  /**
+   * Reads the current value of the millisecond-resolution timer that CANData
+   * timestamps are based on
+   *
+   * @return Current value of timer used as a base time for CANData timestamps
+   * in milliseconds
+   */
+  static uint64_t GetTimestampBaseTime();
+
+  /// Team manufacturer.
   static constexpr HAL_CANManufacturer kTeamManufacturer = HAL_CAN_Man_kTeamUse;
+
+  /// Team device type.
   static constexpr HAL_CANDeviceType kTeamDeviceType =
       HAL_CAN_Dev_kMiscellaneous;
 

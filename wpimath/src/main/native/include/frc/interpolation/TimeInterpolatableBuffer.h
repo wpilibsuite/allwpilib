@@ -64,7 +64,7 @@ class TimeInterpolatableBuffer {
    * @param sample The sample object.
    */
   void AddSample(units::second_t time, T sample) {
-    // Add the new state into the vector.
+    // Add the new state into the vector
     if (m_pastSnapshots.size() == 0 || time > m_pastSnapshots.back().first) {
       m_pastSnapshots.emplace_back(time, sample);
     } else {
@@ -72,20 +72,17 @@ class TimeInterpolatableBuffer {
           m_pastSnapshots.begin(), m_pastSnapshots.end(), time,
           [](auto t, const auto& pair) { return t < pair.first; });
 
-      // Don't access this before ensuring first_after isn't first.
-      auto last_not_greater_than = first_after - 1;
-
-      if (first_after == m_pastSnapshots.begin() ||
-          last_not_greater_than == m_pastSnapshots.begin() ||
-          last_not_greater_than->first < time) {
-        // Two cases handled together:
-        // 1. All entries come after the sample
-        // 2. Some entries come before the sample, but none are recorded with
-        // the same time
-        m_pastSnapshots.insert(first_after, std::pair(time, sample));
+      if (first_after == m_pastSnapshots.begin()) {
+        // All entries come after the sample
+        m_pastSnapshots.insert(first_after, std::pair{time, sample});
+      } else if (auto last_not_greater_than = first_after - 1;
+                 last_not_greater_than == m_pastSnapshots.begin() ||
+                 last_not_greater_than->first < time) {
+        // Some entries come before the sample, but none are recorded with the
+        // same time
+        m_pastSnapshots.insert(first_after, std::pair{time, sample});
       } else {
-        // Final case:
-        // 3. An entry exists with the same recorded time.
+        // An entry exists with the same recorded time
         last_not_greater_than->second = sample;
       }
     }

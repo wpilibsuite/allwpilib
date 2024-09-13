@@ -8,6 +8,7 @@
 
 #include <fmt/format.h>
 #include <hal/DriverStation.h>
+#include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
 
 #include "frc/DSControlWord.h"
@@ -23,6 +24,8 @@ IterativeRobotBase::IterativeRobotBase(units::second_t period)
       m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
 
 void IterativeRobotBase::RobotInit() {}
+
+void IterativeRobotBase::DriverStationConnected() {}
 
 void IterativeRobotBase::SimulationInit() {}
 
@@ -95,9 +98,15 @@ void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
 }
 
 void IterativeRobotBase::EnableLiveWindowInTest(bool testLW) {
+  static bool hasReported;
   if (IsTestEnabled()) {
     throw FRC_MakeError(err::IncompatibleMode,
                         "Can't configure test mode while in test mode!");
+  }
+  if (!hasReported && testLW) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard,
+               HALUsageReporting::kSmartDashboard_LiveWindow);
+    hasReported = true;
   }
   m_lwEnabledInTest = testLW;
 }
@@ -125,6 +134,11 @@ void IterativeRobotBase::LoopFunc() {
     mode = Mode::kTeleop;
   } else if (word.IsTest()) {
     mode = Mode::kTest;
+  }
+
+  if (!m_calledDsConnected && word.IsDSAttached()) {
+    m_calledDsConnected = true;
+    DriverStationConnected();
   }
 
   // If mode changed, call mode exit and entry functions

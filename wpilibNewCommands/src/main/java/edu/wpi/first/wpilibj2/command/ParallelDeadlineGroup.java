@@ -20,8 +20,7 @@ import java.util.Map;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-@SuppressWarnings("removal")
-public class ParallelDeadlineGroup extends CommandGroupBase {
+public class ParallelDeadlineGroup extends Command {
   // maps commands in this composition to whether they are still running
   private final Map<Command, Boolean> m_commands = new HashMap<>();
   private boolean m_runWhenDisabled = true;
@@ -30,20 +29,18 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
   /**
-   * Creates a new ParallelDeadlineGroup. The given commands (including the deadline) will be
+   * Creates a new ParallelDeadlineGroup. The given commands, including the deadline, will be
    * executed simultaneously. The composition will finish when the deadline finishes, interrupting
    * all other still-running commands. If the composition is interrupted, only the commands still
    * running will be interrupted.
    *
    * @param deadline the command that determines when the composition ends
-   * @param commands the commands to be executed
+   * @param otherCommands the other commands to be executed
+   * @throws IllegalArgumentException if the deadline command is also in the otherCommands argument
    */
-  public ParallelDeadlineGroup(Command deadline, Command... commands) {
-    m_deadline = deadline;
-    addCommands(commands);
-    if (!m_commands.containsKey(deadline)) {
-      addCommands(deadline);
-    }
+  public ParallelDeadlineGroup(Command deadline, Command... otherCommands) {
+    addCommands(otherCommands);
+    setDeadline(deadline);
   }
 
   /**
@@ -51,15 +48,27 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
    * contained.
    *
    * @param deadline the command that determines when the group ends
+   * @throws IllegalArgumentException if the deadline command is already in the composition
    */
-  public void setDeadline(Command deadline) {
-    if (!m_commands.containsKey(deadline)) {
-      addCommands(deadline);
+  public final void setDeadline(Command deadline) {
+    @SuppressWarnings("PMD.CompareObjectsWithEquals")
+    boolean isAlreadyDeadline = deadline == m_deadline;
+    if (isAlreadyDeadline) {
+      return;
     }
+    if (m_commands.containsKey(deadline)) {
+      throw new IllegalArgumentException(
+          "The deadline command cannot also be in the other commands!");
+    }
+    addCommands(deadline);
     m_deadline = deadline;
   }
 
-  @Override
+  /**
+   * Adds the given commands to the group.
+   *
+   * @param commands Commands to add to the group.
+   */
   public final void addCommands(Command... commands) {
     if (!m_finished) {
       throw new IllegalStateException(
@@ -71,7 +80,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
     for (Command command : commands) {
       if (!Collections.disjoint(command.getRequirements(), m_requirements)) {
         throw new IllegalArgumentException(
-            "Multiple commands in a parallel group cannot" + "require the same subsystems");
+            "Multiple commands in a parallel group cannot require the same subsystems");
       }
       m_commands.put(command, false);
       m_requirements.addAll(command.getRequirements());

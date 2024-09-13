@@ -4,6 +4,10 @@
 
 package edu.wpi.first.math.geometry;
 
+import edu.wpi.first.math.geometry.proto.Twist3dProto;
+import edu.wpi.first.math.geometry.struct.Twist3dStruct;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /**
@@ -12,7 +16,7 @@ import java.util.Objects;
  *
  * <p>A Twist can be used to represent a difference between two poses.
  */
-public class Twist3d {
+public class Twist3d implements ProtobufSerializable, StructSerializable {
   /** Linear "dx" component. */
   public double dx;
 
@@ -31,6 +35,7 @@ public class Twist3d {
   /** Rotation vector z component (radians). */
   public double rz;
 
+  /** Default constructor. */
   public Twist3d() {}
 
   /**
@@ -82,4 +87,10 @@ public class Twist3d {
   public int hashCode() {
     return Objects.hash(dx, dy, dz, rx, ry, rz);
   }
+
+  /** Twist3d protobuf for serialization. */
+  public static final Twist3dProto proto = new Twist3dProto();
+
+  /** Twist3d struct for serialization. */
+  public static final Twist3dStruct struct = new Twist3dStruct();
 }

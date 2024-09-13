@@ -17,20 +17,35 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
 public class Joystick extends GenericHID {
+  /** Default X axis channel. */
   public static final byte kDefaultXChannel = 0;
+
+  /** Default Y axis channel. */
   public static final byte kDefaultYChannel = 1;
+
+  /** Default Z axis channel. */
   public static final byte kDefaultZChannel = 2;
+
+  /** Default twist axis channel. */
   public static final byte kDefaultTwistChannel = 2;
+
+  /** Default throttle axis channel. */
   public static final byte kDefaultThrottleChannel = 3;
 
   /** Represents an analog axis on a joystick. */
   public enum AxisType {
+    /** X axis. */
     kX(0),
+    /** Y axis. */
     kY(1),
+    /** Z axis. */
     kZ(2),
+    /** Twist axis. */
     kTwist(3),
+    /** Throttle axis. */
     kThrottle(4);
 
+    /** AxisType value. */
     public final int value;
 
     AxisType(int value) {
@@ -40,9 +55,12 @@ public class Joystick extends GenericHID {
 
   /** Represents a digital button on a joystick. */
   public enum ButtonType {
+    /** kTrigger. */
     kTrigger(1),
+    /** kTop. */
     kTop(2);
 
+    /** ButtonType value. */
     public final int value;
 
     ButtonType(int value) {
@@ -184,7 +202,7 @@ public class Joystick extends GenericHID {
    *
    * @return the z position
    */
-  public double getZ() {
+  public final double getZ() {
     return getRawAxis(m_axes[AxisType.kZ.value]);
   }
 
@@ -194,7 +212,7 @@ public class Joystick extends GenericHID {
    *
    * @return The Twist value of the joystick.
    */
-  public double getTwist() {
+  public final double getTwist() {
     return getRawAxis(m_axes[AxisType.kTwist.value]);
   }
 
@@ -204,7 +222,7 @@ public class Joystick extends GenericHID {
    *
    * @return The Throttle value of the joystick.
    */
-  public double getThrottle() {
+  public final double getThrottle() {
     return getRawAxis(m_axes[AxisType.kThrottle.value]);
   }
 

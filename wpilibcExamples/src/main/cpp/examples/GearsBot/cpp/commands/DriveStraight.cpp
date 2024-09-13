@@ -10,13 +10,15 @@
 
 DriveStraight::DriveStraight(double distance, Drivetrain& drivetrain)
     : frc2::CommandHelper<frc2::PIDCommand, DriveStraight>{
-          frc2::PIDController{4, 0, 0},
+          frc::PIDController{DriveStraightConstants::kP,
+                             DriveStraightConstants::kI,
+                             DriveStraightConstants::kD},
           [&drivetrain] { return drivetrain.GetDistance(); },
           distance,
           [&drivetrain](double output) { drivetrain.Drive(output, output); },
           {&drivetrain}},
       m_drivetrain{&drivetrain} {
-  m_controller.SetTolerance(0.01);
+  m_controller.SetTolerance(DriveStraightConstants::kTolerance);
 }
 
 // Called just before this Command runs the first time

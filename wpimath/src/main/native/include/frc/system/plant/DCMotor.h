@@ -26,19 +26,28 @@ class WPILIB_DLLEXPORT DCMotor {
       units::unit_t<units::compound_unit<units::newton_meters,
                                          units::inverse<units::ampere>>>;
 
+  /// Voltage at which the motor constants were measured.
   units::volt_t nominalVoltage;
+
+  /// Torque when stalled.
   units::newton_meter_t stallTorque;
+
+  /// Current draw when stalled.
   units::ampere_t stallCurrent;
+
+  /// Current draw under no load.
   units::ampere_t freeCurrent;
+
+  /// Angular velocity under no load.
   units::radians_per_second_t freeSpeed;
 
-  // Resistance of motor
+  /// Motor internal resistance.
   units::ohm_t R;
 
-  // Motor velocity constant
+  /// Motor velocity constant.
   radians_per_second_per_volt_t Kv;
 
-  // Torque constant
+  /// Motor torque constant.
   newton_meters_per_ampere_t Kt;
 
   /**
@@ -97,7 +106,7 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
-   * Returns the speed produced by the motor at a given torque and input
+   * Returns the angular speed produced by the motor at a given torque and input
    * voltage.
    *
    * @param torque        The torque produced by the motor.
@@ -119,80 +128,89 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
-   * Returns instance of CIM.
+   * Returns a gearbox of CIM motors.
    */
   static constexpr DCMotor CIM(int numMotors = 1) {
     return DCMotor(12_V, 2.42_Nm, 133_A, 2.7_A, 5310_rpm, numMotors);
   }
 
   /**
-   * Returns instance of MiniCIM.
+   * Returns a gearbox of MiniCIM motors.
    */
   static constexpr DCMotor MiniCIM(int numMotors = 1) {
     return DCMotor(12_V, 1.41_Nm, 89_A, 3_A, 5840_rpm, numMotors);
   }
 
   /**
-   * Returns instance of Bag motor.
+   * Returns a gearbox of Bag motor motors.
    */
   static constexpr DCMotor Bag(int numMotors = 1) {
     return DCMotor(12_V, 0.43_Nm, 53_A, 1.8_A, 13180_rpm, numMotors);
   }
 
   /**
-   * Returns instance of Vex 775 Pro.
+   * Returns a gearbox of Vex 775 Pro motors.
    */
   static constexpr DCMotor Vex775Pro(int numMotors = 1) {
     return DCMotor(12_V, 0.71_Nm, 134_A, 0.7_A, 18730_rpm, numMotors);
   }
 
   /**
-   * Returns instance of Andymark RS 775-125.
+   * Returns a gearbox of Andymark RS 775-125 motors.
    */
   static constexpr DCMotor RS775_125(int numMotors = 1) {
     return DCMotor(12_V, 0.28_Nm, 18_A, 1.6_A, 5800_rpm, numMotors);
   }
 
   /**
-   * Returns instance of Banebots RS 775.
+   * Returns a gearbox of Banebots RS 775 motors.
    */
   static constexpr DCMotor BanebotsRS775(int numMotors = 1) {
     return DCMotor(12_V, 0.72_Nm, 97_A, 2.7_A, 13050_rpm, numMotors);
   }
 
   /**
-   * Returns instance of Andymark 9015.
+   * Returns a gearbox of Andymark 9015 motors.
    */
   static constexpr DCMotor Andymark9015(int numMotors = 1) {
     return DCMotor(12_V, 0.36_Nm, 71_A, 3.7_A, 14270_rpm, numMotors);
   }
 
   /**
-   * Returns instance of Banebots RS 550.
+   * Returns a gearbox of Banebots RS 550 motors.
    */
   static constexpr DCMotor BanebotsRS550(int numMotors = 1) {
     return DCMotor(12_V, 0.38_Nm, 84_A, 0.4_A, 19000_rpm, numMotors);
   }
 
   /**
-   * Returns instance of NEO brushless motor.
+   * Returns a gearbox of NEO brushless motors.
    */
   static constexpr DCMotor NEO(int numMotors = 1) {
     return DCMotor(12_V, 2.6_Nm, 105_A, 1.8_A, 5676_rpm, numMotors);
   }
 
   /**
-   * Returns instance of NEO 550 brushless motor.
+   * Returns a gearbox of NEO 550 brushless motors.
    */
   static constexpr DCMotor NEO550(int numMotors = 1) {
     return DCMotor(12_V, 0.97_Nm, 100_A, 1.4_A, 11000_rpm, numMotors);
   }
 
   /**
-   * Returns instance of Falcon 500 brushless motor.
+   * Returns a gearbox of Falcon 500 brushless motors.
    */
   static constexpr DCMotor Falcon500(int numMotors = 1) {
     return DCMotor(12_V, 4.69_Nm, 257_A, 1.5_A, 6380_rpm, numMotors);
+  }
+
+  /**
+   * Return a gearbox of Falcon 500 motors with FOC (Field-Oriented Control)
+   * enabled.
+   */
+  static constexpr DCMotor Falcon500FOC(int numMotors = 1) {
+    // https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
+    return DCMotor(12_V, 5.84_Nm, 304_A, 1.5_A, 6080_rpm, numMotors);
   }
 
   /**
@@ -202,6 +220,34 @@ class WPILIB_DLLEXPORT DCMotor {
     // From https://www.pololu.com/product/1520/specs
     return DCMotor(4.5_V, 0.1765_Nm, 1.25_A, 0.13_A, 150_rpm, numMotors);
   }
+
+  /**
+   * Return a gearbox of Kraken X60 brushless motors.
+   */
+  static constexpr DCMotor KrakenX60(int numMotors = 1) {
+    // From https://store.ctr-electronics.com/announcing-kraken-x60/
+    return DCMotor(12_V, 7.09_Nm, 366_A, 2_A, 6000_rpm, numMotors);
+  }
+
+  /**
+   * Return a gearbox of Kraken X60 brushless motors with FOC (Field-Oriented
+   * Control) enabled.
+   */
+  static constexpr DCMotor KrakenX60FOC(int numMotors = 1) {
+    // From https://store.ctr-electronics.com/announcing-kraken-x60/
+    return DCMotor(12_V, 9.37_Nm, 483_A, 2_A, 5800_rpm, numMotors);
+  }
+
+  /**
+   * Return a gearbox of Neo Vortex brushless motors.
+   */
+  static constexpr DCMotor NeoVortex(int numMotors = 1) {
+    // From https://www.revrobotics.com/next-generation-spark-neo/
+    return DCMotor(12_V, 3.60_Nm, 211_A, 3.615_A, 6784_rpm, numMotors);
+  }
 };
 
 }  // namespace frc
+
+#include "frc/system/plant/proto/DCMotorProto.h"
+#include "frc/system/plant/struct/DCMotorStruct.h"

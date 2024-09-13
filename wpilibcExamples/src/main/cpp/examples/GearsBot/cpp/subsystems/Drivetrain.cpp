@@ -11,10 +11,16 @@
 #include <units/length.h>
 
 Drivetrain::Drivetrain() {
+  wpi::SendableRegistry::AddChild(&m_robotDrive, &m_leftLeader);
+  wpi::SendableRegistry::AddChild(&m_robotDrive, &m_rightLeader);
+
+  m_leftLeader.AddFollower(m_leftFollower);
+  m_rightLeader.AddFollower(m_rightFollower);
+
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
   // gearbox is constructed, you might have to invert the left side instead.
-  m_right.SetInverted(true);
+  m_rightLeader.SetInverted(true);
 
 // Encoders may measure differently in the real world and in
 // simulation. In this example the robot moves 0.042 barleycorns
@@ -22,8 +28,8 @@ Drivetrain::Drivetrain() {
 // simulate 360 tick encoders. This if statement allows for the
 // real robot to handle this difference in devices.
 #ifndef SIMULATION
-  m_leftEncoder.SetDistancePerPulse(0.042);
-  m_rightEncoder.SetDistancePerPulse(0.042);
+  m_leftEncoder.SetDistancePerPulse(DriveConstants::kEncoderDistancePerPulse);
+  m_rightEncoder.SetDistancePerPulse(DriveConstants::kEncoderDistancePerPulse);
 #else
   // Circumference = diameter * pi. 360 tick simulated encoders.
   m_leftEncoder.SetDistancePerPulse(units::foot_t{4_in}.value() *
@@ -33,10 +39,6 @@ Drivetrain::Drivetrain() {
 #endif
   SetName("Drivetrain");
   // Let's show everything on the LiveWindow
-  AddChild("Front_Left Motor", &m_frontLeft);
-  AddChild("Rear Left Motor", &m_rearLeft);
-  AddChild("Front Right Motor", &m_frontRight);
-  AddChild("Rear Right Motor", &m_rearRight);
   AddChild("Left Encoder", &m_leftEncoder);
   AddChild("Right Encoder", &m_rightEncoder);
   AddChild("Rangefinder", &m_rangefinder);

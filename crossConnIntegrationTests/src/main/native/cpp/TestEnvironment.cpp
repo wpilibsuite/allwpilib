@@ -6,9 +6,9 @@
 #include <thread>
 
 #include <fmt/core.h>
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 
-#include "gtest/gtest.h"
 #include "mockds/MockDS.h"
 
 using namespace std::chrono_literals;

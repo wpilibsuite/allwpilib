@@ -7,6 +7,7 @@ package edu.wpi.first.math.trajectory;
 import static edu.wpi.first.math.util.Units.feetToMeters;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,7 +16,6 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.constraint.TrajectoryConstraint;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -72,12 +72,29 @@ class TrajectoryGeneratorTest {
   void testMalformedTrajectory() {
     var traj =
         TrajectoryGenerator.generateTrajectory(
-            Arrays.asList(
+            List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
                 new Pose2d(1, 0, Rotation2d.fromDegrees(180))),
             new TrajectoryConfig(feetToMeters(12), feetToMeters(12)));
 
     assertEquals(traj.getStates().size(), 1);
     assertEquals(traj.getTotalTimeSeconds(), 0);
+  }
+
+  @Test
+  void testQuinticCurvatureOptimization() {
+    Trajectory t =
+        TrajectoryGenerator.generateTrajectory(
+            List.of(
+                new Pose2d(1, 0, Rotation2d.fromDegrees(90)),
+                new Pose2d(0, 1, Rotation2d.fromDegrees(180)),
+                new Pose2d(-1, 0, Rotation2d.fromDegrees(270)),
+                new Pose2d(0, -1, Rotation2d.fromDegrees(360)),
+                new Pose2d(1, 0, Rotation2d.fromDegrees(90))),
+            new TrajectoryConfig(2, 2));
+
+    for (int i = 1; i < t.getStates().size() - 1; ++i) {
+      assertNotEquals(0, t.getStates().get(i).curvatureRadPerMeter);
+    }
   }
 }

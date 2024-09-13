@@ -6,8 +6,10 @@ suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
   <suppress files=".*test.*" checks="MissingJavadocMethod" />
   <suppress files=".*wpilibjIntegrationTests.*"
     checks="MissingJavadocMethod" />
-  <suppress files="wpimath/*"
+  <suppress files="wpimath.*"
     checks="(LocalVariableName|MemberName|MethodName|MethodTypeParameterName|ParameterName)" />
   <suppress files=".*JNI.*"
     checks="(EmptyLineSeparator|LineLength|MissingJavadocMethod|ParameterName)" />
+  <suppress files=".*math[/\\]proto.*"
+    checks="(CustomImportOrder|EmptyLineSeparator|LineLength|JavadocParagraph|MissingJavadocMethod|OverloadMethodsDeclarationOrder|SummaryJavadoc|UnnecessaryParentheses|OperatorWrap|JavadocMethod|JavadocTagContinuationIndentation)" />
 </suppressions>

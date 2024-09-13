@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <libssh/libssh.h>
-#include <libssh/sftp.h>
-
 #include <span>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include <libssh/libssh.h>
+#include <libssh/sftp.h>
 
 namespace sftp {
 

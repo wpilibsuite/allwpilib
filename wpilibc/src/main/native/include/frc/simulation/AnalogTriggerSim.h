@@ -53,7 +53,8 @@ class AnalogTriggerSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -78,9 +79,9 @@ class AnalogTriggerSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterTriggerLowerBoundCallback(NotifyCallback callback,
-                                    bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterTriggerLowerBoundCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Get the lower bound.
@@ -104,9 +105,9 @@ class AnalogTriggerSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterTriggerUpperBoundCallback(NotifyCallback callback,
-                                    bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterTriggerUpperBoundCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Get the upper bound.

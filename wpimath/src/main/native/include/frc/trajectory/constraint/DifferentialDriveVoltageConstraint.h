@@ -34,7 +34,7 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
    */
   DifferentialDriveVoltageConstraint(
       const SimpleMotorFeedforward<units::meter>& feedforward,
-      const DifferentialDriveKinematics& kinematics, units::volt_t maxVoltage);
+      DifferentialDriveKinematics kinematics, units::volt_t maxVoltage);
 
   units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,

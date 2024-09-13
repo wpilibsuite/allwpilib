@@ -38,7 +38,7 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class MecanumControllerCommand extends CommandBase {
+public class MecanumControllerCommand extends Command {
   private final Timer m_timer = new Timer();
   private final boolean m_usePID;
   private final Trajectory m_trajectory;
@@ -86,6 +86,7 @@ public class MecanumControllerCommand extends CommandBase {
    *     voltages.
    * @param requirements The subsystems to require.
    */
+  @SuppressWarnings("this-escape")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -229,6 +230,7 @@ public class MecanumControllerCommand extends CommandBase {
    * @param outputWheelSpeeds A MecanumDriveWheelSpeeds object containing the output wheel speeds.
    * @param requirements The subsystems to require.
    */
+  @SuppressWarnings("this-escape")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,

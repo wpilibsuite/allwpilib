@@ -17,11 +17,11 @@
 
 using namespace frc;
 
-Notifier::Notifier(std::function<void()> handler) {
-  if (!handler) {
-    throw FRC_MakeError(err::NullParameter, "handler");
+Notifier::Notifier(std::function<void()> callback) {
+  if (!callback) {
+    throw FRC_MakeError(err::NullParameter, "callback");
   }
-  m_handler = handler;
+  m_callback = callback;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
   FRC_CheckErrorStatus(status, "InitializeNotifier");
@@ -38,32 +38,32 @@ Notifier::Notifier(std::function<void()> handler) {
         break;
       }
 
-      std::function<void()> handler;
+      std::function<void()> callback;
       {
         std::scoped_lock lock(m_processMutex);
-        handler = m_handler;
+        callback = m_callback;
         if (m_periodic) {
           m_expirationTime += m_period;
           UpdateAlarm();
         } else {
-          // need to update the alarm to cause it to wait again
+          // Need to update the alarm to cause it to wait again
           UpdateAlarm(UINT64_MAX);
         }
       }
 
-      // call callback
-      if (handler) {
-        handler();
+      // Call callback
+      if (callback) {
+        callback();
       }
     }
   });
 }
 
-Notifier::Notifier(int priority, std::function<void()> handler) {
-  if (!handler) {
-    throw FRC_MakeError(err::NullParameter, "handler");
+Notifier::Notifier(int priority, std::function<void()> callback) {
+  if (!callback) {
+    throw FRC_MakeError(err::NullParameter, "callback");
   }
-  m_handler = handler;
+  m_callback = callback;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
   FRC_CheckErrorStatus(status, "InitializeNotifier");
@@ -81,10 +81,10 @@ Notifier::Notifier(int priority, std::function<void()> handler) {
         break;
       }
 
-      std::function<void()> handler;
+      std::function<void()> callback;
       {
         std::scoped_lock lock(m_processMutex);
-        handler = m_handler;
+        callback = m_callback;
         if (m_periodic) {
           m_expirationTime += m_period;
           UpdateAlarm();
@@ -95,9 +95,9 @@ Notifier::Notifier(int priority, std::function<void()> handler) {
       }
 
       // call callback
-      if (handler) {
+      if (callback) {
         try {
-          handler();
+          callback();
         } catch (const frc::RuntimeError& e) {
           e.Report();
           FRC_ReportError(
@@ -123,7 +123,7 @@ Notifier::~Notifier() {
   HAL_StopNotifier(handle, &status);
   FRC_ReportError(status, "StopNotifier");
 
-  // Join the thread to ensure the handler has exited.
+  // Join the thread to ensure the callback has exited.
   if (m_thread.joinable()) {
     m_thread.join();
   }
@@ -134,7 +134,7 @@ Notifier::~Notifier() {
 Notifier::Notifier(Notifier&& rhs)
     : m_thread(std::move(rhs.m_thread)),
       m_notifier(rhs.m_notifier.load()),
-      m_handler(std::move(rhs.m_handler)),
+      m_callback(std::move(rhs.m_callback)),
       m_expirationTime(std::move(rhs.m_expirationTime)),
       m_period(std::move(rhs.m_period)),
       m_periodic(std::move(rhs.m_periodic)) {
@@ -145,7 +145,7 @@ Notifier& Notifier::operator=(Notifier&& rhs) {
   m_thread = std::move(rhs.m_thread);
   m_notifier = rhs.m_notifier.load();
   rhs.m_notifier = HAL_kInvalidHandle;
-  m_handler = std::move(rhs.m_handler);
+  m_callback = std::move(rhs.m_callback);
   m_expirationTime = std::move(rhs.m_expirationTime);
   m_period = std::move(rhs.m_period);
   m_periodic = std::move(rhs.m_periodic);
@@ -161,9 +161,14 @@ void Notifier::SetName(std::string_view name) {
   HAL_SetNotifierName(m_notifier, buf.data(), &status);
 }
 
-void Notifier::SetHandler(std::function<void()> handler) {
+void Notifier::SetHandler(std::function<void()> callback) {
   std::scoped_lock lock(m_processMutex);
-  m_handler = handler;
+  m_callback = callback;
+}
+
+void Notifier::SetCallback(std::function<void()> callback) {
+  std::scoped_lock lock(m_processMutex);
+  m_callback = callback;
 }
 
 void Notifier::StartSingle(units::second_t delay) {

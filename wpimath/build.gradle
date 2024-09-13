@@ -9,37 +9,24 @@ ext {
 
     nativeName = 'wpimath'
     devMain = 'edu.wpi.first.math.DevMain'
-
-    splitSetup = {
-        it.sources {
-            drakeCpp(CppSourceSet) {
-                source {
-                    srcDirs 'src/main/native/thirdparty/drake/src'
-                    include '**/*.cpp'
-                }
-                exportedHeaders {
-                    srcDirs 'src/main/native/thirdparty/drake/include',
-                            'src/main/native/thirdparty/eigen/include',
-                            'src/main/native/thirdparty/gcem/include'
-                }
-            }
-        }
-    }
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 cppHeadersZip {
-    from('src/main/native/thirdparty/drake/include') {
-        into '/'
-    }
     from('src/main/native/thirdparty/eigen/include') {
         into '/'
     }
     from('src/main/native/thirdparty/gcem/include') {
         into '/'
     }
+    from("$buildDir/generated/source/proto/main/cpp") {
+        into '/wpimath/protobuf'
+        include '*.h'
+    }
 }
+
+cppHeadersZip.dependsOn generateProto
 
 model {
     components {
@@ -47,7 +34,6 @@ model {
             it.sources.each {
                 it.exportedHeaders {
                     srcDirs 'src/main/native/include',
-                            'src/main/native/thirdparty/drake/include',
                             'src/main/native/thirdparty/eigen/include',
                             'src/main/native/thirdparty/gcem/include'
                 }
@@ -56,72 +42,56 @@ model {
     }
 }
 
+nativeUtils.exportsConfigs {
+    wpimath {
+        x64ExcludeSymbols = [
+            '_CT??_R0?AV_System_error',
+            '_CT??_R0?AVexception',
+            '_CT??_R0?AVfailure',
+            '_CT??_R0?AVruntime_error',
+            '_CT??_R0?AVsystem_error',
+            '_CTA5?AVfailure',
+            '_TI5?AVfailure',
+            '_CT??_R0?AVout_of_range',
+            '_CTA3?AVout_of_range',
+            '_TI3?AVout_of_range',
+            '_CT??_R0?AVbad_cast'
+        ]
+        objectFilterClosure = { file ->
+            return file.name.endsWith('.pb.obj')
+        }
+    }
+}
+
 dependencies {
-    api "org.ejml:ejml-simple:0.41"
-    api "com.fasterxml.jackson.core:jackson-annotations:2.12.4"
-    api "com.fasterxml.jackson.core:jackson-core:2.12.4"
-    api "com.fasterxml.jackson.core:jackson-databind:2.12.4"
+    api project(":wpiunits")
+    api "org.ejml:ejml-simple:0.43.1"
+    api "com.fasterxml.jackson.core:jackson-annotations:2.15.2"
+    api "com.fasterxml.jackson.core:jackson-core:2.15.2"
+    api "com.fasterxml.jackson.core:jackson-databind:2.15.2"
+    api "us.hebi.quickbuf:quickbuf-runtime:1.3.3"
 }
 
-def wpilibNumberFileInput = file("src/generate/GenericNumber.java.jinja")
-def natFileInput = file("src/generate/Nat.java.jinja")
-def wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/math/numbers")
-def wpilibNatFileOutput = file("$buildDir/generated/java/edu/wpi/first/math/Nat.java")
-def maxNum = 20
+sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 
-task generateNumbers() {
-    description = "Generates generic number classes from template"
-    group = "WPILib"
+task unitsHeaders(type: Zip) {
+    destinationDirectory = file("$buildDir/outputs")
+    archiveBaseName = zipBaseName
+    archiveClassifier = "units"
 
-    inputs.file wpilibNumberFileInput
-    outputs.dir wpilibNumberFileOutputDir
+    from(licenseFile) {
+        into '/'
+    }
 
-    doLast {
-        if(wpilibNumberFileOutputDir.exists()) {
-            wpilibNumberFileOutputDir.delete()
-        }
-        wpilibNumberFileOutputDir.mkdirs()
+    ext.includeDirs = [
+        project.file('src/main/native/include/units')
+    ]
 
-        def config = new JinjavaConfig()
-        def jinjava = new Jinjava(config)
-
-        def template = wpilibNumberFileInput.text
-
-        for(i in 0..maxNum) {
-            def outputFile = new File(wpilibNumberFileOutputDir, "N${i}.java")
-            def replacements = new HashMap<String,?>()
-            replacements.put("num", i)
-            def output = jinjava.render(template, replacements)
-            outputFile.write(output)
+    ext.includeDirs.each {
+        from(it) {
+            into '/units'
         }
     }
 }
 
-task generateNat() {
-    description = "Generates Nat.java"
-    group = "WPILib"
-    inputs.file natFileInput
-    outputs.file wpilibNatFileOutput
-    dependsOn generateNumbers
-
-    doLast {
-        if(wpilibNatFileOutput.exists()) {
-            wpilibNatFileOutput.delete()
-        }
-
-        def config = new JinjavaConfig()
-        def jinjava = new Jinjava(config)
-
-        def template = natFileInput.text
-
-        def replacements = new HashMap<String,?>()
-        replacements.put("nums", 0..maxNum)
-
-        def output = jinjava.render(template, replacements)
-        wpilibNatFileOutput.write(output)
-    }
-}
-
-sourceSets.main.java.srcDir "${buildDir}/generated/java"
-compileJava.dependsOn generateNumbers
-compileJava.dependsOn generateNat
+addTaskToCopyAllOutputs(unitsHeaders)

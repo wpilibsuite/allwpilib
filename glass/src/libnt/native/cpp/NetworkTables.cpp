@@ -5,7 +5,7 @@
 #include "glass/networktables/NetworkTables.h"
 
 #include <cinttypes>
-#include <cstdio>
+#include <concepts>
 #include <cstring>
 #include <initializer_list>
 #include <memory>
@@ -14,7 +14,10 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
 #include <imgui.h>
+#include <imgui_stdlib.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTableValue.h>
 #include <ntcore_c.h>
@@ -56,36 +59,6 @@ static bool IsVisible(ShowCategory category, bool persistent, bool retained) {
     default:
       return false;
   }
-}
-
-static std::string BooleanArrayToString(std::span<const int> in) {
-  std::string rv;
-  wpi::raw_string_ostream os{rv};
-  os << '[';
-  bool first = true;
-  for (auto v : in) {
-    if (!first) {
-      os << ',';
-    }
-    first = false;
-    if (v) {
-      os << "true";
-    } else {
-      os << "false";
-    }
-  }
-  os << ']';
-  return rv;
-}
-
-static std::string IntegerArrayToString(std::span<const int64_t> in) {
-  return fmt::format("[{:d}]", fmt::join(in, ","));
-}
-
-template <typename T>
-static std::string FloatArrayToString(std::span<const T> in) {
-  static_assert(std::is_same_v<T, float> || std::is_same_v<T, double>);
-  return fmt::format("[{:.6f}]", fmt::join(in, ","));
 }
 
 static std::string StringArrayToString(std::span<const std::string> in) {
@@ -143,36 +116,37 @@ void NetworkTablesModel::Entry::UpdateInfo(nt::TopicInfo&& info_) {
   }
 }
 
-static void UpdateMsgpackValueSource(NetworkTablesModel::ValueSource* out,
+static void UpdateMsgpackValueSource(NetworkTablesModel& model,
+                                     NetworkTablesModel::ValueSource* out,
                                      mpack_reader_t& r, std::string_view name,
                                      int64_t time) {
   mpack_tag_t tag = mpack_read_tag(&r);
   switch (mpack_tag_type(&tag)) {
     case mpack::mpack_type_bool:
-      out->UpdateFromValue(
-          nt::Value::MakeBoolean(mpack_tag_bool_value(&tag), time), name, "");
+      out->value = nt::Value::MakeBoolean(mpack_tag_bool_value(&tag), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case mpack::mpack_type_int:
-      out->UpdateFromValue(
-          nt::Value::MakeInteger(mpack_tag_int_value(&tag), time), name, "");
+      out->value = nt::Value::MakeInteger(mpack_tag_int_value(&tag), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case mpack::mpack_type_uint:
-      out->UpdateFromValue(
-          nt::Value::MakeInteger(mpack_tag_uint_value(&tag), time), name, "");
+      out->value = nt::Value::MakeInteger(mpack_tag_uint_value(&tag), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case mpack::mpack_type_float:
-      out->UpdateFromValue(
-          nt::Value::MakeFloat(mpack_tag_float_value(&tag), time), name, "");
+      out->value = nt::Value::MakeFloat(mpack_tag_float_value(&tag), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case mpack::mpack_type_double:
-      out->UpdateFromValue(
-          nt::Value::MakeDouble(mpack_tag_double_value(&tag), time), name, "");
+      out->value = nt::Value::MakeDouble(mpack_tag_double_value(&tag), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case mpack::mpack_type_str: {
       std::string str;
       mpack_read_str(&r, &tag, &str);
-      out->UpdateFromValue(nt::Value::MakeString(std::move(str), time), name,
-                           "");
+      out->value = nt::Value::MakeString(std::move(str), time);
+      out->UpdateFromValue(model, name, "");
       break;
     }
     case mpack::mpack_type_bin:
@@ -193,7 +167,8 @@ static void UpdateMsgpackValueSource(NetworkTablesModel::ValueSource* out,
           child.path = fmt::format("{}{}", name, child.name);
         }
         ++i;
-        UpdateMsgpackValueSource(&child, r, child.path, time);  // recurse
+        UpdateMsgpackValueSource(model, &child, r, child.path,
+                                 time);  // recurse
       }
       mpack_done_array(&r);
       break;
@@ -215,7 +190,7 @@ static void UpdateMsgpackValueSource(NetworkTablesModel::ValueSource* out,
           auto it = elems.find(key);
           if (it != elems.end()) {
             auto& child = out->valueChildren[it->second];
-            UpdateMsgpackValueSource(&child, r, child.path, time);
+            UpdateMsgpackValueSource(model, &child, r, child.path, time);
             elems.erase(it);
           } else {
             added = true;
@@ -223,7 +198,7 @@ static void UpdateMsgpackValueSource(NetworkTablesModel::ValueSource* out,
             auto& child = out->valueChildren.back();
             child.name = std::move(key);
             child.path = fmt::format("{}/{}", name, child.name);
-            UpdateMsgpackValueSource(&child, r, child.path, time);
+            UpdateMsgpackValueSource(model, &child, r, child.path, time);
           }
         }
       }
@@ -248,7 +223,318 @@ static void UpdateMsgpackValueSource(NetworkTablesModel::ValueSource* out,
   }
 }
 
-static void UpdateJsonValueSource(NetworkTablesModel::ValueSource* out,
+static void UpdateStructValueSource(NetworkTablesModel& model,
+                                    NetworkTablesModel::ValueSource* out,
+                                    const wpi::DynamicStruct& s,
+                                    std::string_view name, int64_t time) {
+  auto desc = s.GetDescriptor();
+  out->typeStr = "struct:" + desc->GetName();
+  auto& fields = desc->GetFields();
+  if (!out->valueChildrenMap || fields.size() != out->valueChildren.size()) {
+    out->valueChildren.clear();
+    out->valueChildrenMap = true;
+    out->valueChildren.reserve(fields.size());
+    for (auto&& field : fields) {
+      out->valueChildren.emplace_back();
+      auto& child = out->valueChildren.back();
+      child.name = field.GetName();
+      child.path = fmt::format("{}/{}", name, child.name);
+    }
+  }
+  auto outIt = out->valueChildren.begin();
+  for (auto&& field : fields) {
+    auto& child = *outIt++;
+    switch (field.GetType()) {
+      case wpi::StructFieldType::kBool:
+        if (field.IsArray()) {
+          std::vector<int> v;
+          v.reserve(field.GetArraySize());
+          for (size_t i = 0; i < field.GetArraySize(); ++i) {
+            v.emplace_back(s.GetBoolField(&field, i));
+          }
+          child.value = nt::Value::MakeBooleanArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeBoolean(s.GetBoolField(&field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case wpi::StructFieldType::kChar:
+        child.value = nt::Value::MakeString(s.GetStringField(&field), time);
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case wpi::StructFieldType::kInt8:
+      case wpi::StructFieldType::kInt16:
+      case wpi::StructFieldType::kInt32:
+      case wpi::StructFieldType::kInt64:
+      case wpi::StructFieldType::kUint8:
+      case wpi::StructFieldType::kUint16:
+      case wpi::StructFieldType::kUint32:
+      case wpi::StructFieldType::kUint64: {
+        bool isUint = field.IsUint();
+        if (field.IsArray()) {
+          std::vector<int64_t> v;
+          v.reserve(field.GetArraySize());
+          for (size_t i = 0; i < field.GetArraySize(); ++i) {
+            if (isUint) {
+              v.emplace_back(s.GetUintField(&field, i));
+            } else {
+              v.emplace_back(s.GetIntField(&field, i));
+            }
+          }
+          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
+        } else {
+          if (isUint) {
+            child.value = nt::Value::MakeInteger(s.GetUintField(&field), time);
+          } else {
+            child.value = nt::Value::MakeInteger(s.GetIntField(&field), time);
+          }
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      }
+      case wpi::StructFieldType::kFloat:
+        if (field.IsArray()) {
+          std::vector<float> v;
+          v.reserve(field.GetArraySize());
+          for (size_t i = 0; i < field.GetArraySize(); ++i) {
+            v.emplace_back(s.GetFloatField(&field, i));
+          }
+          child.value = nt::Value::MakeFloatArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeFloat(s.GetFloatField(&field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case wpi::StructFieldType::kDouble:
+        if (field.IsArray()) {
+          std::vector<double> v;
+          v.reserve(field.GetArraySize());
+          for (size_t i = 0; i < field.GetArraySize(); ++i) {
+            v.emplace_back(s.GetDoubleField(&field, i));
+          }
+          child.value = nt::Value::MakeDoubleArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeDouble(s.GetDoubleField(&field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case wpi::StructFieldType::kStruct:
+        if (field.IsArray()) {
+          if (child.valueChildrenMap) {
+            child.valueChildren.clear();
+            child.valueChildrenMap = false;
+          }
+          child.valueChildren.resize(field.GetArraySize());
+          unsigned int i = 0;
+          for (auto&& child2 : child.valueChildren) {
+            if (child2.name.empty()) {
+              child2.name = fmt::format("[{}]", i);
+              child2.path = fmt::format("{}{}", name, child.name);
+            }
+            UpdateStructValueSource(model, &child2, s.GetStructField(&field, i),
+                                    child2.path, time);  // recurse
+            ++i;
+          }
+        } else {
+          UpdateStructValueSource(model, &child, s.GetStructField(&field),
+                                  child.path, time);  // recurse
+        }
+        break;
+    }
+  }
+}
+
+static void UpdateProtobufValueSource(NetworkTablesModel& model,
+                                      NetworkTablesModel::ValueSource* out,
+                                      const google::protobuf::Message& msg,
+                                      std::string_view name, int64_t time) {
+  auto desc = msg.GetDescriptor();
+  out->typeStr = "proto:" + desc->full_name();
+  if (!out->valueChildrenMap ||
+      desc->field_count() != static_cast<int>(out->valueChildren.size())) {
+    out->valueChildren.clear();
+    out->valueChildrenMap = true;
+    out->valueChildren.reserve(desc->field_count());
+    for (int i = 0, end = desc->field_count(); i < end; ++i) {
+      out->valueChildren.emplace_back();
+      auto& child = out->valueChildren.back();
+      child.name = desc->field(i)->name();
+      child.path = fmt::format("{}/{}", name, child.name);
+    }
+  }
+  auto refl = msg.GetReflection();
+  auto outIt = out->valueChildren.begin();
+  for (int fieldNum = 0, end = desc->field_count(); fieldNum < end;
+       ++fieldNum) {
+    auto field = desc->field(fieldNum);
+    auto& child = *outIt++;
+    switch (field->cpp_type()) {
+      case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<int> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedBool(msg, field, i));
+          }
+          child.value = nt::Value::MakeBooleanArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeBoolean(refl->GetBool(msg, field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<std::string> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedString(msg, field, i));
+          }
+          child.value = nt::Value::MakeStringArray(std::move(v), time);
+        } else {
+          child.value =
+              nt::Value::MakeString(refl->GetString(msg, field), time);
+          child.UpdateFromValue(model, child.path, "");
+        }
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<int64_t> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedInt32(msg, field, i));
+          }
+          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
+        } else {
+          child.value =
+              nt::Value::MakeInteger(refl->GetInt32(msg, field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_INT64:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<int64_t> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedInt64(msg, field, i));
+          }
+          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
+        } else {
+          child.value =
+              nt::Value::MakeInteger(refl->GetInt64(msg, field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_UINT32:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<int64_t> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedUInt32(msg, field, i));
+          }
+          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
+        } else {
+          child.value =
+              nt::Value::MakeInteger(refl->GetUInt32(msg, field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_UINT64:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<int64_t> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedUInt64(msg, field, i));
+          }
+          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
+        } else {
+          child.value =
+              nt::Value::MakeInteger(refl->GetUInt64(msg, field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<float> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedFloat(msg, field, i));
+          }
+          child.value = nt::Value::MakeFloatArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeFloat(refl->GetFloat(msg, field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<double> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedDouble(msg, field, i));
+          }
+          child.value = nt::Value::MakeDoubleArray(std::move(v), time);
+        } else {
+          child.value =
+              nt::Value::MakeDouble(refl->GetDouble(msg, field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<std::string> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedEnum(msg, field, i)->name());
+          }
+          child.value = nt::Value::MakeStringArray(std::move(v), time);
+        } else {
+          child.value =
+              nt::Value::MakeString(refl->GetEnum(msg, field)->name(), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+        if (field->is_repeated()) {
+          if (child.valueChildrenMap) {
+            child.valueChildren.clear();
+            child.valueChildrenMap = false;
+          }
+          size_t size = refl->FieldSize(msg, field);
+          child.valueChildren.resize(size);
+          unsigned int i = 0;
+          for (auto&& child2 : child.valueChildren) {
+            if (child2.name.empty()) {
+              child2.name = fmt::format("[{}]", i);
+              child2.path = fmt::format("{}{}", name, child.name);
+            }
+            UpdateProtobufValueSource(model, &child2,
+                                      refl->GetRepeatedMessage(msg, field, i),
+                                      child2.path, time);  // recurse
+            ++i;
+          }
+        } else {
+          UpdateProtobufValueSource(
+              model, &child,
+              refl->GetMessage(msg, field,
+                               model.GetProtobufDatabase().GetMessageFactory()),
+              child.path, time);  // recurse
+        }
+        break;
+    }
+  }
+}
+
+static void UpdateJsonValueSource(NetworkTablesModel& model,
+                                  NetworkTablesModel::ValueSource* out,
                                   const wpi::json& j, std::string_view name,
                                   int64_t time) {
   switch (j.type()) {
@@ -266,7 +552,7 @@ static void UpdateJsonValueSource(NetworkTablesModel::ValueSource* out,
         auto it = elems.find(kv.key());
         if (it != elems.end()) {
           auto& child = out->valueChildren[it->second];
-          UpdateJsonValueSource(&child, kv.value(), child.path, time);
+          UpdateJsonValueSource(model, &child, kv.value(), child.path, time);
           elems.erase(it);
         } else {
           added = true;
@@ -274,7 +560,7 @@ static void UpdateJsonValueSource(NetworkTablesModel::ValueSource* out,
           auto& child = out->valueChildren.back();
           child.name = kv.key();
           child.path = fmt::format("{}/{}", name, child.name);
-          UpdateJsonValueSource(&child, kv.value(), child.path, time);
+          UpdateJsonValueSource(model, &child, kv.value(), child.path, time);
         }
       }
       // erase unmatched keys
@@ -302,31 +588,30 @@ static void UpdateJsonValueSource(NetworkTablesModel::ValueSource* out,
           child.name = fmt::format("[{}]", i);
           child.path = fmt::format("{}{}", name, child.name);
         }
-        ++i;
-        UpdateJsonValueSource(&child, j[i], child.path, time);  // recurse
+        // recurse
+        UpdateJsonValueSource(model, &child, j[i++], child.path, time);
       }
       break;
     }
     case wpi::json::value_t::string:
-      out->UpdateFromValue(
-          nt::Value::MakeString(j.get_ref<const std::string&>(), time), name,
-          "");
+      out->value = nt::Value::MakeString(j.get_ref<const std::string&>(), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case wpi::json::value_t::boolean:
-      out->UpdateFromValue(nt::Value::MakeBoolean(j.get<bool>(), time), name,
-                           "");
+      out->value = nt::Value::MakeBoolean(j.get<bool>(), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case wpi::json::value_t::number_integer:
-      out->UpdateFromValue(nt::Value::MakeInteger(j.get<int64_t>(), time), name,
-                           "");
+      out->value = nt::Value::MakeInteger(j.get<int64_t>(), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case wpi::json::value_t::number_unsigned:
-      out->UpdateFromValue(nt::Value::MakeInteger(j.get<uint64_t>(), time),
-                           name, "");
+      out->value = nt::Value::MakeInteger(j.get<uint64_t>(), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case wpi::json::value_t::number_float:
-      out->UpdateFromValue(nt::Value::MakeDouble(j.get<double>(), time), name,
-                           "");
+      out->value = nt::Value::MakeDouble(j.get<double>(), time);
+      out->UpdateFromValue(model, name, "");
       break;
     default:
       out->value = {};
@@ -334,66 +619,93 @@ static void UpdateJsonValueSource(NetworkTablesModel::ValueSource* out,
   }
 }
 
+void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
+    std::string_view name, double value, int64_t time, bool digital) {
+  valueChildren.clear();
+  if (!source) {
+    source = std::make_unique<DataSource>(fmt::format("NT:{}", name));
+  }
+  source->SetValue(value, time);
+  source->SetDigital(digital);
+}
+
+template <typename T, typename MakeValue>
+void NetworkTablesModel::ValueSource::UpdateDiscreteArray(
+    std::string_view name, std::span<const T> arr, int64_t time,
+    MakeValue makeValue, bool digital) {
+  if (valueChildrenMap) {
+    valueChildren.clear();
+    valueChildrenMap = false;
+  }
+  valueChildren.resize(arr.size());
+  unsigned int i = 0;
+  for (auto&& child : valueChildren) {
+    if (child.name.empty()) {
+      child.name = fmt::format("[{}]", i);
+      child.path = fmt::format("{}{}", name, child.name);
+    }
+    child.value = makeValue(arr[i], time);
+    child.UpdateDiscreteSource(child.path, arr[i], time, digital);
+    ++i;
+  }
+}
+
 void NetworkTablesModel::ValueSource::UpdateFromValue(
-    nt::Value&& v, std::string_view name, std::string_view typeStr) {
-  value = v;
+    NetworkTablesModel& model, std::string_view name,
+    std::string_view typeStr) {
   switch (value.type()) {
     case NT_BOOLEAN:
-      valueChildren.clear();
-      if (!source) {
-        source = std::make_unique<DataSource>(fmt::format("NT:{}", name));
-      }
-      source->SetValue(value.GetBoolean() ? 1 : 0, value.last_change());
-      source->SetDigital(true);
+      UpdateDiscreteSource(name, value.GetBoolean() ? 1 : 0, value.time(),
+                           true);
       break;
     case NT_INTEGER:
-      valueChildren.clear();
-      if (!source) {
-        source = std::make_unique<DataSource>(fmt::format("NT:{}", name));
-      }
-      source->SetValue(value.GetInteger(), value.last_change());
-      source->SetDigital(false);
+      UpdateDiscreteSource(name, value.GetInteger(), value.time());
       break;
     case NT_FLOAT:
-      valueChildren.clear();
-      if (!source) {
-        source = std::make_unique<DataSource>(fmt::format("NT:{}", name));
-      }
-      source->SetValue(value.GetFloat(), value.last_change());
-      source->SetDigital(false);
+      UpdateDiscreteSource(name, value.GetFloat(), value.time());
       break;
     case NT_DOUBLE:
-      valueChildren.clear();
-      if (!source) {
-        source = std::make_unique<DataSource>(fmt::format("NT:{}", name));
-      }
-      source->SetValue(value.GetDouble(), value.last_change());
-      source->SetDigital(false);
+      UpdateDiscreteSource(name, value.GetDouble(), value.time());
       break;
     case NT_BOOLEAN_ARRAY:
-      valueChildren.clear();
-      valueStr = BooleanArrayToString(value.GetBooleanArray());
+      UpdateDiscreteArray(name, value.GetBooleanArray(), value.time(),
+                          nt::Value::MakeBoolean, true);
       break;
     case NT_INTEGER_ARRAY:
-      valueChildren.clear();
-      valueStr = IntegerArrayToString(value.GetIntegerArray());
+      UpdateDiscreteArray(name, value.GetIntegerArray(), value.time(),
+                          nt::Value::MakeInteger);
       break;
     case NT_FLOAT_ARRAY:
-      valueChildren.clear();
-      valueStr = FloatArrayToString(value.GetFloatArray());
+      UpdateDiscreteArray(name, value.GetFloatArray(), value.time(),
+                          nt::Value::MakeFloat);
       break;
     case NT_DOUBLE_ARRAY:
-      valueChildren.clear();
-      valueStr = FloatArrayToString(value.GetDoubleArray());
+      UpdateDiscreteArray(name, value.GetDoubleArray(), value.time(),
+                          nt::Value::MakeDouble);
       break;
-    case NT_STRING_ARRAY:
-      valueChildren.clear();
-      valueStr = StringArrayToString(value.GetStringArray());
+    case NT_STRING_ARRAY: {
+      auto arr = value.GetStringArray();
+      if (valueChildrenMap) {
+        valueChildren.clear();
+        valueChildrenMap = false;
+      }
+      valueChildren.resize(arr.size());
+      unsigned int i = 0;
+      for (auto&& child : valueChildren) {
+        if (child.name.empty()) {
+          child.name = fmt::format("[{}]", i);
+          child.path = fmt::format("{}{}", name, child.name);
+        }
+        child.value = nt::Value::MakeString(arr[i++], value.time());
+        child.UpdateFromValue(model, child.path, "");
+      }
       break;
+    }
     case NT_STRING:
       if (typeStr == "json") {
         try {
-          UpdateJsonValueSource(this, wpi::json::parse(value.GetString()), name,
+          UpdateJsonValueSource(model, this,
+                                wpi::json::parse(value.GetString()), name,
                                 value.last_change());
         } catch (wpi::json::exception&) {
           // ignore
@@ -411,9 +723,57 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
       if (typeStr == "msgpack") {
         mpack_reader_t r;
         mpack_reader_init_data(&r, value.GetRaw());
-        UpdateMsgpackValueSource(this, r, name, value.last_change());
-
+        UpdateMsgpackValueSource(model, this, r, name, value.last_change());
         mpack_reader_destroy(&r);
+      } else if (wpi::starts_with(typeStr, "struct:")) {
+        auto structName = wpi::drop_front(typeStr, 7);
+        bool isArray = structName.ends_with("[]");
+        if (isArray) {
+          structName = wpi::drop_back(structName, 2);
+        }
+        auto desc = model.m_structDb.Find(structName);
+        if (desc && desc->IsValid()) {
+          if (isArray) {
+            // array of struct at top level
+            if (valueChildrenMap) {
+              valueChildren.clear();
+              valueChildrenMap = false;
+            }
+            auto raw = value.GetRaw();
+            valueChildren.resize(raw.size() / desc->GetSize());
+            unsigned int i = 0;
+            for (auto&& child : valueChildren) {
+              if (child.name.empty()) {
+                child.name = fmt::format("[{}]", i);
+                child.path = fmt::format("{}{}", name, child.name);
+              }
+              wpi::DynamicStruct s{desc, raw};
+              UpdateStructValueSource(model, &child, s, child.path,
+                                      value.last_change());
+              ++i;
+              raw = wpi::drop_front(raw, desc->GetSize());
+            }
+          } else {
+            wpi::DynamicStruct s{desc, value.GetRaw()};
+            UpdateStructValueSource(model, this, s, name, value.last_change());
+          }
+        } else {
+          valueChildren.clear();
+        }
+      } else if (wpi::starts_with(typeStr, "proto:")) {
+        auto msg = model.m_protoDb.Find(wpi::drop_front(typeStr, 6));
+        if (msg) {
+          msg->Clear();
+          auto raw = value.GetRaw();
+          if (msg->ParseFromArray(raw.data(), raw.size())) {
+            UpdateProtobufValueSource(model, this, *msg, name,
+                                      value.last_change());
+          } else {
+            valueChildren.clear();
+          }
+        } else {
+          valueChildren.clear();
+        }
       } else {
         valueChildren.clear();
       }
@@ -477,8 +837,8 @@ void NetworkTablesModel::Update() {
     } else if (auto valueData = event.GetValueEventData()) {
       auto& entry = m_entries[valueData->topic];
       if (entry) {
-        entry->UpdateFromValue(std::move(valueData->value), entry->info.name,
-                               entry->info.type_str);
+        entry->value = std::move(valueData->value);
+        entry->UpdateFromValue(*this);
         if (wpi::starts_with(entry->info.name, '$') && entry->value.IsRaw() &&
             entry->info.type_str == "msgpack") {
           // meta topic handling
@@ -501,6 +861,56 @@ void NetworkTablesModel::Update() {
             auto it = m_clients.find(wpi::drop_front(entry->info.name, 11));
             if (it != m_clients.end()) {
               it->second.UpdateSubscribers(entry->value.GetRaw());
+            }
+          }
+        } else if (entry->value.IsRaw() &&
+                   wpi::starts_with(entry->info.name, "/.schema/struct:") &&
+                   entry->info.type_str == "structschema") {
+          // struct schema handling
+          auto typeStr = wpi::drop_front(entry->info.name, 16);
+          std::string_view schema{
+              reinterpret_cast<const char*>(entry->value.GetRaw().data()),
+              entry->value.GetRaw().size()};
+          std::string err;
+          auto desc = m_structDb.Add(typeStr, schema, &err);
+          if (!desc) {
+            fmt::print("could not decode struct '{}' schema '{}': {}\n",
+                       entry->info.name, schema, err);
+          } else if (desc->IsValid()) {
+            // loop over all entries with this type and update
+            for (auto&& entryPair : m_entries) {
+              if (!entryPair.second) {
+                continue;
+              }
+              std::string_view ts = entryPair.second->info.type_str;
+              if (!wpi::starts_with(ts, "struct:")) {
+                continue;
+              }
+              ts = wpi::drop_front(ts, 7);
+              if (ts == typeStr || (wpi::ends_with(ts, "[]") &&
+                                    wpi::drop_back(ts, 2) == typeStr)) {
+                entryPair.second->UpdateFromValue(*this);
+              }
+            }
+          }
+        } else if (entry->value.IsRaw() &&
+                   wpi::starts_with(entry->info.name, "/.schema/proto:") &&
+                   entry->info.type_str == "proto:FileDescriptorProto") {
+          // protobuf descriptor handling
+          auto filename = wpi::drop_front(entry->info.name, 15);
+          if (!m_protoDb.Add(filename, entry->value.GetRaw())) {
+            fmt::print("could not decode protobuf '{}' filename '{}'\n",
+                       entry->info.name, filename);
+          } else {
+            // loop over all protobuf entries and update (conservatively)
+            for (auto&& entryPair : m_entries) {
+              if (!entryPair.second) {
+                continue;
+              }
+              std::string_view ts = entryPair.second->info.type_str;
+              if (wpi::starts_with(ts, "proto:")) {
+                entryPair.second->UpdateFromValue(*this);
+              }
             }
           }
         }
@@ -667,160 +1077,89 @@ void NetworkTablesModel::UpdateClients(std::span<const uint8_t> data) {
   m_clients = std::move(newClients);
 }
 
-static bool StringToBooleanArray(std::string_view in, std::vector<int>* out) {
-  in = wpi::trim(in);
-  if (in.empty()) {
-    return false;
-  }
-  if (in.front() == '[') {
-    in.remove_prefix(1);
-  }
-  if (in.back() == ']') {
-    in.remove_suffix(1);
-  }
-  in = wpi::trim(in);
-
-  wpi::SmallVector<std::string_view, 16> inSplit;
-
-  wpi::split(in, inSplit, ',', -1, false);
-  for (auto val : inSplit) {
-    val = wpi::trim(val);
-    if (wpi::equals_lower(val, "true")) {
-      out->emplace_back(1);
-    } else if (wpi::equals_lower(val, "false")) {
-      out->emplace_back(0);
-    } else {
-      fmt::print(stderr,
-                 "GUI: NetworkTables: Could not understand value '{}'\n", val);
-      return false;
+static bool GetHeadingTypeString(std::string_view* ts) {
+  if (wpi::starts_with(*ts, "proto:")) {
+    *ts = wpi::drop_front(*ts, 6);
+    auto lastdot = ts->rfind('.');
+    if (lastdot != std::string_view::npos) {
+      *ts = wpi::substr(*ts, lastdot + 1);
     }
+    if (wpi::starts_with(*ts, "Protobuf")) {
+      *ts = wpi::drop_front(*ts, 8);
+    }
+    return true;
+  } else if (wpi::starts_with(*ts, "struct:")) {
+    *ts = wpi::drop_front(*ts, 7);
+    return true;
   }
-
-  return true;
+  return false;
 }
 
-static bool StringToIntegerArray(std::string_view in,
-                                 std::vector<int64_t>* out) {
-  in = wpi::trim(in);
-  if (in.empty()) {
-    return false;
+static const char* GetShortTypeString(std::string_view ts) {
+  if (wpi::starts_with(ts, "proto:")) {
+    return "protobuf";
+  } else if (wpi::starts_with(ts, "struct:")) {
+    return "struct";
+  } else {
+    return ts.data();
   }
-  if (in.front() == '[') {
-    in.remove_prefix(1);
-  }
-  if (in.back() == ']') {
-    in.remove_suffix(1);
-  }
-  in = wpi::trim(in);
-
-  wpi::SmallVector<std::string_view, 16> inSplit;
-
-  wpi::split(in, inSplit, ',', -1, false);
-  for (auto val : inSplit) {
-    if (auto num = wpi::parse_integer<int64_t>(wpi::trim(val), 0)) {
-      out->emplace_back(num.value());
-    } else {
-      fmt::print(stderr,
-                 "GUI: NetworkTables: Could not understand value '{}'\n", val);
-      return false;
-    }
-  }
-
-  return true;
 }
 
-template <typename T>
-static bool StringToFloatArray(std::string_view in, std::vector<T>* out) {
-  static_assert(std::is_same_v<T, float> || std::is_same_v<T, double>);
-  in = wpi::trim(in);
-  if (in.empty()) {
-    return false;
+static const char* GetTypeString(NT_Type type, const char* overrideTypeStr) {
+  if (overrideTypeStr) {
+    return GetShortTypeString(overrideTypeStr);
   }
-  if (in.front() == '[') {
-    in.remove_prefix(1);
+  switch (type) {
+    case NT_BOOLEAN:
+      return "boolean";
+    case NT_INTEGER:
+      return "int";
+    case NT_FLOAT:
+      return "float";
+    case NT_DOUBLE:
+      return "double";
+    case NT_STRING:
+      return "string";
+    case NT_BOOLEAN_ARRAY:
+      return "boolean[]";
+    case NT_INTEGER_ARRAY:
+      return "int[]";
+    case NT_FLOAT_ARRAY:
+      return "float[]";
+    case NT_DOUBLE_ARRAY:
+      return "double[]";
+    case NT_STRING_ARRAY:
+      return "string[]";
+    case NT_RAW:
+      return "raw";
+    case NT_RPC:
+      return "rpc";
+    default:
+      return "other";
   }
-  if (in.back() == ']') {
-    in.remove_suffix(1);
-  }
-  in = wpi::trim(in);
-
-  wpi::SmallVector<std::string_view, 16> inSplit;
-
-  wpi::split(in, inSplit, ',', -1, false);
-  for (auto val : inSplit) {
-    if (auto num = wpi::parse_float<T>(wpi::trim(val))) {
-      out->emplace_back(num.value());
-    } else {
-      fmt::print(stderr,
-                 "GUI: NetworkTables: Could not understand value '{}'\n", val);
-      return false;
-    }
-  }
-
-  return true;
-}
-
-static bool StringToStringArray(std::string_view in,
-                                std::vector<std::string>* out) {
-  in = wpi::trim(in);
-  if (in.empty()) {
-    return false;
-  }
-  if (in.front() == '[') {
-    in.remove_prefix(1);
-  }
-  if (in.back() == ']') {
-    in.remove_suffix(1);
-  }
-  in = wpi::trim(in);
-
-  while (!in.empty()) {
-    if (in.front() != '"') {
-      fmt::print(stderr, "GUI: NetworkTables: Expected '\"'");
-      return false;
-    }
-    in.remove_prefix(1);
-    wpi::SmallString<128> buf;
-    std::string_view val;
-    std::tie(val, in) = wpi::UnescapeCString(in, buf);
-    out->emplace_back(val);
-    if (!in.empty()) {
-      if (in.front() != '"') {
-        fmt::print(stderr, "GUI: NetworkTables: Error escaping string");
-        return false;
-      }
-      in.remove_prefix(1);
-      in = wpi::ltrim(in);
-    }
-    if (!in.empty()) {
-      if (in.front() != ',') {
-        fmt::print(stderr, "GUI: NetworkTables: Expected ','");
-        return false;
-      }
-      in.remove_prefix(1);
-    }
-  }
-  return true;
 }
 
 static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
-                                   const char* typeStr,
+                                   const char* overrideTypeStr,
                                    NetworkTablesFlags flags) {
   auto& val = entry.value;
   if (!val) {
     return;
   }
 
+  const char* typeStr = GetTypeString(val.type(), overrideTypeStr);
+  ImGui::SetNextItemWidth(
+      -1 * (ImGui::CalcTextSize(typeStr).x + ImGui::GetStyle().FramePadding.x));
+
   switch (val.type()) {
     case NT_BOOLEAN:
-      ImGui::LabelText(typeStr ? typeStr : "boolean", "%s",
-                       val.GetBoolean() ? "true" : "false");
+      ImGui::LabelText(typeStr, "%s", val.GetBoolean() ? "true" : "false");
       break;
     case NT_INTEGER:
-      ImGui::LabelText(typeStr ? typeStr : "int", "%" PRId64, val.GetInteger());
+      ImGui::LabelText(typeStr, "%" PRId64, val.GetInteger());
       break;
     case NT_FLOAT:
-      ImGui::LabelText(typeStr ? typeStr : "double", "%.6f", val.GetFloat());
+      ImGui::LabelText(typeStr, "%.6f", val.GetFloat());
       break;
     case NT_DOUBLE: {
       unsigned char precision = (flags & NetworkTablesFlags_Precision) >>
@@ -829,8 +1168,7 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
-      ImGui::LabelText(typeStr ? typeStr : "double",
-                       fmt::format("%.{}f", precision).c_str(),
+      ImGui::LabelText(typeStr, fmt::format("%.{}f", precision).c_str(),
                        val.GetDouble());
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
@@ -838,35 +1176,30 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
       break;
     }
     case NT_STRING: {
-      ImGui::LabelText(typeStr ? typeStr : "string", "%s",
-                       entry.valueStr.c_str());
+      ImGui::LabelText(typeStr, "%s", entry.valueStr.c_str());
       break;
     }
     case NT_BOOLEAN_ARRAY:
-      ImGui::LabelText(typeStr ? typeStr : "boolean[]", "%s",
-                       entry.valueStr.c_str());
-      break;
     case NT_INTEGER_ARRAY:
-      ImGui::LabelText(typeStr ? typeStr : "int[]", "%s",
-                       entry.valueStr.c_str());
-      break;
     case NT_FLOAT_ARRAY:
-      ImGui::LabelText(typeStr ? typeStr : "float[]", "%s",
-                       entry.valueStr.c_str());
-      break;
     case NT_DOUBLE_ARRAY:
-      ImGui::LabelText(typeStr ? typeStr : "double[]", "%s",
-                       entry.valueStr.c_str());
-      break;
     case NT_STRING_ARRAY:
-      ImGui::LabelText(typeStr ? typeStr : "string[]", "%s",
-                       entry.valueStr.c_str());
+      ImGui::LabelText(typeStr, "[]");
       break;
-    case NT_RAW:
-      ImGui::LabelText(typeStr ? typeStr : "raw", "[...]");
+    case NT_RAW: {
+      ImGui::LabelText(typeStr, val.GetRaw().empty() ? "[]" : "[...]");
+      if (ImGui::IsItemHovered()) {
+        ImGui::BeginTooltip();
+        if (overrideTypeStr) {
+          ImGui::TextUnformatted(overrideTypeStr);
+        }
+        ImGui::Text("%u bytes", static_cast<unsigned int>(val.GetRaw().size()));
+        ImGui::EndTooltip();
+      }
       break;
+    }
     default:
-      ImGui::LabelText(typeStr ? typeStr : "other", "?");
+      ImGui::LabelText(typeStr, "?");
       break;
   }
 }
@@ -881,21 +1214,165 @@ static char* GetTextBuffer(std::string_view in) {
   return textBuffer;
 }
 
-static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
+namespace {
+class ArrayEditor {
+ public:
+  virtual ~ArrayEditor() = default;
+  virtual bool Emit() = 0;
+};
+
+template <int NTType, typename T>
+class ArrayEditorImpl final : public ArrayEditor {
+ public:
+  ArrayEditorImpl(NetworkTablesModel& model, std::string name,
+                  NetworkTablesFlags flags, std::span<const T> value)
+      : m_model{model},
+        m_name{std::move(name)},
+        m_flags{flags},
+        m_arr{value.begin(), value.end()} {}
+
+  bool Emit() final;
+
+ private:
+  NetworkTablesModel& m_model;
+  std::string m_name;
+  NetworkTablesFlags m_flags;
+  std::vector<T> m_arr;
+};
+
+template <int NTType, typename T>
+bool ArrayEditorImpl<NTType, T>::Emit() {
+  if (ImGui::BeginTable(
+          "arrayvalues", 1,
+          ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedFit |
+              ImGuiTableFlags_RowBg,
+          ImVec2(0.0f, ImGui::GetTextLineHeightWithSpacing() * 16))) {
+    ImGui::TableSetupScrollFreeze(0, 1);  // Make top row always visible
+    int toAdd = -1;
+    int toRemove = -1;
+    ImGuiListClipper clipper;
+    clipper.Begin(m_arr.size());
+    while (clipper.Step()) {
+      for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; ++row) {
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::PushID(row);
+        char label[16];
+        wpi::format_to_n_c_str(label, sizeof(label), "[{}]", row);
+        if constexpr (NTType == NT_BOOLEAN_ARRAY) {
+          static const char* boolOptions[] = {"false", "true"};
+          ImGui::Combo(label, &m_arr[row], boolOptions, 2);
+        } else if constexpr (NTType == NT_FLOAT_ARRAY) {
+          ImGui::InputFloat(label, &m_arr[row], 0, 0, "%.6f");
+        } else if constexpr (NTType == NT_DOUBLE_ARRAY) {
+          unsigned char precision = (m_flags & NetworkTablesFlags_Precision) >>
+                                    kNetworkTablesFlags_PrecisionBitShift;
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
+          ImGui::InputDouble(label, &m_arr[row], 0, 0,
+                             fmt::format("%.{}f", precision).c_str());
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+        } else if constexpr (NTType == NT_INTEGER_ARRAY) {
+          ImGui::InputScalar(label, ImGuiDataType_S64, &m_arr[row]);
+        } else if constexpr (NTType == NT_STRING_ARRAY) {
+          ImGui::InputText(label, &m_arr[row]);
+        }
+        ImGui::SameLine();
+        if (ImGui::SmallButton("+")) {
+          toAdd = row;
+        }
+        ImGui::SameLine();
+        if (ImGui::SmallButton("-")) {
+          toRemove = row;
+        }
+        ImGui::PopID();
+      }
+    }
+    if (toAdd != -1) {
+      m_arr.emplace(m_arr.begin() + toAdd);
+    } else if (toRemove != -1) {
+      m_arr.erase(m_arr.begin() + toRemove);
+    }
+    ImGui::EndTable();
+  }
+  if (ImGui::Button("Add to end")) {
+    m_arr.emplace_back();
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Cancel")) {
+    return true;
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Apply")) {
+    auto* entry = m_model.GetEntry(m_name);
+    if (!entry) {
+      entry = m_model.AddEntry(
+          nt::GetTopic(m_model.GetInstance().GetHandle(), m_name));
+    }
+    if constexpr (NTType == NT_BOOLEAN_ARRAY) {
+      if (entry->publisher == 0) {
+        entry->publisher =
+            nt::Publish(entry->info.topic, NT_BOOLEAN_ARRAY, "boolean[]");
+      }
+      nt::SetBooleanArray(entry->publisher, m_arr);
+    } else if constexpr (NTType == NT_FLOAT_ARRAY) {
+      if (entry->publisher == 0) {
+        entry->publisher =
+            nt::Publish(entry->info.topic, NT_FLOAT_ARRAY, "float[]");
+      }
+      nt::SetFloatArray(entry->publisher, m_arr);
+    } else if constexpr (NTType == NT_DOUBLE_ARRAY) {
+      if (entry->publisher == 0) {
+        entry->publisher =
+            nt::Publish(entry->info.topic, NT_DOUBLE_ARRAY, "double[]");
+      }
+      nt::SetDoubleArray(entry->publisher, m_arr);
+    } else if constexpr (NTType == NT_INTEGER_ARRAY) {
+      if (entry->publisher == 0) {
+        entry->publisher =
+            nt::Publish(entry->info.topic, NT_INTEGER_ARRAY, "int[]");
+      }
+      nt::SetIntegerArray(entry->publisher, m_arr);
+    } else if constexpr (NTType == NT_STRING_ARRAY) {
+      if (entry->publisher == 0) {
+        entry->publisher =
+            nt::Publish(entry->info.topic, NT_STRING_ARRAY, "string[]");
+      }
+      nt::SetStringArray(entry->publisher, m_arr);
+    }
+    return true;
+  }
+  return false;
+}
+}  // namespace
+
+static ImGuiID gArrayEditorID;
+static std::unique_ptr<ArrayEditor> gArrayEditor;
+
+static void EmitEntryValueEditable(NetworkTablesModel* model,
+                                   NetworkTablesModel::Entry& entry,
                                    NetworkTablesFlags flags) {
   auto& val = entry.value;
   if (!val) {
     return;
   }
 
-  const char* typeStr =
-      entry.info.type_str.empty() ? nullptr : entry.info.type_str.c_str();
+  const char* typeStr = GetTypeString(
+      val.type(),
+      entry.info.type_str.empty() ? nullptr : entry.info.type_str.c_str());
+  ImGui::SetNextItemWidth(
+      -1 * (ImGui::CalcTextSize(typeStr).x + ImGui::GetStyle().FramePadding.x));
+
   ImGui::PushID(entry.info.name.c_str());
   switch (val.type()) {
     case NT_BOOLEAN: {
       static const char* boolOptions[] = {"false", "true"};
       int v = val.GetBoolean() ? 1 : 0;
-      if (ImGui::Combo(typeStr ? typeStr : "boolean", &v, boolOptions, 2)) {
+      if (ImGui::Combo(typeStr, &v, boolOptions, 2)) {
         if (entry.publisher == 0) {
           entry.publisher =
               nt::Publish(entry.info.topic, NT_BOOLEAN, "boolean");
@@ -906,9 +1383,8 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
     }
     case NT_INTEGER: {
       int64_t v = val.GetInteger();
-      if (ImGui::InputScalar(typeStr ? typeStr : "int", ImGuiDataType_S64, &v,
-                             nullptr, nullptr, nullptr,
-                             ImGuiInputTextFlags_EnterReturnsTrue)) {
+      if (ImGui::InputScalar(typeStr, ImGuiDataType_S64, &v, nullptr, nullptr,
+                             nullptr, ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
           entry.publisher = nt::Publish(entry.info.topic, NT_INTEGER, "int");
         }
@@ -918,7 +1394,7 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
     }
     case NT_FLOAT: {
       float v = val.GetFloat();
-      if (ImGui::InputFloat(typeStr ? typeStr : "float", &v, 0, 0, "%.6f",
+      if (ImGui::InputFloat(typeStr, &v, 0, 0, "%.6f",
                             ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
           entry.publisher = nt::Publish(entry.info.topic, NT_FLOAT, "float");
@@ -935,7 +1411,7 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
-      if (ImGui::InputDouble(typeStr ? typeStr : "double", &v, 0, 0,
+      if (ImGui::InputDouble(typeStr, &v, 0, 0,
                              fmt::format("%.{}f", precision).c_str(),
                              ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
@@ -950,7 +1426,7 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
     }
     case NT_STRING: {
       char* v = GetTextBuffer(entry.valueStr);
-      if (ImGui::InputText(typeStr ? typeStr : "string", v, kTextBufferSize,
+      if (ImGui::InputText(typeStr, v, kTextBufferSize,
                            ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (v[0] == '"') {
           if (entry.publisher == 0) {
@@ -964,90 +1440,86 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
       }
       break;
     }
-    case NT_BOOLEAN_ARRAY: {
-      char* v = GetTextBuffer(entry.valueStr);
-      if (ImGui::InputText(typeStr ? typeStr : "boolean[]", v, kTextBufferSize,
-                           ImGuiInputTextFlags_EnterReturnsTrue)) {
-        std::vector<int> outv;
-        if (StringToBooleanArray(v, &outv)) {
-          if (entry.publisher == 0) {
-            entry.publisher =
-                nt::Publish(entry.info.topic, NT_BOOLEAN_ARRAY, "boolean[]");
-          }
-          nt::SetBooleanArray(entry.publisher, outv);
+    case NT_BOOLEAN_ARRAY:
+      ImGui::LabelText(typeStr, "[]");
+      if (ImGui::BeginPopupContextItem("boolean[]")) {
+        if (ImGui::Selectable("Edit Array")) {
+          gArrayEditor =
+              std::make_unique<ArrayEditorImpl<NT_BOOLEAN_ARRAY, int>>(
+                  *model, entry.info.name, flags,
+                  entry.value.GetBooleanArray());
+          ImGui::OpenPopup(gArrayEditorID);
         }
+        ImGui::EndPopup();
+      }
+      break;
+    case NT_INTEGER_ARRAY:
+      ImGui::LabelText(typeStr, "[]");
+      if (ImGui::BeginPopupContextItem("int[]")) {
+        if (ImGui::Selectable("Edit Array")) {
+          gArrayEditor =
+              std::make_unique<ArrayEditorImpl<NT_INTEGER_ARRAY, int64_t>>(
+                  *model, entry.info.name, flags,
+                  entry.value.GetIntegerArray());
+          ImGui::OpenPopup(gArrayEditorID);
+        }
+        ImGui::EndPopup();
+      }
+      break;
+    case NT_FLOAT_ARRAY:
+      ImGui::LabelText(typeStr, "[]");
+      if (ImGui::BeginPopupContextItem("float[]")) {
+        if (ImGui::Selectable("Edit Array")) {
+          gArrayEditor =
+              std::make_unique<ArrayEditorImpl<NT_FLOAT_ARRAY, float>>(
+                  *model, entry.info.name, flags, entry.value.GetFloatArray());
+          ImGui::OpenPopup(gArrayEditorID);
+        }
+        ImGui::EndPopup();
+      }
+      break;
+    case NT_DOUBLE_ARRAY:
+      ImGui::LabelText(typeStr, "[]");
+      if (ImGui::BeginPopupContextItem("double[]")) {
+        if (ImGui::Selectable("Edit Array")) {
+          gArrayEditor =
+              std::make_unique<ArrayEditorImpl<NT_DOUBLE_ARRAY, double>>(
+                  *model, entry.info.name, flags, entry.value.GetDoubleArray());
+          ImGui::OpenPopup(gArrayEditorID);
+        }
+        ImGui::EndPopup();
+      }
+      break;
+    case NT_STRING_ARRAY:
+      ImGui::LabelText(typeStr, "[]");
+      if (ImGui::BeginPopupContextItem("string[]")) {
+        if (ImGui::Selectable("Edit Array")) {
+          gArrayEditor =
+              std::make_unique<ArrayEditorImpl<NT_STRING_ARRAY, std::string>>(
+                  *model, entry.info.name, flags, entry.value.GetStringArray());
+          ImGui::OpenPopup(gArrayEditorID);
+        }
+        ImGui::EndPopup();
+        break;
+      }
+      break;
+    case NT_RAW: {
+      ImGui::LabelText(typeStr, val.GetRaw().empty() ? "[]" : "[...]");
+      if (ImGui::IsItemHovered()) {
+        ImGui::BeginTooltip();
+        if (!entry.info.type_str.empty()) {
+          ImGui::TextUnformatted(entry.info.type_str.c_str());
+        }
+        ImGui::Text("%u bytes", static_cast<unsigned int>(val.GetRaw().size()));
+        ImGui::EndTooltip();
       }
       break;
     }
-    case NT_INTEGER_ARRAY: {
-      char* v = GetTextBuffer(entry.valueStr);
-      if (ImGui::InputText(typeStr ? typeStr : "int[]", v, kTextBufferSize,
-                           ImGuiInputTextFlags_EnterReturnsTrue)) {
-        std::vector<int64_t> outv;
-        if (StringToIntegerArray(v, &outv)) {
-          if (entry.publisher == 0) {
-            entry.publisher =
-                nt::Publish(entry.info.topic, NT_INTEGER_ARRAY, "int[]");
-          }
-          nt::SetIntegerArray(entry.publisher, outv);
-        }
-      }
-      break;
-    }
-    case NT_FLOAT_ARRAY: {
-      char* v = GetTextBuffer(entry.valueStr);
-      if (ImGui::InputText(typeStr ? typeStr : "float[]", v, kTextBufferSize,
-                           ImGuiInputTextFlags_EnterReturnsTrue)) {
-        std::vector<float> outv;
-        if (StringToFloatArray(v, &outv)) {
-          if (entry.publisher == 0) {
-            entry.publisher =
-                nt::Publish(entry.info.topic, NT_DOUBLE_ARRAY, "float[]");
-          }
-          nt::SetFloatArray(entry.publisher, outv);
-        }
-      }
-      break;
-    }
-    case NT_DOUBLE_ARRAY: {
-      char* v = GetTextBuffer(entry.valueStr);
-      if (ImGui::InputText(typeStr ? typeStr : "double[]", v, kTextBufferSize,
-                           ImGuiInputTextFlags_EnterReturnsTrue)) {
-        std::vector<double> outv;
-        if (StringToFloatArray(v, &outv)) {
-          if (entry.publisher == 0) {
-            entry.publisher =
-                nt::Publish(entry.info.topic, NT_DOUBLE_ARRAY, "double[]");
-          }
-          nt::SetDoubleArray(entry.publisher, outv);
-        }
-      }
-      break;
-    }
-    case NT_STRING_ARRAY: {
-      char* v = GetTextBuffer(entry.valueStr);
-      if (ImGui::InputText(typeStr ? typeStr : "string[]", v, kTextBufferSize,
-                           ImGuiInputTextFlags_EnterReturnsTrue)) {
-        std::vector<std::string> outv;
-        if (StringToStringArray(v, &outv)) {
-          if (entry.publisher == 0) {
-            entry.publisher =
-                nt::Publish(entry.info.topic, NT_STRING_ARRAY, "string[]");
-          }
-          nt::SetStringArray(entry.publisher, outv);
-        }
-      }
-      break;
-    }
-    case NT_RAW:
-      ImGui::LabelText(typeStr ? typeStr : "raw",
-                       val.GetRaw().empty() ? "[]" : "[...]");
-      break;
     case NT_RPC:
-      ImGui::LabelText(typeStr ? typeStr : "rpc", "[...]");
+      ImGui::LabelText(typeStr, "[...]");
       break;
     default:
-      ImGui::LabelText(typeStr ? typeStr : "other", "?");
+      ImGui::LabelText(typeStr, "?");
       break;
   }
   ImGui::PopID();
@@ -1178,13 +1650,28 @@ static void EmitValueTree(
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
     EmitValueName(child.source.get(), child.name.c_str(), child.path.c_str());
+
     ImGui::TableNextColumn();
     if (!child.valueChildren.empty()) {
-      char label[64];
-      std::snprintf(label, sizeof(label),
-                    child.valueChildrenMap ? "{...}##v_%s" : "[...]##v_%s",
-                    child.name.c_str());
-      if (TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth)) {
+      auto pos = ImGui::GetCursorPos();
+      char label[128];
+      std::string_view ts = child.typeStr;
+      bool havePopup = GetHeadingTypeString(&ts);
+      wpi::format_to_n_c_str(label, sizeof(label), "{}##v_{}", ts.data(),
+                             child.name.c_str());
+      bool valueChildrenOpen =
+          TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth);
+      if (havePopup) {
+        if (ImGui::IsItemHovered()) {
+          ImGui::BeginTooltip();
+          ImGui::TextUnformatted(child.typeStr.c_str());
+          ImGui::EndTooltip();
+        }
+      }
+      // make it look like a normal label w/type
+      ImGui::SetCursorPos(pos);
+      ImGui::LabelText(child.valueChildrenMap ? "{...}" : "[...]", "%s", "");
+      if (valueChildrenOpen) {
         EmitValueTree(child.valueChildren, flags);
         TreePop();
       }
@@ -1209,23 +1696,68 @@ static void EmitEntry(NetworkTablesModel* model,
   ImGui::TableNextColumn();
   if (!entry.valueChildren.empty()) {
     auto pos = ImGui::GetCursorPos();
-    char label[64];
-    std::snprintf(label, sizeof(label),
-                  entry.valueChildrenMap ? "{...}##v_%s" : "[...]##v_%s",
-                  entry.info.name.c_str());
+    char label[128];
+    std::string_view ts = entry.info.type_str;
+    bool havePopup = GetHeadingTypeString(&ts);
+    wpi::format_to_n_c_str(label, sizeof(label), "{}##v_{}", ts.data(),
+                           entry.info.name.c_str());
     valueChildrenOpen =
         TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth |
                               ImGuiTreeNodeFlags_AllowItemOverlap);
+    if (havePopup) {
+      if (ImGui::IsItemHovered()) {
+        ImGui::BeginTooltip();
+        ImGui::TextUnformatted(entry.info.type_str.c_str());
+        ImGui::EndTooltip();
+      }
+    }
     // make it look like a normal label w/type
+    const char* typeStr = GetTypeString(
+        NT_RAW,
+        entry.info.type_str.empty() ? nullptr : entry.info.type_str.c_str());
     ImGui::SetCursorPos(pos);
-    ImGui::LabelText(entry.info.type_str.c_str(), "%s", "");
+    ImGui::SetNextItemWidth(-1 * (ImGui::CalcTextSize(typeStr).x +
+                                  ImGui::GetStyle().FramePadding.x));
+    ImGui::LabelText(typeStr, "%s", "");
+    if ((entry.value.IsBooleanArray() || entry.value.IsFloatArray() ||
+         entry.value.IsDoubleArray() || entry.value.IsIntegerArray() ||
+         entry.value.IsStringArray()) &&
+        ImGui::BeginPopupContextItem(label)) {
+      if (ImGui::Selectable("Edit Array")) {
+        if (entry.value.IsBooleanArray()) {
+          gArrayEditor =
+              std::make_unique<ArrayEditorImpl<NT_BOOLEAN_ARRAY, int>>(
+                  *model, entry.info.name, flags,
+                  entry.value.GetBooleanArray());
+        } else if (entry.value.IsFloatArray()) {
+          gArrayEditor =
+              std::make_unique<ArrayEditorImpl<NT_FLOAT_ARRAY, float>>(
+                  *model, entry.info.name, flags, entry.value.GetFloatArray());
+        } else if (entry.value.IsDoubleArray()) {
+          gArrayEditor =
+              std::make_unique<ArrayEditorImpl<NT_DOUBLE_ARRAY, double>>(
+                  *model, entry.info.name, flags, entry.value.GetDoubleArray());
+        } else if (entry.value.IsIntegerArray()) {
+          gArrayEditor =
+              std::make_unique<ArrayEditorImpl<NT_INTEGER_ARRAY, int64_t>>(
+                  *model, entry.info.name, flags,
+                  entry.value.GetIntegerArray());
+        } else if (entry.value.IsStringArray()) {
+          gArrayEditor =
+              std::make_unique<ArrayEditorImpl<NT_STRING_ARRAY, std::string>>(
+                  *model, entry.info.name, flags, entry.value.GetStringArray());
+        }
+        ImGui::OpenPopup(gArrayEditorID);
+      }
+      ImGui::EndPopup();
+    }
   } else if (flags & NetworkTablesFlags_ReadOnly) {
     EmitEntryValueReadonly(
         entry,
         entry.info.type_str.empty() ? nullptr : entry.info.type_str.c_str(),
         flags);
   } else {
-    EmitEntryValueEditable(entry, flags);
+    EmitEntryValueEditable(model, entry, flags);
   }
 
   if (flags & NetworkTablesFlags_ShowProperties) {
@@ -1471,6 +2003,16 @@ void glass::DisplayNetworkTablesInfo(NetworkTablesModel* model) {
 
 void glass::DisplayNetworkTables(NetworkTablesModel* model,
                                  NetworkTablesFlags flags) {
+  gArrayEditorID = ImGui::GetID("Array Editor");
+  if (ImGui::BeginPopupModal("Array Editor", nullptr,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (!gArrayEditor || gArrayEditor->Emit()) {
+      ImGui::CloseCurrentPopup();
+      gArrayEditor.release();
+    }
+    ImGui::EndPopup();
+  }
+
   if (flags & NetworkTablesFlags_CombinedView) {
     DisplayTable(model, model->GetTreeRoot(), flags, ShowAll);
   } else {

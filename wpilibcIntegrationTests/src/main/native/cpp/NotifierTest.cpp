@@ -5,9 +5,9 @@
 #include "frc/Notifier.h"  // NOLINT(build/include_order)
 
 #include <fmt/core.h>
+#include <gtest/gtest.h>
 
 #include "frc/Timer.h"
-#include "gtest/gtest.h"
 
 TEST(NotifierTest, StartPeriodicAndStop) {
   uint32_t counter = 0;

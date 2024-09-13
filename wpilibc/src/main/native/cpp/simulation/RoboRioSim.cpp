@@ -284,6 +284,40 @@ void RoboRioSim::SetBrownoutVoltage(units::volt_t vInVoltage) {
   HALSIM_SetRoboRioBrownoutVoltage(vInVoltage.value());
 }
 
+std::unique_ptr<CallbackStore> RoboRioSim::RegisterCPUTempCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelRoboRioCPUTempCallback);
+  store->SetUid(HALSIM_RegisterRoboRioCPUTempCallback(
+      &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+units::celsius_t RoboRioSim::GetCPUTemp() {
+  return units::celsius_t{HALSIM_GetRoboRioCPUTemp()};
+}
+
+void RoboRioSim::SetCPUTemp(units::celsius_t cpuTemp) {
+  HALSIM_SetRoboRioCPUTemp(cpuTemp.value());
+}
+
+std::unique_ptr<CallbackStore> RoboRioSim::RegisterTeamNumberCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelRoboRioTeamNumberCallback);
+  store->SetUid(HALSIM_RegisterRoboRioTeamNumberCallback(
+      &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+int32_t RoboRioSim::GetTeamNumber() {
+  return HALSIM_GetRoboRioTeamNumber();
+}
+
+void RoboRioSim::SetTeamNumber(int32_t teamNumber) {
+  HALSIM_SetRoboRioTeamNumber(teamNumber);
+}
+
 std::string RoboRioSim::GetSerialNumber() {
   char serialNum[9];
   size_t len = HALSIM_GetRoboRioSerialNumber(serialNum, sizeof(serialNum));
@@ -302,6 +336,23 @@ std::string RoboRioSim::GetComments() {
 
 void RoboRioSim::SetComments(std::string_view comments) {
   HALSIM_SetRoboRioComments(comments.data(), comments.size());
+}
+
+std::unique_ptr<CallbackStore> RoboRioSim::RegisterRadioLEDStateCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelRoboRioRadioLEDStateCallback);
+  store->SetUid(HALSIM_RegisterRoboRioRadioLEDStateCallback(
+      &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+RadioLEDState RoboRioSim::GetRadioLEDState() {
+  return static_cast<RadioLEDState>(HALSIM_GetRoboRioRadioLEDState());
+}
+
+void RoboRioSim::SetRadioLEDState(RadioLEDState state) {
+  HALSIM_SetRoboRioRadioLEDState(static_cast<HAL_RadioLEDState>(state));
 }
 
 void RoboRioSim::ResetData() {

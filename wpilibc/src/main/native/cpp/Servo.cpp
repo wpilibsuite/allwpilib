@@ -13,12 +13,12 @@ using namespace frc;
 constexpr double Servo::kMaxServoAngle;
 constexpr double Servo::kMinServoAngle;
 
-constexpr double Servo::kDefaultMaxServoPWM;
-constexpr double Servo::kDefaultMinServoPWM;
+constexpr units::millisecond_t Servo::kDefaultMaxServoPWM;
+constexpr units::millisecond_t Servo::kDefaultMinServoPWM;
 
 Servo::Servo(int channel) : PWM(channel) {
   // Set minimum and maximum PWM values supported by the servo
-  SetBounds(kDefaultMaxServoPWM, 0.0, 0.0, 0.0, kDefaultMinServoPWM);
+  SetBounds(kDefaultMaxServoPWM, 0.0_ms, 0.0_ms, 0.0_ms, kDefaultMinServoPWM);
 
   // Assign defaults for period multiplier for the servo PWM control signal
   SetPeriodMultiplier(kPeriodMultiplier_4X);
@@ -32,7 +32,7 @@ void Servo::Set(double value) {
 }
 
 void Servo::SetOffline() {
-  SetRaw(0);
+  SetDisabled();
 }
 
 double Servo::Get() const {

@@ -9,14 +9,16 @@
 #pragma warning(disable : 4521)
 #endif
 
+#include <concepts>
 #include <limits>
 #include <memory>
-#include <span>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-#include "frc2/command/CommandGroupBase.h"
+#include <wpi/DecayedDerivedFrom.h>
+
+#include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -34,7 +36,7 @@ const size_t invalid_index = std::numeric_limits<size_t>::max();
  * This class is provided by the NewCommands VendorDep
  */
 class SequentialCommandGroup
-    : public CommandHelper<CommandGroupBase, SequentialCommandGroup> {
+    : public CommandHelper<Command, SequentialCommandGroup> {
  public:
   /**
    * Creates a new SequentialCommandGroup. The given commands will be run
@@ -53,11 +55,9 @@ class SequentialCommandGroup
    *
    * @param commands the commands to include in this composition.
    */
-  template <class... Types,
-            typename = std::enable_if_t<std::conjunction_v<
-                std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
-  explicit SequentialCommandGroup(Types&&... commands) {
-    AddCommands(std::forward<Types>(commands)...);
+  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  explicit SequentialCommandGroup(Commands&&... commands) {
+    AddCommands(std::forward<Commands>(commands)...);
   }
 
   SequentialCommandGroup(SequentialCommandGroup&& other) = default;
@@ -68,13 +68,16 @@ class SequentialCommandGroup
   // Prevent template expansion from emulating copy ctor
   SequentialCommandGroup(SequentialCommandGroup&) = delete;
 
-  template <class... Types,
-            typename = std::enable_if_t<std::conjunction_v<
-                std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
-  void AddCommands(Types&&... commands) {
+  /**
+   * Adds the given commands to the group.
+   *
+   * @param commands Commands to add, in order of execution.
+   */
+  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  void AddCommands(Commands&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
-    ((void)foo.emplace_back(std::make_unique<std::remove_reference_t<Types>>(
-         std::forward<Types>(commands))),
+    ((void)foo.emplace_back(std::make_unique<std::decay_t<Commands>>(
+         std::forward<Commands>(commands))),
      ...);
     AddCommands(std::move(foo));
   }
@@ -94,7 +97,7 @@ class SequentialCommandGroup
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
+  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands);
 
   wpi::SmallVector<std::unique_ptr<Command>, 4> m_commands;
   size_t m_currentCommandIndex{invalid_index};

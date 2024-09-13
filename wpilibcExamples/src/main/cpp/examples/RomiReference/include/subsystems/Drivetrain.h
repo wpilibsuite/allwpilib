@@ -8,10 +8,9 @@
 #include <frc/Encoder.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/Spark.h>
+#include <frc/romi/RomiGyro.h>
 #include <frc2/command/SubsystemBase.h>
 #include <units/length.h>
-
-#include "sensors/RomiGyro.h"
 
 class Drivetrain : public frc2::SubsystemBase {
  public:
@@ -115,8 +114,10 @@ class Drivetrain : public frc2::SubsystemBase {
   frc::Encoder m_leftEncoder{4, 5};
   frc::Encoder m_rightEncoder{6, 7};
 
-  frc::DifferentialDrive m_drive{m_leftMotor, m_rightMotor};
+  frc::DifferentialDrive m_drive{
+      [&](double output) { m_leftMotor.Set(output); },
+      [&](double output) { m_rightMotor.Set(output); }};
 
-  RomiGyro m_gyro;
+  frc::RomiGyro m_gyro;
   frc::BuiltInAccelerometer m_accelerometer;
 };

@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.livewindow;
 
 import edu.wpi.first.wpilibj.UtilityClassTest;
 
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 class LiveWindowTest extends UtilityClassTest<LiveWindow> {
   LiveWindowTest() {
     super(LiveWindow.class);

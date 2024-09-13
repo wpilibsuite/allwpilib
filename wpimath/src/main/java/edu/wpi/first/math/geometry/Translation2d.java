@@ -4,12 +4,23 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.proto.Translation2dProto;
+import edu.wpi.first.math.geometry.struct.Translation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -23,7 +34,8 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Translation2d implements Interpolatable<Translation2d> {
+public class Translation2d
+    implements Interpolatable<Translation2d>, ProtobufSerializable, StructSerializable {
   private final double m_x;
   private final double m_y;
 
@@ -59,6 +71,27 @@ public class Translation2d implements Interpolatable<Translation2d> {
   }
 
   /**
+   * Constructs a Translation2d with the X and Y components equal to the provided values. The X and
+   * Y components will be converted to and tracked as meters.
+   *
+   * @param x The x component of the translation.
+   * @param y The y component of the translation.
+   */
+  public Translation2d(Measure<Distance> x, Measure<Distance> y) {
+    this(x.in(Meters), y.in(Meters));
+  }
+
+  /**
+   * Constructs a Translation2d from the provided translation vector's X and Y components. The
+   * values are assumed to be in meters.
+   *
+   * @param vector The translation vector to represent.
+   */
+  public Translation2d(Vector<N2> vector) {
+    this(vector.get(0), vector.get(1));
+  }
+
+  /**
    * Calculates the distance between two translations in 2D space.
    *
    * <p>The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²).
@@ -88,6 +121,15 @@ public class Translation2d implements Interpolatable<Translation2d> {
   @JsonProperty
   public double getY() {
     return m_y;
+  }
+
+  /**
+   * Returns a vector representation of this translation.
+   *
+   * @return A Vector representation of this translation.
+   */
+  public Vector<N2> toVector() {
+    return VecBuilder.fill(m_x, m_y);
   }
 
   /**
@@ -229,4 +271,10 @@ public class Translation2d implements Interpolatable<Translation2d> {
         MathUtil.interpolate(this.getX(), endValue.getX(), t),
         MathUtil.interpolate(this.getY(), endValue.getY(), t));
   }
+
+  /** Translation2d protobuf for serialization. */
+  public static final Translation2dProto proto = new Translation2dProto();
+
+  /** Translation2d struct for serialization. */
+  public static final Translation2dStruct struct = new Translation2dStruct();
 }

@@ -4,7 +4,7 @@
 
 #include "wpinet/raw_uv_ostream.h"  // NOLINT(build/include_order)
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 namespace wpi {
 

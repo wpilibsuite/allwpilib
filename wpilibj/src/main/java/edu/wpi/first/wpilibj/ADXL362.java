@@ -14,7 +14,6 @@ import edu.wpi.first.networktables.DoubleTopic;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -23,7 +22,7 @@ import java.nio.ByteOrder;
  *
  * <p>This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
-public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
+public class ADXL362 implements NTSendable, AutoCloseable {
   private static final byte kRegWrite = 0x0A;
   private static final byte kRegRead = 0x0B;
 
@@ -39,16 +38,31 @@ public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
 
   private static final byte kPowerCtl_UltraLowNoise = 0x20;
 
-  @SuppressWarnings("PMD.UnusedPrivateField")
-  private static final byte kPowerCtl_AutoSleep = 0x04;
+  // @SuppressWarnings("PMD.UnusedPrivateField")
+  // private static final byte kPowerCtl_AutoSleep = 0x04;
 
   private static final byte kPowerCtl_Measure = 0x02;
 
+  /** Accelerometer range. */
+  public enum Range {
+    /** 2 Gs max. */
+    k2G,
+    /** 4 Gs max. */
+    k4G,
+    /** 8 Gs max. */
+    k8G
+  }
+
+  /** Accelerometer axes. */
   public enum Axes {
+    /** X axis. */
     kX((byte) 0x00),
+    /** Y axis. */
     kY((byte) 0x02),
+    /** Z axis. */
     kZ((byte) 0x04);
 
+    /** Axis value. */
     public final byte value;
 
     Axes(byte value) {
@@ -56,11 +70,20 @@ public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
     }
   }
 
+  /** Container type for accelerations from all axes. */
   @SuppressWarnings("MemberName")
   public static class AllAxes {
+    /** Acceleration along the X axis in g-forces. */
     public double XAxis;
+
+    /** Acceleration along the Y axis in g-forces. */
     public double YAxis;
+
+    /** Acceleration along the Z axis in g-forces. */
     public double ZAxis;
+
+    /** Default constructor. */
+    public AllAxes() {}
   }
 
   private SPI m_spi;
@@ -88,6 +111,7 @@ public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
    * @param port The SPI port that the accelerometer is connected to
    * @param range The range (+ or -) that the accelerometer will measure.
    */
+  @SuppressWarnings("this-escape")
   public ADXL362(SPI.Port port, Range range) {
     m_spi = new SPI(port);
 
@@ -136,6 +160,11 @@ public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
     SendableRegistry.addLW(this, "ADXL362", port.value);
   }
 
+  /**
+   * Returns the SPI port.
+   *
+   * @return The SPI port.
+   */
   public int getPort() {
     return m_spi.getPort();
   }
@@ -153,8 +182,13 @@ public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
     }
   }
 
-  @Override
-  public void setRange(Range range) {
+  /**
+   * Set the measuring range of the accelerometer.
+   *
+   * @param range The maximum acceleration, positive or negative, that the accelerometer will
+   *     measure.
+   */
+  public final void setRange(Range range) {
     if (m_spi == null) {
       return;
     }
@@ -170,12 +204,11 @@ public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
         m_gsPerLSB = 0.002;
         break;
       case k8G:
-      case k16G: // 16G not supported; treat as 8G
         value = kFilterCtl_Range8G;
         m_gsPerLSB = 0.004;
         break;
       default:
-        throw new IllegalArgumentException(range + " unsupported");
+        throw new IllegalArgumentException("Missing case for range type " + range);
     }
 
     // Specify the data format to read
@@ -188,17 +221,29 @@ public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
     }
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the X axis in g-forces.
+   *
+   * @return The acceleration along the X axis in g-forces.
+   */
   public double getX() {
     return getAcceleration(Axes.kX);
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the Y axis in g-forces.
+   *
+   * @return The acceleration along the Y axis in g-forces.
+   */
   public double getY() {
     return getAcceleration(Axes.kY);
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the Z axis in g-forces.
+   *
+   * @return The acceleration along the Z axis in g-forces.
+   */
   public double getZ() {
     return getAcceleration(Axes.kZ);
   }

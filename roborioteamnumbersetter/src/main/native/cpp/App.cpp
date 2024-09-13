@@ -57,6 +57,8 @@ struct TeamNumberRefHolder {
 static std::unique_ptr<TeamNumberRefHolder> teamNumberRef;
 static std::unordered_map<std::string, std::pair<unsigned int, std::string>>
     foundDevices;
+static std::unordered_map<std::string, std::optional<sysid::DeviceStatus>>
+    deviceStatuses;
 static wpi::Logger logger;
 static sysid::DeploySession deploySession{logger};
 static std::unique_ptr<wpi::MulticastServiceResolver> multicastResolver;
@@ -76,7 +78,12 @@ static void FindDevices() {
                        [](const auto& a) { return a.first == "MAC"; });
       if (macKey != data.txt.end()) {
         auto& mac = macKey->second;
-        foundDevices[mac] = std::make_pair(data.ipv4Address, data.hostName);
+        auto& foundDevice = foundDevices[mac];
+        foundDevice = std::make_pair(data.ipv4Address, data.hostName);
+        auto& deviceStatus = deviceStatuses[mac];
+        if (!deviceStatus) {
+          deploySession.GetStatus(mac, foundDevice.first);
+        }
       }
     }
   }
@@ -146,15 +153,12 @@ static void DisplayGui() {
     int macWidth = ImGui::CalcTextSize("88:88:88:88:88:88").x;
     int ipAddressWidth = ImGui::CalcTextSize("255.255.255.255").x;
     int setWidth = ImGui::CalcTextSize(" Set Team To 99999 ").x;
-    int blinkWidth = ImGui::CalcTextSize(" Blink ").x;
-    int rebootWidth = ImGui::CalcTextSize(" Reboot ").x;
 
-    minWidth = nameWidth + macWidth + ipAddressWidth + setWidth + blinkWidth +
-               rebootWidth + 100;
+    minWidth = nameWidth + macWidth + ipAddressWidth + setWidth + 100;
 
     std::string setString = fmt::format("Set team to {}", teamNumber);
 
-    if (ImGui::BeginTable("Table", 6)) {
+    if (ImGui::BeginTable("Table", 4)) {
       ImGui::TableSetupColumn(
           "Name",
           ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_WidthFixed,
@@ -171,17 +175,33 @@ static void DisplayGui() {
           "Set",
           ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_WidthFixed,
           setWidth);
-      ImGui::TableSetupColumn(
-          "Blink",
-          ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_WidthFixed,
-          blinkWidth);
-      ImGui::TableSetupColumn(
-          "Reboot",
-          ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_WidthFixed,
-          rebootWidth);
       ImGui::TableHeadersRow();
 
-      for (auto&& i : foundDevices) {
+      ImGui::EndTable();
+    }
+
+    for (auto&& i : foundDevices) {
+      std::future<int>* future = deploySession.GetFuture(i.first);
+      std::future<sysid::DeviceStatus>* futureStatus =
+          deploySession.GetStatusFuture(i.first);
+      if (ImGui::BeginTable("Table", 4)) {
+        ImGui::TableSetupColumn(
+            "Name",
+            ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_WidthFixed,
+            nameWidth);
+        ImGui::TableSetupColumn(
+            "MAC Address",
+            ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_WidthFixed,
+            macWidth);
+        ImGui::TableSetupColumn(
+            "IP Address",
+            ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_WidthFixed,
+            ipAddressWidth);
+        ImGui::TableSetupColumn(
+            "Set",
+            ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_WidthFixed,
+            setWidth);
+
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::Text("%s", i.second.second.c_str());
@@ -192,11 +212,8 @@ static void DisplayGui() {
         in.s_addr = i.second.first;
         ImGui::Text("%s", inet_ntoa(in));
         ImGui::TableNextColumn();
-        std::future<int>* future = deploySession.GetFuture(i.first);
         ImGui::PushID(i.first.c_str());
         if (future) {
-          ImGui::Button("Deploying");
-          ImGui::TableNextColumn();
           ImGui::TableNextColumn();
           const auto fs = future->wait_for(std::chrono::seconds(0));
           if (fs == std::future_status::ready) {
@@ -207,18 +224,62 @@ static void DisplayGui() {
             deploySession.ChangeTeamNumber(i.first, teamNumber, i.second.first);
           }
           ImGui::TableNextColumn();
-          if (ImGui::Button("Blink")) {
-            deploySession.Blink(i.first, i.second.first);
-          }
-          ImGui::TableNextColumn();
-          if (ImGui::Button("Reboot")) {
-            deploySession.Reboot(i.first, i.second.first);
-          }
         }
+
         ImGui::PopID();
+        ImGui::EndTable();
       }
 
-      ImGui::EndTable();
+      ImGui::PushID(i.first.c_str());
+      if (futureStatus) {
+        ImGui::Text("Refreshing Status");
+        const auto fs = futureStatus->wait_for(std::chrono::seconds(0));
+        if (fs == std::future_status::ready) {
+          deviceStatuses[i.first] = futureStatus->get();
+          deploySession.DestroyStatusFuture(i.first);
+        }
+      } else {
+        auto& deviceStatus = deviceStatuses[i.first];
+        if (deviceStatus) {
+          if (ImGui::Button("Refresh Status")) {
+            deploySession.GetStatus(i.first, i.second.first);
+          }
+          std::string formatted =
+              fmt::format("Image: {}", deviceStatus.value().image);
+          ImGui::Text("%s", formatted.c_str());
+          formatted = fmt::format("Serial Number: {}",
+                                  deviceStatus.value().serialNumber);
+          ImGui::Text("%s", formatted.c_str());
+          formatted = fmt::format(
+              "Web Server Status: {}",
+              deviceStatus.value().webServerEnabled ? "Enabled" : "Disabled");
+          ImGui::Text("%s", formatted.c_str());
+        } else {
+          ImGui::Text("Waiting for refresh");
+        }
+      }
+
+      if (future) {
+        ImGui::Text("Deploying");
+      } else {
+        if (ImGui::Button("Blink")) {
+          deploySession.Blink(i.first, i.second.first);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Reboot")) {
+          deploySession.Reboot(i.first, i.second.first);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Disable Web Server")) {
+          deploySession.DisableWebServer(i.first, i.second.first);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Enable Web Server")) {
+          deploySession.EnableWebServer(i.first, i.second.first);
+        }
+      }
+      ImGui::Separator();
+      ImGui::PopID();
     }
 
     ImGui::Columns(6, "Devices");

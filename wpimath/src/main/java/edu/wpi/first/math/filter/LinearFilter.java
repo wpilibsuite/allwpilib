@@ -6,7 +6,7 @@ package edu.wpi.first.math.filter;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
-import edu.wpi.first.util.CircularBuffer;
+import edu.wpi.first.util.DoubleCircularBuffer;
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
 
@@ -35,9 +35,13 @@ import org.ejml.simple.SimpleMatrix;
  * PID controller out of this class!
  *
  * <p>For more on filters, we highly recommend the following articles:<br>
- * https://en.wikipedia.org/wiki/Linear_filter<br>
- * https://en.wikipedia.org/wiki/Iir_filter<br>
- * https://en.wikipedia.org/wiki/Fir_filter<br>
+ * <a
+ * href="https://en.wikipedia.org/wiki/Linear_filter">https://en.wikipedia.org/wiki/Linear_filter</a>
+ * <br>
+ * <a href="https://en.wikipedia.org/wiki/Iir_filter">https://en.wikipedia.org/wiki/Iir_filter</a>
+ * <br>
+ * <a href="https://en.wikipedia.org/wiki/Fir_filter">https://en.wikipedia.org/wiki/Fir_filter</a>
+ * <br>
  *
  * <p>Note 1: calculate() should be called by the user on a known, regular period. You can use a
  * Notifier for this or do it "inline" with code in a periodic function.
@@ -48,8 +52,8 @@ import org.ejml.simple.SimpleMatrix;
  * to make sure calculate() gets called at the desired, constant frequency!
  */
 public class LinearFilter {
-  private final CircularBuffer m_inputs;
-  private final CircularBuffer m_outputs;
+  private final DoubleCircularBuffer m_inputs;
+  private final DoubleCircularBuffer m_outputs;
   private final double[] m_inputGains;
   private final double[] m_outputGains;
 
@@ -62,8 +66,8 @@ public class LinearFilter {
    * @param fbGains The "feedback" or IIR gains.
    */
   public LinearFilter(double[] ffGains, double[] fbGains) {
-    m_inputs = new CircularBuffer(ffGains.length);
-    m_outputs = new CircularBuffer(fbGains.length);
+    m_inputs = new DoubleCircularBuffer(ffGains.length);
+    m_outputs = new DoubleCircularBuffer(fbGains.length);
     m_inputGains = Arrays.copyOf(ffGains, ffGains.length);
     m_outputGains = Arrays.copyOf(fbGains, fbGains.length);
 
@@ -243,6 +247,43 @@ public class LinearFilter {
   }
 
   /**
+   * Resets the filter state, initializing internal buffers to the provided values.
+   *
+   * <p>These are the expected lengths of the buffers, depending on what type of linear filter used:
+   *
+   * <table>
+   * <tr><th>Type</th><th>Input Buffer Length</th><th>Output Buffer Length</th></tr>
+   * <tr><td>Unspecified</td><td>length of {@code ffGains}</td><td>length of {@code fbGains}</td>
+   * </tr>
+   * <tr><td>Single Pole IIR</td><td>1</td><td>1</td></tr>
+   * <tr><td>High-Pass</td><td>2</td><td>1</td></tr>
+   * <tr><td>Moving Average</td><td>{@code taps}</td><td>0</td></tr>
+   * <tr><td>Finite Difference</td><td>length of {@code stencil}</td><td>0</td></tr>
+   * <tr><td>Backward Finite Difference</td><td>{@code samples}</td><td>0</td></tr>
+   * </table>
+   *
+   * @param inputBuffer Values to initialize input buffer.
+   * @param outputBuffer Values to initialize output buffer.
+   * @throws IllegalArgumentException if length of inputBuffer or outputBuffer does not match the
+   *     length of ffGains and fbGains provided in the constructor.
+   */
+  public void reset(double[] inputBuffer, double[] outputBuffer) {
+    // Clear buffers
+    reset();
+
+    if (inputBuffer.length != m_inputGains.length || outputBuffer.length != m_outputGains.length) {
+      throw new IllegalArgumentException("Incorrect length of inputBuffer or outputBuffer");
+    }
+
+    for (double input : inputBuffer) {
+      m_inputs.addFirst(input);
+    }
+    for (double output : outputBuffer) {
+      m_outputs.addFirst(output);
+    }
+  }
+
+  /**
    * Calculates the next value of the filter.
    *
    * @param input Current input value.
@@ -270,6 +311,15 @@ public class LinearFilter {
     }
 
     return retVal;
+  }
+
+  /**
+   * Returns the last value calculated by the LinearFilter.
+   *
+   * @return The last value.
+   */
+  public double lastValue() {
+    return m_outputs.getFirst();
   }
 
   /**

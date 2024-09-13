@@ -6,12 +6,6 @@
 
 using namespace frc2;
 
-RunCommand::RunCommand(std::function<void()> toRun,
-                       std::initializer_list<Subsystem*> requirements)
-    : CommandHelper([] {}, std::move(toRun), [](bool interrupted) {},
-                    [] { return false; }, requirements) {}
-
-RunCommand::RunCommand(std::function<void()> toRun,
-                       std::span<Subsystem* const> requirements)
+RunCommand::RunCommand(std::function<void()> toRun, Requirements requirements)
     : CommandHelper([] {}, std::move(toRun), [](bool interrupted) {},
                     [] { return false; }, requirements) {}

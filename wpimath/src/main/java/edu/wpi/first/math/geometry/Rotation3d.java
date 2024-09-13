@@ -8,26 +8,32 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.proto.Rotation3dProto;
+import edu.wpi.first.math.geometry.struct.Rotation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 
 /** A rotation in a 3D coordinate frame represented by a quaternion. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Rotation3d implements Interpolatable<Rotation3d> {
-  private Quaternion m_q = new Quaternion();
+public class Rotation3d
+    implements Interpolatable<Rotation3d>, ProtobufSerializable, StructSerializable {
+  private final Quaternion m_q;
 
   /** Constructs a Rotation3d with a default angle of 0 degrees. */
-  public Rotation3d() {}
+  public Rotation3d() {
+    m_q = new Quaternion();
+  }
 
   /**
    * Constructs a Rotation3d from a quaternion.
@@ -93,6 +99,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   public Rotation3d(Vector<N3> axis, double angleRadians) {
     double norm = axis.norm();
     if (norm == 0.0) {
+      m_q = new Quaternion();
       return;
     }
 
@@ -113,19 +120,15 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     // Require that the rotation matrix is special orthogonal. This is true if
     // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
     if (R.times(R.transpose()).minus(Matrix.eye(Nat.N3())).normF() > 1e-9) {
-      var builder = new StringBuilder("Rotation matrix isn't orthogonal\n\nR =\n");
-      builder.append(R.getStorage().toString()).append('\n');
-
-      var msg = builder.toString();
+      var msg = "Rotation matrix isn't orthogonal\n\nR =\n" + R.getStorage().toString() + '\n';
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(msg);
     }
     if (Math.abs(R.det() - 1.0) > 1e-9) {
-      var builder =
-          new StringBuilder("Rotation matrix is orthogonal but not special orthogonal\n\nR =\n");
-      builder.append(R.getStorage().toString()).append('\n');
-
-      var msg = builder.toString();
+      var msg =
+          "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n"
+              + R.getStorage().toString()
+              + '\n';
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(msg);
     }
@@ -186,15 +189,13 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     if (dotNorm > 1.0 - 1E-9) {
       // If the dot product is 1, the two vectors point in the same direction so
       // there's no rotation. The default initialization of m_q will work.
-      return;
+      m_q = new Quaternion();
     } else if (dotNorm < -1.0 + 1E-9) {
       // If the dot product is -1, the two vectors point in opposite directions
       // so a 180 degree rotation is required. Any orthogonal vector can be used
       // for it. Q in the QR decomposition is an orthonormal basis, so it
       // contains orthogonal unit vectors.
-      var X =
-          new MatBuilder<>(Nat.N3(), Nat.N1())
-              .fill(initial.get(0, 0), initial.get(1, 0), initial.get(2, 0));
+      var X = VecBuilder.fill(initial.get(0, 0), initial.get(1, 0), initial.get(2, 0));
       final var qr = DecompositionFactory_DDRM.qr(3, 1);
       qr.decompose(X.getStorage().getMatrix());
       final var Q = qr.getQ(null, false);
@@ -278,9 +279,14 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   }
 
   /**
-   * Adds the new rotation to the current rotation.
+   * Adds the new rotation to the current rotation. The other rotation is applied extrinsically,
+   * which means that it rotates around the global axes. For example, {@code new
+   * Rotation3d(Units.degreesToRadians(90), 0, 0).rotateBy(new Rotation3d(0,
+   * Units.degreesToRadians(45), 0))} rotates by 90 degrees around the +X axis and then by 45
+   * degrees around the global +Y axis. (This is equivalent to {@code new
+   * Rotation3d(Units.degreesToRadians(90), Units.degreesToRadians(45), 0)})
    *
-   * @param other The rotation to rotate by.
+   * @param other The extrinsic rotation to rotate by.
    * @return The new rotated Rotation3d.
    */
   public Rotation3d rotateBy(Rotation3d other) {
@@ -308,8 +314,15 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     final var y = m_q.getY();
     final var z = m_q.getZ();
 
-    // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
-    return Math.atan2(2.0 * (w * x + y * z), 1.0 - 2.0 * (x * x + y * y));
+    // wpimath/algorithms.md
+    final var cxcy = 1.0 - 2.0 * (x * x + y * y);
+    final var sxcy = 2.0 * (w * x + y * z);
+    final var cy_sq = cxcy * cxcy + sxcy * sxcy;
+    if (cy_sq > 1e-20) {
+      return Math.atan2(sxcy, cxcy);
+    } else {
+      return 0.0;
+    }
   }
 
   /**
@@ -343,8 +356,15 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     final var y = m_q.getY();
     final var z = m_q.getZ();
 
-    // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
-    return Math.atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z));
+    // wpimath/algorithms.md
+    final var cycz = 1.0 - 2.0 * (y * y + z * z);
+    final var cysz = 2.0 * (w * z + x * y);
+    final var cy_sq = cycz * cycz + cysz * cysz;
+    if (cy_sq > 1e-20) {
+      return Math.atan2(cysz, cycz);
+    } else {
+      return Math.atan2(2.0 * w * z, w * w - z * z);
+    }
   }
 
   /**
@@ -397,7 +417,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   public boolean equals(Object obj) {
     if (obj instanceof Rotation3d) {
       var other = (Rotation3d) obj;
-      return m_q.equals(other.m_q);
+      return Math.abs(Math.abs(m_q.dot(other.m_q)) - m_q.norm() * other.m_q.norm()) < 1e-9;
     }
     return false;
   }
@@ -411,4 +431,10 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   public Rotation3d interpolate(Rotation3d endValue, double t) {
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }
+
+  /** Rotation3d protobuf for serialization. */
+  public static final Rotation3dProto proto = new Rotation3dProto();
+
+  /** Rotation3d struct for serialization. */
+  public static final Rotation3dStruct struct = new Rotation3dStruct();
 }

@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.simulation.testutils.IntCallback;
 import org.junit.jupiter.api.Test;
 
 class PWMSimTest {
+  private static final double PWM_STEP_SIZE = 1.0 / 2000.0;
+
   @Test
   void testInitialize() {
     HAL.initialize(500, 0);
@@ -33,7 +35,7 @@ class PWMSimTest {
   }
 
   @Test
-  void testSetRawValue() {
+  void testSetPulseTime() {
     HAL.initialize(500, 0);
 
     PWMSim sim = new PWMSim(0);
@@ -42,13 +44,13 @@ class PWMSimTest {
 
     IntCallback callback = new IntCallback();
 
-    try (CallbackStore cb = sim.registerRawValueCallback(callback, false);
+    try (CallbackStore cb = sim.registerPulseMicrosecondCallback(callback, false);
         PWM pwm = new PWM(0)) {
-      sim.setRawValue(229);
-      assertEquals(229, sim.getRawValue());
-      assertEquals(229, pwm.getRaw());
+      sim.setPulseMicrosecond(2290);
+      assertEquals(2290, sim.getPulseMicrosecond());
+      assertEquals(2290, pwm.getPulseTimeMicroseconds());
       assertTrue(callback.wasTriggered());
-      assertEquals(229, callback.getSetValue());
+      assertEquals(2290, callback.getSetValue());
     }
   }
 
@@ -64,13 +66,47 @@ class PWMSimTest {
 
     try (CallbackStore cb = sim.registerSpeedCallback(callback, false);
         PWM pwm = new PWM(0)) {
-      final double kTestValue = 0.3504;
+      double kTestValue = 0.3504;
       pwm.setSpeed(kTestValue);
 
-      assertEquals(kTestValue, sim.getSpeed());
-      assertEquals(kTestValue, pwm.getSpeed());
+      assertEquals(kTestValue, sim.getSpeed(), PWM_STEP_SIZE);
+      assertEquals(kTestValue, pwm.getSpeed(), PWM_STEP_SIZE);
       assertTrue(callback.wasTriggered());
-      assertEquals(kTestValue, callback.getSetValue());
+      assertEquals(kTestValue, callback.getSetValue(), PWM_STEP_SIZE);
+      assertEquals(kTestValue / 2 + 0.5, sim.getPosition(), PWM_STEP_SIZE * 2);
+      assertEquals(kTestValue / 2 + 0.5, pwm.getPosition(), PWM_STEP_SIZE * 2);
+
+      kTestValue = -1.0;
+      pwm.setSpeed(kTestValue);
+
+      assertEquals(kTestValue, sim.getSpeed(), PWM_STEP_SIZE);
+      assertEquals(kTestValue, pwm.getSpeed(), PWM_STEP_SIZE);
+      assertEquals(0.0, sim.getPosition(), PWM_STEP_SIZE);
+      assertEquals(0.0, pwm.getPosition(), PWM_STEP_SIZE);
+
+      kTestValue = 0.0;
+      pwm.setSpeed(kTestValue);
+
+      assertEquals(kTestValue, sim.getSpeed(), PWM_STEP_SIZE);
+      assertEquals(kTestValue, pwm.getSpeed(), PWM_STEP_SIZE);
+      assertEquals(0.5, sim.getPosition(), PWM_STEP_SIZE);
+      assertEquals(0.5, pwm.getPosition(), PWM_STEP_SIZE);
+
+      kTestValue = 1.0;
+      pwm.setSpeed(kTestValue);
+
+      assertEquals(kTestValue, sim.getSpeed(), PWM_STEP_SIZE);
+      assertEquals(kTestValue, pwm.getSpeed(), PWM_STEP_SIZE);
+      assertEquals(kTestValue, sim.getPosition(), PWM_STEP_SIZE);
+      assertEquals(kTestValue, pwm.getPosition(), PWM_STEP_SIZE);
+
+      kTestValue = 1.1;
+      pwm.setSpeed(kTestValue);
+
+      assertEquals(1.0, sim.getSpeed(), PWM_STEP_SIZE);
+      assertEquals(1.0, pwm.getSpeed(), PWM_STEP_SIZE);
+      assertEquals(1.0, sim.getPosition(), PWM_STEP_SIZE);
+      assertEquals(1.0, pwm.getPosition(), PWM_STEP_SIZE);
     }
   }
 
@@ -86,13 +122,47 @@ class PWMSimTest {
 
     try (CallbackStore cb = sim.registerPositionCallback(callback, false);
         PWM pwm = new PWM(0)) {
-      final double kTestValue = 0.3504;
+      double kTestValue = 0.3504;
       pwm.setPosition(kTestValue);
 
-      assertEquals(kTestValue, sim.getPosition());
-      assertEquals(kTestValue, pwm.getPosition());
+      assertEquals(kTestValue, sim.getPosition(), PWM_STEP_SIZE);
+      assertEquals(kTestValue, pwm.getPosition(), PWM_STEP_SIZE);
       assertTrue(callback.wasTriggered());
-      assertEquals(kTestValue, callback.getSetValue());
+      assertEquals(kTestValue, callback.getSetValue(), PWM_STEP_SIZE);
+      assertEquals(kTestValue * 2 - 1.0, sim.getSpeed(), PWM_STEP_SIZE * 2);
+      assertEquals(kTestValue * 2 - 1.0, pwm.getSpeed(), PWM_STEP_SIZE * 2);
+
+      kTestValue = -1.0;
+      pwm.setPosition(kTestValue);
+
+      assertEquals(0.0, sim.getPosition(), PWM_STEP_SIZE);
+      assertEquals(0.0, pwm.getPosition(), PWM_STEP_SIZE);
+      assertEquals(kTestValue, sim.getSpeed(), PWM_STEP_SIZE);
+      assertEquals(kTestValue, pwm.getSpeed(), PWM_STEP_SIZE);
+
+      kTestValue = 0.0;
+      pwm.setPosition(kTestValue);
+
+      assertEquals(kTestValue, sim.getPosition(), PWM_STEP_SIZE);
+      assertEquals(kTestValue, pwm.getPosition(), PWM_STEP_SIZE);
+      assertEquals(-1.0, sim.getSpeed(), PWM_STEP_SIZE);
+      assertEquals(-1.0, pwm.getSpeed(), PWM_STEP_SIZE);
+
+      kTestValue = 1.0;
+      pwm.setPosition(kTestValue);
+
+      assertEquals(kTestValue, sim.getPosition(), PWM_STEP_SIZE);
+      assertEquals(kTestValue, pwm.getPosition(), PWM_STEP_SIZE);
+      assertEquals(kTestValue, sim.getSpeed(), PWM_STEP_SIZE);
+      assertEquals(kTestValue, pwm.getSpeed(), PWM_STEP_SIZE);
+
+      kTestValue = 1.1;
+      pwm.setPosition(kTestValue);
+
+      assertEquals(1.0, sim.getPosition(), PWM_STEP_SIZE);
+      assertEquals(1.0, pwm.getPosition(), PWM_STEP_SIZE);
+      assertEquals(1.0, sim.getSpeed(), PWM_STEP_SIZE);
+      assertEquals(1.0, pwm.getSpeed(), PWM_STEP_SIZE);
     }
   }
 

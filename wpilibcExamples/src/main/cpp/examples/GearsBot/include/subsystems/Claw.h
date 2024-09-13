@@ -8,6 +8,8 @@
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 
+#include "Constants.h"
+
 /**
  * The claw subsystem is a simple system with a motor for opening and closing.
  * If using stronger motors, you should probably use a sensor so that the
@@ -50,6 +52,6 @@ class Claw : public frc2::SubsystemBase {
   void Periodic() override;
 
  private:
-  frc::PWMSparkMax m_motor{7};
-  frc::DigitalInput m_contact{5};
+  frc::PWMSparkMax m_motor{ClawConstants::kMotorPort};
+  frc::DigitalInput m_contact{ClawConstants::kContactPort};
 };

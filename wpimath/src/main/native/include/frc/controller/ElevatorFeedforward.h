@@ -6,9 +6,13 @@
 
 #include <wpi/MathExtras.h>
 
+#include "frc/EigenCore.h"
+#include "frc/controller/LinearPlantInversionFeedforward.h"
+#include "frc/system/plant/LinearSystemId.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "units/voltage.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 /**
@@ -26,8 +30,6 @@ class ElevatorFeedforward {
   using ka_unit =
       units::compound_unit<units::volts, units::inverse<Acceleration>>;
 
-  ElevatorFeedforward() = default;
-
   /**
    * Creates a new ElevatorFeedforward with the specified gains.
    *
@@ -39,7 +41,20 @@ class ElevatorFeedforward {
   constexpr ElevatorFeedforward(
       units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
       units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
-      : kS(kS), kG(kG), kV(kV), kA(kA) {}
+      : kS(kS), kG(kG), kV(kV), kA(kA) {
+    if (kV.value() < 0) {
+      wpi::math::MathSharedStore::ReportError(
+          "kV must be a non-negative number, got {}!", kV.value());
+      kV = units::unit_t<kv_unit>{0};
+      wpi::math::MathSharedStore::ReportWarning("kV defaulted to 0.");
+    }
+    if (kA.value() < 0) {
+      wpi::math::MathSharedStore::ReportError(
+          "kA must be a non-negative number, got {}!", kA.value());
+      kA = units::unit_t<ka_unit>{0};
+      wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0;");
+    }
+  }
 
   /**
    * Calculates the feedforward from the gains and setpoints.
@@ -52,6 +67,50 @@ class ElevatorFeedforward {
                                     units::unit_t<Acceleration> acceleration =
                                         units::unit_t<Acceleration>(0)) {
     return kS * wpi::sgn(velocity) + kG + kV * velocity + kA * acceleration;
+  }
+
+  /**
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * @param currentVelocity The current velocity setpoint, in distance per
+   *                        second.
+   * @param nextVelocity    The next velocity setpoint, in distance per second.
+   * @param dt              Time between velocity setpoints in seconds.
+   * @return The computed feedforward, in volts.
+   */
+  units::volt_t Calculate(units::unit_t<Velocity> currentVelocity,
+                          units::unit_t<Velocity> nextVelocity,
+                          units::second_t dt) const {
+    // Discretize the affine model.
+    //
+    //   dx/dt = Ax + Bu + c
+    //   dx/dt = Ax + B(u + B⁺c)
+    //   xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
+    //   xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
+    //   xₖ₊₁ = A_d xₖ + B_duₖ + B_d B⁺cₖ
+    //
+    // Solve for uₖ.
+    //
+    //   B_duₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
+    //
+    // For an elevator with the model
+    // dx/dt = -Kv/Ka x + 1/Ka u - Kg/Ka - Ks/Ka sgn(x),
+    // A = -Kv/Ka, B = 1/Ka, and c = -(Kg/Ka + Ks/Ka sgn(x)). Substitute in B
+    // assuming sgn(x) is a constant for the duration of the step.
+    //
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − Ka(-(Kg/Ka + Ks/Ka sgn(x)))
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Ka(Kg/Ka + Ks/Ka sgn(x))
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Kg + Ks sgn(x)
+    auto plant = LinearSystemId::IdentifyVelocitySystem<Distance>(kV, kA);
+    LinearPlantInversionFeedforward<1, 1> feedforward{plant, dt};
+
+    Vectord<1> r{currentVelocity.value()};
+    Vectord<1> nextR{nextVelocity.value()};
+
+    return kG + kS * wpi::sgn(currentVelocity.value()) +
+           units::volt_t{feedforward.Calculate(r, nextR)(0)};
   }
 
   // Rearranging the main equation from the calculate() method yields the
@@ -123,9 +182,19 @@ class ElevatorFeedforward {
     return MaxAchievableAcceleration(-maxVoltage, velocity);
   }
 
-  units::volt_t kS{0};
-  units::volt_t kG{0};
-  units::unit_t<kv_unit> kV{0};
-  units::unit_t<ka_unit> kA{0};
+  /// The static gain.
+  const units::volt_t kS;
+
+  /// The gravity gain.
+  const units::volt_t kG;
+
+  /// The velocity gain.
+  const units::unit_t<kv_unit> kV;
+
+  /// The acceleration gain.
+  const units::unit_t<ka_unit> kA;
 };
 }  // namespace frc
+
+#include "frc/controller/proto/ElevatorFeedforwardProto.h"
+#include "frc/controller/struct/ElevatorFeedforwardStruct.h"

@@ -7,9 +7,8 @@
 #include <system_error>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
+#include <wpi/MemoryBuffer.h>
 #include <wpi/json.h>
-#include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 
 using namespace frc;
@@ -29,15 +28,14 @@ void TrajectoryUtil::ToPathweaverJson(const Trajectory& trajectory,
 }
 
 Trajectory TrajectoryUtil::FromPathweaverJson(std::string_view path) {
-  std::error_code error_code;
-
-  wpi::raw_fd_istream input{path, error_code};
-  if (error_code) {
+  std::error_code ec;
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+      wpi::MemoryBuffer::GetFile(path, ec);
+  if (fileBuffer == nullptr || ec) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
-  wpi::json json;
-  input >> json;
+  wpi::json json = wpi::json::parse(fileBuffer->GetCharBuffer());
 
   return Trajectory{json.get<std::vector<Trajectory::State>>()};
 }

@@ -87,18 +87,22 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
   bool IsDisabled() const;
 
   /**
-   * Set the pulse duration in the PCM. This is used in conjunction with
-   * the startPulse method to allow the PCM to control the timing of a pulse.
-   * The timing can be controlled in 0.01 second increments.
+   * Set the pulse duration in the pneumatics module. This is used in
+   * conjunction with the startPulse method to allow the pneumatics module to
+   * control the timing of a pulse.
    *
-   * @param duration The duration of the pulse, from 0.01 to 2.55 seconds.
+   * On the PCM, the timing can be controlled in 0.01 second increments, with a
+   * maximum of 2.55 seconds. On the PH, the timing can be controlled in 0.001
+   * second increments, with a maximum of 65.534 seconds.
+   *
+   * @param duration The duration of the pulse.
    *
    * @see startPulse()
    */
   void SetPulseDuration(units::second_t duration);
 
   /**
-   * %Trigger the PCM to generate a pulse of the duration set in
+   * %Trigger the pneumatics module to generate a pulse of the duration set in
    * setPulseDuration.
    *
    * @see setPulseDuration()

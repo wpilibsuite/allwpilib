@@ -30,17 +30,18 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   private double m_sensorMin;
   private double m_sensorMax = 1.0;
 
-  protected SimDevice m_simDevice;
-  protected SimDouble m_simPosition;
-  protected SimDouble m_simAbsolutePosition;
-  protected SimDouble m_simDistancePerRotation;
-  protected SimBoolean m_simIsConnected;
+  private SimDevice m_simDevice;
+  private SimDouble m_simPosition;
+  private SimDouble m_simAbsolutePosition;
+  private SimDouble m_simDistancePerRotation;
+  private SimBoolean m_simIsConnected;
 
   /**
    * Construct a new DutyCycleEncoder on a specific channel.
    *
    * @param channel the channel to attach to
    */
+  @SuppressWarnings("this-escape")
   public DutyCycleEncoder(int channel) {
     m_digitalInput = new DigitalInput(channel);
     m_ownsDutyCycle = true;
@@ -53,6 +54,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    *
    * @param dutyCycle the duty cycle to attach to
    */
+  @SuppressWarnings("this-escape")
   public DutyCycleEncoder(DutyCycle dutyCycle) {
     m_dutyCycle = dutyCycle;
     init();
@@ -63,6 +65,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    *
    * @param source the digital source to attach to
    */
+  @SuppressWarnings("this-escape")
   public DutyCycleEncoder(DigitalSource source) {
     m_ownsDutyCycle = true;
     m_dutyCycle = new DutyCycle(source);
@@ -246,7 +249,10 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     if (m_counter != null) {
       m_counter.reset();
     }
-    m_positionOffset = m_dutyCycle.getOutput();
+    if (m_simPosition != null) {
+      m_simPosition.set(0);
+    }
+    m_positionOffset = getAbsolutePosition();
   }
 
   /**

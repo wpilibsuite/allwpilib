@@ -72,7 +72,7 @@ public class AprilTagDetection {
    * @return Homography matrix
    */
   public Matrix<N3, N3> getHomographyMatrix() {
-    return new MatBuilder<>(Nat.N3(), Nat.N3()).fill(m_homography);
+    return MatBuilder.fill(Nat.N3(), Nat.N3(), m_homography);
   }
 
   /**
@@ -95,7 +95,7 @@ public class AprilTagDetection {
 
   /**
    * Gets a corner of the tag in image pixel coordinates. These always wrap counter-clock wise
-   * around the tag.
+   * around the tag. Index 0 is the bottom left corner.
    *
    * @param ndx Corner index (range is 0-3, inclusive)
    * @return Corner point X coordinate
@@ -106,7 +106,7 @@ public class AprilTagDetection {
 
   /**
    * Gets a corner of the tag in image pixel coordinates. These always wrap counter-clock wise
-   * around the tag.
+   * around the tag. Index 0 is the bottom left corner.
    *
    * @param ndx Corner index (range is 0-3, inclusive)
    * @return Corner point Y coordinate
@@ -117,7 +117,8 @@ public class AprilTagDetection {
 
   /**
    * Gets the corners of the tag in image pixel coordinates. These always wrap counter-clock wise
-   * around the tag.
+   * around the tag. The first set of corner coordinates are the coordinates for the bottom left
+   * corner.
    *
    * @return Corner point array (X and Y for each corner in order)
    */

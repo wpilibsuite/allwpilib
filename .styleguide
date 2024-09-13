@@ -10,8 +10,10 @@ cppSrcFileInclude {
 }
 
 modifiableFileExclude {
+  cmake/toolchains/
   \.patch$
   gradlew
+  vcpkg-ports/
 }
 
 generatedFileExclude {
@@ -29,8 +31,9 @@ includeOtherLibs {
   ^Eigen/
   ^cameraserver/
   ^cscore
-  ^drake/
   ^fmt/
+  ^gtest/
+  ^google/
   ^hal/
   ^imgui
   ^implot

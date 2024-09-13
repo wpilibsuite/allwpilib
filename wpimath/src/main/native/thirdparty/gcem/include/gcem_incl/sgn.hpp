@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -21,6 +21,9 @@
 #ifndef _gcem_sgn_HPP
 #define _gcem_sgn_HPP
 
+namespace gcem
+{
+
 /**
  * Compile-time sign function
  *
@@ -40,6 +43,8 @@ noexcept
             x < T(0) ? -1 :
             // else
                 0 );
+}
+
 }
 
 #endif

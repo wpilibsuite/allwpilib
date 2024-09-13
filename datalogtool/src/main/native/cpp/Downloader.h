@@ -45,6 +45,8 @@ class Downloader {
     kGetFiles,
     kDownload,
     kDownloadDone,
+    kDelete,
+    kDeleteDone,
     kExit
   } m_state = kDisconnected;
   std::condition_variable m_cv;
@@ -60,17 +62,16 @@ class Downloader {
   bool& m_deleteAfter;
 
   std::vector<std::string> m_dirList;
-  struct DownloadState {
-    DownloadState(std::string_view name, uint64_t size)
-        : name{name}, size{size} {}
+  struct FileState {
+    FileState(std::string_view name, uint64_t size) : name{name}, size{size} {}
 
     std::string name;
     uint64_t size;
-    bool enabled = true;
+    bool selected = true;
     float complete = 0.0;
     std::string status;
   };
-  std::vector<DownloadState> m_downloadList;
+  std::vector<FileState> m_fileList;
 
   std::string m_error;
 

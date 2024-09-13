@@ -63,7 +63,8 @@ void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const char* name,
 /**
  * Stops a notifier from running.
  *
- * This will cause any call into HAL_WaitForNotifierAlarm to return.
+ * This will cause any call into HAL_WaitForNotifierAlarm to return with time =
+ * 0.
  *
  * @param[in] notifierHandle the notifier handle
  * @param[out] status Error status variable. 0 on success.

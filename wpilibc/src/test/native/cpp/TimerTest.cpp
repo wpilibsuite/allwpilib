@@ -4,8 +4,9 @@
 
 #include "frc/Timer.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
+
 #include "frc/simulation/SimHooks.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.networktables.DoubleArrayEntry;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /** Game field object on a Field2d. */
@@ -70,9 +71,7 @@ public class FieldObject2d implements AutoCloseable {
    */
   public synchronized void setPoses(List<Pose2d> poses) {
     m_poses.clear();
-    for (Pose2d pose : poses) {
-      m_poses.add(pose);
-    }
+    m_poses.addAll(poses);
     updateEntry();
   }
 
@@ -83,9 +82,7 @@ public class FieldObject2d implements AutoCloseable {
    */
   public synchronized void setPoses(Pose2d... poses) {
     m_poses.clear();
-    for (Pose2d pose : poses) {
-      m_poses.add(pose);
-    }
+    Collections.addAll(m_poses, poses);
     updateEntry();
   }
 
@@ -109,7 +106,7 @@ public class FieldObject2d implements AutoCloseable {
    */
   public synchronized List<Pose2d> getPoses() {
     updateFromEntry();
-    return new ArrayList<Pose2d>(m_poses);
+    return new ArrayList<>(m_poses);
   }
 
   void updateEntry() {
@@ -143,7 +140,7 @@ public class FieldObject2d implements AutoCloseable {
       return;
     }
 
-    double[] arr = m_entry.get((double[]) null);
+    double[] arr = m_entry.get(null);
     if (arr != null) {
       if ((arr.length % 3) != 0) {
         return;

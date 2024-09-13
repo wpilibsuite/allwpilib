@@ -7,13 +7,11 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "frc/EigenCore.h"
+#include "frc/estimator/PoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
-#include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/kinematics/DifferentialDriveOdometry.h"
-#include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
 #include "units/time.h"
 
 namespace frc {
@@ -32,7 +30,9 @@ namespace frc {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
  */
-class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
+class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
+    : public PoseEstimator<DifferentialDriveWheelSpeeds,
+                           DifferentialDriveWheelPositions> {
  public:
   /**
    * Constructs a DifferentialDrivePoseEstimator with default standard
@@ -80,19 +80,6 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
       const wpi::array<double, 3>& visionMeasurementStdDevs);
 
   /**
-   * Sets the pose estimator's trust in vision measurements. This might be used
-   * to change trust in vision measurements after the autonomous period, or to
-   * change trust as distance to a vision target increases.
-   *
-   * @param visionMeasurementStdDevs Standard deviations of the vision pose
-   *     measurement (x position in meters, y position in meters, and heading in
-   *     radians). Increase these numbers to trust the vision pose measurement
-   *     less.
-   */
-  void SetVisionMeasurementStdDevs(
-      const wpi::array<double, 3>& visionMeasurementStdDevs);
-
-  /**
    * Resets the robot's position on the field.
    *
    * @param gyroAngle The current gyro angle.
@@ -101,71 +88,10 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    * @param pose The estimated pose of the robot on the field.
    */
   void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
-                     units::meter_t rightDistance, const Pose2d& pose);
-
-  /**
-   * Gets the estimated robot pose.
-   *
-   * @return The estimated robot pose.
-   */
-  Pose2d GetEstimatedPosition() const;
-
-  /**
-   * Adds a vision measurement to the Kalman Filter. This will correct
-   * the odometry pose estimate while still accounting for measurement noise.
-   *
-   * This method can be called as infrequently as you want, as long as you are
-   * calling Update() every loop.
-   *
-   * To promote stability of the pose estimate and make it robust to bad vision
-   * data, we recommend only adding vision measurements that are already within
-   * one meter or so of the current pose estimate.
-   *
-   * @param visionRobotPose The pose of the robot as measured by the vision
-   *     camera.
-   * @param timestamp The timestamp of the vision measurement in seconds. Note
-   *     that if you don't use your own time source by calling UpdateWithTime(),
-   *     then you must use a timestamp with an epoch since FPGA startup (i.e.,
-   *     the epoch of this timestamp is the same epoch as
-   *     frc::Timer::GetFPGATimestamp(). This means that you should use
-   *     frc::Timer::GetFPGATimestamp() as your time source in this case.
-   */
-  void AddVisionMeasurement(const Pose2d& visionRobotPose,
-                            units::second_t timestamp);
-
-  /**
-   * Adds a vision measurement to the Kalman Filter. This will correct
-   * the odometry pose estimate while still accounting for measurement noise.
-   *
-   * This method can be called as infrequently as you want, as long as you are
-   * calling Update() every loop.
-   *
-   * To promote stability of the pose estimate and make it robust to bad vision
-   * data, we recommend only adding vision measurements that are already within
-   * one meter or so of the current pose estimate.
-   *
-   * Note that the vision measurement standard deviations passed into this
-   * method will continue to apply to future measurements until a subsequent
-   * call to SetVisionMeasurementStdDevs() or this method.
-   *
-   * @param visionRobotPose The pose of the robot as measured by the vision
-   *     camera.
-   * @param timestamp The timestamp of the vision measurement in seconds. Note
-   *     that if you don't use your own time source by calling UpdateWithTime(),
-   *     then you must use a timestamp with an epoch since FPGA startup (i.e.,
-   *     the epoch of this timestamp is the same epoch as
-   *     frc::Timer::GetFPGATimestamp(). This means that you should use
-   *     frc::Timer::GetFPGATimestamp() as your time source in this case.
-   * @param visionMeasurementStdDevs Standard deviations of the vision pose
-   *     measurement (x position in meters, y position in meters, and heading in
-   *     radians). Increase these numbers to trust the vision pose measurement
-   *     less.
-   */
-  void AddVisionMeasurement(
-      const Pose2d& visionRobotPose, units::second_t timestamp,
-      const wpi::array<double, 3>& visionMeasurementStdDevs) {
-    SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
-    AddVisionMeasurement(visionRobotPose, timestamp);
+                     units::meter_t rightDistance, const Pose2d& pose) {
+    PoseEstimator<DifferentialDriveWheelSpeeds,
+                  DifferentialDriveWheelPositions>::
+        ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
   }
 
   /**
@@ -179,7 +105,12 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    * @return The estimated pose of the robot.
    */
   Pose2d Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
-                units::meter_t rightDistance);
+                units::meter_t rightDistance) {
+    return PoseEstimator<
+        DifferentialDriveWheelSpeeds,
+        DifferentialDriveWheelPositions>::Update(gyroAngle,
+                                                 {leftDistance, rightDistance});
+  }
 
   /**
    * Updates the pose estimator with wheel encoder and gyro information. This
@@ -195,63 +126,16 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
   Pose2d UpdateWithTime(units::second_t currentTime,
                         const Rotation2d& gyroAngle,
                         units::meter_t leftDistance,
-                        units::meter_t rightDistance);
+                        units::meter_t rightDistance) {
+    return PoseEstimator<
+        DifferentialDriveWheelSpeeds,
+        DifferentialDriveWheelPositions>::UpdateWithTime(currentTime, gyroAngle,
+                                                         {leftDistance,
+                                                          rightDistance});
+  }
 
  private:
-  struct InterpolationRecord {
-    // The pose observed given the current sensor inputs and the previous pose.
-    Pose2d pose;
-
-    // The current gyro angle.
-    Rotation2d gyroAngle;
-
-    // The distance traveled by the left encoder.
-    units::meter_t leftDistance;
-
-    // The distance traveled by the right encoder.
-    units::meter_t rightDistance;
-
-    /**
-     * Checks equality between this InterpolationRecord and another object.
-     *
-     * @param other The other object.
-     * @return Whether the two objects are equal.
-     */
-    bool operator==(const InterpolationRecord& other) const = default;
-
-    /**
-     * Checks inequality between this InterpolationRecord and another object.
-     *
-     * @param other The other object.
-     * @return Whether the two objects are not equal.
-     */
-    bool operator!=(const InterpolationRecord& other) const = default;
-
-    /**
-     * Interpolates between two InterpolationRecords.
-     *
-     * @param endValue The end value for the interpolation.
-     * @param i The interpolant (fraction).
-     *
-     * @return The interpolated state.
-     */
-    InterpolationRecord Interpolate(DifferentialDriveKinematics& kinematics,
-                                    InterpolationRecord endValue,
-                                    double i) const;
-  };
-
-  static constexpr units::second_t kBufferDuration = 1.5_s;
-
-  DifferentialDriveKinematics& m_kinematics;
-  DifferentialDriveOdometry m_odometry;
-  wpi::array<double, 3> m_q{wpi::empty_array};
-  Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
-
-  TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{
-      kBufferDuration, [this](const InterpolationRecord& start,
-                              const InterpolationRecord& end, double t) {
-        return start.Interpolate(this->m_kinematics, end, t);
-      }};
+  DifferentialDriveOdometry m_odometryImpl;
 };
 
 }  // namespace frc

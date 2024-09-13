@@ -4,24 +4,49 @@
 
 package edu.wpi.first.math.system.plant;
 
+import edu.wpi.first.math.system.plant.proto.DCMotorProto;
+import edu.wpi.first.math.system.plant.struct.DCMotorStruct;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /** Holds the constants for a DC motor. */
-public class DCMotor {
+public class DCMotor implements ProtobufSerializable, StructSerializable {
+  /** Voltage at which the motor constants were measured. */
   public final double nominalVoltageVolts;
+
+  /** Torque when stalled. */
   public final double stallTorqueNewtonMeters;
+
+  /** Current draw when stalled. */
   public final double stallCurrentAmps;
+
+  /** Current draw under no load. */
   public final double freeCurrentAmps;
+
+  /** Angular velocity under no load. */
   public final double freeSpeedRadPerSec;
+
+  /** Motor internal resistance. */
   public final double rOhms;
+
+  /** Motor velocity constant. */
   public final double KvRadPerSecPerVolt;
+
+  /** Motor torque constant. */
   public final double KtNMPerAmp;
+
+  /** DCMotor protobuf for serialization. */
+  public static final DCMotorProto proto = new DCMotorProto();
+
+  /** DCMotor struct for serialization. */
+  public static final DCMotorStruct struct = new DCMotorStruct();
 
   /**
    * Constructs a DC motor.
    *
    * @param nominalVoltageVolts Voltage at which the motor constants were measured.
-   * @param stallTorqueNewtonMeters Current draw when stalled.
+   * @param stallTorqueNewtonMeters Torque when stalled.
    * @param stallCurrentAmps Current draw when stalled.
    * @param freeCurrentAmps Current draw under no load.
    * @param freeSpeedRadPerSec Angular velocity under no load.
@@ -47,10 +72,10 @@ public class DCMotor {
   }
 
   /**
-   * Estimate the current being drawn by this motor.
+   * Calculate current drawn by motor with given speed and input voltage.
    *
-   * @param speedRadiansPerSec The speed of the motor.
-   * @param voltageInputVolts The input voltage.
+   * @param speedRadiansPerSec The current angular velocity of the motor.
+   * @param voltageInputVolts The voltage being applied to the motor.
    * @return The estimated current.
    */
   public double getCurrent(double speedRadiansPerSec, double voltageInputVolts) {
@@ -58,20 +83,20 @@ public class DCMotor {
   }
 
   /**
-   * Calculate the torque produced by the motor for a given current.
+   * Calculate torque produced by the motor with a given current.
    *
    * @param currentAmpere The current drawn by the motor.
-   * @return The torque produced.
+   * @return The torque output.
    */
   public double getTorque(double currentAmpere) {
     return currentAmpere * KtNMPerAmp;
   }
 
   /**
-   * Calculate the voltage provided to the motor at a given torque and angular velocity.
+   * Calculate the voltage provided to the motor for a given torque and angular velocity.
    *
    * @param torqueNm The torque produced by the motor.
-   * @param speedRadiansPerSec The speed of the motor.
+   * @param speedRadiansPerSec The current angular velocity of the motor.
    * @return The voltage of the motor.
    */
   public double getVoltage(double torqueNm, double speedRadiansPerSec) {
@@ -79,11 +104,11 @@ public class DCMotor {
   }
 
   /**
-   * Calculate the speed of the motor at a given torque and input voltage.
+   * Calculates the angular speed produced by the motor at a given torque and input voltage.
    *
    * @param torqueNm The torque produced by the motor.
    * @param voltageInputVolts The voltage applied to the motor.
-   * @return The speed of the motor.
+   * @return The angular speed of the motor.
    */
   public double getSpeed(double torqueNm, double voltageInputVolts) {
     return voltageInputVolts * KvRadPerSecPerVolt
@@ -228,6 +253,18 @@ public class DCMotor {
   }
 
   /**
+   * Return a gearbox of Falcon 500 motors with FOC (Field-Oriented Control) enabled.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Falcon 500 FOC enabled motors.
+   */
+  public static DCMotor getFalcon500Foc(int numMotors) {
+    // https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
+    return new DCMotor(
+        12, 5.84, 304, 1.5, Units.rotationsPerMinuteToRadiansPerSecond(6080.0), numMotors);
+  }
+
+  /**
    * Return a gearbox of Romi/TI_RSLK MAX motors.
    *
    * @param numMotors Number of motors in the gearbox.
@@ -237,5 +274,41 @@ public class DCMotor {
     // From https://www.pololu.com/product/1520/specs
     return new DCMotor(
         4.5, 0.1765, 1.25, 0.13, Units.rotationsPerMinuteToRadiansPerSecond(150.0), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Kraken X60 brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return a gearbox of Kraken X60 motors.
+   */
+  public static DCMotor getKrakenX60(int numMotors) {
+    // From https://store.ctr-electronics.com/announcing-kraken-x60/
+    return new DCMotor(
+        12, 7.09, 366, 2, Units.rotationsPerMinuteToRadiansPerSecond(6000), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Kraken X60 brushless motors with FOC (Field-Oriented Control) enabled.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Kraken X60 FOC enabled motors.
+   */
+  public static DCMotor getKrakenX60Foc(int numMotors) {
+    // From https://store.ctr-electronics.com/announcing-kraken-x60/
+    return new DCMotor(
+        12, 9.37, 483, 2, Units.rotationsPerMinuteToRadiansPerSecond(5800), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Neo Vortex brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return a gearbox of Neo Vortex motors.
+   */
+  public static DCMotor getNeoVortex(int numMotors) {
+    // From https://www.revrobotics.com/next-generation-spark-neo/
+    return new DCMotor(
+        12, 3.60, 211, 3.6, Units.rotationsPerMinuteToRadiansPerSecond(6784), numMotors);
   }
 }

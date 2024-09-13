@@ -5,10 +5,17 @@
 #pragma once
 
 namespace frc {
+/**
+ * Compressor config type.
+ */
 enum class CompressorConfigType {
+  /// Disabled.
   Disabled = 0,
+  /// Digital.
   Digital = 1,
+  /// Analog.
   Analog = 2,
+  /// Hybrid.
   Hybrid = 3
 };
 

@@ -22,11 +22,14 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.FloatArrayLogEntry;
 import edu.wpi.first.util.datalog.IntegerArrayLogEntry;
 import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Provide access to the network communication data to / from the Driver Station. */
 public final class DriverStation {
-  /** Number of Joystick Ports. */
+  /** Number of Joystick ports. */
   public static final int kJoystickPorts = 6;
 
   private static class HALJoystickButtons {
@@ -45,6 +48,8 @@ public final class DriverStation {
 
   private static class HALJoystickAxesRaw {
     public int[] m_axes;
+
+    @SuppressWarnings("unused")
     public int m_count;
 
     HALJoystickAxesRaw(int count) {
@@ -66,15 +71,21 @@ public final class DriverStation {
 
   /** The robot alliance that the robot is a part of. */
   public enum Alliance {
+    /** Red alliance. */
     Red,
-    Blue,
-    Invalid
+    /** Blue alliance. */
+    Blue
   }
 
+  /** The type of robot match that the robot is part of. */
   public enum MatchType {
+    /** None. */
     None,
+    /** Practice. */
     Practice,
+    /** Qualification. */
     Qualification,
+    /** Elimination. */
     Elimination
   }
 
@@ -237,6 +248,7 @@ public final class DriverStation {
         for (int i = 0; i < count; i++) {
           if (axes.m_axes[i] != m_prevAxes.m_axes[i]) {
             needToLog = true;
+            break;
           }
         }
       }
@@ -253,6 +265,7 @@ public final class DriverStation {
         for (int i = 0; i < count; i++) {
           if (povs.m_povs[i] != m_prevPOVs.m_povs[i]) {
             needToLog = true;
+            break;
           }
         }
       }
@@ -1086,33 +1099,40 @@ public final class DriverStation {
     }
   }
 
+  private static Map<AllianceStationID, Optional<Alliance>> m_allianceMap =
+      Map.of(
+          AllianceStationID.Unknown, Optional.empty(),
+          AllianceStationID.Red1, Optional.of(Alliance.Red),
+          AllianceStationID.Red2, Optional.of(Alliance.Red),
+          AllianceStationID.Red3, Optional.of(Alliance.Red),
+          AllianceStationID.Blue1, Optional.of(Alliance.Blue),
+          AllianceStationID.Blue2, Optional.of(Alliance.Blue),
+          AllianceStationID.Blue3, Optional.of(Alliance.Blue));
+
+  private static Map<AllianceStationID, OptionalInt> m_stationMap =
+      Map.of(
+          AllianceStationID.Unknown, OptionalInt.empty(),
+          AllianceStationID.Red1, OptionalInt.of(1),
+          AllianceStationID.Red2, OptionalInt.of(2),
+          AllianceStationID.Red3, OptionalInt.of(3),
+          AllianceStationID.Blue1, OptionalInt.of(1),
+          AllianceStationID.Blue2, OptionalInt.of(2),
+          AllianceStationID.Blue3, OptionalInt.of(3));
+
   /**
    * Get the current alliance from the FMS.
    *
    * <p>If the FMS is not connected, it is set from the team alliance setting on the driver station.
    *
-   * @return the current alliance
+   * @return The alliance (red or blue) or an empty optional if the alliance is invalid
    */
-  public static Alliance getAlliance() {
+  public static Optional<Alliance> getAlliance() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
     if (allianceStationID == null) {
-      return Alliance.Invalid;
+      allianceStationID = AllianceStationID.Unknown;
     }
 
-    switch (allianceStationID) {
-      case Red1:
-      case Red2:
-      case Red3:
-        return Alliance.Red;
-
-      case Blue1:
-      case Blue2:
-      case Blue3:
-        return Alliance.Blue;
-
-      default:
-        return Alliance.Invalid;
-    }
+    return m_allianceMap.get(allianceStationID);
   }
 
   /**
@@ -1122,35 +1142,69 @@ public final class DriverStation {
    *
    * @return the location of the team's driver station controls: 1, 2, or 3
    */
-  public static int getLocation() {
+  public static OptionalInt getLocation() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
     if (allianceStationID == null) {
-      return 0;
+      allianceStationID = AllianceStationID.Unknown;
     }
-    switch (allianceStationID) {
-      case Red1:
-      case Blue1:
-        return 1;
 
-      case Red2:
-      case Blue2:
-        return 2;
+    return m_stationMap.get(allianceStationID);
+  }
 
-      case Blue3:
-      case Red3:
-        return 3;
+  /**
+   * Gets the raw alliance station of the teams driver station.
+   *
+   * <p>This returns the raw low level value. Prefer getLocation or getAlliance unless necessary for
+   * performance.
+   *
+   * @return The raw alliance station id.
+   */
+  public static AllianceStationID getRawAllianceStation() {
+    return DriverStationJNI.getAllianceStation();
+  }
 
-      default:
-        return 0;
+  /**
+   * Wait for a DS connection.
+   *
+   * @param timeoutSeconds timeout in seconds. 0 for infinite.
+   * @return true if connected, false if timeout
+   */
+  public static boolean waitForDsConnection(double timeoutSeconds) {
+    int event = WPIUtilJNI.createEvent(true, false);
+    DriverStationJNI.provideNewDataEventHandle(event);
+    boolean result;
+    try {
+      if (timeoutSeconds == 0) {
+        WPIUtilJNI.waitForObject(event);
+        result = true;
+      } else {
+        result = !WPIUtilJNI.waitForObjectTimeout(event, timeoutSeconds);
+      }
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
+      result = false;
+    } finally {
+      DriverStationJNI.removeNewDataEventHandle(event);
+      WPIUtilJNI.destroyEvent(event);
     }
+    return result;
   }
 
   /**
    * Return the approximate match time. The FMS does not send an official match time to the robots,
    * but does send an approximate match time. The value will count down the time remaining in the
    * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
-   * dispute ref calls or guarantee that a function will trigger before the match ends) The Practice
-   * Match function of the DS approximates the behavior seen on the field.
+   * dispute ref calls or guarantee that a function will trigger before the match ends).
+   *
+   * <p>When connected to the real field, this number only changes in full integer increments, and
+   * always counts down.
+   *
+   * <p>When the DS is in practice mode, this number is a floating point number, and counts down.
+   *
+   * <p>When the DS is in teleop or autonomous mode, this number is a floating point number, and
+   * counts up.
+   *
+   * <p>Simulation matches DS behavior without an FMS connected.
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
@@ -1269,10 +1323,20 @@ public final class DriverStation {
     }
   }
 
+  /**
+   * Registers the given handle for DS data refresh notifications.
+   *
+   * @param handle The event handle.
+   */
   public static void provideRefreshedDataEventHandle(int handle) {
     m_refreshEvents.add(handle);
   }
 
+  /**
+   * Unregisters the given handle from DS data refresh notifications.
+   *
+   * @param handle The event handle.
+   */
   public static void removeRefreshedDataEventHandle(int handle) {
     m_refreshEvents.remove(handle);
   }

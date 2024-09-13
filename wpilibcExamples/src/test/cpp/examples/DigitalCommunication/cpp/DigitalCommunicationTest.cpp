@@ -2,14 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
-
 #include <string>
 #include <thread>
 
 #include <frc/simulation/DIOSim.h>
 #include <frc/simulation/DriverStationSim.h>
 #include <frc/simulation/SimHooks.h>
+#include <gtest/gtest.h>
 #include <units/time.h>
 
 #include "Robot.h"
@@ -55,11 +54,12 @@ TEST_P(AllianceTest, Alliance) {
 
   frc::sim::StepTiming(20_ms);
 
-  bool isRed;
+  bool isRed = false;
   switch (alliance) {
     case HAL_AllianceStationID_kBlue1:
     case HAL_AllianceStationID_kBlue2:
     case HAL_AllianceStationID_kBlue3:
+    case HAL_AllianceStationID_kUnknown:
       isRed = false;
       break;
     case HAL_AllianceStationID_kRed1:
@@ -76,7 +76,8 @@ INSTANTIATE_TEST_SUITE_P(
     testing::Values<HAL_AllianceStationID>(
         HAL_AllianceStationID_kRed1, HAL_AllianceStationID_kRed2,
         HAL_AllianceStationID_kRed3, HAL_AllianceStationID_kBlue1,
-        HAL_AllianceStationID_kBlue2, HAL_AllianceStationID_kBlue3),
+        HAL_AllianceStationID_kBlue2, HAL_AllianceStationID_kBlue3,
+        HAL_AllianceStationID_kUnknown),
     [](const testing::TestParamInfo<AllianceTest::ParamType>& info) {
       switch (info.param) {
         case HAL_AllianceStationID_kBlue1:
@@ -91,6 +92,8 @@ INSTANTIATE_TEST_SUITE_P(
           return std::string{"Red2"};
         case HAL_AllianceStationID_kRed3:
           return std::string{"Red3"};
+        case HAL_AllianceStationID_kUnknown:
+          return std::string{"Unknown"};
       }
       return std::string{"Error"};
     });

@@ -9,11 +9,12 @@
 #include <string>
 #include <string_view>
 
-#include "../SpanMatcher.h"
+#include <gtest/gtest.h>
+#include <wpi/SpanMatcher.h>
+
 #include "../TestPrinters.h"
 #include "../ValueMatcher.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "net3/WireDecoder3.h"
 #include "networktables/NetworkTableValue.h"
 

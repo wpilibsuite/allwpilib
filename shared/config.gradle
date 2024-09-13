@@ -13,9 +13,11 @@ nativeUtils.withCrossLinuxArm64()
 nativeUtils {
     wpi {
         configureDependencies {
-            niLibVersion = "2023.3.0"
-            opencvVersion = "4.6.0-3"
-            googleTestVersion = "1.12.1-1"
+            opencvYear = "frc2024"
+            googleTestYear = "frc2024"
+            niLibVersion = "2024.2.1"
+            opencvVersion = "4.8.0-2"
+            googleTestVersion = "1.14.0-1"
         }
     }
 }
@@ -41,17 +43,17 @@ nativeUtils.platformConfigs.each {
     }
 }
 
+// Compress debug info on Linux
+nativeUtils.platformConfigs.each {
+  if (it.name.contains('linux')) {
+    it.cppCompiler.debugArgs.add("-gz=zlib")
+  }
+}
+
 // NativeUtils adds the following OpenCV warning suppression for Linux, but not
 // for macOS
 // https://github.com/opencv/opencv/issues/20269
 nativeUtils.platformConfigs.osxuniversal.cppCompiler.args.add("-Wno-deprecated-anon-enum-enum-conversion")
-
-// NativeUtils uses the wrong compiler arguments for roboRIO targets, but it's
-// too late to fix NativeUtils for the 2023 season. This temporarily overwrites
-// the flags.
-nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.roborio).configure {
-    cppCompiler.args.remove('-Wno-error=deprecated-declarations')
-}
 
 nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")
 
@@ -138,7 +140,7 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
         def task = project.tasks.create(base + "-${key}", type) {
             description = 'Creates component archive for platform ' + key
             destinationDirectory = outputsFolder
-            classifier = key
+            archiveClassifier = key
             archiveBaseName = '_M_' + base
             duplicatesStrategy = 'exclude'
 

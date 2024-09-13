@@ -79,7 +79,7 @@ Java_edu_wpi_first_hal_I2CJNI_i2CTransactionB
   jint returnValue =
       HAL_TransactionI2C(static_cast<HAL_I2CPort>(port), address,
                          reinterpret_cast<const uint8_t*>(
-                             JByteArrayRef(env, dataToSend).array().data()),
+                             JSpan<const jbyte>(env, dataToSend).data()),
                          sendSize, recvBuf.data(), receiveSize);
   env->SetByteArrayRegion(dataReceived, 0, receiveSize,
                           reinterpret_cast<const jbyte*>(recvBuf.data()));
@@ -120,7 +120,7 @@ Java_edu_wpi_first_hal_I2CJNI_i2CWriteB
   jint returnValue =
       HAL_WriteI2C(static_cast<HAL_I2CPort>(port), address,
                    reinterpret_cast<const uint8_t*>(
-                       JByteArrayRef(env, dataToSend).array().data()),
+                       JSpan<const jbyte>(env, dataToSend).data()),
                    sendSize);
   return returnValue;
 }

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
   <Match>
+    <Bug pattern="CT_CONSTRUCTOR_THROW" />
+  </Match>
+  <Match>
     <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
     <Class name="edu.wpi.first.wpilibj.test.TestSuite" />
   </Match>
@@ -73,6 +76,9 @@
     <Source name="SelectCommand.java" />
   </Match>
   <Match>
+    <Bug pattern="PA_PUBLIC_PRIMITIVE_ATTRIBUTE" />
+  </Match>
+  <Match>
     <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
     <Source name="AntJunitLauncher.java" />
   </Match>
@@ -110,7 +116,19 @@
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
+    <Class name="edu.wpi.first.wpilibj.templates.xrptimed.Robot" />
+  </Match>
+  <Match>
+    <Bug pattern="UC_USELESS_VOID_METHOD" />
     <Class name="edu.wpi.first.wpilibj.templates.timed.Robot" />
+  </Match>
+  <Match>
+    <Bug pattern="UC_USELESS_VOID_METHOD" />
+    <Class name="edu.wpi.first.wpilibj.templates.timeslice.Robot" />
+  </Match>
+  <Match>
+    <Bug pattern="UC_USELESS_VOID_METHOD" />
+    <Class name="edu.wpi.first.wpilibj.templates.timesliceskeleton.Robot" />
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_FIELD" />
@@ -119,6 +137,10 @@
   <Match>
     <Bug pattern="URF_UNREAD_FIELD" />
     <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
+  </Match>
+  <Match>
+    <Bug pattern="URF_UNREAD_FIELD" />
+    <Class name="edu.wpi.first.wpilibj.AnalogTrigger" />
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />

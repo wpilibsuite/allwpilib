@@ -14,15 +14,14 @@
 #define WPIUTIL_WPI_RAW_OSTREAM_H
 
 #include "wpi/SmallVector.h"
-#include <span>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <optional>
+#include <span>
 #include <string>
-#if __cplusplus > 201402L
 #include <string_view>
-#endif
 #include <system_error>
 #include <type_traits>
 #include <vector>
@@ -229,6 +228,20 @@ public:
     return *this;
   }
 
+#if defined(__cpp_char8_t)
+  // When using `char8_t *` integers or pointers are written to the ostream
+  // instead of UTF-8 code as one might expect. This might lead to unexpected
+  // behavior, especially as `u8""` literals are of type `char8_t*` instead of
+  // type `char_t*` from C++20 onwards. Thus we disallow using them with
+  // raw_ostreams.
+  // If you have u8"" literals to stream, you can rewrite them as ordinary
+  // literals with escape sequences
+  // e.g.  replace `u8"\u00a0"` by `"\xc2\xa0"`
+  // or use `reinterpret_cast`:
+  // e.g. replace `u8"\u00a0"` by `reinterpret_cast<const char *>(u8"\u00a0")`
+  raw_ostream &operator<<(const char8_t *Str) = delete;
+#endif
+
   raw_ostream &operator<<(const char *Str) {
     // Inline fast path, particularly for constant strings where a sufficiently
     // smart compiler will simplify strlen.
@@ -343,6 +356,11 @@ protected:
     SetBufferAndMode(BufferStart, Size, BufferKind::ExternalBuffer);
   }
 
+  /// Force-set the number of bytes in the raw_ostream buffer.
+  void SetNumBytesInBuffer(size_t Size) {
+    OutBufCur = OutBufStart + Size;
+  }
+
   /// Return an efficient buffer size for the underlying output mechanism.
   virtual size_t preferred_buffer_size() const;
 
@@ -374,8 +392,8 @@ private:
 /// Call the appropriate insertion operator, given an rvalue reference to a
 /// raw_ostream object and return a stream of the same type as the argument.
 template <typename OStream, typename T>
-std::enable_if_t<!std::is_reference<OStream>::value &&
-                     std::is_base_of<raw_ostream, OStream>::value,
+std::enable_if_t<!std::is_reference_v<OStream> &&
+                     std::is_base_of_v<raw_ostream, OStream>,
                  OStream &&>
 operator<<(OStream &&OS, const T &Value) {
   OS << Value;
@@ -734,7 +752,7 @@ class buffer_ostream : public raw_svector_ostream {
   raw_ostream &OS;
   SmallVector<char, 0> Buffer;
 
-  virtual void anchor() override;
+  void anchor() override;
 
 public:
   buffer_ostream(raw_ostream &OS) : raw_svector_ostream(Buffer), OS(OS) {}
@@ -745,7 +763,7 @@ class buffer_unique_ostream : public raw_svector_ostream {
   std::unique_ptr<raw_ostream> OS;
   SmallVector<char, 0> Buffer;
 
-  virtual void anchor() override;
+  void anchor() override;
 
 public:
   buffer_unique_ostream(std::unique_ptr<raw_ostream> OS)

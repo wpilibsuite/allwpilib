@@ -32,10 +32,11 @@ public class SD540 extends PWMMotorController {
    * @param channel The PWM channel that the SD540 is attached to. 0-9 are on-board, 10-19 are on
    *     the MXP port
    */
+  @SuppressWarnings("this-escape")
   public SD540(final int channel) {
     super("SD540", channel);
 
-    m_pwm.setBounds(2.05, 1.55, 1.50, 1.44, 0.94);
+    m_pwm.setBoundsMicroseconds(2050, 1550, 1500, 1440, 940);
     m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -86,7 +87,7 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
 
 class HALSimWSProviderSimDevices {
  public:
-  using LoopFn = std::function<void(void)>;
+  using LoopFn = std::function<void()>;
   using UvExecFn = wpi::uv::AsyncFunction<void(LoopFn)>;
 
   explicit HALSimWSProviderSimDevices(ProviderContainer& providers)

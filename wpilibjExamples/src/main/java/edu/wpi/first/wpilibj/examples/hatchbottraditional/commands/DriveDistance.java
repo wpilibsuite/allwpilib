@@ -5,9 +5,9 @@
 package edu.wpi.first.wpilibj.examples.hatchbottraditional.commands;
 
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
-public class DriveDistance extends CommandBase {
+public class DriveDistance extends Command {
   private final DriveSubsystem m_drive;
   private final double m_distance;
   private final double m_speed;

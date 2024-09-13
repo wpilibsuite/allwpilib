@@ -13,7 +13,7 @@
 
 #include "units/time.h"
 
-namespace frc2 {
+namespace frc {
 
 /**
  * Implements a PID control loop.
@@ -25,11 +25,11 @@ class WPILIB_DLLEXPORT PIDController
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
    *
-   * @param Kp     The proportional coefficient.
-   * @param Ki     The integral coefficient.
-   * @param Kd     The derivative coefficient.
+   * @param Kp     The proportional coefficient. Must be >= 0.
+   * @param Ki     The integral coefficient. Must be >= 0.
+   * @param Kd     The derivative coefficient. Must be >= 0.
    * @param period The period between controller updates in seconds. The
-   *               default is 20 milliseconds. Must be non-zero and positive.
+   *               default is 20 milliseconds. Must be positive.
    */
   PIDController(double Kp, double Ki, double Kd,
                 units::second_t period = 20_ms);
@@ -46,32 +46,45 @@ class WPILIB_DLLEXPORT PIDController
    *
    * Sets the proportional, integral, and differential coefficients.
    *
-   * @param Kp Proportional coefficient
-   * @param Ki Integral coefficient
-   * @param Kd Differential coefficient
+   * @param Kp The proportional coefficient. Must be >= 0.
+   * @param Ki The integral coefficient. Must be >= 0.
+   * @param Kd The differential coefficient. Must be >= 0.
    */
   void SetPID(double Kp, double Ki, double Kd);
 
   /**
    * Sets the proportional coefficient of the PID controller gain.
    *
-   * @param Kp proportional coefficient
+   * @param Kp The proportional coefficient. Must be >= 0.
    */
   void SetP(double Kp);
 
   /**
    * Sets the integral coefficient of the PID controller gain.
    *
-   * @param Ki integral coefficient
+   * @param Ki The integral coefficient. Must be >= 0.
    */
   void SetI(double Ki);
 
   /**
    * Sets the differential coefficient of the PID controller gain.
    *
-   * @param Kd differential coefficient
+   * @param Kd The differential coefficient. Must be >= 0.
    */
   void SetD(double Kd);
+
+  /**
+   * Sets the IZone range. When the absolute value of the position error is
+   * greater than IZone, the total accumulated error will reset to zero,
+   * disabling integral gain until the absolute value of the position error is
+   * less than IZone. This is used to prevent integral windup. Must be
+   * non-negative. Passing a value of zero will effectively disable integral
+   * gain. Passing a value of infinity disables IZone functionality.
+   *
+   * @param iZone Maximum magnitude of error to allow integral control. Must be
+   *   >= 0.
+   */
+  void SetIZone(double iZone);
 
   /**
    * Gets the proportional coefficient.
@@ -93,6 +106,13 @@ class WPILIB_DLLEXPORT PIDController
    * @return differential coefficient
    */
   double GetD() const;
+
+  /**
+   * Get the IZone range.
+   *
+   * @return Maximum magnitude of error to allow integral control.
+   */
+  double GetIZone() const;
 
   /**
    * Gets the period of this controller.
@@ -221,6 +241,9 @@ class WPILIB_DLLEXPORT PIDController
   // Factor for "derivative" control
   double m_Kd;
 
+  // The error range where "integral" control applies
+  double m_iZone = std::numeric_limits<double>::infinity();
+
   // The period (in seconds) of the control loop running this controller
   units::second_t m_period;
 
@@ -256,11 +279,5 @@ class WPILIB_DLLEXPORT PIDController
   bool m_haveSetpoint = false;
   bool m_haveMeasurement = false;
 };
-
-}  // namespace frc2
-
-namespace frc {
-
-using frc2::PIDController;
 
 }  // namespace frc

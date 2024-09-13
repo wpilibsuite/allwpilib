@@ -22,10 +22,22 @@
 
 using namespace frc2;
 
+CommandPtr::CommandPtr(std::unique_ptr<Command>&& command)
+    : m_ptr(std::move(command)) {
+  AssertValid();
+}
+
+CommandPtr::CommandPtr(CommandPtr&& rhs) {
+  m_ptr = std::move(rhs.m_ptr);
+  AssertValid();
+  rhs.m_moveOutSite = wpi::GetStackTrace(1);
+}
+
 void CommandPtr::AssertValid() const {
   if (!m_ptr) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
-                        "Moved-from CommandPtr object used!");
+                        "Moved-from CommandPtr object used!\nMoved out at:\n{}",
+                        m_moveOutSite);
   }
 }
 
@@ -86,15 +98,7 @@ CommandPtr CommandPtr::WithInterruptBehavior(
 }
 
 CommandPtr CommandPtr::AndThen(std::function<void()> toRun,
-                               std::span<Subsystem* const> requirements) && {
-  AssertValid();
-  return std::move(*this).AndThen(CommandPtr(
-      std::make_unique<InstantCommand>(std::move(toRun), requirements)));
-}
-
-CommandPtr CommandPtr::AndThen(
-    std::function<void()> toRun,
-    std::initializer_list<Subsystem*> requirements) && {
+                               Requirements requirements) && {
   AssertValid();
   return std::move(*this).AndThen(CommandPtr(
       std::make_unique<InstantCommand>(std::move(toRun), requirements)));
@@ -109,16 +113,8 @@ CommandPtr CommandPtr::AndThen(CommandPtr&& next) && {
   return std::move(*this);
 }
 
-CommandPtr CommandPtr::BeforeStarting(
-    std::function<void()> toRun, std::span<Subsystem* const> requirements) && {
-  AssertValid();
-  return std::move(*this).BeforeStarting(CommandPtr(
-      std::make_unique<InstantCommand>(std::move(toRun), requirements)));
-}
-
-CommandPtr CommandPtr::BeforeStarting(
-    std::function<void()> toRun,
-    std::initializer_list<Subsystem*> requirements) && {
+CommandPtr CommandPtr::BeforeStarting(std::function<void()> toRun,
+                                      Requirements requirements) && {
   AssertValid();
   return std::move(*this).BeforeStarting(CommandPtr(
       std::make_unique<InstantCommand>(std::move(toRun), requirements)));
@@ -151,12 +147,22 @@ CommandPtr CommandPtr::Until(std::function<bool()> condition) && {
   return std::move(*this);
 }
 
+CommandPtr CommandPtr::OnlyWhile(std::function<bool()> condition) && {
+  AssertValid();
+  return std::move(*this).Until(std::not_fn(std::move(condition)));
+}
+
 CommandPtr CommandPtr::Unless(std::function<bool()> condition) && {
   AssertValid();
   m_ptr = std::make_unique<ConditionalCommand>(
       std::make_unique<InstantCommand>(), std::move(m_ptr),
       std::move(condition));
   return std::move(*this);
+}
+
+CommandPtr CommandPtr::OnlyIf(std::function<bool()> condition) && {
+  AssertValid();
+  return std::move(*this).Unless(std::not_fn(std::move(condition)));
 }
 
 CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {
@@ -209,7 +215,13 @@ CommandPtr CommandPtr::FinallyDo(std::function<void(bool)> end) && {
   return std::move(*this);
 }
 
-CommandPtr CommandPtr::HandleInterrupt(std::function<void(void)> handler) && {
+CommandPtr CommandPtr::FinallyDo(std::function<void()> end) && {
+  AssertValid();
+  return std::move(*this).FinallyDo(
+      [endHandler = std::move(end)](bool interrupted) { endHandler(); });
+}
+
+CommandPtr CommandPtr::HandleInterrupt(std::function<void()> handler) && {
   AssertValid();
   return std::move(*this).FinallyDo(
       [handler = std::move(handler)](bool interrupted) {
@@ -226,12 +238,12 @@ CommandPtr CommandPtr::WithName(std::string_view name) && {
   return std::move(wrapper).ToPtr();
 }
 
-CommandBase* CommandPtr::get() const& {
+Command* CommandPtr::get() const& {
   AssertValid();
   return m_ptr.get();
 }
 
-std::unique_ptr<CommandBase> CommandPtr::Unwrap() && {
+std::unique_ptr<Command> CommandPtr::Unwrap() && {
   AssertValid();
   return std::move(m_ptr);
 }

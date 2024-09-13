@@ -4,9 +4,10 @@
 
 #include <numbers>
 
+#include <gtest/gtest.h>
+
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
-#include "gtest/gtest.h"
 #include "units/angular_velocity.h"
 
 using namespace frc;
@@ -213,4 +214,16 @@ TEST_F(MecanumDriveKinematicsTest, Desaturate) {
   EXPECT_NEAR(wheelSpeeds.frontRight.value(), 6.0 * kFactor, 1E-9);
   EXPECT_NEAR(wheelSpeeds.rearLeft.value(), 4.0 * kFactor, 1E-9);
   EXPECT_NEAR(wheelSpeeds.rearRight.value(), 7.0 * kFactor, 1E-9);
+}
+
+TEST_F(MecanumDriveKinematicsTest, DesaturateNegativeSpeeds) {
+  MecanumDriveWheelSpeeds wheelSpeeds{-5_mps, 6_mps, 4_mps, -7_mps};
+  wheelSpeeds.Desaturate(5.5_mps);
+
+  constexpr double kFactor = 5.5 / 7.0;
+
+  EXPECT_NEAR(wheelSpeeds.frontLeft.value(), -5.0 * kFactor, 1E-9);
+  EXPECT_NEAR(wheelSpeeds.frontRight.value(), 6.0 * kFactor, 1E-9);
+  EXPECT_NEAR(wheelSpeeds.rearLeft.value(), 4.0 * kFactor, 1E-9);
+  EXPECT_NEAR(wheelSpeeds.rearRight.value(), -7.0 * kFactor, 1E-9);
 }

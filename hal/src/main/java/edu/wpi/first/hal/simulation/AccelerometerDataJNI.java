@@ -6,7 +6,16 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for accelerometer data. */
 public class AccelerometerDataJNI extends JNIWrapper {
+  /**
+   * Register a callback to be run when this accelerometer activates.
+   *
+   * @param index the index
+   * @param callback the callback
+   * @param initialNotify whether to run the callback with the initial state
+   * @return the CallbackStore object associated with this callback
+   */
   public static native int registerActiveCallback(
       int index, NotifyCallback callback, boolean initialNotify);
 
@@ -53,4 +62,7 @@ public class AccelerometerDataJNI extends JNIWrapper {
   public static native void setZ(int index, double z);
 
   public static native void resetData(int index);
+
+  /** Utility class. */
+  private AccelerometerDataJNI() {}
 }

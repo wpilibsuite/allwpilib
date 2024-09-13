@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Fri, 8 Sep 2023 21:42:01 -0700
+Subject: [PATCH 3/4] Make dump_escaped() take std::string_view
+
+---
+ include/nlohmann/detail/output/serializer.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/nlohmann/detail/output/serializer.hpp b/include/nlohmann/detail/output/serializer.hpp
+index 7674d134a4d9f230aa4e432294c19dac8dd366b1..ecc4f7d500b9e0bc15917503061a4db100391366 100644
+--- a/include/nlohmann/detail/output/serializer.hpp
++++ b/include/nlohmann/detail/output/serializer.hpp
+@@ -388,7 +388,7 @@ class serializer
+ 
+     @complexity Linear in the length of string @a s.
+     */
+-    void dump_escaped(const string_t& s, const bool ensure_ascii)
++    void dump_escaped(std::string_view s, const bool ensure_ascii)
+     {
+         std::uint32_t codepoint{};
+         std::uint8_t state = UTF8_ACCEPT;

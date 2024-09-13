@@ -39,15 +39,13 @@ class TrapezoidProfileSubsystem : public SubsystemBase {
   explicit TrapezoidProfileSubsystem(Constraints constraints,
                                      Distance_t initialPosition = Distance_t{0},
                                      units::second_t period = 20_ms)
-      : m_constraints(constraints),
+      : m_profile(constraints),
         m_state{initialPosition, Velocity_t(0)},
         m_goal{initialPosition, Velocity_t{0}},
         m_period(period) {}
 
   void Periodic() override {
-    auto profile =
-        frc::TrapezoidProfile<Distance>(m_constraints, m_goal, m_state);
-    m_state = profile.Calculate(m_period);
+    m_state = m_profile.Calculate(m_period, m_state, m_goal);
     if (m_enabled) {
       UseState(m_state);
     }
@@ -87,7 +85,7 @@ class TrapezoidProfileSubsystem : public SubsystemBase {
   void Disable() { m_enabled = false; }
 
  private:
-  Constraints m_constraints;
+  frc::TrapezoidProfile<Distance> m_profile;
   State m_state;
   State m_goal;
   units::second_t m_period;

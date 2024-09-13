@@ -7,11 +7,13 @@
 using namespace frc2;
 
 ScheduleCommand::ScheduleCommand(std::span<Command* const> toSchedule) {
-  SetInsert(m_toSchedule, toSchedule);
+  for (auto cmd : toSchedule) {
+    m_toSchedule.insert(cmd);
+  }
 }
 
 ScheduleCommand::ScheduleCommand(Command* toSchedule) {
-  SetInsert(m_toSchedule, {&toSchedule, 1});
+  m_toSchedule.insert(toSchedule);
 }
 
 void ScheduleCommand::Initialize() {

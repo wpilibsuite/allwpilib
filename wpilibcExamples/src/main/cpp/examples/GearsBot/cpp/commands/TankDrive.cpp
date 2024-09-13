@@ -14,7 +14,7 @@ TankDrive::TankDrive(std::function<double()> left,
       m_right(std::move(right)),
       m_drivetrain(&drivetrain) {
   SetName("TankDrive");
-  AddRequirements({m_drivetrain});
+  AddRequirements(m_drivetrain);
 }
 
 // Called repeatedly when this Command is scheduled to run

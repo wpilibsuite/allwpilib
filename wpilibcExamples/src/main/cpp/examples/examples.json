@@ -58,6 +58,7 @@
     "tags": [
       "Hardware",
       "Joystick",
+      "Shuffleboard",
       "Pneumatics"
     ],
     "foldername": "Solenoid",
@@ -201,6 +202,20 @@
       "Joystick"
     ],
     "foldername": "PotentiometerPID",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Elevator with exponential profiled PID",
+    "description": "Reach elevator position setpoints with exponential profiles and smart motor controller PID.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Exponential Profile",
+      "Smart Motor Controller",
+      "Joystick"
+    ],
+    "foldername": "ElevatorExponentialProfile",
     "gradlebase": "cpp",
     "commandversion": 2
   },
@@ -685,7 +700,27 @@
     ],
     "foldername": "RomiReference",
     "gradlebase": "cppromi",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
+  },
+  {
+    "name": "XRP Reference",
+    "description": "An example command-based robot program that can be used with the XRP reference robot design.",
+    "tags": [
+      "XRP",
+      "Command-based",
+      "Differential Drive",
+      "Digital Input",
+      "Joystick"
+    ],
+    "foldername": "XRPReference",
+    "gradlebase": "cppxrp",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
   },
   {
     "name": "StateSpaceFlywheel",
@@ -764,6 +799,21 @@
     "commandversion": 2
   },
   {
+    "name": "Elevator Exponential Profile Simulation",
+    "description": "Simulate an elevator.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "State-Space",
+      "Simulation",
+      "Mechanism2d",
+      "Profiled PID"
+    ],
+    "foldername": "ElevatorExponentialSimulation",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "DifferentialDrivePoseEstimator",
     "description": "Combine differential-drive odometry with vision data using DifferentialDrivePoseEstimator.",
     "tags": [
@@ -817,7 +867,8 @@
     ],
     "foldername": "UnitTest",
     "gradlebase": "cpp",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "SimpleDifferentialDriveSimulation",
@@ -862,6 +913,30 @@
       "XboxController"
     ],
     "foldername": "SwerveDrivePoseEstimator",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Flywheel BangBangController",
+    "description": "A sample program to demonstrate the use of a BangBangController with a flywheel to control RPM",
+    "tags": [
+      "Flywheel",
+      "Simulation",
+      "Joystick"
+    ],
+    "foldername": "FlywheelBangBangController",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "SysIdRoutine",
+    "description": "A sample command-based robot demonstrating use of the SysIdRoutine command factory",
+    "tags": [
+      "SysId",
+      "Command-based",
+      "DataLog"
+    ],
+    "foldername": "SysId",
     "gradlebase": "cpp",
     "commandversion": 2
   }

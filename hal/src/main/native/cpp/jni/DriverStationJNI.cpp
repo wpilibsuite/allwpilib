@@ -15,7 +15,27 @@
 #include "hal/FRCUsageReporting.h"
 #include "hal/HALBase.h"
 
-// TODO Static asserts
+static_assert(edu_wpi_first_hal_DriverStationJNI_kUnknownAllianceStation ==
+              HAL_AllianceStationID_kUnknown);
+static_assert(edu_wpi_first_hal_DriverStationJNI_kRed1AllianceStation ==
+              HAL_AllianceStationID_kRed1);
+static_assert(edu_wpi_first_hal_DriverStationJNI_kRed2AllianceStation ==
+              HAL_AllianceStationID_kRed2);
+static_assert(edu_wpi_first_hal_DriverStationJNI_kRed3AllianceStation ==
+              HAL_AllianceStationID_kRed3);
+static_assert(edu_wpi_first_hal_DriverStationJNI_kBlue1AllianceStation ==
+              HAL_AllianceStationID_kBlue1);
+static_assert(edu_wpi_first_hal_DriverStationJNI_kBlue2AllianceStation ==
+              HAL_AllianceStationID_kBlue2);
+static_assert(edu_wpi_first_hal_DriverStationJNI_kBlue3AllianceStation ==
+              HAL_AllianceStationID_kBlue3);
+
+static_assert(edu_wpi_first_hal_DriverStationJNI_kMaxJoystickAxes ==
+              HAL_kMaxJoystickAxes);
+static_assert(edu_wpi_first_hal_DriverStationJNI_kMaxJoystickPOVs ==
+              HAL_kMaxJoystickPOVs);
+static_assert(edu_wpi_first_hal_DriverStationJNI_kMaxJoysticks ==
+              HAL_kMaxJoysticks);
 
 using namespace hal;
 using namespace wpi::java;
@@ -231,10 +251,10 @@ Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
 
   HAL_GetAllJoystickData(axes, povs, buttons);
 
-  CriticalJFloatArrayRef jAxes(env, axesArray);
-  CriticalJByteArrayRef jRawAxes(env, rawAxesArray);
-  CriticalJShortArrayRef jPovs(env, povsArray);
-  CriticalJLongArrayRef jButtons(env, buttonsAndMetadataArray);
+  CriticalJSpan<jfloat> jAxes(env, axesArray);
+  CriticalJSpan<jbyte> jRawAxes(env, rawAxesArray);
+  CriticalJSpan<jshort> jPovs(env, povsArray);
+  CriticalJSpan<jlong> jButtons(env, buttonsAndMetadataArray);
 
   static_assert(sizeof(jAxes[0]) == sizeof(axes[0].axes[0]));
   static_assert(sizeof(jRawAxes[0]) == sizeof(axes[0].raw[0]));

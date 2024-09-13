@@ -13,7 +13,7 @@ import java.util.Set;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class ScheduleCommand extends CommandBase {
+public class ScheduleCommand extends Command {
   private final Set<Command> m_toSchedule;
 
   /**

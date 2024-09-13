@@ -13,6 +13,9 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/protobuf/Protobuf.h>
+#include <wpi/struct/Struct.h>
+
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableEntry.h"
 #include "ntcore_c.h"
@@ -29,9 +32,17 @@ class FloatTopic;
 class IntegerArrayTopic;
 class IntegerTopic;
 class MultiSubscriber;
+template <wpi::ProtobufSerializable T>
+class ProtobufTopic;
 class RawTopic;
 class StringArrayTopic;
 class StringTopic;
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+class StructArrayTopic;
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+class StructTopic;
 class Subscriber;
 class Topic;
 
@@ -237,6 +248,38 @@ class NetworkTableInstance final {
    * @return Topic
    */
   StringArrayTopic GetStringArrayTopic(std::string_view name) const;
+
+  /**
+   * Gets a protobuf serialized value topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  template <wpi::ProtobufSerializable T>
+  ProtobufTopic<T> GetProtobufTopic(std::string_view name) const;
+
+  /**
+   * Gets a raw struct serialized value topic.
+   *
+   * @param name topic name
+   * @param info optional struct type info
+   * @return Topic
+   */
+  template <typename T, typename... I>
+    requires wpi::StructSerializable<T, I...>
+  StructTopic<T, I...> GetStructTopic(std::string_view name, I... info) const;
+
+  /**
+   * Gets a raw struct serialized array topic.
+   *
+   * @param name topic name
+   * @param info optional struct type info
+   * @return Topic
+   */
+  template <typename T, typename... I>
+    requires wpi::StructSerializable<T, I...>
+  StructArrayTopic<T, I...> GetStructArrayTopic(std::string_view name,
+                                                I... info) const;
 
   /**
    * Get Published Topics.
@@ -717,6 +760,77 @@ class NetworkTableInstance final {
                         ListenerCallback func);
 
   /** @} */
+
+  /**
+   * @{
+   * @name Schema Functions
+   */
+
+  /**
+   * Returns whether there is a data schema already registered with the given
+   * name. This does NOT perform a check as to whether the schema has already
+   * been published by another node on the network.
+   *
+   * @param name Name (the string passed as the data type for topics using this
+   *             schema)
+   * @return True if schema already registered
+   */
+  bool HasSchema(std::string_view name) const;
+
+  /**
+   * Registers a data schema.  Data schemas provide information for how a
+   * certain data type string can be decoded.  The type string of a data schema
+   * indicates the type of the schema itself (e.g. "protobuf" for protobuf
+   * schemas, "struct" for struct schemas, etc). In NetworkTables, schemas are
+   * published just like normal topics, with the name being generated from the
+   * provided name: "/.schema/<name>".  Duplicate calls to this function with
+   * the same name are silently ignored.
+   *
+   * @param name Name (the string passed as the data type for topics using this
+   *             schema)
+   * @param type Type of schema (e.g. "protobuf", "struct", etc)
+   * @param schema Schema data
+   */
+  void AddSchema(std::string_view name, std::string_view type,
+                 std::span<const uint8_t> schema);
+
+  /**
+   * Registers a data schema.  Data schemas provide information for how a
+   * certain data type string can be decoded.  The type string of a data schema
+   * indicates the type of the schema itself (e.g. "protobuf" for protobuf
+   * schemas, "struct" for struct schemas, etc). In NetworkTables, schemas are
+   * published just like normal topics, with the name being generated from the
+   * provided name: "/.schema/<name>".  Duplicate calls to this function with
+   * the same name are silently ignored.
+   *
+   * @param name Name (the string passed as the data type for topics using this
+   *             schema)
+   * @param type Type of schema (e.g. "protobuf", "struct", etc)
+   * @param schema Schema data
+   */
+  void AddSchema(std::string_view name, std::string_view type,
+                 std::string_view schema);
+
+  /**
+   * Registers a protobuf schema. Duplicate calls to this function with the same
+   * name are silently ignored.
+   *
+   * @tparam T protobuf serializable type
+   * @param msg protobuf message
+   */
+  template <wpi::ProtobufSerializable T>
+  void AddProtobufSchema(wpi::ProtobufMessage<T>& msg);
+
+  /**
+   * Registers a struct schema. Duplicate calls to this function with the same
+   * name are silently ignored.
+   *
+   * @tparam T struct serializable type
+   * @param info optional struct type info
+   */
+  template <typename T, typename... I>
+    requires wpi::StructSerializable<T, I...>
+  void AddStructSchema(const I&... info);
 
   /**
    * Equality operator.  Returns true if both instances refer to the same

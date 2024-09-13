@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <units/angle.h>
+
 #include "frc/PWM.h"
 
 namespace frc {
@@ -17,6 +19,11 @@ namespace frc {
 class Servo : public PWM {
  public:
   /**
+   * Constructor.
+   *
+   * By default, 2.4 ms is used as the max PWM value and 0.6 ms is used as the
+   * min PWM value.
+   *
    * @param channel The PWM channel to which the servo is attached. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
@@ -98,11 +105,11 @@ class Servo : public PWM {
  private:
   double GetServoAngleRange() const;
 
-  static constexpr double kMaxServoAngle = 180.0;
+  static constexpr double kMaxServoAngle = 180.;
   static constexpr double kMinServoAngle = 0.0;
 
-  static constexpr double kDefaultMaxServoPWM = 2.4;
-  static constexpr double kDefaultMinServoPWM = 0.6;
+  static constexpr units::millisecond_t kDefaultMaxServoPWM = 2.4_ms;
+  static constexpr units::millisecond_t kDefaultMinServoPWM = 0.6_ms;
 };
 
 }  // namespace frc

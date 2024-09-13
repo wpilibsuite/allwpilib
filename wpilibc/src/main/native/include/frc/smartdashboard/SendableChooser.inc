@@ -5,32 +5,35 @@
 #pragma once
 
 #include <algorithm>
+#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include <networktables/NTSendableBuilder.h>
+#include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/smartdashboard/SendableChooser.h"
 
 namespace frc {
 
 template <class T>
+  requires std::copy_constructible<T> && std::default_initializable<T>
 void SendableChooser<T>::AddOption(std::string_view name, T object) {
   m_choices[name] = std::move(object);
 }
 
 template <class T>
+  requires std::copy_constructible<T> && std::default_initializable<T>
 void SendableChooser<T>::SetDefaultOption(std::string_view name, T object) {
   m_defaultChoice = name;
   AddOption(name, std::move(object));
 }
 
 template <class T>
-auto SendableChooser<T>::GetSelected()
-    -> decltype(_unwrap_smart_ptr(m_choices[""])) {
+  requires std::copy_constructible<T> && std::default_initializable<T>
+typename SendableChooser<T>::CopyType SendableChooser<T>::GetSelected() const {
   std::string selected = m_defaultChoice;
   {
     std::scoped_lock lock(m_mutex);
@@ -39,23 +42,24 @@ auto SendableChooser<T>::GetSelected()
     }
   }
   if (selected.empty()) {
-    return decltype(_unwrap_smart_ptr(m_choices[""])){};
+    return CopyType{};
   } else {
-    return _unwrap_smart_ptr(m_choices[selected]);
+    return _unwrap_smart_ptr(m_choices.lookup(selected));
   }
 }
 
 template <class T>
-void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
+  requires std::copy_constructible<T> && std::default_initializable<T>
+void SendableChooser<T>::OnChange(std::function<void(T)> listener) {
+  std::scoped_lock lock(m_mutex);
+  m_listener = listener;
+}
+
+template <class T>
+  requires std::copy_constructible<T> && std::default_initializable<T>
+void SendableChooser<T>::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("String Chooser");
-  {
-    std::scoped_lock lock(m_mutex);
-    m_instancePubs.emplace_back(
-        nt::IntegerTopic{builder.GetTopic(kInstance)}.Publish());
-    m_instancePubs.back().Set(m_instance);
-    m_activePubs.emplace_back(
-        nt::StringTopic{builder.GetTopic(kActive)}.Publish());
-  }
+  builder.PublishConstInteger(kInstance, m_instance);
   builder.AddStringArrayProperty(
       kOptions,
       [=, this] {
@@ -91,28 +95,33 @@ void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
       nullptr);
   builder.AddStringProperty(kSelected, nullptr,
                             [=, this](std::string_view val) {
-                              std::scoped_lock lock(m_mutex);
-                              m_haveSelected = true;
-                              m_selected = val;
-                              for (auto& pub : m_activePubs) {
-                                pub.Set(val);
+                              T choice{};
+                              std::function<void(T)> listener;
+                              {
+                                std::scoped_lock lock(m_mutex);
+                                m_haveSelected = true;
+                                m_selected = val;
+                                if (m_previousVal != val && m_listener) {
+                                  choice = m_choices[val];
+                                  listener = m_listener;
+                                }
+                                m_previousVal = val;
+                              }
+                              if (listener) {
+                                listener(choice);
                               }
                             });
 }
 
 template <class T>
+  requires std::copy_constructible<T> && std::default_initializable<T>
 template <class U>
 U SendableChooser<T>::_unwrap_smart_ptr(const U& value) {
   return value;
 }
 
 template <class T>
-template <class U>
-U* SendableChooser<T>::_unwrap_smart_ptr(const std::unique_ptr<U>& value) {
-  return value.get();
-}
-
-template <class T>
+  requires std::copy_constructible<T> && std::default_initializable<T>
 template <class U>
 std::weak_ptr<U> SendableChooser<T>::_unwrap_smart_ptr(
     const std::shared_ptr<U>& value) {

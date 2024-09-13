@@ -2,9 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
+
 #include "frc/drive/DifferentialDrive.h"
-#include "gtest/gtest.h"
-#include "motorcontrol/MockMotorController.h"
+#include "motorcontrol/MockPWMMotorController.h"
 
 TEST(DifferentialDriveTest, ArcadeDriveIK) {
   // Forward
@@ -239,9 +240,10 @@ TEST(DifferentialDriveTest, TankDriveIKSquared) {
 }
 
 TEST(DifferentialDriveTest, ArcadeDrive) {
-  frc::MockMotorController left;
-  frc::MockMotorController right;
-  frc::DifferentialDrive drive{left, right};
+  frc::MockPWMMotorController left;
+  frc::MockPWMMotorController right;
+  frc::DifferentialDrive drive{[&](double output) { left.Set(output); },
+                               [&](double output) { right.Set(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
@@ -276,9 +278,10 @@ TEST(DifferentialDriveTest, ArcadeDrive) {
 }
 
 TEST(DifferentialDriveTest, ArcadeDriveSquared) {
-  frc::MockMotorController left;
-  frc::MockMotorController right;
-  frc::DifferentialDrive drive{left, right};
+  frc::MockPWMMotorController left;
+  frc::MockPWMMotorController right;
+  frc::DifferentialDrive drive{[&](double output) { left.Set(output); },
+                               [&](double output) { right.Set(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
@@ -313,9 +316,10 @@ TEST(DifferentialDriveTest, ArcadeDriveSquared) {
 }
 
 TEST(DifferentialDriveTest, CurvatureDrive) {
-  frc::MockMotorController left;
-  frc::MockMotorController right;
-  frc::DifferentialDrive drive{left, right};
+  frc::MockPWMMotorController left;
+  frc::MockPWMMotorController right;
+  frc::DifferentialDrive drive{[&](double output) { left.Set(output); },
+                               [&](double output) { right.Set(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
@@ -350,9 +354,10 @@ TEST(DifferentialDriveTest, CurvatureDrive) {
 }
 
 TEST(DifferentialDriveTest, CurvatureDriveTurnInPlace) {
-  frc::MockMotorController left;
-  frc::MockMotorController right;
-  frc::DifferentialDrive drive{left, right};
+  frc::MockPWMMotorController left;
+  frc::MockPWMMotorController right;
+  frc::DifferentialDrive drive{[&](double output) { left.Set(output); },
+                               [&](double output) { right.Set(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
@@ -387,9 +392,10 @@ TEST(DifferentialDriveTest, CurvatureDriveTurnInPlace) {
 }
 
 TEST(DifferentialDriveTest, TankDrive) {
-  frc::MockMotorController left;
-  frc::MockMotorController right;
-  frc::DifferentialDrive drive{left, right};
+  frc::MockPWMMotorController left;
+  frc::MockPWMMotorController right;
+  frc::DifferentialDrive drive{[&](double output) { left.Set(output); },
+                               [&](double output) { right.Set(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
@@ -424,9 +430,10 @@ TEST(DifferentialDriveTest, TankDrive) {
 }
 
 TEST(DifferentialDriveTest, TankDriveSquared) {
-  frc::MockMotorController left;
-  frc::MockMotorController right;
-  frc::DifferentialDrive drive{left, right};
+  frc::MockPWMMotorController left;
+  frc::MockPWMMotorController right;
+  frc::DifferentialDrive drive{[&](double output) { left.Set(output); },
+                               [&](double output) { right.Set(output); }};
   drive.SetDeadband(0.0);
 
   // Forward

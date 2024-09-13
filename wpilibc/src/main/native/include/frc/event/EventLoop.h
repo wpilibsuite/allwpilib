@@ -10,8 +10,8 @@
 #include <wpi/FunctionExtras.h>
 
 namespace frc {
-/** The loop polling BooleanEvent objects and executing the actions bound to
- * them. */
+/** A declarative way to bind a set of actions to a loop and execute them when
+ * the loop is polled. */
 class EventLoop {
  public:
   EventLoop();
@@ -20,7 +20,7 @@ class EventLoop {
   EventLoop& operator=(const EventLoop&) = delete;
 
   /**
-   * Bind a new action to run.
+   * Bind a new action to run when the loop is polled.
    *
    * @param action the action to run.
    */
@@ -38,5 +38,6 @@ class EventLoop {
 
  private:
   std::vector<wpi::unique_function<void()>> m_bindings;
+  bool m_running{false};
 };
 }  // namespace frc

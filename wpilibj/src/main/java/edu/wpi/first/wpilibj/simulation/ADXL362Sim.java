@@ -8,10 +8,11 @@ import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.ADXL362;
 import java.util.Objects;
 
+/** Class to control a simulated ADXL362. */
 public class ADXL362Sim {
-  protected SimDouble m_simX;
-  protected SimDouble m_simY;
-  protected SimDouble m_simZ;
+  private SimDouble m_simX;
+  private SimDouble m_simY;
+  private SimDouble m_simZ;
 
   /**
    * Constructor.
@@ -34,15 +35,30 @@ public class ADXL362Sim {
     Objects.requireNonNull(m_simZ);
   }
 
-  public void setX(double x) {
-    m_simX.set(x);
+  /**
+   * Sets the X acceleration.
+   *
+   * @param accel The X acceleration.
+   */
+  public void setX(double accel) {
+    m_simX.set(accel);
   }
 
-  public void setY(double y) {
-    m_simY.set(y);
+  /**
+   * Sets the Y acceleration.
+   *
+   * @param accel The Y acceleration.
+   */
+  public void setY(double accel) {
+    m_simY.set(accel);
   }
 
-  public void setZ(double z) {
-    m_simZ.set(z);
+  /**
+   * Sets the Z acceleration.
+   *
+   * @param accel The Z acceleration.
+   */
+  public void setZ(double accel) {
+    m_simZ.set(accel);
   }
 }

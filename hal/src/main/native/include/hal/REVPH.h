@@ -9,7 +9,7 @@
 #include "hal/Types.h"
 
 /**
- * @defgroup hal_rev_ph REV PH Functions
+ * @defgroup hal_rev_ph REV Pneumatic Hub (PH) Functions
  * @ingroup hal_capi
  * @{
  */
@@ -17,11 +17,11 @@
 /**
  * The compressor configuration type
  */
-HAL_ENUM(HAL_REVPHCompressorConfigType){
-    HAL_REVPHCompressorConfigType_kDisabled = 0,
-    HAL_REVPHCompressorConfigType_kDigital = 1,
-    HAL_REVPHCompressorConfigType_kAnalog = 2,
-    HAL_REVPHCompressorConfigType_kHybrid = 3,
+HAL_ENUM(HAL_REVPHCompressorConfigType) {
+  HAL_REVPHCompressorConfigType_kDisabled = 0,
+  HAL_REVPHCompressorConfigType_kDigital = 1,
+  HAL_REVPHCompressorConfigType_kAnalog = 2,
+  HAL_REVPHCompressorConfigType_kHybrid = 3,
 };
 
 /**
@@ -91,58 +91,279 @@ struct HAL_REVPHStickyFaults {
 extern "C" {
 #endif
 
+/**
+ * Initializes a PH.
+ *
+ * @param[in] module             the CAN ID to initialize
+ * @param[in] allocationLocation the location where the allocation is occurring
+ *                               (can be null)
+ * @param[out] status            Error status variable. 0 on success.
+ * @return the created PH handle
+ */
 HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
                                     const char* allocationLocation,
                                     int32_t* status);
 
+/**
+ * Frees a PH handle.
+ *
+ * @param[in] handle the PH handle
+ */
 void HAL_FreeREVPH(HAL_REVPHHandle handle);
 
+/**
+ * Checks if a solenoid channel number is valid.
+ *
+ * @param[in] channel the channel to check
+ * @return true if the channel is valid, otherwise false
+ */
 HAL_Bool HAL_CheckREVPHSolenoidChannel(int32_t channel);
+
+/**
+ * Checks if a PH module (CAN ID) is valid.
+ *
+ * @param[in] module the module to check
+ * @return true if the module is valid, otherwise false
+ */
 HAL_Bool HAL_CheckREVPHModuleNumber(int32_t module);
 
+/**
+ * Get whether compressor is turned on.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return true if the compressor is turned on
+ */
 HAL_Bool HAL_GetREVPHCompressor(HAL_REVPHHandle handle, int32_t* status);
+
+/**
+ * Send compressor configuration to the PH.
+ *
+ * @param[in] handle  the PH handle
+ * @param[in] config  compressor configuration
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_SetREVPHCompressorConfig(HAL_REVPHHandle handle,
                                   const HAL_REVPHCompressorConfig* config,
                                   int32_t* status);
+
+/**
+ * Disable Compressor.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_SetREVPHClosedLoopControlDisabled(HAL_REVPHHandle handle,
                                            int32_t* status);
+
+/**
+ * Enables the compressor in digital mode using the digital pressure switch. The
+ * compressor will turn on when the pressure switch indicates that the system is
+ * not full, and will turn off when the pressure switch indicates that the
+ * system is full.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_SetREVPHClosedLoopControlDigital(HAL_REVPHHandle handle,
                                           int32_t* status);
+
+/**
+ * Enables the compressor in analog mode. This mode uses an analog
+ * pressure sensor connected to analog channel 0 to cycle the compressor. The
+ * compressor will turn on when the pressure drops below minAnalogVoltage and
+ * will turn off when the pressure reaches maxAnalogVoltage. This mode is only
+ * supported by the REV PH with the REV Analog Pressure Sensor connected to
+ * analog channel 0.
+ * @param[in] handle  the PH handle
+ * @param[in] minAnalogVoltage The compressor will turn on when the analog
+ * pressure sensor voltage drops below this value
+ * @param[in] maxAnalogVoltage The compressor will turn off when the analog
+ * pressure sensor reaches this value.
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_SetREVPHClosedLoopControlAnalog(HAL_REVPHHandle handle,
                                          double minAnalogVoltage,
                                          double maxAnalogVoltage,
                                          int32_t* status);
+
+/**
+ * Enables the compressor in hybrid mode. This mode uses both a digital
+ * pressure switch and an analog pressure sensor connected to analog channel 0
+ * to cycle the compressor.
+ *
+ * The compressor will turn on when \a both:
+ *
+ * - The digital pressure switch indicates the system is not full AND
+ * - The analog pressure sensor indicates that the pressure in the system is
+ * below the specified minimum pressure.
+ *
+ * The compressor will turn off when \a either:
+ *
+ * - The digital pressure switch is disconnected or indicates that the system
+ * is full OR
+ * - The pressure detected by the analog sensor is greater than the specified
+ * maximum pressure.
+ *
+ * @param[in] handle  the PH handle
+ * @param[in] minAnalogVoltage The compressor will turn on when the analog
+ * pressure sensor voltage drops below this value and the pressure switch
+ * indicates that the system is not full.
+ * @param[in] maxAnalogVoltage The compressor will turn off when the analog
+ * pressure sensor reaches this value or the pressure switch is disconnected or
+ * indicates that the system is full.
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_SetREVPHClosedLoopControlHybrid(HAL_REVPHHandle handle,
                                          double minAnalogVoltage,
                                          double maxAnalogVoltage,
                                          int32_t* status);
+
+/**
+ * Get compressor configuration from the PH.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return compressor configuration
+ */
 HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
     HAL_REVPHHandle handle, int32_t* status);
+
+/**
+ * Returns the state of the digital pressure switch.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return True if pressure switch indicates that the system is full,
+ * otherwise false.
+ */
 HAL_Bool HAL_GetREVPHPressureSwitch(HAL_REVPHHandle handle, int32_t* status);
+
+/**
+ * Returns the current drawn by the compressor.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return The current drawn by the compressor in amps.
+ */
 double HAL_GetREVPHCompressorCurrent(HAL_REVPHHandle handle, int32_t* status);
+
+/**
+ * Returns the raw voltage of the specified analog
+ * input channel.
+ *
+ * @param[in] handle  the PH handle
+ * @param[in] channel The analog input channel to read voltage from.
+ * @param[out] status Error status variable. 0 on success.
+ * @return The voltage of the specified analog input channel in volts.
+ */
 double HAL_GetREVPHAnalogVoltage(HAL_REVPHHandle handle, int32_t channel,
                                  int32_t* status);
+
+/**
+ * Returns the current input voltage for the PH.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return The input voltage in volts.
+ */
 double HAL_GetREVPHVoltage(HAL_REVPHHandle handle, int32_t* status);
+
+/**
+ * Returns the current voltage of the regulated 5v supply.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return The current voltage of the 5v supply in volts.
+ */
 double HAL_GetREVPH5VVoltage(HAL_REVPHHandle handle, int32_t* status);
+
+/**
+ * Returns the total current drawn by all solenoids.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return Total current drawn by all solenoids in amps.
+ */
 double HAL_GetREVPHSolenoidCurrent(HAL_REVPHHandle handle, int32_t* status);
+
+/**
+ * Returns the current voltage of the solenoid power supply.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return The current voltage of the solenoid power supply in volts.
+ */
 double HAL_GetREVPHSolenoidVoltage(HAL_REVPHHandle handle, int32_t* status);
+
+/**
+ * Returns the hardware and firmware versions of the PH.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] version The hardware and firmware versions.
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
                          int32_t* status);
 
+/**
+ * Gets a bitmask of solenoid values.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return solenoid values
+ */
 int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status);
+
+/**
+ * Sets solenoids on a PH.
+ *
+ * @param[in] handle  the PH handle
+ * @param[in] mask bitmask to set
+ * @param[in] values solenoid values
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_SetREVPHSolenoids(HAL_REVPHHandle handle, int32_t mask, int32_t values,
                            int32_t* status);
 
+/**
+ * Fire a single solenoid shot for the specified duration.
+ *
+ * @param[in] handle  the PH handle
+ * @param[in] index solenoid index
+ * @param[in] durMs shot duration in ms
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
                           int32_t* status);
 
+/**
+ * Returns the faults currently active on the PH.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] faults The faults.
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_GetREVPHFaults(HAL_REVPHHandle handle, HAL_REVPHFaults* faults,
                         int32_t* status);
 
+/**
+ * Returns the sticky faults currently active on this device.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] stickyFaults The sticky faults.
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
                               HAL_REVPHStickyFaults* stickyFaults,
                               int32_t* status);
 
+/**
+ * Clears the sticky faults.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_ClearREVPHStickyFaults(HAL_REVPHHandle handle, int32_t* status);
 
 #ifdef __cplusplus

@@ -4,6 +4,7 @@
 
 #include "hal/AnalogGyro.h"
 
+#include <cmath>
 #include <string>
 #include <thread>
 
@@ -204,8 +205,8 @@ void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
     return;
   }
 
-  gyro->center = static_cast<int32_t>(
-      static_cast<double>(value) / static_cast<double>(count) + 0.5);
+  gyro->center =
+      std::round(static_cast<double>(value) / static_cast<double>(count));
 
   gyro->offset = static_cast<double>(value) / static_cast<double>(count) -
                  static_cast<double>(gyro->center);

@@ -4,11 +4,11 @@
 
 #include "frc/simulation/AnalogInputSim.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/AnalogInput.h"
-#include "gtest/gtest.h"
 
 namespace frc::sim {
 

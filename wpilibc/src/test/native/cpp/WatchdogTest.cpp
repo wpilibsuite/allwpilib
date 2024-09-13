@@ -6,8 +6,9 @@
 
 #include <stdint.h>
 
+#include <gtest/gtest.h>
+
 #include "frc/simulation/SimHooks.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

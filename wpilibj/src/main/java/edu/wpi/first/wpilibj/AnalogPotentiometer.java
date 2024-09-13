@@ -33,6 +33,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
    * @param fullRange The scaling to multiply the fraction by to get a meaningful unit.
    * @param offset The offset to add to the scaled value for controlling the zero value
    */
+  @SuppressWarnings("this-escape")
   public AnalogPotentiometer(final int channel, double fullRange, double offset) {
     this(new AnalogInput(channel), fullRange, offset);
     m_initAnalogInput = true;
@@ -53,6 +54,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
    *     input.
    * @param offset The angular value (in desired units) representing the angular output at 0V.
    */
+  @SuppressWarnings("this-escape")
   public AnalogPotentiometer(final AnalogInput input, double fullRange, double offset) {
     SendableRegistry.addLW(this, "AnalogPotentiometer", input.getChannel());
     m_analogInput = input;

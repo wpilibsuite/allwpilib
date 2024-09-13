@@ -25,7 +25,8 @@ class PIDSubsystem : public SubsystemBase {
    * @param controller the PIDController to use
    * @param initialPosition the initial setpoint of the subsystem
    */
-  explicit PIDSubsystem(PIDController controller, double initialPosition = 0);
+  explicit PIDSubsystem(frc::PIDController controller,
+                        double initialPosition = 0);
 
   void Periodic() override;
 
@@ -65,10 +66,13 @@ class PIDSubsystem : public SubsystemBase {
    *
    * @return The controller.
    */
-  PIDController& GetController();
+  frc::PIDController& GetController();
 
  protected:
-  PIDController m_controller;
+  /// PID controller.
+  frc::PIDController m_controller;
+
+  /// Whether PID controller output is enabled.
   bool m_enabled{false};
 
   /**

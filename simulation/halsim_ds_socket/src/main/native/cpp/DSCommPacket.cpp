@@ -146,7 +146,9 @@ void DSCommPacket::DecodeUDP(std::span<const uint8_t> packet) {
   m_lo = packet[1];
   // Comm Version is packet 2, ignore
   SetControl(packet[3], packet[4]);
-  SetAlliance(packet[5]);
+  // DS sends values 0, 1, and 2 for Red, but kUnknown is 0, so the value needs
+  // to be offset by one
+  SetAlliance(packet[5] + 1);
 
   // Return if packet finished
   if (packet.size() == 6) {

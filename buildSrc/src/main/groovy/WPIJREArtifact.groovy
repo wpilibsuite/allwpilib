@@ -28,7 +28,7 @@ public class WPIJREArtifact extends MavenArtifact {
 
     private boolean checkJreVersion = true;
 
-    private final String artifactLocation = "edu.wpi.first.jdk:roborio-2023:17.0.5u7-1"
+    private final String artifactLocation = "edu.wpi.first.jdk:roborio-2024:17.0.9u7-1"
 
     @Inject
     public WPIJREArtifact(String name, RemoteTarget target) {

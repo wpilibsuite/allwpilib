@@ -4,9 +4,9 @@
 
 #include "wpi/future.h"  // NOLINT(build/include_order)
 
-#include "gtest/gtest.h"  // NOLINT(build/include_order)
-
 #include <thread>
+
+#include <gtest/gtest.h>
 
 namespace wpi {
 

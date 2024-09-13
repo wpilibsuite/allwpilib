@@ -643,8 +643,9 @@ void HAL_SetSPIAutoTransmitData(HAL_SPIPort port, const uint8_t* dataToSend,
   }
 
   // set tx data registers
-  for (int32_t i = 0; i < dataSize; ++i)
+  for (int32_t i = 0; i < dataSize; ++i) {
     spiSystem->writeAutoTx(i >> 2, i & 3, dataToSend[i], status);
+  }
 
   // set byte counts
   tSPI::tAutoByteCount config;

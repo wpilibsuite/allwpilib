@@ -25,11 +25,10 @@
 
 #include "wpinet/uv/Async.h"  // NOLINT(build/include_order)
 
-#include "gtest/gtest.h"  // NOLINT(build/include_order)
-
 #include <atomic>
 #include <thread>
 
+#include <gtest/gtest.h>
 #include <wpi/mutex.h>
 
 #include "wpinet/uv/Loop.h"

@@ -35,13 +35,6 @@ struct CANStorage {
 static UnlimitedHandleResource<HAL_CANHandle, CANStorage, HAL_HandleEnum::CAN>*
     canHandles;
 
-static uint32_t GetPacketBaseTime() {
-  int status = 0;
-  auto basetime = HAL_GetFPGATime(&status);
-  // us to ms
-  return (basetime / 1000ull) & 0xFFFFFFFF;
-}
-
 namespace hal {
 namespace init {
 void InitializeCANAPI() {
@@ -69,6 +62,13 @@ static int32_t CreateCANId(CANStorage* storage, int32_t apiId) {
   createdId |= (apiId & 0x3FF) << 6;
   createdId |= (storage->deviceId & 0x3F);
   return createdId;
+}
+
+uint32_t HAL_GetCANPacketBaseTime() {
+  int status = 0;
+  auto basetime = HAL_GetFPGATime(&status);
+  // us to ms
+  return (basetime / 1000ull) & 0xFFFFFFFF;
 }
 
 HAL_CANHandle HAL_InitializeCAN(HAL_CANManufacturer manufacturer,
@@ -275,7 +275,7 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
-      uint32_t now = GetPacketBaseTime();
+      uint32_t now = HAL_GetCANPacketBaseTime();
       if (now - i->second.lastTimeStamp > static_cast<uint32_t>(timeoutMs)) {
         // Timeout, return bad status
         *status = HAL_CAN_TIMEOUT;
@@ -307,7 +307,7 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
-      uint32_t now = GetPacketBaseTime();
+      uint32_t now = HAL_GetCANPacketBaseTime();
       if (now - i->second.lastTimeStamp < static_cast<uint32_t>(periodMs)) {
         *status = 0;
         // Read the data from the stored message into the output
@@ -337,7 +337,7 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
-      uint32_t now = GetPacketBaseTime();
+      uint32_t now = HAL_GetCANPacketBaseTime();
       if (now - i->second.lastTimeStamp > static_cast<uint32_t>(timeoutMs)) {
         // Timeout, return bad status
         *status = HAL_CAN_TIMEOUT;

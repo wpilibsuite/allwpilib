@@ -10,13 +10,10 @@
 #include <string_view>
 
 #include <wpi/Logger.h>
+#include <wpi/json_fwd.h>
 #include <wpi/mutex.h>
 
 #include "SourceImpl.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace cs {
 

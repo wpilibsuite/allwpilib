@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for analog input data. */
 public class AnalogInDataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -89,4 +90,7 @@ public class AnalogInDataJNI extends JNIWrapper {
   public static native void setAccumulatorDeadband(int index, int AccumulatorDeadband);
 
   public static native void resetData(int index);
+
+  /** Utility class. */
+  private AnalogInDataJNI() {}
 }

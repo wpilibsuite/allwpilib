@@ -16,22 +16,17 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * Class implements the PWM generation in the FPGA.
  *
  * <p>The values supplied as arguments for PWM outputs range from -1.0 to 1.0. They are mapped to
- * the hardware dependent values, in this case 0-2000 for the FPGA. Changes are immediately sent to
- * the FPGA, and the update occurs at the next FPGA cycle (5.005ms). There is no delay.
- *
- * <p>As of revision 0.1.10 of the FPGA, the FPGA interprets the 0-2000 values as follows: - 2000 =
- * maximum pulse width - 1999 to 1001 = linear scaling from "full forward" to "center" - 1000 =
- * center value - 999 to 2 = linear scaling from "center" to "full reverse" - 1 = minimum pulse
- * width (currently .5ms) - 0 = disabled (i.e. PWM output is held low)
+ * the microseconds to keep the pulse high, with a range of 0 (off) to 4096. Changes are immediately
+ * sent to the FPGA, and the update occurs at the next FPGA cycle (5.05ms). There is no delay.
  */
 public class PWM implements Sendable, AutoCloseable {
   /** Represents the amount to multiply the minimum servo-pulse pwm period by. */
   public enum PeriodMultiplier {
-    /** Period Multiplier: don't skip pulses. PWM pulses occur every 5.005 ms */
+    /** Period Multiplier: don't skip pulses. PWM pulses occur every 5.05 ms */
     k1X,
-    /** Period Multiplier: skip every other pulse. PWM pulses occur every 10.010 ms */
+    /** Period Multiplier: skip every other pulse. PWM pulses occur every 10.10 ms */
     k2X,
-    /** Period Multiplier: skip three out of four pulses. PWM pulses occur every 20.020 ms */
+    /** Period Multiplier: skip three out of four pulses. PWM pulses occur every 20.20 ms */
     k4X
   }
 
@@ -59,6 +54,7 @@ public class PWM implements Sendable, AutoCloseable {
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
    * @param registerSendable If true, adds this instance to SendableRegistry and LiveWindow
    */
+  @SuppressWarnings("this-escape")
   public PWM(final int channel, final boolean registerSendable) {
     SensorUtil.checkPWMChannel(channel);
     m_channel = channel;
@@ -103,15 +99,15 @@ public class PWM implements Sendable, AutoCloseable {
    * type of controller. The values determine the upper and lower speeds as well as the deadband
    * bracket.
    *
-   * @param max The max PWM pulse width in ms
-   * @param deadbandMax The high end of the deadband range pulse width in ms
-   * @param center The center (off) pulse width in ms
-   * @param deadbandMin The low end of the deadband pulse width in ms
-   * @param min The minimum pulse width in ms
+   * @param max The max PWM pulse width in us
+   * @param deadbandMax The high end of the deadband range pulse width in us
+   * @param center The center (off) pulse width in us
+   * @param deadbandMin The low end of the deadband pulse width in us
+   * @param min The minimum pulse width in us
    */
-  public void setBounds(
-      double max, double deadbandMax, double center, double deadbandMin, double min) {
-    PWMJNI.setPWMConfig(m_handle, max, deadbandMax, center, deadbandMin, min);
+  public void setBoundsMicroseconds(
+      int max, int deadbandMax, int center, int deadbandMin, int min) {
+    PWMJNI.setPWMConfigMicroseconds(m_handle, max, deadbandMax, center, deadbandMin, min);
   }
 
   /**
@@ -121,8 +117,8 @@ public class PWM implements Sendable, AutoCloseable {
    *
    * @return The bounds on the PWM pulse widths.
    */
-  public PWMConfigDataResult getRawBounds() {
-    return PWMJNI.getPWMConfigRaw(m_handle);
+  public PWMConfigDataResult getBoundsMicroseconds() {
+    return PWMJNI.getPWMConfigMicroseconds(m_handle);
   }
 
   /**
@@ -140,8 +136,7 @@ public class PWM implements Sendable, AutoCloseable {
    * <p>This is intended to be used by servos.
    *
    * @param pos The position to set the servo between 0.0 and 1.0.
-   * @pre SetMaxPositivePwm() called.
-   * @pre SetMinNegativePwm() called.
+   * @pre setBoundsMicroseconds() called.
    */
   public void setPosition(double pos) {
     PWMJNI.setPWMPosition(m_handle, pos);
@@ -153,8 +148,7 @@ public class PWM implements Sendable, AutoCloseable {
    * <p>This is intended to be used by servos.
    *
    * @return The position the servo is set to between 0.0 and 1.0.
-   * @pre SetMaxPositivePwm() called.
-   * @pre SetMinNegativePwm() called.
+   * @pre setBoundsMicroseconds() called.
    */
   public double getPosition() {
     return PWMJNI.getPWMPosition(m_handle);
@@ -166,11 +160,7 @@ public class PWM implements Sendable, AutoCloseable {
    * <p>This is intended to be used by motor controllers.
    *
    * @param speed The speed to set the motor controller between -1.0 and 1.0.
-   * @pre SetMaxPositivePwm() called.
-   * @pre SetMinPositivePwm() called.
-   * @pre SetCenterPwm() called.
-   * @pre SetMaxNegativePwm() called.
-   * @pre SetMinNegativePwm() called.
+   * @pre setBoundsMicroseconds() called.
    */
   public void setSpeed(double speed) {
     PWMJNI.setPWMSpeed(m_handle, speed);
@@ -182,10 +172,7 @@ public class PWM implements Sendable, AutoCloseable {
    * <p>This is intended to be used by motor controllers.
    *
    * @return The most recently set speed between -1.0 and 1.0.
-   * @pre SetMaxPositivePwm() called.
-   * @pre SetMinPositivePwm() called.
-   * @pre SetMaxNegativePwm() called.
-   * @pre SetMinNegativePwm() called.
+   * @pre setBoundsMicroseconds() called.
    */
   public double getSpeed() {
     return PWMJNI.getPWMSpeed(m_handle);
@@ -194,12 +181,12 @@ public class PWM implements Sendable, AutoCloseable {
   /**
    * Set the PWM value directly to the hardware.
    *
-   * <p>Write a raw value to a PWM channel.
+   * <p>Write a microsecond pulse value to a PWM channel.
    *
-   * @param value Raw PWM value. Range 0 - 255.
+   * @param microsecondPulseTime Microsecond pulse PWM value. Range 0 - 4096.
    */
-  public void setRaw(int value) {
-    PWMJNI.setPWMRaw(m_handle, (short) value);
+  public void setPulseTimeMicroseconds(int microsecondPulseTime) {
+    PWMJNI.setPulseTimeMicroseconds(m_handle, microsecondPulseTime);
   }
 
   /**
@@ -207,14 +194,14 @@ public class PWM implements Sendable, AutoCloseable {
    *
    * <p>Read a raw value from a PWM channel.
    *
-   * @return Raw PWM control value. Range: 0 - 255.
+   * @return Microsecond pulse PWM control value. Range: 0 - 4096.
    */
-  public int getRaw() {
-    return PWMJNI.getPWMRaw(m_handle);
+  public int getPulseTimeMicroseconds() {
+    return PWMJNI.getPulseTimeMicroseconds(m_handle);
   }
 
   /** Temporarily disables the PWM output. The next set call will re-enable the output. */
-  public void setDisabled() {
+  public final void setDisabled() {
     PWMJNI.setPWMDisabled(m_handle);
   }
 
@@ -242,8 +229,14 @@ public class PWM implements Sendable, AutoCloseable {
     }
   }
 
+  /** Latches PWM to zero. */
   public void setZeroLatch() {
     PWMJNI.latchPWMZero(m_handle);
+  }
+
+  /** Sets the PWM output to be a continuous high signal while enabled. */
+  public void setAlwaysHighMode() {
+    PWMJNI.setAlwaysHighMode(m_handle);
   }
 
   /**
@@ -260,6 +253,9 @@ public class PWM implements Sendable, AutoCloseable {
     builder.setSmartDashboardType("PWM");
     builder.setActuator(true);
     builder.setSafeState(this::setDisabled);
-    builder.addDoubleProperty("Value", this::getRaw, value -> setRaw((int) value));
+    builder.addDoubleProperty(
+        "Value", this::getPulseTimeMicroseconds, value -> setPulseTimeMicroseconds((int) value));
+    builder.addDoubleProperty("Speed", this::getSpeed, this::setSpeed);
+    builder.addDoubleProperty("Position", this::getPosition, this::setPosition);
   }
 }

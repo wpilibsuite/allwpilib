@@ -17,13 +17,13 @@ public class ReplaceMeTrapezoidProfileCommand extends TrapezoidProfileCommand {
         // The motion profile to be executed
         new TrapezoidProfile(
             // The motion profile constraints
-            new TrapezoidProfile.Constraints(0, 0),
-            // Goal state
-            new TrapezoidProfile.State(),
-            // Initial state
-            new TrapezoidProfile.State()),
+            new TrapezoidProfile.Constraints(0, 0)),
         state -> {
           // Use current trajectory state here
-        });
+        },
+        // Goal state
+        TrapezoidProfile.State::new,
+        // Current state
+        TrapezoidProfile.State::new);
   }
 }

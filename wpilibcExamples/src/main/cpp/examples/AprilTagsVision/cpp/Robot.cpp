@@ -37,13 +37,13 @@ class Robot : public frc::TimedRobot {
  private:
   static void VisionThread() {
     frc::AprilTagDetector detector;
-    // look for tag16h5, don't correct any error bits
-    detector.AddFamily("tag16h5", 0);
+    // look for tag36h11, correct 3 error bits
+    detector.AddFamily("tag36h11", 3);
 
     // Set up Pose Estimator - parameters are for a Microsoft Lifecam HD-3000
     // (https://www.chiefdelphi.com/t/wpilib-apriltagdetector-sample-code/421411/21)
     frc::AprilTagPoseEstimator::Config poseEstConfig = {
-        .tagSize = units::length::inch_t(6.0),
+        .tagSize = units::length::inch_t(6.5),
         .fx = 699.3778103158814,
         .fy = 677.7161226393544,
         .cx = 345.6059345433618,

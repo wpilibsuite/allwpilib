@@ -24,6 +24,9 @@ public class PIDController implements Sendable, AutoCloseable {
   // Factor for "derivative" control
   private double m_kd;
 
+  // The error range where "integral" control applies
+  private double m_iZone = Double.POSITIVE_INFINITY;
+
   // The period (in seconds) of the loop that calls the controller
   private final double m_period;
 
@@ -65,6 +68,9 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param kp The proportional coefficient.
    * @param ki The integral coefficient.
    * @param kd The derivative coefficient.
+   * @throws IllegalArgumentException if kp &lt; 0
+   * @throws IllegalArgumentException if ki &lt; 0
+   * @throws IllegalArgumentException if kd &lt; 0
    */
   public PIDController(double kp, double ki, double kd) {
     this(kp, ki, kd, 0.02);
@@ -76,15 +82,29 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param kp The proportional coefficient.
    * @param ki The integral coefficient.
    * @param kd The derivative coefficient.
-   * @param period The period between controller updates in seconds. Must be non-zero and positive.
+   * @param period The period between controller updates in seconds.
+   * @throws IllegalArgumentException if kp &lt; 0
+   * @throws IllegalArgumentException if ki &lt; 0
+   * @throws IllegalArgumentException if kd &lt; 0
+   * @throws IllegalArgumentException if period &lt;= 0
    */
+  @SuppressWarnings("this-escape")
   public PIDController(double kp, double ki, double kd, double period) {
     m_kp = kp;
     m_ki = ki;
     m_kd = kd;
 
-    if (period <= 0) {
-      throw new IllegalArgumentException("Controller period must be a non-zero positive number!");
+    if (kp < 0.0) {
+      throw new IllegalArgumentException("Kp must be a non-negative number!");
+    }
+    if (ki < 0.0) {
+      throw new IllegalArgumentException("Ki must be a non-negative number!");
+    }
+    if (kd < 0.0) {
+      throw new IllegalArgumentException("Kd must be a non-negative number!");
+    }
+    if (period <= 0.0) {
+      throw new IllegalArgumentException("Controller period must be a positive number!");
     }
     m_period = period;
 
@@ -117,7 +137,7 @@ public class PIDController implements Sendable, AutoCloseable {
   /**
    * Sets the Proportional coefficient of the PID controller gain.
    *
-   * @param kp proportional coefficient
+   * @param kp The proportional coefficient. Must be &gt;= 0.
    */
   public void setP(double kp) {
     m_kp = kp;
@@ -126,7 +146,7 @@ public class PIDController implements Sendable, AutoCloseable {
   /**
    * Sets the Integral coefficient of the PID controller gain.
    *
-   * @param ki integral coefficient
+   * @param ki The integral coefficient. Must be &gt;= 0.
    */
   public void setI(double ki) {
     m_ki = ki;
@@ -135,10 +155,27 @@ public class PIDController implements Sendable, AutoCloseable {
   /**
    * Sets the Differential coefficient of the PID controller gain.
    *
-   * @param kd differential coefficient
+   * @param kd The differential coefficient. Must be &gt;= 0.
    */
   public void setD(double kd) {
     m_kd = kd;
+  }
+
+  /**
+   * Sets the IZone range. When the absolute value of the position error is greater than IZone, the
+   * total accumulated error will reset to zero, disabling integral gain until the absolute value of
+   * the position error is less than IZone. This is used to prevent integral windup. Must be
+   * non-negative. Passing a value of zero will effectively disable integral gain. Passing a value
+   * of {@link Double#POSITIVE_INFINITY} disables IZone functionality.
+   *
+   * @param iZone Maximum magnitude of error to allow integral control.
+   * @throws IllegalArgumentException if iZone &lt; 0
+   */
+  public void setIZone(double iZone) {
+    if (iZone < 0) {
+      throw new IllegalArgumentException("IZone must be a non-negative number!");
+    }
+    m_iZone = iZone;
   }
 
   /**
@@ -166,6 +203,15 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   public double getD() {
     return m_kd;
+  }
+
+  /**
+   * Get the IZone range.
+   *
+   * @return Maximum magnitude of error to allow integral control.
+   */
+  public double getIZone() {
+    return m_iZone;
   }
 
   /**
@@ -351,7 +397,10 @@ public class PIDController implements Sendable, AutoCloseable {
 
     m_velocityError = (m_positionError - m_prevError) / m_period;
 
-    if (m_ki != 0) {
+    // If the absolute value of the position error is greater than IZone, reset the total error
+    if (Math.abs(m_positionError) > m_iZone) {
+      m_totalError = 0;
+    } else if (m_ki != 0) {
       m_totalError =
           MathUtil.clamp(
               m_totalError + m_positionError * m_period,
@@ -377,6 +426,16 @@ public class PIDController implements Sendable, AutoCloseable {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
+    builder.addDoubleProperty(
+        "izone",
+        this::getIZone,
+        (double toSet) -> {
+          try {
+            setIZone(toSet);
+          } catch (IllegalArgumentException e) {
+            MathSharedStore.reportError("IZone must be a non-negative number!", e.getStackTrace());
+          }
+        });
     builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
   }
 }

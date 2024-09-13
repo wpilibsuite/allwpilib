@@ -10,9 +10,9 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants;
+import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
@@ -50,7 +50,7 @@ public class Shooter extends SubsystemBase {
    *
    * @param setpointRotationsPerSecond The desired shooter velocity
    */
-  public CommandBase shootCommand(double setpointRotationsPerSecond) {
+  public Command shootCommand(double setpointRotationsPerSecond) {
     return parallel(
             // Run the shooter flywheel at the desired setpoint using feedforward and feedback
             run(

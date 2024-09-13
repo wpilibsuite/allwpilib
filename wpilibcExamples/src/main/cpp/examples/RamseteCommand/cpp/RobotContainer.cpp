@@ -76,15 +76,19 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
           DriveConstants::ks, DriveConstants::kv, DriveConstants::ka},
       DriveConstants::kDriveKinematics,
       [this] { return m_drive.GetWheelSpeeds(); },
-      frc2::PIDController{DriveConstants::kPDriveVel, 0, 0},
-      frc2::PIDController{DriveConstants::kPDriveVel, 0, 0},
+      frc::PIDController{DriveConstants::kPDriveVel, 0, 0},
+      frc::PIDController{DriveConstants::kPDriveVel, 0, 0},
       [this](auto left, auto right) { m_drive.TankDriveVolts(left, right); },
       {&m_drive})};
 
-  // Reset odometry to the starting pose of the trajectory.
-  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
-
-  return std::move(ramseteCommand)
-      .BeforeStarting(
+  // Reset odometry to the initial pose of the trajectory, run path following
+  // command, then stop at the end.
+  return frc2::cmd::RunOnce(
+             [this, initialPose = exampleTrajectory.InitialPose()] {
+               m_drive.ResetOdometry(initialPose);
+             },
+             {})
+      .AndThen(std::move(ramseteCommand))
+      .AndThen(
           frc2::cmd::RunOnce([this] { m_drive.TankDriveVolts(0_V, 0_V); }, {}));
 }

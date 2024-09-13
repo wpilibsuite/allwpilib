@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
@@ -89,7 +88,7 @@ class DifferentialDriveVoltageConstraintTest {
         () ->
             TrajectoryGenerator.generateTrajectory(
                 new Pose2d(1, 0, Rotation2d.fromDegrees(90)),
-                new ArrayList<Translation2d>(),
+                new ArrayList<>(),
                 new Pose2d(0, 1, Rotation2d.fromDegrees(180)),
                 config));
 
@@ -97,7 +96,7 @@ class DifferentialDriveVoltageConstraintTest {
         () ->
             TrajectoryGenerator.generateTrajectory(
                 new Pose2d(0, 1, Rotation2d.fromDegrees(180)),
-                new ArrayList<Translation2d>(),
+                new ArrayList<>(),
                 new Pose2d(1, 0, Rotation2d.fromDegrees(90)),
                 config.setReversed(true)));
   }

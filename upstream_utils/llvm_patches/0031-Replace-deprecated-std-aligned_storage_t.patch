@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Fri, 15 Sep 2023 18:26:50 -0700
+Subject: [PATCH 31/34] Replace deprecated std::aligned_storage_t
+
+---
+ llvm/include/llvm/ADT/FunctionExtras.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
+index 1daeae915eb506b32a2d1296d2f0fe4e6dab606e..2e60e34d69914bd9b2197fc0a0e75a8e025674b2 100644
+--- a/llvm/include/llvm/ADT/FunctionExtras.h
++++ b/llvm/include/llvm/ADT/FunctionExtras.h
+@@ -37,6 +37,7 @@
+ #include "llvm/ADT/STLForwardCompat.h"
+ #include "llvm/Support/MemAlloc.h"
+ #include "llvm/Support/type_traits.h"
++#include <cstddef>
+ #include <cstring>
+ #include <memory>
+ #include <type_traits>
+@@ -167,8 +168,7 @@ protected:
+     // provide four pointers worth of storage here.
+     // This is mutable as an inlined `const unique_function<void() const>` may
+     // still modify its own mutable members.
+-    mutable std::aligned_storage_t<InlineStorageSize, alignof(void *)>
+-        InlineStorage;
++    alignas(void*) mutable std::byte InlineStorage[InlineStorageSize];
+   } StorageUnion;
+ 
+   // A compressed pointer to either our dispatching callback or our table of

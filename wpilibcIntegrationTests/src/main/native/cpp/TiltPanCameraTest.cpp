@@ -4,6 +4,7 @@
 
 #include <cmath>
 
+#include <gtest/gtest.h>
 #include <units/time.h>
 
 #include "TestBench.h"
@@ -11,7 +12,6 @@
 #include "frc/AnalogGyro.h"
 #include "frc/Servo.h"
 #include "frc/Timer.h"
-#include "gtest/gtest.h"
 
 static constexpr double kTiltSetpoint0 = 0.22;
 static constexpr double kTiltSetpoint45 = 0.45;

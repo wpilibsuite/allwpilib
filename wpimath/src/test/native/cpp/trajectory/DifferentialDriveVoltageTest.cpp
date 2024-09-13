@@ -5,11 +5,12 @@
 #include <memory>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h"
-#include "gtest/gtest.h"
 #include "trajectory/TestTrajectory.h"
 #include "units/acceleration.h"
 #include "units/length.h"

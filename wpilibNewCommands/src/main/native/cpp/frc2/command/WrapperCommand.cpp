@@ -9,7 +9,7 @@
 using namespace frc2;
 
 WrapperCommand::WrapperCommand(std::unique_ptr<Command>&& command) {
-  CommandScheduler::GetInstance().RequireUngrouped(command.get());
+  CommandScheduler::GetInstance().RequireUngroupedAndUnscheduled(command.get());
   m_command = std::move(command);
   m_command->SetComposed(true);
   // copy the wrapped command's name

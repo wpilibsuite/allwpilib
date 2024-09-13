@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.StateSpaceUtil;
@@ -25,7 +26,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -136,7 +136,7 @@ class UnscentedKalmanFilterTest {
             dtSeconds);
 
     List<Pose2d> waypoints =
-        Arrays.asList(
+        List.of(
             new Pose2d(2.75, 22.521, new Rotation2d()),
             new Pose2d(24.73, 19.68, Rotation2d.fromDegrees(5.846)));
     var trajectory =
@@ -264,7 +264,7 @@ class UnscentedKalmanFilterTest {
             VecBuilder.fill(0.0, 0.0),
             dtSeconds);
 
-    var P = Matrix.mat(Nat.N2(), Nat.N2()).fill(2.0, 1.0, 1.0, 2.0);
+    var P = MatBuilder.fill(Nat.N2(), Nat.N2(), 2.0, 1.0, 1.0, 2.0);
     observer.setP(P);
 
     assertTrue(observer.getP().isEqual(P, 1e-9));

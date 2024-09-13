@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include <libssh/libssh.h>
-
 #include <stdexcept>
 #include <string>
 #include <string_view>
 
+#include <libssh/libssh.h>
 #include <wpi/Logger.h>
 
 namespace sysid {
@@ -58,6 +57,8 @@ class SshSession {
    * @param cmd The command to execute on the server.
    */
   void Execute(std::string_view cmd);
+
+  std::string ExecuteResult(std::string_view cmd, int* exitStatus);
 
   /**
    * Puts a file on the server using SFTP.

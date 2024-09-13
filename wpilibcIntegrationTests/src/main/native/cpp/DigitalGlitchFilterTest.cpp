@@ -4,10 +4,11 @@
 
 #include "frc/DigitalGlitchFilter.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
+
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/Encoder.h"
-#include "gtest/gtest.h"
 
 /**
  * Tests that configuring inputs to be filtered succeeds.

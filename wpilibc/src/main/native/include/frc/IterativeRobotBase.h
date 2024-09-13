@@ -23,6 +23,9 @@ namespace frc {
  *
  * RobotInit() -- provide for initialization at robot power-on
  *
+ * DriverStationConnected() -- provide for initialization the first time the DS
+ * is connected
+ *
  * Init() functions -- each of the following functions is called once when the
  * appropriate mode is entered:
  *
@@ -66,6 +69,14 @@ class IterativeRobotBase : public RobotBase {
    * ready, causing the robot to be bypassed in a match.
    */
   virtual void RobotInit();
+
+  /**
+   * Code that needs to know the DS state should go here.
+   *
+   * Users should override this method for initialization that needs to occur
+   * after the DS is connected, such as needing the alliance information.
+   */
+  virtual void DriverStationConnected();
 
   /**
    * Robot-wide simulation initialization code should go here.
@@ -204,7 +215,7 @@ class IterativeRobotBase : public RobotBase {
   /**
    * Sets whether LiveWindow operation is enabled during test mode.
    *
-   * @param testLW True to enable, false to disable. Defaults to true.
+   * @param testLW True to enable, false to disable. Defaults to false.
    * @throws if called in test mode.
    */
   void EnableLiveWindowInTest(bool testLW);
@@ -232,6 +243,9 @@ class IterativeRobotBase : public RobotBase {
   IterativeRobotBase(IterativeRobotBase&&) = default;
   IterativeRobotBase& operator=(IterativeRobotBase&&) = default;
 
+  /**
+   * Loop function.
+   */
   void LoopFunc();
 
  private:
@@ -241,7 +255,8 @@ class IterativeRobotBase : public RobotBase {
   units::second_t m_period;
   Watchdog m_watchdog;
   bool m_ntFlushEnabled = true;
-  bool m_lwEnabledInTest = true;
+  bool m_lwEnabledInTest = false;
+  bool m_calledDsConnected = false;
 
   void PrintLoopOverrunMessage();
 };

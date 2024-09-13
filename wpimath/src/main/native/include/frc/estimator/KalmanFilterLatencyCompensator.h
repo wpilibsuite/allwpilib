@@ -16,13 +16,28 @@
 
 namespace frc {
 
+/**
+ * This class incorporates time-delayed measurements into a Kalman filter's
+ * state estimate.
+ *
+ * @tparam States The number of states.
+ * @tparam Inputs The number of inputs.
+ * @tparam Outputs The number of outputs.
+ */
 template <int States, int Inputs, int Outputs, typename KalmanFilterType>
 class KalmanFilterLatencyCompensator {
  public:
+  /**
+   * This class contains all the information about our observer at a given time.
+   */
   struct ObserverSnapshot {
+    /// The state estimate.
     Vectord<States> xHat;
+    /// The square root error covariance.
     Matrixd<States, States> squareRootErrorCovariances;
+    /// The inputs.
     Vectord<Inputs> inputs;
+    /// The local measurements.
     Vectord<Outputs> localMeasurements;
 
     ObserverSnapshot(const KalmanFilterType& observer, const Vectord<Inputs>& u,

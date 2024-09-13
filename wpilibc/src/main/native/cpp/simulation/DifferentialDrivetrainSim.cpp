@@ -41,7 +41,8 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
               driveMotor, mass, wheelRadius, trackWidth / 2.0, J, gearing),
           trackWidth, driveMotor, gearing, wheelRadius, measurementStdDevs) {}
 
-Vectord<2> DifferentialDrivetrainSim::ClampInput(const Vectord<2>& u) {
+Eigen::Vector2d DifferentialDrivetrainSim::ClampInput(
+    const Eigen::Vector2d& u) {
   return frc::DesaturateInputVector<2>(u,
                                        frc::RobotController::GetInputVoltage());
 }
@@ -57,7 +58,7 @@ void DifferentialDrivetrainSim::SetGearing(double newGearing) {
 }
 
 void DifferentialDrivetrainSim::Update(units::second_t dt) {
-  m_x = RK4([this](auto& x, auto& u) { return Dynamics(x, u); }, m_x, m_u, dt);
+  m_x = RKDP([this](auto& x, auto& u) { return Dynamics(x, u); }, m_x, m_u, dt);
   m_y = m_x + frc::MakeWhiteNoiseVector<7>(m_measurementStdDevs);
 }
 
@@ -91,26 +92,22 @@ Pose2d DifferentialDrivetrainSim::GetPose() const {
 }
 
 units::ampere_t DifferentialDrivetrainSim::GetLeftCurrentDraw() const {
-  auto loadIleft =
-      m_motor.Current(
-          units::radians_per_second_t{m_x(State::kLeftVelocity) *
-                                      m_currentGearing / m_wheelRadius.value()},
-          units::volt_t{m_u(0)}) *
-      wpi::sgn(m_u(0));
-
-  return loadIleft;
+  return m_motor.Current(units::radians_per_second_t{m_x(State::kLeftVelocity) *
+                                                     m_currentGearing /
+                                                     m_wheelRadius.value()},
+                         units::volt_t{m_u(0)}) *
+         wpi::sgn(m_u(0));
 }
 
 units::ampere_t DifferentialDrivetrainSim::GetRightCurrentDraw() const {
-  auto loadIRight =
-      m_motor.Current(
-          units::radians_per_second_t{m_x(State::kRightVelocity) *
-                                      m_currentGearing / m_wheelRadius.value()},
-          units::volt_t{m_u(1)}) *
-      wpi::sgn(m_u(1));
-
-  return loadIRight;
+  return m_motor.Current(
+             units::radians_per_second_t{m_x(State::kRightVelocity) *
+                                         m_currentGearing /
+                                         m_wheelRadius.value()},
+             units::volt_t{m_u(1)}) *
+         wpi::sgn(m_u(1));
 }
+
 units::ampere_t DifferentialDrivetrainSim::GetCurrentDraw() const {
   return GetLeftCurrentDraw() + GetRightCurrentDraw();
 }
@@ -128,7 +125,7 @@ void DifferentialDrivetrainSim::SetPose(const frc::Pose2d& pose) {
 }
 
 Vectord<7> DifferentialDrivetrainSim::Dynamics(const Vectord<7>& x,
-                                               const Vectord<2>& u) {
+                                               const Eigen::Vector2d& u) {
   // Because G² can be factored out of A, we can divide by the old ratio
   // squared and multiply by the new ratio squared to get a new drivetrain
   // model.

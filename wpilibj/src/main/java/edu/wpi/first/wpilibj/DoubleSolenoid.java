@@ -21,8 +21,11 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 public class DoubleSolenoid implements Sendable, AutoCloseable {
   /** Possible values for a DoubleSolenoid. */
   public enum Value {
+    /** Off position. */
     kOff,
+    /** Forward position. */
     kForward,
+    /** Reverse position. */
     kReverse
   }
 
@@ -53,7 +56,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
-  @SuppressWarnings("PMD.UseTryWithResources")
+  @SuppressWarnings({"PMD.UseTryWithResources", "this-escape"})
   public DoubleSolenoid(
       final int module,
       final PneumaticsModuleType moduleType,

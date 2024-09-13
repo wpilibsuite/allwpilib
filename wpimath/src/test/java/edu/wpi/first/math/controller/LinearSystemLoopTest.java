@@ -58,12 +58,12 @@ class LinearSystemLoopTest {
     TrapezoidProfile profile;
     TrapezoidProfile.State state;
     for (int i = 0; i < 1000; i++) {
-      profile =
-          new TrapezoidProfile(
-              constraints,
+      profile = new TrapezoidProfile(constraints);
+      state =
+          profile.calculate(
+              kDt,
               new TrapezoidProfile.State(m_loop.getXHat(0), m_loop.getXHat(1)),
               new TrapezoidProfile.State(references.get(0, 0), references.get(1, 0)));
-      state = profile.calculate(kDt);
       m_loop.setNextR(VecBuilder.fill(state.position, state.velocity));
 
       updateTwoState(m_plant, m_loop, (random.nextGaussian()) * kPositionStddev);

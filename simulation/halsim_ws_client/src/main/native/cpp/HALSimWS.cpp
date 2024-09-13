@@ -8,6 +8,8 @@
 
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
+#include <wpi/StringExtras.h>
 #include <wpinet/uv/util.h>
 
 #include "HALSimWSClientConnection.h"
@@ -66,6 +68,22 @@ bool HALSimWS::Initialize() {
     m_uri = "/wpilibws";
   }
 
+  const char* msgFilters = std::getenv("HALSIMWS_FILTERS");
+  if (msgFilters != nullptr) {
+    m_useMsgFiltering = true;
+
+    std::string_view filters(msgFilters);
+    filters = wpi::trim(filters);
+    wpi::SmallVector<std::string_view, 16> filtersSplit;
+
+    wpi::split(filters, filtersSplit, ',', -1, false);
+    for (auto val : filtersSplit) {
+      m_msgFilters[wpi::trim(val)] = true;
+    }
+  } else {
+    m_useMsgFiltering = false;
+  }
+
   return true;
 }
 
@@ -87,8 +105,19 @@ void HALSimWS::Start() {
 
   m_tcp_client->closed.connect([]() { std::puts("TCP connection closed"); });
 
-  // Set up the connection timer
   std::puts("HALSimWS Initialized");
+
+  // Print any filters we are using
+  if (m_useMsgFiltering) {
+    fmt::print("WS Message Filters:");
+    for (auto filter : m_msgFilters.keys()) {
+      fmt::print("* \"{}\"\n", filter);
+    }
+  } else {
+    fmt::print("No WS Message Filters specified");
+  }
+
+  // Set up the connection timer
   fmt::print("Will attempt to connect to ws://{}:{}{}\n", m_host, m_port,
              m_uri);
 
@@ -170,4 +199,11 @@ void HALSimWS::OnNetValueChanged(const wpi::json& msg) {
   } catch (wpi::json::exception& e) {
     fmt::print(stderr, "Error with incoming message: {}\n", e.what());
   }
+}
+
+bool HALSimWS::CanSendMessage(std::string_view type) {
+  if (!m_useMsgFiltering) {
+    return true;
+  }
+  return m_msgFilters.count(type) > 0;
 }

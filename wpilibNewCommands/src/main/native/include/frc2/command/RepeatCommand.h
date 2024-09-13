@@ -9,10 +9,11 @@
 #pragma warning(disable : 4521)
 #endif
 
+#include <concepts>
 #include <memory>
 #include <utility>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -28,7 +29,7 @@ namespace frc2 {
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-class RepeatCommand : public CommandHelper<CommandBase, RepeatCommand> {
+class RepeatCommand : public CommandHelper<Command, RepeatCommand> {
  public:
   /**
    * Creates a new RepeatCommand. Will run another command repeatedly,
@@ -44,11 +45,11 @@ class RepeatCommand : public CommandHelper<CommandBase, RepeatCommand> {
    *
    * @param command the command to run repeatedly
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
+  // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
   explicit RepeatCommand(T&& command)
-      : RepeatCommand(std::make_unique<std::remove_reference_t<T>>(
-            std::forward<T>(command))) {}
+      : RepeatCommand(
+            std::make_unique<std::decay_t<T>>(std::forward<T>(command))) {}
 
   RepeatCommand(RepeatCommand&& other) = default;
 

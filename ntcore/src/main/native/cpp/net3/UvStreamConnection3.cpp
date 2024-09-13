@@ -10,6 +10,8 @@
 using namespace nt;
 using namespace nt::net3;
 
+static constexpr size_t kMaxPoolSize = 16;
+
 UvStreamConnection3::UvStreamConnection3(wpi::uv::Stream& stream)
     : m_stream{stream}, m_os{m_buffers, [this] { return AllocBuf(); }} {}
 
@@ -26,7 +28,17 @@ void UvStreamConnection3::Flush() {
   ++m_sendsActive;
   m_stream.Write(m_buffers, [selfweak = weak_from_this()](auto bufs, auto) {
     if (auto self = selfweak.lock()) {
-      self->m_buf_pool.insert(self->m_buf_pool.end(), bufs.begin(), bufs.end());
+#ifdef __SANITIZE_ADDRESS__
+      size_t numToPool = 0;
+#else
+      size_t numToPool =
+          (std::min)(bufs.size(), kMaxPoolSize - self->m_buf_pool.size());
+      self->m_buf_pool.insert(self->m_buf_pool.end(), bufs.begin(),
+                              bufs.begin() + numToPool);
+#endif
+      for (auto&& buf : bufs.subspan(numToPool)) {
+        buf.Deallocate();
+      }
       if (self->m_sendsActive > 0) {
         --self->m_sendsActive;
       }

@@ -10,9 +10,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Map;
 
 public final class PrintLog {
@@ -133,11 +133,11 @@ public final class PrintLog {
           } else if ("boolean".equals(entry.type)) {
             System.out.println("  " + record.getBoolean());
           } else if ("double[]".equals(entry.type)) {
-            System.out.println("  " + Arrays.asList(record.getDoubleArray()));
+            System.out.println("  " + List.of(record.getDoubleArray()));
           } else if ("int64[]".equals(entry.type)) {
-            System.out.println("  " + Arrays.asList(record.getIntegerArray()));
+            System.out.println("  " + List.of(record.getIntegerArray()));
           } else if ("string[]".equals(entry.type)) {
-            System.out.println("  " + Arrays.asList(record.getStringArray()));
+            System.out.println("  " + List.of(record.getStringArray()));
           }
         } catch (InputMismatchException ex) {
           System.out.println("  invalid");

@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.examples.ultrasonicpid;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.MedianFilter;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -21,8 +22,7 @@ public class Robot extends TimedRobot {
   static final double kHoldDistanceMillimeters = 1.0e3;
 
   // proportional speed constant
-  // negative because applying positive voltage will bring us closer to the target
-  private static final double kP = -0.001;
+  private static final double kP = 0.001;
   // integral speed constant
   private static final double kI = 0.0;
   // derivative speed constant
@@ -41,8 +41,14 @@ public class Robot extends TimedRobot {
   private final Ultrasonic m_ultrasonic = new Ultrasonic(kUltrasonicPingPort, kUltrasonicEchoPort);
   private final PWMSparkMax m_leftMotor = new PWMSparkMax(kLeftMotorPort);
   private final PWMSparkMax m_rightMotor = new PWMSparkMax(kRightMotorPort);
-  private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
+  private final DifferentialDrive m_robotDrive =
+      new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
   private final PIDController m_pidController = new PIDController(kP, kI, kD);
+
+  public Robot() {
+    SendableRegistry.addChild(m_robotDrive, m_leftMotor);
+    SendableRegistry.addChild(m_robotDrive, m_rightMotor);
+  }
 
   @Override
   public void autonomousInit() {

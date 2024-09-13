@@ -60,6 +60,19 @@ TEST_F(RepeatCommandTest, CallsMethodsCorrectly) {
   EXPECT_EQ(3, exeCounter);
   EXPECT_EQ(3, isFinishedCounter);
   EXPECT_EQ(1, endCounter);
+
+  isFinishedHook = true;
+  scheduler.Run();
+  EXPECT_EQ(2, initCounter);
+  EXPECT_EQ(4, exeCounter);
+  EXPECT_EQ(4, isFinishedCounter);
+  EXPECT_EQ(2, endCounter);
+
+  command.Cancel();
+  EXPECT_EQ(2, initCounter);
+  EXPECT_EQ(4, exeCounter);
+  EXPECT_EQ(4, isFinishedCounter);
+  EXPECT_EQ(2, endCounter);
 }
 
 INSTANTIATE_SINGLE_COMMAND_COMPOSITION_TEST_SUITE(RepeatCommandTest,

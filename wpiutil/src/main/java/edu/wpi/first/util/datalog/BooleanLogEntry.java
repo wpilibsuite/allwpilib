@@ -6,20 +6,49 @@ package edu.wpi.first.util.datalog;
 
 /** Log boolean values. */
 public class BooleanLogEntry extends DataLogEntry {
+  /** The data type for boolean values. */
   public static final String kDataType = "boolean";
 
+  /**
+   * Constructs a boolean log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   * @param metadata metadata
+   * @param timestamp entry creation timestamp (0=now)
+   */
   public BooleanLogEntry(DataLog log, String name, String metadata, long timestamp) {
     super(log, name, kDataType, metadata, timestamp);
   }
 
+  /**
+   * Constructs a boolean log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   * @param metadata metadata
+   */
   public BooleanLogEntry(DataLog log, String name, String metadata) {
     this(log, name, metadata, 0);
   }
 
+  /**
+   * Constructs a boolean log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   * @param timestamp entry creation timestamp (0=now)
+   */
   public BooleanLogEntry(DataLog log, String name, long timestamp) {
     this(log, name, "", timestamp);
   }
 
+  /**
+   * Constructs a boolean log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   */
   public BooleanLogEntry(DataLog log, String name) {
     this(log, name, 0);
   }

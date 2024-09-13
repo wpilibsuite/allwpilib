@@ -24,6 +24,7 @@ import org.ejml.simple.SimpleMatrix;
  * @param <C> The number of columns in this matrix.
  */
 public class Matrix<R extends Num, C extends Num> {
+  /** Storage for underlying EJML matrix. */
   protected final SimpleMatrix m_storage;
 
   /**
@@ -36,6 +37,18 @@ public class Matrix<R extends Num, C extends Num> {
     this.m_storage =
         new SimpleMatrix(
             Objects.requireNonNull(rows).getNum(), Objects.requireNonNull(columns).getNum());
+  }
+
+  /**
+   * Constructs a new {@link Matrix} with the given storage. Caller should make sure that the
+   * provided generic bounds match the shape of the provided {@link Matrix}.
+   *
+   * @param rows The number of rows of the matrix.
+   * @param columns The number of columns of the matrix.
+   * @param storage The double array to back this value.
+   */
+  public Matrix(Nat<R> rows, Nat<C> columns, double[] storage) {
+    this.m_storage = new SimpleMatrix(rows.getNum(), columns.getNum(), true, storage);
   }
 
   /**
@@ -80,7 +93,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @return The number of columns, according to the internal storage.
    */
   public final int getNumCols() {
-    return this.m_storage.numCols();
+    return this.m_storage.getNumCols();
   }
 
   /**
@@ -89,7 +102,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @return The number of rows, according to the internal storage.
    */
   public final int getNumRows() {
-    return this.m_storage.numRows();
+    return this.m_storage.getNumRows();
   }
 
   /**
@@ -276,7 +289,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @return The resultant matrix.
    */
   public Matrix<R, C> div(int value) {
-    return new Matrix<>(this.m_storage.divide((double) value));
+    return new Matrix<>(this.m_storage.divide(value));
   }
 
   /**
@@ -476,7 +489,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @return The element by element power of "this" and b.
    */
   public final Matrix<R, C> elementPower(int b) {
-    return new Matrix<>(this.m_storage.elementPower((double) b));
+    return new Matrix<>(this.m_storage.elementPower(b));
   }
 
   /**
@@ -533,7 +546,7 @@ public class Matrix<R extends Num, C extends Num> {
    */
   public final <R2 extends Num, C2 extends Num> Matrix<R2, C2> block(
       int height, int width, int startingRow, int startingCol) {
-    return new Matrix<R2, C2>(
+    return new Matrix<>(
         this.m_storage.extractMatrix(
             startingRow, startingRow + height, startingCol, startingCol + width));
   }
@@ -582,7 +595,7 @@ public class Matrix<R extends Num, C extends Num> {
     SimpleMatrix temp = m_storage.copy();
 
     CholeskyDecomposition_F64<DMatrixRMaj> chol =
-        DecompositionFactory_DDRM.chol(temp.numRows(), lowerTriangular);
+        DecompositionFactory_DDRM.chol(temp.getNumRows(), lowerTriangular);
     if (!chol.decompose(temp.getMatrix())) {
       // check that the input is not all zeros -- if they are, we special case and return all
       // zeros.
@@ -592,11 +605,10 @@ public class Matrix<R extends Num, C extends Num> {
         isZeros &= Math.abs(matDatum) < 1e-6;
       }
       if (isZeros) {
-        return new Matrix<>(new SimpleMatrix(temp.numRows(), temp.numCols()));
+        return new Matrix<>(new SimpleMatrix(temp.getNumRows(), temp.getNumCols()));
       }
 
-      throw new RuntimeException(
-          "Cholesky decomposition failed! Input matrix:\n" + m_storage.toString());
+      throw new RuntimeException("Cholesky decomposition failed! Input matrix:\n" + m_storage);
     }
 
     return new Matrix<>(SimpleMatrix.wrap(chol.getT(null)));
@@ -642,7 +654,10 @@ public class Matrix<R extends Num, C extends Num> {
    * @param <R> The number of rows of the desired matrix as a generic.
    * @param <C> The number of columns of the desired matrix as a generic.
    * @return A builder to construct the matrix.
+   * @deprecated Use {@link MatBuilder#fill} instead.
    */
+  @Deprecated(since = "2024", forRemoval = true)
+  @SuppressWarnings("removal")
   public static <R extends Num, C extends Num> MatBuilder<R, C> mat(Nat<R> rows, Nat<C> cols) {
     return new MatBuilder<>(Objects.requireNonNull(rows), Objects.requireNonNull(cols));
   }

@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -24,6 +24,9 @@
 
 #ifndef _gcem_incomplete_gamma_HPP
 #define _gcem_incomplete_gamma_HPP
+
+namespace gcem
+{
 
 namespace internal
 {
@@ -242,6 +245,8 @@ incomplete_gamma(const T1 a, const T2 x)
 noexcept
 {
     return internal::incomplete_gamma_type_check(a,x);
+}
+
 }
 
 #endif

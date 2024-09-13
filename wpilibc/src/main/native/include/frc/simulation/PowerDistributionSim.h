@@ -40,7 +40,8 @@ class PowerDistributionSim {
    * @param initialNotify whether to run the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -65,7 +66,8 @@ class PowerDistributionSim {
    * @param initialNotify whether to call the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterTemperatureCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterTemperatureCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -90,7 +92,8 @@ class PowerDistributionSim {
    * @param initialNotify whether to call the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterVoltageCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterVoltageCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -116,7 +119,8 @@ class PowerDistributionSim {
    * @param initialNotify whether to call the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterCurrentCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterCurrentCallback(
       int channel, NotifyCallback callback, bool initialNotify);
 
   /**

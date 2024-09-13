@@ -76,11 +76,11 @@ class DifferentialDrivetrainSimTest {
       sim.update(0.020);
 
       // Update our ground truth
-      groundTruthX = NumericalIntegration.rk4(sim::getDynamics, groundTruthX, voltages, 0.020);
+      groundTruthX = NumericalIntegration.rkdp(sim::getDynamics, groundTruthX, voltages, 0.020);
     }
 
     // 2 inch tolerance is OK since our ground truth is an approximation of the
-    // ODE solution using RK4 anyway
+    // ODE solution using RKDP anyway
     assertEquals(
         groundTruthX.get(DifferentialDrivetrainSim.State.kX.value, 0),
         sim.getState(DifferentialDrivetrainSim.State.kX),

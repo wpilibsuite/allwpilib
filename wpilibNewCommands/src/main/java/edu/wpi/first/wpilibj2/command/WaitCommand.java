@@ -13,8 +13,10 @@ import edu.wpi.first.wpilibj.Timer;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class WaitCommand extends CommandBase {
+public class WaitCommand extends Command {
+  /** The timer used for waiting. */
   protected Timer m_timer = new Timer();
+
   private final double m_duration;
 
   /**
@@ -22,6 +24,7 @@ public class WaitCommand extends CommandBase {
    *
    * @param seconds the time to wait, in seconds
    */
+  @SuppressWarnings("this-escape")
   public WaitCommand(double seconds) {
     m_duration = seconds;
     SendableRegistry.setName(this, getName() + ": " + seconds + " seconds");

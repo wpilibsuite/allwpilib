@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -74,8 +75,7 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Adds a user-defined constraint to the trajectory.
    * @param constraint The user-defined constraint.
    */
-  template <typename Constraint, typename = std::enable_if_t<std::is_base_of_v<
-                                     TrajectoryConstraint, Constraint>>>
+  template <std::derived_from<TrajectoryConstraint> Constraint>
   void AddConstraint(Constraint constraint) {
     m_constraints.emplace_back(std::make_unique<Constraint>(constraint));
   }

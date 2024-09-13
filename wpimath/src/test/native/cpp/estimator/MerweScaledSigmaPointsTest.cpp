@@ -6,8 +6,6 @@
 
 #include "frc/estimator/MerweScaledSigmaPoints.h"
 
-namespace drake::math {
-namespace {
 TEST(MerweScaledSigmaPointsTest, ZeroMean) {
   frc::MerweScaledSigmaPoints<2> sigmaPoints;
   auto points = sigmaPoints.SquareRootSigmaPoints(
@@ -30,5 +28,3 @@ TEST(MerweScaledSigmaPointsTest, NonzeroMean) {
                                    {2.0, 2.0, 2.00548, 2.0, 1.99452}})
           .norm() < 1e-3);
 }
-}  // namespace
-}  // namespace drake::math

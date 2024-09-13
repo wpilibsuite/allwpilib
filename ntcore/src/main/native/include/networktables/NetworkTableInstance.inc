@@ -38,6 +38,26 @@ inline NT_Inst NetworkTableInstance::GetHandle() const {
   return m_handle;
 }
 
+template <wpi::ProtobufSerializable T>
+inline ProtobufTopic<T> NetworkTableInstance::GetProtobufTopic(
+    std::string_view name) const {
+  return ProtobufTopic<T>{GetTopic(name)};
+}
+
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+inline StructTopic<T, I...> NetworkTableInstance::GetStructTopic(
+    std::string_view name, I... info) const {
+  return StructTopic<T, I...>{GetTopic(name), std::move(info)...};
+}
+
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+inline StructArrayTopic<T, I...> NetworkTableInstance::GetStructArrayTopic(
+    std::string_view name, I... info) const {
+  return StructArrayTopic<T, I...>{GetTopic(name), std::move(info)...};
+}
+
 inline std::vector<Topic> NetworkTableInstance::GetTopics() {
   auto handles = ::nt::GetTopics(m_handle, "", 0);
   return {handles.begin(), handles.end()};
@@ -222,5 +242,50 @@ inline NT_Listener NetworkTableInstance::AddLogger(unsigned int min_level,
                                                    ListenerCallback func) {
   return ::nt::AddLogger(m_handle, min_level, max_level, std::move(func));
 }
+
+inline bool NetworkTableInstance::HasSchema(std::string_view name) const {
+  return ::nt::HasSchema(m_handle, name);
+}
+
+inline void NetworkTableInstance::AddSchema(std::string_view name,
+                                            std::string_view type,
+                                            std::span<const uint8_t> schema) {
+  ::nt::AddSchema(m_handle, name, type, schema);
+}
+
+inline void NetworkTableInstance::AddSchema(std::string_view name,
+                                            std::string_view type,
+                                            std::string_view schema) {
+  ::nt::AddSchema(m_handle, name, type, schema);
+}
+
+// Suppress unused-lambda-capture warning on AddSchema() call
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-lambda-capture"
+#endif
+
+template <wpi::ProtobufSerializable T>
+void NetworkTableInstance::AddProtobufSchema(wpi::ProtobufMessage<T>& msg) {
+  msg.ForEachProtobufDescriptor(
+      [this](auto typeString) { return HasSchema(typeString); },
+      [this](auto typeString, auto schema) {
+        AddSchema(typeString, "proto:FileDescriptorProto", schema);
+      });
+}
+
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+void NetworkTableInstance::AddStructSchema(const I&... info) {
+  wpi::ForEachStructSchema<T>(
+      [this](auto typeString, auto schema) {
+        AddSchema(typeString, "structschema", schema);
+      },
+      info...);
+}
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }  // namespace nt

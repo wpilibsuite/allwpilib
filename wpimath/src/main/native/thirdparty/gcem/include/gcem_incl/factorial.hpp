@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -24,6 +24,9 @@
 
 #ifndef _gcem_factorial_HPP
 #define _gcem_factorial_HPP
+
+namespace gcem
+{
 
 namespace internal
 {
@@ -93,6 +96,8 @@ factorial(const T x)
 noexcept
 {
     return internal::factorial_recur(x);
+}
+
 }
 
 #endif

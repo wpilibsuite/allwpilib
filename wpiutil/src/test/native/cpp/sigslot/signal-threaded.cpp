@@ -33,11 +33,11 @@ SOFTWARE.
 
 #include "wpi/Signal.h"  // NOLINT(build/include_order)
 
-#include "gtest/gtest.h"  // NOLINT(build/include_order)
-
 #include <array>
 #include <atomic>
 #include <thread>
+
+#include <gtest/gtest.h>
 
 using namespace wpi::sig;
 

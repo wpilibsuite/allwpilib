@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform2d.h"
@@ -14,10 +15,6 @@
 #include "units/curvature.h"
 #include "units/time.h"
 #include "units/velocity.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 /**
@@ -31,19 +28,19 @@ class WPILIB_DLLEXPORT Trajectory {
    * Represents one point on the trajectory.
    */
   struct WPILIB_DLLEXPORT State {
-    // The time elapsed since the beginning of the trajectory.
+    /// The time elapsed since the beginning of the trajectory.
     units::second_t t = 0_s;
 
-    // The speed at that point of the trajectory.
+    /// The speed at that point of the trajectory.
     units::meters_per_second_t velocity = 0_mps;
 
-    // The acceleration at that point of the trajectory.
+    /// The acceleration at that point of the trajectory.
     units::meters_per_second_squared_t acceleration = 0_mps_sq;
 
-    // The pose at that point of the trajectory.
+    /// The pose at that point of the trajectory.
     Pose2d pose;
 
-    // The curvature at that point of the trajectory.
+    /// The curvature at that point of the trajectory.
     units::curvature_t curvature{0.0};
 
     /**
@@ -66,6 +63,8 @@ class WPILIB_DLLEXPORT Trajectory {
 
   /**
    * Constructs a trajectory from a vector of states.
+   *
+   * @throws std::invalid_argument if the vector of states is empty.
    */
   explicit Trajectory(const std::vector<State>& states);
 
@@ -77,6 +76,7 @@ class WPILIB_DLLEXPORT Trajectory {
 
   /**
    * Return the states of the trajectory.
+   *
    * @return The states of the trajectory.
    */
   const std::vector<State>& States() const { return m_states; }
@@ -86,6 +86,7 @@ class WPILIB_DLLEXPORT Trajectory {
    *
    * @param t The point in time since the beginning of the trajectory to sample.
    * @return The state at that point in time.
+   * @throws std::runtime_error if the trajectory has no states.
    */
   State Sample(units::second_t t) const;
 
@@ -144,3 +145,6 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Trajectory::State& state);
 
 }  // namespace frc
+
+#include "frc/trajectory/proto/TrajectoryProto.h"
+#include "frc/trajectory/proto/TrajectoryStateProto.h"

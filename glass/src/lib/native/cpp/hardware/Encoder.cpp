@@ -6,6 +6,7 @@
 
 #include <fmt/format.h>
 #include <imgui.h>
+#include <wpi/StringExtras.h>
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
@@ -70,10 +71,11 @@ void glass::DisplayEncoder(EncoderModel* model) {
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (!name.empty()) {
-    std::snprintf(label, sizeof(label), "%s [%d,%d]###header", name.c_str(),
-                  chA, chB);
+    wpi::format_to_n_c_str(label, sizeof(label), "{} [{},{}]###header", name,
+                           chA, chB);
   } else {
-    std::snprintf(label, sizeof(label), "Encoder[%d,%d]###header", chA, chB);
+    wpi::format_to_n_c_str(label, sizeof(label), "Encoder[{},{}]###header", chA,
+                           chB);
   }
 
   // header

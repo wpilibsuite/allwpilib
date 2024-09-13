@@ -6,10 +6,15 @@
 
 namespace frc {
 
+/** Defines the state in which the AnalogTrigger triggers. */
 enum class AnalogTriggerType {
+  /// In window.
   kInWindow = 0,
+  /// State.
   kState = 1,
+  /// Rising Pulse.
   kRisingPulse = 2,
+  /// Falling pulse.
   kFallingPulse = 3
 };
 

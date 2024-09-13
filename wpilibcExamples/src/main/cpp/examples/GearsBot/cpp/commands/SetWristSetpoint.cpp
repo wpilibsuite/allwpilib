@@ -6,10 +6,10 @@
 
 #include "Robot.h"
 
-SetWristSetpoint::SetWristSetpoint(double setpoint, Wrist& wrist)
+SetWristSetpoint::SetWristSetpoint(units::degree_t setpoint, Wrist& wrist)
     : m_setpoint(setpoint), m_wrist(&wrist) {
   SetName("SetWristSetpoint");
-  AddRequirements({m_wrist});
+  AddRequirements(m_wrist);
 }
 
 // Called just before this Command runs the first time

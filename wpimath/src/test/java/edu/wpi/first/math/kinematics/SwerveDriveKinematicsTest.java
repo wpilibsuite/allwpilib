@@ -120,6 +120,28 @@ class SwerveDriveKinematicsTest {
   }
 
   @Test
+  void testResetWheelAngle() {
+    Rotation2d fl = new Rotation2d(0);
+    Rotation2d fr = new Rotation2d(Math.PI / 2);
+    Rotation2d bl = new Rotation2d(Math.PI);
+    Rotation2d br = new Rotation2d(3 * Math.PI / 2);
+    m_kinematics.resetHeadings(fl, fr, bl, br);
+    var moduleStates = m_kinematics.toSwerveModuleStates(new ChassisSpeeds());
+
+    // Robot is stationary, but module angles are preserved.
+
+    assertAll(
+        () -> assertEquals(0.0, moduleStates[0].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[1].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[2].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[3].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[0].angle.getDegrees(), kEpsilon),
+        () -> assertEquals(90.0, moduleStates[1].angle.getDegrees(), kEpsilon),
+        () -> assertEquals(180.0, moduleStates[2].angle.getDegrees(), kEpsilon),
+        () -> assertEquals(270.0, moduleStates[3].angle.getDegrees(), kEpsilon));
+  }
+
+  @Test
   void testTurnInPlaceInverseKinematics() {
     ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 2 * Math.PI);
     var moduleStates = m_kinematics.toSwerveModuleStates(speeds);
@@ -370,5 +392,22 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(6.0 * factor, arr[1].speedMetersPerSecond, kEpsilon),
         () -> assertEquals(4.0 * factor, arr[2].speedMetersPerSecond, kEpsilon),
         () -> assertEquals(7.0 * factor, arr[3].speedMetersPerSecond, kEpsilon));
+  }
+
+  @Test
+  void testDesaturateNegativeSpeed() {
+    SwerveModuleState fl = new SwerveModuleState(1, new Rotation2d());
+    SwerveModuleState fr = new SwerveModuleState(1, new Rotation2d());
+    SwerveModuleState bl = new SwerveModuleState(-2, new Rotation2d());
+    SwerveModuleState br = new SwerveModuleState(-2, new Rotation2d());
+
+    SwerveModuleState[] arr = {fl, fr, bl, br};
+    SwerveDriveKinematics.desaturateWheelSpeeds(arr, 1);
+
+    assertAll(
+        () -> assertEquals(0.5, arr[0].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.5, arr[1].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(-1.0, arr[2].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(-1.0, arr[3].speedMetersPerSecond, kEpsilon));
   }
 }

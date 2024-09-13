@@ -10,8 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.RobotController.RadioLEDState;
 import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
+import edu.wpi.first.wpilibj.simulation.testutils.EnumCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.IntCallback;
 import org.junit.jupiter.api.Test;
 
@@ -210,6 +212,40 @@ class RoboRioSimTest {
   }
 
   @Test
+  void testCPUTemp() {
+    RoboRioSim.resetData();
+
+    DoubleCallback callback = new DoubleCallback();
+
+    try (CallbackStore cb = RoboRioSim.registerCPUTempCallback(callback, false)) {
+      final double kCPUTemp = 100.0;
+
+      RoboRioSim.setCPUTemp(kCPUTemp);
+      assertTrue(callback.wasTriggered());
+      assertEquals(kCPUTemp, callback.getSetValue());
+      assertEquals(kCPUTemp, RoboRioSim.getCPUTemp());
+      assertEquals(kCPUTemp, RobotController.getCPUTemp());
+    }
+  }
+
+  @Test
+  void testTeamNumber() {
+    RoboRioSim.resetData();
+
+    IntCallback callback = new IntCallback();
+
+    try (CallbackStore cb = RoboRioSim.registerTeamNumberCallback(callback, false)) {
+      final int kTeamNumber = 9999;
+
+      RoboRioSim.setTeamNumber(kTeamNumber);
+      assertTrue(callback.wasTriggered());
+      assertEquals(kTeamNumber, callback.getSetValue());
+      assertEquals(kTeamNumber, RoboRioSim.getTeamNumber());
+      assertEquals(kTeamNumber, RobotController.getTeamNumber());
+    }
+  }
+
+  @Test
   void testSerialNumber() {
     RoboRioSim.resetData();
 
@@ -244,5 +280,27 @@ class RoboRioSimTest {
     RoboRioSim.setComments(kCommentsOverflow);
     assertEquals(kCommentsTruncated, RoboRioSim.getComments());
     assertEquals(kCommentsTruncated, RobotController.getComments());
+  }
+
+  @Test
+  void testRadioLEDState() {
+    RoboRioSim.resetData();
+
+    EnumCallback callback = new EnumCallback();
+    try (CallbackStore cb = RoboRioSim.registerRadioLEDStateCallback(callback, false)) {
+      RobotController.setRadioLEDState(RadioLEDState.kGreen);
+      assertTrue(callback.wasTriggered());
+      assertEquals(RadioLEDState.kGreen.value, callback.getSetValue());
+      assertEquals(RadioLEDState.kGreen, RoboRioSim.getRadioLEDState());
+      assertEquals(RadioLEDState.kGreen, RobotController.getRadioLEDState());
+
+      callback.reset();
+
+      RoboRioSim.setRadioLEDState(RadioLEDState.kOrange);
+      assertTrue(callback.wasTriggered());
+      assertEquals(RadioLEDState.kOrange.value, callback.getSetValue());
+      assertEquals(RadioLEDState.kOrange, RoboRioSim.getRadioLEDState());
+      assertEquals(RadioLEDState.kOrange, RobotController.getRadioLEDState());
+    }
   }
 }

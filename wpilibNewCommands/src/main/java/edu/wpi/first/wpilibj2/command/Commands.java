@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj2.command;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -21,8 +22,18 @@ public final class Commands {
    *
    * @return the command
    */
-  public static CommandBase none() {
+  public static Command none() {
     return new InstantCommand();
+  }
+
+  /**
+   * Constructs a command that does nothing until interrupted.
+   *
+   * @param requirements Subsystems to require
+   * @return the command
+   */
+  public static Command idle(Subsystem... requirements) {
+    return run(() -> {}, requirements);
   }
 
   // Action Commands
@@ -35,7 +46,7 @@ public final class Commands {
    * @return the command
    * @see InstantCommand
    */
-  public static CommandBase runOnce(Runnable action, Subsystem... requirements) {
+  public static Command runOnce(Runnable action, Subsystem... requirements) {
     return new InstantCommand(action, requirements);
   }
 
@@ -47,7 +58,7 @@ public final class Commands {
    * @return the command
    * @see RunCommand
    */
-  public static CommandBase run(Runnable action, Subsystem... requirements) {
+  public static Command run(Runnable action, Subsystem... requirements) {
     return new RunCommand(action, requirements);
   }
 
@@ -61,7 +72,7 @@ public final class Commands {
    * @return the command
    * @see StartEndCommand
    */
-  public static CommandBase startEnd(Runnable start, Runnable end, Subsystem... requirements) {
+  public static Command startEnd(Runnable start, Runnable end, Subsystem... requirements) {
     return new StartEndCommand(start, end, requirements);
   }
 
@@ -74,7 +85,7 @@ public final class Commands {
    * @param requirements subsystems the action requires
    * @return the command
    */
-  public static CommandBase runEnd(Runnable run, Runnable end, Subsystem... requirements) {
+  public static Command runEnd(Runnable run, Runnable end, Subsystem... requirements) {
     requireNonNullParam(end, "end", "Command.runEnd");
     return new FunctionalCommand(
         () -> {}, run, interrupted -> end.run(), () -> false, requirements);
@@ -87,7 +98,7 @@ public final class Commands {
    * @return the command
    * @see PrintCommand
    */
-  public static CommandBase print(String message) {
+  public static Command print(String message) {
     return new PrintCommand(message);
   }
 
@@ -100,7 +111,7 @@ public final class Commands {
    * @return the command
    * @see WaitCommand
    */
-  public static CommandBase waitSeconds(double seconds) {
+  public static Command waitSeconds(double seconds) {
     return new WaitCommand(seconds);
   }
 
@@ -111,7 +122,7 @@ public final class Commands {
    * @return the command
    * @see WaitUntilCommand
    */
-  public static CommandBase waitUntil(BooleanSupplier condition) {
+  public static Command waitUntil(BooleanSupplier condition) {
     return new WaitUntilCommand(condition);
   }
 
@@ -126,21 +137,49 @@ public final class Commands {
    * @return the command
    * @see ConditionalCommand
    */
-  public static CommandBase either(Command onTrue, Command onFalse, BooleanSupplier selector) {
+  public static Command either(Command onTrue, Command onFalse, BooleanSupplier selector) {
     return new ConditionalCommand(onTrue, onFalse, selector);
   }
 
   /**
    * Runs one of several commands, based on the selector function.
    *
+   * @param <K> The type of key used to select the command
    * @param selector the selector function
    * @param commands map of commands to select from
    * @return the command
    * @see SelectCommand
    */
-  public static CommandBase select(Map<Object, Command> commands, Supplier<Object> selector) {
-    return new SelectCommand(commands, selector);
+  public static <K> Command select(Map<K, Command> commands, Supplier<? extends K> selector) {
+    return new SelectCommand<>(commands, selector);
   }
+
+  /**
+   * Runs the command supplied by the supplier.
+   *
+   * @param supplier the command supplier
+   * @param requirements the set of requirements for this command
+   * @return the command
+   * @see DeferredCommand
+   */
+  public static Command defer(Supplier<Command> supplier, Set<Subsystem> requirements) {
+    return new DeferredCommand(supplier, requirements);
+  }
+
+  /**
+   * Constructs a command that schedules the command returned from the supplier when initialized,
+   * and ends when it is no longer scheduled. The supplier is called when the command is
+   * initialized.
+   *
+   * @param supplier the command supplier
+   * @return the command
+   * @see ProxyCommand
+   */
+  public static Command deferredProxy(Supplier<Command> supplier) {
+    return new ProxyCommand(supplier);
+  }
+
+  // Command Groups
 
   /**
    * Runs a group of commands in series, one after the other.
@@ -149,11 +188,9 @@ public final class Commands {
    * @return the command group
    * @see SequentialCommandGroup
    */
-  public static CommandBase sequence(Command... commands) {
+  public static Command sequence(Command... commands) {
     return new SequentialCommandGroup(commands);
   }
-
-  // Command Groups
 
   /**
    * Runs a group of commands in series, one after the other. Once the last command ends, the group
@@ -164,7 +201,7 @@ public final class Commands {
    * @see SequentialCommandGroup
    * @see Command#repeatedly()
    */
-  public static CommandBase repeatingSequence(Command... commands) {
+  public static Command repeatingSequence(Command... commands) {
     return sequence(commands).repeatedly();
   }
 
@@ -175,7 +212,7 @@ public final class Commands {
    * @return the command
    * @see ParallelCommandGroup
    */
-  public static CommandBase parallel(Command... commands) {
+  public static Command parallel(Command... commands) {
     return new ParallelCommandGroup(commands);
   }
 
@@ -187,7 +224,7 @@ public final class Commands {
    * @return the command group
    * @see ParallelRaceGroup
    */
-  public static CommandBase race(Command... commands) {
+  public static Command race(Command... commands) {
     return new ParallelRaceGroup(commands);
   }
 
@@ -196,12 +233,13 @@ public final class Commands {
    * the others.
    *
    * @param deadline the deadline command
-   * @param commands the commands to include
+   * @param otherCommands the other commands to include
    * @return the command group
    * @see ParallelDeadlineGroup
+   * @throws IllegalArgumentException if the deadline command is also in the otherCommands argument
    */
-  public static CommandBase deadline(Command deadline, Command... commands) {
-    return new ParallelDeadlineGroup(deadline, commands);
+  public static Command deadline(Command deadline, Command... otherCommands) {
+    return new ParallelDeadlineGroup(deadline, otherCommands);
   }
 
   private Commands() {

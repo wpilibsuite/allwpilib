@@ -7,6 +7,7 @@
 
 #include <uv.h>
 
+#include <functional>
 #include <memory>
 
 #include <wpi/Signal.h>

@@ -4,11 +4,12 @@
 
 #include "frc/AnalogPotentiometer.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
+
 #include "TestBench.h"
 #include "frc/AnalogOutput.h"
 #include "frc/RobotController.h"
 #include "frc/Timer.h"
-#include "gtest/gtest.h"
 
 static constexpr double kScale = 270.0;
 static constexpr double kAngle = 180.0;

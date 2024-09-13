@@ -4,9 +4,17 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.proto.DifferentialDriveKinematicsProto;
+import edu.wpi.first.math.kinematics.struct.DifferentialDriveKinematicsStruct;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /**
  * Helper class that converts a chassis velocity (dx and dtheta components) to left and right wheel
@@ -16,8 +24,20 @@ import edu.wpi.first.math.geometry.Twist2d;
  * whereas forward kinematics converts left and right component velocities into a linear and angular
  * chassis speed.
  */
-public class DifferentialDriveKinematics {
+public class DifferentialDriveKinematics
+    implements Kinematics<DifferentialDriveWheelSpeeds, DifferentialDriveWheelPositions>,
+        ProtobufSerializable,
+        StructSerializable {
+  /** Differential drive trackwidth. */
   public final double trackWidthMeters;
+
+  /** DifferentialDriveKinematics protobuf for serialization. */
+  public static final DifferentialDriveKinematicsProto proto =
+      new DifferentialDriveKinematicsProto();
+
+  /** DifferentialDriveKinematics struct for serialization. */
+  public static final DifferentialDriveKinematicsStruct struct =
+      new DifferentialDriveKinematicsStruct();
 
   /**
    * Constructs a differential drive kinematics object.
@@ -32,11 +52,23 @@ public class DifferentialDriveKinematics {
   }
 
   /**
+   * Constructs a differential drive kinematics object.
+   *
+   * @param trackWidth The track width of the drivetrain. Theoretically, this is the distance
+   *     between the left wheels and right wheels. However, the empirical value may be larger than
+   *     the physical measured value due to scrubbing effects.
+   */
+  public DifferentialDriveKinematics(Measure<Distance> trackWidth) {
+    this(trackWidth.in(Meters));
+  }
+
+  /**
    * Returns a chassis speed from left and right component velocities using forward kinematics.
    *
    * @param wheelSpeeds The left and right velocities.
    * @return The chassis speed.
    */
+  @Override
   public ChassisSpeeds toChassisSpeeds(DifferentialDriveWheelSpeeds wheelSpeeds) {
     return new ChassisSpeeds(
         (wheelSpeeds.leftMetersPerSecond + wheelSpeeds.rightMetersPerSecond) / 2,
@@ -51,12 +83,19 @@ public class DifferentialDriveKinematics {
    *     chassis' speed.
    * @return The left and right velocities.
    */
+  @Override
   public DifferentialDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
     return new DifferentialDriveWheelSpeeds(
         chassisSpeeds.vxMetersPerSecond
             - trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond,
         chassisSpeeds.vxMetersPerSecond
             + trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond);
+  }
+
+  @Override
+  public Twist2d toTwist2d(
+      DifferentialDriveWheelPositions start, DifferentialDriveWheelPositions end) {
+    return toTwist2d(end.leftMeters - start.leftMeters, end.rightMeters - start.rightMeters);
   }
 
   /**

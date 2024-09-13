@@ -12,13 +12,16 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.wpilibj.UtilityClassTest;
 import java.util.ArrayList;
 import java.util.List;
-import org.ejml.dense.row.MatrixFeatures_DDRM;
-import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
-class StateSpaceUtilTest {
+class StateSpaceUtilTest extends UtilityClassTest<StateSpaceUtil> {
+  StateSpaceUtilTest() {
+    super(StateSpaceUtil.class);
+  }
+
   @Test
   void testCostArray() {
     var mat = StateSpaceUtil.makeCostMatrix(VecBuilder.fill(1.0, 2.0, 3.0));
@@ -56,48 +59,48 @@ class StateSpaceUtilTest {
 
     // First eigenvalue is uncontrollable and unstable.
     // Second eigenvalue is controllable and stable.
-    A = Matrix.mat(Nat.N2(), Nat.N2()).fill(1.2, 0, 0, 0.5);
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.2, 0, 0, 0.5);
     assertFalse(StateSpaceUtil.isStabilizable(A, B));
 
     // First eigenvalue is uncontrollable and marginally stable.
     // Second eigenvalue is controllable and stable.
-    A = Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, 0.5);
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 0.5);
     assertFalse(StateSpaceUtil.isStabilizable(A, B));
 
     // First eigenvalue is uncontrollable and stable.
     // Second eigenvalue is controllable and stable.
-    A = Matrix.mat(Nat.N2(), Nat.N2()).fill(0.2, 0, 0, 0.5);
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 0.5);
     assertTrue(StateSpaceUtil.isStabilizable(A, B));
 
     // First eigenvalue is uncontrollable and stable.
     // Second eigenvalue is controllable and unstable.
-    A = Matrix.mat(Nat.N2(), Nat.N2()).fill(0.2, 0, 0, 1.2);
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 1.2);
     assertTrue(StateSpaceUtil.isStabilizable(A, B));
   }
 
   @Test
   void testIsDetectable() {
     Matrix<N2, N2> A;
-    Matrix<N1, N2> C = Matrix.mat(Nat.N1(), Nat.N2()).fill(0, 1);
+    Matrix<N1, N2> C = MatBuilder.fill(Nat.N1(), Nat.N2(), 0, 1);
 
     // First eigenvalue is unobservable and unstable.
     // Second eigenvalue is observable and stable.
-    A = Matrix.mat(Nat.N2(), Nat.N2()).fill(1.2, 0, 0, 0.5);
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.2, 0, 0, 0.5);
     assertFalse(StateSpaceUtil.isDetectable(A, C));
 
     // First eigenvalue is unobservable and marginally stable.
     // Second eigenvalue is observable and stable.
-    A = Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, 0.5);
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 0.5);
     assertFalse(StateSpaceUtil.isDetectable(A, C));
 
     // First eigenvalue is unobservable and stable.
     // Second eigenvalue is observable and stable.
-    A = Matrix.mat(Nat.N2(), Nat.N2()).fill(0.2, 0, 0, 0.5);
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 0.5);
     assertTrue(StateSpaceUtil.isDetectable(A, C));
 
     // First eigenvalue is unobservable and stable.
     // Second eigenvalue is observable and unstable.
-    A = Matrix.mat(Nat.N2(), Nat.N2()).fill(0.2, 0, 0, 1.2);
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 1.2);
     assertTrue(StateSpaceUtil.isDetectable(A, C));
   }
 
@@ -138,37 +141,14 @@ class StateSpaceUtilTest {
     var wrappedResult = wrappedMatrix.exp();
 
     assertTrue(
-        wrappedResult.isEqual(Matrix.mat(Nat.N2(), Nat.N2()).fill(Math.E, 0, 0, Math.E), 1E-9));
+        wrappedResult.isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), Math.E, 0, 0, Math.E), 1E-9));
 
-    var matrix = Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 2, 3, 4);
+    var matrix = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 2, 3, 4);
     wrappedResult = matrix.times(0.01).exp();
 
     assertTrue(
         wrappedResult.isEqual(
-            Matrix.mat(Nat.N2(), Nat.N2()).fill(1.01035625, 0.02050912, 0.03076368, 1.04111993),
-            1E-8));
-  }
-
-  @Test
-  void testSimpleMatrixExp() {
-    SimpleMatrix matrix = SimpleMatrixUtils.eye(2);
-    var result = SimpleMatrixUtils.exp(matrix);
-
-    assertTrue(
-        MatrixFeatures_DDRM.isIdentical(
-            result.getDDRM(),
-            new SimpleMatrix(2, 2, true, new double[] {Math.E, 0, 0, Math.E}).getDDRM(),
-            1E-9));
-
-    matrix = new SimpleMatrix(2, 2, true, new double[] {1, 2, 3, 4});
-    result = SimpleMatrixUtils.exp(matrix.scale(0.01));
-
-    assertTrue(
-        MatrixFeatures_DDRM.isIdentical(
-            result.getDDRM(),
-            new SimpleMatrix(
-                    2, 2, true, new double[] {1.01035625, 0.02050912, 0.03076368, 1.04111993})
-                .getDDRM(),
+            MatBuilder.fill(Nat.N2(), Nat.N2(), 1.01035625, 0.02050912, 0.03076368, 1.04111993),
             1E-8));
   }
 

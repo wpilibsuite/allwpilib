@@ -11,9 +11,10 @@
 #include <string>
 #include <string_view>
 
+#include <wpi/json_fwd.h>
+
 namespace wpi {
 class Logger;
-class json;
 }  // namespace wpi
 
 namespace nt {
@@ -51,7 +52,8 @@ class ServerMessageHandler {
                                       const wpi::json& update, bool ack) = 0;
 };
 
-void WireDecodeText(std::string_view in, ClientMessageHandler& out,
+// return true if client pub/sub metadata needs updating
+bool WireDecodeText(std::string_view in, ClientMessageHandler& out,
                     wpi::Logger& logger);
 void WireDecodeText(std::string_view in, ServerMessageHandler& out,
                     wpi::Logger& logger);

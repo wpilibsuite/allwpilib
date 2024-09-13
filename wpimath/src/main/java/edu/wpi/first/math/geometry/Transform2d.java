@@ -4,10 +4,18 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
+import edu.wpi.first.math.geometry.proto.Transform2dProto;
+import edu.wpi.first.math.geometry.struct.Transform2dStruct;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
-/** Represents a transformation for a Pose2d. */
-public class Transform2d {
+/** Represents a transformation for a Pose2d in the pose's frame. */
+public class Transform2d implements ProtobufSerializable, StructSerializable {
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
 
@@ -40,6 +48,30 @@ public class Transform2d {
     m_rotation = rotation;
   }
 
+  /**
+   * Constructs a transform with x and y translations instead of a separate Translation2d.
+   *
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  public Transform2d(double x, double y, Rotation2d rotation) {
+    m_translation = new Translation2d(x, y);
+    m_rotation = rotation;
+  }
+
+  /**
+   * Constructs a transform with x and y translations instead of a separate Translation2d. The X and
+   * Y translations will be converted to and tracked as meters.
+   *
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  public Transform2d(Measure<Distance> x, Measure<Distance> y, Rotation2d rotation) {
+    this(x.in(Meters), y.in(Meters), rotation);
+  }
+
   /** Constructs the identity transform -- maps an initial pose to itself. */
   public Transform2d() {
     m_translation = new Translation2d();
@@ -67,7 +99,8 @@ public class Transform2d {
   }
 
   /**
-   * Composes two transformations.
+   * Composes two transformations. The second transform is applied relative to the orientation of
+   * the first.
    *
    * @param other The transform to compose with this one.
    * @return The composition of the two transformations.
@@ -150,4 +183,10 @@ public class Transform2d {
   public int hashCode() {
     return Objects.hash(m_translation, m_rotation);
   }
+
+  /** Transform2d protobuf for serialization. */
+  public static final Transform2dProto proto = new Transform2dProto();
+
+  /** Transform2d struct for serialization. */
+  public static final Transform2dStruct struct = new Transform2dStruct();
 }

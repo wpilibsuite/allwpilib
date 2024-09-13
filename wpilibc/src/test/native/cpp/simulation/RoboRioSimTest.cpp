@@ -4,12 +4,12 @@
 
 #include "frc/simulation/RoboRioSim.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 #include <hal/HALBase.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/RobotController.h"
-#include "gtest/gtest.h"
 
 namespace frc::sim {
 
@@ -207,6 +207,36 @@ TEST(RoboRioSimTest, Set3V3) {
   EXPECT_EQ(kTestFaults, RobotController::GetFaultCount3V3());
 }
 
+TEST(RoboRioSimTest, SetCPUTemp) {
+  RoboRioSim::ResetData();
+
+  DoubleCallback callback;
+  auto cbHandle =
+      RoboRioSim::RegisterCPUTempCallback(callback.GetCallback(), false);
+  constexpr double kCPUTemp = 100.0;
+
+  RoboRioSim::SetCPUTemp(units::celsius_t{kCPUTemp});
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(kCPUTemp, callback.GetLastValue());
+  EXPECT_EQ(kCPUTemp, RoboRioSim::GetCPUTemp().value());
+  EXPECT_EQ(kCPUTemp, RobotController::GetCPUTemp().value());
+}
+
+TEST(RoboRioSimTest, SetTeamNumber) {
+  RoboRioSim::ResetData();
+
+  IntCallback callback;
+  auto cbHandle =
+      RoboRioSim::RegisterTeamNumberCallback(callback.GetCallback(), false);
+  constexpr int kTeamNumber = 9999;
+
+  RoboRioSim::SetTeamNumber(kTeamNumber);
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(kTeamNumber, callback.GetLastValue());
+  EXPECT_EQ(kTeamNumber, RoboRioSim::GetTeamNumber());
+  EXPECT_EQ(kTeamNumber, RobotController::GetTeamNumber());
+}
+
 TEST(RoboRioSimTest, SetSerialNumber) {
   const std::string kSerialNum = "Hello";
 
@@ -242,6 +272,28 @@ TEST(RoboRioSimTest, SetComments) {
   RoboRioSim::SetComments(kCommentsOverflow);
   EXPECT_EQ(kCommentsTruncated, RoboRioSim::GetComments());
   EXPECT_EQ(kCommentsTruncated, RobotController::GetComments());
+}
+
+TEST(RoboRioSimTest, SetRadioLEDState) {
+  RoboRioSim::ResetData();
+
+  EnumCallback callback;
+  auto cbHandle =
+      RoboRioSim::RegisterRadioLEDStateCallback(callback.GetCallback(), false);
+
+  RobotController::SetRadioLEDState(RadioLEDState::kGreen);
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(RadioLEDState::kGreen, callback.GetLastValue());
+  EXPECT_EQ(RadioLEDState::kGreen, RoboRioSim::GetRadioLEDState());
+  EXPECT_EQ(RadioLEDState::kGreen, RobotController::GetRadioLEDState());
+
+  callback.Reset();
+
+  RoboRioSim::SetRadioLEDState(RadioLEDState::kOrange);
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(RadioLEDState::kOrange, callback.GetLastValue());
+  EXPECT_EQ(RadioLEDState::kOrange, RoboRioSim::GetRadioLEDState());
+  EXPECT_EQ(RadioLEDState::kOrange, RobotController::GetRadioLEDState());
 }
 
 }  // namespace frc::sim

@@ -16,10 +16,10 @@ void MecanumDriveWheelSpeeds::Desaturate(
     units::meters_per_second_t attainableMaxSpeed) {
   std::array<units::meters_per_second_t, 4> wheelSpeeds{frontLeft, frontRight,
                                                         rearLeft, rearRight};
-  units::meters_per_second_t realMaxSpeed = *std::max_element(
+  units::meters_per_second_t realMaxSpeed = units::math::abs(*std::max_element(
       wheelSpeeds.begin(), wheelSpeeds.end(), [](const auto& a, const auto& b) {
         return units::math::abs(a) < units::math::abs(b);
-      });
+      }));
 
   if (realMaxSpeed > attainableMaxSpeed) {
     for (int i = 0; i < 4; ++i) {

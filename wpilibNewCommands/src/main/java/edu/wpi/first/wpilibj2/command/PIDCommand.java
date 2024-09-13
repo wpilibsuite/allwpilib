@@ -18,10 +18,17 @@ import java.util.function.DoubleSupplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class PIDCommand extends CommandBase {
+public class PIDCommand extends Command {
+  /** PID controller. */
   protected final PIDController m_controller;
+
+  /** Measurement getter. */
   protected DoubleSupplier m_measurement;
+
+  /** Setpoint getter. */
   protected DoubleSupplier m_setpoint;
+
+  /** PID controller output consumer. */
   protected DoubleConsumer m_useOutput;
 
   /**

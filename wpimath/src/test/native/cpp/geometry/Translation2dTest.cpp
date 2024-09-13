@@ -4,8 +4,9 @@
 
 #include <cmath>
 
+#include <gtest/gtest.h>
+
 #include "frc/geometry/Translation2d.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 
@@ -123,6 +124,16 @@ TEST(Translation2dTest, Nearest) {
   EXPECT_DOUBLE_EQ(
       origin.Nearest({translation4, translation2, translation3}).Y().value(),
       translation2.Y().value());
+}
+
+TEST(Translation2dTest, ToVector) {
+  const Eigen::Vector2d vec(1.0, 2.0);
+  const Translation2d translation{vec};
+
+  EXPECT_DOUBLE_EQ(vec[0], translation.X().value());
+  EXPECT_DOUBLE_EQ(vec[1], translation.Y().value());
+
+  EXPECT_TRUE(vec == translation.ToVector());
 }
 
 TEST(Translation2dTest, Constexpr) {

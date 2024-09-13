@@ -4,8 +4,16 @@
 
 #include "RobotContainer.h"
 
+#include <frc/smartdashboard/SmartDashboard.h>
+
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
+
+  m_chooser.SetDefaultOption("ONE", CommandSelector::ONE);
+  m_chooser.AddOption("TWO", CommandSelector::TWO);
+  m_chooser.AddOption("THREE", CommandSelector::THREE);
+
+  frc::SmartDashboard::PutData("Auto Chooser", &m_chooser);
 
   // Configure the button bindings
   ConfigureButtonBindings();

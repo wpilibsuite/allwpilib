@@ -14,6 +14,7 @@
 #include "glass/networktables/NTMechanism2D.h"
 #include "glass/networktables/NTMotorController.h"
 #include "glass/networktables/NTPIDController.h"
+#include "glass/networktables/NTProfiledPIDController.h"
 #include "glass/networktables/NTStringChooser.h"
 #include "glass/networktables/NTSubsystem.h"
 #include "glass/networktables/NetworkTablesProvider.h"
@@ -62,7 +63,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
       [](Window* win, Model* model, const char*) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         return MakeFunctionView(
-            [=] { DisplayFMS(static_cast<FMSModel*>(model)); });
+            [=] { DisplayFMS(static_cast<FMSModel*>(model), true); });
       });
   provider.Register(
       NTDigitalInputModel::kType,
@@ -139,6 +140,18 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         return MakeFunctionView([=] {
           DisplayPIDController(static_cast<NTPIDControllerModel*>(model));
+        });
+      });
+  provider.Register(
+      NTProfiledPIDControllerModel::kType,
+      [](nt::NetworkTableInstance inst, const char* path) {
+        return std::make_unique<NTProfiledPIDControllerModel>(inst, path);
+      },
+      [](Window* win, Model* model, const char* path) {
+        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+        return MakeFunctionView([=] {
+          DisplayProfiledPIDController(
+              static_cast<NTProfiledPIDControllerModel*>(model));
         });
       });
   provider.Register(

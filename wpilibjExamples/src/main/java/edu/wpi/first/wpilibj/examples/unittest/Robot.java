@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj.examples.unittest.subsystems.Intake;
  * project.
  */
 public class Robot extends TimedRobot {
-  private Intake m_intake = new Intake();
-  private Joystick m_joystick = new Joystick(Constants.kJoystickIndex);
+  private final Intake m_intake = new Intake();
+  private final Joystick m_joystick = new Joystick(Constants.kJoystickIndex);
 
   /** This function is called periodically during operator control. */
   @Override

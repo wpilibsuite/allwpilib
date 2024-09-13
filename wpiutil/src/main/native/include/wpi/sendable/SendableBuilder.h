@@ -15,12 +15,20 @@
 
 namespace wpi {
 
+/**
+ * Helper class for building Sendable dashboard representations.
+ */
 class SendableBuilder {
  public:
   /**
    * The backend kinds used for the sendable builder.
    */
-  enum BackendKind { kUnknown, kNetworkTables };
+  enum BackendKind {
+    /// Unknown.
+    kUnknown,
+    /// NetworkTables.
+    kNetworkTables
+  };
 
   virtual ~SendableBuilder() = default;
 
@@ -60,6 +68,14 @@ class SendableBuilder {
                                   std::function<void(bool)> setter) = 0;
 
   /**
+   * Add a constant boolean property.
+   *
+   * @param key     property name
+   * @param value   the value
+   */
+  virtual void PublishConstBoolean(std::string_view key, bool value) = 0;
+
+  /**
    * Add an integer property.
    *
    * @param key     property name
@@ -69,6 +85,14 @@ class SendableBuilder {
   virtual void AddIntegerProperty(std::string_view key,
                                   std::function<int64_t()> getter,
                                   std::function<void(int64_t)> setter) = 0;
+
+  /**
+   * Add a constant integer property.
+   *
+   * @param key     property name
+   * @param value   the value
+   */
+  virtual void PublishConstInteger(std::string_view key, int64_t value) = 0;
 
   /**
    * Add a float property.
@@ -82,6 +106,14 @@ class SendableBuilder {
                                 std::function<void(float)> setter) = 0;
 
   /**
+   * Add a constant float property.
+   *
+   * @param key     property name
+   * @param value   the value
+   */
+  virtual void PublishConstFloat(std::string_view key, float value) = 0;
+
+  /**
    * Add a double property.
    *
    * @param key     property name
@@ -91,6 +123,14 @@ class SendableBuilder {
   virtual void AddDoubleProperty(std::string_view key,
                                  std::function<double()> getter,
                                  std::function<void(double)> setter) = 0;
+
+  /**
+   * Add a constant double property.
+   *
+   * @param key     property name
+   * @param value   the value
+   */
+  virtual void PublishConstDouble(std::string_view key, double value) = 0;
 
   /**
    * Add a string property.
@@ -104,6 +144,15 @@ class SendableBuilder {
       std::function<void(std::string_view)> setter) = 0;
 
   /**
+   * Add a constant string property.
+   *
+   * @param key     property name
+   * @param value   the value
+   */
+  virtual void PublishConstString(std::string_view key,
+                                  std::string_view value) = 0;
+
+  /**
    * Add a boolean array property.
    *
    * @param key     property name
@@ -113,6 +162,15 @@ class SendableBuilder {
   virtual void AddBooleanArrayProperty(
       std::string_view key, std::function<std::vector<int>()> getter,
       std::function<void(std::span<const int>)> setter) = 0;
+
+  /**
+   * Add a constant boolean array property.
+   *
+   * @param key     property name
+   * @param value   the value
+   */
+  virtual void PublishConstBooleanArray(std::string_view key,
+                                        std::span<const int> value) = 0;
 
   /**
    * Add an integer array property.
@@ -126,6 +184,15 @@ class SendableBuilder {
       std::function<void(std::span<const int64_t>)> setter) = 0;
 
   /**
+   * Add a constant integer array property.
+   *
+   * @param key     property name
+   * @param value   the value
+   */
+  virtual void PublishConstIntegerArray(std::string_view key,
+                                        std::span<const int64_t> value) = 0;
+
+  /**
    * Add a float array property.
    *
    * @param key     property name
@@ -135,6 +202,15 @@ class SendableBuilder {
   virtual void AddFloatArrayProperty(
       std::string_view key, std::function<std::vector<float>()> getter,
       std::function<void(std::span<const float>)> setter) = 0;
+
+  /**
+   * Add a constant float array property.
+   *
+   * @param key     property name
+   * @param value   the value
+   */
+  virtual void PublishConstFloatArray(std::string_view key,
+                                      std::span<const float> value) = 0;
 
   /**
    * Add a double array property.
@@ -148,6 +224,15 @@ class SendableBuilder {
       std::function<void(std::span<const double>)> setter) = 0;
 
   /**
+   * Add a constant double array property.
+   *
+   * @param key     property name
+   * @param value   the value
+   */
+  virtual void PublishConstDoubleArray(std::string_view key,
+                                       std::span<const double> value) = 0;
+
+  /**
    * Add a string array property.
    *
    * @param key     property name
@@ -157,6 +242,15 @@ class SendableBuilder {
   virtual void AddStringArrayProperty(
       std::string_view key, std::function<std::vector<std::string>()> getter,
       std::function<void(std::span<const std::string>)> setter) = 0;
+
+  /**
+   * Add a constant string array property.
+   *
+   * @param key     property name
+   * @param value   the value
+   */
+  virtual void PublishConstStringArray(std::string_view key,
+                                       std::span<const std::string> value) = 0;
 
   /**
    * Add a raw property.
@@ -170,6 +264,17 @@ class SendableBuilder {
       std::string_view key, std::string_view typeString,
       std::function<std::vector<uint8_t>()> getter,
       std::function<void(std::span<const uint8_t>)> setter) = 0;
+
+  /**
+   * Add a constant raw property.
+   *
+   * @param key     property name
+   * @param typeString  type string
+   * @param value   the value
+   */
+  virtual void PublishConstRaw(std::string_view key,
+                               std::string_view typeString,
+                               std::span<const uint8_t> value) = 0;
 
   /**
    * Add a string property (SmallString form).

@@ -37,7 +37,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
  * Checks if a DIO channel is valid.
  *
  * @param channel the channel number to check
- * @return true if the channel is correct, otherwise false
+ * @return true if the channel is valid, otherwise false
  */
 HAL_Bool HAL_CheckDIOChannel(int32_t channel);
 
@@ -77,7 +77,7 @@ void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status);
  *
  * The valid range is from 0.6 Hz to 19 kHz.
  *
- *  The frequency resolution is logarithmic.
+ * The frequency resolution is logarithmic.
  *
  * @param[in] rate the frequency to output all digital output PWM signals
  * @param[out] status Error status variable. 0 on success.
@@ -227,7 +227,7 @@ int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status);
  *
  * Sets the filter period in FPGA cycles.  Even though there are 2 different
  * filter index domains (MXP vs HDR), ignore that distinction for now since it
- * compilicates the interface.  That can be changed later.
+ * complicates the interface.  That can be changed later.
  *
  * @param[in] filterIndex the filter index, 0 - 2
  * @param[in] value       the number of cycles that the signal must not
@@ -241,11 +241,12 @@ void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status);
  *
  * Gets the filter period in FPGA cycles.  Even though there are 2 different
  * filter index domains (MXP vs HDR), ignore that distinction for now since it
- * compilicates the interface.  Set status to NiFpga_Status_SoftwareFault if the
- * filter values miss-match.
+ * complicates the interface.  Set status to NiFpga_Status_SoftwareFault if the
+ * filter values mismatch.
  *
  * @param[in] filterIndex the filter index, 0 - 2
  * @param[out] status     Error status variable. 0 on success.
+ * @return                The number of FPGA cycles of the filter period.
  */
 int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status);
 #ifdef __cplusplus

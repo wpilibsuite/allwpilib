@@ -6,12 +6,16 @@
 
 #include <array>
 #include <cstddef>
+#include <iterator>
 
 namespace wpi {
 
 /**
  * This is a simple circular buffer so we don't need to "bucket brigade" copy
  * old values.
+ *
+ * @tparam T Buffer element type.
+ * @tparam N Maximum number of buffer elements.
  */
 template <class T, size_t N>
 class static_circular_buffer {
@@ -27,7 +31,7 @@ class static_circular_buffer {
     using reference = T&;
 
     iterator(static_circular_buffer* buffer, size_t index)
-        : m_buffer(buffer), m_index(index) {}
+        : m_buffer{buffer}, m_index{index} {}
 
     iterator& operator++() {
       ++m_index;
@@ -55,7 +59,7 @@ class static_circular_buffer {
     using const_reference = const T&;
 
     const_iterator(const static_circular_buffer* buffer, size_t index)
-        : m_buffer(buffer), m_index(index) {}
+        : m_buffer{buffer}, m_index{index} {}
 
     const_iterator& operator++() {
       ++m_index;

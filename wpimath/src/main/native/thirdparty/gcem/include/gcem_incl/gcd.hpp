@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -20,6 +20,9 @@
 
 #ifndef _gcem_gcd_HPP
 #define _gcem_gcd_HPP
+
+namespace gcem
+{
 
 namespace internal
 {
@@ -77,6 +80,8 @@ gcd(const T1 a, const T2 b)
 noexcept
 {
     return internal::gcd_type_check(a,b);
+}
+
 }
 
 #endif

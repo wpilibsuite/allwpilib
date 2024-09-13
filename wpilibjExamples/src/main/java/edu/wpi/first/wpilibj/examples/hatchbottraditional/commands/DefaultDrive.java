@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.hatchbottraditional.commands;
 
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.DoubleSupplier;
 
 /**
@@ -13,7 +13,7 @@ import java.util.function.DoubleSupplier;
  * explicitly for pedagogical purposes - actual code should inline a command this simple with {@link
  * edu.wpi.first.wpilibj2.command.RunCommand}.
  */
-public class DefaultDrive extends CommandBase {
+public class DefaultDrive extends Command {
   private final DriveSubsystem m_drive;
   private final DoubleSupplier m_forward;
   private final DoubleSupplier m_rotation;

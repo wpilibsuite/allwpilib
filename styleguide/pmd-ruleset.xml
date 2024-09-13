@@ -8,6 +8,7 @@
 
   <exclude-pattern>.*/*JNI.*</exclude-pattern>
   <exclude-pattern>.*/*IntegrationTests.*</exclude-pattern>
+  <exclude-pattern>.*/math/proto.*</exclude-pattern>
 
   <rule ref="category/java/bestpractices.xml">
     <exclude name="AccessorClassGeneration" />
@@ -64,7 +65,6 @@
     <exclude name="AvoidCatchingThrowable" />
     <exclude name="AvoidDuplicateLiterals" />
     <exclude name="AvoidLiteralsInIfCondition" />
-    <exclude name="BeanMembersShouldSerialize" />
     <exclude name="CloseResource" />
     <exclude name="ConstructorCallsOverridableMethod" />
     <exclude name="DataflowAnomalyAnalysis" />
@@ -74,6 +74,7 @@
     <exclude name="FinalizeDoesNotCallSuperFinalize" />
     <exclude name="JUnitSpelling" />
     <exclude name="MissingSerialVersionUID" />
+    <exclude name="NonSerializableClass" />
     <exclude name="NullAssignment" />
   </rule>
 

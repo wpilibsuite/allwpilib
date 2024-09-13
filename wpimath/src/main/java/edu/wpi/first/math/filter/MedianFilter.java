@@ -4,7 +4,7 @@
 
 package edu.wpi.first.math.filter;
 
-import edu.wpi.first.util.CircularBuffer;
+import edu.wpi.first.util.DoubleCircularBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
  * processing, LIDAR, or ultrasonic sensors).
  */
 public class MedianFilter {
-  private final CircularBuffer m_valueBuffer;
+  private final DoubleCircularBuffer m_valueBuffer;
   private final List<Double> m_orderedValues;
   private final int m_size;
 
@@ -26,7 +26,7 @@ public class MedianFilter {
    */
   public MedianFilter(int size) {
     // Circular buffer of values currently in the window, ordered by time
-    m_valueBuffer = new CircularBuffer(size);
+    m_valueBuffer = new DoubleCircularBuffer(size);
     // List of values currently in the window, ordered by value
     m_orderedValues = new ArrayList<>(size);
     // Size of rolling window
@@ -70,6 +70,15 @@ public class MedianFilter {
       // If size is even, return average of middle elements
       return (m_orderedValues.get(curSize / 2 - 1) + m_orderedValues.get(curSize / 2)) / 2.0;
     }
+  }
+
+  /**
+   * Returns the last value calculated by the MedianFilter.
+   *
+   * @return The last value.
+   */
+  public double lastValue() {
+    return m_valueBuffer.getFirst();
   }
 
   /** Resets the filter, clearing the window of all elements. */

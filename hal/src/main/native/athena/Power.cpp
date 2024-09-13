@@ -61,6 +61,11 @@ int32_t HAL_GetUserCurrentFaults6V(int32_t* status) {
       power->readFaultCounts_OverCurrentFaultCount6V(status));
 }
 
+void HAL_SetUserRailEnabled6V(HAL_Bool enabled, int32_t* status) {
+  initializePower(status);
+  power->writeDisable_User6V(!enabled, status);
+}
+
 double HAL_GetUserVoltage5V(int32_t* status) {
   initializePower(status);
   return power->readUserVoltage5V(status) / 4.096 * 0.005962 - 0.013;
@@ -80,6 +85,11 @@ int32_t HAL_GetUserCurrentFaults5V(int32_t* status) {
   initializePower(status);
   return static_cast<int32_t>(
       power->readFaultCounts_OverCurrentFaultCount5V(status));
+}
+
+void HAL_SetUserRailEnabled5V(HAL_Bool enabled, int32_t* status) {
+  initializePower(status);
+  power->writeDisable_User5V(!enabled, status);
 }
 
 double HAL_GetUserVoltage3V3(int32_t* status) {
@@ -103,6 +113,11 @@ int32_t HAL_GetUserCurrentFaults3V3(int32_t* status) {
       power->readFaultCounts_OverCurrentFaultCount3V3(status));
 }
 
+void HAL_SetUserRailEnabled3V3(HAL_Bool enabled, int32_t* status) {
+  initializePower(status);
+  power->writeDisable_User3V3(!enabled, status);
+}
+
 void HAL_SetBrownoutVoltage(double voltage, int32_t* status) {
   initializePower(status);
   if (voltage < 0) {
@@ -119,6 +134,11 @@ double HAL_GetBrownoutVoltage(int32_t* status) {
   initializePower(status);
   auto brownout = power->readBrownoutVoltage250mV(status);
   return brownout / 4.0;
+}
+
+double HAL_GetCPUTemp(int32_t* status) {
+  initializePower(status);
+  return power->readOnChipTemperature(status) / 4096.0 * 503.975 - 273.15;
 }
 
 }  // extern "C"

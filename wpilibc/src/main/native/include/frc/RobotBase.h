@@ -115,14 +115,14 @@ int StartRobot() {
 }
 
 /**
- * Implement a Robot Program framework.
+ * Implement a Robot Program framework. The RobotBase class is intended to be
+ * subclassed to create a robot program. The user must implement
+ * StartCompetition() which will be called once and is not expected to exit. The
+ * user must also implement EndCompetition(), which signals to the code in
+ * StartCompetition() that it should exit.
  *
- * The RobotBase class is intended to be subclassed by a user creating a robot
- * program. Overridden Autonomous() and OperatorControl() methods are called at
- * the appropriate time as the match proceeds. In the current implementation,
- * the Autonomous code will run to completion before the OperatorControl code
- * could start. In the future the Autonomous code might be spawned as a task,
- * then killed at the end of the Autonomous period.
+ * It is not recommended to subclass this class directly - instead subclass
+ * IterativeRobotBase or TimedRobot.
  */
 class RobotBase {
  public:
@@ -189,12 +189,19 @@ class RobotBase {
   bool IsTestEnabled() const;
 
   /**
-   * Gets the ID of the main robot thread.
+   * Returns the main thread ID.
+   *
+   * @return The main thread ID.
    */
   static std::thread::id GetThreadId();
 
+  /**
+   * Start the main robot code. This function will be called once and should not
+   * exit until signalled by EndCompetition()
+   */
   virtual void StartCompetition() = 0;
 
+  /** Ends the main loop in StartCompetition(). */
   virtual void EndCompetition() = 0;
 
   /**
@@ -223,13 +230,17 @@ class RobotBase {
    * @return If the robot is running in simulation.
    */
   static constexpr bool IsSimulation() {
-    return !IsReal();
+#ifdef __FRC_ROBORIO__
+    return false;
+#else
+    return true;
+#endif
   }
 
   /**
    * Constructor for a generic robot program.
    *
-   * User code should be placed in the constructor that runs before the
+   * User code can be placed in the constructor that runs before the
    * Autonomous or Operator Control period starts. The constructor will run to
    * completion before Autonomous is entered.
    *

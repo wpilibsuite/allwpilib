@@ -11,6 +11,8 @@
 
 using namespace frc;
 
+WPI_IGNORE_DEPRECATED
+
 NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
     : m_dio(dioChannel), m_pwm(pwmChannel) {
   wpi::SendableRegistry::AddChild(this, &m_dio);
@@ -26,11 +28,13 @@ NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
   wpi::SendableRegistry::AddLW(this, "Nidec Brushless", pwmChannel);
 }
 
+WPI_UNIGNORE_DEPRECATED
+
 void NidecBrushless::Set(double speed) {
   if (!m_disabled) {
     m_speed = speed;
     m_dio.UpdateDutyCycle(0.5 + 0.5 * (m_isInverted ? -speed : speed));
-    m_pwm.SetRaw(0xffff);
+    m_pwm.SetAlwaysHighMode();
   }
   Feed();
 }

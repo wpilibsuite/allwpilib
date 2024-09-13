@@ -19,7 +19,7 @@ namespace frc::sim {
 class DifferentialDrivetrainSim {
  public:
   /**
-   * Create a SimDrivetrain.
+   * Creates a simulated differential drivetrain.
    *
    * @param plant The LinearSystem representing the robot's drivetrain. This
    *              system can be created with
@@ -46,7 +46,7 @@ class DifferentialDrivetrainSim {
       const std::array<double, 7>& measurementStdDevs = {});
 
   /**
-   * Create a SimDrivetrain.
+   * Creates a simulated differential drivetrain.
    *
    * @param driveMotor  A DCMotor representing the left side of the drivetrain.
    * @param gearing     The gearing on the drive between motor and wheel, as
@@ -80,7 +80,7 @@ class DifferentialDrivetrainSim {
    * @param u The input vector.
    * @return The normalized input.
    */
-  Vectord<2> ClampInput(const Vectord<2>& u);
+  Eigen::Vector2d ClampInput(const Eigen::Vector2d& u);
 
   /**
    * Sets the applied voltage to the drivetrain. Note that positive voltage must
@@ -187,7 +187,14 @@ class DifferentialDrivetrainSim {
    */
   void SetPose(const frc::Pose2d& pose);
 
-  Vectord<7> Dynamics(const Vectord<7>& x, const Vectord<2>& u);
+  /**
+   * The differential drive dynamics function.
+   *
+   * @param x The state.
+   * @param u The input.
+   * @return The state derivative with respect to time.
+   */
+  Vectord<7> Dynamics(const Vectord<7>& x, const Eigen::Vector2d& u);
 
   class State {
    public:
@@ -210,32 +217,54 @@ class DifferentialDrivetrainSim {
    */
   class KitbotGearing {
    public:
+    /// Gear ratio of 12.75:1.
     static constexpr double k12p75 = 12.75;
+    /// Gear ratio of 10.71:1.
     static constexpr double k10p71 = 10.71;
+    /// Gear ratio of 8.45:1.
     static constexpr double k8p45 = 8.45;
+    /// Gear ratio of 7.31:1.
     static constexpr double k7p31 = 7.31;
+    /// Gear ratio of 5.95:1.
     static constexpr double k5p95 = 5.95;
   };
 
+  /**
+   * Represents common motor layouts of the kit drivetrain.
+   */
   class KitbotMotor {
    public:
+    /// One CIM motor per drive side.
     static constexpr frc::DCMotor SingleCIMPerSide = frc::DCMotor::CIM(1);
+    /// Two CIM motors per drive side.
     static constexpr frc::DCMotor DualCIMPerSide = frc::DCMotor::CIM(2);
+    /// One Mini CIM motor per drive side.
     static constexpr frc::DCMotor SingleMiniCIMPerSide =
         frc::DCMotor::MiniCIM(1);
+    /// Two Mini CIM motors per drive side.
     static constexpr frc::DCMotor DualMiniCIMPerSide = frc::DCMotor::MiniCIM(2);
+    /// One Falcon 500 motor per drive side.
     static constexpr frc::DCMotor SingleFalcon500PerSide =
         frc::DCMotor::Falcon500(1);
+    /// Two Falcon 500 motors per drive side.
     static constexpr frc::DCMotor DualFalcon500PerSide =
         frc::DCMotor::Falcon500(2);
+    /// One NEO motor per drive side.
     static constexpr frc::DCMotor SingleNEOPerSide = frc::DCMotor::NEO(1);
+    /// Two NEO motors per drive side.
     static constexpr frc::DCMotor DualNEOPerSide = frc::DCMotor::NEO(2);
   };
 
+  /**
+   * Represents common wheel sizes of the kit drivetrain.
+   */
   class KitbotWheelSize {
    public:
+    /// Six inch diameter wheels.
     static constexpr units::meter_t kSixInch = 6_in;
+    /// Eight inch diameter wheels.
     static constexpr units::meter_t kEightInch = 8_in;
+    /// Ten inch diameter wheels.
     static constexpr units::meter_t kTenInch = 10_in;
   };
 
@@ -325,7 +354,7 @@ class DifferentialDrivetrainSim {
   double m_currentGearing;
 
   Vectord<7> m_x;
-  Vectord<2> m_u;
+  Eigen::Vector2d m_u;
   Vectord<7> m_y;
   std::array<double, 7> m_measurementStdDevs;
 };

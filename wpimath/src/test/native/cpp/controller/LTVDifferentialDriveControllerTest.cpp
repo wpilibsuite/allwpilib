@@ -4,12 +4,13 @@
 
 #include <cmath>
 
+#include <gtest/gtest.h>
+
 #include "frc/MathUtil.h"
 #include "frc/controller/LTVDifferentialDriveController.h"
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "gtest/gtest.h"
 #include "units/math.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \

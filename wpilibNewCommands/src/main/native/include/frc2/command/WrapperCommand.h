@@ -9,10 +9,11 @@
 #pragma warning(disable : 4521)
 #endif
 
+#include <concepts>
 #include <memory>
 #include <utility>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -23,7 +24,7 @@ namespace frc2 {
  * <p>Wrapped commands may only be used through the wrapper, trying to directly
  * schedule them or add them to a group will throw an exception.
  */
-class WrapperCommand : public CommandHelper<CommandBase, WrapperCommand> {
+class WrapperCommand : public CommandHelper<Command, WrapperCommand> {
  public:
   /**
    * Wrap a command.
@@ -39,11 +40,11 @@ class WrapperCommand : public CommandHelper<CommandBase, WrapperCommand> {
    * @param command the command being wrapped. Trying to directly schedule this
    * command or add it to a group will throw an exception.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
+  // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
   explicit WrapperCommand(T&& command)
-      : WrapperCommand(std::make_unique<std::remove_reference_t<T>>(
-            std::forward<T>(command))) {}
+      : WrapperCommand(
+            std::make_unique<std::decay_t<T>>(std::forward<T>(command))) {}
 
   WrapperCommand(WrapperCommand&& other) = default;
 
@@ -68,6 +69,7 @@ class WrapperCommand : public CommandHelper<CommandBase, WrapperCommand> {
   wpi::SmallSet<Subsystem*, 4> GetRequirements() const override;
 
  protected:
+  /// Command being wrapped.
   std::unique_ptr<Command> m_command;
 };
 }  // namespace frc2

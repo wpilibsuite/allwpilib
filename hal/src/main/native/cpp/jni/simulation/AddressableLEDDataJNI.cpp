@@ -269,7 +269,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setData
   (JNIEnv* env, jclass, jint index, jbyteArray arr)
 {
-  JByteArrayRef jArrRef{env, arr};
+  JSpan<const jbyte> jArrRef{env, arr};
   auto arrRef = jArrRef.array();
   HALSIM_SetAddressableLEDData(
       index, reinterpret_cast<const HAL_AddressableLEDData*>(arrRef.data()),

@@ -9,8 +9,12 @@ package edu.wpi.first.hal;
 public class AccumulatorResult {
   /** The total value accumulated. */
   public long value;
+
   /** The number of sample value was accumulated over. */
   public long count;
+
+  /** Constructs an AccumulatorResult. */
+  public AccumulatorResult() {}
 
   /**
    * Set the value and count.

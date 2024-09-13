@@ -17,9 +17,9 @@ import edu.wpi.first.wpilibj.Notifier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class NotifierCommand extends CommandBase {
-  protected final Notifier m_notifier;
-  protected final double m_period;
+public class NotifierCommand extends Command {
+  private final Notifier m_notifier;
+  private final double m_period;
 
   /**
    * Creates a new NotifierCommand.
@@ -28,6 +28,7 @@ public class NotifierCommand extends CommandBase {
    * @param period the period at which the notifier should run, in seconds
    * @param requirements the subsystems required by this command
    */
+  @SuppressWarnings("this-escape")
   public NotifierCommand(Runnable toRun, double period, Subsystem... requirements) {
     m_notifier = new Notifier(toRun);
     m_period = period;

@@ -25,9 +25,13 @@ class SynchronousInterrupt {
    * Event trigger combinations for a synchronous interrupt.
    */
   enum WaitResult {
+    /// Timeout event.
     kTimeout = 0x0,
+    /// Rising edge event.
     kRisingEdge = 0x1,
+    /// Falling edge event.
     kFallingEdge = 0x100,
+    /// Both rising and falling edge events.
     kBoth = 0x101,
   };
 

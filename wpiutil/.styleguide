@@ -3,6 +3,7 @@ cppHeaderFileInclude {
   \.hpp$
   \.inc$
   \.inl$
+  expected$
   math$
   numbers$
   scope$
@@ -37,6 +38,13 @@ licenseUpdateExclude {
 
 repoRootNameOverride {
   wpiutil
+}
+
+includeOtherLibs {
+  ^fmt/
+  ^google/
+  ^gmock/
+  ^gtest/
 }
 
 includeGuardRoots {

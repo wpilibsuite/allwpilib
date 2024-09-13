@@ -4,6 +4,8 @@
 
 #include "glass/hardware/AnalogGyro.h"
 
+#include <wpi/StringExtras.h>
+
 #include "glass/DataSource.h"
 #include "glass/other/DeviceTree.h"
 
@@ -11,7 +13,8 @@ using namespace glass;
 
 void glass::DisplayAnalogGyroDevice(AnalogGyroModel* model, int index) {
   char name[32];
-  std::snprintf(name, sizeof(name), "AnalogGyro[%d]", index);
+  wpi::format_to_n_c_str(name, sizeof(name), "AnalogGyro[{}]", index);
+
   if (BeginDevice(name)) {
     // angle
     if (auto angleData = model->GetAngleData()) {

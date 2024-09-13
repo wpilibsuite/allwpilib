@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include <unsupported/Eigen/MatrixFunctions>
+
 #include "frc/EigenCore.h"
 #include "units/time.h"
-#include "unsupported/Eigen/MatrixFunctions"
 
 namespace frc {
 
@@ -94,95 +95,6 @@ void DiscretizeAQ(const Matrixd<States, States>& contA,
 
   *discA = phi22.transpose();
 
-  Q = *discA * phi12;
-
-  // Make discrete Q symmetric if it isn't already
-  *discQ = (Q + Q.transpose()) / 2.0;
-}
-
-/**
- * Discretizes the given continuous A and Q matrices.
- *
- * Rather than solving a 2N x 2N matrix exponential like in DiscretizeAQ()
- * (which is expensive), we take advantage of the structure of the block matrix
- * of A and Q.
- *
- * <ul>
- *   <li>eᴬᵀ, which is only N x N, is relatively cheap.
- *   <li>The upper-right quarter of the 2N x 2N matrix, which we can approximate
- *       using a taylor series to several terms and still be substantially
- *       cheaper than taking the big exponential.
- * </ul>
- *
- * @tparam States Number of states.
- * @param contA Continuous system matrix.
- * @param contQ Continuous process noise covariance matrix.
- * @param dt    Discretization timestep.
- * @param discA Storage for discrete system matrix.
- * @param discQ Storage for discrete process noise covariance matrix.
- */
-template <int States>
-void DiscretizeAQTaylor(const Matrixd<States, States>& contA,
-                        const Matrixd<States, States>& contQ,
-                        units::second_t dt, Matrixd<States, States>* discA,
-                        Matrixd<States, States>* discQ) {
-  //       T
-  // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
-  //       0
-  //
-  // M = [−A  Q ]
-  //     [ 0  Aᵀ]
-  // ϕ = eᴹᵀ
-  // ϕ₁₂ = A_d⁻¹Q_d
-  //
-  // Taylor series of ϕ:
-  //
-  //   ϕ = eᴹᵀ = I + MT + 1/2 M²T² + 1/6 M³T³ + …
-  //   ϕ = eᴹᵀ = I + MT + 1/2 T²M² + 1/6 T³M³ + …
-  //
-  // Taylor series of ϕ expanded for ϕ₁₂:
-  //
-  //   ϕ₁₂ = 0 + QT + 1/2 T² (−AQ + QAᵀ) + 1/6 T³ (−A lastTerm + Q Aᵀ²) + …
-  //
-  // ```
-  // lastTerm = Q
-  // lastCoeff = T
-  // ATn = Aᵀ
-  // ϕ₁₂ = lastTerm lastCoeff = QT
-  //
-  // for i in range(2, 6):
-  //   // i = 2
-  //   lastTerm = −A lastTerm + Q ATn = −AQ + QAᵀ
-  //   lastCoeff *= T/i → lastCoeff *= T/2 = 1/2 T²
-  //   ATn *= Aᵀ = Aᵀ²
-  //
-  //   // i = 3
-  //   lastTerm = −A lastTerm + Q ATn = −A (−AQ + QAᵀ) + QAᵀ² = …
-  //   …
-  // ```
-
-  // Make continuous Q symmetric if it isn't already
-  Matrixd<States, States> Q = (contQ + contQ.transpose()) / 2.0;
-
-  Matrixd<States, States> lastTerm = Q;
-  double lastCoeff = dt.value();
-
-  // Aᵀⁿ
-  Matrixd<States, States> ATn = contA.transpose();
-
-  Matrixd<States, States> phi12 = lastTerm * lastCoeff;
-
-  // i = 6 i.e. 5th order should be enough precision
-  for (int i = 2; i < 6; ++i) {
-    lastTerm = -contA * lastTerm + Q * ATn;
-    lastCoeff *= dt.value() / static_cast<double>(i);
-
-    phi12 += lastTerm * lastCoeff;
-
-    ATn *= contA.transpose();
-  }
-
-  DiscretizeA<States>(contA, dt, discA);
   Q = *discA * phi12;
 
   // Make discrete Q symmetric if it isn't already

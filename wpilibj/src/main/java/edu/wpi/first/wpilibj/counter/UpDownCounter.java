@@ -32,6 +32,7 @@ public class UpDownCounter implements Sendable, AutoCloseable {
    * @param upSource The up count source (can be null).
    * @param downSource The down count source (can be null).
    */
+  @SuppressWarnings("this-escape")
   public UpDownCounter(DigitalSource upSource, DigitalSource downSource) {
     ByteBuffer index = ByteBuffer.allocateDirect(4);
     // set the byte order
@@ -92,7 +93,7 @@ public class UpDownCounter implements Sendable, AutoCloseable {
   }
 
   /** Resets the current count. */
-  public void reset() {
+  public final void reset() {
     CounterJNI.resetCounter(m_handle);
   }
 

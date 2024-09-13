@@ -4,12 +4,50 @@
 
 #include "frc/geometry/Quaternion.h"
 
+#include <numbers>
+
 #include <wpi/json.h>
 
 using namespace frc;
 
 Quaternion::Quaternion(double w, double x, double y, double z)
     : m_r{w}, m_v{x, y, z} {}
+
+Quaternion Quaternion::operator+(const Quaternion& other) const {
+  return Quaternion{
+      m_r + other.m_r,
+      m_v(0) + other.m_v(0),
+      m_v(1) + other.m_v(1),
+      m_v(2) + other.m_v(2),
+  };
+}
+
+Quaternion Quaternion::operator-(const Quaternion& other) const {
+  return Quaternion{
+      m_r - other.m_r,
+      m_v(0) - other.m_v(0),
+      m_v(1) - other.m_v(1),
+      m_v(2) - other.m_v(2),
+  };
+}
+
+Quaternion Quaternion::operator*(const double other) const {
+  return Quaternion{
+      m_r * other,
+      m_v(0) * other,
+      m_v(1) * other,
+      m_v(2) * other,
+  };
+}
+
+Quaternion Quaternion::operator/(const double other) const {
+  return Quaternion{
+      m_r / other,
+      m_v(0) / other,
+      m_v(1) / other,
+      m_v(2) / other,
+  };
+}
 
 Quaternion Quaternion::operator*(const Quaternion& other) const {
   // https://en.wikipedia.org/wiki/Quaternion#Scalar_and_vector_parts
@@ -26,24 +64,101 @@ Quaternion Quaternion::operator*(const Quaternion& other) const {
   // v = r₁v₂ + r₂v₁ + v₁ x v₂
   Eigen::Vector3d v = r1 * v2 + r2 * v1 + cross;
 
-  return Quaternion{r1 * r2 - v1.dot(v2), v(0), v(1), v(2)};
+  return Quaternion{// r = r₁r₂ − v₁ ⋅ v₂
+                    r1 * r2 - v1.dot(v2),
+                    // v = r₁v₂ + r₂v₁ + v₁ x v₂
+                    v(0), v(1), v(2)};
 }
 
 bool Quaternion::operator==(const Quaternion& other) const {
-  return std::abs(m_r * other.m_r + m_v.dot(other.m_v)) > 1.0 - 1E-9;
+  return std::abs(Dot(other) - Norm() * other.Norm()) < 1e-9 &&
+         std::abs(Norm() - other.Norm()) < 1e-9;
+}
+
+Quaternion Quaternion::Conjugate() const {
+  return Quaternion{W(), -X(), -Y(), -Z()};
+}
+
+double Quaternion::Dot(const Quaternion& other) const {
+  return W() * other.W() + m_v.dot(other.m_v);
 }
 
 Quaternion Quaternion::Inverse() const {
-  return Quaternion{m_r, -m_v(0), -m_v(1), -m_v(2)};
+  double norm = Norm();
+  return Conjugate() / (norm * norm);
+}
+
+double Quaternion::Norm() const {
+  return std::sqrt(Dot(*this));
 }
 
 Quaternion Quaternion::Normalize() const {
-  double norm = std::sqrt(W() * W() + X() * X() + Y() * Y() + Z() * Z());
+  double norm = Norm();
   if (norm == 0.0) {
     return Quaternion{};
   } else {
-    return Quaternion{W() / norm, X() / norm, Y() / norm, Z() / norm};
+    return Quaternion{W(), X(), Y(), Z()} / norm;
   }
+}
+
+Quaternion Quaternion::Pow(const double other) const {
+  return (Log() * other).Exp();
+}
+
+Quaternion Quaternion::Exp(const Quaternion& other) const {
+  return other.Exp() * *this;
+}
+
+Quaternion Quaternion::Exp() const {
+  double scalar = std::exp(m_r);
+
+  double axial_magnitude = m_v.norm();
+  double cosine = std::cos(axial_magnitude);
+
+  double axial_scalar;
+
+  if (axial_magnitude < 1e-9) {
+    // Taylor series of sin(x)/x near x=0: 1 − x²/6 + x⁴/120 + O(n⁶)
+    double axial_magnitude_sq = axial_magnitude * axial_magnitude;
+    double axial_magnitude_sq_sq = axial_magnitude_sq * axial_magnitude_sq;
+    axial_scalar =
+        1.0 - axial_magnitude_sq / 6.0 + axial_magnitude_sq_sq / 120.0;
+  } else {
+    axial_scalar = std::sin(axial_magnitude) / axial_magnitude;
+  }
+
+  return Quaternion(cosine * scalar, X() * axial_scalar * scalar,
+                    Y() * axial_scalar * scalar, Z() * axial_scalar * scalar);
+}
+
+Quaternion Quaternion::Log(const Quaternion& other) const {
+  return (other * Inverse()).Log();
+}
+
+Quaternion Quaternion::Log() const {
+  double norm = Norm();
+  double scalar = std::log(norm);
+
+  double v_norm = m_v.norm();
+
+  double s_norm = W() / norm;
+
+  if (std::abs(s_norm + 1) < 1e-9) {
+    return Quaternion{scalar, -std::numbers::pi, 0, 0};
+  }
+
+  double v_scalar;
+
+  if (v_norm < 1e-9) {
+    // Taylor series expansion of atan2(y / x) / y around y = 0 = 1/x -
+    // y^2/3*x^3 + O(y^4)
+    v_scalar = 1.0 / W() - 1.0 / 3.0 * v_norm * v_norm / (W() * W() * W());
+  } else {
+    v_scalar = std::atan2(v_norm, W()) / v_norm;
+  }
+
+  return Quaternion{scalar, v_scalar * m_v(0), v_scalar * m_v(1),
+                    v_scalar * m_v(2)};
 }
 
 double Quaternion::W() const {
@@ -78,6 +193,30 @@ Eigen::Vector3d Quaternion::ToRotationVector() const {
       return 2.0 * std::atan2(norm, W()) / norm * m_v;
     }
   }
+}
+
+Quaternion Quaternion::FromRotationVector(const Eigen::Vector3d& rvec) {
+  // 𝑣⃗ = θ * v̂
+  // v̂ = 𝑣⃗ / θ
+
+  // 𝑞 = std::cos(θ/2) + std::sin(θ/2) * v̂
+  // 𝑞 = std::cos(θ/2) + std::sin(θ/2) / θ * 𝑣⃗
+
+  double theta = rvec.norm();
+  double cos = std::cos(theta / 2);
+
+  double axial_scalar;
+
+  if (theta < 1e-9) {
+    // taylor series expansion of sin(θ/2) / θ around θ = 0 = 1/2 - θ²/48 +
+    // O(θ⁴)
+    axial_scalar = 1.0 / 2.0 - theta * theta / 48.0;
+  } else {
+    axial_scalar = std::sin(theta / 2) / theta;
+  }
+
+  return Quaternion{cos, axial_scalar * rvec(0), axial_scalar * rvec(1),
+                    axial_scalar * rvec(2)};
 }
 
 void frc::to_json(wpi::json& json, const Quaternion& quaternion) {

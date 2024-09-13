@@ -6,7 +6,10 @@
 
 #include <cmath>
 
+#include <Eigen/Core>
 #include <wpi/json.h>
+
+#include "geometry3d.pb.h"
 
 using namespace frc;
 
@@ -21,27 +24,27 @@ namespace {
  * @param rotation The rotation vector.
  * @return The rotation vector as a 3x3 rotation matrix.
  */
-Matrixd<3, 3> RotationVectorToMatrix(const Vectord<3>& rotation) {
+Eigen::Matrix3d RotationVectorToMatrix(const Eigen::Vector3d& rotation) {
   // Given a rotation vector <a, b, c>,
   //         [ 0 -c  b]
   // Omega = [ c  0 -a]
   //         [-b  a  0]
-  return Matrixd<3, 3>{{0.0, -rotation(2), rotation(1)},
-                       {rotation(2), 0.0, -rotation(0)},
-                       {-rotation(1), rotation(0), 0.0}};
+  return Eigen::Matrix3d{{0.0, -rotation(2), rotation(1)},
+                         {rotation(2), 0.0, -rotation(0)},
+                         {-rotation(1), rotation(0), 0.0}};
 }
 }  // namespace
 
 Pose3d::Pose3d(Translation3d translation, Rotation3d rotation)
-    : m_translation(std::move(translation)), m_rotation(std::move(rotation)) {}
+    : m_translation{std::move(translation)}, m_rotation{std::move(rotation)} {}
 
 Pose3d::Pose3d(units::meter_t x, units::meter_t y, units::meter_t z,
                Rotation3d rotation)
-    : m_translation(x, y, z), m_rotation(std::move(rotation)) {}
+    : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
 
 Pose3d::Pose3d(const Pose2d& pose)
-    : m_translation(pose.X(), pose.Y(), 0_m),
-      m_rotation(0_rad, 0_rad, pose.Rotation().Radians()) {}
+    : m_translation{pose.X(), pose.Y(), 0_m},
+      m_rotation{0_rad, 0_rad, pose.Rotation().Radians()} {}
 
 Pose3d Pose3d::operator+(const Transform3d& other) const {
   return TransformBy(other);
@@ -58,6 +61,10 @@ Pose3d Pose3d::operator*(double scalar) const {
 
 Pose3d Pose3d::operator/(double scalar) const {
   return *this * (1.0 / scalar);
+}
+
+Pose3d Pose3d::RotateBy(const Rotation3d& other) const {
+  return {m_translation.RotateBy(other), m_rotation.RotateBy(other)};
 }
 
 Pose3d Pose3d::TransformBy(const Transform3d& other) const {

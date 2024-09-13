@@ -44,9 +44,13 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
 
   /** The state to drive a Relay to. */
   public enum Value {
+    /** Off. */
     kOff("Off"),
+    /** On. */
     kOn("On"),
+    /** Forward. */
     kForward("Forward"),
+    /** Reverse. */
     kReverse("Reverse");
 
     private final String m_prettyValue;
@@ -55,10 +59,21 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
       m_prettyValue = prettyValue;
     }
 
+    /**
+     * Returns the pretty string representation of the value.
+     *
+     * @return The pretty string representation of the value.
+     */
     public String getPrettyValue() {
       return m_prettyValue;
     }
 
+    /**
+     * Returns the value for a given pretty string.
+     *
+     * @param value The pretty string.
+     * @return The value or an empty optional if there is no corresponding value.
+     */
     public static Optional<Value> getValueOf(String value) {
       return Arrays.stream(Value.values()).filter(v -> v.m_prettyValue.equals(value)).findFirst();
     }
@@ -66,11 +81,11 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
 
   /** The Direction(s) that a relay is configured to operate in. */
   public enum Direction {
-    /** direction: both directions are valid. */
+    /** Both directions are valid. */
     kBoth,
-    /** direction: Only forward is valid. */
+    /** Only forward is valid. */
     kForward,
-    /** direction: only reverse is valid. */
+    /** Only reverse is valid. */
     kReverse
   }
 
@@ -110,6 +125,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * @param channel The channel number for this relay (0 - 3).
    * @param direction The direction that the Relay object will control.
    */
+  @SuppressWarnings("this-escape")
   public Relay(final int channel, Direction direction) {
     m_channel = channel;
     m_direction = requireNonNullParam(direction, "direction", "Relay");
@@ -279,6 +295,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    *
    * @param direction The direction for the relay to operate in
    */
+  @SuppressWarnings("this-escape")
   public void setDirection(Direction direction) {
     requireNonNullParam(direction, "direction", "setDirection");
     if (m_direction == direction) {

@@ -5,6 +5,8 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -23,6 +25,8 @@ import java.util.ConcurrentModificationException;
  * startCompetition(), at the appropriate times:
  *
  * <p>robotInit() -- provide for initialization at robot power-on
+ *
+ * <p>driverStationConnected() -- provide for initialization the first time the DS is connected
  *
  * <p>init() functions -- each of the following functions is called once when the appropriate mode
  * is entered:
@@ -68,7 +72,8 @@ public abstract class IterativeRobotBase extends RobotBase {
   private final double m_period;
   private final Watchdog m_watchdog;
   private boolean m_ntFlushEnabled = true;
-  private boolean m_lwEnabledInTest = true;
+  private boolean m_lwEnabledInTest;
+  private boolean m_calledDsConnected;
 
   /**
    * Constructor for IterativeRobotBase.
@@ -97,6 +102,14 @@ public abstract class IterativeRobotBase extends RobotBase {
    * never indicate that the code is ready, causing the robot to be bypassed in a match.
    */
   public void robotInit() {}
+
+  /**
+   * Code that needs to know the DS state should go here.
+   *
+   * <p>Users should override this method for initialization that needs to occur after the DS is
+   * connected, such as needing the alliance information.
+   */
+  public void driverStationConnected() {}
 
   /**
    * Robot-wide simulation initialization code should go here.
@@ -246,15 +259,21 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_ntFlushEnabled = enabled;
   }
 
+  private boolean m_reportedLw;
+
   /**
    * Sets whether LiveWindow operation is enabled during test mode. Calling
    *
-   * @param testLW True to enable, false to disable. Defaults to true.
+   * @param testLW True to enable, false to disable. Defaults to false.
    * @throws ConcurrentModificationException if this is called during test mode.
    */
   public void enableLiveWindowInTest(boolean testLW) {
     if (isTestEnabled()) {
       throw new ConcurrentModificationException("Can't configure test mode while in test mode!");
+    }
+    if (!m_reportedLw && testLW) {
+      HAL.report(tResourceType.kResourceType_SmartDashboard, tInstances.kSmartDashboard_LiveWindow);
+      m_reportedLw = true;
     }
     m_lwEnabledInTest = testLW;
   }
@@ -277,6 +296,7 @@ public abstract class IterativeRobotBase extends RobotBase {
     return m_period;
   }
 
+  /** Loop function. */
   protected void loopFunc() {
     DriverStation.refreshData();
     m_watchdog.reset();
@@ -293,6 +313,11 @@ public abstract class IterativeRobotBase extends RobotBase {
       mode = Mode.kTeleop;
     } else if (m_word.isTest()) {
       mode = Mode.kTest;
+    }
+
+    if (!m_calledDsConnected && m_word.isDSAttached()) {
+      m_calledDsConnected = true;
+      driverStationConnected();
     }
 
     // If mode changed, call mode exit and entry functions

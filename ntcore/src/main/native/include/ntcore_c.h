@@ -16,6 +16,8 @@
 extern "C" {
 #endif
 
+struct WPI_DataLog;
+
 /**
  * @defgroup ntcore_c_api ntcore C API
  *
@@ -63,7 +65,11 @@ enum NT_Type {
 };
 
 /** NetworkTables entry flags. */
-enum NT_EntryFlags { NT_PERSISTENT = 0x01, NT_RETAINED = 0x02 };
+enum NT_EntryFlags {
+  NT_PERSISTENT = 0x01,
+  NT_RETAINED = 0x02,
+  NT_UNCACHED = 0x04
+};
 
 /** NetworkTables logging levels. */
 enum NT_LogLevel {
@@ -361,6 +367,14 @@ struct NT_PubSubOptions {
    * internal publisher.
    */
   NT_Bool excludeSelf;
+
+  /**
+   * For subscriptions, don't share the existence of the subscription with the
+   * network. Note this means updates will not be received from the network
+   * unless another subscription overlaps with this one, and the subscription
+   * will not appear in metatopics.
+   */
+  NT_Bool hidden;
 };
 
 /**
@@ -459,6 +473,24 @@ uint64_t NT_GetEntryLastChange(NT_Entry entry);
 void NT_GetEntryValue(NT_Entry entry, struct NT_Value* value);
 
 /**
+ * Get Entry Value.
+ *
+ * Returns copy of current entry value.
+ * Note that one of the type options is "unassigned".
+ *
+ * @param entry     entry handle
+ * @param types     bitmask of NT_Type values; 0 is treated specially
+ *                  as a "don't care"
+ * @param value     storage for returned entry value
+ *
+ * It is the caller's responsibility to free value once it's no longer
+ * needed (the utility function NT_DisposeValue() is useful for this
+ * purpose).
+ */
+void NT_GetEntryValueType(NT_Entry entry, unsigned int types,
+                          struct NT_Value* value);
+
+/**
  * Set Default Entry Value.
  *
  * Returns copy of current entry value if it exists.
@@ -511,6 +543,21 @@ unsigned int NT_GetEntryFlags(NT_Entry entry);
  * @return entry value array; returns NULL and count=0 if no new values
  */
 struct NT_Value* NT_ReadQueueValue(NT_Handle subentry, size_t* count);
+
+/**
+ * Read Entry Queue.
+ *
+ * Returns new entry values since last call. The returned array must be freed
+ * using NT_DisposeValueArray().
+ *
+ * @param subentry     subscriber or entry handle
+ * @param types        bitmask of NT_Type values; 0 is treated specially
+ *                     as a "don't care"
+ * @param count        count of items in returned array (output)
+ * @return entry value array; returns NULL and count=0 if no new values
+ */
+struct NT_Value* NT_ReadQueueValueType(NT_Handle subentry, unsigned int types,
+                                       size_t* count);
 
 /** @} */
 
@@ -682,6 +729,24 @@ void NT_SetTopicRetained(NT_Topic topic, NT_Bool value);
  * @return retained property value
  */
 NT_Bool NT_GetTopicRetained(NT_Topic topic);
+
+/**
+ * Sets the cached property of a topic.  If true, the server and clients will
+ * store the latest value, allowing the value to be read (and not just accessed
+ * through event queues and listeners).
+ *
+ * @param topic topic handle
+ * @param value True for cached, false for not cached
+ */
+void NT_SetTopicCached(NT_Topic topic, NT_Bool value);
+
+/**
+ * Gets the cached property of a topic.
+ *
+ * @param topic topic handle
+ * @return cached property value
+ */
+NT_Bool NT_GetTopicCached(NT_Topic topic);
 
 /**
  * Determine if topic exists (e.g. has at least one publisher).
@@ -1348,6 +1413,54 @@ void NT_SetNow(int64_t timestamp);
 /** @} */
 
 /**
+ * @defgroup ntcore_data_logger_cfunc Data Logger Functions
+ * @{
+ */
+
+/**
+ * Starts logging entry changes to a DataLog.
+ *
+ * @param inst instance handle
+ * @param log data log object; lifetime must extend until StopEntryDataLog is
+ *            called or the instance is destroyed
+ * @param prefix only store entries with names that start with this prefix;
+ *               the prefix is not included in the data log entry name
+ * @param logPrefix prefix to add to data log entry names
+ * @return Data logger handle
+ */
+NT_DataLogger NT_StartEntryDataLog(NT_Inst inst, struct WPI_DataLog* log,
+                                   const char* prefix, const char* logPrefix);
+
+/**
+ * Stops logging entry changes to a DataLog.
+ *
+ * @param logger data logger handle
+ */
+void NT_StopEntryDataLog(NT_DataLogger logger);
+
+/**
+ * Starts logging connection changes to a DataLog.
+ *
+ * @param inst instance handle
+ * @param log data log object; lifetime must extend until StopConnectionDataLog
+ *            is called or the instance is destroyed
+ * @param name data log entry name
+ * @return Data logger handle
+ */
+NT_ConnectionDataLogger NT_StartConnectionDataLog(NT_Inst inst,
+                                                  struct WPI_DataLog* log,
+                                                  const char* name);
+
+/**
+ * Stops logging connection changes to a DataLog.
+ *
+ * @param logger data logger handle
+ */
+void NT_StopConnectionDataLog(NT_ConnectionDataLogger logger);
+
+/** @} */
+
+/**
  * @defgroup ntcore_logger_cfunc Logger Functions
  * @{
  */
@@ -1382,6 +1495,44 @@ NT_Listener NT_AddLogger(NT_Inst inst, unsigned int min_level,
  */
 NT_Listener NT_AddPolledLogger(NT_ListenerPoller poller, unsigned int min_level,
                                unsigned int max_level);
+
+/** @} */
+
+/**
+ * @defgroup ntcore_schema_cfunc Schema Functions
+ * @{
+ */
+
+/**
+ * Returns whether there is a data schema already registered with the given
+ * name. This does NOT perform a check as to whether the schema has already
+ * been published by another node on the network.
+ *
+ * @param inst instance
+ * @param name Name (the string passed as the data type for topics using this
+ *             schema)
+ * @return True if schema already registered
+ */
+NT_Bool NT_HasSchema(NT_Inst inst, const char* name);
+
+/**
+ * Registers a data schema.  Data schemas provide information for how a
+ * certain data type string can be decoded.  The type string of a data schema
+ * indicates the type of the schema itself (e.g. "protobuf" for protobuf
+ * schemas, "struct" for struct schemas, etc). In NetworkTables, schemas are
+ * published just like normal topics, with the name being generated from the
+ * provided name: "/.schema/<name>".  Duplicate calls to this function with
+ * the same name are silently ignored.
+ *
+ * @param inst instance
+ * @param name Name (the string passed as the data type for topics using this
+ *             schema)
+ * @param type Type of schema (e.g. "protobuf", "struct", etc)
+ * @param schema Schema data
+ * @param schemaSize Size of schema data
+ */
+void NT_AddSchema(NT_Inst inst, const char* name, const char* type,
+                  const uint8_t* schema, size_t schemaSize);
 
 /** @} */
 

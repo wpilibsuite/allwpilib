@@ -4,6 +4,7 @@
 
 #include "hal/HAL.h"
 
+#include <dlfcn.h>
 #include <signal.h>  // linux for kill
 #include <sys/prctl.h>
 #include <unistd.h>
@@ -33,6 +34,7 @@
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/roborio/HMB.h"
 #include "hal/roborio/InterruptManager.h"
 #include "visa/visa.h"
 
@@ -45,6 +47,11 @@ static uint64_t dsStartTime;
 static char roboRioCommentsString[64];
 static size_t roboRioCommentsStringSize;
 static bool roboRioCommentsStringInitialized;
+
+static int32_t teamNumber = -1;
+
+static const volatile HAL_HMBData* hmbBuffer;
+#define HAL_HMB_TIMESTAMP_OFFSET 5
 
 using namespace hal;
 
@@ -76,6 +83,7 @@ void InitializeHAL() {
   InitializeFRCDriverStation();
   InitializeI2C();
   InitializeInterrupts();
+  InitializeLEDs();
   InitializeMain();
   InitializeNotifier();
   InitializeCTREPDP();
@@ -349,27 +357,61 @@ size_t HAL_GetComments(char* buffer, size_t size) {
   return toCopy;
 }
 
+void InitializeTeamNumber(void) {
+  char hostnameBuf[25];
+  auto status = gethostname(hostnameBuf, sizeof(hostnameBuf));
+  if (status != 0) {
+    teamNumber = 0;
+    return;
+  }
+
+  std::string_view hostname{hostnameBuf, sizeof(hostnameBuf)};
+
+  // hostname is frc-{TEAM}-roborio
+  // Split string around '-' (max of 2 splits), take the second element of the
+  // resulting array.
+  wpi::SmallVector<std::string_view> elements;
+  wpi::split(hostname, elements, "-", 2);
+  if (elements.size() < 3) {
+    teamNumber = 0;
+    return;
+  }
+
+  teamNumber = wpi::parse_integer<int32_t>(elements[1], 10).value_or(0);
+}
+
+int32_t HAL_GetTeamNumber(void) {
+  if (teamNumber == -1) {
+    InitializeTeamNumber();
+  }
+  return teamNumber;
+}
+
 uint64_t HAL_GetFPGATime(int32_t* status) {
   hal::init::CheckInit();
-  if (!global) {
+  if (!hmbBuffer) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
   }
-  *status = 0;
-  uint64_t upper1 = global->readLocalTimeUpper(status);
-  uint32_t lower = global->readLocalTime(status);
-  uint64_t upper2 = global->readLocalTimeUpper(status);
-  if (*status != 0) {
-    return 0;
-  }
+
+  asm("dmb");
+  uint64_t upper1 = hmbBuffer->Timestamp.Upper;
+  asm("dmb");
+  uint32_t lower = hmbBuffer->Timestamp.Lower;
+  asm("dmb");
+  uint64_t upper2 = hmbBuffer->Timestamp.Upper;
+
   if (upper1 != upper2) {
     // Rolled over between the lower call, reread lower
-    lower = global->readLocalTime(status);
-    if (*status != 0) {
-      return 0;
-    }
+    asm("dmb");
+    lower = hmbBuffer->Timestamp.Lower;
   }
-  return (upper2 << 32) + lower;
+  // 5 is added here because the time to write from the FPGA
+  // to the HMB buffer is longer then the time to read
+  // from the time register. This would cause register based
+  // timestamps to be ahead of HMB timestamps, which could
+  // be very bad.
+  return (upper2 << 32) + lower + HAL_HMB_TIMESTAMP_OFFSET;
 }
 
 uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
@@ -423,6 +465,21 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return !(watchdog->readStatus_PowerAlive(status));
 }
 
+HAL_Bool HAL_GetRSLState(int32_t* status) {
+  hal::init::CheckInit();
+  if (!global) {
+    *status = NiFpga_Status_ResourceNotInitialized;
+    return false;
+  }
+  return global->readLEDs_RSL(status);
+}
+
+HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
+  uint8_t timeWasSet = 0;
+  *status = FRC_NetworkCommunication_getTimeWasSet(&timeWasSet);
+  return timeWasSet != 0;
+}
+
 static bool killExistingProgram(int timeout, int mode) {
   // Kill any previous robot programs
   std::fstream fs;
@@ -467,6 +524,35 @@ static bool killExistingProgram(int timeout, int mode) {
   return true;
 }
 
+static bool SetupNowRio(void) {
+  nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
+      nLoadOut::getTargetClass();
+
+  int32_t status = 0;
+
+  Dl_info info;
+  status = dladdr(reinterpret_cast<void*>(tHMB::create), &info);
+  if (status == 0) {
+    fmt::print(stderr, "Failed to call dladdr on chipobject {}\n", dlerror());
+    return false;
+  }
+
+  void* chipObjectLibrary = dlopen(info.dli_fname, RTLD_LAZY);
+  if (chipObjectLibrary == nullptr) {
+    fmt::print(stderr, "Failed to call dlopen on chipobject {}\n", dlerror());
+    return false;
+  }
+
+  std::unique_ptr<tHMB> hmb;
+  hmb.reset(tHMB::create(&status));
+  if (hmb == nullptr) {
+    fmt::print(stderr, "Failed to open HMB on chipobject {}\n", status);
+    dlclose(chipObjectLibrary);
+    return false;
+  }
+  return wpi::impl::SetupNowRio(chipObjectLibrary, std::move(hmb));
+}
+
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
@@ -507,10 +593,27 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     setNewDataSem(nullptr);
   });
 
-  nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
-      nLoadOut::getTargetClass();
+  if (!SetupNowRio()) {
+    fmt::print(stderr,
+               "Failed to run SetupNowRio(). This is a fatal error. The "
+               "process is being terminated.\n");
+    std::fflush(stderr);
+    // Attempt to force a segfault to get a better java log
+    *reinterpret_cast<int*>(0) = 0;
+    // If that fails, terminate
+    std::terminate();
+    return false;
+  }
 
   int32_t status = 0;
+
+  HAL_InitializeHMB(&status);
+  if (status != 0) {
+    fmt::print(stderr, "Failed to open HAL HMB, status code {}\n", status);
+    return false;
+  }
+  hmbBuffer = HAL_GetHMBBuffer();
+
   global.reset(tGlobal::create(&status));
   watchdog.reset(tSysWatchdog::create(&status));
 
@@ -533,21 +636,6 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   if (status != 0) {
     return false;
   }
-
-  // Set WPI_Now to use FPGA timestamp
-  wpi::SetNowImpl([]() -> uint64_t {
-    int32_t status = 0;
-    uint64_t rv = HAL_GetFPGATime(&status);
-    if (status != 0) {
-      fmt::print(stderr,
-                 "Call to HAL_GetFPGATime failed in wpi::Now() with status {}. "
-                 "Initialization might have failed. Time will not be correct\n",
-                 status);
-      std::fflush(stderr);
-      return 0u;
-    }
-    return rv;
-  });
 
   hal::WaitForInitialPacket();
 

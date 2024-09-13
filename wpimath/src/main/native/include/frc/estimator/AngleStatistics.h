@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <functional>
 #include <numbers>
 
 #include "frc/EigenCore.h"
@@ -15,7 +16,7 @@ namespace frc {
  * Subtracts a and b while normalizing the resulting value in the selected row
  * as if it were an angle.
  *
- * @tparam States The number of states.
+ * @tparam States Number of states.
  * @param a A vector to subtract from.
  * @param b A vector to subtract with.
  * @param angleStateIdx The row containing angles to be normalized.
@@ -33,7 +34,7 @@ Vectord<States> AngleResidual(const Vectord<States>& a,
  * Returns a function that subtracts two vectors while normalizing the resulting
  * value in the selected row as if it were an angle.
  *
- * @tparam States The number of states.
+ * @tparam States Number of states.
  * @param angleStateIdx The row containing angles to be normalized.
  */
 template <int States>
@@ -48,7 +49,7 @@ AngleResidual(int angleStateIdx) {
  * Adds a and b while normalizing the resulting value in the selected row as an
  * angle.
  *
- * @tparam States The number of states.
+ * @tparam States Number of states.
  * @param a A vector to add with.
  * @param b A vector to add with.
  * @param angleStateIdx The row containing angles to be normalized.
@@ -66,7 +67,7 @@ Vectord<States> AngleAdd(const Vectord<States>& a, const Vectord<States>& b,
  * Returns a function that adds two vectors while normalizing the resulting
  * value in the selected row as an angle.
  *
- * @tparam States The number of states.
+ * @tparam States Number of states.
  * @param angleStateIdx The row containing angles to be normalized.
  */
 template <int States>
@@ -81,7 +82,7 @@ AngleAdd(int angleStateIdx) {
  *
  * @tparam CovDim Dimension of covariance of sigma points after passing through
  *                the transform.
- * @tparam States The number of states.
+ * @tparam States Number of states.
  * @param sigmas Sigma points.
  * @param Wm Weights for the mean.
  * @param angleStatesIdx The row containing the angles.
@@ -112,7 +113,7 @@ Vectord<CovDim> AngleMean(const Matrixd<CovDim, 2 * States + 1>& sigmas,
  *
  * @tparam CovDim Dimension of covariance of sigma points after passing through
  *                the transform.
- * @tparam States The number of states.
+ * @tparam States Number of states.
  * @param angleStateIdx The row containing the angles.
  */
 template <int CovDim, int States>

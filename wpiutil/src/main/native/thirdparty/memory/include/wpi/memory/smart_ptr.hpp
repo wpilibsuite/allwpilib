@@ -1,6 +1,5 @@
-// Copyright (C) 2015-2021 Müller <jonathanmueller.dev@gmail.com>
-// This file is subject to the license terms in the LICENSE file
-// found in the top-level directory of this distribution.
+// Copyright (C) 2015-2023 Jonathan Müller and foonathan/memory contributors
+// SPDX-License-Identifier: Zlib
 
 #ifndef WPI_MEMORY_SMART_PTR_HPP_INCLUDED
 #define WPI_MEMORY_SMART_PTR_HPP_INCLUDED
@@ -192,18 +191,6 @@ namespace wpi
                                                detail::forward<RawAllocator>(alloc)),
                                            detail::forward<Args>(args)...);
         }
-
-#if !defined(DOXYGEN)
-#include "detail/container_node_sizes.hpp"
-#else
-        /// Contains the node size needed for a `std::shared_ptr`.
-        /// These classes are auto-generated and only available if the tools are build and without cross-compiling.
-        /// \ingroup adapter
-        template <typename T>
-        struct shared_ptr_node_size : std::integral_constant<std::size_t, implementation_defined>
-        {
-        };
-#endif
     } // namespace memory
 } // namespace wpi
 

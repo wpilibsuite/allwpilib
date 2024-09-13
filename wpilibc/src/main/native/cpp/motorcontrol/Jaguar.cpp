@@ -9,7 +9,7 @@
 using namespace frc;
 
 Jaguar::Jaguar(int channel) : PWMMotorController("Jaguar", channel) {
-  m_pwm.SetBounds(2.31, 1.55, 1.507, 1.454, 0.697);
+  m_pwm.SetBounds(2.31_ms, 1.55_ms, 1.507_ms, 1.454_ms, 0.697_ms);
   m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();

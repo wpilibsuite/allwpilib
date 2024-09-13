@@ -9,7 +9,7 @@
 using namespace frc;
 
 DMC60::DMC60(int channel) : PWMMotorController("DMC60", channel) {
-  m_pwm.SetBounds(2.004, 1.52, 1.50, 1.48, 0.997);
+  m_pwm.SetBounds(2.004_ms, 1.52_ms, 1.50_ms, 1.48_ms, 0.997_ms);
   m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();

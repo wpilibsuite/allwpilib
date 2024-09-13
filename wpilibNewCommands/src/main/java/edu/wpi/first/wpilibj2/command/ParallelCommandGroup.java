@@ -17,8 +17,7 @@ import java.util.Map;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-@SuppressWarnings("removal")
-public class ParallelCommandGroup extends CommandGroupBase {
+public class ParallelCommandGroup extends Command {
   // maps commands in this composition to whether they are still running
   private final Map<Command, Boolean> m_commands = new HashMap<>();
   private boolean m_runWhenDisabled = true;
@@ -35,7 +34,11 @@ public class ParallelCommandGroup extends CommandGroupBase {
     addCommands(commands);
   }
 
-  @Override
+  /**
+   * Adds the given commands to the group.
+   *
+   * @param commands Commands to add to the group.
+   */
   public final void addCommands(Command... commands) {
     if (m_commands.containsValue(true)) {
       throw new IllegalStateException(

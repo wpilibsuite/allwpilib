@@ -4,25 +4,35 @@
 
 package edu.wpi.first.math.controller;
 
+import edu.wpi.first.math.DARE;
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.StateSpaceUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N5;
+import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.trajectory.Trajectory;
 
 /**
  * The linear time-varying differential drive controller has a similar form to the LQR, but the
- * model used to compute the controller gain is the nonlinear model linearized around the
- * drivetrain's current state. We precomputed gains for important places in our state-space, then
- * interpolated between them with a LUT to save computational resources.
+ * model used to compute the controller gain is the nonlinear differential drive model linearized
+ * around the drivetrain's current state. We precompute gains for important places in our
+ * state-space, then interpolate between them with a lookup table to save computational resources.
+ *
+ * <p>This controller has a flat hierarchy with pose and wheel velocity references and voltage
+ * outputs. This is different from a Ramsete controller's nested hierarchy where the top-level
+ * controller has a pose reference and chassis velocity command outputs, and the low-level
+ * controller has wheel velocity references and voltage outputs. Flat hierarchies are easier to tune
+ * in one shot. Furthermore, this controller is more optimal in the "least-squares error" sense than
+ * a controller based on Ramsete.
  *
  * <p>See section 8.7 in Controls Engineering in FRC for a derivation of the control law we used
  * shown in theorem 8.7.4.
@@ -55,13 +65,18 @@ public class LTVDifferentialDriveController {
   /**
    * Constructs a linear time-varying differential drive controller.
    *
+   * <p>See <a
+   * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning">https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning</a>
+   * for how to select the tolerances.
+   *
    * @param plant The differential drive velocity plant.
    * @param trackwidth The distance between the differential drive's left and right wheels in
    *     meters.
    * @param qelems The maximum desired error tolerance for each state.
    * @param relems The maximum desired control effort for each input.
    * @param dt Discretization timestep in seconds.
-   * @throws IllegalArgumentException if max velocity of plant with 12 V input &lt;= 0.
+   * @throws IllegalArgumentException if max velocity of plant with 12 V input &lt;= 0 m/s or &gt;=
+   *     15 m/s.
    */
   public LTVDifferentialDriveController(
       LinearSystem<N2, N2, N2> plant,
@@ -74,46 +89,48 @@ public class LTVDifferentialDriveController {
     // Control law derivation is in section 8.7 of
     // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
     var A =
-        new MatBuilder<>(Nat.N5(), Nat.N5())
-            .fill(
-                0.0,
-                0.0,
-                0.0,
-                0.5,
-                0.5,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                -1.0 / m_trackwidth,
-                1.0 / m_trackwidth,
-                0.0,
-                0.0,
-                0.0,
-                plant.getA(0, 0),
-                plant.getA(0, 1),
-                0.0,
-                0.0,
-                0.0,
-                plant.getA(1, 0),
-                plant.getA(1, 1));
+        MatBuilder.fill(
+            Nat.N5(),
+            Nat.N5(),
+            0.0,
+            0.0,
+            0.0,
+            0.5,
+            0.5,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -1.0 / m_trackwidth,
+            1.0 / m_trackwidth,
+            0.0,
+            0.0,
+            0.0,
+            plant.getA(0, 0),
+            plant.getA(0, 1),
+            0.0,
+            0.0,
+            0.0,
+            plant.getA(1, 0),
+            plant.getA(1, 1));
     var B =
-        new MatBuilder<>(Nat.N5(), Nat.N2())
-            .fill(
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                plant.getB(0, 0),
-                plant.getB(0, 1),
-                plant.getB(1, 0),
-                plant.getB(1, 1));
+        MatBuilder.fill(
+            Nat.N5(),
+            Nat.N2(),
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            plant.getB(0, 0),
+            plant.getB(0, 1),
+            plant.getB(1, 0),
+            plant.getB(1, 1));
     var Q = StateSpaceUtil.makeCostMatrix(qelems);
     var R = StateSpaceUtil.makeCostMatrix(relems);
 
@@ -122,26 +139,41 @@ public class LTVDifferentialDriveController {
     // Ax = -Bu
     // x = -A⁻¹Bu
     double maxV =
-        plant
-            .getA()
-            .solve(plant.getB().times(new MatBuilder<>(Nat.N2(), Nat.N1()).fill(12.0, 12.0)))
-            .times(-1.0)
-            .get(0, 0);
+        plant.getA().solve(plant.getB().times(VecBuilder.fill(12.0, 12.0))).times(-1.0).get(0, 0);
 
     if (maxV <= 0.0) {
       throw new IllegalArgumentException(
-          "Max velocity of plant with 12 V input must be greater than zero.");
+          "Max velocity of plant with 12 V input must be greater than 0 m/s.");
+    }
+    if (maxV >= 15.0) {
+      throw new IllegalArgumentException(
+          "Max velocity of plant with 12 V input must be less than 15 m/s.");
     }
 
     for (double velocity = -maxV; velocity < maxV; velocity += 0.01) {
       // The DARE is ill-conditioned if the velocity is close to zero, so don't
       // let the system stop.
       if (Math.abs(velocity) < 1e-4) {
-        m_table.put(velocity, new Matrix<>(Nat.N2(), Nat.N5()));
+        A.set(State.kY.value, State.kHeading.value, 1e-4);
       } else {
         A.set(State.kY.value, State.kHeading.value, velocity);
-        m_table.put(velocity, new LinearQuadraticRegulator<N5, N2, N5>(A, B, Q, R, dt).getK());
       }
+
+      var discABPair = Discretization.discretizeAB(A, B, dt);
+      var discA = discABPair.getFirst();
+      var discB = discABPair.getSecond();
+
+      var S = DARE.dareDetail(discA, discB, Q, R);
+
+      // K = (BᵀSB + R)⁻¹BᵀSA
+      m_table.put(
+          velocity,
+          discB
+              .transpose()
+              .times(S)
+              .times(discB)
+              .plus(R)
+              .solve(discB.transpose().times(S).times(discA)));
     }
   }
 
@@ -168,13 +200,12 @@ public class LTVDifferentialDriveController {
   public void setTolerance(
       Pose2d poseTolerance, double leftVelocityTolerance, double rightVelocityTolerance) {
     m_tolerance =
-        new MatBuilder<>(Nat.N5(), Nat.N1())
-            .fill(
-                poseTolerance.getX(),
-                poseTolerance.getY(),
-                poseTolerance.getRotation().getRadians(),
-                leftVelocityTolerance,
-                rightVelocityTolerance);
+        VecBuilder.fill(
+            poseTolerance.getX(),
+            poseTolerance.getY(),
+            poseTolerance.getRotation().getRadians(),
+            leftVelocityTolerance,
+            rightVelocityTolerance);
   }
 
   /**
@@ -201,13 +232,12 @@ public class LTVDifferentialDriveController {
     // This implements the linear time-varying differential drive controller in
     // theorem 9.6.3 of https://tavsys.net/controls-in-frc.
     var x =
-        new MatBuilder<>(Nat.N5(), Nat.N1())
-            .fill(
-                currentPose.getX(),
-                currentPose.getY(),
-                currentPose.getRotation().getRadians(),
-                leftVelocity,
-                rightVelocity);
+        VecBuilder.fill(
+            currentPose.getX(),
+            currentPose.getY(),
+            currentPose.getRotation().getRadians(),
+            leftVelocity,
+            rightVelocity);
 
     var inRobotFrame = Matrix.eye(Nat.N5());
     inRobotFrame.set(0, 0, Math.cos(x.get(State.kHeading.value, 0)));
@@ -216,13 +246,12 @@ public class LTVDifferentialDriveController {
     inRobotFrame.set(1, 1, Math.cos(x.get(State.kHeading.value, 0)));
 
     var r =
-        new MatBuilder<>(Nat.N5(), Nat.N1())
-            .fill(
-                poseRef.getX(),
-                poseRef.getY(),
-                poseRef.getRotation().getRadians(),
-                leftVelocityRef,
-                rightVelocityRef);
+        VecBuilder.fill(
+            poseRef.getX(),
+            poseRef.getY(),
+            poseRef.getRotation().getRadians(),
+            leftVelocityRef,
+            rightVelocityRef);
     m_error = r.minus(x);
     m_error.set(
         State.kHeading.value, 0, MathUtil.angleModulus(m_error.get(State.kHeading.value, 0)));

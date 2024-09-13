@@ -74,7 +74,7 @@ public final class SendableCameraWrapper implements Sendable, AutoCloseable {
     }
   }
 
-  /*
+  /**
    * Sets NetworkTable instance used for camera publisher entries.
    *
    * @param inst NetworkTable instance

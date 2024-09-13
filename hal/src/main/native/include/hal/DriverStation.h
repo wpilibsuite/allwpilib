@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <stddef.h>  //NOLINT
+
 #include <wpi/Synchronization.h>
 
 #include "hal/DriverStationTypes.h"
@@ -32,6 +34,7 @@ extern "C" {
  * @param callStack the callstack of the error
  * @param printMsg  true to print the error message to stdout as well as to the
  * DS
+ * @return the error code, or 0 for success
  */
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
@@ -48,13 +51,14 @@ void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size));
  * Sends a line to the driver station console.
  *
  * @param line the line to send (null terminated)
+ * @return the error code, or 0 for success
  */
 int32_t HAL_SendConsoleLine(const char* line);
 
 /**
  * Gets the current control word of the driver station.
  *
- * The control work contains the robot state.
+ * The control word contains the robot state.
  *
  * @param controlWord the control word (out)
  * @return the error code, or 0 for success
@@ -117,7 +121,7 @@ int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc);
 
 /**
- * Gets is a specific joystick is considered to be an XBox controller.
+ * Gets whether a specific joystick is considered to be an XBox controller.
  *
  * @param joystickNum the joystick number
  * @return true if xbox, false otherwise
@@ -179,25 +183,32 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble);
 
 /**
- * Returns the approximate match time.
- *
- * The FMS does not send an official match time to the robots, but does send
- * an approximate match time. The value will count down the time remaining in
- * the current period (auto or teleop).
- *
+ * Return the approximate match time. The FMS does not send an official match
+ * time to the robots, but does send an approximate match time. The value will
+ * count down the time remaining in the current period (auto or teleop).
  * Warning: This is not an official time (so it cannot be used to dispute ref
  * calls or guarantee that a function will trigger before the match ends).
  *
- * The Practice Match function of the DS approximates the behavior seen on
- * the field.
+ * <p>When connected to the real field, this number only changes in full integer
+ * increments, and always counts down.
+ *
+ * <p>When the DS is in practice mode, this number is a floating point number,
+ * and counts down.
+ *
+ * <p>When the DS is in teleop or autonomous mode, this number is a floating
+ * point number, and counts up.
+ *
+ * <p>Simulation matches DS behavior without an FMS connected.
  *
  * @param[out] status the error code, or 0 for success
- * @return time remaining in current match period (auto or teleop)
+ * @return Time remaining in current match period (auto or teleop) in seconds
  */
 double HAL_GetMatchTime(int32_t* status);
 
 /**
  * Gets if outputs are enabled by the control system.
+ *
+ * @return true if outputs are enabled
  */
 HAL_Bool HAL_GetOutputsEnabled(void);
 
@@ -209,6 +220,11 @@ HAL_Bool HAL_GetOutputsEnabled(void);
  */
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info);
 
+/**
+ * Refresh the DS control word.
+ *
+ * @return true if updated
+ */
 HAL_Bool HAL_RefreshDSData(void);
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle);

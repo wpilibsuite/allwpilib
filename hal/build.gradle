@@ -1,60 +1,9 @@
-def javaResourceFile = file("$buildDir/generated/java/edu/wpi/first/hal/FRCNetComm.java")
-def cppResourceFile = file("$buildDir/generated/headers/hal/FRCUsageReporting.h")
-
-def generateUsageReporting = tasks.register('generateUsageReporting') {
-    def javaBase = file('src/generate/FRCNetComm.java.in')
-    def cppBase = file('src/generate/FRCUsageReporting.h.in')
-
-    def instances = file('src/generate/Instances.txt')
-    def resourceType = file('src/generate/ResourceType.txt')
-
-    inputs.file(javaBase)
-    inputs.file(cppBase)
-    inputs.file(instances)
-    inputs.file(resourceType)
-
-    outputs.file(javaResourceFile)
-    outputs.file(cppResourceFile)
-
-    doLast {
-        def instanceTextJava = instances as String[]
-        def instanceTextCpp = instances as String[]
-        def resourceTextJava = resourceType as String[]
-        def resourceTextCpp = resourceType as String[]
-
-        instanceTextJava = instanceTextJava.collect {
-            "    public static final int ${it};"
-        }.join('\n')
-
-        instanceTextCpp = instanceTextCpp.collect {
-            "    ${it},"
-        }.join('\n')
-
-        resourceTextJava = resourceTextJava.collect {
-            "    public static final int ${it};"
-        }.join('\n')
-
-        resourceTextCpp = resourceTextCpp.collect {
-            "    ${it},"
-        }.join('\n')
-
-        javaResourceFile.text = javaBase.text.replace('${usage_reporting_types}', resourceTextJava).replace('${usage_reporting_instances}', instanceTextJava)
-        cppResourceFile.text = cppBase.text.replace('${usage_reporting_types_cpp}', resourceTextCpp).replace('${usage_reporting_instances_cpp}', instanceTextCpp)
-    }
-}
-
 ext {
     addHalDependency = { binary, shared->
-        binary.tasks.withType(AbstractNativeSourceCompileTask) {
-            it.dependsOn generateUsageReporting
-        }
         binary.lib project: ':hal', library: 'hal', linkage: shared
     }
 
     addHalJniDependency = { binary->
-        binary.tasks.withType(AbstractNativeSourceCompileTask) {
-            it.dependsOn generateUsageReporting
-        }
         binary.lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
     }
 
@@ -62,16 +11,8 @@ ext {
     setBaseName = 'wpiHal'
     devMain = 'edu.wpi.first.hal.DevMain'
     niLibraries = true
-    generatedHeaders = "$buildDir/generated/headers"
-    jniSplitSetup = {
-        it.tasks.withType(AbstractNativeSourceCompileTask) {
-            it.dependsOn generateUsageReporting
-        }
-    }
+    generatedHeaders = "src/generated/main/native/include"
     splitSetup = {
-        it.tasks.withType(AbstractNativeSourceCompileTask) {
-            it.dependsOn generateUsageReporting
-        }
         if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
             it.sources {
                 athenaCpp(CppSourceSet) {
@@ -109,11 +50,7 @@ ext {
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
-sourceSets.main.java.srcDir "${buildDir}/generated/java/"
-
-compileJava {
-    dependsOn generateUsageReporting
-}
+sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 
 cppSourcesZip {
     from('src/main/native/athena') {
@@ -126,7 +63,6 @@ cppSourcesZip {
 }
 
 cppHeadersZip {
-    dependsOn generateUsageReporting
     from(generatedHeaders) {
         into '/'
     }
@@ -160,9 +96,6 @@ nativeUtils.exportsConfigs {
 model {
     binaries {
         all {
-            it.tasks.withType(AbstractNativeSourceCompileTask) {
-                it.dependsOn generateUsageReporting
-            }
             if (!(it instanceof NativeBinarySpec)) return
                 if (it.component.name != 'hal' && it.component.name != 'halBase') return
                 if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) return

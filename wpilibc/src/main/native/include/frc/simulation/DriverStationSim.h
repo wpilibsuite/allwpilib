@@ -26,7 +26,8 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore> RegisterEnabledCallback(
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterEnabledCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -51,8 +52,9 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterAutonomousCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterAutonomousCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Check if the DS is in autonomous.
@@ -76,7 +78,8 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore> RegisterTestCallback(
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterTestCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -101,7 +104,8 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore> RegisterEStopCallback(
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterEStopCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -126,8 +130,9 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterFmsAttachedCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterFmsAttachedCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Check if the FMS is connected.
@@ -151,8 +156,9 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterDsAttachedCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterDsAttachedCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Check if the DS is attached.
@@ -176,9 +182,9 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterAllianceStationIdCallback(NotifyCallback callback,
-                                    bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterAllianceStationIdCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Get the alliance station ID (color + number).
@@ -202,7 +208,8 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore> RegisterMatchTimeCallback(
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterMatchTimeCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**

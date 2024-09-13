@@ -4,12 +4,12 @@
 
 #include <vector>
 
+#include <gtest/gtest.h>
 #include <wpi/json.h>
 
 #include "frc/apriltag/AprilTag.h"
 #include "frc/apriltag/AprilTagFieldLayout.h"
 #include "frc/geometry/Pose3d.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

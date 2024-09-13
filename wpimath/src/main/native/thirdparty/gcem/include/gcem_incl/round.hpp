@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -20,6 +20,12 @@
 
 #ifndef _gcem_round_HPP
 #define _gcem_round_HPP
+
+#include <cmath>
+#include <type_traits>
+
+namespace gcem
+{
 
 namespace internal
 {
@@ -119,7 +125,13 @@ return_t<T>
 round(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::round_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::round(x);
+  }
+}
+
 }
 
 #endif

@@ -14,9 +14,11 @@
  * @{
  */
 
-// clang-format off
-HAL_ENUM(HAL_I2CPort) { HAL_I2C_kInvalid = -1, HAL_I2C_kOnboard, HAL_I2C_kMXP };
-// clang-format on
+HAL_ENUM(HAL_I2CPort) {
+  HAL_I2C_kInvalid = -1,
+  HAL_I2C_kOnboard,
+  HAL_I2C_kMXP
+};
 
 #ifdef __cplusplus
 namespace hal {

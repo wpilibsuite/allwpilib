@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include "Eigen/QR"
+#include <Eigen/QR>
 
 using namespace frc;
 

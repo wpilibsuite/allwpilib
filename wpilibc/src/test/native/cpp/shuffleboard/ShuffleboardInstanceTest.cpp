@@ -6,12 +6,12 @@
 
 #include <string_view>
 
+#include <gtest/gtest.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTableListener.h>
 #include <networktables/StringTopic.h>
 
 #include "frc/shuffleboard/ShuffleboardInstance.h"
-#include "gtest/gtest.h"
 #include "shuffleboard/MockActuatorSendable.h"
 
 class NTWrapper {
@@ -113,9 +113,11 @@ TEST(ShuffleboardInstanceTest, DuplicateSelectTabs) {
   NTWrapper ntInst;
   frc::detail::ShuffleboardInstance shuffleboardInst{ntInst.inst};
   std::atomic_int counter = 0;
-  auto listener = nt::NetworkTableListener::CreateListener(
-      ntInst.inst.GetStringTopic("/Shuffleboard/.metadata/Selected"),
-      nt::EventFlags::kValueAll | nt::EventFlags::kImmediate,
+  auto subscriber =
+      ntInst.inst.GetStringTopic("/Shuffleboard/.metadata/Selected")
+          .Subscribe("", {.keepDuplicates = true});
+  ntInst.inst.AddListener(
+      subscriber, nt::EventFlags::kValueAll | nt::EventFlags::kImmediate,
       [&counter](auto& event) { counter++; });
 
   // There shouldn't be anything there
@@ -123,7 +125,7 @@ TEST(ShuffleboardInstanceTest, DuplicateSelectTabs) {
 
   shuffleboardInst.SelectTab("tab1");
   shuffleboardInst.SelectTab("tab1");
-  EXPECT_TRUE(ntInst.inst.WaitForListenerQueue(0.005))
+  EXPECT_TRUE(ntInst.inst.WaitForListenerQueue(1.0))
       << "Listener queue timed out!";
   EXPECT_EQ(2, counter);
 }

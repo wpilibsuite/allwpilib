@@ -12,7 +12,3 @@ Storage::Storage() {
 frc2::CommandPtr Storage::RunCommand() {
   return Run([this] { m_motor.Set(1.0); }).WithName("Run");
 }
-
-bool Storage::IsFull() const {
-  return m_ballSensor.Get();
-}

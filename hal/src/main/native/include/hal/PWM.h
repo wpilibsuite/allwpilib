@@ -50,7 +50,7 @@ HAL_Bool HAL_CheckPWMChannel(int32_t channel);
 /**
  * Sets the configuration settings for the PWM channel.
  *
- * All values are in milliseconds.
+ * All values are in microseconds.
  *
  * @param[in] pwmPortHandle  the PWM handle
  * @param[in] maxPwm         the maximum PWM value
@@ -60,17 +60,15 @@ HAL_Bool HAL_CheckPWMChannel(int32_t channel);
  * @param[in] minPwm         the minimum PWM value
  * @param[out] status        Error status variable. 0 on success.
  */
-void HAL_SetPWMConfig(HAL_DigitalHandle pwmPortHandle, double maxPwm,
-                      double deadbandMaxPwm, double centerPwm,
-                      double deadbandMinPwm, double minPwm, int32_t* status);
+void HAL_SetPWMConfigMicroseconds(HAL_DigitalHandle pwmPortHandle,
+                                  int32_t maxPwm, int32_t deadbandMaxPwm,
+                                  int32_t centerPwm, int32_t deadbandMinPwm,
+                                  int32_t minPwm, int32_t* status);
 
 /**
- * Sets the raw configuration settings for the PWM channel.
+ * Gets the pwm configuration settings for the PWM channel.
  *
- * We recommend using HAL_SetPWMConfig() instead, as those values are properly
- * scaled. Usually used for values grabbed by HAL_GetPWMConfigRaw().
- *
- * Values are in raw FPGA units.
+ * Values are in microseconds.
  *
  * @param[in] pwmPortHandle  the PWM handle
  * @param[in] maxPwm         the maximum PWM value
@@ -80,29 +78,10 @@ void HAL_SetPWMConfig(HAL_DigitalHandle pwmPortHandle, double maxPwm,
  * @param[in] minPwm         the minimum PWM value
  * @param[out] status        Error status variable. 0 on success.
  */
-void HAL_SetPWMConfigRaw(HAL_DigitalHandle pwmPortHandle, int32_t maxPwm,
-                         int32_t deadbandMaxPwm, int32_t centerPwm,
-                         int32_t deadbandMinPwm, int32_t minPwm,
-                         int32_t* status);
-
-/**
- * Gets the raw pwm configuration settings for the PWM channel.
- *
- * Values are in raw FPGA units. These units have the potential to change for
- * any FPGA release.
- *
- * @param[in] pwmPortHandle  the PWM handle
- * @param[in] maxPwm         the maximum PWM value
- * @param[in] deadbandMaxPwm the high range of the center deadband
- * @param[in] centerPwm      the center PWM value
- * @param[in] deadbandMinPwm the low range of the center deadband
- * @param[in] minPwm         the minimum PWM value
- * @param[out] status        Error status variable. 0 on success.
- */
-void HAL_GetPWMConfigRaw(HAL_DigitalHandle pwmPortHandle, int32_t* maxPwm,
-                         int32_t* deadbandMaxPwm, int32_t* centerPwm,
-                         int32_t* deadbandMinPwm, int32_t* minPwm,
-                         int32_t* status);
+void HAL_GetPWMConfigMicroseconds(HAL_DigitalHandle pwmPortHandle,
+                                  int32_t* maxPwm, int32_t* deadbandMaxPwm,
+                                  int32_t* centerPwm, int32_t* deadbandMinPwm,
+                                  int32_t* minPwm, int32_t* status);
 
 /**
  * Sets if the FPGA should output the center value if the input value is within
@@ -126,17 +105,16 @@ HAL_Bool HAL_GetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
                                      int32_t* status);
 
 /**
- * Sets a PWM channel to the desired value.
+ * Sets a PWM channel to the desired pulse width in microseconds.
  *
- * The values are in raw FPGA units, and have the potential to change with any
- * FPGA release.
  *
  * @param[in] pwmPortHandle the PWM handle
- * @param[in] value         the PWM value to set
+ * @param[in] microsecondPulseTime  the PWM value to set
  * @param[out] status       Error status variable. 0 on success.
  */
-void HAL_SetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t value,
-                   int32_t* status);
+void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
+                                     int32_t microsecondPulseTime,
+                                     int32_t* status);
 
 /**
  * Sets a PWM channel to the desired scaled value.
@@ -177,16 +155,14 @@ void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double position,
 void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status);
 
 /**
- * Gets a value from a PWM channel.
- *
- * The values are in raw FPGA units, and have the potential to change with any
- * FPGA release.
+ * Gets the current microsecond pulse time from a PWM channel.
  *
  * @param[in] pwmPortHandle the PWM handle
  * @param[out] status       Error status variable. 0 on success.
- * @return the current raw PWM value
+ * @return the current PWM microsecond pulse time
  */
-int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status);
+int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
+                                        int32_t* status);
 
 /**
  * Gets a scaled value from a PWM channel.
@@ -227,6 +203,14 @@ void HAL_LatchPWMZero(HAL_DigitalHandle pwmPortHandle, int32_t* status);
  */
 void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
                            int32_t* status);
+
+/**
+ * Sets the PWM output to be a continuous high signal while enabled.
+ *
+ * @param[in] pwmPortHandle the PWM handle.
+ * @param[out] status       Error status variable. 0 on success.
+ */
+void HAL_SetPWMAlwaysHighMode(HAL_DigitalHandle pwmPortHandle, int32_t* status);
 
 /**
  * Gets the loop timing of the PWM system.

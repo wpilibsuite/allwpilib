@@ -8,105 +8,53 @@
 
 #include <string_view>
 
-#include <wpi/raw_ostream.h>
+#include <wpi/function_ref.h>
+
+namespace wpi {
+class raw_ostream;
+}  // namespace wpi
 
 namespace nt::net {
 
-class BinaryWriter;
-class TextWriter;
-
 class WireConnection {
-  friend class TextWriter;
-  friend class BinaryWriter;
-
  public:
   virtual ~WireConnection() = default;
 
+  virtual unsigned int GetVersion() const = 0;
+
+  virtual void SendPing(uint64_t time) = 0;
+
   virtual bool Ready() const = 0;
 
-  virtual TextWriter SendText() = 0;
+  // These return <0 on error, 0 on success. On buffer full, a positive number
+  // is is returned indicating the number of previous messages (including this
+  // call) that were NOT sent, e.g. 1 if just this call to WriteText or
+  // WriteBinary was not sent, 2 if the this call and the *previous* call were
+  // not sent.
+  [[nodiscard]]
+  virtual int WriteText(
+      wpi::function_ref<void(wpi::raw_ostream& os)> writer) = 0;
+  [[nodiscard]]
+  virtual int WriteBinary(
+      wpi::function_ref<void(wpi::raw_ostream& os)> writer) = 0;
 
-  virtual BinaryWriter SendBinary() = 0;
+  // Flushes any pending buffers. Return value equivalent to
+  // WriteText/WriteBinary (e.g. 1 means the last WriteX call was not sent).
+  [[nodiscard]]
+  virtual int Flush() = 0;
 
-  virtual void Flush() = 0;
+  // These immediately send the data even if the buffer is full.
+  virtual void SendText(
+      wpi::function_ref<void(wpi::raw_ostream& os)> writer) = 0;
+  virtual void SendBinary(
+      wpi::function_ref<void(wpi::raw_ostream& os)> writer) = 0;
 
   virtual uint64_t GetLastFlushTime() const = 0;  // in microseconds
 
+  // Gets the timestamp of the last incoming data
+  virtual uint64_t GetLastReceivedTime() const = 0;  // in microseconds
+
   virtual void Disconnect(std::string_view reason) = 0;
-
- protected:
-  virtual void StartSendText() = 0;
-  virtual void FinishSendText() = 0;
-  virtual void StartSendBinary() = 0;
-  virtual void FinishSendBinary() = 0;
-};
-
-class TextWriter {
- public:
-  TextWriter(wpi::raw_ostream& os, WireConnection& wire)
-      : m_os{&os}, m_wire{&wire} {}
-  TextWriter(const TextWriter&) = delete;
-  TextWriter(TextWriter&& rhs) : m_os{rhs.m_os}, m_wire{rhs.m_wire} {
-    rhs.m_os = nullptr;
-    rhs.m_wire = nullptr;
-  }
-  TextWriter& operator=(const TextWriter&) = delete;
-  TextWriter& operator=(TextWriter&& rhs) {
-    m_os = rhs.m_os;
-    m_wire = rhs.m_wire;
-    rhs.m_os = nullptr;
-    rhs.m_wire = nullptr;
-    return *this;
-  }
-  ~TextWriter() {
-    if (m_os) {
-      m_wire->FinishSendText();
-    }
-  }
-
-  wpi::raw_ostream& Add() {
-    m_wire->StartSendText();
-    return *m_os;
-  }
-  WireConnection& wire() { return *m_wire; }
-
- private:
-  wpi::raw_ostream* m_os;
-  WireConnection* m_wire;
-};
-
-class BinaryWriter {
- public:
-  BinaryWriter(wpi::raw_ostream& os, WireConnection& wire)
-      : m_os{&os}, m_wire{&wire} {}
-  BinaryWriter(const BinaryWriter&) = delete;
-  BinaryWriter(BinaryWriter&& rhs) : m_os{rhs.m_os}, m_wire{rhs.m_wire} {
-    rhs.m_os = nullptr;
-    rhs.m_wire = nullptr;
-  }
-  BinaryWriter& operator=(const BinaryWriter&) = delete;
-  BinaryWriter& operator=(BinaryWriter&& rhs) {
-    m_os = rhs.m_os;
-    m_wire = rhs.m_wire;
-    rhs.m_os = nullptr;
-    rhs.m_wire = nullptr;
-    return *this;
-  }
-  ~BinaryWriter() {
-    if (m_wire) {
-      m_wire->FinishSendBinary();
-    }
-  }
-
-  wpi::raw_ostream& Add() {
-    m_wire->StartSendBinary();
-    return *m_os;
-  }
-  WireConnection& wire() { return *m_wire; }
-
- private:
-  wpi::raw_ostream* m_os;
-  WireConnection* m_wire;
 };
 
 }  // namespace nt::net

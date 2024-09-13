@@ -10,16 +10,13 @@
 #include <utility>
 
 #include <HALSimBaseWebSocketConnection.h>
+#include <wpi/json_fwd.h>
 #include <wpi/mutex.h>
 #include <wpinet/HttpWebSocketServerConnection.h>
 #include <wpinet/uv/AsyncFunction.h>
 #include <wpinet/uv/Buffer.h>
 
 #include "HALSimWeb.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace wpilibws {
 

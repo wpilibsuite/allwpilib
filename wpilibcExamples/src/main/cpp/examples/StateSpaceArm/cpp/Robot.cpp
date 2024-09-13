@@ -86,8 +86,8 @@ class Robot : public frc::TimedRobot {
   frc::PWMSparkMax m_motor{kMotorPort};
   frc::XboxController m_joystick{kJoystickPort};
 
-  frc::TrapezoidProfile<units::radians>::Constraints m_constraints{
-      45_deg_per_s, 90_deg_per_s / 1_s};
+  frc::TrapezoidProfile<units::radians> m_profile{
+      {45_deg_per_s, 90_deg_per_s / 1_s}};
 
   frc::TrapezoidProfile<units::radians>::State m_lastProfiledReference;
 
@@ -117,9 +117,7 @@ class Robot : public frc::TimedRobot {
       goal = {kLoweredPosition, 0_rad_per_s};
     }
     m_lastProfiledReference =
-        (frc::TrapezoidProfile<units::radians>(m_constraints, goal,
-                                               m_lastProfiledReference))
-            .Calculate(20_ms);
+        m_profile.Calculate(20_ms, m_lastProfiledReference, goal);
 
     m_loop.SetNextR(frc::Vectord<2>{m_lastProfiledReference.position.value(),
                                     m_lastProfiledReference.velocity.value()});

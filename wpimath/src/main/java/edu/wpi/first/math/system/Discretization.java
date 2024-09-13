@@ -9,6 +9,7 @@ import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Pair;
 import org.ejml.simple.SimpleMatrix;
 
+/** Discretization helper functions. */
 public final class Discretization {
   private Discretization() {
     // Utility class
@@ -104,93 +105,6 @@ public final class Discretization {
 
     // Make discrete Q symmetric if it isn't already
     final var discQ = Q.plus(Q.transpose()).div(2.0);
-
-    return new Pair<>(discA, discQ);
-  }
-
-  /**
-   * Discretizes the given continuous A and Q matrices.
-   *
-   * <p>Rather than solving a 2N x 2N matrix exponential like in DiscretizeQ() (which is expensive),
-   * we take advantage of the structure of the block matrix of A and Q.
-   *
-   * <ul>
-   *   <li>eᴬᵀ, which is only N x N, is relatively cheap.
-   *   <li>The upper-right quarter of the 2N x 2N matrix, which we can approximate using a taylor
-   *       series to several terms and still be substantially cheaper than taking the big
-   *       exponential.
-   * </ul>
-   *
-   * @param <States> Nat representing the number of states.
-   * @param contA Continuous system matrix.
-   * @param contQ Continuous process noise covariance matrix.
-   * @param dtSeconds Discretization timestep.
-   * @return a pair representing the discrete system matrix and process noise covariance matrix.
-   */
-  public static <States extends Num>
-      Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQTaylor(
-          Matrix<States, States> contA, Matrix<States, States> contQ, double dtSeconds) {
-    //       T
-    // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
-    //       0
-    //
-    // M = [−A  Q ]
-    //     [ 0  Aᵀ]
-    // ϕ = eᴹᵀ
-    // ϕ₁₂ = A_d⁻¹Q_d
-    //
-    // Taylor series of ϕ:
-    //
-    //   ϕ = eᴹᵀ = I + MT + 1/2 M²T² + 1/6 M³T³ + …
-    //   ϕ = eᴹᵀ = I + MT + 1/2 T²M² + 1/6 T³M³ + …
-    //
-    // Taylor series of ϕ expanded for ϕ₁₂:
-    //
-    //   ϕ₁₂ = 0 + QT + 1/2 T² (−AQ + QAᵀ) + 1/6 T³ (−A lastTerm + Q Aᵀ²) + …
-    //
-    // ```
-    // lastTerm = Q
-    // lastCoeff = T
-    // ATn = Aᵀ
-    // ϕ₁₂ = lastTerm lastCoeff = QT
-    //
-    // for i in range(2, 6):
-    //   // i = 2
-    //   lastTerm = −A lastTerm + Q ATn = −AQ + QAᵀ
-    //   lastCoeff *= T/i → lastCoeff *= T/2 = 1/2 T²
-    //   ATn *= Aᵀ = Aᵀ²
-    //
-    //   // i = 3
-    //   lastTerm = −A lastTerm + Q ATn = −A (−AQ + QAᵀ) + QAᵀ² = …
-    //   …
-    // ```
-
-    // Make continuous Q symmetric if it isn't already
-    Matrix<States, States> Q = contQ.plus(contQ.transpose()).div(2.0);
-
-    Matrix<States, States> lastTerm = Q.copy();
-    double lastCoeff = dtSeconds;
-
-    // Aᵀⁿ
-    Matrix<States, States> ATn = contA.transpose();
-
-    Matrix<States, States> phi12 = lastTerm.times(lastCoeff);
-
-    // i = 6 i.e. 5th order should be enough precision
-    for (int i = 2; i < 6; ++i) {
-      lastTerm = contA.times(-1).times(lastTerm).plus(Q.times(ATn));
-      lastCoeff *= dtSeconds / ((double) i);
-
-      phi12 = phi12.plus(lastTerm.times(lastCoeff));
-
-      ATn = ATn.times(contA.transpose());
-    }
-
-    var discA = discretizeA(contA, dtSeconds);
-    Q = discA.times(phi12);
-
-    // Make Q symmetric if it isn't already
-    var discQ = Q.plus(Q.transpose()).div(2.0);
 
     return new Pair<>(discA, discQ);
   }

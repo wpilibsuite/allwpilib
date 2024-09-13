@@ -13,6 +13,7 @@ evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
 evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpinet')
+evaluationDependsOn(':wpiunits')
 evaluationDependsOn(':wpiutil')
 
 def baseArtifactIdCpp = 'documentation'
@@ -67,18 +68,13 @@ doxygen {
     cppIncludeRoots << '../ntcore/build/generated/main/native/include/'
 
     if (project.hasProperty('docWarningsAsErrors')) {
-        // C++20 shims
-        exclude 'wpi/ghc/filesystem.hpp'
-
-        // Drake
-        exclude 'drake/common/**'
-
         // Eigen
         exclude 'Eigen/**'
         exclude 'unsupported/**'
 
         // LLVM
         exclude 'wpi/AlignOf.h'
+        exclude 'wpi/Casting.h'
         exclude 'wpi/Chrono.h'
         exclude 'wpi/Compiler.h'
         exclude 'wpi/ConvertUTF.h'
@@ -89,6 +85,7 @@ doxygen {
         exclude 'wpi/Errc.h'
         exclude 'wpi/Errno.h'
         exclude 'wpi/ErrorHandling.h'
+        exclude 'wpi/bit.h'
         exclude 'wpi/fs.h'
         exclude 'wpi/FunctionExtras.h'
         exclude 'wpi/function_ref.h'
@@ -124,7 +121,13 @@ doxygen {
         exclude 'wpinet/uv/**'
 
         // json
+        exclude 'wpi/adl_serializer.h'
+        exclude 'wpi/byte_container_with_subtype.h'
+        exclude 'wpi/detail/**'
         exclude 'wpi/json.h'
+        exclude 'wpi/json_fwd.h'
+        exclude 'wpi/ordered_map.h'
+        exclude 'wpi/thirdparty/**'
 
         // memory
         exclude 'wpi/memory/**'
@@ -138,6 +141,12 @@ doxygen {
 
     //TODO: building memory docs causes search to break
     exclude 'wpi/memory/**'
+
+    exclude '*.pb.h'
+
+    // Save space by excluding protobuf and eigen
+    exclude 'Eigen/**'
+    exclude 'google/protobuf/**'
 
     aliases 'effects=\\par <i>Effects:</i>^^',
             'notes=\\par <i>Notes:</i>^^',
@@ -175,7 +184,9 @@ doxygen {
     enable_preprocessing true
     macro_expansion true
     expand_only_predef true
-    predefined "WPI_DEPRECATED(x)=[[deprecated(x)]]"
+    predefined "WPI_DEPRECATED(x)=[[deprecated(x)]]\"\\\n" +
+            "\"__cplusplus\"\\\n" +
+            "\"HAL_ENUM(name)=enum name : int32_t"
 
     if (project.hasProperty('docWarningsAsErrors')) {
         warn_as_error 'FAIL_ON_WARNINGS'
@@ -197,28 +208,31 @@ configurations {
     }
 }
 
-ext {
-    sharedCvConfigs = [:]
-    staticCvConfigs = [:]
-    useJava = true
-    useCpp = false
-    skipDev = true
-    useDocumentation = true
-}
-
-apply from: "${rootDir}/shared/opencv.gradle"
-
 task generateJavaDocs(type: Javadoc) {
-    classpath += project(":wpimath").sourceSets.main.compileClasspath
-    options.links("https://docs.oracle.com/en/java/javase/11/docs/api/")
+    classpath += project(":wpilibj").sourceSets.main.compileClasspath
+    options.links("https://docs.oracle.com/en/java/javase/17/docs/api/")
+    options.links("https://docs.opencv.org/4.x/javadoc/")
     options.addStringOption("tag", "pre:a:Pre-Condition")
+    options.addBooleanOption("Xdoclint/package:" +
+            // TODO: v Document these, then remove them from the list
+            "-edu.wpi.first.hal," +
+            "-edu.wpi.first.hal.can," +
+            "-edu.wpi.first.hal.simulation," +
+            // TODO: ^ Document these, then remove them from the list
+            "-edu.wpi.first.math.proto," +
+            "-edu.wpi.first.math.controller.proto," +
+            "-edu.wpi.first.math.controller.struct," +
+            "-edu.wpi.first.math.geometry.proto," +
+            "-edu.wpi.first.math.geometry.struct," +
+            "-edu.wpi.first.math.kinematics.proto," +
+            "-edu.wpi.first.math.kinematics.struct," +
+            "-edu.wpi.first.math.system.plant.proto," +
+            "-edu.wpi.first.math.system.plant.struct," +
+            "-edu.wpi.first.math.trajectory.proto", true)
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     options.linkSource(true)
-    dependsOn project(':hal').generateUsageReporting
-    dependsOn project(':ntcore').ntcoreGenerateJavaTypes
     dependsOn project(':wpilibj').generateJavaVersion
-    dependsOn project(':wpimath').generateNat
     source project(':apriltag').sourceSets.main.java
     source project(':cameraserver').sourceSets.main.java
     source project(':cscore').sourceSets.main.java
@@ -228,6 +242,7 @@ task generateJavaDocs(type: Javadoc) {
     source project(':wpilibj').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java
     source project(':wpinet').sourceSets.main.java
+    source project(':wpiunits').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'

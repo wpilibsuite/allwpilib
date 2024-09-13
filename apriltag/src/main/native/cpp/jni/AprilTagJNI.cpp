@@ -2,12 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <jni.h>
+
 #include <cstdio>
 #include <cstring>
 
+#define WPI_RAWFRAME_JNI
+#include <wpi/RawFrame.h>
 #include <wpi/jni_util.h>
 
 #include "edu_wpi_first_apriltag_jni_AprilTagJNI.h"
+#include "frc/apriltag/AprilTag.h"
 #include "frc/apriltag/AprilTagDetector.h"
 #include "frc/apriltag/AprilTagPoseEstimator.h"
 
@@ -24,6 +29,7 @@ static JClass quaternionCls;
 static JClass rotation3dCls;
 static JClass transform3dCls;
 static JClass translation3dCls;
+static JClass rawFrameCls;
 static JException illegalArgEx;
 static JException nullPointerEx;
 
@@ -36,7 +42,8 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/math/geometry/Quaternion", &quaternionCls},
     {"edu/wpi/first/math/geometry/Rotation3d", &rotation3dCls},
     {"edu/wpi/first/math/geometry/Transform3d", &transform3dCls},
-    {"edu/wpi/first/math/geometry/Translation3d", &translation3dCls}};
+    {"edu/wpi/first/math/geometry/Translation3d", &translation3dCls},
+    {"edu/wpi/first/util/RawFrame", &rawFrameCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgEx},
@@ -504,15 +511,14 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseHomography
     nullPointerEx.Throw(env, "homography cannot be null");
     return nullptr;
   }
-  JDoubleArrayRef harr{env, homography};
+  JSpan<const jdouble, 9> harr{env, homography};
   if (harr.size() != 9) {
     illegalArgEx.Throw(env, "homography array must be size 9");
     return nullptr;
   }
 
   AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
-  return MakeJObject(env, estimator.EstimateHomography(
-                              std::span<const double, 9>{harr.array()}));
+  return MakeJObject(env, estimator.EstimateHomography(harr));
 }
 
 /*
@@ -530,7 +536,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
     nullPointerEx.Throw(env, "homography cannot be null");
     return nullptr;
   }
-  JDoubleArrayRef harr{env, homography};
+  JSpan<const jdouble, 9> harr{env, homography};
   if (harr.size() != 9) {
     illegalArgEx.Throw(env, "homography array must be size 9");
     return nullptr;
@@ -541,7 +547,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
     nullPointerEx.Throw(env, "corners cannot be null");
     return nullptr;
   }
-  JDoubleArrayRef carr{env, corners};
+  JSpan<const jdouble, 8> carr{env, corners};
   if (carr.size() != 8) {
     illegalArgEx.Throw(env, "corners array must be size 8");
     return nullptr;
@@ -549,9 +555,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
 
   AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
   return MakeJObject(env,
-                     estimator.EstimateOrthogonalIteration(
-                         std::span<const double, 9>{harr.array()},
-                         std::span<const double, 8>{carr.array()}, nIters));
+                     estimator.EstimateOrthogonalIteration(harr, carr, nIters));
 }
 
 /*
@@ -569,7 +573,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
     nullPointerEx.Throw(env, "homography cannot be null");
     return nullptr;
   }
-  JDoubleArrayRef harr{env, homography};
+  JSpan<const jdouble, 9> harr{env, homography};
   if (harr.size() != 9) {
     illegalArgEx.Throw(env, "homography array must be size 9");
     return nullptr;
@@ -580,16 +584,51 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
     nullPointerEx.Throw(env, "corners cannot be null");
     return nullptr;
   }
-  JDoubleArrayRef carr{env, corners};
+  JSpan<const jdouble, 8> carr{env, corners};
   if (carr.size() != 8) {
     illegalArgEx.Throw(env, "corners array must be size 8");
     return nullptr;
   }
 
   AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
-  return MakeJObject(
-      env, estimator.Estimate(std::span<const double, 9>{harr.array()},
-                              std::span<const double, 8>{carr.array()}));
+  return MakeJObject(env, estimator.Estimate(harr, carr));
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    generate16h5AprilTagImage
+ * Signature: (Ljava/lang/Object;JI)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate16h5AprilTagImage
+  (JNIEnv* env, jclass, jobject frameObj, jlong framePtr, jint id)
+{
+  auto* frame = reinterpret_cast<wpi::RawFrame*>(framePtr);
+  if (!frame) {
+    nullPointerEx.Throw(env, "frame is null");
+    return;
+  }
+  bool newData = AprilTag::Generate16h5AprilTagImage(frame, id);
+  wpi::SetFrameData(env, rawFrameCls, frameObj, *frame, newData);
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    generate36h11AprilTagImage
+ * Signature: (Ljava/lang/Object;JI)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate36h11AprilTagImage
+  (JNIEnv* env, jclass, jobject frameObj, jlong framePtr, jint id)
+{
+  auto* frame = reinterpret_cast<wpi::RawFrame*>(framePtr);
+  if (!frame) {
+    nullPointerEx.Throw(env, "frame is null");
+    return;
+  }
+  // function might reallocate
+  bool newData = AprilTag::Generate36h11AprilTagImage(frame, id);
+  wpi::SetFrameData(env, rawFrameCls, frameObj, *frame, newData);
 }
 
 }  // extern "C"

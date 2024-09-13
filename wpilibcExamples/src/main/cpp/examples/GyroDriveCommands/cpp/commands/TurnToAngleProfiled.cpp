@@ -30,7 +30,7 @@ TurnToAngleProfiled::TurnToAngleProfiled(units::degree_t target,
   // reference
   GetController().SetTolerance(kTurnTolerance, kTurnRateTolerance);
 
-  AddRequirements({drive});
+  AddRequirements(drive);
 }
 
 bool TurnToAngleProfiled::IsFinished() {

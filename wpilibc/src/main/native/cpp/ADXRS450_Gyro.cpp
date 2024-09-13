@@ -140,6 +140,10 @@ void ADXRS450_Gyro::Calibrate() {
   m_spi.ResetAccumulator();
 }
 
+Rotation2d ADXRS450_Gyro::GetRotation2d() const {
+  return units::degree_t{-GetAngle()};
+}
+
 int ADXRS450_Gyro::GetPort() const {
   return m_port;
 }

@@ -5,6 +5,7 @@
 #include <thread>
 
 #include <fmt/format.h>
+#include <gtest/gtest.h>
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
 #include <hal/Main.h>
@@ -13,7 +14,6 @@
 
 #include "HALSimWSServer.h"
 #include "WebServerClientTest.h"
-#include "gtest/gtest.h"
 
 namespace uv = wpi::uv;
 

@@ -4,6 +4,20 @@
 
 package edu.wpi.first.hal;
 
+/**
+ * Constants HAL JNI functions.
+ *
+ * @see "hal/Constants.h"
+ */
 public class ConstantsJNI extends JNIWrapper {
+  /**
+   * Gets the number of FPGA system clock ticks per microsecond.
+   *
+   * @return the number of clock ticks per microsecond
+   * @see "HAL_GetSystemClockTicksPerMicrosecond"
+   */
   public static native int getSystemClockTicksPerMicrosecond();
+
+  /** Utility class. */
+  private ConstantsJNI() {}
 }

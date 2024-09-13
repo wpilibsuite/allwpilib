@@ -7,13 +7,14 @@
 #include <tuple>
 #include <utility>
 
+#include <gtest/gtest.h>
+
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/DifferentialDrivePoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "gtest/gtest.h"
 #include "units/angle.h"
 #include "units/length.h"
 #include "units/time.h"
@@ -138,6 +139,7 @@ void testFollowTrajectory(
               0.15);
 
   if (checkError) {
+    // NOLINTNEXTLINE(bugprone-integer-division)
     EXPECT_LT(errorSum / (trajectory.TotalTime() / dt), 0.05);
     EXPECT_LT(maxError, 0.2);
   }

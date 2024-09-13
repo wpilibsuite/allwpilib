@@ -7,9 +7,12 @@
 #include <cmath>
 #include <stdexcept>
 
+#include <Eigen/Cholesky>
+
+#include "frc/DARE.h"
 #include "frc/MathUtil.h"
 #include "frc/StateSpaceUtil.h"
-#include "frc/controller/LinearQuadraticRegulator.h"
+#include "frc/system/Discretization.h"
 
 using namespace frc;
 
@@ -64,23 +67,39 @@ LTVDifferentialDriveController::LTVDifferentialDriveController(
   // Ax = -Bu
   // x = -A⁻¹Bu
   units::meters_per_second_t maxV{
+      // NOLINTNEXTLINE(clang-analyzer-unix.Malloc)
       -plant.A().householderQr().solve(plant.B() * Vectord<2>{12.0, 12.0})(0)};
 
   if (maxV <= 0_mps) {
     throw std::domain_error(
-        "Max velocity of plant with 12 V input must be greater than zero.");
+        "Max velocity of plant with 12 V input must be greater than 0 m/s.");
   }
+  if (maxV >= 15_mps) {
+    throw std::domain_error(
+        "Max velocity of plant with 12 V input must be less than 15 m/s.");
+  }
+
+  auto R_llt = R.llt();
 
   for (auto velocity = -maxV; velocity < maxV; velocity += 0.01_mps) {
     // The DARE is ill-conditioned if the velocity is close to zero, so don't
     // let the system stop.
     if (units::math::abs(velocity) < 1e-4_mps) {
-      m_table.insert(velocity, Matrixd<2, 5>::Zero());
+      A(State::kY, State::kHeading) = 1e-4;
     } else {
       A(State::kY, State::kHeading) = velocity.value();
-      m_table.insert(velocity,
-                     frc::LinearQuadraticRegulator<5, 2>{A, B, Q, R, dt}.K());
     }
+
+    Matrixd<5, 5> discA;
+    Matrixd<5, 2> discB;
+    DiscretizeAB(A, B, dt, &discA, &discB);
+
+    Matrixd<5, 5> S = detail::DARE<5, 2>(discA, discB, Q, R_llt);
+
+    // K = (BᵀSB + R)⁻¹BᵀSA
+    m_table.insert(velocity, (discB.transpose() * S * discB + R)
+                                 .llt()
+                                 .solve(discB.transpose() * S * discA));
   }
 }
 

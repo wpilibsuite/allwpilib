@@ -9,7 +9,7 @@
 using namespace DriveConstants;
 
 TurnToAngle::TurnToAngle(units::degree_t target, DriveSubsystem* drive)
-    : CommandHelper{frc2::PIDController{kTurnP, kTurnI, kTurnD},
+    : CommandHelper{frc::PIDController{kTurnP, kTurnI, kTurnD},
                     // Close loop on heading
                     [drive] { return drive->GetHeading().value(); },
                     // Set reference to target
@@ -25,7 +25,7 @@ TurnToAngle::TurnToAngle(units::degree_t target, DriveSubsystem* drive)
   // reference
   m_controller.SetTolerance(kTurnTolerance.value(), kTurnRateTolerance.value());
 
-  AddRequirements({drive});
+  AddRequirements(drive);
 }
 
 bool TurnToAngle::IsFinished() {

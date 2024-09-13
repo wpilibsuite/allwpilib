@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -27,6 +27,9 @@
 
 #ifndef _gcem_erf_inv_HPP
 #define _gcem_erf_inv_HPP
+
+namespace gcem
+{
 
 namespace internal
 {
@@ -260,5 +263,6 @@ noexcept
     return internal::erf_inv_begin( static_cast<return_t<T>>(p) );
 }
 
+}
 
 #endif

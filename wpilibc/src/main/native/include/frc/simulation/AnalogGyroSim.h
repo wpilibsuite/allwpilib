@@ -40,8 +40,9 @@ class AnalogGyroSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterAngleCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterAngleCallback(NotifyCallback callback,
+                                                       bool initialNotify);
 
   /**
    * Get the current angle of the gyro.
@@ -64,8 +65,9 @@ class AnalogGyroSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterRateCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterRateCallback(NotifyCallback callback,
+                                                      bool initialNotify);
 
   /**
    * Get the rate of angle change on this gyro.
@@ -89,7 +91,8 @@ class AnalogGyroSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**

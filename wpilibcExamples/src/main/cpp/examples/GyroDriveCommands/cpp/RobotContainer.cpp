@@ -35,8 +35,8 @@ void RobotContainer::ConfigureButtonBindings() {
   frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kL1)
       .WhileTrue(
           frc2::PIDCommand(
-              frc2::PIDController{dc::kStabilizationP, dc::kStabilizationI,
-                                  dc::kStabilizationD},
+              frc::PIDController{dc::kStabilizationP, dc::kStabilizationI,
+                                 dc::kStabilizationD},
               // Close the loop on the turn rate
               [this] { return m_drive.GetTurnRate(); },
               // Setpoint is 0
@@ -64,7 +64,7 @@ void RobotContainer::ConfigureButtonBindings() {
       .OnFalse(frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(1); }, {}));
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // no auto
-  return nullptr;
+  return frc2::cmd::None();
 }

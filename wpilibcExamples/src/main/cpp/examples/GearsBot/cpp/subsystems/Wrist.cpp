@@ -7,8 +7,8 @@
 #include <frc/controller/PIDController.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-Wrist::Wrist() : frc2::PIDSubsystem{frc2::PIDController{kP, 0, 0}} {
-  m_controller.SetTolerance(2.5);
+Wrist::Wrist() : frc2::PIDSubsystem{frc::PIDController{kP, kI, kD}} {
+  m_controller.SetTolerance(WristConstants::kTolerance);
 
   SetName("Wrist");
   // Let's show everything on the LiveWindow

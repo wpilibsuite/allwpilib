@@ -8,10 +8,11 @@
 #include <frc/Timer.h>
 #include <frc/motorcontrol/Jaguar.h>
 
+#include <gtest/gtest.h>
+
 #include "TestBench.h"
 #include "frc/DMA.h"
 #include "frc/DMASample.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

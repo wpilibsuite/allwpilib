@@ -31,9 +31,9 @@ class ListenerExecutor implements Executor {
   /** Runs all posted tasks. Called periodically from main thread. */
   public void runListenerTasks() {
     // Locally copy tasks from internal list; minimizes blocking time
-    Collection<Runnable> tasks = new ArrayList<>();
+    Collection<Runnable> tasks;
     synchronized (m_lock) {
-      tasks.addAll(m_tasks);
+      tasks = new ArrayList<>(m_tasks);
       m_tasks.clear();
     }
 

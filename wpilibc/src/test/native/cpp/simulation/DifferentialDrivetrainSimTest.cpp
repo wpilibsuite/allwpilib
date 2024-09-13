@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
 #include <units/current.h>
 #include <units/math.h>
 #include <units/moment_of_inertia.h>
@@ -15,7 +16,6 @@
 #include "frc/system/plant/LinearSystemId.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
-#include "gtest/gtest.h"
 
 TEST(DifferentialDrivetrainSimTest, Convergence) {
   auto motor = frc::DCMotor::NEO(2);
@@ -55,7 +55,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
     sim.Update(20_ms);
 
     // Update ground truth.
-    groundTruthX = frc::RK4(
+    groundTruthX = frc::RKDP(
         [&sim](const auto& x, const auto& u) -> frc::Vectord<7> {
           return sim.Dynamics(x, u);
         },
@@ -63,7 +63,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
   }
 
   // 2 inch tolerance is OK since our ground truth is an approximation of the
-  // ODE solution using RK4 anyway
+  // ODE solution using RKDP anyway
   EXPECT_NEAR(groundTruthX(0, 0), sim.GetPose().X().value(), 0.05);
   EXPECT_NEAR(groundTruthX(1, 0), sim.GetPose().Y().value(), 0.05);
   EXPECT_NEAR(groundTruthX(2, 0), sim.GetHeading().Radians().value(), 0.01);

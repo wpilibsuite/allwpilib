@@ -4,6 +4,7 @@
 
 #include "RobotContainer.h"
 
+#include <frc2/command/Commands.h>
 #include <units/angle.h>
 
 RobotContainer::RobotContainer() {
@@ -34,6 +35,6 @@ void RobotContainer::ConfigureButtonBindings() {
       .OnFalse(m_drive.SetMaxOutputCommand(1.0));
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
-  return nullptr;
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
+  return frc2::cmd::None();
 }

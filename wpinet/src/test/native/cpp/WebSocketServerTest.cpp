@@ -167,7 +167,7 @@ TEST_F(WebSocketServerTest, CloseReason) {
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
       ASSERT_EQ(code, 1000);
-      ASSERT_EQ(reason, "hangup");
+      ASSERT_EQ(reason, "remote close: hangup");
     });
   };
   // need to respond with close for server to finish shutdown
@@ -237,7 +237,7 @@ TEST_F(WebSocketServerTest, ReceiveCloseReason) {
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
       ASSERT_EQ(code, 1000);
-      ASSERT_EQ(reason, "hangup");
+      ASSERT_EQ(reason, "remote close: hangup");
     });
   };
   const uint8_t contents[] = {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'};
@@ -396,7 +396,14 @@ TEST_F(WebSocketServerTest, ReceiveFragment) {
   std::vector<uint8_t> data2(4, 0x04);
   std::vector<uint8_t> data3(4, 0x05);
   std::vector<uint8_t> combData{data};
+#if __GNUC__ == 11
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overread"
+#endif  // __GNUC__ == 11
   combData.insert(combData.end(), data2.begin(), data2.end());
+#if __GNUC__ == 11
+#pragma GCC diagnostic pop
+#endif  // __GNUC__ == 11
   combData.insert(combData.end(), data3.begin(), data3.end());
 
   setupWebSocket = [&] {
@@ -469,6 +476,56 @@ TEST_F(WebSocketServerTest, ReceiveFragmentSeparate) {
   loop->Run();
 
   ASSERT_EQ(gotCallback, 3);
+}
+
+// Control frames can happen in the middle of a fragmented message
+TEST_F(WebSocketServerTest, ReceiveFragmentWithControl) {
+  int gotCallback = 0;
+  int gotPongCallback = 0;
+
+  std::vector<uint8_t> data(4, 0x03);
+  std::vector<uint8_t> data2(4, 0x04);
+  std::vector<uint8_t> data3(4, 0x05);
+  std::vector<uint8_t> data4(4, 0x06);
+  std::vector<uint8_t> combData{data};
+#if __GNUC__ == 11
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overread"
+#endif  // __GNUC__ == 11
+  combData.insert(combData.end(), data2.begin(), data2.end());
+#if __GNUC__ == 11
+#pragma GCC diagnostic pop
+#endif  // __GNUC__ == 11
+  combData.insert(combData.end(), data4.begin(), data4.end());
+
+  setupWebSocket = [&] {
+    ws->binary.connect([&](auto inData, bool fin) {
+      ASSERT_TRUE(gotPongCallback);
+      ++gotCallback;
+      ws->Terminate();
+      ASSERT_TRUE(fin);
+      std::vector<uint8_t> recvData{inData.begin(), inData.end()};
+      ASSERT_EQ(combData, recvData);
+    });
+    ws->pong.connect([&](auto inData) {
+      ASSERT_FALSE(gotCallback);
+      ++gotPongCallback;
+    });
+  };
+
+  auto message = BuildMessage(0x02, false, true, data);
+  auto message2 = BuildMessage(0x00, false, true, data2);
+  auto message3 = BuildMessage(0x0a, true, true, data3);
+  auto message4 = BuildMessage(0x00, true, true, data4);
+  resp.headersComplete.connect([&](bool) {
+    clientPipe->Write({{message}, {message2}, {message3}, {message4}},
+                      [&](auto bufs, uv::Error) {});
+  });
+
+  loop->Run();
+
+  ASSERT_EQ(gotCallback, 1);
+  ASSERT_EQ(gotPongCallback, 1);
 }
 
 //

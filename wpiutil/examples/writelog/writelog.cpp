@@ -8,7 +8,8 @@
 #include <string>
 #include <vector>
 
-#include "fmt/format.h"
+#include <fmt/format.h>
+
 #include "wpi/DataLog.h"
 
 int main(int argc, char** argv) {

@@ -128,6 +128,7 @@ class executor;
 class dialog : protected settings
 {
 public:
+    virtual ~dialog();
     bool ready(int timeout = default_wait_timeout) const;
     bool kill() const;
 
@@ -146,7 +147,7 @@ protected:
     std::shared_ptr<executor> m_async;
 };
 
-class file_dialog : public dialog
+class file_dialog : public internal::dialog
 {
 protected:
     enum type

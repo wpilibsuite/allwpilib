@@ -9,9 +9,8 @@
 #include <span>
 #include <string_view>
 
+#include <Eigen/Core>
 #include <wpi/SymbolExports.h>
-
-#include "frc/EigenCore.h"
 
 namespace frc {
 
@@ -94,7 +93,7 @@ class WPILIB_DLLEXPORT AprilTagDetection final {
 
   /**
    * Gets a corner of the tag in image pixel coordinates. These always
-   * wrap counter-clock wise around the tag.
+   * wrap counter-clock wise around the tag. Index 0 is the bottom left corner.
    *
    * @param ndx Corner index (range is 0-3, inclusive)
    * @return Corner point
@@ -105,7 +104,8 @@ class WPILIB_DLLEXPORT AprilTagDetection final {
 
   /**
    * Gets the corners of the tag in image pixel coordinates. These always
-   * wrap counter-clock wise around the tag.
+   * wrap counter-clock wise around the tag. The first set of corner coordinates
+   * are the coordinates for the bottom left corner.
    *
    * @param cornersBuf Corner point array (X and Y for each corner in order)
    * @return Corner point array (copy of cornersBuf span)

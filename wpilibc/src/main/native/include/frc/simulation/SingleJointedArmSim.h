@@ -23,7 +23,9 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
   /**
    * Creates a simulated arm mechanism.
    *
-   * @param system             The system representing this arm.
+   * @param system             The system representing this arm. This system can
+   *                           be created with
+   *                           LinearSystemId::SingleJointedArmSystem().
    * @param gearbox            The type and number of motors on the arm gearbox.
    * @param gearing            The gear ratio of the arm (numbers greater than 1
    *                           represent reductions).
@@ -31,12 +33,14 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    * @param minAngle           The minimum angle that the arm is capable of.
    * @param maxAngle           The maximum angle that the arm is capable of.
    * @param simulateGravity    Whether gravity should be simulated or not.
+   * @param startingAngle      The initial position of the arm.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
   SingleJointedArmSim(const LinearSystem<2, 1, 1>& system,
                       const DCMotor& gearbox, double gearing,
                       units::meter_t armLength, units::radian_t minAngle,
                       units::radian_t maxAngle, bool simulateGravity,
+                      units::radian_t startingAngle,
                       const std::array<double, 1>& measurementStdDevs = {0.0});
   /**
    * Creates a simulated arm mechanism.
@@ -50,13 +54,26 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    * @param minAngle           The minimum angle that the arm is capable of.
    * @param maxAngle           The maximum angle that the arm is capable of.
    * @param simulateGravity    Whether gravity should be simulated or not.
+   * @param startingAngle      The initial position of the arm.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
   SingleJointedArmSim(const DCMotor& gearbox, double gearing,
                       units::kilogram_square_meter_t moi,
                       units::meter_t armLength, units::radian_t minAngle,
                       units::radian_t maxAngle, bool simulateGravity,
+                      units::radian_t startingAngle,
                       const std::array<double, 1>& measurementStdDevs = {0.0});
+
+  using LinearSystemSim::SetState;
+
+  /**
+   * Sets the arm's state. The new angle will be limited between the minimum and
+   * maximum allowed limits.
+   *
+   * @param angle The new angle.
+   * @param velocity The new angular velocity.
+   */
+  void SetState(units::radian_t angle, units::radians_per_second_t velocity);
 
   /**
    * Returns whether the arm would hit the lower limit.

@@ -4,6 +4,10 @@
 
 package edu.wpi.first.math.geometry;
 
+import edu.wpi.first.math.geometry.proto.Twist2dProto;
+import edu.wpi.first.math.geometry.struct.Twist2dStruct;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /**
@@ -12,7 +16,7 @@ import java.util.Objects;
  *
  * <p>A Twist can be used to represent a difference between two poses.
  */
-public class Twist2d {
+public class Twist2d implements ProtobufSerializable, StructSerializable {
   /** Linear "dx" component. */
   public double dx;
 
@@ -22,6 +26,7 @@ public class Twist2d {
   /** Angular "dtheta" component (radians). */
   public double dtheta;
 
+  /** Default constructor. */
   public Twist2d() {}
 
   /**
@@ -62,4 +67,10 @@ public class Twist2d {
   public int hashCode() {
     return Objects.hash(dx, dy, dtheta);
   }
+
+  /** Twist2d protobuf for serialization. */
+  public static final Twist2dProto proto = new Twist2dProto();
+
+  /** Twist2d struct for serialization. */
+  public static final Twist2dStruct struct = new Twist2dStruct();
 }

@@ -32,7 +32,7 @@ class UsbCameraTest {
 
         assertTimeoutPreemptively(
             Duration.ofSeconds(5),
-            () -> assertTrue(result.get().contains("Connecting to USB camera on ")));
+            () -> assertTrue(result.get().contains("Attempting to connect to USB camera on ")));
       }
     }
 

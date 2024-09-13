@@ -42,8 +42,9 @@ class PneumaticsBaseSim {
    * Save a reference to this object; it being deconstructed cancels the
    * callback.
    */
-  [[nodiscard]] virtual std::unique_ptr<CallbackStore>
-  RegisterInitializedCallback(NotifyCallback callback, bool initialNotify) = 0;
+  [[nodiscard]]
+  virtual std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+      NotifyCallback callback, bool initialNotify) = 0;
 
   /**
    * Check if the compressor is on.
@@ -68,8 +69,9 @@ class PneumaticsBaseSim {
    * Save a reference to this object; it being deconstructed cancels the
    * callback.
    */
-  [[nodiscard]] virtual std::unique_ptr<CallbackStore>
-  RegisterCompressorOnCallback(NotifyCallback callback, bool initialNotify) = 0;
+  [[nodiscard]]
+  virtual std::unique_ptr<CallbackStore> RegisterCompressorOnCallback(
+      NotifyCallback callback, bool initialNotify) = 0;
 
   /**
    * Check the solenoid output on a specific channel.
@@ -98,9 +100,9 @@ class PneumaticsBaseSim {
    * Save a reference to this object; it being deconstructed cancels the
    * callback.
    */
-  [[nodiscard]] virtual std::unique_ptr<CallbackStore>
-  RegisterSolenoidOutputCallback(int channel, NotifyCallback callback,
-                                 bool initialNotify) = 0;
+  [[nodiscard]]
+  virtual std::unique_ptr<CallbackStore> RegisterSolenoidOutputCallback(
+      int channel, NotifyCallback callback, bool initialNotify) = 0;
 
   /**
    * Check the value of the pressure switch.
@@ -126,9 +128,9 @@ class PneumaticsBaseSim {
    * Save a reference to this object; it being deconstructed cancels the
    * callback.
    */
-  [[nodiscard]] virtual std::unique_ptr<CallbackStore>
-  RegisterPressureSwitchCallback(NotifyCallback callback,
-                                 bool initialNotify) = 0;
+  [[nodiscard]]
+  virtual std::unique_ptr<CallbackStore> RegisterPressureSwitchCallback(
+      NotifyCallback callback, bool initialNotify) = 0;
 
   /**
    * Read the compressor current.
@@ -153,9 +155,9 @@ class PneumaticsBaseSim {
    * Save a reference to this object; it being deconstructed cancels the
    * callback.
    */
-  [[nodiscard]] virtual std::unique_ptr<CallbackStore>
-  RegisterCompressorCurrentCallback(NotifyCallback callback,
-                                    bool initialNotify) = 0;
+  [[nodiscard]]
+  virtual std::unique_ptr<CallbackStore> RegisterCompressorCurrentCallback(
+      NotifyCallback callback, bool initialNotify) = 0;
 
   /**
    * Get the current value of all solenoid outputs.
@@ -175,9 +177,22 @@ class PneumaticsBaseSim {
   virtual void ResetData() = 0;
 
  protected:
+  /// PneumaticsBase index.
   const int m_index;
-  explicit PneumaticsBaseSim(const PneumaticsBase& module);
+
+  /**
+   * Constructs a PneumaticsBaseSim with the given index.
+   *
+   * @param index The index.
+   */
   explicit PneumaticsBaseSim(const int index);
+
+  /**
+   * Constructs a PneumaticsBaseSim for the given module.
+   *
+   * @param module The module.
+   */
+  explicit PneumaticsBaseSim(const PneumaticsBase& module);
 };
 
 }  // namespace frc::sim

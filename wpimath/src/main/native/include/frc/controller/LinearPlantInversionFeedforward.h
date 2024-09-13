@@ -7,7 +7,8 @@
 #include <array>
 #include <functional>
 
-#include "Eigen/QR"
+#include <Eigen/QR>
+
 #include "frc/EigenCore.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"
@@ -25,8 +26,8 @@ namespace frc {
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  *
- * @tparam States The number of states.
- * @tparam Inputs The number of inputs.
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
  */
 template <int States, int Inputs>
 class LinearPlantInversionFeedforward {
@@ -37,7 +38,7 @@ class LinearPlantInversionFeedforward {
   /**
    * Constructs a feedforward with the given plant.
    *
-   * @tparam Outputs The number of outputs.
+   * @tparam Outputs Number of outputs.
    * @param plant The plant being controlled.
    * @param dt    Discretization timestep.
    */
@@ -137,6 +138,9 @@ class LinearPlantInversionFeedforward {
    * @return The calculated feedforward.
    */
   InputVector Calculate(const StateVector& r, const StateVector& nextR) {
+    // rₖ₊₁ = Arₖ + Buₖ
+    // Buₖ = rₖ₊₁ − Arₖ
+    // uₖ = B⁺(rₖ₊₁ − Arₖ)
     m_uff = m_B.householderQr().solve(nextR - (m_A * r));
     m_r = nextR;
     return m_uff;

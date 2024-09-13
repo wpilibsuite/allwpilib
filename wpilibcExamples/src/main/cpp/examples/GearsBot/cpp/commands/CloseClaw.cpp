@@ -8,7 +8,7 @@
 
 CloseClaw::CloseClaw(Claw& claw) : m_claw(&claw) {
   SetName("CloseClaw");
-  AddRequirements({m_claw});
+  AddRequirements(m_claw);
 }
 
 // Called just before this Command runs the first time

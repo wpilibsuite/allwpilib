@@ -7,12 +7,13 @@
 #include <cmath>
 #include <numbers>
 
+#include <Eigen/Core>
+#include <Eigen/LU>
+#include <Eigen/QR>
 #include <wpi/json.h>
 
-#include "Eigen/Core"
-#include "Eigen/LU"
-#include "Eigen/QR"
 #include "frc/fmt/Eigen.h"
+#include "geometry3d.pb.h"
 #include "units/math.h"
 #include "wpimath/MathShared.h"
 
@@ -41,23 +42,23 @@ Rotation3d::Rotation3d(units::radian_t roll, units::radian_t pitch,
 Rotation3d::Rotation3d(const Eigen::Vector3d& rvec)
     : Rotation3d{rvec, units::radian_t{rvec.norm()}} {}
 
-Rotation3d::Rotation3d(const Vectord<3>& axis, units::radian_t angle) {
+Rotation3d::Rotation3d(const Eigen::Vector3d& axis, units::radian_t angle) {
   double norm = axis.norm();
   if (norm == 0.0) {
     return;
   }
 
   // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Definition
-  Vectord<3> v = axis / norm * units::math::sin(angle / 2.0);
+  Eigen::Vector3d v = axis / norm * units::math::sin(angle / 2.0);
   m_q = Quaternion{units::math::cos(angle / 2.0), v(0), v(1), v(2)};
 }
 
-Rotation3d::Rotation3d(const Matrixd<3, 3>& rotationMatrix) {
+Rotation3d::Rotation3d(const Eigen::Matrix3d& rotationMatrix) {
   const auto& R = rotationMatrix;
 
   // Require that the rotation matrix is special orthogonal. This is true if the
   // matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
-  if ((R * R.transpose() - Matrixd<3, 3>::Identity()).norm() > 1e-9) {
+  if ((R * R.transpose() - Eigen::Matrix3d::Identity()).norm() > 1e-9) {
     std::string msg =
         fmt::format("Rotation matrix isn't orthogonal\n\nR =\n{}\n", R);
 
@@ -112,7 +113,8 @@ Rotation3d::Rotation3d(const Matrixd<3, 3>& rotationMatrix) {
   m_q = Quaternion{w, x, y, z};
 }
 
-Rotation3d::Rotation3d(const Vectord<3>& initial, const Vectord<3>& final) {
+Rotation3d::Rotation3d(const Eigen::Vector3d& initial,
+                       const Eigen::Vector3d& final) {
   double dot = initial.dot(final);
   double normProduct = initial.norm() * final.norm();
   double dotNorm = dot / normProduct;
@@ -173,6 +175,11 @@ Rotation3d Rotation3d::operator/(double scalar) const {
   return *this * (1.0 / scalar);
 }
 
+bool Rotation3d::operator==(const Rotation3d& other) const {
+  return std::abs(std::abs(m_q.Dot(other.m_q)) -
+                  m_q.Norm() * other.m_q.Norm()) < 1e-9;
+}
+
 Rotation3d Rotation3d::RotateBy(const Rotation3d& other) const {
   return Rotation3d{other.m_q * m_q};
 }
@@ -187,9 +194,15 @@ units::radian_t Rotation3d::X() const {
   double y = m_q.Y();
   double z = m_q.Z();
 
-  // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
-  return units::radian_t{
-      std::atan2(2.0 * (w * x + y * z), 1.0 - 2.0 * (x * x + y * y))};
+  // wpimath/algorithms.md
+  double cxcy = 1.0 - 2.0 * (x * x + y * y);
+  double sxcy = 2.0 * (w * x + y * z);
+  double cy_sq = cxcy * cxcy + sxcy * sxcy;
+  if (cy_sq > 1e-20) {
+    return units::radian_t{std::atan2(sxcy, cxcy)};
+  } else {
+    return 0_rad;
+  }
 }
 
 units::radian_t Rotation3d::Y() const {
@@ -213,12 +226,18 @@ units::radian_t Rotation3d::Z() const {
   double y = m_q.Y();
   double z = m_q.Z();
 
-  // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
-  return units::radian_t{
-      std::atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z))};
+  // wpimath/algorithms.md
+  double cycz = 1.0 - 2.0 * (y * y + z * z);
+  double cysz = 2.0 * (w * z + x * y);
+  double cy_sq = cycz * cycz + cysz * cysz;
+  if (cy_sq > 1e-20) {
+    return units::radian_t{std::atan2(cysz, cycz)};
+  } else {
+    return units::radian_t{std::atan2(2.0 * w * z, w * w - z * z)};
+  }
 }
 
-Vectord<3> Rotation3d::Axis() const {
+Eigen::Vector3d Rotation3d::Axis() const {
   double norm = std::hypot(m_q.X(), m_q.Y(), m_q.Z());
   if (norm == 0.0) {
     return {0.0, 0.0, 0.0};

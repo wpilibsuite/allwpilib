@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Notifiers run a callback function on a separate thread at a specified period.
+ * Notifiers run a user-provided callback function on a separate thread.
  *
  * <p>If startSingle() is used, the callback will run once. If startPeriodic() is used, the callback
  * will run repeatedly with the given period until stop() is called.
@@ -19,22 +19,26 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Notifier implements AutoCloseable {
   // The thread waiting on the HAL alarm.
   private Thread m_thread;
-  // The lock for the process information.
+
+  // The lock held while updating process information.
   private final ReentrantLock m_processLock = new ReentrantLock();
-  // The C pointer to the notifier object. We don't use it directly, it is
-  // just passed to the JNI bindings.
+
+  // HAL handle passed to the JNI bindings (atomic for proper destruction).
   private final AtomicInteger m_notifier = new AtomicInteger();
-  // The time, in seconds, at which the corresponding handler should be
-  // called. Has the same zero as RobotController.getFPGATime().
+
+  // The user-provided callback.
+  private Runnable m_callback;
+
+  // The time, in seconds, at which the callback should be called. Has the same
+  // zero as RobotController.getFPGATime().
   private double m_expirationTimeSeconds;
-  // The handler passed in by the user which should be called at the
-  // appropriate interval.
-  private Runnable m_handler;
-  // Whether we are calling the handler just once or periodically.
-  private boolean m_periodic;
-  // If periodic, the period of the calling; if just once, stores how long it
-  // is until we call the handler.
+
+  // If periodic, stores the callback period; if single, stores the time until
+  // the callback call.
   private double m_periodSeconds;
+
+  // True if the callback is periodic
+  private boolean m_periodic;
 
   @Override
   public void close() {
@@ -43,7 +47,7 @@ public class Notifier implements AutoCloseable {
       return;
     }
     NotifierJNI.stopNotifier(handle);
-    // Join the thread to ensure the handler has exited.
+    // Join the thread to ensure the callback has exited.
     if (m_thread.isAlive()) {
       try {
         m_thread.interrupt();
@@ -75,15 +79,16 @@ public class Notifier implements AutoCloseable {
   }
 
   /**
-   * Create a Notifier for timer event notification.
+   * Create a Notifier with the given callback.
    *
-   * @param run The handler that is called at the notification time which is set using StartSingle
-   *     or StartPeriodic.
+   * <p>Configure when the callback runs with startSingle() or startPeriodic().
+   *
+   * @param callback The callback to run.
    */
-  public Notifier(Runnable run) {
-    requireNonNullParam(run, "run", "Notifier");
+  public Notifier(Runnable callback) {
+    requireNonNullParam(callback, "callback", "Notifier");
 
-    m_handler = run;
+    m_callback = callback;
     m_notifier.set(NotifierJNI.initializeNotifier());
 
     m_thread =
@@ -99,23 +104,24 @@ public class Notifier implements AutoCloseable {
                   break;
                 }
 
-                Runnable handler;
+                Runnable threadHandler;
                 m_processLock.lock();
                 try {
-                  handler = m_handler;
+                  threadHandler = m_callback;
                   if (m_periodic) {
                     m_expirationTimeSeconds += m_periodSeconds;
                     updateAlarm();
                   } else {
-                    // need to update the alarm to cause it to wait again
-                    updateAlarm((long) -1);
+                    // Need to update the alarm to cause it to wait again
+                    updateAlarm(-1);
                   }
                 } finally {
                   m_processLock.unlock();
                 }
 
-                if (handler != null) {
-                  handler.run();
+                // Call callback
+                if (threadHandler != null) {
+                  threadHandler.run();
                 }
               }
             });
@@ -128,7 +134,7 @@ public class Notifier implements AutoCloseable {
             error = cause;
           }
           DriverStation.reportError(
-              "Unhandled exception in Notifier thread: " + error.toString(), error.getStackTrace());
+              "Unhandled exception in Notifier thread: " + error, error.getStackTrace());
           DriverStation.reportError(
               "The Runnable for this Notifier (or methods called by it) should have handled "
                   + "the exception above.\n"
@@ -150,24 +156,39 @@ public class Notifier implements AutoCloseable {
   }
 
   /**
-   * Change the handler function.
+   * Change the callback function.
    *
-   * @param handler Handler
+   * @param callback The callback function.
+   * @deprecated Use setCallback() instead.
    */
-  public void setHandler(Runnable handler) {
+  @Deprecated(forRemoval = true, since = "2024")
+  public void setHandler(Runnable callback) {
     m_processLock.lock();
     try {
-      m_handler = handler;
+      m_callback = callback;
     } finally {
       m_processLock.unlock();
     }
   }
 
   /**
-   * Register for single event notification. A timer event is queued for a single event after the
-   * specified delay.
+   * Change the callback function.
    *
-   * @param delaySeconds Seconds to wait before the handler is called.
+   * @param callback The callback function.
+   */
+  public void setCallback(Runnable callback) {
+    m_processLock.lock();
+    try {
+      m_callback = callback;
+    } finally {
+      m_processLock.unlock();
+    }
+  }
+
+  /**
+   * Run the callback once after the given delay.
+   *
+   * @param delaySeconds Time in seconds to wait before the callback is called.
    */
   public void startSingle(double delaySeconds) {
     m_processLock.lock();
@@ -182,15 +203,13 @@ public class Notifier implements AutoCloseable {
   }
 
   /**
-   * Register for periodic event notification. A timer event is queued for periodic event
-   * notification. Each time the interrupt occurs, the event will be immediately requeued for the
-   * same time interval.
+   * Run the callback periodically with the given period.
    *
-   * <p>The user-provided callback should be written in a nonblocking manner so the callback can be
-   * recalled at the next periodic event notification.
+   * <p>The user-provided callback should be written so that it completes before the next time it's
+   * scheduled to run.
    *
-   * @param periodSeconds Period in seconds to call the handler starting one period after the call
-   *     to this method.
+   * @param periodSeconds Period in seconds after which to to call the callback starting one period
+   *     after the call to this method.
    */
   public void startPeriodic(double periodSeconds) {
     m_processLock.lock();
@@ -205,9 +224,13 @@ public class Notifier implements AutoCloseable {
   }
 
   /**
-   * Stop timer events from occurring. Stop any repeating timer events from occurring. This will
-   * also remove any single notification events from the queue. If a timer-based call to the
-   * registered handler is in progress, this function will block until the handler call is complete.
+   * Stop further callback invocations.
+   *
+   * <p>No further periodic callbacks will occur. Single invocations will also be cancelled if they
+   * haven't yet occurred.
+   *
+   * <p>If a callback invocation is in progress, this function will block until the callback is
+   * complete.
    */
   public void stop() {
     m_processLock.lock();

@@ -8,6 +8,7 @@
 
 #include <hal/CAN.h>
 #include <hal/HALBase.h>
+#include <hal/LEDs.h>
 #include <hal/Power.h>
 
 #include "frc/Errors.h"
@@ -39,6 +40,10 @@ std::string RobotController::GetComments() {
   char comments[65];
   size_t len = HAL_GetComments(comments, sizeof(comments));
   return std::string(comments, len);
+}
+
+int32_t RobotController::GetTeamNumber() {
+  return HAL_GetTeamNumber();
 }
 
 uint64_t RobotController::GetFPGATime() {
@@ -76,6 +81,20 @@ bool RobotController::IsBrownedOut() {
   return retVal;
 }
 
+bool RobotController::GetRSLState() {
+  int32_t status = 0;
+  bool retVal = HAL_GetRSLState(&status);
+  FRC_CheckErrorStatus(status, "GetRSLState");
+  return retVal;
+}
+
+bool RobotController::IsSystemTimeValid() {
+  int32_t status = 0;
+  bool retVal = HAL_GetSystemTimeValid(&status);
+  FRC_CheckErrorStatus(status, "IsSystemTimeValid");
+  return retVal;
+}
+
 double RobotController::GetInputVoltage() {
   int32_t status = 0;
   double retVal = HAL_GetVinVoltage(&status);
@@ -102,6 +121,12 @@ double RobotController::GetCurrent3V3() {
   double retVal = HAL_GetUserCurrent3V3(&status);
   FRC_CheckErrorStatus(status, "GetCurrent3V3");
   return retVal;
+}
+
+void RobotController::SetEnabled3V3(bool enabled) {
+  int32_t status = 0;
+  HAL_SetUserRailEnabled3V3(enabled, &status);
+  FRC_CheckErrorStatus(status, "SetEnabled3V3");
 }
 
 bool RobotController::GetEnabled3V3() {
@@ -132,6 +157,12 @@ double RobotController::GetCurrent5V() {
   return retVal;
 }
 
+void RobotController::SetEnabled5V(bool enabled) {
+  int32_t status = 0;
+  HAL_SetUserRailEnabled5V(enabled, &status);
+  FRC_CheckErrorStatus(status, "SetEnabled5V");
+}
+
 bool RobotController::GetEnabled5V() {
   int32_t status = 0;
   bool retVal = HAL_GetUserActive5V(&status);
@@ -160,6 +191,12 @@ double RobotController::GetCurrent6V() {
   return retVal;
 }
 
+void RobotController::SetEnabled6V(bool enabled) {
+  int32_t status = 0;
+  HAL_SetUserRailEnabled6V(enabled, &status);
+  FRC_CheckErrorStatus(status, "SetEnabled6V");
+}
+
 bool RobotController::GetEnabled6V() {
   int32_t status = 0;
   bool retVal = HAL_GetUserActive6V(&status);
@@ -185,6 +222,37 @@ void RobotController::SetBrownoutVoltage(units::volt_t brownoutVoltage) {
   int32_t status = 0;
   HAL_SetBrownoutVoltage(brownoutVoltage.value(), &status);
   FRC_CheckErrorStatus(status, "SetBrownoutVoltage");
+}
+
+units::celsius_t RobotController::GetCPUTemp() {
+  int32_t status = 0;
+  double retVal = HAL_GetCPUTemp(&status);
+  FRC_CheckErrorStatus(status, "GetCPUTemp");
+  return units::celsius_t{retVal};
+}
+
+static_assert(RadioLEDState::kOff ==
+              static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kOff));
+static_assert(
+    RadioLEDState::kGreen ==
+    static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kGreen));
+static_assert(RadioLEDState::kRed ==
+              static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kRed));
+static_assert(
+    RadioLEDState::kOrange ==
+    static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kOrange));
+
+void RobotController::SetRadioLEDState(RadioLEDState state) {
+  int32_t status = 0;
+  HAL_SetRadioLEDState(static_cast<HAL_RadioLEDState>(state), &status);
+  FRC_CheckErrorStatus(status, "SetRadioLEDState");
+}
+
+RadioLEDState RobotController::GetRadioLEDState() {
+  int32_t status = 0;
+  auto retVal = static_cast<RadioLEDState>(HAL_GetRadioLEDState(&status));
+  FRC_CheckErrorStatus(status, "GetRadioLEDState");
+  return retVal;
 }
 
 CANStatus RobotController::GetCANStatus() {

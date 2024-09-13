@@ -40,7 +40,7 @@ void RawSinkImpl::Stop() {
   }
 }
 
-uint64_t RawSinkImpl::GrabFrame(CS_RawFrame& image) {
+uint64_t RawSinkImpl::GrabFrame(WPI_RawFrame& image) {
   SetEnabled(true);
 
   auto source = GetSource();
@@ -60,7 +60,7 @@ uint64_t RawSinkImpl::GrabFrame(CS_RawFrame& image) {
   return GrabFrameImpl(image, frame);
 }
 
-uint64_t RawSinkImpl::GrabFrame(CS_RawFrame& image, double timeout) {
+uint64_t RawSinkImpl::GrabFrame(WPI_RawFrame& image, double timeout) {
   SetEnabled(true);
 
   auto source = GetSource();
@@ -80,11 +80,11 @@ uint64_t RawSinkImpl::GrabFrame(CS_RawFrame& image, double timeout) {
   return GrabFrameImpl(image, frame);
 }
 
-uint64_t RawSinkImpl::GrabFrameImpl(CS_RawFrame& rawFrame,
+uint64_t RawSinkImpl::GrabFrameImpl(WPI_RawFrame& rawFrame,
                                     Frame& incomingFrame) {
   Image* newImage = nullptr;
 
-  if (rawFrame.pixelFormat == CS_PixelFormat::CS_PIXFMT_UNKNOWN) {
+  if (rawFrame.pixelFormat == WPI_PixelFormat::WPI_PIXFMT_UNKNOWN) {
     // Always get incoming image directly on unknown
     newImage = incomingFrame.GetExistingImage(0);
   } else {
@@ -106,13 +106,13 @@ uint64_t RawSinkImpl::GrabFrameImpl(CS_RawFrame& rawFrame,
     return 0;
   }
 
-  CS_AllocateRawFrameData(&rawFrame, newImage->size());
+  WPI_AllocateRawFrameData(&rawFrame, newImage->size());
   rawFrame.height = newImage->height;
   rawFrame.width = newImage->width;
+  rawFrame.stride = newImage->GetStride();
   rawFrame.pixelFormat = newImage->pixelFormat;
-  rawFrame.totalData = newImage->size();
-  std::copy(newImage->data(), newImage->data() + rawFrame.totalData,
-            rawFrame.data);
+  rawFrame.size = newImage->size();
+  std::copy(newImage->data(), newImage->data() + rawFrame.size, rawFrame.data);
 
   return incomingFrame.GetTime();
 }
@@ -159,7 +159,7 @@ CS_Sink CreateRawSinkCallback(std::string_view name,
                                           inst.telemetry, processFrame));
 }
 
-uint64_t GrabSinkFrame(CS_Sink sink, CS_RawFrame& image, CS_Status* status) {
+uint64_t GrabSinkFrame(CS_Sink sink, WPI_RawFrame& image, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_RAW) {
     *status = CS_INVALID_HANDLE;
@@ -168,7 +168,7 @@ uint64_t GrabSinkFrame(CS_Sink sink, CS_RawFrame& image, CS_Status* status) {
   return static_cast<RawSinkImpl&>(*data->sink).GrabFrame(image);
 }
 
-uint64_t GrabSinkFrameTimeout(CS_Sink sink, CS_RawFrame& image, double timeout,
+uint64_t GrabSinkFrameTimeout(CS_Sink sink, WPI_RawFrame& image, double timeout,
                               CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_RAW) {
@@ -192,12 +192,12 @@ CS_Sink CS_CreateRawSinkCallback(const char* name, void* data,
       name, [=](uint64_t time) { processFrame(data, time); }, status);
 }
 
-uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct CS_RawFrame* image,
+uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct WPI_RawFrame* image,
                              CS_Status* status) {
   return cs::GrabSinkFrame(sink, *image, status);
 }
 
-uint64_t CS_GrabRawSinkFrameTimeout(CS_Sink sink, struct CS_RawFrame* image,
+uint64_t CS_GrabRawSinkFrameTimeout(CS_Sink sink, struct WPI_RawFrame* image,
                                     double timeout, CS_Status* status) {
   return cs::GrabSinkFrameTimeout(sink, *image, timeout, status);
 }

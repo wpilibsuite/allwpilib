@@ -15,7 +15,10 @@ import edu.wpi.first.math.controller.PIDController;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public abstract class PIDSubsystem extends SubsystemBase {
+  /** PID controller. */
   protected final PIDController m_controller;
+
+  /** Whether PID controller output is enabled. */
   protected boolean m_enabled;
 
   /**
@@ -24,6 +27,7 @@ public abstract class PIDSubsystem extends SubsystemBase {
    * @param controller the PIDController to use
    * @param initialPosition the initial setpoint of the subsystem
    */
+  @SuppressWarnings("this-escape")
   public PIDSubsystem(PIDController controller, double initialPosition) {
     m_controller = requireNonNullParam(controller, "controller", "PIDSubsystem");
     setSetpoint(initialPosition);
@@ -46,6 +50,11 @@ public abstract class PIDSubsystem extends SubsystemBase {
     }
   }
 
+  /**
+   * Returns the PIDController.
+   *
+   * @return The controller.
+   */
   public PIDController getController() {
     return m_controller;
   }
@@ -55,7 +64,7 @@ public abstract class PIDSubsystem extends SubsystemBase {
    *
    * @param setpoint the setpoint for the subsystem
    */
-  public void setSetpoint(double setpoint) {
+  public final void setSetpoint(double setpoint) {
     m_controller.setSetpoint(setpoint);
   }
 

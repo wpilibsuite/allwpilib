@@ -22,7 +22,9 @@ includeOtherLibs {
   ^GLFW
   ^cscore
   ^fmt/
+  ^fields/
   ^frc/
+  ^google/
   ^imgui
   ^networktables/
   ^ntcore

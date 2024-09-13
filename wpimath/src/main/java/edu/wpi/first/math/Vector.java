@@ -5,6 +5,8 @@
 package edu.wpi.first.math;
 
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import java.util.Objects;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -47,6 +49,16 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
     super(other);
   }
 
+  /**
+   * Returns an element of the vector at a specified row.
+   *
+   * @param row The row that the element is located at.
+   * @return An element of the vector.
+   */
+  public double get(int row) {
+    return get(row, 0);
+  }
+
   @Override
   public Vector<R> times(double value) {
     return new Vector<>(this.m_storage.scale(value));
@@ -60,6 +72,26 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
   @Override
   public Vector<R> div(double value) {
     return new Vector<>(this.m_storage.divide(value));
+  }
+
+  /**
+   * Adds the given vector to this vector.
+   *
+   * @param value The vector to add.
+   * @return The resultant vector.
+   */
+  public final Vector<R> plus(Vector<R> value) {
+    return new Vector<>(this.m_storage.plus(Objects.requireNonNull(value).m_storage));
+  }
+
+  /**
+   * Subtracts the given vector to this vector.
+   *
+   * @param value The vector to add.
+   * @return The resultant vector.
+   */
+  public final Vector<R> minus(Vector<R> value) {
+    return new Vector<>(this.m_storage.minus(Objects.requireNonNull(value).m_storage));
   }
 
   /**
@@ -84,12 +116,39 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
    * @return The norm.
    */
   public double norm() {
-    double squaredNorm = 0.0;
+    return Math.sqrt(dot(this));
+  }
 
-    for (int i = 0; i < getNumRows(); ++i) {
-      squaredNorm += get(i, 0) * get(i, 0);
-    }
+  /**
+   * Returns the unit vector parallel with this vector.
+   *
+   * @return The unit vector.
+   */
+  public Vector<R> unit() {
+    return div(norm());
+  }
 
-    return Math.sqrt(squaredNorm);
+  /**
+   * Returns the projection of this vector along another.
+   *
+   * @param other The vector to project along.
+   * @return The projection.
+   */
+  public Vector<R> projection(Vector<R> other) {
+    return other.times(dot(other)).div(other.dot(other));
+  }
+
+  /**
+   * Returns the cross product of 3 dimensional vectors a and b.
+   *
+   * @param a The vector to cross with b.
+   * @param b The vector to cross with a.
+   * @return The cross product of a and b.
+   */
+  public static Vector<N3> cross(Vector<N3> a, Vector<N3> b) {
+    return VecBuilder.fill(
+        a.get(1) * b.get(2) - a.get(2) * b.get(1),
+        a.get(2) * b.get(0) - a.get(0) * b.get(2),
+        a.get(0) * b.get(1) - a.get(1) * b.get(0));
   }
 }

@@ -4,25 +4,28 @@
 
 #pragma once
 
+#include <wpi/RawFrame.h>
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
 #include "frc/geometry/Pose3d.h"
 
-namespace wpi {
-class json;
-}  // namespace wpi
-
 namespace frc {
 
+/**
+ * Represents an AprilTag's metadata.
+ */
 struct WPILIB_DLLEXPORT AprilTag {
+  /// The tag's ID.
   int ID;
 
+  /// The tag's pose.
   Pose3d pose;
 
-  /**
-   * Checks equality between this AprilTag and another object.
-   */
   bool operator==(const AprilTag&) const = default;
+
+  static bool Generate36h11AprilTagImage(wpi::RawFrame* frame, int id);
+  static bool Generate16h5AprilTagImage(wpi::RawFrame* frame, int id);
 };
 
 WPILIB_DLLEXPORT

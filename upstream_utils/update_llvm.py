@@ -13,7 +13,6 @@ from upstream_utils import (
 
 
 def run_global_replacements(wpiutil_llvm_files):
-
     for wpi_file in wpiutil_llvm_files:
         with open(wpi_file) as f:
             content = f.read()
@@ -29,7 +28,7 @@ def run_global_replacements(wpiutil_llvm_files):
 
         # Fix uses of span
         content = content.replace("span", "std::span")
-        content = content.replace('include "wpi/std::span.h"', "include <span>")
+        content = content.replace("include <std::span>", "include <span>")
         if wpi_file.endswith("ConvertUTFWrapper.cpp"):
             content = content.replace(
                 "const UTF16 *Src = reinterpret_cast<const UTF16 *>(SrcBytes.begin());",
@@ -38,6 +37,14 @@ def run_global_replacements(wpiutil_llvm_files):
             content = content.replace(
                 "const UTF16 *SrcEnd = reinterpret_cast<const UTF16 *>(SrcBytes.end());",
                 "const UTF16 *SrcEnd = reinterpret_cast<const UTF16 *>(&*SrcBytes.begin() + SrcBytes.size());",
+            )
+            content = content.replace(
+                "const UTF32 *Src = reinterpret_cast<const UTF32 *>(SrcBytes.begin());",
+                "const UTF32 *Src = reinterpret_cast<const UTF32 *>(&*SrcBytes.begin());",
+            )
+            content = content.replace(
+                "const UTF32 *SrcEnd = reinterpret_cast<const UTF32 *>(SrcBytes.end());",
+                "const UTF32 *SrcEnd = reinterpret_cast<const UTF32 *>(&*SrcBytes.begin() + SrcBytes.size());",
             )
 
         # Remove unused headers
@@ -100,7 +107,6 @@ def flattened_llvm_files(llvm, dirs_to_keep):
 
 
 def find_wpiutil_llvm_files(wpiutil_root, subfolder):
-
     # These files have substantial changes, not worth managing with the patching process
     ignore_list = [
         "StringExtras.h",
@@ -165,41 +171,47 @@ def overwrite_tests(wpiutil_root, llvm_root):
 
 
 def main():
-    upstream_root = clone_repo("https://github.com/llvm/llvm-project", "llvmorg-14.0.6")
+    upstream_root = clone_repo("https://github.com/llvm/llvm-project", "llvmorg-17.0.5")
     wpilib_root = get_repo_root()
     wpiutil = os.path.join(wpilib_root, "wpiutil")
 
     # Apply patches to upstream Git repo
     os.chdir(upstream_root)
     for f in [
-        "0001-Fix-spelling-language-errors.patch",
-        "0002-Remove-StringRef-ArrayRef-and-Optional.patch",
-        "0003-Wrap-std-min-max-calls-in-parens-for-Windows-warning.patch",
-        "0004-Change-unique_function-storage-size.patch",
-        "0005-Threading-updates.patch",
-        "0006-ifdef-guard-safety.patch",
-        "0007-Explicitly-use-std.patch",
-        "0008-Remove-format_provider.patch",
-        "0009-Add-compiler-warning-pragmas.patch",
-        "0010-Remove-unused-functions.patch",
-        "0011-Detemplatize-SmallVectorBase.patch",
-        "0012-Add-vectors-to-raw_ostream.patch",
-        "0013-Extra-collections-features.patch",
-        "0014-EpochTracker-ABI-macro.patch",
-        "0015-Delete-numbers-from-MathExtras.patch",
-        "0016-Add-lerp-and-sgn.patch",
-        "0017-Fixup-includes.patch",
-        "0018-Use-std-is_trivially_copy_constructible.patch",
-        "0019-Windows-support.patch",
-        "0020-Prefer-fmtlib.patch",
-        "0021-Prefer-wpi-s-fs.h.patch",
-        "0022-Remove-unused-functions.patch",
-        "0023-OS-specific-changes.patch",
-        "0024-Use-SmallVector-for-UTF-conversion.patch",
-        "0025-Prefer-to-use-static-pointers-in-raw_ostream.patch",
-        "0026-constexpr-endian-byte-swap.patch",
-        "0027-Copy-type-traits-from-STLExtras.h-into-PointerUnion..patch",
-        "0028-Remove-StringMap-test-for-llvm-sort.patch",
+        "0001-Remove-StringRef-ArrayRef-and-Optional.patch",
+        "0002-Wrap-std-min-max-calls-in-parens-for-Windows-warning.patch",
+        "0003-Change-unique_function-storage-size.patch",
+        "0004-Threading-updates.patch",
+        "0005-ifdef-guard-safety.patch",
+        "0006-Explicitly-use-std.patch",
+        "0007-Remove-format_provider.patch",
+        "0008-Add-compiler-warning-pragmas.patch",
+        "0009-Remove-unused-functions.patch",
+        "0010-Detemplatize-SmallVectorBase.patch",
+        "0011-Add-vectors-to-raw_ostream.patch",
+        "0012-Extra-collections-features.patch",
+        "0013-EpochTracker-ABI-macro.patch",
+        "0014-Delete-numbers-from-MathExtras.patch",
+        "0015-Add-lerp-and-sgn.patch",
+        "0016-Fixup-includes.patch",
+        "0017-Use-std-is_trivially_copy_constructible.patch",
+        "0018-Windows-support.patch",
+        "0019-Prefer-fmtlib.patch",
+        "0020-Prefer-wpi-s-fs.h.patch",
+        "0021-Remove-unused-functions.patch",
+        "0022-OS-specific-changes.patch",
+        "0023-Use-SmallVector-for-UTF-conversion.patch",
+        "0024-Prefer-to-use-static-pointers-in-raw_ostream.patch",
+        "0025-constexpr-endian-byte-swap.patch",
+        "0026-Copy-type-traits-from-STLExtras.h-into-PointerUnion..patch",
+        "0027-Remove-StringMap-test-for-llvm-sort.patch",
+        "0028-Unused-variable-in-release-mode.patch",
+        "0029-Use-C-20-bit-header.patch",
+        "0030-Remove-DenseMap-GTest-printer-test.patch",
+        "0031-Replace-deprecated-std-aligned_storage_t.patch",
+        "0032-Fix-compilation-of-MathExtras.h-on-Windows-with-sdl.patch",
+        "0033-raw_ostream-Add-SetNumBytesInBuffer.patch",
+        "0034-type_traits.h-Add-is_constexpr.patch",
     ]:
         git_am(
             os.path.join(wpilib_root, "upstream_utils/llvm_patches", f),

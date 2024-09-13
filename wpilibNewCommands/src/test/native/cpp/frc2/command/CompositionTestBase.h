@@ -7,9 +7,10 @@
 #include <memory>
 #include <utility>
 
+#include <gtest/gtest.h>
+
 #include "CommandTestBase.h"
 #include "frc2/command/Commands.h"
-#include "gtest/gtest.h"
 #include "make_vector.h"
 
 namespace frc2 {

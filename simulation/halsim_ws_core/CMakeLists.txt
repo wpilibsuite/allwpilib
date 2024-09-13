@@ -13,4 +13,4 @@ target_include_directories(halsim_ws_core PUBLIC src/main/native/include)
 
 set_property(TARGET halsim_ws_core PROPERTY FOLDER "libraries")
 
-install(TARGETS halsim_ws_core EXPORT halsim_ws_core DESTINATION "${main_lib_dest}")
+install(TARGETS halsim_ws_core EXPORT halsim_ws_core)

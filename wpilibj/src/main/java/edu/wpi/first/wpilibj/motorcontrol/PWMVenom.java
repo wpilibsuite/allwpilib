@@ -31,10 +31,11 @@ public class PWMVenom extends PWMMotorController {
    * @param channel The PWM channel that the Venom is attached to. 0-9 are on-board, 10-19 are on
    *     the MXP port
    */
+  @SuppressWarnings("this-escape")
   public PWMVenom(final int channel) {
     super("PWMVenom", channel);
 
-    m_pwm.setBounds(2.004, 1.52, 1.50, 1.48, 0.997);
+    m_pwm.setBoundsMicroseconds(2004, 1520, 1500, 1480, 997);
     m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();

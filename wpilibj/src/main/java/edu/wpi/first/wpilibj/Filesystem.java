@@ -23,7 +23,13 @@ public final class Filesystem {
    * @return The current working directory (launch directory)
    */
   public static File getLaunchDirectory() {
-    return new File(System.getProperty("user.dir")).getAbsoluteFile();
+    // workaround for
+    // https://www.chiefdelphi.com/t/filesystem-getdeploydirectory-returning-wrong-location-how-to-fix/427292
+    String path =
+        System.getProperty("user.dir")
+            .replace(
+                File.separator + "build" + File.separator + "jni" + File.separator + "release", "");
+    return new File(path).getAbsoluteFile();
   }
 
   /**
@@ -33,7 +39,7 @@ public final class Filesystem {
    * @return The operating directory
    */
   public static File getOperatingDirectory() {
-    if (RobotBase.isReal()) {
+    if (!RobotBase.isSimulation()) {
       return new File("/home/lvuser");
     } else {
       return getLaunchDirectory();
@@ -48,7 +54,7 @@ public final class Filesystem {
    * @return The 'deploy' directory
    */
   public static File getDeployDirectory() {
-    if (RobotBase.isReal()) {
+    if (!RobotBase.isSimulation()) {
       return new File(getOperatingDirectory(), "deploy");
     } else {
       return new File(

@@ -400,12 +400,12 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
           fmt::print(os,
                      "<input id=\"{0}{1}\" type=\"radio\" name=\"{0}\" "
                      "value=\"{2}\" onclick=\"update('{0}', {1})\"",
-                     name, j, ch_name);
+                     name, j, ch_name.str());
           if (j == valE) {
             os << " checked";
           }
           fmt::print(os, " /><label for=\"{}{}\">{}</label>\n", name, j,
-                     ch_name);
+                     ch_name.str());
         }
         break;
       }
@@ -543,7 +543,7 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
         for (char ch : *choice) {
           ch_name.push_back(std::isprint(ch) ? ch : ' ');
         }
-        fmt::print(os, "\"{}\": \"{}\"", j, ch_name);
+        fmt::print(os, "\"{}\": \"{}\"", j, ch_name.str());
       }
       os << "}\n";
     }

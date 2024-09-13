@@ -16,6 +16,8 @@
       _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #elif defined(_WIN32)
 #define WPI_IGNORE_DEPRECATED _Pragma("warning(disable : 4996)")
+#else
+#define WPI_IGNORE_DEPRECATED
 #endif
 
 #endif
@@ -25,6 +27,8 @@
 #define WPI_UNIGNORE_DEPRECATED _Pragma("GCC diagnostic pop")
 #elif defined(_WIN32)
 #define WPI_UNIGNORE_DEPRECATED _Pragma("warning(default : 4996)")
+#else
+#define WPI_UNIGNORE_DEPRECATED
 #endif
 #endif
 

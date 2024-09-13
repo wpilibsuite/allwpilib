@@ -90,5 +90,5 @@ units::second_t Timer::GetFPGATimestamp() {
 }
 
 units::second_t Timer::GetMatchTime() {
-  return units::second_t{frc::DriverStation::GetMatchTime()};
+  return frc::DriverStation::GetMatchTime();
 }

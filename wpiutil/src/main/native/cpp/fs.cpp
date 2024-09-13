@@ -43,26 +43,6 @@
 
 #endif  // _WIN32
 
-#if defined(__APPLE__)
-#include <Availability.h>
-#endif
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) \
-     || (defined(__cplusplus) && __cplusplus >= 201703L)) \
-    && defined(__has_include)
-#if __has_include(<filesystem>) \
-    && (!defined(__MAC_OS_X_VERSION_MIN_REQUIRED) \
-        || __MAC_OS_X_VERSION_MIN_REQUIRED >= 101500) \
-    && (defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 10 \
-        || (__GNUC__ >= 9 && __GNUC_MINOR__ >= 1))
-#define GHC_USE_STD_FS
-#endif
-#endif
-#ifndef GHC_USE_STD_FS
-// #define GHC_WIN_DISABLE_WSTRING_STORAGE_TYPE
-#define GHC_FILESYSTEM_IMPLEMENTATION
-#include "wpi/ghc/filesystem.hpp"
-#endif
-
 #include "wpi/Errno.h"
 #include "wpi/ErrorHandling.h"
 #include "wpi/WindowsError.h"

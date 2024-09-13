@@ -15,7 +15,7 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class ProxyCommand extends CommandBase {
+public class ProxyCommand extends Command {
   private final Supplier<Command> m_supplier;
   private Command m_command;
 
@@ -35,6 +35,7 @@ public class ProxyCommand extends CommandBase {
    *
    * @param command the command to run by proxy
    */
+  @SuppressWarnings("this-escape")
   public ProxyCommand(Command command) {
     this(() -> command);
     setName("Proxy(" + command.getName() + ")");

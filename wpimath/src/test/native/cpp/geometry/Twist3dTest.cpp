@@ -5,8 +5,9 @@
 #include <cmath>
 #include <numbers>
 
+#include <gtest/gtest.h>
+
 #include "frc/geometry/Pose3d.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

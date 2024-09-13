@@ -14,6 +14,7 @@
 
 #include <fmt/format.h>
 #include <wpi/Synchronization.h>
+#include <wpi/timestamp.h>
 
 #include "ntcore.h"
 #include "ntcore_cpp.h"
@@ -23,6 +24,8 @@ void bench2();
 void stress();
 
 int main(int argc, char* argv[]) {
+  wpi::impl::SetupNowDefaultOnRio();
+
   if (argc == 2 && std::string_view{argv[1]} == "bench") {
     bench();
     return EXIT_SUCCESS;

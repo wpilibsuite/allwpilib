@@ -7,6 +7,7 @@ package edu.wpi.first.math.estimator;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
@@ -47,16 +48,16 @@ class KalmanFilterTest {
   // Y is [x, y, theta]ᵀ and u is [ax, ay, alpha}ᵀ
   LinearSystem<N6, N3, N3> m_swerveObserverSystem =
       new LinearSystem<>(
-          Matrix.mat(Nat.N6(), Nat.N6())
-              .fill( // A
-                  0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                  0, 0, 0, 0, 0, 0, 0, 0, 0),
-          Matrix.mat(Nat.N6(), Nat.N3())
-              .fill( // B
-                  0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1),
-          Matrix.mat(Nat.N3(), Nat.N6())
-              .fill( // C
-                  1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0),
+          MatBuilder.fill(
+              Nat.N6(), Nat.N6(), // A
+              0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0),
+          MatBuilder.fill(
+              Nat.N6(), Nat.N3(), // B
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+          MatBuilder.fill(
+              Nat.N3(), Nat.N6(), // C
+              1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0),
           new Matrix<>(Nat.N3(), Nat.N3())); // D
 
   @Test

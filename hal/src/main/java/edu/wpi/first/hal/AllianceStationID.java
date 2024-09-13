@@ -4,11 +4,20 @@
 
 package edu.wpi.first.hal;
 
+/** Alliance station ID. */
 public enum AllianceStationID {
+  /** Unknown. */
+  Unknown,
+  /** Red 1. */
   Red1,
+  /** Red 2. */
   Red2,
+  /** Red 3. */
   Red3,
+  /** Blue 1. */
   Blue1,
+  /** Blue 2. */
   Blue2,
+  /** Blue 3. */
   Blue3
 }

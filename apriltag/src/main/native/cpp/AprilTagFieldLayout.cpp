@@ -8,22 +8,21 @@
 
 #include <units/angle.h>
 #include <units/length.h>
+#include <wpi/MemoryBuffer.h>
 #include <wpi/json.h>
-#include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 
 using namespace frc;
 
 AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
-  std::error_code error_code;
-
-  wpi::raw_fd_istream input{path, error_code};
-  if (error_code) {
+  std::error_code ec;
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+      wpi::MemoryBuffer::GetFile(path, ec);
+  if (fileBuffer == nullptr || ec) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
-  wpi::json json;
-  input >> json;
+  wpi::json json = wpi::json::parse(fileBuffer->GetCharBuffer());
 
   for (const auto& tag : json.at("tags").get<std::vector<AprilTag>>()) {
     m_apriltags[tag.ID] = tag;
@@ -42,6 +41,23 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
   }
 }
 
+units::meter_t AprilTagFieldLayout::GetFieldLength() const {
+  return m_fieldLength;
+}
+
+units::meter_t AprilTagFieldLayout::GetFieldWidth() const {
+  return m_fieldWidth;
+}
+
+std::vector<AprilTag> AprilTagFieldLayout::GetTags() const {
+  std::vector<AprilTag> tags;
+  tags.reserve(m_apriltags.size());
+  for (const auto& tag : m_apriltags) {
+    tags.emplace_back(tag.second);
+  }
+  return tags;
+}
+
 void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
   switch (origin) {
     case OriginPosition::kBlueAllianceWallRightSide:
@@ -58,6 +74,10 @@ void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
 
 void AprilTagFieldLayout::SetOrigin(const Pose3d& origin) {
   m_origin = origin;
+}
+
+Pose3d AprilTagFieldLayout::GetOrigin() const {
+  return m_origin;
 }
 
 std::optional<frc::Pose3d> AprilTagFieldLayout::GetTagPose(int ID) const {
@@ -104,4 +124,38 @@ void frc::from_json(const wpi::json& json, AprilTagFieldLayout& layout) {
       units::meter_t{json.at("field").at("length").get<double>()};
   layout.m_fieldWidth =
       units::meter_t{json.at("field").at("width").get<double>()};
+}
+
+// Use namespace declaration for forward declaration
+namespace frc {
+
+// C++ generated from resource files
+std::string_view GetResource_2022_rapidreact_json();
+std::string_view GetResource_2023_chargedup_json();
+std::string_view GetResource_2024_crescendo_json();
+
+}  // namespace frc
+
+AprilTagFieldLayout AprilTagFieldLayout::LoadField(AprilTagField field) {
+  std::string_view fieldString;
+  switch (field) {
+    case AprilTagField::k2022RapidReact:
+      fieldString = GetResource_2022_rapidreact_json();
+      break;
+    case AprilTagField::k2023ChargedUp:
+      fieldString = GetResource_2023_chargedup_json();
+      break;
+    case AprilTagField::k2024Crescendo:
+      fieldString = GetResource_2024_crescendo_json();
+      break;
+    case AprilTagField::kNumFields:
+      throw std::invalid_argument("Invalid Field");
+  }
+
+  wpi::json json = wpi::json::parse(fieldString);
+  return json.get<AprilTagFieldLayout>();
+}
+
+AprilTagFieldLayout frc::LoadAprilTagLayoutField(AprilTagField field) {
+  return AprilTagFieldLayout::LoadField(field);
 }

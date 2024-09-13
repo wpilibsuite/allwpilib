@@ -133,6 +133,10 @@ void AnalogGyro::Calibrate() {
   FRC_CheckErrorStatus(status, "Channel {}", m_analog->GetChannel());
 }
 
+Rotation2d AnalogGyro::GetRotation2d() const {
+  return units::degree_t{-GetAngle()};
+}
+
 std::shared_ptr<AnalogInput> AnalogGyro::GetAnalogInput() const {
   return m_analog;
 }

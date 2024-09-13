@@ -14,8 +14,11 @@
 
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
+#include <wpi/protobuf/Protobuf.h>
+#include <wpi/struct/Struct.h>
 
 #include "networktables/NetworkTableEntry.h"
+#include "networktables/Topic.h"
 #include "ntcore_c.h"
 
 namespace nt {
@@ -29,9 +32,17 @@ class FloatTopic;
 class IntegerArrayTopic;
 class IntegerTopic;
 class NetworkTableInstance;
+template <wpi::ProtobufSerializable T>
+class ProtobufTopic;
 class RawTopic;
 class StringArrayTopic;
 class StringTopic;
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+class StructArrayTopic;
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+class StructTopic;
 class Topic;
 
 /**
@@ -219,6 +230,44 @@ class NetworkTable final {
    * @return StringArrayTopic
    */
   StringArrayTopic GetStringArrayTopic(std::string_view name) const;
+
+  /**
+   * Gets a protobuf serialized value topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  template <wpi::ProtobufSerializable T>
+  ProtobufTopic<T> GetProtobufTopic(std::string_view name) const {
+    return ProtobufTopic<T>{GetTopic(name)};
+  }
+
+  /**
+   * Gets a raw struct serialized value topic.
+   *
+   * @param name topic name
+   * @param info optional struct type info
+   * @return Topic
+   */
+  template <typename T, typename... I>
+    requires wpi::StructSerializable<T, I...>
+  StructTopic<T, I...> GetStructTopic(std::string_view name, I... info) const {
+    return StructTopic<T, I...>{GetTopic(name), std::move(info)...};
+  }
+
+  /**
+   * Gets a raw struct serialized array topic.
+   *
+   * @param name topic name
+   * @param info optional struct type info
+   * @return Topic
+   */
+  template <typename T, typename... I>
+    requires wpi::StructSerializable<T, I...>
+  StructArrayTopic<T, I...> GetStructArrayTopic(std::string_view name,
+                                                I... info) const {
+    return StructArrayTopic<T, I...>{GetTopic(name), std::move(info)...};
+  }
 
   /**
    * Returns the table at the specified key. If there is no table at the

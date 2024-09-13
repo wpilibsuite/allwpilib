@@ -11,7 +11,7 @@ def licenseFile = file("$rootDir/license.md")
 task cppSourcesZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = zipBaseName
-    classifier = "sources"
+    archiveClassifier = "sources"
 
     from(licenseFile) {
         into '/'
@@ -25,7 +25,7 @@ task cppSourcesZip(type: Zip) {
 task cppHeadersZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = zipBaseName
-    classifier = "headers"
+    archiveClassifier = "headers"
 
     from(licenseFile) {
         into '/'

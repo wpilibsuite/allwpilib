@@ -6,11 +6,13 @@
 
 #include <stdint.h>
 
+/** max length of LED strip supported by FPGA. */
 #define HAL_kAddressableLEDMaxLength 5460
 
+/** structure for holding one LED's color data. */
 struct HAL_AddressableLEDData {
-  uint8_t b;
-  uint8_t g;
-  uint8_t r;
+  uint8_t b;  ///< blue value
+  uint8_t g;  ///< green value
+  uint8_t r;  ///< red value
   uint8_t padding;
 };

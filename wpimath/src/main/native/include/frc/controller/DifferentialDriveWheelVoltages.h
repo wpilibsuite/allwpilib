@@ -12,8 +12,14 @@ namespace frc {
  * Motor voltages for a differential drive.
  */
 struct DifferentialDriveWheelVoltages {
+  /// Left wheel voltage.
   units::volt_t left = 0_V;
+
+  /// Right wheel voltage.
   units::volt_t right = 0_V;
 };
 
 }  // namespace frc
+
+#include "frc/controller/proto/DifferentialDriveWheelVoltagesProto.h"
+#include "frc/controller/struct/DifferentialDriveWheelVoltagesStruct.h"

@@ -13,43 +13,17 @@
 
 #pragma once
 
+#include <filesystem>
+#include <fstream>
 #include <string_view>
 #include <system_error>
 
-#if defined(__APPLE__)
-#include <Availability.h>
-#endif
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) \
-     || (defined(__cplusplus) && __cplusplus >= 201703L)) \
-    && defined(__has_include)
-#if __has_include(<filesystem>) \
-    && (!defined(__MAC_OS_X_VERSION_MIN_REQUIRED) \
-        || __MAC_OS_X_VERSION_MIN_REQUIRED >= 101500) \
-    && (defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 10 \
-        || (__GNUC__ >= 9 && __GNUC_MINOR__ >= 1))
-#define GHC_USE_STD_FS
-#include <filesystem>
 namespace fs {
+
 using namespace std::filesystem;
 using ifstream = std::ifstream;
 using ofstream = std::ofstream;
 using fstream = std::fstream;
-}  // namespace fs
-#endif
-#endif
-#ifndef GHC_USE_STD_FS
-// #define GHC_WIN_DISABLE_WSTRING_STORAGE_TYPE
-#define GHC_FILESYSTEM_FWD
-#include "wpi/ghc/filesystem.hpp"
-namespace fs {
-using namespace ghc::filesystem;
-using ifstream = ghc::filesystem::ifstream;
-using ofstream = ghc::filesystem::ofstream;
-using fstream = ghc::filesystem::fstream;
-}  // namespace fs
-#endif
-
-namespace fs {
 
 #if defined(_WIN32)
 // A Win32 HANDLE is a typedef of void*

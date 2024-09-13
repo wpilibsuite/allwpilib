@@ -9,6 +9,7 @@
 #include <string_view>
 #include <utility>
 
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 
 #include "glass/View.h"

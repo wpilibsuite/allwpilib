@@ -46,6 +46,7 @@ static JException canMessageNotFoundExCls;
 static JException canMessageNotAllowedExCls;
 static JException canNotInitializedExCls;
 static JException uncleanStatusExCls;
+static JException nullPointerEx;
 static JClass powerDistributionVersionCls;
 static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
@@ -56,6 +57,7 @@ static JClass canStreamMessageCls;
 static JClass halValueCls;
 static JClass baseStoreCls;
 static JClass revPHVersionCls;
+static JClass canStreamOverflowExCls;
 
 static const JClassInit classes[] = {
     {"edu/wpi/first/hal/PowerDistributionVersion",
@@ -68,7 +70,9 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/hal/CANStreamMessage", &canStreamMessageCls},
     {"edu/wpi/first/hal/HALValue", &halValueCls},
     {"edu/wpi/first/hal/DMAJNISample$BaseStore", &baseStoreCls},
-    {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls}};
+    {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls},
+    {"edu/wpi/first/hal/can/CANStreamOverflowException",
+     &canStreamOverflowExCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
@@ -82,7 +86,8 @@ static const JExceptionInit exceptions[] = {
      &canMessageNotAllowedExCls},
     {"edu/wpi/first/hal/can/CANNotInitializedException",
      &canNotInitializedExCls},
-    {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls}};
+    {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls},
+    {"java/lang/NullPointerException", &nullPointerEx}};
 
 namespace hal {
 
@@ -207,6 +212,20 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
       break;
     }
   }
+}
+
+void ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
+  nullPointerEx.Throw(env, msg);
+}
+
+void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages,
+                                     jint length) {
+  static jmethodID constructor =
+      env->GetMethodID(canStreamOverflowExCls, "<init>",
+                       "([Ledu/wpi/first/hal/CANStreamMessage;I)V");
+  jobject exception =
+      env->NewObject(canStreamOverflowExCls, constructor, messages, length);
+  env->Throw(static_cast<jthrowable>(exception));
 }
 
 void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
@@ -365,6 +384,12 @@ jobject CreatePowerDistributionVersion(JNIEnv* env, uint32_t firmwareMajor,
       static_cast<jint>(hardwareMajor), static_cast<jint>(uniqueId));
 }
 
+jobject CreateCANStreamMessage(JNIEnv* env) {
+  static jmethodID constructor =
+      env->GetMethodID(canStreamMessageCls, "<init>", "()V");
+  return env->NewObject(canStreamMessageCls, constructor);
+}
+
 JavaVM* GetJVM() {
   return jvm;
 }
@@ -482,6 +507,18 @@ Java_edu_wpi_first_hal_HALUtil_getComments
   char comments[65];
   size_t len = HAL_GetComments(comments, sizeof(comments));
   return MakeJString(env, std::string_view(comments, len));
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HALUtil
+ * Method:    getTeamNumber
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_HALUtil_getTeamNumber
+  (JNIEnv* env, jclass)
+{
+  return HAL_GetTeamNumber();
 }
 
 /*

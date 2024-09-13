@@ -41,7 +41,8 @@ class AnalogInputSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -66,7 +67,8 @@ class AnalogInputSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterAverageBitsCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterAverageBitsCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -91,7 +93,8 @@ class AnalogInputSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterOversampleBitsCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterOversampleBitsCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -116,7 +119,8 @@ class AnalogInputSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterVoltageCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterVoltageCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -141,9 +145,9 @@ class AnalogInputSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterAccumulatorInitializedCallback(NotifyCallback callback,
-                                         bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterAccumulatorInitializedCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Check if the accumulator has been initialized.
@@ -167,7 +171,8 @@ class AnalogInputSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterAccumulatorValueCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterAccumulatorValueCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -192,7 +197,8 @@ class AnalogInputSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterAccumulatorCountCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterAccumulatorCountCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -217,9 +223,9 @@ class AnalogInputSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterAccumulatorCenterCallback(NotifyCallback callback,
-                                    bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterAccumulatorCenterCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Get the accumulator center.
@@ -243,9 +249,9 @@ class AnalogInputSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterAccumulatorDeadbandCallback(NotifyCallback callback,
-                                      bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterAccumulatorDeadbandCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Get the accumulator deadband.

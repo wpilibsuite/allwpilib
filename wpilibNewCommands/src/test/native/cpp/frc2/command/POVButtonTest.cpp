@@ -4,13 +4,13 @@
 
 #include <frc/Joystick.h>
 #include <frc/simulation/JoystickSim.h>
+#include <gtest/gtest.h>
 
 #include "CommandTestBase.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
 #include "frc2/command/button/POVButton.h"
-#include "gtest/gtest.h"
 
 using namespace frc2;
 class POVButtonTest : public CommandTestBase {};

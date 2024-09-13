@@ -15,10 +15,14 @@ import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
+/** Helper class for building Sendable dashboard representations. */
 public interface SendableBuilder extends AutoCloseable {
   /** The backend kinds used for the sendable builder. */
   enum BackendKind {
+    /** Unknown. */
     kUnknown,
+
+    /** NetworkTables. */
     kNetworkTables
   }
 
@@ -56,6 +60,14 @@ public interface SendableBuilder extends AutoCloseable {
   void addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter);
 
   /**
+   * Add a constant boolean property.
+   *
+   * @param key property name
+   * @param value the value
+   */
+  void publishConstBoolean(String key, boolean value);
+
+  /**
    * Add an integer property.
    *
    * @param key property name
@@ -63,6 +75,14 @@ public interface SendableBuilder extends AutoCloseable {
    * @param setter setter function (sets new value)
    */
   void addIntegerProperty(String key, LongSupplier getter, LongConsumer setter);
+
+  /**
+   * Add a constant integer property.
+   *
+   * @param key property name
+   * @param value the value
+   */
+  void publishConstInteger(String key, long value);
 
   /**
    * Add a float property.
@@ -74,6 +94,14 @@ public interface SendableBuilder extends AutoCloseable {
   void addFloatProperty(String key, FloatSupplier getter, FloatConsumer setter);
 
   /**
+   * Add a constant float property.
+   *
+   * @param key property name
+   * @param value the value
+   */
+  void publishConstFloat(String key, float value);
+
+  /**
    * Add a double property.
    *
    * @param key property name
@@ -81,6 +109,14 @@ public interface SendableBuilder extends AutoCloseable {
    * @param setter setter function (sets new value)
    */
   void addDoubleProperty(String key, DoubleSupplier getter, DoubleConsumer setter);
+
+  /**
+   * Add a constant double property.
+   *
+   * @param key property name
+   * @param value the value
+   */
+  void publishConstDouble(String key, double value);
 
   /**
    * Add a string property.
@@ -92,6 +128,14 @@ public interface SendableBuilder extends AutoCloseable {
   void addStringProperty(String key, Supplier<String> getter, Consumer<String> setter);
 
   /**
+   * Add a constant string property.
+   *
+   * @param key property name
+   * @param value the value
+   */
+  void publishConstString(String key, String value);
+
+  /**
    * Add a boolean array property.
    *
    * @param key property name
@@ -99,6 +143,14 @@ public interface SendableBuilder extends AutoCloseable {
    * @param setter setter function (sets new value)
    */
   void addBooleanArrayProperty(String key, Supplier<boolean[]> getter, Consumer<boolean[]> setter);
+
+  /**
+   * Add a constant boolean array property.
+   *
+   * @param key property name
+   * @param value the value
+   */
+  void publishConstBooleanArray(String key, boolean[] value);
 
   /**
    * Add an integer array property.
@@ -110,6 +162,14 @@ public interface SendableBuilder extends AutoCloseable {
   void addIntegerArrayProperty(String key, Supplier<long[]> getter, Consumer<long[]> setter);
 
   /**
+   * Add a constant integer property.
+   *
+   * @param key property name
+   * @param value the value
+   */
+  void publishConstIntegerArray(String key, long[] value);
+
+  /**
    * Add a float array property.
    *
    * @param key property name
@@ -117,6 +177,14 @@ public interface SendableBuilder extends AutoCloseable {
    * @param setter setter function (sets new value)
    */
   void addFloatArrayProperty(String key, Supplier<float[]> getter, Consumer<float[]> setter);
+
+  /**
+   * Add a constant float array property.
+   *
+   * @param key property name
+   * @param value the value
+   */
+  void publishConstFloatArray(String key, float[] value);
 
   /**
    * Add a double array property.
@@ -128,6 +196,14 @@ public interface SendableBuilder extends AutoCloseable {
   void addDoubleArrayProperty(String key, Supplier<double[]> getter, Consumer<double[]> setter);
 
   /**
+   * Add a constant double array property.
+   *
+   * @param key property name
+   * @param value the value
+   */
+  void publishConstDoubleArray(String key, double[] value);
+
+  /**
    * Add a string array property.
    *
    * @param key property name
@@ -135,6 +211,14 @@ public interface SendableBuilder extends AutoCloseable {
    * @param setter setter function (sets new value)
    */
   void addStringArrayProperty(String key, Supplier<String[]> getter, Consumer<String[]> setter);
+
+  /**
+   * Add a constant string array property.
+   *
+   * @param key property name
+   * @param value the value
+   */
+  void publishConstStringArray(String key, String[] value);
 
   /**
    * Add a raw property.
@@ -146,6 +230,15 @@ public interface SendableBuilder extends AutoCloseable {
    */
   void addRawProperty(
       String key, String typeString, Supplier<byte[]> getter, Consumer<byte[]> setter);
+
+  /**
+   * Add a constant raw property.
+   *
+   * @param key property name
+   * @param typeString type string
+   * @param value the value
+   */
+  void publishConstRaw(String key, String typeString, byte[] value);
 
   /**
    * Gets the kind of backend being used.

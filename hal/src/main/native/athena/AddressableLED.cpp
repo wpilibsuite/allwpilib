@@ -198,6 +198,10 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
     return;
   }
 
+  if (length == 0) {
+    return;
+  }
+
   std::memcpy(led->ledBuffer, data, length * sizeof(HAL_AddressableLEDData));
 
   asm("dmb");
@@ -206,10 +210,10 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
 }
 
 void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
-                                    int32_t lowTime0NanoSeconds,
                                     int32_t highTime0NanoSeconds,
-                                    int32_t lowTime1NanoSeconds,
+                                    int32_t lowTime0NanoSeconds,
                                     int32_t highTime1NanoSeconds,
+                                    int32_t lowTime1NanoSeconds,
                                     int32_t* status) {
   auto led = addressableLEDHandles->Get(handle);
   if (!led) {
@@ -217,10 +221,10 @@ void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
     return;
   }
 
-  led->led->writeLowBitTickTiming(1, highTime0NanoSeconds / 25, status);
-  led->led->writeLowBitTickTiming(0, lowTime0NanoSeconds / 25, status);
-  led->led->writeHighBitTickTiming(1, highTime1NanoSeconds / 25, status);
-  led->led->writeHighBitTickTiming(0, lowTime1NanoSeconds / 25, status);
+  led->led->writeLowBitTickTiming(0, highTime0NanoSeconds / 25, status);
+  led->led->writeLowBitTickTiming(1, lowTime0NanoSeconds / 25, status);
+  led->led->writeHighBitTickTiming(0, highTime1NanoSeconds / 25, status);
+  led->led->writeHighBitTickTiming(1, lowTime1NanoSeconds / 25, status);
 }
 
 void HAL_SetAddressableLEDSyncTime(HAL_AddressableLEDHandle handle,

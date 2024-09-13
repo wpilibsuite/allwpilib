@@ -79,7 +79,7 @@ class AddressableLEDSimTest {
     BufferCallback callback = new BufferCallback();
 
     try (AddressableLED led = new AddressableLED(0);
-        CallbackStore cb = sim.registerDataCallback(callback); ) {
+        CallbackStore cb = sim.registerDataCallback(callback)) {
       assertFalse(sim.getRunning());
 
       assertEquals(1, sim.getLength()); // Defaults to 1 led

@@ -7,13 +7,15 @@
 
 #include <jni.h>
 
+#include <concepts>
 #include <queue>
 #include <span>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <utility>
 #include <vector>
+
+#include <fmt/core.h>
 
 #include "wpi/ConvertUTF.h"
 #include "wpi/SafeThread.h"
@@ -158,8 +160,8 @@ class JStringRef {
         env->ReleaseStringCritical(str, chars);
       }
     } else {
-      errs() << "JStringRef was passed a null pointer at \n"
-             << GetJavaStackTrace(env);
+      fmt::print(stderr, "JStringRef was passed a null pointer at\n",
+                 GetJavaStackTrace(env));
     }
     // Ensure str is null-terminated.
     m_str.push_back('\0');
@@ -175,208 +177,242 @@ class JStringRef {
   SmallString<128> m_str;
 };
 
-// Details for J*ArrayRef and CriticalJ*ArrayRef
 namespace detail {
 
-template <typename C, typename T>
-class JArrayRefInner {
+template <typename T>
+struct ArrayHelper {};
+
+#define WPI_JNI_ARRAYHELPER(T, F)                                             \
+  template <>                                                                 \
+  struct ArrayHelper<T> {                                                     \
+    using jarray_type = T##Array;                                             \
+    static T* GetArrayElements(JNIEnv* env, jarray_type jarr) {               \
+      return env->Get##F##ArrayElements(jarr, nullptr);                       \
+    }                                                                         \
+    static void ReleaseArrayElements(JNIEnv* env, jarray_type jarr, T* elems, \
+                                     jint mode) {                             \
+      env->Release##F##ArrayElements(jarr, elems, mode);                      \
+    }                                                                         \
+  };
+
+WPI_JNI_ARRAYHELPER(jboolean, Boolean)
+WPI_JNI_ARRAYHELPER(jbyte, Byte)
+WPI_JNI_ARRAYHELPER(jshort, Short)
+WPI_JNI_ARRAYHELPER(jint, Int)
+WPI_JNI_ARRAYHELPER(jlong, Long)
+WPI_JNI_ARRAYHELPER(jfloat, Float)
+WPI_JNI_ARRAYHELPER(jdouble, Double)
+
+#undef WPI_JNI_ARRAYHELPER
+
+template <typename T>
+concept JArrayType =
+    requires { typename ArrayHelper<std::remove_cv_t<T>>::jarray_type; };
+
+template <typename CvSrc, typename Dest>
+struct copy_cv {
+ private:
+  using U0 = std::remove_cv_t<Dest>;
+  using U1 = std::conditional_t<std::is_const_v<CvSrc>, const U0, U0>;
+  using U2 = std::conditional_t<std::is_volatile_v<CvSrc>, volatile U1, U1>;
+
  public:
-  operator std::span<const T>() const {  // NOLINT
-    return static_cast<const C*>(this)->array();
-  }
+  using type = U2;
 };
 
-/**
- * Specialization of JArrayRefBase to provide std::string_view conversion
- * and span<const uint8_t> conversion.
- */
-template <typename C>
-class JArrayRefInner<C, jbyte> {
- public:
-  operator std::string_view() const { return str(); }
+template <typename CvSrc, typename Dest>
+using copy_cv_t = typename copy_cv<CvSrc, Dest>::type;
 
-  std::string_view str() const {
-    auto arr = static_cast<const C*>(this)->array();
+template <typename From, typename To>
+constexpr bool is_qualification_convertible_v =
+    !(std::is_const_v<From> && !std::is_const_v<To>)&&!(
+        std::is_volatile_v<From> && !std::is_volatile_v<To>);
+
+/**
+ * Helper class for working with JNI arrays.
+ *
+ * This class exposes an is_valid() member and an explicit conversion to bool
+ * which indicate if the span is valid. Operations on invalid spans are
+ * undefined.
+ *
+ * Note that Set<PrimitiveType>ArrayRegion may be faster for pure writes since
+ * it avoids copying the elements from Java to C++.
+ *
+ * @tparam T The element type of the array (e.g., jdouble).
+ * @tparam IsCritical If true, Get/ReleasePrimitiveArrayCritical will be used
+ * instead of Get/Release\<PrimitiveType\>ArrayElements.
+ * @tparam Size The number of elements in the span.
+ */
+template <JArrayType T, bool IsCritical, size_t Size = std::dynamic_extent>
+class JSpanBase {
+  using ArrHelper = ArrayHelper<std::remove_cv_t<T>>;
+  using jarray_type = typename ArrHelper::jarray_type;
+
+ public:
+  JSpanBase(const JSpanBase&) = delete;
+  JSpanBase& operator=(const JSpanBase&) = delete;
+
+  JSpanBase(JSpanBase&& other)
+      : m_valid{other.m_valid},
+        m_env{other.m_env},
+        m_jarr{other.m_jarr},
+        m_size{other.m_size},
+        m_elements{other.m_elements} {
+    other.m_jarr = nullptr;
+    other.m_elements = nullptr;
+  }
+
+  JSpanBase& operator=(JSpanBase&& other) {
+    m_valid = other.m_valid;
+    m_env = other.m_env;
+    m_jarr = other.m_jarr;
+    m_size = other.m_size;
+    m_elements = other.m_elements;
+    other.m_valid = false;
+    other.m_jarr = nullptr;
+    other.m_elements = nullptr;
+    return *this;
+  }
+
+  JSpanBase(JNIEnv* env, jobject bb, size_t size)
+    requires(!IsCritical)
+      : m_valid{Size == std::dynamic_extent || size == Size},
+        m_env{env},
+        m_jarr{nullptr},
+        m_size{size},
+        m_elements{static_cast<std::remove_cv_t<T>*>(
+            bb ? env->GetDirectBufferAddress(bb) : nullptr)} {
+    if (!bb) {
+      fmt::print(stderr, "JSpan was passed a null pointer at\n",
+                 GetJavaStackTrace(env));
+    }
+  }
+
+  JSpanBase(JNIEnv* env, jarray_type jarr, size_t size)
+      : m_valid{Size == std::dynamic_extent || size == Size},
+        m_env{env},
+        m_jarr{jarr},
+        m_size{size},
+        m_elements{nullptr} {
+    if (jarr) {
+      if constexpr (IsCritical) {
+        m_elements = static_cast<std::remove_cv_t<T>*>(
+            env->GetPrimitiveArrayCritical(jarr, nullptr));
+      } else {
+        m_elements = ArrHelper::GetArrayElements(env, jarr);
+      }
+    } else {
+      fmt::print(stderr, "JSpan was passed a null pointer at\n",
+                 GetJavaStackTrace(env));
+    }
+  }
+
+  JSpanBase(JNIEnv* env, jarray_type jarr)
+      : JSpanBase(env, jarr, jarr ? env->GetArrayLength(jarr) : 0) {}
+
+  ~JSpanBase() {
+    if (m_jarr && m_elements) {
+      constexpr jint mode = std::is_const_v<T> ? JNI_ABORT : 0;
+      if constexpr (IsCritical) {
+        m_env->ReleasePrimitiveArrayCritical(m_jarr, m_elements, mode);
+      } else {
+        ArrHelper::ReleaseArrayElements(m_env, m_jarr, m_elements, mode);
+      }
+    }
+  }
+
+  operator std::span<T, Size>() const { return array(); }
+
+  std::span<T, Size> array() const {
+    // If Size is dynamic_extent, can return empty span
+    // Unfortunately, sized spans will return a span over nullptr if m_elements
+    // is nullptr
+    if constexpr (Size == std::dynamic_extent) {
+      if (!m_elements) {
+        return {};
+      }
+    }
+    return std::span<T, Size>{m_elements, m_size};
+  }
+
+  T* begin() const { return m_elements; }
+
+  T* end() const { return m_elements + m_size; }
+
+  bool is_valid() const { return m_valid && m_elements != nullptr; }
+
+  explicit operator bool() const { return is_valid(); }
+
+  T* data() const { return m_elements; }
+
+  size_t size() const { return m_size; }
+
+  const T& operator[](size_t i) const { return m_elements[i]; }
+
+  T& operator[](size_t i)
+    requires(!std::is_const_v<T>)
+  {
+    return m_elements[i];
+  }
+
+  // Provide std::string_view and span<const uint8_t> conversions for jbyte
+
+  operator std::string_view() const
+    requires std::is_same_v<std::remove_cv_t<T>, jbyte>
+  {
+    return str();
+  }
+
+  std::string_view str() const
+    requires std::is_same_v<std::remove_cv_t<T>, jbyte>
+  {
+    auto arr = array();
     if (arr.empty()) {
       return {};
     }
     return {reinterpret_cast<const char*>(arr.data()), arr.size()};
   }
 
-  std::span<const uint8_t> uarray() const {
-    auto arr = static_cast<const C*>(this)->array();
+  std::span<copy_cv_t<T, uint8_t>, Size> uarray() const
+    requires std::is_same_v<std::remove_cv_t<T>, jbyte>
+  {
+    auto arr = array();
     if (arr.empty()) {
       return {};
     }
     return {reinterpret_cast<const uint8_t*>(arr.data()), arr.size()};
   }
-};
 
-/**
- * Specialization of JArrayRefBase to handle both "long long" and "long" on
- * 64-bit systems.
- */
-template <typename C>
-class JArrayRefInner<C, jlong> {
- public:
-  template <typename U,
-            typename = std::enable_if_t<sizeof(U) == sizeof(jlong) &&
-                                        std::is_integral_v<U>>>
-  operator std::span<const U>() const {  // NOLINT
-    auto arr = static_cast<const C*>(this)->array();
+  // Support both "long long" and "long" on 64-bit systems
+
+  template <typename U>
+    requires(sizeof(U) == sizeof(jlong) && std::integral<U> &&
+             is_qualification_convertible_v<T, U>)
+  operator std::span<U, Size>() const
+    requires std::is_same_v<std::remove_cv_t<T>, jlong>
+  {
+    auto arr = array();
     if (arr.empty()) {
       return {};
     }
-    return {reinterpret_cast<const U*>(arr.data()), arr.size()};
-  }
-};
-
-/**
- * Base class for J*ArrayRef and CriticalJ*ArrayRef
- */
-template <typename T>
-class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
- public:
-  explicit operator bool() const { return this->m_elements != nullptr; }
-
-  std::span<const T> array() const {
-    if (!this->m_elements) {
-      return {};
-    }
-    return {this->m_elements, this->m_size};
+    return {reinterpret_cast<U*>(arr.data()), arr.size()};
   }
 
-  size_t size() const { return this->m_size; }
-  T& operator[](size_t i) { return this->m_elements[i]; }
-  const T& operator[](size_t i) const { return this->m_elements[i]; }
-
-  JArrayRefBase(const JArrayRefBase&) = delete;
-  JArrayRefBase& operator=(const JArrayRefBase&) = delete;
-
-  JArrayRefBase(JArrayRefBase&& oth)
-      : m_env(oth.m_env),
-        m_jarr(oth.m_jarr),
-        m_size(oth.m_size),
-        m_elements(oth.m_elements) {
-    oth.m_jarr = nullptr;
-    oth.m_elements = nullptr;
-  }
-
-  JArrayRefBase& operator=(JArrayRefBase&& oth) {
-    this->m_env = oth.m_env;
-    this->m_jarr = oth.m_jarr;
-    this->m_size = oth.m_size;
-    this->m_elements = oth.m_elements;
-    oth.m_jarr = nullptr;
-    oth.m_elements = nullptr;
-    return *this;
-  }
-
- protected:
-  JArrayRefBase(JNIEnv* env, T* elements, size_t size) {
-    this->m_env = env;
-    this->m_jarr = nullptr;
-    this->m_size = size;
-    this->m_elements = elements;
-  }
-
-  JArrayRefBase(JNIEnv* env, jarray jarr, size_t size) {
-    this->m_env = env;
-    this->m_jarr = jarr;
-    this->m_size = size;
-    this->m_elements = nullptr;
-  }
-
-  JArrayRefBase(JNIEnv* env, jarray jarr)
-      : JArrayRefBase(env, jarr, jarr ? env->GetArrayLength(jarr) : 0) {}
-
+ private:
+  bool m_valid;
   JNIEnv* m_env;
-  jarray m_jarr = nullptr;
+  jarray_type m_jarr = nullptr;
   size_t m_size;
-  T* m_elements;
+  std::remove_cv_t<T>* m_elements;
 };
 
 }  // namespace detail
 
-// Java array / DirectBuffer reference.
+template <typename T, size_t Extent = std::dynamic_extent>
+using JSpan = detail::JSpanBase<T, false, Extent>;
 
-#define WPI_JNI_JARRAYREF(T, F)                                                \
-  class J##F##ArrayRef : public detail::JArrayRefBase<T> {                     \
-   public:                                                                     \
-    J##F##ArrayRef(JNIEnv* env, jobject bb, int len)                           \
-        : detail::JArrayRefBase<T>(                                            \
-              env,                                                             \
-              static_cast<T*>(bb ? env->GetDirectBufferAddress(bb) : nullptr), \
-              len) {                                                           \
-      if (!bb) {                                                               \
-        errs() << "JArrayRef was passed a null pointer at \n"                  \
-               << GetJavaStackTrace(env);                                      \
-      }                                                                        \
-    }                                                                          \
-    J##F##ArrayRef(JNIEnv* env, T##Array jarr, int len)                        \
-        : detail::JArrayRefBase<T>(env, jarr, len) {                           \
-      if (jarr) {                                                              \
-        m_elements = env->Get##F##ArrayElements(jarr, nullptr);                \
-      } else {                                                                 \
-        errs() << "JArrayRef was passed a null pointer at \n"                  \
-               << GetJavaStackTrace(env);                                      \
-      }                                                                        \
-    }                                                                          \
-    J##F##ArrayRef(JNIEnv* env, T##Array jarr)                                 \
-        : detail::JArrayRefBase<T>(env, jarr) {                                \
-      if (jarr) {                                                              \
-        m_elements = env->Get##F##ArrayElements(jarr, nullptr);                \
-      } else {                                                                 \
-        errs() << "JArrayRef was passed a null pointer at \n"                  \
-               << GetJavaStackTrace(env);                                      \
-      }                                                                        \
-    }                                                                          \
-    ~J##F##ArrayRef() {                                                        \
-      if (m_jarr && m_elements) {                                              \
-        m_env->Release##F##ArrayElements(static_cast<T##Array>(m_jarr),        \
-                                         m_elements, JNI_ABORT);               \
-      }                                                                        \
-    }                                                                          \
-  };                                                                           \
-                                                                               \
-  class CriticalJ##F##ArrayRef : public detail::JArrayRefBase<T> {             \
-   public:                                                                     \
-    CriticalJ##F##ArrayRef(JNIEnv* env, T##Array jarr, int len)                \
-        : detail::JArrayRefBase<T>(env, jarr, len) {                           \
-      if (jarr) {                                                              \
-        m_elements =                                                           \
-            static_cast<T*>(env->GetPrimitiveArrayCritical(jarr, nullptr));    \
-      } else {                                                                 \
-        errs() << "JArrayRef was passed a null pointer at \n"                  \
-               << GetJavaStackTrace(env);                                      \
-      }                                                                        \
-    }                                                                          \
-    CriticalJ##F##ArrayRef(JNIEnv* env, T##Array jarr)                         \
-        : detail::JArrayRefBase<T>(env, jarr) {                                \
-      if (jarr) {                                                              \
-        m_elements =                                                           \
-            static_cast<T*>(env->GetPrimitiveArrayCritical(jarr, nullptr));    \
-      } else {                                                                 \
-        errs() << "JArrayRef was passed a null pointer at \n"                  \
-               << GetJavaStackTrace(env);                                      \
-      }                                                                        \
-    }                                                                          \
-    ~CriticalJ##F##ArrayRef() {                                                \
-      if (m_jarr && m_elements) {                                              \
-        m_env->ReleasePrimitiveArrayCritical(m_jarr, m_elements, JNI_ABORT);   \
-      }                                                                        \
-    }                                                                          \
-  };
-
-WPI_JNI_JARRAYREF(jboolean, Boolean)
-WPI_JNI_JARRAYREF(jbyte, Byte)
-WPI_JNI_JARRAYREF(jshort, Short)
-WPI_JNI_JARRAYREF(jint, Int)
-WPI_JNI_JARRAYREF(jlong, Long)
-WPI_JNI_JARRAYREF(jfloat, Float)
-WPI_JNI_JARRAYREF(jdouble, Double)
-
-#undef WPI_JNI_JARRAYREF
+template <typename T, size_t Extent = std::dynamic_extent>
+using CriticalJSpan = detail::JSpanBase<T, true, Extent>;
 
 //
 // Conversions from C++ to Java objects
@@ -397,46 +433,38 @@ inline jstring MakeJString(JNIEnv* env, std::string_view str) {
 // details for MakeJIntArray
 namespace detail {
 
-/**
- * Slow path (get primitive array and set individual elements).
- *
- * This is used if the input type is not an integer of the same size (note
- * signed/unsigned is ignored).
- */
-template <typename T,
-          bool = (std::is_integral<T>::value && sizeof(jint) == sizeof(T))>
+template <typename T>
 struct ConvertIntArray {
   static jintArray ToJava(JNIEnv* env, std::span<const T> arr) {
-    jintArray jarr = env->NewIntArray(arr.size());
-    if (!jarr) {
-      return nullptr;
+    if constexpr (sizeof(T) == sizeof(jint) && std::integral<T>) {
+      // Fast path (use SetIntArrayRegion).
+      jintArray jarr = env->NewIntArray(arr.size());
+      if (!jarr) {
+        return nullptr;
+      }
+      env->SetIntArrayRegion(jarr, 0, arr.size(),
+                             reinterpret_cast<const jint*>(arr.data()));
+      return jarr;
+    } else {
+      // Slow path (get primitive array and set individual elements).
+      //
+      // This is used if the input type is not an integer of the same size (note
+      // signed/unsigned is ignored).
+      jintArray jarr = env->NewIntArray(arr.size());
+      if (!jarr) {
+        return nullptr;
+      }
+      jint* elements =
+          static_cast<jint*>(env->GetPrimitiveArrayCritical(jarr, nullptr));
+      if (!elements) {
+        return nullptr;
+      }
+      for (size_t i = 0; i < arr.size(); ++i) {
+        elements[i] = static_cast<jint>(arr[i]);
+      }
+      env->ReleasePrimitiveArrayCritical(jarr, elements, 0);
+      return jarr;
     }
-    jint* elements =
-        static_cast<jint*>(env->GetPrimitiveArrayCritical(jarr, nullptr));
-    if (!elements) {
-      return nullptr;
-    }
-    for (size_t i = 0; i < arr.size(); ++i) {
-      elements[i] = static_cast<jint>(arr[i]);
-    }
-    env->ReleasePrimitiveArrayCritical(jarr, elements, 0);
-    return jarr;
-  }
-};
-
-/**
- * Fast path (use SetIntArrayRegion).
- */
-template <typename T>
-struct ConvertIntArray<T, true> {
-  static jintArray ToJava(JNIEnv* env, std::span<const T> arr) {
-    jintArray jarr = env->NewIntArray(arr.size());
-    if (!jarr) {
-      return nullptr;
-    }
-    env->SetIntArrayRegion(jarr, 0, arr.size(),
-                           reinterpret_cast<const jint*>(arr.data()));
-    return jarr;
   }
 };
 
@@ -574,9 +602,9 @@ WPI_JNI_MAKEJARRAY(jdouble, Double)
 
 #undef WPI_JNI_MAKEJARRAY
 
-template <class T, typename = std::enable_if_t<
-                       sizeof(typename T::value_type) == sizeof(jlong) &&
-                       std::is_integral_v<typename T::value_type>>>
+template <class T>
+  requires(sizeof(typename T::value_type) == sizeof(jlong) &&
+           std::integral<typename T::value_type>)
 inline jlongArray MakeJLongArray(JNIEnv* env, const T& arr) {
   jlongArray jarr = env->NewLongArray(arr.size());
   if (!jarr) {

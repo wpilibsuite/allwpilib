@@ -9,7 +9,6 @@
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/SPI.h"
-#include "frc/interfaces/Accelerometer.h"
 
 namespace frc {
 
@@ -18,15 +17,42 @@ namespace frc {
  *
  * This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
-class ADXL362 : public Accelerometer,
-                public nt::NTSendable,
-                public wpi::SendableHelper<ADXL362> {
+class ADXL362 : public nt::NTSendable, public wpi::SendableHelper<ADXL362> {
  public:
-  enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
+  /**
+   * Accelerometer range.
+   */
+  enum Range {
+    /// 2 Gs max.
+    kRange_2G = 0,
+    /// 4 Gs max.
+    kRange_4G = 1,
+    /// 8 Gs max.
+    kRange_8G = 2
+  };
+
+  /**
+   * Accelerometer axes.
+   */
+  enum Axes {
+    /// X axis.
+    kAxis_X = 0x00,
+    /// Y axis.
+    kAxis_Y = 0x02,
+    /// Z axis.
+    kAxis_Z = 0x04
+  };
+
+  /**
+   * Container type for accelerations from all axes.
+   */
   struct AllAxes {
-    double XAxis;
-    double YAxis;
-    double ZAxis;
+    /// Acceleration along the X axis in g-forces.
+    double XAxis = 0.0;
+    /// Acceleration along the Y axis in g-forces.
+    double YAxis = 0.0;
+    /// Acceleration along the Z axis in g-forces.
+    double ZAxis = 0.0;
   };
 
  public:
@@ -52,11 +78,34 @@ class ADXL362 : public Accelerometer,
 
   SPI::Port GetSpiPort() const;
 
-  // Accelerometer interface
-  void SetRange(Range range) final;
-  double GetX() override;
-  double GetY() override;
-  double GetZ() override;
+  /**
+   * Set the measuring range of the accelerometer.
+   *
+   * @param range The maximum acceleration, positive or negative, that the
+   *     accelerometer will measure.
+   */
+  void SetRange(Range range);
+
+  /**
+   * Returns the acceleration along the X axis in g-forces.
+   *
+   * @return The acceleration along the X axis in g-forces.
+   */
+  double GetX();
+
+  /**
+   * Returns the acceleration along the Y axis in g-forces.
+   *
+   * @return The acceleration along the Y axis in g-forces.
+   */
+  double GetY();
+
+  /**
+   * Returns the acceleration along the Z axis in g-forces.
+   *
+   * @return The acceleration along the Z axis in g-forces.
+   */
+  double GetZ();
 
   /**
    * Get the acceleration of one axis in Gs.

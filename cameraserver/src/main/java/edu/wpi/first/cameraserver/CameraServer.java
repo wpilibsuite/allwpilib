@@ -14,7 +14,6 @@ import edu.wpi.first.cscore.VideoEvent;
 import edu.wpi.first.cscore.VideoException;
 import edu.wpi.first.cscore.VideoListener;
 import edu.wpi.first.cscore.VideoMode;
-import edu.wpi.first.cscore.VideoMode.PixelFormat;
 import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.cscore.VideoSource;
 import edu.wpi.first.networktables.BooleanEntry;
@@ -27,6 +26,8 @@ import edu.wpi.first.networktables.StringArrayPublisher;
 import edu.wpi.first.networktables.StringArrayTopic;
 import edu.wpi.first.networktables.StringEntry;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.util.PixelFormat;
+import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * NetworkTables.
  */
 public final class CameraServer {
+  /** CameraServer base port. */
   public static final int kBasePort = 1181;
 
   private static final String kPublishName = "/CameraPublisher";
@@ -114,7 +116,7 @@ public final class CameraServer {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
       if (m_booleanValueEntry != null) {
         m_booleanValueEntry.close();
       }
@@ -139,6 +141,7 @@ public final class CameraServer {
       if (m_choicesPublisher != null) {
         m_choicesPublisher.close();
       }
+      Reference.reachabilityFence(m_videoListener);
     }
 
     BooleanEntry m_booleanValueEntry;
@@ -222,7 +225,7 @@ public final class CameraServer {
   // - "PropertyInfo/{Property}" - Property supporting information
 
   // Listener for video events
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.AvoidCatchingGenericException"})
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private static final VideoListener m_videoListener =
       new VideoListener(
           event -> {
@@ -686,7 +689,7 @@ public final class CameraServer {
    */
   public static MjpegServer addSwitchedCamera(String name) {
     // create a dummy CvSource
-    CvSource source = new CvSource(name, VideoMode.PixelFormat.kMJPEG, 160, 120, 30);
+    CvSource source = new CvSource(name, PixelFormat.kMJPEG, 160, 120, 30);
     MjpegServer server = startAutomaticCapture(source);
     synchronized (CameraServer.class) {
       m_fixedSources.put(server.getHandle(), source.getHandle());
@@ -749,6 +752,34 @@ public final class CameraServer {
    * Get OpenCV access to the specified camera. This allows you to get images from the camera for
    * image processing on the roboRIO.
    *
+   * @param camera Camera (e.g. as returned by startAutomaticCapture).
+   * @param pixelFormat Desired pixelFormat of the camera
+   * @return OpenCV sink for the specified camera
+   */
+  public static CvSink getVideo(VideoSource camera, PixelFormat pixelFormat) {
+    String name = "opencv_" + camera.getName();
+
+    synchronized (CameraServer.class) {
+      VideoSink sink = m_sinks.get(name);
+      if (sink != null) {
+        VideoSink.Kind kind = sink.getKind();
+        if (kind != VideoSink.Kind.kCv) {
+          throw new VideoException("expected OpenCV sink, but got " + kind);
+        }
+        return (CvSink) sink;
+      }
+    }
+
+    CvSink newsink = new CvSink(name, pixelFormat);
+    newsink.setSource(camera);
+    addServer(newsink);
+    return newsink;
+  }
+
+  /**
+   * Get OpenCV access to the specified camera. This allows you to get images from the camera for
+   * image processing on the roboRIO.
+   *
    * @param name Camera name
    * @return OpenCV sink for the specified camera
    */
@@ -773,7 +804,7 @@ public final class CameraServer {
    * @return OpenCV source for the MJPEG stream
    */
   public static CvSource putVideo(String name, int width, int height) {
-    CvSource source = new CvSource(name, VideoMode.PixelFormat.kMJPEG, width, height, 30);
+    CvSource source = new CvSource(name, PixelFormat.kMJPEG, width, height, 30);
     startAutomaticCapture(source);
     return source;
   }

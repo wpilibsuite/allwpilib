@@ -7,7 +7,7 @@
 #include <frc/Timer.h>
 #include <units/time.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -16,7 +16,7 @@ namespace frc2 {
  *
  * This class is provided by the NewCommands VendorDep
  */
-class WaitCommand : public CommandHelper<CommandBase, WaitCommand> {
+class WaitCommand : public CommandHelper<Command, WaitCommand> {
  public:
   /**
    * Creates a new WaitCommand.  This command will do nothing, and end after the
@@ -41,6 +41,7 @@ class WaitCommand : public CommandHelper<CommandBase, WaitCommand> {
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  protected:
+  /// The timer used for waiting.
   frc::Timer m_timer;
 
  private:

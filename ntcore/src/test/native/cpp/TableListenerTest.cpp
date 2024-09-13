@@ -4,9 +4,10 @@
 
 #include <memory>
 
+#include <gtest/gtest.h>
+
 #include "TestPrinters.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "networktables/DoubleTopic.h"
 #include "networktables/NetworkTableInstance.h"
 #include "ntcore_cpp.h"
@@ -45,7 +46,7 @@ TEST_F(TableListenerTest, AddListener) {
   MockTableEventListener listener;
   table->AddListener(NT_EVENT_TOPIC | NT_EVENT_IMMEDIATE,
                      listener.AsStdFunction());
-  EXPECT_CALL(listener, Call(table.get(), "foovalue", _));
+  EXPECT_CALL(listener, Call(table.get(), std::string_view{"foovalue"}, _));
   PublishTopics();
   EXPECT_TRUE(m_inst.WaitForListenerQueue(1.0));
 }
@@ -54,7 +55,7 @@ TEST_F(TableListenerTest, AddSubTableListener) {
   auto table = m_inst.GetTable("/foo");
   MockSubTableListener listener;
   table->AddSubTableListener(listener.AsStdFunction());
-  EXPECT_CALL(listener, Call(table.get(), "bar", _));
+  EXPECT_CALL(listener, Call(table.get(), std::string_view{"bar"}, _));
   PublishTopics();
   EXPECT_TRUE(m_inst.WaitForListenerQueue(1.0));
 }

@@ -4,7 +4,7 @@
 
 package edu.wpi.first.math.controller;
 
-import edu.wpi.first.math.Drake;
+import edu.wpi.first.math.DARE;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
@@ -19,8 +19,12 @@ import org.ejml.simple.SimpleMatrix;
  * Contains the controller coefficients and logic for a linear-quadratic regulator (LQR). LQRs use
  * the control law u = K(r - x).
  *
- * <p>For more on the underlying math, read
- * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ * <p>For more on the underlying math, read <a
+ * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>.
+ *
+ * @param <States> Number of states.
+ * @param <Inputs> Number of inputs.
+ * @param <Outputs> Number of outputs.
  */
 public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Outputs extends Num> {
   /** The current reference state. */
@@ -34,6 +38,10 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
   /**
    * Constructs a controller with the given coefficients and plant. Rho is defaulted to 1.
+   *
+   * <p>See <a
+   * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning">https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning</a>
+   * for how to select the tolerances.
    *
    * @param plant The plant being controlled.
    * @param qelms The maximum desired error tolerance for each state.
@@ -56,6 +64,10 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
   /**
    * Constructs a controller with the given coefficients and plant.
+   *
+   * <p>See <a
+   * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning">https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning</a>
+   * for how to select the tolerances.
    *
    * @param A Continuous system matrix of the plant being controlled.
    * @param B Continuous input matrix of the plant being controlled.
@@ -99,19 +111,17 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     var discB = discABPair.getSecond();
 
     if (!StateSpaceUtil.isStabilizable(discA, discB)) {
-      var builder = new StringBuilder("The system passed to the LQR is uncontrollable!\n\nA =\n");
-      builder
-          .append(discA.getStorage().toString())
-          .append("\nB =\n")
-          .append(discB.getStorage().toString())
-          .append('\n');
-
-      var msg = builder.toString();
+      var msg =
+          "The system passed to the LQR is uncontrollable!\n\nA =\n"
+              + discA.getStorage().toString()
+              + "\nB =\n"
+              + discB.getStorage().toString()
+              + '\n';
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(msg);
     }
 
-    var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R);
+    var S = DARE.dare(discA, discB, Q, R);
 
     // K = (BᵀSB + R)⁻¹BᵀSA
     m_K =
@@ -150,7 +160,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
 
-    var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R, N);
+    var S = DARE.dare(discA, discB, Q, R, N);
 
     // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
     m_K =
@@ -215,7 +225,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
   }
 
   /** Resets the controller. */
-  public void reset() {
+  public final void reset() {
     m_r.fill(0.0);
     m_u.fill(0.0);
   }
@@ -250,8 +260,9 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * are time-delayed too long, the LQR may be unstable. However, if we know the amount of delay, we
    * can compute the control based on where the system will be after the time delay.
    *
-   * <p>See https://file.tavsys.net/control/controls-engineering-in-frc.pdf appendix C.4 for a
-   * derivation.
+   * <p>See <a
+   * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>
+   * appendix C.4 for a derivation.
    *
    * @param plant The plant being controlled.
    * @param dtSeconds Discretization timestep in seconds.

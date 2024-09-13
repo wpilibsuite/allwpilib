@@ -8,14 +8,12 @@
 #include <span>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
-#include "Transform2d.h"
-#include "Translation2d.h"
-#include "Twist2d.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
+#include "frc/geometry/Rotation2d.h"
+#include "frc/geometry/Transform2d.h"
+#include "frc/geometry/Translation2d.h"
+#include "frc/geometry/Twist2d.h"
 
 namespace frc {
 
@@ -123,6 +121,15 @@ class WPILIB_DLLEXPORT Pose2d {
   constexpr Pose2d operator/(double scalar) const;
 
   /**
+   * Rotates the pose around the origin and returns the new pose.
+   *
+   * @param other The rotation to transform the pose by.
+   *
+   * @return The rotated pose.
+   */
+  constexpr Pose2d RotateBy(const Rotation2d& other) const;
+
+  /**
    * Transforms the pose by the given transformation and returns the new pose.
    * See + operator for the matrix multiplication performed.
    *
@@ -206,4 +213,6 @@ void from_json(const wpi::json& json, Pose2d& pose);
 
 }  // namespace frc
 
-#include "Pose2d.inc"
+#include "frc/geometry/proto/Pose2dProto.h"
+#include "frc/geometry/struct/Pose2dStruct.h"
+#include "frc/geometry/Pose2d.inc"

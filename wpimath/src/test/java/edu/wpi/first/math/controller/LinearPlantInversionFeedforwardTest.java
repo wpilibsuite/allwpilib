@@ -6,6 +6,7 @@ package edu.wpi.first.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
@@ -16,11 +17,11 @@ import org.junit.jupiter.api.Test;
 class LinearPlantInversionFeedforwardTest {
   @Test
   void testCalculate() {
-    Matrix<N2, N2> A = Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1);
+    Matrix<N2, N2> A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 1);
     Matrix<N2, N1> B = VecBuilder.fill(0, 1);
 
     LinearPlantInversionFeedforward<N2, N1, N1> feedforward =
-        new LinearPlantInversionFeedforward<N2, N1, N1>(A, B, 0.02);
+        new LinearPlantInversionFeedforward<>(A, B, 0.02);
 
     assertEquals(
         47.502599,

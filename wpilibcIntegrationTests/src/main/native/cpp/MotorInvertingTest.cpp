@@ -2,7 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
 #include <units/time.h>
+#include <wpi/deprecated.h>
 
 #include "TestBench.h"
 #include "frc/Encoder.h"
@@ -10,7 +12,6 @@
 #include "frc/motorcontrol/Jaguar.h"
 #include "frc/motorcontrol/Talon.h"
 #include "frc/motorcontrol/Victor.h"
-#include "gtest/gtest.h"
 
 enum MotorInvertingTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
 
@@ -32,6 +33,9 @@ std::ostream& operator<<(std::ostream& os, MotorInvertingTestType const& type) {
 
   return os;
 }
+
+WPI_IGNORE_DEPRECATED
+
 class MotorInvertingTest
     : public testing::TestWithParam<MotorInvertingTestType> {
  protected:
@@ -153,3 +157,5 @@ TEST_P(MotorInvertingTest, InvertingSwitchingNegToPos) {
 
 INSTANTIATE_TEST_SUITE_P(Tests, MotorInvertingTest,
                          testing::Values(TEST_VICTOR, TEST_JAGUAR, TEST_TALON));
+
+WPI_UNIGNORE_DEPRECATED

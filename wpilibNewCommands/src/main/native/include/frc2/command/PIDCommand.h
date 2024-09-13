@@ -5,13 +5,12 @@
 #pragma once
 
 #include <functional>
-#include <initializer_list>
-#include <span>
 
 #include <frc/controller/PIDController.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
+#include "frc2/command/Requirements.h"
 
 namespace frc2 {
 /**
@@ -24,7 +23,7 @@ namespace frc2 {
  *
  * @see PIDController
  */
-class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
+class PIDCommand : public CommandHelper<Command, PIDCommand> {
  public:
   /**
    * Creates a new PIDCommand, which controls the given output with a
@@ -36,27 +35,11 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
    */
-  PIDCommand(PIDController controller,
+  PIDCommand(frc::PIDController controller,
              std::function<double()> measurementSource,
              std::function<double()> setpointSource,
              std::function<void(double)> useOutput,
-             std::initializer_list<Subsystem*> requirements);
-
-  /**
-   * Creates a new PIDCommand, which controls the given output with a
-   * PIDController.
-   *
-   * @param controller        the controller that controls the output.
-   * @param measurementSource the measurement of the process variable
-   * @param setpointSource   the controller's reference (aka setpoint)
-   * @param useOutput         the controller's output
-   * @param requirements      the subsystems required by this command
-   */
-  PIDCommand(PIDController controller,
-             std::function<double()> measurementSource,
-             std::function<double()> setpointSource,
-             std::function<void(double)> useOutput,
-             std::span<Subsystem* const> requirements = {});
+             Requirements requirements = {});
 
   /**
    * Creates a new PIDCommand, which controls the given output with a
@@ -68,25 +51,10 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
    */
-  PIDCommand(PIDController controller,
+  PIDCommand(frc::PIDController controller,
              std::function<double()> measurementSource, double setpoint,
              std::function<void(double)> useOutput,
-             std::initializer_list<Subsystem*> requirements);
-
-  /**
-   * Creates a new PIDCommand, which controls the given output with a
-   * PIDController with a constant setpoint.
-   *
-   * @param controller        the controller that controls the output.
-   * @param measurementSource the measurement of the process variable
-   * @param setpoint         the controller's setpoint (aka setpoint)
-   * @param useOutput         the controller's output
-   * @param requirements      the subsystems required by this command
-   */
-  PIDCommand(PIDController controller,
-             std::function<double()> measurementSource, double setpoint,
-             std::function<void(double)> useOutput,
-             std::span<Subsystem* const> requirements = {});
+             Requirements requirements = {});
 
   PIDCommand(PIDCommand&& other) = default;
 
@@ -103,12 +71,19 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
    *
    * @return The PIDController
    */
-  PIDController& GetController();
+  frc::PIDController& GetController();
 
  protected:
-  PIDController m_controller;
+  /// PID controller.
+  frc::PIDController m_controller;
+
+  /// Measurement getter.
   std::function<double()> m_measurement;
+
+  /// Setpoint getter.
   std::function<double()> m_setpoint;
+
+  /// PID controller output consumer.
   std::function<void(double)> m_useOutput;
 };
 }  // namespace frc2

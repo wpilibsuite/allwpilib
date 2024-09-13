@@ -37,21 +37,24 @@ class REVPHSim : public PneumaticsBaseSim {
 
   ~REVPHSim() override = default;
 
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify) override;
 
   bool GetInitialized() const override;
 
   void SetInitialized(bool solenoidInitialized) override;
 
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterSolenoidOutputCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterSolenoidOutputCallback(
       int channel, NotifyCallback callback, bool initialNotify) override;
 
   bool GetSolenoidOutput(int channel) const override;
 
   void SetSolenoidOutput(int channel, bool solenoidOutput) override;
 
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterCompressorOnCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterCompressorOnCallback(
       NotifyCallback callback, bool initialNotify) override;
 
   /**
@@ -76,9 +79,9 @@ class REVPHSim : public PneumaticsBaseSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterCompressorConfigTypeCallback(NotifyCallback callback,
-                                       bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterCompressorConfigTypeCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Check whether the closed loop compressor control is active.
@@ -94,16 +97,17 @@ class REVPHSim : public PneumaticsBaseSim {
    */
   void SetCompressorConfigType(int compressorConfigType);
 
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterPressureSwitchCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterPressureSwitchCallback(
       NotifyCallback callback, bool initialNotify) override;
 
   bool GetPressureSwitch() const override;
 
   void SetPressureSwitch(bool pressureSwitch) override;
 
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterCompressorCurrentCallback(NotifyCallback callback,
-                                    bool initialNotify) override;
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterCompressorCurrentCallback(
+      NotifyCallback callback, bool initialNotify) override;
 
   double GetCompressorCurrent() const override;
 

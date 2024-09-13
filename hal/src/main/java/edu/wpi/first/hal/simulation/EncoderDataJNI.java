@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for encoder data. */
 public class EncoderDataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -99,4 +100,7 @@ public class EncoderDataJNI extends JNIWrapper {
   public static native void resetData(int index);
 
   public static native int findForChannel(int channel);
+
+  /** Utility class. */
+  private EncoderDataJNI() {}
 }

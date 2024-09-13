@@ -5,13 +5,13 @@
 package edu.wpi.first.wpilibj.examples.romireference.commands;
 
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
 /*
  * Creates a new TurnTime command. This command will turn your robot for a
  * desired rotational speed and time.
  */
-public class TurnTime extends CommandBase {
+public class TurnTime extends Command {
   private final double m_duration;
   private final double m_rotationalSpeed;
   private final Drivetrain m_drive;

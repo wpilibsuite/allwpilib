@@ -110,7 +110,7 @@ static AprilTagPoseEstimate DoEstimateOrthogonalIteration(
   apriltag_pose_t pose1, pose2;
   double err1, err2;
   estimate_tag_pose_orthogonal_iteration(&info, &err1, &pose1, &err2, &pose2,
-                                         nIters);
+                                         nIters, 1e-7);
   return {MakePose(pose1), MakePose(pose2), err1, err2};
 }
 

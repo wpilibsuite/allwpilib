@@ -1,82 +1,85 @@
-if (!project.hasProperty('skipJavaFormat')) {
-    apply plugin: 'checkstyle'
+if (project.hasProperty('skipJavaFormat')) {
+    return;
+}
 
-    checkstyle {
-        toolVersion = "10.1"
-        configDirectory = file("${project.rootDir}/styleguide")
-        config = resources.text.fromFile(new File(configDirectory.get().getAsFile(), "checkstyle.xml"))
+apply plugin: 'checkstyle'
+
+checkstyle {
+    toolVersion = "10.12.2"
+    configDirectory = file("${project.rootDir}/styleguide")
+    config = resources.text.fromFile(new File(configDirectory.get().getAsFile(), "checkstyle.xml"))
+}
+
+apply plugin: 'pmd'
+
+pmd {
+    toolVersion = '6.55.0'
+    consoleOutput = true
+    reportsDir = file("$project.buildDir/reports/pmd")
+    ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
+    ruleSets = []
+}
+
+apply plugin: 'com.diffplug.spotless'
+
+spotless {
+    java {
+        target fileTree('.') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**', '**/bin/**', "src/generated/**"
+        }
+        toggleOffOn()
+        googleJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
     }
-
-    apply plugin: 'pmd'
-
-    pmd {
-        toolVersion = '6.44.0'
-        consoleOutput = true
-        reportsDir = file("$project.buildDir/reports/pmd")
-        ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
-        ruleSets = []
+    groovyGradle {
+        target fileTree('.') {
+            include '**/*.gradle'
+            exclude '**/build/**', '**/build-*/**', '**/bin/**'
+        }
+        greclipse()
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
     }
-
-    apply plugin: 'com.diffplug.spotless'
-
-    spotless {
-        java {
-            target fileTree('.') {
-                include '**/*.java'
-                exclude '**/build/**', '**/build-*/**'
-            }
-            toggleOffOn()
-            googleJavaFormat()
-            removeUnusedImports()
-            trimTrailingWhitespace()
-            endWithNewline()
+    json {
+        target fileTree('.') {
+            include '**/*.json'
+            exclude '**/build/**', '**/build-*/**', '**/bin/**'
+            exclude '**/simgui-ds.json', '**/simgui-window.json', '**/simgui.json', '**/networktables.json'
         }
-        groovyGradle {
-            target fileTree('.') {
-                include '**/*.gradle'
-                exclude '**/build/**', '**/build-*/**'
-            }
-            greclipse()
-            indentWithSpaces(4)
-            trimTrailingWhitespace()
-            endWithNewline()
-        }
-        json {
-            target fileTree('.') {
-                include '**/*.json'
-                exclude '**/build/**', '**/build-*/**'
-            }
-            gson()
-              .indentWithSpaces(2)
-        }
-        format 'xml', {
-            target fileTree('.') {
-                include '**/*.xml'
-                exclude '**/build/**', '**/build-*/**'
-            }
-            eclipseWtp('xml')
-            trimTrailingWhitespace()
-            indentWithSpaces(2)
-            endWithNewline()
-        }
-        format 'misc', {
-            target fileTree('.') {
-                include '**/*.md', '**/.gitignore'
-                exclude '**/build/**', '**/build-*/**'
-            }
-            trimTrailingWhitespace()
-            indentWithSpaces(2)
-            endWithNewline()
-        }
+        gson()
+          .indentWithSpaces(2)
     }
-
-    apply plugin: 'com.github.spotbugs'
-
-    spotbugs {
-        ignoreFailures = false
-        effort = 'max'
-        excludeFilter = file("${project.rootDir}/styleguide/spotbugs-exclude.xml")
+    format 'xml', {
+        target fileTree('.') {
+            include '**/*.xml'
+            exclude '**/build/**', '**/build-*/**', '**/bin/**', '**/.idea/**', '**/.run/**'
+        }
+        eclipseWtp('xml')
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
     }
+    format 'misc', {
+        target fileTree('.') {
+            include '**/*.md', '**/.gitignore'
+            exclude '**/build/**', '**/build-*/**', '**/bin/**'
+        }
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+}
+
+apply plugin: 'com.github.spotbugs'
+
+spotbugs {
+    ignoreFailures = false
+    effort = spotbugsEffort
+    excludeFilter = file("${project.rootDir}/styleguide/spotbugs-exclude.xml")
 }
 
 task javaFormat {

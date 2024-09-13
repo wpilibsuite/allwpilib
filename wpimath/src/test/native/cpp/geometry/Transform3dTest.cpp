@@ -4,11 +4,12 @@
 
 #include <cmath>
 
+#include <gtest/gtest.h>
+
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Transform3d.h"
 #include "frc/geometry/Translation3d.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

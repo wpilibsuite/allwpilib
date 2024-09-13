@@ -10,6 +10,7 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
+#include "hal/CAN.h"
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"
 #include "hal/handles/IndexedHandleResource.h"
@@ -107,6 +108,8 @@ namespace {
 struct PDP {
   HAL_CANHandle canHandle;
   std::string previousAllocation;
+  bool streamHandleAllocated{false};
+  uint32_t streamSessionHandles[3];
 };
 }  // namespace
 
@@ -521,6 +524,243 @@ void HAL_ClearPDPStickyFaults(HAL_PDPHandle handle, int32_t* status) {
 
   uint8_t pdpControl[] = {0x80}; /* only bit set is ClearStickyFaults */
   HAL_WriteCANPacket(pdp->canHandle, pdpControl, 1, Control1, status);
+}
+
+uint32_t HAL_StartCANStream(HAL_CANHandle handle, int32_t apiId, int32_t depth,
+                            int32_t* status);
+
+void HAL_StartPDPStream(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (pdp == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  if (pdp->streamHandleAllocated) {
+    *status = RESOURCE_IS_ALLOCATED;
+    return;
+  }
+
+  pdp->streamSessionHandles[0] =
+      HAL_StartCANStream(pdp->canHandle, Status1, 50, status);
+  if (*status != 0) {
+    return;
+  }
+  pdp->streamSessionHandles[1] =
+      HAL_StartCANStream(pdp->canHandle, Status2, 50, status);
+  if (*status != 0) {
+    HAL_CAN_CloseStreamSession(pdp->streamSessionHandles[0]);
+    return;
+  }
+  pdp->streamSessionHandles[2] =
+      HAL_StartCANStream(pdp->canHandle, Status3, 50, status);
+  if (*status != 0) {
+    HAL_CAN_CloseStreamSession(pdp->streamSessionHandles[0]);
+    HAL_CAN_CloseStreamSession(pdp->streamSessionHandles[1]);
+    return;
+  }
+  pdp->streamHandleAllocated = true;
+}
+
+HAL_PowerDistributionChannelData* HAL_GetPDPStreamData(HAL_PDPHandle handle,
+                                                       int32_t* count,
+                                                       int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (pdp == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return nullptr;
+  }
+
+  if (!pdp->streamHandleAllocated) {
+    *status = RESOURCE_OUT_OF_RANGE;
+    return nullptr;
+  }
+
+  *count = 0;
+  // 3 streams, 6 channels per stream, 50 depth per stream
+  HAL_PowerDistributionChannelData* retData =
+      new HAL_PowerDistributionChannelData[3 * 6 * 50];
+
+  HAL_CANStreamMessage messages[50];
+  uint32_t messagesRead = 0;
+  HAL_CAN_ReadStreamSession(pdp->streamSessionHandles[0], messages, 50,
+                            &messagesRead, status);
+  if (*status < 0) {
+    goto Exit;
+  }
+
+  for (uint32_t i = 0; i < messagesRead; i++) {
+    PdpStatus1 pdpStatus;
+    std::memcpy(pdpStatus.data, messages[i].data, sizeof(messages[i].data));
+    uint32_t timestamp = messages[i].timeStamp;
+
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan1_h8) << 2) |
+         pdpStatus.bits.chan1_l2) *
+        0.125;
+    retData[*count].channel = 1;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan2_h6) << 4) |
+         pdpStatus.bits.chan2_l4) *
+        0.125;
+    retData[*count].channel = 2;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan3_h4) << 6) |
+         pdpStatus.bits.chan3_l6) *
+        0.125;
+    retData[*count].channel = 3;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan4_h2) << 8) |
+         pdpStatus.bits.chan4_l8) *
+        0.125;
+    retData[*count].channel = 4;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan5_h8) << 2) |
+         pdpStatus.bits.chan5_l2) *
+        0.125;
+    retData[*count].channel = 5;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan6_h6) << 4) |
+         pdpStatus.bits.chan6_l4) *
+        0.125;
+    retData[*count].channel = 6;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+  }
+
+  messagesRead = 0;
+  HAL_CAN_ReadStreamSession(pdp->streamSessionHandles[1], messages, 50,
+                            &messagesRead, status);
+  if (*status < 0) {
+    goto Exit;
+  }
+
+  for (uint32_t i = 0; i < messagesRead; i++) {
+    PdpStatus2 pdpStatus;
+    std::memcpy(pdpStatus.data, messages[i].data, sizeof(messages[i].data));
+    uint32_t timestamp = messages[i].timeStamp;
+
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan7_h8) << 2) |
+         pdpStatus.bits.chan7_l2) *
+        0.125;
+    retData[*count].channel = 7;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan8_h6) << 4) |
+         pdpStatus.bits.chan8_l4) *
+        0.125;
+    retData[*count].channel = 8;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan9_h4) << 6) |
+         pdpStatus.bits.chan9_l6) *
+        0.125;
+    retData[*count].channel = 9;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan10_h2) << 8) |
+         pdpStatus.bits.chan10_l8) *
+        0.125;
+    retData[*count].channel = 10;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan11_h8) << 2) |
+         pdpStatus.bits.chan11_l2) *
+        0.125;
+    retData[*count].channel = 11;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan12_h6) << 4) |
+         pdpStatus.bits.chan12_l4) *
+        0.125;
+    retData[*count].channel = 12;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+  }
+
+  messagesRead = 0;
+  HAL_CAN_ReadStreamSession(pdp->streamSessionHandles[2], messages, 50,
+                            &messagesRead, status);
+  if (*status < 0) {
+    goto Exit;
+  }
+
+  for (uint32_t i = 0; i < messagesRead; i++) {
+    PdpStatus3 pdpStatus;
+    std::memcpy(pdpStatus.data, messages[i].data, sizeof(messages[i].data));
+    uint32_t timestamp = messages[i].timeStamp;
+
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan13_h8) << 2) |
+         pdpStatus.bits.chan13_l2) *
+        0.125;
+    retData[*count].channel = 13;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan14_h6) << 4) |
+         pdpStatus.bits.chan14_l4) *
+        0.125;
+    retData[*count].channel = 14;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan15_h4) << 6) |
+         pdpStatus.bits.chan15_l6) *
+        0.125;
+    retData[*count].channel = 15;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        ((static_cast<uint32_t>(pdpStatus.bits.chan16_h2) << 8) |
+         pdpStatus.bits.chan16_l8) *
+        0.125;
+    retData[*count].channel = 16;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+  }
+
+Exit:
+  if (*status < 0) {
+    delete[] retData;
+    retData = nullptr;
+  }
+  return retData;
+}
+
+void HAL_StopPDPStream(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (pdp == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  if (!pdp->streamHandleAllocated) {
+    *status = RESOURCE_OUT_OF_RANGE;
+    return;
+  }
+
+  HAL_CAN_CloseStreamSession(pdp->streamSessionHandles[0]);
+  HAL_CAN_CloseStreamSession(pdp->streamSessionHandles[1]);
+  HAL_CAN_CloseStreamSession(pdp->streamSessionHandles[2]);
+
+  pdp->streamHandleAllocated = false;
 }
 
 }  // extern "C"

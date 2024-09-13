@@ -16,8 +16,9 @@
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/simulation/SimHooks.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
+#include <gtest/gtest.h>
 
-#include "gtest/gtest.h"
+#include "CommandTestBase.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
@@ -87,7 +88,7 @@ class MecanumControllerCommandTest : public ::testing::Test {
 };
 
 TEST_F(MecanumControllerCommandTest, ReachesReference) {
-  frc2::Subsystem subsystem;
+  frc2::TestSubsystem subsystem;
 
   auto waypoints =
       std::vector{frc::Pose2d{0_m, 0_m, 0_rad}, frc::Pose2d{1_m, 5_m, 3_rad}};
@@ -99,7 +100,7 @@ TEST_F(MecanumControllerCommandTest, ReachesReference) {
   auto command = frc2::MecanumControllerCommand(
       trajectory, [&]() { return getRobotPose(); }, m_kinematics,
 
-      frc2::PIDController(0.6, 0, 0), frc2::PIDController(0.6, 0, 0),
+      frc::PIDController(0.6, 0, 0), frc::PIDController(0.6, 0, 0),
       m_rotController, 8.8_mps,
       [&](units::meters_per_second_t frontLeft,
           units::meters_per_second_t rearLeft,

@@ -31,10 +31,11 @@ public class Talon extends PWMMotorController {
    * @param channel The PWM channel that the Talon is attached to. 0-9 are on-board, 10-19 are on
    *     the MXP port
    */
+  @SuppressWarnings("this-escape")
   public Talon(final int channel) {
     super("Talon", channel);
 
-    m_pwm.setBounds(2.037, 1.539, 1.513, 1.487, 0.989);
+    m_pwm.setBoundsMicroseconds(2037, 1539, 1513, 1487, 989);
     m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();

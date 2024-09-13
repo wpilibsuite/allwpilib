@@ -4,6 +4,7 @@
 
 package edu.wpi.first.cscore;
 
+import edu.wpi.first.util.PixelFormat;
 import org.opencv.core.Mat;
 
 /**
@@ -16,9 +17,20 @@ public class CvSink extends ImageSink {
    * get each new image.
    *
    * @param name Source name (arbitrary unique identifier)
+   * @param pixelFormat Source pixel format
+   */
+  public CvSink(String name, PixelFormat pixelFormat) {
+    super(CameraServerCvJNI.createCvSink(name, pixelFormat.getValue()));
+  }
+
+  /**
+   * Create a sink for accepting OpenCV images. WaitForFrame() must be called on the created sink to
+   * get each new image. Defaults to kBGR for pixelFormat
+   *
+   * @param name Source name (arbitrary unique identifier)
    */
   public CvSink(String name) {
-    super(CameraServerCvJNI.createCvSink(name));
+    this(name, PixelFormat.kBGR);
   }
 
   /// Create a sink for accepting OpenCV images in a separate thread.

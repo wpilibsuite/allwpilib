@@ -17,22 +17,21 @@
 #include "frc/RobotBase.h"
 #include "frc/SensorUtil.h"
 #include "frc/Solenoid.h"
-#include "frc/fmt/Units.h"
 
 using namespace frc;
 
 /** Converts volts to PSI per the REV Analog Pressure Sensor datasheet. */
 units::pounds_per_square_inch_t VoltsToPSI(units::volt_t sensorVoltage,
                                            units::volt_t supplyVoltage) {
-  auto pressure = 250 * (sensorVoltage.value() / supplyVoltage.value()) - 25;
-  return units::pounds_per_square_inch_t{pressure};
+  return units::pounds_per_square_inch_t{
+      250 * (sensorVoltage.value() / supplyVoltage.value()) - 25};
 }
 
 /** Converts PSI to volts per the REV Analog Pressure Sensor datasheet. */
 units::volt_t PSIToVolts(units::pounds_per_square_inch_t pressure,
                          units::volt_t supplyVoltage) {
-  auto voltage = supplyVoltage.value() * (0.004 * pressure.value() + 0.1);
-  return units::volt_t{voltage};
+  return units::volt_t{supplyVoltage.value() *
+                       (0.004 * pressure.value() + 0.1)};
 }
 
 wpi::mutex PneumaticHub::m_handleLock;
@@ -338,6 +337,46 @@ PneumaticHub::StickyFaults PneumaticHub::GetStickyFaults() const {
   static_assert(std::is_trivial_v<decltype(stickyFaults)>);
   std::memcpy(&stickyFaults, &halStickyFaults, sizeof(stickyFaults));
   return stickyFaults;
+}
+
+bool PneumaticHub::Faults::GetChannelFault(int channel) const {
+  switch (channel) {
+    case 0:
+      return Channel0Fault != 0;
+    case 1:
+      return Channel1Fault != 0;
+    case 2:
+      return Channel2Fault != 0;
+    case 3:
+      return Channel3Fault != 0;
+    case 4:
+      return Channel4Fault != 0;
+    case 5:
+      return Channel5Fault != 0;
+    case 6:
+      return Channel6Fault != 0;
+    case 7:
+      return Channel7Fault != 0;
+    case 8:
+      return Channel8Fault != 0;
+    case 9:
+      return Channel9Fault != 0;
+    case 10:
+      return Channel10Fault != 0;
+    case 11:
+      return Channel11Fault != 0;
+    case 12:
+      return Channel12Fault != 0;
+    case 13:
+      return Channel13Fault != 0;
+    case 14:
+      return Channel14Fault != 0;
+    case 15:
+      return Channel15Fault != 0;
+    default:
+      throw FRC_MakeError(err::ChannelIndexOutOfRange,
+                          "Pneumatics fault channel out of bounds!");
+  }
 }
 
 void PneumaticHub::ClearStickyFaults() {

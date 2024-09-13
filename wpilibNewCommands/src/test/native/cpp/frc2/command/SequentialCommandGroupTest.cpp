@@ -22,7 +22,7 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupSchedule) {
   MockCommand* command2 = command2Holder.get();
   MockCommand* command3 = command3Holder.get();
 
-  SequentialCommandGroup group{tcb::make_vector<std::unique_ptr<Command>>(
+  SequentialCommandGroup group{make_vector<std::unique_ptr<Command>>(
       std::move(command1Holder), std::move(command2Holder),
       std::move(command3Holder))};
 
@@ -61,7 +61,7 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupInterrupt) {
   MockCommand* command2 = command2Holder.get();
   MockCommand* command3 = command3Holder.get();
 
-  SequentialCommandGroup group{tcb::make_vector<std::unique_ptr<Command>>(
+  SequentialCommandGroup group{make_vector<std::unique_ptr<Command>>(
       std::move(command1Holder), std::move(command2Holder),
       std::move(command3Holder))};
 

@@ -6,19 +6,14 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.networktables.IntegerPublisher;
-import edu.wpi.first.networktables.IntegerTopic;
-import edu.wpi.first.networktables.NTSendable;
-import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.networktables.StringTopic;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 /**
  * The {@link SendableChooser} class is a useful tool for presenting a selection of options to the
@@ -32,25 +27,33 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @param <V> The type of the values to be stored
  */
-public class SendableChooser<V> implements NTSendable, AutoCloseable {
+public class SendableChooser<V> implements Sendable, AutoCloseable {
   /** The key for the default value. */
   private static final String DEFAULT = "default";
+
   /** The key for the selected option. */
   private static final String SELECTED = "selected";
+
   /** The key for the active option. */
   private static final String ACTIVE = "active";
+
   /** The key for the option array. */
   private static final String OPTIONS = "options";
+
   /** The key for the instance number. */
   private static final String INSTANCE = ".instance";
+
   /** A map linking strings to the objects they represent. */
   private final Map<String, V> m_map = new LinkedHashMap<>();
 
   private String m_defaultChoice = "";
   private final int m_instance;
+  private String m_previousVal;
+  private Consumer<V> m_listener;
   private static final AtomicInteger s_instances = new AtomicInteger();
 
   /** Instantiates a {@link SendableChooser}. */
+  @SuppressWarnings("this-escape")
   public SendableChooser() {
     m_instance = s_instances.getAndIncrement();
     SendableRegistry.add(this, "SendableChooser", m_instance);
@@ -59,14 +62,6 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
   @Override
   public void close() {
     SendableRegistry.remove(this);
-    m_mutex.lock();
-    try {
-      for (StringPublisher pub : m_activePubs) {
-        pub.close();
-      }
-    } finally {
-      m_mutex.unlock();
-    }
   }
 
   /**
@@ -114,16 +109,26 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
     }
   }
 
+  /**
+   * Bind a listener that's called when the selected value changes. Only one listener can be bound.
+   * Calling this function will replace the previous listener.
+   *
+   * @param listener The function to call that accepts the new value
+   */
+  public void onChange(Consumer<V> listener) {
+    requireNonNullParam(listener, "listener", "onChange");
+    m_mutex.lock();
+    m_listener = listener;
+    m_mutex.unlock();
+  }
+
   private String m_selected;
-  private final List<StringPublisher> m_activePubs = new ArrayList<>();
   private final ReentrantLock m_mutex = new ReentrantLock();
 
   @Override
-  public void initSendable(NTSendableBuilder builder) {
+  public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("String Chooser");
-    IntegerPublisher instancePub = new IntegerTopic(builder.getTopic(INSTANCE)).publish();
-    instancePub.set(m_instance);
-    builder.addCloseable(instancePub);
+    builder.publishConstInteger(INSTANCE, m_instance);
     builder.addStringProperty(DEFAULT, () -> m_defaultChoice, null);
     builder.addStringArrayProperty(OPTIONS, () -> m_map.keySet().toArray(new String[0]), null);
     builder.addStringProperty(
@@ -141,24 +146,28 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
           }
         },
         null);
-    m_mutex.lock();
-    try {
-      m_activePubs.add(new StringTopic(builder.getTopic(ACTIVE)).publish());
-    } finally {
-      m_mutex.unlock();
-    }
     builder.addStringProperty(
         SELECTED,
         null,
         val -> {
+          V choice;
+          Consumer<V> listener;
           m_mutex.lock();
           try {
             m_selected = val;
-            for (StringPublisher pub : m_activePubs) {
-              pub.set(val);
+            if (!m_selected.equals(m_previousVal) && m_listener != null) {
+              choice = m_map.get(val);
+              listener = m_listener;
+            } else {
+              choice = null;
+              listener = null;
             }
+            m_previousVal = val;
           } finally {
             m_mutex.unlock();
+          }
+          if (listener != null) {
+            listener.accept(choice);
           }
         });
   }

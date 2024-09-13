@@ -4,10 +4,9 @@
 
 #include "wpinet/hostname.h"
 
+#include <gtest/gtest.h>
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
-
-#include "gtest/gtest.h"
 
 namespace wpi {
 TEST(HostNameTest, HostNameNotEmpty) {

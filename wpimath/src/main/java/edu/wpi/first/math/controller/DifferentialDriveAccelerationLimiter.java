@@ -5,7 +5,10 @@
 package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 
@@ -80,10 +83,10 @@ public class DifferentialDriveAccelerationLimiter {
    */
   public DifferentialDriveWheelVoltages calculate(
       double leftVelocity, double rightVelocity, double leftVoltage, double rightVoltage) {
-    var u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(leftVoltage, rightVoltage);
+    Matrix<N2, N1> u = VecBuilder.fill(leftVoltage, rightVoltage);
 
     // Find unconstrained wheel accelerations
-    var x = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(leftVelocity, rightVelocity);
+    var x = VecBuilder.fill(leftVelocity, rightVelocity);
     var dxdt = m_system.getA().times(x).plus(m_system.getB().times(u));
 
     // Convert from wheel accelerations to linear and angular accelerations
@@ -98,9 +101,7 @@ public class DifferentialDriveAccelerationLimiter {
     // [α]   [-1/trackwidth  1/trackwidth][dxdt(1)]
     //
     // accels = M dxdt where M = [0.5, 0.5; -1/trackwidth, 1/trackwidth]
-    var M =
-        new MatBuilder<>(Nat.N2(), Nat.N2())
-            .fill(0.5, 0.5, -1.0 / m_trackwidth, 1.0 / m_trackwidth);
+    var M = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.5, 0.5, -1.0 / m_trackwidth, 1.0 / m_trackwidth);
     var accels = M.times(dxdt);
 
     // Constrain the linear and angular accelerations

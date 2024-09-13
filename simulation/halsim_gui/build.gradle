@@ -1,50 +1,51 @@
-if (!project.hasProperty('onlylinuxathena')) {
+if (project.hasProperty('onlylinuxathena')) {
+    return;
+}
 
-    description = "A plugin that creates a simulation gui"
+description = "A plugin that creates a simulation gui"
 
-    ext {
-        pluginName = 'halsim_gui'
-    }
+ext {
+    pluginName = 'halsim_gui'
+}
 
-    apply plugin: 'google-test-test-suite'
+apply plugin: 'google-test-test-suite'
+
+ext {
+    staticGtestConfigs = [:]
+}
+
+staticGtestConfigs["${pluginName}Test"] = []
+apply from: "${rootDir}/shared/googletest.gradle"
+
+apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
 
 
-    ext {
-        staticGtestConfigs = [:]
-    }
+apply from: "${rootDir}/shared/imgui.gradle"
 
-    staticGtestConfigs["${pluginName}Test"] = []
-    apply from: "${rootDir}/shared/googletest.gradle"
-
-    apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
-
-
-    apply from: "${rootDir}/shared/imgui.gradle"
-
-    model {
-        binaries {
-            all {
-                lib project: ':glass', library: 'glassnt', linkage: 'static'
-                lib project: ':glass', library: 'glass', linkage: 'static'
-                lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                project(':ntcore').addNtcoreDependency(it, 'shared')
-                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                nativeUtils.useRequiredLibrary(it, 'imgui')
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    it.buildable = false
-                    return
-                }
-                if (it.targetPlatform.operatingSystem.isWindows()) {
-                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
-                } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                    it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
-                } else {
-                    it.linker.args << '-lX11'
-                    if (it.targetPlatform.name.startsWith('linuxarm')) {
-                        it.linker.args << '-lGL'
-                    }
+model {
+    binaries {
+        all {
+            lib project: ':glass', library: 'glassnt', linkage: 'static'
+            lib project: ':glass', library: 'glass', linkage: 'static'
+            lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+            lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+            project(':ntcore').addNtcoreDependency(it, 'shared')
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':fieldImages', library: 'fieldImages', linkage: 'static'
+            nativeUtils.useRequiredLibrary(it, 'imgui')
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                it.buildable = false
+                return
+            }
+            if (it.targetPlatform.operatingSystem.isWindows()) {
+                it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+            } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
+            } else {
+                it.linker.args << '-lX11'
+                if (it.targetPlatform.name.startsWith('linuxarm')) {
+                    it.linker.args << '-lGL'
                 }
             }
         }

@@ -8,7 +8,9 @@
 #include <fmt/format.h>
 #include <imgui.h>
 #include <ntcore_cpp.h>
+#include <wpi/StringExtras.h>
 #include <wpigui.h>
+#include <wpigui_openurl.h>
 
 #include "glass/Context.h"
 #include "glass/MainMenuBar.h"
@@ -53,6 +55,7 @@ static bool gKeyEdit = false;
 static int* gEnterKey;
 static void (*gPrevKeyCallback)(GLFWwindow*, int, int, int, int);
 static bool gNetworkTablesDebugLog = false;
+static unsigned int gPrevMode = NT_NET_MODE_NONE;
 
 static void RemapEnterKeyCallback(GLFWwindow* window, int key, int scancode,
                                   int action, int mods) {
@@ -70,26 +73,46 @@ static void RemapEnterKeyCallback(GLFWwindow* window, int key, int scancode,
   }
 }
 
+/**
+ * Generates the proper title bar title based on current instance state and
+ * event.
+ */
+static std::string MakeTitle(NT_Inst inst, nt::Event event) {
+  auto mode = nt::GetNetworkMode(inst);
+  if (mode & NT_NET_MODE_SERVER) {
+    auto numClients = nt::GetConnections(inst).size();
+    return fmt::format("Glass - {} Client{} Connected", numClients,
+                       (numClients == 1 ? "" : "s"));
+  } else if (mode & NT_NET_MODE_CLIENT3 || mode & NT_NET_MODE_CLIENT4) {
+    if (event.Is(NT_EVENT_CONNECTED)) {
+      return fmt::format("Glass - Connected ({})",
+                         event.GetConnectionInfo()->remote_ip);
+    }
+  }
+  return "Glass - DISCONNECTED";
+}
+
 static void NtInitialize() {
   auto inst = nt::GetDefaultInstance();
   auto poller = nt::CreateListenerPoller(inst);
   nt::AddPolledListener(poller, inst, NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE);
-  nt::AddPolledLogger(poller, 0, 100);
-  gui::AddEarlyExecute([poller] {
+  nt::AddPolledLogger(poller, NT_LOG_INFO, 100);
+  gui::AddEarlyExecute([inst, poller] {
     auto win = gui::GetSystemWindow();
     if (!win) {
       return;
     }
+    bool updateTitle = false;
+    nt::Event connectionEvent;
+    if (nt::GetNetworkMode(inst) != gPrevMode) {
+      gPrevMode = nt::GetNetworkMode(inst);
+      updateTitle = true;
+    }
+
     for (auto&& event : nt::ReadListenerQueue(poller)) {
-      if (auto connInfo = event.GetConnectionInfo()) {
-        // update window title when connection status changes
-        if ((event.flags & NT_EVENT_CONNECTED) != 0) {
-          glfwSetWindowTitle(
-              win, fmt::format("Glass - Connected ({})", connInfo->remote_ip)
-                       .c_str());
-        } else {
-          glfwSetWindowTitle(win, "Glass - DISCONNECTED");
-        }
+      if (event.Is(NT_EVENT_CONNECTION)) {
+        updateTitle = true;
+        connectionEvent = event;
       } else if (auto msg = event.GetLogMessage()) {
         const char* level = "";
         if (msg->level >= NT_LOG_CRITICAL) {
@@ -104,6 +127,10 @@ static void NtInitialize() {
         gNetworkTablesLog.Append(fmt::format(
             "{}{} ({}:{})\n", level, msg->message, msg->filename, msg->line));
       }
+    }
+
+    if (updateTitle) {
+      glfwSetWindowTitle(win, MakeTitle(inst, connectionEvent).c_str());
     }
   });
 
@@ -256,6 +283,15 @@ int main(int argc, char** argv) {
       }
       ImGui::EndMenu();
     }
+
+    if (ImGui::BeginMenu("Docs")) {
+      if (ImGui::MenuItem("Online documentation")) {
+        wpi::gui::OpenURL(
+            "https://docs.wpilib.org/en/stable/docs/software/dashboards/"
+            "glass/");
+      }
+      ImGui::EndMenu();
+    }
   });
 
   gui::AddLateExecute([] {
@@ -292,11 +328,13 @@ int main(int argc, char** argv) {
       char nameBuf[32];
       const char* name = glfwGetKeyName(*gEnterKey, 0);
       if (!name) {
-        std::snprintf(nameBuf, sizeof(nameBuf), "%d", *gEnterKey);
+        wpi::format_to_n_c_str(nameBuf, sizeof(nameBuf), "{}", *gEnterKey);
+
         name = nameBuf;
       }
-      std::snprintf(editLabel, sizeof(editLabel), "%s###edit",
-                    gKeyEdit ? "(press key)" : name);
+      wpi::format_to_n_c_str(editLabel, sizeof(editLabel), "{}###edit",
+                             gKeyEdit ? "(press key)" : name);
+
       if (ImGui::SmallButton(editLabel)) {
         gKeyEdit = true;
       }

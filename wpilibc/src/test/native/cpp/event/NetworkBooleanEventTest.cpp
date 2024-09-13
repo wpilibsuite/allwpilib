@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
 #include <networktables/BooleanTopic.h>
 #include <networktables/NetworkTableInstance.h>
 
 #include "frc/event/EventLoop.h"
 #include "frc/event/NetworkBooleanEvent.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

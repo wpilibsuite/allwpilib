@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <stdexcept>
 
 #include <wpi/SymbolExports.h>
@@ -19,6 +20,9 @@
 #include "units/voltage.h"
 
 namespace frc {
+/**
+ * Linear system ID utility functions.
+ */
 class WPILIB_DLLEXPORT LinearSystemId {
  public:
   template <typename Distance>
@@ -37,12 +41,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param motor The motor (or gearbox) attached to the carriage.
    * @param mass The mass of the elevator carriage, in kilograms.
    * @param radius The radius of the elevator's driving drum, in meters.
-   * @param G Gear ratio from motor to carriage.
-   * @throws std::domain_error if mass <= 0, radius <= 0, or G <= 0.
+   * @param gearing Gear ratio from motor to carriage.
+   * @throws std::domain_error if mass <= 0, radius <= 0, or gearing <= 0.
    */
   static LinearSystem<2, 1, 1> ElevatorSystem(DCMotor motor,
                                               units::kilogram_t mass,
-                                              units::meter_t radius, double G);
+                                              units::meter_t radius,
+                                              double gearing);
 
   /**
    * Create a state-space model of a single-jointed arm system.The states of the
@@ -51,11 +56,11 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *
    * @param motor The motor (or gearbox) attached to the arm.
    * @param J The moment of inertia J of the arm.
-   * @param G Gear ratio from motor to arm.
-   * @throws std::domain_error if J <= 0 or G <= 0.
+   * @param gearing Gear ratio from motor to arm.
+   * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
   static LinearSystem<2, 1, 1> SingleJointedArmSystem(
-      DCMotor motor, units::kilogram_square_meter_t J, double G);
+      DCMotor motor, units::kilogram_square_meter_t J, double gearing);
 
   /**
    * Create a state-space model for a 1 DOF velocity system from its kV
@@ -74,16 +79,18 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *
    * @param kV The velocity gain, in volts/(unit/sec).
    * @param kA The acceleration gain, in volts/(unit/sec²).
-   * @throws std::domain_error if kV <= 0 or kA <= 0.
+   * @throws std::domain_error if kV < 0 or kA <= 0.
+   * @see <a
+   * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  template <typename Distance, typename = std::enable_if_t<
-                                   std::is_same_v<units::meter, Distance> ||
-                                   std::is_same_v<units::radian, Distance>>>
+  template <typename Distance>
+    requires std::same_as<units::meter, Distance> ||
+             std::same_as<units::radian, Distance>
   static LinearSystem<1, 1, 1> IdentifyVelocitySystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    if (kV <= decltype(kV){0}) {
-      throw std::domain_error("Kv must be greater than zero.");
+    if (kV < decltype(kV){0}) {
+      throw std::domain_error("Kv must be greater than or equal to zero.");
     }
     if (kA <= decltype(kA){0}) {
       throw std::domain_error("Ka must be greater than zero.");
@@ -115,16 +122,18 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param kV The velocity gain, in volts/(unit/sec).
    * @param kA The acceleration gain, in volts/(unit/sec²).
    *
-   * @throws std::domain_error if kV <= 0 or kA <= 0.
+   * @throws std::domain_error if kV < 0 or kA <= 0.
+   * @see <a
+   * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  template <typename Distance, typename = std::enable_if_t<
-                                   std::is_same_v<units::meter, Distance> ||
-                                   std::is_same_v<units::radian, Distance>>>
+  template <typename Distance>
+    requires std::same_as<units::meter, Distance> ||
+             std::same_as<units::radian, Distance>
   static LinearSystem<2, 1, 1> IdentifyPositionSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    if (kV <= decltype(kV){0}) {
-      throw std::domain_error("Kv must be greater than zero.");
+    if (kV < decltype(kV){0}) {
+      throw std::domain_error("Kv must be greater than or equal to zero.");
     }
     if (kA <= decltype(kA){0}) {
       throw std::domain_error("Ka must be greater than zero.");
@@ -157,6 +166,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *                  second squared).
    * @throws domain_error if kVLinear <= 0, kALinear <= 0, kVAngular <= 0,
    *         or kAAngular <= 0.
+   * @see <a
+   * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   static LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
       decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
@@ -184,6 +195,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *                   right wheels, in meters.
    * @throws domain_error if kVLinear <= 0, kALinear <= 0, kVAngular <= 0,
    *         kAAngular <= 0, or trackwidth <= 0.
+   * @see <a
+   * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   static LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
       decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
@@ -197,12 +210,12 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *
    * @param motor The motor (or gearbox) attached to the flywheel.
    * @param J The moment of inertia J of the flywheel.
-   * @param G Gear ratio from motor to flywheel.
-   * @throws std::domain_error if J <= 0 or G <= 0.
+   * @param gearing Gear ratio from motor to flywheel.
+   * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
   static LinearSystem<1, 1, 1> FlywheelSystem(DCMotor motor,
                                               units::kilogram_square_meter_t J,
-                                              double G);
+                                              double gearing);
 
   /**
    * Create a state-space model of a DC motor system. The states of the system
@@ -211,12 +224,56 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *
    * @param motor The motor (or gearbox) attached to the system.
    * @param J the moment of inertia J of the DC motor.
-   * @param G Gear ratio from motor to output.
-   * @throws std::domain_error if J <= 0 or G <= 0.
+   * @param gearing Gear ratio from motor to output.
+   * @throws std::domain_error if J <= 0 or gearing <= 0.
+   * @see <a
+   * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   static LinearSystem<2, 1, 2> DCMotorSystem(DCMotor motor,
                                              units::kilogram_square_meter_t J,
-                                             double G);
+                                             double gearing);
+
+  /**
+   * Create a state-space model of a DC motor system from its kV
+   * (volts/(unit/sec)) and kA (volts/(unit/sec²)). These constants can be
+   * found using SysId. the states of the system are [position, velocity],
+   * inputs are [voltage], and outputs are [position].
+   *
+   * You MUST use an SI unit (i.e. meters or radians) for the Distance template
+   * argument. You may still use non-SI units (such as feet or inches) for the
+   * actual method arguments; they will automatically be converted to SI
+   * internally.
+   *
+   * The parameters provided by the user are from this feedforward model:
+   *
+   * u = K_v v + K_a a
+   *
+   * @param kV The velocity gain, in volts/(unit/sec).
+   * @param kA The acceleration gain, in volts/(unit/sec²).
+   *
+   * @throws std::domain_error if kV < 0 or kA <= 0.
+   */
+  template <typename Distance>
+    requires std::same_as<units::meter, Distance> ||
+             std::same_as<units::radian, Distance>
+  static LinearSystem<2, 1, 2> DCMotorSystem(
+      decltype(1_V / Velocity_t<Distance>(1)) kV,
+      decltype(1_V / Acceleration_t<Distance>(1)) kA) {
+    if (kV < decltype(kV){0}) {
+      throw std::domain_error("Kv must be greater than or equal to zero.");
+    }
+    if (kA <= decltype(kA){0}) {
+      throw std::domain_error("Ka must be greater than zero.");
+    }
+
+    Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
+    Matrixd<2, 1> B{0.0, 1.0 / kA.value()};
+    Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+    Matrixd<2, 1> D{{0.0}, {0.0}};
+
+    return LinearSystem<2, 1, 2>(A, B, C, D);
+  }
+
   /**
    * Create a state-space model of differential drive drivetrain. In this model,
    * the states are [left velocity, right velocity], the inputs are [left
@@ -228,13 +285,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param r The radius of the wheels in meters.
    * @param rb The radius of the base (half of the track width), in meters.
    * @param J The moment of inertia of the robot.
-   * @param G Gear ratio from motor to wheel.
+   * @param gearing Gear ratio from motor to wheel.
    * @throws std::domain_error if mass <= 0, r <= 0, rb <= 0, J <= 0, or
-   *         G <= 0.
+   *         gearing <= 0.
    */
   static LinearSystem<2, 2, 2> DrivetrainVelocitySystem(
       const DCMotor& motor, units::kilogram_t mass, units::meter_t r,
-      units::meter_t rb, units::kilogram_square_meter_t J, double G);
+      units::meter_t rb, units::kilogram_square_meter_t J, double gearing);
 };
 
 }  // namespace frc

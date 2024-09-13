@@ -6,11 +6,11 @@
 
 #include <array>
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/AddressableLED.h"
-#include "gtest/gtest.h"
 
 namespace frc::sim {
 

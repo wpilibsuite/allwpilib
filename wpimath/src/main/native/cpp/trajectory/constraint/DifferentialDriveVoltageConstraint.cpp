@@ -15,9 +15,9 @@ using namespace frc;
 
 DifferentialDriveVoltageConstraint::DifferentialDriveVoltageConstraint(
     const SimpleMotorFeedforward<units::meter>& feedforward,
-    const DifferentialDriveKinematics& kinematics, units::volt_t maxVoltage)
+    DifferentialDriveKinematics kinematics, units::volt_t maxVoltage)
     : m_feedforward(feedforward),
-      m_kinematics(kinematics),
+      m_kinematics(std::move(kinematics)),
       m_maxVoltage(maxVoltage) {}
 
 units::meters_per_second_t DifferentialDriveVoltageConstraint::MaxVelocity(

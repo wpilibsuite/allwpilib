@@ -31,6 +31,7 @@ public class Compressor implements Sendable, AutoCloseable {
    * @param module The module ID to use.
    * @param moduleType The module type to use.
    */
+  @SuppressWarnings("this-escape")
   public Compressor(int module, PneumaticsModuleType moduleType) {
     m_module = PneumaticsBase.getForType(module, moduleType);
 
@@ -60,18 +61,6 @@ public class Compressor implements Sendable, AutoCloseable {
     m_module.unreserveCompressor();
     m_module.close();
     m_module = null;
-  }
-
-  /**
-   * Get the status of the compressor. To (re)enable the compressor use enableDigital() or
-   * enableAnalog(...).
-   *
-   * @return true if the compressor is on
-   * @deprecated To avoid confusion in thinking this (re)enables the compressor use IsEnabled().
-   */
-  @Deprecated(since = "2023", forRemoval = true)
-  public boolean enabled() {
-    return isEnabled();
   }
 
   /**

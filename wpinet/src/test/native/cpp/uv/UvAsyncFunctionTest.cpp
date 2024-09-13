@@ -4,9 +4,9 @@
 
 #include "wpinet/uv/AsyncFunction.h"  // NOLINT(build/include_order)
 
-#include "gtest/gtest.h"  // NOLINT(build/include_order)
-
 #include <thread>
+
+#include <gtest/gtest.h>
 
 #include "wpinet/uv/Loop.h"
 #include "wpinet/uv/Prepare.h"

@@ -1,0 +1,12 @@
+---
+Language:     Cpp
+BasedOnStyle: Google
+ColumnLimit:  120
+SortIncludes: false
+AttributeMacros:
+- EIGEN_STRONG_INLINE
+- EIGEN_ALWAYS_INLINE
+- EIGEN_DEVICE_FUNC
+- EIGEN_DONT_INLINE
+- EIGEN_DEPRECATED
+- EIGEN_UNUSED

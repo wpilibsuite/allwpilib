@@ -125,7 +125,7 @@ int uv_poll_start(uv_poll_t* handle, int pevents, uv_poll_cb poll_cb) {
                       UV_PRIORITIZED)) == 0);
   assert(!uv__is_closing(handle));
 
-  watchers = handle->loop->watchers;
+  watchers = (void**)handle->loop->watchers;
   w = &handle->io_watcher;
 
   if (uv__fd_exists(handle->loop, w->fd))

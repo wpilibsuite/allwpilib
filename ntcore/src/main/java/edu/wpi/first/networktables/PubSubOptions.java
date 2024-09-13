@@ -42,6 +42,9 @@ public class PubSubOptions {
         case excludeSelf:
           excludeSelf = option.m_bValue;
           break;
+        case hidden:
+          hidden = option.m_bValue;
+          break;
         default:
           break;
       }
@@ -58,7 +61,8 @@ public class PubSubOptions {
       boolean prefixMatch,
       boolean disableRemote,
       boolean disableLocal,
-      boolean excludeSelf) {
+      boolean excludeSelf,
+      boolean hidden) {
     this.pollStorage = pollStorage;
     this.periodic = periodic;
     this.excludePublisher = excludePublisher;
@@ -69,6 +73,7 @@ public class PubSubOptions {
     this.disableRemote = disableRemote;
     this.disableLocal = disableLocal;
     this.excludeSelf = excludeSelf;
+    this.hidden = hidden;
   }
 
   /** Default value of periodic. */
@@ -123,4 +128,11 @@ public class PubSubOptions {
 
   /** For entries, don't queue (for readQueue) value updates for the entry's internal publisher. */
   public boolean excludeSelf;
+
+  /**
+   * For subscriptions, don't share the existence of the subscription with the network. Note this
+   * means updates will not be received from the network unless another subscription overlaps with
+   * this one, and the subscription will not appear in metatopics.
+   */
+  public boolean hidden;
 }

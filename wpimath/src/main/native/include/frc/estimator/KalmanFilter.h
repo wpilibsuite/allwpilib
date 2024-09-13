@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "frc/EigenCore.h"
@@ -29,9 +28,9 @@ namespace frc {
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9
  * "Stochastic control theory".
  *
- * @tparam States The number of states.
- * @tparam Inputs The number of inputs.
- * @tparam Outputs The number of outputs.
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
+ * @tparam Outputs Number of outputs.
  */
 template <int States, int Inputs, int Outputs>
 class KalmanFilter {
@@ -43,8 +42,14 @@ class KalmanFilter {
   using StateArray = wpi::array<double, States>;
   using OutputArray = wpi::array<double, Outputs>;
 
+  using StateMatrix = Matrixd<States, States>;
+
   /**
-   * Constructs a state-space observer with the given plant.
+   * Constructs a Kalman filter with the given plant.
+   *
+   * See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
    *
    * @param plant              The plant used for the prediction step.
    * @param stateStdDevs       Standard deviations of model states.
@@ -56,21 +61,25 @@ class KalmanFilter {
                const StateArray& stateStdDevs,
                const OutputArray& measurementStdDevs, units::second_t dt);
 
-  KalmanFilter(KalmanFilter&&) = default;
-  KalmanFilter& operator=(KalmanFilter&&) = default;
-
   /**
-   * Returns the steady-state Kalman gain matrix K.
+   * Returns the error covariance matrix P.
    */
-  const Matrixd<States, Outputs>& K() const { return m_K; }
+  const StateMatrix& P() const { return m_P; }
 
   /**
-   * Returns an element of the steady-state Kalman gain matrix K.
+   * Returns an element of the error covariance matrix P.
    *
-   * @param i Row of K.
-   * @param j Column of K.
+   * @param i Row of P.
+   * @param j Column of P.
    */
-  double K(int i, int j) const { return m_K(i, j); }
+  double P(int i, int j) const { return m_P(i, j); }
+
+  /**
+   * Set the current error covariance matrix P.
+   *
+   * @param P The error covariance matrix P.
+   */
+  void SetP(const StateMatrix& P) { m_P = P; }
 
   /**
    * Returns the state estimate x-hat.
@@ -102,7 +111,10 @@ class KalmanFilter {
   /**
    * Resets the observer.
    */
-  void Reset() { m_xHat.setZero(); }
+  void Reset() {
+    m_xHat.setZero();
+    m_P = m_initP;
+  }
 
   /**
    * Project the model into the future with a new control input u.
@@ -115,23 +127,34 @@ class KalmanFilter {
   /**
    * Correct the state estimate x-hat using the measurements in y.
    *
-   * @param u Same control input used in the last predict step.
+   * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    */
-  void Correct(const InputVector& u, const OutputVector& y);
+  void Correct(const InputVector& u, const OutputVector& y) {
+    Correct(u, y, m_contR);
+  }
+
+  /**
+   * Correct the state estimate x-hat using the measurements in y.
+   *
+   * This is useful for when the measurement noise covariances vary.
+   *
+   * @param u Same control input used in the predict step.
+   * @param y Measurement vector.
+   * @param R Continuous measurement noise covariance matrix.
+   */
+  void Correct(const InputVector& u, const OutputVector& y,
+               const Matrixd<Outputs, Outputs>& R);
 
  private:
   LinearSystem<States, Inputs, Outputs>* m_plant;
-
-  /**
-   * The steady-state Kalman gain matrix.
-   */
-  Matrixd<States, Outputs> m_K;
-
-  /**
-   * The state estimate.
-   */
   StateVector m_xHat;
+  StateMatrix m_P;
+  StateMatrix m_contQ;
+  Matrixd<Outputs, Outputs> m_contR;
+  units::second_t m_dt;
+
+  StateMatrix m_initP;
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)

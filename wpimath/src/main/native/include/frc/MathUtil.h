@@ -5,6 +5,7 @@
 #pragma once
 
 #include <numbers>
+#include <type_traits>
 
 #include <wpi/SymbolExports.h>
 
@@ -25,12 +26,11 @@ namespace frc {
  * be infinite.
  * @return The value after the deadband is applied.
  */
-template <typename T,
-          typename = std::enable_if_t<std::disjunction_v<
-              std::is_floating_point<T>, units::traits::is_unit_t<T>>>>
+template <typename T>
+  requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
 T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
   T magnitude;
-  if constexpr (std::is_floating_point_v<T>) {
+  if constexpr (std::is_arithmetic_v<T>) {
     magnitude = std::abs(value);
   } else {
     magnitude = units::math::abs(value);
@@ -103,6 +103,58 @@ constexpr T InputModulus(T input, T minimumInput, T maximumInput) {
   input -= numMin * modulus;
 
   return input;
+}
+
+/**
+ * Checks if the given value matches an expected value within a certain
+ * tolerance.
+ *
+ * @param expected The expected value
+ * @param actual The actual value
+ * @param tolerance The allowed difference between the actual and the expected
+ * value
+ * @return Whether or not the actual value is within the allowed tolerance
+ */
+template <typename T>
+  requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
+constexpr bool IsNear(T expected, T actual, T tolerance) {
+  if constexpr (std::is_arithmetic_v<T>) {
+    return std::abs(expected - actual) < tolerance;
+  } else {
+    return units::math::abs(expected - actual) < tolerance;
+  }
+}
+
+/**
+ * Checks if the given value matches an expected value within a certain
+ * tolerance. Supports continuous input for cases like absolute encoders.
+ *
+ * Continuous input means that the min and max value are considered to be the
+ * same point, and tolerances can be checked across them. A common example
+ * would be for absolute encoders: calling isNear(2, 359, 5, 0, 360) returns
+ * true because 359 is 1 away from 360 (which is treated as the same as 0) and
+ * 2 is 2 away from 0, adding up to an error of 3 degrees, which is within the
+ * given tolerance of 5.
+ *
+ * @param expected The expected value
+ * @param actual The actual value
+ * @param tolerance The allowed difference between the actual and the expected
+ * value
+ * @param min Smallest value before wrapping around to the largest value
+ * @param max Largest value before wrapping around to the smallest value
+ * @return Whether or not the actual value is within the allowed tolerance
+ */
+template <typename T>
+  requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
+constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
+  T errorBound = (max - min) / 2.0;
+  T error = frc::InputModulus<T>(expected - actual, -errorBound, errorBound);
+
+  if constexpr (std::is_arithmetic_v<T>) {
+    return std::abs(error) < tolerance;
+  } else {
+    return units::math::abs(error) < tolerance;
+  }
 }
 
 /**

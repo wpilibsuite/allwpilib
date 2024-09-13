@@ -7,7 +7,7 @@
 #include "hal/Types.h"
 
 /**
- * @defgroup hal_relay Main loop functions
+ * @defgroup hal_main Main loop functions
  * @ingroup hal_capi
  * @{
  */

@@ -21,11 +21,7 @@ public class Wrist extends PIDSubsystem {
 
   /** Create a new wrist subsystem. */
   public Wrist() {
-    super(
-        new PIDController(
-            WristConstants.kP,
-            WristConstants.kI,
-            WristConstants.kD));
+    super(new PIDController(WristConstants.kP, WristConstants.kI, WristConstants.kD));
     getController().setTolerance(WristConstants.kTolerance);
 
     // Conversion value of potentiometer varies between the real world and

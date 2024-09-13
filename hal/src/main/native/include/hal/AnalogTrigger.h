@@ -14,7 +14,6 @@
  * @{
  */
 
-// clang-format off
 /**
  * The type of analog trigger to trigger on.
  */
@@ -24,7 +23,6 @@ HAL_ENUM(HAL_AnalogTriggerType) {
   HAL_Trigger_kRisingPulse = 2,
   HAL_Trigger_kFallingPulse = 3
 };
-// clang-format on
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,6 +43,7 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
  *
  * @param[in] dutyCycleHandle the analog input to use for duty cycle
  * @param[out] status          Error status variable. 0 on success.
+ * @return tbe created analog trigger handle
  */
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
     HAL_DutyCycleHandle dutyCycleHandle, int32_t* status);

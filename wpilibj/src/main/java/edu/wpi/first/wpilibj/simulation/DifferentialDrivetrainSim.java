@@ -52,7 +52,7 @@ public class DifferentialDrivetrainSim {
   private final LinearSystem<N2, N2, N2> m_plant;
 
   /**
-   * Create a SimDrivetrain.
+   * Creates a simulated differential drivetrain.
    *
    * @param driveMotor A {@link DCMotor} representing the left side of the drivetrain.
    * @param gearing The gearing ratio between motor and wheel, as output over input. This must be
@@ -91,10 +91,10 @@ public class DifferentialDrivetrainSim {
   }
 
   /**
-   * Create a SimDrivetrain .
+   * Creates a simulated differential drivetrain.
    *
-   * @param drivetrainPlant The {@link LinearSystem} representing the robot's drivetrain. This
-   *     system can be created with {@link
+   * @param plant The {@link LinearSystem} representing the robot's drivetrain. This system can be
+   *     created with {@link
    *     edu.wpi.first.math.system.plant.LinearSystemId#createDrivetrainVelocitySystem(DCMotor,
    *     double, double, double, double, double)} or {@link
    *     edu.wpi.first.math.system.plant.LinearSystemId#identifyDrivetrainSystem(double, double,
@@ -112,13 +112,13 @@ public class DifferentialDrivetrainSim {
    *     point.
    */
   public DifferentialDrivetrainSim(
-      LinearSystem<N2, N2, N2> drivetrainPlant,
+      LinearSystem<N2, N2, N2> plant,
       DCMotor driveMotor,
       double gearing,
       double trackWidthMeters,
       double wheelRadiusMeters,
       Matrix<N7, N1> measurementStdDevs) {
-    this.m_plant = drivetrainPlant;
+    this.m_plant = plant;
     this.m_rb = trackWidthMeters / 2.0;
     this.m_motor = driveMotor;
     this.m_originalGearing = gearing;
@@ -148,8 +148,7 @@ public class DifferentialDrivetrainSim {
    * @param dtSeconds the time difference
    */
   public void update(double dtSeconds) {
-    // Update state estimate with RK4
-    m_x = NumericalIntegration.rk4(this::getDynamics, m_x, m_u, dtSeconds);
+    m_x = NumericalIntegration.rkdp(this::getDynamics, m_x, m_u, dtSeconds);
     m_y = m_x;
     if (m_measurementStdDevs != null) {
       m_y = m_y.plus(StateSpaceUtil.makeWhiteNoiseVector(m_measurementStdDevs));
@@ -237,12 +236,9 @@ public class DifferentialDrivetrainSim {
    * @return the drivetrain's left side current draw, in amps
    */
   public double getLeftCurrentDrawAmps() {
-    var loadIleft =
-        m_motor.getCurrent(
-                getState(State.kLeftVelocity) * m_currentGearing / m_wheelRadiusMeters,
-                m_u.get(0, 0))
-            * Math.signum(m_u.get(0, 0));
-    return loadIleft;
+    return m_motor.getCurrent(
+            getState(State.kLeftVelocity) * m_currentGearing / m_wheelRadiusMeters, m_u.get(0, 0))
+        * Math.signum(m_u.get(0, 0));
   }
 
   /**
@@ -251,13 +247,9 @@ public class DifferentialDrivetrainSim {
    * @return the drivetrain's right side current draw, in amps
    */
   public double getRightCurrentDrawAmps() {
-    var loadIright =
-        m_motor.getCurrent(
-                getState(State.kRightVelocity) * m_currentGearing / m_wheelRadiusMeters,
-                m_u.get(1, 0))
-            * Math.signum(m_u.get(1, 0));
-
-    return loadIright;
+    return m_motor.getCurrent(
+            getState(State.kRightVelocity) * m_currentGearing / m_wheelRadiusMeters, m_u.get(1, 0))
+        * Math.signum(m_u.get(1, 0));
   }
 
   /**
@@ -309,6 +301,13 @@ public class DifferentialDrivetrainSim {
     m_x.set(State.kRightPosition.value, 0, 0);
   }
 
+  /**
+   * The differential drive dynamics function.
+   *
+   * @param x The state.
+   * @param u The input.
+   * @return The state derivative with respect to time.
+   */
   protected Matrix<N7, N1> getDynamics(Matrix<N7, N1> x, Matrix<N2, N1> u) {
     // Because G can be factored out of B, we can divide by the old ratio and multiply
     // by the new ratio to get a new drivetrain model.
@@ -377,12 +376,18 @@ public class DifferentialDrivetrainSim {
    * and 16:48 8.45:1 -- 14:50 and 19:45 7.31:1 -- 14:50 and 21:43 5.95:1 -- 14:50 and 24:40
    */
   public enum KitbotGearing {
+    /** Gear ratio of 12.75:1. */
     k12p75(12.75),
+    /** Gear ratio of 10.71:1. */
     k10p71(10.71),
+    /** Gear ratio of 8.45:1. */
     k8p45(8.45),
+    /** Gear ratio of 7.31:1. */
     k7p31(7.31),
+    /** Gear ratio of 5.95:1. */
     k5p95(5.95);
 
+    /** KitbotGearing value. */
     public final double value;
 
     KitbotGearing(double i) {
@@ -392,15 +397,24 @@ public class DifferentialDrivetrainSim {
 
   /** Represents common motor layouts of the kit drivetrain. */
   public enum KitbotMotor {
+    /** One CIM motor per drive side. */
     kSingleCIMPerSide(DCMotor.getCIM(1)),
+    /** Two CIM motors per drive side. */
     kDualCIMPerSide(DCMotor.getCIM(2)),
+    /** One Mini CIM motor per drive side. */
     kSingleMiniCIMPerSide(DCMotor.getMiniCIM(1)),
+    /** Two Mini CIM motors per drive side. */
     kDualMiniCIMPerSide(DCMotor.getMiniCIM(2)),
+    /** One Falcon 500 motor per drive side. */
     kSingleFalcon500PerSide(DCMotor.getFalcon500(1)),
+    /** Two Falcon 500 motors per drive side. */
     kDoubleFalcon500PerSide(DCMotor.getFalcon500(2)),
+    /** One NEO motor per drive side. */
     kSingleNEOPerSide(DCMotor.getNEO(1)),
+    /** Two NEO motors per drive side. */
     kDoubleNEOPerSide(DCMotor.getNEO(2));
 
+    /** KitbotMotor value. */
     public final DCMotor value;
 
     KitbotMotor(DCMotor i) {
@@ -410,10 +424,14 @@ public class DifferentialDrivetrainSim {
 
   /** Represents common wheel sizes of the kit drivetrain. */
   public enum KitbotWheelSize {
+    /** Six inch diameter wheels. */
     kSixInch(Units.inchesToMeters(6)),
+    /** Eight inch diameter wheels. */
     kEightInch(Units.inchesToMeters(8)),
+    /** Ten inch diameter wheels. */
     kTenInch(Units.inchesToMeters(10));
 
+    /** KitbotWheelSize value. */
     public final double value;
 
     KitbotWheelSize(double i) {

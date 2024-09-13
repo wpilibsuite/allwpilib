@@ -7,17 +7,16 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <WSProviderContainer.h>
 #include <WSProvider_SimDevice.h>
+#include <wpi/StringMap.h>
+#include <wpi/json_fwd.h>
 #include <wpinet/uv/Async.h>
 #include <wpinet/uv/Loop.h>
 #include <wpinet/uv/Tcp.h>
 #include <wpinet/uv/Timer.h>
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace wpilibws {
 
@@ -25,7 +24,7 @@ class HALSimWSClientConnection;
 
 class HALSimWS : public std::enable_shared_from_this<HALSimWS> {
  public:
-  using LoopFunc = std::function<void(void)>;
+  using LoopFunc = std::function<void()>;
   using UvExecFunc = wpi::uv::Async<LoopFunc>;
 
   HALSimWS(wpi::uv::Loop& loop, ProviderContainer& providers,
@@ -40,6 +39,8 @@ class HALSimWS : public std::enable_shared_from_this<HALSimWS> {
   void CloseWebsocket(std::shared_ptr<HALSimBaseWebSocketConnection> hws);
 
   void OnNetValueChanged(const wpi::json& msg);
+
+  bool CanSendMessage(std::string_view type);
 
   const std::string& GetTargetHost() const { return m_host; }
   const std::string& GetTargetUri() const { return m_uri; }
@@ -67,6 +68,9 @@ class HALSimWS : public std::enable_shared_from_this<HALSimWS> {
   std::string m_host;
   std::string m_uri;
   int m_port;
+
+  bool m_useMsgFiltering;
+  wpi::StringMap<bool> m_msgFilters;
 };
 
 }  // namespace wpilibws

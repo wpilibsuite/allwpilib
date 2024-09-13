@@ -4,7 +4,9 @@
 
 #include "wpinet/uv/Stream.h"
 
+#include <wpi/Logger.h>
 #include <wpi/SmallVector.h>
+#include <wpi/raw_ostream.h>
 
 using namespace wpi;
 using namespace wpi::uv;
@@ -86,10 +88,37 @@ void Stream::StartRead() {
          });
 }
 
+static std::string BufsToString(std::span<const Buffer> bufs) {
+  std::string str;
+  wpi::raw_string_ostream stros{str};
+  size_t count = 0;
+  for (auto buf : bufs) {
+    for (auto ch : buf.bytes()) {
+      stros << fmt::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);
+      if (count++ > 30) {
+        goto extra;
+      }
+    }
+  }
+  goto done;
+extra: {
+  size_t total = 0;
+  for (auto buf : bufs) {
+    total += buf.len;
+  }
+  stros << fmt::format("... (total {})", total);
+}
+done:
+  return str;
+}
+
 void Stream::Write(std::span<const Buffer> bufs,
                    const std::shared_ptr<WriteReq>& req) {
   if (IsLoopClosing()) {
     return;
+  }
+  if (auto logger = GetLogger()) {
+    WPI_DEBUG4(*logger, "uv::Write({})", BufsToString(bufs));
   }
   if (Invoke(&uv_write, req->GetRaw(), GetRawStream(), bufs.data(), bufs.size(),
              [](uv_write_t* r, int status) {
@@ -97,8 +126,8 @@ void Stream::Write(std::span<const Buffer> bufs,
                if (status < 0) {
                  h.ReportError(status);
                }
+               auto ptr = h.Release();  // one-shot, but finish() may Keep()
                h.finish(Error(status));
-               h.Release();  // this is always a one-shot
              })) {
     req->Keep();
   }
@@ -111,25 +140,34 @@ void Stream::Write(std::span<const Buffer> bufs,
 
 int Stream::TryWrite(std::span<const Buffer> bufs) {
   if (IsLoopClosing()) {
-    return 0;
+    return UV_ECANCELED;
+  }
+  if (auto logger = GetLogger()) {
+    WPI_DEBUG4(*logger, "uv::TryWrite({})", BufsToString(bufs));
   }
   int val = uv_try_write(GetRawStream(), bufs.data(), bufs.size());
+  if (val == UV_EAGAIN) {
+    return 0;
+  }
   if (val < 0) {
     this->ReportError(val);
-    return 0;
+    return val;
   }
   return val;
 }
 
 int Stream::TryWrite2(std::span<const Buffer> bufs, Stream& send) {
   if (IsLoopClosing()) {
-    return 0;
+    return UV_ECANCELED;
   }
   int val = uv_try_write2(GetRawStream(), bufs.data(), bufs.size(),
                           send.GetRawStream());
+  if (val == UV_EAGAIN) {
+    return 0;
+  }
   if (val < 0) {
     this->ReportError(val);
-    return 0;
+    return val;
   }
   return val;
 }

@@ -35,21 +35,41 @@ class WPILIB_DLLEXPORT CubicHermiteSpline : public Spline<3> {
                      wpi::array<double, 2> yInitialControlVector,
                      wpi::array<double, 2> yFinalControlVector);
 
- protected:
   /**
    * Returns the coefficients matrix.
    * @return The coefficients matrix.
    */
   Matrixd<6, 3 + 1> Coefficients() const override { return m_coefficients; }
 
+  /**
+   * Returns the initial control vector that created this spline.
+   *
+   * @return The initial control vector that created this spline.
+   */
+  const ControlVector& GetInitialControlVector() const override {
+    return m_initialControlVector;
+  }
+
+  /**
+   * Returns the final control vector that created this spline.
+   *
+   * @return The final control vector that created this spline.
+   */
+  const ControlVector& GetFinalControlVector() const override {
+    return m_finalControlVector;
+  }
+
  private:
   Matrixd<6, 4> m_coefficients = Matrixd<6, 4>::Zero();
+
+  ControlVector m_initialControlVector;
+  ControlVector m_finalControlVector;
 
   /**
    * Returns the hermite basis matrix for cubic hermite spline interpolation.
    * @return The hermite basis matrix for cubic hermite spline interpolation.
    */
-  static Matrixd<4, 4> MakeHermiteBasis() {
+  static Eigen::Matrix4d MakeHermiteBasis() {
     // Given P(i), P'(i), P(i+1), P'(i+1), the control vectors, we want to find
     // the coefficients of the spline P(t) = a₃t³ + a₂t² + a₁t + a₀.
     //
@@ -71,10 +91,10 @@ class WPILIB_DLLEXPORT CubicHermiteSpline : public Spline<3> {
     // [a₁] = [ 0  1  0  0][P(i+1) ]
     // [a₀] = [ 1  0  0  0][P'(i+1)]
 
-    static const Matrixd<4, 4> basis{{+2.0, +1.0, -2.0, +1.0},
-                                     {-3.0, -2.0, +3.0, -1.0},
-                                     {+0.0, +1.0, +0.0, +0.0},
-                                     {+1.0, +0.0, +0.0, +0.0}};
+    static const Eigen::Matrix4d basis{{+2.0, +1.0, -2.0, +1.0},
+                                       {-3.0, -2.0, +3.0, -1.0},
+                                       {+0.0, +1.0, +0.0, +0.0},
+                                       {+1.0, +0.0, +0.0, +0.0}};
     return basis;
   }
 

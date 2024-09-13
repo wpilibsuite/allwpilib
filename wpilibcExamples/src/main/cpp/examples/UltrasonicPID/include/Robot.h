@@ -18,6 +18,7 @@
  */
 class Robot : public frc::TimedRobot {
  public:
+  Robot();
   void AutonomousInit() override;
   void AutonomousPeriodic() override;
 
@@ -31,9 +32,7 @@ class Robot : public frc::TimedRobot {
 
  private:
   // proportional speed constant
-  // negative because applying positive voltage will bring us closer to the
-  // target
-  static constexpr double kP = -0.001;
+  static constexpr double kP = 0.001;
   // integral speed constant
   static constexpr double kI = 0.0;
   // derivative speed constant
@@ -46,6 +45,8 @@ class Robot : public frc::TimedRobot {
   frc::Ultrasonic m_ultrasonic{kUltrasonicPingPort, kUltrasonicEchoPort};
   frc::PWMSparkMax m_left{kLeftMotorPort};
   frc::PWMSparkMax m_right{kRightMotorPort};
-  frc::DifferentialDrive m_robotDrive{m_left, m_right};
-  frc2::PIDController m_pidController{kP, kI, kD};
+  frc::DifferentialDrive m_robotDrive{
+      [&](double output) { m_left.Set(output); },
+      [&](double output) { m_right.Set(output); }};
+  frc::PIDController m_pidController{kP, kI, kD};
 };

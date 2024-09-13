@@ -5,12 +5,13 @@
 #include "glass/hardware/Gyro.h"
 
 #include <cmath>
+#include <numbers>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <numbers>
+#include <wpi/StringExtras.h>
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
@@ -65,7 +66,8 @@ void glass::DisplayGyro(GyroModel* m) {
                   color, 1.2f);
     if (major) {
       char txt[16];
-      std::snprintf(txt, sizeof(txt), "%d°", i);
+      wpi::format_to_n_c_str(txt, sizeof(txt), "{}°", i);
+
       draw->AddText(
           center + (direction * radius * 1.25) - ImGui::CalcTextSize(txt) * 0.5,
           primaryColor, txt, nullptr);

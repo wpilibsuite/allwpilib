@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -22,7 +23,9 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   /**
    * Creates a simulated flywheel mechanism.
    *
-   * @param plant The linear system that represents the flywheel.
+   * @param plant The linear system that represents the flywheel. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createFlywheelSystem(DCMotor, double,
+   *     double)}.
    * @param gearbox The type of and number of motors in the flywheel gearbox.
    * @param gearing The gearing of the flywheel (numbers greater than 1 represent reductions).
    */
@@ -80,6 +83,15 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
         measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
+  }
+
+  /**
+   * Sets the flywheel's state.
+   *
+   * @param velocityRadPerSec The new velocity in radians per second.
+   */
+  public void setState(double velocityRadPerSec) {
+    setState(VecBuilder.fill(velocityRadPerSec));
   }
 
   /**

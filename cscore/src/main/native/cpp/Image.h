@@ -22,9 +22,7 @@ class Image {
 
  public:
 #ifndef __linux__
-  explicit Image(size_t capacity) {
-    m_data.reserve(capacity);
-  }
+  explicit Image(size_t capacity) { m_data.reserve(capacity); }
 #else
   explicit Image(size_t capacity)
       : m_data{capacity, default_init_allocator<uchar>{}} {
@@ -39,35 +37,19 @@ class Image {
   operator std::string_view() const {  // NOLINT
     return str();
   }
-  std::string_view str() const {
-    return {data(), size()};
-  }
-  size_t capacity() const {
-    return m_data.capacity();
-  }
+  std::string_view str() const { return {data(), size()}; }
+  size_t capacity() const { return m_data.capacity(); }
   const char* data() const {
     return reinterpret_cast<const char*>(m_data.data());
   }
-  char* data() {
-    return reinterpret_cast<char*>(m_data.data());
-  }
-  size_t size() const {
-    return m_data.size();
-  }
+  char* data() { return reinterpret_cast<char*>(m_data.data()); }
+  size_t size() const { return m_data.size(); }
 
-  const std::vector<uchar>& vec() const {
-    return m_data;
-  }
-  std::vector<uchar>& vec() {
-    return m_data;
-  }
+  const std::vector<uchar>& vec() const { return m_data; }
+  std::vector<uchar>& vec() { return m_data; }
 
-  void resize(size_t size) {
-    m_data.resize(size);
-  }
-  void SetSize(size_t size) {
-    m_data.resize(size);
-  }
+  void resize(size_t size) { m_data.resize(size); }
+  void SetSize(size_t size) { m_data.resize(size); }
 
   cv::Mat AsMat() {
     int type;
@@ -90,9 +72,24 @@ class Image {
     return cv::Mat{height, width, type, m_data.data()};
   }
 
-  cv::_InputArray AsInputArray() {
-    return cv::_InputArray{m_data};
+  int GetStride() const {
+    switch (pixelFormat) {
+      case VideoMode::kYUYV:
+      case VideoMode::kRGB565:
+      case VideoMode::kY16:
+      case VideoMode::kUYVY:
+        return 2 * width;
+      case VideoMode::kBGR:
+        return 3 * width;
+      case VideoMode::kGray:
+        return width;
+      case VideoMode::kMJPEG:
+      default:
+        return 0;
+    }
   }
+
+  cv::_InputArray AsInputArray() { return cv::_InputArray{m_data}; }
 
   bool Is(int width_, int height_) {
     return width == width_ && height == height_;
@@ -114,12 +111,8 @@ class Image {
   bool IsLarger(const Image& oth) {
     return width >= oth.width && height >= oth.height;
   }
-  bool IsSmaller(int width_, int height_) {
-    return !IsLarger(width_, height_);
-  }
-  bool IsSmaller(const Image& oth) {
-    return !IsLarger(oth);
-  }
+  bool IsSmaller(int width_, int height_) { return !IsLarger(width_, height_); }
+  bool IsSmaller(const Image& oth) { return !IsLarger(oth); }
 
  private:
   std::vector<uchar> m_data;

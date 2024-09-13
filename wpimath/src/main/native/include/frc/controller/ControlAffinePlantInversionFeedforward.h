@@ -7,7 +7,8 @@
 #include <array>
 #include <functional>
 
-#include "Eigen/QR"
+#include <Eigen/QR>
+
 #include "frc/EigenCore.h"
 #include "frc/system/NumericalJacobian.h"
 #include "units/time.h"
@@ -33,8 +34,8 @@ namespace frc {
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  *
- * @tparam States The number of states.
- * @tparam Inputs the number of inputs.
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
  */
 template <int States, int Inputs>
 class ControlAffinePlantInversionFeedforward {
@@ -165,6 +166,9 @@ class ControlAffinePlantInversionFeedforward {
   InputVector Calculate(const StateVector& r, const StateVector& nextR) {
     StateVector rDot = (nextR - r) / m_dt.value();
 
+    // ṙ = f(r) + Bu
+    // Bu = ṙ − f(r)
+    // u = B⁺(ṙ − f(r))
     m_uff = m_B.householderQr().solve(rDot - m_f(r, InputVector::Zero()));
 
     m_r = nextR;

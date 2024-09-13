@@ -4,14 +4,12 @@
 
 package edu.wpi.first.wpilibj.examples.armbotoffboard;
 
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-
 /**
  * A simplified stub class that simulates the API of a common "smart" motor controller.
  *
  * <p>Has no actual functionality.
  */
-public class ExampleSmartMotorController implements MotorController {
+public class ExampleSmartMotorController {
   public enum PIDMode {
     kPosition,
     kVelocity,
@@ -72,25 +70,19 @@ public class ExampleSmartMotorController implements MotorController {
   /** Resets the encoder to zero distance. */
   public void resetEncoder() {}
 
-  @Override
   public void set(double speed) {}
 
-  @Override
   public double get() {
     return 0;
   }
 
-  @Override
   public void setInverted(boolean isInverted) {}
 
-  @Override
   public boolean getInverted() {
     return false;
   }
 
-  @Override
   public void disable() {}
 
-  @Override
   public void stopMotor() {}
 }

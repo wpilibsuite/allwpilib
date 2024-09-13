@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package wpi.proto;
+
+option java_package = "edu.wpi.first.math.proto";
+
+message ProtobufMatrix {
+  uint32 num_rows = 1;
+  uint32 num_cols = 2;
+  repeated double data = 3;
+}
+
+message ProtobufVector {
+  repeated double rows = 1;
+}

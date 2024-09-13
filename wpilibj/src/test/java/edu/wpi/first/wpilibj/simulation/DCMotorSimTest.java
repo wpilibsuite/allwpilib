@@ -63,7 +63,7 @@ class DCMotorSimTest {
 
     try (var motor = new PWMVictorSPX(0);
         var encoder = new Encoder(0, 1);
-        var controller = new PIDController(0.04, 0.0, 0.001); ) {
+        var controller = new PIDController(0.04, 0.0, 0.001)) {
       var encoderSim = new EncoderSim(encoder);
       encoderSim.resetData();
 

@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -24,6 +24,9 @@
 
 #ifndef _gcem_incomplete_beta_inv_HPP
 #define _gcem_incomplete_beta_inv_HPP
+
+namespace gcem
+{
 
 namespace internal
 {
@@ -347,6 +350,8 @@ incomplete_beta_inv(const T1 a, const T2 b, const T3 p)
 noexcept
 {
     return internal::incomplete_beta_inv_type_check(a,b,p);
+}
+
 }
 
 #endif

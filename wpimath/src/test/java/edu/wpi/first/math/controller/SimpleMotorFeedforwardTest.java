@@ -6,7 +6,7 @@ package edu.wpi.first.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
@@ -20,8 +20,8 @@ class SimpleMotorFeedforwardTest {
     double Ka = 0.6;
     double dt = 0.02;
 
-    var A = Matrix.mat(Nat.N1(), Nat.N1()).fill(-Kv / Ka);
-    var B = Matrix.mat(Nat.N1(), Nat.N1()).fill(1.0 / Ka);
+    var A = MatBuilder.fill(Nat.N1(), Nat.N1(), -Kv / Ka);
+    var B = MatBuilder.fill(Nat.N1(), Nat.N1(), 1.0 / Ka);
 
     var plantInversion = new LinearPlantInversionFeedforward<N1, N1, N1>(A, B, dt);
     var simpleMotor = new SimpleMotorFeedforward(Ks, Kv, Ka);
@@ -29,7 +29,7 @@ class SimpleMotorFeedforwardTest {
     var r = VecBuilder.fill(2.0);
     var nextR = VecBuilder.fill(3.0);
 
-    assertEquals(37.524995834325161 + 0.5, simpleMotor.calculate(2.0, 3.0, dt), 0.002);
+    assertEquals(37.52499583432516 + 0.5, simpleMotor.calculate(2.0, 3.0, dt), 0.002);
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + Ks,
         simpleMotor.calculate(2.0, 3.0, dt),

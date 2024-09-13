@@ -31,10 +31,11 @@ public class Jaguar extends PWMMotorController {
    * @param channel The PWM channel that the Jaguar is attached to. 0-9 are on-board, 10-19 are on
    *     the MXP port
    */
+  @SuppressWarnings("this-escape")
   public Jaguar(final int channel) {
     super("Jaguar", channel);
 
-    m_pwm.setBounds(2.31, 1.55, 1.507, 1.454, 0.697);
+    m_pwm.setBoundsMicroseconds(2310, 1550, 1507, 1454, 697);
     m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();

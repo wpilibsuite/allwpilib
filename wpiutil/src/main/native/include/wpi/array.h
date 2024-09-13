@@ -5,6 +5,7 @@
 #pragma once
 
 #include <array>
+#include <concepts>
 #include <cstddef>
 #include <tuple>
 #include <utility>
@@ -26,11 +27,10 @@ class array : public std::array<T, N> {
  public:
   constexpr explicit array(empty_array_t) {}
 
-  template <typename... Ts>
+  template <std::convertible_to<T>... Ts>
+    requires(1 + sizeof...(Ts) == N)
   constexpr array(T arg, Ts&&... args)  // NOLINT
-      : std::array<T, N>{std::forward<T>(arg), std::forward<Ts>(args)...} {
-    static_assert(1 + sizeof...(args) == N, "Dimension mismatch");
-  }
+      : std::array<T, N>{std::forward<T>(arg), std::forward<Ts>(args)...} {}
 
   constexpr array(const array<T, N>&) = default;
   constexpr array& operator=(const array<T, N>&) = default;
@@ -56,33 +56,32 @@ class array : public std::array<T, N> {
   }
 };
 
-template <typename T, typename... Ts>
-array(T, Ts...) -> array<std::enable_if_t<(std::is_same_v<T, Ts> && ...), T>,
-                         1 + sizeof...(Ts)>;
+template <typename T, std::convertible_to<T>... Ts>
+array(T, Ts...) -> array<T, 1 + sizeof...(Ts)>;
 
 }  // namespace wpi
 
 template <size_t I, typename T, size_t N>
+  requires(I < N)
 constexpr T& get(wpi::array<T, N>& arr) noexcept {
-  static_assert(I < N, "array index is within bounds");
   return std::get<I>(static_cast<std::array<T, N>>(arr));
 }
 
 template <size_t I, typename T, size_t N>
+  requires(I < N)
 constexpr T&& get(wpi::array<T, N>&& arr) noexcept {
-  static_assert(I < N, "array index is within bounds");
   return std::move(std::get<I>(arr));
 }
 
 template <size_t I, typename T, size_t N>
+  requires(I < N)
 constexpr const T& get(const wpi::array<T, N>& arr) noexcept {
-  static_assert(I < N, "array index is within bounds");
   return std::get<I>(static_cast<std::array<T, N>>(arr));
 }
 
 template <size_t I, typename T, size_t N>
+  requires(I < N)
 constexpr const T&& get(const wpi::array<T, N>&& arr) noexcept {
-  static_assert(I < N, "array index is within bounds");
   return std::move(std::get<I>(arr));
 }
 
@@ -94,8 +93,8 @@ struct tuple_size<wpi::array<T, N>> : public integral_constant<size_t, N> {};
 
 // Partial specialization for wpi::array
 template <size_t I, typename T, size_t N>
+  requires(I < N)
 struct tuple_element<I, wpi::array<T, N>> {
-  static_assert(I < N, "index is out of bounds");
   using type = T;
 };
 }  // namespace std

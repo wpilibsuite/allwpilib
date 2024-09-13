@@ -8,11 +8,11 @@
 #include <string_view>
 #include <vector>
 
+#include <gtest/gtest.h>
+#include <wpi/SpanMatcher.h>
 #include <wpi/raw_ostream.h>
 
-#include "../SpanMatcher.h"
 #include "../TestPrinters.h"
-#include "gtest/gtest.h"
 #include "net3/Message3.h"
 #include "net3/WireEncoder3.h"
 #include "networktables/NetworkTableValue.h"

@@ -11,22 +11,26 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * A command composition that runs one of a selection of commands, either using a selector and a key
- * to command mapping, or a supplier that returns the command directly at runtime.
+ * A command composition that runs one of a selection of commands using a selector and a key to
+ * command mapping.
  *
  * <p>The rules for command compositions apply: command instances that are passed to it cannot be
  * added to any other composition or scheduled individually, and the composition requires all
  * subsystems its components require.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @param <K> The type of key used to select the command
  */
-public class SelectCommand extends CommandBase {
-  private final Map<Object, Command> m_commands;
-  private final Supplier<Object> m_selector;
-  private final Supplier<Command> m_toRun;
+public class SelectCommand<K> extends Command {
+  private final Map<K, Command> m_commands;
+  private final Supplier<? extends K> m_selector;
   private Command m_selectedCommand;
   private boolean m_runsWhenDisabled = true;
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
+
+  private final Command m_defaultCommand =
+      new PrintCommand("SelectCommand selector value does not correspond to any command!");
 
   /**
    * Creates a new SelectCommand.
@@ -34,14 +38,13 @@ public class SelectCommand extends CommandBase {
    * @param commands the map of commands to choose from
    * @param selector the selector to determine which command to run
    */
-  public SelectCommand(Map<Object, Command> commands, Supplier<Object> selector) {
+  public SelectCommand(Map<K, Command> commands, Supplier<? extends K> selector) {
     m_commands = requireNonNullParam(commands, "commands", "SelectCommand");
     m_selector = requireNonNullParam(selector, "selector", "SelectCommand");
 
+    CommandScheduler.getInstance().registerComposedCommands(m_defaultCommand);
     CommandScheduler.getInstance()
         .registerComposedCommands(commands.values().toArray(new Command[] {}));
-
-    m_toRun = null;
 
     for (Command command : m_commands.values()) {
       m_requirements.addAll(command.getRequirements());
@@ -52,36 +55,9 @@ public class SelectCommand extends CommandBase {
     }
   }
 
-  /**
-   * Creates a new SelectCommand.
-   *
-   * @param toRun a supplier providing the command to run
-   * @deprecated Replace with {@link ProxyCommand}
-   */
-  @Deprecated
-  public SelectCommand(Supplier<Command> toRun) {
-    m_commands = null;
-    m_selector = null;
-    m_toRun = requireNonNullParam(toRun, "toRun", "SelectCommand");
-
-    // we have no way of checking the underlying command, so default.
-    m_runsWhenDisabled = false;
-    m_interruptBehavior = InterruptionBehavior.kCancelSelf;
-  }
-
   @Override
   public void initialize() {
-    if (m_selector != null) {
-      if (!m_commands.containsKey(m_selector.get())) {
-        m_selectedCommand =
-            new PrintCommand(
-                "SelectCommand selector value does not correspond to" + " any command!");
-        return;
-      }
-      m_selectedCommand = m_commands.get(m_selector.get());
-    } else {
-      m_selectedCommand = m_toRun.get();
-    }
+    m_selectedCommand = m_commands.getOrDefault(m_selector.get(), m_defaultCommand);
     m_selectedCommand.initialize();
   }
 

@@ -47,3 +47,6 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
                                     const Rotation2d& currentAngle);
 };
 }  // namespace frc
+
+#include "frc/kinematics/proto/SwerveModuleStateProto.h"
+#include "frc/kinematics/struct/SwerveModuleStateStruct.h"

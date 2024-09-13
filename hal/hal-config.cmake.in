@@ -4,3 +4,6 @@ include(CMakeFindDependencyMacro)
 
 @FILENAME_DEP_REPLACE@
 include(${SELF_DIR}/hal.cmake)
+if(@WITH_JAVA@)
+    include(${SELF_DIR}/hal_jar.cmake)
+endif()

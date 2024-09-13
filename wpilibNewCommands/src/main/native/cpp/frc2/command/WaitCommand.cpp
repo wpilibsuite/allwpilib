@@ -5,7 +5,6 @@
 #include "frc2/command/WaitCommand.h"
 
 #include <fmt/format.h>
-#include <frc/fmt/Units.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc2;
@@ -31,7 +30,7 @@ bool WaitCommand::RunsWhenDisabled() const {
 }
 
 void WaitCommand::InitSendable(wpi::SendableBuilder& builder) {
-  CommandBase::InitSendable(builder);
+  Command::InitSendable(builder);
   builder.AddDoubleProperty(
       "duration", [this] { return m_duration.value(); }, nullptr);
 }

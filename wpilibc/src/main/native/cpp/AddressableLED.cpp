@@ -65,14 +65,14 @@ void AddressableLED::SetData(std::initializer_list<LEDData> ledData) {
   FRC_CheckErrorStatus(status, "Port {}", m_port);
 }
 
-void AddressableLED::SetBitTiming(units::nanosecond_t lowTime0,
-                                  units::nanosecond_t highTime0,
-                                  units::nanosecond_t lowTime1,
-                                  units::nanosecond_t highTime1) {
+void AddressableLED::SetBitTiming(units::nanosecond_t highTime0,
+                                  units::nanosecond_t lowTime0,
+                                  units::nanosecond_t highTime1,
+                                  units::nanosecond_t lowTime1) {
   int32_t status = 0;
   HAL_SetAddressableLEDBitTiming(
-      m_handle, lowTime0.to<int32_t>(), highTime0.to<int32_t>(),
-      lowTime1.to<int32_t>(), highTime1.to<int32_t>(), &status);
+      m_handle, highTime0.to<int32_t>(), lowTime0.to<int32_t>(),
+      highTime1.to<int32_t>(), lowTime1.to<int32_t>(), &status);
   FRC_CheckErrorStatus(status, "Port {}", m_port);
 }
 

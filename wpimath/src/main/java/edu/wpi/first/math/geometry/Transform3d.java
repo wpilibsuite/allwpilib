@@ -4,10 +4,14 @@
 
 package edu.wpi.first.math.geometry;
 
+import edu.wpi.first.math.geometry.proto.Transform3dProto;
+import edu.wpi.first.math.geometry.struct.Transform3dStruct;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
-/** Represents a transformation for a Pose3d. */
-public class Transform3d {
+/** Represents a transformation for a Pose3d in the pose's frame. */
+public class Transform3d implements ProtobufSerializable, StructSerializable {
   private final Translation3d m_translation;
   private final Rotation3d m_rotation;
 
@@ -40,6 +44,19 @@ public class Transform3d {
     m_rotation = rotation;
   }
 
+  /**
+   * Constructs a transform with x, y, and z translations instead of a separate Translation3d.
+   *
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param z The z component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  public Transform3d(double x, double y, double z, Rotation3d rotation) {
+    m_translation = new Translation3d(x, y, z);
+    m_rotation = rotation;
+  }
+
   /** Constructs the identity transform -- maps an initial pose to itself. */
   public Transform3d() {
     m_translation = new Translation3d();
@@ -67,7 +84,8 @@ public class Transform3d {
   }
 
   /**
-   * Composes two transformations.
+   * Composes two transformations. The second transform is applied relative to the orientation of
+   * the first.
    *
    * @param other The transform to compose with this one.
    * @return The composition of the two transformations.
@@ -159,4 +177,10 @@ public class Transform3d {
   public int hashCode() {
     return Objects.hash(m_translation, m_rotation);
   }
+
+  /** Transform3d protobuf for serialization. */
+  public static final Transform3dProto proto = new Transform3dProto();
+
+  /** Transform3d struct for serialization. */
+  public static final Transform3dStruct struct = new Transform3dStruct();
 }

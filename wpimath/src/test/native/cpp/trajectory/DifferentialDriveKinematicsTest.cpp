@@ -5,9 +5,10 @@
 #include <memory>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
-#include "gtest/gtest.h"
 #include "trajectory/TestTrajectory.h"
 #include "units/time.h"
 

@@ -1,4 +1,4 @@
-From 94882f4460897f92dfe9f95ec33629094f8e76a2 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Fri, 20 Jan 2023 23:41:56 -0800
 Subject: [PATCH 2/2] Intellisense fix
@@ -8,10 +8,10 @@ Subject: [PATCH 2/2] Intellisense fix
  1 file changed, 10 insertions(+)
 
 diff --git a/Eigen/src/Core/util/Macros.h b/Eigen/src/Core/util/Macros.h
-index 986c3d4..81986b9 100644
+index 5d054e67c4355a549b1351f1ecc5e49a96e91ace..fda6ad91eedacc9958a5a0bc34db33d8b4e57cd6 100644
 --- a/Eigen/src/Core/util/Macros.h
 +++ b/Eigen/src/Core/util/Macros.h
-@@ -58,6 +58,16 @@
+@@ -60,6 +60,16 @@
  // Compiler identification, EIGEN_COMP_*
  //------------------------------------------------------------------------------------------
  
@@ -25,6 +25,6 @@ index 986c3d4..81986b9 100644
 +#endif
 +#endif
 +
- /// \internal EIGEN_COMP_GNUC set to 1 for all compilers compatible with GCC
+ /// \internal EIGEN_COMP_GNUC set to version (e.g., 951 for GCC 9.5.1) for all compilers compatible with GCC
  #ifdef __GNUC__
-   #define EIGEN_COMP_GNUC (__GNUC__*10+__GNUC_MINOR__)
+ #define EIGEN_COMP_GNUC (__GNUC__ * 100 + __GNUC_MINOR__ * 10 + __GNUC_PATCHLEVEL__)

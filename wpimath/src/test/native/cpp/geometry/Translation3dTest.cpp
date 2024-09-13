@@ -4,8 +4,9 @@
 
 #include <cmath>
 
+#include <gtest/gtest.h>
+
 #include "frc/geometry/Translation3d.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 
@@ -125,6 +126,17 @@ TEST(Translation3dTest, PolarConstructor) {
   EXPECT_NEAR(two.X().value(), 1.0, kEpsilon);
   EXPECT_NEAR(two.Y().value(), std::sqrt(3.0), kEpsilon);
   EXPECT_NEAR(two.Z().value(), 0.0, kEpsilon);
+}
+
+TEST(Translation3dTest, ToVector) {
+  const Eigen::Vector3d vec(1.0, 2.0, 3.0);
+  const Translation3d translation{vec};
+
+  EXPECT_DOUBLE_EQ(vec[0], translation.X().value());
+  EXPECT_DOUBLE_EQ(vec[1], translation.Y().value());
+  EXPECT_DOUBLE_EQ(vec[2], translation.Z().value());
+
+  EXPECT_TRUE(vec == translation.ToVector());
 }
 
 TEST(Translation3dTest, Constexpr) {

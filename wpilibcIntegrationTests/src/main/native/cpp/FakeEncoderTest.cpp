@@ -4,6 +4,7 @@
 
 #include "frc/Encoder.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <units/time.h>
 
 #include "TestBench.h"
@@ -11,7 +12,6 @@
 #include "frc/AnalogTrigger.h"
 #include "frc/DigitalOutput.h"
 #include "frc/Timer.h"
-#include "gtest/gtest.h"
 
 static constexpr auto kDelayTime = 1_ms;
 

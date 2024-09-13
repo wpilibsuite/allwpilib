@@ -8,63 +8,73 @@ include(AddTest)
 file(GLOB wpinet_jni_src src/main/native/cpp/jni/WPINetJNI.cpp)
 
 # Java bindings
-if (WITH_JAVA)
-  find_package(Java REQUIRED)
-  find_package(JNI REQUIRED)
-  include(UseJava)
-  set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
+if(WITH_JAVA)
+    find_package(Java REQUIRED)
+    find_package(JNI REQUIRED)
+    include(UseJava)
+    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
-  set(CMAKE_JNI_TARGET true)
+    set(CMAKE_JNI_TARGET true)
 
-  file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
 
-  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-    set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-    add_jar(wpinet_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpinet)
-  else()
-    add_jar(wpinet_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpinet GENERATE_NATIVE_HEADERS wpinet_jni_headers)
-  endif()
+    add_jar(
+        wpinet_jar
+        ${JAVA_SOURCES}
+        INCLUDE_JARS wpiutil_jar
+        OUTPUT_NAME wpinet
+        GENERATE_NATIVE_HEADERS wpinet_jni_headers
+    )
 
-  get_property(WPINET_JAR_FILE TARGET wpinet_jar PROPERTY JAR_FILE)
-  install(FILES ${WPINET_JAR_FILE} DESTINATION "${java_lib_dest}")
+    install_jar(wpinet_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS wpinet_jar FILE wpinet_jar.cmake DESTINATION share/wpinet)
 
-  set_property(TARGET wpinet_jar PROPERTY FOLDER "java")
+    add_library(wpinetjni ${wpinet_jni_src})
+    wpilib_target_warnings(wpinetjni)
+    target_link_libraries(wpinetjni PUBLIC wpinet)
 
-  add_library(wpinetjni ${wpinet_jni_src})
-  wpilib_target_warnings(wpinetjni)
-  target_link_libraries(wpinetjni PUBLIC wpinet)
+    set_property(TARGET wpinetjni PROPERTY FOLDER "libraries")
 
-  set_property(TARGET wpinetjni PROPERTY FOLDER "libraries")
-
-  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-    target_include_directories(wpinetjni PRIVATE ${JNI_INCLUDE_DIRS})
-    target_include_directories(wpinetjni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-  else()
     target_link_libraries(wpinetjni PRIVATE wpinet_jni_headers)
-  endif()
-  add_dependencies(wpinetjni wpinet_jar)
+    add_dependencies(wpinetjni wpinet_jar)
 
-  if (MSVC)
-    install(TARGETS wpinetjni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-  endif()
+    install(TARGETS wpinetjni EXPORT wpinetjni)
+endif()
 
-  install(TARGETS wpinetjni EXPORT wpinetjni DESTINATION "${main_lib_dest}")
+if(WITH_JAVA_SOURCE)
+    find_package(Java REQUIRED)
+    include(UseJava)
+    file(GLOB WPINET_SOURCES src/main/java/edu/wpi/first/net/*.java)
+    add_jar(
+        wpinet_src_jar
+        RESOURCES
+        NAMESPACE "edu/wpi/first/net" ${WPINET_SOURCES}
+        OUTPUT_NAME wpinet-sources
+    )
 
+    get_property(WPINET_SRC_JAR_FILE TARGET wpinet_src_jar PROPERTY JAR_FILE)
+    install(FILES ${WPINET_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+    set_property(TARGET wpinet_src_jar PROPERTY FOLDER "java")
 endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-if (NOT MSVC AND NOT APPLE)
+if(NOT MSVC AND NOT APPLE)
     find_library(ATOMIC NAMES atomic libatomic.so.1)
-    if (ATOMIC)
+    if(ATOMIC)
         message(STATUS "Found libatomic: ${ATOMIC}")
     endif()
 endif()
 
-GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpinet_resources_src)
+generate_resources(src/main/native/resources generated/main/cpp WPI wpi wpinet_resources_src)
 
-file(GLOB_RECURSE wpinet_native_src src/main/native/cpp/*.cpp src/main/native/thirdparty/tcpsockets/cpp/*.cpp)
+file(
+    GLOB_RECURSE wpinet_native_src
+    src/main/native/cpp/*.cpp
+    src/main/native/thirdparty/tcpsockets/cpp/*.cpp
+)
 list(REMOVE_ITEM wpinet_native_src ${wpinet_jni_src})
 file(GLOB_RECURSE wpinet_unix_src src/main/native/unix/*.cpp)
 file(GLOB_RECURSE wpinet_linux_src src/main/native/linux/*.cpp)
@@ -108,10 +118,7 @@ set(uv_darwin_src
 )
 
 set(uv_linux_src
-    src/main/native/thirdparty/libuv/src/unix/epoll.cpp
-    src/main/native/thirdparty/libuv/src/unix/linux-core.cpp
-    src/main/native/thirdparty/libuv/src/unix/linux-inotify.cpp
-    src/main/native/thirdparty/libuv/src/unix/linux-syscalls.cpp
+    src/main/native/thirdparty/libuv/src/unix/linux.cpp
     src/main/native/thirdparty/libuv/src/unix/procfs-exepath.cpp
     src/main/native/thirdparty/libuv/src/unix/proctitle.cpp
     src/main/native/thirdparty/libuv/src/unix/random-sysctl-linux.cpp
@@ -126,17 +133,22 @@ target_compile_features(wpinet PUBLIC cxx_std_20)
 wpilib_target_warnings(wpinet)
 target_link_libraries(wpinet PUBLIC wpiutil)
 
-if (NOT USE_SYSTEM_LIBUV)
+if(NOT USE_SYSTEM_LIBUV)
     target_sources(wpinet PRIVATE ${uv_native_src})
-    install(DIRECTORY src/main/native/thirdparty/libuv/include/ DESTINATION "${include_dest}/wpinet")
-    target_include_directories(wpinet PRIVATE
-        src/main/native/thirdparty/libuv/src)
-    target_include_directories(wpinet PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/libuv/include>
-                            $<INSTALL_INTERFACE:${include_dest}/wpinet>)
+    install(
+        DIRECTORY src/main/native/thirdparty/libuv/include/
+        DESTINATION "${include_dest}/wpinet"
+    )
+    target_include_directories(wpinet PRIVATE src/main/native/thirdparty/libuv/src)
+    target_include_directories(
+        wpinet
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/libuv/include>
+            $<INSTALL_INTERFACE:${include_dest}/wpinet>
+    )
     if(NOT MSVC)
         target_sources(wpinet PRIVATE ${uv_unix_src})
-        if (APPLE)
+        if(APPLE)
             target_sources(wpinet PRIVATE ${uv_darwin_src})
         else()
             target_sources(wpinet PRIVATE ${uv_linux_src})
@@ -149,49 +161,47 @@ if (NOT USE_SYSTEM_LIBUV)
         endif()
     endif()
 else()
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(libuv REQUIRED IMPORTED_TARGET libuv)
-    target_link_libraries(wpinet PUBLIC PkgConfig::libuv)
+    find_package(libuv CONFIG REQUIRED)
+    target_link_libraries(wpinet PUBLIC $<IF:$<TARGET_EXISTS:libuv::uv_a>,libuv::uv_a,libuv::uv>)
 endif()
 
-if (MSVC)
+if(MSVC)
     target_sources(wpinet PRIVATE ${wpinet_windows_src})
-else ()
+else()
     target_sources(wpinet PRIVATE ${wpinet_unix_src})
-    if (APPLE)
+    if(APPLE)
         target_sources(wpinet PRIVATE ${wpinet_macos_src})
     else()
         target_sources(wpinet PRIVATE ${wpinet_linux_src})
     endif()
 endif()
 
-install(DIRECTORY src/main/native/thirdparty/tcpsockets/include/ DESTINATION "${include_dest}/wpinet")
-target_include_directories(wpinet PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
-                            $<INSTALL_INTERFACE:${include_dest}/wpinet>)
+install(
+    DIRECTORY src/main/native/thirdparty/tcpsockets/include/
+    DESTINATION "${include_dest}/wpinet"
+)
+target_include_directories(
+    wpinet
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
+        $<INSTALL_INTERFACE:${include_dest}/wpinet>
+)
 
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpinet")
-target_include_directories(wpinet PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-                            $<INSTALL_INTERFACE:${include_dest}/wpinet>)
+target_include_directories(
+    wpinet
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${include_dest}/wpinet>
+)
 
-install(TARGETS wpinet EXPORT wpinet DESTINATION "${main_lib_dest}")
+install(TARGETS wpinet EXPORT wpinet)
 
-if (WITH_JAVA AND MSVC)
-    install(TARGETS wpinet RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
+configure_file(wpinet-config.cmake.in ${WPILIB_BINARY_DIR}/wpinet-config.cmake)
+install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION share/wpinet)
+install(EXPORT wpinet DESTINATION share/wpinet)
 
-if (WITH_FLAT_INSTALL)
-    set (wpinet_config_dir ${wpilib_dest})
-else()
-    set (wpinet_config_dir share/wpinet)
-endif()
-
-configure_file(wpinet-config.cmake.in ${WPILIB_BINARY_DIR}/wpinet-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION ${wpinet_config_dir})
-install(EXPORT wpinet DESTINATION ${wpinet_config_dir})
-
-SUBDIR_LIST(wpinet_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+subdir_list(wpinet_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${wpinet_examples})
     file(GLOB wpinet_example_src examples/${example}/*.cpp)
     if(wpinet_example_src)
@@ -202,10 +212,10 @@ foreach(example ${wpinet_examples})
     endif()
 endforeach()
 
-if (UNIX AND NOT APPLE)
-    set (LIBUTIL -lutil)
+if(UNIX AND NOT APPLE)
+    set(LIBUTIL -lutil)
 else()
-    set (LIBUTIL)
+    set(LIBUTIL)
 endif()
 
 file(GLOB netconsoleServer_src src/netconsoleServer/native/cpp/*.cpp)
@@ -221,8 +231,8 @@ target_link_libraries(netconsoleTee wpinet)
 set_property(TARGET netconsoleServer PROPERTY FOLDER "examples")
 set_property(TARGET netconsoleTee PROPERTY FOLDER "examples")
 
-if (WITH_TESTS)
+if(WITH_TESTS)
     wpilib_add_test(wpinet src/test/native/cpp)
-    target_include_directories(wpinet_test PRIVATE src/test/native/include)
-    target_link_libraries(wpinet_test wpinet ${LIBUTIL} gmock_main)
+    target_include_directories(wpinet_test PRIVATE src/test/native/include src/main/native/cpp)
+    target_link_libraries(wpinet_test wpinet ${LIBUTIL} gmock_main wpiutil_testlib)
 endif()

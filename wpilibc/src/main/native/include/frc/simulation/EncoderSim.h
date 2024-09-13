@@ -53,7 +53,8 @@ class EncoderSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -78,8 +79,9 @@ class EncoderSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterCountCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterCountCallback(NotifyCallback callback,
+                                                       bool initialNotify);
 
   /**
    * Read the count of the encoder.
@@ -103,8 +105,9 @@ class EncoderSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterPeriodCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterPeriodCallback(NotifyCallback callback,
+                                                        bool initialNotify);
 
   /**
    * Read the period of the encoder.
@@ -127,8 +130,9 @@ class EncoderSim {
    * @param initialNotify whether to run the callback on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterResetCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterResetCallback(NotifyCallback callback,
+                                                       bool initialNotify);
 
   /**
    * Check if the encoder has been reset.
@@ -152,7 +156,8 @@ class EncoderSim {
    * @param initialNotify whether to run the callback on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterMaxPeriodCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterMaxPeriodCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -177,7 +182,8 @@ class EncoderSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterDirectionCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterDirectionCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -202,7 +208,8 @@ class EncoderSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterReverseDirectionCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterReverseDirectionCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -227,7 +234,8 @@ class EncoderSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterSamplesToAverageCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterSamplesToAverageCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -252,7 +260,8 @@ class EncoderSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterDistancePerPulseCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterDistancePerPulseCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -286,7 +295,7 @@ class EncoderSim {
    *
    * @return the encoder distance
    */
-  double GetDistance();
+  double GetDistance() const;
 
   /**
    * Change the rate of the encoder.
@@ -300,7 +309,7 @@ class EncoderSim {
    *
    * @return the rate of change
    */
-  double GetRate();
+  double GetRate() const;
 
  private:
   explicit EncoderSim(int index) : m_index{index} {}

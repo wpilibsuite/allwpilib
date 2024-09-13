@@ -25,7 +25,17 @@ namespace frc {
 class DoubleSolenoid : public wpi::Sendable,
                        public wpi::SendableHelper<DoubleSolenoid> {
  public:
-  enum Value { kOff, kForward, kReverse };
+  /**
+   * Possible values for a DoubleSolenoid.
+   */
+  enum Value {
+    /// Off position.
+    kOff,
+    /// Forward position.
+    kForward,
+    /// Reverse position.
+    kReverse
+  };
 
   /**
    * Constructs a double solenoid for a specified module of a specific module
@@ -98,7 +108,7 @@ class DoubleSolenoid : public wpi::Sendable,
    * If a solenoid is shorted, it is added to the DisabledList and disabled
    * until power cycle, or until faults are cleared.
    *
-   * @see ClearAllPCMStickyFaults()
+   * @see ClearAllStickyFaults()
    * @return If solenoid is disabled due to short.
    */
   bool IsFwdSolenoidDisabled() const;
@@ -109,7 +119,7 @@ class DoubleSolenoid : public wpi::Sendable,
    * If a solenoid is shorted, it is added to the DisabledList and disabled
    * until power cycle, or until faults are cleared.
    *
-   * @see ClearAllPCMStickyFaults()
+   * @see ClearAllStickyFaults()
    * @return If solenoid is disabled due to short.
    */
   bool IsRevSolenoidDisabled() const;

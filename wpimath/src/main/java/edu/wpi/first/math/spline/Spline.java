@@ -27,7 +27,21 @@ public abstract class Spline {
    *
    * @return The coefficients of the spline.
    */
-  protected abstract SimpleMatrix getCoefficients();
+  public abstract SimpleMatrix getCoefficients();
+
+  /**
+   * Returns the initial control vector that created this spline.
+   *
+   * @return The initial control vector that created this spline.
+   */
+  public abstract ControlVector getInitialControlVector();
+
+  /**
+   * Returns the final control vector that created this spline.
+   *
+   * @return The final control vector that created this spline.
+   */
+  public abstract ControlVector getFinalControlVector();
 
   /**
    * Gets the pose and curvature at some point t on the spline.
@@ -85,7 +99,10 @@ public abstract class Spline {
    * the value of x[2] is the second derivative in the x dimension.
    */
   public static class ControlVector {
+    /** The x components of the control vector. */
     public double[] x;
+
+    /** The y components of the control vector. */
     public double[] y;
 
     /**

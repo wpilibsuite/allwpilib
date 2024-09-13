@@ -4,12 +4,10 @@
 
 #pragma once
 
-#include <frc/StateSpaceUtil.h>
-
 #include <algorithm>
 #include <array>
+#include <cmath>
 
-#include "Eigen/Core"
 #include "units/time.h"
 
 namespace frc {

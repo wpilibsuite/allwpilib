@@ -17,11 +17,11 @@ import java.util.function.Consumer;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class FunctionalCommand extends CommandBase {
-  protected final Runnable m_onInit;
-  protected final Runnable m_onExecute;
-  protected final Consumer<Boolean> m_onEnd;
-  protected final BooleanSupplier m_isFinished;
+public class FunctionalCommand extends Command {
+  private final Runnable m_onInit;
+  private final Runnable m_onExecute;
+  private final Consumer<Boolean> m_onEnd;
+  private final BooleanSupplier m_isFinished;
 
   /**
    * Creates a new FunctionalCommand.
@@ -32,6 +32,7 @@ public class FunctionalCommand extends CommandBase {
    * @param isFinished the function that determines whether the command has finished
    * @param requirements the subsystems required by this command
    */
+  @SuppressWarnings("this-escape")
   public FunctionalCommand(
       Runnable onInit,
       Runnable onExecute,

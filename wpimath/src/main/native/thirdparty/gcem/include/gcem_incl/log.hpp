@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -25,11 +25,39 @@
 #ifndef _gcem_log_HPP
 #define _gcem_log_HPP
 
+#include <cmath>
+#include <type_traits>
+
+namespace gcem
+{
+
 namespace internal
 {
 
 // continued fraction seems to be a better approximation for small x
 // see http://functions.wolfram.com/ElementaryFunctions/Log/10/0005/
+
+#if __cplusplus >= 201402L // C++14 version
+
+template<typename T>
+constexpr
+T
+log_cf_main(const T xx, const int depth_end)
+noexcept
+{
+    int depth = GCEM_LOG_MAX_ITER_SMALL - 1;
+    T res = T(2*(depth+1) - 1);
+
+    while (depth > depth_end - 1) {
+        res = T(2*depth - 1) - T(depth*depth) * xx / res;
+
+        --depth;
+    }
+
+    return res;
+}
+
+#else // C++11 version
 
 template<typename T>
 constexpr
@@ -39,10 +67,12 @@ noexcept
 {
     return( depth < GCEM_LOG_MAX_ITER_SMALL ? \
             // if 
-                T(2*depth - 1) - T(depth*depth)*xx/log_cf_main(xx,depth+1) :
+                T(2*depth - 1) - T(depth*depth) * xx / log_cf_main(xx,depth+1) :
             // else 
                 T(2*depth - 1) );
 }
+
+#endif
 
 template<typename T>
 constexpr
@@ -156,7 +186,13 @@ return_t<T>
 log(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::log_integral_check( x );
+  } else {
+    return std::log(x);
+  }
+}
+
 }
 
 #endif

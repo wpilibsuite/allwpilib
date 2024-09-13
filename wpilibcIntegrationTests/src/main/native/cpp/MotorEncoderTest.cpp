@@ -4,7 +4,9 @@
 
 #include <algorithm>
 
+#include <gtest/gtest.h>
 #include <units/time.h>
+#include <wpi/deprecated.h>
 
 #include "TestBench.h"
 #include "frc/Encoder.h"
@@ -15,7 +17,6 @@
 #include "frc/motorcontrol/Jaguar.h"
 #include "frc/motorcontrol/Talon.h"
 #include "frc/motorcontrol/Victor.h"
-#include "gtest/gtest.h"
 
 enum MotorEncoderTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
 
@@ -36,6 +37,8 @@ std::ostream& operator<<(std::ostream& os, MotorEncoderTestType const& type) {
 }
 
 static constexpr auto kMotorTime = 0.5_s;
+
+WPI_IGNORE_DEPRECATED
 
 /**
  * A fixture that includes a PWM motor controller and an encoder connected to
@@ -139,7 +142,7 @@ TEST_P(MotorEncoderTest, ClampSpeed) {
 TEST_P(MotorEncoderTest, PositionPIDController) {
   Reset();
   double goal = 1000;
-  frc2::PIDController pidController(0.001, 0.01, 0.0);
+  frc::PIDController pidController(0.001, 0.01, 0.0);
   pidController.SetTolerance(50.0);
   pidController.SetIntegratorRange(-0.2, 0.2);
   pidController.SetSetpoint(goal);
@@ -166,7 +169,7 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
 TEST_P(MotorEncoderTest, VelocityPIDController) {
   Reset();
 
-  frc2::PIDController pidController(1e-5, 0.0, 0.0006);
+  frc::PIDController pidController(1e-5, 0.0, 0.0006);
   pidController.SetTolerance(200.0);
   pidController.SetSetpoint(600);
 
@@ -197,3 +200,5 @@ TEST_P(MotorEncoderTest, Reset) {
 
 INSTANTIATE_TEST_SUITE_P(Tests, MotorEncoderTest,
                          testing::Values(TEST_VICTOR, TEST_JAGUAR, TEST_TALON));
+
+WPI_UNIGNORE_DEPRECATED

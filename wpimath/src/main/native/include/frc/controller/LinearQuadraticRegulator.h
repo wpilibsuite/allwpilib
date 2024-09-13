@@ -36,6 +36,11 @@ class LinearQuadraticRegulator {
   /**
    * Constructs a controller with the given coefficients and plant.
    *
+   * See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning
+   * for how to select the tolerances.
+   *
+   * @tparam Outputs Number of outputs.
    * @param plant  The plant being controlled.
    * @param Qelems The maximum desired error tolerance for each state.
    * @param Relems The maximum desired control effort for each input.
@@ -49,6 +54,10 @@ class LinearQuadraticRegulator {
 
   /**
    * Constructs a controller with the given coefficients and plant.
+   *
+   * See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning
+   * for how to select the tolerances.
    *
    * @param A      Continuous system matrix of the plant being controlled.
    * @param B      Continuous input matrix of the plant being controlled.

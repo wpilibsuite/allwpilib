@@ -68,12 +68,17 @@ public abstract class MechanismObject2d implements AutoCloseable {
   }
 
   /**
-   * Update all entries with new ones from a new table.
+   * Update this object's entries with new ones from a new table.
    *
    * @param table the new table.
    */
   protected abstract void updateEntries(NetworkTable table);
 
+  /**
+   * Retrieve the object's name.
+   *
+   * @return the object's name relative to its parent.
+   */
   public final String getName() {
     return m_name;
   }

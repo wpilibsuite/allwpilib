@@ -17,12 +17,15 @@
 
 #pragma once
 
+#include <iterator>
 #include <limits>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
 #include <utility>
+
+#include <fmt/format.h>
 
 namespace wpi {
 
@@ -720,5 +723,24 @@ std::optional<long double> parse_float<long double>(
  */
 std::pair<std::string_view, std::string_view> UnescapeCString(
     std::string_view str, SmallVectorImpl<char>& buf);
+
+/**
+ * Like std::format_to_n() in that it writes at most n bytes to the output
+ * buffer, but also includes a terminating null byte in n.
+ *
+ * This is essentially a more performant replacement for std::snprintf().
+ *
+ * @param out The output buffer.
+ * @param n The size of the output buffer.
+ * @param fmt The format string.
+ * @param args The format string arguments.
+ */
+template <class OutputIt, class... Args>
+inline void format_to_n_c_str(OutputIt out, std::iter_difference_t<OutputIt> n,
+                              fmt::format_string<Args...> fmt, Args&&... args) {
+  const auto result =
+      fmt::format_to_n(out, n - 1, fmt, std::forward<Args>(args)...);
+  *result.out = '\0';
+}
 
 }  // namespace wpi

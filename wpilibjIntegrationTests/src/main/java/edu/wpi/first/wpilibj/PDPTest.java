@@ -4,17 +4,17 @@
 
 package edu.wpi.first.wpilibj;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 import edu.wpi.first.hal.can.CANMessageNotFoundException;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -65,7 +65,7 @@ public class PDPTest extends AbstractComsSetup {
   @Parameters(name = "{index}: {0}, Expected Stopped Current Draw: {1}")
   public static Collection<Object[]> generateData() {
     // logger.fine("Loading the MotorList");
-    return Arrays.asList(new Object[][] {{TestBench.getTalonPair(), 0.0}});
+    return List.of(new Object[][] {{TestBench.getTalonPair(), 0.0}});
   }
 
   @After

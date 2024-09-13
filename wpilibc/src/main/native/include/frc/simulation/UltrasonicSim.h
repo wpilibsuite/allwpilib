@@ -36,14 +36,14 @@ class UltrasonicSim {
   /**
    * Sets if the range measurement is valid.
    *
-   * @param isValid True if valid
+   * @param valid True if valid
    */
-  void SetRangeValid(bool isValid);
+  void SetRangeValid(bool valid);
 
   /**
-   * Sets the range measurement
+   * Sets the range measurement.
    *
-   * @param range The range
+   * @param range The range.
    */
   void SetRange(units::inch_t range);
 

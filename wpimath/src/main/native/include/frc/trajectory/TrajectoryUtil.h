@@ -12,6 +12,9 @@
 #include "frc/trajectory/Trajectory.h"
 
 namespace frc {
+/**
+ * Trajectory utilities.
+ */
 class WPILIB_DLLEXPORT TrajectoryUtil {
  public:
   TrajectoryUtil() = delete;

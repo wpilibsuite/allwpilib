@@ -23,10 +23,12 @@ NTPIDControllerModel::NTPIDControllerModel(nt::NetworkTableInstance inst,
       m_d{inst.GetDoubleTopic(fmt::format("{}/d", path)).GetEntry(0)},
       m_setpoint{
           inst.GetDoubleTopic(fmt::format("{}/setpoint", path)).GetEntry(0)},
+      m_iZone{inst.GetDoubleTopic(fmt::format("{}/izone", path)).GetEntry(0)},
       m_pData{fmt::format("NTPIDCtrlP:{}", path)},
       m_iData{fmt::format("NTPIDCtrlI:{}", path)},
       m_dData{fmt::format("NTPIDCtrlD:{}", path)},
       m_setpointData{fmt::format("NTPIDCtrlStpt:{}", path)},
+      m_iZoneData{fmt::format("NTPIDCtrlIZone:{}", path)},
       m_nameValue{wpi::rsplit(path, '/').second} {}
 
 void NTPIDControllerModel::SetP(double value) {
@@ -44,6 +46,9 @@ void NTPIDControllerModel::SetD(double value) {
 void NTPIDControllerModel::SetSetpoint(double value) {
   m_setpoint.Set(value);
 }
+void NTPIDControllerModel::SetIZone(double value) {
+  m_iZone.Set(value);
+}
 
 void NTPIDControllerModel::Update() {
   for (auto&& v : m_name.ReadQueue()) {
@@ -60,6 +65,9 @@ void NTPIDControllerModel::Update() {
   }
   for (auto&& v : m_setpoint.ReadQueue()) {
     m_setpointData.SetValue(v.value, v.time);
+  }
+  for (auto&& v : m_iZone.ReadQueue()) {
+    m_iZoneData.SetValue(v.value, v.time);
   }
   for (auto&& v : m_controllable.ReadQueue()) {
     m_controllableValue = v.value;

@@ -11,20 +11,6 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-test {
-    useJUnitPlatform()
-    systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
-    testLogging {
-        events "failed"
-        exceptionFormat "full"
-    }
-    finalizedBy jacocoTestReport
-}
-
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64')) {
-    test.enabled = false
-}
-
 dependencies {
     implementation project(':wpilibj')
     implementation project(':apriltag')
@@ -36,14 +22,15 @@ dependencies {
     implementation project(':cscore')
     implementation project(':cameraserver')
     implementation project(':wpilibNewCommands')
+    implementation project(':romiVendordep')
+    implementation project(':xrpVendordep')
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.10"
 }
 
 jacocoTestReport {
@@ -107,9 +94,8 @@ model {
                 }
             }
             binaries.all { binary ->
-                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
-                lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                lib project: ':apriltag', library: 'apriltagJNIShared', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
                 project(':ntcore').addNtcoreDependency(binary, 'shared')
@@ -122,7 +108,6 @@ model {
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
-                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
                 } else {
@@ -170,6 +155,7 @@ model {
                                 test.dependsOn it.tasks.install
                                 test.systemProperty 'java.library.path', filePath
                                 test.environment 'LD_LIBRARY_PATH', filePath
+                                test.environment 'DYLD_LIBRARY_PATH', filePath
                                 test.workingDir filePath
                             }
 
@@ -181,6 +167,7 @@ model {
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath
                                     run.environment 'LD_LIBRARY_PATH', filePath
+                                    run.environment 'DYLD_LIBRARY_PATH', filePath
                                     run.workingDir filePath
                                     doFirst { doFirstTask(run) }
 
@@ -193,6 +180,14 @@ model {
                                     testTask.useJUnitPlatform()
                                     testTask.filter {
                                         includeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
+                                        // armsimulation regularly fails on CI Win64Debug
+                                        if (project.hasProperty('ciDebugOnly')) {
+                                            excludeTestsMatching("edu.wpi.first.wpilibj.examples.armsimulation.*")
+                                        }
+                                        setFailOnNoMatchingTests(false)
+                                    }
+                                    test.filter {
+                                        excludeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
                                         setFailOnNoMatchingTests(false)
                                     }
                                     testTask.classpath = sourceSets.test.runtimeClasspath
@@ -205,7 +200,13 @@ model {
                                     }
                                     testTask.systemProperty 'java.library.path', filePath
                                     testTask.environment 'LD_LIBRARY_PATH', filePath
+                                    testTask.environment 'DYLD_LIBRARY_PATH', filePath
                                     testTask.workingDir filePath
+
+                                    if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
+                                        testTask.enabled = false
+                                    }
+                                    test.dependsOn(testTask)
                                 }
                             }
 

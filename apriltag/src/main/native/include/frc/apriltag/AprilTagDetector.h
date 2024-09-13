@@ -205,7 +205,7 @@ class WPILIB_DLLEXPORT AprilTagDetector {
    * Adds a family of tags to be detected.
    *
    * @param fam Family name, e.g. "tag16h5"
-   * @param bitsCorrected
+   * @param bitsCorrected Maximum number of bits to correct
    * @return False if family can't be found
    */
   bool AddFamily(std::string_view fam, int bitsCorrected = 2);
@@ -226,6 +226,7 @@ class WPILIB_DLLEXPORT AprilTagDetector {
 
   /**
    * Detect tags from an 8-bit image.
+   * The image must be grayscale.
    *
    * @param width width of the image
    * @param height height of the image
@@ -237,6 +238,7 @@ class WPILIB_DLLEXPORT AprilTagDetector {
 
   /**
    * Detect tags from an 8-bit image.
+   * The image must be grayscale.
    *
    * @param width width of the image
    * @param height height of the image

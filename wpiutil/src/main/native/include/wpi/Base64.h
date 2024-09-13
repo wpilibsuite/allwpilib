@@ -5,6 +5,8 @@
 #ifndef WPIUTIL_WPI_BASE64_H_
 #define WPIUTIL_WPI_BASE64_H_
 
+#include <stdint.h>
+
 #include <cstddef>
 #include <span>
 #include <string>

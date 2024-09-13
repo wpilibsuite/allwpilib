@@ -56,6 +56,7 @@ class Elevator {
                                       Constants::kMinElevatorHeight,
                                       Constants::kMaxElevatorHeight,
                                       true,
+                                      0_m,
                                       {0.01}};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 

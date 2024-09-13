@@ -7,10 +7,10 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <concepts>
 #include <functional>
 #include <string_view>
 #include <thread>
-#include <type_traits>
 #include <utility>
 
 #include <hal/Types.h>
@@ -20,7 +20,7 @@
 namespace frc {
 
 /**
- * Notifiers run a callback function on a separate thread at a specified period.
+ * Notifiers run a user-provided callback function on a separate thread.
  *
  * If StartSingle() is used, the callback will run once. If StartPeriodic() is
  * used, the callback will run repeatedly with the given period until stop() is
@@ -29,22 +29,25 @@ namespace frc {
 class Notifier {
  public:
   /**
-   * Create a Notifier for timer event notification.
+   * Create a Notifier with the given callback.
    *
-   * @param handler The handler is called at the notification time which is set
-   *                using StartSingle or StartPeriodic.
+   * Configure when the callback runs with StartSingle() or StartPeriodic().
+   *
+   * @param callback The callback to run.
    */
-  explicit Notifier(std::function<void()> handler);
+  explicit Notifier(std::function<void()> callback);
 
-  template <
-      typename Callable, typename Arg, typename... Args,
-      typename = std::enable_if_t<std::is_invocable_v<Callable, Arg, Args...>>>
-  Notifier(Callable&& f, Arg&& arg, Args&&... args)
-      : Notifier(std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
+  template <typename Arg, typename... Args>
+  Notifier(std::invocable<Arg, Args...> auto&& callback, Arg&& arg,
+           Args&&... args)
+      : Notifier(std::bind(std::forward<decltype(callback)>(callback),
+                           std::forward<Arg>(arg),
                            std::forward<Args>(args)...)) {}
 
   /**
-   * Create a Notifier for timer event notification.
+   * Create a Notifier with the given callback.
+   *
+   * Configure when the callback runs with StartSingle() or StartPeriodic().
    *
    * This overload makes the underlying thread run with a real-time priority.
    * This is useful for reducing scheduling jitter on processes which are
@@ -53,16 +56,16 @@ class Notifier {
    * @param priority The FIFO real-time scheduler priority ([1..99] where a
    *                 higher number represents higher priority). See "man 7
    *                 sched" for more details.
-   * @param handler  The handler is called at the notification time which is set
-   *                 using StartSingle or StartPeriodic.
+   * @param callback The callback to run.
    */
-  explicit Notifier(int priority, std::function<void()> handler);
+  explicit Notifier(int priority, std::function<void()> callback);
 
-  template <typename Callable, typename Arg, typename... Args>
-  Notifier(int priority, Callable&& f, Arg&& arg, Args&&... args)
-      : Notifier(priority,
-                 std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
-                           std::forward<Args>(args)...)) {}
+  template <typename Arg, typename... Args>
+  Notifier(int priority, std::invocable<Arg, Args...> auto&& callback,
+           Arg&& arg, Args&&... args)
+      : Notifier(priority, std::bind(std::forward<decltype(callback)>(callback),
+                                     std::forward<Arg>(arg),
+                                     std::forward<Args>(args)...)) {}
 
   /**
    * Free the resources for a timer event.
@@ -73,51 +76,54 @@ class Notifier {
   Notifier& operator=(Notifier&& rhs);
 
   /**
-   * Sets the name of the notifier.  Used for debugging purposes only.
+   * Sets the name of the notifier. Used for debugging purposes only.
    *
    * @param name Name
    */
   void SetName(std::string_view name);
 
   /**
-   * Change the handler function.
+   * Change the callback function.
    *
-   * @param handler Handler
+   * @param callback The callback function.
+   * @deprecated Use SetCallback() instead.
    */
-  void SetHandler(std::function<void()> handler);
+  [[deprecated("Use SetCallback() instead.")]]
+  void SetHandler(std::function<void()> callback);
 
   /**
-   * Register for single event notification.
+   * Change the callback function.
    *
-   * A timer event is queued for a single event after the specified delay.
+   * @param callback The callback function.
+   */
+  void SetCallback(std::function<void()> callback);
+
+  /**
+   * Run the callback once after the given delay.
    *
-   * @param delay Amount of time to wait before the handler is called.
+   * @param delay Time to wait before the callback is called.
    */
   void StartSingle(units::second_t delay);
 
   /**
-   * Register for periodic event notification.
+   * Run the callback periodically with the given period.
    *
-   * A timer event is queued for periodic event notification. Each time the
-   * interrupt occurs, the event will be immediately requeued for the same time
-   * interval.
+   * The user-provided callback should be written so that it completes before
+   * the next time it's scheduled to run.
    *
-   * The user-provided callback should be written in a nonblocking manner so the
-   * callback can be recalled at the next periodic event notification.
-   *
-   * @param period Period to call the handler starting one period
-   *               after the call to this method.
+   * @param period Period after which to to call the callback starting one
+   *               period after the call to this method.
    */
   void StartPeriodic(units::second_t period);
 
   /**
-   * Stop timer events from occurring.
+   * Stop further callback invocations.
    *
-   * Stop any repeating timer events from occurring. This will also remove any
-   * single notification events from the queue.
+   * No further periodic callbacks will occur. Single invocations will also be
+   * cancelled if they haven't yet occurred.
    *
-   * If a timer-based call to the registered handler is in progress, this
-   * function will block until the handler call is complete.
+   * If a callback invocation is in progress, this function will block until the
+   * callback is complete.
    */
   void Stop();
 
@@ -154,22 +160,24 @@ class Notifier {
   // The thread waiting on the HAL alarm
   std::thread m_thread;
 
-  // Held while updating process information
+  // The mutex held while updating process information
   wpi::mutex m_processMutex;
 
-  // HAL handle, atomic for proper destruction
+  // HAL handle (atomic for proper destruction)
   std::atomic<HAL_NotifierHandle> m_notifier{0};
 
-  // Address of the handler
-  std::function<void()> m_handler;
+  // The user-provided callback
+  std::function<void()> m_callback;
 
-  // The absolute expiration time
+  // The time at which the callback should be called. Has the same zero as
+  // Timer::GetFPGATimestamp().
   units::second_t m_expirationTime = 0_s;
 
-  // The relative time (either periodic or single)
+  // If periodic, stores the callback period; if single, stores the time until
+  // the callback call.
   units::second_t m_period = 0_s;
 
-  // True if this is a periodic event
+  // True if the callback is periodic
   bool m_periodic = false;
 };
 

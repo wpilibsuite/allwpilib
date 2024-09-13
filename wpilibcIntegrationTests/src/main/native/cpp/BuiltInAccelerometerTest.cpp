@@ -4,8 +4,9 @@
 
 #include "frc/BuiltInAccelerometer.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
+
 #include "frc/Timer.h"
-#include "gtest/gtest.h"
 
 static constexpr double kAccelerationTolerance = 0.1;
 

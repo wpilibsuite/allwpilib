@@ -4,6 +4,8 @@
 
 package edu.wpi.first.networktables;
 
+import edu.wpi.first.util.protobuf.Protobuf;
+import edu.wpi.first.util.struct.Struct;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -13,8 +15,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
+import us.hebi.quickbuf.ProtoMessage;
 
 /** A network table that knows its subtable path. */
+@SuppressWarnings("PMD.CouplingBetweenObjects")
 public final class NetworkTable {
   /** The path separator for sub-tables and keys. */
   public static final char PATH_SEPARATOR = '/';
@@ -250,6 +254,44 @@ public final class NetworkTable {
     return m_inst.getStringArrayTopic(m_pathWithSep + name);
   }
 
+  /**
+   * Get protobuf-encoded value topic.
+   *
+   * @param <T> value class (inferred from proto)
+   * @param <MessageType> protobuf message type (inferred from proto)
+   * @param name topic name
+   * @param proto protobuf serialization implementation
+   * @return ProtobufTopic
+   */
+  public <T, MessageType extends ProtoMessage<?>> ProtobufTopic<T> getProtobufTopic(
+      String name, Protobuf<T, MessageType> proto) {
+    return m_inst.getProtobufTopic(m_pathWithSep + name, proto);
+  }
+
+  /**
+   * Get struct-encoded value topic.
+   *
+   * @param <T> value class (inferred from struct)
+   * @param name topic name
+   * @param struct struct serialization implementation
+   * @return StructTopic
+   */
+  public <T> StructTopic<T> getStructTopic(String name, Struct<T> struct) {
+    return m_inst.getStructTopic(m_pathWithSep + name, struct);
+  }
+
+  /**
+   * Get struct-encoded value array topic.
+   *
+   * @param <T> value class (inferred from struct)
+   * @param name topic name
+   * @param struct struct serialization implementation
+   * @return StructTopic
+   */
+  public <T> StructArrayTopic<T> getStructArrayTopic(String name, Struct<T> struct) {
+    return m_inst.getStructArrayTopic(m_pathWithSep + name, struct);
+  }
+
   private final ConcurrentMap<String, NetworkTableEntry> m_entries = new ConcurrentHashMap<>();
 
   /**
@@ -288,7 +330,7 @@ public final class NetworkTable {
    * @return true if the table as a value assigned to the given key
    */
   public boolean containsKey(String key) {
-    return !("".equals(key)) && getTopic(key).exists();
+    return !"".equals(key) && getTopic(key).exists();
   }
 
   /**
@@ -532,7 +574,7 @@ public final class NetworkTable {
     return m_inst.addListener(
         new String[] {m_pathWithSep},
         EnumSet.of(NetworkTableEvent.Kind.kPublish, NetworkTableEvent.Kind.kImmediate),
-        new Consumer<NetworkTableEvent>() {
+        new Consumer<>() {
           final Set<String> m_notifiedTables = new HashSet<>();
 
           @Override

@@ -16,6 +16,6 @@
 
 namespace OperatorConstants {
 
-constexpr int kDriverControllerPort = 0;
+inline constexpr int kDriverControllerPort = 0;
 
 }  // namespace OperatorConstants

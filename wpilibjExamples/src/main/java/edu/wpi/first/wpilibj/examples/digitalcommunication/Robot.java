@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj.examples.digitalcommunication;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import java.util.Optional;
 
 /**
  * This is a sample program demonstrating how to communicate to a light controller from the robot
@@ -26,8 +27,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+    boolean setAlliance = false;
+    Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+    if (alliance.isPresent()) {
+      setAlliance = alliance.get() == DriverStation.Alliance.Red;
+    }
+
     // pull alliance port high if on red alliance, pull low if on blue alliance
-    m_allianceOutput.set(DriverStation.getAlliance() == DriverStation.Alliance.Red);
+    m_allianceOutput.set(setAlliance);
 
     // pull enabled port high if enabled, low if disabled
     m_enabledOutput.set(DriverStation.isEnabled());

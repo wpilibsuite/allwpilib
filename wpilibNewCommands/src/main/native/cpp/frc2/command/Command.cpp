@@ -4,6 +4,10 @@
 
 #include "frc2/command/Command.h"
 
+#include <wpi/StackTrace.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
+
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/ConditionalCommand.h"
@@ -11,7 +15,6 @@
 #include "frc2/command/ParallelCommandGroup.h"
 #include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/PerpetualCommand.h"
 #include "frc2/command/RepeatCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
@@ -20,12 +23,16 @@
 
 using namespace frc2;
 
+Command::Command() {
+  wpi::SendableRegistry::Add(this, GetTypeName(*this));
+}
+
 Command::~Command() {
   CommandScheduler::GetInstance().Cancel(this);
 }
 
 Command& Command::operator=(const Command& rhs) {
-  m_isComposed = false;
+  SetComposed(false);
   return *this;
 }
 
@@ -33,12 +40,48 @@ void Command::Initialize() {}
 void Command::Execute() {}
 void Command::End(bool interrupted) {}
 
+wpi::SmallSet<Subsystem*, 4> Command::GetRequirements() const {
+  return m_requirements;
+}
+
+void Command::AddRequirements(Requirements requirements) {
+  m_requirements.insert(requirements.begin(), requirements.end());
+}
+
+void Command::AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements) {
+  m_requirements.insert(requirements.begin(), requirements.end());
+}
+
+void Command::AddRequirements(Subsystem* requirement) {
+  m_requirements.insert(requirement);
+}
+
+void Command::SetName(std::string_view name) {
+  wpi::SendableRegistry::SetName(this, name);
+}
+
+std::string Command::GetName() const {
+  return wpi::SendableRegistry::GetName(this);
+}
+
+std::string Command::GetSubsystem() const {
+  return wpi::SendableRegistry::GetSubsystem(this);
+}
+
+void Command::SetSubsystem(std::string_view subsystem) {
+  wpi::SendableRegistry::SetSubsystem(this, subsystem);
+}
+
 CommandPtr Command::WithTimeout(units::second_t duration) && {
   return std::move(*this).ToPtr().WithTimeout(duration);
 }
 
 CommandPtr Command::Until(std::function<bool()> condition) && {
   return std::move(*this).ToPtr().Until(std::move(condition));
+}
+
+CommandPtr Command::OnlyWhile(std::function<bool()> condition) && {
+  return std::move(*this).ToPtr().OnlyWhile(std::move(condition));
 }
 
 CommandPtr Command::IgnoringDisable(bool doesRunWhenDisabled) && {
@@ -50,38 +93,15 @@ CommandPtr Command::WithInterruptBehavior(
   return std::move(*this).ToPtr().WithInterruptBehavior(interruptBehavior);
 }
 
-CommandPtr Command::WithInterrupt(std::function<bool()> condition) && {
-  return std::move(*this).ToPtr().Until(std::move(condition));
-}
-
-CommandPtr Command::BeforeStarting(
-    std::function<void()> toRun,
-    std::initializer_list<Subsystem*> requirements) && {
-  return std::move(*this).BeforeStarting(
-      std::move(toRun), {requirements.begin(), requirements.end()});
-}
-
-CommandPtr Command::BeforeStarting(
-    std::function<void()> toRun, std::span<Subsystem* const> requirements) && {
+CommandPtr Command::BeforeStarting(std::function<void()> toRun,
+                                   Requirements requirements) && {
   return std::move(*this).ToPtr().BeforeStarting(std::move(toRun),
                                                  requirements);
 }
 
 CommandPtr Command::AndThen(std::function<void()> toRun,
-                            std::initializer_list<Subsystem*> requirements) && {
-  return std::move(*this).AndThen(std::move(toRun),
-                                  {requirements.begin(), requirements.end()});
-}
-
-CommandPtr Command::AndThen(std::function<void()> toRun,
-                            std::span<Subsystem* const> requirements) && {
+                            Requirements requirements) && {
   return std::move(*this).ToPtr().AndThen(std::move(toRun), requirements);
-}
-
-PerpetualCommand Command::Perpetually() && {
-  WPI_IGNORE_DEPRECATED
-  return PerpetualCommand(std::move(*this).TransferOwnership());
-  WPI_UNIGNORE_DEPRECATED
 }
 
 CommandPtr Command::Repeatedly() && {
@@ -96,11 +116,19 @@ CommandPtr Command::Unless(std::function<bool()> condition) && {
   return std::move(*this).ToPtr().Unless(std::move(condition));
 }
 
+CommandPtr Command::OnlyIf(std::function<bool()> condition) && {
+  return std::move(*this).ToPtr().OnlyIf(std::move(condition));
+}
+
 CommandPtr Command::FinallyDo(std::function<void(bool)> end) && {
   return std::move(*this).ToPtr().FinallyDo(std::move(end));
 }
 
-CommandPtr Command::HandleInterrupt(std::function<void(void)> handler) && {
+CommandPtr Command::FinallyDo(std::function<void()> end) && {
+  return std::move(*this).ToPtr().FinallyDo(std::move(end));
+}
+
+CommandPtr Command::HandleInterrupt(std::function<void()> handler) && {
   return std::move(*this).ToPtr().HandleInterrupt(std::move(handler));
 }
 
@@ -128,26 +156,53 @@ bool Command::HasRequirement(Subsystem* requirement) const {
   return hasRequirement;
 }
 
-std::string Command::GetName() const {
-  return GetTypeName(*this);
-}
-
-void Command::SetName(std::string_view name) {}
-
 bool Command::IsComposed() const {
-  return m_isComposed;
+  return GetPreviousCompositionSite().has_value();
 }
 
 void Command::SetComposed(bool isComposed) {
-  m_isComposed = isComposed;
+  if (isComposed) {
+    m_previousComposition = wpi::GetStackTrace(1);
+  } else {
+    m_previousComposition.reset();
+  }
 }
 
-bool Command::IsGrouped() const {
-  return IsComposed();
+std::optional<std::string> Command::GetPreviousCompositionSite() const {
+  return m_previousComposition;
 }
 
-void Command::SetGrouped(bool grouped) {
-  SetComposed(grouped);
+void Command::InitSendable(wpi::SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Command");
+  builder.AddStringProperty(
+      ".name", [this] { return GetName(); }, nullptr);
+  builder.AddBooleanProperty(
+      "running", [this] { return IsScheduled(); },
+      [this](bool value) {
+        bool isScheduled = IsScheduled();
+        if (value && !isScheduled) {
+          Schedule();
+        } else if (!value && isScheduled) {
+          Cancel();
+        }
+      });
+  builder.AddBooleanProperty(
+      ".isParented", [this] { return IsComposed(); }, nullptr);
+  builder.AddStringProperty(
+      "interruptBehavior",
+      [this] {
+        switch (GetInterruptionBehavior()) {
+          case Command::InterruptionBehavior::kCancelIncoming:
+            return "kCancelIncoming";
+          case Command::InterruptionBehavior::kCancelSelf:
+            return "kCancelSelf";
+          default:
+            return "Invalid";
+        }
+      },
+      nullptr);
+  builder.AddBooleanProperty(
+      "runsWhenDisabled", [this] { return RunsWhenDisabled(); }, nullptr);
 }
 
 namespace frc2 {

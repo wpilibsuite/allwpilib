@@ -6,17 +6,12 @@
 
 #include <string>
 
-#include "networktables/NetworkTableInstance.h"
 #include "networktables/NetworkTableType.h"
 #include "networktables/Topic.h"
 #include "ntcore_c.h"
 #include "ntcore_cpp.h"
 
 namespace nt {
-
-inline NetworkTableInstance Topic::GetInstance() const {
-  return NetworkTableInstance{GetInstanceFromHandle(m_handle)};
-}
 
 inline std::string Topic::GetName() const {
   return ::nt::GetTopicName(m_handle);
@@ -44,6 +39,14 @@ inline void Topic::SetRetained(bool retained) {
 
 inline bool Topic::IsRetained() const {
   return ::nt::GetTopicRetained(m_handle);
+}
+
+inline void Topic::SetCached(bool cached) {
+  ::nt::SetTopicCached(m_handle, cached);
+}
+
+inline bool Topic::IsCached() const {
+  return ::nt::GetTopicCached(m_handle);
 }
 
 inline bool Topic::Exists() const {

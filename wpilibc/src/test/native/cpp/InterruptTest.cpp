@@ -4,13 +4,13 @@
 
 #include <atomic>
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 
 #include "frc/AsynchronousInterrupt.h"
 #include "frc/DigitalInput.h"
 #include "frc/Timer.h"
 #include "frc/simulation/DIOSim.h"
-#include "gtest/gtest.h"
 
 namespace frc {
 using namespace frc::sim;

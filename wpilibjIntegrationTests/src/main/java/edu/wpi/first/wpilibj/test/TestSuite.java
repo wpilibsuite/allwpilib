@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.WpiLibJTestSuite;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.LogManager;
@@ -51,7 +50,10 @@ public class TestSuite extends AbstractTestSuite {
     TestBench.out().println("Starting Tests");
   }
 
+  @SuppressWarnings("unused")
   private static final Logger WPILIBJ_ROOT_LOGGER = Logger.getLogger("edu.wpi.first.wpilibj");
+
+  @SuppressWarnings("unused")
   private static final Logger WPILIBJ_COMMAND_ROOT_LOGGER =
       Logger.getLogger("edu.wpi.first.wpilibj.command");
 
@@ -77,40 +79,36 @@ public class TestSuite extends AbstractTestSuite {
 
   /** Displays a help message for the user when they use the --help flag at runtime. */
   protected static void displayHelp() {
-    StringBuilder helpMessage = new StringBuilder("Test Parameters help: \n");
-    helpMessage.append(
-        "\t"
+    String helpMessage =
+        "Test Parameters help: \n"
+            + "\t"
             + QUICK_TEST_FLAG
             + " will cause the quick test to be run. Ignores other flags except for "
             + METHOD_REPEAT_FILTER
-            + "\n");
-    helpMessage.append(
-        "\t"
+            + "\n"
+            + "\t"
             + CLASS_NAME_FILTER
             + " will use the supplied regex text to search for suite/test class names "
-            + "matching the regex and run them.\n");
-    helpMessage.append(
-        "\t"
+            + "matching the regex and run them.\n"
+            + "\t"
             + METHOD_NAME_FILTER
             + " will use the supplied regex text to search for test methods (excluding methods "
             + "with the @Ignore annotation) and run only those methods. Can be paired with "
             + METHOD_REPEAT_FILTER
             + " to "
-            + "repeat the selected tests multiple times.\n");
-    helpMessage.append(
-        "\t"
+            + "repeat the selected tests multiple times.\n"
+            + "\t"
             + METHOD_REPEAT_FILTER
             + " will repeat the tests selected with either "
             + QUICK_TEST_FLAG
             + " or "
             + CLASS_NAME_FILTER
-            + " and run them the given number of times.\n");
-    helpMessage.append(
-        "[NOTE] All regex uses the syntax defined by java.util.regex.Pattern. This "
+            + " and run them the given number of times.\n"
+            + "[NOTE] All regex uses the syntax defined by java.util.regex.Pattern. This "
             + "documentation can be found at "
-            + "http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html\n");
-    helpMessage.append("\n");
-    helpMessage.append("\n");
+            + "http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html\n"
+            + "\n"
+            + "\n";
 
     TestBench.out().println(helpMessage);
   }
@@ -123,7 +121,7 @@ public class TestSuite extends AbstractTestSuite {
     StringBuilder invalidMessage = new StringBuilder("Invalid Usage: " + message + "\n");
     invalidMessage.append("Params received: ");
     for (String a : args) {
-      invalidMessage.append(a + " ");
+      invalidMessage.append(a).append(" ");
     }
     invalidMessage.append("\n");
     invalidMessage.append(
@@ -145,9 +143,9 @@ public class TestSuite extends AbstractTestSuite {
     for (Class<?> c : classes) {
       if (c.getPackage().equals(packagE)) {
         packagE = c.getPackage();
-        loadedTestsMessage.append(packagE.getName() + "\n");
+        loadedTestsMessage.append(packagE.getName()).append("\n");
       }
-      loadedTestsMessage.append("\t" + c.getSimpleName() + "\n");
+      loadedTestsMessage.append("\t").append(c.getSimpleName()).append("\n");
     }
     TestBench.out().println(loadedTestsMessage);
   }
@@ -193,7 +191,7 @@ public class TestSuite extends AbstractTestSuite {
       }
     }
 
-    ArrayList<String> argsParsed = new ArrayList<String>(Arrays.asList(args));
+    ArrayList<String> argsParsed = new ArrayList<>(List.of(args));
     if (argsParsed.contains(HELP_FLAG)) {
       // If the user inputs the help flag then return the help message and exit
       // without running any tests
@@ -257,7 +255,7 @@ public class TestSuite extends AbstractTestSuite {
     // If a specific method has been requested
     if (methodFilter) {
       List<ClassMethodPair> pairs = (new TestSuite()).getMethodMatching(methodRegex);
-      if (pairs.size() == 0) {
+      if (pairs.isEmpty()) {
         displayInvalidUsage(
             "None of the arguments passed to the method name filter matched.", args);
         return null;
@@ -292,7 +290,7 @@ public class TestSuite extends AbstractTestSuite {
     // If a specific class has been requested
     if (classFilter) {
       List<Class<?>> testClasses = (new TestSuite()).getSuiteOrTestMatchingRegex(classRegex);
-      if (testClasses.size() == 0) {
+      if (testClasses.isEmpty()) {
         displayInvalidUsage("None of the arguments passed to the filter matched.", args);
         return null;
       }

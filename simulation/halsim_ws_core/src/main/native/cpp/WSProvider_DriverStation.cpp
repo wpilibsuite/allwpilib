@@ -84,6 +84,9 @@ void HALSimWSProviderDriverStation::RegisterCallbacks() {
           case HAL_AllianceStationID_kBlue3:
             station = "blue3";
             break;
+          case HAL_AllianceStationID_kUnknown:
+            station = "unknown";
+            break;
         }
         static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
             {{">station", station}});

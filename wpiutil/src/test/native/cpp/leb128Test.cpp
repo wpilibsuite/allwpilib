@@ -16,7 +16,8 @@
 #include <string>
 #include <string_view>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
 #include "wpi/SmallString.h"
 #include "wpi/leb128.h"
 #include "wpi/raw_istream.h"

@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -25,8 +25,38 @@
 #ifndef _gcem_exp_HPP
 #define _gcem_exp_HPP
 
+#include <cmath>
+#include <type_traits>
+
+namespace gcem
+{
+
 namespace internal
 {
+
+// see https://en.wikipedia.org/wiki/Euler%27s_continued_fraction_formula
+
+#if __cplusplus >= 201402L // C++14 version
+
+template<typename T>
+constexpr
+T
+exp_cf_recur(const T x, const int depth_end)
+noexcept
+{
+    int depth = GCEM_EXP_MAX_ITER_SMALL - 1;
+    T res = T(1);
+
+    while (depth > depth_end - 1) {
+        res = T(1) + x/T(depth - 1) - x/depth/res;
+
+        --depth;
+    }
+
+    return res;
+}
+
+#else // C++11 version
 
 template<typename T>
 constexpr
@@ -36,12 +66,12 @@ noexcept
 {
     return( depth < GCEM_EXP_MAX_ITER_SMALL ? \
             // if
-                depth == 1 ? \
-                    T(1) - x/exp_cf_recur(x,depth+1) : 
-                    T(1) + x/T(depth - 1) - x/depth/exp_cf_recur(x,depth+1) : 
+                T(1) + x/T(depth - 1) - x/depth/exp_cf_recur(x,depth+1) : 
              // else
                 T(1) );
 }
+
+#endif
 
 template<typename T>
 constexpr
@@ -49,7 +79,7 @@ T
 exp_cf(const T x)
 noexcept
 {
-    return( T(1)/exp_cf_recur(x,1) );
+    return( T(1) / (T(1) - x / exp_cf_recur(x,2)) );
 }
 
 template<typename T>
@@ -72,7 +102,7 @@ noexcept
             //
             is_neginf(x) ? \
                 T(0) :
-            //
+            // indistinguishable from zero
             GCLIM<T>::min() > abs(x) ? \
                 T(1) : 
             //
@@ -100,7 +130,13 @@ return_t<T>
 exp(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::exp_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::exp(x);
+  }
+}
+
 }
 
 #endif

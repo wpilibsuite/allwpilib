@@ -14,14 +14,12 @@
  * @{
  */
 
-// clang-format off
 HAL_ENUM(HAL_SerialPort) {
   HAL_SerialPort_Onboard = 0,
   HAL_SerialPort_MXP = 1,
   HAL_SerialPort_USB1 = 2,
   HAL_SerialPort_USB2 = 3
 };
-// clang-format on
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,11 +28,12 @@ extern "C" {
 /**
  * Initializes a serial port.
  *
- * The channels are either the onboard RS232, the mxp uart, or 2 USB ports. The
+ * The channels are either the onboard RS232, the MXP UART, or 2 USB ports. The
  * top port is USB1, the bottom port is USB2.
  *
  * @param[in] port the serial port to initialize
  * @param[out] status the error code, or 0 for success
+ * @return Serial Port Handle
  */
 HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
                                               int32_t* status);
@@ -48,6 +47,7 @@ HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
  * @param[in] port     the serial port to initialize
  * @param[in] portName the dev port name
  * @param[out] status  the error code, or 0 for success
+ * @return Serial Port Handle
  */
 HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
                                                     const char* portName,

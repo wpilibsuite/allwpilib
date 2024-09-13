@@ -10,9 +10,9 @@
 #include <numbers>
 #include <random>
 
+#include <gtest/gtest.h>
 #include <wpi/array.h>
 
-#include "gtest/gtest.h"
 #include "units/time.h"
 
 // Filter constants

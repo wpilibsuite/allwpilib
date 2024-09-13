@@ -5,11 +5,12 @@
 #include <string>
 #include <tuple>
 
+#include <gtest/gtest.h>
+
 #include "frc/DriverStation.h"
 #include "frc/Joystick.h"
 #include "frc/simulation/DriverStationSim.h"
 #include "frc/simulation/SimHooks.h"
-#include "gtest/gtest.h"
 
 class IsJoystickConnectedParametersTest
     : public ::testing::TestWithParam<std::tuple<int, int, int, bool>> {};

@@ -12,8 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-@SuppressWarnings("deprecation")
-public class InternalButton extends Button {
+public class InternalButton extends Trigger {
   // need to be references, so they can be mutated after being captured in the constructor.
   private final AtomicBoolean m_pressed;
   private final AtomicBoolean m_inverted;
@@ -43,10 +42,20 @@ public class InternalButton extends Button {
     this.m_inverted = inverted;
   }
 
+  /**
+   * Sets whether to invert button state.
+   *
+   * @param inverted Whether button state should be inverted.
+   */
   public void setInverted(boolean inverted) {
     m_inverted.set(inverted);
   }
 
+  /**
+   * Sets whether button is pressed.
+   *
+   * @param pressed Whether button is pressed.
+   */
   public void setPressed(boolean pressed) {
     m_pressed.set(pressed);
   }

@@ -5,9 +5,10 @@
 #include <memory>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include "frc/trajectory/constraint/CentripetalAccelerationConstraint.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
-#include "gtest/gtest.h"
 #include "trajectory/TestTrajectory.h"
 #include "units/acceleration.h"
 #include "units/angle.h"

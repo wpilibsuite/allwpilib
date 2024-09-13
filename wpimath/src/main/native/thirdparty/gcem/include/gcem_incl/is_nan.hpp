@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -24,6 +24,9 @@
 
 #ifndef _gcem_is_nan_HPP
 #define _gcem_is_nan_HPP
+
+namespace gcem
+{
 
 namespace internal
 {
@@ -73,6 +76,8 @@ all_nan(const T1 x, const T2 y, const T3 z)
 noexcept
 {
     return( is_nan(x) && is_nan(y) && is_nan(z) );
+}
+
 }
 
 }

@@ -30,13 +30,11 @@
 /**
  * Direction of a simulated value (from the perspective of user code).
  */
-// clang-format off
 HAL_ENUM(HAL_SimValueDirection) {
-  HAL_SimValueInput = 0,  /**< input to user code from the simulator */
-  HAL_SimValueOutput,     /**< output from user code to the simulator */
-  HAL_SimValueBidir       /**< bidirectional between user code and simulator */
+  HAL_SimValueInput = 0, /**< input to user code from the simulator */
+  HAL_SimValueOutput,    /**< output from user code to the simulator */
+  HAL_SimValueBidir      /**< bidirectional between user code and simulator */
 };
-// clang-format on
 
 #ifdef __cplusplus
 extern "C" {
@@ -409,7 +407,7 @@ class SimValue {
   /**
    * Wraps a simulated value handle as returned by HAL_CreateSimValue().
    *
-   * @param handle simulated value handle
+   * @param val simulated value handle
    */
   /*implicit*/ SimValue(HAL_SimValueHandle val)  // NOLINT
       : m_handle(val) {}
@@ -461,7 +459,7 @@ class SimInt : public SimValue {
   /**
    * Wraps a simulated value handle as returned by HAL_CreateSimValueInt().
    *
-   * @param handle simulated value handle
+   * @param val simulated value handle
    */
   /*implicit*/ SimInt(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
@@ -502,7 +500,7 @@ class SimLong : public SimValue {
   /**
    * Wraps a simulated value handle as returned by HAL_CreateSimValueLong().
    *
-   * @param handle simulated value handle
+   * @param val simulated value handle
    */
   /*implicit*/ SimLong(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
@@ -543,7 +541,7 @@ class SimDouble : public SimValue {
   /**
    * Wraps a simulated value handle as returned by HAL_CreateSimValueDouble().
    *
-   * @param handle simulated value handle
+   * @param val simulated value handle
    */
   /*implicit*/ SimDouble(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
@@ -584,7 +582,7 @@ class SimEnum : public SimValue {
   /**
    * Wraps a simulated value handle as returned by HAL_CreateSimValueEnum().
    *
-   * @param handle simulated value handle
+   * @param val simulated value handle
    */
   /*implicit*/ SimEnum(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
@@ -618,7 +616,7 @@ class SimBoolean : public SimValue {
   /**
    * Wraps a simulated value handle as returned by HAL_CreateSimValueBoolean().
    *
-   * @param handle simulated value handle
+   * @param val simulated value handle
    */
   /*implicit*/ SimBoolean(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}

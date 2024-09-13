@@ -9,13 +9,8 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.networktables.IntegerArrayEntry;
-import edu.wpi.first.networktables.IntegerArrayPublisher;
-import edu.wpi.first.networktables.IntegerArrayTopic;
-import edu.wpi.first.networktables.NTSendable;
-import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.networktables.StringArrayPublisher;
-import edu.wpi.first.networktables.StringArrayTopic;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -33,8 +28,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -46,7 +43,7 @@ import java.util.function.Consumer;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public final class CommandScheduler implements NTSendable, AutoCloseable {
+public final class CommandScheduler implements Sendable, AutoCloseable {
   /** The Singleton Instance. */
   private static CommandScheduler instance;
 
@@ -62,7 +59,9 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
     return instance;
   }
 
-  private final Set<Command> m_composedCommands = Collections.newSetFromMap(new WeakHashMap<>());
+  private static final Optional<Command> kNoInterruptor = Optional.empty();
+
+  private final Map<Command, Exception> m_composedCommands = new WeakHashMap<>();
 
   // A set of the currently-running commands.
   private final Set<Command> m_scheduledCommands = new LinkedHashSet<>();
@@ -84,14 +83,16 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   // Lists of user-supplied actions to be executed on scheduling events for every command.
   private final List<Consumer<Command>> m_initActions = new ArrayList<>();
   private final List<Consumer<Command>> m_executeActions = new ArrayList<>();
-  private final List<Consumer<Command>> m_interruptActions = new ArrayList<>();
+  private final List<BiConsumer<Command, Optional<Command>>> m_interruptActions = new ArrayList<>();
   private final List<Consumer<Command>> m_finishActions = new ArrayList<>();
 
   // Flag and queues for avoiding ConcurrentModificationException if commands are
   // scheduled/canceled during run
   private boolean m_inRunLoop;
   private final Set<Command> m_toSchedule = new LinkedHashSet<>();
-  private final List<Command> m_toCancel = new ArrayList<>();
+  private final List<Command> m_toCancelCommands = new ArrayList<>();
+  private final List<Optional<Command>> m_toCancelInterruptors = new ArrayList<>();
+  private final Set<Command> m_endingCommands = new LinkedHashSet<>();
 
   private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> {});
 
@@ -149,27 +150,6 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   public void setActiveButtonLoop(EventLoop loop) {
     m_activeButtonLoop =
         requireNonNullParam(loop, "loop", "CommandScheduler" + ".replaceButtonEventLoop");
-  }
-
-  /**
-   * Adds a button binding to the scheduler, which will be polled to schedule commands.
-   *
-   * @param button The button to add
-   * @deprecated Use {@link edu.wpi.first.wpilibj2.command.button.Trigger}
-   */
-  @Deprecated(since = "2023")
-  public void addButton(Runnable button) {
-    m_activeButtonLoop.bind(requireNonNullParam(button, "button", "addButton"));
-  }
-
-  /**
-   * Removes all button bindings from the scheduler.
-   *
-   * @deprecated call {@link EventLoop#clear()} on {@link #getActiveButtonLoop()} directly instead.
-   */
-  @Deprecated(since = "2023")
-  public void clearButtons() {
-    m_activeButtonLoop.clear();
   }
 
   /**
@@ -237,7 +217,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
       for (Subsystem requirement : requirements) {
         Command requiring = requiring(requirement);
         if (requiring != null) {
-          cancel(requiring);
+          cancel(requiring, Optional.of(command));
         }
       }
       initCommand(command, requirements);
@@ -281,7 +261,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
       if (RobotBase.isSimulation()) {
         subsystem.simulationPeriodic();
       }
-      m_watchdog.addEpoch(subsystem.getClass().getSimpleName() + ".periodic()");
+      m_watchdog.addEpoch(subsystem.getName() + ".periodic()");
     }
 
     // Cache the active instance to avoid concurrency problems if setActiveLoop() is called from
@@ -292,18 +272,13 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
     m_watchdog.addEpoch("buttons.run()");
 
     m_inRunLoop = true;
+    boolean isDisabled = RobotState.isDisabled();
     // Run scheduled commands, remove finished commands.
     for (Iterator<Command> iterator = m_scheduledCommands.iterator(); iterator.hasNext(); ) {
       Command command = iterator.next();
 
-      if (!command.runsWhenDisabled() && RobotState.isDisabled()) {
-        command.end(true);
-        for (Consumer<Command> action : m_interruptActions) {
-          action.accept(command);
-        }
-        m_requirements.keySet().removeAll(command.getRequirements());
-        iterator.remove();
-        m_watchdog.addEpoch(command.getName() + ".end(true)");
+      if (isDisabled && !command.runsWhenDisabled()) {
+        cancel(command, kNoInterruptor);
         continue;
       }
 
@@ -313,10 +288,12 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
       }
       m_watchdog.addEpoch(command.getName() + ".execute()");
       if (command.isFinished()) {
+        m_endingCommands.add(command);
         command.end(false);
         for (Consumer<Command> action : m_finishActions) {
           action.accept(command);
         }
+        m_endingCommands.remove(command);
         iterator.remove();
 
         m_requirements.keySet().removeAll(command.getRequirements());
@@ -330,12 +307,13 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
       schedule(command);
     }
 
-    for (Command command : m_toCancel) {
-      cancel(command);
+    for (int i = 0; i < m_toCancelCommands.size(); i++) {
+      cancel(m_toCancelCommands.get(i), m_toCancelInterruptors.get(i));
     }
 
     m_toSchedule.clear();
-    m_toCancel.clear();
+    m_toCancelCommands.clear();
+    m_toCancelInterruptors.clear();
 
     // Add default commands for un-required registered subsystems.
     for (Map.Entry<Subsystem, Command> subsystemCommand : m_subsystems.entrySet()) {
@@ -381,6 +359,15 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    */
   public void unregisterSubsystem(Subsystem... subsystems) {
     m_subsystems.keySet().removeAll(Set.of(subsystems));
+  }
+
+  /**
+   * Un-registers all registered Subsystems with the scheduler. All currently registered subsystems
+   * will no longer have their periodic block called, and will not have their default command
+   * scheduled.
+   */
+  public void unregisterAllSubsystems() {
+    m_subsystems.clear();
   }
 
   /**
@@ -457,28 +444,47 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * @param commands the commands to cancel
    */
   public void cancel(Command... commands) {
+    for (Command command : commands) {
+      cancel(command, kNoInterruptor);
+    }
+  }
+
+  /**
+   * Cancels a command. The scheduler will only call {@link Command#end(boolean)} method of the
+   * canceled command with {@code true}, indicating they were canceled (as opposed to finishing
+   * normally).
+   *
+   * <p>Commands will be canceled regardless of {@link InterruptionBehavior interruption behavior}.
+   *
+   * @param command the command to cancel
+   * @param interruptor the interrupting command, if any
+   */
+  private void cancel(Command command, Optional<Command> interruptor) {
+    if (command == null) {
+      DriverStation.reportWarning("Tried to cancel a null command", true);
+      return;
+    }
+    if (m_endingCommands.contains(command)) {
+      return;
+    }
     if (m_inRunLoop) {
-      m_toCancel.addAll(List.of(commands));
+      m_toCancelCommands.add(command);
+      m_toCancelInterruptors.add(interruptor);
+      return;
+    }
+    if (!isScheduled(command)) {
       return;
     }
 
-    for (Command command : commands) {
-      if (command == null) {
-        DriverStation.reportWarning("Tried to cancel a null command", true);
-        continue;
-      }
-      if (!isScheduled(command)) {
-        continue;
-      }
-
-      m_scheduledCommands.remove(command);
-      m_requirements.keySet().removeAll(command.getRequirements());
-      command.end(true);
-      for (Consumer<Command> action : m_interruptActions) {
-        action.accept(command);
-      }
-      m_watchdog.addEpoch(command.getName() + ".end(true)");
+    m_endingCommands.add(command);
+    command.end(true);
+    for (BiConsumer<Command, Optional<Command>> action : m_interruptActions) {
+      action.accept(command, interruptor);
     }
+    m_endingCommands.remove(command);
+    m_scheduledCommands.remove(command);
+    m_requirements.keySet().removeAll(command.getRequirements());
+    m_watchdog.addEpoch(command.getName() + ".end(true)");
   }
 
   /** Cancels all commands that are currently scheduled. */
@@ -545,6 +551,19 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * @param action the action to perform
    */
   public void onCommandInterrupt(Consumer<Command> action) {
+    requireNonNullParam(action, "action", "onCommandInterrupt");
+    m_interruptActions.add((command, interruptor) -> action.accept(command));
+  }
+
+  /**
+   * Adds an action to perform on the interruption of any command by the scheduler. The action
+   * receives the interrupted command and an Optional containing the interrupting command, or
+   * Optional.empty() if it was not canceled by a command (e.g., by {@link
+   * CommandScheduler#cancel}).
+   *
+   * @param action the action to perform
+   */
+  public void onCommandInterrupt(BiConsumer<Command, Optional<Command>> action) {
     m_interruptActions.add(requireNonNullParam(action, "action", "onCommandInterrupt"));
   }
 
@@ -562,12 +581,25 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * directly or added to a composition.
    *
    * @param commands the commands to register
-   * @throws IllegalArgumentException if the given commands have already been composed.
+   * @throws IllegalArgumentException if the given commands have already been composed, or the array
+   *     of commands has duplicates.
    */
   public void registerComposedCommands(Command... commands) {
-    var commandSet = Set.of(commands);
-    requireNotComposed(commandSet);
-    m_composedCommands.addAll(commandSet);
+    Set<Command> commandSet;
+    try {
+      commandSet = Set.of(commands);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException(
+          "Cannot compose a command twice in the same composition! (Original exception: "
+              + e
+              + ")");
+    }
+    requireNotComposedOrScheduled(commandSet);
+    var exception = new Exception("Originally composed at:");
+    exception.fillInStackTrace();
+    for (var command : commands) {
+      m_composedCommands.put(command, exception);
+    }
   }
 
   /**
@@ -594,30 +626,58 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   }
 
   /**
-   * Requires that the specified command hasn't been already added to a composition.
+   * Requires that the specified command hasn't already been added to a composition.
    *
-   * @param command The command to check
+   * @param commands The commands to check
    * @throws IllegalArgumentException if the given commands have already been composed.
    */
-  public void requireNotComposed(Command command) {
-    if (m_composedCommands.contains(command)) {
-      throw new IllegalArgumentException(
-          "Commands that have been composed may not be added to another composition or scheduled "
-              + "individually!");
+  public void requireNotComposed(Command... commands) {
+    for (var command : commands) {
+      var exception = m_composedCommands.getOrDefault(command, null);
+      if (exception != null) {
+        throw new IllegalArgumentException(
+            "Commands that have been composed may not be added to another composition or scheduled "
+                + "individually!",
+            exception);
+      }
     }
   }
 
   /**
-   * Requires that the specified commands not have been already added to a composition.
+   * Requires that the specified commands have not already been added to a composition.
    *
    * @param commands The commands to check
    * @throws IllegalArgumentException if the given commands have already been composed.
    */
   public void requireNotComposed(Collection<Command> commands) {
-    if (!Collections.disjoint(commands, getComposedCommands())) {
+    requireNotComposed(commands.toArray(Command[]::new));
+  }
+
+  /**
+   * Requires that the specified command hasn't already been added to a composition, and is not
+   * currently scheduled.
+   *
+   * @param command The command to check
+   * @throws IllegalArgumentException if the given command has already been composed or scheduled.
+   */
+  public void requireNotComposedOrScheduled(Command command) {
+    if (isScheduled(command)) {
       throw new IllegalArgumentException(
-          "Commands that have been composed may not be added to another composition or scheduled "
-              + "individually!");
+          "Commands that have been scheduled individually may not be added to a composition!");
+    }
+    requireNotComposed(command);
+  }
+
+  /**
+   * Requires that the specified commands have not already been added to a composition, and are not
+   * currently scheduled.
+   *
+   * @param commands The commands to check
+   * @throws IllegalArgumentException if the given commands have already been composed or scheduled.
+   */
+  public void requireNotComposedOrScheduled(Collection<Command> commands) {
+    for (var command : commands) {
+      requireNotComposedOrScheduled(command);
     }
   }
 
@@ -632,49 +692,48 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   }
 
   Set<Command> getComposedCommands() {
-    return m_composedCommands;
+    return m_composedCommands.keySet();
   }
 
   @Override
-  public void initSendable(NTSendableBuilder builder) {
+  public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Scheduler");
-    final StringArrayPublisher namesPub = new StringArrayTopic(builder.getTopic("Names")).publish();
-    final IntegerArrayPublisher idsPub = new IntegerArrayTopic(builder.getTopic("Ids")).publish();
-    final IntegerArrayEntry cancelEntry =
-        new IntegerArrayTopic(builder.getTopic("Cancel")).getEntry(new long[] {});
-    builder.addCloseable(namesPub);
-    builder.addCloseable(idsPub);
-    builder.addCloseable(cancelEntry);
-    builder.setUpdateTable(
+    builder.addStringArrayProperty(
+        "Names",
         () -> {
-          if (namesPub == null || idsPub == null || cancelEntry == null) {
-            return;
-          }
-
-          Map<Long, Command> ids = new LinkedHashMap<>();
-          List<String> names = new ArrayList<>();
-          long[] ids2 = new long[m_scheduledCommands.size()];
-
+          String[] names = new String[m_scheduledCommands.size()];
           int i = 0;
+          for (Command command : m_scheduledCommands) {
+            names[i] = command.getName();
+            i++;
+          }
+          return names;
+        },
+        null);
+    builder.addIntegerArrayProperty(
+        "Ids",
+        () -> {
+          long[] ids = new long[m_scheduledCommands.size()];
+          int i = 0;
+          for (Command command : m_scheduledCommands) {
+            ids[i] = command.hashCode();
+            i++;
+          }
+          return ids;
+        },
+        null);
+    builder.addIntegerArrayProperty(
+        "Cancel",
+        () -> new long[] {},
+        toCancel -> {
+          Map<Long, Command> ids = new LinkedHashMap<>();
           for (Command command : m_scheduledCommands) {
             long id = command.hashCode();
             ids.put(id, command);
-            names.add(command.getName());
-            ids2[i] = id;
-            i++;
           }
-
-          long[] toCancel = cancelEntry.get();
-          if (toCancel.length > 0) {
-            for (long hash : toCancel) {
-              cancel(ids.get(hash));
-              ids.remove(hash);
-            }
-            cancelEntry.set(new long[] {});
+          for (long hash : toCancel) {
+            cancel(ids.get(hash));
           }
-
-          namesPub.set(names.toArray(new String[] {}));
-          idsPub.set(ids2);
         });
   }
 }

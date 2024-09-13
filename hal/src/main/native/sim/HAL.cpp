@@ -288,6 +288,10 @@ size_t HAL_GetComments(char* buffer, size_t size) {
   return HALSIM_GetRoboRioComments(buffer, size);
 }
 
+int32_t HAL_GetTeamNumber(void) {
+  return HALSIM_GetRoboRioTeamNumber();
+}
+
 uint64_t HAL_GetFPGATime(int32_t* status) {
   return hal::GetFPGATime();
 }
@@ -328,6 +332,14 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return false;  // Figure out if we need to detect a brownout condition
 }
 
+HAL_Bool HAL_GetRSLState(int32_t* status) {
+  return false;
+}
+
+HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
+  return true;
+}
+
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
@@ -355,12 +367,12 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 #ifdef _WIN32
   TIMECAPS tc;
   if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
-    UINT target = min(1, tc.wPeriodMin);
+    UINT target = (std::min)(static_cast<UINT>(1), tc.wPeriodMin);
     timeBeginPeriod(target);
     std::atexit([]() {
       TIMECAPS tc;
       if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
-        UINT target = min(1, tc.wPeriodMin);
+        UINT target = (std::min)(static_cast<UINT>(1), tc.wPeriodMin);
         timeEndPeriod(target);
       }
     });

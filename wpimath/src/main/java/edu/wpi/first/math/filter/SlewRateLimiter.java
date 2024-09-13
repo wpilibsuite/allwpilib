@@ -38,20 +38,6 @@ public class SlewRateLimiter {
 
   /**
    * Creates a new SlewRateLimiter with the given positive rate limit and negative rate limit of
-   * -rateLimit and initial value.
-   *
-   * @param rateLimit The rate-of-change limit, in units per second.
-   * @param initalValue The initial value of the input.
-   * @deprecated Use SlewRateLimiter(double positiveRateLimit, double negativeRateLimit, double
-   *     initalValue) instead.
-   */
-  @Deprecated(since = "2023", forRemoval = true)
-  public SlewRateLimiter(double rateLimit, double initalValue) {
-    this(rateLimit, -rateLimit, initalValue);
-  }
-
-  /**
-   * Creates a new SlewRateLimiter with the given positive rate limit and negative rate limit of
    * -rateLimit.
    *
    * @param rateLimit The rate-of-change limit, in units per second.
@@ -75,6 +61,15 @@ public class SlewRateLimiter {
             m_negativeRateLimit * elapsedTime,
             m_positiveRateLimit * elapsedTime);
     m_prevTime = currentTime;
+    return m_prevVal;
+  }
+
+  /**
+   * Returns the value last calculated by the SlewRateLimiter.
+   *
+   * @return The last value.
+   */
+  public double lastValue() {
     return m_prevVal;
   }
 

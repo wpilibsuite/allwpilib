@@ -9,6 +9,7 @@
 
 #include <imgui.h>
 #include <wpi/SmallVector.h>
+#include <wpi/StringExtras.h>
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
@@ -46,10 +47,10 @@ bool glass::DisplayPCMSolenoids(PCMModel* model, int index,
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (!name.empty()) {
-    std::snprintf(label, sizeof(label), "%s [%d]###header", name.c_str(),
-                  index);
+    wpi::format_to_n_c_str(label, sizeof(label), "{} [{}]###header", name,
+                           index);
   } else {
-    std::snprintf(label, sizeof(label), "PCM[%d]###header", index);
+    wpi::format_to_n_c_str(label, sizeof(label), "PCM[{}]###header", index);
   }
 
   // header
@@ -111,7 +112,8 @@ void glass::DisplayCompressorDevice(PCMModel* model, int index,
 void glass::DisplayCompressorDevice(CompressorModel* model, int index,
                                     bool outputsEnabled) {
   char name[32];
-  std::snprintf(name, sizeof(name), "Compressor[%d]", index);
+  wpi::format_to_n_c_str(name, sizeof(name), "Compressor[{}]", index);
+
   if (BeginDevice(name)) {
     // output enabled
     if (auto runningData = model->GetRunningData()) {

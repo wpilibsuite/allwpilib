@@ -39,9 +39,9 @@ namespace frc {
  * (SR-UKF). For more information about the SR-UKF, see
  * https://www.researchgate.net/publication/3908304.
  *
- * @tparam States The number of states.
- * @tparam Inputs The number of inputs.
- * @tparam Outputs The number of outputs.
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
+ * @tparam Outputs Number of outputs.
  */
 template <int States, int Inputs, int Outputs>
 class UnscentedKalmanFilter {
@@ -57,6 +57,10 @@ class UnscentedKalmanFilter {
 
   /**
    * Constructs an unscented Kalman filter.
+   *
+   * See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
    *
    * @param f                  A vector-valued function of x and u that returns
    *                           the derivative of the state vector.
@@ -77,6 +81,10 @@ class UnscentedKalmanFilter {
    * addition functions. Using custom functions for arithmetic can be useful if
    * you have angles in the state or measurements, because they allow you to
    * correctly account for the modular nature of angle arithmetic.
+   *
+   * See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
    *
    * @param f                  A vector-valued function of x and u that returns
    *                           the derivative of the state vector.
@@ -205,6 +213,21 @@ class UnscentedKalmanFilter {
   /**
    * Correct the state estimate x-hat using the measurements in y.
    *
+   * This is useful for when the measurement noise covariances vary.
+   *
+   * @param u Same control input used in the predict step.
+   * @param y Measurement vector.
+   * @param R Continuous measurement noise covariance matrix.
+   */
+  void Correct(const InputVector& u, const OutputVector& y,
+               const Matrixd<Outputs, Outputs>& R) {
+    Correct<Outputs>(u, y, m_h, R, m_meanFuncY, m_residualFuncY,
+                     m_residualFuncX, m_addFuncX);
+  }
+
+  /**
+   * Correct the state estimate x-hat using the measurements in y.
+   *
    * This is useful for when the measurements available during a timestep's
    * Correct() call vary. The h(x, u) passed to the constructor is used if one
    * is not provided (the two-argument version of this function).
@@ -213,7 +236,7 @@ class UnscentedKalmanFilter {
    * @param y Measurement vector.
    * @param h A vector-valued function of x and u that returns the measurement
    *          vector.
-   * @param R Measurement noise covariance matrix (continuous-time).
+   * @param R Continuous measurement noise covariance matrix.
    */
   template <int Rows>
   void Correct(
@@ -232,7 +255,7 @@ class UnscentedKalmanFilter {
    * @param y             Measurement vector.
    * @param h             A vector-valued function of x and u that returns the
    *                      measurement vector.
-   * @param R             Measurement noise covariance matrix (continuous-time).
+   * @param R             Continuous measurement noise covariance matrix.
    * @param meanFuncY     A function that computes the mean of 2 * States + 1
    *                      measurement vectors using a given set of weights.
    * @param residualFuncY A function that computes the residual of two

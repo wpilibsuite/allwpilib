@@ -102,8 +102,11 @@ void JoystickDataCache::Update() {
     HAL_GetJoystickPOVsInternal(i, &povs[i]);
     HAL_GetJoystickButtonsInternal(i, &buttons[i]);
   }
-  FRC_NetworkCommunication_getAllianceStation(
-      reinterpret_cast<AllianceStationID_t*>(&allianceStation));
+  AllianceStationID_t alliance = kAllianceStationID_red1;
+  FRC_NetworkCommunication_getAllianceStation(&alliance);
+  int allianceInt = alliance;
+  allianceInt += 1;
+  allianceStation = static_cast<HAL_AllianceStationID>(allianceInt);
   FRC_NetworkCommunication_getMatchTime(&matchTime);
   FRC_NetworkCommunication_getControlWord(
       reinterpret_cast<ControlWord_t*>(&controlWord));
@@ -178,9 +181,10 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
 namespace {
 struct TcpCache {
   TcpCache() { std::memset(this, 0, sizeof(*this)); }
-  void Update(uint32_t mask);
+  bool Update(uint32_t mask);
   void CloneTo(TcpCache* other) { std::memcpy(other, this, sizeof(*this)); }
 
+  bool hasReadMatchInfo = false;
   HAL_MatchInfo matchInfo;
   HAL_JoystickDescriptor descriptors[HAL_kMaxJoysticks];
 };
@@ -196,15 +200,25 @@ constexpr uint32_t combinedMatchInfoMask = kTcpRecvMask_MatchInfoOld |
                                            kTcpRecvMask_MatchInfo |
                                            kTcpRecvMask_GameSpecific;
 
-void TcpCache::Update(uint32_t mask) {
+bool TcpCache::Update(uint32_t mask) {
+  bool failedToReadInfo = false;
   if ((mask & combinedMatchInfoMask) != 0) {
-    HAL_GetMatchInfoInternal(&matchInfo);
+    int status = HAL_GetMatchInfoInternal(&matchInfo);
+    if (status != 0) {
+      failedToReadInfo = true;
+      if (!hasReadMatchInfo) {
+        std::memset(&matchInfo, 0, sizeof(matchInfo));
+      }
+    } else {
+      hasReadMatchInfo = true;
+    }
   }
   for (int i = 0; i < HAL_kMaxJoysticks; i++) {
     if ((mask & (1 << i)) != 0) {
       HAL_GetJoystickDescriptorInternal(i, &descriptors[i]);
     }
   }
+  return failedToReadInfo;
 }
 
 namespace hal::init {
@@ -525,17 +539,35 @@ HAL_Bool HAL_RefreshDSData(void) {
     }
     // If newest state shows we have a DS attached, just use the
     // control word out of the cache, As it will be the one in sync
-    // with the data. Otherwise use the state that shows disconnected.
-    if (controlWord.dsAttached) {
-      newestControlWord = currentRead->controlWord;
-    } else {
-      newestControlWord = controlWord;
+    // with the data. If no data has been updated, at this point,
+    // and a DS wasn't attached previously, this will still return
+    // a zeroed out control word, with is the correct state for
+    // no new data.
+    if (!controlWord.dsAttached) {
+      // If the DS is not attached, we need to zero out the control word.
+      // This is because HAL_RefreshDSData is called asynchronously from
+      // the DS data. The dsAttached variable comes directly from netcomm
+      // and could be updated before the caches are. If that happens,
+      // we would end up returning the previous cached control word,
+      // which is out of sync with the current control word and could
+      // break invariants such as which alliance station is in used.
+      // Also, when the DS has never been connected the rest of the fields
+      // in control word are garbage, so we also need to zero out in that
+      // case too
+      std::memset(&currentRead->controlWord, 0,
+                  sizeof(currentRead->controlWord));
     }
+    newestControlWord = currentRead->controlWord;
   }
 
   uint32_t mask = tcpMask.exchange(0);
   if (mask != 0) {
-    tcpCache.Update(mask);
+    bool failedToReadMatchInfo = tcpCache.Update(mask);
+    if (failedToReadMatchInfo) {
+      // If we failed to read match info
+      // we want to try again next iteration
+      tcpMask.fetch_or(combinedMatchInfoMask);
+    }
     std::scoped_lock tcpLock(tcpCacheMutex);
     tcpCache.CloneTo(&tcpCurrent);
   }

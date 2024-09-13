@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 
-#include "Eigen/Core"
 #include "frc/controller/DifferentialDriveWheelVoltages.h"
 #include "frc/system/LinearSystem.h"
 #include "units/acceleration.h"

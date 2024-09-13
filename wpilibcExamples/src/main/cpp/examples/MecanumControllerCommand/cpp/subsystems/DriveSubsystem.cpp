@@ -30,6 +30,11 @@ DriveSubsystem::DriveSubsystem()
 
       m_odometry{kDriveKinematics, m_gyro.GetRotation2d(),
                  getCurrentWheelDistances(), frc::Pose2d{}} {
+  wpi::SendableRegistry::AddChild(&m_drive, &m_frontLeft);
+  wpi::SendableRegistry::AddChild(&m_drive, &m_rearLeft);
+  wpi::SendableRegistry::AddChild(&m_drive, &m_frontRight);
+  wpi::SendableRegistry::AddChild(&m_drive, &m_rearRight);
+
   // Set the distance per pulse for the encoders
   m_frontLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rearLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);

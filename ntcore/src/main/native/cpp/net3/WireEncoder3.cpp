@@ -32,7 +32,7 @@ static void Write32(wpi::raw_ostream& os, uint32_t val) {
 
 static void WriteDouble(wpi::raw_ostream& os, double val) {
   // The highest performance way to do this, albeit non-portable.
-  uint64_t v = wpi::DoubleToBits(val);
+  uint64_t v = wpi::bit_cast<uint64_t>(val);
   os << std::span<const uint8_t>{{static_cast<uint8_t>((v >> 56) & 0xff),
                                   static_cast<uint8_t>((v >> 48) & 0xff),
                                   static_cast<uint8_t>((v >> 40) & 0xff),

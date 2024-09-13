@@ -33,9 +33,9 @@ namespace frc {
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9
  * "Stochastic control theory".
  *
- * @tparam States The number of states.
- * @tparam Inputs The number of inputs.
- * @tparam Outputs The number of outputs.
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
+ * @tparam Outputs Number of outputs.
  */
 template <int States, int Inputs, int Outputs>
 class ExtendedKalmanFilter {
@@ -51,6 +51,10 @@ class ExtendedKalmanFilter {
 
   /**
    * Constructs an extended Kalman filter.
+   *
+   * See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
    *
    * @param f                  A vector-valued function of x and u that returns
    *                           the derivative of the state vector.
@@ -68,6 +72,10 @@ class ExtendedKalmanFilter {
 
   /**
    * Constructs an extended Kalman filter.
+   *
+   * See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
    *
    * @param f                  A vector-valued function of x and u that returns
    *                           the derivative of the state vector.
@@ -163,6 +171,33 @@ class ExtendedKalmanFilter {
     Correct<Outputs>(u, y, m_h, m_contR, m_residualFuncY, m_addFuncX);
   }
 
+  /**
+   * Correct the state estimate x-hat using the measurements in y.
+   *
+   * This is useful for when the measurement noise covariances vary.
+   *
+   * @param u Same control input used in the predict step.
+   * @param y Measurement vector.
+   * @param R Continuous measurement noise covariance matrix.
+   */
+  void Correct(const InputVector& u, const OutputVector& y,
+               const Matrixd<Outputs, Outputs>& R) {
+    Correct<Outputs>(u, y, m_h, R, m_residualFuncY, m_addFuncX);
+  }
+
+  /**
+   * Correct the state estimate x-hat using the measurements in y.
+   *
+   * This is useful for when the measurements available during a timestep's
+   * Correct() call vary. The h(x, u) passed to the constructor is used if one
+   * is not provided (the two-argument version of this function).
+   *
+   * @param u Same control input used in the predict step.
+   * @param y Measurement vector.
+   * @param h A vector-valued function of x and u that returns the measurement
+   *          vector.
+   * @param R Continuous measurement noise covariance matrix.
+   */
   template <int Rows>
   void Correct(
       const InputVector& u, const Vectord<Rows>& y,
@@ -180,7 +215,7 @@ class ExtendedKalmanFilter {
    * @param y             Measurement vector.
    * @param h             A vector-valued function of x and u that returns
    *                      the measurement vector.
-   * @param R             Discrete measurement noise covariance matrix.
+   * @param R             Continuous measurement noise covariance matrix.
    * @param residualFuncY A function that computes the residual of two
    *                      measurement vectors (i.e. it subtracts them.)
    * @param addFuncX      A function that adds two state vectors.

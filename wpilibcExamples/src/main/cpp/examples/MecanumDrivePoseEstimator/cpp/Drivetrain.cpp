@@ -24,7 +24,7 @@ frc::MecanumDriveWheelPositions Drivetrain::GetCurrentDistances() const {
 
 void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
   std::function<void(units::meters_per_second_t, const frc::Encoder&,
-                     frc2::PIDController&, frc::PWMSparkMax&)>
+                     frc::PIDController&, frc::PWMSparkMax&)>
       calcAndSetSpeeds = [&m_feedforward = m_feedforward](
                              units::meters_per_second_t speed,
                              const auto& encoder, auto& controller,
@@ -46,11 +46,14 @@ void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
 
 void Drivetrain::Drive(units::meters_per_second_t xSpeed,
                        units::meters_per_second_t ySpeed,
-                       units::radians_per_second_t rot, bool fieldRelative) {
-  auto wheelSpeeds = m_kinematics.ToWheelSpeeds(
+                       units::radians_per_second_t rot, bool fieldRelative,
+                       units::second_t period) {
+  auto wheelSpeeds = m_kinematics.ToWheelSpeeds(frc::ChassisSpeeds::Discretize(
       fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                          xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
-                    : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
+                          xSpeed, ySpeed, rot,
+                          m_poseEstimator.GetEstimatedPosition().Rotation())
+                    : frc::ChassisSpeeds{xSpeed, ySpeed, rot},
+      period));
   wheelSpeeds.Desaturate(kMaxSpeed);
   SetSpeeds(wheelSpeeds);
 }

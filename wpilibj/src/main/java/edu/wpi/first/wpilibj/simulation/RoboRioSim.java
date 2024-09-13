@@ -6,6 +6,8 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.hal.simulation.RoboRioDataJNI;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.RobotController.RadioLEDState;
 
 /** A utility class to control a simulated RoboRIO. */
 public final class RoboRioSim {
@@ -526,6 +528,70 @@ public final class RoboRioSim {
   }
 
   /**
+   * Register a callback to be run whenever the cpu temp changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerCPUTempCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid = RoboRioDataJNI.registerCPUTempCallback(callback, initialNotify);
+    return new CallbackStore(uid, RoboRioDataJNI::cancelCPUTempCallback);
+  }
+
+  /**
+   * Get the cpu temp.
+   *
+   * @return the cpu temp.
+   */
+  public static double getCPUTemp() {
+    return RoboRioDataJNI.getCPUTemp();
+  }
+
+  /**
+   * Set the cpu temp.
+   *
+   * @param cpuTemp the new cpu temp.
+   */
+  public static void setCPUTemp(double cpuTemp) {
+    RoboRioDataJNI.setCPUTemp(cpuTemp);
+  }
+
+  /**
+   * Register a callback to be run whenever the team number changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerTeamNumberCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid = RoboRioDataJNI.registerTeamNumberCallback(callback, initialNotify);
+    return new CallbackStore(uid, RoboRioDataJNI::cancelTeamNumberCallback);
+  }
+
+  /**
+   * Get the team number.
+   *
+   * @return the team number.
+   */
+  public static int getTeamNumber() {
+    return RoboRioDataJNI.getTeamNumber();
+  }
+
+  /**
+   * Set the team number.
+   *
+   * @param teamNumber the new team number.
+   */
+  public static void setTeamNumber(int teamNumber) {
+    RoboRioDataJNI.setTeamNumber(teamNumber);
+  }
+
+  /**
    * Get the serial number.
    *
    * @return The serial number.
@@ -559,6 +625,38 @@ public final class RoboRioSim {
    */
   public static void setComments(String comments) {
     RoboRioDataJNI.setComments(comments);
+  }
+
+  /**
+   * Register a callback to be run whenever the Radio led state changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerRadioLEDStateCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid = RoboRioDataJNI.registerRadioLEDStateCallback(callback, initialNotify);
+    return new CallbackStore(uid, RoboRioDataJNI::cancelRadioLEDStateCallback);
+  }
+
+  /**
+   * Get the state of the radio led.
+   *
+   * @return The state of the radio led.
+   */
+  public static RadioLEDState getRadioLEDState() {
+    return RadioLEDState.fromValue(RoboRioDataJNI.getRadioLEDState());
+  }
+
+  /**
+   * Set the state of the radio led.
+   *
+   * @param state The state of the radio led.
+   */
+  public static void setRadioLEDState(RobotController.RadioLEDState state) {
+    RoboRioDataJNI.setRadioLEDState(state.value);
   }
 
   /** Reset all simulation data. */

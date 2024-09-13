@@ -22,6 +22,9 @@ public class MatchInfoData {
   /** Stores the match type. */
   public int matchType;
 
+  /** Default constructor. */
+  public MatchInfoData() {}
+
   /**
    * Called from JNI to set the structure data.
    *

@@ -18,7 +18,10 @@ def clone_repo(url, treeish, shallow=True):
     root -- root directory of the cloned Git repository
     """
     cwd = os.getcwd()
-    os.chdir(tempfile.gettempdir())
+    if url.startswith("file://"):
+        os.chdir(os.path.dirname(url[7:]))
+    else:
+        os.chdir(tempfile.gettempdir())
 
     repo = os.path.basename(url)
     dest = os.path.join(os.getcwd(), repo)

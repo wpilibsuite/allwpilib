@@ -33,6 +33,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
    *
    * @param digitalSource The DigitalSource to use.
    */
+  @SuppressWarnings("this-escape")
   public DutyCycle(DigitalSource digitalSource) {
     m_handle =
         DutyCycleJNI.initialize(
@@ -102,6 +103,11 @@ public class DutyCycle implements Sendable, AutoCloseable {
     return DutyCycleJNI.getFPGAIndex(m_handle);
   }
 
+  /**
+   * Get the channel of the source.
+   *
+   * @return the source channel
+   */
   public int getSourceChannel() {
     return m_source.getChannel();
   }

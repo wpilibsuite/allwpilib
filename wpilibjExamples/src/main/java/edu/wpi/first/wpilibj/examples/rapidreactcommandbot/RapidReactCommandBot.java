@@ -11,9 +11,10 @@ import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.OIConstants
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Drive;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Intake;
+import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Pneumatics;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Shooter;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Storage;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -29,6 +30,7 @@ public class RapidReactCommandBot {
   private final Intake m_intake = new Intake();
   private final Storage m_storage = new Storage();
   private final Shooter m_shooter = new Shooter();
+  private final Pneumatics m_pneumatics = new Pneumatics();
 
   // The driver's controller
   CommandXboxController m_driverController =
@@ -44,11 +46,12 @@ public class RapidReactCommandBot {
    */
   public void configureBindings() {
     // Automatically run the storage motor whenever the ball storage is not full,
-    // and turn it off whenever it fills.
-    new Trigger(m_storage::isFull).whileFalse(m_storage.runCommand());
+    // and turn it off whenever it fills. Uses subsystem-hosted trigger to
+    // improve readability and make inter-subsystem communication easier.
+    m_storage.hasCargo.whileFalse(m_storage.runCommand());
 
     // Automatically disable and retract the intake whenever the ball storage is full.
-    new Trigger(m_storage::isFull).onTrue(m_intake.retractCommand());
+    m_storage.hasCargo.onTrue(m_intake.retractCommand());
 
     // Control the drive with split-stick arcade controls
     m_drive.setDefaultCommand(
@@ -69,6 +72,9 @@ public class RapidReactCommandBot {
                     m_storage.runCommand())
                 // Since we composed this inline we should give it a name
                 .withName("Shoot"));
+
+    // Toggle compressor with the Start button
+    m_driverController.start().toggleOnTrue(m_pneumatics.disableCompressorCommand());
   }
 
   /**
@@ -76,7 +82,7 @@ public class RapidReactCommandBot {
    *
    * <p>Scheduled during {@link Robot#autonomousInit()}.
    */
-  public CommandBase getAutonomousCommand() {
+  public Command getAutonomousCommand() {
     // Drive forward for 2 meters at half speed with a 3 second timeout
     return m_drive
         .driveDistanceCommand(AutoConstants.kDriveDistanceMeters, AutoConstants.kDriveSpeed)

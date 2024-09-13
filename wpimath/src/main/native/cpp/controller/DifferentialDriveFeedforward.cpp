@@ -4,7 +4,8 @@
 
 #include "frc/controller/DifferentialDriveFeedforward.h"
 
-#include "frc/EigenCore.h"
+#include <Eigen/Core>
+
 #include "frc/controller/LinearPlantInversionFeedforward.h"
 #include "frc/system/plant/LinearSystemId.h"
 
@@ -30,8 +31,8 @@ DifferentialDriveWheelVoltages DifferentialDriveFeedforward::Calculate(
     units::meters_per_second_t nextRightVelocity, units::second_t dt) {
   frc::LinearPlantInversionFeedforward<2, 2> feedforward{m_plant, dt};
 
-  frc::Vectord<2> r{currentLeftVelocity, currentRightVelocity};
-  frc::Vectord<2> nextR{nextLeftVelocity, nextRightVelocity};
+  Eigen::Vector2d r{currentLeftVelocity, currentRightVelocity};
+  Eigen::Vector2d nextR{nextLeftVelocity, nextRightVelocity};
   auto u = feedforward.Calculate(r, nextR);
   return {units::volt_t{u(0)}, units::volt_t{u(1)}};
 }

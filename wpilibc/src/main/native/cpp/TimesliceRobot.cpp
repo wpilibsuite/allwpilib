@@ -5,7 +5,6 @@
 #include "frc/TimesliceRobot.h"
 
 #include "frc/Errors.h"
-#include "frc/fmt/Units.h"
 
 using namespace frc;
 

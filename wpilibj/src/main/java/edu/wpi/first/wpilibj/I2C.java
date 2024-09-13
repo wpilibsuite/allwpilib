@@ -23,10 +23,14 @@ import java.nio.ByteBuffer;
  * WPILib Known Issues</a> page for details.
  */
 public class I2C implements AutoCloseable {
+  /** I2C connection ports. */
   public enum Port {
+    /** Onboard I2C port. */
     kOnboard(0),
+    /** MXP (roboRIO MXP) I2C port. */
     kMXP(1);
 
+    /** Port value. */
     public final int value;
 
     Port(int value) {
@@ -58,10 +62,20 @@ public class I2C implements AutoCloseable {
     HAL.report(tResourceType.kResourceType_I2C, deviceAddress);
   }
 
+  /**
+   * Returns I2C port.
+   *
+   * @return I2C port.
+   */
   public int getPort() {
     return m_port;
   }
 
+  /**
+   * Returns I2C device address.
+   *
+   * @return I2C device address.
+   */
   public int getDeviceAddress() {
     return m_deviceAddress;
   }
@@ -369,7 +383,7 @@ public class I2C implements AutoCloseable {
 
     byte[] deviceData = new byte[4];
     for (int i = 0; i < count; i += 4) {
-      int toRead = count - i < 4 ? count - i : 4;
+      int toRead = Math.min(count - i, 4);
       // Read the chunk of data. Return false if the sensor does not
       // respond.
       dataToSend[0] = (byte) (registerAddress + i);

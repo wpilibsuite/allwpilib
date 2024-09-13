@@ -4,20 +4,12 @@
 
 #include "TestPrinters.h"
 
-#include <wpi/json.h>
-
 #include "Handle.h"
 #include "PubSubOptions.h"
 #include "net/Message.h"
 #include "net3/Message3.h"
 #include "networktables/NetworkTableValue.h"
 #include "ntcore_cpp.h"
-
-namespace wpi {
-void PrintTo(const json& val, ::std::ostream* os) {
-  *os << val.dump();
-}
-}  // namespace wpi
 
 namespace nt {
 

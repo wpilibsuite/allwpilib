@@ -4,27 +4,36 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <utility>
 
 #include <frc/simulation/DriverStationSim.h>
+#include <gtest/gtest.h>
 
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
-#include "frc2/command/SetUtilities.h"
+#include "frc2/command/Requirements.h"
 #include "frc2/command/SubsystemBase.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "make_vector.h"
 
 namespace frc2 {
 
-class TestSubsystem : public SubsystemBase {};
+class TestSubsystem : public SubsystemBase {
+ public:
+  explicit TestSubsystem(std::function<void()> periodic = [] {})
+      : m_periodic{periodic} {}
+  void Periodic() override { m_periodic(); }
+
+ private:
+  std::function<void()> m_periodic;
+};
 
 /**
  * NOTE: Moving mock objects causes EXPECT_CALL to not work correctly!
  */
-class MockCommand : public CommandHelper<CommandBase, MockCommand> {
+class MockCommand : public CommandHelper<Command, MockCommand> {
  public:
   MOCK_CONST_METHOD0(GetRequirements, wpi::SmallSet<Subsystem*, 4>());
   MOCK_METHOD0(IsFinished, bool());
@@ -42,8 +51,8 @@ class MockCommand : public CommandHelper<CommandBase, MockCommand> {
         .WillRepeatedly(::testing::Return(true));
   }
 
-  MockCommand(std::initializer_list<Subsystem*> requirements,
-              bool finished = false, bool runWhenDisabled = true) {
+  explicit MockCommand(Requirements requirements, bool finished = false,
+                       bool runWhenDisabled = true) {
     m_requirements.insert(requirements.begin(), requirements.end());
     EXPECT_CALL(*this, GetRequirements())
         .WillRepeatedly(::testing::Return(m_requirements));
@@ -83,12 +92,10 @@ class CommandTestBase : public ::testing::Test {
  public:
   CommandTestBase();
 
+  ~CommandTestBase() override;
+
  protected:
   CommandScheduler GetScheduler();
-
-  void SetUp() override;
-
-  void TearDown() override;
 
   void SetDSEnabled(bool enabled);
 };
@@ -101,19 +108,23 @@ class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
     scheduler.CancelAll();
     scheduler.Enable();
     scheduler.GetActiveButtonLoop()->Clear();
+    scheduler.UnregisterAllSubsystems();
+
+    SetDSEnabled(true);
+  }
+
+  ~CommandTestBaseWithParam() override {
+    CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
+    CommandScheduler::GetInstance().UnregisterAllSubsystems();
   }
 
  protected:
   CommandScheduler GetScheduler() { return CommandScheduler(); }
 
-  void SetUp() override { frc::sim::DriverStationSim::SetEnabled(true); }
-
-  void TearDown() override {
-    CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
-  }
-
   void SetDSEnabled(bool enabled) {
+    frc::sim::DriverStationSim::SetDsAttached(true);
     frc::sim::DriverStationSim::SetEnabled(enabled);
+    frc::sim::DriverStationSim::NotifyNewData();
   }
 };
 

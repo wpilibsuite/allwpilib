@@ -45,7 +45,7 @@ int32_t HAL_GetNumAnalogInputs(void);
 int32_t HAL_GetNumAnalogOutputs(void);
 
 /**
- * Gets the number of analog counters in the current system.
+ * Gets the number of counters in the current system.
  *
  * @return the number of counters
  */

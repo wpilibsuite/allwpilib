@@ -223,10 +223,9 @@ void TrajectoryParameterizer::EnforceAccelerationLimits(
 
     if (minMaxAccel.minAcceleration > minMaxAccel.maxAcceleration) {
       throw std::runtime_error(
-          "The constraint's min acceleration was greater than its max "
-          "acceleration. To debug this, remove all constraints from the config "
-          "and add each one individually. If the offending constraint was "
-          "packaged with WPILib, please file a bug report.");
+          "There was an infeasible trajectory constraint. To determine which "
+          "one, remove all constraints from the TrajectoryConfig and add them "
+          "back one-by-one.");
     }
 
     state->minAcceleration = units::math::max(

@@ -93,12 +93,15 @@ class MotorSafety {
    */
   static void CheckMotors();
 
+  /**
+   * Called to stop the motor when the timeout expires.
+   */
   virtual void StopMotor() = 0;
 
   /**
-   * The return value from this method is printed out when an error occurs
+   * Returns a description to print when an error occurs.
    *
-   * This method must not throw!
+   * @return Description to print when an error occurs.
    */
   virtual std::string GetDescription() const = 0;
 

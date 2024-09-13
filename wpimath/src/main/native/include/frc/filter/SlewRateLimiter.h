@@ -47,7 +47,7 @@ class SlewRateLimiter {
         m_negativeRateLimit{negativeRateLimit},
         m_prevVal{initialValue},
         m_prevTime{
-            units::microsecond_t(wpi::math::MathSharedStore::GetTimestamp())} {}
+            units::microsecond_t{wpi::math::MathSharedStore::GetTimestamp()}} {}
 
   /**
    * Creates a new SlewRateLimiter with the given positive rate limit and
@@ -57,19 +57,6 @@ class SlewRateLimiter {
    */
   explicit SlewRateLimiter(Rate_t rateLimit)
       : SlewRateLimiter(rateLimit, -rateLimit) {}
-
-  /**
-   * Creates a new SlewRateLimiter with the given positive rate limit and
-   * negative rate limit of -rateLimit and initial value.
-   *
-   * @param rateLimit The rate-of-change limit.
-   * @param initialValue The initial value of the input.
-   */
-  WPI_DEPRECATED(
-      "Use SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit, "
-      "Unit_t initalValue) instead")
-  SlewRateLimiter(Rate_t rateLimit, Unit_t initialValue)
-      : SlewRateLimiter(rateLimit, -rateLimit, initialValue) {}
 
   /**
    * Filters the input to limit its slew rate.
@@ -87,6 +74,13 @@ class SlewRateLimiter {
     m_prevTime = currentTime;
     return m_prevVal;
   }
+
+  /**
+   * Returns the value last calculated by the SlewRateLimiter.
+   *
+   * @return The last value.
+   */
+  Unit_t LastValue() const { return m_prevVal; }
 
   /**
    * Resets the slew rate limiter to the specified value; ignores the rate limit

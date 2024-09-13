@@ -18,6 +18,10 @@ namespace frc {
 class Solenoid;
 class DoubleSolenoid;
 class Compressor;
+
+/**
+ * Base class for pneumatics devices.
+ */
 class PneumaticsBase {
  public:
   virtual ~PneumaticsBase() = default;
@@ -117,15 +121,15 @@ class PneumaticsBase {
   /**
    * Sets solenoids on a pneumatics module.
    *
-   * @param mask mask
-   * @param values values
+   * @param mask bitmask to set
+   * @param values solenoid values
    */
   virtual void SetSolenoids(int mask, int values) = 0;
 
   /**
    * Gets a bitmask of solenoid values.
    *
-   * @return values
+   * @return solenoid values
    */
   virtual int GetSolenoids() const = 0;
 
@@ -183,8 +187,16 @@ class PneumaticsBase {
    */
   virtual void UnreserveSolenoids(int mask) = 0;
 
+  /**
+   * Reserve the compressor.
+   *
+   * @return true if successful; false if compressor already reserved
+   */
   virtual bool ReserveCompressor() = 0;
 
+  /**
+   * Unreserve the compressor.
+   */
   virtual void UnreserveCompressor() = 0;
 
   /**
@@ -212,9 +224,29 @@ class PneumaticsBase {
    */
   virtual units::pounds_per_square_inch_t GetPressure(int channel) const = 0;
 
+  /**
+   * Create a solenoid object for the specified channel.
+   *
+   * @param channel solenoid channel
+   * @return Solenoid object
+   */
   virtual Solenoid MakeSolenoid(int channel) = 0;
+
+  /**
+   * Create a double solenoid object for the specified channels.
+   *
+   * @param forwardChannel solenoid channel for forward
+   * @param reverseChannel solenoid channel for reverse
+   * @return DoubleSolenoid object
+   */
   virtual DoubleSolenoid MakeDoubleSolenoid(int forwardChannel,
                                             int reverseChannel) = 0;
+
+  /**
+   * Create a compressor object.
+   *
+   * @return Compressor object
+   */
   virtual Compressor MakeCompressor() = 0;
 
   /**

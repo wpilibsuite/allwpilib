@@ -8,7 +8,8 @@
 
 namespace hal {
 namespace init {
-[[nodiscard]] int InitializeFPGA();
+[[nodiscard]]
+int InitializeFPGA();
 }  // namespace init
 
 using HAL_NiFpga_ReserveIrqContextFunc =

@@ -20,6 +20,39 @@ class Rotation3dTest {
   private static final double kEpsilon = 1E-9;
 
   @Test
+  void testGimbalLockAccuracy() {
+    var rot1 = new Rotation3d(0, 0, Math.PI / 2);
+    var rot2 = new Rotation3d(Math.PI, 0, 0);
+    var rot3 = new Rotation3d(-Math.PI / 2, 0, 0);
+    final var result1 = rot1.plus(rot2).plus(rot3);
+    final var expected1 = new Rotation3d(0, -Math.PI / 2, Math.PI / 2);
+    assertAll(
+        () -> assertEquals(expected1, result1),
+        () -> assertEquals(Math.PI / 2, result1.getX() + result1.getZ(), kEpsilon),
+        () -> assertEquals(-Math.PI / 2, result1.getY(), kEpsilon));
+
+    rot1 = new Rotation3d(0, 0, Math.PI / 2);
+    rot2 = new Rotation3d(-Math.PI, 0, 0);
+    rot3 = new Rotation3d(Math.PI / 2, 0, 0);
+    final var result2 = rot1.plus(rot2).plus(rot3);
+    final var expected2 = new Rotation3d(0, Math.PI / 2, Math.PI / 2);
+    assertAll(
+        () -> assertEquals(expected2, result2),
+        () -> assertEquals(Math.PI / 2, result2.getZ() - result2.getX(), kEpsilon),
+        () -> assertEquals(Math.PI / 2, result2.getY(), kEpsilon));
+
+    rot1 = new Rotation3d(0, 0, Math.PI / 2);
+    rot2 = new Rotation3d(0, Math.PI / 3, 0);
+    rot3 = new Rotation3d(-Math.PI / 2, 0, 0);
+    final var result3 = rot1.plus(rot2).plus(rot3);
+    final var expected3 = new Rotation3d(0, Math.PI / 2, Math.PI / 6);
+    assertAll(
+        () -> assertEquals(expected3, result3),
+        () -> assertEquals(Math.PI / 6, result3.getZ() - result3.getX(), kEpsilon),
+        () -> assertEquals(Math.PI / 2, result3.getY(), kEpsilon));
+  }
+
+  @Test
   void testInitAxisAngleAndRollPitchYaw() {
     final var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
     final var rot1 = new Rotation3d(xAxis, Math.PI / 3);
@@ -60,8 +93,7 @@ class Rotation3dTest {
     assertEquals(expected2, rot2);
 
     // Matrix that isn't orthogonal
-    final var R3 =
-        new MatBuilder<>(Nat.N3(), Nat.N3()).fill(1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+    final var R3 = MatBuilder.fill(Nat.N3(), Nat.N3(), 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
     assertThrows(IllegalArgumentException.class, () -> new Rotation3d(R3));
 
     // Matrix that's orthogonal but not special orthogonal
@@ -330,9 +362,9 @@ class Rotation3dTest {
     rot1 = new Rotation3d(xAxis, Units.degreesToRadians(170));
     rot2 = new Rotation3d(xAxis, Units.degreesToRadians(-160));
     interpolated = rot1.interpolate(rot2, 0.5);
-    assertEquals(Units.degreesToRadians(-175.0), interpolated.getX());
+    assertEquals(Units.degreesToRadians(-175.0), interpolated.getX(), kEpsilon);
     assertEquals(Units.degreesToRadians(0.0), interpolated.getY(), kEpsilon);
-    assertEquals(Units.degreesToRadians(0.0), interpolated.getZ());
+    assertEquals(Units.degreesToRadians(0.0), interpolated.getZ(), kEpsilon);
 
     // 50 + (70 - 50) * 0.5 = 60
     rot1 = new Rotation3d(yAxis, Units.degreesToRadians(50));

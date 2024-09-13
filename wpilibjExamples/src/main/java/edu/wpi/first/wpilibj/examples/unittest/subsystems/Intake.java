@@ -44,7 +44,7 @@ public class Intake implements AutoCloseable {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     m_piston.close();
     m_motor.close();
   }

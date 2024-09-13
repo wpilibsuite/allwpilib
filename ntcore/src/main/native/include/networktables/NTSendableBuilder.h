@@ -15,6 +15,10 @@
 
 namespace nt {
 
+/**
+ * Helper class for building Sendable dashboard representations for
+ * NetworkTables.
+ */
 class NTSendableBuilder : public wpi::SendableBuilder {
  public:
   /**

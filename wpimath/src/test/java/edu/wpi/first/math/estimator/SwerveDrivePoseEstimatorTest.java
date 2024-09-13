@@ -5,6 +5,7 @@
 package edu.wpi.first.math.estimator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -288,7 +289,7 @@ class SwerveDrivePoseEstimatorTest {
           "Estimator converged to one vision measurement: "
               + estimator.getEstimatedPosition().toString()
               + " -> "
-              + measurement.toString();
+              + measurement;
 
       var dx = Math.abs(measurement.getX() - estimator.getEstimatedPosition().getX());
       var dy = Math.abs(measurement.getY() - estimator.getEstimatedPosition().getY());
@@ -297,7 +298,7 @@ class SwerveDrivePoseEstimatorTest {
               measurement.getRotation().getDegrees()
                   - estimator.getEstimatedPosition().getRotation().getDegrees());
 
-      assertEquals(dx > 0.08 || dy > 0.08 || dtheta > 0.08, true, errorLog);
+      assertTrue(dx > 0.08 || dy > 0.08 || dtheta > 0.08, errorLog);
     }
   }
 

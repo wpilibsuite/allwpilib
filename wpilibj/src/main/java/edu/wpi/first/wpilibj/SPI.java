@@ -14,13 +14,20 @@ import java.nio.IntBuffer;
 
 /** Represents an SPI bus port. */
 public class SPI implements AutoCloseable {
+  /** SPI port. */
   public enum Port {
+    /** Onboard SPI bus port CS0. */
     kOnboardCS0(SPIJNI.ONBOARD_CS0_PORT),
+    /** Onboard SPI bus port CS1. */
     kOnboardCS1(SPIJNI.ONBOARD_CS1_PORT),
+    /** Onboard SPI bus port CS2. */
     kOnboardCS2(SPIJNI.ONBOARD_CS2_PORT),
+    /** Onboard SPI bus port CS3. */
     kOnboardCS3(SPIJNI.ONBOARD_CS3_PORT),
+    /** MXP (roboRIO MXP) SPI bus port. */
     kMXP(SPIJNI.MXP_PORT);
 
+    /** SPI port value. */
     public final int value;
 
     Port(int value) {
@@ -28,12 +35,18 @@ public class SPI implements AutoCloseable {
     }
   }
 
+  /** SPI mode. */
   public enum Mode {
+    /** Clock idle low, data sampled on rising edge. */
     kMode0(SPIJNI.SPI_MODE0),
+    /** Clock idle low, data sampled on falling edge. */
     kMode1(SPIJNI.SPI_MODE1),
+    /** Clock idle high, data sampled on falling edge. */
     kMode2(SPIJNI.SPI_MODE2),
+    /** Clock idle high, data sampled on rising edge. */
     kMode3(SPIJNI.SPI_MODE3);
 
+    /** SPI mode value. */
     public final int value;
 
     Mode(int value) {
@@ -60,6 +73,11 @@ public class SPI implements AutoCloseable {
     HAL.report(tResourceType.kResourceType_SPI, port.value + 1);
   }
 
+  /**
+   * Returns the SPI port value.
+   *
+   * @return SPI port value.
+   */
   public int getPort() {
     return m_port;
   }
@@ -81,76 +99,6 @@ public class SPI implements AutoCloseable {
    */
   public final void setClockRate(int hz) {
     SPIJNI.spiSetSpeed(m_port, hz);
-  }
-
-  /**
-   * Configure the order that bits are sent and received on the wire to be the most significant bit
-   * first.
-   *
-   * @deprecated Does not work, will be removed.
-   */
-  @Deprecated(since = "2023", forRemoval = true)
-  public final void setMSBFirst() {
-    DriverStation.reportWarning("setMSBFirst not supported by roboRIO", false);
-  }
-
-  /**
-   * Configure the order that bits are sent and received on the wire to be the least significant bit
-   * first.
-   *
-   * @deprecated Does not work, will be removed.
-   */
-  @Deprecated(since = "2023", forRemoval = true)
-  public final void setLSBFirst() {
-    DriverStation.reportWarning("setLSBFirst not supported by roboRIO", false);
-  }
-
-  /**
-   * Configure the clock output line to be active low. This is sometimes called clock polarity high
-   * or clock idle high.
-   *
-   * @deprecated Use setMode() instead.
-   */
-  @Deprecated(since = "2023", forRemoval = true)
-  public final void setClockActiveLow() {
-    m_mode |= 1;
-    SPIJNI.spiSetMode(m_port, m_mode);
-  }
-
-  /**
-   * Configure the clock output line to be active high. This is sometimes called clock polarity low
-   * or clock idle low.
-   *
-   * @deprecated Use setMode() instead.
-   */
-  @Deprecated(since = "2023", forRemoval = true)
-  public final void setClockActiveHigh() {
-    m_mode &= 1;
-    SPIJNI.spiSetMode(m_port, m_mode);
-  }
-
-  /**
-   * Configure that the data is stable on the leading edge and the data changes on the trailing
-   * edge.
-   *
-   * @deprecated Use setMode() instead.
-   */
-  @Deprecated(since = "2023", forRemoval = true)
-  public final void setSampleDataOnLeadingEdge() {
-    m_mode &= 2;
-    SPIJNI.spiSetMode(m_port, m_mode);
-  }
-
-  /**
-   * Configure that the data is stable on the trailing edge and the data changes on the leading
-   * edge.
-   *
-   * @deprecated Use setMode() instead.
-   */
-  @Deprecated(since = "2023", forRemoval = true)
-  public final void setSampleDataOnTrailingEdge() {
-    m_mode |= 2;
-    SPIJNI.spiSetMode(m_port, m_mode);
   }
 
   /**

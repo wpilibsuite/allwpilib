@@ -4,10 +4,10 @@
 
 #include "frc/simulation/ADXRS450_GyroSim.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 
 #include "frc/ADXRS450_Gyro.h"
-#include "gtest/gtest.h"
 
 namespace frc::sim {
 

@@ -22,7 +22,15 @@ namespace frc {
  */
 class I2C {
  public:
-  enum Port { kOnboard = 0, kMXP };
+  /**
+   * I2C connection ports.
+   */
+  enum Port {
+    /// Onboard I2C port.
+    kOnboard = 0,
+    /// MXP (roboRIO MXP) I2C port.
+    kMXP
+  };
 
   /**
    * Constructor.
@@ -37,7 +45,18 @@ class I2C {
   I2C(I2C&&) = default;
   I2C& operator=(I2C&&) = default;
 
+  /**
+   * Returns I2C port.
+   *
+   * @return I2C port.
+   */
   Port GetPort() const;
+
+  /**
+   * Returns I2C device address.
+   *
+   * @return I2C device address.
+   */
   int GetDeviceAddress() const;
 
   /**

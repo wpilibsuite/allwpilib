@@ -25,7 +25,6 @@ public class Autonomous extends SequentialCommandGroup {
         new SetDistanceToBox(AutoConstants.kDistToBox2, drive),
         // new DriveStraight(-2), // Use Encoders if ultrasonic is broken
         Commands.parallel(
-            new SetWristSetpoint(AutoConstants.kWristSetpoint, wrist),
-            new CloseClaw(claw)));   
+            new SetWristSetpoint(AutoConstants.kWristSetpoint, wrist), new CloseClaw(claw)));
   }
 }

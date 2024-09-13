@@ -11,7 +11,7 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 
-#include "Button.h"
+#include "Trigger.h"
 
 namespace frc2 {
 /**
@@ -19,7 +19,7 @@ namespace frc2 {
  *
  * This class is provided by the NewCommands VendorDep
  */
-class NetworkButton : public Button {
+class NetworkButton : public Trigger {
  public:
   /**
    * Creates a NetworkButton that commands can be bound to.

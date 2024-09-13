@@ -6,7 +6,7 @@
 
 #include <optional>
 
-#include <wpi/json_serializer.h>
+#include <wpi/json.h>
 #include <wpi/mpack.h>
 #include <wpi/raw_ostream.h>
 
