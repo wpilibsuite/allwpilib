@@ -86,31 +86,27 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @param angularPositionRad The new position in radians.
    * @param angularVelocityRadPerSec The new velocity in radians per second.
-   * @return this simulated DC motor with applied state.
    */
-  public DCMotorSim setState(double angularPositionRad, double angularVelocityRadPerSec) {
+  public void setState(double angularPositionRad, double angularVelocityRadPerSec) {
     setState(VecBuilder.fill(angularPositionRad, angularVelocityRadPerSec));
-    return this;
   }
 
   /**
    * Sets the DC motor's angular position.
    *
    * @param angularPositionRad The new position in radians.
-   * @return this simulated DC motor with applied position.
    */
-  public DCMotorSim setAngle(double angularPositionRad) {
-    return setState(angularPositionRad, getAngularVelocityRadPerSec());
+  public void setAngle(double angularPositionRad) {
+    setState(angularPositionRad, getAngularVelocityRadPerSec());
   }
 
   /**
    * Sets the DC motor's angular velocity.
    *
    * @param angularVelocityRadPerSec The new velocity in radians per second.
-   * @return this simulated DC motor with applied position.
    */
-  public DCMotorSim setAngularVelocity(double angularVelocityRadPerSec) {
-    return setState(getAngularPositionRad(), angularVelocityRadPerSec);
+  public void setAngularVelocity(double angularVelocityRadPerSec) {
+    setState(getAngularPositionRad(), angularVelocityRadPerSec);
   }
 
   /**

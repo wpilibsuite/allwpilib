@@ -76,11 +76,9 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * Sets the flywheel's angular velocity.
    *
    * @param velocityRadPerSec The new velocity in radians per second.
-   * @return this simulated flywheel with applied state.
    */
-  public FlywheelSim setAngularVelocity(double velocityRadPerSec) {
+  public void setAngularVelocity(double velocityRadPerSec) {
     setState(VecBuilder.fill(velocityRadPerSec));
-    return this;
   }
 
   /**
