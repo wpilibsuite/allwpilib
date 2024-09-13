@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <google/protobuf/arena.h>
-#include <google/protobuf/message.h>
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/system/LinearSystem.h"
