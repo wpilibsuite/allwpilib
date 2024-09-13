@@ -173,7 +173,7 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    * @param setpoint The velocity setpoint.
    * @return The computed feedforward.
    */
-  public Voltage calculate(LinearVelocity setpoint) {
+  public Voltage calculate(LinearVelocity currentVelocity) {
     return calculate(setpoint, setpoint);
   }
 
