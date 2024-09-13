@@ -130,12 +130,12 @@ class ElevatorFeedforward {
    * Calculates the feedforward from the gains and setpoint assuming discrete
    * control. Use this method when the setpoint does not change.
    *
-   * @param setpoint The velocity setpoint, in distance per
+   * @param currentVelocity The velocity setpoint, in distance per
    *                        second.
    * @return The computed feedforward, in volts.
    */
   constexpr units::volt_t Calculate(units::unit_t<Velocity> currentVelocity) const {
-    return Calculate(setpoint, setpoint);
+    return Calculate(currentVelocity, currentVelocity);
   }
 
   /**
