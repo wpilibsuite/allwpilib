@@ -154,7 +154,7 @@ class SimpleMotorFeedforward {
       // Simplify A_d.
       //
       //   A_d = eᴬᵀ
-      //   A_d = exp(−∞)
+      //   A_d = std::exp(−∞)
       //   A_d = 0
       //
       // Simplify B_d.
