@@ -60,7 +60,7 @@ public class SolenoidSim {
    * @return true if the solenoid is on.
    */
   public boolean isOn() {
-    return get();
+    return m_module.getSolenoidOutput(m_channel);
   }
 
   /**
@@ -69,7 +69,7 @@ public class SolenoidSim {
    * @return true if the solenoid off.
    */
   public boolean isOff() {
-    return !get();
+    return !m_module.getSolenoidOutput(m_channel);
   }
 
   /** Turns the solenoid on. */
