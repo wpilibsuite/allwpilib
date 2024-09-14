@@ -38,14 +38,14 @@ class SolenoidSim {
   virtual bool IsOff() const;
 
   /**
-   * Turns the solenoid on.  
+   * Turns the solenoid on.
    */
   virtual void On();
-  
+
   /**
-   * Turns the solenoid off.  
+   * Turns the solenoid off.
    */
-  virtual void Off();  
+  virtual void Off();
 
   /**
    * Register a callback to be run when the output of this solenoid has changed.

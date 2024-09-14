@@ -78,12 +78,12 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
   virtual bool IsOff() const;
 
   /**
-   * Turns the solenoid on.  
+   * Turns the solenoid on.
    */
   virtual void On();
-  
+
   /**
-   * Turns the solenoid off.  
+   * Turns the solenoid off.
    */
   virtual void Off();
 

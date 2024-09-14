@@ -5,9 +5,9 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticsBase;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 /** Class to control a simulated {@link edu.wpi.first.wpilibj.DoubleSolenoid}. */
 public class DoubleSolenoidSim {
@@ -70,7 +70,7 @@ public class DoubleSolenoidSim {
 
   /**
    * Returns true if the double solenoid is in a forward state.
-   * 
+   *
    * @return true if the double solenoid is in a forward state.
    */
   public boolean isForward() {
@@ -79,7 +79,7 @@ public class DoubleSolenoidSim {
 
   /**
    * Returns true if the double solenoid is in a reverse state.
-   * 
+   *
    * @return true if the double solenoid is in a reverse state.
    */
   public boolean isReverse() {
@@ -88,33 +88,27 @@ public class DoubleSolenoidSim {
 
   /**
    * Returns true if the double solenoid is in an off state.
-   * 
+   *
    * @return true if the double solenoid in in an off state.
    */
   public boolean isOff() {
     return get() == Value.kOff;
   }
 
-  /**
-   * Sets the double solenoid to a forward state.
-   */
+  /** Sets the double solenoid to a forward state. */
   public void forward() {
     set(Value.kForward);
   }
 
-  /**
-   * Sets the double solenoid to a reverse state.
-   */
+  /** Sets the double solenoid to a reverse state. */
   public void reverse() {
     set(Value.kReverse);
   }
 
-  /**
-   * Sets the double solenoid to a off state.
-   */
+  /** Sets the double solenoid to a off state. */
   public void off() {
     set(Value.kOff);
-  }  
+  }
 
   /**
    * Set the value of the double solenoid output.

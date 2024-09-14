@@ -56,33 +56,31 @@ public class SolenoidSim {
 
   /**
    * Returns true if the solenoid is on.
-   * @return true if the solenoid is on.  
+   *
+   * @return true if the solenoid is on.
    */
-  public boolean isOn(){
+  public boolean isOn() {
     return getOutput() == true;
   }
 
   /**
    * Returns true if the solenoid is off.
+   *
    * @return true if the solenoid off.
    */
-  public boolean isOff(){
+  public boolean isOff() {
     return getOutput() == false;
-  }  
+  }
 
-  /**
-   * Turns the solenoid on.
-   */
-  public void on(){
+  /** Turns the solenoid on. */
+  public void on() {
     setOutput(true);
   }
 
-  /**
-   * Turns the solenoid off
-   */
-  public void off(){
+  /** Turns the solenoid off */
+  public void off() {
     setOutput(false);
-  }  
+  }
 
   /**
    * Change the solenoid output.

@@ -12,13 +12,10 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
- * DoubleSolenoid class for running 2 channels of high voltage Digital Output on
- * the pneumatics
+ * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the pneumatics
  * module.
  *
- * <p>
- * The DoubleSolenoid class is typically used for pneumatics solenoids that have
- * two positions
+ * <p>The DoubleSolenoid class is typically used for pneumatics solenoids that have two positions
  * controlled by two separate channels.
  */
 public class DoubleSolenoid implements Sendable, AutoCloseable {
@@ -42,7 +39,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   /**
    * Constructs a double solenoid for a default module of a specific module type.
    *
-   * @param moduleType     The module type to use.
+   * @param moduleType The module type to use.
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
@@ -52,15 +49,14 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Constructs a double solenoid for a specified module of a specific module
-   * type.
+   * Constructs a double solenoid for a specified module of a specific module type.
    *
-   * @param module         The module of the solenoid module to use.
-   * @param moduleType     The module type to use.
+   * @param module The module of the solenoid module to use.
+   * @param moduleType The module type to use.
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
-  @SuppressWarnings({ "PMD.UseTryWithResources", "this-escape" })
+  @SuppressWarnings({"PMD.UseTryWithResources", "this-escape"})
   public DoubleSolenoid(
       final int module,
       final PneumaticsModuleType moduleType,
@@ -129,11 +125,12 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    * @param value The value to set (Off, Forward, Reverse)
    */
   public void set(final Value value) {
-    int setValue = switch (value) {
-      case kOff -> 0;
-      case kForward -> m_forwardMask;
-      case kReverse -> m_reverseMask;
-    };
+    int setValue =
+        switch (value) {
+          case kOff -> 0;
+          case kForward -> m_forwardMask;
+          case kReverse -> m_reverseMask;
+        };
 
     m_module.setSolenoids(m_mask, setValue);
   }
@@ -157,7 +154,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
 
   /**
    * Returns true if the double solenoid is in a forward state.
-   * 
+   *
    * @return true if the double solenoid is in a forward state.
    */
   public boolean isForward() {
@@ -166,7 +163,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
 
   /**
    * Returns true if the double solenoid is in a reverse state.
-   * 
+   *
    * @return true if the double solenoid is in a reverse state.
    */
   public boolean isReverse() {
@@ -175,30 +172,24 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
 
   /**
    * Returns true if the double solenoid is in an off state.
-   * 
+   *
    * @return true if the double solenoid in in an off state.
    */
   public boolean isOff() {
     return get() == Value.kOff;
   }
 
-  /**
-   * Sets the double solenoid to a forward state.
-   */
+  /** Sets the double solenoid to a forward state. */
   public void forward() {
     set(Value.kForward);
   }
 
-  /**
-   * Sets the double solenoid to a reverse state.
-   */
+  /** Sets the double solenoid to a reverse state. */
   public void reverse() {
     set(Value.kReverse);
   }
 
-  /**
-   * Sets the double solenoid to a off state.
-   */
+  /** Sets the double solenoid to a off state. */
   public void off() {
     set(Value.kOff);
   }
@@ -206,11 +197,8 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   /**
    * Toggle the value of the solenoid.
    *
-   * <p>
-   * If the solenoid is set to forward, it'll be set to reverse. If the solenoid
-   * is set to
-   * reverse, it'll be set to forward. If the solenoid is set to off, nothing
-   * happens.
+   * <p>If the solenoid is set to forward, it'll be set to reverse. If the solenoid is set to
+   * reverse, it'll be set to forward. If the solenoid is set to off, nothing happens.
    */
   public void toggle() {
     Value value = get();
@@ -241,8 +229,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Check if the forward solenoid is Disabled. If a solenoid is shorted, it is
-   * added to the
+   * Check if the forward solenoid is Disabled. If a solenoid is shorted, it is added to the
    * DisabledList and disabled until power cycle, or until faults are cleared.
    *
    * @return If solenoid is disabled due to short.
@@ -252,8 +239,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Check if the reverse solenoid is Disabled. If a solenoid is shorted, it is
-   * added to the
+   * Check if the reverse solenoid is Disabled. If a solenoid is shorted, it is added to the
    * DisabledList and disabled until power cycle, or until faults are cleared.
    *
    * @return If solenoid is disabled due to short.
