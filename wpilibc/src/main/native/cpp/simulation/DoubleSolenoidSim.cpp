@@ -43,6 +43,30 @@ void DoubleSolenoidSim::Set(DoubleSolenoid::Value output) {
   m_module->SetSolenoidOutput(m_rev, output == DoubleSolenoid::Value::kReverse);
 }
 
+bool DoubleSolenoid::IsForward() const {
+  return Get() == kForward;
+}
+
+bool DoubleSolenoid::IsReverse() const {
+  return Get() == kReverse;
+}
+
+bool DoubleSolenoid::IsOff() const {
+  return Get() == kOff;
+}
+
+void DoubleSolenoid::Forward() {
+  Set(kForward);
+}
+
+void DoubleSolenoid::Reverse() {
+  Set(kReverse);
+}
+
+void DoubleSolenoid::Off() {
+  Set(kOff);
+}
+
 std::shared_ptr<PneumaticsBaseSim> DoubleSolenoidSim::GetModuleSim() const {
   return m_module;
 }

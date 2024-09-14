@@ -62,6 +62,32 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
   virtual bool Get() const;
 
   /**
+   * Returns true if the solenoid is on.
+   *
+   * @return true if the solenoid is on.
+   *
+   */
+  virtual bool IsOn() const;
+
+  /**
+   * Returns true if the solenoid is off.
+   *
+   * @return true if the solenoid is off.
+   *
+   */
+  virtual bool IsOff() const;
+
+  /**
+   * Turns the solenoid on.  
+   */
+  virtual void On();
+  
+  /**
+   * Turns the solenoid off.  
+   */
+  virtual void Off();
+
+  /**
    * Toggle the value of the solenoid.
    *
    * If the solenoid is set to on, it'll be turned off. If the solenoid is set

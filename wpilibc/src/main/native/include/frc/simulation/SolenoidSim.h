@@ -22,6 +22,32 @@ class SolenoidSim {
   void SetOutput(bool output);
 
   /**
+   * Returns true if the solenoid is on.
+   *
+   * @return true if the solenoid is on.
+   *
+   */
+  virtual bool IsOn() const;
+
+  /**
+   * Returns true if the solenoid is off.
+   *
+   * @return true if the solenoid is off.
+   *
+   */
+  virtual bool IsOff() const;
+
+  /**
+   * Turns the solenoid on.  
+   */
+  virtual void On();
+  
+  /**
+   * Turns the solenoid off.  
+   */
+  virtual void Off();  
+
+  /**
    * Register a callback to be run when the output of this solenoid has changed.
    *
    * @param callback the callback

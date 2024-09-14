@@ -54,6 +54,22 @@ bool Solenoid::Get() const {
   return (currentAll & m_mask) != 0;
 }
 
+bool Solenoid::IsOn() const {
+  return Get() == true;
+}
+
+bool Solenoid::IsOff() const {
+  return Get() == false;
+}
+
+void Solenoid::On() {
+  Set(true);
+}
+
+void Solenoid::Off() {
+  Set(false);
+}
+
 void Solenoid::Toggle() {
   Set(!Get());
 }
