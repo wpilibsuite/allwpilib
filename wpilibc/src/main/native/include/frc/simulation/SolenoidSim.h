@@ -16,7 +16,7 @@ class SolenoidSim {
   SolenoidSim(std::shared_ptr<PneumaticsBaseSim> moduleSim, int channel);
   SolenoidSim(int module, PneumaticsModuleType type, int channel);
   SolenoidSim(PneumaticsModuleType type, int channel);
-  virtual ~SolenoidSim() = default;
+  ~SolenoidSim() = default;
 
   bool GetOutput() const;
   void SetOutput(bool output);
@@ -31,7 +31,7 @@ class SolenoidSim {
    * callback.
    */
   [[nodiscard]]
-  virtual std::unique_ptr<CallbackStore> RegisterOutputCallback(
+  std::unique_ptr<CallbackStore> RegisterOutputCallback(
       NotifyCallback callback, bool initialNotify);
 
   std::shared_ptr<PneumaticsBaseSim> GetModuleSim() const;
