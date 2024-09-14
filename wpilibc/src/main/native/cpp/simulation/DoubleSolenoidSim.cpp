@@ -43,27 +43,27 @@ void DoubleSolenoidSim::Set(DoubleSolenoid::Value output) {
   m_module->SetSolenoidOutput(m_rev, output == DoubleSolenoid::Value::kReverse);
 }
 
-bool DoubleSolenoid::IsForward() {
+bool DoubleSolenoidSim::IsForward() {
   return Get() == kForward;
 }
 
-bool DoubleSolenoid::IsReverse() {
+bool DoubleSolenoidSim::IsReverse() {
   return Get() == kReverse;
 }
 
-bool DoubleSolenoid::IsOff() {
+bool DoubleSolenoidSim::IsOff() {
   return Get() == kOff;
 }
 
-void DoubleSolenoid::SetForward() {
+void DoubleSolenoidSim::SetForward() {
   Set(kForward);
 }
 
-void DoubleSolenoid::SetReverse() {
+void DoubleSolenoidSim::SetReverse() {
   Set(kReverse);
 }
 
-void DoubleSolenoid::SetOff() {
+void DoubleSolenoidSim::SetOff() {
   Set(kOff);
 }
 
