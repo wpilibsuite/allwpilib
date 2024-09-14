@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/simulation/DoubleSolenoidSim.h"
-#include "frc/DoubleSolenoid.h"
 
+#include "frc/DoubleSolenoid.h"
 #include "frc/PneumaticsBase.h"
 
 using namespace frc;
