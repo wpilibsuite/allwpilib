@@ -120,6 +120,10 @@ CommandPtr Command::AsProxy() && {
   return std::move(*this).ToPtr().AsProxy();
 }
 
+CommandPtr Command::Fork() && {
+  return std::move(*this).ToPtr().Fork();
+}
+
 CommandPtr Command::Unless(std::function<bool()> condition) && {
   return std::move(*this).ToPtr().Unless(std::move(condition));
 }
