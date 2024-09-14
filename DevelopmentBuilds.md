@@ -33,8 +33,8 @@ plugins {
 
 wpi.maven.useLocal = false
 wpi.maven.useDevelopment = true
-wpi.versions.wpilibVersion = '2024.+'
-wpi.versions.wpimathVersion = '2024.+'
+wpi.versions.wpilibVersion = '2025.+'
+wpi.versions.wpimathVersion = '2025.+'
 ```
 
 C++
@@ -47,8 +47,8 @@ plugins {
 
 wpi.maven.useLocal = false
 wpi.maven.useDevelopment = true
-wpi.versions.wpilibVersion = '2024.+'
-wpi.versions.wpimathVersion = '2024.+'
+wpi.versions.wpilibVersion = '2025.+'
+wpi.versions.wpimathVersion = '2025.+'
 ```
 
 ### Development Build Documentation
