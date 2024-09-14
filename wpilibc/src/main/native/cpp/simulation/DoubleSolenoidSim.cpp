@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/simulation/DoubleSolenoidSim.h"
+#include "frc/DoubleSolenoid.h"
 
 #include "frc/PneumaticsBase.h"
 
@@ -44,27 +45,27 @@ void DoubleSolenoidSim::Set(DoubleSolenoid::Value output) {
 }
 
 bool DoubleSolenoidSim::IsForward() {
-  return Get() == kForward;
+  return Get() == DoubleSolenoid::Value::kForward;
 }
 
 bool DoubleSolenoidSim::IsReverse() {
-  return Get() == kReverse;
+  return Get() == DoubleSolenoid::Value::kReverse;
 }
 
 bool DoubleSolenoidSim::IsOff() {
-  return Get() == kOff;
+  return Get() == DoubleSolenoid::Value::kOff;
 }
 
 void DoubleSolenoidSim::SetForward() {
-  Set(kForward);
+  Set(DoubleSolenoid::Value::kForward);
 }
 
 void DoubleSolenoidSim::SetReverse() {
-  Set(kReverse);
+  Set(DoubleSolenoid::Value::kReverse);
 }
 
 void DoubleSolenoidSim::SetOff() {
-  Set(kOff);
+  Set(DoubleSolenoid::Value::kOff);
 }
 
 std::shared_ptr<PneumaticsBaseSim> DoubleSolenoidSim::GetModuleSim() const {
