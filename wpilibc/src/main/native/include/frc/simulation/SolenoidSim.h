@@ -31,8 +31,8 @@ class SolenoidSim {
    * callback.
    */
   [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterOutputCallback(
-      NotifyCallback callback, bool initialNotify);
+  std::unique_ptr<CallbackStore> RegisterOutputCallback(NotifyCallback callback,
+                                                        bool initialNotify);
 
   std::shared_ptr<PneumaticsBaseSim> GetModuleSim() const;
 
