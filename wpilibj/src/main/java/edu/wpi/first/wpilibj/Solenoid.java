@@ -89,6 +89,36 @@ public class Solenoid implements Sendable, AutoCloseable {
   }
 
   /**
+   * Returns true if the solenoid is on.
+   * @return true if the solenoid is on.  
+   */
+  public boolean isOn(){
+    return get() == true;
+  }
+
+  /**
+   * Returns true if the solenoid is off.
+   * @return true if the solenoid off.
+   */
+  public boolean isOff(){
+    return get() == false;
+  }
+
+  /**
+   * Turns the solenoid on.
+   */
+  public void on(){
+    set(true);
+  }
+
+  /**
+   * Turns the solenoid off
+   */
+  public void off(){
+    set(false);
+  }
+
+  /**
    * Toggle the value of the solenoid.
    *
    * <p>If the solenoid is set to on, it'll be turned off. If the solenoid is set to off, it'll be
