@@ -70,14 +70,14 @@ class DoubleSolenoid : public wpi::Sendable,
    *
    * @param value The value to set (Off, Forward or Reverse)
    */
-  virtual void Set(Value value);
+  void Set(Value value);
 
   /**
    * Read the current value of the solenoid.
    *
    * @return The current value of the solenoid.
    */
-  virtual Value Get() const;
+  Value Get() const;
 
   /**
    * Toggle the value of the solenoid.
@@ -92,34 +92,34 @@ class DoubleSolenoid : public wpi::Sendable,
    * Returns true if the double solenoid is in a forward state.
    * @return true if the double solenoid is in a forward state.
    */
-  virtual bool IsForward() const;
+  bool IsForward();
 
   /**
    * Returns true if the double solenoid is in a reverse state.
    * @return true if the double solenoid is in a reverse state.
    */
-  virtual bool IsReverse() const;
+  bool IsReverse();
 
   /**
    * Returns true if the double solenoid is in an off state.
    * @return true if the double solenoid is in an off state.
    */
-  virtual bool IsOff() const;
+  bool IsOff();
 
   /**
    * Sets the double solenoid to a forward state
    */
-  virtual void Forward();
+  void SetForward();
 
   /**
    * Sets the double solenoid to a reverse state
    */
-  virtual void Reverse();
+  void SetReverse();
 
   /**
    * Sets the double solenoid to an off state
    */
-  virtual void Off();
+  void SetOff();
 
   /**
    * Get the forward channel.

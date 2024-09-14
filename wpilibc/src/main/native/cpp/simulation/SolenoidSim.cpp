@@ -30,19 +30,19 @@ void SolenoidSim::SetOutput(bool output) {
   m_module->SetSolenoidOutput(m_channel, output);
 }
 
-bool SolenoidSim::IsOn() const {
+bool SolenoidSim::IsOn() {
   return GetOutput() == true;
 }
 
-bool SolenoidSim::IsOff() const {
+bool SolenoidSim::IsOff() {
   return GetOutput() == false;
 }
 
-void SolenoidSim::On() {
+void SolenoidSim::SetOn() {
   SetOutput(true);
 }
 
-void SolenoidSim::Off() {
+void SolenoidSim::SetOff() {
   SetOutput(false);
 }
 

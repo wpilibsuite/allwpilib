@@ -62,11 +62,11 @@ bool Solenoid::IsOff() const {
   return Get() == false;
 }
 
-void Solenoid::On() {
+void Solenoid::SetOn() {
   Set(true);
 }
 
-void Solenoid::Off() {
+void Solenoid::SetOff() {
   Set(false);
 }
 

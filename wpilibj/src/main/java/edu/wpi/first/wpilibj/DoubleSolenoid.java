@@ -180,17 +180,17 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   }
 
   /** Sets the double solenoid to a forward state. */
-  public void forward() {
+  public void setForward() {
     set(Value.kForward);
   }
 
   /** Sets the double solenoid to a reverse state. */
-  public void reverse() {
+  public void setReverse() {
     set(Value.kReverse);
   }
 
   /** Sets the double solenoid to a off state. */
-  public void off() {
+  public void setOff() {
     set(Value.kOff);
   }
 

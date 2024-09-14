@@ -52,14 +52,14 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
    *
    * @param on Turn the solenoid output off or on.
    */
-  virtual void Set(bool on);
+  void Set(bool on);
 
   /**
    * Read the current value of the solenoid.
    *
    * @return The current value of the solenoid.
    */
-  virtual bool Get() const;
+  bool Get() const;
 
   /**
    * Returns true if the solenoid is on.
@@ -67,7 +67,7 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
    * @return true if the solenoid is on.
    *
    */
-  virtual bool IsOn() const;
+  bool IsOn() const;
 
   /**
    * Returns true if the solenoid is off.
@@ -75,17 +75,17 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
    * @return true if the solenoid is off.
    *
    */
-  virtual bool IsOff() const;
+  bool IsOff() const;
 
   /**
    * Turns the solenoid on.
    */
-  virtual void On();
+  void SetOn();
 
   /**
    * Turns the solenoid off.
    */
-  virtual void Off();
+  void SetOff();
 
   /**
    * Toggle the value of the solenoid.

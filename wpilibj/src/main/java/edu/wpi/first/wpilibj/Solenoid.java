@@ -107,12 +107,12 @@ public class Solenoid implements Sendable, AutoCloseable {
   }
 
   /** Turns the solenoid on. */
-  public void on() {
+  public void setOn() {
     set(true);
   }
 
   /** Turns the solenoid off */
-  public void off() {
+  public void setOff() {
     set(false);
   }
 

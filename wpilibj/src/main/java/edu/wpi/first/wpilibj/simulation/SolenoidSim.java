@@ -50,7 +50,7 @@ public class SolenoidSim {
    *
    * @return the solenoid output
    */
-  public boolean getOutput() {
+  public boolean get() {
     return m_module.getSolenoidOutput(m_channel);
   }
 
@@ -60,7 +60,7 @@ public class SolenoidSim {
    * @return true if the solenoid is on.
    */
   public boolean isOn() {
-    return getOutput() == true;
+    return get() == true;
   }
 
   /**
@@ -69,17 +69,17 @@ public class SolenoidSim {
    * @return true if the solenoid off.
    */
   public boolean isOff() {
-    return getOutput() == false;
+    return get() == false;
   }
 
   /** Turns the solenoid on. */
-  public void on() {
-    setOutput(true);
+  public void setOn() {
+    set(true);
   }
 
   /** Turns the solenoid off */
-  public void off() {
-    setOutput(false);
+  public void setOff() {
+    set(false);
   }
 
   /**
@@ -87,7 +87,7 @@ public class SolenoidSim {
    *
    * @param output the new solenoid output
    */
-  public void setOutput(boolean output) {
+  public void set(boolean output) {
     m_module.setSolenoidOutput(m_channel, output);
   }
 
