@@ -7,6 +7,7 @@
 #include "CommandTestBase.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/InstantCommand.h"
+#include "frc2/command/Commands.h"
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
 
@@ -18,7 +19,7 @@ TEST_F(CommandDecoratorTest, WithTimeout) {
 
   frc::sim::PauseTiming();
 
-  auto command = RunCommand([] {}, {}).WithTimeout(100_ms);
+  auto command = cmd::Idle().WithTimeout(100_ms);
 
   scheduler.Schedule(command);
   scheduler.Run();
@@ -39,7 +40,7 @@ TEST_F(CommandDecoratorTest, Until) {
 
   bool finish = false;
 
-  auto command = RunCommand([] {}, {}).Until([&finish] { return finish; });
+  auto command = cmd::Idle().Until([&finish] { return finish; });
 
   scheduler.Schedule(command);
   scheduler.Run();
@@ -82,7 +83,7 @@ TEST_F(CommandDecoratorTest, OnlyWhile) {
 
   bool run = true;
 
-  auto command = RunCommand([] {}, {}).OnlyWhile([&run] { return run; });
+  auto command = cmd::Idle().OnlyWhile([&run] { return run; });
 
   scheduler.Schedule(command);
   scheduler.Run();
@@ -123,7 +124,7 @@ TEST_F(CommandDecoratorTest, OnlyWhileOrder) {
 TEST_F(CommandDecoratorTest, IgnoringDisable) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto command = RunCommand([] {}, {}).IgnoringDisable(true);
+  auto command = cmd::Idle().IgnoringDisable(true);
 
   SetDSEnabled(false);
 
@@ -138,7 +139,7 @@ TEST_F(CommandDecoratorTest, BeforeStarting) {
 
   bool finished = false;
 
-  auto command = InstantCommand([] {}, {}).BeforeStarting(
+  auto command = cmd::None().BeforeStarting(
       [&finished] { finished = true; });
 
   scheduler.Schedule(command);
@@ -160,7 +161,7 @@ TEST_F(CommandDecoratorTest, AndThenLambda) {
   bool finished = false;
 
   auto command =
-      InstantCommand([] {}, {}).AndThen([&finished] { finished = true; });
+      cmd::None().AndThen([&finished] { finished = true; });
 
   scheduler.Schedule(command);
 
