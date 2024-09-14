@@ -402,8 +402,7 @@ class SchedulingRecursionTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
       Subsystem requirement = new SubsystemBase() {};
-      Command other =
-          requirement.runOnce(() -> {}).withInterruptBehavior(interruptionBehavior);
+      Command other = requirement.runOnce(() -> {}).withInterruptBehavior(interruptionBehavior);
       FunctionalCommand defaultCommand =
           new FunctionalCommand(
               () -> {

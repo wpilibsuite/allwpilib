@@ -18,17 +18,14 @@ public abstract class SingleCompositionTestBase<T extends Command> extends Comma
   @EnumSource(Command.InterruptionBehavior.class)
   @ParameterizedTest
   void interruptible(Command.InterruptionBehavior interruptionBehavior) {
-    var command =
-        composeSingle(
-            Commands.idle().withInterruptBehavior(interruptionBehavior));
+    var command = composeSingle(Commands.idle().withInterruptBehavior(interruptionBehavior));
     assertEquals(interruptionBehavior, command.getInterruptionBehavior());
   }
 
   @ValueSource(booleans = {true, false})
   @ParameterizedTest
   void runWhenDisabled(boolean runsWhenDisabled) {
-    var command =
-        composeSingle(Commands.idle().ignoringDisable(runsWhenDisabled));
+    var command = composeSingle(Commands.idle().ignoringDisable(runsWhenDisabled));
     assertEquals(runsWhenDisabled, command.runsWhenDisabled());
   }
 
