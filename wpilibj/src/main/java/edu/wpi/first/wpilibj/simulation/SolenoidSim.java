@@ -77,7 +77,7 @@ public class SolenoidSim {
     set(true);
   }
 
-  /** Turns the solenoid off */
+  /** Turns the solenoid off. */
   public void setOff() {
     set(false);
   }
