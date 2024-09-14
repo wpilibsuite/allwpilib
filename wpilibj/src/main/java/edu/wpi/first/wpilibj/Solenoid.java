@@ -94,7 +94,7 @@ public class Solenoid implements Sendable, AutoCloseable {
    * @return true if the solenoid is on.
    */
   public boolean isOn() {
-    return get() == true;
+    return get();
   }
 
   /**
@@ -103,7 +103,7 @@ public class Solenoid implements Sendable, AutoCloseable {
    * @return true if the solenoid off.
    */
   public boolean isOff() {
-    return get() == false;
+    return !get();
   }
 
   /** Turns the solenoid on. */
@@ -111,7 +111,7 @@ public class Solenoid implements Sendable, AutoCloseable {
     set(true);
   }
 
-  /** Turns the solenoid off */
+  /** Turns the solenoid off. */
   public void setOff() {
     set(false);
   }

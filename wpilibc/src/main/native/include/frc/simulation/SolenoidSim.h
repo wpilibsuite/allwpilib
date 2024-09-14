@@ -18,8 +18,8 @@ class SolenoidSim {
   SolenoidSim(PneumaticsModuleType type, int channel);
   virtual ~SolenoidSim() = default;
 
-  bool GetOutput() const;
-  void SetOutput(bool output);
+  bool Get() const;
+  void Set(bool output);
 
   /**
    * Returns true if the solenoid is on.

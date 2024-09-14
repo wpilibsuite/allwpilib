@@ -60,7 +60,7 @@ public class SolenoidSim {
    * @return true if the solenoid is on.
    */
   public boolean isOn() {
-    return get() == true;
+    return get();
   }
 
   /**
@@ -69,7 +69,7 @@ public class SolenoidSim {
    * @return true if the solenoid off.
    */
   public boolean isOff() {
-    return get() == false;
+    return !get();
   }
 
   /** Turns the solenoid on. */

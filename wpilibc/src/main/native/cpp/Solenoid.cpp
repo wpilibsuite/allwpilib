@@ -55,11 +55,11 @@ bool Solenoid::Get() const {
 }
 
 bool Solenoid::IsOn() const {
-  return Get() == true;
+  return Get();
 }
 
 bool Solenoid::IsOff() const {
-  return Get() == false;
+  return !Get();
 }
 
 void Solenoid::SetOn() {
