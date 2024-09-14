@@ -154,7 +154,7 @@ class SimpleMotorFeedforward {
       // Simplify A_d.
       //
       //   A_d = eᴬᵀ
-      //   A_d = std::exp(−∞)
+      //   A_d = exp(−∞)
       //   A_d = 0
       //
       // Simplify B_d.
@@ -172,10 +172,12 @@ class SimpleMotorFeedforward {
       //
       //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₛ sgn(x)
       //   uₖ = (1/kᵥ)⁺(xₖ₊₁ − (0) xₖ) + kₛ sgn(x)
+      //   uₖ = (1/kᵥ)⁺(xₖ₊₁) + kₛ sgn(x)
+      //   uₖ = kᵥxₖ₊₁ + kₛ sgn(x)
       //   uₖ = kₛ sgn(x) + kᵥxₖ₊₁
       return kS * wpi::sgn(nextVelocity) + kV * nextVelocity;
     } else {
-      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
+      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ)
       //
       // where
       //
