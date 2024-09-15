@@ -129,7 +129,7 @@ else()
     find_package(Java REQUIRED COMPONENTS Runtime)
 endif()
 
-find_package(LIBSSH 0.7.1)
+find_package(LIBSSH CONFIG 0.7.1)
 
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 if(WITH_PROTOBUF)
