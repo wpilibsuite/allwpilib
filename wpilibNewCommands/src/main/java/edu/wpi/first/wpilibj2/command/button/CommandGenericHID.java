@@ -246,6 +246,22 @@ public class CommandGenericHID {
   }
 
   /**
+   * Constructs a Trigger instance that is true when the axis value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(int axis, double threshold, EventLoop loop) {
+    var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
+    return cache.computeIfAbsent(
+        Pair.of(axis, threshold), k -> new Trigger(loop, () -> getRawAxis(axis) > threshold));
+  }  
+
+  /**
    * Constructs a Trigger instance that is true when the axis value is active (non-zero) given a
    * {@code deadband}, attached to the given loop.
    *
@@ -313,21 +329,7 @@ public class CommandGenericHID {
         axis, deadband, maxMagnitude, CommandScheduler.getInstance().getDefaultButtonLoop());
   }
 
-  /**
-   * Constructs a Trigger instance that is true when the axis value is greater than {@code
-   * threshold}, attached to the given loop.
-   *
-   * @param axis The axis to read, starting at 0
-   * @param threshold The value above which this trigger should return true.
-   * @param loop the event loop instance to attach the trigger to.
-   * @return a Trigger instance that is true when the axis value is greater than the provided
-   *     threshold.
-   */
-  public Trigger axisGreaterThan(int axis, double threshold, EventLoop loop) {
-    var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
-    return cache.computeIfAbsent(
-        Pair.of(axis, threshold), k -> new Trigger(loop, () -> getRawAxis(axis) > threshold));
-  }
+
 
   /**
    * Get the value of the axis.
