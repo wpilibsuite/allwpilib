@@ -406,7 +406,8 @@ public abstract class Command implements Sendable {
    * command as finishing instantly. Commands can be added to this and will be scheduled in order
    * with this command scheduled first.
    *
-   * @param commands other commands to schedule along with this one. This command is scheduled first.
+   * @param commands other commands to schedule along with this one. This command is scheduled
+   *     first.
    * @return the decorated command
    * @see ScheduleCommand
    * @see <a
