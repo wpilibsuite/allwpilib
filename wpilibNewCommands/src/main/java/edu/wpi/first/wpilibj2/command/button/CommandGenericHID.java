@@ -259,7 +259,7 @@ public class CommandGenericHID {
     var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
         Pair.of(axis, threshold), k -> new Trigger(loop, () -> getRawAxis(axis) > threshold));
-  }  
+  }
 
   /**
    * Constructs a Trigger instance that is true when the axis value is active (non-zero) given a
@@ -328,8 +328,6 @@ public class CommandGenericHID {
     return axisActive(
         axis, deadband, maxMagnitude, CommandScheduler.getInstance().getDefaultButtonLoop());
   }
-
-
 
   /**
    * Get the value of the axis.
