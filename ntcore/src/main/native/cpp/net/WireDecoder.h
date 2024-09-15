@@ -28,26 +28,26 @@ class ClientMessageHandler {
  public:
   virtual ~ClientMessageHandler() = default;
 
-  virtual void ClientPublish(int64_t pubuid, std::string_view name,
+  virtual void ClientPublish(int pubuid, std::string_view name,
                              std::string_view typeStr,
                              const wpi::json& properties) = 0;
-  virtual void ClientUnpublish(int64_t pubuid) = 0;
+  virtual void ClientUnpublish(int pubuid) = 0;
   virtual void ClientSetProperties(std::string_view name,
                                    const wpi::json& update) = 0;
-  virtual void ClientSubscribe(int64_t subuid,
+  virtual void ClientSubscribe(int subuid,
                                std::span<const std::string> topicNames,
                                const PubSubOptionsImpl& options) = 0;
-  virtual void ClientUnsubscribe(int64_t subuid) = 0;
+  virtual void ClientUnsubscribe(int subuid) = 0;
 };
 
 class ServerMessageHandler {
  public:
   virtual ~ServerMessageHandler() = default;
-  virtual void ServerAnnounce(std::string_view name, int64_t id,
+  virtual void ServerAnnounce(std::string_view name, int id,
                               std::string_view typeStr,
                               const wpi::json& properties,
-                              std::optional<int64_t> pubuid) = 0;
-  virtual void ServerUnannounce(std::string_view name, int64_t id) = 0;
+                              std::optional<int> pubuid) = 0;
+  virtual void ServerUnannounce(std::string_view name, int id) = 0;
   virtual void ServerPropertiesUpdate(std::string_view name,
                                       const wpi::json& update, bool ack) = 0;
 };
@@ -59,8 +59,7 @@ void WireDecodeText(std::string_view in, ServerMessageHandler& out,
                     wpi::Logger& logger);
 
 // returns true if successfully decoded a message
-bool WireDecodeBinary(std::span<const uint8_t>* in, int64_t* outId,
-                      Value* outValue, std::string* error,
-                      int64_t localTimeOffset);
+bool WireDecodeBinary(std::span<const uint8_t>* in, int* outId, Value* outValue,
+                      std::string* error, int64_t localTimeOffset);
 
 }  // namespace nt::net

@@ -403,7 +403,7 @@ void LocalStorage::Impl::PropertiesUpdated(TopicData* topic,
   NotifyTopic(topic, eventFlags | NT_EVENT_PROPERTIES);
   // check local flag so we don't echo back received properties changes
   if (m_network && sendNetwork) {
-    m_network->SetProperties(topic->handle, topic->name, update);
+    m_network->SetProperties(topic->name, update);
   }
 }
 
@@ -427,10 +427,10 @@ void LocalStorage::Impl::RefreshPubSubActive(TopicData* topic,
 void LocalStorage::Impl::NetworkAnnounce(TopicData* topic,
                                          std::string_view typeStr,
                                          const wpi::json& properties,
-                                         NT_Publisher pubHandle) {
+                                         std::optional<int> pubuid) {
   DEBUG4("LS NetworkAnnounce({}, {}, {}, {})", topic->name, typeStr,
-         properties.dump(), pubHandle);
-  if (pubHandle != 0) {
+         properties.dump(), pubuid.value_or(-1));
+  if (pubuid.has_value()) {
     return;  // ack of our publish; ignore
   }
 
@@ -503,7 +503,7 @@ void LocalStorage::Impl::RemoveNetworkPublisher(TopicData* topic) {
       // this may result in a duplicate publish warning on the server side,
       // but send one anyway in this case just to be sure
       if (nextPub->active && m_network) {
-        m_network->Publish(nextPub->handle, topic->handle, topic->name,
+        m_network->Publish(Handle{nextPub->handle}.GetIndex(), topic->name,
                            topic->typeStr, topic->properties, nextPub->config);
       }
     }
@@ -561,7 +561,7 @@ LocalStorage::PublisherData* LocalStorage::Impl::AddLocalPublisher(
   }
 
   if (publisher->active && m_network) {
-    m_network->Publish(publisher->handle, topic->handle, topic->name,
+    m_network->Publish(Handle{publisher->handle}.GetIndex(), topic->name,
                        topic->typeStr, topic->properties, config);
   }
   return publisher;
@@ -580,7 +580,7 @@ LocalStorage::Impl::RemoveLocalPublisher(NT_Publisher pubHandle) {
     }
 
     if (publisher->active && m_network) {
-      m_network->Unpublish(publisher->handle, topic->handle);
+      m_network->Unpublish(Handle{publisher->handle}.GetIndex());
     }
 
     if (publisher->active && !topic->localPublishers.empty()) {
@@ -593,7 +593,7 @@ LocalStorage::Impl::RemoveLocalPublisher(NT_Publisher pubHandle) {
         topic->typeStr = nextPub->config.typeStr;
         RefreshPubSubActive(topic, false);
         if (nextPub->active && m_network) {
-          m_network->Publish(nextPub->handle, topic->handle, topic->name,
+          m_network->Publish(Handle{nextPub->handle}.GetIndex(), topic->name,
                              topic->typeStr, topic->properties,
                              nextPub->config);
         }
@@ -619,7 +619,8 @@ LocalStorage::SubscriberData* LocalStorage::Impl::AddLocalSubscriber(
   }
   if (m_network && !subscriber->config.hidden) {
     DEBUG4("-> NetworkSubscribe({})", topic->name);
-    m_network->Subscribe(subscriber->handle, {{topic->name}}, config);
+    m_network->Subscribe(Handle{subscriber->handle}.GetIndex(), {{topic->name}},
+                         config);
   }
 
   // queue current value
@@ -647,7 +648,7 @@ LocalStorage::Impl::RemoveLocalSubscriber(NT_Subscriber subHandle) {
       }
     }
     if (m_network && !subscriber->config.hidden) {
-      m_network->Unsubscribe(subscriber->handle);
+      m_network->Unsubscribe(Handle{subscriber->handle}.GetIndex());
     }
   }
   return subscriber;
@@ -684,8 +685,8 @@ LocalStorage::MultiSubscriberData* LocalStorage::Impl::AddMultiSubscriber(
   }
   if (m_network && !subscriber->options.hidden) {
     DEBUG4("-> NetworkSubscribe");
-    m_network->Subscribe(subscriber->handle, subscriber->prefixes,
-                         subscriber->options);
+    m_network->Subscribe(Handle{subscriber->handle}.GetIndex(),
+                         subscriber->prefixes, subscriber->options);
   }
   return subscriber;
 }
@@ -703,7 +704,7 @@ LocalStorage::Impl::RemoveMultiSubscriber(NT_MultiSubscriber subHandle) {
       }
     }
     if (m_network && !subscriber->options.hidden) {
-      m_network->Unsubscribe(subscriber->handle);
+      m_network->Unsubscribe(Handle{subscriber->handle}.GetIndex());
     }
   }
   return subscriber;
@@ -977,7 +978,7 @@ bool LocalStorage::Impl::PublishLocalValue(PublisherData* publisher,
       if (publisher->topic->IsCached()) {
         publisher->topic->lastValueNetwork = value;
       }
-      m_network->SetValue(publisher->handle, value);
+      m_network->SetValue(Handle{publisher->handle}.GetIndex(), value);
     }
     return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL,
                     suppressDuplicates, publisher);
@@ -1076,10 +1077,10 @@ LocalStorage::~LocalStorage() = default;
 NT_Topic LocalStorage::NetworkAnnounce(std::string_view name,
                                        std::string_view typeStr,
                                        const wpi::json& properties,
-                                       NT_Publisher pubHandle) {
+                                       std::optional<int> pubuid) {
   std::scoped_lock lock{m_mutex};
   auto topic = m_impl.GetOrCreateTopic(name);
-  m_impl.NetworkAnnounce(topic, typeStr, properties, pubHandle);
+  m_impl.NetworkAnnounce(topic, typeStr, properties, pubuid);
   return topic->handle;
 }
 
@@ -1124,25 +1125,26 @@ void LocalStorage::Impl::StartNetwork(net::NetworkInterface* network) {
     PublisherData* anyPublisher = nullptr;
     for (auto&& publisher : topic->localPublishers) {
       if (publisher->active) {
-        network->Publish(publisher->handle, topic->handle, topic->name,
+        network->Publish(Handle{publisher->handle}.GetIndex(), topic->name,
                          topic->typeStr, topic->properties, publisher->config);
         anyPublisher = publisher;
       }
     }
     if (anyPublisher && topic->lastValue) {
-      network->SetValue(anyPublisher->handle, topic->lastValue);
+      network->SetValue(Handle{anyPublisher->handle}.GetIndex(),
+                        topic->lastValue);
     }
   }
   for (auto&& subscriber : m_subscribers) {
     if (!subscriber->config.hidden) {
-      network->Subscribe(subscriber->handle, {{subscriber->topic->name}},
-                         subscriber->config);
+      network->Subscribe(Handle{subscriber->handle}.GetIndex(),
+                         {{subscriber->topic->name}}, subscriber->config);
     }
   }
   for (auto&& subscriber : m_multiSubscribers) {
     if (!subscriber->options.hidden) {
-      network->Subscribe(subscriber->handle, subscriber->prefixes,
-                         subscriber->options);
+      network->Subscribe(Handle{subscriber->handle}.GetIndex(),
+                         subscriber->prefixes, subscriber->options);
     }
   }
 }

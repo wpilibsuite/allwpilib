@@ -21,14 +21,12 @@
 #include <wpi/UidVector.h>
 #include <wpi/json.h>
 
-#include "Handle.h"
 #include "Log.h"
 #include "Message.h"
 #include "NetworkInterface.h"
 #include "NetworkOutgoingQueue.h"
 #include "NetworkPing.h"
 #include "PubSubOptions.h"
-#include "VectorSet.h"
 #include "WireConnection.h"
 #include "WireDecoder.h"
 #include "WireEncoder.h"
@@ -119,8 +117,6 @@ class ServerImpl final {
     void RefreshProperties();
     bool SetFlags(unsigned int flags_);
 
-    NT_Handle GetIdHandle() const { return Handle(0, id, Handle::kTopic); }
-
     wpi::Logger& m_logger;  // Must be m_logger for WARN macro to work
     std::string name;
     unsigned int id;
@@ -190,8 +186,7 @@ class ServerImpl final {
 
     virtual void SendValue(TopicData* topic, const Value& value,
                            ValueSendMode mode) = 0;
-    virtual void SendAnnounce(TopicData* topic,
-                              std::optional<int64_t> pubuid) = 0;
+    virtual void SendAnnounce(TopicData* topic, std::optional<int> pubuid) = 0;
     virtual void SendUnannounce(TopicData* topic) = 0;
     virtual void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
                                       bool ack) = 0;
@@ -223,8 +218,8 @@ class ServerImpl final {
 
     wpi::Logger& m_logger;
 
-    wpi::DenseMap<int64_t, std::unique_ptr<PublisherData>> m_publishers;
-    wpi::DenseMap<int64_t, std::unique_ptr<SubscriberData>> m_subscribers;
+    wpi::DenseMap<int, std::unique_ptr<PublisherData>> m_publishers;
+    wpi::DenseMap<int, std::unique_ptr<SubscriberData>> m_subscribers;
 
    public:
     // meta topics
@@ -241,18 +236,17 @@ class ServerImpl final {
 
    protected:
     // ClientMessageHandler interface
-    void ClientPublish(int64_t pubuid, std::string_view name,
+    void ClientPublish(int pubuid, std::string_view name,
                        std::string_view typeStr,
                        const wpi::json& properties) final;
-    void ClientUnpublish(int64_t pubuid) final;
+    void ClientUnpublish(int pubuid) final;
     void ClientSetProperties(std::string_view name,
                              const wpi::json& update) final;
-    void ClientSubscribe(int64_t subuid,
-                         std::span<const std::string> topicNames,
+    void ClientSubscribe(int subuid, std::span<const std::string> topicNames,
                          const PubSubOptionsImpl& options) final;
-    void ClientUnsubscribe(int64_t subuid) final;
+    void ClientUnsubscribe(int subuid) final;
 
-    void ClientSetValue(int64_t pubuid, const Value& value);
+    void ClientSetValue(int pubuid, const Value& value);
 
     wpi::DenseMap<TopicData*, bool> m_announceSent;
   };
@@ -267,7 +261,7 @@ class ServerImpl final {
 
     void SendValue(TopicData* topic, const Value& value,
                    ValueSendMode mode) final;
-    void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
+    void SendAnnounce(TopicData* topic, std::optional<int> pubuid) final;
     void SendUnannounce(TopicData* topic) final;
     void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
                               bool ack) final;
@@ -293,7 +287,7 @@ class ServerImpl final {
 
     void SendValue(TopicData* topic, const Value& value,
                    ValueSendMode mode) final;
-    void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
+    void SendAnnounce(TopicData* topic, std::optional<int> pubuid) final;
     void SendUnannounce(TopicData* topic) final;
     void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
                               bool ack) final;
@@ -328,7 +322,7 @@ class ServerImpl final {
 
     void SendValue(TopicData* topic, const Value& value,
                    ValueSendMode mode) final;
-    void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
+    void SendAnnounce(TopicData* topic, std::optional<int> pubuid) final;
     void SendUnannounce(TopicData* topic) final;
     void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
                               bool ack) final;

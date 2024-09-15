@@ -48,7 +48,7 @@ class LocalStorage final : public net::ILocalStorage {
   // network interface functions
   NT_Topic NetworkAnnounce(std::string_view name, std::string_view typeStr,
                            const wpi::json& properties,
-                           NT_Publisher pubHandle) final;
+                           std::optional<int> pubuid) final;
   void NetworkUnannounce(std::string_view name) final;
   void NetworkPropertiesUpdate(std::string_view name, const wpi::json& update,
                                bool ack) final;
@@ -601,7 +601,8 @@ class LocalStorage final : public net::ILocalStorage {
     void RefreshPubSubActive(TopicData* topic, bool warnOnSubMismatch);
 
     void NetworkAnnounce(TopicData* topic, std::string_view typeStr,
-                         const wpi::json& properties, NT_Publisher pubHandle);
+                         const wpi::json& properties,
+                         std::optional<int> pubuid);
     void RemoveNetworkPublisher(TopicData* topic);
     void NetworkPropertiesUpdate(TopicData* topic, const wpi::json& update,
                                  bool ack);

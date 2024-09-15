@@ -18,7 +18,7 @@ class MockLocalInterface : public LocalInterface {
  public:
   MOCK_METHOD(NT_Topic, NetworkAnnounce,
               (std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, NT_Publisher pubHandle),
+               const wpi::json& properties, std::optional<int> pubuid),
               (override));
   MOCK_METHOD(void, NetworkUnannounce, (std::string_view name), (override));
   MOCK_METHOD(void, NetworkPropertiesUpdate,
@@ -31,30 +31,25 @@ class MockLocalInterface : public LocalInterface {
 class MockNetworkInterface : public NetworkInterface {
  public:
   MOCK_METHOD(void, Publish,
-              (NT_Publisher pubHandle, NT_Topic topicHandle,
-               std::string_view name, std::string_view typeStr,
+              (int pubuid, std::string_view name, std::string_view typeStr,
                const wpi::json& properties, const PubSubOptionsImpl& options),
               (override));
-  MOCK_METHOD(void, Unpublish, (NT_Publisher pubHandle, NT_Topic topicHandle),
-              (override));
+  MOCK_METHOD(void, Unpublish, (int pubuid), (override));
   MOCK_METHOD(void, SetProperties,
-              (NT_Topic topicHandle, std::string_view name,
-               const wpi::json& update),
-              (override));
+              (std::string_view name, const wpi::json& update), (override));
   MOCK_METHOD(void, Subscribe,
-              (NT_Subscriber subHandle, std::span<const std::string> prefixes,
+              (int subuid, std::span<const std::string> prefixes,
                const PubSubOptionsImpl& options),
               (override));
-  MOCK_METHOD(void, Unsubscribe, (NT_Subscriber subHandle), (override));
-  MOCK_METHOD(void, SetValue, (NT_Publisher pubHandle, const Value& value),
-              (override));
+  MOCK_METHOD(void, Unsubscribe, (int subuid), (override));
+  MOCK_METHOD(void, SetValue, (int pubuid, const Value& value), (override));
 };
 
 class MockLocalStorage : public ILocalStorage {
  public:
   MOCK_METHOD(NT_Topic, NetworkAnnounce,
               (std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, NT_Publisher pubHandle),
+               const wpi::json& properties, std::optional<int> pubuid),
               (override));
   MOCK_METHOD(void, NetworkUnannounce, (std::string_view name), (override));
   MOCK_METHOD(void, NetworkPropertiesUpdate,

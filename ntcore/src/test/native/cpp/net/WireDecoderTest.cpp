@@ -10,7 +10,6 @@
 
 #include "../MockLogger.h"
 #include "../TestPrinters.h"
-#include "Handle.h"
 #include "gmock/gmock.h"
 #include "net/Message.h"
 #include "net/WireDecoder.h"
@@ -26,24 +25,23 @@ namespace nt {
 class MockClientMessageHandler : public net::ClientMessageHandler {
  public:
   MOCK_METHOD4(ClientPublish,
-               void(int64_t pubuid, std::string_view name,
-                    std::string_view typeStr, const wpi::json& properties));
-  MOCK_METHOD1(ClientUnpublish, void(int64_t pubuid));
+               void(int pubuid, std::string_view name, std::string_view typeStr,
+                    const wpi::json& properties));
+  MOCK_METHOD1(ClientUnpublish, void(int pubuid));
   MOCK_METHOD2(ClientSetProperties,
                void(std::string_view name, const wpi::json& update));
   MOCK_METHOD3(ClientSubscribe,
-               void(int64_t subuid, std::span<const std::string> prefixes,
+               void(int subuid, std::span<const std::string> prefixes,
                     const PubSubOptionsImpl& options));
-  MOCK_METHOD1(ClientUnsubscribe, void(int64_t subuid));
+  MOCK_METHOD1(ClientUnsubscribe, void(int subuid));
 };
 
 class MockServerMessageHandler : public net::ServerMessageHandler {
  public:
   MOCK_METHOD5(ServerAnnounce,
-               void(std::string_view name, int64_t id, std::string_view typeStr,
-                    const wpi::json& properties,
-                    std::optional<int64_t> pubuid));
-  MOCK_METHOD2(ServerUnannounce, void(std::string_view name, int64_t id));
+               void(std::string_view name, int id, std::string_view typeStr,
+                    const wpi::json& properties, std::optional<int> pubuid));
+  MOCK_METHOD2(ServerUnannounce, void(std::string_view name, int id));
   MOCK_METHOD3(ServerPropertiesUpdate,
                void(std::string_view name, const wpi::json& update, bool ack));
 };
