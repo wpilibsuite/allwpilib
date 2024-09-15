@@ -289,8 +289,9 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * Decorates this command to run "forked" by wrapping it in a ScheduleCommand.
    * Use this for "forking off" from command compositions when the user does not
    * wish to extend the command's requirements to the entire command
-   * composition. Note that if run from a composition, the composition will not know about the
-   * status of the scheduled commands, and will treat this command as finishing instantly, see <a
+   * composition. Note that if run from a composition, the composition will not
+   * know about the status of the scheduled commands, and will treat this
+   * command as finishing instantly, see <a
    * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#scheduling-other-commands">WPILib
    * docs</a> for a full explanation.
    *
@@ -300,7 +301,7 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @see ScheduleCommand
    */
   [[nodiscard]]
-  CommandPtr Fork() &&;  
+  CommandPtr Fork() &&;
 
   /**
    * Decorates this command to only run if this condition is not met. If the
