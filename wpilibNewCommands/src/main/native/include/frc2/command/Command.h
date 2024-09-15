@@ -300,7 +300,7 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @see ScheduleCommand
    */
   [[nodiscard]]
-  CommandPtr Fork() &&;  
+  CommandPtr Fork() &&;
 
   /**
    * Decorates this command to only run if this condition is not met. If the
