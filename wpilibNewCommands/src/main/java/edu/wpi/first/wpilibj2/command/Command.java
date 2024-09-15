@@ -12,6 +12,8 @@ import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
+
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -416,9 +418,7 @@ public abstract class Command implements Sendable {
   public ScheduleCommand fork(Command... other) {
     Command[] commands = new Command[1 + other.length];
     commands[0] = this;
-    for (int i = 1; i < commands.length; i++) {
-      commands[i] = other[i - 1];
-    }
+    System.arraycopy(other, 0, commands, 1, other.length);
     return new ScheduleCommand(commands);
   }
 
