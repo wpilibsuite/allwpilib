@@ -54,12 +54,6 @@ CommandPtr CommandPtr::AsProxy() && {
   return std::move(*this);
 }
 
-CommandPtr CommandPtr::Fork() && {
-  AssertValid();
-  m_ptr = std::make_unique<ScheduleCommand>(std::move(m_ptr));
-  return std::move(*this);
-}
-
 class RunsWhenDisabledCommand : public WrapperCommand {
  public:
   RunsWhenDisabledCommand(std::unique_ptr<Command>&& command,
