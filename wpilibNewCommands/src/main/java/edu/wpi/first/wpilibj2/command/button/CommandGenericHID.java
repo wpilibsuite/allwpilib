@@ -329,8 +329,6 @@ public class CommandGenericHID {
         axis, deadband, maxMagnitude, CommandScheduler.getInstance().getDefaultButtonLoop());
   }
 
-
-
   /**
    * Get the value of the axis.
    *
