@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.event.EventLoop;
@@ -245,6 +246,64 @@ public class CommandGenericHID {
   }
 
   /**
+   * Constructs a Trigger instance that is true when the axis value is active (non-zero) given a {@code
+   * deadband}, attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param deadband The value used to deadband the axis value.  The trigger returns true if the deadbanded value is non-zero.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
+   */
+  public Trigger axisActive(int axis, double deadband, EventLoop loop) {
+    var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
+    return cache.computeIfAbsent(
+        Pair.of(axis, deadband), k -> new Trigger(loop, () -> MathUtil.applyDeadband(getRawAxis(axis), deadband) != 0.0));
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is active (non-zero) given a {@code
+   * deadband}, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   * 
+   * @param axis The axis to read, starting at 0
+   * @param deadband The value used to deadband the axis value.  The trigger returns true if the deadbanded value is non-zero.
+   * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
+   */
+  public Trigger axisActive(int axis, double deadband) {
+    return axisGreaterThan(axis, deadband, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is active (non-zero) given a {@code
+   * deadband}, attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param deadband The value used to deadband the axis value.  The trigger returns true if the deadbanded value is non-zero.
+   * @param maxMagnitude  The maximum magnitude of the input. Can be infinite.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
+   */
+  public Trigger axisActive(int axis, double deadband, double maxMagnitude, EventLoop loop) {
+    var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
+    return cache.computeIfAbsent(
+        Pair.of(axis, deadband), k -> new Trigger(loop, () -> MathUtil.applyDeadband(getRawAxis(axis), deadband, maxMagnitude) != 0.0));
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is active (non-zero) given a {@code
+   * deadband}, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   * 
+   * @param axis The axis to read, starting at 0
+   * @param deadband The value used to deadband the axis value.  The trigger returns true if the deadbanded value is non-zero.
+   * @param maxMagnitude  The maximum magnitude of the input. Can be infinite.
+   * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
+   */
+  public Trigger axisActive(int axis, double deadband, double maxMagnitude) {
+    return axisActive(axis, deadband, maxMagnitude, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }  
+
+  /**
    * Constructs a Trigger instance that is true when the axis value is greater than {@code
    * threshold}, attached to the given loop.
    *
@@ -258,7 +317,7 @@ public class CommandGenericHID {
     var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
         Pair.of(axis, threshold), k -> new Trigger(loop, () -> getRawAxis(axis) > threshold));
-  }
+  }  
 
   /**
    * Get the value of the axis.
