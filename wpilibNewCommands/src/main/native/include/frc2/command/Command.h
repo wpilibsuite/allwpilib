@@ -218,6 +218,24 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   CommandPtr OnlyWhile(std::function<bool()> condition) &&;
 
   /**
+   * Decorates this command to run after a condition becomes true.
+   *
+   * @param condition the condition to run after
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr After(std::function<bool()> condition) &&;
+
+  /**
+   * Decorates this command to run after a specified amount of time.
+   *
+   * @param duration the time to wait before running
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr AfterTime(units::second_t duration) &&;
+
+  /**
    * Decorates this command with a runnable to run before this command starts.
    *
    * @param toRun the Runnable to run

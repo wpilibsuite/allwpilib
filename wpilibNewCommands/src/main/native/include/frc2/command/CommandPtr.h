@@ -183,6 +183,24 @@ class CommandPtr final {
   CommandPtr OnlyIf(std::function<bool()> condition) &&;
 
   /**
+   * Decorates this command to run after a condition becomes true.
+   *
+   * @param condition the condition to run after
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr After(std::function<bool()> condition) &&;
+
+  /**
+   * Decorates this command to run after a specified amount of time.
+   *
+   * @param duration the time to wait before running
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr AfterTime(units::second_t duration) &&;
+
+  /**
    * Decorates this command with a set of commands to run parallel to it, ending
    * when the calling command ends and interrupting all the others. Often more
    * convenient/less-verbose than constructing a new {@link

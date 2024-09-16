@@ -84,6 +84,14 @@ CommandPtr Command::OnlyWhile(std::function<bool()> condition) && {
   return std::move(*this).ToPtr().OnlyWhile(std::move(condition));
 }
 
+CommandPtr After(std::function<bool()> condition) && {
+  return std::move(*this).ToPtr().After(std::move(condition));
+}
+
+CommandPtr AfterTime(units::second_t duration) && {
+  return std::move(*this).ToPtr().AfterTime(duration);
+}
+
 CommandPtr Command::IgnoringDisable(bool doesRunWhenDisabled) && {
   return std::move(*this).ToPtr().IgnoringDisable(doesRunWhenDisabled);
 }
