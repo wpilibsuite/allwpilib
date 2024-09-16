@@ -231,6 +231,22 @@ class CommandGenericHID {
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
+   * Constructs a Trigger instance that is true when the axis value is active
+   * (non-zero) given a
+   * {@code deadband}, attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param deadband The value used to deadband the axis value. The trigger
+   * returns true if the deadbanded value is non-zero.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the deadbanded axis value is
+   * active (non-zero).
+   */
+  Trigger AxisActive(int axis, double deadband,
+                     frc::EventLoop* loop = CommandScheduler::GetInstance()
+                                                .GetDefaultButtonLoop()) const;
+
+  /**
    * Set the rumble output for the HID.
    *
    * The DS currently supports 2 rumble values, left rumble and right rumble.
