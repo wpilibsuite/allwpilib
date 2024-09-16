@@ -275,7 +275,7 @@ public class CommandGenericHID {
     var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
         Pair.of(axis, deadband),
-        k -> new Trigger(loop, () -> MathUtil.applyDeadband(getRawAxis(axis), deadband) != 0.0));
+        k -> new Trigger(loop, () -> Math.abs(getRawAxis(axis)) > deadband));
   }
 
   /**
