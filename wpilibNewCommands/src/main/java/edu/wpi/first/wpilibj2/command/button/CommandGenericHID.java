@@ -23,8 +23,7 @@ public class CommandGenericHID {
       new HashMap<>();
   private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisGreaterThanCache =
       new HashMap<>();
-      private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisActive =
-      new HashMap<>();      
+  private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisActive = new HashMap<>();
   private final Map<EventLoop, Map<Integer, Trigger>> m_povCache = new HashMap<>();
 
   /**
