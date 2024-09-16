@@ -289,7 +289,7 @@ public class CommandGenericHID {
    * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
    */
   public Trigger axisActive(int axis, double deadband) {
-    return axisGreaterThan(axis, deadband, CommandScheduler.getInstance().getDefaultButtonLoop());
+    return axisActive(axis, deadband, CommandScheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
