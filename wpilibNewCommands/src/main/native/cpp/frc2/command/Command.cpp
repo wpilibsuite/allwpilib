@@ -84,11 +84,11 @@ CommandPtr Command::OnlyWhile(std::function<bool()> condition) && {
   return std::move(*this).ToPtr().OnlyWhile(std::move(condition));
 }
 
-CommandPtr After(std::function<bool()> condition) && {
+CommandPtr Command::After(std::function<bool()> condition) && {
   return std::move(*this).ToPtr().After(std::move(condition));
 }
 
-CommandPtr AfterTime(units::second_t duration) && {
+CommandPtr Command::AfterTime(units::second_t duration) && {
   return std::move(*this).ToPtr().AfterTime(duration);
 }
 
