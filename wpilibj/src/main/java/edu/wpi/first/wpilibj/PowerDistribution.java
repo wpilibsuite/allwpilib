@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.PowerDistributionFaults;
@@ -15,8 +13,6 @@ import edu.wpi.first.hal.PowerDistributionVersion;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.util.struct.Struct;
-import edu.wpi.first.util.struct.StructSerializable;
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the CTRE Power
@@ -25,7 +21,6 @@ import edu.wpi.first.util.struct.StructSerializable;
 public class PowerDistribution implements Sendable, AutoCloseable {
   private final int m_handle;
   private final int m_module;
-  private final PowerDistributionStats m_stats;
 
   /** Default module number. */
   public static final int kDefaultModule = PowerDistributionJNI.DEFAULT_MODULE;
@@ -55,7 +50,6 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   public PowerDistribution(int module, ModuleType moduleType) {
     m_handle = PowerDistributionJNI.initialize(module, moduleType.value);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
-    m_stats = new PowerDistributionStats(this);
 
     HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
     SendableRegistry.addLW(this, "PowerDistribution", m_module);
@@ -70,7 +64,6 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   public PowerDistribution() {
     m_handle = PowerDistributionJNI.initialize(kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
-    m_stats = new PowerDistributionStats(this);
 
     HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
     SendableRegistry.addLW(this, "PowerDistribution", m_module);
@@ -265,98 +258,5 @@ public class PowerDistribution implements Sendable, AutoCloseable {
         "SwitchableChannel",
         () -> PowerDistributionJNI.getSwitchableChannelNoError(m_handle),
         value -> PowerDistributionJNI.setSwitchableChannel(m_handle, value));
-  }
-
-  protected static final class PowerDistributionStats implements StructSerializable {
-    public int faults = 0;
-    public int stickyFaults = 0;
-    public double voltage = 0.0;
-    public double totalCurrent = 0.0;
-    public boolean switchableChannel = false;
-    public double temperature = 0.0;
-    public double[] currents;
-
-    public PowerDistributionStats(final PowerDistribution pd) {
-      currents = new double[pd.getNumChannels()];
-      update(pd);
-    }
-
-    public void update(final PowerDistribution pd) {
-      faults = PowerDistributionJNI.getFaultsNative(pd.m_handle);
-      stickyFaults = PowerDistributionJNI.getStickyFaultsNative(pd.m_handle);
-      voltage = pd.getVoltage();
-      totalCurrent = pd.getTotalCurrent();
-      switchableChannel = pd.getSwitchableChannel();
-      temperature = pd.getTemperature();
-      PowerDistributionJNI.getAllCurrents(pd.m_handle, currents);
-    }
-
-    public final static PDDataStruct struct = new PDDataStruct();
-  }
-
-  protected static final class PDDataStruct implements Struct<PowerDistributionStats> {
-    private static final int kSize = 4 + 4 + 8 + 8 + 1 + 8 + (8 * 24);
-
-    @Override
-    public Class<PowerDistributionStats> getTypeClass() {
-      return PowerDistributionStats.class;
-    }
-
-    @Override
-    public int getSize() {
-      return kSize;
-    }
-
-    @Override
-    public String getSchema() {
-      return "PowerDistributionFaults faults; "
-          + "PowerDistributionStickyFaults stickyFaults; "
-          + "double voltage; "
-          + "double totalCurrent; "
-          + "bool switchableChannel; "
-          + "double temperature;"
-          + "double currents[24];";
-    }
-
-    @Override
-    public String getTypeName() {
-      return "PDData";
-    }
-
-    @Override
-    public void pack(ByteBuffer bb, PowerDistributionStats value) {
-      bb.putInt(value.faults);
-      bb.putInt(value.stickyFaults);
-      bb.putDouble(value.voltage);
-      bb.putDouble(value.totalCurrent);
-      bb.put((byte) (value.switchableChannel ? 1 : 0));
-      bb.putDouble(value.temperature);
-      for (int i = 0; i < value.currents.length; i++) {
-        bb.putDouble(value.currents[i]);
-      }
-    }
-
-    @Override
-    public PowerDistributionStats unpack(ByteBuffer bb) {
-      PowerDistributionStats data = new PowerDistributionStats(null);
-      data.faults = bb.getInt();
-      data.stickyFaults = bb.getInt();
-      data.voltage = bb.getDouble();
-      data.totalCurrent = bb.getDouble();
-      data.switchableChannel = bb.get() == 1;
-      data.temperature = bb.getDouble();
-      for (int i = 0; i < 24; i++) {
-        data.currents[i] = bb.getDouble();
-      }
-      return data;
-    }
-
-    @Override
-    public Struct<?>[] getNested() {
-      return new Struct<?>[] {
-          new PowerDistributionFaultsStruct(),
-          new PowerDistributionStickyFaultsStruct()
-      };
-    }
   }
 }
