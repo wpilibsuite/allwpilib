@@ -23,7 +23,7 @@ public class CommandGenericHID {
       new HashMap<>();
   private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisGreaterThanCache =
       new HashMap<>();
-  private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisActive = new HashMap<>();
+  private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisMagnitudeGreaterThanCache = new HashMap<>();
   private final Map<EventLoop, Map<Integer, Trigger>> m_povCache = new HashMap<>();
 
   /**
@@ -262,34 +262,32 @@ public class CommandGenericHID {
   }
 
   /**
-   * Constructs a Trigger instance that is true when the axis value is active (non-zero) given a
-   * {@code deadband}, attached to the given loop.
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code 
+   * threshold}, attached to the given loop.
    *
    * @param axis The axis to read, starting at 0
-   * @param deadband The value used to deadband the axis value. The trigger returns true if the
-   *     deadbanded value is non-zero.
+   * @param threshold The value above which this trigger should return true.
    * @param loop the event loop instance to attach the trigger to.
-   * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
+   * @return a Trigger instance that is true when the axis magnitude value is greater than the provided
+   *     threshold.
    */
-  public Trigger axisActive(int axis, double deadband, EventLoop loop) {
-    var cache = m_axisActive.computeIfAbsent(loop, k -> new HashMap<>());
+  public Trigger axisMagnitudeGreaterThan(int axis, double threshold, EventLoop loop) {
+    var cache = m_axisMagnitudeGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
-        Pair.of(axis, deadband),
-        k -> new Trigger(loop, () -> Math.abs(getRawAxis(axis)) > deadband));
+        Pair.of(axis, threshold),
+        k -> new Trigger(loop, () -> Math.abs(getRawAxis(axis)) > threshold));
   }
 
   /**
-   * Constructs a Trigger instance that is true when the axis value is active (non-zero) given a
-   * {@code deadband}, attached to {@link CommandScheduler#getDefaultButtonLoop() the default
-   * command scheduler button loop}.
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code 
+   * threshold}, attached to the given loop.
    *
    * @param axis The axis to read, starting at 0
-   * @param deadband The value used to deadband the axis value. The trigger returns true if the
-   *     deadbanded value is non-zero.
+   * @param threshold The value above which this trigger should return true.
    * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
    */
-  public Trigger axisActive(int axis, double deadband) {
-    return axisActive(axis, deadband, CommandScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger axisActive(int axis, double threshold) {
+    return axisMagnitudeGreaterThan(axis, threshold, CommandScheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**

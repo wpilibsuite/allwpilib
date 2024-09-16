@@ -231,18 +231,16 @@ class CommandGenericHID {
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance that is true when the axis value is active
-   * (non-zero) given a
-   * {@code deadband}, attached to the given loop.
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code 
+   * threshold}, attached to the given loop.
    *
    * @param axis The axis to read, starting at 0
-   * @param deadband The value used to deadband the axis value. The trigger
-   * returns true if the deadbanded value is non-zero.
+   * @param threshold The value above which this trigger should return true.
    * @param loop the event loop instance to attach the trigger to.
-   * @return a Trigger instance that is true when the deadbanded axis value is
-   * active (non-zero).
+   * @return a Trigger instance that is true when the axis magnitude value is greater than the provided
+   *     threshold.
    */
-  Trigger AxisActive(int axis, double deadband,
+  Trigger AxisMagnitudeGreaterThan(int axis, double threshold,
                      frc::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 

@@ -75,7 +75,7 @@ Trigger CommandGenericHID::AxisGreaterThan(int axis, double threshold,
   });
 }
 
-Trigger CommandGenericHID::AxisActive(int axis, double deadband,
+Trigger CommandGenericHID::AxisMagnitudeGreaterThan(int axis, double deadband,
                                       frc::EventLoop* loop) const {
   return Trigger(loop, [this, axis, deadband]() {
     return std::abs(m_hid.GetRawAxis(axis)) > deadband;
