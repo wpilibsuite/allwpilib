@@ -160,10 +160,7 @@ public class PIDTest extends AbstractComsSetup {
     assertEquals(pidData() + "did not start at 0", 0, me.getMotor().get(), 0);
     m_controller.setSetpoint(reference);
     assertEquals(
-        pidData() + "did not have an error of " + reference,
-        reference,
-        m_controller.getError(),
-        0);
+        pidData() + "did not have an error of " + reference, reference, m_controller.getError(), 0);
     Notifier pidRunner =
         new Notifier(
             () -> me.getMotor().set(m_controller.calculate(me.getEncoder().getDistance())));
