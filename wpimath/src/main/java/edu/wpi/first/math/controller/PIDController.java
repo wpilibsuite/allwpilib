@@ -224,6 +224,26 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
+   * Returns the position tolerance of this controller.
+   *
+   * @return the position tolerance of the controller.
+   */
+  @Deprecated(forRemoval = true, since = "2025")
+  public double getPositionTolerance() {
+    return m_error;
+  }
+
+  /**
+   * Returns the velocity tolerance of this controller.
+   *
+   * @return the velocity tolerance of the controller.
+   */
+  @Deprecated(forRemoval = true, since = "2025")
+  public double getVelocityTolerance() {
+    return m_errorDerivative;
+  }  
+
+  /**
    * Returns the error tolerance of this controller.
    *
    * @return the error tolerance of the controller.
@@ -353,6 +373,26 @@ public class PIDController implements Sendable, AutoCloseable {
   public void setTolerance(double errorTolerance, double errorDerivativeTolerance) {
     m_errorTolerance = errorTolerance;
     m_errorDerivativeTolerance = errorDerivativeTolerance;
+  }
+
+  /**
+   * Returns the difference between the setpoint and the measurement.
+   *
+   * @return The error.
+   */
+  @Deprecated(forRemoval = true, since = "2025")
+  public double getPositionError() {
+    return m_error;
+  }
+
+  /**
+   * Returns the velocity error.
+   *
+   * @return The velocity error.
+   */
+  @Deprecated(forRemoval = true, since = "2025")
+  public double getVelocityError() {
+    return m_errorDerivative;
   }
 
   /**
