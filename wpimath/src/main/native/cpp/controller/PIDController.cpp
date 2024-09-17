@@ -135,7 +135,7 @@ double PIDController::GetSetpoint() const {
 
 bool PIDController::AtSetpoint() const {
   return m_haveMeasurement && m_haveSetpoint &&
-         std::abs(m_error) < m_errorTolerance
+         std::abs(m_error) < m_errorTolerance && 
          std::abs(m_errorDerivative) < m_errorDerivativeTolerance;
 }
 
