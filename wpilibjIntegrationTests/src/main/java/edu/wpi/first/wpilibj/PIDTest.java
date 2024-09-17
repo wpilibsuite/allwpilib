@@ -133,7 +133,7 @@ public class PIDTest extends AbstractComsSetup {
     assertEquals(
         "PID.getPositionError() did not start at " + reference,
         reference,
-        m_controller.getPositionError(),
+        m_controller.getError(),
         0);
     m_builder.update();
     assertEquals(m_p, m_table.getEntry("Kp").getDouble(9999999), 0);
@@ -162,7 +162,7 @@ public class PIDTest extends AbstractComsSetup {
     assertEquals(
         pidData() + "did not have an error of " + reference,
         reference,
-        m_controller.getPositionError(),
+        m_controller.getError(),
         0);
     Notifier pidRunner =
         new Notifier(
@@ -171,7 +171,7 @@ public class PIDTest extends AbstractComsSetup {
     Timer.delay(5);
     pidRunner.stop();
     assertTrue(
-        pidData() + "Was not on Target. Controller Error: " + m_controller.getPositionError(),
+        pidData() + "Was not on Target. Controller Error: " + m_controller.getError(),
         m_controller.atSetpoint());
 
     pidRunner.close();
