@@ -253,7 +253,7 @@ void PIDController::InitSendable(wpi::SendableBuilder& builder) {
       "error", [this] { return GetError(); },
       nullptr);
   builder.AddDoubleProperty(
-      "error derivative", [this] { GetErrorDerivative(); },
+      "error derivative", [this] { return GetErrorDerivative(); },
       nullptr);
   builder.AddDoubleProperty(
       "previous error", [this] { return m_prevError; },
