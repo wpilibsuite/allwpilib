@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include <frc/RobotController.h>
 #include <frc2/command/Commands.h>
 
 Drive::Drive() {
@@ -57,7 +58,12 @@ frc2::CommandPtr Drive::TurnToAngleCommand(units::degree_t angle) {
              [this, angle] {
                m_drive.ArcadeDrive(
                    0, m_controller.Calculate(m_gyro.GetRotation2d().Radians(),
-                                             angle));
+                                             angle) +
+                          // Divide feedforward voltage by battery voltage to
+                          // normalize it to [-1, 1]
+                          m_feedforward.Calculate(
+                              m_controller.GetSetpoint().velocity) /
+                              frc::RobotController::GetBatteryVoltage());
              })
       .Until([this] { return m_controller.AtGoal(); })
       .FinallyDo([this] { m_drive.ArcadeDrive(0, 0); });

@@ -38,6 +38,14 @@ inline constexpr auto kTurnRateTolerance = 10_deg_per_s;
 
 inline constexpr auto kMaxTurnRate = 100_deg_per_s;
 inline constexpr auto kMaxTurnAcceleration = 300_deg_per_s / 1_s;
+
+// These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
+// These characterization values MUST be determined either experimentally or
+// theoretically for *your* robot's drive. The SysId tool provides a convenient
+// method for obtaining these values for your robot.
+inline constexpr auto ks = 1_V;
+inline constexpr auto kv = 0.8_V * 1_s / 1_rad;
+inline constexpr auto ka = 0.15_V * 1_s * 1_s / 1_rad;
 }  // namespace DriveConstants
 
 namespace IntakeConstants {
