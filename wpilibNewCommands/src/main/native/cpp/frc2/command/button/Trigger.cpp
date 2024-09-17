@@ -29,7 +29,7 @@ void Trigger::AddBinding(wpi::unique_function<void(bool, bool)>&& body) {
 Trigger Trigger::OnChange(Command* command) {
   AddBinding([command](bool previous, bool current) {
     if (previous != current) {
-      command->Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     }
   });
   return *this;
@@ -47,7 +47,7 @@ Trigger Trigger::OnChange(CommandPtr&& command) {
 Trigger Trigger::OnTrue(Command* command) {
   AddBinding([command](bool previous, bool current) {
     if (!previous && current) {
-      command->Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     }
   });
   return *this;
@@ -65,7 +65,7 @@ Trigger Trigger::OnTrue(CommandPtr&& command) {
 Trigger Trigger::OnFalse(Command* command) {
   AddBinding([command](bool previous, bool current) {
     if (previous && !current) {
-      command->Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     }
   });
   return *this;
@@ -83,7 +83,7 @@ Trigger Trigger::OnFalse(CommandPtr&& command) {
 Trigger Trigger::WhileTrue(Command* command) {
   AddBinding([command](bool previous, bool current) {
     if (!previous && current) {
-      command->Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     } else if (previous && !current) {
       command->Cancel();
     }
@@ -105,7 +105,7 @@ Trigger Trigger::WhileTrue(CommandPtr&& command) {
 Trigger Trigger::WhileFalse(Command* command) {
   AddBinding([command](bool previous, bool current) {
     if (previous && !current) {
-      command->Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     } else if (!previous && current) {
       command->Cancel();
     }
@@ -130,7 +130,7 @@ Trigger Trigger::ToggleOnTrue(Command* command) {
       if (command->IsScheduled()) {
         command->Cancel();
       } else {
-        command->Schedule();
+        frc2::CommandScheduler::GetInstance().Schedule(command);
       }
     }
   });
@@ -156,7 +156,7 @@ Trigger Trigger::ToggleOnFalse(Command* command) {
       if (command->IsScheduled()) {
         command->Cancel();
       } else {
-        command->Schedule();
+        frc2::CommandScheduler::GetInstance().Schedule(command);
       }
     }
   });
