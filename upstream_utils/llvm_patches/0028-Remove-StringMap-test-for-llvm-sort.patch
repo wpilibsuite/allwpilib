@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 10 Aug 2022 22:35:00 -0700
-Subject: [PATCH 27/38] Remove StringMap test for llvm::sort()
+Subject: [PATCH 28/38] Remove StringMap test for llvm::sort()
 
 ---
  llvm/unittests/ADT/StringMapTest.cpp | 14 --------------
  1 file changed, 14 deletions(-)
 
 diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
-index 6b6cf564909f329c220eb225f3b7af6c35301029..0d83669a580408e925ec6308410ebe7c01b48b12 100644
+index c7fb99836499a8f99d31e414930b948aa6353cb0..792d39e871922b3788788a095a98d7f1611fe409 100644
 --- a/llvm/unittests/ADT/StringMapTest.cpp
 +++ b/llvm/unittests/ADT/StringMapTest.cpp
 @@ -322,20 +322,6 @@ TEST_F(StringMapTest, InsertOrAssignTest) {

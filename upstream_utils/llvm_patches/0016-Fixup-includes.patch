@@ -8,16 +8,16 @@ Subject: [PATCH 16/38] Fixup includes
  llvm/include/llvm/ADT/StringMapEntry.h            |  4 ++++
  llvm/include/llvm/Support/PointerLikeTypeTraits.h |  1 +
  llvm/lib/Support/ConvertUTFWrapper.cpp            |  1 +
- llvm/lib/Support/ErrorHandling.cpp                |  7 +++----
+ llvm/lib/Support/ErrorHandling.cpp                |  9 ++++-----
  llvm/lib/Support/raw_ostream.cpp                  | 11 ++++++-----
  llvm/unittests/ADT/SmallPtrSetTest.cpp            |  2 ++
  llvm/unittests/ADT/SmallVectorTest.cpp            |  1 +
  llvm/unittests/ADT/StringMapTest.cpp              |  1 +
  llvm/unittests/Support/ConvertUTFTest.cpp         |  2 ++
- 10 files changed, 25 insertions(+), 9 deletions(-)
+ 10 files changed, 26 insertions(+), 10 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index c133e84f9b2e3a225cdac782c011fadbf07adab2..2173a4159111e7fea70325de82dbfce628ae3ea8 100644
+index 44c18809207082fd16fd46d58b61d805fc150fb5..acb1dfc95f7abf27301e3f1d0d077062b3112f87 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
 +++ b/llvm/include/llvm/ADT/StringMap.h
 @@ -17,6 +17,10 @@
@@ -71,7 +71,7 @@ index d53462e742e61d3476915d5b2c5aa63772e78a8a..34054140489e4d536ace4650207c783d
  #include "llvm/Support/SwapByteOrder.h"
  #include <span>
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 0b87b375de67dc18647e3ebe646bf323dd05e8c5..3a88178cfbbcf7062a958c7de820247bc913ab33 100644
+index c205eab6f5467e3f461a168a596e574e3876f77e..8c22a46cd0f1faa2becb0a686bf1b6fd5b1e46c9 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -28,12 +28,11 @@
@@ -90,8 +90,17 @@ index 0b87b375de67dc18647e3ebe646bf323dd05e8c5..3a88178cfbbcf7062a958c7de820247b
  #endif
  
  using namespace llvm;
+@@ -212,7 +211,7 @@ void LLVMResetFatalErrorHandler() {
+ #ifdef _WIN32
+ 
+ #define WIN32_NO_STATUS
+-#include "llvm/Support/Windows/WindowsSupport.h"
++#include "Windows/WindowsSupport.h"
+ #undef WIN32_NO_STATUS
+ #include <ntstatus.h>
+ #include <winerror.h>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 5bec803ccc76ce287b7ff3ea037d5e490a7af20c..ae5428825f7f62ad8e742490448d40aea7506990 100644
+index 7086368a3598ccad9502112f734c9ad81252ebec..e173687cafdd04894c27ccd5efb109a7411f1398 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -15,6 +15,8 @@
@@ -129,7 +138,7 @@ index 5bec803ccc76ce287b7ff3ea037d5e490a7af20c..ae5428825f7f62ad8e742490448d40ae
  
  using namespace llvm;
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index 531f81ab5b3fc1dcff731230f3cb7649cb90aedf..3db8b6e37d31a0a3cc304da8fc4cbbe1d89252b5 100644
+index a6c2b329f072639706aa221feb8c08e33533f813..4c1a144a7a52eb38c7af2d20749901974b29f962 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
 @@ -15,6 +15,8 @@
@@ -154,7 +163,7 @@ index f8c37820ef9fdfe0af067f5aa8d2297ed15e73bc..5e91f71bc9ac0e499a64dd1591e581d0
  #include <span>
  #include <stdarg.h>
 diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
-index acd8b566f9c7a6efc2c9204624c01104dd34daf6..6b6cf564909f329c220eb225f3b7af6c35301029 100644
+index 2cb3cf91fb0e51b91cee86ff7eaac165bd9e176b..c7fb99836499a8f99d31e414930b948aa6353cb0 100644
 --- a/llvm/unittests/ADT/StringMapTest.cpp
 +++ b/llvm/unittests/ADT/StringMapTest.cpp
 @@ -9,6 +9,7 @@
