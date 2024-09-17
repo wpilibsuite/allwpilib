@@ -120,8 +120,7 @@ void PIDController::SetSetpoint(double setpoint) {
 
   if (m_continuous) {
     double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
-    m_error =
-        InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+    m_error = InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
   } else {
     m_error = m_setpoint - m_measurement;
   }
@@ -135,7 +134,7 @@ double PIDController::GetSetpoint() const {
 
 bool PIDController::AtSetpoint() const {
   return m_haveMeasurement && m_haveSetpoint &&
-         std::abs(m_error) < m_errorTolerance && 
+         std::abs(m_error) < m_errorTolerance &&
          std::abs(m_errorDerivative) < m_errorDerivativeTolerance;
 }
 
@@ -197,8 +196,7 @@ double PIDController::Calculate(double measurement) {
 
   if (m_continuous) {
     double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
-    m_error =
-        InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+    m_error = InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
   } else {
     m_error = m_setpoint - m_measurement;
   }
@@ -247,20 +245,12 @@ void PIDController::InitSendable(wpi::SendableBuilder& builder) {
       "setpoint", [this] { return GetSetpoint(); },
       [this](double value) { SetSetpoint(value); });
   builder.AddDoubleProperty(
-      "measurement", [this] { return m_measurement; },
-      nullptr);
+      "measurement", [this] { return m_measurement; }, nullptr);
+  builder.AddDoubleProperty("error", [this] { return GetError(); }, nullptr);
   builder.AddDoubleProperty(
-      "error", [this] { return GetError(); },
-      nullptr);
+      "error derivative", [this] { return GetErrorDerivative(); }, nullptr);
   builder.AddDoubleProperty(
-      "error derivative", [this] { return GetErrorDerivative(); },
-      nullptr);
+      "previous error", [this] { return m_prevError; }, nullptr);
   builder.AddDoubleProperty(
-      "previous error", [this] { return m_prevError; },
-      nullptr);
-  builder.AddDoubleProperty(
-      "total error", [this] { return GetAccumulatedError(); },
-      nullptr);
-
-
+      "total error", [this] { return GetAccumulatedError(); }, nullptr);
 }

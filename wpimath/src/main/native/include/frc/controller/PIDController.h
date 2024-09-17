@@ -133,7 +133,7 @@ class WPILIB_DLLEXPORT PIDController
    *
    * @return The error derivative tolerance of the controller.
    */
-  double GetErrorDerivativeTolerance() const;  
+  double GetErrorDerivativeTolerance() const;
 
   /**
    * Gets the position tolerance of this controller.
