@@ -9,10 +9,12 @@
 #include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
 #include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
+#include <units/angle.h>
 #include <units/length.h>
 
 #include "Constants.h"
@@ -73,4 +75,6 @@ class Drive : public frc2::SubsystemBase {
       DriveConstants::kTurnI,
       DriveConstants::kTurnD,
       {DriveConstants::kMaxTurnRate, DriveConstants::kMaxTurnAcceleration}};
+  frc::SimpleMotorFeedforward<units::radians> m_feedforward{
+      DriveConstants::ks, DriveConstants::kv, DriveConstants::ka};
 };

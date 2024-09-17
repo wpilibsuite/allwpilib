@@ -41,6 +41,14 @@ public final class Constants {
 
     public static final double kMaxTurnRateDegPerS = 100;
     public static final double kMaxTurnAccelerationDegPerSSquared = 300;
+
+    // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
+    // These characterization values MUST be determined either experimentally or theoretically
+    // for *your* robot's drive.
+    // The SysId tool provides a convenient method for obtaining these values for your robot.
+    public static final double ksVolts = 1;
+    public static final double kvVoltSecondsPerDegree = 0.8;
+    public static final double kaVoltSecondsSquaredPerDegree = 0.15;
   }
 
   public static final class ShooterConstants {
