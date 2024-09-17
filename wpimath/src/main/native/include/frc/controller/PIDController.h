@@ -122,10 +122,25 @@ class WPILIB_DLLEXPORT PIDController
   units::second_t GetPeriod() const;
 
   /**
+   * Gets the error tolerance of this controller.
+   *
+   * @return The error tolerance of the controller.
+   */
+  double GetErrorTolerance() const;
+
+  /**
+   * Gets the error derivative tolerance of this controller.
+   *
+   * @return The error derivative tolerance of the controller.
+   */
+  double GetErrorDerivativeTolerance() const;  
+
+  /**
    * Gets the position tolerance of this controller.
    *
    * @return The position tolerance of the controller.
    */
+  [[deprecated("Use the GetErrorTolerance method instead.")]]
   double GetPositionTolerance() const;
 
   /**
@@ -133,6 +148,7 @@ class WPILIB_DLLEXPORT PIDController
    *
    * @return The velocity tolerance of the controller.
    */
+  [[deprecated("Use the GetErrorDerivative method instead.")]]
   double GetVelocityTolerance() const;
 
   /**
@@ -211,11 +227,23 @@ class WPILIB_DLLEXPORT PIDController
   /**
    * Returns the difference between the setpoint and the measurement.
    */
+  double GetError() const;
+
+  /**
+   * Returns the error derivative.
+   */
+  double GetErrorDerivative() const;
+
+  /**
+   * Returns the difference between the setpoint and the measurement.
+   */
+  [[deprecated("Use GetError method instead.")]]
   double GetPositionError() const;
 
   /**
    * Returns the velocity error.
    */
+  [[deprecated("Use GetError method instead.")]]
   double GetVelocityError() const;
 
   /**
@@ -268,8 +296,8 @@ class WPILIB_DLLEXPORT PIDController
   bool m_continuous = false;
 
   // The error at the time of the most recent call to Calculate()
-  double m_positionError = 0;
-  double m_velocityError = 0;
+  double m_error = 0;
+  double m_errorDerivative = 0;
 
   // The error at the time of the second-most-recent call to Calculate() (used
   // to compute velocity)
@@ -279,8 +307,8 @@ class WPILIB_DLLEXPORT PIDController
   double m_totalError = 0;
 
   // The error that is considered at setpoint.
-  double m_positionTolerance = 0.05;
-  double m_velocityTolerance = std::numeric_limits<double>::infinity();
+  double m_errorTolerance = 0.05;
+  double m_errorDerivativeTolerance = std::numeric_limits<double>::infinity();
 
   double m_setpoint = 0;
   double m_measurement = 0;
