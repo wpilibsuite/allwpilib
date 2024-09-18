@@ -222,9 +222,9 @@ class WPILIB_DLLEXPORT PIDController
    * @param errorTolerance error which is tolerable.
    * @param errorDerivativeTolerance error derivative which is tolerable.
    */
-  void SetTolerance(
-      double errorTolerance,
-      double errorDerivativeTolerance = std::numeric_limits<double>::infinity());
+  void SetTolerance(double errorTolerance,
+                    double errorDerivativeTolerance =
+                        std::numeric_limits<double>::infinity());
 
   /**
    * Returns the difference between the setpoint and the measurement.
