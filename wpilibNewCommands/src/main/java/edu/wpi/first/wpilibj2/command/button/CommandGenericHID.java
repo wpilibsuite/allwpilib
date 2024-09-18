@@ -281,7 +281,8 @@ public class CommandGenericHID {
 
   /**
    * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
-   * threshold}, attached to the given loop.
+   * threshold}, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
    *
    * @param axis The axis to read, starting at 0
    * @param threshold The value above which this trigger should return true.
