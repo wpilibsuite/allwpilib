@@ -38,7 +38,7 @@ Trigger Trigger::OnChange(Command* command) {
 Trigger Trigger::OnChange(CommandPtr&& command) {
   AddBinding([command = std::move(command)](bool previous, bool current) {
     if (previous != current) {
-      command.Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     }
   });
   return *this;
@@ -56,7 +56,7 @@ Trigger Trigger::OnTrue(Command* command) {
 Trigger Trigger::OnTrue(CommandPtr&& command) {
   AddBinding([command = std::move(command)](bool previous, bool current) {
     if (!previous && current) {
-      command.Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     }
   });
   return *this;
@@ -74,7 +74,7 @@ Trigger Trigger::OnFalse(Command* command) {
 Trigger Trigger::OnFalse(CommandPtr&& command) {
   AddBinding([command = std::move(command)](bool previous, bool current) {
     if (previous && !current) {
-      command.Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     }
   });
   return *this;
@@ -94,7 +94,7 @@ Trigger Trigger::WhileTrue(Command* command) {
 Trigger Trigger::WhileTrue(CommandPtr&& command) {
   AddBinding([command = std::move(command)](bool previous, bool current) {
     if (!previous && current) {
-      command.Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     } else if (previous && !current) {
       command.Cancel();
     }
@@ -116,7 +116,7 @@ Trigger Trigger::WhileFalse(Command* command) {
 Trigger Trigger::WhileFalse(CommandPtr&& command) {
   AddBinding([command = std::move(command)](bool previous, bool current) {
     if (!previous && current) {
-      command.Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     } else if (previous && !current) {
       command.Cancel();
     }
@@ -143,7 +143,7 @@ Trigger Trigger::ToggleOnTrue(CommandPtr&& command) {
       if (command.IsScheduled()) {
         command.Cancel();
       } else {
-        command.Schedule();
+        frc2::CommandScheduler::GetInstance().Schedule(command);
       }
     }
   });
@@ -169,7 +169,7 @@ Trigger Trigger::ToggleOnFalse(CommandPtr&& command) {
       if (command.IsScheduled()) {
         command.Cancel();
       } else {
-        command.Schedule();
+        frc2::CommandScheduler::GetInstance().Schedule(command);
       }
     }
   });

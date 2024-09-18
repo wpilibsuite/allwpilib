@@ -82,7 +82,7 @@ TEST_F(CommandSendableButtonTest, falseAndNotScheduledNoOp) {
 
 TEST_F(CommandSendableButtonTest, falseAndScheduledCancel) {
   // Scheduled and false -> cancel
-  frc2::CommandScheduler::GetInstance().Schedule(m_command);
+  frc2::CommandScheduler::GetInstance().Schedule(m_command.value());
   GetScheduler().Run();
   frc::SmartDashboard::UpdateValues();
   EXPECT_TRUE(m_command->IsScheduled());

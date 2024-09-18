@@ -615,7 +615,7 @@ public abstract class Command implements Sendable {
         value -> {
           if (value) {
             if (!isScheduled()) {
-              schedule();
+              CommandScheduler.getInstance().schedule(this);
             }
           } else {
             if (isScheduled()) {
