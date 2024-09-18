@@ -219,12 +219,12 @@ class WPILIB_DLLEXPORT PIDController
   /**
    * Sets the error which is considered tolerable for use with AtSetpoint().
    *
-   * @param positionTolerance Position error which is tolerable.
-   * @param velocityTolerance Velocity error which is tolerable.
+   * @param errorTolerance error which is tolerable.
+   * @param errorDerivativeTolerance error derivative which is tolerable.
    */
   void SetTolerance(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity());
+      double errorTolerance,
+      double errorDerivativeTolerance = std::numeric_limits<double>::infinity());
 
   /**
    * Returns the difference between the setpoint and the measurement.

@@ -231,7 +231,7 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   @Deprecated(forRemoval = true, since = "2025")
   public double getPositionTolerance() {
-    return m_error;
+    return m_errorTolerance;
   }
 
   /**
@@ -242,7 +242,7 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   @Deprecated(forRemoval = true, since = "2025")
   public double getVelocityTolerance() {
-    return m_errorDerivative;
+    return m_errorDerivativeTolerance;
   }
 
   /**

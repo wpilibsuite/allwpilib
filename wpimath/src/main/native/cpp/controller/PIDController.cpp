@@ -159,10 +159,10 @@ void PIDController::SetIntegratorRange(double minimumIntegral,
   m_maximumIntegral = maximumIntegral;
 }
 
-void PIDController::SetTolerance(double positionTolerance,
-                                 double velocityTolerance) {
-  m_errorTolerance = positionTolerance;
-  m_errorDerivativeTolerance = velocityTolerance;
+void PIDController::SetTolerance(double errorTolerance,
+                                 double errorDerivativeTolerance) {
+  m_errorTolerance = errorTolerance;
+  m_errorDerivativeTolerance = errorDerivativeTolerance;
 }
 
 double PIDController::GetErrorTolerance() const {
@@ -170,7 +170,7 @@ double PIDController::GetErrorTolerance() const {
 }
 
 double PIDController::GetErrorDerivativeTolerance() const {
-  return m_errorDerivative;
+  return m_errorDerivativeTolerance;
 }
 
 double PIDController::GetError() const {
