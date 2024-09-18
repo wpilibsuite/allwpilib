@@ -288,7 +288,7 @@ public class CommandGenericHID {
    * @param threshold The value above which this trigger should return true.
    * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
    */
-  public Trigger axisActive(int axis, double threshold) {
+  public Trigger axisMagnitudeGreaterThan(int axis, double threshold) {
     return axisMagnitudeGreaterThan(
         axis, threshold, CommandScheduler.getInstance().getDefaultButtonLoop());
   }
