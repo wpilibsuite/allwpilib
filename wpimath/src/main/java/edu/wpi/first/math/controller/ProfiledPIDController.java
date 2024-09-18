@@ -183,7 +183,7 @@ public class ProfiledPIDController implements Sendable {
    * @return the velocity tolerance of the controller.
    */
   public double getVelocityTolerance() {
-    return m_controller.getErrorDerivative();
+    return m_controller.getErrorDerivativeTolerance();
   }
 
   /**
