@@ -150,7 +150,7 @@ class WPILIB_DLLEXPORT PIDController
    * @return The velocity tolerance of the controller.
    * @deprecated Use GetErrorDerivativeTolerance() instead.
    */
-  [[deprecated("Use the GetErrorDerivative method instead.")]]
+  [[deprecated("Use the GetErrorDerivativeTolerance method instead.")]]
   double GetVelocityTolerance() const;
 
   /**
@@ -247,7 +247,7 @@ class WPILIB_DLLEXPORT PIDController
    * Returns the velocity error.
    * @deprecated Use GetErrorDerivative() instead.
    */
-  [[deprecated("Use GetError method instead.")]]
+  [[deprecated("Use GetErrorDerivative method instead.")]]
   double GetVelocityError() const;
 
   /**
