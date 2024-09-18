@@ -139,6 +139,7 @@ class WPILIB_DLLEXPORT PIDController
    * Gets the position tolerance of this controller.
    *
    * @return The position tolerance of the controller.
+   * @deprecated Use GetErrorTolerance() instead.
    */
   [[deprecated("Use the GetErrorTolerance method instead.")]]
   double GetPositionTolerance() const;
@@ -147,6 +148,7 @@ class WPILIB_DLLEXPORT PIDController
    * Gets the velocity tolerance of this controller.
    *
    * @return The velocity tolerance of the controller.
+   * @deprecated Use GetErrorDerivativeTolerance() instead.
    */
   [[deprecated("Use the GetErrorDerivative method instead.")]]
   double GetVelocityTolerance() const;
@@ -236,12 +238,14 @@ class WPILIB_DLLEXPORT PIDController
 
   /**
    * Returns the difference between the setpoint and the measurement.
+   * @deprecated Use GetError() instead.
    */
   [[deprecated("Use GetError method instead.")]]
   double GetPositionError() const;
 
   /**
    * Returns the velocity error.
+   * @deprecated Use GetErrorDerivative() instead.
    */
   [[deprecated("Use GetError method instead.")]]
   double GetVelocityError() const;
