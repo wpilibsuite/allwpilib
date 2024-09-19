@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <span>
 #include <string>
@@ -14,7 +15,6 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/StringMap.h>
 #include <wpi/iterator_range.h>
 #include <wpi/json_fwd.h>
 
@@ -62,6 +62,22 @@ class Storage {
     explicit Value(Type type) : type{type} {}
     Value(const Value&) = delete;
     Value& operator=(const Value&) = delete;
+    Value(Value&& rhs)
+        : type{rhs.type},
+          stringVal{std::move(rhs.stringVal)},
+          stringDefault{std::move(rhs.stringDefault)},
+          hasDefault{rhs.hasDefault} {
+      rhs.type = kNone;
+    }
+    Value& operator=(Value&& rhs) {
+      Reset(kNone);
+      type = rhs.type;
+      stringVal = std::move(rhs.stringVal);
+      stringDefault = std::move(rhs.stringDefault);
+      hasDefault = rhs.hasDefault;
+      rhs.type = kNone;
+      return *this;
+    }
     ~Value() { Reset(kNone); }
 
     Type type = kNone;
@@ -103,7 +119,7 @@ class Storage {
     void Reset(Type newType);
   };
 
-  using ValueMap = wpi::StringMap<std::unique_ptr<Value>>;
+  using ValueMap = std::map<std::string, Value, std::less<>>;
   template <typename Iterator>
   using ChildIterator = detail::ChildIterator<Iterator>;
 
@@ -158,15 +174,23 @@ class Storage {
     return static_cast<T*>(m_data.get());
   }
 
+  template <typename T, typename... Args>
+  T& GetOrNewData(Args&&... args) {
+    if (!m_data) {
+      m_data = std::make_shared<T>(std::forward<Args>(args)...);
+    }
+    return *static_cast<T*>(m_data.get());
+  }
+
   Storage() = default;
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
 
-  void Insert(std::string_view key, std::unique_ptr<Value> value) {
-    m_values[key] = std::move(value);
+  void Insert(std::string_view key, Value&& value) {
+    m_values.try_emplace(std::string{key}, std::move(value));
   }
 
-  std::unique_ptr<Value> Erase(std::string_view key);
+  void Erase(std::string_view key);
 
   void EraseAll() { m_values.clear(); }
 
@@ -249,8 +273,7 @@ class ChildIterator {
  public:
   ChildIterator(IteratorType it, IteratorType end) noexcept
       : anchor(it), end(end) {
-    while (anchor != end &&
-           anchor->getValue()->type != Storage::Value::kChild) {
+    while (anchor != end && anchor->second.type != Storage::Value::kChild) {
       ++anchor;
     }
   }
@@ -261,8 +284,7 @@ class ChildIterator {
   /// increment operator (needed for range-based for)
   ChildIterator& operator++() {
     ++anchor;
-    while (anchor != end &&
-           anchor->getValue()->type != Storage::Value::kChild) {
+    while (anchor != end && anchor->second.type != Storage::Value::kChild) {
       ++anchor;
     }
     return *this;
@@ -274,10 +296,10 @@ class ChildIterator {
   }
 
   /// return key of the iterator
-  std::string_view key() const { return anchor->getKey(); }
+  std::string_view key() const { return anchor->first; }
 
   /// return value of the iterator
-  Storage& value() const { return *anchor->getValue()->child; }
+  Storage& value() const { return *anchor->second.child; }
 };
 
 }  // namespace detail

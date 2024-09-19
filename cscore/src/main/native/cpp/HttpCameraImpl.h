@@ -15,7 +15,6 @@
 #include <thread>
 #include <vector>
 
-#include <wpi/SmallString.h>
 #include <wpi/StringMap.h>
 #include <wpi/condition_variable.h>
 #include <wpi/raw_istream.h>
@@ -136,10 +135,10 @@ class HttpCameraImpl : public SourceImpl {
 
   wpi::condition_variable m_sinkEnabledCond;
 
-  wpi::StringMap<wpi::SmallString<16>> m_settings;
+  wpi::StringMap<std::string> m_settings;
   wpi::condition_variable m_settingsCond;
 
-  wpi::StringMap<wpi::SmallString<16>> m_streamSettings;
+  wpi::StringMap<std::string> m_streamSettings;
   std::atomic_bool m_streamSettingsUpdated{false};
 
   wpi::condition_variable m_monitorCond;

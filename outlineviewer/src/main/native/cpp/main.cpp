@@ -35,7 +35,6 @@ std::string_view GetResource_ov_512_png();
 static std::unique_ptr<glass::NetworkTablesModel> gModel;
 static std::unique_ptr<glass::NetworkTablesSettings> gSettings;
 static glass::LogData gLog;
-static glass::NetworkTablesFlagsSettings gFlagsSettings;
 static glass::MainMenuBar gMainMenu;
 static unsigned int gPrevMode = NT_NET_MODE_NONE;
 
@@ -124,7 +123,8 @@ static void DisplayGui() {
                    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                    ImGuiWindowFlags_NoCollapse);
 
-  gFlagsSettings.Update();
+  auto& flagsSettings =
+      glass::GetStorage().GetOrNewData<glass::NetworkTablesFlagsSettings>();
 
   // can't create popups from within menu, so use flags
   bool settings = false;
@@ -136,7 +136,7 @@ static void DisplayGui() {
   gMainMenu.WorkspaceMenu();
   gui::EmitViewMenu();
   if (ImGui::BeginMenu("View")) {
-    gFlagsSettings.DisplayMenu();
+    flagsSettings.DisplayMenu();
     glass::DisplayNetworkTablesAddMenu(gModel.get());
     ImGui::EndMenu();
   }
@@ -222,7 +222,7 @@ static void DisplayGui() {
   // display table view
   glass::DisplayNetworkTablesInfo(gModel.get());
   ImGui::Separator();
-  glass::DisplayNetworkTables(gModel.get(), gFlagsSettings.GetFlags());
+  glass::DisplayNetworkTables(gModel.get(), flagsSettings.GetFlags());
 
   ImGui::End();
 }
