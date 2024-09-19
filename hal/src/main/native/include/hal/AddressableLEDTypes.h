@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <hal/Types.h>
+#include <stdint.h>
 
 /** max length of LED strip supported by FPGA. */
 #define HAL_kAddressableLEDMaxLength 5460

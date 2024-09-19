@@ -54,7 +54,7 @@ template <bool inAlign, bool outAlign, ConvertFunc<uint8x8_t*> Convert>
 void ConvertNEON_8(const uint8_t* in, uint8_t* out) {
   uint8x8x4_t rgb = LoadHalf4<inAlign>(in);
   Convert(rgb.val);
-  StoreHalf4<outAlign>(out, rgb);
+  Store4<outAlign>(out, rgb);
 }
 
 template <HAL_AddressableLEDColorOrder order, bool inAlign, bool outAlign>
@@ -79,9 +79,55 @@ void RGBConvert_16(const uint8_t* src, uint8_t* dst) {
 }
 
 template <HAL_AddressableLEDColorOrder order, bool inAlign, bool outAlign>
+void RGBConvert_8(const uint8_t* src, uint8_t* dst) {
+  switch (order) {
+    case HAL_ALED_RBG:
+      ConvertNEON_8<inAlign, outAlign, RGBToRBG>(src, dst);
+      break;
+    case HAL_ALED_BGR:
+      ConvertNEON_8<inAlign, outAlign, RGBToBGR>(src, dst);
+      break;
+    case HAL_ALED_BRG:
+      ConvertNEON_8<inAlign, outAlign, RGBToBRG>(src, dst);
+      break;
+    case HAL_ALED_GRB:
+      ConvertNEON_8<inAlign, outAlign, RGBToGRB>(src, dst);
+      break;
+    case HAL_ALED_GBR:
+      ConvertNEON_8<inAlign, outAlign, RGBToGBR>(src, dst);
+      break;
+  }
+}
+
+void RGBConvert_1(HAL_AddressableLEDColorOrder order, const uint8_t* in, uint8_t* out) {
+  uint8_t tmp[4];
+  std::memcpy(tmp, in, 4);
+  switch (order) {
+    case HAL_ALED_RBG:
+      RGBToRBG(tmp);
+      break;
+    case HAL_ALED_BGR:
+      RGBToBGR(tmp);
+      break;
+    case HAL_ALED_BRG:
+      RGBToBRG(tmp);
+      break;
+    case HAL_ALED_GRB:
+      RGBToGRB(tmp);
+      break;
+    case HAL_ALED_GBR:
+      RGBToGBR(tmp);
+      break;
+    case HAL_ALED_RGB:
+      std::memcpy(out, in, 4);
+  }
+}
+
+template <HAL_AddressableLEDColorOrder order, bool inAlign, bool outAlign>
 void RGBConvert(const uint8_t* src, uint8_t* dst, size_t len) {
-  if(len >= 16) {
-    const size_t A4 = A * 4;
+  if (len >= 16) {
+    constexpr size_t A4 =
+        A * 4;  // Stride of 1 16 pixel conversion operation. (4 NEON registers)
     size_t size = len * 4;
     size_t aligned = Simd::AlignLo(size, A4);
     for (size_t i = 0; i < aligned; i += A4) {
@@ -92,7 +138,16 @@ void RGBConvert(const uint8_t* src, uint8_t* dst, size_t len) {
           src + size - A4,
           dst + size - A4);  // copy last 16 pixels, possibly recopying.
     }
+  } else if( len >=8 ) {
+    RGBConvert_8<order, inAlign, outAlign>(src, dst);
+    if(len > 8) {
+      size_t recopyOffset = (len * 4) - (HA * 4);
+      RGBConvert_8<order, false, false>(src + recopyOffset, dst + recopyOffset); // copy last 8 pixels, possibly recopying
+    }
   } else {
+    for(size_t i = 0; i < len; i += 4) {
+      RGBConvert_1(order, src + i, dst + i);
+    }
     // https://developer.arm.com/documentation/ddi0406/c/Application-Level-Architecture/Instruction-Details/Alphabetical-list-of-instructions/VLD4--single-4-element-structure-to-all-lanes-
     // https://developer.arm.com/documentation/102474/0100/Fundamentals-of-Armv8-Neon-technology/Registers--vectors--lanes-and-elements
     // vld4_lane_u8

@@ -36,7 +36,9 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
  */
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle);
 
-void HAL_SetAddressableLEDColorOrder(HAL_AddressableLEDHandle handle, HAL_AddressableLEDColorOrder colorOrder, int32_t* status);
+void HAL_SetAddressableLEDColorOrder(HAL_AddressableLEDHandle handle,
+                                     HAL_AddressableLEDColorOrder colorOrder,
+                                     int32_t* status);
 
 /**
  * Set the Addressable LED PWM Digital port.
