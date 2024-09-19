@@ -18,7 +18,7 @@
 #include "../TestPrinters.h"
 #include "../ValueMatcher.h"
 #include "Handle.h"
-#include "MockNetworkInterface.h"
+#include "MockMessageHandler.h"
 #include "MockWireConnection.h"
 #include "gmock/gmock.h"
 #include "net/Message.h"
@@ -44,7 +44,7 @@ namespace nt {
 
 class ServerImplTest : public ::testing::Test {
  public:
-  ::testing::StrictMock<net::MockLocalInterface> local;
+  ::testing::StrictMock<net::MockServerMessageHandler> local;
   wpi::MockLogger logger;
   net::ServerImpl server{logger};
 };
@@ -150,17 +150,18 @@ TEST_F(ServerImplTest, PublishLocal) {
   constexpr int pubuid3 = 3;
   {
     ::testing::InSequence seq;
-    EXPECT_CALL(local, NetworkAnnounce(
-                           std::string_view{"test"}, std::string_view{"double"},
-                           wpi::json::object(), std::optional<int>{pubuid}));
     EXPECT_CALL(
         local,
-        NetworkAnnounce(std::string_view{"test2"}, std::string_view{"double"},
-                        wpi::json::object(), std::optional<int>{pubuid2}));
+        ServerAnnounce(std::string_view{"test"}, 0, std::string_view{"double"},
+                       wpi::json::object(), std::optional<int>{pubuid}));
     EXPECT_CALL(
         local,
-        NetworkAnnounce(std::string_view{"test3"}, std::string_view{"double"},
-                        wpi::json::object(), std::optional<int>{pubuid3}));
+        ServerAnnounce(std::string_view{"test2"}, 0, std::string_view{"double"},
+                       wpi::json::object(), std::optional<int>{pubuid2}));
+    EXPECT_CALL(
+        local,
+        ServerAnnounce(std::string_view{"test3"}, 0, std::string_view{"double"},
+                       wpi::json::object(), std::optional<int>{pubuid3}));
   }
 
   {
@@ -235,9 +236,10 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
   // publish before client connect
   server.SetLocal(&local);
   constexpr int pubuid = 1;
-  EXPECT_CALL(local, NetworkAnnounce(
-                         std::string_view{"test"}, std::string_view{"double"},
-                         wpi::json::object(), std::optional<int>{pubuid}));
+  EXPECT_CALL(
+      local,
+      ServerAnnounce(std::string_view{"test"}, 0, std::string_view{"double"},
+                     wpi::json::object(), std::optional<int>{pubuid}));
 
   {
     std::vector<net::ClientMessage> msgs;
@@ -311,12 +313,13 @@ TEST_F(ServerImplTest, ClientDisconnectUnpublish) {
     ::testing::InSequence seq;
     EXPECT_CALL(
         local,
-        NetworkAnnounce(std::string_view{"test2"}, std::string_view{"double"},
-                        wpi::json::object(), std::optional<int>{pubuidLocal}));
-    EXPECT_CALL(local, NetworkAnnounce(
-                           std::string_view{"test"}, std::string_view{"double"},
-                           wpi::json::object(), std::optional<int>{}));
-    EXPECT_CALL(local, NetworkUnannounce(std::string_view{"test"}));
+        ServerAnnounce(std::string_view{"test2"}, 0, std::string_view{"double"},
+                       wpi::json::object(), std::optional<int>{pubuidLocal}));
+    EXPECT_CALL(
+        local,
+        ServerAnnounce(std::string_view{"test"}, 0, std::string_view{"double"},
+                       wpi::json::object(), std::optional<int>{}));
+    EXPECT_CALL(local, ServerUnannounce(std::string_view{"test"}, 0));
   }
 
   {
@@ -381,12 +384,13 @@ TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
   Value value = Value::MakeDouble(5, -10);
   {
     ::testing::InSequence seq;
-    EXPECT_CALL(local, NetworkAnnounce(
-                           std::string_view{"test"}, std::string_view{"double"},
-                           wpi::json::object(), std::optional<int>{pubuid}))
+    EXPECT_CALL(
+        local,
+        ServerAnnounce(std::string_view{"test"}, 0, std::string_view{"double"},
+                       wpi::json::object(), std::optional<int>{pubuid}))
         .WillOnce(Return(topicHandle));
-    EXPECT_CALL(local, NetworkSetValue(topicHandle, defaultValue));
-    EXPECT_CALL(local, NetworkSetValue(topicHandle, value));
+    EXPECT_CALL(local, ServerSetValue(topicHandle, defaultValue));
+    EXPECT_CALL(local, ServerSetValue(topicHandle, value));
   }
 
   {

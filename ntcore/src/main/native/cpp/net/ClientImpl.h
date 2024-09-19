@@ -14,7 +14,7 @@
 
 #include <wpi/DenseMap.h>
 
-#include "NetworkInterface.h"
+#include "MessageHandler.h"
 #include "NetworkOutgoingQueue.h"
 #include "NetworkPing.h"
 #include "PubSubOptions.h"
@@ -49,7 +49,7 @@ class ClientImpl final : private ServerMessageHandler {
 
   void SendOutgoing(uint64_t curTimeMs, bool flush);
 
-  void SetLocal(LocalInterface* local) { m_local = local; }
+  void SetLocal(ServerMessageHandler* local) { m_local = local; }
   void SendInitial();
 
  private:
@@ -63,12 +63,13 @@ class ClientImpl final : private ServerMessageHandler {
   void UpdatePeriodic();
 
   // ServerMessageHandler interface
-  void ServerAnnounce(std::string_view name, int id, std::string_view typeStr,
+  int ServerAnnounce(std::string_view name, int id, std::string_view typeStr,
                       const wpi::json& properties,
                       std::optional<int> pubuid) final;
   void ServerUnannounce(std::string_view name, int id) final;
   void ServerPropertiesUpdate(std::string_view name, const wpi::json& update,
                               bool ack) final;
+  void ServerSetValue(int topicId, const Value& value) final;
 
   void Publish(int pubuid, std::string_view name, std::string_view typeStr,
                const wpi::json& properties, const PubSubOptionsImpl& options);
@@ -77,7 +78,7 @@ class ClientImpl final : private ServerMessageHandler {
 
   WireConnection& m_wire;
   wpi::Logger& m_logger;
-  LocalInterface* m_local{nullptr};
+  ServerMessageHandler* m_local{nullptr};
   std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
       m_timeSyncUpdated;
   std::function<void(uint32_t repeatMs)> m_setPeriodic;
@@ -86,7 +87,7 @@ class ClientImpl final : private ServerMessageHandler {
   std::vector<std::unique_ptr<PublisherData>> m_publishers;
 
   // indexed by server-provided topic id
-  wpi::DenseMap<int, NT_Topic> m_topicMap;
+  wpi::DenseMap<int, int> m_topicMap;
 
   // ping
   NetworkPing m_ping;

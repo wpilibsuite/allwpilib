@@ -22,6 +22,7 @@
 
 #include "IConnectionList.h"
 #include "Log.h"
+#include "net/NetworkInterface.h"
 
 using namespace nt;
 namespace uv = wpi::uv;

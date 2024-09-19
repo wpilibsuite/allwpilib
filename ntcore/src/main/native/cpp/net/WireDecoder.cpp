@@ -17,6 +17,7 @@
 #include <wpi/mpack.h>
 
 #include "Message.h"
+#include "MessageHandler.h"
 
 using namespace nt;
 using namespace nt::net;
@@ -190,7 +191,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           }
 
           // complete
-          out.ClientPublish(pubuid, *name, *typeStr, *properties);
+          out.ClientPublish(pubuid, *name, *typeStr, *properties, {});
           rv = true;
         } else if (*method == UnpublishMsg::kMethodStr) {
           // pubuid

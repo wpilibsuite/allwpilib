@@ -199,10 +199,9 @@ std::span<ServerImpl::SubscriberData*> ServerImpl::ClientData::GetSubscribers(
   return {buf.data(), buf.size()};
 }
 
-void ServerImpl::ClientData4Base::ClientPublish(int pubuid,
-                                                std::string_view name,
-                                                std::string_view typeStr,
-                                                const wpi::json& properties) {
+void ServerImpl::ClientData4Base::ClientPublish(
+    int pubuid, std::string_view name, std::string_view typeStr,
+    const wpi::json& properties, const PubSubOptionsImpl& options) {
   DEBUG3("ClientPublish({}, {}, {}, {})", m_id, name, pubuid, typeStr);
   auto topic = m_server.CreateTopic(this, name, typeStr, properties);
 
@@ -393,7 +392,7 @@ void ServerImpl::ClientDataLocal::SendValue(TopicData* topic,
                                             const Value& value,
                                             ValueSendMode mode) {
   if (m_server.m_local) {
-    m_server.m_local->NetworkSetValue(topic->localHandle, value);
+    m_server.m_local->ServerSetValue(topic->localTopic, value);
   }
 }
 
@@ -406,8 +405,8 @@ void ServerImpl::ClientDataLocal::SendAnnounce(TopicData* topic,
     }
     sent = true;
 
-    topic->localHandle = m_server.m_local->NetworkAnnounce(
-        topic->name, topic->typeStr, topic->properties, pubuid);
+    topic->localTopic = m_server.m_local->ServerAnnounce(
+        topic->name, 0, topic->typeStr, topic->properties, pubuid);
   }
 }
 
@@ -418,7 +417,7 @@ void ServerImpl::ClientDataLocal::SendUnannounce(TopicData* topic) {
       return;
     }
     sent = false;
-    m_server.m_local->NetworkUnannounce(topic->name);
+    m_server.m_local->ServerUnannounce(topic->name, topic->localTopic);
   }
 }
 
@@ -429,7 +428,7 @@ void ServerImpl::ClientDataLocal::SendPropertiesUpdate(TopicData* topic,
     if (!m_announceSent.lookup(topic)) {
       return;
     }
-    m_server.m_local->NetworkPropertiesUpdate(topic->name, update, ack);
+    m_server.m_local->ServerPropertiesUpdate(topic->name, update, ack);
   }
 }
 
@@ -447,7 +446,8 @@ void ServerImpl::ClientDataLocal::HandleLocal(
     if (auto msg = std::get_if<ClientValueMsg>(&elem.contents)) {
       ClientSetValue(msg->pubuid, msg->value);
     } else if (auto msg = std::get_if<PublishMsg>(&elem.contents)) {
-      ClientPublish(msg->pubuid, msg->name, msg->typeStr, msg->properties);
+      ClientPublish(msg->pubuid, msg->name, msg->typeStr, msg->properties,
+                    msg->options);
       updatepub = true;
     } else if (auto msg = std::get_if<UnpublishMsg>(&elem.contents)) {
       ClientUnpublish(msg->pubuid);
@@ -1923,7 +1923,7 @@ void ServerImpl::HandleLocal(std::span<const ClientMessage> msgs) {
   m_localClient->HandleLocal(msgs);
 }
 
-void ServerImpl::SetLocal(LocalInterface* local) {
+void ServerImpl::SetLocal(ServerMessageHandler* local) {
   DEBUG4("SetLocal()");
   m_local = local;
 

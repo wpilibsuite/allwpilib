@@ -11,7 +11,7 @@
 #include <wpi/mutex.h>
 
 #include "Message.h"
-#include "NetworkInterface.h"
+#include "MessageHandler.h"
 
 namespace wpi {
 class Logger;
@@ -19,7 +19,7 @@ class Logger;
 
 namespace nt::net {
 
-class NetworkLoopQueue : public NetworkInterface {
+class NetworkLoopQueue : public ClientMessageHandler {
  public:
   static constexpr size_t kInitialQueueSize = 2000;
 
@@ -30,16 +30,17 @@ class NetworkLoopQueue : public NetworkInterface {
   void ReadQueue(std::vector<ClientMessage>* out);
   void ClearQueue();
 
-  // NetworkInterface - calls to these append to the queue
-  void Publish(int pubuid, std::string_view name, std::string_view typeStr,
-               const wpi::json& properties,
-               const PubSubOptionsImpl& options) final;
-  void Unpublish(int pubuid) final;
-  void SetProperties(std::string_view name, const wpi::json& update) final;
-  void Subscribe(int subuid, std::span<const std::string> topicNames,
-                 const PubSubOptionsImpl& options) final;
-  void Unsubscribe(int subuid) final;
-  void SetValue(int pubuid, const Value& value) final;
+  // ClientMessageHandler - calls to these append to the queue
+  void ClientPublish(int pubuid, std::string_view name,
+                     std::string_view typeStr, const wpi::json& properties,
+                     const PubSubOptionsImpl& options) final;
+  void ClientUnpublish(int pubuid) final;
+  void ClientSetProperties(std::string_view name,
+                           const wpi::json& update) final;
+  void ClientSubscribe(int subuid, std::span<const std::string> topicNames,
+                       const PubSubOptionsImpl& options) final;
+  void ClientUnsubscribe(int subuid) final;
+  void ClientSetValue(int pubuid, const Value& value) final;
 
  private:
   wpi::mutex m_mutex;
