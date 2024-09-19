@@ -4,6 +4,9 @@
 
 #include "wpimath/MathShared.h"
 
+#include <memory>
+#include <utility>
+
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
 

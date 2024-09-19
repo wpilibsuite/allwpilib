@@ -6,6 +6,8 @@
 
 #include <execinfo.h>
 
+#include <string>
+
 #include "wpi/Demangle.h"
 #include "wpi/SmallString.h"
 #include "wpi/StringExtras.h"

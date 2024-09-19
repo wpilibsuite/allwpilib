@@ -5,7 +5,8 @@
 #include "frc/AnalogGyro.h"
 
 #include <climits>
-#include <utility>
+#include <memory>
+#include <string>
 
 #include <hal/AnalogGyro.h>
 #include <hal/Errors.h>
@@ -17,7 +18,6 @@
 
 #include "frc/AnalogInput.h"
 #include "frc/Errors.h"
-#include "frc/Timer.h"
 
 using namespace frc;
 

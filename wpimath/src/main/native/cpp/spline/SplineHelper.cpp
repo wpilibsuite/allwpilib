@@ -5,6 +5,7 @@
 #include "frc/spline/SplineHelper.h"
 
 #include <cstddef>
+#include <vector>
 
 using namespace frc;
 
