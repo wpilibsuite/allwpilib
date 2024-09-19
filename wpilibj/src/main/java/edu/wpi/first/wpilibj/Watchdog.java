@@ -31,8 +31,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   boolean m_suppressTimeoutMessage;
 
-  private final Tracer m_tracer;
-
   private static final PriorityQueue<Watchdog> m_watchdogs = new PriorityQueue<>();
   private static ReentrantLock m_queueMutex = new ReentrantLock();
   private static int m_notifier;
@@ -52,7 +50,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   public Watchdog(double timeoutSeconds, Runnable callback) {
     m_timeoutSeconds = timeoutSeconds;
     m_callback = callback;
-    m_tracer = new Tracer();
   }
 
   @Override
@@ -94,7 +91,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    */
   public void setTimeout(double timeoutSeconds) {
     m_startTimeSeconds = Timer.getFPGATimestamp();
-    m_tracer.clearEpochs();
 
     m_queueMutex.lock();
     try {
@@ -139,25 +135,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   }
 
   /**
-   * Adds time since last epoch to the list printed by printEpochs().
-   *
-   * @see Tracer#addEpoch(String)
-   * @param epochName The name to associate with the epoch.
-   */
-  public void addEpoch(String epochName) {
-    m_tracer.addEpoch(epochName);
-  }
-
-  /**
-   * Prints list of epochs added so far and their times.
-   *
-   * @see Tracer#printEpochs()
-   */
-  public void printEpochs() {
-    m_tracer.printEpochs();
-  }
-
-  /**
    * Resets the watchdog timer.
    *
    * <p>This also enables the timer if it was previously disabled.
@@ -169,7 +146,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /** Enables the watchdog timer. */
   public void enable() {
     m_startTimeSeconds = Timer.getFPGATimestamp();
-    m_tracer.clearEpochs();
 
     m_queueMutex.lock();
     try {

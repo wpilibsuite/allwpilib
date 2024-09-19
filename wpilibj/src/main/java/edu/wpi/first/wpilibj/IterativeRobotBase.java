@@ -299,6 +299,8 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   /** Loop function. */
   protected void loopFunc() {
+    Tracer.startTrace("RobotLoop");
+
     DriverStation.refreshData();
     m_watchdog.reset();
 
@@ -344,15 +346,12 @@ public abstract class IterativeRobotBase extends RobotBase {
       switch (mode) {
         case kDisabled -> {
           disabledInit();
-          m_watchdog.addEpoch("disabledInit()");
         }
         case kAutonomous -> {
           autonomousInit();
-          m_watchdog.addEpoch("autonomousInit()");
         }
         case kTeleop -> {
           teleopInit();
-          m_watchdog.addEpoch("teleopInit()");
         }
         case kTest -> {
           if (m_lwEnabledInTest) {
@@ -360,7 +359,6 @@ public abstract class IterativeRobotBase extends RobotBase {
             Shuffleboard.enableActuatorWidgets();
           }
           testInit();
-          m_watchdog.addEpoch("testInit()");
         }
         default -> {
           // NOP
@@ -374,44 +372,35 @@ public abstract class IterativeRobotBase extends RobotBase {
     switch (mode) {
       case kDisabled -> {
         DriverStationJNI.observeUserProgramDisabled();
-        disabledPeriodic();
-        m_watchdog.addEpoch("disabledPeriodic()");
+        Tracer.traceFunc("DisabledPeriodic", this::disabledPeriodic);
       }
       case kAutonomous -> {
         DriverStationJNI.observeUserProgramAutonomous();
-        autonomousPeriodic();
-        m_watchdog.addEpoch("autonomousPeriodic()");
+        Tracer.traceFunc("AutonomousPeriodic", this::autonomousPeriodic);
       }
       case kTeleop -> {
         DriverStationJNI.observeUserProgramTeleop();
-        teleopPeriodic();
-        m_watchdog.addEpoch("teleopPeriodic()");
+        Tracer.traceFunc("TeleopPeriodic", this::teleopPeriodic);
       }
       case kTest -> {
         DriverStationJNI.observeUserProgramTest();
-        testPeriodic();
-        m_watchdog.addEpoch("testPeriodic()");
+        Tracer.traceFunc("TestPeriodic", this::testPeriodic);
       }
       default -> {
         // NOP
       }
     }
 
-    robotPeriodic();
-    m_watchdog.addEpoch("robotPeriodic()");
+    Tracer.traceFunc("RobotPeriodic", this::robotPeriodic);
 
     SmartDashboard.updateValues();
-    m_watchdog.addEpoch("SmartDashboard.updateValues()");
     LiveWindow.updateValues();
-    m_watchdog.addEpoch("LiveWindow.updateValues()");
     Shuffleboard.update();
-    m_watchdog.addEpoch("Shuffleboard.update()");
 
     if (isSimulation()) {
       HAL.simPeriodicBefore();
-      simulationPeriodic();
+      Tracer.traceFunc("SimulationPeriodic", this::simulationPeriodic);
       HAL.simPeriodicAfter();
-      m_watchdog.addEpoch("simulationPeriodic()");
     }
 
     m_watchdog.disable();
@@ -421,15 +410,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       NetworkTableInstance.getDefault().flushLocal();
     }
 
-    // Warn on loop time overruns
-    if (m_watchdog.isExpired()) {
-      m_watchdog.printEpochs();
-    }
-  }
-
-  /** Prints list of epochs added so far and their times. */
-  public void printWatchdogEpochs() {
-    m_watchdog.printEpochs();
+    Tracer.endTrace();
   }
 
   private void printLoopOverrunMessage() {
