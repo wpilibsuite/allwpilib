@@ -15,7 +15,7 @@ runs:
       shell: bash
       run: |
           echo "No API key secret detected, will setup readonly cache"
-          echo "build:ci --build_buddy_readonly" > bazel_auth.rc
+          echo "build:ci --config=build_buddy_readonly" > bazel_auth.rc
 
     - name: Set with key
       env:
