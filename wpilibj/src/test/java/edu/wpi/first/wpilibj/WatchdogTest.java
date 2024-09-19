@@ -119,6 +119,36 @@ class WatchdogTest {
 
   @Test
   @ResourceLock("timing")
+  void epochsTest() {
+    final AtomicInteger watchdogCounter = new AtomicInteger(0);
+
+    try (Watchdog watchdog = new Watchdog(0.4, () -> watchdogCounter.addAndGet(1))) {
+      // Run 1
+      watchdog.enable();
+      watchdog.addEpoch("Epoch 1");
+      SimHooks.stepTiming(0.1);
+      watchdog.addEpoch("Epoch 2");
+      SimHooks.stepTiming(0.1);
+      watchdog.addEpoch("Epoch 3");
+      watchdog.disable();
+
+      assertEquals(0, watchdogCounter.get(), "Watchdog triggered early");
+
+      // Run 2
+      watchdog.enable();
+      watchdog.addEpoch("Epoch 1");
+      SimHooks.stepTiming(0.2);
+      watchdog.reset();
+      SimHooks.stepTiming(0.2);
+      watchdog.addEpoch("Epoch 2");
+      watchdog.disable();
+
+      assertEquals(0, watchdogCounter.get(), "Watchdog triggered early");
+    }
+  }
+
+  @Test
+  @ResourceLock("timing")
   void multiWatchdogTest() {
     final AtomicInteger watchdogCounter1 = new AtomicInteger(0);
     final AtomicInteger watchdogCounter2 = new AtomicInteger(0);

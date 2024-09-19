@@ -128,8 +128,6 @@ public class TimedRobot extends IterativeRobotBase {
         break;
       }
 
-      Tracer.startTrace("TimedRobot");
-
       callback.func.run();
 
       // Increment the expiration time by the number of full periods it's behind
@@ -152,8 +150,6 @@ public class TimedRobot extends IterativeRobotBase {
                 + (currentTime - callback.expirationTime) / callback.period * callback.period;
         m_callbacks.add(callback);
       }
-
-      Tracer.endTrace();
     }
   }
 
