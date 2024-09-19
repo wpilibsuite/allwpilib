@@ -170,8 +170,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     for (Consumer<Command> action : m_initActions) {
       action.accept(command);
     }
-
-    m_watchdog.addEpoch(command.getName() + ".initialize()");
   }
 
   /**
@@ -264,7 +262,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       if (RobotBase.isSimulation()) {
         subsystem.simulationPeriodic();
       }
-      m_watchdog.addEpoch(subsystem.getName() + ".periodic()");
     }
 
     // Cache the active instance to avoid concurrency problems if setActiveLoop() is called from
@@ -272,7 +269,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     EventLoop loopCache = m_activeButtonLoop;
     // Poll buttons for new commands to add.
     loopCache.poll();
-    m_watchdog.addEpoch("buttons.run()");
 
     m_inRunLoop = true;
     boolean isDisabled = RobotState.isDisabled();
@@ -289,7 +285,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       for (Consumer<Command> action : m_executeActions) {
         action.accept(command);
       }
-      m_watchdog.addEpoch(command.getName() + ".execute()");
       if (command.isFinished()) {
         m_endingCommands.add(command);
         command.end(false);
@@ -300,7 +295,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
         iterator.remove();
 
         m_requirements.keySet().removeAll(command.getRequirements());
-        m_watchdog.addEpoch(command.getName() + ".end(false)");
       }
     }
     m_inRunLoop = false;
@@ -329,7 +323,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     m_watchdog.disable();
     if (m_watchdog.isExpired()) {
       System.out.println("CommandScheduler loop overrun");
-      m_watchdog.printEpochs();
     }
   }
 
@@ -487,7 +480,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     m_endingCommands.remove(command);
     m_scheduledCommands.remove(command);
     m_requirements.keySet().removeAll(command.getRequirements());
-    m_watchdog.addEpoch(command.getName() + ".end(true)");
   }
 
   /** Cancels all commands that are currently scheduled. */
@@ -528,11 +520,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   /** Enables the command scheduler. */
   public void enable() {
     m_disabled = false;
-  }
-
-  /** Prints list of epochs added so far and their times. */
-  public void printWatchdogEpochs() {
-    m_watchdog.printEpochs();
   }
 
   /**
