@@ -25,8 +25,7 @@ add_executable(
     ${APP_ICON_MACOSX}
 )
 wpilib_link_macos_gui(datalogtool)
-target_link_libraries(datalogtool libglass ${LIBSSH_LIBRARIES})
-target_include_directories(datalogtool SYSTEM PRIVATE ${LIBSSH_INCLUDE_DIRS})
+target_link_libraries(datalogtool libglass ssh)
 
 if(WIN32)
     set_target_properties(datalogtool PROPERTIES WIN32_EXECUTABLE YES)

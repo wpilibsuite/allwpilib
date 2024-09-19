@@ -9,6 +9,7 @@
 #include <fmt/format.h>
 #include <wpi/ProtoHelper.h>
 
+#include "frc/proto/MatrixProto.h"
 #include "frc/system/proto/LinearSystemProto.h"
 #include "system.pb.h"
 

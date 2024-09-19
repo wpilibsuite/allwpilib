@@ -99,5 +99,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
 };
 }  // namespace frc
 
+#ifndef NO_PROTOBUF
 #include "frc/kinematics/proto/DifferentialDriveKinematicsProto.h"
+#endif
 #include "frc/kinematics/struct/DifferentialDriveKinematicsStruct.h"

@@ -32,7 +32,7 @@ ext {
                     include '*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/fmtlib/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/llvm/include'
                 }
             }
             llvmCpp(CppSourceSet) {
@@ -41,7 +41,7 @@ ext {
                     include '**/*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include'
                 }
             }
             mpackCpp(CppSourceSet) {
@@ -180,6 +180,9 @@ nativeUtils.exportsConfigs {
 }
 
 cppHeadersZip {
+    from('src/main/native/thirdparty/argparse/include/') {
+        into '/'
+    }
     from('src/main/native/thirdparty/concurrentqueue/include') {
         into '/'
     }
@@ -238,7 +241,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/concurrentqueue/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/concurrentqueue/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include'
                 }
             }
         }

@@ -9,8 +9,6 @@
 #include <Eigen/Core>
 #include <wpi/json.h>
 
-#include "geometry3d.pb.h"
-
 using namespace frc;
 
 namespace {

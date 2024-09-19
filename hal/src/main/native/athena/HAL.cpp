@@ -297,20 +297,15 @@ void HAL_GetSerialNumber(struct WPI_String* serialNumber) {
 
 void InitializeRoboRioComments(void) {
   if (!roboRioCommentsStringInitialized) {
-    std::error_code ec;
-    std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-        wpi::MemoryBuffer::GetFile("/etc/machine-info", ec);
-
-    std::string_view fileContents;
-    if (fileBuffer && !ec) {
-      fileContents =
-          std::string_view(reinterpret_cast<const char*>(fileBuffer->begin()),
-                           fileBuffer->size());
-    } else {
+    auto fileBuffer = wpi::MemoryBuffer::GetFile("/etc/machine-info");
+    if (!fileBuffer) {
       roboRioCommentsStringSize = 0;
       roboRioCommentsStringInitialized = true;
       return;
     }
+    std::string_view fileContents{
+        reinterpret_cast<const char*>(fileBuffer.value()->begin()),
+        fileBuffer.value()->size()};
     std::string_view searchString = "PRETTY_HOSTNAME=\"";
 
     size_t start = fileContents.find(searchString);

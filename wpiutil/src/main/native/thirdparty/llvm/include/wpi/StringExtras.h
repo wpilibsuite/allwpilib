@@ -680,7 +680,7 @@ inline std::optional<T> parse_integer(std::string_view str,
       static_cast<Int>(static_cast<T>(val)) != val) {
     return std::nullopt;
   }
-  return val;
+  return static_cast<T>(val);
 }
 
 /**

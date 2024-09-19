@@ -85,6 +85,12 @@ class DataLogManager final {
    * @param enabled true to enable, false to disable
    */
   static void LogNetworkTables(bool enabled);
+
+  /**
+   * Enable or disable logging of the console output. Defaults to enabled.
+   * @param enabled  true to enable, false to disable
+   */
+  static void LogConsoleOutput(bool enabled);
 };
 
 }  // namespace frc

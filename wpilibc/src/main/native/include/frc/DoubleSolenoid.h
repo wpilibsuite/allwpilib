@@ -70,14 +70,14 @@ class DoubleSolenoid : public wpi::Sendable,
    *
    * @param value The value to set (Off, Forward or Reverse)
    */
-  virtual void Set(Value value);
+  void Set(Value value);
 
   /**
    * Read the current value of the solenoid.
    *
    * @return The current value of the solenoid.
    */
-  virtual Value Get() const;
+  Value Get() const;
 
   /**
    * Toggle the value of the solenoid.

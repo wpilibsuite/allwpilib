@@ -48,5 +48,7 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
 };
 }  // namespace frc
 
+#ifndef NO_PROTOBUF
 #include "frc/kinematics/proto/SwerveModuleStateProto.h"
+#endif
 #include "frc/kinematics/struct/SwerveModuleStateStruct.h"

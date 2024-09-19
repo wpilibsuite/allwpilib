@@ -259,10 +259,14 @@ static std::unique_ptr<WritableMemoryBuffer> GetMemoryBufferForStream(
   return GetMemBufferCopyImpl(buffer, bufferName, ec);
 }
 
-std::unique_ptr<MemoryBuffer> MemoryBuffer::GetFile(std::string_view filename,
-                                                    std::error_code& ec,
-                                                    int64_t fileSize) {
-  return GetFileAux<MemoryBuffer>(filename, ec, fileSize, fileSize, 0);
+wpi::expected<std::unique_ptr<MemoryBuffer>, std::error_code>
+MemoryBuffer::GetFile(std::string_view filename, int64_t fileSize) {
+  std::error_code ec;
+  auto ret = GetFileAux<MemoryBuffer>(filename, ec, fileSize, fileSize, 0);
+  if (ec) {
+    return wpi::unexpected{ec};
+  }
+  return ret;
 }
 
 template <typename MB>

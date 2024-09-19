@@ -1,6 +1,7 @@
 DLM_GetLog
 DLM_GetLogDir
 DLM_Log
+DLM_LogConsoleOutput
 DLM_LogNetworkTables
 DLM_SignalNewDSDataOccur
 DLM_Start

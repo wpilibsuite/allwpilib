@@ -90,6 +90,11 @@ class DataLogManager final {
   static void LogNetworkTables(bool enabled);
 
   /**
+   * Enable or disable logging of the console output. Defaults to enabled.
+   * @param enabled  true to enable, false to disable
+   */
+  static void LogConsoleOutput(bool enabled);
+  /**
    * Signal new DS data is available.
    */
   static void SignalNewDSDataOccur();
@@ -151,6 +156,13 @@ const char* DLM_GetLogDir(void);
  * @param enabled true to enable, false to disable
  */
 void DLM_LogNetworkTables(int enabled);
+
+
+  /**
+   * Enable or disable logging of the console output. Defaults to enabled.
+   * @param enabled  true to enable, false to disable
+   */
+void DLM_LogConsoleOutput(int enabled);
 
 /**
  * Signal new DS data is available.

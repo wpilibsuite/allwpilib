@@ -21,5 +21,7 @@ struct DifferentialDriveWheelVoltages {
 
 }  // namespace frc
 
+#ifndef NO_PROTOBUF
 #include "frc/controller/proto/DifferentialDriveWheelVoltagesProto.h"
+#endif
 #include "frc/controller/struct/DifferentialDriveWheelVoltagesStruct.h"
