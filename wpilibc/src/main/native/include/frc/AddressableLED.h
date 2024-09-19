@@ -99,9 +99,9 @@ class AddressableLED {
   /**
    * Sets the color order for this AddressableLED
    *
-   * @param[in] colorOrder the color order
+   * @param[in] order the color order
    */
-  void SetOrder(HAL_AddressableLEDColorOrder);
+  void SetOrder(HAL_AddressableLEDColorOrder order);
 
   /**
    * Sets the length of the LED strip.
