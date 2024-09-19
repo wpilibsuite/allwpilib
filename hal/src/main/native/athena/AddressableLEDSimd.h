@@ -176,8 +176,12 @@ void RGBConvert_8(const uint8_t* src, uint8_t* dst) {
  */
 void RGBConvert_1(HAL_AddressableLEDColorOrder order, const uint8_t* src,
                   uint8_t* dst) {
+  // we could also use neon single lane instructions
+  // https://developer.arm.com/documentation/ddi0406/c/Application-Level-Architecture/Instruction-Details/Alphabetical-list-of-instructions/VLD4--single-4-element-structure-to-one-lane-
+  // vld4_lane_u8
   uint8_t tmp[4];
-  std::memcpy(tmp, src, 4);
+  std::memcpy(tmp, src, 4);  // Load 4 bytes
+  // convert based on order
   switch (order) {
     case HAL_ALED_RBG:
       RGBToRBG(tmp);
@@ -195,8 +199,10 @@ void RGBConvert_1(HAL_AddressableLEDColorOrder order, const uint8_t* src,
       RGBToGBR(tmp);
       break;
     case HAL_ALED_RGB:
-      std::memcpy(dst, src, 4);
+      std::memcpy(dst, src, 4);  // this shouldn't ever get hit but compiler
+                                 // wants this to be exhaustive
   }
+  std::memcpy(dst, tmp, 4);  // Store 4 bytes
 }
 /**
  * Copies len pixels from src to dst, converting from RGB(?) to order. Optimizes
@@ -241,9 +247,6 @@ void RGBConvert(const uint8_t* src, uint8_t* dst, size_t len) {
     for (size_t i = 0; i < len; i += 4) {
       RGBConvert_1(order, src + i, dst + i);
     }
-    // we could also use neon single lane instructions
-    // https://developer.arm.com/documentation/ddi0406/c/Application-Level-Architecture/Instruction-Details/Alphabetical-list-of-instructions/VLD4--single-4-element-structure-to-one-lane-
-    // vld4_lane_u8
   }
 }
 
