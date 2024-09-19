@@ -233,7 +233,7 @@ public abstract class Command implements Sendable {
   public SequentialCommandGroup after(BooleanSupplier condition) {
     // if we want this to bypass the `WaitUntilCommand` if the condition is already true,
     // we can use a conditional command but it proposes some compositional issues
-    return new SequentialCommandGroup(new WaitUntilCommand(condition), this);
+    return beforeStarting(new WaitUntilCommand(condition));
   }
 
   /**
@@ -249,7 +249,7 @@ public abstract class Command implements Sendable {
    * @return the decorated command
    */
   public SequentialCommandGroup afterSeconds(double seconds) {
-    return new SequentialCommandGroup(new WaitCommand(seconds), this);
+    return beforeStarting(new WaitCommand(seconds));
   }
 
   /**

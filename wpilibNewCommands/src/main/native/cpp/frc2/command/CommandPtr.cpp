@@ -167,20 +167,12 @@ CommandPtr CommandPtr::OnlyIf(std::function<bool()> condition) && {
 
 CommandPtr CommandPtr::After(std::function<bool()> condition) && {
   AssertValid();
-  std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));
-  temp.emplace_back(std::move(m_ptr));
-  m_ptr = std::make_unique<SequentialCommandGroup>(std::move(temp));
-  return std::move(*this);
+  return std::move(*this).BeforeStarting(std::make_unique<WaitUntilCommand>(std::move(condition)));
 }
 
 CommandPtr CommandPtr::AfterTime(units::second_t duration) && {
   AssertValid();
-  std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(std::make_unique<WaitCommand>(duration));
-  temp.emplace_back(std::move(m_ptr));
-  m_ptr = std::make_unique<SequentialCommandGroup>(std::move(temp));
-  return std::move(*this);
+  return std::move(*this).BeforeStarting(std::make_unique<WaitCommand>(duration));
 }
 
 CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {
