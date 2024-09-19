@@ -95,6 +95,12 @@ class AddressableLED {
   AddressableLED(AddressableLED&&) = default;
   AddressableLED& operator=(AddressableLED&&) = default;
 
+
+  /**
+   * Sets the color order for this AddressableLED
+   *
+   * @param[in] colorOrder the color order
+   */
   void SetOrder(HAL_AddressableLEDColorOrder);
 
   /**

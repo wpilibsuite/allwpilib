@@ -36,6 +36,12 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
  */
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle);
 
+/**
+ * Sets the color order for the addressable LED output
+ * @param[in] handle the Addressable LED handle
+ * @param[in] colorOrder the color order
+ * @param[out] status the error code, or 0 for success
+ */
 void HAL_SetAddressableLEDColorOrder(HAL_AddressableLEDHandle handle,
                                      HAL_AddressableLEDColorOrder colorOrder,
                                      int32_t* status);
