@@ -181,9 +181,9 @@ TEST_F(CommandDecoratorTest, AndThen) {
 
   bool finished = false;
 
-  auto command1 = InstantCommand();
-  auto command2 = InstantCommand([&finished] { finished = true; });
-  auto group = std::move(command1).AndThen(std::move(command2).ToPtr());
+  auto command1 = cmd::None();
+  auto command2 = cmd::RunOnce([&finished] { finished = true; });
+  auto group = std::move(command1).AndThen(std::move(command2));
 
   scheduler.Schedule(group);
 
@@ -203,10 +203,10 @@ TEST_F(CommandDecoratorTest, DeadlineFor) {
 
   bool finish = false;
 
-  auto dictator = WaitUntilCommand([&finish] { return finish; });
-  auto endsAfter = WaitUntilCommand([] { return false; });
+  auto dictator = cmd::WaitUntil([&finish] { return finish; });
+  auto endsAfter = cmd::Idle();
 
-  auto group = std::move(dictator).DeadlineFor(std::move(endsAfter).ToPtr());
+  auto group = std::move(dictator).DeadlineFor(std::move(endsAfter));
 
   scheduler.Schedule(group);
   scheduler.Run();
@@ -224,10 +224,10 @@ TEST_F(CommandDecoratorTest, AlongWith) {
 
   bool finish = false;
 
-  auto command1 = WaitUntilCommand([&finish] { return finish; });
-  auto command2 = InstantCommand();
+  auto command1 = cmd::WaitUntil([&finish] { return finish; });
+  auto command2 = cmd::None();
 
-  auto group = std::move(command1).AlongWith(std::move(command2).ToPtr());
+  auto group = std::move(command1).AlongWith(std::move(command2));
 
   scheduler.Schedule(group);
   scheduler.Run();
@@ -243,10 +243,10 @@ TEST_F(CommandDecoratorTest, AlongWith) {
 TEST_F(CommandDecoratorTest, RaceWith) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto command1 = WaitUntilCommand([] { return false; });
-  auto command2 = InstantCommand();
+  auto command1 = cmd::Idle();
+  auto command2 = cmd::None();
 
-  auto group = std::move(command1).RaceWith(std::move(command2).ToPtr());
+  auto group = std::move(command1).RaceWith(std::move(command2));
 
   scheduler.Schedule(group);
   scheduler.Run();
@@ -267,12 +267,12 @@ TEST_F(CommandDecoratorTest, DeadlineForOrder) {
                           dictatorWasPolled = true;
                           return true;
                         });
-  auto other = RunCommand([&dictatorHasRun, &dictatorWasPolled] {
+  auto other = cmd::Run([&dictatorHasRun, &dictatorWasPolled] {
     EXPECT_TRUE(dictatorHasRun);
     EXPECT_TRUE(dictatorWasPolled);
   });
 
-  auto group = std::move(dictator).DeadlineFor(std::move(other).ToPtr());
+  auto group = std::move(dictator).DeadlineFor(std::move(other));
 
   scheduler.Schedule(group);
   scheduler.Run();
@@ -293,12 +293,12 @@ TEST_F(CommandDecoratorTest, AlongWithOrder) {
         firstWasPolled = true;
         return true;
       });
-  auto command2 = RunCommand([&firstHasRun, &firstWasPolled] {
+  auto command2 = cmd::Run([&firstHasRun, &firstWasPolled] {
     EXPECT_TRUE(firstHasRun);
     EXPECT_TRUE(firstWasPolled);
   });
 
-  auto group = std::move(command1).AlongWith(std::move(command2).ToPtr());
+  auto group = std::move(command1).AlongWith(std::move(command2));
 
   scheduler.Schedule(group);
   scheduler.Run();
@@ -319,12 +319,12 @@ TEST_F(CommandDecoratorTest, RaceWithOrder) {
         firstWasPolled = true;
         return true;
       });
-  auto command2 = RunCommand([&firstHasRun, &firstWasPolled] {
+  auto command2 = cmd::Run([&firstHasRun, &firstWasPolled] {
     EXPECT_TRUE(firstHasRun);
     EXPECT_TRUE(firstWasPolled);
   });
 
-  auto group = std::move(command1).RaceWith(std::move(command2).ToPtr());
+  auto group = std::move(command1).RaceWith(std::move(command2));
 
   scheduler.Schedule(group);
   scheduler.Run();
@@ -339,7 +339,7 @@ TEST_F(CommandDecoratorTest, Unless) {
   bool hasRun = false;
   bool unlessCondition = true;
 
-  auto command = InstantCommand([&hasRun] { hasRun = true; }, {})
+  auto command = cmd::RunOnce([&hasRun] { hasRun = true; }, {})
                      .Unless([&unlessCondition] { return unlessCondition; });
 
   scheduler.Schedule(command);
