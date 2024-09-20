@@ -5,7 +5,6 @@
 package edu.wpi.first.math.filter;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUtil;
 
 /**
  * A class that limits the rate of change of an input value. Useful for implementing voltage,

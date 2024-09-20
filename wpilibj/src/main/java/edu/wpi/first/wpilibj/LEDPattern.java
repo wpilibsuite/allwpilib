@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.Microsecond;
 import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Value;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.collections.LongToObjectHashMap;
 import edu.wpi.first.units.measure.Dimensionless;
 import edu.wpi.first.units.measure.Distance;

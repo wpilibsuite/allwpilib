@@ -6,7 +6,6 @@ package edu.wpi.first.math.optimization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.MathUtil;
 import java.util.function.DoubleUnaryOperator;
 import org.junit.jupiter.api.Test;
 

@@ -6,7 +6,6 @@ package edu.wpi.first.math.geometry;
 
 import static edu.wpi.first.units.Units.Meters;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.proto.Rectangle2dProto;
 import edu.wpi.first.math.geometry.struct.Rectangle2dStruct;
 import edu.wpi.first.units.measure.Distance;
