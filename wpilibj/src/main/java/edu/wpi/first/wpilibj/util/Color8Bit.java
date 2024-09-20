@@ -34,9 +34,9 @@ public class Color8Bit {
    * @param blue Blue value (0-255)
    */
   public Color8Bit(int red, int green, int blue) {
-    this.red = MathUtil.clamp(red, 0, 255);
-    this.green = MathUtil.clamp(green, 0, 255);
-    this.blue = MathUtil.clamp(blue, 0, 255);
+    this.red = Math.clamp(red, 0, 255);
+    this.green = Math.clamp(green, 0, 255);
+    this.blue = Math.clamp(blue, 0, 255);
   }
 
   /**

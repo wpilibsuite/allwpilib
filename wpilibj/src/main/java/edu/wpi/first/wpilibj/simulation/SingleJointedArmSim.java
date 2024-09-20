@@ -118,7 +118,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    */
   public final void setState(double angleRadians, double velocityRadPerSec) {
     setState(
-        VecBuilder.fill(MathUtil.clamp(angleRadians, m_minAngle, m_maxAngle), velocityRadPerSec));
+        VecBuilder.fill(Math.clamp(angleRadians, m_minAngle, m_maxAngle), velocityRadPerSec));
   }
 
   /**

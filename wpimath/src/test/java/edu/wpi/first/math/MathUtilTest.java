@@ -19,16 +19,16 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
   @Test
   void testClamp() {
     // int
-    assertEquals(5, MathUtil.clamp(10, 1, 5));
+    assertEquals(5, Math.clamp(10, 1, 5));
 
     // double
-    assertEquals(5.5, MathUtil.clamp(10.5, 1.5, 5.5));
+    assertEquals(5.5, Math.clamp(10.5, 1.5, 5.5));
 
     // negative int
-    assertEquals(-5, MathUtil.clamp(-10, -5, -1));
+    assertEquals(-5, Math.clamp(-10, -5, -1));
 
     // negative double
-    assertEquals(-5.5, MathUtil.clamp(-10.5, -5.5, -1.5));
+    assertEquals(-5.5, Math.clamp(-10.5, -5.5, -1.5));
   }
 
   @Test

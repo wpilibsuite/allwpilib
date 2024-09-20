@@ -501,7 +501,7 @@ public class Rotation3d
 
   @Override
   public Rotation3d interpolate(Rotation3d endValue, double t) {
-    return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
+    return plus(endValue.minus(this).times(Math.clamp(t, 0, 1)));
   }
 
   /** Rotation3d protobuf for serialization. */

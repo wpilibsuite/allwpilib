@@ -479,7 +479,7 @@ public class GenericHID {
    * @param value The normalized value (0 to 1) to set the rumble to
    */
   public void setRumble(RumbleType type, double value) {
-    value = MathUtil.clamp(value, 0, 1);
+    value = Math.clamp(value, 0, 1);
     int rumbleValue = (int) (value * 65535);
     switch (type) {
       case kLeftRumble -> this.m_leftRumble = rumbleValue;

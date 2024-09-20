@@ -217,9 +217,9 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
     // Find nearest point
     point =
         new Translation2d(
-            MathUtil.clamp(
+            Math.clamp(
                 point.getX(), m_center.getX() - m_xWidth / 2.0, m_center.getX() + m_xWidth / 2.0),
-            MathUtil.clamp(
+            Math.clamp(
                 point.getY(), m_center.getY() - m_yWidth / 2.0, m_center.getY() + m_yWidth / 2.0));
 
     // Undo rotation

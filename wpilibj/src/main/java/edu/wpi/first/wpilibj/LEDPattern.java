@@ -455,9 +455,9 @@ public interface LEDPattern {
 
             writer.setRGB(
                 i,
-                (int) MathUtil.clamp(r * multiplier, 0, 255),
-                (int) MathUtil.clamp(g * multiplier, 0, 255),
-                (int) MathUtil.clamp(b * multiplier, 0, 255));
+                (int) Math.clamp(r * multiplier, 0, 255),
+                (int) Math.clamp(g * multiplier, 0, 255),
+                (int) Math.clamp(b * multiplier, 0, 255));
           });
     };
   }
@@ -502,7 +502,7 @@ public interface LEDPattern {
    */
   static LEDPattern progressMaskLayer(DoubleSupplier progressSupplier) {
     return (reader, writer) -> {
-      double progress = MathUtil.clamp(progressSupplier.getAsDouble(), 0, 1);
+      double progress = Math.clamp(progressSupplier.getAsDouble(), 0, 1);
 
       int bufLen = reader.getLength();
       int max = (int) (bufLen * progress);

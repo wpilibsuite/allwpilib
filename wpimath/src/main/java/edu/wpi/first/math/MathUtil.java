@@ -144,7 +144,7 @@ public final class MathUtil {
    * @return The interpolated value.
    */
   public static double interpolate(double startValue, double endValue, double t) {
-    return startValue + (endValue - startValue) * MathUtil.clamp(t, 0, 1);
+    return startValue + (endValue - startValue) * Math.clamp(t, 0, 1);
   }
 
   /**

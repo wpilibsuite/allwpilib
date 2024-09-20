@@ -137,7 +137,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   public final void setState(double positionMeters, double velocityMetersPerSecond) {
     setState(
         VecBuilder.fill(
-            MathUtil.clamp(positionMeters, m_minHeight, m_maxHeight), velocityMetersPerSecond));
+          Math.clamp(positionMeters, m_minHeight, m_maxHeight), velocityMetersPerSecond));
   }
 
   /**

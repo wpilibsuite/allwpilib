@@ -56,7 +56,7 @@ public class SlewRateLimiter {
     double currentTime = MathSharedStore.getTimestamp();
     double elapsedTime = currentTime - m_prevTime;
     m_prevVal +=
-        MathUtil.clamp(
+        Math.clamp(
             input - m_prevVal,
             m_negativeRateLimit * elapsedTime,
             m_positiveRateLimit * elapsedTime);

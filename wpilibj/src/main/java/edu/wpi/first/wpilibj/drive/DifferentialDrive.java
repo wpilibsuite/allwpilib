@@ -259,8 +259,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @return Wheel speeds [-1.0..1.0].
    */
   public static WheelSpeeds arcadeDriveIK(double xSpeed, double zRotation, boolean squareInputs) {
-    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
-    zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
+    xSpeed = Math.clamp(xSpeed, -1.0, 1.0);
+    zRotation = Math.clamp(zRotation, -1.0, 1.0);
 
     // Square the inputs (while preserving the sign) to increase fine control
     // while permitting full power.
@@ -300,8 +300,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    */
   public static WheelSpeeds curvatureDriveIK(
       double xSpeed, double zRotation, boolean allowTurnInPlace) {
-    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
-    zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
+    xSpeed = Math.clamp(xSpeed, -1.0, 1.0);
+    zRotation = Math.clamp(zRotation, -1.0, 1.0);
 
     double leftSpeed;
     double rightSpeed;
@@ -334,8 +334,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @return Wheel speeds [-1.0..1.0].
    */
   public static WheelSpeeds tankDriveIK(double leftSpeed, double rightSpeed, boolean squareInputs) {
-    leftSpeed = MathUtil.clamp(leftSpeed, -1.0, 1.0);
-    rightSpeed = MathUtil.clamp(rightSpeed, -1.0, 1.0);
+    leftSpeed = Math.clamp(leftSpeed, -1.0, 1.0);
+    rightSpeed = Math.clamp(rightSpeed, -1.0, 1.0);
 
     // Square the inputs (while preserving the sign) to increase fine control
     // while permitting full power.

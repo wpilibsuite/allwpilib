@@ -182,7 +182,7 @@ public class PoseEstimator<T> {
     double oldestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().firstKey();
     double newestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().lastKey();
     timestampSeconds =
-        MathUtil.clamp(timestampSeconds, oldestOdometryTimestamp, newestOdometryTimestamp);
+        Math.clamp(timestampSeconds, oldestOdometryTimestamp, newestOdometryTimestamp);
 
     // Step 2: If there are no applicable vision updates, use the odometry-only information.
     if (m_visionUpdates.isEmpty() || timestampSeconds < m_visionUpdates.firstKey()) {

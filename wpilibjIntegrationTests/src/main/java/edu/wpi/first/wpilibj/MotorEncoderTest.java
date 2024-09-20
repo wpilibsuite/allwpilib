@@ -200,7 +200,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
           new Notifier(
               () -> {
                 var speed = pidController.calculate(me.getEncoder().getDistance());
-                me.getMotor().set(MathUtil.clamp(speed, -0.2, 0.2));
+                me.getMotor().set(Math.clamp(speed, -0.2, 0.2));
               })) {
         pidRunner.startPeriodic(pidController.getPeriod());
         Timer.delay(10.0);
@@ -225,7 +225,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
           new Notifier(
               () -> {
                 var speed = filter.calculate(me.getEncoder().getRate());
-                me.getMotor().set(MathUtil.clamp(speed, -0.3, 0.3));
+                me.getMotor().set(Math.clamp(speed, -0.3, 0.3));
               })) {
         pidRunner.startPeriodic(pidController.getPeriod());
         Timer.delay(10.0);
