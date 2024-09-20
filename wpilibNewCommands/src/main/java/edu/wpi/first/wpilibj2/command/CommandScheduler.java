@@ -522,7 +522,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    * @return whether all of the commands are currently scheduled
    */
   public boolean isScheduled(Command command) {
-      return m_scheduledCommands.contains(command);
+    return m_scheduledCommands.contains(command);
   }
 
   /**
