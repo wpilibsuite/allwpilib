@@ -42,7 +42,13 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
    *
    * @param currentAngle The current module angle.
    */
-  void Optimize(const Rotation2d& currentAngle);
+  void Optimize(const Rotation2d& currentAngle) {
+    auto delta = angle - currentAngle;
+    if (units::math::abs(delta.Degrees()) > 90_deg) {
+      speed *= -1;
+      angle = angle + Rotation2d{180_deg};
+    }
+  }
 
   /**
    * Minimize the change in heading the desired swerve module state would

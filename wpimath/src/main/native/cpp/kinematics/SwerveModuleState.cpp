@@ -13,14 +13,6 @@ bool SwerveModuleState::operator==(const SwerveModuleState& other) const {
          angle == other.angle;
 }
 
-void SwerveModuleState::Optimize(const Rotation2d& currentAngle) {
-  auto delta = angle - currentAngle;
-  if (units::math::abs(delta.Degrees()) > 90_deg) {
-    speed *= -1;
-    angle = angle + Rotation2d{180_deg};
-  }
-}
-
 SwerveModuleState SwerveModuleState::Optimize(
     const SwerveModuleState& desiredState, const Rotation2d& currentAngle) {
   auto delta = desiredState.angle - currentAngle;
