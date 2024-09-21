@@ -160,12 +160,15 @@ wpi::TimeSyncServer::TimeSyncServer(int port,
     : m_logger{::ServerLoggerFunc},
       m_timeProvider{timeProvider},
       m_udp{wpi::uv::Udp::Create(m_loopRunner.GetLoop(), AF_INET)} {
-  m_udp->Bind("0.0.0.0", port);
+  m_loopRunner.ExecSync(
+      [this, port](uv::Loop&) { m_udp->Bind("0.0.0.0", port); });
 }
 
 void wpi::TimeSyncServer::Start() {
-  m_udp->received.connect(&wpi::TimeSyncServer::UdpCallback, this);
-  m_udp->StartRecv();
+  m_loopRunner.ExecSync([this](uv::Loop&) {
+    m_udp->received.connect(&wpi::TimeSyncServer::UdpCallback, this);
+    m_udp->StartRecv();
+  });
 }
 
 void wpi::TimeSyncServer::Stop() {
@@ -269,13 +272,17 @@ wpi::TimeSyncClient::TimeSyncClient(std::string_view server, int remote_port,
       m_loopDelay(ping_delay) {
   struct sockaddr_in serverAddr;
   uv::NameToAddr(m_serverIP, m_serverPort, &serverAddr);
-  m_udp->Connect(serverAddr);
+
+  m_loopRunner.ExecSync([this, serverAddr](uv::Loop&) { m_udp->Connect(serverAddr); });
 }
 
 void wpi::TimeSyncClient::Start() {
   wpi::println("Connecting recieved");
-  m_udp->received.connect(&wpi::TimeSyncClient::UdpCallback, this);
-  m_udp->StartRecv();
+
+  m_loopRunner.ExecSync([this](uv::Loop&) {
+    m_udp->received.connect(&wpi::TimeSyncClient::UdpCallback, this);
+    m_udp->StartRecv();
+  });
 
   wpi::println("Starting pinger");
   using namespace std::chrono_literals;
