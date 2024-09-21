@@ -120,7 +120,7 @@ public class SwerveModule {
     // Scale speed by cosine of angle error. This scales down movement perpendicular to the desired
     // direction of travel that can occur when modules change directions. This results in smoother
     // driving.
-    state.speedMetersPerSecond *= state.angle.minus(encoderRotation).getCos();
+    state.cosineScale(encoderRotation);
 
     // Calculate the drive output from the drive PID controller.
 
