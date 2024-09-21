@@ -96,7 +96,7 @@ public class SwerveModuleState
       speedMetersPerSecond *= -1;
       angle = angle.rotateBy(Rotation2d.kPi);
     }
-  }  
+  }
 
   /**
    * Scales speed by cosine of angle error. This scales down movement perpendicular to the desired
@@ -104,7 +104,7 @@ public class SwerveModuleState
    * driving.
    *
    * @param currentAngle The current module angle.
-   */  
+   */
   public void cosineScale(Rotation2d currentAngle) {
     speedMetersPerSecond *= angle.minus(currentAngle).getCos();
   }
