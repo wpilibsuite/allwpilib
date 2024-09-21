@@ -46,8 +46,7 @@ frc::SwerveModulePosition SwerveModule::GetPosition() const {
           units::radian_t{m_turningEncoder.GetDistance()}};
 }
 
-void SwerveModule::SetDesiredState(
-    frc::SwerveModuleState& referenceState) {
+void SwerveModule::SetDesiredState(frc::SwerveModuleState& referenceState) {
   frc::Rotation2d encoderRotation{
       units::radian_t{m_turningEncoder.GetDistance()}};
 
