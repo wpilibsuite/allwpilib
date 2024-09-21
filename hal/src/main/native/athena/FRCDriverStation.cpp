@@ -4,6 +4,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
@@ -272,10 +273,10 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     std::string_view locationRef{location};
     std::string_view callStackRef{callStack};
 
-    // 1 tag, 4 timestamp, 2 seqnum
+    // 2 size, 1 tag, 4 timestamp, 2 seqnum
     // 2 numOccur, 4 error code, 1 flags, 6 strlen
     // 1 extra needed for padding on Netcomm end.
-    size_t baseLength = 21;
+    size_t baseLength = 23;
 
     if (baseLength + detailsRef.size() + locationRef.size() +
             callStackRef.size() <=

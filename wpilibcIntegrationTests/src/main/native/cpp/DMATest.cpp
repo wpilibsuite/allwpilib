@@ -2,17 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/AnalogInput.h>
-#include <frc/AnalogOutput.h>
-#include <frc/DigitalOutput.h>
-#include <frc/Timer.h>
-#include <frc/motorcontrol/Jaguar.h>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 #include "TestBench.h"
+#include "frc/AnalogInput.h"
+#include "frc/AnalogOutput.h"
 #include "frc/DMA.h"
 #include "frc/DMASample.h"
+#include "frc/DigitalOutput.h"
+#include "frc/Timer.h"
+#include "frc/motorcontrol/Jaguar.h"
 
 using namespace frc;
 

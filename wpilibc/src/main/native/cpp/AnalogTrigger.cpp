@@ -4,6 +4,7 @@
 
 #include "frc/AnalogTrigger.h"
 
+#include <memory>
 #include <utility>
 
 #include <hal/AnalogTrigger.h>
@@ -55,12 +56,6 @@ AnalogTrigger::AnalogTrigger(std::shared_ptr<DutyCycle> input)
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
   wpi::SendableRegistry::AddLW(this, "AnalogTrigger", index);
-}
-
-AnalogTrigger::~AnalogTrigger() {
-  int32_t status = 0;
-  HAL_CleanAnalogTrigger(m_trigger, &status);
-  FRC_ReportError(status, "Channel {}", GetSourceChannel());
 }
 
 void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {

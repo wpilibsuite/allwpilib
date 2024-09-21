@@ -4,8 +4,7 @@
 
 #include "frc/AnalogOutput.h"
 
-#include <limits>
-#include <utility>
+#include <string>
 
 #include <hal/AnalogOutput.h>
 #include <hal/FRCUsageReporting.h>
@@ -35,10 +34,6 @@ AnalogOutput::AnalogOutput(int channel) {
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogOutput, m_channel + 1);
   wpi::SendableRegistry::AddLW(this, "AnalogOutput", m_channel);
-}
-
-AnalogOutput::~AnalogOutput() {
-  HAL_FreeAnalogOutputPort(m_port);
 }
 
 void AnalogOutput::SetVoltage(double voltage) {

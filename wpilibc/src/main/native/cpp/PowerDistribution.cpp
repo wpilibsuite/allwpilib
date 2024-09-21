@@ -4,6 +4,8 @@
 
 #include "frc/PowerDistribution.h"
 
+#include <vector>
+
 #include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/Ports.h>
@@ -13,7 +15,6 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
-#include "frc/SensorUtil.h"
 
 static_assert(static_cast<HAL_PowerDistributionType>(
                   frc::PowerDistribution::ModuleType::kCTRE) ==
@@ -55,13 +56,6 @@ PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
 
   HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
-}
-
-PowerDistribution::~PowerDistribution() {
-  if (m_handle != HAL_kInvalidHandle) {
-    HAL_CleanPowerDistribution(m_handle);
-    m_handle = HAL_kInvalidHandle;
-  }
 }
 
 int PowerDistribution::GetNumChannels() const {

@@ -4,6 +4,7 @@
 
 #include "glass/support/DataLogReaderThread.h"
 
+#include <string>
 #include <utility>
 
 #include <wpi/StringExtras.h>
@@ -109,11 +110,13 @@ void DataLogReaderThread::ReadMain() {
                    schema, err);
       }
     } else if (auto filename = wpi::remove_prefix(name, "/.schema/proto:")) {
+#ifndef NO_PROTOBUF
       // protobuf descriptor handling
       if (!m_protoDb.Add(*filename, data)) {
         wpi::print("could not decode protobuf '{}' filename '{}'\n", name,
                    *filename);
       }
+#endif
     }
   }
 

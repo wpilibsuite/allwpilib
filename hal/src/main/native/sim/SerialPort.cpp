@@ -80,5 +80,5 @@ void HAL_FlushSerial(HAL_SerialPortHandle handle, int32_t* status) {}
 
 void HAL_ClearSerial(HAL_SerialPortHandle handle, int32_t* status) {}
 
-void HAL_CloseSerial(HAL_SerialPortHandle handle, int32_t* status) {}
+void HAL_CloseSerial(HAL_SerialPortHandle handle) {}
 }  // extern "C"

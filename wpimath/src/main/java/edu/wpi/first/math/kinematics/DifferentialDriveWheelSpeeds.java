@@ -8,9 +8,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.math.kinematics.proto.DifferentialDriveWheelSpeedsProto;
 import edu.wpi.first.math.kinematics.struct.DifferentialDriveWheelSpeedsStruct;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
@@ -50,8 +48,7 @@ public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, Struc
    * @param left The left speed.
    * @param right The right speed.
    */
-  public DifferentialDriveWheelSpeeds(
-      Measure<Velocity<Distance>> left, Measure<Velocity<Distance>> right) {
+  public DifferentialDriveWheelSpeeds(LinearVelocity left, LinearVelocity right) {
     this(left.in(MetersPerSecond), right.in(MetersPerSecond));
   }
 
@@ -85,7 +82,7 @@ public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, Struc
    *
    * @param attainableMaxSpeed The absolute max speed that a wheel can reach.
    */
-  public void desaturate(Measure<Velocity<Distance>> attainableMaxSpeed) {
+  public void desaturate(LinearVelocity attainableMaxSpeed) {
     desaturate(attainableMaxSpeed.in(MetersPerSecond));
   }
 

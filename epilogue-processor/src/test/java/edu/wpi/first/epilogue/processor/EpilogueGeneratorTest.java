@@ -148,6 +148,17 @@ class EpilogueGeneratorTest {
           }
 
           /**
+           * Updates Epilogue. This must be called periodically in order for Epilogue to record
+           * new values. Alternatively, {@code bind()} can be used to update at an offset from
+           * the main robot loop.
+           */
+          public static void update(edu.wpi.first.epilogue.Example robot) {
+            long start = System.nanoTime();
+            exampleLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
+            config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
+          }
+
+          /**
            * Binds Epilogue updates to a timed robot's update period. Log calls will be made at the
            * same update rate as the robot's loop function, but will be offset by a full phase
            * (for example, a 20ms update rate but 10ms offset from the main loop invocation) to
@@ -164,9 +175,7 @@ class EpilogueGeneratorTest {
             }
 
             robot.addPeriodic(() -> {
-              long start = System.nanoTime();
-              exampleLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
-              edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry("Epilogue/Stats/Last Run").setDouble((System.nanoTime() - start) / 1e6);
+              update(robot);
             }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
           }
         }
@@ -219,6 +228,17 @@ class EpilogueGeneratorTest {
           }
 
           /**
+           * Updates Epilogue. This must be called periodically in order for Epilogue to record
+           * new values. Alternatively, {@code bind()} can be used to update at an offset from
+           * the main robot loop.
+           */
+          public static void update(edu.wpi.first.epilogue.AlphaBot robot) {
+            long start = System.nanoTime();
+            alphaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
+            config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
+          }
+
+          /**
            * Binds Epilogue updates to a timed robot's update period. Log calls will be made at the
            * same update rate as the robot's loop function, but will be offset by a full phase
            * (for example, a 20ms update rate but 10ms offset from the main loop invocation) to
@@ -235,10 +255,19 @@ class EpilogueGeneratorTest {
             }
 
             robot.addPeriodic(() -> {
-              long start = System.nanoTime();
-              alphaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
-              edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry("Epilogue/Stats/Last Run").setDouble((System.nanoTime() - start) / 1e6);
+              update(robot);
             }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
+          }
+
+          /**
+           * Updates Epilogue. This must be called periodically in order for Epilogue to record
+           * new values. Alternatively, {@code bind()} can be used to update at an offset from
+           * the main robot loop.
+           */
+          public static void update(edu.wpi.first.epilogue.BetaBot robot) {
+            long start = System.nanoTime();
+            betaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
+            config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -258,9 +287,7 @@ class EpilogueGeneratorTest {
             }
 
             robot.addPeriodic(() -> {
-              long start = System.nanoTime();
-              betaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
-              edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry("Epilogue/Stats/Last Run").setDouble((System.nanoTime() - start) / 1e6);
+              update(robot);
             }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
           }
         }

@@ -61,7 +61,7 @@ jobs:
 
   build-host:
     env:
-      MACOSX_DEPLOYMENT_TARGET: 13
+      MACOSX_DEPLOYMENT_TARGET: 13.3
     strategy:
       fail-fast: false
       matrix:
@@ -118,12 +118,12 @@ jobs:
           certificate-passphrase: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           keychain-password: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
         if: |
-          matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
+          matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
       - name: Set Keychain Lock Timeout
         run: security set-keychain-settings -lut 3600
         if: |
-          matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
+          matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
@@ -158,7 +158,7 @@ jobs:
       - name: Sign Libraries with Developer ID
         run: ./gradlew copyAllOutputs --build-cache -PbuildServer -PskipJavaFormat -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         if: |
-          matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
+          matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
@@ -202,7 +202,7 @@ jobs:
     steps:
       - name: Free Disk Space
         if: |
-          github.repository_owner == 'wpilibsuite' &&
+          github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         uses: jlumbroso/free-disk-space@main
         with:
@@ -215,38 +215,38 @@ jobs:
           swap-storage: false
       - uses: actions/checkout@v4
         if: |
-          github.repository_owner == 'wpilibsuite' &&
+          github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
           repository: wpilibsuite/build-tools
       - uses: actions/download-artifact@v4
         if: |
-          github.repository_owner == 'wpilibsuite' &&
+          github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
           path: combiner/products/build/allOutputs
       - name: Flatten Artifacts
         if: |
-          github.repository_owner == 'wpilibsuite' &&
+          github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         run: rsync -a --delete combiner/products/build/allOutputs/*/* combiner/products/build/allOutputs/
       - name: Check version number exists
         if: |
-          github.repository_owner == 'wpilibsuite' &&
+          github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         run: |
           cat combiner/products/build/allOutputs/version.txt
           test -s combiner/products/build/allOutputs/version.txt
       - uses: actions/setup-java@v4
         if: |
-          github.repository_owner == 'wpilibsuite' &&
+          github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
           distribution: 'temurin'
           java-version: 17
       - name: Combine (Main)
         if: |
-          github.repository_owner == 'wpilibsuite' &&
+          github.repository == 'wpilibsuite/allwpilib' &&
           github.ref == 'refs/heads/main'
         run: cd combiner && ./gradlew publish -Pallwpilib
         env:
@@ -255,7 +255,7 @@ jobs:
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: Combine (Release)
         if: |
-          github.repository_owner == 'wpilibsuite' &&
+          github.repository == 'wpilibsuite/allwpilib' &&
           startsWith(github.ref, 'refs/tags/v')
         run: cd combiner && ./gradlew publish -Pallwpilib -PreleaseRepoPublish
         env:
@@ -264,7 +264,7 @@ jobs:
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - uses: actions/upload-artifact@v4
         if: |
-          github.repository_owner == 'wpilibsuite' &&
+          github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
           name: Maven
@@ -280,7 +280,7 @@ jobs:
     steps:
       - uses: peter-evans/repository-dispatch@v3
         if: |
-          github.repository_owner == 'wpilibsuite' &&
+          github.repository == 'wpilibsuite/allwpilib' &&
           startsWith(github.ref, 'refs/tags/v')
         with:
           token: ${{ secrets.TOOL_REPO_ACCESS_TOKEN }}

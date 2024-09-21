@@ -4,12 +4,12 @@
 
 #pragma once
 
+#include <functional>
+#include <memory>
+
 #include <glass/MainMenuBar.h>
 #include <glass/WindowManager.h>
 #include <glass/networktables/NetworkTablesProvider.h>
-
-#include <functional>
-#include <memory>
 
 #include "HALProvider.h"
 

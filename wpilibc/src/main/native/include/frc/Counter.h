@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include <hal/Counter.h>
 #include <hal/Types.h>
 #include <units/time.h>
 #include <wpi/sendable/Sendable.h>
@@ -142,10 +143,10 @@ class Counter : public CounterBase,
   Counter(EncodingType encodingType, std::shared_ptr<DigitalSource> upSource,
           std::shared_ptr<DigitalSource> downSource, bool inverted);
 
-  ~Counter() override;
-
   Counter(Counter&&) = default;
   Counter& operator=(Counter&&) = default;
+
+  ~Counter() override;
 
   /**
    * Set the up source for the counter as a digital input channel.
@@ -458,7 +459,7 @@ class Counter : public CounterBase,
   std::shared_ptr<DigitalSource> m_downSource;
 
   /// The FPGA counter object
-  hal::Handle<HAL_CounterHandle> m_counter;
+  hal::Handle<HAL_CounterHandle, HAL_FreeCounter> m_counter;
 
  private:
   /// The index of this counter.

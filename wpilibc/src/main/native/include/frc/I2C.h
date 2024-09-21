@@ -40,8 +40,6 @@ class I2C {
    */
   I2C(Port port, int deviceAddress);
 
-  ~I2C();
-
   I2C(I2C&&) = default;
   I2C& operator=(I2C&&) = default;
 

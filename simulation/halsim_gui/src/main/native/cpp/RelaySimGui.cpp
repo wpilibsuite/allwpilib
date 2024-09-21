@@ -4,11 +4,10 @@
 
 #include "RelaySimGui.h"
 
-#include <glass/hardware/Relay.h>
-
 #include <memory>
 #include <vector>
 
+#include <glass/hardware/Relay.h>
 #include <hal/Ports.h>
 #include <hal/simulation/RelayData.h>
 #include <wpigui.h>

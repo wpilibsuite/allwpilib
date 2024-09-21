@@ -321,7 +321,6 @@ static void maxheapify(zmaxheap_t *heap, int parent)
     if (betterchild != parent) {
         heap->swap(heap, parent, betterchild);
         maxheapify(heap, betterchild);
-        return;
     }
 }
 
@@ -376,7 +375,6 @@ void zmaxheap_test(void)
             // add a value
             int32_t v = (int32_t) (random() / 1000);
             float fv = v;
-            assert(v == fv);
 
             vals[sz] = v;
             zmaxheap_add(heap, &v, fv);
@@ -395,12 +393,13 @@ void zmaxheap_test(void)
             }
 
 
-            int32_t outv;
-            float outfv;
+            int32_t outv = 0;
+            float outfv = 0;
             int res = zmaxheap_remove_max(heap, &outv, &outfv);
             if (sz == 0) {
                 (void) res;
                 assert(res == 0);
+                (void)res;
             } else {
 //                printf("%d %d %d %f\n", sz, maxv, outv, outfv);
                 assert(outv == outfv);

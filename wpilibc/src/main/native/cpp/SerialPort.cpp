@@ -4,7 +4,7 @@
 
 #include "frc/SerialPort.h"
 
-#include <utility>
+#include <string>
 
 #include <hal/FRCUsageReporting.h>
 #include <hal/SerialPort.h>
@@ -72,12 +72,6 @@ SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
 
   HAL_Report(HALUsageReporting::kResourceType_SerialPort,
              static_cast<uint8_t>(port) + 1);
-}
-
-SerialPort::~SerialPort() {
-  int32_t status = 0;
-  HAL_CloseSerial(m_portHandle, &status);
-  FRC_ReportError(status, "CloseSerial");
 }
 
 void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {

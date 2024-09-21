@@ -4,6 +4,10 @@
 
 #include "wpi/DataLogWriter.h"
 
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include "wpi/raw_ostream.h"
 
 using namespace wpi::log;

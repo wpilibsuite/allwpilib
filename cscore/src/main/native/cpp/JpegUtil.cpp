@@ -4,6 +4,8 @@
 
 #include "JpegUtil.h"
 
+#include <string>
+
 #include <wpi/StringExtras.h>
 #include <wpi/raw_istream.h>
 
