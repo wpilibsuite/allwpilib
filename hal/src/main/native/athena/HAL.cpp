@@ -13,7 +13,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
+#include <memory>
 #include <thread>
+#include <utility>
 
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/LoadOut.h>

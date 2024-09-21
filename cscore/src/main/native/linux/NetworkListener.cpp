@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <algorithm>
 #include <cerrno>
 
 #include <wpi/SafeThread.h>

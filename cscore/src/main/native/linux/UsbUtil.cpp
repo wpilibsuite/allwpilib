@@ -8,6 +8,8 @@
 #include <libgen.h>
 #include <sys/ioctl.h>
 
+#include <string>
+
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
@@ -16,7 +18,6 @@
 #include <wpi/raw_ostream.h>
 
 #include "Instance.h"
-#include "Log.h"
 
 namespace cs {
 

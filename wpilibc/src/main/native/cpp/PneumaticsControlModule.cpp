@@ -4,6 +4,9 @@
 
 #include "frc/PneumaticsControlModule.h"
 
+#include <memory>
+#include <string>
+
 #include <hal/CTREPCM.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>

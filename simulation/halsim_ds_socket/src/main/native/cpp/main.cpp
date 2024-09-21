@@ -17,6 +17,7 @@
 #include <cstdio>
 #include <cstring>
 #include <exception>
+#include <memory>
 #include <string_view>
 
 #include <DSCommPacket.h>

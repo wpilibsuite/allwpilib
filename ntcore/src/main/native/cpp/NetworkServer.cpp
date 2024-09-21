@@ -7,8 +7,11 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <memory>
 #include <span>
+#include <string>
 #include <system_error>
+#include <utility>
 #include <vector>
 
 #include <wpi/MemoryBuffer.h>

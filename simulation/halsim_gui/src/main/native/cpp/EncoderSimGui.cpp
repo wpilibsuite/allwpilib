@@ -4,7 +4,6 @@
 
 #include "EncoderSimGui.h"
 
-#include <glass/hardware/Encoder.h>
 #include <stdint.h>
 
 #include <limits>
@@ -13,6 +12,7 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <glass/hardware/Encoder.h>
 #include <hal/Ports.h>
 #include <hal/simulation/EncoderData.h>
 #include <hal/simulation/SimDeviceData.h>
