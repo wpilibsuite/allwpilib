@@ -4,6 +4,11 @@
 
 #include "wpinet/WebSocket.h"  // NOLINT(build/include_order)
 
+#include <functional>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include <wpi/Base64.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>

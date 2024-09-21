@@ -6,11 +6,11 @@
 
 #include <stdint.h>
 
-#include <algorithm>
 #include <cmath>
-#include <numeric>
+#include <memory>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <fmt/ranges.h>

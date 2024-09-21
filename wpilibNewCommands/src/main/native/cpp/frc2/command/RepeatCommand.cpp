@@ -4,6 +4,9 @@
 
 #include "frc2/command/RepeatCommand.h"
 
+#include <string>
+#include <utility>
+
 #include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc2;

@@ -5,6 +5,7 @@
 #include "WireEncoder.h"
 
 #include <optional>
+#include <string>
 
 #include <wpi/json.h>
 #include <wpi/mpack.h>

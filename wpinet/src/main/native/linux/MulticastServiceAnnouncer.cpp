@@ -4,6 +4,9 @@
 
 #include "wpinet/MulticastServiceAnnouncer.h"
 
+#include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>

@@ -4,6 +4,8 @@
 
 #include "frc/shuffleboard/SimpleWidget.h"
 
+#include <memory>
+
 #include "frc/shuffleboard/Shuffleboard.h"
 #include "frc/shuffleboard/ShuffleboardLayout.h"
 #include "frc/shuffleboard/ShuffleboardTab.h"
