@@ -4,12 +4,11 @@
 
 #include "HALProvider.h"
 
+#include <string>
+#include <utility>
+
 #include <glass/Model.h>
 #include <glass/Storage.h>
-
-#include <algorithm>
-#include <string>
-
 #include <hal/simulation/DriverStationData.h>
 
 using namespace halsimgui;

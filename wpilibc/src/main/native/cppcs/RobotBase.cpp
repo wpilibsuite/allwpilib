@@ -9,6 +9,8 @@
 #endif
 
 #include <cstdio>
+#include <memory>
+#include <utility>
 
 #include <cameraserver/CameraServerShared.h>
 #include <hal/FRCUsageReporting.h>
@@ -22,7 +24,6 @@
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
 #include "frc/Notifier.h"
-#include "frc/RobotState.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 

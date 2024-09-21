@@ -4,13 +4,13 @@
 
 #include "TimingGui.h"
 
-#include <glass/Model.h>
-#include <glass/View.h>
-
 #include <cstdio>
 #include <cstring>
+#include <memory>
 #include <vector>
 
+#include <glass/Model.h>
+#include <glass/View.h>
 #include <hal/HALBase.h>
 #include <hal/simulation/MockHooks.h>
 #include <hal/simulation/NotifierData.h>

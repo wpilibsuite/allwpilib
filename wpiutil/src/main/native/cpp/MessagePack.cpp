@@ -4,6 +4,8 @@
 
 #include "wpi/MessagePack.h"
 
+#include <string>
+
 using namespace mpack;
 
 mpack_error_t mpack::mpack_expect_str(mpack_reader_t* reader, std::string* out,

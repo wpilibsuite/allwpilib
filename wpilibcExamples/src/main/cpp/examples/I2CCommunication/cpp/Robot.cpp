@@ -4,6 +4,8 @@
 
 #include "Robot.h"
 
+#include <string>
+
 #include <fmt/format.h>
 #include <frc/DriverStation.h>
 #include <frc/Timer.h>

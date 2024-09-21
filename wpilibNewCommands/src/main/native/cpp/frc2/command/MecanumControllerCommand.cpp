@@ -4,6 +4,7 @@
 
 #include "frc2/command/MecanumControllerCommand.h"
 
+#include <memory>
 #include <utility>
 
 #include <units/velocity.h>

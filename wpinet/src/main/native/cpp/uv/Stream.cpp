@@ -4,6 +4,11 @@
 
 #include "wpinet/uv/Stream.h"
 
+#include <functional>
+#include <memory>
+#include <string>
+#include <utility>
+
 #include <wpi/Logger.h>
 #include <wpi/SmallVector.h>
 #include <wpi/raw_ostream.h>

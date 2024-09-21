@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <string>
+
 #include <gtest/gtest.h>
 
 using namespace wpi;

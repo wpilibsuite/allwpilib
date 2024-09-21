@@ -8,6 +8,8 @@
 
 #include <filesystem>
 #include <memory>
+#include <string>
+#include <utility>
 #include <string_view>
 
 #include <glass/Context.h>

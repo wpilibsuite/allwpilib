@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstdio>
+#include <memory>
+#include <string>
 
 #include <fmt/format.h>
 #include <wpi/MathExtras.h>

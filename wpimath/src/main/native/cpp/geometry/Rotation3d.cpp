@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <numbers>
+#include <string>
 
 #include <Eigen/Core>
 #include <Eigen/LU>
@@ -13,7 +14,6 @@
 #include <wpi/json.h>
 
 #include "frc/fmt/Eigen.h"
-#include "geometry3d.pb.h"
 #include "units/math.h"
 #include "wpimath/MathShared.h"
 
