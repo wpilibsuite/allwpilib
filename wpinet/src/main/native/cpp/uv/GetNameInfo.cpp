@@ -4,6 +4,10 @@
 
 #include "wpinet/uv/GetNameInfo.h"
 
+#include <functional>
+#include <memory>
+#include <utility>
+
 #include "wpinet/uv/Loop.h"
 #include "wpinet/uv/util.h"
 

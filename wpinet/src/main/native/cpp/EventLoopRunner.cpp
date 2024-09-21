@@ -4,6 +4,9 @@
 
 #include "wpinet/EventLoopRunner.h"
 
+#include <memory>
+#include <utility>
+
 #include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>

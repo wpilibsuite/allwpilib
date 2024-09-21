@@ -13,23 +13,21 @@
 
 #include "frc/ADIS16448_IMU.h"
 
-#include <frc/DigitalInput.h>
-#include <frc/DigitalOutput.h>
-#include <frc/DigitalSource.h>
-#include <frc/DriverStation.h>
-#include <frc/SPI.h>
-#include <frc/Timer.h>
-
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include <utility>
 
 #include <hal/HAL.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
+#include "frc/DigitalInput.h"
+#include "frc/DigitalOutput.h"
 #include "frc/Errors.h"
 #include "frc/MathUtil.h"
+#include "frc/SPI.h"
+#include "frc/Timer.h"
 
 /* Helpful conversion functions */
 static inline uint16_t BuffToUShort(const uint32_t* buf) {

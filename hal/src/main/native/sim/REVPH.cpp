@@ -4,10 +4,11 @@
 
 #include "hal/REVPH.h"
 
+#include <string>
+
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/CANAPI.h"
 #include "hal/Errors.h"
 #include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/REVPHDataInternal.h"

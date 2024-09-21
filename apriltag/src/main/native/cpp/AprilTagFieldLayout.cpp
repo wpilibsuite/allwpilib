@@ -5,6 +5,8 @@
 #include "frc/apriltag/AprilTagFieldLayout.h"
 
 #include <system_error>
+#include <utility>
+#include <vector>
 
 #include <units/angle.h>
 #include <units/length.h>

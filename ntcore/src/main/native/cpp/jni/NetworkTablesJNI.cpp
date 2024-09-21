@@ -5,6 +5,9 @@
 #include <jni.h>
 
 #include <cassert>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <wpi/ConvertUTF.h>

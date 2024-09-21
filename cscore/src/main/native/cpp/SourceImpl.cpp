@@ -7,6 +7,9 @@
 #include <algorithm>
 #include <cstring>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <wpi/StringExtras.h>
 #include <wpi/json.h>

@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <ctime>
+#include <utility>
+#include <vector>
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>

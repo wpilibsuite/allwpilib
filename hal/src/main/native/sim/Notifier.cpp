@@ -8,7 +8,9 @@
 #include <chrono>
 #include <cstdio>
 #include <cstring>
+#include <memory>
 #include <string>
+#include <utility>
 
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>

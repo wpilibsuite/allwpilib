@@ -4,6 +4,8 @@
 
 #include "frc/smartdashboard/ListenerExecutor.h"
 
+#include <utility>
+
 using namespace frc::detail;
 
 void ListenerExecutor::Execute(std::function<void()> task) {

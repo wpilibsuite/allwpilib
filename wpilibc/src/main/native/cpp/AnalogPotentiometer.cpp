@@ -4,6 +4,7 @@
 
 #include "frc/AnalogPotentiometer.h"
 
+#include <memory>
 #include <utility>
 
 #include <wpi/NullDeleter.h>
