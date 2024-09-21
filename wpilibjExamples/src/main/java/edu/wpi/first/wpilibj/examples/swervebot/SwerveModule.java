@@ -11,7 +11,6 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.MutRotation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -32,10 +31,6 @@ public class SwerveModule {
 
   private final Encoder m_driveEncoder;
   private final Encoder m_turningEncoder;
-
-  private final MutRotation2d m_moduleAngle = new MutRotation2d();
-  private final SwerveModuleState m_moduleState = new SwerveModuleState();
-  private final MutRotation2d m_encoderRotation = new MutRotation2d();
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final PIDController m_drivePIDController = new PIDController(1, 0, 0);
@@ -81,8 +76,7 @@ public class SwerveModule {
     // resolution.
     m_driveEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
 
-    // Set the distance (in this case, angle) in radians per pulse for the turning
-    // encoder.
+    // Set the distance (in this case, angle) in radians per pulse for the turning encoder.
     // This is the the angle through an entire rotation (2 * pi) divided by the
     // encoder resolution.
     m_turningEncoder.setDistancePerPulse(2 * Math.PI / kEncoderResolution);
@@ -98,9 +92,8 @@ public class SwerveModule {
    * @return The current state of the module.
    */
   public SwerveModuleState getState() {
-    m_moduleAngle.mut_fromRadians(m_turningEncoder.getDistance());
-    m_moduleState.setState(m_driveEncoder.getRate(), m_moduleAngle);
-    return m_moduleState;
+    return new SwerveModuleState(
+        m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getDistance()));
   }
 
   /**
@@ -116,33 +109,30 @@ public class SwerveModule {
   /**
    * Sets the desired state for the module.
    *
-   * @param state Desired state with speed and angle.
+   * @param desiredState Desired state with speed and angle.
    */
-  public void setDesiredState(SwerveModuleState state) {
-    m_encoderRotation.mut_fromRadians(m_turningEncoder.getDistance());
+  public void setDesiredState(SwerveModuleState desiredState) {
+    var encoderRotation = new Rotation2d(m_turningEncoder.getDistance());
 
     // Optimize the reference state to avoid spinning further than 90 degrees
-    state.optimize(m_encoderRotation);
+    SwerveModuleState state = SwerveModuleState.optimize(desiredState, encoderRotation);
 
-    // Scale speed by cosine of angle error. This scales down movement perpendicular
-    // to the desired
-    // direction of travel that can occur when modules change directions. This
-    // results in smoother
+    // Scale speed by cosine of angle error. This scales down movement perpendicular to the desired
+    // direction of travel that can occur when modules change directions. This results in smoother
     // driving.
-    state.cosineScale(m_encoderRotation);
+    state.speedMetersPerSecond *= state.angle.minus(encoderRotation).getCos();
 
     // Calculate the drive output from the drive PID controller.
 
     final double driveOutput =
-        m_drivePIDController.calculate(m_driveEncoder.getRate(), state.getSpeedMetersPerSecond());
+        m_drivePIDController.calculate(m_driveEncoder.getRate(), state.speedMetersPerSecond);
 
     final double driveFeedforward =
-        m_driveFeedforward.calculate(MetersPerSecond.of(state.getSpeedMetersPerSecond())).in(Volts);
+        m_driveFeedforward.calculate(MetersPerSecond.of(state.speedMetersPerSecond)).in(Volts);
 
     // Calculate the turning motor output from the turning PID controller.
     final double turnOutput =
-        m_turningPIDController.calculate(
-            m_turningEncoder.getDistance(), state.getAngle().getRadians());
+        m_turningPIDController.calculate(m_turningEncoder.getDistance(), state.angle.getRadians());
 
     final double turnFeedforward =
         m_turnFeedforward

@@ -213,10 +213,8 @@ public class SwerveDriveKinematics
 
     for (int i = 0; i < m_numModules; i++) {
       var module = moduleStates[i];
-      moduleStatesMatrix.set(
-          i * 2, 0, module.getSpeedMetersPerSecond() * module.getAngle().getCos());
-      moduleStatesMatrix.set(
-          i * 2 + 1, module.getSpeedMetersPerSecond() * module.getAngle().getSin());
+      moduleStatesMatrix.set(i * 2, 0, module.speedMetersPerSecond * module.angle.getCos());
+      moduleStatesMatrix.set(i * 2 + 1, module.speedMetersPerSecond * module.angle.getSin());
     }
 
     var chassisSpeedsVector = m_forwardKinematics.mult(moduleStatesMatrix);
@@ -284,14 +282,12 @@ public class SwerveDriveKinematics
       SwerveModuleState[] moduleStates, double attainableMaxSpeedMetersPerSecond) {
     double realMaxSpeed = 0;
     for (SwerveModuleState moduleState : moduleStates) {
-      realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.getSpeedMetersPerSecond()));
+      realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speedMetersPerSecond));
     }
     if (realMaxSpeed > attainableMaxSpeedMetersPerSecond) {
       for (SwerveModuleState moduleState : moduleStates) {
-        moduleState.setSpeed(
-            moduleState.getSpeedMetersPerSecond()
-                / realMaxSpeed
-                * attainableMaxSpeedMetersPerSecond);
+        moduleState.speedMetersPerSecond =
+            moduleState.speedMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond;
       }
     }
   }
@@ -339,7 +335,7 @@ public class SwerveDriveKinematics
       double attainableMaxRotationalVelocityRadiansPerSecond) {
     double realMaxSpeed = 0;
     for (SwerveModuleState moduleState : moduleStates) {
-      realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.getSpeedMetersPerSecond()));
+      realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speedMetersPerSecond));
     }
 
     if (attainableMaxTranslationalSpeedMetersPerSecond == 0
@@ -356,7 +352,7 @@ public class SwerveDriveKinematics
     double k = Math.max(translationalK, rotationalK);
     double scale = Math.min(k * attainableMaxModuleSpeedMetersPerSecond / realMaxSpeed, 1);
     for (SwerveModuleState moduleState : moduleStates) {
-      moduleState.setSpeed(moduleState.getSpeedMetersPerSecond() * scale);
+      moduleState.speedMetersPerSecond *= scale;
     }
   }
 

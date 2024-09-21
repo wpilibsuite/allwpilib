@@ -201,9 +201,9 @@ class SwerveDrivePoseEstimatorTest {
 
       for (int i = 0; i < moduleStates.length; i++) {
         positions[i].distanceMeters +=
-            moduleStates[i].getSpeedMetersPerSecond() * (1 - rand.nextGaussian() * 0.05) * dt;
+            moduleStates[i].speedMetersPerSecond * (1 - rand.nextGaussian() * 0.05) * dt;
         positions[i].angle =
-            moduleStates[i].getAngle().plus(new Rotation2d(rand.nextGaussian() * 0.005));
+            moduleStates[i].angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
       }
 
       var xHat =

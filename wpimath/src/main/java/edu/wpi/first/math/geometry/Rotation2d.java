@@ -81,12 +81,9 @@ public class Rotation2d
    */
   public static final Rotation2d k180deg = kPi;
 
-  /** The value of the Rotation2d in radians. */
-  protected double m_value;
-  /** The cosine of the Rotation2d object. */
-  protected double m_cos;
-  /** the sine of the Rotation2d object. */
-  protected double m_sin;
+  private final double m_value;
+  private final double m_cos;
+  private final double m_sin;
 
   /** Constructs a Rotation2d with a default angle of 0 degrees. */
   public Rotation2d() {

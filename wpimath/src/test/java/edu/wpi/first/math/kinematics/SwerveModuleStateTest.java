@@ -17,41 +17,37 @@ class SwerveModuleStateTest {
   void testOptimize() {
     var angleA = Rotation2d.fromDegrees(45);
     var refA = new SwerveModuleState(-2.0, Rotation2d.kPi);
-    refA.optimize(angleA);
-    var optimizedA = refA;
+    var optimizedA = SwerveModuleState.optimize(refA, angleA);
 
     assertAll(
-        () -> assertEquals(2.0, optimizedA.getSpeedMetersPerSecond(), kEpsilon),
-        () -> assertEquals(0.0, optimizedA.getAngle().getDegrees(), kEpsilon));
+        () -> assertEquals(2.0, optimizedA.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, optimizedA.angle.getDegrees(), kEpsilon));
 
     var angleB = Rotation2d.fromDegrees(-50);
     var refB = new SwerveModuleState(4.7, Rotation2d.fromDegrees(41));
-    refB.optimize(angleB);
-    var optimizedB = refB;
+    var optimizedB = SwerveModuleState.optimize(refB, angleB);
 
     assertAll(
-        () -> assertEquals(-4.7, optimizedB.getSpeedMetersPerSecond(), kEpsilon),
-        () -> assertEquals(-139.0, optimizedB.getAngle().getDegrees(), kEpsilon));
+        () -> assertEquals(-4.7, optimizedB.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(-139.0, optimizedB.angle.getDegrees(), kEpsilon));
   }
 
   @Test
   void testNoOptimize() {
     var angleA = Rotation2d.kZero;
     var refA = new SwerveModuleState(2.0, Rotation2d.fromDegrees(89));
-    refA.optimize(angleA);
-    var optimizedA = refA;
+    var optimizedA = SwerveModuleState.optimize(refA, angleA);
 
     assertAll(
-        () -> assertEquals(2.0, optimizedA.getSpeedMetersPerSecond(), kEpsilon),
-        () -> assertEquals(89.0, optimizedA.getAngle().getDegrees(), kEpsilon));
+        () -> assertEquals(2.0, optimizedA.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(89.0, optimizedA.angle.getDegrees(), kEpsilon));
 
     var angleB = Rotation2d.kZero;
     var refB = new SwerveModuleState(-2.0, Rotation2d.fromDegrees(-2));
-    refB.optimize(angleB);
-    var optimizedB = refB;
+    var optimizedB = SwerveModuleState.optimize(refB, angleB);
 
     assertAll(
-        () -> assertEquals(-2.0, optimizedB.getSpeedMetersPerSecond(), kEpsilon),
-        () -> assertEquals(-2.0, optimizedB.getAngle().getDegrees(), kEpsilon));
+        () -> assertEquals(-2.0, optimizedB.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(-2.0, optimizedB.angle.getDegrees(), kEpsilon));
   }
 }

@@ -44,7 +44,7 @@ public class SwerveModuleStateStruct implements Struct<SwerveModuleState> {
 
   @Override
   public void pack(ByteBuffer bb, SwerveModuleState value) {
-    bb.putDouble(value.getSpeedMetersPerSecond());
-    Rotation2d.struct.pack(bb, value.getAngle());
+    bb.putDouble(value.speedMetersPerSecond);
+    Rotation2d.struct.pack(bb, value.angle);
   }
 }
