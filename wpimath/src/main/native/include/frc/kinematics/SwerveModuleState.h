@@ -41,7 +41,7 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
    * furthest a wheel will ever rotate is 90 degrees.
    *
    * @param currentAngle The current module angle.
-   */  
+   */
   void Optimize(const Rotation2d& currentAngle);
 
   /**
