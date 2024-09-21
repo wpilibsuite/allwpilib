@@ -84,9 +84,9 @@ public class SwerveModuleState
   }
 
   /**
-   * Minimize the change in heading this swerve module state would require by potentially
-   * reversing the direction the wheel spins. If this is used with the PIDController class's
-   * continuous input functionality, the furthest a wheel will ever rotate is 90 degrees.
+   * Minimize the change in heading this swerve module state would require by potentially reversing
+   * the direction the wheel spins. If this is used with the PIDController class's continuous input
+   * functionality, the furthest a wheel will ever rotate is 90 degrees.
    *
    * @param currentAngle The current module angle.
    */
@@ -96,17 +96,6 @@ public class SwerveModuleState
       speedMetersPerSecond *= -1;
       angle = angle.rotateBy(Rotation2d.kPi);
     }
-  }
-
-  /**
-   * Scales speed by cosine of angle error. This scales down movement perpendicular to the desired
-   * direction of travel that can occur when modules change directions. This results in smoother
-   * driving.
-   *
-   * @param currentAngle The current module angle.
-   */
-  public void cosineScale(Rotation2d currentAngle) {
-    speedMetersPerSecond *= angle.minus(currentAngle).getCos();
   }
 
   /**
@@ -129,5 +118,16 @@ public class SwerveModuleState
     } else {
       return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
     }
+  }
+
+  /**
+   * Scales speed by cosine of angle error. This scales down movement perpendicular to the desired
+   * direction of travel that can occur when modules change directions. This results in smoother
+   * driving.
+   *
+   * @param currentAngle The current module angle.
+   */
+  public void cosineScale(Rotation2d currentAngle) {
+    speedMetersPerSecond *= angle.minus(currentAngle).getCos();
   }
 }
