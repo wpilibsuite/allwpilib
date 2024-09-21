@@ -130,6 +130,24 @@ public class Translation2d
   }
 
   /**
+   * Returns the X component of the translation in a measure.
+   *
+   * @return The x component of the translation in a measure.
+   */
+  public Distance getMeasureX() {
+    return Meters.of(m_x);
+  }
+
+  /**
+   * Returns the Y component of the translation in a measure.
+   *
+   * @return The y component of the translation in a measure.
+   */
+  public Distance getMeasureY() {
+    return Meters.of(m_y);
+  }
+
+  /**
    * Returns a vector representation of this translation.
    *
    * @return A Vector representation of this translation.

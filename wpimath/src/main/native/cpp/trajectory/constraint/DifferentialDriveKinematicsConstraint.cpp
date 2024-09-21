@@ -4,6 +4,8 @@
 
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 
+#include <utility>
+
 using namespace frc;
 
 DifferentialDriveKinematicsConstraint::DifferentialDriveKinematicsConstraint(

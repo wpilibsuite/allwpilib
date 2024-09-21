@@ -19,6 +19,8 @@
 
 #include "wpi/sha1.h"
 
+#include <string>
+
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
 #include "wpi/raw_istream.h"

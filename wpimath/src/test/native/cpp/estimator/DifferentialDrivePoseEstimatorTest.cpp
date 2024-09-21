@@ -6,6 +6,7 @@
 #include <random>
 #include <tuple>
 #include <utility>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <wpi/print.h>

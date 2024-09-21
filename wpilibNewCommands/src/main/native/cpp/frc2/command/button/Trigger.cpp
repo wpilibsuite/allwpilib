@@ -4,9 +4,11 @@
 
 #include "frc2/command/button/Trigger.h"
 
+#include <utility>
+
 #include <frc/filter/Debouncer.h>
 
-#include "frc2/command/InstantCommand.h"
+#include "frc2/command/CommandPtr.h"
 
 using namespace frc;
 using namespace frc2;

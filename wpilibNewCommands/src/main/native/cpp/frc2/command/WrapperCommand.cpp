@@ -4,6 +4,8 @@
 
 #include "frc2/command/WrapperCommand.h"
 
+#include <utility>
+
 #include "frc2/command/Command.h"
 
 using namespace frc2;

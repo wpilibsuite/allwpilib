@@ -5,6 +5,7 @@
 #include <limits>
 #include <random>
 #include <tuple>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <wpi/print.h>

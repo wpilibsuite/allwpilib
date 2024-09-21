@@ -6,6 +6,7 @@
 
 #include <concepts>
 #include <span>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -303,6 +304,77 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
   }
 
   server.SendOutgoing(id, 200);
+}
+
+TEST_F(ServerImplTest, ClientDisconnectUnpublish) {
+  server.SetLocal(&local);
+  NT_Publisher pubLocalHandle = nt::Handle{0, 1, nt::Handle::kPublisher};
+  NT_Topic topicLocalHandle = nt::Handle{0, 1, nt::Handle::kTopic};
+  NT_Publisher subHandle = nt::Handle{0, 1, nt::Handle::kSubscriber};
+  {
+    ::testing::InSequence seq;
+    EXPECT_CALL(local, NetworkAnnounce(std::string_view{"test2"},
+                                       std::string_view{"double"},
+                                       wpi::json::object(), pubLocalHandle));
+    EXPECT_CALL(local, NetworkAnnounce(std::string_view{"test"},
+                                       std::string_view{"double"},
+                                       wpi::json::object(), 0));
+    EXPECT_CALL(local, NetworkUnannounce(std::string_view{"test"}));
+  }
+
+  {
+    std::vector<net::ClientMessage> msgs;
+    msgs.emplace_back(net::ClientMessage{net::PublishMsg{pubLocalHandle,
+                                                         topicLocalHandle,
+                                                         "test2",
+                                                         "double",
+                                                         wpi::json::object(),
+                                                         {}}});
+    msgs.emplace_back(net::ClientMessage{
+        net::ClientValueMsg{pubLocalHandle, Value::MakeDouble(1.0, 10)}});
+    server.HandleLocal(msgs);
+  }
+
+  {
+    std::vector<net::ClientMessage> msgs;
+    msgs.emplace_back(
+        net::ClientMessage{net::SubscribeMsg{subHandle, {"test"}, {}}});
+    server.HandleLocal(msgs);
+  }
+
+  ::testing::StrictMock<net::MockWireConnection> wire;
+  EXPECT_CALL(wire, GetVersion()).WillRepeatedly(Return(0x0401));
+  MockSetPeriodicFunc setPeriodic;
+  {
+    ::testing::InSequence seq;
+    EXPECT_CALL(wire, GetLastReceivedTime()).WillOnce(Return(0));
+    EXPECT_CALL(wire, SendPing(100));
+    EXPECT_CALL(wire, Ready()).WillOnce(Return(true));  // SendValues()
+    EXPECT_CALL(
+        wire, DoWriteText(StrEq(EncodeText1(net::ServerMessage{net::AnnounceMsg{
+                  "test", 8, "double", 1, wpi::json::object()}}))))
+        .WillOnce(Return(0));
+    EXPECT_CALL(wire, Flush());  // SendValues()
+  }
+
+  // connect client
+  auto [name, id] = server.AddClient("test", "connInfo", false, wire,
+                                     setPeriodic.AsStdFunction());
+
+  // publish topic
+  {
+    NT_Publisher pubHandle = nt::Handle{0, 1, nt::Handle::kPublisher};
+    NT_Topic topicHandle = nt::Handle{0, 1, nt::Handle::kTopic};
+    std::vector<net::ClientMessage> msgs;
+    msgs.emplace_back(net::ClientMessage{net::PublishMsg{
+        pubHandle, topicHandle, "test", "double", wpi::json::object(), {}}});
+    server.ProcessIncomingText(id, EncodeText(msgs));
+  }
+
+  server.SendOutgoing(id, 100);
+
+  // disconnect client
+  server.RemoveClient(id);
 }
 
 TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {

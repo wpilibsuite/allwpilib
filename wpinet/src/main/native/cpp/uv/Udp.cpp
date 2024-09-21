@@ -5,6 +5,9 @@
 #include "wpinet/uv/Udp.h"
 
 #include <cstring>
+#include <functional>
+#include <memory>
+#include <utility>
 
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>

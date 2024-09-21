@@ -4,12 +4,11 @@
 
 #include "DIOSimGui.h"
 
-#include <glass/hardware/DIO.h>
-#include <glass/hardware/Encoder.h>
-
 #include <memory>
 #include <vector>
 
+#include <glass/hardware/DIO.h>
+#include <glass/hardware/Encoder.h>
 #include <hal/Ports.h>
 #include <hal/simulation/DIOData.h>
 #include <hal/simulation/DigitalPWMData.h>

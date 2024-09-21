@@ -6,6 +6,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <string>
 
 #include <imgui.h>
 #include <wpi/SmallVector.h>

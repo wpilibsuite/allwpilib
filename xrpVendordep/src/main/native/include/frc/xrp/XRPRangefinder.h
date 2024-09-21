@@ -11,6 +11,11 @@
 namespace frc {
 
 /**
+ * @ingroup xrp_api
+ * @{
+ */
+
+/**
  * This class represents the reflectance sensor pair
  * on the XRP robot.
  */
@@ -25,5 +30,7 @@ class XRPRangefinder {
  private:
   frc::AnalogInput m_rangefinder{2};
 };
+
+/** @} */
 
 }  // namespace frc
