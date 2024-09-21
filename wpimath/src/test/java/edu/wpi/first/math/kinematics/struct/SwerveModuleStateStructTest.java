@@ -23,7 +23,7 @@ class SwerveModuleStateStructTest {
     buffer.rewind();
 
     SwerveModuleState data = SwerveModuleState.struct.unpack(buffer);
-    assertEquals(DATA.speedMetersPerSecond, data.speedMetersPerSecond);
-    assertEquals(DATA.angle, data.angle);
+    assertEquals(DATA.getSpeedMetersPerSecond(), data.getSpeedMetersPerSecond());
+    assertEquals(DATA.getAngle(), data.getAngle());
   }
 }

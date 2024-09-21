@@ -34,7 +34,7 @@ public class SwerveModuleStateProto
 
   @Override
   public void pack(ProtobufSwerveModuleState msg, SwerveModuleState value) {
-    msg.setSpeed(value.speedMetersPerSecond);
-    Rotation2d.proto.pack(msg.getMutableAngle(), value.angle);
+    msg.setSpeed(value.getSpeedMetersPerSecond());
+    Rotation2d.proto.pack(msg.getMutableAngle(), value.getAngle());
   }
 }

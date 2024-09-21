@@ -121,8 +121,8 @@ class SwerveControllerCommandTest {
       m_angle = trajectory.sample(m_timer.get()).poseMeters.getRotation();
 
       for (int i = 0; i < m_modulePositions.length; i++) {
-        m_modulePositions[i].distanceMeters += m_moduleStates[i].speedMetersPerSecond * 0.005;
-        m_modulePositions[i].angle = m_moduleStates[i].angle;
+        m_modulePositions[i].distanceMeters += m_moduleStates[i].getSpeedMetersPerSecond() * 0.005;
+        m_modulePositions[i].angle = m_moduleStates[i].getAngle();
       }
 
       SimHooks.stepTiming(0.005);

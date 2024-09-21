@@ -6,6 +6,7 @@ package edu.wpi.first.math.kinematics;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import edu.wpi.first.math.geometry.MutRotation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.proto.SwerveModuleStateProto;
 import edu.wpi.first.math.kinematics.struct.SwerveModuleStateStruct;
@@ -18,10 +19,10 @@ import java.util.Objects;
 public class SwerveModuleState
     implements Comparable<SwerveModuleState>, ProtobufSerializable, StructSerializable {
   /** Speed of the wheel of the module. */
-  public double speedMetersPerSecond;
+  private double speedMetersPerSecond;
 
   /** Angle of the module. */
-  public Rotation2d angle = Rotation2d.kZero;
+  private final MutRotation2d angle = new MutRotation2d();
 
   /** SwerveModuleState protobuf for serialization. */
   public static final SwerveModuleStateProto proto = new SwerveModuleStateProto();
@@ -40,7 +41,7 @@ public class SwerveModuleState
    */
   public SwerveModuleState(double speedMetersPerSecond, Rotation2d angle) {
     this.speedMetersPerSecond = speedMetersPerSecond;
-    this.angle = angle;
+    this.angle.mut_Rotation2d(angle);
   }
 
   /**
@@ -51,6 +52,53 @@ public class SwerveModuleState
    */
   public SwerveModuleState(LinearVelocity speed, Rotation2d angle) {
     this(speed.in(MetersPerSecond), angle);
+  }
+
+  /**
+   * Returns the angle of this SwerveModuleState.
+   *
+   * @return The angle of this SwerveModuleState.
+   */
+  public Rotation2d getAngle() {
+    return angle;
+  }
+
+  /**
+   * Returns the speed of this SwerveModuleState.
+   *
+   * @return The speed of this SwerveModuleState.
+   */
+  public double getSpeedMetersPerSecond() {
+    return speedMetersPerSecond;
+  }
+
+  /**
+   * Sets the angle of this SwerveModuleState.
+   *
+   * @param angle The new angle of this state.
+   */
+  public void setAngle(Rotation2d angle) {
+    this.angle.mut_Rotation2d(angle);
+  }
+
+  /**
+   * Sets the speed of this SwerveModuleState.
+   *
+   * @param speedMetersPerSecond The new speed of this state.
+   */
+  public void setSpeed(double speedMetersPerSecond) {
+    this.speedMetersPerSecond = speedMetersPerSecond;
+  }
+
+  /**
+   * Sets the angle and speed of this SwerveModuleState.
+   *
+   * @param speedMetersPerSecond The new speed of this state.
+   * @param angle The new angle of this state.
+   */
+  public void setState(double speedMetersPerSecond, Rotation2d angle) {
+    setAngle(angle);
+    setSpeed(speedMetersPerSecond);
   }
 
   @Override
@@ -84,22 +132,30 @@ public class SwerveModuleState
   }
 
   /**
-   * Minimize the change in heading the desired swerve module state would require by potentially
-   * reversing the direction the wheel spins. If this is used with the PIDController class's
-   * continuous input functionality, the furthest a wheel will ever rotate is 90 degrees.
+   * Minimize the change in heading this swerve module state would require by potentially reversing
+   * the direction the wheel spins. If this is used with the PIDController class's continuous input
+   * functionality, the furthest a wheel will ever rotate is 90 degrees.
    *
-   * @param desiredState The desired state.
-   * @param currentAngle The current module angle.
-   * @return Optimized swerve module state.
+   * @param currentModuleAngle The current module state's angle.
    */
-  public static SwerveModuleState optimize(
-      SwerveModuleState desiredState, Rotation2d currentAngle) {
-    var delta = desiredState.angle.minus(currentAngle);
-    if (Math.abs(delta.getDegrees()) > 90.0) {
-      return new SwerveModuleState(
-          -desiredState.speedMetersPerSecond, desiredState.angle.rotateBy(Rotation2d.kPi));
-    } else {
-      return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
+  public void optimize(Rotation2d currentModuleAngle) {
+    var delta = angle.deltaDegrees(currentModuleAngle);
+    if (Math.abs(delta) > 90.0) {
+      speedMetersPerSecond *= -1;
+      angle.mut_rotateBy(Rotation2d.kPi);
     }
+  }
+
+  /**
+   * Scales the speed of the module by the cosine of the angle error. This scales down movement
+   * perpendicular to the desired direction of travel that can occur when modules change directions.
+   * This results in smoother driver.
+   *
+   * @param currentModuleAngle The current module state's angle.
+   */
+  public void cosineScale(Rotation2d currentModuleAngle) {
+    var delta = angle.deltaRadians(currentModuleAngle);
+    var cosine = Math.cos(delta);
+    speedMetersPerSecond *= cosine;
   }
 }

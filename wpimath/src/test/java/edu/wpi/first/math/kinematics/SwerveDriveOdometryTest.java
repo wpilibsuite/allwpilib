@@ -146,19 +146,20 @@ class SwerveDriveOdometryTest {
                   groundTruthState.velocityMetersPerSecond
                       * groundTruthState.curvatureRadPerMeter));
       for (var moduleState : moduleStates) {
-        moduleState.angle = moduleState.angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
-        moduleState.speedMetersPerSecond += rand.nextGaussian() * 0.1;
+        moduleState.setAngle(
+            moduleState.getAngle().plus(new Rotation2d(rand.nextGaussian() * 0.005)));
+        moduleState.setSpeed(moduleState.getSpeedMetersPerSecond() + rand.nextGaussian() * 0.1);
       }
 
-      fl.distanceMeters += moduleStates[0].speedMetersPerSecond * dt;
-      fr.distanceMeters += moduleStates[1].speedMetersPerSecond * dt;
-      bl.distanceMeters += moduleStates[2].speedMetersPerSecond * dt;
-      br.distanceMeters += moduleStates[3].speedMetersPerSecond * dt;
+      fl.distanceMeters += moduleStates[0].getSpeedMetersPerSecond() * dt;
+      fr.distanceMeters += moduleStates[1].getSpeedMetersPerSecond() * dt;
+      bl.distanceMeters += moduleStates[2].getSpeedMetersPerSecond() * dt;
+      br.distanceMeters += moduleStates[3].getSpeedMetersPerSecond() * dt;
 
-      fl.angle = moduleStates[0].angle;
-      fr.angle = moduleStates[1].angle;
-      bl.angle = moduleStates[2].angle;
-      br.angle = moduleStates[3].angle;
+      fl.angle = moduleStates[0].getAngle();
+      fr.angle = moduleStates[1].getAngle();
+      bl.angle = moduleStates[2].getAngle();
+      br.angle = moduleStates[3].getAngle();
 
       var xHat =
           odometry.update(
