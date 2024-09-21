@@ -5,6 +5,8 @@
 #include "ListenerStorage.h"
 
 #include <algorithm>
+#include <utility>
+#include <vector>
 
 #include <wpi/SmallVector.h>
 

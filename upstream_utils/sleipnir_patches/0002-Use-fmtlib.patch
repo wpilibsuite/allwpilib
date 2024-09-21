@@ -19,13 +19,13 @@ index 8fb61fdf9cc5ceff633d3126f0579eef25a1326f..6a7f8ed28f9cb037c9746a7e0ef5e110
 +  ^fmt/
  }
 diff --git a/include/sleipnir/util/Print.hpp b/include/sleipnir/util/Print.hpp
-index 339320bce6d017ca85025060ba445b2f025bb225..a9220cdaadcb9b88862542935bc72781d8389239 100644
+index a746cb77b70f095bb15f4c493295cb925bc74cd3..c01fd4ac679df854b885293d681ea1e0984626fa 100644
 --- a/include/sleipnir/util/Print.hpp
 +++ b/include/sleipnir/util/Print.hpp
-@@ -2,52 +2,57 @@
- 
+@@ -3,52 +3,57 @@
  #pragma once
  
+ #include <cstdio>
 -#include <print>
  #include <system_error>
  #include <utility>

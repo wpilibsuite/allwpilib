@@ -25,8 +25,7 @@ add_executable(
     ${APP_ICON_MACOSX}
 )
 wpilib_link_macos_gui(roborioteamnumbersetter)
-target_link_libraries(roborioteamnumbersetter libglass wpinet ${LIBSSH_LIBRARIES})
-target_include_directories(roborioteamnumbersetter SYSTEM PRIVATE ${LIBSSH_INCLUDE_DIRS})
+target_link_libraries(roborioteamnumbersetter libglass wpinet ssh)
 
 if(WIN32)
     set_target_properties(roborioteamnumbersetter PROPERTIES WIN32_EXECUTABLE YES)

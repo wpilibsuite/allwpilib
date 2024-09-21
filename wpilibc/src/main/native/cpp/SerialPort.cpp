@@ -4,7 +4,7 @@
 
 #include "frc/SerialPort.h"
 
-#include <utility>
+#include <string>
 
 #include <hal/FRCUsageReporting.h>
 #include <hal/SerialPort.h>

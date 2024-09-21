@@ -5,6 +5,9 @@
 #include "frc/simulation/DoubleSolenoidSim.h"
 
 #include "frc/DoubleSolenoid.h"
+#include <memory>
+#include <utility>
+
 #include "frc/PneumaticsBase.h"
 
 using namespace frc;

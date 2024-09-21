@@ -4,6 +4,7 @@
 
 #include "frc/controller/ArmFeedforward.h"
 
+#include <algorithm>
 #include <limits>
 
 #include <sleipnir/autodiff/Gradient.hpp>

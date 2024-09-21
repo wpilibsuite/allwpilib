@@ -6,6 +6,7 @@
 
 #include <cstdio>
 #include <fstream>
+#include <string>
 
 #include <gtest/gtest.h>
 #include <networktables/MultiSubscriber.h>

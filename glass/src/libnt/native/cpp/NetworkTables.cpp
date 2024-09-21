@@ -4,13 +4,18 @@
 
 #include "glass/networktables/NetworkTables.h"
 
+#include <algorithm>
 #include <cinttypes>
 #include <concepts>
 #include <cstring>
+#include <functional>
 #include <initializer_list>
+#include <map>
 #include <memory>
 #include <span>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>

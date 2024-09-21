@@ -4,10 +4,13 @@
 
 #include "SimDeviceGui.h"
 
-#include <glass/other/DeviceTree.h>
 #include <stdint.h>
 
+#include <memory>
+#include <utility>
+
 #include <fmt/format.h>
+#include <glass/other/DeviceTree.h>
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
 #include <wpi/DenseMap.h>

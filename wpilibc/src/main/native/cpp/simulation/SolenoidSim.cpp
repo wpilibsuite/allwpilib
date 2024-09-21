@@ -4,6 +4,9 @@
 
 #include "frc/simulation/SolenoidSim.h"
 
+#include <memory>
+#include <utility>
+
 #include "frc/PneumaticsBase.h"
 
 using namespace frc;
