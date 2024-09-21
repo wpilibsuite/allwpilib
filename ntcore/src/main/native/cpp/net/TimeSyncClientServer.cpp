@@ -273,7 +273,8 @@ wpi::TimeSyncClient::TimeSyncClient(std::string_view server, int remote_port,
   struct sockaddr_in serverAddr;
   uv::NameToAddr(m_serverIP, m_serverPort, &serverAddr);
 
-  m_loopRunner.ExecSync([this, serverAddr](uv::Loop&) { m_udp->Connect(serverAddr); });
+  m_loopRunner.ExecSync(
+      [this, serverAddr](uv::Loop&) { m_udp->Connect(serverAddr); });
 }
 
 void wpi::TimeSyncClient::Start() {
