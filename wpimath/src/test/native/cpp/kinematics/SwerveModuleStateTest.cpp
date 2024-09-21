@@ -28,17 +28,17 @@ TEST(SwerveModuleStateTest, Optimize) {
 TEST(SwerveModuleStateTest, NoOptimize) {
   frc::Rotation2d angleA{0_deg};
   frc::SwerveModuleState refA{2_mps, 89_deg};
-  auto optimizedA = frc::SwerveModuleState::Optimize(refA, angleA);
+  refA.Optimize(angleA);
 
-  EXPECT_NEAR(optimizedA.speed.value(), 2.0, kEpsilon);
-  EXPECT_NEAR(optimizedA.angle.Degrees().value(), 89.0, kEpsilon);
+  EXPECT_NEAR(refA.speed.value(), 2.0, kEpsilon);
+  EXPECT_NEAR(refA.angle.Degrees().value(), 89.0, kEpsilon);
 
   frc::Rotation2d angleB{0_deg};
   frc::SwerveModuleState refB{-2_mps, -2_deg};
-  auto optimizedB = frc::SwerveModuleState::Optimize(refB, angleB);
+  refB.Optimize(angleB);
 
-  EXPECT_NEAR(optimizedB.speed.value(), -2.0, kEpsilon);
-  EXPECT_NEAR(optimizedB.angle.Degrees().value(), -2.0, kEpsilon);
+  EXPECT_NEAR(refB.speed.value(), -2.0, kEpsilon);
+  EXPECT_NEAR(refB.angle.Degrees().value(), -2.0, kEpsilon);
 }
 
 TEST(SwerveModuleStateTest, Equality) {
