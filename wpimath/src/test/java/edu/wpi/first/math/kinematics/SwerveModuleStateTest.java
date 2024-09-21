@@ -50,4 +50,57 @@ class SwerveModuleStateTest {
         () -> assertEquals(-2.0, refB.speedMetersPerSecond, kEpsilon),
         () -> assertEquals(-2.0, refB.angle.getDegrees(), kEpsilon));
   }
+
+  @Test 
+  void testCosineScale() {
+    var angleA = Rotation2d.fromDegrees(0.0);
+    var refA = new SwerveModuleState(2.0, Rotation2d.fromDegrees(45.0));
+    refA.cosineScale(angleA);
+
+    assertAll(
+        () -> assertEquals(2.0, refA.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(45.0, refA.angle.getDegrees(), kEpsilon));
+
+    var angleB = Rotation2d.fromDegrees(45.0);
+    var refB = new SwerveModuleState(2.0, Rotation2d.fromDegrees(45.0));
+    refB.cosineScale(angleB);
+
+    assertAll(
+        () -> assertEquals(2.0, refB.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(45.0, refB.angle.getDegrees(), kEpsilon));        
+
+    var angleC = Rotation2d.fromDegrees(-45.0);
+    var refC = new SwerveModuleState(2.0, Rotation2d.fromDegrees(45.0));
+    refC.cosineScale(angleC);
+
+    assertAll(
+        () -> assertEquals(2.0, refC.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(45.0, refC.angle.getDegrees(), kEpsilon));      
+        
+    var angleD = Rotation2d.fromDegrees(135.0);
+    var refD = new SwerveModuleState(2.0, Rotation2d.fromDegrees(45.0));
+    refD.cosineScale(angleD);
+
+    assertAll(
+        () -> assertEquals(2.0, refD.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(45.0, refD.angle.getDegrees(), kEpsilon));        
+
+    var angleE = Rotation2d.fromDegrees(-135.0);
+    var refE = new SwerveModuleState(2.0, Rotation2d.fromDegrees(45.0));
+    refE.cosineScale(angleE);
+
+    assertAll(
+        () -> assertEquals(2.0, refE.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(45.0, refE.angle.getDegrees(), kEpsilon));    
+        
+    var angleF = Rotation2d.fromDegrees(180.0);
+    var refF = new SwerveModuleState(2.0, Rotation2d.fromDegrees(45.0));
+    refF.cosineScale(angleF);
+
+    assertAll(
+        () -> assertEquals(2.0, refF.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(45.0, refF.angle.getDegrees(), kEpsilon));             
+
+  }
+
 }
