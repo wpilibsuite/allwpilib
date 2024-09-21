@@ -64,7 +64,7 @@ void SwerveModule::SetDesiredState(
   // Scale speed by cosine of angle error. This scales down movement
   // perpendicular to the desired direction of travel that can occur when
   // modules change directions. This results in smoother driving.
-  referenceState.speed *= (referenceState.angle - encoderRotation).Cos();
+  referenceState.CosineScale(encoderRotation);
 
   // Calculate the drive output from the drive PID controller.
   const auto driveOutput = m_drivePIDController.Calculate(

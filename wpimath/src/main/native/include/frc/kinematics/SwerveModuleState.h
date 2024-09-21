@@ -62,6 +62,18 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
   [[deprecated("Use instance method instead.")]]
   static SwerveModuleState Optimize(const SwerveModuleState& desiredState,
                                     const Rotation2d& currentAngle);
+
+  /**
+   * Scales speed by cosine of angle error. This scales down movement perpendicular to the desired
+   * direction of travel that can occur when modules change directions. This results in smoother
+   * driving.
+   *
+   * @param currentAngle The current module angle.
+   */
+  void CosineScale(const Rotation2d& currentAngle) {
+    speed *= (angle - currentAngle).Cos();
+  }
+
 };
 }  // namespace frc
 
