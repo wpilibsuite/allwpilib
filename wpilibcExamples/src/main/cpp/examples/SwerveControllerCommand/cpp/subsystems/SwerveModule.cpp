@@ -54,12 +54,12 @@ frc::SwerveModulePosition SwerveModule::GetPosition() {
 }
 
 void SwerveModule::SetDesiredState(
-    const frc::SwerveModuleState& referenceState) {
+    frc::SwerveModuleState& referenceState) {
   frc::Rotation2d encoderRotation{
       units::radian_t{m_turningEncoder.GetDistance()}};
 
   // Optimize the reference state to avoid spinning further than 90 degrees
-  referenceState::Optimize(encoderRotation);
+  referenceState.Optimize(encoderRotation);
 
   // Scale speed by cosine of angle error. This scales down movement
   // perpendicular to the desired direction of travel that can occur when
