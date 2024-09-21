@@ -4,6 +4,8 @@
 
 #include "frc2/command/FunctionalCommand.h"
 
+#include <utility>
+
 using namespace frc2;
 
 FunctionalCommand::FunctionalCommand(std::function<void()> onInit,

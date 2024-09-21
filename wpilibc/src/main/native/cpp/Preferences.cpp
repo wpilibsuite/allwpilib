@@ -4,7 +4,9 @@
 
 #include "frc/Preferences.h"
 
-#include <algorithm>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>

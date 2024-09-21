@@ -4,6 +4,8 @@
 
 #include "hal/CTREPCM.h"
 
+#include <string>
+
 #include <fmt/format.h>
 
 #include "HALInitializer.h"

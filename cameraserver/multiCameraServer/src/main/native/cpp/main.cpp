@@ -6,6 +6,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include <networktables/NetworkTableInstance.h>
@@ -94,18 +95,17 @@ bool ReadCameraConfig(const wpi::json& config) {
 
 bool ReadConfig() {
   // open config file
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(configFile, ec);
-  if (fileBuffer == nullptr || ec) {
-    wpi::print(stderr, "could not open '{}': {}\n", configFile, ec.message());
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(configFile);
+  if (!fileBuffer) {
+    wpi::print(stderr, "could not open '{}': {}\n", configFile,
+               fileBuffer.error().message());
     return false;
   }
 
   // parse file
   wpi::json j;
   try {
-    j = wpi::json::parse(fileBuffer->GetCharBuffer());
+    j = wpi::json::parse(fileBuffer.value()->GetCharBuffer());
   } catch (const wpi::json::parse_error& e) {
     wpi::print(stderr, "config error in '{}': byte {}: {}\n", configFile,
                e.byte, e.what());

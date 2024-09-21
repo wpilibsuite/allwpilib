@@ -4,6 +4,9 @@
 
 #include "frc2/command/ParallelRaceGroup.h"
 
+#include <utility>
+#include <vector>
+
 using namespace frc2;
 
 ParallelRaceGroup::ParallelRaceGroup(

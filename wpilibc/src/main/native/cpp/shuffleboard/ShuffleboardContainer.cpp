@@ -4,6 +4,11 @@
 
 #include "frc/shuffleboard/ShuffleboardContainer.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <ntcore_cpp.h>
 #include <wpi/sendable/SendableRegistry.h>
 

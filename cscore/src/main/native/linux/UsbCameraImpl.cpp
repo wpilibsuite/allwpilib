@@ -21,6 +21,9 @@
 
 #include <algorithm>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <wpi/MemAlloc.h>
@@ -30,7 +33,6 @@
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
-#include "Handle.h"
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"

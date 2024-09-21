@@ -6,11 +6,11 @@
 
 #include <stdint.h>
 
-#include <algorithm>
 #include <cmath>
-#include <numeric>
+#include <memory>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <fmt/ranges.h>
@@ -211,13 +211,13 @@ void ServerImpl::ClientData4Base::ClientPublish(int64_t pubuid,
       pubuid, std::make_unique<PublisherData>(this, topic, pubuid));
   if (!isNew) {
     WARN("client {} duplicate publish of pubuid {}", m_id, pubuid);
+  } else {
+    // add publisher to topic
+    topic->AddPublisher(this, publisherIt->getSecond().get());
+
+    // update meta data
+    m_server.UpdateMetaTopicPub(topic);
   }
-
-  // add publisher to topic
-  topic->AddPublisher(this, publisherIt->getSecond().get());
-
-  // update meta data
-  m_server.UpdateMetaTopicPub(topic);
 
   // respond with announce with pubuid to client
   DEBUG4("client {}: announce {} pubuid {}", m_id, topic->name, pubuid);
@@ -1265,6 +1265,7 @@ void ServerImpl::RemoveClient(int clientId) {
     if (tcdIt != topic->clients.end()) {
       pubChanged = !tcdIt->second.publishers.empty();
       subChanged = !tcdIt->second.subscribers.empty();
+      topic->publisherCount -= tcdIt->second.publishers.size();
       topic->clients.erase(tcdIt);
     }
 

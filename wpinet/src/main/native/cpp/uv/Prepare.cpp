@@ -4,6 +4,8 @@
 
 #include "wpinet/uv/Prepare.h"
 
+#include <memory>
+
 #include "wpinet/uv/Loop.h"
 
 namespace wpi::uv {

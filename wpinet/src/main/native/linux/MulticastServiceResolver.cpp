@@ -4,6 +4,10 @@
 
 #include "wpinet/MulticastServiceResolver.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/mutex.h>

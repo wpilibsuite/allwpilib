@@ -4,6 +4,8 @@
 
 #include "frc2/command/PrintCommand.h"
 
+#include <string>
+
 #include <wpi/print.h>
 
 using namespace frc2;

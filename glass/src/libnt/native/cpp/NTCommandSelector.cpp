@@ -4,6 +4,8 @@
 
 #include "glass/networktables/NTCommandSelector.h"
 
+#include <utility>
+
 #include <fmt/format.h>
 #include <wpi/StringExtras.h>
 
