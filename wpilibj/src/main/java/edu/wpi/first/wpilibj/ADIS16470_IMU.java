@@ -338,10 +338,6 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       m_reset_in = new DigitalInput(27); // Set SPI CS2 (IMU RST) high
       Timer.delay(0.25); // Wait for reset to complete
 
-      m_spi = new SPI(m_spi_port);
-      m_spi.setClockRate(2000000);
-      m_spi.setMode(SPI.Mode.kMode3);
-      m_spi.setChipSelectActiveLow();
       if (!switchToStandardSPI()) {
         return;
       }
@@ -402,8 +398,6 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       // Write offset calibration command to IMU
       writeRegister(GLOB_CMD, 0x0001);
 
-      // Configure interrupt on SPI CS1
-      m_auto_interrupt = new DigitalInput(26);
       // Configure and enable auto SPI
       if (!switchToAutoSPI()) {
         return;
@@ -459,7 +453,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       }
       System.out.println("Paused the IMU processing thread successfully!");
       // Maybe we're in auto SPI mode? If so, kill auto SPI, and then SPI.
-      if (m_auto_configured) {
+      if (m_spi != null && m_auto_configured) {
         m_spi.stopAuto();
         // We need to get rid of all the garbage left in the auto SPI buffer after
         // stopping it.
@@ -478,6 +472,14 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
         System.out.println("Paused auto SPI successfully.");
       }
     }
+    // There doesn't seem to be a SPI port active. Let's try to set one up
+    if (m_spi == null) {
+      System.out.println("Setting up a new SPI port.");
+      m_spi = new SPI(m_spi_port);
+      m_spi.setClockRate(2000000);
+      m_spi.setMode(SPI.Mode.kMode3);
+      m_spi.setChipSelectActiveLow();
+    }
     readRegister(PROD_ID); // Dummy read
     // Validate the product ID
     if (readRegister(PROD_ID) != 16982) {
@@ -494,6 +496,16 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return True if successful, false otherwise.
    */
   boolean switchToAutoSPI() {
+    // No SPI port has been set up. Go set one up first.
+    if (m_spi == null && !switchToStandardSPI()) {
+      DriverStation.reportError("Failed to start/restart auto SPI", false);
+      return false;
+    }
+    // Only set up the interrupt if needed.
+    if (m_auto_interrupt == null) {
+      // Configure interrupt on SPI CS1
+      m_auto_interrupt = new DigitalInput(26);
+    }
     // The auto SPI controller gets angry if you try to set up two instances on one
     // bus.
     if (!m_auto_configured) {
