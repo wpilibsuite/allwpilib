@@ -338,7 +338,6 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
             "ADIS16448: Flash and RAM configuration consistent. No flash update required!", false);
       }
 
-      // Configure standard SPI
       if (!switchToAutoSPI()) {
         return;
       }
@@ -418,9 +417,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
         System.out.println("Paused auto SPI successfully.");
       }
     }
-    // There doesn't seem to be a SPI port active. Let's try to set one up
     if (m_spi == null) {
-      System.out.println("Setting up a new SPI port.");
       m_spi = new SPI(m_spi_port);
       m_spi.setClockRate(1000000);
       m_spi.setMode(SPI.Mode.kMode3);

@@ -398,7 +398,6 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       // Write offset calibration command to IMU
       writeRegister(GLOB_CMD, 0x0001);
 
-      // Configure and enable auto SPI
       if (!switchToAutoSPI()) {
         return;
       }
@@ -472,9 +471,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
         System.out.println("Paused auto SPI successfully.");
       }
     }
-    // There doesn't seem to be a SPI port active. Let's try to set one up
     if (m_spi == null) {
-      System.out.println("Setting up a new SPI port.");
       m_spi = new SPI(m_spi_port);
       m_spi.setClockRate(2000000);
       m_spi.setMode(SPI.Mode.kMode3);

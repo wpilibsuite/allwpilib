@@ -99,7 +99,6 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
 
     ConfigCalTime(cal_time);
 
-    // Configure standard SPI
     if (!SwitchToStandardSPI()) {
       return;
     }
@@ -174,7 +173,6 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
           "required!");
     }
 
-    // Configure and enable auto SPI
     if (!SwitchToAutoSPI()) {
       return;
     }
@@ -366,7 +364,6 @@ bool ADIS16448_IMU::SwitchToStandardSPI() {
       }
     }
   }
-  // There doesn't seem to be a SPI port active. Let's try to set one up
   if (m_spi == nullptr) {
     m_spi = new SPI(m_spi_port);
     m_spi->SetClockRate(1000000);
