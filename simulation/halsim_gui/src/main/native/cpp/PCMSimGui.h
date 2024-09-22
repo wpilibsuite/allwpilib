@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
-#include <glass/hardware/Pneumatic.h>
-
 #include <memory>
+
+#include <glass/hardware/Pneumatic.h>
 
 namespace halsimgui {
 

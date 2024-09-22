@@ -4,8 +4,10 @@
 
 #include "RawSinkImpl.h"
 
+#include <algorithm>
+#include <memory>
+
 #include "Instance.h"
-#include "cscore.h"
 #include "cscore_raw.h"
 
 using namespace cs;

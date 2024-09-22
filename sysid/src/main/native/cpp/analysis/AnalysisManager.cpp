@@ -5,7 +5,9 @@
 #include "sysid/analysis/AnalysisManager.h"
 
 #include <cmath>
-#include <functional>
+#include <limits>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <units/angle.h>

@@ -6,6 +6,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <utility>
 #include <vector>
 
 #include <wpi/mutex.h>
@@ -25,7 +26,6 @@ NtQueryTimerResolution(PULONG MinimumResolution, PULONG MaximumResolution,
 #include "ErrorsInternal.h"
 #include "HALInitializer.h"
 #include "MockHooksInternal.h"
-#include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/Extensions.h"
 #include "hal/handles/HandlesInternal.h"

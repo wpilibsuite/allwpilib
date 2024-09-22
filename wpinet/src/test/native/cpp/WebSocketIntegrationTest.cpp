@@ -4,10 +4,11 @@
 
 #include "wpinet/WebSocketServer.h"  // NOLINT(build/include_order)
 
+#include <vector>
+
 #include <wpi/SmallString.h>
 
 #include "WebSocketTest.h"
-#include "wpinet/HttpParser.h"
 
 namespace wpi {
 

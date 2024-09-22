@@ -4,6 +4,8 @@
 
 #include "WSProvider_AddressableLED.h"
 
+#include <vector>
+
 #include <hal/Ports.h>
 #include <hal/simulation/AddressableLEDData.h>
 

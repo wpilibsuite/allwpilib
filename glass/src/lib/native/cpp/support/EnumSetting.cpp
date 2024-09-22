@@ -4,6 +4,8 @@
 
 #include "glass/support/EnumSetting.h"
 
+#include <string>
+
 #include <imgui.h>
 
 using namespace glass;

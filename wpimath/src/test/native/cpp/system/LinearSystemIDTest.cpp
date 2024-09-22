@@ -8,7 +8,6 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/system/plant/LinearSystemId.h"
 #include "units/length.h"
 #include "units/mass.h"
 

@@ -15,11 +15,6 @@
 #include <hal/DMA.h>
 #include <hal/HALBase.h>
 
-#include "frc/AnalogInput.h"
-#include "frc/Counter.h"
-#include "frc/DigitalSource.h"
-#include "frc/DutyCycle.h"
-#include "frc/Encoder.h"
 #include "frc/Errors.h"
 
 using namespace frc;

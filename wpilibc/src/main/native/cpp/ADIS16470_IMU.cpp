@@ -13,11 +13,6 @@
 
 #include "frc/ADIS16470_IMU.h"
 
-#include <frc/DigitalInput.h>
-#include <frc/DigitalSource.h>
-#include <frc/DriverStation.h>
-#include <frc/Timer.h>
-
 #include <cmath>
 #include <numbers>
 #include <utility>
@@ -26,8 +21,10 @@
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
+#include "frc/DigitalInput.h"
 #include "frc/Errors.h"
 #include "frc/MathUtil.h"
+#include "frc/Timer.h"
 
 /* Helpful conversion functions */
 static inline int32_t ToInt(const uint32_t* buf) {

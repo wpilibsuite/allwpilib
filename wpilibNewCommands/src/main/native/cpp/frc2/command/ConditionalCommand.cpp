@@ -4,6 +4,10 @@
 
 #include "frc2/command/ConditionalCommand.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+
 #include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc2;

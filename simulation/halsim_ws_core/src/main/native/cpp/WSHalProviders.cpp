@@ -4,6 +4,8 @@
 
 #include "WSHalProviders.h"
 
+#include <memory>
+
 #include <fmt/format.h>
 
 namespace wpilibws {
