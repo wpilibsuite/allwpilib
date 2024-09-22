@@ -6,6 +6,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include <fmt/format.h>
 #include <hal/Ports.h>

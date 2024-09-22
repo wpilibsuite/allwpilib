@@ -4,6 +4,8 @@
 
 #include "frc/AnalogInput.h"
 
+#include <string>
+
 #include <hal/AnalogAccumulator.h>
 #include <hal/AnalogInput.h>
 #include <hal/FRCUsageReporting.h>

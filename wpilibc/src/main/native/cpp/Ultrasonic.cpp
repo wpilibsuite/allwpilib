@@ -4,7 +4,9 @@
 
 #include "frc/Ultrasonic.h"
 
+#include <memory>
 #include <utility>
+#include <vector>
 
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>

@@ -4,13 +4,15 @@
 
 #include "frc/DutyCycleEncoder.h"
 
+#include <memory>
+#include <utility>
+
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/DigitalInput.h"
 #include "frc/DigitalSource.h"
 #include "frc/DutyCycle.h"
-#include "frc/Errors.h"
 #include "frc/MathUtil.h"
 
 using namespace frc;
