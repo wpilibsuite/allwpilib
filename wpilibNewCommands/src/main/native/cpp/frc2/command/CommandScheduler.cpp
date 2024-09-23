@@ -10,6 +10,7 @@
 #include <frc/RobotState.h>
 #include <frc/TimedRobot.h>
 #include <frc/livewindow/LiveWindow.h>
+#include <frc/Tracer.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/IntegerArrayTopic.h>
@@ -175,24 +176,34 @@ void CommandScheduler::Run() {
     return;
   }
 
+  frc::Tracer::StartTrace("CommandScheduler");
   m_watchdog.Reset();
 
   // Run the periodic method of all registered subsystems.
   for (auto&& subsystem : m_impl->subsystems) {
     subsystem.getFirst()->Periodic();
+    frc::Tracer::TraceFunc(
+      subsystem.getFirst()->GetName() + "Periodic",
+      std::bind(&Subsystem::Periodic, subsystem.getFirst())
+    );
     if constexpr (frc::RobotBase::IsSimulation()) {
-      subsystem.getFirst()->SimulationPeriodic();
+      frc::Tracer::TraceFunc(
+        subsystem.getFirst()->GetName() + "SimulationPeriodic",
+        std::bind(&Subsystem::SimulationPeriodic, subsystem.getFirst())
+      );
     }
-    m_watchdog.AddEpoch(subsystem.getFirst()->GetName() + ".Periodic()");
   }
 
   // Cache the active instance to avoid concurrency problems if SetActiveLoop()
   // is called from inside the button bindings.
   frc::EventLoop* loopCache = m_impl->activeButtonLoop;
   // Poll buttons for new commands to add.
-  loopCache->Poll();
-  m_watchdog.AddEpoch("buttons.Run()");
+  frc::Tracer::TraceFunc(
+    "PollButtons",
+    std::bind(&frc::EventLoop::Poll, loopCache)
+  );
 
+  frc::Tracer::StartTrace("Commands");
   m_impl->inRunLoop = true;
   bool isDisabled = frc::RobotState::IsDisabled();
   // Run scheduled commands, remove finished commands.
@@ -206,8 +217,6 @@ void CommandScheduler::Run() {
     for (auto&& action : m_impl->executeActions) {
       action(*command);
     }
-    m_watchdog.AddEpoch(command->GetName() + ".Execute()");
-
     if (command->IsFinished()) {
       m_impl->endingCommands.insert(command);
       command->End(false);
@@ -220,8 +229,6 @@ void CommandScheduler::Run() {
       for (auto&& requirement : command->GetRequirements()) {
         m_impl->requirements.erase(requirement);
       }
-
-      m_watchdog.AddEpoch(command->GetName() + ".End(false)");
     }
   }
   m_impl->inRunLoop = false;
@@ -245,11 +252,9 @@ void CommandScheduler::Run() {
       Schedule({subsystem.getSecond().get()});
     }
   }
+  frc::Tracer::EndTrace();
 
   m_watchdog.Disable();
-  if (m_watchdog.IsExpired()) {
-    m_watchdog.PrintEpochs();
-  }
 }
 
 void CommandScheduler::RegisterSubsystem(Subsystem* subsystem) {

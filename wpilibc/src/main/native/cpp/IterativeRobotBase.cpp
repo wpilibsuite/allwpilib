@@ -16,12 +16,12 @@
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/shuffleboard/Shuffleboard.h"
 #include "frc/smartdashboard/SmartDashboard.h"
+#include "frc/Tracer.h"
 
 using namespace frc;
 
 IterativeRobotBase::IterativeRobotBase(units::second_t period)
-    : m_period(period),
-      m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
+    : m_period(period) {}
 
 void IterativeRobotBase::RobotInit() {}
 
@@ -120,8 +120,9 @@ units::second_t IterativeRobotBase::GetPeriod() const {
 }
 
 void IterativeRobotBase::LoopFunc() {
+  Tracer::StartTrace("RobotLoop");
+
   DriverStation::RefreshData();
-  m_watchdog.Reset();
 
   // Get current mode
   DSControlWord word;
@@ -161,20 +162,16 @@ void IterativeRobotBase::LoopFunc() {
     // Call current mode's entry function
     if (mode == Mode::kDisabled) {
       DisabledInit();
-      m_watchdog.AddEpoch("DisabledInit()");
     } else if (mode == Mode::kAutonomous) {
       AutonomousInit();
-      m_watchdog.AddEpoch("AutonomousInit()");
     } else if (mode == Mode::kTeleop) {
       TeleopInit();
-      m_watchdog.AddEpoch("TeleopInit()");
     } else if (mode == Mode::kTest) {
       if (m_lwEnabledInTest) {
         LiveWindow::SetEnabled(true);
         Shuffleboard::EnableActuatorWidgets();
       }
       TestInit();
-      m_watchdog.AddEpoch("TestInit()");
     }
 
     m_lastMode = mode;
@@ -183,37 +180,31 @@ void IterativeRobotBase::LoopFunc() {
   // Call the appropriate function depending upon the current robot mode
   if (mode == Mode::kDisabled) {
     HAL_ObserveUserProgramDisabled();
-    DisabledPeriodic();
-    m_watchdog.AddEpoch("DisabledPeriodic()");
+    Tracer::TraceFunc("DisabledPeriodic", std::bind(&IterativeRobotBase::DisabledPeriodic, this));
   } else if (mode == Mode::kAutonomous) {
     HAL_ObserveUserProgramAutonomous();
-    AutonomousPeriodic();
-    m_watchdog.AddEpoch("AutonomousPeriodic()");
+    Tracer::TraceFunc("AutonomousPeriodic", std::bind(&IterativeRobotBase::AutonomousPeriodic, this));
   } else if (mode == Mode::kTeleop) {
     HAL_ObserveUserProgramTeleop();
-    TeleopPeriodic();
-    m_watchdog.AddEpoch("TeleopPeriodic()");
+    Tracer::TraceFunc("TeleopPeriodic", std::bind(&IterativeRobotBase::TeleopPeriodic, this));
   } else if (mode == Mode::kTest) {
     HAL_ObserveUserProgramTest();
-    TestPeriodic();
-    m_watchdog.AddEpoch("TestPeriodic()");
+    Tracer::TraceFunc("TestPeriodic", std::bind(&IterativeRobotBase::TestPeriodic, this));
   }
 
-  RobotPeriodic();
-  m_watchdog.AddEpoch("RobotPeriodic()");
+  // RobotPeriodic();
+  Tracer::TraceFunc("RobotPeriodic", std::bind(&IterativeRobotBase::RobotPeriodic, this));
 
-  SmartDashboard::UpdateValues();
-  m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
-  LiveWindow::UpdateValues();
-  m_watchdog.AddEpoch("LiveWindow::UpdateValues()");
-  Shuffleboard::Update();
-  m_watchdog.AddEpoch("Shuffleboard::Update()");
+  Tracer::StartTrace("DefaultLogging");
+  Tracer::TraceFunc("SmartDashboard", SmartDashboard::UpdateValues);
+  Tracer::TraceFunc("LiveWindow", LiveWindow::UpdateValues);
+  Tracer::TraceFunc("Shuffleboard", Shuffleboard::Update);
+  Tracer::EndTrace();
 
   if constexpr (IsSimulation()) {
     HAL_SimPeriodicBefore();
     SimulationPeriodic();
     HAL_SimPeriodicAfter();
-    m_watchdog.AddEpoch("SimulationPeriodic()");
   }
 
   m_watchdog.Disable();
@@ -221,11 +212,6 @@ void IterativeRobotBase::LoopFunc() {
   // Flush NetworkTables
   if (m_ntFlushEnabled) {
     nt::NetworkTableInstance::GetDefault().FlushLocal();
-  }
-
-  // Warn on loop time overruns
-  if (m_watchdog.IsExpired()) {
-    m_watchdog.PrintEpochs();
   }
 }
 

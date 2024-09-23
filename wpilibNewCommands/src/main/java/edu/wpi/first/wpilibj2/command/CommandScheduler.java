@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Tracer;
 import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -254,13 +255,21 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     if (m_disabled) {
       return;
     }
+  
+    Tracer.startTrace("CommandScheduler");
     m_watchdog.reset();
 
     // Run the periodic method of all registered subsystems.
     for (Subsystem subsystem : m_subsystems.keySet()) {
-      subsystem.periodic();
+      Tracer.traceFunc(
+        subsystem.getName() + "Periodic",
+        subsystem::periodic
+      );
       if (RobotBase.isSimulation()) {
-        subsystem.simulationPeriodic();
+        Tracer.traceFunc(
+          subsystem.getName() + "SimulationPeriodic",
+          subsystem::simulationPeriodic
+        );
       }
     }
 
@@ -268,8 +277,10 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     // inside the button bindings.
     EventLoop loopCache = m_activeButtonLoop;
     // Poll buttons for new commands to add.
-    loopCache.poll();
+    Tracer.traceFunc("PollButtons", loopCache::poll);
 
+
+    Tracer.startTrace("Commands");
     m_inRunLoop = true;
     boolean isDisabled = RobotState.isDisabled();
     // Run scheduled commands, remove finished commands.
@@ -319,11 +330,9 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
         schedule(subsystemCommand.getValue());
       }
     }
+    Tracer.endTrace(); // Commands
 
     m_watchdog.disable();
-    if (m_watchdog.isExpired()) {
-      System.out.println("CommandScheduler loop overrun");
-    }
   }
 
   /**
