@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <memory>
+#include <string>
 
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
@@ -14,7 +15,6 @@
 
 #include "glass/Context.h"
 #include "glass/MainMenuBar.h"
-#include "glass/Model.h"
 #include "glass/Storage.h"
 #include "glass/View.h"
 #include "glass/networktables/NetworkTables.h"

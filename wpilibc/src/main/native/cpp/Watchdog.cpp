@@ -7,6 +7,7 @@
 #include <atomic>
 #include <thread>
 #include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <hal/Notifier.h>

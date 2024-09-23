@@ -4,11 +4,12 @@
 
 #include "frc/AnalogEncoder.h"
 
+#include <utility>
+
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/AnalogInput.h"
-#include "frc/Errors.h"
 #include "frc/MathUtil.h"
 #include "frc/RobotController.h"
 

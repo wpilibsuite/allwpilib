@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <optional>
+#include <utility>
 
 #ifdef __FRC_ROBORIO__
 #include <stdint.h>
@@ -21,7 +22,8 @@ using namespace nRoboRIO_FPGANamespace;
 }  // namespace fpga
 #include <memory>
 
-#include "dlfcn.h"
+#include "dlfcn.h"  // NOLINT(build/include_subdir)
+
 #endif
 
 #ifdef _WIN32

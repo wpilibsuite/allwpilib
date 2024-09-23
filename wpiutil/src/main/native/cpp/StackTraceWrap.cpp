@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <atomic>
+#include <string>
 
 #include "wpi/StackTrace.h"
 

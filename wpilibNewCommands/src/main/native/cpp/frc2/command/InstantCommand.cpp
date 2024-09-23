@@ -4,6 +4,8 @@
 
 #include "frc2/command/InstantCommand.h"
 
+#include <utility>
+
 using namespace frc2;
 
 InstantCommand::InstantCommand(std::function<void()> toRun,

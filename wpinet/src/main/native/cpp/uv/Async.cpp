@@ -4,6 +4,8 @@
 
 #include "wpinet/uv/Async.h"
 
+#include <memory>
+
 #include "wpinet/uv/Loop.h"
 
 namespace wpi::uv {

@@ -4,6 +4,7 @@
 
 #include "hal/REVPH.h"
 
+#include <string>
 #include <thread>
 
 #include <fmt/format.h>

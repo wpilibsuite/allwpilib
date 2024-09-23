@@ -6,7 +6,6 @@
 
 #include <wpi/protobuf/Protobuf.h>
 
-#include "frc/proto/MatrixProto.h"
 #include "frc/system/LinearSystem.h"
 
 template <int States, int Inputs, int Outputs>
