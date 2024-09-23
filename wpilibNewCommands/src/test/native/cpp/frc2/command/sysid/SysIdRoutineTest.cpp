@@ -5,7 +5,8 @@
 #include <frc2/command/Subsystem.h>
 #include <frc2/command/sysid/SysIdRoutine.h>
 
-#include <numbers>
+#include <utility>
+#include <vector>
 
 #include <frc/Timer.h>
 #include <frc/simulation/SimHooks.h>

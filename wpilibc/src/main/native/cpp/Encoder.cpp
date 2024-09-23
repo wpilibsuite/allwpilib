@@ -4,6 +4,7 @@
 
 #include "frc/Encoder.h"
 
+#include <memory>
 #include <utility>
 
 #include <hal/Encoder.h>

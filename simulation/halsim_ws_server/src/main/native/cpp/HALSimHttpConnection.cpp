@@ -6,6 +6,8 @@
 
 #include <uv.h>
 
+#include <cstdio>
+#include <string>
 #include <string_view>
 
 #include <wpi/MemoryBuffer.h>
@@ -125,9 +127,8 @@ void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
   }
 
   // open file
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(filename, ec);
-  if (fileBuffer == nullptr || ec) {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(filename);
+  if (!fileBuffer) {
     MySendError(404, "error opening file");
     return;
   }
@@ -143,7 +144,7 @@ void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
   wpi::SmallVector<uv::Buffer, 4> bodyData;
   wpi::raw_uv_ostream bodyOs{bodyData, 4096};
 
-  bodyOs << fileBuffer->GetBuffer();
+  bodyOs << fileBuffer.value()->GetBuffer();
 
   SendData(bodyOs.bufs(), false);
   if (!m_keepAlive) {

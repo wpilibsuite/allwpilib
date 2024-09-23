@@ -5,6 +5,7 @@
 #include "HALSimWSClientConnection.h"
 
 #include <cstdio>
+#include <string>
 
 #include <fmt/format.h>
 #include <wpi/print.h>

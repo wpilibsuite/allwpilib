@@ -4,6 +4,8 @@
 
 #include "frc/SharpIR.h"
 
+#include <algorithm>
+
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 

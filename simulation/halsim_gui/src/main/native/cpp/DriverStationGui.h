@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <glass/WindowManager.h>
-
 #include <memory>
 #include <string_view>
+
+#include <glass/WindowManager.h>
 
 namespace halsimgui {
 

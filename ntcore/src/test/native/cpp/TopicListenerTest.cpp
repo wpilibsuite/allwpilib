@@ -3,7 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <chrono>
+#include <cstdio>
 #include <thread>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <wpi/Synchronization.h>

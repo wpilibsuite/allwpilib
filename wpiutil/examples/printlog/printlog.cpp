@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <ctime>
+#include <utility>
+#include <vector>
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
@@ -18,12 +20,13 @@ int main(int argc, const char** argv) {
     wpi::print(stderr, "Usage: printlog <file>\n");
     return EXIT_FAILURE;
   }
-  std::error_code ec;
-  wpi::log::DataLogReader reader{wpi::MemoryBuffer::GetFile(argv[1], ec)};
-  if (ec) {
-    wpi::print(stderr, "could not open file: {}\n", ec.message());
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(argv[1]);
+  if (!fileBuffer) {
+    wpi::print(stderr, "could not open file: {}\n",
+               fileBuffer.error().message());
     return EXIT_FAILURE;
   }
+  wpi::log::DataLogReader reader{std::move(*fileBuffer)};
   if (!reader) {
     wpi::print(stderr, "not a log file\n");
     return EXIT_FAILURE;

@@ -4,6 +4,10 @@
 
 #include "frc2/command/CommandPtr.h"
 
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include <frc/Errors.h>
 
 #include "frc2/command/CommandScheduler.h"
@@ -12,7 +16,6 @@
 #include "frc2/command/ParallelCommandGroup.h"
 #include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/PrintCommand.h"
 #include "frc2/command/ProxyCommand.h"
 #include "frc2/command/RepeatCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"

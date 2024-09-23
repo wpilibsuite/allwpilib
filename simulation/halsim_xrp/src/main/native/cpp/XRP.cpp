@@ -4,6 +4,8 @@
 
 #include "XRP.h"
 
+#include <string>
+
 #include <fmt/format.h>
 #include <wpi/Endian.h>
 #include <wpi/MathExtras.h>
@@ -388,8 +390,9 @@ void XRP::ReadEncoderTag(std::span<const uint8_t> packet) {
         static_cast<double>(period_numerator >> 1) / period_denominator;
 
     // If direction is not forward, return negative value for period.
-    if (!(period_numerator & 1))
+    if (!(period_numerator & 1)) {
       period = -period;
+    }
 
     encJson["data"].push_back({wpi::json(">period"), wpi::json(period)});
   }

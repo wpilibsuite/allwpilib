@@ -121,6 +121,9 @@ file(
     src/main/native/thirdparty/mpack/src/*.cpp
 )
 list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
+if(NOT WITH_PROTOBUF)
+    list(FILTER wpiutil_native_src EXCLUDE REGEX "/protobuf/")
+endif()
 file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
 file(GLOB_RECURSE wpiutil_linux_src src/main/native/linux/*.cpp)
 file(GLOB_RECURSE wpiutil_macos_src src/main/native/macOS/*.cpp)
@@ -143,7 +146,12 @@ if(MSVC)
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 wpilib_target_warnings(wpiutil)
-target_link_libraries(wpiutil protobuf::libprotobuf Threads::Threads ${CMAKE_DL_LIBS})
+if(WITH_PROTOBUF)
+    target_link_libraries(wpiutil protobuf::libprotobuf Threads::Threads ${CMAKE_DL_LIBS})
+else()
+    target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS})
+    target_compile_definitions(wpiutil PUBLIC NO_PROTOBUF)
+endif()
 
 if(ATOMIC)
     target_link_libraries(wpiutil ${ATOMIC})
@@ -186,6 +194,7 @@ endif()
 install(
     DIRECTORY
         src/main/native/include/
+        src/main/native/thirdparty/argparse/include/
         src/main/native/thirdparty/concurrentqueue/include/
         src/main/native/thirdparty/expected/include/
         src/main/native/thirdparty/json/include/
@@ -199,6 +208,7 @@ target_include_directories(
     wpiutil
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/argparse/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/concurrentqueue/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/expected/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>

@@ -4,6 +4,9 @@
 
 #include "cscore_oo.h"
 
+#include <string>
+#include <vector>
+
 #include <fmt/format.h>
 #include <wpi/json.h>
 

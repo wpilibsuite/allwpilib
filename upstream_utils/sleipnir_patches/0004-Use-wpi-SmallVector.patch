@@ -408,7 +408,7 @@ index f3b2f0cf9e60b3a86b9654ff2b381f9c48734ff6..ad739cea6dce6f6cb586f538d1d30b92
 +  ^wpi/
  }
 diff --git a/src/optimization/solver/InteriorPoint.cpp b/src/optimization/solver/InteriorPoint.cpp
-index 817e3d1dcb808c36192ea5b483eee1a08dbb5e2f..1470eb235bfdac363557c207ac0eaedb6c73d295 100644
+index dcd8b56dc08516b80f89550c43cb7002745b93d8..892d2dd20f7fe92c2c91518a4ecb487425643585 100644
 --- a/src/optimization/solver/InteriorPoint.cpp
 +++ b/src/optimization/solver/InteriorPoint.cpp
 @@ -9,6 +9,7 @@

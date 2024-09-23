@@ -4,6 +4,8 @@
 
 #include "HALSimXRPClient.h"
 
+#include <memory>
+
 #include <WSProviderContainer.h>
 #include <WSProvider_Analog.h>
 #include <WSProvider_BuiltInAccelerometer.h>
