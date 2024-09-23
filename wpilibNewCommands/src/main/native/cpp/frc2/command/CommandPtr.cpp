@@ -167,7 +167,7 @@ CommandPtr CommandPtr::OnlyIf(std::function<bool()> condition) && {
 
 CommandPtr CommandPtr::After(std::function<bool()> condition) && {
   AssertValid();
-  return std::move(*this).BeforeStarting(std::make_unique<WaitUntilCommand>(std::move(condition)));
+  return std::move(*this).BeforeStarting(cmd::WaitUntil(condition));
 }
 
 CommandPtr CommandPtr::AfterTime(units::second_t duration) && {
