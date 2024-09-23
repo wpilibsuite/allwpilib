@@ -4,6 +4,8 @@
 
 #include "frc/PneumaticsBase.h"
 
+#include <memory>
+
 #include <hal/REVPH.h>
 
 #include "frc/Errors.h"

@@ -4,6 +4,8 @@
 
 #include "frc/simulation/RoboRioSim.h"  // NOLINT(build/include_order)
 
+#include <string>
+
 #include <gtest/gtest.h>
 #include <hal/HAL.h>
 #include <hal/HALBase.h>

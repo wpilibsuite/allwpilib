@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj.xrp;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.
@@ -152,6 +153,15 @@ public class XRPGyro {
    */
   public double getAngle() {
     return getAngleZ();
+  }
+
+  /**
+   * Gets the angle the robot is facing.
+   *
+   * @return A Rotation2d with the current heading.
+   */
+  public Rotation2d getRotation2d() {
+    return Rotation2d.fromDegrees(getAngle());
   }
 
   /**

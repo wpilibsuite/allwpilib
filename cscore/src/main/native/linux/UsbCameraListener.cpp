@@ -4,6 +4,8 @@
 
 #include "UsbCameraListener.h"
 
+#include <memory>
+
 #include <wpi/StringExtras.h>
 #include <wpinet/EventLoopRunner.h>
 #include <wpinet/uv/FsEvent.h>

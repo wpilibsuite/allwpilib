@@ -4,7 +4,9 @@
 
 #include "WSProvider_Joystick.h"
 
+#include <algorithm>
 #include <atomic>
+#include <vector>
 
 #include <hal/Ports.h>
 #include <hal/simulation/DriverStationData.h>

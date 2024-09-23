@@ -4,6 +4,8 @@
 
 #include "wpinet/uv/Loop.h"
 
+#include <memory>
+
 using namespace wpi::uv;
 
 Loop::Loop(const private_init&) noexcept {

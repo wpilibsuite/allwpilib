@@ -130,5 +130,7 @@ class WPILIB_DLLEXPORT Transform3d {
 };
 }  // namespace frc
 
+#ifndef NO_PROTOBUF
 #include "frc/geometry/proto/Transform3dProto.h"
+#endif
 #include "frc/geometry/struct/Transform3dStruct.h"

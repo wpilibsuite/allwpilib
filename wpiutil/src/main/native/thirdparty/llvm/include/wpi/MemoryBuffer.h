@@ -24,6 +24,7 @@
 #include <span>
 #include <string_view>
 #include <system_error>
+#include <wpi/expected>
 
 // Duplicated from fs.h to avoid a dependency
 namespace fs {
@@ -77,9 +78,8 @@ class MemoryBuffer {
   /// if successful, otherwise returning null. If FileSize is specified, this
   /// means that the client knows that the file exists and that it has the
   /// specified size.
-  static std::unique_ptr<MemoryBuffer> GetFile(std::string_view filename,
-                                               std::error_code& ec,
-                                               int64_t fileSize = -1);
+  static wpi::expected<std::unique_ptr<MemoryBuffer>, std::error_code>
+  GetFile(std::string_view filename, int64_t fileSize = -1);
 
   /// Read all of the specified file into a MemoryBuffer as a stream
   /// (i.e. until EOF reached). This is useful for special files that

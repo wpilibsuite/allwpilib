@@ -5,6 +5,7 @@
 #include "hal/Counter.h"
 
 #include <limits>
+#include <memory>
 
 #include <fmt/format.h>
 

@@ -4,6 +4,8 @@
 
 #include "frc/xrp/XRPGyro.h"
 
+#include <units/angle.h>
+
 using namespace frc;
 
 XRPGyro::XRPGyro() : m_simDevice("Gyro:XRPGyro") {
@@ -26,6 +28,10 @@ XRPGyro::XRPGyro() : m_simDevice("Gyro:XRPGyro") {
 
 double XRPGyro::GetAngle() const {
   return GetAngleZ();
+}
+
+frc::Rotation2d XRPGyro::GetRotation2d() const {
+  return frc::Rotation2d{units::degree_t{GetAngle()}};
 }
 
 double XRPGyro::GetRate() const {

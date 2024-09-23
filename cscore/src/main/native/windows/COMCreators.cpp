@@ -13,12 +13,12 @@
 
 // https://github.com/opencv/opencv/blob/master/modules/videoio/src/cap_msmf.cpp
 
-#include <mfidl.h>
-#include <mfapi.h>
 #include <Dbt.h>
 #include <ks.h>
 #include <ksmedia.h>
 #include <mfreadwrite.h>
+
+#include <memory>
 
 #include "COMCreators.h"
 #include "ComPtr.h"

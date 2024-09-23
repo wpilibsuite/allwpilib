@@ -5,8 +5,10 @@
 #include "ClientImpl3.h"
 
 #include <algorithm>
+#include <memory>
 #include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
