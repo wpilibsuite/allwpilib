@@ -193,6 +193,10 @@ static void EnableTracingForCurrentThread() {
   threadLocalState.m_disableNextCycle = false;
 }
 
+static void SetThreadName(std::string_view name) {
+  threadLocalState.UpdateThreadName(name);
+}
+
 static void TraceFunc(std::string_view name, std::function<void()> runnable) {
   StartTrace(name);
   runnable();

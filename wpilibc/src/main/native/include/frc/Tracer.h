@@ -72,6 +72,13 @@ class Tracer {
   static void EnableTracingForCurrentThread();
 
   /**
+   * Sets the name for the current thread to be used in the trace.
+   * 
+   * @param name the name of the thread.
+   */
+  static void SetThreadName(std::string_view name);
+
+  /**
    * Traces a function, should be used in place of
    * `Tracer.StartTrace(string)` and `Tracer.EndTrace()`
    * for functions called by user code like `CommandScheduler.run()` and
