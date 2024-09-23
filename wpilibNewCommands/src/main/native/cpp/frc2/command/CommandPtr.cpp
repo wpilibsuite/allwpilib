@@ -172,7 +172,7 @@ CommandPtr CommandPtr::After(std::function<bool()> condition) && {
 
 CommandPtr CommandPtr::AfterTime(units::second_t duration) && {
   AssertValid();
-  return std::move(*this).BeforeStarting(std::make_unique<WaitCommand>(duration));
+  return std::move(*this).BeforeStarting(cmd::Wait(duration));
 }
 
 CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {
