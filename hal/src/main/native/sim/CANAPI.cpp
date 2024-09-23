@@ -4,6 +4,8 @@
 
 #include "hal/CANAPI.h"
 
+#include <memory>
+
 #include <wpi/DenseMap.h>
 
 #include "CANAPIInternal.h"

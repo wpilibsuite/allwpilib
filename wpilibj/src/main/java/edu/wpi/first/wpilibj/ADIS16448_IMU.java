@@ -270,10 +270,6 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
 
       configCalTime(cal_time);
 
-      m_spi = new SPI(m_spi_port);
-      m_spi.setClockRate(1000000);
-      m_spi.setMode(SPI.Mode.kMode3);
-      m_spi.setChipSelectActiveLow();
       if (!switchToStandardSPI()) {
         return;
       }
@@ -342,9 +338,6 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
             "ADIS16448: Flash and RAM configuration consistent. No flash update required!", false);
       }
 
-      // Set up the interrupt
-      m_auto_interrupt = new DigitalInput(10); // MXP DIO0
-      // Configure standard SPI
       if (!switchToAutoSPI()) {
         return;
       }
@@ -403,7 +396,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
       }
       System.out.println("Paused the IMU processing thread successfully!");
       // Maybe we're in auto SPI mode? If so, kill auto SPI, and then SPI.
-      if (m_auto_configured) {
+      if (m_spi != null && m_auto_configured) {
         m_spi.stopAuto();
         // We need to get rid of all the garbage left in the auto SPI buffer after
         // stopping it.
@@ -424,6 +417,12 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
         System.out.println("Paused auto SPI successfully.");
       }
     }
+    if (m_spi == null) {
+      m_spi = new SPI(m_spi_port);
+      m_spi.setClockRate(1000000);
+      m_spi.setMode(SPI.Mode.kMode3);
+      m_spi.setChipSelectActiveLow();
+    }
     readRegister(PROD_ID); // Dummy read
     // Validate the product ID
     if (readRegister(PROD_ID) != 16448) {
@@ -435,6 +434,15 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   boolean switchToAutoSPI() {
+    // No SPI port has been set up. Go set one up first.
+    if (m_spi == null && !switchToStandardSPI()) {
+      DriverStation.reportError("Failed to start/restart auto SPI", false);
+      return false;
+    }
+    // Only set up the interrupt if needed.
+    if (m_auto_interrupt == null) {
+      m_auto_interrupt = new DigitalInput(10); // MXP DIO0
+    }
     // The auto SPI controller gets angry if you try to set up two instances on one
     // bus.
     if (!m_auto_configured) {

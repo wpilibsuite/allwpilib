@@ -8,8 +8,10 @@
 #include <cmath>
 #include <cstdio>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <fields/fields.h>
 #include <frc/geometry/Pose2d.h>
@@ -540,16 +542,14 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
 }
 
 void FieldInfo::LoadJsonFile(std::string_view jsonfile) {
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(jsonfile, ec);
-  if (fileBuffer == nullptr || ec) {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(jsonfile);
+  if (!fileBuffer) {
     std::fputs("GUI: could not open field JSON file\n", stderr);
     return;
   }
-  LoadJson(
-      {reinterpret_cast<const char*>(fileBuffer->begin()), fileBuffer->size()},
-      jsonfile);
+  LoadJson({reinterpret_cast<const char*>(fileBuffer.value()->begin()),
+            fileBuffer.value()->size()},
+           jsonfile);
 }
 
 bool FieldInfo::LoadImageImpl(const std::string& fn) {

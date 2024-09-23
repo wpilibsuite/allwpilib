@@ -13,6 +13,7 @@
 #include <atomic>
 #include <cstdio>
 #include <cstring>
+#include <memory>
 
 #include <fmt/format.h>
 #include <wpi/mutex.h>

@@ -8,7 +8,9 @@
 
 #include "wpinet/MulticastServiceResolver.h"
 
+#include <memory>
 #include <string>
+#include <utility>
 
 #include <wpi/ConvertUTF.h>
 #include <wpi/SmallString.h>

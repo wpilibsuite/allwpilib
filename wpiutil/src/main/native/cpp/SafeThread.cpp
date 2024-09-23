@@ -5,6 +5,8 @@
 #include "wpi/SafeThread.h"
 
 #include <atomic>
+#include <memory>
+#include <utility>
 
 using namespace wpi;
 

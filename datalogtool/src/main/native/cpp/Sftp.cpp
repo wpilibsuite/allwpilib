@@ -4,6 +4,10 @@
 
 #include "Sftp.h"
 
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <fmt/format.h>
 
 using namespace sftp;

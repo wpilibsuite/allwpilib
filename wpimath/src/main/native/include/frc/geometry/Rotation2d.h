@@ -169,6 +169,8 @@ void from_json(const wpi::json& json, Rotation2d& rotation);
 
 }  // namespace frc
 
+#ifndef NO_PROTOBUF
 #include "frc/geometry/proto/Rotation2dProto.h"
+#endif
 #include "frc/geometry/struct/Rotation2dStruct.h"
 #include "frc/geometry/Rotation2d.inc"
