@@ -14,6 +14,7 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.proto.Rotation2dProto;
 import edu.wpi.first.math.geometry.struct.Rotation2dStruct;
+import edu.wpi.first.math.geometry.AllianceFlipper.*;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
@@ -31,7 +32,7 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation2d
-    implements Interpolatable<Rotation2d>, ProtobufSerializable, StructSerializable {
+    implements Interpolatable<Rotation2d>, ProtobufSerializable, StructSerializable, Flippable<Rotation2d> {
   /**
    * A preallocated Rotation2d representing no rotation.
    *
@@ -330,6 +331,14 @@ public class Rotation2d
   @Override
   public Rotation2d interpolate(Rotation2d endValue, double t) {
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
+  }
+
+  @Override
+  public Rotation2d flip(Flipper flipper) {
+    return switch (flipper) {
+      case VERTICALLY_MIRRORED -> new Rotation2d(-getCos(), getSin());
+      case ROTATIONALLY_MIRRORED -> new Rotation2d(-getCos(), -getSin());
+    };
   }
 
   /** Rotation2d protobuf for serialization. */

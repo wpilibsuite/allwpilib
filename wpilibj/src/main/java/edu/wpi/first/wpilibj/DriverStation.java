@@ -9,6 +9,7 @@ import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.MatchInfoData;
+import edu.wpi.first.math.geometry.AllianceFlipper;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -29,6 +30,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /** Provide access to the network communication data to / from the Driver Station. */
 public final class DriverStation {
+  static {
+    // i don't like this, 110% open to suggestions
+    AllianceFlipper.setOnRed(
+      () -> getAlliance().orElse(Alliance.Blue) == Alliance.Red
+    );
+  }
+
   /** Number of Joystick ports. */
   public static final int kJoystickPorts = 6;
 

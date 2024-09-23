@@ -1,13 +1,7 @@
-package edu.wpi.first.wpilibj;
+package edu.wpi.first.math.geometry;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.HashMap;
+import java.util.function.BooleanSupplier;
 
 /**
  * A utility to standardize flipping of coordinate data based on the current alliance across
@@ -15,24 +9,6 @@ import java.util.HashMap;
  *
  * <p>If every vendor used this, the user would be able to specify the year and no matter the year
  * the vendor's code is from, the user would be able to flip as expected.
- *
- * <p>This api still allows vendors and users to match case against the flipping variant as a way to
- * specially handle cases or throw errors if a variant is explicitly not supported.
- * 
- * <p>Flipping a custom structure that is based on the field coordiante system looks like
- * <pre><code>
- * public class CustomStructure {
- *   public double x, y, vx, vy;
- *   public CustomStructure( ... ) { ... }
- * 
- *   public CustomStructure flip() {
- *     return switch (AllianceFlipper.getFlipper()) {
- *       case VERTICALLY_MIRRORED -> new CustomStructure(AllianceFlipper.flipX(x), y, -vx, vy);
- *       case ROTATIONALLY_MIRRORED -> new CustomStructure(AllianceFlipper.flipX(x), AllianceFlipper.flipY(y), -vx, -vy);
- *     };
- *   }
- * }
- * </code></pre>
  */
 public class AllianceFlipper {
   private AllianceFlipper() {
@@ -98,21 +74,44 @@ public class AllianceFlipper {
     public abstract double flipHeading(double heading);
   }
 
+  /**
+   * An interface for objects that can be flipped based on the current alliance.
+   */
+  public static interface Flippable<Self extends Flippable<Self>> {
+    /**
+     * Flips the object based on the supplied flipper.
+     */
+    public Self flip(Flipper flipper);
+
+    /**
+     * Flips the object based on the active flipper.
+     */
+    public default Self flip() {
+      return flip(getFlipper());
+    }
+
+    /**
+     * Flips the object if on the red alliance, otherwise returns the object unchanged.
+     */
+    @SuppressWarnings("unchecked")
+    public default Self flipIfRed() {
+        return onRed() ? flip() : (Self) this;
+    }
+  }
+
   private static record YearInfo(Flipper flipper, double fieldLength, double fieldWidth) {}
 
-  // TODO: Update and expand this map
   private static final HashMap<Integer, YearInfo> flipperMap =
       new HashMap<Integer, YearInfo>() {
         {
-          put(2020, new YearInfo(Flipper.ROTATIONALLY_MIRRORED, 16.5811, 8.19912));
-          put(2021, new YearInfo(Flipper.ROTATIONALLY_MIRRORED, 16.5811, 8.19912));
-          put(2022, new YearInfo(Flipper.ROTATIONALLY_MIRRORED, 16.5811, 8.19912));
-          put(2023, new YearInfo(Flipper.VERTICALLY_MIRRORED, 16.5811, 8.19912));
-          put(2024, new YearInfo(Flipper.VERTICALLY_MIRRORED, 16.5811, 8.19912));
+          put(2022, new YearInfo(Flipper.ROTATIONALLY_MIRRORED, 16.4592, 8.2296));
+          put(2023, new YearInfo(Flipper.VERTICALLY_MIRRORED, 16.54175, 8.0137));
+          put(2024, new YearInfo(Flipper.VERTICALLY_MIRRORED, 16.54175, 8.211));
         }
       };
 
   private static YearInfo activeYear = flipperMap.get(2024);
+  private static BooleanSupplier onRed = () -> false;
 
   /**
    * Get the flipper that is currently active for flipping coordinates. It's reccomended not to
@@ -130,7 +129,7 @@ public class AllianceFlipper {
    * @return If you are on red alliance.
    */
   public static boolean onRed() {
-    return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
+    return onRed.getAsBoolean();
   }
 
   /**
@@ -139,13 +138,13 @@ public class AllianceFlipper {
    * @return If you are on blue alliance.
    */
   public static boolean onBlue() {
-    return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue;
+    return !onRed.getAsBoolean();
   }
 
   /**
    * Set the year to determine the Alliance Coordinate Flipper to use.
    *
-   * @param year The year to set the flipper to. [2020 - 2024]
+   * @param year The year to set the flipper to. [2022 - 2024]
    */
   public static void setYear(int year) {
     if (!flipperMap.containsKey(year)) {
@@ -155,6 +154,16 @@ public class AllianceFlipper {
       throw new IllegalArgumentException("Year " + year + " is not supported.");
     }
     activeYear = flipperMap.get(year);
+  }
+
+  /**
+   * Set the `onRed` resolver to determine if the robot is on the red alliance.
+   * 
+   * @param onRedResolver The resolver to determine if the robot is on the red alliance.
+   */
+  public static void setOnRed(BooleanSupplier onRedResolver) {
+    // cannot access driverstation in wpimath
+    onRed = onRedResolver;
   }
 
   /**
@@ -188,67 +197,27 @@ public class AllianceFlipper {
   }
 
   /**
-   * Flips the translation.
+   * Flips the {@link Flippable} object.
    *
-   * @param translation The translation to flip.
-   * @return The flipped translation.
+   * @param <T> The type of the object to flip.
+   * @param flippable The object to flip.
+   * @return The flipped object.
    */
-  public static Translation2d flip(Translation2d translation) {
-    return new Translation2d(flipX(translation.getX()), flipY(translation.getY()));
+  public static <T extends Flippable<T>> T flip(Flippable<T> flippable) {
+    return flippable.flip();
   }
 
   /**
-   * Flips the rotation.
+   * Flips the {@link Flippable} object if on the red alliance.
    *
-   * @param rotation The rotation to flip.
-   * @return The flipped rotation.
+   * @param <T> The type of the object to flip.
+   * @param flippable The object to flip.
+   * @return The flipped object.
+   * 
+   * @see #onRed() A way of determining if you are on the red alliance.
+   * @see Flippable#flipIfRed() An instance method that does the same thing.
    */
-  public static Rotation2d flip(Rotation2d rotation) {
-    return switch (activeYear.flipper) {
-      case VERTICALLY_MIRRORED -> new Rotation2d(-rotation.getCos(), rotation.getSin());
-      case ROTATIONALLY_MIRRORED -> new Rotation2d(-rotation.getCos(), -rotation.getSin());
-    };
-  }
-
-  /**
-   * Flips the pose.
-   *
-   * @param pose The pose to flip.
-   * @return The flipped pose.
-   */
-  public static Pose2d flip(Pose2d pose) {
-    return new Pose2d(flip(pose.getTranslation()), flip(pose.getRotation()));
-  }
-
-  /**
-   * Flips the translation.
-   *
-   * @param translation The translation to flip.
-   * @return The flipped translation.
-   */
-  public static Translation3d flip(Translation3d translation) {
-    return new Translation3d(
-        flipX(translation.getX()), flipY(translation.getY()), translation.getZ());
-  }
-
-  /**
-   * Flips the rotation.
-   *
-   * @param rotation The rotation to flip.
-   * @return The flipped rotation.
-   */
-  public static Rotation3d flip(Rotation3d rotation) {
-    return new Rotation3d(
-        rotation.getX(), rotation.getY(), flip(rotation.toRotation2d()).getRadians());
-  }
-
-  /**
-   * Flips the pose.
-   *
-   * @param pose The pose to flip.
-   * @return The flipped pose.
-   */
-  public static Pose3d flip(Pose3d pose) {
-    return new Pose3d(flip(pose.getTranslation()), flip(pose.getRotation()));
+  public static <T extends Flippable<T>> T flipIfRed(Flippable<T> flippable) {
+    return flippable.flipIfRed();
   }
 }
