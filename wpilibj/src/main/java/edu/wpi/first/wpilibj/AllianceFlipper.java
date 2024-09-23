@@ -27,21 +27,25 @@ import java.util.HashMap;
  * 
  *   public CustomStructure flip() {
  *     return switch (AllianceFlipper.getFlipper()) {
- *       case MIRRORED -> new CustomStructure(AllianceFlipper.flipX(x), y, -vx, vy);
- *       case ROTATE_AROUND -> new CustomStructure(AllianceFlipper.flipX(x), AllianceFlipper.flipY(y), -vx, -vy);
+ *       case VERTICALLY_MIRRORED -> new CustomStructure(AllianceFlipper.flipX(x), y, -vx, vy);
+ *       case ROTATIONALLY_MIRRORED -> new CustomStructure(AllianceFlipper.flipX(x), AllianceFlipper.flipY(y), -vx, -vy);
  *     };
  *   }
  * }
  * </code></pre>
  */
 public class AllianceFlipper {
+  private AllianceFlipper() {
+    throw new UnsupportedOperationException("This is a utility class!");
+  }
+
   /** The flipper to use for flipping coordinates. */
   public static enum Flipper {
     /**
      * X becomes fieldLength - x, leaves the y coordinate unchanged, and heading becomes PI -
      * heading.
      */
-    MIRRORED {
+    VERTICALLY_MIRRORED {
       public double flipX(double x) {
         return activeYear.fieldLength - x;
       }
@@ -55,7 +59,7 @@ public class AllianceFlipper {
       }
     },
     /** X becomes fieldLength - x, Y becomes fieldWidth - y, and heading becomes PI - heading. */
-    ROTATE_AROUND {
+    ROTATIONALLY_MIRRORED {
       public double flipX(double x) {
         return activeYear.fieldLength - x;
       }
@@ -100,11 +104,11 @@ public class AllianceFlipper {
   private static final HashMap<Integer, YearInfo> flipperMap =
       new HashMap<Integer, YearInfo>() {
         {
-          put(2020, new YearInfo(Flipper.ROTATE_AROUND, 16.5811, 8.19912));
-          put(2021, new YearInfo(Flipper.ROTATE_AROUND, 16.5811, 8.19912));
-          put(2022, new YearInfo(Flipper.ROTATE_AROUND, 16.5811, 8.19912));
-          put(2023, new YearInfo(Flipper.MIRRORED, 16.5811, 8.19912));
-          put(2024, new YearInfo(Flipper.MIRRORED, 16.5811, 8.19912));
+          put(2020, new YearInfo(Flipper.ROTATIONALLY_MIRRORED, 16.5811, 8.19912));
+          put(2021, new YearInfo(Flipper.ROTATIONALLY_MIRRORED, 16.5811, 8.19912));
+          put(2022, new YearInfo(Flipper.ROTATIONALLY_MIRRORED, 16.5811, 8.19912));
+          put(2023, new YearInfo(Flipper.VERTICALLY_MIRRORED, 16.5811, 8.19912));
+          put(2024, new YearInfo(Flipper.VERTICALLY_MIRRORED, 16.5811, 8.19912));
         }
       };
 
@@ -201,8 +205,8 @@ public class AllianceFlipper {
    */
   public static Rotation2d flip(Rotation2d rotation) {
     return switch (activeYear.flipper) {
-      case MIRRORED -> new Rotation2d(-rotation.getCos(), rotation.getSin());
-      case ROTATE_AROUND -> new Rotation2d(-rotation.getCos(), -rotation.getSin());
+      case VERTICALLY_MIRRORED -> new Rotation2d(-rotation.getCos(), rotation.getSin());
+      case ROTATIONALLY_MIRRORED -> new Rotation2d(-rotation.getCos(), -rotation.getSin());
     };
   }
 
