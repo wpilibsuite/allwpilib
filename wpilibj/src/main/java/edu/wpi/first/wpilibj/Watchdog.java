@@ -49,6 +49,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * @param timeoutSeconds The watchdog's timeout in seconds with microsecond resolution.
    * @param callback This function is called when the timeout expires.
    */
+  @SuppressWarnings("removal")
   public Watchdog(double timeoutSeconds, Runnable callback) {
     m_timeoutSeconds = timeoutSeconds;
     m_callback = callback;
@@ -92,6 +93,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    *
    * @param timeoutSeconds The watchdog's timeout in seconds with microsecond resolution.
    */
+  @SuppressWarnings("removal")
   public void setTimeout(double timeoutSeconds) {
     m_startTimeSeconds = Timer.getFPGATimestamp();
     m_tracer.clearEpochs();
@@ -173,6 +175,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   }
 
   /** Enables the watchdog timer. */
+  @SuppressWarnings("removal")
   public void enable() {
     m_startTimeSeconds = Timer.getFPGATimestamp();
     m_tracer.clearEpochs();

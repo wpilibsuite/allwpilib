@@ -21,7 +21,8 @@
 using namespace frc;
 
 IterativeRobotBase::IterativeRobotBase(units::second_t period)
-    : m_period(period) {}
+    : m_period(period),
+      m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
 
 void IterativeRobotBase::RobotInit() {}
 

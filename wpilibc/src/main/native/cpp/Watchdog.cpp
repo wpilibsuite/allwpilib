@@ -13,6 +13,7 @@
 #include <hal/Notifier.h>
 #include <wpi/mutex.h>
 #include <wpi/priority_queue.h>
+#include <wpi/deprecated.h>
 
 #include "frc/Errors.h"
 #include "frc/Timer.h"
@@ -169,6 +170,7 @@ units::second_t Watchdog::GetTime() const {
   return Timer::GetFPGATimestamp() - m_startTime;
 }
 
+WPI_IGNORE_DEPRECATED
 void Watchdog::SetTimeout(units::second_t timeout) {
   m_startTime = Timer::GetFPGATimestamp();
   m_tracer.ClearEpochs();
@@ -182,6 +184,7 @@ void Watchdog::SetTimeout(units::second_t timeout) {
   m_impl->m_watchdogs.emplace(this);
   m_impl->UpdateAlarm();
 }
+WPI_UNIGNORE_DEPRECATED
 
 units::second_t Watchdog::GetTimeout() const {
   std::scoped_lock lock(m_impl->m_mutex);
@@ -193,6 +196,7 @@ bool Watchdog::IsExpired() const {
   return m_isExpired;
 }
 
+WPI_IGNORE_DEPRECATED
 void Watchdog::AddEpoch(std::string_view epochName) {
   m_tracer.AddEpoch(epochName);
 }
@@ -217,6 +221,7 @@ void Watchdog::Enable() {
   m_impl->m_watchdogs.emplace(this);
   m_impl->UpdateAlarm();
 }
+WPI_UNIGNORE_DEPRECATED
 
 void Watchdog::Disable() {
   std::scoped_lock lock(m_impl->m_mutex);

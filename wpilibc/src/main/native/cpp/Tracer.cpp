@@ -18,6 +18,9 @@
 
 using namespace frc;
 
+std::atomic<bool> singleThreadedMode = false;
+std::atomic<bool> anyTracesStarted = false;
+
 class TracerState {
  public:
   TracerState() {
@@ -141,12 +144,10 @@ class TracerState {
   uint32_t m_stackSize = 0;
 };
 
-static std::atomic<bool> singleThreadedMode = false;
-static std::atomic<bool> anyTracesStarted = false;
-static thread_local TracerState threadLocalState = TracerState();
+thread_local TracerState threadLocalState = TracerState();
 
 
-static void StartTrace(std::string_view name) {
+void Tracer::StartTrace(std::string_view name) {
   // Call `AppendTraceStack` even if disabled to keep `m_stackSize` in sync
   std::string stack = threadLocalState.AppendTraceStack(name);
   if (!threadLocalState.m_disabled) {
@@ -155,7 +156,7 @@ static void StartTrace(std::string_view name) {
   }
 }
 
-static void EndTrace() {
+void Tracer::EndTrace() {
   // Call `PopTraceStack` even if disabled to keep `m_stackSize` in sync
   std::string stack = threadLocalState.PopTraceStack();
   if (!threadLocalState.m_disabled) {
@@ -175,7 +176,7 @@ static void EndTrace() {
   }
 }
 
-static void EnableSingleThreadedMode() {
+void Tracer::EnableSingleThreadedMode() {
   if (anyTracesStarted) {
     FRC_ReportWarning("Cannot enable single-threaded mode after traces have been started");
   } else {
@@ -185,26 +186,26 @@ static void EnableSingleThreadedMode() {
   }
 }
 
-static void DisableTracingForCurrentThread() {
+void Tracer::DisableTracingForCurrentThread() {
   threadLocalState.m_disableNextCycle = true;
 }
 
-static void EnableTracingForCurrentThread() {
+void Tracer::EnableTracingForCurrentThread() {
   threadLocalState.m_disableNextCycle = false;
 }
 
-static void SetThreadName(std::string_view name) {
+void TracerSetThreadName(std::string_view name) {
   threadLocalState.UpdateThreadName(name);
 }
 
-static void TraceFunc(std::string_view name, std::function<void()> runnable) {
+void Tracer::TraceFunc(std::string_view name, std::function<void()> runnable) {
   StartTrace(name);
   runnable();
   EndTrace();
 }
 
 template <typename T>
-static T TraceFunc(std::string_view name, std::function<T()> supplier) {
+T Tracer::TraceFunc(std::string_view name, std::function<T()> supplier) {
   StartTrace(name);
   T result = supplier();
   EndTrace();
