@@ -11,9 +11,9 @@
 
 #include <fmt/format.h>
 #include <hal/Notifier.h>
+#include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 #include <wpi/priority_queue.h>
-#include <wpi/deprecated.h>
 
 #include "frc/Errors.h"
 #include "frc/Timer.h"

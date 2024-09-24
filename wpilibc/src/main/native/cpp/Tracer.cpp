@@ -5,16 +5,16 @@
 #include "frc/Tracer.h"
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
+#include <networktables/DoubleTopic.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
-#include "networktables/DoubleTopic.h"
-#include <wpi/StringMap.h>
 #include <units/time.h>
-#include "frc/RobotController.h"
+#include <wpi/SmallString.h>
+#include <wpi/StringMap.h>
+#include <wpi/raw_ostream.h>
 
 #include "frc/Errors.h"
+#include "frc/RobotController.h"
 
 using namespace frc;
 
@@ -30,7 +30,9 @@ class TracerState {
     }
     anyTracesStarted = true;
     auto inst = nt::NetworkTableInstance::GetDefault();
-    m_rootTable = inst.GetTable(fmt::format("/Tracer/{}", std::hash<std::thread::id>{}(std::this_thread::get_id())));
+    m_rootTable = inst.GetTable(
+        fmt::format("/Tracer/{}",
+                    std::hash<std::thread::id>{}(std::this_thread::get_id())));
   }
 
   std::string BuildStack() {
@@ -94,8 +96,7 @@ class TracerState {
         if (auto publisher = topic.Publish(); publisher) {
           publisher.Set(traceTime.second.value());
           m_publisherHeap.insert(
-              std::make_pair(traceTime.first(), std::move(publisher))
-          );
+              std::make_pair(traceTime.first(), std::move(publisher)));
         }
       }
     }
@@ -111,7 +112,8 @@ class TracerState {
       auto inst = nt::NetworkTableInstance::GetDefault();
       m_rootTable = inst.GetTable(fmt::format("/Tracer/{}", name));
     } else {
-      FRC_ReportWarning("Cannot update Tracer thread name while traces are still active");
+      FRC_ReportWarning(
+          "Cannot update Tracer thread name while traces are still active");
     }
   }
 
@@ -146,12 +148,12 @@ class TracerState {
 
 thread_local TracerState threadLocalState = TracerState();
 
-
 void Tracer::StartTrace(std::string_view name) {
   // Call `AppendTraceStack` even if disabled to keep `m_stackSize` in sync
   std::string stack = threadLocalState.AppendTraceStack(name);
   if (!threadLocalState.m_disabled) {
-      auto now = units::millisecond_t{frc::RobotController::GetFPGATime() / 1000.0};
+    auto now =
+        units::millisecond_t{frc::RobotController::GetFPGATime() / 1000.0};
     threadLocalState.m_traceStartTimes.insert_or_assign(stack, now);
   }
 }
@@ -165,9 +167,11 @@ void Tracer::EndTrace() {
       FRC_ReportWarning("Trace ended without starting");
       return;
     }
-    auto now = units::millisecond_t{frc::RobotController::GetFPGATime() / 1000.0};
+    auto now =
+        units::millisecond_t{frc::RobotController::GetFPGATime() / 1000.0};
     auto startTime = threadLocalState.m_traceStartTimes.find(stack);
-    threadLocalState.m_traceTimes.insert_or_assign(stack, now - startTime->second);
+    threadLocalState.m_traceTimes.insert_or_assign(stack,
+                                                   now - startTime->second);
   }
   // If the stack is empty, the cycle is over.
   // Cycles can be ended even if the tracer is disabled
@@ -178,7 +182,8 @@ void Tracer::EndTrace() {
 
 void Tracer::EnableSingleThreadedMode() {
   if (anyTracesStarted) {
-    FRC_ReportWarning("Cannot enable single-threaded mode after traces have been started");
+    FRC_ReportWarning(
+        "Cannot enable single-threaded mode after traces have been started");
   } else {
     singleThreadedMode = true;
     auto inst = nt::NetworkTableInstance::GetDefault();
@@ -211,8 +216,6 @@ T Tracer::TraceFunc(std::string_view name, std::function<T()> supplier) {
   EndTrace();
   return result;
 }
-
-
 
 // DEPRECATED CLASS INSTANCE METHODS
 Tracer::Tracer() {

@@ -19,7 +19,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 /**
  * A Utility class for tracing code execution time.
  * Will put info to NetworkTables under the "Tracer" table.
- * 
+ *
  * <p> Example inside {@code Robot.java}
  * <pre><code>
  * @Override
@@ -28,7 +28,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  *   Tracer.traceFunc("MyVendorDep", MyVendorDep::updateAll);
  * }
  * </code></pre>
- * 
+ *
  * <p> Example inside a {@code Drive Subsystem}
  * <pre><code>
  * public void periodic() {
@@ -230,10 +230,7 @@ public class Tracer {
    * Starts a trace,
    * should be called at the beginning of a function thats not being called by
    * user code.
-   * Should be paired with {@link Tracer#endTrace()} at the end of the function.
-   * 
-   * Best used in periodic functions in Subsystems and Robot.java.
-   * 
+   *
    * @param name the name of the trace, should be unique to the function.
    */
   public static void startTrace(String name) {
@@ -253,7 +250,7 @@ public class Tracer {
   /**
    * Disables garbage collection logging for the current thread.
    * This can help performance in some cases.
-   * 
+   *
    * <p>This counts as starting a tracer on the current thread,
    * this is important to consider with {@link Tracer#enableSingleThreadedMode()}
    * and should never be called before if you are using single threaded mode.
@@ -268,7 +265,7 @@ public class Tracer {
    * Enables single threaded mode for the Tracer.
    * This will cause traces on different threads to throw an exception.
    * This will shorten the path of traced data in NetworkTables by not including the thread name.
-   * 
+   *
    * <p><b>Warning:</b> This will throw an exception if called after any traces have been started.
    */
   public static void enableSingleThreadedMode() {
@@ -306,10 +303,10 @@ public class Tracer {
    * {@link Tracer#startTrace(String)} and {@link Tracer#endTrace()}
    * for functions called by user code like {@code CommandScheduler.run()} and
    * other expensive functions.
-   * 
+   *
    * @param name     the name of the trace, should be unique to the function.
    * @param runnable the function to trace.
-   * 
+   *
    * @apiNote If you want to return a value then use
    *          {@link Tracer#traceFunc(String, Supplier)}.
    */
@@ -325,7 +322,7 @@ public class Tracer {
    * {@link Tracer#startTrace(String)} and {@link Tracer#endTrace()}
    * for functions called by user code like {@code CommandScheduler.run()} and
    * other expensive functions.
-   * 
+   *
    * @param name     the name of the trace, should be unique to the function.
    * @param supplier the function to trace.
    */
@@ -346,9 +343,9 @@ public class Tracer {
 
   private final HashMap<String, Long> m_epochs = new HashMap<>(); // microseconds
 
-  /** 
+  /**
    * Constructs a {@code Tracer} compatible with the 2024 {@code Tracer}.
-   * 
+   *
    * @deprecated This constructor is only for compatibility with the 2024 {@code Tracer} and will be removed in 2025.
    * Use the static methods in {@link Tracer} instead.
   */
@@ -358,7 +355,7 @@ public class Tracer {
   }
 
   /** Clears all epochs.
-   * 
+   *
    * @deprecated This method is only for compatibility with the 2024 {@code Tracer} and will be removed in 2025.
    * Use the static methods in {@link Tracer} instead.
   */
@@ -369,7 +366,7 @@ public class Tracer {
   }
 
   /** Restarts the epoch timer.
-   * 
+   *
    * @deprecated This method is only for compatibility with the 2024 {@code Tracer} and will be removed in 2025.
    * Use the static methods in {@link Tracer} instead.
   */
@@ -388,7 +385,7 @@ public class Tracer {
    * or {@link #resetTimer()} before execution.
    *
    * @param epochName The name to associate with the epoch.
-   * 
+   *
    * @deprecated This method is only for compatibility with the 2024 {@code Tracer} and will be removed in 2025.
    * Use the static methods in {@link Tracer} instead.
    */
@@ -401,7 +398,7 @@ public class Tracer {
 
   /**
    * Prints list of epochs added so far and their times to the DriverStation.
-   * 
+   *
    * @deprecated This method is only for compatibility with the 2024 {@code Tracer} and will be removed in 2025.
    * Use the static methods in {@link Tracer} instead.
    */
@@ -416,7 +413,7 @@ public class Tracer {
    * <p>This overload can be useful for logging to a file, etc.
    *
    * @param output the stream that the output is sent to
-   * 
+   *
    * @deprecated This method is only for compatibility with the 2024 {@code Tracer} and will be removed in 2025.
    * Use the static methods in {@link Tracer} instead.
    */

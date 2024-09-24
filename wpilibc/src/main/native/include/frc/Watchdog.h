@@ -75,15 +75,17 @@ class Watchdog {
    * one can determine which parts of an operation consumed the most time.
    *
    * @param epochName The name to associate with the epoch.
-   * 
-   * @deprecated Deprecated in favor of using 2025 `Tracer` static methods directly.
+   *
+   * @deprecated Deprecated in favor of using 2025 `Tracer` static methods
+   * directly.
    */
-  [[deprecated("Deprecated in favor of using 2025 `Tracer` static methods directly.")]]
+  [[deprecated(
+      "Deprecated in favor of using 2025 `Tracer` static methods directly.")]]
   void AddEpoch(std::string_view epochName);
 
   /**
    * Prints list of epochs added so far and their times.
-   * 
+   *
    * @deprecated Deprecated with no replacement.
    */
   [[deprecated("Deprecated with no replacement.")]]

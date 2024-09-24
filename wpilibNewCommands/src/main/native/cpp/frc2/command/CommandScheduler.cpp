@@ -13,8 +13,8 @@
 #include <frc/RobotBase.h>
 #include <frc/RobotState.h>
 #include <frc/TimedRobot.h>
-#include <frc/livewindow/LiveWindow.h>
 #include <frc/Tracer.h>
+#include <frc/livewindow/LiveWindow.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/IntegerArrayTopic.h>
@@ -187,14 +187,12 @@ void CommandScheduler::Run() {
   for (auto&& subsystem : m_impl->subsystems) {
     subsystem.getFirst()->Periodic();
     frc::Tracer::TraceFunc(
-      subsystem.getFirst()->GetName() + "Periodic",
-      std::bind(&Subsystem::Periodic, subsystem.getFirst())
-    );
+        subsystem.getFirst()->GetName() + "Periodic",
+        std::bind(&Subsystem::Periodic, subsystem.getFirst()));
     if constexpr (frc::RobotBase::IsSimulation()) {
       frc::Tracer::TraceFunc(
-        subsystem.getFirst()->GetName() + "SimulationPeriodic",
-        std::bind(&Subsystem::SimulationPeriodic, subsystem.getFirst())
-      );
+          subsystem.getFirst()->GetName() + "SimulationPeriodic",
+          std::bind(&Subsystem::SimulationPeriodic, subsystem.getFirst()));
     }
   }
 
@@ -202,10 +200,8 @@ void CommandScheduler::Run() {
   // is called from inside the button bindings.
   frc::EventLoop* loopCache = m_impl->activeButtonLoop;
   // Poll buttons for new commands to add.
-  frc::Tracer::TraceFunc(
-    "PollButtons",
-    std::bind(&frc::EventLoop::Poll, loopCache)
-  );
+  frc::Tracer::TraceFunc("PollButtons",
+                         std::bind(&frc::EventLoop::Poll, loopCache));
 
   frc::Tracer::StartTrace("Commands");
   m_impl->inRunLoop = true;

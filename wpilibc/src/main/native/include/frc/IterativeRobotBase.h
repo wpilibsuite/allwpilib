@@ -232,10 +232,13 @@ class IterativeRobotBase : public RobotBase {
 
   /**
    * Prints list of epochs added so far and their times.
-   * 
-   * @deprecated Deprecated without a direct replacement. `Trace` now logs execution time
+   *
+   * @deprecated Deprecated without a direct replacement. `Trace` now logs
+   * execution time
    */
-  [[deprecated("Deprecated without a direct replacement. `Trace` now logs execution time")]]
+  [[deprecated(
+      "Deprecated without a direct replacement. `Trace` now logs execution "
+      "time")]]
   void PrintWatchdogEpochs();
 
   /**

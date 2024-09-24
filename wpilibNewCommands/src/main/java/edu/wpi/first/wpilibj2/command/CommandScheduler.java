@@ -255,7 +255,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     if (m_disabled) {
       return;
     }
-  
+
     Tracer.startTrace("CommandScheduler");
     m_watchdog.reset();
 

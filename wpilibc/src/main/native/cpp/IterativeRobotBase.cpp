@@ -13,10 +13,10 @@
 
 #include "frc/DSControlWord.h"
 #include "frc/Errors.h"
+#include "frc/Tracer.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/shuffleboard/Shuffleboard.h"
 #include "frc/smartdashboard/SmartDashboard.h"
-#include "frc/Tracer.h"
 
 using namespace frc;
 
@@ -181,20 +181,25 @@ void IterativeRobotBase::LoopFunc() {
   // Call the appropriate function depending upon the current robot mode
   if (mode == Mode::kDisabled) {
     HAL_ObserveUserProgramDisabled();
-    Tracer::TraceFunc("DisabledPeriodic", std::bind(&IterativeRobotBase::DisabledPeriodic, this));
+    Tracer::TraceFunc("DisabledPeriodic",
+                      std::bind(&IterativeRobotBase::DisabledPeriodic, this));
   } else if (mode == Mode::kAutonomous) {
     HAL_ObserveUserProgramAutonomous();
-    Tracer::TraceFunc("AutonomousPeriodic", std::bind(&IterativeRobotBase::AutonomousPeriodic, this));
+    Tracer::TraceFunc("AutonomousPeriodic",
+                      std::bind(&IterativeRobotBase::AutonomousPeriodic, this));
   } else if (mode == Mode::kTeleop) {
     HAL_ObserveUserProgramTeleop();
-    Tracer::TraceFunc("TeleopPeriodic", std::bind(&IterativeRobotBase::TeleopPeriodic, this));
+    Tracer::TraceFunc("TeleopPeriodic",
+                      std::bind(&IterativeRobotBase::TeleopPeriodic, this));
   } else if (mode == Mode::kTest) {
     HAL_ObserveUserProgramTest();
-    Tracer::TraceFunc("TestPeriodic", std::bind(&IterativeRobotBase::TestPeriodic, this));
+    Tracer::TraceFunc("TestPeriodic",
+                      std::bind(&IterativeRobotBase::TestPeriodic, this));
   }
 
   // RobotPeriodic();
-  Tracer::TraceFunc("RobotPeriodic", std::bind(&IterativeRobotBase::RobotPeriodic, this));
+  Tracer::TraceFunc("RobotPeriodic",
+                    std::bind(&IterativeRobotBase::RobotPeriodic, this));
 
   Tracer::StartTrace("DefaultLogging");
   Tracer::TraceFunc("SmartDashboard", SmartDashboard::UpdateValues);
