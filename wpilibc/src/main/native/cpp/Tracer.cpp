@@ -73,13 +73,14 @@ class TracerState {
     if (m_disabled != m_disableNextCycle || m_cyclePoisened) {
       // Gives publishers empty times,
       // reporting no data is better than bad data
-      for (auto&& [key, publisher] : m_publisherHeap) {
+      for (auto&& [_, publisher] : m_publisherHeap) {
         publisher.Set(0.0);
       }
       return;
     } else {
       // Update times for all already existing publishers
       for (auto&& [key, publisher] : m_publisherHeap) {
+        // auto publisher = m_publisherHeap.find(key)->second;
         if (auto time = m_traceTimes.find(key); time != m_traceTimes.end()) {
           publisher.Set(time->second.value());
           m_traceTimes.erase(time);
@@ -95,8 +96,9 @@ class TracerState {
         topic.SetCached(false);
         if (auto publisher = topic.Publish(); publisher) {
           publisher.Set(traceTime.second.value());
-          m_publisherHeap.insert(
-              std::make_pair(traceTime.first(), std::move(publisher)));
+          m_publisherHeap.push_back(
+            std::make_pair(traceTime.first(), std::move(publisher))
+          );
         }
       }
     }
@@ -113,7 +115,7 @@ class TracerState {
       m_rootTable = inst.GetTable(fmt::format("/Tracer/{}", name));
     } else {
       FRC_ReportWarning(
-          "Cannot update Tracer thread name while traces are still active");
+          "Cannot update Tracer thread name after traces have been started");
     }
   }
 
@@ -128,7 +130,7 @@ class TracerState {
   wpi::StringMap<units::millisecond_t> m_traceStartTimes;
   // A collection of all publishers that have been created,
   // this makes updating the times of publishers much easier and faster
-  wpi::StringMap<nt::DoublePublisher> m_publisherHeap;
+  std::vector<std::pair<std::string_view, nt::DoublePublisher>> m_publisherHeap;
   // If the cycle is poisened, it will warn the user
   // and not publish any data
   bool m_cyclePoisened = false;
