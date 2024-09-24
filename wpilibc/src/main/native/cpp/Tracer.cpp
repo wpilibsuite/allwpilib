@@ -4,6 +4,11 @@
 
 #include "frc/Tracer.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <fmt/format.h>
 #include <networktables/DoubleTopic.h>
 #include <networktables/NetworkTable.h>
