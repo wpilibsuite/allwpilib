@@ -413,6 +413,17 @@ public abstract class IterativeRobotBase extends RobotBase {
     Tracer.endTrace();
   }
 
+  /**
+   * Prints list of epochs added so far and their times.
+   *
+   * @deprecated Deprecated with no replacement.
+   */
+  @SuppressWarnings("removal")
+  @Deprecated(since = "2025", forRemoval = true)
+  public void printWatchdogEpochs() {
+    m_watchdog.printEpochs();
+  }
+
   private void printLoopOverrunMessage() {
     DriverStation.reportWarning("Loop time of " + m_period + "s overrun\n", false);
   }

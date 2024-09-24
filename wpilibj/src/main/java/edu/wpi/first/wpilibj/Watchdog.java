@@ -148,6 +148,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * @deprecated Deprecated in favor of using 2025
    * {@link Tracer} static methods directly.
    */
+  @SuppressWarnings("removal")
   @Deprecated(since = "2025", forRemoval = true)
   public void addEpoch(String epochName) {
     m_tracer.addEpoch(epochName);
@@ -160,6 +161,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    *
    * @deprecated Deprecated with no replacement.
    */
+  @SuppressWarnings("removal")
   @Deprecated(since = "2025", forRemoval = true)
   public void printEpochs() {
     m_tracer.printEpochs();
