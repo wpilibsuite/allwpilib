@@ -97,8 +97,7 @@ class TracerState {
         if (auto publisher = topic.Publish(); publisher) {
           publisher.Set(traceTime.second.value());
           m_publisherHeap.push_back(
-            std::make_pair(traceTime.first(), std::move(publisher))
-          );
+              std::make_pair(traceTime.first(), std::move(publisher)));
         }
       }
     }
