@@ -181,10 +181,7 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    * @param poseMeters The position on the field that your robot is at.
    */
   public void resetPosition(
-      Rotation2d gyroAngle,
-      Distance leftDistance,
-      Distance rightDistance,
-      Pose2d poseMeters) {
+      Rotation2d gyroAngle, Distance leftDistance, Distance rightDistance, Pose2d poseMeters) {
     resetPosition(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), poseMeters);
   }
 
@@ -222,10 +219,7 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    * @param poseMeters The position on the field that your robot is at.
    */
   public void resetPosition(
-      Rotation3d gyroAngle,
-      Distance leftDistance,
-      Distance rightDistance,
-      Pose3d poseMeters) {
+      Rotation3d gyroAngle, Distance leftDistance, Distance rightDistance, Pose3d poseMeters) {
     resetPosition(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), poseMeters);
   }
 
