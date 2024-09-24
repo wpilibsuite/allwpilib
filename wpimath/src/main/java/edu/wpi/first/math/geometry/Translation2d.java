@@ -13,9 +13,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.AllianceFlipper.*;
 import edu.wpi.first.math.geometry.proto.Translation2dProto;
 import edu.wpi.first.math.geometry.struct.Translation2dStruct;
-import edu.wpi.first.math.geometry.AllianceFlipper.*;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.measure.Distance;
@@ -35,7 +35,10 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Translation2d
-    implements Interpolatable<Translation2d>, ProtobufSerializable, StructSerializable, Flippable<Translation2d> {
+    implements Interpolatable<Translation2d>,
+        ProtobufSerializable,
+        StructSerializable,
+        Flippable<Translation2d> {
   /**
    * A preallocated Translation2d representing the origin.
    *

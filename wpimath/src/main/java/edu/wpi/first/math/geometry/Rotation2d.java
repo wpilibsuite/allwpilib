@@ -12,9 +12,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.AllianceFlipper.*;
 import edu.wpi.first.math.geometry.proto.Rotation2dProto;
 import edu.wpi.first.math.geometry.struct.Rotation2dStruct;
-import edu.wpi.first.math.geometry.AllianceFlipper.*;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
@@ -32,7 +32,10 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation2d
-    implements Interpolatable<Rotation2d>, ProtobufSerializable, StructSerializable, Flippable<Rotation2d> {
+    implements Interpolatable<Rotation2d>,
+        ProtobufSerializable,
+        StructSerializable,
+        Flippable<Rotation2d> {
   /**
    * A preallocated Rotation2d representing no rotation.
    *

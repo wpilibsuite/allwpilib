@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.math.geometry;
 
 import java.util.HashMap;
@@ -73,18 +77,12 @@ public class AllianceFlipper {
     public abstract double flipHeading(double heading);
   }
 
-  /**
-   * An interface for objects that can be flipped based on the current alliance.
-   */
+  /** An interface for objects that can be flipped based on the current alliance. */
   public static interface Flippable<Self extends Flippable<Self>> {
-    /**
-     * Flips the object based on the supplied flipper.
-     */
+    /** Flips the object based on the supplied flipper. */
     public Self flip(Flipper flipper);
 
-    /**
-     * Flips the object based on the active flipper.
-     */
+    /** Flips the object based on the active flipper. */
     public default Self flip() {
       return flip(getFlipper());
     }

@@ -10,9 +10,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.geometry.AllianceFlipper.*;
 import edu.wpi.first.math.geometry.proto.Pose2dProto;
 import edu.wpi.first.math.geometry.struct.Pose2dStruct;
-import edu.wpi.first.math.geometry.AllianceFlipper.*;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
@@ -25,7 +25,8 @@ import java.util.Objects;
 /** Represents a 2D pose containing translational and rotational elements. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, StructSerializable, Flippable<Pose2d> {
+public class Pose2d
+    implements Interpolatable<Pose2d>, ProtobufSerializable, StructSerializable, Flippable<Pose2d> {
   /**
    * A preallocated Pose2d representing the origin.
    *
@@ -351,10 +352,7 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
 
   @Override
   public Pose2d flip(Flipper flipper) {
-    return new Pose2d(
-        m_translation.flip(flipper),
-        m_rotation.flip(flipper)
-    );
+    return new Pose2d(m_translation.flip(flipper), m_rotation.flip(flipper));
   }
 
   /** Pose2d protobuf for serialization. */
