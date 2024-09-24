@@ -12,8 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Distance;
 
 /**
  * Class for differential drive odometry. Odometry allows you to track the robot's position on the
@@ -57,8 +56,8 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    */
   public DifferentialDriveOdometry3d(
       Rotation2d gyroAngle,
-      Measure<Distance> leftDistance,
-      Measure<Distance> rightDistance,
+      Distance leftDistance,
+      Distance rightDistance,
       Pose2d initialPoseMeters) {
     this(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), initialPoseMeters);
   }
@@ -83,7 +82,7 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    * @param rightDistance The distance traveled by the right encoder.
    */
   public DifferentialDriveOdometry3d(
-      Rotation2d gyroAngle, Measure<Distance> leftDistance, Measure<Distance> rightDistance) {
+      Rotation2d gyroAngle, Distance leftDistance, Distance rightDistance) {
     this(gyroAngle, leftDistance, rightDistance, Pose2d.kZero);
   }
 
@@ -118,8 +117,8 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    */
   public DifferentialDriveOdometry3d(
       Rotation3d gyroAngle,
-      Measure<Distance> leftDistance,
-      Measure<Distance> rightDistance,
+      Distance leftDistance,
+      Distance rightDistance,
       Pose3d initialPoseMeters) {
     this(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), initialPoseMeters);
   }
@@ -144,7 +143,7 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    * @param rightDistance The distance traveled by the right encoder.
    */
   public DifferentialDriveOdometry3d(
-      Rotation3d gyroAngle, Measure<Distance> leftDistance, Measure<Distance> rightDistance) {
+      Rotation3d gyroAngle, Distance leftDistance, Distance rightDistance) {
     this(gyroAngle, leftDistance, rightDistance, Pose3d.kZero);
   }
 
@@ -183,8 +182,8 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    */
   public void resetPosition(
       Rotation2d gyroAngle,
-      Measure<Distance> leftDistance,
-      Measure<Distance> rightDistance,
+      Distance leftDistance,
+      Distance rightDistance,
       Pose2d poseMeters) {
     resetPosition(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), poseMeters);
   }
@@ -224,8 +223,8 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    */
   public void resetPosition(
       Rotation3d gyroAngle,
-      Measure<Distance> leftDistance,
-      Measure<Distance> rightDistance,
+      Distance leftDistance,
+      Distance rightDistance,
       Pose3d poseMeters) {
     resetPosition(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), poseMeters);
   }
