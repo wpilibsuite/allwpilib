@@ -1,7 +1,6 @@
 package edu.wpi.first.math.geometry;
 
 import java.util.HashMap;
-import java.util.function.BooleanSupplier;
 
 /**
  * A utility to standardize flipping of coordinate data based on the current alliance across
@@ -89,14 +88,6 @@ public class AllianceFlipper {
     public default Self flip() {
       return flip(getFlipper());
     }
-
-    /**
-     * Flips the object if on the red alliance, otherwise returns the object unchanged.
-     */
-    @SuppressWarnings("unchecked")
-    public default Self flipIfRed() {
-        return onRed() ? flip() : (Self) this;
-    }
   }
 
   private static record YearInfo(Flipper flipper, double fieldLength, double fieldWidth) {}
@@ -111,7 +102,6 @@ public class AllianceFlipper {
       };
 
   private static YearInfo activeYear = flipperMap.get(2024);
-  private static BooleanSupplier onRed = () -> false;
 
   /**
    * Get the flipper that is currently active for flipping coordinates. It's reccomended not to
@@ -121,24 +111,6 @@ public class AllianceFlipper {
    */
   public static Flipper getFlipper() {
     return activeYear.flipper;
-  }
-
-  /**
-   * Returns if you are on red alliance, if the alliance is unknown it will return false.
-   *
-   * @return If you are on red alliance.
-   */
-  public static boolean onRed() {
-    return onRed.getAsBoolean();
-  }
-
-  /**
-   * Returns if you are on blue alliance, if the alliance is unknown it will return true.
-   *
-   * @return If you are on blue alliance.
-   */
-  public static boolean onBlue() {
-    return !onRed.getAsBoolean();
   }
 
   /**
@@ -154,16 +126,6 @@ public class AllianceFlipper {
       throw new IllegalArgumentException("Year " + year + " is not supported.");
     }
     activeYear = flipperMap.get(year);
-  }
-
-  /**
-   * Set the `onRed` resolver to determine if the robot is on the red alliance.
-   * 
-   * @param onRedResolver The resolver to determine if the robot is on the red alliance.
-   */
-  public static void setOnRed(BooleanSupplier onRedResolver) {
-    // cannot access driverstation in wpimath
-    onRed = onRedResolver;
   }
 
   /**
@@ -205,19 +167,5 @@ public class AllianceFlipper {
    */
   public static <T extends Flippable<T>> T flip(Flippable<T> flippable) {
     return flippable.flip();
-  }
-
-  /**
-   * Flips the {@link Flippable} object if on the red alliance.
-   *
-   * @param <T> The type of the object to flip.
-   * @param flippable The object to flip.
-   * @return The flipped object.
-   * 
-   * @see #onRed() A way of determining if you are on the red alliance.
-   * @see Flippable#flipIfRed() An instance method that does the same thing.
-   */
-  public static <T extends Flippable<T>> T flipIfRed(Flippable<T> flippable) {
-    return flippable.flipIfRed();
   }
 }
