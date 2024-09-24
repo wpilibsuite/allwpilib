@@ -22,22 +22,21 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  *
  * <p> Example inside {@code Robot.java}
  * <pre><code>
- * @Override
+ *
  * public void robotPeriodic() {
- *   Tracer.traceFunc("CommandScheduler", scheduler::run);
+ *   CommandScheduler.getInstance().run(); // CommandScheduler is already traced
  *   Tracer.traceFunc("MyVendorDep", MyVendorDep::updateAll);
  * }
  * </code></pre>
  *
  * <p> Example inside a {@code Drive Subsystem}
  * <pre><code>
+ * // Subsystem periodics are automaticall traced
  * public void periodic() {
- *   Tracer.startTrace("DrivePeriodic");
  *   for (var module : modules) {
  *     Tracer.traceFunc("Module" + module.getName(), module::update);
  *   }
  *   Tracer.traceFunc("Gyro", gyro::update);
- *   Tracer.endTrace();
  * }
  * </code></pre>
  */
@@ -252,7 +251,7 @@ public class Tracer {
    * This can help performance in some cases.
    *
    * <p>This counts as starting a tracer on the current thread,
-   * this is important to consider with {@link Tracer#enableSingleThreadedMode()}
+   * this is important to consider with {@link #enableSingleThreadedMode()}
    * and should never be called before if you are using single threaded mode.
    */
   public static void disableGcLoggingForCurrentThread() {
@@ -282,8 +281,8 @@ public class Tracer {
 
   /**
    * Disables any tracing for the current thread.
-   * This will cause all {@link Tracer#startTrace(String)}, {@link Tracer#endTrace()}
-   * and {@link Tracer#traceFunc(Runnable)} to do nothing.
+   * This will cause all {@link #startTrace(String)}, {@link #endTrace()}
+   * and {@link #traceFunc(Runnable)} to do nothing.
    */
   public static void disableTracingForCurrentThread() {
       threadLocalState.get().m_disableNextCycle = true;
@@ -291,8 +290,8 @@ public class Tracer {
 
   /**
    * Enables any tracing for the current thread.
-   * This will cause all {@link Tracer#startTrace(String)}, {@link Tracer#endTrace()}
-   * and {@link Tracer#traceFunc(Runnable)} to work as normal.
+   * This will cause all {@link #startTrace(String)}, {@link #endTrace()}
+   * and {@link #traceFunc(Runnable)} to work as normal.
    */
   public static void enableTracingForCurrentThread() {
       threadLocalState.get().m_disableNextCycle = false;
@@ -300,15 +299,12 @@ public class Tracer {
 
   /**
    * Traces a function, should be used in place of
-   * {@link Tracer#startTrace(String)} and {@link Tracer#endTrace()}
+   * {@link #startTrace(String)} and {@link #endTrace()}
    * for functions called by user code like {@code CommandScheduler.run()} and
    * other expensive functions.
    *
    * @param name     the name of the trace, should be unique to the function.
    * @param runnable the function to trace.
-   *
-   * @apiNote If you want to return a value then use
-   *          {@link Tracer#traceFunc(String, Supplier)}.
    */
   public static void traceFunc(String name, Runnable runnable) {
       final TracerState state = threadLocalState.get();
@@ -319,12 +315,13 @@ public class Tracer {
 
   /**
    * Traces a function, should be used in place of
-   * {@link Tracer#startTrace(String)} and {@link Tracer#endTrace()}
-   * for functions called by user code like {@code CommandScheduler.run()} and
-   * other expensive functions.
+   * {@link #startTrace(String)} and {@link #endTrace()}
+   * for functions called by user code.
    *
+   * @param <R>      the return type of the function.
    * @param name     the name of the trace, should be unique to the function.
    * @param supplier the function to trace.
+   * @return the return value of the function.
    */
   public static <R> R traceFunc(String name, Supplier<R> supplier) {
       final TracerState state = threadLocalState.get();
