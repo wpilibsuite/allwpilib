@@ -9,18 +9,18 @@ import java.util.HashMap;
  * <p>If every vendor used this, the user would be able to specify the year and no matter the year
  * the vendor's code is from, the user would be able to flip as expected.
  */
-public class AllianceFlipper {
-  private AllianceFlipper() {
+public class AllianceSymetry {
+  private AllianceSymetry() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
-  /** The flipper to use for flipping coordinates. */
-  public static enum Flipper {
+  /** The strategy to use for flipping coordinates over axis of symetry. */
+  public static enum SymetryStrategy {
     /**
      * X becomes fieldLength - x, leaves the y coordinate unchanged, and heading becomes PI -
      * heading.
      */
-    VERTICALLY_MIRRORED {
+    VERTICAL {
       public double flipX(double x) {
         return activeYear.fieldLength - x;
       }
@@ -34,9 +34,23 @@ public class AllianceFlipper {
       }
     },
     /** X becomes fieldLength - x, Y becomes fieldWidth - y, and heading becomes PI - heading. */
-    ROTATIONALLY_MIRRORED {
+    ROTATIONAL {
       public double flipX(double x) {
         return activeYear.fieldLength - x;
+      }
+
+      public double flipY(double y) {
+        return activeYear.fieldWidth - y;
+      }
+
+      public double flipHeading(double heading) {
+        return Math.PI - heading;
+      }
+    },
+    /** Leaves the X coordinate unchanged, Y becomes fieldWidth - y, and heading becomes PI - heading. */
+    HORIZONTAL {
+      public double flipX(double x) {
+        return x;
       }
 
       public double flipY(double y) {
@@ -80,7 +94,7 @@ public class AllianceFlipper {
     /**
      * Flips the object based on the supplied flipper.
      */
-    public Self flip(Flipper flipper);
+    public Self flip(SymetryStrategy strategy);
 
     /**
      * Flips the object based on the active flipper.
@@ -90,14 +104,14 @@ public class AllianceFlipper {
     }
   }
 
-  private static record YearInfo(Flipper flipper, double fieldLength, double fieldWidth) {}
+  private static record YearInfo(SymetryStrategy flipper, double fieldLength, double fieldWidth) {}
 
   private static final HashMap<Integer, YearInfo> flipperMap =
       new HashMap<Integer, YearInfo>() {
         {
-          put(2022, new YearInfo(Flipper.ROTATIONALLY_MIRRORED, 16.4592, 8.2296));
-          put(2023, new YearInfo(Flipper.VERTICALLY_MIRRORED, 16.54175, 8.0137));
-          put(2024, new YearInfo(Flipper.VERTICALLY_MIRRORED, 16.54175, 8.211));
+          put(2022, new YearInfo(SymetryStrategy.ROTATIONAL, 16.4592, 8.2296));
+          put(2023, new YearInfo(SymetryStrategy.VERTICAL, 16.54175, 8.0137));
+          put(2024, new YearInfo(SymetryStrategy.VERTICAL, 16.54175, 8.211));
         }
       };
 
@@ -109,7 +123,7 @@ public class AllianceFlipper {
    *
    * @return The active flipper.
    */
-  public static Flipper getFlipper() {
+  public static SymetryStrategy getFlipper() {
     return activeYear.flipper;
   }
 

@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.geometry.proto.Pose3dProto;
 import edu.wpi.first.math.geometry.struct.Pose3dStruct;
-import edu.wpi.first.math.geometry.AllianceFlipper.*;
+import edu.wpi.first.math.geometry.AllianceSymetry.*;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.jni.Pose3dJNI;
 import edu.wpi.first.units.measure.Distance;
@@ -373,8 +373,8 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   }
 
   @Override
-  public Pose3d flip(Flipper flipper) {
-    return new Pose3d(m_translation.flip(flipper), m_rotation.flip(flipper));
+  public Pose3d flip(SymetryStrategy strategy) {
+    return new Pose3d(m_translation.flip(strategy), m_rotation.flip(strategy));
   }
 
   /** Pose3d protobuf for serialization. */

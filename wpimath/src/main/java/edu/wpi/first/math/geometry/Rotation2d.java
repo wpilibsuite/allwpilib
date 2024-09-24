@@ -14,7 +14,7 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.proto.Rotation2dProto;
 import edu.wpi.first.math.geometry.struct.Rotation2dStruct;
-import edu.wpi.first.math.geometry.AllianceFlipper.*;
+import edu.wpi.first.math.geometry.AllianceSymetry.*;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
@@ -334,10 +334,11 @@ public class Rotation2d
   }
 
   @Override
-  public Rotation2d flip(Flipper flipper) {
-    return switch (flipper) {
-      case VERTICALLY_MIRRORED -> new Rotation2d(-getCos(), getSin());
-      case ROTATIONALLY_MIRRORED -> new Rotation2d(-getCos(), -getSin());
+  public Rotation2d flip(SymetryStrategy strategy) {
+    return switch (strategy) {
+      case VERTICAL -> new Rotation2d(-getCos(), getSin());
+      case ROTATIONAL -> new Rotation2d(-getCos(), -getSin());
+      case HORIZONTAL -> new Rotation2d(getCos(), -getSin());
     };
   }
 

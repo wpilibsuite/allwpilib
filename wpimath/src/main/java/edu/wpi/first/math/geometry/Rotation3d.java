@@ -18,7 +18,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.proto.Rotation3dProto;
 import edu.wpi.first.math.geometry.struct.Rotation3dStruct;
-import edu.wpi.first.math.geometry.AllianceFlipper.*;
+import edu.wpi.first.math.geometry.AllianceSymetry.*;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
@@ -506,8 +506,8 @@ public class Rotation3d
   }
 
   @Override
-  public Rotation3d flip(Flipper flipper) {
-      Rotation2d rot2d = toRotation2d().flip(flipper);
+  public Rotation3d flip(SymetryStrategy strategy) {
+      Rotation2d rot2d = toRotation2d().flip(strategy);
       return new Rotation3d(
           this.getX(),
           this.getY(),

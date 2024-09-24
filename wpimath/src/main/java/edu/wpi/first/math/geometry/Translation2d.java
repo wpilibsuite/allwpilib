@@ -15,7 +15,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.proto.Translation2dProto;
 import edu.wpi.first.math.geometry.struct.Translation2dStruct;
-import edu.wpi.first.math.geometry.AllianceFlipper.*;
+import edu.wpi.first.math.geometry.AllianceSymetry.*;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.measure.Distance;
@@ -314,8 +314,8 @@ public class Translation2d
   }
 
   @Override
-  public Translation2d flip(Flipper flipper) {
-    return new Translation2d(flipper.flipX(m_x), flipper.flipY(m_y));
+  public Translation2d flip(SymetryStrategy strategy) {
+    return new Translation2d(strategy.flipX(m_x), strategy.flipY(m_y));
   }
 
   /** Translation2d protobuf for serialization. */

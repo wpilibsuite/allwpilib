@@ -15,7 +15,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.proto.Translation3dProto;
 import edu.wpi.first.math.geometry.struct.Translation3dStruct;
-import edu.wpi.first.math.geometry.AllianceFlipper.*;
+import edu.wpi.first.math.geometry.AllianceSymetry.*;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Distance;
@@ -308,10 +308,10 @@ public class Translation3d
   }
 
   @Override
-  public Translation3d flip(Flipper flipper) {
+  public Translation3d flip(SymetryStrategy strategy) {
     return new Translation3d(
-      flipper.flipX(m_x),
-      flipper.flipY(m_y),
+      strategy.flipX(m_x),
+      strategy.flipY(m_y),
       m_z
     );
   }
