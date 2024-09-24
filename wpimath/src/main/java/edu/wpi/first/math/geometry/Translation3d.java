@@ -33,7 +33,10 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Translation3d
-    implements Interpolatable<Translation3d>, ProtobufSerializable, StructSerializable, Flippable<Translation3d> {
+    implements Interpolatable<Translation3d>,
+        ProtobufSerializable,
+        StructSerializable,
+        Flippable<Translation3d> {
   /**
    * A preallocated Translation3d representing the origin.
    *

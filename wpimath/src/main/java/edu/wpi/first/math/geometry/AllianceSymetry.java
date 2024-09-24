@@ -91,18 +91,14 @@ public class AllianceSymetry {
     public abstract double flipHeading(double heading);
   }
 
-  /**
-   * An interface for objects that can be flipped based on the current alliance.
-   */
+  /** An interface for objects that can be flipped based on the current alliance. */
   public static interface Flippable<Self extends Flippable<Self>> {
     /**
      * Flips the object based on the supplied flipper.
      */
     public Self flip(SymetryStrategy strategy);
 
-    /**
-     * Flips the object based on the active flipper.
-     */
+    /** Flips the object based on the active flipper. */
     public default Self flip() {
       return flip(getFlipper());
     }

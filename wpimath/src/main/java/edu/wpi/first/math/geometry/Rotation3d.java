@@ -31,7 +31,10 @@ import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation3d
-    implements Interpolatable<Rotation3d>, ProtobufSerializable, StructSerializable, Flippable<Rotation3d> {
+    implements Interpolatable<Rotation3d>,
+        ProtobufSerializable,
+        StructSerializable,
+        Flippable<Rotation3d> {
   /**
    * A preallocated Rotation3d representing no rotation.
    *
