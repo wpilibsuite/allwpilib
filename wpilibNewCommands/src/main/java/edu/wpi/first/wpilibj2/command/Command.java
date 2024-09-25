@@ -573,7 +573,7 @@ public abstract class Command implements Sendable {
   /**
    * Decorates this Command with a name.
    *
-   * <p>The returned commands `Execute` method is implicity timed using the {@link Tracer} class.
+   * <p>The returned commands `Execute` method is implicitly timed using the {@link Tracer} class.
    *
    * @param name name
    * @return the decorated Command

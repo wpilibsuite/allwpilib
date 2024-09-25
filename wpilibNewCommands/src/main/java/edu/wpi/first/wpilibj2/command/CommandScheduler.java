@@ -251,7 +251,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    *
    * <p>Any subsystems not being used as requirements have their default methods started.
    *
-   * <p>This method is implicity timed using the {@link Tracer} class.
+   * <p>This method is implicitly timed using the {@link Tracer} class.
    */
   public void run() {
     if (m_disabled) {

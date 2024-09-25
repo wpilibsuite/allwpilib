@@ -50,7 +50,7 @@ class Subsystem {
    * about which responsibilities will be handled by Commands, and which will be
    * handled here.
    *
-   * <p>This method is implicity timed using the `Tracer` class.
+   * <p>This method is implicitly timed using the `Tracer` class.
    */
   virtual void Periodic();
 
@@ -60,7 +60,7 @@ class Subsystem {
    * simulations, such as for updating simulation classes and setting simulated
    * sensor readings.
    *
-   * <p>This method is implicity timed using the `Tracer` class.
+   * <p>This method is implicitly timed using the `Tracer` class.
    */
   virtual void SimulationPeriodic();
 

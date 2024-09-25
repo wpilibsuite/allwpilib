@@ -158,7 +158,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Periodic code for all robot modes should go here.
    *
-   * <p>This method is implicity timed using the {@link Tracer} class.
+   * <p>This method is implicitly timed using the {@link Tracer} class.
    */
   public void robotPeriodic() {
     if (m_rpFirstRun) {
@@ -174,7 +174,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    *
    * <p>This function is called in a simulated robot after user code executes.
    *
-   * <p>This method is implicity timed using the {@link Tracer} class.
+   * <p>This method is implicitly timed using the {@link Tracer} class.
    */
   public void simulationPeriodic() {
     if (m_spFirstRun) {
@@ -188,7 +188,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Periodic code for disabled mode should go here.
    *
-   * <p>This method is implicity timed using the {@link Tracer} class.
+   * <p>This method is implicitly timed using the {@link Tracer} class.
    */
   public void disabledPeriodic() {
     if (m_dpFirstRun) {
@@ -202,7 +202,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Periodic code for autonomous mode should go here.
    *
-   * <p>This method is implicity timed using the {@link Tracer} class.
+   * <p>This method is implicitly timed using the {@link Tracer} class.
    */
   public void autonomousPeriodic() {
     if (m_apFirstRun) {
@@ -216,7 +216,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Periodic code for teleop mode should go here.
    *
-   * <p>This method is implicity timed using the {@link Tracer} class.
+   * <p>This method is implicitly timed using the {@link Tracer} class.
    */
   public void teleopPeriodic() {
     if (m_tpFirstRun) {
@@ -230,7 +230,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Periodic code for test mode should go here.
    *
-   * <p>This method is implicity timed using the {@link Tracer} class.
+   * <p>This method is implicitly timed using the {@link Tracer} class.
    */
   public void testPeriodic() {
     if (m_tmpFirstRun) {

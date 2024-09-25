@@ -31,7 +31,7 @@ public interface Subsystem {
    * to be consistent within their own codebases about which responsibilities will be handled by
    * Commands, and which will be handled here.
    *
-   * <p>This method is implicity timed using the {@link edu.wpi.first.wpilibj.Tracer}.
+   * <p>This method is implicitly timed using the {@link edu.wpi.first.wpilibj.Tracer}.
    */
   default void periodic() {}
 
@@ -40,7 +40,7 @@ public interface Subsystem {
    * subsystem-specific state that needs to be maintained for simulations, such as for updating
    * {@link edu.wpi.first.wpilibj.simulation} classes and setting simulated sensor readings.
    *
-   * <p>This method is implicity timed using the {@link edu.wpi.first.wpilibj.Tracer}.
+   * <p>This method is implicitly timed using the {@link edu.wpi.first.wpilibj.Tracer}.
    */
   default void simulationPeriodic() {}
 

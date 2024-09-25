@@ -265,7 +265,7 @@ class CommandPtr final {
    * Decorates this Command with a name. Is an inline function for
    * Command::SetName(std::string_view);
    *
-   * <p> The returned commands `Execute` method is implicity timed using the
+   * <p> The returned commands `Execute` method is implicitly timed using the
    * `Tracer` class.
    *
    * @param name name
