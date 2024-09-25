@@ -155,7 +155,6 @@ void CommandScheduler::Schedule(Command* command) {
     for (auto&& action : m_impl->initActions) {
       action(*command);
     }
-    m_watchdog.AddEpoch(command->GetName() + ".Initialize()");
   }
 }
 
@@ -357,7 +356,6 @@ void CommandScheduler::Cancel(Command* command,
       m_impl->requirements.erase(requirement.first);
     }
   }
-  m_watchdog.AddEpoch(command->GetName() + ".End(true)");
 }
 
 void CommandScheduler::Cancel(Command* command) {
@@ -431,10 +429,6 @@ void CommandScheduler::Disable() {
 
 void CommandScheduler::Enable() {
   m_impl->disabled = false;
-}
-
-void CommandScheduler::PrintWatchdogEpochs() {
-  m_watchdog.PrintEpochs();
 }
 
 void CommandScheduler::OnCommandInitialize(Action action) {

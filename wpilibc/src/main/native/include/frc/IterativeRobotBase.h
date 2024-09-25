@@ -231,17 +231,6 @@ class IterativeRobotBase : public RobotBase {
   units::second_t GetPeriod() const;
 
   /**
-   * Prints list of epochs added so far and their times.
-   *
-   * @deprecated Deprecated without a direct replacement. `Trace` now logs
-   * execution time
-   */
-  [[deprecated(
-      "Deprecated without a direct replacement. `Trace` now logs execution "
-      "time")]]
-  void PrintWatchdogEpochs();
-
-  /**
    * Constructor for IterativeRobotBase.
    *
    * @param period Period.
