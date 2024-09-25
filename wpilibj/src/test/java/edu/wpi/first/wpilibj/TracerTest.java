@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
-class WatchdogTest {
+class TracerTest {
   @BeforeEach
   void setup() {
     HAL.initialize(500, 0);
