@@ -5,6 +5,7 @@
 #include "frc2/command/CommandPtr.h"
 
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 

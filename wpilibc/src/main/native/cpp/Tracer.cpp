@@ -54,8 +54,8 @@ class TracerState {
   }
 
   std::string AppendTraceStack(std::string_view trace) {
+    m_stackSize++;
     if (m_disabled) {
-      m_stackSize++;
       return "";
     }
     m_traceStack.push_back(trace);
@@ -63,8 +63,8 @@ class TracerState {
   }
 
   std::string PopTraceStack() {
+    m_stackSize > 0 ? m_stackSize-- : m_stackSize;
     if (m_disabled) {
-      m_stackSize > 0 ? m_stackSize-- : m_stackSize;
       return "";
     }
     if (m_traceStack.empty() || m_cyclePoisened) {
@@ -171,7 +171,6 @@ void Tracer::EndTrace() {
   std::string stack = threadLocalState.PopTraceStack();
   if (!threadLocalState.m_disabled) {
     if (stack.empty()) {
-      threadLocalState.m_cyclePoisened = true;
       FRC_ReportWarning("Trace ended without starting");
       return;
     }

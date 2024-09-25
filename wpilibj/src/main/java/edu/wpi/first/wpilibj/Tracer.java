@@ -42,8 +42,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  */
 public class Tracer {
   private static final class TraceStartData {
-    private double m_startTime = 0.0;
-    private double m_startGCTotalTime = 0.0;
+    private double m_startTime;
+    private double m_startGCTotalTime;
 
     private void set(double startTime, double startGCTotalTime) {
       this.m_startTime = startTime;
@@ -55,6 +55,7 @@ public class Tracer {
    * All of the tracers persistent state in a single object to be stored in a
    * {@link ThreadLocal}.
    */
+  @SuppressWarnings("PMD.RedundantFieldInitializer")
   private static final class TracerState {
     private final NetworkTable m_rootTable;
 
@@ -123,23 +124,33 @@ public class Tracer {
     }
 
     private String appendTraceStack(String trace) {
+      m_stackSize++;
+      if (m_disabled) {
+        return "";
+      }
       m_traceStack.add(trace);
       StringBuilder sb = new StringBuilder();
       for (int i = 0; i < m_traceStack.size(); i++) {
         sb.append(m_traceStack.get(i));
         if (i < m_traceStack.size() - 1) {
-          sb.append("/");
+          sb.append('/');
         }
       }
       String str = sb.toString();
       m_traceStackHistory.add(str);
-      m_stackSize++;
       return str;
     }
 
     private String popTraceStack() {
-      m_traceStack.remove(m_traceStack.size() - 1);
       m_stackSize = Math.max(0, m_stackSize - 1);
+      if (m_disabled) {
+        return "";
+      }
+      if (m_traceStack.isEmpty() || m_traceStackHistory.isEmpty() || m_cyclePoisened) {
+        m_cyclePoisened = true;
+        return "";
+      }
+      m_traceStack.remove(m_traceStack.size() - 1);
       return m_traceStackHistory.remove(m_traceStackHistory.size() - 1);
     }
 
@@ -177,7 +188,7 @@ public class Tracer {
       }
 
       // log gc time
-      if (gcs.size() > 0)
+      if (!gcs.isEmpty())
         gcTimeEntry.set(gcTimeThisCycle);
       gcTimeThisCycle = 0.0;
 
@@ -211,6 +222,13 @@ public class Tracer {
   private static void endTraceInner(final TracerState state) {
     String stack = state.popTraceStack();
     if (!state.m_disabled) {
+      if (stack.isEmpty()) {
+        DriverStation.reportError(
+          "[Tracer] Stack is empty, this means that there are more endTrace calls than startTrace calls",
+          true
+        );
+        return;
+      }
       var startData = state.m_traceStartTimes.get(stack);
       double gcTimeSinceStart = state.totalGCTime() - startData.m_startGCTotalTime;
       state.gcTimeThisCycle += gcTimeSinceStart;
@@ -220,7 +238,7 @@ public class Tracer {
                       - startData.m_startTime
                       - gcTimeSinceStart);
     }
-    if (state.m_traceStack.size() == 0) {
+    if (state.m_traceStack.isEmpty()) {
         state.endCycle();
     }
   }
@@ -270,7 +288,7 @@ public class Tracer {
   public static void enableSingleThreadedMode() {
       if (anyTracesStarted.get()) {
           DriverStation.reportError(
-            "Cannot enable single-threaded mode after traces have been started",
+            "[Tracer] Cannot enable single-threaded mode after traces have been started",
             true
           );
       } else {
