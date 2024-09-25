@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <gtest/gtest.h>
+#include <wpi/deprecated.h>
 
 #include "frc/simulation/SimHooks.h"
 
@@ -102,6 +103,7 @@ TEST_F(WatchdogTest, IsExpired) {
   EXPECT_FALSE(watchdog.IsExpired());
 }
 
+WPI_IGNORE_DEPRECATED
 TEST_F(WatchdogTest, Epochs) {
   uint32_t watchdogCounter = 0;
 
@@ -129,6 +131,7 @@ TEST_F(WatchdogTest, Epochs) {
 
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 }
+WPI_UNIGNORE_DEPRECATED
 
 TEST_F(WatchdogTest, MultiWatchdog) {
   uint32_t watchdogCounter1 = 0;
