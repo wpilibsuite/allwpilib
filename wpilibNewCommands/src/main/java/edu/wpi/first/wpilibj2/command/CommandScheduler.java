@@ -251,7 +251,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    *
    * <p>Any subsystems not being used as requirements have their default methods started.
    *
-   * <p> This method is implicity timed using the {@link Tracer} class.
+   * <p>This method is implicity timed using the {@link Tracer} class.
    */
   public void run() {
     if (m_disabled) {
@@ -263,15 +263,9 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
     // Run the periodic method of all registered subsystems.
     for (Subsystem subsystem : m_subsystems.keySet()) {
-      Tracer.traceFunc(
-        subsystem.getName() + "Periodic",
-        subsystem::periodic
-      );
+      Tracer.traceFunc(subsystem.getName() + "Periodic", subsystem::periodic);
       if (RobotBase.isSimulation()) {
-        Tracer.traceFunc(
-          subsystem.getName() + "SimulationPeriodic",
-          subsystem::simulationPeriodic
-        );
+        Tracer.traceFunc(subsystem.getName() + "SimulationPeriodic", subsystem::simulationPeriodic);
       }
     }
 
@@ -280,7 +274,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     EventLoop loopCache = m_activeButtonLoop;
     // Poll buttons for new commands to add.
     Tracer.traceFunc("PollButtons", loopCache::poll);
-
 
     Tracer.startTrace("Commands");
     m_inRunLoop = true;
