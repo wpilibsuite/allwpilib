@@ -32,8 +32,6 @@ class Tracer {
    * user code.
    * Should be paired with `Tracer.endTrace()` at the end of the function.
    *
-   * Best used in periodic functions in Subsystems and Robot.java.
-   *
    * @param name the name of the trace, should be unique to the function.
    */
   static void StartTrace(std::string_view name);
@@ -99,6 +97,28 @@ class Tracer {
    */
   template <typename T>
   static T TraceFunc(std::string_view name, std::function<T()> supplier);
+
+  class ScopedTraceHandle {
+   public:
+    explicit ScopedTraceHandle(std::string_view name) { StartTrace(name); }
+    ~ScopedTraceHandle() { EndTrace(); }
+  };
+
+  /**
+   * Starts a trace,
+   * should be called at the beginning of a function thats not being called by
+   * user code.
+   * This is a RAII version of `Tracer.startTrace(string)`,
+   * and will automatically call `Tracer.endTrace()` when the scope ends and
+   * the instance gets destroyed.
+   *
+   * @param name the name of the trace, should be unique to the function.
+   */
+  static ScopedTraceHandle StartScopedTrace(std::string_view name) {
+    return ScopedTraceHandle{name};
+  }
+
+  // DEPRECATED CLASS INSTANCE METHODS
 
   /**
    * Constructs a `Tracer` compatible with the 2024 `Tracer`.

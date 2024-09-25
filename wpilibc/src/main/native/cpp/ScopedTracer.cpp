@@ -4,10 +4,12 @@
 
 #include "frc/ScopedTracer.h"
 
+#include <wpi/deprecated.h>
 #include <wpi/raw_ostream.h>
 
 using namespace frc;
 
+WPI_IGNORE_DEPRECATED
 ScopedTracer::ScopedTracer(std::string_view name, wpi::raw_ostream& os)
     : m_name(name), m_os(os) {
   m_tracer.ResetTimer();
@@ -17,3 +19,4 @@ ScopedTracer::~ScopedTracer() {
   m_tracer.AddEpoch(m_name);
   m_tracer.PrintEpochs(m_os);
 }
+WPI_UNIGNORE_DEPRECATED

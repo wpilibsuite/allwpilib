@@ -132,6 +132,7 @@ void Watchdog::Impl::Main() {
     UpdateAlarm();
   }
 }
+WPI_IGNORE_DEPRECATED
 
 Watchdog::Watchdog(units::second_t timeout, std::function<void()> callback)
     : m_timeout(timeout), m_callback(std::move(callback)), m_impl(GetImpl()) {}
@@ -170,7 +171,6 @@ units::second_t Watchdog::GetTime() const {
   return Timer::GetFPGATimestamp() - m_startTime;
 }
 
-WPI_IGNORE_DEPRECATED
 void Watchdog::SetTimeout(units::second_t timeout) {
   m_startTime = Timer::GetFPGATimestamp();
   m_tracer.ClearEpochs();
