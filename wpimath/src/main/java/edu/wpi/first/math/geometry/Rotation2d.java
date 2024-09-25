@@ -14,7 +14,7 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.proto.Rotation2dProto;
 import edu.wpi.first.math.geometry.struct.Rotation2dStruct;
-import edu.wpi.first.math.geometry.AllianceSymetry.*;
+import edu.wpi.first.math.geometry.AllianceSymmetry.*;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;

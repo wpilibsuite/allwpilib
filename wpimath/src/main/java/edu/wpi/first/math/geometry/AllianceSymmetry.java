@@ -13,8 +13,8 @@ import java.util.HashMap;
  * <p>If every vendor used this, the user would be able to specify the year and no matter the year
  * the vendor's code is from, the user would be able to flip as expected.
  */
-public class AllianceSymetry {
-  private AllianceSymetry() {
+public class AllianceSymmetry {
+  private AllianceSymmetry() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 

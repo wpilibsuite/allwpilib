@@ -15,7 +15,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.proto.Translation2dProto;
 import edu.wpi.first.math.geometry.struct.Translation2dStruct;
-import edu.wpi.first.math.geometry.AllianceSymetry.*;
+import edu.wpi.first.math.geometry.AllianceSymmetry.*;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.measure.Distance;
