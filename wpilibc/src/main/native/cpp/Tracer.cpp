@@ -6,9 +6,9 @@
 
 #include <memory>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
-#include <thread>
 
 #include <fmt/format.h>
 #include <networktables/DoubleTopic.h>
@@ -17,6 +17,7 @@
 #include <units/time.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringMap.h>
+#include <wpi/deprecated.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/Errors.h"
@@ -206,7 +207,7 @@ void Tracer::EnableTracingForCurrentThread() {
   threadLocalState.m_disableNextCycle = false;
 }
 
-void TracerSetThreadName(std::string_view name) {
+void Tracer::SetThreadName(std::string_view name) {
   threadLocalState.UpdateThreadName(name);
 }
 
@@ -225,6 +226,7 @@ T Tracer::TraceFunc(std::string_view name, std::function<T()> supplier) {
 }
 
 // DEPRECATED CLASS INSTANCE METHODS
+WPI_IGNORE_DEPRECATED
 Tracer::Tracer() {
   ResetTimer();
 }
@@ -267,3 +269,4 @@ void Tracer::PrintEpochs(wpi::raw_ostream& os) {
     }
   }
 }
+WPI_UNIGNORE_DEPRECATED
