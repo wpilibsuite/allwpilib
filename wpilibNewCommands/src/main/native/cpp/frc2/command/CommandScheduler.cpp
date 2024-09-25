@@ -184,7 +184,6 @@ void CommandScheduler::Run() {
 
   // Run the periodic method of all registered subsystems.
   for (auto&& subsystem : m_impl->subsystems) {
-    subsystem.getFirst()->Periodic();
     frc::Tracer::TraceFunc(
         subsystem.getFirst()->GetName() + "Periodic",
         std::bind(&Subsystem::Periodic, subsystem.getFirst()));

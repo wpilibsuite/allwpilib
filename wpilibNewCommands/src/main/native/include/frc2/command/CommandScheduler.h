@@ -135,7 +135,7 @@ class CommandScheduler final : public wpi::Sendable,
    * <p>Any subsystems not being used as requirements have their default methods
    * started.
    *
-   * <p> This method is implicity timed using the `Tracer` class.
+   * <p>This method is implicity timed using the `Tracer` class.
    */
   void Run();
 
