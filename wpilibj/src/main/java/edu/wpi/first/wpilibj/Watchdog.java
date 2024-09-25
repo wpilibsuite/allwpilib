@@ -144,9 +144,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * Adds time since last epoch to the list printed by printEpochs().
    *
    * @param epochName The name to associate with the epoch.
-   *
-   * @deprecated Deprecated in favor of using 2025
-   * {@link Tracer} static methods directly.
+   * @deprecated Deprecated in favor of using 2025 {@link Tracer} static methods directly.
    */
   @SuppressWarnings("removal")
   @Deprecated(since = "2025", forRemoval = true)
@@ -158,7 +156,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * Prints list of epochs added so far and their times.
    *
    * @see Tracer#printEpochs()
-   *
    * @deprecated Deprecated with no replacement.
    */
   @SuppressWarnings("removal")

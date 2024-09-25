@@ -37,7 +37,6 @@ TEST(TracerTest, ScopedTrace) {
 
   frc::sim::PauseTiming();
 
-
   frc::Tracer::StartTrace("Test3");
   {
     frc::Tracer::StartScopedTrace("Test4");
