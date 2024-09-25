@@ -101,10 +101,13 @@ public class LoggableHandler extends ElementHandler {
   }
 
   private String generateSimpleLogInvocation(TypeElement reflectedType, Element element) {
-    return String.format(
-        "Epilogue.%s.tryUpdate(dataLogger.getSubLogger(\"%s\"), "
-            + "%s, Epilogue.getConfig().errorHandler);",
-        StringUtils.loggerFieldName(reflectedType), loggedName(element), elementAccess(element));
+    return "Epilogue."
+        + StringUtils.loggerFieldName(reflectedType)
+        + ".tryUpdate(dataLogger.getSubLogger(\""
+        + loggedName(element)
+        + "\"), "
+        + elementAccess(element)
+        + ", Epilogue.getConfig().errorHandler)";
   }
 
   private String generateConditionalLogInvocation(
