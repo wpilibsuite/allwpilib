@@ -6,21 +6,28 @@ package edu.wpi.first.epilogue.processor;
 
 import edu.wpi.first.epilogue.Logged;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementScanner9;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 /** Handles logging for types annotated with the {@link Logged @Logged} annotation. */
 public class LoggableHandler extends ElementHandler {
   private final Types m_typeUtils;
+  private final Elements m_elementUtils;
 
   protected LoggableHandler(ProcessingEnvironment processingEnv) {
     super(processingEnv);
     this.m_typeUtils = processingEnv.getTypeUtils();
+    this.m_elementUtils = processingEnv.getElementUtils();
   }
 
   @Override
@@ -37,16 +44,16 @@ public class LoggableHandler extends ElementHandler {
     TypeElement reflectedType =
         (TypeElement) m_processingEnv.getTypeUtils().asElement(m_typeUtils.erasure(dataType));
 
-    List<TypeMirror> subtypes = getLoggedSubtypes();
+    List<TypeMirror> subtypes = getLoggedSubtypes(dataType);
 
     return subtypes.isEmpty()
         ? generateSimpleLogInvocation(reflectedType, element)
         : generateConditionalLogInvocation(reflectedType, element, subtypes);
   }
 
-  private List<TypeMirror> getLoggedSubtypes() {
+  private List<TypeMirror> getLoggedSubtypes(TypeMirror type) {
     List<TypeMirror> loggedSubtypes = new ArrayList<>();
-    for (TypeMirror subtype : getAllSubtypes()) {
+    for (TypeMirror subtype : getAllSubtypes(type)) {
       Element subtypeElement = m_typeUtils.asElement(subtype);
       if (subtypeElement != null && subtypeElement.getAnnotation(Logged.class) != null) {
         loggedSubtypes.add(subtype);
@@ -55,34 +62,61 @@ public class LoggableHandler extends ElementHandler {
     return loggedSubtypes;
   }
 
-  private List<TypeMirror> getAllSubtypes() {
-    // This method should return all known subtypes of the given type.
-    // The implementation depends on how you track and store type hierarchies in
-    // your system.
-    // For simplicity, we'll return an empty list here.
-    return new ArrayList<>();
+  private List<TypeMirror> getAllSubtypes(TypeMirror type) {
+    List<TypeMirror> allSubtypes = new ArrayList<>();
+    Set<TypeElement> allTypes = findAllTypes();
+
+    for (TypeElement potentialSubtype : allTypes) {
+      TypeMirror potentialSubtypeMirror = potentialSubtype.asType();
+      if (m_typeUtils.isSubtype(potentialSubtypeMirror, type)
+          && !potentialSubtypeMirror.equals(type)) {
+        allSubtypes.add(potentialSubtypeMirror);
+      }
+    }
+
+    return allSubtypes;
+  }
+
+  private Set<TypeElement> findAllTypes() {
+    Set<TypeElement> allTypes = new HashSet<>();
+
+    // This scanner will collect all TypeElements from the root elements in the compilation unit
+    ElementScanner9<Void, Void> scanner =
+        new ElementScanner9<>() {
+          @Override
+          public Void visitType(TypeElement e, Void p) {
+            allTypes.add(e);
+            return super.visitType(e, p);
+          }
+        };
+
+    // Iterate through all elements and scan
+    for (Element rootElement : m_elementUtils.getAllModuleElements()) {
+      if (rootElement.getKind() == ElementKind.PACKAGE) {
+        rootElement.accept(scanner, null);
+      }
+    }
+
+    return allTypes;
   }
 
   private String generateSimpleLogInvocation(TypeElement reflectedType, Element element) {
-    // Distributing the long line across multiple lines
-    return "Epilogue."
-        + StringUtils.loggerFieldName(reflectedType)
-        + ".tryUpdate(dataLogger.getSubLogger(\""
-        + loggedName(element)
-        + "\"), "
-        + elementAccess(element)
-        + ", Epilogue.getConfig().errorHandler)";
+    return String.format(
+        "Epilogue.%s.tryUpdate(dataLogger.getSubLogger(\"%s\"), "
+            + "%s, Epilogue.getConfig().errorHandler);",
+        StringUtils.loggerFieldName(reflectedType), loggedName(element), elementAccess(element));
   }
 
   private String generateConditionalLogInvocation(
       TypeElement reflectedType, Element element, List<TypeMirror> subtypes) {
     StringBuilder builder = new StringBuilder(256);
 
-    // Combining multiple strings into fewer append calls
+    // Combining multiple strings into fewer append calls for better readability
     builder
         .append("{\n  var obj = ")
         .append(elementAccess(element))
-        .append(";\n  var logger = dataLogger.getSubLogger(\"")
+        .append(";\n")
+        .append("  var logger = dataLogger.getSubLogger(\"")
         .append(loggedName(element))
         .append("\");\n");
 
@@ -93,7 +127,8 @@ public class LoggableHandler extends ElementHandler {
       builder
           .append("  if (obj instanceof ")
           .append(typeName)
-          .append(") {\n    Epilogue.")
+          .append(") {\n")
+          .append("    Epilogue.")
           .append(StringUtils.loggerFieldName(subtypeElement))
           .append(".tryUpdate(logger, (")
           .append(typeName)
