@@ -109,7 +109,7 @@ public class LoggableHandler extends ElementHandler {
         + elementAccess(element)
         + ", Epilogue.getConfig().errorHandler)";
   }
-
+  @SuppressWarnings("PMD.ConsecutiveLiteralAppends")
   private String generateConditionalLogInvocation(
       TypeElement reflectedType, Element element, List<TypeMirror> subtypes) {
     StringBuilder builder = new StringBuilder(256);
