@@ -280,24 +280,6 @@ public class Tracer {
   }
 
   /**
-   * Disables any tracing for the current thread.
-   * This will cause all {@link #startTrace(String)}, {@link #endTrace()}
-   * and {@link #traceFunc(Runnable)} to do nothing.
-   */
-  public static void disableTracingForCurrentThread() {
-      threadLocalState.get().m_disableNextCycle = true;
-  }
-
-  /**
-   * Enables any tracing for the current thread.
-   * This will cause all {@link #startTrace(String)}, {@link #endTrace()}
-   * and {@link #traceFunc(Runnable)} to work as normal.
-   */
-  public static void enableTracingForCurrentThread() {
-      threadLocalState.get().m_disableNextCycle = false;
-  }
-
-  /**
    * Traces a function, should be used in place of
    * {@link #startTrace(String)} and {@link #endTrace()}
    * for functions called by user code like {@code CommandScheduler.run()} and
@@ -329,6 +311,24 @@ public class Tracer {
       R ret = supplier.get();
       endTraceInner(state);
       return ret;
+  }
+
+  /**
+   * Disables any tracing for the current thread.
+   * This will cause all {@link #startTrace(String)}, {@link #endTrace()}
+   * and {@link #traceFunc(Runnable)} to do nothing.
+   */
+  public static void disableTracingForCurrentThread() {
+    threadLocalState.get().m_disableNextCycle = true;
+  }
+
+  /**
+   * Enables any tracing for the current thread.
+   * This will cause all {@link #startTrace(String)}, {@link #endTrace()}
+   * and {@link #traceFunc(Runnable)} to work as normal.
+   */
+  public static void enableTracingForCurrentThread() {
+      threadLocalState.get().m_disableNextCycle = false;
   }
 
   // A REIMPLEMENTATION OF THE OLD TRACER TO NOT BREAK OLD CODE
