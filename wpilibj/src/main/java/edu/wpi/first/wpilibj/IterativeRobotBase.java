@@ -155,7 +155,10 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_rpFirstRun = true;
 
-  /** Periodic code for all robot modes should go here. */
+  /**
+   * Periodic code for all robot modes should go here.
+   * <p> This method is implicity timed using the {@link Tracer} class.
+   */
   public void robotPeriodic() {
     if (m_rpFirstRun) {
       System.out.println("Default robotPeriodic() method... Override me!");
@@ -169,6 +172,8 @@ public abstract class IterativeRobotBase extends RobotBase {
    * Periodic simulation code should go here.
    *
    * <p>This function is called in a simulated robot after user code executes.
+   *
+   * <p> This method is implicity timed using the {@link Tracer} class.
    */
   public void simulationPeriodic() {
     if (m_spFirstRun) {
@@ -179,7 +184,10 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_dpFirstRun = true;
 
-  /** Periodic code for disabled mode should go here. */
+  /**
+   * Periodic code for disabled mode should go here.
+   * <p> This method is implicity timed using the {@link Tracer} class.
+   */
   public void disabledPeriodic() {
     if (m_dpFirstRun) {
       System.out.println("Default disabledPeriodic() method... Override me!");
@@ -189,7 +197,10 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_apFirstRun = true;
 
-  /** Periodic code for autonomous mode should go here. */
+  /**
+   * Periodic code for autonomous mode should go here.
+   * <p> This method is implicity timed using the {@link Tracer} class.
+   */
   public void autonomousPeriodic() {
     if (m_apFirstRun) {
       System.out.println("Default autonomousPeriodic() method... Override me!");
@@ -199,7 +210,10 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_tpFirstRun = true;
 
-  /** Periodic code for teleop mode should go here. */
+  /**
+   * Periodic code for teleop mode should go here.
+   * <p> This method is implicity timed using the {@link Tracer} class.
+   */
   public void teleopPeriodic() {
     if (m_tpFirstRun) {
       System.out.println("Default teleopPeriodic() method... Override me!");
@@ -209,7 +223,10 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_tmpFirstRun = true;
 
-  /** Periodic code for test mode should go here. */
+  /**
+   * Periodic code for test mode should go here.
+   * <p> This method is implicity timed using the {@link Tracer} class.
+   */
   public void testPeriodic() {
     if (m_tmpFirstRun) {
       System.out.println("Default testPeriodic() method... Override me!");

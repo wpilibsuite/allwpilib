@@ -209,7 +209,8 @@ void IterativeRobotBase::LoopFunc() {
 
   if constexpr (IsSimulation()) {
     HAL_SimPeriodicBefore();
-    SimulationPeriodic();
+    Tracer::TraceFunc("SimulationPeriodic",
+                      std::bind(&IterativeRobotBase::SimulationPeriodic, this));
     HAL_SimPeriodicAfter();
   }
 

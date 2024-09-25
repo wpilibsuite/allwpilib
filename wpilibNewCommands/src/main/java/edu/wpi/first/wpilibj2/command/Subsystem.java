@@ -7,6 +7,8 @@ package edu.wpi.first.wpilibj2.command;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import edu.wpi.first.wpilibj.Tracer;
+
 /**
  * A robot subsystem. Subsystems are the basic unit of robot organization in the Command-based
  * framework; they encapsulate low-level hardware objects (motor controllers, sensors, etc.) and
@@ -30,6 +32,8 @@ public interface Subsystem {
    * subsystem-specific state that you don't want to offload to a {@link Command}. Teams should try
    * to be consistent within their own codebases about which responsibilities will be handled by
    * Commands, and which will be handled here.
+   *
+   * <p> This method is implicity timed using the {@link edu.wpi.first.wpilibj.Tracer}.
    */
   default void periodic() {}
 
@@ -37,6 +41,8 @@ public interface Subsystem {
    * This method is called periodically by the {@link CommandScheduler}. Useful for updating
    * subsystem-specific state that needs to be maintained for simulations, such as for updating
    * {@link edu.wpi.first.wpilibj.simulation} classes and setting simulated sensor readings.
+   *
+   * <p> This method is implicity timed using the {@link edu.wpi.first.wpilibj.Tracer}.
    */
   default void simulationPeriodic() {}
 
