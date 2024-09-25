@@ -8,6 +8,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <thread>
 
 #include <fmt/format.h>
 #include <networktables/DoubleTopic.h>
