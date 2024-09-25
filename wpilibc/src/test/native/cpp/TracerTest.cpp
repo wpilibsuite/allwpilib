@@ -6,9 +6,6 @@
 
 #include <gtest/gtest.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/raw_ostream.h>
 
 #include "frc/Tracer.h"
 #include "frc/simulation/SimHooks.h"
