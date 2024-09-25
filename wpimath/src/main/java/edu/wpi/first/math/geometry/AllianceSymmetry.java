@@ -18,8 +18,8 @@ public class AllianceSymmetry {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
-  /** The strategy to use for flipping coordinates over axis of symetry. */
-  public static enum SymetryStrategy {
+  /** The strategy to use for flipping coordinates over axis of symmetry. */
+  public static enum SymmetryStrategy {
     /**
      * X becomes fieldLength - x, leaves the y coordinate unchanged, and heading becomes PI -
      * heading.
@@ -96,7 +96,7 @@ public class AllianceSymmetry {
     /**
      * Flips the object based on the supplied flipper.
      */
-    public Self flip(SymetryStrategy strategy);
+    public Self flip(SymmetryStrategy strategy);
 
     /** Flips the object based on the active flipper. */
     public default Self flip() {
@@ -104,14 +104,14 @@ public class AllianceSymmetry {
     }
   }
 
-  private static record YearInfo(SymetryStrategy flipper, double fieldLength, double fieldWidth) {}
+  private static record YearInfo(SymmetryStrategy flipper, double fieldLength, double fieldWidth) {}
 
   private static final HashMap<Integer, YearInfo> flipperMap =
       new HashMap<Integer, YearInfo>() {
         {
-          put(2022, new YearInfo(SymetryStrategy.ROTATIONAL, 16.4592, 8.2296));
-          put(2023, new YearInfo(SymetryStrategy.VERTICAL, 16.54175, 8.0137));
-          put(2024, new YearInfo(SymetryStrategy.VERTICAL, 16.54175, 8.211));
+          put(2022, new YearInfo(SymmetryStrategy.ROTATIONAL, 16.4592, 8.2296));
+          put(2023, new YearInfo(SymmetryStrategy.VERTICAL, 16.54175, 8.0137));
+          put(2024, new YearInfo(SymmetryStrategy.VERTICAL, 16.54175, 8.211));
         }
       };
 
@@ -123,7 +123,7 @@ public class AllianceSymmetry {
    *
    * @return The active flipper.
    */
-  public static SymetryStrategy getFlipper() {
+  public static SymmetryStrategy getFlipper() {
     return activeYear.flipper;
   }
 

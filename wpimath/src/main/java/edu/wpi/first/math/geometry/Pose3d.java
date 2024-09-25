@@ -374,7 +374,7 @@ public class Pose3d
   }
 
   @Override
-  public Pose3d flip(SymetryStrategy strategy) {
+  public Pose3d flip(SymmetryStrategy strategy) {
     return new Pose3d(m_translation.flip(strategy), m_rotation.flip(strategy));
   }
 

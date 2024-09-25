@@ -509,7 +509,7 @@ public class Rotation3d
   }
 
   @Override
-  public Rotation3d flip(SymetryStrategy strategy) {
+  public Rotation3d flip(SymmetryStrategy strategy) {
       Rotation2d rot2d = toRotation2d().flip(strategy);
       return new Rotation3d(
           this.getX(),

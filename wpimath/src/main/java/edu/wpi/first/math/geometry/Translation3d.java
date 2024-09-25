@@ -311,7 +311,7 @@ public class Translation3d
   }
 
   @Override
-  public Translation3d flip(SymetryStrategy strategy) {
+  public Translation3d flip(SymmetryStrategy strategy) {
     return new Translation3d(
       strategy.flipX(m_x),
       strategy.flipY(m_y),

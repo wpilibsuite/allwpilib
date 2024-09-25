@@ -337,7 +337,7 @@ public class Rotation2d
   }
 
   @Override
-  public Rotation2d flip(SymetryStrategy strategy) {
+  public Rotation2d flip(SymmetryStrategy strategy) {
     return switch (strategy) {
       case VERTICAL -> new Rotation2d(-getCos(), getSin());
       case ROTATIONAL -> new Rotation2d(-getCos(), -getSin());
