@@ -398,6 +398,9 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   /**
    * Decorates this Command with a name.
    *
+   * <p> The returned commands `Execute` method is implicity timed using the
+   * `Tracer` class.
+   *
    * @param name name
    * @return the decorated Command
    */

@@ -12,6 +12,8 @@ import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.Tracer;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -572,11 +574,18 @@ public abstract class Command implements Sendable {
   /**
    * Decorates this Command with a name.
    *
+   * <p> The returned commands `Execute` method is implicity timed using the {@link Tracer} class.
+   *
    * @param name name
    * @return the decorated Command
    */
   public WrapperCommand withName(String name) {
-    WrapperCommand wrapper = new WrapperCommand(Command.this) {};
+    WrapperCommand wrapper = new WrapperCommand(Command.this) {
+      @Override
+      public void execute() {
+        Tracer.traceFunc(this.getName()+"Execute", super::execute);
+      }
+    };
     wrapper.setName(name);
     return wrapper;
   }

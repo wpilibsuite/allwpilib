@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <frc/Errors.h>
+#include <frc/Tracer.h>
 
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/ConditionalCommand.h"
@@ -243,11 +244,28 @@ CommandPtr CommandPtr::HandleInterrupt(std::function<void()> handler) && {
       });
 }
 
+namespace {
+class NamedCommand : public WrapperCommand {
+ public:
+  NamedCommand(std::unique_ptr<Command>&& command, std::string_view name)
+      : WrapperCommand(std::move(command)), m_name(name) {}
+
+  void Execute() override {
+    frc::Tracer::StartTrace(m_name);
+    WrapperCommand::Execute();
+    frc::Tracer::EndTrace();
+  }
+
+ private:
+  std::string m_name;
+};
+}  // namespace
+
 CommandPtr CommandPtr::WithName(std::string_view name) && {
   AssertValid();
-  WrapperCommand wrapper{std::move(m_ptr)};
-  wrapper.SetName(name);
-  return std::move(wrapper).ToPtr();
+  m_ptr = std::make_unique<NamedCommand>(std::move(m_ptr), name);
+  m_ptr->SetName(name);
+  return std::move(*this);
 }
 
 Command* CommandPtr::get() const& {
