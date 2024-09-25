@@ -30,7 +30,7 @@ class TracerTest {
   @Test
   @ResourceLock("timing")
   void traceFuncTest() {
-    String threadName = Thread.currentThread().getName();
+    final String threadName = Thread.currentThread().getName();
     Tracer.disableGcLoggingForCurrentThread();
 
     Tracer.startTrace("Test1");

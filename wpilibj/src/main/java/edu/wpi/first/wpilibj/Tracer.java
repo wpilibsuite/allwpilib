@@ -61,17 +61,17 @@ public class Tracer {
 
     /**
      * The stack of traces, every startTrace will add to this stack and every endTrace will remove
-     * from this stack
+     * from this stack.
      */
     private final ArrayList<String> m_traceStack = new ArrayList<>();
 
     /**
      * ideally we only need `traceStack` but in the interest of memory optimization and string
-     * concatenation speed we store the history of the stack to reuse the stack names
+     * concatenation speed we store the history of the stack to reuse the stack names.
      */
     private final ArrayList<String> m_traceStackHistory = new ArrayList<>();
 
-    /** The time of each trace, the key is the trace name, modified every endTrace */
+    /** The time of each trace, the key is the trace name, modified every endTrace. */
     private final HashMap<String, Double> m_traceTimes = new HashMap<>();
 
     /**
@@ -80,35 +80,35 @@ public class Tracer {
      */
     private final HashMap<String, TraceStartData> m_traceStartTimes = new HashMap<>();
 
-    /** the publishers for each trace, the key is the trace name, modified every endCycle */
-    private final HashMap<String, DoublePublisher> m_publisherHeap = new HashMap<>();
+    /** the publishers for each trace, the key is the trace name, modified every endCycle. */
+    private final HashMap<String, DoublePublisher> m_publishers = new HashMap<>();
 
     /*
      * If the cycle is poisened, it will warn the user
-     * and not publish any data
+     * and not publish any data.
      */
     boolean m_cyclePoisened = false;
 
-    /** If the tracer is disabled, it will not publish any data or do any string manipulation */
+    /** If the tracer is disabled, it will not publish any data or do any string manipulation. */
     boolean m_disabled = false;
 
     /**
      * If the tracer should be disabled next cycle and every cycle after that until this flag is set
-     * to false. Disabling is done this way to prevent disabling/enabling
+     * to false. Disabling is done this way to prevent disabling/enabling.
      */
     boolean m_disableNextCycle = false;
 
     /**
      * Stack size is used to keep track of stack size even when disabled, calling `EndCycle` is
-     * important when disabled or not to update the disabled state in a safe manner
+     * important when disabled or not to update the disabled state in a safe manner.
      */
     int m_stackSize = 0;
 
     // the garbage collector beans
-    private final ArrayList<GarbageCollectorMXBean> gcs =
+    private final ArrayList<GarbageCollectorMXBean> m_gcs =
         new ArrayList<>(ManagementFactory.getGarbageCollectorMXBeans());
-    private final DoublePublisher gcTimeEntry;
-    private double gcTimeThisCycle = 0.0;
+    private final DoublePublisher m_gcTimeEntry;
+    private double m_gcTimeThisCycle = 0.0;
 
     private TracerState(String threadName) {
       if (singleThreadedMode.get()) {
@@ -124,7 +124,7 @@ public class Tracer {
         this.m_rootTable =
             NetworkTableInstance.getDefault().getTable("Tracer").getSubTable(threadName);
       }
-      this.gcTimeEntry = m_rootTable.getDoubleTopic("GCTime").publish();
+      this.m_gcTimeEntry = m_rootTable.getDoubleTopic("GCTime").publish();
     }
 
     private String appendTraceStack(String trace) {
@@ -160,7 +160,7 @@ public class Tracer {
 
     private double totalGCTime() {
       double gcTime = 0;
-      for (GarbageCollectorMXBean gc : gcs) {
+      for (GarbageCollectorMXBean gc : m_gcs) {
         gcTime += gc.getCollectionTime();
       }
       return gcTime;
@@ -170,28 +170,32 @@ public class Tracer {
       if (m_disabled != m_disableNextCycle || m_cyclePoisened) {
         // Gives publishers empty times,
         // reporting no data is better than bad data
-        for (var publisher : m_publisherHeap.entrySet()) {
+        for (var publisher : m_publishers.entrySet()) {
           publisher.getValue().set(0.0);
         }
         return;
       } else {
         // update times for all already existing publishers
-        for (var publisher : m_publisherHeap.entrySet()) {
+        for (var publisher : m_publishers.entrySet()) {
           Double time = m_traceTimes.remove(publisher.getKey());
-          if (time == null) time = 0.0;
+          if (time == null) {
+            time = 0.0;
+          }
           publisher.getValue().set(time);
         }
         // create publishers for all new entries
         for (var traceTime : m_traceTimes.entrySet()) {
           DoublePublisher publisher = m_rootTable.getDoubleTopic(traceTime.getKey()).publish();
           publisher.set(traceTime.getValue());
-          m_publisherHeap.put(traceTime.getKey(), publisher);
+          m_publishers.put(traceTime.getKey(), publisher);
         }
       }
 
       // log gc time
-      if (!gcs.isEmpty()) gcTimeEntry.set(gcTimeThisCycle);
-      gcTimeThisCycle = 0.0;
+      if (!m_gcs.isEmpty()) {
+        m_gcTimeEntry.set(m_gcTimeThisCycle);
+      }
+      m_gcTimeThisCycle = 0.0;
 
       // clean up state
       m_traceTimes.clear();
@@ -227,13 +231,14 @@ public class Tracer {
     if (!state.m_disabled) {
       if (stack.isEmpty()) {
         DriverStation.reportError(
-            "[Tracer] Stack is empty, this means that there are more endTrace calls than startTrace calls",
+            "[Tracer] Stack is empty,"
+                + "this means that there are more endTrace calls than startTrace calls",
             true);
         return;
       }
       var startData = state.m_traceStartTimes.get(stack);
       double gcTimeSinceStart = state.totalGCTime() - startData.m_startGCTotalTime;
-      state.gcTimeThisCycle += gcTimeSinceStart;
+      state.m_gcTimeThisCycle += gcTimeSinceStart;
       state.m_traceTimes.put(
           stack, Timer.getFPGATimestamp() * 1_000.0 - startData.m_startTime - gcTimeSinceStart);
     }
@@ -271,8 +276,8 @@ public class Tracer {
    */
   public static void disableGcLoggingForCurrentThread() {
     TracerState state = threadLocalState.get();
-    state.gcTimeEntry.close();
-    state.gcs.clear();
+    state.m_gcTimeEntry.close();
+    state.m_gcs.clear();
   }
 
   /**
