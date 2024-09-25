@@ -76,7 +76,6 @@ public class LoggableHandler extends ElementHandler {
 
   private String generateConditionalLogInvocation(
       TypeElement reflectedType, Element element, List<TypeMirror> subtypes) {
-
     StringBuilder builder = new StringBuilder(256);
 
     // Combining multiple strings into fewer append calls
