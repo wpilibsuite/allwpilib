@@ -159,7 +159,17 @@ decltype(auto) get(const StringMapEntry<ValueTy> &E) {
   if constexpr (Index == 0)
     return E.first();
   else
-    return E.second;
+    return (E.second);
+}
+
+// Allow structured bindings on StringMapEntry.
+template <std::size_t Index, typename ValueTy>
+decltype(auto) get(StringMapEntry<ValueTy> &E) {
+  static_assert(Index < 2);
+  if constexpr (Index == 0)
+    return E.first();
+  else
+    return (E.second);
 }
 
 } // end namespace wpi
