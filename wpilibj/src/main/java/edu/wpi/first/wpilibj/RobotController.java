@@ -118,6 +118,16 @@ public final class RobotController {
   }
 
   /**
+   * Gets the number of times the system has been disabled due to communication errors with the
+   * Driver Station.
+   *
+   * @return number of disables due to communication errors.
+   */
+  public static int getCommsDisableCount() {
+    return HAL.getCommsDisableCount();
+  }
+
+  /**
    * Gets the current state of the Robot Signal Light (RSL).
    *
    * @return The current state of the RSL- true if on, false if off
@@ -191,7 +201,7 @@ public final class RobotController {
   }
 
   /**
-   * Get the count of the total current faults on the 3.3V rail since the controller has booted.
+   * Get the count of the total current faults on the 3.3V rail since the code started.
    *
    * @return The number of faults
    */
@@ -237,7 +247,7 @@ public final class RobotController {
   }
 
   /**
-   * Get the count of the total current faults on the 5V rail since the controller has booted.
+   * Get the count of the total current faults on the 5V rail since the code started.
    *
    * @return The number of faults
    */
@@ -283,12 +293,17 @@ public final class RobotController {
   }
 
   /**
-   * Get the count of the total current faults on the 6V rail since the controller has booted.
+   * Get the count of the total current faults on the 6V rail since the code started.
    *
    * @return The number of faults
    */
   public static int getFaultCount6V() {
     return PowerJNI.getUserCurrentFaults6V();
+  }
+
+  /** Reset the overcurrent fault counters for all user rails to 0. */
+  public static void resetRailFaultCounts() {
+    PowerJNI.resetUserCurrentFaults();
   }
 
   /**

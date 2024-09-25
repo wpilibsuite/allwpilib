@@ -22,8 +22,9 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
    * Creates a simulated DC motor mechanism.
    *
    * @param plant              The linear system representing the DC motor. This
-   *                           system can be created with
-   *                           LinearSystemId::DCMotorSystem().
+   * system can be created with LinearSystemId::DCMotorSystem(). If
+   * LinearSystemId::DCMotorSystem(kV, kA) is used, the distance unit must be
+   * radians.
    * @param gearbox            The type of and number of motors in the DC motor
    * gearbox.
    * @param gearing            The gearing of the DC motor (numbers greater than

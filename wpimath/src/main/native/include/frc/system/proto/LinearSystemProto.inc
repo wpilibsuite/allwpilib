@@ -9,6 +9,7 @@
 #include <fmt/format.h>
 #include <wpi/ProtoHelper.h>
 
+#include "frc/proto/MatrixProto.h"
 #include "frc/system/proto/LinearSystemProto.h"
 #include "system.pb.h"
 
@@ -33,10 +34,10 @@ wpi::Protobuf<frc::LinearSystem<States, Inputs, Outputs>>::Unpack(
         Outputs));
   }
   return frc::LinearSystem<States, Inputs, Outputs>{
-      wpi::UnpackProtobuf<frc::Matrixd<States, States>>(m->a()),
-      wpi::UnpackProtobuf<frc::Matrixd<States, Inputs>>(m->b()),
-      wpi::UnpackProtobuf<frc::Matrixd<Outputs, States>>(m->c()),
-      wpi::UnpackProtobuf<frc::Matrixd<Outputs, Inputs>>(m->d())};
+      wpi::UnpackProtobuf<frc::Matrixd<States, States>>(m->wpi_a()),
+      wpi::UnpackProtobuf<frc::Matrixd<States, Inputs>>(m->wpi_b()),
+      wpi::UnpackProtobuf<frc::Matrixd<Outputs, States>>(m->wpi_c()),
+      wpi::UnpackProtobuf<frc::Matrixd<Outputs, Inputs>>(m->wpi_d())};
 }
 
 template <int States, int Inputs, int Outputs>

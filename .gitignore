@@ -10,6 +10,7 @@ simgui-window.json
 simgui.json
 
 networktables.json
+*.bck
 
 ntcore/connectionlistenertest.json
 ntcore/timesynctest.json
@@ -238,7 +239,7 @@ compile_commands.json
 
 # clang configuration and clangd cache
 .clang
-.clangd/
+.clangd
 .cache/
 
 imgui.ini
@@ -248,3 +249,9 @@ imgui.ini
 /bazel-*
 user.bazelrc
 coverage_report/
+
+# ctest
+/Testing/
+
+# protobuf
+!wpiprotoplugin.jar

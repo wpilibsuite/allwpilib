@@ -5,7 +5,7 @@
 package edu.wpi.first.cscore;
 
 /**
- * A source for video that provides a sequence of frames. Each frame may consist of multiple images
+ * A sink for video that accepts a sequence of frames. Each frame may consist of multiple images
  * (e.g. from a stereo or depth camera); these are called channels.
  */
 public class VideoSink implements AutoCloseable {
@@ -94,11 +94,7 @@ public class VideoSink implements AutoCloseable {
     if (other == null) {
       return false;
     }
-    if (getClass() != other.getClass()) {
-      return false;
-    }
-    VideoSink sink = (VideoSink) other;
-    return m_handle == sink.m_handle;
+    return other instanceof VideoSink sink && m_handle == sink.m_handle;
   }
 
   @Override

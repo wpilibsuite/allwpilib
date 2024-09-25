@@ -5,7 +5,7 @@ apply plugin: 'com.google.protobuf'
 
 def baseArtifactId = project.baseId
 def artifactGroupId = project.groupId
-def javaBaseName = "_GROUP_edu_wpi_first_${project.baseId}_ID_${project.baseId}-java_CLS"
+def javaBaseName = "_GROUP_${project.groupId.replace('.', '_')}_ID_${project.baseId}-java_CLS"
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -148,8 +148,19 @@ protobuf {
     protoc {
         artifact = 'com.google.protobuf:protoc:3.21.12'
     }
+    plugins {
+        wpilib {
+            path = rootProject.file("protoplugin/binary/wpiprotoplugin.jar")
+        }
+    }
     generateProtoTasks {
         all().configureEach { task ->
+            task.inputs.file(rootProject.file("protoplugin/binary/wpiprotoplugin.jar"))
+            task.plugins {
+                wpilib {
+                    outputSubDir = 'cpp'
+                }
+            }
             task.builtins {
                 cpp {}
                 remove java

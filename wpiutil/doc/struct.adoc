@@ -202,7 +202,7 @@ results in a 5-byte encoding:
 [[layout-bit-field]]
 === Bit-Field Data Layout
 
-Multiple adjacant bit-fields of the same integer type width are packed together to fit in the minimum number of multiples of that type. The bit-fields are packed, starting from the least significant bit, in the order they appear in the schema. Individual bit-fields must not span across multiple underlying types; if a bit-field is larger than the remaining space in the data type, a new element of that type is started and the bit-field starts from the least significant bit of the new element. Unused bits should be set to 0 during serialization and must be ignored during deserialization.
+Multiple adjacent bit-fields of the same integer type width are packed together to fit in the minimum number of multiples of that type. The bit-fields are packed, starting from the least significant bit, in the order they appear in the schema. Individual bit-fields must not span across multiple underlying types; if a bit-field is larger than the remaining space in the data type, a new element of that type is started and the bit-field starts from the least significant bit of the new element. Unused bits should be set to 0 during serialization and must be ignored during deserialization.
 
 Boolean bit-fields are always a single bit wide. The underlying data type is by default uint8, but if a boolean bit-field immediately follows a bit-field of another integer type (and fits), it is packed into that type.
 

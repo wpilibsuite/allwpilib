@@ -15,7 +15,6 @@ set_target_properties(libglass PROPERTIES DEBUG_POSTFIX "d")
 if(NOT MSVC)
     set_target_properties(libglass PROPERTIES OUTPUT_NAME "glass")
 endif()
-set_property(TARGET libglass PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 set_property(TARGET libglass PROPERTY FOLDER "libraries")
 
@@ -43,7 +42,6 @@ set_target_properties(libglassnt PROPERTIES DEBUG_POSTFIX "d")
 if(NOT MSVC)
     set_target_properties(libglassnt PROPERTIES OUTPUT_NAME "glassnt")
 endif()
-set_property(TARGET libglassnt PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 set_property(TARGET libglassnt PROPERTY FOLDER "libraries")
 

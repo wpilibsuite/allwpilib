@@ -103,10 +103,10 @@ public interface Protobuf<T, MessageType extends ProtoMessage<?>> {
   }
 
   /**
-   * Returns whether or not objects are cloneable using the clone() method. Clonable objects must
+   * Returns whether or not objects are cloneable using the clone() method. Cloneable objects must
    * also be comparable using the equals() method. Default implementation returns false.
    *
-   * @return True if object is clonable
+   * @return True if object is cloneable
    */
   default boolean isCloneable() {
     return false;

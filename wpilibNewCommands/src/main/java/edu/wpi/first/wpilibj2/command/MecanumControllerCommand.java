@@ -19,9 +19,7 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -61,22 +59,14 @@ public class MecanumControllerCommand extends Command {
   private final Supplier<MecanumDriveWheelSpeeds> m_currentWheelSpeeds;
   private final MecanumVoltagesConsumer m_outputDriveVoltages;
   private final Consumer<MecanumDriveWheelSpeeds> m_outputWheelSpeeds;
-  private final MutableMeasure<Velocity<Distance>> m_prevFrontLeftSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_prevRearLeftSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_prevFrontRightSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_prevRearRightSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_frontLeftSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_rearLeftSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_frontRightSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_rearRightSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
+  private final MutLinearVelocity m_prevFrontLeftSpeedSetpoint = MetersPerSecond.mutable(0);
+  private final MutLinearVelocity m_prevRearLeftSpeedSetpoint = MetersPerSecond.mutable(0);
+  private final MutLinearVelocity m_prevFrontRightSpeedSetpoint = MetersPerSecond.mutable(0);
+  private final MutLinearVelocity m_prevRearRightSpeedSetpoint = MetersPerSecond.mutable(0);
+  private final MutLinearVelocity m_frontLeftSpeedSetpoint = MetersPerSecond.mutable(0);
+  private final MutLinearVelocity m_rearLeftSpeedSetpoint = MetersPerSecond.mutable(0);
+  private final MutLinearVelocity m_frontRightSpeedSetpoint = MetersPerSecond.mutable(0);
+  private final MutLinearVelocity m_rearRightSpeedSetpoint = MetersPerSecond.mutable(0);
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow the provided

@@ -6,12 +6,14 @@
 
 #include <atomic>
 #include <ctime>
+#include <functional>
 #include <future>
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <fmt/chrono.h>
@@ -180,17 +182,16 @@ InputFile::~InputFile() {
 }
 
 static std::unique_ptr<InputFile> LoadDataLog(std::string_view filename) {
-  std::error_code ec;
-  auto buf = wpi::MemoryBuffer::GetFile(filename, ec);
-  std::string fn{filename};
-  if (ec) {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(filename);
+  if (!fileBuffer) {
     return std::make_unique<InputFile>(
-        fn, fmt::format("Could not open file: {}", ec.message()));
+        filename,
+        fmt::format("Could not open file: {}", fileBuffer.error().message()));
   }
 
-  wpi::log::DataLogReader reader{std::move(buf)};
+  wpi::log::DataLogReader reader{std::move(*fileBuffer)};
   if (!reader.IsValid()) {
-    return std::make_unique<InputFile>(fn, "Not a valid datalog file");
+    return std::make_unique<InputFile>(filename, "Not a valid datalog file");
   }
 
   return std::make_unique<InputFile>(

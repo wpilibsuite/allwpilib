@@ -2,6 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <string>
+#include <vector>
+
 #include <gtest/gtest.h>
 #include <wpi/SpanMatcher.h>
 
@@ -759,7 +762,7 @@ TEST_F(LocalStorageNumberVariantsTest, GetEntryPubAfter) {
   EXPECT_EQ(storage.GetEntryValue(sub2), Value::MakeInteger(1, 50));
   EXPECT_EQ(storage.GetEntryValue(sub3), Value::MakeFloat(1.0, 50));
   EXPECT_EQ(storage.GetEntryValue(sub4), Value{});
-  // entrys just get whatever the value is
+  // entries just get whatever the value is
   EXPECT_EQ(storage.GetEntryValue(entry), Value::MakeDouble(1.0, 50));
 }
 
@@ -781,7 +784,7 @@ TEST_F(LocalStorageNumberVariantsTest, GetEntryPubBefore) {
   EXPECT_EQ(storage.GetEntryValue(sub2), Value::MakeInteger(1, 50));
   EXPECT_EQ(storage.GetEntryValue(sub3), Value::MakeFloat(1.0, 50));
   EXPECT_EQ(storage.GetEntryValue(sub4), Value{});
-  // entrys just get whatever the value is
+  // entries just get whatever the value is
   EXPECT_EQ(storage.GetEntryValue(entry), Value::MakeDouble(1.0, 50));
 }
 

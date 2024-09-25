@@ -4,6 +4,7 @@
 
 #include "hal/REVPH.h"
 
+#include <string>
 #include <thread>
 
 #include <fmt/format.h>
@@ -737,6 +738,8 @@ void HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
   stickyFaults->brownout = status1.sticky_brownout_fault;
   stickyFaults->canWarning = status1.sticky_can_warning_fault;
   stickyFaults->canBusOff = status1.sticky_can_bus_off_fault;
+  stickyFaults->hardwareFault = status1.sticky_hardware_fault;
+  stickyFaults->firmwareFault = status1.sticky_firmware_fault;
   stickyFaults->hasReset = status1.sticky_has_reset_fault;
 }
 

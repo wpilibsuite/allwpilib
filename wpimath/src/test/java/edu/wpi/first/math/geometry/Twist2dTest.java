@@ -20,7 +20,7 @@ class Twist2dTest {
   }
 
   @Test
-  void testQuarterCirle() {
+  void testQuarterCircle() {
     var quarterCircle = new Twist2d(5.0 / 2.0 * Math.PI, 0, Math.PI / 2.0);
     var quarterCirclePose = Pose2d.kZero.exp(quarterCircle);
 

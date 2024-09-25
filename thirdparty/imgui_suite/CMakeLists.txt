@@ -1,12 +1,9 @@
-
-
 include(LinkMacOSGUI)
 
 set(SAVE_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 set(BUILD_SHARED_LIBS OFF)
 set(GLFW_INSTALL OFF)
 add_subdirectory("glfw")
-set_property(TARGET glfw PROPERTY POSITION_INDEPENDENT_CODE ON)
 set(BUILD_SHARED_LIBS ${SAVE_BUILD_SHARED_LIBS})
 export(TARGETS glfw FILE glfw.cmake NAMESPACE glfw::)
 
@@ -54,7 +51,6 @@ target_include_directories(
     PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
 )
 
-set_property(TARGET imgui PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_features(imgui PUBLIC cxx_std_20)
 
 install(TARGETS imgui EXPORT imgui)

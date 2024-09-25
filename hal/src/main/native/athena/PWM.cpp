@@ -10,6 +10,7 @@
 #include <thread>
 
 #include <fmt/format.h>
+#include <wpi/print.h>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
@@ -126,10 +127,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
 
   return handle;
 }
-void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
+void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
     return;
   }
 
@@ -148,11 +148,17 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   }
 
   if (port->channel > tPWM::kNumHdrRegisters - 1) {
+    int32_t status = 0;
     int32_t bitToUnset = 1 << remapMXPPWMChannel(port->channel);
     uint16_t specialFunctions =
-        digitalSystem->readEnableMXPSpecialFunction(status);
+        digitalSystem->readEnableMXPSpecialFunction(&status);
     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToUnset,
-                                                 status);
+                                                 &status);
+    if (status != 0) {
+      wpi::println(
+          "HAL_FreePWMPort: failed to free MXP PWM port {}, status code {}",
+          port->channel, status);
+    }
   }
 }
 

@@ -15,7 +15,7 @@
 namespace nt {
 
 inline StringSubscriber::StringSubscriber(
-    NT_Subscriber handle, std::string_view defaultValue)
+    NT_Subscriber handle, ParamType defaultValue)
     : Subscriber{handle},
       m_defaultValue{defaultValue} {}
 
@@ -24,7 +24,7 @@ inline std::string StringSubscriber::Get() const {
 }
 
 inline std::string StringSubscriber::Get(
-    std::string_view defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetString(m_subHandle, defaultValue);
 }
 
@@ -32,7 +32,7 @@ inline std::string_view StringSubscriber::Get(wpi::SmallVectorImpl<char>& buf) c
   return Get(buf, m_defaultValue);
 }
 
-inline std::string_view StringSubscriber::Get(wpi::SmallVectorImpl<char>& buf, std::string_view defaultValue) const {
+inline std::string_view StringSubscriber::Get(wpi::SmallVectorImpl<char>& buf, ParamType defaultValue) const {
   return nt::GetString(m_subHandle, buf, defaultValue);
 }
 
@@ -41,7 +41,7 @@ inline TimestampedString StringSubscriber::GetAtomic() const {
 }
 
 inline TimestampedString StringSubscriber::GetAtomic(
-    std::string_view defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetAtomicString(m_subHandle, defaultValue);
 }
 
@@ -49,7 +49,7 @@ inline TimestampedStringView StringSubscriber::GetAtomic(wpi::SmallVectorImpl<ch
   return GetAtomic(buf, m_defaultValue);
 }
 
-inline TimestampedStringView StringSubscriber::GetAtomic(wpi::SmallVectorImpl<char>& buf, std::string_view defaultValue) const {
+inline TimestampedStringView StringSubscriber::GetAtomic(wpi::SmallVectorImpl<char>& buf, ParamType defaultValue) const {
   return nt::GetAtomicString(m_subHandle, buf, defaultValue);
 }
 
@@ -65,12 +65,12 @@ inline StringTopic StringSubscriber::GetTopic() const {
 inline StringPublisher::StringPublisher(NT_Publisher handle)
     : Publisher{handle} {}
 
-inline void StringPublisher::Set(std::string_view value,
+inline void StringPublisher::Set(ParamType value,
                                          int64_t time) {
   ::nt::SetString(m_pubHandle, value, time);
 }
 
-inline void StringPublisher::SetDefault(std::string_view value) {
+inline void StringPublisher::SetDefault(ParamType value) {
   ::nt::SetDefaultString(m_pubHandle, value);
 }
 
@@ -79,7 +79,7 @@ inline StringTopic StringPublisher::GetTopic() const {
 }
 
 inline StringEntry::StringEntry(
-    NT_Entry handle, std::string_view defaultValue)
+    NT_Entry handle, ParamType defaultValue)
     : StringSubscriber{handle, defaultValue},
       StringPublisher{handle} {}
 

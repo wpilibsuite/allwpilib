@@ -9,10 +9,18 @@ FATAL: In-source builds are not allowed.
     )
 endif()
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
     set(CMAKE_SYSTEM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
     set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
     message(STATUS "Platform version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
+endif()
+
+# Set default build type to release with debug info (i.e. release mode optimizations
+# are performed, but debug info still exists).
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
 endif()
 
 cmake_minimum_required(VERSION 3.21)
@@ -26,6 +34,7 @@ endif()
 
 set(WPILIB_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
+include(CMakeDependentOption)
 include(CPack)
 include(OptionValidation)
 
@@ -53,25 +62,26 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 # which point to directories outside the build tree to the install RPATH
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-# the RPATH to be used when installing, but only if it's not a system directory
-list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-endif()
-
 # Options for building certain parts of the repo. Everything is built by default.
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
-option(WITH_JAVA "Include Java and JNI in the build" ON)
+option(WITH_JAVA "Include Java and JNI in the build" OFF)
 option(WITH_JAVA_SOURCE "Build Java source jars" ${WITH_JAVA})
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
-option(WITH_WPIUNITS "Build wpiunits" ON)
+cmake_dependent_option(
+    WITH_WPIUNITS
+    "Build wpiunits"
+    ON
+    WITH_JAVA
+    OFF
+)
 option(WITH_WPILIB "Build hal, wpilibc/j, and developerRobot (needs OpenCV)" ON)
 option(WITH_EXAMPLES "Build examples" OFF)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
 option(WITH_GUI "Build GUI items" ON)
 option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
+option(WITH_PROTOBUF "Build protobuf support" ON)
 
 # Options for using a package manager (e.g., vcpkg) for certain dependencies.
 option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
@@ -83,12 +93,6 @@ set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar
 
 # Options for compilation flags.
 option(NO_WERROR "Disable -Werror flag during compilation" OFF)
-
-# Set default build type to release with debug info (i.e. release mode optimizations
-# are performed, but debug info still exists).
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
-endif()
 
 if(NOT WITH_JAVA OR NOT WITH_CSCORE)
     if(NOT "${OPENCV_JAVA_INSTALL_DIR}" STREQUAL "")
@@ -120,14 +124,19 @@ if(WITH_JAVA OR WITH_JAVA_SOURCE)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
     find_package(Java REQUIRED COMPONENTS Development)
     find_package(JNI REQUIRED COMPONENTS JVM)
+else()
+    # Protoc requires the java runtime
+    find_package(Java REQUIRED COMPONENTS Runtime)
 endif()
 
-find_package(LIBSSH 0.7.1)
+find_package(LIBSSH CONFIG 0.7.1)
 
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
-set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "" FORCE)
-find_package(Protobuf REQUIRED)
-find_program(PROTOC_COMPILER protoc REQUIRED)
+if(WITH_PROTOBUF)
+    set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "" FORCE)
+    find_package(Protobuf REQUIRED)
+    find_program(PROTOC_COMPILER protoc REQUIRED)
+endif()
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG OFF)
 
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
@@ -270,6 +279,8 @@ if(WITH_NTCORE)
     add_subdirectory(ntcore)
 endif()
 
+add_subdirectory(protoplugin)
+
 if(WITH_WPIMATH)
     if(WITH_JAVA)
         set(WPIUNITS_DEP_REPLACE ${WPIUNITS_DEP_REPLACE_IMPL})
@@ -328,7 +339,7 @@ if(WITH_WPILIB)
     add_subdirectory(developerRobot)
 endif()
 
-if(WITH_SIMULATION_MODULES AND NOT WITH_EXTERNAL_HAL)
+if(WITH_SIMULATION_MODULES)
     add_subdirectory(simulation)
 endif()
 

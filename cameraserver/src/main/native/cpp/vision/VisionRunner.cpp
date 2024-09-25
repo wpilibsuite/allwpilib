@@ -4,6 +4,7 @@
 
 #include "vision/VisionRunner.h"
 
+#include <memory>
 #include <thread>
 
 #include <opencv2/core/mat.hpp>

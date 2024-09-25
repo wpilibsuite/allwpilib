@@ -18,7 +18,7 @@ DEFINE_CAPI(double, X, 0)
 DEFINE_CAPI(double, Y, 0)
 DEFINE_CAPI(double, Z, 0)
 
-void HALSIM_RegisterSPIAccelerometerAllCallbcaks(int32_t index,
+void HALSIM_RegisterSPIAccelerometerAllCallbacks(int32_t index,
                                                  HAL_NotifyCallback callback,
                                                  void* param,
                                                  HAL_Bool initialNotify) {}

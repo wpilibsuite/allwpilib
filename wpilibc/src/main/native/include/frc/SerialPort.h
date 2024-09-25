@@ -7,6 +7,7 @@
 #include <string>
 #include <string_view>
 
+#include <hal/SerialPort.h>
 #include <hal/Types.h>
 #include <units/time.h>
 
@@ -34,7 +35,7 @@ class SerialPort {
     kOnboard = 0,
     /// MXP (roboRIO MXP) serial port.
     kMXP = 1,
-    /// USB serial port (same as KUSB1).
+    /// USB serial port (same as kUSB1).
     kUSB = 2,
     /// USB serial port 1.
     kUSB1 = 2,
@@ -127,8 +128,6 @@ class SerialPort {
   SerialPort(int baudRate, std::string_view portName, Port port = kOnboard,
              int dataBits = 8, Parity parity = kParity_None,
              StopBits stopBits = kStopBits_One);
-
-  ~SerialPort();
 
   SerialPort(SerialPort&& rhs) = default;
   SerialPort& operator=(SerialPort&& rhs) = default;
@@ -255,7 +254,7 @@ class SerialPort {
   void Reset();
 
  private:
-  hal::Handle<HAL_SerialPortHandle> m_portHandle;
+  hal::Handle<HAL_SerialPortHandle, HAL_CloseSerial> m_portHandle;
 };
 
 }  // namespace frc

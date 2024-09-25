@@ -207,7 +207,9 @@ class IterativeRobotBase : public RobotBase {
    * By default, this is enabled.
    *
    * @param enabled True to enable, false to disable
+   * @deprecated Deprecated without replacement.
    */
+  [[deprecated("Deprecated without replacement.")]]
   void SetNetworkTablesFlushEnabled(bool enabled);
 
   /**

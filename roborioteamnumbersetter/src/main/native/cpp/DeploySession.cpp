@@ -4,8 +4,10 @@
 
 #include "DeploySession.h"
 
+#include <string>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
@@ -17,7 +19,7 @@
 
 #include "SshSession.h"
 
-using namespace sysid;
+using namespace rtns;
 
 #ifdef ERROR
 #undef ERROR

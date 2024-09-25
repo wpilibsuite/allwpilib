@@ -4,6 +4,7 @@
 
 #include "FPGAEncoder.h"
 
+#include <limits>
 #include <memory>
 
 #include <fmt/format.h>
@@ -95,8 +96,7 @@ HAL_FPGAEncoderHandle HAL_InitializeFPGAEncoder(
   return handle;
 }
 
-void HAL_FreeFPGAEncoder(HAL_FPGAEncoderHandle fpgaEncoderHandle,
-                         int32_t* status) {
+void HAL_FreeFPGAEncoder(HAL_FPGAEncoderHandle fpgaEncoderHandle) {
   fpgaEncoderHandles->Free(fpgaEncoderHandle);
 }
 
@@ -128,18 +128,14 @@ double HAL_GetFPGAEncoderPeriod(HAL_FPGAEncoderHandle fpgaEncoderHandle,
     return 0.0;
   }
   tEncoder::tTimerOutput output = encoder->encoder->readTimerOutput(status);
-  double value;
   if (output.Stalled) {
-    // Return infinity
-    double zero = 0.0;
-    value = 1.0 / zero;
-  } else {
-    // output.Period is a fixed point number that counts by 2 (24 bits, 25
-    // integer bits)
-    value = static_cast<double>(output.Period << 1) /
-            static_cast<double>(output.Count);
+    return std::numeric_limits<double>::infinity();
   }
-  double measuredPeriod = value * 2.5e-8;
+  // output.Period is a fixed point number that counts by 2 (24 bits, 25
+  // integer bits)
+  double value = static_cast<double>(output.Period << 1) /
+                 static_cast<double>(output.Count);
+  double measuredPeriod = value * 2.5e-8;  // result * timebase (currently 25ns)
   return measuredPeriod / DECODING_SCALING_FACTOR;
 }
 

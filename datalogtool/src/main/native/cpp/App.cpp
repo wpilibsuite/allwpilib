@@ -97,7 +97,7 @@ static void DisplayMainMenu() {
     if (ImGui::MenuItem("Online documentation")) {
       wpi::gui::OpenURL(
           "https://docs.wpilib.org/en/stable/docs/software/telemetry/"
-          "datalog.html");
+          "datalog-download.html");
     }
     ImGui::EndMenu();
   }

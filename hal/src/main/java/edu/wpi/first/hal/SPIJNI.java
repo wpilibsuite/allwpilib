@@ -12,16 +12,34 @@ import java.nio.ByteBuffer;
  * @see "SPI.h"
  */
 public class SPIJNI extends JNIWrapper {
+  /** Invalid port number. */
   public static final int INVALID_PORT = -1;
+
+  /** Onboard SPI bus port CS0. */
   public static final int ONBOARD_CS0_PORT = 0;
+
+  /** Onboard SPI bus port CS1. */
   public static final int ONBOARD_CS1_PORT = 1;
+
+  /** Onboard SPI bus port CS2. */
   public static final int ONBOARD_CS2_PORT = 2;
+
+  /** Onboard SPI bus port CS3. */
   public static final int ONBOARD_CS3_PORT = 3;
+
+  /** MXP (roboRIO MXP) SPI bus port. */
   public static final int MXP_PORT = 4;
 
+  /** Clock idle low, data sampled on rising edge. */
   public static final int SPI_MODE0 = 0;
+
+  /** Clock idle low, data sampled on falling edge. */
   public static final int SPI_MODE1 = 1;
+
+  /** Clock idle high, data sampled on falling edge. */
   public static final int SPI_MODE2 = 2;
+
+  /** Clock idle high, data sampled on rising edge. */
   public static final int SPI_MODE3 = 3;
 
   /**

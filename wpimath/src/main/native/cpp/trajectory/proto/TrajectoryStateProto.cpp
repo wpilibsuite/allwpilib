@@ -20,7 +20,7 @@ frc::Trajectory::State wpi::Protobuf<frc::Trajectory::State>::Unpack(
       units::second_t{m->time()},
       units::meters_per_second_t{m->velocity()},
       units::meters_per_second_squared_t{m->acceleration()},
-      wpi::UnpackProtobuf<frc::Pose2d>(m->pose()),
+      wpi::UnpackProtobuf<frc::Pose2d>(m->wpi_pose()),
       units::curvature_t{m->curvature()},
   };
 }

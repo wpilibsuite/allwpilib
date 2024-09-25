@@ -95,7 +95,7 @@ public final class ClassPreloader {
    * @return Number of classes loaded.
    */
   public static int preload(InputStream stream) {
-    return preload(new BufferedReader(new InputStreamReader(stream)));
+    return preload(new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8)));
   }
 
   /**

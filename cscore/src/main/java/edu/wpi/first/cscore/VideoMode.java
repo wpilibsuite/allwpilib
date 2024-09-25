@@ -60,12 +60,9 @@ public class VideoMode {
     if (other == null) {
       return false;
     }
-    if (getClass() != other.getClass()) {
-      return false;
-    }
-    VideoMode mode = (VideoMode) other;
 
-    return pixelFormat == mode.pixelFormat
+    return other instanceof VideoMode mode
+        && pixelFormat == mode.pixelFormat
         && width == mode.width
         && height == mode.height
         && fps == mode.fps;

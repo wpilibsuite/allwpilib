@@ -16,8 +16,7 @@ import edu.wpi.first.math.geometry.proto.Rotation2dProto;
 import edu.wpi.first.math.geometry.struct.Rotation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -130,7 +129,7 @@ public class Rotation2d
    *
    * @param angle The angle of the rotation.
    */
-  public Rotation2d(Measure<Angle> angle) {
+  public Rotation2d(Angle angle) {
     this(angle.in(Radians));
   }
 
@@ -244,7 +243,7 @@ public class Rotation2d
    *
    * @return The measure of the Rotation2d.
    */
-  public Measure<Angle> getMeasure() {
+  public Angle getMeasure() {
     return Radians.of(getRadians());
   }
 

@@ -8,9 +8,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.math.kinematics.proto.MecanumDriveWheelSpeedsProto;
 import edu.wpi.first.math.kinematics.struct.MecanumDriveWheelSpeedsStruct;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
@@ -65,10 +63,10 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
    * @param rearRight Speed of the rear right wheel.
    */
   public MecanumDriveWheelSpeeds(
-      Measure<Velocity<Distance>> frontLeft,
-      Measure<Velocity<Distance>> frontRight,
-      Measure<Velocity<Distance>> rearLeft,
-      Measure<Velocity<Distance>> rearRight) {
+      LinearVelocity frontLeft,
+      LinearVelocity frontRight,
+      LinearVelocity rearLeft,
+      LinearVelocity rearRight) {
     this(
         frontLeft.in(MetersPerSecond),
         frontRight.in(MetersPerSecond),
@@ -114,7 +112,7 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
    *
    * @param attainableMaxSpeed The absolute max speed that a wheel can reach.
    */
-  public void desaturate(Measure<Velocity<Distance>> attainableMaxSpeed) {
+  public void desaturate(LinearVelocity attainableMaxSpeed) {
     desaturate(attainableMaxSpeed.in(MetersPerSecond));
   }
 

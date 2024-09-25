@@ -65,7 +65,7 @@ TEST(ExponentialProfileTest, ReachesGoal) {
 
 // Tests that decreasing the maximum velocity in the middle when it is already
 // moving faster than the new max is handled correctly
-TEST(ExponentialProfileTest, PosContinousUnderVelChange) {
+TEST(ExponentialProfileTest, PosContinuousUnderVelChange) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
@@ -88,7 +88,7 @@ TEST(ExponentialProfileTest, PosContinousUnderVelChange) {
 
 // Tests that decreasing the maximum velocity in the middle when it is already
 // moving faster than the new max is handled correctly
-TEST(ExponentialProfileTest, PosContinousUnderVelChangeBackward) {
+TEST(ExponentialProfileTest, PosContinuousUnderVelChangeBackward) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
@@ -306,7 +306,7 @@ TEST(ExponentialProfileTest, TimingToGoal) {
   for (int i = 0; i < 900; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
     if (!reachedGoal && state == goal) {
-      EXPECT_NEAR_UNITS(prediction, i * 0.01_s, 0.25_s);
+      EXPECT_NEAR_UNITS(prediction, i * 10_ms, 250_ms);
       reachedGoal = true;
     }
   }
@@ -329,7 +329,7 @@ TEST(ExponentialProfileTest, TimingToNegativeGoal) {
   for (int i = 0; i < 900; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
     if (!reachedGoal && state == goal) {
-      EXPECT_NEAR_UNITS(prediction, i * 0.01_s, 0.25_s);
+      EXPECT_NEAR_UNITS(prediction, i * 10_ms, 250_ms);
       reachedGoal = true;
     }
   }

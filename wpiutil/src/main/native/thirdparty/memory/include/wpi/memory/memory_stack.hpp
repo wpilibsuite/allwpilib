@@ -92,12 +92,12 @@ namespace wpi
             };
         } // namespace detail
 
-        /// A stateful \concept{concept_rawallocator,RawAllocator} that provides stack-like (LIFO) allocations.
+        /// A stateful RawAllocator that provides stack-like (LIFO) allocations.
         /// It uses a \ref memory_arena with a given \c BlockOrRawAllocator defaulting to \ref growing_block_allocator to allocate huge blocks
         /// and saves a marker to the current top.
         /// Allocation simply moves this marker by the appropriate number of bytes and returns the pointer at the old marker position,
         /// deallocation is not directly supported, only setting the marker to a previously queried position.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <class BlockOrRawAllocator = default_allocator>
         class memory_stack
         : WPI_EBO(detail::default_leak_checker<detail::memory_stack_leak_handler>)
@@ -116,7 +116,7 @@ namespace wpi
                 return detail::memory_block_stack::implementation_offset() + byte_size;
             }
 
-            /// \effects Creates it with a given initial block size and and other constructor arguments for the \concept{concept_blockallocator,BlockAllocator}.
+            /// \effects Creates it with a given initial block size and and other constructor arguments for the BlockAllocator.
             /// It will allocate the first block and sets the top to its beginning.
             /// \requires \c block_size must be at least \c min_block_size(1).
             template <typename... Args>
@@ -129,10 +129,10 @@ namespace wpi
             /// \effects Allocates a memory block of given size and alignment.
             /// It simply moves the top marker.
             /// If there is not enough space on the current memory block,
-            /// a new one will be allocated by the \concept{concept_blockallocator,BlockAllocator} or taken from a cache
+            /// a new one will be allocated by the BlockAllocator or taken from a cache
             /// and used for the allocation.
-            /// \returns A \concept{concept_node,node} with given size and alignment.
-            /// \throws Anything thrown by the \concept{concept_blockallocator,BlockAllocator} on growth
+            /// \returns A node with given size and alignment.
+            /// \throws Anything thrown by the BlockAllocator on growth
             /// or \ref bad_allocation_size if \c size is too big.
             /// \requires \c size and \c alignment must be valid.
             void* allocate(std::size_t size, std::size_t alignment)
@@ -160,7 +160,7 @@ namespace wpi
             /// \effects Allocates a memory block of given size and alignment,
             /// similar to \ref allocate().
             /// But it does not attempt a growth if the arena is empty.
-            /// \returns A \concept{concept_node,node} with given size and alignment
+            /// \returns A node with given size and alignment
             /// or `nullptr` if there wasn't enough memory available.
             void* try_allocate(std::size_t size, std::size_t alignment) noexcept
             {
@@ -221,7 +221,7 @@ namespace wpi
                 }
             }
 
-            /// \effects \ref unwind() does not actually do any deallocation of blocks on the \concept{concept_blockallocator,BlockAllocator},
+            /// \effects \ref unwind() does not actually do any deallocation of blocks on the BlockAllocator,
             /// unused memory is stored in a cache for later reuse.
             /// This function clears that cache.
             void shrink_to_fit() noexcept
@@ -231,7 +231,7 @@ namespace wpi
 
             /// \returns The amount of memory remaining in the current block.
             /// This is the number of bytes that are available for allocation
-            /// before the cache or \concept{concept_blockallocator,BlockAllocator} needs to be used.
+            /// before the cache or BlockAllocator needs to be used.
             std::size_t capacity_left() const noexcept
             {
                 return std::size_t(block_end() - stack_.top());
@@ -246,7 +246,7 @@ namespace wpi
                 return arena_.next_block_size();
             }
 
-            /// \returns A reference to the \concept{concept_blockallocator,BlockAllocator} used for managing the arena.
+            /// \returns A reference to the BlockAllocator used for managing the arena.
             /// \requires It is undefined behavior to move this allocator out into another object.
             allocator_type& get_allocator() noexcept
             {
@@ -276,7 +276,7 @@ namespace wpi
         /// A `Stack` is anything that provides a `marker`, a `top()` function returning a `marker`
         /// and an `unwind()` function to unwind to a `marker`,
         /// like a \ref wpi::memory::memory_stack
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <class Stack = memory_stack<>>
         class memory_stack_raii_unwind
         {
@@ -379,7 +379,7 @@ namespace wpi
         /// Specialization of the \ref allocator_traits for \ref memory_stack classes.
         /// \note It is not allowed to mix calls through the specialization and through the member functions,
         /// i.e. \ref memory_stack::allocate() and this \c allocate_node().
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <class BlockAllocator>
         class allocator_traits<memory_stack<BlockAllocator>>
         {
@@ -441,7 +441,7 @@ namespace wpi
         };
 
         /// Specialization of the \ref composable_allocator_traits for \ref memory_stack classes.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <class BlockAllocator>
         class composable_allocator_traits<memory_stack<BlockAllocator>>
         {

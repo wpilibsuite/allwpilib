@@ -17,8 +17,8 @@ frc::Transform2d wpi::Protobuf<frc::Transform2d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufTransform2d*>(&msg);
   return frc::Transform2d{
-      wpi::UnpackProtobuf<frc::Translation2d>(m->translation()),
-      wpi::UnpackProtobuf<frc::Rotation2d>(m->rotation()),
+      wpi::UnpackProtobuf<frc::Translation2d>(m->wpi_translation()),
+      wpi::UnpackProtobuf<frc::Rotation2d>(m->wpi_rotation()),
   };
 }
 

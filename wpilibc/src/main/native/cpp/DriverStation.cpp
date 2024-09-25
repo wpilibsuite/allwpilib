@@ -8,12 +8,10 @@
 
 #include <array>
 #include <atomic>
-#include <chrono>
+#include <memory>
 #include <span>
 #include <string>
 #include <string_view>
-#include <thread>
-#include <type_traits>
 
 #include <fmt/format.h>
 #include <hal/DriverStation.h>
@@ -33,7 +31,6 @@
 #include <wpi/timestamp.h>
 
 #include "frc/Errors.h"
-#include "frc/MotorSafety.h"
 #include "frc/Timer.h"
 
 using namespace frc;
@@ -47,7 +44,7 @@ class MatchDataSenderEntry {
   MatchDataSenderEntry(const std::shared_ptr<nt::NetworkTable>& table,
                        std::string_view key,
                        typename Topic::ParamType initialVal,
-                       wpi::json topicProperties = {{}})
+                       wpi::json topicProperties = wpi::json::object())
       : publisher{Topic{table->GetTopic(key)}.PublishEx(Topic::kTypeString,
                                                         topicProperties)},
         prevVal{initialVal} {

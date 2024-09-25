@@ -989,10 +989,9 @@ struct functor_traits<scalar_isnan_op<Scalar, UseTypedPredicate>> {
  * \brief Template functor to check whether a scalar is +/-inf
  * \sa class CwiseUnaryOp, ArrayBase::isinf()
  */
-template <typename Scalar>
+template <typename Scalar, bool UseTypedPredicate = false>
 struct scalar_isinf_op {
-  typedef bool result_type;
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE result_type operator()(const Scalar& a) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool operator()(const Scalar& a) const {
 #if defined(SYCL_DEVICE_ONLY)
     return numext::isinf(a);
 #else
@@ -1000,19 +999,33 @@ struct scalar_isinf_op {
 #endif
   }
 };
+
 template <typename Scalar>
-struct functor_traits<scalar_isinf_op<Scalar>> {
-  enum { Cost = NumTraits<Scalar>::MulCost, PacketAccess = false };
+struct scalar_isinf_op<Scalar, true> {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar operator()(const Scalar& a) const {
+#if defined(SYCL_DEVICE_ONLY)
+    return (numext::isinf(a) ? ptrue(a) : pzero(a));
+#else
+    return (numext::isinf EIGEN_NOT_A_MACRO(a) ? ptrue(a) : pzero(a));
+#endif
+  }
+  template <typename Packet>
+  EIGEN_DEVICE_FUNC inline Packet packetOp(const Packet& a) const {
+    return pisinf(a);
+  }
+};
+template <typename Scalar, bool UseTypedPredicate>
+struct functor_traits<scalar_isinf_op<Scalar, UseTypedPredicate>> {
+  enum { Cost = NumTraits<Scalar>::MulCost, PacketAccess = packet_traits<Scalar>::HasCmp && UseTypedPredicate };
 };
 
 /** \internal
  * \brief Template functor to check whether a scalar has a finite value
  * \sa class CwiseUnaryOp, ArrayBase::isfinite()
  */
-template <typename Scalar>
+template <typename Scalar, bool UseTypedPredicate = false>
 struct scalar_isfinite_op {
-  typedef bool result_type;
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE result_type operator()(const Scalar& a) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool operator()(const Scalar& a) const {
 #if defined(SYCL_DEVICE_ONLY)
     return numext::isfinite(a);
 #else
@@ -1020,9 +1033,25 @@ struct scalar_isfinite_op {
 #endif
   }
 };
+
 template <typename Scalar>
-struct functor_traits<scalar_isfinite_op<Scalar>> {
-  enum { Cost = NumTraits<Scalar>::MulCost, PacketAccess = false };
+struct scalar_isfinite_op<Scalar, true> {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar operator()(const Scalar& a) const {
+#if defined(SYCL_DEVICE_ONLY)
+    return (numext::isfinite(a) ? ptrue(a) : pzero(a));
+#else
+    return (numext::isfinite EIGEN_NOT_A_MACRO(a) ? ptrue(a) : pzero(a));
+#endif
+  }
+  template <typename Packet>
+  EIGEN_DEVICE_FUNC inline Packet packetOp(const Packet& a) const {
+    constexpr Scalar inf = NumTraits<Scalar>::infinity();
+    return pcmp_lt(pabs(a), pset1<Packet>(inf));
+  }
+};
+template <typename Scalar, bool UseTypedPredicate>
+struct functor_traits<scalar_isfinite_op<Scalar, UseTypedPredicate>> {
+  enum { Cost = NumTraits<Scalar>::MulCost, PacketAccess = packet_traits<Scalar>::HasCmp && UseTypedPredicate };
 };
 
 /** \internal

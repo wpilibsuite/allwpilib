@@ -15,7 +15,7 @@
 namespace nt {
 
 inline BooleanArraySubscriber::BooleanArraySubscriber(
-    NT_Subscriber handle, std::span<const int> defaultValue)
+    NT_Subscriber handle, ParamType defaultValue)
     : Subscriber{handle},
       m_defaultValue{defaultValue.begin(), defaultValue.end()} {}
 
@@ -24,7 +24,7 @@ inline std::vector<int> BooleanArraySubscriber::Get() const {
 }
 
 inline std::vector<int> BooleanArraySubscriber::Get(
-    std::span<const int> defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetBooleanArray(m_subHandle, defaultValue);
 }
 
@@ -32,7 +32,7 @@ inline std::span<int> BooleanArraySubscriber::Get(wpi::SmallVectorImpl<int>& buf
   return Get(buf, m_defaultValue);
 }
 
-inline std::span<int> BooleanArraySubscriber::Get(wpi::SmallVectorImpl<int>& buf, std::span<const int> defaultValue) const {
+inline std::span<int> BooleanArraySubscriber::Get(wpi::SmallVectorImpl<int>& buf, ParamType defaultValue) const {
   return nt::GetBooleanArray(m_subHandle, buf, defaultValue);
 }
 
@@ -41,7 +41,7 @@ inline TimestampedBooleanArray BooleanArraySubscriber::GetAtomic() const {
 }
 
 inline TimestampedBooleanArray BooleanArraySubscriber::GetAtomic(
-    std::span<const int> defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetAtomicBooleanArray(m_subHandle, defaultValue);
 }
 
@@ -49,7 +49,7 @@ inline TimestampedBooleanArrayView BooleanArraySubscriber::GetAtomic(wpi::SmallV
   return GetAtomic(buf, m_defaultValue);
 }
 
-inline TimestampedBooleanArrayView BooleanArraySubscriber::GetAtomic(wpi::SmallVectorImpl<int>& buf, std::span<const int> defaultValue) const {
+inline TimestampedBooleanArrayView BooleanArraySubscriber::GetAtomic(wpi::SmallVectorImpl<int>& buf, ParamType defaultValue) const {
   return nt::GetAtomicBooleanArray(m_subHandle, buf, defaultValue);
 }
 
@@ -65,12 +65,12 @@ inline BooleanArrayTopic BooleanArraySubscriber::GetTopic() const {
 inline BooleanArrayPublisher::BooleanArrayPublisher(NT_Publisher handle)
     : Publisher{handle} {}
 
-inline void BooleanArrayPublisher::Set(std::span<const int> value,
+inline void BooleanArrayPublisher::Set(ParamType value,
                                          int64_t time) {
   ::nt::SetBooleanArray(m_pubHandle, value, time);
 }
 
-inline void BooleanArrayPublisher::SetDefault(std::span<const int> value) {
+inline void BooleanArrayPublisher::SetDefault(ParamType value) {
   ::nt::SetDefaultBooleanArray(m_pubHandle, value);
 }
 
@@ -79,7 +79,7 @@ inline BooleanArrayTopic BooleanArrayPublisher::GetTopic() const {
 }
 
 inline BooleanArrayEntry::BooleanArrayEntry(
-    NT_Entry handle, std::span<const int> defaultValue)
+    NT_Entry handle, ParamType defaultValue)
     : BooleanArraySubscriber{handle, defaultValue},
       BooleanArrayPublisher{handle} {}
 

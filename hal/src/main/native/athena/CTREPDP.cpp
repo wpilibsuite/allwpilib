@@ -4,6 +4,8 @@
 
 #include "CTREPDP.h"
 
+#include <string>
+
 #include <fmt/format.h>
 #include <wpi/mutex.h>
 

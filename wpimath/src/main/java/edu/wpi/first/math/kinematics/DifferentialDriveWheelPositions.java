@@ -10,8 +10,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.proto.DifferentialDriveWheelPositionsProto;
 import edu.wpi.first.math.kinematics.struct.DifferentialDriveWheelPositionsStruct;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Distance;
 import java.util.Objects;
 
 /** Represents the wheel positions for a differential drive drivetrain. */
@@ -23,11 +22,11 @@ public class DifferentialDriveWheelPositions
   /** Distance measured by the right side. */
   public double rightMeters;
 
-  /** DifferentialDriveWheelPostions struct for serialization. */
+  /** DifferentialDriveWheelPositions struct for serialization. */
   public static final DifferentialDriveWheelPositionsStruct struct =
       new DifferentialDriveWheelPositionsStruct();
 
-  /** DifferentialDriveWheelPostions struct for serialization. */
+  /** DifferentialDriveWheelPositions struct for serialization. */
   public static final DifferentialDriveWheelPositionsProto proto =
       new DifferentialDriveWheelPositionsProto();
 
@@ -48,7 +47,7 @@ public class DifferentialDriveWheelPositions
    * @param left Distance measured by the left side.
    * @param right Distance measured by the right side.
    */
-  public DifferentialDriveWheelPositions(Measure<Distance> left, Measure<Distance> right) {
+  public DifferentialDriveWheelPositions(Distance left, Distance right) {
     this(left.in(Meters), right.in(Meters));
   }
 

@@ -4,16 +4,21 @@
 
 package edu.wpi.first.hal;
 
+/** Represents a CAN message read from a stream. */
 public class CANStreamMessage {
+  /** The message data. */
   @SuppressWarnings("MemberName")
   public final byte[] data = new byte[8];
 
+  /** The length of the data received (0-8 bytes). */
   @SuppressWarnings("MemberName")
   public int length;
 
+  /** Timestamp message was received, in milliseconds (based off of CLOCK_MONOTONIC). */
   @SuppressWarnings("MemberName")
   public long timestamp;
 
+  /** The message ID. */
   @SuppressWarnings("MemberName")
   public int messageID;
 

@@ -5,6 +5,8 @@
 #include "HALSimWS.h"
 
 #include <cstdio>
+#include <memory>
+#include <string>
 
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>

@@ -7,8 +7,11 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <memory>
 #include <span>
+#include <string>
 #include <system_error>
+#include <utility>
 #include <vector>
 
 #include <wpi/MemoryBuffer.h>
@@ -351,15 +354,14 @@ void NetworkServer::HandleLocal() {
 }
 
 void NetworkServer::LoadPersistent() {
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(m_persistentFilename, ec);
-  if (fileBuffer == nullptr || ec.value() != 0) {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(m_persistentFilename);
+  if (!fileBuffer) {
     INFO(
         "could not open persistent file '{}': {} "
         "(this can be ignored if you aren't expecting persistent values)",
-        m_persistentFilename, ec.message());
+        m_persistentFilename, fileBuffer.error().message());
     // backup file
+    std::error_code ec;
     fs::copy_file(m_persistentFilename, m_persistentFilename + ".bak",
                   std::filesystem::copy_options::overwrite_existing, ec);
     // try to write an empty file so it doesn't happen again
@@ -370,7 +372,8 @@ void NetworkServer::LoadPersistent() {
     }
     return;
   }
-  m_persistentData = std::string{fileBuffer->begin(), fileBuffer->end()};
+  m_persistentData =
+      std::string{fileBuffer.value()->begin(), fileBuffer.value()->end()};
   DEBUG4("read data: {}", m_persistentData);
 }
 

@@ -25,6 +25,11 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * Creates a simulated DC motor mechanism.
    *
    * @param plant The linear system representing the DC motor. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(DCMotor, double,
+   *     double)} or {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}. If
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}
+   *     is used, the distance unit must be radians.
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param gearing The gearing of the DC motor (numbers greater than 1 represent reductions).
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no

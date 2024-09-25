@@ -4,50 +4,73 @@
 
 package edu.wpi.first.hal;
 
+/** Faults for a REV PH. These faults are only active while the condition is active. */
 @SuppressWarnings("MemberName")
 public class REVPHFaults {
+  /** Fault on channel 0. */
   public final boolean Channel0Fault;
 
+  /** Fault on channel 1. */
   public final boolean Channel1Fault;
 
+  /** Fault on channel 2. */
   public final boolean Channel2Fault;
 
+  /** Fault on channel 3. */
   public final boolean Channel3Fault;
 
+  /** Fault on channel 4. */
   public final boolean Channel4Fault;
 
+  /** Fault on channel 5. */
   public final boolean Channel5Fault;
 
+  /** Fault on channel 6. */
   public final boolean Channel6Fault;
 
+  /** Fault on channel 7. */
   public final boolean Channel7Fault;
 
+  /** Fault on channel 8. */
   public final boolean Channel8Fault;
 
+  /** Fault on channel 9. */
   public final boolean Channel9Fault;
 
+  /** Fault on channel 10. */
   public final boolean Channel10Fault;
 
+  /** Fault on channel 11. */
   public final boolean Channel11Fault;
 
+  /** Fault on channel 12. */
   public final boolean Channel12Fault;
 
+  /** Fault on channel 13. */
   public final boolean Channel13Fault;
 
+  /** Fault on channel 14. */
   public final boolean Channel14Fault;
 
+  /** Fault on channel 15. */
   public final boolean Channel15Fault;
 
+  /** An overcurrent event occurred on the compressor output. */
   public final boolean CompressorOverCurrent;
 
+  /** The compressor output has an open circuit. */
   public final boolean CompressorOpen;
 
+  /** An overcurrent event occurred on a solenoid output. */
   public final boolean SolenoidOverCurrent;
 
+  /** The input voltage is below the minimum voltage. */
   public final boolean Brownout;
 
+  /** A warning was raised by the device's CAN controller. */
   public final boolean CanWarning;
 
+  /** The hardware on the device has malfunctioned. */
   public final boolean HardwareFault;
 
   /**

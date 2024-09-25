@@ -52,7 +52,7 @@ The following build options are available:
   * This option will build C++ examples.
 * `WITH_GUI` (ON Default)
   * This option will build GUI items. If this is off, and `WITH_SIMULATION_MODULES` is on, the simulation GUI will not be built.
-* `WITH_JAVA` (ON Default)
+* `WITH_JAVA` (OFF Default)
   * This option will enable Java and JNI builds. If this is on, `BUILD_SHARED_LIBS` must be on. Otherwise CMake will error.
 * `WITH_JAVA_SOURCE` (`WITH_JAVA` Default)
   * This option will build Java source JARs for each enabled Java library. This does not require `WITH_JAVA` to be on, allowing source JARs to be built without the compiled JARs if desired.
@@ -66,7 +66,7 @@ The following build options are available:
   * This option will build the HAL and wpilibc/j during the build. The HAL is the simulation HAL, unless the external HAL options are used. The CMake build has no capability to build for the roboRIO.
 * `WITH_WPIMATH` (ON Default)
   * This option will build the wpimath library. This option must be on to build wpilib.
-* `WITH_WPIUNITS` (ON Default)
+* `WITH_WPIUNITS` (`WITH_JAVA` Default)
   * This option will build the wpiunits library. This option must be on to build the Java wpimath library and requires `WITH_JAVA` to also be on.
 * `OPENCV_JAVA_INSTALL_DIR`
   * Set this option to the location of the archive of the OpenCV Java bindings (it should be called opencv-xxx.jar, with the x'es being version numbers). NOTE: set it to the LOCATION of the file, not the file itself!
@@ -77,12 +77,12 @@ The following build options are available:
 
 ## Build Setup
 
-The WPILib CMake build does not allow in source builds. Because the `build` directory is used by Gradle, we recommend a `build-cmake` directory in the root. This folder is included in the gitignore.
+The WPILib CMake build does not allow in source builds. Because the `build` directory is used by Gradle, we recommend a `build-cmake` directory in the root. This folder is included in the gitignore. We support building with Ninja; other options like Makefiles may be broken.
 
-Once you have a build folder, run CMake configuration in that build directory with the following command.
+Once you have a build folder, run CMake configuration in the root directory with the following command.
 
 ```
-cmake path/to/allwpilib/root
+cmake --preset default
 ```
 
 If you want to change any of the options, add `-DOPTIONHERE=VALUE` to the `cmake` command. This will check for any dependencies. If everything works properly this will succeed. If not, please check out the troubleshooting section for help.
@@ -90,6 +90,10 @@ If you want to change any of the options, add `-DOPTIONHERE=VALUE` to the `cmake
 If you want, you can also use `ccmake` in order to visually set these properties as well. [Here](https://cmake.org/cmake/help/v3.0/manual/ccmake.1.html) is the link to the documentation for that program. On Windows, you can use `cmake-gui` instead.
 
 Note that if you are cross-compiling, you will need to override the protobuf options manually to point to the libraries for the target platform. Leave the protoc binary location as the path to the binary for the host platform, since protoc needs to execute on the host platform.
+
+## Presets
+
+The WPILib CMake setup has a variety of presets for common configurations and options used. The default sets the generator to Ninja and build directory to `build-cmake`. The other presets are `with-java` (sets `WITH_JAVA=ON`), `sccache` (sets the C/C++ compiler launcher to sccache), and `with-java-sccache` (a comibination of `with-java` and `sccache`.
 
 ## Building
 
@@ -176,7 +180,7 @@ After that, run `cmake --build .` to create your JAR file. To execute the JAR fi
 
 ## Using vendordeps
 
-Vendordeps are not included as part of the `wpilib` CMake package. However, if you want to use a vendordep, you need to use `find_package(VENDORDEP)`, where `VENDORDEP` is the name of the vendordep (case-sensitive), like `xrpVendordep` or `romiVenderdep`. Note that wpilibNewCommands, while a vendordep in normal robot projects, is not built as a vendordep in CMake, and is instead included as part of the `wpilib` CMake package. After you used `find_package`, you can reference the vendordep library like normal, either by using `target_link_libraries` for C++ or `add_jar` for Java.
+Vendordeps are not included as part of the `wpilib` CMake package. However, if you want to use a vendordep, you need to use `find_package(VENDORDEP)`, where `VENDORDEP` is the name of the vendordep (case-sensitive), like `xrpVendordep` or `romiVendordep`. Note that wpilibNewCommands, while a vendordep in normal robot projects, is not built as a vendordep in CMake, and is instead included as part of the `wpilib` CMake package. After you used `find_package`, you can reference the vendordep library like normal, either by using `target_link_libraries` for C++ or `add_jar` for Java.
 
 ## Troubleshooting
 Below are some common issues that are run into when building.

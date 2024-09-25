@@ -4,6 +4,8 @@
 
 #include "frc/counter/ExternalDirectionCounter.h"
 
+#include <memory>
+
 #include <hal/Counter.h>
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>
@@ -59,11 +61,6 @@ ExternalDirectionCounter::ExternalDirectionCounter(
 
   HAL_Report(HALUsageReporting::kResourceType_Counter, m_index + 1);
   wpi::SendableRegistry::AddLW(this, "External Direction Counter", m_index);
-}
-
-ExternalDirectionCounter::~ExternalDirectionCounter() {
-  int32_t status = 0;
-  HAL_FreeCounter(m_handle, &status);
 }
 
 int ExternalDirectionCounter::GetCount() const {

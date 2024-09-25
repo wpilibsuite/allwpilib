@@ -176,7 +176,6 @@ Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
       // OOM, just return
       elem = JLocal<jobject>{env, CreateCANStreamMessage(env)};
       if (elem) {
-        std::printf("Allocated and set object\n");
         env->SetObjectArrayElement(messages, i, elem);
       } else {
         return 0;

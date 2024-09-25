@@ -399,12 +399,15 @@ class JSpanBase {
     return {reinterpret_cast<U*>(arr.data()), arr.size()};
   }
 
+  // FIXME doxygen gives error parsing initializer list
+  //! @cond Doxygen_Suppress
  private:
   bool m_valid;
   JNIEnv* m_env;
   jarray_type m_jarr = nullptr;
   size_t m_size;
   std::remove_cv_t<T>* m_elements;
+  //! @endcond
 };
 
 }  // namespace detail

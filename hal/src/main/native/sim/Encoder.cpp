@@ -4,6 +4,8 @@
 
 #include "hal/Encoder.h"
 
+#include <limits>
+
 #include "CounterInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
@@ -113,7 +115,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(
   return handle;
 }
 
-void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
+void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle) {
   auto encoder = encoderHandles->Get(encoderHandle);
   encoderHandles->Free(encoderHandle);
   if (encoder == nullptr) {

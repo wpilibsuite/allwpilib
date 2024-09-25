@@ -2,24 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
 
 #include "frc/system/plant/DCMotor.h"
-#include "plant.pb.h"
 
 using namespace frc;
 
-namespace {
-
 using ProtoType = wpi::Protobuf<frc::DCMotor>;
 
-const DCMotor kExpectedData = DCMotor{units::volt_t{1.91},
-                                      units::newton_meter_t{19.1},
-                                      units::ampere_t{1.74},
-                                      units::ampere_t{2.29},
-                                      units::radians_per_second_t{2.2},
-                                      2};
-}  // namespace
+inline constexpr DCMotor kExpectedData =
+    DCMotor{1.91_V, 19.1_Nm, 1.74_A, 2.29_A, 2.2_rad_per_s, 2};
 
 TEST(DCMotorProtoTest, Roundtrip) {
   google::protobuf::Arena arena;

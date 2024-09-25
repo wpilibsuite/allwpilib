@@ -13,7 +13,7 @@ file(
 if(MSVC)
     set_source_files_properties(
         ${apriltaglib_src}
-        PROPERTIES COMPILE_FLAGS "/wd2220 /wd4005 /wd4018 /wd4244 /wd4267 /wd4996"
+        PROPERTIES COMPILE_FLAGS "/wd4005 /wd4018 /wd4244 /wd4267 /wd4996"
     )
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set_source_files_properties(
@@ -128,13 +128,12 @@ target_link_libraries(apriltag wpimath)
 target_include_directories(
     apriltag
     PUBLIC
-        $<BUILD_INTERFACE:${apriltaglib_SOURCE_DIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/apriltag>
 )
 
 install(
-    DIRECTORY src/main/native/thirdparty/apriltag/include/
+    DIRECTORY src/main/native/include/ src/main/native/thirdparty/apriltag/include/
     DESTINATION "${include_dest}/apriltag"
 )
 target_include_directories(
@@ -143,12 +142,10 @@ target_include_directories(
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include/common>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/src>
 )
 
 install(TARGETS apriltag EXPORT apriltag)
 export(TARGETS apriltag FILE apriltag.cmake NAMESPACE apriltag::)
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/apriltag")
 
 configure_file(apriltag-config.cmake.in ${WPILIB_BINARY_DIR}/apriltag-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/apriltag-config.cmake DESTINATION share/apriltag)

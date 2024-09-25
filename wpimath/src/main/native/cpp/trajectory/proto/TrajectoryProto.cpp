@@ -4,6 +4,8 @@
 
 #include "frc/trajectory/proto/TrajectoryProto.h"
 
+#include <vector>
+
 #include <wpi/ProtoHelper.h>
 
 #include "trajectory.pb.h"

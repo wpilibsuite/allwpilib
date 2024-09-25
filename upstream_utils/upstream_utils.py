@@ -7,70 +7,17 @@ import sys
 import tempfile
 
 
-def clone_repo(url, treeish, shallow=True):
-    """Clones a Git repo at the given URL into a temp folder, checks out the
-    given tree-ish (either branch or tag), then returns the repo root.
-
-    Keyword argument:
-    url -- The URL of the Git repo
-    treeish -- The tree-ish to check out (branch or tag)
-    shallow -- Whether to do a shallow clone
-
-    Returns:
-    root -- root directory of the cloned Git repository
-    """
-    cwd = os.getcwd()
-    if url.startswith("file://"):
-        os.chdir(os.path.dirname(url[7:]))
-    else:
-        os.chdir(tempfile.gettempdir())
-
-    repo = os.path.basename(url)
-    dest = os.path.join(os.getcwd(), repo)
-    if dest.endswith(".git"):
-        dest = dest[:-4]
-
-    # Clone Git repository into current directory or update it
-    if not os.path.exists(dest):
-        cmd = ["git", "clone"]
-        if shallow:
-            cmd += ["--branch", treeish, "--depth", "1"]
-        subprocess.run(cmd + [url, dest])
-        os.chdir(dest)
-    else:
-        os.chdir(dest)
-        subprocess.run(["git", "fetch", "origin", treeish])
-
-    # Get list of heads
-    # Example output of "git ls-remote --heads":
-    #   From https://gitlab.com/libeigen/eigen.git
-    #   77c66e368c7e355f8be299659f57b0ffcaedb505  refs/heads/3.4
-    #   3e006bfd31e4389e8c5718c30409cddb65a73b04  refs/heads/master
-    ls_out = subprocess.check_output(["git", "ls-remote", "--heads"]).decode().rstrip()
-    heads = [x.split()[1] for x in ls_out.split("\n")[1:]]
-
-    if f"refs/heads/{treeish}" in heads:
-        # Checking out the remote branch avoids needing to handle syncing a
-        # preexisting local one
-        subprocess.run(["git", "checkout", f"origin/{treeish}"])
-    else:
-        subprocess.run(["git", "checkout", treeish])
-
-    os.chdir(cwd)
-    return dest
-
-
 def get_repo_root():
     """Returns the Git repository root as an absolute path.
 
     An empty string is returned if no repository root was found.
     """
-    current_dir = os.path.abspath(os.getcwd())
-    while current_dir != os.path.dirname(current_dir):
-        if os.path.exists(current_dir + os.sep + ".git"):
-            return current_dir
-        current_dir = os.path.dirname(current_dir)
-    return ""
+    return subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        encoding="ascii",
+    ).stdout.rstrip()
 
 
 def walk_if(top, pred):
@@ -558,13 +505,13 @@ class Lib:
         )
         parser_rebase.add_argument("new_tag", help="The tag to rebase onto")
 
-        parser_format_patch = subparsers.add_parser(
+        subparsers.add_parser(
             "format-patch",
             help="Generates patch files for the upstream repository and moves them into the upstream_utils patch directory",
         )
 
         subparsers.add_parser(
-            "copy-upstream-to-thirdparty",
+            "copy-src",
             help="Copies files from the upstream repository into the thirdparty directory in allwpilib",
         )
 
@@ -581,5 +528,5 @@ class Lib:
             self.rebase(args.new_tag)
         elif args.subcommand == "format-patch":
             self.format_patch()
-        elif args.subcommand == "copy-upstream-to-thirdparty":
+        elif args.subcommand == "copy-src":
             self.copy_upstream_to_thirdparty()
