@@ -321,6 +321,7 @@ public class Tracer {
    * @param name the name of the trace, should be unique to the function.
    * @param runnable the function to trace.
    */
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public static void traceFunc(String name, Runnable runnable) {
     final TracerState state = threadLocalState.get();
     startTraceInner(name, state);
@@ -350,6 +351,7 @@ public class Tracer {
    * @param supplier the function to trace.
    * @return the return value of the function.
    */
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public static <R> R traceFunc(String name, Supplier<R> supplier) {
     final TracerState state = threadLocalState.get();
     startTraceInner(name, state);
