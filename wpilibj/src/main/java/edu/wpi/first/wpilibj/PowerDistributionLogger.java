@@ -99,7 +99,7 @@ public class PowerDistributionLogger {
   }
 
   @SuppressWarnings("PMD.RedundantFieldInitializer")
-  private static final class PowerDistributionStats implements StructSerializable {
+  static final class PowerDistributionStats implements StructSerializable {
 
     private int m_faults = 0;
     private int m_stickyFaults = 0;
@@ -109,9 +109,9 @@ public class PowerDistributionLogger {
     private double m_temperature = 0.0;
     private double[] m_currents = new double[24];
 
-    private PowerDistributionStats() {}
+    PowerDistributionStats() {}
 
-    private PowerDistributionStats(
+    PowerDistributionStats(
         int faults,
         int stickyFaults,
         double voltage,
@@ -137,9 +137,32 @@ public class PowerDistributionLogger {
       m_temperature = PowerDistributionJNI.getTemperature(handle);
       PowerDistributionJNI.getAllCurrents(handle, m_currents);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof PowerDistributionStats) {
+        PowerDistributionStats other = (PowerDistributionStats) obj;
+        if (m_currents.length == other.m_currents.length) {
+          for (int i = 0; i < m_currents.length; i++) {
+            if (Math.abs(m_currents[i] - other.m_currents[i]) > 0.1) {
+              return false;
+            }
+          }
+        } else {
+          return false;
+        }
+        return m_faults == other.m_faults
+            && m_stickyFaults == other.m_stickyFaults
+            && Math.abs(m_voltage - other.m_voltage) < 0.1
+            && Math.abs(m_totalCurrent - other.m_totalCurrent) < 0.1
+            && Math.abs(m_temperature - other.m_temperature) < 0.1
+            && m_switchableChannel == other.m_switchableChannel;
+      }
+      return false;
+    }
   }
 
-  private static final class PowerDistributionStatsStruct
+  static final class PowerDistributionStatsStruct
       implements Struct<PowerDistributionStats> {
     private static final int kSize = 4 + 4 + 8 + 8 + 1 + 8 + (8 * 24);
 
@@ -208,7 +231,7 @@ public class PowerDistributionLogger {
     }
   }
 
-  private static final class PowerDistributionMeta implements StructSerializable {
+  static final class PowerDistributionMeta implements StructSerializable {
 
     private final int m_canId;
     private final int m_type;
@@ -222,12 +245,29 @@ public class PowerDistributionLogger {
       m_version = PowerDistributionJNI.getVersion(handle);
     }
 
-    private PowerDistributionMeta(
+    PowerDistributionMeta(
         int canId, int type, int channelCount, PowerDistributionVersion version) {
       m_canId = canId;
       m_type = type;
       m_channelCount = channelCount;
       m_version = version;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof PowerDistributionMeta) {
+        PowerDistributionMeta other = (PowerDistributionMeta) obj;
+        return m_canId == other.m_canId
+            && m_type == other.m_type
+            && m_channelCount == other.m_channelCount
+            && m_version.firmwareFix == other.m_version.firmwareFix
+            && m_version.firmwareMajor == other.m_version.firmwareMajor
+            && m_version.firmwareMinor == other.m_version.firmwareMinor
+            && m_version.hardwareMajor == other.m_version.hardwareMajor
+            && m_version.hardwareMinor == other.m_version.hardwareMinor
+            && m_version.uniqueId == other.m_version.uniqueId;
+      }
+      return false;
     }
   }
 
