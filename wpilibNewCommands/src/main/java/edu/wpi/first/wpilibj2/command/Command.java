@@ -573,17 +573,31 @@ public abstract class Command implements Sendable {
   /**
    * Decorates this Command with a name.
    *
-   * <p>The returned commands `Execute` method is implicitly timed using the {@link Tracer} class.
-   *
    * @param name name
    * @return the decorated Command
    */
   public WrapperCommand withName(String name) {
+    WrapperCommand wrapper = new WrapperCommand(Command.this) {};
+    wrapper.setName(name);
+    return wrapper;
+  }
+
+  /**
+   * Decorates this Command so that it's `Execute` method is implicitly timed using the {@link Tracer} class.
+   * This decorator also names the command similarly to the {@link #withName(String)} method.
+   *
+   * @param name name
+   * @return the decorated Command
+   */
+  public WrapperCommand traced(String name) {
     WrapperCommand wrapper =
         new WrapperCommand(Command.this) {
           @Override
           public void execute() {
-            Tracer.traceFunc(name + "Execute", super::execute);
+            // Avoid `Trace.traceFunc` to keep it out of the stack trace
+            Tracer.startTrace(name);
+            super.execute();
+            Tracer.endTrace();
           }
         };
     wrapper.setName(name);

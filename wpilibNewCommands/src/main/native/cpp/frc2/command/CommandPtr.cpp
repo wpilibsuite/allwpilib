@@ -245,10 +245,17 @@ CommandPtr CommandPtr::HandleInterrupt(std::function<void()> handler) && {
       });
 }
 
+CommandPtr CommandPtr::WithName(std::string_view name) && {
+  AssertValid();
+  WrapperCommand wrapper{std::move(m_ptr)};
+  wrapper.SetName(name);
+  return std::move(wrapper).ToPtr();
+}
+
 namespace {
-class NamedCommand : public WrapperCommand {
+class TracedCommand : public WrapperCommand {
  public:
-  NamedCommand(std::unique_ptr<Command>&& command, std::string_view name)
+  TracedCommand(std::unique_ptr<Command>&& command, std::string_view name)
       : WrapperCommand(std::move(command)), m_name(name) {}
 
   void Execute() override {
@@ -262,9 +269,9 @@ class NamedCommand : public WrapperCommand {
 };
 }  // namespace
 
-CommandPtr CommandPtr::WithName(std::string_view name) && {
+CommandPtr CommandPtr::Traced(std::string_view name) && {
   AssertValid();
-  m_ptr = std::make_unique<NamedCommand>(std::move(m_ptr), name);
+  m_ptr = std::make_unique<TracedCommand>(std::move(m_ptr), name);
   m_ptr->SetName(name);
   return std::move(*this);
 }

@@ -149,6 +149,11 @@ CommandPtr Command::WithName(std::string_view name) && {
   return std::move(*this).ToPtr().WithName(name);
 }
 
+CommandPtr Command::Traced(std::string_view name) && {
+  return std::move(*this).ToPtr().Traced(name);
+}
+
+
 void Command::Schedule() {
   CommandScheduler::GetInstance().Schedule(this);
 }
