@@ -24,6 +24,14 @@ Drive::Drive() {
   // Sets the distance per pulse for the encoders
   m_leftEncoder.SetDistancePerPulse(DriveConstants::kEncoderDistancePerPulse);
   m_rightEncoder.SetDistancePerPulse(DriveConstants::kEncoderDistancePerPulse);
+
+  // Set the controller to be continuous (because it is an angle controller)
+  m_controller.EnableContinuousInput(-180_deg, 180_deg);
+  // Set the controller tolerance - the delta tolerance ensures the robot is
+  // stationary at the setpoint before it is considered as having reached the
+  // reference
+  m_controller.SetTolerance(DriveConstants::kTurnTolerance,
+                            DriveConstants::kTurnRateTolerance);
 }
 
 frc2::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
@@ -54,10 +62,10 @@ frc2::CommandPtr Drive::DriveDistanceCommand(units::meter_t distance,
 
 frc2::CommandPtr Drive::TurnToAngleCommand(units::degree_t angle) {
   return StartRun(
-             [this] { m_controller.Reset(m_gyro.GetRotation2d().Radians()); },
+             [this] { m_controller.Reset(m_gyro.GetRotation2d().Degrees()); },
              [this, angle] {
                m_drive.ArcadeDrive(
-                   0, m_controller.Calculate(m_gyro.GetRotation2d().Radians(),
+                   0, m_controller.Calculate(m_gyro.GetRotation2d().Degrees(),
                                              angle) +
                           // Divide feedforward voltage by battery voltage to
                           // normalize it to [-1, 1]
