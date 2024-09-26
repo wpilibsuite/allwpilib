@@ -437,8 +437,6 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private void printLoopOverrunMessage() {
     DriverStation.reportWarning(
-      "Loop time of " + m_period + "s overrun\n    Check NetworkTables for timing info",
-      false
-    );
+        "Loop time of " + m_period + "s overrun\n    Check NetworkTables for timing info", false);
   }
 }

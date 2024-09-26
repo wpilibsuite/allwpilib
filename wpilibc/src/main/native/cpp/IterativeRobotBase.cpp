@@ -223,8 +223,7 @@ void IterativeRobotBase::LoopFunc() {
 
 void IterativeRobotBase::PrintLoopOverrunMessage() {
   FRC_ReportError(
-    err::Error,
-    "Loop time of {:.6f}s overrun\n    Check NetworkTables for timing info",
-    m_period.value()
-  );
+      err::Error,
+      "Loop time of {:.6f}s overrun\n    Check NetworkTables for timing info",
+      m_period.value());
 }

@@ -272,8 +272,9 @@ class CommandPtr final {
   CommandPtr WithName(std::string_view name) &&;
 
   /**
-   * Decorates this Command so that it's `Execute` method is implicitly timed using the `Tracer` class.
-   * This decorator also names the command similarly to the `WithName(string)` method.
+   * Decorates this Command so that it's `Execute` method is implicitly timed
+   * using the `Tracer` class. This decorator also names the command similarly
+   * to the `WithName(string)` method.
    *
    * @param name name
    * @return the decorated Command

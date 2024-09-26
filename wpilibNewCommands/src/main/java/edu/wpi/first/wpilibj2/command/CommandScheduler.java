@@ -98,11 +98,13 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   private final List<Optional<Command>> m_toCancelInterruptors = new ArrayList<>();
   private final Set<Command> m_endingCommands = new LinkedHashSet<>();
 
-  private final Watchdog m_watchdog = new Watchdog(
-    TimedRobot.kDefaultPeriod,
-    () -> {
-      System.out.println("CommandScheduler loop overrun, check NetworkTables for timing info");
-    });
+  private final Watchdog m_watchdog =
+      new Watchdog(
+          TimedRobot.kDefaultPeriod,
+          () -> {
+            System.out.println(
+                "CommandScheduler loop overrun, check NetworkTables for timing info");
+          });
 
   CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
