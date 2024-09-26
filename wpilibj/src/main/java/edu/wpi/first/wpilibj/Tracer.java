@@ -324,7 +324,20 @@ public class Tracer {
   public static void traceFunc(String name, Runnable runnable) {
     final TracerState state = threadLocalState.get();
     startTraceInner(name, state);
-    runnable.run();
+    try {
+      runnable.run();
+    } catch (Exception e) {
+      endTraceInner(state);
+      StackTraceElement[] stackTrace = e.getStackTrace();
+      ArrayList<StackTraceElement> newStackTrace = new ArrayList<>();
+      for (StackTraceElement element : stackTrace) {
+        if (!element.getClassName().contains("edu.wpi.first.wpilibj.Tracer")) {
+          newStackTrace.add(element);
+        }
+      }
+      e.setStackTrace(newStackTrace.toArray(new StackTraceElement[0]));
+      throw e;
+    }
     endTraceInner(state);
   }
 
@@ -340,9 +353,22 @@ public class Tracer {
   public static <R> R traceFunc(String name, Supplier<R> supplier) {
     final TracerState state = threadLocalState.get();
     startTraceInner(name, state);
-    R ret = supplier.get();
-    endTraceInner(state);
-    return ret;
+    try {
+      R ret = supplier.get();
+      endTraceInner(state);
+      return ret;
+    } catch (Exception e) {
+      endTraceInner(state);
+      StackTraceElement[] stackTrace = e.getStackTrace();
+      ArrayList<StackTraceElement> newStackTrace = new ArrayList<>();
+      for (StackTraceElement element : stackTrace) {
+        if (!element.getClassName().contains("edu.wpi.first.wpilibj.Tracer")) {
+          newStackTrace.add(element);
+        }
+      }
+      e.setStackTrace(newStackTrace.toArray(new StackTraceElement[0]));
+      throw e;
+    }
   }
 
   /** This function is only to be used in tests and is package private to prevent misuse. */
