@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.DoubleEntry;
@@ -20,6 +21,7 @@ class TracerTest {
   void setup() {
     HAL.initialize(500, 0);
     SimHooks.pauseTiming();
+    Tracer.resetForTest();
   }
 
   @AfterEach
@@ -33,21 +35,118 @@ class TracerTest {
     final String threadName = Thread.currentThread().getName();
     Tracer.disableGcLoggingForCurrentThread();
 
-    Tracer.startTrace("Test1");
-    Tracer.traceFunc("Test2", () -> SimHooks.stepTiming(0.4));
+    Tracer.startTrace("FuncTest1");
+    Tracer.traceFunc("FuncTest2", () -> SimHooks.stepTiming(0.4));
     SimHooks.stepTiming(0.1);
     Tracer.endTrace();
 
     DoubleEntry test1Entry =
         NetworkTableInstance.getDefault()
-            .getDoubleTopic("/Tracer/" + threadName + "/Test1")
+            .getDoubleTopic("/Tracer/" + threadName + "/FuncTest1")
             .getEntry(0.0);
     DoubleEntry test2Entry =
         NetworkTableInstance.getDefault()
-            .getDoubleTopic("/Tracer/" + threadName + "/Test1/Test2")
+            .getDoubleTopic("/Tracer/" + threadName + "/FuncTest1/FuncTest2")
             .getEntry(0.0);
 
     assertEquals(500.0, test1Entry.get(), 1.0);
     assertEquals(400.0, test2Entry.get(), 1.0);
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void traceThreadTest() {
+    final String threadName = Thread.currentThread().getName();
+
+    Tracer.disableGcLoggingForCurrentThread();
+
+    // run a trace in the main thread, assert that the tracer ran
+    {
+      Tracer.startTrace("ThreadTest1");
+      SimHooks.stepTiming(0.1);
+      Tracer.endTrace();
+
+      DoubleEntry test1Entry =
+      NetworkTableInstance.getDefault()
+          .getDoubleTopic("/Tracer/" + threadName + "/ThreadTest1")
+          .getEntry(0.0);
+      assertEquals(100.0, test1Entry.get(), 1.0);
+    }
+
+    // run a trace in a new thread, assert that the tracer ran
+    // and that the output position and value are correct
+    {
+      final String newThreadName = "TestThread";
+      try {
+          Thread thread = new Thread(
+              () -> {
+                Tracer.disableGcLoggingForCurrentThread();
+                Tracer.startTrace("ThreadTest1");
+                SimHooks.stepTiming(0.4);
+                Tracer.endTrace();
+              },
+              newThreadName
+          );
+          thread.start();
+          thread.join();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+
+      DoubleEntry test2Entry =
+          NetworkTableInstance.getDefault()
+              .getDoubleTopic("/Tracer/" + newThreadName + "/ThreadTest1")
+              .getEntry(0.0);
+      assertEquals(400.0, test2Entry.get(), 1.0);
+    }
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void traceSingleThreadTest() {
+    final String newThreadName = "TestThread";
+
+    // start a trace in the main thread, assert that the tracer ran
+    // and that the thread name is not in the trace path
+    {
+      Tracer.enableSingleThreadedMode();
+      Tracer.disableGcLoggingForCurrentThread();
+
+      Tracer.startTrace("SingleThreadTest1");
+      SimHooks.stepTiming(0.1);
+      Tracer.endTrace();
+
+      DoubleEntry test1Entry = NetworkTableInstance.getDefault()
+          .getDoubleTopic("/Tracer/SingleThreadTest1")
+          .getEntry(0.0);
+      assertEquals(100.0, test1Entry.get(), 1.0);
+    }
+
+    // start a trace in a new thread after enabling single threaded mode,
+    // this should disable the tracer on the new thread, assert that the tracer did not run
+    {
+      try {
+        Thread thread = new Thread(
+            () -> {
+              Tracer.disableGcLoggingForCurrentThread();
+              Tracer.startTrace("SingleThreadTest1");
+              SimHooks.stepTiming(0.4);
+              Tracer.endTrace();
+            },
+            newThreadName
+        );
+        thread.start();
+        thread.join();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+
+      boolean test2EntryExists =
+          NetworkTableInstance.getDefault()
+              .getDoubleTopic("/Tracer/" + newThreadName + "/SingleThreadTest1")
+              .exists();
+
+      assertTrue(!test2EntryExists);
+    }
   }
 }

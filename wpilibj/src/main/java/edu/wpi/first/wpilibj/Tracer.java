@@ -87,7 +87,7 @@ public class Tracer {
      * If the cycle is poisened, it will warn the user
      * and not publish any data.
      */
-    boolean m_cyclePoisened = false;
+    boolean m_cyclePoisoned = false;
 
     /** If the tracer is disabled, it will not publish any data or do any string manipulation. */
     boolean m_disabled = false;
@@ -150,8 +150,8 @@ public class Tracer {
       if (m_disabled) {
         return "";
       }
-      if (m_traceStack.isEmpty() || m_traceStackHistory.isEmpty() || m_cyclePoisened) {
-        m_cyclePoisened = true;
+      if (m_traceStack.isEmpty() || m_traceStackHistory.isEmpty() || m_cyclePoisoned) {
+        m_cyclePoisoned = true;
         return "";
       }
       m_traceStack.remove(m_traceStack.size() - 1);
@@ -167,7 +167,7 @@ public class Tracer {
     }
 
     private void endCycle() {
-      if (m_disabled != m_disableNextCycle || m_cyclePoisened) {
+      if (m_disabled != m_disableNextCycle || m_cyclePoisoned) {
         // Gives publishers empty times,
         // reporting no data is better than bad data
         for (var publisher : m_publishers.entrySet()) {
@@ -343,6 +343,16 @@ public class Tracer {
     R ret = supplier.get();
     endTraceInner(state);
     return ret;
+  }
+
+  /**
+   * This function is only to be used in tests
+   * and is package private to prevent misuse.
+   */
+  static void resetForTest() {
+    threadLocalState.remove();
+    singleThreadedMode.set(false);
+    anyTracesStarted.set(false);
   }
 
   // A REIMPLEMENTATION OF THE OLD TRACER TO NOT BREAK OLD CODE
