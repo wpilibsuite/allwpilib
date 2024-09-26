@@ -4,6 +4,9 @@
 
 #include "frc/smartdashboard/MechanismLigament2d.h"
 
+#include <cstdio>
+#include <memory>
+
 #include <wpi/StringExtras.h>
 #include <wpi/json.h>
 

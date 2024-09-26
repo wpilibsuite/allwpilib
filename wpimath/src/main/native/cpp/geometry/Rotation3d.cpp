@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <numbers>
+#include <string>
 
 #include <Eigen/Core>
 #include <Eigen/LU>

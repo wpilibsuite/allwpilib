@@ -5,6 +5,7 @@
 #include "hal/AddressableLED.h"
 
 #include <cstring>
+#include <memory>
 
 #include <fmt/format.h>
 

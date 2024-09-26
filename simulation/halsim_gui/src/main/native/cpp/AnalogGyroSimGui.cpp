@@ -4,12 +4,11 @@
 
 #include "AnalogGyroSimGui.h"
 
-#include <glass/hardware/AnalogGyro.h>
-#include <glass/other/DeviceTree.h>
-
 #include <memory>
 #include <vector>
 
+#include <glass/hardware/AnalogGyro.h>
+#include <glass/other/DeviceTree.h>
 #include <hal/Ports.h>
 #include <hal/Value.h>
 #include <hal/simulation/AnalogGyroData.h>

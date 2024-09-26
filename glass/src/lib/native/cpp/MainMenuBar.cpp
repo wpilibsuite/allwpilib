@@ -4,6 +4,9 @@
 
 #include "glass/MainMenuBar.h"
 
+#include <memory>
+#include <utility>
+
 #include <imgui.h>
 #include <wpi/StringExtras.h>
 #include <wpigui.h>

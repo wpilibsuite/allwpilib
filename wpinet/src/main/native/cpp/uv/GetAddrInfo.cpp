@@ -4,10 +4,13 @@
 
 #include "wpinet/uv/GetAddrInfo.h"
 
+#include <functional>
+#include <memory>
+#include <utility>
+
 #include <wpi/SmallString.h>
 
 #include "wpinet/uv/Loop.h"
-#include "wpinet/uv/util.h"
 
 namespace wpi::uv {
 

@@ -4,6 +4,8 @@
 
 #include "glass/networktables/NTMotorController.h"
 
+#include <utility>
+
 #include <fmt/format.h>
 #include <wpi/StringExtras.h>
 

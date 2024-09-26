@@ -4,6 +4,9 @@
 
 #include "wpi/protobuf/ProtobufMessageDatabase.h"
 
+#include <memory>
+#include <string>
+
 #include <google/protobuf/descriptor.h>
 
 #include "wpi/ProtoHelper.h"

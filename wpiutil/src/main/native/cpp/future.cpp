@@ -4,6 +4,8 @@
 
 #include "wpi/future.h"
 
+#include <utility>
+
 namespace wpi {
 namespace detail {
 

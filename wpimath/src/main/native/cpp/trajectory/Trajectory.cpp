@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <vector>
 
 #include <wpi/MathExtras.h>
 #include <wpi/json.h>

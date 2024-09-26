@@ -4,8 +4,7 @@
 
 #include "frc/AnalogOutput.h"
 
-#include <limits>
-#include <utility>
+#include <string>
 
 #include <hal/AnalogOutput.h>
 #include <hal/FRCUsageReporting.h>

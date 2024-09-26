@@ -4,6 +4,8 @@
 
 #include "glass/networktables/NTSubsystem.h"
 
+#include <utility>
+
 #include <fmt/format.h>
 
 using namespace glass;

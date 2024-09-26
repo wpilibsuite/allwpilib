@@ -4,6 +4,9 @@
 
 #include "ValueCircularBuffer.h"
 
+#include <utility>
+#include <vector>
+
 using namespace nt;
 
 std::vector<Value> ValueCircularBuffer::ReadValue(unsigned int types) {

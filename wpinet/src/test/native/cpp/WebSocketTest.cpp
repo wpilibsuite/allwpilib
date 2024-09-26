@@ -6,6 +6,9 @@
 
 #include "WebSocketTest.h"
 
+#include <utility>
+#include <vector>
+
 #include <wpi/StringExtras.h>
 
 #include "wpinet/HttpParser.h"

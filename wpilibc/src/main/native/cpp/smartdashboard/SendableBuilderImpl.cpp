@@ -4,6 +4,10 @@
 
 #include "frc/smartdashboard/SendableBuilderImpl.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+
 #include <networktables/BooleanArrayTopic.h>
 #include <networktables/BooleanTopic.h>
 #include <networktables/DoubleArrayTopic.h>
@@ -17,8 +21,6 @@
 #include <ntcore_cpp.h>
 #include <wpi/SmallVector.h>
 #include <wpi/json.h>
-
-#include "frc/smartdashboard/SmartDashboard.h"
 
 using namespace frc;
 

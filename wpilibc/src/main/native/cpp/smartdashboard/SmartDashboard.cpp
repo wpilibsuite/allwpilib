@@ -4,6 +4,11 @@
 
 #include "frc/smartdashboard/SmartDashboard.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>

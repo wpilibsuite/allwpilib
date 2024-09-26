@@ -6,7 +6,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <functional>
 #include <mutex>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <units/math.h>

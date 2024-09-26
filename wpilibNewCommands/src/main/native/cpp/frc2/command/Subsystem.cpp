@@ -4,6 +4,9 @@
 
 #include "frc2/command/Subsystem.h"
 
+#include <string>
+#include <utility>
+
 #include <wpi/Demangle.h>
 
 #include "frc2/command/CommandPtr.h"

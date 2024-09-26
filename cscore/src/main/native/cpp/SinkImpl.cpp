@@ -4,6 +4,8 @@
 
 #include "SinkImpl.h"
 
+#include <string>
+
 #include <wpi/SmallString.h>
 #include <wpi/json.h>
 

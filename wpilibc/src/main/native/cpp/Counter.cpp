@@ -4,7 +4,7 @@
 
 #include "frc/Counter.h"
 
-#include <utility>
+#include <memory>
 
 #include <hal/Counter.h>
 #include <hal/FRCUsageReporting.h>

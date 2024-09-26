@@ -4,13 +4,12 @@
 
 #include "PowerDistributionSimGui.h"
 
-#include <glass/hardware/PowerDistribution.h>
-
 #include <cstdio>
 #include <cstring>
 #include <memory>
 #include <vector>
 
+#include <glass/hardware/PowerDistribution.h>
 #include <hal/Ports.h>
 #include <hal/simulation/PowerDistributionData.h>
 

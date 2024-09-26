@@ -6,6 +6,10 @@
 
 #include <arpa/inet.h>
 
+#include <memory>
+#include <string>
+#include <utility>
+
 #include <wpi/SmallString.h>
 
 #include "dns_sd.h"

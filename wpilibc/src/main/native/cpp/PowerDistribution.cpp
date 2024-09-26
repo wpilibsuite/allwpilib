@@ -4,6 +4,8 @@
 
 #include "frc/PowerDistribution.h"
 
+#include <vector>
+
 #include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/Ports.h>
@@ -13,7 +15,6 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
-#include "frc/SensorUtil.h"
 
 static_assert(static_cast<HAL_PowerDistributionType>(
                   frc::PowerDistribution::ModuleType::kCTRE) ==

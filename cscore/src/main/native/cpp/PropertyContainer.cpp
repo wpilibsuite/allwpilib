@@ -4,6 +4,10 @@
 
 #include "PropertyContainer.h"
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include <wpi/Logger.h>
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>

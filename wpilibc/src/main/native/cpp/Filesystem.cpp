@@ -4,6 +4,8 @@
 
 #include "frc/Filesystem.h"
 
+#include <string>
+
 #include <wpi/fs.h>
 
 #include "frc/RobotBase.h"

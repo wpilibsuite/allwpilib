@@ -4,6 +4,9 @@
 
 #include "wpi/struct/SchemaParser.h"
 
+#include <string>
+#include <utility>
+
 #include <fmt/format.h>
 
 #include "wpi/StringExtras.h"

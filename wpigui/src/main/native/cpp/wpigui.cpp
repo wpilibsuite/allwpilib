@@ -10,7 +10,9 @@
 #include <chrono>
 #include <cstdio>
 #include <cstring>
+#include <string>
 #include <thread>
+#include <utility>
 
 #include <GLFW/glfw3.h>
 #include <IconsFontAwesome6.h>

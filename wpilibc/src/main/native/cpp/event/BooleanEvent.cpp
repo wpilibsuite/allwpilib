@@ -4,6 +4,9 @@
 
 #include "frc/event/BooleanEvent.h"
 
+#include <memory>
+#include <utility>
+
 using namespace frc;
 
 BooleanEvent::BooleanEvent(EventLoop* loop, std::function<bool()> condition)

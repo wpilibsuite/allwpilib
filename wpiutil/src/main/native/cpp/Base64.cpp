@@ -57,6 +57,9 @@
 
 #include "wpi/Base64.h"
 
+#include <string>
+#include <vector>
+
 #include "wpi/SmallVector.h"
 #include "wpi/raw_ostream.h"
 

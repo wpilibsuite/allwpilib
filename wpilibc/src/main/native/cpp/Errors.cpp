@@ -4,7 +4,8 @@
 
 #include "frc/Errors.h"
 
-#include <exception>
+#include <string>
+#include <utility>
 
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>

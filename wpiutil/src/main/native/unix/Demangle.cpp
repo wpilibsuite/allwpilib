@@ -7,6 +7,7 @@
 #include <cxxabi.h>
 
 #include <cstdio>
+#include <string>
 
 #include "wpi/SmallString.h"
 

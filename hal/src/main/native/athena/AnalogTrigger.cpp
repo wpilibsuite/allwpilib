@@ -4,6 +4,8 @@
 
 #include "hal/AnalogTrigger.h"
 
+#include <memory>
+
 #include "AnalogInternal.h"
 #include "ConstantsInternal.h"
 #include "DutyCycleInternal.h"

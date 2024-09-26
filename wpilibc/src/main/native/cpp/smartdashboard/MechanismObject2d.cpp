@@ -4,6 +4,8 @@
 
 #include "frc/smartdashboard/MechanismObject2d.h"
 
+#include <string>
+
 using namespace frc;
 
 MechanismObject2d::MechanismObject2d(std::string_view name) : m_name{name} {}

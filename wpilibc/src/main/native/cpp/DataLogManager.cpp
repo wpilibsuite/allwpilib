@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <ctime>
 #include <random>
+#include <string>
+#include <vector>
 
 #include <fmt/chrono.h>
 #include <networktables/NetworkTableInstance.h>

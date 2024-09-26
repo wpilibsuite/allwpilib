@@ -4,10 +4,13 @@
 
 #include "wpinet/WebSocket.h"
 
+#include <functional>
+#include <memory>
 #include <random>
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <wpi/Base64.h>
 #include <wpi/SmallString.h>

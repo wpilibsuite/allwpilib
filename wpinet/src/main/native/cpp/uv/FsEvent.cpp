@@ -5,6 +5,8 @@
 #include "wpinet/uv/FsEvent.h"
 
 #include <cstdlib>
+#include <memory>
+#include <string>
 
 #include <wpi/SmallString.h>
 

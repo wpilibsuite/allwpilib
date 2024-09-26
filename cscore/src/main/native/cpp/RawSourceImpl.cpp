@@ -4,11 +4,11 @@
 
 #include "RawSourceImpl.h"
 
+#include <memory>
+
 #include <wpi/timestamp.h>
 
-#include "Handle.h"
 #include "Instance.h"
-#include "Log.h"
 #include "Notifier.h"
 #include "cscore_raw.h"
 

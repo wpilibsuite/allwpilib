@@ -9,6 +9,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <string>
+#include <vector>
+
 namespace cs {
 
 std::vector<std::string> GetNetworkInterfaces() {

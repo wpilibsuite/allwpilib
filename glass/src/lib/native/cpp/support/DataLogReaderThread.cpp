@@ -4,6 +4,7 @@
 
 #include "glass/support/DataLogReaderThread.h"
 
+#include <string>
 #include <utility>
 
 #include <wpi/StringExtras.h>

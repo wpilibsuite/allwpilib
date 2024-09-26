@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <cstdio>
 #include <system_error>
 #include <utility>
 

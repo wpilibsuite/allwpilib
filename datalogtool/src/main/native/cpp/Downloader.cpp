@@ -13,6 +13,9 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include <fmt/format.h>
 #include <glass/Storage.h>

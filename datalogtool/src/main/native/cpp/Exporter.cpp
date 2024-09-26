@@ -6,12 +6,14 @@
 
 #include <atomic>
 #include <ctime>
+#include <functional>
 #include <future>
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <fmt/chrono.h>

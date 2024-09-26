@@ -5,7 +5,6 @@
 #include <cstring>
 
 #include "DriverStationDataInternal.h"
-#include "hal/DriverStation.h"
 
 using namespace hal;
 

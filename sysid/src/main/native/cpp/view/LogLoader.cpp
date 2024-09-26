@@ -7,7 +7,10 @@
 #include <algorithm>
 #include <memory>
 #include <span>
+#include <string>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include <glass/support/DataLogReaderThread.h>
 #include <imgui.h>

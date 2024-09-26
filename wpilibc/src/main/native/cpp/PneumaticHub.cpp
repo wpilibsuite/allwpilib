@@ -5,6 +5,9 @@
 #include "frc/PneumaticHub.h"
 
 #include <array>
+#include <cstdio>
+#include <memory>
+#include <string>
 
 #include <fmt/format.h>
 #include <hal/REVPH.h>

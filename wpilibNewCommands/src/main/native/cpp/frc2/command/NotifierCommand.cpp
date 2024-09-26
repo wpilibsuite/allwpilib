@@ -4,6 +4,8 @@
 
 #include "frc2/command/NotifierCommand.h"
 
+#include <utility>
+
 using namespace frc2;
 
 NotifierCommand::NotifierCommand(std::function<void()> toRun,

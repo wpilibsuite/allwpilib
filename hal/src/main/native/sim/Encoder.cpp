@@ -4,6 +4,8 @@
 
 #include "hal/Encoder.h"
 
+#include <limits>
+
 #include "CounterInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"

@@ -4,6 +4,8 @@
 
 #include "frc/simulation/PneumaticsBaseSim.h"
 
+#include <memory>
+
 #include "frc/Errors.h"
 #include "frc/PneumaticsModuleType.h"
 #include "frc/simulation/CTREPCMSim.h"

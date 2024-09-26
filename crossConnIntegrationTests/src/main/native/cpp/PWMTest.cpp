@@ -4,6 +4,7 @@
 
 #include <atomic>
 #include <thread>
+#include <utility>
 
 #include <gtest/gtest.h>
 #include <hal/DMA.h>

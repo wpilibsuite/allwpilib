@@ -5,6 +5,7 @@
 #include "hal/CANAPI.h"
 
 #include <ctime>
+#include <memory>
 
 #include <wpi/DenseMap.h>
 #include <wpi/mutex.h>

@@ -11,7 +11,6 @@
 #include <networktables/NetworkTableListener.h>
 #include <networktables/StringTopic.h>
 
-#include "frc/shuffleboard/ShuffleboardInstance.h"
 #include "shuffleboard/MockActuatorSendable.h"
 
 class NTWrapper {

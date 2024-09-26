@@ -6,8 +6,12 @@
 
 #include <algorithm>
 #include <array>
+#include <functional>
+#include <memory>
 #include <ostream>
 #include <span>
+#include <utility>
+#include <vector>
 
 #include <gmock/gmock.h>
 #include <wpi/SpanMatcher.h>

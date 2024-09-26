@@ -4,6 +4,8 @@
 
 #include "frc/shuffleboard/ShuffleboardLayout.h"
 
+#include <memory>
+
 #include <wpi/json.h>
 
 using namespace frc;

@@ -7,6 +7,8 @@
 #include <array>
 #include <bitset>
 #include <cmath>
+#include <string>
+#include <vector>
 
 #include <Eigen/Eigenvalues>
 #include <fmt/format.h>
@@ -14,8 +16,6 @@
 #include <units/math.h>
 #include <units/time.h>
 
-#include "sysid/analysis/AnalysisManager.h"
-#include "sysid/analysis/FilteringUtils.h"
 #include "sysid/analysis/OLS.h"
 
 namespace sysid {

@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <thread>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <wpi/Synchronization.h>

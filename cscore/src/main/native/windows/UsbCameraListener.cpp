@@ -9,6 +9,8 @@
 
 #include <dbt.h>  // NOLINT(build/include_order)
 
+#include <memory>
+
 #define IDT_TIMER1 1001
 
 using namespace cs;

@@ -5,6 +5,10 @@
 #include "LocalStorage.h"
 
 #include <algorithm>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <fmt/ranges.h>
 #include <wpi/DataLog.h>

@@ -4,12 +4,11 @@
 
 #include "AnalogOutputSimGui.h"
 
-#include <glass/hardware/AnalogOutput.h>
-#include <glass/other/DeviceTree.h>
-
 #include <memory>
 #include <vector>
 
+#include <glass/hardware/AnalogOutput.h>
+#include <glass/other/DeviceTree.h>
 #include <hal/Ports.h>
 #include <hal/simulation/AnalogOutData.h>
 

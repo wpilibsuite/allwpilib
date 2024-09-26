@@ -4,13 +4,16 @@
 
 #include "cscore_cpp.h"
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include <wpi/SmallString.h>
 #include <wpi/json.h>
 #include <wpinet/hostname.h>
 
 #include "Handle.h"
 #include "Instance.h"
-#include "Log.h"
 #include "NetworkListener.h"
 #include "Notifier.h"
 #include "PropertyContainer.h"

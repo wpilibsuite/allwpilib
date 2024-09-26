@@ -4,6 +4,8 @@
 
 #include "glass/networktables/NTCommandScheduler.h"
 
+#include <utility>
+
 #include <fmt/format.h>
 #include <wpi/StringExtras.h>
 

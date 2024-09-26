@@ -7,7 +7,9 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
+#include <string>
 #include <string_view>
+#include <vector>
 
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>

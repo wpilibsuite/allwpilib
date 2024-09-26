@@ -5,7 +5,7 @@
 #include "Telemetry.h"
 
 #include <chrono>
-#include <limits>
+#include <utility>
 
 #include <wpi/DenseMap.h>
 #include <wpi/timestamp.h>
@@ -14,7 +14,6 @@
 #include "Instance.h"
 #include "Notifier.h"
 #include "SourceImpl.h"
-#include "cscore_cpp.h"
 
 using namespace cs;
 

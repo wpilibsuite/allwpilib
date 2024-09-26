@@ -5,6 +5,9 @@
 #include "cameraserver/CameraServer.h"
 
 #include <atomic>
+#include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>

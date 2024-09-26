@@ -4,6 +4,8 @@
 
 #include "frc/simulation/AnalogGyroSim.h"  // NOLINT(build/include_order)
 
+#include <memory>
+
 #include <gtest/gtest.h>
 #include <hal/HAL.h>
 

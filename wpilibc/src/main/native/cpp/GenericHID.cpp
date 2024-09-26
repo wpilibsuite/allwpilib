@@ -4,6 +4,8 @@
 
 #include "frc/GenericHID.h"
 
+#include <string>
+
 #include <hal/DriverStation.h>
 
 #include "frc/DriverStation.h"

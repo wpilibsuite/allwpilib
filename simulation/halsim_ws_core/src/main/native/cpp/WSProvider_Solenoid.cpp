@@ -4,6 +4,10 @@
 
 #include "WSProvider_Solenoid.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+
 #include <fmt/format.h>
 #include <hal/Ports.h>
 #include <hal/simulation/CTREPCMData.h>

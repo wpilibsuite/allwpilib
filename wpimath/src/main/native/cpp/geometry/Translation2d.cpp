@@ -4,6 +4,8 @@
 
 #include "frc/geometry/Translation2d.h"
 
+#include <algorithm>
+
 #include <wpi/json.h>
 
 #include "units/math.h"

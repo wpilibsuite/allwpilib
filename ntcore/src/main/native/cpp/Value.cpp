@@ -6,8 +6,12 @@
 
 #include <algorithm>
 #include <cstring>
+#include <memory>
 #include <numeric>
 #include <span>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <wpi/MemAlloc.h>
 #include <wpi/timestamp.h>

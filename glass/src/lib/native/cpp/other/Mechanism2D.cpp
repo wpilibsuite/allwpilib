@@ -8,8 +8,10 @@
 #include <cmath>
 #include <cstdio>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>

@@ -4,15 +4,17 @@
 
 #include "cscore_c.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdlib>
+#include <utility>
+#include <vector>
 
 #include <wpi/MemAlloc.h>
 #include <wpi/SmallString.h>
 
 #include "c_util.h"
 #include "cscore_cpp.h"
-#include "cscore_raw.h"
 
 static CS_Event ConvertToC(const cs::RawEvent& rawEvent) {
   CS_Event event;

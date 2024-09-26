@@ -3,8 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <memory>
+#include <string>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 
 #ifndef _WIN32
 #include <arpa/inet.h>

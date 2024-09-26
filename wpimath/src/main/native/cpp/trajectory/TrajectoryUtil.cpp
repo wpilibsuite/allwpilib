@@ -4,6 +4,7 @@
 
 #include "frc/trajectory/TrajectoryUtil.h"
 
+#include <string>
 #include <system_error>
 
 #include <fmt/format.h>

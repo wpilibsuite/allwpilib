@@ -4,6 +4,9 @@
 
 #include "frc/smartdashboard/Field2d.h"
 
+#include <memory>
+#include <utility>
+
 #include <networktables/DoubleArrayTopic.h>
 #include <networktables/NTSendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>

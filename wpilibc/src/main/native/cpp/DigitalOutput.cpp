@@ -4,7 +4,7 @@
 
 #include "frc/DigitalOutput.h"
 
-#include <limits>
+#include <string>
 
 #include <hal/DIO.h>
 #include <hal/FRCUsageReporting.h>

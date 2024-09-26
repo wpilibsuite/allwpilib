@@ -4,6 +4,8 @@
 
 #include "glass/hardware/LEDDisplay.h"
 
+#include <vector>
+
 #include <wpi/SmallVector.h>
 
 #include "glass/Context.h"

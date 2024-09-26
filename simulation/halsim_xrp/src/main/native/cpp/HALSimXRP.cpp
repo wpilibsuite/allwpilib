@@ -5,6 +5,7 @@
 #include "HALSimXRP.h"
 
 #include <cstdio>
+#include <string>
 
 #include <wpi/Endian.h>
 #include <wpi/MathExtras.h>

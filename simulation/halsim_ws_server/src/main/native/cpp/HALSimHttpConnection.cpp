@@ -6,6 +6,8 @@
 
 #include <uv.h>
 
+#include <cstdio>
+#include <string>
 #include <string_view>
 
 #include <wpi/MemoryBuffer.h>

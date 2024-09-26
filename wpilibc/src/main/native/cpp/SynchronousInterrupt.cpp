@@ -4,7 +4,9 @@
 
 #include "frc/SynchronousInterrupt.h"
 
+#include <memory>
 #include <type_traits>
+#include <utility>
 
 #include <hal/Interrupts.h>
 #include <wpi/NullDeleter.h>

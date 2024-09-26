@@ -4,6 +4,8 @@
 
 #include "wpinet/HttpServerConnection.h"
 
+#include <memory>
+
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
 #include <wpi/SpanExtras.h>

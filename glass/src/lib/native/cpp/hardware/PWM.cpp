@@ -4,6 +4,8 @@
 
 #include "glass/hardware/PWM.h"
 
+#include <string>
+
 #include <imgui.h>
 #include <wpi/StringExtras.h>
 

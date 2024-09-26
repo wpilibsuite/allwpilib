@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <string>
+#include <utility>
 
 #include <fmt/format.h>
 #include <wpi/MathExtras.h>

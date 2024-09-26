@@ -4,6 +4,9 @@
 
 #include "wpi/protobuf/Protobuf.h"
 
+#include <string>
+#include <vector>
+
 #include <fmt/format.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor.pb.h>

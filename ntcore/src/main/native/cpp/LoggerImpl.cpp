@@ -4,6 +4,8 @@
 
 #include "LoggerImpl.h"
 
+#include <string>
+
 #include <wpi/Logger.h>
 #include <wpi/SmallVector.h>
 #include <wpi/fs.h>

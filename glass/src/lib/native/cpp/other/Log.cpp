@@ -4,6 +4,8 @@
 
 #include "glass/other/Log.h"
 
+#include <string>
+
 #include <imgui.h>
 
 using namespace glass;

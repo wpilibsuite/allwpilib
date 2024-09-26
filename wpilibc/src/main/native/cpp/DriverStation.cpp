@@ -8,12 +8,10 @@
 
 #include <array>
 #include <atomic>
-#include <chrono>
+#include <memory>
 #include <span>
 #include <string>
 #include <string_view>
-#include <thread>
-#include <type_traits>
 
 #include <fmt/format.h>
 #include <hal/DriverStation.h>
@@ -33,7 +31,6 @@
 #include <wpi/timestamp.h>
 
 #include "frc/Errors.h"
-#include "frc/MotorSafety.h"
 #include "frc/Timer.h"
 
 using namespace frc;

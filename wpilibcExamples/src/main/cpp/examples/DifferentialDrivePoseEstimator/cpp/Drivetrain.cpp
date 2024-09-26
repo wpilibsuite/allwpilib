@@ -4,7 +4,7 @@
 
 #include "Drivetrain.h"
 
-#include "ExampleGlobalMeasurementSensor.h"
+#include <vector>
 
 Drivetrain::Drivetrain() {
   m_leftLeader.AddFollower(m_leftFollower);

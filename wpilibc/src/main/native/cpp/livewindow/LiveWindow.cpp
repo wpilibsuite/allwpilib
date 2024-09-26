@@ -4,6 +4,8 @@
 
 #include "frc/livewindow/LiveWindow.h"
 
+#include <memory>
+
 #include <networktables/BooleanTopic.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>

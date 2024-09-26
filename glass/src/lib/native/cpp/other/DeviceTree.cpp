@@ -5,6 +5,7 @@
 #include "glass/other/DeviceTree.h"
 
 #include <cinttypes>
+#include <string>
 
 #include <imgui.h>
 #include <wpi/StringExtras.h>

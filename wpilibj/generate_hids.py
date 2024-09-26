@@ -23,7 +23,7 @@ def generate_hids(output_directory: Path, template_directory: Path):
 
     # Java files
     env = Environment(
-        loader=FileSystemLoader(template_directory),
+        loader=FileSystemLoader(template_directory / "main/java"),
         autoescape=False,
         keep_trailing_newline=True,
     )

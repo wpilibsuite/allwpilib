@@ -5,6 +5,7 @@
 #include "AnalogInternal.h"
 
 #include <atomic>
+#include <memory>
 
 #include <wpi/mutex.h>
 

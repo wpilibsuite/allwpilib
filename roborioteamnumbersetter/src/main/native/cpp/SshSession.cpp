@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 
 #include <algorithm>
-#include <stdexcept>
+#include <string>
 
 #include <fmt/format.h>
 #include <libssh/libssh.h>

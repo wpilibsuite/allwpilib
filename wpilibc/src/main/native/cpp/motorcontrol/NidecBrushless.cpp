@@ -4,6 +4,8 @@
 
 #include "frc/motorcontrol/NidecBrushless.h"
 
+#include <string>
+
 #include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>

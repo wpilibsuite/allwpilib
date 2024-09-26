@@ -4,6 +4,8 @@
 
 #include "frc/shuffleboard/ComplexWidget.h"
 
+#include <memory>
+
 #include <wpi/sendable/Sendable.h>
 
 #include "frc/smartdashboard/SendableBuilderImpl.h"

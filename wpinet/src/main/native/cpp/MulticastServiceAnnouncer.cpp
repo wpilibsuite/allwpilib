@@ -4,6 +4,9 @@
 
 #include "wpinet/MulticastServiceAnnouncer.h"
 
+#include <memory>
+#include <utility>
+
 #include <wpi/SmallVector.h>
 
 #include "MulticastHandleManager.h"

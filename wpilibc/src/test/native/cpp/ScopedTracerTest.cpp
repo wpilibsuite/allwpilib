@@ -24,5 +24,5 @@ TEST(ScopedTracerTest, Timing) {
   frc::sim::ResumeTiming();
 
   std::string_view out = os.str();
-  EXPECT_TRUE(wpi::starts_with(out, "	timing_test: 1.5"));
+  EXPECT_TRUE(wpi::starts_with(out, "\ttiming_test: 1.5"));
 }

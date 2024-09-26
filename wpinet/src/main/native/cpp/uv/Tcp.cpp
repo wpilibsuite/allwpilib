@@ -5,6 +5,9 @@
 #include "wpinet/uv/Tcp.h"
 
 #include <cstring>
+#include <functional>
+#include <memory>
+#include <utility>
 
 #include "wpinet/uv/util.h"
 

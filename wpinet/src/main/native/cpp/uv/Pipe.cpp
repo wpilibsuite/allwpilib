@@ -5,6 +5,10 @@
 #include "wpinet/uv/Pipe.h"
 
 #include <cstdlib>
+#include <functional>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include <wpi/SmallString.h>
 

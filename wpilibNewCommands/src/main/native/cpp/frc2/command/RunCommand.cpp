@@ -4,6 +4,8 @@
 
 #include "frc2/command/RunCommand.h"
 
+#include <utility>
+
 using namespace frc2;
 
 RunCommand::RunCommand(std::function<void()> toRun, Requirements requirements)

@@ -6,6 +6,10 @@
 
 #include <frc/Errors.h>
 
+#include <map>
+#include <set>
+#include <string>
+
 using namespace frc;
 
 std::map<int, std::string> XRPMotor::s_simDeviceMap = {

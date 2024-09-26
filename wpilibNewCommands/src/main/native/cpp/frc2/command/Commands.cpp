@@ -4,6 +4,9 @@
 
 #include "frc2/command/Commands.h"
 
+#include <utility>
+#include <vector>
+
 #include <wpi/deprecated.h>
 
 #include "frc2/command/ConditionalCommand.h"

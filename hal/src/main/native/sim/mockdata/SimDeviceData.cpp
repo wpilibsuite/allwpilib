@@ -5,6 +5,8 @@
 #include "hal/simulation/SimDeviceData.h"  // NOLINT(build/include_order)
 
 #include <algorithm>
+#include <memory>
+#include <utility>
 
 #include <wpi/StringExtras.h>
 

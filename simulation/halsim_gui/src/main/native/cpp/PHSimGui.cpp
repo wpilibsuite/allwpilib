@@ -4,13 +4,12 @@
 
 #include "PHSimGui.h"
 
-#include <glass/hardware/Pneumatic.h>
-#include <glass/other/DeviceTree.h>
-
 #include <cstdio>
 #include <memory>
 #include <vector>
 
+#include <glass/hardware/Pneumatic.h>
+#include <glass/other/DeviceTree.h>
 #include <hal/Ports.h>
 #include <hal/Value.h>
 #include <hal/simulation/REVPHData.h>

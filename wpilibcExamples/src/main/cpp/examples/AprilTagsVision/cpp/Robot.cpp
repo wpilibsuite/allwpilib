@@ -4,9 +4,9 @@
 
 #include <cstdio>
 #include <span>
-#include <sstream>
 #include <string>
 #include <thread>
+#include <vector>
 
 #include <cameraserver/CameraServer.h>
 #include <fmt/format.h>

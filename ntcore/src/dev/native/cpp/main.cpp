@@ -7,10 +7,12 @@
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
+#include <limits>
 #include <numeric>
 #include <random>
 #include <string_view>
 #include <thread>
+#include <vector>
 
 #include <fmt/format.h>
 #include <fmt/ranges.h>

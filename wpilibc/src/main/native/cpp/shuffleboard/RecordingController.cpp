@@ -4,6 +4,8 @@
 
 #include "frc/shuffleboard/RecordingController.h"
 
+#include <string>
+
 #include "frc/Errors.h"
 
 using namespace frc;

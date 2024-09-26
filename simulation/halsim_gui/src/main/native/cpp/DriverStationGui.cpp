@@ -4,12 +4,6 @@
 
 #include "DriverStationGui.h"
 
-#include <glass/Context.h>
-#include <glass/Storage.h>
-#include <glass/other/FMS.h>
-#include <glass/support/ExtraGuiWidgets.h>
-#include <glass/support/NameSetting.h>
-
 #include <algorithm>
 #include <atomic>
 #include <cstring>
@@ -20,6 +14,11 @@
 
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
+#include <glass/Context.h>
+#include <glass/Storage.h>
+#include <glass/other/FMS.h>
+#include <glass/support/ExtraGuiWidgets.h>
+#include <glass/support/NameSetting.h>
 #include <hal/DriverStationTypes.h>
 #include <hal/simulation/DriverStationData.h>
 #include <hal/simulation/MockHooks.h>

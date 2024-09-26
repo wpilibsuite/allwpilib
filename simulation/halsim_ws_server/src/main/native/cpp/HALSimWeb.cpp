@@ -4,6 +4,9 @@
 
 #include "HALSimWeb.h"
 
+#include <memory>
+#include <string>
+
 #include <wpi/SmallString.h>
 #include <wpi/fs.h>
 #include <wpi/print.h>

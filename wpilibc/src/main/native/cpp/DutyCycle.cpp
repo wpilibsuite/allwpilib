@@ -4,6 +4,8 @@
 
 #include "frc/DutyCycle.h"
 
+#include <utility>
+
 #include <hal/DutyCycle.h>
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>

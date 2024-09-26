@@ -4,6 +4,8 @@
 
 #include "WSProvider_BuiltInAccelerometer.h"
 
+#include <memory>
+
 #include <hal/Ports.h>
 #include <hal/simulation/AccelerometerData.h>
 

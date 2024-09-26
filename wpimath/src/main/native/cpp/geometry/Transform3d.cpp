@@ -4,6 +4,8 @@
 
 #include "frc/geometry/Transform3d.h"
 
+#include <utility>
+
 #include "frc/geometry/Pose3d.h"
 
 using namespace frc;

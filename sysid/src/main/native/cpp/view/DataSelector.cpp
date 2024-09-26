@@ -4,6 +4,11 @@
 
 #include "sysid/view/DataSelector.h"
 
+#include <algorithm>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <fmt/format.h>
 #include <glass/support/DataLogReaderThread.h>
 #include <imgui.h>

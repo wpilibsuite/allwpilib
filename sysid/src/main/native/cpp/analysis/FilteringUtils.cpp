@@ -4,10 +4,13 @@
 
 #include "sysid/analysis/FilteringUtils.h"
 
+#include <algorithm>
+#include <functional>
 #include <limits>
 #include <numbers>
 #include <numeric>
-#include <stdexcept>
+#include <string>
+#include <tuple>
 #include <vector>
 
 #include <fmt/format.h>

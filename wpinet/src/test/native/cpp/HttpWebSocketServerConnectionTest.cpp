@@ -4,6 +4,8 @@
 
 #include "wpinet/HttpWebSocketServerConnection.h"  // NOLINT(build/include_order)
 
+#include <memory>
+
 #include <gtest/gtest.h>
 
 namespace wpi {

@@ -34,6 +34,7 @@ SOFTWARE.
 #include "wpi/Signal.h"  // NOLINT(build/include_order)
 
 #include <cmath>
+#include <memory>
 #include <sstream>
 #include <string>
 

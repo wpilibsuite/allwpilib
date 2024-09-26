@@ -4,6 +4,8 @@
 
 #include "frc/sysid/SysIdRoutineLog.h"
 
+#include <string>
+
 #include <fmt/format.h>
 
 #include "frc/DataLogManager.h"

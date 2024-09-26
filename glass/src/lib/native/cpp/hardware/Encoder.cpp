@@ -4,6 +4,8 @@
 
 #include "glass/hardware/Encoder.h"
 
+#include <string>
+
 #include <fmt/format.h>
 #include <imgui.h>
 #include <wpi/StringExtras.h>

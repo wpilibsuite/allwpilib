@@ -12,6 +12,7 @@
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
+#include <string>
 
 int main(int argc, char* argv[]) {
   char path[PATH_MAX];

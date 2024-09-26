@@ -4,6 +4,9 @@
 
 #include "frc/motorcontrol/MotorControllerGroup.h"
 
+#include <utility>
+#include <vector>
+
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 

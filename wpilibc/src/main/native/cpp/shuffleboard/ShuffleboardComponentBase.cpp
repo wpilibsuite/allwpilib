@@ -4,6 +4,9 @@
 
 #include "frc/shuffleboard/ShuffleboardComponentBase.h"
 
+#include <memory>
+#include <string>
+
 using namespace frc;
 
 ShuffleboardComponentBase::ShuffleboardComponentBase(

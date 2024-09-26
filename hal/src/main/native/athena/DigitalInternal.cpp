@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <cmath>
+#include <memory>
 #include <thread>
 
 #include <FRC_NetworkCommunication/LoadOut.h>

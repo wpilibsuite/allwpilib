@@ -7,6 +7,7 @@
 #include <optional>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <imgui.h>
 #include <imgui_stdlib.h>

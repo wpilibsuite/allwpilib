@@ -4,6 +4,9 @@
 
 #include "frc2/command/SequentialCommandGroup.h"
 
+#include <utility>
+#include <vector>
+
 #include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc2;

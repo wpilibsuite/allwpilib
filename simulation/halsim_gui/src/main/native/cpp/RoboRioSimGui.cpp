@@ -4,10 +4,9 @@
 
 #include "RoboRioSimGui.h"
 
-#include <glass/hardware/RoboRio.h>
-
 #include <memory>
 
+#include <glass/hardware/RoboRio.h>
 #include <hal/simulation/RoboRioData.h>
 
 #include "HALDataSource.h"

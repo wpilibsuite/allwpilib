@@ -26,6 +26,7 @@
 #include "wpinet/uv/Async.h"  // NOLINT(build/include_order)
 
 #include <atomic>
+#include <functional>
 #include <thread>
 
 #include <gtest/gtest.h>

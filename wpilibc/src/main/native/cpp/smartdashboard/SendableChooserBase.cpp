@@ -4,6 +4,8 @@
 
 #include "frc/smartdashboard/SendableChooserBase.h"
 
+#include <utility>
+
 #include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;

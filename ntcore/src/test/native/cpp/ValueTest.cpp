@@ -3,7 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <algorithm>
+#include <string>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -13,7 +16,7 @@
 
 using namespace std::string_view_literals;
 
-namespace std {  // NOLINT(clang-tidy.cert-dcl58-cpp)
+namespace std {  // NOLINT (clang-tidy.cert-dcl58-cpp)
 template <typename T, typename U>
 inline bool operator==(std::span<T> lhs, std::span<U> rhs) {
   if (lhs.size() != rhs.size()) {

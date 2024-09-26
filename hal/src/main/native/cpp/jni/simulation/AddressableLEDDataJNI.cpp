@@ -4,6 +4,8 @@
 
 #include <jni.h>
 
+#include <memory>
+
 #include "CallbackStore.h"
 #include "ConstBufferCallbackStore.h"
 #include "edu_wpi_first_hal_simulation_AddressableLEDDataJNI.h"

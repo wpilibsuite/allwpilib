@@ -18,6 +18,9 @@
 #endif
 
 #include <random>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 

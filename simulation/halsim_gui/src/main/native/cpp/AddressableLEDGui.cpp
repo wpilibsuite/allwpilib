@@ -4,8 +4,10 @@
 
 #include "AddressableLEDGui.h"
 
-#include <glass/hardware/LEDDisplay.h>
+#include <memory>
+#include <vector>
 
+#include <glass/hardware/LEDDisplay.h>
 #include <hal/Ports.h>
 #include <hal/simulation/AddressableLEDData.h>
 #include <imgui.h>

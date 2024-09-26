@@ -5,13 +5,13 @@
 #include "Frame.h"
 
 #include <cstdlib>
+#include <memory>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "Instance.h"
-#include "Log.h"
 #include "SourceImpl.h"
 
 using namespace cs;

@@ -4,6 +4,8 @@
 
 #include "frc/simulation/PowerDistributionSim.h"  // NOLINT(build/include_order)
 
+#include <vector>
+
 #include <gtest/gtest.h>
 #include <hal/HAL.h>
 

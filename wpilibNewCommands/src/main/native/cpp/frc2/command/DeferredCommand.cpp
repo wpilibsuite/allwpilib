@@ -4,6 +4,8 @@
 
 #include "frc2/command/DeferredCommand.h"
 
+#include <utility>
+
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc2/command/Commands.h"

@@ -4,6 +4,8 @@
 
 #include "frc/event/EventLoop.h"
 
+#include <utility>
+
 #include "frc/Errors.h"
 
 using namespace frc;

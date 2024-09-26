@@ -4,12 +4,16 @@
 
 #include "HttpCameraImpl.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <wpi/MemAlloc.h>
 #include <wpi/StringExtras.h>
 #include <wpi/timestamp.h>
 #include <wpinet/TCPConnector.h>
 
-#include "Handle.h"
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"

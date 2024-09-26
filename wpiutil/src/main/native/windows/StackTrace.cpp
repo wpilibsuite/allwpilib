@@ -4,6 +4,8 @@
 
 #include "wpi/StackTrace.h"
 
+#include <string>
+
 #include "StackWalker.h"
 #include "wpi/ConvertUTF.h"
 #include "wpi/SmallString.h"

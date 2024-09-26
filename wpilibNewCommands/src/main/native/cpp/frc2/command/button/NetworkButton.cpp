@@ -4,6 +4,9 @@
 
 #include "frc2/command/button/NetworkButton.h"
 
+#include <memory>
+#include <utility>
+
 using namespace frc2;
 
 NetworkButton::NetworkButton(nt::BooleanTopic topic)

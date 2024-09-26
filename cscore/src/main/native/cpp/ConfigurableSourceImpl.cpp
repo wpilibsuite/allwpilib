@@ -4,11 +4,13 @@
 
 #include "ConfigurableSourceImpl.h"
 
+#include <memory>
+#include <string>
+
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
 #include "Instance.h"
-#include "Log.h"
 #include "Notifier.h"
 
 using namespace cs;

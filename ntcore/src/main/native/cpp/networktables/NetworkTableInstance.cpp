@@ -4,6 +4,11 @@
 
 #include "networktables/NetworkTableInstance.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <wpi/SmallVector.h>
 #include <wpi/print.h>
 

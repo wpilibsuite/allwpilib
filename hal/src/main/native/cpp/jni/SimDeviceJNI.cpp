@@ -4,6 +4,9 @@
 
 #include <jni.h>
 
+#include <string>
+#include <vector>
+
 #include <wpi/jni_util.h>
 
 #include "HALUtil.h"

@@ -5,6 +5,8 @@
 #include "WebServerClientTest.h"
 
 #include <cstdio>
+#include <memory>
+#include <string>
 
 #include <fmt/format.h>
 #include <wpi/SmallString.h>

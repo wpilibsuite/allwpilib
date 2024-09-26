@@ -5,6 +5,10 @@
 #include "wpinet/ParallelTcpConnector.h"
 
 #include <cstring>
+#include <functional>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include <fmt/format.h>
 #include <wpi/Logger.h>

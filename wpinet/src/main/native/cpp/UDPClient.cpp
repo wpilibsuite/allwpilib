@@ -16,6 +16,8 @@
 #include <unistd.h>
 #endif
 
+#include <utility>
+
 #include <wpi/Logger.h>
 #include <wpi/SmallString.h>
 

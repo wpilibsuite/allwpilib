@@ -4,6 +4,8 @@
 
 #include "frc2/command/WaitUntilCommand.h"
 
+#include <utility>
+
 #include <frc/Timer.h>
 
 using namespace frc2;

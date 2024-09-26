@@ -6,6 +6,9 @@
 
 #include <algorithm>
 #include <concepts>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <wpi/Logger.h>

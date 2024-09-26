@@ -5,6 +5,9 @@
 #include "glass/networktables/NTField2D.h"
 
 #include <algorithm>
+#include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>

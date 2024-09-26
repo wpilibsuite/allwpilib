@@ -4,7 +4,7 @@
 
 #include "wpi/future.h"  // NOLINT(build/include_order)
 
-#include <thread>
+#include <utility>
 
 #include <gtest/gtest.h>
 

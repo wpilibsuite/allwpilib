@@ -4,6 +4,8 @@
 
 #include "frc2/command/StartEndCommand.h"
 
+#include <utility>
+
 using namespace frc2;
 
 StartEndCommand::StartEndCommand(std::function<void()> onInit,

@@ -12,6 +12,7 @@
 #include <hal/handles/IndexedHandleResource.h>
 
 #include <cstring>
+#include <string>
 #include <thread>
 
 #include <fmt/format.h>

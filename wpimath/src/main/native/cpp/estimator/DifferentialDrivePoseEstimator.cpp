@@ -4,6 +4,8 @@
 
 #include "frc/estimator/DifferentialDrivePoseEstimator.h"
 
+#include <vector>
+
 using namespace frc;
 
 DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(

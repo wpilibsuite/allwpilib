@@ -4,6 +4,8 @@
 
 #include "HALSimWSClient.h"
 
+#include <memory>
+
 #include <WSProviderContainer.h>
 #include <WSProvider_AddressableLED.h>
 #include <WSProvider_Analog.h>

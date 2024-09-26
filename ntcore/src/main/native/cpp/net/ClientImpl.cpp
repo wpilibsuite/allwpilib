@@ -4,9 +4,11 @@
 
 #include "ClientImpl.h"
 
+#include <memory>
 #include <numeric>
 #include <optional>
 #include <string>
+#include <utility>
 #include <variant>
 
 #include <fmt/format.h>

@@ -4,6 +4,10 @@
 
 #include "frc2/command/ParallelDeadlineGroup.h"
 
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc2;

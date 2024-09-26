@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <glass/Model.h>
-#include <glass/Provider.h>
-
 #include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include <glass/Model.h>
+#include <glass/Provider.h>
 
 namespace halsimgui {
 

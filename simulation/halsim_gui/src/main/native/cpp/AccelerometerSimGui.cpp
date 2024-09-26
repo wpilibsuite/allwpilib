@@ -4,11 +4,10 @@
 
 #include "AccelerometerSimGui.h"
 
-#include <glass/hardware/Accelerometer.h>
-#include <glass/other/DeviceTree.h>
-
 #include <memory>
 
+#include <glass/hardware/Accelerometer.h>
+#include <glass/other/DeviceTree.h>
 #include <hal/Value.h>
 #include <hal/simulation/AccelerometerData.h>
 

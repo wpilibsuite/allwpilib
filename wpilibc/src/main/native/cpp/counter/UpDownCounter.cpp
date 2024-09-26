@@ -4,6 +4,8 @@
 
 #include "frc/counter/UpDownCounter.h"
 
+#include <memory>
+
 #include <hal/Counter.h>
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>

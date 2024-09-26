@@ -5,6 +5,10 @@
 #include "frc2/command/CommandScheduler.h"
 
 #include <cstdio>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <frc/RobotBase.h>
 #include <frc/RobotState.h>

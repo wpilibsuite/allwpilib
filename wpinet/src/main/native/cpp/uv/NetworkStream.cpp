@@ -4,6 +4,9 @@
 
 #include "wpinet/uv/NetworkStream.h"
 
+#include <functional>
+#include <utility>
+
 namespace wpi::uv {
 
 ConnectReq::ConnectReq() {

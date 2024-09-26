@@ -4,6 +4,8 @@
 
 #include "wpinet/DsClient.h"
 
+#include <memory>
+
 #include <fmt/format.h>
 #include <wpi/Logger.h>
 #include <wpi/StringExtras.h>

@@ -5,6 +5,9 @@
 #include "wpi/struct/DynamicStruct.h"
 
 #include <algorithm>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include <fmt/format.h>
 

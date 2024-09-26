@@ -4,6 +4,8 @@
 
 #include "wpinet/uv/Process.h"
 
+#include <memory>
+
 #include <wpi/SmallString.h>
 
 #include "wpinet/uv/Loop.h"
