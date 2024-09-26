@@ -72,7 +72,7 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
 
 CommandScheduler::CommandScheduler()
     : m_impl(new Impl), m_watchdog(frc::TimedRobot::kDefaultPeriod, [] {
-        std::puts("CommandScheduler loop time overrun.");
+        std::puts("CommandScheduler loop overrun, check NetworkTables for timing info");
       }) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand2_Scheduler);

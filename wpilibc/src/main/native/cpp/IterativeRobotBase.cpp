@@ -197,7 +197,6 @@ void IterativeRobotBase::LoopFunc() {
                       std::bind(&IterativeRobotBase::TestPeriodic, this));
   }
 
-  // RobotPeriodic();
   Tracer::TraceFunc("RobotPeriodic",
                     std::bind(&IterativeRobotBase::RobotPeriodic, this));
 
@@ -223,5 +222,9 @@ void IterativeRobotBase::LoopFunc() {
 }
 
 void IterativeRobotBase::PrintLoopOverrunMessage() {
-  FRC_ReportError(err::Error, "Loop time of {:.6f}s overrun", m_period.value());
+  FRC_ReportError(
+    err::Error,
+    "Loop time of {:.6f}s overrun\n    Check NetworkTables for timing info",
+    m_period.value()
+  );
 }
