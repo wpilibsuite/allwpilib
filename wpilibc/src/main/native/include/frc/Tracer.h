@@ -28,7 +28,7 @@ class Tracer {
  public:
   /**
    * Starts a trace,
-   * should be called at the beginning of a function thats not being called by
+   * should be called at the beginning of a function that's not being called by
    * user code.
    * Should be paired with `Tracer.endTrace()` at the end of the function.
    *
@@ -37,7 +37,7 @@ class Tracer {
   static void StartTrace(std::string_view name);
 
   /**
-   * Ends a trace, should only be called at the end of a function thats not
+   * Ends a trace, should only be called at the end of a function that's not
    * being called by user code. If a `Tracer.startTrace(string)` is not paired
    * with a `Tracer.endTrace()` there will be timing issues and dropped timing
    * data.
@@ -106,7 +106,7 @@ class Tracer {
 
   /**
    * Starts a trace,
-   * should be called at the beginning of a function thats not being called by
+   * should be called at the beginning of a function that's not being called by
    * user code.
    * This is a RAII version of `Tracer.startTrace(string)`,
    * and will automatically call `Tracer.endTrace()` when the scope ends and

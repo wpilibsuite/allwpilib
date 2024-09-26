@@ -248,7 +248,7 @@ public class Tracer {
   }
 
   /**
-   * Starts a trace, should be called at the beginning of a function thats not being called by user
+   * Starts a trace, should be called at the beginning of a function that's not being called by user
    * code.
    *
    * @param name the name of the trace, should be unique to the function.
@@ -258,7 +258,7 @@ public class Tracer {
   }
 
   /**
-   * Ends a trace, should only be called at the end of a function thats not being called by user
+   * Ends a trace, should only be called at the end of a function that's not being called by user
    * code. If a {@link Tracer#startTrace(String)} is not paired with a {@link Tracer#endTrace()}
    * there could be dropped or incorrect data.
    */
