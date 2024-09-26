@@ -345,10 +345,7 @@ public class Tracer {
     return ret;
   }
 
-  /**
-   * This function is only to be used in tests
-   * and is package private to prevent misuse.
-   */
+  /** This function is only to be used in tests and is package private to prevent misuse. */
   static void resetForTest() {
     threadLocalState.remove();
     singleThreadedMode.set(false);

@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.DoubleEntry;
@@ -67,9 +67,9 @@ class TracerTest {
       Tracer.endTrace();
 
       DoubleEntry test1Entry =
-      NetworkTableInstance.getDefault()
-          .getDoubleTopic("/Tracer/" + threadName + "/ThreadTest1")
-          .getEntry(0.0);
+          NetworkTableInstance.getDefault()
+              .getDoubleTopic("/Tracer/" + threadName + "/ThreadTest1")
+              .getEntry(0.0);
       assertEquals(100.0, test1Entry.get(), 1.0);
     }
 
@@ -78,17 +78,17 @@ class TracerTest {
     {
       final String newThreadName = "TestThread";
       try {
-          Thread thread = new Thread(
-              () -> {
-                Tracer.disableGcLoggingForCurrentThread();
-                Tracer.startTrace("ThreadTest1");
-                SimHooks.stepTiming(0.4);
-                Tracer.endTrace();
-              },
-              newThreadName
-          );
-          thread.start();
-          thread.join();
+        Thread thread =
+            new Thread(
+                () -> {
+                  Tracer.disableGcLoggingForCurrentThread();
+                  Tracer.startTrace("ThreadTest1");
+                  SimHooks.stepTiming(0.4);
+                  Tracer.endTrace();
+                },
+                newThreadName);
+        thread.start();
+        thread.join();
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       }
@@ -116,9 +116,10 @@ class TracerTest {
       SimHooks.stepTiming(0.1);
       Tracer.endTrace();
 
-      DoubleEntry test1Entry = NetworkTableInstance.getDefault()
-          .getDoubleTopic("/Tracer/SingleThreadTest1")
-          .getEntry(0.0);
+      DoubleEntry test1Entry =
+          NetworkTableInstance.getDefault()
+              .getDoubleTopic("/Tracer/SingleThreadTest1")
+              .getEntry(0.0);
       assertEquals(100.0, test1Entry.get(), 1.0);
     }
 
@@ -126,15 +127,15 @@ class TracerTest {
     // this should disable the tracer on the new thread, assert that the tracer did not run
     {
       try {
-        Thread thread = new Thread(
-            () -> {
-              Tracer.disableGcLoggingForCurrentThread();
-              Tracer.startTrace("SingleThreadTest1");
-              SimHooks.stepTiming(0.4);
-              Tracer.endTrace();
-            },
-            newThreadName
-        );
+        Thread thread =
+            new Thread(
+                () -> {
+                  Tracer.disableGcLoggingForCurrentThread();
+                  Tracer.startTrace("SingleThreadTest1");
+                  SimHooks.stepTiming(0.4);
+                  Tracer.endTrace();
+                },
+                newThreadName);
         thread.start();
         thread.join();
       } catch (InterruptedException e) {
@@ -146,7 +147,7 @@ class TracerTest {
               .getDoubleTopic("/Tracer/" + newThreadName + "/SingleThreadTest1")
               .exists();
 
-      assertTrue(!test2EntryExists);
+      assertFalse(test2EntryExists);
     }
   }
 }
