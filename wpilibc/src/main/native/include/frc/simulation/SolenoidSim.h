@@ -18,8 +18,31 @@ class SolenoidSim {
   SolenoidSim(PneumaticsModuleType type, int channel);
   ~SolenoidSim() = default;
 
+  /**
+   * Returns the solenoid output.
+   * @return the solenoid output.
+   */
   bool Get() const;
+
+  /**
+   * Returns the solenoid output.
+   * @return the solenoid output.
+   */
+  [[deprecated("Use Get method instead.")]]
+  bool GetOutput() const;
+
+  /**
+   * Sets the solenoid output.
+   * @param output The new solenoid output.
+   */
   void Set(bool output);
+
+  /**
+   * Sets the solenoid output.
+   * @param output The new solenoid output.
+   */
+  [[deprecated("Use Set method instead.")]]
+  void SetOutput(bool output);
 
   /**
    * Returns true if the solenoid is on.

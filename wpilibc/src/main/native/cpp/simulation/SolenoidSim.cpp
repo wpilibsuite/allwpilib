@@ -29,7 +29,15 @@ bool SolenoidSim::Get() const {
   return m_module->GetSolenoidOutput(m_channel);
 }
 
+bool SolenoidSim::GetOutput() const {
+  return m_module->GetSolenoidOutput(m_channel);
+}
+
 void SolenoidSim::Set(bool output) {
+  m_module->SetSolenoidOutput(m_channel, output);
+}
+
+void SolenoidSim::SetOutput(bool output) {
   m_module->SetSolenoidOutput(m_channel, output);
 }
 
