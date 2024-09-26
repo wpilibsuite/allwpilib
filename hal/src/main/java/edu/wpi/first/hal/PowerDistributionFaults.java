@@ -176,7 +176,7 @@ public class PowerDistributionFaults implements StructSerializable {
 
   public static final PowerDistributionFaultsStruct struct = new PowerDistributionFaultsStruct();
 
-  protected static final class PowerDistributionFaultsStruct implements Struct<PowerDistributionFaults> {
+  public static final class PowerDistributionFaultsStruct implements Struct<PowerDistributionFaults> {
     @Override
     public Class<PowerDistributionFaults> getTypeClass() {
       return PowerDistributionFaults.class;

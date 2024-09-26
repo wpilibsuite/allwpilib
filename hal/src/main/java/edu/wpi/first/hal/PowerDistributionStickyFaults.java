@@ -186,67 +186,69 @@ public class PowerDistributionStickyFaults implements StructSerializable {
     HasReset = (faults & 0x20000000) != 0;
   }
 
-  protected static final class PowerDistributionStickyFaultsStruct implements Struct<PowerDistributionStickyFaults> {
+  public static final PowerDistributionStickyFaultsStruct struct = new PowerDistributionStickyFaultsStruct();
+
+  public static final class PowerDistributionStickyFaultsStruct implements Struct<PowerDistributionStickyFaults> {
     @Override
     public Class<PowerDistributionStickyFaults> getTypeClass() {
-        return PowerDistributionStickyFaults.class;
+      return PowerDistributionStickyFaults.class;
     }
 
     @Override
     public int getSize() {
-        return 4; //doing bitfields on a u32
+      return 4; //doing bitfields on a u32
     }
 
     @Override
     public String getSchema() {
-        return "bool channel0BreakerFault:1; "
-            + "bool channel1BreakerFault:1; "
-            + "bool channel2BreakerFault:1; "
-            + "bool channel3BreakerFault:1; "
-            + "bool channel4BreakerFault:1; "
-            + "bool channel5BreakerFault:1; "
-            + "bool channel6BreakerFault:1; "
-            + "bool channel7BreakerFault:1; "
-            + "bool channel8BreakerFault:1; "
-            + "bool channel9BreakerFault:1; "
-            + "bool channel10BreakerFault:1; "
-            + "bool channel11BreakerFault:1; "
-            + "bool channel12BreakerFault:1; "
-            + "bool channel13BreakerFault:1; "
-            + "bool channel14BreakerFault:1; "
-            + "bool channel15BreakerFault:1; "
-            + "bool channel16BreakerFault:1; "
-            + "bool channel17BreakerFault:1; "
-            + "bool channel18BreakerFault:1; "
-            + "bool channel19BreakerFault:1; "
-            + "bool channel20BreakerFault:1; "
-            + "bool channel21BreakerFault:1; "
-            + "bool channel22BreakerFault:1; "
-            + "bool channel23BreakerFault:1; "
-            + "bool brownout:1; "
-            + "bool canWarning:1; "
-            + "bool canBusOff:1; "
-            + "bool hasReset:1;";
+      return "bool channel0BreakerFault:1; "
+          + "bool channel1BreakerFault:1; "
+          + "bool channel2BreakerFault:1; "
+          + "bool channel3BreakerFault:1; "
+          + "bool channel4BreakerFault:1; "
+          + "bool channel5BreakerFault:1; "
+          + "bool channel6BreakerFault:1; "
+          + "bool channel7BreakerFault:1; "
+          + "bool channel8BreakerFault:1; "
+          + "bool channel9BreakerFault:1; "
+          + "bool channel10BreakerFault:1; "
+          + "bool channel11BreakerFault:1; "
+          + "bool channel12BreakerFault:1; "
+          + "bool channel13BreakerFault:1; "
+          + "bool channel14BreakerFault:1; "
+          + "bool channel15BreakerFault:1; "
+          + "bool channel16BreakerFault:1; "
+          + "bool channel17BreakerFault:1; "
+          + "bool channel18BreakerFault:1; "
+          + "bool channel19BreakerFault:1; "
+          + "bool channel20BreakerFault:1; "
+          + "bool channel21BreakerFault:1; "
+          + "bool channel22BreakerFault:1; "
+          + "bool channel23BreakerFault:1; "
+          + "bool brownout:1; "
+          + "bool canWarning:1; "
+          + "bool canBusOff:1; "
+          + "bool hasReset:1;";
     }
 
     @Override
     public String getTypeName() {
-        return "PowerDistributionStickyFaults";
+      return "PowerDistributionStickyFaults";
     }
 
     @Override
     public void pack(ByteBuffer bb, PowerDistributionStickyFaults value) {
-        bb.putInt(value.bitfield);
+      bb.putInt(value.bitfield);
     }
 
     public void pack(ByteBuffer bb, int value) {
-        bb.putInt(value);
+      bb.putInt(value);
     }
 
     @Override
     public PowerDistributionStickyFaults unpack(ByteBuffer bb) {
-        int packed = bb.getInt();
-        return new PowerDistributionStickyFaults(packed);
+      int packed = bb.getInt();
+      return new PowerDistributionStickyFaults(packed);
     }
-}
+  }
 }

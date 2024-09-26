@@ -4,9 +4,14 @@
 
 package edu.wpi.first.hal;
 
+import java.nio.ByteBuffer;
+
+import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
+
 /** Power distribution version. */
 @SuppressWarnings("MemberName")
-public class PowerDistributionVersion {
+public class PowerDistributionVersion implements StructSerializable {
   /** Firmware major version number. */
   public final int firmwareMajor;
 
@@ -49,4 +54,56 @@ public class PowerDistributionVersion {
     this.hardwareMajor = hardwareMajor;
     this.uniqueId = uniqueId;
   }
+
+  public static final PowerDistributionVersionStruct struct = new PowerDistributionVersionStruct();
+
+  public static final class PowerDistributionVersionStruct implements Struct<PowerDistributionVersion> {
+    @Override
+    public Class<PowerDistributionVersion> getTypeClass() {
+      return PowerDistributionVersion.class;
+    }
+
+    @Override
+    public int getSize() {
+      return kSizeInt32;
+    }
+
+    @Override
+    public String getSchema() {
+      return "int8 firmwareMajor; "
+          + "int8 firmwareMinor; "
+          + "int8 firmwareFix; "
+          + "int8 hardwareMinor; "
+          + "int8 hardwareMajor; "
+          + "int32 uniqueId;";
+    }
+
+    @Override
+    public String getTypeName() {
+      return "PowerDistributionVersion";
+    }
+
+    @Override
+    public void pack(ByteBuffer bb, PowerDistributionVersion value) {
+      bb.put((byte) value.firmwareMajor);
+      bb.put((byte) value.firmwareMinor);
+      bb.put((byte) value.firmwareFix);
+      bb.put((byte) value.hardwareMinor);
+      bb.put((byte) value.hardwareMajor);
+      bb.putLong(value.uniqueId);
+    }
+
+    @Override
+    public PowerDistributionVersion unpack(ByteBuffer bb) {
+      return new PowerDistributionVersion(
+        bb.get(),
+        bb.get(),
+        bb.get(),
+        bb.get(),
+        bb.get(),
+        bb.getInt()
+      );
+    }
+  }
+
 }
