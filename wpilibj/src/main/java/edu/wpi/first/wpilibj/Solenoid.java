@@ -12,12 +12,9 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
- * Solenoid class for running high voltage Digital Output on a pneumatics
- * module.
+ * Solenoid class for running high voltage Digital Output on a pneumatics module.
  *
- * <p>
- * The Solenoid class is typically used for pneumatic solenoids, but could be
- * used for any device
+ * <p>The Solenoid class is typically used for pneumatic solenoids, but could be used for any device
  * within the current spec of the module.
  */
 public class Solenoid implements Sendable, AutoCloseable {
@@ -29,7 +26,7 @@ public class Solenoid implements Sendable, AutoCloseable {
    * Constructs a solenoid for a default module and specified type.
    *
    * @param moduleType The module type to use.
-   * @param channel    The channel the solenoid is on.
+   * @param channel The channel the solenoid is on.
    */
   public Solenoid(final PneumaticsModuleType moduleType, final int channel) {
     this(PneumaticsBase.getDefaultForType(moduleType), moduleType, channel);
@@ -38,9 +35,9 @@ public class Solenoid implements Sendable, AutoCloseable {
   /**
    * Constructs a solenoid for a specified module and type.
    *
-   * @param module     The module ID to use.
+   * @param module The module ID to use.
    * @param moduleType The module type to use.
-   * @param channel    The channel the solenoid is on.
+   * @param channel The channel the solenoid is on.
    */
   @SuppressWarnings("this-escape")
   public Solenoid(final int module, final PneumaticsModuleType moduleType, final int channel) {
@@ -74,8 +71,7 @@ public class Solenoid implements Sendable, AutoCloseable {
   /**
    * Set the value of a solenoid.
    *
-   * @param on True will turn the solenoid output on. False will turn the solenoid
-   *           output off.
+   * @param on True will turn the solenoid output on. False will turn the solenoid output off.
    */
   public void set(boolean on) {
     int value = on ? (0xFFFF & m_mask) : 0;
@@ -85,8 +81,7 @@ public class Solenoid implements Sendable, AutoCloseable {
   /**
    * Read the current value of the solenoid.
    *
-   * @return True if the solenoid output is on or false if the solenoid output is
-   *         off.
+   * @return True if the solenoid output is on or false if the solenoid output is off.
    */
   public boolean get() {
     int currentAll = m_module.getSolenoids();
@@ -96,8 +91,7 @@ public class Solenoid implements Sendable, AutoCloseable {
   /**
    * Read the current value of the solenoid.
    *
-   * @return True if the solenoid output is on or false if the solenoid output is
-   *         off.
+   * @return True if the solenoid output is on or false if the solenoid output is off.
    * @deprecated Use get instead
    */
   @Deprecated
@@ -139,9 +133,7 @@ public class Solenoid implements Sendable, AutoCloseable {
   /**
    * Toggle the value of the solenoid.
    *
-   * <p>
-   * If the solenoid is set to on, it'll be turned off. If the solenoid is set to
-   * off, it'll be
+   * <p>If the solenoid is set to on, it'll be turned off. If the solenoid is set to off, it'll be
    * turned on.
    */
   public void toggle() {
@@ -158,8 +150,7 @@ public class Solenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Check if solenoid is DisabledListed. If a solenoid is shorted, it is added to
-   * the Disabled List
+   * Check if solenoid is DisabledListed. If a solenoid is shorted, it is added to the Disabled List
    * and disabled until power cycle, or until faults are cleared.
    *
    * @return If solenoid is disabled due to short.
@@ -169,19 +160,13 @@ public class Solenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Set the pulse duration in the pneumatics module. This is used in conjunction
-   * with the
-   * startPulse method to allow the pneumatics module to control the timing of a
-   * pulse.
+   * Set the pulse duration in the pneumatics module. This is used in conjunction with the
+   * startPulse method to allow the pneumatics module to control the timing of a pulse.
    *
-   * <p>
-   * On the PCM, the timing can be controlled in 0.01 second increments, with a
-   * maximum of 2.55
+   * <p>On the PCM, the timing can be controlled in 0.01 second increments, with a maximum of 2.55
    * seconds.
    *
-   * <p>
-   * On the PH, the timing can be controlled in 0.001 second increments, with a
-   * maximum of 65.534
+   * <p>On the PH, the timing can be controlled in 0.001 second increments, with a maximum of 65.534
    * seconds.
    *
    * @param durationSeconds The duration of the pulse in seconds.
@@ -193,8 +178,7 @@ public class Solenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Trigger the pneumatics module to generate a pulse of the duration set in
-   * setPulseDuration.
+   * Trigger the pneumatics module to generate a pulse of the duration set in setPulseDuration.
    *
    * @see #setPulseDuration(double)
    */
