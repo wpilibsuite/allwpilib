@@ -35,7 +35,6 @@ class TracerState {
       FRC_ReportWarning("Cannot start a new trace in single-threaded mode");
       m_disabled = true;
     }
-    anyTracesStarted = true;
     auto inst = nt::NetworkTableInstance::GetDefault();
     m_rootTable = inst.GetTable(
         fmt::format("/Tracer/{}",
@@ -67,8 +66,8 @@ class TracerState {
     if (m_disabled) {
       return "";
     }
-    if (m_traceStack.empty() || m_cyclePoisened) {
-      m_cyclePoisened = true;
+    if (m_traceStack.empty() || m_cyclePoisoned) {
+      m_cyclePoisoned = true;
       return "";
     }
     std::string stack = BuildStack();
@@ -77,7 +76,7 @@ class TracerState {
   }
 
   void EndCycle() {
-    if (m_disabled != m_disableNextCycle || m_cyclePoisened) {
+    if (m_disabled != m_disableNextCycle || m_cyclePoisoned) {
       // Gives publishers empty times,
       // reporting no data is better than bad data
       for (auto&& [_, publisher] : m_publishers) {
@@ -85,7 +84,8 @@ class TracerState {
       }
       return;
     } else {
-      // Update times for all already existing publishers
+      // Update times for all already existing publishers,
+      // pop trace times for keys with existing publishers
       for (auto&& [key, publisher] : m_publishers) {
         if (auto time = m_traceTimes.find(key); time != m_traceTimes.end()) {
           publisher.Set(time->second.value());
@@ -101,8 +101,7 @@ class TracerState {
         auto topic = m_rootTable->GetDoubleTopic(traceTime.first());
         if (auto publisher = topic.Publish(); publisher) {
           publisher.Set(traceTime.second.value());
-          m_publishers.push_back(
-              std::make_pair(traceTime.first(), std::move(publisher)));
+          m_publishers.emplace_back(traceTime.first(), std::move(publisher));
         }
       }
     }
@@ -137,7 +136,7 @@ class TracerState {
   std::vector<std::pair<std::string_view, nt::DoublePublisher>> m_publishers;
   // If the cycle is poisened, it will warn the user
   // and not publish any data
-  bool m_cyclePoisened = false;
+  bool m_cyclePoisoned = false;
   // If the tracer is disabled, it will not publish any data
   // or do any string manipulation
   bool m_disabled = false;
@@ -155,6 +154,7 @@ class TracerState {
 thread_local TracerState threadLocalState = TracerState();
 
 void Tracer::StartTrace(std::string_view name) {
+  anyTracesStarted = true;
   // Call `AppendTraceStack` even if disabled to keep `m_stackSize` in sync
   std::string stack = threadLocalState.AppendTraceStack(name);
   if (!threadLocalState.m_disabled) {
