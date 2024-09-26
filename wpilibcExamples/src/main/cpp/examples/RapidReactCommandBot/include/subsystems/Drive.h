@@ -70,11 +70,11 @@ class Drive : public frc2::SubsystemBase {
 
   frc::ADXRS450_Gyro m_gyro;
 
-  frc::ProfiledPIDController<units::radians> m_controller{
+  frc::ProfiledPIDController<units::degrees> m_controller{
       DriveConstants::kTurnP,
       DriveConstants::kTurnI,
       DriveConstants::kTurnD,
       {DriveConstants::kMaxTurnRate, DriveConstants::kMaxTurnAcceleration}};
-  frc::SimpleMotorFeedforward<units::radians> m_feedforward{
+  frc::SimpleMotorFeedforward<units::degrees> m_feedforward{
       DriveConstants::ks, DriveConstants::kv, DriveConstants::ka};
 };
