@@ -34,8 +34,8 @@ public class LoggableHandler extends ElementHandler {
   public boolean isLoggable(Element element) {
     var dataType = dataType(element);
     return dataType.getAnnotation(Logged.class) != null
-        || dataType instanceof DeclaredType decl
-            && decl.asElement().getAnnotation(Logged.class) != null;
+        || (dataType instanceof DeclaredType decl
+            && decl.asElement().getAnnotation(Logged.class) != null);
   }
 
   @Override
@@ -56,6 +56,7 @@ public class LoggableHandler extends ElementHandler {
     for (TypeMirror subtype : getAllSubtypes(type)) {
       Element subtypeElement = m_typeUtils.asElement(subtype);
       if (subtypeElement != null && subtypeElement.getAnnotation(Logged.class) != null) {
+        System.out.println("Detected logged subtype: " + subtypeElement); // Debugging line
         loggedSubtypes.add(subtype);
       }
     }
@@ -80,7 +81,7 @@ public class LoggableHandler extends ElementHandler {
   private Set<TypeElement> findAllTypes() {
     Set<TypeElement> allTypes = new HashSet<>();
 
-    // This scanner will collect all TypeElements from the root elements in the compilation unit
+    // Scanner to collect all TypeElements from root elements
     ElementScanner9<Void, Void> scanner =
         new ElementScanner9<>() {
           @Override
@@ -100,49 +101,55 @@ public class LoggableHandler extends ElementHandler {
     return allTypes;
   }
 
+  @SuppressWarnings("checkstyle:LineLength")
   private String generateSimpleLogInvocation(TypeElement reflectedType, Element element) {
-    return "Epilogue."
-        + StringUtils.loggerFieldName(reflectedType)
-        + ".tryUpdate(dataLogger.getSubLogger(\""
-        + loggedName(element)
-        + "\"), "
-        + elementAccess(element)
-        + ", Epilogue.getConfig().errorHandler)";
+    return String.format(
+        "Epilogue.%s.tryUpdate(dataLogger.getSubLogger(\"%s\"), %s, Epilogue.getConfig().errorHandler)",
+        StringUtils.loggerFieldName(reflectedType), loggedName(element), elementAccess(element));
   }
+
   @SuppressWarnings("PMD.ConsecutiveLiteralAppends")
   private String generateConditionalLogInvocation(
       TypeElement reflectedType, Element element, List<TypeMirror> subtypes) {
     StringBuilder builder = new StringBuilder(256);
 
-    // Combining multiple strings into fewer append calls for better readability
+    builder.append("if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {\n");
+    builder.append("  var obj = ").append(elementAccess(element)).append(";\n");
     builder
-        .append("{\n  var obj = ")
-        .append(elementAccess(element))
-        .append(";\n")
         .append("  var logger = dataLogger.getSubLogger(\"")
         .append(loggedName(element))
         .append("\");\n");
 
-    for (TypeMirror subtype : subtypes) {
+    for (int i = 0; i < subtypes.size(); i++) {
+      TypeMirror subtype = subtypes.get(i);
       TypeElement subtypeElement = (TypeElement) m_typeUtils.asElement(subtype);
       String typeName = subtypeElement.getQualifiedName().toString();
 
+      // Generate the conditional block for each subtype
+      if (i == 0) {
+        builder.append("  if (obj instanceof ").append(typeName).append(") {\n");
+      } else {
+        builder.append("  else if (obj instanceof ").append(typeName).append(") {\n");
+      }
+
       builder
-          .append("  if (obj instanceof ")
-          .append(typeName)
-          .append(") {\n")
           .append("    Epilogue.")
           .append(StringUtils.loggerFieldName(subtypeElement))
           .append(".tryUpdate(logger, (")
           .append(typeName)
-          .append(") obj, Epilogue.getConfig().errorHandler);\n  } else ");
+          .append(") obj, Epilogue.getConfig().errorHandler);\n");
+      builder.append("  }\n");
     }
 
+    // Fallback to the parent type handling if no subtype matches
+    builder.append("  else {\n");
     builder
-        .append("{\n    Epilogue.")
+        .append("    Epilogue.")
         .append(StringUtils.loggerFieldName(reflectedType))
-        .append(".tryUpdate(logger, obj, Epilogue.getConfig().errorHandler);\n  }\n}");
+        .append(".tryUpdate(logger, obj, Epilogue.getConfig().errorHandler);\n");
+    builder.append("  }\n");
 
+    builder.append("}");
     return builder.toString();
   }
 }
