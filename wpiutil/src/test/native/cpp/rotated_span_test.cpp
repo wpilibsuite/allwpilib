@@ -5,6 +5,7 @@
 #include "wpi/rotated_span.h"  // NOLINT(build/include_order)
 
 #include <array>
+#include <vector>
 
 #include <gtest/gtest.h>
 
