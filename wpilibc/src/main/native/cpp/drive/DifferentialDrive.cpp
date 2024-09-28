@@ -6,6 +6,8 @@
 
 #include <algorithm>
 #include <cmath>
+#include <string>
+#include <utility>
 
 #include <hal/FRCUsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>

@@ -124,6 +124,8 @@ class WPILIB_DLLEXPORT Transform2d {
 };
 }  // namespace frc
 
+#ifndef NO_PROTOBUF
 #include "frc/geometry/proto/Transform2dProto.h"
+#endif
 #include "frc/geometry/struct/Transform2dStruct.h"
 #include "frc/geometry/Transform2d.inc"

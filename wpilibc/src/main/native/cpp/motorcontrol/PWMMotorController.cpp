@@ -4,6 +4,8 @@
 
 #include "frc/motorcontrol/PWMMotorController.h"
 
+#include <string>
+
 #include <fmt/format.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>

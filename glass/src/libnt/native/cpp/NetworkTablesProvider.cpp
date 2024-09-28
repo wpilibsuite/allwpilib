@@ -5,6 +5,8 @@
 #include "glass/networktables/NetworkTablesProvider.h"
 
 #include <algorithm>
+#include <memory>
+#include <utility>
 
 #include <fmt/format.h>
 #include <ntcore_cpp.h>

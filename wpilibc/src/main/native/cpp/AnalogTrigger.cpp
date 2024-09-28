@@ -4,6 +4,7 @@
 
 #include "frc/AnalogTrigger.h"
 
+#include <memory>
 #include <utility>
 
 #include <hal/AnalogTrigger.h>

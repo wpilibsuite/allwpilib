@@ -4,6 +4,10 @@
 
 #include "InstanceImpl.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+
 using namespace nt;
 
 std::atomic<int> InstanceImpl::s_default{-1};
