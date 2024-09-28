@@ -168,7 +168,7 @@ void AddDefaultFont(
  */
 ImFont* GetFont(int font);
 
-enum Style { kStyleClassic = 0, kStyleDark, kStyleLight };
+enum Style { kStyleClassic = 0, kStyleDark, kStyleLight, kStyleDeepDark };
 
 /**
  * Sets the ImGui style.  Using this function makes this setting persistent.
