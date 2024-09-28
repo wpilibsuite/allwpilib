@@ -58,6 +58,10 @@ class Tracer {
    * Disables any tracing for the current thread.
    * This will cause all `Tracer.startTrace(string)`, `Tracer.endTrace()`
    * and `Tracer.TraceFunc(function)` to do nothing.
+   * 
+   * <p>Being disabled prevents the `Tracer` from publishing any values to NetworkTables.
+   * This will cause all values to appear as if they're frozen at the value they were
+   * at when this function was called.
    */
   static void DisableTracingForCurrentThread();
 

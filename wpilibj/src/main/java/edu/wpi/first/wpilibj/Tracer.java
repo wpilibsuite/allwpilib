@@ -84,7 +84,7 @@ public class Tracer {
     private final HashMap<String, DoublePublisher> m_publishers = new HashMap<>();
 
     /*
-     * If the cycle is poisened, it will warn the user
+     * If the cycle is poisoned, it will warn the user
      * and not publish any data.
      */
     boolean m_cyclePoisoned = false;
@@ -174,7 +174,7 @@ public class Tracer {
           publisher.getValue().set(0.0);
         }
         return;
-      } else {
+      } else if (!m_disabled) {
         // update times for all already existing publishers
         for (var publisher : m_publishers.entrySet()) {
           Double time = m_traceTimes.remove(publisher.getKey());
@@ -189,13 +189,12 @@ public class Tracer {
           publisher.set(traceTime.getValue());
           m_publishers.put(traceTime.getKey(), publisher);
         }
+        // log gc time
+        if (!m_gcs.isEmpty()) {
+          m_gcTimeEntry.set(m_gcTimeThisCycle);
+        }
+        m_gcTimeThisCycle = 0.0;
       }
-
-      // log gc time
-      if (!m_gcs.isEmpty()) {
-        m_gcTimeEntry.set(m_gcTimeThisCycle);
-      }
-      m_gcTimeThisCycle = 0.0;
 
       // clean up state
       m_traceTimes.clear();
@@ -284,8 +283,8 @@ public class Tracer {
    * Enables single threaded mode for the Tracer. This will cause traces on different threads to
    * throw an exception. This will shorten the path of traced data in NetworkTables by not including
    * the thread name.
-   *
-   * <p><b>Warning:</b> This will throw an exception if called after any traces have been started.
+   * 
+   * <p>This function should be called before any traces are started.
    */
   public static void enableSingleThreadedMode() {
     if (anyTracesStarted.get()) {
@@ -300,9 +299,14 @@ public class Tracer {
   /**
    * Disables any tracing for the current thread. This will cause all {@link #startTrace(String)},
    * {@link #endTrace()} and {@link #traceFunc(String, Runnable)} to do nothing.
+   * 
+   * <p>Being disabled prevents the {@link Tracer} from publishing any values to NetworkTables.
+   * This will cause all values to appear as if they're frozen at the value they were
+   * at when this function was called.
    */
   public static void disableTracingForCurrentThread() {
-    threadLocalState.get().m_disableNextCycle = true;
+    final TracerState state = threadLocalState.get();
+    state.m_disableNextCycle = true;
   }
 
   /**
@@ -310,7 +314,11 @@ public class Tracer {
    * {@link #endTrace()} and {@link #traceFunc(String, Runnable)} to work as normal.
    */
   public static void enableTracingForCurrentThread() {
-    threadLocalState.get().m_disableNextCycle = false;
+    final TracerState state = threadLocalState.get();
+    state.m_disableNextCycle = false;
+    if (state.m_stackSize == 0) {
+      state.m_disabled = false;
+    }
   }
 
   /**
@@ -321,24 +329,10 @@ public class Tracer {
    * @param name the name of the trace, should be unique to the function.
    * @param runnable the function to trace.
    */
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public static void traceFunc(String name, Runnable runnable) {
     final TracerState state = threadLocalState.get();
     startTraceInner(name, state);
-    try {
-      runnable.run();
-    } catch (Exception e) {
-      endTraceInner(state);
-      StackTraceElement[] stackTrace = e.getStackTrace();
-      ArrayList<StackTraceElement> newStackTrace = new ArrayList<>();
-      for (StackTraceElement element : stackTrace) {
-        if (!element.getClassName().contains("edu.wpi.first.wpilibj.Tracer")) {
-          newStackTrace.add(element);
-        }
-      }
-      e.setStackTrace(newStackTrace.toArray(new StackTraceElement[0]));
-      throw e;
-    }
+    runnable.run();
     endTraceInner(state);
   }
 
@@ -351,25 +345,13 @@ public class Tracer {
    * @param supplier the function to trace.
    * @return the return value of the function.
    */
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public static <R> R traceFunc(String name, Supplier<R> supplier) {
     final TracerState state = threadLocalState.get();
     startTraceInner(name, state);
     try {
-      R ret = supplier.get();
+      return supplier.get();
+    } finally {
       endTraceInner(state);
-      return ret;
-    } catch (Exception e) {
-      endTraceInner(state);
-      StackTraceElement[] stackTrace = e.getStackTrace();
-      ArrayList<StackTraceElement> newStackTrace = new ArrayList<>();
-      for (StackTraceElement element : stackTrace) {
-        if (!element.getClassName().contains("edu.wpi.first.wpilibj.Tracer")) {
-          newStackTrace.add(element);
-        }
-      }
-      e.setStackTrace(newStackTrace.toArray(new StackTraceElement[0]));
-      throw e;
     }
   }
 

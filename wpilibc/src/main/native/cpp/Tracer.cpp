@@ -76,14 +76,14 @@ class TracerState {
   }
 
   void EndCycle() {
-    if (m_disabled != m_disableNextCycle || m_cyclePoisoned) {
+    if (m_cyclePoisoned && !m_disabled) {
       // Gives publishers empty times,
       // reporting no data is better than bad data
       for (auto&& [_, publisher] : m_publishers) {
         publisher.Set(0.0);
       }
       return;
-    } else {
+    } else if (!m_disabled) {
       // Update times for all already existing publishers,
       // pop trace times for keys with existing publishers
       for (auto&& [key, publisher] : m_publishers) {
@@ -134,7 +134,7 @@ class TracerState {
   // A collection of all publishers that have been created,
   // this makes updating the times of publishers much easier and faster
   std::vector<std::pair<std::string_view, nt::DoublePublisher>> m_publishers;
-  // If the cycle is poisened, it will warn the user
+  // If the cycle is poisoned, it will warn the user
   // and not publish any data
   bool m_cyclePoisoned = false;
   // If the tracer is disabled, it will not publish any data
@@ -202,6 +202,9 @@ void Tracer::DisableTracingForCurrentThread() {
 
 void Tracer::EnableTracingForCurrentThread() {
   threadLocalState.m_disableNextCycle = false;
+  if (threadLocalState.m_stackSize == 0) {
+    threadLocalState.m_disabled = false;
+  }
 }
 
 void Tracer::SetThreadName(std::string_view name) {
