@@ -21,6 +21,12 @@
 #include <imgui_FiraCodeRetina.h>
 #include <imgui_FontAwesomeSolid.h>
 #include <imgui_ProggyDotted.h>
+#include <imgui_RobotoCondensedBold.h>
+#include <imgui_RobotoCondensedLight.h>
+#include <imgui_RobotoCondensedRegular.h>
+#include <imgui_RobotoBold.h>
+#include <imgui_RobotoLight.h>
+#include <imgui_RobotoRegular.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_internal.h>
 #include <implot.h>
@@ -129,6 +135,30 @@ void gui::CreateContext() {
   AddDefaultFont("Fira Code Retina",
                  [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
                    return ImGui::AddFontFiraCodeRetina(io, size, cfg);
+                 });
+  AddDefaultFont("Roboto Light",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontRobotoLight(io, size, cfg);
+                 });
+  AddDefaultFont("Roboto Regular",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontRobotoRegular(io, size, cfg);
+                 });
+  AddDefaultFont("Roboto Bold",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontRobotoBold(io, size, cfg);
+                 });
+  AddDefaultFont("Roboto Condensed Light",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontRobotoCondensedLight(io, size, cfg);
+                 });
+  AddDefaultFont("Roboto Condensed Regular",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontRobotoCondensedRegular(io, size, cfg);
+                 });
+  AddDefaultFont("Roboto Condensed Bold",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontRobotoCondensedBold(io, size, cfg);
                  });
   PlatformCreateContext();
 }
