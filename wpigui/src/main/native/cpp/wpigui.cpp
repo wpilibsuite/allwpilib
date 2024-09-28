@@ -17,6 +17,8 @@
 #include <GLFW/glfw3.h>
 #include <IconsFontAwesome6.h>
 #include <imgui.h>
+#include <imgui_DroidSans.h>
+#include <imgui_FiraCodeRetina.h>
 #include <imgui_FontAwesomeSolid.h>
 #include <imgui_ProggyDotted.h>
 #include <imgui_impl_glfw.h>
@@ -94,6 +96,8 @@ static void IniReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
     impl->userScale = num;
   } else if (std::strncmp(lineStr, "style=", 6) == 0) {
     impl->style = num;
+  } else if (std::strncmp(lineStr, "font=", 5) == 0) {
+    impl->defaultFontName = &lineStr[5];
   } else if (std::strncmp(lineStr, "fps=", 4) == 0) {
     impl->fps = num;
   }
@@ -106,23 +110,26 @@ static void IniWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
   }
   out_buf->appendf(
       "[MainWindow][GLOBAL]\nwidth=%d\nheight=%d\nmaximized=%d\n"
-      "xpos=%d\nypos=%d\nuserScale=%d\nstyle=%d\nfps=%d\n\n",
+      "xpos=%d\nypos=%d\nuserScale=%d\nstyle=%d\nfont=%s\nfps=%d\n\n",
       gContext->width, gContext->height, gContext->maximized ? 1 : 0,
       gContext->xPos, gContext->yPos, gContext->userScale, gContext->style,
-      gContext->fps);
+      gContext->defaultFontName.c_str(), gContext->fps);
 }
 
 void gui::CreateContext() {
   gContext = new Context;
-  AddFont("ProggyDotted", [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
-    auto font = ImGui::AddFontProggyDotted(io, size, cfg);
-    static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
-    ImFontConfig icons_cfg;
-    icons_cfg.MergeMode = true;
-    icons_cfg.PixelSnapH = true;
-    ImGui::AddFontFontAwesomeSolid(io, size, &icons_cfg, icons_ranges);
-    return font;
-  });
+  AddDefaultFont("Proggy Dotted",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontProggyDotted(io, size, cfg);
+                 });
+  AddDefaultFont("Droid Sans",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontDroidSans(io, size, cfg);
+                 });
+  AddDefaultFont("Fira Code Retina",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontFiraCodeRetina(io, size, cfg);
+                 });
   PlatformCreateContext();
 }
 
@@ -158,17 +165,25 @@ static void ReloadFonts() {
   io.Fonts->Clear();
   gContext->fonts.clear();
   float size = 7.0f + gContext->fontScale * 3.0f;
-  bool first = true;
   for (auto&& makeFont : gContext->makeFonts) {
-    if (makeFont.second) {
+    if (makeFont.func) {
       ImFontConfig cfg;
-      std::snprintf(cfg.Name, sizeof(cfg.Name), "%s", makeFont.first);
-      ImFont* font = makeFont.second(io, size, &cfg);
-      if (first) {
-        ImGui::GetIO().FontDefault = font;
-        first = false;
+      std::snprintf(cfg.Name, sizeof(cfg.Name), "%s", makeFont.name.c_str());
+      bool isDefault = makeFont.name == gContext->defaultFontName;
+      if (!makeFont.defaultOnly || isDefault) {
+        ImFont* font = makeFont.func(io, size, &cfg);
+        if (isDefault) {
+          // Merge font awesome solid into default font
+          static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA,
+                                                 0};
+          ImFontConfig icons_cfg;
+          icons_cfg.MergeMode = true;
+          icons_cfg.PixelSnapH = true;
+          ImGui::AddFontFontAwesomeSolid(io, size, &icons_cfg, icons_ranges);
+          ImGui::GetIO().FontDefault = font;
+        }
+        gContext->fonts.emplace_back(font);
       }
-      gContext->fonts.emplace_back(font);
     }
   }
 }
@@ -479,9 +494,18 @@ int gui::AddFont(
     std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
         makeFont) {
   if (makeFont) {
-    gContext->makeFonts.emplace_back(name, std::move(makeFont));
+    gContext->makeFonts.emplace_back(name, false, std::move(makeFont));
   }
   return gContext->makeFonts.size() - 1;
+}
+
+void gui::AddDefaultFont(
+    const char* name,
+    std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
+        makeFont) {
+  if (makeFont) {
+    gContext->makeFonts.emplace_back(name, true, std::move(makeFont));
+  }
 }
 
 void gui::SetStyle(Style style) {
@@ -549,6 +573,17 @@ void gui::EmitViewMenu() {
       selected = gContext->style == kStyleLight;
       if (ImGui::MenuItem("Light", nullptr, &selected, true)) {
         SetStyle(kStyleLight);
+      }
+      ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Font")) {
+      for (auto&& makeFont : gContext->makeFonts) {
+        bool selected = gContext->defaultFontName == makeFont.name;
+        if (ImGui::MenuItem(makeFont.name.c_str(), nullptr, &selected)) {
+          gContext->defaultFontName = makeFont.name;
+          gContext->reloadFonts = true;
+        }
       }
       ImGui::EndMenu();
     }
