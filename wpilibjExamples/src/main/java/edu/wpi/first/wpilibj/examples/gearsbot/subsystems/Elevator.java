@@ -42,7 +42,7 @@ public class Elevator extends PIDSubsystem {
       m_pot = new AnalogPotentiometer(ElevatorConstants.kPotentiometerPort, -2.0 / 5);
     } else {
       // Defaults to meters
-      m_pot = new AnalogPotentiometer(ElevatorConstants.kPotentiometerPort); 
+      m_pot = new AnalogPotentiometer(ElevatorConstants.kPotentiometerPort);
     }
 
     // Let's name everything on the LiveWindow
