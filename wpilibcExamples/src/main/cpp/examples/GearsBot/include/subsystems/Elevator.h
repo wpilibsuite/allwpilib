@@ -48,12 +48,14 @@ class Elevator : public frc2::PIDSubsystem {
  private:
   frc::PWMSparkMax m_motor{ElevatorConstants::kMotorPort};
 
-// Conversion value of potentiometer varies between the real world and
-// simulation
+  // Conversion value of potentiometer varies between the real world and
+  // simulation
   frc::AnalogPotentiometer m_pot =
       frc::RobotBase::IsReal()
-          ? frc::AnalogPotentiometer{ElevatorConstants::kPotentiometerPort,-2.0 / 5}
-          : frc::AnalogPotentiometer{ElevatorConstants::kPotentiometerPort};  // Defaults to meters
+          ? frc::AnalogPotentiometer{ElevatorConstants::kPotentiometerPort,
+                                     -2.0 / 5}
+          : frc::AnalogPotentiometer{
+                ElevatorConstants::kPotentiometerPort};  // Defaults to meters
 
   static constexpr double kP_real = ElevatorConstants::kP_real;
   static constexpr double kI_real = ElevatorConstants::kI_real;

@@ -9,7 +9,7 @@
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/PIDSubsystem.h>
 
-#include "Constants.h"   
+#include "Constants.h"
 
 /**
  * The wrist subsystem is like the elevator, but with a rotational joint instead
@@ -49,9 +49,9 @@ class Wrist : public frc2::PIDSubsystem {
   frc::AnalogPotentiometer m_pot =
       frc::RobotBase::IsReal()
           ? frc::AnalogPotentiometer{WristConstants::kPotentiometerPort,
-                                 -270.0 / 5}
+                                     -270.0 / 5}
           : frc::AnalogPotentiometer{
-      WristConstants::kPotentiometerPort};  // Defaults to degrees
+                WristConstants::kPotentiometerPort};  // Defaults to degrees
 
   static constexpr double kP = WristConstants::kP;
   static constexpr double kI = WristConstants::kI;
