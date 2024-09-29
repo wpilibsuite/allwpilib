@@ -110,19 +110,19 @@ public class Tracer {
     private final DoublePublisher m_gcTimeEntry;
     private double m_gcTimeThisCycle = 0.0;
 
-    private TracerState(String threadName) {
-      if (singleThreadedMode.get()) {
+    private TracerState(String name, boolean threadLocalConstruction) {
+      if (singleThreadedMode.get() && threadLocalConstruction) {
         DriverStation.reportError(
             "[Tracer] Tracer is in single threaded mode, cannot start traces on multiple threads",
             true);
         this.m_disabled = true;
       }
       anyTracesStarted.set(true);
-      if (threadName == null) {
+      if (name == null) {
         this.m_rootTable = NetworkTableInstance.getDefault().getTable("Tracer");
       } else {
         this.m_rootTable =
-            NetworkTableInstance.getDefault().getTable("Tracer").getSubTable(threadName);
+            NetworkTableInstance.getDefault().getTable("Tracer").getSubTable(name);
       }
       this.m_gcTimeEntry = m_rootTable.getDoubleTopic("GCTime").publish();
     }
@@ -209,7 +209,7 @@ public class Tracer {
   private static final ThreadLocal<TracerState> threadLocalState =
       ThreadLocal.withInitial(
           () -> {
-            return new TracerState(Thread.currentThread().getName());
+            return new TracerState(Thread.currentThread().getName(), true);
           });
 
   private static void startTraceInner(final String name, final TracerState state) {
@@ -291,7 +291,7 @@ public class Tracer {
       DriverStation.reportError(
           "[Tracer] Cannot enable single-threaded mode after traces have been started", true);
     } else {
-      threadLocalState.set(new TracerState(null));
+      threadLocalState.set(new TracerState(null, false));
       singleThreadedMode.set(true);
     }
   }
@@ -360,6 +360,56 @@ public class Tracer {
     threadLocalState.remove();
     singleThreadedMode.set(false);
     anyTracesStarted.set(false);
+  }
+
+  /**
+   * A class to help with substituting the current tracer state with a new one.
+   * 
+   * This can be used to act as if code is running on another thread even
+   * if it's running synchronously on the same thread.
+   */
+  public static class SubstitutiveTracer {
+    private final TracerState m_state, m_originalState;
+
+    /**
+     * Constructs a {@code SubstitutiveTracer} with the given name.
+     *
+     * @param name the name of the new tracer state.
+     */
+    public SubstitutiveTracer(String name) {
+      m_state = new TracerState(name, false);
+      m_state.m_gcTimeEntry.close();
+      m_state.m_gcs.clear();
+      m_originalState = threadLocalState.get();
+    }
+
+    /**
+     * Substitutes the current tracer state with the new one.
+     */
+    public void subIn() {
+      threadLocalState.set(m_state);
+    }
+
+    /**
+     * Substitutes the current tracer state with the original one.
+     */
+    public void subOut() {
+      threadLocalState.set(m_originalState);
+    }
+
+    /**
+     * Runs the given runnable with the new tracer state.
+     *
+     * @param runnable the runnable to run.
+     */
+    public void subWith(Runnable runnable) {
+      subIn();
+      try {
+        runnable.run();
+      } finally {
+        subOut();
+      }
+    }
   }
 
   // A REIMPLEMENTATION OF THE OLD TRACER TO NOT BREAK OLD CODE

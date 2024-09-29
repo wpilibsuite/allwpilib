@@ -28,130 +28,103 @@ using namespace frc;
 std::atomic<bool> singleThreadedMode = false;
 std::atomic<bool> anyTracesStarted = false;
 
-class TracerState {
- public:
-  TracerState() {
-    if (singleThreadedMode && anyTracesStarted) {
-      FRC_ReportWarning("Cannot start a new trace in single-threaded mode");
-      m_disabled = true;
-    }
-    auto inst = nt::NetworkTableInstance::GetDefault();
-    m_rootTable = inst.GetTable(
-        fmt::format("/Tracer/{}",
-                    std::hash<std::thread::id>{}(std::this_thread::get_id())));
+Tracer::TracerState::TracerState() {
+  if (singleThreadedMode && anyTracesStarted) {
+    FRC_ReportWarning("Cannot start a new trace in single-threaded mode");
+    m_disabled = true;
   }
+  auto inst = nt::NetworkTableInstance::GetDefault();
+  m_rootTable = inst.GetTable(fmt::format(
+      "/Tracer/{}", std::hash<std::thread::id>{}(std::this_thread::get_id())));
+}
 
-  std::string BuildStack() {
-    std::string stack = "";
-    for (size_t i = 0; i < m_traceStack.size(); ++i) {
-      stack += m_traceStack[i];
-      if (i < m_traceStack.size() - 1) {
-        stack += "/";
-      }
+Tracer::TracerState::TracerState(std::string_view name) {
+  auto inst = nt::NetworkTableInstance::GetDefault();
+  m_rootTable = inst.GetTable(fmt::format("/Tracer/{}", name));
+}
+
+std::string Tracer::TracerState::BuildStack() {
+  std::string stack = "";
+  for (size_t i = 0; i < m_traceStack.size(); ++i) {
+    stack += m_traceStack[i];
+    if (i < m_traceStack.size() - 1) {
+      stack += "/";
     }
-    return stack;
   }
+  return stack;
+}
 
-  std::string AppendTraceStack(std::string_view trace) {
-    m_stackSize++;
-    if (m_disabled) {
-      return "";
-    }
-    m_traceStack.push_back(trace);
-    return BuildStack();
+std::string Tracer::TracerState::AppendTraceStack(std::string_view trace) {
+  m_stackSize++;
+  if (m_disabled) {
+    return "";
   }
+  m_traceStack.push_back(trace);
+  return BuildStack();
+}
 
-  std::string PopTraceStack() {
-    m_stackSize > 0 ? m_stackSize-- : m_stackSize;
-    if (m_disabled) {
-      return "";
-    }
-    if (m_traceStack.empty() || m_cyclePoisoned) {
-      m_cyclePoisoned = true;
-      return "";
-    }
-    std::string stack = BuildStack();
-    m_traceStack.pop_back();
-    return stack;
+std::string Tracer::TracerState::PopTraceStack() {
+  m_stackSize > 0 ? m_stackSize-- : m_stackSize;
+  if (m_disabled) {
+    return "";
   }
+  if (m_traceStack.empty() || m_cyclePoisoned) {
+    m_cyclePoisoned = true;
+    return "";
+  }
+  std::string stack = BuildStack();
+  m_traceStack.pop_back();
+  return stack;
+}
 
-  void EndCycle() {
-    if (m_cyclePoisoned && !m_disabled) {
-      // Gives publishers empty times,
-      // reporting no data is better than bad data
-      for (auto&& [_, publisher] : m_publishers) {
+void Tracer::TracerState::EndCycle() {
+  if (m_cyclePoisoned && !m_disabled) {
+    // Gives publishers empty times,
+    // reporting no data is better than bad data
+    for (auto&& [_, publisher] : m_publishers) {
+      publisher.Set(0.0);
+    }
+    return;
+  } else if (!m_disabled) {
+    // Update times for all already existing publishers,
+    // pop trace times for keys with existing publishers
+    for (auto&& [key, publisher] : m_publishers) {
+      if (auto time = m_traceTimes.find(key); time != m_traceTimes.end()) {
+        publisher.Set(time->second.value());
+        m_traceTimes.erase(time);
+      } else {
         publisher.Set(0.0);
       }
-      return;
-    } else if (!m_disabled) {
-      // Update times for all already existing publishers,
-      // pop trace times for keys with existing publishers
-      for (auto&& [key, publisher] : m_publishers) {
-        if (auto time = m_traceTimes.find(key); time != m_traceTimes.end()) {
-          publisher.Set(time->second.value());
-          m_traceTimes.erase(time);
-        } else {
-          publisher.Set(0.0);
-        }
-      }
-
-      // Create publishers for all new entries, add them to the heap
-      // and set their times
-      for (auto&& traceTime : m_traceTimes) {
-        auto topic = m_rootTable->GetDoubleTopic(traceTime.first());
-        if (auto publisher = topic.Publish(); publisher) {
-          publisher.Set(traceTime.second.value());
-          m_publishers.emplace_back(traceTime.first(), std::move(publisher));
-        }
-      }
     }
 
-    // Clean up state
-    m_traceTimes.clear();
-
-    m_disabled = m_disableNextCycle;
-  }
-
-  void UpdateThreadName(std::string_view name) {
-    if (m_publishers.empty()) {
-      auto inst = nt::NetworkTableInstance::GetDefault();
-      m_rootTable = inst.GetTable(fmt::format("/Tracer/{}", name));
-    } else {
-      FRC_ReportWarning(
-          "Cannot update Tracer thread name after traces have been started");
+    // Create publishers for all new entries, add them to the heap
+    // and set their times
+    for (auto&& traceTime : m_traceTimes) {
+      auto topic = m_rootTable->GetDoubleTopic(traceTime.first());
+      if (auto publisher = topic.Publish(); publisher) {
+        publisher.Set(traceTime.second.value());
+        m_publishers.emplace_back(traceTime.first(), std::move(publisher));
+      }
     }
   }
 
-  // The network table that all data is published to
-  std::shared_ptr<nt::NetworkTable> m_rootTable;
-  // The stack of trace frames, every startTrace will add to this stack
-  // and every endTrace will remove from this stack
-  std::vector<std::string_view> m_traceStack;
-  // A map of trace names to the time they took to execute
-  wpi::StringMap<units::millisecond_t> m_traceTimes;
-  // A map of trace names to the time they started
-  wpi::StringMap<units::millisecond_t> m_traceStartTimes;
-  // A collection of all publishers that have been created,
-  // this makes updating the times of publishers much easier and faster
-  std::vector<std::pair<std::string_view, nt::DoublePublisher>> m_publishers;
-  // If the cycle is poisoned, it will warn the user
-  // and not publish any data
-  bool m_cyclePoisoned = false;
-  // If the tracer is disabled, it will not publish any data
-  // or do any string manipulation
-  bool m_disabled = false;
-  // If the tracer should be disabled next cycle
-  // and every cycle after that until this flag is set to false.
-  // Disabling is done this way to prevent disabling/enabling
-  // in the middle of a cycle
-  bool m_disableNextCycle = false;
-  // stack size is used to keep track of stack size
-  // even when disabled, calling `EndCycle` is important when
-  // disabled or not to update the disabled state in a safe manner
-  uint32_t m_stackSize = 0;
-};
+  // Clean up state
+  m_traceTimes.clear();
 
-thread_local TracerState threadLocalState = TracerState();
+  m_disabled = m_disableNextCycle;
+}
+
+void Tracer::TracerState::UpdateThreadName(std::string_view name) {
+  if (m_publishers.empty()) {
+    auto inst = nt::NetworkTableInstance::GetDefault();
+    m_rootTable = inst.GetTable(fmt::format("/Tracer/{}", name));
+  } else {
+    FRC_ReportWarning(
+        "Cannot update Tracer thread name after traces have been started");
+  }
+}
+
+thread_local Tracer::TracerState threadLocalState = Tracer::TracerState();
 
 void Tracer::StartTrace(std::string_view name) {
   anyTracesStarted = true;
@@ -223,6 +196,37 @@ T Tracer::TraceFunc(std::string_view name, std::function<T()> supplier) {
   T result = supplier();
   EndTrace();
   return result;
+}
+
+Tracer::SubstitutiveTracer::SubstitutiveTracer(std::string_view name) {
+  m_state = std::optional<TracerState>(TracerState(name));
+  m_originalState = std::optional<TracerState>();
+}
+
+Tracer::SubstitutiveTracer::~SubstitutiveTracer() {
+  if (m_originalState.has_value()) {
+    SubOut();
+  }
+}
+
+void Tracer::SubstitutiveTracer::SubIn() {
+  if (m_state.has_value()) {
+    std::swap(threadLocalState, m_state.value());
+    std::swap(m_originalState, m_state);
+  }
+}
+
+void Tracer::SubstitutiveTracer::SubOut() {
+  if (m_originalState.has_value()) {
+    std::swap(threadLocalState, m_originalState.value());
+    std::swap(m_originalState, m_state);
+  }
+}
+
+void Tracer::SubstitutiveTracer::SubWith(std::function<void()> runnable) {
+  SubIn();
+  runnable();
+  SubOut();
 }
 
 // DEPRECATED CLASS INSTANCE METHODS

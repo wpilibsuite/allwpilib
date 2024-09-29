@@ -6,9 +6,17 @@
 
 #include <chrono>
 #include <functional>
+#include <memory>
+#include <string>
 #include <string_view>
+#include <utility>
+#include <vector>
 
+#include <fmt/format.h>
 #include <hal/cpp/fpga_clock.h>
+#include <networktables/DoubleTopic.h>
+#include <networktables/NetworkTable.h>
+#include <units/time.h>
 #include <wpi/StringMap.h>
 
 namespace wpi {
@@ -26,6 +34,51 @@ namespace frc {
  */
 class Tracer {
  public:
+  /**
+   * This is not to be used by user code.
+   *
+   * This manages the state of the Tracer for a single thread.
+   */
+  class TracerState {
+   public:
+    TracerState();
+    explicit TracerState(std::string_view name);
+
+    std::string BuildStack();
+    std::string AppendTraceStack(std::string_view trace);
+    std::string PopTraceStack();
+    void EndCycle();
+    void UpdateThreadName(std::string_view name);
+
+    // The network table that all data is published to
+    std::shared_ptr<nt::NetworkTable> m_rootTable;
+    // The stack of trace frames, every startTrace will add to this stack
+    // and every endTrace will remove from this stack
+    std::vector<std::string_view> m_traceStack;
+    // A map of trace names to the time they took to execute
+    wpi::StringMap<units::millisecond_t> m_traceTimes;
+    // A map of trace names to the time they started
+    wpi::StringMap<units::millisecond_t> m_traceStartTimes;
+    // A collection of all publishers that have been created,
+    // this makes updating the times of publishers much easier and faster
+    std::vector<std::pair<std::string_view, nt::DoublePublisher>> m_publishers;
+    // If the cycle is poisoned, it will warn the user
+    // and not publish any data
+    bool m_cyclePoisoned = false;
+    // If the tracer is disabled, it will not publish any data
+    // or do any string manipulation
+    bool m_disabled = false;
+    // If the tracer should be disabled next cycle
+    // and every cycle after that until this flag is set to false.
+    // Disabling is done this way to prevent disabling/enabling
+    // in the middle of a cycle
+    bool m_disableNextCycle = false;
+    // stack size is used to keep track of stack size
+    // even when disabled, calling `EndCycle` is important when
+    // disabled or not to update the disabled state in a safe manner
+    uint32_t m_stackSize = 0;
+  };
+
   /**
    * Starts a trace,
    * should be called at the beginning of a function that's not being called by
@@ -58,10 +111,10 @@ class Tracer {
    * Disables any tracing for the current thread.
    * This will cause all `Tracer.startTrace(string)`, `Tracer.endTrace()`
    * and `Tracer.TraceFunc(function)` to do nothing.
-   * 
-   * <p>Being disabled prevents the `Tracer` from publishing any values to NetworkTables.
-   * This will cause all values to appear as if they're frozen at the value they were
-   * at when this function was called.
+   *
+   * <p>Being disabled prevents the `Tracer` from publishing any values to
+   * NetworkTables. This will cause all values to appear as if they're frozen at
+   * the value they were at when this function was called.
    */
   static void DisableTracingForCurrentThread();
 
@@ -102,6 +155,9 @@ class Tracer {
   template <typename T>
   static T TraceFunc(std::string_view name, std::function<T()> supplier);
 
+  /**
+   * A RAII class for starting and ending traces.
+   */
   class ScopedTraceHandle {
    public:
     explicit ScopedTraceHandle(std::string_view name) { StartTrace(name); }
@@ -121,6 +177,37 @@ class Tracer {
   static ScopedTraceHandle StartScopedTrace(std::string_view name) {
     return ScopedTraceHandle{name};
   }
+
+  /**
+   * A class to help with substituting the current tracer state with a new one.
+   *
+   * This can be used to act as if code is running on another thread even
+   * if it's running synchronously on the same thread.
+   */
+  class SubstitutiveTracer {
+   public:
+    explicit SubstitutiveTracer(std::string_view name);
+    ~SubstitutiveTracer();
+
+    /**
+     * Substitutes the current tracer state with the new one.
+     */
+    void SubIn();
+    /**
+     * Substitutes the current tracer state with the original one.
+     */
+    void SubOut();
+    /**
+     * Runs the given runnable with the new tracer state.
+     *
+     * @param runnable the runnable to run.
+     */
+    void SubWith(std::function<void()> runnable);
+
+   private:
+    std::optional<TracerState> m_state;
+    std::optional<TracerState> m_originalState;
+  };
 
   // DEPRECATED CLASS INSTANCE METHODS
 
