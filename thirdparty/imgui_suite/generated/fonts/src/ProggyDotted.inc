@@ -1,4 +1,4 @@
-// File: 'extract/proggyfonts-1.1.5/ProggyDotted/ProggyDotted Regular.ttf' (591376 bytes)
+// File: 'extract/proggyfonts-1.1.7/ProggyDotted/ProggyDotted Regular.ttf' (591376 bytes)
 // Exported using binary_to_compressed_c.cpp
 static const unsigned int ProggyDotted_compressed_size = 254065;
 static const unsigned int ProggyDotted_compressed_data[254068/4] =

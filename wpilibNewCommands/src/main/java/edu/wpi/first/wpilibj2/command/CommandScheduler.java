@@ -501,11 +501,28 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    * scheduled by the scheduler; it will not work on commands inside compositions, as the scheduler
    * does not see them.
    *
-   * @param commands the command to query
-   * @return whether the command is currently scheduled
+   * @param commands multiple commands to check
+   * @return whether all of the commands are currently scheduled
    */
   public boolean isScheduled(Command... commands) {
-    return m_scheduledCommands.containsAll(Set.of(commands));
+    for (var cmd : commands) {
+      if (!isScheduled(cmd)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Whether the given commands are running. Note that this only works on commands that are directly
+   * scheduled by the scheduler; it will not work on commands inside compositions, as the scheduler
+   * does not see them.
+   *
+   * @param command a single command to check
+   * @return whether all of the commands are currently scheduled
+   */
+  public boolean isScheduled(Command command) {
+    return m_scheduledCommands.contains(command);
   }
 
   /**

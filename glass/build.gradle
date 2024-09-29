@@ -161,6 +161,7 @@ model {
                 if (OperatingSystem.current().isWindows()) {
                     rc.source {
                         srcDirs 'src/app/native/win'
+                        include '*.rc'
                     }
                 }
             }
