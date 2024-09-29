@@ -7,6 +7,7 @@
 #include <string>
 #include <string_view>
 
+#include <hal/SerialPort.h>
 #include <hal/Types.h>
 #include <units/time.h>
 
@@ -127,8 +128,6 @@ class SerialPort {
   SerialPort(int baudRate, std::string_view portName, Port port = kOnboard,
              int dataBits = 8, Parity parity = kParity_None,
              StopBits stopBits = kStopBits_One);
-
-  ~SerialPort();
 
   SerialPort(SerialPort&& rhs) = default;
   SerialPort& operator=(SerialPort&& rhs) = default;
@@ -255,7 +254,7 @@ class SerialPort {
   void Reset();
 
  private:
-  hal::Handle<HAL_SerialPortHandle> m_portHandle;
+  hal::Handle<HAL_SerialPortHandle, HAL_CloseSerial> m_portHandle;
 };
 
 }  // namespace frc

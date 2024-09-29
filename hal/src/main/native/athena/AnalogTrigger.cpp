@@ -4,6 +4,8 @@
 
 #include "hal/AnalogTrigger.h"
 
+#include <memory>
+
 #include "AnalogInternal.h"
 #include "ConstantsInternal.h"
 #include "DutyCycleInternal.h"
@@ -99,8 +101,7 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
   return handle;
 }
 
-void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analogTriggerHandle,
-                            int32_t* status) {
+void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analogTriggerHandle) {
   analogTriggerHandles->Free(analogTriggerHandle);
   // caller owns the input handle.
 }

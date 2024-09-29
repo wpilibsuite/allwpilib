@@ -5,6 +5,8 @@
 #include "glass/networktables/NTMechanism2D.h"
 
 #include <algorithm>
+#include <memory>
+#include <string>
 #include <string_view>
 #include <vector>
 

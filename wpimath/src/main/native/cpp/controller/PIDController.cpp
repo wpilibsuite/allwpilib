@@ -103,11 +103,11 @@ units::second_t PIDController::GetPeriod() const {
 }
 
 double PIDController::GetPositionTolerance() const {
-  return m_positionTolerance;
+  return m_error;
 }
 
 double PIDController::GetVelocityTolerance() const {
-  return m_velocityTolerance;
+  return m_errorDerivative;
 }
 
 double PIDController::GetAccumulatedError() const {
@@ -120,13 +120,12 @@ void PIDController::SetSetpoint(double setpoint) {
 
   if (m_continuous) {
     double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
-    m_positionError =
-        InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+    m_error = InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
   } else {
-    m_positionError = m_setpoint - m_measurement;
+    m_error = m_setpoint - m_measurement;
   }
 
-  m_velocityError = (m_positionError - m_prevError) / m_period.value();
+  m_errorDerivative = (m_error - m_prevError) / m_period.value();
 }
 
 double PIDController::GetSetpoint() const {
@@ -135,8 +134,8 @@ double PIDController::GetSetpoint() const {
 
 bool PIDController::AtSetpoint() const {
   return m_haveMeasurement && m_haveSetpoint &&
-         std::abs(m_positionError) < m_positionTolerance &&
-         std::abs(m_velocityError) < m_velocityTolerance;
+         std::abs(m_error) < m_errorTolerance &&
+         std::abs(m_errorDerivative) < m_errorDerivativeTolerance;
 }
 
 void PIDController::EnableContinuousInput(double minimumInput,
@@ -160,46 +159,61 @@ void PIDController::SetIntegratorRange(double minimumIntegral,
   m_maximumIntegral = maximumIntegral;
 }
 
-void PIDController::SetTolerance(double positionTolerance,
-                                 double velocityTolerance) {
-  m_positionTolerance = positionTolerance;
-  m_velocityTolerance = velocityTolerance;
+void PIDController::SetTolerance(double errorTolerance,
+                                 double errorDerivativeTolerance) {
+  m_errorTolerance = errorTolerance;
+  m_errorDerivativeTolerance = errorDerivativeTolerance;
+}
+
+double PIDController::GetErrorTolerance() const {
+  return m_error;
+}
+
+double PIDController::GetErrorDerivativeTolerance() const {
+  return m_errorDerivativeTolerance;
+}
+
+double PIDController::GetError() const {
+  return m_error;
+}
+
+double PIDController::GetErrorDerivative() const {
+  return m_errorDerivative;
 }
 
 double PIDController::GetPositionError() const {
-  return m_positionError;
+  return m_error;
 }
 
 double PIDController::GetVelocityError() const {
-  return m_velocityError;
+  return m_errorDerivative;
 }
 
 double PIDController::Calculate(double measurement) {
   m_measurement = measurement;
-  m_prevError = m_positionError;
+  m_prevError = m_error;
   m_haveMeasurement = true;
 
   if (m_continuous) {
     double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
-    m_positionError =
-        InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+    m_error = InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
   } else {
-    m_positionError = m_setpoint - m_measurement;
+    m_error = m_setpoint - m_measurement;
   }
 
-  m_velocityError = (m_positionError - m_prevError) / m_period.value();
+  m_errorDerivative = (m_error - m_prevError) / m_period.value();
 
   // If the absolute value of the position error is outside of IZone, reset the
   // total error
-  if (std::abs(m_positionError) > m_iZone) {
+  if (std::abs(m_error) > m_iZone) {
     m_totalError = 0;
   } else if (m_Ki != 0) {
     m_totalError =
-        std::clamp(m_totalError + m_positionError * m_period.value(),
+        std::clamp(m_totalError + m_error * m_period.value(),
                    m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
   }
 
-  return m_Kp * m_positionError + m_Ki * m_totalError + m_Kd * m_velocityError;
+  return m_Kp * m_error + m_Ki * m_totalError + m_Kd * m_errorDerivative;
 }
 
 double PIDController::Calculate(double measurement, double setpoint) {
@@ -209,10 +223,10 @@ double PIDController::Calculate(double measurement, double setpoint) {
 }
 
 void PIDController::Reset() {
-  m_positionError = 0;
+  m_error = 0;
   m_prevError = 0;
   m_totalError = 0;
-  m_velocityError = 0;
+  m_errorDerivative = 0;
   m_haveMeasurement = false;
 }
 
@@ -230,4 +244,13 @@ void PIDController::InitSendable(wpi::SendableBuilder& builder) {
   builder.AddDoubleProperty(
       "setpoint", [this] { return GetSetpoint(); },
       [this](double value) { SetSetpoint(value); });
+  builder.AddDoubleProperty(
+      "measurement", [this] { return m_measurement; }, nullptr);
+  builder.AddDoubleProperty("error", [this] { return GetError(); }, nullptr);
+  builder.AddDoubleProperty(
+      "error derivative", [this] { return GetErrorDerivative(); }, nullptr);
+  builder.AddDoubleProperty(
+      "previous error", [this] { return m_prevError; }, nullptr);
+  builder.AddDoubleProperty(
+      "total error", [this] { return GetAccumulatedError(); }, nullptr);
 }

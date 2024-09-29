@@ -82,8 +82,7 @@ int main(void) {
   if (status != 0) {
     const char* message = HAL_GetLastError(&status);
     printf("%s\n", message);
-    status = 0;
-    HAL_FreePWMPort(pwmPort, &status);
+    HAL_FreePWMPort(pwmPort);
     return 1;
   }
 
@@ -128,5 +127,5 @@ int main(void) {
 
   status = 0;
   HAL_FreeDIOPort(dio);
-  HAL_FreePWMPort(pwmPort, &status);
+  HAL_FreePWMPort(pwmPort);
 }

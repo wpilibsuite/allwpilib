@@ -4,6 +4,8 @@
 
 #include "glass/hardware/AnalogOutput.h"
 
+#include <string>
+
 #include <wpi/StringExtras.h>
 
 #include "glass/Context.h"

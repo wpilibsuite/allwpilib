@@ -4,6 +4,10 @@
 
 #include "wpinet/MulticastServiceResolver.h"
 
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include <wpi/MemAlloc.h>
 
 #include "MulticastHandleManager.h"

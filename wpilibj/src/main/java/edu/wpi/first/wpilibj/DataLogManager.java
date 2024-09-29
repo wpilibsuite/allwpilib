@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.FileLogger;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.concurrent.Event;
 import edu.wpi.first.util.datalog.DataLog;
@@ -52,6 +53,8 @@ public final class DataLogManager {
   private static boolean m_ntLoggerEnabled = true;
   private static int m_ntEntryLogger;
   private static int m_ntConnLogger;
+  private static boolean m_consoleLoggerEnabled = true;
+  private static FileLogger m_consoleLogger;
   private static StringLogEntry m_messageLog;
 
   // if less than this much free space, delete log files until there is this much free space
@@ -120,6 +123,10 @@ public final class DataLogManager {
       // Log all NT entries and connections
       if (m_ntLoggerEnabled) {
         startNtLog();
+      }
+      // Log console output
+      if (m_consoleLoggerEnabled) {
+        startConsoleLog();
       }
     } else if (m_stopped) {
       m_log.setFilename(makeLogFilename(filename));
@@ -205,6 +212,25 @@ public final class DataLogManager {
     }
   }
 
+  /**
+   * Enable or disable logging of the console output. Defaults to enabled.
+   *
+   * @param enabled true to enable, false to disable
+   */
+  public static synchronized void logConsoleOutput(boolean enabled) {
+    boolean wasEnabled = m_consoleLoggerEnabled;
+    m_consoleLoggerEnabled = enabled;
+    if (m_log == null) {
+      start();
+      return;
+    }
+    if (enabled && !wasEnabled) {
+      startConsoleLog();
+    } else if (!enabled && wasEnabled) {
+      stopConsoleLog();
+    }
+  }
+
   private static String makeLogDir(String dir) {
     if (!dir.isEmpty()) {
       return dir;
@@ -264,6 +290,18 @@ public final class DataLogManager {
   private static void stopNtLog() {
     NetworkTableInstance.stopEntryDataLog(m_ntEntryLogger);
     NetworkTableInstance.stopConnectionDataLog(m_ntConnLogger);
+  }
+
+  private static void startConsoleLog() {
+    if (RobotBase.isReal()) {
+      m_consoleLogger = new FileLogger("/home/lvuser/FRC_UserProgram.log", m_log, "console");
+    }
+  }
+
+  private static void stopConsoleLog() {
+    if (RobotBase.isReal()) {
+      m_consoleLogger.close();
+    }
   }
 
   private static void logMain() {

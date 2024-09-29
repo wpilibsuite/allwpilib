@@ -4,6 +4,10 @@
 
 #include "wpinet/uv/Timer.h"
 
+#include <functional>
+#include <memory>
+#include <utility>
+
 #include "wpinet/uv/Loop.h"
 
 namespace wpi::uv {

@@ -4,6 +4,8 @@
 
 #include "wpi/DataLogReader.h"
 
+#include <utility>
+
 #include "wpi/DataLog.h"
 #include "wpi/Endian.h"
 #include "wpi/MathExtras.h"

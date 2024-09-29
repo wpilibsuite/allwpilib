@@ -35,13 +35,6 @@ CAN::CAN(int deviceId, int deviceManufacturer, int deviceType) {
   HAL_Report(HALUsageReporting::kResourceType_CAN, deviceId + 1);
 }
 
-CAN::~CAN() {
-  if (m_handle != HAL_kInvalidHandle) {
-    HAL_CleanCAN(m_handle);
-    m_handle = HAL_kInvalidHandle;
-  }
-}
-
 void CAN::WritePacket(const uint8_t* data, int length, int apiId) {
   int32_t status = 0;
   HAL_WriteCANPacket(m_handle, data, length, apiId, &status);

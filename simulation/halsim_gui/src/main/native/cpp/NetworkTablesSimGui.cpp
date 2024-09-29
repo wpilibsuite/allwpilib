@@ -4,10 +4,11 @@
 
 #include "NetworkTablesSimGui.h"
 
+#include <memory>
+
 #include <glass/Context.h>
 #include <glass/Storage.h>
 #include <glass/networktables/NetworkTables.h>
-
 #include <wpigui.h>
 
 #include "HALSimGui.h"

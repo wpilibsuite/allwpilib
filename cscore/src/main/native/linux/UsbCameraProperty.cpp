@@ -4,6 +4,10 @@
 
 #include "UsbCameraProperty.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>

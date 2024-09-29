@@ -4,6 +4,9 @@
 
 #include "frc/event/NetworkBooleanEvent.h"
 
+#include <memory>
+#include <utility>
+
 #include <networktables/BooleanTopic.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>

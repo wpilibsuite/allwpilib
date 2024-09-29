@@ -10,13 +10,23 @@
 #include <chrono>
 #include <cstdio>
 #include <cstring>
+#include <string>
 #include <thread>
+#include <utility>
 
 #include <GLFW/glfw3.h>
 #include <IconsFontAwesome6.h>
 #include <imgui.h>
+#include <imgui_DroidSans.h>
+#include <imgui_FiraCodeRetina.h>
 #include <imgui_FontAwesomeSolid.h>
 #include <imgui_ProggyDotted.h>
+#include <imgui_RobotoBold.h>
+#include <imgui_RobotoCondensedBold.h>
+#include <imgui_RobotoCondensedLight.h>
+#include <imgui_RobotoCondensedRegular.h>
+#include <imgui_RobotoLight.h>
+#include <imgui_RobotoRegular.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_internal.h>
 #include <implot.h>
@@ -92,6 +102,8 @@ static void IniReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
     impl->userScale = num;
   } else if (std::strncmp(lineStr, "style=", 6) == 0) {
     impl->style = num;
+  } else if (std::strncmp(lineStr, "font=", 5) == 0) {
+    impl->defaultFontName = &lineStr[5];
   } else if (std::strncmp(lineStr, "fps=", 4) == 0) {
     impl->fps = num;
   }
@@ -104,23 +116,50 @@ static void IniWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
   }
   out_buf->appendf(
       "[MainWindow][GLOBAL]\nwidth=%d\nheight=%d\nmaximized=%d\n"
-      "xpos=%d\nypos=%d\nuserScale=%d\nstyle=%d\nfps=%d\n\n",
+      "xpos=%d\nypos=%d\nuserScale=%d\nstyle=%d\nfont=%s\nfps=%d\n\n",
       gContext->width, gContext->height, gContext->maximized ? 1 : 0,
       gContext->xPos, gContext->yPos, gContext->userScale, gContext->style,
-      gContext->fps);
+      gContext->defaultFontName.c_str(), gContext->fps);
 }
 
 void gui::CreateContext() {
   gContext = new Context;
-  AddFont("ProggyDotted", [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
-    auto font = ImGui::AddFontProggyDotted(io, size, cfg);
-    static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
-    ImFontConfig icons_cfg;
-    icons_cfg.MergeMode = true;
-    icons_cfg.PixelSnapH = true;
-    ImGui::AddFontFontAwesomeSolid(io, size, &icons_cfg, icons_ranges);
-    return font;
-  });
+  AddDefaultFont("Proggy Dotted",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontProggyDotted(io, size, cfg);
+                 });
+  AddDefaultFont("Droid Sans",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontDroidSans(io, size, cfg);
+                 });
+  AddDefaultFont("Fira Code Retina",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontFiraCodeRetina(io, size, cfg);
+                 });
+  AddDefaultFont("Roboto Light",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontRobotoLight(io, size, cfg);
+                 });
+  AddDefaultFont("Roboto Regular",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontRobotoRegular(io, size, cfg);
+                 });
+  AddDefaultFont("Roboto Bold",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontRobotoBold(io, size, cfg);
+                 });
+  AddDefaultFont("Roboto Condensed Light",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontRobotoCondensedLight(io, size, cfg);
+                 });
+  AddDefaultFont("Roboto Condensed Regular",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontRobotoCondensedRegular(io, size, cfg);
+                 });
+  AddDefaultFont("Roboto Condensed Bold",
+                 [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
+                   return ImGui::AddFontRobotoCondensedBold(io, size, cfg);
+                 });
   PlatformCreateContext();
 }
 
@@ -156,17 +195,25 @@ static void ReloadFonts() {
   io.Fonts->Clear();
   gContext->fonts.clear();
   float size = 7.0f + gContext->fontScale * 3.0f;
-  bool first = true;
   for (auto&& makeFont : gContext->makeFonts) {
-    if (makeFont.second) {
+    if (makeFont.func) {
       ImFontConfig cfg;
-      std::snprintf(cfg.Name, sizeof(cfg.Name), "%s", makeFont.first);
-      ImFont* font = makeFont.second(io, size, &cfg);
-      if (first) {
-        ImGui::GetIO().FontDefault = font;
-        first = false;
+      std::snprintf(cfg.Name, sizeof(cfg.Name), "%s", makeFont.name.c_str());
+      bool isDefault = makeFont.name == gContext->defaultFontName;
+      if (!makeFont.defaultOnly || isDefault) {
+        ImFont* font = makeFont.func(io, size, &cfg);
+        if (isDefault) {
+          // Merge font awesome solid into default font
+          static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA,
+                                                 0};
+          ImFontConfig icons_cfg;
+          icons_cfg.MergeMode = true;
+          icons_cfg.PixelSnapH = true;
+          ImGui::AddFontFontAwesomeSolid(io, size, &icons_cfg, icons_ranges);
+          ImGui::GetIO().FontDefault = font;
+        }
+        gContext->fonts.emplace_back(font);
       }
-      gContext->fonts.emplace_back(font);
     }
   }
 }
@@ -477,9 +524,102 @@ int gui::AddFont(
     std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
         makeFont) {
   if (makeFont) {
-    gContext->makeFonts.emplace_back(name, std::move(makeFont));
+    gContext->makeFonts.emplace_back(name, false, std::move(makeFont));
   }
   return gContext->makeFonts.size() - 1;
+}
+
+void gui::AddDefaultFont(
+    const char* name,
+    std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
+        makeFont) {
+  if (makeFont) {
+    gContext->makeFonts.emplace_back(name, true, std::move(makeFont));
+  }
+}
+
+// https://github.com/ocornut/imgui/issues/707#issuecomment-917151020
+static void StyleColorsDeepDark() {
+  ImVec4* colors = ImGui::GetStyle().Colors;
+  colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+  colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+  colors[ImGuiCol_WindowBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+  colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+  colors[ImGuiCol_PopupBg] = ImVec4(0.19f, 0.19f, 0.19f, 0.92f);
+  colors[ImGuiCol_Border] = ImVec4(0.19f, 0.19f, 0.19f, 0.29f);
+  colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.24f);
+  colors[ImGuiCol_FrameBg] = ImVec4(0.05f, 0.05f, 0.05f, 0.54f);
+  colors[ImGuiCol_FrameBgHovered] = ImVec4(0.19f, 0.19f, 0.19f, 0.54f);
+  colors[ImGuiCol_FrameBgActive] = ImVec4(0.20f, 0.22f, 0.23f, 1.00f);
+  colors[ImGuiCol_TitleBg] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+  colors[ImGuiCol_TitleBgActive] = ImVec4(0.06f, 0.06f, 0.06f, 1.00f);
+  colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+  colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+  colors[ImGuiCol_ScrollbarBg] = ImVec4(0.05f, 0.05f, 0.05f, 0.54f);
+  colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.34f, 0.34f, 0.34f, 0.54f);
+  colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.40f, 0.40f, 0.40f, 0.54f);
+  colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.56f, 0.56f, 0.56f, 0.54f);
+  colors[ImGuiCol_CheckMark] = ImVec4(0.33f, 0.67f, 0.86f, 1.00f);
+  colors[ImGuiCol_SliderGrab] = ImVec4(0.34f, 0.34f, 0.34f, 0.54f);
+  colors[ImGuiCol_SliderGrabActive] = ImVec4(0.56f, 0.56f, 0.56f, 0.54f);
+  colors[ImGuiCol_Button] = ImVec4(0.05f, 0.05f, 0.05f, 0.54f);
+  colors[ImGuiCol_ButtonHovered] = ImVec4(0.19f, 0.19f, 0.19f, 0.54f);
+  colors[ImGuiCol_ButtonActive] = ImVec4(0.20f, 0.22f, 0.23f, 1.00f);
+  colors[ImGuiCol_Header] = ImVec4(0.00f, 0.00f, 0.00f, 0.52f);
+  colors[ImGuiCol_HeaderHovered] = ImVec4(0.00f, 0.00f, 0.00f, 0.36f);
+  colors[ImGuiCol_HeaderActive] = ImVec4(0.20f, 0.22f, 0.23f, 0.33f);
+  colors[ImGuiCol_Separator] = ImVec4(0.28f, 0.28f, 0.28f, 0.29f);
+  colors[ImGuiCol_SeparatorHovered] = ImVec4(0.44f, 0.44f, 0.44f, 0.29f);
+  colors[ImGuiCol_SeparatorActive] = ImVec4(0.40f, 0.44f, 0.47f, 1.00f);
+  colors[ImGuiCol_ResizeGrip] = ImVec4(0.28f, 0.28f, 0.28f, 0.29f);
+  colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.44f, 0.44f, 0.44f, 0.29f);
+  colors[ImGuiCol_ResizeGripActive] = ImVec4(0.40f, 0.44f, 0.47f, 1.00f);
+  colors[ImGuiCol_Tab] = ImVec4(0.00f, 0.00f, 0.00f, 0.52f);
+  colors[ImGuiCol_TabHovered] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+  colors[ImGuiCol_TabActive] = ImVec4(0.20f, 0.20f, 0.20f, 0.36f);
+  colors[ImGuiCol_TabUnfocused] = ImVec4(0.00f, 0.00f, 0.00f, 0.52f);
+  colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+  colors[ImGuiCol_DockingPreview] = ImVec4(0.33f, 0.67f, 0.86f, 1.00f);
+  colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+  colors[ImGuiCol_PlotLines] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
+  colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
+  colors[ImGuiCol_PlotHistogram] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
+  colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
+  colors[ImGuiCol_TableHeaderBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.52f);
+  colors[ImGuiCol_TableBorderStrong] = ImVec4(0.00f, 0.00f, 0.00f, 0.52f);
+  colors[ImGuiCol_TableBorderLight] = ImVec4(0.28f, 0.28f, 0.28f, 0.29f);
+  colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+  colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
+  colors[ImGuiCol_TextSelectedBg] = ImVec4(0.20f, 0.22f, 0.23f, 1.00f);
+  colors[ImGuiCol_DragDropTarget] = ImVec4(0.33f, 0.67f, 0.86f, 1.00f);
+  colors[ImGuiCol_NavHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+  colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+  colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.15f, 0.15f, 0.15f, 0.20f);
+  colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.15f, 0.15f, 0.15f, 0.35f);
+
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.WindowPadding = ImVec2(8.00f, 8.00f);
+  style.FramePadding = ImVec2(5.00f, 2.00f);
+  style.CellPadding = ImVec2(6.00f, 6.00f);
+  style.ItemSpacing = ImVec2(6.00f, 6.00f);
+  style.ItemInnerSpacing = ImVec2(6.00f, 6.00f);
+  style.TouchExtraPadding = ImVec2(0.00f, 0.00f);
+  style.IndentSpacing = 25;
+  style.ScrollbarSize = 15;
+  style.GrabMinSize = 10;
+  style.WindowBorderSize = 1;
+  style.ChildBorderSize = 1;
+  style.PopupBorderSize = 1;
+  style.FrameBorderSize = 1;
+  style.TabBorderSize = 1;
+  style.WindowRounding = 7;
+  style.ChildRounding = 4;
+  style.FrameRounding = 3;
+  style.PopupRounding = 4;
+  style.ScrollbarRounding = 9;
+  style.GrabRounding = 3;
+  style.LogSliderDeadzone = 4;
+  style.TabRounding = 4;
 }
 
 void gui::SetStyle(Style style) {
@@ -493,6 +633,9 @@ void gui::SetStyle(Style style) {
       break;
     case kStyleLight:
       ImGui::StyleColorsLight();
+      break;
+    case kStyleDeepDark:
+      StyleColorsDeepDark();
       break;
   }
 }
@@ -547,6 +690,21 @@ void gui::EmitViewMenu() {
       selected = gContext->style == kStyleLight;
       if (ImGui::MenuItem("Light", nullptr, &selected, true)) {
         SetStyle(kStyleLight);
+      }
+      selected = gContext->style == kStyleDeepDark;
+      if (ImGui::MenuItem("Deep Dark", nullptr, &selected, true)) {
+        SetStyle(kStyleDeepDark);
+      }
+      ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Font")) {
+      for (auto&& makeFont : gContext->makeFonts) {
+        bool selected = gContext->defaultFontName == makeFont.name;
+        if (ImGui::MenuItem(makeFont.name.c_str(), nullptr, &selected)) {
+          gContext->defaultFontName = makeFont.name;
+          gContext->reloadFonts = true;
+        }
       }
       ImGui::EndMenu();
     }

@@ -5,6 +5,9 @@
 #include "MjpegServerImpl.h"
 
 #include <chrono>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
@@ -15,7 +18,6 @@
 #include <wpinet/raw_socket_istream.h>
 #include <wpinet/raw_socket_ostream.h>
 
-#include "Handle.h"
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"

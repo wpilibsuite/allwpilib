@@ -4,6 +4,8 @@
 
 #include "frc/DutyCycle.h"
 
+#include <utility>
+
 #include <hal/DutyCycle.h>
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>
@@ -33,10 +35,6 @@ DutyCycle::DutyCycle(std::shared_ptr<DigitalSource> source)
     throw FRC_MakeError(err::NullParameter, "source");
   }
   InitDutyCycle();
-}
-
-DutyCycle::~DutyCycle() {
-  HAL_FreeDutyCycle(m_handle);
 }
 
 void DutyCycle::InitDutyCycle() {

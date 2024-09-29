@@ -4,6 +4,8 @@
 
 #include "frc/shuffleboard/Shuffleboard.h"
 
+#include <memory>
+
 #include <networktables/NetworkTableInstance.h>
 
 #include "frc/shuffleboard/ShuffleboardTab.h"

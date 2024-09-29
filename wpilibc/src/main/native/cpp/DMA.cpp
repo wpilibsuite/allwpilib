@@ -15,11 +15,6 @@
 #include <hal/DMA.h>
 #include <hal/HALBase.h>
 
-#include "frc/AnalogInput.h"
-#include "frc/Counter.h"
-#include "frc/DigitalSource.h"
-#include "frc/DutyCycle.h"
-#include "frc/Encoder.h"
 #include "frc/Errors.h"
 
 using namespace frc;
@@ -28,10 +23,6 @@ DMA::DMA() {
   int32_t status = 0;
   dmaHandle = HAL_InitializeDMA(&status);
   FRC_CheckErrorStatus(status, "InitializeDMA");
-}
-
-DMA::~DMA() {
-  HAL_FreeDMA(dmaHandle);
 }
 
 void DMA::SetPause(bool pause) {
