@@ -99,11 +99,6 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
 
     ConfigCalTime(cal_time);
 
-    m_spi = new SPI(m_spi_port);
-    m_spi->SetClockRate(1000000);
-    m_spi->SetMode(frc::SPI::Mode::kMode3);
-    m_spi->SetChipSelectActiveLow();
-    // Configure standard SPI
     if (!SwitchToStandardSPI()) {
       return;
     }
@@ -178,8 +173,6 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
           "required!");
     }
 
-    m_auto_interrupt = new DigitalInput(10);
-    // Configure and enable auto SPI
     if (!SwitchToAutoSPI()) {
       return;
     }
@@ -352,7 +345,7 @@ bool ADIS16448_IMU::SwitchToStandardSPI() {
       Wait(10_ms);
     }
     // Maybe we're in auto SPI mode? If so, kill auto SPI, and then SPI.
-    if (m_auto_configured) {
+    if (m_spi != nullptr && m_auto_configured) {
       m_spi->StopAuto();
       // We need to get rid of all the garbage left in the auto SPI buffer after
       // stopping it.
@@ -370,6 +363,12 @@ bool ADIS16448_IMU::SwitchToStandardSPI() {
         data_count = m_spi->ReadAutoReceivedData(trashBuffer, 0, 0_s);
       }
     }
+  }
+  if (m_spi == nullptr) {
+    m_spi = new SPI(m_spi_port);
+    m_spi->SetClockRate(1000000);
+    m_spi->SetMode(frc::SPI::Mode::kMode3);
+    m_spi->SetChipSelectActiveLow();
   }
   ReadRegister(PROD_ID);  // Dummy read
   // Validate the product ID
@@ -412,6 +411,15 @@ void ADIS16448_IMU::InitOffsetBuffer(int size) {
  *are hard-coded to work only with the ADIS16448 IMU.
  **/
 bool ADIS16448_IMU::SwitchToAutoSPI() {
+  // No SPI port has been set up. Go set one up first.
+  if (m_spi == nullptr && !SwitchToStandardSPI()) {
+    REPORT_ERROR("Failed to start/restart auto SPI");
+    return false;
+  }
+  // Only set up the interrupt if needed.
+  if (m_auto_interrupt == nullptr) {
+    m_auto_interrupt = new DigitalInput(10);
+  }
   // The auto SPI controller gets angry if you try to set up two instances on
   // one bus.
   if (!m_auto_configured) {
