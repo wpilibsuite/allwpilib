@@ -154,7 +154,7 @@ class ElevatorFeedforward {
   constexpr units::volt_t Calculate(
       units::unit_t<Velocity> currentVelocity,
       units::unit_t<Velocity> nextVelocity) const {
-    // See wpimath/algorithms.md#Elevator_feedforward for derivation        
+    // See wpimath/algorithms.md#Elevator_feedforward for derivation
     if (kA == decltype(kA)(0)) {
       return kS * wpi::sgn(nextVelocity) + kG + kV * nextVelocity;
     } else {
