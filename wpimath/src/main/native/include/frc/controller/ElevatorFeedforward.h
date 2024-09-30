@@ -68,7 +68,7 @@ class ElevatorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints.
+   * Calculates the feedforward from the gains and setpoints assuming continuous control.
    *
    * @param velocity     The velocity setpoint.
    * @param acceleration The acceleration setpoint.
@@ -82,7 +82,7 @@ class ElevatorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints.
+   * Calculates the feedforward from the gains and setpoints assuming continuous control.
    *
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity    The next velocity setpoint.
