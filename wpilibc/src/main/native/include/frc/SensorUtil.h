@@ -78,11 +78,11 @@ class SensorUtil final {
    */
   static bool CheckAnalogOutputChannel(int channel);
 
-  static const int kDigitalChannels;
-  static const int kAnalogInputs;
-  static const int kAnalogOutputs;
-  static const int kPwmChannels;
-  static const int kRelayChannels;
+  static int GetNumDigitalChannels();
+  static int GetNumAnalogInputs();
+  static int GetNumAnalogOuputs();
+  static int GetNumPwmChannels();
+  static int GetNumRelayChannels();
 };
 
 }  // namespace frc
