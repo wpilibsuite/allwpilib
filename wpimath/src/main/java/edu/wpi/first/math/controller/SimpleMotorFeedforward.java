@@ -187,7 +187,7 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   public <U extends Unit> Voltage calculate(
       Measure<? extends PerUnit<U, TimeUnit>> currentVelocity,
       Measure<? extends PerUnit<U, TimeUnit>> nextVelocity) {
-    //derivation at wpimath/algorithms.md#Simple motor feedforward
+    // See wpimath/algorithms.md#Simple_motor_feedforward for derivation
     if (ka == 0.0) {
       output.mut_replace(
           ks * Math.signum(nextVelocity.magnitude()) + kv * nextVelocity.magnitude(), Volts);

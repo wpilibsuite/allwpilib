@@ -108,6 +108,7 @@ class SimpleMotorFeedforward {
   constexpr units::volt_t Calculate(
       units::unit_t<Velocity> currentVelocity,
       units::unit_t<Velocity> nextVelocity) const {
+    // See wpimath/algorithms.md#Simple_motor_feedforward for derivation        
     if (kA == decltype(kA)(0)) {
       return kS * wpi::sgn(nextVelocity) + kV * nextVelocity;
     } else {

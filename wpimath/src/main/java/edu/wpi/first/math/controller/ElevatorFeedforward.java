@@ -187,6 +187,7 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    * @return The computed feedforward.
    */
   public Voltage calculate(LinearVelocity currentVelocity, LinearVelocity nextVelocity) {
+    // See wpimath/algorithms.md#Elevator_feedforward for derivation        
     if (ka == 0.0) {
       output.mut_replace(
           ks * Math.signum(nextVelocity.in(MetersPerSecond))
