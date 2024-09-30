@@ -95,7 +95,7 @@ class ElevatorFeedforward {
   units::volt_t Calculate(units::unit_t<Velocity> currentVelocity,
                           units::unit_t<Velocity> nextVelocity,
                           units::second_t dt) const {
-    // See wpimath/algorithms.md#Elevator_feedforward for derivation        
+    // See wpimath/algorithms.md#Elevator_feedforward for derivation
     auto plant = LinearSystemId::IdentifyVelocitySystem<Distance>(kV, kA);
     LinearPlantInversionFeedforward<1, 1> feedforward{plant, dt};
 
