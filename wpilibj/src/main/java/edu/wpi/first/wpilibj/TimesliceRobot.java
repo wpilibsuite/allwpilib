@@ -4,6 +4,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.units.Units.Seconds;
+
+import java.text.DecimalFormat;
+
 /**
  * TimesliceRobot extends the TimedRobot robot program framework to provide timeslice scheduling of
  * periodic functions.
@@ -93,7 +97,7 @@ public class TimesliceRobot extends TimedRobot {
    * will have conflicting timeslices.
    *
    * @param func Function to schedule.
-   * @param allocation The function's runtime allocation in seconds out of the controller period.
+   * @param allocation The function's runtime allocation out of the controller period.
    */
   public void schedule(Runnable func, double allocation) {
     if (m_nextOffset + allocation > m_controllerPeriod) {
@@ -107,7 +111,13 @@ public class TimesliceRobot extends TimedRobot {
               + "\n");
     }
 
-    addPeriodic(func, m_controllerPeriod, m_nextOffset);
+    var fmt = new DecimalFormat("#0.00");
+    String name = "Timeslice{"
+      + new DecimalFormat("#0.00").format(m_nextOffset)
+      + "->"
+      + fmt.format(m_nextOffset + allocation)
+      + "}";
+    addPeriodic(func, name, Seconds.of(m_controllerPeriod), Seconds.of(m_nextOffset));
     m_nextOffset += allocation;
   }
 
