@@ -68,7 +68,8 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming continuous control.
+   * Calculates the feedforward from the gains and setpoints assuming continuous
+   * control.
    *
    * @param angle        The angle setpoint, in radians. This angle should be
    *                     measured from the horizontal (i.e. if the provided
@@ -88,7 +89,8 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming continuous control.
+   * Calculates the feedforward from the gains and setpoints assuming continuous
+   * control.
    *
    * @param currentAngle The current angle in radians. This angle should be
    *   measured from the horizontal (i.e. if the provided angle is 0, the arm

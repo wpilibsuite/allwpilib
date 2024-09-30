@@ -149,8 +149,8 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Calculates the feedforward from the gains and velocity setpoint assuming continuous control (acceleration is assumed to be
-   * zero).
+   * Calculates the feedforward from the gains and velocity setpoint assuming continuous control
+   * (acceleration is assumed to be zero).
    *
    * @param velocity The velocity setpoint.
    * @return The computed feedforward.

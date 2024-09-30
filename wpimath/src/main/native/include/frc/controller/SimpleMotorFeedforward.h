@@ -69,7 +69,8 @@ class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming continuous control.
+   * Calculates the feedforward from the gains and setpoints assuming continuous
+   * control.
    *
    * @param velocity     The velocity setpoint.
    * @param acceleration The acceleration setpoint.

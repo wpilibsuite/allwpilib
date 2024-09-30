@@ -162,8 +162,8 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
-   * Calculates the feedforward from the gains and velocity setpoint assuming continuous control (acceleration is assumed to be
-   * zero).
+   * Calculates the feedforward from the gains and velocity setpoint assuming continuous control
+   * (acceleration is assumed to be zero).
    *
    * @param positionRadians The position (angle) setpoint. This angle should be measured from the
    *     horizontal (i.e. if the provided angle is 0, the arm should be parallel with the floor). If
