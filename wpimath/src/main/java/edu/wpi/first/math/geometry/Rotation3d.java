@@ -16,9 +16,10 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.AllianceSymmetry.Flippable;
+import edu.wpi.first.math.geometry.AllianceSymmetry.SymmetryStrategy;
 import edu.wpi.first.math.geometry.proto.Rotation3dProto;
 import edu.wpi.first.math.geometry.struct.Rotation3dStruct;
-import edu.wpi.first.math.geometry.AllianceSymmetry.*;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
@@ -510,12 +511,8 @@ public class Rotation3d
 
   @Override
   public Rotation3d flip(SymmetryStrategy strategy) {
-      Rotation2d rot2d = toRotation2d().flip(strategy);
-      return new Rotation3d(
-          this.getX(),
-          this.getY(),
-          rot2d.getRadians()
-      );
+    Rotation2d rot2d = toRotation2d().flip(strategy);
+    return new Rotation3d(this.getX(), this.getY(), rot2d.getRadians());
   }
 
   /** Rotation3d protobuf for serialization. */

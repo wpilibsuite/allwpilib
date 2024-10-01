@@ -10,9 +10,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.geometry.AllianceSymmetry.Flippable;
+import edu.wpi.first.math.geometry.AllianceSymmetry.SymmetryStrategy;
 import edu.wpi.first.math.geometry.proto.Pose2dProto;
 import edu.wpi.first.math.geometry.struct.Pose2dStruct;
-import edu.wpi.first.math.geometry.AllianceSymmetry.*;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
@@ -352,10 +353,7 @@ public class Pose2d
 
   @Override
   public Pose2d flip(SymmetryStrategy strategy) {
-    return new Pose2d(
-        m_translation.flip(strategy),
-        m_rotation.flip(strategy)
-    );
+    return new Pose2d(m_translation.flip(strategy), m_rotation.flip(strategy));
   }
 
   /** Pose2d protobuf for serialization. */
