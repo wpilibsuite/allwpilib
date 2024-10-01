@@ -34,7 +34,9 @@ class PIDCommand : public CommandHelper<Command, PIDCommand> {
    * @param setpointSource   the controller's reference (aka setpoint)
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
+   * @deprecated Use a PIDController instead
    */
+  [[deprecated("Use a PIDController instead")]]
   PIDCommand(frc::PIDController controller,
              std::function<double()> measurementSource,
              std::function<double()> setpointSource,
@@ -50,7 +52,9 @@ class PIDCommand : public CommandHelper<Command, PIDCommand> {
    * @param setpoint         the controller's setpoint (aka setpoint)
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
+   * @deprecated Use a PIDController instead
    */
+  [[deprecated("Use a PIDController instead")]]
   PIDCommand(frc::PIDController controller,
              std::function<double()> measurementSource, double setpoint,
              std::function<void(double)> useOutput,
