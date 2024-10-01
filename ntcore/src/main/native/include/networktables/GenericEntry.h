@@ -335,7 +335,7 @@ class GenericPublisher : public Publisher {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   bool SetDefaultBoolean(bool defaultValue);
 
@@ -343,7 +343,7 @@ class GenericPublisher : public Publisher {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   bool SetDefaultInteger(int64_t defaultValue);
 
@@ -351,7 +351,7 @@ class GenericPublisher : public Publisher {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   bool SetDefaultFloat(float defaultValue);
 
@@ -359,7 +359,7 @@ class GenericPublisher : public Publisher {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   bool SetDefaultDouble(double defaultValue);
 
@@ -367,7 +367,7 @@ class GenericPublisher : public Publisher {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   bool SetDefaultString(std::string_view defaultValue);
 
@@ -375,7 +375,7 @@ class GenericPublisher : public Publisher {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   bool SetDefaultRaw(std::span<const uint8_t> defaultValue);
 
@@ -383,7 +383,7 @@ class GenericPublisher : public Publisher {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   bool SetDefaultBooleanArray(std::span<const int> defaultValue);
 
@@ -391,7 +391,7 @@ class GenericPublisher : public Publisher {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   bool SetDefaultIntegerArray(std::span<const int64_t> defaultValue);
 
@@ -399,7 +399,7 @@ class GenericPublisher : public Publisher {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   bool SetDefaultFloatArray(std::span<const float> defaultValue);
 
@@ -407,7 +407,7 @@ class GenericPublisher : public Publisher {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   bool SetDefaultDoubleArray(std::span<const double> defaultValue);
 
@@ -415,7 +415,7 @@ class GenericPublisher : public Publisher {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   bool SetDefaultStringArray(std::span<const std::string> defaultValue);
 
