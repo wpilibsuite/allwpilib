@@ -85,18 +85,6 @@ namespace frc {
 class TimesliceRobot : public TimedRobot {
  public:
   /**
-   * Constructor for TimesliceRobot.
-   *
-   * @param robotPeriodicAllocation The allocation to give the TimesliceRobot
-   *                                periodic functions.
-   * @param controllerPeriod The controller period. The sum of all scheduler
-   *                         allocations should be less than or equal to this
-   *                         value.
-   */
-  explicit TimesliceRobot(units::second_t robotPeriodicAllocation,
-                          units::second_t controllerPeriod);
-
-  /**
    * Schedule a periodic function with the constructor's controller period and
    * the given allocation. The function's runtime allocation will be placed
    * after the end of the previous one's.
@@ -111,6 +99,19 @@ class TimesliceRobot : public TimedRobot {
    *                   period.
    */
   void Schedule(std::function<void()> func, units::second_t allocation);
+
+ protected:
+  /**
+   * Constructor for TimesliceRobot.
+   *
+   * @param robotPeriodicAllocation The allocation to give the TimesliceRobot
+   *                                periodic functions.
+   * @param controllerPeriod The controller period. The sum of all scheduler
+   *                         allocations should be less than or equal to this
+   *                         value.
+   */
+  explicit TimesliceRobot(units::second_t robotPeriodicAllocation,
+                          units::second_t controllerPeriod);
 
  private:
   units::second_t m_nextOffset;

@@ -17,6 +17,13 @@
 
 using namespace frc;
 
+TimedRobot::~TimedRobot() {
+  int32_t status = 0;
+
+  HAL_StopNotifier(m_notifier, &status);
+  FRC_ReportError(status, "StopNotifier");
+}
+
 void TimedRobot::StartCompetition() {
   RobotInit();
 
@@ -76,6 +83,14 @@ void TimedRobot::EndCompetition() {
   HAL_StopNotifier(m_notifier, &status);
 }
 
+void TimedRobot::AddPeriodic(std::function<void()> callback,
+                             units::second_t period, units::second_t offset) {
+  m_callbacks.emplace(
+      callback, m_startTime,
+      std::chrono::microseconds{static_cast<int64_t>(period.value() * 1e6)},
+      std::chrono::microseconds{static_cast<int64_t>(offset.value() * 1e6)});
+}
+
 TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   m_startTime = std::chrono::microseconds{RobotController::GetFPGATime()};
   AddPeriodic([=, this] { LoopFunc(); }, period);
@@ -87,19 +102,4 @@ TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
 
   HAL_Report(HALUsageReporting::kResourceType_Framework,
              HALUsageReporting::kFramework_Timed);
-}
-
-TimedRobot::~TimedRobot() {
-  int32_t status = 0;
-
-  HAL_StopNotifier(m_notifier, &status);
-  FRC_ReportError(status, "StopNotifier");
-}
-
-void TimedRobot::AddPeriodic(std::function<void()> callback,
-                             units::second_t period, units::second_t offset) {
-  m_callbacks.emplace(
-      callback, m_startTime,
-      std::chrono::microseconds{static_cast<int64_t>(period.value() * 1e6)},
-      std::chrono::microseconds{static_cast<int64_t>(offset.value() * 1e6)});
 }
