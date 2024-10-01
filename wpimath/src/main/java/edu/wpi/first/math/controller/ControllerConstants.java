@@ -5,20 +5,15 @@
 package edu.wpi.first.math.controller;
 
 /**
- * A helper class that computes feedforward outputs for a simple arm (modeled as
- * a motor acting
+ * A helper class that computes feedforward outputs for a simple arm (modeled as a motor acting
  * against the force of gravity on a beam suspended at an angle).
  */
 public class ControllerConstants {
-
   private ControllerConstants() {
     // prevents instantiation
   }
 
-  public record FeedforwardConstants(double ks, double kv, double ka, double kg) {
-  }
+  public record FeedforwardConstants(double ks, double kv, double ka, double kg) {}
 
-  public record FeedbackContants(double kp, double ki, double kd) {
-  }
-
+  public record FeedbackContants(double kp, double ki, double kd) {}
 }
