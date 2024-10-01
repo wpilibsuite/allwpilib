@@ -34,7 +34,7 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   private final double m_dt;
 
   /**
-   * Create a new SimpleMotorFeedforward with the specified plant. Units used to create the plant
+   * Creates a new SimpleMotorFeedforward with the specified plant. Units used to create the plant
    * will dictate units of the computed feedforward. The static gain (ks) is assumed to be 0.0.
    *
    * <p>The constructor is useful for simulating LinearSystemSim classes.
@@ -43,8 +43,8 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    * @param dtSeconds The period in seconds.
    * @throws IllegalArgumentException for period &le; zero.
    */
-  public SimpleMotorFeedforward(LinearSystem<N2, N1, N2> plant, double dtSeconds) {
-    this(0.0, -plant.getA(1, 1) / plant.getB(1, 0), 1.0 / plant.getB(1, 0), dtSeconds);
+  public SimpleMotorFeedforward(LinearSystem<N1, N1, N1> plant, double dtSeconds) {
+    this(0.0, -plant.getA(0, 0) / plant.getB(0, 0), 1.0 / plant.getB(0, 0), dtSeconds);
   }
 
   /**
