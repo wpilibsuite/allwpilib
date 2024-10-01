@@ -4,9 +4,14 @@
 
 package edu.wpi.first.hal;
 
+import java.nio.ByteBuffer;
+
+import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
+
 /** Version and device data received from a REV PH. */
 @SuppressWarnings("MemberName")
-public class REVPHVersion {
+public class REVPHVersion implements StructSerializable {
   /** The firmware major version. */
   public final int firmwareMajor;
 
@@ -48,5 +53,56 @@ public class REVPHVersion {
     this.hardwareMinor = hardwareMinor;
     this.hardwareMajor = hardwareMajor;
     this.uniqueId = uniqueId;
+  }
+
+  public static final REVPHVersionStruct struct = new REVPHVersionStruct();
+
+  public static final class REVPHVersionStruct implements Struct<REVPHVersion> {
+    @Override
+    public Class<REVPHVersion> getTypeClass() {
+      return REVPHVersion.class;
+    }
+
+    @Override
+    public int getSize() {
+      return kSizeInt32;
+    }
+
+    @Override
+    public String getSchema() {
+      return "int8 firmwareMajor; "
+          + "int8 firmwareMinor; "
+          + "int8 firmwareFix; "
+          + "int8 hardwareMinor; "
+          + "int8 hardwareMajor; "
+          + "int32 uniqueId;";
+    }
+
+    @Override
+    public String getTypeName() {
+      return "REVPHVersion";
+    }
+
+    @Override
+    public void pack(ByteBuffer bb, REVPHVersion value) {
+      bb.put((byte) value.firmwareMajor);
+      bb.put((byte) value.firmwareMinor);
+      bb.put((byte) value.firmwareFix);
+      bb.put((byte) value.hardwareMinor);
+      bb.put((byte) value.hardwareMajor);
+      bb.putLong(value.uniqueId);
+    }
+
+    @Override
+    public REVPHVersion unpack(ByteBuffer bb) {
+      return new REVPHVersion(
+        bb.get(),
+        bb.get(),
+        bb.get(),
+        bb.get(),
+        bb.get(),
+        bb.getInt()
+      );
+    }
   }
 }
