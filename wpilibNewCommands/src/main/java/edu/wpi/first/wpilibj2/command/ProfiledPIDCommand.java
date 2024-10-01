@@ -18,7 +18,10 @@ import java.util.function.Supplier;
  * output are performed synchronously in the command's execute() method.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @deprecated Use a ProfiledPIDController instead
  */
+@Deprecated(forRemoval = true, since = "2025")
 public class ProfiledPIDCommand extends Command {
   /** Profiled PID controller. */
   protected final ProfiledPIDController m_controller;

@@ -24,9 +24,10 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  *
  * @see ProfiledPIDController<Distance>
+ * @deprecated Use a ProfiledPIDController instead
  */
 template <class Distance>
-class ProfiledPIDCommand
+class [[deprecated("Use a ProfiledPIDController instead")]] ProfiledPIDCommand
     : public CommandHelper<Command, ProfiledPIDCommand<Distance>> {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =

@@ -22,8 +22,10 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  *
  * @see PIDController
+ * @deprecated Use a PIDController instead
  */
-class PIDCommand : public CommandHelper<Command, PIDCommand> {
+class [[deprecated("Use a PIDController instead")]] PIDCommand
+    : public CommandHelper<Command, PIDCommand> {
  public:
   /**
    * Creates a new PIDCommand, which controls the given output with a

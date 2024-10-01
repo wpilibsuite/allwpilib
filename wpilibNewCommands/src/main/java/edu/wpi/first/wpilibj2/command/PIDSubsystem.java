@@ -13,7 +13,10 @@ import edu.wpi.first.math.controller.PIDController;
  * synchronously from the subsystem's periodic() method.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @deprecated Use a PIDController instead
  */
+@Deprecated(forRemoval = true, since = "2025")
 public abstract class PIDSubsystem extends SubsystemBase {
   /** PID controller. */
   protected final PIDController m_controller;
