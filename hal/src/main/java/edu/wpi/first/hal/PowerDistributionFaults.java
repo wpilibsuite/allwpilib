@@ -4,10 +4,9 @@
 
 package edu.wpi.first.hal;
 
-import java.nio.ByteBuffer;
-
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.nio.ByteBuffer;
 
 /**
  * Faults for a PowerDistribution device. These faults are only active while the condition is
@@ -19,7 +18,7 @@ public class PowerDistributionFaults implements StructSerializable {
   // introduces some invariance concerns with the promise this class makes.
   // From now on the bitfield is the absolute source of truth for the state of
   // the object.
-  /** The faults bitfield the object was constructed with */
+  /** The faults bitfield the object was constructed with. */
   public final int m_bitfield;
 
   /** Breaker fault on channel 0. */
@@ -180,7 +179,8 @@ public class PowerDistributionFaults implements StructSerializable {
 
   public static final PowerDistributionFaultsStruct struct = new PowerDistributionFaultsStruct();
 
-  public static final class PowerDistributionFaultsStruct implements Struct<PowerDistributionFaults> {
+  public static final class PowerDistributionFaultsStruct
+      implements Struct<PowerDistributionFaults> {
     @Override
     public Class<PowerDistributionFaults> getTypeClass() {
       return PowerDistributionFaults.class;

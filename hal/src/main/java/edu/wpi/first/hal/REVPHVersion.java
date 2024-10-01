@@ -4,10 +4,9 @@
 
 package edu.wpi.first.hal;
 
-import java.nio.ByteBuffer;
-
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.nio.ByteBuffer;
 
 /** Version and device data received from a REV PH. */
 @SuppressWarnings("MemberName")
@@ -95,14 +94,7 @@ public class REVPHVersion implements StructSerializable {
 
     @Override
     public REVPHVersion unpack(ByteBuffer bb) {
-      return new REVPHVersion(
-        bb.get(),
-        bb.get(),
-        bb.get(),
-        bb.get(),
-        bb.get(),
-        bb.getInt()
-      );
+      return new REVPHVersion(bb.get(), bb.get(), bb.get(), bb.get(), bb.get(), bb.getInt());
     }
   }
 }

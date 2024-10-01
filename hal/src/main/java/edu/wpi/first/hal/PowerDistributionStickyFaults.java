@@ -4,10 +4,9 @@
 
 package edu.wpi.first.hal;
 
-import java.nio.ByteBuffer;
-
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.nio.ByteBuffer;
 
 /**
  * Sticky faults for a PowerDistribution device. These faults will remain active until they are
@@ -19,7 +18,7 @@ public class PowerDistributionStickyFaults implements StructSerializable {
   // introduces some invariance concerns with the promise this class makes.
   // From now on the bitfield is the absolute source of truth for the state of
   // the object.
-  /** The faults bitfield the object was constructed with */
+  /** The faults bitfield the object was constructed with. */
   public final int m_bitfield;
 
   /** Breaker fault on channel 0. */
@@ -190,9 +189,11 @@ public class PowerDistributionStickyFaults implements StructSerializable {
     HasReset = (faults & 0x20000000) != 0;
   }
 
-  public static final PowerDistributionStickyFaultsStruct struct = new PowerDistributionStickyFaultsStruct();
+  public static final PowerDistributionStickyFaultsStruct struct =
+      new PowerDistributionStickyFaultsStruct();
 
-  public static final class PowerDistributionStickyFaultsStruct implements Struct<PowerDistributionStickyFaults> {
+  public static final class PowerDistributionStickyFaultsStruct
+      implements Struct<PowerDistributionStickyFaults> {
     @Override
     public Class<PowerDistributionStickyFaults> getTypeClass() {
       return PowerDistributionStickyFaults.class;
@@ -200,7 +201,7 @@ public class PowerDistributionStickyFaults implements StructSerializable {
 
     @Override
     public int getSize() {
-      return 4; //doing bitfields on a u32
+      return 4; // doing bitfields on a u32
     }
 
     @Override

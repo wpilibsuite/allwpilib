@@ -4,10 +4,9 @@
 
 package edu.wpi.first.hal;
 
-import java.nio.ByteBuffer;
-
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.nio.ByteBuffer;
 
 /** Power distribution version. */
 @SuppressWarnings("MemberName")
@@ -57,7 +56,8 @@ public class PowerDistributionVersion implements StructSerializable {
 
   public static final PowerDistributionVersionStruct struct = new PowerDistributionVersionStruct();
 
-  public static final class PowerDistributionVersionStruct implements Struct<PowerDistributionVersion> {
+  public static final class PowerDistributionVersionStruct
+      implements Struct<PowerDistributionVersion> {
     @Override
     public Class<PowerDistributionVersion> getTypeClass() {
       return PowerDistributionVersion.class;
@@ -96,14 +96,7 @@ public class PowerDistributionVersion implements StructSerializable {
     @Override
     public PowerDistributionVersion unpack(ByteBuffer bb) {
       return new PowerDistributionVersion(
-        bb.get(),
-        bb.get(),
-        bb.get(),
-        bb.get(),
-        bb.get(),
-        bb.getInt()
-      );
+          bb.get(), bb.get(), bb.get(), bb.get(), bb.get(), bb.getInt());
     }
   }
-
 }

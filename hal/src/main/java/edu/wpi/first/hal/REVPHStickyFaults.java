@@ -4,10 +4,9 @@
 
 package edu.wpi.first.hal;
 
-import java.nio.ByteBuffer;
-
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.nio.ByteBuffer;
 
 /** Sticky faults for a REV PH. These faults will remain active until they are reset by the user. */
 @SuppressWarnings("MemberName")
@@ -16,7 +15,7 @@ public class REVPHStickyFaults implements StructSerializable {
   // introduces some invariance concerns with the promise this class makes.
   // From now on the bitfield is the absolute source of truth for the state of
   // the object.
-  /** The faults bitfield the object was constructed with */
+  /** The faults bitfield the object was constructed with. */
   public final int m_bitfield;
 
   /** An overcurrent event occurred on the compressor output. */
@@ -87,8 +86,7 @@ public class REVPHStickyFaults implements StructSerializable {
           + "bool canbusOff:1; "
           + "bool hardwareFault:1;"
           + "bool firmwareFault:1; "
-          + "bool hasReset:1; "
-          ;
+          + "bool hasReset:1; ";
     }
 
     @Override

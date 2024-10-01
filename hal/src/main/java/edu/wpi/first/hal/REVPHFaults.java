@@ -4,10 +4,9 @@
 
 package edu.wpi.first.hal;
 
-import java.nio.ByteBuffer;
-
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.nio.ByteBuffer;
 
 /** Faults for a REV PH. These faults are only active while the condition is active. */
 @SuppressWarnings("MemberName")
@@ -16,7 +15,7 @@ public class REVPHFaults implements StructSerializable {
   // introduces some invariance concerns with the promise this class makes.
   // From now on the bitfield is the absolute source of truth for the state of
   // the object.
-  /** The faults bitfield the object was constructed with */
+  /** The faults bitfield the object was constructed with. */
   public final int m_bitfield;
 
   /** Fault on channel 0. */
