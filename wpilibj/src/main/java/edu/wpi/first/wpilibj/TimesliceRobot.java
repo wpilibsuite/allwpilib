@@ -112,11 +112,12 @@ public class TimesliceRobot extends TimedRobot {
     }
 
     var fmt = new DecimalFormat("#0.00");
-    String name = "Timeslice{"
-      + new DecimalFormat("#0.00").format(m_nextOffset)
-      + "->"
-      + fmt.format(m_nextOffset + allocation)
-      + "}";
+    String name =
+        "Timeslice{"
+            + new DecimalFormat("#0.00").format(m_nextOffset)
+            + "->"
+            + fmt.format(m_nextOffset + allocation)
+            + "}";
     addPeriodic(func, name, Seconds.of(m_controllerPeriod), Seconds.of(m_nextOffset));
     m_nextOffset += allocation;
   }

@@ -121,8 +121,7 @@ public class Tracer {
       if (name == null) {
         this.m_rootTable = NetworkTableInstance.getDefault().getTable("Tracer");
       } else {
-        this.m_rootTable =
-            NetworkTableInstance.getDefault().getTable("Tracer").getSubTable(name);
+        this.m_rootTable = NetworkTableInstance.getDefault().getTable("Tracer").getSubTable(name);
       }
       this.m_gcTimeEntry = m_rootTable.getDoubleTopic("GCTime").publish();
     }
@@ -283,7 +282,7 @@ public class Tracer {
    * Enables single threaded mode for the Tracer. This will cause traces on different threads to
    * throw an exception. This will shorten the path of traced data in NetworkTables by not including
    * the thread name.
-   * 
+   *
    * <p>This function should be called before any traces are started.
    */
   public static void enableSingleThreadedMode() {
@@ -299,10 +298,10 @@ public class Tracer {
   /**
    * Disables any tracing for the current thread. This will cause all {@link #startTrace(String)},
    * {@link #endTrace()} and {@link #traceFunc(String, Runnable)} to do nothing.
-   * 
-   * <p>Being disabled prevents the {@link Tracer} from publishing any values to NetworkTables.
-   * This will cause all values to appear as if they're frozen at the value they were
-   * at when this function was called.
+   *
+   * <p>Being disabled prevents the {@link Tracer} from publishing any values to NetworkTables. This
+   * will cause all values to appear as if they're frozen at the value they were at when this
+   * function was called.
    */
   public static void disableTracingForCurrentThread() {
     final TracerState state = threadLocalState.get();
@@ -364,12 +363,13 @@ public class Tracer {
 
   /**
    * A class to help with substituting the current tracer state with a new one.
-   * 
-   * This can be used to act as if code is running on another thread even
-   * if it's running synchronously on the same thread.
+   *
+   * <p>This can be used to act as if code is running on another thread even if it's running
+   * synchronously on the same thread.
    */
   public static class SubstitutiveTracer {
-    private final TracerState m_state, m_originalState;
+    private final TracerState m_state;
+    private final TracerState m_originalState;
 
     /**
      * Constructs a {@code SubstitutiveTracer} with the given name.
@@ -383,16 +383,12 @@ public class Tracer {
       m_originalState = threadLocalState.get();
     }
 
-    /**
-     * Substitutes the current tracer state with the new one.
-     */
+    /** Substitutes the current tracer state with the new one. */
     public void subIn() {
       threadLocalState.set(m_state);
     }
 
-    /**
-     * Substitutes the current tracer state with the original one.
-     */
+    /** Substitutes the current tracer state with the original one. */
     public void subOut() {
       threadLocalState.set(m_originalState);
     }
