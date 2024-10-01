@@ -151,7 +151,6 @@ public class TimedRobot extends IterativeRobotBase {
       }
 
       callback.call();
-      ;
 
       // Increment the expiration time by the number of full periods it's behind
       // plus one to avoid rapid repeat fires from a large loop overrun. We
