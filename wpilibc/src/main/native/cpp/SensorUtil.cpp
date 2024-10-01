@@ -13,12 +13,6 @@
 
 using namespace frc;
 
-const int SensorUtil::kDigitalChannels = HAL_GetNumDigitalChannels();
-const int SensorUtil::kAnalogInputs = HAL_GetNumAnalogInputs();
-const int SensorUtil::kAnalogOutputs = HAL_GetNumAnalogOutputs();
-const int SensorUtil::kPwmChannels = HAL_GetNumPWMChannels();
-const int SensorUtil::kRelayChannels = HAL_GetNumRelayHeaders();
-
 int SensorUtil::GetDefaultCTREPCMModule() {
   return 0;
 }
@@ -45,4 +39,24 @@ bool SensorUtil::CheckAnalogInputChannel(int channel) {
 
 bool SensorUtil::CheckAnalogOutputChannel(int channel) {
   return HAL_CheckAnalogOutputChannel(channel);
+}
+
+int SensorUtil::GetNumDigitalChannels() {
+  return HAL_GetNumDigitalChannels();
+}
+
+int SensorUtil::GetNumAnalogInputs() {
+  return HAL_GetNumAnalogInputs();
+}
+
+int SensorUtil::GetNumAnalogOuputs() {
+  return HAL_GetNumAnalogOutputs();
+}
+
+int SensorUtil::GetNumPwmChannels() {
+  return HAL_GetNumPWMChannels();
+}
+
+int SensorUtil::GetNumRelayChannels() {
+  return HAL_GetNumRelayHeaders();
 }
