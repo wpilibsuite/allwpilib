@@ -19,10 +19,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
-/**
- * A helper class that computes feedforward outputs for a simple
- * permanent-magnet DC motor.
- */
+/** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
 public class SimpleMotorFeedforward implements ProtobufSerializable, StructSerializable {
   /** The static gain. */
   private final double ks;
@@ -37,34 +34,26 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   private final double m_dt;
 
   /**
-   * Create a new SimpleMotorFeedforward with the specified plant. Units used to
-   * create the plant
-   * will dictate units of the computed feedforward. The static gain (ks) is
-   * assumed to be 0.0.
-   * 
-   * <p>
-   * The constructor is useful for simulating LinearSystemSim classes.
-   * 
-   * @param plant     The system plant
+   * Create a new SimpleMotorFeedforward with the specified plant. Units used to create the plant
+   * will dictate units of the computed feedforward. The static gain (ks) is assumed to be 0.0.
+   *
+   * <p>The constructor is useful for simulating LinearSystemSim classes.
+   *
+   * @param plant The system plant
    * @param dtSeconds The period in seconds.
    * @throws IllegalArgumentException for period &le; zero.
    */
   public SimpleMotorFeedforward(LinearSystem<N2, N1, N2> plant, double dtSeconds) {
-    this(
-        0.0,
-        -plant.getA(1, 1) / plant.getB(1, 0),
-        1.0 / plant.getB(1, 0),
-        dtSeconds);
+    this(0.0, -plant.getA(1, 1) / plant.getB(1, 0), 1.0 / plant.getB(1, 0), dtSeconds);
   }
 
   /**
-   * Creates a new SimpleMotorFeedforward with the specified gains and period.
-   * Units of the gain
+   * Creates a new SimpleMotorFeedforward with the specified gains and period. Units of the gain
    * values will dictate units of the computed feedforward.
    *
-   * @param ks        The static gain.
-   * @param kv        The velocity gain.
-   * @param ka        The acceleration gain.
+   * @param ks The static gain.
+   * @param kv The velocity gain.
+   * @param ka The acceleration gain.
    * @param dtSeconds The period in seconds.
    * @throws IllegalArgumentException for kv &lt; zero.
    * @throws IllegalArgumentException for ka &lt; zero.
@@ -88,10 +77,8 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Creates a new SimpleMotorFeedforward with the specified gains and period. The
-   * period is
-   * defaulted to 20 ms. Units of the gain values will dictate units of the
-   * computed feedforward.
+   * Creates a new SimpleMotorFeedforward with the specified gains and period. The period is
+   * defaulted to 20 ms. Units of the gain values will dictate units of the computed feedforward.
    *
    * @param ks The static gain.
    * @param kv The velocity gain.
@@ -104,10 +91,8 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Creates a new SimpleMotorFeedforward with the specified gains. Acceleration
-   * gain is defaulted
-   * to zero. The period is defaulted to 20 ms. Units of the gain values will
-   * dictate units of the
+   * Creates a new SimpleMotorFeedforward with the specified gains. Acceleration gain is defaulted
+   * to zero. The period is defaulted to 20 ms. Units of the gain values will dictate units of the
    * computed feedforward.
    *
    * @param ks The static gain.
@@ -156,7 +141,7 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
-   * @param velocity     The velocity setpoint.
+   * @param velocity The velocity setpoint.
    * @param acceleration The acceleration setpoint.
    * @return The computed feedforward.
    * @deprecated Use the current/next velocity overload instead.
@@ -168,8 +153,7 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Calculates the feedforward from the gains and velocity setpoint (acceleration
-   * is assumed to be
+   * Calculates the feedforward from the gains and velocity setpoint (acceleration is assumed to be
    * zero).
    *
    * @param velocity The velocity setpoint.
@@ -183,11 +167,10 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete
-   * control when the
+   * Calculates the feedforward from the gains and setpoints assuming discrete control when the
    * setpoint does not change.
    *
-   * @param <U>      The velocity parameter either as distance or angle.
+   * @param <U> The velocity parameter either as distance or angle.
    * @param setpoint The velocity setpoint.
    * @return The computed feedforward.
    */
@@ -196,12 +179,11 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete
-   * control.
+   * Calculates the feedforward from the gains and setpoints assuming discrete control.
    *
-   * @param <U>             The velocity parameter either as distance or angle.
+   * @param <U> The velocity parameter either as distance or angle.
    * @param currentVelocity The current velocity setpoint.
-   * @param nextVelocity    The next velocity setpoint.
+   * @param nextVelocity The next velocity setpoint.
    * @return The computed feedforward.
    */
   public <U extends Unit> Voltage calculate(
@@ -272,15 +254,12 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Calculates the maximum achievable velocity given a maximum voltage supply and
-   * an acceleration.
-   * Useful for ensuring that velocity and acceleration constraints for a
-   * trapezoidal profile are
-   * simultaneously achievable - enter the acceleration constraint, and this will
-   * give you a
+   * Calculates the maximum achievable velocity given a maximum voltage supply and an acceleration.
+   * Useful for ensuring that velocity and acceleration constraints for a trapezoidal profile are
+   * simultaneously achievable - enter the acceleration constraint, and this will give you a
    * simultaneously-achievable velocity constraint.
    *
-   * @param maxVoltage   The maximum voltage that can be supplied to the motor.
+   * @param maxVoltage The maximum voltage that can be supplied to the motor.
    * @param acceleration The acceleration of the motor.
    * @return The maximum possible velocity at the given acceleration.
    */
@@ -290,15 +269,12 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Calculates the minimum achievable velocity given a maximum voltage supply and
-   * an acceleration.
-   * Useful for ensuring that velocity and acceleration constraints for a
-   * trapezoidal profile are
-   * simultaneously achievable - enter the acceleration constraint, and this will
-   * give you a
+   * Calculates the minimum achievable velocity given a maximum voltage supply and an acceleration.
+   * Useful for ensuring that velocity and acceleration constraints for a trapezoidal profile are
+   * simultaneously achievable - enter the acceleration constraint, and this will give you a
    * simultaneously-achievable velocity constraint.
    *
-   * @param maxVoltage   The maximum voltage that can be supplied to the motor.
+   * @param maxVoltage The maximum voltage that can be supplied to the motor.
    * @param acceleration The acceleration of the motor.
    * @return The minimum possible velocity at the given acceleration.
    */
@@ -308,16 +284,13 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Calculates the maximum achievable acceleration given a maximum voltage supply
-   * and a velocity.
-   * Useful for ensuring that velocity and acceleration constraints for a
-   * trapezoidal profile are
-   * simultaneously achievable - enter the velocity constraint, and this will give
-   * you a
+   * Calculates the maximum achievable acceleration given a maximum voltage supply and a velocity.
+   * Useful for ensuring that velocity and acceleration constraints for a trapezoidal profile are
+   * simultaneously achievable - enter the velocity constraint, and this will give you a
    * simultaneously-achievable acceleration constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the motor.
-   * @param velocity   The velocity of the motor.
+   * @param velocity The velocity of the motor.
    * @return The maximum possible acceleration at the given velocity.
    */
   public double maxAchievableAcceleration(double maxVoltage, double velocity) {
@@ -325,16 +298,13 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Calculates the minimum achievable acceleration given a maximum voltage supply
-   * and a velocity.
-   * Useful for ensuring that velocity and acceleration constraints for a
-   * trapezoidal profile are
-   * simultaneously achievable - enter the velocity constraint, and this will give
-   * you a
+   * Calculates the minimum achievable acceleration given a maximum voltage supply and a velocity.
+   * Useful for ensuring that velocity and acceleration constraints for a trapezoidal profile are
+   * simultaneously achievable - enter the velocity constraint, and this will give you a
    * simultaneously-achievable acceleration constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the motor.
-   * @param velocity   The velocity of the motor.
+   * @param velocity The velocity of the motor.
    * @return The minimum possible acceleration at the given velocity.
    */
   public double minAchievableAcceleration(double maxVoltage, double velocity) {
