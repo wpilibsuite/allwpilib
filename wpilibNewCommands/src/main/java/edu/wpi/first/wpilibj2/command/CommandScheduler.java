@@ -99,6 +99,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
   private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> {});
 
+  @SuppressWarnings("removal")
   CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
@@ -121,6 +122,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   @Override
+  @SuppressWarnings("removal")
   public void close() {
     SendableRegistry.remove(this);
     LiveWindow.setEnabledListener(null);

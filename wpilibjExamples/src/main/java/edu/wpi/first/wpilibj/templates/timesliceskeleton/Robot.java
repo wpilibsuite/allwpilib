@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.templates.timesliceskeleton;
 
 import edu.wpi.first.wpilibj.TimesliceRobot;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -17,10 +16,6 @@ public class Robot extends TimesliceRobot {
   public Robot() {
     // Run robot periodic() functions for 5 ms, and run controllers every 10 ms
     super(0.005, 0.01);
-
-    // LiveWindow causes drastic overruns in robot periodic functions that will
-    // interfere with controllers
-    LiveWindow.disableAllTelemetry();
 
     // Runs for 2 ms after robot periodic functions
     schedule(() -> {}, 0.002);
