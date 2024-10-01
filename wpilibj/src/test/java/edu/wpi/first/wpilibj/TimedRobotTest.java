@@ -632,7 +632,7 @@ class TimedRobotTest {
     MockRobot robot = new MockRobot();
 
     final AtomicInteger callbackCount = new AtomicInteger(0);
-    robot.addPeriodic(() -> callbackCount.addAndGet(1), kPeriod / 2.0);
+    robot.addPeriodic(() -> callbackCount.addAndGet(1), "Test", kPeriod / 2.0);
 
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
@@ -673,7 +673,7 @@ class TimedRobotTest {
     MockRobot robot = new MockRobot();
 
     final AtomicInteger callbackCount = new AtomicInteger(0);
-    robot.addPeriodic(() -> callbackCount.addAndGet(1), kPeriod / 2.0, kPeriod / 4.0);
+    robot.addPeriodic(() -> callbackCount.addAndGet(1), "Test", kPeriod / 2.0, kPeriod / 4.0);
 
     // Expirations in this test (ms)
     //

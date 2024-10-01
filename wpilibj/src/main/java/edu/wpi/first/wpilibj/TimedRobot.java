@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import static edu.wpi.first.units.Units.Microsecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.hal.DriverStationJNI;
@@ -162,9 +161,7 @@ public class TimedRobot extends IterativeRobotBase {
         break;
       }
 
-      Tracer.startTrace("TimedRobot");
-
-      callback.func.run();
+      callback.call();;
 
       // Increment the expiration time by the number of full periods it's behind
       // plus one to avoid rapid repeat fires from a large loop overrun. We
@@ -179,15 +176,13 @@ public class TimedRobot extends IterativeRobotBase {
       while (m_callbacks.peek().expirationTime <= currentTime) {
         callback = m_callbacks.poll();
 
-        callback.func.run();
+        callback.call();
 
         callback.expirationTime +=
             callback.period
                 + (currentTime - callback.expirationTime) / callback.period * callback.period;
         m_callbacks.add(callback);
       }
-
-      Tracer.endTrace();
     }
   }
 
@@ -208,7 +203,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @param callback The callback to run.
    * @param periodSeconds The period at which to run the callback in seconds.
    * 
-   * @deprecated Use {@link #addPeriodic(Runnable, String, Time, Time)} instead.
+   * @deprecated Use {@link #addPeriodic(Runnable, String, Double)} instead.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public final void addPeriodic(Runnable callback, double periodSeconds) {
@@ -231,7 +226,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @param offsetSeconds The offset from the common starting time in seconds. This is useful for
    *     scheduling a callback in a different timeslot relative to TimedRobot.
    * 
-   * @deprecated Use {@link #addPeriodic(Runnable, String, Time, Time)} instead.
+   * @deprecated Use {@link #addPeriodic(Runnable, String, Double, Double)} instead.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public final void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
@@ -252,7 +247,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @param callback The callback to run.
    * @param period The period at which to run the callback.
    * 
-   * @deprecated Use {@link #addPeriodic(Runnable, String, Time, Time)} instead.
+   * @deprecated Use {@link #addPeriodic(Runnable, String, Time)} instead.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public final void addPeriodic(Runnable callback, Time period) {
@@ -290,14 +285,61 @@ public class TimedRobot extends IterativeRobotBase {
    * @param offset The offset from the common starting time in seconds. This is useful for scheduling
    *    a callback in a different timeslot relative to TimedRobot.
    */
-  public final void addPeriodic(Runnable callback, String name, Time period, Time offset) {
+  public final void addPeriodic(Runnable callback, String name, double period, double offset) {
     m_callbacks.add(
       new Callback(
         callback,
         Optional.of(name),
         m_startTimeUs,
-        (long) period.in(Microsecond),
-        (long) offset.in(Microsecond)
+        (long) (period * 1_000_000),
+        (long) (offset * 1_000_000)
     ));
+  }
+
+  /**
+   * Add a callback to run at a specific period.
+   *
+   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+   * synchronously. Interactions between them are thread-safe.
+   *
+   * @param callback The callback to run.
+   * @param name The name of the callback. This is used to create a separate tracer table for the
+   *     callback.
+   * @param period The period at which to run the callback in seconds.
+   */
+  public final void addPeriodic(Runnable callback, String name, double period) {
+    addPeriodic(callback, name, period, 0.0);
+  }
+
+  /**
+   * Add a callback to run at a specific period.
+   *
+   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+   * synchronously. Interactions between them are thread-safe.
+   *
+   * @param callback The callback to run.
+   * @param name The name of the callback. This is used to create a separate tracer table for the
+   *     callback.
+   * @param period The period at which to run the callback.
+   * @param offset The offset from the common starting time. This is useful for scheduling
+   *    a callback in a different timeslot relative to TimedRobot.
+   */
+  public final void addPeriodic(Runnable callback, String name, Time period, Time offset) {
+    addPeriodic(callback, name, period.in(Seconds), offset.in(Seconds));
+  }
+
+  /**
+   * Add a callback to run at a specific period.
+   *
+   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+   * synchronously. Interactions between them are thread-safe.
+   *
+   * @param callback The callback to run.
+   * @param name The name of the callback. This is used to create a separate tracer table for the
+   *     callback.
+   * @param period The period at which to run the callback.
+   */
+  public final void addPeriodic(Runnable callback, String name, Time period) {
+    addPeriodic(callback, name, period, Seconds.zero());
   }
 }
