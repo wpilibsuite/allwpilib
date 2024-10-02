@@ -105,7 +105,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return Discretized ChassisSpeeds.
    * @deprecated Use instance method instead.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds discretize(
       double vxMetersPerSecond,
       double vyMetersPerSecond,
@@ -145,7 +145,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return Discretized ChassisSpeeds.
    * @deprecated Use instance method instead.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds discretize(
       LinearVelocity vx, LinearVelocity vy, AngularVelocity omega, Time dt) {
     return discretize(
@@ -168,7 +168,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return Discretized ChassisSpeeds.
    * @deprecated Use instance method instead.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds discretize(ChassisSpeeds continuousSpeeds, double dtSeconds) {
     return discretize(
         continuousSpeeds.vxMetersPerSecond,
@@ -222,7 +222,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return ChassisSpeeds object representing the speeds in the robot's frame of reference.
    * @deprecated Use toRobotRelativeSpeeds instead.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromFieldRelativeSpeeds(
       double vxMetersPerSecond,
       double vyMetersPerSecond,
@@ -249,7 +249,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return ChassisSpeeds object representing the speeds in the robot's frame of reference.
    * @deprecated Use toRobotRelativeSpeeds instead.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromFieldRelativeSpeeds(
       LinearVelocity vx, LinearVelocity vy, AngularVelocity omega, Rotation2d robotAngle) {
     return fromFieldRelativeSpeeds(
@@ -269,7 +269,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return ChassisSpeeds object representing the speeds in the robot's frame of reference.
    * @deprecated Use toRobotRelativeSpeeds instead.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromFieldRelativeSpeeds(
       ChassisSpeeds fieldRelativeSpeeds, Rotation2d robotAngle) {
     return fromFieldRelativeSpeeds(
@@ -309,7 +309,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return ChassisSpeeds object representing the speeds in the field's frame of reference.
    * @deprecated Use toFieldRelativeSpeeds instead.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromRobotRelativeSpeeds(
       double vxMetersPerSecond,
       double vyMetersPerSecond,
@@ -335,7 +335,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return ChassisSpeeds object representing the speeds in the field's frame of reference.
    * @deprecated Use toFieldRelativeSpeeds instead.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromRobotRelativeSpeeds(
       LinearVelocity vx, LinearVelocity vy, AngularVelocity omega, Rotation2d robotAngle) {
     return fromRobotRelativeSpeeds(
@@ -355,7 +355,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return ChassisSpeeds object representing the speeds in the field's frame of reference.
    * @deprecated Use toFieldRelativeSpeeds instead.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromRobotRelativeSpeeds(
       ChassisSpeeds robotRelativeSpeeds, Rotation2d robotAngle) {
     return fromRobotRelativeSpeeds(
