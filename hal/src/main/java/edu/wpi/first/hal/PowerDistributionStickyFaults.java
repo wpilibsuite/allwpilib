@@ -246,10 +246,6 @@ public class PowerDistributionStickyFaults implements StructSerializable {
       bb.putInt(value.m_bitfield);
     }
 
-    public void pack(ByteBuffer bb, int value) {
-      bb.putInt(value);
-    }
-
     @Override
     public PowerDistributionStickyFaults unpack(ByteBuffer bb) {
       int packed = bb.getInt();
