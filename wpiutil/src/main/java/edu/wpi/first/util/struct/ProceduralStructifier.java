@@ -176,6 +176,11 @@ public final class ProceduralStructifier {
       private final String m_fieldName;
       private boolean m_firstVariant = true;
 
+      /**
+       * Creates a new enum field builder.
+       *
+       * @param fieldName The name of the field.
+       */
       public EnumFieldBuilder(String fieldName) {
         this.m_fieldName = fieldName;
         m_builder.append("enum {");
@@ -208,6 +213,9 @@ public final class ProceduralStructifier {
         return m_builder.toString();
       }
     }
+
+    /** Creates a new schema builder. */
+    public SchemaBuilder() {}
 
     private final StringBuilder m_builder = new StringBuilder();
 
@@ -244,8 +252,12 @@ public final class ProceduralStructifier {
     }
   }
 
-  /** A struct that was procedurally generated from a record. */
-  public interface ProcRecordStruct<T extends Record> extends Struct<T> {
+  /**
+   * A struct that was procedurally generated from a record.
+   *
+   * @param <R> The type of the record.
+   */
+  public interface ProcRecordStruct<R extends Record> extends Struct<R> {
     /**
      * Generates a no-op struct for the given record class.
      *
@@ -362,99 +374,98 @@ public final class ProceduralStructifier {
 
       final int frozenSize = size;
       final String schema = schemaBuilder.build();
-      ProcRecordStruct<R> retStruct =
-          new ProcRecordStruct<>() {
-            @Override
-            public Class<R> getTypeClass() {
-              return recordClass;
-            }
+      return new ProcRecordStruct<>() {
+        @Override
+        public Class<R> getTypeClass() {
+          return recordClass;
+        }
 
-            @Override
-            public String getTypeName() {
-              return recordClass.getSimpleName();
-            }
+        @Override
+        public String getTypeName() {
+          return recordClass.getSimpleName();
+        }
 
-            @Override
-            public String getSchema() {
-              return schema;
-            }
+        @Override
+        public String getSchema() {
+          return schema;
+        }
 
-            @Override
-            public int getSize() {
-              return frozenSize;
-            }
+        @Override
+        public int getSize() {
+          return frozenSize;
+        }
 
-            @Override
-            public void pack(ByteBuffer buffer, R value) {
-              boolean failed = false;
-              int startingPosition = buffer.position();
-              for (int i = 0; i < components.length; i++) {
-                Packer<Object> packer = (Packer<Object>) packers.get(i);
-                try {
-                  Object componentValue = components[i].getAccessor().invoke(value);
-                  if (componentValue == null) {
-                    throw new IllegalArgumentException("Component is null");
-                  }
-                  packer.pack(buffer, componentValue);
-                } catch (IllegalAccessException
-                    | IllegalArgumentException
-                    | InvocationTargetException e) {
-                  System.err.println(
-                      "Could not pack record component: "
-                          + recordClass.getSimpleName()
-                          + "#"
-                          + components[i].getName()
-                          + "\n    "
-                          + e.getMessage());
-                  failed = true;
-                  break;
-                }
+        @Override
+        public void pack(ByteBuffer buffer, R value) {
+          boolean failed = false;
+          int startingPosition = buffer.position();
+          for (int i = 0; i < components.length; i++) {
+            Packer<Object> packer = (Packer<Object>) packers.get(i);
+            try {
+              Object componentValue = components[i].getAccessor().invoke(value);
+              if (componentValue == null) {
+                throw new IllegalArgumentException("Component is null");
               }
-              if (failed) {
-                buffer.position(startingPosition);
-                for (int i = 0; i < frozenSize; i++) {
-                  buffer.put((byte) 0);
-                }
-              }
+              packer.pack(buffer, componentValue);
+            } catch (IllegalAccessException
+                | IllegalArgumentException
+                | InvocationTargetException e) {
+              System.err.println(
+                  "Could not pack record component: "
+                      + recordClass.getSimpleName()
+                      + "#"
+                      + components[i].getName()
+                      + "\n    "
+                      + e.getMessage());
+              failed = true;
+              break;
             }
-
-            @Override
-            public R unpack(ByteBuffer buffer) {
-              try {
-                Object[] args = new Object[components.length];
-                for (int i = 0; i < components.length; i++) {
-                  args[i] = unpackers.get(i).unpack(buffer);
-                }
-                return recordClass.getConstructor().newInstance(args);
-              } catch (InstantiationException
-                  | IllegalAccessException
-                  | InvocationTargetException
-                  | NoSuchMethodException
-                  | SecurityException e) {
-                System.err.println("Could not unpack record: " + recordClass.getSimpleName());
-                return null;
-              }
+          }
+          if (failed) {
+            buffer.position(startingPosition);
+            for (int i = 0; i < frozenSize; i++) {
+              buffer.put((byte) 0);
             }
+          }
+        }
 
-            @Override
-            public Struct<?>[] getNested() {
-              return nestedStructs.toArray(new Struct<?>[0]);
+        @Override
+        public R unpack(ByteBuffer buffer) {
+          try {
+            Object[] args = new Object[components.length];
+            for (int i = 0; i < components.length; i++) {
+              args[i] = unpackers.get(i).unpack(buffer);
             }
+            return recordClass.getConstructor().newInstance(args);
+          } catch (InstantiationException
+              | IllegalAccessException
+              | InvocationTargetException
+              | NoSuchMethodException
+              | SecurityException e) {
+            System.err.println("Could not unpack record: " + recordClass.getSimpleName());
+            return null;
+          }
+        }
 
-            @Override
-            public boolean isImmutable() {
-              return true;
-            }
-          };
+        @Override
+        public Struct<?>[] getNested() {
+          return nestedStructs.toArray(new Struct<?>[0]);
+        }
 
-      addCustomStruct(recordClass, retStruct, !failed);
-
-      return retStruct;
+        @Override
+        public boolean isImmutable() {
+          return true;
+        }
+      };
     }
   }
 
-  /** A struct that was procedurally generated from an enum. */
-  public interface ProcEnumStruct<T extends Enum<T>> extends Struct<T> {
+  /**
+   * A struct that was procedurally generated from an enum.
+   *
+   * @param <E> The type of the enum.
+   */
+  public interface ProcEnumStruct<E extends Enum<E>> extends Struct<E> {
     /**
      * Generates a no-op struct for the given enum class. This struct will publish no data and will
      * not be able to unpack data. This is useful for when a struct could not be generated.
@@ -591,80 +602,75 @@ public final class ProceduralStructifier {
 
       final int frozenSize = size;
       final String schema = schemaBuilder.build();
-      ProcEnumStruct<E> retStruct =
-          new ProcEnumStruct<>() {
-            @Override
-            public Class<E> getTypeClass() {
-              return enumClass;
-            }
+      return new ProcEnumStruct<>() {
+        @Override
+        public Class<E> getTypeClass() {
+          return enumClass;
+        }
 
-            @Override
-            public String getTypeName() {
-              return enumClass.getSimpleName();
-            }
+        @Override
+        public String getTypeName() {
+          return enumClass.getSimpleName();
+        }
 
-            @Override
-            public String getSchema() {
-              return schema;
-            }
+        @Override
+        public String getSchema() {
+          return schema;
+        }
 
-            @Override
-            public int getSize() {
-              return frozenSize;
-            }
+        @Override
+        public int getSize() {
+          return frozenSize;
+        }
 
-            @Override
-            public void pack(ByteBuffer buffer, E value) {
-              boolean failed = false;
-              int startingPosition = buffer.position();
-              buffer.put((byte) value.ordinal());
-              for (int i = 0; i < enumFields.size(); i++) {
-                Packer<Object> packer = (Packer<Object>) packers.get(i);
-                Field field = enumFields.get(i);
-                try {
-                  Object fieldValue = field.get(value);
-                  if (fieldValue == null) {
-                    throw new IllegalArgumentException("Field is null");
-                  }
-                  packer.pack(buffer, fieldValue);
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                  System.err.println(
-                      "Could not pack enum field: "
-                          + enumClass.getSimpleName()
-                          + "#"
-                          + field.getName()
-                          + "\n    "
-                          + e.getMessage());
-                  failed = true;
-                  break;
-                }
+        @Override
+        public void pack(ByteBuffer buffer, E value) {
+          boolean failed = false;
+          int startingPosition = buffer.position();
+          buffer.put((byte) value.ordinal());
+          for (int i = 0; i < enumFields.size(); i++) {
+            Packer<Object> packer = (Packer<Object>) packers.get(i);
+            Field field = enumFields.get(i);
+            try {
+              Object fieldValue = field.get(value);
+              if (fieldValue == null) {
+                throw new IllegalArgumentException("Field is null");
               }
-              if (failed) {
-                buffer.position(startingPosition);
-                for (int i = 0; i < frozenSize; i++) {
-                  buffer.put((byte) 0);
-                }
-              }
+              packer.pack(buffer, fieldValue);
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+              System.err.println(
+                  "Could not pack enum field: "
+                      + enumClass.getSimpleName()
+                      + "#"
+                      + field.getName()
+                      + "\n    "
+                      + e.getMessage());
+              failed = true;
+              break;
             }
-
-            final byte[] m_spongeBuffer = new byte[frozenSize - 1];
-
-            @Override
-            public E unpack(ByteBuffer buffer) {
-              int ordinal = buffer.getInt();
-              buffer.get(m_spongeBuffer);
-              return enumMap.getOrDefault(ordinal, null);
+          }
+          if (failed) {
+            buffer.position(startingPosition);
+            for (int i = 0; i < frozenSize; i++) {
+              buffer.put((byte) 0);
             }
+          }
+        }
 
-            @Override
-            public boolean isImmutable() {
-              return true;
-            }
-          };
+        final byte[] m_spongeBuffer = new byte[frozenSize - 1];
 
-      addCustomStruct(enumClass, retStruct, !failed);
+        @Override
+        public E unpack(ByteBuffer buffer) {
+          int ordinal = buffer.getInt();
+          buffer.get(m_spongeBuffer);
+          return enumMap.getOrDefault(ordinal, null);
+        }
 
-      return retStruct;
+        @Override
+        public boolean isImmutable() {
+          return true;
+        }
+      };
     }
   }
 }
