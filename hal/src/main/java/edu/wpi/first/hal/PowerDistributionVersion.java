@@ -65,16 +65,16 @@ public class PowerDistributionVersion implements StructSerializable {
 
     @Override
     public int getSize() {
-      return kSizeInt32;
+      return kSizeInt32 + (kSizeInt8 * 5);
     }
 
     @Override
     public String getSchema() {
-      return "int8 firmwareMajor; "
-          + "int8 firmwareMinor; "
-          + "int8 firmwareFix; "
-          + "int8 hardwareMinor; "
-          + "int8 hardwareMajor; "
+      return "uint8 firmwareMajor; "
+          + "uint8 firmwareMinor; "
+          + "uint8 firmwareFix; "
+          + "uint8 hardwareMinor; "
+          + "uint8 hardwareMajor; "
           + "int32 uniqueId;";
     }
 
@@ -90,7 +90,7 @@ public class PowerDistributionVersion implements StructSerializable {
       bb.put((byte) value.firmwareFix);
       bb.put((byte) value.hardwareMinor);
       bb.put((byte) value.hardwareMajor);
-      bb.putLong(value.uniqueId);
+      bb.putInt(value.uniqueId);
     }
 
     @Override
