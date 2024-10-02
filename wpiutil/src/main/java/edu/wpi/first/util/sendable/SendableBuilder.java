@@ -56,7 +56,7 @@ public interface SendableBuilder extends AutoCloseable {
    * @param key property name
    * @param getter getter function (returns current value)
    */
-  default void addBooleanProperty(String key, BooleanSupplier getter){
+  default void addBooleanProperty(String key, BooleanSupplier getter) {
     addBooleanProperty(key, getter, null);
   }
 
@@ -83,7 +83,7 @@ public interface SendableBuilder extends AutoCloseable {
    * @param key property name
    * @param getter getter function (returns current value)
    */
-  default void addIntegerProperty(String key, LongSupplier getter){
+  default void addIntegerProperty(String key, LongSupplier getter) {
     addIntegerProperty(key, getter, null);
   }
 
@@ -105,13 +105,12 @@ public interface SendableBuilder extends AutoCloseable {
   void publishConstInteger(String key, long value);
 
   /**
-   * Add a read only float property.
-   * The setter is null.
+   * Add a read only float property. The setter is null.
    *
    * @param key property name
    * @param getter getter function (returns current value)
    */
-  default void addFloatProperty(String key, FloatSupplier getter){
+  default void addFloatProperty(String key, FloatSupplier getter) {
     addFloatProperty(key, getter, null);
   }
 
@@ -138,9 +137,10 @@ public interface SendableBuilder extends AutoCloseable {
    * @param key property name
    * @param getter getter function (returns current value)
    */
-  default void addDoubleProperty(String key, DoubleSupplier getter){
+  default void addDoubleProperty(String key, DoubleSupplier getter) {
     addDoubleProperty(key, getter, null);
-  };
+  }
+  ;
 
   /**
    * Add a double property.
@@ -165,7 +165,7 @@ public interface SendableBuilder extends AutoCloseable {
    * @param key property name
    * @param getter getter function (returns current value)
    */
-  default void addStringProperty(String key, Supplier<String> getter){
+  default void addStringProperty(String key, Supplier<String> getter) {
     addStringProperty(key, getter, null);
   }
 
@@ -192,7 +192,7 @@ public interface SendableBuilder extends AutoCloseable {
    * @param key property name
    * @param getter getter function (returns current value)
    */
-  default void addBooleanArrayProperty(String key, Supplier<boolean[]> getter){
+  default void addBooleanArrayProperty(String key, Supplier<boolean[]> getter) {
     addBooleanArrayProperty(key, getter, null);
   }
 
@@ -219,7 +219,7 @@ public interface SendableBuilder extends AutoCloseable {
    * @param key property name
    * @param getter getter function (returns current value)
    */
-  default void addIntegerArrayProperty(String key, Supplier<long[]> getter){
+  default void addIntegerArrayProperty(String key, Supplier<long[]> getter) {
     addIntegerArrayProperty(key, getter, null);
   }
 
@@ -240,13 +240,13 @@ public interface SendableBuilder extends AutoCloseable {
    */
   void publishConstIntegerArray(String key, long[] value);
 
-    /**
+  /**
    * Add a read only float array property.
    *
    * @param key property name
    * @param getter getter function (returns current value)
    */
-  default void addFloatArrayProperty(String key, Supplier<float[]> getter){
+  default void addFloatArrayProperty(String key, Supplier<float[]> getter) {
     addFloatArrayProperty(key, getter, null);
   }
 
@@ -267,13 +267,13 @@ public interface SendableBuilder extends AutoCloseable {
    */
   void publishConstFloatArray(String key, float[] value);
 
-    /**
+  /**
    * Add a read only double array property.
    *
    * @param key property name
    * @param getter getter function (returns current value)
    */
-  default void addDoubleArrayProperty(String key, Supplier<double[]> getter){
+  default void addDoubleArrayProperty(String key, Supplier<double[]> getter) {
     addDoubleArrayProperty(key, getter, null);
   }
 
@@ -300,7 +300,7 @@ public interface SendableBuilder extends AutoCloseable {
    * @param key property name
    * @param getter getter function (returns current value)
    */
-  default void addStringArrayProperty(String key, Supplier<String[]> getter){
+  default void addStringArrayProperty(String key, Supplier<String[]> getter) {
     addStringArrayProperty(key, getter, null);
   }
 
@@ -328,10 +328,9 @@ public interface SendableBuilder extends AutoCloseable {
    * @param typeString type string
    * @param getter getter function (returns current value)
    */
-  default void addRawProperty(
-      String key, String typeString, Supplier<byte[]> getter){
-        addRawProperty(key, typeString, getter, null);
-      }
+  default void addRawProperty(String key, String typeString, Supplier<byte[]> getter) {
+    addRawProperty(key, typeString, getter, null);
+  }
 
   /**
    * Add a raw property.
