@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.util.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,7 +15,6 @@ import org.junit.jupiter.api.Test;
 class ProceduralStructifierRecordTest {
   public record CustomRecord(int int32, boolean bool, double float64, char character, short int16)
       implements StructSerializable {
-
     public static CustomRecord create() {
       return new CustomRecord(42, true, Math.PI, 'a', (short) 16);
     }
@@ -62,7 +65,6 @@ class ProceduralStructifierRecordTest {
   public record HigherOrderRecord(
       CustomRecord procRecord, CustomEnum procEnum, long i64, byte uint8)
       implements StructSerializable {
-
     public static HigherOrderRecord create() {
       return new HigherOrderRecord(
           CustomRecord.create(), CustomEnum.A, 1234567890123456789L, (byte) 255);
