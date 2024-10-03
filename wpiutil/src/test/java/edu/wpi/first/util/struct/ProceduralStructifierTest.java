@@ -62,12 +62,18 @@ class ProceduralStructifierTest {
     public static final Struct<CustomEnum> struct = ProcEnumStruct.generate(CustomEnum.class);
   }
 
+  public enum AnimalEnum implements StructSerializable {
+    Dog, Cat;
+
+    public static final Struct<AnimalEnum> struct = ProcEnumStruct.generate(AnimalEnum.class);
+  }
+
   public record HigherOrderRecord(
-      CustomRecord procRecord, CustomEnum procEnum, long i64, byte uint8)
+      CustomRecord procRecord, CustomEnum procEnum, AnimalEnum animal, long i64, byte uint8)
       implements StructSerializable {
     public static HigherOrderRecord create() {
       return new HigherOrderRecord(
-          CustomRecord.create(), CustomEnum.A, 1234567890123456789L, (byte) 255);
+          CustomRecord.create(), CustomEnum.A, AnimalEnum.Dog, 1234567890123456789L, (byte) 100);
     }
 
     public static final Struct<HigherOrderRecord> struct =
