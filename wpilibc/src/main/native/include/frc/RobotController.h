@@ -21,7 +21,13 @@ struct CANStatus {
   int transmitErrorCount;
 };
 
-enum RadioLEDState { kOff = 0, kGreen = 1, kRed = 2, kOrange = 3 };
+/** State for the radio led. */
+enum RadioLEDState {
+  kOff = 0,    /// Off.
+  kGreen = 1,  /// Green.
+  kRed = 2,    /// Red.
+  kOrange = 3  /// Orange.
+};
 
 class RobotController {
  public:
