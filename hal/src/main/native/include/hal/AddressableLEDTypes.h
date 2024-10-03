@@ -18,6 +18,9 @@ struct HAL_AddressableLEDData {
   uint8_t padding;
 };
 
+/**
+ * Order that color data is sent over the wire.
+ */
 HAL_ENUM(HAL_AddressableLEDColorOrder) {
   HAL_ALED_RBG,
   HAL_ALED_BGR,
@@ -28,7 +31,7 @@ HAL_ENUM(HAL_AddressableLEDColorOrder) {
 };
 
 #ifdef __cplusplus
-inline auto format_as(HAL_AddressableLEDColorOrder order) {
+constexpr auto format_as(HAL_AddressableLEDColorOrder order) {
   return static_cast<int32_t>(order);
 }
 #endif
