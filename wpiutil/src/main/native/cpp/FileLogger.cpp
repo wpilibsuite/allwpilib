@@ -17,7 +17,6 @@
 #include <utility>
 
 #include "wpi/StringExtras.h"
-#include "wpi/print.h"
 
 namespace wpi {
 FileLogger::FileLogger(std::string_view file,
@@ -29,11 +28,10 @@ FileLogger::FileLogger(std::string_view file,
           inotify_add_watch(m_inotifyHandle, file.data(), IN_MODIFY)},
       m_thread{[=, this] {
         char buf[4000];
-        struct inotify_event ev;
+        char eventBuf[sizeof(struct inotify_event) + NAME_MAX + 1];
         lseek(m_fileHandle, 0, SEEK_END);
-        while (read(m_inotifyHandle, &ev, sizeof(ev)) > 0) {
-          int bufLen = read(m_fileHandle, buf, sizeof(buf));
-          while (bufLen > 0) {
+        while (read(m_inotifyHandle, eventBuf, sizeof(eventBuf)) > 0) {
+          while ((bufLen = read(m_fileHandle, buf, sizeof(buf)) > 0)) {
             callback(std::string_view{buf, static_cast<size_t>(bufLen)});
             bufLen = read(m_fileHandle, buf, sizeof(buf));
           }
