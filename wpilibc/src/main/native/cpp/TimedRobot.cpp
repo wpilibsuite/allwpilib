@@ -78,7 +78,7 @@ void TimedRobot::EndCompetition() {
 
 TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   m_startTime = std::chrono::microseconds{RobotController::GetFPGATime()};
-  AddPeriodic([=, this] { LoopFunc(); }, period);
+  AddPeriodic([=, this] { LoopFunc(); }, "RobotMain", period);
 
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
