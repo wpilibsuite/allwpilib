@@ -444,8 +444,11 @@ public final class ProceduralStructifier {
               | InvocationTargetException
               | NoSuchMethodException
               | SecurityException e) {
-            System.err.println("Could not unpack record: " + recordClass.getSimpleName()
-                + "\n    " + e.getMessage());
+            System.err.println(
+                "Could not unpack record: "
+                    + recordClass.getSimpleName()
+                    + "\n    "
+                    + e.getMessage());
             return null;
           }
         }
