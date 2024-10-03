@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-// This file contains snippets from the Simd Library by Ihar Yermalayeu
+// This file contains modified snippets from the Simd Library by Ihar Yermalayeu
 // (http://ermig1979.github.io/Simd). The original source file names are listed
 // above each section.
 /*
@@ -95,7 +95,7 @@ SIMD_INLINE uint8x8x4_t LoadHalf4<true>(const uint8_t* p) {
 #if SIMD_NEON_PREFECH_SIZE
   __builtin_prefetch(p + SIMD_NEON_PREFECH_SIZE);
 #endif
-  uint8_t* _p = (uint8_t*)__builtin_assume_aligned(p, 8);
+  uint8_t* _p = static_cast<uint8_t*>(__builtin_assume_aligned(p, 8));
   return vld4_u8(_p);
 #elif defined(_MSC_VER)
   return vld4_u8_ex(p, 64);
@@ -121,7 +121,7 @@ SIMD_INLINE uint8x16x4_t Load4<true>(const uint8_t* p) {
 #if SIMD_NEON_PREFECH_SIZE
   __builtin_prefetch(p + SIMD_NEON_PREFECH_SIZE);
 #endif
-  uint8_t* _p = (uint8_t*)__builtin_assume_aligned(p, 16);
+  uint8_t* _p = static_cast<uint8_t*>(__builtin_assume_aligned(p, 16));
   return vld4q_u8(_p);
 #elif defined(_MSC_VER)
   return vld4q_u8_ex(p, 128);
@@ -142,7 +142,7 @@ SIMD_INLINE void Store4<false>(uint8_t* p, uint8x16x4_t a) {
 template <>
 SIMD_INLINE void Store4<true>(uint8_t* p, uint8x16x4_t a) {
 #if defined(__GNUC__)
-  uint8_t* _p = (uint8_t*)__builtin_assume_aligned(p, 16);
+  uint8_t* _p = static_cast<uint8_t*>(__builtin_assume_aligned(p, 16));
   vst4q_u8(_p, a);
 #elif defined(_MSC_VER)
   vst4q_u8_ex(p, a, 128);
@@ -162,7 +162,7 @@ SIMD_INLINE void Store4<false>(uint8_t* p, uint8x8x4_t a) {
 template <>
 SIMD_INLINE void Store4<true>(uint8_t* p, uint8x8x4_t a) {
 #if defined(__GNUC__)
-  uint8_t* _p = (uint8_t*)__builtin_assume_aligned(p, 8);
+  uint8_t* _p = static_cast<uint8_t*>(__builtin_assume_aligned(p, 8));
   vst4_u8(_p, a);
 #elif defined(_MSC_VER)
   vst4_u8_ex(p, a, 64);
