@@ -4,37 +4,32 @@
 
 package edu.wpi.first.util.struct;
 
+import static edu.wpi.first.util.struct.ProceduralStructGenerator.genEnum;
+import static edu.wpi.first.util.struct.ProceduralStructGenerator.genRecord;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.util.struct.ProceduralStructifier.ProcEnumStruct;
-import edu.wpi.first.util.struct.ProceduralStructifier.ProcRecordStruct;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
-class ProceduralStructifierTest {
+class ProceduralStructGeneratorTest {
   public record CustomRecord(int int32, boolean bool, double float64, char character, short int16)
       implements StructSerializable {
     public static CustomRecord create() {
       return new CustomRecord(42, true, Math.PI, 'a', (short) 16);
     }
 
-    public static final Struct<CustomRecord> struct = ProcRecordStruct.generate(CustomRecord.class);
+    public static final Struct<CustomRecord> struct = genRecord(CustomRecord.class);
 
     @Override
     public final boolean equals(Object arg) {
-      if (arg == this) {
-        return true;
-      }
-      if (!(arg instanceof CustomRecord)) {
-        return false;
-      }
-      CustomRecord other = (CustomRecord) arg;
-      return int32 == other.int32
-          && bool == other.bool
-          && float64 == other.float64
-          && character == other.character
-          && int16 == other.int16;
+      return arg == this
+          || arg instanceof CustomRecord other
+              && int32 == other.int32
+              && bool == other.bool
+              && float64 == other.float64
+              && character == other.character
+              && int16 == other.int16;
     }
 
     @Override
@@ -59,14 +54,14 @@ class ProceduralStructifierTest {
       this.value = value;
     }
 
-    public static final Struct<CustomEnum> struct = ProcEnumStruct.generate(CustomEnum.class);
+    public static final Struct<CustomEnum> struct = genEnum(CustomEnum.class);
   }
 
   public enum AnimalEnum implements StructSerializable {
     Dog,
     Cat;
 
-    public static final Struct<AnimalEnum> struct = ProcEnumStruct.generate(AnimalEnum.class);
+    public static final Struct<AnimalEnum> struct = genEnum(AnimalEnum.class);
   }
 
   public record HigherOrderRecord(
@@ -77,22 +72,16 @@ class ProceduralStructifierTest {
           CustomRecord.create(), CustomEnum.A, AnimalEnum.Dog, 1234567890123456789L, (byte) 100);
     }
 
-    public static final Struct<HigherOrderRecord> struct =
-        ProcRecordStruct.generate(HigherOrderRecord.class);
+    public static final Struct<HigherOrderRecord> struct = genRecord(HigherOrderRecord.class);
 
     @Override
     public final boolean equals(Object arg) {
-      if (arg == this) {
-        return true;
-      }
-      if (!(arg instanceof HigherOrderRecord)) {
-        return false;
-      }
-      HigherOrderRecord other = (HigherOrderRecord) arg;
-      return procRecord.equals(other.procRecord)
-          && procEnum == other.procEnum
-          && i64 == other.i64
-          && uint8 == other.uint8;
+      return arg == this
+          || arg instanceof HigherOrderRecord other
+              && procRecord.equals(other.procRecord)
+              && procEnum == other.procEnum
+              && i64 == other.i64
+              && uint8 == other.uint8;
     }
 
     @Override
@@ -106,7 +95,8 @@ class ProceduralStructifierTest {
 
   @SuppressWarnings("unchecked")
   private <S extends StructSerializable> void testStructRoundTrip(S value) {
-    Struct<S> struct = ProceduralStructifier.extractClassStruct((Class<S>) value.getClass()).get();
+    Struct<S> struct =
+        ProceduralStructGenerator.extractClassStruct((Class<S>) value.getClass()).get();
     ByteBuffer buffer = ByteBuffer.allocate(struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     struct.pack(buffer, value);
@@ -118,7 +108,8 @@ class ProceduralStructifierTest {
 
   @SuppressWarnings("unchecked")
   private <S extends StructSerializable> void testStructDoublePack(S value) {
-    Struct<S> struct = ProceduralStructifier.extractClassStruct((Class<S>) value.getClass()).get();
+    Struct<S> struct =
+        ProceduralStructGenerator.extractClassStruct((Class<S>) value.getClass()).get();
     ByteBuffer buffer = ByteBuffer.allocate(struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     struct.pack(buffer, value);
@@ -132,7 +123,8 @@ class ProceduralStructifierTest {
 
   @SuppressWarnings("unchecked")
   private <S extends StructSerializable> void testStructDoubleUnpack(S value) {
-    Struct<S> struct = ProceduralStructifier.extractClassStruct((Class<S>) value.getClass()).get();
+    Struct<S> struct =
+        ProceduralStructGenerator.extractClassStruct((Class<S>) value.getClass()).get();
     ByteBuffer buffer = ByteBuffer.allocate(struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     struct.pack(buffer, value);
