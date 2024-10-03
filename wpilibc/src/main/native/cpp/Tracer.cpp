@@ -64,7 +64,9 @@ std::string Tracer::TracerState::AppendTraceStack(std::string_view trace) {
 }
 
 std::string Tracer::TracerState::PopTraceStack() {
-  m_stackSize > 0 ? m_stackSize-- : m_stackSize;
+  if (m_stackSize > 0) {
+    m_stackSize--;
+  }
   if (m_disabled) {
     return "";
   }
