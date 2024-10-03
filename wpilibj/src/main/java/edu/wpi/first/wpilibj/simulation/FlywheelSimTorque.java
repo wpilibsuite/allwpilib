@@ -11,7 +11,6 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** Represents a simulated flywheel mechanism controlled by torque input. */
 public class FlywheelSimTorque extends FlywheelSim {
-
   /**
    * Creates a simulated flywheel mechanism controlled by torque input.
    *
@@ -42,7 +41,7 @@ public class FlywheelSimTorque extends FlywheelSim {
    * Gets the voltage of the flywheel.
    *
    * @return The flywheel's voltage.
-   */  
+   */
   @Override
   public double getVoltage() {
     // I = V / R - omega / (Kv * R)
@@ -52,7 +51,7 @@ public class FlywheelSimTorque extends FlywheelSim {
     // spinning
     // 2x faster than the flywheel
     return m_gearbox.getVoltage(
-      m_u.get(0, 0), 
+      m_u.get(0, 0),
       m_x.get(0, 0) * m_gearing) * Math.signum(m_u.get(0, 0));
 
   }
@@ -67,7 +66,7 @@ public class FlywheelSimTorque extends FlywheelSim {
         // I = V / R - omega / (Kv * R)
     // Reductions are output over input, so a reduction of 2:1 means the motor is
     // spinning
-    // 2x faster than the flywheel 
+    // 2x faster than the flywheel
     return getInput(0);
 
   }

@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated flywheel mechanism controlled by voltage input. */
 public class FlywheelSimVoltage extends FlywheelSim {
-
   /**
    * Creates a simulated flywheel mechanism controlled by voltage input.
    *
