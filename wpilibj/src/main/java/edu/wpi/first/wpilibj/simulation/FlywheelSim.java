@@ -21,10 +21,10 @@ import edu.wpi.first.units.measure.MutAngularVelocity;
 /** Represents a simulated flywheel mechanism. */
 public abstract class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   // Gearbox for the flywheel.
-  private final DCMotor m_gearbox;
+  final DCMotor m_gearbox;
 
   // The gearing from the motors to the output.
-  private final double m_gearing;
+  final double m_gearing;
 
   // The moment of inertia for the flywheel mechanism.
   final double m_jKgMetersSquared;

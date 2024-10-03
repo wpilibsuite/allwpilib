@@ -48,9 +48,9 @@ public class FlywheelSimVoltage extends FlywheelSim {
   }
 
   /**
-   * Gets the input voltage for the flywheel.
+   * Gets the voltage of the flywheel.
    *
-   * @return The flywheel input voltage.
+   * @return The flywheel's voltage.
    */
   @Override
   public double getVoltage() {

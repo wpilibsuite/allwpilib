@@ -37,15 +37,37 @@ public class FlywheelSimTorque extends FlywheelSim {
     setInput(torqueNM);
   }
 
+  /**
+   * Gets the voltage of the flywheel.
+   *
+   * @return The flywheel's voltage.
+   */  
   @Override
   public double getVoltage() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getVoltage'");
+    // I = V / R - omega / (Kv * R)
+    // torque = J * omega
+    // V = R * torque / J + omega / Kv
+    // Reductions are output over input, so a reduction of 2:1 means the motor is
+    // spinning
+    // 2x faster than the flywheel
+    return m_gearbox.getVoltage(
+      m_u.get(0, 0), 
+      m_x.get(0, 0) * m_gearing) * Math.signum(m_u.get(0, 0));
+
   }
 
+  /**
+   * Gets the torque on the flywheel.
+   *
+   * @return The flywheel's torque in Newton-Meters.
+   */
   @Override
   public double getTorqueNewtonMeters() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getTorqueNewtonMeters'");
+        // I = V / R - omega / (Kv * R)
+    // Reductions are output over input, so a reduction of 2:1 means the motor is
+    // spinning
+    // 2x faster than the flywheel 
+    return getInput(0);
+
   }
 }
