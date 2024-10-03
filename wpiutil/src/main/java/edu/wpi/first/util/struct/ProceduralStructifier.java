@@ -20,11 +20,15 @@ public final class ProceduralStructifier {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
+  /**
+   * A functional interface representing a method that retrives a value from a {@link ByteBuffer}.
+   */
   @FunctionalInterface
   private interface Unpacker<T> {
     T unpack(ByteBuffer buffer);
   }
 
+  /** A functional interface representing a method that packs a value into a {@link ByteBuffer}. */
   @FunctionalInterface
   private interface Packer<T> {
     ByteBuffer pack(ByteBuffer buffer, T value);
@@ -54,7 +58,7 @@ public final class ProceduralStructifier {
     primitiveTypeMap.put(primitiveClass, primType);
   }
 
-  // Add boxed primitive types to the map
+  // Add primitive types to the map
   static {
     addPrimType(
         Integer.class, int.class, "int32", Integer.BYTES, ByteBuffer::getInt, ByteBuffer::putInt);
@@ -130,7 +134,7 @@ public final class ProceduralStructifier {
    */
   @SuppressWarnings("unchecked")
   public static <T extends StructSerializable> Optional<Struct<T>> extractClassStruct(
-      Class<T> clazz) {
+      Class<? extends T> clazz) {
     try {
       var possibleField = Optional.ofNullable(clazz.getDeclaredField("struct"));
       return possibleField.flatMap(
