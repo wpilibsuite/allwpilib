@@ -181,10 +181,10 @@ public class EpilogueGenerator {
             out.println();
             out.println("    robot.addPeriodic(() -> {");
             out.println("      update(robot);");
-            out.println(
-                "    },");
+            out.println("    },");
             out.println("    \"EpiloguePeriodic\",");
-            out.println("    config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));");
+            out.println(
+                "    config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));");
             out.println("  }");
           }
         }
