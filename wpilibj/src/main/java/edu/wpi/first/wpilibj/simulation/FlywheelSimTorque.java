@@ -35,6 +35,7 @@ public class FlywheelSimTorque extends FlywheelSim {
    */
   public void setInputTorque(double torqueNM) {
     setInput(torqueNM);
+    // TODO:  Need some guidance on clamping.
   }
 
   /**
