@@ -29,7 +29,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   private final DoubleConsumer m_callback;
   private double m_lastTimeoutPrintSeconds;
 
-  int m_overruns = 0;
+  int m_overruns;
   private String m_originalAlertText = "";
   private Optional<Alert> m_alert = Optional.empty();
 
@@ -61,12 +61,12 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     m_tracer = new Tracer();
   }
 
-    /**
+  /**
    * Watchdog constructor.
    *
    * @param timeoutSeconds The watchdog's timeout in seconds with microsecond resolution.
    * @param callback This function is called with the time in seconds since the watchdog was last
-   *    fed when the timeout expires.
+   *     fed when the timeout expires.
    */
   public Watchdog(double timeoutSeconds, DoubleConsumer callback) {
     m_timeoutSeconds = timeoutSeconds;
@@ -99,12 +99,11 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   /**
    * Links the given alert to this watchdog.
-   * 
-   * <p>A linked alert will be activated every time the watchdog times out.
-   * On timeout the activation time will be reset and the text of the alert will
-   * be updated to {@code "<alert-text> [xN]"} where {@code N} is the number
-   * of overruns that have occurred.
-   * 
+   *
+   * <p>A linked alert will be activated every time the watchdog times out. On timeout the
+   * activation time will be reset and the text of the alert will be updated to {@code "<alert-text>
+   * [xN]"} where {@code N} is the number of overruns that have occurred.
+   *
    * @param alert The alert to link to this watchdog.
    */
   public void linkToAlert(Alert alert) {
