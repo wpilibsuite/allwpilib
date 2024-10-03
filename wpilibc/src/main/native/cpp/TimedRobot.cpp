@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <cstdio>
+#include <string>
 #include <utility>
 
 #include <hal/DriverStation.h>
