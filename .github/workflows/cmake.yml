@@ -20,6 +20,10 @@ jobs:
             name: Linux
             container: wpilib/roborio-cross-ubuntu:2024-22.04
             flags: "--preset with-java-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
+          - os: ubuntu-22.04
+            name: No protobuf
+            container: wpilib/roborio-cross-ubuntu:2024-22.04
+            flags: "--preset with-java-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DWITH_PROTOBUF=OFF"
           - os: macOS-14
             name: macOS
             container: ""
