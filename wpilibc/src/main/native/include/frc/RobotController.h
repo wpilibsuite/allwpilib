@@ -23,10 +23,10 @@ struct CANStatus {
 
 /** State for the radio led. */
 enum RadioLEDState {
-  kOff = 0,    /// Off.
-  kGreen = 1,  /// Green.
-  kRed = 2,    /// Red.
-  kOrange = 3  /// Orange.
+  kOff = 0,    ///< Off.
+  kGreen = 1,  ///< Green.
+  kRed = 2,    ///< Red.
+  kOrange = 3  ///< Orange.
 };
 
 class RobotController {
