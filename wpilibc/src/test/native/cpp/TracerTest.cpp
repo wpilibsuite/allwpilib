@@ -29,35 +29,39 @@ TEST(TracerTest, TraceFunc) {
   auto test2Entry = nt::NetworkTableInstance::GetDefault().GetEntry(
       "/Tracer/TracerTest/Test1/Test2");
 
-  EXPECT_TRUE(test1Entry.GetDouble(0.0) - 500.0 < 1.0);
-  EXPECT_TRUE(test2Entry.GetDouble(0.0) - 400.0 < 1.0);
+  EXPECT_NEAR(test1Entry.GetDouble(0.0), 500.0, 1.0);
+  EXPECT_NEAR(test2Entry.GetDouble(0.0), 400.0, 1.0);
 
   frc::sim::ResumeTiming();
+  frc::Tracer::ResetForTest();
 }
 
 TEST(TracerTest, ScopedTrace) {
   frc::Tracer::ResetForTest();
-  frc::Tracer::SetThreadName("TracerTest");
+  frc::Tracer::SetThreadName("ScopedTracerTest");
 
   frc::sim::PauseTiming();
 
   frc::Tracer::StartTrace("Test3");
   {
-    frc::Tracer::StartScopedTrace("Test4");
+    auto st = frc::Tracer::StartScopedTrace("Test4");
     frc::sim::StepTiming(400_ms);
   }
   frc::sim::StepTiming(100_ms);
   frc::Tracer::EndTrace();
 
   auto test3Entry = nt::NetworkTableInstance::GetDefault().GetEntry(
-      "/Tracer/TracerTest/Test3");
+      "/Tracer/ScopedTracerTest/Test3");
   auto test4Entry = nt::NetworkTableInstance::GetDefault().GetEntry(
-      "/Tracer/TracerTest/Test3/Test4");
+      "/Tracer/ScopedTracerTest/Test3/Test4");
 
-  EXPECT_TRUE(test3Entry.GetDouble(0.0) - 500.0 < 1.0);
-  EXPECT_TRUE(test4Entry.GetDouble(0.0) - 400.0 < 1.0);
+  EXPECT_TRUE(test3Entry.Exists());
+  EXPECT_TRUE(test4Entry.Exists());
+  EXPECT_NEAR(test3Entry.GetDouble(0.0), 500.0, 1.0);
+  EXPECT_NEAR(test4Entry.GetDouble(0.0), 400.0, 1.0);
 
   frc::sim::ResumeTiming();
+  frc::Tracer::ResetForTest();
 }
 
 TEST(TracerTest, Threaded) {
@@ -75,26 +79,42 @@ TEST(TracerTest, Threaded) {
     auto test1Entry = nt::NetworkTableInstance::GetDefault().GetEntry(
         "/Tracer/TracerTest/ThreadTest1");
 
-    EXPECT_TRUE(test1Entry.GetDouble(0.0) - 100.0 < 1.0);
+    EXPECT_TRUE(test1Entry.Exists());
+    EXPECT_NEAR(test1Entry.GetDouble(0.0), 100.0, 1.0);
   }
 
   // run a trace in a new thread, assert that the tracer ran
   // and that the output position and value are correct
   {
-    std::string newThreadName = "TestThread";
-    std::thread thread([newThreadName]() {
-      frc::Tracer::SetThreadName(newThreadName);
+    std::thread thread([]() {
+      frc::Tracer::SetThreadName("TestThread");
       frc::Tracer::StartTrace("ThreadTest1");
       frc::sim::StepTiming(400_ms);
       frc::Tracer::EndTrace();
+
+      auto test1Entry = nt::NetworkTableInstance::GetDefault().GetEntry(
+        "/Tracer/TracerTest/ThreadTest1");
+
+      EXPECT_TRUE(test1Entry.Exists());
+      EXPECT_NEAR(test1Entry.GetDouble(0.0), 100.0, 1.0);
+
+      auto test2Entry = nt::NetworkTableInstance::GetDefault().GetEntry(
+        "/Tracer/TestThread/ThreadTest1");
+
+      EXPECT_TRUE(test2Entry.Exists());
+      EXPECT_NEAR(test2Entry.GetDouble(0.0), 400.0, 1.0);
     });
     thread.join();
 
     auto test2Entry = nt::NetworkTableInstance::GetDefault().GetEntry(
-        "/Tracer/" + newThreadName + "/ThreadTest1");
+      "/Tracer/TestThread/ThreadTest1");
 
-    EXPECT_TRUE(test2Entry.GetDouble(0.0) - 400.0 < 1.0);
+    EXPECT_TRUE(test2Entry.Exists());
+    EXPECT_NEAR(test2Entry.GetDouble(0.0), 400.0, 1.0);
   }
+
+  frc::sim::ResumeTiming();
+  frc::Tracer::ResetForTest();
 }
 
 TEST(TracerTest, SingleThreaded) {
@@ -115,27 +135,31 @@ TEST(TracerTest, SingleThreaded) {
     auto test1Entry = nt::NetworkTableInstance::GetDefault().GetEntry(
         "/Tracer/SingleThreadTest1");
 
-    EXPECT_TRUE(test1Entry.GetDouble(0.0) - 100.0 < 1.0);
+    EXPECT_TRUE(test1Entry.Exists());
+    EXPECT_NEAR(test1Entry.GetDouble(0.0), 100.0, 1.0);
   }
 
   // start a trace in a new thread after enabling single threaded mode,
   // this should disable the tracer on the new thread, assert that the tracer
   // did not run
   {
-    std::string newThreadName = "TestThread";
-    std::thread thread([newThreadName]() {
+    std::thread thread([]() {
+      std::string newThreadName = "TestThread";
       frc::Tracer::SetThreadName(newThreadName);
       frc::Tracer::StartTrace("SingleThreadTest1");
       frc::sim::StepTiming(400_ms);
       frc::Tracer::EndTrace();
-    });
-    thread.join();
 
-    auto test2Entry = nt::NetworkTableInstance::GetDefault().GetEntry(
+      auto test2Entry = nt::NetworkTableInstance::GetDefault().GetEntry(
         "/Tracer/" + newThreadName + "/SingleThreadTest1");
 
-    EXPECT_FALSE(test2Entry.Exists());
+      EXPECT_FALSE(test2Entry.Exists());
+    });
+    thread.join();
   }
+
+  frc::sim::ResumeTiming();
+  frc::Tracer::ResetForTest();
 }
 
 TEST(TracerTest, Substitutor) {
@@ -172,8 +196,15 @@ TEST(TracerTest, Substitutor) {
   auto test4Entry = nt::NetworkTableInstance::GetDefault().GetEntry(
       "/Tracer/Sub/SubTest1/SubTest2");
 
-  EXPECT_TRUE(test1Entry.GetDouble(0.0) - 500.0 < 1.0);
-  EXPECT_TRUE(test2Entry.GetDouble(0.0) - 400.0 < 1.0);
-  EXPECT_TRUE(test3Entry.GetDouble(0.0) - 500.0 < 1.0);
-  EXPECT_TRUE(test4Entry.GetDouble(0.0) - 400.0 < 1.0);
+  EXPECT_TRUE(test1Entry.Exists());
+  EXPECT_TRUE(test2Entry.Exists());
+  EXPECT_TRUE(test3Entry.Exists());
+  EXPECT_TRUE(test4Entry.Exists());
+  EXPECT_NEAR(test1Entry.GetDouble(0.0), 500.0, 1.0);
+  EXPECT_NEAR(test2Entry.GetDouble(0.0), 400.0, 1.0);
+  EXPECT_NEAR(test3Entry.GetDouble(0.0), 500.0, 1.0);
+  EXPECT_NEAR(test4Entry.GetDouble(0.0), 400.0, 1.0);
+
+  frc::sim::ResumeTiming();
+  frc::Tracer::ResetForTest();
 }

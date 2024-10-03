@@ -95,7 +95,7 @@ public class TimesliceRobot extends TimedRobot {
    * will have conflicting timeslices.
    *
    * @param func Function to schedule.
-   * @param allocation The function's runtime allocation out of the controller period.
+   * @param allocation The function's runtime allocation in seconds out of the controller period.
    */
   public void schedule(Runnable func, double allocation) {
     if (m_nextOffset + allocation > m_controllerPeriod) {
