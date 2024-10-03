@@ -171,4 +171,27 @@ class WatchdogTest {
       assertEquals(0, watchdogCounter2.get(), "Watchdog triggered early");
     }
   }
+
+  @Test
+  @ResourceLock("timing")
+  void watchdogAlertTest() {
+    final Alert alert = new Alert("Watchdog Alert", Alert.AlertType.kError);
+    final Watchdog watchdog = new Watchdog(0.2, () -> {});
+    watchdog.linkToAlert(alert);
+
+    double now = 1000.0;
+
+    watchdog.m_overruns = 100;
+    watchdog.updateAlert(now);
+    assertEquals("Watchdog Alert [x100]", alert.m_text, "Alert text incorrect");
+    assertTrue(Math.abs(alert.m_activeStartTime - now) < 1e-6, "Alert start time incorrect");
+
+    now += 123.456;
+    watchdog.m_overruns = 123456;
+    watchdog.updateAlert(now);
+    assertEquals("Watchdog Alert [x123456]", alert.m_text, "Alert text incorrect");
+    assertTrue(Math.abs(alert.m_activeStartTime - now) < 1e-6, "Alert start time incorrect");
+
+    watchdog.close();
+  }
 }
