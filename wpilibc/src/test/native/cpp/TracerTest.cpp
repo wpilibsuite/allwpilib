@@ -4,6 +4,7 @@
 
 #include <string>
 #include <string_view>
+#include <thread>
 
 #include <gtest/gtest.h>
 #include <networktables/DoubleTopic.h>
