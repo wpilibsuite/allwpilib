@@ -83,6 +83,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   protected IterativeRobotBase(double period) {
     m_period = period;
     m_watchdog = new Watchdog(period, this::printLoopOverrunMessage);
+    m_watchdog.linkToAlert(new Alert("Loop time of " + period + "s overrun", Alert.AlertType.kWarning));
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
