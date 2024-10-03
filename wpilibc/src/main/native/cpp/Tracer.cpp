@@ -214,13 +214,15 @@ Tracer::SubstitutiveTracer::~SubstitutiveTracer() {
 
 void Tracer::SubstitutiveTracer::SubIn() {
   if (!m_currentlySubbedIn) {
-    std::swap(m_state, threadLocalState);
+    m_state.swap(threadLocalState);
+    m_currentlySubbedIn = true;
   }
 }
 
 void Tracer::SubstitutiveTracer::SubOut() {
   if (m_currentlySubbedIn) {
-    std::swap(m_state, threadLocalState);
+    m_state.swap(threadLocalState);
+    m_currentlySubbedIn = false;
   }
 }
 
