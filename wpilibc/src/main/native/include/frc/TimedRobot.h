@@ -17,6 +17,7 @@
 
 #include "frc/IterativeRobotBase.h"
 #include "frc/RobotController.h"
+#include "frc/Tracer.h"
 
 namespace frc {
 
@@ -67,14 +68,34 @@ class TimedRobot : public IterativeRobotBase {
    * @param offset   The offset from the common starting time. This is useful
    *                 for scheduling a callback in a different timeslot relative
    *                 to TimedRobot.
+   * 
+   * @deprecated Use AddPeriodic(std::function<void()>, std::string_view, units::second_t, units::second_t) instead.
    */
+  [[deprecated("Use AddPeriodic(std::function<void()>, std::string_view, units::second_t, units::second_t) instead.")]]
   void AddPeriodic(std::function<void()> callback, units::second_t period,
                    units::second_t offset = 0_s);
+
+  /**
+   * Add a callback to run at a specific period with a starting time offset.
+   * 
+   * This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback
+   * run synchronously. Interactions between them are thread-safe.
+   * 
+   * @param callback The callback to run.
+   * @param name     The name of the callback.
+   * @param period   The period at which to run the callback.
+   * @param offset   The offset from the common starting time. This is useful
+   *                 for scheduling a callback in a different timeslot relative
+   *                 to TimedRobot.
+   */
+  void AddPeriodic(std::function<void()> callback, std::string name,
+                   units::second_t period, units::second_t offset = 0_s);
 
  private:
   class Callback {
    public:
     std::function<void()> func;
+    frc::Tracer::SubstitutiveTracer tracer;
     std::chrono::microseconds period;
     std::chrono::microseconds expirationTime;
 
@@ -86,9 +107,10 @@ class TimedRobot : public IterativeRobotBase {
      * @param period    The period at which to run the callback.
      * @param offset    The offset from the common starting time.
      */
-    Callback(std::function<void()> func, std::chrono::microseconds startTime,
+    Callback(std::function<void()> func, std::string name, std::chrono::microseconds startTime,
              std::chrono::microseconds period, std::chrono::microseconds offset)
         : func{std::move(func)},
+          tracer{name},
           period{period},
           expirationTime(
               startTime + offset + period +

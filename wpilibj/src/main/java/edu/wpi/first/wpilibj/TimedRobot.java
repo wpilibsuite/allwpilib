@@ -13,7 +13,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Tracer.SubstitutiveTracer;
-import java.util.Optional;
 import java.util.PriorityQueue;
 
 /**
@@ -33,7 +32,7 @@ public class TimedRobot extends IterativeRobotBase {
      * The tracer to use for this callback. This allows callbacks to appear in their own tracer
      * table separate from the main RobotLoop tracer table.
      */
-    public Optional<SubstitutiveTracer> m_tracer;
+    public SubstitutiveTracer m_tracerSub;
 
     /** The period at which to run the callback in microseconds. */
     public long m_period;
@@ -52,9 +51,9 @@ public class TimedRobot extends IterativeRobotBase {
      * @param offsetUs The offset from the common starting time in microseconds. This is useful for
      *     scheduling a callback in a different timeslot relative to TimedRobot.
      */
-    Callback(Runnable func, Optional<String> name, long startTimeUs, long periodUs, long offsetUs) {
+    Callback(Runnable func, String name, long startTimeUs, long periodUs, long offsetUs) {
       this.m_func = func;
-      this.m_tracer = name.map(SubstitutiveTracer::new);
+      this.m_tracerSub = new SubstitutiveTracer(name);
       this.m_period = periodUs;
       this.m_expirationTime =
           startTimeUs
@@ -64,7 +63,7 @@ public class TimedRobot extends IterativeRobotBase {
     }
 
     void call() {
-      m_tracer.ifPresentOrElse(sub -> sub.subWith(m_func), m_func);
+      m_tracerSub.subWith(m_func);
     }
 
     @Override
@@ -109,9 +108,7 @@ public class TimedRobot extends IterativeRobotBase {
   protected TimedRobot(double period) {
     super(period);
     m_startTimeUs = RobotController.getFPGATime();
-    m_callbacks.add(
-        new Callback(
-            this::loopFunc, Optional.empty(), m_startTimeUs, (long) (period * 1_000_000), 0L));
+    addPeriodic(this::loopFunc, "RobotMain", period);
     NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
@@ -272,7 +269,7 @@ public class TimedRobot extends IterativeRobotBase {
     m_callbacks.add(
         new Callback(
             callback,
-            Optional.of(name),
+            name,
             m_startTimeUs,
             (long) (period * 1_000_000),
             (long) (offset * 1_000_000)));

@@ -96,10 +96,20 @@ TimedRobot::~TimedRobot() {
   FRC_ReportError(status, "StopNotifier");
 }
 
+int periodics = 0;
+
 void TimedRobot::AddPeriodic(std::function<void()> callback,
                              units::second_t period, units::second_t offset) {
   m_callbacks.emplace(
-      callback, m_startTime,
+      callback, m_startTime, fmt::format("Periodic{}", periodics++),
+      std::chrono::microseconds{static_cast<int64_t>(period.value() * 1e6)},
+      std::chrono::microseconds{static_cast<int64_t>(offset.value() * 1e6)});
+}
+
+void TimedRobot::AddPeriodic(std::function<void()> callback, std::string name,
+                             units::second_t period, units::second_t offset) {
+  m_callbacks.emplace(
+      callback, m_startTime, name,
       std::chrono::microseconds{static_cast<int64_t>(period.value() * 1e6)},
       std::chrono::microseconds{static_cast<int64_t>(offset.value() * 1e6)});
 }
