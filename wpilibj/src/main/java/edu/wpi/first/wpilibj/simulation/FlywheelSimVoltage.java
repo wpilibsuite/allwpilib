@@ -10,15 +10,15 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 
-/** Represents a simulated flywheel mechanism. */
+/** Represents a simulated flywheel mechanism controlled by voltage input. */
 public class FlywheelSimVoltage extends FlywheelSim {
 
   /**
-   * Creates a simulated flywheel mechanism.
+   * Creates a simulated flywheel mechanism controlled by voltage input.
    *
-   * @param plant              The linear system that represents the flywheel. Use
+   * @param plant              The linear system that represents the flywheel controlled by voltage input. Use
    *                           either {@link
-   *                           LinearSystemId#createFlywheelSystem(DCMotor, double, double)}
+   *                           LinearSystemId#createFlywheelVoltageSystem(DCMotor, double, double)}
    *                           if using physical constants
    *                           or
    *                           {@link LinearSystemId#identifyVelocitySystem(double, double)}

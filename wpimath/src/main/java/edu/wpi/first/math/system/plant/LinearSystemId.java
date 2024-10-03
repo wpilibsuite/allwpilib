@@ -66,7 +66,7 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or gearing &lt;= 0.
    */
-  public static LinearSystem<N1, N1, N1> createFlywheelSystem(
+  public static LinearSystem<N1, N1, N1> createFlywheelVoltageSystem(
       DCMotor motor, double JKgMetersSquared, double gearing) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
@@ -85,6 +85,32 @@ public final class LinearSystemId {
         Matrix.eye(Nat.N1()),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
+
+  /**
+   * Create a state-space model of a flywheel system. The states of the system are [angular
+   * velocity], inputs are [torque], and outputs are [angular velocity].
+   *
+   * @param motor The motor (or gearbox) attached to the flywheel.
+   * @param JKgMetersSquared The moment of inertia J of the flywheel.
+   * @param gearing The reduction between motor and drum, as a ratio of output to input.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or gearing &lt;= 0.
+   */
+  public static LinearSystem<N1, N1, N1> createFlywheelTorqueSystem(
+      DCMotor motor, double JKgMetersSquared, double gearing) {
+    if (JKgMetersSquared <= 0.0) {
+      throw new IllegalArgumentException("J must be greater than zero.");
+    }
+    if (gearing <= 0.0) {
+      throw new IllegalArgumentException("gearing must be greater than zero.");
+    }
+
+    return new LinearSystem<>(
+        VecBuilder.fill(0),
+        VecBuilder.fill(gearing / JKgMetersSquared),
+        Matrix.eye(Nat.N1()),
+        new Matrix<>(Nat.N1(), Nat.N1()));
+  }  
 
   /**
    * Create a state-space model of a DC motor system. The states of the system are [angular

@@ -9,14 +9,14 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
-/** Represents a simulated flywheel mechanism. */
+/** Represents a simulated flywheel mechanism controlled by torque input. */
 public class FlywheelSimTorque extends FlywheelSim {
 
   /**
-   * Creates a simulated flywheel mechanism.
+   * Creates a simulated flywheel mechanism controlled by torque input.
    *
-   * @param plant The linear system that represents the flywheel. Use either {@link
-   *     LinearSystemId#createFlywheelSystem(DCMotor, double, double)} if using physical constants
+   * @param plant The linear system that represents the flywheel controlled by torque input. Use either {@link
+   *     LinearSystemId#createFlywheelTorqueSystem(DCMotor, double, double)} if using physical constants
    *     or {@link LinearSystemId#identifyVelocitySystem(double, double)} if using system
    *     characterization.
    * @param gearbox The type of and number of motors in the flywheel gearbox.
