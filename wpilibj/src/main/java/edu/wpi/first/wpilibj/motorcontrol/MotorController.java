@@ -9,7 +9,12 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 
-/** Interface for motor controlling devices. */
+/**
+ * Interface for motor controlling devices.
+ *
+ * @deprecated Use the derived class instead.
+ */
+@Deprecated(forRemoval = true, since = "2025")
 public interface MotorController {
   /**
    * Common interface for setting the speed of a motor controller.

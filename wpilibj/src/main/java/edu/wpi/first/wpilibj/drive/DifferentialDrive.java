@@ -101,7 +101,9 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    *
    * @param leftMotor Left motor.
    * @param rightMotor Right motor.
+   * @deprecated Use DifferentialDrive constructor with function arguments.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   @SuppressWarnings({"removal", "this-escape"})
   public DifferentialDrive(MotorController leftMotor, MotorController rightMotor) {
     this((double output) -> leftMotor.set(output), (double output) -> rightMotor.set(output));
