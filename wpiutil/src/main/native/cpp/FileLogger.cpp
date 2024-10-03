@@ -10,12 +10,14 @@
 #include <unistd.h>
 #endif
 
-#include <string>
+#include <chrono>
 #include <string_view>
+#include <thread>
 #include <tuple>
 #include <utility>
 
 #include "wpi/StringExtras.h"
+#include "wpi/print.h"
 
 namespace wpi {
 FileLogger::FileLogger(std::string_view file,
@@ -28,13 +30,14 @@ FileLogger::FileLogger(std::string_view file,
       m_thread{[=, this] {
         char buf[4000];
         struct inotify_event ev;
-        int len = 0;
         lseek(m_fileHandle, 0, SEEK_END);
-        while ((len = read(m_inotifyHandle, &ev, sizeof(ev))) > 0) {
-          int bufLen = 0;
-          if ((bufLen = read(m_fileHandle, buf, sizeof(buf)) > 0)) {
+        while (read(m_inotifyHandle, &ev, sizeof(ev)) > 0) {
+          int bufLen = read(m_fileHandle, buf, sizeof(buf));
+          while (bufLen > 0) {
             callback(std::string_view{buf, static_cast<size_t>(bufLen)});
+            bufLen = read(m_fileHandle, buf, sizeof(buf));
           }
+          std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
       }}
 #endif
