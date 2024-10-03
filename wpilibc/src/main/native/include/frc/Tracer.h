@@ -205,9 +205,15 @@ class Tracer {
     void SubWith(std::function<void()> runnable);
 
    private:
-    std::optional<TracerState> m_state;
-    std::optional<TracerState> m_originalState;
+    std::shared_ptr<TracerState> m_state;
+    bool m_currentlySubbedIn;
   };
+
+  /**
+   * Resets the internal state of the Tracer.
+   * This should only be used for testing purposes.
+   */
+  static void ResetForTest();
 
   // DEPRECATED CLASS INSTANCE METHODS
 

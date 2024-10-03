@@ -150,4 +150,56 @@ class TracerTest {
       assertFalse(test2EntryExists);
     }
   }
+
+  @Test
+  @ResourceLock("timing")
+  void traceSubstitutorTest() {
+    final String threadName = Thread.currentThread().getName();
+    Tracer.disableGcLoggingForCurrentThread();
+
+    // Run a trace in the main thread with the default tracer
+    {
+      Tracer.startTrace("SubTest1");
+      Tracer.traceFunc("SubTest2", () -> SimHooks.stepTiming(0.4));
+      SimHooks.stepTiming(0.1);
+      Tracer.endTrace();
+    }
+
+    // Run a trace in the main thread with a substitutive tracer
+    {
+      var sub = new Tracer.SubstitutiveTracer("Sub");
+      sub.subIn();
+
+      Tracer.disableGcLoggingForCurrentThread();
+      Tracer.startTrace("SubTest1");
+      Tracer.traceFunc("SubTest2", () -> SimHooks.stepTiming(0.4));
+      SimHooks.stepTiming(0.1);
+      Tracer.endTrace();
+
+      sub.subOut();
+    }
+
+    DoubleEntry test1Entry =
+        NetworkTableInstance.getDefault()
+            .getDoubleTopic("/Tracer/" + threadName + "/SubTest1")
+            .getEntry(0.0);
+    DoubleEntry test2Entry =
+        NetworkTableInstance.getDefault()
+            .getDoubleTopic("/Tracer/" + threadName + "/SubTest1/SubTest2")
+            .getEntry(0.0);
+
+    DoubleEntry test3Entry =
+        NetworkTableInstance.getDefault()
+            .getDoubleTopic("/Tracer/Sub/SubTest1")
+            .getEntry(0.0);
+    DoubleEntry test4Entry =
+        NetworkTableInstance.getDefault()
+            .getDoubleTopic("/Tracer/Sub/SubTest1/SubTest2")
+            .getEntry(0.0);
+
+    assertEquals(500.0, test1Entry.get(), 1.0);
+    assertEquals(400.0, test2Entry.get(), 1.0);
+    assertEquals(500.0, test3Entry.get(), 1.0);
+    assertEquals(400.0, test4Entry.get(), 1.0);
+  }
 }

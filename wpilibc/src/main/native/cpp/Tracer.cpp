@@ -124,37 +124,38 @@ void Tracer::TracerState::UpdateThreadName(std::string_view name) {
   }
 }
 
-thread_local Tracer::TracerState threadLocalState = Tracer::TracerState();
+thread_local std::shared_ptr<Tracer::TracerState> threadLocalState =
+    std::make_shared<Tracer::TracerState>();
 
 void Tracer::StartTrace(std::string_view name) {
   anyTracesStarted = true;
   // Call `AppendTraceStack` even if disabled to keep `m_stackSize` in sync
-  std::string stack = threadLocalState.AppendTraceStack(name);
-  if (!threadLocalState.m_disabled) {
+  std::string stack = threadLocalState->AppendTraceStack(name);
+  if (!threadLocalState->m_disabled) {
     auto now =
         units::millisecond_t{frc::RobotController::GetFPGATime() / 1000.0};
-    threadLocalState.m_traceStartTimes.insert_or_assign(stack, now);
+    threadLocalState->m_traceStartTimes.insert_or_assign(stack, now);
   }
 }
 
 void Tracer::EndTrace() {
   // Call `PopTraceStack` even if disabled to keep `m_stackSize` in sync
-  std::string stack = threadLocalState.PopTraceStack();
-  if (!threadLocalState.m_disabled) {
+  std::string stack = threadLocalState->PopTraceStack();
+  if (!threadLocalState->m_disabled) {
     if (stack.empty()) {
       FRC_ReportWarning("Trace ended without starting");
       return;
     }
     auto now =
         units::millisecond_t{frc::RobotController::GetFPGATime() / 1000.0};
-    auto startTime = threadLocalState.m_traceStartTimes.find(stack);
-    threadLocalState.m_traceTimes.insert_or_assign(stack,
-                                                   now - startTime->second);
+    auto startTime = threadLocalState->m_traceStartTimes.find(stack);
+    threadLocalState->m_traceTimes.insert_or_assign(stack,
+                                                    now - startTime->second);
   }
   // If the stack is empty, the cycle is over.
   // Cycles can be ended even if the tracer is disabled
-  if (threadLocalState.m_stackSize == 0) {
-    threadLocalState.EndCycle();
+  if (threadLocalState->m_stackSize == 0) {
+    threadLocalState->EndCycle();
   }
 }
 
@@ -165,23 +166,23 @@ void Tracer::EnableSingleThreadedMode() {
   } else {
     singleThreadedMode = true;
     auto inst = nt::NetworkTableInstance::GetDefault();
-    threadLocalState.m_rootTable = inst.GetTable("/Tracer");
+    threadLocalState->m_rootTable = inst.GetTable("/Tracer");
   }
 }
 
 void Tracer::DisableTracingForCurrentThread() {
-  threadLocalState.m_disableNextCycle = true;
+  threadLocalState->m_disableNextCycle = true;
 }
 
 void Tracer::EnableTracingForCurrentThread() {
-  threadLocalState.m_disableNextCycle = false;
-  if (threadLocalState.m_stackSize == 0) {
-    threadLocalState.m_disabled = false;
+  threadLocalState->m_disableNextCycle = false;
+  if (threadLocalState->m_stackSize == 0) {
+    threadLocalState->m_disabled = false;
   }
 }
 
 void Tracer::SetThreadName(std::string_view name) {
-  threadLocalState.UpdateThreadName(name);
+  threadLocalState->UpdateThreadName(name);
 }
 
 void Tracer::TraceFunc(std::string_view name, std::function<void()> runnable) {
@@ -199,27 +200,25 @@ T Tracer::TraceFunc(std::string_view name, std::function<T()> supplier) {
 }
 
 Tracer::SubstitutiveTracer::SubstitutiveTracer(std::string_view name) {
-  m_state = std::optional<TracerState>(TracerState(name));
-  m_originalState = std::optional<TracerState>();
+  m_state = std::make_shared<TracerState>(name);
+  m_currentlySubbedIn = false;
 }
 
 Tracer::SubstitutiveTracer::~SubstitutiveTracer() {
-  if (m_originalState.has_value()) {
+  if (m_currentlySubbedIn) {
     SubOut();
   }
 }
 
 void Tracer::SubstitutiveTracer::SubIn() {
-  if (m_state.has_value()) {
-    std::swap(threadLocalState, m_state.value());
-    std::swap(m_originalState, m_state);
+  if (!m_currentlySubbedIn) {
+    std::swap(threadLocalState, m_state);
   }
 }
 
 void Tracer::SubstitutiveTracer::SubOut() {
-  if (m_originalState.has_value()) {
-    std::swap(threadLocalState, m_originalState.value());
-    std::swap(m_originalState, m_state);
+  if (m_currentlySubbedIn) {
+    std::swap(threadLocalState, m_state);
   }
 }
 
@@ -227,6 +226,12 @@ void Tracer::SubstitutiveTracer::SubWith(std::function<void()> runnable) {
   SubIn();
   runnable();
   SubOut();
+}
+
+void Tracer::ResetForTest() {
+  threadLocalState = std::make_shared<TracerState>();
+  anyTracesStarted = false;
+  singleThreadedMode = false;
 }
 
 // DEPRECATED CLASS INSTANCE METHODS
