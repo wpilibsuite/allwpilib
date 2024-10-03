@@ -31,9 +31,9 @@ FileLogger::FileLogger(std::string_view file,
         char eventBuf[sizeof(struct inotify_event) + NAME_MAX + 1];
         lseek(m_fileHandle, 0, SEEK_END);
         while (read(m_inotifyHandle, eventBuf, sizeof(eventBuf)) > 0) {
-          while ((bufLen = read(m_fileHandle, buf, sizeof(buf)) > 0)) {
+          int bufLen = 0;
+          while ((bufLen = read(m_fileHandle, buf, sizeof(buf))) > 0) {
             callback(std::string_view{buf, static_cast<size_t>(bufLen)});
-            bufLen = read(m_fileHandle, buf, sizeof(buf));
           }
           std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
