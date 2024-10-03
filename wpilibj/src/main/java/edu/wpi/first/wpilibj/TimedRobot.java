@@ -191,7 +191,7 @@ public class TimedRobot extends IterativeRobotBase {
    *
    * @param callback The callback to run.
    * @param periodSeconds The period at which to run the callback in seconds.
-   * @deprecated Use {@link #addPeriodic(Runnable, String, Double)} instead.
+   * @deprecated Use {@link #addPeriodic(Runnable, String, double)} instead.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public final void addPeriodic(Runnable callback, double periodSeconds) {
@@ -212,7 +212,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @param periodSeconds The period at which to run the callback in seconds.
    * @param offsetSeconds The offset from the common starting time in seconds. This is useful for
    *     scheduling a callback in a different timeslot relative to TimedRobot.
-   * @deprecated Use {@link #addPeriodic(Runnable, String, Double, Double)} instead.
+   * @deprecated Use {@link #addPeriodic(Runnable, String, double, double)} instead.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public final void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
