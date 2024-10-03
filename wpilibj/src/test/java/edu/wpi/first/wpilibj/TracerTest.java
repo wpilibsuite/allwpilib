@@ -183,23 +183,19 @@ class TracerTest {
         NetworkTableInstance.getDefault()
             .getDoubleTopic("/Tracer/" + threadName + "/SubTest1")
             .getEntry(0.0);
+    assertEquals(500.0, test1Entry.get(), 1.0);
     DoubleEntry test2Entry =
         NetworkTableInstance.getDefault()
             .getDoubleTopic("/Tracer/" + threadName + "/SubTest1/SubTest2")
             .getEntry(0.0);
-
+    assertEquals(400.0, test2Entry.get(), 1.0);
     DoubleEntry test3Entry =
-        NetworkTableInstance.getDefault()
-            .getDoubleTopic("/Tracer/Sub/SubTest1")
-            .getEntry(0.0);
+        NetworkTableInstance.getDefault().getDoubleTopic("/Tracer/Sub/SubTest1").getEntry(0.0);
+    assertEquals(500.0, test3Entry.get(), 1.0);
     DoubleEntry test4Entry =
         NetworkTableInstance.getDefault()
             .getDoubleTopic("/Tracer/Sub/SubTest1/SubTest2")
             .getEntry(0.0);
-
-    assertEquals(500.0, test1Entry.get(), 1.0);
-    assertEquals(400.0, test2Entry.get(), 1.0);
-    assertEquals(500.0, test3Entry.get(), 1.0);
     assertEquals(400.0, test4Entry.get(), 1.0);
   }
 }
