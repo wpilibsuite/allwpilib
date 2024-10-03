@@ -63,7 +63,8 @@ class ProceduralStructifierTest {
   }
 
   public enum AnimalEnum implements StructSerializable {
-    Dog, Cat;
+    Dog,
+    Cat;
 
     public static final Struct<AnimalEnum> struct = ProcEnumStruct.generate(AnimalEnum.class);
   }
