@@ -30,7 +30,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   private double m_lastTimeoutPrintSeconds;
 
   int m_overruns = 0;
-  private String m_lastOverrunCount = "";
+  private String m_originalAlertText = "";
   private Optional<Alert> m_alert = Optional.empty();
 
   boolean m_isExpired;
@@ -109,6 +109,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    */
   public void linkToAlert(Alert alert) {
     m_alert = Optional.of(alert);
+    m_originalAlertText = alert.m_text;
   }
 
   /**
@@ -240,32 +241,13 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   }
 
   void updateAlert(double nowSeconds) {
-    final int bracketLength = 1;
     if (m_alert.isEmpty()) {
       return;
     }
     Alert alert = m_alert.get();
-    String overrunCount = Integer.toString(this.m_overruns);
+    alert.m_active = true;
     alert.m_activeStartTime = nowSeconds;
-    if (alert.m_active) {
-      // get the index in the string where nothing before it will be changed
-      int truncateIndex = alert.m_text.length()
-        - (this.m_lastOverrunCount.length() + bracketLength);
-      // create a new char-array that can fit the new text
-      char[] newText = new char[truncateIndex + overrunCount.length() + bracketLength];
-      // copy the old text we are keeping into the new array
-      alert.m_text.getChars(0, truncateIndex, newText, 0);
-      // copy the new overrun count into the new array
-      overrunCount.getChars(0, overrunCount.length(), newText, truncateIndex);
-      // add the closing bracket
-      newText[truncateIndex + overrunCount.length()] = ']';
-      // set the new text
-      alert.m_text = new String(newText);
-    } else {
-      alert.m_active = true;
-      alert.m_text = alert.m_text + " [x" + overrunCount + "]";
-    }
-    this.m_lastOverrunCount = overrunCount;
+    alert.m_text = String.format("%s [x%d]", m_originalAlertText, m_overruns);
   }
 
   @SuppressWarnings("resource")
