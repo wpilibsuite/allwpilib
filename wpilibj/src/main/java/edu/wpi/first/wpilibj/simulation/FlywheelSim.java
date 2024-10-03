@@ -17,10 +17,9 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngularAcceleration;
 import edu.wpi.first.units.measure.MutAngularVelocity;
-import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated flywheel mechanism. */
-public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
+public abstract class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   // Gearbox for the flywheel.
   private final DCMotor m_gearbox;
 
@@ -28,7 +27,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   private final double m_gearing;
 
   // The moment of inertia for the flywheel mechanism.
-  private final double m_jKgMetersSquared;
+  final double m_jKgMetersSquared;
 
   // The angular velocity of the system.
   private final MutAngularVelocity m_angularVelocity = RadiansPerSecond.mutable(0);
@@ -39,35 +38,43 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   /**
    * Creates a simulated flywheel mechanism.
    *
-   * @param plant The linear system that represents the flywheel. Use either {@link
-   *     LinearSystemId#createFlywheelSystem(DCMotor, double, double)} if using physical constants
-   *     or {@link LinearSystemId#identifyVelocitySystem(double, double)} if using system
-   *     characterization.
-   * @param gearbox The type of and number of motors in the flywheel gearbox.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 1 element for velocity.
+   * @param plant              The linear system that represents the flywheel. Use
+   *                           either {@link
+   *                           LinearSystemId#createFlywheelSystem(DCMotor, double, double)}
+   *                           if using physical constants
+   *                           or
+   *                           {@link LinearSystemId#identifyVelocitySystem(double, double)}
+   *                           if using system
+   *                           characterization.
+   * @param gearbox            The type of and number of motors in the flywheel
+   *                           gearbox.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be
+   *                           omitted if no
+   *                           noise is desired. If present must have 1 element
+   *                           for velocity.
    */
   public FlywheelSim(
       LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
 
-    // By theorem 6.10.1 of https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
+    // By theorem 6.10.1 of
+    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
     // the flywheel state-space model is:
     //
-    //   dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
-    //   A = -G²Kₜ/(KᵥRJ)
-    //   B = GKₜ/(RJ)
+    // dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
+    // A = -G²Kₜ/(KᵥRJ)
+    // B = GKₜ/(RJ)
     //
     // Solve for G.
     //
-    //   A/B = -G/Kᵥ
-    //   G = -KᵥA/B
+    // A/B = -G/Kᵥ
+    // G = -KᵥA/B
     //
     // Solve for J.
     //
-    //   B = GKₜ/(RJ)
-    //   J = GKₜ/(RB)
+    // B = GKₜ/(RJ)
+    // J = GKₜ/(RB)
     m_gearing = -gearbox.KvRadPerSecPerVolt * plant.getA(0, 0) / plant.getB(0, 0);
     m_jKgMetersSquared = m_gearing * gearbox.KtNMPerAmp / (gearbox.rOhms * plant.getB(0, 0));
   }
@@ -157,43 +164,31 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   }
 
   /**
-   * Returns the flywheel's torque in Newton-Meters.
-   *
-   * @return The flywheel's torque in Newton-Meters.
-   */
-  public double getTorqueNewtonMeters() {
-    return getAngularAccelerationRadPerSecSq() * m_jKgMetersSquared;
-  }
-
-  /**
    * Returns the flywheel's current draw.
    *
    * @return The flywheel's current draw.
    */
   public double getCurrentDrawAmps() {
     // I = V / R - omega / (Kv * R)
-    // Reductions are output over input, so a reduction of 2:1 means the motor is spinning
+    // Reductions are output over input, so a reduction of 2:1 means the motor is
+    // spinning
     // 2x faster than the flywheel
     return m_gearbox.getCurrent(m_x.get(0, 0) * m_gearing, m_u.get(0, 0))
         * Math.signum(m_u.get(0, 0));
   }
 
   /**
-   * Gets the input voltage for the flywheel.
+   * Gets the voltage of the flywheel.
    *
-   * @return The flywheel input voltage.
+   * @return The flywheel's voltage.
    */
-  public double getInputVoltage() {
-    return getInput(0);
-  }
+  public abstract double getVoltage();
 
   /**
-   * Sets the input voltage for the flywheel.
+   * Gets the torque on the flywheel.
    *
-   * @param volts The input voltage.
+   * @return The flywheel's torque in Newton-Meters.
    */
-  public void setInputVoltage(double volts) {
-    setInput(volts);
-    clampInput(RobotController.getBatteryVoltage());
-  }
+  public abstract double getTorqueNewtonMeters();
+
 }
