@@ -104,7 +104,11 @@ public final class AllianceSymmetry {
     public abstract double flipHeading(double heading);
   }
 
-  /** An interface for objects that can be flipped based on the current alliance. */
+  /**
+   * An interface for objects that can be flipped based on the current alliance.
+   *
+   * @param <Self> The type of the object that is flippable.
+   */
   public interface Flippable<Self extends Flippable<Self>> {
     /**
      * Flips the object based on the supplied {@link SymmetryStrategy} .
