@@ -270,9 +270,9 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model for a 1 DOF velocity system from its kV (volts/(unit/sec)) and kA
-   * (volts/(unit/sec²). These constants cam be found using SysId. The states of the system are
-   * [velocity], inputs are [voltage], and outputs are [velocity].
+   * Create a state-space model for a 1 DOF velocity system from its kV (input units/(unit/sec)) and kA
+   * (input units/(unit/sec²). These constants cam be found using SysId. The states of the system are
+   * [velocity], inputs are [voltage or torque], and outputs are [velocity].
    *
    * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
    * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
@@ -281,8 +281,8 @@ public final class LinearSystemId {
    *
    * <p>u = K_v v + K_a a
    *
-   * @param kV The velocity gain, in volts/(unit/sec)
-   * @param kA The acceleration gain, in volts/(unit/sec²)
+   * @param kV The velocity gain, in input units/(unit/sec)
+   * @param kA The acceleration gain, in input units/(unit/sec²)
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
    * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
