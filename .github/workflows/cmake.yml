@@ -19,12 +19,12 @@ jobs:
           - os: ubuntu-22.04
             name: Linux
             container: wpilib/roborio-cross-ubuntu:2024-22.04
-            flags: "--preset with-java-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
+            flags: "--preset with-java-and-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
           - os: macOS-14
             name: macOS
             container: ""
             env: "PATH=\"/opt/homebrew/opt/protobuf@3/bin:$PATH\""
-            flags: "--preset sccache -DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=/opt/homebrew/opt/protobuf@3/bin/protoc"
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=/opt/homebrew/opt/protobuf@3/bin/protoc"
 
     name: "Build - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -80,7 +80,7 @@ jobs:
           vcpkgGitCommitId: 37c3e63a1306562f7f59c4c3c8892ddd50fdf992 # HEAD on 2024-02-24
 
       - name: configure
-        run: cmake --preset sccache -DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release
+        run: cmake --preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release
         env:
           SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
