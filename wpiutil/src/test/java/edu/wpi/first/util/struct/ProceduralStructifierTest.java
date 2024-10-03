@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
-class ProceduralStructifierRecordTest {
+class ProceduralStructifierTest {
   public record CustomRecord(int int32, boolean bool, double float64, char character, short int16)
       implements StructSerializable {
     public static CustomRecord create() {

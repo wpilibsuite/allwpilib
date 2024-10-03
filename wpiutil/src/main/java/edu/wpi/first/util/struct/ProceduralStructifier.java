@@ -433,16 +433,19 @@ public final class ProceduralStructifier {
         public R unpack(ByteBuffer buffer) {
           try {
             Object[] args = new Object[components.length];
+            Class<?>[] argTypes = new Class<?>[components.length];
             for (int i = 0; i < components.length; i++) {
               args[i] = unpackers.get(i).unpack(buffer);
+              argTypes[i] = components[i].getType();
             }
-            return recordClass.getConstructor().newInstance(args);
+            return recordClass.getConstructor(argTypes).newInstance(args);
           } catch (InstantiationException
               | IllegalAccessException
               | InvocationTargetException
               | NoSuchMethodException
               | SecurityException e) {
-            System.err.println("Could not unpack record: " + recordClass.getSimpleName());
+            System.err.println("Could not unpack record: " + recordClass.getSimpleName()
+                + "\n    " + e.getMessage());
             return null;
           }
         }
@@ -661,7 +664,7 @@ public final class ProceduralStructifier {
 
         @Override
         public E unpack(ByteBuffer buffer) {
-          int ordinal = buffer.getInt();
+          int ordinal = buffer.get();
           buffer.get(m_spongeBuffer);
           return enumMap.getOrDefault(ordinal, null);
         }
