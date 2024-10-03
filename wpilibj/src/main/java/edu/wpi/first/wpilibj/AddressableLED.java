@@ -13,12 +13,57 @@ import edu.wpi.first.hal.PWMJNI;
  * A class for driving addressable LEDs, such as WS2812B, WS2815, and NeoPixels.
  *
  * <p>By default, the timing supports WS2812B and WS2815 LEDs, but is configurable using
- * setBitTiming()
+ * {@link #setBitTiming(int, int, int, int)}
+ *
+ * <p>Some LEDs use a different color order than the default RGB. The color order is configurable
+ * using {@link #setColorOrder(ColorOrder)}.
  *
  * <p>Only 1 LED driver is currently supported by the roboRIO. However, multiple LED strips can be
  * connected in series and controlled from the single driver.
  */
 public class AddressableLED implements AutoCloseable {
+
+  /** Order that color data is sent over the wire. */
+  enum ColorOrder {
+    /** RBG order. */
+    kRBG(AddressableLEDJNI.COLOR_ORDER_RBG),
+    /** BGR order. */
+    kBGR(AddressableLEDJNI.COLOR_ORDER_BGR),
+    /** BRG order. */
+    kBRG(AddressableLEDJNI.COLOR_ORDER_BRG),
+    /** GRB order. */
+    kGRB(AddressableLEDJNI.COLOR_ORDER_GRB),
+    /** GBR order. */
+    kGBR(AddressableLEDJNI.COLOR_ORDER_GBR),
+    /** RGB order. */
+    kRGB(AddressableLEDJNI.COLOR_ORDER_RGB);
+
+    /** The native value for this ColorOrder */
+    public final int value;
+
+    ColorOrder(int value) {
+      this.value = value;
+    }
+
+    /**
+     * Gets a color order from an int value.
+     *
+     * @param value int value
+     * @return color order
+     */
+    public ColorOrder fromValue(int value) {
+      return switch (value) {
+        case AddressableLEDJNI.COLOR_ORDER_RBG -> kRBG;
+        case AddressableLEDJNI.COLOR_ORDER_BGR -> kBGR;
+        case AddressableLEDJNI.COLOR_ORDER_BRG -> kBRG;
+        case AddressableLEDJNI.COLOR_ORDER_GRB -> kGRB;
+        case AddressableLEDJNI.COLOR_ORDER_GBR -> kGBR;
+        case AddressableLEDJNI.COLOR_ORDER_RGB -> kRGB;
+        default -> kRGB;
+      };
+    }
+  }
+
   private final int m_pwmHandle;
   private final int m_handle;
 
@@ -41,6 +86,15 @@ public class AddressableLED implements AutoCloseable {
     if (m_pwmHandle != 0) {
       PWMJNI.freePWMPort(m_pwmHandle);
     }
+  }
+
+  /**
+   * Sets the color order for this AddressableLED. The default order is RGB.
+   *
+   * @param order the color order
+   */
+  public void setColorOrder(ColorOrder order) {
+    AddressableLEDJNI.setColorOrder(m_handle, order.value);
   }
 
   /**
