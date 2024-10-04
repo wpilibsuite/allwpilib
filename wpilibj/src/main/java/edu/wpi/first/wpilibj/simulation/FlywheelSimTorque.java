@@ -14,17 +14,42 @@ public class FlywheelSimTorque extends FlywheelSim {
   /**
    * Creates a simulated flywheel mechanism controlled by torque input.
    *
-   * @param plant The linear system that represents the flywheel controlled by torque input. Use either {@link
-   *     LinearSystemId#createFlywheelTorqueSystem(DCMotor, double, double)} if using physical constants
-   *     or {@link LinearSystemId#identifyVelocitySystem(double, double)} if using system
-   *     characterization.
-   * @param gearbox The type of and number of motors in the flywheel gearbox.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 1 element for velocity.
+   * @param plant              The linear system that represents the flywheel
+   *                           controlled by torque input. Use either {@link
+   *                           LinearSystemId#createFlywheelTorqueSystem(DCMotor, double, double)}
+   *                           if using physical constants
+   *                           or
+   *                           {@link LinearSystemId#identifyVelocitySystem(double, double)}
+   *                           if using system
+   *                           characterization.
+   * @param gearbox            The type of and number of motors in the flywheel
+   *                           gearbox.
+   * @param gearing            The gearing from the motors to the output.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be
+   *                           omitted if no
+   *                           noise is desired. If present must have 1 element
+   *                           for velocity.
    */
   public FlywheelSimTorque(
-      LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double... measurementStdDevs) {
-    super(plant, gearbox, measurementStdDevs);
+      LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double gearing, double... measurementStdDevs) {
+    // By equations 12.17 of
+    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
+    // the torque applied to the flywheel is τ = Jα.
+    // the flywheel state-space model with torque as input is:
+    //
+    // dx/dt = 0 x + 1/J u
+    // A = 0
+    // B = 1/J
+    //
+    // Solve for J.
+    //
+    // B = 1/J
+    // J = 1/B
+    super(
+        plant,
+        gearbox,
+        gearing, 0,
+        measurementStdDevs);
   }
 
   /**
@@ -34,11 +59,25 @@ public class FlywheelSimTorque extends FlywheelSim {
    */
   public void setInputTorque(double torqueNM) {
     setInput(torqueNM);
-    // TODO:  Need some guidance on clamping.
+    // TODO: Need some guidance on clamping.
   }
 
   /**
-   * Gets the voltage of the flywheel.
+   * Returns the flywheel's torque in Newton-Meters.
+   *
+   * @return The flywheel's torque in Newton-Meters.
+   */
+  @Override
+  public double getTorqueNewtonMeters() {
+    // I = V / R - omega / (Kv * R)
+    // Reductions are output over input, so a reduction of 2:1 means the motor is
+    // spinning
+    // 2x faster than the flywheel
+    return getInput(0);
+  }
+
+  /**
+   * Returns the voltage of the flywheel.
    *
    * @return The flywheel's voltage.
    */
@@ -51,23 +90,8 @@ public class FlywheelSimTorque extends FlywheelSim {
     // spinning
     // 2x faster than the flywheel
     return m_gearbox.getVoltage(
-      m_u.get(0, 0),
-      m_x.get(0, 0) * m_gearing) * Math.signum(m_u.get(0, 0));
-
+        m_u.get(0, 0),
+        m_x.get(0, 0) * m_gearing) * Math.signum(m_u.get(0, 0));
   }
 
-  /**
-   * Gets the torque on the flywheel.
-   *
-   * @return The flywheel's torque in Newton-Meters.
-   */
-  @Override
-  public double getTorqueNewtonMeters() {
-        // I = V / R - omega / (Kv * R)
-    // Reductions are output over input, so a reduction of 2:1 means the motor is
-    // spinning
-    // 2x faster than the flywheel
-    return getInput(0);
-
-  }
 }

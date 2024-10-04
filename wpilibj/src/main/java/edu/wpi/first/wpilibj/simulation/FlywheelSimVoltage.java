@@ -15,7 +15,8 @@ public class FlywheelSimVoltage extends FlywheelSim {
   /**
    * Creates a simulated flywheel mechanism controlled by voltage input.
    *
-   * @param plant              The linear system that represents the flywheel controlled by voltage input. Use
+   * @param plant              The linear system that represents the flywheel
+   *                           controlled by voltage input. Use
    *                           either {@link
    *                           LinearSystemId#createFlywheelSystem(DCMotor, double, double)}
    *                           if using physical constants
@@ -32,8 +33,31 @@ public class FlywheelSimVoltage extends FlywheelSim {
    */
   public FlywheelSimVoltage(
       LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double... measurementStdDevs) {
-    super(plant, gearbox, measurementStdDevs);
-
+    // By theorem 6.10.1 of
+    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
+    // the flywheel state-space model with voltage as input is:
+    //
+    // dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
+    // A = -G²Kₜ/(KᵥRJ)
+    // B = GKₜ/(RJ)
+    //
+    // Solve for G.
+    //
+    // A/B = -G/Kᵥ
+    // G = -KᵥA/B
+    //
+    // Solve for J.
+    //
+    // B = GKₜ/(RJ)
+    // J = GKₜ/(RB)
+    // J = -KᵥKₜA/(RB²)
+    super(
+        plant,
+        gearbox,
+        -gearbox.KvRadPerSecPerVolt * plant.getA(0, 0) / plant.getB(0, 0),
+        -gearbox.KvRadPerSecPerVolt * -gearbox.KtNMPerAmp * plant.getA(0, 0) / gearbox.rOhms
+            * Math.pow(plant.getB(0, 0), 2),
+        measurementStdDevs);
   }
 
   /**
@@ -47,16 +71,6 @@ public class FlywheelSimVoltage extends FlywheelSim {
   }
 
   /**
-   * Gets the voltage of the flywheel.
-   *
-   * @return The flywheel's voltage.
-   */
-  @Override
-  public double getVoltage() {
-    return getInput(0);
-  }
-
-  /**
    * Gets the torque on the flywheel.
    *
    * @return The flywheel's torque in Newton-Meters.
@@ -64,5 +78,15 @@ public class FlywheelSimVoltage extends FlywheelSim {
   @Override
   public double getTorqueNewtonMeters() {
     return getAngularAccelerationRadPerSecSq() * m_jKgMetersSquared;
+  }
+
+  /**
+   * Gets the voltage of the flywheel.
+   *
+   * @return The flywheel's voltage.
+   */
+  @Override
+  public double getVoltage() {
+    return getInput(0);
   }
 }

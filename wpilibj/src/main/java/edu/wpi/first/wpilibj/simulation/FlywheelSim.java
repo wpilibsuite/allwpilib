@@ -48,35 +48,20 @@ public abstract class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *                           characterization.
    * @param gearbox            The type of and number of motors in the flywheel
    *                           gearbox.
+   * @param gearing            The gearing from the motors to the output.
+   * @param JKgMetersSquared   The moment of inertia for the flywheel mechanism.
    * @param measurementStdDevs The standard deviations of the measurements. Can be
    *                           omitted if no
    *                           noise is desired. If present must have 1 element
    *                           for velocity.
    */
   public FlywheelSim(
-      LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double... measurementStdDevs) {
+      LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double gearing, double JKgMetersSquared,
+      double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
-
-    // By theorem 6.10.1 of
-    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
-    // the flywheel state-space model is:
-    //
-    // dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
-    // A = -G²Kₜ/(KᵥRJ)
-    // B = GKₜ/(RJ)
-    //
-    // Solve for G.
-    //
-    // A/B = -G/Kᵥ
-    // G = -KᵥA/B
-    //
-    // Solve for J.
-    //
-    // B = GKₜ/(RJ)
-    // J = GKₜ/(RB)
-    m_gearing = -gearbox.KvRadPerSecPerVolt * plant.getA(0, 0) / plant.getB(0, 0);
-    m_jKgMetersSquared = m_gearing * gearbox.KtNMPerAmp / (gearbox.rOhms * plant.getB(0, 0));
+    m_gearing = gearing;
+    m_jKgMetersSquared = JKgMetersSquared;
   }
 
   /**
@@ -111,7 +96,7 @@ public abstract class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel's gearbox.
    */
-  public DCMotor getGearBox() {
+  public DCMotor getGearbox() {
     return m_gearbox;
   }
 
@@ -178,17 +163,17 @@ public abstract class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   }
 
   /**
-   * Gets the voltage of the flywheel.
-   *
-   * @return The flywheel's voltage.
-   */
-  public abstract double getVoltage();
-
-  /**
-   * Gets the torque on the flywheel.
+   * Returns the flywheel's torque in Newton-Meters.
    *
    * @return The flywheel's torque in Newton-Meters.
    */
   public abstract double getTorqueNewtonMeters();
+
+  /**
+   * Returns the voltage of the flywheel.
+   *
+   * @return The flywheel's voltage.
+   */
+  public abstract double getVoltage();
 
 }
