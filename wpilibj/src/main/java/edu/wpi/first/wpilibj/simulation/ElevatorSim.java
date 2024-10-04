@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -22,7 +21,6 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.measure.Acceleration;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Force;
@@ -43,16 +41,16 @@ import edu.wpi.first.units.measure.Voltage;
 public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   // Gearbox for the elevator.
-  private final DCMotor m_gearbox;
+  protected final DCMotor m_gearbox;
 
   // The gearing from the motors to the output.
-  private final double m_gearing;
+  protected final double m_gearing;
 
   // The mass of the elevator carriage.
   private final Mass m_mass;
 
   // the drum radius of the elevator.
-  private final Distance m_drumRadius;
+  protected final Distance m_drumRadius;
 
   // The min allowable height for the elevator.
   private final Distance m_minHeight;
@@ -91,15 +89,19 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    *                           elevator.
    *                           This system can be created with
    *                           {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *                           double, double)}.
+   *                           double, double)}or {@link
+   *                           edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}.
+   *                           If
+   *                           {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}
+   *                           is used, the distance unit must be meters.
    * @param gearbox            The type of and number of motors in the
    *                           elevator
    *                           gearbox.
    * @param gearing            The gearing from the motors to the output.
    * @param mass               The mass of the elevator's carriage.
    * @param drumRadius         The radius of the elevator's drum.
-   * @param minHeightMeters    The min allowable height of the elevator.
-   * @param maxHeightMeters    The max allowable height of the elevator.
+   * @param minHeight          The min allowable height of the elevator.
+   * @param maxHeight          The max allowable height of the elevator.
    * @param g                  The acceleration due to gravity.
    * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements.
@@ -119,7 +121,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
       Distance minHeight,
       Distance maxHeight,
       LinearAcceleration g,
-      Distance startingHeightMeters,
+      Distance startingHeight,
       double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
@@ -129,7 +131,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
     m_minHeight = minHeight;
     m_maxHeight = maxHeight;
     m_g = g;
-    setState(startingHeightMeters.in(Meters), 0);
+    setState(startingHeight.in(Meters), 0);
   }
 
   /**
