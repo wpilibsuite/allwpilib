@@ -39,7 +39,6 @@ import edu.wpi.first.units.measure.Voltage;
 
 /** Represents a simulated elevator mechanism. */
 public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
-
   // Gearbox for the elevator.
   protected final DCMotor m_gearbox;
 
@@ -163,7 +162,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Sets the elevator's position. The new position will be limited bewtween the
    * minimum and maximum allowed heights.
-   * 
+   *
    * @param positionMeters The new position in meters.
    */
   public void setPosition(double positionMeters) {
@@ -173,7 +172,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Sets the elevator's position. The new position will be limited bewtween the
    * minimum and maximum allowed heights.
-   * 
+   *
    * @param position The new position.
    */
   public void setPosition(Distance position) {
@@ -182,7 +181,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Sets the elevator's velocity.
-   * 
+   *
    * @param velocityMetersPerSecond The new velocity in meters per second.
    */
   public void setVelocity(double velocityMetersPerSecond) {
@@ -191,7 +190,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Sets the elevator's velocity.
-   * 
+   *
    * @param velocity The new velocity.
    */
   public void setVelocity(LinearVelocity velocity) {
@@ -258,7 +257,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the gear ratio of the elevator's gear box.
-   * 
+   *
    * @return the elevator gear box's gear ratio.
    */
   public double getGearing() {
@@ -267,7 +266,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the mass of the elevator's carriage in kilograms.
-   * 
+   *
    * @return the carriage mass of the elevator in kilograms.
    */
   public double getMassKilograms() {
@@ -276,7 +275,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the mass of the elevator's carriage.
-   * 
+   *
    * @return the mass of the elevator's carriage.
    */
   public Mass getMass() {
@@ -285,7 +284,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the drum radius of the elevator in meters.
-   * 
+   *
    * @return the drum radius of the elevator in meters.
    */
   public double getDrumRadiusMeters() {
@@ -294,7 +293,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the drum radius of the elevator.
-   * 
+   *
    * @return the drum radius of the elevator.
    */
   public Distance getDrumRadius() {
@@ -303,7 +302,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the gearbox for the elevator.
-   * 
+   *
    * @return The elevator's gearbox.
    */
   public DCMotor getGearbox() {
@@ -312,7 +311,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the acceleration due to gravity in meters per second squared.
-   * 
+   *
    * @return The acceleeration due to gravity in meters per second squared.
    */
   public double getGMetersPerSecondSquared() {
@@ -321,7 +320,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the acceleration due to gravity.
-   * 
+   *
    * @return The acceleration due to gravity.
    */
   public LinearAcceleration getG() {
@@ -339,7 +338,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the position of the elevator.
-   * 
+   *
    * @return The position of the elevator.
    */
   public Distance getPosition() {
@@ -357,7 +356,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the velocity of the elevator.
-   * 
+   *
    * @return The velocity of the elevator.
    */
   public LinearVelocity getVelocity() {
@@ -366,7 +365,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the acceleration of the elevator in meters per second squared.
-   * 
+   *
    * @return The acceleration of the elevator in meters per second squared.
    */
   public double getAccelerationMetersPerSecondSquared() {
@@ -375,7 +374,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the acceleration of the elevator.
-   * 
+   *
    * @return The acceleration of the elevator.
    */
   public LinearAcceleration getAcceleration() {
@@ -420,7 +419,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the force on the elevator's carriage in Newtons
-   * 
+   *
    * @return The force on the elevator's carriage in Newtons.
    */
   public double getForceNewtons() {
@@ -429,7 +428,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the force on the elevator's carriage.
-   * 
+   *
    * @return The force on the elevator's carriage.
    */
   public Force getForce() {

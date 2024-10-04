@@ -315,7 +315,7 @@ public final class LinearSystemId {
    *                         this will be greater than 1.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or gearing &lt;=
-   *                                  0.   
+   *                                  0.
    */
   public static LinearSystem<N2, N1, N2> createSingleJointedArmSystem(
       DCMotor motor, double JKgSquaredMeters, double gearing) {
@@ -348,7 +348,7 @@ public final class LinearSystemId {
    *
    * @param JKgSquaredMeters The moment of inertia J of the arm.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0.    
+   * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0.
    */
   public static LinearSystem<N2, N1, N2> createSingleJointedArmTorqueSystem(
       double JKgSquaredMeters) {

@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated DC motor mechanism. */
 public class DCMotorVoltageSim extends DCMotorSim {
-
   /**
    * Creates a simulated DC motor mechanism.
    *

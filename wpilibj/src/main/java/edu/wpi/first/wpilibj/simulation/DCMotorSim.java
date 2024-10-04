@@ -285,7 +285,7 @@ public abstract class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the DC motor's torque.
-   * 
+   *
    * @return The DC motor's torque.
    */
   public Torque getTorque() {
@@ -303,7 +303,7 @@ public abstract class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Returns the voltage of the DC motor.
-   * 
+   *
    * @return The DC motor's voltage.
    */
   public Voltage getVoltage() {

@@ -212,7 +212,7 @@ public abstract class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
 
   /**
    * Returns the flywheel's torque.
-   * 
+   *
    * @return The flywheel's torque.
    */
   public Torque getTorque() {
@@ -230,7 +230,7 @@ public abstract class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
 
   /**
    * Returns the voltage of the flywheel.
-   * 
+   *
    * @return The flywheel's voltage.
    */
   public Voltage getVoltage() {
