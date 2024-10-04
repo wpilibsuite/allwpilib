@@ -93,9 +93,7 @@ std::function<void(std::string_view)> FileLogger::LineBuffer(
     }
     auto combinedData =
         fmt::format("{}{}", std::string_view{buf.data(), buf.size()}, data);
-    std::string_view wholeData;
-    std::string_view extra;
-    std::tie(wholeData, extra) = wpi::rsplit(combinedData, "\n");
+    auto [wholeData, extra] = wpi::rsplit(combinedData, "\n");
 
     callback(wholeData);
     buf.clear();
