@@ -4,10 +4,15 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.NewtonMeters;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated flywheel mechanism controlled by voltage input. */
@@ -55,8 +60,8 @@ public class FlywheelSimVoltage extends FlywheelSim {
         plant,
         gearbox,
         -gearbox.KvRadPerSecPerVolt * plant.getA(0, 0) / plant.getB(0, 0),
-        -gearbox.KvRadPerSecPerVolt * -gearbox.KtNMPerAmp * plant.getA(0, 0) / gearbox.rOhms
-            * Math.pow(plant.getB(0, 0), 2),
+        KilogramSquareMeters.of(-gearbox.KvRadPerSecPerVolt * gearbox.KtNMPerAmp * plant.getA(0, 0) / gearbox.rOhms
+            * Math.pow(plant.getB(0, 0), 2)),
         measurementStdDevs);
   }
 
@@ -68,25 +73,22 @@ public class FlywheelSimVoltage extends FlywheelSim {
   public void setInputVoltage(double volts) {
     setInput(volts);
     clampInput(RobotController.getBatteryVoltage());
+    m_voltage.mut_replace(m_u.get(0, 0), Volts);
   }
 
   /**
-   * Gets the torque on the flywheel.
+   * Sets the input voltage for the flywheel.
    *
-   * @return The flywheel's torque in Newton-Meters.
+   * @param volts The input voltage.
    */
-  @Override
-  public double getTorqueNewtonMeters() {
-    return getAngularAccelerationRadPerSecSq() * m_jKgMetersSquared;
+  public void setInputVoltage(Voltage voltage) {
+    setInputVoltage(voltage.in(Volts));
   }
 
-  /**
-   * Gets the voltage of the flywheel.
-   *
-   * @return The flywheel's voltage.
-   */
   @Override
-  public double getVoltage() {
-    return getInput(0);
+  public void update(double dtSeconds) {
+    super.update(dtSeconds);
+    m_torque.mut_replace(getJKgMetersSquared() * getAngularAccelerationRadPerSecSq(), NewtonMeters);
   }
+
 }

@@ -4,10 +4,16 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.NewtonMeters;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.Torque;
 
 /** Represents a simulated flywheel mechanism controlled by torque input. */
 public class FlywheelSimTorque extends FlywheelSim {
@@ -49,50 +55,35 @@ public class FlywheelSimTorque extends FlywheelSim {
         plant,
         gearbox,
         gearing,
-        1.0 / plant.getB().get(0, 0),
+        KilogramSquareMeters.of(1.0 / plant.getB().get(0, 0)),
         measurementStdDevs);
   }
 
   /**
    * Sets the input torque for the flywheel.
    *
-   * @param volts The input torque.
+   * @param torqueNM The input torque in Newton-Meters.
    */
   public void setInputTorque(double torqueNM) {
     setInput(torqueNM);
     // TODO: Need some guidance on clamping.
+    m_torque.mut_replace(m_u.get(0, 0), NewtonMeters);
   }
 
   /**
-   * Returns the flywheel's torque in Newton-Meters.
+   * Sets the input torque for the flywheel.
    *
-   * @return The flywheel's torque in Newton-Meters.
+   * @param torqueNM The input torque.
    */
-  @Override
-  public double getTorqueNewtonMeters() {
-    // I = V / R - omega / (Kv * R)
-    // Reductions are output over input, so a reduction of 2:1 means the motor is
-    // spinning
-    // 2x faster than the flywheel
-    return getInput(0);
+  public void setInputTorque(Torque torque) {
+    setInputTorque(torque.in(NewtonMeters));
   }
 
-  /**
-   * Returns the voltage of the flywheel.
-   *
-   * @return The flywheel's voltage.
-   */
   @Override
-  public double getVoltage() {
-    // I = V / R - omega / (Kv * R)
-    // torque = J * omega
-    // V = R * torque / J + omega / Kv
-    // Reductions are output over input, so a reduction of 2:1 means the motor is
-    // spinning
-    // 2x faster than the flywheel
-    return m_gearbox.getVoltage(
-        m_u.get(0, 0),
-        m_x.get(0, 0) * m_gearing) * Math.signum(m_u.get(0, 0));
+  public void update(double dtSeconds) {
+    super.update(dtSeconds);
+    m_voltage.mut_replace(m_gearbox.getVoltage(m_torque.in(NewtonMeters), m_angularVelocity.in(RadiansPerSecond)),
+        Volts);
   }
 
 }
