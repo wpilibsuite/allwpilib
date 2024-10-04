@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/FileLogger.h"
-#include "fmt/format.h"
 
 #ifdef __linux__
 #include <fcntl.h>
@@ -16,6 +15,8 @@
 #include <thread>
 #include <tuple>
 #include <utility>
+
+#include <fmt/format.h>
 
 #include "wpi/StringExtras.h"
 
