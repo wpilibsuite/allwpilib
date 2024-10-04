@@ -33,7 +33,31 @@ public class DCMotorVoltageSim extends DCMotorSim {
    *                           second element is for velocity.
    */
   public DCMotorVoltageSim(LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double... measurementStdDevs) {
-    super(plant, gearbox, measurementStdDevs);
+    // By theorem 6.10.1 of
+    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
+    // the DC motor mechanism state-space model with voltage as input is:
+    //
+    // dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
+    // A = -G²Kₜ/(KᵥRJ)
+    // B = GKₜ/(RJ)
+    //
+    // Solve for G.
+    //
+    // A/B = -G/Kᵥ
+    // G = -KᵥA/B
+    //
+    // Solve for J.
+    //
+    // B = GKₜ/(RJ)
+    // J = GKₜ/(RB)
+    // J = -KᵥKₜA/(RB²)
+    super(
+        plant,
+        gearbox,
+        -gearbox.KvRadPerSecPerVolt * plant.getA(0, 0) / plant.getB(0, 0),
+        -gearbox.KvRadPerSecPerVolt * -gearbox.KtNMPerAmp * plant.getA(0, 0) / gearbox.rOhms
+            * Math.pow(plant.getB(0, 0), 2),
+        measurementStdDevs);
   }
 
   /**

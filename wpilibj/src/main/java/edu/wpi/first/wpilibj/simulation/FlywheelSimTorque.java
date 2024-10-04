@@ -48,7 +48,8 @@ public class FlywheelSimTorque extends FlywheelSim {
     super(
         plant,
         gearbox,
-        gearing, 0,
+        gearing,
+        1.0 / plant.getB().get(0, 0),
         measurementStdDevs);
   }
 

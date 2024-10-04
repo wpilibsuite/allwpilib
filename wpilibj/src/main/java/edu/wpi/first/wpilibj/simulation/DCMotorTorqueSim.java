@@ -22,13 +22,32 @@ public class DCMotorTorqueSim extends DCMotorSim {
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}
    *     is used, the distance unit must be radians.
    * @param gearbox The type of and number of motors in the DC motor gearbox.
+   * @param gearing            The gearing from the motors to the output.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
    */
-  public DCMotorTorqueSim(LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double... measurementStdDevs) {
-    super(plant, gearbox, measurementStdDevs);
-
+  public DCMotorTorqueSim(
+      LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double gearing, double... measurementStdDevs) {
+    // By equations 12.17 of
+    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
+    // the torque applied to a DC motor mechanism is τ = Jα.
+    // The DC motor mechanism state-space model with torque as input is:
+    //
+    // dx/dt = 0 x + 1/J u
+    // A = 0
+    // B = 1/J
+    //
+    // Solve for J.
+    //
+    // B = 1/J
+    // J = 1/B
+    super(
+        plant,
+        gearbox,
+        gearing,
+        1.0 / plant.getB().get(1, 0),
+        measurementStdDevs);
   }
 
   /**
@@ -46,7 +65,7 @@ public class DCMotorTorqueSim extends DCMotorSim {
     // I = V / R - omega / (Kv * R)
     // Reductions are output over input, so a reduction of 2:1 means the motor is
     // spinning
-    // 2x faster than the flywheel
+    // 2x faster than the motor
     return getInput(0);
   }
 
@@ -57,7 +76,7 @@ public class DCMotorTorqueSim extends DCMotorSim {
     // V = R * torque / J + omega / Kv
     // Reductions are output over input, so a reduction of 2:1 means the motor is
     // spinning
-    // 2x faster than the flywheel
+    // 2x faster than the mechanism.
     return m_gearbox.getVoltage(
         m_u.get(0, 0),
         m_x.get(1, 0) * m_gearing) * Math.signum(m_u.get(0, 0));

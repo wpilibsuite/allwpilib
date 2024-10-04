@@ -4,6 +4,10 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -13,12 +17,24 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutLinearAcceleration;
+import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated elevator mechanism. */
 public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   // Gearbox for the elevator.
   private final DCMotor m_gearbox;
+
+  // The gearing from the motors to the output.
+  private final DCMotor m_gearing;
+
+  // The mass of the elevator carriage in kilograms.
+  private final double massKg;
+
+  // the drum radius of the elevator in meters.
+  private final double drumRadiusMeters;
 
   // The min allowable height for the elevator.
   private final double m_minHeight;
@@ -29,19 +45,32 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   // Whether the simulator should simulate gravity.
   private final boolean m_simulateGravity;
 
+  // The angle of the system.
+  private final MutDistance m_angle = Meters.mutable(0.0);
+
+  // The angular velocity of the system.
+  private final MutLinearVelocity m_angularVelocity = MetersPerSecond.mutable(0.0);
+
+  // The angular acceleration of the system.
+  private final MutLinearAcceleration m_angularAcceleration = MetersPerSecondPerSecond.mutable(0.0);
+
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param plant The linear system that represents the elevator. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *     double, double)}.
-   * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param minHeightMeters The min allowable height of the elevator.
-   * @param maxHeightMeters The max allowable height of the elevator.
-   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param plant                The linear system that represents the elevator.
+   *                             This system can be created with
+   *                             {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
+   *                             double, double)}.
+   * @param gearbox              The type of and number of motors in the elevator
+   *                             gearbox.
+   * @param minHeightMeters      The min allowable height of the elevator.
+   * @param maxHeightMeters      The max allowable height of the elevator.
+   * @param simulateGravity      Whether gravity should be simulated or not.
    * @param startingHeightMeters The starting height of the elevator.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 1 element for position.
+   * @param measurementStdDevs   The standard deviations of the measurements. Can
+   *                             be omitted if no
+   *                             noise is desired. If present must have 1 element
+   *                             for position.
    */
   @SuppressWarnings("this-escape")
   public ElevatorSim(
@@ -64,15 +93,18 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param kV The velocity gain.
-   * @param kA The acceleration gain.
-   * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param minHeightMeters The min allowable height of the elevator.
-   * @param maxHeightMeters The max allowable height of the elevator.
-   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param kV                   The velocity gain.
+   * @param kA                   The acceleration gain.
+   * @param gearbox              The type of and number of motors in the elevator
+   *                             gearbox.
+   * @param minHeightMeters      The min allowable height of the elevator.
+   * @param maxHeightMeters      The max allowable height of the elevator.
+   * @param simulateGravity      Whether gravity should be simulated or not.
    * @param startingHeightMeters The starting height of the elevator.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 1 element for position.
+   * @param measurementStdDevs   The standard deviations of the measurements. Can
+   *                             be omitted if no
+   *                             noise is desired. If present must have 1 element
+   *                             for position.
    */
   public ElevatorSim(
       double kV,
@@ -96,16 +128,21 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
-   * @param carriageMassKg The mass of the elevator carriage.
-   * @param drumRadiusMeters The radius of the drum that the elevator spool is wrapped around.
-   * @param minHeightMeters The min allowable height of the elevator.
-   * @param maxHeightMeters The max allowable height of the elevator.
-   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param gearbox              The type of and number of motors in the elevator
+   *                             gearbox.
+   * @param gearing              The gearing of the elevator (numbers greater than
+   *                             1 represent reductions).
+   * @param carriageMassKg       The mass of the elevator carriage.
+   * @param drumRadiusMeters     The radius of the drum that the elevator spool is
+   *                             wrapped around.
+   * @param minHeightMeters      The min allowable height of the elevator.
+   * @param maxHeightMeters      The max allowable height of the elevator.
+   * @param simulateGravity      Whether gravity should be simulated or not.
    * @param startingHeightMeters The starting height of the elevator.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 1 element for position.
+   * @param measurementStdDevs   The standard deviations of the measurements. Can
+   *                             be omitted if no
+   *                             noise is desired. If present must have 1 element
+   *                             for position.
    */
   public ElevatorSim(
       DCMotor gearbox,
@@ -128,10 +165,11 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Sets the elevator's state. The new position will be limited between the minimum and maximum
+   * Sets the elevator's state. The new position will be limited between the
+   * minimum and maximum
    * allowed heights.
    *
-   * @param positionMeters The new position in meters.
+   * @param positionMeters          The new position in meters.
    * @param velocityMetersPerSecond New velocity in meters per second.
    */
   public final void setState(double positionMeters, double velocityMetersPerSecond) {
@@ -228,24 +266,23 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * Updates the state of the elevator.
    *
    * @param currentXhat The current state estimate.
-   * @param u The system inputs (voltage).
-   * @param dtSeconds The time difference between controller updates.
+   * @param u           The system inputs (voltage).
+   * @param dtSeconds   The time difference between controller updates.
    */
   @Override
   protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
     // Calculate updated x-hat from Runge-Kutta.
-    var updatedXhat =
-        NumericalIntegration.rkdp(
-            (x, _u) -> {
-              Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
-              if (m_simulateGravity) {
-                xdot = xdot.plus(VecBuilder.fill(0, -9.8));
-              }
-              return xdot;
-            },
-            currentXhat,
-            u,
-            dtSeconds);
+    var updatedXhat = NumericalIntegration.rkdp(
+        (x, _u) -> {
+          Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
+          if (m_simulateGravity) {
+            xdot = xdot.plus(VecBuilder.fill(0, -9.8));
+          }
+          return xdot;
+        },
+        currentXhat,
+        u,
+        dtSeconds);
 
     // We check for collisions after updating x-hat.
     if (wouldHitLowerLimit(updatedXhat.get(0, 0))) {

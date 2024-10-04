@@ -54,35 +54,20 @@ public abstract class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    *                           is used, the distance unit must be radians.
    * @param gearbox            The type of and number of motors in the DC motor
    *                           gearbox.
+   * @param gearing            The gearing from the motors to the output.
+   * @param JKgMetersSquared   The moment of inertia for the flywheel mechanism.
    * @param measurementStdDevs The standard deviations of the measurements. Can be
    *                           omitted if no
    *                           noise is desired. If present must have 2 elements.
    *                           The first element is for position. The
    *                           second element is for velocity.
    */
-  public DCMotorSim(LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double... measurementStdDevs) {
+  public DCMotorSim(LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double gearing, double JKgMetersSquared,
+      double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
-
-    // By theorem 6.10.1 of
-    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
-    // the DC motor state-space model is:
-    //
-    // dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
-    // A = -G²Kₜ/(KᵥRJ)
-    // B = GKₜ/(RJ)
-    //
-    // Solve for G.
-    //
-    // A/B = -G/Kᵥ
-    // G = -KᵥA/B
-    //
-    // Solve for J.
-    //
-    // B = GKₜ/(RJ)
-    // J = GKₜ/(RB)
-    m_gearing = -gearbox.KvRadPerSecPerVolt * plant.getA(1, 1) / plant.getB(1, 0);
-    m_jKgMetersSquared = m_gearing * gearbox.KtNMPerAmp / (gearbox.rOhms * plant.getB(1, 0));
+    m_gearing = gearing;
+    m_jKgMetersSquared = JKgMetersSquared;
   }
 
   /**
