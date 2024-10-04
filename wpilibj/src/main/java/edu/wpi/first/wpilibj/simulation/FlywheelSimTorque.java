@@ -84,6 +84,7 @@ public class FlywheelSimTorque extends FlywheelSim {
     super.update(dtSeconds);
     m_voltage.mut_replace(m_gearbox.getVoltage(m_torque.in(NewtonMeters), m_angularVelocity.in(RadiansPerSecond)),
         Volts);
+    m_torque.mut_replace(getInput(0), NewtonMeters);
   }
 
 }

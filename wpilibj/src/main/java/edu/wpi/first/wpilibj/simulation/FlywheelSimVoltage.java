@@ -88,6 +88,7 @@ public class FlywheelSimVoltage extends FlywheelSim {
   @Override
   public void update(double dtSeconds) {
     super.update(dtSeconds);
+    m_voltage.mut_replace(getInput(0), Volts);
     m_torque.mut_replace(getJKgMetersSquared() * getAngularAccelerationRadPerSecSq(), NewtonMeters);
   }
 
