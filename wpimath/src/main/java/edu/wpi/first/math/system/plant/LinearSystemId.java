@@ -32,7 +32,7 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0, or
    *                                  gearing &lt;= 0.
    */
-  public static LinearSystem<N2, N1, N2> createElevatorVoltageSystem(
+  public static LinearSystem<N2, N1, N2> createElevatorSystem(
       DCMotor motor, double massKg, double radiusMeters, double gearing) {
     if (massKg <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
@@ -104,7 +104,7 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or gearing &lt;=
    *                                  0.
    */
-  public static LinearSystem<N1, N1, N1> createFlywheelVoltageSystem(
+  public static LinearSystem<N1, N1, N1> createFlywheelSystem(
       DCMotor motor, double JKgMetersSquared, double gearing) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
@@ -167,7 +167,7 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or gearing &lt;=
    *                                  0.
    */
-  public static LinearSystem<N2, N1, N2> createDCMotorVoltageSystem(
+  public static LinearSystem<N2, N1, N2> createDCMotorSystem(
       DCMotor motor, double JKgMetersSquared, double gearing) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
@@ -332,7 +332,7 @@ public final class LinearSystemId {
    *                         this will be greater than 1.
    * @return A LinearSystem representing the given characterized constants.
    */
-  public static LinearSystem<N2, N1, N2> createSingleJointedArmVoltageSystem(
+  public static LinearSystem<N2, N1, N2> createSingleJointedArmSystem(
       DCMotor motor, double JKgSquaredMeters, double gearing) {
     if (JKgSquaredMeters <= 0.0) {
       throw new IllegalArgumentException("JKgSquaredMeters must be greater than zero.");

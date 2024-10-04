@@ -17,7 +17,7 @@ public class FlywheelSimVoltage extends FlywheelSim {
    *
    * @param plant              The linear system that represents the flywheel controlled by voltage input. Use
    *                           either {@link
-   *                           LinearSystemId#createFlywheelVoltageSystem(DCMotor, double, double)}
+   *                           LinearSystemId#createFlywheelSystem(DCMotor, double, double)}
    *                           if using physical constants
    *                           or
    *                           {@link LinearSystemId#identifyVelocitySystem(double, double)}
