@@ -124,7 +124,6 @@ public final class LinearSystemId {
    */
   public static LinearSystem<N2, N1, N2> createElevatorTorqueSystem(
       Mass mass, Distance drumRadius) {
-
     return createElevatorTorqueSystem(mass.in(Kilograms), drumRadius.in(Meters));
   }
 
@@ -375,7 +374,6 @@ public final class LinearSystemId {
    */
   public static LinearSystem<N2, N1, N2> createDCMotorTorqueSystem(
       MomentOfInertia J, double gearing) {
-
     return createDCMotorTorqueSystem(J.in(KilogramSquareMeters), gearing);
   }
 
@@ -421,7 +419,6 @@ public final class LinearSystemId {
    */
   public static LinearSystem<N2, N1, N2> createDCMotorTorqueSystem(
       Mass mass, Distance radius) {
-
     return createElevatorTorqueSystem(mass.in(Kilograms), radius.in(Meters));
   }
 
