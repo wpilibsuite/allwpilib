@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated DC motor mechanism. */
 public class ElevatorVoltageSim extends ElevatorSim {
+
   /**
    * Creates a simulated elevator mechanism.
    *
@@ -45,7 +46,12 @@ public class ElevatorVoltageSim extends ElevatorSim {
    * @param maxHeightMeters         The max allowable height of the elevator in
    *                                meters.
    * @param gMetersPerSecondSquared The acceleration due to gravity in meters per
-   *                                second squared.
+   *                                second squared. To disable gravity in the
+   *                                simulation set to 0. The enable normal earth
+   *                                gravity use -9.8. Values between 0 and -9.8
+   *                                can be used to simulate free fall more
+   *                                accurately, but must be determined by the
+   *                                user.
    * @param startingHeightMeters    The starting height of the elevator in meters.
    * @param measurementStdDevs      The standard deviations of the measurements.
    *                                Can be
@@ -93,8 +99,15 @@ public class ElevatorVoltageSim extends ElevatorSim {
    * @param drumRadius         The radius of the elevator's drum.
    * @param minHeight          The min allowable height of the elevator.
    * @param maxHeight          The max allowable height of the elevator.
-   * @param g                  The acceleration due to gravity.
-   * @param startingHeight     The starting height of the elevator.
+   * @param g                  The acceleration due to gravity in meters per
+   *                           second squared. To disable gravity in the
+   *                           simulation set to 0. The enable normal earth
+   *                           gravity use -9.8. Values between 0 and -9.8
+   *                           can be used to simulate free fall more
+   *                           accurately, but must be determined by the
+   *                           user.
+   * @param startingHeight     The starting height
+   *                           of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements. Can be
    *                           omitted if no
    *                           noise is desired. If present must have 2 elements.
