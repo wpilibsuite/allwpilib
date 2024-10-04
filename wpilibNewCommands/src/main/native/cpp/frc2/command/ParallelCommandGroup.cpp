@@ -6,6 +6,7 @@
 
 #include <utility>
 #include <vector>
+#include <string>
 
 using namespace frc2;
 
@@ -87,7 +88,7 @@ void ParallelCommandGroup::AddCommands(
     } else {
       std::string formattedRequirements = "";
       bool first = true;
-      for (auto&& requirement: command->GetRequirements()) {
+      for (auto&& requirement : command->GetRequirements()) {
         if (first) {
           first = false;
         } else {
@@ -95,11 +96,13 @@ void ParallelCommandGroup::AddCommands(
         }
         formattedRequirements += requirement->GetName();
       }
-      throw FRC_MakeError(frc::err::CommandIllegalUse,
-                          "Command {} could not be added to this ParallelCommandGroup"
-                          " because the subsystems [{}] are already required in this command."
-                          " Multiple commands in a parallel composition cannot require the same subsystems.",
-                          command->GetName(), formattedRequirements);
+      throw FRC_MakeError(
+          frc::err::CommandIllegalUse,
+          "Command {} could not be added to this ParallelCommandGroup"
+          " because the subsystems [{}] are already required in this command."
+          " Multiple commands in a parallel composition cannot require the "
+          "same subsystems.",
+          command->GetName(), formattedRequirements);
     }
   }
 }

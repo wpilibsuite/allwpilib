@@ -83,13 +83,17 @@ public class ParallelDeadlineGroup extends Command {
 
     for (Command command : commands) {
       if (!Collections.disjoint(command.getRequirements(), getRequirements())) {
+        String requirementsStr = command.getRequirements()
+          .stream()
+          .map(Subsystem::getName)
+          .collect(Collectors.joining(", "));
         throw new IllegalArgumentException(
-          String.format("Command %s could not be added to this ParallelCommandGroup"
-                        + " because the subsystems [%s] are already required in this command."
-                        + " Multiple commands in a parallel composition cannot require the same subsystems.",
-            command.getName(), command.getRequirements().stream().map(Subsystem::getName).collect(Collectors.joining(", "))
-          )
-        );
+          String.format(
+            "Command %s could not be added to this ParallelCommandGroup"
+            + " because the subsystems [%s] are already required in this command."
+            + " Multiple commands in a parallel composition cannot require"
+            + " the same subsystems.",
+            command.getName(), requirementsStr));
       }
       m_commands.put(command, false);
       addRequirements(command.getRequirements());
