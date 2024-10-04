@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -82,7 +83,8 @@ public class FlywheelSimTorque extends FlywheelSim {
   @Override
   public void update(double dtSeconds) {
     super.update(dtSeconds);
-    m_voltage.mut_replace(m_gearbox.getVoltage(m_torque.in(NewtonMeters), m_angularVelocity.in(RadiansPerSecond)),
+    m_currentDraw.mut_replace(m_gearbox.getCurrent(getInput(0)) * m_gearing * Math.signum(m_u.get(0, 0)), Amps);
+    m_voltage.mut_replace(m_gearbox.getVoltage(getInput(0), m_x.get(0, 0)),
         Volts);
     m_torque.mut_replace(getInput(0), NewtonMeters);
   }

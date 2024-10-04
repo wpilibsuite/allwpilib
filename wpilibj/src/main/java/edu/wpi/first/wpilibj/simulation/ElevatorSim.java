@@ -4,9 +4,15 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Kilogram;
+import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.NewtonMeters;
+import static edu.wpi.first.units.Units.Newtons;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -16,17 +22,25 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Acceleration;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutForce;
 import edu.wpi.first.units.measure.MutLinearAcceleration;
 import edu.wpi.first.units.measure.MutLinearVelocity;
+import edu.wpi.first.units.measure.MutTorque;
+import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Torque;
+import edu.wpi.first.units.measure.Voltage;
 
 /** Represents a simulated elevator mechanism. */
 public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
-  // The acceleration due to gravity in meters per second squared.
-  private final double m_gMetersPerSecondSquared;
 
   // Gearbox for the elevator.
   private final DCMotor m_gearbox;
@@ -34,77 +48,88 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   // The gearing from the motors to the output.
   private final double m_gearing;
 
-  // The mass of the elevator carriage in kilograms.
-  private final double m_massKg;
+  // The mass of the elevator carriage.
+  private final Mass m_mass;
 
-  // the drum radius of the elevator in meters.
-  private final double m_drumRadiusMeters;
+  // the drum radius of the elevator.
+  private final Distance m_drumRadius;
 
   // The min allowable height for the elevator.
-  private final double m_minHeight;
+  private final Distance m_minHeight;
 
   // The max allowable height for the elevator.
-  private final double m_maxHeight;
+  private final Distance m_maxHeight;
 
-  // Whether the simulator should simulate gravity.
-  private final boolean m_simulateGravity;
+  // The acceleration due to gravity.
+  private final LinearAcceleration m_g;
 
-  // The angle of the system.
+  // The position of the elevator.
   private final MutDistance m_position = Meters.mutable(0.0);
 
-  // The angular velocity of the system.
+  // The velocity of the elevator.
   private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0.0);
 
-  // The angular acceleration of the system.
+  // The acceleration of the elevator.
   private final MutLinearAcceleration m_acceleration = MetersPerSecondPerSecond.mutable(0.0);
+
+  // The current draw of elevator.
+  protected final MutCurrent m_currentDraw = Amps.mutable(0.0);
+
+  // The voltage of the elevator.
+  protected final MutVoltage m_voltage = Volts.mutable(0.0);
+
+  // The torque on the elevator's drum.
+  protected final MutTorque m_torque = NewtonMeters.mutable(0.0);
+
+  // The force on the elevator's carriage.
+  protected final MutForce m_force = Newtons.mutable(0.0);
 
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param plant                   The linear system that represents the
-   *                                elevator.
-   *                                This system can be created with
-   *                                {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *                                double, double)}.
-   * @param gMetersPerSecondSquared The acceleration due to gravity in meters per
-   *                                second squared.
-   * @param gearbox                 The type of and number of motors in the
-   *                                elevator
-   *                                gearbox.
-   * @param minHeightMeters         The min allowable height of the elevator.
-   * @param maxHeightMeters         The max allowable height of the elevator.
-   * @param simulateGravity         Whether gravity should be simulated or not.
-   * @param startingHeightMeters    The starting height of the elevator.
-   * @param measurementStdDevs      The standard deviations of the measurements.
-   *                                Can
-   *                                be omitted if no
-   *                                noise is desired. If present must have 1
-   *                                element
-   *                                for position.
+   * @param plant              The linear system that represents the
+   *                           elevator.
+   *                           This system can be created with
+   *                           {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
+   *                           double, double)}.
+   * @param gearbox            The type of and number of motors in the
+   *                           elevator
+   *                           gearbox.
+   * @param gearing            The gearing from the motors to the output.
+   * @param mass               The mass of the elevator's carriage.
+   * @param drumRadius         The radius of the elevator's drum.
+   * @param minHeightMeters    The min allowable height of the elevator.
+   * @param maxHeightMeters    The max allowable height of the elevator.
+   * @param g                  The acceleration due to gravity.
+   * @param startingHeight     The starting height of the elevator.
+   * @param measurementStdDevs The standard deviations of the measurements.
+   *                           Can
+   *                           be omitted if no
+   *                           noise is desired. If present must have 1
+   *                           element
+   *                           for position.
    */
   @SuppressWarnings("this-escape")
   public ElevatorSim(
       LinearSystem<N2, N1, N2> plant,
-      double gMetersPerSecondSquared,
       DCMotor gearbox,
       double gearing,
-      double massKg,
-      double drumRadiusMeters,
-      double minHeightMeters,
-      double maxHeightMeters,
-      boolean simulateGravity,
-      double startingHeightMeters,
+      Mass mass,
+      Distance drumRadius,
+      Distance minHeight,
+      Distance maxHeight,
+      LinearAcceleration g,
+      Distance startingHeightMeters,
       double... measurementStdDevs) {
     super(plant, measurementStdDevs);
-    m_gMetersPerSecondSquared = gMetersPerSecondSquared;
     m_gearbox = gearbox;
     m_gearing = gearing;
-    m_massKg = massKg;
-    m_drumRadiusMeters = drumRadiusMeters;
-    m_minHeight = minHeightMeters;
-    m_maxHeight = maxHeightMeters;
-    m_simulateGravity = simulateGravity;
-    setState(startingHeightMeters, 0);
+    m_mass = mass;
+    m_drumRadius = drumRadius;
+    m_minHeight = minHeight;
+    m_maxHeight = maxHeight;
+    m_g = g;
+    setState(startingHeightMeters.in(Meters), 0);
   }
 
   /**
@@ -118,7 +143,19 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   public void setState(double positionMeters, double velocityMetersPerSecond) {
     setState(
         VecBuilder.fill(
-            MathUtil.clamp(positionMeters, m_minHeight, m_maxHeight), velocityMetersPerSecond));
+            MathUtil.clamp(positionMeters, m_minHeight.in(Meters), m_maxHeight.in(Meters)), velocityMetersPerSecond));
+  }
+
+  /**
+   * Sets the elevator's state. The new position will be limited between the
+   * minimum and maximum
+   * allowed heights.
+   *
+   * @param position The new position.
+   * @param velocity The new velocity.
+   */
+  public void setState(Distance position, LinearVelocity velocity) {
+    setState(position.in(Meters), velocity.in(MetersPerSecond));
   }
 
   /**
@@ -128,9 +165,17 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * @param positionMeters The new position in meters.
    */
   public void setPosition(double positionMeters) {
-    setState(
-        VecBuilder.fill(
-            MathUtil.clamp(positionMeters, m_minHeight, m_maxHeight), getVelocityMetersPerSecond()));
+    setState(positionMeters, m_velocity.in(MetersPerSecond));
+  }
+
+  /**
+   * Sets the elevator's position. The new position will be limited bewtween the
+   * minimum and maximum allowed heights.
+   * 
+   * @param position The new position.
+   */
+  public void setPosition(Distance position) {
+    setPosition(position.in(Meters));
   }
 
   /**
@@ -139,27 +184,56 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * @param velocityMetersPerSecond The new velocity in meters per second.
    */
   public void setVelocity(double velocityMetersPerSecond) {
-    setState(getPositionMeters(), velocityMetersPerSecond);
+    setState(m_position.in(Meters), velocityMetersPerSecond);
+  }
+
+  /**
+   * Sets the elevator's velocity.
+   * 
+   * @param velocity The new velocity.
+   */
+  public void setVelocity(LinearVelocity velocity) {
+    setVelocity(velocity.in(MetersPerSecond));
   }
 
   /**
    * Returns whether the elevator would hit the lower limit.
    *
-   * @param elevatorHeightMeters The elevator height.
+   * @param elevatorHeightMeters The elevator height in meters.
    * @return Whether the elevator would hit the lower limit.
    */
   public boolean wouldHitLowerLimit(double elevatorHeightMeters) {
-    return elevatorHeightMeters <= this.m_minHeight;
+    return elevatorHeightMeters <= this.m_minHeight.in(Meters);
+  }
+
+  /**
+   * Returns whether the elevator would hit the lower limit.
+   *
+   * @param elevatorHeight The elevator height.
+   * @return Whether the elevator would hit the lower limit.
+   */
+  public boolean wouldHitLowerLimit(Distance elevatorHeight) {
+    return wouldHitLowerLimit(elevatorHeight.in(Meters));
   }
 
   /**
    * Returns whether the elevator would hit the upper limit.
    *
-   * @param elevatorHeightMeters The elevator height.
+   * @param elevatorHeightMeters The elevator height in meters.
    * @return Whether the elevator would hit the upper limit.
    */
   public boolean wouldHitUpperLimit(double elevatorHeightMeters) {
-    return elevatorHeightMeters >= this.m_maxHeight;
+    return elevatorHeightMeters >= this.m_maxHeight.in(Meters);
+  }
+
+  /**
+   * Returns whether the elevator would hit the upper limit.
+   *
+   * @param elevatorHeight The elevator height.
+   * @return Whether the elevator would hit the upper limit.
+   */
+  public boolean wouldHitUpperLimit(Distance elevatorHeight) {
+    return wouldHitUpperLimit(elevatorHeight.in(Meters));
   }
 
   /**
@@ -168,7 +242,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * @return Whether the elevator has hit the lower limit.
    */
   public boolean hasHitLowerLimit() {
-    return wouldHitLowerLimit(getPositionMeters());
+    return wouldHitLowerLimit(m_position);
   }
 
   /**
@@ -177,7 +251,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * @return Whether the elevator has hit the upper limit.
    */
   public boolean hasHitUpperLimit() {
-    return wouldHitUpperLimit(getPositionMeters());
+    return wouldHitUpperLimit(m_position);
   }
 
   /**
@@ -190,12 +264,30 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
+   * Returns the mass of the elevator's carriage in kilograms.
+   * 
+   * @return the carriage mass of the elevator in kilograms.
+   */
+  public double getMassKilograms() {
+    return m_mass.in(Kilograms);
+  }
+
+  /**
    * Returns the mass of the elevator's carriage.
    * 
-   * @return the carriage mass of the elevator.
+   * @return the mass of the elevator's carriage.
    */
-  public double getMassKg() {
-    return m_massKg;
+  public Mass getMass() {
+    return m_mass;
+  }
+
+  /**
+   * Returns the drum radius of the elevator in meters.
+   * 
+   * @return the drum radius of the elevator in meters.
+   */
+  public double getDrumRadiusMeters() {
+    return m_drumRadius.in(Meters);
   }
 
   /**
@@ -203,8 +295,8 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * 
    * @return the drum radius of the elevator.
    */
-  public double getDrumRadiusMeters() {
-    return m_drumRadiusMeters;
+  public Distance getDrumRadius() {
+    return m_drumRadius;
   }
 
   /**
@@ -217,9 +309,27 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Returns the position of the elevator.
+   * Returns the acceleration due to gravity in meters per second squared.
+   * 
+   * @return The acceleeration due to gravity in meters per second squared.
+   */
+  public double getGMetersPerSecondSquared() {
+    return m_g.in(MetersPerSecondPerSecond);
+  }
+
+  /**
+   * Returns the acceleration due to gravity.
+   * 
+   * @return The acceleration due to gravity.
+   */
+  public LinearAcceleration getG() {
+    return m_g;
+  }
+
+  /**
+   * Returns the position of the elevator in meters.
    *
-   * @return The position of the elevator.
+   * @return The position of the elevator in meters.
    */
   public double getPositionMeters() {
     return m_position.in(Meters);
@@ -235,9 +345,9 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Returns the velocity of the elevator.
+   * Returns the velocity of the elevator in meters per second.
    *
-   * @return The velocity of the elevator.
+   * @return The velocity of the elevator in meters per second.
    */
   public double getVelocityMetersPerSecond() {
     return m_velocity.in(MetersPerSecond);
@@ -253,9 +363,9 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Returns the acceleration of the elevator.
+   * Returns the acceleration of the elevator in meters per second squared.
    * 
-   * @return The acceleration of the elevator.
+   * @return The acceleration of the elevator in meters per second squared.
    */
   public double getAccelerationMetersPerSecondSquared() {
     return m_acceleration.in(MetersPerSecondPerSecond);
@@ -271,29 +381,40 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Returns the elevator current draw.
+   * Returns the elevator's current draw in Amps.
    *
-   * @return The elevator current draw.
+   * @return The elevator's current draw in Amps.
    */
   public double getCurrentDrawAmps() {
-    // I = V / R - omega / (Kv * R)
-    // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
-    // spinning 10x faster than the output
-    // v = r w, so w = v/r
-    double kA = 1 / m_plant.getB().get(1, 0);
-    double kV = -m_plant.getA().get(1, 1) * kA;
-    double motorVelocityRadPerSec = m_x.get(1, 0) * kV * m_gearbox.KvRadPerSecPerVolt;
-    var appliedVoltage = m_u.get(0, 0);
-    return m_gearbox.getCurrent(motorVelocityRadPerSec, appliedVoltage)
-        * Math.signum(appliedVoltage);
+    return m_currentDraw.in(Amps);
+  }
+
+  /**
+   * Returns the elevator's current draw.
+   *
+   * @return The elevator's current draw.
+   */
+  public Current getCurrentDraw() {
+    return m_currentDraw;
   }
 
   /**
    * Returns the torque on the elevator's drum in Newton-Meters.
-   * 
+   *
    * @return The torque on the elevator's drum in Newton-Meters.
    */
-  public abstract double getTorqueNewtonMeters();
+  public double getTorqueNewtonMeters() {
+    return m_torque.in(NewtonMeters);
+  }
+
+  /**
+   * Returns the torque on the elevator's drum.
+   *
+   * @return The torque on the elevator's drum.
+   */
+  public Torque getTorque() {
+    return m_torque;
+  }
 
   /**
    * Returns the force on the elevator's carriage in Newtons
@@ -301,15 +422,35 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * @return The force on the elevator's carriage in Newtons.
    */
   public double getForceNewtons() {
-    return getTorqueNewtonMeters() / m_drumRadiusMeters;
+    return m_force.in(Newtons);
   }
 
   /**
-   * Returns the voltage of the DC motor.
-   *
-   * @return The DC motor's voltage.
+   * Returns the force on the elevator's carriage.
+   * 
+   * @return The force on the elevator's carriage.
    */
-  public abstract double getVoltage();
+  public Force getForce() {
+    return m_force;
+  }
+
+  /**
+   * Returns the voltage of the elevator in volts.
+   *
+   * @return The voltage of the elevator in volts.
+   */
+  public double getVoltageVolts() {
+    return m_voltage.in(Volts);
+  }
+
+  /**
+   * Returns the voltage of the elevator.
+   *
+   * @return The voltage of the elevator.
+   */
+  public Voltage getVoltage() {
+    return m_voltage;
+  }
 
   /**
    * Updates the state of the elevator.
@@ -324,9 +465,7 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
     var updatedXhat = NumericalIntegration.rkdp(
         (x, _u) -> {
           Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
-          if (m_simulateGravity) {
-            xdot = xdot.plus(VecBuilder.fill(0, m_gMetersPerSecondSquared));
-          }
+          xdot = xdot.plus(VecBuilder.fill(0, m_g.in(MetersPerSecondPerSecond)));
           return xdot;
         },
         currentXhat,
@@ -335,10 +474,10 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
 
     // We check for collisions after updating x-hat.
     if (wouldHitLowerLimit(updatedXhat.get(0, 0))) {
-      return VecBuilder.fill(m_minHeight, 0);
+      return VecBuilder.fill(m_minHeight.in(Meters), 0);
     }
     if (wouldHitUpperLimit(updatedXhat.get(0, 0))) {
-      return VecBuilder.fill(m_maxHeight, 0);
+      return VecBuilder.fill(m_maxHeight.in(Meters), 0);
     }
     return updatedXhat;
   }
@@ -350,5 +489,13 @@ public abstract class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
     m_velocity.mut_replace(getOutput(1), MetersPerSecond);
     m_acceleration.mut_replace((m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u)).get(0, 0),
         MetersPerSecondPerSecond);
+    // I = V / R - omega / (Kv * R)
+    // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
+    // spinning 10x faster than the output
+    // v = r w, so w = v/r
+    m_currentDraw.mut_replace(
+        m_gearbox.getCurrent(m_x.get(1, 0) * m_gearing / 2 / Math.PI / m_drumRadius.in(Meters), m_u.get(0, 0))
+            * Math.signum(m_u.get(0, 0)),
+        Amps);
   }
 }

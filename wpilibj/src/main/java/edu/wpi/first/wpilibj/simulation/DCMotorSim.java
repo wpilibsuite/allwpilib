@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
@@ -20,7 +19,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -319,12 +317,6 @@ public abstract class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
     m_angularVelocity.mut_replace(getOutput(1), RadiansPerSecond);
     m_angularAcceleration.mut_replace((m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u)).get(1, 0),
         RadiansPerSecondPerSecond);
-    // I = V / R - omega / (Kv * R)
-    // Reductions are output over input, so a reduction of 2:1 means the motor is
-    // spinning
-    // 2x faster than the output
-    m_currentDraw.mut_replace(m_gearbox.getCurrent(m_x.get(1, 0) * m_gearing, m_u.get(0, 0))
-        * Math.signum(m_u.get(0, 0)), Amps);
   }
 
 }

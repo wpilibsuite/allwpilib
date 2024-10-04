@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.Volts;
@@ -76,7 +77,7 @@ public class DCMotorVoltageSim extends DCMotorSim {
     m_voltage.mut_replace(m_u.get(0, 0), Volts);
   }
 
-    /**
+  /**
    * Sets the input voltage for the DC motor.
    *
    * @param volts The input voltage.
@@ -87,9 +88,15 @@ public class DCMotorVoltageSim extends DCMotorSim {
 
   @Override
   public void update(double dtSeconds) {
-      super.update(dtSeconds);
-      m_voltage.mut_replace(getInput(0), Volts);
-      m_torque.mut_replace(getJKgMetersSquared() * getAngularAccelerationRadPerSecSq(), NewtonMeters);
+    super.update(dtSeconds);
+    // I = V / R - omega / (Kv * R)
+    // Reductions are output over input, so a reduction of 2:1 means the motor is
+    // spinning
+    // 2x faster than the flywheel
+    m_currentDraw.mut_replace(m_gearbox.getCurrent(m_x.get(1, 0) * m_gearing, getInput(0))
+        * Math.signum(m_u.get(0, 0)), Amps);
+    m_voltage.mut_replace(getInput(0), Volts);
+    m_torque.mut_replace(getJKgMetersSquared() * getAngularAccelerationRadPerSecSq(), NewtonMeters);
   }
 
 }

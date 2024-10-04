@@ -35,7 +35,7 @@ public abstract class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   protected final DCMotor m_gearbox;
 
   // The gearing from the motors to the output.
-  private final double m_gearing;
+  protected final double m_gearing;
 
   // The moment of inertia for the flywheel mechanism.
   private final MomentOfInertia m_j;
@@ -243,12 +243,6 @@ public abstract class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
     m_angularVelocity.mut_replace(getOutput(0), RadiansPerSecond);
     m_angularAcceleration.mut_replace((m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u)).get(0, 0),
         RadiansPerSecondPerSecond);
-    // I = V / R - omega / (Kv * R)
-    // Reductions are output over input, so a reduction of 2:1 means the motor is
-    // spinning
-    // 2x faster than the flywheel
-    m_currentDraw.mut_replace(m_gearbox.getCurrent(m_x.get(0, 0) * m_gearing, m_u.get(0, 0))
-        * Math.signum(m_u.get(0, 0)), Amps);
   }
 
 }
