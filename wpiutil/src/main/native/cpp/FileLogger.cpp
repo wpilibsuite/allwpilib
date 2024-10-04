@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/FileLogger.h"
+#include "fmt/format.h"
 
 #ifdef __linux__
 #include <fcntl.h>
@@ -27,12 +28,12 @@ FileLogger::FileLogger(std::string_view file,
       m_inotifyWatchHandle{
           inotify_add_watch(m_inotifyHandle, file.data(), IN_MODIFY)},
       m_thread{[=, this] {
-        char buf[4000];
+        char buf[8000];
         char eventBuf[sizeof(struct inotify_event) + NAME_MAX + 1];
         lseek(m_fileHandle, 0, SEEK_END);
         while (read(m_inotifyHandle, eventBuf, sizeof(eventBuf)) > 0) {
           int bufLen = 0;
-          while ((bufLen = read(m_fileHandle, buf, sizeof(buf))) > 0) {
+          if ((bufLen = read(m_fileHandle, buf, sizeof(buf))) > 0) {
             callback(std::string_view{buf, static_cast<size_t>(bufLen)});
           }
           std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -89,18 +90,15 @@ std::function<void(std::string_view)> FileLogger::LineBuffer(
       buf.append(data.begin(), data.end());
       return;
     }
-    std::string_view line;
-    std::string_view remainingData;
-    std::tie(line, remainingData) = wpi::split(data, "\n");
-    buf.append(line.begin(), line.end());
-    callback(std::string_view{buf.data(), buf.size()});
+    auto combinedData =
+        fmt::format("{}{}", std::string_view{buf.data(), buf.size()}, data);
+    std::string_view wholeData;
+    std::string_view extra;
+    std::tie(wholeData, extra) = wpi::rsplit(combinedData, "\n");
 
-    while (wpi::contains(remainingData, "\n")) {
-      std::tie(line, remainingData) = wpi::split(remainingData, "\n");
-      callback(line);
-    }
+    callback(wholeData);
     buf.clear();
-    buf.append(remainingData.begin(), remainingData.end());
+    buf.append(extra.begin(), extra.end());
   };
 }
 }  // namespace wpi
