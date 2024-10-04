@@ -82,7 +82,7 @@ public final class LinearSystemId {
 
     return new LinearSystem<>(
         Matrix.eye(Nat.N2()),
-        VecBuilder.fill(0, 1.0 / (massKg * radiusMeters * radiusMeters)),
+        VecBuilder.fill(0, 1.0 / (massKg * radiusMeters)),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));
   }

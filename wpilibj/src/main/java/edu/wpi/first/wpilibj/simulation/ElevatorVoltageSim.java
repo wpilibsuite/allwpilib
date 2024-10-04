@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated DC motor mechanism. */
 public class ElevatorVoltageSim extends ElevatorSim {
-
   /**
    * Creates a simulated elevator mechanism.
    *
