@@ -96,11 +96,10 @@ void ParallelCommandGroup::AddCommands(
         formattedRequirements += requirement->GetName();
       }
       throw FRC_MakeError(frc::err::CommandIllegalUse,
-                          fmt::format("Command {} could not be added to this ParallelCommandGroup"
-                                      " because the subsystems [{}] are already required in this command."
-                                      " Multiple commands in a parallel composition cannot require the same subsystems.",
-                                      command->GetName(), formattedRequirements
-                          ));
+                          "Command {} could not be added to this ParallelCommandGroup"
+                          " because the subsystems [{}] are already required in this command."
+                          " Multiple commands in a parallel composition cannot require the same subsystems.",
+                          command->GetName(), formattedRequirements);
     }
   }
 }
