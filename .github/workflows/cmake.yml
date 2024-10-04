@@ -28,7 +28,7 @@ jobs:
           - os: windows-2022
             name: Windows
             container: ""
-            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release"
+            flags: '--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release'
 
     name: "Build - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -49,17 +49,17 @@ jobs:
         if: runner.os == 'Windows'
         uses: lukka/get-cmake@v3.29.3
 
+      - name: Install sccache
+        uses: mozilla-actions/sccache-action@v0.0.5
+
+      - uses: actions/checkout@v4
+
       - name: Run vcpkg (Windows only)
         if: runner.os == 'Windows'
         uses: lukka/run-vcpkg@v11.5
         with:
           vcpkgDirectory: ${{ runner.workspace }}/vcpkg
           vcpkgGitCommitId: 37c3e63a1306562f7f59c4c3c8892ddd50fdf992 # HEAD on 2024-02-24
-
-      - name: Install sccache
-        uses: mozilla-actions/sccache-action@v0.0.5
-
-      - uses: actions/checkout@v4
 
       - name: configure
         run: cmake ${{ matrix.flags }}
