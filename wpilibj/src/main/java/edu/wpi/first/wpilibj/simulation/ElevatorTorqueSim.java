@@ -22,7 +22,7 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.Torque;
 
 /** Represents a simulated DC motor mechanism. */
-public class ElevatorTorqueSim extends ElevatorSim {
+public class ElevatorTorqueSim extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
    *

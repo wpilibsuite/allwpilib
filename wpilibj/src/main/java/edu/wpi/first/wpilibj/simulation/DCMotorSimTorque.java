@@ -16,7 +16,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Torque;
 
 /** Represents a simulated DC motor mechanism. */
-public class DCMotorTorqueSim extends DCMotorSim {
+public class DCMotorSimTorque extends DCMotorSimBase {
   /**
    * Creates a simulated DC motor mechanism.
    *
@@ -37,7 +37,7 @@ public class DCMotorTorqueSim extends DCMotorSim {
    *                           The first element is for position. The
    *                           second element is for velocity.
    */
-  public DCMotorTorqueSim(
+  public DCMotorSimTorque(
       LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double gearing, double... measurementStdDevs) {
     // By equations 12.17 of
     // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,

@@ -19,7 +19,7 @@ class DCMotorSimTest {
     RoboRioSim.resetData();
 
     DCMotor gearbox = DCMotor.getNEO(1);
-    DCMotorSim sim = new DCMotorSim(gearbox, 1.0, 0.0005);
+    DCMotorSimBase sim = new DCMotorSimBase(gearbox, 1.0, 0.0005);
 
     try (var motor = new PWMVictorSPX(0);
         var encoder = new Encoder(0, 1)) {
@@ -59,7 +59,7 @@ class DCMotorSimTest {
     RoboRioSim.resetData();
 
     DCMotor gearbox = DCMotor.getNEO(1);
-    DCMotorSim sim = new DCMotorSim(gearbox, 1.0, 0.0005);
+    DCMotorSimBase sim = new DCMotorSimBase(gearbox, 1.0, 0.0005);
 
     try (var motor = new PWMVictorSPX(0);
         var encoder = new Encoder(0, 1);

@@ -14,7 +14,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.ElevatorSimBase;
 import edu.wpi.first.wpilibj.simulation.JoystickSim;
 import edu.wpi.first.wpilibj.simulation.PWMSim;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
@@ -33,7 +33,7 @@ class PotentiometerPIDTest {
   private Robot m_robot;
   private Thread m_thread;
 
-  private ElevatorSim m_elevatorSim;
+  private ElevatorSimBase m_elevatorSim;
   private PWMSim m_motorSim;
   private AnalogInputSim m_analogSim;
   private SimPeriodicBeforeCallback m_callback;
@@ -47,7 +47,7 @@ class PotentiometerPIDTest {
     m_robot = new Robot();
     m_thread = new Thread(m_robot::startCompetition);
     m_elevatorSim =
-        new ElevatorSim(
+        new ElevatorSimBase(
             m_elevatorGearbox,
             kElevatorGearing,
             kCarriageMassKg,

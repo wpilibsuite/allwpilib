@@ -17,7 +17,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Torque;
 
 /** Represents a simulated flywheel mechanism controlled by torque input. */
-public class FlywheelSimTorque extends FlywheelSim {
+public class FlywheelSimTorque extends FlywheelSimBase {
   /**
    * Creates a simulated flywheel mechanism controlled by torque input.
    *
