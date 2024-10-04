@@ -260,7 +260,8 @@ UNIT_CONFIGURATIONS = {
         "generics": {"D": {"extends": "Unit"}},
         "multiply": {
             "Time": {
-                "implementation": inspect.cleandoc("""
+                "implementation": inspect.cleandoc(
+                    """
                   @Override
                   default Measure<D> times(Time multiplier) {
                     return (Measure<D>) unit().numerator().ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
@@ -319,11 +320,14 @@ def mtou(measure_name):
         regex = re.compile(r"^(.*?)(<.*>)?$")
         return re.sub(regex, "\\1Unit\\2", measure_name)
 
+
 def indent(multiline_string, indentation):
     """
     Indents a multiline string by `indentation` number of spaces
     """
-    return "\n".join(list(map(lambda line : " " * indentation + line, multiline_string.split("\n"))))
+    return "\n".join(
+        list(map(lambda line: " " * indentation + line, multiline_string.split("\n")))
+    )
 
 
 def main():
