@@ -11,18 +11,24 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.Newtons;
 import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
+import static edu.wpi.first.units.Units.VoltsPerMeterPerSecondSquared;
 
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.LinearAccelerationUnit;
+import edu.wpi.first.units.LinearVelocityUnit;
+import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 
-/** Represents a simulated elevator mechanism controlled by voltage input. */
+/** Represents a simulated elevator mechanism controlled by voltage. */
 public class ElevatorSim extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
@@ -136,35 +142,36 @@ public class ElevatorSim extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param kv The velocity gain of the elevator in volt / meters per second.
-   * @param ka The acceleration gain of the elevator in volts / meters per second squared.
+   * @param kv The velocity gain of the elevator.
+   * @param ka The acceleration gain of the elevator.
+   * @param kg The gravity gain of the elevator.
    * @param gearbox The type of and number of motors in the elevator gearbox.
    * @param drumRadius The radius of the elevator's drum.
    * @param minHeight The min allowable height of the elevator.
    * @param maxHeight The max allowable height of the elevator.
-   * @param kg The gravity gain of the elevator.
    * @param startingHeight The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
    */
   public ElevatorSim(
-      double kv,
-      double ka,
+      Per<VoltageUnit, LinearVelocityUnit> kv,
+      Per<VoltageUnit, LinearAccelerationUnit> ka,
+      Voltage kg,
       DCMotor gearbox,
       Distance drumRadius,
       Distance minHeight,
       Distance maxHeight,
-      Voltage kg,
       Distance startingHeight,
       double... measurementStdDevs) {
     this(
-        LinearSystemId.identifyPositionSystem(kv, ka),
+        LinearSystemId.identifyPositionSystem(
+            kv.baseUnitMagnitude(), ka.baseUnitMagnitude()),
         gearbox,
         drumRadius,
         minHeight,
         maxHeight,
-        MetersPerSecondPerSecond.of(-kg.in(Volts) / ka),
+        MetersPerSecondPerSecond.of(-kg.in(Volts) / ka.in(VoltsPerMeterPerSecondSquared)),
         startingHeight,
         measurementStdDevs);
   }
@@ -174,11 +181,11 @@ public class ElevatorSim extends ElevatorSimBase {
    *
    * @param kv The velocity gain of the elevator in volt / meters per second.
    * @param ka The acceleration gain of the elevator in volts / meters per second squared.
+   * @param kg The gravity gain of the elevator in volts.
    * @param gearbox The type of and number of motors in the elevator gearbox.
    * @param drumRadiusMeters The radius of the elevator's drum in meters.
    * @param minHeightMeters The min allowable height of the elevator in meters.
    * @param maxHeightMeters The max allowable height of the elevator in meters.
-   * @param kg The gravity gain of the elevator in volts.
    * @param startingHeightMeters The starting height of the elevator in meters.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
@@ -187,22 +194,21 @@ public class ElevatorSim extends ElevatorSimBase {
   public ElevatorSim(
       double kv,
       double ka,
+      double kg,
       DCMotor gearbox,
       double drumRadiusMeters,
       double minHeightMeters,
       double maxHeightMeters,
-      double kg,
       double startingHeightMeters,
       double... measurementStdDevs) {
     this(
-        kv,
-        ka,
+        LinearSystemId.identifyPositionSystem(kv, ka),
         gearbox,
-        Meters.of(drumRadiusMeters),
-        Meters.of(minHeightMeters),
-        Meters.of(maxHeightMeters),
-        Volts.of(kg),
-        Meters.of(startingHeightMeters),
+        drumRadiusMeters,
+        minHeightMeters,
+        maxHeightMeters,
+        -kg / ka,
+        startingHeightMeters,
         measurementStdDevs);
   }
 

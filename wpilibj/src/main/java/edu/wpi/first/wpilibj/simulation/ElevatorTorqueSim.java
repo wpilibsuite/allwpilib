@@ -17,8 +17,12 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.LinearAccelerationUnit;
+import edu.wpi.first.units.LinearVelocityUnit;
+import edu.wpi.first.units.TorqueUnit;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Torque;
 
 /** Represents a simulated elevator mechanism controlled by torque input. */
@@ -123,38 +127,38 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param kv The velocity gain of the elevator in Newton-Meters / meters per second.
-   * @param ka The acceleration gain of the elevator in Newton-Meters / meters per second squared.
+   * @param kv The velocity gain of the elevator.
+   * @param ka The acceleration gain of the elevator.
+   * @param kg The gravity gain of the elevator.
    * @param gearbox The type of and number of motors in the elevator gearbox.
    * @param gearing The gearing from the motors to the output.
    * @param drumRadius The radius of the elevator's drum.
    * @param minHeight The min allowable height of the elevator.
    * @param maxHeight The max allowable height of the elevator.
-   * @param kg The gravity gain of the elevator in Newton-Meters.
    * @param startingHeight The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
    */
   public ElevatorTorqueSim(
-      double kv,
-      double ka,
+      Per<TorqueUnit, LinearVelocityUnit> kv,
+      Per<TorqueUnit, LinearAccelerationUnit> ka,
+      Torque kg,
       DCMotor gearbox,
       double gearing,
       Distance drumRadius,
       Distance minHeight,
       Distance maxHeight,
-      Torque kg,
       Distance startingHeight,
       double... measurementStdDevs) {
     this(
-        LinearSystemId.identifyPositionSystem(kv, ka),
+        LinearSystemId.identifyPositionSystem(kv.baseUnitMagnitude(), ka.baseUnitMagnitude()),
         gearbox,
         gearing,
         drumRadius,
         minHeight,
         maxHeight,
-        MetersPerSecondPerSecond.of(-kg.in(NewtonMeters) / ka),
+        MetersPerSecondPerSecond.of(-kg.in(NewtonMeters) / ka.baseUnitMagnitude()),
         startingHeight,
         measurementStdDevs);
   }
@@ -164,12 +168,12 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
    *
    * @param kv The velocity gain of the elevator in Newton-Meters / meters per second.
    * @param ka The acceleration gain of the elevator in Newton-Meters / meters per second squared.
+   * @param kg The gravity gain of the elevator in Newton-Meters.
    * @param gearbox The type of and number of motors in the elevator gearbox.
    * @param gearing The gearing from the motors to the output.
    * @param drumRadiusMeters The radius of the elevator's drum in meters.
    * @param minHeightMeters The min allowable height of the elevator in meters.
    * @param maxHeightMeters The max allowable height of the elevator in meters.
-   * @param kg The gravity gain of the elevator in Newton-Meters.
    * @param startingHeightMeters The starting height of the elevator in meters.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
@@ -178,24 +182,23 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
   public ElevatorTorqueSim(
       double kv,
       double ka,
+      double kg,
       DCMotor gearbox,
       double gearing,
       double drumRadiusMeters,
       double minHeightMeters,
       double maxHeightMeters,
-      double kg,
       double startingHeightMeters,
       double... measurementStdDevs) {
     this(
-        kv,
-        ka,
+        LinearSystemId.identifyPositionSystem(kv, ka),
         gearbox,
         gearing,
-        Meters.of(drumRadiusMeters),
-        Meters.of(minHeightMeters),
-        Meters.of(maxHeightMeters),
-        NewtonMeters.of(kg),
-        Meters.of(startingHeightMeters),
+        drumRadiusMeters,
+        minHeightMeters,
+        maxHeightMeters,
+        -kg / ka,
+        startingHeightMeters,
         measurementStdDevs);
   }
 
