@@ -15,6 +15,9 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.PerUnit;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
@@ -553,7 +556,34 @@ public final class LinearSystemId {
 
   /**
    * Create a state-space model for a 1 DOF velocity system from its kV (input units/(unit/sec)) and
-   * kA (input units/(unit/sec²). These constants cam be found using SysId. The states of the system
+   * kA (input units/(unit/sec²). These constants can be found using SysId. The states of the system
+   * are [velocity], inputs are [voltage or torque], and outputs are [velocity].
+   *
+   * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
+   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
+   *
+   * <p>The parameters provided by the user are from this feedforward model:
+   *
+   * <p>u = K_v v + K_a a
+   *
+   * @param <U> The input parameter either as voltage or torque.
+   * @param <V> The velocity gain parameter either as LinearVelocity or AngularVelocity.
+   * @param <A> The acceleration gain parameter either as LinearAcceleration or AngularAcceleration.
+   * @param kV The velocity gain, in input units/(unit/sec)
+   * @param kA The acceleration gain, in input units/(unit/sec²)
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
+   * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   */
+  public static <U extends Unit, V extends Unit, A extends Unit>
+      LinearSystem<N1, N1, N1> identifyVelocitySystem(
+          Measure<? extends PerUnit<U, V>> kV, Measure<? extends PerUnit<U, A>> kA) {
+    return identifyVelocitySystem(kV.baseUnitMagnitude(), kA.baseUnitMagnitude());
+  }
+
+  /**
+   * Create a state-space model for a 1 DOF velocity system from its kV (input units/(unit/sec)) and
+   * kA (input units/(unit/sec²). These constants can be found using SysId. The states of the system
    * are [velocity], inputs are [voltage or torque], and outputs are [velocity].
    *
    * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
@@ -586,7 +616,34 @@ public final class LinearSystemId {
 
   /**
    * Create a state-space model for a 1 DOF position system from its kV (input units/(unit/sec)) and
-   * kA (input units/(unit/sec²). These constants cam be found using SysId. The states of the system
+   * kA (input units/(unit/sec²). These constants can be found using SysId. The states of the system
+   * are [position, velocity]ᵀ, inputs are [voltage or torque], and outputs are [position].
+   *
+   * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
+   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
+   *
+   * <p>The parameters provided by the user are from this feedforward model:
+   *
+   * <p>u = K_v v + K_a a
+   *
+   * @param <U> The input parameter either as voltage or torque.
+   * @param <V> The velocity gain parameter either as LinearVelocity or AngularVelocity.
+   * @param <A> The acceleration gain parameter either as LinearAcceleration or AngularAcceleration.
+   * @param kV The velocity gain, in volts/(unit/sec)
+   * @param kA The acceleration gain, in volts/(unit/sec²)
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
+   * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   */
+  public static <U extends Unit, V extends Unit, A extends Unit>
+      LinearSystem<N2, N1, N2> identifyPositionSystem(
+          Measure<? extends PerUnit<U, V>> kV, Measure<? extends PerUnit<U, A>> kA) {
+    return identifyPositionSystem(kV.baseUnitMagnitude(), kA.baseUnitMagnitude());
+  }
+
+  /**
+   * Create a state-space model for a 1 DOF position system from its kV (input units/(unit/sec)) and
+   * kA (input units/(unit/sec²). These constants can be found using SysId. The states of the system
    * are [position, velocity]ᵀ, inputs are [voltage or torque], and outputs are [position].
    *
    * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
