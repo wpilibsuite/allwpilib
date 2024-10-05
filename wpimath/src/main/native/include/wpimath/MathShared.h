@@ -24,6 +24,7 @@ enum class MathUsageId {
   kOdometry_MecanumDrive,
   kController_PIDController2,
   kController_ProfiledPIDController,
+  kController_BangBangController,
 };
 
 class WPILIB_DLLEXPORT MathShared {
