@@ -4,9 +4,9 @@
 
 #include "frc2/command/ParallelCommandGroup.h"
 
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
 
 using namespace frc2;
 
