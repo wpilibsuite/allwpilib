@@ -251,7 +251,7 @@ public final class FRCNetComm {
     public static final int kResourceType_RevSparkFlexCAN = 114;
     /** kResourceType_RevSparkFlexPWM = 115. */
     public static final int kResourceType_RevSparkFlexPWM = 115;
-    /** kResourceType_RevSparkFlexPWM = 116. */
+    /** kResourceType_BangBangController = 116. */
     public static final int kResourceType_BangBangController = 116;
   }
 
