@@ -223,7 +223,7 @@ std::vector<Subsystem*> GetSharedRequirements(Command* first, Command* second) {
   std::vector<Subsystem*> shared;
   auto&& requirementsOfSecond = second->GetRequirements();
   for (auto&& requirement : first->GetRequirements()) {
-    if (requirementsOfSecond.find(requirement) == requirementsOfSecond.end()) {
+    if (requirementsOfSecond.find(requirement) != requirementsOfSecond.end()) {
       shared.push_back(requirement);
     }
   }
