@@ -531,10 +531,10 @@ public final class Units {
   public static final ResistanceUnit Ohm = Ohms; // alias
 
   /** A unit equal to 1,000 {@link #Ohms}. */
-  public static final ResistanceUnit Kiloohms = Kilo(Ohms);
+  public static final ResistanceUnit KiloOhms = Kilo(Ohms);
 
   /** A unit equal to 1,000 {@link #Ohms}. */
-  public static final ResistanceUnit Kiloohm = Kiloohms; // alias
+  public static final ResistanceUnit KiloOhm = KiloOhms; // alias
 
   /**
    * Creates a unit equal to a thousandth of the base unit, eg Milliseconds = Milli(Units.Seconds).
