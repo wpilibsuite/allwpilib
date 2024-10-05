@@ -36,10 +36,10 @@ import edu.wpi.first.units.measure.Voltage;
 /** Represents a simulated DC motor mechanism. */
 public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
   // Gearbox for the DC motor.
-  final DCMotor m_gearbox;
+  private final DCMotor m_gearbox;
 
   // The gearing from the motors to the output.
-  final double m_gearing;
+  private final double m_gearing;
 
   // The moment of inertia for the flywheel mechanism.
   private final MomentOfInertia m_j;
