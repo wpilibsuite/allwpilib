@@ -351,7 +351,7 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0.
    */
   public static LinearSystem<N2, N1, N2> createDCMotorTorqueSystem(
-      double JKgMetersSquared, double gearing) {
+      double JKgMetersSquared) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
     }
@@ -373,8 +373,8 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if J &lt;= 0.
    */
   public static LinearSystem<N2, N1, N2> createDCMotorTorqueSystem(
-      MomentOfInertia J, double gearing) {
-    return createDCMotorTorqueSystem(J.in(KilogramSquareMeters), gearing);
+      MomentOfInertia J) {
+    return createDCMotorTorqueSystem(J.in(KilogramSquareMeters));
   }
 
   /**
@@ -387,7 +387,7 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0.
    */
   public static LinearSystem<N2, N1, N2> createDCMotorTorqueSystem(
-      double massKg, double radiusMeters, double gearing) {
+      double massKg, double radiusMeters) {
     if (massKg <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
     }
