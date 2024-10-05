@@ -39,46 +39,46 @@ import edu.wpi.first.units.measure.Voltage;
 
 /** Represents a simulated elevator mechanism. */
 public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
-  // Gearbox for the elevator.
+  /** Gearbox for the elevator. */
   protected final DCMotor m_gearbox;
 
-  // The gearing from the motors to the output.
+  /** The gearing from the motors to the output. */
   protected final double m_gearing;
 
-  // The mass of the elevator carriage.
+  /** The mass of the elevator carriage. */
   private final Mass m_mass;
 
-  // the drum radius of the elevator.
+  /** the drum radius of the elevator. */
   protected final Distance m_drumRadius;
 
-  // The min allowable height for the elevator.
+  /** The min allowable height for the elevator. */
   private final Distance m_minHeight;
 
-  // The max allowable height for the elevator.
+  /** The max allowable height for the elevator. */
   private final Distance m_maxHeight;
 
-  // The acceleration due to gravity.
+  /** The acceleration due to gravity. */
   private final LinearAcceleration m_g;
 
-  // The position of the elevator.
+  /** The position of the elevator. */
   private final MutDistance m_position = Meters.mutable(0.0);
 
-  // The velocity of the elevator.
+  /** The velocity of the elevator. */
   private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0.0);
 
-  // The acceleration of the elevator.
+  /** The acceleration of the elevator. */
   private final MutLinearAcceleration m_acceleration = MetersPerSecondPerSecond.mutable(0.0);
 
-  // The current draw of elevator.
+  /** The current draw of elevator. */
   protected final MutCurrent m_currentDraw = Amps.mutable(0.0);
 
-  // The voltage of the elevator.
+  /** The voltage of the elevator. */
   protected final MutVoltage m_voltage = Volts.mutable(0.0);
 
-  // The torque on the elevator's drum.
+  /** The torque on the elevator's drum. */
   protected final MutTorque m_torque = NewtonMeters.mutable(0.0);
 
-  // The force on the elevator's carriage.
+  /** The force on the elevator's carriage. */
   protected final MutForce m_force = Newtons.mutable(0.0);
 
   /**

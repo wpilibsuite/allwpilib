@@ -350,8 +350,7 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0.
    */
-  public static LinearSystem<N2, N1, N2> createDCMotorTorqueSystem(
-      double JKgMetersSquared) {
+  public static LinearSystem<N2, N1, N2> createDCMotorTorqueSystem(double JKgMetersSquared) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
     }
@@ -372,8 +371,7 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if J &lt;= 0.
    */
-  public static LinearSystem<N2, N1, N2> createDCMotorTorqueSystem(
-      MomentOfInertia J) {
+  public static LinearSystem<N2, N1, N2> createDCMotorTorqueSystem(MomentOfInertia J) {
     return createDCMotorTorqueSystem(J.in(KilogramSquareMeters));
   }
 

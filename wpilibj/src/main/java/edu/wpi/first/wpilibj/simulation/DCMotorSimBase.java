@@ -35,32 +35,32 @@ import edu.wpi.first.units.measure.Voltage;
 
 /** Represents a simulated DC motor mechanism. */
 public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
-  // Gearbox for the DC motor.
+  /** Gearbox for the DC motor. */
   protected final DCMotor m_gearbox;
 
-  // The gearing from the motors to the output.
+  /** The gearing from the motors to the output. */
   protected final double m_gearing;
 
-  // The moment of inertia for the flywheel mechanism.
+  /** The moment of inertia for the flywheel mechanism. */
   private final MomentOfInertia m_j;
 
-  // The angle of the system.
+  /** The angle of the system. */
   private final MutAngle m_angle = Radians.mutable(0.0);
 
-  // The angular velocity of the system.
+  /** The angular velocity of the system. */
   protected final MutAngularVelocity m_angularVelocity = RadiansPerSecond.mutable(0.0);
 
-  // The angular acceleration of the system.
+  /** The angular acceleration of the system. */
   private final MutAngularAcceleration m_angularAcceleration =
       RadiansPerSecondPerSecond.mutable(0.0);
 
-  // The current draw of flywheel.
+  /** The current draw of flywheel. */
   protected final MutCurrent m_currentDraw = Amps.mutable(0.0);
 
-  // The voltage of the flywheel.
+  /** The voltage of the flywheel. */
   protected final MutVoltage m_voltage = Volts.mutable(0.0);
 
-  // The torque on the flywheel.
+  /** The torque on the flywheel. */
   protected final MutTorque m_torque = NewtonMeters.mutable(0.0);
 
   /**
