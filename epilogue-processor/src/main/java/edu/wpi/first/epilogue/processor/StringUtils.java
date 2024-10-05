@@ -5,6 +5,8 @@
 package edu.wpi.first.epilogue.processor;
 
 import edu.wpi.first.epilogue.Logged;
+import java.util.Arrays;
+import java.util.List;
 import javax.lang.model.element.TypeElement;
 
 public final class StringUtils {
@@ -57,6 +59,33 @@ public final class StringUtils {
 
     builder.append(str.subSequence(i, str.length()));
     return builder.toString();
+  }
+
+  /**
+   * Splits a camel-cased string like "fooBar" into individual words like ["foo", "Bar"].
+   *
+   * @param camelCasedString the camel-cased string to split
+   * @return the individual words in the input
+   */
+  public static List<String> splitToWords(CharSequence camelCasedString) {
+    // Implementation from https://stackoverflow.com/a/2560017, refactored for readability
+
+    // Uppercase letter not followed by the first letter of the next word
+    // This allows for splitting "IOLayer" into "IO" and "Layer"
+    String penultimateUppercaseLetter = "(?<=[A-Z])(?=[A-Z][a-z])";
+
+    // Any character that's NOT an uppercase letter, immediately followed by an uppercase letter
+    // This allows for splitting "fooBar" into "foo" and "Bar", or "123Bang" into "123" and "Bang"
+    String lastNonUppercaseLetter = "(?<=[^A-Z])(?=[A-Z])";
+
+    // The final letter in a sequence, followed by a non-alpha character like a number or underscore
+    // This allows for splitting "foo123" into "foo" and "123"
+    String finalLetter = "(?<=[A-Za-z])(?=[^A-Za-z])";
+
+    String regex =
+        String.format("%s|%s|%s", penultimateUppercaseLetter, lastNonUppercaseLetter, finalLetter);
+
+    return Arrays.asList(camelCasedString.toString().split(regex));
   }
 
   /**

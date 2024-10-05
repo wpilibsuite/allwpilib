@@ -7,6 +7,7 @@ package edu.wpi.first.epilogue.processor;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
 import edu.wpi.first.epilogue.logging.DataLogger;
+import java.util.stream.Collectors;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -61,14 +62,24 @@ public abstract class ElementHandler {
    * @return the name specified in the {@link Logged @Logged} annotation on the element, if present;
    *     otherwise, the field or method's name with no modifications
    */
-  public String loggedName(Element element) {
+  public static String loggedName(Element element) {
     var elementName = element.getSimpleName().toString();
     var config = element.getAnnotation(Logged.class);
 
     if (config != null && !config.name().isBlank()) {
       return config.name();
     } else {
-      return elementName;
+      // Delete common field prefixes (k_Name, m_name, s_name)
+      elementName = elementName.replaceFirst("^[msk]_", "");
+      if (elementName.matches("^k[A-Z]")) {
+        // Drop leading "k" prefix from fields
+        // (though normally these should be static, and thus not logged)
+        elementName = elementName.substring(1);
+      }
+
+      return StringUtils.splitToWords(elementName).stream()
+          .map(StringUtils::capitalize)
+          .collect(Collectors.joining(" "));
     }
   }
 

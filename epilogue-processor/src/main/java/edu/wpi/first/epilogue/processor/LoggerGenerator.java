@@ -11,19 +11,28 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.tools.Diagnostic;
 
 /** Generates logger class files for {@link Logged @Logged}-annotated classes. */
 public class LoggerGenerator {
+  public static final Predicate<ExecutableElement> kIsBuiltInJavaMethod =
+      LoggerGenerator::isBuiltInJavaMethod;
   private final ProcessingEnvironment m_processingEnv;
   private final List<ElementHandler> m_handlers;
 
@@ -34,6 +43,19 @@ public class LoggerGenerator {
 
   private static boolean isNotSkipped(Element e) {
     return e.getAnnotation(NotLogged.class) == null;
+  }
+
+  /**
+   * Checks if a method is a method declared in java.lang.Object that should not be logged.
+   *
+   * @param e the method to check
+   * @return true if the method is toString, hashCode, or clone; false otherwise
+   */
+  private static boolean isBuiltInJavaMethod(ExecutableElement e) {
+    Name name = e.getSimpleName();
+    return name.contentEquals("toString")
+        || name.contentEquals("hashCode")
+        || name.contentEquals("clone");
   }
 
   /**
@@ -53,15 +75,21 @@ public class LoggerGenerator {
     Predicate<Element> optedIn =
         e -> !requireExplicitOptIn || e.getAnnotation(Logged.class) != null;
 
-    var fieldsToLog =
-        clazz.getEnclosedElements().stream()
-            .filter(e -> e instanceof VariableElement)
-            .map(e -> (VariableElement) e)
-            .filter(notSkipped)
-            .filter(optedIn)
-            .filter(e -> !e.getModifiers().contains(Modifier.STATIC))
-            .filter(this::isLoggable)
-            .toList();
+    List<VariableElement> fieldsToLog;
+    if (Objects.equals(clazz.getSuperclass().toString(), "java.lang.Record")) {
+      // Do not log record members - just use the accessor methods
+      fieldsToLog = List.of();
+    } else {
+      fieldsToLog =
+          clazz.getEnclosedElements().stream()
+              .filter(e -> e instanceof VariableElement)
+              .map(e -> (VariableElement) e)
+              .filter(notSkipped)
+              .filter(optedIn)
+              .filter(e -> !e.getModifiers().contains(Modifier.STATIC))
+              .filter(this::isLoggable)
+              .toList();
+    }
 
     var methodsToLog =
         clazz.getEnclosedElements().stream()
@@ -73,8 +101,49 @@ public class LoggerGenerator {
             .filter(e -> e.getModifiers().contains(Modifier.PUBLIC))
             .filter(e -> e.getParameters().isEmpty())
             .filter(e -> e.getReceiverType() != null)
+            .filter(kIsBuiltInJavaMethod.negate())
             .filter(this::isLoggable)
             .toList();
+
+    // Validate no name collisions
+    Map<String, List<Element>> usedNames =
+        Stream.concat(fieldsToLog.stream(), methodsToLog.stream())
+            .reduce(
+                new HashMap<>(),
+                (map, element) -> {
+                  String name = ElementHandler.loggedName(element);
+                  map.computeIfAbsent(name, _k -> new ArrayList<>()).add(element);
+
+                  return map;
+                },
+                (left, right) -> {
+                  left.putAll(right);
+                  return left;
+                });
+
+    usedNames.forEach(
+        (name, elements) -> {
+          if (elements.size() > 1) {
+            // Collisions!
+            for (Element conflictingElement : elements) {
+              String conflicts =
+                  elements.stream()
+                      .filter(e -> !e.equals(conflictingElement))
+                      .map(e -> e.getEnclosingElement().getSimpleName() + "." + e)
+                      .collect(Collectors.joining(", "));
+
+              m_processingEnv
+                  .getMessager()
+                  .printMessage(
+                      Diagnostic.Kind.ERROR,
+                      "[EPILOGUE] Conflicting name detected: \""
+                          + name
+                          + "\" is also used by "
+                          + conflicts,
+                      conflictingElement);
+            }
+          }
+        });
 
     writeLoggerFile(clazz.getQualifiedName().toString(), config, fieldsToLog, methodsToLog);
   }

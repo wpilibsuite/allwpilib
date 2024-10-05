@@ -49,7 +49,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
+            dataLogger.log("X", object.x);
           }
         }
       }
@@ -88,8 +88,8 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("y", object.y);
+            dataLogger.log("X", object.x);
+            dataLogger.log("Y", object.y);
           }
         }
       }
@@ -140,7 +140,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", (double) $x.get(object));
+            dataLogger.log("X", (double) $x.get(object));
           }
         }
       }
@@ -191,7 +191,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            logSendable(dataLogger.getSubLogger("chooser"), (edu.wpi.first.wpilibj.smartdashboard.SendableChooser<java.lang.String>) $chooser.get(object));
+            logSendable(dataLogger.getSubLogger("Chooser"), (edu.wpi.first.wpilibj.smartdashboard.SendableChooser<java.lang.String>) $chooser.get(object));
           }
         }
       }
@@ -231,13 +231,13 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("low", object.low);
+            dataLogger.log("Low", object.low);
           }
           if (Epilogue.shouldLog(Logged.Importance.INFO)) {
-            dataLogger.log("medium", object.medium);
+            dataLogger.log("Medium", object.medium);
           }
           if (Epilogue.shouldLog(Logged.Importance.CRITICAL)) {
-            dataLogger.log("high", object.high);
+            dataLogger.log("High", object.high);
           }
         }
       }
@@ -279,7 +279,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("enumValue", object.enumValue);
+            dataLogger.log("Enum Value", object.enumValue);
           }
         }
       }
@@ -323,10 +323,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("arr1", object.arr1);
-            dataLogger.log("getX", object.getX());
-            dataLogger.log("getArr1", object.getArr1());
+            dataLogger.log("X", object.x);
+            dataLogger.log("Arr 1", object.arr1);
+            dataLogger.log("Get X", object.getX());
+            dataLogger.log("Get Arr 1", object.getArr1());
           }
         }
       }
@@ -370,8 +370,8 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("getX", object.getX());
+            dataLogger.log("X", object.x);
+            dataLogger.log("Get X", object.getX());
           }
         }
       }
@@ -415,8 +415,8 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("getX", object.getX());
+            dataLogger.log("X", object.x);
+            dataLogger.log("Get X", object.getX());
           }
         }
       }
@@ -433,7 +433,7 @@ class AnnotationProcessorTest {
 
       @Logged
       class Example {
-        int x;           // Should be logged
+        int x;        // Should be logged
         int[] arr1;   // Should be logged
         int[][] arr2; // Should not be logged
 
@@ -460,10 +460,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("arr1", object.arr1);
-            dataLogger.log("getX", object.getX());
-            dataLogger.log("getArr1", object.getArr1());
+            dataLogger.log("X", object.x);
+            dataLogger.log("Arr 1", object.arr1);
+            dataLogger.log("Get X", object.getX());
+            dataLogger.log("Get Arr 1", object.getArr1());
           }
         }
       }
@@ -507,10 +507,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("arr1", object.arr1);
-            dataLogger.log("getX", object.getX());
-            dataLogger.log("getArr1", object.getArr1());
+            dataLogger.log("X", object.x);
+            dataLogger.log("Arr 1", object.arr1);
+            dataLogger.log("Get X", object.getX());
+            dataLogger.log("Get Arr 1", object.getArr1());
           }
         }
       }
@@ -554,10 +554,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("arr1", object.arr1);
-            dataLogger.log("getX", object.getX());
-            dataLogger.log("getArr1", object.getArr1());
+            dataLogger.log("X", object.x);
+            dataLogger.log("Arr 1", object.arr1);
+            dataLogger.log("Get X", object.getX());
+            dataLogger.log("Get Arr 1", object.getArr1());
           }
         }
       }
@@ -604,10 +604,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("arr1", object.arr1);
-            dataLogger.log("getX", object.getX());
-            dataLogger.log("getArr1", object.getArr1());
+            dataLogger.log("X", object.x);
+            dataLogger.log("Arr 1", object.arr1);
+            dataLogger.log("Get X", object.getX());
+            dataLogger.log("Get Arr 1", object.getArr1());
           }
         }
       }
@@ -653,10 +653,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("arr1", object.arr1);
-            dataLogger.log("getX", object.getX());
-            dataLogger.log("getArr1", object.getArr1());
+            dataLogger.log("X", object.x);
+            dataLogger.log("Arr 1", object.arr1);
+            dataLogger.log("Get X", object.getX());
+            dataLogger.log("Get Arr 1", object.getArr1());
           }
         }
       }
@@ -703,11 +703,11 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("arr1", object.arr1);
-            dataLogger.log("list", object.list);
-            dataLogger.log("getX", object.getX());
-            dataLogger.log("getArr1", object.getArr1());
+            dataLogger.log("X", object.x);
+            dataLogger.log("Arr 1", object.arr1);
+            dataLogger.log("List", object.list);
+            dataLogger.log("Get X", object.getX());
+            dataLogger.log("Get Arr 1", object.getArr1());
           }
         }
       }
@@ -762,11 +762,11 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x, edu.wpi.first.epilogue.Example.Structable.struct);
-            dataLogger.log("arr1", object.arr1, edu.wpi.first.epilogue.Example.Structable.struct);
-            dataLogger.log("list", object.list, edu.wpi.first.epilogue.Example.Structable.struct);
-            dataLogger.log("getX", object.getX(), edu.wpi.first.epilogue.Example.Structable.struct);
-            dataLogger.log("getArr1", object.getArr1(), edu.wpi.first.epilogue.Example.Structable.struct);
+            dataLogger.log("X", object.x, edu.wpi.first.epilogue.Example.Structable.struct);
+            dataLogger.log("Arr 1", object.arr1, edu.wpi.first.epilogue.Example.Structable.struct);
+            dataLogger.log("List", object.list, edu.wpi.first.epilogue.Example.Structable.struct);
+            dataLogger.log("Get X", object.getX(), edu.wpi.first.epilogue.Example.Structable.struct);
+            dataLogger.log("Get Arr 1", object.getArr1(), edu.wpi.first.epilogue.Example.Structable.struct);
           }
         }
       }
@@ -813,10 +813,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("list", object.list);
-            dataLogger.log("set", object.set);
-            dataLogger.log("queue", object.queue);
-            dataLogger.log("stack", object.stack);
+            dataLogger.log("List", object.list);
+            dataLogger.log("Set", object.set);
+            dataLogger.log("Queue", object.queue);
+            dataLogger.log("Stack", object.stack);
           }
         }
       }
@@ -993,8 +993,8 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("value", object.value);
-            dataLogger.log("upcast", object.upcast());
+            dataLogger.log("Value", object.value);
+            dataLogger.log("Upcast", object.upcast());
           }
         }
       }
@@ -1045,8 +1045,8 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            Epilogue.childLogger.tryUpdate(dataLogger.getSubLogger("child"), object.child, Epilogue.getConfig().errorHandler);
-            Epilogue.ioLogger.tryUpdate(dataLogger.getSubLogger("io"), object.io, Epilogue.getConfig().errorHandler);
+            Epilogue.childLogger.tryUpdate(dataLogger.getSubLogger("Child"), object.child, Epilogue.getConfig().errorHandler);
+            Epilogue.ioLogger.tryUpdate(dataLogger.getSubLogger("Io"), object.io, Epilogue.getConfig().errorHandler);
           }
         }
       }
@@ -1100,7 +1100,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            Epilogue.customPointLogger.tryUpdate(dataLogger.getSubLogger("point"), object.point, Epilogue.getConfig().errorHandler);
+            Epilogue.customPointLogger.tryUpdate(dataLogger.getSubLogger("Point"), object.point, Epilogue.getConfig().errorHandler);
           }
         }
       }
@@ -1133,6 +1133,87 @@ class AnnotationProcessorTest {
     assertEquals(
         "[EPILOGUE] Excluded from logs because java.lang.Throwable is not a loggable data type",
         message);
+  }
+
+  @Test
+  void loggingRecords() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        @Logged
+        record Example(double x, double y) { }
+        """;
+
+    String expectedRootLogger =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              dataLogger.log("X", object.x());
+              dataLogger.log("Y", object.y());
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void errorsOnNameConflicts() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        @Logged
+        class Example {
+          @Logged(name = "Custom Name") double x;
+          @Logged(name = "Custom Name") double y;
+          @Logged(name = "Custom Name") double z;
+        }
+        """;
+
+    Compilation compilation =
+        javac()
+            .withProcessors(new AnnotationProcessor())
+            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+
+    assertThat(compilation).failed();
+    assertThat(compilation).hadErrorCount(3);
+
+    List<Diagnostic<? extends JavaFileObject>> errors = compilation.errors();
+    assertAll(
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.y, Example.z",
+                5,
+                40,
+                errors.get(0)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.x, Example.z",
+                6,
+                40,
+                errors.get(1)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.x, Example.y",
+                7,
+                40,
+                errors.get(2)));
   }
 
   private void assertCompilationError(
