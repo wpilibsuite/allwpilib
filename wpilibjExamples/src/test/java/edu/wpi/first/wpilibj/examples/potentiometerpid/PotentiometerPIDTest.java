@@ -10,11 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HAL.SimPeriodicBeforeCallback;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-import edu.wpi.first.wpilibj.simulation.ElevatorSimBase;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.JoystickSim;
 import edu.wpi.first.wpilibj.simulation.PWMSim;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
@@ -33,7 +34,7 @@ class PotentiometerPIDTest {
   private Robot m_robot;
   private Thread m_thread;
 
-  private ElevatorSimBase m_elevatorSim;
+  private ElevatorSim m_elevatorSim;
   private PWMSim m_motorSim;
   private AnalogInputSim m_analogSim;
   private SimPeriodicBeforeCallback m_callback;
@@ -47,14 +48,14 @@ class PotentiometerPIDTest {
     m_robot = new Robot();
     m_thread = new Thread(m_robot::startCompetition);
     m_elevatorSim =
-        new ElevatorSimBase(
+        new ElevatorSim(
+            LinearSystemId.createElevatorSystem(
+                m_elevatorGearbox, kCarriageMassKg, kElevatorDrumRadius, kElevatorGearing),
             m_elevatorGearbox,
-            kElevatorGearing,
-            kCarriageMassKg,
             kElevatorDrumRadius,
             0.0,
             Robot.kFullHeightMeters,
-            true,
+            -9.8,
             0);
     m_analogSim = new AnalogInputSim(Robot.kPotChannel);
     m_motorSim = new PWMSim(Robot.kMotorChannel);

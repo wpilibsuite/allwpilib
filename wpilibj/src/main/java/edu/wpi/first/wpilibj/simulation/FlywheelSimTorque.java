@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj.simulation;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.NewtonMeters;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.numbers.N1;
@@ -21,24 +20,20 @@ public class FlywheelSimTorque extends FlywheelSimBase {
   /**
    * Creates a simulated flywheel mechanism controlled by torque input.
    *
-   * @param plant              The linear system that represents the flywheel
-   *                           controlled by torque input. Use either {@link
-   *                           LinearSystemId#createFlywheelTorqueSystem(DCMotor, double, double)}
-   *                           if using physical constants
-   *                           or
-   *                           {@link LinearSystemId#identifyVelocitySystem(double, double)}
-   *                           if using system
-   *                           characterization.
-   * @param gearbox            The type of and number of motors in the flywheel
-   *                           gearbox.
-   * @param gearing            The gearing from the motors to the output.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be
-   *                           omitted if no
-   *                           noise is desired. If present must have 1 element
-   *                           for velocity.
+   * @param plant The linear system that represents the flywheel controlled by torque input. Use
+   *     either {@link LinearSystemId#createFlywheelTorqueSystem(DCMotor, double, double)} if using
+   *     physical constants or {@link LinearSystemId#identifyVelocitySystem(double, double)} if
+   *     using system characterization.
+   * @param gearbox The type of and number of motors in the flywheel gearbox.
+   * @param gearing The gearing from the motors to the output.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for velocity.
    */
   public FlywheelSimTorque(
-      LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double gearing, double... measurementStdDevs) {
+      LinearSystem<N1, N1, N1> plant,
+      DCMotor gearbox,
+      double gearing,
+      double... measurementStdDevs) {
     // By equations 12.17 of
     // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
     // the torque applied to the flywheel is τ = Jα.
@@ -74,7 +69,7 @@ public class FlywheelSimTorque extends FlywheelSimBase {
   /**
    * Sets the input torque for the flywheel.
    *
-   * @param torqueNM The input torque.
+   * @param torque The input torque.
    */
   public void setInputTorque(Torque torque) {
     setInputTorque(torque.in(NewtonMeters));
@@ -83,10 +78,9 @@ public class FlywheelSimTorque extends FlywheelSimBase {
   @Override
   public void update(double dtSeconds) {
     super.update(dtSeconds);
-    m_currentDraw.mut_replace(m_gearbox.getCurrent(getInput(0)) * m_gearing * Math.signum(m_u.get(0, 0)), Amps);
-    m_voltage.mut_replace(m_gearbox.getVoltage(getInput(0), m_x.get(0, 0)),
-        Volts);
+    m_currentDraw.mut_replace(
+        m_gearbox.getCurrent(getInput(0)) * m_gearing * Math.signum(m_u.get(0, 0)), Amps);
+    m_voltage.mut_replace(m_gearbox.getVoltage(getInput(0), m_x.get(0, 0)), Volts);
     m_torque.mut_replace(getInput(0), NewtonMeters);
   }
-
 }

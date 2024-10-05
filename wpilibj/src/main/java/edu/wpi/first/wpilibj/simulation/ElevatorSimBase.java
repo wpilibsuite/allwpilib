@@ -84,31 +84,22 @@ public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param plant              The linear system that represents the
-   *                           elevator.
-   *                           This system can be created with
-   *                           {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *                           double, double)}or {@link
-   *                           edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}.
-   *                           If
-   *                           {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}
-   *                           is used, the distance unit must be meters.
-   * @param gearbox            The type of and number of motors in the
-   *                           elevator
-   *                           gearbox.
-   * @param gearing            The gearing from the motors to the output.
-   * @param mass               The mass of the elevator's carriage.
-   * @param drumRadius         The radius of the elevator's drum.
-   * @param minHeight          The min allowable height of the elevator.
-   * @param maxHeight          The max allowable height of the elevator.
-   * @param g                  The acceleration due to gravity.
-   * @param startingHeight     The starting height of the elevator.
-   * @param measurementStdDevs The standard deviations of the measurements.
-   *                           Can
-   *                           be omitted if no
-   *                           noise is desired. If present must have 1
-   *                           element
-   *                           for position.
+   * @param plant The linear system that represents the elevator. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
+   *     double, double)}or {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
+   *     double)} is used, the distance unit must be meters.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param gearing The gearing from the motors to the output.
+   * @param mass The mass of the elevator's carriage.
+   * @param drumRadius The radius of the elevator's drum.
+   * @param minHeight The min allowable height of the elevator.
+   * @param maxHeight The max allowable height of the elevator.
+   * @param g The acceleration due to gravity.
+   * @param startingHeight The starting height of the elevator.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for position.
    */
   @SuppressWarnings("this-escape")
   public ElevatorSimBase(
@@ -134,22 +125,21 @@ public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Sets the elevator's state. The new position will be limited between the
-   * minimum and maximum
+   * Sets the elevator's state. The new position will be limited between the minimum and maximum
    * allowed heights.
    *
-   * @param positionMeters          The new position in meters.
+   * @param positionMeters The new position in meters.
    * @param velocityMetersPerSecond New velocity in meters per second.
    */
   public void setState(double positionMeters, double velocityMetersPerSecond) {
     setState(
         VecBuilder.fill(
-            MathUtil.clamp(positionMeters, m_minHeight.in(Meters), m_maxHeight.in(Meters)), velocityMetersPerSecond));
+            MathUtil.clamp(positionMeters, m_minHeight.in(Meters), m_maxHeight.in(Meters)),
+            velocityMetersPerSecond));
   }
 
   /**
-   * Sets the elevator's state. The new position will be limited between the
-   * minimum and maximum
+   * Sets the elevator's state. The new position will be limited between the minimum and maximum
    * allowed heights.
    *
    * @param position The new position.
@@ -160,8 +150,8 @@ public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Sets the elevator's position. The new position will be limited bewtween the
-   * minimum and maximum allowed heights.
+   * Sets the elevator's position. The new position will be limited bewtween the minimum and maximum
+   * allowed heights.
    *
    * @param positionMeters The new position in meters.
    */
@@ -170,8 +160,8 @@ public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Sets the elevator's position. The new position will be limited bewtween the
-   * minimum and maximum allowed heights.
+   * Sets the elevator's position. The new position will be limited bewtween the minimum and maximum
+   * allowed heights.
    *
    * @param position The new position.
    */
@@ -418,7 +408,7 @@ public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Returns the force on the elevator's carriage in Newtons
+   * Returns the force on the elevator's carriage in Newtons.
    *
    * @return The force on the elevator's carriage in Newtons.
    */
@@ -457,21 +447,22 @@ public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
    * Updates the state of the elevator.
    *
    * @param currentXhat The current state estimate.
-   * @param u           The system inputs (voltage).
-   * @param dtSeconds   The time difference between controller updates.
+   * @param u The system inputs (voltage).
+   * @param dtSeconds The time difference between controller updates.
    */
   @Override
   protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
     // Calculate updated x-hat from Runge-Kutta.
-    var updatedXhat = NumericalIntegration.rkdp(
-        (x, _u) -> {
-          Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
-          xdot = xdot.plus(VecBuilder.fill(0, m_g.in(MetersPerSecondPerSecond)));
-          return xdot;
-        },
-        currentXhat,
-        u,
-        dtSeconds);
+    var updatedXhat =
+        NumericalIntegration.rkdp(
+            (x, _u) -> {
+              Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
+              xdot = xdot.plus(VecBuilder.fill(0, m_g.in(MetersPerSecondPerSecond)));
+              return xdot;
+            },
+            currentXhat,
+            u,
+            dtSeconds);
 
     // We check for collisions after updating x-hat.
     if (wouldHitLowerLimit(updatedXhat.get(0, 0))) {
@@ -488,14 +479,16 @@ public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
     super.update(dtSeconds);
     m_position.mut_replace(getOutput(0), Meters);
     m_velocity.mut_replace(getOutput(1), MetersPerSecond);
-    m_acceleration.mut_replace((m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u)).get(0, 0),
+    m_acceleration.mut_replace(
+        (m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u)).get(0, 0),
         MetersPerSecondPerSecond);
     // I = V / R - omega / (Kv * R)
     // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
     // spinning 10x faster than the output
     // v = r w, so w = v/r
     m_currentDraw.mut_replace(
-        m_gearbox.getCurrent(m_x.get(1, 0) * m_gearing / 2 / Math.PI / m_drumRadius.in(Meters), m_u.get(0, 0))
+        m_gearbox.getCurrent(
+                m_x.get(1, 0) * m_gearing / 2 / Math.PI / m_drumRadius.in(Meters), m_u.get(0, 0))
             * Math.signum(m_u.get(0, 0)),
         Amps);
   }

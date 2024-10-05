@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.simulation.FlywheelSimBase;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -65,7 +65,7 @@ public class Robot extends TimedRobot {
   private final LinearSystem<N1, N1, N1> m_plant =
       LinearSystemId.createFlywheelSystem(m_gearbox, kFlywheelGearing, kFlywheelMomentOfInertia);
 
-  private final FlywheelSimBase m_flywheelSim = new FlywheelSimBase(m_plant, m_gearbox);
+  private final FlywheelSim m_flywheelSim = new FlywheelSim(m_plant, m_gearbox);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
   public Robot() {

@@ -51,7 +51,8 @@ public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
   protected final MutAngularVelocity m_angularVelocity = RadiansPerSecond.mutable(0.0);
 
   // The angular acceleration of the system.
-  private final MutAngularAcceleration m_angularAcceleration = RadiansPerSecondPerSecond.mutable(0.0);
+  private final MutAngularAcceleration m_angularAcceleration =
+      RadiansPerSecondPerSecond.mutable(0.0);
 
   // The current draw of flywheel.
   protected final MutCurrent m_currentDraw = Amps.mutable(0.0);
@@ -65,25 +66,24 @@ public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
   /**
    * Creates a simulated DC motor mechanism.
    *
-   * @param plant              The linear system representing the DC motor. This
-   *                           system can be created with
-   *                           {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(DCMotor, double,
-   *                           double)} or {@link
-   *                           edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}.
-   *                           If
-   *                           {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}
-   *                           is used, the distance unit must be radians.
-   * @param gearbox            The type of and number of motors in the DC motor
-   *                           gearbox.
-   * @param gearing            The gearing from the motors to the output.
-   * @param J                  The moment of inertia for the flywheel mechanism.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be
-   *                           omitted if no
-   *                           noise is desired. If present must have 2 elements.
-   *                           The first element is for position. The
-   *                           second element is for velocity.
+   * @param plant The linear system representing the DC motor. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(DCMotor, double,
+   *     double)} or {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}. If
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}
+   *     is used, the distance unit must be radians.
+   * @param gearbox The type of and number of motors in the DC motor gearbox.
+   * @param gearing The gearing from the motors to the output.
+   * @param J The moment of inertia for the flywheel mechanism.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 2 elements. The first element is for position. The
+   *     second element is for velocity.
    */
-  public DCMotorSimBase(LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double gearing, MomentOfInertia J,
+  public DCMotorSimBase(
+      LinearSystem<N2, N1, N2> plant,
+      DCMotor gearbox,
+      double gearing,
+      MomentOfInertia J,
       double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
@@ -94,9 +94,8 @@ public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
   /**
    * Sets the state of the DC motor.
    *
-   * @param angularPositionRad       The new angular position in radians.
-   * @param angularVelocityRadPerSec The new angualr velocity in radians per
-   *                                 second.
+   * @param angularPositionRad The new angular position in radians.
+   * @param angularVelocityRadPerSec The new angualr velocity in radians per second.
    */
   public void setState(double angularPositionRad, double angularVelocityRadPerSec) {
     setState(VecBuilder.fill(angularPositionRad, angularVelocityRadPerSec));
@@ -315,8 +314,8 @@ public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
     super.update(dtSeconds);
     m_angle.mut_replace(getOutput(0), Radians);
     m_angularVelocity.mut_replace(getOutput(1), RadiansPerSecond);
-    m_angularAcceleration.mut_replace((m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u)).get(1, 0),
+    m_angularAcceleration.mut_replace(
+        (m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u)).get(1, 0),
         RadiansPerSecondPerSecond);
   }
-
 }

@@ -7,13 +7,14 @@ package edu.wpi.first.wpilibj.examples.elevatorsimulation.subsystems;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.examples.elevatorsimulation.Constants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.ElevatorSimBase;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.PWMSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -44,16 +45,19 @@ public class Elevator implements AutoCloseable {
   private final PWMSparkMax m_motor = new PWMSparkMax(Constants.kMotorPort);
 
   // Simulation classes help us simulate what's going on, including gravity.
-  private final ElevatorSimBase m_elevatorSim =
-      new ElevatorSimBase(
+  private final ElevatorSim m_elevatorSim =
+      new ElevatorSim(
+          LinearSystemId.createElevatorSystem(
+              m_elevatorGearbox,
+              Constants.kCarriageMass,
+              Constants.kElevatorDrumRadius,
+              Constants.kElevatorGearing),
           m_elevatorGearbox,
-          Constants.kElevatorGearing,
-          Constants.kCarriageMass,
           Constants.kElevatorDrumRadius,
           Constants.kMinElevatorHeightMeters,
           Constants.kMaxElevatorHeightMeters,
-          true,
-          0,
+          -9.8,
+          0.0,
           0.01,
           0.0);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
@@ -71,7 +75,8 @@ public class Elevator implements AutoCloseable {
     m_encoder.setDistancePerPulse(Constants.kElevatorEncoderDistPerPulse);
 
     // Publish Mechanism2d to SmartDashboard
-    // To view the Elevator visualization, select Network Tables -> SmartDashboard -> Elevator Sim
+    // To view the Elevator visualization, select Network Tables -> SmartDashboard
+    // -> Elevator Sim
     SmartDashboard.putData("Elevator Sim", m_mech2d);
   }
 
@@ -84,7 +89,8 @@ public class Elevator implements AutoCloseable {
     // Next, we update it. The standard loop time is 20ms.
     m_elevatorSim.update(0.020);
 
-    // Finally, we set our simulated encoder's readings and simulated battery voltage
+    // Finally, we set our simulated encoder's readings and simulated battery
+    // voltage
     m_encoderSim.setDistance(m_elevatorSim.getPositionMeters());
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(

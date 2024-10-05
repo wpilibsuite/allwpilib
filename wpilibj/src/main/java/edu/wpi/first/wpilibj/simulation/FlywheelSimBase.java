@@ -44,7 +44,8 @@ public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
   protected final MutAngularVelocity m_angularVelocity = RadiansPerSecond.mutable(0.0);
 
   // The angular acceleration of the flywheel mechanism.
-  private final MutAngularAcceleration m_angularAcceleration = RadiansPerSecondPerSecond.mutable(0.0);
+  private final MutAngularAcceleration m_angularAcceleration =
+      RadiansPerSecondPerSecond.mutable(0.0);
 
   // The current draw of flywheel.
   protected final MutCurrent m_currentDraw = Amps.mutable(0.0);
@@ -58,25 +59,21 @@ public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
   /**
    * Creates a simulated flywheel mechanism.
    *
-   * @param plant              The linear system that represents the flywheel. Use
-   *                           either {@link
-   *                           LinearSystemId#createFlywheelSystem(DCMotor, double, double)}
-   *                           if using physical constants
-   *                           or
-   *                           {@link LinearSystemId#identifyVelocitySystem(double, double)}
-   *                           if using system
-   *                           characterization.
-   * @param gearbox            The type of and number of motors in the flywheel
-   *                           gearbox.
-   * @param gearing            The gearing from the motors to the output.
-   * @param J                  The moment of inertia for the flywheel mechanism.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be
-   *                           omitted if no
-   *                           noise is desired. If present must have 1 element
-   *                           for velocity.
+   * @param plant The linear system that represents the flywheel. Use either {@link
+   *     LinearSystemId#createFlywheelSystem(DCMotor, double, double)} if using physical constants
+   *     or {@link LinearSystemId#identifyVelocitySystem(double, double)} if using system
+   *     characterization.
+   * @param gearbox The type of and number of motors in the flywheel gearbox.
+   * @param gearing The gearing from the motors to the output.
+   * @param J The moment of inertia for the flywheel mechanism.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for velocity.
    */
   public FlywheelSimBase(
-      LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double gearing, MomentOfInertia J,
+      LinearSystem<N1, N1, N1> plant,
+      DCMotor gearbox,
+      double gearing,
+      MomentOfInertia J,
       double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
@@ -241,8 +238,8 @@ public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
   public void update(double dtSeconds) {
     super.update(dtSeconds);
     m_angularVelocity.mut_replace(getOutput(0), RadiansPerSecond);
-    m_angularAcceleration.mut_replace((m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u)).get(0, 0),
+    m_angularAcceleration.mut_replace(
+        (m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u)).get(0, 0),
         RadiansPerSecondPerSecond);
   }
-
 }

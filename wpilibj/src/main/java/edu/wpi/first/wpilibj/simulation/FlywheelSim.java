@@ -21,21 +21,13 @@ public class FlywheelSim extends FlywheelSimBase {
   /**
    * Creates a simulated flywheel mechanism controlled by voltage input.
    *
-   * @param plant              The linear system that represents the flywheel
-   *                           controlled by voltage input. Use
-   *                           either {@link
-   *                           LinearSystemId#createFlywheelSystem(DCMotor, double, double)}
-   *                           if using physical constants
-   *                           or
-   *                           {@link LinearSystemId#identifyVelocitySystem(double, double)}
-   *                           if using system
-   *                           characterization.
-   * @param gearbox            The type of and number of motors in the flywheel
-   *                           gearbox.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be
-   *                           omitted if no
-   *                           noise is desired. If present must have 1 element
-   *                           for velocity.
+   * @param plant The linear system that represents the flywheel controlled by voltage input. Use
+   *     either {@link LinearSystemId#createFlywheelSystem(DCMotor, double, double)} if using
+   *     physical constants or {@link LinearSystemId#identifyVelocitySystem(double, double)} if
+   *     using system characterization.
+   * @param gearbox The type of and number of motors in the flywheel gearbox.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for velocity.
    */
   public FlywheelSim(
       LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double... measurementStdDevs) {
@@ -61,8 +53,12 @@ public class FlywheelSim extends FlywheelSimBase {
         plant,
         gearbox,
         -gearbox.KvRadPerSecPerVolt * plant.getA(0, 0) / plant.getB(0, 0),
-        KilogramSquareMeters.of(-gearbox.KvRadPerSecPerVolt * gearbox.KtNMPerAmp * plant.getA(0, 0) / gearbox.rOhms
-            * Math.pow(plant.getB(0, 0), 2)),
+        KilogramSquareMeters.of(
+            -gearbox.KvRadPerSecPerVolt
+                * gearbox.KtNMPerAmp
+                * plant.getA(0, 0)
+                / gearbox.rOhms
+                * Math.pow(plant.getB(0, 0), 2)),
         measurementStdDevs);
   }
 
@@ -80,7 +76,7 @@ public class FlywheelSim extends FlywheelSimBase {
   /**
    * Sets the input voltage for the flywheel.
    *
-   * @param volts The input voltage.
+   * @param voltage The input voltage.
    */
   public void setInputVoltage(Voltage voltage) {
     setInputVoltage(voltage.in(Volts));
@@ -93,10 +89,10 @@ public class FlywheelSim extends FlywheelSimBase {
     // Reductions are output over input, so a reduction of 2:1 means the motor is
     // spinning
     // 2x faster than the flywheel
-    m_currentDraw.mut_replace(m_gearbox.getCurrent(m_x.get(0, 0) * m_gearing, getInput(0))
-        * Math.signum(m_u.get(0, 0)), Amps);
+    m_currentDraw.mut_replace(
+        m_gearbox.getCurrent(m_x.get(0, 0) * m_gearing, getInput(0)) * Math.signum(m_u.get(0, 0)),
+        Amps);
     m_voltage.mut_replace(getInput(0), Volts);
     m_torque.mut_replace(getJKgMetersSquared() * getAngularAccelerationRadPerSecSq(), NewtonMeters);
   }
-
 }

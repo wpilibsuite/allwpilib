@@ -26,36 +26,21 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param plant                   The linear system that represents the
-   *                                elevator.
-   *                                This system can be created with
-   *                                {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *                                double, double)}or {@link
-   *                                edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}.
-   *                                If
-   *                                {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}
-   *                                is used, the distance unit must be meters.
-   * @param gearbox                 The type of and number of motors in the
-   *                                elevator
-   *                                gearbox.
-   * @param gearbox                 The type of and number of motors in the
-   *                                elevator
-   *                                gearbox.
-   * @param drumRadiusMeters        The radius of the elevator's drum in meters.
-   * @param minHeightMeters         The min allowable height of the elevator in
-   *                                meters.
-   * @param maxHeightMeters         The max allowable height of the elevator in
-   *                                meters.
-   * @param gMetersPerSecondSquared The acceleration due to gravity in meters per
-   *                                second squared.
-   * @param startingHeightMeters    The starting height of the elevator in meters.
-   * @param measurementStdDevs      The standard deviations of the measurements.
-   *                                Can be
-   *                                omitted if no
-   *                                noise is desired. If present must have 2
-   *                                elements.
-   *                                The first element is for position. The
-   *                                second element is for velocity.
+   * @param plant The linear system that represents the elevator. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
+   *     double, double)}or {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
+   *     double)} is used, the distance unit must be meters.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param drumRadiusMeters The radius of the elevator's drum in meters.
+   * @param minHeightMeters The min allowable height of the elevator in meters.
+   * @param maxHeightMeters The max allowable height of the elevator in meters.
+   * @param gMetersPerSecondSquared The acceleration due to gravity in meters per second squared.
+   * @param startingHeightMeters The starting height of the elevator in meters.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 2 elements. The first element is for position. The
+   *     second element is for velocity.
    */
   public ElevatorTorqueSim(
       LinearSystem<N2, N1, N2> plant,
@@ -82,29 +67,22 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param plant              The linear system that represents the
-   *                           elevator.
-   *                           This system can be created with
-   *                           {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *                           double, double)}or {@link
-   *                           edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}.
-   *                           If
-   *                           {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}
-   *                           is used, the distance unit must be meters.
-   * @param gearbox            The type of and number of motors in the
-   *                           elevator
-   *                           gearbox.
-   * @param gearing            The gearing from the motors to the output.
-   * @param drumRadius         The radius of the elevator's drum.
-   * @param minHeight          The min allowable height of the elevator.
-   * @param maxHeight          The max allowable height of the elevator.
-   * @param g                  The acceleration due to gravity.
-   * @param startingHeight     The starting height of the elevator.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be
-   *                           omitted if no
-   *                           noise is desired. If present must have 2 elements.
-   *                           The first element is for position. The
-   *                           second element is for velocity.
+   * @param plant The linear system that represents the elevator. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
+   *     double, double)}or {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
+   *     double)} is used, the distance unit must be meters.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param gearing The gearing from the motors to the output.
+   * @param drumRadius The radius of the elevator's drum.
+   * @param minHeight The min allowable height of the elevator.
+   * @param maxHeight The max allowable height of the elevator.
+   * @param g The acceleration due to gravity.
+   * @param startingHeight The starting height of the elevator.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 2 elements. The first element is for position. The
+   *     second element is for velocity.
    */
   public ElevatorTorqueSim(
       LinearSystem<N2, N1, N2> plant,
@@ -144,24 +122,18 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param kv                 The velocity gain of the elevator in Newton-Meters / meters
-   *                           per second.
-   * @param ka                 The acceleration gain of the elevator in Newton-Meters /
-   *                           meters per second squared.
-   * @param gearbox            The type of and number of motors in the
-   *                           elevator
-   *                           gearbox.
-   * @param gearing            The gearing from the motors to the output.
-   * @param drumRadius         The radius of the elevator's drum.
-   * @param minHeight          The min allowable height of the elevator.
-   * @param maxHeight          The max allowable height of the elevator.
-   * @param kg                 The gravity gain of the elevator in Newton-Meters.
-   * @param startingHeight     The starting height of the elevator.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be
-   *                           omitted if no
-   *                           noise is desired. If present must have 2 elements.
-   *                           The first element is for position. The
-   *                           second element is for velocity.
+   * @param kv The velocity gain of the elevator in Newton-Meters / meters per second.
+   * @param ka The acceleration gain of the elevator in Newton-Meters / meters per second squared.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param gearing The gearing from the motors to the output.
+   * @param drumRadius The radius of the elevator's drum.
+   * @param minHeight The min allowable height of the elevator.
+   * @param maxHeight The max allowable height of the elevator.
+   * @param kg The gravity gain of the elevator in Newton-Meters.
+   * @param startingHeight The starting height of the elevator.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 2 elements. The first element is for position. The
+   *     second element is for velocity.
    */
   public ElevatorTorqueSim(
       double kv,
@@ -189,29 +161,18 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param kv                   The velocity gain of the elevator in Newton-Meters /
-   *                             meters
-   *                             per second.
-   * @param ka                   The acceleration gain of the elevator in Newton-Meters /
-   *                             meters per second squared.
-   * @param gearbox              The type of and number of motors in the
-   *                             elevator
-   *                             gearbox.
-   * @param gearing            The gearing from the motors to the output.
-   * @param drumRadiusMeters     The radius of the elevator's drum in meters.
-   * @param minHeightMeters      The min allowable height of the elevator in
-   *                             meters.
-   * @param maxHeightMeters      The max allowable height of the elevator in
-   *                             meters.
-   * @param kg                   The gravity gain of the elevator in Newton-Meters.
+   * @param kv The velocity gain of the elevator in Newton-Meters / meters per second.
+   * @param ka The acceleration gain of the elevator in Newton-Meters / meters per second squared.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param gearing The gearing from the motors to the output.
+   * @param drumRadiusMeters The radius of the elevator's drum in meters.
+   * @param minHeightMeters The min allowable height of the elevator in meters.
+   * @param maxHeightMeters The max allowable height of the elevator in meters.
+   * @param kg The gravity gain of the elevator in Newton-Meters.
    * @param startingHeightMeters The starting height of the elevator in meters.
-   * @param measurementStdDevs   The standard deviations of the measurements. Can
-   *                             be
-   *                             omitted if no
-   *                             noise is desired. If present must have 2
-   *                             elements.
-   *                             The first element is for position. The
-   *                             second element is for velocity.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 2 elements. The first element is for position. The
+   *     second element is for velocity.
    */
   public ElevatorTorqueSim(
       double kv,
@@ -240,7 +201,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
   /**
    * Sets the input torque for the elevator.
    *
-   * @param volts The input torque.
+   * @param torqueNM The input torque.
    */
   public void setInputTorque(double torqueNM) {
     setInput(torqueNM);
@@ -251,7 +212,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
   /**
    * Sets the input torque for the elevator.
    *
-   * @param volts The input torque.
+   * @param torque The input torque.
    */
   public void setInputTorque(Torque torque) {
     setInputTorque(torque.in(NewtonMeters));
@@ -260,11 +221,11 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
   @Override
   public void update(double dtSeconds) {
     super.update(dtSeconds);
-    m_currentDraw.mut_replace(m_gearbox.getCurrent(getInput(0)) * m_gearing * Math.signum(m_u.get(0, 0)), Amps);
-    m_voltage.mut_replace(m_gearbox.getVoltage(getInput(0), m_x.get(1, 0) / m_drumRadius.in(Meters)),
-        Volts);
+    m_currentDraw.mut_replace(
+        m_gearbox.getCurrent(getInput(0)) * m_gearing * Math.signum(m_u.get(0, 0)), Amps);
+    m_voltage.mut_replace(
+        m_gearbox.getVoltage(getInput(0), m_x.get(1, 0) / m_drumRadius.in(Meters)), Volts);
     m_torque.mut_replace(getInput(0), NewtonMeters);
     m_force.mut_replace(getInput(0) / m_drumRadius.in(Meters), Newtons);
   }
-
 }

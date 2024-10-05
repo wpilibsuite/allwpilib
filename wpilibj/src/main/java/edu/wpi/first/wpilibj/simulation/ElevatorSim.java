@@ -27,38 +27,24 @@ public class ElevatorSim extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param plant                   The linear system that represents the
-   *                                elevator.
-   *                                This system can be created with
-   *                                {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *                                double, double)}or {@link
-   *                                edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}.
-   *                                If
-   *                                {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}
-   *                                is used, the distance unit must be meters.
-   * @param gearbox                 The type of and number of motors in the
-   *                                elevator
-   *                                gearbox.
-   * @param drumRadiusMeters        The radius of the elevator's drum in meters.
-   * @param minHeightMeters         The min allowable height of the elevator in
-   *                                meters.
-   * @param maxHeightMeters         The max allowable height of the elevator in
-   *                                meters.
-   * @param gMetersPerSecondSquared The acceleration due to gravity in meters per
-   *                                second squared. To disable gravity in the
-   *                                simulation set to 0. The enable normal earth
-   *                                gravity use -9.8. Values between 0 and -9.8
-   *                                can be used to simulate free fall more
-   *                                accurately, but must be determined by the
-   *                                user.
-   * @param startingHeightMeters    The starting height of the elevator in meters.
-   * @param measurementStdDevs      The standard deviations of the measurements.
-   *                                Can be
-   *                                omitted if no
-   *                                noise is desired. If present must have 2
-   *                                elements.
-   *                                The first element is for position. The
-   *                                second element is for velocity.
+   * @param plant The linear system that represents the elevator. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
+   *     double, double)}or {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
+   *     double)} is used, the distance unit must be meters.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param drumRadiusMeters The radius of the elevator's drum in meters.
+   * @param minHeightMeters The min allowable height of the elevator in meters.
+   * @param maxHeightMeters The max allowable height of the elevator in meters.
+   * @param gMetersPerSecondSquared The acceleration due to gravity in meters per second squared. To
+   *     disable gravity in the simulation set to 0. The enable normal earth gravity use -9.8.
+   *     Values between 0 and -9.8 can be used to simulate free fall more accurately, but must be
+   *     determined by the user.
+   * @param startingHeightMeters The starting height of the elevator in meters.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 2 elements. The first element is for position. The
+   *     second element is for velocity.
    */
   public ElevatorSim(
       LinearSystem<N2, N1, N2> plant,
@@ -83,35 +69,23 @@ public class ElevatorSim extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param plant              The linear system that represents the
-   *                           elevator.
-   *                           This system can be created with
-   *                           {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *                           double, double)}or {@link
-   *                           edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}.
-   *                           If
-   *                           {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}
-   *                           is used, the distance unit must be meters.
-   * @param gearbox            The type of and number of motors in the
-   *                           elevator
-   *                           gearbox.
-   * @param drumRadius         The radius of the elevator's drum.
-   * @param minHeight          The min allowable height of the elevator.
-   * @param maxHeight          The max allowable height of the elevator.
-   * @param g                  The acceleration due to gravity in meters per
-   *                           second squared. To disable gravity in the
-   *                           simulation set to 0. The enable normal earth
-   *                           gravity use -9.8. Values between 0 and -9.8
-   *                           can be used to simulate free fall more
-   *                           accurately, but must be determined by the
-   *                           user.
-   * @param startingHeight     The starting height
-   *                           of the elevator.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be
-   *                           omitted if no
-   *                           noise is desired. If present must have 2 elements.
-   *                           The first element is for position. The
-   *                           second element is for velocity.
+   * @param plant The linear system that represents the elevator. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
+   *     double, double)}or {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
+   *     double)} is used, the distance unit must be meters.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param drumRadius The radius of the elevator's drum.
+   * @param minHeight The min allowable height of the elevator.
+   * @param maxHeight The max allowable height of the elevator.
+   * @param g The acceleration due to gravity in meters per second squared. To disable gravity in
+   *     the simulation set to 0. The enable normal earth gravity use -9.8. Values between 0 and
+   *     -9.8 can be used to simulate free fall more accurately, but must be determined by the user.
+   * @param startingHeight The starting height of the elevator.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 2 elements. The first element is for position. The
+   *     second element is for velocity.
    */
   public ElevatorSim(
       LinearSystem<N2, N1, N2> plant,
@@ -145,8 +119,12 @@ public class ElevatorSim extends ElevatorSimBase {
         plant,
         gearbox,
         -gearbox.KvRadPerSecPerVolt * plant.getA(1, 1) / plant.getB(1, 0),
-        Kilograms.of(-gearbox.KvRadPerSecPerVolt * gearbox.KtNMPerAmp * plant.getA(0, 0) / gearbox.rOhms
-            * Math.pow(plant.getB(1, 0), 2)),
+        Kilograms.of(
+            -gearbox.KvRadPerSecPerVolt
+                * gearbox.KtNMPerAmp
+                * plant.getA(0, 0)
+                / gearbox.rOhms
+                * Math.pow(plant.getB(1, 0), 2)),
         drumRadius,
         minHeight,
         maxHeight,
@@ -158,23 +136,17 @@ public class ElevatorSim extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param kv                 The velocity gain of the elevator in volt / meters
-   *                           per second.
-   * @param ka                 The acceleration gain of the elevator in volts /
-   *                           meters per second squared.
-   * @param gearbox            The type of and number of motors in the
-   *                           elevator
-   *                           gearbox.
-   * @param drumRadius         The radius of the elevator's drum.
-   * @param minHeight          The min allowable height of the elevator.
-   * @param maxHeight          The max allowable height of the elevator.
-   * @param kg                 The gravity gain of the elevator.
-   * @param startingHeight     The starting height of the elevator.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be
-   *                           omitted if no
-   *                           noise is desired. If present must have 2 elements.
-   *                           The first element is for position. The
-   *                           second element is for velocity.
+   * @param kv The velocity gain of the elevator in volt / meters per second.
+   * @param ka The acceleration gain of the elevator in volts / meters per second squared.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param drumRadius The radius of the elevator's drum.
+   * @param minHeight The min allowable height of the elevator.
+   * @param maxHeight The max allowable height of the elevator.
+   * @param kg The gravity gain of the elevator.
+   * @param startingHeight The starting height of the elevator.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 2 elements. The first element is for position. The
+   *     second element is for velocity.
    */
   public ElevatorSim(
       double kv,
@@ -200,28 +172,17 @@ public class ElevatorSim extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param kv                   The velocity gain of the elevator in volt /
-   *                             meters
-   *                             per second.
-   * @param ka                   The acceleration gain of the elevator in volts /
-   *                             meters per second squared.
-   * @param gearbox              The type of and number of motors in the
-   *                             elevator
-   *                             gearbox.
-   * @param drumRadiusMeters     The radius of the elevator's drum in meters.
-   * @param minHeightMeters      The min allowable height of the elevator in
-   *                             meters.
-   * @param maxHeightMeters      The max allowable height of the elevator in
-   *                             meters.
-   * @param kg                   The gravity gain of the elevator in volts.
+   * @param kv The velocity gain of the elevator in volt / meters per second.
+   * @param ka The acceleration gain of the elevator in volts / meters per second squared.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param drumRadiusMeters The radius of the elevator's drum in meters.
+   * @param minHeightMeters The min allowable height of the elevator in meters.
+   * @param maxHeightMeters The max allowable height of the elevator in meters.
+   * @param kg The gravity gain of the elevator in volts.
    * @param startingHeightMeters The starting height of the elevator in meters.
-   * @param measurementStdDevs   The standard deviations of the measurements. Can
-   *                             be
-   *                             omitted if no
-   *                             noise is desired. If present must have 2
-   *                             elements.
-   *                             The first element is for position. The
-   *                             second element is for velocity.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 2 elements. The first element is for position. The
+   *     second element is for velocity.
    */
   public ElevatorSim(
       double kv,
@@ -259,7 +220,7 @@ public class ElevatorSim extends ElevatorSimBase {
   /**
    * Sets the input voltage for the elevator.
    *
-   * @param volts The input voltage.
+   * @param voltage The input voltage.
    */
   public void setInputVoltage(Voltage voltage) {
     setInputVoltage(voltage.in(Volts));
@@ -273,13 +234,14 @@ public class ElevatorSim extends ElevatorSimBase {
     // spinning
     // 2x faster than the flywheel
     m_currentDraw.mut_replace(
-        m_gearbox.getCurrent(m_x.get(1, 0) * m_gearing / 2 / Math.PI / m_drumRadius.in(Meters), getInput(0))
+        m_gearbox.getCurrent(
+                m_x.get(1, 0) * m_gearing / 2 / Math.PI / m_drumRadius.in(Meters), getInput(0))
             * Math.signum(m_u.get(0, 0)),
         Amps);
     m_voltage.mut_replace(getInput(0), Volts);
-    m_torque.mut_replace(getMassKilograms() * getAccelerationMetersPerSecondSquared() * m_drumRadius.in(Meters),
+    m_torque.mut_replace(
+        getMassKilograms() * getAccelerationMetersPerSecondSquared() * m_drumRadius.in(Meters),
         NewtonMeters);
     m_force.mut_replace(getMassKilograms() * getAccelerationMetersPerSecondSquared(), Newtons);
   }
-
 }

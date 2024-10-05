@@ -21,21 +21,16 @@ public class DCMotorSim extends DCMotorSimBase {
   /**
    * Creates a simulated DC motor mechanism.
    *
-   * @param plant              The linear system representing the DC motor. This
-   *                           system can be created with
-   *                           {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(DCMotor, double,
-   *                           double)} or {@link
-   *                           edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}.
-   *                           If
-   *                           {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}
-   *                           is used, the distance unit must be radians.
-   * @param gearbox            The type of and number of motors in the DC motor
-   *                           gearbox.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be
-   *                           omitted if no
-   *                           noise is desired. If present must have 2 elements.
-   *                           The first element is for position. The
-   *                           second element is for velocity.
+   * @param plant The linear system representing the DC motor. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId #createDCMotorSystem(DCMotor, double,
+   *     double)} or {@link edu.wpi.first.math.system.plant.LinearSystemId
+   *     #createDCMotorSystem(double, double)}. If {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId #createDCMotorSystem(double, double)} is
+   *     used, the distance unit must be radians.
+   * @param gearbox The type of and number of motors in the DC motor gearbox.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 2 elements. The first element is for position. The
+   *     second element is for velocity.
    */
   public DCMotorSim(LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double... measurementStdDevs) {
     // By theorem 6.10.1 of
@@ -60,8 +55,12 @@ public class DCMotorSim extends DCMotorSimBase {
         plant,
         gearbox,
         -gearbox.KvRadPerSecPerVolt * plant.getA(1, 1) / plant.getB(1, 0),
-        KilogramSquareMeters.of(-gearbox.KvRadPerSecPerVolt * gearbox.KtNMPerAmp * plant.getA(0, 0) / gearbox.rOhms
-            * Math.pow(plant.getB(1, 0), 2)),
+        KilogramSquareMeters.of(
+            -gearbox.KvRadPerSecPerVolt
+                * gearbox.KtNMPerAmp
+                * plant.getA(0, 0)
+                / gearbox.rOhms
+                * Math.pow(plant.getB(1, 0), 2)),
         measurementStdDevs);
   }
 
@@ -79,7 +78,7 @@ public class DCMotorSim extends DCMotorSimBase {
   /**
    * Sets the input voltage for the DC motor.
    *
-   * @param volts The input voltage.
+   * @param voltage The input voltage.
    */
   public void setInputVoltage(Voltage voltage) {
     setInputVoltage(voltage.in(Volts));
@@ -92,10 +91,10 @@ public class DCMotorSim extends DCMotorSimBase {
     // Reductions are output over input, so a reduction of 2:1 means the motor is
     // spinning
     // 2x faster than the flywheel
-    m_currentDraw.mut_replace(m_gearbox.getCurrent(m_x.get(1, 0) * m_gearing, getInput(0))
-        * Math.signum(m_u.get(0, 0)), Amps);
+    m_currentDraw.mut_replace(
+        m_gearbox.getCurrent(m_x.get(1, 0) * m_gearing, getInput(0)) * Math.signum(m_u.get(0, 0)),
+        Amps);
     m_voltage.mut_replace(getInput(0), Volts);
     m_torque.mut_replace(getJKgMetersSquared() * getAngularAccelerationRadPerSecSq(), NewtonMeters);
   }
-
 }
