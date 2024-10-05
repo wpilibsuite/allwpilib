@@ -492,11 +492,11 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
 };
 
 /**
- * Checks if two commands have disjoint requirement sets.
+ * Gets the shared requirements between two distinct commands.
  *
  * @param first The first command to check.
  * @param second The second command to check.
- * @return False if first and second share a requirement.
+ * @return A vector of shared subsystem requirements.
  */
-bool RequirementsDisjoint(Command* first, Command* second);
+std::vector<Subsystem*> GetSharedRequirements(Command* first, Command* second);
 }  // namespace frc2

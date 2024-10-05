@@ -52,9 +52,11 @@ public class ParallelCommandGroup extends Command {
     CommandScheduler.getInstance().registerComposedCommands(commands);
 
     for (Command command : commands) {
-      if (!Collections.disjoint(command.getRequirements(), getRequirements())) {
+      var currentRequirements = getRequirements();
+      if (!Collections.disjoint(command.getRequirements(), currentRequirements)) {
         String requirementsStr = command.getRequirements()
           .stream()
+          .filter(currentRequirements::contains)
           .map(Subsystem::getName)
           .collect(Collectors.joining(", "));
         throw new IllegalArgumentException(

@@ -63,7 +63,8 @@ void ParallelRaceGroup::AddCommands(
   }
 
   for (auto&& command : commands) {
-    if (RequirementsDisjoint(this, command.get())) {
+    auto sharedRequirements = GetSharedRequirements(this, command.get());
+    if (sharedRequirements.empty()) {
       command->SetComposed(true);
       AddRequirements(command->GetRequirements());
       m_runWhenDisabled &= command->RunsWhenDisabled();
@@ -75,7 +76,7 @@ void ParallelRaceGroup::AddCommands(
     } else {
       std::string formattedRequirements = "";
       bool first = true;
-      for (auto&& requirement : command->GetRequirements()) {
+      for (auto&& requirement : sharedRequirements) {
         if (first) {
           first = false;
         } else {

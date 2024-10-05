@@ -218,12 +218,15 @@ void Command::InitSendable(wpi::SendableBuilder& builder) {
 }
 
 namespace frc2 {
-bool RequirementsDisjoint(Command* first, Command* second) {
-  bool disjoint = true;
-  auto&& requirements = second->GetRequirements();
+
+std::vector<Subsystem*> GetSharedRequirements(Command* first, Command* second) {
+  std::vector<Subsystem*> shared;
+  auto&& requirementsOfSecond = second->GetRequirements();
   for (auto&& requirement : first->GetRequirements()) {
-    disjoint &= requirements.find(requirement) == requirements.end();
+    if (requirementsOfSecond.find(requirement) == requirementsOfSecond.end()) {
+      shared.push_back(requirement);
+    }
   }
-  return disjoint;
+  return shared;
 }
 }  // namespace frc2
