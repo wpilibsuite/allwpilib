@@ -33,6 +33,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
    *     double)} is used, the distance unit must be meters.
    * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param gearing The gearing from the motors to the output.
    * @param drumRadiusMeters The radius of the elevator's drum in meters.
    * @param minHeightMeters The min allowable height of the elevator in meters.
    * @param maxHeightMeters The max allowable height of the elevator in meters.
@@ -45,6 +46,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
   public ElevatorTorqueSim(
       LinearSystem<N2, N1, N2> plant,
       DCMotor gearbox,
+      double gearing,
       double drumRadiusMeters,
       double minHeightMeters,
       double maxHeightMeters,
