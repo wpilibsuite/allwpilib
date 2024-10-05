@@ -45,7 +45,6 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
   public ElevatorTorqueSim(
       LinearSystem<N2, N1, N2> plant,
       DCMotor gearbox,
-      double gearing,
       double drumRadiusMeters,
       double minHeightMeters,
       double maxHeightMeters,
