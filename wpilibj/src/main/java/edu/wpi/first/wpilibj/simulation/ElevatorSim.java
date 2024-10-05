@@ -11,7 +11,6 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.Newtons;
 import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerMeterPerSecondSquared;
 
 import edu.wpi.first.math.numbers.N1;
@@ -165,8 +164,7 @@ public class ElevatorSim extends ElevatorSimBase {
       Distance startingHeight,
       double... measurementStdDevs) {
     this(
-        LinearSystemId.identifyPositionSystem(
-            kv.baseUnitMagnitude(), ka.baseUnitMagnitude()),
+        LinearSystemId.identifyPositionSystem(kv.baseUnitMagnitude(), ka.baseUnitMagnitude()),
         gearbox,
         drumRadius,
         minHeight,
