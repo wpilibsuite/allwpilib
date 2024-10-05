@@ -253,60 +253,6 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a DC motor system. The states of the system are [linear position,
-   * linear velocity], inputs are [voltage], and outputs are [linear position, linear velocity].
-   *
-   * @param motor The motor (or gearbox) of the system.
-   * @param massKg The mass of the system, in kilograms.
-   * @param radiusMeters The radius of the system , in meters.
-   * @param gearing The reduction between motor and output, as a ratio of output to input.
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0, or gearing &lt;= 0.
-   */
-  public static LinearSystem<N2, N1, N2> createDCMotorSystem(
-      DCMotor motor, double massKg, double radiusMeters, double gearing) {
-    if (massKg <= 0.0) {
-      throw new IllegalArgumentException("massKg must be greater than zero.");
-    }
-    if (radiusMeters <= 0.0) {
-      throw new IllegalArgumentException("radiusMeters must be greater than zero.");
-    }
-    if (gearing <= 0) {
-      throw new IllegalArgumentException("gearing must be greater than zero.");
-    }
-
-    return new LinearSystem<>(
-        MatBuilder.fill(
-            Nat.N2(),
-            Nat.N2(),
-            0,
-            1,
-            0,
-            -Math.pow(gearing, 2)
-                * motor.KtNMPerAmp
-                / (motor.rOhms * radiusMeters * radiusMeters * massKg * motor.KvRadPerSecPerVolt)),
-        VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * radiusMeters * massKg)),
-        Matrix.eye(Nat.N2()),
-        new Matrix<>(Nat.N2(), Nat.N1()));
-  }
-
-  /**
-   * Create a state-space model of a DC motor system. The states of the system are [linear position,
-   * linear velocity], inputs are [voltage], and outputs are [linear position, linear velocity].
-   *
-   * @param motor The motor (or gearbox) of the system.
-   * @param mass The mass of the system.
-   * @param radius The radius of the system.
-   * @param gearing The reduction between motor and output, as a ratio of output to input.
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if mass &lt;= 0, radius &lt;= 0, or gearing &lt;= 0.
-   */
-  public static LinearSystem<N2, N1, N2> createDCMotorSystem(
-      DCMotor motor, Mass mass, Distance radius, double gearing) {
-    return createElevatorSystem(motor, mass.in(Kilograms), radius.in(Meters), gearing);
-  }
-
-  /**
    * Create a state-space model of a DC motor system from its kV (volts/(unit/sec)) and kA
    * (volts/(unit/sec²)). These constants can be found using SysId. the states of the system are
    * [position, velocity], inputs are [voltage], and outputs are [position].
@@ -373,44 +319,6 @@ public final class LinearSystemId {
    */
   public static LinearSystem<N2, N1, N2> createDCMotorTorqueSystem(MomentOfInertia J) {
     return createDCMotorTorqueSystem(J.in(KilogramSquareMeters));
-  }
-
-  /**
-   * Create a state-space model of a DC motor system. The states of the system are [linear position,
-   * linear velocity], inputs are [torque], and outputs are [linear position, linear velocity].
-   *
-   * @param massKg The mass of the system, in kilograms.
-   * @param radiusMeters The radius of the system, in meters.
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0.
-   */
-  public static LinearSystem<N2, N1, N2> createDCMotorTorqueSystem(
-      double massKg, double radiusMeters) {
-    if (massKg <= 0.0) {
-      throw new IllegalArgumentException("massKg must be greater than zero.");
-    }
-    if (radiusMeters <= 0.0) {
-      throw new IllegalArgumentException("radiusMeters must be greater than zero.");
-    }
-
-    return new LinearSystem<>(
-        Matrix.eye(Nat.N2()),
-        VecBuilder.fill(0, 1.0 / (massKg * radiusMeters)),
-        Matrix.eye(Nat.N2()),
-        new Matrix<>(Nat.N2(), Nat.N1()));
-  }
-
-  /**
-   * Create a state-space model of a DC motor system. The states of the system are [linear position,
-   * linear velocity], inputs are [torque], and outputs are [linear position, linear velocity].
-   *
-   * @param mass The mass of the system.
-   * @param radius The radius of the system.
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if mass &lt;= 0, radius &lt;= 0.
-   */
-  public static LinearSystem<N2, N1, N2> createDCMotorTorqueSystem(Mass mass, Distance radius) {
-    return createElevatorTorqueSystem(mass.in(Kilograms), radius.in(Meters));
   }
 
   /**
@@ -549,6 +457,98 @@ public final class LinearSystemId {
    */
   public static LinearSystem<N2, N1, N2> createSingleJointedArmTorqueSystem(MomentOfInertia J) {
     return createSingleJointedArmTorqueSystem(J.in(KilogramSquareMeters));
+  }
+
+  /**
+   * Create a state-space model of a wheel system. The states of the system are [linear position,
+   * linear velocity], inputs are [voltage], and outputs are [linear position, linear velocity].
+   *
+   * @param motor The motor (or gearbox) of the system.
+   * @param massKg The mass of the system, in kilograms.
+   * @param radiusMeters The radius of the system , in meters.
+   * @param gearing The reduction between motor and output, as a ratio of output to input.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0, or gearing &lt;= 0.
+   */
+  public static LinearSystem<N2, N1, N2> createWheelSystem(
+      DCMotor motor, double massKg, double radiusMeters, double gearing) {
+    if (massKg <= 0.0) {
+      throw new IllegalArgumentException("massKg must be greater than zero.");
+    }
+    if (radiusMeters <= 0.0) {
+      throw new IllegalArgumentException("radiusMeters must be greater than zero.");
+    }
+    if (gearing <= 0) {
+      throw new IllegalArgumentException("gearing must be greater than zero.");
+    }
+
+    return new LinearSystem<>(
+        MatBuilder.fill(
+            Nat.N2(),
+            Nat.N2(),
+            0,
+            1,
+            0,
+            -Math.pow(gearing, 2)
+                * motor.KtNMPerAmp
+                / (motor.rOhms * radiusMeters * radiusMeters * massKg * motor.KvRadPerSecPerVolt)),
+        VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * radiusMeters * massKg)),
+        Matrix.eye(Nat.N2()),
+        new Matrix<>(Nat.N2(), Nat.N1()));
+  }
+
+  /**
+   * Create a state-space model of a wheel system. The states of the system are [linear position,
+   * linear velocity], inputs are [voltage], and outputs are [linear position, linear velocity].
+   *
+   * @param motor The motor (or gearbox) of the system.
+   * @param mass The mass of the system.
+   * @param radius The radius of the system.
+   * @param gearing The reduction between motor and output, as a ratio of output to input.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if mass &lt;= 0, radius &lt;= 0, or gearing &lt;= 0.
+   */
+  public static LinearSystem<N2, N1, N2> createWheelSystem(
+      DCMotor motor, Mass mass, Distance radius, double gearing) {
+    return createElevatorSystem(motor, mass.in(Kilograms), radius.in(Meters), gearing);
+  }
+
+  /**
+   * Create a state-space model of a wheel system. The states of the system are [linear position,
+   * linear velocity], inputs are [torque], and outputs are [linear position, linear velocity].
+   *
+   * @param massKg The mass of the system, in kilograms.
+   * @param radiusMeters The radius of the system, in meters.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0.
+   */
+  public static LinearSystem<N2, N1, N2> createWheelTorqueSystem(
+      double massKg, double radiusMeters) {
+    if (massKg <= 0.0) {
+      throw new IllegalArgumentException("massKg must be greater than zero.");
+    }
+    if (radiusMeters <= 0.0) {
+      throw new IllegalArgumentException("radiusMeters must be greater than zero.");
+    }
+
+    return new LinearSystem<>(
+        Matrix.eye(Nat.N2()),
+        VecBuilder.fill(0, 1.0 / (massKg * radiusMeters)),
+        Matrix.eye(Nat.N2()),
+        new Matrix<>(Nat.N2(), Nat.N1()));
+  }
+
+  /**
+   * Create a state-space model of a wheel system. The states of the system are [linear position,
+   * linear velocity], inputs are [torque], and outputs are [linear position, linear velocity].
+   *
+   * @param mass The mass of the system.
+   * @param radius The radius of the system.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if mass &lt;= 0, radius &lt;= 0.
+   */
+  public static LinearSystem<N2, N1, N2> createWheelTorqueSystem(Mass mass, Distance radius) {
+    return createElevatorTorqueSystem(mass.in(Kilograms), radius.in(Meters));
   }
 
   /**

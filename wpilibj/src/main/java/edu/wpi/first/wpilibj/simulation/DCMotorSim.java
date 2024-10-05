@@ -16,7 +16,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 
-/** Represents a simulated DC motor mechanism. */
+/** Represents a simulated DC motor mechanism controlled by voltage input. */
 public class DCMotorSim extends DCMotorSimBase {
   /**
    * Creates a simulated DC motor mechanism.

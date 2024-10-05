@@ -22,7 +22,7 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 
-/** Represents a simulated DC motor mechanism. */
+/** Represents a simulated elevator mechanism controlled by voltage input. */
 public class ElevatorSim extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.

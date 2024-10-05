@@ -15,7 +15,7 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Torque;
 
-/** Represents a simulated DC motor mechanism. */
+/** Represents a simulated DC motor mechanism controlled by torque input. */
 public class DCMotorSimTorque extends DCMotorSimBase {
   /**
    * Creates a simulated DC motor mechanism.
