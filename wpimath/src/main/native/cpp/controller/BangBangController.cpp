@@ -12,8 +12,11 @@ using namespace frc;
 
 BangBangController::BangBangController(double tolerance)
     : m_tolerance(tolerance) {
+      static int instances = 0;
+      instances++;
+
       wpi::math::MathSharedStore::ReportUsage(
-        wpi::math::MathUsageId::kResourceType_BangBangController, instances);
+        wpi::math::MathUsageId::kController_BangBangController, instances);
     }
 
 void BangBangController::SetSetpoint(double setpoint) {
