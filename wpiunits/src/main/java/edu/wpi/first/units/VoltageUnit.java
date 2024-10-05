@@ -81,6 +81,12 @@ public final class VoltageUnit extends Unit {
     return VelocityUnit.combine(this, period);
   }
 
+  /**
+   * Creates a ResistanceUnit from this voltage and another CurrentUnit.
+   * 
+   * @param currentUnit the CurrentUnit
+   * @return the ResistanceUnit.
+   */
   public ResistanceUnit per(CurrentUnit currentUnit) {
     return ResistanceUnit.combine(this, currentUnit);
   }
