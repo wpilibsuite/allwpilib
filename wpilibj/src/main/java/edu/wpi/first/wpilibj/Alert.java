@@ -83,8 +83,8 @@ public class Alert {
   }
 
   /**
-   * Sets whether the alert should currently be displayed. When activated, the alert text will also
-   * be sent to the console. This method can be safely called periodically.
+   * Sets whether the alert should currently be displayed. This method can be safely called
+   * periodically.
    *
    * @param active Whether to display the alert.
    */

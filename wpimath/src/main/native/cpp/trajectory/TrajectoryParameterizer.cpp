@@ -28,6 +28,8 @@
 
 #include "frc/trajectory/TrajectoryParameterizer.h"
 
+#include <vector>
+
 #include <fmt/format.h>
 
 #include "units/math.h"

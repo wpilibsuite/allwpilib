@@ -8,6 +8,8 @@
 
 #include <dbghelp.h>
 
+#include <string>
+
 #include "wpi/SmallString.h"
 #include "wpi/mutex.h"
 

@@ -4,7 +4,7 @@
 
 #include "frc/DigitalOutput.h"
 
-#include <limits>
+#include <string>
 
 #include <hal/DIO.h>
 #include <hal/FRCUsageReporting.h>
@@ -135,8 +135,8 @@ void DigitalOutput::DisablePWM() {
   int32_t status = 0;
 
   // Disable the output by routing to a dead bit.
-  HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, SensorUtil::kDigitalChannels,
-                                 &status);
+  HAL_SetDigitalPWMOutputChannel(m_pwmGenerator,
+                                 SensorUtil::GetNumDigitalChannels(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 
   HAL_FreeDigitalPWM(m_pwmGenerator);

@@ -270,7 +270,18 @@ UNIT_CONFIGURATIONS = {
     "Velocity": {
         "base_unit": "unit()",
         "generics": {"D": {"extends": "Unit"}},
-        "multiply": {},
+        "multiply": {
+            "Time": {
+                "implementation": inspect.cleandoc(
+                    """
+                  @Override
+                  default Measure<D> times(Time multiplier) {
+                    return (Measure<D>) unit().numerator().ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+                  }
+                """
+                )
+            }
+        },
         "divide": {},
     },
     "Voltage": {
@@ -331,6 +342,15 @@ def mtou(measure_name):
         return re.sub(regex, "\\1Unit\\2", measure_name)
 
 
+def indent(multiline_string, indentation):
+    """
+    Indents a multiline string by `indentation` number of spaces
+    """
+    return "\n".join(
+        list(map(lambda line: " " * indentation + line, multiline_string.split("\n")))
+    )
+
+
 def main():
     dirname, _ = os.path.split(os.path.abspath(__file__))
 
@@ -351,6 +371,7 @@ def main():
         "generics_list": generics_list,
         "generics_usage": generics_usage,
         "mtou": mtou,
+        "indent": indent,
     }
 
     for unit_name in UNIT_CONFIGURATIONS:

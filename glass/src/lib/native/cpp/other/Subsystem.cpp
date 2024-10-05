@@ -4,10 +4,9 @@
 
 #include "glass/other/Subsystem.h"
 
-#include <imgui.h>
+#include <string>
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
+#include <imgui.h>
 
 using namespace glass;
 
