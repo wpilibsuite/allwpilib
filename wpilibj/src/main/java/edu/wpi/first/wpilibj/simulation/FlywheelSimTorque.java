@@ -21,9 +21,9 @@ public class FlywheelSimTorque extends FlywheelSimBase {
    * Creates a simulated flywheel mechanism controlled by torque input.
    *
    * @param plant The linear system that represents the flywheel controlled by torque input. Use
-   *     either {@link LinearSystemId#createFlywheelTorqueSystem(double)} if using
-   *     physical constants or {@link LinearSystemId#identifyVelocitySystem(double, double)} if
-   *     using system characterization.
+   *     either {@link LinearSystemId#createFlywheelTorqueSystem(double)} if using physical
+   *     constants or {@link LinearSystemId#identifyVelocitySystem(double, double)} if using system
+   *     characterization.
    * @param gearbox The type of and number of motors in the flywheel gearbox.
    * @param gearing The gearing from the motors to the output.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no

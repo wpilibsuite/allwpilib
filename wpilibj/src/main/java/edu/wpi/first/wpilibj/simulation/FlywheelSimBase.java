@@ -31,7 +31,7 @@ import edu.wpi.first.units.measure.Voltage;
 
 /** Represents a simulated flywheel mechanism. */
 public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
-  /**  Gearbox for the flywheel. */
+  /** Gearbox for the flywheel. */
   protected final DCMotor m_gearbox;
 
   /** The gearing from the motors to the output. */
