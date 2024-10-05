@@ -31,29 +31,29 @@ import edu.wpi.first.units.measure.Voltage;
 
 /** Represents a simulated flywheel mechanism. */
 public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
-  // Gearbox for the flywheel.
+  /**  Gearbox for the flywheel. */
   protected final DCMotor m_gearbox;
 
-  // The gearing from the motors to the output.
+  /** The gearing from the motors to the output. */
   protected final double m_gearing;
 
-  // The moment of inertia for the flywheel mechanism.
+  /** The moment of inertia for the flywheel mechanism. */
   private final MomentOfInertia m_j;
 
-  // The angular velocity of the flywheel mechanism.
+  /** The angular velocity of the flywheel mechanism. */
   protected final MutAngularVelocity m_angularVelocity = RadiansPerSecond.mutable(0.0);
 
-  // The angular acceleration of the flywheel mechanism.
+  /** The angular acceleration of the flywheel mechanism. */
   private final MutAngularAcceleration m_angularAcceleration =
       RadiansPerSecondPerSecond.mutable(0.0);
 
-  // The current draw of flywheel.
+  /** The current draw of flywheel. */
   protected final MutCurrent m_currentDraw = Amps.mutable(0.0);
 
-  // The voltage of the flywheel.
+  /** The voltage of the flywheel. */
   protected final MutVoltage m_voltage = Volts.mutable(0.0);
 
-  // The torque on the flywheel.
+  /** The torque on the flywheel. */
   protected final MutTorque m_torque = NewtonMeters.mutable(0.0);
 
   /**
