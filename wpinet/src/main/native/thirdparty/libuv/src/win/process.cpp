@@ -28,7 +28,6 @@
 #include <signal.h>
 #include <limits.h>
 #include <wchar.h>
-#include <malloc.h>    /* _alloca */
 
 #include "uv.h"
 #include "internal.h"
@@ -597,11 +596,9 @@ error:
 }
 
 
-int env_strncmp(const wchar_t* a, int na, const wchar_t* b) {
+static int env_strncmp(const wchar_t* a, int na, const wchar_t* b) {
   const wchar_t* a_eq;
   const wchar_t* b_eq;
-  wchar_t* A;
-  wchar_t* B;
   int nb;
   int r;
 
@@ -616,27 +613,8 @@ int env_strncmp(const wchar_t* a, int na, const wchar_t* b) {
   assert(b_eq);
   nb = b_eq - b;
 
-  A = (wchar_t*)_alloca((na+1) * sizeof(wchar_t));
-  B = (wchar_t*)_alloca((nb+1) * sizeof(wchar_t));
-
-  r = LCMapStringW(LOCALE_INVARIANT, LCMAP_UPPERCASE, a, na, A, na);
-  assert(r==na);
-  A[na] = L'\0';
-  r = LCMapStringW(LOCALE_INVARIANT, LCMAP_UPPERCASE, b, nb, B, nb);
-  assert(r==nb);
-  B[nb] = L'\0';
-
-  for (;;) {
-    wchar_t AA = *A++;
-    wchar_t BB = *B++;
-    if (AA < BB) {
-      return -1;
-    } else if (AA > BB) {
-      return 1;
-    } else if (!AA && !BB) {
-      return 0;
-    }
-  }
+  r = CompareStringOrdinal(a, na, b, nb, /*case insensitive*/TRUE);
+  return r - CSTR_EQUAL;
 }
 
 
@@ -675,6 +653,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
   WCHAR* dst_copy;
   WCHAR** ptr_copy;
   WCHAR** env_copy;
+  char* p;
   size_t required_vars_value_len[ARRAY_SIZE(required_vars)];
 
   /* first pass: determine size in UTF-16 */
@@ -690,11 +669,13 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
   }
 
   /* second pass: copy to UTF-16 environment block */
-  dst_copy = (WCHAR*)uv__malloc(env_len * sizeof(WCHAR));
-  if (dst_copy == NULL && env_len > 0) {
+  len = env_block_count * sizeof(WCHAR*);
+  p = (char*)uv__malloc(len + env_len * sizeof(WCHAR));
+  if (p == NULL) {
     return UV_ENOMEM;
   }
-  env_copy = (WCHAR**)_alloca(env_block_count * sizeof(WCHAR*));
+  env_copy = (WCHAR**) &p[0];
+  dst_copy = (WCHAR*) &p[len];
 
   ptr = dst_copy;
   ptr_copy = env_copy;
@@ -744,7 +725,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
   /* final pass: copy, in sort order, and inserting required variables */
   dst = (WCHAR*)uv__malloc((1+env_len) * sizeof(WCHAR));
   if (!dst) {
-    uv__free(dst_copy);
+    uv__free(p);
     return UV_ENOMEM;
   }
 
@@ -789,7 +770,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
   assert(env_len == (size_t) (ptr - dst));
   *ptr = L'\0';
 
-  uv__free(dst_copy);
+  uv__free(p);
   *dst_ptr = dst;
   return 0;
 }
@@ -1185,16 +1166,34 @@ static int uv__kill(HANDLE process_handle, int signum) {
       /* Unconditionally terminate the process. On Windows, killed processes
        * normally return 1. */
       int err;
+      DWORD status;
 
       if (TerminateProcess(process_handle, 1))
         return 0;
 
-      /* If the process already exited before TerminateProcess was called,.
+      /* If the process already exited before TerminateProcess was called,
        * TerminateProcess will fail with ERROR_ACCESS_DENIED. */
       err = GetLastError();
-      if (err == ERROR_ACCESS_DENIED &&
-          WaitForSingleObject(process_handle, 0) == WAIT_OBJECT_0) {
-        return UV_ESRCH;
+      if (err == ERROR_ACCESS_DENIED) {
+        /* First check using GetExitCodeProcess() with status different from
+         * STILL_ACTIVE (259). This check can be set incorrectly by the process,
+         * though that is uncommon. */
+        if (GetExitCodeProcess(process_handle, &status) &&
+            status != STILL_ACTIVE) {
+          return UV_ESRCH;
+        }
+
+        /* But the process could have exited with code == STILL_ACTIVE, use then
+         * WaitForSingleObject with timeout zero. This is prone to a race
+         * condition as it could return WAIT_TIMEOUT because the handle might
+         * not have been signaled yet.That would result in returning the wrong
+         * error code here (UV_EACCES instead of UV_ESRCH), but we cannot fix
+         * the kernel synchronization issue that TerminateProcess is
+         * inconsistent with WaitForSingleObject with just the APIs available to
+         * us in user space. */
+        if (WaitForSingleObject(process_handle, 0) == WAIT_OBJECT_0) {
+          return UV_ESRCH;
+        }
       }
 
       return uv_translate_sys_error(err);
@@ -1202,6 +1201,14 @@ static int uv__kill(HANDLE process_handle, int signum) {
 
     case 0: {
       /* Health check: is the process still alive? */
+      DWORD status;
+
+      if (!GetExitCodeProcess(process_handle, &status))
+        return uv_translate_sys_error(GetLastError());
+
+      if (status != STILL_ACTIVE)
+        return UV_ESRCH;
+
       switch (WaitForSingleObject(process_handle, 0)) {
         case WAIT_OBJECT_0:
           return UV_ESRCH;

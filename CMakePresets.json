@@ -15,7 +15,7 @@
       "cacheVariables": {}
     },
     {
-      "name": "sccache",
+      "name": "with-sccache",
       "displayName": "",
       "description": "Ninja config with sccache",
       "generator": "Ninja",
@@ -36,11 +36,11 @@
       }
     },
     {
-      "name": "with-java-sccache",
+      "name": "with-java-and-sccache",
       "displayName": "",
       "description": "Ninja config with Java and sccache",
       "generator": "Ninja",
-      "inherits": "sccache",
+      "inherits": "with-sccache",
       "binaryDir": "build-cmake",
       "cacheVariables": {
         "WITH_JAVA": "ON"

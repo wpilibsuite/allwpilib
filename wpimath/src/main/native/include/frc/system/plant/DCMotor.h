@@ -85,6 +85,15 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
+   * Returns current drawn by motor for a given torque.
+   *
+   * @param torque The torque produced by the motor.
+   */
+  constexpr units::ampere_t Current(units::newton_meter_t torque) const {
+    return torque / Kt;
+  }
+
+  /**
    * Returns torque produced by the motor with a given current.
    *
    * @param current     The current drawn by the motor.

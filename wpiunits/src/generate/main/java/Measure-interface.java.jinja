@@ -80,10 +80,14 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   }
 {% else %}
 {% if unit in config[name]['multiply'] %}
+{%- if 'implementation' in config[name]['multiply'][unit] -%}
+{{ helpers['indent'](config[name]['multiply'][unit]['implementation'], 2) }}
+{%- else %}
   @Override
   default {{ config[name]['multiply'][unit] }} times({{ unit }} multiplier) {
     return {{ config[config[name]['multiply'][unit]]['base_unit'] }}.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
+{%- endif %}
 {% else %}
   @Override
   default Mult<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> times({{ unit }} multiplier) {

@@ -83,6 +83,16 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   }
 
   /**
+   * Calculate current drawn by motor for a given torque.
+   *
+   * @param torqueNm The torque produced by the motor.
+   * @return The current drawn by the motor.
+   */
+  public double getCurrent(double torqueNm) {
+    return torqueNm / KtNMPerAmp;
+  }
+
+  /**
    * Calculate torque produced by the motor with a given current.
    *
    * @param currentAmpere The current drawn by the motor.

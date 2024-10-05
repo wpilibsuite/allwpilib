@@ -104,7 +104,7 @@ LEDPattern LEDPattern::Blink(units::second_t onTime, units::second_t offTime) {
     if (wpi::Now() % totalMicros < onMicros) {
       self.ApplyTo(data, writer);
     } else {
-      LEDPattern::kOff.ApplyTo(data, writer);
+      LEDPattern::Off().ApplyTo(data, writer);
     }
   }};
 }
@@ -118,7 +118,7 @@ LEDPattern LEDPattern::SynchronizedBlink(std::function<bool()> signal) {
     if (signal()) {
       self.ApplyTo(data, writer);
     } else {
-      LEDPattern::kOff.ApplyTo(data, writer);
+      LEDPattern::Off().ApplyTo(data, writer);
     }
   }};
 }
@@ -198,7 +198,9 @@ LEDPattern LEDPattern::AtBrightness(double relativeBrightness) {
 
 // Static constants and functions
 
-LEDPattern LEDPattern::kOff = LEDPattern::Solid(Color::kBlack);
+LEDPattern LEDPattern::Off() {
+  return LEDPattern::Solid(Color::kBlack);
+}
 
 LEDPattern LEDPattern::Solid(const Color color) {
   return LEDPattern{[=](auto data, auto writer) {
@@ -228,7 +230,7 @@ LEDPattern LEDPattern::ProgressMaskLayer(
 LEDPattern LEDPattern::Steps(std::span<const std::pair<double, Color>> steps) {
   if (steps.size() == 0) {
     // no colors specified
-    return LEDPattern::kOff;
+    return LEDPattern::Off();
   }
   if (steps.size() == 1 && steps[0].first == 0) {
     // only one color specified, just show a static color
@@ -264,7 +266,7 @@ LEDPattern LEDPattern::Steps(
 LEDPattern LEDPattern::Gradient(std::span<const Color> colors) {
   if (colors.size() == 0) {
     // no colors specified
-    return LEDPattern::kOff;
+    return LEDPattern::Off();
   }
   if (colors.size() == 1) {
     // only one color specified, just show a static color

@@ -25,6 +25,7 @@ struct SavedSettings {
   int userScale = 2;
   int style = 0;
   int fps = 120;
+  std::string defaultFontName = "Proggy Dotted";
 };
 
 constexpr int kFontScaledLevels = 9;
@@ -44,10 +45,21 @@ struct Context : public SavedSettings {
   std::function<void(bool exiting)> saveSettings;
   std::vector<std::function<void()>> initializers;
   std::vector<std::function<void(float scale)>> windowScalers;
-  std::vector<std::pair<
-      const char*,
-      std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>>>
-      makeFonts;
+  struct FontMaker {
+    FontMaker(
+        std::string name, bool defaultOnly,
+        std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
+            func)
+        : name{std::move(name)},
+          defaultOnly{defaultOnly},
+          func{std::move(func)} {}
+
+    std::string name;
+    bool defaultOnly;
+    std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
+        func;
+  };
+  std::vector<FontMaker> makeFonts;
 
   ImVec4 clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
   std::vector<std::function<void()>> earlyExecutors;

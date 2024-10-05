@@ -6,11 +6,12 @@ cd $DIR/generated
 
 # Versions
 IMGUI_COMMIT=74f7ac04a166c77ef1cbbbebff51e5bfc4fcfa5d
-ICONFONTCPPHEADERS_COMMIT=acd3728de3ee4e2461f8958154bb2dc46f958723
+ICONFONTCPPHEADERS_COMMIT=d4dae38e016e3fb41ee9f3fe393d2577c0ea6315
 DROID_COMMIT=d3817c246c6e3da7531fa1fbb0b0fca271aae7fb
-PROGGYFONTS_VERSION=1.1.5
-FONTAWESOME_VERSION=6.2.0
+PROGGYFONTS_VERSION=1.1.7
+FONTAWESOME_VERSION=6.6.0
 FIRACODE_VERSION=6.2
+ROBOTO_VERSION=2.138
 
 mkdir download
 pushd download
@@ -22,6 +23,7 @@ wget -O proggyfonts.zip https://github.com/bluescan/proggyfonts/archive/refs/tag
 wget https://github.com/FortAwesome/Font-Awesome/releases/download/${FONTAWESOME_VERSION}/fontawesome-free-${FONTAWESOME_VERSION}-web.zip
 wget -O droid-fonts.zip https://github.com/grays/droid-fonts/archive/${DROID_COMMIT}.zip
 wget -O fira-code.zip https://github.com/tonsky/FiraCode/releases/download/${FIRACODE_VERSION}/Fira_Code_v${FIRACODE_VERSION}.zip
+wget -O roboto.zip https://github.com/googlefonts/roboto/releases/download/v${ROBOTO_VERSION}/roboto-android.zip
 
 # Download C++ icon font header
 wget https://github.com/juliettef/IconFontCppHeaders/raw/${ICONFONTCPPHEADERS_COMMIT}/IconsFontAwesome6.h
@@ -39,6 +41,10 @@ mkdir fira-code
 pushd fira-code
 unzip ../../download/fira-code.zip
 popd
+mkdir roboto
+pushd roboto
+unzip ../../download/roboto.zip
+popd
 popd
 
 rm -rf fonts
@@ -52,6 +58,7 @@ cp -p download/IconsFontAwesome6.h fonts/include/
 cp -p extract/proggyfonts-${PROGGYFONTS_VERSION}/LICENSE fonts/LICENSE-proggyfonts.txt
 cp -p extract/fontawesome-free-${FONTAWESOME_VERSION}-web/LICENSE.txt fonts/LICENSE-fontawesome.txt
 cp -p extract/droid-fonts-${DROID_COMMIT}/droid/NOTICE fonts/LICENSE-droid.txt
+cp -p extract/roboto/LICENSE fonts/LICENSE-roboto.txt
 
 # Build C versions
 g++ -o imgui_font_bin2c download/binary_to_compressed_c.cpp
@@ -60,9 +67,15 @@ g++ -o imgui_font_bin2c download/binary_to_compressed_c.cpp
 ./imgui_font_bin2c "extract/fontawesome-free-${FONTAWESOME_VERSION}-web/webfonts/fa-solid-900.ttf" FontAwesomeSolid > fonts/src/FontAwesomeSolid.inc
 ./imgui_font_bin2c "extract/droid-fonts-${DROID_COMMIT}/droid/DroidSans.ttf" DroidSans > fonts/src/DroidSans.inc
 ./imgui_font_bin2c "extract/fira-code/ttf/FiraCode-Retina.ttf" FiraCodeRetina > fonts/src/FiraCodeRetina.inc
+./imgui_font_bin2c "extract/roboto/Roboto-Light.ttf" RobotoLight > fonts/src/RobotoLight.inc
+./imgui_font_bin2c "extract/roboto/Roboto-Regular.ttf" RobotoRegular > fonts/src/RobotoRegular.inc
+./imgui_font_bin2c "extract/roboto/Roboto-Bold.ttf" RobotoBold > fonts/src/RobotoBold.inc
+./imgui_font_bin2c "extract/roboto/RobotoCondensed-Light.ttf" RobotoCondensedLight > fonts/src/RobotoCondensedLight.inc
+./imgui_font_bin2c "extract/roboto/RobotoCondensed-Regular.ttf" RobotoCondensedRegular > fonts/src/RobotoCondensedRegular.inc
+./imgui_font_bin2c "extract/roboto/RobotoCondensed-Bold.ttf" RobotoCondensedBold > fonts/src/RobotoCondensedBold.inc
 
 # Generate C wrapper source/headers
-for font in ProggyDotted FontAwesomeRegular FontAwesomeSolid DroidSans FiraCodeRetina
+for font in ProggyDotted FontAwesomeRegular FontAwesomeSolid DroidSans FiraCodeRetina RobotoLight RobotoRegular RobotoBold RobotoCondensedLight RobotoCondensedRegular RobotoCondensedBold
 do
 cat >fonts/src/imgui_${font}.cpp <<END
 #include "imgui_${font}.h"

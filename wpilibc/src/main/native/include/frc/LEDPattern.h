@@ -246,7 +246,7 @@ class LEDPattern {
   LEDPattern AtBrightness(double relativeBrightness);
 
   /** A pattern that turns off all LEDs. */
-  static LEDPattern kOff;
+  static LEDPattern Off();
 
   /**
    * Creates a pattern that displays a single static color along the entire
