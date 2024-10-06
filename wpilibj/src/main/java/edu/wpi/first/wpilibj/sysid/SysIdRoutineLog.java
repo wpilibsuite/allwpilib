@@ -4,7 +4,14 @@
 
 package edu.wpi.first.wpilibj.sysid;
 
-import edu.wpi.first.units.*;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.AngularVelocityUnit;
+import edu.wpi.first.units.LinearVelocityUnit;
+import edu.wpi.first.units.AngularAccelerationUnit;
+import edu.wpi.first.units.LinearAccelerationUnit;
+import edu.wpi.first.units.CurrentUnit;
+import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -153,7 +160,9 @@ public class SysIdRoutineLog {
      * @param position The angular position to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog angularPosition(Angle position) { return angularPosition(position, Rotations); }
+    public MotorLog angularPosition(Angle position) {
+      return angularPosition(position, Rotations);
+    }
 
     /**
      * Log the angular position of the motor.
@@ -172,7 +181,9 @@ public class SysIdRoutineLog {
      * @param velocity The linear velocity to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog linearVelocity(LinearVelocity velocity) { return linearVelocity(velocity, MetersPerSecond); }
+    public MotorLog linearVelocity(LinearVelocity velocity) {
+      return linearVelocity(velocity, MetersPerSecond);
+    }
 
     /**
      * Log the linear velocity of the motor.
@@ -191,7 +202,9 @@ public class SysIdRoutineLog {
      * @param velocity The angular velocity to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog angularVelocity(AngularVelocity velocity) { return angularVelocity(velocity, RotationsPerSecond); }
+    public MotorLog angularVelocity(AngularVelocity velocity) {
+      return angularVelocity(velocity, RotationsPerSecond);
+    }
 
     /**
      * Log the angular velocity of the motor.
@@ -225,7 +238,10 @@ public class SysIdRoutineLog {
      * @param unit The unit to log the acceleration in.
      * @return The motor log (for call chaining).
      */
-    public MotorLog linearAcceleration(LinearAcceleration acceleration, LinearAccelerationUnit unit) {
+    public MotorLog linearAcceleration(
+      LinearAcceleration acceleration,
+      LinearAccelerationUnit unit
+    ) {
       return value("acceleration", acceleration.in(unit), unit.name());
     }
 
@@ -250,7 +266,10 @@ public class SysIdRoutineLog {
      * @param unit The unit to log the acceleration in.
      * @return The motor log (for call chaining).
      */
-    public MotorLog angularAcceleration(AngularAcceleration acceleration, AngularAccelerationUnit unit) {
+    public MotorLog angularAcceleration(
+      AngularAcceleration acceleration,
+      AngularAccelerationUnit unit
+    ) {
       return value("acceleration", acceleration.in(unit), unit.name());
     }
 
