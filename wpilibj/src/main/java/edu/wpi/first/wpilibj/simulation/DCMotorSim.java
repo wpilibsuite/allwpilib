@@ -21,7 +21,7 @@ public class DCMotorSim extends DCMotorSimBase {
    * Creates a simulated DC motor mechanism.
    *
    * @param plant The linear system representing the DC motor. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId #createDCMotorSystem(DCMotor, double,
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId #createDCMotorSystem(DCMotor,
    *     double)} or {@link edu.wpi.first.math.system.plant.LinearSystemId
    *     #createDCMotorSystem(double, double)}. If {@link
    *     edu.wpi.first.math.system.plant.LinearSystemId #createDCMotorSystem(double, double)} is

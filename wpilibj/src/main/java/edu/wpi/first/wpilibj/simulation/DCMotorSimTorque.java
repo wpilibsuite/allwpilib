@@ -12,7 +12,6 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.units.measure.Torque;
 
@@ -22,8 +21,7 @@ public class DCMotorSimTorque extends DCMotorSimBase {
    * Creates a simulated DC motor mechanism.
    *
    * @param plant The linear system representing the DC motor. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(DCMotor, double,
-   *     double)} or {@link
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorTorqueSystem(double)} or {@link
    *     edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}. If
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}
    *     is used, the distance unit must be radians.

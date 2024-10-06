@@ -18,7 +18,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -64,12 +63,7 @@ public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
   /**
    * Creates a simulated DC motor mechanism.
    *
-   * @param plant The linear system representing the DC motor. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(DCMotor, double,
-   *     double)} or {@link
-   *     edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}. If
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}
-   *     is used, the distance unit must be radians.
+   * @param plant The linear system representing the DC motor.
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param J The moment of inertia for the flywheel mechanism.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
