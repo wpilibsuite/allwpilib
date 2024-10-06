@@ -165,7 +165,7 @@ public final class LinearSystemId {
    * @param gearbox The gearbox attached to the flywheel.
    * @param J The moment of inertia J of the flywheel.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if J &lt;= 0 or gearing &lt;= 0.
+   * @throws IllegalArgumentException if J &leq; 0.
    */
   public static LinearSystem<N1, N1, N1> createFlywheelSystem(Gearbox gearbox, MomentOfInertia J) {
     return createFlywheelSystem(gearbox, J.in(KilogramSquareMeters));
