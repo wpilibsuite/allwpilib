@@ -61,13 +61,13 @@ public class DCMotorType {
   public final Per<VoltageUnit, CurrentUnit> R;
 
   /** Motor velocity constant in radians per second per volt. */
-  public final double kvRadPerSecPerVolt;
+  public final double KvRadPerSecPerVolt;
 
   /** Motor velocity constant. */
   public final Per<AngularVelocityUnit, VoltageUnit> Kv;
 
   /** Motor torque constant in Newton-Meters per amp. */
-  public final double ktNMPerAmp;
+  public final double KtNMPerAmp;
 
   /** Motor torque constant. */
   public final Per<TorqueUnit, CurrentUnit> Kt;
@@ -120,9 +120,9 @@ public class DCMotorType {
         Per.ofBaseUnits(
             freeSpeedRadPerSec / (nominalVoltageVolts - rOhms * freeCurrentAmps),
             RadiansPerSecond.per(Volt));
-    kvRadPerSecPerVolt = Kv.in(RadiansPerSecond.per(Volt));
+    KvRadPerSecPerVolt = Kv.in(RadiansPerSecond.per(Volt));
     Kt = stallTorque.divide(stallCurrent);
-    ktNMPerAmp = Kt.in(NewtonMeters.per(Amp));
+    KtNMPerAmp = Kt.in(NewtonMeters.per(Amp));
   }
 
   /**

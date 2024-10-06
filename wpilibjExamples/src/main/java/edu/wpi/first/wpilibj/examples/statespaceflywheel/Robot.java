@@ -11,7 +11,8 @@ import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.LinearSystemLoop;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
@@ -32,18 +33,20 @@ public class Robot extends TimedRobot {
 
   private static final double kFlywheelMomentOfInertia = 0.00032; // kg * m^2
 
-  // Reduction between motors and encoder, as output over input. If the flywheel spins slower than
+  // Reduction between motors and encoder, as output over input. If the flywheel
+  // spins slower than
   // the motors, this number should be greater than one.
   private static final double kFlywheelGearing = 1.0;
 
-  // The plant holds a state-space model of our flywheel. This system has the following properties:
+  // The plant holds a state-space model of our flywheel. This system has the
+  // following properties:
   //
   // States: [velocity], in radians per second.
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [velocity], in radians per second.
   private final LinearSystem<N1, N1, N1> m_flywheelPlant =
       LinearSystemId.createFlywheelSystem(
-          DCMotor.getNEO(2), kFlywheelMomentOfInertia, kFlywheelGearing);
+          new Gearbox(DCMotorType.NEO, kFlywheelGearing, 2), kFlywheelMomentOfInertia);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   private final KalmanFilter<N1, N1, N1> m_observer =
@@ -61,15 +64,19 @@ public class Robot extends TimedRobot {
       new LinearQuadraticRegulator<>(
           m_flywheelPlant,
           VecBuilder.fill(8.0), // qelms. Velocity error tolerance, in radians per second. Decrease
-          // this to more heavily penalize state excursion, or make the controller behave more
+          // this to more heavily penalize state excursion, or make the controller behave
+          // more
           // aggressively.
           VecBuilder.fill(12.0), // relms. Control effort (voltage) tolerance. Decrease this to more
-          // heavily penalize control effort, or make the controller less aggressive. 12 is a good
-          // starting point because that is the (approximate) maximum voltage of a battery.
+          // heavily penalize control effort, or make the controller less aggressive. 12
+          // is a good
+          // starting point because that is the (approximate) maximum voltage of a
+          // battery.
           0.020); // Nominal time between loops. 0.020 for TimedRobot, but can be
   // lower if using notifiers.
 
-  // The state-space loop combines a controller, observer, feedforward and plant for easy control.
+  // The state-space loop combines a controller, observer, feedforward and plant
+  // for easy control.
   private final LinearSystemLoop<N1, N1, N1> m_loop =
       new LinearSystemLoop<>(m_flywheelPlant, m_controller, m_observer, 12.0, 0.020);
 
@@ -93,7 +100,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    // Sets the target speed of our flywheel. This is similar to setting the setpoint of a
+    // Sets the target speed of our flywheel. This is similar to setting the
+    // setpoint of a
     // PID controller.
     if (m_joystick.getTriggerPressed()) {
       // We just pressed the trigger, so let's set our next reference
@@ -106,7 +114,8 @@ public class Robot extends TimedRobot {
     // Correct our Kalman filter's state vector estimate with encoder data.
     m_loop.correct(VecBuilder.fill(m_encoder.getRate()));
 
-    // Update our LQR to generate new voltage commands and use the voltages to predict the next
+    // Update our LQR to generate new voltage commands and use the voltages to
+    // predict the next
     // state with out Kalman filter.
     m_loop.predict(0.020);
 

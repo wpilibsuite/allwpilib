@@ -128,7 +128,7 @@ public class Gearbox {
     return -numMotors
             * speedRadiansPerSec
             * reduction
-            / motorType.kvRadPerSecPerVolt
+            / motorType.KvRadPerSecPerVolt
             / motorType.rOhms
         + numMotors * voltageInputVolts / motorType.rOhms;
   }
@@ -140,7 +140,7 @@ public class Gearbox {
    * @return The current drawn by the motor in amps.
    */
   public double currentAmps(double torqueNm) {
-    return torqueNm / motorType.ktNMPerAmp / reduction;
+    return torqueNm / motorType.KtNMPerAmp / reduction;
   }
 
   /**
@@ -161,7 +161,7 @@ public class Gearbox {
    * @return The torque output in Newton-Meters.
    */
   public double torqueNm(double currentAmpere) {
-    return currentAmpere * reduction * motorType.ktNMPerAmp;
+    return currentAmpere * reduction * motorType.KtNMPerAmp;
   }
 
   /**
@@ -185,8 +185,8 @@ public class Gearbox {
    * @return The voltage of the motor in volts.
    */
   public double voltageVolts(double torqueNm, double angularVelocityRadPerSec) {
-    return angularVelocityRadPerSec * reduction / motorType.kvRadPerSecPerVolt
-        + motorType.rOhms * torqueNm / numMotors / reduction / motorType.ktNMPerAmp;
+    return angularVelocityRadPerSec * reduction / motorType.KvRadPerSecPerVolt
+        + motorType.rOhms * torqueNm / numMotors / reduction / motorType.KtNMPerAmp;
   }
 
   /**
@@ -211,14 +211,14 @@ public class Gearbox {
    * @return The angular speed of the motor.
    */
   public double angularVelocityRadPerSec(double torqueNm, double voltageInputVolts) {
-    return voltageInputVolts * motorType.kvRadPerSecPerVolt / reduction
-        - motorType.kvRadPerSecPerVolt
+    return voltageInputVolts * motorType.KvRadPerSecPerVolt / reduction
+        - motorType.KvRadPerSecPerVolt
             * motorType.rOhms
             * torqueNm
             / numMotors
             / reduction
             / reduction
-            / motorType.ktNMPerAmp;
+            / motorType.KtNMPerAmp;
   }
 
   /**

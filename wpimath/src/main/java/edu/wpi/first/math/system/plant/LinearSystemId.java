@@ -130,28 +130,30 @@ public final class LinearSystemId {
    * Create a state-space model of a flywheel system. The states of the system are [angular
    * velocity], inputs are [voltage], and outputs are [angular velocity].
    *
-   * @param motor The motor (or gearbox) attached to the flywheel.
+   * @param gearbox The gearbox attached to the flywheel.
    * @param JKgMetersSquared The moment of inertia J of the flywheel.
-   * @param gearing The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or gearing &lt;= 0.
+   * @throws IllegalArgumentException if JKgMetersSquared &leq; 0.
    */
   public static LinearSystem<N1, N1, N1> createFlywheelSystem(
-      DCMotor motor, double JKgMetersSquared, double gearing) {
+      Gearbox gearbox, double JKgMetersSquared) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
-    }
-    if (gearing <= 0.0) {
-      throw new IllegalArgumentException("gearing must be greater than zero.");
     }
 
     return new LinearSystem<>(
         VecBuilder.fill(
-            -gearing
-                * gearing
-                * motor.KtNMPerAmp
-                / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgMetersSquared)),
-        VecBuilder.fill(gearing * motor.KtNMPerAmp / (motor.rOhms * JKgMetersSquared)),
+            -Math.pow(gearbox.reduction, 2)
+                * gearbox.numMotors
+                * gearbox.motorType.KtNMPerAmp
+                / (gearbox.motorType.KvRadPerSecPerVolt
+                    * gearbox.motorType.rOhms
+                    * JKgMetersSquared)),
+        VecBuilder.fill(
+            gearbox.numMotors
+                * gearbox.reduction
+                * gearbox.motorType.KtNMPerAmp
+                / (gearbox.motorType.rOhms * JKgMetersSquared)),
         Matrix.eye(Nat.N1()),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }

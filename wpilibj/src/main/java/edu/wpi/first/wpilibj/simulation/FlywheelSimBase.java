@@ -16,6 +16,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -32,10 +33,7 @@ import edu.wpi.first.units.measure.Voltage;
 /** Represents a simulated flywheel mechanism. */
 public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
   /** Gearbox for the flywheel. */
-  protected final DCMotor m_gearbox;
-
-  /** The gearing from the motors to the output. */
-  protected final double m_gearing;
+  protected final Gearbox m_gearbox;
 
   /** The moment of inertia for the flywheel mechanism. */
   private final MomentOfInertia m_j;
@@ -64,20 +62,17 @@ public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
    *     or {@link LinearSystemId#identifyVelocitySystem(double, double)} if using system
    *     characterization.
    * @param gearbox The type of and number of motors in the flywheel gearbox.
-   * @param gearing The gearing from the motors to the output.
    * @param J The moment of inertia for the flywheel mechanism.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for velocity.
    */
   public FlywheelSimBase(
       LinearSystem<N1, N1, N1> plant,
-      DCMotor gearbox,
-      double gearing,
+      Gearbox gearbox,
       MomentOfInertia J,
       double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
-    m_gearing = gearing;
     m_j = J;
   }
 
@@ -97,15 +92,6 @@ public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
    */
   public void setAngularVelocity(AngularVelocity velocity) {
     setAngularVelocity(velocity.in(RadiansPerSecond));
-  }
-
-  /**
-   * Returns the gear ratio of the flywheel.
-   *
-   * @return the flywheel's gear ratio.
-   */
-  public double getGearing() {
-    return m_gearing;
   }
 
   /**
@@ -131,7 +117,7 @@ public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel's gearbox.
    */
-  public DCMotor getGearbox() {
+  public Gearbox getGearbox() {
     return m_gearbox;
   }
 
