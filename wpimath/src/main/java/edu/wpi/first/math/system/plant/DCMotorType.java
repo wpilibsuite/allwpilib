@@ -80,6 +80,8 @@ public class DCMotorType {
    * @param stallCurrent The current draw when stalled.
    * @param freeCurrent The current draw under no load.
    * @param freeSpeed The angular velocity under no load.
+   * @throws IllegalArgumentException if nominalVoltageVolts &leq; 0, stallTorqueNewtonMeters &leq;
+   *     0, stallCurrentAmps &leq; 0, freeCurrentAmps &leq; 0, or freeSpeedRadPerSec &leq; 0.
    */
   public DCMotorType(
       Voltage nominalVoltage,
@@ -87,6 +89,21 @@ public class DCMotorType {
       Current stallCurrent,
       Current freeCurrent,
       AngularVelocity freeSpeed) {
+    if (nominalVoltage.in(Volts) <= 0) {
+      throw new IllegalArgumentException("nominalVoltage must be greater than zero.");
+    }
+    if (stallTorque.in(NewtonMeters) <= 0) {
+      throw new IllegalArgumentException("stallTorque must be greater than zero.");
+    }
+    if (stallCurrent.in(Amps) <= 0) {
+      throw new IllegalArgumentException("stallCurrent must be greater than zero.");
+    }
+    if (freeCurrent.in(Amps) <= 0) {
+      throw new IllegalArgumentException("freeCurrent must be greater than zero.");
+    }
+    if (freeSpeed.in(RadiansPerSecond) <= 0) {
+      throw new IllegalArgumentException("freeSpeed must be greater than zero.");
+    }
     this.nominalVoltage = nominalVoltage;
     this.stallTorque = stallTorque;
     this.stallCurrent = stallCurrent;
@@ -116,6 +133,8 @@ public class DCMotorType {
    * @param stallCurrentAmps The current draw when stalled in amps.
    * @param freeCurrentAmps The current draw under no load in amps.
    * @param freeSpeedRadPerSec The angular velocity under no load in radians per second.
+   * @throws IllegalArgumentException if nominalVoltageVolts &leq; 0, stallTorqueNewtonMeters &leq;
+   *     0, stallCurrentAmps &leq; 0, freeCurrentAmps &leq; 0, or freeSpeedRadPerSec &leq; 0.
    */
   public DCMotorType(
       double nominalVoltageVolts,

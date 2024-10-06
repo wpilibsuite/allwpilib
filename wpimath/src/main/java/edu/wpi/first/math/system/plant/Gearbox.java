@@ -47,8 +47,15 @@ public class Gearbox {
    * @param motorType The type of motor used in the gearbox.
    * @param reduction The gearbox reduction as a ratio of output turns to input turns.
    * @param numMotors The number of motors used in the gearbox.
+   * @throws IllegalArgumentException if reduction &leq; 0 or numMotors &leq; 0.
    */
   public Gearbox(DCMotorType motorType, double reduction, int numMotors) {
+    if (reduction <= 0) {
+      throw new IllegalArgumentException("reduction must be greater than zero.");
+    }
+    if (numMotors <= 0) {
+      throw new IllegalArgumentException("numMotors must be greater than zero.");
+    }
     this.motorType = motorType;
     this.reduction = reduction;
     this.numMotors = numMotors;
@@ -70,6 +77,7 @@ public class Gearbox {
    *
    * @param motorType The type of motor used in the gearbox.
    * @param numMotors The number of motors used in the gearbox.
+   * @throws IllegalArgumentException if numMotors &leq; 0.
    */
   public Gearbox(DCMotorType motorType, int numMotors) {
     this(motorType, 1.0, numMotors);
