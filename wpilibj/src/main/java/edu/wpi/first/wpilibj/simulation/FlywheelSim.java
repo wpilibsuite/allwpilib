@@ -21,13 +21,23 @@ public class FlywheelSim extends FlywheelSimBase {
   /**
    * Creates a simulated flywheel mechanism controlled by voltage input.
    *
-   * @param plant The linear system that represents the flywheel controlled by voltage input. Use
-   *     either {@link LinearSystemId#createFlywheelSystem(DCMotor, double, double)} if using
-   *     physical constants or {@link LinearSystemId#identifyVelocitySystem(double, double)} if
-   *     using system characterization.
-   * @param gearbox The type of and number of motors in the flywheel gearbox.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 1 element for velocity.
+   * @param plant              The linear system that represents the flywheel
+   *                           controlled by voltage input. Use
+   *                           either
+   *                           {@link LinearSystemId#createFlywheelSystem(DCMotor, double)}
+   *                           or
+   *                           {@link LinearSystemId#createFlywheelSystem(DCMotor, MomentOfInertia)}
+   *                           if using
+   *                           physical constants or
+   *                           {@link LinearSystemId#identifyVelocitySystem(double, double)}
+   *                           if
+   *                           using system characterization.
+   * @param gearbox            The type of and number of motors in the flywheel
+   *                           gearbox.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be
+   *                           omitted if no
+   *                           noise is desired. If present must have 1 element
+   *                           for velocity.
    */
   public FlywheelSim(
       LinearSystem<N1, N1, N1> plant, Gearbox gearbox, double... measurementStdDevs) {
