@@ -64,7 +64,8 @@ class SysIdRoutineLog {
      * @param voltage The voltage to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& voltage(units::volt_t voltage) {
+    template <typename U = units::volt_t>
+    MotorLog& voltage(U voltage) {
       return value("voltage", voltage.value(), voltage.name());
     }
 
@@ -74,7 +75,8 @@ class SysIdRoutineLog {
      * @param position The linear position to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& position(units::meter_t position) {
+    template <typename U = units::meter_t>
+    MotorLog& position(U position) {
       return value("position", position.value(), position.name());
     }
 
@@ -84,7 +86,8 @@ class SysIdRoutineLog {
      * @param position The angular position to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& position(units::turn_t position) {
+    template <typename U = units::turn_t>
+    MotorLog& position(U position) {
       return value("position", position.value(), position.name());
     }
 
@@ -94,7 +97,8 @@ class SysIdRoutineLog {
      * @param velocity The linear velocity to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& velocity(units::meters_per_second_t velocity) {
+    template <typename U = units::meters_per_second_t>
+    MotorLog& velocity(U velocity) {
       return value("velocity", velocity.value(), velocity.name());
     }
 
@@ -104,7 +108,8 @@ class SysIdRoutineLog {
      * @param velocity The angular velocity to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& velocity(units::turns_per_second_t velocity) {
+    template <typename U = units::turns_per_second_t>
+    MotorLog& velocity(U velocity) {
       return value("velocity", velocity.value(), velocity.name());
     }
 
@@ -116,7 +121,8 @@ class SysIdRoutineLog {
      * @param acceleration The linear acceleration to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& acceleration(units::meters_per_second_squared_t acceleration) {
+    template <typename U = units::meters_per_second_squared_t>
+    MotorLog& acceleration(U acceleration) {
       return value("acceleration", acceleration.value(), acceleration.name());
     }
 
@@ -128,7 +134,8 @@ class SysIdRoutineLog {
      * @param acceleration The angular acceleration to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& acceleration(units::turns_per_second_squared_t acceleration) {
+    template <typename U = units::turns_per_second_squared_t>
+    MotorLog& acceleration(U acceleration) {
       return value("acceleration", acceleration.value(), acceleration.name());
     }
 
@@ -140,7 +147,8 @@ class SysIdRoutineLog {
      * @param current The current to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& current(units::ampere_t current) {
+    template <typename U = units::ampere_t>
+    MotorLog& current(U current) {
       return value("current", current.value(), current.name());
     }
 
