@@ -175,13 +175,11 @@ public record DCMotorType(
 
   /** DC motor constants for a REV NEO brushless motor. */
   public static final DCMotorType NEO =
-      new DCMotorType(
-          Volts.of(12), NewtonMeters.of(2.6), Amps.of(105), Amps.of(1.8), RPM.of(5676));
+      new DCMotorType(Volts.of(12), NewtonMeters.of(2.6), Amps.of(105), Amps.of(1.8), RPM.of(5676));
 
   /** DC motor constants for a VEX MiniCIM motor. */
   public static final DCMotorType MiniCIM =
-      new DCMotorType(
-          Volts.of(12), NewtonMeters.of(1.41), Amps.of(89), Amps.of(3.0), RPM.of(5840));
+      new DCMotorType(Volts.of(12), NewtonMeters.of(1.41), Amps.of(89), Amps.of(3.0), RPM.of(5840));
 
   /** DC motor constants for a VEX Bag motor. */
   public static final DCMotorType Bag =
@@ -246,8 +244,7 @@ public record DCMotorType(
    * <p>https://store.ctr-electronics.com/announcing-kraken-x60/
    */
   public static final DCMotorType KrakenX60 =
-      new DCMotorType(
-          Volts.of(12), NewtonMeters.of(7.09), Amps.of(366), Amps.of(2), RPM.of(6000));
+      new DCMotorType(Volts.of(12), NewtonMeters.of(7.09), Amps.of(366), Amps.of(2), RPM.of(6000));
 
   /**
    * DC motor constants for a Kraken X60 brushless motor with FOC (Field-Oriented Control) enabled.
@@ -255,8 +252,7 @@ public record DCMotorType(
    * <p>https://store.ctr-electronics.com/announcing-kraken-x60/
    */
   public static final DCMotorType KrakenX60FOC =
-      new DCMotorType(
-          Volts.of(12), NewtonMeters.of(9.37), Amps.of(483), Amps.of(2), RPM.of(5800));
+      new DCMotorType(Volts.of(12), NewtonMeters.of(9.37), Amps.of(483), Amps.of(2), RPM.of(5800));
 
   /**
    * DC motor constants for a REV Neo Vortex brushless motor.
