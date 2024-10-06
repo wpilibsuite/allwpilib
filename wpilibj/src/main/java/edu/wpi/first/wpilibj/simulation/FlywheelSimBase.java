@@ -57,10 +57,7 @@ public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
   /**
    * Creates a simulated flywheel mechanism.
    *
-   * @param plant The linear system that represents the flywheel. Use either {@link
-   *     LinearSystemId#createFlywheelSystem(DCMotor, double, double)} if using physical constants
-   *     or {@link LinearSystemId#identifyVelocitySystem(double, double)} if using system
-   *     characterization.
+   * @param plant The linear system that represents the flywheel.
    * @param gearbox The type of and number of motors in the flywheel gearbox.
    * @param J The moment of inertia for the flywheel mechanism.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no

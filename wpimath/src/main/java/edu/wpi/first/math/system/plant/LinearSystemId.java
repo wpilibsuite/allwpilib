@@ -167,8 +167,7 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if J &lt;= 0 or gearing &lt;= 0.
    */
-  public static LinearSystem<N1, N1, N1> createFlywheelSystem(
-      Gearbox gearbox, MomentOfInertia J) {
+  public static LinearSystem<N1, N1, N1> createFlywheelSystem(Gearbox gearbox, MomentOfInertia J) {
     return createFlywheelSystem(gearbox, J.in(KilogramSquareMeters));
   }
 

@@ -10,7 +10,6 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Voltage;
@@ -21,23 +20,14 @@ public class FlywheelSim extends FlywheelSimBase {
   /**
    * Creates a simulated flywheel mechanism controlled by voltage input.
    *
-   * @param plant              The linear system that represents the flywheel
-   *                           controlled by voltage input. Use
-   *                           either
-   *                           {@link LinearSystemId#createFlywheelSystem(DCMotor, double)}
-   *                           or
-   *                           {@link LinearSystemId#createFlywheelSystem(DCMotor, MomentOfInertia)}
-   *                           if using
-   *                           physical constants or
-   *                           {@link LinearSystemId#identifyVelocitySystem(double, double)}
-   *                           if
-   *                           using system characterization.
-   * @param gearbox            The type of and number of motors in the flywheel
-   *                           gearbox.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be
-   *                           omitted if no
-   *                           noise is desired. If present must have 1 element
-   *                           for velocity.
+   * @param plant The linear system that represents the flywheel controlled by voltage input. Use
+   *     either {@link LinearSystemId#createFlywheelSystem(Gearbox, double)} or {@link
+   *     LinearSystemId#createFlywheelSystem(Gearbox, MomentOfInertia)} if using physical constants
+   *     or {@link LinearSystemId#identifyVelocitySystem(double, double)} if using system
+   *     characterization.
+   * @param gearbox The type of and number of motors in the flywheel gearbox.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for velocity.
    */
   public FlywheelSim(
       LinearSystem<N1, N1, N1> plant, Gearbox gearbox, double... measurementStdDevs) {
