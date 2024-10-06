@@ -17,7 +17,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Force;
@@ -31,22 +31,15 @@ import edu.wpi.first.units.measure.MutLinearAcceleration;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutTorque;
 import edu.wpi.first.units.measure.MutVoltage;
-import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.units.measure.Voltage;
 
 /** Represents a simulated wheel mechanism. */
 public abstract class WheelSimBase extends LinearSystemSim<N2, N1, N2> {
-  /** Gearbox for the wheel. */
-  protected final DCMotor m_gearbox;
-
-  /** The gearing from the motors to the output. */
-  protected final double m_gearing;
+  /** The wheel object containing the radius and the gearbox. */
+  protected final Wheel m_wheel;
 
   /** The mass of the wheel. */
   private final Mass m_mass;
-
-  /** the radius of the wheel. */
-  protected final Distance m_radius;
 
   /** The position of the wheel. */
   private final MutDistance m_position = Meters.mutable(0.0);
@@ -63,41 +56,27 @@ public abstract class WheelSimBase extends LinearSystemSim<N2, N1, N2> {
   /** The voltage of the wheel. */
   protected final MutVoltage m_voltage = Volts.mutable(0.0);
 
-  /** The torque on the wheel's gearbox. */
-  protected final MutTorque m_torque = NewtonMeters.mutable(0.0);
-
   /** The force on the wheel. */
   protected final MutForce m_force = Newtons.mutable(0.0);
+
+  /** The torque on the wheel. */
+  protected final MutTorque m_torque = NewtonMeters.mutable(0.0);
 
   /**
    * Creates a simulated wheel mechanism.
    *
-   * @param plant The linear system that represents the wheel. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId #createWheelSystem(DCMotor, double,
-   *     double, double)}or {@link edu.wpi.first.math.system.plant.LinearSystemId
-   *     #identifyPositionSystem(double, double)}. If {@link
-   *     edu.wpi.first.math.system.plant.LinearSystemId #identifyPositionSystem(double, double)} is
-   *     used, the distance unit must be meters.
-   * @param gearbox The type of and number of motors in the wheel gearbox.
-   * @param gearing The gearing from the motors to the output.
+   * @param plant The linear system that represents the wheel
+   * @param wheel The wheel object containing the radius and the gearbox.
    * @param mass The mass of the wheel.
-   * @param radius The radius of the wheel.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
    */
   @SuppressWarnings("this-escape")
   public WheelSimBase(
-      LinearSystem<N2, N1, N2> plant,
-      DCMotor gearbox,
-      double gearing,
-      Mass mass,
-      Distance radius,
-      double... measurementStdDevs) {
+      LinearSystem<N2, N1, N2> plant, Wheel wheel, Mass mass, double... measurementStdDevs) {
     super(plant, measurementStdDevs);
-    m_gearbox = gearbox;
-    m_gearing = gearing;
+    m_wheel = wheel;
     m_mass = mass;
-    m_radius = radius;
   }
 
   /**
@@ -157,15 +136,6 @@ public abstract class WheelSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Returns the gear ratio of the wheel's gear box.
-   *
-   * @return the wheel gear box's gear ratio.
-   */
-  public double getGearing() {
-    return m_gearing;
-  }
-
-  /**
    * Returns the mass of the wheel in kilograms.
    *
    * @return the mass of the wheel in kilograms.
@@ -184,30 +154,12 @@ public abstract class WheelSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Returns the radius of the wheel in meters.
+   * Returns the wheel.
    *
-   * @return the radius of the wheel in meters.
+   * @return The wheel.
    */
-  public double getRadiusMeters() {
-    return m_radius.in(Meters);
-  }
-
-  /**
-   * Returns the radius of the wheel.
-   *
-   * @return the radius of the wheel.
-   */
-  public Distance getRadius() {
-    return m_radius;
-  }
-
-  /**
-   * Returns the gearbox for the wheel.
-   *
-   * @return The wheel's gearbox.
-   */
-  public DCMotor getGearbox() {
-    return m_gearbox;
+  public Wheel getWheel() {
+    return m_wheel;
   }
 
   /**
@@ -283,24 +235,6 @@ public abstract class WheelSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Returns the torque on the wheel's gearbox in Newton-Meters.
-   *
-   * @return The torque on the wheel's gearbox in Newton-Meters.
-   */
-  public double getTorqueNewtonMeters() {
-    return m_torque.in(NewtonMeters);
-  }
-
-  /**
-   * Returns the torque on the wheel's gearbox.
-   *
-   * @return The torque on the wheel's gearbox.
-   */
-  public Torque getTorque() {
-    return m_torque;
-  }
-
-  /**
    * Returns the force on the wheel in Newtons.
    *
    * @return The force on the wheel in Newtons.
@@ -344,14 +278,7 @@ public abstract class WheelSimBase extends LinearSystemSim<N2, N1, N2> {
     m_acceleration.mut_replace(
         (m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u)).get(0, 0),
         MetersPerSecondPerSecond);
-    // I = V / R - omega / (Kv * R)
-    // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
-    // spinning 10x faster than the output
-    // v = r w, so w = v/r
     m_currentDraw.mut_replace(
-        m_gearbox.getCurrent(
-                m_x.get(1, 0) * m_gearing / 2 / Math.PI / m_radius.in(Meters), m_u.get(0, 0))
-            * Math.signum(m_u.get(0, 0)),
-        Amps);
+        m_wheel.currentAmps(m_x.get(1, 0), m_u.get(0, 0)) * Math.signum(m_u.get(0, 0)), Amps);
   }
 }
