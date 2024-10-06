@@ -52,7 +52,7 @@ TEST_P(ArmSimulationTest, Teleop) {
   EXPECT_TRUE(frc::Preferences::ContainsKey(kArmPKey));
   frc::Preferences::SetDouble(kArmPositionKey, GetParam().value());
   units::degree_t setpoint = GetParam();
-  EXPECT_DOUBLE_EQ(GetParam().value(),
+  EXPECT_DOUBLE_EQ(setpoint.value(),
                    frc::Preferences::GetDouble(kArmPositionKey, NAN));
 
   // teleop init
