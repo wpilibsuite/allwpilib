@@ -18,9 +18,7 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.units.measure.Voltage;
 
-/**
- * Represents a gearbox with a non-zero number of DC motors of the same type.
- */
+/** Represents a gearbox with a non-zero number of DC motors of the same type. */
 public class Gearbox {
   /** The type of motor used in the gearbox. */
   public final DCMotorType motorType;
@@ -44,12 +42,10 @@ public class Gearbox {
   private final MutAngularVelocity m_angularVelocity = RadiansPerSecond.mutable(0.0);
 
   /**
-   * Creates a gearbox with the supplied motor type, reduction, and number of
-   * motors.
+   * Creates a gearbox with the supplied motor type, reduction, and number of motors.
    *
    * @param motorType The type of motor used in the gearbox.
-   * @param reduction The gearbox reduction as a ratio of output turns to input
-   *                  turns.
+   * @param reduction The gearbox reduction as a ratio of output turns to input turns.
    * @param numMotors The number of motors used in the gearbox.
    */
   public Gearbox(DCMotorType motorType, double reduction, int numMotors) {
@@ -59,8 +55,8 @@ public class Gearbox {
   }
 
   /**
-   * Creates a gearbox with the supplied motor type. The reduction is set to 1.0
-   * and the number of motors is set to 1.
+   * Creates a gearbox with the supplied motor type. The reduction is set to 1.0 and the number of
+   * motors is set to 1.
    *
    * @param motorType The type of motor used in the gearbox.
    */
@@ -69,8 +65,8 @@ public class Gearbox {
   }
 
   /**
-   * Creates a gearbox with the supplied motor type and number of motors. The
-   * reduction is set to 1.0.
+   * Creates a gearbox with the supplied motor type and number of motors. The reduction is set to
+   * 1.0.
    *
    * @param motorType The type of motor used in the gearbox.
    * @param numMotors The number of motors used in the gearbox.
@@ -80,27 +76,25 @@ public class Gearbox {
   }
 
   /**
-   * Creates a gearbox with the supplied motor type and reduction. The number of
-   * motors is set to 1.
+   * Creates a gearbox with the supplied motor type and reduction. The number of motors is set to 1.
    *
    * @param motorType The type of motor used in the gearbox.
-   * @param reduction The gearbox reduction as a ratio of output turns to input
-   *                  turns.
+   * @param reduction The gearbox reduction as a ratio of output turns to input turns.
    */
   public Gearbox(DCMotorType motorType, double reduction) {
     this(motorType, reduction, 1);
   }
 
   /**
-   * Calculates net current drawn by the motors with given speed and input
-   * voltage.
+   * Calculates net current drawn by the motors with given speed and input voltage.
    *
    * @param angularVelocity The angular velocity of the motor.
-   * @param voltage         The voltage being applied to the motor.
+   * @param voltage The voltage being applied to the motor.
    * @return The estimated current.
    */
   public Current current(AngularVelocity angularVelocity, Voltage voltage) {
-    m_current.mut_replace(currentAmps(angularVelocity.in(RadiansPerSecond), voltage.in(Volts)), Amps);
+    m_current.mut_replace(
+        currentAmps(angularVelocity.in(RadiansPerSecond), voltage.in(Volts)), Amps);
     return m_current;
   }
 
@@ -116,19 +110,18 @@ public class Gearbox {
   }
 
   /**
-   * Calculates net current drawn in amps by the motors with given speed and input
-   * voltage.
+   * Calculates net current drawn in amps by the motors with given speed and input voltage.
    *
    * @param speedRadiansPerSec The current angular velocity of the motor.
-   * @param voltageInputVolts  The voltage being applied to the motor.
+   * @param voltageInputVolts The voltage being applied to the motor.
    * @return The estimated current in amps.
    */
   public double currentAmps(double speedRadiansPerSec, double voltageInputVolts) {
     return -numMotors
-        * speedRadiansPerSec
-        * reduction
-        / motorType.kvRadPerSecPerVolt
-        / motorType.rOhms
+            * speedRadiansPerSec
+            * reduction
+            / motorType.kvRadPerSecPerVolt
+            / motorType.rOhms
         + numMotors * voltageInputVolts / motorType.rOhms;
   }
 
@@ -154,8 +147,7 @@ public class Gearbox {
   }
 
   /**
-   * Calculate the torque in Newton-Meters produced by the motors with a given
-   * current.
+   * Calculate the torque in Newton-Meters produced by the motors with a given current.
    *
    * @param currentAmpere The net current drawn by the motors in amps.
    * @return The torque output in Newton-Meters.
@@ -165,26 +157,23 @@ public class Gearbox {
   }
 
   /**
-   * Calculate the voltage provided to the motors for a given torque and angular
-   * velocity.
+   * Calculate the voltage provided to the motors for a given torque and angular velocity.
    *
-   * @param torque          The torque produced by the motor.
+   * @param torque The torque produced by the motor.
    * @param angularVelocity The angular velocity of the motor.
    * @return The voltage of the motor.
    */
   public Voltage voltage(Torque torque, AngularVelocity angularVelocity) {
-    m_voltage.mut_replace(voltageVolts(torque.in(NewtonMeters), angularVelocity.in(RadiansPerSecond)), Volts);
+    m_voltage.mut_replace(
+        voltageVolts(torque.in(NewtonMeters), angularVelocity.in(RadiansPerSecond)), Volts);
     return m_voltage;
   }
 
   /**
-   * Calculate the voltage provided to the motors for a given torque and angular
-   * velocity in volts.
+   * Calculate the voltage provided to the motors for a given torque and angular velocity in volts.
    *
-   * @param torqueNm                 The torque produced by the motor in
-   *                                 Newton-Meters.
-   * @param angularVelocityRadPerSec The angular velocity of the motor in
-   *                                 radians per second.
+   * @param torqueNm The torque produced by the motor in Newton-Meters.
+   * @param angularVelocityRadPerSec The angular velocity of the motor in radians per second.
    * @return The voltage of the motor in volts.
    */
   public double voltageVolts(double torqueNm, double angularVelocityRadPerSec) {
@@ -193,24 +182,23 @@ public class Gearbox {
   }
 
   /**
-   * Calculates the angular speed produced by the motor at a given torque and
-   * input voltage.
+   * Calculates the angular speed produced by the motor at a given torque and input voltage.
    *
-   * @param torque  The torque produced by the motor.
+   * @param torque The torque produced by the motor.
    * @param voltage The voltage applied to the motor.
    * @return The angular speed of the motor.
    */
   public AngularVelocity angularVelocity(Torque torque, Voltage voltage) {
-    m_angularVelocity.mut_replace(angularVelocityRadPerSec(torque.in(NewtonMeters), voltage.in(Volts)),
-        RadiansPerSecond);
+    m_angularVelocity.mut_replace(
+        angularVelocityRadPerSec(torque.in(NewtonMeters), voltage.in(Volts)), RadiansPerSecond);
     return m_angularVelocity;
   }
 
   /**
-   * Calculates the angular speed produced by the motor at a given torque and
-   * input voltage in radians per second.
+   * Calculates the angular speed produced by the motor at a given torque and input voltage in
+   * radians per second.
    *
-   * @param torqueNm          The torque produced by the motor in Newton-Meters.
+   * @param torqueNm The torque produced by the motor in Newton-Meters.
    * @param voltageInputVolts The voltage applied to the motor in volts.
    * @return The angular speed of the motor.
    */

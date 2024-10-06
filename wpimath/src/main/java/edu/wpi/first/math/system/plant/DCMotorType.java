@@ -76,10 +76,10 @@ public class DCMotorType {
    * Constructs a DCMotorConstants object.
    *
    * @param nominalVoltage The voltage at which the motor constants were measured.
-   * @param stallTorque    The torque when stalled.
-   * @param stallCurrent   The current draw when stalled.
-   * @param freeCurrent    The current draw under no load.
-   * @param freeSpeed      The angular velocity under no load.
+   * @param stallTorque The torque when stalled.
+   * @param stallCurrent The current draw when stalled.
+   * @param freeCurrent The current draw under no load.
+   * @param freeSpeed The angular velocity under no load.
    */
   public DCMotorType(
       Voltage nominalVoltage,
@@ -99,9 +99,10 @@ public class DCMotorType {
     freeSpeedRadPerSec = freeSpeed.in(RadiansPerSecond);
     R = nominalVoltage.divide(stallCurrent);
     rOhms = R.in(Volts.per(Amp));
-    Kv = Per.ofBaseUnits(
-        freeSpeedRadPerSec / (nominalVoltageVolts - rOhms * freeCurrentAmps),
-        RadiansPerSecond.per(Volt));
+    Kv =
+        Per.ofBaseUnits(
+            freeSpeedRadPerSec / (nominalVoltageVolts - rOhms * freeCurrentAmps),
+            RadiansPerSecond.per(Volt));
     kvRadPerSecPerVolt = Kv.in(RadiansPerSecond.per(Volt));
     Kt = stallTorque.divide(stallCurrent);
     ktNMPerAmp = Kt.in(NewtonMeters.per(Amp));
@@ -110,13 +111,11 @@ public class DCMotorType {
   /**
    * Constructs a DCMotorConstants object.
    *
-   * @param nominalVoltageVolts     The voltage at which the motor constants were
-   *                                measured in volts.
+   * @param nominalVoltageVolts The voltage at which the motor constants were measured in volts.
    * @param stallTorqueNewtonMeters The torque when stalled in Newton-Meters.
-   * @param stallCurrentAmps        The current draw when stalled in amps.
-   * @param freeCurrentAmps         The current draw under no load in amps.
-   * @param freeSpeedRadPerSec      The angular velocity under no load in radians
-   *                                per second.
+   * @param stallCurrentAmps The current draw when stalled in amps.
+   * @param freeCurrentAmps The current draw under no load in amps.
+   * @param freeSpeedRadPerSec The angular velocity under no load in radians per second.
    */
   public DCMotorType(
       double nominalVoltageVolts,
@@ -133,98 +132,102 @@ public class DCMotorType {
   }
 
   /** DC motor constants for a VEX CIM motor. */
-  public static final DCMotorType CIM = new DCMotorType(
-      Volts.of(12), NewtonMeters.of(2.42), Amps.of(133), Amps.of(2.7), RPM.of(5310));
+  public static final DCMotorType CIM =
+      new DCMotorType(
+          Volts.of(12), NewtonMeters.of(2.42), Amps.of(133), Amps.of(2.7), RPM.of(5310));
 
   /** DC motor constants for a VEX 775Pro motor. */
-  public static final DCMotorType Vex775Pro = new DCMotorType(
-      Volts.of(12), NewtonMeters.of(0.71), Amps.of(134), Amps.of(0.7), RPM.of(18730));
+  public static final DCMotorType Vex775Pro =
+      new DCMotorType(
+          Volts.of(12), NewtonMeters.of(0.71), Amps.of(134), Amps.of(0.7), RPM.of(18730));
 
   /** DC motor constants for a REV NEO brushless motor. */
-  public static final DCMotorType NEO = new DCMotorType(Volts.of(12), NewtonMeters.of(2.6), Amps.of(105), Amps.of(1.8),
-      RPM.of(5676));
+  public static final DCMotorType NEO =
+      new DCMotorType(Volts.of(12), NewtonMeters.of(2.6), Amps.of(105), Amps.of(1.8), RPM.of(5676));
 
   /** DC motor constants for a VEX MiniCIM motor. */
-  public static final DCMotorType MiniCIM = new DCMotorType(Volts.of(12), NewtonMeters.of(1.41), Amps.of(89),
-      Amps.of(3.0), RPM.of(5840));
+  public static final DCMotorType MiniCIM =
+      new DCMotorType(Volts.of(12), NewtonMeters.of(1.41), Amps.of(89), Amps.of(3.0), RPM.of(5840));
 
   /** DC motor constants for a VEX Bag motor. */
-  public static final DCMotorType Bag = new DCMotorType(
-      Volts.of(12), NewtonMeters.of(0.43), Amps.of(53), Amps.of(1.8), RPM.of(13180));
+  public static final DCMotorType Bag =
+      new DCMotorType(
+          Volts.of(12), NewtonMeters.of(0.43), Amps.of(53), Amps.of(1.8), RPM.of(13180));
 
   /** DC motor constants for a Andymark RS775-125 motor. */
-  public static final DCMotorType AndymarkRs775_125 = new DCMotorType(
-      Volts.of(12), NewtonMeters.of(0.28), Amps.of(18), Amps.of(1.6), RPM.of(5800.0));
+  public static final DCMotorType AndymarkRs775_125 =
+      new DCMotorType(
+          Volts.of(12), NewtonMeters.of(0.28), Amps.of(18), Amps.of(1.6), RPM.of(5800.0));
 
   /** DC motor constants for a Banebots RS775 motor. */
-  public static final DCMotorType BanebotsRs775 = new DCMotorType(
-      Volts.of(12), NewtonMeters.of(0.72), Amps.of(97), Amps.of(2.7), RPM.of(13050.0));
+  public static final DCMotorType BanebotsRs775 =
+      new DCMotorType(
+          Volts.of(12), NewtonMeters.of(0.72), Amps.of(97), Amps.of(2.7), RPM.of(13050.0));
 
   /** DC motor constants for a Andymark 9015 motor. */
-  public static final DCMotorType Andymark9015 = new DCMotorType(
-      Volts.of(12), NewtonMeters.of(0.36), Amps.of(71), Amps.of(3.7), RPM.of(14270.0));
+  public static final DCMotorType Andymark9015 =
+      new DCMotorType(
+          Volts.of(12), NewtonMeters.of(0.36), Amps.of(71), Amps.of(3.7), RPM.of(14270.0));
 
   /** DC motor constants for a Banebots RS 550 motor. */
-  public static final DCMotorType BanebotsRs550 = new DCMotorType(
-      Volts.of(12), NewtonMeters.of(0.38), Amps.of(84), Amps.of(0.4), RPM.of(19000.0));
+  public static final DCMotorType BanebotsRs550 =
+      new DCMotorType(
+          Volts.of(12), NewtonMeters.of(0.38), Amps.of(84), Amps.of(0.4), RPM.of(19000.0));
 
   /** DC motor constants for a REV NEO 550 brushless motor. */
-  public static final DCMotorType Neo550 = new DCMotorType(
-      Volts.of(12), NewtonMeters.of(0.97), Amps.of(100), Amps.of(1.4), RPM.of(11000.0));
+  public static final DCMotorType Neo550 =
+      new DCMotorType(
+          Volts.of(12), NewtonMeters.of(0.97), Amps.of(100), Amps.of(1.4), RPM.of(11000.0));
 
   /**
    * DC motor constants for a VEX Falcon 500 brushless motor.
    *
-   * <p>
-   * https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
+   * <p>https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
    */
-  public static final DCMotorType Falcon500 = new DCMotorType(
-      Volts.of(12), NewtonMeters.of(4.69), Amps.of(257), Amps.of(1.5), RPM.of(6380.0));
+  public static final DCMotorType Falcon500 =
+      new DCMotorType(
+          Volts.of(12), NewtonMeters.of(4.69), Amps.of(257), Amps.of(1.5), RPM.of(6380.0));
 
   /**
-   * DC motor constants for a VEX Falcon 500 brushless motor with FOC
-   * (Field-Oriented Control).
+   * DC motor constants for a VEX Falcon 500 brushless motor with FOC (Field-Oriented Control).
    *
-   * <p>
-   * https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
+   * <p>https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
    */
-  public static final DCMotorType Falcon500FOC = new DCMotorType(
-      Volts.of(12), NewtonMeters.of(5.84), Amps.of(304), Amps.of(1.5), RPM.of(6080.0));
+  public static final DCMotorType Falcon500FOC =
+      new DCMotorType(
+          Volts.of(12), NewtonMeters.of(5.84), Amps.of(304), Amps.of(1.5), RPM.of(6080.0));
 
   /**
    * DC motor constants for a Romi/TI_RSLK MAX motor.
    *
-   * <p>
-   * https://www.pololu.com/product/1520/specs
+   * <p>https://www.pololu.com/product/1520/specs
    */
-  public static final DCMotorType RomiBuiltIn = new DCMotorType(
-      Volts.of(4.5), NewtonMeters.of(0.1765), Amps.of(1.25), Amps.of(0.13), RPM.of(150.0));
+  public static final DCMotorType RomiBuiltIn =
+      new DCMotorType(
+          Volts.of(4.5), NewtonMeters.of(0.1765), Amps.of(1.25), Amps.of(0.13), RPM.of(150.0));
 
   /**
    * DC motor constants for a Kraken X60 brushless motor.
    *
-   * <p>
-   * https://store.ctr-electronics.com/announcing-kraken-x60/
+   * <p>https://store.ctr-electronics.com/announcing-kraken-x60/
    */
-  public static final DCMotorType KrakenX60 = new DCMotorType(Volts.of(12), NewtonMeters.of(7.09), Amps.of(366),
-      Amps.of(2), RPM.of(6000));
+  public static final DCMotorType KrakenX60 =
+      new DCMotorType(Volts.of(12), NewtonMeters.of(7.09), Amps.of(366), Amps.of(2), RPM.of(6000));
 
   /**
-   * DC motor constants for a Kraken X60 brushless motor with FOC (Field-Oriented
-   * Control) enabled.
+   * DC motor constants for a Kraken X60 brushless motor with FOC (Field-Oriented Control) enabled.
    *
-   * <p>
-   * https://store.ctr-electronics.com/announcing-kraken-x60/
+   * <p>https://store.ctr-electronics.com/announcing-kraken-x60/
    */
-  public static final DCMotorType KrakenX60FOC = new DCMotorType(Volts.of(12), NewtonMeters.of(9.37), Amps.of(483),
-      Amps.of(2), RPM.of(5800));
+  public static final DCMotorType KrakenX60FOC =
+      new DCMotorType(Volts.of(12), NewtonMeters.of(9.37), Amps.of(483), Amps.of(2), RPM.of(5800));
 
   /**
    * DC motor constants for a REV Neo Vortex brushless motor.
    *
-   * <p>
-   * https://www.revrobotics.com/next-generation-spark-neo/
+   * <p>https://www.revrobotics.com/next-generation-spark-neo/
    */
-  public static final DCMotorType NeoVortex = new DCMotorType(
-      Volts.of(12), NewtonMeters.of(3.60), Amps.of(211), Amps.of(3.6), RPM.of(6784));
+  public static final DCMotorType NeoVortex =
+      new DCMotorType(
+          Volts.of(12), NewtonMeters.of(3.60), Amps.of(211), Amps.of(3.6), RPM.of(6784));
 }
