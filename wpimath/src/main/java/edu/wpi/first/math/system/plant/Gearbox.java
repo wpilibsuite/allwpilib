@@ -64,8 +64,8 @@ public class Gearbox {
    *
    * @param motorType The type of motor used in the gearbox.
    */
-  public Gearbox(DCMotorType motortype) {
-    this(motortype, 1.0, 1);
+  public Gearbox(DCMotorType motorType) {
+    this(motorType, 1.0, 1);
   }
 
   /**
