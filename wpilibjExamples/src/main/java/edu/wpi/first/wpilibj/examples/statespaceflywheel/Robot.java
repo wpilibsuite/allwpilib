@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
   // Outputs (what we can measure): [velocity], in radians per second.
   private final LinearSystem<N1, N1, N1> m_flywheelPlant =
       LinearSystemId.createFlywheelSystem(
-          new Gearbox(DCMotorType.NEO, kFlywheelGearing, 2), kFlywheelMomentOfInertia);
+          new Gearbox(2, DCMotorType.NEO, kFlywheelGearing), kFlywheelMomentOfInertia);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   private final KalmanFilter<N1, N1, N1> m_observer =

@@ -97,7 +97,7 @@ class LinearSystemLoopTest {
   @Test
   void testFlywheelEnabled() {
     LinearSystem<N1, N1, N1> plant =
-        LinearSystemId.createFlywheelSystem(new Gearbox(DCMotorType.NEO, 2), 0.00289);
+        LinearSystemId.createFlywheelSystem(new Gearbox(2, DCMotorType.NEO), 0.00289);
     KalmanFilter<N1, N1, N1> observer =
         new KalmanFilter<>(
             Nat.N1(), Nat.N1(), plant, VecBuilder.fill(1.0), VecBuilder.fill(kPositionStddev), kDt);

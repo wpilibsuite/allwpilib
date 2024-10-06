@@ -208,19 +208,15 @@ public final class LinearSystemId {
    * position, angular velocity], inputs are [voltage], and outputs are [angular position, angular
    * velocity].
    *
-   * @param motor The motor (or gearbox) attached to system.
+   * @param gearbox The gearbox attached to system.
    * @param JKgMetersSquared The moment of inertia J of the DC motor.
-   * @param gearing The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or gearing &lt;= 0.
+   * @throws IllegalArgumentException if JKgMetersSquared &leq; 0.
    */
   public static LinearSystem<N2, N1, N2> createDCMotorSystem(
-      DCMotor motor, double JKgMetersSquared, double gearing) {
+      Gearbox gearbox, double JKgMetersSquared) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
-    }
-    if (gearing <= 0.0) {
-      throw new IllegalArgumentException("gearing must be greater than zero.");
     }
 
     return new LinearSystem<>(
@@ -230,11 +226,18 @@ public final class LinearSystemId {
             0,
             1,
             0,
-            -gearing
-                * gearing
-                * motor.KtNMPerAmp
-                / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgMetersSquared)),
-        VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * JKgMetersSquared)),
+            -Math.pow(gearbox.reduction, 2)
+                * gearbox.numMotors
+                * gearbox.motorType.KtNMPerAmp
+                / (gearbox.motorType.KvRadPerSecPerVolt
+                    * gearbox.motorType.rOhms
+                    * JKgMetersSquared)),
+        VecBuilder.fill(
+            0,
+            gearbox.numMotors
+                * gearbox.reduction
+                * gearbox.motorType.KtNMPerAmp
+                / (gearbox.motorType.rOhms * JKgMetersSquared)),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));
   }
@@ -244,15 +247,13 @@ public final class LinearSystemId {
    * position, angular velocity], inputs are [voltage], and outputs are [angular position, angular
    * velocity].
    *
-   * @param motor The motor (or gearbox) attached to system.
+   * @param gearbox The gearbox attached to system.
    * @param J The moment of inertia J of the DC motor.
-   * @param gearing The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if J &lt;= 0 or gearing &lt;= 0.
+   * @throws IllegalArgumentException if J &leq; 0.
    */
-  public static LinearSystem<N2, N1, N2> createDCMotorSystem(
-      DCMotor motor, MomentOfInertia J, double gearing) {
-    return createDCMotorSystem(motor, J.in(KilogramSquareMeters), gearing);
+  public static LinearSystem<N2, N1, N2> createDCMotorSystem(Gearbox gearbox, MomentOfInertia J) {
+    return createDCMotorSystem(gearbox, J.in(KilogramSquareMeters));
   }
 
   /**

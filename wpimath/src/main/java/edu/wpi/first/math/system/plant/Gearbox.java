@@ -44,17 +44,17 @@ public class Gearbox {
   /**
    * Creates a gearbox with the supplied motor type, reduction, and number of motors.
    *
+   * @param numMotors The number of motors used in the gearbox.
    * @param motorType The type of motor used in the gearbox.
    * @param reduction The gearbox reduction as a ratio of output turns to input turns.
-   * @param numMotors The number of motors used in the gearbox.
    * @throws IllegalArgumentException if reduction &leq; 0 or numMotors &leq; 0.
    */
-  public Gearbox(DCMotorType motorType, double reduction, int numMotors) {
-    if (reduction <= 0) {
-      throw new IllegalArgumentException("reduction must be greater than zero.");
-    }
+  public Gearbox(int numMotors, DCMotorType motorType, double reduction) {
     if (numMotors <= 0) {
       throw new IllegalArgumentException("numMotors must be greater than zero.");
+    }
+    if (reduction <= 0) {
+      throw new IllegalArgumentException("reduction must be greater than zero.");
     }
     this.motorType = motorType;
     this.reduction = reduction;
@@ -68,19 +68,19 @@ public class Gearbox {
    * @param motorType The type of motor used in the gearbox.
    */
   public Gearbox(DCMotorType motorType) {
-    this(motorType, 1.0, 1);
+    this(1, motorType, 1.0);
   }
 
   /**
    * Creates a gearbox with the supplied motor type and number of motors. The reduction is set to
    * 1.0.
    *
-   * @param motorType The type of motor used in the gearbox.
    * @param numMotors The number of motors used in the gearbox.
+   * @param motorType The type of motor used in the gearbox.
    * @throws IllegalArgumentException if numMotors &leq; 0.
    */
-  public Gearbox(DCMotorType motorType, int numMotors) {
-    this(motorType, 1.0, numMotors);
+  public Gearbox(int numMotors, DCMotorType motorType) {
+    this(numMotors, motorType, 1.0);
   }
 
   /**
@@ -90,7 +90,7 @@ public class Gearbox {
    * @param reduction The gearbox reduction as a ratio of output turns to input turns.
    */
   public Gearbox(DCMotorType motorType, double reduction) {
-    this(motorType, reduction, 1);
+    this(1, motorType, reduction);
   }
 
   /**
@@ -228,6 +228,6 @@ public class Gearbox {
    * @return A motor with the gearbox reduction applied.
    */
   public Gearbox withReduction(double reduction) {
-    return new Gearbox(motorType, reduction, numMotors);
+    return new Gearbox(numMotors, motorType, reduction);
   }
 }

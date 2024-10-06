@@ -57,7 +57,7 @@ class LinearSystemIDTest {
 
   @Test
   void testFlywheelSystem() {
-    var model = LinearSystemId.createFlywheelSystem(new Gearbox(DCMotorType.NEO, 2), 0.00032);
+    var model = LinearSystemId.createFlywheelSystem(new Gearbox(2, DCMotorType.NEO), 0.00032);
     assertTrue(model.getA().isEqual(VecBuilder.fill(-26.87032), 0.001));
 
     assertTrue(model.getB().isEqual(VecBuilder.fill(1354.166667), 0.001));
@@ -69,7 +69,7 @@ class LinearSystemIDTest {
 
   @Test
   void testDCMotorSystem() {
-    var model = LinearSystemId.createDCMotorSystem(DCMotor.getNEO(2), 0.00032, 1.0);
+    var model = LinearSystemId.createDCMotorSystem(new Gearbox(2, DCMotorType.NEO), 0.00032);
     assertTrue(
         model.getA().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -26.87032), 0.001));
 

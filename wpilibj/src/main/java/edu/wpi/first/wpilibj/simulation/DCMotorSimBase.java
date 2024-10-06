@@ -19,6 +19,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -36,10 +37,7 @@ import edu.wpi.first.units.measure.Voltage;
 /** Represents a simulated DC motor mechanism. */
 public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
   /** Gearbox for the DC motor. */
-  protected final DCMotor m_gearbox;
-
-  /** The gearing from the motors to the output. */
-  protected final double m_gearing;
+  protected final Gearbox m_gearbox;
 
   /** The moment of inertia for the flywheel mechanism. */
   private final MomentOfInertia m_j;
@@ -73,7 +71,6 @@ public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}
    *     is used, the distance unit must be radians.
    * @param gearbox The type of and number of motors in the DC motor gearbox.
-   * @param gearing The gearing from the motors to the output.
    * @param J The moment of inertia for the flywheel mechanism.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
@@ -81,13 +78,11 @@ public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
    */
   public DCMotorSimBase(
       LinearSystem<N2, N1, N2> plant,
-      DCMotor gearbox,
-      double gearing,
+      Gearbox gearbox,
       MomentOfInertia J,
       double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
-    m_gearing = gearing;
     m_j = J;
   }
 
@@ -148,15 +143,6 @@ public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Returns the gear ratio of the DC motor.
-   *
-   * @return the DC motor's gear ratio.
-   */
-  public double getGearing() {
-    return m_gearing;
-  }
-
-  /**
    * Returns the moment of inertia in kilograms meters squared.
    *
    * @return The DC motor's moment of inertia in kilograms meters squared.
@@ -179,7 +165,7 @@ public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
    *
    * @return The DC motor's gearbox.
    */
-  public DCMotor getGearbox() {
+  public Gearbox getGearbox() {
     return m_gearbox;
   }
 

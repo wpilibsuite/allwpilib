@@ -13,6 +13,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.units.measure.Torque;
 
 /** Represents a simulated DC motor mechanism controlled by torque input. */
@@ -27,16 +28,12 @@ public class DCMotorSimTorque extends DCMotorSimBase {
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}
    *     is used, the distance unit must be radians.
    * @param gearbox The type of and number of motors in the DC motor gearbox.
-   * @param gearing The gearing from the motors to the output.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
    */
   public DCMotorSimTorque(
-      LinearSystem<N2, N1, N2> plant,
-      DCMotor gearbox,
-      double gearing,
-      double... measurementStdDevs) {
+      LinearSystem<N2, N1, N2> plant, Gearbox gearbox, double... measurementStdDevs) {
     // By equations 12.17 of
     // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
     // the torque applied to a DC motor mechanism is τ = Jα.
@@ -51,11 +48,7 @@ public class DCMotorSimTorque extends DCMotorSimBase {
     // B = 1/J
     // J = 1/B
     super(
-        plant,
-        gearbox,
-        gearing,
-        KilogramSquareMeters.of(1.0 / plant.getB().get(1, 0)),
-        measurementStdDevs);
+        plant, gearbox, KilogramSquareMeters.of(1.0 / plant.getB().get(1, 0)), measurementStdDevs);
   }
 
   /**
@@ -82,8 +75,8 @@ public class DCMotorSimTorque extends DCMotorSimBase {
   public void update(double dtSeconds) {
     super.update(dtSeconds);
     m_currentDraw.mut_replace(
-        m_gearbox.getCurrent(getInput(0)) * m_gearing * Math.signum(m_u.get(0, 0)), Amps);
-    m_voltage.mut_replace(m_gearbox.getVoltage(getInput(0), m_x.get(1, 0)), Volts);
+        m_gearbox.currentAmps(getInput(0)) * Math.signum(m_u.get(0, 0)), Amps);
+    m_voltage.mut_replace(m_gearbox.voltageVolts(getInput(0), m_x.get(1, 0)), Volts);
     m_torque.mut_replace(getInput(0), NewtonMeters);
   }
 }
