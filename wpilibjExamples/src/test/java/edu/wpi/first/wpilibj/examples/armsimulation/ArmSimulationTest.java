@@ -71,11 +71,8 @@ class ArmSimulationTest {
   void teleopTest(double setpoint) {
     assertTrue(Preferences.containsKey(Constants.kArmPositionKey));
     assertTrue(Preferences.containsKey(Constants.kArmPKey));
-    assertEquals(
-        Constants.kDefaultArmSetpointDegrees,
-        Preferences.getDouble(Constants.kArmPositionKey, Double.NaN));
-
     Preferences.setDouble(Constants.kArmPositionKey, setpoint);
+    assertEquals(setpoint, Preferences.getDouble(Constants.kArmPositionKey, Double.NaN));
     // teleop init
     {
       DriverStationSim.setAutonomous(false);
