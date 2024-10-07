@@ -16,7 +16,6 @@ import static edu.wpi.first.units.Units.VoltsPerMeterPerSecondSquared;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.units.LinearAccelerationUnit;
