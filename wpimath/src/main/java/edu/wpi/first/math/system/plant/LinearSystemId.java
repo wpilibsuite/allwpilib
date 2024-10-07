@@ -531,7 +531,7 @@ public final class LinearSystemId {
     if (radiusMeters <= 0.0) {
       throw new IllegalArgumentException("radiusMeters must be greater than zero.");
     }
-    if(numWheels <= 0.0){
+    if(numWheels <= 0){
       throw new IllegalArgumentException("numWheels must be greater than zero.");
     }    
 
