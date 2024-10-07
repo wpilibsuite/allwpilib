@@ -5,12 +5,12 @@
 package edu.wpi.first.wpilibj.sysid;
 
 import edu.wpi.first.units.AngleUnit;
-import edu.wpi.first.units.DistanceUnit;
-import edu.wpi.first.units.AngularVelocityUnit;
-import edu.wpi.first.units.LinearVelocityUnit;
 import edu.wpi.first.units.AngularAccelerationUnit;
-import edu.wpi.first.units.LinearAccelerationUnit;
+import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.CurrentUnit;
+import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.LinearAccelerationUnit;
+import edu.wpi.first.units.LinearVelocityUnit;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
