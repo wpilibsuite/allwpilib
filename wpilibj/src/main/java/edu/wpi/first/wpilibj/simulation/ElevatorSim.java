@@ -34,9 +34,8 @@ public class ElevatorSim extends ElevatorSimBase {
    * Creates a simulated elevator mechanism.
    *
    * @param plant The linear system that represents the elevator. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *     double, double)}or {@link
-   *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double)} or 
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
    *     double)} is used, the distance unit must be meters.
    * @param drum The elevator's drum.
@@ -73,9 +72,8 @@ public class ElevatorSim extends ElevatorSimBase {
    * Creates a simulated elevator mechanism.
    *
    * @param plant The linear system that represents the elevator. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *     double, double)}or {@link
-   *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(Wheel, double)} or 
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
    *     double)} is used, the distance unit must be meters.
    * @param drum The elevator's drum.
