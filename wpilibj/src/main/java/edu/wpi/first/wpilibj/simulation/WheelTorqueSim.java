@@ -13,7 +13,6 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.units.measure.Torque;
 
@@ -23,8 +22,7 @@ public class WheelTorqueSim extends WheelSimBase {
    * Creates a simulated wheel mechanism.
    *
    * @param plant The linear system that represents the wheel. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createWheelSystem(DCMotor, double,
-   *     double, double)}or {@link
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createWheelTorqueSystem(double, double)}or {@link
    *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
    *     double)} is used, the distance unit must be meters.

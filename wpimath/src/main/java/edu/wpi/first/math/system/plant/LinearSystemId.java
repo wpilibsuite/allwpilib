@@ -460,7 +460,7 @@ public final class LinearSystemId {
    * linear velocity], inputs are [voltage], and outputs are [linear position, linear velocity].
    *
    * @param wheel The wheel object containing the gearbox and wheel radius.
-   * @param massKg The mass of the system, in kilograms.
+   * @param massKg The mass of the system driven by the wheel, in kilograms.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if massKg &leq; 0.
    */
@@ -498,7 +498,7 @@ public final class LinearSystemId {
    * linear velocity], inputs are [voltage], and outputs are [linear position, linear velocity].
    *
    * @param wheel The wheel object containing the gearbox and wheel radius.
-   * @param mass The mass of the system.
+   * @param mass The mass of the system driven by the wheel.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if mass &lt;= 0, radius &lt;= 0, or gearing &lt;= 0.
    */
@@ -510,7 +510,7 @@ public final class LinearSystemId {
    * Create a state-space model of a wheel system. The states of the system are [linear position,
    * linear velocity], inputs are [torque], and outputs are [linear position, linear velocity].
    *
-   * @param massKg The mass of the system, in kilograms.
+   * @param massKg The mass of the system driven by the wheel, in kilograms.
    * @param radiusMeters The radius of the system, in meters.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0.
@@ -535,7 +535,7 @@ public final class LinearSystemId {
    * Create a state-space model of a wheel system. The states of the system are [linear position,
    * linear velocity], inputs are [torque], and outputs are [linear position, linear velocity].
    *
-   * @param mass The mass of the system.
+   * @param mass The mass of the system driven by the wheel.
    * @param radius The radius of the system.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if mass &lt;= 0, radius &lt;= 0.

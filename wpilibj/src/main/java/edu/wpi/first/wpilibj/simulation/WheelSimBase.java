@@ -38,7 +38,7 @@ public abstract class WheelSimBase extends LinearSystemSim<N2, N1, N2> {
   /** The wheel object containing the radius and the gearbox. */
   protected final Wheel m_wheel;
 
-  /** The mass of the wheel. */
+  /** The mass of the system driven by the wheel. */
   private final Mass m_mass;
 
   /** The position of the wheel. */
@@ -67,7 +67,7 @@ public abstract class WheelSimBase extends LinearSystemSim<N2, N1, N2> {
    *
    * @param plant The linear system that represents the wheel
    * @param wheel The wheel object containing the radius and the gearbox.
-   * @param mass The mass of the wheel.
+   * @param mass The mass of the system drive by the wheel.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
    */
