@@ -26,7 +26,7 @@ import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Torque;
 
 /** Represents a simulated elevator mechanism controlled by torque input. */
-public class ElevatorTorqueSim extends ElevatorSimBase {
+public class ElevatorSimTorque extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
    *
@@ -45,7 +45,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
    */
-  public ElevatorTorqueSim(
+  public ElevatorSimTorque(
       LinearSystem<N2, N1, N2> plant,
       Wheel drum,
       double minHeightMeters,
@@ -81,7 +81,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
    */
-  public ElevatorTorqueSim(
+  public ElevatorSimTorque(
       LinearSystem<N2, N1, N2> plant,
       Wheel drum,
       Distance minHeight,
@@ -126,7 +126,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
    */
-  public ElevatorTorqueSim(
+  public ElevatorSimTorque(
       Per<TorqueUnit, LinearVelocityUnit> kv,
       Per<TorqueUnit, LinearAccelerationUnit> ka,
       Torque kg,
@@ -159,7 +159,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
    */
-  public ElevatorTorqueSim(
+  public ElevatorSimTorque(
       double kv,
       double ka,
       double kg,
