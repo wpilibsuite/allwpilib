@@ -469,7 +469,7 @@ public final class LinearSystemId {
     if (massKg <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
     }
-    if(numWheels <= 0.0){
+    if(numWheels <= 0){
       throw new IllegalArgumentException("numWheels must be greater than zero.");
     }
 
