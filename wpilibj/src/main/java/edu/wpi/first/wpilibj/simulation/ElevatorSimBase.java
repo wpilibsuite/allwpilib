@@ -20,7 +20,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Force;
@@ -39,17 +39,11 @@ import edu.wpi.first.units.measure.Voltage;
 
 /** Represents a simulated elevator mechanism. */
 public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
-  /** Gearbox for the elevator. */
-  protected final DCMotor m_gearbox;
-
-  /** The gearing from the motors to the output. */
-  protected final double m_gearing;
+  /** The elevator's drum. */
+  protected final Wheel m_drum;
 
   /** The mass of the elevator carriage. */
   private final Mass m_mass;
-
-  /** the drum radius of the elevator. */
-  protected final Distance m_drumRadius;
 
   /** The min allowable height for the elevator. */
   private final Distance m_minHeight;
@@ -75,25 +69,18 @@ public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
   /** The voltage of the elevator. */
   protected final MutVoltage m_voltage = Volts.mutable(0.0);
 
-  /** The torque on the elevator's drum. */
-  protected final MutTorque m_torque = NewtonMeters.mutable(0.0);
-
   /** The force on the elevator's carriage. */
   protected final MutForce m_force = Newtons.mutable(0.0);
+
+  /** The torque on the elevator's drum. */
+  protected final MutTorque m_torque = NewtonMeters.mutable(0.0);
 
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param plant The linear system that represents the elevator. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *     double, double)}or {@link
-   *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
-   *     double)} is used, the distance unit must be meters.
-   * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param gearing The gearing from the motors to the output.
+   * @param plant The linear system that represents the elevator.
+   * @param drum The elevator's drum.
    * @param mass The mass of the elevator's carriage.
-   * @param drumRadius The radius of the elevator's drum.
    * @param minHeight The min allowable height of the elevator.
    * @param maxHeight The max allowable height of the elevator.
    * @param g The acceleration due to gravity.
@@ -104,20 +91,16 @@ public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
   @SuppressWarnings("this-escape")
   public ElevatorSimBase(
       LinearSystem<N2, N1, N2> plant,
-      DCMotor gearbox,
-      double gearing,
+      Wheel drum,
       Mass mass,
-      Distance drumRadius,
       Distance minHeight,
       Distance maxHeight,
       LinearAcceleration g,
       Distance startingHeight,
       double... measurementStdDevs) {
     super(plant, measurementStdDevs);
-    m_gearbox = gearbox;
-    m_gearing = gearing;
+    m_drum = drum;
     m_mass = mass;
-    m_drumRadius = drumRadius;
     m_minHeight = minHeight;
     m_maxHeight = maxHeight;
     m_g = g;
@@ -246,15 +229,6 @@ public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Returns the gear ratio of the elevator's gear box.
-   *
-   * @return the elevator gear box's gear ratio.
-   */
-  public double getGearing() {
-    return m_gearing;
-  }
-
-  /**
    * Returns the mass of the elevator's carriage in kilograms.
    *
    * @return the carriage mass of the elevator in kilograms.
@@ -273,30 +247,12 @@ public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Returns the drum radius of the elevator in meters.
+   * Returns the elevator's drum.
    *
-   * @return the drum radius of the elevator in meters.
+   * @return The elevator's drum.
    */
-  public double getDrumRadiusMeters() {
-    return m_drumRadius.in(Meters);
-  }
-
-  /**
-   * Returns the drum radius of the elevator.
-   *
-   * @return the drum radius of the elevator.
-   */
-  public Distance getDrumRadius() {
-    return m_drumRadius;
-  }
-
-  /**
-   * Returns the gearbox for the elevator.
-   *
-   * @return The elevator's gearbox.
-   */
-  public DCMotor getGearbox() {
-    return m_gearbox;
+  public Wheel getDrum() {
+    return m_drum;
   }
 
   /**
@@ -482,14 +438,7 @@ public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
     m_acceleration.mut_replace(
         (m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u)).get(0, 0),
         MetersPerSecondPerSecond);
-    // I = V / R - omega / (Kv * R)
-    // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
-    // spinning 10x faster than the output
-    // v = r w, so w = v/r
     m_currentDraw.mut_replace(
-        m_gearbox.getCurrent(
-                m_x.get(1, 0) * m_gearing / 2 / Math.PI / m_drumRadius.in(Meters), m_u.get(0, 0))
-            * Math.signum(m_u.get(0, 0)),
-        Amps);
+        m_drum.currentAmps(m_x.get(1, 0), m_u.get(0, 0)) * Math.signum(m_u.get(0, 0)), Amps);
   }
 }

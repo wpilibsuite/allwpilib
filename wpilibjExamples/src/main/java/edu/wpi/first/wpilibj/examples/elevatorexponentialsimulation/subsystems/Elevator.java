@@ -6,8 +6,10 @@ package edu.wpi.first.wpilibj.examples.elevatorexponentialsimulation.subsystems;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.math.trajectory.ExponentialProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
@@ -25,8 +27,11 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator implements AutoCloseable {
-  // This gearbox represents a gearbox containing 4 Vex 775pro motors.
-  private final DCMotor m_elevatorGearbox = DCMotor.getNEO(2);
+  // This gearbox represents a gearbox containing 2 NEO motors.
+  private final Wheel m_elevatorDrum =
+      new Wheel(
+          new Gearbox(2, DCMotorType.NEO, Constants.kElevatorGearing),
+          Constants.kElevatorDrumRadius);
 
   private final ExponentialProfile m_profile =
       new ExponentialProfile(
@@ -49,16 +54,10 @@ public class Elevator implements AutoCloseable {
       new Encoder(Constants.kEncoderAChannel, Constants.kEncoderBChannel);
   private final PWMSparkMax m_motor = new PWMSparkMax(Constants.kMotorPort);
 
-  // Simulation classes help us simulate what's going on, including gravity.
   private final ElevatorSim m_elevatorSim =
       new ElevatorSim(
-          LinearSystemId.createElevatorSystem(
-              m_elevatorGearbox,
-              Constants.kCarriageMass,
-              Constants.kElevatorDrumRadius,
-              Constants.kElevatorGearing),
-          m_elevatorGearbox,
-          Constants.kElevatorDrumRadius,
+          LinearSystemId.createElevatorSystem(m_elevatorDrum, Constants.kCarriageMass),
+          m_elevatorDrum,
           Constants.kMinElevatorHeightMeters,
           Constants.kMaxElevatorHeightMeters,
           -9.8,

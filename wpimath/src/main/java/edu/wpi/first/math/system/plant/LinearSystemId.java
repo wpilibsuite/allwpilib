@@ -32,24 +32,14 @@ public final class LinearSystemId {
    * Create a state-space model of an elevator system. The states of the system are [position,
    * velocity]ᵀ, inputs are [voltage], and outputs are [position].
    *
-   * @param motor The motor (or gearbox) attached to the carriage.
+   * @param drum The elevator's drum.
    * @param massKg The mass of the elevator carriage, in kilograms.
-   * @param drumRadiusMeters The radius of the elevator's driving drum, in meters.
-   * @param gearing The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if massKg &lt;= 0, drumRadiusMeters &lt;= 0, or gearing &lt;=
-   *     0.
+   * @throws IllegalArgumentException if massKg &leq; 0.
    */
-  public static LinearSystem<N2, N1, N2> createElevatorSystem(
-      DCMotor motor, double massKg, double drumRadiusMeters, double gearing) {
+  public static LinearSystem<N2, N1, N2> createElevatorSystem(Wheel drum, double massKg) {
     if (massKg <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
-    }
-    if (drumRadiusMeters <= 0.0) {
-      throw new IllegalArgumentException("radiusMeters must be greater than zero.");
-    }
-    if (gearing <= 0) {
-      throw new IllegalArgumentException("gearing must be greater than zero.");
     }
 
     return new LinearSystem<>(
@@ -59,14 +49,19 @@ public final class LinearSystemId {
             0,
             1,
             0,
-            -Math.pow(gearing, 2)
-                * motor.KtNMPerAmp
-                / (motor.rOhms
-                    * drumRadiusMeters
-                    * drumRadiusMeters
+            -Math.pow(drum.gearbox.reduction, 2)
+                * drum.gearbox.numMotors
+                * drum.gearbox.motorType.KtNMPerAmp
+                / (drum.gearbox.motorType.rOhms
+                    * Math.pow(drum.radiusMeters, 2)
                     * massKg
-                    * motor.KvRadPerSecPerVolt)),
-        VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * drumRadiusMeters * massKg)),
+                    * drum.gearbox.motorType.KvRadPerSecPerVolt)),
+        VecBuilder.fill(
+            0,
+            drum.gearbox.numMotors
+                * drum.gearbox.reduction
+                * drum.gearbox.motorType.KtNMPerAmp
+                / (drum.gearbox.motorType.rOhms * drum.radiusMeters * massKg)),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));
   }
@@ -75,16 +70,13 @@ public final class LinearSystemId {
    * Create a state-space model of an elevator system. The states of the system are [position,
    * velocity]ᵀ, inputs are [voltage], and outputs are [position].
    *
-   * @param motor The motor (or gearbox) attached to the carriage.
+   * @param drum The elevator's drum.
    * @param mass The mass of the elevator carriage.
-   * @param drumRadius The radius of the elevator's driving drum.
-   * @param gearing The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if mass &lt;= 0, drumRadius &lt;= 0, or gearing &lt;= 0.
+   * @throws IllegalArgumentException if mass &leq; 0.
    */
-  public static LinearSystem<N2, N1, N2> createElevatorSystem(
-      DCMotor motor, Mass mass, Distance drumRadius, double gearing) {
-    return createElevatorSystem(motor, mass.in(Kilograms), drumRadius.in(Meters), gearing);
+  public static LinearSystem<N2, N1, N2> createElevatorSystem(Wheel drum, Mass mass) {
+    return createElevatorSystem(drum, mass.in(Kilograms));
   }
 
   /**
@@ -467,23 +459,14 @@ public final class LinearSystemId {
    * Create a state-space model of a wheel system. The states of the system are [linear position,
    * linear velocity], inputs are [voltage], and outputs are [linear position, linear velocity].
    *
-   * @param motor The motor (or gearbox) of the system.
+   * @param wheel The wheel object containing the gearbox and wheel radius.
    * @param massKg The mass of the system, in kilograms.
-   * @param radiusMeters The radius of the system , in meters.
-   * @param gearing The reduction between motor and output, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0, or gearing &lt;= 0.
+   * @throws IllegalArgumentException if massKg &leq; 0.
    */
-  public static LinearSystem<N2, N1, N2> createWheelSystem(
-      DCMotor motor, double massKg, double radiusMeters, double gearing) {
+  public static LinearSystem<N2, N1, N2> createWheelSystem(Wheel wheel, double massKg) {
     if (massKg <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
-    }
-    if (radiusMeters <= 0.0) {
-      throw new IllegalArgumentException("radiusMeters must be greater than zero.");
-    }
-    if (gearing <= 0) {
-      throw new IllegalArgumentException("gearing must be greater than zero.");
     }
 
     return new LinearSystem<>(
@@ -493,10 +476,19 @@ public final class LinearSystemId {
             0,
             1,
             0,
-            -Math.pow(gearing, 2)
-                * motor.KtNMPerAmp
-                / (motor.rOhms * radiusMeters * radiusMeters * massKg * motor.KvRadPerSecPerVolt)),
-        VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * radiusMeters * massKg)),
+            -Math.pow(wheel.gearbox.reduction, 2)
+                * wheel.gearbox.numMotors
+                * wheel.gearbox.motorType.KtNMPerAmp
+                / (wheel.gearbox.motorType.rOhms
+                    * Math.pow(wheel.radiusMeters, 2)
+                    * massKg
+                    * wheel.gearbox.motorType.KvRadPerSecPerVolt)),
+        VecBuilder.fill(
+            0,
+            wheel.gearbox.numMotors
+                * wheel.gearbox.reduction
+                * wheel.gearbox.motorType.KtNMPerAmp
+                / (wheel.gearbox.motorType.rOhms * wheel.radiusMeters * massKg)),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));
   }
@@ -505,16 +497,13 @@ public final class LinearSystemId {
    * Create a state-space model of a wheel system. The states of the system are [linear position,
    * linear velocity], inputs are [voltage], and outputs are [linear position, linear velocity].
    *
-   * @param motor The motor (or gearbox) of the system.
+   * @param wheel The wheel object containing the gearbox and wheel radius.
    * @param mass The mass of the system.
-   * @param radius The radius of the system.
-   * @param gearing The reduction between motor and output, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if mass &lt;= 0, radius &lt;= 0, or gearing &lt;= 0.
    */
-  public static LinearSystem<N2, N1, N2> createWheelSystem(
-      DCMotor motor, Mass mass, Distance radius, double gearing) {
-    return createElevatorSystem(motor, mass.in(Kilograms), radius.in(Meters), gearing);
+  public static LinearSystem<N2, N1, N2> createWheelSystem(Wheel wheel, Mass mass) {
+    return createWheelSystem(wheel, mass.in(Kilograms));
   }
 
   /**

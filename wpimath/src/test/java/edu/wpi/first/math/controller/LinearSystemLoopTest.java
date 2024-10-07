@@ -15,10 +15,10 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.LinearSystemLoop;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.DCMotorType;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
@@ -28,8 +28,9 @@ class LinearSystemLoopTest {
   private static final double kPositionStddev = 0.0001;
   private static final Random random = new Random();
 
-  LinearSystem<N2, N1, N2> m_plant =
-      LinearSystemId.createElevatorSystem(DCMotor.getVex775Pro(2), 5, 0.0181864, 1.0);
+  Wheel drum = new Wheel(new Gearbox(2, DCMotorType.Vex775Pro), 0.0181864);
+
+  LinearSystem<N2, N1, N2> m_plant = LinearSystemId.createElevatorSystem(drum, 5);
 
   @SuppressWarnings("unchecked")
   KalmanFilter<N2, N1, N1> m_observer =

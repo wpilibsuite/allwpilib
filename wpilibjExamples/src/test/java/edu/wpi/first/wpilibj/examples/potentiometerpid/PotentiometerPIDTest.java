@@ -9,8 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HAL.SimPeriodicBeforeCallback;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
@@ -26,10 +28,11 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 
 @ResourceLock("timing")
 class PotentiometerPIDTest {
-  private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
   private static final double kElevatorGearing = 10.0;
   private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
   private static final double kCarriageMassKg = 4.0; // kg
+  private final Wheel m_elevatorDrum =
+      new Wheel(new Gearbox(4, DCMotorType.Vex775Pro, kElevatorGearing), kElevatorDrumRadius);
 
   private Robot m_robot;
   private Thread m_thread;
@@ -49,10 +52,8 @@ class PotentiometerPIDTest {
     m_thread = new Thread(m_robot::startCompetition);
     m_elevatorSim =
         new ElevatorSim(
-            LinearSystemId.createElevatorSystem(
-                m_elevatorGearbox, kCarriageMassKg, kElevatorDrumRadius, kElevatorGearing),
-            m_elevatorGearbox,
-            kElevatorDrumRadius,
+            LinearSystemId.createElevatorSystem(m_elevatorDrum, kCarriageMassKg),
+            m_elevatorDrum,
             0.0,
             Robot.kFullHeightMeters,
             -9.8,
@@ -69,9 +70,9 @@ class PotentiometerPIDTest {
               m_elevatorSim.update(0.02);
 
               /*
-              meters = (v / 5v) * range
-              meters / range = v / 5v
-              5v * (meters / range) = v
+               * meters = (v / 5v) * range
+               * meters / range = v / 5v
+               * 5v * (meters / range) = v
                */
               m_analogSim.setVoltage(
                   RobotController.getVoltage5V()

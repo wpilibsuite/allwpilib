@@ -17,6 +17,7 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.units.LinearAccelerationUnit;
 import edu.wpi.first.units.LinearVelocityUnit;
 import edu.wpi.first.units.TorqueUnit;
@@ -36,9 +37,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
    *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
    *     double)} is used, the distance unit must be meters.
-   * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param gearing The gearing from the motors to the output.
-   * @param drumRadiusMeters The radius of the elevator's drum in meters.
+   * @param drum The elevator's drum.
    * @param minHeightMeters The min allowable height of the elevator in meters.
    * @param maxHeightMeters The max allowable height of the elevator in meters.
    * @param gMetersPerSecondSquared The acceleration due to gravity in meters per second squared.
@@ -49,9 +48,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
    */
   public ElevatorTorqueSim(
       LinearSystem<N2, N1, N2> plant,
-      DCMotor gearbox,
-      double gearing,
-      double drumRadiusMeters,
+      Wheel drum,
       double minHeightMeters,
       double maxHeightMeters,
       double gMetersPerSecondSquared,
@@ -59,9 +56,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
       double... measurementStdDevs) {
     this(
         plant,
-        gearbox,
-        gearing,
-        Meters.of(drumRadiusMeters),
+        drum,
         Meters.of(minHeightMeters),
         Meters.of(maxHeightMeters),
         MetersPerSecondPerSecond.of(gMetersPerSecondSquared),
@@ -78,9 +73,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
    *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
    *     double)} is used, the distance unit must be meters.
-   * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param gearing The gearing from the motors to the output.
-   * @param drumRadius The radius of the elevator's drum.
+   * @param drum The elevator's drum.
    * @param minHeight The min allowable height of the elevator.
    * @param maxHeight The max allowable height of the elevator.
    * @param g The acceleration due to gravity.
@@ -91,9 +84,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
    */
   public ElevatorTorqueSim(
       LinearSystem<N2, N1, N2> plant,
-      DCMotor gearbox,
-      double gearing,
-      Distance drumRadius,
+      Wheel drum,
       Distance minHeight,
       Distance maxHeight,
       LinearAcceleration g,
@@ -113,10 +104,8 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
     // m = (1/Br)
     super(
         plant,
-        gearbox,
-        gearing,
-        Kilograms.of(1.0 / drumRadius.in(Meters) / plant.getB(1, 0)),
-        drumRadius,
+        drum,
+        Kilograms.of(1.0 / drum.radiusMeters / plant.getB(1, 0)),
         minHeight,
         maxHeight,
         g,
@@ -130,9 +119,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
    * @param kv The velocity gain of the elevator.
    * @param ka The acceleration gain of the elevator.
    * @param kg The gravity gain of the elevator.
-   * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param gearing The gearing from the motors to the output.
-   * @param drumRadius The radius of the elevator's drum.
+   * @param drum The elevator's drum.
    * @param minHeight The min allowable height of the elevator.
    * @param maxHeight The max allowable height of the elevator.
    * @param startingHeight The starting height of the elevator.
@@ -144,18 +131,14 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
       Per<TorqueUnit, LinearVelocityUnit> kv,
       Per<TorqueUnit, LinearAccelerationUnit> ka,
       Torque kg,
-      DCMotor gearbox,
-      double gearing,
-      Distance drumRadius,
+      Wheel drum,
       Distance minHeight,
       Distance maxHeight,
       Distance startingHeight,
       double... measurementStdDevs) {
     this(
         LinearSystemId.identifyPositionSystem(kv.baseUnitMagnitude(), ka.baseUnitMagnitude()),
-        gearbox,
-        gearing,
-        drumRadius,
+        drum,
         minHeight,
         maxHeight,
         MetersPerSecondPerSecond.of(-kg.in(NewtonMeters) / ka.baseUnitMagnitude()),
@@ -169,9 +152,7 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
    * @param kv The velocity gain of the elevator in Newton-Meters / meters per second.
    * @param ka The acceleration gain of the elevator in Newton-Meters / meters per second squared.
    * @param kg The gravity gain of the elevator in Newton-Meters.
-   * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param gearing The gearing from the motors to the output.
-   * @param drumRadiusMeters The radius of the elevator's drum in meters.
+   * @param drum The elevator's drum.
    * @param minHeightMeters The min allowable height of the elevator in meters.
    * @param maxHeightMeters The max allowable height of the elevator in meters.
    * @param startingHeightMeters The starting height of the elevator in meters.
@@ -183,18 +164,14 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
       double kv,
       double ka,
       double kg,
-      DCMotor gearbox,
-      double gearing,
-      double drumRadiusMeters,
+      Wheel drum,
       double minHeightMeters,
       double maxHeightMeters,
       double startingHeightMeters,
       double... measurementStdDevs) {
     this(
         LinearSystemId.identifyPositionSystem(kv, ka),
-        gearbox,
-        gearing,
-        drumRadiusMeters,
+        drum,
         minHeightMeters,
         maxHeightMeters,
         -kg / ka,
@@ -225,11 +202,10 @@ public class ElevatorTorqueSim extends ElevatorSimBase {
   @Override
   public void update(double dtSeconds) {
     super.update(dtSeconds);
-    m_currentDraw.mut_replace(
-        m_gearbox.getCurrent(getInput(0)) * m_gearing * Math.signum(m_u.get(0, 0)), Amps);
+    m_currentDraw.mut_replace(m_drum.currentAmps(getInput(0)) * Math.signum(m_u.get(0, 0)), Amps);
     m_voltage.mut_replace(
-        m_gearbox.getVoltage(getInput(0), m_x.get(1, 0) / m_drumRadius.in(Meters)), Volts);
+        m_drum.voltageVolts(getInput(0) / m_drum.radiusMeters, m_x.get(1, 0)), Volts);
+    m_force.mut_replace(getInput(0) / m_drum.radiusMeters, Newtons);
     m_torque.mut_replace(getInput(0), NewtonMeters);
-    m_force.mut_replace(getInput(0) / m_drumRadius.in(Meters), Newtons);
   }
 }

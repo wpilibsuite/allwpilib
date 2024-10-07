@@ -15,6 +15,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.DCMotorType;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.system.plant.Wheel;
 import org.junit.jupiter.api.Test;
 
 class LinearSystemIDTest {
@@ -44,7 +45,9 @@ class LinearSystemIDTest {
 
   @Test
   void testElevatorSystem() {
-    var model = LinearSystemId.createElevatorSystem(DCMotor.getNEO(2), 5, 0.05, 12);
+    var model =
+        LinearSystemId.createElevatorSystem(
+            new Wheel(new Gearbox(2, DCMotorType.NEO, 12), 0.05), 5);
     assertTrue(
         model.getA().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -99.05473), 0.001));
 

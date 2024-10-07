@@ -6,8 +6,10 @@ package edu.wpi.first.wpilibj.examples.elevatorsimulation.subsystems;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -25,7 +27,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator implements AutoCloseable {
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
-  private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
+  private final Wheel m_elevatorDrum =
+      new Wheel(
+          new Gearbox(4, DCMotorType.Vex775Pro, Constants.kElevatorGearing),
+          Constants.kElevatorDrumRadius);
 
   // Standard classes for controlling our elevator
   private final ProfiledPIDController m_controller =
@@ -47,17 +52,12 @@ public class Elevator implements AutoCloseable {
   // Simulation classes help us simulate what's going on, including gravity.
   private final ElevatorSim m_elevatorSim =
       new ElevatorSim(
-          LinearSystemId.createElevatorSystem(
-              m_elevatorGearbox,
-              Constants.kCarriageMass,
-              Constants.kElevatorDrumRadius,
-              Constants.kElevatorGearing),
-          m_elevatorGearbox,
-          Constants.kElevatorDrumRadius,
+          LinearSystemId.createElevatorSystem(m_elevatorDrum, Constants.kCarriageMass),
+          m_elevatorDrum,
           Constants.kMinElevatorHeightMeters,
           Constants.kMaxElevatorHeightMeters,
           -9.8,
-          0.0,
+          0,
           0.01,
           0.0);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
