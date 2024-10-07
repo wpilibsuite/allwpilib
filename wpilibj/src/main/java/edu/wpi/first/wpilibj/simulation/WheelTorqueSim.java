@@ -23,7 +23,7 @@ public class WheelTorqueSim extends WheelSimBase {
    *
    * @param plant The linear system that represents the wheel. This system can be created with
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createWheelTorqueSystem(double,
-   *     double)}or {@link
+   *     double, int)}or {@link
    *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
    *     double)} is used, the distance unit must be meters.

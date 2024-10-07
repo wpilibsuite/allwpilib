@@ -23,7 +23,7 @@ public class WheelSim extends WheelSimBase {
    * Creates a simulated wheel mechanism.
    *
    * @param plant The linear system that represents the wheel. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createWheelSystem(Wheel, double)}or
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createWheelSystem(Wheel, double, int)}or
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
    *     double)}. If {@link
    *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)} is
