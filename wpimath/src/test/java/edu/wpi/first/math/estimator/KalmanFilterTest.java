@@ -38,7 +38,6 @@ class KalmanFilterTest {
   }
 
   private static void createElevator() {
-
     var m = 5.0;
     var r = 0.0181864;
     var drum = new Wheel(new Gearbox(2, DCMotorType.Vex775Pro), r);
