@@ -23,11 +23,11 @@ public class WheelSim extends WheelSimBase {
    * Creates a simulated wheel mechanism.
    *
    * @param plant The linear system that represents the wheel. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createWheelSystem(Wheel, double, int)}or
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createWheelSystem(Wheel, double,
+   *     int)} or {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
-   *     double)}. If {@link
-   *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)} is
-   *     used, the distance unit must be meters.
+   *     double)} is used, the distance unit must be meters.
    * @param wheel The wheel object containing the radius of the wheel and gearbox.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
