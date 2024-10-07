@@ -461,12 +461,16 @@ public final class LinearSystemId {
    *
    * @param wheel The wheel object containing the gearbox and wheel radius.
    * @param massKg The mass of the system driven by the wheel, in kilograms.
+   * @param numWheels The number of wheels in the system.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if massKg &leq; 0.
+   * @throws IllegalArgumentException if massKg &leq; 0 or numWheels &leq; 0.
    */
-  public static LinearSystem<N2, N1, N2> createWheelSystem(Wheel wheel, double massKg) {
+  public static LinearSystem<N2, N1, N2> createWheelSystem(Wheel wheel, double massKg, int numWheels) {
     if (massKg <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
+    }
+    if(numWheels <= 0.0){
+      throw new IllegalArgumentException("numWheels must be greater than zero.");
     }
 
     return new LinearSystem<>(
@@ -477,6 +481,7 @@ public final class LinearSystemId {
             1,
             0,
             -Math.pow(wheel.gearbox.reduction, 2)
+                * numWheels
                 * wheel.gearbox.numMotors
                 * wheel.gearbox.motorType.KtNMPerAmp
                 / (wheel.gearbox.motorType.rOhms
@@ -486,6 +491,7 @@ public final class LinearSystemId {
         VecBuilder.fill(
             0,
             wheel.gearbox.numMotors
+                * numWheels
                 * wheel.gearbox.reduction
                 * wheel.gearbox.motorType.KtNMPerAmp
                 / (wheel.gearbox.motorType.rOhms * wheel.radiusMeters * massKg)),
@@ -499,11 +505,12 @@ public final class LinearSystemId {
    *
    * @param wheel The wheel object containing the gearbox and wheel radius.
    * @param mass The mass of the system driven by the wheel.
+   * @param numWheels The number of wheels in the system.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if mass &lt;= 0, radius &lt;= 0, or gearing &lt;= 0.
+   * @throws IllegalArgumentException if mass &leq; 0 or numWheels &leq; 0.
    */
-  public static LinearSystem<N2, N1, N2> createWheelSystem(Wheel wheel, Mass mass) {
-    return createWheelSystem(wheel, mass.in(Kilograms));
+  public static LinearSystem<N2, N1, N2> createWheelSystem(Wheel wheel, Mass mass, int numWheels) {
+    return createWheelSystem(wheel, mass.in(Kilograms), numWheels);
   }
 
   /**
@@ -512,21 +519,25 @@ public final class LinearSystemId {
    *
    * @param massKg The mass of the system driven by the wheel, in kilograms.
    * @param radiusMeters The radius of the system, in meters.
+   * @param numWheels The number of wheels in the system.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0.
+   * @throws IllegalArgumentException if massKg &leq; 0, radiusMeters &leq; 0, or numWheels &leq; 0.
    */
   public static LinearSystem<N2, N1, N2> createWheelTorqueSystem(
-      double massKg, double radiusMeters) {
+      double massKg, double radiusMeters, int numWheels) {
     if (massKg <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
     }
     if (radiusMeters <= 0.0) {
       throw new IllegalArgumentException("radiusMeters must be greater than zero.");
     }
+    if(numWheels <= 0.0){
+      throw new IllegalArgumentException("numWheels must be greater than zero.");
+    }    
 
     return new LinearSystem<>(
         Matrix.eye(Nat.N2()),
-        VecBuilder.fill(0, 1.0 / (massKg * radiusMeters)),
+        VecBuilder.fill(0, numWheels / (massKg * radiusMeters)),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));
   }
@@ -538,10 +549,10 @@ public final class LinearSystemId {
    * @param mass The mass of the system driven by the wheel.
    * @param radius The radius of the system.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if mass &lt;= 0, radius &lt;= 0.
+   * @throws IllegalArgumentException if mass &leq; 0, radius &leq; 0, or numWheels &leq; 0.
    */
-  public static LinearSystem<N2, N1, N2> createWheelTorqueSystem(Mass mass, Distance radius) {
-    return createElevatorTorqueSystem(mass.in(Kilograms), radius.in(Meters));
+  public static LinearSystem<N2, N1, N2> createWheelTorqueSystem(Mass mass, Distance radius, int numWheels) {
+    return createWheelTorqueSystem(mass.in(Kilograms), radius.in(Meters), numWheels);
   }
 
   /**
