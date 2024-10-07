@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 class LinearQuadraticRegulatorTest {
   @Test
   void testLQROnElevator() {
-
     var m = 5.0;
     var r = 0.0181864;
     var G = 1.0;
