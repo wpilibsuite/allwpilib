@@ -465,11 +465,12 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if massKg &leq; 0 or numWheels &leq; 0.
    */
-  public static LinearSystem<N2, N1, N2> createWheelSystem(Wheel wheel, double massKg, int numWheels) {
+  public static LinearSystem<N2, N1, N2> createWheelSystem(
+      Wheel wheel, double massKg, int numWheels) {
     if (massKg <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
     }
-    if(numWheels <= 0){
+    if (numWheels <= 0) {
       throw new IllegalArgumentException("numWheels must be greater than zero.");
     }
 
@@ -531,9 +532,9 @@ public final class LinearSystemId {
     if (radiusMeters <= 0.0) {
       throw new IllegalArgumentException("radiusMeters must be greater than zero.");
     }
-    if(numWheels <= 0){
+    if (numWheels <= 0) {
       throw new IllegalArgumentException("numWheels must be greater than zero.");
-    }    
+    }
 
     return new LinearSystem<>(
         Matrix.eye(Nat.N2()),
@@ -551,7 +552,8 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if mass &leq; 0, radius &leq; 0, or numWheels &leq; 0.
    */
-  public static LinearSystem<N2, N1, N2> createWheelTorqueSystem(Mass mass, Distance radius, int numWheels) {
+  public static LinearSystem<N2, N1, N2> createWheelTorqueSystem(
+      Mass mass, Distance radius, int numWheels) {
     return createWheelTorqueSystem(mass.in(Kilograms), radius.in(Meters), numWheels);
   }
 
