@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.sysid;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
@@ -25,8 +27,6 @@ import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import java.util.HashMap;
 import java.util.Map;
-
-import static edu.wpi.first.units.Units.*;
 
 /**
  * Utility for logging data from a SysId test routine. Each complete routine (quasistatic and
@@ -239,9 +239,7 @@ public class SysIdRoutineLog {
      * @return The motor log (for call chaining).
      */
     public MotorLog linearAcceleration(
-      LinearAcceleration acceleration,
-      LinearAccelerationUnit unit
-    ) {
+        LinearAcceleration acceleration, LinearAccelerationUnit unit) {
       return value("acceleration", acceleration.in(unit), unit.name());
     }
 
@@ -267,9 +265,7 @@ public class SysIdRoutineLog {
      * @return The motor log (for call chaining).
      */
     public MotorLog angularAcceleration(
-      AngularAcceleration acceleration,
-      AngularAccelerationUnit unit
-    ) {
+        AngularAcceleration acceleration, AngularAccelerationUnit unit) {
       return value("acceleration", acceleration.in(unit), unit.name());
     }
 
