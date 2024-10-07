@@ -549,6 +549,7 @@ public final class LinearSystemId {
    *
    * @param mass The mass of the system driven by the wheel.
    * @param radius The radius of the system.
+   * @param numWheels The number of wheels in the system.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if mass &leq; 0, radius &leq; 0, or numWheels &leq; 0.
    */
