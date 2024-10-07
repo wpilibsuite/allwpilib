@@ -88,24 +88,20 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
   /**
    * Creates a simulated arm mechanism.
    *
-   * @param plant              The linear system that represents the arm. This
-   *                           system can be created with {@link
-   *                           edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(DCMotor,
-   *                           double, double)}.
-   * @param gearbox            The type of and number of motors in the arm
-   *                           gearbox.
-   * @param armLength          The length of the arm.
-   * @param pivotDistance      The distance of the pivot from the center of mass.
-   * @param mass               The mass of the arm.
-   * @param j                  The moment of inertia of the arm.
-   * @param minAngle           The minimum angle that the arm is capable of.
-   * @param maxAngle           The maximum angle that the arm is capable of.
-   * @param g                  The acceleration due to gravity.
-   * @param startingAngle      The initial position of the Arm simulation.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be
-   *                           omitted if no
-   *                           noise is desired. If present must have 1 element
-   *                           for position.
+   * @param plant The linear system that represents the arm. This system can be created with {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(DCMotor,
+   *     double, double)}.
+   * @param gearbox The type of and number of motors in the arm gearbox.
+   * @param armLength The length of the arm.
+   * @param pivotDistance The distance of the pivot from the center of mass.
+   * @param mass The mass of the arm.
+   * @param j The moment of inertia of the arm.
+   * @param minAngle The minimum angle that the arm is capable of.
+   * @param maxAngle The maximum angle that the arm is capable of.
+   * @param g The acceleration due to gravity.
+   * @param startingAngle The initial position of the Arm simulation.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for position.
    */
   @SuppressWarnings("this-escape")
   public SingleJointedArmSimBase(
@@ -134,11 +130,10 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Sets the arm's state. The new angle will be limited between the minimum and
-   * maximum
-   * allowed angles.
+   * Sets the arm's state. The new angle will be limited between the minimum and maximum allowed
+   * angles.
    *
-   * @param positionMeters          The new position in meters.
+   * @param positionMeters The new position in meters.
    * @param velocityMetersPerSecond New velocity in meters per second.
    */
   public void setState(double positionMeters, double velocityMetersPerSecond) {
@@ -149,11 +144,10 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Sets the arm's state. The new angle will be limited between the minimum and
-   * maximum
-   * allowed angles.
+   * Sets the arm's state. The new angle will be limited between the minimum and maximum allowed
+   * angles.
    *
-   * @param angle           The new angle.
+   * @param angle The new angle.
    * @param angularVelocity The new angular velocity.
    */
   public void setState(Angle angle, AngularVelocity angularVelocity) {
@@ -161,9 +155,8 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Sets the arm's position. The new angle will be limited bewtween the minimum
-   * and maximum
-   * allowed angles.
+   * Sets the arm's position. The new angle will be limited bewtween the minimum and maximum allowed
+   * angles.
    *
    * @param angleRadians The new angle in radians.
    */
@@ -172,9 +165,8 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Sets the arm's position. The new angle will be limited bewtween the minimum
-   * and maximum
-   * allowed angles.
+   * Sets the arm's position. The new angle will be limited bewtween the minimum and maximum allowed
+   * angles.
    *
    * @param angle The new position.
    */
@@ -185,8 +177,7 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
   /**
    * Sets the arm's velocity.
    *
-   * @param angularVelocityRadiansPerSecond The new velocity in radiansPerSecond per
-   *                                 second.
+   * @param angularVelocityRadiansPerSecond The new velocity in radiansPerSecond per second.
    */
   public void setAngularVelocity(double angularVelocityRadiansPerSecond) {
     setState(m_angle.in(Radians), angularVelocityRadiansPerSecond);
@@ -318,7 +309,7 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
    */
   public Distance getArmLength() {
     return m_armLength;
-  }  
+  }
 
   /**
    * Returns the distance of the pivot to the center of mass in meters.
@@ -336,7 +327,7 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
    */
   public Distance getPivotDistance() {
     return m_pivotDistance;
-  }  
+  }
 
   /**
    * Returns the current arm angle in radians.
@@ -450,8 +441,8 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
    * Updates the state of the arm.
    *
    * @param currentXhat The current state estimate.
-   * @param u           The system inputs (voltage).
-   * @param dtSeconds   The time difference between controller updates.
+   * @param u The system inputs (voltage).
+   * @param dtSeconds The time difference between controller updates.
    */
   @Override
   protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
@@ -478,18 +469,22 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
     // f(x, u) = Ax + Bu + [0 α]ᵀ
     // f(x, u) = Ax + Bu + [0 m⋅g⋅r⋅cos(θ)/J]ᵀ
 
-    Matrix<N2, N1> updatedXhat = NumericalIntegration.rkdp(
-        (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
-          Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
-          double alphaGrav = m_mass.in(Kilograms) * m_g.in(MetersPerSecondPerSecond) * m_pivotDistance.in(Meters)
-              * Math.cos(x.get(0, 0))
-              / m_j.in(KilogramSquareMeters);
-          xdot = xdot.plus(VecBuilder.fill(0, alphaGrav));
-          return xdot;
-        },
-        currentXhat,
-        u,
-        dtSeconds);
+    Matrix<N2, N1> updatedXhat =
+        NumericalIntegration.rkdp(
+            (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
+              Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
+              double alphaGrav =
+                  m_mass.in(Kilograms)
+                      * m_g.in(MetersPerSecondPerSecond)
+                      * m_pivotDistance.in(Meters)
+                      * Math.cos(x.get(0, 0))
+                      / m_j.in(KilogramSquareMeters);
+              xdot = xdot.plus(VecBuilder.fill(0, alphaGrav));
+              return xdot;
+            },
+            currentXhat,
+            u,
+            dtSeconds);
 
     // We check for collision after updating xhat
     if (wouldHitLowerLimit(updatedXhat.get(0, 0))) {
