@@ -167,7 +167,7 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
    *
    * @param angleRadians The new angle in radians.
    */
-  public void setPosition(double angleRadians) {
+  public void setAngle(double angleRadians) {
     setState(angleRadians, m_angularVelocity.in(RadiansPerSecond));
   }
 
@@ -178,27 +178,27 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
    *
    * @param angle The new position.
    */
-  public void setPosition(Angle angle) {
-    setPosition(angle.in(Radians));
+  public void setAngle(Angle angle) {
+    setAngle(angle.in(Radians));
   }
 
   /**
    * Sets the arm's velocity.
    *
-   * @param velocityRadiansPerSecond The new velocity in radiansPerSecond per
+   * @param angularVelocityRadiansPerSecond The new velocity in radiansPerSecond per
    *                                 second.
    */
-  public void setVelocity(double velocityRadiansPerSecond) {
-    setState(m_angle.in(Radians), velocityRadiansPerSecond);
+  public void setAngularVelocity(double angularVelocityRadiansPerSecond) {
+    setState(m_angle.in(Radians), angularVelocityRadiansPerSecond);
   }
 
   /**
    * Sets the arm's velocity.
    *
-   * @param velocity The new velocity.
+   * @param angularVelocity The new velocity.
    */
-  public void setVelocity(AngularVelocity angularVelocity) {
-    setVelocity(angularVelocity.in(RadiansPerSecond));
+  public void setAngularVelocity(AngularVelocity angularVelocity) {
+    setAngularVelocity(angularVelocity.in(RadiansPerSecond));
   }
 
   /**
