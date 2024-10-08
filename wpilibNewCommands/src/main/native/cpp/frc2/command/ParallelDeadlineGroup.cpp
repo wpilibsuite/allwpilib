@@ -5,6 +5,7 @@
 #include "frc2/command/ParallelDeadlineGroup.h"
 
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -75,7 +76,8 @@ void ParallelDeadlineGroup::AddCommands(
   }
 
   for (auto&& command : commands) {
-    if (RequirementsDisjoint(this, command.get())) {
+    auto sharedRequirements = GetSharedRequirements(this, command.get());
+    if (sharedRequirements.empty()) {
       command->SetComposed(true);
       AddRequirements(command->GetRequirements());
       m_runWhenDisabled &= command->RunsWhenDisabled();
@@ -85,9 +87,23 @@ void ParallelDeadlineGroup::AddCommands(
       }
       m_commands.emplace_back(std::move(command), false);
     } else {
-      throw FRC_MakeError(frc::err::CommandIllegalUse,
-                          "Multiple commands in a parallel group cannot "
-                          "require the same subsystems");
+      std::string formattedRequirements = "";
+      bool first = true;
+      for (auto&& requirement : sharedRequirements) {
+        if (first) {
+          first = false;
+        } else {
+          formattedRequirements += ", ";
+        }
+        formattedRequirements += requirement->GetName();
+      }
+      throw FRC_MakeError(
+          frc::err::CommandIllegalUse,
+          "Command {} could not be added to this ParallelCommandGroup"
+          " because the subsystems [{}] are already required in this command."
+          " Multiple commands in a parallel composition cannot require the "
+          "same subsystems.",
+          command->GetName(), formattedRequirements);
     }
   }
 }
