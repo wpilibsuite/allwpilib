@@ -246,14 +246,14 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
    * Sets the arm's state. The new angle will be limited between the minimum and maximum allowed
    * angles.
    *
-   * @param positionMeters The new position in meters.
-   * @param velocityMetersPerSecond New velocity in meters per second.
+   * @param angleRadians The new angle in radians.
+   * @param angularVelocityRadiansPerSecond The new velocity in radiansPerSecond per second.
    */
-  public void setState(double positionMeters, double velocityMetersPerSecond) {
+  public void setState(double angleRadians, double angularVelocityRadiansPerSecond) {
     setState(
         VecBuilder.fill(
-            MathUtil.clamp(positionMeters, m_minAngle.in(Radians), m_maxAngle.in(Radians)),
-            velocityMetersPerSecond));
+            MathUtil.clamp(angleRadians, m_minAngle.in(Radians), m_maxAngle.in(Radians)),
+            angularVelocityRadiansPerSecond));
   }
 
   /**
