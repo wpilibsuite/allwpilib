@@ -125,7 +125,10 @@ void NetworkServer::ServerConnection::UpdateOutgoingTimer(uint32_t repeatMs) {
 void NetworkServer::ServerConnection::ConnectionClosed() {
   // don't call back into m_server if it's being destroyed
   if (!m_outgoingTimer->IsLoopClosing()) {
-    m_server.m_serverImpl.RemoveClient(m_clientId);
+    uv::Timer::SingleShot(m_outgoingTimer->GetLoopRef(), uv::Timer::Time{0},
+                          [server = &m_server, clientId = m_clientId] {
+                            server->m_serverImpl.RemoveClient(clientId);
+                          });
     m_server.RemoveConnection(this);
   }
   m_outgoingTimer->Close();
