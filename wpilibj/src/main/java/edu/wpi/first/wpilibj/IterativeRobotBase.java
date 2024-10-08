@@ -155,7 +155,11 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_rpFirstRun = true;
 
-  /** Periodic code for all robot modes should go here. */
+  /**
+   * Periodic code for all robot modes should go here.
+   *
+   * <p>This method is implicitly timed using the {@link Tracer} class.
+   */
   public void robotPeriodic() {
     if (m_rpFirstRun) {
       System.out.println("Default robotPeriodic() method... Override me!");
@@ -169,6 +173,8 @@ public abstract class IterativeRobotBase extends RobotBase {
    * Periodic simulation code should go here.
    *
    * <p>This function is called in a simulated robot after user code executes.
+   *
+   * <p>This method is implicitly timed using the {@link Tracer} class.
    */
   public void simulationPeriodic() {
     if (m_spFirstRun) {
@@ -179,7 +185,11 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_dpFirstRun = true;
 
-  /** Periodic code for disabled mode should go here. */
+  /**
+   * Periodic code for disabled mode should go here.
+   *
+   * <p>This method is implicitly timed using the {@link Tracer} class.
+   */
   public void disabledPeriodic() {
     if (m_dpFirstRun) {
       System.out.println("Default disabledPeriodic() method... Override me!");
@@ -189,7 +199,11 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_apFirstRun = true;
 
-  /** Periodic code for autonomous mode should go here. */
+  /**
+   * Periodic code for autonomous mode should go here.
+   *
+   * <p>This method is implicitly timed using the {@link Tracer} class.
+   */
   public void autonomousPeriodic() {
     if (m_apFirstRun) {
       System.out.println("Default autonomousPeriodic() method... Override me!");
@@ -199,7 +213,11 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_tpFirstRun = true;
 
-  /** Periodic code for teleop mode should go here. */
+  /**
+   * Periodic code for teleop mode should go here.
+   *
+   * <p>This method is implicitly timed using the {@link Tracer} class.
+   */
   public void teleopPeriodic() {
     if (m_tpFirstRun) {
       System.out.println("Default teleopPeriodic() method... Override me!");
@@ -209,7 +227,11 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_tmpFirstRun = true;
 
-  /** Periodic code for test mode should go here. */
+  /**
+   * Periodic code for test mode should go here.
+   *
+   * <p>This method is implicitly timed using the {@link Tracer} class.
+   */
   public void testPeriodic() {
     if (m_tmpFirstRun) {
       System.out.println("Default testPeriodic() method... Override me!");
@@ -299,6 +321,8 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   /** Loop function. */
   protected void loopFunc() {
+    Tracer.startTrace("RobotLoop");
+
     DriverStation.refreshData();
     m_watchdog.reset();
 
@@ -344,15 +368,12 @@ public abstract class IterativeRobotBase extends RobotBase {
       switch (mode) {
         case kDisabled -> {
           disabledInit();
-          m_watchdog.addEpoch("disabledInit()");
         }
         case kAutonomous -> {
           autonomousInit();
-          m_watchdog.addEpoch("autonomousInit()");
         }
         case kTeleop -> {
           teleopInit();
-          m_watchdog.addEpoch("teleopInit()");
         }
         case kTest -> {
           if (m_lwEnabledInTest) {
@@ -360,7 +381,6 @@ public abstract class IterativeRobotBase extends RobotBase {
             Shuffleboard.enableActuatorWidgets();
           }
           testInit();
-          m_watchdog.addEpoch("testInit()");
         }
         default -> {
           // NOP
@@ -374,44 +394,35 @@ public abstract class IterativeRobotBase extends RobotBase {
     switch (mode) {
       case kDisabled -> {
         DriverStationJNI.observeUserProgramDisabled();
-        disabledPeriodic();
-        m_watchdog.addEpoch("disabledPeriodic()");
+        Tracer.traceFunc("DisabledPeriodic", this::disabledPeriodic);
       }
       case kAutonomous -> {
         DriverStationJNI.observeUserProgramAutonomous();
-        autonomousPeriodic();
-        m_watchdog.addEpoch("autonomousPeriodic()");
+        Tracer.traceFunc("AutonomousPeriodic", this::autonomousPeriodic);
       }
       case kTeleop -> {
         DriverStationJNI.observeUserProgramTeleop();
-        teleopPeriodic();
-        m_watchdog.addEpoch("teleopPeriodic()");
+        Tracer.traceFunc("TeleopPeriodic", this::teleopPeriodic);
       }
       case kTest -> {
         DriverStationJNI.observeUserProgramTest();
-        testPeriodic();
-        m_watchdog.addEpoch("testPeriodic()");
+        Tracer.traceFunc("TestPeriodic", this::testPeriodic);
       }
       default -> {
         // NOP
       }
     }
 
-    robotPeriodic();
-    m_watchdog.addEpoch("robotPeriodic()");
+    Tracer.traceFunc("RobotPeriodic", this::robotPeriodic);
 
     SmartDashboard.updateValues();
-    m_watchdog.addEpoch("SmartDashboard.updateValues()");
     LiveWindow.updateValues();
-    m_watchdog.addEpoch("LiveWindow.updateValues()");
     Shuffleboard.update();
-    m_watchdog.addEpoch("Shuffleboard.update()");
 
     if (isSimulation()) {
       HAL.simPeriodicBefore();
-      simulationPeriodic();
+      Tracer.traceFunc("SimulationPeriodic", this::simulationPeriodic);
       HAL.simPeriodicAfter();
-      m_watchdog.addEpoch("simulationPeriodic()");
     }
 
     m_watchdog.disable();
@@ -421,18 +432,11 @@ public abstract class IterativeRobotBase extends RobotBase {
       NetworkTableInstance.getDefault().flushLocal();
     }
 
-    // Warn on loop time overruns
-    if (m_watchdog.isExpired()) {
-      m_watchdog.printEpochs();
-    }
-  }
-
-  /** Prints list of epochs added so far and their times. */
-  public void printWatchdogEpochs() {
-    m_watchdog.printEpochs();
+    Tracer.endTrace();
   }
 
   private void printLoopOverrunMessage() {
-    DriverStation.reportWarning("Loop time of " + m_period + "s overrun\n", false);
+    DriverStation.reportWarning(
+        "Loop time of " + m_period + "s overrun\n    Check NetworkTables for timing info", false);
   }
 }

@@ -124,6 +124,7 @@ class IterativeRobotBase : public RobotBase {
    *
    * This function is called each time a new packet is received from the driver
    * station.
+   * <p>This method is implicitly timed using the `Tracer` class.
    */
   virtual void RobotPeriodic();
 
@@ -131,6 +132,7 @@ class IterativeRobotBase : public RobotBase {
    * Periodic simulation code should go here.
    *
    * This function is called in a simulated robot after user code executes.
+   * <p>This method is implicitly timed using the `Tracer` class.
    */
   virtual void SimulationPeriodic();
 
@@ -140,6 +142,7 @@ class IterativeRobotBase : public RobotBase {
    * Users should override this method for code which will be called each time a
    * new packet is received from the driver station and the robot is in disabled
    * mode.
+   * <p>This method is implicitly timed using the `Tracer` class.
    */
   virtual void DisabledPeriodic();
 
@@ -149,6 +152,7 @@ class IterativeRobotBase : public RobotBase {
    * Users should override this method for code which will be called each time a
    * new packet is received from the driver station and the robot is in
    * autonomous mode.
+   * <p>This method is implicitly timed using the `Tracer` class.
    */
   virtual void AutonomousPeriodic();
 
@@ -158,6 +162,7 @@ class IterativeRobotBase : public RobotBase {
    * Users should override this method for code which will be called each time a
    * new packet is received from the driver station and the robot is in teleop
    * mode.
+   * <p>This method is implicitly timed using the `Tracer` class.
    */
   virtual void TeleopPeriodic();
 
@@ -167,6 +172,7 @@ class IterativeRobotBase : public RobotBase {
    * Users should override this method for code which will be called each time a
    * new packet is received from the driver station and the robot is in test
    * mode.
+   * <p>This method is implicitly timed using the `Tracer` class.
    */
   virtual void TestPeriodic();
 
@@ -229,11 +235,6 @@ class IterativeRobotBase : public RobotBase {
    * Gets time period between calls to Periodic() functions.
    */
   units::second_t GetPeriod() const;
-
-  /**
-   * Prints list of epochs added so far and their times.
-   */
-  void PrintWatchdogEpochs();
 
   /**
    * Constructor for IterativeRobotBase.

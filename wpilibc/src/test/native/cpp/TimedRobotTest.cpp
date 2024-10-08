@@ -531,7 +531,7 @@ TEST_F(TimedRobotTest, AddPeriodic) {
   MockRobot robot;
 
   std::atomic<uint32_t> callbackCount{0};
-  robot.AddPeriodic([&] { callbackCount++; }, kPeriod / 2.0);
+  robot.AddPeriodic([&] { callbackCount++; }, "TestAddPeriodic", kPeriod / 2.0);
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
 
@@ -563,7 +563,8 @@ TEST_F(TimedRobotTest, AddPeriodicWithOffset) {
   MockRobot robot;
 
   std::atomic<uint32_t> callbackCount{0};
-  robot.AddPeriodic([&] { callbackCount++; }, kPeriod / 2.0, kPeriod / 4.0);
+  robot.AddPeriodic([&] { callbackCount++; }, "TestAddPeriodicWithOffset",
+                    kPeriod / 2.0, kPeriod / 4.0);
 
   // Expirations in this test (ms)
   //
