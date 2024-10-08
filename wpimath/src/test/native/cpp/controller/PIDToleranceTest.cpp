@@ -28,23 +28,23 @@ TEST(PIDToleranceTest, AbsoluteTolerance) {
 
   EXPECT_FALSE(controller.AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "
-      << controller.GetPositionError();
+      << controller.GetError();
 
   controller.Calculate(0.0);
 
   EXPECT_FALSE(controller.AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "
-      << controller.GetPositionError();
+      << controller.GetError();
 
   controller.Calculate(kSetpoint + kTolerance / 2);
 
   EXPECT_TRUE(controller.AtSetpoint())
       << "Error was not in tolerance when it should have been. Error was "
-      << controller.GetPositionError();
+      << controller.GetError();
 
   controller.Calculate(kSetpoint + 10 * kTolerance);
 
   EXPECT_FALSE(controller.AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "
-      << controller.GetPositionError();
+      << controller.GetError();
 }
