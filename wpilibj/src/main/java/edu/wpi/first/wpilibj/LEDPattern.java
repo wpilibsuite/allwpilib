@@ -145,7 +145,29 @@ public interface LEDPattern {
   default LEDPattern reversed() {
     return (reader, writer) -> {
       int bufLen = reader.getLength();
-      applyTo(reader, (i, r, g, b) -> writer.setRGB((bufLen - 1) - i, r, g, b));
+      applyTo(
+          new LEDReader() {
+            @Override
+            public int getLength() {
+              return reader.getLength();
+            }
+
+            @Override
+            public int getRed(int index) {
+              return reader.getRed(getLength() - 1 - index);
+            }
+
+            @Override
+            public int getGreen(int index) {
+              return reader.getGreen(getLength() - 1 - index);
+            }
+
+            @Override
+            public int getBlue(int index) {
+              return reader.getBlue(getLength() - 1 - index);
+            }
+          },
+          (i, r, g, b) -> writer.setRGB((bufLen - 1) - i, r, g, b));
     };
   }
 
@@ -160,7 +182,7 @@ public interface LEDPattern {
     return (reader, writer) -> {
       int bufLen = reader.getLength();
       applyTo(
-          reader,
+          new LEDReader.OffsetLEDReader(reader, offset),
           (i, r, g, b) -> {
             int shiftedIndex = Math.floorMod(i + offset, bufLen);
             writer.setRGB(shiftedIndex, r, g, b);
@@ -198,7 +220,7 @@ public interface LEDPattern {
       int offset = (int) (t * bufLen);
 
       applyTo(
-          reader,
+          new LEDReader.OffsetLEDReader(reader, offset),
           (i, r, g, b) -> {
             // floorMod so if the offset is negative, we still get positive outputs
             int shiftedIndex = Math.floorMod(i + offset, bufLen);
@@ -248,7 +270,7 @@ public interface LEDPattern {
       var offset = now / microsPerLED;
 
       applyTo(
-          reader,
+          new LEDReader.OffsetLEDReader(reader, offset),
           (i, r, g, b) -> {
             // floorMod so if the offset is negative, we still get positive outputs
             int shiftedIndex = Math.floorMod(i + offset, bufLen);
