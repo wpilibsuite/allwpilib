@@ -113,7 +113,6 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
       LinearAcceleration g,
       Angle startingAngle,
       double... measurementStdDevs) {
-
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
     m_armLength = armLength;
@@ -163,7 +162,6 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
       Angle maxAngle,
       Angle startingAngle,
       double... measurementStdDevs) {
-
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
     m_armLength = armLength;
@@ -222,7 +220,6 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
       Angle maxAngle,
       Angle startingAngle,
       double... measurementStdDevs) {
-
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
     m_armLength = armLength;
