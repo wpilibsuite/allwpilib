@@ -12,7 +12,6 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.system.Discretization;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.DCMotorType;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -59,13 +58,13 @@ class LinearQuadraticRegulatorTest {
 
   @Test
   void testLQROnArm() {
-    var motors = DCMotor.getVex775Pro(2);
-
     var m = 4.0;
     var r = 0.4;
     var G = 100.0;
 
-    var plant = LinearSystemId.createSingleJointedArmSystem(motors, 1d / 3d * m * r * r, G);
+    var gearbox = new Gearbox(2, DCMotorType.Vex775Pro, G);
+
+    var plant = LinearSystemId.createSingleJointedArmSystem(gearbox, m, r, r / 2.0);
 
     var qElms = VecBuilder.fill(0.01745, 0.08726);
     var rElms = VecBuilder.fill(12.0);

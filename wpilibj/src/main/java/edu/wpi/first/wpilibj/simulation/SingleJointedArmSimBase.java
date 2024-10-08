@@ -22,7 +22,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -44,7 +43,7 @@ import edu.wpi.first.units.measure.Voltage;
 /** Represents a simulated single jointed arm mechanism. */
 public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
   /** The gearbox for the arm. */
-  private final Gearbox m_gearbox;
+  protected final Gearbox m_gearbox;
 
   /** The length of the arm. */
   private final Distance m_armLength;
@@ -89,12 +88,11 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
    * Creates a simulated arm mechanism.
    *
    * @param plant The linear system that represents the arm. This system can be created with {@link
-   *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(DCMotor,
-   *     double, double)}.
+   *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(Gearbox,
+   *     double, double, double)}.
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param armLength The length of the arm.
    * @param pivotDistance The distance of the pivot from the center of mass.
-   * @param mass The mass of the arm.
    * @param j The moment of inertia of the arm.
    * @param minAngle The minimum angle that the arm is capable of.
    * @param maxAngle The maximum angle that the arm is capable of.
@@ -109,23 +107,141 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
       Gearbox gearbox,
       Distance armLength,
       Distance pivotDistance,
-      Mass mass,
       MomentOfInertia j,
       Angle minAngle,
       Angle maxAngle,
       LinearAcceleration g,
       Angle startingAngle,
       double... measurementStdDevs) {
+
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
     m_armLength = armLength;
     m_pivotDistance = pivotDistance;
-    m_mass = mass;
     m_j = j;
+    // we know the arm mass-moment of inertia J of and arm with pivot through its
+    // center of mass is given by J=1/12 mL²
+    // J a distance r from pivot if J = 1/12 mL² + mr²
+    // J = m(1/12 L² + r²)
+    // m = J / (1/12 L² + r²)
+    m_mass =
+        Kilograms.of(
+            j.in(KilogramSquareMeters)
+                / ((1.0 / 12.0) * Math.pow(armLength.in(Meters), 2)
+                    + Math.pow(pivotDistance.in(Meters), 2)));
     m_minAngle = minAngle;
     m_maxAngle = maxAngle;
     m_g = g;
 
+    setState(startingAngle.in(Radians), 0.0);
+  }
+
+  /**
+   * Creates a simulated arm mechanism.
+   *
+   * @param plant The linear system that represents the arm. This system can be created with {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(Gearbox,
+   *     double, double, double)}.
+   * @param kg The gravity gain.
+   * @param gearbox The type of and number of motors in the arm gearbox.
+   * @param armLength The length of the arm.
+   * @param pivotDistance The distance of the pivot from the center of mass.
+   * @param minAngle The minimum angle that the arm is capable of.
+   * @param maxAngle The maximum angle that the arm is capable of.
+   * @param startingAngle The initial position of the Arm simulation.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for position.
+   */
+  @SuppressWarnings("this-escape")
+  public SingleJointedArmSimBase(
+      LinearSystem<N2, N1, N2> plant,
+      Voltage kg,
+      Gearbox gearbox,
+      Distance armLength,
+      Distance pivotDistance,
+      Angle minAngle,
+      Angle maxAngle,
+      Angle startingAngle,
+      double... measurementStdDevs) {
+
+    super(plant, measurementStdDevs);
+    m_gearbox = gearbox;
+    m_armLength = armLength;
+    m_pivotDistance = pivotDistance;
+    m_j =
+        KilogramSquareMeters.of(
+            gearbox.numMotors
+                * gearbox.reduction
+                * gearbox.motorType.KtNMPerAmp
+                / gearbox.motorType.rOhms
+                / plant.getB(1, 0));
+    m_mass =
+        Kilograms.of(
+            m_j.in(KilogramSquareMeters)
+                / ((1.0 / 12.0) * Math.pow(armLength.in(Meters), 2)
+                    + Math.pow(pivotDistance.in(Meters), 2)));
+    m_minAngle = minAngle;
+    m_maxAngle = maxAngle;
+    // kg / ka = alpha = mgr / J
+    // g = kg * J / (ka * r * m)
+    m_g =
+        MetersPerSecondPerSecond.of(
+            kg.in(Volts)
+                * m_j.in(KilogramSquareMeters)
+                / (1.0 / plant.getB(1, 0))
+                / pivotDistance.in(Meters)
+                / m_mass.in(Kilograms));
+
+    setState(startingAngle.in(Radians), 0.0);
+  }
+
+  /**
+   * Creates a simulated arm mechanism.
+   *
+   * @param plant The linear system that represents the arm. This system can be created with {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(Gearbox,
+   *     double, double, double)}.
+   * @param kg The gravity gain.
+   * @param gearbox The type of and number of motors in the arm gearbox.
+   * @param armLength The length of the arm.
+   * @param pivotDistance The distance of the pivot from the center of mass.
+   * @param minAngle The minimum angle that the arm is capable of.
+   * @param maxAngle The maximum angle that the arm is capable of.
+   * @param startingAngle The initial position of the Arm simulation.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for position.
+   */
+  @SuppressWarnings("this-escape")
+  public SingleJointedArmSimBase(
+      LinearSystem<N2, N1, N2> plant,
+      Torque kg,
+      Gearbox gearbox,
+      Distance armLength,
+      Distance pivotDistance,
+      Angle minAngle,
+      Angle maxAngle,
+      Angle startingAngle,
+      double... measurementStdDevs) {
+
+    super(plant, measurementStdDevs);
+    m_gearbox = gearbox;
+    m_armLength = armLength;
+    m_pivotDistance = pivotDistance;
+    m_j = KilogramSquareMeters.of(1.0 / plant.getB(1, 0));
+    m_mass =
+        Kilograms.of(
+            m_j.in(KilogramSquareMeters)
+                / ((1.0 / 12.0) * Math.pow(armLength.in(Meters), 2)
+                    + Math.pow(pivotDistance.in(Meters), 2)));
+    m_minAngle = minAngle;
+    m_maxAngle = maxAngle;
+    m_g =
+        MetersPerSecondPerSecond.of(
+            kg.in(NewtonMeters)
+                * m_j.in(KilogramSquareMeters)
+                / (1.0 / plant.getB(1, 0))
+                / pivotDistance.in(Meters)
+                / m_mass.in(Kilograms));
     setState(startingAngle.in(Radians), 0.0);
   }
 

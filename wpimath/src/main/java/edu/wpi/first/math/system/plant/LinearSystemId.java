@@ -375,22 +375,34 @@ public final class LinearSystemId {
    * Create a state-space model of a single jointed arm system. The states of the system are [angle,
    * angular velocity], inputs are [voltage], and outputs are [angle].
    *
-   * @param motor The motor (or gearbox) attached to the arm.
-   * @param JKgSquaredMeters The moment of inertia J of the arm.
-   * @param gearing The gearing between the motor and arm, in output over input. Most of the time
-   *     this will be greater than 1.
+   * @param gearbox The gearbox attached to the arm.
+   * @param massKg The mass of the arm.
+   * @param armLengthMeters The length of the arm.
+   * @param pivotDistanceMeters The distance from the center of mass of the pivot in meters.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or gearing &lt;= 0.
+   * @throws IllegalArgumentException if massKg &leq; 0 or armLengthMeters &leq; 0.
+   * @throws IllegalArgumentException if pivotDistanceMeters &lt; 0 or pivotDistanceMeters &gt; ½
+   *     armLengthMeters.
    */
   public static LinearSystem<N2, N1, N2> createSingleJointedArmSystem(
-      DCMotor motor, double JKgSquaredMeters, double gearing) {
-    if (JKgSquaredMeters <= 0.0) {
-      throw new IllegalArgumentException("JKgSquaredMeters must be greater than zero.");
+      Gearbox gearbox, double massKg, double armLengthMeters, double pivotDistanceMeters) {
+    if (massKg <= 0.0) {
+      throw new IllegalArgumentException("massKg must be greater than zero.");
     }
-    if (gearing <= 0.0) {
-      throw new IllegalArgumentException("gearing must be greater than zero.");
+    if (armLengthMeters <= 0.0) {
+      throw new IllegalArgumentException("armLengthMeters must be greater than zero.");
+    }
+    if (pivotDistanceMeters < 0.0) {
+      throw new IllegalArgumentException("pivotDistanceMeters must be non-negative.");
+    }
+    if (pivotDistanceMeters > armLengthMeters / 2.0) {
+      throw new IllegalArgumentException(
+          "pivotDistanceMeters must not be larger than half of armLengthMeters.");
     }
 
+    double JKgMetersSquared =
+        (1.0 / 12.0) * massKg * Math.pow(armLengthMeters, 2)
+            + massKg * Math.pow(pivotDistanceMeters, 2);
     return new LinearSystem<>(
         MatBuilder.fill(
             Nat.N2(),
@@ -398,10 +410,18 @@ public final class LinearSystemId {
             0,
             1,
             0,
-            -Math.pow(gearing, 2)
-                * motor.KtNMPerAmp
-                / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgSquaredMeters)),
-        VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * JKgSquaredMeters)),
+            -Math.pow(gearbox.reduction, 2)
+                * gearbox.numMotors
+                * gearbox.motorType.KtNMPerAmp
+                / (gearbox.motorType.KvRadPerSecPerVolt
+                    * gearbox.motorType.rOhms
+                    * JKgMetersSquared)),
+        VecBuilder.fill(
+            0,
+            gearbox.numMotors
+                * gearbox.reduction
+                * gearbox.motorType.KtNMPerAmp
+                / (gearbox.motorType.rOhms * JKgMetersSquared)),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));
   }
@@ -410,35 +430,55 @@ public final class LinearSystemId {
    * Create a state-space model of a single jointed arm system. The states of the system are [angle,
    * angular velocity], inputs are [voltage], and outputs are [angle].
    *
-   * @param motor The motor (or gearbox) attached to the arm.
-   * @param J The moment of inertia J of the arm.
-   * @param gearing The gearing between the motor and arm, in output over input. Most of the time
-   *     this will be greater than 1.
+   * @param gearbox The gearbox attached to the arm.
+   * @param mass The mass of the arm.
+   * @param armLength The length of the arm.
+   * @param pivotDistance The distance from the center of mass of the pivot.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if J &lt;= 0 or gearing &lt;= 0.
+   * @throws IllegalArgumentException if massKg &leq; 0 or armLengthMeters &leq; 0.
+   * @throws IllegalArgumentException if pivotDistanceMeters &lt; 0 or pivotDistanceMeters &gt; ½
+   *     armLengthMeters.
    */
   public static LinearSystem<N2, N1, N2> createSingleJointedArmSystem(
-      DCMotor motor, MomentOfInertia J, double gearing) {
-    return createSingleJointedArmSystem(motor, J.in(KilogramSquareMeters), gearing);
+      Gearbox gearbox, Mass mass, Distance armLength, Distance pivotDistance) {
+    return createSingleJointedArmSystem(
+        gearbox, mass.in(Kilograms), armLength.in(Meters), pivotDistance.in(Meters));
   }
 
   /**
    * Create a state-space model of a single jointed arm system. The states of the system are [angle,
    * angular velocity], inputs are [torque], and outputs are [angle].
    *
-   * @param JKgSquaredMeters The moment of inertia J of the arm.
+   * @param massKg The mass of the arm.
+   * @param armLengthMeters The length of the arm.
+   * @param pivotDistanceMeters The distance from the center of mass of the pivot.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0.
+   * @throws IllegalArgumentException if massKg &leq; 0 or armLengthMeters &leq; 0.
+   * @throws IllegalArgumentException if pivotDistanceMeters &lt; 0 or pivotDistanceMeters &gt; ½
+   *     armLengthMeters.
    */
   public static LinearSystem<N2, N1, N2> createSingleJointedArmTorqueSystem(
-      double JKgSquaredMeters) {
-    if (JKgSquaredMeters <= 0.0) {
-      throw new IllegalArgumentException("JKgSquaredMeters must be greater than zero.");
+      double massKg, double armLengthMeters, double pivotDistanceMeters) {
+    if (massKg <= 0.0) {
+      throw new IllegalArgumentException("massKg must be greater than zero.");
+    }
+    if (armLengthMeters <= 0.0) {
+      throw new IllegalArgumentException("armLengthMeters must be greater than zero.");
+    }
+    if (pivotDistanceMeters < 0.0) {
+      throw new IllegalArgumentException("pivotDistanceMeters must be non-negative.");
+    }
+    if (pivotDistanceMeters > armLengthMeters / 2.0) {
+      throw new IllegalArgumentException(
+          "pivotDistanceMeters must not be larger than half of armLengthMeters.");
     }
 
+    double JKgMetersSquared =
+        (1.0 / 12.0) * massKg * Math.pow(armLengthMeters, 2)
+            + massKg * Math.pow(pivotDistanceMeters, 2);
     return new LinearSystem<>(
         Matrix.eye(Nat.N2()),
-        VecBuilder.fill(0, 1.0 / JKgSquaredMeters),
+        VecBuilder.fill(0, 1.0 / JKgMetersSquared),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));
   }
@@ -447,12 +487,17 @@ public final class LinearSystemId {
    * Create a state-space model of a single jointed arm system. The states of the system are [angle,
    * angular velocity], inputs are [torque], and outputs are [angle].
    *
-   * @param J The moment of inertia J of the arm.
+   * @param mass The mass of the arm.
+   * @param armLength The length of the arm.
+   * @param pivotDistance The distance from the center of mass of the pivot.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if J &lt;= 0.
+   * @throws IllegalArgumentException if mass &leq; 0 or armLength &leq; 0.
+   * @throws IllegalArgumentException if pivotDistance &lt; 0 or pivotDistance &gt; ½ armLength.
    */
-  public static LinearSystem<N2, N1, N2> createSingleJointedArmTorqueSystem(MomentOfInertia J) {
-    return createSingleJointedArmTorqueSystem(J.in(KilogramSquareMeters));
+  public static LinearSystem<N2, N1, N2> createSingleJointedArmTorqueSystem(
+      Mass mass, Distance armLength, Distance pivotDistance) {
+    return createSingleJointedArmTorqueSystem(
+        mass.in(Kilograms), armLength.in(Meters), pivotDistance.in(Meters));
   }
 
   /**

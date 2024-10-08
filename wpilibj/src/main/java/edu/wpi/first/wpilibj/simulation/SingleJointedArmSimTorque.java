@@ -4,266 +4,239 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.NewtonMeters;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.NumericalIntegration;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.units.AngularAccelerationUnit;
+import edu.wpi.first.units.AngularVelocityUnit;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.PerUnit;
+import edu.wpi.first.units.TorqueUnit;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.Torque;
 
-/** Represents a simulated single jointed arm mechanism. */
-public class SingleJointedArmSimTorque extends LinearSystemSim<N2, N1, N2> {
-  // The gearbox for the arm.
-  private final DCMotor m_gearbox;
-
-  // The gearing between the motors and the output.
-  private final double m_gearing;
-
-  // The length of the arm.
-  private final double m_armLenMeters;
-
-  // The minimum angle that the arm is capable of.
-  private final double m_minAngle;
-
-  // The maximum angle that the arm is capable of.
-  private final double m_maxAngle;
-
-  // Whether the simulator should simulate gravity.
-  private final boolean m_simulateGravity;
+/** Represents a simulated arm mechanism controlled by torque input. */
+public class SingleJointedArmSimTorque extends SingleJointedArmSimBase {
+  /**
+   * Creates a simulated arm mechanism.
+   *
+   * @param plant The linear system that represents the arm. This system can be created with {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(Gearbox,
+   *     double, double, double)} or {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
+   *     double)} is used, the distance unit must be meters.
+   * @param gearbox The type of and number of motors in the arm gearbox.
+   * @param armLength The length of the arm.
+   * @param pivotDistance The distance of the pivot from the center of mass.
+   * @param minAngle The minimum angle that the arm is capable of.
+   * @param maxAngle The maximum angle that the arm is capable of.
+   * @param g The acceleration due to gravity in meters per second squared. To disable gravity in
+   *     the simulation set to 0. The enable normal earth gravity use -9.8. Values between 0 and
+   *     -9.8 can be used to simulate free fall more accurately, but must be determined by the user.
+   * @param startingAngle The initial position of the Arm simulation.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 2 elements. The first element is for position. The
+   *     second element is for velocity.
+   */
+  public SingleJointedArmSimTorque(
+      LinearSystem<N2, N1, N2> plant,
+      Gearbox gearbox,
+      Distance armLength,
+      Distance pivotDistance,
+      Angle minAngle,
+      Angle maxAngle,
+      LinearAcceleration g,
+      Angle startingAngle,
+      double... measurementStdDevs) {
+    // By equations 12.17 of
+    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
+    // the torque applied to a DC motor mechanism is τ = Jα.
+    // The DC motor mechanism state-space model with torque as input is:
+    //
+    // dx/dt = 0 x + 1/J u
+    // A = 0
+    // B = 1/J
+    //
+    // Solve for J.
+    //
+    // B = 1/J
+    // J = 1/B
+    super(
+        plant,
+        gearbox,
+        armLength,
+        pivotDistance,
+        KilogramSquareMeters.of(1.0 / plant.getB().get(1, 0)),
+        minAngle,
+        maxAngle,
+        g,
+        startingAngle,
+        measurementStdDevs);
+  }
 
   /**
    * Creates a simulated arm mechanism.
    *
    * @param plant The linear system that represents the arm. This system can be created with {@link
-   *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(DCMotor,
-   *     double, double)}.
+   *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(Gearbox,
+   *     double, double, double)} or {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}. If
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double,
+   *     double)} is used, the distance unit must be meters.
    * @param gearbox The type of and number of motors in the arm gearbox.
-   * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
    * @param armLengthMeters The length of the arm.
-   * @param minAngleRads The minimum angle that the arm is capable of.
-   * @param maxAngleRads The maximum angle that the arm is capable of.
-   * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingAngleRads The initial position of the Arm simulation in radians.
+   * @param pivotDistanceMeters The distance of the pivot from the center of mass.
+   * @param minAngleRadians The minimum angle that the arm is capable of.
+   * @param maxAngleRadians The maximum angle that the arm is capable of.
+   * @param gMetersPerSecondSquared The acceleration due to gravity in meters per second squared. To
+   *     disable gravity in the simulation set to 0. The enable normal earth gravity use -9.8.
+   *     Values between 0 and -9.8 can be used to simulate free fall more accurately, but must be
+   *     determined by the user. * @param startingAngleRadians The initial position of the Arm
+   *     simulation.
+   * @param startingAngleRadians The initial position of the Arm simulation.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
    */
-  @SuppressWarnings("this-escape")
   public SingleJointedArmSimTorque(
       LinearSystem<N2, N1, N2> plant,
-      DCMotor gearbox,
-      double gearing,
+      Gearbox gearbox,
       double armLengthMeters,
-      double minAngleRads,
-      double maxAngleRads,
-      boolean simulateGravity,
-      double startingAngleRads,
+      double pivotDistanceMeters,
+      double minAngleRadians,
+      double maxAngleRadians,
+      double gMetersPerSecondSquared,
+      double startingAngleRadians,
       double... measurementStdDevs) {
-    super(plant, measurementStdDevs);
-    m_gearbox = gearbox;
-    m_gearing = gearing;
-    m_armLenMeters = armLengthMeters;
-    m_minAngle = minAngleRads;
-    m_maxAngle = maxAngleRads;
-    m_simulateGravity = simulateGravity;
-
-    setState(startingAngleRads, 0.0);
+    this(
+        plant,
+        gearbox,
+        Meters.of(armLengthMeters),
+        Meters.of(pivotDistanceMeters),
+        Radians.of(minAngleRadians),
+        Radians.of(maxAngleRadians),
+        MetersPerSecondPerSecond.of(gMetersPerSecondSquared),
+        Radians.of(startingAngleRadians),
+        measurementStdDevs);
   }
 
   /**
    * Creates a simulated arm mechanism.
    *
+   * @param kv The velocity gain of the arm.
+   * @param ka The acceleration gain of the arm.
+   * @param kg The gravity gain of the arm.
    * @param gearbox The type of and number of motors in the arm gearbox.
-   * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
-   * @param jKgMetersSquared The moment of inertia of the arm; can be calculated from CAD software.
-   * @param armLengthMeters The length of the arm.
-   * @param minAngleRads The minimum angle that the arm is capable of.
-   * @param maxAngleRads The maximum angle that the arm is capable of.
-   * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingAngleRads The initial position of the Arm simulation in radians.
+   * @param armLength The length of the arm.
+   * @param pivotDistance The distance of the pivot from the center of mass.
+   * @param minAngle The minimum angle that the arm is capable of.
+   * @param maxAngle The maximum angle that the arm is capable of.
+   * @param startingAngle The initial position of the Arm simulation.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
    */
   public SingleJointedArmSimTorque(
-      DCMotor gearbox,
-      double gearing,
-      double jKgMetersSquared,
-      double armLengthMeters,
-      double minAngleRads,
-      double maxAngleRads,
-      boolean simulateGravity,
-      double startingAngleRads,
+      Measure<? extends PerUnit<TorqueUnit, AngularVelocityUnit>> kv,
+      Measure<? extends PerUnit<TorqueUnit, AngularAccelerationUnit>> ka,
+      Torque kg,
+      Gearbox gearbox,
+      Distance armLength,
+      Distance pivotDistance,
+      Angle minAngle,
+      Angle maxAngle,
+      Angle startingAngle,
       double... measurementStdDevs) {
-    this(
-        LinearSystemId.createSingleJointedArmSystem(gearbox, jKgMetersSquared, gearing),
+    super(
+        LinearSystemId.identifyPositionSystem(kv.baseUnitMagnitude(), ka.baseUnitMagnitude()),
+        kg,
         gearbox,
-        gearing,
-        armLengthMeters,
-        minAngleRads,
-        maxAngleRads,
-        simulateGravity,
-        startingAngleRads,
+        armLength,
+        pivotDistance,
+        minAngle,
+        maxAngle,
+        startingAngle,
         measurementStdDevs);
   }
 
   /**
-   * Sets the arm's state. The new angle will be limited between the minimum and maximum allowed
-   * limits.
+   * Creates a simulated arm mechanism.
    *
-   * @param angleRadians The new angle in radians.
-   * @param velocityRadPerSec The new angular velocity in radians per second.
+   * @param kv The velocity gain of the arm.
+   * @param ka The acceleration gain of the arm.
+   * @param kg The gravity gain of the arm.
+   * @param gearbox The type of and number of motors in the arm gearbox.
+   * @param armLengthMeters The length of the arm.
+   * @param pivotDistanceMeters The distance of the pivot from the center of mass.
+   * @param minAngleRadians The minimum angle that the arm is capable of.
+   * @param maxAngleRadians The maximum angle that the arm is capable of.
+   * @param startingAngleRadians The initial position of the Arm simulation.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for position.
    */
-  public final void setState(double angleRadians, double velocityRadPerSec) {
-    setState(
-        VecBuilder.fill(MathUtil.clamp(angleRadians, m_minAngle, m_maxAngle), velocityRadPerSec));
+  public SingleJointedArmSimTorque(
+      double kv,
+      double ka,
+      double kg,
+      Gearbox gearbox,
+      double armLengthMeters,
+      double pivotDistanceMeters,
+      double minAngleRadians,
+      double maxAngleRadians,
+      double startingAngleRadians,
+      double... measurementStdDevs) {
+    this(
+        NewtonMeters.per(RadiansPerSecond).of(kv),
+        NewtonMeters.per(RadiansPerSecondPerSecond).of(ka),
+        NewtonMeters.of(kg),
+        gearbox,
+        Meters.of(armLengthMeters),
+        Meters.of(pivotDistanceMeters),
+        Radians.of(minAngleRadians),
+        Radians.of(maxAngleRadians),
+        Radians.of(startingAngleRadians),
+        measurementStdDevs);
   }
 
   /**
-   * Returns whether the arm would hit the lower limit.
+   * Sets the input torque for the arm.
    *
-   * @param currentAngleRads The current arm height.
-   * @return Whether the arm would hit the lower limit.
+   * @param torqueNM The input torque.
    */
-  public boolean wouldHitLowerLimit(double currentAngleRads) {
-    return currentAngleRads <= this.m_minAngle;
+  public void setInputTorque(double torqueNM) {
+    setInput(torqueNM);
+    // TODO: Need some guidance on clamping.
+    m_torque.mut_replace(m_u.get(0, 0), NewtonMeters);
   }
 
   /**
-   * Returns whether the arm would hit the upper limit.
+   * Sets the input torque for the arm.
    *
-   * @param currentAngleRads The current arm height.
-   * @return Whether the arm would hit the upper limit.
+   * @param torque The input torque.
    */
-  public boolean wouldHitUpperLimit(double currentAngleRads) {
-    return currentAngleRads >= this.m_maxAngle;
+  public void setInputTorque(Torque torque) {
+    setInputTorque(torque.in(NewtonMeters));
   }
 
-  /**
-   * Returns whether the arm has hit the lower limit.
-   *
-   * @return Whether the arm has hit the lower limit.
-   */
-  public boolean hasHitLowerLimit() {
-    return wouldHitLowerLimit(getAngleRads());
-  }
-
-  /**
-   * Returns whether the arm has hit the upper limit.
-   *
-   * @return Whether the arm has hit the upper limit.
-   */
-  public boolean hasHitUpperLimit() {
-    return wouldHitUpperLimit(getAngleRads());
-  }
-
-  /**
-   * Returns the current arm angle.
-   *
-   * @return The current arm angle.
-   */
-  public double getAngleRads() {
-    return getOutput(0);
-  }
-
-  /**
-   * Returns the current arm velocity.
-   *
-   * @return The current arm velocity.
-   */
-  public double getVelocityRadPerSec() {
-    return getOutput(1);
-  }
-
-  /**
-   * Returns the arm current draw.
-   *
-   * @return The arm current draw.
-   */
-  public double getCurrentDrawAmps() {
-    // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
-    // spinning 10x faster than the output
-    var motorVelocity = m_x.get(1, 0) * m_gearing;
-    return m_gearbox.getCurrent(motorVelocity, m_u.get(0, 0)) * Math.signum(m_u.get(0, 0));
-  }
-
-  /**
-   * Sets the input voltage for the arm.
-   *
-   * @param volts The input voltage.
-   */
-  public void setInputVoltage(double volts) {
-    setInput(volts);
-    clampInput(RobotController.getBatteryVoltage());
-  }
-
-  /**
-   * Calculates a rough estimate of the moment of inertia of an arm given its length and mass.
-   *
-   * @param lengthMeters The length of the arm.
-   * @param massKg The mass of the arm.
-   * @return The calculated moment of inertia.
-   */
-  public static double estimateMOI(double lengthMeters, double massKg) {
-    return 1.0 / 3.0 * massKg * lengthMeters * lengthMeters;
-  }
-
-  /**
-   * Updates the state of the arm.
-   *
-   * @param currentXhat The current state estimate.
-   * @param u The system inputs (voltage).
-   * @param dtSeconds The time difference between controller updates.
-   */
   @Override
-  protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
-    // The torque on the arm is given by τ = F⋅r, where F is the force applied by
-    // gravity and r the distance from pivot to center of mass. Recall from
-    // dynamics that the sum of torques for a rigid body is τ = J⋅α, were τ is
-    // torque on the arm, J is the mass-moment of inertia about the pivot axis,
-    // and α is the angular acceleration in rad/s². Rearranging yields: α = F⋅r/J
-    //
-    // We substitute in F = m⋅g⋅cos(θ), where θ is the angle from horizontal:
-    //
-    //   α = (m⋅g⋅cos(θ))⋅r/J
-    //
-    // Multiply RHS by cos(θ) to account for the arm angle. Further, we know the
-    // arm mass-moment of inertia J of our arm is given by J=1/3 mL², modeled as a
-    // rod rotating about it's end, where L is the overall rod length. The mass
-    // distribution is assumed to be uniform. Substitute r=L/2 to find:
-    //
-    //   α = (m⋅g⋅cos(θ))⋅r/(1/3 mL²)
-    //   α = (m⋅g⋅cos(θ))⋅(L/2)/(1/3 mL²)
-    //   α = 3/2⋅g⋅cos(θ)/L
-    //
-    // This acceleration is next added to the linear system dynamics ẋ=Ax+Bu
-    //
-    //   f(x, u) = Ax + Bu + [0  α]ᵀ
-    //   f(x, u) = Ax + Bu + [0  3/2⋅g⋅cos(θ)/L]ᵀ
-
-    Matrix<N2, N1> updatedXhat =
-        NumericalIntegration.rkdp(
-            (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
-              Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
-              if (m_simulateGravity) {
-                double alphaGrav = 3.0 / 2.0 * -9.8 * Math.cos(x.get(0, 0)) / m_armLenMeters;
-                xdot = xdot.plus(VecBuilder.fill(0, alphaGrav));
-              }
-              return xdot;
-            },
-            currentXhat,
-            u,
-            dtSeconds);
-
-    // We check for collision after updating xhat
-    if (wouldHitLowerLimit(updatedXhat.get(0, 0))) {
-      return VecBuilder.fill(m_minAngle, 0);
-    }
-    if (wouldHitUpperLimit(updatedXhat.get(0, 0))) {
-      return VecBuilder.fill(m_maxAngle, 0);
-    }
-    return updatedXhat;
+  public void update(double dtSeconds) {
+    super.update(dtSeconds);
+    m_currentDraw.mut_replace(
+        m_gearbox.currentAmps(getInput(0)) * Math.signum(m_u.get(0, 0)), Amps);
+    m_voltage.mut_replace(m_gearbox.voltageVolts(getInput(0), m_x.get(1, 0)), Volts);
+    m_torque.mut_replace(getInput(0), NewtonMeters);
   }
 }
