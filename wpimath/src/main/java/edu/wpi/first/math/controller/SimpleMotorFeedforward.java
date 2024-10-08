@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.proto.SimpleMotorFeedforwardProto;
 import edu.wpi.first.math.controller.struct.SimpleMotorFeedforwardStruct;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.PerUnit;
 import edu.wpi.first.units.TimeUnit;
@@ -29,6 +31,20 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
 
   /** The period. */
   private final double m_dt;
+
+  /**
+   * Creates a new SimpleMotorFeedforward with the specified plant. Units used to create the plant
+   * will dictate units of the computed feedforward. The static gain (ks) is assumed to be 0.0.
+   *
+   * <p>The constructor is useful for simulating LinearSystemSim classes.
+   *
+   * @param plant The system plant
+   * @param dtSeconds The period in seconds.
+   * @throws IllegalArgumentException for period &le; zero.
+   */
+  public SimpleMotorFeedforward(LinearSystem<N1, N1, N1> plant, double dtSeconds) {
+    this(0.0, -plant.getA(0, 0) / plant.getB(0, 0), 1.0 / plant.getB(0, 0), dtSeconds);
+  }
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains and period. Units of the gain
@@ -175,57 +191,57 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
     if (ka == 0.0) {
       // Given the following discrete feedforward model
       //
-      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
+      // uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
       //
       // where
       //
-      //   A_d = eᴬᵀ
-      //   B_d = A⁻¹(eᴬᵀ - I)B
-      //   A = −kᵥ/kₐ
-      //   B = 1/kₐ
+      // A_d = eᴬᵀ
+      // B_d = A⁻¹(eᴬᵀ - I)B
+      // A = −kᵥ/kₐ
+      // B = 1/kₐ
       //
       // We want the feedforward model when kₐ = 0.
       //
       // Simplify A.
       //
-      //   A = −kᵥ/kₐ
+      // A = −kᵥ/kₐ
       //
       // As kₐ approaches zero, A approaches -∞.
       //
-      //   A = −∞
+      // A = −∞
       //
       // Simplify A_d.
       //
-      //   A_d = eᴬᵀ
-      //   A_d = exp(−∞)
-      //   A_d = 0
+      // A_d = eᴬᵀ
+      // A_d = exp(−∞)
+      // A_d = 0
       //
       // Simplify B_d.
       //
-      //   B_d = A⁻¹(eᴬᵀ - I)B
-      //   B_d = A⁻¹((0) - I)B
-      //   B_d = A⁻¹(-I)B
-      //   B_d = -A⁻¹B
-      //   B_d = -(−kᵥ/kₐ)⁻¹(1/kₐ)
-      //   B_d = (kᵥ/kₐ)⁻¹(1/kₐ)
-      //   B_d = kₐ/kᵥ(1/kₐ)
-      //   B_d = 1/kᵥ
+      // B_d = A⁻¹(eᴬᵀ - I)B
+      // B_d = A⁻¹((0) - I)B
+      // B_d = A⁻¹(-I)B
+      // B_d = -A⁻¹B
+      // B_d = -(−kᵥ/kₐ)⁻¹(1/kₐ)
+      // B_d = (kᵥ/kₐ)⁻¹(1/kₐ)
+      // B_d = kₐ/kᵥ(1/kₐ)
+      // B_d = 1/kᵥ
       //
       // Substitute these into the feedforward equation.
       //
-      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
-      //   uₖ = (1/kᵥ)⁺(rₖ₊₁ − (0) rₖ)
-      //   uₖ = kᵥrₖ₊₁
+      // uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
+      // uₖ = (1/kᵥ)⁺(rₖ₊₁ − (0) rₖ)
+      // uₖ = kᵥrₖ₊₁
       return Volts.of(ks * Math.signum(nextVelocity.magnitude()) + kv * nextVelocity.magnitude());
     } else {
-      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
+      // uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
       //
       // where
       //
-      //   A_d = eᴬᵀ
-      //   B_d = A⁻¹(eᴬᵀ - I)B
-      //   A = −kᵥ/kₐ
-      //   B = 1/kₐ
+      // A_d = eᴬᵀ
+      // B_d = A⁻¹(eᴬᵀ - I)B
+      // A = −kᵥ/kₐ
+      // B = 1/kₐ
       double A = -kv / ka;
       double B = 1.0 / ka;
       double A_d = Math.exp(A * m_dt);
