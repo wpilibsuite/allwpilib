@@ -278,6 +278,17 @@ public interface Current extends Measure<CurrentUnit> {
 
 
   @Override
+  default Voltage times(Resistance multiplier) {
+    return Volts.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  @Override
+  default Per<CurrentUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<CurrentUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<CurrentUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<CurrentUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }

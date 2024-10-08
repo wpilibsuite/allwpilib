@@ -278,6 +278,17 @@ public interface AngularMomentum extends Measure<AngularMomentumUnit> {
 
 
   @Override
+  default Mult<AngularMomentumUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<AngularMomentumUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<AngularMomentumUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<AngularMomentumUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<AngularMomentumUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<AngularMomentumUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }

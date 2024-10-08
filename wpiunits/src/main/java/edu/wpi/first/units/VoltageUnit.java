@@ -82,6 +82,16 @@ public final class VoltageUnit extends Unit {
   }
 
   /**
+   * Combines this unit of voltage with a unit of current to form a unit of resistance.
+   *
+   * @param currentUnit the unit of current
+   * @return the combined resistance unit
+   */
+  public ResistanceUnit per(CurrentUnit currentUnit) {
+    return ResistanceUnit.combine(this, currentUnit);
+  }
+
+  /**
    * Creates a generic ratio unit of this voltage to a different unit type.
    *
    * @param other the other unit type

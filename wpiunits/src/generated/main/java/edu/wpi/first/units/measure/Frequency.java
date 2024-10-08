@@ -278,6 +278,17 @@ public interface Frequency extends Measure<FrequencyUnit> {
 
 
   @Override
+  default Mult<FrequencyUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<FrequencyUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<FrequencyUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<FrequencyUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<FrequencyUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<FrequencyUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }

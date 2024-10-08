@@ -278,6 +278,17 @@ public interface Force extends Measure<ForceUnit> {
 
 
   @Override
+  default Mult<ForceUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<ForceUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<ForceUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<ForceUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<ForceUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<ForceUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }
