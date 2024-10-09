@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
+#include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/StartEndCommand.h"
@@ -13,18 +14,39 @@ class SchedulerTest : public CommandTestBase {};
 TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
-  InstantCommand command;
+  ::testing::MockFunction<void(const Command&)> onInitialize;
+  ::testing::MockFunction<void(const Command&)> onBeforeExecute;
+  ::testing::MockFunction<void(const Command&)> onAfterExecute;
+  ::testing::MockFunction<void(const Command&)> onFinish;
 
-  int counter = 0;
+  MockCommand onceCommand({}, true);
+  MockCommand continuingCommand({}, false);
 
-  scheduler.OnCommandInitialize([&counter](const Command&) { counter++; });
-  scheduler.OnCommandExecute([&counter](const Command&) { counter++; });
-  scheduler.OnCommandFinish([&counter](const Command&) { counter++; });
+  {
+    ::testing::InSequence s;
 
-  scheduler.Schedule(&command);
+    EXPECT_CALL(onceCommand, Initialize());
+    EXPECT_CALL(onInitialize, Call(testing::Ref(onceCommand)));
+    EXPECT_CALL(continuingCommand, Initialize());
+    EXPECT_CALL(onInitialize, Call(testing::Ref(continuingCommand)));
+    EXPECT_CALL(onBeforeExecute, Call(testing::Ref(onceCommand)));
+    EXPECT_CALL(onceCommand, Execute());
+    EXPECT_CALL(onAfterExecute, Call(testing::Ref(onceCommand)));
+    EXPECT_CALL(onceCommand, End(testing::_));
+    EXPECT_CALL(onFinish, Call(testing::Ref(onceCommand)));
+    EXPECT_CALL(onBeforeExecute, Call(testing::Ref(continuingCommand)));
+    EXPECT_CALL(continuingCommand, Execute());
+    EXPECT_CALL(onAfterExecute, Call(testing::Ref(continuingCommand)));
+  }
+
+  scheduler.OnCommandInitialize(onInitialize.AsStdFunction());
+  scheduler.OnCommandBeforeExecute(onBeforeExecute.AsStdFunction());
+  scheduler.OnCommandExecute(onAfterExecute.AsStdFunction());
+  scheduler.OnCommandFinish(onFinish.AsStdFunction());
+
+  scheduler.Schedule(&onceCommand);
+  scheduler.Schedule(&continuingCommand);
   scheduler.Run();
-
-  EXPECT_EQ(counter, 3);
 }
 
 TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {

@@ -85,6 +85,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
   // Lists of user-supplied actions to be executed on scheduling events for every command.
   private final List<Consumer<Command>> m_initActions = new ArrayList<>();
+  private final List<Consumer<Command>> m_beforeExecuteActions = new ArrayList<>();
   private final List<Consumer<Command>> m_executeActions = new ArrayList<>();
   private final List<BiConsumer<Command, Optional<Command>>> m_interruptActions = new ArrayList<>();
   private final List<Consumer<Command>> m_finishActions = new ArrayList<>();
@@ -285,6 +286,9 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
         continue;
       }
 
+      for (Consumer<Command> action : m_beforeExecuteActions) {
+        action.accept(command);
+      }
       command.execute();
       for (Consumer<Command> action : m_executeActions) {
         action.accept(command);
@@ -562,7 +566,16 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Adds an action to perform on the execution of any command by the scheduler.
+   * Adds an action to perform before the execution of any command by the scheduler.
+   *
+   * @param action the action to perform
+   */
+  public void onCommandBeforeExecute(Consumer<Command> action) {
+    m_beforeExecuteActions.add(requireNonNullParam(action, "action", "onCommandBeforeExecute"));
+  }
+
+  /**
+   * Adds an action to perform after the execution of any command by the scheduler.
    *
    * @param action the action to perform
    */
