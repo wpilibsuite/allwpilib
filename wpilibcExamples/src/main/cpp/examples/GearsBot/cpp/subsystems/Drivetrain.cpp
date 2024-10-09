@@ -12,16 +12,16 @@
 #include <units/length.h>
 
 Drivetrain::Drivetrain() {
-  wpi::SendableRegistry::AddChild(&m_robotDrive, &m_frontLeft);
-  wpi::SendableRegistry::AddChild(&m_robotDrive, &m_frontRight);
+  wpi::SendableRegistry::AddChild(&m_robotDrive, &m_leftLeader);
+  wpi::SendableRegistry::AddChild(&m_robotDrive, &m_rightLeader);
 
-  m_frontLeft.AddFollower(m_rearLeft);
-  m_frontRight.AddFollower(m_rearRight);
+  m_leftLeader.AddFollower(m_leftFollower);
+  m_rightLeader.AddFollower(m_rightFollower);
 
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
   // gearbox is constructed, you might have to invert the left side instead.
-  m_frontRight.SetInverted(true);
+  m_rightLeader.SetInverted(true);
 
   // Encoders may measure differently in the real world and in simulation. In
   // this example the robot moves 0.042 barleycorns per tick in the real world,
@@ -39,10 +39,6 @@ Drivetrain::Drivetrain() {
   }
   SetName("Drivetrain");
   // Let's show everything on the LiveWindow
-  AddChild("Front_Left Motor", &m_frontLeft);
-  AddChild("Rear Left Motor", &m_rearLeft);
-  AddChild("Front Right Motor", &m_frontRight);
-  AddChild("Rear Right Motor", &m_rearRight);
   AddChild("Left Encoder", &m_leftEncoder);
   AddChild("Right Encoder", &m_rightEncoder);
   AddChild("Rangefinder", &m_rangefinder);
