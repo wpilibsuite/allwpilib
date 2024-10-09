@@ -569,16 +569,35 @@ public interface LEDPattern {
     };
   }
 
+  /** Types of gradients. */
+  enum GradientType {
+    /**
+     * A continuous gradient, where the gradient wraps around to allow for seamless scrolling
+     * effects.
+     */
+    kContinuous,
+
+    /**
+     * A discontinuous gradient, where the first pixel is set to the first color of the gradient and
+     * the final pixel is set to the last color of the gradient. There is no wrapping effect, so
+     * scrolling effects will display an obvious seam.
+     */
+    kDiscontinuous
+  }
+
   /**
    * Creates a pattern that displays a non-animated gradient of colors across the entire length of
-   * the LED strip. The gradient wraps around so the start and end of the strip are the same color,
-   * which allows the gradient to be modified with a scrolling effect with no discontinuities.
-   * Colors are evenly distributed along the full length of the LED strip.
+   * the LED strip. Colors are evenly distributed along the full length of the LED strip. The
+   * gradient type is configured with the {@code type} parameter, allowing the gradient to be either
+   * continuous (no seams, good for scrolling effects) or discontinuous (a clear seam is visible,
+   * but the gradient applies to the full length of the LED strip without needing to use some space
+   * for wrapping).
    *
+   * @param type the type of gradient (continuous or discontinuous)
    * @param colors the colors to display in the gradient
    * @return a motionless gradient pattern
    */
-  static LEDPattern gradient(Color... colors) {
+  static LEDPattern gradient(GradientType type, Color... colors) {
     if (colors.length == 0) {
       // Nothing to display
       DriverStation.reportWarning("Creating a gradient with no colors!", false);
@@ -595,7 +614,11 @@ public interface LEDPattern {
 
     return (reader, writer) -> {
       int bufLen = reader.getLength();
-      int ledsPerSegment = bufLen / numSegments;
+      int ledsPerSegment =
+          switch (type) {
+            case kContinuous -> bufLen / numSegments;
+            case kDiscontinuous -> (bufLen - 1) / (numSegments - 1);
+          };
 
       for (int led = 0; led < bufLen; led++) {
         int colorIndex = (led / ledsPerSegment) % numSegments;

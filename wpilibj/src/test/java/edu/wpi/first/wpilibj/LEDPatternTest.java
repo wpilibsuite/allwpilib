@@ -11,6 +11,8 @@ import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Value;
+import static edu.wpi.first.wpilibj.LEDPattern.GradientType.kContinuous;
+import static edu.wpi.first.wpilibj.LEDPattern.GradientType.kDiscontinuous;
 import static edu.wpi.first.wpilibj.util.Color.kBlack;
 import static edu.wpi.first.wpilibj.util.Color.kBlue;
 import static edu.wpi.first.wpilibj.util.Color.kLime;
@@ -80,7 +82,7 @@ class LEDPatternTest {
 
   @Test
   void gradient0SetsToBlack() {
-    LEDPattern pattern = LEDPattern.gradient();
+    LEDPattern pattern = LEDPattern.gradient(kContinuous);
     AddressableLEDBuffer buffer = new AddressableLEDBuffer(99);
     for (int i = 0; i < buffer.getLength(); i++) {
       buffer.setRGB(i, 127, 128, 129);
@@ -95,7 +97,7 @@ class LEDPatternTest {
 
   @Test
   void gradient1SetsToSolid() {
-    LEDPattern pattern = LEDPattern.gradient(kYellow);
+    LEDPattern pattern = LEDPattern.gradient(kContinuous, kYellow);
 
     AddressableLEDBuffer buffer = new AddressableLEDBuffer(99);
     pattern.applyTo(buffer);
@@ -106,8 +108,8 @@ class LEDPatternTest {
   }
 
   @Test
-  void gradient2Colors() {
-    LEDPattern pattern = LEDPattern.gradient(kYellow, kPurple);
+  void continuousGradient2Colors() {
+    LEDPattern pattern = LEDPattern.gradient(kContinuous, kYellow, kPurple);
 
     AddressableLEDBuffer buffer = new AddressableLEDBuffer(99);
     pattern.applyTo(buffer);
@@ -120,8 +122,20 @@ class LEDPatternTest {
   }
 
   @Test
+  void discontinuousGradient2Colors() {
+    LEDPattern pattern = LEDPattern.gradient(kDiscontinuous, kYellow, kPurple);
+
+    AddressableLEDBuffer buffer = new AddressableLEDBuffer(99);
+    pattern.applyTo(buffer);
+
+    assertColorEquals(kYellow, buffer.getLED(0));
+    assertColorEquals(Color.lerpRGB(kYellow, kPurple, 0.5), buffer.getLED(49));
+    assertColorEquals(kPurple, buffer.getLED(98));
+  }
+
+  @Test
   void gradient3Colors() {
-    LEDPattern pattern = LEDPattern.gradient(kYellow, kPurple, kWhite);
+    LEDPattern pattern = LEDPattern.gradient(kContinuous, kYellow, kPurple, kWhite);
     AddressableLEDBuffer buffer = new AddressableLEDBuffer(99);
     pattern.applyTo(buffer);
 
@@ -132,6 +146,19 @@ class LEDPatternTest {
     assertColorEquals(kWhite, buffer.getLED(66));
     assertColorEquals(Color.lerpRGB(kWhite, kYellow, 25.0 / 33.0), buffer.getLED(91));
     assertColorEquals(Color.lerpRGB(kWhite, kYellow, 32.0 / 33.0), buffer.getLED(98));
+  }
+
+  @Test
+  void discontinuousGradient3Colors() {
+    LEDPattern pattern = LEDPattern.gradient(kDiscontinuous, kYellow, kPurple, kWhite);
+    AddressableLEDBuffer buffer = new AddressableLEDBuffer(101);
+    pattern.applyTo(buffer);
+
+    assertColorEquals(kYellow, buffer.getLED(0));
+    assertColorEquals(Color.lerpRGB(kYellow, kPurple, 0.5), buffer.getLED(25));
+    assertColorEquals(kPurple, buffer.getLED(50));
+    assertColorEquals(Color.lerpRGB(kPurple, kWhite, 0.5), buffer.getLED(75));
+    assertColorEquals(kWhite, buffer.getLED(100));
   }
 
   @Test
