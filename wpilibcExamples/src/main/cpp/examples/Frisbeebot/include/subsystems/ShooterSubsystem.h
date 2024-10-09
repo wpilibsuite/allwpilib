@@ -28,5 +28,5 @@ class ShooterSubsystem : public frc2::PIDSubsystem {
   frc::PWMSparkMax m_shooterMotor;
   frc::PWMSparkMax m_feederMotor;
   frc::Encoder m_shooterEncoder;
-  frc::SimpleMotorFeedforward<units::turns> m_shooterFeedforward;
+  frc::SimpleMotorFeedforward<units::radians> m_shooterFeedforward;
 };

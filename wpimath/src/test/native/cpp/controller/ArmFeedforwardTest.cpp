@@ -62,7 +62,7 @@ void CalculateAndSimulate(const frc::ArmFeedforward& armFF,
                           units::radians_per_second_t currentVelocity,
                           units::radians_per_second_t nextVelocity,
                           units::second_t dt) {
-  auto input = armFF.Calculate(currentAngle, currentVelocity, nextVelocity, dt);
+  auto input = armFF.Calculate(currentAngle, currentVelocity, nextVelocity);
   EXPECT_NEAR(nextVelocity.value(),
               Simulate(currentAngle, currentVelocity, input, dt)(1), 1e-12);
 }
@@ -79,17 +79,6 @@ TEST(ArmFeedforwardTest, Calculate) {
   EXPECT_NEAR(
       armFF.Calculate(std::numbers::pi / 3 * 1_rad, 1_rad_per_s).value(), 2.5,
       0.002);
-
-  // Calculate(angle, angular velocity, angular acceleration)
-  EXPECT_NEAR(
-      armFF.Calculate(std::numbers::pi / 3 * 1_rad, 1_rad_per_s, 2_rad_per_s_sq)
-          .value(),
-      6.5, 0.002);
-  EXPECT_NEAR(
-      armFF
-          .Calculate(std::numbers::pi / 3 * 1_rad, -1_rad_per_s, 2_rad_per_s_sq)
-          .value(),
-      2.5, 0.002);
 
   // Calculate(currentAngle, currentVelocity, nextAngle, dt)
   CalculateAndSimulate(armFF, std::numbers::pi / 3 * 1_rad, 1_rad_per_s,

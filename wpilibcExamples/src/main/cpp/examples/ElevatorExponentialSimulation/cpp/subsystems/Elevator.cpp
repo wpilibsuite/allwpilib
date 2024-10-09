@@ -48,7 +48,7 @@ void Elevator::ReachGoal(units::meter_t goal) {
   auto pidOutput = m_controller.Calculate(m_encoder.GetDistance(),
                                           m_setpoint.position / 1_m);
   auto feedforwardOutput =
-      m_feedforward.Calculate(m_setpoint.velocity, next.velocity, 20_ms);
+      m_feedforward.Calculate(m_setpoint.velocity, next.velocity);
 
   m_motor.SetVoltage(units::volt_t{pidOutput} + feedforwardOutput);
 

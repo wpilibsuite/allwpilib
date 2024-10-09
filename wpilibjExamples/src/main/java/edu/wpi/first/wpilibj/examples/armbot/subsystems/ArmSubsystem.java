@@ -4,6 +4,10 @@
 
 package edu.wpi.first.wpilibj.examples.armbot.subsystems;
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -41,7 +45,10 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
   @Override
   public void useOutput(double output, TrapezoidProfile.State setpoint) {
     // Calculate the feedforward from the sepoint
-    double feedforward = m_feedforward.calculate(setpoint.position, setpoint.velocity);
+    double feedforward =
+        m_feedforward
+            .calculate(Radians.of(setpoint.position), RadiansPerSecond.of(setpoint.velocity))
+            .in(Volts);
     // Add the feedforward to the PID output to get the motor output
     m_motor.setVoltage(output + feedforward);
   }

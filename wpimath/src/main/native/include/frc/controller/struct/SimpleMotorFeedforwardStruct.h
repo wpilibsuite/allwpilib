@@ -10,7 +10,8 @@
 #include "units/length.h"
 
 // Everything is converted into units for
-// frc::SimpleMotorFeedforward<units::meters>
+// frc::SimpleMotorFeedforward<units::meters> or
+// frc::SimpleMotorFeedforward<units::radians>
 
 template <class Distance>
 struct wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
@@ -31,6 +32,6 @@ struct wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
 static_assert(
     wpi::StructSerializable<frc::SimpleMotorFeedforward<units::meters>>);
 static_assert(
-    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::feet>>);
+    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::radians>>);
 
 #include "frc/controller/struct/SimpleMotorFeedforwardStruct.inc"

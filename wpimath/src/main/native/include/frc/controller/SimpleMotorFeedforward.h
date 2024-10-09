@@ -7,6 +7,8 @@
 #include <gcem.hpp>
 #include <wpi/MathExtras.h>
 
+#include "units/angle.h"
+#include "units/length.h"
 #include "units/time.h"
 #include "units/voltage.h"
 #include "wpimath/MathShared.h"
@@ -18,6 +20,8 @@ namespace frc {
  * permanent-magnet DC motor.
  */
 template <class Distance>
+  requires std::same_as<units::meter, Distance> ||
+           std::same_as<units::radian, Distance>
 class SimpleMotorFeedforward {
  public:
   using Velocity =
@@ -35,6 +39,9 @@ class SimpleMotorFeedforward {
    * @param kV The velocity gain, in volt seconds per distance.
    * @param kA The acceleration gain, in volt seconds² per distance.
    * @param dt The period in seconds.
+   * @throws IllegalArgumentException for kv &lt; zero.
+   * @throws IllegalArgumentException for ka &lt; zero.
+   * @throws IllegalArgumentException for period &le; zero.
    */
   constexpr SimpleMotorFeedforward(
       units::volt_t kS, units::unit_t<kv_unit> kV,
@@ -62,10 +69,11 @@ class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints.
+   * Calculates the feedforward from the gains and setpoints assuming continuous
+   * control.
    *
-   * @param velocity     The velocity setpoint, in distance per second.
-   * @param acceleration The acceleration setpoint, in distance per second².
+   * @param velocity     The velocity setpoint.
+   * @param acceleration The acceleration setpoint.
    * @return The computed feedforward, in volts.
    * @deprecated Use the current/next velocity overload instead.
    */
@@ -77,11 +85,10 @@ class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoint.
-   * Use this method when the setpoint does not change.
+   * Calculates the feedforward from the gains and setpoint assuming discrete
+   * control. Use this method when the setpoint does not change.
    *
-   * @param setpoint The velocity setpoint, in distance per
-   *                        second.
+   * @param setpoint The velocity setpoint.
    * @return The computed feedforward, in volts.
    */
   constexpr units::volt_t Calculate(units::unit_t<Velocity> setpoint) const {
@@ -89,70 +96,22 @@ class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints.
+   * Calculates the feedforward from the gains and setpoints assuming discrete
+   * control.
    *
-   * @param currentVelocity The current velocity setpoint, in distance per
-   *                        second.
-   * @param nextVelocity    The next velocity setpoint, in distance per second.
+   * <p>Note this method is inaccurate when the velocity crosses 0.
+   *
+   * @param currentVelocity The current velocity setpoint.
+   * @param nextVelocity    The next velocity setpoint.
    * @return The computed feedforward, in volts.
    */
   constexpr units::volt_t Calculate(
       units::unit_t<Velocity> currentVelocity,
       units::unit_t<Velocity> nextVelocity) const {
+    // See wpimath/algorithms.md#Simple_motor_feedforward for derivation
     if (kA == decltype(kA)(0)) {
-      // Given the following discrete feedforward model
-      //
-      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
-      //
-      // where
-      //
-      //   A_d = eᴬᵀ
-      //   B_d = A⁻¹(eᴬᵀ - I)B
-      //   A = −kᵥ/kₐ
-      //   B = 1/kₐ
-      //
-      // We want the feedforward model when kₐ = 0.
-      //
-      // Simplify A.
-      //
-      //   A = −kᵥ/kₐ
-      //
-      // As kₐ approaches zero, A approaches -∞.
-      //
-      //   A = −∞
-      //
-      // Simplify A_d.
-      //
-      //   A_d = eᴬᵀ
-      //   A_d = std::exp(−∞)
-      //   A_d = 0
-      //
-      // Simplify B_d.
-      //
-      //   B_d = A⁻¹(eᴬᵀ - I)B
-      //   B_d = A⁻¹((0) - I)B
-      //   B_d = A⁻¹(-I)B
-      //   B_d = -A⁻¹B
-      //   B_d = -(−kᵥ/kₐ)⁻¹(1/kₐ)
-      //   B_d = (kᵥ/kₐ)⁻¹(1/kₐ)
-      //   B_d = kₐ/kᵥ(1/kₐ)
-      //   B_d = 1/kᵥ
-      //
-      // Substitute these into the feedforward equation.
-      //
-      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
-      //   uₖ = (1/kᵥ)⁺(rₖ₊₁ − (0) rₖ)
-      //   uₖ = kᵥrₖ₊₁
       return kS * wpi::sgn(nextVelocity) + kV * nextVelocity;
     } else {
-      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
-      //
-      // where
-      //
-      //   A_d = eᴬᵀ
-      //   B_d = A⁻¹(eᴬᵀ - I)B
-      //   A = −kᵥ/kₐ
-      //   B = 1/kₐ
       double A = -kV.value() / kA.value();
       double B = 1.0 / kA.value();
       double A_d = gcem::exp(A * m_dt.value());
