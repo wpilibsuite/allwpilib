@@ -1,0 +1,14 @@
+
+
+###############################
+# Linux
+###############################
+build:linux --config=base_linux
+
+# Warning level
+build:linux --copt=-Wall
+build:linux --copt=-Wextra
+build:linux --copt=-Werror
+
+# Not in nativetools
+build:linux --cxxopt=-Wno-deprecated-enum-enum-conversion

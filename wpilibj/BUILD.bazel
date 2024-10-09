@@ -1,0 +1,82 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
+
+generate_version_file(
+    name = "generate-version",
+    output_file = "WPILibVersion.java",
+    template = "src/generate/WPILibVersion.java.in",
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "generated_java",
+    srcs = glob(["src/generated/main/java/**/*.java"]),
+    visibility = ["//wpilibj:__subpackages__"],
+)
+
+java_library(
+    name = "wpilibj",
+    srcs = [
+        ":generate-version",
+        ":generated_java",
+    ] + glob(["src/main/java/**/*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cameraserver:cameraserver-java",
+        "//cscore:cscore-java",
+        "//hal:hal-java",
+        "//ntcore:networktables-java",
+        "//wpimath:wpimath-java",
+        "//wpinet:wpinet-java",
+        "//wpiunits",
+        "//wpiutil:wpiutil-java",
+        "@maven//:org_ejml_ejml_core",
+        "@maven//:org_ejml_ejml_simple",
+    ],
+)
+
+cc_binary(
+    name = "DevMain-Cpp",
+    srcs = ["src/dev/native/cpp/main.cpp"],
+    deps = [
+    ],
+)
+
+java_binary(
+    name = "DevMain-Java",
+    srcs = ["src/dev/java/edu/wpi/first/wpilibj/DevMain.java"],
+    main_class = "edu.wpi.first.wpilibj.DevMain",
+    deps = [
+        "//hal:hal-java",
+        "//ntcore:networktables-java",
+        "//wpimath:wpimath-java",
+        "//wpiutil:wpiutil-java",
+    ],
+)
+
+filegroup(
+    name = "hid_schema",
+    srcs = [
+        "src/generate/hids.json",
+        "src/generate/hids.schema.json",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "pwm_schema",
+    srcs = [
+        "src/generate/pwm_motor_controllers.json",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "templates",
+    srcs = glob(["src/generate/*.jinja"]) + [
+        ":hid_schema",
+        ":pwm_schema",
+    ],
+    visibility = ["//visibility:public"],
+)

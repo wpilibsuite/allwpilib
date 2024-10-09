@@ -1,0 +1,21 @@
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+
+java_library(
+    name = "cscore-java",
+    srcs = glob(["src/main/java/**/*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil:wpiutil-java",
+        "@bzlmodrio-opencv//libraries/java/opencv",
+    ],
+)
+
+java_binary(
+    name = "DevMain-Java",
+    srcs = ["src/dev/java/edu/wpi/first/cscore/DevMain.java"],
+    main_class = "edu.wpi.first.cscore.DevMain",
+    deps = [
+        ":cscore-java",
+        "//wpiutil:wpiutil-java",
+    ],
+)
