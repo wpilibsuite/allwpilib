@@ -19,9 +19,13 @@ public final class EventLoop {
   public EventLoop() {}
 
   /**
-   * Bind a new action to run when the loop is polled.
+   * Bind a new action to run when the loop is polled. Has no effect if the action instance is
+   * already bound (note that different invocations of lambda functions and method references are
+   * different objects, and can be re-bound).
    *
    * @param action the action to run.
+   * @throws ConcurrentModificationException if the loop is in the middle of being
+   *   {@link #poll() polled}
    */
   public void bind(Runnable action) {
     if (m_running) {
@@ -41,7 +45,12 @@ public final class EventLoop {
     }
   }
 
-  /** Clear all bindings. */
+  /**
+   * Clear all bindings.
+   *
+   * @throws ConcurrentModificationException if the loop is in the middle of being
+   *   {@link #poll() polled}
+   */
   public void clear() {
     if (m_running) {
       throw new ConcurrentModificationException("Cannot clear EventLoop while it is running");

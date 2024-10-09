@@ -1,0 +1,47 @@
+ext {
+    useJava = true
+    useCpp = false
+    baseId = 'commandsv3'
+    groupId = 'edu.wpi.first.wpilibj'
+
+    nativeName = 'commandsv3'
+    devMain = ''
+}
+
+apply from: "${rootDir}/shared/java/javacommon.gradle"
+
+evaluationDependsOn(':wpiutil')
+evaluationDependsOn(':ntcore')
+evaluationDependsOn(':hal')
+evaluationDependsOn(':wpimath')
+evaluationDependsOn(':wpilibj')
+
+dependencies {
+    implementation project(':wpiutil')
+    implementation project(':wpinet')
+    implementation project(':ntcore')
+    implementation project(':hal')
+    implementation project(':wpimath')
+    implementation project(':wpilibj')
+    testImplementation 'org.mockito:mockito-core:4.1.0'
+}
+
+tasks.withType(Javadoc) {
+    options.addBooleanOption("-enable-preview", true)
+    options.addStringOption("-release", "21")
+}
+
+test {
+    testLogging {
+        outputs.upToDateWhen {false}
+        showStandardStreams = true
+    }
+    doFirst {
+        jvmArgs = [
+            '--add-opens',
+            'java.base/jdk.internal.vm=ALL-UNNAMED',
+            '--add-opens',
+            'java.base/java.lang=ALL-UNNAMED',
+        ]
+    }
+}

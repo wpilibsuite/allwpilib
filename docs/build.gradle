@@ -214,6 +214,8 @@ task generateJavaDocs(type: Javadoc) {
             "-edu.wpi.first.units.measure", true)
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
+    options.addBooleanOption("-enable-preview", true)
+    options.addStringOption("-release", "21")
     options.linkSource(true)
     dependsOn project(':wpilibj').generateJavaVersion
     source project(':apriltag').sourceSets.main.java
