@@ -49,7 +49,7 @@ TEST(LEDPatternTest, SolidColor) {
 TEST(LEDPatternTest, EmptyGradientSetsToBlack) {
   std::array<Color, 0> colors;
   LEDPattern pattern =
-    LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
+      LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
   std::array<AddressableLED::LEDData, 5> buffer;
   pattern.ApplyTo(buffer);
   for (int i = 0; i < 5; i++) {
@@ -60,7 +60,7 @@ TEST(LEDPatternTest, EmptyGradientSetsToBlack) {
 TEST(LEDPatternTest, SingleColorGradientSetsSolid) {
   std::array<Color, 1> colors{Color::kYellow};
   LEDPattern pattern =
-    LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
+      LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
   std::array<AddressableLED::LEDData, 5> buffer;
   pattern.ApplyTo(buffer);
   for (int i = 0; i < 5; i++) {
@@ -71,7 +71,7 @@ TEST(LEDPatternTest, SingleColorGradientSetsSolid) {
 TEST(LEDPatternTest, Gradient2Colors) {
   std::array<Color, 2> colors{Color::kYellow, Color::kPurple};
   LEDPattern pattern =
-    LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
+      LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
   std::array<AddressableLED::LEDData, 99> buffer;
   pattern.ApplyTo(buffer);
   AssertIndexColor(buffer, 0, Color::kYellow);
@@ -86,19 +86,18 @@ TEST(LEDPatternTest, Gradient2Colors) {
 TEST(LEDPatternTest, DiscontinuousGradient2Colors) {
   std::array<Color, 2> colors{Color::kYellow, Color::kPurple};
   LEDPattern pattern =
-    LEDPattern::Gradient(LEDPattern::GradientType::kDiscontinuous, colors);
+      LEDPattern::Gradient(LEDPattern::GradientType::kDiscontinuous, colors);
   std::array<AddressableLED::LEDData, 99> buffer;
   pattern.ApplyTo(buffer);
   AssertIndexColor(buffer, 0, Color::kYellow);
-  AssertIndexColor(buffer, 49,
-                   LerpColors(Color::kYellow, Color::kPurple, 0.5));
+  AssertIndexColor(buffer, 49, LerpColors(Color::kYellow, Color::kPurple, 0.5));
   AssertIndexColor(buffer, 98, Color::kPurple);
 }
 
 TEST(LEDPatternTest, Gradient3Colors) {
   std::array<Color, 3> colors{Color::kYellow, Color::kPurple, Color::kWhite};
   LEDPattern pattern =
-    LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
+      LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
   std::array<AddressableLED::LEDData, 99> buffer;
   pattern.ApplyTo(buffer);
 
@@ -118,16 +117,14 @@ TEST(LEDPatternTest, Gradient3Colors) {
 TEST(LEDPatternTest, DiscontinuousGradient3Colors) {
   std::array<Color, 3> colors{Color::kYellow, Color::kPurple, Color::kWhite};
   LEDPattern pattern =
-    LEDPattern::Gradient(LEDPattern::GradientType::kDiscontinuous, colors);
+      LEDPattern::Gradient(LEDPattern::GradientType::kDiscontinuous, colors);
   std::array<AddressableLED::LEDData, 101> buffer;
   pattern.ApplyTo(buffer);
 
   AssertIndexColor(buffer, 0, Color::kYellow);
-  AssertIndexColor(buffer, 25,
-                   LerpColors(Color::kYellow, Color::kPurple, 0.5));
+  AssertIndexColor(buffer, 25, LerpColors(Color::kYellow, Color::kPurple, 0.5));
   AssertIndexColor(buffer, 50, Color::kPurple);
-  AssertIndexColor(buffer, 75,
-                   LerpColors(Color::kPurple, Color::kWhite, 0.5));
+  AssertIndexColor(buffer, 75, LerpColors(Color::kPurple, Color::kWhite, 0.5));
   AssertIndexColor(buffer, 100, Color::kWhite);
 }
 

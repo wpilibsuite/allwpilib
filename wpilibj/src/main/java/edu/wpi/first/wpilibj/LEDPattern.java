@@ -578,9 +578,9 @@ public interface LEDPattern {
     kContinuous,
 
     /**
-     * A discontinuous gradient, where the first pixel is set to the first color of the gradient
-     * and the final pixel is set to the last color of the gradient. There is no wrapping effect,
-     * so scrolling effects will display an obvious seam.
+     * A discontinuous gradient, where the first pixel is set to the first color of the gradient and
+     * the final pixel is set to the last color of the gradient. There is no wrapping effect, so
+     * scrolling effects will display an obvious seam.
      */
     kDiscontinuous
   }
@@ -614,10 +614,11 @@ public interface LEDPattern {
 
     return (reader, writer) -> {
       int bufLen = reader.getLength();
-      int ledsPerSegment = switch (type) {
-        case kContinuous -> bufLen / numSegments;
-        case kDiscontinuous -> (bufLen - 1) / (numSegments - 1);
-      };
+      int ledsPerSegment =
+          switch (type) {
+            case kContinuous -> bufLen / numSegments;
+            case kDiscontinuous -> (bufLen - 1) / (numSegments - 1);
+          };
 
       for (int led = 0; led < bufLen; led++) {
         int colorIndex = (led / ledsPerSegment) % numSegments;

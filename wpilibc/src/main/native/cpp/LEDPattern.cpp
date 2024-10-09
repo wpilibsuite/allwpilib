@@ -263,9 +263,8 @@ LEDPattern LEDPattern::Steps(
   return Steps(std::span{steps.begin(), steps.end()});
 }
 
-LEDPattern LEDPattern::Gradient(
-    GradientType type,
-    std::span<const Color> colors) {
+LEDPattern LEDPattern::Gradient(GradientType type,
+                                std::span<const Color> colors) {
   if (colors.size() == 0) {
     // no colors specified
     return LEDPattern::Off();
@@ -305,9 +304,8 @@ LEDPattern LEDPattern::Gradient(
   }};
 }
 
-LEDPattern LEDPattern::Gradient(
-    GradientType type,
-    std::initializer_list<Color> colors) {
+LEDPattern LEDPattern::Gradient(GradientType type,
+                                std::initializer_list<Color> colors) {
   return Gradient(type, std::span{colors.begin(), colors.end()});
 }
 
