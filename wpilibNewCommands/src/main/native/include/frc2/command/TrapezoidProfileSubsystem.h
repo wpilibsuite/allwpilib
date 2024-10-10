@@ -16,9 +16,11 @@ namespace frc2 {
  * profile by overriding the `UseState` method.
  *
  * This class is provided by the NewCommands VendorDep
+ * @deprecated Use a TrapezoidProfile instead
  */
 template <class Distance>
-class TrapezoidProfileSubsystem : public SubsystemBase {
+class [[deprecated("Use a TrapezoidProfile instead")]] TrapezoidProfileSubsystem
+    : public SubsystemBase {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;

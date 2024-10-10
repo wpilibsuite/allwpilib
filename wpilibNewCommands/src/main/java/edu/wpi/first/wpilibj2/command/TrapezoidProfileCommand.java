@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -15,6 +15,8 @@ import java.util.function.Supplier;
  * A command that runs a {@link TrapezoidProfile}. Useful for smoothly controlling mechanism motion.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @deprecated Use a TrapezoidProfile instead
  */
 @Deprecated(since = "2025", forRemoval = true)
 public class TrapezoidProfileCommand extends Command {

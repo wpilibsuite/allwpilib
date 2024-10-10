@@ -13,7 +13,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  * how to use the current state of the motion profile by overriding the `useState` method.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @deprecated Use a TrapezoidProfile instead
  */
+@Deprecated(forRemoval = true, since = "2025")
 public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
   private final double m_period;
   private final TrapezoidProfile m_profile;

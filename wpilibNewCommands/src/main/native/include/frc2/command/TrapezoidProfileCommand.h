@@ -20,9 +20,10 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  *
  * @see TrapezoidProfile
+ * @deprecated Use a TrapezoidProfile instead
  */
 template <class Distance>
-class TrapezoidProfileCommand
+class [[deprecated("Use a TrapezoidProfile instead")]] TrapezoidProfileCommand
     : public CommandHelper<Command, TrapezoidProfileCommand<Distance>> {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
