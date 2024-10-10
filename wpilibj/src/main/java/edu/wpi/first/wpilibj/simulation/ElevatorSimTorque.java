@@ -11,7 +11,6 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.Newtons;
 import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.units.Units.VoltsPerMeterPerSecondSquared;
 
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
@@ -20,15 +19,14 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.units.LinearAccelerationUnit;
 import edu.wpi.first.units.LinearVelocityUnit;
-import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.TorqueUnit;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.Per;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.units.measure.Torque;
 
-/** Represents a simulated elevator mechanism controlled by voltage. */
-public class ElevatorSim extends ElevatorSimBase {
+/** Represents a simulated elevator mechanism controlled by torque input. */
+public class ElevatorSimTorque extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
    *
@@ -41,16 +39,13 @@ public class ElevatorSim extends ElevatorSimBase {
    * @param drum The elevator's drum.
    * @param minHeightMeters The min allowable height of the elevator in meters.
    * @param maxHeightMeters The max allowable height of the elevator in meters.
-   * @param gMetersPerSecondSquared The acceleration due to gravity in meters per second squared. To
-   *     disable gravity in the simulation set to 0. The enable normal earth gravity use -9.8.
-   *     Values between 0 and -9.8 can be used to simulate free fall more accurately, but must be
-   *     determined by the user.
+   * @param gMetersPerSecondSquared The acceleration due to gravity in meters per second squared.
    * @param startingHeightMeters The starting height of the elevator in meters.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
    */
-  public ElevatorSim(
+  public ElevatorSimTorque(
       LinearSystem<N2, N1, N2> plant,
       Wheel drum,
       double minHeightMeters,
@@ -80,15 +75,13 @@ public class ElevatorSim extends ElevatorSimBase {
    * @param drum The elevator's drum.
    * @param minHeight The min allowable height of the elevator.
    * @param maxHeight The max allowable height of the elevator.
-   * @param g The acceleration due to gravity in meters per second squared. To disable gravity in
-   *     the simulation set to 0. The enable normal earth gravity use -9.8. Values between 0 and
-   *     -9.8 can be used to simulate free fall more accurately, but must be determined by the user.
+   * @param g The acceleration due to gravity.
    * @param startingHeight The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
    */
-  public ElevatorSim(
+  public ElevatorSimTorque(
       LinearSystem<N2, N1, N2> plant,
       Wheel drum,
       Distance minHeight,
@@ -96,32 +89,22 @@ public class ElevatorSim extends ElevatorSimBase {
       LinearAcceleration g,
       Distance startingHeight,
       double... measurementStdDevs) {
-    // By theorem 6.9.1 of
-    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
-    // the elevator state-space model with voltage as input is:
+    // τ = rF, F = ma, τ = rma.
+    // The acceleration a = τ / mr
+    // the elevator state-space model with torque as input is:
     //
-    // dx/dt = -G²Kₜ/(KᵥRr²m)x + (GKₜ)/(Rrm)u
-    // A = -G²Kₜ/(KᵥRr²m)
-    // B = (GKₜ)/(Rrm)
-    //
-    // Solve for G.
-    //
-    // A/B = -G/Kᵥr
-    // G = -KᵥrA/B
+    // dx/dt = 0 x + (1/mr) u
+    // A = 0
+    // B = (1/mr)
     //
     // Solve for m.
     //
-    // B = GKₜ/(Rrm)
-    // m = GKₜ/(RrB)
+    // B = (1/mr)
+    // m = (1/Br)
     super(
         plant,
         drum,
-        Kilograms.of(
-            drum.gearbox.reduction
-                * drum.gearbox.motorType.KtNMPerAmp
-                / drum.gearbox.motorType.rOhms
-                / drum.radiusMeters
-                / plant.getB(1, 0)),
+        Kilograms.of(1.0 / drum.radiusMeters / plant.getB(1, 0)),
         minHeight,
         maxHeight,
         g,
@@ -143,10 +126,10 @@ public class ElevatorSim extends ElevatorSimBase {
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
    */
-  public ElevatorSim(
-      Per<VoltageUnit, LinearVelocityUnit> kv,
-      Per<VoltageUnit, LinearAccelerationUnit> ka,
-      Voltage kg,
+  public ElevatorSimTorque(
+      Per<TorqueUnit, LinearVelocityUnit> kv,
+      Per<TorqueUnit, LinearAccelerationUnit> ka,
+      Torque kg,
       Wheel drum,
       Distance minHeight,
       Distance maxHeight,
@@ -157,7 +140,7 @@ public class ElevatorSim extends ElevatorSimBase {
         drum,
         minHeight,
         maxHeight,
-        MetersPerSecondPerSecond.of(-kg.in(Volts) / ka.in(VoltsPerMeterPerSecondSquared)),
+        MetersPerSecondPerSecond.of(-kg.in(NewtonMeters) / ka.baseUnitMagnitude()),
         startingHeight,
         measurementStdDevs);
   }
@@ -165,9 +148,9 @@ public class ElevatorSim extends ElevatorSimBase {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param kv The velocity gain of the elevator in volt / meters per second.
-   * @param ka The acceleration gain of the elevator in volts / meters per second squared.
-   * @param kg The gravity gain of the elevator in volts.
+   * @param kv The velocity gain of the elevator in Newton-Meters / meters per second.
+   * @param ka The acceleration gain of the elevator in Newton-Meters / meters per second squared.
+   * @param kg The gravity gain of the elevator in Newton-Meters.
    * @param drum The elevator's drum.
    * @param minHeightMeters The min allowable height of the elevator in meters.
    * @param maxHeightMeters The max allowable height of the elevator in meters.
@@ -176,7 +159,7 @@ public class ElevatorSim extends ElevatorSimBase {
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
    */
-  public ElevatorSim(
+  public ElevatorSimTorque(
       double kv,
       double ka,
       double kg,
@@ -196,32 +179,32 @@ public class ElevatorSim extends ElevatorSimBase {
   }
 
   /**
-   * Sets the input voltage for the elevator.
+   * Sets the input torque for the elevator.
    *
-   * @param volts The input voltage.
+   * @param torqueNM The input torque.
    */
-  public void setInputVoltage(double volts) {
-    setInput(volts);
-    clampInput(RobotController.getBatteryVoltage());
-    m_voltage.mut_replace(m_u.get(0, 0), Volts);
+  public void setInputTorque(double torqueNM) {
+    setInput(torqueNM);
+    // TODO: Need some guidance on clamping.
+    m_torque.mut_replace(m_u.get(0, 0), NewtonMeters);
   }
 
   /**
-   * Sets the input voltage for the elevator.
+   * Sets the input torque for the elevator.
    *
-   * @param voltage The input voltage.
+   * @param torque The input torque.
    */
-  public void setInputVoltage(Voltage voltage) {
-    setInputVoltage(voltage.in(Volts));
+  public void setInputTorque(Torque torque) {
+    setInputTorque(torque.in(NewtonMeters));
   }
 
   @Override
   public void update(double dtSeconds) {
     super.update(dtSeconds);
-    m_currentDraw.mut_replace(
-        m_drum.currentAmps(m_x.get(1, 0), getInput(0)) * Math.signum(m_u.get(0, 0)), Amps);
-    m_voltage.mut_replace(getInput(0), Volts);
-    m_force.mut_replace(m_drum.forceNewtons(m_currentDraw.in(Amps)), Newtons);
-    m_torque.mut_replace(m_force.in(Newtons) * m_drum.radiusMeters, NewtonMeters);
+    m_currentDraw.mut_replace(m_drum.currentAmps(getInput(0)) * Math.signum(m_u.get(0, 0)), Amps);
+    m_voltage.mut_replace(
+        m_drum.voltageVolts(getInput(0) / m_drum.radiusMeters, m_x.get(1, 0)), Volts);
+    m_force.mut_replace(getInput(0) / m_drum.radiusMeters, Newtons);
+    m_torque.mut_replace(getInput(0), NewtonMeters);
   }
 }

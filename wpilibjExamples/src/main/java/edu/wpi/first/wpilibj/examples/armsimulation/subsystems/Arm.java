@@ -5,7 +5,12 @@
 package edu.wpi.first.wpilibj.examples.armsimulation.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.Gearbox;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Preferences;
@@ -29,7 +34,13 @@ public class Arm implements AutoCloseable {
   private double m_armSetpointDegrees = Constants.kDefaultArmSetpointDegrees;
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
-  private final DCMotor m_armGearbox = DCMotor.getVex775Pro(2);
+  private final Gearbox m_armGearbox =
+      new Gearbox(2, DCMotorType.Vex775Pro, Constants.kArmReduction);
+
+  // The model that represents our arm system.
+  private final LinearSystem<N2, N1, N2> m_plant =
+      LinearSystemId.createSingleJointedArmSystem(
+          m_armGearbox, Constants.kArmMass, Constants.kArmLength, Constants.kArmLength / 2.0);
 
   // Standard classes for controlling our arm
   private final PIDController m_controller = new PIDController(m_armKp, 0, 0);
@@ -42,17 +53,16 @@ public class Arm implements AutoCloseable {
   // to 255 degrees (rotated down in the back).
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
+          m_plant,
           m_armGearbox,
-          Constants.kArmReduction,
-          SingleJointedArmSim.estimateMOI(Constants.kArmLength, Constants.kArmMass),
           Constants.kArmLength,
+          Constants.kArmLength / 2.0,
           Constants.kMinAngleRads,
           Constants.kMaxAngleRads,
-          true,
-          0,
+          -9.8,
+          0.0,
           Constants.kArmEncoderDistPerPulse,
-          0.0 // Add noise with a std-dev of 1 tick
-          );
+          0.0);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.

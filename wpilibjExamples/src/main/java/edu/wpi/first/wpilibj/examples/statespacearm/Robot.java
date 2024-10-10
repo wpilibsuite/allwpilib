@@ -12,7 +12,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.LinearSystemLoop;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -32,11 +33,14 @@ public class Robot extends TimedRobot {
   private static final double kRaisedPosition = Units.degreesToRadians(90.0);
   private static final double kLoweredPosition = Units.degreesToRadians(0.0);
 
-  // Moment of inertia of the arm, in kg * m^2. Can be estimated with CAD. If finding this constant
-  // is difficult, LinearSystem.identifyPositionSystem may be better.
-  private static final double kArmMOI = 1.2;
+  // Mass of the arm, in kg.
+  private static final double kArmMass = 3.6;
 
-  // Reduction between motors and encoder, as output over input. If the arm spins slower than
+  // The length of the arm pivoted at the end in meters.
+  private static final double kArmLength = 1.0;
+
+  // Reduction between motors and encoder, as output over input. If the arm spins
+  // slower than
   // the motors, this number should be greater than one.
   private static final double kArmGearing = 10.0;
 
@@ -47,13 +51,15 @@ public class Robot extends TimedRobot {
               Units.degreesToRadians(90))); // Max arm speed and acceleration.
   private TrapezoidProfile.State m_lastProfiledReference = new TrapezoidProfile.State();
 
-  // The plant holds a state-space model of our arm. This system has the following properties:
+  // The plant holds a state-space model of our arm. This system has the following
+  // properties:
   //
   // States: [position, velocity], in radians and radians per second.
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in radians.
   private final LinearSystem<N2, N1, N2> m_armPlant =
-      LinearSystemId.createSingleJointedArmSystem(DCMotor.getNEO(2), kArmMOI, kArmGearing);
+      LinearSystemId.createSingleJointedArmSystem(
+          new Gearbox(2, DCMotorType.NEO, kArmGearing), kArmMass, kArmLength, kArmLength / 2.0);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   @SuppressWarnings("unchecked")
@@ -74,20 +80,25 @@ public class Robot extends TimedRobot {
       new LinearQuadraticRegulator<>(
           (LinearSystem<N2, N1, N1>) m_armPlant.slice(0),
           VecBuilder.fill(Units.degreesToRadians(1.0), Units.degreesToRadians(10.0)), // qelms.
-          // Position and velocity error tolerances, in radians and radians per second. Decrease
+          // Position and velocity error tolerances, in radians and radians per second.
+          // Decrease
           // this
           // to more heavily penalize state excursion, or make the controller behave more
-          // aggressively. In this example we weight position much more highly than velocity, but
+          // aggressively. In this example we weight position much more highly than
+          // velocity, but
           // this
           // can be tuned to balance the two.
           VecBuilder.fill(12.0), // relms. Control effort (voltage) tolerance. Decrease this to more
-          // heavily penalize control effort, or make the controller less aggressive. 12 is a good
-          // starting point because that is the (approximate) maximum voltage of a battery.
+          // heavily penalize control effort, or make the controller less aggressive. 12
+          // is a good
+          // starting point because that is the (approximate) maximum voltage of a
+          // battery.
           0.020); // Nominal time between loops. 0.020 for TimedRobot, but can be
 
   // lower if using notifiers.
 
-  // The state-space loop combines a controller, observer, feedforward and plant for easy control.
+  // The state-space loop combines a controller, observer, feedforward and plant
+  // for easy control.
   @SuppressWarnings("unchecked")
   private final LinearSystemLoop<N2, N1, N1> m_loop =
       new LinearSystemLoop<>(
@@ -118,7 +129,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    // Sets the target position of our arm. This is similar to setting the setpoint of a
+    // Sets the target position of our arm. This is similar to setting the setpoint
+    // of a
     // PID controller.
     TrapezoidProfile.State goal;
     if (m_joystick.getTrigger()) {
@@ -134,7 +146,8 @@ public class Robot extends TimedRobot {
     // Correct our Kalman filter's state vector estimate with encoder data.
     m_loop.correct(VecBuilder.fill(m_encoder.getDistance()));
 
-    // Update our LQR to generate new voltage commands and use the voltages to predict the next
+    // Update our LQR to generate new voltage commands and use the voltages to
+    // predict the next
     // state with out Kalman filter.
     m_loop.predict(0.020);
 

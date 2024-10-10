@@ -9,8 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -25,18 +27,11 @@ class ElevatorSimTest {
     @SuppressWarnings("resource")
     var controller = new PIDController(10, 0, 0);
 
-    var sim =
-        new ElevatorSim(
-            DCMotor.getVex775Pro(4),
-            14.67,
-            8,
-            0.75 * 25.4 / 1000.0,
-            0.0,
-            3.0,
-            true,
-            0.0,
-            0.01,
-            0.0);
+    var drum = new Wheel(new Gearbox(4, DCMotorType.Vex775Pro, 14.67), Units.inchesToMeters(0.75));
+
+    var plant = LinearSystemId.createElevatorSystem(drum, 8);
+
+    var sim = new ElevatorSim(plant, drum, 0.0, 3.0, -9.8, 0.0, 0.01, 0.0);
 
     try (var motor = new PWMVictorSPX(0);
         var encoder = new Encoder(0, 1)) {
@@ -65,18 +60,11 @@ class ElevatorSimTest {
 
   @Test
   void testMinMax() {
-    var sim =
-        new ElevatorSim(
-            DCMotor.getVex775Pro(4),
-            14.67,
-            8.0,
-            0.75 * 25.4 / 1000.0,
-            0.0,
-            1.0,
-            true,
-            0.0,
-            0.01,
-            0.0);
+    var drum = new Wheel(new Gearbox(4, DCMotorType.Vex775Pro, 14.67), Units.inchesToMeters(0.75));
+
+    var plant = LinearSystemId.createElevatorSystem(drum, 8);
+
+    var sim = new ElevatorSim(plant, drum, 0.0, 1.0, -9.8, 0.0, 0.01, 0.0);
 
     for (int i = 0; i < 100; i++) {
       sim.setInput(VecBuilder.fill(0));
@@ -95,9 +83,11 @@ class ElevatorSimTest {
 
   @Test
   void testStability() {
-    var sim =
-        new ElevatorSim(
-            DCMotor.getVex775Pro(4), 100, 4, Units.inchesToMeters(0.5), 0, 10, false, 0.0);
+    var drum = new Wheel(new Gearbox(4, DCMotorType.Vex775Pro, 100), Units.inchesToMeters(0.5));
+
+    var system = LinearSystemId.createElevatorSystem(drum, 4);
+
+    var sim = new ElevatorSim(system, drum, 0.0, 10.0, 0.0, 0.0);
 
     sim.setState(VecBuilder.fill(0, 0));
     sim.setInput(12);
@@ -105,9 +95,6 @@ class ElevatorSimTest {
       sim.update(0.02);
     }
 
-    var system =
-        LinearSystemId.createElevatorSystem(
-            DCMotor.getVex775Pro(4), 4, Units.inchesToMeters(0.5), 100);
     assertEquals(
         system.calculateX(VecBuilder.fill(0, 0), VecBuilder.fill(12), 0.02 * 50.0).get(0, 0),
         sim.getPositionMeters(),
