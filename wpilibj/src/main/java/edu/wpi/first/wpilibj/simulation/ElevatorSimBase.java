@@ -86,7 +86,7 @@ public abstract class ElevatorSimBase extends LinearSystemSim<N2, N1, N2> {
    * @param g The acceleration due to gravity.
    * @param startingHeight The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 1 element for position.
+   *     noise is desired. If present must have 2 elements for position and velocity.
    */
   @SuppressWarnings("this-escape")
   public ElevatorSimBase(

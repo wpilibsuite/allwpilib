@@ -69,7 +69,8 @@ public abstract class WheelSimBase extends LinearSystemSim<N2, N1, N2> {
    * @param wheel The wheel object containing the radius and the gearbox.
    * @param mass The mass of the system drive by the wheel.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 1 element for position.
+   *     noise is desired. If present must have 2 elements. The first element is for position. The
+   *     second element is for velocity.
    */
   @SuppressWarnings("this-escape")
   public WheelSimBase(

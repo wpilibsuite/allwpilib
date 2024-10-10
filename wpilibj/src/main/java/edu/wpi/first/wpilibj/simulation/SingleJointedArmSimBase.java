@@ -41,7 +41,7 @@ import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.units.measure.Voltage;
 
 /** Represents a simulated single jointed arm mechanism. */
-public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
+public abstract class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
   /** The gearbox for the arm. */
   protected final Gearbox m_gearbox;
 
@@ -99,7 +99,8 @@ public class SingleJointedArmSimBase extends LinearSystemSim<N2, N1, N2> {
    * @param g The acceleration due to gravity.
    * @param startingAngle The initial position of the Arm simulation.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 1 element for position.
+   *     noise is desired. If present must have 2 elements. The first element is for position. The
+   *     second element is for velocity.
    */
   @SuppressWarnings("this-escape")
   public SingleJointedArmSimBase(
