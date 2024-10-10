@@ -66,7 +66,7 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
     units::meters_per_second_t y{moduleStateMatrix(i * 2 + 1, 0)};
 
     auto speed = units::math::hypot(x, y);
-    Rotation2d rotation{x.value(), y.value()};
+    auto rotation = speed.value() > 1e-6 ? Rotation2d{x.value(), y.value()} : m_moduleHeadings[i];
 
     moduleStates[i] = {speed, rotation};
     m_moduleHeadings[i] = rotation;
