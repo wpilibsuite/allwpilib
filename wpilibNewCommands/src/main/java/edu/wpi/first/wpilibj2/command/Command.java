@@ -399,6 +399,28 @@ public abstract class Command implements Sendable {
   }
 
   /**
+   * Decorates this command to run "forked" by wrapping it in a {@link ScheduleCommand}. Use this
+   * for "forking off" from command compositions when the user does not wish to extend the command's
+   * requirements to the entire command composition. Note that if run from a composition, the
+   * composition will not know about the status of the scheduled commands, and will treat this
+   * command as finishing instantly. Commands can be added to this and will be scheduled in order
+   * with this command scheduled first.
+   *
+   * @param other other commands to schedule along with this one. This command is scheduled first.
+   * @return the decorated command
+   * @see ScheduleCommand
+   * @see <a
+   *     href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#scheduling-other-commands">WPILib
+   *     docs</a>
+   */
+  public ScheduleCommand fork(Command... other) {
+    Command[] commands = new Command[1 + other.length];
+    commands[0] = this;
+    System.arraycopy(other, 0, commands, 1, other.length);
+    return new ScheduleCommand(commands);
+  }
+
+  /**
    * Decorates this command to only run if this condition is not met. If the command is already
    * running and the condition changes to true, the command will not stop running. The requirements
    * of this command will be kept for the new conditional command.

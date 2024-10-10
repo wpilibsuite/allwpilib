@@ -18,6 +18,7 @@
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/ProxyCommand.h"
 #include "frc2/command/RepeatCommand.h"
+#include "frc2/command/ScheduleCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
