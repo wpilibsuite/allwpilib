@@ -231,6 +231,21 @@ class CommandGenericHID {
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is
+   * greater than {@code threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis magnitude value is
+   * greater than the provided threshold.
+   */
+  Trigger AxisMagnitudeGreaterThan(
+      int axis, double threshold,
+      frc::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+
+  /**
    * Set the rumble output for the HID.
    *
    * The DS currently supports 2 rumble values, left rumble and right rumble.
