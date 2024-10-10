@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.PixelFormat;
+import edu.wpi.first.util.RawFrame;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -143,8 +145,15 @@ class AprilTagDetectorTest {
       fail(ex);
       return;
     }
+
+    var frameBytes = new byte[image.width() * image.height()];
+    image.get(0, 0, frameBytes);
+
+    var frame = new RawFrame();
+    frame.setData(frameBytes, image.width(), image.height(), 1, PixelFormat.kGray);
+
     try {
-      AprilTagDetection[] results = detector.detect(image);
+      AprilTagDetection[] results = detector.detect(frame);
       assertEquals(1, results.length);
       assertEquals("tag36h11", results[0].getFamily());
       assertEquals(1, results[0].getId());
@@ -176,8 +185,15 @@ class AprilTagDetectorTest {
       fail(ex);
       return;
     }
+
+    var frameBytes = new byte[image.width() * image.height()];
+    image.get(0, 0, frameBytes);
+
+    var frame = new RawFrame();
+    frame.setData(frameBytes, image.width(), image.height(), 1, PixelFormat.kGray);
+
     try {
-      AprilTagDetection[] results = detector.detect(image);
+      AprilTagDetection[] results = detector.detect(frame);
       assertEquals(1, results.length);
 
       var estimator =
@@ -209,8 +225,15 @@ class AprilTagDetectorTest {
       fail(ex);
       return;
     }
+
+    var frameBytes = new byte[image.width() * image.height()];
+    image.get(0, 0, frameBytes);
+
+    var frame = new RawFrame();
+    frame.setData(frameBytes, image.width(), image.height(), 1, PixelFormat.kGray);
+
     try {
-      AprilTagDetection[] results = detector.detect(image);
+      AprilTagDetection[] results = detector.detect(frame);
       assertEquals(1, results.length);
 
       var estimator =
@@ -239,8 +262,15 @@ class AprilTagDetectorTest {
       fail(ex);
       return;
     }
+
+    var frameBytes = new byte[image.width() * image.height()];
+    image.get(0, 0, frameBytes);
+
+    var frame = new RawFrame();
+    frame.setData(frameBytes, image.width(), image.height(), 1, PixelFormat.kGray);
+
     try {
-      AprilTagDetection[] results = detector.detect(image);
+      AprilTagDetection[] results = detector.detect(frame);
       assertEquals(1, results.length);
 
       var estimator =
