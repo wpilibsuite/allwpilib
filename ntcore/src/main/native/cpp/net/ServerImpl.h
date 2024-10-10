@@ -80,7 +80,7 @@ class ServerImpl final {
   int AddClient3(std::string_view connInfo, bool local,
                  net3::WireConnection3& wire, Connected3Func connected,
                  SetPeriodicFunc setPeriodic);
-  void RemoveClient(int clientId);
+  std::shared_ptr<void> RemoveClient(int clientId);
 
   void ConnectionsChanged(const std::vector<ConnectionInfo>& conns);
 
