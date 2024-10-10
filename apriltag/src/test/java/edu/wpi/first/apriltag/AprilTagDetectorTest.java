@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.PixelFormat;
+import edu.wpi.first.util.RawFrame;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -132,34 +134,6 @@ class AprilTagDetectorTest {
   }
 
   @Test
-  void testDecodeCropped() {
-    detector.addFamily("tag16h5");
-    detector.addFamily("tag36h11");
-
-    Mat image;
-    try {
-      image = loadImage("tag1_640_480.jpg");
-    } catch (IOException ex) {
-      fail(ex);
-      return;
-    }
-
-    // Pre-knowledge -- the tag is within this ROI of this particular test image
-    var cropped = image.submat(100, 400, 220, 570);
-
-    try {
-      AprilTagDetection[] results = detector.detect(cropped);
-      assertEquals(1, results.length);
-      assertEquals("tag36h11", results[0].getFamily());
-      assertEquals(1, results[0].getId());
-      assertEquals(0, results[0].getHamming());
-    } finally {
-      cropped.release();
-      image.release();
-    }
-  }
-
-  @Test
   void testDecodeAndPose() {
     detector.addFamily("tag16h5");
     detector.addFamily("tag36h11");
@@ -171,8 +145,15 @@ class AprilTagDetectorTest {
       fail(ex);
       return;
     }
+
+    var frameBytes = new byte[image.width() * image.height()];
+    image.get(0, 0, frameBytes);
+
+    var frame = new RawFrame();
+    frame.setData(frameBytes, image.width(), image.height(), 1, PixelFormat.kGray);
+
     try {
-      AprilTagDetection[] results = detector.detect(image);
+      AprilTagDetection[] results = detector.detect(frame);
       assertEquals(1, results.length);
       assertEquals("tag36h11", results[0].getFamily());
       assertEquals(1, results[0].getId());
@@ -204,8 +185,15 @@ class AprilTagDetectorTest {
       fail(ex);
       return;
     }
+
+    var frameBytes = new byte[image.width() * image.height()];
+    image.get(0, 0, frameBytes);
+
+    var frame = new RawFrame();
+    frame.setData(frameBytes, image.width(), image.height(), 1, PixelFormat.kGray);
+
     try {
-      AprilTagDetection[] results = detector.detect(image);
+      AprilTagDetection[] results = detector.detect(frame);
       assertEquals(1, results.length);
 
       var estimator =
@@ -237,8 +225,15 @@ class AprilTagDetectorTest {
       fail(ex);
       return;
     }
+
+    var frameBytes = new byte[image.width() * image.height()];
+    image.get(0, 0, frameBytes);
+
+    var frame = new RawFrame();
+    frame.setData(frameBytes, image.width(), image.height(), 1, PixelFormat.kGray);
+
     try {
-      AprilTagDetection[] results = detector.detect(image);
+      AprilTagDetection[] results = detector.detect(frame);
       assertEquals(1, results.length);
 
       var estimator =
@@ -267,8 +262,15 @@ class AprilTagDetectorTest {
       fail(ex);
       return;
     }
+
+    var frameBytes = new byte[image.width() * image.height()];
+    image.get(0, 0, frameBytes);
+
+    var frame = new RawFrame();
+    frame.setData(frameBytes, image.width(), image.height(), 1, PixelFormat.kGray);
+
     try {
-      AprilTagDetection[] results = detector.detect(image);
+      AprilTagDetection[] results = detector.detect(frame);
       assertEquals(1, results.length);
 
       var estimator =

@@ -16,6 +16,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.IntegerArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.PixelFormat;
+import edu.wpi.first.util.RawFrame;
 import edu.wpi.first.wpilibj.TimedRobot;
 import java.util.ArrayList;
 import org.opencv.core.Mat;
@@ -65,6 +67,9 @@ public class Robot extends TimedRobot {
     var mat = new Mat();
     var grayMat = new Mat();
 
+    var frameBytes = new byte[640 * 480];
+    var frame = new RawFrame();
+
     // Instantiate once
     ArrayList<Long> tags = new ArrayList<>();
     var outlineColor = new Scalar(0, 255, 0);
@@ -89,7 +94,10 @@ public class Robot extends TimedRobot {
 
       Imgproc.cvtColor(mat, grayMat, Imgproc.COLOR_RGB2GRAY);
 
-      AprilTagDetection[] detections = detector.detect(grayMat);
+      grayMat.get(0, 0, frameBytes);
+      frame.setData(frameBytes, grayMat.width(), grayMat.height(), 1, PixelFormat.kGray);
+
+      AprilTagDetection[] detections = detector.detect(frame);
 
       // have not seen any tags yet
       tags.clear();
