@@ -49,7 +49,7 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
                                            pcm->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PCM", 0,
-                                       kNumCTREPCMModules, module);
+                                       kNumCTREPCMModules - 1, module);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }

@@ -44,8 +44,14 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
   }
 
   if (!HAL_CheckPowerDistributionModule(module, type)) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, fmt::format("Invalid pdp module {}", module));
+    *status = RESOURCE_OUT_OF_RANGE;
+    if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PDP", 0,
+                                       kNumCTREPDPModules - 1, module);
+    } else {
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH", 1,
+                                       kNumREVPDHModules, module);
+    }
     return HAL_kInvalidHandle;
   }
   hal::init::CheckInit();
@@ -74,7 +80,7 @@ HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
   if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
     return module < kNumCTREPDPModules && module >= 0;
   } else {
-    return module < kNumREVPDHModules && module >= 1;
+    return module <= kNumREVPDHModules && module >= 1;
   }
 }
 
