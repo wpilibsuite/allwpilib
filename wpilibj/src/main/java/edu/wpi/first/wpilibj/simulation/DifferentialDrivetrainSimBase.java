@@ -34,10 +34,8 @@ import edu.wpi.first.units.measure.Voltage;
 /** This class simulates the state of the drivetrain. */
 public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
   /**
-   * Represents a gearing option of the Toughbox mini. 12.75:1 -- 14:50 and 14:50
-   * 10.71:1 -- 14:50
-   * and 16:48 8.45:1 -- 14:50 and 19:45 7.31:1 -- 14:50 and 21:43 5.95:1 -- 14:50
-   * and 24:40
+   * Represents a gearing option of the Toughbox mini. 12.75:1 -- 14:50 and 14:50 10.71:1 -- 14:50
+   * and 16:48 8.45:1 -- 14:50 and 19:45 7.31:1 -- 14:50 and 21:43 5.95:1 -- 14:50 and 24:40
    */
   public enum KitbotGearing {
     /** Gear ratio of 12.75:1. */
@@ -154,21 +152,14 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
   /**
    * Creates a simulated differential drivetrain.
    *
-   * @param plant              The linear system that represents the drivetrain.
-   * @param wheel              A {@link Wheel} representing one of the
-   *                           drivetrain's wheel.
-   * @param trackWidth         The robot's track width, or distance between left
-   *                           and right wheels.
-   * @param measurementStdDevs Standard deviations for measurements, in the form
-   *                           [x, y, heading,
-   *                           left velocity, right velocity, left distance, right
-   *                           distance]ᵀ. Can be null if no noise is
-   *                           desired. Gyro standard deviations of 0.0001
-   *                           radians, velocity standard deviations of 0.05
-   *                           m/s, and position measurement standard deviations
-   *                           of 0.005 meters are a reasonable starting
-   *                           point. If present must have 7 elements matching the
-   *                           aforementioned measurements.
+   * @param plant The linear system that represents the drivetrain.
+   * @param wheel A {@link Wheel} representing one of the drivetrain's wheel.
+   * @param trackWidth The robot's track width, or distance between left and right wheels.
+   * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
+   *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
+   *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
+   *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
+   *     point. If present must have 7 elements matching the aforementioned measurements.
    */
   public DifferentialDrivetrainSimBase(
       LinearSystem<N4, N2, N4> plant,
@@ -180,12 +171,13 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
     m_trackWidth = trackWidth;
     double A0 = plant.getA(0, 0);
     double A1 = plant.getA(1, 0);
-    var C1 = -wheel.gearbox.numMotors
-        * Math.pow(wheel.gearbox.reduction, 2)
-        * wheel.gearbox.motorType.KtNMPerAmp
-        / (wheel.gearbox.motorType.KvRadPerSecPerVolt
-            * wheel.gearbox.motorType.rOhms
-            * Math.pow(wheel.radiusMeters, 2));
+    var C1 =
+        -wheel.gearbox.numMotors
+            * Math.pow(wheel.gearbox.reduction, 2)
+            * wheel.gearbox.motorType.KtNMPerAmp
+            / (wheel.gearbox.motorType.KvRadPerSecPerVolt
+                * wheel.gearbox.motorType.rOhms
+                * Math.pow(wheel.radiusMeters, 2));
     double a0massJPart = A0 / C1;
     double a1massJPart = A1 / C1;
     double halfMassRecip = a0massJPart + a1massJPart;
@@ -207,7 +199,7 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
   /**
    * Sets the position of the left and right encoders.
    *
-   * @param leftPositionMeters  The new left encoder position in meters.
+   * @param leftPositionMeters The new left encoder position in meters.
    * @param rightPositionMeters The new right encoder position in meters.
    */
   public void setEncoderPositions(double leftPositionMeters, double rightPositionMeters) {
@@ -218,7 +210,7 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
   /**
    * Sets the position of the left and right encoders.
    *
-   * @param leftPosition  The new left encoder position.
+   * @param leftPosition The new left encoder position.
    * @param rightPosition The new right encoder position.
    */
   public void setEncoderPositions(Distance leftPosition, Distance rightPosition) {
@@ -264,10 +256,8 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
   /**
    * Sets the velocity of the left and right encoders.
    *
-   * @param leftVelocityMetersPerSecond  The new left encoder velocity in meters
-   *                                     per second.
-   * @param rightVelocityMetersPerSecond The new right encoder velocity in meters
-   *                                     per second.
+   * @param leftVelocityMetersPerSecond The new left encoder velocity in meters per second.
+   * @param rightVelocityMetersPerSecond The new right encoder velocity in meters per second.
    */
   public void setEncoderVelocities(
       double leftVelocityMetersPerSecond, double rightVelocityMetersPerSecond) {
@@ -278,7 +268,7 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
   /**
    * Sets the position of the left and right encoders.
    *
-   * @param leftVelocity  The new left encoder velocity.
+   * @param leftVelocity The new left encoder velocity.
    * @param rightVelocity The new right encoder velocity.
    */
   public void setEncoderVelocities(LinearVelocity leftVelocity, LinearVelocity rightVelocity) {
@@ -340,11 +330,9 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
   }
 
   /**
-   * Returns the moment of inertia in kilograms meters squared around the
-   * drivetrain's center.
+   * Returns the moment of inertia in kilograms meters squared around the drivetrain's center.
    *
-   * @return The moment of inertia in kilograms meters squared around the
-   *         drivetrain's center.
+   * @return The moment of inertia in kilograms meters squared around the drivetrain's center.
    */
   public double getJKgMetersSquared() {
     return m_J.in(KilogramSquareMeters);
