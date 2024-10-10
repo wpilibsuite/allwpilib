@@ -5,39 +5,151 @@
 package edu.wpi.first.epilogue.processor;
 
 import edu.wpi.first.epilogue.Logged;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementScanner9;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 
 /** Handles logging for types annotated with the {@link Logged @Logged} annotation. */
 public class LoggableHandler extends ElementHandler {
+  private final Types m_typeUtils;
+  private final Elements m_elementUtils;
+
   protected LoggableHandler(ProcessingEnvironment processingEnv) {
     super(processingEnv);
+    this.m_typeUtils = processingEnv.getTypeUtils();
+    this.m_elementUtils = processingEnv.getElementUtils();
   }
 
   @Override
   public boolean isLoggable(Element element) {
     var dataType = dataType(element);
     return dataType.getAnnotation(Logged.class) != null
-        || dataType instanceof DeclaredType decl
-            && decl.asElement().getAnnotation(Logged.class) != null;
+        || (dataType instanceof DeclaredType decl
+            && decl.asElement().getAnnotation(Logged.class) != null);
   }
 
   @Override
   public String logInvocation(Element element) {
     TypeMirror dataType = dataType(element);
-    var reflectedType =
-        m_processingEnv
-            .getElementUtils()
-            .getTypeElement(m_processingEnv.getTypeUtils().erasure(dataType).toString());
+    TypeElement reflectedType =
+        (TypeElement) m_processingEnv.getTypeUtils().asElement(m_typeUtils.erasure(dataType));
 
-    return "Epilogue."
-        + StringUtils.loggerFieldName(reflectedType)
-        + ".tryUpdate(dataLogger.getSubLogger(\""
-        + loggedName(element)
-        + "\"), "
-        + elementAccess(element)
-        + ", Epilogue.getConfig().errorHandler)";
+    List<TypeMirror> subtypes = getLoggedSubtypes(dataType);
+
+    return subtypes.isEmpty()
+        ? generateSimpleLogInvocation(reflectedType, element)
+        : generateConditionalLogInvocation(reflectedType, element, subtypes);
+  }
+
+  private List<TypeMirror> getLoggedSubtypes(TypeMirror type) {
+    List<TypeMirror> loggedSubtypes = new ArrayList<>();
+    for (TypeMirror subtype : getAllSubtypes(type)) {
+      Element subtypeElement = m_typeUtils.asElement(subtype);
+      if (subtypeElement != null && subtypeElement.getAnnotation(Logged.class) != null) {
+        System.out.println("Detected logged subtype: " + subtypeElement); // Debugging line
+        loggedSubtypes.add(subtype);
+      }
+    }
+    return loggedSubtypes;
+  }
+
+  private List<TypeMirror> getAllSubtypes(TypeMirror type) {
+    List<TypeMirror> allSubtypes = new ArrayList<>();
+    Set<TypeElement> allTypes = findAllTypes();
+
+    for (TypeElement potentialSubtype : allTypes) {
+      TypeMirror potentialSubtypeMirror = potentialSubtype.asType();
+      if (m_typeUtils.isSubtype(potentialSubtypeMirror, type)
+          && !potentialSubtypeMirror.equals(type)) {
+        allSubtypes.add(potentialSubtypeMirror);
+      }
+    }
+
+    return allSubtypes;
+  }
+
+  private Set<TypeElement> findAllTypes() {
+    Set<TypeElement> allTypes = new HashSet<>();
+
+    // Scanner to collect all TypeElements from root elements
+    ElementScanner9<Void, Void> scanner =
+        new ElementScanner9<>() {
+          @Override
+          public Void visitType(TypeElement e, Void p) {
+            allTypes.add(e);
+            return super.visitType(e, p);
+          }
+        };
+
+    // Iterate through all elements and scan
+    for (Element rootElement : m_elementUtils.getAllModuleElements()) {
+      if (rootElement.getKind() == ElementKind.PACKAGE) {
+        rootElement.accept(scanner, null);
+      }
+    }
+
+    return allTypes;
+  }
+
+  @SuppressWarnings("checkstyle:LineLength")
+  private String generateSimpleLogInvocation(TypeElement reflectedType, Element element) {
+    return String.format(
+        "Epilogue.%s.tryUpdate(dataLogger.getSubLogger(\"%s\"), %s, Epilogue.getConfig().errorHandler)",
+        StringUtils.loggerFieldName(reflectedType), loggedName(element), elementAccess(element));
+  }
+
+  @SuppressWarnings("PMD.ConsecutiveLiteralAppends")
+  private String generateConditionalLogInvocation(
+      TypeElement reflectedType, Element element, List<TypeMirror> subtypes) {
+    StringBuilder builder = new StringBuilder(256);
+
+    builder.append("if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {\n");
+    builder.append("  var obj = ").append(elementAccess(element)).append(";\n");
+    builder
+        .append("  var logger = dataLogger.getSubLogger(\"")
+        .append(loggedName(element))
+        .append("\");\n");
+
+    for (int i = 0; i < subtypes.size(); i++) {
+      TypeMirror subtype = subtypes.get(i);
+      TypeElement subtypeElement = (TypeElement) m_typeUtils.asElement(subtype);
+      String typeName = subtypeElement.getQualifiedName().toString();
+
+      // Generate the conditional block for each subtype
+      if (i == 0) {
+        builder.append("  if (obj instanceof ").append(typeName).append(") {\n");
+      } else {
+        builder.append("  else if (obj instanceof ").append(typeName).append(") {\n");
+      }
+
+      builder
+          .append("    Epilogue.")
+          .append(StringUtils.loggerFieldName(subtypeElement))
+          .append(".tryUpdate(logger, (")
+          .append(typeName)
+          .append(") obj, Epilogue.getConfig().errorHandler);\n");
+      builder.append("  }\n");
+    }
+
+    // Fallback to the parent type handling if no subtype matches
+    builder.append("  else {\n");
+    builder
+        .append("    Epilogue.")
+        .append(StringUtils.loggerFieldName(reflectedType))
+        .append(".tryUpdate(logger, obj, Epilogue.getConfig().errorHandler);\n");
+    builder.append("  }\n");
+
+    builder.append("}");
+    return builder.toString();
   }
 }
