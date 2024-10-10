@@ -89,18 +89,6 @@ public class Solenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Read the current value of the solenoid.
-   *
-   * @return True if the solenoid output is on or false if the solenoid output is off.
-   * @deprecated Use get instead
-   */
-  @Deprecated
-  public boolean getOutput() {
-    int currentAll = m_module.getSolenoids();
-    return (currentAll & m_mask) != 0;
-  }
-
-  /**
    * Returns true if the solenoid is on.
    *
    * @return true if the solenoid is on.

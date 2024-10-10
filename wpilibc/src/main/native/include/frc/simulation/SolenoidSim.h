@@ -22,26 +22,14 @@ class SolenoidSim {
    * Returns the solenoid output.
    * @return the solenoid output.
    */
-  bool Get() const;
-
-  /**
-   * Returns the solenoid output.
-   * @return the solenoid output.
-   */
-  [[deprecated("Use Get method instead.")]]
+  [[deprecated("Use IsOn or IsOff methods instead.")]]
   bool GetOutput() const;
 
   /**
    * Sets the solenoid output.
    * @param output The new solenoid output.
    */
-  void Set(bool output);
-
-  /**
-   * Sets the solenoid output.
-   * @param output The new solenoid output.
-   */
-  [[deprecated("Use Set method instead.")]]
+  [[deprecated("Use SetOn or SetOff methods instead.")]]
   void SetOutput(bool output);
 
   /**

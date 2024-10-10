@@ -25,16 +25,8 @@ SolenoidSim::SolenoidSim(PneumaticsModuleType type, int channel)
           PneumaticsBase::GetDefaultForType(type), type)},
       m_channel{channel} {}
 
-bool SolenoidSim::Get() const {
-  return m_module->GetSolenoidOutput(m_channel);
-}
-
 bool SolenoidSim::GetOutput() const {
   return m_module->GetSolenoidOutput(m_channel);
-}
-
-void SolenoidSim::Set(bool output) {
-  m_module->SetSolenoidOutput(m_channel, output);
 }
 
 void SolenoidSim::SetOutput(bool output) {
@@ -42,19 +34,19 @@ void SolenoidSim::SetOutput(bool output) {
 }
 
 bool SolenoidSim::IsOn() {
-  return Get();
+  return m_module->GetSolenoidOutput(m_channel);
 }
 
 bool SolenoidSim::IsOff() {
-  return !Get();
+  return !m_module->GetSolenoidOutput(m_channel);
 }
 
 void SolenoidSim::SetOn() {
-  Set(true);
+  m_module->SetSolenoidOutput(m_channel, true);
 }
 
 void SolenoidSim::SetOff() {
-  Set(false);
+  m_module->SetSolenoidOutput(m_channel, false);
 }
 
 std::unique_ptr<CallbackStore> SolenoidSim::RegisterOutputCallback(

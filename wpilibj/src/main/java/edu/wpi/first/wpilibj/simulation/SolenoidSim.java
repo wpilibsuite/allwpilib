@@ -49,8 +49,10 @@ public class SolenoidSim {
    * Check the solenoid output.
    *
    * @return the solenoid output
+   * @deprecated Use isOn or isOff instead
    */
-  public boolean get() {
+  @Deprecated
+  public boolean getOutput() {
     return m_module.getSolenoidOutput(m_channel);
   }
 
@@ -74,20 +76,22 @@ public class SolenoidSim {
 
   /** Turns the solenoid on. */
   public void setOn() {
-    set(true);
+    m_module.setSolenoidOutput(m_channel, true);
   }
 
   /** Turns the solenoid off. */
   public void setOff() {
-    set(false);
+    m_module.setSolenoidOutput(m_channel, false);
   }
 
   /**
    * Change the solenoid output.
    *
    * @param output the new solenoid output
+   * @deprecated Use setOn or setOff instead.
    */
-  public void set(boolean output) {
+  @Deprecated
+  public void setOutput(boolean output) {
     m_module.setSolenoidOutput(m_channel, output);
   }
 
