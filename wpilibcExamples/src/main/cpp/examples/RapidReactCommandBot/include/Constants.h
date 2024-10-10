@@ -29,6 +29,23 @@ inline constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
     ((kWheelDiameter * std::numbers::pi) / kEncoderCPR).value();
 
+// These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
+// These values MUST be determined either experimentally or theoretically for
+// *your* robot's drive. The SysId tool provides a convenient method for
+// obtaining feedback and feedforward values for your robot.
+inline constexpr double kTurnP = 1;
+inline constexpr double kTurnI = 0;
+inline constexpr double kTurnD = 0;
+
+inline constexpr auto kTurnTolerance = 5_deg;
+inline constexpr auto kTurnRateTolerance = 10_deg_per_s;
+
+inline constexpr auto kMaxTurnRate = 100_deg_per_s;
+inline constexpr auto kMaxTurnAcceleration = 300_deg_per_s / 1_s;
+
+inline constexpr auto ks = 1_V;
+inline constexpr auto kv = 0.8_V * 1_s / 1_deg;
+inline constexpr auto ka = 0.15_V * 1_s * 1_s / 1_deg;
 }  // namespace DriveConstants
 
 namespace IntakeConstants {
