@@ -89,6 +89,25 @@ public class RawFrame implements AutoCloseable {
   }
 
   /**
+   * Set frame data.
+   *
+   * @param data A Java byte[] pointing to the frame data.
+   * @param width The width of the frame, in pixels
+   * @param height The height of the frame, in pixels
+   * @param stride The number of bytes in each row of image data
+   * @param pixelFormat The PixelFormat of the frame
+   */
+  public void setData(byte[] data, int width, int height, int stride, PixelFormat pixelFormat) {
+    m_data = ByteBuffer.wrap(data);
+    m_width = width;
+    m_height = height;
+    m_stride = stride;
+    m_pixelFormat = pixelFormat;
+    WPIUtilJNI.setRawFrameDataArray(
+        m_nativeObj, data, data.length, width, height, stride, pixelFormat.getValue());
+  }
+
+  /**
    * Call to set frame information.
    *
    * @param width The width of the frame, in pixels
