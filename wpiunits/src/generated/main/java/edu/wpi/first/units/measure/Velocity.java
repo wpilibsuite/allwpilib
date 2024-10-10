@@ -287,10 +287,9 @@ public interface Velocity<D extends Unit> extends Measure<VelocityUnit<D>> {
     return (Per<VelocityUnit<D>, TemperatureUnit>) Measure.super.divide(divisor);
   }
 
-
   @Override
-  default Mult<VelocityUnit<D>, TimeUnit> times(Time multiplier) {
-    return (Mult<VelocityUnit<D>, TimeUnit>) Measure.super.times(multiplier);
+  default Measure<D> times(Time multiplier) {
+    return (Measure<D>) unit().numerator().ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override

@@ -176,7 +176,8 @@ static std::string MakeRandomFilename() {
 }
 
 struct DataLogBackgroundWriter::WriterThreadState {
-  explicit WriterThreadState(std::string_view dir) : dirPath{dir} {}
+  explicit WriterThreadState(std::string_view dir)
+      : dirPath{dir.empty() ? "." : dir} {}
   WriterThreadState(const WriterThreadState&) = delete;
   WriterThreadState& operator=(const WriterThreadState&) = delete;
   ~WriterThreadState() { Close(); }
