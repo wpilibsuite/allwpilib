@@ -249,7 +249,7 @@ void HAL_FreeREVPH(HAL_REVPHHandle handle) {
 }
 
 HAL_Bool HAL_CheckREVPHModuleNumber(int32_t module) {
-  return module >= 1 && module <= kNumREVPDHModules;
+  return module >= 1 && module <= kNumREVPHModules;
 }
 
 HAL_Bool HAL_CheckREVPHSolenoidChannel(int32_t channel) {
