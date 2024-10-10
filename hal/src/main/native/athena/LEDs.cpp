@@ -43,7 +43,7 @@ static bool ReadStateFromFile(fs::path path, int32_t* status) {
   }
   // We only need to read one byte because the file won't have leading zeros.
   char buf[1]{};
-  size_t count = read(file, buf, 1);
+  ssize_t count = read(file, buf, 1);
   // save errno, always close file.
   int err = errno;
   fs::CloseFile(file);
