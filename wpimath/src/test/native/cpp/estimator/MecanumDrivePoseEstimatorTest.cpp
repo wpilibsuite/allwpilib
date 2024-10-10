@@ -10,14 +10,14 @@
 #include <gtest/gtest.h>
 #include <wpi/print.h>
 
-#include "frc/estimator/MecanumDrivePoseEstimator.h"
+#include "frc/estimator/MecanumDrivePoseEstimator3d.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 
 void testFollowTrajectory(
     const frc::MecanumDriveKinematics& kinematics,
-    frc::MecanumDrivePoseEstimator& estimator,
+    frc::MecanumDrivePoseEstimator3d& estimator,
     const frc::Trajectory& trajectory,
     std::function<frc::ChassisSpeeds(frc::Trajectory::State&)>
         chassisSpeedsGenerator,
@@ -138,16 +138,16 @@ void testFollowTrajectory(
   }
 }
 
-TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
+TEST(MecanumDrivePoseEstimator3dTest, AccuracyFacingTrajectory) {
   frc::MecanumDriveKinematics kinematics{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
 
   frc::MecanumDriveWheelPositions wheelPositions;
 
-  frc::MecanumDrivePoseEstimator estimator{kinematics,      frc::Rotation2d{},
-                                           wheelPositions,  frc::Pose2d{},
-                                           {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}};
+  frc::MecanumDrivePoseEstimator3d estimator{
+      kinematics,    frc::Rotation2d{}, wheelPositions,
+      frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.45, 0.45, 0.45}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -167,16 +167,16 @@ TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
       100_ms, 250_ms, true, false);
 }
 
-TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
+TEST(MecanumDrivePoseEstimator3dTest, BadInitialPose) {
   frc::MecanumDriveKinematics kinematics{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
 
   frc::MecanumDriveWheelPositions wheelPositions;
 
-  frc::MecanumDrivePoseEstimator estimator{kinematics,      frc::Rotation2d{},
-                                           wheelPositions,  frc::Pose2d{},
-                                           {0.1, 0.1, 0.1}, {0.45, 0.45, 0.1}};
+  frc::MecanumDrivePoseEstimator3d estimator{
+      kinematics,    frc::Rotation2d{}, wheelPositions,
+      frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.45, 0.45, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -211,7 +211,7 @@ TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
   }
 }
 
-TEST(MecanumDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
+TEST(MecanumDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
   // This tests for multiple vision measurements applied at the same time.
   // The expected behavior is that all measurements affect the estimated pose.
   // The alternative result is that only one vision measurement affects the
@@ -223,7 +223,7 @@ TEST(MecanumDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
 
   frc::MecanumDriveWheelPositions wheelPositions;
 
-  frc::MecanumDrivePoseEstimator estimator{
+  frc::MecanumDrivePoseEstimator3d estimator{
       kinematics,      frc::Rotation2d{},
       wheelPositions,  frc::Pose2d{1_m, 2_m, frc::Rotation2d{270_deg}},
       {0.1, 0.1, 0.1}, {0.45, 0.45, 0.1}};
@@ -267,12 +267,12 @@ TEST(MecanumDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
   }
 }
 
-TEST(MecanumDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
+TEST(MecanumDrivePoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
   frc::MecanumDriveKinematics kinematics{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
 
-  frc::MecanumDrivePoseEstimator estimator{
+  frc::MecanumDrivePoseEstimator3d estimator{
       kinematics,    frc::Rotation2d{}, frc::MecanumDriveWheelPositions{},
       frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.45, 0.45, 0.45}};
 
@@ -298,11 +298,11 @@ TEST(MecanumDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
               1e-6);
 }
 
-TEST(MecanumDrivePoseEstimatorTest, TestSampleAt) {
+TEST(MecanumDrivePoseEstimator3dTest, TestSampleAt) {
   frc::MecanumDriveKinematics kinematics{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
-  frc::MecanumDrivePoseEstimator estimator{
+  frc::MecanumDrivePoseEstimator3d estimator{
       kinematics,    frc::Rotation2d{}, frc::MecanumDriveWheelPositions{},
       frc::Pose2d{}, {1.0, 1.0, 1.0},   {1.0, 1.0, 1.0}};
 
