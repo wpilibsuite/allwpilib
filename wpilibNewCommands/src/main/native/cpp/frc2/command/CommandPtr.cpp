@@ -54,11 +54,9 @@ CommandPtr CommandPtr::Repeatedly(int times) && {
   AssertValid();
   std::shared_ptr<int> countPtr = std::make_shared<int>(0);
   return std::move(*this)
-      .FinallyDo([countPtr = countPtr] { (*countPtr)++; })
+      .FinallyDo([countPtr] { (*countPtr)++; })
       .Repeatedly()
-      .Until([countPtr = countPtr, times = times] {
-        return ((*countPtr) >= times);
-      });
+      .Until([countPtr, times] { return ((*countPtr) >= times); });
 }
 
 CommandPtr CommandPtr::AsProxy() && {
