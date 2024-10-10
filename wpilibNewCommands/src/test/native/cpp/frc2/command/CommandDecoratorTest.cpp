@@ -408,12 +408,16 @@ TEST_F(CommandDecoratorTest, RepeatFor) {
   auto command = InstantCommand([&counter] { counter++; }, {}).Repeatedly(3);
 
   scheduler.Schedule(command);
-  for (int i = 0; scheduler.IsScheduled(command); i++) {
+  EXPECT_TRUE(scheduler.IsScheduled(command));
+  for (int i = 1; i < 3; i++) {
     scheduler.Run();
-    EXPECT_EQ(i + 1, counter);
+    EXPECT_EQ(i, counter);
+    EXPECT_TRUE(scheduler.IsScheduled(command));
   }
 
+  scheduler.Run();
   EXPECT_EQ(3, counter);
+  EXPECT_FALSE(scheduler.IsScheduled(command));
 }
 
 TEST_F(CommandDecoratorTest, Unless) {

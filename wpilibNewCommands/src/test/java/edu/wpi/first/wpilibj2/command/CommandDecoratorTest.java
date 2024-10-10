@@ -450,13 +450,15 @@ class CommandDecoratorTest extends CommandTestBase {
       Command group = command.repeatedly(3);
 
       scheduler.schedule(group);
-      for (int i = 0;
-          scheduler.isScheduled(group);
-          i++) { // If this causes an infinite loop, repeatedly is cooked
+      assertEquals(1, counter.get());
+      for (int i = 1; i < 3; i++) {
         scheduler.run();
-        assertEquals(i + 1, counter.get());
+        assertEquals(i, counter.get());
+        assertTrue(scheduler.isScheduled(group), "Expected group to be scheduled with i = " + i);
       }
-      assertEquals(3, counter.get());
+      scheduler.run();
+      assertEquals(3, counter.get(), "Loop should have run 3 times something went wrong");
+      assertFalse(scheduler.isScheduled(group), "This command should have gotten unscheduled");
     }
   }
 
