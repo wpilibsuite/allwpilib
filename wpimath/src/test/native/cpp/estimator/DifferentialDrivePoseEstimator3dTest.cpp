@@ -5,21 +5,25 @@
 #include <limits>
 #include <random>
 #include <tuple>
+#include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <wpi/print.h>
-#include <wpi/timestamp.h>
 
-#include "frc/estimator/SwerveDrivePoseEstimator3d.h"
+#include "frc/StateSpaceUtil.h"
+#include "frc/estimator/DifferentialDrivePoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
-#include "frc/kinematics/SwerveDriveKinematics.h"
+#include "frc/geometry/Rotation2d.h"
+#include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
+#include "units/angle.h"
+#include "units/length.h"
+#include "units/time.h"
 
 void testFollowTrajectory(
-    const frc::SwerveDriveKinematics<4>& kinematics,
-    frc::SwerveDrivePoseEstimator3d<4>& estimator,
+    const frc::DifferentialDriveKinematics& kinematics,
+    frc::DifferentialDrivePoseEstimator& estimator,
     const frc::Trajectory& trajectory,
     std::function<frc::ChassisSpeeds(frc::Trajectory::State&)>
         chassisSpeedsGenerator,
@@ -29,9 +33,11 @@ void testFollowTrajectory(
     const units::second_t dt, const units::second_t kVisionUpdateRate,
     const units::second_t kVisionUpdateDelay, const bool checkError,
     const bool debug) {
-  wpi::array<frc::SwerveModulePosition, 4> positions{wpi::empty_array};
+  units::meter_t leftDistance = 0_m;
+  units::meter_t rightDistance = 0_m;
 
-  estimator.ResetPosition(frc::Rotation2d{}, positions, startingPose);
+  estimator.ResetPosition(frc::Rotation2d{}, leftDistance, rightDistance,
+                          startingPose);
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -46,7 +52,9 @@ void testFollowTrajectory(
   double errorSum = 0;
 
   if (debug) {
-    wpi::print("time, est_x, est_y, est_theta, true_x, true_y, true_theta\n");
+    wpi::print(
+        "time, est_x, est_y, est_theta, true_x, true_y, true_theta, left, "
+        "right\n");
   }
 
   while (t < trajectory.TotalTime()) {
@@ -76,26 +84,25 @@ void testFollowTrajectory(
 
     auto chassisSpeeds = chassisSpeedsGenerator(groundTruthState);
 
-    auto moduleStates = kinematics.ToSwerveModuleStates(chassisSpeeds);
+    auto wheelSpeeds = kinematics.ToWheelSpeeds(chassisSpeeds);
 
-    for (size_t i = 0; i < 4; i++) {
-      positions[i].distance += moduleStates[i].speed * dt;
-      positions[i].angle = moduleStates[i].angle;
-    }
+    leftDistance += wheelSpeeds.left * dt;
+    rightDistance += wheelSpeeds.right * dt;
 
     auto xhat = estimator.UpdateWithTime(
         t,
         groundTruthState.pose.Rotation() +
             frc::Rotation2d{distribution(generator) * 0.05_rad} -
             trajectory.InitialPose().Rotation(),
-        positions);
+        leftDistance, rightDistance);
 
     if (debug) {
-      wpi::print("{}, {}, {}, {}, {}, {}, {}\n", t.value(), xhat.X().value(),
-                 xhat.Y().value(), xhat.Rotation().Radians().value(),
-                 groundTruthState.pose.X().value(),
-                 groundTruthState.pose.Y().value(),
-                 groundTruthState.pose.Rotation().Radians().value());
+      wpi::print(
+          "{}, {}, {}, {}, {}, {}, {}, {}, {}\n", t.value(), xhat.X().value(),
+          xhat.Y().value(), xhat.Rotation().Radians().value(),
+          groundTruthState.pose.X().value(), groundTruthState.pose.Y().value(),
+          groundTruthState.pose.Rotation().Radians().value(),
+          leftDistance.value(), rightDistance.value());
     }
 
     double error = groundTruthState.pose.Translation()
@@ -135,31 +142,24 @@ void testFollowTrajectory(
 
   if (checkError) {
     // NOLINTNEXTLINE(bugprone-integer-division)
-    EXPECT_LT(errorSum / (trajectory.TotalTime() / dt), 0.058);
+    EXPECT_LT(errorSum / (trajectory.TotalTime() / dt), 0.05);
     EXPECT_LT(maxError, 0.2);
   }
 }
 
-TEST(SwerveDrivePoseEstimator3dTest, AccuracyFacingTrajectory) {
-  frc::SwerveDriveKinematics<4> kinematics{
-      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
-      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
+  frc::DifferentialDriveKinematics kinematics{1.0_m};
 
-  frc::SwerveModulePosition fl;
-  frc::SwerveModulePosition fr;
-  frc::SwerveModulePosition bl;
-  frc::SwerveModulePosition br;
-
-  frc::SwerveDrivePoseEstimator3d<4> estimator{
-      kinematics,    frc::Rotation2d{}, {fl, fr, bl, br},
-      frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.45, 0.45, 0.45}};
+  frc::DifferentialDrivePoseEstimator estimator{
+      kinematics,         frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{},
+      {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
                   frc::Pose2d{0_m, 0_m, 135_deg},
                   frc::Pose2d{-3_m, 0_m, -90_deg},
                   frc::Pose2d{0_m, 0_m, 45_deg}},
-      frc::TrajectoryConfig(2_mps, 2.0_mps_sq));
+      frc::TrajectoryConfig(2_mps, 2_mps_sq));
 
   testFollowTrajectory(
       kinematics, estimator, trajectory,
@@ -168,30 +168,23 @@ TEST(SwerveDrivePoseEstimator3dTest, AccuracyFacingTrajectory) {
                                   state.velocity * state.curvature};
       },
       [&](frc::Trajectory::State& state) { return state.pose; },
-      {0_m, 0_m, frc::Rotation2d{45_deg}}, {0_m, 0_m, frc::Rotation2d{45_deg}},
-      20_ms, 100_ms, 250_ms, true, false);
+      trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms,
+      100_ms, 250_ms, true, false);
 }
 
-TEST(SwerveDrivePoseEstimator3dTest, BadInitialPose) {
-  frc::SwerveDriveKinematics<4> kinematics{
-      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
-      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
+  frc::DifferentialDriveKinematics kinematics{1.0_m};
 
-  frc::SwerveModulePosition fl;
-  frc::SwerveModulePosition fr;
-  frc::SwerveModulePosition bl;
-  frc::SwerveModulePosition br;
-
-  frc::SwerveDrivePoseEstimator3d<4> estimator{
-      kinematics,    frc::Rotation2d{}, {fl, fr, bl, br},
-      frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.9, 0.9, 0.9}};
+  frc::DifferentialDrivePoseEstimator estimator{
+      kinematics,         frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{},
+      {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
                   frc::Pose2d{0_m, 0_m, 135_deg},
                   frc::Pose2d{-3_m, 0_m, -90_deg},
                   frc::Pose2d{0_m, 0_m, 45_deg}},
-      frc::TrajectoryConfig(2_mps, 2.0_mps_sq));
+      frc::TrajectoryConfig(2_mps, 2_mps_sq));
 
   for (units::degree_t offset_direction_degs = 0_deg;
        offset_direction_degs < 360_deg; offset_direction_degs += 45_deg) {
@@ -219,27 +212,24 @@ TEST(SwerveDrivePoseEstimator3dTest, BadInitialPose) {
   }
 }
 
-TEST(SwerveDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
+TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
   // This tests for multiple vision measurements applied at the same time.
   // The expected behavior is that all measurements affect the estimated pose.
   // The alternative result is that only one vision measurement affects the
   // outcome. If that were the case, after 1000 measurements, the estimated
   // pose would converge to that measurement.
-  frc::SwerveDriveKinematics<4> kinematics{
-      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
-      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+  frc::DifferentialDriveKinematics kinematics{1.0_m};
 
-  frc::SwerveModulePosition fl;
-  frc::SwerveModulePosition fr;
-  frc::SwerveModulePosition bl;
-  frc::SwerveModulePosition br;
+  frc::DifferentialDrivePoseEstimator estimator{
+      kinematics,
+      frc::Rotation2d{},
+      0_m,
+      0_m,
+      frc::Pose2d{1_m, 2_m, frc::Rotation2d{270_deg}},
+      {0.02, 0.02, 0.01},
+      {0.1, 0.1, 0.1}};
 
-  frc::SwerveDrivePoseEstimator3d<4> estimator{
-      kinematics,       frc::Rotation2d{},
-      {fl, fr, bl, br}, frc::Pose2d{1_m, 2_m, frc::Rotation2d{270_deg}},
-      {0.1, 0.1, 0.1},  {0.45, 0.45, 0.45}};
-
-  estimator.UpdateWithTime(0_s, frc::Rotation2d{}, {fl, fr, bl, br});
+  estimator.UpdateWithTime(0_s, frc::Rotation2d{}, 0_m, 0_m);
 
   for (int i = 0; i < 1000; i++) {
     estimator.AddVisionMeasurement(
@@ -278,23 +268,16 @@ TEST(SwerveDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
   }
 }
 
-TEST(SwerveDrivePoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
-  frc::SwerveDriveKinematics<4> kinematics{
-      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
-      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+TEST(DifferentialDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
+  frc::DifferentialDriveKinematics kinematics{1_m};
 
-  frc::SwerveModulePosition fl;
-  frc::SwerveModulePosition fr;
-  frc::SwerveModulePosition bl;
-  frc::SwerveModulePosition br;
-
-  frc::SwerveDrivePoseEstimator3d<4> estimator{
-      kinematics,    frc::Rotation2d{}, {fl, fr, bl, br},
-      frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.45, 0.45, 0.45}};
+  frc::DifferentialDrivePoseEstimator estimator{
+      kinematics,      frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{},
+      {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}};
 
   // Add enough measurements to fill up the buffer
   for (auto time = 0_s; time < 4_s; time += 20_ms) {
-    estimator.UpdateWithTime(time, frc::Rotation2d{}, {fl, fr, bl, br});
+    estimator.UpdateWithTime(time, frc::Rotation2d{}, 0_m, 0_m);
   }
 
   auto odometryPose = estimator.GetEstimatedPosition();
@@ -313,18 +296,11 @@ TEST(SwerveDrivePoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
               1e-6);
 }
 
-TEST(SwerveDrivePoseEstimator3dTest, TestSampleAt) {
-  frc::SwerveDriveKinematics<4> kinematics{
-      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
-      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
-  frc::SwerveDrivePoseEstimator3d estimator{
-      kinematics,
-      frc::Rotation2d{},
-      {frc::SwerveModulePosition{}, frc::SwerveModulePosition{},
-       frc::SwerveModulePosition{}, frc::SwerveModulePosition{}},
-      frc::Pose2d{},
-      {1.0, 1.0, 1.0},
-      {1.0, 1.0, 1.0}};
+TEST(DifferentialDrivePoseEstimatorTest, TestSampleAt) {
+  frc::DifferentialDriveKinematics kinematics{1_m};
+  frc::DifferentialDrivePoseEstimator estimator{
+      kinematics,      frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{},
+      {1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
 
   // Returns empty when null
   EXPECT_EQ(std::nullopt, estimator.SampleAt(1_s));
@@ -333,13 +309,8 @@ TEST(SwerveDrivePoseEstimator3dTest, TestSampleAt) {
   // Add a tiny tolerance for the upper bound because of floating point rounding
   // error
   for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
-    wpi::array<frc::SwerveModulePosition, 4> wheelPositions{
-        {frc::SwerveModulePosition{units::meter_t{time}, frc::Rotation2d{}},
-         frc::SwerveModulePosition{units::meter_t{time}, frc::Rotation2d{}},
-         frc::SwerveModulePosition{units::meter_t{time}, frc::Rotation2d{}},
-         frc::SwerveModulePosition{units::meter_t{time}, frc::Rotation2d{}}}};
     estimator.UpdateWithTime(units::second_t{time}, frc::Rotation2d{},
-                             wheelPositions);
+                             units::meter_t{time}, units::meter_t{time});
   }
 
   // Sample at an added time

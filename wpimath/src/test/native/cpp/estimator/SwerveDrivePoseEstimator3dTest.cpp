@@ -12,14 +12,14 @@
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
 
-#include "frc/estimator/SwerveDrivePoseEstimator3d.h"
+#include "frc/estimator/SwerveDrivePoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 
 void testFollowTrajectory(
     const frc::SwerveDriveKinematics<4>& kinematics,
-    frc::SwerveDrivePoseEstimator3d<4>& estimator,
+    frc::SwerveDrivePoseEstimator<4>& estimator,
     const frc::Trajectory& trajectory,
     std::function<frc::ChassisSpeeds(frc::Trajectory::State&)>
         chassisSpeedsGenerator,
@@ -140,7 +140,7 @@ void testFollowTrajectory(
   }
 }
 
-TEST(SwerveDrivePoseEstimator3dTest, AccuracyFacingTrajectory) {
+TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
   frc::SwerveDriveKinematics<4> kinematics{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
@@ -150,7 +150,7 @@ TEST(SwerveDrivePoseEstimator3dTest, AccuracyFacingTrajectory) {
   frc::SwerveModulePosition bl;
   frc::SwerveModulePosition br;
 
-  frc::SwerveDrivePoseEstimator3d<4> estimator{
+  frc::SwerveDrivePoseEstimator<4> estimator{
       kinematics,    frc::Rotation2d{}, {fl, fr, bl, br},
       frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.45, 0.45, 0.45}};
 
@@ -172,7 +172,7 @@ TEST(SwerveDrivePoseEstimator3dTest, AccuracyFacingTrajectory) {
       20_ms, 100_ms, 250_ms, true, false);
 }
 
-TEST(SwerveDrivePoseEstimator3dTest, BadInitialPose) {
+TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
   frc::SwerveDriveKinematics<4> kinematics{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
@@ -182,7 +182,7 @@ TEST(SwerveDrivePoseEstimator3dTest, BadInitialPose) {
   frc::SwerveModulePosition bl;
   frc::SwerveModulePosition br;
 
-  frc::SwerveDrivePoseEstimator3d<4> estimator{
+  frc::SwerveDrivePoseEstimator<4> estimator{
       kinematics,    frc::Rotation2d{}, {fl, fr, bl, br},
       frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.9, 0.9, 0.9}};
 
@@ -219,7 +219,7 @@ TEST(SwerveDrivePoseEstimator3dTest, BadInitialPose) {
   }
 }
 
-TEST(SwerveDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
+TEST(SwerveDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
   // This tests for multiple vision measurements applied at the same time.
   // The expected behavior is that all measurements affect the estimated pose.
   // The alternative result is that only one vision measurement affects the
@@ -234,7 +234,7 @@ TEST(SwerveDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
   frc::SwerveModulePosition bl;
   frc::SwerveModulePosition br;
 
-  frc::SwerveDrivePoseEstimator3d<4> estimator{
+  frc::SwerveDrivePoseEstimator<4> estimator{
       kinematics,       frc::Rotation2d{},
       {fl, fr, bl, br}, frc::Pose2d{1_m, 2_m, frc::Rotation2d{270_deg}},
       {0.1, 0.1, 0.1},  {0.45, 0.45, 0.45}};
@@ -278,7 +278,7 @@ TEST(SwerveDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
   }
 }
 
-TEST(SwerveDrivePoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
+TEST(SwerveDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
   frc::SwerveDriveKinematics<4> kinematics{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
@@ -288,7 +288,7 @@ TEST(SwerveDrivePoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
   frc::SwerveModulePosition bl;
   frc::SwerveModulePosition br;
 
-  frc::SwerveDrivePoseEstimator3d<4> estimator{
+  frc::SwerveDrivePoseEstimator<4> estimator{
       kinematics,    frc::Rotation2d{}, {fl, fr, bl, br},
       frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.45, 0.45, 0.45}};
 
@@ -313,11 +313,11 @@ TEST(SwerveDrivePoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
               1e-6);
 }
 
-TEST(SwerveDrivePoseEstimator3dTest, TestSampleAt) {
+TEST(SwerveDrivePoseEstimatorTest, TestSampleAt) {
   frc::SwerveDriveKinematics<4> kinematics{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
-  frc::SwerveDrivePoseEstimator3d estimator{
+  frc::SwerveDrivePoseEstimator estimator{
       kinematics,
       frc::Rotation2d{},
       {frc::SwerveModulePosition{}, frc::SwerveModulePosition{},

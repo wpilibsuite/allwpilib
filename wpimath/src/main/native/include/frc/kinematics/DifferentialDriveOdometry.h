@@ -62,11 +62,7 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
    */
   void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                      units::meter_t rightDistance, const Pose2d& pose) {
-    Odometry<DifferentialDriveWheelSpeeds,
-             DifferentialDriveWheelPositions>::ResetPosition(gyroAngle,
-                                                             {leftDistance,
-                                                              rightDistance},
-                                                             pose);
+    Odometry::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
   }
 
   /**
@@ -82,10 +78,7 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
    */
   const Pose2d& Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                        units::meter_t rightDistance) {
-    return Odometry<DifferentialDriveWheelSpeeds,
-                    DifferentialDriveWheelPositions>::Update(gyroAngle,
-                                                             {leftDistance,
-                                                              rightDistance});
+    return Odometry::Update(gyroAngle, {leftDistance, rightDistance});
   }
 
  private:
