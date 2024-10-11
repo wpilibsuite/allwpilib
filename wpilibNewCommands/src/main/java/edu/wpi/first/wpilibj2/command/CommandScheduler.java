@@ -67,6 +67,9 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
   // A set of the currently-running commands.
   private final Set<Command> m_scheduledCommands = new LinkedHashSet<>();
+  // A copy of the currently-running commands, used for iteration stored on class for caching
+  // purposes.
+  private Command[] m_scheduledCommandsCopy = new Command[12]; // 12 is arbitrary, it auto-resizes
 
   // A map from required subsystems to their requiring commands. Also used as a set of the
   // currently-required subsystems.
@@ -263,9 +266,16 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
     boolean isDisabled = RobotState.isDisabled();
     // Run scheduled commands, remove finished commands.
-    for (Command command : Set.copyOf(m_scheduledCommands)) {
+    m_scheduledCommandsCopy = m_scheduledCommands.toArray(m_scheduledCommandsCopy);
+    for (Command command : m_scheduledCommandsCopy) {
+      if (command == null) {
+        // at least 1 Command was removed before `run` was called (diff between copy and original).
+        // No more elements to iterate over (see toArray documentation)
+        break;
+      }
+
       if (!isScheduled(command)) {
-        continue; // skip as the normal scheduledCommands was modified and that command was canceled
+        continue; // Command was canceled in the previous iterations.
       }
 
       if (isDisabled && !command.runsWhenDisabled()) {
