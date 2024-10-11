@@ -106,6 +106,8 @@ public class DifferentialDrivetrainSimBase {
    *
    * @param plant The linear system that represents the drivetrain.
    * @param driveMotor A {@link DCMotor} representing one of the drivetrain's motors.
+   * @param gearing The gearingRatio ratio of the robot, as output over input. This must be the same
+   *     ratio as the ratio used to identify or create the drivetrainPlant.
    * @param trackWidthMeters The robot's track width, or distance between left and right wheels.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
    *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
