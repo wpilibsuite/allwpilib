@@ -12,6 +12,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 
@@ -20,14 +21,20 @@ public class FlywheelSim extends FlywheelSimBase {
   /**
    * Creates a simulated flywheel mechanism controlled by voltage input.
    *
-   * @param plant The linear system that represents the flywheel controlled by voltage input. Use
-   *     either {@link LinearSystemId#createFlywheelSystem(Gearbox, double)} or {@link
-   *     LinearSystemId#createFlywheelSystem(Gearbox, MomentOfInertia)} if using physical constants
-   *     or {@link LinearSystemId#identifyVelocitySystem(double, double)} if using system
-   *     characterization.
-   * @param gearbox The type of and number of motors in the flywheel gearbox.
+   * <p>If using physical constants create the plant using either {@link
+   * LinearSystemId#createFlywheelSystem(Gearbox, double)} or {@link
+   * LinearSystemId#createFlywheelSystem(Gearbox, MomentOfInertia)}.
+   *
+   * <p>If using system characterization create the plant using either {@link
+   * LinearSystemId#identifyVelocitySystem(double, double)} or {@link
+   * LinearSystem#identifyVelocitySystem(Measure, Measure)}.
+   *
+   * @param plant The linear system that represents the simulated flywheel mechanism controlled by
+   *     voltage input.
+   * @param gearbox The gearbox of the simulated flywheel mechanism.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 1 element for velocity.
+   *     noise is desired. If present must have 1 element for velocity. The units should be radians
+   *     per second.
    */
   public FlywheelSim(
       LinearSystem<N1, N1, N1> plant, Gearbox gearbox, double... measurementStdDevs) {
@@ -56,9 +63,9 @@ public class FlywheelSim extends FlywheelSimBase {
   }
 
   /**
-   * Sets the input voltage for the flywheel.
+   * Sets the input voltage of the simulated flywheel mechanism.
    *
-   * @param volts The input voltage.
+   * @param volts The input voltage in volts.
    */
   public void setInputVoltage(double volts) {
     setInput(volts);
@@ -67,7 +74,7 @@ public class FlywheelSim extends FlywheelSimBase {
   }
 
   /**
-   * Sets the input voltage for the flywheel.
+   * Sets the input voltage of the simulated flywheel mechanism.
    *
    * @param voltage The input voltage.
    */

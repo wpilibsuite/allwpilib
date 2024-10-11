@@ -28,38 +28,39 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.units.measure.Voltage;
 
-/** Represents a simulated flywheel mechanism. */
+/** The base class for a simulated flywheel mechanism. */
 public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
-  /** Gearbox for the flywheel. */
+  /** The gearbox of the simulated flywheel mechanism. */
   protected final Gearbox m_gearbox;
 
-  /** The moment of inertia for the flywheel mechanism. */
+  /** The moment of inertia of simulated the flywheel mechanism. */
   private final MomentOfInertia m_j;
 
-  /** The angular velocity of the flywheel mechanism. */
+  /** The angular velocity of the simulated flywheel mechanism. */
   protected final MutAngularVelocity m_angularVelocity = RadiansPerSecond.mutable(0.0);
 
-  /** The angular acceleration of the flywheel mechanism. */
+  /** The angular acceleration of the simulated flywheel mechanism. */
   private final MutAngularAcceleration m_angularAcceleration =
       RadiansPerSecondPerSecond.mutable(0.0);
 
-  /** The current draw of flywheel. */
+  /** The current draw of the simulated flywheel mechanism. */
   protected final MutCurrent m_currentDraw = Amps.mutable(0.0);
 
-  /** The voltage of the flywheel. */
+  /** The voltage of the simulated flywheel mechanism. */
   protected final MutVoltage m_voltage = Volts.mutable(0.0);
 
-  /** The torque on the flywheel. */
+  /** The torque of the simulated flywheel mechanism. */
   protected final MutTorque m_torque = NewtonMeters.mutable(0.0);
 
   /**
    * Creates a simulated flywheel mechanism.
    *
-   * @param plant The linear system that represents the flywheel.
-   * @param gearbox The type of and number of motors in the flywheel gearbox.
-   * @param J The moment of inertia for the flywheel mechanism.
+   * @param plant The linear system that represents the simulated flywheel mechanism.
+   * @param gearbox The gearbox of the simulated flywheel mechanism.
+   * @param J The moment of inertia of the simulated flywheel mechanism.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 1 element for velocity.
+   *     noise is desired. If present must have 1 element for velocity. The units should be radians
+   *     per second.
    */
   public FlywheelSimBase(
       LinearSystem<N1, N1, N1> plant,
@@ -72,7 +73,7 @@ public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
   }
 
   /**
-   * Sets the flywheel's angular velocity.
+   * Sets the angular velocity of the simulated flywheel mechanism.
    *
    * @param velocityRadPerSec The new angular velocity in radians per second.
    */
@@ -81,7 +82,7 @@ public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
   }
 
   /**
-   * Sets the flywheel's angular velocity.
+   * Sets the angular velocity of the simulated flywheel mechanism.
    *
    * @param velocity The new angular velocity.
    */
@@ -90,126 +91,126 @@ public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
   }
 
   /**
-   * Returns the moment of inertia in kilograms meters squared.
+   * Returns the moment of inertia of the simulated flywheel mechanism.
    *
-   * @return The flywheel's moment of inertia.
+   * @return The moment of inertia of the simulated flywheel mechanism in kilogram-square meters.
    */
   public double getJKgMetersSquared() {
     return m_j.in(KilogramSquareMeters);
   }
 
   /**
-   * Returns the moment of inertia.
+   * Returns the moment of inertia of the simulatd flywheel mechanism.
    *
-   * @return The flywheel's moment of inertia.
+   * @return The moment of inertia of the simulated flywheel mechanism.
    */
   public MomentOfInertia getJ() {
     return m_j;
   }
 
   /**
-   * Returns the gearbox for the flywheel.
+   * Returns the gearbox of the simulated flywheel mechanism.
    *
-   * @return The flywheel's gearbox.
+   * @return The gearbox of the simulated flywheel mechanism.
    */
   public Gearbox getGearbox() {
     return m_gearbox;
   }
 
   /**
-   * Returns the flywheel's velocity in Radians Per Second.
+   * Returns the angular velocity of the simulated flywheel mechanism.
    *
-   * @return The flywheel's velocity in Radians Per Second.
+   * @return The angular velocity of the simulated flywheel mechanism in radians per second.
    */
   public double getAngularVelocityRadPerSec() {
     return m_angularVelocity.in(RadiansPerSecond);
   }
 
   /**
-   * Returns the flywheel's velocity in RPM.
+   * Returns the angular velocity of the simulated flywheel mechanism.
    *
-   * @return The flywheel's velocity in RPM.
+   * @return The angular velocity of the simulated flywheel mechanism in RPM.
    */
   public double getAngularVelocityRPM() {
     return m_angularVelocity.in(RPM);
   }
 
   /**
-   * Returns the flywheel's velocity.
+   * Returns the angular velocity of the simulated flywheel mechanism.
    *
-   * @return The flywheel's velocity
+   * @return The angular velocity of the simulated flywheel mechanism.
    */
   public AngularVelocity getAngularVelocity() {
     return m_angularVelocity;
   }
 
   /**
-   * Returns the flywheel's acceleration in Radians Per Second Squared.
+   * Returns the angular acceleration of the simulated flywheel mechanism.
    *
-   * @return The flywheel's acceleration in Radians Per Second Squared.
+   * @return The angular acceleration of the simulated flywheel mechanism in radians per squared.
    */
   public double getAngularAccelerationRadPerSecSq() {
     return m_angularAcceleration.in(RadiansPerSecondPerSecond);
   }
 
   /**
-   * Returns the flywheel's acceleration.
+   * Returns the angular acceleration of the simulated flywheel mechanism.
    *
-   * @return The flywheel's acceleration.
+   * @return The angular acceleration of the simulated flywheel mechanism.
    */
   public AngularAcceleration getAngularAcceleration() {
     return m_angularAcceleration;
   }
 
   /**
-   * Returns the flywheel's current draw in Amps.
+   * Returns the current draw of the simulated flywheel mechanism.
    *
-   * @return The flywheel's current draw in Amps.
+   * @return The current draw of the simulated flywheel mechanism in amps.
    */
   public double getCurrentDrawAmps() {
     return m_currentDraw.in(Amps);
   }
 
   /**
-   * Returns the flywheel's current draw.
+   * Returns the current draw of the simulated flywheel mechanism.
    *
-   * @return The flywheel's current draw.
+   * @return The current draw of the simulated flywheel mechanism.
    */
   public Current getCurrentDraw() {
     return m_currentDraw;
   }
 
   /**
-   * Returns the flywheel's torque in Newton-Meters.
+   * Returns the torque of the simulated flywheel mechanism.
    *
-   * @return The flywheel's torque in Newton-Meters.
+   * @return The torque of the simulated flywheel mechanism in newton-meters.
    */
   public double getTorqueNewtonMeters() {
     return m_torque.in(NewtonMeters);
   }
 
   /**
-   * Returns the flywheel's torque.
+   * Returns the torque of the simulated flywheel mechanism.
    *
-   * @return The flywheel's torque.
+   * @return The torque of the simulated flywheel mechanism.
    */
   public Torque getTorque() {
     return m_torque;
   }
 
   /**
-   * Returns the voltage of the flywheel in volts.
+   * Returns the voltage of the simulated flywheel mechanism.
    *
-   * @return The flywheel's voltage in volts.
+   * @return The voltage of the simulated flywheel mechanism in volts.
    */
   public double getVoltageVolts() {
     return m_voltage.in(Volts);
   }
 
   /**
-   * Returns the voltage of the flywheel.
+   * Returns the voltage of the simulated flywheel mechanism.
    *
-   * @return The flywheel's voltage.
+   * @return The voltage of the simulated flywheel mechanism.
    */
   public Voltage getVoltage() {
     return m_voltage;

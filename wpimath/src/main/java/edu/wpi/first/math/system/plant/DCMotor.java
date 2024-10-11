@@ -158,45 +158,61 @@ public class DCMotor {
         RadiansPerSecond.of(freeSpeedRadPerSec));
   }
 
-  /** DC motor constants for a VEX CIM motor. */
-  public static final DCMotor CIM =
-      new DCMotor(Volts.of(12), NewtonMeters.of(2.42), Amps.of(133), Amps.of(2.7), RPM.of(5310));
-
-  /** DC motor constants for a VEX 775Pro motor. */
-  public static final DCMotor Vex775Pro =
-      new DCMotor(Volts.of(12), NewtonMeters.of(0.71), Amps.of(134), Amps.of(0.7), RPM.of(18730));
-
-  /** DC motor constants for a REV NEO brushless motor. */
-  public static final DCMotor NEO =
-      new DCMotor(Volts.of(12), NewtonMeters.of(2.6), Amps.of(105), Amps.of(1.8), RPM.of(5676));
-
-  /** DC motor constants for a VEX MiniCIM motor. */
-  public static final DCMotor MiniCIM =
-      new DCMotor(Volts.of(12), NewtonMeters.of(1.41), Amps.of(89), Amps.of(3.0), RPM.of(5840));
-
-  /** DC motor constants for a VEX Bag motor. */
-  public static final DCMotor Bag =
-      new DCMotor(Volts.of(12), NewtonMeters.of(0.43), Amps.of(53), Amps.of(1.8), RPM.of(13180));
-
-  /** DC motor constants for a Andymark RS775-125 motor. */
-  public static final DCMotor AndymarkRs775_125 =
-      new DCMotor(Volts.of(12), NewtonMeters.of(0.28), Amps.of(18), Amps.of(1.6), RPM.of(5800.0));
-
-  /** DC motor constants for a Banebots RS775 motor. */
-  public static final DCMotor BanebotsRs775 =
-      new DCMotor(Volts.of(12), NewtonMeters.of(0.72), Amps.of(97), Amps.of(2.7), RPM.of(13050.0));
-
-  /** DC motor constants for a Andymark 9015 motor. */
+  /**
+   * DC motor constants for a Andymark 9015 motor.
+   *
+   * <p>https://www.andymark.com/products/9015-motor
+   */
   public static final DCMotor Andymark9015 =
       new DCMotor(Volts.of(12), NewtonMeters.of(0.36), Amps.of(71), Amps.of(3.7), RPM.of(14270.0));
 
-  /** DC motor constants for a Banebots RS 550 motor. */
+  /**
+   * DC motor constants for a Andymark RS775-125 motor.
+   *
+   * <p>https://www.andymark.com/products/rs775-125-motor-for-pg27-gearbox
+   */
+  public static final DCMotor AndymarkRs775_125 =
+      new DCMotor(Volts.of(12), NewtonMeters.of(0.28), Amps.of(18), Amps.of(1.6), RPM.of(5800.0));
+
+  /**
+   * DC motor constants for a VEX Bag motor.
+   *
+   * <p>https://www.vexrobotics.com/217-3351.html
+   */
+  public static final DCMotor Bag =
+      new DCMotor(Volts.of(12), NewtonMeters.of(0.43), Amps.of(53), Amps.of(1.8), RPM.of(13180));
+
+  /**
+   * DC motor constants for a Banebots RS 550 motor.
+   *
+   * <p>https://banebots.com/m5-rs550-12/
+   */
   public static final DCMotor BanebotsRs550 =
       new DCMotor(Volts.of(12), NewtonMeters.of(0.38), Amps.of(84), Amps.of(0.4), RPM.of(19000.0));
 
-  /** DC motor constants for a REV NEO 550 brushless motor. */
-  public static final DCMotor Neo550 =
-      new DCMotor(Volts.of(12), NewtonMeters.of(0.97), Amps.of(100), Amps.of(1.4), RPM.of(11000.0));
+  /**
+   * DC motor constants for a Banebots RS775 motor.
+   *
+   * <p>https://banebots.com/m7-rs775-12/
+   */
+  public static final DCMotor BanebotsRs775 =
+      new DCMotor(Volts.of(12), NewtonMeters.of(0.72), Amps.of(97), Amps.of(2.7), RPM.of(13050.0));
+
+  /**
+   * DC motor constants for a VEX CIM motor.
+   *
+   * <p>https://www.vexrobotics.com/217-2000.html
+   */
+  public static final DCMotor CIM =
+      new DCMotor(Volts.of(12), NewtonMeters.of(2.42), Amps.of(133), Amps.of(2.7), RPM.of(5310));
+
+  /**
+   * DC motor constants for a VEX MiniCIM motor.
+   *
+   * <p>https://motors.vex.com/vexpro-motors/mini-cim-motor
+   */
+  public static final DCMotor MiniCIM =
+      new DCMotor(Volts.of(12), NewtonMeters.of(1.41), Amps.of(89), Amps.of(3.0), RPM.of(5840));
 
   /**
    * DC motor constants for a VEX Falcon 500 brushless motor.
@@ -215,15 +231,6 @@ public class DCMotor {
       new DCMotor(Volts.of(12), NewtonMeters.of(5.84), Amps.of(304), Amps.of(1.5), RPM.of(6080.0));
 
   /**
-   * DC motor constants for a Romi/TI_RSLK MAX motor.
-   *
-   * <p>https://www.pololu.com/product/1520/specs
-   */
-  public static final DCMotor RomiBuiltIn =
-      new DCMotor(
-          Volts.of(4.5), NewtonMeters.of(0.1765), Amps.of(1.25), Amps.of(0.13), RPM.of(150.0));
-
-  /**
    * DC motor constants for a Kraken X60 brushless motor.
    *
    * <p>https://store.ctr-electronics.com/announcing-kraken-x60/
@@ -240,10 +247,43 @@ public class DCMotor {
       new DCMotor(Volts.of(12), NewtonMeters.of(9.37), Amps.of(483), Amps.of(2), RPM.of(5800));
 
   /**
+   * DC motor constants for a REV NEO brushless motor.
+   *
+   * <p>https://www.revrobotics.com/rev-21-1650/
+   */
+  public static final DCMotor NEO =
+      new DCMotor(Volts.of(12), NewtonMeters.of(2.6), Amps.of(105), Amps.of(1.8), RPM.of(5676));
+
+  /**
+   * DC motor constants for a REV NEO 550 brushless motor.
+   *
+   * <p>https://www.revrobotics.com/rev-21-1651/
+   */
+  public static final DCMotor Neo550 =
+      new DCMotor(Volts.of(12), NewtonMeters.of(0.97), Amps.of(100), Amps.of(1.4), RPM.of(11000.0));
+
+  /**
    * DC motor constants for a REV Neo Vortex brushless motor.
    *
    * <p>https://www.revrobotics.com/next-generation-spark-neo/
    */
   public static final DCMotor NeoVortex =
       new DCMotor(Volts.of(12), NewtonMeters.of(3.60), Amps.of(211), Amps.of(3.6), RPM.of(6784));
+
+  /**
+   * DC motor constants for a Romi/TI_RSLK MAX motor.
+   *
+   * <p>https://www.pololu.com/product/1520/specs
+   */
+  public static final DCMotor RomiBuiltIn =
+      new DCMotor(
+          Volts.of(4.5), NewtonMeters.of(0.1765), Amps.of(1.25), Amps.of(0.13), RPM.of(150.0));
+
+  /**
+   * DC motor constants for a VEX 775Pro motor.
+   *
+   * <p>https://www.vexrobotics.com/775pro.html
+   */
+  public static final DCMotor Vex775Pro =
+      new DCMotor(Volts.of(12), NewtonMeters.of(0.71), Amps.of(134), Amps.of(0.7), RPM.of(18730));
 }

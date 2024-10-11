@@ -134,7 +134,7 @@ public class Wheel {
    * @return The force output in Newtons.
    */
   public double forceNewtons(double currentAmpere) {
-    return gearbox.torqueNm(currentAmpere) / radiusMeters;
+    return gearbox.torqueNewtonMeters(currentAmpere) / radiusMeters;
   }
 
   /**
@@ -158,8 +158,7 @@ public class Wheel {
    * @return The voltage of the motor in volts.
    */
   public double voltageVolts(double forceNewtons, double velocityMetersPerSecond) {
-    return gearbox.voltageVolts(
-        forceNewtons * radiusMeters, velocityMetersPerSecond / radiusMeters);
+    return gearbox.voltage(forceNewtons * radiusMeters, velocityMetersPerSecond / radiusMeters);
   }
 
   /**

@@ -236,7 +236,7 @@ public class SingleJointedArmSimTorque extends SingleJointedArmSimBase {
     super.update(dtSeconds);
     m_currentDraw.mut_replace(
         m_gearbox.currentAmps(getInput(0)) * Math.signum(m_u.get(0, 0)), Amps);
-    m_voltage.mut_replace(m_gearbox.voltageVolts(getInput(0), m_x.get(1, 0)), Volts);
+    m_voltage.mut_replace(m_gearbox.voltage(getInput(0), m_x.get(1, 0)), Volts);
     m_torque.mut_replace(getInput(0), NewtonMeters);
   }
 }

@@ -122,15 +122,15 @@ public final class LinearSystemId {
    * Create a state-space model of a flywheel system. The states of the system are [angular
    * velocity], inputs are [voltage], and outputs are [angular velocity].
    *
-   * @param gearbox The gearbox attached to the flywheel.
-   * @param JKgMetersSquared The moment of inertia J of the flywheel.
+   * @param gearbox The gearbox of the flywheel mechanism.
+   * @param JKgMetersSquared The moment of inertia of the flywheel in kilograms-square meters.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if JKgMetersSquared &leq; 0.
    */
   public static LinearSystem<N1, N1, N1> createFlywheelSystem(
       Gearbox gearbox, double JKgMetersSquared) {
     if (JKgMetersSquared <= 0.0) {
-      throw new IllegalArgumentException("J must be greater than zero.");
+      throw new IllegalArgumentException("JKgMetersSquared must be greater than zero.");
     }
 
     return new LinearSystem<>(
@@ -155,7 +155,7 @@ public final class LinearSystemId {
    * velocity], inputs are [voltage], and outputs are [angular velocity].
    *
    * @param gearbox The gearbox attached to the flywheel.
-   * @param J The moment of inertia J of the flywheel.
+   * @param J The moment of inertia of the flywheel.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if J &leq; 0.
    */
@@ -167,13 +167,13 @@ public final class LinearSystemId {
    * Create a state-space model of a flywheel system. The states of the system are [angular
    * velocity], inputs are [torque], and outputs are [angular velocity].
    *
-   * @param JKgMetersSquared The moment of inertia J of the flywheel.
+   * @param JKgMetersSquared The moment of inertia of the flywheel in kilograms-square meters.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0.
+   * @throws IllegalArgumentException if JKgMetersSquared &leq; 0.
    */
-  public static LinearSystem<N1, N1, N1> createFlywheelTorqueSystem(double JKgMetersSquared) {
+  public static LinearSystem<N1, N1, N1> createFlywheelSystem(double JKgMetersSquared) {
     if (JKgMetersSquared <= 0.0) {
-      throw new IllegalArgumentException("J must be greater than zero.");
+      throw new IllegalArgumentException("JKgMetersSquared must be greater than zero.");
     }
 
     return new LinearSystem<>(
@@ -187,12 +187,12 @@ public final class LinearSystemId {
    * Create a state-space model of a flywheel system. The states of the system are [angular
    * velocity], inputs are [torque], and outputs are [angular velocity].
    *
-   * @param J The moment of inertia J of the flywheel.
+   * @param J The moment of inertia of the flywheel.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if J &lt;= 0.
+   * @throws IllegalArgumentException if J &leq;= 0.
    */
-  public static LinearSystem<N1, N1, N1> createFlywheelTorqueSystem(MomentOfInertia J) {
-    return createFlywheelTorqueSystem(J.in(KilogramSquareMeters));
+  public static LinearSystem<N1, N1, N1> createFlywheelSystem(MomentOfInertia J) {
+    return createFlywheelSystem(J.in(KilogramSquareMeters));
   }
 
   /**
@@ -598,48 +598,25 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model for a 1 DOF velocity system from its kV (input units/(unit/sec)) and
-   * kA (input units/(unit/sec²). These constants can be found using SysId. The states of the system
+   * Create a state-space model for a 1 DOF velocity system from its kV (input-units/(unit/sec)) and
+   * kA (input-units/(unit/sec²). These constants can be found using SysId. The states of the system
    * are [velocity], inputs are [voltage or torque], and outputs are [velocity].
    *
-   * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
-   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
+   * <p>The distance-units you choose MUST be an SI unit (i.e. meters or radians).
+   *
+   * <p>The input-units you choose MUST be an SI unit (i.e. volts or newton-meters).
+   *
+   * <p>You can use the {@link edu.wpi.first.math.util.Units} class for converting between unit
+   * types.
    *
    * <p>The parameters provided by the user are from this feedforward model:
    *
    * <p>u = K_v v + K_a a
    *
-   * @param <U> The input parameter either as voltage or torque.
-   * @param <V> The velocity gain parameter either as LinearVelocity or AngularVelocity.
-   * @param <A> The acceleration gain parameter either as LinearAcceleration or AngularAcceleration.
-   * @param kV The velocity gain, in input units/(unit/sec)
-   * @param kA The acceleration gain, in input units/(unit/sec²)
+   * @param kV The velocity gain, in input-units/(distance-units/sec)
+   * @param kA The acceleration gain, in input-units/(distance-units/sec²)
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
-   * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
-   */
-  public static <U extends Unit, V extends Unit, A extends Unit>
-      LinearSystem<N1, N1, N1> identifyVelocitySystem(
-          Measure<? extends PerUnit<U, V>> kV, Measure<? extends PerUnit<U, A>> kA) {
-    return identifyVelocitySystem(kV.baseUnitMagnitude(), kA.baseUnitMagnitude());
-  }
-
-  /**
-   * Create a state-space model for a 1 DOF velocity system from its kV (input units/(unit/sec)) and
-   * kA (input units/(unit/sec²). These constants can be found using SysId. The states of the system
-   * are [velocity], inputs are [voltage or torque], and outputs are [velocity].
-   *
-   * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
-   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
-   *
-   * <p>The parameters provided by the user are from this feedforward model:
-   *
-   * <p>u = K_v v + K_a a
-   *
-   * @param kV The velocity gain, in input units/(unit/sec)
-   * @param kA The acceleration gain, in input units/(unit/sec²)
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
+   * @throws IllegalArgumentException if kV &lt; 0 or kA &leq; 0.
    * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   public static LinearSystem<N1, N1, N1> identifyVelocitySystem(double kV, double kA) {
@@ -655,6 +632,31 @@ public final class LinearSystemId {
         VecBuilder.fill(1.0 / kA),
         VecBuilder.fill(1.0),
         VecBuilder.fill(0.0));
+  }
+
+  /**
+   * Create a state-space model for a 1 DOF velocity system from its kV
+   * (input-units/(distance-units/sec)) and kA (input-units/(distance-units/sec²). These constants
+   * can be found using SysId. The states of the system are [velocity], inputs are [voltage or
+   * torque], and outputs are [velocity].
+   *
+   * <p>The parameters provided by the user are from this feedforward model:
+   *
+   * <p>u = K_v v + K_a a
+   *
+   * @param <U> The input parameter either as voltage or torque.
+   * @param <V> The velocity gain parameter either as LinearVelocity or AngularVelocity.
+   * @param <A> The acceleration gain parameter either as LinearAcceleration or AngularAcceleration.
+   * @param kV The velocity gain, in input units/(unit/sec)
+   * @param kA The acceleration gain, in input units/(unit/sec²)
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if kV &lt; 0 or kA &leq; 0.
+   * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   */
+  public static <U extends Unit, V extends Unit, A extends Unit>
+      LinearSystem<N1, N1, N1> identifyVelocitySystem(
+          Measure<? extends PerUnit<U, V>> kV, Measure<? extends PerUnit<U, A>> kA) {
+    return identifyVelocitySystem(kV.baseUnitMagnitude(), kA.baseUnitMagnitude());
   }
 
   /**
