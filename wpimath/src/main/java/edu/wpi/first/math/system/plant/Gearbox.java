@@ -21,7 +21,7 @@ import edu.wpi.first.units.measure.Voltage;
 /** Represents a gearbox with a non-zero number of DC motors of the same type. */
 public class Gearbox {
   /** The type of motor used in the gearbox. */
-  public final DCMotorType motorType;
+  public final DCMotor motorType;
 
   /** The gearbox reduction as a ratio of output turn to input turns. */
   public final double reduction;
@@ -49,7 +49,7 @@ public class Gearbox {
    * @param reduction The gearbox reduction as a ratio of output turns to input turns.
    * @throws IllegalArgumentException if reduction &leq; 0 or numMotors &leq; 0.
    */
-  public Gearbox(int numMotors, DCMotorType motorType, double reduction) {
+  public Gearbox(int numMotors, DCMotor motorType, double reduction) {
     if (numMotors <= 0) {
       throw new IllegalArgumentException("numMotors must be greater than zero.");
     }
@@ -67,7 +67,7 @@ public class Gearbox {
    *
    * @param motorType The type of motor used in the gearbox.
    */
-  public Gearbox(DCMotorType motorType) {
+  public Gearbox(DCMotor motorType) {
     this(1, motorType, 1.0);
   }
 
@@ -79,7 +79,7 @@ public class Gearbox {
    * @param motorType The type of motor used in the gearbox.
    * @throws IllegalArgumentException if numMotors &leq; 0.
    */
-  public Gearbox(int numMotors, DCMotorType motorType) {
+  public Gearbox(int numMotors, DCMotor motorType) {
     this(numMotors, motorType, 1.0);
   }
 
@@ -89,7 +89,7 @@ public class Gearbox {
    * @param motorType The type of motor used in the gearbox.
    * @param reduction The gearbox reduction as a ratio of output turns to input turns.
    */
-  public Gearbox(DCMotorType motorType, double reduction) {
+  public Gearbox(DCMotor motorType, double reduction) {
     this(1, motorType, reduction);
   }
 

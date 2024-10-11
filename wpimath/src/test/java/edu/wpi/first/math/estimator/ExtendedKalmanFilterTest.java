@@ -20,6 +20,7 @@ import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.NumericalJacobian;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import java.util.List;
@@ -27,7 +28,6 @@ import org.junit.jupiter.api.Test;
 
 class ExtendedKalmanFilterTest {
   private static Matrix<N5, N1> getDynamics(final Matrix<N5, N1> x, final Matrix<N2, N1> u) {
-    final var motors = DCMotor.getCIM(2);
 
     final var gr = 7.08; // Gear ratio
     final var rb = 0.8382 / 2.0; // Wheelbase radius (track width)
@@ -35,9 +35,15 @@ class ExtendedKalmanFilterTest {
     final var m = 63.503; // Robot mass
     final var J = 5.6; // Robot moment of inertia
 
+    var gearbox = new Gearbox(2, DCMotor.CIM);
+
     final var C1 =
-        -Math.pow(gr, 2) * motors.KtNMPerAmp / (motors.KvRadPerSecPerVolt * motors.rOhms * r * r);
-    final var C2 = gr * motors.KtNMPerAmp / (motors.rOhms * r);
+        -gearbox.numMotors
+            * Math.pow(gr, 2)
+            * gearbox.motorType.KtNMPerAmp
+            / (gearbox.motorType.KvRadPerSecPerVolt * gearbox.motorType.rOhms * r * r);
+    final var C2 =
+        gearbox.numMotors * gr * gearbox.motorType.KtNMPerAmp / (gearbox.motorType.rOhms * r);
     final var k1 = 1.0 / m + rb * rb / J;
     final var k2 = 1.0 / m - rb * rb / J;
 

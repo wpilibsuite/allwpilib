@@ -12,7 +12,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.LinearSystemLoop;
-import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
   // Outputs (what we can measure): [position], in radians.
   private final LinearSystem<N2, N1, N2> m_armPlant =
       LinearSystemId.createSingleJointedArmSystem(
-          new Gearbox(2, DCMotorType.NEO, kArmGearing), kArmMass, kArmLength, kArmLength / 2.0);
+          new Gearbox(2, DCMotor.NEO, kArmGearing), kArmMass, kArmLength, kArmLength / 2.0);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   @SuppressWarnings("unchecked")

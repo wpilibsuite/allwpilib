@@ -23,6 +23,7 @@ import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.NumericalJacobian;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -31,20 +32,23 @@ import org.junit.jupiter.api.Test;
 
 class UnscentedKalmanFilterTest {
   private static Matrix<N5, N1> getDynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {
-    var motors = DCMotor.getCIM(2);
 
-    // var gLow = 15.32;    // Low gear ratio
+    // var gLow = 15.32; // Low gear ratio
     var gHigh = 7.08; // High gear ratio
     var rb = 0.8382 / 2.0; // Robot radius
     var r = 0.0746125; // Wheel radius
     var m = 63.503; // Robot mass
     var J = 5.6; // Robot moment of inertia
 
+    var gearbox = new Gearbox(2, DCMotor.CIM);
+
     var C1 =
-        -Math.pow(gHigh, 2)
-            * motors.KtNMPerAmp
-            / (motors.KvRadPerSecPerVolt * motors.rOhms * r * r);
-    var C2 = gHigh * motors.KtNMPerAmp / (motors.rOhms * r);
+        -gearbox.numMotors
+            * Math.pow(gHigh, 2)
+            * gearbox.motorType.KtNMPerAmp
+            / (gearbox.motorType.KvRadPerSecPerVolt * gearbox.motorType.rOhms * r * r);
+    var C2 =
+        gearbox.numMotors * gHigh * gearbox.motorType.KtNMPerAmp / (gearbox.motorType.rOhms * r);
     var k1 = 1.0 / m + Math.pow(rb, 2) / J;
     var k2 = 1.0 / m - Math.pow(rb, 2) / J;
 

@@ -8,7 +8,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -34,8 +34,7 @@ public class Arm implements AutoCloseable {
   private double m_armSetpointDegrees = Constants.kDefaultArmSetpointDegrees;
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
-  private final Gearbox m_armGearbox =
-      new Gearbox(2, DCMotorType.Vex775Pro, Constants.kArmReduction);
+  private final Gearbox m_armGearbox = new Gearbox(2, DCMotor.Vex775Pro, Constants.kArmReduction);
 
   // The model that represents our arm system.
   private final LinearSystem<N2, N1, N2> m_plant =

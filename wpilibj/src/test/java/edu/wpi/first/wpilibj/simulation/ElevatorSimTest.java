@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.system.plant.Wheel;
@@ -27,7 +27,7 @@ class ElevatorSimTest {
     @SuppressWarnings("resource")
     var controller = new PIDController(10, 0, 0);
 
-    var drum = new Wheel(new Gearbox(4, DCMotorType.Vex775Pro, 14.67), Units.inchesToMeters(0.75));
+    var drum = new Wheel(new Gearbox(4, DCMotor.Vex775Pro, 14.67), Units.inchesToMeters(0.75));
 
     var plant = LinearSystemId.createElevatorSystem(drum, 8);
 
@@ -60,7 +60,7 @@ class ElevatorSimTest {
 
   @Test
   void testMinMax() {
-    var drum = new Wheel(new Gearbox(4, DCMotorType.Vex775Pro, 14.67), Units.inchesToMeters(0.75));
+    var drum = new Wheel(new Gearbox(4, DCMotor.Vex775Pro, 14.67), Units.inchesToMeters(0.75));
 
     var plant = LinearSystemId.createElevatorSystem(drum, 8);
 
@@ -83,7 +83,7 @@ class ElevatorSimTest {
 
   @Test
   void testStability() {
-    var drum = new Wheel(new Gearbox(4, DCMotorType.Vex775Pro, 100), Units.inchesToMeters(0.5));
+    var drum = new Wheel(new Gearbox(4, DCMotor.Vex775Pro, 100), Units.inchesToMeters(0.5));
 
     var system = LinearSystemId.createElevatorSystem(drum, 4);
 

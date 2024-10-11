@@ -10,7 +10,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.Encoder;
@@ -23,7 +23,7 @@ class DCMotorSimTest {
   void testVoltageSteadyState() {
     RoboRioSim.resetData();
 
-    Gearbox gearbox = new Gearbox(DCMotorType.NEO);
+    Gearbox gearbox = new Gearbox(DCMotor.NEO);
     LinearSystem<N2, N1, N2> plant = LinearSystemId.createDCMotorSystem(gearbox, 0.0005);
     DCMotorSim sim = new DCMotorSim(plant, gearbox);
 
@@ -64,9 +64,9 @@ class DCMotorSimTest {
   void testPositionFeedbackControl() {
     RoboRioSim.resetData();
 
-    Gearbox gearbox = new Gearbox(DCMotorType.NEO);
+    Gearbox gearbox = new Gearbox(DCMotor.NEO);
     LinearSystem<N2, N1, N2> plant =
-        LinearSystemId.createDCMotorSystem(new Gearbox(DCMotorType.NEO), 0.0005);
+        LinearSystemId.createDCMotorSystem(new Gearbox(DCMotor.NEO), 0.0005);
     DCMotorSim sim = new DCMotorSim(plant, gearbox);
 
     try (var motor = new PWMVictorSPX(0);

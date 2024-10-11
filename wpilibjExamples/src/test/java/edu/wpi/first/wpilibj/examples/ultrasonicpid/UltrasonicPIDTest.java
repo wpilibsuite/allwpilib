@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HAL.SimPeriodicBeforeCallback;
-import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.system.plant.Wheel;
@@ -63,7 +63,7 @@ class UltrasonicPIDTest {
                 kaVoltSecondsSquaredPerMeter,
                 kvVoltSecondsPerRadian,
                 kaVoltSecondsSquaredPerRadian),
-            new Wheel(new Gearbox(2, DCMotorType.Falcon500, kGearing), kWheelDiameterMeters / 2.0),
+            new Wheel(new Gearbox(2, DCMotor.Falcon500, kGearing), kWheelDiameterMeters / 2.0),
             kTrackwidthMeters,
             null);
     m_ultrasonicSim = new UltrasonicSim(Robot.kUltrasonicPingPort, Robot.kUltrasonicEchoPort);

@@ -12,7 +12,7 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.system.Discretization;
-import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.system.plant.Wheel;
@@ -26,7 +26,7 @@ class LinearQuadraticRegulatorTest {
     var r = 0.0181864;
     var G = 1.0;
 
-    var drum = new Wheel(new Gearbox(2, DCMotorType.Vex775Pro, G), r);
+    var drum = new Wheel(new Gearbox(2, DCMotor.Vex775Pro, G), r);
 
     var plant = LinearSystemId.createElevatorSystem(drum, m);
 
@@ -44,7 +44,7 @@ class LinearQuadraticRegulatorTest {
   void testFourMotorElevator() {
     var dt = 0.020;
 
-    var drum = new Wheel(new Gearbox(4, DCMotorType.Vex775Pro, 14.67), Units.inchesToMeters(0.75));
+    var drum = new Wheel(new Gearbox(4, DCMotor.Vex775Pro, 14.67), Units.inchesToMeters(0.75));
 
     var plant = LinearSystemId.createElevatorSystem(drum, 8.0);
 
@@ -62,7 +62,7 @@ class LinearQuadraticRegulatorTest {
     var r = 0.4;
     var G = 100.0;
 
-    var gearbox = new Gearbox(2, DCMotorType.Vex775Pro, G);
+    var gearbox = new Gearbox(2, DCMotor.Vex775Pro, G);
 
     var plant = LinearSystemId.createSingleJointedArmSystem(gearbox, m, r, r / 2.0);
 
@@ -162,7 +162,7 @@ class LinearQuadraticRegulatorTest {
   void testLatencyCompensate() {
     var dt = 0.02;
 
-    var drum = new Wheel(new Gearbox(4, DCMotorType.Vex775Pro, 14.67), Units.inchesToMeters(0.75));
+    var drum = new Wheel(new Gearbox(4, DCMotor.Vex775Pro, 14.67), Units.inchesToMeters(0.75));
 
     var plant = LinearSystemId.createElevatorSystem(drum, 8.0);
 

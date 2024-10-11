@@ -11,7 +11,7 @@ import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.system.plant.Wheel;
@@ -22,7 +22,7 @@ class LinearSystemIDTest {
   void testDrivetrainVelocitySystem() {
     var model =
         LinearSystemId.createDrivetrainVelocitySystem(
-            new Wheel(new Gearbox(4, DCMotorType.NEO, 6), 0.05), 70, 0.4, 6.0);
+            new Wheel(new Gearbox(4, DCMotor.NEO, 6), 0.05), 70, 0.4, 6.0);
     assertTrue(
         model
             .getA()
@@ -46,8 +46,7 @@ class LinearSystemIDTest {
   @Test
   void testElevatorSystem() {
     var model =
-        LinearSystemId.createElevatorSystem(
-            new Wheel(new Gearbox(2, DCMotorType.NEO, 12), 0.05), 5);
+        LinearSystemId.createElevatorSystem(new Wheel(new Gearbox(2, DCMotor.NEO, 12), 0.05), 5);
     assertTrue(
         model.getA().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -99.05473), 0.001));
 
@@ -60,7 +59,7 @@ class LinearSystemIDTest {
 
   @Test
   void testFlywheelSystem() {
-    var model = LinearSystemId.createFlywheelSystem(new Gearbox(2, DCMotorType.NEO), 0.00032);
+    var model = LinearSystemId.createFlywheelSystem(new Gearbox(2, DCMotor.NEO), 0.00032);
     assertTrue(model.getA().isEqual(VecBuilder.fill(-26.87032), 0.001));
 
     assertTrue(model.getB().isEqual(VecBuilder.fill(1354.166667), 0.001));
@@ -72,7 +71,7 @@ class LinearSystemIDTest {
 
   @Test
   void testDCMotorSystem() {
-    var model = LinearSystemId.createDCMotorSystem(new Gearbox(2, DCMotorType.NEO), 0.00032);
+    var model = LinearSystemId.createDCMotorSystem(new Gearbox(2, DCMotor.NEO), 0.00032);
     assertTrue(
         model.getA().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -26.87032), 0.001));
 

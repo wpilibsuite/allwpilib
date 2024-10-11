@@ -19,7 +19,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.system.NumericalIntegration;
-import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.system.plant.Wheel;
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 class DifferentialDrivetrainSimTest {
   @Test
   void testConvergence() {
-    var wheel = new Wheel(new Gearbox(2, DCMotorType.NEO), Units.inchesToMeters(2));
+    var wheel = new Wheel(new Gearbox(2, DCMotor.NEO), Units.inchesToMeters(2));
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(wheel, 50, Units.inchesToMeters(12), 0.5);
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
@@ -96,7 +96,7 @@ class DifferentialDrivetrainSimTest {
 
   @Test
   void testCurrent() {
-    var wheel = new Wheel(new Gearbox(2, DCMotorType.NEO), Units.inchesToMeters(2));
+    var wheel = new Wheel(new Gearbox(2, DCMotor.NEO), Units.inchesToMeters(2));
     var sim = new DifferentialDrivetrainSim(wheel, 0.5, 50, Units.inchesToMeters(12), null);
 
     sim.setInputVoltages(-12, -12);
@@ -120,7 +120,7 @@ class DifferentialDrivetrainSimTest {
 
   @Test
   void testModelStability() {
-    var wheel = new Wheel(new Gearbox(2, DCMotorType.NEO, 5.0), Units.inchesToMeters(2));
+    var wheel = new Wheel(new Gearbox(2, DCMotor.NEO, 5.0), Units.inchesToMeters(2));
 
     var sim = new DifferentialDrivetrainSim(wheel, 2.0, 50, Units.inchesToMeters(12), null);
 

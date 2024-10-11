@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.elevatorexponentialsimulation.subsystems;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.system.plant.Wheel;
@@ -30,8 +30,7 @@ public class Elevator implements AutoCloseable {
   // This gearbox represents a gearbox containing 2 NEO motors.
   private final Wheel m_elevatorDrum =
       new Wheel(
-          new Gearbox(2, DCMotorType.NEO, Constants.kElevatorGearing),
-          Constants.kElevatorDrumRadius);
+          new Gearbox(2, DCMotor.NEO, Constants.kElevatorGearing), Constants.kElevatorDrumRadius);
 
   private final ExponentialProfile m_profile =
       new ExponentialProfile(

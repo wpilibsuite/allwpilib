@@ -11,7 +11,7 @@ import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.LinearSystemLoop;
-import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
   // Outputs (what we can measure): [velocity], in radians per second.
   private final LinearSystem<N1, N1, N1> m_flywheelPlant =
       LinearSystemId.createFlywheelSystem(
-          new Gearbox(2, DCMotorType.NEO, kFlywheelGearing), kFlywheelMomentOfInertia);
+          new Gearbox(2, DCMotor.NEO, kFlywheelGearing), kFlywheelMomentOfInertia);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   private final KalmanFilter<N1, N1, N1> m_observer =

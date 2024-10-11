@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HAL.SimPeriodicBeforeCallback;
-import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.system.plant.Wheel;
@@ -32,7 +32,7 @@ class PotentiometerPIDTest {
   private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
   private static final double kCarriageMassKg = 4.0; // kg
   private final Wheel m_elevatorDrum =
-      new Wheel(new Gearbox(4, DCMotorType.Vex775Pro, kElevatorGearing), kElevatorDrumRadius);
+      new Wheel(new Gearbox(4, DCMotor.Vex775Pro, kElevatorGearing), kElevatorDrumRadius);
 
   private Robot m_robot;
   private Thread m_thread;

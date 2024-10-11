@@ -11,7 +11,7 @@ import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -61,7 +61,7 @@ public class Robot extends TimedRobot {
   private static final double kFlywheelMomentOfInertia =
       0.5 * Units.lbsToKilograms(1.5) * Math.pow(Units.inchesToMeters(4), 2);
 
-  private final Gearbox m_gearbox = new Gearbox(DCMotorType.NEO, kFlywheelGearing);
+  private final Gearbox m_gearbox = new Gearbox(DCMotor.NEO, kFlywheelGearing);
 
   private final LinearSystem<N1, N1, N1> m_plant =
       LinearSystemId.createFlywheelSystem(m_gearbox, kFlywheelMomentOfInertia);

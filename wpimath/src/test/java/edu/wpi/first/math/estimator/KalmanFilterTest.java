@@ -18,7 +18,7 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.system.plant.Wheel;
@@ -40,7 +40,7 @@ class KalmanFilterTest {
   private static void createElevator() {
     var m = 5.0;
     var r = 0.0181864;
-    var drum = new Wheel(new Gearbox(2, DCMotorType.Vex775Pro), r);
+    var drum = new Wheel(new Gearbox(2, DCMotor.Vex775Pro), r);
     elevatorPlant = LinearSystemId.createElevatorSystem(drum, m);
   }
 

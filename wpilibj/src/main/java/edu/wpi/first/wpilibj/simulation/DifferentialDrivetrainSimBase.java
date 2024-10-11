@@ -21,7 +21,7 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
-import edu.wpi.first.math.system.plant.DCMotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.system.plant.Wheel;
@@ -480,21 +480,21 @@ public class DifferentialDrivetrainSimBase {
   /** Represents common motor layouts of the kit drivetrain. */
   public enum KitbotGearbox {
     /** One CIM motor per drive side. */
-    kSingleCIMPerSide(new Gearbox(1, DCMotorType.CIM)),
+    kSingleCIMPerSide(new Gearbox(1, DCMotor.CIM)),
     /** Two CIM motors per drive side. */
-    kDualCIMPerSide(new Gearbox(2, DCMotorType.CIM)),
+    kDualCIMPerSide(new Gearbox(2, DCMotor.CIM)),
     /** One Mini CIM motor per drive side. */
-    kSingleMiniCIMPerSide(new Gearbox(1, DCMotorType.MiniCIM)),
+    kSingleMiniCIMPerSide(new Gearbox(1, DCMotor.MiniCIM)),
     /** Two Mini CIM motors per drive side. */
-    kDualMiniCIMPerSide(new Gearbox(2, DCMotorType.CIM)),
+    kDualMiniCIMPerSide(new Gearbox(2, DCMotor.CIM)),
     /** One Falcon 500 motor per drive side. */
-    kSingleFalcon500PerSide(new Gearbox(1, DCMotorType.Falcon500)),
+    kSingleFalcon500PerSide(new Gearbox(1, DCMotor.Falcon500)),
     /** Two Falcon 500 motors per drive side. */
-    kDoubleFalcon500PerSide(new Gearbox(2, DCMotorType.Falcon500)),
+    kDoubleFalcon500PerSide(new Gearbox(2, DCMotor.Falcon500)),
     /** One NEO motor per drive side. */
-    kSingleNEOPerSide(new Gearbox(1, DCMotorType.NEO)),
+    kSingleNEOPerSide(new Gearbox(1, DCMotor.NEO)),
     /** Two NEO motors per drive side. */
-    kDoubleNEOPerSide(new Gearbox(2, DCMotorType.NEO));
+    kDoubleNEOPerSide(new Gearbox(2, DCMotor.NEO));
 
     /** KitbotMotor value. */
     public final Gearbox value;
