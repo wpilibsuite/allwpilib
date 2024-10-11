@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj.simulation;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
@@ -20,6 +21,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularAcceleration;
 import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated DC motor mechanism. */
@@ -42,6 +44,9 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   // The angular acceleration of the system.
   private final MutAngularAcceleration m_angularAcceleration =
       RadiansPerSecondPerSecond.mutable(0.0);
+
+  // Input voltage of the system
+  private final MutVoltage m_voltage = Volts.mutable(0);
 
   /**
    * Creates a simulated DC motor mechanism.
@@ -244,12 +249,32 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
+   * Gets the input voltage for the DC motor.
+   *
+   * @return The DC motor's input voltage.
+   */
+  public Voltage getInputVoltageVolts() {
+    m_voltage.mut_setMagnitude(getInput(0));
+    return m_voltage;
+  }
+  
+  /**
    * Sets the input voltage for the DC motor.
    *
    * @param volts The input voltage.
    */
   public void setInputVoltage(double volts) {
     setInput(volts);
+    clampInput(RobotController.getBatteryVoltage());
+  }
+
+  /**
+   * Sets the input voltage for the DC motor.
+   *
+   * @param volts The input voltage.
+   */
+  public void setInputVoltage(Voltage volts) {
+    setInput(volts.in(Volts));
     clampInput(RobotController.getBatteryVoltage());
   }
 }
