@@ -263,7 +263,8 @@ LEDPattern LEDPattern::Steps(
   return Steps(std::span{steps.begin(), steps.end()});
 }
 
-LEDPattern LEDPattern::Gradient(std::span<const Color> colors) {
+LEDPattern LEDPattern::Gradient(GradientType type,
+                                std::span<const Color> colors) {
   if (colors.size() == 0) {
     // no colors specified
     return LEDPattern::Off();
@@ -273,11 +274,19 @@ LEDPattern LEDPattern::Gradient(std::span<const Color> colors) {
     return LEDPattern::Solid(colors[0]);
   }
 
-  return LEDPattern{[colors = std::vector(colors.begin(), colors.end())](
+  return LEDPattern{[type, colors = std::vector(colors.begin(), colors.end())](
                         auto data, auto writer) {
     size_t numSegments = colors.size();
     auto bufLen = data.size();
-    int ledsPerSegment = bufLen / numSegments;
+    int ledsPerSegment = 0;
+    switch (type) {
+      case kContinuous:
+        ledsPerSegment = bufLen / numSegments;
+        break;
+      case kDiscontinuous:
+        ledsPerSegment = (bufLen - 1) / (numSegments - 1);
+        break;
+    }
 
     for (size_t led = 0; led < bufLen; led++) {
       int colorIndex = (led / ledsPerSegment) % numSegments;
@@ -295,8 +304,9 @@ LEDPattern LEDPattern::Gradient(std::span<const Color> colors) {
   }};
 }
 
-LEDPattern LEDPattern::Gradient(std::initializer_list<Color> colors) {
-  return Gradient(std::span{colors.begin(), colors.end()});
+LEDPattern LEDPattern::Gradient(GradientType type,
+                                std::initializer_list<Color> colors) {
+  return Gradient(type, std::span{colors.begin(), colors.end()});
 }
 
 LEDPattern LEDPattern::Rainbow(int saturation, int value) {
