@@ -14,8 +14,7 @@
 namespace nt::net::detail {
 
 template <size_t MaxValueSize, bool IsMutexed>
-inline void
-ClientMessageQueueImpl<MaxValueSize, IsMutexed>::ClientPublish(
+inline void ClientMessageQueueImpl<MaxValueSize, IsMutexed>::ClientPublish(
     int pubuid, std::string_view name, std::string_view typeStr,
     const wpi::json& properties, const PubSubOptionsImpl& options) {
   std::scoped_lock lock{m_mutex};
@@ -24,8 +23,7 @@ ClientMessageQueueImpl<MaxValueSize, IsMutexed>::ClientPublish(
 }
 
 template <size_t MaxValueSize, bool IsMutexed>
-inline void
-ClientMessageQueueImpl<MaxValueSize, IsMutexed>::ClientUnpublish(
+inline void ClientMessageQueueImpl<MaxValueSize, IsMutexed>::ClientUnpublish(
     int pubuid) {
   std::scoped_lock lock{m_mutex};
   m_queue.enqueue(ClientMessage{UnpublishMsg{pubuid}});
@@ -40,8 +38,7 @@ ClientMessageQueueImpl<MaxValueSize, IsMutexed>::ClientSetProperties(
 }
 
 template <size_t MaxValueSize, bool IsMutexed>
-inline void
-ClientMessageQueueImpl<MaxValueSize, IsMutexed>::ClientSubscribe(
+inline void ClientMessageQueueImpl<MaxValueSize, IsMutexed>::ClientSubscribe(
     int subuid, std::span<const std::string> topicNames,
     const PubSubOptionsImpl& options) {
   std::scoped_lock lock{m_mutex};
@@ -50,8 +47,7 @@ ClientMessageQueueImpl<MaxValueSize, IsMutexed>::ClientSubscribe(
 }
 
 template <size_t MaxValueSize, bool IsMutexed>
-inline void
-ClientMessageQueueImpl<MaxValueSize, IsMutexed>::ClientUnsubscribe(
+inline void ClientMessageQueueImpl<MaxValueSize, IsMutexed>::ClientUnsubscribe(
     int subuid) {
   std::scoped_lock lock{m_mutex};
   m_queue.enqueue(ClientMessage{UnsubscribeMsg{subuid}});

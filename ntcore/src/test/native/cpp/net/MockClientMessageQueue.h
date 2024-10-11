@@ -25,9 +25,7 @@ class MockClientMessageQueue : public net::ClientMessageQueue {
     return out.subspan(0, size);
   }
 
-  void ClearQueue() override {
-    msgs.clear();
-  }
+  void ClearQueue() override { msgs.clear(); }
 
   std::vector<ClientMessage> msgs;
 };
