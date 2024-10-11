@@ -4,10 +4,10 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/concurrentqueue.h"
+#include "wpi/FastQueue.h"
 
-TEST(ConcurrentQueueTest, Basic) {
-  wpi::ConcurrentQueue<int> q;
+TEST(FastQueueTest, Basic) {
+  wpi::FastQueue<int> q;
   q.enqueue(25);
 
   int item;
