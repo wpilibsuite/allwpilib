@@ -149,7 +149,7 @@ NetworkClient3::NetworkClient3(int inst, std::string_view id,
   m_loopRunner.ExecAsync([this](uv::Loop& loop) {
     m_parallelConnect = wpi::ParallelTcpConnector::Create(
         loop, kReconnectRate, m_logger,
-        [this](uv::Tcp& tcp) { TcpConnected(tcp); });
+        [this](uv::Tcp& tcp) { TcpConnected(tcp); }, true);
 
     m_sendOutgoingTimer = uv::Timer::Create(loop);
     if (m_sendOutgoingTimer) {
@@ -307,7 +307,7 @@ NetworkClient::NetworkClient(
   m_loopRunner.ExecAsync([this](uv::Loop& loop) {
     m_parallelConnect = wpi::ParallelTcpConnector::Create(
         loop, kReconnectRate, m_logger,
-        [this](uv::Tcp& tcp) { TcpConnected(tcp); });
+        [this](uv::Tcp& tcp) { TcpConnected(tcp); }, true);
 
     m_readLocalTimer = uv::Timer::Create(loop);
     if (m_readLocalTimer) {
