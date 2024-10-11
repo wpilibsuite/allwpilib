@@ -360,13 +360,13 @@ void ClientImpl3::EntryAssign(std::string_view name, unsigned int id,
 
   if (m_local) {
     // XXX: need to handle type change specially? (e.g. with unannounce)
-    if (entry->topic == 0 || flagsChanged || typeChanged) {
+    if (!entry->topic || flagsChanged || typeChanged) {
       DEBUG4("NetworkAnnounce({}, {})", name, entry->typeStr);
-      entry->topic = m_local->NetworkAnnounce(name, entry->typeStr,
-                                              entry->properties, std::nullopt);
+      entry->topic = m_local->ServerAnnounce(name, 0, entry->typeStr,
+                                             entry->properties, std::nullopt);
     }
     if (valueChanged) {
-      m_local->NetworkSetValue(entry->topic, entry->value);
+      m_local->ServerSetValue(entry->topic.value(), entry->value);
     }
   }
 }
@@ -380,8 +380,8 @@ void ClientImpl3::EntryUpdate(unsigned int id, unsigned int seq_num,
   }
   if (auto entry = LookupId(id)) {
     entry->value = value;
-    if (m_local && entry->topic != 0) {
-      m_local->NetworkSetValue(entry->topic, entry->value);
+    if (m_local && entry->topic) {
+      m_local->ServerSetValue(entry->topic.value(), entry->value);
     }
   }
 }
@@ -395,7 +395,7 @@ void ClientImpl3::FlagsUpdate(unsigned int id, unsigned int flags) {
   if (auto entry = LookupId(id)) {
     wpi::json update = entry->SetFlags(flags);
     if (!update.empty() && m_local) {
-      m_local->NetworkPropertiesUpdate(entry->name, update, false);
+      m_local->ServerPropertiesUpdate(entry->name, update, false);
     }
   }
 
@@ -419,8 +419,8 @@ void ClientImpl3::EntryDelete(unsigned int id) {
     entry->value = Value{};
 
     // if we have no local publishers, unannounce
-    if (entry->publishers.empty() && m_local) {
-      m_local->NetworkUnannounce(entry->name);
+    if (entry->publishers.empty() && m_local && entry->topic) {
+      m_local->ServerUnannounce(entry->name, entry->topic.value());
     }
   }
 
@@ -443,8 +443,8 @@ void ClientImpl3::ClearEntries() {
       entry->value = Value{};
 
       // if we have no local publishers, unannounce
-      if (entry->publishers.empty() && m_local) {
-        m_local->NetworkUnannounce(entry->name);
+      if (entry->publishers.empty() && m_local && entry->topic) {
+        m_local->ServerUnannounce(entry->name, entry->topic.value());
       }
 
       entry = nullptr;  // clear id mapping

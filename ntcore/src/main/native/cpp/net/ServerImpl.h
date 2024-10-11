@@ -64,7 +64,7 @@ class ServerImpl final {
   void SendOutgoing(int clientId, uint64_t curTimeMs);
 
   void HandleLocal(std::span<const ClientMessage> msgs);
-  void SetLocal(LocalInterface* local);
+  void SetLocal(ServerMessageHandler* local);
 
   void ProcessIncomingText(int clientId, std::string_view data);
   void ProcessIncomingBinary(int clientId, std::span<const uint8_t> data);
@@ -129,7 +129,7 @@ class ServerImpl final {
     bool retained{false};
     bool cached{true};
     bool special{false};
-    NT_Topic localHandle{0};
+    int localTopic{0};
 
     void AddPublisher(ClientData* client, PublisherData* pub) {
       if (clients[client].publishers.insert(pub).second) {
@@ -237,8 +237,8 @@ class ServerImpl final {
    protected:
     // ClientMessageHandler interface
     void ClientPublish(int pubuid, std::string_view name,
-                       std::string_view typeStr,
-                       const wpi::json& properties) final;
+                       std::string_view typeStr, const wpi::json& properties,
+                       const PubSubOptionsImpl& options) final;
     void ClientUnpublish(int pubuid) final;
     void ClientSetProperties(std::string_view name,
                              const wpi::json& update) final;
@@ -246,7 +246,7 @@ class ServerImpl final {
                          const PubSubOptionsImpl& options) final;
     void ClientUnsubscribe(int subuid) final;
 
-    void ClientSetValue(int pubuid, const Value& value);
+    void ClientSetValue(int pubuid, const Value& value) final;
 
     wpi::DenseMap<TopicData*, bool> m_announceSent;
   };
@@ -437,7 +437,7 @@ class ServerImpl final {
   };
 
   wpi::Logger& m_logger;
-  LocalInterface* m_local{nullptr};
+  ServerMessageHandler* m_local{nullptr};
   bool m_controlReady{false};
 
   ClientDataLocal* m_localClient;

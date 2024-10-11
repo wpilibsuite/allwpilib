@@ -94,17 +94,8 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
       continue;
     }
 
-    // otherwise it's a value message, get the local topic handle for it
-    auto topicIt = m_topicMap.find(id);
-    if (topicIt == m_topicMap.end()) {
-      WARN("received unknown id {}", id);
-      continue;
-    }
-
-    // pass along to local handler
-    if (m_local) {
-      m_local->NetworkSetValue(topicIt->second, value);
-    }
+    // otherwise it's a value message
+    ServerSetValue(id, value);
   }
 }
 
@@ -229,19 +220,21 @@ void ClientImpl::SetValue(int32_t pubuid, const Value& value) {
       publisher.options.sendAll ? ValueSendMode::kAll : ValueSendMode::kNormal);
 }
 
-void ClientImpl::ServerAnnounce(std::string_view name, int id,
-                                std::string_view typeStr,
-                                const wpi::json& properties,
-                                std::optional<int> pubuid) {
+int ClientImpl::ServerAnnounce(std::string_view name, int id,
+                               std::string_view typeStr,
+                               const wpi::json& properties,
+                               std::optional<int> pubuid) {
   DEBUG4("ServerAnnounce({}, {}, {})", name, id, typeStr);
   assert(m_local);
-  m_topicMap[id] = m_local->NetworkAnnounce(name, typeStr, properties, pubuid);
+  m_topicMap[id] =
+      m_local->ServerAnnounce(name, 0, typeStr, properties, pubuid);
+  return id;
 }
 
 void ClientImpl::ServerUnannounce(std::string_view name, int id) {
   DEBUG4("ServerUnannounce({}, {})", name, id);
   assert(m_local);
-  m_local->NetworkUnannounce(name);
+  m_local->ServerUnannounce(name, m_topicMap[id]);
   m_topicMap.erase(id);
 }
 
@@ -249,7 +242,21 @@ void ClientImpl::ServerPropertiesUpdate(std::string_view name,
                                         const wpi::json& update, bool ack) {
   DEBUG4("ServerProperties({}, {}, {})", name, update.dump(), ack);
   assert(m_local);
-  m_local->NetworkPropertiesUpdate(name, update, ack);
+  m_local->ServerPropertiesUpdate(name, update, ack);
+}
+
+void ClientImpl::ServerSetValue(int topicId, const Value& value) {
+  // get the local topic handle for it
+  auto topicIt = m_topicMap.find(topicId);
+  if (topicIt == m_topicMap.end()) {
+    WARN("received unknown id {}", topicId);
+    return;
+  }
+
+  // pass along to local handler
+  if (m_local) {
+    m_local->ServerSetValue(topicIt->second, value);
+  }
 }
 
 void ClientImpl::ProcessIncomingText(std::string_view data) {
