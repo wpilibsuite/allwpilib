@@ -50,11 +50,11 @@ class ArmSimulationTest : public testing::TestWithParam<units::degree_t> {
 TEST_P(ArmSimulationTest, Teleop) {
   EXPECT_TRUE(frc::Preferences::ContainsKey(kArmPositionKey));
   EXPECT_TRUE(frc::Preferences::ContainsKey(kArmPKey));
-  EXPECT_DOUBLE_EQ(kDefaultArmSetpoint.value(),
-                   frc::Preferences::GetDouble(kArmPositionKey, NAN));
-
   frc::Preferences::SetDouble(kArmPositionKey, GetParam().value());
   units::degree_t setpoint = GetParam();
+  EXPECT_DOUBLE_EQ(setpoint.value(),
+                   frc::Preferences::GetDouble(kArmPositionKey, NAN));
+
   // teleop init
   {
     frc::sim::DriverStationSim::SetAutonomous(false);
@@ -68,7 +68,7 @@ TEST_P(ArmSimulationTest, Teleop) {
   {
     frc::sim::StepTiming(3_s);
 
-    // Ensure elevator is still at 0.
+    // Ensure arm is still at minimum angle.
     EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 2.0);
   }
 

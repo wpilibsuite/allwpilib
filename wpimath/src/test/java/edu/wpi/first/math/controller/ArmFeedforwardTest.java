@@ -4,6 +4,9 @@
 
 package edu.wpi.first.math.controller;
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -68,19 +71,23 @@ class ArmFeedforwardTest {
    */
   private void calculateAndSimulate(
       double currentAngle, double currentVelocity, double nextVelocity, double dt) {
-    final double input = m_armFF.calculate(currentAngle, currentVelocity, nextVelocity, dt);
+    final double input =
+        m_armFF
+            .calculate(
+                Radians.of(currentAngle),
+                RadiansPerSecond.of(currentVelocity),
+                RadiansPerSecond.of(nextVelocity))
+            .in(Volts);
     assertEquals(nextVelocity, simulate(currentAngle, currentVelocity, input, dt).get(1, 0), 1e-12);
   }
 
   @Test
   void testCalculate() {
     // calculate(angle, angular velocity)
-    assertEquals(0.5, m_armFF.calculate(Math.PI / 3, 0), 0.002);
-    assertEquals(2.5, m_armFF.calculate(Math.PI / 3, 1), 0.002);
-
-    // calculate(angle, angular velocity, angular acceleration)
-    assertEquals(6.5, m_armFF.calculate(Math.PI / 3, 1, 2), 0.002);
-    assertEquals(2.5, m_armFF.calculate(Math.PI / 3, -1, 2), 0.002);
+    assertEquals(
+        0.5, m_armFF.calculate(Radians.of(Math.PI / 3), RadiansPerSecond.of(0)).in(Volts), 0.002);
+    assertEquals(
+        2.5, m_armFF.calculate(Radians.of(Math.PI / 3), RadiansPerSecond.of(1)).in(Volts), 0.002);
 
     // calculate(currentAngle, currentVelocity, nextAngle, dt)
     calculateAndSimulate(Math.PI / 3, 1.0, 1.05, 0.020);
