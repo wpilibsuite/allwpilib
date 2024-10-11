@@ -5,25 +5,27 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.StateSpaceUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotorType;
-import edu.wpi.first.math.system.plant.Gearbox;
-import edu.wpi.first.math.system.plant.Wheel;
+import edu.wpi.first.math.system.NumericalIntegration;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
@@ -32,87 +34,7 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 
 /** This class simulates the state of the drivetrain. */
-public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
-  /**
-   * Represents a gearing option of the Toughbox mini. 12.75:1 -- 14:50 and 14:50 10.71:1 -- 14:50
-   * and 16:48 8.45:1 -- 14:50 and 19:45 7.31:1 -- 14:50 and 21:43 5.95:1 -- 14:50 and 24:40
-   */
-  public enum KitbotGearing {
-    /** Gear ratio of 12.75:1. */
-    k12p75(12.75),
-    /** Gear ratio of 10.71:1. */
-    k10p71(10.71),
-    /** Gear ratio of 8.45:1. */
-    k8p45(8.45),
-    /** Gear ratio of 7.31:1. */
-    k7p31(7.31),
-    /** Gear ratio of 5.95:1. */
-    k5p95(5.95);
-
-    /** KitbotGearing value. */
-    public final double value;
-
-    KitbotGearing(double i) {
-      this.value = i;
-    }
-  }
-
-  /** Represents common motor layouts of the kit drivetrain. */
-  public enum KitbotGearbox {
-    /** One CIM motor per drive side. */
-    kSingleCIMPerSide(new Gearbox(1, DCMotorType.CIM)),
-    /** Two CIM motors per drive side. */
-    kDualCIMPerSide(new Gearbox(2, DCMotorType.CIM)),
-    /** One Mini CIM motor per drive side. */
-    kSingleMiniCIMPerSide(new Gearbox(1, DCMotorType.MiniCIM)),
-    /** Two Mini CIM motors per drive side. */
-    kDualMiniCIMPerSide(new Gearbox(2, DCMotorType.MiniCIM)),
-    /** One Falcon 500 motor per drive side. */
-    kSingleFalcon500PerSide(new Gearbox(1, DCMotorType.Falcon500)),
-    /** Two Falcon 500 motors per drive side. */
-    kDoubleFalcon500PerSide(new Gearbox(2, DCMotorType.Falcon500)),
-    /** One NEO motor per drive side. */
-    kSingleNEOPerSide(new Gearbox(1, DCMotorType.NEO)),
-    /** Two NEO motors per drive side. */
-    kDoubleNEOPerSide(new Gearbox(2, DCMotorType.NEO));
-
-    /** KitbotGearbox value. */
-    public final Gearbox value;
-
-    KitbotGearbox(Gearbox i) {
-      this.value = i;
-    }
-  }
-
-  /** Represents common wheel sizes of the kit drivetrain. */
-  public enum KitbotWheelSize {
-    /** Six inch diameter wheels. */
-    kSixInch(Units.inchesToMeters(6)),
-    /** Eight inch diameter wheels. */
-    kEightInch(Units.inchesToMeters(8)),
-    /** Ten inch diameter wheels. */
-    kTenInch(Units.inchesToMeters(10));
-
-    /** KitbotWheelSize value. */
-    public final double value;
-
-    KitbotWheelSize(double i) {
-      this.value = i;
-    }
-  }
-
-  /** The drive train's wheel. */
-  protected final Wheel m_wheel;
-
-  /** The mass of the drivetrain. */
-  private final Mass m_mass;
-
-  /** The moment of inertia of the drivetrain about its center. */
-  private final MomentOfInertia m_J;
-
-  /** The distance between left and right wheels. */
-  private final Distance m_trackWidth;
-
+public class DifferentialDrivetrainSimBase {
   /** The velocity of the left wheel. */
   private final MutLinearVelocity m_leftVelocity = MetersPerSecond.mutable(0.0);
 
@@ -149,12 +71,24 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
   /** The current reduction of the gearboxes. */
   protected double m_currentGearing;
 
+  protected final DCMotor m_motor;
+  protected final double m_originalGearing;
+  protected final Matrix<N7, N1> m_measurementStdDevs;
+  protected final double m_wheelRadiusMeters;
+
+  protected Matrix<N2, N1> m_u;
+  protected Matrix<N7, N1> m_x;
+  protected Matrix<N7, N1> m_y;
+
+  protected final double m_rb;
+  protected final LinearSystem<N2, N2, N2> m_plant;
+
   /**
    * Creates a simulated differential drivetrain.
    *
    * @param plant The linear system that represents the drivetrain.
-   * @param wheel A {@link Wheel} representing one of the drivetrain's wheel.
-   * @param trackWidth The robot's track width, or distance between left and right wheels.
+   * @param driveMotor A {@link DCMotor} representing one of the drivetrain's motors.
+   * @param trackWidthMeters The robot's track width, or distance between left and right wheels.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
    *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
@@ -162,29 +96,31 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
    *     point. If present must have 7 elements matching the aforementioned measurements.
    */
   public DifferentialDrivetrainSimBase(
-      LinearSystem<N4, N2, N4> plant,
-      Wheel wheel,
-      Distance trackWidth,
-      double... measurementStdDevs) {
-    super(plant, measurementStdDevs);
-    m_wheel = wheel;
-    m_trackWidth = trackWidth;
-    double A0 = plant.getA(0, 0);
-    double A1 = plant.getA(1, 0);
-    var C1 =
-        -wheel.gearbox.numMotors
-            * Math.pow(wheel.gearbox.reduction, 2)
-            * wheel.gearbox.motorType.KtNMPerAmp
-            / (wheel.gearbox.motorType.KvRadPerSecPerVolt
-                * wheel.gearbox.motorType.rOhms
-                * Math.pow(wheel.radiusMeters, 2));
-    double a0massJPart = A0 / C1;
-    double a1massJPart = A1 / C1;
-    double halfMassRecip = a0massJPart + a1massJPart;
-    double massKg = 1.0 / halfMassRecip;
-    m_mass = Kilograms.of(massKg);
-    double jKgMetersSquared = Math.pow(trackWidth.in(Meters), 2) / (a0massJPart - (1.0 / massKg));
-    m_J = KilogramSquareMeters.of(jKgMetersSquared);
+      LinearSystem<N2, N2, N2> plant,
+      DCMotor driveMotor,
+      double gearing,
+      double trackWidthMeters,
+      double wheelRadiusMeters,
+      Matrix<N7, N1> measurementStdDevs) {
+    m_x = new Matrix<>(Nat.N7(), Nat.N1());
+    m_u = VecBuilder.fill(0, 0);
+    m_y = new Matrix<>(Nat.N7(), Nat.N1());
+    m_plant = plant;
+    m_motor = driveMotor;
+    m_originalGearing = gearing;
+    m_currentGearing = gearing;
+    m_rb = trackWidthMeters / 2.0;
+    m_wheelRadiusMeters = wheelRadiusMeters;
+    m_measurementStdDevs = measurementStdDevs;
+  }
+
+  /**
+   * Sets the gearing reduction on the drivetrain. This is commonly used for shifting drivetrains.
+   *
+   * @param newGearRatio The new gear ratio, as output over input.
+   */
+  public void setCurrentGearing(double newGearRatio) {
+    this.m_currentGearing = newGearRatio;
   }
 
   /**
@@ -196,25 +132,61 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
     return m_currentGearing;
   }
 
-  /**
-   * Sets the position of the left and right encoders.
-   *
-   * @param leftPositionMeters The new left encoder position in meters.
-   * @param rightPositionMeters The new right encoder position in meters.
-   */
-  public void setEncoderPositions(double leftPositionMeters, double rightPositionMeters) {
-    m_x.set(5, 0, leftPositionMeters);
-    m_x.set(6, 0, rightPositionMeters);
+  /** Returns the full simulated state of the drivetrain. */
+  Matrix<N7, N1> getState() {
+    return m_x;
   }
 
   /**
-   * Sets the position of the left and right encoders.
+   * Get one of the drivetrain states.
    *
-   * @param leftPosition The new left encoder position.
-   * @param rightPosition The new right encoder position.
+   * @param state the state to get
+   * @return the state
    */
-  public void setEncoderPositions(Distance leftPosition, Distance rightPosition) {
-    setEncoderPositions(leftPosition.in(Meters), rightPosition.in(Meters));
+  double getState(State state) {
+    return m_x.get(state.value, 0);
+  }
+
+  /**
+   * Returns the direction the robot is pointing.
+   *
+   * <p>Note that this angle is counterclockwise-positive, while most gyros are clockwise positive.
+   *
+   * @return The direction the robot is pointing.
+   */
+  public Rotation2d getHeading() {
+    return new Rotation2d(getOutput(State.kHeading));
+  }
+
+  /**
+   * Returns the current pose.
+   *
+   * @return The current pose.
+   */
+  public Pose2d getPose() {
+    return new Pose2d(getOutput(State.kX), getOutput(State.kY), getHeading());
+  }
+
+  /**
+   * Sets the system state.
+   *
+   * @param state The state.
+   */
+  public void setState(Matrix<N7, N1> state) {
+    m_x = state;
+  }
+
+  /**
+   * Sets the system pose.
+   *
+   * @param pose The pose.
+   */
+  public void setPose(Pose2d pose) {
+    m_x.set(State.kX.value, 0, pose.getX());
+    m_x.set(State.kY.value, 0, pose.getY());
+    m_x.set(State.kHeading.value, 0, pose.getRotation().getRadians());
+    m_x.set(State.kLeftPosition.value, 0, 0);
+    m_x.set(State.kRightPosition.value, 0, 0);
   }
 
   /**
@@ -254,28 +226,6 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
   }
 
   /**
-   * Sets the velocity of the left and right encoders.
-   *
-   * @param leftVelocityMetersPerSecond The new left encoder velocity in meters per second.
-   * @param rightVelocityMetersPerSecond The new right encoder velocity in meters per second.
-   */
-  public void setEncoderVelocities(
-      double leftVelocityMetersPerSecond, double rightVelocityMetersPerSecond) {
-    m_x.set(3, 0, leftVelocityMetersPerSecond);
-    m_x.set(4, 0, rightVelocityMetersPerSecond);
-  }
-
-  /**
-   * Sets the position of the left and right encoders.
-   *
-   * @param leftVelocity The new left encoder velocity.
-   * @param rightVelocity The new right encoder velocity.
-   */
-  public void setEncoderVelocities(LinearVelocity leftVelocity, LinearVelocity rightVelocity) {
-    setEncoderVelocities(leftVelocity.in(MetersPerSecond), rightVelocity.in(MetersPerSecond));
-  }
-
-  /**
    * Get the left encoder velocity.
    *
    * @return The left encoder velocity.
@@ -309,69 +259,6 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
    */
   public double getRightVelocityMetersPerSecond() {
     return m_rightVelocity.in(MetersPerSecond);
-  }
-
-  /**
-   * Returns the mass of the drivetrain in kilograms.
-   *
-   * @return the drivetrain mass of in kilograms.
-   */
-  public double getMassKilograms() {
-    return m_mass.in(Kilograms);
-  }
-
-  /**
-   * Returns the mass of the drivetrain.
-   *
-   * @return the drivetrain mass.
-   */
-  public Mass getMass() {
-    return m_mass;
-  }
-
-  /**
-   * Returns the moment of inertia in kilograms meters squared around the drivetrain's center.
-   *
-   * @return The moment of inertia in kilograms meters squared around the drivetrain's center.
-   */
-  public double getJKgMetersSquared() {
-    return m_J.in(KilogramSquareMeters);
-  }
-
-  /**
-   * Returns the moment of inertia around the drivetrain's center.
-   *
-   * @return The moment of inertia around the drivetrain's center.
-   */
-  public MomentOfInertia getJ() {
-    return m_J;
-  }
-
-  /**
-   * Returns the wheel used by the drivetrain.
-   *
-   * @return The wheel used by the drivetrain.
-   */
-  public Wheel getWheel() {
-    return m_wheel;
-  }
-
-  /**
-   * Returns the track width of the drivetrain in meters.
-   *
-   * @return the track width of the drivetrain in meters.
-   */
-  public double getTrackWidthMeters() {
-    return m_trackWidth.in(Meters);
-  }
-
-  /**
-   * Returns the track width of the drivetrain.
-   *
-   * @return the track width of the drivetrain.
-   */
-  public Distance getTrackWidth() {
-    return m_trackWidth;
   }
 
   /**
@@ -411,6 +298,24 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
   }
 
   /**
+   * Get the current draw of the drivetrain.
+   *
+   * @return the current draw.
+   */
+  public Current getCurrentDraw() {
+    return m_currentDraw;
+  }
+
+  /**
+   * Get the current draw of the drivetrain.
+   *
+   * @return the current draw, in amps
+   */
+  public double getCurrentDrawAmps() {
+    return m_currentDraw.in(Amps);
+  }
+
+  /**
    * Get the voltage of the left side of the drivetrain.
    *
    * @return the drivetrain's left side voltage.
@@ -446,22 +351,52 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
     return m_rightVoltage.in(Volts);
   }
 
-  /**
-   * Get the current draw of the drivetrain.
-   *
-   * @return the current draw.
-   */
-  public Current getCurrentDraw() {
-    return m_currentDraw;
+  private double getOutput(State output) {
+    return m_y.get(output.value, 0);
   }
 
   /**
-   * Get the current draw of the drivetrain.
+   * The differential drive dynamics function.
    *
-   * @return the current draw, in amps
+   * @param x The state.
+   * @param u The input.
+   * @return The state derivative with respect to time.
    */
-  public double getCurrentDrawAmps() {
-    return m_currentDraw.in(Amps);
+  protected Matrix<N7, N1> getDynamics(Matrix<N7, N1> x, Matrix<N2, N1> u) {
+    // Because G can be factored out of B, we can divide by the old ratio and
+    // multiply
+    // by the new ratio to get a new drivetrain model.
+    var B = new Matrix<>(Nat.N4(), Nat.N2());
+    B.assignBlock(0, 0, m_plant.getB().times(this.m_currentGearing / this.m_originalGearing));
+
+    // Because G² can be factored out of A, we can divide by the old ratio squared
+    // and multiply
+    // by the new ratio squared to get a new drivetrain model.
+    var A = new Matrix<>(Nat.N4(), Nat.N4());
+    A.assignBlock(
+        0,
+        0,
+        m_plant
+            .getA()
+            .times(
+                (this.m_currentGearing * this.m_currentGearing)
+                    / (this.m_originalGearing * this.m_originalGearing)));
+
+    A.assignBlock(2, 0, Matrix.eye(Nat.N2()));
+
+    var v = (x.get(State.kLeftVelocity.value, 0) + x.get(State.kRightVelocity.value, 0)) / 2.0;
+
+    var xdot = new Matrix<>(Nat.N7(), Nat.N1());
+    xdot.set(0, 0, v * Math.cos(x.get(State.kHeading.value, 0)));
+    xdot.set(1, 0, v * Math.sin(x.get(State.kHeading.value, 0)));
+    xdot.set(
+        2,
+        0,
+        (x.get(State.kRightVelocity.value, 0) - x.get(State.kLeftVelocity.value, 0))
+            / (2.0 * m_rb));
+    xdot.assignBlock(3, 0, A.times(x.block(Nat.N4(), Nat.N1(), 3, 0)).plus(B.times(u)));
+
+    return xdot;
   }
 
   /**
@@ -469,17 +404,163 @@ public class DifferentialDrivetrainSimBase extends LinearSystemSim<N4, N2, N4> {
    *
    * @param dtSeconds the time difference
    */
-  @Override
   public void update(double dtSeconds) {
-    super.update(dtSeconds);
-    m_leftPosition.mut_replace(getOutput(2), Meters);
-    m_rightPosition.mut_replace(getOutput(3), Meters);
-    m_leftVelocity.mut_replace(getOutput(0), MetersPerSecond);
-    m_rightVelocity.mut_replace(getOutput(1), MetersPerSecond);
+    m_x = NumericalIntegration.rkdp(this::getDynamics, m_x, m_u, dtSeconds);
+    m_y = m_x;
+    if (m_measurementStdDevs != null) {
+      m_y = m_y.plus(StateSpaceUtil.makeWhiteNoiseVector(m_measurementStdDevs));
+    }
+    m_leftPosition.mut_replace(getOutput(State.kLeftPosition), Meters);
+    m_rightPosition.mut_replace(getOutput(State.kRightPosition), Meters);
+    m_leftVelocity.mut_replace(getOutput(State.kLeftVelocity), MetersPerSecond);
+    m_rightVelocity.mut_replace(getOutput(State.kRightVelocity), MetersPerSecond);
     m_leftCurrentDraw.mut_replace(
-        m_wheel.currentAmps(m_x.get(0, 0), m_u.get(0, 0)) * Math.signum(m_u.get(0, 0)), Amps);
+        m_motor.getCurrent(m_x.get(0, 0), m_u.get(0, 0)) * Math.signum(m_u.get(0, 0)), Amps);
     m_rightCurrentDraw.mut_replace(
-        m_wheel.currentAmps(m_x.get(1, 0), m_u.get(1, 0)) * Math.signum(m_u.get(1, 0)), Amps);
+        m_motor.getCurrent(m_x.get(1, 0), m_u.get(1, 0)) * Math.signum(m_u.get(1, 0)), Amps);
     m_currentDraw.mut_replace(m_leftCurrentDraw.in(Amps) + m_rightCurrentDraw.in(Amps), Amps);
+  }
+
+  /** Represents the different states of the drivetrain. */
+  enum State {
+    kX(0),
+    kY(1),
+    kHeading(2),
+    kLeftVelocity(3),
+    kRightVelocity(4),
+    kLeftPosition(5),
+    kRightPosition(6);
+
+    public final int value;
+
+    State(int i) {
+      this.value = i;
+    }
+  }
+
+  /**
+   * Represents a gearing option of the Toughbox mini. 12.75:1 -- 14:50 and 14:50 10.71:1 -- 14:50
+   * and 16:48 8.45:1 -- 14:50 and 19:45 7.31:1 -- 14:50 and 21:43 5.95:1 -- 14:50 and 24:40
+   */
+  public enum KitbotGearing {
+    /** Gear ratio of 12.75:1. */
+    k12p75(12.75),
+    /** Gear ratio of 10.71:1. */
+    k10p71(10.71),
+    /** Gear ratio of 8.45:1. */
+    k8p45(8.45),
+    /** Gear ratio of 7.31:1. */
+    k7p31(7.31),
+    /** Gear ratio of 5.95:1. */
+    k5p95(5.95);
+
+    /** KitbotGearing value. */
+    public final double value;
+
+    KitbotGearing(double i) {
+      this.value = i;
+    }
+  }
+
+  /** Represents common motor layouts of the kit drivetrain. */
+  public enum KitbotMotor {
+    /** One CIM motor per drive side. */
+    kSingleCIMPerSide(DCMotor.getCIM(1)),
+    /** Two CIM motors per drive side. */
+    kDualCIMPerSide(DCMotor.getCIM(2)),
+    /** One Mini CIM motor per drive side. */
+    kSingleMiniCIMPerSide(DCMotor.getMiniCIM(1)),
+    /** Two Mini CIM motors per drive side. */
+    kDualMiniCIMPerSide(DCMotor.getMiniCIM(2)),
+    /** One Falcon 500 motor per drive side. */
+    kSingleFalcon500PerSide(DCMotor.getFalcon500(1)),
+    /** Two Falcon 500 motors per drive side. */
+    kDoubleFalcon500PerSide(DCMotor.getFalcon500(2)),
+    /** One NEO motor per drive side. */
+    kSingleNEOPerSide(DCMotor.getNEO(1)),
+    /** Two NEO motors per drive side. */
+    kDoubleNEOPerSide(DCMotor.getNEO(2));
+
+    /** KitbotMotor value. */
+    public final DCMotor value;
+
+    KitbotMotor(DCMotor i) {
+      this.value = i;
+    }
+  }
+
+  /** Represents common wheel sizes of the kit drivetrain. */
+  public enum KitbotWheelSize {
+    /** Six inch diameter wheels. */
+    kSixInch(Units.inchesToMeters(6)),
+    /** Eight inch diameter wheels. */
+    kEightInch(Units.inchesToMeters(8)),
+    /** Ten inch diameter wheels. */
+    kTenInch(Units.inchesToMeters(10));
+
+    /** KitbotWheelSize value. */
+    public final double value;
+
+    KitbotWheelSize(double i) {
+      this.value = i;
+    }
+  }
+
+  /**
+   * Create a sim for the standard FRC kitbot.
+   *
+   * @param motor The motors installed in the bot.
+   * @param gearing The gearing reduction used.
+   * @param wheelSize The wheel size.
+   * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
+   *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
+   *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
+   *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
+   *     point.
+   * @return A sim for the standard FRC kitbot.
+   */
+  public static DifferentialDrivetrainSim createKitbotSim(
+      KitbotMotor motor,
+      KitbotGearing gearing,
+      KitbotWheelSize wheelSize,
+      Matrix<N7, N1> measurementStdDevs) {
+    // MOI estimation -- note that I = mr² for point masses
+    var batteryMoi = 12.5 / 2.2 * Math.pow(Units.inchesToMeters(10), 2);
+    var gearboxMoi =
+        (2.8 /* CIM motor */ * 2 / 2.2 + 2.0 /* Toughbox Mini- ish */)
+            * Math.pow(Units.inchesToMeters(26.0 / 2.0), 2);
+
+    return createKitbotSim(motor, gearing, wheelSize, batteryMoi + gearboxMoi, measurementStdDevs);
+  }
+
+  /**
+   * Create a sim for the standard FRC kitbot.
+   *
+   * @param motor The motors installed in the bot.
+   * @param gearing The gearing reduction used.
+   * @param wheelSize The wheel size.
+   * @param jKgMetersSquared The moment of inertia of the drivebase. This can be calculated using
+   *     SysId.
+   * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
+   *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
+   *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
+   *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
+   *     point.
+   * @return A sim for the standard FRC kitbot.
+   */
+  public static DifferentialDrivetrainSim createKitbotSim(
+      KitbotMotor motor,
+      KitbotGearing gearing,
+      KitbotWheelSize wheelSize,
+      double jKgMetersSquared,
+      Matrix<N7, N1> measurementStdDevs) {
+    return new DifferentialDrivetrainSim(
+        motor.value,
+        gearing.value,
+        jKgMetersSquared,
+        Units.lbsToKilograms(60),
+        wheelSize.value / 2.0,
+        Units.inchesToMeters(26),
+        measurementStdDevs);
   }
 }

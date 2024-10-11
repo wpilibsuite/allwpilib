@@ -72,7 +72,7 @@ class DifferentialDrivetrainSimTest {
               VecBuilder.fill(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond));
 
       // Sim periodic code
-      sim.setInputs(voltages.get(0, 0), voltages.get(1, 0));
+      sim.setInputVoltages(voltages.get(0, 0), voltages.get(1, 0));
       sim.update(0.020);
 
       // Update our ground truth
@@ -106,19 +106,19 @@ class DifferentialDrivetrainSimTest {
         new DifferentialDrivetrainSim(
             plant, motor, 1, kinematics.trackWidthMeters, Units.inchesToMeters(2), null);
 
-    sim.setInputs(-12, -12);
+    sim.setInputVoltages(-12, -12);
     for (int i = 0; i < 10; i++) {
       sim.update(0.020);
     }
     assertTrue(sim.getCurrentDrawAmps() > 0);
 
-    sim.setInputs(12, 12);
+    sim.setInputVoltages(12, 12);
     for (int i = 0; i < 20; i++) {
       sim.update(0.020);
     }
     assertTrue(sim.getCurrentDrawAmps() > 0);
 
-    sim.setInputs(-12, 12);
+    sim.setInputVoltages(-12, 12);
     for (int i = 0; i < 30; i++) {
       sim.update(0.020);
     }
@@ -142,7 +142,7 @@ class DifferentialDrivetrainSimTest {
             Units.inchesToMeters(2),
             VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
-    sim.setInputs(2, 4);
+    sim.setInputVoltages(2, 4);
 
     // 10 seconds should be enough time to verify stability
     for (int i = 0; i < 500; i++) {

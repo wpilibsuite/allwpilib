@@ -253,7 +253,7 @@ public class Drivetrain {
     // To update our simulation, we set motor voltage inputs, update the
     // simulation, and write the simulated positions and velocities to our
     // simulated encoder and gyro.
-    m_drivetrainSimulator.setInputs(
+    m_drivetrainSimulator.setInputVoltages(
         m_leftLeader.get() * RobotController.getInputVoltage(),
         m_rightLeader.get() * RobotController.getInputVoltage());
     m_drivetrainSimulator.update(0.02);

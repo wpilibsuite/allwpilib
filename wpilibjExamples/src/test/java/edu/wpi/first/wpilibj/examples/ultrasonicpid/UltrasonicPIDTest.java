@@ -13,7 +13,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
-import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSimBase.KitbotGearing;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.PWMSim;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
@@ -74,7 +74,7 @@ class UltrasonicPIDTest {
     m_callback =
         HAL.registerSimPeriodicBeforeCallback(
             () -> {
-              m_driveSim.setInputs(
+              m_driveSim.setInputVoltages(
                   m_leftMotorSim.getSpeed() * RobotController.getBatteryVoltage(),
                   m_rightMotorSim.getSpeed() * RobotController.getBatteryVoltage());
               m_driveSim.update(0.02);
