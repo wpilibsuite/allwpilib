@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <wpi/array.h>
@@ -51,22 +52,22 @@ struct fmt::formatter<wpi::array<T, N>, CharT> {
   fmt::formatter<T, CharT> m_underlying;
 };
 
-template <size_t N>
-void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
+void ProcessDurations(const std::vector<units::nanosecond_t>& durations,
                       std::string_view prefix = "") {
   units::nanosecond_t total_duration = 0_ns;
   for (auto duration : durations) {
     total_duration += duration;
   }
 
-  units::nanosecond_t mean = total_duration / N;
+  units::nanosecond_t mean = total_duration / durations.size();
 
   auto sum_squares = 0_ns * 0_ns;
   for (auto duration : durations) {
     sum_squares += (duration - mean) * (duration - mean);
   }
 
-  units::nanosecond_t std_dev = units::math::sqrt(sum_squares / N);
+  units::nanosecond_t std_dev =
+      units::math::sqrt(sum_squares / durations.size());
 
   wpi::print("{}Mean: {}, Std dev: {}\n", prefix, mean, std_dev);
 
@@ -79,12 +80,12 @@ void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
   wpi::print("{}First 10: {}\n", prefix, buffer);
 
   for (size_t i = 0; i < 10; ++i) {
-    buffer[i] = durations[N - 10 + i];
+    buffer[i] = durations[durations.size() - 10 + i];
   }
 
   wpi::print("{}Last 10: {}\n", prefix, buffer);
 
-  wpi::array<units::nanosecond_t, N> sorted{durations};
+  std::vector<units::nanosecond_t> sorted{durations};
   std::sort(sorted.begin(), sorted.end());
 
   for (size_t i = 0; i < 10; ++i) {
@@ -94,7 +95,7 @@ void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
   wpi::print("{}Fastest 10: {}\n", prefix, buffer);
 
   for (size_t i = 0; i < 10; ++i) {
-    buffer[i] = sorted[N - 10 + i];
+    buffer[i] = sorted[durations.size() - 10 + i];
   }
 
   wpi::print("{}Slowest 10: {}\n", prefix, buffer);
@@ -104,7 +105,7 @@ template <size_t N>
 void Time(
     std::function<void()> action, std::function<void()> setup = [] {},
     std::string_view prefix = "") {
-  wpi::array<units::nanosecond_t, N> durations(wpi::empty_array);
+  std::vector<units::nanosecond_t> durations{N};
 
   for (size_t i = 0; i < N; ++i) {
     setup();
