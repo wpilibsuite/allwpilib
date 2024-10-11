@@ -35,6 +35,39 @@ import edu.wpi.first.units.measure.Voltage;
 
 /** This class simulates the state of the drivetrain. */
 public class DifferentialDrivetrainSimBase {
+  /** The motor type of the drivetrain wheels. */
+  protected final DCMotor m_motor;
+
+  /** The original reduction of the gearboxes. */
+  protected final double m_originalGearing;
+
+  /** The current reduction of the gearboxes. */
+  protected double m_currentGearing;
+
+  /** The radius of the drivetrain wheels. */
+  protected final double m_wheelRadiusMeters;
+
+  /** The radius of the drivetrain. Half of the distance between the wheels. */
+  protected final double m_rb;
+
+  /** The linear system representing the drivetrain wheel velocities. */
+  protected final LinearSystem<N2, N2, N2> m_plant;
+
+  /**
+   * Standard deviations for measurements, in the form [x, y, heading, left velocity, right
+   * velocity, left distance, right distance]ᵀ.
+   */
+  protected final Matrix<N7, N1> m_measurementStdDevs;
+
+  /** The input matrix. */
+  protected Matrix<N2, N1> m_u;
+
+  /** The state matrix. */
+  protected Matrix<N7, N1> m_x;
+
+  /** The output matrix. */
+  protected Matrix<N7, N1> m_y;
+
   /** The velocity of the left wheel. */
   private final MutLinearVelocity m_leftVelocity = MetersPerSecond.mutable(0.0);
 
@@ -67,21 +100,6 @@ public class DifferentialDrivetrainSimBase {
 
   /** The torque of the right wheel. */
   protected final MutTorque m_rightTorque = NewtonMeters.mutable(0.0);
-
-  /** The current reduction of the gearboxes. */
-  protected double m_currentGearing;
-
-  protected final DCMotor m_motor;
-  protected final double m_originalGearing;
-  protected final Matrix<N7, N1> m_measurementStdDevs;
-  protected final double m_wheelRadiusMeters;
-
-  protected Matrix<N2, N1> m_u;
-  protected Matrix<N7, N1> m_x;
-  protected Matrix<N7, N1> m_y;
-
-  protected final double m_rb;
-  protected final LinearSystem<N2, N2, N2> m_plant;
 
   /**
    * Creates a simulated differential drivetrain.
