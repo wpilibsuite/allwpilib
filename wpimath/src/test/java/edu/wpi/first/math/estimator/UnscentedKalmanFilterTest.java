@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Test;
 
 class UnscentedKalmanFilterTest {
   private static Matrix<N5, N1> getDynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {
-
     // var gLow = 15.32; // Low gear ratio
     var gHigh = 7.08; // High gear ratio
     var rb = 0.8382 / 2.0; // Robot radius
