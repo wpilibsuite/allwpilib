@@ -129,7 +129,8 @@ TEST_F(CommandScheduleTest, CancelNextCommand) {
   scheduler.Schedule(&command2);
   scheduler.Run();
 
-  EXPECT_EQ(*counterPtr, 1);
+  EXPECT_EQ(*counterPtr, 1)
+      << "Second command was run when it shouldn't have been";
 
   // only one of the commands should be canceled.
   EXPECT_FALSE(scheduler.IsScheduled(&command1) &&
@@ -143,6 +144,26 @@ TEST_F(CommandScheduleTest, CancelNextCommand) {
 
   scheduler.Run();
   EXPECT_EQ(*counterPtr, 2);
+}
+
+TEST_F(CommandScheduleTest, CommandKnowsWhenItEnded) {
+  CommandScheduler scheduler = GetScheduler();
+
+  frc2::FunctionalCommand* commandPtr = nullptr;
+  auto command = frc2::FunctionalCommand(
+      [] {}, [] {},
+      [&](auto isForced) {
+        EXPECT_FALSE(scheduler.IsScheduled(commandPtr))
+            << "Command shouldn't be scheduled when its end is called";
+      },
+      [] { return true; });
+  commandPtr = &command;
+
+  scheduler.Schedule(commandPtr);
+  scheduler.Run();
+  EXPECT_FALSE(scheduler.IsScheduled(commandPtr))
+      << "Command should be removed from scheduler when its isFinished() "
+         "returns true";
 }
 
 TEST_F(CommandScheduleTest, SmartDashboardCancel) {
