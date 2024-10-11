@@ -38,8 +38,10 @@ if(WITH_JAVA)
             ${OPENCV_JAR_FILE}
             cscore_jar
             cameraserver_jar
+            apriltag_jar
             wpimath_jar
             wpiunits_jar
+            wpinet_jar
             wpiutil_jar
         OUTPUT_NAME wpilibj
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}

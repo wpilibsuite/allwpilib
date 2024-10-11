@@ -18,8 +18,8 @@ public class AprilTagJNI {
   static boolean libraryLoaded = false;
 
   /** Sets whether JNI should be loaded in the static block. */
-  public static class Helper {
-    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
+  public static final class Helper {
+    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(false);
 
     /**
      * Returns true if the JNI should be loaded in the static block.
@@ -53,6 +53,19 @@ public class AprilTagJNI {
       }
       libraryLoaded = true;
     }
+  }
+
+  /**
+   * Force load the library.
+   *
+   * @throws IOException if library load failed
+   */
+  public static synchronized void forceLoad() throws IOException {
+    if (libraryLoaded) {
+      return;
+    }
+    RuntimeLoader.loadLibrary("apriltagjni");
+    libraryLoaded = true;
   }
 
   /**

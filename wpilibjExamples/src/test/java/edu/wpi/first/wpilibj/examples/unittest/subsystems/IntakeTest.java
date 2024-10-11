@@ -6,9 +6,9 @@ package edu.wpi.first.wpilibj.examples.unittest.subsystems;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.examples.unittest.Constants.IntakeConstants;
 import edu.wpi.first.wpilibj.simulation.DoubleSolenoidSim;
 import edu.wpi.first.wpilibj.simulation.PWMSim;
@@ -24,7 +24,7 @@ class IntakeTest {
 
   @BeforeEach // this method will run before each test
   void setup() {
-    assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
+    assert RobotBase.loadLibrariesAndInitializeHal(); // initialize the HAL, crash if failed
     m_intake = new Intake(); // create our intake
     m_simMotor =
         new PWMSim(IntakeConstants.kMotorPort); // create our simulation PWM motor controller
