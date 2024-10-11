@@ -13,7 +13,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Torque;
 
@@ -27,8 +26,7 @@ public class FlywheelSimTorque extends FlywheelSimBase {
    * LinearSystemId#createFlywheelSystem(MomentOfInertia)}.
    *
    * <p>If using system characterization create the plant using either {@link
-   * LinearSystemId#identifyVelocitySystem(double, double)} or 
-   * {@link LinearSystem#identifyVelocitySystem(Measure<? extends PerUnit<U, V>>, Measure<? extends PerUnit<U,A>>)}.
+   * LinearSystemId#identifyVelocitySystem(double, double)} or the units class overload.
    *
    * @param plant The linear system that represents the simulated flywheel mechanism controlled by
    *     torque input.
