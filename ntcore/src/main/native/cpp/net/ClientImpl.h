@@ -64,8 +64,8 @@ class ClientImpl final : private ServerMessageHandler {
 
   // ServerMessageHandler interface
   int ServerAnnounce(std::string_view name, int id, std::string_view typeStr,
-                      const wpi::json& properties,
-                      std::optional<int> pubuid) final;
+                     const wpi::json& properties,
+                     std::optional<int> pubuid) final;
   void ServerUnannounce(std::string_view name, int id) final;
   void ServerPropertiesUpdate(std::string_view name, const wpi::json& update,
                               bool ack) final;
