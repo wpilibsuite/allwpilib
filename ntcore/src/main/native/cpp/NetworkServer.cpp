@@ -42,6 +42,8 @@ namespace uv = wpi::uv;
 // use a larger max message size for websockets
 static constexpr size_t kMaxMessageSize = 2 * 1024 * 1024;
 
+static constexpr size_t kClientProcessMessageCountMax = 16;
+
 class NetworkServer::ServerConnection {
  public:
   ServerConnection(NetworkServer& server, std::string_view addr,
@@ -105,7 +107,6 @@ class NetworkServer::ServerConnection4 final
 void NetworkServer::ServerConnection::SetupOutgoingTimer() {
   m_outgoingTimer = uv::Timer::Create(m_server.m_loop);
   m_outgoingTimer->timeout.connect([this] {
-    m_server.ProcessAllLocal();
     m_server.m_serverImpl.SendOutgoing(m_clientId,
                                        m_server.m_loop.Now().count());
   });
@@ -426,8 +427,10 @@ void NetworkServer::Init() {
   m_readLocalTimer = uv::Timer::Create(m_loop);
   if (m_readLocalTimer) {
     m_readLocalTimer->timeout.connect([this] {
-      ProcessAllLocal();
-      m_serverImpl.SendAllOutgoing(m_loop.Now().count(), false);
+      if (m_serverImpl.ProcessLocalMessages(kClientProcessMessageCountMax)) {
+        DEBUG4("Starting idle processing");
+        m_idle->Start();  // more to process
+      }
     });
     m_readLocalTimer->Start(uv::Timer::Time{100}, uv::Timer::Time{100});
   }
@@ -461,7 +464,7 @@ void NetworkServer::Init() {
   m_flushLocal = uv::Async<>::Create(m_loop);
   if (m_flushLocal) {
     m_flushLocal->wakeup.connect([this] {
-      if (m_serverImpl.ProcessLocalMessages(16)) {
+      if (m_serverImpl.ProcessLocalMessages(kClientProcessMessageCountMax)) {
         DEBUG4("Starting idle processing");
         m_idle->Start();  // more to process
       }
@@ -472,7 +475,7 @@ void NetworkServer::Init() {
   m_idle = uv::Idle::Create(m_loop);
   if (m_idle) {
     m_idle->idle.connect([this] {
-      if (m_serverImpl.ProcessIncomingMessages(16)) {
+      if (m_serverImpl.ProcessIncomingMessages(kClientProcessMessageCountMax)) {
         DEBUG4("Starting idle processing");
         m_idle->Start();  // more to process
       } else {
