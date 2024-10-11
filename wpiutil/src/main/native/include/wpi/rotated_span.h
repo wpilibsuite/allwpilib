@@ -54,8 +54,8 @@ class rotated_span {
     requires(Extent == std::dynamic_extent || Extent == 0)
   = default;
 
-  constexpr rotated_span(std::span<T, Extent> data,  // NOLINT
-                         int rotation = 0)
+  constexpr /*implicit*/ rotated_span(std::span<T, Extent> data,  // NOLINT
+                                      int rotation = 0)
       : m_data{data}, m_offset{MakeOffset(data.size(), rotation)} {}
 
   template <std::contiguous_iterator It>
@@ -211,8 +211,11 @@ class rotated_span {
     if (rotation >= 0) {
       return rotation % size;
     } else {
-      return (size + rotation % static_cast<int>(size)) %
-             static_cast<int>(size);
+      // The usual arithmetic conversions mean that rotation is converted to
+      // size_t, which is unsigned. Converting negative values to unsigned
+      // integer types produces large numbers with useless remainders, so
+      // instead make rotation positive before doing the modulo arithmetic.
+      return size - (-rotation % size);
     }
   }
 };
