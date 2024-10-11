@@ -20,7 +20,7 @@ GetAddrInfoReq::GetAddrInfoReq() {
 
 void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
                  std::string_view node, std::string_view service,
-                 const addrinfo* hints) {
+                 std::optional<addrinfo> hints) {
   if (loop.IsClosing()) {
     return;
   }
@@ -39,7 +39,8 @@ void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
         h.Release();  // this is always a one-shot
       },
       node.empty() ? nullptr : nodeStr.c_str(),
-      service.empty() ? nullptr : serviceStr.c_str(), hints);
+      service.empty() ? nullptr : serviceStr.c_str(),
+      hints.has_value() ? &hints.value() : nullptr);
   if (err < 0) {
     loop.ReportError(err);
   } else {
@@ -49,7 +50,7 @@ void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
 
 void GetAddrInfo(Loop& loop, std::function<void(const addrinfo&)> callback,
                  std::string_view node, std::string_view service,
-                 const addrinfo* hints) {
+                 std::optional<addrinfo> hints) {
   auto req = std::make_shared<GetAddrInfoReq>();
   req->resolved.connect(std::move(callback));
   GetAddrInfo(loop, req, node, service, hints);

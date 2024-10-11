@@ -198,7 +198,7 @@ void ParallelTcpConnector::Connect() {
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_NUMERICSERV | AI_ADDRCONFIG;
     uv::GetAddrInfo(m_loop, req, server.first, fmt::format("{}", server.second),
-                    &hints);
+                    hints);
   }
 }
 
