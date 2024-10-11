@@ -253,7 +253,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @return The DC motor's input voltage.
    */
-  public Voltage getInputVoltageVolts() {
+  public Voltage getInputVoltageMeasure() {
     m_voltage.mut_setMagnitude(getInputVoltage());
     return m_voltage;
   }
