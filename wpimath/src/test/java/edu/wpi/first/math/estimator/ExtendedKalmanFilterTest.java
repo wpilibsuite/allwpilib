@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 
 class ExtendedKalmanFilterTest {
   private static Matrix<N5, N1> getDynamics(final Matrix<N5, N1> x, final Matrix<N2, N1> u) {
-
     final var gr = 7.08; // Gear ratio
     final var rb = 0.8382 / 2.0; // Wheelbase radius (track width)
     final var r = 0.0746125; // Wheel radius
