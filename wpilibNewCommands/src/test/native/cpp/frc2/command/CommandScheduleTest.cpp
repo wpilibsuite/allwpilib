@@ -133,11 +133,13 @@ TEST_F(CommandScheduleTest, CancelNextCommand) {
 
   // only one of the commands should be canceled.
   EXPECT_FALSE(scheduler.IsScheduled(&command1) &&
-               scheduler.IsScheduled(&command2));
+               scheduler.IsScheduled(&command2))
+      << "Both commands are running when only one should be";
   // one of the commands shouldn't be canceled because the other one is canceled
   // first
   EXPECT_TRUE(scheduler.IsScheduled(&command1) ||
-              scheduler.IsScheduled(&command2));
+              scheduler.IsScheduled(&command2))
+      << "Both commands are canceled when only one should be";
 
   scheduler.Run();
   EXPECT_EQ(*counterPtr, 2);
