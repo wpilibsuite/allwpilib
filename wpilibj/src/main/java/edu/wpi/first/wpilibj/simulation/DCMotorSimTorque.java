@@ -13,22 +13,30 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.Gearbox;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Torque;
 
 /** Represents a simulated DC motor mechanism controlled by torque input. */
 public class DCMotorSimTorque extends DCMotorSimBase {
   /**
-   * Creates a simulated DC motor mechanism.
+   * Creates a simulated DC motor mechanism controlled by torque input.
    *
-   * @param plant The linear system representing the DC motor. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorTorqueSystem(double)} or
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}.
-   *     If {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double,
-   *     double)} is used, the distance unit must be radians.
+   * <p>If using physical constants create the plant using either {@link
+   * LinearSystemId#createDCMotorSystem(double)} or {@link
+   * LinearSystemId#createDCMotorSystem(MomentOfInertia)}.
+   *
+   * <p>If using system characterization create the plant using either {@link
+   * LinearSystemId#identifyPositionSystem(double, double)} or the units class overload. The
+   * distance unit must be radians. The input unit must be newton-meters.
+   *
+   * @param plant The linear system that represents the simulated DC motor mechanism controlled by
+   *     torque input.
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
-   *     second element is for velocity.
+   *     second element is for velocity. The units should be radians for position and radians per
+   *     second for velocity.
    */
   public DCMotorSimTorque(
       LinearSystem<N2, N1, N2> plant, Gearbox gearbox, double... measurementStdDevs) {
@@ -50,18 +58,18 @@ public class DCMotorSimTorque extends DCMotorSimBase {
   }
 
   /**
-   * Sets the input torque for the DC motor.
+   * Sets the input torque of the simulated DC motor mechanism.
    *
-   * @param torqueNM The input torque.
+   * @param torqueNewtonMeters The input torque in newton-meters.
    */
-  public void setInputTorque(double torqueNM) {
-    setInput(torqueNM);
+  public void setInputTorque(double torqueNewtonMeters) {
+    setInput(torqueNewtonMeters);
     // TODO: Need some guidance on clamping.
     m_torque.mut_replace(m_u.get(0, 0), NewtonMeters);
   }
 
   /**
-   * Sets the input torque for the DC motor.
+   * Sets the input torque of the simulated DC motor mechanism.
    *
    * @param torque The input torque.
    */

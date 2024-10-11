@@ -29,186 +29,20 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of an elevator system. The states of the system are [position,
-   * velocity]ᵀ, inputs are [voltage], and outputs are [position].
-   *
-   * @param drum The elevator's drum.
-   * @param massKg The mass of the elevator carriage, in kilograms.
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if massKg &leq; 0.
-   */
-  public static LinearSystem<N2, N1, N2> createElevatorSystem(Wheel drum, double massKg) {
-    if (massKg <= 0.0) {
-      throw new IllegalArgumentException("massKg must be greater than zero.");
-    }
-
-    return new LinearSystem<>(
-        MatBuilder.fill(
-            Nat.N2(),
-            Nat.N2(),
-            0,
-            1,
-            0,
-            -Math.pow(drum.gearbox.reduction, 2)
-                * drum.gearbox.numMotors
-                * drum.gearbox.motorType.KtNMPerAmp
-                / (drum.gearbox.motorType.rOhms
-                    * Math.pow(drum.radiusMeters, 2)
-                    * massKg
-                    * drum.gearbox.motorType.KvRadPerSecPerVolt)),
-        VecBuilder.fill(
-            0,
-            drum.gearbox.numMotors
-                * drum.gearbox.reduction
-                * drum.gearbox.motorType.KtNMPerAmp
-                / (drum.gearbox.motorType.rOhms * drum.radiusMeters * massKg)),
-        Matrix.eye(Nat.N2()),
-        new Matrix<>(Nat.N2(), Nat.N1()));
-  }
-
-  /**
-   * Create a state-space model of an elevator system. The states of the system are [position,
-   * velocity]ᵀ, inputs are [voltage], and outputs are [position].
-   *
-   * @param drum The elevator's drum.
-   * @param mass The mass of the elevator carriage.
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if mass &leq; 0.
-   */
-  public static LinearSystem<N2, N1, N2> createElevatorSystem(Wheel drum, Mass mass) {
-    return createElevatorSystem(drum, mass.in(Kilograms));
-  }
-
-  /**
-   * Create a state-space model of an elevator system. The states of the system are [position,
-   * velocity]ᵀ, inputs are [torque], and outputs are [position].
-   *
-   * @param massKg The mass of the elevator carriage, in kilograms.
-   * @param drumRadiusMeters The radius of the elevator's driving drum, in meters.
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if massKg &lt;= 0, drumRadiusMeters &lt;= 0.
-   */
-  public static LinearSystem<N2, N1, N2> createElevatorTorqueSystem(
-      double massKg, double drumRadiusMeters) {
-    if (massKg <= 0.0) {
-      throw new IllegalArgumentException("massKg must be greater than zero.");
-    }
-    if (drumRadiusMeters <= 0.0) {
-      throw new IllegalArgumentException("drumRadiusMeters must be greater than zero.");
-    }
-
-    return new LinearSystem<>(
-        Matrix.eye(Nat.N2()),
-        VecBuilder.fill(0, 1.0 / (massKg * drumRadiusMeters)),
-        Matrix.eye(Nat.N2()),
-        new Matrix<>(Nat.N2(), Nat.N1()));
-  }
-
-  /**
-   * Create a state-space model of an elevator system. The states of the system are [position,
-   * velocity]ᵀ, inputs are [torque], and outputs are [position].
-   *
-   * @param mass The mass of the elevator carriage.
-   * @param drumRadius The radius of the elevator's driving drum.
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if mass &lt;= 0, drumRadius &lt;= 0.
-   */
-  public static LinearSystem<N2, N1, N2> createElevatorTorqueSystem(
-      Mass mass, Distance drumRadius) {
-    return createElevatorTorqueSystem(mass.in(Kilograms), drumRadius.in(Meters));
-  }
-
-  /**
-   * Create a state-space model of a flywheel system. The states of the system are [angular
-   * velocity], inputs are [voltage], and outputs are [angular velocity].
-   *
-   * @param gearbox The gearbox of the flywheel mechanism.
-   * @param JKgMetersSquared The moment of inertia of the flywheel in kilograms-square meters.
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if JKgMetersSquared &leq; 0.
-   */
-  public static LinearSystem<N1, N1, N1> createFlywheelSystem(
-      Gearbox gearbox, double JKgMetersSquared) {
-    if (JKgMetersSquared <= 0.0) {
-      throw new IllegalArgumentException("JKgMetersSquared must be greater than zero.");
-    }
-
-    return new LinearSystem<>(
-        VecBuilder.fill(
-            -Math.pow(gearbox.reduction, 2)
-                * gearbox.numMotors
-                * gearbox.motorType.KtNMPerAmp
-                / (gearbox.motorType.KvRadPerSecPerVolt
-                    * gearbox.motorType.rOhms
-                    * JKgMetersSquared)),
-        VecBuilder.fill(
-            gearbox.numMotors
-                * gearbox.reduction
-                * gearbox.motorType.KtNMPerAmp
-                / (gearbox.motorType.rOhms * JKgMetersSquared)),
-        Matrix.eye(Nat.N1()),
-        new Matrix<>(Nat.N1(), Nat.N1()));
-  }
-
-  /**
-   * Create a state-space model of a flywheel system. The states of the system are [angular
-   * velocity], inputs are [voltage], and outputs are [angular velocity].
-   *
-   * @param gearbox The gearbox attached to the flywheel.
-   * @param J The moment of inertia of the flywheel.
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if J &leq; 0.
-   */
-  public static LinearSystem<N1, N1, N1> createFlywheelSystem(Gearbox gearbox, MomentOfInertia J) {
-    return createFlywheelSystem(gearbox, J.in(KilogramSquareMeters));
-  }
-
-  /**
-   * Create a state-space model of a flywheel system. The states of the system are [angular
-   * velocity], inputs are [torque], and outputs are [angular velocity].
-   *
-   * @param JKgMetersSquared The moment of inertia of the flywheel in kilograms-square meters.
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if JKgMetersSquared &leq; 0.
-   */
-  public static LinearSystem<N1, N1, N1> createFlywheelSystem(double JKgMetersSquared) {
-    if (JKgMetersSquared <= 0.0) {
-      throw new IllegalArgumentException("JKgMetersSquared must be greater than zero.");
-    }
-
-    return new LinearSystem<>(
-        VecBuilder.fill(0),
-        VecBuilder.fill(1.0 / JKgMetersSquared),
-        Matrix.eye(Nat.N1()),
-        new Matrix<>(Nat.N1(), Nat.N1()));
-  }
-
-  /**
-   * Create a state-space model of a flywheel system. The states of the system are [angular
-   * velocity], inputs are [torque], and outputs are [angular velocity].
-   *
-   * @param J The moment of inertia of the flywheel.
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if J &leq;= 0.
-   */
-  public static LinearSystem<N1, N1, N1> createFlywheelSystem(MomentOfInertia J) {
-    return createFlywheelSystem(J.in(KilogramSquareMeters));
-  }
-
-  /**
-   * Create a state-space model of a DC motor system. The states of the system are [angular
+   * Creates a state-space model of a DC motor system. The states of the system are [angular
    * position, angular velocity], inputs are [voltage], and outputs are [angular position, angular
    * velocity].
    *
-   * @param gearbox The gearbox attached to system.
-   * @param JKgMetersSquared The moment of inertia J of the DC motor.
+   * @param gearbox The gearbox of the DC motor mechanism.
+   * @param JKgMetersSquared The moment of inertia of the DC motor mechanism in kilograms-square
+   *     meters.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if JKgMetersSquared &leq; 0.
    */
   public static LinearSystem<N2, N1, N2> createDCMotorSystem(
       Gearbox gearbox, double JKgMetersSquared) {
     if (JKgMetersSquared <= 0.0) {
-      throw new IllegalArgumentException("J must be greater than zero.");
+      throw new IllegalArgumentException("JKgMetersSquared must be greater than zero.");
     }
 
     return new LinearSystem<>(
@@ -235,12 +69,12 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a DC motor system. The states of the system are [angular
+   * Creates a state-space model of a DC motor system. The states of the system are [angular
    * position, angular velocity], inputs are [voltage], and outputs are [angular position, angular
    * velocity].
    *
-   * @param gearbox The gearbox attached to system.
-   * @param J The moment of inertia J of the DC motor.
+   * @param gearbox The gearbox of the DC motor mechanism.
+   * @param J The moment of inertia of the DC motor mechanism.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if J &leq; 0.
    */
@@ -249,50 +83,16 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a DC motor system from its kV (volts/(unit/sec)) and kA
-   * (volts/(unit/sec²)). These constants can be found using SysId. the states of the system are
-   * [position, velocity], inputs are [voltage], and outputs are [position].
-   *
-   * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
-   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
-   *
-   * <p>The parameters provided by the user are from this feedforward model:
-   *
-   * <p>u = K_v v + K_a a
-   *
-   * @param kV The velocity gain, in volts/(unit/sec)
-   * @param kA The acceleration gain, in volts/(unit/sec²)
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
-   * @deprecated Use identifyPositionSystem instead.
-   * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
-   */
-  @Deprecated
-  public static LinearSystem<N2, N1, N2> createDCMotorSystem(double kV, double kA) {
-    if (kV < 0.0) {
-      throw new IllegalArgumentException("Kv must be greater than or equal to zero.");
-    }
-    if (kA <= 0.0) {
-      throw new IllegalArgumentException("Ka must be greater than zero.");
-    }
-
-    return new LinearSystem<>(
-        MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -kV / kA),
-        VecBuilder.fill(0, 1 / kA),
-        Matrix.eye(Nat.N2()),
-        new Matrix<>(Nat.N2(), Nat.N1()));
-  }
-
-  /**
-   * Create a state-space model of a DC motor system. The states of the system are [angular
+   * Creates a state-space model of a DC motor system. The states of the system are [angular
    * position, angular velocity], inputs are [torque], and outputs are [angular position, angular
    * velocity].
    *
-   * @param JKgMetersSquared The moment of inertia J of the DC motor.
+   * @param JKgMetersSquared The moment of inertia of the DC motor mechanism in kilograms-square
+   *     meters.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0.
+   * @throws IllegalArgumentException if JKgMetersSquared &leq; 0.
    */
-  public static LinearSystem<N2, N1, N2> createDCMotorTorqueSystem(double JKgMetersSquared) {
+  public static LinearSystem<N2, N1, N2> createDCMotorSystem(double JKgMetersSquared) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
     }
@@ -305,20 +105,20 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a DC motor system. The states of the system are [angular
+   * Creates a state-space model of a DC motor system. The states of the system are [angular
    * position, angular velocity], inputs are [torque], and outputs are [angular position, angular
    * velocity].
    *
-   * @param J The moment of inertia J of the DC motor.
+   * @param J The moment of inertia of the DC motor mechanism.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if J &lt;= 0.
+   * @throws IllegalArgumentException if J &leq; 0.
    */
-  public static LinearSystem<N2, N1, N2> createDCMotorTorqueSystem(MomentOfInertia J) {
-    return createDCMotorTorqueSystem(J.in(KilogramSquareMeters));
+  public static LinearSystem<N2, N1, N2> createDCMotorSystem(MomentOfInertia J) {
+    return createDCMotorSystem(J.in(KilogramSquareMeters));
   }
 
   /**
-   * Create a state-space model of a differential drive drivetrain. In this model, the states are
+   * Creates a state-space model of a differential drive drivetrain. In this model, the states are
    * [left velocity, right velocity]ᵀ, inputs are [left voltage, right voltage]ᵀ, and outputs are
    * [left velocity, right velocity]ᵀ.
    *
@@ -366,8 +166,175 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a single jointed arm system. The states of the system are [angle,
-   * angular velocity], inputs are [voltage], and outputs are [angle].
+   * Creates a state-space model of an elevator system. The states of the system are [position,
+   * velocity]ᵀ, inputs are [voltage], and outputs are [position].
+   *
+   * @param drum The elevator's drum.
+   * @param massKg The mass of the elevator carriage, in kilograms.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if massKg &leq; 0.
+   */
+  public static LinearSystem<N2, N1, N2> createElevatorSystem(Wheel drum, double massKg) {
+    if (massKg <= 0.0) {
+      throw new IllegalArgumentException("massKg must be greater than zero.");
+    }
+
+    return new LinearSystem<>(
+        MatBuilder.fill(
+            Nat.N2(),
+            Nat.N2(),
+            0,
+            1,
+            0,
+            -Math.pow(drum.gearbox.reduction, 2)
+                * drum.gearbox.numMotors
+                * drum.gearbox.motorType.KtNMPerAmp
+                / (drum.gearbox.motorType.rOhms
+                    * Math.pow(drum.radiusMeters, 2)
+                    * massKg
+                    * drum.gearbox.motorType.KvRadPerSecPerVolt)),
+        VecBuilder.fill(
+            0,
+            drum.gearbox.numMotors
+                * drum.gearbox.reduction
+                * drum.gearbox.motorType.KtNMPerAmp
+                / (drum.gearbox.motorType.rOhms * drum.radiusMeters * massKg)),
+        Matrix.eye(Nat.N2()),
+        new Matrix<>(Nat.N2(), Nat.N1()));
+  }
+
+  /**
+   * Creates a state-space model of an elevator system. The states of the system are [position,
+   * velocity]ᵀ, inputs are [voltage], and outputs are [position].
+   *
+   * @param drum The elevator's drum.
+   * @param mass The mass of the elevator carriage.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if mass &leq; 0.
+   */
+  public static LinearSystem<N2, N1, N2> createElevatorSystem(Wheel drum, Mass mass) {
+    return createElevatorSystem(drum, mass.in(Kilograms));
+  }
+
+  /**
+   * Creates a state-space model of an elevator system. The states of the system are [position,
+   * velocity]ᵀ, inputs are [torque], and outputs are [position].
+   *
+   * @param massKg The mass of the elevator carriage, in kilograms.
+   * @param drumRadiusMeters The radius of the elevator's driving drum, in meters.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if massKg &lt;= 0, drumRadiusMeters &lt;= 0.
+   */
+  public static LinearSystem<N2, N1, N2> createElevatorTorqueSystem(
+      double massKg, double drumRadiusMeters) {
+    if (massKg <= 0.0) {
+      throw new IllegalArgumentException("massKg must be greater than zero.");
+    }
+    if (drumRadiusMeters <= 0.0) {
+      throw new IllegalArgumentException("drumRadiusMeters must be greater than zero.");
+    }
+
+    return new LinearSystem<>(
+        Matrix.eye(Nat.N2()),
+        VecBuilder.fill(0, 1.0 / (massKg * drumRadiusMeters)),
+        Matrix.eye(Nat.N2()),
+        new Matrix<>(Nat.N2(), Nat.N1()));
+  }
+
+  /**
+   * Creates a state-space model of an elevator system. The states of the system are [position,
+   * velocity]ᵀ, inputs are [torque], and outputs are [position].
+   *
+   * @param mass The mass of the elevator carriage.
+   * @param drumRadius The radius of the elevator's driving drum.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if mass &lt;= 0, drumRadius &lt;= 0.
+   */
+  public static LinearSystem<N2, N1, N2> createElevatorTorqueSystem(
+      Mass mass, Distance drumRadius) {
+    return createElevatorTorqueSystem(mass.in(Kilograms), drumRadius.in(Meters));
+  }
+
+  /**
+   * Creates a state-space model of a flywheel system. The states of the system are [angular
+   * velocity], inputs are [voltage], and outputs are [angular velocity].
+   *
+   * @param gearbox The gearbox of the flywheel mechanism.
+   * @param JKgMetersSquared The moment of inertia of the flywheel in kilograms-square meters.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if JKgMetersSquared &leq; 0.
+   */
+  public static LinearSystem<N1, N1, N1> createFlywheelSystem(
+      Gearbox gearbox, double JKgMetersSquared) {
+    if (JKgMetersSquared <= 0.0) {
+      throw new IllegalArgumentException("JKgMetersSquared must be greater than zero.");
+    }
+
+    return new LinearSystem<>(
+        VecBuilder.fill(
+            -Math.pow(gearbox.reduction, 2)
+                * gearbox.numMotors
+                * gearbox.motorType.KtNMPerAmp
+                / (gearbox.motorType.KvRadPerSecPerVolt
+                    * gearbox.motorType.rOhms
+                    * JKgMetersSquared)),
+        VecBuilder.fill(
+            gearbox.numMotors
+                * gearbox.reduction
+                * gearbox.motorType.KtNMPerAmp
+                / (gearbox.motorType.rOhms * JKgMetersSquared)),
+        Matrix.eye(Nat.N1()),
+        new Matrix<>(Nat.N1(), Nat.N1()));
+  }
+
+  /**
+   * Creates a state-space model of a flywheel system. The states of the system are [angular
+   * velocity], inputs are [voltage], and outputs are [angular velocity].
+   *
+   * @param gearbox The gearbox attached to the flywheel.
+   * @param J The moment of inertia of the flywheel.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if J &leq; 0.
+   */
+  public static LinearSystem<N1, N1, N1> createFlywheelSystem(Gearbox gearbox, MomentOfInertia J) {
+    return createFlywheelSystem(gearbox, J.in(KilogramSquareMeters));
+  }
+
+  /**
+   * Creates a state-space model of a flywheel system. The states of the system are [angular
+   * velocity], inputs are [torque], and outputs are [angular velocity].
+   *
+   * @param JKgMetersSquared The moment of inertia of the flywheel in kilograms-square meters.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if JKgMetersSquared &leq; 0.
+   */
+  public static LinearSystem<N1, N1, N1> createFlywheelSystem(double JKgMetersSquared) {
+    if (JKgMetersSquared <= 0.0) {
+      throw new IllegalArgumentException("JKgMetersSquared must be greater than zero.");
+    }
+
+    return new LinearSystem<>(
+        VecBuilder.fill(0),
+        VecBuilder.fill(1.0 / JKgMetersSquared),
+        Matrix.eye(Nat.N1()),
+        new Matrix<>(Nat.N1(), Nat.N1()));
+  }
+
+  /**
+   * Creates a state-space model of a flywheel system. The states of the system are [angular
+   * velocity], inputs are [torque], and outputs are [angular velocity].
+   *
+   * @param J The moment of inertia of the flywheel.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if J &leq;= 0.
+   */
+  public static LinearSystem<N1, N1, N1> createFlywheelSystem(MomentOfInertia J) {
+    return createFlywheelSystem(J.in(KilogramSquareMeters));
+  }
+
+  /**
+   * Creates a state-space model of a single jointed arm system. The states of the system are
+   * [angle, angular velocity], inputs are [voltage], and outputs are [angle].
    *
    * @param gearbox The gearbox attached to the arm.
    * @param massKg The mass of the arm.
@@ -421,8 +388,8 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a single jointed arm system. The states of the system are [angle,
-   * angular velocity], inputs are [voltage], and outputs are [angle].
+   * Creates a state-space model of a single jointed arm system. The states of the system are
+   * [angle, angular velocity], inputs are [voltage], and outputs are [angle].
    *
    * @param gearbox The gearbox attached to the arm.
    * @param mass The mass of the arm.
@@ -440,8 +407,8 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a single jointed arm system. The states of the system are [angle,
-   * angular velocity], inputs are [torque], and outputs are [angle].
+   * Creates a state-space model of a single jointed arm system. The states of the system are
+   * [angle, angular velocity], inputs are [torque], and outputs are [angle].
    *
    * @param massKg The mass of the arm.
    * @param armLengthMeters The length of the arm.
@@ -478,8 +445,8 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a single jointed arm system. The states of the system are [angle,
-   * angular velocity], inputs are [torque], and outputs are [angle].
+   * Creates a state-space model of a single jointed arm system. The states of the system are
+   * [angle, angular velocity], inputs are [torque], and outputs are [angle].
    *
    * @param mass The mass of the arm.
    * @param armLength The length of the arm.
@@ -495,7 +462,7 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a wheel system. The states of the system are [linear position,
+   * Creates a state-space model of a wheel system. The states of the system are [linear position,
    * linear velocity], inputs are [voltage], and outputs are [linear position, linear velocity].
    *
    * @param wheel The wheel object containing the gearbox and wheel radius.
@@ -540,7 +507,7 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a wheel system. The states of the system are [linear position,
+   * Creates a state-space model of a wheel system. The states of the system are [linear position,
    * linear velocity], inputs are [voltage], and outputs are [linear position, linear velocity].
    *
    * @param wheel The wheel object containing the gearbox and wheel radius.
@@ -554,7 +521,7 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a wheel system. The states of the system are [linear position,
+   * Creates a state-space model of a wheel system. The states of the system are [linear position,
    * linear velocity], inputs are [torque], and outputs are [linear position, linear velocity].
    *
    * @param massKg The mass of the system driven by the wheel, in kilograms.
@@ -583,7 +550,7 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a wheel system. The states of the system are [linear position,
+   * Creates a state-space model of a wheel system. The states of the system are [linear position,
    * linear velocity], inputs are [torque], and outputs are [linear position, linear velocity].
    *
    * @param mass The mass of the system driven by the wheel.
@@ -595,128 +562,6 @@ public final class LinearSystemId {
   public static LinearSystem<N2, N1, N2> createWheelTorqueSystem(
       Mass mass, Distance radius, int numWheels) {
     return createWheelTorqueSystem(mass.in(Kilograms), radius.in(Meters), numWheels);
-  }
-
-  /**
-   * Create a state-space model for a 1 DOF velocity system from its kV (input-units/(unit/sec)) and
-   * kA (input-units/(unit/sec²). These constants can be found using SysId. The states of the system
-   * are [velocity], inputs are [voltage or torque], and outputs are [velocity].
-   *
-   * <p>The distance-units you choose MUST be an SI unit (i.e. meters or radians).
-   *
-   * <p>The input-units you choose MUST be an SI unit (i.e. volts or newton-meters).
-   *
-   * <p>You can use the {@link edu.wpi.first.math.util.Units} class for converting between unit
-   * types.
-   *
-   * <p>The parameters provided by the user are from this feedforward model:
-   *
-   * <p>u = K_v v + K_a a
-   *
-   * @param kV The velocity gain, in input-units/(distance-units/sec)
-   * @param kA The acceleration gain, in input-units/(distance-units/sec²)
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt; 0 or kA &leq; 0.
-   * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
-   */
-  public static LinearSystem<N1, N1, N1> identifyVelocitySystem(double kV, double kA) {
-    if (kV < 0.0) {
-      throw new IllegalArgumentException("Kv must be greater than or equal to zero.");
-    }
-    if (kA <= 0.0) {
-      throw new IllegalArgumentException("Ka must be greater than zero.");
-    }
-
-    return new LinearSystem<>(
-        VecBuilder.fill(-kV / kA),
-        VecBuilder.fill(1.0 / kA),
-        VecBuilder.fill(1.0),
-        VecBuilder.fill(0.0));
-  }
-
-  /**
-   * Create a state-space model for a 1 DOF velocity system from its kV
-   * (input-units/(distance-units/sec)) and kA (input-units/(distance-units/sec²). These constants
-   * can be found using SysId. The states of the system are [velocity], inputs are [voltage or
-   * torque], and outputs are [velocity].
-   *
-   * <p>The parameters provided by the user are from this feedforward model:
-   *
-   * <p>u = K_v v + K_a a
-   *
-   * @param <U> The input parameter either as voltage or torque.
-   * @param <V> The velocity gain parameter either as LinearVelocity or AngularVelocity.
-   * @param <A> The acceleration gain parameter either as LinearAcceleration or AngularAcceleration.
-   * @param kV The velocity gain, in input units/(unit/sec)
-   * @param kA The acceleration gain, in input units/(unit/sec²)
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt; 0 or kA &leq; 0.
-   * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
-   */
-  public static <U extends Unit, V extends Unit, A extends Unit>
-      LinearSystem<N1, N1, N1> identifyVelocitySystem(
-          Measure<? extends PerUnit<U, V>> kV, Measure<? extends PerUnit<U, A>> kA) {
-    return identifyVelocitySystem(kV.baseUnitMagnitude(), kA.baseUnitMagnitude());
-  }
-
-  /**
-   * Create a state-space model for a 1 DOF position system from its kV (input units/(unit/sec)) and
-   * kA (input units/(unit/sec²). These constants can be found using SysId. The states of the system
-   * are [position, velocity]ᵀ, inputs are [voltage or torque], and outputs are [position].
-   *
-   * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
-   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
-   *
-   * <p>The parameters provided by the user are from this feedforward model:
-   *
-   * <p>u = K_v v + K_a a
-   *
-   * @param <U> The input parameter either as voltage or torque.
-   * @param <V> The velocity gain parameter either as LinearVelocity or AngularVelocity.
-   * @param <A> The acceleration gain parameter either as LinearAcceleration or AngularAcceleration.
-   * @param kV The velocity gain, in volts/(unit/sec)
-   * @param kA The acceleration gain, in volts/(unit/sec²)
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
-   * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
-   */
-  public static <U extends Unit, V extends Unit, A extends Unit>
-      LinearSystem<N2, N1, N2> identifyPositionSystem(
-          Measure<? extends PerUnit<U, V>> kV, Measure<? extends PerUnit<U, A>> kA) {
-    return identifyPositionSystem(kV.baseUnitMagnitude(), kA.baseUnitMagnitude());
-  }
-
-  /**
-   * Create a state-space model for a 1 DOF position system from its kV (input units/(unit/sec)) and
-   * kA (input units/(unit/sec²). These constants can be found using SysId. The states of the system
-   * are [position, velocity]ᵀ, inputs are [voltage or torque], and outputs are [position].
-   *
-   * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
-   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
-   *
-   * <p>The parameters provided by the user are from this feedforward model:
-   *
-   * <p>u = K_v v + K_a a
-   *
-   * @param kV The velocity gain, in volts/(unit/sec)
-   * @param kA The acceleration gain, in volts/(unit/sec²)
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
-   * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
-   */
-  public static LinearSystem<N2, N1, N2> identifyPositionSystem(double kV, double kA) {
-    if (kV < 0.0) {
-      throw new IllegalArgumentException("Kv must be greater than or equal to zero.");
-    }
-    if (kA <= 0.0) {
-      throw new IllegalArgumentException("Ka must be greater than zero.");
-    }
-
-    return new LinearSystem<>(
-        MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0, 1.0, 0.0, -kV / kA),
-        VecBuilder.fill(0.0, 1.0 / kA),
-        Matrix.eye(Nat.N2()),
-        new Matrix<>(Nat.N2(), Nat.N1()));
   }
 
   /**
@@ -815,5 +660,131 @@ public final class LinearSystemId {
     // to V/(m/s).
     return identifyDrivetrainSystem(
         kVLinear, kALinear, kVAngular * 2.0 / trackwidth, kAAngular * 2.0 / trackwidth);
+  }
+
+  /**
+   * Creates a state-space model for a 1 DOF position system from its kV
+   * (input-units/(distance-units/sec)) and kA (input-units/(distance-units/sec²). These constants
+   * can be found using SysId. The states of the system are [position, velocity], inputs are
+   * [voltage or torque], and outputs are [position, velocity].
+   *
+   * <p>The distance-units you choose MUST be an SI unit (i.e. meters or radians).
+   *
+   * <p>The input-units you choose MUST be an SI unit (i.e. volts or newton-meters).
+   *
+   * <p>You can use the {@link edu.wpi.first.math.util.Units} class for converting between unit
+   * types.
+   *
+   * <p>The parameters provided by the user are from this feedforward model:
+   *
+   * <p>u = kᵥ v + kₐ a
+   *
+   * @param kV The velocity gain, in input-units/(distance-units/sec)
+   * @param kA The acceleration gain, in input-units/(distance-units/sec²)
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if kV &lt; 0 or kA &leq; 0.
+   * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   */
+  public static LinearSystem<N2, N1, N2> identifyPositionSystem(double kV, double kA) {
+    if (kV < 0.0) {
+      throw new IllegalArgumentException("kV must be greater than or equal to zero.");
+    }
+    if (kA <= 0.0) {
+      throw new IllegalArgumentException("kA must be greater than zero.");
+    }
+
+    return new LinearSystem<>(
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0, 1.0, 0.0, -kV / kA),
+        VecBuilder.fill(0.0, 1.0 / kA),
+        Matrix.eye(Nat.N2()),
+        new Matrix<>(Nat.N2(), Nat.N1()));
+  }
+
+  /**
+   * Creates a state-space model for a 1 DOF velocity system from its kV
+   * (input-units/(distance-units/sec)) and kA (input-units/(distance-units/sec²). These constants
+   * can be found using SysId. The states of the system are [velocity], inputs are [voltage or
+   * torque], and outputs are [velocity].
+   *
+   * <p>The parameters provided by the user are from this feedforward model:
+   *
+   * <p>u = kᵥ v + kₐ a
+   *
+   * @param <U> The input parameter either as voltage or torque.
+   * @param <V> The velocity gain parameter either as LinearVelocity or AngularVelocity.
+   * @param <A> The acceleration gain parameter either as LinearAcceleration or AngularAcceleration.
+   * @param kV The velocity gain, in input-units/(distance-units/sec)
+   * @param kA The acceleration gain, in input-units/(distance-units/sec²)
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if kV &lt; 0 or kA &leq; 0.
+   * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   */
+  public static <U extends Unit, V extends Unit, A extends Unit>
+      LinearSystem<N2, N1, N2> identifyPositionSystem(
+          Measure<? extends PerUnit<U, V>> kV, Measure<? extends PerUnit<U, A>> kA) {
+    return identifyPositionSystem(kV.baseUnitMagnitude(), kA.baseUnitMagnitude());
+  }
+
+  /**
+   * Creates a state-space model for a 1 DOF velocity system from its kV
+   * (input-units/(distance-units/sec)) and kA (input-units/(distance-units/sec²). These constants
+   * can be found using SysId. The states of the system are [velocity], inputs are [voltage or
+   * torque], and outputs are [velocity].
+   *
+   * <p>The distance-units you choose MUST be an SI unit (i.e. meters or radians).
+   *
+   * <p>The input-units you choose MUST be an SI unit (i.e. volts or newton-meters).
+   *
+   * <p>You can use the {@link edu.wpi.first.math.util.Units} class for converting between unit
+   * types.
+   *
+   * <p>The parameters provided by the user are from this feedforward model:
+   *
+   * <p>u = kᵥ v + kₐ a
+   *
+   * @param kV The velocity gain, in input-units/(distance-units/sec)
+   * @param kA The acceleration gain, in input-units/(distance-units/sec²)
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if kV &lt; 0 or kA &leq; 0.
+   * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   */
+  public static LinearSystem<N1, N1, N1> identifyVelocitySystem(double kV, double kA) {
+    if (kV < 0.0) {
+      throw new IllegalArgumentException("kV must be greater than or equal to zero.");
+    }
+    if (kA <= 0.0) {
+      throw new IllegalArgumentException("kA must be greater than zero.");
+    }
+
+    return new LinearSystem<>(
+        VecBuilder.fill(-kV / kA),
+        VecBuilder.fill(1.0 / kA),
+        VecBuilder.fill(1.0),
+        VecBuilder.fill(0.0));
+  }
+
+  /**
+   * Creates a state-space model for a 1 DOF velocity system from its kV
+   * (input-units/(distance-units/sec)) and kA (input-units/(distance-units/sec²). These constants
+   * can be found using SysId. The states of the system are [velocity], inputs are [voltage or
+   * torque], and outputs are [velocity].
+   *
+   * <p>The parameters provided by the user are from this feedforward model:
+   *
+   * <p>u = kᵥ v + kₐ a
+   *
+   * @param <U> The input parameter either as voltage or torque.
+   * @param <V> The velocity gain parameter either as LinearVelocity or AngularVelocity.
+   * @param <A> The acceleration gain parameter either as LinearAcceleration or AngularAcceleration.
+   * @param kV The velocity gain, in input-units/(distance-units/sec)
+   * @param kA The acceleration gain, in input-units/(distance-units/sec²)
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if kV &lt; 0 or kA &leq; 0.
+   * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   */
+  public static <U extends Unit, V extends Unit, A extends Unit>
+      LinearSystem<N1, N1, N1> identifyVelocitySystem(
+          Measure<? extends PerUnit<U, V>> kV, Measure<? extends PerUnit<U, A>> kA) {
+    return identifyVelocitySystem(kV.baseUnitMagnitude(), kA.baseUnitMagnitude());
   }
 }

@@ -33,7 +33,7 @@ public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
   /** The gearbox of the simulated flywheel mechanism. */
   protected final Gearbox m_gearbox;
 
-  /** The moment of inertia of simulated the flywheel mechanism. */
+  /** The moment of inertia of the simulated flywheel mechanism. */
   private final MomentOfInertia m_j;
 
   /** The angular velocity of the simulated flywheel mechanism. */
@@ -75,19 +75,19 @@ public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
   /**
    * Sets the angular velocity of the simulated flywheel mechanism.
    *
-   * @param velocityRadPerSec The new angular velocity in radians per second.
+   * @param angularVelocityRadPerSec The new angular velocity in radians per second.
    */
-  public void setAngularVelocity(double velocityRadPerSec) {
-    setState(VecBuilder.fill(velocityRadPerSec));
+  public void setAngularVelocity(double angularVelocityRadPerSec) {
+    setState(VecBuilder.fill(angularVelocityRadPerSec));
   }
 
   /**
    * Sets the angular velocity of the simulated flywheel mechanism.
    *
-   * @param velocity The new angular velocity.
+   * @param angularVelocity The new angular velocity.
    */
-  public void setAngularVelocity(AngularVelocity velocity) {
-    setAngularVelocity(velocity.in(RadiansPerSecond));
+  public void setAngularVelocity(AngularVelocity angularVelocity) {
+    setAngularVelocity(angularVelocity.in(RadiansPerSecond));
   }
 
   /**
@@ -147,7 +147,8 @@ public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
   /**
    * Returns the angular acceleration of the simulated flywheel mechanism.
    *
-   * @return The angular acceleration of the simulated flywheel mechanism in radians per squared.
+   * @return The angular acceleration of the simulated flywheel mechanism in radians per second
+   *     squared.
    */
   public double getAngularAccelerationRadPerSecSq() {
     return m_angularAcceleration.in(RadiansPerSecondPerSecond);
@@ -203,7 +204,7 @@ public abstract class FlywheelSimBase extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The voltage of the simulated flywheel mechanism in volts.
    */
-  public double getVoltageVolts() {
+  public double getVolts() {
     return m_voltage.in(Volts);
   }
 

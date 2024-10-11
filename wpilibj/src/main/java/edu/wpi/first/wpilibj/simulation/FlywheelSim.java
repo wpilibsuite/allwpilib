@@ -26,7 +26,8 @@ public class FlywheelSim extends FlywheelSimBase {
    * LinearSystemId#createFlywheelSystem(Gearbox, MomentOfInertia)}.
    *
    * <p>If using system characterization create the plant using either {@link
-   * LinearSystemId#identifyVelocitySystem(double, double)} or the units class overload.
+   * LinearSystemId#identifyVelocitySystem(double, double)} or the units class overload. The
+   * distance unit must be radians. The input unit must be volts.
    *
    * @param plant The linear system that represents the simulated flywheel mechanism controlled by
    *     voltage input.

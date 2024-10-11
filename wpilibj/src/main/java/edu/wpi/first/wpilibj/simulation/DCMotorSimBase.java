@@ -33,42 +33,43 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.units.measure.Voltage;
 
-/** Represents a simulated DC motor mechanism. */
+/** The base clase for a simulated DC motor mechanism. */
 public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
-  /** Gearbox for the DC motor. */
+  /** The gearbox of the simulated DC motor mechanism. */
   protected final Gearbox m_gearbox;
 
-  /** The moment of inertia for the flywheel mechanism. */
+  /** The moment of inertia of the simulated DC motor mechanism. */
   private final MomentOfInertia m_j;
 
-  /** The angle of the system. */
+  /** The angle of the simulated DC motor mechanism. */
   private final MutAngle m_angle = Radians.mutable(0.0);
 
-  /** The angular velocity of the system. */
+  /** The angular velocity of the simulated DC motor mechanism. */
   protected final MutAngularVelocity m_angularVelocity = RadiansPerSecond.mutable(0.0);
 
-  /** The angular acceleration of the system. */
+  /** The angular acceleration of the simulated DC motor mechanism. */
   private final MutAngularAcceleration m_angularAcceleration =
       RadiansPerSecondPerSecond.mutable(0.0);
 
-  /** The current draw of flywheel. */
+  /** The current draw of the simulated DC motor mechanism. */
   protected final MutCurrent m_currentDraw = Amps.mutable(0.0);
 
-  /** The voltage of the flywheel. */
+  /** The voltage of the simulated DC motor mechanism. */
   protected final MutVoltage m_voltage = Volts.mutable(0.0);
 
-  /** The torque on the flywheel. */
+  /** The torque of the simulated DC motor mechanism. */
   protected final MutTorque m_torque = NewtonMeters.mutable(0.0);
 
   /**
    * Creates a simulated DC motor mechanism.
    *
-   * @param plant The linear system representing the DC motor.
-   * @param gearbox The type of and number of motors in the DC motor gearbox.
-   * @param J The moment of inertia for the flywheel mechanism.
+   * @param plant The linear system that represents the simulated DC motor mechanism.
+   * @param gearbox The gearbox of the simulated DC motor mechanism.
+   * @param J The moment of inertia of the simulated DC motor mechanism.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
-   *     second element is for velocity.
+   *     second element is for velocity. The units should be radians for position and radians per
+   *     second for velocity.
    */
   public DCMotorSimBase(
       LinearSystem<N2, N1, N2> plant,
@@ -81,7 +82,7 @@ public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Sets the state of the DC motor.
+   * Sets the state of the simulated DC motor mechanism.
    *
    * @param angularPositionRad The new angular position in radians.
    * @param angularVelocityRadPerSec The new angualr velocity in radians per second.
@@ -91,7 +92,7 @@ public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Sets the state of the DC motor.
+   * Sets the state of the simulated DC motor mechanism.
    *
    * @param angularPosition The new angular position.
    * @param angularVelocity The new angular velocity.
@@ -101,16 +102,16 @@ public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Sets the DC motor's angular position.
+   * Sets the angular position of the simulated DC motor mechanism.
    *
-   * @param angularPositionRad The new position in radians.
+   * @param angularPositionRad The new angular position in radians.
    */
   public void setAngle(double angularPositionRad) {
     setState(angularPositionRad, m_angularVelocity.in(RadiansPerSecond));
   }
 
   /**
-   * Sets the DC motor's angular position.
+   * Sets the angular position of the simulated DC motor mechanism.
    *
    * @param angularPosition The new angular position.
    */
@@ -119,171 +120,172 @@ public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Sets the DC motor's angular velocity.
+   * Sets the angular velocity of the simulated DC motor mechanism.
    *
-   * @param angularVelocityRadPerSec The new velocity in radians per second.
+   * @param angularVelocityRadPerSec The new angular velocity in radians per second.
    */
   public void setAngularVelocity(double angularVelocityRadPerSec) {
     setState(m_angle.in(Radians), angularVelocityRadPerSec);
   }
 
   /**
-   * Sets the DC motor's angular velocity.
+   * Sets the angular velocity of the simulated DC motor mechanism.
    *
-   * @param angularVelocity The new velocity.
+   * @param angularVelocity The new angular velocity.
    */
   public void setAngularVelocity(AngularVelocity angularVelocity) {
     setAngularVelocity(angularVelocity.in(RadiansPerSecond));
   }
 
   /**
-   * Returns the moment of inertia in kilograms meters squared.
+   * Returns the moment of inertia of the simulated DC motor mechanism.
    *
-   * @return The DC motor's moment of inertia in kilograms meters squared.
+   * @return The moment of inertia of the simulated DC motor mechanism in kilogram-square meters.
    */
   public double getJKgMetersSquared() {
     return m_j.in(KilogramSquareMeters);
   }
 
   /**
-   * Returns the moment of inertia.
+   * Returns the moment of inertia of the simulated DC motor mechanism.
    *
-   * @return The DC motor's moment of inertia.
+   * @return The moment of inertia of the simulated DC motor mechanism.
    */
   public MomentOfInertia getJ() {
     return m_j;
   }
 
   /**
-   * Returns the gearbox for the DC motor.
+   * Returns the gearbox of the simulated DC motor mechanism.
    *
-   * @return The DC motor's gearbox.
+   * @return The gearbox of the simulated DC motor mechanism.
    */
   public Gearbox getGearbox() {
     return m_gearbox;
   }
 
   /**
-   * Returns the DC motor's position.
+   * Returns the angular position of the simulated DC motor mechanism.
    *
-   * @return The DC motor's position.
+   * @return The angular position of the simulated DC motor mechanism in radians.
    */
   public double getAngularPositionRad() {
     return m_angle.in(Radians);
   }
 
   /**
-   * Returns the DC motor's position in rotations.
+   * Returns the angular position of the simulated DC motor mechanism.
    *
-   * @return The DC motor's position in rotations.
+   * @return The angular position of the simulated DC motor mechanism in rotations.
    */
   public double getAngularPositionRotations() {
     return m_angle.in(Rotations);
   }
 
   /**
-   * Returns the DC motor's position.
+   * Returns the angular position of the simulated DC motor mechanism.
    *
-   * @return The DC motor's position
+   * @return The angular position of the simulated DC motor mechanism.
    */
   public Angle getAngularPosition() {
     return m_angle;
   }
 
   /**
-   * Returns the DC motor's velocity.
+   * Returns the angular velocity of the simulated DC motor mechanism.
    *
-   * @return The DC motor's velocity.
+   * @return The angular velocity of the simulated DC motor mechanism in radians per second.
    */
   public double getAngularVelocityRadPerSec() {
     return m_angularVelocity.in(RadiansPerSecond);
   }
 
   /**
-   * Returns the DC motor's velocity in RPM.
+   * Returns the angular velocity of the simulated DC motor mechanism.
    *
-   * @return The DC motor's velocity in RPM.
+   * @return The angular velocity of the simulated DC motor mechanism in RPM.
    */
   public double getAngularVelocityRPM() {
     return m_angularVelocity.in(RPM);
   }
 
   /**
-   * Returns the DC motor's velocity.
+   * Returns the angular velocity of the simulated DC motor mechanism.
    *
-   * @return The DC motor's velocity
+   * @return The angular velocity of the simulated DC motor mechanism.
    */
   public AngularVelocity getAngularVelocity() {
     return m_angularVelocity;
   }
 
   /**
-   * Returns the DC motor's acceleration in Radians Per Second Squared.
+   * Returns the angular acceleration of the simulated DC motor mechanism.
    *
-   * @return The DC motor's acceleration in Radians Per Second Squared.
+   * @return The angular acceleration of the simulated DC motor mechanism in radians per second
+   *     squared.
    */
   public double getAngularAccelerationRadPerSecSq() {
     return m_angularAcceleration.in(RadiansPerSecondPerSecond);
   }
 
   /**
-   * Returns the DC motor's acceleration.
+   * Returns the angular acceleration of the simulated DC motor mechanism.
    *
-   * @return The DC motor's acceleration.
+   * @return The angular acceleration of the simulated DC motor mechanism.
    */
   public AngularAcceleration getAngularAcceleration() {
     return m_angularAcceleration;
   }
 
   /**
-   * Returns the DC motor's current draw in Amps.
+   * Returns the current draw of the simulated DC motor mechanism.
    *
-   * @return The DC motor's current draw in Amps.
+   * @return The current draw of the simulated DC motor mechanism in amps.
    */
   public double getCurrentDrawAmps() {
     return m_currentDraw.in(Amps);
   }
 
   /**
-   * Returns the DC motor's current draw.
+   * Returns the current draw of the simulated DC motor mechanism.
    *
-   * @return The DC motor's current draw.
+   * @return The current draw of the simulated DC motor mechanism.
    */
   public Current getCurrentDraw() {
     return m_currentDraw;
   }
 
   /**
-   * Returns the DC motor's torque in Newton-Meters.
+   * Returns the torque of the simulated DC motor mechanism.
    *
-   * @return The DC motor's torque in Newton-Meters.
+   * @return The torque of the simulated DC motor mechanism in newton-meters.
    */
   public double getTorqueNewtonMeters() {
     return m_torque.in(NewtonMeters);
   }
 
   /**
-   * Returns the DC motor's torque.
+   * Returns the torque of the simulated DC motor mechanism.
    *
-   * @return The DC motor's torque.
+   * @return The torque of the simulated DC motor mechanism.
    */
   public Torque getTorque() {
     return m_torque;
   }
 
   /**
-   * Returns the voltage of the DC motor in volts.
+   * Returns the voltage of the simulated DC motor mechanism.
    *
-   * @return The DC motor's voltage in volts.
+   * @return The voltage of the simulated DC motor mechanism in volts.
    */
-  public double getVoltageVolts() {
+  public double getVolts() {
     return m_voltage.in(Volts);
   }
 
   /**
-   * Returns the voltage of the DC motor.
+   * Returns the voltage of the simulated DC motor mechanism.
    *
-   * @return The DC motor's voltage.
+   * @return The voltage of the simulated DC motor mechanism.
    */
   public Voltage getVoltage() {
     return m_voltage;
