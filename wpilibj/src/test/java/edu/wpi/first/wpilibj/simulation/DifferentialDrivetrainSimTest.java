@@ -39,10 +39,7 @@ class DifferentialDrivetrainSimTest {
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
     var sim =
         new DifferentialDrivetrainSim(
-            plant,
-            wheel,
-            Units.inchesToMeters(12),
-            VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
+            plant, wheel, Units.inchesToMeters(12), 0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005);
 
     var feedforward = new LinearPlantInversionFeedforward<>(plant, 0.020);
     var feedback = new LTVUnicycleController(0.020);
@@ -98,7 +95,7 @@ class DifferentialDrivetrainSimTest {
     var wheel = new Wheel(new Gearbox(2, DCMotor.NEO), Units.inchesToMeters(2));
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(wheel, 50, Units.inchesToMeters(12), 0.5);
-    var sim = new DifferentialDrivetrainSim(plant, wheel, Units.inchesToMeters(12), null);
+    var sim = new DifferentialDrivetrainSim(plant, wheel, Units.inchesToMeters(12));
 
     sim.setInputVoltages(-12, -12);
     for (int i = 0; i < 10; i++) {
@@ -124,7 +121,7 @@ class DifferentialDrivetrainSimTest {
     var wheel = new Wheel(new Gearbox(2, DCMotor.NEO, 5.0), Units.inchesToMeters(2));
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(wheel, 50, Units.inchesToMeters(12), 2.0);
-    var sim = new DifferentialDrivetrainSim(plant, wheel, Units.inchesToMeters(12), null);
+    var sim = new DifferentialDrivetrainSim(plant, wheel, Units.inchesToMeters(12));
 
     sim.setInputVoltages(2, 4);
 

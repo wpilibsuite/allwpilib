@@ -64,8 +64,7 @@ class UltrasonicPIDTest {
                 kvVoltSecondsPerRadian,
                 kaVoltSecondsSquaredPerRadian),
             new Wheel(new Gearbox(2, DCMotor.Falcon500, kGearing), kWheelDiameterMeters / 2.0),
-            kTrackwidthMeters,
-            null);
+            kTrackwidthMeters);
     m_ultrasonicSim = new UltrasonicSim(Robot.kUltrasonicPingPort, Robot.kUltrasonicEchoPort);
     m_leftMotorSim = new PWMSim(Robot.kLeftMotorPort);
     m_rightMotorSim = new PWMSim(Robot.kRightMotorPort);

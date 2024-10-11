@@ -35,6 +35,7 @@ import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutTorque;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
+import org.ejml.MatrixDimensionException;
 
 /** This class simulates the state of the drivetrain. */
 public class DifferentialDrivetrainSimBase {
@@ -112,12 +113,13 @@ public class DifferentialDrivetrainSimBase {
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point. If present must have 7 elements matching the aforementioned measurements.
+   * @throws MatrixDimensionException if measurementStdDev.length &ne; 0 and numMotors &ne; 70.
    */
   public DifferentialDrivetrainSimBase(
       LinearSystem<N2, N2, N2> plant,
       Wheel driveWheel,
       double trackWidthMeters,
-      Matrix<N7, N1> measurementStdDevs) {
+      double... measurementStdDevs) {
     m_x = new Matrix<>(Nat.N7(), Nat.N1());
     m_u = VecBuilder.fill(0, 0);
     m_y = new Matrix<>(Nat.N7(), Nat.N1());
@@ -126,7 +128,25 @@ public class DifferentialDrivetrainSimBase {
     m_originalGearing = driveWheel.gearbox.reduction;
     m_currentGearing = m_originalGearing;
     m_rb = trackWidthMeters / 2.0;
-    m_measurementStdDevs = measurementStdDevs;
+    if (measurementStdDevs.length != 0 && measurementStdDevs.length != 7) {
+      throw new MatrixDimensionException(
+          "Malformed measurementStdDevs! Got "
+              + measurementStdDevs.length
+              + " elements instead of "
+              + 7);
+    } else if (measurementStdDevs.length == 0) {
+      m_measurementStdDevs = null;
+    } else {
+      m_measurementStdDevs =
+          VecBuilder.fill(
+              measurementStdDevs[0],
+              measurementStdDevs[1],
+              measurementStdDevs[2],
+              measurementStdDevs[3],
+              measurementStdDevs[4],
+              measurementStdDevs[5],
+              measurementStdDevs[6]);
+    }
   }
 
   /**
@@ -538,7 +558,7 @@ public class DifferentialDrivetrainSimBase {
       KitbotGearbox motor,
       KitbotGearing gearing,
       KitbotWheelSize wheelSize,
-      Matrix<N7, N1> measurementStdDevs) {
+      double... measurementStdDevs) {
     // MOI estimation -- note that I = mr² for point masses
     var batteryMoi = 12.5 / 2.2 * Math.pow(Units.inchesToMeters(10), 2);
     var gearboxMoi =
@@ -568,7 +588,7 @@ public class DifferentialDrivetrainSimBase {
       KitbotGearing gearing,
       KitbotWheelSize wheelSize,
       double jKgMetersSquared,
-      Matrix<N7, N1> measurementStdDevs) {
+      double... measurementStdDevs) {
     Wheel driveWheel = new Wheel(gearbox.value.withReduction(gearing.value), wheelSize.value / 2);
     LinearSystem<N2, N2, N2> plant =
         LinearSystemId.createDrivetrainVelocitySystem(

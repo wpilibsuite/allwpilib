@@ -7,11 +7,8 @@ package edu.wpi.first.wpilibj.simulation;
 import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.StateSpaceUtil;
-import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.units.measure.Voltage;
@@ -47,17 +44,17 @@ public class DifferentialDrivetrainSim extends DifferentialDrivetrainSimBase {
    * @param driveWheel A {@link Wheel} representing one of the drivetrain's wheels.
    * @param trackWidthMeters The distance between the two sides of the drivetrain. Can be found with
    *     SysId.
-   * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
-   *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
-   *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
-   *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
-   *     point.
+   * @param measurementStdDevs The standard deviations of the measurements, in the form [x, y,
+   *     heading, left velocity, right velocity, left distance, right distance]ᵀ. Can be omitted if
+   *     no noise is desired. Gyro standard deviations of 0.0001 radians, velocity standard
+   *     deviations of 0.05 m/s, and position measurement standard deviations of 0.005 meters are a
+   *     reasonable starting point. * If present must have 7 elements.
    */
   public DifferentialDrivetrainSim(
       LinearSystem<N2, N2, N2> plant,
       Wheel driveWheel,
       double trackWidthMeters,
-      Matrix<N7, N1> measurementStdDevs) {
+      double... measurementStdDevs) {
     super(plant, driveWheel, trackWidthMeters, measurementStdDevs);
   }
 

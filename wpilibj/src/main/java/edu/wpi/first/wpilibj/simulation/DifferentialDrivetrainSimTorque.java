@@ -7,10 +7,7 @@ package edu.wpi.first.wpilibj.simulation;
 import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.units.measure.Torque;
@@ -55,7 +52,7 @@ public class DifferentialDrivetrainSimTorque extends DifferentialDrivetrainSimBa
       LinearSystem<N2, N2, N2> plant,
       Wheel driveWheel,
       double trackWidthMeters,
-      Matrix<N7, N1> measurementStdDevs) {
+      double... measurementStdDevs) {
     super(plant, driveWheel, trackWidthMeters, measurementStdDevs);
   }
 
