@@ -1,10 +1,10 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:01:25 -0400
-Subject: [PATCH 2/9] Fix missing casts
+Subject: [PATCH 02/10] Fix missing casts
 
 ---
- src/fs-poll.c                  | 10 +++----
+ src/fs-poll.c                  | 10 ++++----
  src/idna.c                     |  2 +-
  src/inet.c                     | 11 ++++----
  src/strscpy.c                  |  2 +-
@@ -15,22 +15,22 @@ Subject: [PATCH 2/9] Fix missing casts
  src/unix/darwin-proctitle.c    |  5 ++--
  src/unix/darwin.c              |  2 +-
  src/unix/freebsd.c             |  4 +--
- src/unix/fs.c                  | 22 ++++++++--------
- src/unix/fsevents.c            | 34 ++++++++++++------------
+ src/unix/fs.c                  | 20 +++++++--------
+ src/unix/fsevents.c            | 34 ++++++++++++-------------
  src/unix/getaddrinfo.c         |  8 +++---
  src/unix/ibmi.c                |  2 +-
  src/unix/kqueue.c              |  6 ++---
- src/unix/linux.c               | 48 +++++++++++++++++-----------------
+ src/unix/linux.c               | 46 +++++++++++++++++-----------------
  src/unix/loop.c                |  2 +-
  src/unix/netbsd.c              |  4 +--
  src/unix/openbsd.c             |  4 +--
- src/unix/pipe.c                |  8 +++---
+ src/unix/pipe.c                |  6 ++---
  src/unix/poll.c                |  4 +--
  src/unix/posix-poll.c          |  2 +-
  src/unix/process.c             |  4 +--
  src/unix/proctitle.c           |  2 +-
  src/unix/random-sysctl-linux.c |  2 +-
- src/unix/stream.c              | 33 +++++++++++------------
+ src/unix/stream.c              | 31 ++++++++++++-----------
  src/unix/tcp.c                 |  2 +-
  src/unix/thread.c              |  5 ++--
  src/unix/udp.c                 |  8 +++---
@@ -39,15 +39,15 @@ Subject: [PATCH 2/9] Fix missing casts
  src/win/dl.c                   |  2 +-
  src/win/fs-event.c             |  4 +--
  src/win/fs-fd-hash-inl.h       |  2 +-
- src/win/fs.c                   | 38 +++++++++++++--------------
- src/win/getaddrinfo.c          | 10 +++----
+ src/win/fs.c                   | 38 ++++++++++++++--------------
+ src/win/getaddrinfo.c          | 12 ++++-----
  src/win/pipe.c                 | 12 ++++-----
- src/win/process.c              | 20 +++++++-------
+ src/win/process.c              | 22 ++++++++--------
  src/win/tcp.c                  |  2 +-
- src/win/thread.c               |  6 ++---
+ src/win/thread.c               |  4 +--
  src/win/tty.c                  |  6 ++---
- src/win/util.c                 | 35 +++++++++++++------------
- 43 files changed, 213 insertions(+), 208 deletions(-)
+ src/win/util.c                 | 35 +++++++++++++-------------
+ 43 files changed, 210 insertions(+), 205 deletions(-)
 
 diff --git a/src/fs-poll.c b/src/fs-poll.c
 index 1bac1c568e36cadd0b68451926c6f045f88342d2..5a39daed095502b2db34f23fcaf0ab04f31f96ff 100644
@@ -177,7 +177,7 @@ index c67c0a7dd7279af6c67b7d5d4a623c47bdf3fff2..c0e39b543df229dd8cb8492bb695e61e
      return UV_ENOMEM;
  #endif
 diff --git a/src/threadpool.c b/src/threadpool.c
-index 45af50dcd04ea6ab1d0cfd7ed48ced3aac9c562a..ccb5249893df2733fc607fec6e8d3037ebe2e212 100644
+index dbef67f2f10f1df498f228c21eba2a71ceceee29..f572de5aaf1a1b150e58c7b989949441cac279c4 100644
 --- a/src/threadpool.c
 +++ b/src/threadpool.c
 @@ -207,7 +207,7 @@ static void init_threads(void) {
@@ -203,10 +203,10 @@ index 11ca95591fc38244e931fecd9dd4038d3968af7a..c3dd71a1889bfae08cfdf95acda61e6c
    if (*addresses == NULL) {
      freeifaddrs(addrs);
 diff --git a/src/unix/core.c b/src/unix/core.c
-index 1935ba87381db2616326188eed075dfee9bf70e9..d8c09f5e41ff96dae4d0df9982f227eaac3c8576 100644
+index 965e7f775250cf9899266bc3aaf62eda69367264..8c08d607884335a2da5cb49f35e3108cb833da32 100644
 --- a/src/unix/core.c
 +++ b/src/unix/core.c
-@@ -866,7 +866,7 @@ static unsigned int next_power_of_two(unsigned int val) {
+@@ -856,7 +856,7 @@ static unsigned int next_power_of_two(unsigned int val) {
  }
  
  static void maybe_resize(uv_loop_t* loop, unsigned int len) {
@@ -215,7 +215,7 @@ index 1935ba87381db2616326188eed075dfee9bf70e9..d8c09f5e41ff96dae4d0df9982f227ea
    void* fake_watcher_list;
    void* fake_watcher_count;
    unsigned int nwatchers;
-@@ -885,8 +885,8 @@ static void maybe_resize(uv_loop_t* loop, unsigned int len) {
+@@ -875,8 +875,8 @@ static void maybe_resize(uv_loop_t* loop, unsigned int len) {
    }
  
    nwatchers = next_power_of_two(len + 2) - 2;
@@ -226,7 +226,7 @@ index 1935ba87381db2616326188eed075dfee9bf70e9..d8c09f5e41ff96dae4d0df9982f227ea
  
    if (watchers == NULL)
      abort();
-@@ -895,7 +895,7 @@ static void maybe_resize(uv_loop_t* loop, unsigned int len) {
+@@ -885,7 +885,7 @@ static void maybe_resize(uv_loop_t* loop, unsigned int len) {
    watchers[nwatchers] = fake_watcher_list;
    watchers[nwatchers + 1] = fake_watcher_count;
  
@@ -235,7 +235,7 @@ index 1935ba87381db2616326188eed075dfee9bf70e9..d8c09f5e41ff96dae4d0df9982f227ea
    loop->nwatchers = nwatchers;
  }
  
-@@ -1227,7 +1227,7 @@ static int uv__getpwuid_r(uv_passwd_t *pwd, uid_t uid) {
+@@ -1217,7 +1217,7 @@ static int uv__getpwuid_r(uv_passwd_t *pwd, uid_t uid) {
     * is frequently 1024 or 4096, so we can just use that directly. The pwent
     * will not usually be large. */
    for (bufsize = 2000;; bufsize *= 2) {
@@ -244,7 +244,7 @@ index 1935ba87381db2616326188eed075dfee9bf70e9..d8c09f5e41ff96dae4d0df9982f227ea
  
      if (buf == NULL)
        return UV_ENOMEM;
-@@ -1253,7 +1253,7 @@ static int uv__getpwuid_r(uv_passwd_t *pwd, uid_t uid) {
+@@ -1243,7 +1243,7 @@ static int uv__getpwuid_r(uv_passwd_t *pwd, uid_t uid) {
    name_size = strlen(pw.pw_name) + 1;
    homedir_size = strlen(pw.pw_dir) + 1;
    shell_size = strlen(pw.pw_shell) + 1;
@@ -253,7 +253,7 @@ index 1935ba87381db2616326188eed075dfee9bf70e9..d8c09f5e41ff96dae4d0df9982f227ea
  
    if (pwd->username == NULL) {
      uv__free(buf);
-@@ -1303,7 +1303,7 @@ int uv_os_get_group(uv_group_t* grp, uv_uid_t gid) {
+@@ -1293,7 +1293,7 @@ int uv_os_get_group(uv_group_t* grp, uv_uid_t gid) {
     * is frequently 1024 or 4096, so we can just use that directly. The pwent
     * will not usually be large. */
    for (bufsize = 2000;; bufsize *= 2) {
@@ -262,7 +262,7 @@ index 1935ba87381db2616326188eed075dfee9bf70e9..d8c09f5e41ff96dae4d0df9982f227ea
  
      if (buf == NULL)
        return UV_ENOMEM;
-@@ -1334,7 +1334,7 @@ int uv_os_get_group(uv_group_t* grp, uv_uid_t gid) {
+@@ -1324,7 +1324,7 @@ int uv_os_get_group(uv_group_t* grp, uv_uid_t gid) {
      members++;
    }
  
@@ -271,7 +271,7 @@ index 1935ba87381db2616326188eed075dfee9bf70e9..d8c09f5e41ff96dae4d0df9982f227ea
    if (gr_mem == NULL) {
      uv__free(buf);
      return UV_ENOMEM;
-@@ -1391,7 +1391,7 @@ int uv_os_environ(uv_env_item_t** envitems, int* count) {
+@@ -1381,7 +1381,7 @@ int uv_os_environ(uv_env_item_t** envitems, int* count) {
  
    for (i = 0; environ[i] != NULL; i++);
  
@@ -297,10 +297,10 @@ index 5288083ef04fd78d90c34071cc76281adbc310d8..9bd55dd764b845cf8ea441d525b4e136
    if (display_name_key == NULL || *display_name_key == NULL)
      goto out;
 diff --git a/src/unix/darwin.c b/src/unix/darwin.c
-index 009efbefaa70ee1e552cf6177893bd412201e276..b1657a2ffdab4e41c7900d6dda92f23bd8d137c2 100644
+index 5e764a65ee4c71efd61876c70b0e999420f24f61..dc93d236b6b7c6da62dc7aa66cb42ddc125575a2 100644
 --- a/src/unix/darwin.c
 +++ b/src/unix/darwin.c
-@@ -211,7 +211,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
+@@ -217,7 +217,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
      return UV_EINVAL;  /* FIXME(bnoordhuis) Translate error. */
    }
  
@@ -310,10 +310,10 @@ index 009efbefaa70ee1e552cf6177893bd412201e276..b1657a2ffdab4e41c7900d6dda92f23b
      vm_deallocate(mach_task_self(), (vm_address_t)info, msg_type);
      return UV_ENOMEM;
 diff --git a/src/unix/freebsd.c b/src/unix/freebsd.c
-index a6de29c558cde45dacc5bba7d75950fe6e57e857..8fb03c7803cd6d8e3c65558bee0be21f7ad07a3c 100644
+index 191bc8bc213ffddb15c5e04baa66e2a0a8d69a3d..1bd63886b823be6451ac013d94e29885795375b7 100644
 --- a/src/unix/freebsd.c
 +++ b/src/unix/freebsd.c
-@@ -225,7 +225,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
+@@ -220,7 +220,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
    if (sysctlbyname("hw.ncpu", &numcpus, &size, NULL, 0))
      return UV__ERR(errno);
  
@@ -322,7 +322,7 @@ index a6de29c558cde45dacc5bba7d75950fe6e57e857..8fb03c7803cd6d8e3c65558bee0be21f
    if (!(*cpu_infos))
      return UV_ENOMEM;
  
-@@ -242,7 +242,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
+@@ -237,7 +237,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
  
    size = maxcpus * CPUSTATES * sizeof(long);
  
@@ -332,10 +332,10 @@ index a6de29c558cde45dacc5bba7d75950fe6e57e857..8fb03c7803cd6d8e3c65558bee0be21f
      uv__free(*cpu_infos);
      return UV_ENOMEM;
 diff --git a/src/unix/fs.c b/src/unix/fs.c
-index 6d810debf5d469ec3d67420062eeb9b6810137dd..77f3a17ad3d102f0aa2860eaf88602fe9555bc4e 100644
+index 3a74350f0e5ab6b268b9fb72eda2a4da909f3f5d..22f31f7285c995c981aca0fa5125bc70aeedc151 100644
 --- a/src/unix/fs.c
 +++ b/src/unix/fs.c
-@@ -126,7 +126,7 @@ extern char *mkdtemp(char *template); /* See issue #740 on AIX < 7 */
+@@ -136,7 +136,7 @@ extern char *mkdtemp(char *template); /* See issue #740 on AIX < 7 */
        size_t new_path_len;                                                    \
        path_len = strlen(path) + 1;                                            \
        new_path_len = strlen(new_path) + 1;                                    \
@@ -344,16 +344,7 @@ index 6d810debf5d469ec3d67420062eeb9b6810137dd..77f3a17ad3d102f0aa2860eaf88602fe
        if (req->path == NULL)                                                  \
          return UV_ENOMEM;                                                     \
        req->new_path = req->path + path_len;                                   \
-@@ -478,7 +478,7 @@ static ssize_t uv__preadv_or_pwritev(int fd,
-     dlerror();  /* Clear errors. */
- #endif  /* RTLD_DEFAULT */
-     if (p == NULL)
--      p = is_pread ? uv__preadv_emul : uv__pwritev_emul;
-+      p = (void*)(is_pread ? uv__preadv_emul : uv__pwritev_emul);
-     atomic_store_explicit(cache, (uintptr_t) p, memory_order_relaxed);
-   }
- 
-@@ -600,7 +600,7 @@ static ssize_t uv__fs_scandir(uv_fs_t* req) {
+@@ -498,7 +498,7 @@ static ssize_t uv__fs_scandir(uv_fs_t* req) {
  static int uv__fs_opendir(uv_fs_t* req) {
    uv_dir_t* dir;
  
@@ -362,7 +353,7 @@ index 6d810debf5d469ec3d67420062eeb9b6810137dd..77f3a17ad3d102f0aa2860eaf88602fe
    if (dir == NULL)
      goto error;
  
-@@ -624,7 +624,7 @@ static int uv__fs_readdir(uv_fs_t* req) {
+@@ -522,7 +522,7 @@ static int uv__fs_readdir(uv_fs_t* req) {
    unsigned int dirent_idx;
    unsigned int i;
  
@@ -371,7 +362,7 @@ index 6d810debf5d469ec3d67420062eeb9b6810137dd..77f3a17ad3d102f0aa2860eaf88602fe
    dirent_idx = 0;
  
    while (dirent_idx < dir->nentries) {
-@@ -666,7 +666,7 @@ error:
+@@ -564,7 +564,7 @@ error:
  static int uv__fs_closedir(uv_fs_t* req) {
    uv_dir_t* dir;
  
@@ -380,7 +371,7 @@ index 6d810debf5d469ec3d67420062eeb9b6810137dd..77f3a17ad3d102f0aa2860eaf88602fe
  
    if (dir->dir != NULL) {
      closedir(dir->dir);
-@@ -695,7 +695,7 @@ static int uv__fs_statfs(uv_fs_t* req) {
+@@ -593,7 +593,7 @@ static int uv__fs_statfs(uv_fs_t* req) {
  #endif /* defined(__sun) */
      return -1;
  
@@ -389,7 +380,7 @@ index 6d810debf5d469ec3d67420062eeb9b6810137dd..77f3a17ad3d102f0aa2860eaf88602fe
    if (stat_fs == NULL) {
      errno = ENOMEM;
      return -1;
-@@ -759,7 +759,7 @@ static ssize_t uv__fs_readlink(uv_fs_t* req) {
+@@ -657,7 +657,7 @@ static ssize_t uv__fs_readlink(uv_fs_t* req) {
      maxlen = uv__fs_pathmax_size(req->path);
  #endif
  
@@ -398,7 +389,7 @@ index 6d810debf5d469ec3d67420062eeb9b6810137dd..77f3a17ad3d102f0aa2860eaf88602fe
  
    if (buf == NULL) {
      errno = ENOMEM;
-@@ -779,7 +779,7 @@ static ssize_t uv__fs_readlink(uv_fs_t* req) {
+@@ -677,7 +677,7 @@ static ssize_t uv__fs_readlink(uv_fs_t* req) {
  
    /* Uncommon case: resize to make room for the trailing nul byte. */
    if (len == maxlen) {
@@ -407,8 +398,8 @@ index 6d810debf5d469ec3d67420062eeb9b6810137dd..77f3a17ad3d102f0aa2860eaf88602fe
  
      if (buf == NULL)
        return -1;
-@@ -811,7 +811,7 @@ static ssize_t uv__fs_realpath(uv_fs_t* req) {
-   (void)tmp;
+@@ -700,7 +700,7 @@ static ssize_t uv__fs_realpath(uv_fs_t* req) {
+   ssize_t len;
  
    len = uv__fs_pathmax_size(req->path);
 -  buf = uv__malloc(len + 1);
@@ -416,7 +407,7 @@ index 6d810debf5d469ec3d67420062eeb9b6810137dd..77f3a17ad3d102f0aa2860eaf88602fe
  
    if (buf == NULL) {
      errno = ENOMEM;
-@@ -2042,7 +2042,7 @@ int uv_fs_read(uv_loop_t* loop, uv_fs_t* req,
+@@ -1898,7 +1898,7 @@ int uv_fs_read(uv_loop_t* loop, uv_fs_t* req,
  
    req->bufs = req->bufsml;
    if (nbufs > ARRAY_SIZE(req->bufsml))
@@ -425,7 +416,7 @@ index 6d810debf5d469ec3d67420062eeb9b6810137dd..77f3a17ad3d102f0aa2860eaf88602fe
  
    if (req->bufs == NULL)
      return UV_ENOMEM;
-@@ -2227,7 +2227,7 @@ int uv_fs_write(uv_loop_t* loop,
+@@ -2083,7 +2083,7 @@ int uv_fs_write(uv_loop_t* loop,
    req->nbufs = nbufs;
    req->bufs = req->bufsml;
    if (nbufs > ARRAY_SIZE(req->bufsml))
@@ -435,7 +426,7 @@ index 6d810debf5d469ec3d67420062eeb9b6810137dd..77f3a17ad3d102f0aa2860eaf88602fe
    if (req->bufs == NULL)
      return UV_ENOMEM;
 diff --git a/src/unix/fsevents.c b/src/unix/fsevents.c
-index 7fb6bb2ec36ae0b1584a43a2fc0101db54c42f97..0d1c9ebad6f490f3f890d81a66496ff31417e213 100644
+index df703f3635fc95bab21debc9697dba06a2a44827..c31d08ba37cfd10672ab6a7a8fd38a1c79b952fe 100644
 --- a/src/unix/fsevents.c
 +++ b/src/unix/fsevents.c
 @@ -183,7 +183,7 @@ static void (*pFSEventStreamStop)(FSEventStreamRef);
@@ -461,7 +452,7 @@ index 7fb6bb2ec36ae0b1584a43a2fc0101db54c42f97..0d1c9ebad6f490f3f890d81a66496ff3
  
    /* For each handle */
    uv_mutex_lock(&state->fsevent_mutex);
-@@ -300,7 +300,7 @@ static void uv__fsevents_event_cb(const FSEventStreamRef streamRef,
+@@ -304,7 +304,7 @@ static void uv__fsevents_event_cb(const FSEventStreamRef streamRef,
            continue;
        }
  
@@ -470,7 +461,7 @@ index 7fb6bb2ec36ae0b1584a43a2fc0101db54c42f97..0d1c9ebad6f490f3f890d81a66496ff3
        if (event == NULL)
          break;
  
-@@ -434,7 +434,7 @@ static void uv__fsevents_reschedule(uv__cf_loop_state_t* state,
+@@ -438,7 +438,7 @@ static void uv__fsevents_reschedule(uv__cf_loop_state_t* state,
    uv_mutex_lock(&state->fsevent_mutex);
    path_count = state->fsevent_handle_count;
    if (path_count != 0) {
@@ -479,7 +470,7 @@ index 7fb6bb2ec36ae0b1584a43a2fc0101db54c42f97..0d1c9ebad6f490f3f890d81a66496ff3
      if (paths == NULL) {
        uv_mutex_unlock(&state->fsevent_mutex);
        goto final;
-@@ -590,7 +590,7 @@ static int uv__fsevents_loop_init(uv_loop_t* loop) {
+@@ -594,7 +594,7 @@ static int uv__fsevents_loop_init(uv_loop_t* loop) {
    if (err)
      return err;
  
@@ -488,7 +479,7 @@ index 7fb6bb2ec36ae0b1584a43a2fc0101db54c42f97..0d1c9ebad6f490f3f890d81a66496ff3
    if (state == NULL)
      return UV_ENOMEM;
  
-@@ -692,7 +692,7 @@ void uv__fsevents_loop_delete(uv_loop_t* loop) {
+@@ -696,7 +696,7 @@ void uv__fsevents_loop_delete(uv_loop_t* loop) {
    }
  
    /* Destroy state */
@@ -497,7 +488,7 @@ index 7fb6bb2ec36ae0b1584a43a2fc0101db54c42f97..0d1c9ebad6f490f3f890d81a66496ff3
    uv_sem_destroy(&state->fsevent_sem);
    uv_mutex_destroy(&state->fsevent_mutex);
    pCFRelease(state->signal_source);
-@@ -706,8 +706,8 @@ static void* uv__cf_loop_runner(void* arg) {
+@@ -710,8 +710,8 @@ static void* uv__cf_loop_runner(void* arg) {
    uv_loop_t* loop;
    uv__cf_loop_state_t* state;
  
@@ -508,7 +499,7 @@ index 7fb6bb2ec36ae0b1584a43a2fc0101db54c42f97..0d1c9ebad6f490f3f890d81a66496ff3
    state->loop = pCFRunLoopGetCurrent();
  
    pCFRunLoopAddSource(state->loop,
-@@ -735,8 +735,8 @@ static void uv__cf_loop_cb(void* arg) {
+@@ -739,8 +739,8 @@ static void uv__cf_loop_cb(void* arg) {
    struct uv__queue split_head;
    uv__cf_loop_signal_t* s;
  
@@ -519,7 +510,7 @@ index 7fb6bb2ec36ae0b1584a43a2fc0101db54c42f97..0d1c9ebad6f490f3f890d81a66496ff3
  
    uv_mutex_lock(&loop->cf_mutex);
    uv__queue_move(&loop->cf_signals, &split_head);
-@@ -766,7 +766,7 @@ int uv__cf_loop_signal(uv_loop_t* loop,
+@@ -770,7 +770,7 @@ int uv__cf_loop_signal(uv_loop_t* loop,
    uv__cf_loop_signal_t* item;
    uv__cf_loop_state_t* state;
  
@@ -528,7 +519,7 @@ index 7fb6bb2ec36ae0b1584a43a2fc0101db54c42f97..0d1c9ebad6f490f3f890d81a66496ff3
    if (item == NULL)
      return UV_ENOMEM;
  
-@@ -776,7 +776,7 @@ int uv__cf_loop_signal(uv_loop_t* loop,
+@@ -780,7 +780,7 @@ int uv__cf_loop_signal(uv_loop_t* loop,
    uv_mutex_lock(&loop->cf_mutex);
    uv__queue_insert_tail(&loop->cf_signals, &item->member);
  
@@ -537,7 +528,7 @@ index 7fb6bb2ec36ae0b1584a43a2fc0101db54c42f97..0d1c9ebad6f490f3f890d81a66496ff3
    assert(state != NULL);
    pCFRunLoopSourceSignal(state->signal_source);
    pCFRunLoopWakeUp(state->loop);
-@@ -815,7 +815,7 @@ int uv__fsevents_init(uv_fs_event_t* handle) {
+@@ -814,7 +814,7 @@ int uv__fsevents_init(uv_fs_event_t* handle) {
     * Events will occur in other thread.
     * Initialize callback for getting them back into event loop's thread
     */
@@ -546,7 +537,7 @@ index 7fb6bb2ec36ae0b1584a43a2fc0101db54c42f97..0d1c9ebad6f490f3f890d81a66496ff3
    if (handle->cf_cb == NULL) {
      err = UV_ENOMEM;
      goto fail_cf_cb_malloc;
-@@ -831,7 +831,7 @@ int uv__fsevents_init(uv_fs_event_t* handle) {
+@@ -830,7 +830,7 @@ int uv__fsevents_init(uv_fs_event_t* handle) {
      goto fail_cf_mutex_init;
  
    /* Insert handle into the list */
@@ -555,7 +546,7 @@ index 7fb6bb2ec36ae0b1584a43a2fc0101db54c42f97..0d1c9ebad6f490f3f890d81a66496ff3
    uv_mutex_lock(&state->fsevent_mutex);
    uv__queue_insert_tail(&state->fsevent_handles, &handle->cf_member);
    state->fsevent_handle_count++;
-@@ -871,7 +871,7 @@ int uv__fsevents_close(uv_fs_event_t* handle) {
+@@ -870,7 +870,7 @@ int uv__fsevents_close(uv_fs_event_t* handle) {
      return UV_EINVAL;
  
    /* Remove handle from  the list */
@@ -565,7 +556,7 @@ index 7fb6bb2ec36ae0b1584a43a2fc0101db54c42f97..0d1c9ebad6f490f3f890d81a66496ff3
    uv__queue_remove(&handle->cf_member);
    state->fsevent_handle_count--;
 diff --git a/src/unix/getaddrinfo.c b/src/unix/getaddrinfo.c
-index b70753436665901c5fc8a4126b9537d01a47ffa0..5a205d0ebd89009472d6062f5173aac1be2f8a87 100644
+index 77337ace9454e032a392c97cb9aa311f15518956..41dc3909969a643e129847ae3a3252d51feadb27 100644
 --- a/src/unix/getaddrinfo.c
 +++ b/src/unix/getaddrinfo.c
 @@ -172,7 +172,7 @@ int uv_getaddrinfo(uv_loop_t* loop,
@@ -612,10 +603,10 @@ index 837bba6e2fef7b834a8d104d263bef47eaed0950..5e0fa98d104428534e5264a1c6358e3f
      return UV_ENOMEM;
    }
 diff --git a/src/unix/kqueue.c b/src/unix/kqueue.c
-index 876b717086c6098dda97461ccc50292065d8137d..2dd3b2156f363c73e4ba3ebc7e52367c85f654a8 100644
+index 4d09edc06a0972a32ef66a91100404d95e006e60..c307e6631eefb1effb0e0c304eb400e0cb8d984e 100644
 --- a/src/unix/kqueue.c
 +++ b/src/unix/kqueue.c
-@@ -336,8 +336,8 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
+@@ -303,8 +303,8 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
      nevents = 0;
  
      assert(loop->watchers != NULL);
@@ -626,7 +617,7 @@ index 876b717086c6098dda97461ccc50292065d8137d..2dd3b2156f363c73e4ba3ebc7e52367c
      for (i = 0; i < nfds; i++) {
        ev = events + i;
        fd = ev->ident;
-@@ -359,7 +359,7 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
+@@ -326,7 +326,7 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
        /* Skip invalidated events, see uv__platform_invalidate_fd */
        if (fd == -1)
          continue;
@@ -636,7 +627,7 @@ index 876b717086c6098dda97461ccc50292065d8137d..2dd3b2156f363c73e4ba3ebc7e52367c
        if (w == NULL) {
          /* File descriptor that we've stopped watching, disarm it. */
 diff --git a/src/unix/linux.c b/src/unix/linux.c
-index a5f74e8901600412267ce25bc4e739da482423d0..96c8b1dfe060e896f768493448ec20cfb9203592 100644
+index 4164e90dbb0a39457d565a35be2d7890f66a7d71..09b02cd5df6c32a954cbed817111cf3c1874c3db 100644
 --- a/src/unix/linux.c
 +++ b/src/unix/linux.c
 @@ -514,8 +514,8 @@ static void uv__iou_init(int epollfd,
@@ -667,7 +658,7 @@ index a5f74e8901600412267ce25bc4e739da482423d0..96c8b1dfe060e896f768493448ec20cf
               sqelen,
               PROT_READ | PROT_WRITE,
               MAP_SHARED | MAP_POPULATE,
-@@ -700,7 +700,7 @@ void uv__platform_invalidate_fd(uv_loop_t* loop, int fd) {
+@@ -701,7 +701,7 @@ void uv__platform_invalidate_fd(uv_loop_t* loop, int fd) {
    int i;
  
    lfields = uv__get_internal_fields(loop);
@@ -676,7 +667,7 @@ index a5f74e8901600412267ce25bc4e739da482423d0..96c8b1dfe060e896f768493448ec20cf
  
    /* Invalidate events with same file descriptor */
    if (inv != NULL)
-@@ -786,7 +786,7 @@ static struct uv__io_uring_sqe* uv__iou_get_sqe(struct uv__iou* iou,
+@@ -776,7 +776,7 @@ static struct uv__io_uring_sqe* uv__iou_get_sqe(struct uv__iou* iou,
      return NULL;  /* No room in ring buffer. TODO(bnoordhuis) maybe flush it? */
  
    slot = tail & mask;
@@ -685,7 +676,7 @@ index a5f74e8901600412267ce25bc4e739da482423d0..96c8b1dfe060e896f768493448ec20cf
    sqe = &sqe[slot];
    memset(sqe, 0, sizeof(*sqe));
    sqe->user_data = (uintptr_t) req;
-@@ -1063,7 +1063,7 @@ int uv__iou_fs_statx(uv_loop_t* loop,
+@@ -1053,7 +1053,7 @@ int uv__iou_fs_statx(uv_loop_t* loop,
    struct uv__statx* statxbuf;
    struct uv__iou* iou;
  
@@ -694,7 +685,7 @@ index a5f74e8901600412267ce25bc4e739da482423d0..96c8b1dfe060e896f768493448ec20cf
    if (statxbuf == NULL)
      return 0;
  
-@@ -1127,7 +1127,7 @@ static void uv__iou_fs_statx_post(uv_fs_t* req) {
+@@ -1117,7 +1117,7 @@ static void uv__iou_fs_statx_post(uv_fs_t* req) {
    uv_stat_t* buf;
  
    buf = &req->statbuf;
@@ -703,7 +694,7 @@ index a5f74e8901600412267ce25bc4e739da482423d0..96c8b1dfe060e896f768493448ec20cf
    req->ptr = NULL;
  
    if (req->result == 0) {
-@@ -1156,7 +1156,7 @@ static void uv__poll_io_uring(uv_loop_t* loop, struct uv__iou* iou) {
+@@ -1146,7 +1146,7 @@ static void uv__poll_io_uring(uv_loop_t* loop, struct uv__iou* iou) {
    tail = atomic_load_explicit((_Atomic uint32_t*) iou->cqtail,
                                memory_order_acquire);
    mask = iou->cqmask;
@@ -712,16 +703,16 @@ index a5f74e8901600412267ce25bc4e739da482423d0..96c8b1dfe060e896f768493448ec20cf
    nevents = 0;
  
    for (i = head; i != tail; i++) {
-@@ -1241,7 +1241,7 @@ static void uv__epoll_ctl_prep(int epollfd,
-   pe = &(*events)[slot];
-   *pe = *e;
+@@ -1243,7 +1243,7 @@ static void uv__epoll_ctl_prep(int epollfd,
+     pe = &(*events)[slot];
+     *pe = *e;
  
--  sqe = ctl->sqe;
-+  sqe = (uv__io_uring_sqe*)ctl->sqe;
-   sqe = &sqe[slot];
+-    sqe = ctl->sqe;
++    sqe = (uv__io_uring_sqe*)ctl->sqe;
+     sqe = &sqe[slot];
  
-   memset(sqe, 0, sizeof(*sqe));
-@@ -1296,7 +1296,7 @@ static void uv__epoll_ctl_flush(int epollfd,
+     memset(sqe, 0, sizeof(*sqe));
+@@ -1299,7 +1299,7 @@ static void uv__epoll_ctl_flush(int epollfd,
    while (*ctl->cqhead != *ctl->cqtail) {
      slot = (*ctl->cqhead)++ & ctl->cqmask;
  
@@ -802,16 +793,7 @@ index a5f74e8901600412267ce25bc4e739da482423d0..96c8b1dfe060e896f768493448ec20cf
    if (!(*addresses)) {
      freeifaddrs(addrs);
      return UV_ENOMEM;
-@@ -2321,7 +2321,7 @@ static int uv__get_cgroupv2_constrained_cpu(const char* cgroup,
- static char* uv__cgroup1_find_cpu_controller(const char* cgroup,
-                                              int* cgroup_size) {
-   /* Seek to the cpu controller line. */
--  char* cgroup_cpu = strstr(cgroup, ":cpu,");
-+  char* cgroup_cpu = (char*)strstr(cgroup, ":cpu,");
- 
-   if (cgroup_cpu != NULL) {
-     /* Skip the controller prefix to the start of the cgroup path. */
-@@ -2647,12 +2647,12 @@ int uv_fs_event_start(uv_fs_event_t* handle,
+@@ -2517,12 +2517,12 @@ int uv_fs_event_start(uv_fs_event_t* handle,
      goto no_insert;
  
    len = strlen(path) + 1;
@@ -827,7 +809,7 @@ index a5f74e8901600412267ce25bc4e739da482423d0..96c8b1dfe060e896f768493448ec20cf
    w->iterating = 0;
    RB_INSERT(watcher_root, uv__inotify_watchers(loop), w);
 diff --git a/src/unix/loop.c b/src/unix/loop.c
-index 179ee999d8052e779dc692aeb5b673d210aaa997..006db94d0080507bf3d52bf206bffbbc812cc375 100644
+index a9468e8e19cbede795032980c47eb83aee1e0c68..3babe4d701949ebc69d74f7dedee33c777d89892 100644
 --- a/src/unix/loop.c
 +++ b/src/unix/loop.c
 @@ -148,7 +148,7 @@ int uv_loop_fork(uv_loop_t* loop) {
@@ -883,10 +865,10 @@ index 9c863b6c90dad9864cb8341c2b6203c1390a9487..2aa61e2ee3321d91ba84887c7ed6dcfa
      return UV_ENOMEM;
  
 diff --git a/src/unix/pipe.c b/src/unix/pipe.c
-index 1f9acfac41e9c561cbd823c27863d9a3dc52f7b8..7627ee39c1be869d4d2bbf93dbae0bbd52a4464f 100644
+index fca364426f809e2085a3e6c4d984cfb88de548d3..ea26ce45c9b4c298528ab45cd4e8a21917f4be0e 100644
 --- a/src/unix/pipe.c
 +++ b/src/unix/pipe.c
-@@ -109,7 +109,7 @@ int uv_pipe_bind2(uv_pipe_t* handle,
+@@ -104,7 +104,7 @@ int uv_pipe_bind2(uv_pipe_t* handle,
    if (*name == '\0') {
      addrlen = offsetof(struct sockaddr_un, sun_path) + namelen;
    } else {
@@ -895,16 +877,7 @@ index 1f9acfac41e9c561cbd823c27863d9a3dc52f7b8..7627ee39c1be869d4d2bbf93dbae0bbd
      if (pipe_fname == NULL)
        return UV_ENOMEM;
      memcpy(pipe_fname, name, namelen);
-@@ -377,7 +377,7 @@ static int uv__pipe_getsockpeername(const uv_pipe_t* handle,
-     slop = 0;
-     addrlen -= offsetof(struct sockaddr_un, sun_path);
-   } else {
--    p = memchr(sa.sun_path, '\0', sizeof(sa.sun_path));
-+    p = (char*)memchr(sa.sun_path, '\0', sizeof(sa.sun_path));
-     if (p == NULL)
-       p = ARRAY_END(sa.sun_path);
-     addrlen = p - sa.sun_path;
-@@ -425,7 +425,7 @@ int uv_pipe_pending_count(uv_pipe_t* handle) {
+@@ -410,7 +410,7 @@ int uv_pipe_pending_count(uv_pipe_t* handle) {
    if (handle->queued_fds == NULL)
      return 1;
  
@@ -913,7 +886,7 @@ index 1f9acfac41e9c561cbd823c27863d9a3dc52f7b8..7627ee39c1be869d4d2bbf93dbae0bbd
    return queued_fds->offset + 1;
  }
  
-@@ -462,7 +462,7 @@ int uv_pipe_chmod(uv_pipe_t* handle, int mode) {
+@@ -447,7 +447,7 @@ int uv_pipe_chmod(uv_pipe_t* handle, int mode) {
    if (r != UV_ENOBUFS)
      return r;
  
@@ -958,10 +931,10 @@ index 2e016c2fbaed2eeccd78080969a86aff821a4251..b71eee3f01a3f30b3b5efef539194139
      abort();
  
 diff --git a/src/unix/process.c b/src/unix/process.c
-index f2038f2c0e823e1d5ebf3331b1d93c12fe23e83e..e1349689065b4593a929509a3daafa5a48916768 100644
+index 4812a90f2f5047fc18ddb9b6f70e3f380641ddde..8271d513b15588a3a73401cc2df3be160940ab10 100644
 --- a/src/unix/process.c
 +++ b/src/unix/process.c
-@@ -420,7 +420,7 @@ static int posix_spawn_can_use_setsid;
+@@ -423,7 +423,7 @@ static int posix_spawn_can_use_setsid;
  static void uv__spawn_init_posix_spawn_fncs(void) {
    /* Try to locate all non-portable functions at runtime */
    posix_spawn_fncs.file_actions.addchdir_np =
@@ -970,7 +943,7 @@ index f2038f2c0e823e1d5ebf3331b1d93c12fe23e83e..e1349689065b4593a929509a3daafa5a
  }
  
  
-@@ -986,7 +986,7 @@ int uv_spawn(uv_loop_t* loop,
+@@ -989,7 +989,7 @@ int uv_spawn(uv_loop_t* loop,
    err = UV_ENOMEM;
    pipes = pipes_storage;
    if (stdio_count > (int) ARRAY_SIZE(pipes_storage))
@@ -1006,7 +979,7 @@ index 66ba8d74ec22b72d318b91d82365f5b9693feb3c..9ef18df01a51aa6a26ae6d1d9660a819
  
    while (p < pe) {
 diff --git a/src/unix/stream.c b/src/unix/stream.c
-index 18763b4744c30a93f067a911b8059984bf36eb86..2d2b5d2f45e673d495ac814fbc1c6a877950ab9b 100644
+index 28c4d5463c4622725a433b8807e5e7bde580dadd..265ddade7aec129eb9dbf07cde2a16a0e341d1a7 100644
 --- a/src/unix/stream.c
 +++ b/src/unix/stream.c
 @@ -123,7 +123,7 @@ static void uv__stream_osx_interrupt_select(uv_stream_t* stream) {
@@ -1047,7 +1020,7 @@ index 18763b4744c30a93f067a911b8059984bf36eb86..2d2b5d2f45e673d495ac814fbc1c6a87
  
      /* Read first */
      server->accepted_fd = queued_fds->fds[0];
-@@ -943,11 +943,12 @@ static int uv__stream_queue_fd(uv_stream_t* stream, int fd) {
+@@ -942,11 +942,12 @@ static int uv__stream_queue_fd(uv_stream_t* stream, int fd) {
    uv__stream_queued_fds_t* queued_fds;
    unsigned int queue_size;
  
@@ -1063,7 +1036,7 @@ index 18763b4744c30a93f067a911b8059984bf36eb86..2d2b5d2f45e673d495ac814fbc1c6a87
      if (queued_fds == NULL)
        return UV_ENOMEM;
      queued_fds->size = queue_size;
-@@ -957,9 +958,9 @@ static int uv__stream_queue_fd(uv_stream_t* stream, int fd) {
+@@ -956,9 +957,9 @@ static int uv__stream_queue_fd(uv_stream_t* stream, int fd) {
      /* Grow */
    } else if (queued_fds->size == queued_fds->offset) {
      queue_size = queued_fds->size + 8;
@@ -1076,16 +1049,7 @@ index 18763b4744c30a93f067a911b8059984bf36eb86..2d2b5d2f45e673d495ac814fbc1c6a87
  
      /*
       * Allocation failure, report back.
-@@ -999,7 +1000,7 @@ static int uv__stream_recv_cmsg(uv_stream_t* stream, struct msghdr* msg) {
-     assert(count % sizeof(fd) == 0);
-     count /= sizeof(fd);
- 
--    p = (void*) CMSG_DATA(cmsg);
-+    p = (char*) CMSG_DATA(cmsg);
-     pe = p + count * sizeof(fd);
- 
-     while (p < pe) {
-@@ -1361,7 +1362,7 @@ int uv_write2(uv_write_t* req,
+@@ -1356,7 +1357,7 @@ int uv_write2(uv_write_t* req,
  
    req->bufs = req->bufsml;
    if (nbufs > ARRAY_SIZE(req->bufsml))
@@ -1094,7 +1058,7 @@ index 18763b4744c30a93f067a911b8059984bf36eb86..2d2b5d2f45e673d495ac814fbc1c6a87
  
    if (req->bufs == NULL)
      return UV_ENOMEM;
-@@ -1495,7 +1496,7 @@ int uv___stream_fd(const uv_stream_t* handle) {
+@@ -1490,7 +1491,7 @@ int uv___stream_fd(const uv_stream_t* handle) {
           handle->type == UV_TTY ||
           handle->type == UV_NAMED_PIPE);
  
@@ -1103,7 +1067,7 @@ index 18763b4744c30a93f067a911b8059984bf36eb86..2d2b5d2f45e673d495ac814fbc1c6a87
    if (s != NULL)
      return s->fd;
  
-@@ -1513,7 +1514,7 @@ void uv__stream_close(uv_stream_t* handle) {
+@@ -1508,7 +1509,7 @@ void uv__stream_close(uv_stream_t* handle) {
    if (handle->select != NULL) {
      uv__stream_select_t* s;
  
@@ -1112,7 +1076,7 @@ index 18763b4744c30a93f067a911b8059984bf36eb86..2d2b5d2f45e673d495ac814fbc1c6a87
  
      uv_sem_post(&s->close_sem);
      uv_sem_post(&s->async_sem);
-@@ -1548,7 +1549,7 @@ void uv__stream_close(uv_stream_t* handle) {
+@@ -1543,7 +1544,7 @@ void uv__stream_close(uv_stream_t* handle) {
  
    /* Close all queued fds */
    if (handle->queued_fds != NULL) {
@@ -1122,10 +1086,10 @@ index 18763b4744c30a93f067a911b8059984bf36eb86..2d2b5d2f45e673d495ac814fbc1c6a87
        uv__close(queued_fds->fds[i]);
      uv__free(handle->queued_fds);
 diff --git a/src/unix/tcp.c b/src/unix/tcp.c
-index 98970d75278e312578facdfd06e349fdf51c0ba3..018ec144c78e9dcc7cbebcdaa432b31832f6e902 100644
+index 799fca77aa53920e86c128336f19903f522c3b6a..6fe6361c81e39133b605edfedd88da840ba9ba20 100644
 --- a/src/unix/tcp.c
 +++ b/src/unix/tcp.c
-@@ -301,7 +301,7 @@ int uv__tcp_connect(uv_connect_t* req,
+@@ -295,7 +295,7 @@ int uv__tcp_connect(uv_connect_t* req,
      memcpy(&tmp6, addr, sizeof(tmp6));
      if (tmp6.sin6_scope_id == 0) {
        tmp6.sin6_scope_id = uv__ipv6_link_local_scope_id();
@@ -1158,10 +1122,10 @@ index f05e6fe0f7dd5ac579f6a9d6f93bffb99e1bcbc2..20409541de3cb300504b823472a73bc9
      return UV_ENOMEM;
  
 diff --git a/src/unix/udp.c b/src/unix/udp.c
-index f6640fc72318635d9c1aba6015646cf241747774..50506752d0b168aec9507cd36ac81586bb912981 100644
+index c2814512a5f507ceb9e764cdb7c6ff3d36e77974..cbee16b22a36b1c82e74f6a81c3811052e9b8482 100644
 --- a/src/unix/udp.c
 +++ b/src/unix/udp.c
-@@ -198,11 +198,11 @@ static int uv__udp_recvmmsg(uv_udp_t* handle, uv_buf_t* buf) {
+@@ -191,11 +191,11 @@ static int uv__udp_recvmmsg(uv_udp_t* handle, uv_buf_t* buf) {
        if (msgs[k].msg_hdr.msg_flags & MSG_TRUNC)
          flags |= UV_UDP_PARTIAL;
  
@@ -1175,7 +1139,7 @@ index f6640fc72318635d9c1aba6015646cf241747774..50506752d0b168aec9507cd36ac81586
                        flags);
      }
  
-@@ -252,7 +252,7 @@ static void uv__udp_recvmsg(uv_udp_t* handle) {
+@@ -245,7 +245,7 @@ static void uv__udp_recvmsg(uv_udp_t* handle) {
      memset(&peer, 0, sizeof(peer));
      h.msg_name = &peer;
      h.msg_namelen = sizeof(peer);
@@ -1184,7 +1148,7 @@ index f6640fc72318635d9c1aba6015646cf241747774..50506752d0b168aec9507cd36ac81586
      h.msg_iovlen = 1;
  
      do {
-@@ -754,7 +754,7 @@ int uv__udp_send(uv_udp_send_t* req,
+@@ -719,7 +719,7 @@ int uv__udp_send(uv_udp_send_t* req,
  
    req->bufs = req->bufsml;
    if (nbufs > ARRAY_SIZE(req->bufsml))
@@ -1192,7 +1156,7 @@ index f6640fc72318635d9c1aba6015646cf241747774..50506752d0b168aec9507cd36ac81586
 +    req->bufs = (uv_buf_t*)uv__malloc(nbufs * sizeof(bufs[0]));
  
    if (req->bufs == NULL) {
-     uv__req_unregister(handle->loop);
+     uv__req_unregister(handle->loop, req);
 diff --git a/src/uv-common.c b/src/uv-common.c
 index 2200fe3f0a41e295acb426f39ccc9f0133994675..69e95801a18104ea910abf86db236d85f62afb66 100644
 --- a/src/uv-common.c
@@ -1307,7 +1271,7 @@ index 7880c9595be1f66ea0dcbdbcc4a91ce40577587f..d88400f0e819d74998e13f60f13c67a6
    lib->handle = LoadLibraryExW(filename_w, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
    if (lib->handle == NULL) {
 diff --git a/src/win/fs-event.c b/src/win/fs-event.c
-index 7ab407e05345f96a2c5f577e51dc9b21b2f610b9..3754437b4989d67f688153e066ef047268911708 100644
+index fce411813e937018f636aefd6b8c172eebc7532b..dba981c68821ece88e0beb80422b214b77e84b79 100644
 --- a/src/win/fs-event.c
 +++ b/src/win/fs-event.c
 @@ -73,7 +73,7 @@ static void uv__relative_path(const WCHAR* filename,
@@ -1342,10 +1306,10 @@ index 0b532af12d4371c2311bd50a66913287a0716f43..703a8d8f87de1089ac8b18bd817d416d
          uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
        }
 diff --git a/src/win/fs.c b/src/win/fs.c
-index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8bd4da3c0 100644
+index b73c17d8c1c831c29aef6454cb0525bb0b951071..7e2367e8c1c6ad96af55a2cc370142104cc0de77 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
-@@ -302,7 +302,7 @@ INLINE static int fs__readlink_handle(HANDLE handle,
+@@ -280,7 +280,7 @@ INLINE static int fs__readlink_handle(HANDLE handle,
    }
  
    assert(target_ptr == NULL || *target_ptr == NULL);
@@ -1354,7 +1318,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
  }
  
  
-@@ -345,7 +345,7 @@ INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
+@@ -323,7 +323,7 @@ INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
      return 0;
    }
  
@@ -1363,7 +1327,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
    if (buf == NULL) {
      return ERROR_OUTOFMEMORY;
    }
-@@ -353,7 +353,7 @@ INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
+@@ -331,7 +331,7 @@ INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
    pos = buf;
  
    if (path != NULL) {
@@ -1372,7 +1336,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
      req->file.pathw = pos;
      pos += pathw_len;
    } else {
-@@ -361,7 +361,7 @@ INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
+@@ -339,7 +339,7 @@ INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
    }
  
    if (new_path != NULL) {
@@ -1381,7 +1345,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
      req->fs.info.new_pathw = pos;
      pos += new_pathw_len;
    } else {
-@@ -1447,13 +1447,13 @@ void fs__scandir(uv_fs_t* req) {
+@@ -1390,13 +1390,13 @@ void fs__scandir(uv_fs_t* req) {
          continue;
  
        /* Compute the space required to store the filename as WTF-8. */
@@ -1397,7 +1361,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
              uv__realloc(dirents, new_dirents_size * sizeof *dirents);
  
          if (new_dirents == NULL)
-@@ -1467,7 +1467,7 @@ void fs__scandir(uv_fs_t* req) {
+@@ -1410,7 +1410,7 @@ void fs__scandir(uv_fs_t* req) {
         * includes room for the first character of the filename, but `utf8_len`
         * doesn't count the NULL terminator at this point.
         */
@@ -1406,7 +1370,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
        if (dirent == NULL)
          goto out_of_memory_error;
  
-@@ -1475,7 +1475,7 @@ void fs__scandir(uv_fs_t* req) {
+@@ -1418,7 +1418,7 @@ void fs__scandir(uv_fs_t* req) {
  
        /* Convert file name to UTF-8. */
        wtf8 = &dirent->d_name[0];
@@ -1415,7 +1379,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
          goto out_of_memory_error;
  
        /* Fill out the type field. */
-@@ -1569,7 +1569,7 @@ void fs__opendir(uv_fs_t* req) {
+@@ -1512,7 +1512,7 @@ void fs__opendir(uv_fs_t* req) {
      goto error;
    }
  
@@ -1424,7 +1388,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
    if (dir == NULL) {
      SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
      goto error;
-@@ -1584,7 +1584,7 @@ void fs__opendir(uv_fs_t* req) {
+@@ -1527,7 +1527,7 @@ void fs__opendir(uv_fs_t* req) {
    else
      fmt = L"%s\\*";
  
@@ -1433,7 +1397,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
    if (find_path == NULL) {
      SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
      goto error;
-@@ -1621,7 +1621,7 @@ void fs__readdir(uv_fs_t* req) {
+@@ -1564,7 +1564,7 @@ void fs__readdir(uv_fs_t* req) {
    int r;
  
    req->flags |= UV_FS_FREE_PTR;
@@ -1442,7 +1406,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
    dirents = dir->dirents;
    memset(dirents, 0, dir->nentries * sizeof(*dir->dirents));
    find_data = &dir->find_data;
-@@ -1678,7 +1678,7 @@ error:
+@@ -1621,7 +1621,7 @@ error:
  void fs__closedir(uv_fs_t* req) {
    uv_dir_t* dir;
  
@@ -1451,7 +1415,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
    FindClose(dir->dir_handle);
    uv__free(req->ptr);
    SET_REQ_RESULT(req, 0);
-@@ -2754,7 +2754,7 @@ static ssize_t fs__realpath_handle(HANDLE handle, char** realpath_ptr) {
+@@ -2612,7 +2612,7 @@ static ssize_t fs__realpath_handle(HANDLE handle, char** realpath_ptr) {
      return -1;
    }
  
@@ -1460,7 +1424,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
    if (w_realpath_buf == NULL) {
      SetLastError(ERROR_OUTOFMEMORY);
      return -1;
-@@ -2787,7 +2787,7 @@ static ssize_t fs__realpath_handle(HANDLE handle, char** realpath_ptr) {
+@@ -2645,7 +2645,7 @@ static ssize_t fs__realpath_handle(HANDLE handle, char** realpath_ptr) {
    }
  
    assert(*realpath_ptr == NULL);
@@ -1469,7 +1433,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
    uv__free(w_realpath_buf);
    return r;
  }
-@@ -2867,7 +2867,7 @@ retry_get_disk_free_space:
+@@ -2725,7 +2725,7 @@ retry_get_disk_free_space:
      }
  
      len = MAX_PATH + 1;
@@ -1478,7 +1442,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
      if (pathw == NULL) {
        SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
        return;
-@@ -2883,7 +2883,7 @@ retry_get_full_path_name:
+@@ -2741,7 +2741,7 @@ retry_get_full_path_name:
        return;
      } else if (ret > len) {
        len = ret;
@@ -1487,7 +1451,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
        if (pathw == NULL) {
          SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
          return;
-@@ -2899,7 +2899,7 @@ retry_get_full_path_name:
+@@ -2757,7 +2757,7 @@ retry_get_full_path_name:
      uv__free(pathw);
    }
  
@@ -1496,7 +1460,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
    if (stat_fs == NULL) {
      SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
      return;
-@@ -3058,7 +3058,7 @@ int uv_fs_read(uv_loop_t* loop,
+@@ -2916,7 +2916,7 @@ int uv_fs_read(uv_loop_t* loop,
    req->fs.info.nbufs = nbufs;
    req->fs.info.bufs = req->fs.info.bufsml;
    if (nbufs > ARRAY_SIZE(req->fs.info.bufsml))
@@ -1505,7 +1469,7 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
  
    if (req->fs.info.bufs == NULL) {
      SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
-@@ -3091,7 +3091,7 @@ int uv_fs_write(uv_loop_t* loop,
+@@ -2949,7 +2949,7 @@ int uv_fs_write(uv_loop_t* loop,
    req->fs.info.nbufs = nbufs;
    req->fs.info.bufs = req->fs.info.bufsml;
    if (nbufs > ARRAY_SIZE(req->fs.info.bufsml))
@@ -1515,56 +1479,51 @@ index d87246e0ff34aae2c1e456e2530aa089d3031b29..b90d2368aa769cb66f9367e97f004fa8
    if (req->fs.info.bufs == NULL) {
      SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
 diff --git a/src/win/getaddrinfo.c b/src/win/getaddrinfo.c
-index f20e10d49d974ac547f44ea7a9c3e9a0a84fcfa5..1181695550d3ed3f4cad9ff059a53d9af1fd854a 100644
+index 8b8406ada8e7434e291b2e50caf4ed7f36613fa0..5bc63d8e19411b967a2acf5c24b34b9b17323ccc 100644
 --- a/src/win/getaddrinfo.c
 +++ b/src/win/getaddrinfo.c
-@@ -129,7 +129,7 @@ static void uv__getaddrinfo_done(struct uv__work* w, int status) {
-       cur_off += addrinfow_ptr->ai_addrlen;
+@@ -132,7 +132,7 @@ static void uv__getaddrinfo_done(struct uv__work* w, int status) {
+       addrinfo_len += addrinfo_struct_len +
+           ALIGNED_SIZE(addrinfow_ptr->ai_addrlen);
        if (addrinfow_ptr->ai_canonname != NULL) {
-         ssize_t name_len =
--            uv_utf16_length_as_wtf8(addrinfow_ptr->ai_canonname, -1);
-+            uv_utf16_length_as_wtf8((const uint16_t*)addrinfow_ptr->ai_canonname, -1);
+-        name_len = uv_utf16_length_as_wtf8(addrinfow_ptr->ai_canonname, -1);
++        name_len = uv_utf16_length_as_wtf8((const uint16_t*)addrinfow_ptr->ai_canonname, -1);
          if (name_len < 0) {
            req->retcode = name_len;
            goto complete;
-@@ -141,7 +141,7 @@ static void uv__getaddrinfo_done(struct uv__work* w, int status) {
- 
-     /* allocate memory for addrinfo results */
-     addrinfo_len = cur_off;
--    alloc_ptr = uv__malloc(addrinfo_len);
-+    alloc_ptr = (char*)uv__malloc(addrinfo_len);
- 
-     /* do conversions */
-     if (alloc_ptr != NULL) {
-@@ -292,7 +292,7 @@ int uv_getaddrinfo(uv_loop_t* loop,
+@@ -281,9 +281,9 @@ int uv_getaddrinfo(uv_loop_t* loop,
    }
  
    /* allocate memory for inputs, and partition it as needed */
--  req->alloc = uv__malloc(off);
-+  req->alloc = (char*)uv__malloc(off);
-   if (!req->alloc)
+-  alloc_ptr = uv__malloc(ALIGNED_SIZE(nodesize * sizeof(WCHAR)) +
+-                         ALIGNED_SIZE(servicesize * sizeof(WCHAR)) +
+-                         hintssize);
++  alloc_ptr = (char*)uv__malloc(ALIGNED_SIZE(nodesize * sizeof(WCHAR)) +
++                                ALIGNED_SIZE(servicesize * sizeof(WCHAR)) +
++                                hintssize);
+   if (!alloc_ptr)
      return UV_ENOMEM;
  
-@@ -300,7 +300,7 @@ int uv_getaddrinfo(uv_loop_t* loop,
+@@ -294,7 +294,7 @@ int uv_getaddrinfo(uv_loop_t* loop,
     * request. The node here has been converted to ascii. */
    if (node != NULL) {
-     req->node = (WCHAR*) req->alloc;
--    uv_wtf8_to_utf16(node, req->node, nodesize);
-+    uv_wtf8_to_utf16(node, (uint16_t*)req->node, nodesize);
+     req->node = (WCHAR*) alloc_ptr;
+-    uv_wtf8_to_utf16(node, (WCHAR*) alloc_ptr, nodesize);
++    uv_wtf8_to_utf16(node, (uint16_t*) alloc_ptr, nodesize);
+     alloc_ptr += ALIGNED_SIZE(nodesize * sizeof(WCHAR));
    } else {
      req->node = NULL;
-   }
-@@ -309,7 +309,7 @@ int uv_getaddrinfo(uv_loop_t* loop,
+@@ -304,7 +304,7 @@ int uv_getaddrinfo(uv_loop_t* loop,
     * the req. */
    if (service != NULL) {
-     req->service = (WCHAR*) ((char*) req->alloc + serviceoff);
--    uv_wtf8_to_utf16(service, req->service, servicesize);
-+    uv_wtf8_to_utf16(service, (uint16_t*)req->service, servicesize);
+     req->service = (WCHAR*) alloc_ptr;
+-    uv_wtf8_to_utf16(service, (WCHAR*) alloc_ptr, servicesize);
++    uv_wtf8_to_utf16(service, (uint16_t*) alloc_ptr, servicesize);
+     alloc_ptr += ALIGNED_SIZE(servicesize * sizeof(WCHAR));
    } else {
      req->service = NULL;
-   }
 diff --git a/src/win/pipe.c b/src/win/pipe.c
-index 76ea169e19ff0a3fc92e8b3be981b21b39b03e94..8226369294299fd2a9d7d05a91d3d711015b7fd0 100644
+index 3c8abe1c28ce369dc9fbc91936f6a97b0c178fdc..27868221455dcbb90c00066fd8b716d2c0a4d371 100644
 --- a/src/win/pipe.c
 +++ b/src/win/pipe.c
 @@ -739,7 +739,7 @@ int uv_pipe_bind2(uv_pipe_t* handle,
@@ -1594,7 +1553,7 @@ index 76ea169e19ff0a3fc92e8b3be981b21b39b03e94..8226369294299fd2a9d7d05a91d3d711
        if (!req->u.connect.name) {
          uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
        }
-@@ -1547,7 +1547,7 @@ static int uv__build_coalesced_write_req(uv_write_t* user_req,
+@@ -1548,7 +1548,7 @@ static int uv__build_coalesced_write_req(uv_write_t* user_req,
                         data_length;                  /* (c) */
  
    /* Allocate buffer. */
@@ -1603,7 +1562,7 @@ index 76ea169e19ff0a3fc92e8b3be981b21b39b03e94..8226369294299fd2a9d7d05a91d3d711
    if (heap_buffer == NULL)
      return ERROR_NOT_ENOUGH_MEMORY; /* Maps to UV_ENOMEM. */
  
-@@ -1796,7 +1796,7 @@ int uv__pipe_write_ipc(uv_loop_t* loop,
+@@ -1797,7 +1797,7 @@ int uv__pipe_write_ipc(uv_loop_t* loop,
      bufs = stack_bufs;
    } else {
      /* Use heap-allocated buffer array. */
@@ -1612,7 +1571,7 @@ index 76ea169e19ff0a3fc92e8b3be981b21b39b03e94..8226369294299fd2a9d7d05a91d3d711
      if (bufs == NULL)
        return ERROR_NOT_ENOUGH_MEMORY; /* Maps to UV_ENOMEM. */
    }
-@@ -2545,7 +2545,7 @@ static int uv__pipe_getname(const uv_pipe_t* handle, char* buffer, size_t* size)
+@@ -2494,7 +2494,7 @@ static int uv__pipe_getname(const uv_pipe_t* handle, char* buffer, size_t* size)
                                        FileNameInformation);
    if (nt_status == STATUS_BUFFER_OVERFLOW) {
      name_size = sizeof(*name_info) + tmp_name_info.FileNameLength;
@@ -1622,10 +1581,10 @@ index 76ea169e19ff0a3fc92e8b3be981b21b39b03e94..8226369294299fd2a9d7d05a91d3d711
        *size = 0;
        return UV_ENOMEM;
 diff --git a/src/win/process.c b/src/win/process.c
-index 79bec0090cc94bfe20dab722cf2d8135ddd03cb8..5a648494ae03688f6a56705f2c3d65b026605818 100644
+index 4f0af83e83442bb905762361775abe05ab6beb4e..25f1075745267785cdd7d7de83d9c62750305852 100644
 --- a/src/win/process.c
 +++ b/src/win/process.c
-@@ -546,14 +546,14 @@ int make_program_args(char** args, int verbatim_arguments, WCHAR** dst_ptr) {
+@@ -547,14 +547,14 @@ int make_program_args(char** args, int verbatim_arguments, WCHAR** dst_ptr) {
    dst_len = dst_len * 2 + arg_count * 2;
  
    /* Allocate buffer for the final command line. */
@@ -1642,7 +1601,7 @@ index 79bec0090cc94bfe20dab722cf2d8135ddd03cb8..5a648494ae03688f6a56705f2c3d65b0
    if (temp_buffer == NULL) {
      err = UV_ENOMEM;
      goto error;
-@@ -567,7 +567,7 @@ int make_program_args(char** args, int verbatim_arguments, WCHAR** dst_ptr) {
+@@ -568,7 +568,7 @@ int make_program_args(char** args, int verbatim_arguments, WCHAR** dst_ptr) {
      arg_len = uv_wtf8_length_as_utf16(*arg);
      assert(arg_len > 0);
      assert(temp_buffer_len >= (size_t) arg_len);
@@ -1651,34 +1610,43 @@ index 79bec0090cc94bfe20dab722cf2d8135ddd03cb8..5a648494ae03688f6a56705f2c3d65b0
  
      if (verbatim_arguments) {
        /* Copy verbatim. */
-@@ -595,8 +595,8 @@ error:
+@@ -596,8 +596,8 @@ error:
  
  
- static int env_strncmp(const wchar_t* a, int na, const wchar_t* b) {
+ int env_strncmp(const wchar_t* a, int na, const wchar_t* b) {
 -  wchar_t* a_eq;
 -  wchar_t* b_eq;
 +  const wchar_t* a_eq;
 +  const wchar_t* b_eq;
+   wchar_t* A;
+   wchar_t* B;
    int nb;
-   int r;
+@@ -614,8 +614,8 @@ int env_strncmp(const wchar_t* a, int na, const wchar_t* b) {
+   assert(b_eq);
+   nb = b_eq - b;
  
-@@ -668,12 +668,12 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
+-  A = _alloca((na+1) * sizeof(wchar_t));
+-  B = _alloca((nb+1) * sizeof(wchar_t));
++  A = (wchar_t*)_alloca((na+1) * sizeof(wchar_t));
++  B = (wchar_t*)_alloca((nb+1) * sizeof(wchar_t));
+ 
+   r = LCMapStringW(LOCALE_INVARIANT, LCMAP_UPPERCASE, a, na, A, na);
+   assert(r==na);
+@@ -688,11 +688,11 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
+   }
  
    /* second pass: copy to UTF-16 environment block */
-   len = env_block_count * sizeof(WCHAR*);
--  p = uv__malloc(len + env_len * sizeof(WCHAR));
-+  p = (char*)uv__malloc(len + env_len * sizeof(WCHAR));
-   if (p == NULL) {
+-  dst_copy = uv__malloc(env_len * sizeof(WCHAR));
++  dst_copy = (WCHAR*)uv__malloc(env_len * sizeof(WCHAR));
+   if (dst_copy == NULL && env_len > 0) {
      return UV_ENOMEM;
    }
--  env_copy = (void*) &p[0];
--  dst_copy = (void*) &p[len];
-+  env_copy = (WCHAR**) &p[0];
-+  dst_copy = (WCHAR*) &p[len];
+-  env_copy = _alloca(env_block_count * sizeof(WCHAR*));
++  env_copy = (WCHAR**)_alloca(env_block_count * sizeof(WCHAR*));
  
    ptr = dst_copy;
    ptr_copy = env_copy;
-@@ -683,7 +683,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
+@@ -702,7 +702,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
        len = uv_wtf8_length_as_utf16(*env);
        assert(len > 0);
        assert((size_t) len <= env_len - (ptr - dst_copy));
@@ -1687,20 +1655,20 @@ index 79bec0090cc94bfe20dab722cf2d8135ddd03cb8..5a648494ae03688f6a56705f2c3d65b0
        *ptr_copy++ = ptr;
        ptr += len;
      }
-@@ -721,7 +721,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
+@@ -740,7 +740,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
    }
  
    /* final pass: copy, in sort order, and inserting required variables */
 -  dst = uv__malloc((1+env_len) * sizeof(WCHAR));
 +  dst = (WCHAR*)uv__malloc((1+env_len) * sizeof(WCHAR));
    if (!dst) {
-     uv__free(p);
+     uv__free(dst_copy);
      return UV_ENOMEM;
 diff --git a/src/win/tcp.c b/src/win/tcp.c
-index c452c12e8f06f13e519a198f786eec63faebe2bf..2b43d03ea227b87a717b128ed0d8f0767c8233fd 100644
+index 187f36e2a61c870b0d16e17e9d4a9e1161ba8851..d8da4d941a51b0625fc0c072342ec4edf74c0ea3 100644
 --- a/src/win/tcp.c
 +++ b/src/win/tcp.c
-@@ -597,7 +597,7 @@ int uv__tcp_listen(uv_tcp_t* handle, int backlog, uv_connection_cb cb) {
+@@ -585,7 +585,7 @@ int uv__tcp_listen(uv_tcp_t* handle, int backlog, uv_connection_cb cb) {
  
    if (handle->tcp.serv.accept_reqs == NULL) {
      handle->tcp.serv.accept_reqs =
@@ -1710,19 +1678,10 @@ index c452c12e8f06f13e519a198f786eec63faebe2bf..2b43d03ea227b87a717b128ed0d8f076
        uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
      }
 diff --git a/src/win/thread.c b/src/win/thread.c
-index bf39b88633b0d87de02b56579121d384aa5f2d3e..dd958ccd782772869d5448d788a563c1526a89f6 100644
+index 57c25e8f5a861c9d8a4c402c260d3ac235200423..57f1698f595e2410a51044f7f228b5a235206819 100644
 --- a/src/win/thread.c
 +++ b/src/win/thread.c
-@@ -39,7 +39,7 @@ typedef struct {
- } uv__once_data_t;
- 
- static BOOL WINAPI uv__once_inner(INIT_ONCE *once, void* param, void** context) {
--  uv__once_data_t* data = param;
-+  uv__once_data_t* data = (uv__once_data_t*)param;
- 
-   data->callback();
- 
-@@ -76,7 +76,7 @@ static UINT __stdcall uv__thread_start(void* arg) {
+@@ -98,7 +98,7 @@ static UINT __stdcall uv__thread_start(void* arg) {
    struct thread_ctx *ctx_p;
    struct thread_ctx ctx;
  
@@ -1731,7 +1690,7 @@ index bf39b88633b0d87de02b56579121d384aa5f2d3e..dd958ccd782772869d5448d788a563c1
    ctx = *ctx_p;
    uv__free(ctx_p);
  
-@@ -119,7 +119,7 @@ int uv_thread_create_ex(uv_thread_t* tid,
+@@ -141,7 +141,7 @@ int uv_thread_create_ex(uv_thread_t* tid,
        return UV_EINVAL;
    }
  
@@ -1741,7 +1700,7 @@ index bf39b88633b0d87de02b56579121d384aa5f2d3e..dd958ccd782772869d5448d788a563c1
      return UV_ENOMEM;
  
 diff --git a/src/win/tty.c b/src/win/tty.c
-index c0339ded2e4b763c3b09331e3acd58bf43dccc28..145706e27a7b596dc003d43d94b54f6ceb0eabee 100644
+index 9f8dd698d761248a994e66c4039b35cb216f1d82..0b51b6c82fad711480c28ad6cee7125ddb72ca87 100644
 --- a/src/win/tty.c
 +++ b/src/win/tty.c
 @@ -528,7 +528,7 @@ static DWORD CALLBACK uv_tty_line_read_thread(void* data) {
@@ -1772,7 +1731,7 @@ index c0339ded2e4b763c3b09331e3acd58bf43dccc28..145706e27a7b596dc003d43d94b54f6c
                                 &last_key_buf,
                                 &char_len))
 diff --git a/src/win/util.c b/src/win/util.c
-index e0dba1aaa94e285a6e10f57d3b923b53126767d8..1aca4e9a081cd7e4481503d59f39872acbbc6a9c 100644
+index a96cb915930a30a49ba55fd7d15ea48f0b471f89..924d878e89260c2d3cf9a30b7151abeaf735b8be 100644
 --- a/src/win/util.c
 +++ b/src/win/util.c
 @@ -124,7 +124,7 @@ int uv_exepath(char* buffer, size_t* size_ptr) {
@@ -1793,7 +1752,7 @@ index e0dba1aaa94e285a6e10f57d3b923b53126767d8..1aca4e9a081cd7e4481503d59f39872a
      if (p == NULL)
        return UV_ENOMEM;
  
-@@ -546,14 +546,14 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos_ptr, int* cpu_count_ptr) {
+@@ -548,14 +548,14 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos_ptr, int* cpu_count_ptr) {
    GetSystemInfo(&system_info);
    cpu_count = system_info.dwNumberOfProcessors;
  
@@ -1810,7 +1769,7 @@ index e0dba1aaa94e285a6e10f57d3b923b53126767d8..1aca4e9a081cd7e4481503d59f39872a
    if (sppi == NULL) {
      err = ERROR_OUTOFMEMORY;
      goto error;
-@@ -697,7 +697,8 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
+@@ -699,7 +699,8 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
        case ERROR_BUFFER_OVERFLOW:
          /* This happens when win_address_buf is NULL or too small to hold all
           * adapters. */
@@ -1820,7 +1779,7 @@ index e0dba1aaa94e285a6e10f57d3b923b53126767d8..1aca4e9a081cd7e4481503d59f39872a
          if (win_address_buf == NULL)
            return UV_ENOMEM;
  
-@@ -705,7 +706,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
+@@ -707,7 +708,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
  
        case ERROR_NO_DATA: {
          /* No adapters were found. */
@@ -1829,7 +1788,7 @@ index e0dba1aaa94e285a6e10f57d3b923b53126767d8..1aca4e9a081cd7e4481503d59f39872a
          if (uv_address_buf == NULL)
            return UV_ENOMEM;
  
-@@ -756,7 +757,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
+@@ -758,7 +759,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
        continue;
  
      /* Compute the size of the interface name. */
@@ -1838,7 +1797,7 @@ index e0dba1aaa94e285a6e10f57d3b923b53126767d8..1aca4e9a081cd7e4481503d59f39872a
      uv_address_buf_size += name_size + 1;
  
      /* Count the number of addresses associated with this interface, and
-@@ -771,7 +772,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
+@@ -773,7 +774,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
    }
  
    /* Allocate space to store interface data plus adapter names. */
@@ -1847,8 +1806,8 @@ index e0dba1aaa94e285a6e10f57d3b923b53126767d8..1aca4e9a081cd7e4481503d59f39872a
    if (uv_address_buf == NULL) {
      uv__free(win_address_buf);
      return UV_ENOMEM;
-@@ -991,7 +992,7 @@ int uv_os_tmpdir(char* buffer, size_t* size) {
- 
+@@ -982,7 +983,7 @@ int uv_os_tmpdir(char* buffer, size_t* size) {
+   }
    /* Include space for terminating null char. */
    len += 1;
 -  path = uv__malloc(len * sizeof(wchar_t));
@@ -1856,7 +1815,7 @@ index e0dba1aaa94e285a6e10f57d3b923b53126767d8..1aca4e9a081cd7e4481503d59f39872a
    if (path == NULL) {
      return UV_ENOMEM;
    }
-@@ -1028,7 +1029,7 @@ int uv__convert_utf16_to_utf8(const WCHAR* utf16, size_t utf16len, char** utf8)
+@@ -1019,7 +1020,7 @@ int uv__convert_utf16_to_utf8(const WCHAR* utf16, size_t utf16len, char** utf8)
      return UV_EINVAL;
  
     *utf8 = NULL;
@@ -1865,7 +1824,7 @@ index e0dba1aaa94e285a6e10f57d3b923b53126767d8..1aca4e9a081cd7e4481503d59f39872a
  }
  
  
-@@ -1048,13 +1049,13 @@ int uv__convert_utf8_to_utf16(const char* utf8, WCHAR** utf16) {
+@@ -1039,13 +1040,13 @@ int uv__convert_utf8_to_utf16(const char* utf8, WCHAR** utf16) {
      return UV__EINVAL;
  
    /* Allocate the destination buffer. */
@@ -1881,7 +1840,7 @@ index e0dba1aaa94e285a6e10f57d3b923b53126767d8..1aca4e9a081cd7e4481503d59f39872a
  
    return 0;
  }
-@@ -1074,11 +1075,11 @@ int uv__copy_utf16_to_utf8(const WCHAR* utf16buffer, size_t utf16len, char* utf8
+@@ -1065,11 +1066,11 @@ int uv__copy_utf16_to_utf8(const WCHAR* utf16buffer, size_t utf16len, char* utf8
      return UV_EINVAL;
  
    if (*size == 0) {
@@ -1895,7 +1854,7 @@ index e0dba1aaa94e285a6e10f57d3b923b53126767d8..1aca4e9a081cd7e4481503d59f39872a
    }
    if (r == UV_ENOBUFS)
      *size += 1; /* Add space for NUL. */
-@@ -1108,7 +1109,7 @@ static int uv__getpwuid_r(uv_passwd_t* pwd) {
+@@ -1099,7 +1100,7 @@ static int uv__getpwuid_r(uv_passwd_t* pwd) {
      return uv_translate_sys_error(r);
    }
  
@@ -1904,7 +1863,7 @@ index e0dba1aaa94e285a6e10f57d3b923b53126767d8..1aca4e9a081cd7e4481503d59f39872a
    if (path == NULL) {
      CloseHandle(token);
      return UV_ENOMEM;
-@@ -1189,7 +1190,7 @@ int uv_os_environ(uv_env_item_t** envitems, int* count) {
+@@ -1180,7 +1181,7 @@ int uv_os_environ(uv_env_item_t** envitems, int* count) {
  
    for (penv = env, i = 0; *penv != L'\0'; penv += wcslen(penv) + 1, i++);
  
@@ -1913,7 +1872,7 @@ index e0dba1aaa94e285a6e10f57d3b923b53126767d8..1aca4e9a081cd7e4481503d59f39872a
    if (*envitems == NULL) {
      FreeEnvironmentStringsW(env);
      return UV_ENOMEM;
-@@ -1281,7 +1282,7 @@ int uv_os_getenv(const char* name, char* buffer, size_t* size) {
+@@ -1269,7 +1270,7 @@ int uv_os_getenv(const char* name, char* buffer, size_t* size) {
        uv__free(var);
  
      varlen = 1 + len;

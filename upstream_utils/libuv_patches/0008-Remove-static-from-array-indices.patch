@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Thu, 13 Jul 2023 23:30:58 -0700
-Subject: [PATCH 7/9] Remove static from array indices
+Subject: [PATCH 08/10] Remove static from array indices
 
 ---
  src/unix/linux.c | 12 ++++++------
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/src/unix/linux.c b/src/unix/linux.c
-index be72054ab6513dce8099caeb4dca5083dfbef9df..322873f6f0e8954d2c5b572ef87fcbc74d7b12c1 100644
+index e0c4902385edac10ac31bc5075a85a45025615f9..091c0474cfe37de4eb55dbf6c20144aa78e896a5 100644
 --- a/src/unix/linux.c
 +++ b/src/unix/linux.c
 @@ -2098,7 +2098,7 @@ static uint64_t uv__read_uint64(const char* filename) {

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jade Turner <spacey-sooty@proton.me>
 Date: Wed, 26 Jun 2024 11:40:37 +0800
-Subject: [PATCH 9/9] Remove swearing
+Subject: [PATCH 10/10] Remove swearing
 
 ---
  src/win/fs.c  | 2 +-
@@ -9,10 +9,10 @@ Subject: [PATCH 9/9] Remove swearing
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/win/fs.c b/src/win/fs.c
-index af07d092a65909ac4948c679b95468eef549ccca..69a413eab4caa2aee4137411d17f630eea138975 100644
+index 05488e5d67101adba611f882ded4f6dc5a462d9a..d6b2b3f1d08d846fa941942f4bb33ae2fa30e320 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
-@@ -1844,7 +1844,7 @@ INLINE static void fs__stat_assign_statbuf(uv_stat_t* statbuf,
+@@ -1704,7 +1704,7 @@ INLINE static int fs__stat_handle(HANDLE handle, uv_stat_t* statbuf,
     * impossible to delete the file afterwards, since read-only files can't be
     * deleted.
     *
@@ -22,7 +22,7 @@ index af07d092a65909ac4948c679b95468eef549ccca..69a413eab4caa2aee4137411d17f630e
     *
     * And uv_fs_chmod should probably just fail on windows or be a total no-op.
 diff --git a/src/win/tty.c b/src/win/tty.c
-index 9a4252d9d89d82fdd316312cc4550dd3c0fe798d..f1acef2c64e5a7397c86729d81d1f15ee74b7a43 100644
+index 7294f311e17d5d02e5873e60f8f0cdd551f6d34d..f7d5ef6c29f97a979fb1df993b66e31830af55c4 100644
 --- a/src/win/tty.c
 +++ b/src/win/tty.c
 @@ -1055,7 +1055,7 @@ int uv__tty_read_stop(uv_tty_t* handle) {

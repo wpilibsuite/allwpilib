@@ -32,23 +32,45 @@
 #include "uv.h"
 #include "internal.h"
 
-typedef void (*uv__once_cb)(void);
+static void uv__once_inner(uv_once_t* guard, void (*callback)(void)) {
+  DWORD result;
+  HANDLE existing_event, created_event;
 
-typedef struct {
-  uv__once_cb callback;
-} uv__once_data_t;
+  created_event = CreateEvent(NULL, 1, 0, NULL);
+  if (created_event == 0) {
+    /* Could fail in a low-memory situation? */
+    uv_fatal_error(GetLastError(), "CreateEvent");
+  }
 
-static BOOL WINAPI uv__once_inner(INIT_ONCE *once, void* param, void** context) {
-  uv__once_data_t* data = (uv__once_data_t*)param;
+  existing_event = InterlockedCompareExchangePointer(&guard->event,
+                                                     created_event,
+                                                     NULL);
 
-  data->callback();
+  if (existing_event == NULL) {
+    /* We won the race */
+    callback();
 
-  return TRUE;
+    result = SetEvent(created_event);
+    assert(result);
+    guard->ran = 1;
+
+  } else {
+    /* We lost the race. Destroy the event we created and wait for the existing
+     * one to become signaled. */
+    CloseHandle(created_event);
+    result = WaitForSingleObject(existing_event, INFINITE);
+    assert(result == WAIT_OBJECT_0);
+  }
 }
 
-void uv_once(uv_once_t* guard, uv__once_cb callback) {
-  uv__once_data_t data = { .callback = callback };
-  InitOnceExecuteOnce(&guard->init_once, uv__once_inner, (void*) &data, NULL);
+
+void uv_once(uv_once_t* guard, void (*callback)(void)) {
+  /* Fast case - avoid WaitForSingleObject. */
+  if (guard->ran) {
+    return;
+  }
+
+  uv__once_inner(guard, callback);
 }
 
 
