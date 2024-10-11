@@ -13,8 +13,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.system.plant.Wheel;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 
 /**
@@ -35,33 +35,6 @@ import edu.wpi.first.wpilibj.RobotController;
  * <p>y = x
  */
 public class DifferentialDrivetrainSim extends DifferentialDrivetrainSimBase {
-  /**
-   * Creates a simulated differential drivetrain.
-   *
-   * @param driveWheel A {@link Wheel} representing one of the drivetrain's wheels.
-   * @param jKgMetersSquared The moment of inertia of the drivetrain about its center.
-   * @param massKg The mass of the drivebase.
-   * @param trackWidthMeters The robot's track width, or distance between left and right wheels.
-   * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
-   *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
-   *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
-   *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
-   *     point.
-   */
-  public DifferentialDrivetrainSim(
-      Wheel driveWheel,
-      double jKgMetersSquared,
-      double massKg,
-      double trackWidthMeters,
-      Matrix<N7, N1> measurementStdDevs) {
-    this(
-        LinearSystemId.createDrivetrainVelocitySystem(
-            driveWheel, massKg, trackWidthMeters / 2.0, jKgMetersSquared),
-        driveWheel,
-        trackWidthMeters,
-        measurementStdDevs);
-  }
-
   /**
    * Creates a simulated differential drivetrain.
    *
@@ -99,6 +72,17 @@ public class DifferentialDrivetrainSim extends DifferentialDrivetrainSimBase {
     m_u.set(0, 0, leftVoltageVolts);
     m_u.set(1, 0, rightVoltageVolts);
     m_u = StateSpaceUtil.desaturateInputVector(m_u, RobotController.getBatteryVoltage());
+  }
+
+  /**
+   * Sets the applied voltage to the drivetrain. Note that positive voltage must make that side of
+   * the drivetrain travel forward (+X).
+   *
+   * @param leftVoltage The left voltage.
+   * @param rightVoltage The right voltage.
+   */
+  public void setInputVoltages(Voltage leftVoltage, Voltage rightVoltage) {
+    setInputVoltages(leftVoltage.in(Volts), rightVoltage.in(Volts));
   }
 
   @Override

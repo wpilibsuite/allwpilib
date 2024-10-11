@@ -13,6 +13,7 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.Wheel;
+import edu.wpi.first.units.measure.Torque;
 
 /**
  * This class simulates the state of the drivetrain controlled by voltage. In simulationPeriodic,
@@ -62,13 +63,24 @@ public class DifferentialDrivetrainSimTorque extends DifferentialDrivetrainSimBa
    * Sets the applied torque to the drivetrain. Note that positive torque must make that side of the
    * drivetrain travel forward (+X).
    *
-   * @param leftTorqueNewtonMeters The left torque.
-   * @param rightTorqueNewtonMeters The right torque.
+   * @param leftTorqueNewtonMeters The left torque in Newton-Meters.
+   * @param rightTorqueNewtonMeters The right torque in Newton-Meters.
    */
   public void setInputTorques(double leftTorqueNewtonMeters, double rightTorqueNewtonMeters) {
     m_u.set(0, 0, leftTorqueNewtonMeters);
     m_u.set(1, 0, rightTorqueNewtonMeters);
     // TODO: not sure how to clamp these.
+  }
+
+  /**
+   * Sets the applied torque to the drivetrain. Note that positive torque must make that side of the
+   * drivetrain travel forward (+X).
+   *
+   * @param leftTorque The left torque.
+   * @param rightTorque The right torque.
+   */
+  public void setInputTorques(Torque leftTorque, Torque rightTorque) {
+    setInputTorques(leftTorque.in(NewtonMeters), rightTorque.in(NewtonMeters));
   }
 
   @Override
