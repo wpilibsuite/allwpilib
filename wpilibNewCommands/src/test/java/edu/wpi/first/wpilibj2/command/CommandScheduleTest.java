@@ -155,6 +155,30 @@ class CommandScheduleTest extends CommandTestBase {
   }
 
   @Test
+  void commandKnowsWhenEndedTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      Command[] commands = new Command[1];
+      Command command =
+          new FunctionalCommand(
+              () -> {},
+              () -> {},
+              isForced -> {
+                assertFalse(
+                    scheduler.isScheduled(commands[0]),
+                    "Command shouldn't be scheduled when its end is called");
+              },
+              () -> true);
+
+      commands[0] = command;
+      scheduler.schedule(command);
+      scheduler.run();
+      assertFalse(
+          scheduler.isScheduled(command),
+          "Command should be removed from scheduler when its isFinished() returns true");
+    }
+  }
+
+  @Test
   void notScheduledCancelTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       MockCommandHolder holder = new MockCommandHolder(true);
