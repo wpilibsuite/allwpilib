@@ -57,6 +57,16 @@ CommandPtr CommandPtr::AsProxy() && {
   return std::move(*this);
 }
 
+CommandPtr CommandPtr::Fork(CommandPtr&& other) && {
+  AssertValid();
+  std::vector<std::unique_ptr<Command>> vec;
+  vec.emplace_back(std::move(m_ptr));
+  vec.emplace_back(std::move(other).Unwrap());
+  std::span<std::unique_ptr<Command>> span(vec);
+  m_ptr = std::make_unique<ScheduleCommand>(std::move(span));
+  return std::move(*this);
+}
+
 class RunsWhenDisabledCommand : public WrapperCommand {
  public:
   RunsWhenDisabledCommand(std::unique_ptr<Command>&& command,
