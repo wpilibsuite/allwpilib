@@ -394,6 +394,8 @@
       "Pneumatics",
       "Digital Input",
       "PID",
+      "Gyro",
+      "Profiled PID",
       "XboxController"
     ],
     "foldername": "RapidReactCommandBot",
