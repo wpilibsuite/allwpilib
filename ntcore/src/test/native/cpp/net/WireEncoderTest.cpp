@@ -142,8 +142,7 @@ TEST_F(WireEncoderTextTest, Unannounce) {
 }
 
 TEST_F(WireEncoderTextTest, MessagePublish) {
-  net::ClientMessage msg{net::PublishMsg{
-      Handle{0, 5, Handle::kPublisher}, 0, "test", "double", {{"k", 6}}, {}}};
+  net::ClientMessage msg{net::PublishMsg{5, "test", "double", {{"k", 6}}, {}}};
   ASSERT_TRUE(net::WireEncodeText(os, msg));
   ASSERT_EQ(os.str(),
             "{\"method\":\"publish\",\"params\":{"
@@ -152,14 +151,13 @@ TEST_F(WireEncoderTextTest, MessagePublish) {
 }
 
 TEST_F(WireEncoderTextTest, MessageUnpublish) {
-  net::ClientMessage msg{
-      net::UnpublishMsg{Handle{0, 5, Handle::kPublisher}, 0}};
+  net::ClientMessage msg{net::UnpublishMsg{5}};
   ASSERT_TRUE(net::WireEncodeText(os, msg));
   ASSERT_EQ(os.str(), "{\"method\":\"unpublish\",\"params\":{\"pubuid\":5}}");
 }
 
 TEST_F(WireEncoderTextTest, MessageSetProperties) {
-  net::ClientMessage msg{net::SetPropertiesMsg{0, "test", {{"k", 6}}}};
+  net::ClientMessage msg{net::SetPropertiesMsg{"test", {{"k", 6}}}};
   ASSERT_TRUE(net::WireEncodeText(os, msg));
   ASSERT_EQ(os.str(),
             "{\"method\":\"setproperties\",\"params\":{"
@@ -167,20 +165,17 @@ TEST_F(WireEncoderTextTest, MessageSetProperties) {
 }
 
 TEST_F(WireEncoderTextTest, MessageSubscribe) {
-  net::ClientMessage msg{
-      net::SubscribeMsg{Handle{0, 5, Handle::kSubscriber}, {"a", "b"}, {}}};
+  net::ClientMessage msg{net::SubscribeMsg{5, {"a", "b"}, {}}};
   ASSERT_TRUE(net::WireEncodeText(os, msg));
   ASSERT_EQ(os.str(),
             "{\"method\":\"subscribe\",\"params\":{"
-            "\"options\":{},\"topics\":[\"a\",\"b\"],\"subuid\":402653189}}");
+            "\"options\":{},\"topics\":[\"a\",\"b\"],\"subuid\":5}}");
 }
 
 TEST_F(WireEncoderTextTest, MessageUnsubscribe) {
-  net::ClientMessage msg{
-      net::UnsubscribeMsg{Handle{0, 5, Handle::kSubscriber}}};
+  net::ClientMessage msg{net::UnsubscribeMsg{5}};
   ASSERT_TRUE(net::WireEncodeText(os, msg));
-  ASSERT_EQ(os.str(),
-            "{\"method\":\"unsubscribe\",\"params\":{\"subuid\":402653189}}");
+  ASSERT_EQ(os.str(), "{\"method\":\"unsubscribe\",\"params\":{\"subuid\":5}}");
 }
 
 TEST_F(WireEncoderTextTest, MessageAnnounce) {

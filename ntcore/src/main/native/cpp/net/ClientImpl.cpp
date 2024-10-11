@@ -28,12 +28,11 @@ using namespace nt;
 using namespace nt::net;
 
 ClientImpl::ClientImpl(
-    uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
+    uint64_t curTimeMs, WireConnection& wire, wpi::Logger& logger,
     std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
         timeSyncUpdated,
     std::function<void(uint32_t repeatMs)> setPeriodic)
-    : m_inst{inst},
-      m_wire{wire},
+    : m_wire{wire},
       m_logger{logger},
       m_timeSyncUpdated{std::move(timeSyncUpdated)},
       m_setPeriodic{std::move(setPeriodic)},
@@ -58,7 +57,7 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
     }
 
     // decode message
-    int64_t id;
+    int id;
     Value value;
     std::string error;
     if (!WireDecodeBinary(&data, &id, &value, &error,
@@ -114,13 +113,13 @@ void ClientImpl::HandleLocal(std::vector<ClientMessage>&& msgs) {
   for (auto&& elem : msgs) {
     // common case is value
     if (auto msg = std::get_if<ClientValueMsg>(&elem.contents)) {
-      SetValue(msg->pubHandle, msg->value);
+      SetValue(msg->pubuid, msg->value);
     } else if (auto msg = std::get_if<PublishMsg>(&elem.contents)) {
-      Publish(msg->pubHandle, msg->topicHandle, msg->name, msg->typeStr,
-              msg->properties, msg->options);
-      m_outgoing.SendMessage(msg->pubHandle, std::move(elem));
+      Publish(msg->pubuid, msg->name, msg->typeStr, msg->properties,
+              msg->options);
+      m_outgoing.SendMessage(msg->pubuid, std::move(elem));
     } else if (auto msg = std::get_if<UnpublishMsg>(&elem.contents)) {
-      Unpublish(msg->pubHandle, msg->topicHandle, std::move(elem));
+      Unpublish(msg->pubuid, std::move(elem));
     } else {
       m_outgoing.SendMessage(0, std::move(elem));
     }
@@ -174,38 +173,33 @@ void ClientImpl::UpdatePeriodic() {
   m_setPeriodic(m_periodMs);
 }
 
-void ClientImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-                         std::string_view name, std::string_view typeStr,
-                         const wpi::json& properties,
+void ClientImpl::Publish(int32_t pubuid, std::string_view name,
+                         std::string_view typeStr, const wpi::json& properties,
                          const PubSubOptionsImpl& options) {
-  unsigned int index = Handle{pubHandle}.GetIndex();
-  if (index >= m_publishers.size()) {
-    m_publishers.resize(index + 1);
+  if (static_cast<uint32_t>(pubuid) >= m_publishers.size()) {
+    m_publishers.resize(pubuid + 1);
   }
-  auto& publisher = m_publishers[index];
+  auto& publisher = m_publishers[pubuid];
   if (!publisher) {
     publisher = std::make_unique<PublisherData>();
   }
-  publisher->handle = pubHandle;
   publisher->options = options;
   publisher->periodMs = std::lround(options.periodicMs / 10.0) * 10;
   if (publisher->periodMs < kMinPeriodMs) {
     publisher->periodMs = kMinPeriodMs;
   }
-  m_outgoing.SetPeriod(pubHandle, publisher->periodMs);
+  m_outgoing.SetPeriod(pubuid, publisher->periodMs);
 
   // update period
   m_periodMs = UpdatePeriodCalc(m_periodMs, publisher->periodMs);
   UpdatePeriodic();
 }
 
-void ClientImpl::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle,
-                           ClientMessage&& msg) {
-  unsigned int index = Handle{pubHandle}.GetIndex();
-  if (index >= m_publishers.size()) {
+void ClientImpl::Unpublish(int32_t pubuid, ClientMessage&& msg) {
+  if (static_cast<uint32_t>(pubuid) >= m_publishers.size()) {
     return;
   }
-  m_publishers[index].reset();
+  m_publishers[pubuid].reset();
 
   // loop over all publishers to update period
   m_periodMs = kMaxPeriodMs;
@@ -216,40 +210,35 @@ void ClientImpl::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle,
   }
   UpdatePeriodic();
 
-  m_outgoing.SendMessage(pubHandle, std::move(msg));
+  m_outgoing.SendMessage(pubuid, std::move(msg));
 
   // remove from outgoing handle map
-  m_outgoing.EraseHandle(pubHandle);
+  m_outgoing.EraseId(pubuid);
 }
 
-void ClientImpl::SetValue(NT_Publisher pubHandle, const Value& value) {
-  DEBUG4("SetValue({}, time={}, server_time={})", pubHandle, value.time(),
+void ClientImpl::SetValue(int32_t pubuid, const Value& value) {
+  DEBUG4("SetValue({}, time={}, server_time={})", pubuid, value.time(),
          value.server_time());
-  unsigned int index = Handle{pubHandle}.GetIndex();
-  if (index >= m_publishers.size() || !m_publishers[index]) {
+  if (static_cast<uint32_t>(pubuid) >= m_publishers.size() ||
+      !m_publishers[pubuid]) {
     return;
   }
-  auto& publisher = *m_publishers[index];
+  auto& publisher = *m_publishers[pubuid];
   m_outgoing.SendValue(
-      pubHandle, value,
+      pubuid, value,
       publisher.options.sendAll ? ValueSendMode::kAll : ValueSendMode::kNormal);
 }
 
-void ClientImpl::ServerAnnounce(std::string_view name, int64_t id,
+void ClientImpl::ServerAnnounce(std::string_view name, int id,
                                 std::string_view typeStr,
                                 const wpi::json& properties,
-                                std::optional<int64_t> pubuid) {
+                                std::optional<int> pubuid) {
   DEBUG4("ServerAnnounce({}, {}, {})", name, id, typeStr);
   assert(m_local);
-  NT_Publisher pubHandle{0};
-  if (pubuid) {
-    pubHandle = Handle(m_inst, pubuid.value(), Handle::kPublisher);
-  }
-  m_topicMap[id] =
-      m_local->NetworkAnnounce(name, typeStr, properties, pubHandle);
+  m_topicMap[id] = m_local->NetworkAnnounce(name, typeStr, properties, pubuid);
 }
 
-void ClientImpl::ServerUnannounce(std::string_view name, int64_t id) {
+void ClientImpl::ServerUnannounce(std::string_view name, int id) {
   DEBUG4("ServerUnannounce({}, {})", name, id);
   assert(m_local);
   m_local->NetworkUnannounce(name);

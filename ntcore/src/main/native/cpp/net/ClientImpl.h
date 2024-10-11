@@ -9,7 +9,6 @@
 #include <functional>
 #include <memory>
 #include <span>
-#include <string>
 #include <string_view>
 #include <vector>
 
@@ -39,7 +38,7 @@ class WireConnection;
 class ClientImpl final : private ServerMessageHandler {
  public:
   ClientImpl(
-      uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
+      uint64_t curTimeMs, WireConnection& wire, wpi::Logger& logger,
       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
           timeSyncUpdated,
       std::function<void(uint32_t repeatMs)> setPeriodic);
@@ -55,7 +54,6 @@ class ClientImpl final : private ServerMessageHandler {
 
  private:
   struct PublisherData {
-    NT_Publisher handle;
     PubSubOptionsImpl options;
     // in options as double, but copy here as integer; rounded to the nearest
     // 10 ms
@@ -65,21 +63,18 @@ class ClientImpl final : private ServerMessageHandler {
   void UpdatePeriodic();
 
   // ServerMessageHandler interface
-  void ServerAnnounce(std::string_view name, int64_t id,
-                      std::string_view typeStr, const wpi::json& properties,
-                      std::optional<int64_t> pubuid) final;
-  void ServerUnannounce(std::string_view name, int64_t id) final;
+  void ServerAnnounce(std::string_view name, int id, std::string_view typeStr,
+                      const wpi::json& properties,
+                      std::optional<int> pubuid) final;
+  void ServerUnannounce(std::string_view name, int id) final;
   void ServerPropertiesUpdate(std::string_view name, const wpi::json& update,
                               bool ack) final;
 
-  void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-               std::string_view name, std::string_view typeStr,
+  void Publish(int pubuid, std::string_view name, std::string_view typeStr,
                const wpi::json& properties, const PubSubOptionsImpl& options);
-  void Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle,
-                 ClientMessage&& msg);
-  void SetValue(NT_Publisher pubHandle, const Value& value);
+  void Unpublish(int pubuid, ClientMessage&& msg);
+  void SetValue(int pubuid, const Value& value);
 
-  int m_inst;
   WireConnection& m_wire;
   wpi::Logger& m_logger;
   LocalInterface* m_local{nullptr};
@@ -91,7 +86,7 @@ class ClientImpl final : private ServerMessageHandler {
   std::vector<std::unique_ptr<PublisherData>> m_publishers;
 
   // indexed by server-provided topic id
-  wpi::DenseMap<int64_t, NT_Topic> m_topicMap;
+  wpi::DenseMap<int, NT_Topic> m_topicMap;
 
   // ping
   NetworkPing m_ping;

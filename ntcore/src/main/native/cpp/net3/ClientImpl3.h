@@ -61,7 +61,6 @@ class ClientImpl3 final : private MessageHandler3 {
     explicit PublisherData(Entry* entry) : entry{entry} {}
 
     Entry* entry;
-    NT_Publisher handle;
     PubSubOptionsImpl options;
     // in options as double, but copy here as integer; rounded to the nearest
     // 10 ms
@@ -106,13 +105,11 @@ class ClientImpl3 final : private MessageHandler3 {
   bool CheckNetworkReady(uint64_t curTimeMs);
 
   // Outgoing handlers
-  void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-               std::string_view name, std::string_view typeStr,
+  void Publish(int pubuid, std::string_view name, std::string_view typeStr,
                const wpi::json& properties, const PubSubOptionsImpl& options);
-  void Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle);
-  void SetProperties(NT_Topic topicHandle, std::string_view name,
-                     const wpi::json& update);
-  void SetValue(NT_Publisher pubHandle, const Value& value);
+  void Unpublish(int pubuid);
+  void SetProperties(std::string_view name, const wpi::json& update);
+  void SetValue(int pubuid, const Value& value);
 
   // MessageHandler interface
   void KeepAlive() final;

@@ -10,7 +10,7 @@ using namespace nt::net;
 
 static constexpr size_t kMaxSize = 2 * 1024 * 1024;
 
-void NetworkLoopQueue::SetValue(NT_Publisher pubHandle, const Value& value) {
+void NetworkLoopQueue::SetValue(int pubuid, const Value& value) {
   std::scoped_lock lock{m_mutex};
   m_size += sizeof(ClientMessage) + value.size();
   if (m_size > kMaxSize) {
@@ -20,5 +20,5 @@ void NetworkLoopQueue::SetValue(NT_Publisher pubHandle, const Value& value) {
     }
     return;  // avoid potential out of memory
   }
-  m_queue.emplace_back(ClientMessage{ClientValueMsg{pubHandle, value}});
+  m_queue.emplace_back(ClientMessage{ClientValueMsg{pubuid, value}});
 }

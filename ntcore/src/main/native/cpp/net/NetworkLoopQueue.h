@@ -31,18 +31,15 @@ class NetworkLoopQueue : public NetworkInterface {
   void ClearQueue();
 
   // NetworkInterface - calls to these append to the queue
-  void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-               std::string_view name, std::string_view typeStr,
+  void Publish(int pubuid, std::string_view name, std::string_view typeStr,
                const wpi::json& properties,
                const PubSubOptionsImpl& options) final;
-  void Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) final;
-  void SetProperties(NT_Topic topicHandle, std::string_view name,
-                     const wpi::json& update) final;
-  void Subscribe(NT_Subscriber subHandle,
-                 std::span<const std::string> topicNames,
+  void Unpublish(int pubuid) final;
+  void SetProperties(std::string_view name, const wpi::json& update) final;
+  void Subscribe(int subuid, std::span<const std::string> topicNames,
                  const PubSubOptionsImpl& options) final;
-  void Unsubscribe(NT_Subscriber subHandle) final;
-  void SetValue(NT_Publisher pubHandle, const Value& value) final;
+  void Unsubscribe(int subuid) final;
+  void SetValue(int pubuid, const Value& value) final;
 
  private:
   wpi::mutex m_mutex;

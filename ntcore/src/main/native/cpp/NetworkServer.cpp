@@ -254,7 +254,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
       m_websocket->binary.connect([this](std::span<const uint8_t> data, bool) {
         while (!data.empty()) {
           // decode message
-          int64_t pubuid;
+          int pubuid;
           Value value;
           std::string error;
           if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0)) {
