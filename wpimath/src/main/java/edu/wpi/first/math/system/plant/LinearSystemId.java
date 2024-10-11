@@ -14,7 +14,6 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.PerUnit;
@@ -323,28 +322,18 @@ public final class LinearSystemId {
    * [left velocity, right velocity]ᵀ, inputs are [left voltage, right voltage]ᵀ, and outputs are
    * [left velocity, right velocity]ᵀ.
    *
-   * @param motor The motor (or gearbox) driving the drivetrain.
+   * @param driveWheel A {@link Wheel} representing one of the drivetrain's wheels.
    * @param massKg The mass of the robot in kilograms.
-   * @param rMeters The radius of the wheels in meters.
    * @param rbMeters The radius of the base (half the track width) in meters.
    * @param JKgMetersSquared The moment of inertia of the robot.
-   * @param gearing The gearing reduction as output over input.
    * @return A LinearSystem representing a differential drivetrain.
    * @throws IllegalArgumentException if m &lt;= 0, r &lt;= 0, rb &lt;= 0, J &lt;= 0, or gearing
    *     &lt;= 0.
    */
   public static LinearSystem<N2, N2, N2> createDrivetrainVelocitySystem(
-      DCMotor motor,
-      double massKg,
-      double rMeters,
-      double rbMeters,
-      double JKgMetersSquared,
-      double gearing) {
+      Wheel driveWheel, double massKg, double rbMeters, double JKgMetersSquared) {
     if (massKg <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
-    }
-    if (rMeters <= 0.0) {
-      throw new IllegalArgumentException("rMeters must be greater than zero.");
     }
     if (rbMeters <= 0.0) {
       throw new IllegalArgumentException("rbMeters must be greater than zero.");
@@ -352,15 +341,19 @@ public final class LinearSystemId {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("JKgMetersSquared must be greater than zero.");
     }
-    if (gearing <= 0.0) {
-      throw new IllegalArgumentException("gearing must be greater than zero.");
-    }
 
     var C1 =
-        -(gearing * gearing)
-            * motor.KtNMPerAmp
-            / (motor.KvRadPerSecPerVolt * motor.rOhms * rMeters * rMeters);
-    var C2 = gearing * motor.KtNMPerAmp / (motor.rOhms * rMeters);
+        -driveWheel.gearbox.numMotors
+            * Math.pow(driveWheel.gearbox.reduction, 2)
+            * driveWheel.gearbox.motorType.KtNMPerAmp
+            / (driveWheel.gearbox.motorType.KvRadPerSecPerVolt
+                * driveWheel.gearbox.motorType.rOhms
+                * Math.pow(driveWheel.radiusMeters, 2));
+    var C2 =
+        driveWheel.gearbox.numMotors
+            * driveWheel.gearbox.reduction
+            * driveWheel.gearbox.motorType.KtNMPerAmp
+            / (driveWheel.gearbox.motorType.rOhms * driveWheel.radiusMeters);
 
     final double C3 = 1 / massKg + rbMeters * rbMeters / JKgMetersSquared;
     final double C4 = 1 / massKg - rbMeters * rbMeters / JKgMetersSquared;
@@ -368,109 +361,6 @@ public final class LinearSystemId {
     var B = MatBuilder.fill(Nat.N2(), Nat.N2(), C3 * C2, C4 * C2, C4 * C2, C3 * C2);
     var C = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 0.0, 0.0, 1.0);
     var D = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0, 0.0, 0.0, 0.0);
-
-    return new LinearSystem<>(A, B, C, D);
-  }
-
-  /**
-   * Create a state-space model of a differential drive drivetrain. In this model, the states are
-   * [x, y, theta, vel_l, vel_r, dist_l, dist_r]ᵀ, inputs are [left voltage, right voltage]ᵀ, and
-   * outputs are [x, y, theta, vel_l, vel_r, dist_l, dist_r]ᵀ.
-   *
-   * @param wheel The wheel driving the drivetrain.
-   * @param massKg The mass of the robot in kilograms.
-   * @param JKgMetersSquared The moment of inertia of the robot.
-   * @param trackWidthMeters The robot's track width, or distance between left and right wheels.
-   * @return A LinearSystem representing a differential drivetrain.
-   * @throws IllegalArgumentException if massKg &leq; 0, trackWidthMeters &leq; 0, or
-   *     JKgMetersSquared &leq; 0.
-   */
-  public static LinearSystem<N7, N2, N7> createDrivetrainSystem(
-      Wheel wheel, double massKg, double JKgMetersSquared, double trackWidthMeters) {
-    if (massKg <= 0.0) {
-      throw new IllegalArgumentException("massKg must be greater than zero.");
-    }
-    if (JKgMetersSquared <= 0.0) {
-      throw new IllegalArgumentException("JKgMetersSquared must be greater than zero.");
-    }
-    if (trackWidthMeters <= 0.0) {
-      throw new IllegalArgumentException("trackWidthMeters must be greater than zero.");
-    }
-
-    var rbMeters = trackWidthMeters / 2.0; // The radius of the drivetrain.
-    var C1 =
-        -wheel.gearbox.numMotors
-            * Math.pow(wheel.gearbox.reduction, 2)
-            * wheel.gearbox.motorType.KtNMPerAmp
-            / (wheel.gearbox.motorType.KvRadPerSecPerVolt
-                * wheel.gearbox.motorType.rOhms
-                * Math.pow(rbMeters, 2));
-    var C2 =
-        wheel.gearbox.numMotors
-            * wheel.gearbox.reduction
-            * wheel.gearbox.motorType.KtNMPerAmp
-            / (wheel.gearbox.motorType.rOhms * wheel.radiusMeters);
-
-    final double C3 = 1 / massKg + rbMeters * rbMeters / JKgMetersSquared;
-    final double C4 = 1 / massKg - rbMeters * rbMeters / JKgMetersSquared;
-    var A =
-        MatBuilder.fill(
-            Nat.N7(),
-            Nat.N7(),
-            0,
-            0,
-            0,
-            0.5,
-            0.5,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            -1.0 / trackWidthMeters,
-            1.0 / trackWidthMeters,
-            0,
-            0,
-            0,
-            0,
-            0,
-            C3 * C1,
-            C4 * C1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            C4 * C1,
-            C3 * C1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0);
-    var B =
-        MatBuilder.fill(
-            Nat.N7(), Nat.N2(), 0, 0, 0, 0, 0, 0, C3 * C2, C4 * C2, C4 * C2, C3 * C2, 0, 0, 0, 0);
-    var C = Matrix.eye(Nat.N7());
-    var D = new Matrix<>(Nat.N7(), Nat.N2());
 
     return new LinearSystem<>(A, B, C, D);
   }

@@ -11,7 +11,6 @@ import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.DCMotorType;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -22,7 +21,8 @@ class LinearSystemIDTest {
   @Test
   void testDrivetrainVelocitySystem() {
     var model =
-        LinearSystemId.createDrivetrainVelocitySystem(DCMotor.getNEO(4), 70, 0.05, 0.4, 6.0, 6);
+        LinearSystemId.createDrivetrainVelocitySystem(
+            new Wheel(new Gearbox(4, DCMotorType.NEO, 6), 0.05), 70, 0.4, 6.0);
     assertTrue(
         model
             .getA()
