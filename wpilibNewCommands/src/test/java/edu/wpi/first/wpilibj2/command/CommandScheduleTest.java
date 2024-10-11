@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj2.command;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.verify;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 class CommandScheduleTest extends CommandTestBase {
@@ -106,6 +108,49 @@ class CommandScheduleTest extends CommandTestBase {
       verify(mockCommand, never()).end(false);
 
       assertFalse(scheduler.isScheduled(mockCommand));
+    }
+  }
+
+  @Test
+  void cancelNextCommandTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      Command[] commands = new Command[2];
+      var commandRunCounter = new AtomicInteger(0);
+      // due to the ordering of sets being non-deterministic, we cancel the other command in the
+      // first command and check that the second command is not run
+      Command command1 =
+          new RunCommand(
+              () -> {
+                scheduler.cancel(commands[1]);
+                commandRunCounter.incrementAndGet();
+              });
+      Command command2 =
+          new RunCommand(
+              () -> {
+                scheduler.cancel(commands[0]);
+                commandRunCounter.incrementAndGet();
+              });
+
+      commands[0] = command1;
+      commands[1] = command2;
+
+      scheduler.schedule(command1, command2);
+      scheduler.run();
+
+      assertEquals(
+          1, commandRunCounter.get(), "Second command was run when it shouldn't have been");
+
+      // only one of the commands should be canceled.
+      assertFalse(
+          scheduler.isScheduled(command1) && scheduler.isScheduled(command2),
+          "None of the commands were canceled when one should have been");
+      // one of the commands shouldn't be canceled because the other one is canceled first
+      assertTrue(
+          scheduler.isScheduled(command1) || scheduler.isScheduled(command2),
+          "Both commands were canceled when only one should have been");
+
+      scheduler.run();
+      assertEquals(2, commandRunCounter.get());
     }
   }
 
