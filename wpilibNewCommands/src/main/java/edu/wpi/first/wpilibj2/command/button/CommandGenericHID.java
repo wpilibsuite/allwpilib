@@ -23,6 +23,8 @@ public class CommandGenericHID {
       new HashMap<>();
   private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisGreaterThanCache =
       new HashMap<>();
+  private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>>
+      m_axisMagnitudeGreaterThanCache = new HashMap<>();
   private final Map<EventLoop, Map<Integer, Trigger>> m_povCache = new HashMap<>();
 
   /**
@@ -258,6 +260,37 @@ public class CommandGenericHID {
     var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
         Pair.of(axis, threshold), k -> new Trigger(loop, () -> getRawAxis(axis) > threshold));
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis magnitude value is greater than the
+   *     provided threshold.
+   */
+  public Trigger axisMagnitudeGreaterThan(int axis, double threshold, EventLoop loop) {
+    var cache = m_axisMagnitudeGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
+    return cache.computeIfAbsent(
+        Pair.of(axis, threshold),
+        k -> new Trigger(loop, () -> Math.abs(getRawAxis(axis)) > threshold));
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
+   */
+  public Trigger axisMagnitudeGreaterThan(int axis, double threshold) {
+    return axisMagnitudeGreaterThan(
+        axis, threshold, CommandScheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**

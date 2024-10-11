@@ -1252,7 +1252,7 @@ int ServerImpl::AddClient3(std::string_view connInfo, bool local,
   return index;
 }
 
-void ServerImpl::RemoveClient(int clientId) {
+std::shared_ptr<void> ServerImpl::RemoveClient(int clientId) {
   DEBUG3("RemoveClient({})", clientId);
   auto& client = m_clients[clientId];
 
@@ -1288,8 +1288,7 @@ void ServerImpl::RemoveClient(int clientId) {
   DeleteTopic(client->m_metaPub);
   DeleteTopic(client->m_metaSub);
 
-  // delete the client
-  client.reset();
+  return std::move(client);
 }
 
 bool ServerImpl::PersistentChanged() {

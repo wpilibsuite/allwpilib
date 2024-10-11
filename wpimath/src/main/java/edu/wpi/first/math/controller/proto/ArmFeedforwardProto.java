@@ -27,7 +27,7 @@ public class ArmFeedforwardProto implements Protobuf<ArmFeedforward, ProtobufArm
 
   @Override
   public ArmFeedforward unpack(ProtobufArmFeedforward msg) {
-    return new ArmFeedforward(msg.getKs(), msg.getKg(), msg.getKv(), msg.getKa());
+    return new ArmFeedforward(msg.getKs(), msg.getKg(), msg.getKv(), msg.getKa(), msg.getDt());
   }
 
   @Override
@@ -36,5 +36,6 @@ public class ArmFeedforwardProto implements Protobuf<ArmFeedforward, ProtobufArm
     msg.setKg(value.getKg());
     msg.setKv(value.getKv());
     msg.setKa(value.getKa());
+    msg.setDt(value.getDt());
   }
 }
