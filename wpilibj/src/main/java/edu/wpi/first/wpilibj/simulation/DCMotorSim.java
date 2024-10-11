@@ -254,7 +254,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @return The DC motor's input voltage.
    */
   public Voltage getInputVoltageVolts() {
-    m_voltage.mut_setMagnitude(getInput(0));
+    m_voltage.mut_setMagnitude(getInputVoltage());
     return m_voltage;
   }
   
@@ -274,7 +274,6 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @param volts The input voltage.
    */
   public void setInputVoltage(Voltage volts) {
-    setInput(volts.in(Volts));
-    clampInput(RobotController.getBatteryVoltage());
+    setInputVoltage(volts.in(Volts));
   }
 }
