@@ -21,9 +21,8 @@
 #include <wpi/UidVector.h>
 #include <wpi/json.h>
 
-#include "Log.h"
+#include "ClientMessageQueue.h"
 #include "Message.h"
-#include "NetworkInterface.h"
 #include "NetworkOutgoingQueue.h"
 #include "NetworkPing.h"
 #include "PubSubOptions.h"
@@ -63,11 +62,15 @@ class ServerImpl final {
   void SendAllOutgoing(uint64_t curTimeMs, bool flush);
   void SendOutgoing(int clientId, uint64_t curTimeMs);
 
-  void HandleLocal(std::span<const ClientMessage> msgs);
-  void SetLocal(ServerMessageHandler* local);
+  void SetLocal(ServerMessageHandler* local, ClientMessageQueue* queue);
 
-  void ProcessIncomingText(int clientId, std::string_view data);
-  void ProcessIncomingBinary(int clientId, std::span<const uint8_t> data);
+  // these return true if any messages have been queued for later processing
+  bool ProcessIncomingText(int clientId, std::string_view data);
+  bool ProcessIncomingBinary(int clientId, std::span<const uint8_t> data);
+
+  // later processing -- returns true if more to process
+  bool ProcessIncomingMessages(size_t max);
+  bool ProcessLocalMessages(size_t max);
 
   // Returns -1 if cannot add client (e.g. due to duplicate name).
   // Caller must ensure WireConnection lifetime lasts until RemoveClient() call.
@@ -181,8 +184,9 @@ class ServerImpl final {
           m_logger{logger} {}
     virtual ~ClientData() = default;
 
-    virtual void ProcessIncomingText(std::string_view data) = 0;
-    virtual void ProcessIncomingBinary(std::span<const uint8_t> data) = 0;
+    // these return true if any messages have been queued for later processing
+    virtual bool ProcessIncomingText(std::string_view data) = 0;
+    virtual bool ProcessIncomingBinary(std::span<const uint8_t> data) = 0;
 
     virtual void SendValue(TopicData* topic, const Value& value,
                            ValueSendMode mode) = 0;
@@ -192,6 +196,9 @@ class ServerImpl final {
                                       bool ack) = 0;
     virtual void SendOutgoing(uint64_t curTimeMs, bool flush) = 0;
     virtual void Flush() = 0;
+
+    // later processing -- returns true if more to process
+    virtual bool ProcessIncomingMessages(size_t max) = 0;
 
     void UpdateMetaClientPub();
     void UpdateMetaClientSub();
@@ -248,7 +255,12 @@ class ServerImpl final {
 
     void ClientSetValue(int pubuid, const Value& value) final;
 
+    bool DoProcessIncomingMessages(ClientMessageQueue& queue, size_t max);
+
     wpi::DenseMap<TopicData*, bool> m_announceSent;
+
+   private:
+    std::array<ClientMessage, 16> m_msgsBuf;
   };
 
   class ClientDataLocal final : public ClientData4Base {
@@ -256,8 +268,17 @@ class ServerImpl final {
     ClientDataLocal(ServerImpl& server, int id, wpi::Logger& logger)
         : ClientData4Base{"", "", true, [](uint32_t) {}, server, id, logger} {}
 
-    void ProcessIncomingText(std::string_view data) final {}
-    void ProcessIncomingBinary(std::span<const uint8_t> data) final {}
+    bool ProcessIncomingText(std::string_view data) final { return false; }
+    bool ProcessIncomingBinary(std::span<const uint8_t> data) final {
+      return false;
+    }
+
+    bool ProcessIncomingMessages(size_t max) final {
+      if (!m_queue) {
+        return false;
+      }
+      return DoProcessIncomingMessages(*m_queue, max);
+    }
 
     void SendValue(TopicData* topic, const Value& value,
                    ValueSendMode mode) final;
@@ -268,7 +289,10 @@ class ServerImpl final {
     void SendOutgoing(uint64_t curTimeMs, bool flush) final {}
     void Flush() final {}
 
-    void HandleLocal(std::span<const ClientMessage> msgs);
+    void SetQueue(ClientMessageQueue* queue) { m_queue = queue; }
+
+   private:
+    ClientMessageQueue* m_queue = nullptr;
   };
 
   class ClientData4 final : public ClientData4Base {
@@ -280,10 +304,19 @@ class ServerImpl final {
                           server, id,       logger},
           m_wire{wire},
           m_ping{wire},
+          m_incoming{logger},
           m_outgoing{wire, local} {}
 
-    void ProcessIncomingText(std::string_view data) final;
-    void ProcessIncomingBinary(std::span<const uint8_t> data) final;
+    bool ProcessIncomingText(std::string_view data) final;
+    bool ProcessIncomingBinary(std::span<const uint8_t> data) final;
+
+    bool ProcessIncomingMessages(size_t max) final {
+      if (!DoProcessIncomingMessages(m_incoming, max)) {
+        m_wire.StartRead();
+        return false;
+      }
+      return true;
+    }
 
     void SendValue(TopicData* topic, const Value& value,
                    ValueSendMode mode) final;
@@ -302,6 +335,7 @@ class ServerImpl final {
 
    private:
     NetworkPing m_ping;
+    NetworkIncomingClientQueue m_incoming;
     NetworkOutgoingQueue<ServerMessage> m_outgoing;
   };
 
@@ -315,10 +349,13 @@ class ServerImpl final {
         : ClientData{"", connInfo, local, setPeriodic, server, id, logger},
           m_connected{std::move(connected)},
           m_wire{wire},
-          m_decoder{*this} {}
+          m_decoder{*this},
+          m_incoming{logger} {}
 
-    void ProcessIncomingText(std::string_view data) final {}
-    void ProcessIncomingBinary(std::span<const uint8_t> data) final;
+    bool ProcessIncomingText(std::string_view data) final { return false; }
+    bool ProcessIncomingBinary(std::span<const uint8_t> data) final;
+
+    bool ProcessIncomingMessages(size_t max) final { return false; }
 
     void SendValue(TopicData* topic, const Value& value,
                    ValueSendMode mode) final;
@@ -358,6 +395,7 @@ class ServerImpl final {
     State m_state{kStateInitial};
     net3::WireDecoder3 m_decoder;
 
+    NetworkIncomingClientQueue m_incoming;
     std::vector<net3::Message3> m_outgoing;
     wpi::DenseMap<NT_Topic, size_t> m_outgoingValueMap;
     int64_t m_nextPubUid{1};

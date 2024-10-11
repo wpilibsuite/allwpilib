@@ -17,6 +17,7 @@
 #include <wpi/Base64.h>
 #include <wpi/MessagePack.h>
 #include <wpi/SmallVector.h>
+#include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/json.h>
 #include <wpi/raw_ostream.h>
@@ -26,6 +27,7 @@
 #include "Log.h"
 #include "NetworkInterface.h"
 #include "Types_internal.h"
+#include "net/Message.h"
 #include "net/WireEncoder.h"
 #include "net3/WireConnection3.h"
 #include "net3/WireEncoder3.h"
@@ -432,12 +434,13 @@ void ServerImpl::ClientDataLocal::SendPropertiesUpdate(TopicData* topic,
   }
 }
 
-void ServerImpl::ClientDataLocal::HandleLocal(
-    std::span<const ClientMessage> msgs) {
-  DEBUG4("HandleLocal()");
-  if (msgs.empty()) {
-    return;
-  }
+bool ServerImpl::ClientData4Base::DoProcessIncomingMessages(
+    ClientMessageQueue& queue, size_t max) {
+  DEBUG4("ProcessIncomingMessage()");
+  max = (std::min)(m_msgsBuf.size(), max);
+  std::span<ClientMessage> msgs =
+      queue.ReadQueue(wpi::take_front(std::span{m_msgsBuf}, max));
+
   // just map as a normal client into client=0 calls
   bool updatepub = false;
   bool updatesub = false;
@@ -468,17 +471,28 @@ void ServerImpl::ClientDataLocal::HandleLocal(
   if (updatesub) {
     UpdateMetaClientSub();
   }
+
+  return msgs.size() == max;  // don't know for sure, but there might be more
 }
 
-void ServerImpl::ClientData4::ProcessIncomingText(std::string_view data) {
-  if (WireDecodeText(data, *this, m_logger)) {
-    UpdateMetaClientPub();
-    UpdateMetaClientSub();
+bool ServerImpl::ClientData4::ProcessIncomingText(std::string_view data) {
+  constexpr int kMaxImmProcessing = 10;
+  bool queueWasEmpty = m_incoming.empty();
+  // can't directly process, because we don't know how big it is
+  WireDecodeText(data, m_incoming, m_logger);
+  if (queueWasEmpty &&
+      DoProcessIncomingMessages(m_incoming, kMaxImmProcessing)) {
+    m_wire.StopRead();
+    return true;
   }
+  return false;
 }
 
-void ServerImpl::ClientData4::ProcessIncomingBinary(
+bool ServerImpl::ClientData4::ProcessIncomingBinary(
     std::span<const uint8_t> data) {
+  constexpr int kMaxImmProcessing = 10;
+  // if we've already queued, keep queuing
+  int count = m_incoming.empty() ? 0 : kMaxImmProcessing;
   for (;;) {
     if (data.empty()) {
       break;
@@ -503,8 +517,17 @@ void ServerImpl::ClientData4::ProcessIncomingBinary(
     }
 
     // handle value set
-    ClientSetValue(pubuid, value);
+    if (++count < kMaxImmProcessing) {
+      ClientSetValue(pubuid, value);
+    } else {
+      m_incoming.ClientSetValue(pubuid, value);
+    }
   }
+  if (count >= kMaxImmProcessing) {
+    m_wire.StopRead();
+    return true;
+  }
+  return false;
 }
 
 void ServerImpl::ClientData4::SendValue(TopicData* topic, const Value& value,
@@ -608,11 +631,12 @@ bool ServerImpl::ClientData3::TopicData3::UpdateFlags(TopicData* topic) {
   return updated;
 }
 
-void ServerImpl::ClientData3::ProcessIncomingBinary(
+bool ServerImpl::ClientData3::ProcessIncomingBinary(
     std::span<const uint8_t> data) {
   if (!m_decoder.Execute(&data)) {
     m_wire.Disconnect(m_decoder.GetError());
   }
+  return false;
 }
 
 void ServerImpl::ClientData3::SendValue(TopicData* topic, const Value& value,
@@ -1918,14 +1942,11 @@ void ServerImpl::SendOutgoing(int clientId, uint64_t curTimeMs) {
   }
 }
 
-void ServerImpl::HandleLocal(std::span<const ClientMessage> msgs) {
-  // just map as a normal client into client=0 calls
-  m_localClient->HandleLocal(msgs);
-}
-
-void ServerImpl::SetLocal(ServerMessageHandler* local) {
+void ServerImpl::SetLocal(ServerMessageHandler* local,
+                          ClientMessageQueue* queue) {
   DEBUG4("SetLocal()");
   m_local = local;
+  m_localClient->SetQueue(queue);
 
   // create server meta topics
   m_metaClients = CreateMetaTopic("$clients");
@@ -1939,17 +1960,37 @@ void ServerImpl::SetLocal(ServerMessageHandler* local) {
   m_localClient->UpdateMetaClientSub();
 }
 
-void ServerImpl::ProcessIncomingText(int clientId, std::string_view data) {
+bool ServerImpl::ProcessIncomingText(int clientId, std::string_view data) {
   if (auto client = m_clients[clientId].get()) {
-    client->ProcessIncomingText(data);
+    return client->ProcessIncomingText(data);
+  } else {
+    return false;
   }
 }
 
-void ServerImpl::ProcessIncomingBinary(int clientId,
+bool ServerImpl::ProcessIncomingBinary(int clientId,
                                        std::span<const uint8_t> data) {
   if (auto client = m_clients[clientId].get()) {
-    client->ProcessIncomingBinary(data);
+    return client->ProcessIncomingBinary(data);
+  } else {
+    return false;
   }
+}
+
+bool ServerImpl::ProcessIncomingMessages(size_t max) {
+  DEBUG4("ProcessIncomingMessages({})", max);
+  bool rv = false;
+  for (auto&& client : m_clients) {
+    if (client && client->ProcessIncomingMessages(max)) {
+      rv = true;
+    }
+  }
+  return rv;
+}
+
+bool ServerImpl::ProcessLocalMessages(size_t max) {
+  DEBUG4("ProcessLocalMessages({})", max);
+  return m_localClient->ProcessIncomingMessages(max);
 }
 
 void ServerImpl::ConnectionsChanged(const std::vector<ConnectionInfo>& conns) {

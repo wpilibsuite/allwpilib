@@ -99,7 +99,7 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
   }
 }
 
-void ClientImpl::HandleLocal(std::vector<ClientMessage>&& msgs) {
+void ClientImpl::HandleLocal(std::span<ClientMessage> msgs) {
   DEBUG4("HandleLocal()");
   for (auto&& elem : msgs) {
     // common case is value
