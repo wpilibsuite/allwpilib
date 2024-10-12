@@ -9,13 +9,17 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 
 /**
  * A subsystem that uses a {@link ProfiledPIDController} to control an output. The controller is run
  * synchronously from the subsystem's periodic() method.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @deprecated Use a ProfiledPIDController instead
  */
+@Deprecated(forRemoval = true, since = "2025")
 public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   /** Profiled PID controller. */
   protected final ProfiledPIDController m_controller;
