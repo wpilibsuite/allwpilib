@@ -25,29 +25,20 @@ filegroup(
 )
 
 cc_library(
-    name = "private_includes",
-    hdrs = glob([
-        "src/main/native/cpp/*.h",
-        "src/main/native/cpp/net/*.h",
-        "src/main/native/cpp/net/*.inc",
-        "src/main/native/cpp/net3/*.h",
-    ]),
-    strip_include_prefix = "src/main/native/cpp",
-)
-
-cc_library(
     name = "ntcore.static",
     srcs = glob(
         ["src/main/native/cpp/**"],
         exclude = ["src/main/native/cpp/jni/**"],
     ) + [":generated_cc_source"],
     hdrs = glob(["src/main/native/include/**/*"]),
-    includes = ["src/main/native/include"],
+    includes = [
+        "src/main/native/cpp",
+        "src/main/native/include",
+    ],
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
         ":generated_cc_headers",
-        ":private_includes",
         "//wpinet:wpinet.static",
         "//wpiutil:wpiutil.static",
     ],
