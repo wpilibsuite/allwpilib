@@ -202,8 +202,7 @@ public class ElevatorSimTorque extends ElevatorSimBase {
   public void update(double dtSeconds) {
     super.update(dtSeconds);
     m_currentDraw.mut_replace(m_drum.currentAmps(getInput(0)) * Math.signum(m_u.get(0, 0)), Amps);
-    m_voltage.mut_replace(
-        m_drum.voltageVolts(getInput(0) / m_drum.radiusMeters, m_x.get(1, 0)), Volts);
+    m_voltage.mut_replace(m_drum.voltage(getInput(0) / m_drum.radiusMeters, m_x.get(1, 0)), Volts);
     m_force.mut_replace(getInput(0) / m_drum.radiusMeters, Newtons);
     m_torque.mut_replace(getInput(0), NewtonMeters);
   }

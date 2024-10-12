@@ -22,7 +22,7 @@ import edu.wpi.first.units.measure.Voltage;
 
 /** Represents a wheel. */
 public class Wheel {
-  /** The wheel's gearbox. */
+  /** The gearbox of the wheel. */
   public final Gearbox gearbox;
 
   /** The radius of the wheel in meters. */
@@ -34,10 +34,8 @@ public class Wheel {
   /** The net current of the wheel. */
   private final MutCurrent m_current = Amps.mutable(0.0);
 
-  /** The net torque produced by the wheel. */
+  /** The net force produced by the wheel. */
   private final MutForce m_force = Newtons.mutable(0.0);
-
-  /** The net force produced by the wheel */
 
   /** The voltage on the wheel. */
   private final MutVoltage m_voltage = Volts.mutable(0.0);
@@ -46,10 +44,10 @@ public class Wheel {
   private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0.0);
 
   /**
-   * Creates a wheel with the supplied gearbox and radius in meters.
+   * Creates a wheel.
    *
-   * @param gearbox The wheel's gearbox.
-   * @param radiusMeters The wheel's radius in meters.
+   * @param gearbox The gearbox of the wheel
+   * @param radiusMeters The radius of the wheel in meters.
    * @throws IllegalArgumentException if radiusMeters &leq; 0.
    */
   public Wheel(Gearbox gearbox, double radiusMeters) {
@@ -62,10 +60,10 @@ public class Wheel {
   }
 
   /**
-   * Creates a wheel with the supplied gearbox and radius in meters.
+   * Creates a wheel.
    *
-   * @param gearbox The wheel's gearbox.
-   * @param radius The wheel's radius.
+   * @param gearbox The gearbox of the wheel
+   * @param radius The radius of the wheel.
    * @throws IllegalArgumentException if radius &leq; 0.
    */
   public Wheel(Gearbox gearbox, Distance radius) {
@@ -73,11 +71,32 @@ public class Wheel {
   }
 
   /**
-   * Calculates net current drawn by the motors with given speed and input voltage.
+   * Calculates the estimated net current drawn by the motors.
+   *
+   * @param velocityMetersPerSecond The linear velocity of the wheel in meters per second.
+   * @param voltageInputVolts The voltage applied to the motors in volts.
+   * @return The estimated net current drawn by the motors in amps.
+   */
+  public double currentAmps(double velocityMetersPerSecond, double voltageInputVolts) {
+    return gearbox.currentAmps(velocityMetersPerSecond / radiusMeters, voltageInputVolts);
+  }
+
+  /**
+   * Calculates the estimated net current drawn by the motors.
+   *
+   * @param forceNewtons The force produced by the wheel in newtons.
+   * @return The estimated net current drawn by the motors in amps.
+   */
+  public double currentAmps(double forceNewtons) {
+    return gearbox.currentAmps(forceNewtons * radiusMeters);
+  }
+
+  /**
+   * Calculates the estimated net current drawn by the motors.
    *
    * @param velocity The linear velocity of the motor.
-   * @param voltage The voltage being applied to the motor.
-   * @return The estimated current.
+   * @param voltage The voltage applied to the motors.
+   * @return The estimated net current drawn by the motors.
    */
   public Current current(LinearVelocity velocity, Voltage voltage) {
     m_current.mut_replace(currentAmps(velocity.in(MetersPerSecond), voltage.in(Volts)), Amps);
@@ -85,10 +104,10 @@ public class Wheel {
   }
 
   /**
-   * Calculates net current drawn by the motors for a given force.
+   * Calculates the estimated net current drawn by the motors.
    *
-   * @param force The force produced by the motor.
-   * @return The net current drawn by the motors.
+   * @param force The force produced by the wheel.
+   * @return The estimated net current drawn by the motors.
    */
   public Current current(Force force) {
     m_current.mut_replace(currentAmps(force.in(Newtons)), Amps);
@@ -96,31 +115,20 @@ public class Wheel {
   }
 
   /**
-   * Calculates net current drawn in amps by the motors with given speed and input voltage.
+   * Calculates the force produced by the wheel.
    *
-   * @param velocityMetersPerSecond The linear velocity of the motor in meters per second.
-   * @param voltageInputVolts The voltage being applied to the motor in volts.
-   * @return The estimated current in amps.
+   * @param currentAmpere The net current drawn by the motors in amps.
+   * @return The force produced by the wheel in newtons.
    */
-  public double currentAmps(double velocityMetersPerSecond, double voltageInputVolts) {
-    return gearbox.currentAmps(velocityMetersPerSecond / radiusMeters, voltageInputVolts);
+  public double forceNewtons(double currentAmpere) {
+    return gearbox.torqueNewtonMeters(currentAmpere) / radiusMeters;
   }
 
   /**
-   * Calculates net current in amps drawn by the motors for a given force.
-   *
-   * @param forceNewtons The force produced by the motor in Newtons.
-   * @return The current drawn by the motor in amps.
-   */
-  public double currentAmps(double forceNewtons) {
-    return gearbox.currentAmps(forceNewtons * radiusMeters);
-  }
-
-  /**
-   * Calculates the torque produced by the motors with a given current.
+   * Calculates the force produced by the wheel.
    *
    * @param current The net current drawn by the motors.
-   * @return The torque output.
+   * @return The force produced by the wheel.
    */
   public Force force(Current current) {
     m_force.mut_replace(forceNewtons(current.in(Amps)), Newtons);
@@ -128,61 +136,49 @@ public class Wheel {
   }
 
   /**
-   * Calculate the force in Newtons produced by the motors with a given current.
+   * Calculates the estimated voltage on the motors.
    *
-   * @param currentAmpere The net current drawn by the motors in amps.
-   * @return The force output in Newtons.
+   * @param forceNewtons The force produced by the wheel in newtons.
+   * @param velocityMetersPerSecond The linear velocity of the wheel in meters per second.
+   * @return The voltage of the motors in volts.
    */
-  public double forceNewtons(double currentAmpere) {
-    return gearbox.torqueNewtonMeters(currentAmpere) / radiusMeters;
-  }
-
-  /**
-   * Calculate the voltage provided to the wheel for a given force and linear velocity.
-   *
-   * @param force The force produced by the wheel.
-   * @param velocity The linear velocity of the motor.
-   * @return The voltage of the motor.
-   */
-  public Voltage voltage(Force force, LinearVelocity velocity) {
-    m_voltage.mut_replace(voltageVolts(force.in(Newtons), velocity.in(MetersPerSecond)), Volts);
-    return m_voltage;
-  }
-
-  /**
-   * Calculate the voltage provided to the motors for a given force in Newtons and linear velocity
-   * in meters per second.
-   *
-   * @param forceNewtons The force produced by the motor in Newtons.
-   * @param velocityMetersPerSecond The linear velocity of the motor in meters per second.
-   * @return The voltage of the motor in volts.
-   */
-  public double voltageVolts(double forceNewtons, double velocityMetersPerSecond) {
+  public double voltage(double forceNewtons, double velocityMetersPerSecond) {
     return gearbox.voltage(forceNewtons * radiusMeters, velocityMetersPerSecond / radiusMeters);
   }
 
   /**
-   * Calculates the linear speed produced by the motor at a given force and input voltage.
+   * Calculates the estimated voltage on the motors.
    *
-   * @param force The force produced by the motor.
-   * @param voltage The voltage applied to the motor.
+   * @param force The force produced by the wheel.
+   * @param velocity The linear velocity of the wheel.
+   * @return The voltage of the motors.
+   */
+  public Voltage voltage(Force force, LinearVelocity velocity) {
+    m_voltage.mut_replace(voltage(force.in(Newtons), velocity.in(MetersPerSecond)), Volts);
+    return m_voltage;
+  }
+
+  /**
+   * Calculates the estimated linear speed of the wheel.
+   *
+   * @param forceNewtons The force produced by the wheel in newtons.
+   * @param voltage The voltage of the motors in volts.
+   * @return The linear speed of the motor in meters per second.
+   */
+  public double velocityMetersPerSecond(double forceNewtons, double voltage) {
+    return gearbox.angularVelocityRadPerSec(forceNewtons * radiusMeters, voltage);
+  }
+
+  /**
+   * Calculates the estimated linear speed of the wheel.
+   *
+   * @param force The force produced by the wheel.
+   * @param voltage The voltage of the motors.
    * @return The linear speed of the motor.
    */
   public LinearVelocity velocity(Force force, Voltage voltage) {
     m_velocity.mut_replace(
         velocityMetersPerSecond(force.in(Newtons), voltage.in(Volts)), MetersPerSecond);
     return m_velocity;
-  }
-
-  /**
-   * Calculates the linear speed produced by the motor at a given force in Newtons and input voltage
-   * in volts.
-   *
-   * @param forceNewtons The force produced by the motor in Newtons.
-   * @param voltageInputVolts The voltage applied to the motor in volts.
-   * @return The angular speed of the motor.
-   */
-  public double velocityMetersPerSecond(double forceNewtons, double voltageInputVolts) {
-    return gearbox.angularVelocityRadPerSec(forceNewtons * radiusMeters, voltageInputVolts);
   }
 }

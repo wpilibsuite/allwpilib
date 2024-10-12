@@ -115,7 +115,7 @@ public class Gearbox {
   }
 
   /**
-   * Calculates the net current drawn by the motors.
+   * Calculates the estimated net current drawn by the motors.
    *
    * @param torqueNewtonMeters The torque produced by the gearbox in newton-meters.
    * @return The estimated net current drawn by the motors in amps.
@@ -170,7 +170,7 @@ public class Gearbox {
   }
 
   /**
-   * Calculate the estimated voltage on the motors.
+   * Calculates the estimated voltage on the motors.
    *
    * @param torqueNm The torque produced by the gearbox in newton-meters.
    * @param angularVelocityRadPerSec The angular velocity of the gearbox in radians per second.
@@ -182,7 +182,7 @@ public class Gearbox {
   }
 
   /**
-   * Calculate the estimated voltage on the motors.
+   * Calculates the estimated voltage on the motors.
    *
    * @param torque The torque produced by the gearbox.
    * @param angularVelocity The angular velocity of the gearbox.
