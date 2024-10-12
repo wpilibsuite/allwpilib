@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <frc2/command/FunctionalCommand.h>
+#include <frc2/command/InstantCommand.h>
 #include <frc2/command/RunCommand.h>
 
 #include <memory>
@@ -99,13 +101,6 @@ TEST_F(CommandScheduleTest, SchedulerCancel) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(CommandScheduleTest, NotScheduledCancel) {
-  CommandScheduler scheduler = GetScheduler();
-  MockCommand command;
-
-  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&command));
-}
-
 TEST_F(CommandScheduleTest, CancelNextCommand) {
   CommandScheduler scheduler = GetScheduler();
 
@@ -164,6 +159,39 @@ TEST_F(CommandScheduleTest, CommandKnowsWhenItEnded) {
   EXPECT_FALSE(scheduler.IsScheduled(commandPtr))
       << "Command should be removed from scheduler when its isFinished() "
          "returns true";
+}
+
+TEST_F(CommandScheduleTest, ScheduleCommandInCommand) {
+  CommandScheduler scheduler = GetScheduler();
+  int counter = 0;
+  frc2::InstantCommand* commandPtr = nullptr;
+
+  auto command = frc2::RunCommand([&] {
+    scheduler.Schedule(commandPtr);
+    EXPECT_EQ(counter, 1)
+        << "Command 2's init was not run immediately after getting scheduled";
+  });
+  auto commandToGetScheduled = frc2::InstantCommand([&counter] { counter++; });
+
+  commandPtr = &commandToGetScheduled;
+
+  scheduler.Schedule(&command);
+  scheduler.Run();
+  EXPECT_EQ(counter, 1) << "Command 2 was not run when it should have been";
+  EXPECT_TRUE(scheduler.IsScheduled(commandPtr))
+      << "Command 2 was not added to scheduler";
+
+  scheduler.Run();
+  EXPECT_EQ(counter, 1) << "Command 2 was run when it shouldn't have been";
+  EXPECT_FALSE(scheduler.IsScheduled(commandPtr))
+      << "Command 2 did not end when it should have";
+}
+
+TEST_F(CommandScheduleTest, NotScheduledCancel) {
+  CommandScheduler scheduler = GetScheduler();
+  MockCommand command;
+
+  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&command));
 }
 
 TEST_F(CommandScheduleTest, SmartDashboardCancel) {
