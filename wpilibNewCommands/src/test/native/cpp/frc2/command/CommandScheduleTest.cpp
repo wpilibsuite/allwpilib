@@ -104,28 +104,27 @@ TEST_F(CommandScheduleTest, SchedulerCancel) {
 TEST_F(CommandScheduleTest, CancelNextCommand) {
   CommandScheduler scheduler = GetScheduler();
 
-  frc2::RunCommand* command1PtrPtr = nullptr;
-  frc2::RunCommand* command2PtrPtr = nullptr;
-  auto counterPtr = std::make_shared<int>(0);
+  frc2::RunCommand* command1Ptr = nullptr;
+  frc2::RunCommand* command2Ptr = nullptr;
+  int counter = 0;
 
-  auto command1 = frc2::RunCommand([counterPtr, &command2PtrPtr, &scheduler] {
-    scheduler.Cancel(command2PtrPtr);
-    (*counterPtr)++;
+  auto command1 = frc2::RunCommand([&counter, &command2Ptr, &scheduler] {
+    scheduler.Cancel(command2Ptr);
+    counter++;
   });
-  auto command2 = frc2::RunCommand([counterPtr, &command1PtrPtr, &scheduler] {
-    scheduler.Cancel(command1PtrPtr);
-    (*counterPtr)++;
+  auto command2 = frc2::RunCommand([&counter, &command1Ptr, &scheduler] {
+    scheduler.Cancel(command1Ptr);
+    counter++;
   });
 
-  command1PtrPtr = &command1;
-  command2PtrPtr = &command2;
+  command1Ptr = &command1;
+  command2Ptr = &command2;
 
   scheduler.Schedule(&command1);
   scheduler.Schedule(&command2);
   scheduler.Run();
 
-  EXPECT_EQ(*counterPtr, 1)
-      << "Second command was run when it shouldn't have been";
+  EXPECT_EQ(counter, 1) << "Second command was run when it shouldn't have been";
 
   // only one of the commands should be canceled.
   EXPECT_FALSE(scheduler.IsScheduled(&command1) &&
@@ -138,7 +137,7 @@ TEST_F(CommandScheduleTest, CancelNextCommand) {
       << "Both commands are canceled when only one should be";
 
   scheduler.Run();
-  EXPECT_EQ(*counterPtr, 2);
+  EXPECT_EQ(counter, 2);
 }
 
 TEST_F(CommandScheduleTest, CommandKnowsWhenItEnded) {
@@ -164,26 +163,25 @@ TEST_F(CommandScheduleTest, CommandKnowsWhenItEnded) {
 TEST_F(CommandScheduleTest, ScheduleCommandInCommand) {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
-  frc2::InstantCommand* commandPtr = nullptr;
+  frc2::InstantCommand commandToGetScheduled{[&counter] { counter++; }};
 
-  auto command = frc2::RunCommand([&] {
-    scheduler.Schedule(commandPtr);
-    EXPECT_EQ(counter, 1)
-        << "Command 2's init was not run immediately after getting scheduled";
-  });
-  auto commandToGetScheduled = frc2::InstantCommand([&counter] { counter++; });
-
-  commandPtr = &commandToGetScheduled;
+  auto command =
+      frc2::RunCommand([&counter, &scheduler, &commandToGetScheduled] {
+        scheduler.Schedule(&commandToGetScheduled);
+        EXPECT_EQ(counter, 1)
+            << "Scheduled cmmand's init was not run immediately "
+               "after getting scheduled";
+      });
 
   scheduler.Schedule(&command);
   scheduler.Run();
   EXPECT_EQ(counter, 1) << "Command 2 was not run when it should have been";
-  EXPECT_TRUE(scheduler.IsScheduled(commandPtr))
+  EXPECT_TRUE(scheduler.IsScheduled(&commandToGetScheduled))
       << "Command 2 was not added to scheduler";
 
   scheduler.Run();
   EXPECT_EQ(counter, 1) << "Command 2 was run when it shouldn't have been";
-  EXPECT_FALSE(scheduler.IsScheduled(commandPtr))
+  EXPECT_FALSE(scheduler.IsScheduled(&commandToGetScheduled))
       << "Command 2 did not end when it should have";
 }
 
