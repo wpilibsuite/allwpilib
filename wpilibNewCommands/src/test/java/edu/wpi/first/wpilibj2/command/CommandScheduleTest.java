@@ -179,6 +179,35 @@ class CommandScheduleTest extends CommandTestBase {
   }
 
   @Test
+  void scheduleCommandInCommand() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicInteger counter = new AtomicInteger(0);
+      Command[] commands = new Command[1];
+      Command command1 =
+          new RunCommand(
+              () -> {
+                scheduler.schedule(commands[0]);
+                assertEquals(
+                    1,
+                    counter.get(),
+                    "Command 2's init was not run immediately after getting scheduled");
+              });
+      Command command2 = new InstantCommand(counter::incrementAndGet);
+
+      commands[0] = command2;
+
+      scheduler.schedule(command1);
+      scheduler.run();
+      assertEquals(1, counter.get(), "Command 2 was not run when it should have been");
+      assertTrue(scheduler.isScheduled(command2));
+
+      scheduler.run();
+      assertEquals(1, counter.get(), "Command 2 was run when it shouldn't have been");
+      assertFalse(scheduler.isScheduled(command2), "Command 2 did not end when it should have");
+    }
+  }
+
+  @Test
   void notScheduledCancelTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       MockCommandHolder holder = new MockCommandHolder(true);
