@@ -621,7 +621,7 @@ LocalStorage::SubscriberData* LocalStorage::Impl::AddLocalSubscriber(
   }
   if (m_network && !subscriber->config.hidden) {
     DEBUG4("-> NetworkSubscribe({})", topic->name);
-    m_network->ClientSubscribe(Handle{subscriber->handle}.GetIndex(),
+    m_network->ClientSubscribe(1 + Handle{subscriber->handle}.GetIndex(),
                                {{topic->name}}, config);
   }
 
@@ -650,7 +650,7 @@ LocalStorage::Impl::RemoveLocalSubscriber(NT_Subscriber subHandle) {
       }
     }
     if (m_network && !subscriber->config.hidden) {
-      m_network->ClientUnsubscribe(Handle{subscriber->handle}.GetIndex());
+      m_network->ClientUnsubscribe(1 + Handle{subscriber->handle}.GetIndex());
     }
   }
   return subscriber;
@@ -687,7 +687,7 @@ LocalStorage::MultiSubscriberData* LocalStorage::Impl::AddMultiSubscriber(
   }
   if (m_network && !subscriber->options.hidden) {
     DEBUG4("-> NetworkSubscribe");
-    m_network->ClientSubscribe(Handle{subscriber->handle}.GetIndex(),
+    m_network->ClientSubscribe(-1 - Handle{subscriber->handle}.GetIndex(),
                                subscriber->prefixes, subscriber->options);
   }
   return subscriber;
@@ -706,7 +706,7 @@ LocalStorage::Impl::RemoveMultiSubscriber(NT_MultiSubscriber subHandle) {
       }
     }
     if (m_network && !subscriber->options.hidden) {
-      m_network->ClientUnsubscribe(Handle{subscriber->handle}.GetIndex());
+      m_network->ClientUnsubscribe(-1 - Handle{subscriber->handle}.GetIndex());
     }
   }
   return subscriber;
@@ -1141,13 +1141,13 @@ void LocalStorage::Impl::StartNetwork(net::ClientMessageHandler* network) {
   }
   for (auto&& subscriber : m_subscribers) {
     if (!subscriber->config.hidden) {
-      network->ClientSubscribe(Handle{subscriber->handle}.GetIndex(),
+      network->ClientSubscribe(1 + Handle{subscriber->handle}.GetIndex(),
                                {{subscriber->topic->name}}, subscriber->config);
     }
   }
   for (auto&& subscriber : m_multiSubscribers) {
     if (!subscriber->options.hidden) {
-      network->ClientSubscribe(Handle{subscriber->handle}.GetIndex(),
+      network->ClientSubscribe(-1 - Handle{subscriber->handle}.GetIndex(),
                                subscriber->prefixes, subscriber->options);
     }
   }
