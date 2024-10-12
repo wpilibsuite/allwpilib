@@ -326,7 +326,7 @@ static units::second_t GetMaxStepTime(
     auto& dataset = it.getValue();
 
     if (IsRaw(key) && wpi::contains(key, "dynamic")) {
-      if (dataset.size() > 0) {
+      if (!dataset.empty()) {
         auto duration = dataset.back().timestamp - dataset.front().timestamp;
         if (duration > maxStepTime) {
           maxStepTime = duration;
