@@ -85,7 +85,7 @@ public abstract class DCMotorSimBase extends LinearSystemSim<N2, N1, N2> {
    * Sets the state of the simulated DC motor mechanism.
    *
    * @param angularPositionRad The new angular position in radians.
-   * @param angularVelocityRadPerSec The new angualr velocity in radians per second.
+   * @param angularVelocityRadPerSec The new angular velocity in radians per second.
    */
   public void setState(double angularPositionRad, double angularVelocityRadPerSec) {
     setState(VecBuilder.fill(angularPositionRad, angularVelocityRadPerSec));
