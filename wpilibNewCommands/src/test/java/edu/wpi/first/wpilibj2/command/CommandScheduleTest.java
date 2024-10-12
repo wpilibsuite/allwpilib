@@ -116,7 +116,8 @@ class CommandScheduleTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       Command[] commands = new Command[2];
       var commandRunCounter = new AtomicInteger(0);
-      // due to the ordering of sets being non-deterministic, we cancel the other command in the
+      // for parity with C++ where the ordering of sets is non-deterministic, we cancel the other
+      // command in the
       // first command and check that the second command is not run
       Command command1 =
           new RunCommand(
@@ -182,28 +183,27 @@ class CommandScheduleTest extends CommandTestBase {
   void scheduleCommandInCommand() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger(0);
-      Command[] commands = new Command[1];
-      Command command1 =
+      Command commandToGetScheduled = new InstantCommand(counter::incrementAndGet);
+      Command command =
           new RunCommand(
               () -> {
-                scheduler.schedule(commands[0]);
+                scheduler.schedule(commandToGetScheduled);
                 assertEquals(
                     1,
                     counter.get(),
-                    "Command 2's init was not run immediately after getting scheduled");
+                    "Scheduled command's init was not run immediately after getting scheduled");
               });
-      Command command2 = new InstantCommand(counter::incrementAndGet);
 
-      commands[0] = command2;
-
-      scheduler.schedule(command1);
+      scheduler.schedule(command);
       scheduler.run();
       assertEquals(1, counter.get(), "Command 2 was not run when it should have been");
-      assertTrue(scheduler.isScheduled(command2));
+      assertTrue(scheduler.isScheduled(commandToGetScheduled));
 
       scheduler.run();
       assertEquals(1, counter.get(), "Command 2 was run when it shouldn't have been");
-      assertFalse(scheduler.isScheduled(command2), "Command 2 did not end when it should have");
+      assertFalse(
+          scheduler.isScheduled(commandToGetScheduled),
+          "Command 2 did not end when it should have");
     }
   }
 
