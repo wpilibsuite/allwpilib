@@ -40,14 +40,16 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
                                     int32_t* status) {
   hal::init::CheckInit();
 
-  if (module == 0) {
+  if (!HAL_CheckREVPHModuleNumber(module)) {
+    *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
                                      kNumREVPHModules, module);
     return HAL_kInvalidHandle;
   }
 
   HAL_REVPHHandle handle;
-  auto pcm = pcmHandles->Allocate(module, &handle, status);
+  // Module starts at 1
+  auto pcm = pcmHandles->Allocate(module - 1, &handle, status);
 
   if (*status != 0) {
     if (pcm) {
@@ -82,7 +84,7 @@ void HAL_FreeREVPH(HAL_REVPHHandle handle) {
 }
 
 HAL_Bool HAL_CheckREVPHModuleNumber(int32_t module) {
-  return module >= 1 && module < kNumREVPDHModules;
+  return module >= 1 && module <= kNumREVPHModules;
 }
 
 HAL_Bool HAL_CheckREVPHSolenoidChannel(int32_t channel) {

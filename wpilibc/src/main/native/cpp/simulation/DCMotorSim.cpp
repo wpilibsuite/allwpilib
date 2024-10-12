@@ -12,17 +12,30 @@ using namespace frc;
 using namespace frc::sim;
 
 DCMotorSim::DCMotorSim(const LinearSystem<2, 1, 2>& plant,
-                       const DCMotor& gearbox, double gearing,
+                       const DCMotor& gearbox,
                        const std::array<double, 2>& measurementStdDevs)
     : LinearSystemSim<2, 1, 2>(plant, measurementStdDevs),
       m_gearbox(gearbox),
-      m_gearing(gearing) {}
-
-DCMotorSim::DCMotorSim(const DCMotor& gearbox, double gearing,
-                       units::kilogram_square_meter_t moi,
-                       const std::array<double, 2>& measurementStdDevs)
-    : DCMotorSim(LinearSystemId::DCMotorSystem(gearbox, moi, gearing), gearbox,
-                 gearing, measurementStdDevs) {}
+      // By theorem 6.10.1 of
+      // https://file.tavsys.net/control/controls-engineering-in-frc.pdf, the
+      // flywheel state-space model is:
+      //
+      //   dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
+      //   A = -G²Kₜ/(KᵥRJ)
+      //   B = GKₜ/(RJ)
+      //
+      // Solve for G.
+      //
+      //   A/B = -G/Kᵥ
+      //   G = -KᵥA/B
+      //
+      // Solve for J.
+      //
+      //   B = GKₜ/(RJ)
+      //   J = GKₜ/(RB)
+      m_gearing(-gearbox.Kv.value() * m_plant.A(1, 1) / m_plant.B(1, 0)),
+      m_j(m_gearing * gearbox.Kt.value() /
+          (gearbox.R.value() * m_plant.B(1, 0))) {}
 
 void DCMotorSim::SetState(units::radian_t angularPosition,
                           units::radians_per_second_t angularVelocity) {
@@ -37,6 +50,15 @@ units::radians_per_second_t DCMotorSim::GetAngularVelocity() const {
   return units::radians_per_second_t{GetOutput(1)};
 }
 
+units::radians_per_second_squared_t DCMotorSim::GetAngularAcceleration() const {
+  return units::radians_per_second_squared_t{
+      (m_plant.A() * m_x + m_plant.B() * m_u)(0, 0)};
+}
+
+units::newton_meter_t DCMotorSim::GetTorque() const {
+  return units::newton_meter_t{GetAngularAcceleration().value() * m_j.value()};
+}
+
 units::ampere_t DCMotorSim::GetCurrentDraw() const {
   // I = V / R - omega / (Kv * R)
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
@@ -44,6 +66,10 @@ units::ampere_t DCMotorSim::GetCurrentDraw() const {
   return m_gearbox.Current(units::radians_per_second_t{m_x(1)} * m_gearing,
                            units::volt_t{m_u(0)}) *
          wpi::sgn(m_u(0));
+}
+
+units::volt_t DCMotorSim::GetInputVoltage() const {
+  return units::volt_t{GetInput(0)};
 }
 
 void DCMotorSim::SetInputVoltage(units::volt_t voltage) {

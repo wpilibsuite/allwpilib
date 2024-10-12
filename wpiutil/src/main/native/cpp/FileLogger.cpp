@@ -10,10 +10,14 @@
 #include <unistd.h>
 #endif
 
+#include <chrono>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <tuple>
 #include <utility>
+
+#include <fmt/format.h>
 
 #include "wpi/StringExtras.h"
 
@@ -26,15 +30,15 @@ FileLogger::FileLogger(std::string_view file,
       m_inotifyWatchHandle{
           inotify_add_watch(m_inotifyHandle, file.data(), IN_MODIFY)},
       m_thread{[=, this] {
-        char buf[4000];
-        struct inotify_event ev;
-        int len = 0;
+        char buf[8000];
+        char eventBuf[sizeof(struct inotify_event) + NAME_MAX + 1];
         lseek(m_fileHandle, 0, SEEK_END);
-        while ((len = read(m_inotifyHandle, &ev, sizeof(ev))) > 0) {
+        while (read(m_inotifyHandle, eventBuf, sizeof(eventBuf)) > 0) {
           int bufLen = 0;
-          if ((bufLen = read(m_fileHandle, buf, sizeof(buf)) > 0)) {
+          if ((bufLen = read(m_fileHandle, buf, sizeof(buf))) > 0) {
             callback(std::string_view{buf, static_cast<size_t>(bufLen)});
           }
+          std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
       }}
 #endif
@@ -42,8 +46,8 @@ FileLogger::FileLogger(std::string_view file,
 }
 FileLogger::FileLogger(std::string_view file, log::DataLog& log,
                        std::string_view key)
-    : FileLogger(file, LineBuffer([entry = log.Start(key, "string"),
-                                   &log](std::string_view line) {
+    : FileLogger(file, Buffer([entry = log.Start(key, "string"),
+                               &log](std::string_view line) {
                    log.AppendString(entry, line, 0);
                  })) {}
 FileLogger::FileLogger(FileLogger&& other)
@@ -80,26 +84,21 @@ FileLogger::~FileLogger() {
   }
 #endif
 }
-std::function<void(std::string_view)> FileLogger::LineBuffer(
+
+std::function<void(std::string_view)> FileLogger::Buffer(
     std::function<void(std::string_view)> callback) {
   return [callback,
-          buf = wpi::SmallVector<char, 32>{}](std::string_view data) mutable {
-    if (!wpi::contains(data, "\n")) {
-      buf.append(data.begin(), data.end());
+          buf = wpi::SmallVector<char, 64>{}](std::string_view data) mutable {
+    buf.append(data.begin(), data.end());
+    if (!wpi::contains({data.data(), data.size()}, "\n")) {
       return;
     }
-    std::string_view line;
-    std::string_view remainingData;
-    std::tie(line, remainingData) = wpi::split(data, "\n");
-    buf.append(line.begin(), line.end());
-    callback(std::string_view{buf.data(), buf.size()});
+    auto [wholeData, extra] = wpi::rsplit({buf.data(), buf.size()}, "\n");
+    std::string leftover{extra};
 
-    while (wpi::contains(remainingData, "\n")) {
-      std::tie(line, remainingData) = wpi::split(remainingData, "\n");
-      callback(line);
-    }
+    callback(wholeData);
     buf.clear();
-    buf.append(remainingData.begin(), remainingData.end());
+    buf.append(leftover.begin(), leftover.end());
   };
 }
 }  // namespace wpi

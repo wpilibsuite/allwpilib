@@ -40,11 +40,6 @@ jobs:
           cd upstream_utils
           ./argparse_lib.py clone
           ./argparse_lib.py copy-src
-      - name: Run concurrentqueue.py
-        run: |
-          cd upstream_utils
-          ./concurrentqueue.py clone
-          ./concurrentqueue.py copy-src
       - name: Run eigen.py
         run: |
           cd upstream_utils

@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -18,7 +19,7 @@
 #include <wpi/json.h>
 
 #include "PubSubOptions.h"
-#include "net/NetworkInterface.h"
+#include "net/MessageHandler.h"
 #include "net3/Message3.h"
 #include "net3/SequenceNumber.h"
 #include "net3/WireConnection3.h"
@@ -52,7 +53,7 @@ class ClientImpl3 final : private MessageHandler3 {
     DoSendPeriodic(curTimeMs, false, flush);
   }
 
-  void SetLocal(net::LocalInterface* local) { m_local = local; }
+  void SetLocal(net::ServerMessageHandler* local) { m_local = local; }
 
  private:
   struct Entry;
@@ -61,7 +62,6 @@ class ClientImpl3 final : private MessageHandler3 {
     explicit PublisherData(Entry* entry) : entry{entry} {}
 
     Entry* entry;
-    NT_Publisher handle;
     PubSubOptionsImpl options;
     // in options as double, but copy here as integer; rounded to the nearest
     // 10 ms
@@ -94,8 +94,8 @@ class ClientImpl3 final : private MessageHandler3 {
     // Sequence number for update resolution
     SequenceNumber seqNum;
 
-    // Local topic handle
-    NT_Topic topic{0};
+    // Local topic id
+    std::optional<int> topic;
 
     // Local publishers
     std::vector<PublisherData*> publishers;
@@ -106,13 +106,11 @@ class ClientImpl3 final : private MessageHandler3 {
   bool CheckNetworkReady(uint64_t curTimeMs);
 
   // Outgoing handlers
-  void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-               std::string_view name, std::string_view typeStr,
+  void Publish(int pubuid, std::string_view name, std::string_view typeStr,
                const wpi::json& properties, const PubSubOptionsImpl& options);
-  void Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle);
-  void SetProperties(NT_Topic topicHandle, std::string_view name,
-                     const wpi::json& update);
-  void SetValue(NT_Publisher pubHandle, const Value& value);
+  void Unpublish(int pubuid);
+  void SetProperties(std::string_view name, const wpi::json& update);
+  void SetValue(int pubuid, const Value& value);
 
   // MessageHandler interface
   void KeepAlive() final;
@@ -142,7 +140,7 @@ class ClientImpl3 final : private MessageHandler3 {
 
   WireConnection3& m_wire;
   wpi::Logger& m_logger;
-  net::LocalInterface* m_local{nullptr};
+  net::ServerMessageHandler* m_local{nullptr};
   std::function<void(uint32_t repeatMs)> m_setPeriodic;
   uint64_t m_initTimeMs;
 

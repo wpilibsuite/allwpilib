@@ -9,6 +9,7 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string_view>
 #include <utility>
 
@@ -53,7 +54,7 @@ class GetAddrInfoReq : public RequestImpl<GetAddrInfoReq, uv_getaddrinfo_t> {
  */
 void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
                  std::string_view node, std::string_view service = {},
-                 const addrinfo* hints = nullptr);
+                 std::optional<addrinfo> hints = {});
 
 /**
  * Asynchronous getaddrinfo(3).  HandleResolvedAddress() is called on the
@@ -72,7 +73,7 @@ void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
 inline void GetAddrInfo(const std::shared_ptr<Loop>& loop,
                         const std::shared_ptr<GetAddrInfoReq>& req,
                         std::string_view node, std::string_view service = {},
-                        const addrinfo* hints = nullptr) {
+                        std::optional<addrinfo> hints = {}) {
   GetAddrInfo(*loop, req, node, service, hints);
 }
 
@@ -92,7 +93,7 @@ inline void GetAddrInfo(const std::shared_ptr<Loop>& loop,
  */
 void GetAddrInfo(Loop& loop, std::function<void(const addrinfo&)> callback,
                  std::string_view node, std::string_view service = {},
-                 const addrinfo* hints = nullptr);
+                 std::optional<addrinfo> hints = {});
 
 /**
  * Asynchronous getaddrinfo(3).  The callback is called when the resolution
@@ -111,7 +112,7 @@ void GetAddrInfo(Loop& loop, std::function<void(const addrinfo&)> callback,
 inline void GetAddrInfo(const std::shared_ptr<Loop>& loop,
                         std::function<void(const addrinfo&)> callback,
                         std::string_view node, std::string_view service = {},
-                        const addrinfo* hints = nullptr) {
+                        std::optional<addrinfo> hints = {}) {
   GetAddrInfo(*loop, std::move(callback), node, service, hints);
 }
 
