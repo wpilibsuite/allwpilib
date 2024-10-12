@@ -77,8 +77,8 @@ setup_legacy_setup_jdk_dependencies()
 
 http_archive(
     name = "bzlmodrio-ni",
-    sha256 = "28abfa366389514669dabf9e71cc723749f650e98a689bf428ec1fc998ca5de9",
-    url = "https://github.com/wpilibsuite/bzlmodRio-ni/releases/download/2024.2.1.bcr1/bzlmodRio-ni-2024.2.1.bcr1.tar.gz",
+    sha256 = "197fceac88bf44fb8427d5e000b0083118d3346172dd2ad31eccf83a5e61b3ce",
+    url = "https://github.com/wpilibsuite/bzlmodRio-ni/releases/download/2025.0.0/bzlmodRio-ni-2025.0.0.tar.gz",
 )
 
 load("@bzlmodrio-ni//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_ni_cpp_dependencies")
