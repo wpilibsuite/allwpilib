@@ -41,8 +41,18 @@ class UvStreamConnection3 final
 
   uint64_t GetLastFlushTime() const final { return m_lastFlushTime; }
 
-  void StopRead() final { m_stream.StopRead(); }
-  void StartRead() final { m_stream.StartRead(); }
+  void StopRead() final {
+    if (m_readActive) {
+      m_stream.StopRead();
+      m_readActive = false;
+    }
+  }
+  void StartRead() final {
+    if (!m_readActive) {
+      m_stream.StartRead();
+      m_readActive = true;
+    }
+  }
 
   void Disconnect(std::string_view reason) final;
 
@@ -62,6 +72,7 @@ class UvStreamConnection3 final
   std::string m_reason;
   uint64_t m_lastFlushTime = 0;
   int m_sendsActive = 0;
+  bool m_readActive = true;
 };
 
 }  // namespace nt::net3
