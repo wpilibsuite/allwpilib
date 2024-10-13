@@ -47,3 +47,5 @@ build:remote_user --remote_download_toplevel
 
 build:ci --config=build_buddy
 build:ci --remote_download_minimal
+
+build --build_metadata=REPO_URL=https://github.com/wpilibsuite/allwpilib.git
