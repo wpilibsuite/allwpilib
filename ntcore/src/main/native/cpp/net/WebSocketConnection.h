@@ -59,8 +59,18 @@ class WebSocketConnection final
     return m_ws.GetLastReceivedTime();
   }
 
-  void StopRead() final { m_ws.GetStream().StopRead(); }
-  void StartRead() final { m_ws.GetStream().StartRead(); }
+  void StopRead() final {
+    if (m_readActive) {
+      m_ws.GetStream().StopRead();
+      m_readActive = false;
+    }
+  }
+  void StartRead() final {
+    if (!m_readActive) {
+      m_ws.GetStream().StartRead();
+      m_readActive = true;
+    }
+  }
 
   void Disconnect(std::string_view reason) final;
 
@@ -80,6 +90,7 @@ class WebSocketConnection final
 
   wpi::WebSocket& m_ws;
   wpi::Logger& m_logger;
+  bool m_readActive = true;
 
   class Stream;
 
