@@ -30,6 +30,9 @@ class MockWireConnection3 : public WireConnection3 {
 
   MOCK_METHOD(uint64_t, GetLastFlushTime, (), (const, override));
 
+  MOCK_METHOD(void, StopRead, (), (override));
+  MOCK_METHOD(void, StartRead, (), (override));
+
   MOCK_METHOD(void, Disconnect, (std::string_view reason), (override));
 
  protected:

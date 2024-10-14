@@ -75,11 +75,7 @@ template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 template <typename... Args>
 THandle UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Allocate(
     Args&&... args) {
-#ifdef _MSC_VER  // work around VS2019 16.4.0 bug
-  std::scoped_lock<TMutex> lock(m_handleMutex);
-#else
   std::scoped_lock sync(m_handleMutex);
-#endif
   size_t i;
   for (i = 0; i < m_structures.size(); i++) {
     if (m_structures[i] == nullptr) {
