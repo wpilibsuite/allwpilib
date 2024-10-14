@@ -20,6 +20,7 @@
 #include <networktables/StringArrayTopic.h>
 #include <wpi/DenseMap.h>
 #include <wpi/SmallVector.h>
+#include <wpi/deprecated.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -69,6 +70,7 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
   return map.find(keyToCheck) != map.end();
 }
 
+WPI_IGNORE_DEPRECATED
 CommandScheduler::CommandScheduler()
     : m_impl(new Impl), m_watchdog(frc::TimedRobot::kDefaultPeriod, [] {
         std::puts("CommandScheduler loop time overrun.");
@@ -90,6 +92,7 @@ CommandScheduler::~CommandScheduler() {
 
   std::unique_ptr<Impl>().swap(m_impl);
 }
+WPI_UNIGNORE_DEPRECATED
 
 CommandScheduler& CommandScheduler::GetInstance() {
   static CommandScheduler scheduler;

@@ -389,6 +389,7 @@ class TimedRobotTest {
     robot.close();
   }
 
+  @SuppressWarnings("removal")
   @ValueSource(booleans = {true, false})
   @ParameterizedTest
   @ResourceLock("timing")
