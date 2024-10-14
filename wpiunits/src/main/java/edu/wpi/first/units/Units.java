@@ -540,7 +540,7 @@ public final class Units {
   public static final ResistanceUnit MilliOhms = Milli(Ohms);
 
   /** A unit equal to 1/1000 of a {@link #Ohm}. */
-  public static final ResistanceUnit MilliOhm = MilliOhms; // alias  
+  public static final ResistanceUnit MilliOhm = MilliOhms; // alias
 
   /**
    * Creates a unit equal to a thousandth of the base unit, eg Milliseconds = Milli(Units.Seconds).
