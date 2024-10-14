@@ -4,12 +4,22 @@
 
 #pragma once
 
+#include <stdexcept>
+#include <string>
+
+#include <Eigen/Cholesky>
+#include <unsupported/Eigen/MatrixFunctions>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
+#include "frc/DARE.h"
 #include "frc/EigenCore.h"
+#include "frc/StateSpaceUtil.h"
+#include "frc/fmt/Eigen.h"
+#include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"
 #include "units/time.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
@@ -50,7 +60,8 @@ class LinearQuadraticRegulator {
   template <int Outputs>
   LinearQuadraticRegulator(const LinearSystem<States, Inputs, Outputs>& plant,
                            const StateArray& Qelems, const InputArray& Relems,
-                           units::second_t dt);
+                           units::second_t dt)
+      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
 
   /**
    * Constructs a controller with the given coefficients and plant.
@@ -69,7 +80,9 @@ class LinearQuadraticRegulator {
   LinearQuadraticRegulator(const Matrixd<States, States>& A,
                            const Matrixd<States, Inputs>& B,
                            const StateArray& Qelems, const InputArray& Relems,
-                           units::second_t dt);
+                           units::second_t dt)
+      : LinearQuadraticRegulator(A, B, MakeCostMatrix(Qelems),
+                                 MakeCostMatrix(Relems), dt) {}
 
   /**
    * Constructs a controller with the given coefficients and plant.
@@ -85,7 +98,30 @@ class LinearQuadraticRegulator {
                            const Matrixd<States, Inputs>& B,
                            const Matrixd<States, States>& Q,
                            const Matrixd<Inputs, Inputs>& R,
-                           units::second_t dt);
+                           units::second_t dt) {
+    Matrixd<States, States> discA;
+    Matrixd<States, Inputs> discB;
+    DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
+
+    if (!IsStabilizable<States, Inputs>(discA, discB)) {
+      std::string msg = fmt::format(
+          "The system passed to the LQR is unstabilizable!\n\nA =\n{}\nB "
+          "=\n{}\n",
+          discA, discB);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    }
+
+    Matrixd<States, States> S = DARE<States, Inputs>(discA, discB, Q, R);
+
+    // K = (BᵀSB + R)⁻¹BᵀSA
+    m_K = (discB.transpose() * S * discB + R)
+              .llt()
+              .solve(discB.transpose() * S * discA);
+
+    Reset();
+  }
 
   /**
    * Constructs a controller with the given coefficients and plant.
@@ -103,7 +139,20 @@ class LinearQuadraticRegulator {
                            const Matrixd<States, States>& Q,
                            const Matrixd<Inputs, Inputs>& R,
                            const Matrixd<States, Inputs>& N,
-                           units::second_t dt);
+                           units::second_t dt) {
+    Matrixd<States, States> discA;
+    Matrixd<States, Inputs> discB;
+    DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
+
+    Matrixd<States, States> S = DARE<States, Inputs>(discA, discB, Q, R, N);
+
+    // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
+    m_K = (discB.transpose() * S * discB + R)
+              .llt()
+              .solve(discB.transpose() * S * discA + N.transpose());
+
+    Reset();
+  }
 
   LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;
   LinearQuadraticRegulator& operator=(LinearQuadraticRegulator&&) = default;
@@ -166,7 +215,10 @@ class LinearQuadraticRegulator {
    *
    * @param x The current state x.
    */
-  InputVector Calculate(const StateVector& x);
+  InputVector Calculate(const StateVector& x) {
+    m_u = m_K * (m_r - x);
+    return m_u;
+  }
 
   /**
    * Returns the next output of the controller.
@@ -174,7 +226,10 @@ class LinearQuadraticRegulator {
    * @param x     The current state x.
    * @param nextR The next reference vector r.
    */
-  InputVector Calculate(const StateVector& x, const StateVector& nextR);
+  InputVector Calculate(const StateVector& x, const StateVector& nextR) {
+    m_r = nextR;
+    return Calculate(x);
+  }
 
   /**
    * Adjusts LQR controller gain to compensate for a pure time delay in the
@@ -194,7 +249,13 @@ class LinearQuadraticRegulator {
    */
   template <int Outputs>
   void LatencyCompensate(const LinearSystem<States, Inputs, Outputs>& plant,
-                         units::second_t dt, units::second_t inputDelay);
+                         units::second_t dt, units::second_t inputDelay) {
+    Matrixd<States, States> discA;
+    Matrixd<States, Inputs> discB;
+    DiscretizeAB<States, Inputs>(plant.A(), plant.B(), dt, &discA, &discB);
+
+    m_K = m_K * (discA - discB * m_K).pow(inputDelay / dt);
+  }
 
  private:
   // Current reference
@@ -215,5 +276,3 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     LinearQuadraticRegulator<2, 2>;
 
 }  // namespace frc
-
-#include "LinearQuadraticRegulator.inc"

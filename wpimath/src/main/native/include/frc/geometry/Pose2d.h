@@ -6,6 +6,7 @@
 
 #include <initializer_list>
 #include <span>
+#include <utility>
 
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
@@ -14,6 +15,7 @@
 #include "frc/geometry/Transform2d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Twist2d.h"
+#include "units/length.h"
 
 namespace frc {
 
@@ -33,7 +35,9 @@ class WPILIB_DLLEXPORT Pose2d {
    * @param translation The translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  constexpr Pose2d(Translation2d translation, Rotation2d rotation);
+  constexpr Pose2d(Translation2d translation, Rotation2d rotation)
+      : m_translation{std::move(translation)},
+        m_rotation{std::move(rotation)} {}
 
   /**
    * Constructs a pose with x and y translations instead of a separate
@@ -43,7 +47,8 @@ class WPILIB_DLLEXPORT Pose2d {
    * @param y The y component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  constexpr Pose2d(units::meter_t x, units::meter_t y, Rotation2d rotation);
+  constexpr Pose2d(units::meter_t x, units::meter_t y, Rotation2d rotation)
+      : m_translation{x, y}, m_rotation{std::move(rotation)} {}
 
   /**
    * Transforms the pose by the given transformation and returns the new
@@ -59,7 +64,9 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The transformed pose.
    */
-  constexpr Pose2d operator+(const Transform2d& other) const;
+  constexpr Pose2d operator+(const Transform2d& other) const {
+    return TransformBy(other);
+  }
 
   /**
    * Returns the Transform2d that maps the one pose to another.
@@ -109,7 +116,9 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The new scaled Pose2d.
    */
-  constexpr Pose2d operator*(double scalar) const;
+  constexpr Pose2d operator*(double scalar) const {
+    return Pose2d{m_translation * scalar, m_rotation * scalar};
+  }
 
   /**
    * Divides the current pose by a scalar.
@@ -118,7 +127,9 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The new scaled Pose2d.
    */
-  constexpr Pose2d operator/(double scalar) const;
+  constexpr Pose2d operator/(double scalar) const {
+    return *this * (1.0 / scalar);
+  }
 
   /**
    * Rotates the pose around the origin and returns the new pose.
@@ -127,7 +138,9 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The rotated pose.
    */
-  constexpr Pose2d RotateBy(const Rotation2d& other) const;
+  constexpr Pose2d RotateBy(const Rotation2d& other) const {
+    return {m_translation.RotateBy(other), m_rotation.RotateBy(other)};
+  }
 
   /**
    * Transforms the pose by the given transformation and returns the new pose.
@@ -137,7 +150,10 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The transformed pose.
    */
-  constexpr Pose2d TransformBy(const Transform2d& other) const;
+  constexpr Pose2d TransformBy(const Transform2d& other) const {
+    return {m_translation + (other.Translation().RotateBy(m_rotation)),
+            other.Rotation() + m_rotation};
+  }
 
   /**
    * Returns the current pose relative to the given pose.
@@ -217,4 +233,3 @@ void from_json(const wpi::json& json, Pose2d& pose);
 #include "frc/geometry/proto/Pose2dProto.h"
 #endif
 #include "frc/geometry/struct/Pose2dStruct.h"
-#include "frc/geometry/Pose2d.inc"
