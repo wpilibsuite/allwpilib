@@ -537,7 +537,7 @@ public final class Units {
   public static final ResistanceUnit KiloOhm = KiloOhms; // alias
 
   /** A unit equal to 1/1000 of a {@link #Ohm}. */
-  public static final ResistanceUnit MilliOhms = Milli(Ohms, "MilliOhms", "mΩ");
+  public static final ResistanceUnit MilliOhms = Milli(Ohms, "MilliOhm", "mΩ");
 
   /** A unit equal to 1/1000 of a {@link #Ohm}. */
   public static final ResistanceUnit MilliOhm = MilliOhms; // alias  
