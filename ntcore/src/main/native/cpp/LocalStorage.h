@@ -246,13 +246,29 @@ class LocalStorage final : public net::ILocalStorage {
 
   template <ValidType T>
   Timestamped<typename TypeInfo<T>::Value> GetAtomic(
-      NT_Handle subentry, typename TypeInfo<T>::View defaultValue);
+      NT_Handle subentry, typename TypeInfo<T>::View defaultValue) {
+    std::scoped_lock lock{m_mutex};
+    Value* value = m_impl.GetSubEntryValue(subentry);
+    if (value && (IsNumericConvertibleTo<T>(*value) || IsType<T>(*value))) {
+      return GetTimestamped<T, true>(*value);
+    } else {
+      return {0, 0, CopyValue<T>(defaultValue)};
+    }
+  }
 
   template <SmallArrayType T>
   Timestamped<typename TypeInfo<T>::SmallRet> GetAtomic(
       NT_Handle subentry,
       wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf,
-      typename TypeInfo<T>::View defaultValue);
+      typename TypeInfo<T>::View defaultValue) {
+    std::scoped_lock lock{m_mutex};
+    Value* value = m_impl.GetSubEntryValue(subentry);
+    if (value && (IsNumericConvertibleTo<T>(*value) || IsType<T>(*value))) {
+      return GetTimestamped<T, true>(*value, buf);
+    } else {
+      return {0, 0, CopyValue<T>(defaultValue, buf)};
+    }
+  }
 
   std::vector<Value> ReadQueueValue(NT_Handle subentry, unsigned int types) {
     std::scoped_lock lock{m_mutex};
@@ -265,7 +281,14 @@ class LocalStorage final : public net::ILocalStorage {
 
   template <ValidType T>
   std::vector<Timestamped<typename TypeInfo<T>::Value>> ReadQueue(
-      NT_Handle subentry);
+      NT_Handle subentry) {
+    std::scoped_lock lock{m_mutex};
+    auto subscriber = m_impl.GetSubEntry(subentry);
+    if (!subscriber) {
+      return {};
+    }
+    return subscriber->pollStorage.Read<T>();
+  }
 
   //
   // Backwards compatible user functions
@@ -664,42 +687,5 @@ class LocalStorage final : public net::ILocalStorage {
   wpi::mutex m_mutex;
   Impl m_impl;
 };
-
-template <ValidType T>
-Timestamped<typename TypeInfo<T>::Value> LocalStorage::GetAtomic(
-    NT_Handle subentry, typename TypeInfo<T>::View defaultValue) {
-  std::scoped_lock lock{m_mutex};
-  Value* value = m_impl.GetSubEntryValue(subentry);
-  if (value && (IsNumericConvertibleTo<T>(*value) || IsType<T>(*value))) {
-    return GetTimestamped<T, true>(*value);
-  } else {
-    return {0, 0, CopyValue<T>(defaultValue)};
-  }
-}
-
-template <SmallArrayType T>
-Timestamped<typename TypeInfo<T>::SmallRet> LocalStorage::GetAtomic(
-    NT_Handle subentry,
-    wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf,
-    typename TypeInfo<T>::View defaultValue) {
-  std::scoped_lock lock{m_mutex};
-  Value* value = m_impl.GetSubEntryValue(subentry);
-  if (value && (IsNumericConvertibleTo<T>(*value) || IsType<T>(*value))) {
-    return GetTimestamped<T, true>(*value, buf);
-  } else {
-    return {0, 0, CopyValue<T>(defaultValue, buf)};
-  }
-}
-
-template <ValidType T>
-std::vector<Timestamped<typename TypeInfo<T>::Value>> LocalStorage::ReadQueue(
-    NT_Handle subentry) {
-  std::scoped_lock lock{m_mutex};
-  auto subscriber = m_impl.GetSubEntry(subentry);
-  if (!subscriber) {
-    return {};
-  }
-  return subscriber->pollStorage.Read<T>();
-}
 
 }  // namespace nt
