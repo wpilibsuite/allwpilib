@@ -170,9 +170,7 @@ class DoubleArraySubscriber : public Subscriber {
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return DoubleArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
-  }
+  TopicType GetTopic() const;
 
  private:
   ValueType m_defaultValue;
@@ -228,9 +226,7 @@ class DoubleArrayPublisher : public Publisher {
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return DoubleArrayTopic{::nt::GetTopicFromHandle(m_pubHandle)};
-  }
+  TopicType GetTopic() const;
 };
 
 /**
@@ -284,9 +280,7 @@ class DoubleArrayEntry final : public DoubleArraySubscriber,
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return DoubleArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
-  }
+  TopicType GetTopic() const;
 
   /**
    * Stops publishing the entry if it's published.
@@ -478,5 +472,17 @@ class DoubleArrayTopic final : public Topic {
   }
 
 };
+
+inline DoubleArrayTopic DoubleArraySubscriber::GetTopic() const {
+  return DoubleArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
+
+inline DoubleArrayTopic DoubleArrayPublisher::GetTopic() const {
+  return DoubleArrayTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+}
+
+inline DoubleArrayTopic DoubleArrayEntry::GetTopic() const {
+  return DoubleArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
 
 }  // namespace nt

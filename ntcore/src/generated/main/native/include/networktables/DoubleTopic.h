@@ -115,9 +115,7 @@ class DoubleSubscriber : public Subscriber {
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return DoubleTopic{::nt::GetTopicFromHandle(m_subHandle)};
-  }
+  TopicType GetTopic() const;
 
  private:
   ValueType m_defaultValue;
@@ -170,9 +168,7 @@ class DoublePublisher : public Publisher {
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return DoubleTopic{::nt::GetTopicFromHandle(m_pubHandle)};
-  }
+  TopicType GetTopic() const;
 };
 
 /**
@@ -223,9 +219,7 @@ class DoubleEntry final : public DoubleSubscriber,
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return DoubleTopic{::nt::GetTopicFromHandle(m_subHandle)};
-  }
+  TopicType GetTopic() const;
 
   /**
    * Stops publishing the entry if it's published.
@@ -417,5 +411,17 @@ class DoubleTopic final : public Topic {
   }
 
 };
+
+inline DoubleTopic DoubleSubscriber::GetTopic() const {
+  return DoubleTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
+
+inline DoubleTopic DoublePublisher::GetTopic() const {
+  return DoubleTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+}
+
+inline DoubleTopic DoubleEntry::GetTopic() const {
+  return DoubleTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
 
 }  // namespace nt

@@ -115,9 +115,7 @@ class BooleanSubscriber : public Subscriber {
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return BooleanTopic{::nt::GetTopicFromHandle(m_subHandle)};
-  }
+  TopicType GetTopic() const;
 
  private:
   ValueType m_defaultValue;
@@ -170,9 +168,7 @@ class BooleanPublisher : public Publisher {
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return BooleanTopic{::nt::GetTopicFromHandle(m_pubHandle)};
-  }
+  TopicType GetTopic() const;
 };
 
 /**
@@ -223,9 +219,7 @@ class BooleanEntry final : public BooleanSubscriber,
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return BooleanTopic{::nt::GetTopicFromHandle(m_subHandle)};
-  }
+  TopicType GetTopic() const;
 
   /**
    * Stops publishing the entry if it's published.
@@ -417,5 +411,17 @@ class BooleanTopic final : public Topic {
   }
 
 };
+
+inline BooleanTopic BooleanSubscriber::GetTopic() const {
+  return BooleanTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
+
+inline BooleanTopic BooleanPublisher::GetTopic() const {
+  return BooleanTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+}
+
+inline BooleanTopic BooleanEntry::GetTopic() const {
+  return BooleanTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
 
 }  // namespace nt

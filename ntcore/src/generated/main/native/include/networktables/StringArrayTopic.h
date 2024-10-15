@@ -115,9 +115,7 @@ class StringArraySubscriber : public Subscriber {
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return StringArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
-  }
+  TopicType GetTopic() const;
 
  private:
   ValueType m_defaultValue;
@@ -170,9 +168,7 @@ class StringArrayPublisher : public Publisher {
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return StringArrayTopic{::nt::GetTopicFromHandle(m_pubHandle)};
-  }
+  TopicType GetTopic() const;
 };
 
 /**
@@ -223,9 +219,7 @@ class StringArrayEntry final : public StringArraySubscriber,
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return StringArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
-  }
+  TopicType GetTopic() const;
 
   /**
    * Stops publishing the entry if it's published.
@@ -417,5 +411,17 @@ class StringArrayTopic final : public Topic {
   }
 
 };
+
+inline StringArrayTopic StringArraySubscriber::GetTopic() const {
+  return StringArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
+
+inline StringArrayTopic StringArrayPublisher::GetTopic() const {
+  return StringArrayTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+}
+
+inline StringArrayTopic StringArrayEntry::GetTopic() const {
+  return StringArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
 
 }  // namespace nt

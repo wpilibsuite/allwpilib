@@ -115,9 +115,7 @@ class IntegerSubscriber : public Subscriber {
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return IntegerTopic{::nt::GetTopicFromHandle(m_subHandle)};
-  }
+  TopicType GetTopic() const;
 
  private:
   ValueType m_defaultValue;
@@ -170,9 +168,7 @@ class IntegerPublisher : public Publisher {
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return IntegerTopic{::nt::GetTopicFromHandle(m_pubHandle)};
-  }
+  TopicType GetTopic() const;
 };
 
 /**
@@ -223,9 +219,7 @@ class IntegerEntry final : public IntegerSubscriber,
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return IntegerTopic{::nt::GetTopicFromHandle(m_subHandle)};
-  }
+  TopicType GetTopic() const;
 
   /**
    * Stops publishing the entry if it's published.
@@ -417,5 +411,17 @@ class IntegerTopic final : public Topic {
   }
 
 };
+
+inline IntegerTopic IntegerSubscriber::GetTopic() const {
+  return IntegerTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
+
+inline IntegerTopic IntegerPublisher::GetTopic() const {
+  return IntegerTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+}
+
+inline IntegerTopic IntegerEntry::GetTopic() const {
+  return IntegerTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
 
 }  // namespace nt

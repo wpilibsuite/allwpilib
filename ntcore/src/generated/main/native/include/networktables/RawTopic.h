@@ -170,9 +170,7 @@ class RawSubscriber : public Subscriber {
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return RawTopic{::nt::GetTopicFromHandle(m_subHandle)};
-  }
+  TopicType GetTopic() const;
 
  private:
   ValueType m_defaultValue;
@@ -228,9 +226,7 @@ class RawPublisher : public Publisher {
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return RawTopic{::nt::GetTopicFromHandle(m_pubHandle)};
-  }
+  TopicType GetTopic() const;
 };
 
 /**
@@ -284,9 +280,7 @@ class RawEntry final : public RawSubscriber,
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return RawTopic{::nt::GetTopicFromHandle(m_subHandle)};
-  }
+  TopicType GetTopic() const;
 
   /**
    * Stops publishing the entry if it's published.
@@ -428,5 +422,17 @@ class RawTopic final : public Topic {
         defaultValue};
   }
 };
+
+inline RawTopic RawSubscriber::GetTopic() const {
+  return RawTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
+
+inline RawTopic RawPublisher::GetTopic() const {
+  return RawTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+}
+
+inline RawTopic RawEntry::GetTopic() const {
+  return RawTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
 
 }  // namespace nt

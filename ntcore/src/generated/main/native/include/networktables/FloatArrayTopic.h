@@ -170,9 +170,7 @@ class FloatArraySubscriber : public Subscriber {
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return FloatArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
-  }
+  TopicType GetTopic() const;
 
  private:
   ValueType m_defaultValue;
@@ -228,9 +226,7 @@ class FloatArrayPublisher : public Publisher {
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return FloatArrayTopic{::nt::GetTopicFromHandle(m_pubHandle)};
-  }
+  TopicType GetTopic() const;
 };
 
 /**
@@ -284,9 +280,7 @@ class FloatArrayEntry final : public FloatArraySubscriber,
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return FloatArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
-  }
+  TopicType GetTopic() const;
 
   /**
    * Stops publishing the entry if it's published.
@@ -478,5 +472,17 @@ class FloatArrayTopic final : public Topic {
   }
 
 };
+
+inline FloatArrayTopic FloatArraySubscriber::GetTopic() const {
+  return FloatArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
+
+inline FloatArrayTopic FloatArrayPublisher::GetTopic() const {
+  return FloatArrayTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+}
+
+inline FloatArrayTopic FloatArrayEntry::GetTopic() const {
+  return FloatArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
 
 }  // namespace nt
