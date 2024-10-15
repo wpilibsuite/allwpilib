@@ -18,7 +18,6 @@
 
 #include "Value_internal.h"
 #include "networktables/NetworkTableValue.h"
-#include "ntcore_cpp.h"
 
 using namespace nt;
 
@@ -68,35 +67,6 @@ void StringArrayStorage::InitNtStrings() {
     ntStrings.emplace_back(
         WPI_String{const_cast<char*>(str.c_str()), str.size()});
   }
-}
-
-Value::Value() {
-  m_val.type = NT_UNASSIGNED;
-  m_val.last_change = 0;
-  m_val.server_time = 0;
-  m_size = 0;
-}
-
-Value::Value(NT_Type type, size_t size, int64_t time, const private_init&)
-    : Value{type, size, time == 0 ? nt::Now() : time, 1, private_init{}} {}
-
-Value::Value(NT_Type type, size_t size, int64_t time, int64_t serverTime,
-             const private_init&) {
-  m_val.type = type;
-  m_val.last_change = time;
-  m_val.server_time = serverTime;
-  if (m_val.type == NT_BOOLEAN_ARRAY) {
-    m_val.data.arr_boolean.arr = nullptr;
-  } else if (m_val.type == NT_INTEGER_ARRAY) {
-    m_val.data.arr_int.arr = nullptr;
-  } else if (m_val.type == NT_FLOAT_ARRAY) {
-    m_val.data.arr_float.arr = nullptr;
-  } else if (m_val.type == NT_DOUBLE_ARRAY) {
-    m_val.data.arr_double.arr = nullptr;
-  } else if (m_val.type == NT_STRING_ARRAY) {
-    m_val.data.arr_string.arr = nullptr;
-  }
-  m_size = size;
 }
 
 Value Value::MakeBooleanArray(std::span<const bool> value, int64_t time) {
