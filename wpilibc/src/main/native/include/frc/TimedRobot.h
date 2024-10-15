@@ -34,6 +34,11 @@ class TimedRobot : public IterativeRobotBase {
   /// Default loop period.
   static constexpr auto kDefaultPeriod = 20_ms;
 
+  TimedRobot(TimedRobot&&) = default;
+  TimedRobot& operator=(TimedRobot&&) = default;
+
+  ~TimedRobot() override;
+
   /**
    * Provide an alternate "main loop" via StartCompetition().
    */
@@ -43,18 +48,6 @@ class TimedRobot : public IterativeRobotBase {
    * Ends the main loop in StartCompetition().
    */
   void EndCompetition() override;
-
-  /**
-   * Constructor for TimedRobot.
-   *
-   * @param period Period.
-   */
-  explicit TimedRobot(units::second_t period = kDefaultPeriod);
-
-  TimedRobot(TimedRobot&&) = default;
-  TimedRobot& operator=(TimedRobot&&) = default;
-
-  ~TimedRobot() override;
 
   /**
    * Add a callback to run at a specific period with a starting time offset.
@@ -70,6 +63,14 @@ class TimedRobot : public IterativeRobotBase {
    */
   void AddPeriodic(std::function<void()> callback, units::second_t period,
                    units::second_t offset = 0_s);
+
+ protected:
+  /**
+   * Constructor for TimedRobot.
+   *
+   * @param period Period.
+   */
+  explicit TimedRobot(units::second_t period = kDefaultPeriod);
 
  private:
   class Callback {
