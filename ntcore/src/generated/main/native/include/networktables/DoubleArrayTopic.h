@@ -15,7 +15,9 @@
 
 #include <wpi/json_fwd.h>
 
+#include "networktables/NetworkTableType.h"
 #include "networktables/Topic.h"
+#include "ntcore_cpp.h"
 
 namespace wpi {
 template <typename T>
@@ -50,7 +52,9 @@ class DoubleArraySubscriber : public Subscriber {
    * @param handle Native handle
    * @param defaultValue Default value
    */
-  DoubleArraySubscriber(NT_Subscriber handle, ParamType defaultValue);
+  DoubleArraySubscriber(NT_Subscriber handle, ParamType defaultValue)
+      : Subscriber{handle},
+        m_defaultValue{defaultValue.begin(), defaultValue.end()} {}
 
   /**
    * Get the last published value.
@@ -58,7 +62,9 @@ class DoubleArraySubscriber : public Subscriber {
    *
    * @return value
    */
-  ValueType Get() const;
+  ValueType Get() const {
+    return Get(m_defaultValue);
+  }
 
   /**
    * Get the last published value.
@@ -67,7 +73,9 @@ class DoubleArraySubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return value
    */
-  ValueType Get(ParamType defaultValue) const;
+  ValueType Get(ParamType defaultValue) const {
+    return ::nt::GetDoubleArray(m_subHandle, defaultValue);
+  }
 
   /**
    * Get the last published value.
@@ -76,7 +84,9 @@ class DoubleArraySubscriber : public Subscriber {
    * @param buf storage for returned value
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf) const;
+  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf) const {
+    return Get(buf, m_defaultValue);
+  }
 
   /**
    * Get the last published value.
@@ -86,7 +96,9 @@ class DoubleArraySubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const;
+  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
+    return nt::GetDoubleArray(m_subHandle, buf, defaultValue);
+  }
 
   /**
    * Get the last published value along with its timestamp
@@ -95,7 +107,9 @@ class DoubleArraySubscriber : public Subscriber {
    *
    * @return timestamped value
    */
-  TimestampedValueType GetAtomic() const;
+  TimestampedValueType GetAtomic() const {
+    return GetAtomic(m_defaultValue);
+  }
 
   /**
    * Get the last published value along with its timestamp.
@@ -105,7 +119,9 @@ class DoubleArraySubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return timestamped value
    */
-  TimestampedValueType GetAtomic(ParamType defaultValue) const;
+  TimestampedValueType GetAtomic(ParamType defaultValue) const {
+    return ::nt::GetAtomicDoubleArray(m_subHandle, defaultValue);
+  }
 
   /**
    * Get the last published value along with its timestamp.
@@ -116,7 +132,9 @@ class DoubleArraySubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf) const;
+      wpi::SmallVectorImpl<SmallElemType>& buf) const {
+    return GetAtomic(buf, m_defaultValue);
+  }
 
   /**
    * Get the last published value along with its timestamp.
@@ -129,7 +147,9 @@ class DoubleArraySubscriber : public Subscriber {
    */
   TimestampedValueViewType GetAtomic(
       wpi::SmallVectorImpl<SmallElemType>& buf,
-      ParamType defaultValue) const;
+      ParamType defaultValue) const {
+    return nt::GetAtomicDoubleArray(m_subHandle, buf, defaultValue);
+  }
 
   /**
    * Get an array of all value changes since the last call to ReadQueue.
@@ -141,7 +161,9 @@ class DoubleArraySubscriber : public Subscriber {
    * @return Array of timestamped values; empty array if no new changes have
    *     been published since the previous call.
    */
-  std::vector<TimestampedValueType> ReadQueue();
+  std::vector<TimestampedValueType> ReadQueue() {
+    return ::nt::ReadQueueDoubleArray(m_subHandle);
+  }
 
   /**
    * Get the corresponding topic.
@@ -176,7 +198,7 @@ class DoubleArrayPublisher : public Publisher {
    *
    * @param handle Native handle
    */
-  explicit DoubleArrayPublisher(NT_Publisher handle);
+  explicit DoubleArrayPublisher(NT_Publisher handle) : Publisher{handle} {}
 
   /**
    * Publish a new value.
@@ -184,7 +206,9 @@ class DoubleArrayPublisher : public Publisher {
    * @param value value to publish
    * @param time timestamp; 0 indicates current NT time should be used
    */
-  void Set(ParamType value, int64_t time = 0);
+  void Set(ParamType value, int64_t time = 0) {
+    ::nt::SetDoubleArray(m_pubHandle, value, time);
+  }
 
   /**
    * Publish a default value.
@@ -193,7 +217,9 @@ class DoubleArrayPublisher : public Publisher {
    *
    * @param value value
    */
-  void SetDefault(ParamType value);
+  void SetDefault(ParamType value) {
+    ::nt::SetDefaultDoubleArray(m_pubHandle, value);
+  }
 
   /**
    * Get the corresponding topic.
@@ -231,7 +257,9 @@ class DoubleArrayEntry final : public DoubleArraySubscriber,
    * @param handle Native handle
    * @param defaultValue Default value
    */
-  DoubleArrayEntry(NT_Entry handle, ParamType defaultValue);
+  DoubleArrayEntry(NT_Entry handle, ParamType defaultValue)
+      : DoubleArraySubscriber{handle, defaultValue},
+        DoubleArrayPublisher{handle} {}
 
   /**
    * Determines if the native handle is valid.
@@ -257,7 +285,9 @@ class DoubleArrayEntry final : public DoubleArraySubscriber,
   /**
    * Stops publishing the entry if it's published.
    */
-  void Unpublish();
+  void Unpublish() {
+    ::nt::Unpublish(m_pubHandle);
+  }
 };
 
 /**
@@ -309,7 +339,11 @@ class DoubleArrayTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions);
+      const PubSubOptions& options = kDefaultPubSubOptions) {
+    return DoubleArraySubscriber{
+        ::nt::Subscribe(m_handle, NT_DOUBLE_ARRAY, "double[]", options),
+        defaultValue};
+  }
   /**
    * Create a new subscriber to the topic, with specific type string.
    *
@@ -329,7 +363,11 @@ class DoubleArrayTopic final : public Topic {
   [[nodiscard]]
   SubscriberType SubscribeEx(
       std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions);
+      const PubSubOptions& options = kDefaultPubSubOptions) {
+    return DoubleArraySubscriber{
+        ::nt::Subscribe(m_handle, NT_DOUBLE_ARRAY, typeString, options),
+        defaultValue};
+  }
 
   /**
    * Create a new publisher to the topic.
@@ -347,7 +385,10 @@ class DoubleArrayTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions);
+  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
+    return DoubleArrayPublisher{
+        ::nt::Publish(m_handle, NT_DOUBLE_ARRAY, "double[]", options)};
+  }
 
   /**
    * Create a new publisher to the topic, with type string and initial
@@ -369,7 +410,10 @@ class DoubleArrayTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions);
+    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    return DoubleArrayPublisher{
+        ::nt::PublishEx(m_handle, NT_DOUBLE_ARRAY, typeString, properties, options)};
+  }
 
   /**
    * Create a new entry for the topic.
@@ -393,7 +437,11 @@ class DoubleArrayTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(ParamType defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions);
+                     const PubSubOptions& options = kDefaultPubSubOptions) {
+    return DoubleArrayEntry{
+        ::nt::GetEntry(m_handle, NT_DOUBLE_ARRAY, "double[]", options),
+        defaultValue};
+  }
   /**
    * Create a new entry for the topic, with specific type string.
    *
@@ -417,10 +465,24 @@ class DoubleArrayTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
-                       const PubSubOptions& options = kDefaultPubSubOptions);
+                       const PubSubOptions& options = kDefaultPubSubOptions) {
+    return DoubleArrayEntry{
+        ::nt::GetEntry(m_handle, NT_DOUBLE_ARRAY, typeString, options),
+        defaultValue};
+  }
 
 };
 
-}  // namespace nt
+inline DoubleArrayTopic DoubleArraySubscriber::GetTopic() const {
+  return DoubleArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
 
-#include "networktables/DoubleArrayTopic.inc"
+inline DoubleArrayTopic DoubleArrayPublisher::GetTopic() const {
+  return DoubleArrayTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+}
+
+inline DoubleArrayTopic DoubleArrayEntry::GetTopic() const {
+  return DoubleArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
+
+}  // namespace nt
