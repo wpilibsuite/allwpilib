@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -62,6 +63,11 @@ class CommandScheduler::Impl {
   wpi::SmallVector<Command*, 4> toCancelCommands;
   wpi::SmallVector<std::optional<Command*>, 4> toCancelInterruptors;
   wpi::SmallSet<Command*, 4> endingCommands;
+
+  // Map of Command* -> CommandPtr for CommandPtrs transferred to the scheduler
+  // via Schedule(CommandPtr&&). These are erased (destroyed) at the very end of
+  // the loop cycle when the command lifecycle is complete.
+  std::unordered_map<Command*, CommandPtr> ownedCommands;
 };
 
 template <typename TMap, typename TKey>
@@ -174,6 +180,12 @@ void CommandScheduler::Schedule(const CommandPtr& command) {
   Schedule(command.get());
 }
 
+void CommandScheduler::Schedule(CommandPtr&& command) {
+  auto ptr = command.get();
+  m_impl->ownedCommands.emplace(ptr, std::move(command));
+  Schedule(ptr);
+}
+
 void CommandScheduler::Run() {
   if (m_impl->disabled) {
     return;
@@ -226,6 +238,8 @@ void CommandScheduler::Run() {
       }
 
       m_watchdog.AddEpoch(command->GetName() + ".End(false)");
+      // remove owned commands after everything else is done
+      m_impl->ownedCommands.erase(command);
     }
   }
   m_impl->inRunLoop = false;
