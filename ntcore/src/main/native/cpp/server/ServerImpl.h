@@ -91,7 +91,6 @@ class ServerImpl final {
 
  private:
   wpi::Logger& m_logger;
-  bool m_controlReady{false};
 
   ServerClientLocal* m_localClient;
   std::vector<std::unique_ptr<ServerClient>> m_clients;
