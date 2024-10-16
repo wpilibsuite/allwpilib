@@ -591,6 +591,12 @@ FieldFrameData FieldInfo::GetFrameData(ImVec2 min, ImVec2 max) const {
     max.x -= 20;
     min.y += 20;
     max.y -= 20;
+
+    // also pad the image so it's the same size as the box
+    ffd.imageMin.x += 20;
+    ffd.imageMax.x -= 20;
+    ffd.imageMin.y += 20;
+    ffd.imageMax.y -= 20;
   }
 
   ffd.min = min;
