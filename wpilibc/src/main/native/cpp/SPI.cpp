@@ -165,8 +165,6 @@ SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
              static_cast<uint8_t>(port) + 1);
 }
 
-SPI::~SPI() = default;
-
 SPI::Port SPI::GetPort() const {
   return static_cast<Port>(static_cast<int>(m_port));
 }
