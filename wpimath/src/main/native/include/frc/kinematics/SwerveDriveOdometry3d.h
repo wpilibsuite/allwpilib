@@ -45,7 +45,13 @@ class SwerveDriveOdometry3d
   SwerveDriveOdometry3d(
       SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
-      const Pose2d& initialPose = Pose2d{});
+      const Pose2d& initialPose = Pose2d{})
+      : SwerveDriveOdometry3d::Odometry3d(m_kinematicsImpl, gyroAngle,
+                                          modulePositions, initialPose),
+        m_kinematicsImpl(kinematics) {
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);
+  }
 
   /**
    * Constructs a SwerveDriveOdometry3d object.
@@ -58,7 +64,13 @@ class SwerveDriveOdometry3d
   SwerveDriveOdometry3d(
       SwerveDriveKinematics<NumModules> kinematics, const Rotation3d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
-      const Pose3d& initialPose = Pose3d{});
+      const Pose3d& initialPose = Pose3d{})
+      : SwerveDriveOdometry3d::Odometry3d(m_kinematicsImpl, gyroAngle,
+                                          modulePositions, initialPose),
+        m_kinematicsImpl(kinematics) {
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);
+  }
 
  private:
   SwerveDriveKinematics<NumModules> m_kinematicsImpl;
@@ -68,5 +80,3 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     SwerveDriveOdometry3d<4>;
 
 }  // namespace frc
-
-#include "SwerveDriveOdometry3d.inc"

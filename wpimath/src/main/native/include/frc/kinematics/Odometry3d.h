@@ -42,7 +42,9 @@ class WPILIB_DLLEXPORT Odometry3d {
   explicit Odometry3d(const Kinematics<WheelSpeeds, WheelPositions>& kinematics,
                       const Rotation2d& gyroAngle,
                       const WheelPositions& wheelPositions,
-                      const Pose2d& initialPose = Pose2d{});
+                      const Pose2d& initialPose = Pose2d{})
+      : Odometry3d{kinematics, Rotation3d{0_rad, 0_rad, gyroAngle.Radians()},
+                   wheelPositions, Pose3d{initialPose}} {}
 
   /**
    * Constructs an Odometry3d object.
@@ -55,7 +57,13 @@ class WPILIB_DLLEXPORT Odometry3d {
   explicit Odometry3d(const Kinematics<WheelSpeeds, WheelPositions>& kinematics,
                       const Rotation3d& gyroAngle,
                       const WheelPositions& wheelPositions,
-                      const Pose3d& initialPose = Pose3d{});
+                      const Pose3d& initialPose = Pose3d{})
+      : m_kinematics(kinematics),
+        m_pose(initialPose),
+        m_previousWheelPositions(wheelPositions) {
+    m_previousAngle = m_pose.Rotation();
+    m_gyroOffset = m_pose.Rotation() - gyroAngle;
+  }
 
   /**
    * Resets the robot's position on the field.
@@ -175,7 +183,10 @@ class WPILIB_DLLEXPORT Odometry3d {
    * @return The new pose of the robot.
    */
   const Pose2d& Update(const Rotation2d& gyroAngle,
-                       const WheelPositions& wheelPositions);
+                       const WheelPositions& wheelPositions) {
+    Update(Rotation3d{0_rad, 0_rad, gyroAngle.Radians()}, wheelPositions);
+    return GetPose();
+  }
 
   /**
    * Updates the robot's position on the field using forward kinematics and
@@ -189,7 +200,29 @@ class WPILIB_DLLEXPORT Odometry3d {
    * @return The new pose of the robot.
    */
   const Pose3d& Update(const Rotation3d& gyroAngle,
-                       const WheelPositions& wheelPositions);
+                       const WheelPositions& wheelPositions) {
+    auto angle = gyroAngle + m_gyroOffset;
+    auto angle_difference =
+        (angle - m_previousAngle).GetQuaternion().ToRotationVector();
+
+    auto twist2d =
+        m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
+    Twist3d twist{twist2d.dx,
+                  twist2d.dy,
+                  0_m,
+                  units::radian_t{angle_difference(0)},
+                  units::radian_t{angle_difference(1)},
+                  units::radian_t{angle_difference(2)}};
+
+    auto newPose = m_pose.Exp(twist);
+
+    m_previousWheelPositions = wheelPositions;
+    m_previousAngle = angle;
+    m_pose = {newPose.Translation(), angle};
+    m_pose2d = m_pose.ToPose2d();
+
+    return m_pose;
+  }
 
  private:
   const Kinematics<WheelSpeeds, WheelPositions>& m_kinematics;
@@ -200,6 +233,5 @@ class WPILIB_DLLEXPORT Odometry3d {
   Rotation3d m_previousAngle;
   Rotation3d m_gyroOffset;
 };
-}  // namespace frc
 
-#include "Odometry3d.inc"
+}  // namespace frc
