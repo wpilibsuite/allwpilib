@@ -4,6 +4,7 @@
 
 #include "glass/other/Alerts.h"
 
+#include <IconsFontAwesome6.h>
 #include <imgui.h>
 
 using namespace glass;
@@ -18,14 +19,15 @@ void glass::DisplayAlerts(AlertsModel* model) {
   const ImVec4 kErrorColor{1.0, 0.33, 0.33, 1.0};
 
   // show higher severity alerts on top
-
   for (auto&& error : errors) {
-    ImGui::TextColored(kErrorColor, "Error: %s", error.c_str());
+    ImGui::TextColored(kErrorColor, "%s %s", ICON_FA_CIRCLE_XMARK,
+                       error.c_str());
   }
   for (auto&& warning : warnings) {
-    ImGui::TextColored(kWarningColor, "Warning: %s", warning.c_str());
+    ImGui::TextColored(kWarningColor, "%s %s", ICON_FA_TRIANGLE_EXCLAMATION,
+                       warning.c_str());
   }
   for (auto&& info : infos) {
-    ImGui::TextColored(kInfoColor, "Info: %s", info.c_str());
+    ImGui::TextColored(kInfoColor, "%s %s", ICON_FA_CIRCLE_INFO, info.c_str());
   }
 }
