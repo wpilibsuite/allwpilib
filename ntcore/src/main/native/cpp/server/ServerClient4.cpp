@@ -10,7 +10,6 @@
 
 #include "Log.h"
 #include "net/WireDecoder.h"
-#include "server/ServerImpl.h"
 #include "server/ServerTopic.h"
 
 using namespace nt::server;
@@ -97,7 +96,6 @@ void ServerClient4::SendAnnounce(ServerTopic* topic,
   m_outgoing.SendMessage(
       topic->id, net::AnnounceMsg{topic->name, static_cast<int>(topic->id),
                                   topic->typeStr, pubuid, topic->properties});
-  m_server.m_controlReady = true;
 }
 
 void ServerClient4::SendUnannounce(ServerTopic* topic) {
@@ -121,7 +119,6 @@ void ServerClient4::SendUnannounce(ServerTopic* topic) {
   m_outgoing.SendMessage(
       topic->id, net::UnannounceMsg{topic->name, static_cast<int>(topic->id)});
   m_outgoing.EraseId(topic->id);
-  m_server.m_controlReady = true;
 }
 
 void ServerClient4::SendPropertiesUpdate(ServerTopic* topic,
@@ -143,7 +140,6 @@ void ServerClient4::SendPropertiesUpdate(ServerTopic* topic,
   }
   m_outgoing.SendMessage(topic->id,
                          net::PropertiesUpdateMsg{topic->name, update, ack});
-  m_server.m_controlReady = true;
 }
 
 void ServerClient4::SendOutgoing(uint64_t curTimeMs, bool flush) {
