@@ -42,9 +42,9 @@ static void WriteOptions(mpack_writer_t& w, const PubSubOptionsImpl& options) {
 }
 
 bool ServerSubscriber::Matches(std::string_view name, bool special) {
-  for (auto&& topicName : topicNames) {
-    if ((!options.prefixMatch && name == topicName) ||
-        (options.prefixMatch && (!special || !topicName.empty()) &&
+  for (auto&& topicName : m_topicNames) {
+    if ((!m_options.prefixMatch && name == topicName) ||
+        (m_options.prefixMatch && (!special || !topicName.empty()) &&
          wpi::starts_with(name, topicName))) {
       return true;
     }
@@ -57,32 +57,32 @@ void ServerSubscriber::UpdateMeta() {
     Writer w;
     mpack_start_map(&w, 3);
     mpack_write_str(&w, "uid");
-    mpack_write_int(&w, subuid);
+    mpack_write_int(&w, m_subuid);
     mpack_write_str(&w, "topics");
-    mpack_start_array(&w, topicNames.size());
-    for (auto&& name : topicNames) {
+    mpack_start_array(&w, m_topicNames.size());
+    for (auto&& name : m_topicNames) {
       mpack_write_str(&w, name);
     }
     mpack_finish_array(&w);
     mpack_write_str(&w, "options");
-    WriteOptions(w, options);
+    WriteOptions(w, m_options);
     mpack_finish_map(&w);
     if (mpack_writer_destroy(&w) == mpack_ok) {
-      metaClient = std::move(w.bytes);
+      m_metaClient = std::move(w.bytes);
     }
   }
   {
     Writer w;
     mpack_start_map(&w, 3);
     mpack_write_str(&w, "client");
-    mpack_write_str(&w, clientName);
+    mpack_write_str(&w, m_clientName);
     mpack_write_str(&w, "subuid");
-    mpack_write_int(&w, subuid);
+    mpack_write_int(&w, m_subuid);
     mpack_write_str(&w, "options");
-    WriteOptions(w, options);
+    WriteOptions(w, m_options);
     mpack_finish_map(&w);
     if (mpack_writer_destroy(&w) == mpack_ok) {
-      metaTopic = std::move(w.bytes);
+      m_metaTopic = std::move(w.bytes);
     }
   }
 }

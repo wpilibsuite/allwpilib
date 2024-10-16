@@ -23,8 +23,8 @@ class Logger;
 namespace nt::server {
 
 class ServerClient;
-struct ServerPublisher;
-struct ServerSubscriber;
+class ServerPublisher;
+class ServerSubscriber;
 
 struct TopicClientData {
   wpi::SmallPtrSet<ServerPublisher*, 2> publishers;
@@ -33,8 +33,9 @@ struct TopicClientData {
 
   bool AddSubscriber(ServerSubscriber* sub) {
     bool added = subscribers.insert(sub).second;
-    if (!sub->options.topicsOnly) {
-      if (sub->options.sendAll) {
+    auto& options = sub->GetOptions();
+    if (!options.topicsOnly) {
+      if (options.sendAll) {
         sendMode = net::ValueSendMode::kAll;
       } else if (sendMode == net::ValueSendMode::kDisabled) {
         sendMode = net::ValueSendMode::kNormal;

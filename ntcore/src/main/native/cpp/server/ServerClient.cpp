@@ -22,9 +22,7 @@ void ServerClient::UpdateMetaClientPub() {
   Writer w;
   mpack_start_array(&w, m_publishers.size());
   for (auto&& pub : m_publishers) {
-    mpack_write_object_bytes(
-        &w, reinterpret_cast<const char*>(pub.second->metaClient.data()),
-        pub.second->metaClient.size());
+    mpack_write_object_bytes(&w, pub.second->GetMetaClientData());
   }
   mpack_finish_array(&w);
   if (mpack_writer_destroy(&w) == mpack_ok) {
@@ -39,9 +37,7 @@ void ServerClient::UpdateMetaClientSub() {
   Writer w;
   mpack_start_array(&w, m_subscribers.size());
   for (auto&& sub : m_subscribers) {
-    mpack_write_object_bytes(
-        &w, reinterpret_cast<const char*>(sub.second->metaClient.data()),
-        sub.second->metaClient.size());
+    mpack_write_object_bytes(&w, sub.second->GetMetaClientData());
   }
   mpack_finish_array(&w);
   if (mpack_writer_destroy(&w) == mpack_ok) {
