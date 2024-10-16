@@ -116,7 +116,7 @@ class Timer {
    *
    * @return true if running.
    */
-  bool IsRunning();
+  bool IsRunning() const;
 
   /**
    * Return the FPGA system clock time in seconds.

@@ -84,7 +84,7 @@ bool Timer::AdvanceIfElapsed(units::second_t period) {
   }
 }
 
-bool Timer::IsRunning() {
+bool Timer::IsRunning() const {
   return m_running;
 }
 
