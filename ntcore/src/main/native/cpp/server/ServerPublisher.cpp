@@ -9,7 +9,6 @@
 #include <wpi/MessagePack.h>
 
 #include "server/MessagePackWriter.h"
-#include "server/ServerClient.h"
 #include "server/ServerTopic.h"
 
 using namespace nt::server;
@@ -32,11 +31,7 @@ void ServerPublisher::UpdateMeta() {
     Writer w;
     mpack_start_map(&w, 2);
     mpack_write_str(&w, "client");
-    if (client) {
-      mpack_write_str(&w, client->GetName());
-    } else {
-      mpack_write_str(&w, "");
-    }
+    mpack_write_str(&w, clientName);
     mpack_write_str(&w, "pubuid");
     mpack_write_int(&w, pubuid);
     mpack_finish_map(&w);

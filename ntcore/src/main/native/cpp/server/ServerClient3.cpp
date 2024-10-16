@@ -284,7 +284,7 @@ void ServerClient3::ClientHello(std::string_view self_id,
   PubSubOptions options;
   options.prefixMatch = true;
   sub = std::make_unique<ServerSubscriber>(
-      this, std::span<const std::string>{{prefix}}, 0, options);
+      GetName(), std::span<const std::string>{{prefix}}, 0, options);
   m_periodMs = net::UpdatePeriodCalc(m_periodMs, sub->periodMs);
   m_setPeriodic(m_periodMs);
 
@@ -356,7 +356,7 @@ void ServerClient3::EntryAssign(std::string_view name, unsigned int id,
   // create publisher
   auto [publisherIt, isNew] = m_publishers.try_emplace(
       topic3->pubuid,
-      std::make_unique<ServerPublisher>(this, topic, topic3->pubuid));
+      std::make_unique<ServerPublisher>(GetName(), topic, topic3->pubuid));
   if (!isNew) {
     return;  // shouldn't happen, but just in case...
   }
@@ -409,7 +409,7 @@ void ServerClient3::EntryUpdate(unsigned int id, unsigned int seq_num,
     // create publisher
     auto [publisherIt, isNew] = m_publishers.try_emplace(
         topic3->pubuid,
-        std::make_unique<ServerPublisher>(this, topic, topic3->pubuid));
+        std::make_unique<ServerPublisher>(GetName(), topic, topic3->pubuid));
     if (isNew) {
       // add publisher to topic
       topic->AddPublisher(this, publisherIt->getSecond().get());

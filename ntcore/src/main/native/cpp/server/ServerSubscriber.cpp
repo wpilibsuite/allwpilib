@@ -11,7 +11,6 @@
 
 #include "PubSubOptions.h"
 #include "server/MessagePackWriter.h"
-#include "server/ServerClient.h"
 
 using namespace nt;
 using namespace nt::server;
@@ -76,11 +75,7 @@ void ServerSubscriber::UpdateMeta() {
     Writer w;
     mpack_start_map(&w, 3);
     mpack_write_str(&w, "client");
-    if (client) {
-      mpack_write_str(&w, client->GetName());
-    } else {
-      mpack_write_str(&w, "");
-    }
+    mpack_write_str(&w, clientName);
     mpack_write_str(&w, "subuid");
     mpack_write_int(&w, subuid);
     mpack_write_str(&w, "options");

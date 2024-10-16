@@ -9,6 +9,7 @@
 #include <cmath>
 #include <span>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <wpi/DenseMap.h>
@@ -22,10 +23,10 @@ class ServerClient;
 struct ServerTopic;
 
 struct ServerSubscriber {
-  ServerSubscriber(ServerClient* client,
+  ServerSubscriber(std::string_view clientName,
                    std::span<const std::string> topicNames, int64_t subuid,
                    const PubSubOptionsImpl& options)
-      : client{client},
+      : clientName{clientName},
         topicNames{topicNames.begin(), topicNames.end()},
         subuid{subuid},
         options{options},
@@ -51,7 +52,7 @@ struct ServerSubscriber {
 
   void UpdateMeta();
 
-  ServerClient* client;
+  std::string clientName;
   std::vector<std::string> topicNames;
   int64_t subuid;
   PubSubOptionsImpl options;
