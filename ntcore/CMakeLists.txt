@@ -10,6 +10,7 @@ file(
     src/main/native/cpp/net/*.cpp
     src/main/native/cpp/net3/*.cpp
     src/main/native/cpp/networktables/*.cpp
+    src/main/native/cpp/server/*.cpp
     src/main/native/cpp/tables/*.cpp
 )
 add_library(ntcore ${ntcore_native_src})

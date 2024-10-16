@@ -21,14 +21,14 @@
 #include <wpi/UidVector.h>
 #include <wpi/json.h>
 
-#include "ClientMessageQueue.h"
-#include "Message.h"
-#include "NetworkOutgoingQueue.h"
-#include "NetworkPing.h"
 #include "PubSubOptions.h"
-#include "WireConnection.h"
-#include "WireDecoder.h"
-#include "WireEncoder.h"
+#include "net/ClientMessageQueue.h"
+#include "net/Message.h"
+#include "net/NetworkOutgoingQueue.h"
+#include "net/NetworkPing.h"
+#include "net/WireConnection.h"
+#include "net/WireDecoder.h"
+#include "net/WireEncoder.h"
 #include "net3/Message3.h"
 #include "net3/SequenceNumber.h"
 #include "net3/WireConnection3.h"
@@ -41,15 +41,17 @@ class SmallVectorImpl;
 class raw_ostream;
 }  // namespace wpi
 
+namespace nt::net {
+struct ClientMessage;
+class LocalInterface;
+class WireConnection;
+}  // namespace nt::net
+
 namespace nt::net3 {
 class WireConnection3;
 }  // namespace nt::net3
 
-namespace nt::net {
-
-struct ClientMessage;
-class LocalInterface;
-class WireConnection;
+namespace nt::server {
 
 class ServerImpl final {
  public:
@@ -62,7 +64,8 @@ class ServerImpl final {
   void SendAllOutgoing(uint64_t curTimeMs, bool flush);
   void SendOutgoing(int clientId, uint64_t curTimeMs);
 
-  void SetLocal(ServerMessageHandler* local, ClientMessageQueue* queue);
+  void SetLocal(net::ServerMessageHandler* local,
+                net::ClientMessageQueue* queue);
 
   // these return true if any messages have been queued for later processing
   bool ProcessIncomingText(int clientId, std::string_view data);
@@ -76,7 +79,7 @@ class ServerImpl final {
   // Caller must ensure WireConnection lifetime lasts until RemoveClient() call.
   std::pair<std::string, int> AddClient(std::string_view name,
                                         std::string_view connInfo, bool local,
-                                        WireConnection& wire,
+                                        net::WireConnection& wire,
                                         SetPeriodicFunc setPeriodic);
   int AddClient3(std::string_view connInfo, bool local,
                  net3::WireConnection3& wire, Connected3Func connected,
@@ -149,15 +152,15 @@ class ServerImpl final {
     struct TopicClientData {
       wpi::SmallPtrSet<PublisherData*, 2> publishers;
       wpi::SmallPtrSet<SubscriberData*, 2> subscribers;
-      ValueSendMode sendMode = ValueSendMode::kDisabled;
+      net::ValueSendMode sendMode = net::ValueSendMode::kDisabled;
 
       bool AddSubscriber(SubscriberData* sub) {
         bool added = subscribers.insert(sub).second;
         if (!sub->options.topicsOnly) {
           if (sub->options.sendAll) {
-            sendMode = ValueSendMode::kAll;
-          } else if (sendMode == ValueSendMode::kDisabled) {
-            sendMode = ValueSendMode::kNormal;
+            sendMode = net::ValueSendMode::kAll;
+          } else if (sendMode == net::ValueSendMode::kDisabled) {
+            sendMode = net::ValueSendMode::kNormal;
           }
         }
         return added;
@@ -189,7 +192,7 @@ class ServerImpl final {
     virtual bool ProcessIncomingBinary(std::span<const uint8_t> data) = 0;
 
     virtual void SendValue(TopicData* topic, const Value& value,
-                           ValueSendMode mode) = 0;
+                           net::ValueSendMode mode) = 0;
     virtual void SendAnnounce(TopicData* topic, std::optional<int> pubuid) = 0;
     virtual void SendUnannounce(TopicData* topic) = 0;
     virtual void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
@@ -234,7 +237,8 @@ class ServerImpl final {
     TopicData* m_metaSub = nullptr;
   };
 
-  class ClientData4Base : public ClientData, protected ClientMessageHandler {
+  class ClientData4Base : public ClientData,
+                          protected net::ClientMessageHandler {
    public:
     ClientData4Base(std::string_view name, std::string_view connInfo,
                     bool local, ServerImpl::SetPeriodicFunc setPeriodic,
@@ -255,12 +259,12 @@ class ServerImpl final {
 
     void ClientSetValue(int pubuid, const Value& value) final;
 
-    bool DoProcessIncomingMessages(ClientMessageQueue& queue, size_t max);
+    bool DoProcessIncomingMessages(net::ClientMessageQueue& queue, size_t max);
 
     wpi::DenseMap<TopicData*, bool> m_announceSent;
 
    private:
-    std::array<ClientMessage, 16> m_msgsBuf;
+    std::array<net::ClientMessage, 16> m_msgsBuf;
   };
 
   class ClientDataLocal final : public ClientData4Base {
@@ -281,7 +285,7 @@ class ServerImpl final {
     }
 
     void SendValue(TopicData* topic, const Value& value,
-                   ValueSendMode mode) final;
+                   net::ValueSendMode mode) final;
     void SendAnnounce(TopicData* topic, std::optional<int> pubuid) final;
     void SendUnannounce(TopicData* topic) final;
     void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
@@ -289,17 +293,18 @@ class ServerImpl final {
     void SendOutgoing(uint64_t curTimeMs, bool flush) final {}
     void Flush() final {}
 
-    void SetQueue(ClientMessageQueue* queue) { m_queue = queue; }
+    void SetQueue(net::ClientMessageQueue* queue) { m_queue = queue; }
 
    private:
-    ClientMessageQueue* m_queue = nullptr;
+    net::ClientMessageQueue* m_queue = nullptr;
   };
 
   class ClientData4 final : public ClientData4Base {
    public:
     ClientData4(std::string_view name, std::string_view connInfo, bool local,
-                WireConnection& wire, ServerImpl::SetPeriodicFunc setPeriodic,
-                ServerImpl& server, int id, wpi::Logger& logger)
+                net::WireConnection& wire,
+                ServerImpl::SetPeriodicFunc setPeriodic, ServerImpl& server,
+                int id, wpi::Logger& logger)
         : ClientData4Base{name,   connInfo, local, setPeriodic,
                           server, id,       logger},
           m_wire{wire},
@@ -319,7 +324,7 @@ class ServerImpl final {
     }
 
     void SendValue(TopicData* topic, const Value& value,
-                   ValueSendMode mode) final;
+                   net::ValueSendMode mode) final;
     void SendAnnounce(TopicData* topic, std::optional<int> pubuid) final;
     void SendUnannounce(TopicData* topic) final;
     void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
@@ -331,12 +336,12 @@ class ServerImpl final {
     void UpdatePeriod(TopicData::TopicClientData& tcd, TopicData* topic) final;
 
    public:
-    WireConnection& m_wire;
+    net::WireConnection& m_wire;
 
    private:
-    NetworkPing m_ping;
-    NetworkIncomingClientQueue m_incoming;
-    NetworkOutgoingQueue<ServerMessage> m_outgoing;
+    net::NetworkPing m_ping;
+    net::NetworkIncomingClientQueue m_incoming;
+    net::NetworkOutgoingQueue<net::ServerMessage> m_outgoing;
   };
 
   class ClientData3 final : public ClientData, private net3::MessageHandler3 {
@@ -358,7 +363,7 @@ class ServerImpl final {
     bool ProcessIncomingMessages(size_t max) final { return false; }
 
     void SendValue(TopicData* topic, const Value& value,
-                   ValueSendMode mode) final;
+                   net::ValueSendMode mode) final;
     void SendAnnounce(TopicData* topic, std::optional<int> pubuid) final;
     void SendUnannounce(TopicData* topic) final;
     void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
@@ -395,7 +400,7 @@ class ServerImpl final {
     State m_state{kStateInitial};
     net3::WireDecoder3 m_decoder;
 
-    NetworkIncomingClientQueue m_incoming;
+    net::NetworkIncomingClientQueue m_incoming;
     std::vector<net3::Message3> m_outgoing;
     wpi::DenseMap<NT_Topic, size_t> m_outgoingValueMap;
     int64_t m_nextPubUid{1};
@@ -475,7 +480,7 @@ class ServerImpl final {
   };
 
   wpi::Logger& m_logger;
-  ServerMessageHandler* m_local{nullptr};
+  net::ServerMessageHandler* m_local{nullptr};
   bool m_controlReady{false};
 
   ClientDataLocal* m_localClient;
@@ -510,4 +515,4 @@ class ServerImpl final {
                          const wpi::json& update);
 };
 
-}  // namespace nt::net
+}  // namespace nt::server
