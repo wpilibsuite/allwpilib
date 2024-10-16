@@ -17,16 +17,16 @@
 #include "../PubSubOptionsMatcher.h"
 #include "../TestPrinters.h"
 #include "../ValueMatcher.h"
+#include "../net/MockClientMessageQueue.h"
+#include "../net/MockMessageHandler.h"
+#include "../net/MockWireConnection.h"
 #include "Handle.h"
-#include "MockClientMessageQueue.h"
-#include "MockMessageHandler.h"
-#include "MockWireConnection.h"
 #include "gmock/gmock.h"
 #include "net/Message.h"
-#include "net/ServerImpl.h"
 #include "net/WireEncoder.h"
 #include "ntcore_c.h"
 #include "ntcore_cpp.h"
+#include "server/ServerImpl.h"
 
 using ::testing::_;
 using ::testing::AllOf;
@@ -48,7 +48,7 @@ class ServerImplTest : public ::testing::Test {
   ::testing::StrictMock<net::MockServerMessageHandler> local;
   ::testing::StrictMock<net::MockClientMessageQueue> queue;
   wpi::MockLogger logger;
-  net::ServerImpl server{logger};
+  server::ServerImpl server{logger};
 };
 
 TEST_F(ServerImplTest, AddClient) {
