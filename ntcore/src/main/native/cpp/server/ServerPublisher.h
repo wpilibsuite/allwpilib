@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <string>
+#include <string_view>
 #include <vector>
 
 namespace nt::server {
@@ -14,14 +16,15 @@ class ServerClient;
 struct ServerTopic;
 
 struct ServerPublisher {
-  ServerPublisher(ServerClient* client, ServerTopic* topic, int64_t pubuid)
-      : client{client}, topic{topic}, pubuid{pubuid} {
+  ServerPublisher(std::string_view clientName, ServerTopic* topic,
+                  int64_t pubuid)
+      : clientName{clientName}, topic{topic}, pubuid{pubuid} {
     UpdateMeta();
   }
 
   void UpdateMeta();
 
-  ServerClient* client;
+  std::string clientName;
   ServerTopic* topic;
   int64_t pubuid;
   std::vector<uint8_t> metaClient;

@@ -27,7 +27,7 @@ void ServerClient4Base::ClientPublish(int pubuid, std::string_view name,
 
   // create publisher
   auto [publisherIt, isNew] = m_publishers.try_emplace(
-      pubuid, std::make_unique<ServerPublisher>(this, topic, pubuid));
+      pubuid, std::make_unique<ServerPublisher>(GetName(), topic, pubuid));
   if (!isNew) {
     WARN("client {} duplicate publish of pubuid {}", m_id, pubuid);
   } else {
@@ -101,7 +101,8 @@ void ServerClient4Base::ClientSubscribe(int subuid,
     replace = true;
   } else {
     // create
-    sub = std::make_unique<ServerSubscriber>(this, topicNames, subuid, options);
+    sub = std::make_unique<ServerSubscriber>(GetName(), topicNames, subuid,
+                                             options);
   }
 
   // limit subscriber min period
