@@ -124,6 +124,50 @@ if(WITH_JAVA OR WITH_JAVA_SOURCE)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
     find_package(Java REQUIRED COMPONENTS Development)
     find_package(JNI REQUIRED COMPONENTS JVM)
+    if(WITH_TESTS)
+        include(DownloadAndCheck)
+        set(maven_url https://search.maven.org/remotecontent?filepath=)
+        set(junit_jar_name junit-platform-console-standalone-1.9.3.jar)
+        set(junit_jar ${WPILIB_BINARY_DIR}/${java_lib_dest}/${junit_jar_name})
+        if(NOT EXISTS ${junit_jar})
+            download_and_check(
+                "${maven_url}org/junit/platform/junit-platform-console-standalone/1.9.3/${junit_jar_name}"
+                ${junit_jar}
+            )
+        endif()
+        set(objenesis_jar_name objenesis-3.3.jar)
+        set(objenesis_jar ${WPILIB_BINARY_DIR}/${java_lib_dest}/${objenesis_jar_name})
+        if(NOT EXISTS ${objenesis_jar})
+            download_and_check(
+                "${maven_url}org/objenesis/objenesis/3.3/${objenesis_jar_name}"
+                ${objenesis_jar}
+            )
+        endif()
+        set(byte_buddy_jar_name byte-buddy-1.14.15.jar)
+        set(byte_buddy_jar ${WPILIB_BINARY_DIR}/${java_lib_dest}/${byte_buddy_jar_name})
+        if(NOT EXISTS ${byte_buddy_jar})
+            download_and_check(
+                "${maven_url}net/bytebuddy/byte-buddy/1.14.15/${byte_buddy_jar_name}"
+                ${byte_buddy_jar}
+            )
+        endif()
+        set(byte_buddy_agent_jar_name byte-buddy-agent-1.14.15.jar)
+        set(byte_buddy_agent_jar ${WPILIB_BINARY_DIR}/${java_lib_dest}/${byte_buddy_agent_jar_name})
+        if(NOT EXISTS ${byte_buddy_agent_jar})
+            download_and_check(
+                "${maven_url}net/bytebuddy/byte-buddy-agent/1.14.15/${byte_buddy_agent_jar_name}"
+                ${byte_buddy_agent_jar}
+            )
+        endif()
+        set(mockito_jar_name mockito-core-4.1.0.jar)
+        set(mockito_jar ${WPILIB_BINARY_DIR}/${java_lib_dest}/${mockito_jar_name})
+        if(NOT EXISTS ${mockito_jar})
+            download_and_check(
+                "${maven_url}org/mockito/mockito-core/4.1.0/${mockito_jar_name}"
+                ${mockito_jar}
+            )
+        endif()
+    endif()
 else()
     # Protoc requires the java runtime
     find_package(Java REQUIRED COMPONENTS Runtime)

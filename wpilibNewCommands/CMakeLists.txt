@@ -91,6 +91,30 @@ install(
 install(EXPORT wpilibnewcommands DESTINATION share/wpilibNewCommands)
 
 if(WITH_TESTS)
+    if(WITH_JAVA)
+        file(GLOB EJML_JARS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/*.jar")
+        file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
+        file(GLOB EXTENSION src/test/resources/META-INF/services/*)
+        wpilib_add_java_test(
+            wpilibNewCommands
+            INCLUDE_JARS
+                hal_jar
+                ntcore_jar
+                ${EJML_JARS}
+                ${JACKSON_JARS}
+                ${QUICKBUF_JAR}
+                cscore_jar
+                cameraserver_jar
+                wpimath_jar
+                wpiunits_jar
+                wpiutil_jar
+                wpilibj_jar
+                RESOURCES
+                NAMESPACE
+                "META-INF/services"
+                ${EXTENSION}
+        )
+    endif()
     wpilib_add_test(wpilibNewCommands src/test/native/cpp)
     target_include_directories(wpilibNewCommands_test PRIVATE src/test/native/include)
     target_link_libraries(wpilibNewCommands_test wpilibNewCommands googletest)

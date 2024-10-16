@@ -1,5 +1,6 @@
 project(wpilibj)
 
+include(AddTest)
 # Java bindings
 if(WITH_JAVA)
     include(UseJava)
@@ -74,4 +75,32 @@ if(WITH_JAVA_SOURCE)
     set_property(TARGET wpilibj_src_jar PROPERTY FOLDER "java")
 
     install_jar(wpilibj_src_jar DESTINATION ${java_lib_dest})
+endif()
+
+if(WITH_TESTS AND WITH_JAVA)
+    file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
+    file(GLOB PREFERENCES src/test/resources/edu/wpi/first/wpilibj/*)
+    file(GLOB EXTENSION src/test/resources/META-INF/services/*)
+    wpilib_add_java_test(
+        wpilibj
+        INCLUDE_JARS
+            hal_jar
+            ntcore_jar
+            ${EJML_JARS}
+            ${JACKSON_JARS}
+            ${QUICKBUF_JAR}
+            ${OPENCV_JAR_FILE}
+            cscore_jar
+            cameraserver_jar
+            wpimath_jar
+            wpiunits_jar
+            wpiutil_jar
+            RESOURCES
+            NAMESPACE
+            "edu/wpi/first/wpilibj"
+            ${PREFERENCES}
+            NAMESPACE
+            "META-INF/services"
+            ${EXTENSION}
+    )
 endif()
