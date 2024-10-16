@@ -37,9 +37,14 @@ class ServerClientLocal final : public ServerClient4Base {
   void SendOutgoing(uint64_t curTimeMs, bool flush) final {}
   void Flush() final {}
 
-  void SetQueue(net::ClientMessageQueue* queue) { m_queue = queue; }
+  void SetLocal(net::ServerMessageHandler* local,
+                net::ClientMessageQueue* queue) {
+    m_local = local;
+    m_queue = queue;
+  }
 
  private:
+  net::ServerMessageHandler* m_local = nullptr;
   net::ClientMessageQueue* m_queue = nullptr;
 };
 

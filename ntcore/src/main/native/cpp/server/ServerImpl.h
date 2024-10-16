@@ -52,7 +52,6 @@ class ServerImpl final {
   friend class ServerClient3;
   friend class ServerClient4;
   friend class ServerClient4Base;
-  friend class ServerClientLocal;
 
  public:
   explicit ServerImpl(wpi::Logger& logger);
@@ -92,7 +91,6 @@ class ServerImpl final {
 
  private:
   wpi::Logger& m_logger;
-  net::ServerMessageHandler* m_local{nullptr};
   bool m_controlReady{false};
 
   ServerClientLocal* m_localClient;
