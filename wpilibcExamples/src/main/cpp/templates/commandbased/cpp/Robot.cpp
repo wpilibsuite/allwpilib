@@ -6,7 +6,19 @@
 
 #include <frc2/command/CommandScheduler.h>
 
-Robot::Robot() {}
+#include "commands/Autos.h"
+#include "commands/ExampleCommand.h"
+
+Robot::Robot() {
+  // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+  frc2::Trigger([this] {
+    return m_subsystem.ExampleCondition();
+  }).OnTrue(ExampleCommand(&m_subsystem).ToPtr());
+
+  // Schedule `ExampleMethodCommand` when the Xbox controller's B button is
+  // pressed, cancelling on release.
+  m_driverController.B().WhileTrue(m_subsystem.ExampleMethodCommand());
+}
 
 /**
  * This function is called every 20 ms, no matter the mode. Use
@@ -34,7 +46,7 @@ void Robot::DisabledPeriodic() {}
  * RobotContainer} class.
  */
 void Robot::AutonomousInit() {
-  m_autonomousCommand = m_container.GetAutonomousCommand();
+  m_autonomousCommand = autos::ExampleAuto(&m_subsystem);
 
   if (m_autonomousCommand) {
     m_autonomousCommand->Schedule();
