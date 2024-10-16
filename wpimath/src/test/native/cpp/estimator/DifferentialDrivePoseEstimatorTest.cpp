@@ -12,7 +12,7 @@
 #include <wpi/print.h>
 
 #include "frc/StateSpaceUtil.h"
-#include "frc/estimator/DifferentialDrivePoseEstimator3d.h"
+#include "frc/estimator/DifferentialDrivePoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
@@ -23,7 +23,7 @@
 
 void testFollowTrajectory(
     const frc::DifferentialDriveKinematics& kinematics,
-    frc::DifferentialDrivePoseEstimator3d& estimator,
+    frc::DifferentialDrivePoseEstimator& estimator,
     const frc::Trajectory& trajectory,
     std::function<frc::ChassisSpeeds(frc::Trajectory::State&)>
         chassisSpeedsGenerator,
@@ -147,10 +147,10 @@ void testFollowTrajectory(
   }
 }
 
-TEST(DifferentialDrivePoseEstimator3dTest, Accuracy) {
+TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
   frc::DifferentialDriveKinematics kinematics{1.0_m};
 
-  frc::DifferentialDrivePoseEstimator3d estimator{
+  frc::DifferentialDrivePoseEstimator estimator{
       kinematics,         frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{},
       {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}};
 
@@ -172,10 +172,10 @@ TEST(DifferentialDrivePoseEstimator3dTest, Accuracy) {
       100_ms, 250_ms, true, false);
 }
 
-TEST(DifferentialDrivePoseEstimator3dTest, BadInitialPose) {
+TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
   frc::DifferentialDriveKinematics kinematics{1.0_m};
 
-  frc::DifferentialDrivePoseEstimator3d estimator{
+  frc::DifferentialDrivePoseEstimator estimator{
       kinematics,         frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{},
       {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}};
 
@@ -212,7 +212,7 @@ TEST(DifferentialDrivePoseEstimator3dTest, BadInitialPose) {
   }
 }
 
-TEST(DifferentialDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
+TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
   // This tests for multiple vision measurements applied at the same time.
   // The expected behavior is that all measurements affect the estimated pose.
   // The alternative result is that only one vision measurement affects the
@@ -220,7 +220,7 @@ TEST(DifferentialDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
   // pose would converge to that measurement.
   frc::DifferentialDriveKinematics kinematics{1.0_m};
 
-  frc::DifferentialDrivePoseEstimator3d estimator{
+  frc::DifferentialDrivePoseEstimator estimator{
       kinematics,
       frc::Rotation2d{},
       0_m,
@@ -268,10 +268,10 @@ TEST(DifferentialDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
   }
 }
 
-TEST(DifferentialDrivePoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
+TEST(DifferentialDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
   frc::DifferentialDriveKinematics kinematics{1_m};
 
-  frc::DifferentialDrivePoseEstimator3d estimator{
+  frc::DifferentialDrivePoseEstimator estimator{
       kinematics,      frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{},
       {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}};
 
@@ -296,9 +296,9 @@ TEST(DifferentialDrivePoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
               1e-6);
 }
 
-TEST(DifferentialDrivePoseEstimator3dTest, TestSampleAt) {
+TEST(DifferentialDrivePoseEstimatorTest, TestSampleAt) {
   frc::DifferentialDriveKinematics kinematics{1_m};
-  frc::DifferentialDrivePoseEstimator3d estimator{
+  frc::DifferentialDrivePoseEstimator estimator{
       kinematics,      frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{},
       {1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
 
