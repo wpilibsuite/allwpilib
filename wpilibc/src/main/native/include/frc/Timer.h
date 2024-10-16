@@ -112,6 +112,13 @@ class Timer {
   bool AdvanceIfElapsed(units::second_t period);
 
   /**
+   * Whether the command is currently running.
+   *
+   * @return true if running.
+   */
+  bool IsRunning();
+
+  /**
    * Return the FPGA system clock time in seconds.
    *
    * Return the time from the FPGA hardware clock in seconds since the FPGA
