@@ -20,6 +20,7 @@
 #include "Log.h"
 #include "Types_internal.h"
 #include "Value_internal.h"
+#include "net/MessageHandler.h"
 #include "networktables/NetworkTableValue.h"
 
 using namespace nt;
@@ -403,7 +404,7 @@ void LocalStorage::Impl::PropertiesUpdated(TopicData* topic,
   NotifyTopic(topic, eventFlags | NT_EVENT_PROPERTIES);
   // check local flag so we don't echo back received properties changes
   if (m_network && sendNetwork) {
-    m_network->SetProperties(topic->handle, topic->name, update);
+    m_network->ClientSetProperties(topic->name, update);
   }
 }
 
@@ -427,10 +428,10 @@ void LocalStorage::Impl::RefreshPubSubActive(TopicData* topic,
 void LocalStorage::Impl::NetworkAnnounce(TopicData* topic,
                                          std::string_view typeStr,
                                          const wpi::json& properties,
-                                         NT_Publisher pubHandle) {
+                                         std::optional<int> pubuid) {
   DEBUG4("LS NetworkAnnounce({}, {}, {}, {})", topic->name, typeStr,
-         properties.dump(), pubHandle);
-  if (pubHandle != 0) {
+         properties.dump(), pubuid.value_or(-1));
+  if (pubuid.has_value()) {
     return;  // ack of our publish; ignore
   }
 
@@ -503,8 +504,9 @@ void LocalStorage::Impl::RemoveNetworkPublisher(TopicData* topic) {
       // this may result in a duplicate publish warning on the server side,
       // but send one anyway in this case just to be sure
       if (nextPub->active && m_network) {
-        m_network->Publish(nextPub->handle, topic->handle, topic->name,
-                           topic->typeStr, topic->properties, nextPub->config);
+        m_network->ClientPublish(Handle{nextPub->handle}.GetIndex(),
+                                 topic->name, topic->typeStr, topic->properties,
+                                 nextPub->config);
       }
     }
   }
@@ -561,8 +563,8 @@ LocalStorage::PublisherData* LocalStorage::Impl::AddLocalPublisher(
   }
 
   if (publisher->active && m_network) {
-    m_network->Publish(publisher->handle, topic->handle, topic->name,
-                       topic->typeStr, topic->properties, config);
+    m_network->ClientPublish(Handle{publisher->handle}.GetIndex(), topic->name,
+                             topic->typeStr, topic->properties, config);
   }
   return publisher;
 }
@@ -580,7 +582,7 @@ LocalStorage::Impl::RemoveLocalPublisher(NT_Publisher pubHandle) {
     }
 
     if (publisher->active && m_network) {
-      m_network->Unpublish(publisher->handle, topic->handle);
+      m_network->ClientUnpublish(Handle{publisher->handle}.GetIndex());
     }
 
     if (publisher->active && !topic->localPublishers.empty()) {
@@ -593,9 +595,9 @@ LocalStorage::Impl::RemoveLocalPublisher(NT_Publisher pubHandle) {
         topic->typeStr = nextPub->config.typeStr;
         RefreshPubSubActive(topic, false);
         if (nextPub->active && m_network) {
-          m_network->Publish(nextPub->handle, topic->handle, topic->name,
-                             topic->typeStr, topic->properties,
-                             nextPub->config);
+          m_network->ClientPublish(Handle{nextPub->handle}.GetIndex(),
+                                   topic->name, topic->typeStr,
+                                   topic->properties, nextPub->config);
         }
       }
     }
@@ -619,7 +621,8 @@ LocalStorage::SubscriberData* LocalStorage::Impl::AddLocalSubscriber(
   }
   if (m_network && !subscriber->config.hidden) {
     DEBUG4("-> NetworkSubscribe({})", topic->name);
-    m_network->Subscribe(subscriber->handle, {{topic->name}}, config);
+    m_network->ClientSubscribe(1 + Handle{subscriber->handle}.GetIndex(),
+                               {{topic->name}}, config);
   }
 
   // queue current value
@@ -647,7 +650,7 @@ LocalStorage::Impl::RemoveLocalSubscriber(NT_Subscriber subHandle) {
       }
     }
     if (m_network && !subscriber->config.hidden) {
-      m_network->Unsubscribe(subscriber->handle);
+      m_network->ClientUnsubscribe(1 + Handle{subscriber->handle}.GetIndex());
     }
   }
   return subscriber;
@@ -684,8 +687,8 @@ LocalStorage::MultiSubscriberData* LocalStorage::Impl::AddMultiSubscriber(
   }
   if (m_network && !subscriber->options.hidden) {
     DEBUG4("-> NetworkSubscribe");
-    m_network->Subscribe(subscriber->handle, subscriber->prefixes,
-                         subscriber->options);
+    m_network->ClientSubscribe(-1 - Handle{subscriber->handle}.GetIndex(),
+                               subscriber->prefixes, subscriber->options);
   }
   return subscriber;
 }
@@ -703,7 +706,7 @@ LocalStorage::Impl::RemoveMultiSubscriber(NT_MultiSubscriber subHandle) {
       }
     }
     if (m_network && !subscriber->options.hidden) {
-      m_network->Unsubscribe(subscriber->handle);
+      m_network->ClientUnsubscribe(-1 - Handle{subscriber->handle}.GetIndex());
     }
   }
   return subscriber;
@@ -977,7 +980,7 @@ bool LocalStorage::Impl::PublishLocalValue(PublisherData* publisher,
       if (publisher->topic->IsCached()) {
         publisher->topic->lastValueNetwork = value;
       }
-      m_network->SetValue(publisher->handle, value);
+      m_network->ClientSetValue(Handle{publisher->handle}.GetIndex(), value);
     }
     return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL,
                     suppressDuplicates, publisher);
@@ -1073,24 +1076,24 @@ LocalStorage::Impl::Impl(int inst, IListenerStorage& listenerStorage,
 
 LocalStorage::~LocalStorage() = default;
 
-NT_Topic LocalStorage::NetworkAnnounce(std::string_view name,
-                                       std::string_view typeStr,
-                                       const wpi::json& properties,
-                                       NT_Publisher pubHandle) {
+int LocalStorage::ServerAnnounce(std::string_view name, int id,
+                                 std::string_view typeStr,
+                                 const wpi::json& properties,
+                                 std::optional<int> pubuid) {
   std::scoped_lock lock{m_mutex};
   auto topic = m_impl.GetOrCreateTopic(name);
-  m_impl.NetworkAnnounce(topic, typeStr, properties, pubHandle);
-  return topic->handle;
+  m_impl.NetworkAnnounce(topic, typeStr, properties, pubuid);
+  return Handle{topic->handle}.GetIndex();
 }
 
-void LocalStorage::NetworkUnannounce(std::string_view name) {
+void LocalStorage::ServerUnannounce(std::string_view name, int id) {
   std::scoped_lock lock{m_mutex};
   auto topic = m_impl.GetOrCreateTopic(name);
   m_impl.RemoveNetworkPublisher(topic);
 }
 
-void LocalStorage::NetworkPropertiesUpdate(std::string_view name,
-                                           const wpi::json& update, bool ack) {
+void LocalStorage::ServerPropertiesUpdate(std::string_view name,
+                                          const wpi::json& update, bool ack) {
   std::scoped_lock lock{m_mutex};
   auto it = m_impl.m_nameTopics.find(name);
   if (it != m_impl.m_nameTopics.end()) {
@@ -1098,9 +1101,10 @@ void LocalStorage::NetworkPropertiesUpdate(std::string_view name,
   }
 }
 
-void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
+void LocalStorage::ServerSetValue(int topicId, const Value& value) {
   std::scoped_lock lock{m_mutex};
-  if (auto topic = m_impl.m_topics.Get(topicHandle)) {
+  if (auto topic =
+          m_impl.m_topics.Get(Handle{m_impl.m_inst, topicId, Handle::kTopic})) {
     if (m_impl.SetValue(topic, value, NT_EVENT_VALUE_REMOTE, false, nullptr)) {
       if (topic->IsCached()) {
         topic->lastValueNetwork = value;
@@ -1110,12 +1114,12 @@ void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
   }
 }
 
-void LocalStorage::StartNetwork(net::NetworkInterface* network) {
+void LocalStorage::StartNetwork(net::ClientMessageHandler* network) {
   std::scoped_lock lock{m_mutex};
   m_impl.StartNetwork(network);
 }
 
-void LocalStorage::Impl::StartNetwork(net::NetworkInterface* network) {
+void LocalStorage::Impl::StartNetwork(net::ClientMessageHandler* network) {
   DEBUG4("StartNetwork()");
   m_network = network;
   // publish all active publishers to the network and send last values
@@ -1124,25 +1128,27 @@ void LocalStorage::Impl::StartNetwork(net::NetworkInterface* network) {
     PublisherData* anyPublisher = nullptr;
     for (auto&& publisher : topic->localPublishers) {
       if (publisher->active) {
-        network->Publish(publisher->handle, topic->handle, topic->name,
-                         topic->typeStr, topic->properties, publisher->config);
+        network->ClientPublish(Handle{publisher->handle}.GetIndex(),
+                               topic->name, topic->typeStr, topic->properties,
+                               publisher->config);
         anyPublisher = publisher;
       }
     }
     if (anyPublisher && topic->lastValue) {
-      network->SetValue(anyPublisher->handle, topic->lastValue);
+      network->ClientSetValue(Handle{anyPublisher->handle}.GetIndex(),
+                              topic->lastValue);
     }
   }
   for (auto&& subscriber : m_subscribers) {
     if (!subscriber->config.hidden) {
-      network->Subscribe(subscriber->handle, {{subscriber->topic->name}},
-                         subscriber->config);
+      network->ClientSubscribe(1 + Handle{subscriber->handle}.GetIndex(),
+                               {{subscriber->topic->name}}, subscriber->config);
     }
   }
   for (auto&& subscriber : m_multiSubscribers) {
     if (!subscriber->options.hidden) {
-      network->Subscribe(subscriber->handle, subscriber->prefixes,
-                         subscriber->options);
+      network->ClientSubscribe(-1 - Handle{subscriber->handle}.GetIndex(),
+                               subscriber->prefixes, subscriber->options);
     }
   }
 }

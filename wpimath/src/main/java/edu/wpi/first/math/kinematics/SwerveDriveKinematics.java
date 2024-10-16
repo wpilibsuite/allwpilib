@@ -167,7 +167,7 @@ public class SwerveDriveKinematics
       double y = moduleStatesMatrix.get(i * 2 + 1, 0);
 
       double speed = Math.hypot(x, y);
-      Rotation2d angle = new Rotation2d(x, y);
+      Rotation2d angle = speed > 1e-6 ? new Rotation2d(x, y) : m_moduleHeadings[i];
 
       moduleStates[i] = new SwerveModuleState(speed, angle);
       m_moduleHeadings[i] = angle;

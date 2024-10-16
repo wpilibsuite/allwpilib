@@ -79,11 +79,7 @@ class SimCallbackRegistry : public impl::SimCallbackRegistryBase {
 
   template <typename... U>
   void Invoke(U&&... u) const {
-#ifdef _MSC_VER  // work around VS2019 16.4.0 bug
-    std::scoped_lock<wpi::recursive_spinlock> lock(m_mutex);
-#else
     std::scoped_lock lock(m_mutex);
-#endif
     if (m_callbacks) {
       const char* name = GetName();
       for (auto&& cb : *m_callbacks) {

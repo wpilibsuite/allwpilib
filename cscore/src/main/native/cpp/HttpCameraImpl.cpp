@@ -458,11 +458,7 @@ std::unique_ptr<PropertyImpl> HttpCameraImpl::CreateEmptyProperty(
 }
 
 bool HttpCameraImpl::CacheProperties(CS_Status* status) const {
-#ifdef _MSC_VER  // work around VS2019 16.4.0 bug
-  std::scoped_lock<wpi::mutex> lock(m_mutex);
-#else
   std::scoped_lock lock(m_mutex);
-#endif
 
   // Pretty typical set of video modes
   m_videoModes.clear();

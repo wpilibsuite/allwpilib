@@ -24,9 +24,19 @@ struct wpi::Struct<frc::SwerveDriveKinematics<NumModules>> {
   static constexpr std::string_view GetSchema() { return kSchema; }
 
   static frc::SwerveDriveKinematics<NumModules> Unpack(
-      std::span<const uint8_t> data);
+      std::span<const uint8_t> data) {
+    constexpr size_t kModulesOff = 0;
+    return frc::SwerveDriveKinematics<NumModules>{
+        wpi::UnpackStructArray<frc::Translation2d, kModulesOff, NumModules>(
+            data)};
+  }
+
   static void Pack(std::span<uint8_t> data,
-                   const frc::SwerveDriveKinematics<NumModules>& value);
+                   const frc::SwerveDriveKinematics<NumModules>& value) {
+    constexpr size_t kModulesOff = 0;
+    wpi::PackStructArray<kModulesOff, NumModules>(data, value.GetModules());
+  }
+
   static void ForEachNested(
       std::invocable<std::string_view, std::string_view> auto fn) {
     wpi::ForEachStructSchema<frc::Translation2d>(fn);
@@ -37,5 +47,3 @@ static_assert(wpi::StructSerializable<frc::SwerveDriveKinematics<4>>);
 static_assert(wpi::HasNestedStruct<frc::SwerveDriveKinematics<4>>);
 static_assert(wpi::StructSerializable<frc::SwerveDriveKinematics<3>>);
 static_assert(wpi::HasNestedStruct<frc::SwerveDriveKinematics<3>>);
-
-#include "frc/kinematics/struct/SwerveDriveKinematicsStruct.inc"
