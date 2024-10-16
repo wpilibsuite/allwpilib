@@ -12,7 +12,6 @@
 #include <wpi/SpanExtras.h>
 
 #include "Log.h"
-#include "server/Constants.h"
 #include "server/ServerImpl.h"
 #include "server/ServerPublisher.h"
 
@@ -50,7 +49,7 @@ void ServerClient4Base::ClientUnpublish(int pubuid) {
     return;  // nothing to do
   }
   auto publisher = publisherIt->getSecond().get();
-  auto topic = publisher->topic;
+  auto topic = publisher->GetTopic();
 
   // remove publisher from topic
   topic->RemovePublisher(this, publisher);
@@ -105,14 +104,9 @@ void ServerClient4Base::ClientSubscribe(int subuid,
                                              options);
   }
 
-  // limit subscriber min period
-  if (sub->periodMs < kMinPeriodMs) {
-    sub->periodMs = kMinPeriodMs;
-  }
-
   // update periodic sender (if not local)
   if (!m_local) {
-    m_periodMs = net::UpdatePeriodCalc(m_periodMs, sub->periodMs);
+    m_periodMs = net::UpdatePeriodCalc(m_periodMs, sub->GetPeriodMs());
     m_setPeriodic(m_periodMs);
   }
 
@@ -155,7 +149,7 @@ void ServerClient4Base::ClientSubscribe(int subuid,
     }
 
     // send last value
-    if (added && !sub->options.topicsOnly && !wasSubscribedValue &&
+    if (added && !sub->GetOptions().topicsOnly && !wasSubscribedValue &&
         topic->lastValue) {
       dataToSend.emplace_back(topic.get());
     }
@@ -192,7 +186,7 @@ void ServerClient4Base::ClientUnsubscribe(int subuid) {
   // loop over all subscribers to update period
   if (!m_local) {
     m_periodMs = net::CalculatePeriod(
-        m_subscribers, [](auto& x) { return x.getSecond()->periodMs; });
+        m_subscribers, [](auto& x) { return x.getSecond()->GetPeriodMs(); });
     m_setPeriodic(m_periodMs);
   }
 }
@@ -204,7 +198,7 @@ void ServerClient4Base::ClientSetValue(int pubuid, const Value& value) {
     WARN("unrecognized client {} pubuid {}, ignoring set", m_id, pubuid);
     return;  // ignore unrecognized pubuids
   }
-  auto topic = publisherIt->getSecond().get()->topic;
+  auto topic = publisherIt->getSecond().get()->GetTopic();
   m_server.SetValue(this, topic, value);
 }
 

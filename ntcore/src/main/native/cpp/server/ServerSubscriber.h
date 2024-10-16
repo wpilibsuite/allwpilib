@@ -12,8 +12,6 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/DenseMap.h>
-
 #include "PubSubOptions.h"
 #include "server/Constants.h"
 
@@ -22,46 +20,53 @@ namespace nt::server {
 class ServerClient;
 struct ServerTopic;
 
-struct ServerSubscriber {
+class ServerSubscriber {
+ public:
   ServerSubscriber(std::string_view clientName,
                    std::span<const std::string> topicNames, int64_t subuid,
                    const PubSubOptionsImpl& options)
-      : clientName{clientName},
-        topicNames{topicNames.begin(), topicNames.end()},
-        subuid{subuid},
-        options{options},
-        periodMs(std::lround(options.periodicMs / 10.0) * 10) {
+      : m_clientName{clientName},
+        m_topicNames{topicNames.begin(), topicNames.end()},
+        m_subuid{subuid},
+        m_options{options},
+        m_periodMs(std::lround(options.periodicMs / 10.0) * 10) {
     UpdateMeta();
-    if (periodMs < kMinPeriodMs) {
-      periodMs = kMinPeriodMs;
+    if (m_periodMs < kMinPeriodMs) {
+      m_periodMs = kMinPeriodMs;
     }
   }
 
   void Update(std::span<const std::string> topicNames_,
               const PubSubOptionsImpl& options_) {
-    topicNames = {topicNames_.begin(), topicNames_.end()};
-    options = options_;
+    m_topicNames = {topicNames_.begin(), topicNames_.end()};
+    m_options = options_;
     UpdateMeta();
-    periodMs = std::lround(options_.periodicMs / 10.0) * 10;
-    if (periodMs < kMinPeriodMs) {
-      periodMs = kMinPeriodMs;
+    m_periodMs = std::lround(options_.periodicMs / 10.0) * 10;
+    if (m_periodMs < kMinPeriodMs) {
+      m_periodMs = kMinPeriodMs;
     }
   }
 
   bool Matches(std::string_view name, bool special);
 
+  const PubSubOptions& GetOptions() const { return m_options; }
+  uint32_t GetPeriodMs() const { return m_periodMs; }
+
+  std::span<const uint8_t> GetMetaClientData() const { return m_metaClient; }
+  std::span<const uint8_t> GetMetaTopicData() const { return m_metaTopic; }
+
+ private:
   void UpdateMeta();
 
-  std::string clientName;
-  std::vector<std::string> topicNames;
-  int64_t subuid;
-  PubSubOptionsImpl options;
-  std::vector<uint8_t> metaClient;
-  std::vector<uint8_t> metaTopic;
-  wpi::DenseMap<ServerTopic*, bool> topics;
+  std::string m_clientName;
+  std::vector<std::string> m_topicNames;
+  int64_t m_subuid;
+  PubSubOptionsImpl m_options;
+  std::vector<uint8_t> m_metaClient;
+  std::vector<uint8_t> m_metaTopic;
   // in options as double, but copy here as integer; rounded to the nearest
   // 10 ms
-  uint32_t periodMs;
+  uint32_t m_periodMs;
 };
 
 }  // namespace nt::server

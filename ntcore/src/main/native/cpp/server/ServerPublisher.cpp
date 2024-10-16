@@ -19,24 +19,24 @@ void ServerPublisher::UpdateMeta() {
     Writer w;
     mpack_start_map(&w, 2);
     mpack_write_str(&w, "uid");
-    mpack_write_int(&w, pubuid);
+    mpack_write_int(&w, m_pubuid);
     mpack_write_str(&w, "topic");
-    mpack_write_str(&w, topic->name);
+    mpack_write_str(&w, m_topic->name);
     mpack_finish_map(&w);
     if (mpack_writer_destroy(&w) == mpack_ok) {
-      metaClient = std::move(w.bytes);
+      m_metaClient = std::move(w.bytes);
     }
   }
   {
     Writer w;
     mpack_start_map(&w, 2);
     mpack_write_str(&w, "client");
-    mpack_write_str(&w, clientName);
+    mpack_write_str(&w, m_clientName);
     mpack_write_str(&w, "pubuid");
-    mpack_write_int(&w, pubuid);
+    mpack_write_int(&w, m_pubuid);
     mpack_finish_map(&w);
     if (mpack_writer_destroy(&w) == mpack_ok) {
-      metaTopic = std::move(w.bytes);
+      m_metaTopic = std::move(w.bytes);
     }
   }
 }

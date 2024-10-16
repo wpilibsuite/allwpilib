@@ -24,6 +24,12 @@ inline void mpack_write_bytes(mpack_writer_t* writer,
                     data.size());
 }
 
+inline void mpack_write_object_bytes(mpack_writer_t* writer,
+                                     std::span<const uint8_t> data) {
+  mpack_write_object_bytes(writer, reinterpret_cast<const char*>(data.data()),
+                           data.size());
+}
+
 inline void mpack_reader_init_data(mpack_reader_t* reader,
                                    std::span<const uint8_t> data) {
   mpack_reader_init_data(reader, reinterpret_cast<const char*>(data.data()),

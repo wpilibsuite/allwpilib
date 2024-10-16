@@ -285,7 +285,7 @@ void ServerClient3::ClientHello(std::string_view self_id,
   options.prefixMatch = true;
   sub = std::make_unique<ServerSubscriber>(
       GetName(), std::span<const std::string>{{prefix}}, 0, options);
-  m_periodMs = net::UpdatePeriodCalc(m_periodMs, sub->periodMs);
+  m_periodMs = net::UpdatePeriodCalc(m_periodMs, sub->GetPeriodMs());
   m_setPeriodic(m_periodMs);
 
   {

@@ -156,8 +156,8 @@ void ServerClient4::SendOutgoing(uint64_t curTimeMs, bool flush) {
 }
 
 void ServerClient4::UpdatePeriod(TopicClientData& tcd, ServerTopic* topic) {
-  uint32_t period = net::CalculatePeriod(tcd.subscribers,
-                                         [](auto& x) { return x->periodMs; });
+  uint32_t period = net::CalculatePeriod(
+      tcd.subscribers, [](auto& x) { return x->GetPeriodMs(); });
   DEBUG4("updating {} period to {} ms", topic->name, period);
   m_outgoing.SetPeriod(topic->id, period);
 }

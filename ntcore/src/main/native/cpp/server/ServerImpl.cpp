@@ -719,9 +719,7 @@ void ServerImpl::UpdateMetaTopicPub(ServerTopic* topic) {
   mpack_start_array(&w, count);
   for (auto&& tcd : topic->clients) {
     for (auto&& pub : tcd.second.publishers) {
-      mpack_write_object_bytes(
-          &w, reinterpret_cast<const char*>(pub->metaTopic.data()),
-          pub->metaTopic.size());
+      mpack_write_object_bytes(&w, pub->GetMetaTopicData());
     }
   }
   mpack_finish_array(&w);
@@ -742,9 +740,7 @@ void ServerImpl::UpdateMetaTopicSub(ServerTopic* topic) {
   mpack_start_array(&w, count);
   for (auto&& tcd : topic->clients) {
     for (auto&& sub : tcd.second.subscribers) {
-      mpack_write_object_bytes(
-          &w, reinterpret_cast<const char*>(sub->metaTopic.data()),
-          sub->metaTopic.size());
+      mpack_write_object_bytes(&w, sub->GetMetaTopicData());
     }
   }
   mpack_finish_array(&w);
