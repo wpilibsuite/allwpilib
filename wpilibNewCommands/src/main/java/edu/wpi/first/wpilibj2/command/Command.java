@@ -514,7 +514,12 @@ public abstract class Command implements Sendable {
         });
   }
 
-  /** Schedules this command. */
+  /**
+   * Schedules this command.
+   *
+   * @deprecated Use CommandScheduler.getInstance().schedule(Command...) instead
+   */
+  @Deprecated(since = "2025", forRemoval = true)
   public void schedule() {
     CommandScheduler.getInstance().schedule(this);
   }
@@ -591,7 +596,7 @@ public abstract class Command implements Sendable {
         value -> {
           if (value) {
             if (!isScheduled()) {
-              schedule();
+              CommandScheduler.getInstance().schedule(this);
             }
           } else {
             if (isScheduled()) {
