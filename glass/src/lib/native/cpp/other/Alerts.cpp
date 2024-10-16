@@ -14,9 +14,9 @@ void glass::DisplayAlerts(AlertsModel* model) {
   auto& warnings = model->GetWarnings();
   auto& errors = model->GetErrors();
 
-  const ImVec4 kInfoColor{1.0, 1.0, 1.0, 1.0};
-  const ImVec4 kWarningColor{1.0, 0.66, 0.0, 1.0};
-  const ImVec4 kErrorColor{1.0, 0.33, 0.33, 1.0};
+  const ImVec4 kInfoColor{1.0f, 1.0f, 1.0f, 1.0f};
+  const ImVec4 kWarningColor{1.0f, 0.66f, 0.0f, 1.0f};
+  const ImVec4 kErrorColor{1.0f, 0.33f, 0.33f, 1.0f};
 
   // show higher severity alerts on top
   for (auto&& error : errors) {
