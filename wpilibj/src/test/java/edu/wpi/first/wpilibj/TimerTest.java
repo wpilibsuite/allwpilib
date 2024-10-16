@@ -50,7 +50,7 @@ class TimerTest {
     timer.stop();
     SimHooks.stepTiming(0.5);
     assertEquals(timer.get(), 0.5, 1e-9);
-    assertTrue(timer.isRunning());
+    assertFalse(timer.isRunning());
   }
 
   @Test
