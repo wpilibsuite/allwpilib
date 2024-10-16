@@ -32,9 +32,8 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
       },
       [](Window* win, Model* model, const char*) {
         win->SetDefaultSize(300, 150);
-        return MakeFunctionView([=] {
-          DisplayAlerts(static_cast<NTAlertsModel*>(model));
-        });
+        return MakeFunctionView(
+            [=] { DisplayAlerts(static_cast<NTAlertsModel*>(model)); });
       });
   provider.Register(
       NTCommandSchedulerModel::kType,

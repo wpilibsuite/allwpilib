@@ -23,17 +23,13 @@ class NTAlertsModel : public AlertsModel {
   explicit NTAlertsModel(std::string_view path);
   NTAlertsModel(nt::NetworkTableInstance inst, std::string_view path);
 
-  const std::vector<std::string>& GetInfos() override {
-    return m_infosValue;
-  }
+  const std::vector<std::string>& GetInfos() override { return m_infosValue; }
 
   const std::vector<std::string>& GetWarnings() override {
     return m_warningsValue;
   }
 
-  const std::vector<std::string>& GetErrors() override {
-    return m_errorsValue;
-  }
+  const std::vector<std::string>& GetErrors() override { return m_errorsValue; }
 
   void Update() override;
   bool Exists() override;

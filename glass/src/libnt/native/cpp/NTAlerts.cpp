@@ -14,7 +14,7 @@ NTAlertsModel::NTAlertsModel(std::string_view path)
     : NTAlertsModel{nt::NetworkTableInstance::GetDefault(), path} {}
 
 NTAlertsModel::NTAlertsModel(nt::NetworkTableInstance inst,
-			     std::string_view path)
+                             std::string_view path)
     : m_inst{inst},
       m_infos{m_inst.GetStringArrayTopic(fmt::format("{}/infos", path))
                   .Subscribe({})},
