@@ -154,7 +154,7 @@ public class Timer {
 
   /**
    * Whether the command is currently running.
-   * 
+   *
    * @return true if running.
    */
   public boolean isRunning() {
