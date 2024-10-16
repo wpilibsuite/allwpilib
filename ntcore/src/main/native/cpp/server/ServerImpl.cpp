@@ -783,8 +783,7 @@ void ServerImpl::SendOutgoing(int clientId, uint64_t curTimeMs) {
 void ServerImpl::SetLocal(net::ServerMessageHandler* local,
                           net::ClientMessageQueue* queue) {
   DEBUG4("SetLocal()");
-  m_local = local;
-  m_localClient->SetQueue(queue);
+  m_localClient->SetLocal(local, queue);
 
   // create server meta topics
   m_metaClients = CreateMetaTopic("$clients");
