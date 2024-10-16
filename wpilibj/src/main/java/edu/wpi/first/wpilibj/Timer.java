@@ -153,7 +153,7 @@ public class Timer {
   }
 
   /**
-   * Whether the command is currently running.
+   * Whether the timer is currently running.
    *
    * @return true if running.
    */

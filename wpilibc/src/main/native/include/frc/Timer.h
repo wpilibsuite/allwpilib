@@ -112,7 +112,7 @@ class Timer {
   bool AdvanceIfElapsed(units::second_t period);
 
   /**
-   * Whether the command is currently running.
+   * Whether the timer is currently running.
    *
    * @return true if running.
    */
