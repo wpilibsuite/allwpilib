@@ -18,8 +18,8 @@
 
 #include "net/ClientMessageQueue.h"
 #include "net/Message.h"
-#include "net/ServerImpl.h"
 #include "ntcore_cpp.h"
+#include "server/ServerImpl.h"
 
 namespace wpi {
 class Logger;
@@ -78,7 +78,7 @@ class NetworkServer {
   using Queue = net::LocalClientMessageQueue;
   net::ClientMessage m_localMsgs[Queue::kBlockSize];
 
-  net::ServerImpl m_serverImpl;
+  server::ServerImpl m_serverImpl;
 
   // shared with user (must be atomic or mutex-protected)
   std::atomic<wpi::uv::Async<>*> m_flushLocalAtomic{nullptr};
