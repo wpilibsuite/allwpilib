@@ -19,9 +19,9 @@ class ServerClient4Base : public ServerClient,
                           protected net::ClientMessageHandler {
  public:
   ServerClient4Base(std::string_view name, std::string_view connInfo,
-                    bool local, SetPeriodicFunc setPeriodic, ServerImpl& server,
-                    int id, wpi::Logger& logger)
-      : ServerClient{name, connInfo, local, setPeriodic, server, id, logger} {}
+                    bool local, SetPeriodicFunc setPeriodic,
+                    ServerStorage& storage, int id, wpi::Logger& logger)
+      : ServerClient{name, connInfo, local, setPeriodic, storage, id, logger} {}
 
  protected:
   // ClientMessageHandler interface

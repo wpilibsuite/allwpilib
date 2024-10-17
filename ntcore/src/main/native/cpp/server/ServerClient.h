@@ -29,21 +29,23 @@ class SmallVectorImpl;
 namespace nt::server {
 
 struct ServerTopic;
-class ServerImpl;
+class ServerStorage;
 struct TopicClientData;
 
 class ServerClient {
  public:
   ServerClient(std::string_view name, std::string_view connInfo, bool local,
-               SetPeriodicFunc setPeriodic, ServerImpl& server, int id,
+               SetPeriodicFunc setPeriodic, ServerStorage& storage, int id,
                wpi::Logger& logger)
       : m_name{name},
         m_connInfo{connInfo},
         m_local{local},
         m_setPeriodic{std::move(setPeriodic)},
-        m_server{server},
+        m_storage{storage},
         m_id{id},
         m_logger{logger} {}
+  ServerClient(const ServerClient&) = delete;
+  ServerClient& operator=(const ServerClient&) = delete;
   virtual ~ServerClient() = default;
 
   // these return true if any messages have been queued for later processing
@@ -81,7 +83,7 @@ class ServerClient {
   SetPeriodicFunc m_setPeriodic;
   // TODO: make this per-topic?
   uint32_t m_periodMs{UINT32_MAX};
-  ServerImpl& m_server;
+  ServerStorage& m_storage;
   int m_id;
 
   wpi::Logger& m_logger;

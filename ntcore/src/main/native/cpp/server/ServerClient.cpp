@@ -9,8 +9,8 @@
 #include <wpi/MessagePack.h>
 
 #include "server/MessagePackWriter.h"
-#include "server/ServerImpl.h"
 #include "server/ServerPublisher.h"
+#include "server/ServerStorage.h"
 
 using namespace nt::server;
 using namespace mpack;
@@ -26,7 +26,7 @@ void ServerClient::UpdateMetaClientPub() {
   }
   mpack_finish_array(&w);
   if (mpack_writer_destroy(&w) == mpack_ok) {
-    m_server.SetValue(nullptr, m_metaPub, Value::MakeRaw(std::move(w.bytes)));
+    m_storage.SetValue(nullptr, m_metaPub, Value::MakeRaw(std::move(w.bytes)));
   }
 }
 
@@ -41,7 +41,7 @@ void ServerClient::UpdateMetaClientSub() {
   }
   mpack_finish_array(&w);
   if (mpack_writer_destroy(&w) == mpack_ok) {
-    m_server.SetValue(nullptr, m_metaSub, Value::MakeRaw(std::move(w.bytes)));
+    m_storage.SetValue(nullptr, m_metaSub, Value::MakeRaw(std::move(w.bytes)));
   }
 }
 

@@ -57,6 +57,8 @@ struct ServerTopic {
         properties(std::move(properties)) {
     RefreshProperties();
   }
+  ServerTopic(const ServerTopic&) = delete;
+  ServerTopic& operator=(const ServerTopic&) = delete;
 
   bool IsPublished() const {
     return persistent || retained || publisherCount != 0;

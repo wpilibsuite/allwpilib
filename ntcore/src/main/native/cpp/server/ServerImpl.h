@@ -13,13 +13,9 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/StringMap.h>
-#include <wpi/UidVector.h>
-#include <wpi/json_fwd.h>
-
 #include "server/Functions.h"
 #include "server/ServerClient.h"
-#include "server/ServerTopic.h"
+#include "server/ServerStorage.h"
 
 namespace wpi {
 class Logger;
@@ -41,18 +37,10 @@ class WireConnection3;
 
 namespace nt::server {
 
-class ServerClient;
-class ServerClient3;
-class ServerClient4;
-class ServerClient4Base;
 class ServerClientLocal;
+struct ServerTopic;
 
 class ServerImpl final {
-  friend class ServerClient;
-  friend class ServerClient3;
-  friend class ServerClient4;
-  friend class ServerClient4Base;
-
  public:
   explicit ServerImpl(wpi::Logger& logger);
 
@@ -84,44 +72,28 @@ class ServerImpl final {
   void ConnectionsChanged(const std::vector<ConnectionInfo>& conns);
 
   // if any persistent values changed since the last call to this function
-  bool PersistentChanged();
+  bool PersistentChanged() { return m_storage.PersistentChanged(); }
+
   std::string DumpPersistent();
   // returns newline-separated errors
-  std::string LoadPersistent(std::string_view in);
+  std::string LoadPersistent(std::string_view in) {
+    return m_storage.LoadPersistent(in);
+  }
 
  private:
   wpi::Logger& m_logger;
 
   ServerClientLocal* m_localClient;
   std::vector<std::unique_ptr<ServerClient>> m_clients;
-  wpi::UidVector<std::unique_ptr<ServerTopic>, 16> m_topics;
-  wpi::StringMap<ServerTopic*> m_nameTopics;
-  bool m_persistentChanged{false};
+
+  ServerStorage m_storage;
 
   // global meta topics (other meta topics are linked to from the specific
   // client or topic)
   ServerTopic* m_metaClients;
 
-  void DumpPersistent(wpi::raw_ostream& os);
-
-  // helper functions
-  ServerTopic* CreateTopic(ServerClient* client, std::string_view name,
-                           std::string_view typeStr,
-                           const wpi::json& properties, bool special = false);
-  ServerTopic* CreateMetaTopic(std::string_view name);
-  void DeleteTopic(ServerTopic* topic);
-  void SetProperties(ServerClient* client, ServerTopic* topic,
-                     const wpi::json& update);
-  void SetFlags(ServerClient* client, ServerTopic* topic, unsigned int flags);
-  void SetValue(ServerClient* client, ServerTopic* topic, const Value& value);
-
-  // update meta topic values from data structures
+  void SendAnnounce(ServerTopic* topic, ServerClient* client);
   void UpdateMetaClients(const std::vector<ConnectionInfo>& conns);
-  void UpdateMetaTopicPub(ServerTopic* topic);
-  void UpdateMetaTopicSub(ServerTopic* topic);
-
-  void PropertiesChanged(ServerClient* client, ServerTopic* topic,
-                         const wpi::json& update);
 };
 
 }  // namespace nt::server
