@@ -17,13 +17,7 @@ class ServerClient4 final : public ServerClient4Base {
  public:
   ServerClient4(std::string_view name, std::string_view connInfo, bool local,
                 net::WireConnection& wire, SetPeriodicFunc setPeriodic,
-                ServerStorage& storage, int id, wpi::Logger& logger)
-      : ServerClient4Base{name,    connInfo, local, setPeriodic,
-                          storage, id,       logger},
-        m_wire{wire},
-        m_ping{wire},
-        m_incoming{logger},
-        m_outgoing{wire, local} {}
+                ServerStorage& storage, int id, wpi::Logger& logger);
 
   bool ProcessIncomingText(std::string_view data) final;
   bool ProcessIncomingBinary(std::span<const uint8_t> data) final;
