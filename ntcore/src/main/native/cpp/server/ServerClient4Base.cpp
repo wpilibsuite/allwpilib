@@ -22,7 +22,7 @@ void ServerClient4Base::ClientPublish(int pubuid, std::string_view name,
                                       const wpi::json& properties,
                                       const PubSubOptionsImpl& options) {
   DEBUG3("ClientPublish({}, {}, {}, {})", m_id, name, pubuid, typeStr);
-  auto topic = m_server.CreateTopic(this, name, typeStr, properties);
+  auto topic = m_storage.CreateTopic(this, name, typeStr, properties);
 
   // create publisher
   auto [publisherIt, isNew] = m_publishers.try_emplace(
@@ -34,7 +34,7 @@ void ServerClient4Base::ClientPublish(int pubuid, std::string_view name,
     topic->AddPublisher(this, publisherIt->getSecond().get());
 
     // update meta data
-    m_server.UpdateMetaTopicPub(topic);
+    m_storage.UpdateMetaTopicPub(topic);
   }
 
   // respond with announce with pubuid to client
@@ -58,33 +58,31 @@ void ServerClient4Base::ClientUnpublish(int pubuid) {
   m_publishers.erase(publisherIt);
 
   // update meta data
-  m_server.UpdateMetaTopicPub(topic);
+  m_storage.UpdateMetaTopicPub(topic);
 
   // delete topic if no longer published
   if (!topic->IsPublished()) {
-    m_server.DeleteTopic(topic);
+    m_storage.DeleteTopic(topic);
   }
 }
 
 void ServerClient4Base::ClientSetProperties(std::string_view name,
                                             const wpi::json& update) {
   DEBUG4("ClientSetProperties({}, {}, {})", m_id, name, update.dump());
-  auto topicIt = m_server.m_nameTopics.find(name);
-  if (topicIt == m_server.m_nameTopics.end() ||
-      !topicIt->second->IsPublished()) {
+  ServerTopic* topic = m_storage.GetTopic(name);
+  if (!topic || !topic->IsPublished()) {
     WARN(
         "server ignoring SetProperties({}) from client {} on unpublished topic "
         "'{}'; publish or set a value first",
         update.dump(), m_id, name);
     return;  // nothing to do
   }
-  auto topic = topicIt->second;
   if (topic->special) {
     WARN("server ignoring SetProperties({}) from client {} on meta topic '{}'",
          update.dump(), m_id, name);
     return;  // nothing to do
   }
-  m_server.SetProperties(nullptr, topic, update);
+  m_storage.SetProperties(nullptr, topic, update);
 }
 
 void ServerClient4Base::ClientSubscribe(int subuid,
@@ -115,8 +113,8 @@ void ServerClient4Base::ClientSubscribe(int subuid,
   // send announcements in first loop and remember what we want to send in
   // second loop.
   std::vector<ServerTopic*> dataToSend;
-  dataToSend.reserve(m_server.m_topics.size());
-  for (auto&& topic : m_server.m_topics) {
+  dataToSend.reserve(m_storage.GetNumTopics());
+  m_storage.ForEachTopic([&](ServerTopic* topic) {
     auto tcdIt = topic->clients.find(this);
     bool removed = tcdIt != topic->clients.end() && replace &&
                    tcdIt->second.subscribers.erase(sub.get());
@@ -138,22 +136,22 @@ void ServerClient4Base::ClientSubscribe(int subuid,
     }
 
     if (added ^ removed) {
-      UpdatePeriod(tcdIt->second, topic.get());
-      m_server.UpdateMetaTopicSub(topic.get());
+      UpdatePeriod(tcdIt->second, topic);
+      m_storage.UpdateMetaTopicSub(topic);
     }
 
     // announce topic to client if not previously announced
     if (added && !removed && !wasSubscribed) {
       DEBUG4("client {}: announce {}", m_id, topic->name);
-      SendAnnounce(topic.get(), std::nullopt);
+      SendAnnounce(topic, std::nullopt);
     }
 
     // send last value
     if (added && !sub->GetOptions().topicsOnly && !wasSubscribedValue &&
         topic->lastValue) {
-      dataToSend.emplace_back(topic.get());
+      dataToSend.emplace_back(topic);
     }
-  }
+  });
 
   for (auto topic : dataToSend) {
     DEBUG4("send last value for {} to client {}", topic->name, m_id);
@@ -170,15 +168,15 @@ void ServerClient4Base::ClientUnsubscribe(int subuid) {
   auto sub = subIt->getSecond().get();
 
   // remove from topics
-  for (auto&& topic : m_server.m_topics) {
+  m_storage.ForEachTopic([&](ServerTopic* topic) {
     auto tcdIt = topic->clients.find(this);
     if (tcdIt != topic->clients.end()) {
       if (tcdIt->second.subscribers.erase(sub)) {
-        UpdatePeriod(tcdIt->second, topic.get());
-        m_server.UpdateMetaTopicSub(topic.get());
+        UpdatePeriod(tcdIt->second, topic);
+        m_storage.UpdateMetaTopicSub(topic);
       }
     }
-  }
+  });
 
   // delete it from client (future value sets will be ignored)
   m_subscribers.erase(subIt);
@@ -199,7 +197,7 @@ void ServerClient4Base::ClientSetValue(int pubuid, const Value& value) {
     return;  // ignore unrecognized pubuids
   }
   auto topic = publisherIt->getSecond().get()->GetTopic();
-  m_server.SetValue(this, topic, value);
+  m_storage.SetValue(this, topic, value);
 }
 
 bool ServerClient4Base::DoProcessIncomingMessages(

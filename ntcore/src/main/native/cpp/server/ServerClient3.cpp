@@ -111,7 +111,7 @@ void ServerClient3::SendAnnounce(ServerTopic* topic,
   // subscribe to all non-special topics
   if (!topic->special) {
     topic->clients[this].AddSubscriber(m_subscribers[0].get());
-    m_server.UpdateMetaTopicSub(topic);
+    m_storage.UpdateMetaTopicSub(topic);
   }
 
   // NT3 requires a value to send the assign message, so the assign message
@@ -240,13 +240,13 @@ void ServerClient3::ClearEntries() {
         m_publishers.erase(publisherIt);
 
         // update meta data
-        m_server.UpdateMetaTopicPub(topic);
+        m_storage.UpdateMetaTopicPub(topic);
         UpdateMetaClientPub();
       }
     }
 
     // set retained=false
-    m_server.SetProperties(this, topic, {{"retained", false}});
+    m_storage.SetProperties(this, topic, {{"retained", false}});
   }
 }
 
@@ -275,8 +275,8 @@ void ServerClient3::ClientHello(std::string_view self_id,
   m_connected = nullptr;  // no longer required
 
   // create client meta topics
-  m_metaPub = m_server.CreateMetaTopic(fmt::format("$clientpub${}", m_name));
-  m_metaSub = m_server.CreateMetaTopic(fmt::format("$clientsub${}", m_name));
+  m_metaPub = m_storage.CreateMetaTopic(fmt::format("$clientpub${}", m_name));
+  m_metaSub = m_storage.CreateMetaTopic(fmt::format("$clientsub${}", m_name));
 
   // subscribe and send initial assignments
   auto& sub = m_subscribers[0];
@@ -291,22 +291,22 @@ void ServerClient3::ClientHello(std::string_view self_id,
   {
     auto out = m_wire.Send();
     net3::WireEncodeServerHello(out.stream(), 0, "server");
-    for (auto&& topic : m_server.m_topics) {
+    m_storage.ForEachTopic([&](ServerTopic* topic) {
       if (topic && !topic->special && topic->IsPublished() &&
           topic->lastValue) {
         DEBUG4("client {}: initial announce of '{}' (id {})", m_id, topic->name,
                topic->id);
         topic->clients[this].AddSubscriber(sub.get());
-        m_server.UpdateMetaTopicSub(topic.get());
+        m_storage.UpdateMetaTopicSub(topic);
 
-        TopicData3* topic3 = GetTopic3(topic.get());
+        TopicData3* topic3 = GetTopic3(topic);
         ++topic3->seqNum;
         net3::WireEncodeEntryAssign(out.stream(), topic->name, topic->id,
                                     topic3->seqNum.value(), topic->lastValue,
                                     topic3->flags);
         topic3->sentAssign = true;
       }
-    }
+    });
     net3::WireEncodeServerHelloDone(out.stream());
   }
   Flush();
@@ -342,7 +342,7 @@ void ServerClient3::EntryAssign(std::string_view name, unsigned int id,
   }
 
   // create topic
-  auto topic = m_server.CreateTopic(this, name, typeStr, properties);
+  auto topic = m_storage.CreateTopic(this, name, typeStr, properties);
   TopicData3* topic3 = GetTopic3(topic);
   if (topic3->published || topic3->sentAssign) {
     WARN("ignoring client {} duplicate publish of '{}'", m_id, name);
@@ -365,12 +365,12 @@ void ServerClient3::EntryAssign(std::string_view name, unsigned int id,
   topic->AddPublisher(this, publisherIt->getSecond().get());
 
   // update meta data
-  m_server.UpdateMetaTopicPub(topic);
+  m_storage.UpdateMetaTopicPub(topic);
   UpdateMetaClientPub();
 
   // acts as an announce + data update
   SendAnnounce(topic, topic3->pubuid);
-  m_server.SetValue(this, topic, value);
+  m_storage.SetValue(this, topic, value);
 
   // respond with assign message with assigned topic ID
   if (m_local && m_state == kStateRunning) {
@@ -391,11 +391,7 @@ void ServerClient3::EntryUpdate(unsigned int id, unsigned int seq_num,
     return;
   }
 
-  if (id >= m_server.m_topics.size()) {
-    DEBUG3("ignored EntryUpdate from {} on non-existent topic {}", m_id, id);
-    return;
-  }
-  ServerTopic* topic = m_server.m_topics[id].get();
+  ServerTopic* topic = m_storage.GetTopic(id);
   if (!topic || !topic->IsPublished()) {
     DEBUG3("ignored EntryUpdate from {} on non-existent topic {}", m_id, id);
     return;
@@ -415,13 +411,13 @@ void ServerClient3::EntryUpdate(unsigned int id, unsigned int seq_num,
       topic->AddPublisher(this, publisherIt->getSecond().get());
 
       // update meta data
-      m_server.UpdateMetaTopicPub(topic);
+      m_storage.UpdateMetaTopicPub(topic);
       UpdateMetaClientPub();
     }
   }
   topic3->seqNum = net3::SequenceNumber{seq_num};
 
-  m_server.SetValue(this, topic, value);
+  m_storage.SetValue(this, topic, value);
 }
 
 void ServerClient3::FlagsUpdate(unsigned int id, unsigned int flags) {
@@ -430,11 +426,7 @@ void ServerClient3::FlagsUpdate(unsigned int id, unsigned int flags) {
     m_decoder.SetError("received unexpected FlagsUpdate message");
     return;
   }
-  if (id >= m_server.m_topics.size()) {
-    DEBUG3("ignored FlagsUpdate from {} on non-existent topic {}", m_id, id);
-    return;
-  }
-  ServerTopic* topic = m_server.m_topics[id].get();
+  ServerTopic* topic = m_storage.GetTopic(id);
   if (!topic || !topic->IsPublished()) {
     DEBUG3("ignored FlagsUpdate from {} on non-existent topic {}", m_id, id);
     return;
@@ -443,7 +435,7 @@ void ServerClient3::FlagsUpdate(unsigned int id, unsigned int flags) {
     DEBUG3("ignored FlagsUpdate from {} on special topic {}", m_id, id);
     return;
   }
-  m_server.SetFlags(this, topic, flags);
+  m_storage.SetFlags(this, topic, flags);
 }
 
 void ServerClient3::EntryDelete(unsigned int id) {
@@ -452,11 +444,7 @@ void ServerClient3::EntryDelete(unsigned int id) {
     m_decoder.SetError("received unexpected EntryDelete message");
     return;
   }
-  if (id >= m_server.m_topics.size()) {
-    DEBUG3("ignored EntryDelete from {} on non-existent topic {}", m_id, id);
-    return;
-  }
-  ServerTopic* topic = m_server.m_topics[id].get();
+  ServerTopic* topic = m_storage.GetTopic(id);
   if (!topic || !topic->IsPublished()) {
     DEBUG3("ignored EntryDelete from {} on non-existent topic {}", m_id, id);
     return;
@@ -483,12 +471,12 @@ void ServerClient3::EntryDelete(unsigned int id) {
         m_publishers.erase(publisherIt);
 
         // update meta data
-        m_server.UpdateMetaTopicPub(topic);
+        m_storage.UpdateMetaTopicPub(topic);
         UpdateMetaClientPub();
       }
     }
   }
 
   // set retained=false
-  m_server.SetProperties(this, topic, {{"retained", false}});
+  m_storage.SetProperties(this, topic, {{"retained", false}});
 }

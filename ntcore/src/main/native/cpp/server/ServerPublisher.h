@@ -23,6 +23,8 @@ class ServerPublisher {
       : m_clientName{clientName}, m_topic{topic}, m_pubuid{pubuid} {
     UpdateMeta();
   }
+  ServerPublisher(const ServerPublisher&) = delete;
+  ServerPublisher& operator=(const ServerPublisher&) = delete;
 
   ServerTopic* GetTopic() const { return m_topic; }
   std::span<const uint8_t> GetMetaClientData() const { return m_metaClient; }

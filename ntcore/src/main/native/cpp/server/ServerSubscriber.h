@@ -35,6 +35,8 @@ class ServerSubscriber {
       m_periodMs = kMinPeriodMs;
     }
   }
+  ServerSubscriber(const ServerSubscriber&) = delete;
+  ServerSubscriber& operator=(const ServerSubscriber&) = delete;
 
   void Update(std::span<const std::string> topicNames_,
               const PubSubOptionsImpl& options_) {

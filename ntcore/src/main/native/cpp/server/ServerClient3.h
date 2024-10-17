@@ -21,9 +21,9 @@ class ServerClient3 final : public ServerClient, private net3::MessageHandler3 {
  public:
   ServerClient3(std::string_view connInfo, bool local,
                 net3::WireConnection3& wire, Connected3Func connected,
-                SetPeriodicFunc setPeriodic, ServerImpl& server, int id,
+                SetPeriodicFunc setPeriodic, ServerStorage& storage, int id,
                 wpi::Logger& logger)
-      : ServerClient{"", connInfo, local, setPeriodic, server, id, logger},
+      : ServerClient{"", connInfo, local, setPeriodic, storage, id, logger},
         m_connected{std::move(connected)},
         m_wire{wire},
         m_decoder{*this},
