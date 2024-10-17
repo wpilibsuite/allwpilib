@@ -19,9 +19,6 @@
 
 namespace wpi {
 class Logger;
-template <typename T>
-class SmallVectorImpl;
-class raw_ostream;
 }  // namespace wpi
 
 namespace nt::net {
