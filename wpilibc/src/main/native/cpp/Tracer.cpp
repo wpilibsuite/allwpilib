@@ -28,10 +28,18 @@ using namespace frc;
 std::atomic<bool> singleThreadedMode = false;
 std::atomic<bool> anyTracesStarted = false;
 
+void PostUnits() {
+  auto table = nt::NetworkTableInstance::GetDefault().GetTable("/Tracer");
+  table->GetEntry("TimingUnits").SetString("Milliseconds", 0);
+}
+
 Tracer::TracerState::TracerState() {
   if (singleThreadedMode && anyTracesStarted) {
     FRC_ReportWarning("Cannot start a new trace in single-threaded mode");
     m_disabled = true;
+  }
+  if (!anyTracesStarted) {
+    PostUnits();
   }
   auto inst = nt::NetworkTableInstance::GetDefault();
   m_rootTable = inst.GetTable(fmt::format(

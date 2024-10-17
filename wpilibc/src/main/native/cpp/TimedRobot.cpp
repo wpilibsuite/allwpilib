@@ -62,7 +62,7 @@ void TimedRobot::StartCompetition() {
     while (m_callbacks.top().expirationTime <= currentTime) {
       callback = m_callbacks.pop();
 
-      callback.func();
+      callback();
 
       callback.expirationTime +=
           callback.period + (currentTime - callback.expirationTime) /
@@ -79,7 +79,7 @@ void TimedRobot::EndCompetition() {
 
 TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   m_startTime = std::chrono::microseconds{RobotController::GetFPGATime()};
-  AddPeriodic([=, this] { LoopFunc(); }, "RobotMain", period);
+  AddPeriodic([=, this] { LoopFunc(); }, "", period);
 
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);

@@ -13,6 +13,8 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Tracer.SubstitutiveTracer;
+
+import java.util.Optional;
 import java.util.PriorityQueue;
 
 /**
@@ -32,7 +34,7 @@ public class TimedRobot extends IterativeRobotBase {
      * The tracer to use for this callback. This allows callbacks to appear in their own tracer
      * table separate from the main RobotLoop tracer table.
      */
-    public SubstitutiveTracer m_tracerSub;
+    public Optional<SubstitutiveTracer> m_tracerSub;
 
     /** The period at which to run the callback in microseconds. */
     public long m_period;
@@ -53,7 +55,7 @@ public class TimedRobot extends IterativeRobotBase {
      */
     Callback(Runnable func, String name, long startTimeUs, long periodUs, long offsetUs) {
       this.m_func = func;
-      this.m_tracerSub = new SubstitutiveTracer(name);
+      this.m_tracerSub = Optional.ofNullable(name).map(SubstitutiveTracer::new);
       this.m_period = periodUs;
       this.m_expirationTime =
           startTimeUs
@@ -63,7 +65,10 @@ public class TimedRobot extends IterativeRobotBase {
     }
 
     void call() {
-      m_tracerSub.subWith(m_func);
+      m_tracerSub.ifPresentOrElse(
+          tracer -> tracer.subWith(m_func),
+          m_func
+      );
     }
 
     @Override
@@ -108,7 +113,7 @@ public class TimedRobot extends IterativeRobotBase {
   protected TimedRobot(double period) {
     super(period);
     m_startTimeUs = RobotController.getFPGATime();
-    addPeriodic(this::loopFunc, "RobotMain", period);
+    addPeriodic(this::loopFunc, null, period);
     NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);

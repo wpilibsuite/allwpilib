@@ -99,7 +99,7 @@ class TimedRobot : public IterativeRobotBase {
   class Callback {
    public:
     std::function<void()> func;
-    frc::Tracer::SubstitutiveTracer tracer;
+    std::optional<frc::Tracer::SubstitutiveTracer> tracer;
     std::chrono::microseconds period;
     std::chrono::microseconds expirationTime;
 
@@ -115,13 +115,31 @@ class TimedRobot : public IterativeRobotBase {
              std::chrono::microseconds startTime,
              std::chrono::microseconds period, std::chrono::microseconds offset)
         : func{std::move(func)},
-          tracer{frc::Tracer::SubstitutiveTracer{name}},
           period{period},
           expirationTime(
               startTime + offset + period +
               (std::chrono::microseconds{frc::RobotController::GetFPGATime()} -
                startTime) /
-                  period * period) {}
+                  period * period) {
+      if (!name.empty()) {
+        tracer.emplace(name);
+      } else {
+        tracer = std::nullopt;
+      }
+    }
+
+    /**
+     * Call the callback function.
+     */
+    void operator()() {
+      if (tracer.has_value()) {
+        tracer->SubIn();
+      }
+      func();
+      if (tracer.has_value()) {
+        tracer->SubOut();
+      }
+    }
 
     bool operator>(const Callback& rhs) const {
       return expirationTime > rhs.expirationTime;

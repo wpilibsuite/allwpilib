@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 /**
  * A Utility class for tracing code execution time. Will put info to NetworkTables under the
- * "Tracer" table.
+ * "Tracer" table. The times outputted by the {@link Tracer} are in milliseconds.
  *
  * <p>Example inside {@code Robot.java}
  *
@@ -117,7 +117,9 @@ public class Tracer {
             true);
         this.m_disabled = true;
       }
-      anyTracesStarted.set(true);
+      if (!anyTracesStarted.get()) {
+        postUnits();
+      }
       if (name == null) {
         this.m_rootTable = NetworkTableInstance.getDefault().getTable("Tracer");
       } else {
@@ -211,7 +213,15 @@ public class Tracer {
             return new TracerState(Thread.currentThread().getName(), true);
           });
 
+  private static void postUnits() {
+    NetworkTableInstance.getDefault()
+        .getTable("Tracer")
+        .getEntry("TimingUnits")
+        .setString("Milliseconds");
+  }
+
   private static void startTraceInner(final String name, final TracerState state) {
+    anyTracesStarted.set(true);
     String stack = state.appendTraceStack(name);
     if (state.m_disabled) {
       return;
@@ -285,6 +295,7 @@ public class Tracer {
    *
    * <p>This function should be called before any traces are started.
    */
+  @SuppressWarnings("unused")
   public static void enableSingleThreadedMode() {
     if (anyTracesStarted.get()) {
       DriverStation.reportError(

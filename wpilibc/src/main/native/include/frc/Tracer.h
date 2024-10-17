@@ -25,12 +25,9 @@ class raw_ostream;
 
 namespace frc {
 /**
- * A class for keeping track of how much time it takes for different parts of
- * code to execute. This is done with epochs, that are added to calls to
- * AddEpoch() and can be printed with a call to PrintEpochs().
- *
- * Epochs are a way to partition the time elapsed so that when overruns occur,
- * one can determine which parts of an operation consumed the most time.
+ * A Utility class for tracing code execution time. Will put info to
+ * NetworkTables under the "Tracer" table. The times outputted by the {@link
+ * Tracer} are in milliseconds.
  */
 class Tracer {
  public:
