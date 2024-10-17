@@ -109,9 +109,9 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @throws std::domain_error if the rotation matrix isn't special orthogonal.
    */
   constexpr explicit Rotation3d(const Eigen::Matrix3d& rotationMatrix) {
-    // Require that the rotation matrix is special orthogonal. This is true if
-    // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
     auto impl = []<typename Matrix3d>(const Matrix3d& R) -> Quaternion {
+      // Require that the rotation matrix is special orthogonal. This is true if
+      // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
       if ((R * R.transpose() - Matrix3d::Identity()).norm() > 1e-9) {
         throw std::domain_error("Rotation matrix isn't orthogonal");
       }
