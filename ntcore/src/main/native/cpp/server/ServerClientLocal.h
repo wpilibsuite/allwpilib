@@ -13,8 +13,7 @@ namespace nt::server {
 
 class ServerClientLocal final : public ServerClient4Base {
  public:
-  ServerClientLocal(ServerStorage& storage, int id, wpi::Logger& logger)
-      : ServerClient4Base{"", "", true, [](uint32_t) {}, storage, id, logger} {}
+  ServerClientLocal(ServerStorage& storage, int id, wpi::Logger& logger);
 
   bool ProcessIncomingText(std::string_view data) final { return false; }
   bool ProcessIncomingBinary(std::span<const uint8_t> data) final {

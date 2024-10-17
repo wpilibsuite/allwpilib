@@ -8,6 +8,18 @@
 
 using namespace nt::server;
 
+ServerClientLocal::ServerClientLocal(ServerStorage& storage, int id,
+                                     wpi::Logger& logger)
+    : ServerClient4Base{"", "", true, [](uint32_t) {}, storage, id, logger} {
+  // create local client meta topics
+  m_metaPub = storage.CreateMetaTopic("$serverpub");
+  m_metaSub = storage.CreateMetaTopic("$serversub");
+
+  // update meta topics
+  UpdateMetaClientPub();
+  UpdateMetaClientSub();
+}
+
 void ServerClientLocal::SendValue(ServerTopic* topic, const Value& value,
                                   net::ValueSendMode mode) {
   if (m_local) {

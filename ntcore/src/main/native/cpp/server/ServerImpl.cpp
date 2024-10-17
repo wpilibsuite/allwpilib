@@ -33,6 +33,9 @@ ServerImpl::ServerImpl(wpi::Logger& logger)
   m_clients.emplace_back(
       std::make_unique<ServerClientLocal>(m_storage, 0, logger));
   m_localClient = static_cast<ServerClientLocal*>(m_clients.back().get());
+
+  // create server meta topics
+  m_metaClients = m_storage.CreateMetaTopic("$clients");
 }
 
 std::pair<std::string, int> ServerImpl::AddClient(std::string_view name,
@@ -169,17 +172,6 @@ void ServerImpl::SetLocal(net::ServerMessageHandler* local,
                           net::ClientMessageQueue* queue) {
   DEBUG4("SetLocal()");
   m_localClient->SetLocal(local, queue);
-
-  // create server meta topics
-  m_metaClients = m_storage.CreateMetaTopic("$clients");
-
-  // create local client meta topics
-  m_localClient->m_metaPub = m_storage.CreateMetaTopic("$serverpub");
-  m_localClient->m_metaSub = m_storage.CreateMetaTopic("$serversub");
-
-  // update meta topics
-  m_localClient->UpdateMetaClientPub();
-  m_localClient->UpdateMetaClientSub();
 }
 
 bool ServerImpl::ProcessIncomingText(int clientId, std::string_view data) {
