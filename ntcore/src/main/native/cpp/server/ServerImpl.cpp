@@ -215,10 +215,6 @@ bool ServerImpl::ProcessLocalMessages(size_t max) {
   return m_localClient->ProcessIncomingMessages(max);
 }
 
-void ServerImpl::ConnectionsChanged(const std::vector<ConnectionInfo>& conns) {
-  UpdateMetaClients(conns);
-}
-
 std::string ServerImpl::DumpPersistent() {
   std::string rv;
   wpi::raw_string_ostream os{rv};

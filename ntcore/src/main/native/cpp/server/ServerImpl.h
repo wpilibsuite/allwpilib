@@ -69,7 +69,9 @@ class ServerImpl final {
                  SetPeriodicFunc setPeriodic);
   std::shared_ptr<void> RemoveClient(int clientId);
 
-  void ConnectionsChanged(const std::vector<ConnectionInfo>& conns);
+  void ConnectionsChanged(const std::vector<ConnectionInfo>& conns) {
+    UpdateMetaClients(conns);
+  }
 
   // if any persistent values changed since the last call to this function
   bool PersistentChanged() { return m_storage.PersistentChanged(); }
