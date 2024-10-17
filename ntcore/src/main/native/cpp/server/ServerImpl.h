@@ -92,6 +92,7 @@ class ServerImpl final {
   // client or topic)
   ServerTopic* m_metaClients;
 
+  size_t GetEmptyClientSlot();
   void SendAnnounce(ServerTopic* topic, ServerClient* client);
   void UpdateMetaClients(const std::vector<ConnectionInfo>& conns);
 };
