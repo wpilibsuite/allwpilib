@@ -124,6 +124,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
   void ResetPose(const Pose2d& pose) {
     m_odometry.ResetPose(pose);
     m_odometryPoseBuffer.Clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.GetPose();
   }
 
   /**
@@ -134,6 +136,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
   void ResetTranslation(const Translation2d& translation) {
     m_odometry.ResetTranslation(translation);
     m_odometryPoseBuffer.Clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.GetPose();
   }
 
   /**
@@ -144,6 +148,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
   void ResetRotation(const Rotation2d& rotation) {
     m_odometry.ResetRotation(rotation);
     m_odometryPoseBuffer.Clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.GetPose();
   }
 
   /**
