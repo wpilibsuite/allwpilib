@@ -43,18 +43,7 @@ std::pair<std::string, int> ServerImpl::AddClient(std::string_view name,
   if (name.empty()) {
     name = "NT4";
   }
-  size_t index = m_clients.size();
-  // find an empty slot
-  // just do a linear search as number of clients is typically small (<10)
-  for (size_t i = 0, end = index; i < end; ++i) {
-    if (!m_clients[i]) {
-      index = i;
-      break;
-    }
-  }
-  if (index == m_clients.size()) {
-    m_clients.emplace_back();
-  }
+  size_t index = GetEmptyClientSlot();
 
   // ensure name is unique by suffixing index
   std::string dedupName = fmt::format("{}@{}", name, index);
@@ -72,18 +61,7 @@ int ServerImpl::AddClient3(std::string_view connInfo, bool local,
                            net3::WireConnection3& wire,
                            Connected3Func connected,
                            SetPeriodicFunc setPeriodic) {
-  size_t index = m_clients.size();
-  // find an empty slot; we can't check for duplicates until we get a hello.
-  // just do a linear search as number of clients is typically small (<10)
-  for (size_t i = 0, end = index; i < end; ++i) {
-    if (!m_clients[i]) {
-      index = i;
-      break;
-    }
-  }
-  if (index == m_clients.size()) {
-    m_clients.emplace_back();
-  }
+  size_t index = GetEmptyClientSlot();
 
   m_clients[index] = std::make_unique<ServerClient3>(
       connInfo, local, wire, std::move(connected), std::move(setPeriodic),
@@ -100,6 +78,19 @@ std::shared_ptr<void> ServerImpl::RemoveClient(int clientId) {
     m_storage.RemoveClient(client.get());
   }
   return std::move(client);
+}
+
+size_t ServerImpl::GetEmptyClientSlot() {
+  size_t size = m_clients.size();
+  // find an empty slot
+  // just do a linear search as number of clients is typically small (<10)
+  for (size_t i = 0, end = size; i < end; ++i) {
+    if (!m_clients[i]) {
+      return i;
+    }
+  }
+  m_clients.emplace_back();
+  return size;
 }
 
 void ServerImpl::SendAnnounce(ServerTopic* topic, ServerClient* client) {
