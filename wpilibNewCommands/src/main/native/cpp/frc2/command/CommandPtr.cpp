@@ -18,6 +18,7 @@
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/ProxyCommand.h"
 #include "frc2/command/RepeatCommand.h"
+#include "frc2/command/ScheduleCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
@@ -53,6 +54,16 @@ CommandPtr CommandPtr::Repeatedly() && {
 CommandPtr CommandPtr::AsProxy() && {
   AssertValid();
   m_ptr = std::make_unique<ProxyCommand>(std::move(m_ptr));
+  return std::move(*this);
+}
+
+CommandPtr CommandPtr::Fork(CommandPtr&& other) && {
+  AssertValid();
+  std::vector<std::unique_ptr<Command>> vec;
+  vec.emplace_back(std::move(m_ptr));
+  vec.emplace_back(std::move(other).Unwrap());
+  std::span<std::unique_ptr<Command>> span(vec);
+  m_ptr = std::make_unique<ScheduleCommand>(std::move(span));
   return std::move(*this);
 }
 
