@@ -10,9 +10,30 @@
 
 #include "Log.h"
 #include "net/WireDecoder.h"
+#include "server/ServerStorage.h"
 #include "server/ServerTopic.h"
 
 using namespace nt::server;
+
+ServerClient4::ServerClient4(std::string_view name, std::string_view connInfo,
+                             bool local, net::WireConnection& wire,
+                             SetPeriodicFunc setPeriodic,
+                             ServerStorage& storage, int id,
+                             wpi::Logger& logger)
+    : ServerClient4Base{name,    connInfo, local, setPeriodic,
+                        storage, id,       logger},
+      m_wire{wire},
+      m_ping{wire},
+      m_incoming{logger},
+      m_outgoing{wire, local} {
+  // create client meta topics
+  m_metaPub = storage.CreateMetaTopic(fmt::format("$clientpub${}", name));
+  m_metaSub = storage.CreateMetaTopic(fmt::format("$clientsub${}", name));
+
+  // update meta topics
+  UpdateMetaClientPub();
+  UpdateMetaClientSub();
+}
 
 bool ServerClient4::ProcessIncomingText(std::string_view data) {
   constexpr int kMaxImmProcessing = 10;

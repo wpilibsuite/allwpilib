@@ -64,16 +64,6 @@ std::pair<std::string, int> ServerImpl::AddClient(std::string_view name,
                                                std::move(setPeriodic),
                                                m_storage, index, m_logger);
 
-  // create client meta topics
-  clientData->m_metaPub =
-      m_storage.CreateMetaTopic(fmt::format("$clientpub${}", dedupName));
-  clientData->m_metaSub =
-      m_storage.CreateMetaTopic(fmt::format("$clientsub${}", dedupName));
-
-  // update meta topics
-  clientData->UpdateMetaClientPub();
-  clientData->UpdateMetaClientSub();
-
   DEBUG3("AddClient('{}', '{}') -> {}", name, connInfo, index);
   return {std::move(dedupName), index};
 }
