@@ -30,7 +30,7 @@ jobs:
             ctest-flags: ""
     name: "${{ matrix.name }}"
     runs-on: ubuntu-22.04
-    container: wpilib/roborio-cross-ubuntu:2024-22.04
+    container: wpilib/roborio-cross-ubuntu:2025-22.04
     steps:
       - name: Install Dependencies
         run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java clang-14 libprotobuf-dev protobuf-compiler ninja-build
