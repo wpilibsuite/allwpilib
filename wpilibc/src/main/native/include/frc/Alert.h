@@ -4,12 +4,15 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#include <array>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
 #include <networktables/NTSendable.h>
-#include <units/time.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringMap.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -88,6 +91,11 @@ class Alert {
    */
   Alert(std::string_view group, std::string_view text, AlertType type);
 
+  Alert(Alert&&) = default;
+  Alert& operator=(Alert&&) = default;
+
+  ~Alert();
+
   /**
    * Sets whether the alert should currently be displayed. This method can be
    * safely called periodically.
@@ -105,22 +113,40 @@ class Alert {
   void SetText(std::string_view text);
 
  private:
-  AlertType m_type;
-  bool m_active = false;
-  units::second_t m_activeStartTime;
-  std::string_view m_text;
+  class PublishedAlert {
+   public:
+    PublishedAlert(uint64_t timestamp, const std::string_view text)
+        : timestamp{timestamp}, text{text} {}
+    uint64_t timestamp;
+    std::string text;  // todo: This could be a string_view since deleting the
+                       // Alert will erase this from the set
+    auto operator<=>(const PublishedAlert&) const = default;
+  };
 
   class SendableAlerts : public nt::NTSendable,
                          public wpi::SendableHelper<SendableAlerts> {
    public:
-    wpi::SmallVector<std::shared_ptr<Alert>> m_alerts;
+    SendableAlerts();
     void InitSendable(nt::NTSendableBuilder& builder) override;
+
+    std::set<PublishedAlert>& GetSetForType(AlertType type);
+    const std::set<PublishedAlert>& GetSetForType(AlertType type) const;
 
    private:
     std::vector<std::string> GetStrings(AlertType type) const;
+    std::array<std::set<PublishedAlert>, 3> m_alerts;
   };
 
-  static wpi::StringMap<SendableAlerts> groups;
+  AlertType m_type;
+  std::string m_text;
+  SendableAlerts* m_group;
+
+  bool m_active = false;
+  uint64_t m_activeStartTime;
+
+  static SendableAlerts& GetGroupSendable(std::string_view group);
 };
+
+std::string format_as(Alert::AlertType type);
 
 }  // namespace frc
