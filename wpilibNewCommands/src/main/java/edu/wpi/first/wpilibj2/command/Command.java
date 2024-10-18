@@ -201,6 +201,57 @@ public abstract class Command implements Sendable {
   }
 
   /**
+   * Decorates this command with a condition to wait for after this command is finished. The command
+   * will finish after the specified condition is met.
+   *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
+   * @param condition the condition to wait for after this command is finished
+   * @return the command with the condition to await
+   */
+  public SequentialCommandGroup andThenWaitUntil(BooleanSupplier condition) {
+    return andThen(Commands.waitUntil(condition));
+  }
+
+  /**
+   * Decorates this command with a time to pass after this command is finished. The command will
+   * finish after this time has passed.
+   *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
+   * @param seconds the timeout duration
+   * @return the command with the time to wait
+   */
+  public SequentialCommandGroup andThenWaitSeconds(double seconds) {
+    return andThen(Commands.waitSeconds(seconds));
+  }
+
+  /**
+   * Decorates this command with a timeout to pass for after this command is finished. The command
+   * will finish after this timeout has passed.
+   *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
+   * @param time the timeout duration
+   * @return the command with the timeout to await
+   */
+  public SequentialCommandGroup andThenWaitTime(Time time) {
+    return andThenWaitSeconds(time.in(Seconds));
+  }
+
+  /**
    * Decorates this command with a run condition. If the specified condition becomes false before
    * the command finishes normally, the command will be interrupted and un-scheduled.
    *
