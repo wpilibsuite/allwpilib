@@ -13,7 +13,7 @@
 
 namespace frc {
 
-class WPILIB_DLLEXPORT Pose2d;
+class Pose2d;
 
 /**
  * Represents a transformation for a Pose2d in the pose's frame.
@@ -26,7 +26,7 @@ class WPILIB_DLLEXPORT Transform2d {
    * @param initial The initial pose for the transformation.
    * @param final The final pose for the transformation.
    */
-  Transform2d(Pose2d initial, Pose2d final);
+  constexpr Transform2d(const Pose2d& initial, const Pose2d& final);
 
   /**
    * Constructs a transform with the given translation and rotation components.
@@ -121,17 +121,38 @@ class WPILIB_DLLEXPORT Transform2d {
    * @param other The transform to compose with this one.
    * @return The composition of the two transformations.
    */
-  Transform2d operator+(const Transform2d& other) const;
+  constexpr Transform2d operator+(const Transform2d& other) const;
 
   /**
    * Checks equality between this Transform2d and another object.
    */
-  bool operator==(const Transform2d&) const = default;
+  constexpr bool operator==(const Transform2d&) const = default;
 
  private:
   Translation2d m_translation;
   Rotation2d m_rotation;
 };
+
+}  // namespace frc
+
+#include "frc/geometry/Pose2d.h"
+
+namespace frc {
+
+constexpr Transform2d::Transform2d(const Pose2d& initial, const Pose2d& final) {
+  // We are rotating the difference between the translations
+  // using a clockwise rotation matrix. This transforms the global
+  // delta into a local delta (relative to the initial pose).
+  m_translation = (final.Translation() - initial.Translation())
+                      .RotateBy(-initial.Rotation());
+
+  m_rotation = final.Rotation() - initial.Rotation();
+}
+
+constexpr Transform2d Transform2d::operator+(const Transform2d& other) const {
+  return Transform2d{Pose2d{}, Pose2d{}.TransformBy(*this).TransformBy(other)};
+}
+
 }  // namespace frc
 
 #ifndef NO_PROTOBUF

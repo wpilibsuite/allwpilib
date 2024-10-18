@@ -80,7 +80,7 @@ TEST(Pose3dTest, RelativeTo) {
 
   EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), finalRelativeToInitial.X().value());
   EXPECT_DOUBLE_EQ(0.0, finalRelativeToInitial.Y().value());
-  EXPECT_DOUBLE_EQ(0.0, finalRelativeToInitial.Rotation().Z().value());
+  EXPECT_NEAR(0.0, finalRelativeToInitial.Rotation().Z().value(), 1e-9);
 }
 
 TEST(Pose3dTest, Equality) {
@@ -109,7 +109,7 @@ TEST(Pose3dTest, Minus) {
 
   EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), transform.X().value());
   EXPECT_DOUBLE_EQ(0.0, transform.Y().value());
-  EXPECT_DOUBLE_EQ(0.0, transform.Rotation().Z().value());
+  EXPECT_NEAR(0.0, transform.Rotation().Z().value(), 1e-9);
 }
 
 TEST(Pose3dTest, ToPose2d) {

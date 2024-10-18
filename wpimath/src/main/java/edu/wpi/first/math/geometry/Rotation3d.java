@@ -24,7 +24,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
-import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 
 /** A rotation in a 3D coordinate frame represented by a quaternion. */
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -230,27 +229,42 @@ public class Rotation3d
       // there's no rotation. The default initialization of m_q will work.
       m_q = new Quaternion();
     } else if (dotNorm < -1.0 + 1E-9) {
-      // If the dot product is -1, the two vectors point in opposite directions
-      // so a 180 degree rotation is required. Any orthogonal vector can be used
-      // for it. Q in the QR decomposition is an orthonormal basis, so it
-      // contains orthogonal unit vectors.
-      var X = VecBuilder.fill(initial.get(0, 0), initial.get(1, 0), initial.get(2, 0));
-      final var qr = DecompositionFactory_DDRM.qr(3, 1);
-      qr.decompose(X.getStorage().getMatrix());
-      final var Q = qr.getQ(null, false);
+      // If the dot product is -1, the two vectors are antiparallel, so a 180°
+      // rotation is required. Any other vector can be used to generate an
+      // orthogonal one.
 
-      // w = cos(θ/2) = cos(90°) = 0
-      //
-      // For x, y, and z, we use the second column of Q because the first is
-      // parallel instead of orthogonal. The third column would also work.
-      m_q = new Quaternion(0.0, Q.get(0, 1), Q.get(1, 1), Q.get(2, 1));
+      double x = Math.abs(initial.get(0, 0));
+      double y = Math.abs(initial.get(1, 0));
+      double z = Math.abs(initial.get(2, 0));
+
+      // Find vector that is most orthogonal to initial vector
+      Vector<N3> other;
+      if (x < y) {
+        if (x < z) {
+          // Use x-axis
+          other = VecBuilder.fill(1, 0, 0);
+        } else {
+          // Use z-axis
+          other = VecBuilder.fill(0, 0, 1);
+        }
+      } else {
+        if (y < z) {
+          // Use y-axis
+          other = VecBuilder.fill(0, 1, 0);
+        } else {
+          // Use z-axis
+          other = VecBuilder.fill(0, 0, 1);
+        }
+      }
+
+      var axis = Vector.cross(initial, other);
+
+      double axisNorm = axis.norm();
+      m_q =
+          new Quaternion(
+              0.0, axis.get(0, 0) / axisNorm, axis.get(1, 0) / axisNorm, axis.get(2, 0) / axisNorm);
     } else {
-      // initial x last
-      var axis =
-          VecBuilder.fill(
-              initial.get(1, 0) * last.get(2, 0) - last.get(1, 0) * initial.get(2, 0),
-              last.get(0, 0) * initial.get(2, 0) - initial.get(0, 0) * last.get(2, 0),
-              initial.get(0, 0) * last.get(1, 0) - last.get(0, 0) * initial.get(1, 0));
+      var axis = Vector.cross(initial, last);
 
       // https://stackoverflow.com/a/11741520
       m_q =

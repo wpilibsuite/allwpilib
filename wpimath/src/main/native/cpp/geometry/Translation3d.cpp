@@ -6,8 +6,6 @@
 
 #include <wpi/json.h>
 
-using namespace frc;
-
 void frc::to_json(wpi::json& json, const Translation3d& translation) {
   json = wpi::json{{"x", translation.X().value()},
                    {"y", translation.Y().value()},
