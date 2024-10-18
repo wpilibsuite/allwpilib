@@ -51,6 +51,7 @@ class CommandScheduler::Impl {
   // Lists of user-supplied actions to be executed on scheduling events for
   // every command.
   wpi::SmallVector<Action, 4> initActions;
+  wpi::SmallVector<Action, 4> beforeExecuteActions;
   wpi::SmallVector<Action, 4> executeActions;
   wpi::SmallVector<InterruptAction, 4> interruptActions;
   wpi::SmallVector<Action, 4> finishActions;
@@ -206,6 +207,9 @@ void CommandScheduler::Run() {
       continue;
     }
 
+    for (auto&& action : m_impl->beforeExecuteActions) {
+      action(*command);
+    }
     command->Execute();
     for (auto&& action : m_impl->executeActions) {
       action(*command);
@@ -438,6 +442,10 @@ void CommandScheduler::PrintWatchdogEpochs() {
 
 void CommandScheduler::OnCommandInitialize(Action action) {
   m_impl->initActions.emplace_back(std::move(action));
+}
+
+void CommandScheduler::OnCommandBeforeExecute(Action action) {
+  m_impl->beforeExecuteActions.emplace_back(std::move(action));
 }
 
 void CommandScheduler::OnCommandExecute(Action action) {
