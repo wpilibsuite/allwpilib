@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <initializer_list>
 #include <span>
 
@@ -58,7 +59,9 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @param vector The translation vector to represent.
    */
-  explicit Translation2d(const Eigen::Vector2d& vector);
+  constexpr explicit Translation2d(const Eigen::Vector2d& vector)
+      : m_x{units::meter_t{vector.coeff(0)}},
+        m_y{units::meter_t{vector.coeff(1)}} {}
 
   /**
    * Calculates the distance between two translations in 2D space.
@@ -101,7 +104,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The norm of the translation.
    */
-  units::meter_t Norm() const;
+  constexpr units::meter_t Norm() const { return units::math::hypot(m_x, m_y); }
 
   /**
    * Returns the angle this translation forms with the positive X axis.
@@ -234,15 +237,26 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param translations The collection of translations.
    * @return The nearest Translation2d from the collection.
    */
-  Translation2d Nearest(std::span<const Translation2d> translations) const;
+  constexpr Translation2d Nearest(
+      std::span<const Translation2d> translations) const {
+    return *std::min_element(translations.begin(), translations.end(),
+                             [this](Translation2d a, Translation2d b) {
+                               return this->Distance(a) < this->Distance(b);
+                             });
+  }
 
   /**
    * Returns the nearest Translation2d from a collection of translations
    * @param translations The collection of translations.
    * @return The nearest Translation2d from the collection.
    */
-  Translation2d Nearest(
-      std::initializer_list<Translation2d> translations) const;
+  constexpr Translation2d Nearest(
+      std::initializer_list<Translation2d> translations) const {
+    return *std::min_element(translations.begin(), translations.end(),
+                             [this](Translation2d a, Translation2d b) {
+                               return this->Distance(a) < this->Distance(b);
+                             });
+  }
 
  private:
   units::meter_t m_x = 0_m;

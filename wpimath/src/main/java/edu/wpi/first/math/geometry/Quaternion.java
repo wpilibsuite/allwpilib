@@ -295,7 +295,9 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
     double v_scalar;
 
     if (v_norm < 1e-9) {
-      // Taylor series expansion of atan2(y / x) / y around y = 0 => 1/x - y²/3*x³ + O(y⁴)
+      // Taylor series expansion of atan2(y/x)/y at y = 0:
+      //
+      //   1/x - 1/3 y²/x³ + O(y⁴)
       v_scalar = 1.0 / getW() - 1.0 / 3.0 * v_norm * v_norm / (getW() * getW() * getW());
     } else {
       v_scalar = Math.atan2(v_norm, getW()) / v_norm;

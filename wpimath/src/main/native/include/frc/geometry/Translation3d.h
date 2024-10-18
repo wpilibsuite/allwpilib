@@ -48,7 +48,7 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param distance The distance from the origin to the end of the translation.
    * @param angle The angle between the x-axis and the translation vector.
    */
-  Translation3d(units::meter_t distance, const Rotation3d& angle) {
+  constexpr Translation3d(units::meter_t distance, const Rotation3d& angle) {
     auto rectangular = Translation3d{distance, 0_m, 0_m}.RotateBy(angle);
     m_x = rectangular.X();
     m_y = rectangular.Y();
@@ -61,7 +61,7 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @param vector The translation vector to represent.
    */
-  explicit Translation3d(const Eigen::Vector3d& vector)
+  constexpr explicit Translation3d(const Eigen::Vector3d& vector)
       : m_x{units::meter_t{vector.x()}},
         m_y{units::meter_t{vector.y()}},
         m_z{units::meter_t{vector.z()}} {}
@@ -76,7 +76,7 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The distance between the two translations.
    */
-  units::meter_t Distance(const Translation3d& other) const {
+  constexpr units::meter_t Distance(const Translation3d& other) const {
     return units::math::sqrt(units::math::pow<2>(other.m_x - m_x) +
                              units::math::pow<2>(other.m_y - m_y) +
                              units::math::pow<2>(other.m_z - m_z));
@@ -117,7 +117,7 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The norm of the translation.
    */
-  units::meter_t Norm() const {
+  constexpr units::meter_t Norm() const {
     return units::math::sqrt(m_x * m_x + m_y * m_y + m_z * m_z);
   }
 
@@ -131,7 +131,7 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The new rotated translation.
    */
-  Translation3d RotateBy(const Rotation3d& other) const {
+  constexpr Translation3d RotateBy(const Rotation3d& other) const {
     Quaternion p{0.0, m_x.value(), m_y.value(), m_z.value()};
     auto qprime = other.GetQuaternion() * p * other.GetQuaternion().Inverse();
     return Translation3d{units::meter_t{qprime.X()}, units::meter_t{qprime.Y()},
