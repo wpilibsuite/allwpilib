@@ -1,0 +1,16 @@
+load("@rules_java//java:defs.bzl", "java_binary")
+
+java_binary(
+    name = "multiCameraServer-java",
+    srcs = ["src/main/java/edu/wpi/Main.java"],
+    main_class = "edu.wpi.Main",
+    deps = [
+        "//cameraserver:cameraserver-java",
+        "//cscore:cscore-java",
+        "//hal:hal-java",
+        "//ntcore:networktables-java",
+        "//wpimath:wpimath-java",
+        "//wpiutil:wpiutil-java",
+        "@maven//:com_google_code_gson_gson",
+    ],
+)

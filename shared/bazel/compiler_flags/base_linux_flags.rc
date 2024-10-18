@@ -1,0 +1,28 @@
+
+###############################
+# Linux Common
+###############################
+
+# C++ only
+build:base_linux --cxxopt=-std=c++20
+build:base_linux --cxxopt=-Wformat=2
+build:base_linux --cxxopt=-pedantic
+build:base_linux --cxxopt=-Wno-psabi
+build:base_linux --cxxopt=-Wno-unused-parameter
+build:base_linux --cxxopt=-fPIC
+build:base_linux --cxxopt=-pthread
+
+# C Only
+build:base_linux --conlyopt=-Wformat=2
+build:base_linux --conlyopt=-pedantic
+build:base_linux --conlyopt=-Wno-psabi
+build:base_linux --conlyopt=-Wno-unused-parameter
+build:base_linux --conlyopt=-fPIC
+build:base_linux --conlyopt=-pthread
+
+# Linker
+build:base_linux --linkopt=-rdynamic
+build:base_linux --linkopt=-pthread
+build:base_linux --linkopt=-ldl
+build:base_linux --linkopt=-latomic
+build:base_linux --linkopt=-Wl,-rpath,'$ORIGIN'

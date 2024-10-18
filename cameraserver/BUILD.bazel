@@ -1,0 +1,32 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+
+java_library(
+    name = "cameraserver-java",
+    srcs = glob(["src/main/java/**/*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cscore:cscore-java",
+        "//hal:hal-java",
+        "//ntcore:networktables-java",
+        "//wpimath:wpimath-java",
+        "//wpinet:wpinet-java",
+        "//wpiutil:wpiutil-java",
+        "@bzlmodrio-opencv//libraries/java/opencv",
+    ],
+)
+
+cc_binary(
+    name = "DevMain-Cpp",
+    srcs = ["src/dev/native/cpp/main.cpp"],
+    deps = [
+    ],
+)
+
+java_binary(
+    name = "DevMain-Java",
+    srcs = ["src/dev/java/edu/wpi/first/cameraserver/DevMain.java"],
+    main_class = "edu.wpi.first.cameraserver.DevMain",
+    deps = [
+    ],
+)

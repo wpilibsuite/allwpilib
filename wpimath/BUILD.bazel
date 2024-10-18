@@ -1,0 +1,40 @@
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("@rules_python//python:defs.bzl", "py_binary")
+
+filegroup(
+    name = "generated_java",
+    srcs = glob(["src/generated/main/java/**/*.java"]),
+    visibility = ["//wpimath:__subpackages__"],
+)
+
+java_library(
+    name = "wpimath-java",
+    srcs = [":generated_java"] + glob(["src/main/java/**/*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiunits",
+        "//wpiutil:wpiutil-java",
+        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
+        "@maven//:com_fasterxml_jackson_core_jackson_core",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "@maven//:org_ejml_ejml_core",
+        "@maven//:org_ejml_ejml_ddense",
+        "@maven//:org_ejml_ejml_simple",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+java_binary(
+    name = "DevMain-Java",
+    srcs = ["src/dev/java/edu/wpi/first/math/DevMain.java"],
+    main_class = "edu.wpi.first.math.DevMain",
+    deps = [
+        ":wpimath-java",
+    ],
+)
+
+py_binary(
+    name = "ExponentialProfileModel",
+    srcs = ["algorithms/ExponentialProfileModel.py"],
+    tags = ["manual"],
+)
