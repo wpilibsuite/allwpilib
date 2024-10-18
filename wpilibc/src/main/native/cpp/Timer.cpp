@@ -84,6 +84,10 @@ bool Timer::AdvanceIfElapsed(units::second_t period) {
   }
 }
 
+bool Timer::IsRunning() const {
+  return m_running;
+}
+
 units::second_t Timer::GetFPGATimestamp() {
   // FPGA returns the timestamp in microseconds
   return units::second_t{frc::RobotController::GetFPGATime() * 1.0e-6};
