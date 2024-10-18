@@ -25,6 +25,7 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Mult;
 import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Power;
+import edu.wpi.first.units.measure.Resistance;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Torque;
@@ -246,6 +247,8 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
       return times(velocity);
     } else if (multiplier instanceof Voltage voltage) {
       return times(voltage);
+    } else if (multiplier instanceof Resistance resistance) {
+      return times(resistance);
     } else {
       // Dimensional analysis fallthrough or a generic input measure type
       // Do a basic unit multiplication
@@ -531,6 +534,18 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   }
 
   /**
+   * Multiplies this measure by a resistance and returns the resulting measure in the most
+   * appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Resistance multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
    * Multiplies this measure by a conversion factor, returning the converted measurement. Unlike
    * {@link #times(Per)}, this allows for basic unit cancellation to return measurements of a known
    * dimension.
@@ -687,6 +702,8 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
       return divide(velocity);
     } else if (divisor instanceof Voltage voltage) {
       return divide(voltage);
+    } else if (divisor instanceof Resistance resistance) {
+      return divide(resistance);
     } else {
       // Dimensional analysis fallthrough or a generic input measure type
       // Do a basic unit multiplication
@@ -953,6 +970,17 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @return the division result
    */
   default Measure<?> divide(Voltage divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a resistance and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Resistance divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }

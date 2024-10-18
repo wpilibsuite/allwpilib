@@ -51,6 +51,7 @@ MATH_OPERATION_UNITS = [
     "Mult<?, ?>",
     "Per<?, ?>",
     "Power",
+    "Resistance",
     "Temperature",
     "Time",
     "Torque",
@@ -91,7 +92,11 @@ UNIT_CONFIGURATIONS = {
         """
         ),
     },
-    "Current": {"base_unit": "Amps", "multiply": {"Voltage": "Power"}, "divide": {}},
+    "Current": {
+        "base_unit": "Amps",
+        "multiply": {"Voltage": "Power", "Resistance": "Voltage"},
+        "divide": {},
+    },
     "Dimensionless": {
         "base_unit": "Value",
         "multiply": {
@@ -225,6 +230,13 @@ UNIT_CONFIGURATIONS = {
         },
         "divide": {"Voltage": "Current", "Current": "Voltage", "Energy": "Frequency"},
     },
+    "Resistance": {
+        "base_unit": "Ohms",
+        "multiply": {
+            "Current": "Voltage",
+        },
+        "divide": {},
+    },
     "Temperature": {"base_unit": "Kelvin", "multiply": {}, "divide": {}},
     "Time": {
         "base_unit": "Seconds",
@@ -272,7 +284,16 @@ UNIT_CONFIGURATIONS = {
         },
         "divide": {},
     },
-    "Voltage": {"base_unit": "Volts", "multiply": {"Current": "Power"}, "divide": {}},
+    "Voltage": {
+        "base_unit": "Volts",
+        "multiply": {
+            "Current": "Power",
+        },
+        "divide": {
+            "Resistance": "Current",
+            "Current": "Resistance",
+        },
+    },
 }
 
 
@@ -331,7 +352,6 @@ def indent(multiline_string, indentation):
 
 
 def main():
-
     dirname, _ = os.path.split(os.path.abspath(__file__))
 
     env = Environment(
