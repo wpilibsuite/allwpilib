@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 /**
  * TimesliceRobot extends the TimedRobot robot program framework to provide timeslice scheduling of
  * periodic functions.
@@ -107,7 +109,8 @@ public class TimesliceRobot extends TimedRobot {
               + "\n");
     }
 
-    addPeriodic(func, m_controllerPeriod, m_nextOffset);
+    String name = String.format("Timeslice{%.3fs->%.3fs}", m_nextOffset, m_nextOffset + allocation);
+    addPeriodic(func, name, Seconds.of(m_controllerPeriod), Seconds.of(m_nextOffset));
     m_nextOffset += allocation;
   }
 

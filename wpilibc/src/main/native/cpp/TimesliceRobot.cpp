@@ -22,6 +22,8 @@ void TimesliceRobot::Schedule(std::function<void()> func,
                         m_nextOffset, allocation, m_controllerPeriod);
   }
 
-  AddPeriodic(func, m_controllerPeriod, m_nextOffset);
+  auto name = fmt::format("Timeslice{{{:.3f}s->{:.3f}s}}", m_nextOffset.value(),
+                          (m_nextOffset + allocation).value());
+  AddPeriodic(func, name, m_controllerPeriod, m_nextOffset);
   m_nextOffset += allocation;
 }
