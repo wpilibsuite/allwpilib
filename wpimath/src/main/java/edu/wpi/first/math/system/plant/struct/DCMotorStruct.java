@@ -37,7 +37,7 @@ public class DCMotorStruct implements Struct<DCMotor> {
     double stallCurrent = bb.getDouble();
     double freeCurrent = bb.getDouble();
     double freeSpeed = bb.getDouble();
-    return new DCMotor(nominalVoltage, stallTorque, stallCurrent, freeCurrent, freeSpeed, 1);
+    return new DCMotor(nominalVoltage, stallTorque, stallCurrent, freeCurrent, freeSpeed);
   }
 
   @Override

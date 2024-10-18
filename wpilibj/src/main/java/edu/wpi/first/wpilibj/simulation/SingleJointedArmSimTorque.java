@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
@@ -22,15 +23,14 @@ import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.PerUnit;
-import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.TorqueUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.units.measure.Torque;
 
-/** Represents a simulated arm mechanism controlled by voltage. */
-public class SingleJointedArmSim extends SingleJointedArmSimBase {
+/** Represents a simulated arm mechanism controlled by torque input. */
+public class SingleJointedArmSimTorque extends SingleJointedArmSimBase {
   /**
    * Creates a simulated arm mechanism.
    *
@@ -50,9 +50,10 @@ public class SingleJointedArmSim extends SingleJointedArmSimBase {
    *     -9.8 can be used to simulate free fall more accurately, but must be determined by the user.
    * @param startingAngle The initial position of the Arm simulation.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 1 element for position.
+   *     noise is desired. If present must have 2 elements. The first element is for position. The
+   *     second element is for velocity.
    */
-  public SingleJointedArmSim(
+  public SingleJointedArmSimTorque(
       LinearSystem<N2, N1, N2> plant,
       Gearbox gearbox,
       Distance armLength,
@@ -62,29 +63,25 @@ public class SingleJointedArmSim extends SingleJointedArmSimBase {
       LinearAcceleration g,
       Angle startingAngle,
       double... measurementStdDevs) {
-    // By theorem 6.10.1 of
+    // By equations 12.17 of
     // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
-    // the DC motor mechanism state-space model with voltage as input is:
+    // the torque applied to a DC motor mechanism is τ = Jα.
+    // The DC motor mechanism state-space model with torque as input is:
     //
-    // dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
-    // A = -G²Kₜ/(KᵥRJ)
-    // B = GKₜ/(RJ)
+    // dx/dt = 0 x + 1/J u
+    // A = 0
+    // B = 1/J
     //
     // Solve for J.
     //
-    // B = GKₜ/(RJ)
-    // J = GKₜ/(RB)
+    // B = 1/J
+    // J = 1/B
     super(
         plant,
         gearbox,
         armLength,
         pivotDistance,
-        KilogramSquareMeters.of(
-            gearbox.numMotors
-                * gearbox.reduction
-                * gearbox.motorType.KtNMPerAmp
-                / gearbox.motorType.rOhms
-                / plant.getB(1, 0)),
+        KilogramSquareMeters.of(1.0 / plant.getB().get(1, 0)),
         minAngle,
         maxAngle,
         g,
@@ -115,7 +112,7 @@ public class SingleJointedArmSim extends SingleJointedArmSimBase {
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
    */
-  public SingleJointedArmSim(
+  public SingleJointedArmSimTorque(
       LinearSystem<N2, N1, N2> plant,
       Gearbox gearbox,
       double armLengthMeters,
@@ -152,10 +149,10 @@ public class SingleJointedArmSim extends SingleJointedArmSimBase {
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
    */
-  public SingleJointedArmSim(
-      Measure<? extends PerUnit<VoltageUnit, AngularVelocityUnit>> kv,
-      Measure<? extends PerUnit<VoltageUnit, AngularAccelerationUnit>> ka,
-      Voltage kg,
+  public SingleJointedArmSimTorque(
+      Measure<? extends PerUnit<TorqueUnit, AngularVelocityUnit>> kv,
+      Measure<? extends PerUnit<TorqueUnit, AngularAccelerationUnit>> ka,
+      Torque kg,
       Gearbox gearbox,
       Distance armLength,
       Distance pivotDistance,
@@ -190,7 +187,7 @@ public class SingleJointedArmSim extends SingleJointedArmSimBase {
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
    */
-  public SingleJointedArmSim(
+  public SingleJointedArmSimTorque(
       double kv,
       double ka,
       double kg,
@@ -202,9 +199,9 @@ public class SingleJointedArmSim extends SingleJointedArmSimBase {
       double startingAngleRadians,
       double... measurementStdDevs) {
     this(
-        Volts.per(RadiansPerSecond).of(kv),
-        Volts.per(RadiansPerSecondPerSecond).of(ka),
-        Volts.of(kg),
+        NewtonMeters.per(RadiansPerSecond).of(kv),
+        NewtonMeters.per(RadiansPerSecondPerSecond).of(ka),
+        NewtonMeters.of(kg),
         gearbox,
         Meters.of(armLengthMeters),
         Meters.of(pivotDistanceMeters),
@@ -215,31 +212,31 @@ public class SingleJointedArmSim extends SingleJointedArmSimBase {
   }
 
   /**
-   * Sets the input voltage for the arm.
+   * Sets the input torque for the arm.
    *
-   * @param volts The input voltage.
+   * @param torqueNM The input torque.
    */
-  public void setInputVoltage(double volts) {
-    setInput(volts);
-    clampInput(RobotController.getBatteryVoltage());
-    m_voltage.mut_replace(m_u.get(0, 0), Volts);
+  public void setInputTorque(double torqueNM) {
+    setInput(torqueNM);
+    // TODO: Need some guidance on clamping.
+    m_torque.mut_replace(m_u.get(0, 0), NewtonMeters);
   }
 
   /**
-   * Sets the input voltage for the arm.
+   * Sets the input torque for the arm.
    *
-   * @param voltage The input voltage.
+   * @param torque The input torque.
    */
-  public void setInputVoltage(Voltage voltage) {
-    setInputVoltage(voltage.in(Volts));
+  public void setInputTorque(Torque torque) {
+    setInputTorque(torque.in(NewtonMeters));
   }
 
   @Override
   public void update(double dtSeconds) {
     super.update(dtSeconds);
     m_currentDraw.mut_replace(
-        m_gearbox.currentAmps(m_x.get(1, 0), getInput(0)) * Math.signum(m_u.get(0, 0)), Amps);
-    m_voltage.mut_replace(getInput(0), Volts);
-    m_torque.mut_replace(m_gearbox.torque(m_currentDraw));
+        m_gearbox.currentAmps(getInput(0)) * Math.signum(m_u.get(0, 0)), Amps);
+    m_voltage.mut_replace(m_gearbox.voltage(getInput(0), m_x.get(1, 0)), Volts);
+    m_torque.mut_replace(getInput(0), NewtonMeters);
   }
 }

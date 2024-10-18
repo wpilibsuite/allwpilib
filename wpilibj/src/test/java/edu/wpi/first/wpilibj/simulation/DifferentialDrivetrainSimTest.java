@@ -20,7 +20,9 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveKinematicsConstraint;
@@ -31,20 +33,13 @@ import org.junit.jupiter.api.Test;
 class DifferentialDrivetrainSimTest {
   @Test
   void testConvergence() {
-    var motor = DCMotor.getNEO(2);
+    var wheel = new Wheel(new Gearbox(2, DCMotor.NEO), Units.inchesToMeters(2));
     var plant =
-        LinearSystemId.createDrivetrainVelocitySystem(
-            motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5, 1.0);
-
+        LinearSystemId.createDrivetrainVelocitySystem(wheel, 50, Units.inchesToMeters(12), 0.5);
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
     var sim =
         new DifferentialDrivetrainSim(
-            plant,
-            motor,
-            1,
-            kinematics.trackWidthMeters,
-            Units.inchesToMeters(2),
-            VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
+            plant, wheel, Units.inchesToMeters(12), 0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005);
 
     var feedforward = new LinearPlantInversionFeedforward<>(plant, 0.020);
     var feedback = new LTVUnicycleController(0.020);
@@ -72,7 +67,7 @@ class DifferentialDrivetrainSimTest {
               VecBuilder.fill(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond));
 
       // Sim periodic code
-      sim.setInputs(voltages.get(0, 0), voltages.get(1, 0));
+      sim.setInputVoltages(voltages.get(0, 0), voltages.get(1, 0));
       sim.update(0.020);
 
       // Update our ground truth
@@ -97,28 +92,24 @@ class DifferentialDrivetrainSimTest {
 
   @Test
   void testCurrent() {
-    var motor = DCMotor.getNEO(2);
+    var wheel = new Wheel(new Gearbox(2, DCMotor.NEO), Units.inchesToMeters(2));
     var plant =
-        LinearSystemId.createDrivetrainVelocitySystem(
-            motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5, 1.0);
-    var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
-    var sim =
-        new DifferentialDrivetrainSim(
-            plant, motor, 1, kinematics.trackWidthMeters, Units.inchesToMeters(2), null);
+        LinearSystemId.createDrivetrainVelocitySystem(wheel, 50, Units.inchesToMeters(12), 0.5);
+    var sim = new DifferentialDrivetrainSim(plant, wheel, Units.inchesToMeters(12));
 
-    sim.setInputs(-12, -12);
+    sim.setInputVoltages(-12, -12);
     for (int i = 0; i < 10; i++) {
       sim.update(0.020);
     }
     assertTrue(sim.getCurrentDrawAmps() > 0);
 
-    sim.setInputs(12, 12);
+    sim.setInputVoltages(12, 12);
     for (int i = 0; i < 20; i++) {
       sim.update(0.020);
     }
     assertTrue(sim.getCurrentDrawAmps() > 0);
 
-    sim.setInputs(-12, 12);
+    sim.setInputVoltages(-12, 12);
     for (int i = 0; i < 30; i++) {
       sim.update(0.020);
     }
@@ -127,22 +118,12 @@ class DifferentialDrivetrainSimTest {
 
   @Test
   void testModelStability() {
-    var motor = DCMotor.getNEO(2);
+    var wheel = new Wheel(new Gearbox(2, DCMotor.NEO, 5.0), Units.inchesToMeters(2));
     var plant =
-        LinearSystemId.createDrivetrainVelocitySystem(
-            motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 2.0, 5.0);
+        LinearSystemId.createDrivetrainVelocitySystem(wheel, 50, Units.inchesToMeters(12), 2.0);
+    var sim = new DifferentialDrivetrainSim(plant, wheel, Units.inchesToMeters(12));
 
-    var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
-    var sim =
-        new DifferentialDrivetrainSim(
-            plant,
-            motor,
-            5,
-            kinematics.trackWidthMeters,
-            Units.inchesToMeters(2),
-            VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
-
-    sim.setInputs(2, 4);
+    sim.setInputVoltages(2, 4);
 
     // 10 seconds should be enough time to verify stability
     for (int i = 0; i < 500; i++) {
