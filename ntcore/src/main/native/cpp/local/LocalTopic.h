@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <string>
 #include <string_view>
 
@@ -13,11 +15,13 @@
 
 #include "Handle.h"
 #include "VectorSet.h"
+#include "local/LocalDataLogger.h"
 #include "local/LocalDataLoggerEntry.h"
 #include "ntcore_cpp.h"
 
 namespace nt::local {
 
+struct LocalDataLogger;
 struct LocalEntry;
 struct LocalMultiSubscriber;
 struct LocalPublisher;
@@ -36,6 +40,11 @@ struct LocalTopic {
   bool Exists() const { return onNetwork || !localPublishers.empty(); }
 
   bool IsCached() const { return (flags & NT_UNCACHED) == 0; }
+
+  // starts if publish is true, stops if false
+  void StartStopDataLog(LocalDataLogger* logger, int64_t timestamp,
+                        bool publish);
+  void UpdateDataLogProperties();
 
   TopicInfo GetTopicInfo() const {
     TopicInfo info;

@@ -4,8 +4,12 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <string>
 #include <string_view>
+
+#include <wpi/DataLog.h>
 
 #include "ntcore_c.h"
 
@@ -28,6 +32,10 @@ struct LocalDataLoggerEntry {
   static std::string MakeMetadata(std::string_view properties);
 
   void Append(const Value& v);
+  void Finish(int64_t timestamp) { log->Finish(entry, timestamp); }
+  void SetMetadata(std::string_view metadata, int64_t timestamp) {
+    log->SetMetadata(entry, metadata, timestamp);
+  }
 
   wpi::log::DataLog* log;
   int entry;
