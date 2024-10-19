@@ -249,6 +249,7 @@ imgui.ini
 /bazel-*
 user.bazelrc
 coverage_report/
+bazel_auth.rc
 
 # ctest
 /Testing/
