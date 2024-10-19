@@ -1,18 +1,18 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Thu, 13 Jul 2023 22:13:47 -0700
-Subject: [PATCH 07/10] Use C++ atomics
+Subject: [PATCH 6/9] Use C++ atomics
 
 ---
  src/unix/async.c  | 25 +++++++++++++------------
  src/unix/core.c   |  3 ++-
- src/unix/fs.c     | 20 +++++++++++---------
+ src/unix/fs.c     | 33 +++++++++++++++++----------------
  src/unix/kqueue.c | 10 ++++++----
  src/unix/linux.c  | 45 +++++++++++++++++++++++----------------------
  src/unix/tty.c    |  5 +++--
  src/uv-common.c   |  2 +-
  src/uv-common.h   |  8 +++-----
- 8 files changed, 62 insertions(+), 56 deletions(-)
+ 8 files changed, 68 insertions(+), 63 deletions(-)
 
 diff --git a/src/unix/async.c b/src/unix/async.c
 index 0ff2669e30a628dbb2df9e28ba14b38cf14114e5..fef4ae93343edc0341179a1c4739dcd831ef6e26 100644
@@ -91,7 +91,7 @@ index 0ff2669e30a628dbb2df9e28ba14b38cf14114e5..fef4ae93343edc0341179a1c4739dcd8
        continue;
  
 diff --git a/src/unix/core.c b/src/unix/core.c
-index 4bc870214afa1e08da2f7b335c031d67d221fdd6..f13ffd1714af26dede3d4d5f6f01efa39fc78959 100644
+index 18f0ce06336e4b3690f84d95b4be954a4466cdf6..c1cc4691439580160cfdda35a01b8e940e4d270b 100644
 --- a/src/unix/core.c
 +++ b/src/unix/core.c
 @@ -45,6 +45,7 @@
@@ -102,7 +102,7 @@ index 4bc870214afa1e08da2f7b335c031d67d221fdd6..f13ffd1714af26dede3d4d5f6f01efa3
  
  #ifdef __sun
  # include <sys/filio.h>
-@@ -264,7 +265,7 @@ int uv__getiovmax(void) {
+@@ -274,7 +275,7 @@ int uv__getiovmax(void) {
  #if defined(IOV_MAX)
    return IOV_MAX;
  #elif defined(_SC_IOV_MAX)
@@ -112,10 +112,18 @@ index 4bc870214afa1e08da2f7b335c031d67d221fdd6..f13ffd1714af26dede3d4d5f6f01efa3
  
    iovmax = atomic_load_explicit(&iovmax_cached, memory_order_relaxed);
 diff --git a/src/unix/fs.c b/src/unix/fs.c
-index 22f31f7285c995c981aca0fa5125bc70aeedc151..75c3093cb7cd6998637c31348265e9299404f91f 100644
+index efd37d78d9216de6ad46633a953f6b292b4af735..6a2e64cb33f004350bee89f28345667d095e1bb5 100644
 --- a/src/unix/fs.c
 +++ b/src/unix/fs.c
-@@ -45,6 +45,8 @@
+@@ -31,7 +31,6 @@
+ 
+ #include <errno.h>
+ #include <dlfcn.h>
+-#include <stdatomic.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -46,6 +45,8 @@
  #include <fcntl.h>
  #include <poll.h>
  
@@ -124,7 +132,7 @@ index 22f31f7285c995c981aca0fa5125bc70aeedc151..75c3093cb7cd6998637c31348265e929
  #if defined(__linux__)
  # include <sys/sendfile.h>
  #endif
-@@ -309,7 +311,7 @@ static int uv__fs_mkstemp(uv_fs_t* req) {
+@@ -299,7 +300,7 @@ static int uv__fs_mkstemp(uv_fs_t* req) {
    static uv_once_t once = UV_ONCE_INIT;
    int r;
  #ifdef O_CLOEXEC
@@ -133,7 +141,7 @@ index 22f31f7285c995c981aca0fa5125bc70aeedc151..75c3093cb7cd6998637c31348265e929
  #endif
    static const char pattern[] = "XXXXXX";
    static const size_t pattern_size = sizeof(pattern) - 1;
-@@ -334,7 +336,7 @@ static int uv__fs_mkstemp(uv_fs_t* req) {
+@@ -324,7 +325,7 @@ static int uv__fs_mkstemp(uv_fs_t* req) {
    uv_once(&once, uv__mkostemp_initonce);
  
  #ifdef O_CLOEXEC
@@ -142,7 +150,7 @@ index 22f31f7285c995c981aca0fa5125bc70aeedc151..75c3093cb7cd6998637c31348265e929
        uv__mkostemp != NULL) {
      r = uv__mkostemp(path, O_CLOEXEC);
  
-@@ -348,7 +350,7 @@ static int uv__fs_mkstemp(uv_fs_t* req) {
+@@ -338,7 +339,7 @@ static int uv__fs_mkstemp(uv_fs_t* req) {
  
      /* We set the static variable so that next calls don't even
         try to use mkostemp. */
@@ -151,7 +159,58 @@ index 22f31f7285c995c981aca0fa5125bc70aeedc151..75c3093cb7cd6998637c31348265e929
    }
  #endif  /* O_CLOEXEC */
  
-@@ -869,10 +871,10 @@ static int uv__is_cifs_or_smb(int fd) {
+@@ -459,7 +460,7 @@ static ssize_t uv__pwritev_emul(int fd,
+ }
+ 
+ 
+-/* The function pointer cache is an uintptr_t because _Atomic void*
++/* The function pointer cache is an uintptr_t because std::atomic<void>*
+  * doesn't work on macos/ios/etc...
+  * Disable optimization on armv7 to work around the bug described in
+  * https://github.com/libuv/libuv/issues/4532
+@@ -471,12 +472,12 @@ static ssize_t uv__preadv_or_pwritev(int fd,
+                                      const struct iovec* bufs,
+                                      size_t nbufs,
+                                      off_t off,
+-                                     _Atomic uintptr_t* cache,
++                                     std::atomic<uintptr_t>* cache,
+                                      int is_pread) {
+   ssize_t (*f)(int, const struct iovec*, uv__iovcnt, off_t);
+   void* p;
+ 
+-  p = (void*) atomic_load_explicit(cache, memory_order_relaxed);
++  p = (void*) atomic_load_explicit(cache, std::memory_order_relaxed);
+   if (p == NULL) {
+ #ifdef RTLD_DEFAULT
+     p = dlsym(RTLD_DEFAULT, is_pread ? "preadv" : "pwritev");
+@@ -484,7 +485,7 @@ static ssize_t uv__preadv_or_pwritev(int fd,
+ #endif  /* RTLD_DEFAULT */
+     if (p == NULL)
+       p = (void*)(is_pread ? uv__preadv_emul : uv__pwritev_emul);
+-    atomic_store_explicit(cache, (uintptr_t) p, memory_order_relaxed);
++    atomic_store_explicit(cache, (uintptr_t) p, std::memory_order_relaxed);
+   }
+ 
+   /* Use memcpy instead of `f = p` to work around a compiler bug,
+@@ -499,7 +500,7 @@ static ssize_t uv__preadv(int fd,
+                           const struct iovec* bufs,
+                           size_t nbufs,
+                           off_t off) {
+-  static _Atomic uintptr_t cache;
++  static std::atomic<uintptr_t> cache;
+   return uv__preadv_or_pwritev(fd, bufs, nbufs, off, &cache, /*is_pread*/1);
+ }
+ 
+@@ -508,7 +509,7 @@ static ssize_t uv__pwritev(int fd,
+                            const struct iovec* bufs,
+                            size_t nbufs,
+                            off_t off) {
+-  static _Atomic uintptr_t cache;
++  static std::atomic<uintptr_t> cache;
+   return uv__preadv_or_pwritev(fd, bufs, nbufs, off, &cache, /*is_pread*/0);
+ }
+ 
+@@ -985,10 +986,10 @@ static int uv__is_cifs_or_smb(int fd) {
  
  static ssize_t uv__fs_try_copy_file_range(int in_fd, off_t* off,
                                            int out_fd, size_t len) {
@@ -164,7 +223,7 @@ index 22f31f7285c995c981aca0fa5125bc70aeedc151..75c3093cb7cd6998637c31348265e929
      errno = ENOSYS;
      return -1;
    }
-@@ -891,7 +893,7 @@ static ssize_t uv__fs_try_copy_file_range(int in_fd, off_t* off,
+@@ -1007,7 +1008,7 @@ static ssize_t uv__fs_try_copy_file_range(int in_fd, off_t* off,
        errno = ENOSYS;  /* Use fallback. */
      break;
    case ENOSYS:
@@ -173,7 +232,7 @@ index 22f31f7285c995c981aca0fa5125bc70aeedc151..75c3093cb7cd6998637c31348265e929
      break;
    case EPERM:
      /* It's been reported that CIFS spuriously fails.
-@@ -1382,14 +1384,14 @@ static int uv__fs_statx(int fd,
+@@ -1531,14 +1532,14 @@ static int uv__fs_statx(int fd,
                          uv_stat_t* buf) {
    STATIC_ASSERT(UV_ENOSYS != -1);
  #ifdef __linux__
@@ -190,7 +249,7 @@ index 22f31f7285c995c981aca0fa5125bc70aeedc151..75c3093cb7cd6998637c31348265e929
      return UV_ENOSYS;
  
    dirfd = AT_FDCWD;
-@@ -1423,7 +1425,7 @@ static int uv__fs_statx(int fd,
+@@ -1572,7 +1573,7 @@ static int uv__fs_statx(int fd,
       * implemented, rc might return 1 with 0 set as the error code in which
       * case we return ENOSYS.
       */
@@ -200,7 +259,7 @@ index 22f31f7285c995c981aca0fa5125bc70aeedc151..75c3093cb7cd6998637c31348265e929
    }
  
 diff --git a/src/unix/kqueue.c b/src/unix/kqueue.c
-index c307e6631eefb1effb0e0c304eb400e0cb8d984e..bd09ac39dda916dd5a7d664979ce5735586fd7e3 100644
+index b7bd00ea0c45964d8e26d7596d9ad3734fe67237..8676a6340d7047585e230138ac130b591c164e4e 100644
 --- a/src/unix/kqueue.c
 +++ b/src/unix/kqueue.c
 @@ -37,6 +37,8 @@
@@ -230,7 +289,7 @@ index c307e6631eefb1effb0e0c304eb400e0cb8d984e..bd09ac39dda916dd5a7d664979ce5735
      uv__free(loop->cf_state);
      loop->cf_state = NULL;
    }
-@@ -565,7 +567,7 @@ int uv_fs_event_start(uv_fs_event_t* handle,
+@@ -598,7 +600,7 @@ int uv_fs_event_start(uv_fs_event_t* handle,
      goto fallback;
  
    if (0 == atomic_load_explicit(&uv__has_forked_with_cfrunloop,
@@ -239,7 +298,7 @@ index c307e6631eefb1effb0e0c304eb400e0cb8d984e..bd09ac39dda916dd5a7d664979ce5735
      int r;
      /* The fallback fd is no longer needed */
      uv__close_nocheckstdio(fd);
-@@ -601,7 +603,7 @@ int uv_fs_event_stop(uv_fs_event_t* handle) {
+@@ -634,7 +636,7 @@ int uv_fs_event_stop(uv_fs_event_t* handle) {
  
  #if defined(__APPLE__) && MAC_OS_X_VERSION_MAX_ALLOWED >= 1070
    if (0 == atomic_load_explicit(&uv__has_forked_with_cfrunloop,
@@ -249,7 +308,7 @@ index c307e6631eefb1effb0e0c304eb400e0cb8d984e..bd09ac39dda916dd5a7d664979ce5735
        r = uv__fsevents_close(handle);
  #endif
 diff --git a/src/unix/linux.c b/src/unix/linux.c
-index 09b02cd5df6c32a954cbed817111cf3c1874c3db..e0c4902385edac10ac31bc5075a85a45025615f9 100644
+index b8063cc8900d4cf255a46a9620d01815c65c6d21..25b93ba43b98874d658d58e3faab12049f6e4edf 100644
 --- a/src/unix/linux.c
 +++ b/src/unix/linux.c
 @@ -27,7 +27,6 @@
@@ -268,8 +327,8 @@ index 09b02cd5df6c32a954cbed817111cf3c1874c3db..e0c4902385edac10ac31bc5075a85a45
 +
  enum {
    UV__IORING_SETUP_SQPOLL = 2u,
- };
-@@ -302,7 +303,7 @@ static struct watcher_root* uv__inotify_watchers(uv_loop_t* loop) {
+   UV__IORING_SETUP_NO_SQARRAY = 0x10000u,
+@@ -300,7 +301,7 @@ static struct watcher_root* uv__inotify_watchers(uv_loop_t* loop) {
  
  
  unsigned uv__kernel_version(void) {
@@ -278,7 +337,7 @@ index 09b02cd5df6c32a954cbed817111cf3c1874c3db..e0c4902385edac10ac31bc5075a85a45
    struct utsname u;
    unsigned version;
    unsigned major;
-@@ -311,7 +312,7 @@ unsigned uv__kernel_version(void) {
+@@ -309,7 +310,7 @@ unsigned uv__kernel_version(void) {
    char v_sig[256];
    char* needle;
  
@@ -287,7 +346,7 @@ index 09b02cd5df6c32a954cbed817111cf3c1874c3db..e0c4902385edac10ac31bc5075a85a45
    if (version != 0)
      return version;
  
-@@ -367,7 +368,7 @@ unsigned uv__kernel_version(void) {
+@@ -365,7 +366,7 @@ unsigned uv__kernel_version(void) {
  
  calculate_version:
    version = major * 65536 + minor * 256 + patch;
@@ -296,7 +355,7 @@ index 09b02cd5df6c32a954cbed817111cf3c1874c3db..e0c4902385edac10ac31bc5075a85a45
  
    return version;
  }
-@@ -468,11 +469,11 @@ static int uv__use_io_uring(void) {
+@@ -466,11 +467,11 @@ static int uv__use_io_uring(void) {
    return 0; /* Random SIGSEGV in signal handler. */
  #else
    /* Ternary: unknown=0, yes=1, no=-1 */
@@ -310,7 +369,7 @@ index 09b02cd5df6c32a954cbed817111cf3c1874c3db..e0c4902385edac10ac31bc5075a85a45
  
    if (use == 0) {
      use = uv__kernel_version() >=
-@@ -491,7 +492,7 @@ static int uv__use_io_uring(void) {
+@@ -489,7 +490,7 @@ static int uv__use_io_uring(void) {
      if (val != NULL)
        use = atoi(val) ? 1 : -1;
  
@@ -319,7 +378,7 @@ index 09b02cd5df6c32a954cbed817111cf3c1874c3db..e0c4902385edac10ac31bc5075a85a45
    }
  
    return use > 0;
-@@ -767,8 +768,8 @@ static struct uv__io_uring_sqe* uv__iou_get_sqe(struct uv__iou* iou,
+@@ -781,8 +782,8 @@ static struct uv__io_uring_sqe* uv__iou_get_sqe(struct uv__iou* iou,
    if (iou->ringfd == -1)
      return NULL;
  
@@ -330,7 +389,7 @@ index 09b02cd5df6c32a954cbed817111cf3c1874c3db..e0c4902385edac10ac31bc5075a85a45
    tail = *iou->sqtail;
    mask = iou->sqmask;
  
-@@ -797,12 +798,12 @@ static struct uv__io_uring_sqe* uv__iou_get_sqe(struct uv__iou* iou,
+@@ -811,12 +812,12 @@ static struct uv__io_uring_sqe* uv__iou_get_sqe(struct uv__iou* iou,
  static void uv__iou_submit(struct uv__iou* iou) {
    uint32_t flags;
  
@@ -347,7 +406,7 @@ index 09b02cd5df6c32a954cbed817111cf3c1874c3db..e0c4902385edac10ac31bc5075a85a45
  
    if (flags & UV__IORING_SQ_NEED_WAKEUP)
      if (uv__io_uring_enter(iou->ringfd, 0, 0, UV__IORING_ENTER_SQ_WAKEUP))
-@@ -1143,8 +1144,8 @@ static void uv__poll_io_uring(uv_loop_t* loop, struct uv__iou* iou) {
+@@ -1174,8 +1175,8 @@ static void uv__poll_io_uring(uv_loop_t* loop, struct uv__iou* iou) {
    int rc;
  
    head = *iou->cqhead;
@@ -358,7 +417,7 @@ index 09b02cd5df6c32a954cbed817111cf3c1874c3db..e0c4902385edac10ac31bc5075a85a45
    mask = iou->cqmask;
    cqe = (uv__io_uring_cqe*)iou->cqe;
    nevents = 0;
-@@ -1182,15 +1183,15 @@ static void uv__poll_io_uring(uv_loop_t* loop, struct uv__iou* iou) {
+@@ -1213,15 +1214,15 @@ static void uv__poll_io_uring(uv_loop_t* loop, struct uv__iou* iou) {
      nevents++;
    }
  
@@ -378,7 +437,7 @@ index 09b02cd5df6c32a954cbed817111cf3c1874c3db..e0c4902385edac10ac31bc5075a85a45
  
    if (flags & UV__IORING_SQ_CQ_OVERFLOW) {
      do
-@@ -1583,7 +1584,7 @@ update_timeout:
+@@ -1619,7 +1620,7 @@ update_timeout:
  }
  
  uint64_t uv__hrtime(uv_clocktype_t type) {
@@ -387,7 +446,7 @@ index 09b02cd5df6c32a954cbed817111cf3c1874c3db..e0c4902385edac10ac31bc5075a85a45
    struct timespec t;
    clock_t clock_id;
  
-@@ -1599,7 +1600,7 @@ uint64_t uv__hrtime(uv_clocktype_t type) {
+@@ -1635,7 +1636,7 @@ uint64_t uv__hrtime(uv_clocktype_t type) {
    if (type != UV_CLOCK_FAST)
      goto done;
  
@@ -396,7 +455,7 @@ index 09b02cd5df6c32a954cbed817111cf3c1874c3db..e0c4902385edac10ac31bc5075a85a45
    if (clock_id != -1)
      goto done;
  
-@@ -1608,7 +1609,7 @@ uint64_t uv__hrtime(uv_clocktype_t type) {
+@@ -1644,7 +1645,7 @@ uint64_t uv__hrtime(uv_clocktype_t type) {
      if (t.tv_nsec <= 1 * 1000 * 1000)
        clock_id = CLOCK_MONOTONIC_COARSE;
  
@@ -406,7 +465,7 @@ index 09b02cd5df6c32a954cbed817111cf3c1874c3db..e0c4902385edac10ac31bc5075a85a45
  done:
  
 diff --git a/src/unix/tty.c b/src/unix/tty.c
-index 1bd217b5a15eed13a8349c479b53471dd36ca216..1304c6d8685cfd122cffea066dc668d1dfc9ae02 100644
+index 699a092da2dea77277557211065f6594bcad4e0b..5ca2105848fc07d312455c336ac7303e61679213 100644
 --- a/src/unix/tty.c
 +++ b/src/unix/tty.c
 @@ -22,7 +22,6 @@
@@ -449,7 +508,7 @@ index 49126e50f07bac16d198775454b731f40630d1d1..1ce25c24d6c046f7aaeaa52dcfc4fafa
    if (uv__exchange_int_relaxed(&was_shutdown, 1))
      return;
 diff --git a/src/uv-common.h b/src/uv-common.h
-index cd57e5a35153d0557351b60cce0c5be7a4468b60..5dce8eaf2705b47935b218181f6dd69af0d5b61b 100644
+index 4baede2e506ee1787d554a0ec75bc9eb346fc8f2..4978cf0633c2de5fa96bf600a59dfb539cab8201 100644
 --- a/src/uv-common.h
 +++ b/src/uv-common.h
 @@ -32,15 +32,13 @@
