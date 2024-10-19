@@ -439,7 +439,7 @@ EntryData* StorageImpl::GetEntry(TopicData* topic, NT_Type type,
   return AddEntry(subscriber);
 }
 
-TopicData* StorageImpl::GetEntry(std::string_view name) {
+EntryData* StorageImpl::GetEntry(std::string_view name) {
   if (name.empty()) {
     return nullptr;
   }
@@ -447,7 +447,7 @@ TopicData* StorageImpl::GetEntry(std::string_view name) {
   // Get the topic data
   auto* topic = GetOrCreateTopic(name);
 
-  if (topic->entry == 0) {
+  if (!topic->entry) {
     if (topic->localSubscribers.size() >= kMaxSubscribers) {
       WPI_ERROR(
           m_logger,
@@ -460,10 +460,10 @@ TopicData* StorageImpl::GetEntry(std::string_view name) {
     auto* subscriber = AddLocalSubscriber(topic, {});
 
     // Create entry
-    topic->entry = AddEntry(subscriber)->handle;
+    topic->entry = AddEntry(subscriber);
   }
 
-  return topic;
+  return topic->entry;
 }
 
 void StorageImpl::RemoveSubEntry(NT_Handle subentryHandle) {
