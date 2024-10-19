@@ -58,6 +58,8 @@ struct LocalTopic {
     return info;
   }
 
+  void ResetIfDoesNotExist();
+
   // invariants
   wpi::SignalObject<NT_Topic> handle;
   std::string name;
@@ -67,8 +69,7 @@ struct LocalTopic {
   Value lastValueNetwork;
   NT_Type type{NT_UNASSIGNED};
   std::string typeStr;
-  unsigned int flags{0};            // for NT3 APIs
-  std::string propertiesStr{"{}"};  // cached string for GetTopicInfo() et al
+  unsigned int flags{0};  // for NT3 APIs
   wpi::json properties = wpi::json::object();
   LocalEntry* entry{nullptr};  // cached entry for GetEntry()
 
@@ -87,6 +88,8 @@ struct LocalTopic {
  private:
   // update flags from properties
   void RefreshFlags();
+
+  std::string propertiesStr{"{}"};  // cached string for GetTopicInfo() et al
 };
 
 }  // namespace nt::local
