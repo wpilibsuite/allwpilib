@@ -823,13 +823,7 @@ void StorageImpl::StopDataLog(NT_DataLogger logger) {
     // finish any active entries
     auto now = Now();
     for (auto&& topic : m_topics) {
-      auto it =
-          std::find_if(topic->datalogs.begin(), topic->datalogs.end(),
-                       [&](const auto& elem) { return elem.logger == logger; });
-      if (it != topic->datalogs.end()) {
-        it->log->Finish(it->entry, now);
-        topic->datalogs.erase(it);
-      }
+      topic->StartStopDataLog(datalogger.get(), now, false);
     }
   }
 }
@@ -905,32 +899,13 @@ void StorageImpl::NotifyTopic(LocalTopic* topic, unsigned int eventFlags) {
       auto now = Now();
       for (auto&& datalogger : m_dataloggers) {
         if (PrefixMatch(topic->name, datalogger->prefix, topic->special)) {
-          auto it = std::find_if(topic->datalogs.begin(), topic->datalogs.end(),
-                                 [&](const auto& elem) {
-                                   return elem.logger == datalogger->handle;
-                                 });
-          if ((eventFlags & NT_EVENT_PUBLISH) != 0 &&
-              it == topic->datalogs.end()) {
-            topic->datalogs.emplace_back(datalogger->log,
-                                         datalogger->Start(topic, now),
-                                         datalogger->handle);
-            topic->datalogType = topic->type;
-          } else if ((eventFlags & NT_EVENT_UNPUBLISH) != 0 &&
-                     it != topic->datalogs.end()) {
-            it->log->Finish(it->entry, now);
-            topic->datalogType = NT_UNASSIGNED;
-            topic->datalogs.erase(it);
-          }
+          topic->StartStopDataLog(datalogger.get(), now,
+                                  (eventFlags & NT_EVENT_PUBLISH) != 0);
         }
       }
     }
   } else if ((eventFlags & NT_EVENT_PROPERTIES) != 0) {
-    if (!topic->datalogs.empty()) {
-      auto metadata = LocalDataLoggerEntry::MakeMetadata(topic->propertiesStr);
-      for (auto&& datalog : topic->datalogs) {
-        datalog.log->SetMetadata(datalog.entry, metadata);
-      }
-    }
+    topic->UpdateDataLogProperties();
   }
 }
 

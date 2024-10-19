@@ -5,7 +5,6 @@
 #include "LocalDataLoggerEntry.h"
 
 #include <fmt/format.h>
-#include <wpi/DataLog.h>
 #include <wpi/StringExtras.h>
 
 #include "networktables/NetworkTableValue.h"
