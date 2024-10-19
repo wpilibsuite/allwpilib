@@ -387,9 +387,8 @@ LocalSubscriber* StorageImpl::Subscribe(LocalTopic* topic, NT_Type type,
                                         std::string_view typeStr,
                                         const PubSubOptions& options) {
   if (topic->localSubscribers.size() >= kMaxSubscribers) {
-    WPI_ERROR(m_logger,
-              "reached maximum number of subscribers to '{}', not subscribing",
-              topic->name);
+    ERR("reached maximum number of subscribers to '{}', not subscribing",
+        topic->name);
     return nullptr;
   }
 
@@ -402,17 +401,14 @@ LocalPublisher* StorageImpl::Publish(LocalTopic* topic, NT_Type type,
                                      const wpi::json& properties,
                                      const PubSubOptions& options) {
   if (type == NT_UNASSIGNED || typeStr.empty()) {
-    WPI_ERROR(
-        m_logger,
-        "cannot publish '{}' with an unassigned type or empty type string",
+    ERR("cannot publish '{}' with an unassigned type or empty type string",
         topic->name);
     return nullptr;
   }
 
   if (topic->localPublishers.size() >= kMaxPublishers) {
-    WPI_ERROR(m_logger,
-              "reached maximum number of publishers to '{}', not publishing",
-              topic->name);
+    ERR("reached maximum number of publishers to '{}', not publishing",
+        topic->name);
     return nullptr;
   }
 
@@ -424,9 +420,7 @@ LocalEntry* StorageImpl::GetEntry(LocalTopic* topic, NT_Type type,
                                   std::string_view typeStr,
                                   const PubSubOptions& options) {
   if (topic->localSubscribers.size() >= kMaxSubscribers) {
-    WPI_ERROR(
-        m_logger,
-        "reached maximum number of subscribers to '{}', not creating entry",
+    ERR("reached maximum number of subscribers to '{}', not creating entry",
         topic->name);
     return nullptr;
   }
@@ -449,9 +443,7 @@ LocalEntry* StorageImpl::GetEntry(std::string_view name) {
 
   if (!topic->entry) {
     if (topic->localSubscribers.size() >= kMaxSubscribers) {
-      WPI_ERROR(
-          m_logger,
-          "reached maximum number of subscribers to '{}', not creating entry",
+      ERR("reached maximum number of subscribers to '{}', not creating entry",
           topic->name);
       return nullptr;
     }
@@ -526,8 +518,7 @@ LocalMultiSubscriber* StorageImpl::AddMultiSubscriber(
     std::span<const std::string_view> prefixes, const PubSubOptions& options) {
   DEBUG4("AddMultiSubscriber({})", fmt::join(prefixes, ","));
   if (m_multiSubscribers.size() >= kMaxMultiSubscribers) {
-    WPI_ERROR(m_logger,
-              "reached maximum number of multi-subscribers, not subscribing");
+    ERR("reached maximum number of multi-subscribers, not subscribing");
     return nullptr;
   }
   auto subscriber = m_multiSubscribers.Add(m_inst, prefixes, options);
@@ -866,9 +857,8 @@ void StorageImpl::AddSchema(std::string_view name, std::string_view type,
   auto topic = GetOrCreateTopic(fullName);
 
   if (topic->localPublishers.size() >= kMaxPublishers) {
-    WPI_ERROR(m_logger,
-              "reached maximum number of publishers to '{}', not publishing",
-              topic->name);
+    ERR("reached maximum number of publishers to '{}', not publishing",
+        topic->name);
     return;
   }
 
