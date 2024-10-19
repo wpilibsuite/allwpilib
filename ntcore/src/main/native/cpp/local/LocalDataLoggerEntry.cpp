@@ -12,11 +12,11 @@
 
 using namespace nt::local;
 
-std::string DataLoggerEntry::MakeMetadata(std::string_view properties) {
+std::string LocalDataLoggerEntry::MakeMetadata(std::string_view properties) {
   return fmt::format("{{\"properties\":{},\"source\":\"NT\"}}", properties);
 }
 
-void DataLoggerEntry::Append(const Value& v) {
+void LocalDataLoggerEntry::Append(const Value& v) {
   auto time = v.time();
   switch (v.type()) {
     case NT_BOOLEAN:

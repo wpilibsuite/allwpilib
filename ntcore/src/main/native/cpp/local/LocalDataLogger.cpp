@@ -13,7 +13,7 @@
 
 using namespace nt::local;
 
-int DataLoggerData::Start(TopicData* topic, int64_t time) {
+int LocalDataLogger::Start(LocalTopic* topic, int64_t time) {
   std::string_view typeStr = topic->typeStr;
   // NT and DataLog use different standard representations for int and int[]
   if (typeStr == "int") {
@@ -25,5 +25,5 @@ int DataLoggerData::Start(TopicData* topic, int64_t time) {
       fmt::format(
           "{}{}", logPrefix,
           wpi::remove_prefix(topic->name, prefix).value_or(topic->name)),
-      typeStr, DataLoggerEntry::MakeMetadata(topic->propertiesStr), time);
+      typeStr, LocalDataLoggerEntry::MakeMetadata(topic->propertiesStr), time);
 }

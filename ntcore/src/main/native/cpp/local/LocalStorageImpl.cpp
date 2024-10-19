@@ -34,7 +34,7 @@ StorageImpl::StorageImpl(int inst, IListenerStorage& listenerStorage,
 // Network interface functions
 //
 
-void StorageImpl::NetworkAnnounce(TopicData* topic, std::string_view typeStr,
+void StorageImpl::NetworkAnnounce(LocalTopic* topic, std::string_view typeStr,
                                   const wpi::json& properties,
                                   std::optional<int> pubuid) {
   DEBUG4("LS NetworkAnnounce({}, {}, {}, {})", topic->name, typeStr,
@@ -88,7 +88,7 @@ void StorageImpl::NetworkAnnounce(TopicData* topic, std::string_view typeStr,
   }
 }
 
-void StorageImpl::RemoveNetworkPublisher(TopicData* topic) {
+void StorageImpl::RemoveNetworkPublisher(LocalTopic* topic) {
   DEBUG4("LS RemoveNetworkPublisher({}, {})", topic->handle.GetHandle(),
          topic->name);
   // this acts as an unpublish
@@ -120,7 +120,7 @@ void StorageImpl::RemoveNetworkPublisher(TopicData* topic) {
   }
 }
 
-void StorageImpl::NetworkPropertiesUpdate(TopicData* topic,
+void StorageImpl::NetworkPropertiesUpdate(LocalTopic* topic,
                                           const wpi::json& update, bool ack) {
   DEBUG4("NetworkPropertiesUpdate({},{})", topic->name, ack);
   if (ack) {
@@ -135,7 +135,7 @@ void StorageImpl::StartNetwork(net::ClientMessageHandler* network) {
   // publish all active publishers to the network and send last values
   // only send value once per topic
   for (auto&& topic : m_topics) {
-    PublisherData* anyPublisher = nullptr;
+    LocalPublisher* anyPublisher = nullptr;
     for (auto&& publisher : topic->localPublishers) {
       if (publisher->active) {
         network->ClientPublish(Handle{publisher->handle}.GetIndex(),
@@ -176,7 +176,7 @@ void StorageImpl::ClearNetwork() {
 // Topic functions
 //
 
-TopicData* StorageImpl::GetOrCreateTopic(std::string_view name) {
+LocalTopic* StorageImpl::GetOrCreateTopic(std::string_view name) {
   auto& topic = m_nameTopics[name];
   // create if it does not already exist
   if (!topic) {
@@ -195,7 +195,7 @@ TopicData* StorageImpl::GetOrCreateTopic(std::string_view name) {
 // Topic property functions
 //
 
-void StorageImpl::SetFlags(TopicData* topic, unsigned int flags) {
+void StorageImpl::SetFlags(LocalTopic* topic, unsigned int flags) {
   wpi::json update = wpi::json::object();
   if ((flags & NT_PERSISTENT) != 0) {
     topic->properties["persistent"] = true;
@@ -233,7 +233,7 @@ void StorageImpl::SetFlags(TopicData* topic, unsigned int flags) {
   }
 }
 
-void StorageImpl::SetPersistent(TopicData* topic, bool value) {
+void StorageImpl::SetPersistent(LocalTopic* topic, bool value) {
   wpi::json update = wpi::json::object();
   if (value) {
     topic->flags |= NT_PERSISTENT;
@@ -247,7 +247,7 @@ void StorageImpl::SetPersistent(TopicData* topic, bool value) {
   PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
 }
 
-void StorageImpl::SetRetained(TopicData* topic, bool value) {
+void StorageImpl::SetRetained(LocalTopic* topic, bool value) {
   wpi::json update = wpi::json::object();
   if (value) {
     topic->flags |= NT_RETAINED;
@@ -261,7 +261,7 @@ void StorageImpl::SetRetained(TopicData* topic, bool value) {
   PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
 }
 
-void StorageImpl::SetCached(TopicData* topic, bool value) {
+void StorageImpl::SetCached(LocalTopic* topic, bool value) {
   wpi::json update = wpi::json::object();
   if (value) {
     topic->flags &= ~NT_UNCACHED;
@@ -275,7 +275,7 @@ void StorageImpl::SetCached(TopicData* topic, bool value) {
   PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
 }
 
-void StorageImpl::SetProperty(TopicData* topic, std::string_view name,
+void StorageImpl::SetProperty(LocalTopic* topic, std::string_view name,
                               const wpi::json& value) {
   if (value.is_null()) {
     topic->properties.erase(name);
@@ -287,7 +287,7 @@ void StorageImpl::SetProperty(TopicData* topic, std::string_view name,
   PropertiesUpdated(topic, update, NT_EVENT_NONE, true);
 }
 
-bool StorageImpl::SetProperties(TopicData* topic, const wpi::json& update,
+bool StorageImpl::SetProperties(LocalTopic* topic, const wpi::json& update,
                                 bool sendNetwork) {
   if (!update.is_object()) {
     return false;
@@ -304,7 +304,7 @@ bool StorageImpl::SetProperties(TopicData* topic, const wpi::json& update,
   return true;
 }
 
-void StorageImpl::DeleteProperty(TopicData* topic, std::string_view name) {
+void StorageImpl::DeleteProperty(LocalTopic* topic, std::string_view name) {
   topic->properties.erase(name);
   wpi::json update = wpi::json::object();
   update[name] = wpi::json();
@@ -383,9 +383,9 @@ bool StorageImpl::SetDefaultEntryValue(NT_Handle pubsubentryHandle,
 // Publish/Subscribe/Entry functions
 //
 
-SubscriberData* StorageImpl::Subscribe(TopicData* topic, NT_Type type,
-                                       std::string_view typeStr,
-                                       const PubSubOptions& options) {
+LocalSubscriber* StorageImpl::Subscribe(LocalTopic* topic, NT_Type type,
+                                        std::string_view typeStr,
+                                        const PubSubOptions& options) {
   if (topic->localSubscribers.size() >= kMaxSubscribers) {
     WPI_ERROR(m_logger,
               "reached maximum number of subscribers to '{}', not subscribing",
@@ -397,10 +397,10 @@ SubscriberData* StorageImpl::Subscribe(TopicData* topic, NT_Type type,
   return AddLocalSubscriber(topic, PubSubConfig{type, typeStr, options});
 }
 
-PublisherData* StorageImpl::Publish(TopicData* topic, NT_Type type,
-                                    std::string_view typeStr,
-                                    const wpi::json& properties,
-                                    const PubSubOptions& options) {
+LocalPublisher* StorageImpl::Publish(LocalTopic* topic, NT_Type type,
+                                     std::string_view typeStr,
+                                     const wpi::json& properties,
+                                     const PubSubOptions& options) {
   if (type == NT_UNASSIGNED || typeStr.empty()) {
     WPI_ERROR(
         m_logger,
@@ -420,9 +420,9 @@ PublisherData* StorageImpl::Publish(TopicData* topic, NT_Type type,
                            PubSubConfig{type, typeStr, options});
 }
 
-EntryData* StorageImpl::GetEntry(TopicData* topic, NT_Type type,
-                                 std::string_view typeStr,
-                                 const PubSubOptions& options) {
+LocalEntry* StorageImpl::GetEntry(LocalTopic* topic, NT_Type type,
+                                  std::string_view typeStr,
+                                  const PubSubOptions& options) {
   if (topic->localSubscribers.size() >= kMaxSubscribers) {
     WPI_ERROR(
         m_logger,
@@ -439,7 +439,7 @@ EntryData* StorageImpl::GetEntry(TopicData* topic, NT_Type type,
   return AddEntry(subscriber);
 }
 
-EntryData* StorageImpl::GetEntry(std::string_view name) {
+LocalEntry* StorageImpl::GetEntry(std::string_view name) {
   if (name.empty()) {
     return nullptr;
   }
@@ -482,7 +482,7 @@ void StorageImpl::RemoveSubEntry(NT_Handle subentryHandle) {
   }
 }
 
-std::unique_ptr<PublisherData> StorageImpl::RemoveLocalPublisher(
+std::unique_ptr<LocalPublisher> StorageImpl::RemoveLocalPublisher(
     NT_Publisher pubHandle) {
   auto publisher = m_publishers.Remove(pubHandle);
   if (publisher) {
@@ -522,7 +522,7 @@ std::unique_ptr<PublisherData> StorageImpl::RemoveLocalPublisher(
 // Multi-subscriber functions
 //
 
-MultiSubscriberData* StorageImpl::AddMultiSubscriber(
+LocalMultiSubscriber* StorageImpl::AddMultiSubscriber(
     std::span<const std::string_view> prefixes, const PubSubOptions& options) {
   DEBUG4("AddMultiSubscriber({})", fmt::join(prefixes, ","));
   if (m_multiSubscribers.size() >= kMaxMultiSubscribers) {
@@ -548,7 +548,7 @@ MultiSubscriberData* StorageImpl::AddMultiSubscriber(
   return subscriber;
 }
 
-std::unique_ptr<MultiSubscriberData> StorageImpl::RemoveMultiSubscriber(
+std::unique_ptr<LocalMultiSubscriber> StorageImpl::RemoveMultiSubscriber(
     NT_MultiSubscriber subHandle) {
   auto subscriber = m_multiSubscribers.Remove(subHandle);
   if (subscriber) {
@@ -571,7 +571,7 @@ std::unique_ptr<MultiSubscriberData> StorageImpl::RemoveMultiSubscriber(
 // Lookup functions
 //
 
-TopicData* StorageImpl::GetTopic(NT_Handle handle) {
+LocalTopic* StorageImpl::GetTopic(NT_Handle handle) {
   switch (Handle{handle}.GetType()) {
     case Handle::kEntry: {
       if (auto entry = m_entries.Get(handle)) {
@@ -599,7 +599,7 @@ TopicData* StorageImpl::GetTopic(NT_Handle handle) {
   return {};
 }
 
-SubscriberData* StorageImpl::GetSubEntry(NT_Handle subentryHandle) {
+LocalSubscriber* StorageImpl::GetSubEntry(NT_Handle subentryHandle) {
   Handle h{subentryHandle};
   if (h.IsType(Handle::kSubscriber)) {
     return m_subscribers.Get(subentryHandle);
@@ -615,7 +615,7 @@ SubscriberData* StorageImpl::GetSubEntry(NT_Handle subentryHandle) {
 // Listener functions
 //
 
-void StorageImpl::AddListenerImpl(NT_Listener listenerHandle, TopicData* topic,
+void StorageImpl::AddListenerImpl(NT_Listener listenerHandle, LocalTopic* topic,
                                   unsigned int eventMask) {
   if (topic->localSubscribers.size() >= kMaxSubscribers) {
     ERR("reached maximum number of subscribers to '{}', ignoring listener add",
@@ -630,11 +630,11 @@ void StorageImpl::AddListenerImpl(NT_Listener listenerHandle, TopicData* topic,
 }
 
 void StorageImpl::AddListenerImpl(NT_Listener listenerHandle,
-                                  SubscriberData* subscriber,
+                                  LocalSubscriber* subscriber,
                                   unsigned int eventMask,
                                   NT_Handle subentryHandle,
                                   bool subscriberOwned) {
-  m_listeners.try_emplace(listenerHandle, std::make_unique<ListenerData>(
+  m_listeners.try_emplace(listenerHandle, std::make_unique<LocalListener>(
                                               listenerHandle, subscriber,
                                               eventMask, subscriberOwned));
 
@@ -690,19 +690,19 @@ void StorageImpl::AddListenerImpl(NT_Listener listenerHandle,
 }
 
 void StorageImpl::AddListenerImpl(NT_Listener listenerHandle,
-                                  MultiSubscriberData* subscriber,
+                                  LocalMultiSubscriber* subscriber,
                                   unsigned int eventMask,
                                   bool subscriberOwned) {
   auto listener =
       m_listeners
-          .try_emplace(listenerHandle, std::make_unique<ListenerData>(
+          .try_emplace(listenerHandle, std::make_unique<LocalListener>(
                                            listenerHandle, subscriber,
                                            eventMask, subscriberOwned))
           .first->getSecond()
           .get();
 
   // if we're doing anything immediate, get the list of matching topics
-  wpi::SmallVector<TopicData*, 32> topics;
+  wpi::SmallVector<LocalTopic*, 32> topics;
   if ((eventMask & NT_EVENT_IMMEDIATE) != 0 &&
       (eventMask & (NT_EVENT_PUBLISH | NT_EVENT_VALUE_ALL)) != 0) {
     for (auto&& topic : m_topics) {
@@ -802,9 +802,9 @@ void StorageImpl::RemoveListener(NT_Listener listenerHandle,
 // Data log functions
 //
 
-DataLoggerData* StorageImpl::StartDataLog(wpi::log::DataLog& log,
-                                          std::string_view prefix,
-                                          std::string_view logPrefix) {
+LocalDataLogger* StorageImpl::StartDataLog(wpi::log::DataLog& log,
+                                           std::string_view prefix,
+                                           std::string_view logPrefix) {
   auto datalogger = m_dataloggers.Add(m_inst, log, prefix, logPrefix);
 
   // start logging any matching topics
@@ -892,7 +892,7 @@ void StorageImpl::Reset() {
   m_topicPrefixListeners.clear();
 }
 
-void StorageImpl::NotifyTopic(TopicData* topic, unsigned int eventFlags) {
+void StorageImpl::NotifyTopic(LocalTopic* topic, unsigned int eventFlags) {
   DEBUG4("NotifyTopic({}, {})", topic->name, eventFlags);
   auto topicInfo = topic->GetTopicInfo();
   if (!topic->listeners.empty()) {
@@ -936,7 +936,7 @@ void StorageImpl::NotifyTopic(TopicData* topic, unsigned int eventFlags) {
     }
   } else if ((eventFlags & NT_EVENT_PROPERTIES) != 0) {
     if (!topic->datalogs.empty()) {
-      auto metadata = DataLoggerEntry::MakeMetadata(topic->propertiesStr);
+      auto metadata = LocalDataLoggerEntry::MakeMetadata(topic->propertiesStr);
       for (auto&& datalog : topic->datalogs) {
         datalog.log->SetMetadata(datalog.entry, metadata);
       }
@@ -944,7 +944,7 @@ void StorageImpl::NotifyTopic(TopicData* topic, unsigned int eventFlags) {
   }
 }
 
-void StorageImpl::CheckReset(TopicData* topic) {
+void StorageImpl::CheckReset(LocalTopic* topic) {
   if (topic->Exists()) {
     return;
   }
@@ -958,9 +958,9 @@ void StorageImpl::CheckReset(TopicData* topic) {
   topic->propertiesStr = "{}";
 }
 
-bool StorageImpl::SetValue(TopicData* topic, const Value& value,
+bool StorageImpl::SetValue(LocalTopic* topic, const Value& value,
                            unsigned int eventFlags, bool suppressIfDuplicate,
-                           const PublisherData* publisher) {
+                           const LocalPublisher* publisher) {
   const bool isDuplicate = topic->IsCached() && topic->lastValue == value;
   DEBUG4("SetValue({}, {}, {}, {})", topic->name, value.time(), eventFlags,
          isDuplicate);
@@ -989,9 +989,9 @@ bool StorageImpl::SetValue(TopicData* topic, const Value& value,
   return true;
 }
 
-void StorageImpl::NotifyValue(TopicData* topic, const Value& value,
+void StorageImpl::NotifyValue(LocalTopic* topic, const Value& value,
                               unsigned int eventFlags, bool isDuplicate,
-                              const PublisherData* publisher) {
+                              const LocalPublisher* publisher) {
   bool isNetwork = (eventFlags & NT_EVENT_VALUE_REMOTE) != 0;
   for (auto&& subscriber : topic->localSubscribers) {
     if (subscriber->active &&
@@ -1020,7 +1020,7 @@ void StorageImpl::NotifyValue(TopicData* topic, const Value& value,
   }
 }
 
-void StorageImpl::PropertiesUpdated(TopicData* topic, const wpi::json& update,
+void StorageImpl::PropertiesUpdated(LocalTopic* topic, const wpi::json& update,
                                     unsigned int eventFlags, bool sendNetwork,
                                     bool updateFlags) {
   DEBUG4("PropertiesUpdated({}, {}, {}, {}, {})", topic->name, update.dump(),
@@ -1079,7 +1079,7 @@ void StorageImpl::PropertiesUpdated(TopicData* topic, const wpi::json& update,
   }
 }
 
-void StorageImpl::RefreshPubSubActive(TopicData* topic,
+void StorageImpl::RefreshPubSubActive(LocalTopic* topic,
                                       bool warnOnSubMismatch) {
   for (auto&& publisher : topic->localPublishers) {
     publisher->UpdateActive();
@@ -1096,9 +1096,9 @@ void StorageImpl::RefreshPubSubActive(TopicData* topic,
   }
 }
 
-PublisherData* StorageImpl::AddLocalPublisher(TopicData* topic,
-                                              const wpi::json& properties,
-                                              const PubSubConfig& config) {
+LocalPublisher* StorageImpl::AddLocalPublisher(LocalTopic* topic,
+                                               const wpi::json& properties,
+                                               const PubSubConfig& config) {
   bool didExist = topic->Exists();
   auto publisher = m_publishers.Add(m_inst, topic, config);
   topic->localPublishers.Add(publisher);
@@ -1144,8 +1144,8 @@ PublisherData* StorageImpl::AddLocalPublisher(TopicData* topic,
   return publisher;
 }
 
-SubscriberData* StorageImpl::AddLocalSubscriber(TopicData* topic,
-                                                const PubSubConfig& config) {
+LocalSubscriber* StorageImpl::AddLocalSubscriber(LocalTopic* topic,
+                                                 const PubSubConfig& config) {
   DEBUG4("AddLocalSubscriber({})", topic->name);
   auto subscriber = m_subscribers.Add(m_inst, topic, config);
   topic->localSubscribers.Add(subscriber);
@@ -1177,7 +1177,7 @@ SubscriberData* StorageImpl::AddLocalSubscriber(TopicData* topic,
   return subscriber;
 }
 
-std::unique_ptr<SubscriberData> StorageImpl::RemoveLocalSubscriber(
+std::unique_ptr<LocalSubscriber> StorageImpl::RemoveLocalSubscriber(
     NT_Subscriber subHandle) {
   auto subscriber = m_subscribers.Remove(subHandle);
   if (subscriber) {
@@ -1195,7 +1195,7 @@ std::unique_ptr<SubscriberData> StorageImpl::RemoveLocalSubscriber(
   return subscriber;
 }
 
-PublisherData* StorageImpl::PublishEntry(EntryData* entry, NT_Type type) {
+LocalPublisher* StorageImpl::PublishEntry(LocalEntry* entry, NT_Type type) {
   if (entry->publisher) {
     return entry->publisher;
   }
@@ -1222,7 +1222,7 @@ PublisherData* StorageImpl::PublishEntry(EntryData* entry, NT_Type type) {
   return entry->publisher;
 }
 
-bool StorageImpl::PublishLocalValue(PublisherData* publisher,
+bool StorageImpl::PublishLocalValue(LocalPublisher* publisher,
                                     const Value& value, bool force) {
   if (!value) {
     return false;

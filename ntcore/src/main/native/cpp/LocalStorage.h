@@ -173,7 +173,7 @@ class LocalStorage final : public net::ILocalStorage {
 
   bool GetTopicExists(NT_Handle handle) {
     std::scoped_lock lock{m_mutex};
-    local::TopicData* topic = m_impl.GetTopic(handle);
+    local::LocalTopic* topic = m_impl.GetTopic(handle);
     return topic && topic->Exists();
   }
 

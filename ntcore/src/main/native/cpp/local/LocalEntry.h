@@ -11,21 +11,21 @@
 
 namespace nt::local {
 
-struct PublisherData;
+struct LocalPublisher;
 
-struct EntryData {
+struct LocalEntry {
   static constexpr auto kType = Handle::kEntry;
 
-  EntryData(NT_Entry handle, SubscriberData* subscriber)
+  LocalEntry(NT_Entry handle, LocalSubscriber* subscriber)
       : handle{handle}, topic{subscriber->topic}, subscriber{subscriber} {}
 
   // invariants
   wpi::SignalObject<NT_Entry> handle;
-  TopicData* topic;
-  SubscriberData* subscriber;
+  LocalTopic* topic;
+  LocalSubscriber* subscriber;
 
   // the publisher (created on demand)
-  PublisherData* publisher{nullptr};
+  LocalPublisher* publisher{nullptr};
 };
 
 }  // namespace nt::local
