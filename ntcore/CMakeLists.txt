@@ -7,6 +7,7 @@ file(
     GLOB ntcore_native_src
     src/main/native/cpp/*.cpp
     src/generated/main/native/cpp/*.cpp
+    src/main/native/cpp/local/*.cpp
     src/main/native/cpp/net/*.cpp
     src/main/native/cpp/net3/*.cpp
     src/main/native/cpp/networktables/*.cpp
