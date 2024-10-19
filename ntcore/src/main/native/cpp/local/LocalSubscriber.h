@@ -16,10 +16,10 @@
 
 namespace nt::local {
 
-struct SubscriberData {
+struct LocalSubscriber {
   static constexpr auto kType = Handle::kSubscriber;
 
-  SubscriberData(NT_Subscriber handle, TopicData* topic, PubSubConfig config)
+  LocalSubscriber(NT_Subscriber handle, LocalTopic* topic, PubSubConfig config)
       : handle{handle},
         topic{topic},
         config{std::move(config)},
@@ -35,7 +35,7 @@ struct SubscriberData {
 
   // invariants
   wpi::SignalObject<NT_Subscriber> handle;
-  TopicData* topic;
+  LocalTopic* topic;
   PubSubConfig config;
 
   // whether or not the subscriber should actually receive values

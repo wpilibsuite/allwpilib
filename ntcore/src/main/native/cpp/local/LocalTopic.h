@@ -18,19 +18,19 @@
 
 namespace nt::local {
 
-struct EntryData;
-struct MultiSubscriberData;
-struct PublisherData;
-struct SubscriberData;
+struct LocalEntry;
+struct LocalMultiSubscriber;
+struct LocalPublisher;
+struct LocalSubscriber;
 
 constexpr bool IsSpecial(std::string_view name) {
   return name.empty() ? false : name.front() == '$';
 }
 
-struct TopicData {
+struct LocalTopic {
   static constexpr auto kType = Handle::kTopic;
 
-  TopicData(NT_Topic handle, std::string_view name)
+  LocalTopic(NT_Topic handle, std::string_view name)
       : handle{handle}, name{name}, special{IsSpecial(name)} {}
 
   bool Exists() const { return onNetwork || !localPublishers.empty(); }
@@ -59,18 +59,18 @@ struct TopicData {
   unsigned int flags{0};            // for NT3 APIs
   std::string propertiesStr{"{}"};  // cached string for GetTopicInfo() et al
   wpi::json properties = wpi::json::object();
-  EntryData* entry{nullptr};  // cached entry for GetEntry()
+  LocalEntry* entry{nullptr};  // cached entry for GetEntry()
 
   bool onNetwork{false};  // true if there are any remote publishers
   bool lastValueFromNetwork{false};
 
-  wpi::SmallVector<DataLoggerEntry, 1> datalogs;
+  wpi::SmallVector<LocalDataLoggerEntry, 1> datalogs;
   NT_Type datalogType{NT_UNASSIGNED};
 
-  VectorSet<PublisherData*> localPublishers;
-  VectorSet<SubscriberData*> localSubscribers;
-  VectorSet<MultiSubscriberData*> multiSubscribers;
-  VectorSet<EntryData*> entries;
+  VectorSet<LocalPublisher*> localPublishers;
+  VectorSet<LocalSubscriber*> localSubscribers;
+  VectorSet<LocalMultiSubscriber*> multiSubscribers;
+  VectorSet<LocalEntry*> entries;
   VectorSet<NT_Listener> listeners;
 };
 

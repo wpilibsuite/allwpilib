@@ -18,16 +18,16 @@ class DataLog;
 
 namespace nt::local {
 
-struct TopicData;
+struct LocalTopic;
 
-struct DataLoggerData {
+struct LocalDataLogger {
   static constexpr auto kType = Handle::kDataLogger;
 
-  DataLoggerData(NT_DataLogger handle, wpi::log::DataLog& log,
-                 std::string_view prefix, std::string_view logPrefix)
+  LocalDataLogger(NT_DataLogger handle, wpi::log::DataLog& log,
+                  std::string_view prefix, std::string_view logPrefix)
       : handle{handle}, log{log}, prefix{prefix}, logPrefix{logPrefix} {}
 
-  int Start(TopicData* topic, int64_t time);
+  int Start(LocalTopic* topic, int64_t time);
 
   NT_DataLogger handle;
   wpi::log::DataLog& log;

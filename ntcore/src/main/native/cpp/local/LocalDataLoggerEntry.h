@@ -19,10 +19,10 @@ class Value;
 
 namespace nt::local {
 
-struct TopicData;
+struct LocalTopic;
 
-struct DataLoggerEntry {
-  DataLoggerEntry(wpi::log::DataLog& log, int entry, NT_DataLogger logger)
+struct LocalDataLoggerEntry {
+  LocalDataLoggerEntry(wpi::log::DataLog& log, int entry, NT_DataLogger logger)
       : log{&log}, entry{entry}, logger{logger} {}
 
   static std::string MakeMetadata(std::string_view properties);

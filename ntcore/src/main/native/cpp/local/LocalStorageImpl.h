@@ -47,13 +47,13 @@ class StorageImpl {
   // Network interface functions
   //
 
-  void NetworkAnnounce(TopicData* topic, std::string_view typeStr,
+  void NetworkAnnounce(LocalTopic* topic, std::string_view typeStr,
                        const wpi::json& properties, std::optional<int> pubuid);
-  void RemoveNetworkPublisher(TopicData* topic);
-  void NetworkPropertiesUpdate(TopicData* topic, const wpi::json& update,
+  void RemoveNetworkPublisher(LocalTopic* topic);
+  void NetworkPropertiesUpdate(LocalTopic* topic, const wpi::json& update,
                                bool ack);
 
-  void ServerSetValue(TopicData* topic, const Value& value) {
+  void ServerSetValue(LocalTopic* topic, const Value& value) {
     if (SetValue(topic, value, NT_EVENT_VALUE_REMOTE, false, nullptr)) {
       if (topic->IsCached()) {
         topic->lastValueNetwork = value;
@@ -69,9 +69,9 @@ class StorageImpl {
   // Topic functions
   //
 
-  TopicData* GetOrCreateTopic(std::string_view name);
+  LocalTopic* GetOrCreateTopic(std::string_view name);
 
-  template <std::invocable<const TopicData&> F>
+  template <std::invocable<const LocalTopic&> F>
   void ForEachTopic(std::string_view prefix, unsigned int types,
                     F&& func) const {
     for (auto&& topic : m_topics) {
@@ -88,7 +88,7 @@ class StorageImpl {
     }
   }
 
-  template <std::invocable<const TopicData&> F>
+  template <std::invocable<const LocalTopic&> F>
   void ForEachTopic(std::string_view prefix,
                     std::span<const std::string_view> types, F&& func) const {
     for (auto&& topic : m_topics) {
@@ -118,17 +118,17 @@ class StorageImpl {
   // Topic property functions
   //
 
-  void SetFlags(TopicData* topic, unsigned int flags);
-  void SetPersistent(TopicData* topic, bool value);
-  void SetRetained(TopicData* topic, bool value);
-  void SetCached(TopicData* topic, bool value);
+  void SetFlags(LocalTopic* topic, unsigned int flags);
+  void SetPersistent(LocalTopic* topic, bool value);
+  void SetRetained(LocalTopic* topic, bool value);
+  void SetCached(LocalTopic* topic, bool value);
 
-  void SetProperty(TopicData* topic, std::string_view name,
+  void SetProperty(LocalTopic* topic, std::string_view name,
                    const wpi::json& value);
-  bool SetProperties(TopicData* topic, const wpi::json& update,
+  bool SetProperties(LocalTopic* topic, const wpi::json& update,
                      bool sendNetwork);
 
-  void DeleteProperty(TopicData* topic, std::string_view name);
+  void DeleteProperty(LocalTopic* topic, std::string_view name);
 
   //
   // Value functions
@@ -149,58 +149,58 @@ class StorageImpl {
   // Publish/Subscribe/Entry functions
   //
 
-  SubscriberData* Subscribe(TopicData* topic, NT_Type type,
-                            std::string_view typeString,
-                            const PubSubOptions& options);
+  LocalSubscriber* Subscribe(LocalTopic* topic, NT_Type type,
+                             std::string_view typeString,
+                             const PubSubOptions& options);
 
-  PublisherData* Publish(TopicData* topic, NT_Type type,
-                         std::string_view typeStr, const wpi::json& properties,
-                         const PubSubOptions& options);
+  LocalPublisher* Publish(LocalTopic* topic, NT_Type type,
+                          std::string_view typeStr, const wpi::json& properties,
+                          const PubSubOptions& options);
 
-  EntryData* GetEntry(TopicData* topicHandle, NT_Type type,
-                      std::string_view typeStr, const PubSubOptions& options);
-  EntryData* GetEntry(std::string_view name);
+  LocalEntry* GetEntry(LocalTopic* topicHandle, NT_Type type,
+                       std::string_view typeStr, const PubSubOptions& options);
+  LocalEntry* GetEntry(std::string_view name);
 
   void RemoveSubEntry(NT_Handle subentryHandle);
 
-  std::unique_ptr<PublisherData> RemoveLocalPublisher(NT_Publisher pubHandle);
+  std::unique_ptr<LocalPublisher> RemoveLocalPublisher(NT_Publisher pubHandle);
 
   //
   // Multi-subscriber functions
   //
 
-  MultiSubscriberData* AddMultiSubscriber(
+  LocalMultiSubscriber* AddMultiSubscriber(
       std::span<const std::string_view> prefixes, const PubSubOptions& options);
 
-  std::unique_ptr<MultiSubscriberData> RemoveMultiSubscriber(
+  std::unique_ptr<LocalMultiSubscriber> RemoveMultiSubscriber(
       NT_MultiSubscriber subHandle);
 
   //
   // Lookup functions
   //
 
-  TopicData* GetTopic(NT_Handle handle);
-  TopicData* GetTopicByHandle(NT_Topic topicHandle) {
+  LocalTopic* GetTopic(NT_Handle handle);
+  LocalTopic* GetTopicByHandle(NT_Topic topicHandle) {
     return m_topics.Get(topicHandle);
   }
-  TopicData* GetTopicByName(std::string_view name) {
+  LocalTopic* GetTopicByName(std::string_view name) {
     return m_nameTopics.lookup(name);
   }
-  TopicData* GetTopicById(int topicId) {
+  LocalTopic* GetTopicById(int topicId) {
     return m_topics.Get(Handle{m_inst, topicId, Handle::kTopic});
   }
 
-  SubscriberData* GetSubEntry(NT_Handle subentryHandle);
+  LocalSubscriber* GetSubEntry(NT_Handle subentryHandle);
 
-  EntryData* GetEntryByHandle(NT_Entry entryHandle) {
+  LocalEntry* GetEntryByHandle(NT_Entry entryHandle) {
     return m_entries.Get(entryHandle);
   }
 
-  MultiSubscriberData* GetMultiSubscriberByHandle(NT_MultiSubscriber handle) {
+  LocalMultiSubscriber* GetMultiSubscriberByHandle(NT_MultiSubscriber handle) {
     return m_multiSubscribers.Get(handle);
   }
 
-  SubscriberData* GetSubscriberByHandle(NT_Subscriber handle) {
+  LocalSubscriber* GetSubscriberByHandle(NT_Subscriber handle) {
     return m_subscribers.Get(handle);
   }
 
@@ -208,13 +208,13 @@ class StorageImpl {
   // Listener functions
   //
 
-  void AddListenerImpl(NT_Listener listenerHandle, TopicData* topic,
+  void AddListenerImpl(NT_Listener listenerHandle, LocalTopic* topic,
                        unsigned int eventMask);
-  void AddListenerImpl(NT_Listener listenerHandle, SubscriberData* subscriber,
+  void AddListenerImpl(NT_Listener listenerHandle, LocalSubscriber* subscriber,
                        unsigned int eventMask, NT_Handle subentryHandle,
                        bool subscriberOwned);
   void AddListenerImpl(NT_Listener listenerHandle,
-                       MultiSubscriberData* subscriber, unsigned int eventMask,
+                       LocalMultiSubscriber* subscriber, unsigned int eventMask,
                        bool subscriberOwned);
   void RemoveListener(NT_Listener listener, unsigned int mask);
 
@@ -222,8 +222,8 @@ class StorageImpl {
   // Data log functions
   //
 
-  DataLoggerData* StartDataLog(wpi::log::DataLog& log, std::string_view prefix,
-                               std::string_view logPrefix);
+  LocalDataLogger* StartDataLog(wpi::log::DataLog& log, std::string_view prefix,
+                                std::string_view logPrefix);
   void StopDataLog(NT_DataLogger logger);
 
   //
@@ -238,39 +238,39 @@ class StorageImpl {
 
  private:
   // topic functions
-  void NotifyTopic(TopicData* topic, unsigned int eventFlags);
+  void NotifyTopic(LocalTopic* topic, unsigned int eventFlags);
 
-  void CheckReset(TopicData* topic);
+  void CheckReset(LocalTopic* topic);
 
-  bool SetValue(TopicData* topic, const Value& value, unsigned int eventFlags,
-                bool suppressIfDuplicate, const PublisherData* publisher);
-  void NotifyValue(TopicData* topic, const Value& value,
+  bool SetValue(LocalTopic* topic, const Value& value, unsigned int eventFlags,
+                bool suppressIfDuplicate, const LocalPublisher* publisher);
+  void NotifyValue(LocalTopic* topic, const Value& value,
                    unsigned int eventFlags, bool isDuplicate,
-                   const PublisherData* publisher);
+                   const LocalPublisher* publisher);
 
-  void PropertiesUpdated(TopicData* topic, const wpi::json& update,
+  void PropertiesUpdated(LocalTopic* topic, const wpi::json& update,
                          unsigned int eventFlags, bool sendNetwork,
                          bool updateFlags = true);
 
-  void RefreshPubSubActive(TopicData* topic, bool warnOnSubMismatch);
+  void RefreshPubSubActive(LocalTopic* topic, bool warnOnSubMismatch);
 
-  PublisherData* AddLocalPublisher(TopicData* topic,
-                                   const wpi::json& properties,
-                                   const PubSubConfig& options);
+  LocalPublisher* AddLocalPublisher(LocalTopic* topic,
+                                    const wpi::json& properties,
+                                    const PubSubConfig& options);
 
-  SubscriberData* AddLocalSubscriber(TopicData* topic,
-                                     const PubSubConfig& options);
+  LocalSubscriber* AddLocalSubscriber(LocalTopic* topic,
+                                      const PubSubConfig& options);
 
-  std::unique_ptr<SubscriberData> RemoveLocalSubscriber(
+  std::unique_ptr<LocalSubscriber> RemoveLocalSubscriber(
       NT_Subscriber subHandle);
 
-  EntryData* AddEntry(SubscriberData* subscriber) {
+  LocalEntry* AddEntry(LocalSubscriber* subscriber) {
     auto entry = m_entries.Add(m_inst, subscriber);
     subscriber->topic->entries.Add(entry);
     return entry;
   }
 
-  std::unique_ptr<EntryData> RemoveEntry(NT_Entry entryHandle) {
+  std::unique_ptr<LocalEntry> RemoveEntry(NT_Entry entryHandle) {
     auto entry = m_entries.Remove(entryHandle);
     if (entry) {
       entry->topic->entries.Remove(entry.get());
@@ -278,9 +278,9 @@ class StorageImpl {
     return entry;
   }
 
-  PublisherData* PublishEntry(EntryData* entry, NT_Type type);
+  LocalPublisher* PublishEntry(LocalEntry* entry, NT_Type type);
 
-  bool PublishLocalValue(PublisherData* publisher, const Value& value,
+  bool PublishLocalValue(LocalPublisher* publisher, const Value& value,
                          bool force = false);
 
  private:
@@ -290,21 +290,21 @@ class StorageImpl {
   net::ClientMessageHandler* m_network{nullptr};
 
   // handle mappings
-  HandleMap<TopicData, 16> m_topics;
-  HandleMap<PublisherData, 16> m_publishers;
-  HandleMap<SubscriberData, 16> m_subscribers;
-  HandleMap<EntryData, 16> m_entries;
-  HandleMap<MultiSubscriberData, 16> m_multiSubscribers;
-  HandleMap<DataLoggerData, 16> m_dataloggers;
+  HandleMap<LocalTopic, 16> m_topics;
+  HandleMap<LocalPublisher, 16> m_publishers;
+  HandleMap<LocalSubscriber, 16> m_subscribers;
+  HandleMap<LocalEntry, 16> m_entries;
+  HandleMap<LocalMultiSubscriber, 16> m_multiSubscribers;
+  HandleMap<LocalDataLogger, 16> m_dataloggers;
 
   // name mappings
-  wpi::StringMap<TopicData*> m_nameTopics;
+  wpi::StringMap<LocalTopic*> m_nameTopics;
 
   // listeners
-  wpi::DenseMap<NT_Listener, std::unique_ptr<ListenerData>> m_listeners;
+  wpi::DenseMap<NT_Listener, std::unique_ptr<LocalListener>> m_listeners;
 
   // string-based listeners
-  VectorSet<ListenerData*> m_topicPrefixListeners;
+  VectorSet<LocalListener*> m_topicPrefixListeners;
 
   // schema publishers
   wpi::StringMap<NT_Publisher> m_schemas;

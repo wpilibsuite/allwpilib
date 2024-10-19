@@ -14,10 +14,10 @@
 
 namespace nt::local {
 
-struct PublisherData {
+struct LocalPublisher {
   static constexpr auto kType = Handle::kPublisher;
 
-  PublisherData(NT_Publisher handle, TopicData* topic, PubSubConfig config)
+  LocalPublisher(NT_Publisher handle, LocalTopic* topic, PubSubConfig config)
       : handle{handle}, topic{topic}, config{std::move(config)} {}
 
   void UpdateActive() {
@@ -26,7 +26,7 @@ struct PublisherData {
 
   // invariants
   wpi::SignalObject<NT_Publisher> handle;
-  TopicData* topic;
+  LocalTopic* topic;
   PubSubConfig config;
 
   // whether or not the publisher should actually publish values

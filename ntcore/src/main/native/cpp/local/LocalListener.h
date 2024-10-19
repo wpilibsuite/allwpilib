@@ -8,18 +8,18 @@
 
 namespace nt::local {
 
-struct MultiSubscriberData;
-struct SubscriberData;
+struct LocalMultiSubscriber;
+struct LocalSubscriber;
 
-struct ListenerData {
-  ListenerData(NT_Listener handle, SubscriberData* subscriber,
-               unsigned int eventMask, bool subscriberOwned)
+struct LocalListener {
+  LocalListener(NT_Listener handle, LocalSubscriber* subscriber,
+                unsigned int eventMask, bool subscriberOwned)
       : handle{handle},
         eventMask{eventMask},
         subscriber{subscriber},
         subscriberOwned{subscriberOwned} {}
-  ListenerData(NT_Listener handle, MultiSubscriberData* subscriber,
-               unsigned int eventMask, bool subscriberOwned)
+  LocalListener(NT_Listener handle, LocalMultiSubscriber* subscriber,
+                unsigned int eventMask, bool subscriberOwned)
       : handle{handle},
         eventMask{eventMask},
         multiSubscriber{subscriber},
@@ -27,8 +27,8 @@ struct ListenerData {
 
   NT_Listener handle;
   unsigned int eventMask;
-  SubscriberData* subscriber{nullptr};
-  MultiSubscriberData* multiSubscriber{nullptr};
+  LocalSubscriber* subscriber{nullptr};
+  LocalMultiSubscriber* multiSubscriber{nullptr};
   bool subscriberOwned;
 };
 

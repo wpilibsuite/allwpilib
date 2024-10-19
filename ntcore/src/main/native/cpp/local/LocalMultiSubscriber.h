@@ -24,12 +24,12 @@ constexpr bool PrefixMatch(std::string_view name, std::string_view prefix,
   return (!special || !prefix.empty()) && wpi::starts_with(name, prefix);
 }
 
-struct MultiSubscriberData {
+struct LocalMultiSubscriber {
   static constexpr auto kType = Handle::kMultiSubscriber;
 
-  MultiSubscriberData(NT_MultiSubscriber handle,
-                      std::span<const std::string_view> prefixes,
-                      const PubSubOptionsImpl& options)
+  LocalMultiSubscriber(NT_MultiSubscriber handle,
+                       std::span<const std::string_view> prefixes,
+                       const PubSubOptionsImpl& options)
       : handle{handle}, options{options} {
     this->options.prefixMatch = true;
     this->prefixes.reserve(prefixes.size());
