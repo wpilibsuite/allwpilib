@@ -240,8 +240,6 @@ class StorageImpl {
   // topic functions
   void NotifyTopic(LocalTopic* topic, unsigned int eventFlags);
 
-  void CheckReset(LocalTopic* topic);
-
   bool SetValue(LocalTopic* topic, const Value& value, unsigned int eventFlags,
                 bool suppressIfDuplicate, const LocalPublisher* publisher);
   void NotifyValue(LocalTopic* topic, const Value& value,

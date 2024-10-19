@@ -95,7 +95,7 @@ void StorageImpl::RemoveNetworkPublisher(LocalTopic* topic) {
   topic->onNetwork = false;
   if (didExist && !topic->Exists()) {
     DEBUG4("Unpublished {}", topic->name);
-    CheckReset(topic);
+    topic->ResetIfDoesNotExist();
     NotifyTopic(topic, NT_EVENT_UNPUBLISH);
   }
 
@@ -481,7 +481,7 @@ std::unique_ptr<LocalPublisher> StorageImpl::RemoveLocalPublisher(
     bool didExist = topic->Exists();
     topic->localPublishers.Remove(publisher.get());
     if (didExist && !topic->Exists()) {
-      CheckReset(topic);
+      topic->ResetIfDoesNotExist();
       NotifyTopic(topic, NT_EVENT_UNPUBLISH);
     }
 
@@ -804,10 +804,7 @@ LocalDataLogger* StorageImpl::StartDataLog(wpi::log::DataLog& log,
         topic->type == NT_UNASSIGNED || topic->typeStr.empty()) {
       continue;
     }
-    topic->datalogs.emplace_back(log, datalogger->Start(topic.get(), now),
-                                 datalogger->handle);
-    topic->datalogType = topic->type;
-
+    topic->StartStopDataLog(datalogger, now, true);
     // log current value, if any
     if (topic->lastValue) {
       topic->datalogs.back().Append(topic->lastValue);
@@ -906,20 +903,6 @@ void StorageImpl::NotifyTopic(LocalTopic* topic, unsigned int eventFlags) {
   } else if ((eventFlags & NT_EVENT_PROPERTIES) != 0) {
     topic->UpdateDataLogProperties();
   }
-}
-
-void StorageImpl::CheckReset(LocalTopic* topic) {
-  if (topic->Exists()) {
-    return;
-  }
-  topic->lastValue = {};
-  topic->lastValueNetwork = {};
-  topic->lastValueFromNetwork = false;
-  topic->type = NT_UNASSIGNED;
-  topic->typeStr.clear();
-  topic->flags = 0;
-  topic->properties = wpi::json::object();
-  topic->propertiesStr = "{}";
 }
 
 bool StorageImpl::SetValue(LocalTopic* topic, const Value& value,

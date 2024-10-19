@@ -16,8 +16,12 @@ void LocalTopic::StartStopDataLog(LocalDataLogger* logger, int64_t timestamp,
       datalogs.begin(), datalogs.end(),
       [&](const auto& elem) { return elem.logger == logger->handle; });
   if (publish && it == datalogs.end()) {
-    datalogs.emplace_back(logger->log, logger->Start(this, timestamp),
-                          logger->handle);
+    datalogs.emplace_back(
+        logger->log,
+        logger->Start(name, typeStr,
+                      LocalDataLoggerEntry::MakeMetadata(propertiesStr),
+                      timestamp),
+        logger->handle);
     datalogType = type;
   } else if (!publish && it != datalogs.end()) {
     it->Finish(timestamp);
@@ -41,6 +45,20 @@ void LocalTopic::RefreshProperties(bool updateFlags) {
     RefreshFlags();
   }
   propertiesStr = properties.dump();
+}
+
+void LocalTopic::ResetIfDoesNotExist() {
+  if (Exists()) {
+    return;
+  }
+  lastValue = {};
+  lastValueNetwork = {};
+  lastValueFromNetwork = false;
+  type = NT_UNASSIGNED;
+  typeStr.clear();
+  flags = 0;
+  properties = wpi::json::object();
+  propertiesStr = "{}";
 }
 
 void LocalTopic::RefreshFlags() {

@@ -8,22 +8,17 @@
 #include <wpi/DataLog.h>
 #include <wpi/StringExtras.h>
 
-#include "local/LocalDataLoggerEntry.h"
-#include "local/LocalTopic.h"
-
 using namespace nt::local;
 
-int LocalDataLogger::Start(LocalTopic* topic, int64_t time) {
-  std::string_view typeStr = topic->typeStr;
+int LocalDataLogger::Start(std::string_view name, std::string_view typeStr,
+                           std::string_view metadata, int64_t time) {
   // NT and DataLog use different standard representations for int and int[]
   if (typeStr == "int") {
     typeStr = "int64";
   } else if (typeStr == "int[]") {
     typeStr = "int64[]";
   }
-  return log.Start(
-      fmt::format(
-          "{}{}", logPrefix,
-          wpi::remove_prefix(topic->name, prefix).value_or(topic->name)),
-      typeStr, LocalDataLoggerEntry::MakeMetadata(topic->propertiesStr), time);
+  return log.Start(fmt::format("{}{}", logPrefix,
+                               wpi::remove_prefix(name, prefix).value_or(name)),
+                   typeStr, metadata, time);
 }

@@ -27,7 +27,8 @@ struct LocalDataLogger {
                   std::string_view prefix, std::string_view logPrefix)
       : handle{handle}, log{log}, prefix{prefix}, logPrefix{logPrefix} {}
 
-  int Start(LocalTopic* topic, int64_t time);
+  int Start(std::string_view name, std::string_view typeStr,
+            std::string_view metadata, int64_t time);
 
   NT_DataLogger handle;
   wpi::log::DataLog& log;
