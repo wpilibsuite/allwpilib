@@ -397,8 +397,8 @@ class LocalStorage final : public net::ILocalStorage {
   // Index-only
   NT_Entry GetEntry(std::string_view name) {
     std::scoped_lock lock{m_mutex};
-    if (auto topic = m_impl.GetEntry(name)) {
-      return topic->entry;
+    if (auto entry = m_impl.GetEntry(name)) {
+      return entry->handle;
     } else {
       return {};
     }

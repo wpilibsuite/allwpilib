@@ -159,7 +159,7 @@ class StorageImpl {
 
   EntryData* GetEntry(TopicData* topicHandle, NT_Type type,
                       std::string_view typeStr, const PubSubOptions& options);
-  TopicData* GetEntry(std::string_view name);
+  EntryData* GetEntry(std::string_view name);
 
   void RemoveSubEntry(NT_Handle subentryHandle);
 
