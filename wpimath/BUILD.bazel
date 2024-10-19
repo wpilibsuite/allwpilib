@@ -1,10 +1,80 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//protoplugin:wpi_proto_library.bzl", "wpi_proto_library")
 
 filegroup(
     name = "generated_java",
     srcs = glob(["src/generated/main/java/**/*.java"]),
     visibility = ["//wpimath:__subpackages__"],
+)
+
+wpi_proto_library(
+    name = "cc_proto",
+    include_prefix = "wpimath/src/main/proto",
+    proto_files = glob(["src/main/proto/*.proto"]),
+)
+
+cc_library(
+    name = "eigen-headers",
+    hdrs = glob([
+        "src/main/native/thirdparty/eigen/include/**",
+    ]),
+    includes = ["src/main/native/thirdparty/eigen/include"],
+    strip_include_prefix = "src/main/native/thirdparty/eigen/include",
+    visibility = ["//wpimath:__subpackages__"],
+)
+
+cc_library(
+    name = "gcem",
+    hdrs = glob([
+        "src/main/native/thirdparty/gcem/include/**",
+    ]),
+    includes = ["src/main/native/thirdparty/gcem/include"],
+    strip_include_prefix = "src/main/native/thirdparty/gcem/include",
+    visibility = ["//wpimath:__subpackages__"],
+)
+
+cc_library(
+    name = "sleipnir-headers",
+    hdrs = glob([
+        "src/main/native/thirdparty/sleipnir/include/**/*.hpp",
+    ]),
+    includes = ["src/main/native/thirdparty/sleipnir/include"],
+    strip_include_prefix = "src/main/native/thirdparty/sleipnir/include",
+    visibility = ["//wpimath:__subpackages__"],
+)
+
+filegroup(
+    name = "sleipnir-srcs",
+    srcs = glob(["src/main/native/thirdparty/sleipnir/src/**"]),
+    visibility = ["//wpimath:__subpackages__"],
+)
+
+cc_library(
+    name = "wpimath.static",
+    srcs = glob(
+        ["src/main/native/cpp/**"],
+        exclude = ["src/main/native/cpp/jni/**"],
+    ) + [
+        ":cc_proto.srcs",
+        ":sleipnir-srcs",
+    ],
+    hdrs = glob(["src/main/native/include/**"]),
+    defines = ["WPILIB_EXPORTS"],
+    includes = [
+        "src/main/native/include",
+        "src/main/native/thirdparty/sleipnir/src",
+    ],
+    strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":cc_proto.hdrs",
+        ":eigen-headers",
+        ":gcem",
+        ":sleipnir-headers",
+        "//wpiutil:wpiutil.static",
+    ],
 )
 
 java_library(
@@ -21,6 +91,40 @@ java_library(
         "@maven//:org_ejml_ejml_ddense",
         "@maven//:org_ejml_ejml_simple",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+cc_library(
+    name = "test_headers",
+    hdrs = glob([
+        "src/test/native/include/**",
+    ]),
+    strip_include_prefix = "src/test/native/include",
+)
+
+cc_test(
+    name = "wpimath-cpp-test",
+    size = "small",
+    srcs = glob([
+        "src/test/native/cpp/**/*.cpp",
+        "src/test/native/cpp/**/*.h",
+    ]),
+    tags = [
+        "no-bullseye",
+        "no-raspi",
+    ],
+    deps = [
+        ":test_headers",
+        ":wpimath.static",
+        "//thirdparty/googletest:googletest.static",
+    ],
+)
+
+cc_binary(
+    name = "DevMain-Cpp",
+    srcs = ["src/dev/native/cpp/main.cpp"],
+    deps = [
+        ":wpimath.static",
     ],
 )
 
