@@ -4,7 +4,6 @@
 
 #include "LocalStorageImpl.h"
 
-#include <algorithm>
 #include <string_view>
 
 #include <fmt/format.h>
@@ -990,53 +989,13 @@ void StorageImpl::PropertiesUpdated(LocalTopic* topic, const wpi::json& update,
                                     bool updateFlags) {
   DEBUG4("PropertiesUpdated({}, {}, {}, {}, {})", topic->name, update.dump(),
          eventFlags, sendNetwork, updateFlags);
-  if (updateFlags) {
-    // set flags from properties
-    auto it = topic->properties.find("persistent");
-    if (it != topic->properties.end()) {
-      if (auto val = it->get_ptr<bool*>()) {
-        if (*val) {
-          topic->flags |= NT_PERSISTENT;
-        } else {
-          topic->flags &= ~NT_PERSISTENT;
-        }
-      }
-    }
-    it = topic->properties.find("retained");
-    if (it != topic->properties.end()) {
-      if (auto val = it->get_ptr<bool*>()) {
-        if (*val) {
-          topic->flags |= NT_RETAINED;
-        } else {
-          topic->flags &= ~NT_RETAINED;
-        }
-      }
-    }
-    it = topic->properties.find("cached");
-    if (it != topic->properties.end()) {
-      if (auto val = it->get_ptr<bool*>()) {
-        if (*val) {
-          topic->flags &= ~NT_UNCACHED;
-        } else {
-          topic->flags |= NT_UNCACHED;
-        }
-      }
-    }
-
-    if ((topic->flags & NT_UNCACHED) != 0) {
-      topic->lastValue = {};
-      topic->lastValueNetwork = {};
-      topic->lastValueFromNetwork = false;
-    }
-
-    if ((topic->flags & NT_UNCACHED) != 0 &&
-        (topic->flags & NT_PERSISTENT) != 0) {
-      WARN("topic {}: disabling cached property disables persistent storage",
-           topic->name);
-    }
+  topic->RefreshProperties(updateFlags);
+  if (updateFlags && (topic->flags & NT_UNCACHED) != 0 &&
+      (topic->flags & NT_PERSISTENT) != 0) {
+    WARN("topic {}: disabling cached property disables persistent storage",
+         topic->name);
   }
 
-  topic->propertiesStr = topic->properties.dump();
   NotifyTopic(topic, eventFlags | NT_EVENT_PROPERTIES);
   // check local flag so we don't echo back received properties changes
   if (m_network && sendNetwork) {

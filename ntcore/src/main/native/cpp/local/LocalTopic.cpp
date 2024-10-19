@@ -35,3 +35,49 @@ void LocalTopic::UpdateDataLogProperties() {
     }
   }
 }
+
+void LocalTopic::RefreshProperties(bool updateFlags) {
+  if (updateFlags) {
+    RefreshFlags();
+  }
+  propertiesStr = properties.dump();
+}
+
+void LocalTopic::RefreshFlags() {
+  auto it = properties.find("persistent");
+  if (it != properties.end()) {
+    if (auto val = it->get_ptr<bool*>()) {
+      if (*val) {
+        flags |= NT_PERSISTENT;
+      } else {
+        flags &= ~NT_PERSISTENT;
+      }
+    }
+  }
+  it = properties.find("retained");
+  if (it != properties.end()) {
+    if (auto val = it->get_ptr<bool*>()) {
+      if (*val) {
+        flags |= NT_RETAINED;
+      } else {
+        flags &= ~NT_RETAINED;
+      }
+    }
+  }
+  it = properties.find("cached");
+  if (it != properties.end()) {
+    if (auto val = it->get_ptr<bool*>()) {
+      if (*val) {
+        flags &= ~NT_UNCACHED;
+      } else {
+        flags |= NT_UNCACHED;
+      }
+    }
+  }
+
+  if ((flags & NT_UNCACHED) != 0) {
+    lastValue = {};
+    lastValueNetwork = {};
+    lastValueFromNetwork = false;
+  }
+}

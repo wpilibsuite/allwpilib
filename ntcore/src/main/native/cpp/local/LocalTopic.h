@@ -46,6 +46,8 @@ struct LocalTopic {
                         bool publish);
   void UpdateDataLogProperties();
 
+  void RefreshProperties(bool updateFlags);
+
   TopicInfo GetTopicInfo() const {
     TopicInfo info;
     info.topic = handle;
@@ -81,6 +83,10 @@ struct LocalTopic {
   VectorSet<LocalMultiSubscriber*> multiSubscribers;
   VectorSet<LocalEntry*> entries;
   VectorSet<NT_Listener> listeners;
+
+ private:
+  // update flags from properties
+  void RefreshFlags();
 };
 
 }  // namespace nt::local
