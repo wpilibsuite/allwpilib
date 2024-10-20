@@ -40,6 +40,113 @@ void LocalTopic::UpdateDataLogProperties() {
   }
 }
 
+wpi::json LocalTopic::SetFlags(unsigned int flags) {
+  wpi::json update = wpi::json::object();
+  if ((flags & NT_PERSISTENT) != 0) {
+    properties["persistent"] = true;
+    update["persistent"] = true;
+  } else {
+    properties.erase("persistent");
+    update["persistent"] = wpi::json();
+  }
+  if ((flags & NT_RETAINED) != 0) {
+    properties["retained"] = true;
+    update["retained"] = true;
+  } else {
+    properties.erase("retained");
+    update["retained"] = wpi::json();
+  }
+  if ((flags & NT_UNCACHED) != 0) {
+    properties["cached"] = false;
+    update["cached"] = false;
+  } else {
+    properties.erase("cached");
+    update["cached"] = wpi::json();
+  }
+  if ((flags & NT_UNCACHED) != 0) {
+    lastValue = {};
+    lastValueNetwork = {};
+    lastValueFromNetwork = false;
+  }
+  this->m_flags = flags;
+  return update;
+}
+
+wpi::json LocalTopic::SetPersistent(bool value) {
+  wpi::json update = wpi::json::object();
+  if (value) {
+    m_flags |= NT_PERSISTENT;
+    properties["persistent"] = true;
+    update["persistent"] = true;
+  } else {
+    m_flags &= ~NT_PERSISTENT;
+    properties.erase("persistent");
+    update["persistent"] = wpi::json();
+  }
+  return update;
+}
+
+wpi::json LocalTopic::SetRetained(bool value) {
+  wpi::json update = wpi::json::object();
+  if (value) {
+    m_flags |= NT_RETAINED;
+    properties["retained"] = true;
+    update["retained"] = true;
+  } else {
+    m_flags &= ~NT_RETAINED;
+    properties.erase("retained");
+    update["retained"] = wpi::json();
+  }
+  return update;
+}
+
+wpi::json LocalTopic::SetCached(bool value) {
+  wpi::json update = wpi::json::object();
+  if (value) {
+    m_flags &= ~NT_UNCACHED;
+    properties.erase("cached");
+    update["cached"] = wpi::json();
+  } else {
+    m_flags |= NT_UNCACHED;
+    properties["cached"] = false;
+    update["cached"] = false;
+  }
+  return update;
+}
+
+wpi::json LocalTopic::SetProperty(std::string_view name,
+                                  const wpi::json& value) {
+  if (value.is_null()) {
+    properties.erase(name);
+  } else {
+    properties[name] = value;
+  }
+  wpi::json update = wpi::json::object();
+  update[name] = value;
+  return update;
+}
+
+wpi::json LocalTopic::DeleteProperty(std::string_view name) {
+  properties.erase(name);
+  wpi::json update = wpi::json::object();
+  update[name] = wpi::json();
+  return update;
+}
+
+bool LocalTopic::SetProperties(const wpi::json& update) {
+  if (!update.is_object()) {
+    return false;
+  }
+  for (auto&& change : update.items()) {
+    if (change.value().is_null()) {
+      properties.erase(change.key());
+    } else {
+      properties[change.key()] = change.value();
+    }
+  }
+  return true;
+}
+
 void LocalTopic::RefreshProperties(bool updateFlags) {
   if (updateFlags) {
     RefreshFlags();
@@ -56,7 +163,7 @@ void LocalTopic::ResetIfDoesNotExist() {
   lastValueFromNetwork = false;
   type = NT_UNASSIGNED;
   typeStr.clear();
-  flags = 0;
+  m_flags = 0;
   properties = wpi::json::object();
   propertiesStr = "{}";
 }
@@ -66,9 +173,9 @@ void LocalTopic::RefreshFlags() {
   if (it != properties.end()) {
     if (auto val = it->get_ptr<bool*>()) {
       if (*val) {
-        flags |= NT_PERSISTENT;
+        m_flags |= NT_PERSISTENT;
       } else {
-        flags &= ~NT_PERSISTENT;
+        m_flags &= ~NT_PERSISTENT;
       }
     }
   }
@@ -76,9 +183,9 @@ void LocalTopic::RefreshFlags() {
   if (it != properties.end()) {
     if (auto val = it->get_ptr<bool*>()) {
       if (*val) {
-        flags |= NT_RETAINED;
+        m_flags |= NT_RETAINED;
       } else {
-        flags &= ~NT_RETAINED;
+        m_flags &= ~NT_RETAINED;
       }
     }
   }
@@ -86,14 +193,14 @@ void LocalTopic::RefreshFlags() {
   if (it != properties.end()) {
     if (auto val = it->get_ptr<bool*>()) {
       if (*val) {
-        flags &= ~NT_UNCACHED;
+        m_flags &= ~NT_UNCACHED;
       } else {
-        flags |= NT_UNCACHED;
+        m_flags |= NT_UNCACHED;
       }
     }
   }
 
-  if ((flags & NT_UNCACHED) != 0) {
+  if ((m_flags & NT_UNCACHED) != 0) {
     lastValue = {};
     lastValueNetwork = {};
     lastValueFromNetwork = false;

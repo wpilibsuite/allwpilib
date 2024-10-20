@@ -195,119 +195,48 @@ LocalTopic* StorageImpl::GetOrCreateTopic(std::string_view name) {
 //
 
 void StorageImpl::SetFlags(LocalTopic* topic, unsigned int flags) {
-  wpi::json update = wpi::json::object();
-  if ((flags & NT_PERSISTENT) != 0) {
-    topic->properties["persistent"] = true;
-    update["persistent"] = true;
-  } else {
-    topic->properties.erase("persistent");
-    update["persistent"] = wpi::json();
-  }
-  if ((flags & NT_RETAINED) != 0) {
-    topic->properties["retained"] = true;
-    update["retained"] = true;
-  } else {
-    topic->properties.erase("retained");
-    update["retained"] = wpi::json();
-  }
-  if ((flags & NT_UNCACHED) != 0) {
-    topic->properties["cached"] = false;
-    update["cached"] = false;
-  } else {
-    topic->properties.erase("cached");
-    update["cached"] = wpi::json();
-  }
-  if ((flags & NT_UNCACHED) != 0) {
-    topic->lastValue = {};
-    topic->lastValueNetwork = {};
-    topic->lastValueFromNetwork = false;
-  }
+  wpi::json update = topic->SetFlags(flags);
   if ((flags & NT_UNCACHED) != 0 && (flags & NT_PERSISTENT) != 0) {
     WARN("topic {}: disabling cached property disables persistent storage",
          topic->name);
   }
-  topic->flags = flags;
   if (!update.empty()) {
     PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
   }
 }
 
 void StorageImpl::SetPersistent(LocalTopic* topic, bool value) {
-  wpi::json update = wpi::json::object();
-  if (value) {
-    topic->flags |= NT_PERSISTENT;
-    topic->properties["persistent"] = true;
-    update["persistent"] = true;
-  } else {
-    topic->flags &= ~NT_PERSISTENT;
-    topic->properties.erase("persistent");
-    update["persistent"] = wpi::json();
-  }
-  PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
+  PropertiesUpdated(topic, topic->SetPersistent(value), NT_EVENT_NONE, true,
+                    false);
 }
 
 void StorageImpl::SetRetained(LocalTopic* topic, bool value) {
-  wpi::json update = wpi::json::object();
-  if (value) {
-    topic->flags |= NT_RETAINED;
-    topic->properties["retained"] = true;
-    update["retained"] = true;
-  } else {
-    topic->flags &= ~NT_RETAINED;
-    topic->properties.erase("retained");
-    update["retained"] = wpi::json();
-  }
-  PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
+  PropertiesUpdated(topic, topic->SetRetained(value), NT_EVENT_NONE, true,
+                    false);
 }
 
 void StorageImpl::SetCached(LocalTopic* topic, bool value) {
-  wpi::json update = wpi::json::object();
-  if (value) {
-    topic->flags &= ~NT_UNCACHED;
-    topic->properties.erase("cached");
-    update["cached"] = wpi::json();
-  } else {
-    topic->flags |= NT_UNCACHED;
-    topic->properties["cached"] = false;
-    update["cached"] = false;
-  }
-  PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
+  PropertiesUpdated(topic, topic->SetCached(value), NT_EVENT_NONE, true, false);
 }
 
 void StorageImpl::SetProperty(LocalTopic* topic, std::string_view name,
                               const wpi::json& value) {
-  if (value.is_null()) {
-    topic->properties.erase(name);
-  } else {
-    topic->properties[name] = value;
-  }
-  wpi::json update = wpi::json::object();
-  update[name] = value;
-  PropertiesUpdated(topic, update, NT_EVENT_NONE, true);
+  PropertiesUpdated(topic, topic->SetProperty(name, value), NT_EVENT_NONE,
+                    true);
 }
 
 bool StorageImpl::SetProperties(LocalTopic* topic, const wpi::json& update,
                                 bool sendNetwork) {
-  if (!update.is_object()) {
-    return false;
-  }
   DEBUG4("SetProperties({},{})", topic->name, sendNetwork);
-  for (auto&& change : update.items()) {
-    if (change.value().is_null()) {
-      topic->properties.erase(change.key());
-    } else {
-      topic->properties[change.key()] = change.value();
-    }
+  if (!topic->SetProperties(update)) {
+    return false;
   }
   PropertiesUpdated(topic, update, NT_EVENT_NONE, sendNetwork);
   return true;
 }
 
 void StorageImpl::DeleteProperty(LocalTopic* topic, std::string_view name) {
-  topic->properties.erase(name);
-  wpi::json update = wpi::json::object();
-  update[name] = wpi::json();
-  PropertiesUpdated(topic, update, NT_EVENT_NONE, true);
+  PropertiesUpdated(topic, topic->DeleteProperty(name), NT_EVENT_NONE, true);
 }
 
 //
@@ -973,8 +902,9 @@ void StorageImpl::PropertiesUpdated(LocalTopic* topic, const wpi::json& update,
   DEBUG4("PropertiesUpdated({}, {}, {}, {}, {})", topic->name, update.dump(),
          eventFlags, sendNetwork, updateFlags);
   topic->RefreshProperties(updateFlags);
-  if (updateFlags && (topic->flags & NT_UNCACHED) != 0 &&
-      (topic->flags & NT_PERSISTENT) != 0) {
+  unsigned int flags = topic->GetFlags();
+  if (updateFlags && (flags & NT_UNCACHED) != 0 &&
+      (flags & NT_PERSISTENT) != 0) {
     WARN("topic {}: disabling cached property disables persistent storage",
          topic->name);
   }

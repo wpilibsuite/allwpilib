@@ -133,7 +133,7 @@ class LocalStorage final : public net::ILocalStorage {
   bool GetTopicPersistent(NT_Topic topicHandle) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.GetTopicByHandle(topicHandle)) {
-      return (topic->flags & NT_PERSISTENT) != 0;
+      return (topic->GetFlags() & NT_PERSISTENT) != 0;
     } else {
       return false;
     }
@@ -149,7 +149,7 @@ class LocalStorage final : public net::ILocalStorage {
   bool GetTopicRetained(NT_Topic topicHandle) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.GetTopicByHandle(topicHandle)) {
-      return (topic->flags & NT_RETAINED) != 0;
+      return (topic->GetFlags() & NT_RETAINED) != 0;
     } else {
       return false;
     }
@@ -165,7 +165,7 @@ class LocalStorage final : public net::ILocalStorage {
   bool GetTopicCached(NT_Topic topicHandle) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.GetTopicByHandle(topicHandle)) {
-      return (topic->flags & NT_UNCACHED) == 0;
+      return (topic->GetFlags() & NT_UNCACHED) == 0;
     } else {
       return false;
     }
@@ -388,7 +388,7 @@ class LocalStorage final : public net::ILocalStorage {
   unsigned int GetEntryFlags(NT_Entry entryHandle) {
     std::scoped_lock lock{m_mutex};
     if (auto entry = m_impl.GetEntryByHandle(entryHandle)) {
-      return entry->subscriber->topic->flags;
+      return entry->subscriber->topic->GetFlags();
     } else {
       return 0;
     }

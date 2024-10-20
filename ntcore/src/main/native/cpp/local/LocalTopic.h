@@ -39,12 +39,25 @@ struct LocalTopic {
 
   bool Exists() const { return onNetwork || !localPublishers.empty(); }
 
-  bool IsCached() const { return (flags & NT_UNCACHED) == 0; }
+  bool IsCached() const { return (m_flags & NT_UNCACHED) == 0; }
 
   // starts if publish is true, stops if false
   void StartStopDataLog(LocalDataLogger* logger, int64_t timestamp,
                         bool publish);
   void UpdateDataLogProperties();
+
+  unsigned int GetFlags() const { return m_flags; }
+
+  // these return update json
+  wpi::json SetFlags(unsigned int flags);
+  wpi::json SetPersistent(bool value);
+  wpi::json SetRetained(bool value);
+  wpi::json SetCached(bool value);
+  wpi::json SetProperty(std::string_view name, const wpi::json& value);
+  wpi::json DeleteProperty(std::string_view name);
+
+  // returns false if not object
+  bool SetProperties(const wpi::json& update);
 
   void RefreshProperties(bool updateFlags);
 
@@ -69,7 +82,6 @@ struct LocalTopic {
   Value lastValueNetwork;
   NT_Type type{NT_UNASSIGNED};
   std::string typeStr;
-  unsigned int flags{0};  // for NT3 APIs
   wpi::json properties = wpi::json::object();
   LocalEntry* entry{nullptr};  // cached entry for GetEntry()
 
@@ -89,6 +101,7 @@ struct LocalTopic {
   // update flags from properties
   void RefreshFlags();
 
+  unsigned int m_flags{0};  // for NT3 APIs
   std::string propertiesStr{"{}"};  // cached string for GetTopicInfo() et al
 };
 
