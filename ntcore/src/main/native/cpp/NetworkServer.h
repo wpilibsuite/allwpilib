@@ -38,7 +38,7 @@ class NetworkServer {
   NetworkServer(std::string_view persistentFilename,
                 std::string_view listenAddress, unsigned int port3,
                 unsigned int port4, net::ILocalStorage& localStorage,
-                IConnectionList& connList, wpi::Logger& logger,
+                IConnectionList& connList, wpi::Logger& logger, bool dedicated,
                 std::function<void()> initDone);
   ~NetworkServer();
 

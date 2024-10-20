@@ -29,8 +29,8 @@
 #include <wpinet/uv/util.h>
 
 #include "IConnectionList.h"
-#include "InstanceImpl.h"
 #include "Log.h"
+#include "net/NetworkInterface.h"
 #include "net/WebSocketConnection.h"
 #include "net/WireDecoder.h"
 #include "net/WireEncoder.h"
@@ -315,7 +315,7 @@ NetworkServer::NetworkServer(std::string_view persistentFilename,
                              unsigned int port4,
                              net::ILocalStorage& localStorage,
                              IConnectionList& connList, wpi::Logger& logger,
-                             std::function<void()> initDone)
+                             bool dedicated, std::function<void()> initDone)
     : m_localStorage{localStorage},
       m_connList{connList},
       m_logger{logger},
@@ -328,10 +328,12 @@ NetworkServer::NetworkServer(std::string_view persistentFilename,
       m_localQueue{logger},
       m_loop(*m_loopRunner.GetLoop()) {
   m_loopRunner.ExecAsync([=, this](uv::Loop& loop) {
-    // connect local storage to server
-    m_serverImpl.SetLocal(&m_localStorage, &m_localQueue);
-    m_localStorage.StartNetwork(&m_localQueue);
-    ProcessAllLocal();
+    if (!dedicated) {
+      // connect local storage to server
+      m_serverImpl.SetLocal(&m_localStorage, &m_localQueue);
+      m_localStorage.StartNetwork(&m_localQueue);
+      ProcessAllLocal();
+    }
 
     // load persistent file first, then initialize
     uv::QueueWork(m_loop, [this] { LoadPersistent(); }, [this] { Init(); });
