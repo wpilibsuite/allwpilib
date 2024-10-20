@@ -278,6 +278,17 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
 
 
   @Override
+  default Mult<AngularVelocityUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<AngularVelocityUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<AngularVelocityUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<AngularVelocityUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<AngularVelocityUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }

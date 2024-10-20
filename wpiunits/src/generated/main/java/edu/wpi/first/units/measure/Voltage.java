@@ -130,8 +130,8 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
-  default Per<VoltageUnit, CurrentUnit> divide(Current divisor) {
-    return (Per<VoltageUnit, CurrentUnit>) Measure.super.divide(divisor);
+  default Resistance divide(Current divisor) {
+    return Ohms.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
@@ -274,6 +274,17 @@ public interface Voltage extends Measure<VoltageUnit> {
   @Override
   default Per<VoltageUnit, PowerUnit> divide(Power divisor) {
     return (Per<VoltageUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<VoltageUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<VoltageUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Current divide(Resistance divisor) {
+    return Amps.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
 
