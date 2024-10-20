@@ -57,6 +57,7 @@ protected:
   }
 
   StringMapImpl(unsigned InitSize, unsigned ItemSize);
+  ~StringMapImpl() { free(TheTable); }
   unsigned RehashTable(unsigned BucketNo = 0);
 
   /// LookupBucketFor - Look up the bucket that the specified string should end
@@ -64,12 +65,20 @@ protected:
   /// specified bucket will be non-null.  Otherwise, it will be null.  In either
   /// case, the FullHashValue field of the bucket will be set to the hash value
   /// of the string.
-  unsigned LookupBucketFor(std::string_view Key);
+  unsigned LookupBucketFor(std::string_view Key) {
+    return LookupBucketFor(Key, hash(Key));
+  }
+
+  /// Overload that explicitly takes precomputed hash(Key).
+  unsigned LookupBucketFor(std::string_view Key, uint32_t FullHashValue);
 
   /// FindKey - Look up the bucket that contains the specified key. If it exists
   /// in the map, return the bucket number of the key.  Otherwise return -1.
   /// This does not modify the map.
-  int FindKey(std::string_view Key) const;
+  int FindKey(std::string_view Key) const { return FindKey(Key, hash(Key)); }
+
+  /// Overload that explicitly takes precomputed hash(Key).
+  int FindKey(std::string_view Key, uint32_t FullHashValue) const;
 
   /// RemoveKey - Remove the specified StringMapEntry from the table, but do not
   /// delete it.  This aborts if the value isn't in the table.
@@ -97,6 +106,13 @@ public:
 
   bool empty() const { return NumItems == 0; }
   unsigned size() const { return NumItems; }
+
+  /// Returns the hash value that will be used for the given string.
+  /// This allows precomputing the value and passing it explicitly
+  /// to some of the functions.
+  /// The implementation of this function is not guaranteed to be stable
+  /// and may change.
+  static uint32_t hash(std::string_view Key);
 
   void swap(StringMapImpl &Other) {
     std::swap(TheTable, Other.TheTable);
@@ -192,7 +208,6 @@ public:
         }
       }
     }
-    free(TheTable);
   }
 
   using AllocTy::getAllocator;
@@ -219,15 +234,19 @@ public:
                       StringMapKeyIterator<ValueTy>(end()));
   }
 
-  iterator find(std::string_view Key) {
-    int Bucket = FindKey(Key);
+  iterator find(std::string_view Key) { return find(Key, hash(Key)); }
+
+  iterator find(std::string_view Key, uint32_t FullHashValue) {
+    int Bucket = FindKey(Key, FullHashValue);
     if (Bucket == -1)
       return end();
     return iterator(TheTable + Bucket, true);
   }
 
-  const_iterator find(std::string_view Key) const {
-    int Bucket = FindKey(Key);
+  const_iterator find(std::string_view Key) const { return find(Key, hash(Key)); }
+
+  const_iterator find(std::string_view Key, uint32_t FullHashValue) const {
+    int Bucket = FindKey(Key, FullHashValue);
     if (Bucket == -1)
       return end();
     return const_iterator(TheTable + Bucket, true);
@@ -276,8 +295,10 @@ public:
       if (FindInRHS == RHS.end())
         return false;
 
-      if (!(KeyValue.getValue() == FindInRHS->getValue()))
-        return false;
+      if constexpr (!std::is_same_v<ValueTy, std::nullopt_t>) {
+        if (!(KeyValue.getValue() == FindInRHS->getValue()))
+          return false;
+      }
     }
 
     return true;
@@ -309,7 +330,13 @@ public:
   /// if and only if the insertion takes place, and the iterator component of
   /// the pair points to the element with key equivalent to the key of the pair.
   std::pair<iterator, bool> insert(std::pair<std::string_view, ValueTy> KV) {
-    return try_emplace(KV.first, std::move(KV.second));
+    return try_emplace_with_hash(KV.first, hash(KV.first),
+                                 std::move(KV.second));
+  }
+
+  std::pair<iterator, bool> insert(std::pair<std::string_view, ValueTy> KV,
+                                   uint32_t FullHashValue) {
+    return try_emplace_with_hash(KV.first, FullHashValue, std::move(KV.second));
   }
 
   /// Inserts elements from range [first, last). If multiple elements in the
@@ -343,7 +370,14 @@ public:
   /// the pair points to the element with key equivalent to the key of the pair.
   template <typename... ArgsTy>
   std::pair<iterator, bool> try_emplace(std::string_view Key, ArgsTy &&...Args) {
-    unsigned BucketNo = LookupBucketFor(Key);
+    return try_emplace_with_hash(Key, hash(Key), std::forward<ArgsTy>(Args)...);
+  }
+
+  template <typename... ArgsTy>
+  std::pair<iterator, bool> try_emplace_with_hash(std::string_view Key,
+                                                  uint32_t FullHashValue,
+                                                  ArgsTy &&...Args) {
+    unsigned BucketNo = LookupBucketFor(Key, FullHashValue);
     StringMapEntryBase *&Bucket = TheTable[BucketNo];
     if (Bucket && Bucket != getTombstoneVal())
       return std::make_pair(iterator(TheTable + BucketNo, false),
