@@ -138,7 +138,7 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(0.0, moduleStates[0].angle.getDegrees(), kEpsilon),
         () -> assertEquals(90.0, moduleStates[1].angle.getDegrees(), kEpsilon),
         () -> assertEquals(180.0, moduleStates[2].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(270.0, moduleStates[3].angle.getDegrees(), kEpsilon));
+        () -> assertEquals(-90.0, moduleStates[3].angle.getDegrees(), kEpsilon));
   }
 
   @Test
