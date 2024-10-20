@@ -65,20 +65,7 @@ void StorageImpl::NetworkAnnounce(LocalTopic* topic, std::string_view typeStr,
 
   // may be properties update, but need to compare to see if it actually
   // changed to determine whether to update string / send event
-  wpi::json update = wpi::json::object();
-  // added/changed
-  for (auto&& prop : properties.items()) {
-    auto it = topic->properties.find(prop.key());
-    if (it == topic->properties.end() || *it != prop.value()) {
-      update[prop.key()] = prop.value();
-    }
-  }
-  // removed
-  for (auto&& prop : topic->properties.items()) {
-    if (properties.find(prop.key()) == properties.end()) {
-      update[prop.key()] = wpi::json();
-    }
-  }
+  wpi::json update = topic->CompareProperties(properties);
   if (!update.empty()) {
     topic->properties = properties;
     PropertiesUpdated(topic, update, event, false);
