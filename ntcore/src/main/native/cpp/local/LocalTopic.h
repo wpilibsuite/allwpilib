@@ -61,13 +61,16 @@ struct LocalTopic {
 
   void RefreshProperties(bool updateFlags);
 
+  // returns update json
+  wpi::json CompareProperties(const wpi::json props);
+
   TopicInfo GetTopicInfo() const {
     TopicInfo info;
     info.topic = handle;
     info.name = name;
     info.type = type;
     info.type_str = typeStr;
-    info.properties = propertiesStr;
+    info.properties = m_propertiesStr;
     return info;
   }
 
@@ -102,7 +105,7 @@ struct LocalTopic {
   void RefreshFlags();
 
   unsigned int m_flags{0};  // for NT3 APIs
-  std::string propertiesStr{"{}"};  // cached string for GetTopicInfo() et al
+  std::string m_propertiesStr{"{}"};  // cached string for GetTopicInfo() et al
 };
 
 }  // namespace nt::local

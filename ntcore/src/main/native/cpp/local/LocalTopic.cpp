@@ -19,7 +19,7 @@ void LocalTopic::StartStopDataLog(LocalDataLogger* logger, int64_t timestamp,
     datalogs.emplace_back(
         logger->log,
         logger->Start(name, typeStr,
-                      LocalDataLoggerEntry::MakeMetadata(propertiesStr),
+                      LocalDataLoggerEntry::MakeMetadata(m_propertiesStr),
                       timestamp),
         logger->handle);
     datalogType = type;
@@ -33,7 +33,7 @@ void LocalTopic::StartStopDataLog(LocalDataLogger* logger, int64_t timestamp,
 void LocalTopic::UpdateDataLogProperties() {
   if (!datalogs.empty()) {
     auto now = Now();
-    auto metadata = LocalDataLoggerEntry::MakeMetadata(propertiesStr);
+    auto metadata = LocalDataLoggerEntry::MakeMetadata(m_propertiesStr);
     for (auto&& datalog : datalogs) {
       datalog.SetMetadata(metadata, now);
     }
@@ -151,7 +151,25 @@ void LocalTopic::RefreshProperties(bool updateFlags) {
   if (updateFlags) {
     RefreshFlags();
   }
-  propertiesStr = properties.dump();
+  m_propertiesStr = properties.dump();
+}
+
+wpi::json LocalTopic::CompareProperties(const wpi::json props) {
+  wpi::json update = wpi::json::object();
+  // added/changed
+  for (auto&& prop : props.items()) {
+    auto it = properties.find(prop.key());
+    if (it == properties.end() || *it != prop.value()) {
+      update[prop.key()] = prop.value();
+    }
+  }
+  // removed
+  for (auto&& prop : properties.items()) {
+    if (props.find(prop.key()) == props.end()) {
+      update[prop.key()] = wpi::json();
+    }
+  }
+  return update;
 }
 
 void LocalTopic::ResetIfDoesNotExist() {
@@ -165,7 +183,7 @@ void LocalTopic::ResetIfDoesNotExist() {
   typeStr.clear();
   m_flags = 0;
   properties = wpi::json::object();
-  propertiesStr = "{}";
+  m_propertiesStr = "{}";
 }
 
 void LocalTopic::RefreshFlags() {
