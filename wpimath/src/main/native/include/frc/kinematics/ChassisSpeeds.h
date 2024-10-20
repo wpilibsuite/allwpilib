@@ -45,7 +45,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    *
    * @return Twist2d.
    */
-  Twist2d ToTwist2d(units::second_t dt) const {
+  constexpr Twist2d ToTwist2d(units::second_t dt) const {
     return Twist2d{vx * dt, vy * dt, omega * dt};
   }
 
@@ -68,10 +68,10 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    *
    * @return Discretized ChassisSpeeds.
    */
-  static ChassisSpeeds Discretize(units::meters_per_second_t vx,
-                                  units::meters_per_second_t vy,
-                                  units::radians_per_second_t omega,
-                                  units::second_t dt) {
+  static constexpr ChassisSpeeds Discretize(units::meters_per_second_t vx,
+                                            units::meters_per_second_t vy,
+                                            units::radians_per_second_t omega,
+                                            units::second_t dt) {
     // Construct the desired pose after a timestep, relative to the current
     // pose. The desired pose has decoupled translation and rotation.
     Pose2d desiredDeltaPose{vx * dt, vy * dt, omega * dt};
@@ -101,8 +101,8 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    *
    * @return Discretized ChassisSpeeds.
    */
-  static ChassisSpeeds Discretize(const ChassisSpeeds& continuousSpeeds,
-                                  units::second_t dt) {
+  static constexpr ChassisSpeeds Discretize(
+      const ChassisSpeeds& continuousSpeeds, units::second_t dt) {
     return Discretize(continuousSpeeds.vx, continuousSpeeds.vy,
                       continuousSpeeds.omega, dt);
   }
@@ -123,7 +123,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * @return ChassisSpeeds object representing the speeds in the robot's frame
    * of reference.
    */
-  static ChassisSpeeds FromFieldRelativeSpeeds(
+  static constexpr ChassisSpeeds FromFieldRelativeSpeeds(
       units::meters_per_second_t vx, units::meters_per_second_t vy,
       units::radians_per_second_t omega, const Rotation2d& robotAngle) {
     // CW rotation into chassis frame
@@ -148,7 +148,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * @return ChassisSpeeds object representing the speeds in the robot's frame
    *    of reference.
    */
-  static ChassisSpeeds FromFieldRelativeSpeeds(
+  static constexpr ChassisSpeeds FromFieldRelativeSpeeds(
       const ChassisSpeeds& fieldRelativeSpeeds, const Rotation2d& robotAngle) {
     return FromFieldRelativeSpeeds(fieldRelativeSpeeds.vx,
                                    fieldRelativeSpeeds.vy,
@@ -171,7 +171,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * @return ChassisSpeeds object representing the speeds in the field's frame
    * of reference.
    */
-  static ChassisSpeeds FromRobotRelativeSpeeds(
+  static constexpr ChassisSpeeds FromRobotRelativeSpeeds(
       units::meters_per_second_t vx, units::meters_per_second_t vy,
       units::radians_per_second_t omega, const Rotation2d& robotAngle) {
     // CCW rotation out of chassis frame
@@ -196,7 +196,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * @return ChassisSpeeds object representing the speeds in the field's frame
    *    of reference.
    */
-  static ChassisSpeeds FromRobotRelativeSpeeds(
+  static constexpr ChassisSpeeds FromRobotRelativeSpeeds(
       const ChassisSpeeds& robotRelativeSpeeds, const Rotation2d& robotAngle) {
     return FromRobotRelativeSpeeds(robotRelativeSpeeds.vx,
                                    robotRelativeSpeeds.vy,
