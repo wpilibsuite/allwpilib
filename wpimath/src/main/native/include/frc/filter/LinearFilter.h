@@ -187,7 +187,7 @@ class LinearFilter {
    */
   template <int Derivative, int Samples>
   static LinearFilter<T> FiniteDifference(
-      const wpi::array<int, Samples> stencil, units::second_t period) {
+      const wpi::array<int, Samples>& stencil, units::second_t period) {
     // See
     // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points
     //
