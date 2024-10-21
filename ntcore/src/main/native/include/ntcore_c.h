@@ -94,6 +94,7 @@ enum NT_NetworkMode {
   NT_NET_MODE_CLIENT4 = 0x04,  /* running in NT4 client mode */
   NT_NET_MODE_STARTING = 0x08, /* flag for starting (either client or server) */
   NT_NET_MODE_LOCAL = 0x10,    /* running in local-only mode */
+  NT_NET_MODE_SERVER_ONLY = 0x20, /* running in server-only mode */
 };
 
 /** Event notification flags. */

@@ -18,8 +18,8 @@
 
 #include "net/ClientMessageQueue.h"
 #include "net/Message.h"
-#include "net/ServerImpl.h"
 #include "ntcore_cpp.h"
+#include "server/ServerImpl.h"
 
 namespace wpi {
 class Logger;
@@ -38,7 +38,7 @@ class NetworkServer {
   NetworkServer(std::string_view persistentFilename,
                 std::string_view listenAddress, unsigned int port3,
                 unsigned int port4, net::ILocalStorage& localStorage,
-                IConnectionList& connList, wpi::Logger& logger,
+                IConnectionList& connList, wpi::Logger& logger, bool dedicated,
                 std::function<void()> initDone);
   ~NetworkServer();
 
@@ -78,7 +78,7 @@ class NetworkServer {
   using Queue = net::LocalClientMessageQueue;
   net::ClientMessage m_localMsgs[Queue::kBlockSize];
 
-  net::ServerImpl m_serverImpl;
+  server::ServerImpl m_serverImpl;
 
   // shared with user (must be atomic or mutex-protected)
   std::atomic<wpi::uv::Async<>*> m_flushLocalAtomic{nullptr};

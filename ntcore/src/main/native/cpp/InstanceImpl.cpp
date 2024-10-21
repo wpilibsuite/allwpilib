@@ -102,18 +102,20 @@ void InstanceImpl::StopLocal() {
 
 void InstanceImpl::StartServer(std::string_view persistFilename,
                                std::string_view listenAddress,
-                               unsigned int port3, unsigned int port4) {
+                               unsigned int port3, unsigned int port4,
+                               bool dedicated) {
   std::scoped_lock lock{m_mutex};
   if (networkMode != NT_NET_MODE_NONE) {
     return;
   }
   m_networkServer = std::make_shared<NetworkServer>(
       persistFilename, listenAddress, port3, port4, localStorage,
-      connectionList, logger, [this] {
+      connectionList, logger, dedicated, [this] {
         std::scoped_lock lock{m_mutex};
         networkMode &= ~NT_NET_MODE_STARTING;
       });
-  networkMode = NT_NET_MODE_SERVER | NT_NET_MODE_STARTING;
+  networkMode = (dedicated ? NT_NET_MODE_SERVER_ONLY : NT_NET_MODE_SERVER) |
+                NT_NET_MODE_STARTING;
   listenerStorage.NotifyTimeSync({}, NT_EVENT_TIMESYNC, 0, 0, true);
   m_serverTimeOffset = 0;
   m_rtt2 = 0;

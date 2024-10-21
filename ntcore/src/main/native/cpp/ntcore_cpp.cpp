@@ -636,7 +636,15 @@ void StartServer(NT_Inst inst, std::string_view persist_filename,
                  std::string_view listen_address, unsigned int port3,
                  unsigned int port4) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartServer(persist_filename, listen_address, port3, port4);
+    ii->StartServer(persist_filename, listen_address, port3, port4, false);
+  }
+}
+
+void StartDedicatedServer(NT_Inst inst, std::string_view persist_filename,
+                          std::string_view listen_address, unsigned int port3,
+                          unsigned int port4) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    ii->StartServer(persist_filename, listen_address, port3, port4, true);
   }
 }
 
