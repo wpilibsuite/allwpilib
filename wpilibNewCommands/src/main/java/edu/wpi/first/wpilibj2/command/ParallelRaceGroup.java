@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj2.command;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A composition that runs a set of commands in parallel, ending when any one of the commands ends
@@ -52,9 +53,20 @@ public class ParallelRaceGroup extends Command {
     CommandScheduler.getInstance().registerComposedCommands(commands);
 
     for (Command command : commands) {
-      if (!Collections.disjoint(command.getRequirements(), getRequirements())) {
+      var currentRequirements = getRequirements();
+      if (!Collections.disjoint(command.getRequirements(), currentRequirements)) {
+        String requirementsStr = command.getRequirements()
+          .stream()
+          .filter(currentRequirements::contains)
+          .map(Subsystem::getName)
+          .collect(Collectors.joining(", "));
         throw new IllegalArgumentException(
-            "Multiple commands in a parallel composition cannot require the same subsystems");
+          String.format(
+            "Command %s could not be added to this ParallelCommandGroup"
+            + " because the subsystems [%s] are already required in this command."
+            + " Multiple commands in a parallel composition cannot require"
+            + " the same subsystems.",
+            command.getName(), requirementsStr));
       }
       m_commands.add(command);
       addRequirements(command.getRequirements());
