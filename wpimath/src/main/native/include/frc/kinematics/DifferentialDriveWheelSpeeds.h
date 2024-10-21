@@ -6,6 +6,7 @@
 
 #include <wpi/SymbolExports.h>
 
+#include "units/math.h"
 #include "units/velocity.h"
 
 namespace frc {
@@ -35,7 +36,15 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelSpeeds {
    *
    * @param attainableMaxSpeed The absolute max speed that a wheel can reach.
    */
-  void Desaturate(units::meters_per_second_t attainableMaxSpeed);
+  constexpr void Desaturate(units::meters_per_second_t attainableMaxSpeed) {
+    auto realMaxSpeed =
+        units::math::max(units::math::abs(left), units::math::abs(right));
+
+    if (realMaxSpeed > attainableMaxSpeed) {
+      left = left / realMaxSpeed * attainableMaxSpeed;
+      right = right / realMaxSpeed * attainableMaxSpeed;
+    }
+  }
 
   /**
    * Adds two DifferentialDriveWheelSpeeds and returns the sum.

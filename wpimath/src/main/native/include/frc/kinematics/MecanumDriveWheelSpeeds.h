@@ -4,8 +4,13 @@
 
 #pragma once
 
+#include <algorithm>
+#include <array>
+#include <cmath>
+
 #include <wpi/SymbolExports.h>
 
+#include "units/math.h"
 #include "units/velocity.h"
 
 namespace frc {
@@ -45,7 +50,25 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
    *
    * @param attainableMaxSpeed The absolute max speed that a wheel can reach.
    */
-  void Desaturate(units::meters_per_second_t attainableMaxSpeed);
+  constexpr void Desaturate(units::meters_per_second_t attainableMaxSpeed) {
+    std::array<units::meters_per_second_t, 4> wheelSpeeds{frontLeft, frontRight,
+                                                          rearLeft, rearRight};
+    units::meters_per_second_t realMaxSpeed = units::math::abs(
+        *std::max_element(wheelSpeeds.begin(), wheelSpeeds.end(),
+                          [](const auto& a, const auto& b) {
+                            return units::math::abs(a) < units::math::abs(b);
+                          }));
+
+    if (realMaxSpeed > attainableMaxSpeed) {
+      for (int i = 0; i < 4; ++i) {
+        wheelSpeeds[i] = wheelSpeeds[i] / realMaxSpeed * attainableMaxSpeed;
+      }
+      frontLeft = wheelSpeeds[0];
+      frontRight = wheelSpeeds[1];
+      rearLeft = wheelSpeeds[2];
+      rearRight = wheelSpeeds[3];
+    }
+  }
 
   /**
    * Adds two MecanumDriveWheelSpeeds and returns the sum.

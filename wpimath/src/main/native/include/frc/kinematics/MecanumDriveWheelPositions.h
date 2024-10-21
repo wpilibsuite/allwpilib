@@ -40,18 +40,10 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelPositions {
    * @param other The other object.
    * @return Whether the two objects are equal.
    */
-  bool operator==(const MecanumDriveWheelPositions& other) const = default;
+  constexpr bool operator==(const MecanumDriveWheelPositions& other) const =
+      default;
 
-  /**
-   * Checks inequality between this MecanumDriveWheelPositions and another
-   * object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const MecanumDriveWheelPositions& other) const = default;
-
-  MecanumDriveWheelPositions Interpolate(
+  constexpr MecanumDriveWheelPositions Interpolate(
       const MecanumDriveWheelPositions& endValue, double t) const {
     return {wpi::Lerp(frontLeft, endValue.frontLeft, t),
             wpi::Lerp(frontRight, endValue.frontRight, t),
