@@ -8,6 +8,8 @@ build --java_runtime_version=roboriojdk_17
 build --tool_java_language_version=17
 build --tool_java_runtime_version=remotejdk_17
 
+build --proto_toolchain_for_cc=//:proto_cc_toolchain
+
 test --test_output=errors
 test --test_verbose_timeout_warnings
 

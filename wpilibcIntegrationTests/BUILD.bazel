@@ -1,0 +1,24 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+
+ATHENA_SOURCES = glob(["src/main/native/cpp/**"])
+
+NON_ATHENA_SOURCES = glob(["src/main/native/dt/**"])
+
+cc_library(
+    name = "test_headers",
+    hdrs = glob(["src/main/native/include/**"]),
+    strip_include_prefix = "src/main/native/include",
+)
+
+cc_binary(
+    name = "wpilibcIntegrationTests",
+    srcs = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ATHENA_SOURCES,
+        "//conditions:default": NON_ATHENA_SOURCES,
+    }),
+    deps = [
+        ":test_headers",
+        "//thirdparty/googletest:googletest.static",
+        "//wpilibc:wpilibc.static",
+    ],
+)
