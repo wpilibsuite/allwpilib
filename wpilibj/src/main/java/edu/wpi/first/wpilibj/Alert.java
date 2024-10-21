@@ -47,9 +47,9 @@ public class Alert {
   private static Map<String, SendableAlerts> groups = new HashMap<String, SendableAlerts>();
 
   private final AlertType m_type;
-  private boolean m_active;
-  private double m_activeStartTime;
-  private String m_text;
+  boolean m_active;
+  double m_activeStartTime;
+  String m_text;
 
   /**
    * Creates a new alert in the default group - "Alerts". If this is the first to be instantiated,
