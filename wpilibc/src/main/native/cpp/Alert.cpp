@@ -14,6 +14,7 @@
 
 #include <fmt/format.h>
 #include <networktables/NTSendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/smartdashboard/SmartDashboard.h"
@@ -21,6 +22,9 @@
 using namespace frc;
 
 Alert::SendableAlerts& Alert::GetGroupSendable(std::string_view group) {
+  // Force initialization of SendableRegistry before our magic static to prevent
+  // incorrect destruction order.
+  wpi::SendableRegistry::EnsureInitialized();
   static wpi::StringMap<Alert::SendableAlerts> groups;
 
   auto [iter, exists] = groups.try_emplace(group);
