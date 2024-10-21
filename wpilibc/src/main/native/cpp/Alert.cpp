@@ -35,7 +35,7 @@ Alert::Alert(std::string_view text, AlertType type)
     : Alert("Alerts", text, type) {}
 
 Alert::Alert(std::string_view group, std::string_view text, AlertType type)
-    : m_type(type), m_text(text), m_group{group} {}
+    : m_type(type), m_text(text), m_group{&GetGroupSendable(group)} {}
 
 Alert::~Alert() {
   Set(false);
@@ -48,11 +48,9 @@ void Alert::Set(bool active) {
 
   if (active) {
     m_activeStartTime = frc::RobotController::GetFPGATime();
-    GetGroupSendable(m_group).GetSetForType(m_type).emplace(m_activeStartTime,
-                                                            m_text);
+    m_group->GetSetForType(m_type).emplace(m_activeStartTime, m_text);
   } else {
-    GetGroupSendable(m_group).GetSetForType(m_type).erase(
-        {m_activeStartTime, m_text});
+    m_group->GetSetForType(m_type).erase({m_activeStartTime, m_text});
   }
   m_active = active;
 }
@@ -63,7 +61,7 @@ void Alert::SetText(std::string_view text) {
   }
 
   if (m_active) {
-    auto set = GetGroupSendable(m_group).GetSetForType(m_type);
+    auto set = m_group->GetSetForType(m_type);
     auto iter = set.find({m_activeStartTime, m_text});
     auto hint = set.erase(iter);
     set.emplace_hint(hint, m_activeStartTime, m_text);

@@ -139,7 +139,7 @@ class Alert {
 
   AlertType m_type;
   std::string m_text;
-  std::string m_group;
+  SendableAlerts* m_group;
 
   bool m_active = false;
   uint64_t m_activeStartTime;
