@@ -5,6 +5,7 @@
 #include <frc/Alert.h>
 
 #include <chrono>
+#include <string>
 
 #include <fmt/format.h>
 #include <gtest/gtest.h>

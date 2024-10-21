@@ -113,12 +113,6 @@ class Alert {
   void SetText(std::string_view text);
 
  private:
-  AlertType m_type;
-  std::string m_text;
-  std::string m_group;  // todo: could store iterator or reference to the actual
-                        // SendableAlerts, would remove lookup
-  bool m_active = false;
-  uint64_t m_activeStartTime;
   class PublishedAlert {
    public:
     PublishedAlert(uint64_t timestamp, const std::string_view text)
@@ -143,7 +137,14 @@ class Alert {
     std::array<std::set<PublishedAlert>, 3> m_alerts;
   };
 
-  static wpi::StringMap<SendableAlerts> groups;
+  AlertType m_type;
+  std::string m_text;
+  std::string m_group;
+
+  bool m_active = false;
+  uint64_t m_activeStartTime;
+
+  static SendableAlerts& GetGroupSendable(std::string_view group);
 };
 
 std::string format_as(Alert::AlertType type);

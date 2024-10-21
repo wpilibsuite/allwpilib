@@ -20,18 +20,22 @@
 
 using namespace frc;
 
-wpi::StringMap<Alert::SendableAlerts> Alert::groups;
+Alert::SendableAlerts& Alert::GetGroupSendable(std::string_view group) {
+  static wpi::StringMap<Alert::SendableAlerts> groups;
+
+  auto [iter, exists] = groups.try_emplace(group);
+  SendableAlerts& sendable = iter->getValue();
+  if (!exists) {
+    frc::SmartDashboard::PutData(group, &iter->getValue());
+  }
+  return sendable;
+}
 
 Alert::Alert(std::string_view text, AlertType type)
     : Alert("Alerts", text, type) {}
 
 Alert::Alert(std::string_view group, std::string_view text, AlertType type)
-    : m_type(type), m_text(text), m_group{group} {
-  if (!groups.contains(group)) {
-    frc::SmartDashboard::PutData(group,
-                                 &groups.try_emplace(group).first->getValue());
-  }
-}
+    : m_type(type), m_text(text), m_group{group} {}
 
 Alert::~Alert() {
   Set(false);
@@ -44,9 +48,11 @@ void Alert::Set(bool active) {
 
   if (active) {
     m_activeStartTime = frc::RobotController::GetFPGATime();
-    groups[m_group].GetSetForType(m_type).emplace(m_activeStartTime, m_text);
+    GetGroupSendable(m_group).GetSetForType(m_type).emplace(m_activeStartTime,
+                                                            m_text);
   } else {
-    groups[m_group].GetSetForType(m_type).erase({m_activeStartTime, m_text});
+    GetGroupSendable(m_group).GetSetForType(m_type).erase(
+        {m_activeStartTime, m_text});
   }
   m_active = active;
 }
@@ -57,7 +63,7 @@ void Alert::SetText(std::string_view text) {
   }
 
   if (m_active) {
-    auto set = groups[m_group].GetSetForType(m_type);
+    auto set = GetGroupSendable(m_group).GetSetForType(m_type);
     auto iter = set.find({m_activeStartTime, m_text});
     auto hint = set.erase(iter);
     set.emplace_hint(hint, m_activeStartTime, m_text);
