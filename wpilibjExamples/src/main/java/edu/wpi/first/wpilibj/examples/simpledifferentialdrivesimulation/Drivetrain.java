@@ -17,7 +17,9 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -70,7 +72,10 @@ public class Drivetrain {
       LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
   private final DifferentialDrivetrainSim m_drivetrainSimulator =
       new DifferentialDrivetrainSim(
-          m_drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
+          m_drivetrainSystem,
+          new Wheel(new Gearbox(2, DCMotor.CIM, 8), kWheelRadius),
+          kTrackWidth,
+          null);
 
   /** Subsystem constructor. */
   public Drivetrain() {
@@ -144,7 +149,7 @@ public class Drivetrain {
     // simulation, and write the simulated positions and velocities to our
     // simulated encoder and gyro. We negate the right side so that positive
     // voltages make the right side move forward.
-    m_drivetrainSimulator.setInputs(
+    m_drivetrainSimulator.setInputVoltages(
         m_leftLeader.get() * RobotController.getInputVoltage(),
         m_rightLeader.get() * RobotController.getInputVoltage());
     m_drivetrainSimulator.update(0.02);
