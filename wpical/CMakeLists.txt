@@ -27,8 +27,6 @@ find_package(OpenCV REQUIRED)
 target_link_libraries(
     wpical
     wpimath
-    libglassnt
-    libglass
     apriltaglib
     ${OpenCV_LIBS}
 )
@@ -48,5 +46,5 @@ if(WITH_TESTS)
         target_compile_options(wpical_test PRIVATE /utf-8)
     endif()
     target_include_directories(wpical_test PRIVATE src/main/native/cpp src/main/native/include)
-    target_link_libraries(wpical_test wpimath libglassnt libglass googletest)
+    target_link_libraries(wpical_test wpimath googletest)
 endif()
