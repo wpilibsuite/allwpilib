@@ -7,7 +7,7 @@ nativeUtils {
             sourceClassifier = "sources"
             ext = "zip"
             version = '2.2-1'
-            targetPlatforms.addAll(nativeUtils.wpi.platforms.allPlatforms)
+            targetPlatforms.addAll(nativeUtils.wpi.platforms.desktopPlatforms)
         }
     }
 }
