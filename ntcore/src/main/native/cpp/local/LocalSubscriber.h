@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include <wpi/Synchronization.h>
 
 #include "Handle.h"
