@@ -6,6 +6,7 @@ if (project.hasProperty('onlylinuxathena')) {
 
 description = "Field Calibration Tool"
 
+apply plugin: 'c'
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'
 apply plugin: 'edu.wpi.first.NativeUtils'
@@ -24,6 +25,7 @@ apply from: "${rootDir}/shared/config.gradle"
 def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
 def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
 
+apply from: "${rootDir}/shared/ceres.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
 
 task generateCppVersion() {
@@ -78,11 +80,20 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp', "$buildDir/generated/main/cpp"
+                        srcDirs 'src/main/native/cpp', 'src/main/native/thirdparty/mrcal/src', 'src/main/native/thirdparty/mrcal_java/src', "$buildDir/generated/main/cpp"
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/mrcal/include', 'src/main/native/thirdparty/mrcal_java/include'
+                    }
+                }
+                c {
+                    source {
+                        srcDirs 'src/main/native/thirdparty/libdogleg/src', 'src/main/native/thirdparty/mrcal/src'
+                        include '**/*.c'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/mrcal/generated', 'src/main/native/thirdparty/mrcal/include', 'src/main/native/thirdparty/mrcal/include/minimath', 'src/main/native/thirdparty/libdogleg/include'
                     }
                 }
                 if (OperatingSystem.current().isWindows()) {
@@ -102,6 +113,7 @@ model {
                 lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
+                nativeUtils.useRequiredLibrary(it, 'ceres')
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
