@@ -37,11 +37,13 @@ DigitalOutput::DigitalOutput(int channel) {
 }
 
 DigitalOutput::~DigitalOutput() {
-  // Disable the PWM in case it was running.
-  try {
-    DisablePWM();
-  } catch (const RuntimeError& e) {
-    e.Report();
+  if (m_handle != HAL_kInvalidHandle) {
+    // Disable the PWM in case it was running.
+    try {
+      DisablePWM();
+    } catch (const RuntimeError& e) {
+      e.Report();
+    }
   }
 }
 

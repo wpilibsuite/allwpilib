@@ -62,7 +62,10 @@ class Provider : public WindowManager {
    * Perform global initialization.  This should be called prior to
    * wpi::gui::Initialize().
    */
-  void GlobalInit() override;
+  void GlobalInit() override {
+    WindowManager::GlobalInit();
+    wpi::gui::AddEarlyExecute([this] { Update(); });
+  }
 
   /**
    * Show the specified view by default on first load.  Has no effect if
@@ -70,7 +73,17 @@ class Provider : public WindowManager {
    *
    * @param name View name
    */
-  void ShowDefault(std::string_view name);
+  void ShowDefault(std::string_view name) {
+    auto win = GetWindow(name);
+    if (win) {
+      return;
+    }
+    auto it = FindViewEntry(name);
+    if (it == m_viewEntries.end() || (*it)->name != name) {
+      return;
+    }
+    (*it)->showDefault = true;
+  }
 
   /**
    * Register a model and view combination.  Equivalent to calling both
@@ -82,7 +95,10 @@ class Provider : public WindowManager {
    * @param createView Functor for creating view
    */
   void Register(std::string_view name, ExistsFunc exists,
-                CreateModelFunc createModel, CreateViewFunc createView);
+                CreateModelFunc createModel, CreateViewFunc createView) {
+    RegisterModel(name, std::move(exists), std::move(createModel));
+    RegisterView(name, name, nullptr, std::move(createView));
+  }
 
   /**
    * Register a model.
@@ -92,7 +108,16 @@ class Provider : public WindowManager {
    * @param createModel Functor for creating model
    */
   void RegisterModel(std::string_view name, ExistsFunc exists,
-                     CreateModelFunc createModel);
+                     CreateModelFunc createModel) {
+    auto it = FindModelEntry(name);
+    // ignore if exists
+    if (it != m_modelEntries.end() && (*it)->name == name) {
+      return;
+    }
+    // insert in sorted location
+    m_modelEntries.emplace(
+        it, MakeModelEntry(name, std::move(exists), std::move(createModel)));
+  }
 
   /**
    * Register a view.
@@ -103,10 +128,33 @@ class Provider : public WindowManager {
    * @param createView Functor for creating view
    */
   void RegisterView(std::string_view name, std::string_view modelName,
-                    ViewExistsFunc exists, CreateViewFunc createView);
+                    ViewExistsFunc exists, CreateViewFunc createView) {
+    // find model; if model doesn't exist, ignore
+    auto modelIt = FindModelEntry(modelName);
+    if (modelIt == m_modelEntries.end() || (*modelIt)->name != modelName) {
+      return;
+    }
+
+    auto viewIt = FindViewEntry(name);
+    // ignore if exists
+    if (viewIt != m_viewEntries.end() && (*viewIt)->name == name) {
+      return;
+    }
+    // insert in sorted location
+    m_viewEntries.emplace(viewIt,
+                          MakeViewEntry(name, modelIt->get(), std::move(exists),
+                                        std::move(createView)));
+  }
 
  protected:
-  virtual void Update();
+  virtual void Update() {
+    // update entries
+    for (auto&& entry : m_modelEntries) {
+      if (entry->model) {
+        entry->model->Update();
+      }
+    }
+  }
 
   struct ModelEntry {
     ModelEntry(std::string_view name, ExistsFunc exists,
@@ -145,8 +193,17 @@ class Provider : public WindowManager {
   using ViewEntries = std::vector<std::unique_ptr<ViewEntry>>;
   ViewEntries m_viewEntries;
 
-  typename ModelEntries::iterator FindModelEntry(std::string_view name);
-  typename ViewEntries::iterator FindViewEntry(std::string_view name);
+  typename ModelEntries::iterator FindModelEntry(std::string_view name) {
+    return std::lower_bound(
+        m_modelEntries.begin(), m_modelEntries.end(), name,
+        [](const auto& elem, std::string_view s) { return elem->name < s; });
+  }
+
+  typename ViewEntries::iterator FindViewEntry(std::string_view name) {
+    return std::lower_bound(
+        m_viewEntries.begin(), m_viewEntries.end(), name,
+        [](const auto& elem, std::string_view s) { return elem->name < s; });
+  }
 
   virtual std::unique_ptr<ModelEntry> MakeModelEntry(
       std::string_view name, ExistsFunc exists, CreateModelFunc createModel) {
@@ -166,5 +223,3 @@ class Provider : public WindowManager {
 };
 
 }  // namespace glass
-
-#include "Provider.inc"

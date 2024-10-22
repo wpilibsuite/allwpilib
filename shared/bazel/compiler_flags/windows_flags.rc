@@ -1,0 +1,53 @@
+################################
+# Common Flags
+################################
+# Warning level
+build:windows_common --copt=/W3
+build:windows_common --copt=/WX
+
+# C++ options
+build:windows_common --cxxopt=/EHsc
+build:windows_common --cxxopt=/FS
+build:windows_common --cxxopt=/Zc:inline
+build:windows_common --cxxopt=/wd4244
+build:windows_common --cxxopt=/wd4267
+build:windows_common --cxxopt=/wd4146
+build:windows_common --cxxopt=/wd4996
+build:windows_common --cxxopt=/Zc:throwingNew
+build:windows_common --cxxopt=/D_CRT_SECURE_NO_WARNINGS
+build:windows_common --cxxopt=/std:c++20
+build:windows_common --cxxopt=/permissive-
+build:windows_common --cxxopt=/utf-8
+build:windows_common --cxxopt=/bigobj
+build:windows_common --cxxopt=/Zc:__cplusplus
+build:windows_common --cxxopt=/Zc:preprocessor
+build:windows_common --cxxopt=/wd5105
+
+# C Only
+build:windows_common --conlyopt=/FS
+build:windows_common --conlyopt=/Zc:inline
+build:windows_common --conlyopt=/D_CRT_SECURE_NO_WARNINGS
+
+# build:windows_common --linkopt=/IGNORE:4099
+
+# TODO there is a "bug" in bazel that forces "/D_WIN32_WINNT=0x0601". Remove it from the files that break because of this.
+build:windows_common --per_file_copt=wpiutil/src/main/native/cpp/timestamp.cpp,wpinet/src/main/native/thirdparty/libuv/src/win/util.cpp,hal/src/main/native/sim/HAL.cpp@/U_WIN32_WINNT
+
+################################
+# Standard Windows Flags
+################################
+build:windows --config=windows_common
+
+build:windows --linkopt=/DEPENDENTLOADFLAG:0x1100
+
+# TODO
+build:windows --copt=/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
+
+################################
+# ARM Windows Flags
+################################
+build:windows_arm --config=windows_common
+
+build:windows_arm --cpu=arm64_windows
+
+build:windows_arm --linkopt=/IGNORE:4099

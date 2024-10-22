@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -26,6 +27,8 @@ import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 
 class SwerveDrivePoseEstimatorTest {
+  private static final double kEpsilon = 1e-9;
+
   @Test
   void testAccuracyFacingTrajectory() {
     var kinematics =
@@ -421,5 +424,113 @@ class SwerveDrivePoseEstimatorTest {
     assertEquals(Optional.of(new Pose2d(1.01, 0.1, Rotation2d.kZero)), estimator.sampleAt(1.01));
     assertEquals(Optional.of(new Pose2d(1, 0.1, Rotation2d.kZero)), estimator.sampleAt(0.5));
     assertEquals(Optional.of(new Pose2d(2, 0.1, Rotation2d.kZero)), estimator.sampleAt(2.5));
+  }
+
+  @Test
+  void testReset() {
+    var kinematics =
+        new SwerveDriveKinematics(
+            new Translation2d(1, 1),
+            new Translation2d(-1, 1),
+            new Translation2d(1, -1),
+            new Translation2d(-1, -1));
+    var estimator =
+        new SwerveDrivePoseEstimator(
+            kinematics,
+            Rotation2d.kZero,
+            new SwerveModulePosition[] {
+              new SwerveModulePosition(),
+              new SwerveModulePosition(),
+              new SwerveModulePosition(),
+              new SwerveModulePosition()
+            },
+            Pose2d.kZero,
+            VecBuilder.fill(1, 1, 1),
+            VecBuilder.fill(1, 1, 1));
+
+    // Test reset position
+    {
+      var modulePosition = new SwerveModulePosition(1, Rotation2d.kZero);
+      estimator.resetPosition(
+          Rotation2d.kZero,
+          new SwerveModulePosition[] {
+            modulePosition, modulePosition, modulePosition, modulePosition
+          },
+          new Pose2d(1, 0, Rotation2d.kZero));
+    }
+
+    assertAll(
+        () -> assertEquals(1, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () ->
+            assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), kEpsilon));
+
+    // Test orientation and wheel positions
+    {
+      var modulePosition = new SwerveModulePosition(2, Rotation2d.kZero);
+      estimator.update(
+          Rotation2d.kZero,
+          new SwerveModulePosition[] {
+            modulePosition, modulePosition, modulePosition, modulePosition
+          });
+    }
+
+    assertAll(
+        () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () ->
+            assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), kEpsilon));
+
+    // Test reset rotation
+    estimator.resetRotation(Rotation2d.kCCW_Pi_2);
+
+    assertAll(
+        () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () ->
+            assertEquals(
+                Math.PI / 2,
+                estimator.getEstimatedPosition().getRotation().getRadians(),
+                kEpsilon));
+
+    // Test orientation
+    {
+      var modulePosition = new SwerveModulePosition(3, Rotation2d.kZero);
+      estimator.update(
+          Rotation2d.kZero,
+          new SwerveModulePosition[] {
+            modulePosition, modulePosition, modulePosition, modulePosition
+          });
+    }
+
+    assertAll(
+        () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(1, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () ->
+            assertEquals(
+                Math.PI / 2,
+                estimator.getEstimatedPosition().getRotation().getRadians(),
+                kEpsilon));
+
+    // Test reset translation
+    estimator.resetTranslation(new Translation2d(-1, -1));
+
+    assertAll(
+        () -> assertEquals(-1, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(-1, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () ->
+            assertEquals(
+                Math.PI / 2,
+                estimator.getEstimatedPosition().getRotation().getRadians(),
+                kEpsilon));
+
+    // Test reset pose
+    estimator.resetPose(Pose2d.kZero);
+
+    assertAll(
+        () -> assertEquals(0, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () ->
+            assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), kEpsilon));
   }
 }

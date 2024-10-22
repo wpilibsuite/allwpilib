@@ -45,6 +45,9 @@ class WPILIB_DLLEXPORT PoseEstimator {
   /**
    * Constructs a PoseEstimator.
    *
+   * @warning The initial pose estimate will always be the default pose,
+   * regardless of the odometry's current pose.
+   *
    * @param kinematics A correctly-configured kinematics object for your
    *     drivetrain.
    * @param odometry A correctly-configured odometry object for your drivetrain.
@@ -60,7 +63,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
                 Odometry<WheelSpeeds, WheelPositions>& odometry,
                 const wpi::array<double, 3>& stateStdDevs,
                 const wpi::array<double, 3>& visionMeasurementStdDevs)
-      : m_odometry(odometry), m_poseEstimate(m_odometry.GetPose()) {
+      : m_odometry(odometry) {
     for (size_t i = 0; i < 3; ++i) {
       m_q[i] = stateStdDevs[i] * stateStdDevs[i];
     }
@@ -124,6 +127,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
   void ResetPose(const Pose2d& pose) {
     m_odometry.ResetPose(pose);
     m_odometryPoseBuffer.Clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.GetPose();
   }
 
   /**
@@ -134,6 +139,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
   void ResetTranslation(const Translation2d& translation) {
     m_odometry.ResetTranslation(translation);
     m_odometryPoseBuffer.Clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.GetPose();
   }
 
   /**
@@ -144,6 +151,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
   void ResetRotation(const Rotation2d& rotation) {
     m_odometry.ResetRotation(rotation);
     m_odometryPoseBuffer.Clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.GetPose();
   }
 
   /**

@@ -84,7 +84,9 @@ class SwerveDrivePoseEstimator
       const wpi::array<double, 3>& visionMeasurementStdDevs)
       : SwerveDrivePoseEstimator::PoseEstimator(
             kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
-        m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {}
+        m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {
+    this->ResetPose(initialPose);
+  }
 
  private:
   SwerveDriveOdometry<NumModules> m_odometryImpl;

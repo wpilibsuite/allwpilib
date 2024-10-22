@@ -23,4 +23,6 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     const wpi::array<double, 3>& visionMeasurementStdDevs)
     : PoseEstimator(kinematics, m_odometryImpl, stateStdDevs,
                     visionMeasurementStdDevs),
-      m_odometryImpl{gyroAngle, leftDistance, rightDistance, initialPose} {}
+      m_odometryImpl{gyroAngle, leftDistance, rightDistance, initialPose} {
+  ResetPose(m_odometryImpl.GetPose());
+}
