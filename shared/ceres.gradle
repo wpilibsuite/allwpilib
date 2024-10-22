@@ -1,8 +1,8 @@
 nativeUtils {
     nativeDependencyContainer {
         ceres(getNativeDependencyTypeClass('WPIStaticMavenDependency')) {
-            groupId = "edu.wpi.first.thirdparty.frc2024"
-            artifactId = "ceres"
+            groupId = "edu.wpi.first.thirdparty.frc2024.ceres"
+            artifactId = "ceres-cpp"
             headerClassifier = "headers"
             sourceClassifier = "sources"
             ext = "zip"
