@@ -434,7 +434,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
   // unless there have been no vision measurements after the last reset
   std::map<units::second_t, VisionUpdate> m_visionUpdates;
 
-  Pose2d m_poseEstimate{};
+  Pose2d m_poseEstimate;
 };
 
 }  // namespace frc
