@@ -6,6 +6,7 @@ if (project.hasProperty('onlylinuxathena')) {
 
 description = "Field Calibration Tool"
 
+apply plugin: 'c'
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'
 apply plugin: 'edu.wpi.first.NativeUtils'
@@ -78,11 +79,20 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp', "$buildDir/generated/main/cpp"
+                        srcDirs 'src/main/native/cpp', 'src/main/native/thirdparty/mrcal/src', 'src/main/native/thirdparty/mrcal_java/src', "$buildDir/generated/main/cpp"
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/mrcal/include', 'src/main/native/thirdparty/mrcal_java/include'
+                    }
+                }
+                c {
+                    source {
+                        srcDirs 'src/main/native/thirdparty/libdogleg/src', 'src/main/native/thirdparty/mrcal/src'
+                        include '**/*.c'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/mrcal/generated', 'src/main/native/thirdparty/mrcal/include', 'src/main/native/thirdparty/mrcal/include/minimath', 'src/main/native/thirdparty/libdogleg/include'
                     }
                 }
                 if (OperatingSystem.current().isWindows()) {

@@ -18,6 +18,7 @@ def main(argv):
     args = parser.parse_args(argv)
     subprocess.run(["python", f"{REPO_ROOT}/hal/generate_usage_reporting.py"])
     subprocess.run(["python", f"{REPO_ROOT}/ntcore/generate_topics.py"])
+    subprocess.run(["python", f"{REPO_ROOT}/wpical/generate_mrcal.py"])
     subprocess.run(["python", f"{REPO_ROOT}/wpimath/generate_numbers.py"])
     subprocess.run(
         [
