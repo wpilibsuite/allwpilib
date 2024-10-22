@@ -5,6 +5,7 @@
 package org.wpilib;
 
 import com.google.protobuf.compiler.PluginProtos.CodeGeneratorResponse;
+import com.google.protobuf.compiler.PluginProtos.CodeGeneratorResponse.Feature;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -39,6 +40,10 @@ public final class ProtoCDllGenerator {
     // Filter to generated descriptors
     CodeGeneratorResponse.Builder response = CodeGeneratorResponse.newBuilder();
 
+    
+
+    response.setSupportedFeatures(Feature.FEATURE_PROTO3_OPTIONAL_VALUE);
+
     for (String genFile : request.getFileToGenerateList()) {
       Descriptors.FileDescriptor desc = descriptors.get(genFile);
 
@@ -57,7 +62,7 @@ public final class ProtoCDllGenerator {
                     + "bool wpi_has_" + field.getName() + "() const;\n"
                     + "const " + type + "& wpi_" + field.getName() + "() const;\n");
 
-            // Add implementation. As were in the cc file for the proto
+            // Add implementation. As we're in the cc file for the proto
             // we can just call straight through to the inline definitions
             response.addFileBuilder()
                 .setName(desc.getName().replace("proto", "pb.cc"))
