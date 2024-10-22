@@ -30,8 +30,12 @@ namespace frc {
  * @return The robot's field-relative pose.
  */
 WPILIB_DLLEXPORT
-frc::Pose3d ObjectToRobotPose(const frc::Pose3d& objectInField,
-                              const frc::Transform3d& cameraToObject,
-                              const frc::Transform3d& robotToCamera);
+constexpr frc::Pose3d ObjectToRobotPose(const frc::Pose3d& objectInField,
+                                        const frc::Transform3d& cameraToObject,
+                                        const frc::Transform3d& robotToCamera) {
+  const auto objectToCamera = cameraToObject.Inverse();
+  const auto cameraToRobot = robotToCamera.Inverse();
+  return objectInField + objectToCamera + cameraToRobot;
+}
 
 }  // namespace frc
