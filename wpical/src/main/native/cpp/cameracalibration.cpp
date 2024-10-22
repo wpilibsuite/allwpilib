@@ -4,6 +4,11 @@
 
 #include "cameracalibration.h"
 
+#include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
+
 bool filter(std::vector<cv::Point2f> charuco_corners,
             std::vector<int> charuco_ids,
             std::vector<std::vector<cv::Point2f>> marker_corners,
@@ -205,7 +210,7 @@ int cameracalibration::calibrate(const std::string& input_video,
     std::vector<cv::Point3f> obj_points;
     std::vector<cv::Point2f> img_points;
 
-    mrcal_point3_t points[(board_width - 1) * (board_height - 1)];
+    const mrcal_point3_t points[(board_width - 1) * (board_height - 1)];
 
     charuco_detector.detectBoard(frame_gray, charuco_corners, charuco_ids,
                                  marker_corners, marker_ids);

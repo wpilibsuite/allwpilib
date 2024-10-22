@@ -4,9 +4,18 @@
 
 #include "fieldcalibration.h"
 
+#include <algorithm>
+#include <functional>
+#include <iostream>
+#include <map>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+
 class PoseGraphError {
  public:
-  PoseGraphError(Pose t_ab_observed)
+  explicit PoseGraphError(Pose t_ab_observed)
       : m_t_ab_observed(std::move(t_ab_observed)) {}
 
   template <typename T>

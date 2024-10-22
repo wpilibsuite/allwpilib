@@ -8,6 +8,7 @@
 #define CAMERACALIBRATION_H
 
 #include <fstream>
+#include <string>
 
 #include <mrcal_wrapper.h>
 #include <opencv2/aruco.hpp>

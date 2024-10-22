@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <numbers>
+#include <string>
 
 std::string fmap::singleTag(int tag, tag::pose tagpose, bool endTag) {
   std::string transform = "";

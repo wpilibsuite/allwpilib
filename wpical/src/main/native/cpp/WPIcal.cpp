@@ -8,7 +8,10 @@
 #include <fmap.h>
 
 #include <iostream>
+#include <memory>
 #include <numbers>
+#include <string>
+#include <vector>
 
 #include <GLFW/glfw3.h>
 #include <imgui.h>
