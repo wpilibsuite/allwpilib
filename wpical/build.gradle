@@ -114,6 +114,7 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
+                nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
