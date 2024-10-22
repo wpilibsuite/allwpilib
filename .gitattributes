@@ -28,3 +28,4 @@
 
 # Generated files
 */src/generated/** linguist-generated
+protoplugin/binary/wpiprotoplugin.jar linguist-generated

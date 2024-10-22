@@ -34,6 +34,7 @@ def main(argv):
     subprocess.run(["python", f"{REPO_ROOT}/wpilibj/generate_pwm_motor_controllers.py"])
     subprocess.run(["python", f"{REPO_ROOT}/thirdparty/imgui_suite/generate_gl3w.py"])
     subprocess.run(f"{REPO_ROOT}/thirdparty/imgui_suite/generate_fonts.sh")
+    subprocess.run([f"{REPO_ROOT}/gradlew", "-p", f"{REPO_ROOT}/protoplugin", "build"])
 
 
 if __name__ == "__main__":
