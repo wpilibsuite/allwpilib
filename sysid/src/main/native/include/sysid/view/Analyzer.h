@@ -87,7 +87,7 @@ class Analyzer {
    */
   void Display();
 
-  ~Analyzer() { AbortDataPrep(); };
+  ~Analyzer() { AbortDataPrep(); }
 
   /**
    * Analyzes the selected data.
