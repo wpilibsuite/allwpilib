@@ -4,6 +4,7 @@
 
 #include "glass/Window.h"
 
+#include <memory>
 #include <string>
 
 #include <fmt/format.h>
