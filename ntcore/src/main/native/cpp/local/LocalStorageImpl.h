@@ -5,6 +5,7 @@
 #pragma once
 
 #include <concepts>
+#include <memory>
 #include <string_view>
 
 #include <wpi/DenseMap.h>
