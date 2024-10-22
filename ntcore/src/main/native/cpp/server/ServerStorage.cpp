@@ -4,6 +4,11 @@
 
 #include "ServerStorage.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <fmt/format.h>
 #include <wpi/Base64.h>
 #include <wpi/MessagePack.h>
