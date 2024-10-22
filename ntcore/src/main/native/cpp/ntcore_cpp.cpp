@@ -8,6 +8,9 @@
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <wpi/json.h>

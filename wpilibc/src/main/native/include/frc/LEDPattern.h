@@ -246,7 +246,7 @@ class LEDPattern {
   LEDPattern AtBrightness(double relativeBrightness);
 
   /** A pattern that turns off all LEDs. */
-  static LEDPattern kOff;
+  static LEDPattern Off();
 
   /**
    * Creates a pattern that displays a single static color along the entire
@@ -315,29 +315,52 @@ class LEDPattern {
   static LEDPattern Steps(
       std::initializer_list<std::pair<double, Color>> steps);
 
-  /**
-   * Creates a pattern that displays a non-animated gradient of colors across
-   * the entire length of the LED strip. The gradient wraps around so the start
-   * and end of the strip are the same color, which allows the gradient to be
-   * modified with a scrolling effect with no discontinuities. Colors are evenly
-   * distributed along the full length of the LED strip.
-   *
-   * @param colors the colors to display in the gradient
-   * @return a motionless gradient pattern
-   */
-  static LEDPattern Gradient(std::span<const Color> colors);
+  /** Types of gradients. */
+  enum GradientType {
+    /**
+     * A continuous gradient, where the gradient wraps around to allow for
+     * seamless scrolling effects.
+     */
+    kContinuous,
+    /**
+     * A discontinuous gradient, where the first pixel is set to the first color
+     * of the gradient and the final pixel is set to the last color of the
+     * gradient. There is no wrapping effect, so scrolling effects will display
+     * an obvious seam.
+     */
+    kDiscontinuous
+  };
 
   /**
    * Creates a pattern that displays a non-animated gradient of colors across
-   * the entire length of the LED strip. The gradient wraps around so the start
-   * and end of the strip are the same color, which allows the gradient to be
-   * modified with a scrolling effect with no discontinuities. Colors are evenly
-   * distributed along the full length of the LED strip.
+   * the entire length of the LED strip. Colors are evenly distributed along the
+   * full length of the LED strip. The gradient type is configured with the
+   * {@code type} parameter, allowing the gradient to be either continuous (no
+   * seams, good for scrolling effects) or discontinuous (a clear seam is
+   * visible, but the gradient applies to the full length of the LED strip
+   * without needing to use some space for wrapping).
    *
+   * @param type the type of gradient (continuous or discontinuous)
    * @param colors the colors to display in the gradient
    * @return a motionless gradient pattern
    */
-  static LEDPattern Gradient(std::initializer_list<Color> colors);
+  static LEDPattern Gradient(GradientType type, std::span<const Color> colors);
+
+  /**
+   * Creates a pattern that displays a non-animated gradient of colors across
+   * the entire length of the LED strip. Colors are evenly distributed along the
+   * full length of the LED strip. The gradient type is configured with the
+   * {@code type} parameter, allowing the gradient to be either continuous (no
+   * seams, good for scrolling effects) or discontinuous (a clear seam is
+   * visible, but the gradient applies to the full length of the LED strip
+   * without needing to use some space for wrapping).
+   *
+   * @param type the type of gradient (continuous or discontinuous)
+   * @param colors the colors to display in the gradient
+   * @return a motionless gradient pattern
+   */
+  static LEDPattern Gradient(GradientType type,
+                             std::initializer_list<Color> colors);
 
   /**
    * Creates an LED pattern that displays a rainbow across the color wheel. The

@@ -145,7 +145,7 @@ If you only want to run the Java autoformatter, run `./gradlew spotlessApply`.
 
 ### Generated files
 
-Several files within WPILib are generated using Jinja. If a PR is opened that modifies these templates then the files can be generated through CI by commenting `/pregen` on the PR. A new commit will be pushed with the regenerated files.
+Several files within WPILib are generated using Jinja. If a PR is opened that modifies these templates then the files can be generated through CI by commenting `/pregen` on the PR. A new commit will be pushed with the regenerated files. See [GeneratedFiles.md](GeneratedFiles.md) for more information.
 
 ### CMake
 

@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
 #include <string_view>
 
 #include <networktables/NetworkTable.h>
@@ -34,7 +32,9 @@ class ShuffleboardComponent : public ShuffleboardComponentBase {
    * @param type The component type.
    */
   ShuffleboardComponent(ShuffleboardContainer& parent, std::string_view title,
-                        std::string_view type = "");
+                        std::string_view type = "")
+      : ShuffleboardValue(title),
+        ShuffleboardComponentBase(parent, title, type) {}
 
   /**
    * Sets custom properties for this component. Property names are
@@ -44,7 +44,11 @@ class ShuffleboardComponent : public ShuffleboardComponentBase {
    * @param properties the properties for this component
    * @return this component
    */
-  Derived& WithProperties(const wpi::StringMap<nt::Value>& properties);
+  Derived& WithProperties(const wpi::StringMap<nt::Value>& properties) {
+    m_properties = properties;
+    m_metadataDirty = true;
+    return *static_cast<Derived*>(this);
+  }
 
   /**
    * Sets the position of this component in the tab. This has no effect if this
@@ -59,7 +63,12 @@ class ShuffleboardComponent : public ShuffleboardComponentBase {
    * @param rowIndex    the row in the tab to place this component
    * @return this component
    */
-  Derived& WithPosition(int columnIndex, int rowIndex);
+  Derived& WithPosition(int columnIndex, int rowIndex) {
+    m_column = columnIndex;
+    m_row = rowIndex;
+    m_metadataDirty = true;
+    return *static_cast<Derived*>(this);
+  }
 
   /**
    * Sets the size of this component in the tab. This has no effect if this
@@ -69,9 +78,12 @@ class ShuffleboardComponent : public ShuffleboardComponentBase {
    * @param height how many rows high the component should be
    * @return this component
    */
-  Derived& WithSize(int width, int height);
+  Derived& WithSize(int width, int height) {
+    m_width = width;
+    m_height = height;
+    m_metadataDirty = true;
+    return *static_cast<Derived*>(this);
+  }
 };
 
 }  // namespace frc
-
-#include "frc/shuffleboard/ShuffleboardComponent.inc"

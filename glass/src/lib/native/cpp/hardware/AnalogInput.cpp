@@ -4,6 +4,8 @@
 
 #include "glass/hardware/AnalogInput.h"
 
+#include <string>
+
 #include <imgui.h>
 #include <wpi/StringExtras.h>
 

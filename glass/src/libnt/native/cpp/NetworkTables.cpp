@@ -4,13 +4,18 @@
 
 #include "glass/networktables/NetworkTables.h"
 
+#include <algorithm>
 #include <cinttypes>
 #include <concepts>
 #include <cstring>
+#include <functional>
 #include <initializer_list>
+#include <map>
 #include <memory>
 #include <span>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
@@ -740,7 +745,7 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
           structName = *withoutArray;
         }
         auto desc = model.m_structDb.Find(structName);
-        if (desc && desc->IsValid()) {
+        if (desc && desc->IsValid() && desc->GetSize() != 0) {
           if (isArray) {
             // array of struct at top level
             if (valueChildrenMap) {

@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <ctime>
 #include <random>
+#include <string>
+#include <vector>
 
 #include <fmt/chrono.h>
 #include <networktables/NetworkTableInstance.h>
@@ -307,7 +309,7 @@ void Thread::StopNTLog() {
 void Thread::StartConsoleLog() {
   if (!m_consoleLoggerEnabled && RobotBase::IsReal()) {
     m_consoleLoggerEnabled = true;
-    m_consoleLogger = {"/home/lvuser/FRC_UserProgram.log", m_log, "output"};
+    m_consoleLogger = {"/home/lvuser/FRC_UserProgram.log", m_log, "console"};
   }
 }
 

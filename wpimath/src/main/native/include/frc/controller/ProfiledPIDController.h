@@ -162,7 +162,7 @@ class ProfiledPIDController
    * @return The position tolerance of the controller.
    */
   double GetPositionTolerance() const {
-    return m_controller.GetPositionTolerance();
+    return m_controller.GetErrorTolerance();
   }
 
   /**
@@ -171,7 +171,7 @@ class ProfiledPIDController
    * @return The velocity tolerance of the controller.
    */
   double GetVelocityTolerance() const {
-    return m_controller.GetVelocityTolerance();
+    return m_controller.GetErrorDerivativeTolerance();
   }
 
   /**
@@ -300,14 +300,14 @@ class ProfiledPIDController
    * @return The error.
    */
   Distance_t GetPositionError() const {
-    return Distance_t{m_controller.GetPositionError()};
+    return Distance_t{m_controller.GetError()};
   }
 
   /**
    * Returns the change in error per second.
    */
   Velocity_t GetVelocityError() const {
-    return Velocity_t{m_controller.GetVelocityError()};
+    return Velocity_t{m_controller.GetErrorDerivative()};
   }
 
   /**

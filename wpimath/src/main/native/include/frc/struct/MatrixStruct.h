@@ -24,13 +24,28 @@ struct wpi::Struct<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
   static constexpr std::string_view GetSchema() { return kSchema; }
 
   static frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols> Unpack(
-      std::span<const uint8_t> data);
+      std::span<const uint8_t> data) {
+    constexpr size_t kDataOff = 0;
+    wpi::array<double, Rows * Cols> mat_data =
+        wpi::UnpackStructArray<double, kDataOff, Rows * Cols>(data);
+    frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols> mat;
+    for (int i = 0; i < Rows * Cols; i++) {
+      mat(i) = mat_data[i];
+    }
+    return mat;
+  }
+
   static void Pack(
       std::span<uint8_t> data,
-      const frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>& value);
+      const frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>& value) {
+    constexpr size_t kDataOff = 0;
+    wpi::array<double, Rows * Cols> mat_data(wpi::empty_array);
+    for (int i = 0; i < Rows * Cols; i++) {
+      mat_data[i] = value(i);
+    }
+    wpi::PackStructArray<kDataOff, Rows * Cols>(data, mat_data);
+  }
 };
 
 static_assert(wpi::StructSerializable<frc::Matrixd<1, 2>>);
 static_assert(wpi::StructSerializable<frc::Matrixd<3, 3>>);
-
-#include "frc/struct/MatrixStruct.inc"

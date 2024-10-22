@@ -4,7 +4,7 @@
 
 #include "frc/Counter.h"
 
-#include <utility>
+#include <memory>
 
 #include <hal/Counter.h>
 #include <hal/FRCUsageReporting.h>
@@ -84,10 +84,12 @@ Counter::Counter(EncodingType encodingType,
 }
 
 Counter::~Counter() {
-  try {
-    SetUpdateWhenEmpty(true);
-  } catch (const RuntimeError& e) {
-    e.Report();
+  if (m_counter != HAL_kInvalidHandle) {
+    try {
+      SetUpdateWhenEmpty(true);
+    } catch (const RuntimeError& e) {
+      e.Report();
+    }
   }
 }
 

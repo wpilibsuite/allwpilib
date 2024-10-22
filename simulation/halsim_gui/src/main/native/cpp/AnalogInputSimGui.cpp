@@ -4,12 +4,11 @@
 
 #include "AnalogInputSimGui.h"
 
-#include <glass/View.h>
-#include <glass/hardware/AnalogInput.h>
-
 #include <memory>
 #include <vector>
 
+#include <glass/View.h>
+#include <glass/hardware/AnalogInput.h>
 #include <hal/Ports.h>
 #include <hal/simulation/AnalogGyroData.h>
 #include <hal/simulation/AnalogInData.h>

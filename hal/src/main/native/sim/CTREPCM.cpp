@@ -4,10 +4,11 @@
 
 #include "hal/CTREPCM.h"
 
+#include <string>
+
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/CANAPI.h"
 #include "hal/Errors.h"
 #include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/CTREPCMDataInternal.h"
@@ -48,7 +49,7 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
                                            pcm->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PCM", 0,
-                                       kNumCTREPCMModules, module);
+                                       kNumCTREPCMModules - 1, module);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }

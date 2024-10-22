@@ -4,7 +4,9 @@
 
 #include "Instance.h"
 
+#include <memory>
 #include <string_view>
+#include <utility>
 
 #include <fmt/format.h>
 #include <wpi/fs.h>
@@ -30,6 +32,7 @@ static void def_log_func(unsigned int level, const char* file,
     return;
   }
   wpi::print(stderr, "CS: {}: {} ({}:{})\n", levelmsg, msg,
+             // NOLINTNEXTLINE(build/include_what_you_use)
              fs::path{file}.filename().string(), line);
 }
 
@@ -95,6 +98,9 @@ void Instance::DestroySource(CS_Source handle) {
 
 void Instance::DestroySink(CS_Sink handle) {
   if (auto data = m_sinks.Free(handle)) {
+    if (auto source = data->sink->GetSource()) {
+      source->Wakeup();
+    }
     notifier.NotifySink(data->sink->GetName(), handle, CS_SINK_DESTROYED);
   }
 }

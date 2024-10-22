@@ -21,12 +21,12 @@ public class ArmFeedforwardStruct implements Struct<ArmFeedforward> {
 
   @Override
   public int getSize() {
-    return kSizeDouble * 4;
+    return kSizeDouble * 5;
   }
 
   @Override
   public String getSchema() {
-    return "double ks;double kg;double kv;double ka";
+    return "double ks;double kg;double kv;double ka;double dt";
   }
 
   @Override
@@ -35,7 +35,8 @@ public class ArmFeedforwardStruct implements Struct<ArmFeedforward> {
     double kg = bb.getDouble();
     double kv = bb.getDouble();
     double ka = bb.getDouble();
-    return new ArmFeedforward(ks, kg, kv, ka);
+    double dt = bb.getDouble();
+    return new ArmFeedforward(ks, kg, kv, ka, dt);
   }
 
   @Override
@@ -44,5 +45,6 @@ public class ArmFeedforwardStruct implements Struct<ArmFeedforward> {
     bb.putDouble(value.getKg());
     bb.putDouble(value.getKv());
     bb.putDouble(value.getKa());
+    bb.putDouble(value.getDt());
   }
 }

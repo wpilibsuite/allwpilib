@@ -33,8 +33,9 @@ includeOtherLibs {
   ^cameraserver/
   ^cscore
   ^fmt/
-  ^gtest/
+  ^glass/
   ^google/
+  ^gtest/
   ^hal/
   ^imgui
   ^implot

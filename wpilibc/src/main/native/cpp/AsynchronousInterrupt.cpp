@@ -6,6 +6,9 @@
 
 #include <frc/DigitalSource.h>
 
+#include <memory>
+#include <utility>
+
 using namespace frc;
 
 AsynchronousInterrupt::AsynchronousInterrupt(

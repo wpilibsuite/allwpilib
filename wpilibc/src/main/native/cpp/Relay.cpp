@@ -4,7 +4,7 @@
 
 #include "frc/Relay.h"
 
-#include <utility>
+#include <string>
 
 #include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
@@ -61,8 +61,12 @@ Relay::Relay(int channel, Relay::Direction direction)
 
 Relay::~Relay() {
   int32_t status = 0;
-  HAL_SetRelay(m_forwardHandle, false, &status);
-  HAL_SetRelay(m_reverseHandle, false, &status);
+  if (m_forwardHandle != HAL_kInvalidHandle) {
+    HAL_SetRelay(m_forwardHandle, false, &status);
+  }
+  if (m_reverseHandle != HAL_kInvalidHandle) {
+    HAL_SetRelay(m_reverseHandle, false, &status);
+  }
 }
 
 void Relay::Set(Relay::Value value) {

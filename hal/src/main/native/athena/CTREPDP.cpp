@@ -4,6 +4,8 @@
 
 #include "CTREPDP.h"
 
+#include <string>
+
 #include <fmt/format.h>
 #include <wpi/mutex.h>
 
@@ -131,8 +133,9 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, const char* allocationLocation,
                                 int32_t* status) {
   hal::init::CheckInit();
   if (!HAL_CheckPDPModule(module)) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, fmt::format("Invalid pdp module {}", module));
+    *status = RESOURCE_OUT_OF_RANGE;
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PDP", 0,
+                                     kNumCTREPDPModules - 1, module);
     return HAL_kInvalidHandle;
   }
 
@@ -145,7 +148,7 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, const char* allocationLocation,
                                            pdp->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PDP", 0,
-                                       kNumCTREPDPModules, module);
+                                       kNumCTREPDPModules - 1, module);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }

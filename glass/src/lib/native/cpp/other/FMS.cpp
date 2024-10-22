@@ -4,6 +4,8 @@
 
 #include "glass/other/FMS.h"
 
+#include <string>
+
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <wpi/SmallString.h>
