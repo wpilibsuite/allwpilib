@@ -39,9 +39,6 @@ public final class ProtoCDllGenerator {
 
     // Filter to generated descriptors
     CodeGeneratorResponse.Builder response = CodeGeneratorResponse.newBuilder();
-
-    
-
     response.setSupportedFeatures(Feature.FEATURE_PROTO3_OPTIONAL_VALUE);
 
     for (String genFile : request.getFileToGenerateList()) {
