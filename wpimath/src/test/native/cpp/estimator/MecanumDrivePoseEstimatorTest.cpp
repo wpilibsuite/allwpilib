@@ -368,8 +368,17 @@ TEST(MecanumDrivePoseEstimatorTest, TestReset) {
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
   frc::MecanumDrivePoseEstimator estimator{
-      kinematics,    frc::Rotation2d{}, frc::MecanumDriveWheelPositions{},
-      frc::Pose2d{}, {1.0, 1.0, 1.0},   {1.0, 1.0, 1.0}};
+      kinematics,
+      frc::Rotation2d{},
+      frc::MecanumDriveWheelPositions{},
+      frc::Pose2d{-1_m, -1_m, frc::Rotation2d{1_rad}},
+      {1.0, 1.0, 1.0},
+      {1.0, 1.0, 1.0}};
+
+  // Test initial pose
+  EXPECT_EQ(-1, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(-1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(1, estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test reset position
   estimator.ResetPosition(frc::Rotation2d{}, {1_m, 1_m, 1_m, 1_m},
