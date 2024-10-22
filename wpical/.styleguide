@@ -10,12 +10,12 @@ cppSrcFileInclude {
 
 generatedFileExclude {
   src/main/native/resources/
-  src/main/native/win/outlineviewer.ico
-  src/main/native/mac/ov.icns
+  src/main/native/win/wpical.ico
+  src/main/native/mac/wpical.icns
 }
 
 repoRootNameOverride {
-  outlineviewer
+  wpical
 }
 
 includeOtherLibs {
@@ -23,17 +23,13 @@ includeOtherLibs {
   ^ceres/
   ^fmt/
   ^frc/
-  ^glass/
-  ^glog/
   ^gtest/
   ^imgui
   ^implot\.h$
   ^mrcal_wrapper\.h$
-  ^networktables/
-  ^ntcore
+  ^opencv2\.h$
   ^portable-file-dialogs\.h$
   ^tagpose\.h$
-  ^units/
   ^wpi/
   ^wpigui
 }
