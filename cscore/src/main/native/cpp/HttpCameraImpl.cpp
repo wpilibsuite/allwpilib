@@ -295,12 +295,27 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
     return false;
   }
 
-  unsigned int contentLength = 0;
+  int width, height;
   if (auto v = wpi::parse_integer<unsigned int>(contentLengthBuf, 10)) {
-    contentLength = v.value();
+    // We know how big it is!  Just get a frame of the right size and read
+    // the data directly into it.
+    unsigned int contentLength = v.value();
+    auto image =
+        AllocImage(VideoMode::PixelFormat::kMJPEG, 0, 0, contentLength);
+    is.read(image->data(), contentLength);
+    if (!m_active || is.has_error()) {
+      return false;
+    }
+    if (!GetJpegSize(image->str(), &width, &height)) {
+      SWARNING("did not receive a JPEG image");
+      PutError("did not receive a JPEG image", wpi::Now());
+      return false;
+    }
+    image->width = width;
+    image->height = height;
+    PutFrame(std::move(image), wpi::Now());
   } else {
     // Ugh, no Content-Length?  Read the blocks of the JPEG file.
-    int width, height;
     if (!ReadJpeg(is, imageBuf, &width, &height)) {
       SWARNING("did not receive a JPEG image");
       PutError("did not receive a JPEG image", wpi::Now());
@@ -308,27 +323,18 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
     }
     PutFrame(VideoMode::PixelFormat::kMJPEG, width, height, imageBuf,
              wpi::Now());
-    ++m_frameCount;
-    return true;
   }
 
-  // We know how big it is!  Just get a frame of the right size and read
-  // the data directly into it.
-  auto image = AllocImage(VideoMode::PixelFormat::kMJPEG, 0, 0, contentLength);
-  is.read(image->data(), contentLength);
-  if (!m_active || is.has_error()) {
-    return false;
-  }
-  int width, height;
-  if (!GetJpegSize(image->str(), &width, &height)) {
-    SWARNING("did not receive a JPEG image");
-    PutError("did not receive a JPEG image", wpi::Now());
-    return false;
-  }
-  image->width = width;
-  image->height = height;
-  PutFrame(std::move(image), wpi::Now());
   ++m_frameCount;
+
+  // update video mode if not set
+  std::scoped_lock lock(m_mutex);
+  if (m_mode.pixelFormat != VideoMode::PixelFormat::kMJPEG ||
+      m_mode.width == 0 || m_mode.height == 0) {
+    m_mode.pixelFormat = VideoMode::PixelFormat::kMJPEG;
+    m_mode.width = width;
+    m_mode.height = height;
+  }
   return true;
 }
 
