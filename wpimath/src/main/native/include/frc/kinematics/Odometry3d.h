@@ -62,6 +62,7 @@ class WPILIB_DLLEXPORT Odometry3d {
       : m_kinematics(kinematics),
         m_pose(initialPose),
         m_previousWheelPositions(wheelPositions) {
+    m_pose2d = m_pose.ToPose2d();
     m_previousAngle = m_pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;
   }

@@ -31,6 +31,18 @@ class MecanumDriveOdometry3dTest {
       new MecanumDriveOdometry3d(m_kinematics, Rotation2d.kZero, zero);
 
   @Test
+  void testInitialize() {
+    MecanumDriveOdometry3d odometry =
+        new MecanumDriveOdometry3d(
+            m_kinematics, Rotation2d.kZero, zero, new Pose2d(1, 2, Rotation2d.fromDegrees(45)));
+    var pose = odometry.getPoseMeters();
+    assertAll(
+        () -> assertEquals(pose.getX(), 1.0, 1e-9),
+        () -> assertEquals(pose.getY(), 2.0, 1e-9),
+        () -> assertEquals(pose.getRotation().getDegrees(), 45.0, 1e-9));
+  }
+
+  @Test
   void testMultipleConsecutiveUpdates() {
     var wheelPositions = new MecanumDriveWheelPositions(3.536, 3.536, 3.536, 3.536);
 

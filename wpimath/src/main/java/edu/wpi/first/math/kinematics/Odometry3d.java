@@ -67,6 +67,7 @@ public class Odometry3d<T> {
       Pose3d initialPoseMeters) {
     m_kinematics = kinematics;
     m_poseMeters = initialPoseMeters;
+    m_pose2dMeters = m_poseMeters.toPose2d();
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = m_poseMeters.getRotation();
     m_previousWheelPositions = m_kinematics.copy(wheelPositions);

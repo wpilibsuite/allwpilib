@@ -25,6 +25,17 @@ class MecanumDriveOdometry3dTest : public ::testing::Test {
   MecanumDriveOdometry3d odometry{kinematics, 0_rad, zero};
 };
 
+TEST_F(MecanumDriveOdometry3dTest, Foo) {
+  MecanumDriveOdometry3d odometry{kinematics, 0_rad, zero,
+                                  frc::Pose2d{1_m, 2_m, 45_deg}};
+
+  const frc::Pose2d& pose = odometry.GetPose();
+
+  EXPECT_NEAR(pose.X().value(), 1, 1e-9);
+  EXPECT_NEAR(pose.Y().value(), 2, 1e-9);
+  EXPECT_NEAR(pose.Rotation().Degrees().value(), 45, 1e-9);
+}
+
 TEST_F(MecanumDriveOdometry3dTest, MultipleConsecutiveUpdates) {
   MecanumDriveWheelPositions wheelDeltas{3.536_m, 3.536_m, 3.536_m, 3.536_m};
 

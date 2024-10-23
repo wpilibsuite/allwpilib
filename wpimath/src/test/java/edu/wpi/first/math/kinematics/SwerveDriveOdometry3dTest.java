@@ -32,6 +32,21 @@ class SwerveDriveOdometry3dTest {
           m_kinematics, Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
 
   @Test
+  void testInitialize() {
+    SwerveDriveOdometry3d odometry =
+        new SwerveDriveOdometry3d(
+            m_kinematics,
+            Rotation2d.kZero,
+            new SwerveModulePosition[] {zero, zero, zero, zero},
+            new Pose2d(1, 2, Rotation2d.fromDegrees(45)));
+    var pose = odometry.getPoseMeters();
+    assertAll(
+        () -> assertEquals(pose.getX(), 1.0, 1e-9),
+        () -> assertEquals(pose.getY(), 2.0, 1e-9),
+        () -> assertEquals(pose.getRotation().getDegrees(), 45.0, 1e-9));
+  }
+
+  @Test
   void testTwoIterations() {
     // 5 units/sec  in the x-axis (forward)
     final SwerveModulePosition[] wheelDeltas = {

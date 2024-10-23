@@ -30,6 +30,19 @@ class SwerveDriveOdometry3dTest : public ::testing::Test {
       m_kinematics, 0_rad, {zero, zero, zero, zero}};
 };
 
+TEST_F(SwerveDriveOdometry3dTest, Foo) {
+  SwerveDriveOdometry3d odometry{m_kinematics,
+                                 0_rad,
+                                 {zero, zero, zero, zero},
+                                 frc::Pose2d{1_m, 2_m, 45_deg}};
+
+  const frc::Pose2d& pose = odometry.GetPose();
+
+  EXPECT_NEAR(pose.X().value(), 1, kEpsilon);
+  EXPECT_NEAR(pose.Y().value(), 2, kEpsilon);
+  EXPECT_NEAR(pose.Rotation().Degrees().value(), 45, kEpsilon);
+}
+
 TEST_F(SwerveDriveOdometry3dTest, TwoIterations) {
   SwerveModulePosition position{0.5_m, 0_deg};
 

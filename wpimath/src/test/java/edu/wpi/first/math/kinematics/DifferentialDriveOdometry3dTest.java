@@ -17,6 +17,18 @@ class DifferentialDriveOdometry3dTest {
       new DifferentialDriveOdometry3d(Rotation2d.kZero, 0, 0);
 
   @Test
+  void testInitialize() {
+    DifferentialDriveOdometry3d odometry =
+        new DifferentialDriveOdometry3d(
+            Rotation2d.kZero, 0, 0, new Pose2d(1, 2, Rotation2d.fromDegrees(45)));
+    var pose = odometry.getPoseMeters();
+    assertAll(
+        () -> assertEquals(pose.getX(), 1.0, kEpsilon),
+        () -> assertEquals(pose.getY(), 2.0, kEpsilon),
+        () -> assertEquals(pose.getRotation().getDegrees(), 45.0, kEpsilon));
+  }
+
+  @Test
   void testOdometryWithEncoderDistances() {
     m_odometry.resetPosition(Rotation2d.fromDegrees(45), 0, 0, Pose2d.kZero);
     var pose = m_odometry.update(Rotation2d.fromDegrees(135.0), 0.0, 5 * Math.PI);
