@@ -278,6 +278,17 @@ public interface Temperature extends Measure<TemperatureUnit> {
 
 
   @Override
+  default Mult<TemperatureUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<TemperatureUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<TemperatureUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<TemperatureUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<TemperatureUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<TemperatureUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }

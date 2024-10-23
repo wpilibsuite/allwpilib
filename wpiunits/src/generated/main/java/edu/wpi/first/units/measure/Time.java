@@ -278,6 +278,17 @@ public interface Time extends Measure<TimeUnit> {
 
 
   @Override
+  default Mult<TimeUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<TimeUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<TimeUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<TimeUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<TimeUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<TimeUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }
