@@ -37,8 +37,9 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   private final MutVoltage output = Volts.mutable(0.0);
 
   /**
-   * Creates a new SimpleMotorFeedforward with the specified plant and period. Units used to create the plant
-   * will dictate units of the computed feedforward. The static gain (ks) is assumed to be 0.0.
+   * Creates a new SimpleMotorFeedforward with the specified plant and period. Units used to create
+   * the plant will dictate units of the computed feedforward. The static gain (ks) is assumed to be
+   * 0.0.
    *
    * <p>The constructor is useful for simulating the FlywheelSim and DCMotorSim classes.
    *

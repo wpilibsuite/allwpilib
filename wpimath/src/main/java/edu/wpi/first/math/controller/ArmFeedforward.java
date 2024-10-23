@@ -45,7 +45,8 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   private final MutVoltage output = Volts.mutable(0.0);
 
   /**
-   * Creates a new ArmFeedforward with the specified plant, gravity gain, and period.  The static gain (ks) is assumed to be 0.0.
+   * Creates a new ArmFeedforward with the specified plant, gravity gain, and period. The static
+   * gain (ks) is assumed to be 0.0.
    *
    * <p>The constructor is useful for simulating the SingleJointedArmSim class.
    *
