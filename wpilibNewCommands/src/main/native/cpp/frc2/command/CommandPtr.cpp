@@ -64,6 +64,13 @@ CommandPtr CommandPtr::Fork(CommandPtr&& other) && {
   return std::move(*this);
 }
 
+CommandPtr CommandPtr::Fork(std::vector<CommandPtr>&& other) && {
+  AssertValid();
+  std::vector<Command*> vec{m_ptr.get(), };
+  m_ptr = make_unique<ScheduleCommand>(std::span<Command *>(vec));
+  return std::move(*this);
+}
+
 class RunsWhenDisabledCommand : public WrapperCommand {
  public:
   RunsWhenDisabledCommand(std::unique_ptr<Command>&& command,
