@@ -101,14 +101,14 @@ public abstract class ElementHandler {
         // Convert snakeCase field and method names to separate words,
         // while removing common field and method prefixes.
 
-        // Delete common field prefixes (k_Name, m_name, s_name)
+        // Delete common field prefixes (k_name, m_name, s_name)
         elementName = elementName.replaceFirst("^[msk]_", "");
-        if (elementName.matches("^k[A-Z]")) {
+        if (elementName.matches("^k[A-Z].*$")) {
           // Drop leading "k" prefix from fields
           // (though normally these should be static, and thus not logged)
           elementName = elementName.substring(1);
         }
-        if (elementName.matches("^get[A-Z]")) {
+        if (elementName.matches("^get[A-Z].*$")) {
           // Drop leading "get" from accessor methods
           elementName = elementName.substring(3);
         }
