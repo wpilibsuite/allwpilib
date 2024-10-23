@@ -840,7 +840,7 @@ class LEDPatternTest {
   @Test
   void offsetMask() {
     var pattern =
-        LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.77, kGreen))
+        LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
             .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
             .offsetBy(4);
     var buffer = new AddressableLEDBuffer(8);
