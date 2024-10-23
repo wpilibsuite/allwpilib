@@ -43,7 +43,7 @@ jobs:
           distribution: 'temurin'
           java-version: 17
       - name: Install wpiformat
-        run: pip3 install wpiformat==2024.42
+        run: pip3 install wpiformat==2024.44
       - name: Run wpiformat
         run: wpiformat
       - name: Run spotlessApply
