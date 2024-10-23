@@ -116,6 +116,7 @@ UNIT_CONFIGURATIONS = {
             "Mass": "Mass",
             "MomentOfInertia": "MomentOfInertia",
             "Power": "Power",
+            "Resistance": "Resistance",
             "Temperature": "Temperature",
             "Time": "Time",
             "Torque": "Torque",

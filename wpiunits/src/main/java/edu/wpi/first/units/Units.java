@@ -412,6 +412,25 @@ public final class Units {
    */
   public static final CurrentUnit Milliamp = Milliamps; // alias
 
+  // ResistanceUnit
+  /** The base unit of resistance. Equivalent to one {@link #Volt} per {@link #Amp}. */
+  public static final ResistanceUnit Ohms = derive(Volts.per(Amp)).named("Ohm").symbol("Ω").make();
+
+  /** The base unit of resistance. Equivalent to one {@link #Volt} per {@link #Amp}. */
+  public static final ResistanceUnit Ohm = Ohms; // alias
+
+  /** A unit equal to 1,000 {@link #Ohms}. */
+  public static final ResistanceUnit KiloOhms = Kilo(Ohms);
+
+  /** A unit equal to 1,000 {@link #Ohms}. */
+  public static final ResistanceUnit KiloOhm = KiloOhms; // alias
+
+  /** A unit equal to 1/1000 of a {@link #Ohm}. */
+  public static final ResistanceUnit MilliOhms = Milli(Ohms);
+
+  /** A unit equal to 1/1000 of a {@link #Ohm}. */
+  public static final ResistanceUnit MilliOhm = MilliOhms; // alias  
+
   // EnergyUnit
   /** The base unit of energy. */
   public static final EnergyUnit Joules = BaseUnits.EnergyUnit;
@@ -522,25 +541,6 @@ public final class Units {
    */
   public static final PerUnit<VoltageUnit, AngularAccelerationUnit> VoltsPerRadianPerSecondSquared =
       Volts.per(RadiansPerSecond.per(Second));
-
-  // ResistanceUnit
-  /** The base unit of resistance. Equivalent to one {@link #Volt} per {@link #Amp}. */
-  public static final ResistanceUnit Ohms = derive(Volts.per(Amp)).named("Ohm").symbol("Ω").make();
-
-  /** The base unit of resistance. Equivalent to one {@link #Volt} per {@link #Amp}. */
-  public static final ResistanceUnit Ohm = Ohms; // alias
-
-  /** A unit equal to 1,000 {@link #Ohms}. */
-  public static final ResistanceUnit KiloOhms = Kilo(Ohms);
-
-  /** A unit equal to 1,000 {@link #Ohms}. */
-  public static final ResistanceUnit KiloOhm = KiloOhms; // alias
-
-  /** A unit equal to 1/1000 of a {@link #Ohm}. */
-  public static final ResistanceUnit MilliOhms = Milli(Ohms);
-
-  /** A unit equal to 1/1000 of a {@link #Ohm}. */
-  public static final ResistanceUnit MilliOhm = MilliOhms; // alias
 
   /**
    * Creates a unit equal to a thousandth of the base unit, eg Milliseconds = Milli(Units.Seconds).
