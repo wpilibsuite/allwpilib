@@ -44,7 +44,7 @@ import java.util.TreeSet;
  * }
  * </pre>
  */
-public class Alert {
+public class Alert implements AutoCloseable {
   /** Represents an alert's level of urgency. */
   public enum AlertType {
     /**
@@ -175,6 +175,11 @@ public class Alert {
       builder.addStringArrayProperty("warnings", () -> getStrings(AlertType.kWarning), null);
       builder.addStringArrayProperty("infos", () -> getStrings(AlertType.kInfo), null);
     }
+  }
+
+  @Override
+  public void close() throws Exception {
+    set(false);
   }
 
   /**
