@@ -87,7 +87,8 @@ class CommandScheduler final : public wpi::Sendable,
    * interruptible. If this is the case, they will be interrupted and the
    * command will be scheduled.
    *
-   * @warning Using this function directly is often a footgun and should be avoided. Instead Triggers should be used to schedule Commands.
+   * @warning Using this function directly is often a footgun and should be
+   * avoided. Instead Triggers should be used to schedule Commands.
    *
    * @param command the command to schedule
    */
@@ -113,7 +114,8 @@ class CommandScheduler final : public wpi::Sendable,
    *
    * The pointer must remain valid through the entire lifecycle of the command.
    *
-   * @warning Using this function directly is often a footgun and should be avoided. Instead Triggers should be used to schedule Commands.
+   * @warning Using this function directly is often a footgun and should be
+   * avoided. Instead Triggers should be used to schedule Commands.
    *
    * @param command the command to schedule
    */
@@ -123,7 +125,8 @@ class CommandScheduler final : public wpi::Sendable,
    * Schedules multiple commands for execution. Does nothing for commands
    * already scheduled.
    *
-   * @warning Using this function directly is often a footgun and should be avoided. Instead Triggers should be used to schedule Commands.
+   * @warning Using this function directly is often a footgun and should be
+   * avoided. Instead Triggers should be used to schedule Commands.
    *
    * @param commands the commands to schedule
    */
@@ -133,7 +136,8 @@ class CommandScheduler final : public wpi::Sendable,
    * Schedules multiple commands for execution. Does nothing for commands
    * already scheduled.
    *
-   * @warning Using this function directly is often a footgun and should be avoided. Instead Triggers should be used to schedule Commands.
+   * @warning Using this function directly is often a footgun and should be
+   * avoided. Instead Triggers should be used to schedule Commands.
    *
    * @param commands the commands to schedule
    */
