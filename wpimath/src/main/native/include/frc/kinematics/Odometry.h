@@ -12,6 +12,7 @@
 #include "frc/kinematics/Kinematics.h"
 
 namespace frc {
+
 /**
  * Class for odometry. Robot code should not use this directly- Instead, use the
  * particular type for your drivetrain (e.g., DifferentialDriveOdometry).
@@ -39,7 +40,13 @@ class WPILIB_DLLEXPORT Odometry {
   explicit Odometry(const Kinematics<WheelSpeeds, WheelPositions>& kinematics,
                     const Rotation2d& gyroAngle,
                     const WheelPositions& wheelPositions,
-                    const Pose2d& initialPose = Pose2d{});
+                    const Pose2d& initialPose = Pose2d{})
+      : m_kinematics(kinematics),
+        m_pose(initialPose),
+        m_previousWheelPositions(wheelPositions) {
+    m_previousAngle = m_pose.Rotation();
+    m_gyroOffset = m_pose.Rotation() - gyroAngle;
+  }
 
   /**
    * Resets the robot's position on the field.
@@ -108,7 +115,21 @@ class WPILIB_DLLEXPORT Odometry {
    * @return The new pose of the robot.
    */
   const Pose2d& Update(const Rotation2d& gyroAngle,
-                       const WheelPositions& wheelPositions);
+                       const WheelPositions& wheelPositions) {
+    auto angle = gyroAngle + m_gyroOffset;
+
+    auto twist =
+        m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
+    twist.dtheta = (angle - m_previousAngle).Radians();
+
+    auto newPose = m_pose.Exp(twist);
+
+    m_previousAngle = angle;
+    m_previousWheelPositions = wheelPositions;
+    m_pose = {newPose.Translation(), angle};
+
+    return m_pose;
+  }
 
  private:
   const Kinematics<WheelSpeeds, WheelPositions>& m_kinematics;
@@ -118,6 +139,5 @@ class WPILIB_DLLEXPORT Odometry {
   Rotation2d m_previousAngle;
   Rotation2d m_gyroOffset;
 };
-}  // namespace frc
 
-#include "Odometry.inc"
+}  // namespace frc

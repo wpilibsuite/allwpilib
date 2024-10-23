@@ -87,10 +87,10 @@ index dc2d1bd234b1f12e39b7e76d6e290c15b19a3735..851af81c74e5b5d62f5f7e72da84703c
  
  #endif /* UV_DARWIN_SYSCALLS_H_ */
 diff --git a/src/unix/internal.h b/src/unix/internal.h
-index 0bf3736cd682e43beedcf4c701a147787f1329fc..c1ead096f7d43b9e7a0daf8de2b65cc82bec7eaf 100644
+index 1daf4d81da3a5bf931c4a5db8fd9116c4c303012..9377e970c4a7adafb8195974f6dc5ba40437ef1a 100644
 --- a/src/unix/internal.h
 +++ b/src/unix/internal.h
-@@ -241,6 +241,8 @@ struct uv__statx {
+@@ -237,6 +237,8 @@ struct uv__statx {
  #if defined(__linux__) && O_NDELAY != O_NONBLOCK
  #undef uv__nonblock
  #define uv__nonblock uv__nonblock_fcntl
@@ -100,7 +100,7 @@ index 0bf3736cd682e43beedcf4c701a147787f1329fc..c1ead096f7d43b9e7a0daf8de2b65cc8
  
  /* core */
 diff --git a/src/win/fs.c b/src/win/fs.c
-index a4b47fe5ec4135059b8e08be6a232ddd7798bebe..af07d092a65909ac4948c679b95468eef549ccca 100644
+index f1966ab5c0245af0f56ca407a1697a5c8609ebb4..572a82dca3cbcdb7829241dd520e8f34591d81e9 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
 @@ -43,6 +43,7 @@

@@ -17,6 +17,7 @@
 #include <wpi/Base64.h>
 #include <wpi/MessagePack.h>
 #include <wpi/SmallVector.h>
+#include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/json.h>
 #include <wpi/raw_ostream.h>
@@ -26,6 +27,7 @@
 #include "Log.h"
 #include "NetworkInterface.h"
 #include "Types_internal.h"
+#include "net/Message.h"
 #include "net/WireEncoder.h"
 #include "net3/WireConnection3.h"
 #include "net3/WireEncoder3.h"
@@ -199,10 +201,9 @@ std::span<ServerImpl::SubscriberData*> ServerImpl::ClientData::GetSubscribers(
   return {buf.data(), buf.size()};
 }
 
-void ServerImpl::ClientData4Base::ClientPublish(int64_t pubuid,
-                                                std::string_view name,
-                                                std::string_view typeStr,
-                                                const wpi::json& properties) {
+void ServerImpl::ClientData4Base::ClientPublish(
+    int pubuid, std::string_view name, std::string_view typeStr,
+    const wpi::json& properties, const PubSubOptionsImpl& options) {
   DEBUG3("ClientPublish({}, {}, {}, {})", m_id, name, pubuid, typeStr);
   auto topic = m_server.CreateTopic(this, name, typeStr, properties);
 
@@ -224,7 +225,7 @@ void ServerImpl::ClientData4Base::ClientPublish(int64_t pubuid,
   SendAnnounce(topic, pubuid);
 }
 
-void ServerImpl::ClientData4Base::ClientUnpublish(int64_t pubuid) {
+void ServerImpl::ClientData4Base::ClientUnpublish(int pubuid) {
   DEBUG3("ClientUnpublish({}, {})", m_id, pubuid);
   auto publisherIt = m_publishers.find(pubuid);
   if (publisherIt == m_publishers.end()) {
@@ -270,7 +271,7 @@ void ServerImpl::ClientData4Base::ClientSetProperties(std::string_view name,
 }
 
 void ServerImpl::ClientData4Base::ClientSubscribe(
-    int64_t subuid, std::span<const std::string> topicNames,
+    int subuid, std::span<const std::string> topicNames,
     const PubSubOptionsImpl& options) {
   DEBUG4("ClientSubscribe({}, ({}), {})", m_id, fmt::join(topicNames, ","),
          subuid);
@@ -347,7 +348,7 @@ void ServerImpl::ClientData4Base::ClientSubscribe(
   }
 }
 
-void ServerImpl::ClientData4Base::ClientUnsubscribe(int64_t subuid) {
+void ServerImpl::ClientData4Base::ClientUnsubscribe(int subuid) {
   DEBUG3("ClientUnsubscribe({}, {})", m_id, subuid);
   auto subIt = m_subscribers.find(subuid);
   if (subIt == m_subscribers.end() || !subIt->getSecond()) {
@@ -377,7 +378,7 @@ void ServerImpl::ClientData4Base::ClientUnsubscribe(int64_t subuid) {
   }
 }
 
-void ServerImpl::ClientData4Base::ClientSetValue(int64_t pubuid,
+void ServerImpl::ClientData4Base::ClientSetValue(int pubuid,
                                                  const Value& value) {
   DEBUG4("ClientSetValue({}, {})", m_id, pubuid);
   auto publisherIt = m_publishers.find(pubuid);
@@ -393,12 +394,12 @@ void ServerImpl::ClientDataLocal::SendValue(TopicData* topic,
                                             const Value& value,
                                             ValueSendMode mode) {
   if (m_server.m_local) {
-    m_server.m_local->NetworkSetValue(topic->localHandle, value);
+    m_server.m_local->ServerSetValue(topic->localTopic, value);
   }
 }
 
 void ServerImpl::ClientDataLocal::SendAnnounce(TopicData* topic,
-                                               std::optional<int64_t> pubuid) {
+                                               std::optional<int> pubuid) {
   if (m_server.m_local) {
     auto& sent = m_announceSent[topic];
     if (sent) {
@@ -406,8 +407,8 @@ void ServerImpl::ClientDataLocal::SendAnnounce(TopicData* topic,
     }
     sent = true;
 
-    topic->localHandle = m_server.m_local->NetworkAnnounce(
-        topic->name, topic->typeStr, topic->properties, pubuid.value_or(0));
+    topic->localTopic = m_server.m_local->ServerAnnounce(
+        topic->name, 0, topic->typeStr, topic->properties, pubuid);
   }
 }
 
@@ -418,7 +419,7 @@ void ServerImpl::ClientDataLocal::SendUnannounce(TopicData* topic) {
       return;
     }
     sent = false;
-    m_server.m_local->NetworkUnannounce(topic->name);
+    m_server.m_local->ServerUnannounce(topic->name, topic->localTopic);
   }
 }
 
@@ -429,36 +430,38 @@ void ServerImpl::ClientDataLocal::SendPropertiesUpdate(TopicData* topic,
     if (!m_announceSent.lookup(topic)) {
       return;
     }
-    m_server.m_local->NetworkPropertiesUpdate(topic->name, update, ack);
+    m_server.m_local->ServerPropertiesUpdate(topic->name, update, ack);
   }
 }
 
-void ServerImpl::ClientDataLocal::HandleLocal(
-    std::span<const ClientMessage> msgs) {
-  DEBUG4("HandleLocal()");
-  if (msgs.empty()) {
-    return;
-  }
+bool ServerImpl::ClientData4Base::DoProcessIncomingMessages(
+    ClientMessageQueue& queue, size_t max) {
+  DEBUG4("ProcessIncomingMessage()");
+  max = (std::min)(m_msgsBuf.size(), max);
+  std::span<ClientMessage> msgs =
+      queue.ReadQueue(wpi::take_front(std::span{m_msgsBuf}, max));
+
   // just map as a normal client into client=0 calls
   bool updatepub = false;
   bool updatesub = false;
   for (const auto& elem : msgs) {  // NOLINT
     // common case is value, so check that first
     if (auto msg = std::get_if<ClientValueMsg>(&elem.contents)) {
-      ClientSetValue(msg->pubHandle, msg->value);
+      ClientSetValue(msg->pubuid, msg->value);
     } else if (auto msg = std::get_if<PublishMsg>(&elem.contents)) {
-      ClientPublish(msg->pubHandle, msg->name, msg->typeStr, msg->properties);
+      ClientPublish(msg->pubuid, msg->name, msg->typeStr, msg->properties,
+                    msg->options);
       updatepub = true;
     } else if (auto msg = std::get_if<UnpublishMsg>(&elem.contents)) {
-      ClientUnpublish(msg->pubHandle);
+      ClientUnpublish(msg->pubuid);
       updatepub = true;
     } else if (auto msg = std::get_if<SetPropertiesMsg>(&elem.contents)) {
       ClientSetProperties(msg->name, msg->update);
     } else if (auto msg = std::get_if<SubscribeMsg>(&elem.contents)) {
-      ClientSubscribe(msg->subHandle, msg->topicNames, msg->options);
+      ClientSubscribe(msg->subuid, msg->topicNames, msg->options);
       updatesub = true;
     } else if (auto msg = std::get_if<UnsubscribeMsg>(&elem.contents)) {
-      ClientUnsubscribe(msg->subHandle);
+      ClientUnsubscribe(msg->subuid);
       updatesub = true;
     }
   }
@@ -468,24 +471,35 @@ void ServerImpl::ClientDataLocal::HandleLocal(
   if (updatesub) {
     UpdateMetaClientSub();
   }
+
+  return msgs.size() == max;  // don't know for sure, but there might be more
 }
 
-void ServerImpl::ClientData4::ProcessIncomingText(std::string_view data) {
-  if (WireDecodeText(data, *this, m_logger)) {
-    UpdateMetaClientPub();
-    UpdateMetaClientSub();
+bool ServerImpl::ClientData4::ProcessIncomingText(std::string_view data) {
+  constexpr int kMaxImmProcessing = 10;
+  bool queueWasEmpty = m_incoming.empty();
+  // can't directly process, because we don't know how big it is
+  WireDecodeText(data, m_incoming, m_logger);
+  if (queueWasEmpty &&
+      DoProcessIncomingMessages(m_incoming, kMaxImmProcessing)) {
+    m_wire.StopRead();
+    return true;
   }
+  return false;
 }
 
-void ServerImpl::ClientData4::ProcessIncomingBinary(
+bool ServerImpl::ClientData4::ProcessIncomingBinary(
     std::span<const uint8_t> data) {
+  constexpr int kMaxImmProcessing = 10;
+  // if we've already queued, keep queuing
+  int count = m_incoming.empty() ? 0 : kMaxImmProcessing;
   for (;;) {
     if (data.empty()) {
       break;
     }
 
     // decode message
-    int64_t pubuid;
+    int pubuid;
     Value value;
     std::string error;
     if (!WireDecodeBinary(&data, &pubuid, &value, &error, 0)) {
@@ -503,17 +517,26 @@ void ServerImpl::ClientData4::ProcessIncomingBinary(
     }
 
     // handle value set
-    ClientSetValue(pubuid, value);
+    if (++count < kMaxImmProcessing) {
+      ClientSetValue(pubuid, value);
+    } else {
+      m_incoming.ClientSetValue(pubuid, value);
+    }
   }
+  if (count >= kMaxImmProcessing) {
+    m_wire.StopRead();
+    return true;
+  }
+  return false;
 }
 
 void ServerImpl::ClientData4::SendValue(TopicData* topic, const Value& value,
                                         ValueSendMode mode) {
-  m_outgoing.SendValue(topic->GetIdHandle(), value, mode);
+  m_outgoing.SendValue(topic->id, value, mode);
 }
 
 void ServerImpl::ClientData4::SendAnnounce(TopicData* topic,
-                                           std::optional<int64_t> pubuid) {
+                                           std::optional<int> pubuid) {
   auto& sent = m_announceSent[topic];
   if (sent) {
     return;
@@ -532,9 +555,9 @@ void ServerImpl::ClientData4::SendAnnounce(TopicData* topic,
       return;
     }
   }
-  m_outgoing.SendMessage(topic->GetIdHandle(),
-                         AnnounceMsg{topic->name, topic->id, topic->typeStr,
-                                     pubuid, topic->properties});
+  m_outgoing.SendMessage(
+      topic->id, AnnounceMsg{topic->name, static_cast<int>(topic->id),
+                             topic->typeStr, pubuid, topic->properties});
   m_server.m_controlReady = true;
 }
 
@@ -555,9 +578,9 @@ void ServerImpl::ClientData4::SendUnannounce(TopicData* topic) {
       return;
     }
   }
-  m_outgoing.SendMessage(topic->GetIdHandle(),
-                         UnannounceMsg{topic->name, topic->id});
-  m_outgoing.EraseHandle(topic->GetIdHandle());
+  m_outgoing.SendMessage(
+      topic->id, UnannounceMsg{topic->name, static_cast<int>(topic->id)});
+  m_outgoing.EraseId(topic->id);
   m_server.m_controlReady = true;
 }
 
@@ -579,7 +602,7 @@ void ServerImpl::ClientData4::SendPropertiesUpdate(TopicData* topic,
       return;
     }
   }
-  m_outgoing.SendMessage(topic->GetIdHandle(),
+  m_outgoing.SendMessage(topic->id,
                          PropertiesUpdateMsg{topic->name, update, ack});
   m_server.m_controlReady = true;
 }
@@ -598,7 +621,7 @@ void ServerImpl::ClientData4::UpdatePeriod(TopicData::TopicClientData& tcd,
   uint32_t period =
       CalculatePeriod(tcd.subscribers, [](auto& x) { return x->periodMs; });
   DEBUG4("updating {} period to {} ms", topic->name, period);
-  m_outgoing.SetPeriod(topic->GetIdHandle(), period);
+  m_outgoing.SetPeriod(topic->id, period);
 }
 
 bool ServerImpl::ClientData3::TopicData3::UpdateFlags(TopicData* topic) {
@@ -608,11 +631,12 @@ bool ServerImpl::ClientData3::TopicData3::UpdateFlags(TopicData* topic) {
   return updated;
 }
 
-void ServerImpl::ClientData3::ProcessIncomingBinary(
+bool ServerImpl::ClientData3::ProcessIncomingBinary(
     std::span<const uint8_t> data) {
   if (!m_decoder.Execute(&data)) {
     m_wire.Disconnect(m_decoder.GetError());
   }
+  return false;
 }
 
 void ServerImpl::ClientData3::SendValue(TopicData* topic, const Value& value,
@@ -681,7 +705,7 @@ void ServerImpl::ClientData3::SendValue(TopicData* topic, const Value& value,
 }
 
 void ServerImpl::ClientData3::SendAnnounce(TopicData* topic,
-                                           std::optional<int64_t> pubuid) {
+                                           std::optional<int> pubuid) {
   // ignore if we've not yet built the subscriber
   if (m_subscribers.empty()) {
     return;
@@ -1918,14 +1942,11 @@ void ServerImpl::SendOutgoing(int clientId, uint64_t curTimeMs) {
   }
 }
 
-void ServerImpl::HandleLocal(std::span<const ClientMessage> msgs) {
-  // just map as a normal client into client=0 calls
-  m_localClient->HandleLocal(msgs);
-}
-
-void ServerImpl::SetLocal(LocalInterface* local) {
+void ServerImpl::SetLocal(ServerMessageHandler* local,
+                          ClientMessageQueue* queue) {
   DEBUG4("SetLocal()");
   m_local = local;
+  m_localClient->SetQueue(queue);
 
   // create server meta topics
   m_metaClients = CreateMetaTopic("$clients");
@@ -1939,17 +1960,37 @@ void ServerImpl::SetLocal(LocalInterface* local) {
   m_localClient->UpdateMetaClientSub();
 }
 
-void ServerImpl::ProcessIncomingText(int clientId, std::string_view data) {
+bool ServerImpl::ProcessIncomingText(int clientId, std::string_view data) {
   if (auto client = m_clients[clientId].get()) {
-    client->ProcessIncomingText(data);
+    return client->ProcessIncomingText(data);
+  } else {
+    return false;
   }
 }
 
-void ServerImpl::ProcessIncomingBinary(int clientId,
+bool ServerImpl::ProcessIncomingBinary(int clientId,
                                        std::span<const uint8_t> data) {
   if (auto client = m_clients[clientId].get()) {
-    client->ProcessIncomingBinary(data);
+    return client->ProcessIncomingBinary(data);
+  } else {
+    return false;
   }
+}
+
+bool ServerImpl::ProcessIncomingMessages(size_t max) {
+  DEBUG4("ProcessIncomingMessages({})", max);
+  bool rv = false;
+  for (auto&& client : m_clients) {
+    if (client && client->ProcessIncomingMessages(max)) {
+      rv = true;
+    }
+  }
+  return rv;
+}
+
+bool ServerImpl::ProcessLocalMessages(size_t max) {
+  DEBUG4("ProcessLocalMessages({})", max);
+  return m_localClient->ProcessIncomingMessages(max);
 }
 
 void ServerImpl::ConnectionsChanged(const std::vector<ConnectionInfo>& conns) {

@@ -163,27 +163,11 @@ apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 nativeUtils.exportsConfigs {
     wpiutil {
-        x64ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
     }
 }
 
 cppHeadersZip {
     from('src/main/native/thirdparty/argparse/include/') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/concurrentqueue/include') {
         into '/'
     }
     from('src/main/native/thirdparty/expected/include') {
@@ -241,7 +225,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/concurrentqueue/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include'
                 }
             }
         }

@@ -29,7 +29,7 @@ index 28c6df2566696785383716bf463c37cf2d07f987..36fef0fdff5090bb3a56d7e231c3bfe3
         src/win/async.c
         src/win/core.c
 diff --git a/configure.ac b/configure.ac
-index b7981d6194969b74751b97747cfc7bc1d679536b..0ad8026905453e27fff8f720913fdda2544baef2 100644
+index 98c59363026f8657dccc3aa2ed80d8bee159ebec..c4ee0756551876eac394282f2020cf44be17d023 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -74,7 +74,7 @@ AM_CONDITIONAL([OS400],    [AS_CASE([$host_os],[os400],         [true], [false])

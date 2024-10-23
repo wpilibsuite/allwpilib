@@ -40,7 +40,9 @@ class TrapezoidProfileCommand
    * @param goal The supplier for the desired state
    * @param currentState The current state
    * @param requirements The list of requirements.
+   * @deprecated Use a TrapezoidProfile instead
    */
+  [[deprecated("Use a TrapezoidProfile instead")]]
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
                           std::function<State()> goal,

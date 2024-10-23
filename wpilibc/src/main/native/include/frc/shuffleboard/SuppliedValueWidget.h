@@ -14,7 +14,6 @@
 #include <networktables/NetworkTable.h>
 
 #include "frc/shuffleboard/ShuffleboardComponent.h"
-#include "frc/shuffleboard/ShuffleboardComponent.inc"
 #include "frc/shuffleboard/ShuffleboardComponentBase.h"
 #include "frc/shuffleboard/ShuffleboardWidget.h"
 

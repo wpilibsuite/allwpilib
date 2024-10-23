@@ -9,10 +9,10 @@
 #include <span>
 #include <string>
 #include <string_view>
-#include <utility>
 #include <vector>
 
 #include "networktables/Topic.h"
+#include "ntcore_cpp.h"
 
 namespace nt {
 
@@ -36,7 +36,7 @@ class GenericSubscriber : public Subscriber {
    *
    * @param handle Native handle
    */
-  explicit GenericSubscriber(NT_Subscriber handle);
+  explicit GenericSubscriber(NT_Subscriber handle) : Subscriber{handle} {}
 
   /**
    * Get the last published value.
@@ -44,7 +44,7 @@ class GenericSubscriber : public Subscriber {
    *
    * @return value
    */
-  ValueType Get() const;
+  ValueType Get() const { return ::nt::GetEntryValue(m_subHandle); }
 
   /**
    * Gets the entry's value as a boolean. If the entry does not exist or is of
@@ -53,7 +53,9 @@ class GenericSubscriber : public Subscriber {
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    */
-  bool GetBoolean(bool defaultValue) const;
+  bool GetBoolean(bool defaultValue) const {
+    return ::nt::GetBoolean(m_subHandle, defaultValue);
+  }
 
   /**
    * Gets the entry's value as a integer. If the entry does not exist or is of
@@ -62,7 +64,9 @@ class GenericSubscriber : public Subscriber {
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    */
-  int64_t GetInteger(int64_t defaultValue) const;
+  int64_t GetInteger(int64_t defaultValue) const {
+    return ::nt::GetInteger(m_subHandle, defaultValue);
+  }
 
   /**
    * Gets the entry's value as a float. If the entry does not exist or is of
@@ -71,7 +75,9 @@ class GenericSubscriber : public Subscriber {
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    */
-  float GetFloat(float defaultValue) const;
+  float GetFloat(float defaultValue) const {
+    return ::nt::GetFloat(m_subHandle, defaultValue);
+  }
 
   /**
    * Gets the entry's value as a double. If the entry does not exist or is of
@@ -80,7 +86,9 @@ class GenericSubscriber : public Subscriber {
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    */
-  double GetDouble(double defaultValue) const;
+  double GetDouble(double defaultValue) const {
+    return ::nt::GetDouble(m_subHandle, defaultValue);
+  }
 
   /**
    * Gets the entry's value as a string. If the entry does not exist or is of
@@ -89,7 +97,9 @@ class GenericSubscriber : public Subscriber {
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    */
-  std::string GetString(std::string_view defaultValue) const;
+  std::string GetString(std::string_view defaultValue) const {
+    return ::nt::GetString(m_subHandle, defaultValue);
+  }
 
   /**
    * Gets the entry's value as a raw. If the entry does not exist or is of
@@ -98,7 +108,9 @@ class GenericSubscriber : public Subscriber {
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    */
-  std::vector<uint8_t> GetRaw(std::span<const uint8_t> defaultValue) const;
+  std::vector<uint8_t> GetRaw(std::span<const uint8_t> defaultValue) const {
+    return ::nt::GetRaw(m_subHandle, defaultValue);
+  }
 
   /**
    * Gets the entry's value as a boolean array. If the entry does not exist
@@ -114,7 +126,9 @@ class GenericSubscriber : public Subscriber {
    *       because std::vector<bool> is special-cased in C++.  0 is false, any
    *       non-zero value is true.
    */
-  std::vector<int> GetBooleanArray(std::span<const int> defaultValue) const;
+  std::vector<int> GetBooleanArray(std::span<const int> defaultValue) const {
+    return ::nt::GetBooleanArray(m_subHandle, defaultValue);
+  }
 
   /**
    * Gets the entry's value as a integer array. If the entry does not exist
@@ -127,7 +141,9 @@ class GenericSubscriber : public Subscriber {
    *       concern, use GetValue() instead.
    */
   std::vector<int64_t> GetIntegerArray(
-      std::span<const int64_t> defaultValue) const;
+      std::span<const int64_t> defaultValue) const {
+    return ::nt::GetIntegerArray(m_subHandle, defaultValue);
+  }
 
   /**
    * Gets the entry's value as a float array. If the entry does not exist
@@ -139,7 +155,9 @@ class GenericSubscriber : public Subscriber {
    * @note This makes a copy of the array.  If the overhead of this is a
    *       concern, use GetValue() instead.
    */
-  std::vector<float> GetFloatArray(std::span<const float> defaultValue) const;
+  std::vector<float> GetFloatArray(std::span<const float> defaultValue) const {
+    return ::nt::GetFloatArray(m_subHandle, defaultValue);
+  }
 
   /**
    * Gets the entry's value as a double array. If the entry does not exist
@@ -152,7 +170,9 @@ class GenericSubscriber : public Subscriber {
    *       concern, use GetValue() instead.
    */
   std::vector<double> GetDoubleArray(
-      std::span<const double> defaultValue) const;
+      std::span<const double> defaultValue) const {
+    return ::nt::GetDoubleArray(m_subHandle, defaultValue);
+  }
 
   /**
    * Gets the entry's value as a string array. If the entry does not exist
@@ -165,7 +185,9 @@ class GenericSubscriber : public Subscriber {
    *       concern, use GetValue() instead.
    */
   std::vector<std::string> GetStringArray(
-      std::span<const std::string> defaultValue) const;
+      std::span<const std::string> defaultValue) const {
+    return ::nt::GetStringArray(m_subHandle, defaultValue);
+  }
 
   /**
    * Get an array of all value changes since the last call to ReadQueue.
@@ -177,14 +199,18 @@ class GenericSubscriber : public Subscriber {
    * @return Array of timestamped values; empty array if no new changes have
    *     been published since the previous call.
    */
-  std::vector<TimestampedValueType> ReadQueue();
+  std::vector<TimestampedValueType> ReadQueue() {
+    return ::nt::ReadQueueValue(m_subHandle);
+  }
 
   /**
    * Get the corresponding topic.
    *
    * @return Topic
    */
-  TopicType GetTopic() const;
+  TopicType GetTopic() const {
+    return Topic{::nt::GetTopicFromHandle(m_subHandle)};
+  }
 };
 
 /**
@@ -205,14 +231,14 @@ class GenericPublisher : public Publisher {
    *
    * @param handle Native handle
    */
-  explicit GenericPublisher(NT_Publisher handle);
+  explicit GenericPublisher(NT_Publisher handle) : Publisher{handle} {}
 
   /**
    * Publish a new value.
    *
    * @param value value to publish
    */
-  void Set(ParamType value);
+  void Set(ParamType value) { ::nt::SetEntryValue(m_pubHandle, value); }
 
   /**
    * Sets the entry's value.
@@ -221,7 +247,9 @@ class GenericPublisher : public Publisher {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetBoolean(bool value, int64_t time = 0);
+  bool SetBoolean(bool value, int64_t time = 0) {
+    return nt::SetBoolean(m_pubHandle, value, time);
+  }
 
   /**
    * Sets the entry's value.
@@ -230,7 +258,9 @@ class GenericPublisher : public Publisher {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetInteger(int64_t value, int64_t time = 0);
+  bool SetInteger(int64_t value, int64_t time = 0) {
+    return nt::SetInteger(m_pubHandle, value, time);
+  }
 
   /**
    * Sets the entry's value.
@@ -239,7 +269,9 @@ class GenericPublisher : public Publisher {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetFloat(float value, int64_t time = 0);
+  bool SetFloat(float value, int64_t time = 0) {
+    return nt::SetFloat(m_pubHandle, value, time);
+  }
 
   /**
    * Sets the entry's value.
@@ -248,7 +280,9 @@ class GenericPublisher : public Publisher {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetDouble(double value, int64_t time = 0);
+  bool SetDouble(double value, int64_t time = 0) {
+    return nt::SetDouble(m_pubHandle, value, time);
+  }
 
   /**
    * Sets the entry's value.
@@ -257,7 +291,9 @@ class GenericPublisher : public Publisher {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetString(std::string_view value, int64_t time = 0);
+  bool SetString(std::string_view value, int64_t time = 0) {
+    return nt::SetString(m_pubHandle, value, time);
+  }
 
   /**
    * Sets the entry's value.
@@ -266,7 +302,9 @@ class GenericPublisher : public Publisher {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetRaw(std::span<const uint8_t> value, int64_t time = 0);
+  bool SetRaw(std::span<const uint8_t> value, int64_t time = 0) {
+    return nt::SetRaw(m_pubHandle, value, time);
+  }
 
   /**
    * Sets the entry's value.
@@ -275,7 +313,9 @@ class GenericPublisher : public Publisher {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetBooleanArray(std::span<const bool> value, int64_t time = 0);
+  bool SetBooleanArray(std::span<const bool> value, int64_t time = 0) {
+    return SetEntryValue(m_pubHandle, Value::MakeBooleanArray(value, time));
+  }
 
   /**
    * Sets the entry's value.
@@ -284,7 +324,9 @@ class GenericPublisher : public Publisher {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetBooleanArray(std::span<const int> value, int64_t time = 0);
+  bool SetBooleanArray(std::span<const int> value, int64_t time = 0) {
+    return nt::SetBooleanArray(m_pubHandle, value, time);
+  }
 
   /**
    * Sets the entry's value.
@@ -293,7 +335,9 @@ class GenericPublisher : public Publisher {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetIntegerArray(std::span<const int64_t> value, int64_t time = 0);
+  bool SetIntegerArray(std::span<const int64_t> value, int64_t time = 0) {
+    return nt::SetIntegerArray(m_pubHandle, value, time);
+  }
 
   /**
    * Sets the entry's value.
@@ -302,7 +346,9 @@ class GenericPublisher : public Publisher {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetFloatArray(std::span<const float> value, int64_t time = 0);
+  bool SetFloatArray(std::span<const float> value, int64_t time = 0) {
+    return nt::SetFloatArray(m_pubHandle, value, time);
+  }
 
   /**
    * Sets the entry's value.
@@ -311,7 +357,9 @@ class GenericPublisher : public Publisher {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetDoubleArray(std::span<const double> value, int64_t time = 0);
+  bool SetDoubleArray(std::span<const double> value, int64_t time = 0) {
+    return nt::SetDoubleArray(m_pubHandle, value, time);
+  }
 
   /**
    * Sets the entry's value.
@@ -320,7 +368,9 @@ class GenericPublisher : public Publisher {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetStringArray(std::span<const std::string> value, int64_t time = 0);
+  bool SetStringArray(std::span<const std::string> value, int64_t time = 0) {
+    return nt::SetStringArray(m_pubHandle, value, time);
+  }
 
   /**
    * Publish a default value.
@@ -329,7 +379,9 @@ class GenericPublisher : public Publisher {
    *
    * @param value value
    */
-  void SetDefault(ParamType value);
+  void SetDefault(ParamType value) {
+    ::nt::SetDefaultEntryValue(m_pubHandle, value);
+  }
 
   /**
    * Sets the entry's value if it does not exist.
@@ -337,7 +389,9 @@ class GenericPublisher : public Publisher {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultBoolean(bool defaultValue);
+  bool SetDefaultBoolean(bool defaultValue) {
+    return nt::SetDefaultBoolean(m_pubHandle, defaultValue);
+  }
 
   /**
    * Sets the entry's value if it does not exist.
@@ -345,7 +399,9 @@ class GenericPublisher : public Publisher {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultInteger(int64_t defaultValue);
+  bool SetDefaultInteger(int64_t defaultValue) {
+    return nt::SetDefaultInteger(m_pubHandle, defaultValue);
+  }
 
   /**
    * Sets the entry's value if it does not exist.
@@ -353,7 +409,9 @@ class GenericPublisher : public Publisher {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultFloat(float defaultValue);
+  bool SetDefaultFloat(float defaultValue) {
+    return nt::SetDefaultFloat(m_pubHandle, defaultValue);
+  }
 
   /**
    * Sets the entry's value if it does not exist.
@@ -361,7 +419,9 @@ class GenericPublisher : public Publisher {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultDouble(double defaultValue);
+  bool SetDefaultDouble(double defaultValue) {
+    return nt::SetDefaultDouble(m_pubHandle, defaultValue);
+  }
 
   /**
    * Sets the entry's value if it does not exist.
@@ -369,7 +429,9 @@ class GenericPublisher : public Publisher {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultString(std::string_view defaultValue);
+  bool SetDefaultString(std::string_view defaultValue) {
+    return nt::SetDefaultString(m_pubHandle, defaultValue);
+  }
 
   /**
    * Sets the entry's value if it does not exist.
@@ -377,7 +439,9 @@ class GenericPublisher : public Publisher {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultRaw(std::span<const uint8_t> defaultValue);
+  bool SetDefaultRaw(std::span<const uint8_t> defaultValue) {
+    return nt::SetDefaultRaw(m_pubHandle, defaultValue);
+  }
 
   /**
    * Sets the entry's value if it does not exist.
@@ -385,7 +449,9 @@ class GenericPublisher : public Publisher {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultBooleanArray(std::span<const int> defaultValue);
+  bool SetDefaultBooleanArray(std::span<const int> defaultValue) {
+    return nt::SetDefaultBooleanArray(m_pubHandle, defaultValue);
+  }
 
   /**
    * Sets the entry's value if it does not exist.
@@ -393,7 +459,9 @@ class GenericPublisher : public Publisher {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultIntegerArray(std::span<const int64_t> defaultValue);
+  bool SetDefaultIntegerArray(std::span<const int64_t> defaultValue) {
+    return nt::SetDefaultIntegerArray(m_pubHandle, defaultValue);
+  }
 
   /**
    * Sets the entry's value if it does not exist.
@@ -401,7 +469,9 @@ class GenericPublisher : public Publisher {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultFloatArray(std::span<const float> defaultValue);
+  bool SetDefaultFloatArray(std::span<const float> defaultValue) {
+    return nt::SetDefaultFloatArray(m_pubHandle, defaultValue);
+  }
 
   /**
    * Sets the entry's value if it does not exist.
@@ -409,7 +479,9 @@ class GenericPublisher : public Publisher {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultDoubleArray(std::span<const double> defaultValue);
+  bool SetDefaultDoubleArray(std::span<const double> defaultValue) {
+    return nt::SetDefaultDoubleArray(m_pubHandle, defaultValue);
+  }
 
   /**
    * Sets the entry's value if it does not exist.
@@ -417,14 +489,18 @@ class GenericPublisher : public Publisher {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultStringArray(std::span<const std::string> defaultValue);
+  bool SetDefaultStringArray(std::span<const std::string> defaultValue) {
+    return nt::SetDefaultStringArray(m_pubHandle, defaultValue);
+  }
 
   /**
    * Get the corresponding topic.
    *
    * @return Topic
    */
-  TopicType GetTopic() const;
+  TopicType GetTopic() const {
+    return Topic{::nt::GetTopicFromHandle(m_pubHandle)};
+  }
 };
 
 /**
@@ -449,7 +525,8 @@ class GenericEntry final : public GenericSubscriber, public GenericPublisher {
    *
    * @param handle Native handle
    */
-  explicit GenericEntry(NT_Entry handle);
+  explicit GenericEntry(NT_Entry handle)
+      : GenericSubscriber{handle}, GenericPublisher{handle} {}
 
   /**
    * Determines if the native handle is valid.
@@ -470,14 +547,14 @@ class GenericEntry final : public GenericSubscriber, public GenericPublisher {
    *
    * @return Topic
    */
-  TopicType GetTopic() const;
+  TopicType GetTopic() const {
+    return Topic{::nt::GetTopicFromHandle(m_subHandle)};
+  }
 
   /**
    * Stops publishing the entry if it's published.
    */
-  void Unpublish();
+  void Unpublish() { ::nt::Unpublish(m_pubHandle); }
 };
 
 }  // namespace nt
-
-#include "networktables/GenericEntry.inc"

@@ -35,10 +35,6 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#if defined(__APPLE__) || defined(__DragonFly__) || \
-    defined(__FreeBSD__) || defined(__NetBSD__)
-#include <sys/event.h>
-#endif
 
 #define uv__msan_unpoison(p, n)                                               \
   do {                                                                        \
@@ -346,6 +342,7 @@ int uv__random_sysctl(void* buf, size_t buflen);
 /* io_uring */
 #ifdef __linux__
 int uv__iou_fs_close(uv_loop_t* loop, uv_fs_t* req);
+int uv__iou_fs_ftruncate(uv_loop_t* loop, uv_fs_t* req);
 int uv__iou_fs_fsync_or_fdatasync(uv_loop_t* loop,
                                   uv_fs_t* req,
                                   uint32_t fsync_flags);
@@ -364,6 +361,7 @@ int uv__iou_fs_symlink(uv_loop_t* loop, uv_fs_t* req);
 int uv__iou_fs_unlink(uv_loop_t* loop, uv_fs_t* req);
 #else
 #define uv__iou_fs_close(loop, req) 0
+#define uv__iou_fs_ftruncate(loop, req) 0
 #define uv__iou_fs_fsync_or_fdatasync(loop, req, fsync_flags) 0
 #define uv__iou_fs_link(loop, req) 0
 #define uv__iou_fs_mkdir(loop, req) 0
@@ -496,7 +494,7 @@ typedef struct {
 int uv__get_constrained_cpu(uv__cpu_constraint* constraint);
 #endif
 
-#ifdef __sun
+#if defined(__sun) && !defined(__illumos__)
 #ifdef SO_FLOW_NAME
 /* Since it's impossible to detect the Solaris 11.4 version via OS macros,
  * so we check the presence of the socket option SO_FLOW_NAME that was first
@@ -506,24 +504,6 @@ int uv__get_constrained_cpu(uv__cpu_constraint* constraint);
 #else
 #define UV__SOLARIS_11_4 (0)
 #endif
-#endif
-
-#if defined(EVFILT_USER) && defined(NOTE_TRIGGER)
-/* EVFILT_USER is available since OS X 10.6, DragonFlyBSD 4.0,
- * FreeBSD 8.1, and NetBSD 10.0.
- * 
- * Note that even though EVFILT_USER is defined on the current system,
- * it may still fail to work at runtime somehow. In that case, we fall
- * back to pipe-based signaling.
- */
-#define UV__KQUEUE_EVFILT_USER 1
-/* Magic number of identifier used for EVFILT_USER during runtime detection.
- * There are no Google hits for this number when I create it. That way,
- * people will be directed here if this number gets printed due to some
- * kqueue error and they google for help. */
-#define UV__KQUEUE_EVFILT_USER_IDENT 0x1e7e7711
-#else
-#define UV__KQUEUE_EVFILT_USER 0
 #endif
 
 #endif /* UV_UNIX_INTERNAL_H_ */

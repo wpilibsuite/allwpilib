@@ -54,6 +54,7 @@ def eigen_inclusions(dp, f):
         "Cholesky",
         "Core",
         "Eigenvalues",
+        "Geometry",
         "Householder",
         "IterativeLinearSolvers",
         "Jacobi",
