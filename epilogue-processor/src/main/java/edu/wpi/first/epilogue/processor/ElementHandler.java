@@ -64,23 +64,60 @@ public abstract class ElementHandler {
    */
   public static String loggedName(Element element) {
     var elementName = element.getSimpleName().toString();
-    var config = element.getAnnotation(Logged.class);
+    var elementConfig = element.getAnnotation(Logged.class);
 
-    if (config != null && !config.name().isBlank()) {
-      return config.name();
-    } else {
-      // Delete common field prefixes (k_Name, m_name, s_name)
-      elementName = elementName.replaceFirst("^[msk]_", "");
-      if (elementName.matches("^k[A-Z]")) {
-        // Drop leading "k" prefix from fields
-        // (though normally these should be static, and thus not logged)
-        elementName = elementName.substring(1);
+    // Use the name provided on the logged element, if one is present
+    if (elementConfig != null && !elementConfig.name().isBlank()) {
+      return elementConfig.name();
+    }
+
+    var config = elementConfig;
+
+    if (config == null) {
+      // Look up the parent class configuration
+      // We assume one is present, since logged elements should only be found if the enclosing class
+      // is @Logged itself
+      Logged parentConfig = null;
+      for (var parent = element.getEnclosingElement();
+           parent != null;
+           parent = parent.getEnclosingElement()) {
+        parentConfig = parent.getAnnotation(Logged.class);
+        if (parentConfig != null) {
+          break;
+        }
       }
 
-      return StringUtils.splitToWords(elementName).stream()
-          .map(StringUtils::capitalize)
-          .collect(Collectors.joining(" "));
+      config = parentConfig;
     }
+
+    if (config == null) {
+      // Uh oh
+      throw new IllegalStateException("Could not generate a name for element " + element + " without a @Logged annotation AND without being contained within a class with a @Logged annotation!\n\nOpen an issue at https://github.com/wpilibsuite/allwpilib/issues and include a copy of the file that caused this error.");
+    }
+
+    return switch (config.defaultNaming()) {
+      case USE_CODE_NAME -> elementName;
+      case USE_HUMAN_NAME -> {
+        // Convert snakeCase field and method names to separate words,
+        // while removing common field and method prefixes.
+
+        // Delete common field prefixes (k_Name, m_name, s_name)
+        elementName = elementName.replaceFirst("^[msk]_", "");
+        if (elementName.matches("^k[A-Z]")) {
+          // Drop leading "k" prefix from fields
+          // (though normally these should be static, and thus not logged)
+          elementName = elementName.substring(1);
+        }
+        if (elementName.matches("^get[A-Z]")) {
+          // Drop leading "get" from accessor methods
+          elementName = elementName.substring(3);
+        }
+
+        yield StringUtils.splitToWords(elementName).stream()
+                   .map(StringUtils::capitalize)
+                   .collect(Collectors.joining(" "));
+      }
+    };
   }
 
   /**

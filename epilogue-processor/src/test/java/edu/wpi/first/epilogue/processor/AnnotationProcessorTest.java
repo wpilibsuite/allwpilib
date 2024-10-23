@@ -49,7 +49,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("X", object.x);
+            dataLogger.log("x", object.x);
           }
         }
       }
@@ -88,8 +88,8 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("X", object.x);
-            dataLogger.log("Y", object.y);
+            dataLogger.log("x", object.x);
+            dataLogger.log("y", object.y);
           }
         }
       }
@@ -140,7 +140,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("X", (double) $x.get(object));
+            dataLogger.log("x", (double) $x.get(object));
           }
         }
       }
@@ -191,7 +191,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            logSendable(dataLogger.getSubLogger("Chooser"), (edu.wpi.first.wpilibj.smartdashboard.SendableChooser<java.lang.String>) $chooser.get(object));
+            logSendable(dataLogger.getSubLogger("chooser"), (edu.wpi.first.wpilibj.smartdashboard.SendableChooser<java.lang.String>) $chooser.get(object));
           }
         }
       }
@@ -231,13 +231,13 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("Low", object.low);
+            dataLogger.log("low", object.low);
           }
           if (Epilogue.shouldLog(Logged.Importance.INFO)) {
-            dataLogger.log("Medium", object.medium);
+            dataLogger.log("medium", object.medium);
           }
           if (Epilogue.shouldLog(Logged.Importance.CRITICAL)) {
-            dataLogger.log("High", object.high);
+            dataLogger.log("high", object.high);
           }
         }
       }
@@ -279,7 +279,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("Enum Value", object.enumValue);
+            dataLogger.log("enumValue", object.enumValue);
           }
         }
       }
@@ -323,10 +323,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("X", object.x);
-            dataLogger.log("Arr 1", object.arr1);
-            dataLogger.log("Get X", object.getX());
-            dataLogger.log("Get Arr 1", object.getArr1());
+            dataLogger.log("x", object.x);
+            dataLogger.log("arr1", object.arr1);
+            dataLogger.log("getX", object.getX());
+            dataLogger.log("getArr1", object.getArr1());
           }
         }
       }
@@ -370,8 +370,8 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("X", object.x);
-            dataLogger.log("Get X", object.getX());
+            dataLogger.log("x", object.x);
+            dataLogger.log("getX", object.getX());
           }
         }
       }
@@ -415,8 +415,8 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("X", object.x);
-            dataLogger.log("Get X", object.getX());
+            dataLogger.log("x", object.x);
+            dataLogger.log("getX", object.getX());
           }
         }
       }
@@ -433,7 +433,7 @@ class AnnotationProcessorTest {
 
       @Logged
       class Example {
-        int x;        // Should be logged
+        int x;           // Should be logged
         int[] arr1;   // Should be logged
         int[][] arr2; // Should not be logged
 
@@ -460,10 +460,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("X", object.x);
-            dataLogger.log("Arr 1", object.arr1);
-            dataLogger.log("Get X", object.getX());
-            dataLogger.log("Get Arr 1", object.getArr1());
+            dataLogger.log("x", object.x);
+            dataLogger.log("arr1", object.arr1);
+            dataLogger.log("getX", object.getX());
+            dataLogger.log("getArr1", object.getArr1());
           }
         }
       }
@@ -507,10 +507,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("X", object.x);
-            dataLogger.log("Arr 1", object.arr1);
-            dataLogger.log("Get X", object.getX());
-            dataLogger.log("Get Arr 1", object.getArr1());
+            dataLogger.log("x", object.x);
+            dataLogger.log("arr1", object.arr1);
+            dataLogger.log("getX", object.getX());
+            dataLogger.log("getArr1", object.getArr1());
           }
         }
       }
@@ -554,10 +554,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("X", object.x);
-            dataLogger.log("Arr 1", object.arr1);
-            dataLogger.log("Get X", object.getX());
-            dataLogger.log("Get Arr 1", object.getArr1());
+            dataLogger.log("x", object.x);
+            dataLogger.log("arr1", object.arr1);
+            dataLogger.log("getX", object.getX());
+            dataLogger.log("getArr1", object.getArr1());
           }
         }
       }
@@ -604,10 +604,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("X", object.x);
-            dataLogger.log("Arr 1", object.arr1);
-            dataLogger.log("Get X", object.getX());
-            dataLogger.log("Get Arr 1", object.getArr1());
+            dataLogger.log("x", object.x);
+            dataLogger.log("arr1", object.arr1);
+            dataLogger.log("getX", object.getX());
+            dataLogger.log("getArr1", object.getArr1());
           }
         }
       }
@@ -653,10 +653,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("X", object.x);
-            dataLogger.log("Arr 1", object.arr1);
-            dataLogger.log("Get X", object.getX());
-            dataLogger.log("Get Arr 1", object.getArr1());
+            dataLogger.log("x", object.x);
+            dataLogger.log("arr1", object.arr1);
+            dataLogger.log("getX", object.getX());
+            dataLogger.log("getArr1", object.getArr1());
           }
         }
       }
@@ -703,11 +703,11 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("X", object.x);
-            dataLogger.log("Arr 1", object.arr1);
-            dataLogger.log("List", object.list);
-            dataLogger.log("Get X", object.getX());
-            dataLogger.log("Get Arr 1", object.getArr1());
+            dataLogger.log("x", object.x);
+            dataLogger.log("arr1", object.arr1);
+            dataLogger.log("list", object.list);
+            dataLogger.log("getX", object.getX());
+            dataLogger.log("getArr1", object.getArr1());
           }
         }
       }
@@ -762,11 +762,11 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("X", object.x, edu.wpi.first.epilogue.Example.Structable.struct);
-            dataLogger.log("Arr 1", object.arr1, edu.wpi.first.epilogue.Example.Structable.struct);
-            dataLogger.log("List", object.list, edu.wpi.first.epilogue.Example.Structable.struct);
-            dataLogger.log("Get X", object.getX(), edu.wpi.first.epilogue.Example.Structable.struct);
-            dataLogger.log("Get Arr 1", object.getArr1(), edu.wpi.first.epilogue.Example.Structable.struct);
+            dataLogger.log("x", object.x, edu.wpi.first.epilogue.Example.Structable.struct);
+            dataLogger.log("arr1", object.arr1, edu.wpi.first.epilogue.Example.Structable.struct);
+            dataLogger.log("list", object.list, edu.wpi.first.epilogue.Example.Structable.struct);
+            dataLogger.log("getX", object.getX(), edu.wpi.first.epilogue.Example.Structable.struct);
+            dataLogger.log("getArr1", object.getArr1(), edu.wpi.first.epilogue.Example.Structable.struct);
           }
         }
       }
@@ -813,10 +813,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("List", object.list);
-            dataLogger.log("Set", object.set);
-            dataLogger.log("Queue", object.queue);
-            dataLogger.log("Stack", object.stack);
+            dataLogger.log("list", object.list);
+            dataLogger.log("set", object.set);
+            dataLogger.log("queue", object.queue);
+            dataLogger.log("stack", object.stack);
           }
         }
       }
@@ -993,8 +993,8 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("Value", object.value);
-            dataLogger.log("Upcast", object.upcast());
+            dataLogger.log("value", object.value);
+            dataLogger.log("upcast", object.upcast());
           }
         }
       }
@@ -1045,8 +1045,8 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            Epilogue.childLogger.tryUpdate(dataLogger.getSubLogger("Child"), object.child, Epilogue.getConfig().errorHandler);
-            Epilogue.ioLogger.tryUpdate(dataLogger.getSubLogger("Io"), object.io, Epilogue.getConfig().errorHandler);
+            Epilogue.childLogger.tryUpdate(dataLogger.getSubLogger("child"), object.child, Epilogue.getConfig().errorHandler);
+            Epilogue.ioLogger.tryUpdate(dataLogger.getSubLogger("io"), object.io, Epilogue.getConfig().errorHandler);
           }
         }
       }
@@ -1100,7 +1100,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            Epilogue.customPointLogger.tryUpdate(dataLogger.getSubLogger("Point"), object.point, Epilogue.getConfig().errorHandler);
+            Epilogue.customPointLogger.tryUpdate(dataLogger.getSubLogger("point"), object.point, Epilogue.getConfig().errorHandler);
           }
         }
       }
@@ -1162,8 +1162,8 @@ class AnnotationProcessorTest {
           @Override
           public void update(DataLogger dataLogger, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              dataLogger.log("X", object.x());
-              dataLogger.log("Y", object.y());
+              dataLogger.log("x", object.x());
+              dataLogger.log("y", object.y());
             }
           }
         }
