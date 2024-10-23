@@ -204,7 +204,7 @@ public final class RobotController {
    *
    * @return The controller input current value in a measure.
    */
-  public static final Current getMeasureInputCurrent() {
+  public static Current getMeasureInputCurrent() {
     return Amps.of(PowerJNI.getVinCurrent());
   }
 
@@ -222,7 +222,7 @@ public final class RobotController {
    *
    * @return The controller 3.3V rail voltage value in a measure.
    */
-  public static final Voltage getMeasureVoltage3V3() {
+  public static Voltage getMeasureVoltage3V3() {
     return Volts.of(PowerJNI.getUserVoltage3V3());
   }
 
