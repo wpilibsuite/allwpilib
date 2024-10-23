@@ -76,7 +76,7 @@ class CommandPtr final {
    * @see ScheduleCommand
    */
   [[nodiscard]]
-  CommandPtr Fork(CommandPtr&& other) &&;
+  CommandPtr Fork(CommandPtr&&... other) &&;
 
   /**
    * Decorates this command to run or stop when disabled.
