@@ -34,8 +34,8 @@ Alert::Alert(Alert&& other)
       m_active{std::exchange(other.m_active, false)},
       m_activeStartTime{other.m_activeStartTime} {}
 
-Alert& Alert::operator=(Alert && other) {
-  if(&other != this) {
+Alert& Alert::operator=(Alert&& other) {
+  if (&other != this) {
     // We want to destroy current state after the move is done
     Alert tmp{std::move(*this)};
     // Now, swap moved-from state with other state
