@@ -278,8 +278,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
 
 
   @Override
-  default Mult<DimensionlessUnit, ResistanceUnit> times(Resistance multiplier) {
-    return (Mult<DimensionlessUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  default Resistance times(Resistance multiplier) {
+    return Ohms.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
