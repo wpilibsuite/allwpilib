@@ -48,6 +48,19 @@ public class AnnotationProcessor extends AbstractProcessor {
   private LoggerGenerator m_loggerGenerator;
   private List<ElementHandler> m_handlers;
 
+  /**
+   * Sets the latest supported Java version to the current compiler release.
+   *
+   * @return the release level of the invoked compiler, that is, the
+   *     {@code javac} that is compiling the code, in effect declaring that
+   *     {@link AnnotationProcessor} supports <b>any</b> Java compiler.
+   * @see AbstractProcessor#getSupportedSourceVersion()
+   */
+  @Override
+  public SourceVersion getSupportedSourceVersion() {
+    return SourceVersion.latestSupported();
+  }
+
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     if (annotations.isEmpty()) {
