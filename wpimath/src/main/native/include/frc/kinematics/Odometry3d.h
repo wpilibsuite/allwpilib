@@ -15,6 +15,7 @@
 #include "frc/kinematics/Kinematics.h"
 
 namespace frc {
+
 /**
  * Class for odometry. Robot code should not use this directly- Instead, use the
  * particular type for your drivetrain (e.g., DifferentialDriveOdometry3d).

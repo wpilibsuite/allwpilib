@@ -216,6 +216,8 @@ public class PoseEstimator3d<T> {
   public void resetPose(Pose3d pose) {
     m_odometry.resetPose(pose);
     m_odometryPoseBuffer.clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.getPose3dMeters();
   }
 
   /**
@@ -235,6 +237,8 @@ public class PoseEstimator3d<T> {
   public void resetTranslation(Translation3d translation) {
     m_odometry.resetTranslation(translation);
     m_odometryPoseBuffer.clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.getPose3dMeters();
   }
 
   /**
@@ -254,6 +258,8 @@ public class PoseEstimator3d<T> {
   public void resetRotation(Rotation3d rotation) {
     m_odometry.resetRotation(rotation);
     m_odometryPoseBuffer.clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.getPose3dMeters();
   }
 
   /**

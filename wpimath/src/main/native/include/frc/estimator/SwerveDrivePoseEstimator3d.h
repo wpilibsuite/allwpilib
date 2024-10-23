@@ -84,7 +84,9 @@ class SwerveDrivePoseEstimator3d
       const wpi::array<double, 3>& visionMeasurementStdDevs)
       : SwerveDrivePoseEstimator3d::PoseEstimator3d(
             kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
-        m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {}
+        m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {
+    this->ResetPose(initialPose);
+  }
 
   /**
    * Constructs a SwerveDrivePoseEstimator3d with default standard deviations
@@ -138,7 +140,9 @@ class SwerveDrivePoseEstimator3d
       const wpi::array<double, 4>& visionMeasurementStdDevs)
       : SwerveDrivePoseEstimator3d::PoseEstimator3d(
             kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
-        m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {}
+        m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {
+    this->ResetPose(initialPose);
+  }
 
  private:
   SwerveDriveOdometry3d<NumModules> m_odometryImpl;

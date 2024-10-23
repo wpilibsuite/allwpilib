@@ -24,6 +24,7 @@
 #include "wpimath/MathShared.h"
 
 namespace frc {
+
 /**
  * This class wraps odometry to fuse latency-compensated
  * vision measurements with encoder measurements. Robot code should not use this
@@ -45,6 +46,9 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
  public:
   /**
    * Constructs a PoseEstimator3d.
+   *
+   * @warning The initial pose estimate will always be the default pose,
+   * regardless of the odometry's current pose.
    *
    * @param kinematics A correctly-configured kinematics object for your
    *     drivetrain.
@@ -71,6 +75,9 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
   /**
    * Constructs a PoseEstimator3d.
    *
+   * @warning The initial pose estimate will always be the default pose,
+   * regardless of the odometry's current pose.
+   *
    * @param kinematics A correctly-configured kinematics object for your
    *     drivetrain.
    * @param odometry A correctly-configured odometry object for your drivetrain.
@@ -86,7 +93,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
                   Odometry3d<WheelSpeeds, WheelPositions>& odometry,
                   const wpi::array<double, 4>& stateStdDevs,
                   const wpi::array<double, 4>& visionMeasurementStdDevs)
-      : m_odometry(odometry), m_poseEstimate(m_odometry.GetPose3d()) {
+      : m_odometry(odometry) {
     for (size_t i = 0; i < 4; ++i) {
       m_q[i] = stateStdDevs[i] * stateStdDevs[i];
     }
@@ -193,6 +200,8 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
   void ResetPose(const Pose3d& pose) {
     m_odometry.ResetPose(pose);
     m_odometryPoseBuffer.Clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.GetPose3d();
   }
 
   /**
@@ -212,6 +221,8 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
   void ResetTranslation(const Translation3d& translation) {
     m_odometry.ResetTranslation(translation);
     m_odometryPoseBuffer.Clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.GetPose3d();
   }
 
   /**
@@ -229,8 +240,10 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    * @param rotation The rotation to reset to.
    */
   void ResetRotation(const Rotation3d& rotation) {
-    m_odometry.ResetTranslation(rotation);
+    m_odometry.ResetRotation(rotation);
     m_odometryPoseBuffer.Clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.GetPose3d();
   }
 
   /**
