@@ -27,5 +27,5 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     : PoseEstimator(kinematics, m_odometryImpl, stateStdDevs,
                     visionMeasurementStdDevs),
       m_odometryImpl(kinematics, gyroAngle, wheelPositions, initialPose) {
-  ResetPose(m_odometryImpl.GetPose());
+  ResetPose(initialPose);
 }

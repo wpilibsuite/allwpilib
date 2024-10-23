@@ -27,7 +27,7 @@ frc::MecanumDrivePoseEstimator3d::MecanumDrivePoseEstimator3d(
     : PoseEstimator3d(kinematics, m_odometryImpl, stateStdDevs,
                       visionMeasurementStdDevs),
       m_odometryImpl(kinematics, gyroAngle, wheelPositions, initialPose) {
-  ResetPose(m_odometryImpl.GetPose3d());
+  ResetPose(initialPose);
 }
 
 frc::MecanumDrivePoseEstimator3d::MecanumDrivePoseEstimator3d(
@@ -46,5 +46,5 @@ frc::MecanumDrivePoseEstimator3d::MecanumDrivePoseEstimator3d(
     : PoseEstimator3d(kinematics, m_odometryImpl, stateStdDevs,
                       visionMeasurementStdDevs),
       m_odometryImpl(kinematics, gyroAngle, wheelPositions, initialPose) {
-  ResetPose(m_odometryImpl.GetPose3d());
+  ResetPose(initialPose);
 }

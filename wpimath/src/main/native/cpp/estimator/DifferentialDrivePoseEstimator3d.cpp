@@ -22,7 +22,7 @@ DifferentialDrivePoseEstimator3d::DifferentialDrivePoseEstimator3d(
     : PoseEstimator3d(kinematics, m_odometryImpl, stateStdDevs,
                       visionMeasurementStdDevs),
       m_odometryImpl{gyroAngle, leftDistance, rightDistance, initialPose} {
-  ResetPose(m_odometryImpl.GetPose3d());
+  ResetPose(initialPose);
 }
 
 DifferentialDrivePoseEstimator3d::DifferentialDrivePoseEstimator3d(
@@ -42,5 +42,5 @@ DifferentialDrivePoseEstimator3d::DifferentialDrivePoseEstimator3d(
     : PoseEstimator3d(kinematics, m_odometryImpl, stateStdDevs,
                       visionMeasurementStdDevs),
       m_odometryImpl{gyroAngle, leftDistance, rightDistance, initialPose} {
-  ResetPose(m_odometryImpl.GetPose3d());
+  ResetPose(initialPose);
 }

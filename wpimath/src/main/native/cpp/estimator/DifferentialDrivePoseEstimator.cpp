@@ -24,5 +24,5 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     : PoseEstimator(kinematics, m_odometryImpl, stateStdDevs,
                     visionMeasurementStdDevs),
       m_odometryImpl{gyroAngle, leftDistance, rightDistance, initialPose} {
-  ResetPose(m_odometryImpl.GetPose());
+  ResetPose(initialPose);
 }
