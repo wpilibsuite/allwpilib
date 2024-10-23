@@ -1216,6 +1216,61 @@ class AnnotationProcessorTest {
                 errors.get(2)));
   }
 
+  @Test
+  void configuredDefaultNaming() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        @Logged(defaultNaming = Logged.Naming.USE_HUMAN_NAME)
+        class Example {
+          double m_memberPrefix;
+          double kConstantPrefix;
+          double k_otherConstantPrefix;
+          double s_otherPrefix;
+
+          public double getTheGetterMethod() {
+            return 0;
+          }
+
+          @Logged(defaultNaming = Logged.Naming.USE_CODE_NAME)
+          public double optedOut() {
+            return 0;
+          }
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              dataLogger.log("Member Prefix", object.m_memberPrefix);
+              dataLogger.log("Constant Prefix", object.kConstantPrefix);
+              dataLogger.log("Other Constant Prefix", object.k_otherConstantPrefix);
+              dataLogger.log("Other Prefix", object.s_otherPrefix);
+              dataLogger.log("The Getter Method", object.getTheGetterMethod());
+              dataLogger.log("optedOut", object.optedOut());
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
   private void assertCompilationError(
       String message, long lineNumber, long col, Diagnostic<? extends JavaFileObject> diagnostic) {
     assertAll(
