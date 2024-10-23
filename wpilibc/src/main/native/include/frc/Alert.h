@@ -91,8 +91,8 @@ class Alert {
    */
   Alert(std::string_view group, std::string_view text, AlertType type);
 
-  Alert(Alert&&) = default;
-  Alert& operator=(Alert&&) = default;
+  Alert(Alert&&);
+  Alert& operator=(Alert&&);
 
   ~Alert();
 
@@ -130,6 +130,8 @@ class Alert {
     void InitSendable(nt::NTSendableBuilder& builder) override;
 
     std::set<PublishedAlert>& GetSetForType(AlertType type);
+    // todo: not sure why i needed this, maybe when i was testing different
+    // container types?
     const std::set<PublishedAlert>& GetSetForType(AlertType type) const;
 
    private:
@@ -139,11 +141,16 @@ class Alert {
 
   AlertType m_type;
   std::string m_text;
-  SendableAlerts* m_group;
-
+  SendableAlerts* m_group;  // could replace with pointer to type set
   bool m_active = false;
   uint64_t m_activeStartTime;
 
+  /**
+   * Returns the SendableAlerts for a given group, initializing and publishing
+   * if it does not already exist.
+   * @param group the group name
+   * @return the SendableAlerts for the group
+   */
   static SendableAlerts& GetGroupSendable(std::string_view group);
 };
 
