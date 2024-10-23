@@ -11,6 +11,9 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.controller.proto.ArmFeedforwardProto;
 import edu.wpi.first.math.controller.struct.ArmFeedforwardStruct;
 import edu.wpi.first.math.jni.ArmFeedforwardJNI;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
@@ -40,6 +43,20 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
 
   /** The calculated output voltage measure. */
   private final MutVoltage output = Volts.mutable(0.0);
+
+  /**
+   * Creates a new ArmFeedforward with the specified plant, gravity gain, and period.  The static gain (ks) is assumed to be 0.0.
+   *
+   * <p>The constructor is useful for simulating the SingleJointedArmSim class.
+   *
+   * @param plant The system plant
+   * @param kg The gravity gain in volts.
+   * @param dtSeconds The period in seconds.
+   * @throws IllegalArgumentException for period &le; zero.
+   */
+  public ArmFeedforward(LinearSystem<N2, N1, N2> plant, double kg, double dtSeconds) {
+    this(0.0, kg, -plant.getA(1, 1) / plant.getB(1, 0), 1.0 / plant.getB(1, 0), dtSeconds);
+  }
 
   /**
    * Creates a new ArmFeedforward with the specified gains and period.

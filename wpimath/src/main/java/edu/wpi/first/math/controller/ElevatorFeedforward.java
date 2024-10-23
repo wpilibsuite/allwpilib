@@ -9,6 +9,9 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.proto.ElevatorFeedforwardProto;
 import edu.wpi.first.math.controller.struct.ElevatorFeedforwardStruct;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
@@ -37,6 +40,20 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
 
   /** The calculated output voltage measure. */
   private final MutVoltage output = Volts.mutable(0.0);
+
+  /**
+   * Creates a new ElevatorFeedforward with the specified plant, gravity gain, and period.  The static gain (ks) is assumed to be 0.0.
+   *
+   * <p>The constructor is useful for simulating the ElevatorSim class.
+   *
+   * @param plant The system plant
+   * @param kg The gravity gain in volts.
+   * @param dtSeconds The period in seconds.
+   * @throws IllegalArgumentException for period &le; zero.
+   */
+  public ElevatorFeedforward(LinearSystem<N2, N1, N2> plant, double kg, double dtSeconds) {
+    this(0.0, kg, -plant.getA(1, 1) / plant.getB(1, 0), 1.0 / plant.getB(1, 0), dtSeconds);
+  }
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains and period.
