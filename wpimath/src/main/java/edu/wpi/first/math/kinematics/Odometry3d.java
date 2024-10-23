@@ -25,6 +25,7 @@ import edu.wpi.first.math.geometry.Twist3d;
  */
 public class Odometry3d<T> {
   private final Kinematics<?, T> m_kinematics;
+  private Pose2d m_pose2dMeters; // Only for getPoseMeters()
   private Pose3d m_poseMeters;
 
   private Rotation3d m_gyroOffset;
@@ -98,6 +99,7 @@ public class Odometry3d<T> {
    */
   public void resetPosition(Rotation3d gyroAngle, T wheelPositions, Pose3d poseMeters) {
     m_poseMeters = poseMeters;
+    m_pose2dMeters = m_poseMeters.toPose2d();
     m_previousAngle = m_poseMeters.getRotation();
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
     m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
@@ -120,6 +122,7 @@ public class Odometry3d<T> {
   public void resetPose(Pose3d poseMeters) {
     m_gyroOffset = m_gyroOffset.plus(poseMeters.getRotation().minus(m_poseMeters.getRotation()));
     m_poseMeters = poseMeters;
+    m_pose2dMeters = m_poseMeters.toPose2d();
     m_previousAngle = m_poseMeters.getRotation();
   }
 
@@ -139,6 +142,7 @@ public class Odometry3d<T> {
    */
   public void resetTranslation(Translation3d translation) {
     m_poseMeters = new Pose3d(translation, m_poseMeters.getRotation());
+    m_pose2dMeters = m_poseMeters.toPose2d();
   }
 
   /**
@@ -158,6 +162,7 @@ public class Odometry3d<T> {
   public void resetRotation(Rotation3d rotation) {
     m_gyroOffset = m_gyroOffset.plus(rotation.minus(m_poseMeters.getRotation()));
     m_poseMeters = new Pose3d(m_poseMeters.getTranslation(), rotation);
+    m_pose2dMeters = m_poseMeters.toPose2d();
     m_previousAngle = m_poseMeters.getRotation();
   }
 
@@ -167,7 +172,7 @@ public class Odometry3d<T> {
    * @return The pose of the robot (x and y are in meters).
    */
   public Pose2d getPoseMeters() {
-    return m_poseMeters.toPose2d();
+    return m_pose2dMeters;
   }
 
   /**
@@ -190,7 +195,8 @@ public class Odometry3d<T> {
    * @return The new pose of the robot.
    */
   public Pose2d update(Rotation2d gyroAngle, T wheelPositions) {
-    return update(new Rotation3d(0, 0, gyroAngle.getRadians()), wheelPositions).toPose2d();
+    update(new Rotation3d(0, 0, gyroAngle.getRadians()), wheelPositions);
+    return getPoseMeters();
   }
 
   /**
@@ -222,6 +228,7 @@ public class Odometry3d<T> {
     m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
     m_previousAngle = angle;
     m_poseMeters = new Pose3d(newPose.getTranslation(), angle);
+    m_pose2dMeters = m_poseMeters.toPose2d();
 
     return m_poseMeters;
   }
