@@ -5,13 +5,14 @@
 #pragma once
 
 #include <algorithm>
-#include <cmath>
 #include <initializer_list>
 #include <span>
 #include <stdexcept>
+#include <type_traits>
 #include <vector>
 
 #include <Eigen/QR>
+#include <gcem.hpp>
 #include <wpi/array.h>
 #include <wpi/circular_buffer.h>
 
@@ -80,7 +81,8 @@ class LinearFilter {
    * @param ffGains The "feedforward" or FIR gains.
    * @param fbGains The "feedback" or IIR gains.
    */
-  LinearFilter(std::span<const double> ffGains, std::span<const double> fbGains)
+  constexpr LinearFilter(std::span<const double> ffGains,
+                         std::span<const double> fbGains)
       : m_inputs(ffGains.size()),
         m_outputs(fbGains.size()),
         m_inputGains(ffGains.begin(), ffGains.end()),
@@ -92,10 +94,11 @@ class LinearFilter {
       m_outputs.emplace_front(0.0);
     }
 
-    static int instances = 0;
-    instances++;
-    wpi::math::MathSharedStore::ReportUsage(
-        wpi::math::MathUsageId::kFilter_Linear, instances);
+    if (!std::is_constant_evaluated()) {
+      ++instances;
+      wpi::math::MathSharedStore::ReportUsage(
+          wpi::math::MathUsageId::kFilter_Linear, instances);
+    }
   }
 
   /**
@@ -104,8 +107,8 @@ class LinearFilter {
    * @param ffGains The "feedforward" or FIR gains.
    * @param fbGains The "feedback" or IIR gains.
    */
-  LinearFilter(std::initializer_list<double> ffGains,
-               std::initializer_list<double> fbGains)
+  constexpr LinearFilter(std::initializer_list<double> ffGains,
+                         std::initializer_list<double> fbGains)
       : LinearFilter({ffGains.begin(), ffGains.end()},
                      {fbGains.begin(), fbGains.end()}) {}
 
@@ -124,9 +127,9 @@ class LinearFilter {
    * @param period       The period in seconds between samples taken by the
    *                     user.
    */
-  static LinearFilter<T> SinglePoleIIR(double timeConstant,
-                                       units::second_t period) {
-    double gain = std::exp(-period.value() / timeConstant);
+  static constexpr LinearFilter<T> SinglePoleIIR(double timeConstant,
+                                                 units::second_t period) {
+    double gain = gcem::exp(-period.value() / timeConstant);
     return LinearFilter({1.0 - gain}, {-gain});
   }
 
@@ -144,8 +147,9 @@ class LinearFilter {
    * @param period       The period in seconds between samples taken by the
    *                     user.
    */
-  static LinearFilter<T> HighPass(double timeConstant, units::second_t period) {
-    double gain = std::exp(-period.value() / timeConstant);
+  static constexpr LinearFilter<T> HighPass(double timeConstant,
+                                            units::second_t period) {
+    double gain = gcem::exp(-period.value() / timeConstant);
     return LinearFilter({gain, -gain}, {-gain});
   }
 
@@ -187,7 +191,7 @@ class LinearFilter {
    */
   template <int Derivative, int Samples>
   static LinearFilter<T> FiniteDifference(
-      const wpi::array<int, Samples> stencil, units::second_t period) {
+      const wpi::array<int, Samples>& stencil, units::second_t period) {
     // See
     // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points
     //
@@ -213,7 +217,7 @@ class LinearFilter {
     Matrixd<Samples, Samples> S;
     for (int row = 0; row < Samples; ++row) {
       for (int col = 0; col < Samples; ++col) {
-        S(row, col) = std::pow(stencil[col], row);
+        S(row, col) = gcem::pow(stencil[col], row);
       }
     }
 
@@ -224,7 +228,7 @@ class LinearFilter {
     }
 
     Vectord<Samples> a =
-        S.householderQr().solve(d) / std::pow(period.value(), Derivative);
+        S.householderQr().solve(d) / gcem::pow(period.value(), Derivative);
 
     // Reverse gains list
     std::vector<double> ffGains;
@@ -266,7 +270,7 @@ class LinearFilter {
   /**
    * Reset the filter state.
    */
-  void Reset() {
+  constexpr void Reset() {
     std::fill(m_inputs.begin(), m_inputs.end(), T{0.0});
     std::fill(m_outputs.begin(), m_outputs.end(), T{0.0});
   }
@@ -321,7 +325,8 @@ class LinearFilter {
    * @throws std::runtime_error if size of inputBuffer or outputBuffer does not
    *   match the size of ffGains and fbGains provided in the constructor.
    */
-  void Reset(std::span<const T> inputBuffer, std::span<const T> outputBuffer) {
+  constexpr void Reset(std::span<const T> inputBuffer,
+                       std::span<const T> outputBuffer) {
     // Clear buffers
     Reset();
 
@@ -346,7 +351,7 @@ class LinearFilter {
    *
    * @return The filtered value at this step
    */
-  T Calculate(T input) {
+  constexpr T Calculate(T input) {
     T retVal{0.0};
 
     // Rotate the inputs
@@ -376,7 +381,7 @@ class LinearFilter {
    *
    * @return The last value.
    */
-  T LastValue() const { return m_lastOutput; }
+  constexpr T LastValue() const { return m_lastOutput; }
 
  private:
   wpi::circular_buffer<T> m_inputs;
@@ -384,6 +389,9 @@ class LinearFilter {
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
   T m_lastOutput{0.0};
+
+  // Usage reporting instances
+  inline static int instances = 0;
 
   /**
    * Factorial of n.

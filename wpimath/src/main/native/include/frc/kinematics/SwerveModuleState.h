@@ -32,7 +32,10 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
    * @param other The other object.
    * @return Whether the two objects are equal.
    */
-  bool operator==(const SwerveModuleState& other) const;
+  constexpr bool operator==(const SwerveModuleState& other) const {
+    return units::math::abs(speed - other.speed) < 1E-9_mps &&
+           angle == other.angle;
+  }
 
   /**
    * Minimize the change in the heading this swerve module state would
@@ -42,7 +45,7 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
    *
    * @param currentAngle The current module angle.
    */
-  void Optimize(const Rotation2d& currentAngle) {
+  constexpr void Optimize(const Rotation2d& currentAngle) {
     auto delta = angle - currentAngle;
     if (units::math::abs(delta.Degrees()) > 90_deg) {
       speed *= -1;
@@ -60,8 +63,15 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
    * @param currentAngle The current module angle.
    */
   [[deprecated("Use instance method instead.")]]
-  static SwerveModuleState Optimize(const SwerveModuleState& desiredState,
-                                    const Rotation2d& currentAngle);
+  constexpr static SwerveModuleState Optimize(
+      const SwerveModuleState& desiredState, const Rotation2d& currentAngle) {
+    auto delta = desiredState.angle - currentAngle;
+    if (units::math::abs(delta.Degrees()) > 90_deg) {
+      return {-desiredState.speed, desiredState.angle + Rotation2d{180_deg}};
+    } else {
+      return {desiredState.speed, desiredState.angle};
+    }
+  }
 
   /**
    * Scales speed by cosine of angle error. This scales down movement
@@ -70,7 +80,7 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
    *
    * @param currentAngle The current module angle.
    */
-  void CosineScale(const Rotation2d& currentAngle) {
+  constexpr void CosineScale(const Rotation2d& currentAngle) {
     speed *= (angle - currentAngle).Cos();
   }
 };

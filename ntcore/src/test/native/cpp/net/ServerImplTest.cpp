@@ -18,7 +18,8 @@
 #include "../TestPrinters.h"
 #include "../ValueMatcher.h"
 #include "Handle.h"
-#include "MockNetworkInterface.h"
+#include "MockClientMessageQueue.h"
+#include "MockMessageHandler.h"
 #include "MockWireConnection.h"
 #include "gmock/gmock.h"
 #include "net/Message.h"
@@ -44,7 +45,8 @@ namespace nt {
 
 class ServerImplTest : public ::testing::Test {
  public:
-  ::testing::StrictMock<net::MockLocalInterface> local;
+  ::testing::StrictMock<net::MockServerMessageHandler> local;
+  ::testing::StrictMock<net::MockClientMessageQueue> queue;
   wpi::MockLogger logger;
   net::ServerImpl server{logger};
 };
@@ -135,8 +137,7 @@ static std::vector<uint8_t> EncodeServerBinary(const T& msgs) {
     } else if constexpr (std::same_as<typename T::value_type,
                                       net::ClientMessage>) {
       if (auto m = std::get_if<net::ClientValueMsg>(&msg.contents)) {
-        net::WireEncodeBinary(os, Handle{m->pubHandle}.GetIndex(),
-                              m->value.time(), m->value);
+        net::WireEncodeBinary(os, m->pubuid, m->value.time(), m->value);
       }
     }
   }
@@ -145,31 +146,30 @@ static std::vector<uint8_t> EncodeServerBinary(const T& msgs) {
 
 TEST_F(ServerImplTest, PublishLocal) {
   // publish before client connect
-  server.SetLocal(&local);
-  NT_Publisher pubHandle = nt::Handle{0, 1, nt::Handle::kPublisher};
-  NT_Topic topicHandle = nt::Handle{0, 1, nt::Handle::kTopic};
-  NT_Publisher pubHandle2 = nt::Handle{0, 2, nt::Handle::kPublisher};
-  NT_Topic topicHandle2 = nt::Handle{0, 2, nt::Handle::kTopic};
-  NT_Publisher pubHandle3 = nt::Handle{0, 3, nt::Handle::kPublisher};
-  NT_Topic topicHandle3 = nt::Handle{0, 3, nt::Handle::kTopic};
+  server.SetLocal(&local, &queue);
+  constexpr int pubuid = 1;
+  constexpr int pubuid2 = 2;
+  constexpr int pubuid3 = 3;
   {
     ::testing::InSequence seq;
-    EXPECT_CALL(local, NetworkAnnounce(std::string_view{"test"},
-                                       std::string_view{"double"},
-                                       wpi::json::object(), pubHandle));
-    EXPECT_CALL(local, NetworkAnnounce(std::string_view{"test2"},
-                                       std::string_view{"double"},
-                                       wpi::json::object(), pubHandle2));
-    EXPECT_CALL(local, NetworkAnnounce(std::string_view{"test3"},
-                                       std::string_view{"double"},
-                                       wpi::json::object(), pubHandle3));
+    EXPECT_CALL(
+        local,
+        ServerAnnounce(std::string_view{"test"}, 0, std::string_view{"double"},
+                       wpi::json::object(), std::optional<int>{pubuid}));
+    EXPECT_CALL(
+        local,
+        ServerAnnounce(std::string_view{"test2"}, 0, std::string_view{"double"},
+                       wpi::json::object(), std::optional<int>{pubuid2}));
+    EXPECT_CALL(
+        local,
+        ServerAnnounce(std::string_view{"test3"}, 0, std::string_view{"double"},
+                       wpi::json::object(), std::optional<int>{pubuid3}));
   }
 
   {
-    std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubHandle, topicHandle, "test", "double", wpi::json::object(), {}}});
-    server.HandleLocal(msgs);
+    queue.msgs.emplace_back(net::ClientMessage{
+        net::PublishMsg{pubuid, "test", "double", wpi::json::object(), {}}});
+    EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   // client connect; it should get already-published topic as soon as it
@@ -205,29 +205,27 @@ TEST_F(ServerImplTest, PublishLocal) {
                                      setPeriodic.AsStdFunction());
 
   {
-    NT_Subscriber subHandle = nt::Handle{0, 1, nt::Handle::kSubscriber};
+    constexpr int subuid = 1;
     std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::SubscribeMsg{
-        subHandle, {{""}}, PubSubOptions{.prefixMatch = true}}});
+    msgs.emplace_back(net::ClientMessage{
+        net::SubscribeMsg{subuid, {{""}}, PubSubOptions{.prefixMatch = true}}});
     server.ProcessIncomingText(id, EncodeText(msgs));
   }
 
   // publish before send control
   {
-    std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubHandle2, topicHandle2, "test2", "double", wpi::json::object(), {}}});
-    server.HandleLocal(msgs);
+    queue.msgs.emplace_back(net::ClientMessage{
+        net::PublishMsg{pubuid2, "test2", "double", wpi::json::object(), {}}});
+    EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   server.SendAllOutgoing(100, false);
 
   // publish after send control
   {
-    std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubHandle3, topicHandle3, "test3", "double", wpi::json::object(), {}}});
-    server.HandleLocal(msgs);
+    queue.msgs.emplace_back(net::ClientMessage{
+        net::PublishMsg{pubuid3, "test3", "double", wpi::json::object(), {}}});
+    EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   server.SendAllOutgoing(200, false);
@@ -235,20 +233,19 @@ TEST_F(ServerImplTest, PublishLocal) {
 
 TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
   // publish before client connect
-  server.SetLocal(&local);
-  NT_Publisher pubHandle = nt::Handle{0, 1, nt::Handle::kPublisher};
-  NT_Topic topicHandle = nt::Handle{0, 1, nt::Handle::kTopic};
-  EXPECT_CALL(local, NetworkAnnounce(std::string_view{"test"},
-                                     std::string_view{"double"},
-                                     wpi::json::object(), pubHandle));
+  server.SetLocal(&local, &queue);
+  constexpr int pubuid = 1;
+  EXPECT_CALL(
+      local,
+      ServerAnnounce(std::string_view{"test"}, 0, std::string_view{"double"},
+                     wpi::json::object(), std::optional<int>{pubuid}));
 
   {
-    std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubHandle, topicHandle, "test", "double", wpi::json::object(), {}}});
-    msgs.emplace_back(net::ClientMessage{
-        net::ClientValueMsg{pubHandle, Value::MakeDouble(1.0, 10)}});
-    server.HandleLocal(msgs);
+    queue.msgs.emplace_back(net::ClientMessage{
+        net::PublishMsg{pubuid, "test", "double", wpi::json::object(), {}}});
+    queue.msgs.emplace_back(net::ClientMessage{
+        net::ClientValueMsg{pubuid, Value::MakeDouble(1.0, 10)}});
+    EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   ::testing::StrictMock<net::MockWireConnection> wire;
@@ -283,10 +280,10 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
 
   // subscribe topics only; will not send value
   {
-    NT_Subscriber subHandle = nt::Handle{0, 1, nt::Handle::kSubscriber};
+    constexpr int subuid = 1;
     std::vector<net::ClientMessage> msgs;
     msgs.emplace_back(net::ClientMessage{net::SubscribeMsg{
-        subHandle,
+        subuid,
         {{""}},
         PubSubOptions{.topicsOnly = true, .prefixMatch = true}}});
     server.ProcessIncomingText(id, EncodeText(msgs));
@@ -296,10 +293,10 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
 
   // subscribe normal; will not resend announcement, but will send value
   {
-    NT_Subscriber subHandle = nt::Handle{0, 2, nt::Handle::kSubscriber};
+    constexpr int subuid = 2;
     std::vector<net::ClientMessage> msgs;
     msgs.emplace_back(net::ClientMessage{
-        net::SubscribeMsg{subHandle, {{"test"}}, PubSubOptions{}}});
+        net::SubscribeMsg{subuid, {{"test"}}, PubSubOptions{}}});
     server.ProcessIncomingText(id, EncodeText(msgs));
   }
 
@@ -307,39 +304,34 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
 }
 
 TEST_F(ServerImplTest, ClientDisconnectUnpublish) {
-  server.SetLocal(&local);
-  NT_Publisher pubLocalHandle = nt::Handle{0, 1, nt::Handle::kPublisher};
-  NT_Topic topicLocalHandle = nt::Handle{0, 1, nt::Handle::kTopic};
-  NT_Publisher subHandle = nt::Handle{0, 1, nt::Handle::kSubscriber};
+  server.SetLocal(&local, &queue);
+  constexpr int pubuidLocal = 1;
+  constexpr int subuid = 1;
   {
     ::testing::InSequence seq;
-    EXPECT_CALL(local, NetworkAnnounce(std::string_view{"test2"},
-                                       std::string_view{"double"},
-                                       wpi::json::object(), pubLocalHandle));
-    EXPECT_CALL(local, NetworkAnnounce(std::string_view{"test"},
-                                       std::string_view{"double"},
-                                       wpi::json::object(), 0));
-    EXPECT_CALL(local, NetworkUnannounce(std::string_view{"test"}));
+    EXPECT_CALL(
+        local,
+        ServerAnnounce(std::string_view{"test2"}, 0, std::string_view{"double"},
+                       wpi::json::object(), std::optional<int>{pubuidLocal}));
+    EXPECT_CALL(
+        local,
+        ServerAnnounce(std::string_view{"test"}, 0, std::string_view{"double"},
+                       wpi::json::object(), std::optional<int>{}));
+    EXPECT_CALL(local, ServerUnannounce(std::string_view{"test"}, 0));
   }
 
   {
-    std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::PublishMsg{pubLocalHandle,
-                                                         topicLocalHandle,
-                                                         "test2",
-                                                         "double",
-                                                         wpi::json::object(),
-                                                         {}}});
-    msgs.emplace_back(net::ClientMessage{
-        net::ClientValueMsg{pubLocalHandle, Value::MakeDouble(1.0, 10)}});
-    server.HandleLocal(msgs);
+    queue.msgs.emplace_back(net::ClientMessage{net::PublishMsg{
+        pubuidLocal, "test2", "double", wpi::json::object(), {}}});
+    queue.msgs.emplace_back(net::ClientMessage{
+        net::ClientValueMsg{pubuidLocal, Value::MakeDouble(1.0, 10)}});
+    EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   {
-    std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(
-        net::ClientMessage{net::SubscribeMsg{subHandle, {"test"}, {}}});
-    server.HandleLocal(msgs);
+    queue.msgs.emplace_back(
+        net::ClientMessage{net::SubscribeMsg{subuid, {"test"}, {}}});
+    EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   ::testing::StrictMock<net::MockWireConnection> wire;
@@ -363,11 +355,10 @@ TEST_F(ServerImplTest, ClientDisconnectUnpublish) {
 
   // publish topic
   {
-    NT_Publisher pubHandle = nt::Handle{0, 1, nt::Handle::kPublisher};
-    NT_Topic topicHandle = nt::Handle{0, 1, nt::Handle::kTopic};
+    constexpr int pubuid = 1;
     std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubHandle, topicHandle, "test", "double", wpi::json::object(), {}}});
+    msgs.emplace_back(net::ClientMessage{
+        net::PublishMsg{pubuid, "test", "double", wpi::json::object(), {}}});
     server.ProcessIncomingText(id, EncodeText(msgs));
   }
 
@@ -379,33 +370,33 @@ TEST_F(ServerImplTest, ClientDisconnectUnpublish) {
 
 TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
   // publish before client connect
-  server.SetLocal(&local);
-  NT_Publisher pubHandle = nt::Handle{0, 1, nt::Handle::kPublisher};
+  server.SetLocal(&local, &queue);
+  constexpr int pubuid = 1;
   NT_Topic topicHandle = nt::Handle{0, 1, nt::Handle::kTopic};
-  NT_Subscriber subHandle = nt::Handle{0, 1, nt::Handle::kSubscriber};
+  constexpr int subuid = 1;
   Value defaultValue = Value::MakeDouble(1.0, 10);
   defaultValue.SetTime(0);
   defaultValue.SetServerTime(0);
   Value value = Value::MakeDouble(5, -10);
   {
     ::testing::InSequence seq;
-    EXPECT_CALL(local, NetworkAnnounce(std::string_view{"test"},
-                                       std::string_view{"double"},
-                                       wpi::json::object(), pubHandle))
+    EXPECT_CALL(
+        local,
+        ServerAnnounce(std::string_view{"test"}, 0, std::string_view{"double"},
+                       wpi::json::object(), std::optional<int>{pubuid}))
         .WillOnce(Return(topicHandle));
-    EXPECT_CALL(local, NetworkSetValue(topicHandle, defaultValue));
-    EXPECT_CALL(local, NetworkSetValue(topicHandle, value));
+    EXPECT_CALL(local, ServerSetValue(topicHandle, defaultValue));
+    EXPECT_CALL(local, ServerSetValue(topicHandle, value));
   }
 
   {
-    std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubHandle, topicHandle, "test", "double", wpi::json::object(), {}}});
-    msgs.emplace_back(
-        net::ClientMessage{net::ClientValueMsg{pubHandle, defaultValue}});
-    msgs.emplace_back(
-        net::ClientMessage{net::SubscribeMsg{subHandle, {"test"}, {}}});
-    server.HandleLocal(msgs);
+    queue.msgs.emplace_back(net::ClientMessage{
+        net::PublishMsg{pubuid, "test", "double", wpi::json::object(), {}}});
+    queue.msgs.emplace_back(
+        net::ClientMessage{net::ClientValueMsg{pubuid, defaultValue}});
+    queue.msgs.emplace_back(
+        net::ClientMessage{net::SubscribeMsg{subuid, {"test"}, {}}});
+    EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   // client connect; it should get already-published topic as soon as it
@@ -421,14 +412,13 @@ TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
 
   // publish and send non-default value with negative time offset
   {
-    NT_Subscriber pubHandle2 = nt::Handle{0, 2, nt::Handle::kPublisher};
+    constexpr int pubuid2 = 2;
     std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubHandle2, topicHandle, "test", "double", wpi::json::object(), {}}});
+    msgs.emplace_back(net::ClientMessage{
+        net::PublishMsg{pubuid2, "test", "double", wpi::json::object(), {}}});
     server.ProcessIncomingText(id, EncodeText(msgs));
     msgs.clear();
-    msgs.emplace_back(
-        net::ClientMessage{net::ClientValueMsg{pubHandle2, value}});
+    msgs.emplace_back(net::ClientMessage{net::ClientValueMsg{pubuid2, value}});
     server.ProcessIncomingBinary(id, EncodeServerBinary(msgs));
   }
 }

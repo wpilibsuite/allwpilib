@@ -30,13 +30,31 @@ class MultiSubscriber final {
    */
   MultiSubscriber(NetworkTableInstance inst,
                   std::span<const std::string_view> prefixes,
-                  const PubSubOptions& options = kDefaultPubSubOptions);
+                  const PubSubOptions& options = kDefaultPubSubOptions)
+      : m_handle{::nt::SubscribeMultiple(inst.GetHandle(), prefixes, options)} {
+  }
 
   MultiSubscriber(const MultiSubscriber&) = delete;
   MultiSubscriber& operator=(const MultiSubscriber&) = delete;
-  MultiSubscriber(MultiSubscriber&& rhs);
-  MultiSubscriber& operator=(MultiSubscriber&& rhs);
-  ~MultiSubscriber();
+
+  MultiSubscriber(MultiSubscriber&& rhs) : m_handle{rhs.m_handle} {
+    rhs.m_handle = 0;
+  }
+
+  MultiSubscriber& operator=(MultiSubscriber&& rhs) {
+    if (m_handle != 0) {
+      ::nt::UnsubscribeMultiple(m_handle);
+    }
+    m_handle = rhs.m_handle;
+    rhs.m_handle = 0;
+    return *this;
+  }
+
+  ~MultiSubscriber() {
+    if (m_handle != 0) {
+      ::nt::UnsubscribeMultiple(m_handle);
+    }
+  }
 
   /**
    * Determines if the native handle is valid.
@@ -57,5 +75,3 @@ class MultiSubscriber final {
 };
 
 }  // namespace nt
-
-#include "MultiSubscriber.inc"

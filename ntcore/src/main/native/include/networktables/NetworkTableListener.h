@@ -4,11 +4,15 @@
 
 #pragma once
 
-#include <functional>
 #include <span>
 #include <string_view>
+#include <utility>
 #include <vector>
 
+#include "networktables/MultiSubscriber.h"
+#include "networktables/NetworkTableEntry.h"
+#include "networktables/NetworkTableInstance.h"
+#include "networktables/Topic.h"
 #include "ntcore_cpp.h"
 
 namespace nt {
@@ -42,7 +46,10 @@ class NetworkTableListener final {
    */
   static NetworkTableListener CreateListener(
       NetworkTableInstance inst, std::span<const std::string_view> prefixes,
-      unsigned int mask, ListenerCallback listener);
+      unsigned int mask, ListenerCallback listener) {
+    return NetworkTableListener{::nt::AddListener(inst.GetHandle(), prefixes,
+                                                  mask, std::move(listener))};
+  }
 
   /**
    * Create a listener for changes on a particular topic. This creates a
@@ -54,7 +61,10 @@ class NetworkTableListener final {
    * @return Listener
    */
   static NetworkTableListener CreateListener(Topic topic, unsigned int mask,
-                                             ListenerCallback listener);
+                                             ListenerCallback listener) {
+    return NetworkTableListener{
+        nt::AddListener(topic.GetHandle(), mask, std::move(listener))};
+  }
 
   /**
    * Create a listener for topic changes on a subscriber. This does NOT keep the
@@ -67,7 +77,10 @@ class NetworkTableListener final {
    */
   static NetworkTableListener CreateListener(Subscriber& subscriber,
                                              unsigned int mask,
-                                             ListenerCallback listener);
+                                             ListenerCallback listener) {
+    return NetworkTableListener{
+        ::nt::AddListener(subscriber.GetHandle(), mask, std::move(listener))};
+  }
 
   /**
    * Create a listener for topic changes on a subscriber. This does NOT keep the
@@ -80,7 +93,10 @@ class NetworkTableListener final {
    */
   static NetworkTableListener CreateListener(MultiSubscriber& subscriber,
                                              unsigned int mask,
-                                             ListenerCallback listener);
+                                             ListenerCallback listener) {
+    return NetworkTableListener{
+        ::nt::AddListener(subscriber.GetHandle(), mask, std::move(listener))};
+  }
 
   /**
    * Create a listener for topic changes on an entry.
@@ -92,7 +108,10 @@ class NetworkTableListener final {
    */
   static NetworkTableListener CreateListener(NetworkTableEntry& entry,
                                              unsigned int mask,
-                                             ListenerCallback listener);
+                                             ListenerCallback listener) {
+    return NetworkTableListener{
+        ::nt::AddListener(entry.GetHandle(), mask, std::move(listener))};
+  }
 
   /**
    * Create a connection listener.
@@ -104,7 +123,12 @@ class NetworkTableListener final {
    */
   static NetworkTableListener CreateConnectionListener(
       NetworkTableInstance inst, bool immediate_notify,
-      ListenerCallback listener);
+      ListenerCallback listener) {
+    return NetworkTableListener{::nt::AddListener(
+        inst.GetHandle(),
+        NT_EVENT_CONNECTION | (immediate_notify ? NT_EVENT_IMMEDIATE : 0),
+        std::move(listener))};
+  }
 
   /**
    * Create a time synchronization listener.
@@ -115,9 +139,14 @@ class NetworkTableListener final {
    * @param listener          listener function
    * @return Listener
    */
-  static NetworkTableListener CreateTimeSyncListener(NetworkTableInstance inst,
-                                                     bool immediate_notify,
-                                                     ListenerCallback listener);
+  static NetworkTableListener CreateTimeSyncListener(
+      NetworkTableInstance inst, bool immediate_notify,
+      ListenerCallback listener) {
+    return NetworkTableListener{::nt::AddListener(
+        inst.GetHandle(),
+        NT_EVENT_TIMESYNC | (immediate_notify ? NT_EVENT_IMMEDIATE : 0),
+        std::move(listener))};
+  }
 
   /**
    * Create a listener for log messages.  By default, log messages are sent to
@@ -136,13 +165,32 @@ class NetworkTableListener final {
   static NetworkTableListener CreateLogger(NetworkTableInstance inst,
                                            unsigned int minLevel,
                                            unsigned int maxLevel,
-                                           ListenerCallback listener);
+                                           ListenerCallback listener) {
+    return NetworkTableListener{::nt::AddLogger(inst.GetHandle(), minLevel,
+                                                maxLevel, std::move(listener))};
+  }
 
   NetworkTableListener(const NetworkTableListener&) = delete;
   NetworkTableListener& operator=(const NetworkTableListener&) = delete;
-  NetworkTableListener(NetworkTableListener&& rhs);
-  NetworkTableListener& operator=(NetworkTableListener&& rhs);
-  ~NetworkTableListener();
+
+  NetworkTableListener(NetworkTableListener&& rhs) : m_handle(rhs.m_handle) {
+    rhs.m_handle = 0;
+  }
+
+  NetworkTableListener& operator=(NetworkTableListener&& rhs) {
+    if (m_handle != 0) {
+      nt::RemoveListener(m_handle);
+    }
+    m_handle = rhs.m_handle;
+    rhs.m_handle = 0;
+    return *this;
+  }
+
+  ~NetworkTableListener() {
+    if (m_handle != 0) {
+      nt::RemoveListener(m_handle);
+    }
+  }
 
   explicit operator bool() const { return m_handle != 0; }
 
@@ -163,7 +211,13 @@ class NetworkTableListener final {
    *                a negative value to block indefinitely
    * @return False if timed out, otherwise true.
    */
-  bool WaitForQueue(double timeout);
+  bool WaitForQueue(double timeout) {
+    if (m_handle != 0) {
+      return nt::WaitForListenerQueue(m_handle, timeout);
+    } else {
+      return false;
+    }
+  }
 
  private:
   explicit NetworkTableListener(NT_Listener handle) : m_handle{handle} {}
@@ -185,14 +239,32 @@ class NetworkTableListenerPoller final {
    *
    * @param inst Instance
    */
-  explicit NetworkTableListenerPoller(NetworkTableInstance inst);
+  explicit NetworkTableListenerPoller(NetworkTableInstance inst)
+      : m_handle(nt::CreateListenerPoller(inst.GetHandle())) {}
 
   NetworkTableListenerPoller(const NetworkTableListenerPoller&) = delete;
   NetworkTableListenerPoller& operator=(const NetworkTableListenerPoller&) =
       delete;
-  NetworkTableListenerPoller(NetworkTableListenerPoller&& rhs);
-  NetworkTableListenerPoller& operator=(NetworkTableListenerPoller&& rhs);
-  ~NetworkTableListenerPoller();
+
+  NetworkTableListenerPoller(NetworkTableListenerPoller&& rhs)
+      : m_handle(rhs.m_handle) {
+    rhs.m_handle = 0;
+  }
+
+  NetworkTableListenerPoller& operator=(NetworkTableListenerPoller&& rhs) {
+    if (m_handle != 0) {
+      nt::DestroyListenerPoller(m_handle);
+    }
+    m_handle = rhs.m_handle;
+    rhs.m_handle = 0;
+    return *this;
+  }
+
+  ~NetworkTableListenerPoller() {
+    if (m_handle != 0) {
+      nt::DestroyListenerPoller(m_handle);
+    }
+  }
 
   explicit operator bool() const { return m_handle != 0; }
 
@@ -213,7 +285,9 @@ class NetworkTableListenerPoller final {
    * @return Listener handle
    */
   NT_Listener AddListener(std::span<const std::string_view> prefixes,
-                          unsigned int mask);
+                          unsigned int mask) {
+    return nt::AddPolledListener(m_handle, prefixes, mask);
+  }
 
   /**
    * Start listening to changes to a particular topic. This creates a
@@ -223,7 +297,9 @@ class NetworkTableListenerPoller final {
    * @param mask Bitmask of EventFlags values
    * @return Listener handle
    */
-  NT_Listener AddListener(Topic topic, unsigned int mask);
+  NT_Listener AddListener(Topic topic, unsigned int mask) {
+    return ::nt::AddPolledListener(m_handle, topic.GetHandle(), mask);
+  }
 
   /**
    * Start listening to topic changes on a subscriber. This does NOT keep the
@@ -233,7 +309,9 @@ class NetworkTableListenerPoller final {
    * @param mask Bitmask of EventFlags values
    * @return Listener handle
    */
-  NT_Listener AddListener(Subscriber& subscriber, unsigned int mask);
+  NT_Listener AddListener(Subscriber& subscriber, unsigned int mask) {
+    return ::nt::AddPolledListener(m_handle, subscriber.GetHandle(), mask);
+  }
 
   /**
    * Start listening to topic changes on a subscriber. This does NOT keep the
@@ -243,7 +321,9 @@ class NetworkTableListenerPoller final {
    * @param mask Bitmask of EventFlags values
    * @return Listener handle
    */
-  NT_Listener AddListener(MultiSubscriber& subscriber, unsigned int mask);
+  NT_Listener AddListener(MultiSubscriber& subscriber, unsigned int mask) {
+    return ::nt::AddPolledListener(m_handle, subscriber.GetHandle(), mask);
+  }
 
   /**
    * Start listening to topic changes on an entry.
@@ -252,7 +332,9 @@ class NetworkTableListenerPoller final {
    * @param mask Bitmask of EventFlags values
    * @return Listener handle
    */
-  NT_Listener AddListener(NetworkTableEntry& entry, unsigned int mask);
+  NT_Listener AddListener(NetworkTableEntry& entry, unsigned int mask) {
+    return ::nt::AddPolledListener(m_handle, entry.GetHandle(), mask);
+  }
 
   /**
    * Add a connection listener. The callback function is called asynchronously
@@ -262,7 +344,11 @@ class NetworkTableListenerPoller final {
    * @param immediate_notify  notify listener of all existing connections
    * @return Listener handle
    */
-  NT_Listener AddConnectionListener(bool immediate_notify);
+  NT_Listener AddConnectionListener(bool immediate_notify) {
+    return ::nt::AddPolledListener(
+        m_handle, ::nt::GetInstanceFromHandle(m_handle),
+        NT_EVENT_CONNECTION | (immediate_notify ? NT_EVENT_IMMEDIATE : 0));
+  }
 
   /**
    * Add a time synchronization listener. The callback function is called
@@ -274,7 +360,11 @@ class NetworkTableListenerPoller final {
    *                          value
    * @return Listener handle
    */
-  NT_Listener AddTimeSyncListener(bool immediate_notify);
+  NT_Listener AddTimeSyncListener(bool immediate_notify) {
+    return ::nt::AddPolledListener(
+        m_handle, ::nt::GetInstanceFromHandle(m_handle),
+        NT_EVENT_TIMESYNC | (immediate_notify ? NT_EVENT_IMMEDIATE : 0));
+  }
 
   /**
    * Add logger callback function.  By default, log messages are sent to stderr;
@@ -287,26 +377,26 @@ class NetworkTableListenerPoller final {
    * @param maxLevel    maximum log level
    * @return Listener handle
    */
-  NT_Listener AddLogger(unsigned int minLevel, unsigned int maxLevel);
+  NT_Listener AddLogger(unsigned int minLevel, unsigned int maxLevel) {
+    return ::nt::AddPolledLogger(m_handle, minLevel, maxLevel);
+  }
 
   /**
    * Remove a listener.
    *
    * @param listener Listener handle
    */
-  void RemoveListener(NT_Listener listener);
+  void RemoveListener(NT_Listener listener) { ::nt::RemoveListener(listener); }
 
   /**
    * Read events.
    *
    * @return Events since the previous call to ReadQueue()
    */
-  std::vector<Event> ReadQueue();
+  std::vector<Event> ReadQueue() { return ::nt::ReadListenerQueue(m_handle); }
 
  private:
   NT_ListenerPoller m_handle{0};
 };
 
 }  // namespace nt
-
-#include "NetworkTableListener.inc"

@@ -6,7 +6,6 @@
 
 #include <stdint.h>
 
-#include <functional>
 #include <memory>
 #include <span>
 #include <string>
@@ -26,6 +25,7 @@
 #include "Types_internal.h"
 #include "ValueCircularBuffer.h"
 #include "VectorSet.h"
+#include "net/MessageHandler.h"
 #include "net/NetworkInterface.h"
 #include "ntcore_cpp.h"
 
@@ -46,15 +46,15 @@ class LocalStorage final : public net::ILocalStorage {
   ~LocalStorage() final;
 
   // network interface functions
-  NT_Topic NetworkAnnounce(std::string_view name, std::string_view typeStr,
-                           const wpi::json& properties,
-                           NT_Publisher pubHandle) final;
-  void NetworkUnannounce(std::string_view name) final;
-  void NetworkPropertiesUpdate(std::string_view name, const wpi::json& update,
-                               bool ack) final;
-  void NetworkSetValue(NT_Topic topicHandle, const Value& value) final;
+  int ServerAnnounce(std::string_view name, int id, std::string_view typeStr,
+                     const wpi::json& properties,
+                     std::optional<int> pubuid) final;
+  void ServerUnannounce(std::string_view name, int id) final;
+  void ServerPropertiesUpdate(std::string_view name, const wpi::json& update,
+                              bool ack) final;
+  void ServerSetValue(int topicId, const Value& value) final;
 
-  void StartNetwork(net::NetworkInterface* network) final;
+  void StartNetwork(net::ClientMessageHandler* network) final;
   void ClearNetwork() final;
 
   // User functions.  These are the actual implementations of the corresponding
@@ -555,7 +555,7 @@ class LocalStorage final : public net::ILocalStorage {
     int m_inst;
     IListenerStorage& m_listenerStorage;
     wpi::Logger& m_logger;
-    net::NetworkInterface* m_network{nullptr};
+    net::ClientMessageHandler* m_network{nullptr};
 
     // handle mappings
     HandleMap<TopicData, 16> m_topics;
@@ -601,11 +601,12 @@ class LocalStorage final : public net::ILocalStorage {
     void RefreshPubSubActive(TopicData* topic, bool warnOnSubMismatch);
 
     void NetworkAnnounce(TopicData* topic, std::string_view typeStr,
-                         const wpi::json& properties, NT_Publisher pubHandle);
+                         const wpi::json& properties,
+                         std::optional<int> pubuid);
     void RemoveNetworkPublisher(TopicData* topic);
     void NetworkPropertiesUpdate(TopicData* topic, const wpi::json& update,
                                  bool ack);
-    void StartNetwork(net::NetworkInterface* network);
+    void StartNetwork(net::ClientMessageHandler* network);
 
     PublisherData* AddLocalPublisher(TopicData* topic,
                                      const wpi::json& properties,

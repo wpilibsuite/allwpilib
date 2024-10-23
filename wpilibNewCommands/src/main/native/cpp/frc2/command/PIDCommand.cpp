@@ -6,6 +6,8 @@
 
 #include <utility>
 
+#include <wpi/deprecated.h>
+
 using namespace frc2;
 
 PIDCommand::PIDCommand(frc::PIDController controller,
@@ -19,6 +21,7 @@ PIDCommand::PIDCommand(frc::PIDController controller,
       m_useOutput{std::move(useOutput)} {
   AddRequirements(requirements);
 }
+WPI_IGNORE_DEPRECATED
 
 PIDCommand::PIDCommand(frc::PIDController controller,
                        std::function<double()> measurementSource,
@@ -27,6 +30,7 @@ PIDCommand::PIDCommand(frc::PIDController controller,
     : PIDCommand(
           controller, measurementSource, [setpoint] { return setpoint; },
           useOutput, requirements) {}
+WPI_UNIGNORE_DEPRECATED
 
 void PIDCommand::Initialize() {
   m_controller.Reset();

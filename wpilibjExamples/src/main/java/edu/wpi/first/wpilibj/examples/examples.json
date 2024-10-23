@@ -277,25 +277,6 @@
     "commandversion": 2
   },
   {
-    "name": "GearsBot",
-    "description": "A fully functional Command-Based program for WPI's GearsBot robot.",
-    "tags": [
-      "Complete Robot",
-      "Command-based",
-      "Differential Drive",
-      "Elevator",
-      "Arm",
-      "Analog",
-      "Digital Input",
-      "SmartDashboard",
-      "XboxController"
-    ],
-    "foldername": "gearsbot",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
     "name": "Simple Vision",
     "description": "Use the CameraServer class to stream from a USB Webcam without processing the images.",
     "tags": [
@@ -407,6 +388,8 @@
       "Pneumatics",
       "Digital Input",
       "PID",
+      "Gyro",
+      "Profiled PID",
       "XboxController"
     ],
     "foldername": "rapidreactcommandbot",
@@ -421,40 +404,6 @@
       "Command-based"
     ],
     "foldername": "selectcommand",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "Frisbeebot",
-    "description": "A simple frisbee shooter for the 2013 game, demonstrating use of PIDSubsystem.",
-    "tags": [
-      "Complete Robot",
-      "Command-based",
-      "Differential Drive",
-      "Flywheel",
-      "Encoder",
-      "XboxController",
-      "PID"
-    ],
-    "foldername": "frisbeebot",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "Gyro Drive Commands",
-    "description": "Control a robot's angle with PID and a gyro, in command-based.",
-    "tags": [
-      "Command-based",
-      "Differential Drive",
-      "Encoder",
-      "PS4Controller",
-      "PID",
-      "Profiled PID",
-      "Gyro"
-    ],
-    "foldername": "gyrodrivecommands",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -579,38 +528,6 @@
       "SmartDashboard"
     ],
     "foldername": "dma",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "ArmBot",
-    "description": "Control an arm with ProfiledPIDSubsystem.",
-    "tags": [
-      "Command-based",
-      "Arm",
-      "Encoder",
-      "Profiled PID",
-      "XboxController",
-      "Differential Drive"
-    ],
-    "foldername": "armbot",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "ArmBotOffboard",
-    "description": "Control an arm with TrapezoidProfileSubsystem and smart motor controller PID.",
-    "tags": [
-      "Command-based",
-      "Arm",
-      "Smart Motor Controller",
-      "Trapezoid Profile",
-      "XboxController",
-      "Differential Drive"
-    ],
-    "foldername": "armbotoffboard",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -940,7 +857,7 @@
       "Command-based",
       "DataLog"
     ],
-    "foldername": "sysid",
+    "foldername": "sysidroutine",
     "gradlebase": "java",
     "commandversion": 2,
     "mainclass": "Main"

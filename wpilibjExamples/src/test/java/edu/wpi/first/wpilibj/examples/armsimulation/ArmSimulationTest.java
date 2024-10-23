@@ -71,11 +71,8 @@ class ArmSimulationTest {
   void teleopTest(double setpoint) {
     assertTrue(Preferences.containsKey(Constants.kArmPositionKey));
     assertTrue(Preferences.containsKey(Constants.kArmPKey));
-    assertEquals(
-        Constants.kDefaultArmSetpointDegrees,
-        Preferences.getDouble(Constants.kArmPositionKey, Double.NaN));
-
     Preferences.setDouble(Constants.kArmPositionKey, setpoint);
+    assertEquals(setpoint, Preferences.getDouble(Constants.kArmPositionKey, Double.NaN));
     // teleop init
     {
       DriverStationSim.setAutonomous(false);
@@ -87,10 +84,10 @@ class ArmSimulationTest {
     }
 
     {
-      // advance 50 timesteps
+      // advance 150 timesteps
       SimHooks.stepTiming(3);
 
-      // Ensure elevator is still at 0.
+      // Ensure arm is still at minimum angle.
       assertEquals(Constants.kMinAngleRads, m_encoderSim.getDistance(), 2.0);
     }
 
@@ -115,7 +112,7 @@ class ArmSimulationTest {
       m_joystickSim.setTrigger(false);
       m_joystickSim.notifyNewData();
 
-      // advance 75 timesteps
+      // advance 150 timesteps
       SimHooks.stepTiming(3.0);
 
       assertEquals(Constants.kMinAngleRads, m_encoderSim.getDistance(), 2.0);

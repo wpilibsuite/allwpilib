@@ -90,10 +90,11 @@ TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
 }
 
 TimedRobot::~TimedRobot() {
-  int32_t status = 0;
-
-  HAL_StopNotifier(m_notifier, &status);
-  FRC_ReportError(status, "StopNotifier");
+  if (m_notifier != HAL_kInvalidHandle) {
+    int32_t status = 0;
+    HAL_StopNotifier(m_notifier, &status);
+    FRC_ReportError(status, "StopNotifier");
+  }
 }
 
 void TimedRobot::AddPeriodic(std::function<void()> callback,

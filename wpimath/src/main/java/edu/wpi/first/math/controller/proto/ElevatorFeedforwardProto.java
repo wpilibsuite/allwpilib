@@ -28,7 +28,7 @@ public class ElevatorFeedforwardProto
 
   @Override
   public ElevatorFeedforward unpack(ProtobufElevatorFeedforward msg) {
-    return new ElevatorFeedforward(msg.getKs(), msg.getKg(), msg.getKv(), msg.getKa());
+    return new ElevatorFeedforward(msg.getKs(), msg.getKg(), msg.getKv(), msg.getKa(), msg.getDt());
   }
 
   @Override
@@ -37,5 +37,6 @@ public class ElevatorFeedforwardProto
     msg.setKg(value.getKg());
     msg.setKv(value.getKv());
     msg.setKa(value.getKa());
+    msg.setDt(value.getDt());
   }
 }

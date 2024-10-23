@@ -9,10 +9,10 @@ Subject: [PATCH 9/9] Remove swearing
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/win/fs.c b/src/win/fs.c
-index af07d092a65909ac4948c679b95468eef549ccca..69a413eab4caa2aee4137411d17f630eea138975 100644
+index 572a82dca3cbcdb7829241dd520e8f34591d81e9..eaa0342f97c87cac3d6802e8f6c8c97d5bdc12ea 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
-@@ -1844,7 +1844,7 @@ INLINE static void fs__stat_assign_statbuf(uv_stat_t* statbuf,
+@@ -1845,7 +1845,7 @@ INLINE static void fs__stat_assign_statbuf(uv_stat_t* statbuf,
     * impossible to delete the file afterwards, since read-only files can't be
     * deleted.
     *

@@ -9,14 +9,12 @@
 #include <algorithm>
 #include <concepts>
 #include <numeric>
-#include <optional>
 #include <span>
 #include <utility>
 #include <vector>
 
 #include <wpi/DenseMap.h>
 
-#include "Handle.h"
 #include "Message.h"
 #include "WireConnection.h"
 #include "WireEncoder.h"
@@ -71,18 +69,17 @@ class NetworkOutgoingQueue {
     m_queues.emplace_back(100);  // default queue is 100 ms period
   }
 
-  void SetPeriod(NT_Handle handle, uint32_t periodMs);
+  void SetPeriod(int id, uint32_t periodMs);
 
-  void EraseHandle(NT_Handle handle) { m_handleMap.erase(handle); }
+  void EraseId(int id) { m_idMap.erase(id); }
 
   template <typename T>
-  void SendMessage(NT_Handle handle, T&& msg) {
-    m_queues[m_handleMap[handle].queueIndex].Append(handle,
-                                                    std::forward<T>(msg));
+  void SendMessage(int id, T&& msg) {
+    m_queues[m_idMap[id].queueIndex].Append(id, std::forward<T>(msg));
     m_totalSize += sizeof(Message);
   }
 
-  void SendValue(NT_Handle handle, const Value& value, ValueSendMode mode);
+  void SendValue(int id, const Value& value, ValueSendMode mode);
 
   void SendOutgoing(uint64_t curTimeMs, bool flush);
 
@@ -95,16 +92,15 @@ class NetworkOutgoingQueue {
  private:
   using ValueMsg = typename MessageType::ValueMsg;
 
-  void EncodeValue(wpi::raw_ostream& os, NT_Handle handle, const Value& value);
+  void EncodeValue(wpi::raw_ostream& os, int id, const Value& value);
 
   struct Message {
     Message() = default;
     template <typename T>
-    Message(T&& msg, NT_Handle handle)
-        : msg{std::forward<T>(msg)}, handle{handle} {}
+    Message(T&& msg, int id) : msg{std::forward<T>(msg)}, id{id} {}
 
     MessageType msg;
-    NT_Handle handle;
+    int id;
   };
 
   struct Queue {
@@ -124,7 +120,7 @@ class NetworkOutgoingQueue {
     unsigned int queueIndex = 0;
     int valuePos = -1;  // -1 if not in queue
   };
-  wpi::DenseMap<NT_Handle, HandleInfo> m_handleMap;
+  wpi::DenseMap<int, HandleInfo> m_idMap;
   size_t m_totalSize{0};
   uint64_t m_lastSendMs{0};
   int64_t m_timeOffsetUs{0};
@@ -137,8 +133,7 @@ class NetworkOutgoingQueue {
 };
 
 template <NetworkMessage MessageType>
-void NetworkOutgoingQueue<MessageType>::SetPeriod(NT_Handle handle,
-                                                  uint32_t periodMs) {
+void NetworkOutgoingQueue<MessageType>::SetPeriod(int id, uint32_t periodMs) {
   // it's quite common to set a lot of things in a row with the same period
   unsigned int queueIndex;
   if (m_lastSetPeriod == periodMs) {
@@ -159,13 +154,12 @@ void NetworkOutgoingQueue<MessageType>::SetPeriod(NT_Handle handle,
   }
 
   // map the handle to the queue
-  auto [infoIt, created] = m_handleMap.try_emplace(handle);
+  auto [infoIt, created] = m_idMap.try_emplace(id);
   if (!created && infoIt->getSecond().queueIndex != queueIndex) {
     // need to move any items from old queue to new queue
     auto& oldMsgs = m_queues[infoIt->getSecond().queueIndex].msgs;
-    auto it = std::stable_partition(
-        oldMsgs.begin(), oldMsgs.end(),
-        [&](const auto& e) { return e.handle != handle; });
+    auto it = std::stable_partition(oldMsgs.begin(), oldMsgs.end(),
+                                    [&](const auto& e) { return e.id != id; });
     auto& newMsgs = m_queues[queueIndex].msgs;
     for (auto i = it, end = oldMsgs.end(); i != end; ++i) {
       newMsgs.emplace_back(std::move(*i));
@@ -177,8 +171,7 @@ void NetworkOutgoingQueue<MessageType>::SetPeriod(NT_Handle handle,
 }
 
 template <NetworkMessage MessageType>
-void NetworkOutgoingQueue<MessageType>::SendValue(NT_Handle handle,
-                                                  const Value& value,
+void NetworkOutgoingQueue<MessageType>::SendValue(int id, const Value& value,
                                                   ValueSendMode mode) {
   if (m_local) {
     mode = ValueSendMode::kImm;  // always send local immediately
@@ -191,26 +184,26 @@ void NetworkOutgoingQueue<MessageType>::SendValue(NT_Handle handle,
     case ValueSendMode::kDisabled:  // do nothing
       break;
     case ValueSendMode::kImm:  // send immediately
-      m_wire.SendBinary([&](auto& os) { EncodeValue(os, handle, value); });
+      m_wire.SendBinary([&](auto& os) { EncodeValue(os, id, value); });
       break;
     case ValueSendMode::kAll: {  // append to outgoing
-      auto& info = m_handleMap[handle];
+      auto& info = m_idMap[id];
       auto& queue = m_queues[info.queueIndex];
       info.valuePos = queue.msgs.size();
-      queue.Append(handle, ValueMsg{handle, value});
+      queue.Append(id, ValueMsg{id, value});
       m_totalSize += sizeof(Message) + value.size();
       break;
     }
     case ValueSendMode::kNormal: {
       // replace, or append if not present
-      auto& info = m_handleMap[handle];
+      auto& info = m_idMap[id];
       auto& queue = m_queues[info.queueIndex];
       if (info.valuePos != -1 &&
           static_cast<unsigned int>(info.valuePos) < queue.msgs.size()) {
         auto& elem = queue.msgs[info.valuePos];
         if (auto m = std::get_if<ValueMsg>(&elem.msg.contents)) {
           // double-check handle, and only replace if timestamp newer
-          if (elem.handle == handle &&
+          if (elem.id == id &&
               (m->value.time() == 0 || value.time() >= m->value.time())) {
             int delta = value.size() - m->value.size();
             m->value = value;
@@ -220,7 +213,7 @@ void NetworkOutgoingQueue<MessageType>::SendValue(NT_Handle handle,
         }
       }
       info.valuePos = queue.msgs.size();
-      queue.Append(handle, ValueMsg{handle, value});
+      queue.Append(id, ValueMsg{id, value});
       m_totalSize += sizeof(Message) + value.size();
       break;
     }
@@ -271,7 +264,7 @@ void NetworkOutgoingQueue<MessageType>::SendOutgoing(uint64_t curTimeMs,
     for (; it != end && unsent == 0; ++it) {
       if (auto m = std::get_if<ValueMsg>(&it->msg.contents)) {
         unsent = m_wire.WriteBinary(
-            [&](auto& os) { EncodeValue(os, it->handle, m->value); });
+            [&](auto& os) { EncodeValue(os, it->id, m->value); });
       } else {
         unsent = m_wire.WriteText([&](auto& os) {
           if (!WireEncodeText(os, it->msg)) {
@@ -299,7 +292,7 @@ void NetworkOutgoingQueue<MessageType>::SendOutgoing(uint64_t curTimeMs,
       }
     }
     msgs.erase(msgs.begin(), it - unsent);
-    for (auto&& kv : m_handleMap) {
+    for (auto&& kv : m_idMap) {
       auto& info = kv.getSecond();
       if (info.queueIndex == queueIndex) {
         if (info.valuePos < delta) {
@@ -324,7 +317,7 @@ void NetworkOutgoingQueue<MessageType>::SendOutgoing(uint64_t curTimeMs,
 
 template <NetworkMessage MessageType>
 void NetworkOutgoingQueue<MessageType>::EncodeValue(wpi::raw_ostream& os,
-                                                    NT_Handle handle,
+                                                    int id,
                                                     const Value& value) {
   int64_t time = value.time();
   if constexpr (std::same_as<ValueMsg, ClientValueMsg>) {
@@ -336,7 +329,7 @@ void NetworkOutgoingQueue<MessageType>::EncodeValue(wpi::raw_ostream& os,
       }
     }
   }
-  WireEncodeBinary(os, Handle{handle}.GetIndex(), time, value);
+  WireEncodeBinary(os, id, time, value);
 }
 
 }  // namespace nt::net

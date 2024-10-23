@@ -4,10 +4,15 @@
 
 #pragma once
 
+#include <type_traits>
+
+#include <gcem.hpp>
+#include <wpi/StackTrace.h>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
 #include "units/angle.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
@@ -32,7 +37,10 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @param value The value of the angle.
    */
-  constexpr Rotation2d(units::angle_unit auto value);  // NOLINT
+  constexpr Rotation2d(units::angle_unit auto value)  // NOLINT
+      : m_value{value},
+        m_cos{gcem::cos(value.template convert<units::radian>().value())},
+        m_sin{gcem::sin(value.template convert<units::radian>().value())} {}
 
   /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)
@@ -41,7 +49,22 @@ class WPILIB_DLLEXPORT Rotation2d {
    * @param x The x component or cosine of the rotation.
    * @param y The y component or sine of the rotation.
    */
-  constexpr Rotation2d(double x, double y);
+  constexpr Rotation2d(double x, double y) {
+    double magnitude = gcem::hypot(x, y);
+    if (magnitude > 1e-6) {
+      m_sin = y / magnitude;
+      m_cos = x / magnitude;
+    } else {
+      m_sin = 0.0;
+      m_cos = 1.0;
+      if (!std::is_constant_evaluated()) {
+        wpi::math::MathSharedStore::ReportError(
+            "x and y components of Rotation2d are zero\n{}",
+            wpi::GetStackTrace(1));
+      }
+    }
+    m_value = units::radian_t{gcem::atan2(m_sin, m_cos)};
+  }
 
   /**
    * Adds two rotations together, with the result being bounded between -pi and
@@ -54,7 +77,9 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The sum of the two rotations.
    */
-  constexpr Rotation2d operator+(const Rotation2d& other) const;
+  constexpr Rotation2d operator+(const Rotation2d& other) const {
+    return RotateBy(other);
+  }
 
   /**
    * Subtracts the new rotation from the current rotation and returns the new
@@ -67,7 +92,9 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The difference between the two rotations.
    */
-  constexpr Rotation2d operator-(const Rotation2d& other) const;
+  constexpr Rotation2d operator-(const Rotation2d& other) const {
+    return *this + -other;
+  }
 
   /**
    * Takes the inverse of the current rotation. This is simply the negative of
@@ -75,7 +102,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The inverse of the current rotation.
    */
-  constexpr Rotation2d operator-() const;
+  constexpr Rotation2d operator-() const { return Rotation2d{-m_value}; }
 
   /**
    * Multiplies the current rotation by a scalar.
@@ -84,7 +111,9 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The new scaled Rotation2d.
    */
-  constexpr Rotation2d operator*(double scalar) const;
+  constexpr Rotation2d operator*(double scalar) const {
+    return Rotation2d{m_value * scalar};
+  }
 
   /**
    * Divides the current rotation by a scalar.
@@ -93,7 +122,9 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The new scaled Rotation2d.
    */
-  constexpr Rotation2d operator/(double scalar) const;
+  constexpr Rotation2d operator/(double scalar) const {
+    return *this * (1.0 / scalar);
+  }
 
   /**
    * Checks equality between this Rotation2d and another object.
@@ -101,7 +132,9 @@ class WPILIB_DLLEXPORT Rotation2d {
    * @param other The other object.
    * @return Whether the two objects are equal.
    */
-  constexpr bool operator==(const Rotation2d& other) const;
+  constexpr bool operator==(const Rotation2d& other) const {
+    return gcem::hypot(Cos() - other.Cos(), Sin() - other.Sin()) < 1E-9;
+  }
 
   /**
    * Adds the new rotation to the current rotation using a rotation matrix.
@@ -116,7 +149,10 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The new rotated Rotation2d.
    */
-  constexpr Rotation2d RotateBy(const Rotation2d& other) const;
+  constexpr Rotation2d RotateBy(const Rotation2d& other) const {
+    return {Cos() * other.Cos() - Sin() * other.Sin(),
+            Cos() * other.Sin() + Sin() * other.Cos()};
+  }
 
   /**
    * Returns the radian value of the rotation.
@@ -173,4 +209,3 @@ void from_json(const wpi::json& json, Rotation2d& rotation);
 #include "frc/geometry/proto/Rotation2dProto.h"
 #endif
 #include "frc/geometry/struct/Rotation2dStruct.h"
-#include "frc/geometry/Rotation2d.inc"

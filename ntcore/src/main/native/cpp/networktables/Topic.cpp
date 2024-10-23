@@ -60,3 +60,7 @@ GenericEntry Topic::GetGenericEntry(std::string_view typeString,
   return GenericEntry{::nt::GetEntry(
       m_handle, ::nt::GetTypeFromString(typeString), typeString, options)};
 }
+
+void Publisher::anchor() {}
+
+void Subscriber::anchor() {}

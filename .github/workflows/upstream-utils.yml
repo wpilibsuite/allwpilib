@@ -40,11 +40,6 @@ jobs:
           cd upstream_utils
           ./argparse_lib.py clone
           ./argparse_lib.py copy-src
-      - name: Run concurrentqueue.py
-        run: |
-          cd upstream_utils
-          ./concurrentqueue.py clone
-          ./concurrentqueue.py copy-src
       - name: Run eigen.py
         run: |
           cd upstream_utils
@@ -138,4 +133,4 @@ jobs:
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output
-        run: git --no-pager diff --exit-code HEAD
+        run: git --no-pager diff --exit-code HEAD ':!*.bazel'

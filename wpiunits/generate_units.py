@@ -51,6 +51,7 @@ MATH_OPERATION_UNITS = [
     "Mult<?, ?>",
     "Per<?, ?>",
     "Power",
+    "Resistance",
     "Temperature",
     "Time",
     "Torque",
@@ -91,7 +92,11 @@ UNIT_CONFIGURATIONS = {
         """
         ),
     },
-    "Current": {"base_unit": "Amps", "multiply": {"Voltage": "Power"}, "divide": {}},
+    "Current": {
+        "base_unit": "Amps",
+        "multiply": {"Voltage": "Power", "Resistance": "Voltage"},
+        "divide": {},
+    },
     "Dimensionless": {
         "base_unit": "Value",
         "multiply": {
@@ -111,6 +116,7 @@ UNIT_CONFIGURATIONS = {
             "Mass": "Mass",
             "MomentOfInertia": "MomentOfInertia",
             "Power": "Power",
+            "Resistance": "Resistance",
             "Temperature": "Temperature",
             "Time": "Time",
             "Torque": "Torque",
@@ -225,6 +231,13 @@ UNIT_CONFIGURATIONS = {
         },
         "divide": {"Voltage": "Current", "Current": "Voltage", "Energy": "Frequency"},
     },
+    "Resistance": {
+        "base_unit": "Ohms",
+        "multiply": {
+            "Current": "Voltage",
+        },
+        "divide": {},
+    },
     "Temperature": {"base_unit": "Kelvin", "multiply": {}, "divide": {}},
     "Time": {
         "base_unit": "Seconds",
@@ -258,10 +271,30 @@ UNIT_CONFIGURATIONS = {
     "Velocity": {
         "base_unit": "unit()",
         "generics": {"D": {"extends": "Unit"}},
-        "multiply": {},
+        "multiply": {
+            "Time": {
+                "implementation": inspect.cleandoc(
+                    """
+                  @Override
+                  default Measure<D> times(Time multiplier) {
+                    return (Measure<D>) unit().numerator().ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+                  }
+                """
+                )
+            }
+        },
         "divide": {},
     },
-    "Voltage": {"base_unit": "Volts", "multiply": {"Current": "Power"}, "divide": {}},
+    "Voltage": {
+        "base_unit": "Volts",
+        "multiply": {
+            "Current": "Power",
+        },
+        "divide": {
+            "Resistance": "Current",
+            "Current": "Resistance",
+        },
+    },
 }
 
 
@@ -310,8 +343,16 @@ def mtou(measure_name):
         return re.sub(regex, "\\1Unit\\2", measure_name)
 
 
-def main():
+def indent(multiline_string, indentation):
+    """
+    Indents a multiline string by `indentation` number of spaces
+    """
+    return "\n".join(
+        list(map(lambda line: " " * indentation + line, multiline_string.split("\n")))
+    )
 
+
+def main():
     dirname, _ = os.path.split(os.path.abspath(__file__))
 
     env = Environment(
@@ -331,6 +372,7 @@ def main():
         "generics_list": generics_list,
         "generics_usage": generics_usage,
         "mtou": mtou,
+        "indent": indent,
     }
 
     for unit_name in UNIT_CONFIGURATIONS:

@@ -398,7 +398,6 @@ void uv__metrics_set_provider_entry_time(uv_loop_t* loop);
 struct uv__iou {
   uint32_t* sqhead;
   uint32_t* sqtail;
-  uint32_t* sqarray;
   uint32_t sqmask;
   uint32_t* sqflags;
   uint32_t* cqhead;
@@ -413,7 +412,6 @@ struct uv__iou {
   size_t sqelen;
   int ringfd;
   uint32_t in_flight;
-  uint32_t flags;
 };
 #endif  /* __linux__ */
 

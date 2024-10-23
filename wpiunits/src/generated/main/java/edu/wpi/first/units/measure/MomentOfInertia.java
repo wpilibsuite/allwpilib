@@ -278,6 +278,17 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
 
 
   @Override
+  default Mult<MomentOfInertiaUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<MomentOfInertiaUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<MomentOfInertiaUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<MomentOfInertiaUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<MomentOfInertiaUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }

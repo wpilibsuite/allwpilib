@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <limits>
+#include <numbers>
 #include <random>
 #include <tuple>
 #include <vector>
@@ -382,4 +383,82 @@ TEST(SwerveDrivePoseEstimatorTest, TestSampleAt) {
             estimator.SampleAt(0.5_s));
   EXPECT_EQ(std::optional(frc::Pose2d{2_m, 0.1_m, frc::Rotation2d{}}),
             estimator.SampleAt(2.5_s));
+}
+
+TEST(SwerveDrivePoseEstimatorTest, TestReset) {
+  frc::SwerveDriveKinematics<4> kinematics{
+      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
+      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+  frc::SwerveDrivePoseEstimator estimator{
+      kinematics,
+      frc::Rotation2d{},
+      {frc::SwerveModulePosition{}, frc::SwerveModulePosition{},
+       frc::SwerveModulePosition{}, frc::SwerveModulePosition{}},
+      frc::Pose2d{-1_m, -1_m, frc::Rotation2d{1_rad}},
+      {1.0, 1.0, 1.0},
+      {1.0, 1.0, 1.0}};
+
+  // Test initial pose
+  EXPECT_EQ(-1, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(-1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(1, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset position
+  {
+    frc::SwerveModulePosition modulePosition{1_m, frc::Rotation2d{}};
+    estimator.ResetPosition(
+        frc::Rotation2d{},
+        {modulePosition, modulePosition, modulePosition, modulePosition},
+        frc::Pose2d{1_m, 0_m, frc::Rotation2d{}});
+  }
+
+  EXPECT_EQ(1, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test orientation and wheel positions
+  {
+    frc::SwerveModulePosition modulePosition{2_m, frc::Rotation2d{}};
+    estimator.Update(frc::Rotation2d{}, {modulePosition, modulePosition,
+                                         modulePosition, modulePosition});
+  }
+
+  EXPECT_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset rotation
+  estimator.ResetRotation(frc::Rotation2d{90_deg});
+
+  EXPECT_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(std::numbers::pi / 2,
+            estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test orientation
+  {
+    frc::SwerveModulePosition modulePosition{3_m, frc::Rotation2d{}};
+    estimator.Update(frc::Rotation2d{}, {modulePosition, modulePosition,
+                                         modulePosition, modulePosition});
+  }
+
+  EXPECT_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(std::numbers::pi / 2,
+            estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset translation
+  estimator.ResetTranslation(frc::Translation2d{-1_m, -1_m});
+
+  EXPECT_EQ(-1, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(-1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(std::numbers::pi / 2,
+            estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset pose
+  estimator.ResetPose(frc::Pose2d{});
+
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().Rotation().Radians().value());
 }

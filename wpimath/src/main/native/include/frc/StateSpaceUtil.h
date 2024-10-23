@@ -209,7 +209,11 @@ Vectord<N> MakeWhiteNoiseVector(const std::array<double, N>& stdDevs) {
  * @return The vector.
  */
 WPILIB_DLLEXPORT
-Eigen::Vector3d PoseTo3dVector(const Pose2d& pose);
+constexpr Eigen::Vector3d PoseTo3dVector(const Pose2d& pose) {
+  return Eigen::Vector3d{{pose.Translation().X().value(),
+                          pose.Translation().Y().value(),
+                          pose.Rotation().Radians().value()}};
+}
 
 /**
  * Converts a Pose2d into a vector of [x, y, std::cos(theta), std::sin(theta)].
@@ -219,7 +223,11 @@ Eigen::Vector3d PoseTo3dVector(const Pose2d& pose);
  * @return The vector.
  */
 WPILIB_DLLEXPORT
-Eigen::Vector4d PoseTo4dVector(const Pose2d& pose);
+constexpr Eigen::Vector4d PoseTo4dVector(const Pose2d& pose) {
+  return Eigen::Vector4d{{pose.Translation().X().value(),
+                          pose.Translation().Y().value(), pose.Rotation().Cos(),
+                          pose.Rotation().Sin()}};
+}
 
 /**
  * Returns true if (A, B) is a stabilizable pair.
@@ -306,7 +314,10 @@ bool IsDetectable(const Matrixd<States, States>& A,
  * @return The vector.
  */
 WPILIB_DLLEXPORT
-Eigen::Vector3d PoseToVector(const Pose2d& pose);
+constexpr Eigen::Vector3d PoseToVector(const Pose2d& pose) {
+  return Eigen::Vector3d{
+      {pose.X().value(), pose.Y().value(), pose.Rotation().Radians().value()}};
+}
 
 /**
  * Clamps input vector between system's minimum and maximum allowable input.
@@ -318,12 +329,12 @@ Eigen::Vector3d PoseToVector(const Pose2d& pose);
  * @return Clamped input vector.
  */
 template <int Inputs>
-Vectord<Inputs> ClampInputMaxMagnitude(const Vectord<Inputs>& u,
-                                       const Vectord<Inputs>& umin,
-                                       const Vectord<Inputs>& umax) {
+constexpr Vectord<Inputs> ClampInputMaxMagnitude(const Vectord<Inputs>& u,
+                                                 const Vectord<Inputs>& umin,
+                                                 const Vectord<Inputs>& umax) {
   Vectord<Inputs> result;
   for (int i = 0; i < Inputs; ++i) {
-    result(i) = std::clamp(u(i), umin(i), umax(i));
+    result.coeffRef(i) = std::clamp(u.coeff(i), umin.coeff(i), umax.coeff(i));
   }
   return result;
 }
