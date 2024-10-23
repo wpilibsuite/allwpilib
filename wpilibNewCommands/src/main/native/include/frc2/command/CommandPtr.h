@@ -78,7 +78,7 @@ class CommandPtr final {
    * @see ScheduleCommand
    */
   [[nodiscard]]
-  CommandPtr Fork(CommandPtr&& other) &&;
+  CommandPtr Fork(std::vector<std::unique_ptr<Command>> other) &&;
 
     /**
    * Decorates this command to run "forked" by wrapping it in a {@link
