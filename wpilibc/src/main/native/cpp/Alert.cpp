@@ -27,6 +27,27 @@ Alert::Alert(std::string_view text, AlertType type)
 Alert::Alert(std::string_view group, std::string_view text, AlertType type)
     : m_type(type), m_text(text), m_group{&GetGroupSendable(group)} {}
 
+Alert::Alert(Alert&& other)
+    : m_type{other.m_type},
+      m_text{std::move(other.m_text)},
+      m_group{std::exchange(other.m_group, nullptr)},
+      m_active{std::exchange(other.m_active, false)},
+      m_activeStartTime{other.m_activeStartTime} {}
+
+Alert& Alert::operator=(Alert&& other) {
+  if (&other != this) {
+    // We want to destroy current state after the move is done
+    Alert tmp{std::move(*this)};
+    // Now, swap moved-from state with other state
+    std::swap(m_type, other.m_type);
+    std::swap(m_text, other.m_text);
+    std::swap(m_group, other.m_group);
+    std::swap(m_active, other.m_active);
+    std::swap(m_activeStartTime, other.m_activeStartTime);
+  }
+  return *this;
+}
+
 Alert::~Alert() {
   Set(false);
 }
@@ -54,7 +75,7 @@ void Alert::SetText(std::string_view text) {
   m_text = text;
 
   if (m_active) {
-    auto set = m_group->GetSetForType(m_type);
+    auto& set = m_group->GetSetForType(m_type);
     auto iter = set.find({m_activeStartTime, oldText});
     auto hint = set.erase(iter);
     set.emplace_hint(hint, m_activeStartTime, m_text);
