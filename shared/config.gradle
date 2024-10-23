@@ -44,6 +44,13 @@ nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.windowsx64).configur
     it.cppCompiler.args.add("/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR")
 }
 
+// Use C++23 on Windows
+nativeUtils.platformConfigs.each {
+  if (it.name.contains('windows')) {
+    it.cppCompiler.args.add("/std:c++latest")
+  }
+}
+
 nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")
 
 model {
