@@ -119,6 +119,9 @@ public @interface Logged {
    * The default naming behavior to use. Defaults to {@link Naming#USE_CODE_NAME}, which uses the
    * raw code name directly in logs. Any configuration of the {@link #name()} attribute on logged
    * fields and methods will take precedence over an automatically generated name.
+   *
+   * @return the naming strategy for and annotated field or method, or the default naming strategy
+   *     for all logged fields and methods in an annotated class
    */
   Naming defaultNaming() default Naming.USE_CODE_NAME;
 }
