@@ -8,8 +8,6 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.proto.SimpleMotorFeedforwardProto;
 import edu.wpi.first.math.controller.struct.SimpleMotorFeedforwardStruct;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.PerUnit;
 import edu.wpi.first.units.TimeUnit;
