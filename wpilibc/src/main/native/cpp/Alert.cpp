@@ -21,20 +21,6 @@
 
 using namespace frc;
 
-Alert::SendableAlerts& Alert::GetGroupSendable(std::string_view group) {
-  // Force initialization of SendableRegistry before our magic static to prevent
-  // incorrect destruction order.
-  wpi::SendableRegistry::EnsureInitialized();
-  static wpi::StringMap<Alert::SendableAlerts> groups;
-
-  auto [iter, exists] = groups.try_emplace(group);
-  SendableAlerts& sendable = iter->second;
-  if (!exists) {
-    frc::SmartDashboard::PutData(group, &iter->second);
-  }
-  return sendable;
-}
-
 Alert::Alert(std::string_view text, AlertType type)
     : Alert("Alerts", text, type) {}
 
@@ -64,13 +50,15 @@ void Alert::SetText(std::string_view text) {
     return;
   }
 
+  std::string oldText = std::move(m_text);
+  m_text = text;
+
   if (m_active) {
     auto set = m_group->GetSetForType(m_type);
-    auto iter = set.find({m_activeStartTime, m_text});
+    auto iter = set.find({m_activeStartTime, oldText});
     auto hint = set.erase(iter);
     set.emplace_hint(hint, m_activeStartTime, m_text);
   }
-  m_text = text;
 }
 
 Alert::SendableAlerts::SendableAlerts() {
@@ -116,6 +104,20 @@ std::vector<std::string> Alert::SendableAlerts::GetStrings(
     output.emplace_back(alert.text);
   }
   return output;
+}
+
+Alert::SendableAlerts& Alert::GetGroupSendable(std::string_view group) {
+  // Force initialization of SendableRegistry before our magic static to prevent
+  // incorrect destruction order.
+  wpi::SendableRegistry::EnsureInitialized();
+  static wpi::StringMap<Alert::SendableAlerts> groups;
+
+  auto [iter, exists] = groups.try_emplace(group);
+  SendableAlerts& sendable = iter->second;
+  if (!exists) {
+    frc::SmartDashboard::PutData(group, &iter->second);
+  }
+  return sendable;
 }
 
 std::string frc::format_as(Alert::AlertType type) {

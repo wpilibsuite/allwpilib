@@ -6,16 +6,25 @@
 
 #include <chrono>
 #include <string>
+#include <utility>
 
 #include <fmt/format.h>
 #include <gtest/gtest.h>
 
 TEST(AlertsTest, Smoke) {
-  { frc::Alert("Thing A", frc::Alert::AlertType::kError); }
-  frc::Alert a{"", frc::Alert::AlertType::kInfo};
+  // Make and destroy
+  frc::Alert("One", frc::Alert::AlertType::kError);
+  frc::Alert a{"Two", frc::Alert::AlertType::kInfo};
+  a.Set(true);
+  a.Set(false);
+  // Move assign
+  a = frc::Alert("Three", frc::Alert::AlertType::kWarning);
+  // Move construct
+  frc::Alert b{std::move(a)};
   {
-    std::string s = fmt::format(
+    // Move assign with dynamic string
+    std::string text = fmt::format(
         "{}", std::chrono::steady_clock::now().time_since_epoch().count());
-    a = frc::Alert(s, frc::Alert::AlertType::kError);
+    b = frc::Alert(text, frc::Alert::AlertType::kError);
   }
 }
