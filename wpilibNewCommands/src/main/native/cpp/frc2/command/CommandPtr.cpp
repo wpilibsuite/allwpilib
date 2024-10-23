@@ -59,10 +59,10 @@ CommandPtr CommandPtr::AsProxy() && {
 
 CommandPtr CommandPtr::Fork(CommandPtr&& other) && {
   AssertValid();
-  std::vector<std::unique_ptr<Command>> vec;
+  std::vector<Command * const> vec;
   vec.emplace_back(std::move(m_ptr));
   vec.emplace_back(std::move(other).Unwrap());
-  std::span<std::unique_ptr<Command>> span(vec);
+  std::span<Command * const> span(vec);
   m_ptr = std::make_unique<ScheduleCommand>(std::move(span));
   return std::move(*this);
 }
