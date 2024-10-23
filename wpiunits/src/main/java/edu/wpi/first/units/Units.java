@@ -429,7 +429,7 @@ public final class Units {
   public static final ResistanceUnit MilliOhms = Milli(Ohms);
 
   /** A unit equal to 1/1000 of a {@link #Ohm}. */
-  public static final ResistanceUnit MilliOhm = MilliOhms; // alias  
+  public static final ResistanceUnit MilliOhm = MilliOhms; // alias
 
   // EnergyUnit
   /** The base unit of energy. */
