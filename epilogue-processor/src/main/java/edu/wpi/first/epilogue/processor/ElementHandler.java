@@ -79,8 +79,8 @@ public abstract class ElementHandler {
       // is @Logged itself
       Logged parentConfig = null;
       for (var parent = element.getEnclosingElement();
-           parent != null;
-           parent = parent.getEnclosingElement()) {
+          parent != null;
+          parent = parent.getEnclosingElement()) {
         parentConfig = parent.getAnnotation(Logged.class);
         if (parentConfig != null) {
           break;
@@ -92,7 +92,10 @@ public abstract class ElementHandler {
 
     if (config == null) {
       // Uh oh
-      throw new IllegalStateException("Could not generate a name for element " + element + " without a @Logged annotation AND without being contained within a class with a @Logged annotation!\n\nOpen an issue at https://github.com/wpilibsuite/allwpilib/issues and include a copy of the file that caused this error.");
+      throw new IllegalStateException(
+          "Could not generate a name for element "
+              + element
+              + " without a @Logged annotation AND without being contained within a class with a @Logged annotation!\n\nOpen an issue at https://github.com/wpilibsuite/allwpilib/issues and include a copy of the file that caused this error.");
     }
 
     return switch (config.defaultNaming()) {
@@ -114,8 +117,8 @@ public abstract class ElementHandler {
         }
 
         yield StringUtils.splitToWords(elementName).stream()
-                   .map(StringUtils::capitalize)
-                   .collect(Collectors.joining(" "));
+            .map(StringUtils::capitalize)
+            .collect(Collectors.joining(" "));
       }
     };
   }
