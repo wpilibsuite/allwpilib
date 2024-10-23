@@ -4,12 +4,21 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.Microseconds;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.hal.LEDJNI;
 import edu.wpi.first.hal.PowerJNI;
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Voltage;
 
 /** Contains functions for roboRIO functionality. */
 public final class RobotController {
@@ -77,6 +86,15 @@ public final class RobotController {
   }
 
   /**
+   * Read the microsecond timer in a measure from the FPGA.
+   *
+   * @return The current time according to the FPGA in a measure.
+   */
+  public static Time getMeasureFPGATime() {
+    return Microseconds.of(HALUtil.getFPGATime());
+  }
+
+  /**
    * Get the state of the "USER" button on the roboRIO.
    *
    * <p>Warning: the User Button is used to stop user programs from automatically loading if it is
@@ -96,6 +114,15 @@ public final class RobotController {
    */
   public static double getBatteryVoltage() {
     return PowerJNI.getVinVoltage();
+  }
+
+  /**
+   * Read the battery voltage in a measure.
+   *
+   * @return The battery voltage in a measure.
+   */
+  public static Voltage getMeasureBatteryVoltage() {
+    return Volts.of(PowerJNI.getVinVoltage());
   }
 
   /**
@@ -155,12 +182,30 @@ public final class RobotController {
   }
 
   /**
+   * Get the input voltage to the robot controller in a measure.
+   *
+   * @return The controller input voltage value in a measure.
+   */
+  public static Voltage getMeasureInputVoltage() {
+    return Volts.of(PowerJNI.getVinVoltage());
+  }
+
+  /**
    * Get the input current to the robot controller.
    *
    * @return The controller input current value in Amps
    */
   public static double getInputCurrent() {
     return PowerJNI.getVinCurrent();
+  }
+
+  /**
+   * Get the input current to the robot controller in a measure.
+   *
+   * @return The controller input current value in a measure.
+   */
+  public static final Current getMeasureInputCurrent() {
+    return Amps.of(PowerJNI.getVinCurrent());
   }
 
   /**
@@ -173,12 +218,30 @@ public final class RobotController {
   }
 
   /**
+   * Get the voltage in a measure of the 3.3V rail.
+   *
+   * @return The controller 3.3V rail voltage value in a measure.
+   */
+  public static final Voltage getMeasureVoltage3V3() {
+    return Volts.of(PowerJNI.getUserVoltage3V3());
+  }
+
+  /**
    * Get the current output of the 3.3V rail.
    *
    * @return The controller 3.3V rail output current value in Amps
    */
   public static double getCurrent3V3() {
     return PowerJNI.getUserCurrent3V3();
+  }
+
+  /**
+   * Get the current output in a measure of the 3.3V rail.
+   *
+   * @return The controller 3.3V rail output current value in a measure.
+   */
+  public static Current getMeasureCurrent3V3() {
+    return Amps.of(PowerJNI.getUserCurrent3V3());
   }
 
   /**
@@ -219,12 +282,30 @@ public final class RobotController {
   }
 
   /**
+   * Get the voltage in a measure of the 5V rail.
+   *
+   * @return The controller 5V rail voltage value in a measure.
+   */
+  public static Voltage getMeasureVoltage5V() {
+    return Volts.of(PowerJNI.getUserVoltage5V());
+  }
+
+  /**
    * Get the current output of the 5V rail.
    *
    * @return The controller 5V rail output current value in Amps
    */
   public static double getCurrent5V() {
     return PowerJNI.getUserCurrent5V();
+  }
+
+  /**
+   * Get the current output in a measure of the 5V rail.
+   *
+   * @return The controller 5V rail output current value in a measure.
+   */
+  public static Current getMeasureCurrent5V() {
+    return Amps.of(PowerJNI.getUserCurrent5V());
   }
 
   /**
@@ -265,12 +346,30 @@ public final class RobotController {
   }
 
   /**
+   * Get the voltage in a measure of the 6V rail.
+   *
+   * @return The controller 6V rail voltage value in a measure.
+   */
+  public static Voltage getMeasureVoltage6V() {
+    return Volts.of(PowerJNI.getUserVoltage6V());
+  }
+
+  /**
    * Get the current output of the 6V rail.
    *
    * @return The controller 6V rail output current value in Amps
    */
   public static double getCurrent6V() {
     return PowerJNI.getUserCurrent6V();
+  }
+
+  /**
+   * Get the current output in a measure of the 6V rail.
+   *
+   * @return The controller 6V rail output current value in a measure.
+   */
+  public static Current getMeasureCurrent6V() {
+    return Amps.of(PowerJNI.getUserCurrent6V());
   }
 
   /**
@@ -316,6 +415,15 @@ public final class RobotController {
   }
 
   /**
+   * Get the current brownout voltage setting in a measure.
+   *
+   * @return The brownout voltage in a measure.
+   */
+  public static Voltage getMeasureBrownoutVoltage() {
+    return Volts.of(PowerJNI.getBrownoutVoltage());
+  }
+
+  /**
    * Set the voltage the roboRIO will brownout and disable all outputs.
    *
    * <p>Note that this only does anything on the roboRIO 2. On the roboRIO it is a no-op.
@@ -327,12 +435,32 @@ public final class RobotController {
   }
 
   /**
+   * Set the voltage in a measure the roboRIO will brownout and disable all outputs.
+   *
+   * <p>Note that this only does anything on the roboRIO 2. On the roboRIO it is a no-op.
+   *
+   * @param brownoutVoltage The brownout voltage in a measure
+   */
+  public static void setBrownoutVoltage(Voltage brownoutVoltage) {
+    PowerJNI.setBrownoutVoltage(brownoutVoltage.baseUnitMagnitude());
+  }
+
+  /**
    * Get the current CPU temperature in degrees Celsius.
    *
    * @return current CPU temperature in degrees Celsius
    */
   public static double getCPUTemp() {
     return PowerJNI.getCPUTemp();
+  }
+
+  /**
+   * Get the current CPU temperature in a measure.
+   *
+   * @return current CPU temperature in a measure.
+   */
+  public static Temperature getMeasureCPUTemp() {
+    return Celsius.of(PowerJNI.getCPUTemp());
   }
 
   /** State for the radio led. */
