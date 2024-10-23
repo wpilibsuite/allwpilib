@@ -7,12 +7,14 @@
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include <ranges>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include <wpi/MathExtras.h>
 #include <wpi/timestamp.h>
+#include <wpi/rotated_span.h>
 
 #include "frc/MathUtil.h"
 
@@ -31,7 +33,7 @@ void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data) const {
 
 LEDPattern LEDPattern::Reversed() {
   return LEDPattern{[self = *this](auto data, auto writer) {
-    self.ApplyTo(data, [&](int i, Color color) {
+    self.ApplyTo(std::ranges::reverse_view{data}, [&](int i, Color color) {
       writer((data.size() - 1) - i, color);
     });
   }};
@@ -39,7 +41,7 @@ LEDPattern LEDPattern::Reversed() {
 
 LEDPattern LEDPattern::OffsetBy(int offset) {
   return LEDPattern{[=, self = *this](auto data, auto writer) {
-    self.ApplyTo(data, [&data, &writer, offset](int i, Color color) {
+    self.ApplyTo(wpi::rotated_span{data, offset}, [&data, &writer, offset](int i, Color color) {
       int shiftedIndex =
           frc::FloorMod(i + offset, static_cast<int>(data.size()));
       writer(shiftedIndex, color);
@@ -62,7 +64,7 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(units::hertz_t velocity) {
         (now % static_cast<int64_t>(std::floor(periodMicros))) / periodMicros;
     int offset = static_cast<int>(std::floor(t * bufLen));
 
-    self.ApplyTo(data, [=](int i, Color color) {
+    self.ApplyTo(wpi::rotated_span{data, offset}, [=](int i, Color color) {
       // floorMod so if the offset is negative, we still get positive outputs
       int shiftedIndex = frc::FloorMod(i + offset, static_cast<int>(bufLen));
       writer(shiftedIndex, color);
@@ -87,7 +89,7 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
     // offset values for negative velocities
     auto offset = static_cast<int64_t>(now) / microsPerLed;
 
-    self.ApplyTo(data, [=, &writer](int i, Color color) {
+    self.ApplyTo(wpi::rotated_span{data, offset}, [=, &writer](int i, Color color) {
       // FloorMod so if the offset is negative, we still get positive outputs
       int shiftedIndex = frc::FloorMod(i + offset, static_cast<int>(bufLen));
 
