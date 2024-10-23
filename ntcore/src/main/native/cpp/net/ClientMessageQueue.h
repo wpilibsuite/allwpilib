@@ -8,6 +8,7 @@
 #include <string>
 
 #include <wpi/FastQueue.h>
+#include <wpi/Logger.h>
 #include <wpi/mutex.h>
 
 #include "Message.h"
@@ -40,20 +41,81 @@ class ClientMessageQueueImpl final : public ClientMessageHandler,
   bool empty() const { return m_queue.empty(); }
 
   // ClientMessageQueue - calls to these read the queue
-  std::span<ClientMessage> ReadQueue(std::span<ClientMessage> out) final;
-  void ClearQueue() final;
+  std::span<ClientMessage> ReadQueue(std::span<ClientMessage> out) final {
+    std::scoped_lock lock{m_mutex};
+    size_t count = 0;
+    for (auto&& msg : out) {
+      if (!m_queue.try_dequeue(msg)) {
+        break;
+      }
+      if constexpr (MaxValueSize != 0) {
+        if (auto* val = std::get_if<ClientValueMsg>(&msg.contents)) {
+          m_valueSize.size -= sizeof(ClientMessage) + val->value.size();
+          m_valueSize.errored = false;
+        }
+      }
+      ++count;
+    }
+    return out.subspan(0, count);
+  }
+
+  void ClearQueue() final {
+    std::scoped_lock lock{m_mutex};
+    ClientMessage msg;
+    while (m_queue.try_dequeue(msg)) {
+    }
+    if constexpr (MaxValueSize != 0) {
+      m_valueSize.size = 0;
+      m_valueSize.errored = false;
+    }
+  }
 
   // ClientMessageHandler - calls to these append to the queue
   void ClientPublish(int pubuid, std::string_view name,
                      std::string_view typeStr, const wpi::json& properties,
-                     const PubSubOptionsImpl& options) final;
-  void ClientUnpublish(int pubuid) final;
+                     const PubSubOptionsImpl& options) final {
+    std::scoped_lock lock{m_mutex};
+    m_queue.enqueue(ClientMessage{PublishMsg{
+        pubuid, std::string{name}, std::string{typeStr}, properties, options}});
+  }
+
+  void ClientUnpublish(int pubuid) final {
+    std::scoped_lock lock{m_mutex};
+    m_queue.enqueue(ClientMessage{UnpublishMsg{pubuid}});
+  }
+
   void ClientSetProperties(std::string_view name,
-                           const wpi::json& update) final;
+                           const wpi::json& update) final {
+    std::scoped_lock lock{m_mutex};
+    m_queue.enqueue(ClientMessage{SetPropertiesMsg{std::string{name}, update}});
+  }
+
   void ClientSubscribe(int subuid, std::span<const std::string> topicNames,
-                       const PubSubOptionsImpl& options) final;
-  void ClientUnsubscribe(int subuid) final;
-  void ClientSetValue(int pubuid, const Value& value) final;
+                       const PubSubOptionsImpl& options) final {
+    std::scoped_lock lock{m_mutex};
+    m_queue.enqueue(ClientMessage{
+        SubscribeMsg{subuid, {topicNames.begin(), topicNames.end()}, options}});
+  }
+
+  void ClientUnsubscribe(int subuid) final {
+    std::scoped_lock lock{m_mutex};
+    m_queue.enqueue(ClientMessage{UnsubscribeMsg{subuid}});
+  }
+
+  void ClientSetValue(int pubuid, const Value& value) final {
+    std::scoped_lock lock{m_mutex};
+    if constexpr (MaxValueSize != 0) {
+      m_valueSize.size += sizeof(ClientMessage) + value.size();
+      if (m_valueSize.size > MaxValueSize) {
+        if (!m_valueSize.errored) {
+          WPI_ERROR(m_logger, "NT: dropping value set due to memory limits");
+          m_valueSize.errored = true;
+        }
+        return;  // avoid potential out of memory
+      }
+    }
+    m_queue.enqueue(ClientMessage{ClientValueMsg{pubuid, value}});
+  }
 
  private:
   wpi::FastQueue<ClientMessage, kBlockSize> m_queue{kBlockSize - 1};
@@ -83,5 +145,3 @@ using LocalClientMessageQueue =
 using NetworkIncomingClientQueue = detail::ClientMessageQueueImpl<0, false>;
 
 }  // namespace nt::net
-
-#include "ClientMessageQueue.inc"

@@ -1,0 +1,51 @@
+try-import %workspace%/bazel_auth.rc
+try-import %workspace%/user.bazelrc
+
+common --noenable_bzlmod
+
+build --java_language_version=17
+build --java_runtime_version=roboriojdk_17
+build --tool_java_language_version=17
+build --tool_java_runtime_version=remotejdk_17
+
+test --test_output=errors
+test --test_verbose_timeout_warnings
+
+import shared/bazel/compiler_flags/sanitizers.rc
+import shared/bazel/compiler_flags/base_linux_flags.rc
+import shared/bazel/compiler_flags/linux_flags.rc
+import shared/bazel/compiler_flags/osx_flags.rc
+import shared/bazel/compiler_flags/roborio_flags.rc
+import shared/bazel/compiler_flags/windows_flags.rc
+import shared/bazel/compiler_flags/coverage_flags.rc
+
+build:build_java --test_tag_filters=allwpilib-build-java --build_tag_filters=allwpilib-build-java
+build:build_cpp --test_tag_filters=+allwpilib-build-cpp --build_tag_filters=+allwpilib-build-cpp
+build:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
+test:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
+
+# Build Buddy Cache Setup
+build:build_buddy --bes_results_url=https://app.buildbuddy.io/invocation/
+build:build_buddy --bes_backend=grpcs://remote.buildbuddy.io
+build:build_buddy --remote_cache=grpcs://remote.buildbuddy.io
+build:build_buddy --remote_timeout=3600
+
+# Additional suggestions from buildbuddy for speed
+build:build_buddy --experimental_remote_cache_compression
+build:build_buddy --experimental_remote_cache_compression_threshold=100
+build:build_buddy --noslim_profile
+build:build_buddy --experimental_profile_include_target_label
+build:build_buddy --experimental_profile_include_primary_output
+build:build_buddy --nolegacy_important_outputs
+
+build:build_buddy_readonly --noremote_upload_local_results
+
+# This config should be used locally. It downloads more than the CI version
+build:remote_user --config=build_buddy
+build:remote_user --config=build_buddy_readonly
+build:remote_user --remote_download_toplevel
+
+build:ci --config=build_buddy
+build:ci --remote_download_minimal
+
+build --build_metadata=REPO_URL=https://github.com/wpilibsuite/allwpilib.git

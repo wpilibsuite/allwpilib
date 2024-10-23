@@ -309,7 +309,7 @@ void Thread::StopNTLog() {
 void Thread::StartConsoleLog() {
   if (!m_consoleLoggerEnabled && RobotBase::IsReal()) {
     m_consoleLoggerEnabled = true;
-    m_consoleLogger = {"/home/lvuser/FRC_UserProgram.log", m_log, "output"};
+    m_consoleLogger = {"/home/lvuser/FRC_UserProgram.log", m_log, "console"};
   }
 }
 

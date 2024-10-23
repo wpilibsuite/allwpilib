@@ -11,6 +11,7 @@
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Translation2d.h"
 #include "units/length.h"
+#include "units/math.h"
 
 namespace frc {
 
@@ -37,7 +38,8 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param y The y component of the translation.
    * @param z The z component of the translation.
    */
-  constexpr Translation3d(units::meter_t x, units::meter_t y, units::meter_t z);
+  constexpr Translation3d(units::meter_t x, units::meter_t y, units::meter_t z)
+      : m_x{x}, m_y{y}, m_z{z} {}
 
   /**
    * Constructs a Translation3d with the provided distance and angle. This is
@@ -46,7 +48,12 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param distance The distance from the origin to the end of the translation.
    * @param angle The angle between the x-axis and the translation vector.
    */
-  Translation3d(units::meter_t distance, const Rotation3d& angle);
+  constexpr Translation3d(units::meter_t distance, const Rotation3d& angle) {
+    auto rectangular = Translation3d{distance, 0_m, 0_m}.RotateBy(angle);
+    m_x = rectangular.X();
+    m_y = rectangular.Y();
+    m_z = rectangular.Z();
+  }
 
   /**
    * Constructs a Translation3d from the provided translation vector's X, Y, and
@@ -54,7 +61,10 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @param vector The translation vector to represent.
    */
-  explicit Translation3d(const Eigen::Vector3d& vector);
+  constexpr explicit Translation3d(const Eigen::Vector3d& vector)
+      : m_x{units::meter_t{vector.x()}},
+        m_y{units::meter_t{vector.y()}},
+        m_z{units::meter_t{vector.z()}} {}
 
   /**
    * Calculates the distance between two translations in 3D space.
@@ -66,7 +76,11 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The distance between the two translations.
    */
-  units::meter_t Distance(const Translation3d& other) const;
+  constexpr units::meter_t Distance(const Translation3d& other) const {
+    return units::math::sqrt(units::math::pow<2>(other.m_x - m_x) +
+                             units::math::pow<2>(other.m_y - m_y) +
+                             units::math::pow<2>(other.m_z - m_z));
+  }
 
   /**
    * Returns the X component of the translation.
@@ -94,14 +108,18 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return A Vector representation of this translation.
    */
-  constexpr Eigen::Vector3d ToVector() const;
+  constexpr Eigen::Vector3d ToVector() const {
+    return Eigen::Vector3d{{m_x.value(), m_y.value(), m_z.value()}};
+  }
 
   /**
    * Returns the norm, or distance from the origin to the translation.
    *
    * @return The norm of the translation.
    */
-  units::meter_t Norm() const;
+  constexpr units::meter_t Norm() const {
+    return units::math::sqrt(m_x * m_x + m_y * m_y + m_z * m_z);
+  }
 
   /**
    * Applies a rotation to the translation in 3D space.
@@ -113,13 +131,20 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The new rotated translation.
    */
-  Translation3d RotateBy(const Rotation3d& other) const;
+  constexpr Translation3d RotateBy(const Rotation3d& other) const {
+    Quaternion p{0.0, m_x.value(), m_y.value(), m_z.value()};
+    auto qprime = other.GetQuaternion() * p * other.GetQuaternion().Inverse();
+    return Translation3d{units::meter_t{qprime.X()}, units::meter_t{qprime.Y()},
+                         units::meter_t{qprime.Z()}};
+  }
 
   /**
    * Returns a Translation2d representing this Translation3d projected into the
    * X-Y plane.
    */
-  constexpr Translation2d ToTranslation2d() const;
+  constexpr Translation2d ToTranslation2d() const {
+    return Translation2d{m_x, m_y};
+  }
 
   /**
    * Returns the sum of two translations in 3D space.
@@ -131,7 +156,9 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The sum of the translations.
    */
-  constexpr Translation3d operator+(const Translation3d& other) const;
+  constexpr Translation3d operator+(const Translation3d& other) const {
+    return {X() + other.X(), Y() + other.Y(), Z() + other.Z()};
+  }
 
   /**
    * Returns the difference between two translations.
@@ -143,7 +170,9 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The difference between the two translations.
    */
-  constexpr Translation3d operator-(const Translation3d& other) const;
+  constexpr Translation3d operator-(const Translation3d& other) const {
+    return operator+(-other);
+  }
 
   /**
    * Returns the inverse of the current translation. This is equivalent to
@@ -151,7 +180,7 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The inverse of the current translation.
    */
-  constexpr Translation3d operator-() const;
+  constexpr Translation3d operator-() const { return {-m_x, -m_y, -m_z}; }
 
   /**
    * Returns the translation multiplied by a scalar.
@@ -163,7 +192,9 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The scaled translation.
    */
-  constexpr Translation3d operator*(double scalar) const;
+  constexpr Translation3d operator*(double scalar) const {
+    return {scalar * m_x, scalar * m_y, scalar * m_z};
+  }
 
   /**
    * Returns the translation divided by a scalar.
@@ -175,7 +206,9 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The scaled translation.
    */
-  constexpr Translation3d operator/(double scalar) const;
+  constexpr Translation3d operator/(double scalar) const {
+    return operator*(1.0 / scalar);
+  }
 
   /**
    * Checks equality between this Translation3d and another object.
@@ -183,7 +216,11 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param other The other object.
    * @return Whether the two objects are equal.
    */
-  bool operator==(const Translation3d& other) const;
+  constexpr bool operator==(const Translation3d& other) const {
+    return units::math::abs(m_x - other.m_x) < 1E-9_m &&
+           units::math::abs(m_y - other.m_y) < 1E-9_m &&
+           units::math::abs(m_z - other.m_z) < 1E-9_m;
+  }
 
  private:
   units::meter_t m_x = 0_m;
@@ -203,4 +240,3 @@ void from_json(const wpi::json& json, Translation3d& state);
 #include "frc/geometry/proto/Translation3dProto.h"
 #endif
 #include "frc/geometry/struct/Translation3dStruct.h"
-#include "frc/geometry/Translation3d.inc"
