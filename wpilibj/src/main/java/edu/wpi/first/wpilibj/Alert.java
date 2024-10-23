@@ -110,7 +110,10 @@ public class Alert implements AutoCloseable {
    * @param active Whether to display the alert.
    */
   public void set(boolean active) {
-    if (active == m_active) return;
+    if (active == m_active) {
+      return;
+    }
+
     if (active) {
       m_activeStartTime = RobotController.getFPGATime();
       m_group.getSetForType(m_type).add(new PublishedAlert(m_activeStartTime, m_text));
@@ -140,8 +143,7 @@ public class Alert implements AutoCloseable {
     }
   }
 
-  private static final record PublishedAlert(long timestamp, String text)
-      implements Comparable<PublishedAlert> {
+  private record PublishedAlert(long timestamp, String text) implements Comparable<PublishedAlert> {
     private static final Comparator<PublishedAlert> comparator =
         Comparator.comparingLong((PublishedAlert alert) -> alert.timestamp())
             .thenComparing(Comparator.comparing((PublishedAlert alert) -> alert.text()));
@@ -165,7 +167,7 @@ public class Alert implements AutoCloseable {
       // TODO: some optimizations available here- could iterate explicitly and cache the array for
       // potential reuse (if size is same, refill array, if nothing has changed, return original
       // array)
-      return getSetForType(type).stream().map((a) -> a.text()).toArray(String[]::new);
+      return getSetForType(type).stream().map(a -> a.text()).toArray(String[]::new);
     }
 
     @Override
