@@ -817,17 +817,14 @@ TEST(LEDPatternTest, ReverseMask) {
   std::array<AddressableLED::LEDData, 8> buffer;
 
   std::array<std::pair<double, Color>, 4> colorSteps{
-    std::pair{0.0, Color::kRed},
-    std::pair{0.25, Color::kBlue},
-    std::pair{0.5, Color::kYellow},
-    std::pair{0.75, Color::kGreen}
-  };
+      std::pair{0.0, Color::kRed}, std::pair{0.25, Color::kBlue},
+      std::pair{0.5, Color::kYellow}, std::pair{0.75, Color::kGreen}};
   std::array<std::pair<double, Color>, 2> maskSteps{
-    std::pair{0, Color::kWhite},
-    std::pair{0.5, Color::kBlack}
-  };
+      std::pair{0, Color::kWhite}, std::pair{0.5, Color::kBlack}};
 
-  auto pattern = LEDPattern::Steps(colorSteps).Mask(LEDPattern::Steps(maskSteps)).Reversed();
+  auto pattern = LEDPattern::Steps(colorSteps)
+                     .Mask(LEDPattern::Steps(maskSteps))
+                     .Reversed();
 
   pattern.ApplyTo(buffer);
 
@@ -845,17 +842,15 @@ TEST(LEDPatternTest, OffsetMask) {
   std::array<AddressableLED::LEDData, 8> buffer;
 
   std::array<std::pair<double, Color>, 4> colorSteps{
-    std::pair{0.0, Color::kRed},
-    std::pair{0.25, Color::kBlue},
-    std::pair{0.5, Color::kYellow},
-    std::pair{0.75, Color::kGreen}
-  };
+      std::pair{0.0, Color::kRed}, std::pair{0.25, Color::kBlue},
+      std::pair{0.5, Color::kYellow}, std::pair{0.75, Color::kGreen}};
   std::array<std::pair<double, Color>, 2> maskSteps{
-    std::pair{0, Color::kWhite},
-    std::pair{0.5, Color::kBlack}
-  };
+      std::pair{0, Color::kWhite}, std::pair{0.5, Color::kBlack}};
 
-  auto pattern = LEDPattern::Steps(colorSteps).Mask(LEDPattern::Steps(maskSteps)).Reversed().OffsetBy(4);
+  auto pattern = LEDPattern::Steps(colorSteps)
+                     .Mask(LEDPattern::Steps(maskSteps))
+                     .Reversed()
+                     .OffsetBy(4);
 
   pattern.ApplyTo(buffer);
 
@@ -873,17 +868,15 @@ TEST(LEDPatternTest, RelativeScrollingMask) {
   std::array<AddressableLED::LEDData, 8> buffer;
 
   std::array<std::pair<double, Color>, 4> colorSteps{
-    std::pair{0.0, Color::kRed},
-    std::pair{0.25, Color::kBlue},
-    std::pair{0.5, Color::kYellow},
-    std::pair{0.75, Color::kGreen}
-  };
+      std::pair{0.0, Color::kRed}, std::pair{0.25, Color::kBlue},
+      std::pair{0.5, Color::kYellow}, std::pair{0.75, Color::kGreen}};
   std::array<std::pair<double, Color>, 2> maskSteps{
-    std::pair{0, Color::kWhite},
-    std::pair{0.5, Color::kBlack}
-  };
+      std::pair{0, Color::kWhite}, std::pair{0.5, Color::kBlack}};
 
-  auto pattern = LEDPattern::Steps(colorSteps).Mask(LEDPattern::Steps(maskSteps)).Reversed().ScrollAtRelativeSpeed(units::hertz_t{ 12.5 * 1e3 });
+  auto pattern = LEDPattern::Steps(colorSteps)
+                     .Mask(LEDPattern::Steps(maskSteps))
+                     .Reversed()
+                     .ScrollAtRelativeSpeed(units::hertz_t{12.5 * 1e3});
 
   pattern.ApplyTo(buffer);
 
@@ -958,17 +951,15 @@ TEST(LEDPatternTest, AbsoluteScrollingMask) {
   std::array<AddressableLED::LEDData, 8> buffer;
 
   std::array<std::pair<double, Color>, 4> colorSteps{
-    std::pair{0.0, Color::kRed},
-    std::pair{0.25, Color::kBlue},
-    std::pair{0.5, Color::kYellow},
-    std::pair{0.75, Color::kGreen}
-  };
+      std::pair{0.0, Color::kRed}, std::pair{0.25, Color::kBlue},
+      std::pair{0.5, Color::kYellow}, std::pair{0.75, Color::kGreen}};
   std::array<std::pair<double, Color>, 2> maskSteps{
-    std::pair{0, Color::kWhite},
-    std::pair{0.5, Color::kBlack}
-  };
+      std::pair{0, Color::kWhite}, std::pair{0.5, Color::kBlack}};
 
-  auto pattern = LEDPattern::Steps(colorSteps).Mask(LEDPattern::Steps(maskSteps)).Reversed().ScrollAtAbsoluteSpeed(1_mps, 1_m);
+  auto pattern = LEDPattern::Steps(colorSteps)
+                     .Mask(LEDPattern::Steps(maskSteps))
+                     .Reversed()
+                     .ScrollAtAbsoluteSpeed(1_mps, 1_m);
 
   pattern.ApplyTo(buffer);
 

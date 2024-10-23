@@ -13,8 +13,8 @@
 #include <vector>
 
 #include <wpi/MathExtras.h>
-#include <wpi/timestamp.h>
 #include <wpi/rotated_span.h>
+#include <wpi/timestamp.h>
 
 #include "frc/MathUtil.h"
 
@@ -41,11 +41,12 @@ LEDPattern LEDPattern::Reversed() {
 
 LEDPattern LEDPattern::OffsetBy(int offset) {
   return LEDPattern{[=, self = *this](auto data, auto writer) {
-    self.ApplyTo(wpi::rotated_span{data, offset}, [&data, &writer, offset](int i, Color color) {
-      int shiftedIndex =
-          frc::FloorMod(i + offset, static_cast<int>(data.size()));
-      writer(shiftedIndex, color);
-    });
+    self.ApplyTo(wpi::rotated_span{data, offset},
+                 [&data, &writer, offset](int i, Color color) {
+                   int shiftedIndex =
+                       frc::FloorMod(i + offset, static_cast<int>(data.size()));
+                   writer(shiftedIndex, color);
+                 });
   }};
 }
 
@@ -89,7 +90,8 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
     // offset values for negative velocities
     auto offset = static_cast<int64_t>(now) / microsPerLed;
 
-    self.ApplyTo(wpi::rotated_span{data, offset}, [=, &writer](int i, Color color) {
+    self.ApplyTo(wpi::rotated_span{data, offset}, [=, &writer](int i,
+                                                               Color color) {
       // FloorMod so if the offset is negative, we still get positive outputs
       int shiftedIndex = frc::FloorMod(i + offset, static_cast<int>(bufLen));
 
