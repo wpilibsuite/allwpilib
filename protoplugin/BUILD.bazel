@@ -1,0 +1,27 @@
+load("@rules_java//java:defs.bzl", "java_binary", "java_import")
+load("@rules_python//python:defs.bzl", "py_binary")
+
+java_import(
+    name = "binary",
+    jars = ["binary/wpiprotoplugin.jar"],
+)
+
+java_binary(
+    name = "wpi_proto_plugin",
+    main_class = "org.wpilib.ProtoCDllGenerator",
+    runtime_deps = [
+        ":binary",
+    ],
+)
+
+py_binary(
+    name = "bazel_proto_generator",
+    srcs = ["bazel_proto_generator.py"],
+    data = [
+        ":wpi_proto_plugin",
+        "@com_google_protobuf//:protoc",
+    ],
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+    deps = ["@rules_python//python/runfiles"],
+)
