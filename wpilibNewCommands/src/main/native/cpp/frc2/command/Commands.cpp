@@ -6,7 +6,7 @@
 
 #include <utility>
 #include <vector>
-
+#include <memory>
 #include <wpi/deprecated.h>
 
 #include "frc2/command/ConditionalCommand.h"
