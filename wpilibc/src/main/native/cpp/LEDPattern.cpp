@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include <ranges>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -18,32 +19,54 @@
 
 using namespace frc;
 
-LEDPattern::LEDPattern(LEDPatternFn impl) : m_impl(std::move(impl)) {}
+LEDPattern::LEDPattern(std::function<void(frc::LEDPattern::LEDReader,
+                                          std::function<void(int, frc::Color)>)>
+                           impl)
+    : m_impl(std::move(impl)) {}
+
+void LEDPattern::ApplyTo(LEDPattern::LEDReader reader,
+                         std::function<void(int, frc::Color)> writer) const {
+  m_impl(reader, writer);
+}
 
 void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data,
-                         LEDWriterFn writer) const {
-  m_impl(data, writer);
+                         std::function<void(int, frc::Color)> writer) const {
+  ApplyTo(LEDPattern::LEDReader{[=](size_t i) { return data[i]; }, data.size()},
+          writer);
 }
 
 void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data) const {
   ApplyTo(data, [&](int index, Color color) { data[index].SetLED(color); });
 }
 
+// void LEDPattern:ApplyTo(std::range::views::reversed<AddressableLED::LEDData>
+// data) const {
+//   ApplyTo(data, [&](int index, Color color) { data[index].SetLED(color); });
+// }
+
 LEDPattern LEDPattern::Reversed() {
   return LEDPattern{[self = *this](auto data, auto writer) {
-    self.ApplyTo(data, [&](int i, Color color) {
-      writer((data.size() - 1) - i, color);
-    });
+    self.ApplyTo(
+        LEDPattern::LEDReader{[=](auto i) { return data[data.size() - 1 - i]; },
+                              data.size()},
+        [&](int i, Color color) { writer((data.size() - 1) - i, color); });
   }};
 }
 
 LEDPattern LEDPattern::OffsetBy(int offset) {
-  return LEDPattern{[=, self = *this](auto data, auto writer) {
-    self.ApplyTo(data, [&data, &writer, offset](int i, Color color) {
-      int shiftedIndex =
-          frc::FloorMod(i + offset, static_cast<int>(data.size()));
-      writer(shiftedIndex, color);
-    });
+  return LEDPattern{[=, self = *this](LEDPattern::LEDReader data, auto writer) {
+    self.ApplyTo(LEDPattern::LEDReader{[=, d = std::move(data)](auto i) {
+                                         int shiftedIndex = frc::FloorMod(
+                                             i + offset,
+                                             static_cast<int>(d.size()));
+                                         return d[shiftedIndex];
+                                       },
+                                       data.size()},
+                 [&data, &writer, offset](int i, Color color) {
+                   int shiftedIndex =
+                       frc::FloorMod(i + offset, static_cast<int>(data.size()));
+                   writer(shiftedIndex, color);
+                 });
   }};
 }
 
@@ -62,11 +85,20 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(units::hertz_t velocity) {
         (now % static_cast<int64_t>(std::floor(periodMicros))) / periodMicros;
     int offset = static_cast<int>(std::floor(t * bufLen));
 
-    self.ApplyTo(data, [=](int i, Color color) {
-      // floorMod so if the offset is negative, we still get positive outputs
-      int shiftedIndex = frc::FloorMod(i + offset, static_cast<int>(bufLen));
-      writer(shiftedIndex, color);
-    });
+    self.ApplyTo(LEDPattern::LEDReader{[=, d = std::move(data)](auto i) {
+                                         int shiftedIndex = frc::FloorMod(
+                                             i + offset,
+                                             static_cast<int>(d.size()));
+                                         return d[shiftedIndex];
+                                       },
+                                       data.size()},
+                 [=](int i, Color color) {
+                   // floorMod so if the offset is negative, we still get
+                   // positive outputs
+                   int shiftedIndex =
+                       frc::FloorMod(i + offset, static_cast<int>(bufLen));
+                   writer(shiftedIndex, color);
+                 });
   }};
 }
 
@@ -87,12 +119,21 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
     // offset values for negative velocities
     auto offset = static_cast<int64_t>(now) / microsPerLed;
 
-    self.ApplyTo(data, [=, &writer](int i, Color color) {
-      // FloorMod so if the offset is negative, we still get positive outputs
-      int shiftedIndex = frc::FloorMod(i + offset, static_cast<int>(bufLen));
+    self.ApplyTo(LEDPattern::LEDReader{[=, d = std::move(data)](auto i) {
+                                         int shiftedIndex = frc::FloorMod(
+                                             i + offset,
+                                             static_cast<int>(d.size()));
+                                         return d[shiftedIndex];
+                                       },
+                                       data.size()},
+                 [=, &writer](int i, Color color) {
+                   // FloorMod so if the offset is negative, we still get
+                   // positive outputs
+                   int shiftedIndex =
+                       frc::FloorMod(i + offset, static_cast<int>(bufLen));
 
-      writer(shiftedIndex, color);
-    });
+                   writer(shiftedIndex, color);
+                 });
   }};
 }
 

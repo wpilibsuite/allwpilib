@@ -5,6 +5,7 @@
 #pragma once
 
 #include <functional>
+#include <ranges>
 #include <span>
 #include <utility>
 
@@ -18,21 +19,36 @@
 
 namespace frc {
 
-/**
- * Sets the LED at the given index to the given color.
- */
-using LEDWriterFn = std::function<void(int, frc::Color)>;
-
-/**
- * Accepts a data buffer (1st argument) and a callback (2nd argument) for
- * writing data.
- */
-using LEDPatternFn =
-    std::function<void(std::span<frc::AddressableLED::LEDData>, LEDWriterFn)>;
-
 class LEDPattern {
  public:
-  explicit LEDPattern(LEDPatternFn impl);
+  /**
+   * A wrapper around a length and an arbitrary reader function that accepts an
+   * LED index and returns data for the LED at that index. This configuration
+   * allows us to abstract over different container types without templating.
+   */
+  class LEDReader {
+   public:
+    LEDReader(std::function<frc::AddressableLED::LEDData(int)> impl,
+              size_t size)
+        : m_impl{std::move(impl)}, m_size{size} {}
+
+    frc::AddressableLED::LEDData operator[](size_t index) const {
+      return m_impl(index);
+    }
+
+    size_t size() const { return m_size; }
+
+   private:
+    std::function<frc::AddressableLED::LEDData(int)> m_impl;
+    size_t m_size;
+  };
+
+  explicit LEDPattern(std::function<void(frc::LEDPattern::LEDReader,
+                                         std::function<void(int, frc::Color)>)>
+                          impl);
+
+  void ApplyTo(LEDReader reader,
+               std::function<void(int, frc::Color)> writer) const;
 
   /**
    * Writes the pattern to an LED buffer. Dynamic animations should be called
@@ -48,7 +64,7 @@ class LEDPattern {
    * @param writer data writer for setting new LED colors on the LED strip
    */
   void ApplyTo(std::span<frc::AddressableLED::LEDData> data,
-               LEDWriterFn writer) const;
+               std::function<void(int, frc::Color)> writer) const;
 
   /**
    * Writes the pattern to an LED buffer. Dynamic animations should be called
@@ -373,6 +389,8 @@ class LEDPattern {
   static LEDPattern Rainbow(int saturation, int value);
 
  private:
-  LEDPatternFn m_impl;
+  std::function<void(frc::LEDPattern::LEDReader,
+                     std::function<void(int, frc::Color)>)>
+      m_impl;
 };
 }  // namespace frc
