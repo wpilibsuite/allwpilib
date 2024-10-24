@@ -249,8 +249,7 @@ class ChildIterator {
  public:
   ChildIterator(IteratorType it, IteratorType end) noexcept
       : anchor(it), end(end) {
-    while (anchor != end &&
-           anchor->getValue()->type != Storage::Value::kChild) {
+    while (anchor != end && anchor->second->type != Storage::Value::kChild) {
       ++anchor;
     }
   }
@@ -261,8 +260,7 @@ class ChildIterator {
   /// increment operator (needed for range-based for)
   ChildIterator& operator++() {
     ++anchor;
-    while (anchor != end &&
-           anchor->getValue()->type != Storage::Value::kChild) {
+    while (anchor != end && anchor->second->type != Storage::Value::kChild) {
       ++anchor;
     }
     return *this;
@@ -274,10 +272,10 @@ class ChildIterator {
   }
 
   /// return key of the iterator
-  std::string_view key() const { return anchor->getKey(); }
+  std::string_view key() const { return anchor->first; }
 
   /// return value of the iterator
-  Storage& value() const { return *anchor->getValue()->child; }
+  Storage& value() const { return *anchor->second->child; }
 };
 
 }  // namespace detail

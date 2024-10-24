@@ -51,7 +51,7 @@ void Mechanism2d::InitSendable(nt::NTSendableBuilder& builder) {
   m_colorPub = m_table->GetStringTopic(kBackgroundColor).Publish();
   m_colorPub.Set(m_color);
   for (const auto& entry : m_roots) {
-    const auto& root = entry.getValue().get();
-    root->Update(m_table->GetSubTable(entry.getKey()));
+    const auto& root = entry.second.get();
+    root->Update(m_table->GetSubTable(entry.first));
   }
 }

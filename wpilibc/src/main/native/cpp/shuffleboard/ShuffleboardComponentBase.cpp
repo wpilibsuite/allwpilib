@@ -46,7 +46,7 @@ void ShuffleboardComponentBase::BuildMetadata(
   if (GetProperties().size() > 0) {
     auto propTable = metaTable->GetSubTable("Properties");
     for (auto& entry : GetProperties()) {
-      propTable->GetEntry(entry.first()).SetValue(entry.second);
+      propTable->GetEntry(entry.first).SetValue(entry.second);
     }
   }
   m_metadataDirty = false;

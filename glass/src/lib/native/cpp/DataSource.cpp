@@ -112,5 +112,5 @@ DataSource* DataSource::Find(std::string_view id) {
   if (it == gContext->sources.end()) {
     return nullptr;
   }
-  return it->getValue();
+  return it->second;
 }

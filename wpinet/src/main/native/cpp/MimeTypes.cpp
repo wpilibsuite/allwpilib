@@ -60,7 +60,7 @@ std::string_view MimeTypeFromPath(std::string_view path) {
   if (dot_pos > 0 && dot_pos != std::string_view::npos) {
     auto type = mimeTypes.find(wpi::substr(path, dot_pos + 1));
     if (type != mimeTypes.end()) {
-      return type->getValue();
+      return type->second;
     }
   }
   return defaultType;

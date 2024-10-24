@@ -83,7 +83,7 @@ void DataLog::StartFile() {
 
   // Existing start and schema data records
   for (auto&& entryInfo : m_entries) {
-    AppendStartRecord(entryInfo.second.id, entryInfo.first(),
+    AppendStartRecord(entryInfo.second.id, entryInfo.first,
                       entryInfo.second.type,
                       m_entryIds[entryInfo.second.id].metadata, 0);
     if (!entryInfo.second.schemaData.empty()) {

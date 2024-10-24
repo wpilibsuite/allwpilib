@@ -128,13 +128,8 @@ class SendableChooser : public SendableChooserBase {
         [=, this] {
           std::vector<std::string> keys;
           for (const auto& choice : m_choices) {
-            keys.emplace_back(choice.first());
+            keys.emplace_back(choice.first);
           }
-
-          // Unlike std::map, wpi::StringMap elements
-          // are not sorted
-          std::sort(keys.begin(), keys.end());
-
           return keys;
         },
         nullptr);
