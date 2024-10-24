@@ -214,8 +214,7 @@ public final class Commands {
    * for "forking off" from command compositions when the user does not wish to extend the command's
    * requirements to the entire command composition. Note that if run from a composition, the
    * composition will not know about the status of the scheduled commands, and will treat this
-   * command as finishing instantly. Multiple commands can be added to this and will be scheduled in order
-   * with this command scheduled first.
+   * command as finishing instantly. Multiple commands can be added to this and will be scheduled in order.
    *
    * @param commands the commands to schedule in order
    * @return the command
