@@ -25,7 +25,7 @@ class MecanumDriveOdometry3dTest : public ::testing::Test {
   MecanumDriveOdometry3d odometry{kinematics, 0_rad, zero};
 };
 
-TEST_F(MecanumDriveOdometry3dTest, Foo) {
+TEST_F(MecanumDriveOdometry3dTest, Initialize) {
   MecanumDriveOdometry3d odometry{kinematics, 0_rad, zero,
                                   frc::Pose2d{1_m, 2_m, 45_deg}};
 

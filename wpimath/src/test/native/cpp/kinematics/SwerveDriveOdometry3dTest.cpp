@@ -30,7 +30,7 @@ class SwerveDriveOdometry3dTest : public ::testing::Test {
       m_kinematics, 0_rad, {zero, zero, zero, zero}};
 };
 
-TEST_F(SwerveDriveOdometry3dTest, Foo) {
+TEST_F(SwerveDriveOdometry3dTest, Initialize) {
   SwerveDriveOdometry3d odometry{m_kinematics,
                                  0_rad,
                                  {zero, zero, zero, zero},
