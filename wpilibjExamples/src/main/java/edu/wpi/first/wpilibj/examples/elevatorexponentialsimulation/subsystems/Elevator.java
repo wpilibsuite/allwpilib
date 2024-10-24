@@ -10,6 +10,9 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.system.plant.Wheel;
 import edu.wpi.first.math.trajectory.ExponentialProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
@@ -27,8 +30,10 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator implements AutoCloseable {
-  // This gearbox represents a gearbox containing 4 Vex 775pro motors.
-  private final DCMotor m_elevatorGearbox = DCMotor.getNEO(2);
+  // This gearbox represents a gearbox containing 2 NEO motors.
+  private final Wheel m_elevatorDrum =
+      new Wheel(
+          new Gearbox(2, DCMotor.NEO, Constants.kElevatorGearing), Constants.kElevatorDrumRadius);
 
   private final ExponentialProfile m_profile =
       new ExponentialProfile(
@@ -51,16 +56,13 @@ public class Elevator implements AutoCloseable {
       new Encoder(Constants.kEncoderAChannel, Constants.kEncoderBChannel);
   private final PWMSparkMax m_motor = new PWMSparkMax(Constants.kMotorPort);
 
-  // Simulation classes help us simulate what's going on, including gravity.
   private final ElevatorSim m_elevatorSim =
       new ElevatorSim(
-          m_elevatorGearbox,
-          Constants.kElevatorGearing,
-          Constants.kCarriageMass,
-          Constants.kElevatorDrumRadius,
+          LinearSystemId.createElevatorSystem(m_elevatorDrum, Constants.kCarriageMass),
+          m_elevatorDrum,
           Constants.kMinElevatorHeightMeters,
           Constants.kMaxElevatorHeightMeters,
-          true,
+          -9.8,
           0,
           0.005,
           0.0);
@@ -81,7 +83,8 @@ public class Elevator implements AutoCloseable {
     m_encoder.setDistancePerPulse(Constants.kElevatorEncoderDistPerPulse);
 
     // Publish Mechanism2d to SmartDashboard
-    // To view the Elevator visualization, select Network Tables -> SmartDashboard -> Elevator Sim
+    // To view the Elevator visualization, select Network Tables -> SmartDashboard
+    // -> Elevator Sim
     SmartDashboard.putData("Elevator Sim", m_mech2d);
   }
 
@@ -94,7 +97,8 @@ public class Elevator implements AutoCloseable {
     // Next, we update it. The standard loop time is 20ms.
     m_elevatorSim.update(0.020);
 
-    // Finally, we set our simulated encoder's readings and simulated battery voltage
+    // Finally, we set our simulated encoder's readings and simulated battery
+    // voltage
     m_encoderSim.setDistance(m_elevatorSim.getPositionMeters());
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
