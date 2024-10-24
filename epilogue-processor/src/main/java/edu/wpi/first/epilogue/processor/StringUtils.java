@@ -7,6 +7,7 @@ package edu.wpi.first.epilogue.processor;
 import edu.wpi.first.epilogue.Logged;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.lang.model.element.TypeElement;
 
 public final class StringUtils {
@@ -135,5 +136,32 @@ public final class StringUtils {
     }
 
     return loggerClassName;
+  }
+
+  /**
+   * Converts a camelCase element name to separate words, removing common field and method name
+   * prefixes like "m_" and "get".
+   *
+   * @param elementName the camelcased element name
+   * @return the name split into separate words and sanitized
+   */
+  public static String toHumanName(String elementName) {
+    // Delete common field prefixes (k_name, m_name, s_name)
+    var sanitizedName = elementName.replaceFirst("^[msk]_", "");
+
+    // Drop leading "k" prefix from fields
+    // (though normally these should be static, and thus not logged)
+    if (sanitizedName.matches("^k[A-Z].*$")) {
+      sanitizedName = sanitizedName.substring(1);
+    }
+
+    // Drop leading "get" from accessor methods
+    if (sanitizedName.matches("^get[A-Z].*$")) {
+      sanitizedName = sanitizedName.substring(3);
+    }
+
+    return splitToWords(sanitizedName).stream()
+        .map(StringUtils::capitalize)
+        .collect(Collectors.joining(" "));
   }
 }

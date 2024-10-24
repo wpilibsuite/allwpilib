@@ -7,7 +7,6 @@ package edu.wpi.first.epilogue.processor;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
 import edu.wpi.first.epilogue.logging.DataLogger;
-import java.util.stream.Collectors;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -63,7 +62,6 @@ public abstract class ElementHandler {
    *     otherwise, the field or method's name with no modifications
    */
   public static String loggedName(Element element) {
-    var elementName = element.getSimpleName().toString();
     var elementConfig = element.getAnnotation(Logged.class);
 
     // Use the name provided on the logged element, if one is present
@@ -98,28 +96,10 @@ public abstract class ElementHandler {
               + " without a @Logged annotation AND without being contained within a class with a @Logged annotation!\n\nOpen an issue at https://github.com/wpilibsuite/allwpilib/issues and include a copy of the file that caused this error.");
     }
 
+    var elementName = element.getSimpleName().toString();
     return switch (config.defaultNaming()) {
       case USE_CODE_NAME -> elementName;
-      case USE_HUMAN_NAME -> {
-        // Convert snakeCase field and method names to separate words,
-        // while removing common field and method prefixes.
-
-        // Delete common field prefixes (k_name, m_name, s_name)
-        elementName = elementName.replaceFirst("^[msk]_", "");
-        if (elementName.matches("^k[A-Z].*$")) {
-          // Drop leading "k" prefix from fields
-          // (though normally these should be static, and thus not logged)
-          elementName = elementName.substring(1);
-        }
-        if (elementName.matches("^get[A-Z].*$")) {
-          // Drop leading "get" from accessor methods
-          elementName = elementName.substring(3);
-        }
-
-        yield StringUtils.splitToWords(elementName).stream()
-            .map(StringUtils::capitalize)
-            .collect(Collectors.joining(" "));
-      }
+      case USE_HUMAN_NAME -> StringUtils.toHumanName(elementName);
     };
   }
 
