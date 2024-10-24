@@ -15,13 +15,28 @@ import edu.wpi.first.hal.LEDJNI;
 import edu.wpi.first.hal.PowerJNI;
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.MutCurrent;
+import edu.wpi.first.units.measure.MutTemperature;
+import edu.wpi.first.units.measure.MutTime;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 
 /** Contains functions for roboRIO functionality. */
 public final class RobotController {
+  // Mutable measures
+  private static final MutTime m_mutFPGATime = Microseconds.mutable(0.0);
+  private static final MutVoltage m_mutBatteryVoltage = Volts.mutable(0.0);
+  private static final MutVoltage m_mutInputVoltage = Volts.mutable(0.0);
+  private static final MutCurrent m_mutInputCurrent = Amps.mutable(0.0);
+  private static final MutVoltage m_mutVoltage3V3 = Volts.mutable(0.0);
+  private static final MutCurrent m_mutCurrent3V3 = Amps.mutable(0.0);
+  private static final MutVoltage m_mutVoltage5V = Volts.mutable(0.0);
+  private static final MutCurrent m_mutCurrent5V = Amps.mutable(0.0);
+  private static final MutVoltage m_mutVoltage6V = Volts.mutable(0.0);
+  private static final MutCurrent m_mutCurrent6V = Amps.mutable(0.0);
+  private static final MutVoltage m_mutBrownoutVoltage = Volts.mutable(0.0);
+  private static final MutTemperature m_mutCPUTemp = Celsius.mutable(0.0);
+
   private RobotController() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
@@ -86,12 +101,13 @@ public final class RobotController {
   }
 
   /**
-   * Read the microsecond timer in a measure from the FPGA.
+   * Read the microsecond timer in a mutable measure from the FPGA.
    *
-   * @return The current time according to the FPGA in a measure.
+   * @return The current time according to the FPGA in a mutable measure.
    */
-  public static Time getMeasureFPGATime() {
-    return Microseconds.of(HALUtil.getFPGATime());
+  public static MutTime getMeasureFPGATime() {
+    m_mutFPGATime.mut_replace(HALUtil.getFPGATime(), Microseconds);
+    return m_mutFPGATime;
   }
 
   /**
@@ -117,12 +133,13 @@ public final class RobotController {
   }
 
   /**
-   * Read the battery voltage in a measure.
+   * Read the battery voltage in a mutable measure.
    *
-   * @return The battery voltage in a measure.
+   * @return The battery voltage in a mutable measure.
    */
-  public static Voltage getMeasureBatteryVoltage() {
-    return Volts.of(PowerJNI.getVinVoltage());
+  public static MutVoltage getMeasureBatteryVoltage() {
+    m_mutBatteryVoltage.mut_replace(PowerJNI.getVinVoltage(), Volts);
+    return m_mutBatteryVoltage;
   }
 
   /**
@@ -182,12 +199,13 @@ public final class RobotController {
   }
 
   /**
-   * Get the input voltage to the robot controller in a measure.
+   * Get the input voltage to the robot controller in a mutable measure.
    *
-   * @return The controller input voltage value in a measure.
+   * @return The controller input voltage value in a mutable measure.
    */
-  public static Voltage getMeasureInputVoltage() {
-    return Volts.of(PowerJNI.getVinVoltage());
+  public static MutVoltage getMeasureInputVoltage() {
+    m_mutInputVoltage.mut_replace(PowerJNI.getVinVoltage(), Volts);
+    return m_mutInputVoltage;
   }
 
   /**
@@ -200,12 +218,13 @@ public final class RobotController {
   }
 
   /**
-   * Get the input current to the robot controller in a measure.
+   * Get the input current to the robot controller in a mutable measure.
    *
-   * @return The controller input current value in a measure.
+   * @return The controller input current value in a mutable measure.
    */
-  public static Current getMeasureInputCurrent() {
-    return Amps.of(PowerJNI.getVinCurrent());
+  public static MutCurrent getMeasureInputCurrent() {
+    m_mutInputCurrent.mut_replace(PowerJNI.getVinCurrent(), Amps);
+    return m_mutInputCurrent;
   }
 
   /**
@@ -218,12 +237,13 @@ public final class RobotController {
   }
 
   /**
-   * Get the voltage in a measure of the 3.3V rail.
+   * Get the voltage in a mutable measure of the 3.3V rail.
    *
-   * @return The controller 3.3V rail voltage value in a measure.
+   * @return The controller 3.3V rail voltage value in a mutable measure.
    */
-  public static Voltage getMeasureVoltage3V3() {
-    return Volts.of(PowerJNI.getUserVoltage3V3());
+  public static MutVoltage getMeasureVoltage3V3() {
+    m_mutVoltage3V3.mut_replace(PowerJNI.getUserVoltage3V3(), Volts);
+    return m_mutVoltage3V3;
   }
 
   /**
@@ -236,12 +256,13 @@ public final class RobotController {
   }
 
   /**
-   * Get the current output in a measure of the 3.3V rail.
+   * Get the current output in a mutable measure of the 3.3V rail.
    *
-   * @return The controller 3.3V rail output current value in a measure.
+   * @return The controller 3.3V rail output current value in a mutable measure.
    */
-  public static Current getMeasureCurrent3V3() {
-    return Amps.of(PowerJNI.getUserCurrent3V3());
+  public static MutCurrent getMeasureCurrent3V3() {
+    m_mutCurrent3V3.mut_replace(PowerJNI.getUserCurrent3V3(), Amps);
+    return m_mutCurrent3V3;
   }
 
   /**
@@ -282,12 +303,13 @@ public final class RobotController {
   }
 
   /**
-   * Get the voltage in a measure of the 5V rail.
+   * Get the voltage in a mutable measure of the 5V rail.
    *
-   * @return The controller 5V rail voltage value in a measure.
+   * @return The controller 5V rail voltage value in a mutable measure.
    */
-  public static Voltage getMeasureVoltage5V() {
-    return Volts.of(PowerJNI.getUserVoltage5V());
+  public static MutVoltage getMeasureVoltage5V() {
+    m_mutVoltage5V.mut_replace(PowerJNI.getUserVoltage5V(), Volts);
+    return m_mutVoltage5V;
   }
 
   /**
@@ -300,12 +322,13 @@ public final class RobotController {
   }
 
   /**
-   * Get the current output in a measure of the 5V rail.
+   * Get the current output in a mutable measure of the 5V rail.
    *
-   * @return The controller 5V rail output current value in a measure.
+   * @return The controller 5V rail output current value in a mutable measure.
    */
-  public static Current getMeasureCurrent5V() {
-    return Amps.of(PowerJNI.getUserCurrent5V());
+  public static MutCurrent getMeasureCurrent5V() {
+    m_mutCurrent5V.mut_replace(PowerJNI.getUserCurrent5V(), Amps);
+    return m_mutCurrent5V;
   }
 
   /**
@@ -346,12 +369,13 @@ public final class RobotController {
   }
 
   /**
-   * Get the voltage in a measure of the 6V rail.
+   * Get the voltage in a mutable measure of the 6V rail.
    *
-   * @return The controller 6V rail voltage value in a measure.
+   * @return The controller 6V rail voltage value in a mutable measure.
    */
-  public static Voltage getMeasureVoltage6V() {
-    return Volts.of(PowerJNI.getUserVoltage6V());
+  public static MutVoltage getMeasureVoltage6V() {
+    m_mutVoltage6V.mut_replace(PowerJNI.getUserVoltage6V(), Volts);
+    return m_mutVoltage6V;
   }
 
   /**
@@ -364,12 +388,13 @@ public final class RobotController {
   }
 
   /**
-   * Get the current output in a measure of the 6V rail.
+   * Get the current output in a mutable measure of the 6V rail.
    *
-   * @return The controller 6V rail output current value in a measure.
+   * @return The controller 6V rail output current value in a mutable measure.
    */
-  public static Current getMeasureCurrent6V() {
-    return Amps.of(PowerJNI.getUserCurrent6V());
+  public static MutCurrent getMeasureCurrent6V() {
+    m_mutCurrent6V.mut_replace(PowerJNI.getUserCurrent6V(), Amps);
+    return m_mutCurrent6V;
   }
 
   /**
@@ -415,12 +440,13 @@ public final class RobotController {
   }
 
   /**
-   * Get the current brownout voltage setting in a measure.
+   * Get the current brownout voltage setting in a mutable measure.
    *
-   * @return The brownout voltage in a measure.
+   * @return The brownout voltage in a mutable measure.
    */
-  public static Voltage getMeasureBrownoutVoltage() {
-    return Volts.of(PowerJNI.getBrownoutVoltage());
+  public static MutVoltage getMeasureBrownoutVoltage() {
+    m_mutBrownoutVoltage.mut_replace(PowerJNI.getBrownoutVoltage(), Volts);
+    return m_mutBrownoutVoltage;
   }
 
   /**
@@ -455,12 +481,13 @@ public final class RobotController {
   }
 
   /**
-   * Get the current CPU temperature in a measure.
+   * Get the current CPU temperature in a mutable measure.
    *
-   * @return current CPU temperature in a measure.
+   * @return current CPU temperature in a mutable measure.
    */
-  public static Temperature getMeasureCPUTemp() {
-    return Celsius.of(PowerJNI.getCPUTemp());
+  public static MutTemperature getMeasureCPUTemp() {
+    m_mutCPUTemp.mut_replace(PowerJNI.getCPUTemp(), Celsius);
+    return m_mutCPUTemp;
   }
 
   /** State for the radio led. */
