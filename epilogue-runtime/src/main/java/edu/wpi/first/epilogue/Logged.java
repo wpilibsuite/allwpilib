@@ -89,4 +89,39 @@ public @interface Logged {
    * @return the importance of the annotated element
    */
   Importance importance() default Importance.DEBUG;
+
+  /**
+   * Different behaviors for how Epilogue will generate the names of logged data points. This only
+   * applies to automatically generated names; any specific name provided with {@link #name()} will
+   * take precedence over an automatically generated name.
+   */
+  enum Naming {
+    /**
+     * Sets the default naming strategy to use the name of the element as it appears in source code.
+     * For example, a field {@code double m_x} would be labeled as {@code "m_x"} by default, and a
+     * {@code getX()} accessor would be labeled as {@code "getX"}.
+     */
+    USE_CODE_NAME,
+
+    /**
+     * Sets the default naming strategy to use a human-readable name based on the name of the name
+     * of the element as it appears in source code. For example, a field {@code double m_x} would be
+     * labeled as {@code "X"} by default, and a {@code getX()} accessor would also be labeled as
+     * {@code "X"}. Because logged names must be unique, this configuration would fail to compile
+     * and require either one of the fields to be excluded from logs (which, for simple accessors,
+     * would be ideal to avoid duplicate data), or to rename one or both elements so the logged data
+     * fields would have unique names.
+     */
+    USE_HUMAN_NAME
+  }
+
+  /**
+   * The default naming behavior to use. Defaults to {@link Naming#USE_CODE_NAME}, which uses the
+   * raw code name directly in logs. Any configuration of the {@link #name()} attribute on logged
+   * fields and methods will take precedence over an automatically generated name.
+   *
+   * @return the naming strategy for and annotated field or method, or the default naming strategy
+   *     for all logged fields and methods in an annotated class
+   */
+  Naming defaultNaming() default Naming.USE_CODE_NAME;
 }

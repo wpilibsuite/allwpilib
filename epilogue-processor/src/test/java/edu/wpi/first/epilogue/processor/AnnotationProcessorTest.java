@@ -1138,6 +1138,142 @@ class AnnotationProcessorTest {
         message);
   }
 
+  @Test
+  void loggingRecords() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        @Logged
+        record Example(double x, double y) { }
+        """;
+
+    String expectedRootLogger =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              dataLogger.log("x", object.x());
+              dataLogger.log("y", object.y());
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void errorsOnNameConflicts() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        @Logged
+        class Example {
+          @Logged(name = "Custom Name") double x;
+          @Logged(name = "Custom Name") double y;
+          @Logged(name = "Custom Name") double z;
+        }
+        """;
+
+    Compilation compilation =
+        javac()
+            .withProcessors(new AnnotationProcessor())
+            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+
+    assertThat(compilation).failed();
+    assertThat(compilation).hadErrorCount(3);
+
+    List<Diagnostic<? extends JavaFileObject>> errors = compilation.errors();
+    assertAll(
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.y, Example.z",
+                5,
+                40,
+                errors.get(0)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.x, Example.z",
+                6,
+                40,
+                errors.get(1)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.x, Example.y",
+                7,
+                40,
+                errors.get(2)));
+  }
+
+  @Test
+  void configuredDefaultNaming() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        @Logged(defaultNaming = Logged.Naming.USE_HUMAN_NAME)
+        class Example {
+          double m_memberPrefix;
+          double kConstantPrefix;
+          double k_otherConstantPrefix;
+          double s_otherPrefix;
+
+          public double getTheGetterMethod() {
+            return 0;
+          }
+
+          @Logged(defaultNaming = Logged.Naming.USE_CODE_NAME)
+          public double optedOut() {
+            return 0;
+          }
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              dataLogger.log("Member Prefix", object.m_memberPrefix);
+              dataLogger.log("Constant Prefix", object.kConstantPrefix);
+              dataLogger.log("Other Constant Prefix", object.k_otherConstantPrefix);
+              dataLogger.log("Other Prefix", object.s_otherPrefix);
+              dataLogger.log("The Getter Method", object.getTheGetterMethod());
+              dataLogger.log("optedOut", object.optedOut());
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
   private void assertCompilationError(
       String message, long lineNumber, long col, Diagnostic<? extends JavaFileObject> diagnostic) {
     assertAll(
