@@ -874,7 +874,7 @@ TEST(LEDPatternTest, RelativeScrollingMask) {
 
   auto pattern = LEDPattern::Steps(colorSteps)
                      .Mask(LEDPattern::Steps(maskSteps))
-                     .ScrollAtRelativeSpeed(units::hertz_t{1e6/8.0});
+                     .ScrollAtRelativeSpeed(units::hertz_t{1e6 / 8.0});
 
   pattern.ApplyTo(buffer);
 
