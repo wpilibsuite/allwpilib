@@ -54,7 +54,7 @@ void HALSimWSProviderSimDevice::CancelCallbacks() {
   m_simValueCreatedCbKey = 0;
 
   for (auto& kv : m_simValueChangedCbKeys) {
-    HALSIM_CancelSimValueChangedCallback(kv.getValue());
+    HALSIM_CancelSimValueChangedCallback(kv.second);
   }
 
   m_simValueChangedCbKeys.clear();
