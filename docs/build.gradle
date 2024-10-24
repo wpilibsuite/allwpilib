@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id "org.ysb33r.doxygen" version "1.0.3"
 }
 
 evaluationDependsOn(':apriltag')
@@ -45,135 +44,41 @@ cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 cppProjectZips.add(project(':romiVendordep').cppHeadersZip)
 cppProjectZips.add(project(':xrpVendordep').cppHeadersZip)
 
-doxygen {
-    // Doxygen binaries are only provided for x86_64 platforms
-    // Other platforms will need to provide doxygen via their system
-    // See below maven and https://doxygen.nl/download.html for provided binaries
-    // Ensure theme.css (from https://github.com/jothepro/doxygen-awesome-css) is compatible with
-    // doxygen version when updating
-
-    String arch = System.getProperty("os.arch");
-    if (arch.equals("x86_64") || arch.equals("amd64")) {
-        executables {
-            doxygen {
-                executableByVersion('1.12.0')
-            }
+tasks.register("cmakeDoxygen", Zip) {
+    doLast {
+        exec {
+            workingDir rootDir
+            def args = [
+                "cmake",
+                "--preset default",
+                "-DWITH_CSCORE=OFF",
+                "-DWITH_GUI=OFF",
+                "-DWITH_NTCORE=OFF",
+                "-DWITH_SIMULATION_MODULES=OFF",
+                "-DWITH_TESTS=OFF",
+                "-DWITH_WPILIB=OFF",
+                "-DWITH_WPIMATH=OFF",
+                "-DWITH_DOCS=ON",
+            ]
+            commandLine args
         }
-    }
-}
-
-doxygen {
-    template 'Doxyfile'
-
-    cppProjectZips.each {
-        dependsOn it
-        source it.source
-        it.ext.includeDirs.each {
-            cppIncludeRoots.add(it.absolutePath)
+        exec {
+            workingDir rootDir
+            def args = [
+                "cmake",
+                "--build build-cmake",
+                "--target docs",
+            ]
+            commandLine args
         }
-    }
-
-    if (project.hasProperty('docWarningsAsErrors')) {
-        // apriltag
-        exclude 'apriltag_pose.h'
-
-        // Eigen
-        exclude 'Eigen/**'
-        exclude 'unsupported/**'
-
-        // LLVM
-        exclude 'wpi/AlignOf.h'
-        exclude 'wpi/Casting.h'
-        exclude 'wpi/Chrono.h'
-        exclude 'wpi/Compiler.h'
-        exclude 'wpi/ConvertUTF.h'
-        exclude 'wpi/DenseMap.h'
-        exclude 'wpi/DenseMapInfo.h'
-        exclude 'wpi/Endian.h'
-        exclude 'wpi/EpochTracker.h'
-        exclude 'wpi/Errc.h'
-        exclude 'wpi/Errno.h'
-        exclude 'wpi/ErrorHandling.h'
-        exclude 'wpi/bit.h'
-        exclude 'wpi/fs.h'
-        exclude 'wpi/FunctionExtras.h'
-        exclude 'wpi/function_ref.h'
-        exclude 'wpi/Hashing.h'
-        exclude 'wpi/iterator.h'
-        exclude 'wpi/iterator_range.h'
-        exclude 'wpi/ManagedStatic.h'
-        exclude 'wpi/MapVector.h'
-        exclude 'wpi/MathExtras.h'
-        exclude 'wpi/MemAlloc.h'
-        exclude 'wpi/PointerIntPair.h'
-        exclude 'wpi/PointerLikeTypeTraits.h'
-        exclude 'wpi/PointerUnion.h'
-        exclude 'wpi/raw_os_ostream.h'
-        exclude 'wpi/raw_ostream.h'
-        exclude 'wpi/SmallPtrSet.h'
-        exclude 'wpi/SmallSet.h'
-        exclude 'wpi/SmallString.h'
-        exclude 'wpi/SmallVector.h'
-        exclude 'wpi/StringExtras.h'
-        exclude 'wpi/StringMap.h'
-        exclude 'wpi/SwapByteOrder.h'
-        exclude 'wpi/type_traits.h'
-        exclude 'wpi/VersionTuple.h'
-        exclude 'wpi/WindowsError.h'
-
-        // fmtlib
-        exclude 'fmt/**'
-
-        // libuv
-        exclude 'uv.h'
-        exclude 'uv/**'
-        exclude 'wpinet/uv/**'
-
-        // json
-        exclude 'wpi/adl_serializer.h'
-        exclude 'wpi/byte_container_with_subtype.h'
-        exclude 'wpi/detail/**'
-        exclude 'wpi/json.h'
-        exclude 'wpi/json_fwd.h'
-        exclude 'wpi/ordered_map.h'
-        exclude 'wpi/thirdparty/**'
-
-        // memory
-        exclude 'wpi/memory/**'
-
-        // mpack
-        exclude 'wpi/mpack.h'
-
-        // units
-        exclude 'units/**'
-    }
-
-    exclude '*.pb.h'
-
-    // Save space by excluding protobuf and eigen
-    exclude 'Eigen/**'
-    exclude 'unsupported/**'
-    exclude 'google/protobuf/**'
-
-    exclude '**/.clang-tidy'
-    exclude '**/.clang-format'
-
-    option 'project_name', 'WPILibC++'
-    option 'project_logo', '../wpiutil/src/main/native/resources/wpilib-128.png'
-    option 'project_number', wpilibVersioning.version.get()
-    option 'strip_from_inc_path', cppIncludeRoots
-    option 'strip_from_path', cppIncludeRoots
-
-    if (project.hasProperty('docWarningsAsErrors')) {
-        option 'warn_as_error', 'FAIL_ON_WARNINGS_PRINT'
     }
 }
 
 tasks.register("zipCppDocs", Zip) {
     archiveBaseName = zipBaseNameCpp
     destinationDirectory = outputsFolder
-    dependsOn doxygen
-    from ("$buildDir/docs/doxygen/html")
+    dependsOn cmakeDoxygen
+    from ("$rootDir/build-cmake/html")
     into '/'
 }
 
@@ -226,7 +131,6 @@ task generateJavaDocs(type: Javadoc) {
     source project(':wpilibj').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java
     source project(':wpinet').sourceSets.main.java
-    source project(':wpiunits').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
     source project(':romiVendordep').sourceSets.main.java
     source project(':xrpVendordep').sourceSets.main.java
