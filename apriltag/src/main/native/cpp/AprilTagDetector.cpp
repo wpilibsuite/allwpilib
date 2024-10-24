@@ -130,7 +130,7 @@ void AprilTagDetector::RemoveFamily(std::string_view fam) {
     apriltag_detector_remove_family(
         static_cast<apriltag_detector_t*>(m_impl),
         static_cast<apriltag_family_t*>(it->second));
-    DestroyFamily(it->getKey(), it->second);
+    DestroyFamily(it->first, it->second);
     m_families.erase(it);
   }
 }
@@ -158,7 +158,7 @@ void AprilTagDetector::Destroy() {
 
 void AprilTagDetector::DestroyFamilies() {
   for (auto&& entry : m_families) {
-    DestroyFamily(entry.getKey(), entry.second);
+    DestroyFamily(entry.first, entry.second);
   }
 }
 
