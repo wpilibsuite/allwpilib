@@ -6,8 +6,10 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.NotifierJNI;
 import java.io.Closeable;
+import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.DoubleConsumer;
 
 /**
  * A class that's a wrapper around a watchdog timer.
@@ -24,8 +26,12 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   private double m_startTimeSeconds;
   private double m_timeoutSeconds;
   private double m_expirationTimeSeconds;
-  private final Runnable m_callback;
+  private final DoubleConsumer m_callback;
   private double m_lastTimeoutPrintSeconds;
+
+  int m_overruns;
+  private String m_originalAlertText = "";
+  private Optional<Alert> m_alert = Optional.empty();
 
   boolean m_isExpired;
 
@@ -50,6 +56,19 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * @param callback This function is called when the timeout expires.
    */
   public Watchdog(double timeoutSeconds, Runnable callback) {
+    m_timeoutSeconds = timeoutSeconds;
+    m_callback = d -> callback.run();
+    m_tracer = new Tracer();
+  }
+
+  /**
+   * Watchdog constructor.
+   *
+   * @param timeoutSeconds The watchdog's timeout in seconds with microsecond resolution.
+   * @param callback This function is called with the time in seconds since the watchdog was last
+   *     fed when the timeout expires.
+   */
+  public Watchdog(double timeoutSeconds, DoubleConsumer callback) {
     m_timeoutSeconds = timeoutSeconds;
     m_callback = callback;
     m_tracer = new Tracer();
@@ -76,6 +95,20 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     // Elements with sooner expiration times are sorted as lesser. The head of
     // Java's PriorityQueue is the least element.
     return Double.compare(m_expirationTimeSeconds, rhs.m_expirationTimeSeconds);
+  }
+
+  /**
+   * Links the given alert to this watchdog.
+   *
+   * <p>A linked alert will be activated every time the watchdog times out. On timeout the
+   * activation time will be reset and the text of the alert will be updated to {@code "<alert-text>
+   * [xN]"} where {@code N} is the number of overruns that have occurred.
+   *
+   * @param alert The alert to link to this watchdog.
+   */
+  public void linkToAlert(Alert alert) {
+    m_alert = Optional.of(alert);
+    m_originalAlertText = alert.m_text;
   }
 
   /**
@@ -206,6 +239,16 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     m_suppressTimeoutMessage = suppress;
   }
 
+  void updateAlert(double nowSeconds) {
+    if (m_alert.isEmpty()) {
+      return;
+    }
+    Alert alert = m_alert.get();
+    alert.m_active = true;
+    alert.m_activeStartTime = nowSeconds;
+    alert.m_text = String.format("%s [x%d]", m_originalAlertText, m_overruns);
+  }
+
   @SuppressWarnings("resource")
   private static void updateAlarm() {
     if (m_watchdogs.isEmpty()) {
@@ -240,6 +283,8 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
         // has occurred, so call its timeout function.
         Watchdog watchdog = m_watchdogs.poll();
 
+        watchdog.m_overruns++;
+
         double now = curTime * 1e-6;
         if (now - watchdog.m_lastTimeoutPrintSeconds > kMinPrintPeriodMicroS) {
           watchdog.m_lastTimeoutPrintSeconds = now;
@@ -249,13 +294,15 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
           }
         }
 
+        watchdog.updateAlert(now);
+
         // Set expiration flag before calling the callback so any
         // manipulation of the flag in the callback (e.g., calling
         // Disable()) isn't clobbered.
         watchdog.m_isExpired = true;
 
         m_queueMutex.unlock();
-        watchdog.m_callback.run();
+        watchdog.m_callback.accept(now - watchdog.m_startTimeSeconds);
         m_queueMutex.lock();
 
         updateAlarm();
