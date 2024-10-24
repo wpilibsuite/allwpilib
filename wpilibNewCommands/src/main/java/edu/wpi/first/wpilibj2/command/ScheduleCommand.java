@@ -28,7 +28,7 @@ public class ScheduleCommand extends Command {
   @Override
   public void initialize() {
     for (Command command : m_toSchedule) {
-      command.schedule();
+      CommandScheduler.getInstance().schedule(command);
     }
   }
 
