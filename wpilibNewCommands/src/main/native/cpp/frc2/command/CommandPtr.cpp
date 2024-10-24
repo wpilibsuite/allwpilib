@@ -57,19 +57,9 @@ CommandPtr CommandPtr::AsProxy() && {
   return std::move(*this);
 }
 
-CommandPtr CommandPtr::Fork(CommandPtr&& other) && {
-  AssertValid();
-  std::vector<Command*> vec{m_ptr.get(), other.get()};
-  m_ptr = make_unique<ScheduleCommand>(std::span<Command*>(vec));
-  return std::move(*this);
-}
-
-CommandPtr CommandPtr::Fork(std::vector<CommandPtr>&& other) && {
+CommandPtr CommandPtr::Fork() && {
   AssertValid();
   std::vector<Command*> vec{m_ptr.get()};
-  for (auto&& ptr : other) {
-    vec.emplace_back(std::move(ptr).Unwrap().get());
-  }
   m_ptr = make_unique<ScheduleCommand>(std::span<Command*>(vec));
   return std::move(*this);
 }

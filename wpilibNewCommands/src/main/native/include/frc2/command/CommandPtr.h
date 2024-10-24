@@ -69,33 +69,13 @@ class CommandPtr final {
    * the user does not wish to extend the command's requirements to the entire
    * command composition. Note that if run from a composition, the composition
    * will not know about the status of the scheduled commands, and will treat
-   * this command as finishing instantly. Commands can be added to this and will
-   * be scheduled in order with this command scheduled first.
+   * this command as finishing instantly.
    *
-   * @param other other commands to schedule along with this one. This command
-   * is scheduled first.
    * @return the decorated command
    * @see ScheduleCommand
    */
   [[nodiscard]]
-  CommandPtr Fork(CommandPtr&& other) &&;
-
-  /**
-   * Decorates this command to run "forked" by wrapping it in a {@link
-   * ScheduleCommand}. Use this for "forking off" from command compositions when
-   * the user does not wish to extend the command's requirements to the entire
-   * command composition. Note that if run from a composition, the composition
-   * will not know about the status of the scheduled commands, and will treat
-   * this command as finishing instantly. Commands can be added to this and will
-   * be scheduled in order with this command scheduled first.
-   *
-   * @param other other commands to schedule along with this one. This command
-   * is scheduled first.
-   * @return the decorated command
-   * @see ScheduleCommand
-   */
-  [[nodiscard]]
-  CommandPtr Fork(std::vector<CommandPtr>&& other) &&;  
+  CommandPtr Fork() &&;
 
   /**
    * Decorates this command to run or stop when disabled.

@@ -403,21 +403,16 @@ public abstract class Command implements Sendable {
    * for "forking off" from command compositions when the user does not wish to extend the command's
    * requirements to the entire command composition. Note that if run from a composition, the
    * composition will not know about the status of the scheduled commands, and will treat this
-   * command as finishing instantly. Commands can be added to this and will be scheduled in order
-   * with this command scheduled first.
+   * command as finishing instantly.
    *
-   * @param other other commands to schedule along with this one. This command is scheduled first.
    * @return the decorated command
    * @see ScheduleCommand
    * @see <a
    *     href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#scheduling-other-commands">WPILib
    *     docs</a>
    */
-  public ScheduleCommand fork(Command... other) {
-    Command[] commands = new Command[1 + other.length];
-    commands[0] = this;
-    System.arraycopy(other, 0, commands, 1, other.length);
-    return new ScheduleCommand(commands);
+  public ScheduleCommand fork() {
+    return new ScheduleCommand(this);
   }
 
   /**
