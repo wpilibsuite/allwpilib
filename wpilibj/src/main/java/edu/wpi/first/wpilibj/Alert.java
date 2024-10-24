@@ -164,9 +164,6 @@ public class Alert implements AutoCloseable {
     }
 
     private String[] getStrings(AlertType type) {
-      // TODO: some optimizations available here- could iterate explicitly and cache the array for
-      // potential reuse (if size is same, refill array, if nothing has changed, return original
-      // array)
       return getSetForType(type).stream().map(a -> a.text()).toArray(String[]::new);
     }
 
