@@ -126,7 +126,7 @@ wpi::Sendable* SmartDashboard::GetData(std::string_view key) {
   if (it == inst.tablesToData.end()) {
     throw FRC_MakeError(err::SmartDashboardMissingKey, "{}", key);
   }
-  return wpi::SendableRegistry::GetSendable(it->getValue());
+  return wpi::SendableRegistry::GetSendable(it->second);
 }
 
 bool SmartDashboard::PutBoolean(std::string_view keyName, bool value) {
@@ -254,6 +254,6 @@ void SmartDashboard::UpdateValues() {
   inst.listenerExecutor.RunListenerTasks();
   std::scoped_lock lock(inst.tablesToDataMutex);
   for (auto& i : inst.tablesToData) {
-    wpi::SendableRegistry::Update(i.getValue());
+    wpi::SendableRegistry::Update(i.second);
   }
 }

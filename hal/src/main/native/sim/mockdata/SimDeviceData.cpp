@@ -317,7 +317,7 @@ HAL_SimDeviceHandle SimDeviceData::GetDeviceHandle(const char* name) {
   if (it == m_deviceMap.end()) {
     return 0;
   }
-  if (auto deviceImpl = it->getValue().lock()) {
+  if (auto deviceImpl = it->second.lock()) {
     return deviceImpl->handle;
   } else {
     return 0;
@@ -459,10 +459,10 @@ HAL_SimValueHandle SimDeviceData::GetValueHandle(HAL_SimDeviceHandle device,
   if (it == deviceImpl->valueMap.end()) {
     return 0;
   }
-  if (!it->getValue()) {
+  if (!it->second) {
     return 0;
   }
-  return it->getValue()->handle;
+  return it->second->handle;
 }
 
 void SimDeviceData::EnumerateValues(HAL_SimDeviceHandle device, void* param,
