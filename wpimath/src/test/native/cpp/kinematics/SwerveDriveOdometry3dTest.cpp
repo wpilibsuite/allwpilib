@@ -31,7 +31,9 @@ class SwerveDriveOdometry3dTest : public ::testing::Test {
 };
 
 TEST_F(SwerveDriveOdometry3dTest, Initialize) {
-  SwerveDriveOdometry3d odometry{m_kinematics,
+  // Workaround for a GCC maybe-uninitialized false positive
+  SwerveDriveKinematics<4> kinematics{m_fl, m_fr, m_bl, m_br};
+  SwerveDriveOdometry3d odometry{kinematics,
                                  0_rad,
                                  {zero, zero, zero, zero},
                                  frc::Pose2d{1_m, 2_m, 45_deg}};
