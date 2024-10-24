@@ -849,7 +849,6 @@ TEST(LEDPatternTest, OffsetMask) {
 
   auto pattern = LEDPattern::Steps(colorSteps)
                      .Mask(LEDPattern::Steps(maskSteps))
-                     .Reversed()
                      .OffsetBy(4);
 
   pattern.ApplyTo(buffer);
@@ -875,8 +874,7 @@ TEST(LEDPatternTest, RelativeScrollingMask) {
 
   auto pattern = LEDPattern::Steps(colorSteps)
                      .Mask(LEDPattern::Steps(maskSteps))
-                     .Reversed()
-                     .ScrollAtRelativeSpeed(units::hertz_t{12.5 * 1e3});
+                     .ScrollAtRelativeSpeed(units::hertz_t{1e6/8.0});
 
   pattern.ApplyTo(buffer);
 
@@ -958,7 +956,6 @@ TEST(LEDPatternTest, AbsoluteScrollingMask) {
 
   auto pattern = LEDPattern::Steps(colorSteps)
                      .Mask(LEDPattern::Steps(maskSteps))
-                     .Reversed()
                      .ScrollAtAbsoluteSpeed(1_mps, 1_m);
 
   pattern.ApplyTo(buffer);
