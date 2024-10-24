@@ -7,10 +7,11 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Persistent alert to be sent via NetworkTables. Alerts are tagged with a type of {@code kError},
@@ -43,88 +44,7 @@ import java.util.Map;
  * }
  * </pre>
  */
-public class Alert {
-  private static Map<String, SendableAlerts> groups = new HashMap<String, SendableAlerts>();
-
-  private final AlertType m_type;
-  private boolean m_active;
-  private double m_activeStartTime;
-  private String m_text;
-
-  /**
-   * Creates a new alert in the default group - "Alerts". If this is the first to be instantiated,
-   * the appropriate entries will be added to NetworkTables.
-   *
-   * @param text Text to be displayed when the alert is active.
-   * @param type Alert urgency level.
-   */
-  public Alert(String text, AlertType type) {
-    this("Alerts", text, type);
-  }
-
-  /**
-   * Creates a new alert. If this is the first to be instantiated in its group, the appropriate
-   * entries will be added to NetworkTables.
-   *
-   * @param group Group identifier, used as the entry name in NetworkTables.
-   * @param text Text to be displayed when the alert is active.
-   * @param type Alert urgency level.
-   */
-  @SuppressWarnings("this-escape")
-  public Alert(String group, String text, AlertType type) {
-    if (!groups.containsKey(group)) {
-      groups.put(group, new SendableAlerts());
-      SmartDashboard.putData(group, groups.get(group));
-    }
-
-    m_text = text;
-    m_type = type;
-    groups.get(group).m_alerts.add(this);
-  }
-
-  /**
-   * Sets whether the alert should currently be displayed. This method can be safely called
-   * periodically.
-   *
-   * @param active Whether to display the alert.
-   */
-  public void set(boolean active) {
-    if (active && !m_active) {
-      m_activeStartTime = Timer.getFPGATimestamp();
-    }
-    m_active = active;
-  }
-
-  /**
-   * Updates current alert text. Use this method to dynamically change the displayed alert, such as
-   * including more details about the detected problem.
-   *
-   * @param text Text to be displayed when the alert is active.
-   */
-  public void setText(String text) {
-    m_text = text;
-  }
-
-  private static final class SendableAlerts implements Sendable {
-    private final Collection<Alert> m_alerts = new HashSet<>();
-
-    private String[] getStrings(AlertType type) {
-      return m_alerts.stream()
-          .filter((Alert a) -> a.m_active && a.m_type == type)
-          .sorted((Alert a, Alert b) -> Double.compare(b.m_activeStartTime, a.m_activeStartTime))
-          .map((Alert a) -> a.m_text)
-          .toArray(String[]::new);
-    }
-
-    @Override
-    public void initSendable(SendableBuilder builder) {
-      builder.setSmartDashboardType("Alerts");
-      builder.addStringArrayProperty("errors", () -> getStrings(AlertType.kError), null);
-      builder.addStringArrayProperty("warnings", () -> getStrings(AlertType.kWarning), null);
-      builder.addStringArrayProperty("infos", () -> getStrings(AlertType.kInfo), null);
-    }
-  }
-
+public class Alert implements AutoCloseable {
   /** Represents an alert's level of urgency. */
   public enum AlertType {
     /**
@@ -147,5 +67,134 @@ public class Alert {
      * which do not fall under the other categories.
      */
     kInfo
+  }
+
+  private static final Map<String, SendableAlerts> groups = new HashMap<String, SendableAlerts>();
+
+  private final AlertType m_type;
+  private boolean m_active;
+  private long m_activeStartTime;
+  private String m_text;
+  private SendableAlerts m_group;
+
+  /**
+   * Creates a new alert in the default group - "Alerts". If this is the first to be instantiated,
+   * the appropriate entries will be added to NetworkTables.
+   *
+   * @param text Text to be displayed when the alert is active.
+   * @param type Alert urgency level.
+   */
+  public Alert(String text, AlertType type) {
+    this("Alerts", text, type);
+  }
+
+  /**
+   * Creates a new alert. If this is the first to be instantiated in its group, the appropriate
+   * entries will be added to NetworkTables.
+   *
+   * @param group Group identifier, used as the entry name in NetworkTables.
+   * @param text Text to be displayed when the alert is active.
+   * @param type Alert urgency level.
+   */
+  @SuppressWarnings("this-escape")
+  public Alert(String group, String text, AlertType type) {
+    m_type = type;
+    m_text = text;
+    m_group = getGroupSendable(group);
+  }
+
+  /**
+   * Sets whether the alert should currently be displayed. This method can be safely called
+   * periodically.
+   *
+   * @param active Whether to display the alert.
+   */
+  public void set(boolean active) {
+    if (active == m_active) {
+      return;
+    }
+
+    if (active) {
+      m_activeStartTime = RobotController.getFPGATime();
+      m_group.getSetForType(m_type).add(new PublishedAlert(m_activeStartTime, m_text));
+    } else {
+      m_group.getSetForType(m_type).remove(new PublishedAlert(m_activeStartTime, m_text));
+    }
+    m_active = active;
+  }
+
+  /**
+   * Updates current alert text. Use this method to dynamically change the displayed alert, such as
+   * including more details about the detected problem.
+   *
+   * @param text Text to be displayed when the alert is active.
+   */
+  public void setText(String text) {
+    if (text.equals(m_text)) {
+      return;
+    }
+    var oldText = m_text;
+    m_text = text;
+    if (m_active) {
+      var set = m_group.getSetForType(m_type);
+      set.remove(
+          new PublishedAlert(m_activeStartTime, oldText)); // TODO: cache instead of constructing
+      set.add(new PublishedAlert(m_activeStartTime, m_text));
+    }
+  }
+
+  private record PublishedAlert(long timestamp, String text) implements Comparable<PublishedAlert> {
+    private static final Comparator<PublishedAlert> comparator =
+        Comparator.comparingLong((PublishedAlert alert) -> alert.timestamp())
+            .thenComparing(Comparator.comparing((PublishedAlert alert) -> alert.text()));
+
+    @Override
+    public int compareTo(PublishedAlert o) {
+      return comparator.compare(this, o);
+    }
+  }
+
+  private static final class SendableAlerts implements Sendable {
+    // TODO: I think we could use WeakReference here to automatically remove dangling alerts
+
+    private final Map<AlertType, Set<PublishedAlert>> m_alerts = new HashMap<>();
+
+    public Set<PublishedAlert> getSetForType(AlertType type) {
+      return m_alerts.computeIfAbsent(type, _type -> new TreeSet<>());
+    }
+
+    private String[] getStrings(AlertType type) {
+      return getSetForType(type).stream().map(a -> a.text()).toArray(String[]::new);
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+      builder.setSmartDashboardType("Alerts");
+      builder.addStringArrayProperty("errors", () -> getStrings(AlertType.kError), null);
+      builder.addStringArrayProperty("warnings", () -> getStrings(AlertType.kWarning), null);
+      builder.addStringArrayProperty("infos", () -> getStrings(AlertType.kInfo), null);
+    }
+  }
+
+  @Override
+  public void close() throws Exception {
+    set(false);
+  }
+
+  /**
+   * Returns the SendableAlerts for a given group, initializing and publishing if it does not
+   * already exist.
+   *
+   * @param group the group name
+   * @return the SendableAlerts for the group
+   */
+  private static SendableAlerts getGroupSendable(String group) {
+    return groups.computeIfAbsent(
+        group,
+        _group -> {
+          var sendable = new SendableAlerts();
+          SmartDashboard.putData(_group, sendable);
+          return sendable;
+        });
   }
 }
