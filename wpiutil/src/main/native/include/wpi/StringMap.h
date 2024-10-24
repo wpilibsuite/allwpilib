@@ -67,16 +67,6 @@ class StringMap : public std::map<std::string, T, std::less<>, Allocator> {
     return *this;
   }
 
-  /// lookup - Return the entry for the specified key, or a default
-  /// constructed value if no such entry exists.
-  T lookup(std::string_view key) const {
-    auto it = find(key);
-    if (it != this->end()) {
-      return it->second;
-    }
-    return {};
-  }
-
   using map_type::at;
 
   T& at(const char* key) { return (*this)[std::string_view{key}]; }

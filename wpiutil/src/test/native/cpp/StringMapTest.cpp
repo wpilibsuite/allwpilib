@@ -174,11 +174,11 @@ TEST_F(StringMapTest, SmallFullMap) {
   Map["funf"] = 5;
 
   EXPECT_EQ(3u, Map.size());
-  EXPECT_EQ(0, Map.lookup("eins"));
-  EXPECT_EQ(2, Map.lookup("zwei"));
-  EXPECT_EQ(0, Map.lookup("drei"));
-  EXPECT_EQ(4, Map.lookup("veir"));
-  EXPECT_EQ(5, Map.lookup("funf"));
+  EXPECT_FALSE(Map.contains("eins"));
+  EXPECT_EQ(2, Map["zwei"]);
+  EXPECT_FALSE(Map.contains("drei"));
+  EXPECT_EQ(4, Map["veir"]);
+  EXPECT_EQ(5, Map["funf"]);
 }
 
 TEST_F(StringMapTest, CopyCtor) {
@@ -193,19 +193,19 @@ TEST_F(StringMapTest, CopyCtor) {
   Map["funf"] = 5;
 
   EXPECT_EQ(3u, Map.size());
-  EXPECT_EQ(0, Map.lookup("eins"));
-  EXPECT_EQ(2, Map.lookup("zwei"));
-  EXPECT_EQ(0, Map.lookup("drei"));
-  EXPECT_EQ(4, Map.lookup("veir"));
-  EXPECT_EQ(5, Map.lookup("funf"));
+  EXPECT_FALSE(Map.contains("eins"));
+  EXPECT_EQ(2, Map["zwei"]);
+  EXPECT_FALSE(Map.contains("drei"));
+  EXPECT_EQ(4, Map["veir"]);
+  EXPECT_EQ(5, Map["funf"]);
 
   wpi::StringMap<int> Map2(Map);
   EXPECT_EQ(3u, Map2.size());
-  EXPECT_EQ(0, Map2.lookup("eins"));
-  EXPECT_EQ(2, Map2.lookup("zwei"));
-  EXPECT_EQ(0, Map2.lookup("drei"));
-  EXPECT_EQ(4, Map2.lookup("veir"));
-  EXPECT_EQ(5, Map2.lookup("funf"));
+  EXPECT_FALSE(Map2.contains("eins"));
+  EXPECT_EQ(2, Map2["zwei"]);
+  EXPECT_FALSE(Map2.contains("drei"));
+  EXPECT_EQ(4, Map2["veir"]);
+  EXPECT_EQ(5, Map2["funf"]);
 }
 
 TEST_F(StringMapTest, At) {

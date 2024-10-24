@@ -49,7 +49,7 @@ class SendableChooser : public SendableChooserBase {
   }
 
  public:
-  using CopyType = decltype(_unwrap_smart_ptr(m_choices.lookup("")));
+  using CopyType = decltype(_unwrap_smart_ptr(m_choices.find("")->second));
 
   SendableChooser() = default;
   ~SendableChooser() override = default;
@@ -105,7 +105,11 @@ class SendableChooser : public SendableChooserBase {
     if (selected.empty()) {
       return CopyType{};
     } else {
-      return _unwrap_smart_ptr(m_choices.lookup(selected));
+      auto it = m_choices.find(selected);
+      if (it == m_choices.end()) {
+        return CopyType{};
+      }
+      return _unwrap_smart_ptr(it->second);
     }
   }
 
