@@ -105,3 +105,5 @@ task unitsHeaders(type: Zip) {
 }
 
 addTaskToCopyAllOutputs(unitsHeaders)
+
+test.testLogging.showStandardStreams = true
