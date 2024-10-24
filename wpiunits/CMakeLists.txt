@@ -1,5 +1,6 @@
 project(wpiunits)
 
+include(AddTest)
 # Java bindings
 if(WITH_JAVA)
     include(UseJava)
@@ -32,4 +33,8 @@ if(WITH_JAVA_SOURCE)
     set_property(TARGET wpiunits_src_jar PROPERTY FOLDER "java")
 
     install_jar(wpiunits_src_jar DESTINATION ${java_lib_dest})
+endif()
+
+if(WITH_TESTS AND WITH_JAVA)
+    wpilib_add_java_test(wpiunits)
 endif()
