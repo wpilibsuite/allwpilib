@@ -20,6 +20,9 @@
 
 namespace nt {
 
+// Forward declare here to avoid circular dependency on ntcore_cpp.h
+int64_t Now();
+
 #if __GNUC__ >= 13
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
@@ -33,10 +36,41 @@ class Value final {
   struct private_init {};
 
  public:
-  Value();
-  Value(NT_Type type, size_t size, int64_t time, const private_init&);
+  Value() {
+    m_val.type = NT_UNASSIGNED;
+    m_val.last_change = 0;
+    m_val.server_time = 0;
+  }
+
+  Value(NT_Type type, size_t size, int64_t time, const private_init&)
+      : Value{type, size, time == 0 ? Now() : time, 1, private_init{}} {}
+
   Value(NT_Type type, size_t size, int64_t time, int64_t serverTime,
-        const private_init&);
+        const private_init&)
+      : m_size{size} {
+    m_val.type = type;
+    m_val.last_change = time;
+    m_val.server_time = serverTime;
+    switch (type) {
+      case NT_BOOLEAN_ARRAY:
+        m_val.data.arr_boolean.arr = nullptr;
+        break;
+      case NT_INTEGER_ARRAY:
+        m_val.data.arr_int.arr = nullptr;
+        break;
+      case NT_FLOAT_ARRAY:
+        m_val.data.arr_float.arr = nullptr;
+        break;
+      case NT_DOUBLE_ARRAY:
+        m_val.data.arr_double.arr = nullptr;
+        break;
+      case NT_STRING_ARRAY:
+        m_val.data.arr_string.arr = nullptr;
+        break;
+      default:
+        break;
+    }
+  }
 
   explicit operator bool() const { return m_val.type != NT_UNASSIGNED; }
 
