@@ -321,8 +321,8 @@ public class LoggerGenerator {
    * Checks if a method is a simple "getter" method for a field in the given list. Here, we define
    * "getter" as a method with a single return statement that references the name of a field, with
    * no other expressions. `getX() { return x; }` would be considered a "getter" method, while
-   * `getX() { return x.clone(); }` would not be. Note that the method name is irrelevant; only
-   * the method body is checked.
+   * `getX() { return x.clone(); }` would not be. Note that the method name is irrelevant; only the
+   * method body is checked.
    *
    * @param ex the method to check
    * @param fieldsToLog the fields that will already be logged
