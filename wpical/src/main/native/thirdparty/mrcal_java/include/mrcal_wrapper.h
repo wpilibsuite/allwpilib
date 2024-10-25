@@ -21,12 +21,6 @@ extern "C" {
 
 } // extern "C"
 
-// Seems like these people don't properly extern-c their headers either
-extern "C" {
-#include <suitesparse/SuiteSparse_config.h>
-#include <suitesparse/cholmod_core.h>
-} // extern "C"
-
 #include <memory>
 #include <opencv2/opencv.hpp>
 #include <span>

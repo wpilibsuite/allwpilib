@@ -93,7 +93,7 @@ model {
                         include '**/*.c'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/mrcal/generated', 'src/main/native/thirdparty/mrcal/include', 'src/main/native/thirdparty/mrcal/include/minimath', 'src/main/native/thirdparty/libdogleg/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/mrcal/generated', 'src/main/native/thirdparty/mrcal/include', 'src/main/native/thirdparty/mrcal/include/minimath', 'src/main/native/thirdparty/libdogleg/include', 'src/main/native/thirdparty/suitesparse_cholmod/include'
                     }
                 }
                 if (OperatingSystem.current().isWindows()) {

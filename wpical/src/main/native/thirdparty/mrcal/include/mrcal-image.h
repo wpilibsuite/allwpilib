@@ -95,24 +95,24 @@ bool mrcal_image_ ## Tname ## _load( mrcal_image_ ## Tname ## _t*  image, const 
 
 
 // Common images types
-MRCAL_IMAGE_DECLARE(uint8_t,     uint8);
-MRCAL_IMAGE_DECLARE(uint16_t,    uint16);
-MRCAL_IMAGE_DECLARE(mrcal_bgr_t, bgr);
-MRCAL_IMAGE_SAVE_LOAD_DECLARE(uint8_t,     uint8);
-MRCAL_IMAGE_SAVE_LOAD_DECLARE(uint16_t,    uint16);
-MRCAL_IMAGE_SAVE_LOAD_DECLARE(mrcal_bgr_t, bgr);
+MRCAL_IMAGE_DECLARE(uint8_t,     uint8)
+MRCAL_IMAGE_DECLARE(uint16_t,    uint16)
+MRCAL_IMAGE_DECLARE(mrcal_bgr_t, bgr)
+MRCAL_IMAGE_SAVE_LOAD_DECLARE(uint8_t,     uint8)
+MRCAL_IMAGE_SAVE_LOAD_DECLARE(uint16_t,    uint16)
+MRCAL_IMAGE_SAVE_LOAD_DECLARE(mrcal_bgr_t, bgr)
 
 // Uncommon types. Not everything supports these
-MRCAL_IMAGE_DECLARE(int8_t,  int8);
-MRCAL_IMAGE_DECLARE(int16_t, int16);
+MRCAL_IMAGE_DECLARE(int8_t,  int8)
+MRCAL_IMAGE_DECLARE(int16_t, int16)
 
-MRCAL_IMAGE_DECLARE(int32_t,  int32);
-MRCAL_IMAGE_DECLARE(uint32_t, uint32);
-MRCAL_IMAGE_DECLARE(int64_t,  int64);
-MRCAL_IMAGE_DECLARE(uint64_t, uint64);
+MRCAL_IMAGE_DECLARE(int32_t,  int32)
+MRCAL_IMAGE_DECLARE(uint32_t, uint32)
+MRCAL_IMAGE_DECLARE(int64_t,  int64)
+MRCAL_IMAGE_DECLARE(uint64_t, uint64)
 
-MRCAL_IMAGE_DECLARE(float,    float);
-MRCAL_IMAGE_DECLARE(double,   double);
+MRCAL_IMAGE_DECLARE(float,    float)
+MRCAL_IMAGE_DECLARE(double,   double)
 
 // Load the image into whatever type is stored on disk
 bool mrcal_image_anytype_load(// output
