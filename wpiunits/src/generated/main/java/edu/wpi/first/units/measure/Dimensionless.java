@@ -278,6 +278,17 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
 
 
   @Override
+  default Resistance times(Resistance multiplier) {
+    return Ohms.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  @Override
+  default Per<DimensionlessUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<DimensionlessUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Temperature times(Temperature multiplier) {
     return Kelvin.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }

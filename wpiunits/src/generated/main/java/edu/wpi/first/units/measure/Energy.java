@@ -278,6 +278,17 @@ public interface Energy extends Measure<EnergyUnit> {
 
 
   @Override
+  default Mult<EnergyUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<EnergyUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<EnergyUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<EnergyUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<EnergyUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<EnergyUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }
