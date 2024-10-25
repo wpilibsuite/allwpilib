@@ -44,7 +44,7 @@ cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 cppProjectZips.add(project(':romiVendordep').cppHeadersZip)
 cppProjectZips.add(project(':xrpVendordep').cppHeadersZip)
 
-tasks.register("cmakeDoxygen", Zip) {
+tasks.register("cmakeDoxygen") {
     doLast {
         exec {
             workingDir rootDir
