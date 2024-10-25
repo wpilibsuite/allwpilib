@@ -105,12 +105,24 @@ class Alert {
   void Set(bool active);
 
   /**
+   * Gets whether the alert is active.
+   * @return whether the alert is active.
+   */
+  bool Get() const;
+
+  /**
    * Updates current alert text. Use this method to dynamically change the
    * displayed alert, such as including more details about the detected problem.
    *
    * @param text Text to be displayed when the alert is active.
    */
   void SetText(std::string_view text);
+
+  /**
+   * Gets the current alert text.
+   * @return the current text.
+   */
+  std::string GetText() const;
 
  private:
   class PublishedAlert {

@@ -21,6 +21,7 @@
 
 using namespace frc;
 
+// TODO: throw if matching (group, text, type) already constructed
 Alert::Alert(std::string_view text, AlertType type)
     : Alert("Alerts", text, type) {}
 
@@ -66,6 +67,10 @@ void Alert::Set(bool active) {
   m_active = active;
 }
 
+bool Alert::Get() const {
+  return m_active;
+}
+
 void Alert::SetText(std::string_view text) {
   if (text == m_text) {
     return;
@@ -80,6 +85,10 @@ void Alert::SetText(std::string_view text) {
     auto hint = set.erase(iter);
     set.emplace_hint(hint, m_activeStartTime, m_text);
   }
+}
+
+std::string Alert::GetText() const {
+  return m_text;
 }
 
 Alert::SendableAlerts::SendableAlerts() {

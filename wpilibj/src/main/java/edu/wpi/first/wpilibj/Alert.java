@@ -124,6 +124,15 @@ public class Alert implements AutoCloseable {
   }
 
   /**
+   * Gets whether the alert is active.
+   *
+   * @return whether the alert is active.
+   */
+  public boolean get() {
+    return m_active;
+  }
+
+  /**
    * Updates current alert text. Use this method to dynamically change the displayed alert, such as
    * including more details about the detected problem.
    *
@@ -141,6 +150,15 @@ public class Alert implements AutoCloseable {
           new PublishedAlert(m_activeStartTime, oldText)); // TODO: cache instead of constructing
       set.add(new PublishedAlert(m_activeStartTime, m_text));
     }
+  }
+
+  /**
+   * Gets the current alert text.
+   *
+   * @return the current text.
+   */
+  public String getText() {
+    return m_text;
   }
 
   private record PublishedAlert(long timestamp, String text) implements Comparable<PublishedAlert> {
