@@ -168,7 +168,7 @@ nativeUtils.exportsConfigs {
 
 cppHeadersZip {
     def thirdpartyIncDirs = [
-    'src/main/native/thirdparty/argparse/include/',
+    'src/main/native/thirdparty/argparse/include',
     'src/main/native/thirdparty/expected/include',
     'src/main/native/thirdparty/fmtlib/include',
     'src/main/native/thirdparty/json/include',
