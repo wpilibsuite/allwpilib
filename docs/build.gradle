@@ -59,6 +59,7 @@ tasks.register("cmakeDoxygen") {
                 "-DWITH_WPILIB=OFF",
                 "-DWITH_WPIMATH=OFF",
                 "-DWITH_DOCS=ON",
+                "-DWITH_PROTOBUFF=OFF",
             ]
             commandLine args
         }
