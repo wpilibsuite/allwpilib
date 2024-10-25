@@ -183,7 +183,7 @@ jobs:
           distribution: 'temurin'
           java-version: 17
       - name: Install Ninja
-        run: sudo apt update -q && sudo apt install ninja-build -y
+        run: sudo apt update -q && sudo apt install ninja-build doxygen -y
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         if: startsWith(github.ref, 'refs/tags/v')
