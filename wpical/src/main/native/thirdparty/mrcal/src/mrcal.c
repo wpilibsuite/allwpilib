@@ -446,7 +446,7 @@ int mrcal_measurement_index_points(int i_observation_point,
         i_observation_point * 2;
 }
 
-// #warning "triangulated-solve: need known-range points, at-infinity points"
+#warning "triangulated-solve: need known-range points, at-infinity points"
 
 int mrcal_num_measurements_points(int Nobservations_point)
 {
@@ -454,7 +454,7 @@ int mrcal_num_measurements_points(int Nobservations_point)
     return Nobservations_point * 2;
 }
 
-// #warning "triangulated-solve: Add a test for mrcal_measurement_index_points_triangulated()"
+#warning "triangulated-solve: Add a test for mrcal_measurement_index_points_triangulated()"
 int mrcal_measurement_index_points_triangulated(int i_point_triangulated,
                                                 int Nobservations_board,
                                                 int Nobservations_point,
@@ -480,7 +480,7 @@ int mrcal_measurement_index_points_triangulated(int i_point_triangulated,
                                                                    i_point_triangulated);
 }
 
-// #warning "triangulated-solve: python-wrap this function"
+#warning "triangulated-solve: python-wrap this function"
 int mrcal_num_measurements_points_triangulated_initial_Npoints(// May be NULL if we don't have any of these
                                                                const mrcal_observation_point_triangulated_t* observations_point_triangulated,
                                                                int Nobservations_point_triangulated,
@@ -526,7 +526,7 @@ int mrcal_num_measurements_points_triangulated(// May be NULL if we don't have a
                                                                     -1 );
 }
 
-// #warning "triangulated-solve: python-wrap this function"
+#warning "triangulated-solve: python-wrap this function"
 bool mrcal_decode_observation_indices_points_triangulated(
     // output
     int* iobservation0,
@@ -650,7 +650,7 @@ bool mrcal_decode_observation_indices_points_triangulated(
 
 
 int mrcal_measurement_index_regularization(
-// #warning "triangulated-solve: this argument order is weird. Put then triangulated stuff at the end?"
+#warning "triangulated-solve: this argument order is weird. Put then triangulated stuff at the end?"
                                            // May be NULL if we don't have any of these
                                            const mrcal_observation_point_triangulated_t* observations_point_triangulated,
                                            int Nobservations_point_triangulated,
@@ -862,7 +862,7 @@ int _mrcal_num_j_nonzero(int Nobservations_board,
        problem_selections.do_optimize_extrinsics &&
        Ncameras_extrinsics > 0)
     {
-// #warning "triangulated-solve: I assume that camera0 is at the reference"
+#warning "triangulated-solve: I assume that camera0 is at the reference"
         N += 3; // translation only
     }
 
@@ -1128,7 +1128,7 @@ void project_cahvor( // outputs
     double mu = r0 + tau*r1 + tau*tau*r2;
     double s__dmu_dalphabeta__domega_dalphabeta = dmu_dtau * s__dtau_dalphabeta__domega_dalphabeta;
 
-    double  dpdistorted_dpcam[3*3] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    double  dpdistorted_dpcam[3*3] = {};
     double  dpdistorted_ddistortion[3*NdistortionParams];
 
     for(int i=0; i<3; i++)
@@ -1488,7 +1488,7 @@ void mrcal_unproject_pinhole( // output
         {
             dv_dq[3*i + 0] = (mrcal_point2_t){.x = fx_recip};
             dv_dq[3*i + 1] = (mrcal_point2_t){.y = fy_recip};
-            dv_dq[3*i + 2] = (mrcal_point2_t){.x = 0, .y = 0};
+            dv_dq[3*i + 2] = (mrcal_point2_t){};
         }
     }
 }
@@ -2757,7 +2757,7 @@ void project( // out
         mrcal_point3_t p =
             _propagate_extrinsics( _dp_drc,_dp_dtc,_dp_drf,_dp_dtf,
                                    &dp_drc,&dp_dtc,&dp_drf,&dp_dtf,
-                                   &(mrcal_point3_t){.x = 0,.y = 0,.z = 0},
+                                   &(mrcal_point3_t){},
                                    camera_at_identity ? NULL : &gg,
                                    Rj, d_Rj_rj, &joint_rt[3]);
         _project_point(  q,
@@ -2784,7 +2784,7 @@ void project( // out
             {
                 mrcal_point3_t pt_ref = {.x = (double)x * calibration_object_spacing,
                                          .y = (double)y * calibration_object_spacing};
-                mrcal_calobject_warp_t dpt_refz_dwarp = {.x2=0,.y2=0};
+                mrcal_calobject_warp_t dpt_refz_dwarp = {};
 
                 if(calobject_warp != NULL)
                 {
@@ -2880,7 +2880,7 @@ bool _mrcal_project_internal( // out
     {
         for(int i=0; i<N; i++)
         {
-            mrcal_pose_t frame = {.r = {.x=0,.y=0,.z=0},
+            mrcal_pose_t frame = {.r = {},
                             .t = p[i]};
 
             // simple non-intrinsics-gradient path
@@ -2904,7 +2904,7 @@ bool _mrcal_project_internal( // out
 
     for(int i=0; i<N; i++)
     {
-        mrcal_pose_t frame = {.r = {.x=0,.y=0,.z=0},
+        mrcal_pose_t frame = {.r = {},
                               .t = p[i]};
 
         // simple non-intrinsics-gradient path
@@ -2912,7 +2912,7 @@ bool _mrcal_project_internal( // out
         int    dq_dintrinsics_pool_int   [1];
         double* dq_dfxy               = NULL;
         double* dq_dintrinsics_nocore = NULL;
-        gradient_sparse_meta_t gradient_sparse_meta; // init to pacify compiler warning
+        gradient_sparse_meta_t gradient_sparse_meta = {}; // init to pacify compiler warning
 
         project( &q[i],
 
@@ -3115,7 +3115,7 @@ void _unproject_callback(const double*   u,
     // projection of the hypothesis v. I unproject it stereographically,
     // and project it using the actual model
     mrcal_point2_t dv_du[3];
-    mrcal_pose_t frame = {.r={.x=0,.y=0,.z=0},.t={.x=0,.y=0,.z=0}};
+    mrcal_pose_t frame = {};
     mrcal_unproject_stereographic( &frame.t, dv_du,
                                    (mrcal_point2_t*)u, 1,
                                    cookie->intrinsics );
@@ -3989,7 +3989,7 @@ bool markOutliers(// output, input
                   int Nobservations_board,
                   int Nobservations_point,
 
-// #warning "triangulated-solve: not const because this is where the outlier bit lives currently"
+#warning "triangulated-solve: not const because this is where the outlier bit lives currently"
                   mrcal_observation_point_triangulated_t* observations_point_triangulated,
                   int Nobservations_point_triangulated,
 
@@ -4057,12 +4057,14 @@ bool markOutliers(// output, input
         i_observation_board++)
 
 #define LOOP_BOARD_FEATURE()                                            \
-        const mrcal_observation_board_t* __attribute__((unused)) observation = &observations_board[i_observation_board]; \
+        const mrcal_observation_board_t* observation = &observations_board[i_observation_board]; \
+        const int icam_intrinsics = observation->icam.intrinsics;       \
         for(int i_pt=0;                                                    \
             i_pt < calibration_object_width_n*calibration_object_height_n; \
             i_pt++, i_pt_board++)
 
 #define LOOP_BOARD_FEATURE_HEADER()                                     \
+            const mrcal_point3_t* pt_observed = &observations_board_pool[i_pt_board]; \
             double* weight = &observations_board_pool[i_pt_board].z;
 
 #define LOOP_TRIANGULATED_POINT0(extra_while_condition) \
@@ -4215,7 +4217,7 @@ bool markOutliers(// output, input
                     pt0->outlier = true;
                     pt1->outlier = true;
                     foundNewOutliers = true;
-// #warning "triangulated-solve: outliers should not be marked in this first loop. This should happen in the following loop. Putting it here breaks the logic"
+#warning "triangulated-solve: outliers should not be marked in this first loop. This should happen in the following loop. Putting it here breaks the logic"
 
 
                     // There are a lot of these, so I'm disabling this print for
@@ -4363,7 +4365,7 @@ bool markOutliers(// output, input
 
                     (*Noutliers_triangulated_point)++;
 
-// #warning "triangulated-solve: outliers not returned to the caller yet, so I simply print them out here"
+#warning "triangulated-solve: outliers not returned to the caller yet, so I simply print them out here"
                     MSG("New outliers found: measurement %d observation (%d,%d)",
                         imeasurement_point_triangulated0 + imeasurement_point_triangulated,
                         i0, i1);
@@ -4426,35 +4428,35 @@ typedef struct
     const int Nmeasurements, N_j_nonzero, Nintrinsics;
 } callback_context_t;
 
-// static
-// void penalty_range_normalization(// out
-//                                  double* penalty, double* dpenalty_ddistsq,
+static
+void penalty_range_normalization(// out
+                                 double* penalty, double* dpenalty_ddistsq,
 
-//                                  // in
-//                                  // SIGNED distance. <0 means "behind the camera"
-//                                  const double distsq,
-//                                  const callback_context_t* ctx,
-//                                  const double weight)
-// {
-//     const double maxsq = ctx->problem_constants->point_max_range*ctx->problem_constants->point_max_range;
-//     if(distsq > maxsq)
-//     {
-//         *penalty = weight * (distsq/maxsq - 1.0);
-//         *dpenalty_ddistsq = weight*(1. / maxsq);
-//         return;
-//     }
+                                 // in
+                                 // SIGNED distance. <0 means "behind the camera"
+                                 const double distsq,
+                                 const callback_context_t* ctx,
+                                 const double weight)
+{
+    const double maxsq = ctx->problem_constants->point_max_range*ctx->problem_constants->point_max_range;
+    if(distsq > maxsq)
+    {
+        *penalty = weight * (distsq/maxsq - 1.0);
+        *dpenalty_ddistsq = weight*(1. / maxsq);
+        return;
+    }
 
-//     const double minsq = ctx->problem_constants->point_min_range*ctx->problem_constants->point_min_range;
-//     if(distsq < minsq)
-//     {
-//         // too close OR behind the camera
-//         *penalty = weight*(1.0 - distsq/minsq);
-//         *dpenalty_ddistsq = weight*(-1. / minsq);
-//         return;
-//     }
+    const double minsq = ctx->problem_constants->point_min_range*ctx->problem_constants->point_min_range;
+    if(distsq < minsq)
+    {
+        // too close OR behind the camera
+        *penalty = weight*(1.0 - distsq/minsq);
+        *dpenalty_ddistsq = weight*(-1. / minsq);
+        return;
+    }
 
-//     *penalty = *dpenalty_ddistsq = 0.0;
-// }
+    *penalty = *dpenalty_ddistsq = 0.0;
+}
 static
 void optimizer_callback(// input state
                        const double*   packed_state,
@@ -4548,7 +4550,7 @@ void optimizer_callback(// input state
     double intrinsics_all[ctx->Ncameras_intrinsics][ctx->Nintrinsics];
     mrcal_pose_t camera_rt[ctx->Ncameras_extrinsics];
 
-    mrcal_calobject_warp_t calobject_warp_local = {.x2=0,.y2=0};
+    mrcal_calobject_warp_t calobject_warp_local = {};
     const int i_var_calobject_warp =
         mrcal_state_index_calobject_warp(ctx->Ncameras_intrinsics, ctx->Ncameras_extrinsics,
                                          ctx->Nframes,
@@ -4679,7 +4681,7 @@ void optimizer_callback(// input state
         int    dq_dintrinsics_pool_int   [ctx->calibration_object_width_n*ctx->calibration_object_height_n];
         double* dq_dfxy = NULL;
         double* dq_dintrinsics_nocore = NULL;
-        gradient_sparse_meta_t gradient_sparse_meta;
+        gradient_sparse_meta_t gradient_sparse_meta = {};
 
         int splined_intrinsics_grad_irun = 0;
 
@@ -5056,7 +5058,7 @@ void optimizer_callback(// input state
         int    dq_dintrinsics_pool_int   [1];
         double* dq_dfxy                             = NULL;
         double* dq_dintrinsics_nocore               = NULL;
-        gradient_sparse_meta_t gradient_sparse_meta;
+        gradient_sparse_meta_t gradient_sparse_meta = {};
 
         mrcal_point3_t dq_drcamera[2];
         mrcal_point3_t dq_dtcamera[2];
@@ -5321,8 +5323,8 @@ void optimizer_callback(// input state
             assert(0);
         }
 
-// #warning "triangulated-solve: mrcal_observation_point_t.px is the observation vector in camera coords. No outliers. No intrinsics"
-// #warning "triangulated-solve: make weights work somehow. This is tied to outliers"
+#warning "triangulated-solve: mrcal_observation_point_t.px is the observation vector in camera coords. No outliers. No intrinsics"
+#warning "triangulated-solve: make weights work somehow. This is tied to outliers"
 
         for(int i0 = 0;
             i0 < ctx->Nobservations_point_triangulated;
@@ -6081,7 +6083,7 @@ void optimizer_callback(// input state
 
             // compute scales
             {
-// #warning "triangulated-solve: better unity_cam01 scale"
+#warning "triangulated-solve: better unity_cam01 scale"
                 double normal_unity_cam01_value = 1.0;
 
                 double expected_regularization_unity_cam01_error_sq_noscale =
@@ -6299,9 +6301,9 @@ bool mrcal_optimizer_callback(// out
         goto done;
     }
 
-    // const int Npoints_fromBoards =
-    //     Nobservations_board *
-    //     calibration_object_width_n*calibration_object_height_n;
+    const int Npoints_fromBoards =
+        Nobservations_board *
+        calibration_object_width_n*calibration_object_height_n;
 
     const callback_context_t ctx = {
         .intrinsics                 = intrinsics,
@@ -6450,7 +6452,7 @@ mrcal_optimize( // out
         // callback. And because I must optimize SOMETHING, so if I have fixed
         // intrinsics then the extrinsics cannot be fixed
         return (mrcal_stats_t){.rms_reproj_error__pixels = -1.0};
-// #warning "triangulated-solve: can I loosen this? Optimizing intrinsics and triangulated points together should work"
+#warning "triangulated-solve: can I loosen this? Optimizing intrinsics and triangulated points together should work"
     }
 
     if(!modelHasCore_fxfycxcy(lensmodel))
@@ -6481,9 +6483,9 @@ mrcal_optimize( // out
     // dogleg_parameters.trustregion_increase_factor    = 4.0
     // dogleg_parameters.trustregion_increase_threshold = 0.75;
 
-    // const int Npoints_fromBoards =
-    //     Nobservations_board *
-    //     calibration_object_width_n*calibration_object_height_n;
+    const int Npoints_fromBoards =
+        Nobservations_board *
+        calibration_object_width_n*calibration_object_height_n;
 
     callback_context_t ctx = {
         .intrinsics                 = intrinsics,
@@ -6601,9 +6603,9 @@ mrcal_optimize( // out
         for(int i=0; i<Nmeasurements_board/2; i++)
             if(observations_board_pool[i].z < 0.0)
                 stats.Noutliers_board++;
-// #warning "triangulated-solve: check for point outliers here as well. Pull the triangulated-point outlier code out of markOutliers, and call it here (divergent-ray finder and looking at marked outliers)"
+#warning "triangulated-solve: check for point outliers here as well. Pull the triangulated-point outlier code out of markOutliers, and call it here (divergent-ray finder and looking at marked outliers)"
 
-        // double outliernessScale = -1.0;
+        double outliernessScale = -1.0;
         do
         {
             if(solver_context != NULL)
@@ -6638,15 +6640,20 @@ mrcal_optimize( // out
                               observations_board,
                               Nobservations_board,
                               Nobservations_point,
-// #warning "triangulated-solve: not const for now. this will become const once the outlier bit moves to the point_triangulated pool"
+#warning "triangulated-solve: not const for now. this will become const once the outlier bit moves to the point_triangulated pool"
                               (mrcal_observation_point_triangulated_t*)observations_point_triangulated,
                               Nobservations_point_triangulated,
                               calibration_object_width_n,
                               calibration_object_height_n,
                               solver_context->beforeStep->x,
                               extrinsics_fromref,
-                              verbose));
-// #warning "triangulated-solve: the above print should deal with triangulated points too"
+                              verbose) &&
+                 ({MSG("Threw out some outliers. New count = %d/%d (%.1f%%). Going again",
+                       stats.Noutliers_board,
+                       Nmeasurements_board,
+                       (double)(stats.Noutliers_board * 100) / (double)Nmeasurements_board);
+                   true;}));
+#warning "triangulated-solve: the above print should deal with triangulated points too"
 
 
         // Done. I have the final state. I spit it back out
@@ -6770,7 +6777,7 @@ mrcal_optimize( // out
                                 (dogleg_callback_t*)&optimizer_callback, &ctx);
 
     stats.rms_reproj_error__pixels =
-// #warning "triangulated-solve: not correct for triangulated points either: 1 measurement, not 2"
+#warning "triangulated-solve: not correct for triangulated points either: 1 measurement, not 2"
         // THIS IS NOT CORRECT FOR POINTS. I have 3 measurements for points currently
         sqrt(norm2_error / (double)ctx.Nmeasurements);
 
@@ -6841,4 +6848,4 @@ bool mrcal_write_cameramodel_file(const char* filename,
 }
 
 
-// #warning "triangulated-solve: fixed points should live in a separate array, instead of at the end of the 'points' array"
+#warning "triangulated-solve: fixed points should live in a separate array, instead of at the end of the 'points' array"
