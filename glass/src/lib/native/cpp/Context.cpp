@@ -38,7 +38,7 @@ static void WorkspaceResetImpl() {
 
   // clear storage
   for (auto&& root : gContext->storageRoots) {
-    root.second->Clear();
+    root.second.Clear();
   }
 
   // ImGui reset
@@ -53,7 +53,7 @@ static void WorkspaceInit() {
   }
 
   for (auto&& root : gContext->storageRoots) {
-    root.second->Apply();
+    root.second.Apply();
   }
 }
 
@@ -152,19 +152,14 @@ static bool LoadStorageRootImpl(Context* ctx, const std::string& filename,
                    fileBuffer.error().message().c_str());
     return false;
   }
-  auto& storage = ctx->storageRoots[rootName];
-  bool createdStorage = false;
-  if (!storage) {
-    storage = std::make_unique<Storage>();
-    createdStorage = true;
-  }
+  auto [it, createdStorage] = ctx->storageRoots.try_emplace(rootName);
   try {
-    storage->FromJson(wpi::json::parse(fileBuffer.value()->GetCharBuffer()),
-                      filename.c_str());
+    it->second.FromJson(wpi::json::parse(fileBuffer.value()->GetCharBuffer()),
+                        filename.c_str());
   } catch (wpi::json::parse_error& e) {
     ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());
     if (createdStorage) {
-      ctx->storageRoots.erase(rootName);
+      ctx->storageRoots.erase(it);
     }
     return false;
   }
@@ -311,7 +306,7 @@ static bool SaveStorageImpl(Context* ctx, std::string_view dir,
     } else {
       filename = (dirPath / fmt::format("{}-{}.json", name, rootName)).string();
     }
-    if (!SaveStorageRootImpl(ctx, filename, *root.second)) {
+    if (!SaveStorageRootImpl(ctx, filename, root.second)) {
       rv = false;
     }
   }
@@ -319,9 +314,9 @@ static bool SaveStorageImpl(Context* ctx, std::string_view dir,
 }
 
 Context::Context()
-    : sourceNameStorage{storageRoots.insert({"", std::make_unique<Storage>()})
-                            .first->second->GetChild("sourceNames")} {
-  storageStack.emplace_back(storageRoots[""].get());
+    : sourceNameStorage{
+          storageRoots.try_emplace("").first->second.GetChild("sourceNames")} {
+  storageStack.emplace_back(&storageRoots[""]);
 
   // override ImGui ini saving
   wpi::gui::ConfigureCustomSaveSettings(
@@ -434,11 +429,7 @@ Storage& glass::GetCurStorageRoot() {
 }
 
 Storage& glass::GetStorageRoot(std::string_view rootName) {
-  auto& storage = gContext->storageRoots[rootName];
-  if (!storage) {
-    storage = std::make_unique<Storage>();
-  }
-  return *storage;
+  return gContext->storageRoots[rootName];
 }
 
 void glass::ResetStorageStack(std::string_view rootName) {
