@@ -167,32 +167,23 @@ nativeUtils.exportsConfigs {
 }
 
 cppHeadersZip {
-    from('src/main/native/thirdparty/argparse/include/') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/expected/include') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/fmtlib/include') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/json/include') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/llvm/include') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/mpack/include') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/sigslot/include') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/memory/include') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/protobuf/include') {
-        into '/'
+    def thirdpartyIncDirs = [
+        'src/main/native/thirdparty/argparse/include',
+        'src/main/native/thirdparty/expected/include',
+        'src/main/native/thirdparty/fmtlib/include',
+        'src/main/native/thirdparty/json/include',
+        'src/main/native/thirdparty/llvm/include',
+        'src/main/native/thirdparty/mpack/include',
+        'src/main/native/thirdparty/sigslot/include',
+        'src/main/native/thirdparty/memory/include',
+        'src/main/native/thirdparty/protobuf/include'
+    ]
+
+    thirdpartyIncDirs.each {
+        ext.includeDirs << project.file(it)
+        from(it) {
+            into '/'
+        }
     }
 }
 
