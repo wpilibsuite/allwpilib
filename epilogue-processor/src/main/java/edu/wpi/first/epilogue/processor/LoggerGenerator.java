@@ -7,6 +7,10 @@ package edu.wpi.first.epilogue.processor;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
+import com.sun.source.tree.IdentifierTree;
+import com.sun.source.tree.ReturnTree;
+import com.sun.source.util.SimpleTreeVisitor;
+import com.sun.source.util.Trees;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import java.io.IOException;
@@ -91,7 +95,7 @@ public class LoggerGenerator {
               .toList();
     }
 
-    var methodsToLog =
+    List<ExecutableElement> methodsToLog =
         clazz.getEnclosedElements().stream()
             .filter(e -> e instanceof ExecutableElement)
             .map(e -> (ExecutableElement) e)
@@ -103,6 +107,7 @@ public class LoggerGenerator {
             .filter(e -> e.getReceiverType() != null)
             .filter(kIsBuiltInJavaMethod.negate())
             .filter(this::isLoggable)
+            .filter(e -> !isSimpleGetterMethodForLoggedField(e, fieldsToLog))
             .toList();
 
     // Validate no name collisions
@@ -310,5 +315,51 @@ public class LoggerGenerator {
 
   private boolean isLoggable(Element element) {
     return m_handlers.stream().anyMatch(h -> h.isLoggable(element));
+  }
+
+  /**
+   * Checks if a method is a simple "getter" method for a field in the given list. Here, we define
+   * "getter" as a method with a single return statement that references the name of a field, with
+   * no other expressions. `getX() { return x; }` would be considered a "getter" method, while
+   * `getX() { return x.clone(); }` would not be. Note that the method name is irrelevant; only
+   * the method body is checked.
+   *
+   * @param ex the method to check
+   * @param fieldsToLog the fields that will already be logged
+   * @return true if the method is a simple "getter" method, false otherwise
+   */
+  private boolean isSimpleGetterMethodForLoggedField(
+      ExecutableElement ex, List<VariableElement> fieldsToLog) {
+    var trees = Trees.instance(m_processingEnv);
+    var methodTree = trees.getTree(ex);
+
+    if (methodTree == null) {
+      // probably a record's synthetic reader method
+      return false;
+    }
+
+    var statements = methodTree.getBody().getStatements();
+    if (statements.size() != 1) {
+      // More complex than a simple `return m_field` statement
+      return false;
+    }
+
+    var statement = statements.get(0);
+    if (!(statement instanceof ReturnTree ret)) {
+      // Shouldn't get here, since we've already filtered for methods that return a value
+      // and with a single statement - that one statement should be the return
+      return false;
+    }
+
+    var returnExpression = ret.getExpression();
+    return returnExpression.accept(
+        new SimpleTreeVisitor<Boolean, Void>(false) {
+          @Override
+          public Boolean visitIdentifier(IdentifierTree identifier, Void unused) {
+            return fieldsToLog.stream()
+                .anyMatch(v -> v.getSimpleName().contentEquals(identifier.getName()));
+          }
+        },
+        null);
   }
 }
