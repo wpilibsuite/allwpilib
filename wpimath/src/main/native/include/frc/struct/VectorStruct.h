@@ -21,13 +21,28 @@ struct wpi::Struct<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
   static constexpr std::string_view GetSchema() { return kSchema; }
 
   static frc::Matrixd<Size, 1, Options, MaxRows, MaxCols> Unpack(
-      std::span<const uint8_t> data);
+      std::span<const uint8_t> data) {
+    constexpr size_t kDataOff = 0;
+    wpi::array<double, Size> vec_data =
+        wpi::UnpackStructArray<double, kDataOff, Size>(data);
+    frc::Matrixd<Size, 1, Options, MaxRows, MaxCols> vec;
+    for (int i = 0; i < Size; i++) {
+      vec(i) = vec_data[i];
+    }
+    return vec;
+  }
+
   static void Pack(
       std::span<uint8_t> data,
-      const frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>& value);
+      const frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>& value) {
+    constexpr size_t kDataOff = 0;
+    wpi::array<double, Size> vec_data(wpi::empty_array);
+    for (int i = 0; i < Size; i++) {
+      vec_data[i] = value(i);
+    }
+    wpi::PackStructArray<kDataOff, Size>(data, vec_data);
+  }
 };
 
 static_assert(wpi::StructSerializable<frc::Vectord<1>>);
 static_assert(wpi::StructSerializable<frc::Vectord<3>>);
-
-#include "frc/struct/VectorStruct.inc"

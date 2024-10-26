@@ -134,6 +134,8 @@ public class PoseEstimator<T> {
   public void resetPose(Pose2d pose) {
     m_odometry.resetPose(pose);
     m_odometryPoseBuffer.clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.getPoseMeters();
   }
 
   /**
@@ -144,6 +146,8 @@ public class PoseEstimator<T> {
   public void resetTranslation(Translation2d translation) {
     m_odometry.resetTranslation(translation);
     m_odometryPoseBuffer.clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.getPoseMeters();
   }
 
   /**
@@ -154,6 +158,8 @@ public class PoseEstimator<T> {
   public void resetRotation(Rotation2d rotation) {
     m_odometry.resetRotation(rotation);
     m_odometryPoseBuffer.clear();
+    m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.getPoseMeters();
   }
 
   /**

@@ -278,6 +278,17 @@ public interface LinearAcceleration extends Measure<LinearAccelerationUnit> {
 
 
   @Override
+  default Mult<LinearAccelerationUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<LinearAccelerationUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<LinearAccelerationUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<LinearAccelerationUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<LinearAccelerationUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<LinearAccelerationUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }

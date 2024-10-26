@@ -857,7 +857,7 @@
       "Command-based",
       "DataLog"
     ],
-    "foldername": "sysid",
+    "foldername": "sysidroutine",
     "gradlebase": "java",
     "commandversion": 2,
     "mainclass": "Main"

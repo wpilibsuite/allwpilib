@@ -278,6 +278,17 @@ public interface Mass extends Measure<MassUnit> {
 
 
   @Override
+  default Mult<MassUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<MassUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<MassUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<MassUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<MassUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<MassUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }
