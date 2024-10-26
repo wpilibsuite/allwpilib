@@ -152,7 +152,7 @@ jobs:
   Robotpy:
     name: "Build - Robotpy"
     needs: [build-artifacts]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -181,7 +181,7 @@ jobs:
       # uses: hendrikmuhs/ccache-action@v1.2.10
       uses: robotpy/ccache-action@fork
       with:
-          key: ubuntu-24.04-3.13
+          key: ubuntu-22.04-3.13
           variant: ccache
           max-size: ${{ steps.ccache.outputs.max_size }}
 
