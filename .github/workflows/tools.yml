@@ -193,7 +193,7 @@ jobs:
     - name: Install numpy (needed for stubgen but broken in raspbian CI)
       shell: bash
       run: |
-        python -m pip --disable-pip-version-check install 'numpy<2'
+        python -m pip --disable-pip-version-check install numpy
     - name: Patch RobotPy rdev to use local development
       run: git config user.name github-actions && git config user.email github-actions@github.com && set -- ~/releases/maven/development/edu/wpi/first/wpiutil/wpiutil-cpp/*/ ; wpilibversion=$(basename $1) && echo $wpilibversion && sed --regexp-extended -i 's@(wpilib_bin_url =).*@\1 \"file:\/\/'"$HOME"'\/releases\/maven\/development"@' rdev.toml && sed --regexp-extended -i 's/(wpilib_bin_version =).*/\1 \"'"$wpilibversion"'\"/' rdev.toml && ./rdev.sh update-pyproject --commit
     - name: Build + test wheels
