@@ -66,6 +66,14 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
 option(WITH_JAVA "Include Java and JNI in the build" OFF)
 option(WITH_JAVA_SOURCE "Build Java source jars" ${WITH_JAVA})
+option(WITH_DOCS "Build Doxygen docs (needs Git for versioning)" OFF)
+cmake_dependent_option(
+    DOCS_WARNINGS_AS_ERRORS
+    "Make docs warnings into errors"
+    OFF
+    WITH_DOCS
+    OFF
+)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
@@ -129,6 +137,12 @@ else()
     find_package(Java REQUIRED COMPONENTS Runtime)
 endif()
 
+if(WITH_DOCS)
+    find_package(Doxygen REQUIRED)
+    find_package(Git REQUIRED)
+    include(AddDoxygenDocs)
+    add_doxygen_docs()
+endif()
 find_package(LIBSSH CONFIG 0.7.1)
 
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
