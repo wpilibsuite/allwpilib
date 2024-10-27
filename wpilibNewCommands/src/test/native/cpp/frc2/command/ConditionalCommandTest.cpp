@@ -56,34 +56,30 @@ TEST_F(ConditionalCommandTest, ConditionalCommandRequirement) {
 }
 
 TEST_F(ConditionalCommandTest, AllTrue) {
-  CommandPtr command =
-      cmd::Either(cmd::Run([] {}, {}).IgnoringDisable(true),
-                  cmd::Run([] {}, {}).IgnoringDisable(true),
-                  [] { return true; });
+  CommandPtr command = cmd::Either(cmd::Run([] {}, {}).IgnoringDisable(true),
+                                   cmd::Run([] {}, {}).IgnoringDisable(true),
+                                   [] { return true; });
   EXPECT_EQ(true, command.get()->RunsWhenDisabled());
 }
 
 TEST_F(ConditionalCommandTest, AllFalse) {
-  CommandPtr command =
-      cmd::Either(cmd::Run([] {}, {}).IgnoringDisable(false),
-                  cmd::Run([] {}, {}).IgnoringDisable(false),
-                  [] { return true; });
+  CommandPtr command = cmd::Either(cmd::Run([] {}, {}).IgnoringDisable(false),
+                                   cmd::Run([] {}, {}).IgnoringDisable(false),
+                                   [] { return true; });
   EXPECT_EQ(false, command.get()->RunsWhenDisabled());
 }
 
 TEST_F(ConditionalCommandTest, OneTrueOneFalse) {
-  CommandPtr command =
-      cmd::Either(cmd::Run([] {}, {}).IgnoringDisable(true),
-                  cmd::Run([] {}, {}).IgnoringDisable(false),
-                  [] { return true; });
+  CommandPtr command = cmd::Either(cmd::Run([] {}, {}).IgnoringDisable(true),
+                                   cmd::Run([] {}, {}).IgnoringDisable(false),
+                                   [] { return true; });
   EXPECT_EQ(false, command.get()->RunsWhenDisabled());
 }
 
 TEST_F(ConditionalCommandTest, TwoFalseOneTrue) {
-  CommandPtr command =
-      cmd::Either(cmd::Run([] {}, {}).IgnoringDisable(false),
-                  cmd::Run([] {}, {}).IgnoringDisable(true),
-                  [] { return true; });
+  CommandPtr command = cmd::Either(cmd::Run([] {}, {}).IgnoringDisable(false),
+                                   cmd::Run([] {}, {}).IgnoringDisable(true),
+                                   [] { return true; });
   EXPECT_EQ(false, command.get()->RunsWhenDisabled());
 }
 
@@ -101,28 +97,34 @@ TEST_F(ConditionalCommandTest, AllCancelSelf) {
 }
 
 TEST_F(ConditionalCommandTest, AllCancelIncoming) {
-  CommandPtr command = cmd::Either(
-      cmd::Run([] {}, {}).WithInterruptBehavior(Command::InterruptionBehavior::kCancelIncoming),
-      cmd::Run([] {}, {}).WithInterruptBehavior(Command::InterruptionBehavior::kCancelIncoming),
-      [] { return false; });
+  CommandPtr command =
+      cmd::Either(cmd::Run([] {}, {}).WithInterruptBehavior(
+                      Command::InterruptionBehavior::kCancelIncoming),
+                  cmd::Run([] {}, {}).WithInterruptBehavior(
+                      Command::InterruptionBehavior::kCancelIncoming),
+                  [] { return false; });
   EXPECT_EQ(Command::InterruptionBehavior::kCancelIncoming,
             command.get()->GetInterruptionBehavior());
 }
 
 TEST_F(ConditionalCommandTest, OneCancelSelfOneIncoming) {
-  CommandPtr command = cmd::Either(
-      cmd::Run([] {}, {}).WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
-      cmd::Run([] {}, {}).WithInterruptBehavior(Command::InterruptionBehavior::kCancelIncoming),
-      [] { return false; });
+  CommandPtr command =
+      cmd::Either(cmd::Run([] {}, {}).WithInterruptBehavior(
+                      Command::InterruptionBehavior::kCancelSelf),
+                  cmd::Run([] {}, {}).WithInterruptBehavior(
+                      Command::InterruptionBehavior::kCancelIncoming),
+                  [] { return false; });
   EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
             command.get()->GetInterruptionBehavior());
 }
 
 TEST_F(ConditionalCommandTest, OneCancelIncomingOneSelf) {
-  CommandPtr command = cmd::Either(
-      cmd::Run([] {}, {}).WithInterruptBehavior(Command::InterruptionBehavior::kCancelIncoming),
-      cmd::Run([] {}, {}).WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
-      [] { return false; });
+  CommandPtr command =
+      cmd::Either(cmd::Run([] {}, {}).WithInterruptBehavior(
+                      Command::InterruptionBehavior::kCancelIncoming),
+                  cmd::Run([] {}, {}).WithInterruptBehavior(
+                      Command::InterruptionBehavior::kCancelSelf),
+                  [] { return false; });
   EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
             command.get()->GetInterruptionBehavior());
 }

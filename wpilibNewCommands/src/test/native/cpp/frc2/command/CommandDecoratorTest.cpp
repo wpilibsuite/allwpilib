@@ -8,9 +8,9 @@
 #include <frc/simulation/SimHooks.h>
 
 #include "CommandTestBase.h"
+#include "frc2/command/Commands.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/InstantCommand.h"
-#include "frc2/command/Commands.h"
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
 
@@ -142,8 +142,7 @@ TEST_F(CommandDecoratorTest, BeforeStarting) {
 
   bool finished = false;
 
-  auto command = cmd::None().BeforeStarting(
-      [&finished] { finished = true; });
+  auto command = cmd::None().BeforeStarting([&finished] { finished = true; });
 
   scheduler.Schedule(command);
 
@@ -163,8 +162,7 @@ TEST_F(CommandDecoratorTest, AndThenLambda) {
 
   bool finished = false;
 
-  auto command =
-      cmd::None().AndThen([&finished] { finished = true; });
+  auto command = cmd::None().AndThen([&finished] { finished = true; });
 
   scheduler.Schedule(command);
 
@@ -342,8 +340,10 @@ TEST_F(CommandDecoratorTest, Unless) {
   bool hasRun = false;
   bool unlessCondition = true;
 
-  auto command = cmd::RunOnce([&hasRun] { hasRun = true; }, {})
-                     .Unless([&unlessCondition] { return unlessCondition; });
+  auto command =
+      cmd::RunOnce([&hasRun] { hasRun = true; }, {}).Unless([&unlessCondition] {
+        return unlessCondition;
+      });
 
   scheduler.Schedule(command);
   scheduler.Run();
@@ -361,8 +361,10 @@ TEST_F(CommandDecoratorTest, OnlyIf) {
   bool hasRun = false;
   bool onlyIfCondition = false;
 
-  auto command = cmd::RunOnce([&hasRun] {hasRun = true;}, {})
-                      .OnlyIf([&onlyIfCondition] { return onlyIfCondition; });
+  auto command =
+      cmd::RunOnce([&hasRun] { hasRun = true; }, {}).OnlyIf([&onlyIfCondition] {
+        return onlyIfCondition;
+      });
 
   scheduler.Schedule(command);
   scheduler.Run();
