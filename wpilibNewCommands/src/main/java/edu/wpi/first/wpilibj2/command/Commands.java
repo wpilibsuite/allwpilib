@@ -242,7 +242,7 @@ public final class Commands {
    * @return the command
    * @see ParallelCommandGroup
    */
-  public static Command parallel(Command... commands) {
+  public static ParallelCommandGroup parallel(Command... commands) {
     return new ParallelCommandGroup(commands);
   }
 
@@ -254,7 +254,7 @@ public final class Commands {
    * @return the command group
    * @see ParallelRaceGroup
    */
-  public static Command race(Command... commands) {
+  public static ParallelRaceGroup race(Command... commands) {
     return new ParallelRaceGroup(commands);
   }
 
@@ -268,7 +268,7 @@ public final class Commands {
    * @see ParallelDeadlineGroup
    * @throws IllegalArgumentException if the deadline command is also in the otherCommands argument
    */
-  public static Command deadline(Command deadline, Command... otherCommands) {
+  public static ParallelDeadlineGroup deadline(Command deadline, Command... otherCommands) {
     return new ParallelDeadlineGroup(deadline, otherCommands);
   }
 
