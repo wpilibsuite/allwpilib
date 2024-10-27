@@ -44,7 +44,11 @@ public class XRPMotor implements MotorController {
   private final SimDouble m_simSpeed;
   private final SimBoolean m_simInverted;
 
-  /** XRPMotor. */
+  /**
+   * Constructs an XRPMotor.
+   *
+   * @param deviceNum the motor channel
+   */
   public XRPMotor(int deviceNum) {
     checkDeviceAllocation(deviceNum);
 

@@ -10,6 +10,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include <wpi/MemAlloc.h>
 #include <wpi/SmallVector.h>
@@ -403,6 +405,21 @@ void NT_Release(NT_Handle pubsubentry) {
 
 NT_Topic NT_GetTopicFromHandle(NT_Handle pubsubentry) {
   return nt::GetTopicFromHandle(pubsubentry);
+}
+
+NT_MultiSubscriber NT_SubscribeMultiple(
+    NT_Inst inst, const struct WPI_String* prefixes, size_t prefixes_len,
+    const struct NT_PubSubOptions* options) {
+  wpi::SmallVector<std::string_view, 8> p;
+  p.resize_for_overwrite(prefixes_len);
+  for (size_t i = 0; i < prefixes_len; ++i) {
+    p[i] = wpi::to_string_view(&prefixes[i]);
+  }
+  return nt::SubscribeMultiple(inst, p, ConvertToCpp(options));
+}
+
+void NT_UnsubscribeMultiple(NT_MultiSubscriber sub) {
+  nt::UnsubscribeMultiple(sub);
 }
 
 /*

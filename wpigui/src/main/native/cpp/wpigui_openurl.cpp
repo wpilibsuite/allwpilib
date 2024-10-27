@@ -14,6 +14,8 @@
 #include <unistd.h>
 #endif
 
+#include <string>
+
 void wpi::gui::OpenURL(const std::string& url) {
 #ifdef _WIN32
   ShellExecuteA(nullptr, "open", url.c_str(), nullptr, nullptr, SW_SHOWNORMAL);

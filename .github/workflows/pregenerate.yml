@@ -26,20 +26,8 @@ jobs:
         run: python -m pip install jinja2
       - name: Install protobuf dependencies
         run: sudo apt-get update && sudo apt-get install -y protobuf-compiler && wget https://github.com/HebiRobotics/QuickBuffers/releases/download/1.3.3/protoc-gen-quickbuf-1.3.3-linux-x86_64.exe && chmod +x protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
-      - name: Run hal
-        run: ./hal/generate_usage_reporting.py
-      - name: Run ntcore
-        run: ./ntcore/generate_topics.py
-      - name: Run wpimath
-        run: ./wpimath/generate_numbers.py && ./wpimath/generate_quickbuf.py --quickbuf_plugin=protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
-      - name: Run HIDs
-        run: ./wpilibj/generate_hids.py && ./wpilibc/generate_hids.py && ./wpilibNewCommands/generate_hids.py
-      - name: Run PWM Controllers
-        run: ./wpilibj/generate_pwm_motor_controllers.py && ./wpilibc/generate_pwm_motor_controllers.py
-      - name: Run imgui gl3w
-        run: ./thirdparty/imgui_suite/generate_gl3w.py
-      - name: Run imgui fonts
-        run: ./thirdparty/imgui_suite/generate_fonts.sh
+      - name: Regenerate all
+        run: python ./.github/workflows/pregen_all.py --quickbuf_plugin protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output

@@ -16,6 +16,8 @@ evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpinet')
 evaluationDependsOn(':wpiunits')
 evaluationDependsOn(':wpiutil')
+evaluationDependsOn(':romiVendordep')
+evaluationDependsOn(':xrpVendordep')
 
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
@@ -40,6 +42,8 @@ cppProjectZips.add(project(':wpilibc').cppHeadersZip)
 cppProjectZips.add(project(':wpimath').cppHeadersZip)
 cppProjectZips.add(project(':wpinet').cppHeadersZip)
 cppProjectZips.add(project(':wpiutil').cppHeadersZip)
+cppProjectZips.add(project(':romiVendordep').cppHeadersZip)
+cppProjectZips.add(project(':xrpVendordep').cppHeadersZip)
 
 doxygen {
     // Doxygen binaries are only provided for x86_64 platforms
@@ -148,6 +152,7 @@ doxygen {
 
     // Save space by excluding protobuf and eigen
     exclude 'Eigen/**'
+    exclude 'unsupported/**'
     exclude 'google/protobuf/**'
 
     exclude '**/.clang-tidy'
@@ -203,7 +208,10 @@ task generateJavaDocs(type: Javadoc) {
             "-edu.wpi.first.math.system.struct," +
             "-edu.wpi.first.math.system.plant.proto," +
             "-edu.wpi.first.math.system.plant.struct," +
-            "-edu.wpi.first.math.trajectory.proto", true)
+            "-edu.wpi.first.math.trajectory.proto," +
+            // The .measure package contains generated source files for which automatic javadoc
+            // generation is very difficult to do meaningfully.
+            "-edu.wpi.first.units.measure", true)
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     options.linkSource(true)
@@ -220,6 +228,8 @@ task generateJavaDocs(type: Javadoc) {
     source project(':wpinet').sourceSets.main.java
     source project(':wpiunits').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
+    source project(':romiVendordep').sourceSets.main.java
+    source project(':xrpVendordep').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
     failOnError = true

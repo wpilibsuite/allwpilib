@@ -4,6 +4,8 @@
 
 #include "frc/counter/UpDownCounter.h"
 
+#include <memory>
+
 #include <hal/Counter.h>
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>
@@ -53,11 +55,6 @@ UpDownCounter::UpDownCounter(std::shared_ptr<DigitalSource> upSource,
 
   HAL_Report(HALUsageReporting::kResourceType_Counter, m_index + 1);
   wpi::SendableRegistry::AddLW(this, "UpDown Counter", m_index);
-}
-
-UpDownCounter::~UpDownCounter() {
-  int32_t status = 0;
-  HAL_FreeCounter(m_handle, &status);
 }
 
 int UpDownCounter::GetCount() const {

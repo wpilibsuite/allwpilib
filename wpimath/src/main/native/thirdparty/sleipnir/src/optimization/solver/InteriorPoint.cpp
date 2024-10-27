@@ -240,11 +240,16 @@ void InteriorPoint(std::span<Variable> decisionVariables,
   // Error estimate
   double E_0 = std::numeric_limits<double>::infinity();
 
-  iterationsStartTime = std::chrono::system_clock::now();
+  if (config.diagnostics) {
+    iterationsStartTime = std::chrono::system_clock::now();
+  }
 
   while (E_0 > config.tolerance &&
          acceptableIterCounter < config.maxAcceptableIterations) {
-    auto innerIterStartTime = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point innerIterStartTime;
+    if (config.diagnostics) {
+      innerIterStartTime = std::chrono::system_clock::now();
+    }
 
     // Check for local equality constraint infeasibility
     if (IsEqualityLocallyInfeasible(A_e, c_e)) {

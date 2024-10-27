@@ -17,8 +17,7 @@ import edu.wpi.first.math.geometry.proto.Translation2dProto;
 import edu.wpi.first.math.geometry.struct.Translation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Collections;
@@ -84,7 +83,7 @@ public class Translation2d
    * @param x The x component of the translation.
    * @param y The y component of the translation.
    */
-  public Translation2d(Measure<Distance> x, Measure<Distance> y) {
+  public Translation2d(Distance x, Distance y) {
     this(x.in(Meters), y.in(Meters));
   }
 
@@ -128,6 +127,24 @@ public class Translation2d
   @JsonProperty
   public double getY() {
     return m_y;
+  }
+
+  /**
+   * Returns the X component of the translation in a measure.
+   *
+   * @return The x component of the translation in a measure.
+   */
+  public Distance getMeasureX() {
+    return Meters.of(m_x);
+  }
+
+  /**
+   * Returns the Y component of the translation in a measure.
+   *
+   * @return The y component of the translation in a measure.
+   */
+  public Distance getMeasureY() {
+    return Meters.of(m_y);
   }
 
   /**

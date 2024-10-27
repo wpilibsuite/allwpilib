@@ -6,7 +6,9 @@
 
 #include <algorithm>
 #include <exception>
+#include <memory>
 #include <numbers>
+#include <string>
 #include <thread>
 
 #include <fmt/format.h>

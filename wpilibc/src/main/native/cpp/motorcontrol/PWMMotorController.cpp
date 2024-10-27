@@ -4,6 +4,8 @@
 
 #include "frc/motorcontrol/PWMMotorController.h"
 
+#include <string>
+
 #include <fmt/format.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -35,6 +37,10 @@ void PWMMotorController::SetVoltage(units::volt_t output) {
 
 double PWMMotorController::Get() const {
   return m_pwm.GetSpeed() * (m_isInverted ? -1.0 : 1.0);
+}
+
+units::volt_t PWMMotorController::GetVoltage() const {
+  return Get() * RobotController::GetBatteryVoltage();
 }
 
 void PWMMotorController::SetInverted(bool isInverted) {

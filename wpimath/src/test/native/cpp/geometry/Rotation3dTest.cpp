@@ -23,7 +23,7 @@ TEST(Rotation3dTest, GimbalLockAccuracy) {
                  units::radian_t{std::numbers::pi / 2}};
   EXPECT_EQ(expected1, result1);
   EXPECT_DOUBLE_EQ(std::numbers::pi / 2, (result1.X() + result1.Z()).value());
-  EXPECT_DOUBLE_EQ(-std::numbers::pi / 2, result1.Y().value());
+  EXPECT_NEAR(-std::numbers::pi / 2, result1.Y().value(), 1e-7);
 
   rot1 = Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}};
   rot2 = Rotation3d{units::radian_t{-std::numbers::pi}, 0_rad, 0_rad};
@@ -34,7 +34,7 @@ TEST(Rotation3dTest, GimbalLockAccuracy) {
                  units::radian_t{std::numbers::pi / 2}};
   EXPECT_EQ(expected2, result2);
   EXPECT_DOUBLE_EQ(std::numbers::pi / 2, (result2.Z() - result2.X()).value());
-  EXPECT_DOUBLE_EQ(std::numbers::pi / 2, result2.Y().value());
+  EXPECT_NEAR(std::numbers::pi / 2, result2.Y().value(), 1e-7);
 
   rot1 = Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}};
   rot2 = Rotation3d{0_rad, units::radian_t{std::numbers::pi / 3}, 0_rad};

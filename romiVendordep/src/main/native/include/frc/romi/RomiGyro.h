@@ -9,6 +9,11 @@
 namespace frc {
 
 /**
+ * @ingroup romi_api
+ * @{
+ */
+
+/**
  * Use a rate gyro to return the robots heading relative to a starting position.
  *
  * This class is for the Romi onboard gyro, and will only work in
@@ -87,5 +92,7 @@ class RomiGyro {
   double m_angleYOffset = 0;
   double m_angleZOffset = 0;
 };
+
+/** @} */
 
 }  // namespace frc

@@ -5,6 +5,7 @@
 #include "frc/trajectory/TrajectoryGenerator.h"
 
 #include <utility>
+#include <vector>
 
 #include <wpi/print.h>
 

@@ -4,10 +4,13 @@
 
 #include "sysid/analysis/FilteringUtils.h"
 
+#include <algorithm>
+#include <functional>
 #include <limits>
 #include <numbers>
 #include <numeric>
-#include <stdexcept>
+#include <string>
+#include <tuple>
 #include <vector>
 
 #include <fmt/format.h>
@@ -323,9 +326,11 @@ static units::second_t GetMaxStepTime(
     auto& dataset = it.getValue();
 
     if (IsRaw(key) && wpi::contains(key, "dynamic")) {
-      auto duration = dataset.back().timestamp - dataset.front().timestamp;
-      if (duration > maxStepTime) {
-        maxStepTime = duration;
+      if (!dataset.empty()) {
+        auto duration = dataset.back().timestamp - dataset.front().timestamp;
+        if (duration > maxStepTime) {
+          maxStepTime = duration;
+        }
       }
     }
   }

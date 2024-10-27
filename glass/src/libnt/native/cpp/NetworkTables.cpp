@@ -4,18 +4,21 @@
 
 #include "glass/networktables/NetworkTables.h"
 
+#include <algorithm>
 #include <cinttypes>
 #include <concepts>
 #include <cstring>
+#include <functional>
 #include <initializer_list>
+#include <map>
 #include <memory>
 #include <span>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/message.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <networktables/NetworkTableInstance.h>
@@ -30,6 +33,11 @@
 #include <wpi/mpack.h>
 #include <wpi/print.h>
 #include <wpi/raw_ostream.h>
+
+#ifndef NO_PROTOBUF
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
+#endif
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
@@ -346,6 +354,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
   }
 }
 
+#ifndef NO_PROTOBUF
 static void UpdateProtobufValueSource(NetworkTablesModel& model,
                                       NetworkTablesModel::ValueSource* out,
                                       const google::protobuf::Message& msg,
@@ -534,6 +543,7 @@ static void UpdateProtobufValueSource(NetworkTablesModel& model,
     }
   }
 }
+#endif
 
 static void UpdateJsonValueSource(NetworkTablesModel& model,
                                   NetworkTablesModel::ValueSource* out,
@@ -735,7 +745,7 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
           structName = *withoutArray;
         }
         auto desc = model.m_structDb.Find(structName);
-        if (desc && desc->IsValid()) {
+        if (desc && desc->IsValid() && desc->GetSize() != 0) {
           if (isArray) {
             // array of struct at top level
             if (valueChildrenMap) {
@@ -764,6 +774,7 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
           valueChildren.clear();
         }
       } else if (auto filename = wpi::remove_prefix(typeStr, "proto:")) {
+#ifndef NO_PROTOBUF
         auto msg = model.m_protoDb.Find(*filename);
         if (msg) {
           msg->Clear();
@@ -777,6 +788,9 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
         } else {
           valueChildren.clear();
         }
+#else
+        valueChildren.clear();
+#endif
       } else {
         valueChildren.clear();
       }
@@ -902,6 +916,7 @@ void NetworkTablesModel::Update() {
                        wpi::remove_prefix(entry->info.name, "/.schema/proto:");
                    entry->value.IsRaw() && filename &&
                    entry->info.type_str == "proto:FileDescriptorProto") {
+#ifndef NO_PROTOBUF
           // protobuf descriptor handling
           if (!m_protoDb.Add(*filename, entry->value.GetRaw())) {
             wpi::print("could not decode protobuf '{}' filename '{}'\n",
@@ -918,6 +933,7 @@ void NetworkTablesModel::Update() {
               }
             }
           }
+#endif
         }
       }
     }

@@ -211,7 +211,7 @@ public interface DataLogger {
    * @param unit the unit to log the measurement in
    * @param <U> the dimension of the unit
    */
-  default <U extends Unit<U>> void log(String identifier, Measure<U> value, U unit) {
+  default <U extends Unit> void log(String identifier, Measure<U> value, U unit) {
     log(identifier, value.in(unit));
   }
 

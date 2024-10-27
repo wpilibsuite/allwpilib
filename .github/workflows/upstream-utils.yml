@@ -35,11 +35,21 @@ jobs:
           cd upstream_utils
           ./apriltag.py clone
           ./apriltag.py copy-src
+      - name: Run argparse_lib.py
+        run: |
+          cd upstream_utils
+          ./argparse_lib.py clone
+          ./argparse_lib.py copy-src
       - name: Run eigen.py
         run: |
           cd upstream_utils
           ./eigen.py clone
           ./eigen.py copy-src
+      - name: Run expected.py
+        run: |
+          cd upstream_utils
+          ./expected.py clone
+          ./expected.py copy-src
       - name: Run fmt.py
         run: |
           cd upstream_utils
@@ -123,4 +133,4 @@ jobs:
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output
-        run: git --no-pager diff --exit-code HEAD
+        run: git --no-pager diff --exit-code HEAD ':!*.bazel'

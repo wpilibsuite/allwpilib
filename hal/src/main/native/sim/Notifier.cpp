@@ -8,7 +8,9 @@
 #include <chrono>
 #include <cstdio>
 #include <cstring>
+#include <memory>
 #include <string>
+#include <utility>
 
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
@@ -204,7 +206,7 @@ void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   notifier->cond.notify_all();
 }
 
-void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
+void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle) {
   auto notifier = notifierHandles->Free(notifierHandle);
   if (!notifier) {
     return;

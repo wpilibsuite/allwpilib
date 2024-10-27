@@ -6,6 +6,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <utility>
 #include <vector>
 
 #include <wpi/mutex.h>
@@ -25,7 +26,6 @@ NtQueryTimerResolution(PULONG MinimumResolution, PULONG MaximumResolution,
 #include "ErrorsInternal.h"
 #include "HALInitializer.h"
 #include "MockHooksInternal.h"
-#include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/Extensions.h"
 #include "hal/handles/HandlesInternal.h"
@@ -44,11 +44,7 @@ class SimPeriodicCallbackRegistry : public impl::SimCallbackRegistryBase {
   }
 
   void operator()() const {
-#ifdef _MSC_VER  // work around VS2019 16.4.0 bug
-    std::scoped_lock<wpi::recursive_spinlock> lock(m_mutex);
-#else
     std::scoped_lock lock(m_mutex);
-#endif
     if (m_callbacks) {
       for (auto&& cb : *m_callbacks) {
         reinterpret_cast<HALSIM_SimPeriodicCallback>(cb.callback)(cb.param);

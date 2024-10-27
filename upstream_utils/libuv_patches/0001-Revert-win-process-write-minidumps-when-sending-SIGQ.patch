@@ -1,8 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Fri, 14 Jul 2023 17:33:08 -0700
-Subject: [PATCH 01/10] Revert "win,process: write minidumps when sending
- SIGQUIT (#3840)"
+Subject: [PATCH 1/9] Revert "win,process: write minidumps when sending SIGQUIT
+ (#3840)"
 
 This reverts commit 748d894e82abcdfff7429cf745003e182c47f163.
 ---
@@ -13,10 +13,10 @@ This reverts commit 748d894e82abcdfff7429cf745003e182c47f163.
  4 files changed, 2 insertions(+), 131 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 5e8e0166d743bc23f446b180fdbe6843492c754b..4b6ff2477e494dde7a876d8b5bd3e8985c93f0e8 100644
+index 28c6df2566696785383716bf463c37cf2d07f987..36fef0fdff5090bb3a56d7e231c3bfe390772318 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -188,10 +188,7 @@ if(WIN32)
+@@ -193,10 +193,7 @@ if(WIN32)
         advapi32
         iphlpapi
         userenv
@@ -29,7 +29,7 @@ index 5e8e0166d743bc23f446b180fdbe6843492c754b..4b6ff2477e494dde7a876d8b5bd3e898
         src/win/async.c
         src/win/core.c
 diff --git a/configure.ac b/configure.ac
-index d4cc003e34388de77fe1cfe2ebf12ab25b00b9b8..b215638506223e1c9edb1847bbcfccb7404be33f 100644
+index 98c59363026f8657dccc3aa2ed80d8bee159ebec..c4ee0756551876eac394282f2020cf44be17d023 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -74,7 +74,7 @@ AM_CONDITIONAL([OS400],    [AS_CASE([$host_os],[os400],         [true], [false])
@@ -42,7 +42,7 @@ index d4cc003e34388de77fe1cfe2ebf12ab25b00b9b8..b215638506223e1c9edb1847bbcfccb7
  AS_CASE([$host_os], [solaris2.10], [
      CFLAGS="$CFLAGS -DSUNOS_NO_IFADDRS"
 diff --git a/include/uv/win.h b/include/uv/win.h
-index f4adaa216c6f0c17437ed42ca594acbf1b8c2c56..518b17606c3b0c114845594e6be9c3c4d95f1776 100644
+index 12ac53b4f217d212d1b5c32cfe090800f8770a09..d4c271d4d856a5ec847439825cace5bafb0d4acd 100644
 --- a/include/uv/win.h
 +++ b/include/uv/win.h
 @@ -91,7 +91,6 @@ typedef struct pollfd {
@@ -54,10 +54,10 @@ index f4adaa216c6f0c17437ed42ca594acbf1b8c2c56..518b17606c3b0c114845594e6be9c3c4
  #define SIGWINCH             28
  
 diff --git a/src/win/process.c b/src/win/process.c
-index 4e94dee90e13eede63d8e97ddc9992726f874ea9..4f0af83e83442bb905762361775abe05ab6beb4e 100644
+index 9d48ddc6f84d6f8c425a8f6f8a344f39d3deb5cc..79bec0090cc94bfe20dab722cf2d8135ddd03cb8 100644
 --- a/src/win/process.c
 +++ b/src/win/process.c
-@@ -32,9 +32,6 @@
+@@ -31,9 +31,6 @@
  #include "internal.h"
  #include "handle-inl.h"
  #include "req-inl.h"
@@ -67,7 +67,7 @@ index 4e94dee90e13eede63d8e97ddc9992726f874ea9..4f0af83e83442bb905762361775abe05
  
  
  #define SIGKILL         9
-@@ -1179,129 +1176,7 @@ static int uv__kill(HANDLE process_handle, int signum) {
+@@ -1160,129 +1157,7 @@ static int uv__kill(HANDLE process_handle, int signum) {
      return UV_EINVAL;
    }
  

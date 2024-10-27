@@ -18,8 +18,18 @@ namespace frc {
 
 WPI_IGNORE_DEPRECATED
 
+/**
+ * @defgroup xrp_api XRP Hardware API
+ * @{
+ */
+
 class XRPMotor : public frc::MotorController, public frc::MotorSafety {
  public:
+  /**
+   * Constructs an XRPMotor.
+   *
+   * @param deviceNum the motor channel
+   */
   explicit XRPMotor(int deviceNum);
 
   void Set(double value) override;
@@ -45,6 +55,8 @@ class XRPMotor : public frc::MotorController, public frc::MotorSafety {
 
   static void CheckDeviceAllocation(int deviceNum);
 };
+
+/** @} */
 
 WPI_UNIGNORE_DEPRECATED
 

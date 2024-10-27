@@ -7,7 +7,6 @@
 #include <atomic>
 #include <functional>
 #include <memory>
-#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -23,12 +22,11 @@
 
 #include "INetworkClient.h"
 #include "net/ClientImpl.h"
+#include "net/ClientMessageQueue.h"
 #include "net/Message.h"
-#include "net/NetworkLoopQueue.h"
 #include "net/WebSocketConnection.h"
 #include "net3/ClientImpl3.h"
 #include "net3/UvStreamConnection3.h"
-#include "ntcore_cpp.h"
 
 namespace wpi {
 class Logger;
@@ -80,7 +78,8 @@ class NetworkClientBase : public INetworkClient {
   std::shared_ptr<wpi::uv::Async<>> m_flushLocal;
   std::shared_ptr<wpi::uv::Async<>> m_flush;
 
-  std::vector<net::ClientMessage> m_localMsgs;
+  using Queue = net::LocalClientMessageQueue;
+  net::ClientMessage m_localMsgs[Queue::kBlockSize];
 
   std::vector<std::pair<std::string, unsigned int>> m_servers;
 
@@ -91,7 +90,7 @@ class NetworkClientBase : public INetworkClient {
   std::atomic<wpi::uv::Async<>*> m_flushLocalAtomic{nullptr};
   std::atomic<wpi::uv::Async<>*> m_flushAtomic{nullptr};
 
-  net::NetworkLoopQueue m_localQueue;
+  Queue m_localQueue;
 
   int m_connHandle = 0;
 

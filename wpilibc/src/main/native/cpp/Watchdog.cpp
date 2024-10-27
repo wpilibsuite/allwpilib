@@ -7,6 +7,7 @@
 #include <atomic>
 #include <thread>
 #include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <hal/Notifier.h>
@@ -65,7 +66,7 @@ Watchdog::Impl::~Impl() {
     m_thread.join();
   }
 
-  HAL_CleanNotifier(handle, &status);
+  HAL_CleanNotifier(handle);
 }
 
 void Watchdog::Impl::UpdateAlarm() {

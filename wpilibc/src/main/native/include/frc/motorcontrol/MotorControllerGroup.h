@@ -36,7 +36,11 @@ class [[deprecated(
    */
   template <class... MotorControllers>
   explicit MotorControllerGroup(MotorController& motorController,
-                                MotorControllers&... motorControllers);
+                                MotorControllers&... motorControllers)
+      : m_motorControllers(std::vector<std::reference_wrapper<MotorController>>{
+            motorController, motorControllers...}) {
+    Initialize();
+  }
 
   /**
    * Create a new MotorControllerGroup with the provided MotorControllers.
@@ -67,7 +71,5 @@ class [[deprecated(
 };
 
 }  // namespace frc
-
-#include "frc/motorcontrol/MotorControllerGroup.inc"
 
 WPI_UNIGNORE_DEPRECATED

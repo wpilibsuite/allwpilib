@@ -37,7 +37,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_DutyCycleJNI_free
   (JNIEnv*, jclass, jint handle)
 {
-  HAL_FreeDutyCycle(static_cast<HAL_DutyCycleHandle>(handle));
+  if (handle != HAL_kInvalidHandle) {
+    HAL_FreeDutyCycle(static_cast<HAL_DutyCycleHandle>(handle));
+  }
 }
 
 /*

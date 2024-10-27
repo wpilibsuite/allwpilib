@@ -21,6 +21,7 @@ generatedFileExclude {
   src/main/native/thirdparty/
 
   src/main/native/include/wpi/fs\.h$
+  src/main/native/include/wpi/FastQueue\.h$
   src/main/native/cpp/fs\.cpp$
   src/main/native/resources/
   src/main/native/windows/StackWalker
@@ -32,7 +33,6 @@ generatedFileExclude {
 licenseUpdateExclude {
   src/main/native/cpp/Base64\.cpp$
   src/main/native/cpp/sha1\.cpp$
-  src/main/native/include/wpi/ConcurrentQueue\.h$
   src/main/native/include/wpi/sha1\.h$
 }
 

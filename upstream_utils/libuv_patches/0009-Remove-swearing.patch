@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jade Turner <spacey-sooty@proton.me>
+Date: Wed, 26 Jun 2024 11:40:37 +0800
+Subject: [PATCH 9/9] Remove swearing
+
+---
+ src/win/fs.c  | 2 +-
+ src/win/tty.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/win/fs.c b/src/win/fs.c
+index 572a82dca3cbcdb7829241dd520e8f34591d81e9..eaa0342f97c87cac3d6802e8f6c8c97d5bdc12ea 100644
+--- a/src/win/fs.c
++++ b/src/win/fs.c
+@@ -1845,7 +1845,7 @@ INLINE static void fs__stat_assign_statbuf(uv_stat_t* statbuf,
+    * impossible to delete the file afterwards, since read-only files can't be
+    * deleted.
+    *
+-   * IOW it's all just a clusterfuck and we should think of something that
++   * IOW it's all just a mess and we should think of something that
+    * makes slightly more sense.
+    *
+    * And uv_fs_chmod should probably just fail on windows or be a total no-op.
+diff --git a/src/win/tty.c b/src/win/tty.c
+index 9a4252d9d89d82fdd316312cc4550dd3c0fe798d..f1acef2c64e5a7397c86729d81d1f15ee74b7a43 100644
+--- a/src/win/tty.c
++++ b/src/win/tty.c
+@@ -1055,7 +1055,7 @@ int uv__tty_read_stop(uv_tty_t* handle) {
+     return 0;
+ 
+   if (handle->flags & UV_HANDLE_TTY_RAW) {
+-    /* Cancel raw read. Write some bullshit event to force the console wait to
++    /* Cancel raw read. Write some event to force the console wait to
+      * return. */
+     memset(&record, 0, sizeof record);
+     record.EventType = FOCUS_EVENT;

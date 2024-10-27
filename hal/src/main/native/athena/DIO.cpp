@@ -188,7 +188,7 @@ HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
   return handle;
 }
 
-void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status) {
+void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator) {
   digitalPWMHandles->Free(pwmGenerator);
 }
 

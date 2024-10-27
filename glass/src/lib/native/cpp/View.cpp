@@ -4,6 +4,9 @@
 
 #include "glass/View.h"
 
+#include <memory>
+#include <utility>
+
 using namespace glass;
 
 namespace {

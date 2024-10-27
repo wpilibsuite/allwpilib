@@ -4,6 +4,11 @@
 
 #include "frc/Resource.h"
 
+#include <limits>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include <wpi/deprecated.h>
 
 #include "frc/Errors.h"

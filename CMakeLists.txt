@@ -66,6 +66,14 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
 option(WITH_JAVA "Include Java and JNI in the build" OFF)
 option(WITH_JAVA_SOURCE "Build Java source jars" ${WITH_JAVA})
+option(WITH_DOCS "Build Doxygen docs (needs Git for versioning)" OFF)
+cmake_dependent_option(
+    DOCS_WARNINGS_AS_ERRORS
+    "Make docs warnings into errors"
+    OFF
+    WITH_DOCS
+    OFF
+)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
@@ -81,6 +89,7 @@ option(WITH_EXAMPLES "Build examples" OFF)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
 option(WITH_GUI "Build GUI items" ON)
 option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
+option(WITH_PROTOBUF "Build protobuf support" ON)
 
 # Options for using a package manager (e.g., vcpkg) for certain dependencies.
 option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
@@ -128,12 +137,20 @@ else()
     find_package(Java REQUIRED COMPONENTS Runtime)
 endif()
 
-find_package(LIBSSH 0.7.1)
+if(WITH_DOCS)
+    find_package(Doxygen REQUIRED)
+    find_package(Git REQUIRED)
+    include(AddDoxygenDocs)
+    add_doxygen_docs()
+endif()
+find_package(LIBSSH CONFIG 0.7.1)
 
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
-set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "" FORCE)
-find_package(Protobuf REQUIRED)
-find_program(PROTOC_COMPILER protoc REQUIRED)
+if(WITH_PROTOBUF)
+    set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "" FORCE)
+    find_package(Protobuf REQUIRED)
+    find_program(PROTOC_COMPILER protoc REQUIRED)
+endif()
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG OFF)
 
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)

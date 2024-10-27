@@ -6,11 +6,10 @@
 
 #include <stdint.h>
 
-#include <span>
 #include <string_view>
 #include <vector>
 
-#include <wpi/json_fwd.h>
+#include <wpi/json.h>
 
 #include "networktables/Topic.h"
 #include "ntcore_cpp.h"
@@ -69,7 +68,8 @@ class UnitSubscriber : public Subscriber {
    * @param handle Native handle
    * @param defaultValue Default value
    */
-  UnitSubscriber(NT_Subscriber handle, ParamType defaultValue);
+  UnitSubscriber(NT_Subscriber handle, ParamType defaultValue)
+      : Subscriber{handle}, m_defaultValue{defaultValue} {}
 
   /**
    * Get the last published value.
@@ -77,7 +77,7 @@ class UnitSubscriber : public Subscriber {
    *
    * @return value
    */
-  ValueType Get() const;
+  ValueType Get() const { return Get(m_defaultValue); }
 
   /**
    * Get the last published value.
@@ -86,7 +86,9 @@ class UnitSubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return value
    */
-  ValueType Get(ParamType defaultValue) const;
+  ValueType Get(ParamType defaultValue) const {
+    return T{::nt::GetDouble(m_subHandle, defaultValue.value())};
+  }
 
   /**
    * Get the last published value along with its timestamp
@@ -95,7 +97,7 @@ class UnitSubscriber : public Subscriber {
    *
    * @return timestamped value
    */
-  TimestampedValueType GetAtomic() const;
+  TimestampedValueType GetAtomic() const { return GetAtomic(m_defaultValue); }
 
   /**
    * Get the last published value along with its timestamp.
@@ -105,7 +107,10 @@ class UnitSubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return timestamped value
    */
-  TimestampedValueType GetAtomic(ParamType defaultValue) const;
+  TimestampedValueType GetAtomic(ParamType defaultValue) const {
+    auto doubleVal = ::nt::GetAtomicDouble(m_subHandle, defaultValue.value());
+    return {doubleVal.time, doubleVal.serverTime, doubleVal.value};
+  }
 
   /**
    * Get an array of all value changes since the last call to ReadQueue.
@@ -117,14 +122,23 @@ class UnitSubscriber : public Subscriber {
    * @return Array of timestamped values; empty array if no new changes have
    *     been published since the previous call.
    */
-  std::vector<TimestampedValueType> ReadQueue();
+  std::vector<TimestampedValueType> ReadQueue() {
+    std::vector<TimestampedUnit<T>> vals;
+    auto doubleVals = ::nt::ReadQueueDouble(m_subHandle);
+    vals.reserve(doubleVals.size());
+    for (auto&& val : doubleVals) {
+      vals.emplace_back(val.time, val.serverTime, val.value);
+    }
+  }
 
   /**
    * Get the corresponding topic.
    *
    * @return Topic
    */
-  TopicType GetTopic() const;
+  TopicType GetTopic() const {
+    return UnitTopic<T>{::nt::GetTopicFromHandle(m_subHandle)};
+  }
 
  private:
   ValueType m_defaultValue;
@@ -152,7 +166,7 @@ class UnitPublisher : public Publisher {
    *
    * @param handle Native handle
    */
-  explicit UnitPublisher(NT_Publisher handle);
+  explicit UnitPublisher(NT_Publisher handle) : Publisher{handle} {}
 
   /**
    * Publish a new value.
@@ -160,7 +174,9 @@ class UnitPublisher : public Publisher {
    * @param value value to publish
    * @param time timestamp; 0 indicates current NT time should be used
    */
-  void Set(ParamType value, int64_t time = 0);
+  void Set(ParamType value, int64_t time = 0) {
+    ::nt::SetDouble(m_pubHandle, value.value(), time);
+  }
 
   /**
    * Publish a default value.
@@ -169,14 +185,18 @@ class UnitPublisher : public Publisher {
    *
    * @param value value
    */
-  void SetDefault(ParamType value);
+  void SetDefault(ParamType value) {
+    ::nt::SetDefaultDouble(m_pubHandle, value.value());
+  }
 
   /**
    * Get the corresponding topic.
    *
    * @return Topic
    */
-  TopicType GetTopic() const;
+  TopicType GetTopic() const {
+    return UnitTopic<T>{::nt::GetTopicFromHandle(m_pubHandle)};
+  }
 };
 
 /**
@@ -206,7 +226,8 @@ class UnitEntry final : public UnitSubscriber<T>, public UnitPublisher<T> {
    * @param handle Native handle
    * @param defaultValue Default value
    */
-  UnitEntry(NT_Entry handle, ParamType defaultValue);
+  UnitEntry(NT_Entry handle, ParamType defaultValue)
+      : UnitSubscriber<T>{handle, defaultValue}, UnitPublisher<T>{handle} {}
 
   /**
    * Determines if the native handle is valid.
@@ -227,12 +248,14 @@ class UnitEntry final : public UnitSubscriber<T>, public UnitPublisher<T> {
    *
    * @return Topic
    */
-  TopicType GetTopic() const;
+  TopicType GetTopic() const {
+    return UnitTopic<T>{::nt::GetTopicFromHandle(this->m_subHandle)};
+  }
 
   /**
    * Stops publishing the entry if it's published.
    */
-  void Unpublish();
+  void Unpublish() { ::nt::Unpublish(this->m_pubHandle); }
 };
 
 /**
@@ -276,7 +299,7 @@ class UnitTopic final : public Topic {
    *
    * @return True if unit matches, false if not matching or topic not published.
    */
-  bool IsMatchingUnit() const;
+  bool IsMatchingUnit() const { return GetProperty("unit") == T{}.name(); }
 
   /**
    * Create a new subscriber to the topic.
@@ -296,7 +319,10 @@ class UnitTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions);
+      const PubSubOptions& options = kDefaultPubSubOptions) {
+    return UnitSubscriber<T>{
+        ::nt::Subscribe(m_handle, NT_DOUBLE, "double", options), defaultValue};
+  }
 
   /**
    * Create a new subscriber to the topic, with specific type string.
@@ -317,7 +343,11 @@ class UnitTopic final : public Topic {
   [[nodiscard]]
   SubscriberType SubscribeEx(
       std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions);
+      const PubSubOptions& options = kDefaultPubSubOptions) {
+    return UnitSubscriber<T>{
+        ::nt::Subscribe(m_handle, NT_DOUBLE, typeString, options),
+        defaultValue};
+  }
 
   /**
    * Create a new publisher to the topic.
@@ -335,7 +365,10 @@ class UnitTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions);
+  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
+    return UnitPublisher<T>{::nt::PublishEx(m_handle, NT_DOUBLE, "double",
+                                            {{"unit", T{}.name()}}, options)};
+  }
 
   /**
    * Create a new publisher to the topic, with type string and initial
@@ -356,9 +389,14 @@ class UnitTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType PublishEx(std::string_view typeString,
-                          const wpi::json& properties,
-                          const PubSubOptions& options = kDefaultPubSubOptions);
+  PublisherType PublishEx(
+      std::string_view typeString, const wpi::json& properties,
+      const PubSubOptions& options = kDefaultPubSubOptions) {
+    wpi::json props = properties;
+    props["unit"] = T{}.name();
+    return UnitPublisher<T>{
+        ::nt::PublishEx(m_handle, NT_DOUBLE, typeString, props, options)};
+  }
 
   /**
    * Create a new entry for the topic.
@@ -382,7 +420,10 @@ class UnitTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(ParamType defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions);
+                     const PubSubOptions& options = kDefaultPubSubOptions) {
+    return UnitEntry<T>{::nt::GetEntry(m_handle, NT_DOUBLE, "double", options),
+                        defaultValue};
+  }
 
   /**
    * Create a new entry for the topic, with specific type string.
@@ -407,9 +448,10 @@ class UnitTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
-                       const PubSubOptions& options = kDefaultPubSubOptions);
+                       const PubSubOptions& options = kDefaultPubSubOptions) {
+    return UnitEntry<T>{
+        ::nt::GetEntry(m_handle, NT_DOUBLE, typeString, options), defaultValue};
+  }
 };
 
 }  // namespace nt
-
-#include "networktables/UnitTopic.inc"

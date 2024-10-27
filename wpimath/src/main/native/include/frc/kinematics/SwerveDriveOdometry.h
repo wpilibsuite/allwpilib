@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <chrono>
 #include <cstddef>
 #include <ctime>
 
@@ -16,7 +15,7 @@
 #include "SwerveModulePosition.h"
 #include "SwerveModuleState.h"
 #include "frc/geometry/Pose2d.h"
-#include "units/time.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
@@ -45,7 +44,14 @@ class SwerveDriveOdometry
   SwerveDriveOdometry(
       SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
-      const Pose2d& initialPose = Pose2d{});
+      const Pose2d& initialPose = Pose2d{})
+      : Odometry<wpi::array<SwerveModuleState, NumModules>,
+                 wpi::array<SwerveModulePosition, NumModules>>(
+            m_kinematicsImpl, gyroAngle, modulePositions, initialPose),
+        m_kinematicsImpl(kinematics) {
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);
+  }
 
  private:
   SwerveDriveKinematics<NumModules> m_kinematicsImpl;
@@ -55,5 +61,3 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     SwerveDriveOdometry<4>;
 
 }  // namespace frc
-
-#include "SwerveDriveOdometry.inc"

@@ -4,6 +4,8 @@
 
 #include "frc2/command/SubsystemBase.h"
 
+#include <string>
+
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 

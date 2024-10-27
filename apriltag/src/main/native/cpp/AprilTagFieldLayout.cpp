@@ -5,6 +5,8 @@
 #include "frc/apriltag/AprilTagFieldLayout.h"
 
 #include <system_error>
+#include <utility>
+#include <vector>
 
 #include <units/angle.h>
 #include <units/length.h>
@@ -15,14 +17,12 @@
 using namespace frc;
 
 AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(path, ec);
-  if (fileBuffer == nullptr || ec) {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(path);
+  if (!fileBuffer) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
-  wpi::json json = wpi::json::parse(fileBuffer->GetCharBuffer());
+  wpi::json json = wpi::json::parse(fileBuffer.value()->GetCharBuffer());
 
   for (const auto& tag : json.at("tags").get<std::vector<AprilTag>>()) {
     m_apriltags[tag.ID] = tag;
