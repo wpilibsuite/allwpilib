@@ -361,8 +361,8 @@ TEST_F(CommandDecoratorTest, OnlyIf) {
   bool hasRun = false;
   bool onlyIfCondition = false;
 
-  auto command = InstantCommand([&hasRun] { hasRun = true; }, {})
-                     .OnlyIf([&onlyIfCondition] { return onlyIfCondition; });
+  auto command = cmd::RunOnce([&hasRun] {hasRun = true;}, {})
+                      .OnlyIf([&onlyIfCondition] { return onlyIfCondition; });
 
   scheduler.Schedule(command);
   scheduler.Run();
