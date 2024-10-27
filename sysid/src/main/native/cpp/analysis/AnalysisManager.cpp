@@ -15,6 +15,7 @@
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 
+#include "sysid/analysis/FeedforwardAnalysis.h"
 #include "sysid/analysis/FilteringUtils.h"
 
 using namespace sysid;
