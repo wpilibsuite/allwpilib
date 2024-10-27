@@ -38,10 +38,11 @@ public class ParallelCommandGroup extends Command {
   }
 
   /**
-   * Creates a new command that runs the commands of this parallel group
-   * and the deadline in parallel, stopping all when the deadline finishes.
+   * Creates a new command that runs this parallel group
+   * and the deadline in parallel, finishing when
+   * the deadline finishes.
    *
-   * @param deadline the command deadline; once this finishes, the other commands will be interrupted.
+   * @param deadline the deadline of the command group
    * @return the command group
    * @see ParallelDeadlineGroup
    */
