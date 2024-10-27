@@ -18,7 +18,5 @@ static struct StaticLoadMutexTest {
 }  // namespace
 
 namespace wpi::detail {
-    void PingStaticLoader() {
-
-    }
-}
+void PingStaticLoader() {}
+}  // namespace wpi::detail
