@@ -25,7 +25,7 @@ public final class RuntimeLoader {
         .append('\n');
     if (System.getProperty("os.name").startsWith("Windows")) {
       msg.append(
-          "A common cause of this error is missing or invalid the C++ runtime.\n"
+          "A common cause of this error is a missing or invalid C++ runtime.\n"
               + "Download the latest at https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads\n");
     }
     return msg.toString();
