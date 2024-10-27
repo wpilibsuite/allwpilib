@@ -873,8 +873,8 @@ void ServerImpl::ClientData3::ClientHello(std::string_view self_id,
         fmt::format("unsupported protocol version {:04x}", proto_rev));
     return;
   }
-  // create a unique name (just ignore provided client id)
-  m_name = fmt::format("NT3@{}", m_connInfo);
+  // create a unique name including client id
+  m_name = fmt::format("{}-NT3@{}", self_id, m_connInfo);
   m_connected(m_name, 0x0300);
   m_connected = nullptr;  // no longer required
 
