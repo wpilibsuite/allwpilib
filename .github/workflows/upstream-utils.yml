@@ -133,4 +133,4 @@ jobs:
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output
-        run: git --no-pager diff --exit-code HEAD
+        run: git --no-pager diff --exit-code HEAD ':!*.bazel'

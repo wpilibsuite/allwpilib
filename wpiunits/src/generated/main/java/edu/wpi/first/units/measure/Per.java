@@ -278,6 +278,17 @@ public interface Per<Dividend extends Unit, Divisor extends Unit> extends Measur
 
 
   @Override
+  default Mult<PerUnit<Dividend, Divisor>, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<PerUnit<Dividend, Divisor>, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<PerUnit<Dividend, Divisor>, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<PerUnit<Dividend, Divisor>, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<PerUnit<Dividend, Divisor>, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<PerUnit<Dividend, Divisor>, TemperatureUnit>) Measure.super.times(multiplier);
   }
