@@ -16,14 +16,29 @@ def copy_upstream_src(wpilib_root):
     ]:
         shutil.rmtree(os.path.join(wpical, d), ignore_errors=True)
 
-    walk_cwd_and_copy_if(
+    files = walk_cwd_and_copy_if(
         lambda dp, f: f.endswith("dogleg.h"),
         os.path.join(wpical, "src/main/native/thirdparty/libdogleg/include"),
     )
-    walk_cwd_and_copy_if(
+    for f in files:
+        with open(f) as file:
+            content = file.read()
+        content = content.replace(
+            "#include <cholmod.h>", "#include <suitesparse/cholmod.h>"
+        )
+        with open(f, "w") as file:
+            file.write(content)
+
+    files = walk_cwd_and_copy_if(
         lambda dp, f: f.endswith("dogleg.c"),
         os.path.join(wpical, "src/main/native/thirdparty/libdogleg/src"),
     )
+    for f in files:
+        with open(f) as file:
+            content = file.read()
+        content = content.replace("#warning", "// #warning")
+        with open(f, "w") as file:
+            file.write(content)
 
 
 def main():
