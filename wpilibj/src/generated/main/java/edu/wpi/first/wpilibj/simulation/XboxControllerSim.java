@@ -185,7 +185,7 @@ public class XboxControllerSim extends GenericHIDSim {
    *
    * @param state the new value
    * @deprecated Use {@link setLeftBumperButton} instead. This function is deprecated for removal
-   * to make function names consistent to allow the HID classes to be automatically generated.
+   *     to make function names consistent to allow the HID classes to be automatically generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public void setLeftBumper(boolean state) {
@@ -197,7 +197,7 @@ public class XboxControllerSim extends GenericHIDSim {
    *
    * @param state the new value
    * @deprecated Use {@link setRightBumperButton} instead. This function is deprecated for removal
-   * to make function names consistent to allow the HID classes to be automatically generated.
+   *     to make function names consistent to allow the HID classes to be automatically generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public void setRightBumper(boolean state) {

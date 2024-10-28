@@ -737,7 +737,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *
    * @return The state of the button.
    * @deprecated Use {@link getLeftBumperButton} instead. This function is deprecated for removal
-   * to make function names consistent to allow the HID classes to be automatically generated.
+   *     to make function names consistent to allow the HID classes to be automatically generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumper() {
@@ -749,7 +749,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *
    * @return The state of the button.
    * @deprecated Use {@link getRightBumperButton} instead. This function is deprecated for removal
-   * to make function names consistent to allow the HID classes to be automatically generated.
+   *     to make function names consistent to allow the HID classes to be automatically generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumper() {
@@ -761,8 +761,8 @@ public class StadiaController extends GenericHID implements Sendable {
    *
    * @return Whether the button was pressed since the last check.
    * @deprecated Use {@link getLeftBumperButtonPressed} instead. This function is deprecated for
-   * removal to make function names consistent to allow the HID classes to be automatically
-   * generated.
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumperPressed() {
@@ -774,8 +774,8 @@ public class StadiaController extends GenericHID implements Sendable {
    *
    * @return Whether the button was pressed since the last check.
    * @deprecated Use {@link getRightBumperButtonPressed} instead. This function is deprecated for
-   * removal to make function names consistent to allow the HID classes to be automatically
-   * generated.
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumperPressed() {
@@ -787,8 +787,8 @@ public class StadiaController extends GenericHID implements Sendable {
    *
    * @return Whether the button was released since the last check.
    * @deprecated Use {@link getLeftBumperButtonReleased} instead. This function is deprecated for
-   * removal to make function names consistent to allow the HID classes to be automatically
-   * generated.
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumperReleased() {
@@ -800,8 +800,8 @@ public class StadiaController extends GenericHID implements Sendable {
    *
    * @return Whether the button was released since the last check.
    * @deprecated Use {@link getRightBumperButtonReleased} instead. This function is deprecated for
-   * removal to make function names consistent to allow the HID classes to be automatically
-   * generated.
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumperReleased() {

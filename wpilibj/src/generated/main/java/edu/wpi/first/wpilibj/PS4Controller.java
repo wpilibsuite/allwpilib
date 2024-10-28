@@ -721,7 +721,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *
    * @return The state of the touchpad.
    * @deprecated Use {@link getTouchpadButton} instead. This function is deprecated for removal to
-   * make function names consistent to allow the HID classes to be automatically generated.
+   *     make function names consistent to allow the HID classes to be automatically generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getTouchpad() {
@@ -733,8 +733,8 @@ public class PS4Controller extends GenericHID implements Sendable {
    *
    * @return Whether the touchpad was pressed since the last check.
    * @deprecated Use {@link getTouchpadButtonPressed} instead. This function is deprecated for
-   * removal to make function names consistent to allow the HID classes to be automatically
-   * generated.
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getTouchpadPressed() {
@@ -746,8 +746,8 @@ public class PS4Controller extends GenericHID implements Sendable {
    *
    * @return Whether the touchpad was released since the last check.
    * @deprecated Use {@link getTouchpadButtonReleased} instead. This function is deprecated for
-   * removal to make function names consistent to allow the HID classes to be automatically
-   * generated.
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getTouchpadReleased() {
