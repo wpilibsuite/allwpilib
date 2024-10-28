@@ -76,19 +76,19 @@ nativeUtils.platformConfigs.each {
     if (it.name.contains('windows')) {
         it.cppCompiler.args.add("/wd4200")
         it.cppCompiler.args.add("/wd4576")
-        it.cppCompiler.define 'GLOG_NO_EXPORT'
+        it.cppCompiler.args.add("-DGLOG_NO_EXPORT")
     } else if (it.name.contains('osx')) {
         it.cCompiler.args.add("-Wno-format-nonliteral")
         it.cCompiler.args.add("-Wno-unused-function")
         it.cppCompiler.args.add("-Wno-extern-c-compat")
         it.cppCompiler.args.add("-Wno-missing-braces")
         it.cppCompiler.args.remove("-pedantic")
-        it.cppCompiler.define 'GLOG_NO_EXPORT'
+        it.cppCompiler.args.add("-DGLOG_NO_EXPORT")
     } else {
         it.cCompiler.args.add("-Wno-format-nonliteral")
         it.cppCompiler.args.add("-Wno-missing-field-initializers")
         it.cppCompiler.args.remove("-pedantic")
-        it.cppCompiler.define 'GLOG_NO_EXPORT'
+        it.cppCompiler.args.add("-DGLOG_NO_EXPORT")
     }
 }
 
