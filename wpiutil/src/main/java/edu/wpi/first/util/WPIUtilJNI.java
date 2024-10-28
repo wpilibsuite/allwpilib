@@ -64,6 +64,11 @@ public class WPIUtilJNI {
   }
 
   /**
+   * Checks if the MSVC runtime is valid. Throws a runtime exception if not.
+   */
+  public static native void checkMsvcRuntime();
+
+  /**
    * Write the given string to stderr.
    *
    * @param str String to write.
