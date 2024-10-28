@@ -79,13 +79,34 @@ nativeUtils.platformConfigs.each {
     } else if (it.name.contains('osx')) {
         it.cCompiler.args.add("-Wno-format-nonliteral")
         it.cCompiler.args.add("-Wno-unused-function")
+        it.cCompiler.args.remove("-pedantic")
+        it.cCompiler.args.add("-Wno-cpp")
+        it.cCompiler.args.add("-Wno-unused-variable")
+        it.cCompiler.args.add("-Wno-unused-function")
+        it.cCompiler.args.add("-Wno-sign-compare")
         it.cppCompiler.args.add("-Wno-extern-c-compat")
         it.cppCompiler.args.add("-Wno-missing-braces")
         it.cppCompiler.args.remove("-pedantic")
+        it.cppCompiler.args.add("-Wno-cpp")
+        it.cppCompiler.args.add("-Wno-unused-variable")
+        it.cppCompiler.args.add("-Wno-unused-function")
+        it.cppCompiler.args.add("-Wno-deprecated-enum-enum-conversion")
+        it.cppCompiler.args.add("-Wno-sign-compare")
+
     } else {
         it.cCompiler.args.add("-Wno-format-nonliteral")
+        it.cCompiler.args.remove("-pedantic")
+        it.cCompiler.args.add("-Wno-cpp")
+        it.cCompiler.args.add("-Wno-unused-variable")
+        it.cCompiler.args.add("-Wno-unused-function")
+        it.cCompiler.args.add("-Wno-sign-compare")
         it.cppCompiler.args.add("-Wno-missing-field-initializers")
         it.cppCompiler.args.remove("-pedantic")
+        it.cppCompiler.args.add("-Wno-cpp")
+        it.cppCompiler.args.add("-Wno-unused-variable")
+        it.cppCompiler.args.add("-Wno-unused-function")
+        it.cppCompiler.args.add("-Wno-deprecated-enum-enum-conversion")
+        it.cppCompiler.args.add("-Wno-sign-compare")
     }
 }
 

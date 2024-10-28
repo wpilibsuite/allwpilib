@@ -33,7 +33,6 @@ def copy_upstream_src(wpilib_root):
         os.path.join(wpical, "src/main/native/thirdparty/mrcal/src"),
     )
 
-
     for f in files:
         with open(f) as file:
             content = file.read()

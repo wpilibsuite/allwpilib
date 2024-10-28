@@ -27,8 +27,8 @@
 #include <wpi/json.h>
 
 extern "C" {
-#include "apriltag/apriltag.h"
-#include "apriltag/tag36h11.h"
+#include "apriltag.h"
+#include "tag36h11.h"
 }  // extern "C"
 
 struct Pose {
