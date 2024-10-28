@@ -59,5 +59,6 @@ def main(argv):
     )
     subprocess.run(f"{REPO_ROOT}/thirdparty/imgui_suite/generate_fonts.sh", check=True)
 
+
 if __name__ == "__main__":
     main(sys.argv[1:])
