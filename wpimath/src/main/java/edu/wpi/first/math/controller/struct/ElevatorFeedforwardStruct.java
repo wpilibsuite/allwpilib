@@ -15,18 +15,18 @@ public class ElevatorFeedforwardStruct implements Struct<ElevatorFeedforward> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:ElevatorFeedforward";
+  public String getTypeName() {
+    return "ElevatorFeedforward";
   }
 
   @Override
   public int getSize() {
-    return kSizeDouble * 4;
+    return kSizeDouble * 5;
   }
 
   @Override
   public String getSchema() {
-    return "double ks;double kg;double kv;double ka";
+    return "double ks;double kg;double kv;double ka;double dt";
   }
 
   @Override
@@ -35,14 +35,16 @@ public class ElevatorFeedforwardStruct implements Struct<ElevatorFeedforward> {
     double kg = bb.getDouble();
     double kv = bb.getDouble();
     double ka = bb.getDouble();
-    return new ElevatorFeedforward(ks, kg, kv, ka);
+    double dt = bb.getDouble();
+    return new ElevatorFeedforward(ks, kg, kv, ka, dt);
   }
 
   @Override
   public void pack(ByteBuffer bb, ElevatorFeedforward value) {
-    bb.putDouble(value.ks);
-    bb.putDouble(value.kg);
-    bb.putDouble(value.kv);
-    bb.putDouble(value.ka);
+    bb.putDouble(value.getKs());
+    bb.putDouble(value.getKg());
+    bb.putDouble(value.getKv());
+    bb.putDouble(value.getKa());
+    bb.putDouble(value.getDt());
   }
 }

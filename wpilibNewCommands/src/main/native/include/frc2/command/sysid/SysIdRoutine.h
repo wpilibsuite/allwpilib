@@ -52,7 +52,8 @@ class Config {
   Config(std::optional<ramp_rate_t> rampRate,
          std::optional<units::volt_t> stepVoltage,
          std::optional<units::second_t> timeout,
-         std::optional<std::function<void(frc::sysid::State)>> recordState) {
+         std::function<void(frc::sysid::State)> recordState)
+      : m_recordState{recordState} {
     if (rampRate) {
       m_rampRate = rampRate.value();
     }
@@ -61,9 +62,6 @@ class Config {
     }
     if (timeout) {
       m_timeout = timeout.value();
-    }
-    if (recordState) {
-      m_recordState = recordState.value();
     }
   }
 };
@@ -109,7 +107,7 @@ class Mechanism {
             std::function<void(frc::sysid::SysIdRoutineLog*)> log,
             frc2::Subsystem* subsystem, std::string_view name)
       : m_drive{std::move(drive)},
-        m_log{std::move(log)},
+        m_log{log ? std::move(log) : [](frc::sysid::SysIdRoutineLog* log) {}},
         m_subsystem{subsystem},
         m_name{name} {}
 
@@ -134,7 +132,7 @@ class Mechanism {
             std::function<void(frc::sysid::SysIdRoutineLog*)> log,
             frc2::Subsystem* subsystem)
       : m_drive{std::move(drive)},
-        m_log{std::move(log)},
+        m_log{log ? std::move(log) : [](frc::sysid::SysIdRoutineLog* log) {}},
         m_subsystem{subsystem},
         m_name{m_subsystem->GetName()} {}
 };
@@ -179,7 +177,7 @@ class SysIdRoutine : public frc::sysid::SysIdRoutineLog {
    * @param mechanism Hardware interface for the SysId routine.
    */
   SysIdRoutine(Config config, Mechanism mechanism)
-      : SysIdRoutineLog(mechanism.m_subsystem->GetName()),
+      : SysIdRoutineLog(mechanism.m_name),
         m_config(config),
         m_mechanism(mechanism),
         m_recordState(config.m_recordState ? config.m_recordState

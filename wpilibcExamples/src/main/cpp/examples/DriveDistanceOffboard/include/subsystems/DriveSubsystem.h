@@ -5,9 +5,11 @@
 #pragma once
 
 #include <frc/Encoder.h>
+#include <frc/Timer.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/trajectory/TrapezoidProfile.h>
+#include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
 #include <units/length.h>
 
@@ -28,11 +30,15 @@ class DriveSubsystem : public frc2::SubsystemBase {
   /**
    * Attempts to follow the given drive states using offboard PID.
    *
-   * @param left The left wheel state.
-   * @param right The right wheel state.
+   * @param currentLeft The current left wheel state.
+   * @param currentRight The current right wheel state.
+   * @param nextLeft The next left wheel state.
+   * @param nextRight The next right wheel state.
    */
-  void SetDriveStates(frc::TrapezoidProfile<units::meters>::State left,
-                      frc::TrapezoidProfile<units::meters>::State right);
+  void SetDriveStates(frc::TrapezoidProfile<units::meters>::State currentLeft,
+                      frc::TrapezoidProfile<units::meters>::State currentRight,
+                      frc::TrapezoidProfile<units::meters>::State nextLeft,
+                      frc::TrapezoidProfile<units::meters>::State nextRight);
 
   /**
    * Drives the robot using arcade controls.
@@ -69,7 +75,32 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void SetMaxOutput(double maxOutput);
 
+  /**
+   * Creates a command to drive forward a specified distance using a motion
+   * profile.
+   *
+   * @param distance The distance to drive forward.
+   * @return A command.
+   */
+  [[nodiscard]]
+  frc2::CommandPtr ProfiledDriveDistance(units::meter_t distance);
+
+  /**
+   * Creates a command to drive forward a specified distance using a motion
+   * profile without resetting the encoders.
+   *
+   * @param distance The distance to drive forward.
+   * @return A command.
+   */
+  [[nodiscard]]
+  frc2::CommandPtr DynamicProfiledDriveDistance(units::meter_t distance);
+
  private:
+  frc::TrapezoidProfile<units::meters> m_profile{
+      {DriveConstants::kMaxSpeed, DriveConstants::kMaxAcceleration}};
+  frc::Timer m_timer;
+  units::meter_t m_initialLeftDistance;
+  units::meter_t m_initialRightDistance;
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 

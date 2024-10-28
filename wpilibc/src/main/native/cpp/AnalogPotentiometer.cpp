@@ -4,6 +4,7 @@
 
 #include "frc/AnalogPotentiometer.h"
 
+#include <memory>
 #include <utility>
 
 #include <wpi/NullDeleter.h>
@@ -45,6 +46,5 @@ double AnalogPotentiometer::Get() const {
 
 void AnalogPotentiometer::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Analog Input");
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return Get(); }, nullptr);
+  builder.AddDoubleProperty("Value", [=, this] { return Get(); }, nullptr);
 }

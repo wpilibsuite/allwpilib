@@ -11,11 +11,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.proto.Translation3dProto;
 import edu.wpi.first.math.geometry.struct.Translation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -31,6 +33,13 @@ import java.util.Objects;
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Translation3d
     implements Interpolatable<Translation3d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Translation3d representing the origin.
+   *
+   * <p>This exists to avoid allocations for common translations.
+   */
+  public static final Translation3d kZero = new Translation3d();
+
   private final double m_x;
   private final double m_y;
   private final double m_z;
@@ -79,8 +88,18 @@ public class Translation3d
    * @param y The y component of the translation.
    * @param z The z component of the translation.
    */
-  public Translation3d(Measure<Distance> x, Measure<Distance> y, Measure<Distance> z) {
+  public Translation3d(Distance x, Distance y, Distance z) {
     this(x.in(Meters), y.in(Meters), z.in(Meters));
+  }
+
+  /**
+   * Constructs a Translation3d from the provided translation vector's X, Y, and Z components. The
+   * values are assumed to be in meters.
+   *
+   * @param vector The translation vector to represent.
+   */
+  public Translation3d(Vector<N3> vector) {
+    this(vector.get(0), vector.get(1), vector.get(2));
   }
 
   /**
@@ -124,6 +143,42 @@ public class Translation3d
   @JsonProperty
   public double getZ() {
     return m_z;
+  }
+
+  /**
+   * Returns the X component of the translation in a measure.
+   *
+   * @return The x component of the translation in a measure.
+   */
+  public Distance getMeasureX() {
+    return Meters.of(m_x);
+  }
+
+  /**
+   * Returns the Y component of the translation in a measure.
+   *
+   * @return The y component of the translation in a measure.
+   */
+  public Distance getMeasureY() {
+    return Meters.of(m_y);
+  }
+
+  /**
+   * Returns the Z component of the translation in a measure.
+   *
+   * @return The z component of the translation in a measure.
+   */
+  public Distance getMeasureZ() {
+    return Meters.of(m_z);
+  }
+
+  /**
+   * Returns a vector representation of this translation.
+   *
+   * @return A Vector representation of this translation.
+   */
+  public Vector<N3> toVector() {
+    return VecBuilder.fill(m_x, m_y, m_z);
   }
 
   /**
@@ -232,12 +287,10 @@ public class Translation3d
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Translation3d) {
-      return Math.abs(((Translation3d) obj).m_x - m_x) < 1E-9
-          && Math.abs(((Translation3d) obj).m_y - m_y) < 1E-9
-          && Math.abs(((Translation3d) obj).m_z - m_z) < 1E-9;
-    }
-    return false;
+    return obj instanceof Translation3d other
+        && Math.abs(other.m_x - m_x) < 1E-9
+        && Math.abs(other.m_y - m_y) < 1E-9
+        && Math.abs(other.m_z - m_z) < 1E-9;
   }
 
   @Override

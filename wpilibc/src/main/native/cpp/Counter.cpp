@@ -4,7 +4,7 @@
 
 #include "frc/Counter.h"
 
-#include <utility>
+#include <memory>
 
 #include <hal/Counter.h>
 #include <hal/FRCUsageReporting.h>
@@ -84,15 +84,13 @@ Counter::Counter(EncodingType encodingType,
 }
 
 Counter::~Counter() {
-  try {
-    SetUpdateWhenEmpty(true);
-  } catch (const RuntimeError& e) {
-    e.Report();
+  if (m_counter != HAL_kInvalidHandle) {
+    try {
+      SetUpdateWhenEmpty(true);
+    } catch (const RuntimeError& e) {
+      e.Report();
+    }
   }
-
-  int32_t status = 0;
-  HAL_FreeCounter(m_counter, &status);
-  FRC_ReportError(status, "Counter destructor");
 }
 
 void Counter::SetUpSource(int channel) {
@@ -320,6 +318,5 @@ bool Counter::GetDirection() const {
 
 void Counter::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Counter");
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return Get(); }, nullptr);
+  builder.AddDoubleProperty("Value", [=, this] { return Get(); }, nullptr);
 }

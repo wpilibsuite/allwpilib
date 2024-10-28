@@ -228,7 +228,8 @@ class StructArraySubscriber : public Subscriber {
 
  private:
   ValueType m_defaultValue;
-  [[no_unique_address]] std::tuple<I...> m_info;
+  [[no_unique_address]]
+  std::tuple<I...> m_info;
 };
 
 /**
@@ -312,6 +313,9 @@ class StructArrayPublisher : public Publisher {
   void Set(std::span<const T> value, int64_t time = 0) {
     std::apply(
         [&](const I&... info) {
+          if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
+            GetTopic().GetInstance().template AddStructSchema<T>(info...);
+          }
           m_buf.Write(
               value,
               [&](auto bytes) { ::nt::SetRaw(m_pubHandle, bytes, time); },
@@ -356,6 +360,9 @@ class StructArrayPublisher : public Publisher {
   void SetDefault(std::span<const T> value) {
     std::apply(
         [&](const I&... info) {
+          if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
+            GetTopic().GetInstance().template AddStructSchema<T>(info...);
+          }
           m_buf.Write(
               value,
               [&](auto bytes) { ::nt::SetDefaultRaw(m_pubHandle, bytes); },
@@ -381,7 +388,8 @@ class StructArrayPublisher : public Publisher {
  private:
   wpi::StructArrayBuffer<T, I...> m_buf;
   std::atomic_bool m_schemaPublished{false};
-  [[no_unique_address]] std::tuple<I...> m_info;
+  [[no_unique_address]]
+  std::tuple<I...> m_info;
 };
 
 /**
@@ -696,7 +704,8 @@ class StructArrayTopic final : public Topic {
   }
 
  private:
-  [[no_unique_address]] std::tuple<I...> m_info;
+  [[no_unique_address]]
+  std::tuple<I...> m_info;
 };
 
 }  // namespace nt

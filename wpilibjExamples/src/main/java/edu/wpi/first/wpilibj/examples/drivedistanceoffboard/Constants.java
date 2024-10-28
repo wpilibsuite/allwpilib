@@ -14,6 +14,7 @@ package edu.wpi.first.wpilibj.examples.drivedistanceoffboard;
  */
 public final class Constants {
   public static final class DriveConstants {
+    public static final double kDt = 0.02;
     public static final int kLeftMotor1Port = 0;
     public static final int kLeftMotor2Port = 1;
     public static final int kRightMotor1Port = 2;

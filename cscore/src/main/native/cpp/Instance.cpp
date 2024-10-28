@@ -4,17 +4,20 @@
 
 #include "Instance.h"
 
+#include <memory>
 #include <string_view>
+#include <utility>
 
 #include <fmt/format.h>
 #include <wpi/fs.h>
+#include <wpi/print.h>
 
 using namespace cs;
 
 static void def_log_func(unsigned int level, const char* file,
                          unsigned int line, const char* msg) {
   if (level == 20) {
-    fmt::print(stderr, "CS: {}\n", msg);
+    wpi::print(stderr, "CS: {}\n", msg);
     return;
   }
 
@@ -28,7 +31,8 @@ static void def_log_func(unsigned int level, const char* file,
   } else {
     return;
   }
-  fmt::print(stderr, "CS: {}: {} ({}:{})\n", levelmsg, msg,
+  wpi::print(stderr, "CS: {}: {} ({}:{})\n", levelmsg, msg,
+             // NOLINTNEXTLINE(build/include_what_you_use)
              fs::path{file}.filename().string(), line);
 }
 
@@ -94,6 +98,9 @@ void Instance::DestroySource(CS_Source handle) {
 
 void Instance::DestroySink(CS_Sink handle) {
   if (auto data = m_sinks.Free(handle)) {
+    if (auto source = data->sink->GetSource()) {
+      source->Wakeup();
+    }
     notifier.NotifySink(data->sink->GetName(), handle, CS_SINK_DESTROYED);
   }
 }

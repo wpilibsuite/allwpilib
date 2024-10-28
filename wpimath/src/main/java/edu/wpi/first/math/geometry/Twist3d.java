@@ -72,15 +72,13 @@ public class Twist3d implements ProtobufSerializable, StructSerializable {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Twist3d) {
-      return Math.abs(((Twist3d) obj).dx - dx) < 1E-9
-          && Math.abs(((Twist3d) obj).dy - dy) < 1E-9
-          && Math.abs(((Twist3d) obj).dz - dz) < 1E-9
-          && Math.abs(((Twist3d) obj).rx - rx) < 1E-9
-          && Math.abs(((Twist3d) obj).ry - ry) < 1E-9
-          && Math.abs(((Twist3d) obj).rz - rz) < 1E-9;
-    }
-    return false;
+    return obj instanceof Twist3d other
+        && Math.abs(other.dx - dx) < 1E-9
+        && Math.abs(other.dy - dy) < 1E-9
+        && Math.abs(other.dz - dz) < 1E-9
+        && Math.abs(other.rx - rx) < 1E-9
+        && Math.abs(other.ry - ry) < 1E-9
+        && Math.abs(other.rz - rz) < 1E-9;
   }
 
   @Override

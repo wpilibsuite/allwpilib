@@ -42,27 +42,28 @@ import static edu.wpi.first.units.Units.Watts;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.function.DoubleFunction;
 import org.junit.jupiter.api.Test;
 
 class UnitsTest {
   // Be accurate to 0.01%
   private static final double thresh = 1e-5;
 
-  void testBaseUnit(Unit<?> baseUnit) {
-    assertEquals(0, baseUnit.of(0).baseUnitMagnitude(), 0);
-    assertEquals(1, baseUnit.of(1).baseUnitMagnitude(), 0);
-    assertEquals(-1, baseUnit.of(-1).baseUnitMagnitude(), 0);
-    assertEquals(100, baseUnit.of(100).baseUnitMagnitude(), 0);
-    assertEquals(8.281723, baseUnit.of(8.281723).baseUnitMagnitude(), 0);
-    assertEquals(Float.MAX_VALUE, baseUnit.of(Float.MAX_VALUE).baseUnitMagnitude(), 0);
-    assertEquals(Float.MIN_VALUE, baseUnit.of(Float.MIN_VALUE).baseUnitMagnitude(), 0);
+  void testBaseUnit(DoubleFunction<Measure<?>> baseUnit) {
+    assertEquals(0, baseUnit.apply(0).baseUnitMagnitude(), 0);
+    assertEquals(1, baseUnit.apply(1).baseUnitMagnitude(), 0);
+    assertEquals(-1, baseUnit.apply(-1).baseUnitMagnitude(), 0);
+    assertEquals(100, baseUnit.apply(100).baseUnitMagnitude(), 0);
+    assertEquals(8.281723, baseUnit.apply(8.281723).baseUnitMagnitude(), 0);
+    assertEquals(Float.MAX_VALUE, baseUnit.apply(Float.MAX_VALUE).baseUnitMagnitude(), 0);
+    assertEquals(Float.MIN_VALUE, baseUnit.apply(Float.MIN_VALUE).baseUnitMagnitude(), 0);
   }
 
   // Distances
 
   @Test
   void testMeters() {
-    testBaseUnit(Meters);
+    testBaseUnit(Meters::of);
     assertEquals("Meter", Meters.name());
     assertEquals("m", Meters.symbol());
   }
@@ -105,7 +106,7 @@ class UnitsTest {
 
   @Test
   void testMetersPerSecond() {
-    testBaseUnit(MetersPerSecond);
+    testBaseUnit(MetersPerSecond::of);
     assertEquals("Meter per Second", MetersPerSecond.name());
     assertEquals("m/s", MetersPerSecond.symbol());
   }
@@ -122,7 +123,7 @@ class UnitsTest {
 
   @Test
   void testMetersPerSecondPerSecond() {
-    testBaseUnit(MetersPerSecondPerSecond);
+    testBaseUnit(MetersPerSecondPerSecond::of);
     assertEquals("Meter per Second per Second", MetersPerSecondPerSecond.name());
     assertEquals("m/s/s", MetersPerSecondPerSecond.symbol());
     assertEquals(MetersPerSecond, MetersPerSecondPerSecond.getUnit());
@@ -135,7 +136,7 @@ class UnitsTest {
     assertEquals(9.80665, Gs.of(1).in(MetersPerSecondPerSecond), thresh);
     assertEquals("G", Gs.name());
     assertEquals("G", Gs.symbol());
-    assertEquals(Units.AnonymousBaseUnit, Gs.getUnit());
+    assertEquals(MetersPerSecond, Gs.getUnit());
     assertEquals(Seconds, Gs.getPeriod());
   }
 
@@ -143,7 +144,7 @@ class UnitsTest {
 
   @Test
   void testSeconds() {
-    testBaseUnit(Seconds);
+    testBaseUnit(Seconds::of);
     assertEquals("Second", Seconds.name());
     assertEquals("s", Seconds.symbol());
   }
@@ -173,7 +174,7 @@ class UnitsTest {
 
   @Test
   void testKilograms() {
-    testBaseUnit(Kilograms);
+    testBaseUnit(Kilograms::of);
     assertEquals("Kilogram", Kilograms.name());
     assertEquals("Kg", Kilograms.symbol());
   }
@@ -210,7 +211,7 @@ class UnitsTest {
 
   @Test
   void testRadians() {
-    testBaseUnit(Radians);
+    testBaseUnit(Radians::of);
     assertEquals(2 * Math.PI, Radians.convertFrom(1, Revolutions), thresh);
     assertEquals(2 * Math.PI, Radians.convertFrom(360, Degrees), thresh);
     assertEquals("Radian", Radians.name());
@@ -229,7 +230,7 @@ class UnitsTest {
 
   @Test
   void testValue() {
-    testBaseUnit(Value);
+    testBaseUnit(Value::of);
     assertEquals("<?>", Value.name());
     assertEquals("<?>", Value.symbol());
   }
@@ -245,7 +246,7 @@ class UnitsTest {
 
   @Test
   void testVolts() {
-    testBaseUnit(Volts);
+    testBaseUnit(Volts::of);
     assertEquals("Volt", Volts.name());
     assertEquals("V", Volts.symbol());
   }
@@ -261,7 +262,7 @@ class UnitsTest {
 
   @Test
   void testAmps() {
-    testBaseUnit(Amps);
+    testBaseUnit(Amps::of);
     assertEquals("Amp", Amps.name());
     assertEquals("A", Amps.symbol());
   }
@@ -277,7 +278,7 @@ class UnitsTest {
 
   @Test
   void testWatts() {
-    testBaseUnit(Watts);
+    testBaseUnit(Watts::of);
     assertEquals("Watt", Watts.name());
     assertEquals("W", Watts.symbol());
   }
@@ -300,7 +301,7 @@ class UnitsTest {
 
   @Test
   void testKelvin() {
-    testBaseUnit(Kelvin);
+    testBaseUnit(Kelvin::of);
     assertEquals("Kelvin", Kelvin.name());
     assertEquals("K", Kelvin.symbol()); // note: there's no degree symbol for Kelvin!
   }

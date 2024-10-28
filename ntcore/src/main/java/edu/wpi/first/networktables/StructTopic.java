@@ -152,20 +152,21 @@ public final class StructTopic<T> extends Topic {
         false);
   }
 
+  /**
+   * Returns the struct.
+   *
+   * @return The struct.
+   */
   public Struct<T> getStruct() {
     return m_struct;
   }
 
   @Override
   public boolean equals(Object other) {
-    if (other == this) {
-      return true;
-    }
-    if (!(other instanceof StructTopic)) {
-      return false;
-    }
-
-    return super.equals(other) && m_struct == ((StructTopic<?>) other).m_struct;
+    return other == this
+        || other instanceof StructTopic<?> topic
+            && super.equals(topic)
+            && m_struct == topic.m_struct;
   }
 
   @Override

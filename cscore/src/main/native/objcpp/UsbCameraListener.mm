@@ -76,7 +76,11 @@ using namespace cs;
       if ([device.deviceType
               isEqualToString:AVCaptureDeviceTypeBuiltInWideAngleCamera] ||
           [device.deviceType
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= 140000
+              isEqualToString:AVCaptureDeviceTypeExternal]) {
+#else
               isEqualToString:AVCaptureDeviceTypeExternalUnknown]) {
+#endif
         self.notifier->NotifyUsbCamerasChanged();
       }
     });

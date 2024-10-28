@@ -4,6 +4,7 @@
 
 #include "frc/Encoder.h"
 
+#include <memory>
 #include <utility>
 
 #include <hal/Encoder.h>
@@ -57,12 +58,6 @@ Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
     throw FRC_MakeError(err::NullParameter, "bSource");
   }
   InitEncoder(reverseDirection, encodingType);
-}
-
-Encoder::~Encoder() {
-  int32_t status = 0;
-  HAL_FreeEncoder(m_encoder, &status);
-  FRC_ReportError(status, "FreeEncoder");
 }
 
 int Encoder::Get() const {
@@ -216,8 +211,7 @@ void Encoder::InitSendable(wpi::SendableBuilder& builder) {
     builder.SetSmartDashboardType("Encoder");
   }
 
-  builder.AddDoubleProperty(
-      "Speed", [=, this] { return GetRate(); }, nullptr);
+  builder.AddDoubleProperty("Speed", [=, this] { return GetRate(); }, nullptr);
   builder.AddDoubleProperty(
       "Distance", [=, this] { return GetDistance(); }, nullptr);
   builder.AddDoubleProperty(

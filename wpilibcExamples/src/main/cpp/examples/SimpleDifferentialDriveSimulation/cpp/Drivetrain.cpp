@@ -30,8 +30,6 @@ void Drivetrain::UpdateOdometry() {
 }
 
 void Drivetrain::ResetOdometry(const frc::Pose2d& pose) {
-  m_leftEncoder.Reset();
-  m_rightEncoder.Reset();
   m_drivetrainSimulator.SetPose(pose);
   m_odometry.ResetPosition(m_gyro.GetRotation2d(),
                            units::meter_t{m_leftEncoder.GetDistance()},

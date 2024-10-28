@@ -6,8 +6,12 @@
 
 #include <algorithm>
 #include <array>
+#include <functional>
+#include <memory>
 #include <ostream>
 #include <span>
+#include <utility>
+#include <vector>
 
 #include <gmock/gmock.h>
 #include <wpi/SpanMatcher.h>
@@ -67,6 +71,8 @@ class MockStream {
   MOCK_METHOD(void, DoWrite,
               (std::span<const uv::Buffer> bufs,
                const std::shared_ptr<MockWebSocketWriteReq>& req));
+
+  Logger* GetLogger() const { return nullptr; }
 };
 
 class WebSocketWriteReqTest : public ::testing::Test {
@@ -371,6 +377,44 @@ TEST_F(WebSocketTrySendTest, ServerPartialLastFrame) {
   std::array<uv::Buffer, 1> remBufs{std::span{m_buf3data}.subspan(1)};
   EXPECT_CALL(stream, DoWrite(wpi::SpanEq(remBufs), _));
   CheckTrySendFrames({}, {});
+  ASSERT_EQ(makeReqCalled, 1);
+  ASSERT_TRUE(req->m_frames.m_bufs.empty());
+  ASSERT_EQ(callbackCalled, 0);
+}
+
+TEST_F(WebSocketTrySendTest, Big) {
+  std::vector<uv::Buffer> bufs;
+  for (int i = 0; i < 100000;) {
+    i += 1430;
+    bufs.emplace_back(
+        uv::Buffer::Allocate(i < 100000 ? 1430 : (100000 - (i - 1430))));
+  }
+  WebSocket::Frame frame{WebSocket::kOpBinary | WebSocket::kFlagFin, bufs};
+  EXPECT_CALL(stream, TryWrite(_)).WillOnce(Return(7681));
+
+  // Write called for remainder of buffers
+  std::vector<uv::Buffer> remBufs;
+  remBufs.emplace_back(bufs[5]);
+  remBufs.back().base += 521;
+  remBufs.back().len -= 521;
+  for (size_t i = 6; i < bufs.size(); ++i) {
+    remBufs.emplace_back(bufs[i]);
+  }
+  EXPECT_CALL(stream, DoWrite(wpi::SpanEq(remBufs), _));
+
+  ASSERT_TRUE(
+      TrySendFrames(
+          true, stream, {{frame}},
+          [&](std::function<void(std::span<uv::Buffer>, uv::Error)>&& cb) {
+            ++makeReqCalled;
+            req = std::make_shared<MockWebSocketWriteReq>(std::move(cb));
+            return req;
+          },
+          [&](auto bufs, auto err) { ++callbackCalled; })
+          .empty());
+  for (auto& buf : bufs) {
+    buf.Deallocate();
+  }
   ASSERT_EQ(makeReqCalled, 1);
   ASSERT_TRUE(req->m_frames.m_bufs.empty());
   ASSERT_EQ(callbackCalled, 0);

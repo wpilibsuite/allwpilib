@@ -71,8 +71,13 @@ class CompressedStorage {
 
   void resize(Index size, double reserveSizeFactor = 0) {
     if (m_allocatedSize < size) {
+      // Avoid underflow on the std::min<Index> call by choosing the smaller index type.
+      using SmallerIndexType =
+          typename std::conditional<static_cast<size_t>((std::numeric_limits<Index>::max)()) <
+                                        static_cast<size_t>((std::numeric_limits<StorageIndex>::max)()),
+                                    Index, StorageIndex>::type;
       Index realloc_size =
-          (std::min<Index>)(NumTraits<StorageIndex>::highest(), size + Index(reserveSizeFactor * double(size)));
+          (std::min<Index>)(NumTraits<SmallerIndexType>::highest(), size + Index(reserveSizeFactor * double(size)));
       if (realloc_size < size) internal::throw_std_bad_alloc();
       reallocate(realloc_size);
     }

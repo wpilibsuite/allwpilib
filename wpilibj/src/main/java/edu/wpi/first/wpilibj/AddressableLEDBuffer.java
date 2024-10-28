@@ -4,11 +4,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
-
 /** Buffer storage for Addressable LEDs. */
-public class AddressableLEDBuffer {
+public class AddressableLEDBuffer implements LEDReader, LEDWriter {
   byte[] m_buffer;
 
   /**
@@ -28,6 +25,7 @@ public class AddressableLEDBuffer {
    * @param g the g value [0-255]
    * @param b the b value [0-255]
    */
+  @Override
   public void setRGB(int index, int r, int g, int b) {
     m_buffer[index * 4] = (byte) b;
     m_buffer[(index * 4) + 1] = (byte) g;
@@ -36,115 +34,59 @@ public class AddressableLEDBuffer {
   }
 
   /**
-   * Sets a specific led in the buffer.
-   *
-   * @param index the index to write
-   * @param h the h value [0-180)
-   * @param s the s value [0-255]
-   * @param v the v value [0-255]
-   */
-  public void setHSV(final int index, final int h, final int s, final int v) {
-    if (s == 0) {
-      setRGB(index, v, v, v);
-      return;
-    }
-
-    // The below algorithm is copied from Color.fromHSV and moved here for
-    // performance reasons.
-
-    // Loosely based on
-    // https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
-    // The hue range is split into 60 degree regions where in each region there
-    // is one rgb component at a low value (m), one at a high value (v) and one
-    // that changes (X) from low to high (X+m) or high to low (v-X)
-
-    // Difference between highest and lowest value of any rgb component
-    final int chroma = (s * v) / 255;
-
-    // Because hue is 0-180 rather than 0-360 use 30 not 60
-    final int region = (h / 30) % 6;
-
-    // Remainder converted from 0-30 to 0-255
-    final int remainder = (int) Math.round((h % 30) * (255 / 30.0));
-
-    // Value of the lowest rgb component
-    final int m = v - chroma;
-
-    // Goes from 0 to chroma as hue increases
-    final int X = (chroma * remainder) >> 8;
-
-    switch (region) {
-      case 0:
-        setRGB(index, v, X + m, m);
-        break;
-      case 1:
-        setRGB(index, v - X, v, m);
-        break;
-      case 2:
-        setRGB(index, m, v, X + m);
-        break;
-      case 3:
-        setRGB(index, m, v - X, v);
-        break;
-      case 4:
-        setRGB(index, X + m, m, v);
-        break;
-      default:
-        setRGB(index, v, m, v - X);
-        break;
-    }
-  }
-
-  /**
-   * Sets a specific LED in the buffer.
-   *
-   * @param index The index to write
-   * @param color The color of the LED
-   */
-  public void setLED(int index, Color color) {
-    setRGB(index, (int) (color.red * 255), (int) (color.green * 255), (int) (color.blue * 255));
-  }
-
-  /**
-   * Sets a specific LED in the buffer.
-   *
-   * @param index The index to write
-   * @param color The color of the LED
-   */
-  public void setLED(int index, Color8Bit color) {
-    setRGB(index, color.red, color.green, color.blue);
-  }
-
-  /**
    * Gets the buffer length.
    *
    * @return the buffer length
    */
+  @Override
   public int getLength() {
     return m_buffer.length / 4;
   }
 
   /**
-   * Gets the color at the specified index.
+   * Gets the red channel of the color at the specified index.
    *
-   * @param index the index to get
-   * @return the LED color at the specified index
+   * @param index the index of the LED to read
+   * @return the value of the red channel, from [0, 255]
    */
-  public Color8Bit getLED8Bit(int index) {
-    return new Color8Bit(
-        m_buffer[index * 4 + 2] & 0xFF, m_buffer[index * 4 + 1] & 0xFF, m_buffer[index * 4] & 0xFF);
+  @Override
+  public int getRed(int index) {
+    return m_buffer[index * 4 + 2] & 0xFF;
   }
 
   /**
-   * Gets the color at the specified index.
+   * Gets the green channel of the color at the specified index.
    *
-   * @param index the index to get
-   * @return the LED color at the specified index
+   * @param index the index of the LED to read
+   * @return the value of the green channel, from [0, 255]
    */
-  public Color getLED(int index) {
-    return new Color(
-        (m_buffer[index * 4 + 2] & 0xFF) / 255.0,
-        (m_buffer[index * 4 + 1] & 0xFF) / 255.0,
-        (m_buffer[index * 4] & 0xFF) / 255.0);
+  @Override
+  public int getGreen(int index) {
+    return m_buffer[index * 4 + 1] & 0xFF;
+  }
+
+  /**
+   * Gets the blue channel of the color at the specified index.
+   *
+   * @param index the index of the LED to read
+   * @return the value of the blue channel, from [0, 255]
+   */
+  @Override
+  public int getBlue(int index) {
+    return m_buffer[index * 4] & 0xFF;
+  }
+
+  /**
+   * Creates a view of a subsection of this data buffer, starting from (and including) {@code
+   * startingIndex} and ending on (and including) {@code endingIndex}. Views cannot be written
+   * directly to an {@link AddressableLED}, but are useful tools for logically separating different
+   * sections of an LED strip for independent control.
+   *
+   * @param startingIndex the first index in this buffer that the view should encompass (inclusive)
+   * @param endingIndex the last index in this buffer that the view should encompass (inclusive)
+   * @return the view object
+   */
+  public AddressableLEDBufferView createView(int startingIndex, int endingIndex) {
+    return new AddressableLEDBufferView(this, startingIndex, endingIndex);
   }
 }

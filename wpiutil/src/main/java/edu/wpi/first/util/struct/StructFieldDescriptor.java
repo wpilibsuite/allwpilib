@@ -206,7 +206,7 @@ public class StructFieldDescriptor {
    * @return minimum value
    */
   public long getIntMin() {
-    return (-(m_bitMask >> 1)) - 1;
+    return -(m_bitMask >> 1) - 1;
   }
 
   /**

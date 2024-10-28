@@ -162,7 +162,7 @@ class ProfiledPIDController
    * @return The position tolerance of the controller.
    */
   double GetPositionTolerance() const {
-    return m_controller.GetPositionTolerance();
+    return m_controller.GetErrorTolerance();
   }
 
   /**
@@ -171,7 +171,17 @@ class ProfiledPIDController
    * @return The velocity tolerance of the controller.
    */
   double GetVelocityTolerance() const {
-    return m_controller.GetVelocityTolerance();
+    return m_controller.GetErrorDerivativeTolerance();
+  }
+
+  /**
+   * Gets the accumulated error used in the integral calculation of this
+   * controller.
+   *
+   * @return The accumulated error of this controller.
+   */
+  double GetAccumulatedError() const {
+    return m_controller.GetAccumulatedError();
   }
 
   /**
@@ -257,13 +267,14 @@ class ProfiledPIDController
   void DisableContinuousInput() { m_controller.DisableContinuousInput(); }
 
   /**
-   * Sets the minimum and maximum values for the integrator.
+   * Sets the minimum and maximum contributions of the integral term.
    *
-   * When the cap is reached, the integrator value is added to the controller
-   * output rather than the integrator value times the integral gain.
+   * The internal integrator is clamped so that the integral term's contribution
+   * to the output stays between minimumIntegral and maximumIntegral. This
+   * prevents integral windup.
    *
-   * @param minimumIntegral The minimum value of the integrator.
-   * @param maximumIntegral The maximum value of the integrator.
+   * @param minimumIntegral The minimum contribution of the integral term.
+   * @param maximumIntegral The maximum contribution of the integral term.
    */
   void SetIntegratorRange(double minimumIntegral, double maximumIntegral) {
     m_controller.SetIntegratorRange(minimumIntegral, maximumIntegral);
@@ -289,14 +300,14 @@ class ProfiledPIDController
    * @return The error.
    */
   Distance_t GetPositionError() const {
-    return Distance_t{m_controller.GetPositionError()};
+    return Distance_t{m_controller.GetError()};
   }
 
   /**
    * Returns the change in error per second.
    */
   Velocity_t GetVelocityError() const {
-    return Velocity_t{m_controller.GetVelocityError()};
+    return Velocity_t{m_controller.GetErrorDerivative()};
   }
 
   /**
@@ -404,6 +415,19 @@ class ProfiledPIDController
     builder.AddDoubleProperty(
         "izone", [this] { return GetIZone(); },
         [this](double value) { SetIZone(value); });
+    builder.AddDoubleProperty(
+        "maxVelocity", [this] { return GetConstraints().maxVelocity.value(); },
+        [this](double value) {
+          SetConstraints(
+              Constraints{Velocity_t{value}, GetConstraints().maxAcceleration});
+        });
+    builder.AddDoubleProperty(
+        "maxAcceleration",
+        [this] { return GetConstraints().maxAcceleration.value(); },
+        [this](double value) {
+          SetConstraints(
+              Constraints{GetConstraints().maxVelocity, Acceleration_t{value}});
+        });
     builder.AddDoubleProperty(
         "goal", [this] { return GetGoal().position.value(); },
         [this](double value) { SetGoal(Distance_t{value}); });

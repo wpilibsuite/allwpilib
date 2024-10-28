@@ -4,6 +4,8 @@
 
 #include "frc/simulation/PowerDistributionSim.h"  // NOLINT(build/include_order)
 
+#include <vector>
+
 #include <gtest/gtest.h>
 #include <hal/HAL.h>
 
@@ -79,4 +81,26 @@ TEST(PowerDistributionSimTest, SetCurrent) {
     EXPECT_TRUE(callback.GetLastValue());
   }
 }
+
+TEST(PowerDistributionSimTest, GetAllCurrents) {
+  HAL_Initialize(500, 0);
+  PowerDistribution pdp{2, frc::PowerDistribution::ModuleType::kRev};
+  PowerDistributionSim sim(pdp);
+
+  // setup
+  for (int channel = 0; channel < pdp.GetNumChannels(); ++channel) {
+    const double kTestCurrent = 24 - channel;
+    sim.SetCurrent(channel, kTestCurrent);
+  }
+
+  // run it
+  std::vector<double> currents = pdp.GetAllCurrents();
+
+  // verify
+  for (int channel = 0; channel < pdp.GetNumChannels(); ++channel) {
+    const double kTestCurrent = 24 - channel;
+    EXPECT_EQ(kTestCurrent, currents[channel]);
+  }
+}
+
 }  // namespace frc::sim

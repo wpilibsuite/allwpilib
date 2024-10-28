@@ -62,8 +62,8 @@ model {
                     it.buildable = false
                     return
                 }
-                it.cppCompiler.define 'WPILIB_EXPORTS'
-                it.cCompiler.define 'WPILIB_EXPORTS'
+                it.cppCompiler.define 'WPILIB_EXPORTS', 'SLEIPNIR_EXPORTS'
+                it.cCompiler.define 'WPILIB_EXPORTS', 'SLEIPNIR_EXPORTS'
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 }
@@ -314,14 +314,8 @@ model {
                                 }
 
                                 test.systemProperty 'java.library.path', filePath
-                                test.environment 'LD_LIBRARY_PATH', filePath
-                                test.environment 'DYLD_LIBRARY_PATH', filePath
-                                test.workingDir filePath
                                 run.dependsOn it.tasks.install
                                 run.systemProperty 'java.library.path', filePath
-                                run.environment 'LD_LIBRARY_PATH', filePath
-                                run.environment 'DYLD_LIBRARY_PATH', filePath
-                                run.workingDir filePath
 
                                 found = true
                             }

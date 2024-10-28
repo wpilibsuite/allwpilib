@@ -9,6 +9,7 @@
 #include <units/voltage.h>
 
 namespace sysid {
+
 /**
  * Simulation of a Simple Motor mechanism based off of a model from SysId
  * Feedforward gains.
@@ -30,7 +31,7 @@ class SimpleMotorSim {
    * seconds.
    *
    * @param voltage Voltage to apply over the timestep.
-   * @param dt      Sammple period.
+   * @param dt      Sample period.
    */
   void Update(units::volt_t voltage, units::second_t dt);
 

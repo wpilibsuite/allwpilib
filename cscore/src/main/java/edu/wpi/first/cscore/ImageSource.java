@@ -4,7 +4,13 @@
 
 package edu.wpi.first.cscore;
 
+/** A base class for single image providing sources. */
 public abstract class ImageSource extends VideoSource {
+  /**
+   * Constructs an ImageSource.
+   *
+   * @param handle The image source handle.
+   */
   protected ImageSource(int handle) {
     super(handle);
   }

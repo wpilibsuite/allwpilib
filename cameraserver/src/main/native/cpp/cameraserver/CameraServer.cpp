@@ -5,6 +5,9 @@
 #include "cameraserver/CameraServer.h"
 
 #include <atomic>
+#include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
@@ -113,6 +116,8 @@ static std::string_view MakeSourceValue(CS_Source source,
     }
     case CS_SOURCE_CV:
       return "cv:";
+    case CS_SOURCE_RAW:
+      return "raw:";
     default:
       return "unknown:";
   }
@@ -502,6 +507,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
   return camera;
 }
 
+WPI_IGNORE_DEPRECATED
 cs::AxisCamera CameraServer::AddAxisCamera(std::string_view host) {
   return AddAxisCamera("Axis Camera", host);
 }
@@ -557,7 +563,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
   csShared->ReportAxisCamera(camera.GetHandle());
   return camera;
 }
-
+WPI_UNIGNORE_DEPRECATED
 cs::MjpegServer CameraServer::AddSwitchedCamera(std::string_view name) {
   auto& inst = ::GetInstance();
   // create a dummy CvSource

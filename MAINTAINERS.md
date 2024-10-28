@@ -18,7 +18,7 @@ Desktop tools publish to the development repo on every push to main. To publish 
 
 ## Publishing VS Code
 Before publishing, make sure to update the gradlerio version in `vscode-wpilib/resources/gradle/version.txt` Also make sure the gradle wrapper version matches the wrapper required by gradlerio.
-Upon pushing a tag, a release will be built, and the files will be uploaded to the releases on GitHub. For publishing to the marketplace, you need a Microsoft account and to be added as a maintainer.
+Upon pushing a tag, a release will be built, and the files will be uploaded to the releases on GitHub.
 
 ## Publishing GradleRIO
 Before publishing, make sure to update the version in build.gradle. Publishing must happen locally, using the command `./gradlew publishPlugin`. This does require your API key for publishing to be set.

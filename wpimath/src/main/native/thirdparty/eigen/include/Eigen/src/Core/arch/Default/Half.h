@@ -208,8 +208,11 @@ struct numeric_limits_half_impl {
   static EIGEN_CONSTEXPR const bool has_infinity = true;
   static EIGEN_CONSTEXPR const bool has_quiet_NaN = true;
   static EIGEN_CONSTEXPR const bool has_signaling_NaN = true;
+  EIGEN_DIAGNOSTICS(push)
+  EIGEN_DISABLE_DEPRECATED_WARNING
   static EIGEN_CONSTEXPR const std::float_denorm_style has_denorm = std::denorm_present;
   static EIGEN_CONSTEXPR const bool has_denorm_loss = false;
+  EIGEN_DIAGNOSTICS(pop)
   static EIGEN_CONSTEXPR const std::float_round_style round_style = std::round_to_nearest;
   static EIGEN_CONSTEXPR const bool is_iec559 = true;
   // The C++ standard defines this as "true if the set of values representable
@@ -256,10 +259,13 @@ template <typename T>
 EIGEN_CONSTEXPR const bool numeric_limits_half_impl<T>::has_quiet_NaN;
 template <typename T>
 EIGEN_CONSTEXPR const bool numeric_limits_half_impl<T>::has_signaling_NaN;
+EIGEN_DIAGNOSTICS(push)
+EIGEN_DISABLE_DEPRECATED_WARNING
 template <typename T>
 EIGEN_CONSTEXPR const std::float_denorm_style numeric_limits_half_impl<T>::has_denorm;
 template <typename T>
 EIGEN_CONSTEXPR const bool numeric_limits_half_impl<T>::has_denorm_loss;
+EIGEN_DIAGNOSTICS(pop)
 template <typename T>
 EIGEN_CONSTEXPR const std::float_round_style numeric_limits_half_impl<T>::round_style;
 template <typename T>
@@ -313,7 +319,7 @@ namespace half_impl {
 #if (defined(EIGEN_HAS_CUDA_FP16) && defined(EIGEN_CUDA_ARCH) && EIGEN_CUDA_ARCH >= 530) || \
     (defined(EIGEN_HAS_HIP_FP16) && defined(HIP_DEVICE_COMPILE))
 // Note: We deliberately do *not* define this to 1 even if we have Arm's native
-// fp16 type since GPU halfs are rather different from native CPU halfs.
+// fp16 type since GPU half types are rather different from native CPU half types.
 // TODO: Rename to something like EIGEN_HAS_NATIVE_GPU_FP16
 #define EIGEN_HAS_NATIVE_FP16
 #endif
@@ -671,7 +677,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half log(const half& a) {
 #if (defined(EIGEN_HAS_CUDA_FP16) && EIGEN_CUDA_SDK_VER >= 80000 && defined(EIGEN_CUDA_ARCH) && \
      EIGEN_CUDA_ARCH >= 530) ||                                                                 \
     (defined(EIGEN_HAS_HIP_FP16) && defined(EIGEN_HIP_DEVICE_COMPILE))
-  return half(::hlog(a));
+  return half(hlog(a));
 #else
   return half(::logf(float(a)));
 #endif
@@ -722,6 +728,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half ceil(const half& a) {
 }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half rint(const half& a) { return half(::rintf(float(a))); }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half round(const half& a) { return half(::roundf(float(a))); }
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half trunc(const half& a) { return half(::truncf(float(a))); }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half fmod(const half& a, const half& b) {
   return half(::fmodf(float(a), float(b)));
 }
@@ -762,16 +769,22 @@ EIGEN_ALWAYS_INLINE std::ostream& operator<<(std::ostream& os, const half& v) {
 namespace internal {
 
 template <>
-struct random_default_impl<half, false, false> {
-  static inline half run(const half& x, const half& y) {
-    return x + (y - x) * half(float(std::rand()) / float(RAND_MAX));
-  }
-  static inline half run() { return run(half(-1.f), half(1.f)); }
+struct is_arithmetic<half> {
+  enum { value = true };
 };
 
 template <>
-struct is_arithmetic<half> {
-  enum { value = true };
+struct random_impl<half> {
+  enum : int { MantissaBits = 10 };
+  using Impl = random_impl<float>;
+  static EIGEN_DEVICE_FUNC inline half run(const half& x, const half& y) {
+    float result = Impl::run(x, y, MantissaBits);
+    return half(result);
+  }
+  static EIGEN_DEVICE_FUNC inline half run() {
+    float result = Impl::run(MantissaBits);
+    return half(result);
+  }
 };
 
 }  // end namespace internal

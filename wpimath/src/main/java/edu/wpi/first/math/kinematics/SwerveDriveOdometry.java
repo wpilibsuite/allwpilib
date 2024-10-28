@@ -17,7 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * <p>Teams can use odometry during the autonomous period for complex tasks like path following.
  * Furthermore, odometry can be used for latency compensation when using computer-vision systems.
  */
-public class SwerveDriveOdometry extends Odometry<SwerveDriveWheelPositions> {
+public class SwerveDriveOdometry extends Odometry<SwerveModulePosition[]> {
   private final int m_numModules;
 
   /**
@@ -33,7 +33,7 @@ public class SwerveDriveOdometry extends Odometry<SwerveDriveWheelPositions> {
       Rotation2d gyroAngle,
       SwerveModulePosition[] modulePositions,
       Pose2d initialPose) {
-    super(kinematics, gyroAngle, new SwerveDriveWheelPositions(modulePositions), initialPose);
+    super(kinematics, gyroAngle, modulePositions, initialPose);
 
     m_numModules = modulePositions.length;
 
@@ -51,30 +51,13 @@ public class SwerveDriveOdometry extends Odometry<SwerveDriveWheelPositions> {
       SwerveDriveKinematics kinematics,
       Rotation2d gyroAngle,
       SwerveModulePosition[] modulePositions) {
-    this(kinematics, gyroAngle, modulePositions, new Pose2d());
-  }
-
-  /**
-   * Resets the robot's position on the field.
-   *
-   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
-   * automatically takes care of offsetting the gyro angle.
-   *
-   * <p>Similarly, module positions do not need to be reset in user code.
-   *
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param modulePositions The wheel positions reported by each module.,
-   * @param pose The position on the field that your robot is at.
-   */
-  public void resetPosition(
-      Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d pose) {
-    resetPosition(gyroAngle, new SwerveDriveWheelPositions(modulePositions), pose);
+    this(kinematics, gyroAngle, modulePositions, Pose2d.kZero);
   }
 
   @Override
   public void resetPosition(
-      Rotation2d gyroAngle, SwerveDriveWheelPositions modulePositions, Pose2d pose) {
-    if (modulePositions.positions.length != m_numModules) {
+      Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d pose) {
+    if (modulePositions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
               + "constructor");
@@ -82,25 +65,9 @@ public class SwerveDriveOdometry extends Odometry<SwerveDriveWheelPositions> {
     super.resetPosition(gyroAngle, modulePositions, pose);
   }
 
-  /**
-   * Updates the robot's position on the field using forward kinematics and integration of the pose
-   * over time. This method automatically calculates the current time to calculate period
-   * (difference between two timestamps). The period is used to calculate the change in distance
-   * from a velocity. This also takes in an angle parameter which is used instead of the angular
-   * rate that is calculated from forward kinematics.
-   *
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param modulePositions The current position of all swerve modules. Please provide the positions
-   *     in the same order in which you instantiated your SwerveDriveKinematics.
-   * @return The new pose of the robot.
-   */
-  public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    return update(gyroAngle, new SwerveDriveWheelPositions(modulePositions));
-  }
-
   @Override
-  public Pose2d update(Rotation2d gyroAngle, SwerveDriveWheelPositions modulePositions) {
-    if (modulePositions.positions.length != m_numModules) {
+  public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
+    if (modulePositions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
               + "constructor");

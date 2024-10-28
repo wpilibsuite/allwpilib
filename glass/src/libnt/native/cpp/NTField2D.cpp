@@ -5,6 +5,9 @@
 #include "glass/networktables/NTField2D.h"
 
 #include <algorithm>
+#include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
@@ -126,7 +129,7 @@ void NTField2DModel::Update() {
   for (auto&& event : m_poller.ReadQueue()) {
     if (auto info = event.GetTopicInfo()) {
       // handle publish/unpublish
-      auto name = wpi::drop_front(info->name, m_path.size());
+      auto name = wpi::remove_prefix(info->name, m_path).value_or("");
       if (name.empty() || name[0] == '.') {
         continue;
       }
@@ -198,7 +201,9 @@ void NTField2DModel::ForEachFieldObject(
         func) {
   for (auto&& obj : m_objects) {
     if (obj->Exists()) {
-      func(*obj, wpi::drop_front(obj->GetName(), m_path.size()));
+      if (auto name = wpi::remove_prefix(obj->GetName(), m_path)) {
+        func(*obj, *name);
+      }
     }
   }
 }

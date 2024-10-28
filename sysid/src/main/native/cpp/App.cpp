@@ -8,9 +8,10 @@
 
 #include <filesystem>
 #include <memory>
+#include <string>
+#include <utility>
 #include <string_view>
 
-#include <fmt/format.h>
 #include <glass/Context.h>
 #include <glass/MainMenuBar.h>
 #include <glass/Storage.h>
@@ -18,8 +19,8 @@
 #include <glass/WindowManager.h>
 #include <glass/other/Log.h>
 #include <imgui.h>
-#include <uv.h>
 #include <wpi/Logger.h>
+#include <wpi/print.h>
 #include <wpigui.h>
 #include <wpigui_openurl.h>
 
@@ -89,13 +90,11 @@ void Application(std::string_view saveDir) {
     std::string filename = std::filesystem::path{file}.filename().string();
     gLog.Append(fmt::format("{}{} ({}:{})\n", lvl, msg, filename, line));
 #ifndef NDEBUG
-    fmt::print(stderr, "{}{} ({}:{})\n", lvl, msg, filename, line);
+    wpi::print(stderr, "{}{} ({}:{})\n", lvl, msg, filename, line);
 #endif
   });
 
   gLogger.set_min_level(wpi::WPI_LOG_DEBUG);
-  // Set the number of workers for the libuv threadpool.
-  uv_os_setenv("UV_THREADPOOL_SIZE", "6");
 
   // Initialize window manager and add views.
   auto& storage = glass::GetStorageRoot().GetChild("SysId");

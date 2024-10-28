@@ -16,6 +16,8 @@ import edu.wpi.first.math.geometry.Translation3d;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -147,19 +149,14 @@ public class AprilTagFieldLayout {
    */
   @JsonIgnore
   public final void setOrigin(OriginPosition origin) {
-    switch (origin) {
-      case kBlueAllianceWallRightSide:
-        setOrigin(new Pose3d());
-        break;
-      case kRedAllianceWallRightSide:
-        setOrigin(
-            new Pose3d(
-                new Translation3d(m_fieldDimensions.fieldLength, m_fieldDimensions.fieldWidth, 0),
-                new Rotation3d(0, 0, Math.PI)));
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported enum value");
-    }
+    var pose =
+        switch (origin) {
+          case kBlueAllianceWallRightSide -> Pose3d.kZero;
+          case kRedAllianceWallRightSide -> new Pose3d(
+              new Translation3d(m_fieldDimensions.fieldLength, m_fieldDimensions.fieldWidth, 0),
+              new Rotation3d(0, 0, Math.PI));
+        };
+    setOrigin(pose);
   }
 
   /**
@@ -222,6 +219,29 @@ public class AprilTagFieldLayout {
   }
 
   /**
+   * Get an official {@link AprilTagFieldLayout}.
+   *
+   * @param field The loadable AprilTag field layout.
+   * @return AprilTagFieldLayout of the field.
+   * @throws UncheckedIOException If the layout does not exist.
+   */
+  public static AprilTagFieldLayout loadField(AprilTagFields field) {
+    if (field.m_fieldLayout == null) {
+      try {
+        field.m_fieldLayout = loadFromResource(field.m_resourceFile);
+      } catch (IOException e) {
+        throw new UncheckedIOException(
+            "Could not load AprilTagFieldLayout from " + field.m_resourceFile, e);
+      }
+    }
+    // Copy layout because the layout's origin is mutable
+    return new AprilTagFieldLayout(
+        field.m_fieldLayout.getTags(),
+        field.m_fieldLayout.getFieldLength(),
+        field.m_fieldLayout.getFieldWidth());
+  }
+
+  /**
    * Deserializes a field layout from a resource within a internal jar file.
    *
    * <p>Users should use {@link AprilTagFields#loadAprilTagLayoutField()} to load official layouts
@@ -237,7 +257,7 @@ public class AprilTagFieldLayout {
       // Class.getResourceAsStream() returns null if the resource does not exist.
       throw new IOException("Could not locate resource: " + resourcePath);
     }
-    InputStreamReader reader = new InputStreamReader(stream);
+    InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
     try {
       return new ObjectMapper().readerFor(AprilTagFieldLayout.class).readValue(reader);
     } catch (IOException e) {
@@ -247,11 +267,9 @@ public class AprilTagFieldLayout {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof AprilTagFieldLayout) {
-      var other = (AprilTagFieldLayout) obj;
-      return m_apriltags.equals(other.m_apriltags) && m_origin.equals(other.m_origin);
-    }
-    return false;
+    return obj instanceof AprilTagFieldLayout layout
+        && m_apriltags.equals(layout.m_apriltags)
+        && m_origin.equals(layout.m_origin);
   }
 
   @Override
@@ -264,11 +282,11 @@ public class AprilTagFieldLayout {
   private static class FieldDimensions {
     @SuppressWarnings("MemberName")
     @JsonProperty(value = "length")
-    public double fieldLength;
+    public final double fieldLength;
 
     @SuppressWarnings("MemberName")
     @JsonProperty(value = "width")
-    public double fieldWidth;
+    public final double fieldWidth;
 
     @JsonCreator()
     FieldDimensions(

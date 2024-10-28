@@ -16,8 +16,8 @@ public class Rotation3dStruct implements Struct<Rotation3d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Rotation3d";
+  public String getTypeName() {
+    return "Rotation3d";
   }
 
   @Override
@@ -44,5 +44,10 @@ public class Rotation3dStruct implements Struct<Rotation3d> {
   @Override
   public void pack(ByteBuffer bb, Rotation3d value) {
     Quaternion.struct.pack(bb, value.getQuaternion());
+  }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
   }
 }

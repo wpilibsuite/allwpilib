@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.HashMap;
@@ -95,8 +96,14 @@ public class GenericHID {
 
   private final int m_port;
   private int m_outputs;
-  private short m_leftRumble;
-  private short m_rightRumble;
+  private int m_leftRumble;
+  private int m_rightRumble;
+  private final Map<EventLoop, Map<Integer, BooleanEvent>> m_buttonCache = new HashMap<>();
+  private final Map<EventLoop, Map<Pair<Integer, Double>, BooleanEvent>> m_axisLessThanCache =
+      new HashMap<>();
+  private final Map<EventLoop, Map<Pair<Integer, Double>, BooleanEvent>> m_axisGreaterThanCache =
+      new HashMap<>();
+  private final Map<EventLoop, Map<Integer, BooleanEvent>> m_povCache = new HashMap<>();
 
   /**
    * Construct an instance of a device.
@@ -159,7 +166,10 @@ public class GenericHID {
    * @return an event instance representing the button's digital signal attached to the given loop.
    */
   public BooleanEvent button(int button, EventLoop loop) {
-    return new BooleanEvent(loop, () -> getRawButton(button));
+    synchronized (m_buttonCache) {
+      var cache = m_buttonCache.computeIfAbsent(loop, k -> new HashMap<>());
+      return cache.computeIfAbsent(button, k -> new BooleanEvent(loop, () -> getRawButton(k)));
+    }
   }
 
   /**
@@ -223,7 +233,12 @@ public class GenericHID {
    * @return a BooleanEvent instance based around this angle of a POV on the HID.
    */
   public BooleanEvent pov(int pov, int angle, EventLoop loop) {
-    return new BooleanEvent(loop, () -> getPOV(pov) == angle);
+    synchronized (m_povCache) {
+      var cache = m_povCache.computeIfAbsent(loop, k -> new HashMap<>());
+      // angle can be -1, so use 3600 instead of 360
+      return cache.computeIfAbsent(
+          pov * 3600 + angle, k -> new BooleanEvent(loop, () -> getPOV(pov) == angle));
+    }
   }
 
   /**
@@ -335,7 +350,12 @@ public class GenericHID {
    * @return an event instance that is true when the axis value is less than the provided threshold.
    */
   public BooleanEvent axisLessThan(int axis, double threshold, EventLoop loop) {
-    return new BooleanEvent(loop, () -> getRawAxis(axis) < threshold);
+    synchronized (m_axisLessThanCache) {
+      var cache = m_axisLessThanCache.computeIfAbsent(loop, k -> new HashMap<>());
+      return cache.computeIfAbsent(
+          Pair.of(axis, threshold),
+          k -> new BooleanEvent(loop, () -> getRawAxis(axis) < threshold));
+    }
   }
 
   /**
@@ -349,7 +369,12 @@ public class GenericHID {
    *     threshold.
    */
   public BooleanEvent axisGreaterThan(int axis, double threshold, EventLoop loop) {
-    return new BooleanEvent(loop, () -> getRawAxis(axis) > threshold);
+    synchronized (m_axisGreaterThanCache) {
+      var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
+      return cache.computeIfAbsent(
+          Pair.of(axis, threshold),
+          k -> new BooleanEvent(loop, () -> getRawAxis(axis) > threshold));
+    }
   }
 
   /**
@@ -455,20 +480,14 @@ public class GenericHID {
    */
   public void setRumble(RumbleType type, double value) {
     value = MathUtil.clamp(value, 0, 1);
-    short rumbleValue = (short) (value * 65535);
-
+    int rumbleValue = (int) (value * 65535);
     switch (type) {
-      case kLeftRumble:
-        this.m_leftRumble = rumbleValue;
-        break;
-      case kRightRumble:
-        this.m_rightRumble = rumbleValue;
-        break;
-      case kBothRumble:
-      default:
+      case kLeftRumble -> this.m_leftRumble = rumbleValue;
+      case kRightRumble -> this.m_rightRumble = rumbleValue;
+      default -> {
         this.m_leftRumble = rumbleValue;
         this.m_rightRumble = rumbleValue;
-        break;
+      }
     }
 
     DriverStationJNI.setJoystickOutputs(

@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2023 Keith O'Hara
+  ##   Copyright (C) 2016-2024 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -124,7 +124,7 @@ T
 log_breakup(const T x)
 noexcept
 {   // x = a*b, where b = 10^c
-    return( log_mantissa(mantissa(x)) + T(GCEM_LOG_10)*T(find_exponent(x,0)) );
+    return( log_mantissa(mantissa(x)) + T(GCEM_LOG_10) * T(find_exponent(x,0)) );
 }
 
 template<typename T>

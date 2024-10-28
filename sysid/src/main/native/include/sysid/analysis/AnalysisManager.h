@@ -9,10 +9,8 @@
 #include <exception>
 #include <limits>
 #include <numeric>
-#include <optional>
 #include <string>
 #include <string_view>
-#include <tuple>
 #include <vector>
 
 #include <units/time.h>
@@ -23,7 +21,7 @@
 #include "sysid/analysis/AnalysisType.h"
 #include "sysid/analysis/FeedbackAnalysis.h"
 #include "sysid/analysis/FeedbackControllerPreset.h"
-#include "sysid/analysis/FeedforwardAnalysis.h"
+#include "sysid/analysis/OLS.h"
 #include "sysid/analysis/Storage.h"
 
 namespace sysid {
@@ -39,7 +37,7 @@ class AnalysisManager {
   TestData m_data;
   /**
    * Represents settings for an instance of the analysis manager. This contains
-   * information about the feedback controller preset, loop type, motion
+   * information about the feedback controller preset, loop type, velocity
    * threshold, acceleration window size, LQR parameters, and the selected
    * dataset.
    */
@@ -60,9 +58,9 @@ class AnalysisManager {
     LQRParameters lqr{1, 1.5, 7};
 
     /**
-     * The motion threshold (units/s) for trimming quasistatic test data.
+     * The velocity threshold (units/s) for trimming quasistatic test data.
      */
-    double motionThreshold = 0.2;
+    double velocityThreshold = 0.2;
 
     /**
      * The window size for the median filter.
@@ -74,32 +72,63 @@ class AnalysisManager {
      * zero indicates it needs to be set to the default.
      */
     units::second_t stepTestDuration = 0_s;
+  };
+
+  struct FeedforwardGain {
+    /**
+     * The feedforward gain.
+     */
+    double gain = 1;
 
     /**
-     * The conversion factor of counts per revolution.
+     * Descriptor attached to the feedforward gain.
      */
-    int cpr = 1440;
+    std::string descriptor = "Feedforward gain.";
 
     /**
-     * The conversion factor of gearing.
+     * Whether the feedforward gain is valid.
      */
-    double gearing = 1;
+    bool isValidGain = true;
 
     /**
-     * Whether or not the gains should be in the encoder's units (mainly for use
-     * in a smart motor controller).
+     * Error message attached to the feedforward gain.
      */
-    bool convertGainsToEncTicks = false;
+    std::string errorMessage = "No error.";
   };
 
   /**
-   * Stores feedforward.
+   * Stores feedforward gains.
    */
   struct FeedforwardGains {
     /**
-     * Stores the Feedforward gains.
+     * Stores the raw OLSResult from analysis.
      */
-    OLSResult ffGains;
+    OLSResult olsResult;
+
+    /**
+     * The static gain Ks.
+     */
+    FeedforwardGain Ks = {};
+
+    /**
+     * The velocity gain kV.
+     */
+    FeedforwardGain Kv = {};
+
+    /**
+     * The acceleration gain kA.
+     */
+    FeedforwardGain Ka = {};
+
+    /**
+     * The gravity gain Kg.
+     */
+    FeedforwardGain Kg = {};
+
+    /**
+     * The offset (arm).
+     */
+    FeedforwardGain offset = {};
   };
 
   /**
@@ -193,7 +222,8 @@ class AnalysisManager {
    * @param ff The feedforward gains.
    * @return The calculated feedback gains.
    */
-  FeedbackGains CalculateFeedback(std::vector<double> ff);
+  FeedbackGains CalculateFeedback(const FeedforwardGain& Kv,
+                                  const FeedforwardGain& Ka);
 
   /**
    * Overrides the units in the JSON with the user-provided ones.
@@ -222,7 +252,7 @@ class AnalysisManager {
   std::string_view GetUnit() const { return m_data.distanceUnit; }
 
   /**
-   * Returns a reference to the iterator of the currently selected raw datset.
+   * Returns a reference to the iterator of the currently selected raw dataset.
    * Unfortunately, due to ImPlot internals, the reference cannot be const so
    * the user should be careful not to change any data.
    *
@@ -232,7 +262,7 @@ class AnalysisManager {
 
   /**
    * Returns a reference to the iterator of the currently selected filtered
-   * datset. Unfortunately, due to ImPlot internals, the reference cannot be
+   * dataset. Unfortunately, due to ImPlot internals, the reference cannot be
    * const so the user should be careful not to change any data.
    *
    * @return A reference to the filtered internal data.

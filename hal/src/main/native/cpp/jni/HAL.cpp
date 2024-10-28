@@ -6,6 +6,10 @@
 
 #include <jni.h>
 
+#ifdef __FRC_ROBORIO__
+#include <signal.h>
+#endif
+
 #include <cassert>
 #include <cstring>
 
@@ -84,6 +88,20 @@ Java_edu_wpi_first_hal_HAL_exitMain
 
 /*
  * Class:     edu_wpi_first_hal_HAL
+ * Method:    terminate
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_HAL_terminate
+  (JNIEnv*, jclass)
+{
+#ifdef __FRC_ROBORIO__
+  ::raise(SIGKILL);
+#endif
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
  * Method:    simPeriodicBeforeNative
  * Signature: ()V
  */
@@ -132,6 +150,21 @@ Java_edu_wpi_first_hal_HAL_getBrownedOut
 {
   int32_t status = 0;
   bool val = HAL_GetBrownedOut(&status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
+ * Method:    getCommsDisableCount
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_HAL_getCommsDisableCount
+  (JNIEnv* env, jclass)
+{
+  int32_t status = 0;
+  int32_t val = HAL_GetCommsDisableCount(&status);
   CheckStatus(env, status);
   return val;
 }

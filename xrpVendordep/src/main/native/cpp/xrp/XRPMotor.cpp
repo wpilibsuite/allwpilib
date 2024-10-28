@@ -6,7 +6,9 @@
 
 #include <frc/Errors.h>
 
-#include <wpi/deprecated.h>
+#include <map>
+#include <set>
+#include <string>
 
 using namespace frc;
 

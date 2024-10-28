@@ -124,20 +124,17 @@ public final class PrintLog {
             continue;
           }
 
-          if ("double".equals(entry.type)) {
-            System.out.println("  " + record.getDouble());
-          } else if ("int64".equals(entry.type)) {
-            System.out.println("  " + record.getInteger());
-          } else if ("string".equals(entry.type) || "json".equals(entry.type)) {
-            System.out.println("  '" + record.getString() + "'");
-          } else if ("boolean".equals(entry.type)) {
-            System.out.println("  " + record.getBoolean());
-          } else if ("double[]".equals(entry.type)) {
-            System.out.println("  " + List.of(record.getDoubleArray()));
-          } else if ("int64[]".equals(entry.type)) {
-            System.out.println("  " + List.of(record.getIntegerArray()));
-          } else if ("string[]".equals(entry.type)) {
-            System.out.println("  " + List.of(record.getStringArray()));
+          switch (entry.type) {
+            case "double" -> System.out.println("  " + record.getDouble());
+            case "int64" -> System.out.println("  " + record.getInteger());
+            case "string", "json" -> System.out.println("  '" + record.getString() + "'");
+            case "boolean" -> System.out.println("  " + record.getBoolean());
+            case "double[]" -> System.out.println("  " + List.of(record.getDoubleArray()));
+            case "int64[]" -> System.out.println("  " + List.of(record.getIntegerArray()));
+            case "string[]" -> System.out.println("  " + List.of(record.getStringArray()));
+            default -> {
+              // NOP
+            }
           }
         } catch (InputMismatchException ex) {
           System.out.println("  invalid");

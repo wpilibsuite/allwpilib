@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AnalogEncoder;
 
 /** Class to control a simulated analog encoder. */
@@ -24,21 +23,12 @@ public class AnalogEncoderSim {
   }
 
   /**
-   * Set the position using an {@link Rotation2d}.
+   * Set the position.
    *
-   * @param angle The angle.
+   * @param value The position.
    */
-  public void setPosition(Rotation2d angle) {
-    setTurns(angle.getDegrees() / 360.0);
-  }
-
-  /**
-   * Set the position of the encoder.
-   *
-   * @param turns The position.
-   */
-  public void setTurns(double turns) {
-    m_simPosition.set(turns);
+  public void set(double value) {
+    m_simPosition.set(value);
   }
 
   /**
@@ -46,16 +36,7 @@ public class AnalogEncoderSim {
    *
    * @return The simulated position.
    */
-  public double getTurns() {
+  public double get() {
     return m_simPosition.get();
-  }
-
-  /**
-   * Get the position as a {@link Rotation2d}.
-   *
-   * @return The position as a {@link Rotation2d}.
-   */
-  public Rotation2d getPosition() {
-    return Rotation2d.fromDegrees(getTurns() * 360.0);
   }
 }

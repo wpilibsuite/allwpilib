@@ -15,8 +15,8 @@ public class QuaternionStruct implements Struct<Quaternion> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Quaternion";
+  public String getTypeName() {
+    return "Quaternion";
   }
 
   @Override
@@ -44,5 +44,10 @@ public class QuaternionStruct implements Struct<Quaternion> {
     bb.putDouble(value.getX());
     bb.putDouble(value.getY());
     bb.putDouble(value.getZ());
+  }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
   }
 }

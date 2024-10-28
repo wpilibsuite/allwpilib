@@ -4,22 +4,15 @@
 
 #include "frc2/command/Command.h"
 
+#include <string>
+#include <utility>
+
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
-#include "frc2/command/CommandHelper.h"
+#include "frc2/command/CommandPtr.h"
 #include "frc2/command/CommandScheduler.h"
-#include "frc2/command/ConditionalCommand.h"
-#include "frc2/command/InstantCommand.h"
-#include "frc2/command/ParallelCommandGroup.h"
-#include "frc2/command/ParallelDeadlineGroup.h"
-#include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/RepeatCommand.h"
-#include "frc2/command/SequentialCommandGroup.h"
-#include "frc2/command/WaitCommand.h"
-#include "frc2/command/WaitUntilCommand.h"
-#include "frc2/command/WrapperCommand.h"
 
 using namespace frc2;
 
@@ -99,9 +92,17 @@ CommandPtr Command::BeforeStarting(std::function<void()> toRun,
                                                  requirements);
 }
 
+CommandPtr Command::BeforeStarting(CommandPtr&& before) && {
+  return std::move(*this).ToPtr().BeforeStarting(std::move(before));
+}
+
 CommandPtr Command::AndThen(std::function<void()> toRun,
                             Requirements requirements) && {
   return std::move(*this).ToPtr().AndThen(std::move(toRun), requirements);
+}
+
+CommandPtr Command::AndThen(CommandPtr&& next) && {
+  return std::move(*this).ToPtr().AndThen(std::move(next));
 }
 
 CommandPtr Command::Repeatedly() && {
@@ -118,6 +119,18 @@ CommandPtr Command::Unless(std::function<bool()> condition) && {
 
 CommandPtr Command::OnlyIf(std::function<bool()> condition) && {
   return std::move(*this).ToPtr().OnlyIf(std::move(condition));
+}
+
+CommandPtr Command::DeadlineFor(CommandPtr&& parallel) && {
+  return std::move(*this).ToPtr().DeadlineFor(std::move(parallel));
+}
+
+CommandPtr Command::AlongWith(CommandPtr&& parallel) && {
+  return std::move(*this).ToPtr().AlongWith(std::move(parallel));
+}
+
+CommandPtr Command::RaceWith(CommandPtr&& parallel) && {
+  return std::move(*this).ToPtr().RaceWith(std::move(parallel));
 }
 
 CommandPtr Command::FinallyDo(std::function<void(bool)> end) && {
@@ -174,8 +187,7 @@ std::optional<std::string> Command::GetPreviousCompositionSite() const {
 
 void Command::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Command");
-  builder.AddStringProperty(
-      ".name", [this] { return GetName(); }, nullptr);
+  builder.AddStringProperty(".name", [this] { return GetName(); }, nullptr);
   builder.AddBooleanProperty(
       "running", [this] { return IsScheduled(); },
       [this](bool value) {

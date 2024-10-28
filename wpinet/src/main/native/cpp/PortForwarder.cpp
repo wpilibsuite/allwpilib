@@ -4,8 +4,12 @@
 
 #include "wpinet/PortForwarder.h"
 
+#include <memory>
+#include <string>
+
 #include <fmt/format.h>
 #include <wpi/DenseMap.h>
+#include <wpi/print.h>
 
 #include "wpinet/EventLoopRunner.h"
 #include "wpinet/uv/GetAddrInfo.h"
@@ -50,6 +54,7 @@ void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
   m_impl->runner.ExecSync([&](uv::Loop& loop) {
     auto server = uv::Tcp::Create(loop);
     if (!server) {
+      wpi::print(stderr, "PortForwarder: Creating server failed\n");
       return;
     }
 
@@ -62,6 +67,7 @@ void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
       auto& loop = serverPtr->GetLoopRef();
       auto client = serverPtr->Accept();
       if (!client) {
+        wpi::print(stderr, "PortForwarder: Connecting to client failed\n");
         return;
       }
 
@@ -75,6 +81,7 @@ void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
 
       auto remote = uv::Tcp::Create(loop);
       if (!remote) {
+        wpi::print(stderr, "PortForwarder: Creating remote failed\n");
         client->Close();
         return;
       }
@@ -106,6 +113,7 @@ void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
                 return;
               }
               *(client->GetData<bool>()) = true;
+              wpi::print("PortForwarder: Connected to remote port\n");
 
               // close both when either side closes
               client->end.connect([clientPtr = client.get(), remoteWeak] {

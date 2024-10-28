@@ -6,44 +6,43 @@ Subject: [PATCH 1/9] Revert "win,process: write minidumps when sending SIGQUIT
 
 This reverts commit 748d894e82abcdfff7429cf745003e182c47f163.
 ---
- CMakeLists.txt    |   6 +--
+ CMakeLists.txt    |   5 +-
  configure.ac      |   2 +-
  include/uv/win.h  |   1 -
- src/win/process.c | 116 ----------------------------------------------
- 4 files changed, 2 insertions(+), 123 deletions(-)
+ src/win/process.c | 125 ----------------------------------------------
+ 4 files changed, 2 insertions(+), 131 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 72377851b69f74c5285fd34ae206ad6bed3745c1..3ec6bd00542f5aacfc6245b1f82e365eb1cff02c 100644
+index 28c6df2566696785383716bf463c37cf2d07f987..36fef0fdff5090bb3a56d7e231c3bfe390772318 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -183,11 +183,7 @@ if(WIN32)
+@@ -193,10 +193,7 @@ if(WIN32)
         advapi32
         iphlpapi
         userenv
 -       ws2_32
 -       dbghelp
 -       ole32
--       uuid
 -       shell32)
 +       ws2_32)
    list(APPEND uv_sources
         src/win/async.c
         src/win/core.c
 diff --git a/configure.ac b/configure.ac
-index 0a1042ce3d384f6a4392a100275c14cb31ba2816..6c87c36039446e04f6c30c23b8fdb9b957dd610d 100644
+index 98c59363026f8657dccc3aa2ed80d8bee159ebec..c4ee0756551876eac394282f2020cf44be17d023 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -74,7 +74,7 @@ AM_CONDITIONAL([OS400],    [AS_CASE([$host_os],[os400],         [true], [false])
  AM_CONDITIONAL([SUNOS],    [AS_CASE([$host_os],[solaris*],      [true], [false])])
  AM_CONDITIONAL([WINNT],    [AS_CASE([$host_os],[mingw*],        [true], [false])])
  AS_CASE([$host_os],[mingw*], [
--    LIBS="$LIBS -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid -lshell32"
-+    LIBS="$LIBS -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32"
+-    LIBS="$LIBS -lws2_32 -lpsapi -liphlpapi -luserenv -luser32 -ldbghelp -lole32 -lshell32"
++    LIBS="$LIBS -lws2_32 -lpsapi -liphlpapi -luserenv -luser32 -lshell32"
  ])
  AS_CASE([$host_os], [solaris2.10], [
      CFLAGS="$CFLAGS -DSUNOS_NO_IFADDRS"
 diff --git a/include/uv/win.h b/include/uv/win.h
-index 6f8c47298e407bcb0151cf383a8370b71074f03e..eb74776978340a4910194bae35a9da6493e8c0a6 100644
+index 12ac53b4f217d212d1b5c32cfe090800f8770a09..d4c271d4d856a5ec847439825cace5bafb0d4acd 100644
 --- a/include/uv/win.h
 +++ b/include/uv/win.h
 @@ -91,7 +91,6 @@ typedef struct pollfd {
@@ -55,10 +54,10 @@ index 6f8c47298e407bcb0151cf383a8370b71074f03e..eb74776978340a4910194bae35a9da64
  #define SIGWINCH             28
  
 diff --git a/src/win/process.c b/src/win/process.c
-index 43059858f3112e7e7185796525697629b72988df..119b46cb3f37122395c172c6e9700d472a2173ed 100644
+index 9d48ddc6f84d6f8c425a8f6f8a344f39d3deb5cc..79bec0090cc94bfe20dab722cf2d8135ddd03cb8 100644
 --- a/src/win/process.c
 +++ b/src/win/process.c
-@@ -32,9 +32,6 @@
+@@ -31,9 +31,6 @@
  #include "internal.h"
  #include "handle-inl.h"
  #include "req-inl.h"
@@ -68,7 +67,7 @@ index 43059858f3112e7e7185796525697629b72988df..119b46cb3f37122395c172c6e9700d47
  
  
  #define SIGKILL         9
-@@ -1173,120 +1170,7 @@ static int uv__kill(HANDLE process_handle, int signum) {
+@@ -1160,129 +1157,7 @@ static int uv__kill(HANDLE process_handle, int signum) {
      return UV_EINVAL;
    }
  
@@ -109,9 +108,18 @@ index 43059858f3112e7e7185796525697629b72988df..119b46cb3f37122395c172c6e9700d47
 -                         (PVOID) dump_folder,
 -                         &dump_folder_len);
 -      if (ret != ERROR_SUCCESS) {
+-        /* Workaround for missing uuid.dll on MinGW. */
+-        static const GUID FOLDERID_LocalAppData_libuv = {
+-          0xf1b32785, 0x6fba, 0x4fcf,
+-              {0x9d, 0x55, 0x7b, 0x8e, 0x7f, 0x15, 0x70, 0x91}
+-        };
+-
 -        /* Default value for `dump_folder` is `%LOCALAPPDATA%\CrashDumps`. */
 -        WCHAR* localappdata;
--        SHGetKnownFolderPath(&FOLDERID_LocalAppData, 0, NULL, &localappdata);
+-        SHGetKnownFolderPath(&FOLDERID_LocalAppData_libuv,
+-                             0,
+-                             NULL,
+-                             &localappdata);
 -        _snwprintf_s(dump_folder,
 -                     sizeof(dump_folder),
 -                     _TRUNCATE,

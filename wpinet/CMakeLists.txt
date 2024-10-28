@@ -9,10 +9,7 @@ file(GLOB wpinet_jni_src src/main/native/cpp/jni/WPINetJNI.cpp)
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     set(CMAKE_JNI_TARGET true)
 
@@ -23,8 +20,10 @@ if(WITH_JAVA)
         ${JAVA_SOURCES}
         INCLUDE_JARS wpiutil_jar
         OUTPUT_NAME wpinet
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS wpinet_jni_headers
     )
+    set_property(TARGET wpinet_jar PROPERTY FOLDER "java")
 
     install_jar(wpinet_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS wpinet_jar FILE wpinet_jar.cmake DESTINATION share/wpinet)
@@ -39,23 +38,21 @@ if(WITH_JAVA)
     add_dependencies(wpinetjni wpinet_jar)
 
     install(TARGETS wpinetjni EXPORT wpinetjni)
+    export(TARGETS wpinetjni FILE wpinetjni.cmake NAMESPACE wpinetjni::)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
-    file(GLOB WPINET_SOURCES src/main/java/edu/wpi/first/net/*.java)
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         wpinet_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/net" ${WPINET_SOURCES}
+        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
         OUTPUT_NAME wpinet-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(WPINET_SRC_JAR_FILE TARGET wpinet_src_jar PROPERTY JAR_FILE)
-    install(FILES ${WPINET_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET wpinet_src_jar PROPERTY FOLDER "java")
+
+    install_jar(wpinet_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -144,7 +141,6 @@ if(NOT USE_SYSTEM_LIBUV)
         wpinet
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/libuv/include>
-            $<INSTALL_INTERFACE:${include_dest}/wpinet>
     )
     if(NOT MSVC)
         target_sources(wpinet PRIVATE ${uv_unix_src})
@@ -177,25 +173,19 @@ else()
 endif()
 
 install(
-    DIRECTORY src/main/native/thirdparty/tcpsockets/include/
+    DIRECTORY src/main/native/include/ src/main/native/thirdparty/tcpsockets/include/
     DESTINATION "${include_dest}/wpinet"
 )
 target_include_directories(
     wpinet
     PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
         $<INSTALL_INTERFACE:${include_dest}/wpinet>
 )
 
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpinet")
-target_include_directories(
-    wpinet
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<INSTALL_INTERFACE:${include_dest}/wpinet>
-)
-
 install(TARGETS wpinet EXPORT wpinet)
+export(TARGETS wpinet FILE wpinet.cmake NAMESPACE wpinet::)
 
 configure_file(wpinet-config.cmake.in ${WPILIB_BINARY_DIR}/wpinet-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION share/wpinet)
@@ -234,5 +224,5 @@ set_property(TARGET netconsoleTee PROPERTY FOLDER "examples")
 if(WITH_TESTS)
     wpilib_add_test(wpinet src/test/native/cpp)
     target_include_directories(wpinet_test PRIVATE src/test/native/include src/main/native/cpp)
-    target_link_libraries(wpinet_test wpinet ${LIBUTIL} gmock_main wpiutil_testlib)
+    target_link_libraries(wpinet_test wpinet ${LIBUTIL} googletest wpiutil_testlib)
 endif()

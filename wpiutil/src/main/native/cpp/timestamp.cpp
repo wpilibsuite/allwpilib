@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <optional>
+#include <utility>
 
 #ifdef __FRC_ROBORIO__
 #include <stdint.h>
@@ -21,7 +22,8 @@ using namespace nRoboRIO_FPGANamespace;
 }  // namespace fpga
 #include <memory>
 
-#include "dlfcn.h"
+#include "dlfcn.h"  // NOLINT(build/include_subdir)
+
 #endif
 
 #ifdef _WIN32
@@ -35,7 +37,7 @@ using namespace nRoboRIO_FPGANamespace;
 
 #include <cstdio>
 
-#include <fmt/format.h>
+#include "wpi/print.h"
 
 #ifdef __FRC_ROBORIO__
 namespace {
@@ -68,7 +70,7 @@ struct HMBLowLevel {
     int32_t status = 0;
     niFpga.reset(dlopen("libNiFpga.so", RTLD_LAZY));
     if (!niFpga) {
-      fmt::print(stderr, "Could not open libNiFpga.so\n");
+      wpi::print(stderr, "Could not open libNiFpga.so\n");
       return false;
     }
     NiFpga_OpenHmbFunc openHmb = reinterpret_cast<NiFpga_OpenHmbFunc>(
@@ -84,14 +86,14 @@ struct HMBLowLevel {
         dlsym(niFpga.get(), "NiFpgaDll_WriteU32"));
     if (openHmb == nullptr || closeHmb == nullptr || findRegister == nullptr ||
         writeU32 == nullptr || readU32 == nullptr) {
-      fmt::print(stderr, "Could not find HMB symbols in libNiFpga.so\n");
+      wpi::print(stderr, "Could not find HMB symbols in libNiFpga.so\n");
       niFpga = nullptr;
       return false;
     }
     uint32_t hmbConfigRegister = 0;
     status = findRegister(session, "HMB.Config", &hmbConfigRegister);
     if (status != 0) {
-      fmt::print(stderr, "Failed to find HMB.Config register, status code {}\n",
+      wpi::print(stderr, "Failed to find HMB.Config register, status code {}\n",
                  status);
       closeHmb = nullptr;
       niFpga = nullptr;
@@ -102,7 +104,7 @@ struct HMBLowLevel {
         openHmb(session, hmbName, &hmbBufferSize,
                 reinterpret_cast<void**>(const_cast<uint32_t**>(&hmbBuffer)));
     if (status != 0) {
-      fmt::print(stderr, "Failed to open HMB, status code {}\n", status);
+      wpi::print(stderr, "Failed to open HMB, status code {}\n", status);
       closeHmb = nullptr;
       niFpga = nullptr;
       return false;
@@ -133,13 +135,15 @@ struct HMBLowLevel {
                                                           dlcloseWrapper};
 };
 struct HMBHolder {
-  void Configure(void* col, std::unique_ptr<fpga::tHMB> hmbObject) {
+  bool Configure(void* col, std::unique_ptr<fpga::tHMB> hmbObject) {
     hmb = std::move(hmbObject);
     chipObjectLibrary.reset(col);
     if (!lowLevel.Configure(hmb->getSystemInterface()->getHandle())) {
       hmb = nullptr;
       chipObjectLibrary = nullptr;
+      return false;
     }
+    return true;
   }
   void Reset() {
     lowLevel.Reset();
@@ -236,20 +240,22 @@ void wpi::impl::SetupNowDefaultOnRio() {
 
 #ifdef __FRC_ROBORIO__
 template <>
-void wpi::impl::SetupNowRio(void* chipObjectLibrary,
+bool wpi::impl::SetupNowRio(void* chipObjectLibrary,
                             std::unique_ptr<fpga::tHMB> hmbObject) {
   if (!hmbInitialized.test()) {
-    hmb.Configure(chipObjectLibrary, std::move(hmbObject));
+    return hmb.Configure(chipObjectLibrary, std::move(hmbObject));
   }
+  return true;
 }
 #endif
 
-void wpi::impl::SetupNowRio(uint32_t session) {
+bool wpi::impl::SetupNowRio(uint32_t session) {
 #ifdef __FRC_ROBORIO__
   if (!hmbInitialized.test()) {
-    hmb.lowLevel.Configure(session);
+    return hmb.lowLevel.Configure(session);
   }
 #endif
+  return true;
 }
 
 void wpi::impl::ShutdownNowRio() {
@@ -269,10 +275,14 @@ uint64_t wpi::Now() {
     if (nowUseDefaultOnFailure.test()) {
       return timestamp() - offset_val;
     } else {
-      fmt::print(
-          stderr,
-          "FPGA not yet configured in wpi::Now(). Time will not be correct.\n");
+      wpi::print(stderr,
+                 "FPGA not yet configured in wpi::Now(). This is a fatal "
+                 "error. The process is being terminated.\n");
       std::fflush(stderr);
+      // Attempt to force a segfault to get a better java log
+      *reinterpret_cast<int*>(0) = 0;
+      // If that fails, terminate
+      std::terminate();
       return 1;
     }
   }
@@ -311,7 +321,7 @@ void WPI_Impl_SetupNowUseDefaultOnRio(void) {
 }
 
 void WPI_Impl_SetupNowRioWithSession(uint32_t session) {
-  return wpi::impl::SetupNowRio(session);
+  wpi::impl::SetupNowRio(session);
 }
 
 void WPI_Impl_ShutdownNowRio(void) {

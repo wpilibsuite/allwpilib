@@ -1,5 +1,3 @@
-
-
 typedef CwiseUnaryOp<internal::scalar_abs_op<Scalar>, const Derived> AbsReturnType;
 typedef CwiseUnaryOp<internal::scalar_arg_op<Scalar>, const Derived> ArgReturnType;
 typedef CwiseUnaryOp<internal::scalar_carg_op<Scalar>, const Derived> CArgReturnType;
@@ -37,9 +35,11 @@ typedef CwiseUnaryOp<internal::scalar_round_op<Scalar>, const Derived> RoundRetu
 typedef CwiseUnaryOp<internal::scalar_rint_op<Scalar>, const Derived> RintReturnType;
 typedef CwiseUnaryOp<internal::scalar_floor_op<Scalar>, const Derived> FloorReturnType;
 typedef CwiseUnaryOp<internal::scalar_ceil_op<Scalar>, const Derived> CeilReturnType;
+typedef CwiseUnaryOp<internal::scalar_trunc_op<Scalar>, const Derived> TruncReturnType;
 typedef CwiseUnaryOp<internal::scalar_isnan_op<Scalar>, const Derived> IsNaNReturnType;
 typedef CwiseUnaryOp<internal::scalar_isinf_op<Scalar>, const Derived> IsInfReturnType;
 typedef CwiseUnaryOp<internal::scalar_isfinite_op<Scalar>, const Derived> IsFiniteReturnType;
+typedef CwiseUnaryOp<internal::scalar_isfinite_op<Scalar, true>, const Derived> IsFiniteTypedReturnType;
 
 /** \returns an expression of the coefficient-wise absolute value of \c *this
  *
@@ -347,6 +347,15 @@ EIGEN_DEVICE_FUNC inline const FloorReturnType floor() const { return FloorRetur
  */
 EIGEN_DEVICE_FUNC inline const CeilReturnType ceil() const { return CeilReturnType(derived()); }
 
+/** \returns an expression of the coefficient-wise truncation of *this.
+ *
+ * Example: \include Cwise_trunc.cpp
+ * Output: \verbinclude Cwise_trunc.out
+ *
+ * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_trunc">Math functions</a>, floor(), round()
+ */
+EIGEN_DEVICE_FUNC inline const TruncReturnType trunc() const { return TruncReturnType(derived()); }
+
 template <int N>
 struct ShiftRightXpr {
   typedef CwiseUnaryOp<internal::scalar_shift_right_op<Scalar, N>, const Derived> Type;
@@ -407,6 +416,9 @@ EIGEN_DEVICE_FUNC inline const IsInfReturnType isInf() const { return IsInfRetur
  * \sa isnan(), isinf()
  */
 EIGEN_DEVICE_FUNC inline const IsFiniteReturnType isFinite() const { return IsFiniteReturnType(derived()); }
+EIGEN_DEVICE_FUNC inline const IsFiniteTypedReturnType isFiniteTyped() const {
+  return IsFiniteTypedReturnType(derived());
+}
 
 /** \returns an expression of the coefficient-wise ! operator of *this
  *
@@ -506,7 +518,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const UnaryPowReturnType<ScalarExponent> p
     const ScalarExponent& exponent) const {
   return UnaryPowReturnType<ScalarExponent>(derived(), internal::scalar_unary_pow_op<Scalar, ScalarExponent>(exponent));
 #else
-/** \returns an expression of the coefficients of \c *this rasied to the constant power \a exponent
+/** \returns an expression of the coefficients of \c *this raised to the constant power \a exponent
  *
  * \tparam T is the scalar type of \a exponent. It must be compatible with the scalar type of the given expression.
  *

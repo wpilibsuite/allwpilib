@@ -57,7 +57,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_AnalogGyroJNI_freeAnalogGyro
   (JNIEnv* env, jclass, jint id)
 {
-  HAL_FreeAnalogGyro((HAL_GyroHandle)id);
+  if (id != HAL_kInvalidHandle) {
+    HAL_FreeAnalogGyro((HAL_GyroHandle)id);
+  }
 }
 
 /*

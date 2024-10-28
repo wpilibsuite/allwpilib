@@ -4,7 +4,14 @@
 
 #include "wpinet/uv/Stream.h"
 
+#include <functional>
+#include <memory>
+#include <string>
+#include <utility>
+
+#include <wpi/Logger.h>
 #include <wpi/SmallVector.h>
+#include <wpi/raw_ostream.h>
 
 using namespace wpi;
 using namespace wpi::uv;
@@ -86,10 +93,37 @@ void Stream::StartRead() {
          });
 }
 
+static std::string BufsToString(std::span<const Buffer> bufs) {
+  std::string str;
+  wpi::raw_string_ostream stros{str};
+  size_t count = 0;
+  for (auto buf : bufs) {
+    for (auto ch : buf.bytes()) {
+      stros << fmt::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);
+      if (count++ > 30) {
+        goto extra;
+      }
+    }
+  }
+  goto done;
+extra: {
+  size_t total = 0;
+  for (auto buf : bufs) {
+    total += buf.len;
+  }
+  stros << fmt::format("... (total {})", total);
+}
+done:
+  return str;
+}
+
 void Stream::Write(std::span<const Buffer> bufs,
                    const std::shared_ptr<WriteReq>& req) {
   if (IsLoopClosing()) {
     return;
+  }
+  if (auto logger = GetLogger()) {
+    WPI_DEBUG4(*logger, "uv::Write({})", BufsToString(bufs));
   }
   if (Invoke(&uv_write, req->GetRaw(), GetRawStream(), bufs.data(), bufs.size(),
              [](uv_write_t* r, int status) {
@@ -112,6 +146,9 @@ void Stream::Write(std::span<const Buffer> bufs,
 int Stream::TryWrite(std::span<const Buffer> bufs) {
   if (IsLoopClosing()) {
     return UV_ECANCELED;
+  }
+  if (auto logger = GetLogger()) {
+    WPI_DEBUG4(*logger, "uv::TryWrite({})", BufsToString(bufs));
   }
   int val = uv_try_write(GetRawStream(), bufs.data(), bufs.size());
   if (val == UV_EAGAIN) {

@@ -30,16 +30,33 @@ public final class Constants {
     public static final double kWheelDiameterMeters = Units.inchesToMeters(6);
     public static final double kEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
+        (kWheelDiameterMeters * Math.PI) / kEncoderCPR;
+
+    // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
+    // These values MUST be determined either experimentally or theoretically for *your* robot's
+    // drive. The SysId tool provides a convenient method for obtaining feedback and feedforward
+    // values for your robot.
+    public static final double kTurnP = 1;
+    public static final double kTurnI = 0;
+    public static final double kTurnD = 0;
+
+    public static final double kTurnToleranceDeg = 5;
+    public static final double kTurnRateToleranceDegPerS = 10; // degrees per second
+
+    public static final double kMaxTurnRateDegPerS = 100;
+    public static final double kMaxTurnAccelerationDegPerSSquared = 300;
+
+    public static final double ksVolts = 1;
+    public static final double kvVoltSecondsPerDegree = 0.8;
+    public static final double kaVoltSecondsSquaredPerDegree = 0.15;
   }
 
   public static final class ShooterConstants {
     public static final int[] kEncoderPorts = {4, 5};
     public static final boolean kEncoderReversed = false;
     public static final int kEncoderCPR = 1024;
-    public static final double kEncoderDistancePerPulse =
-        // Distance units will be rotations
-        1.0 / (double) kEncoderCPR;
+    // Distance units will be rotations
+    public static final double kEncoderDistancePerPulse = 1.0 / kEncoderCPR;
 
     public static final int kShooterMotorPort = 4;
     public static final int kFeederMotorPort = 5;
@@ -54,9 +71,8 @@ public final class Constants {
     // On a real robot the feedforward constants should be empirically determined; these are
     // reasonable guesses.
     public static final double kSVolts = 0.05;
-    public static final double kVVoltSecondsPerRotation =
-        // Should have value 12V at free speed...
-        12.0 / kShooterFreeRPS;
+    // Should have value 12V at free speed
+    public static final double kVVoltSecondsPerRotation = 12.0 / kShooterFreeRPS;
 
     public static final double kFeederSpeed = 0.5;
   }

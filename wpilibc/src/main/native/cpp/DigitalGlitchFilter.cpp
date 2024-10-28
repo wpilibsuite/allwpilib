@@ -25,14 +25,11 @@ std::array<bool, 3> DigitalGlitchFilter::m_filterAllocated = {
 wpi::mutex DigitalGlitchFilter::m_mutex;
 
 DigitalGlitchFilter::DigitalGlitchFilter() {
-  std::scoped_lock lock(m_mutex);
-  auto index =
-      std::find(m_filterAllocated.begin(), m_filterAllocated.end(), false);
-  FRC_Assert(index != m_filterAllocated.end());
-
-  m_channelIndex = std::distance(m_filterAllocated.begin(), index);
-  *index = true;
-
+  m_channelIndex = AllocateFilterIndex();
+  if (m_channelIndex < 0) {
+    throw FRC_MakeError(err::NoAvailableResources,
+                        "No filters available to allocate.");
+  }
   HAL_Report(HALUsageReporting::kResourceType_DigitalGlitchFilter,
              m_channelIndex + 1);
   wpi::SendableRegistry::AddLW(this, "DigitalGlitchFilter", m_channelIndex);
@@ -43,6 +40,18 @@ DigitalGlitchFilter::~DigitalGlitchFilter() {
     std::scoped_lock lock(m_mutex);
     m_filterAllocated[m_channelIndex] = false;
   }
+}
+
+int DigitalGlitchFilter::AllocateFilterIndex() {
+  std::scoped_lock lock{m_mutex};
+  auto filter =
+      std::find(m_filterAllocated.begin(), m_filterAllocated.end(), false);
+
+  if (filter == m_filterAllocated.end()) {
+    return -1;
+  }
+  *filter = true;
+  return std::distance(m_filterAllocated.begin(), filter);
 }
 
 void DigitalGlitchFilter::Add(DigitalSource* input) {
@@ -67,7 +76,9 @@ void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requestedIndex) {
     int actualIndex =
         HAL_GetFilterSelect(input->GetPortHandleForRouting(), &status);
     FRC_CheckErrorStatus(status, "requested index {}", requestedIndex);
-    FRC_Assert(actualIndex == requestedIndex);
+    FRC_AssertMessage(actualIndex == requestedIndex,
+                      "HAL_SetFilterSelect({}) failed -> {}", requestedIndex,
+                      actualIndex);
   }
 }
 

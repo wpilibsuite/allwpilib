@@ -33,7 +33,7 @@ TEST(Pose3dTest, RotateBy) {
 }
 
 TEST(Pose3dTest, TestTransformByRotations) {
-  const double kEpsilon = 1E-9;
+  constexpr double kEpsilon = 1E-9;
 
   const Pose3d initialPose{0_m, 0_m, 0_m, Rotation3d{0_deg, 0_deg, 0_deg}};
   const Transform3d transform1{Translation3d{0_m, 0_m, 0_m},
@@ -80,7 +80,7 @@ TEST(Pose3dTest, RelativeTo) {
 
   EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), finalRelativeToInitial.X().value());
   EXPECT_DOUBLE_EQ(0.0, finalRelativeToInitial.Y().value());
-  EXPECT_DOUBLE_EQ(0.0, finalRelativeToInitial.Rotation().Z().value());
+  EXPECT_NEAR(0.0, finalRelativeToInitial.Rotation().Z().value(), 1e-9);
 }
 
 TEST(Pose3dTest, Equality) {
@@ -109,7 +109,7 @@ TEST(Pose3dTest, Minus) {
 
   EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), transform.X().value());
   EXPECT_DOUBLE_EQ(0.0, transform.Y().value());
-  EXPECT_DOUBLE_EQ(0.0, transform.Rotation().Z().value());
+  EXPECT_NEAR(0.0, transform.Rotation().Z().value(), 1e-9);
 }
 
 TEST(Pose3dTest, ToPose2d) {

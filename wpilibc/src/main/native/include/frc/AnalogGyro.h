@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include <hal/AnalogGyro.h>
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -100,10 +101,10 @@ class AnalogGyro : public wpi::Sendable,
    */
   AnalogGyro(std::shared_ptr<AnalogInput> channel, int center, double offset);
 
-  ~AnalogGyro() override;
-
   AnalogGyro(AnalogGyro&& rhs) = default;
   AnalogGyro& operator=(AnalogGyro&& rhs) = default;
+
+  ~AnalogGyro() override = default;
 
   /**
    * Return the actual angle in degrees that the robot is currently facing.
@@ -220,7 +221,7 @@ class AnalogGyro : public wpi::Sendable,
 
  private:
   std::shared_ptr<AnalogInput> m_analog;
-  hal::Handle<HAL_GyroHandle> m_gyroHandle;
+  hal::Handle<HAL_GyroHandle, HAL_FreeAnalogGyro> m_gyroHandle;
 };
 
 }  // namespace frc

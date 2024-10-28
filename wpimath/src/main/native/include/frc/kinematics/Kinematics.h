@@ -20,6 +20,8 @@ namespace frc {
  * forward kinematics converts wheel speeds into chassis speed.
  */
 template <typename WheelSpeeds, typename WheelPositions>
+  requires std::copy_constructible<WheelPositions> &&
+           std::assignable_from<WheelPositions&, const WheelPositions&>
 class WPILIB_DLLEXPORT Kinematics {
  public:
   /**
@@ -58,5 +60,18 @@ class WPILIB_DLLEXPORT Kinematics {
    */
   virtual Twist2d ToTwist2d(const WheelPositions& start,
                             const WheelPositions& end) const = 0;
+
+  /**
+   * Performs interpolation between two values.
+   *
+   * @param start The value to start at.
+   * @param end The value to end at.
+   * @param t How far between the two values to interpolate. This should be
+   * bounded to [0, 1].
+   * @return The interpolated value.
+   */
+  virtual WheelPositions Interpolate(const WheelPositions& start,
+                                     const WheelPositions& end,
+                                     double t) const = 0;
 };
 }  // namespace frc

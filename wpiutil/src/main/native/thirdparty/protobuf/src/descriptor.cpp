@@ -791,31 +791,31 @@ class Symbol {
   const internal::SymbolBase* ptr_;
 };
 
-const FieldDescriptor::CppType
-    FieldDescriptor::kTypeToCppTypeMap[MAX_TYPE + 1] = {
-        static_cast<CppType>(0),  // 0 is reserved for errors
+static const FieldDescriptor::CppType
+    kTypeToCppTypeMap[FieldDescriptor::MAX_TYPE + 1] = {
+        static_cast<FieldDescriptor::CppType>(0),  // 0 is reserved for errors
 
-        CPPTYPE_DOUBLE,   // TYPE_DOUBLE
-        CPPTYPE_FLOAT,    // TYPE_FLOAT
-        CPPTYPE_INT64,    // TYPE_INT64
-        CPPTYPE_UINT64,   // TYPE_UINT64
-        CPPTYPE_INT32,    // TYPE_INT32
-        CPPTYPE_UINT64,   // TYPE_FIXED64
-        CPPTYPE_UINT32,   // TYPE_FIXED32
-        CPPTYPE_BOOL,     // TYPE_BOOL
-        CPPTYPE_STRING,   // TYPE_STRING
-        CPPTYPE_MESSAGE,  // TYPE_GROUP
-        CPPTYPE_MESSAGE,  // TYPE_MESSAGE
-        CPPTYPE_STRING,   // TYPE_BYTES
-        CPPTYPE_UINT32,   // TYPE_UINT32
-        CPPTYPE_ENUM,     // TYPE_ENUM
-        CPPTYPE_INT32,    // TYPE_SFIXED32
-        CPPTYPE_INT64,    // TYPE_SFIXED64
-        CPPTYPE_INT32,    // TYPE_SINT32
-        CPPTYPE_INT64,    // TYPE_SINT64
+        FieldDescriptor::CPPTYPE_DOUBLE,   // TYPE_DOUBLE
+        FieldDescriptor::CPPTYPE_FLOAT,    // TYPE_FLOAT
+        FieldDescriptor::CPPTYPE_INT64,    // TYPE_INT64
+        FieldDescriptor::CPPTYPE_UINT64,   // TYPE_UINT64
+        FieldDescriptor::CPPTYPE_INT32,    // TYPE_INT32
+        FieldDescriptor::CPPTYPE_UINT64,   // TYPE_FIXED64
+        FieldDescriptor::CPPTYPE_UINT32,   // TYPE_FIXED32
+        FieldDescriptor::CPPTYPE_BOOL,     // TYPE_BOOL
+        FieldDescriptor::CPPTYPE_STRING,   // TYPE_STRING
+        FieldDescriptor::CPPTYPE_MESSAGE,  // TYPE_GROUP
+        FieldDescriptor::CPPTYPE_MESSAGE,  // TYPE_MESSAGE
+        FieldDescriptor::CPPTYPE_STRING,   // TYPE_BYTES
+        FieldDescriptor::CPPTYPE_UINT32,   // TYPE_UINT32
+        FieldDescriptor::CPPTYPE_ENUM,     // TYPE_ENUM
+        FieldDescriptor::CPPTYPE_INT32,    // TYPE_SFIXED32
+        FieldDescriptor::CPPTYPE_INT64,    // TYPE_SFIXED64
+        FieldDescriptor::CPPTYPE_INT32,    // TYPE_SINT32
+        FieldDescriptor::CPPTYPE_INT64,    // TYPE_SINT64
 };
 
-const char* const FieldDescriptor::kTypeToName[MAX_TYPE + 1] = {
+static const char* const kTypeToName[FieldDescriptor::MAX_TYPE + 1] = {
     "ERROR",  // 0 is reserved for errors
 
     "double",    // TYPE_DOUBLE
@@ -838,7 +838,7 @@ const char* const FieldDescriptor::kTypeToName[MAX_TYPE + 1] = {
     "sint64",    // TYPE_SINT64
 };
 
-const char* const FieldDescriptor::kCppTypeToName[MAX_CPPTYPE + 1] = {
+static const char* const kCppTypeToName[FieldDescriptor::MAX_CPPTYPE + 1] = {
     "ERROR",  // 0 is reserved for errors
 
     "int32",    // CPPTYPE_INT32
@@ -853,13 +853,29 @@ const char* const FieldDescriptor::kCppTypeToName[MAX_CPPTYPE + 1] = {
     "message",  // CPPTYPE_MESSAGE
 };
 
-const char* const FieldDescriptor::kLabelToName[MAX_LABEL + 1] = {
+static const char* const kLabelToName[FieldDescriptor::MAX_LABEL + 1] = {
     "ERROR",  // 0 is reserved for errors
 
     "optional",  // LABEL_OPTIONAL
     "required",  // LABEL_REQUIRED
     "repeated",  // LABEL_REPEATED
 };
+
+const FieldDescriptor::CppType *FieldDescriptor::GetTypeToCppTypeMap() {
+  return kTypeToCppTypeMap;
+}
+
+const char* const *FieldDescriptor::GetTypeToName() {
+  return kTypeToName;
+}
+
+const char* const *FieldDescriptor::GetCppTypeToName() {
+  return kCppTypeToName;
+}
+
+const char* const *FieldDescriptor::GetLabelToName() {
+  return kLabelToName;
+}
 
 const char* FileDescriptor::SyntaxName(FileDescriptor::Syntax syntax) {
   switch (syntax) {

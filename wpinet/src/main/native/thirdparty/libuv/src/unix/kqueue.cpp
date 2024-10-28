@@ -101,6 +101,39 @@ int uv__io_fork(uv_loop_t* loop) {
 int uv__io_check_fd(uv_loop_t* loop, int fd) {
   struct kevent ev;
   int rc;
+  struct stat sb;
+#ifdef __APPLE__
+  char path[MAXPATHLEN];
+#endif
+
+  if (uv__fstat(fd, &sb))
+    return UV__ERR(errno);
+
+  /* On FreeBSD, kqueue only supports EVFILT_READ notification for regular files
+   * and always reports ready events for writing, resulting in busy-looping.
+   *
+   * On Darwin, DragonFlyBSD, NetBSD and OpenBSD, kqueue reports ready events for
+   * regular files as readable and writable only once, acting like an EV_ONESHOT.
+   * 
+   * Neither of the above cases should be added to the kqueue.
+   */
+  if (S_ISREG(sb.st_mode) || S_ISDIR(sb.st_mode))
+    return UV_EINVAL;
+
+#ifdef __APPLE__
+  /* On Darwin (both macOS and iOS), in addition to regular files, FIFOs also don't
+   * work properly with kqueue: the disconnection from the last writer won't trigger
+   * an event for kqueue in spite of what the man pages say. Thus, we also disallow
+   * the case of S_IFIFO. */ 
+  if (S_ISFIFO(sb.st_mode)) {
+    /* File descriptors of FIFO, pipe and kqueue share the same type of file, 
+     * therefore there is no way to tell them apart via stat.st_mode&S_IFMT.
+     * Fortunately, FIFO is the only one that has a persisted file on filesystem,
+     * from which we're able to make the distinction for it. */
+    if (!fcntl(fd, F_GETPATH, path))
+      return UV_EINVAL;
+  }
+#endif
 
   rc = 0;
   EV_SET(&ev, fd, EVFILT_READ, EV_ADD, 0, 0, 0);
@@ -490,11 +523,21 @@ static void uv__fs_event(uv_loop_t* loop, uv__io_t* w, unsigned int fflags) {
    * the struct's kf_structsize must be initialised beforehand
    * whether with the KINFO_FILE_SIZE constant or this way.
    */
+  struct stat statbuf;
   struct kinfo_file kf;
-  kf.kf_structsize = sizeof(kf);
 
-  if (fcntl(handle->event_watcher.fd, F_KINFO, &kf) == 0)
-    path = uv__basename_r(kf.kf_path);
+  if (handle->event_watcher.fd != -1 &&
+     (!uv__fstat(handle->event_watcher.fd, &statbuf) && !(statbuf.st_mode & S_IFDIR))) {
+     /* we are purposely not using KINFO_FILE_SIZE here
+      * as it is not available on non intl archs
+      * and here it gives 1392 too on intel.
+      * anyway, the man page also mentions we can proceed
+      * this way.
+      */
+     kf.kf_structsize = sizeof(kf);
+     if (fcntl(handle->event_watcher.fd, F_KINFO, &kf) == 0)
+       path = uv__basename_r(kf.kf_path);
+  }
 #endif
   handle->cb(handle, path, events, 0);
 

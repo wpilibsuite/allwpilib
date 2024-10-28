@@ -3,7 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <algorithm>
+#include <string>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -13,7 +16,7 @@
 
 using namespace std::string_view_literals;
 
-namespace std {  // NOLINT(clang-tidy.cert-dcl58-cpp)
+namespace std {  // NOLINT (clang-tidy.cert-dcl58-cpp)
 template <typename T, typename U>
 inline bool operator==(std::span<T> lhs, std::span<U> rhs) {
   if (lhs.size() != rhs.size()) {
@@ -84,7 +87,7 @@ TEST_F(ValueTest, String) {
   NT_InitValue(&cv);
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_STRING, cv.type);
-  ASSERT_EQ("hello"sv, cv.data.v_string.str);
+  ASSERT_EQ("hello"sv, wpi::to_string_view(&cv.data.v_string));
   ASSERT_EQ(5u, cv.data.v_string.len);
 
   v = Value::MakeString("goodbye");
@@ -93,7 +96,7 @@ TEST_F(ValueTest, String) {
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_STRING, cv.type);
-  ASSERT_EQ("goodbye"sv, cv.data.v_string.str);
+  ASSERT_EQ("goodbye"sv, wpi::to_string_view(&cv.data.v_string));
   ASSERT_EQ(7u, cv.data.v_string.len);
 
   NT_DisposeValue(&cv);
@@ -226,9 +229,9 @@ TEST_F(ValueTest, StringArray) {
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_STRING_ARRAY, cv.type);
   ASSERT_EQ(3u, cv.data.arr_string.size);
-  ASSERT_EQ("hello"sv, cv.data.arr_string.arr[0].str);
-  ASSERT_EQ("goodbye"sv, cv.data.arr_string.arr[1].str);
-  ASSERT_EQ("string"sv, cv.data.arr_string.arr[2].str);
+  ASSERT_EQ("hello"sv, wpi::to_string_view(&cv.data.arr_string.arr[0]));
+  ASSERT_EQ("goodbye"sv, wpi::to_string_view(&cv.data.arr_string.arr[1]));
+  ASSERT_EQ("string"sv, wpi::to_string_view(&cv.data.arr_string.arr[2]));
 
   // assign with same size
   vec.clear();
@@ -245,9 +248,9 @@ TEST_F(ValueTest, StringArray) {
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_STRING_ARRAY, cv.type);
   ASSERT_EQ(3u, cv.data.arr_string.size);
-  ASSERT_EQ("s1"sv, cv.data.arr_string.arr[0].str);
-  ASSERT_EQ("str2"sv, cv.data.arr_string.arr[1].str);
-  ASSERT_EQ("string3"sv, cv.data.arr_string.arr[2].str);
+  ASSERT_EQ("s1"sv, wpi::to_string_view(&cv.data.arr_string.arr[0]));
+  ASSERT_EQ("str2"sv, wpi::to_string_view(&cv.data.arr_string.arr[1]));
+  ASSERT_EQ("string3"sv, wpi::to_string_view(&cv.data.arr_string.arr[2]));
 
   // assign with different size
   vec.clear();
@@ -262,8 +265,8 @@ TEST_F(ValueTest, StringArray) {
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_STRING_ARRAY, cv.type);
   ASSERT_EQ(2u, cv.data.arr_string.size);
-  ASSERT_EQ("short"sv, cv.data.arr_string.arr[0].str);
-  ASSERT_EQ("er"sv, cv.data.arr_string.arr[1].str);
+  ASSERT_EQ("short"sv, wpi::to_string_view(&cv.data.arr_string.arr[0]));
+  ASSERT_EQ("er"sv, wpi::to_string_view(&cv.data.arr_string.arr[1]));
 
   NT_DisposeValue(&cv);
 }

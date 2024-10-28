@@ -6,7 +6,6 @@
 
 #include <functional>
 
-#include <frc/Timer.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 
 #include "frc2/command/Command.h"
@@ -41,7 +40,9 @@ class TrapezoidProfileCommand
    * @param goal The supplier for the desired state
    * @param currentState The current state
    * @param requirements The list of requirements.
+   * @deprecated Use a TrapezoidProfile instead
    */
+  [[deprecated("Use a TrapezoidProfile instead")]]
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
                           std::function<State()> goal,
@@ -52,49 +53,23 @@ class TrapezoidProfileCommand
         m_goal(goal),
         m_currentState(currentState) {
     this->AddRequirements(requirements);
-    m_newAPI = true;
   }
 
-  /**
-   * Creates a new TrapezoidProfileCommand that will execute the given
-   * TrapezoidalProfile. Output will be piped to the provided consumer function.
-   *
-   * @param profile      The motion profile to execute.
-   * @param output       The consumer for the profile output.
-   * @param requirements The list of requirements.
-   * @deprecated The new constructor allows you to pass in a supplier for
-   * desired and current state. This allows you to change goals at runtime.
-   */
-  WPI_DEPRECATED(
-      "The new constructor allows you to pass in a supplier for desired and "
-      "current state. This allows you to change goals at runtime.")
-  TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
-                          std::function<void(State)> output,
-                          Requirements requirements = {})
-      : m_profile(profile), m_output(output) {
-    this->AddRequirements(requirements);
-    m_newAPI = false;
-  }
-
-  void Initialize() override { m_timer.Restart(); }
+  void Initialize() override {}
 
   void Execute() override {
-    m_output(m_profile.Calculate(m_timer.Get(), m_currentState(), m_goal()));
+    m_output(m_profile.Calculate(20_ms, m_currentState(), m_goal()));
   }
 
-  void End(bool interrupted) override { m_timer.Stop(); }
+  void End(bool interrupted) override {}
 
-  bool IsFinished() override {
-    return m_timer.HasElapsed(m_profile.TotalTime());
-  }
+  bool IsFinished() override { return m_profile.IsFinished(0_s); }
 
  private:
   frc::TrapezoidProfile<Distance> m_profile;
   std::function<void(State)> m_output;
   std::function<State()> m_goal;
   std::function<State()> m_currentState;
-  bool m_newAPI;  // TODO: Remove
-  frc::Timer m_timer;
 };
 
 }  // namespace frc2

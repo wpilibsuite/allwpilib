@@ -292,7 +292,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
    * @return The error at that index.
    */
   public double getError(int index) {
-    return (getController().getR().minus(m_observer.getXhat())).get(index, 0);
+    return getController().getR().minus(m_observer.getXhat()).get(index, 0);
   }
 
   /**

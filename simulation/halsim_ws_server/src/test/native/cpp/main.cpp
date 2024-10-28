@@ -2,14 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <memory>
+#include <string>
 #include <thread>
 
-#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <hal/simulation/DIOData.h>
+#include <wpi/print.h>
 #include <wpinet/uv/Loop.h>
 
 #include "HALSimWSServer.h"
@@ -55,7 +57,7 @@ TEST_F(WebServerIntegrationTest, DISABLED_DigitalOutput) {
         return;
       }
       if (IsConnectedClientWS()) {
-        fmt::print("***** Setting DIO value for pin {} to {}\n", PIN,
+        wpi::print("***** Setting DIO value for pin {} to {}\n", PIN,
                    (EXPECTED_VALUE ? "true" : "false"));
         HALSIM_SetDIOValue(PIN, EXPECTED_VALUE);
         done = true;
@@ -83,7 +85,7 @@ TEST_F(WebServerIntegrationTest, DISABLED_DigitalOutput) {
       test_value = it.value();
     }
   } catch (wpi::json::exception& e) {
-    fmt::print(stderr, "Error with incoming message: {}\n", e.what());
+    wpi::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 
   // Compare results
@@ -109,7 +111,7 @@ TEST_F(WebServerIntegrationTest, DISABLED_DigitalInput) {
         wpi::json msg = {{"type", "DIO"},
                          {"device", std::to_string(PIN)},
                          {"data", {{"<>value", EXPECTED_VALUE}}}};
-        fmt::print("***** Input JSON: {}\n", msg.dump());
+        wpi::print("***** Input JSON: {}\n", msg.dump());
         m_webserverClient->SendMessage(msg);
         done = true;
       }
@@ -144,7 +146,7 @@ TEST_F(WebServerIntegrationTest, DriverStation) {
             {"type", "DriverStation"},
             {"device", ""},
             {"data", {{">enabled", EXPECTED_VALUE}, {">new_data", true}}}};
-        fmt::print("***** Input JSON: {}\n", msg.dump());
+        wpi::print("***** Input JSON: {}\n", msg.dump());
         m_webserverClient->SendMessage(msg);
         done = true;
       }

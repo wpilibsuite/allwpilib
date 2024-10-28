@@ -4,6 +4,9 @@
 
 #include "frc2/command/Subsystem.h"
 
+#include <string>
+#include <utility>
+
 #include <wpi/Demangle.h>
 
 #include "frc2/command/CommandPtr.h"
@@ -59,6 +62,11 @@ CommandPtr Subsystem::StartEnd(std::function<void()> start,
 CommandPtr Subsystem::RunEnd(std::function<void()> run,
                              std::function<void()> end) {
   return cmd::RunEnd(std::move(run), std::move(end), {this});
+}
+
+CommandPtr Subsystem::StartRun(std::function<void()> start,
+                               std::function<void()> run) {
+  return cmd::StartRun(std::move(start), std::move(run), {this});
 }
 
 CommandPtr Subsystem::Defer(wpi::unique_function<CommandPtr()> supplier) {

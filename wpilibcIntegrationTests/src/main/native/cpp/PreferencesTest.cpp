@@ -6,6 +6,7 @@
 
 #include <cstdio>
 #include <fstream>
+#include <string>
 
 #include <gtest/gtest.h>
 #include <networktables/MultiSubscriber.h>
@@ -35,8 +36,8 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
                   << "\"properties\":{\"persistent\":true}}," << std::endl;
   preferencesFile << "{\"type\":\"int\","
                   << "\"name\":\"/Preferences/testFileGetInt\","
-                  << "\"value\":1,"
-                  << "\"properties\":{\"persistent\":true}}," << std::endl;
+                  << "\"value\":1," << "\"properties\":{\"persistent\":true}},"
+                  << std::endl;
   preferencesFile << "{\"type\":\"double\","
                   << "\"name\":\"/Preferences/testFileGetDouble\","
                   << "\"value\":0.5,"

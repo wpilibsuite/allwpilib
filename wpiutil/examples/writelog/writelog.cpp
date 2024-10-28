@@ -2,15 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <array>
 #include <chrono>
 #include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-
-#include "wpi/DataLog.h"
+#include "wpi/DataLogBackgroundWriter.h"
+#include "wpi/print.h"
 
 int main(int argc, char** argv) {
   using std::chrono::duration_cast;
@@ -23,7 +22,7 @@ int main(int argc, char** argv) {
     kNumRuns = std::stoi(argv[1]);
   }
 
-  wpi::log::DataLog log;
+  wpi::log::DataLogBackgroundWriter log;
   log.SetFilename("test.wpilog");
 
   auto testVec =
@@ -50,23 +49,23 @@ int main(int argc, char** argv) {
                        }
                      }});
 
-  testVec.push_back(
-      {"Double array append", [](auto& log) {
-         wpi::log::DoubleArrayLogEntry entry{log, "double_array", 1};
-         entry.Append({1, 2, 3}, 20000);
-         entry.Append({4, 5}, 30000);
-       }});
+  testVec.push_back({"Double array append", [](auto& log) {
+                       wpi::log::DoubleArrayLogEntry entry{log, "double_array",
+                                                           1};
+                       entry.Append({1, 2, 3}, 20000);
+                       entry.Append({4, 5}, 30000);
+                     }});
 
-  testVec.push_back(
-      {"String array append", [](auto& log) {
-         wpi::log::StringArrayLogEntry entry{log, "string_array", 1};
-         entry.Append({"Hello", "World"}, 20000);
-         entry.Append({"This", "Is", "Fun"}, 30000);
-       }});
+  testVec.push_back({"String array append", [](auto& log) {
+                       wpi::log::StringArrayLogEntry entry{log, "string_array",
+                                                           1};
+                       entry.Append({"Hello", "World"}, 20000);
+                       entry.Append({"This", "Is", "Fun"}, 30000);
+                     }});
 
   for (const auto& [name, fn] : testVec) {
     auto resVec = std::vector<microseconds::rep>();
-    fmt::print("{}: ", name);
+    wpi::print("{}: ", name);
 
     for (int i = 0; i < kNumRuns; ++i) {
       auto start = high_resolution_clock::now();
@@ -75,7 +74,7 @@ int main(int argc, char** argv) {
       resVec.push_back(duration_cast<microseconds>(stop - start).count());
     }
 
-    fmt::print("{}us\n",
+    wpi::print("{}us\n",
                std::accumulate(resVec.begin(), resVec.end(), 0) / kNumRuns);
   }
 

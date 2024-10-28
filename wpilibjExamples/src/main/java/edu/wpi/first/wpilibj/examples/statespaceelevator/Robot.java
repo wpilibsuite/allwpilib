@@ -57,16 +57,17 @@ public class Robot extends TimedRobot {
 
   This elevator is driven by two NEO motors.
    */
-  private final LinearSystem<N2, N1, N1> m_elevatorPlant =
+  private final LinearSystem<N2, N1, N2> m_elevatorPlant =
       LinearSystemId.createElevatorSystem(
           DCMotor.getNEO(2), kCarriageMass, kDrumRadius, kElevatorGearing);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
+  @SuppressWarnings("unchecked")
   private final KalmanFilter<N2, N1, N1> m_observer =
       new KalmanFilter<>(
           Nat.N2(),
           Nat.N1(),
-          m_elevatorPlant,
+          (LinearSystem<N2, N1, N1>) m_elevatorPlant.slice(0),
           VecBuilder.fill(Units.inchesToMeters(2), Units.inchesToMeters(40)), // How accurate we
           // think our model is, in meters and meters/second.
           VecBuilder.fill(0.001), // How accurate we think our encoder position
@@ -74,9 +75,10 @@ public class Robot extends TimedRobot {
           0.020);
 
   // A LQR uses feedback to create voltage commands.
+  @SuppressWarnings("unchecked")
   private final LinearQuadraticRegulator<N2, N1, N1> m_controller =
       new LinearQuadraticRegulator<>(
-          m_elevatorPlant,
+          (LinearSystem<N2, N1, N1>) m_elevatorPlant.slice(0),
           VecBuilder.fill(Units.inchesToMeters(1.0), Units.inchesToMeters(10.0)), // qelms. Position
           // and velocity error tolerances, in meters and meters per second. Decrease this to more
           // heavily penalize state excursion, or make the controller behave more aggressively. In
@@ -86,11 +88,18 @@ public class Robot extends TimedRobot {
           // heavily penalize control effort, or make the controller less aggressive. 12 is a good
           // starting point because that is the (approximate) maximum voltage of a battery.
           0.020); // Nominal time between loops. 0.020 for TimedRobot, but can be
+
   // lower if using notifiers.
 
   // The state-space loop combines a controller, observer, feedforward and plant for easy control.
+  @SuppressWarnings("unchecked")
   private final LinearSystemLoop<N2, N1, N1> m_loop =
-      new LinearSystemLoop<>(m_elevatorPlant, m_controller, m_observer, 12.0, 0.020);
+      new LinearSystemLoop<>(
+          (LinearSystem<N2, N1, N1>) m_elevatorPlant.slice(0),
+          m_controller,
+          m_observer,
+          12.0,
+          0.020);
 
   // An encoder set up to measure elevator height in meters.
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
@@ -100,8 +109,7 @@ public class Robot extends TimedRobot {
   // A joystick to read the trigger from.
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
-  @Override
-  public void robotInit() {
+  public Robot() {
     // Circumference = pi * d, so distance per click = pi * d / counts
     m_encoder.setDistancePerPulse(Math.PI * 2 * kDrumRadius / 4096.0);
   }

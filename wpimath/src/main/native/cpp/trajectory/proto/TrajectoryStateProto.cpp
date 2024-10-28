@@ -4,12 +4,13 @@
 
 #include "frc/trajectory/proto/TrajectoryStateProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "trajectory.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::Trajectory::State>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufTrajectoryState>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufTrajectoryState>(arena);
 }
 
 frc::Trajectory::State wpi::Protobuf<frc::Trajectory::State>::Unpack(
@@ -19,7 +20,7 @@ frc::Trajectory::State wpi::Protobuf<frc::Trajectory::State>::Unpack(
       units::second_t{m->time()},
       units::meters_per_second_t{m->velocity()},
       units::meters_per_second_squared_t{m->acceleration()},
-      wpi::UnpackProtobuf<frc::Pose2d>(m->pose()),
+      wpi::UnpackProtobuf<frc::Pose2d>(m->wpi_pose()),
       units::curvature_t{m->curvature()},
   };
 }

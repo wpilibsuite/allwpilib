@@ -310,30 +310,12 @@
     "commandversion": 2
   },
   {
-    "name": "Axis Camera Sample",
-    "description": "Acquire images from an Axis network camera and adds some annotation to the image (as you might do for showing operators the result of some image recognition), and sends it to the dashboard for display.",
+    "name": "HTTP Camera",
+    "description": "Acquire images from an HTTP network camera and adds some annotation to the image (as you might do for showing operators the result of some image recognition), and sends it to the dashboard for display.",
     "tags": [
       "Vision"
     ],
-    "foldername": "AxisCameraSample",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "GearsBot",
-    "description": "A fully functional Command-Based program for WPI's GearsBot robot.",
-    "tags": [
-      "Complete Robot",
-      "Command-based",
-      "Differential Drive",
-      "Elevator",
-      "Arm",
-      "Analog",
-      "Digital Input",
-      "SmartDashboard",
-      "XboxController"
-    ],
-    "foldername": "GearsBot",
+    "foldername": "HttpCamera",
     "gradlebase": "cpp",
     "commandversion": 2
   },
@@ -412,6 +394,8 @@
       "Pneumatics",
       "Digital Input",
       "PID",
+      "Gyro",
+      "Profiled PID",
       "XboxController"
     ],
     "foldername": "RapidReactCommandBot",
@@ -425,38 +409,6 @@
       "Command-based"
     ],
     "foldername": "SelectCommand",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "Frisbeebot",
-    "description": "A simple frisbee shooter for the 2013 game, demonstrating use of PIDSubsystem.",
-    "tags": [
-      "Complete Robot",
-      "Command-based",
-      "Differential Drive",
-      "Flywheel",
-      "Encoder",
-      "XboxController",
-      "PID"
-    ],
-    "foldername": "Frisbeebot",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "Gyro Drive Commands",
-    "description": "Control a robot's angle with PID and a gyro, in command-based.",
-    "tags": [
-      "Command-based",
-      "Differential Drive",
-      "Encoder",
-      "PS4Controller",
-      "PID",
-      "Profiled PID",
-      "Gyro"
-    ],
-    "foldername": "GyroDriveCommands",
     "gradlebase": "cpp",
     "commandversion": 2
   },
@@ -499,24 +451,6 @@
       "XboxController"
     ],
     "foldername": "DifferentialDriveBot",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "RamseteCommand",
-    "description": "Follow a pre-generated trajectory with a differential drive using RamseteCommand.",
-    "tags": [
-      "Differential Drive",
-      "Command-based",
-      "Ramsete",
-      "Trajectory",
-      "Path Following",
-      "Odometry",
-      "Encoder",
-      "Gyro",
-      "XboxController"
-    ],
-    "foldername": "RamseteCommand",
     "gradlebase": "cpp",
     "commandversion": 2
   },
@@ -628,36 +562,6 @@
     "commandversion": 2
   },
   {
-    "name": "ArmBot",
-    "description": "Control an arm with ProfiledPIDSubsystem.",
-    "tags": [
-      "Command-based",
-      "Arm",
-      "Encoder",
-      "Profiled PID",
-      "XboxController",
-      "Differential Drive"
-    ],
-    "foldername": "ArmBot",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "ArmBotOffboard",
-    "description": "Control an arm with TrapezoidProfileSubsystem and smart motor controller PID.",
-    "tags": [
-      "Command-based",
-      "Arm",
-      "Smart Motor Controller",
-      "Trapezoid Profile",
-      "XboxController",
-      "Differential Drive"
-    ],
-    "foldername": "ArmBotOffboard",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
     "name": "DriveDistanceOffboard",
     "description": "Drive a differential drivetrain a set distance using TrapezoidProfileCommand and smart motor controller PID.",
     "tags": [
@@ -668,23 +572,6 @@
       "XboxController"
     ],
     "foldername": "DriveDistanceOffboard",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "RamseteController",
-    "description": "Follow a pre-generated trajectory with a differential drive using RamseteController.",
-    "tags": [
-      "Basic Robot",
-      "Differential Drive",
-      "Ramsete",
-      "PID",
-      "Odometry",
-      "Path Following",
-      "Trajectory",
-      "XboxController"
-    ],
-    "foldername": "RamseteController",
     "gradlebase": "cpp",
     "commandversion": 2
   },
@@ -888,20 +775,6 @@
     "commandversion": 2
   },
   {
-    "name": "StateSpaceDriveSimulation",
-    "description": "Simulate a differential drivetrain and follow trajectories with RamseteCommand (command-based).",
-    "tags": [
-      "Command-based",
-      "Differential Drive",
-      "State-Space",
-      "XboxController",
-      "Simulation"
-    ],
-    "foldername": "StateSpaceDifferentialDriveSimulation",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
     "name": "SwerveDrivePoseEstimator",
     "description": "Combine swerve-drive odometry with vision data using SwerveDrivePoseEstimator.",
     "tags": [
@@ -936,7 +809,7 @@
       "Command-based",
       "DataLog"
     ],
-    "foldername": "SysId",
+    "foldername": "SysIdRoutine",
     "gradlebase": "cpp",
     "commandversion": 2
   }

@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
  * The LiveWindow class is the public interface for putting sensors and actuators on the LiveWindow.
  */
 public final class LiveWindow {
-  private static class Component implements AutoCloseable {
+  private static final class Component implements AutoCloseable {
     @Override
     public void close() {
       if (m_namePub != null) {
@@ -35,6 +35,8 @@ public final class LiveWindow {
     StringPublisher m_namePub;
     StringPublisher m_typePub;
   }
+
+  private static final String kSmartDashboardType = "LW Subsystem";
 
   private static final int dataHandle = SendableRegistry.getDataHandle();
   private static final NetworkTable liveWindowTable =
@@ -224,8 +226,12 @@ public final class LiveWindow {
             component.m_namePub.set(cbdata.name);
             ((SendableBuilderImpl) cbdata.builder).setTable(table);
             cbdata.sendable.initSendable(cbdata.builder);
-            component.m_typePub = new StringTopic(ssTable.getTopic(".type")).publish();
-            component.m_typePub.set("LW Subsystem");
+            component.m_typePub =
+                new StringTopic(ssTable.getTopic(".type"))
+                    .publishEx(
+                        StringTopic.kTypeString,
+                        "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
+            component.m_typePub.set(kSmartDashboardType);
 
             component.m_firstTime = false;
           }

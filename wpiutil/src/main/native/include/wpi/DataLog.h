@@ -6,43 +6,28 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
+#include <algorithm>
 #include <concepts>
-#include <functional>
 #include <initializer_list>
-#include <memory>
+#include <optional>
 #include <ranges>
 #include <span>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <tuple>
 #include <utility>
 #include <vector>
 #include <version>
 
+#include "wpi/DataLog_c.h"
 #include "wpi/DenseMap.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringMap.h"
-#include "wpi/condition_variable.h"
 #include "wpi/mutex.h"
 #include "wpi/protobuf/Protobuf.h"
+#include "wpi/string.h"
 #include "wpi/struct/Struct.h"
 #include "wpi/timestamp.h"
-#endif  // __cplusplus
-
-/**
- * A datalog string (for use with string array).
- */
-struct WPI_DataLog_String {
-  /** Contents. */
-  const char* str;
-
-  /** Length. */
-  size_t len;
-};
-
-#ifdef __cplusplus
 
 namespace wpi {
 class Logger;
@@ -61,15 +46,10 @@ enum ControlRecordType {
 }  // namespace impl
 
 /**
- * A data log. The log file is created immediately upon construction with a
- * temporary filename.  The file may be renamed at any time using the
- * SetFilename() function.
+ * A data log for high-speed writing of data values.
  *
  * The lifetime of the data log object must be longer than any data log entry
  * objects that refer to it.
- *
- * The data log is periodically flushed to disk.  It can also be explicitly
- * flushed to disk by using the Flush() function.
  *
  * Finish() is needed only to indicate in the log that a particular entry is
  * no longer being used (it releases the name to ID mapping).  Finish() is not
@@ -87,105 +67,36 @@ enum ControlRecordType {
  * arbitrary values), records in the log are not guaranteed to be sorted by
  * timestamp.
  */
-class DataLog final {
+class DataLog {
  public:
-  /**
-   * Construct a new Data Log.  The log will be initially created with a
-   * temporary filename.
-   *
-   * @param dir directory to store the log
-   * @param filename filename to use; if none provided, a random filename is
-   *                 generated of the form "wpilog_{}.wpilog"
-   * @param period time between automatic flushes to disk, in seconds;
-   *               this is a time/storage tradeoff
-   * @param extraHeader extra header data
-   */
-  explicit DataLog(std::string_view dir = "", std::string_view filename = "",
-                   double period = 0.25, std::string_view extraHeader = "");
+  virtual ~DataLog() = default;
 
-  /**
-   * Construct a new Data Log.  The log will be initially created with a
-   * temporary filename.
-   *
-   * @param msglog message logger (will be called from separate thread)
-   * @param dir directory to store the log
-   * @param filename filename to use; if none provided, a random filename is
-   *                 generated of the form "wpilog_{}.wpilog"
-   * @param period time between automatic flushes to disk, in seconds;
-   *               this is a time/storage tradeoff
-   * @param extraHeader extra header data
-   */
-  explicit DataLog(wpi::Logger& msglog, std::string_view dir = "",
-                   std::string_view filename = "", double period = 0.25,
-                   std::string_view extraHeader = "");
-
-  /**
-   * Construct a new Data Log that passes its output to the provided function
-   * rather than a file.  The write function will be called on a separate
-   * background thread and may block.  The write function is called with an
-   * empty data array when the thread is terminating.
-   *
-   * @param write write function
-   * @param period time between automatic calls to write, in seconds;
-   *               this is a time/storage tradeoff
-   * @param extraHeader extra header data
-   */
-  explicit DataLog(std::function<void(std::span<const uint8_t> data)> write,
-                   double period = 0.25, std::string_view extraHeader = "");
-
-  /**
-   * Construct a new Data Log that passes its output to the provided function
-   * rather than a file.  The write function will be called on a separate
-   * background thread and may block.  The write function is called with an
-   * empty data array when the thread is terminating.
-   *
-   * @param msglog message logger (will be called from separate thread)
-   * @param write write function
-   * @param period time between automatic calls to write, in seconds;
-   *               this is a time/storage tradeoff
-   * @param extraHeader extra header data
-   */
-  explicit DataLog(wpi::Logger& msglog,
-                   std::function<void(std::span<const uint8_t> data)> write,
-                   double period = 0.25, std::string_view extraHeader = "");
-
-  ~DataLog();
   DataLog(const DataLog&) = delete;
   DataLog& operator=(const DataLog&) = delete;
   DataLog(DataLog&&) = delete;
   DataLog& operator=(const DataLog&&) = delete;
 
   /**
-   * Change log filename.
-   *
-   * @param filename filename
-   */
-  void SetFilename(std::string_view filename);
-
-  /**
    * Explicitly flushes the log data to disk.
    */
-  void Flush();
+  virtual void Flush() = 0;
 
   /**
    * Pauses appending of data records to the log.  While paused, no data records
    * are saved (e.g. AppendX is a no-op).  Has no effect on entry starts /
    * finishes / metadata changes.
    */
-  void Pause();
+  virtual void Pause();
 
   /**
-   * Resumes appending of data records to the log.  If called after Stop(),
-   * opens a new file (with random name if SetFilename was not called after
-   * Stop()) and appends Start records and schema data values for all previously
-   * started entries and schemas.
+   * Resumes appending of data records to the log.
    */
-  void Resume();
+  virtual void Resume();
 
   /**
-   * Stops appending all records to the log, and closes the log file.
+   * Stops appending start/metadata/schema records to the log.
    */
-  void Stop();
+  virtual void Stop();
 
   /**
    * Returns whether there is a data schema already registered with the given
@@ -465,16 +376,119 @@ class DataLog final {
    * @param arr String array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void AppendStringArray(int entry, std::span<const WPI_DataLog_String> arr,
+  void AppendStringArray(int entry, std::span<const struct WPI_String> arr,
                          int64_t timestamp);
 
- private:
-  struct WriterThreadState;
+ protected:
+  static constexpr size_t kBlockSize = 16 * 1024;
+  static wpi::Logger s_defaultMessageLog;
 
-  void StartLogFile(WriterThreadState& state);
-  void WriterThreadMain(std::string_view dir);
-  void WriterThreadMain(
-      std::function<void(std::span<const uint8_t> data)> write);
+  class Buffer {
+   public:
+    explicit Buffer(size_t alloc = kBlockSize)
+        : m_buf{new uint8_t[alloc]}, m_maxLen{alloc} {}
+    ~Buffer() { delete[] m_buf; }
+
+    Buffer(const Buffer&) = delete;
+    Buffer& operator=(const Buffer&) = delete;
+
+    Buffer(Buffer&& oth)
+        : m_buf{oth.m_buf}, m_len{oth.m_len}, m_maxLen{oth.m_maxLen} {
+      oth.m_buf = nullptr;
+      oth.m_len = 0;
+      oth.m_maxLen = 0;
+    }
+
+    Buffer& operator=(Buffer&& oth) {
+      if (m_buf) {
+        delete[] m_buf;
+      }
+      m_buf = oth.m_buf;
+      m_len = oth.m_len;
+      m_maxLen = oth.m_maxLen;
+      oth.m_buf = nullptr;
+      oth.m_len = 0;
+      oth.m_maxLen = 0;
+      return *this;
+    }
+
+    uint8_t* Reserve(size_t size) {
+      assert(size <= GetRemaining());
+      uint8_t* rv = m_buf + m_len;
+      m_len += size;
+      return rv;
+    }
+
+    void Unreserve(size_t size) { m_len -= size; }
+
+    void Clear() { m_len = 0; }
+
+    size_t GetRemaining() const { return m_maxLen - m_len; }
+
+    std::span<uint8_t> GetData() { return {m_buf, m_len}; }
+    std::span<const uint8_t> GetData() const { return {m_buf, m_len}; }
+
+   private:
+    uint8_t* m_buf;
+    size_t m_len = 0;
+    size_t m_maxLen;
+  };
+
+  /**
+   * Constructs the log.  StartFile() must be called to actually start the
+   * file output.
+   *
+   * @param msglog message logger (will be called from separate thread)
+   * @param extraHeader extra header metadata
+   */
+  explicit DataLog(wpi::Logger& msglog, std::string_view extraHeader = "")
+      : m_msglog{msglog}, m_extraHeader{extraHeader} {}
+
+  /**
+   * Starts the log.  Appends file header and Start records and schema data
+   * values for all previously started entries and schemas.  No effect unless
+   * the data log is currently stopped.
+   */
+  void StartFile();
+
+  /**
+   * Provides complete set of all buffers that need to be written.
+   *
+   * Any existing contents of writeBufs will be released as if ReleaseBufs()
+   * was called prior to this call.
+   *
+   * Returned buffers should provided back via ReleaseBufs() after the write is
+   * complete.
+   *
+   * @param writeBufs buffers to be written (output)
+   */
+  void FlushBufs(std::vector<Buffer>* writeBufs);
+
+  /**
+   * Releases memory for a set of buffers back to the internal buffer pool.
+   *
+   * @param bufs buffers; empty on return
+   */
+  void ReleaseBufs(std::vector<Buffer>* bufs);
+
+  /**
+   * Called when internal buffers are half the maximum count.  Called with
+   * internal mutex held; do not call any other DataLog functions from this
+   * function.
+   */
+  virtual void BufferHalfFull();
+
+  /**
+   * Called when internal buffers reach the maximum count.  Called with internal
+   * mutex held; do not call any other DataLog functions from this function.
+   *
+   * @return true if log should be paused (don't call PauseLog)
+   */
+  virtual bool BufferFull() = 0;
+
+ private:
+  static constexpr size_t kMaxBufferCount = 1024 * 1024 / kBlockSize;
+  static constexpr size_t kMaxFreeCount = 256 * 1024 / kBlockSize;
 
   // must be called with m_mutex held
   int StartImpl(std::string_view name, std::string_view type,
@@ -486,22 +500,16 @@ class DataLog final {
   void AppendStringImpl(std::string_view str);
   void AppendStartRecord(int id, std::string_view name, std::string_view type,
                          std::string_view metadata, int64_t timestamp);
+  void DoReleaseBufs(std::vector<Buffer>* bufs);
 
+ protected:
   wpi::Logger& m_msglog;
+
+ private:
   mutable wpi::mutex m_mutex;
-  wpi::condition_variable m_cond;
-  bool m_doFlush{false};
-  bool m_shutdown{false};
-  enum State {
-    kStart,
-    kActive,
-    kPaused,
-    kStopped,
-  } m_state = kActive;
-  double m_period;
+  bool m_active = false;
+  bool m_paused = false;
   std::string m_extraHeader;
-  std::string m_newFilename;
-  class Buffer;
   std::vector<Buffer> m_free;
   std::vector<Buffer> m_outgoing;
   struct EntryInfo {
@@ -516,7 +524,6 @@ class DataLog final {
   };
   wpi::DenseMap<int, EntryInfo2> m_entryIds;
   int m_lastId = 0;
-  std::thread m_thread;
 };
 
 /**
@@ -570,10 +577,60 @@ class DataLogEntry {
   int m_entry = 0;
 };
 
+template <typename T>
+class DataLogValueEntryImpl : public DataLogEntry {
+ protected:
+  DataLogValueEntryImpl() = default;
+  DataLogValueEntryImpl(DataLog& log, std::string_view name,
+                        std::string_view type, std::string_view metadata = {},
+                        int64_t timestamp = 0)
+      : DataLogEntry{log, name, type, metadata, timestamp} {}
+
+ public:
+  DataLogValueEntryImpl(DataLogValueEntryImpl&& rhs)
+      : DataLogEntry{std::move(rhs)} {
+    std::scoped_lock lock{rhs.m_mutex};
+    m_lastValue = std::move(rhs.m_lastValue);
+  }
+  DataLogValueEntryImpl& operator=(DataLogValueEntryImpl&& rhs) {
+    DataLogEntry::operator=(std::move(rhs));
+    std::scoped_lock lock{m_mutex, rhs.m_mutex};
+    m_lastValue = std::move(rhs.m_lastValue);
+    return *this;
+  }
+
+  /**
+   * Gets whether there is a last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  bool HasLastValue() const { return m_lastValue.has_value(); }
+
+  /**
+   * Gets the last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return Last value (empty if no last value)
+   */
+  std::optional<T> GetLastValue() const {
+    std::scoped_lock lock{m_mutex};
+    return m_lastValue;
+  }
+
+ protected:
+  mutable wpi::mutex m_mutex;
+  std::optional<T> m_lastValue;
+};
+
 /**
  * Log arbitrary byte data.
  */
-class RawLogEntry : public DataLogEntry {
+class RawLogEntry : public DataLogValueEntryImpl<std::vector<uint8_t>> {
  public:
   static constexpr std::string_view kDataType = "raw";
 
@@ -585,7 +642,7 @@ class RawLogEntry : public DataLogEntry {
       : RawLogEntry{log, name, metadata, kDataType, timestamp} {}
   RawLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
               std::string_view type, int64_t timestamp = 0)
-      : DataLogEntry{log, name, type, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, type, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -596,12 +653,24 @@ class RawLogEntry : public DataLogEntry {
   void Append(std::span<const uint8_t> data, int64_t timestamp = 0) {
     m_log->AppendRaw(m_entry, data, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param data Data to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const uint8_t> data, int64_t timestamp = 0);
 };
 
 /**
  * Log boolean values.
  */
-class BooleanLogEntry : public DataLogEntry {
+class BooleanLogEntry : public DataLogValueEntryImpl<bool> {
  public:
   static constexpr std::string_view kDataType = "boolean";
 
@@ -610,7 +679,7 @@ class BooleanLogEntry : public DataLogEntry {
       : BooleanLogEntry{log, name, {}, timestamp} {}
   BooleanLogEntry(DataLog& log, std::string_view name,
                   std::string_view metadata, int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -621,12 +690,30 @@ class BooleanLogEntry : public DataLogEntry {
   void Append(bool value, int64_t timestamp = 0) {
     m_log->AppendBoolean(m_entry, value, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(bool value, int64_t timestamp = 0) {
+    std::scoped_lock lock{m_mutex};
+    if (m_lastValue != value) {
+      m_lastValue = value;
+      Append(value, timestamp);
+    }
+  }
 };
 
 /**
  * Log integer values.
  */
-class IntegerLogEntry : public DataLogEntry {
+class IntegerLogEntry : public DataLogValueEntryImpl<int64_t> {
  public:
   static constexpr std::string_view kDataType = "int64";
 
@@ -635,7 +722,7 @@ class IntegerLogEntry : public DataLogEntry {
       : IntegerLogEntry{log, name, {}, timestamp} {}
   IntegerLogEntry(DataLog& log, std::string_view name,
                   std::string_view metadata, int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -646,12 +733,30 @@ class IntegerLogEntry : public DataLogEntry {
   void Append(int64_t value, int64_t timestamp = 0) {
     m_log->AppendInteger(m_entry, value, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(int64_t value, int64_t timestamp = 0) {
+    std::scoped_lock lock{m_mutex};
+    if (m_lastValue != value) {
+      m_lastValue = value;
+      Append(value, timestamp);
+    }
+  }
 };
 
 /**
  * Log float values.
  */
-class FloatLogEntry : public DataLogEntry {
+class FloatLogEntry : public DataLogValueEntryImpl<float> {
  public:
   static constexpr std::string_view kDataType = "float";
 
@@ -660,7 +765,7 @@ class FloatLogEntry : public DataLogEntry {
       : FloatLogEntry{log, name, {}, timestamp} {}
   FloatLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
                 int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -671,12 +776,30 @@ class FloatLogEntry : public DataLogEntry {
   void Append(float value, int64_t timestamp = 0) {
     m_log->AppendFloat(m_entry, value, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(float value, int64_t timestamp = 0) {
+    std::scoped_lock lock{m_mutex};
+    if (m_lastValue != value) {
+      m_lastValue = value;
+      Append(value, timestamp);
+    }
+  }
 };
 
 /**
  * Log double values.
  */
-class DoubleLogEntry : public DataLogEntry {
+class DoubleLogEntry : public DataLogValueEntryImpl<double> {
  public:
   static constexpr std::string_view kDataType = "double";
 
@@ -685,7 +808,7 @@ class DoubleLogEntry : public DataLogEntry {
       : DoubleLogEntry{log, name, {}, timestamp} {}
   DoubleLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
                  int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -696,12 +819,30 @@ class DoubleLogEntry : public DataLogEntry {
   void Append(double value, int64_t timestamp = 0) {
     m_log->AppendDouble(m_entry, value, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(double value, int64_t timestamp = 0) {
+    std::scoped_lock lock{m_mutex};
+    if (m_lastValue != value) {
+      m_lastValue = value;
+      Append(value, timestamp);
+    }
+  }
 };
 
 /**
  * Log string values.
  */
-class StringLogEntry : public DataLogEntry {
+class StringLogEntry : public DataLogValueEntryImpl<std::string> {
  public:
   static constexpr const char* kDataType = "string";
 
@@ -713,7 +854,7 @@ class StringLogEntry : public DataLogEntry {
       : StringLogEntry{log, name, metadata, kDataType, timestamp} {}
   StringLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
                  std::string_view type, int64_t timestamp = 0)
-      : DataLogEntry{log, name, type, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, type, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -724,12 +865,30 @@ class StringLogEntry : public DataLogEntry {
   void Append(std::string_view value, int64_t timestamp = 0) {
     m_log->AppendString(m_entry, value, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::string_view value, int64_t timestamp = 0) {
+    std::scoped_lock lock{m_mutex};
+    if (m_lastValue != value) {
+      m_lastValue = value;
+      Append(value, timestamp);
+    }
+  }
 };
 
 /**
  * Log array of boolean values.
  */
-class BooleanArrayLogEntry : public DataLogEntry {
+class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
  public:
   static constexpr const char* kDataType = "boolean[]";
 
@@ -739,7 +898,7 @@ class BooleanArrayLogEntry : public DataLogEntry {
       : BooleanArrayLogEntry{log, name, {}, timestamp} {}
   BooleanArrayLogEntry(DataLog& log, std::string_view name,
                        std::string_view metadata, int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.  For find functions to work, timestamp
@@ -791,12 +950,77 @@ class BooleanArrayLogEntry : public DataLogEntry {
   void Append(std::span<const uint8_t> arr, int64_t timestamp = 0) {
     m_log->AppendBooleanArray(m_entry, arr, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const bool> arr, int64_t timestamp = 0);
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::initializer_list<bool> arr, int64_t timestamp = 0) {
+    Update(std::span{arr.begin(), arr.end()}, timestamp);
+  }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const int> arr, int64_t timestamp = 0);
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::initializer_list<int> arr, int64_t timestamp = 0) {
+    Update(std::span{arr.begin(), arr.end()}, timestamp);
+  }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const uint8_t> arr, int64_t timestamp = 0);
 };
 
 /**
  * Log array of integer values.
  */
-class IntegerArrayLogEntry : public DataLogEntry {
+class IntegerArrayLogEntry
+    : public DataLogValueEntryImpl<std::vector<int64_t>> {
  public:
   static constexpr const char* kDataType = "int64[]";
 
@@ -806,7 +1030,7 @@ class IntegerArrayLogEntry : public DataLogEntry {
       : IntegerArrayLogEntry{log, name, {}, timestamp} {}
   IntegerArrayLogEntry(DataLog& log, std::string_view name,
                        std::string_view metadata, int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -827,12 +1051,38 @@ class IntegerArrayLogEntry : public DataLogEntry {
   void Append(std::initializer_list<int64_t> arr, int64_t timestamp = 0) {
     Append({arr.begin(), arr.end()}, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const int64_t> arr, int64_t timestamp = 0);
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::initializer_list<int64_t> arr, int64_t timestamp = 0) {
+    Update({arr.begin(), arr.end()}, timestamp);
+  }
 };
 
 /**
  * Log array of float values.
  */
-class FloatArrayLogEntry : public DataLogEntry {
+class FloatArrayLogEntry : public DataLogValueEntryImpl<std::vector<float>> {
  public:
   static constexpr const char* kDataType = "float[]";
 
@@ -841,7 +1091,7 @@ class FloatArrayLogEntry : public DataLogEntry {
       : FloatArrayLogEntry{log, name, {}, timestamp} {}
   FloatArrayLogEntry(DataLog& log, std::string_view name,
                      std::string_view metadata, int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -862,12 +1112,38 @@ class FloatArrayLogEntry : public DataLogEntry {
   void Append(std::initializer_list<float> arr, int64_t timestamp = 0) {
     Append({arr.begin(), arr.end()}, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const float> arr, int64_t timestamp = 0);
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::initializer_list<float> arr, int64_t timestamp = 0) {
+    Update({arr.begin(), arr.end()}, timestamp);
+  }
 };
 
 /**
  * Log array of double values.
  */
-class DoubleArrayLogEntry : public DataLogEntry {
+class DoubleArrayLogEntry : public DataLogValueEntryImpl<std::vector<double>> {
  public:
   static constexpr const char* kDataType = "double[]";
 
@@ -877,7 +1153,7 @@ class DoubleArrayLogEntry : public DataLogEntry {
       : DoubleArrayLogEntry{log, name, {}, timestamp} {}
   DoubleArrayLogEntry(DataLog& log, std::string_view name,
                       std::string_view metadata, int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -898,12 +1174,39 @@ class DoubleArrayLogEntry : public DataLogEntry {
   void Append(std::initializer_list<double> arr, int64_t timestamp = 0) {
     Append({arr.begin(), arr.end()}, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const double> arr, int64_t timestamp = 0);
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::initializer_list<double> arr, int64_t timestamp = 0) {
+    Update({arr.begin(), arr.end()}, timestamp);
+  }
 };
 
 /**
  * Log array of string values.
  */
-class StringArrayLogEntry : public DataLogEntry {
+class StringArrayLogEntry
+    : public DataLogValueEntryImpl<std::vector<std::string>> {
  public:
   static constexpr const char* kDataType = "string[]";
 
@@ -913,7 +1216,7 @@ class StringArrayLogEntry : public DataLogEntry {
       : StringArrayLogEntry{log, name, {}, timestamp} {}
   StringArrayLogEntry(DataLog& log, std::string_view name,
                       std::string_view metadata, int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -946,6 +1249,46 @@ class StringArrayLogEntry : public DataLogEntry {
     Append(std::span<const std::string_view>{arr.begin(), arr.end()},
            timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const std::string> arr, int64_t timestamp = 0);
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const std::string_view> arr, int64_t timestamp = 0);
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::initializer_list<std::string_view> arr,
+              int64_t timestamp = 0) {
+    Update(std::span<const std::string_view>{arr.begin(), arr.end()},
+           timestamp);
+  }
 };
 
 /**
@@ -966,7 +1309,21 @@ class StructLogEntry : public DataLogEntry {
       : m_info{std::move(info)...} {
     m_log = &log;
     log.AddStructSchema<T, I...>(info..., timestamp);
-    m_entry = log.Start(name, S::GetTypeString(info...), metadata, timestamp);
+    m_entry =
+        log.Start(name, GetStructTypeString<T>(info...), metadata, timestamp);
+  }
+
+  StructLogEntry(StructLogEntry&& rhs)
+      : DataLogEntry{std::move(rhs)}, m_info{std::move(rhs.m_info)} {
+    std::scoped_lock lock{rhs.m_mutex};
+    m_lastValue = std::move(rhs.m_lastValue);
+  }
+  StructLogEntry& operator=(StructLogEntry&& rhs) {
+    DataLogEntry::operator=(std::move(rhs));
+    m_info = std::move(rhs.m_info);
+    std::scoped_lock lock{m_mutex, rhs.m_mutex};
+    m_lastValue = std::move(rhs.m_lastValue);
+    return *this;
   }
 
   /**
@@ -990,8 +1347,76 @@ class StructLogEntry : public DataLogEntry {
     m_log->AppendRaw(m_entry, buf, timestamp);
   }
 
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param data Data to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(const T& data, int64_t timestamp = 0) {
+    if constexpr (sizeof...(I) == 0) {
+      if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
+        uint8_t buf[S::GetSize()];
+        S::Pack(buf, data);
+        std::scoped_lock lock{m_mutex};
+        if (m_lastValue.empty() ||
+            !std::equal(buf, buf + S::GetSize(), m_lastValue.begin(),
+                        m_lastValue.end())) {
+          m_lastValue.assign(buf, buf + S::GetSize());
+          m_log->AppendRaw(m_entry, buf, timestamp);
+        }
+        return;
+      }
+    }
+    wpi::SmallVector<uint8_t, 128> buf;
+    buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
+    std::apply([&](const I&... info) { S::Pack(buf, data, info...); }, m_info);
+    std::scoped_lock lock{m_mutex};
+    if (m_lastValue.empty() ||
+        !std::equal(buf.begin(), buf.end(), m_lastValue.begin(),
+                    m_lastValue.end())) {
+      m_lastValue.assign(buf.begin(), buf.end());
+      m_log->AppendRaw(m_entry, buf, timestamp);
+    }
+  }
+
+  /**
+   * Gets whether there is a last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  bool HasLastValue() const { return !m_lastValue.empty(); }
+
+  /**
+   * Gets the last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return Last value (empty if no last value)
+   */
+  std::optional<T> GetLastValue() const {
+    std::scoped_lock lock{m_mutex};
+    if (m_lastValue.empty()) {
+      return std::nullopt;
+    }
+    return std::apply(
+        [&](const I&... info) { return S::Unpack(m_lastValue, info...); },
+        m_info);
+  }
+
  private:
-  [[no_unique_address]] std::tuple<I...> m_info;
+  mutable wpi::mutex m_mutex;
+  std::vector<uint8_t> m_lastValue;
+  [[no_unique_address]]
+  std::tuple<I...> m_info;
 };
 
 /**
@@ -1016,6 +1441,22 @@ class StructArrayLogEntry : public DataLogEntry {
     m_entry = log.Start(
         name, MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
         metadata, timestamp);
+  }
+
+  StructArrayLogEntry(StructArrayLogEntry&& rhs)
+      : DataLogEntry{std::move(rhs)},
+        m_buf{std::move(rhs.m_buf)},
+        m_info{std::move(rhs.m_info)} {
+    std::scoped_lock lock{rhs.m_mutex};
+    m_lastValue = std::move(rhs.m_lastValue);
+  }
+  StructArrayLogEntry& operator=(StructArrayLogEntry&& rhs) {
+    DataLogEntry::operator=(std::move(rhs));
+    m_buf = std::move(rhs.m_buf);
+    m_info = std::move(rhs.m_info);
+    std::scoped_lock lock{m_mutex, rhs.m_mutex};
+    m_lastValue = std::move(rhs.m_lastValue);
+    return *this;
   }
 
   /**
@@ -1057,9 +1498,83 @@ class StructArrayLogEntry : public DataLogEntry {
         m_info);
   }
 
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param data Data to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const T> data, int64_t timestamp = 0) {
+    std::apply(
+        [&](const I&... info) {
+          m_buf.Write(
+              data,
+              [&](auto bytes) {
+                std::scoped_lock lock{m_mutex};
+                if (!m_lastValue.has_value()) {
+                  m_lastValue = std::vector(bytes.begin(), bytes.end());
+                  m_log->AppendRaw(m_entry, bytes, timestamp);
+                } else if (!std::equal(bytes.begin(), bytes.end(),
+                                       m_lastValue->begin(),
+                                       m_lastValue->end())) {
+                  m_lastValue->assign(bytes.begin(), bytes.end());
+                  m_log->AppendRaw(m_entry, bytes, timestamp);
+                }
+              },
+              info...);
+        },
+        m_info);
+  }
+
+  /**
+   * Gets whether there is a last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  bool HasLastValue() const { return m_lastValue.has_value(); }
+
+  /**
+   * Gets the last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return Last value (empty if no last value)
+   */
+  std::optional<std::vector<T>> GetLastValue() const {
+    std::scoped_lock lock{m_mutex};
+    if (!m_lastValue.has_value()) {
+      return std::nullopt;
+    }
+    auto& lastValue = m_lastValue.value();
+    size_t size = std::apply(S::GetSize, m_info);
+    std::vector<T> rv;
+    rv.reserve(lastValue.size() / size);
+    for (auto in = lastValue.begin(), end = lastValue.end(); in < end;
+         in += size) {
+      std::apply(
+          [&](const I&... info) {
+            rv.emplace_back(S::Unpack(
+                std::span<const uint8_t>{std::to_address(in), size}, info...));
+          },
+          m_info);
+    }
+    return rv;
+  }
+
  private:
+  mutable wpi::mutex m_mutex;
   StructArrayBuffer<T, I...> m_buf;
-  [[no_unique_address]] std::tuple<I...> m_info;
+  std::optional<std::vector<uint8_t>> m_lastValue;
+  [[no_unique_address]]
+  std::tuple<I...> m_info;
 };
 
 /**
@@ -1095,284 +1610,60 @@ class ProtobufLogEntry : public DataLogEntry {
     m_log->AppendRaw(m_entry, buf, timestamp);
   }
 
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param data Data to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(const T& data, int64_t timestamp = 0) {
+    std::scoped_lock lock{m_mutex};
+    wpi::SmallVector<uint8_t, 128> buf;
+    m_msg.Pack(buf, data);
+    if (!m_lastValue.has_value()) {
+      m_lastValue = std::vector(buf.begin(), buf.end());
+      m_log->AppendRaw(m_entry, buf, timestamp);
+    } else if (!std::equal(buf.begin(), buf.end(), m_lastValue->begin(),
+                           m_lastValue->end())) {
+      m_lastValue->assign(buf.begin(), buf.end());
+      m_log->AppendRaw(m_entry, buf, timestamp);
+    }
+  }
+
+  /**
+   * Gets whether there is a last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  bool HasLastValue() const { return m_lastValue.has_value(); }
+
+  /**
+   * Gets the last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return Last value (empty if no last value)
+   */
+  std::optional<T> GetLastValue() const {
+    std::scoped_lock lock{m_mutex};
+    if (!m_lastValue.has_value()) {
+      return std::nullopt;
+    }
+    return m_msg.Unpack(m_lastValue);
+  }
+
  private:
-  wpi::mutex m_mutex;
+  mutable wpi::mutex m_mutex;
   ProtobufMessage<T> m_msg;
+  std::optional<std::vector<uint8_t>> m_lastValue;
 };
 
 }  // namespace wpi::log
-
-extern "C" {
-#endif  // __cplusplus
-
-/** C-compatible data log (opaque struct). */
-struct WPI_DataLog;
-
-/**
- * Construct a new Data Log.  The log will be initially created with a
- * temporary filename.
- *
- * @param dir directory to store the log
- * @param filename filename to use; if none provided, a random filename is
- *                 generated of the form "wpilog_{}.wpilog"
- * @param period time between automatic flushes to disk, in seconds;
- *               this is a time/storage tradeoff
- * @param extraHeader extra header data
- */
-struct WPI_DataLog* WPI_DataLog_Create(const char* dir, const char* filename,
-                                       double period, const char* extraHeader);
-
-/**
- * Construct a new Data Log that passes its output to the provided function
- * rather than a file.  The write function will be called on a separate
- * background thread and may block.  The write function is called with an
- * empty data array (data=NULL, len=0) when the thread is terminating.
- *
- * @param write write function
- * @param ptr pointer to pass to write function ptr parameter
- * @param period time between automatic calls to write, in seconds;
- *               this is a time/storage tradeoff
- * @param extraHeader extra header data
- */
-struct WPI_DataLog* WPI_DataLog_Create_Func(
-    void (*write)(void* ptr, const uint8_t* data, size_t len), void* ptr,
-    double period, const char* extraHeader);
-
-/**
- * Releases a data log object. Closes the file and returns resources to the
- * system.
- *
- * @param datalog data log
- */
-void WPI_DataLog_Release(struct WPI_DataLog* datalog);
-
-/**
- * Change log filename.
- *
- * @param datalog data log
- * @param filename filename
- */
-void WPI_DataLog_SetFilename(struct WPI_DataLog* datalog, const char* filename);
-
-/**
- * Explicitly flushes the log data to disk.
- *
- * @param datalog data log
- */
-void WPI_DataLog_Flush(struct WPI_DataLog* datalog);
-
-/**
- * Pauses appending of data records to the log.  While paused, no data records
- * are saved (e.g. AppendX is a no-op).  Has no effect on entry starts /
- * finishes / metadata changes.
- *
- * @param datalog data log
- */
-void WPI_DataLog_Pause(struct WPI_DataLog* datalog);
-
-/**
- * Resumes appending of data records to the log.  If called after Stop(),
- * opens a new file (with random name if SetFilename was not called after
- * Stop()) and appends Start records and schema data values for all previously
- * started entries and schemas.
- *
- * @param datalog data log
- */
-void WPI_DataLog_Resume(struct WPI_DataLog* datalog);
-
-/**
- * Stops appending all records to the log, and closes the log file.
- *
- * @param datalog data log
- */
-void WPI_DataLog_Stop(struct WPI_DataLog* datalog);
-
-/**
- * Start an entry.  Duplicate names are allowed (with the same type), and
- * result in the same index being returned (Start/Finish are reference
- * counted).  A duplicate name with a different type will result in an error
- * message being printed to the console and 0 being returned (which will be
- * ignored by the Append functions).
- *
- * @param datalog data log
- * @param name Name
- * @param type Data type
- * @param metadata Initial metadata (e.g. data properties)
- * @param timestamp Time stamp (may be 0 to indicate now)
- *
- * @return Entry index
- */
-int WPI_DataLog_Start(struct WPI_DataLog* datalog, const char* name,
-                      const char* type, const char* metadata,
-                      int64_t timestamp);
-
-/**
- * Finish an entry.
- *
- * @param datalog data log
- * @param entry Entry index
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_Finish(struct WPI_DataLog* datalog, int entry,
-                        int64_t timestamp);
-
-/**
- * Updates the metadata for an entry.
- *
- * @param datalog data log
- * @param entry Entry index
- * @param metadata New metadata for the entry
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_SetMetadata(struct WPI_DataLog* datalog, int entry,
-                             const char* metadata, int64_t timestamp);
-
-/**
- * Appends a raw record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param data Byte array to record
- * @param len Length of byte array
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendRaw(struct WPI_DataLog* datalog, int entry,
-                           const uint8_t* data, size_t len, int64_t timestamp);
-
-/**
- * Appends a boolean record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param value Boolean value to record
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendBoolean(struct WPI_DataLog* datalog, int entry,
-                               int value, int64_t timestamp);
-
-/**
- * Appends an integer record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param value Integer value to record
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendInteger(struct WPI_DataLog* datalog, int entry,
-                               int64_t value, int64_t timestamp);
-
-/**
- * Appends a float record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param value Float value to record
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendFloat(struct WPI_DataLog* datalog, int entry,
-                             float value, int64_t timestamp);
-
-/**
- * Appends a double record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param value Double value to record
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendDouble(struct WPI_DataLog* datalog, int entry,
-                              double value, int64_t timestamp);
-
-/**
- * Appends a string record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param value String value to record
- * @param len Length of string
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendString(struct WPI_DataLog* datalog, int entry,
-                              const char* value, size_t len, int64_t timestamp);
-
-/**
- * Appends a boolean array record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param arr Boolean array to record
- * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendBooleanArray(struct WPI_DataLog* datalog, int entry,
-                                    const int* arr, size_t len,
-                                    int64_t timestamp);
-
-/**
- * Appends a boolean array record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param arr Boolean array to record
- * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendBooleanArrayByte(struct WPI_DataLog* datalog, int entry,
-                                        const uint8_t* arr, size_t len,
-                                        int64_t timestamp);
-
-/**
- * Appends an integer array record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param arr Integer array to record
- * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendIntegerArray(struct WPI_DataLog* datalog, int entry,
-                                    const int64_t* arr, size_t len,
-                                    int64_t timestamp);
-
-/**
- * Appends a float array record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param arr Float array to record
- * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendFloatArray(struct WPI_DataLog* datalog, int entry,
-                                  const float* arr, size_t len,
-                                  int64_t timestamp);
-
-/**
- * Appends a double array record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param arr Double array to record
- * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendDoubleArray(struct WPI_DataLog* datalog, int entry,
-                                   const double* arr, size_t len,
-                                   int64_t timestamp);
-
-/**
- * Appends a string array record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param arr String array to record
- * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendStringArray(struct WPI_DataLog* datalog, int entry,
-                                   const WPI_DataLog_String* arr, size_t len,
-                                   int64_t timestamp);
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif  // __cplusplus

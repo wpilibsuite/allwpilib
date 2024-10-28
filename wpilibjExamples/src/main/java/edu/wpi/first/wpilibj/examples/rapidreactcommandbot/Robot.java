@@ -4,16 +4,19 @@
 
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot;
 
+import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the name of this class or
- * the package after creating this project, you must also update the build.gradle file in the
- * project.
+ * The methods in this class are called automatically corresponding to each mode, as described in
+ * the TimedRobot documentation. If you change the name of this class or the package after creating
+ * this project, you must also update the Main.java file in the project.
  */
+@Logged(name = "Rapid React Command Robot")
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
@@ -23,10 +26,13 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-  @Override
-  public void robotInit() {
+  public Robot() {
     // Configure default commands and condition bindings on robot startup
     m_robot.configureBindings();
+
+    // Initialize data logging.
+    DataLogManager.start();
+    Epilogue.bind(this);
   }
 
   /**

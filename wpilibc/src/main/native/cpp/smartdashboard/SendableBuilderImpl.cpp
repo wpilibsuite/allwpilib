@@ -4,6 +4,10 @@
 
 #include "frc/smartdashboard/SendableBuilderImpl.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+
 #include <networktables/BooleanArrayTopic.h>
 #include <networktables/BooleanTopic.h>
 #include <networktables/DoubleArrayTopic.h>
@@ -16,8 +20,7 @@
 #include <networktables/StringArrayTopic.h>
 #include <ntcore_cpp.h>
 #include <wpi/SmallVector.h>
-
-#include "frc/smartdashboard/SmartDashboard.h"
+#include <wpi/json.h>
 
 using namespace frc;
 
@@ -94,7 +97,8 @@ void SendableBuilderImpl::ClearProperties() {
 
 void SendableBuilderImpl::SetSmartDashboardType(std::string_view type) {
   if (!m_typePublisher) {
-    m_typePublisher = m_table->GetStringTopic(".type").Publish();
+    m_typePublisher = m_table->GetStringTopic(".type").PublishEx(
+        nt::StringTopic::kTypeString, {{"SmartDashboard", type}});
   }
   m_typePublisher.Set(type);
 }

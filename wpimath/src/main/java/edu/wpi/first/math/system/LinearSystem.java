@@ -5,8 +5,39 @@
 package edu.wpi.first.math.system;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N10;
+import edu.wpi.first.math.numbers.N11;
+import edu.wpi.first.math.numbers.N12;
+import edu.wpi.first.math.numbers.N13;
+import edu.wpi.first.math.numbers.N14;
+import edu.wpi.first.math.numbers.N15;
+import edu.wpi.first.math.numbers.N16;
+import edu.wpi.first.math.numbers.N17;
+import edu.wpi.first.math.numbers.N18;
+import edu.wpi.first.math.numbers.N19;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.numbers.N20;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.math.numbers.N5;
+import edu.wpi.first.math.numbers.N6;
+import edu.wpi.first.math.numbers.N7;
+import edu.wpi.first.math.numbers.N8;
+import edu.wpi.first.math.numbers.N9;
+import edu.wpi.first.math.system.proto.LinearSystemProto;
+import edu.wpi.first.math.system.struct.LinearSystemStruct;
+import edu.wpi.first.util.protobuf.Protobuf;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * A plant defined using state-space notation.
@@ -20,7 +51,8 @@ import edu.wpi.first.math.numbers.N1;
  * @param <Inputs> Number of inputs.
  * @param <Outputs> Number of outputs.
  */
-public class LinearSystem<States extends Num, Inputs extends Num, Outputs extends Num> {
+public class LinearSystem<States extends Num, Inputs extends Num, Outputs extends Num>
+    implements ProtobufSerializable, StructSerializable {
   /** Continuous system matrix. */
   private final Matrix<States, States> m_A;
 
@@ -180,7 +212,7 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
       Matrix<States, N1> x, Matrix<Inputs, N1> clampedU, double dtSeconds) {
     var discABpair = Discretization.discretizeAB(m_A, m_B, dtSeconds);
 
-    return (discABpair.getFirst().times(x)).plus(discABpair.getSecond().times(clampedU));
+    return discABpair.getFirst().times(x).plus(discABpair.getSecond().times(clampedU));
   }
 
   /**
@@ -196,10 +228,179 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
     return m_C.times(x).plus(m_D.times(clampedU));
   }
 
+  /**
+   * Returns the LinearSystem with the outputs listed in outputIndices.
+   *
+   * <p>This is used by state observers such as the Kalman Filter.
+   *
+   * @param outputIndices the list of output indices to include in the sliced system.
+   * @return the sliced LinearSystem with outputs set to row vectors of LinearSystem.
+   * @throws IllegalArgumentException if any outputIndices are outside the range of system outputs.
+   * @throws IllegalArgumentException if number of outputIndices exceeds the number of system
+   *     outputs.
+   * @throws IllegalArgumentException if duplication exists in outputIndices.
+   */
+  public LinearSystem<States, Inputs, ? extends Num> slice(int... outputIndices) {
+    for (int index : outputIndices) {
+      if (index < 0 || index >= m_C.getNumRows()) {
+        throw new IllegalArgumentException(
+            "Output indices out of range. This is usually due to model implementation errors.");
+      }
+    }
+
+    if (outputIndices.length >= m_C.getNumRows()) {
+      throw new IllegalArgumentException(
+          "More outputs requested than available. This is usually due to model implementation "
+              + "errors.");
+    }
+
+    List<Integer> outputIndicesList =
+        Arrays.stream(outputIndices).distinct().boxed().collect(Collectors.toList());
+    Collections.sort(outputIndicesList);
+
+    if (outputIndices.length != outputIndicesList.size()) {
+      throw new IllegalArgumentException(
+          "Duplicate indices exist.  This is usually due to model implementation " + "errors.");
+    }
+
+    SimpleMatrix new_C_Storage = new SimpleMatrix(outputIndices.length, m_C.getNumCols());
+    int row = 0;
+    for (var index : outputIndicesList) {
+      var current_row_data = m_C.extractRowVector(index).getData();
+      new_C_Storage.setRow(row, 0, current_row_data);
+      row++;
+    }
+
+    SimpleMatrix new_D_Storage = new SimpleMatrix(outputIndices.length, m_D.getNumCols());
+    row = 0;
+    for (var index : outputIndicesList) {
+      var current_row_data = m_D.extractRowVector(index).getData();
+      new_D_Storage.setRow(row, 0, current_row_data);
+      row++;
+    }
+
+    switch (outputIndices.length) {
+      case 20:
+        Matrix<N20, States> new_C20 = new Matrix<>(new_C_Storage);
+        Matrix<N20, Inputs> new_D20 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C20, new_D20);
+      case 19:
+        Matrix<N19, States> new_C19 = new Matrix<>(new_C_Storage);
+        Matrix<N19, Inputs> new_D19 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C19, new_D19);
+      case 18:
+        Matrix<N18, States> new_C18 = new Matrix<>(new_C_Storage);
+        Matrix<N18, Inputs> new_D18 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C18, new_D18);
+      case 17:
+        Matrix<N17, States> new_C17 = new Matrix<>(new_C_Storage);
+        Matrix<N17, Inputs> new_D17 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C17, new_D17);
+      case 16:
+        Matrix<N16, States> new_C16 = new Matrix<>(new_C_Storage);
+        Matrix<N16, Inputs> new_D16 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C16, new_D16);
+      case 15:
+        Matrix<N15, States> new_C15 = new Matrix<>(new_C_Storage);
+        Matrix<N15, Inputs> new_D15 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C15, new_D15);
+      case 14:
+        Matrix<N14, States> new_C14 = new Matrix<>(new_C_Storage);
+        Matrix<N14, Inputs> new_D14 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C14, new_D14);
+      case 13:
+        Matrix<N13, States> new_C13 = new Matrix<>(new_C_Storage);
+        Matrix<N13, Inputs> new_D13 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C13, new_D13);
+      case 12:
+        Matrix<N12, States> new_C12 = new Matrix<>(new_C_Storage);
+        Matrix<N12, Inputs> new_D12 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C12, new_D12);
+      case 11:
+        Matrix<N11, States> new_C11 = new Matrix<>(new_C_Storage);
+        Matrix<N11, Inputs> new_D11 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C11, new_D11);
+      case 10:
+        Matrix<N10, States> new_C10 = new Matrix<>(new_C_Storage);
+        Matrix<N10, Inputs> new_D10 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C10, new_D10);
+      case 9:
+        Matrix<N9, States> new_C9 = new Matrix<>(new_C_Storage);
+        Matrix<N9, Inputs> new_D9 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C9, new_D9);
+      case 8:
+        Matrix<N8, States> new_C8 = new Matrix<>(new_C_Storage);
+        Matrix<N8, Inputs> new_D8 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C8, new_D8);
+      case 7:
+        Matrix<N7, States> new_C7 = new Matrix<>(new_C_Storage);
+        Matrix<N7, Inputs> new_D7 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C7, new_D7);
+      case 6:
+        Matrix<N6, States> new_C6 = new Matrix<>(new_C_Storage);
+        Matrix<N6, Inputs> new_D6 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C6, new_D6);
+      case 5:
+        Matrix<N5, States> new_C5 = new Matrix<>(new_C_Storage);
+        Matrix<N5, Inputs> new_D5 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C5, new_D5);
+      case 4:
+        Matrix<N4, States> new_C4 = new Matrix<>(new_C_Storage);
+        Matrix<N4, Inputs> new_D4 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C4, new_D4);
+      case 3:
+        Matrix<N3, States> new_C3 = new Matrix<>(new_C_Storage);
+        Matrix<N3, Inputs> new_D3 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C3, new_D3);
+      case 2:
+        Matrix<N2, States> new_C2 = new Matrix<>(new_C_Storage);
+        Matrix<N2, Inputs> new_D2 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C2, new_D2);
+      default:
+        Matrix<N1, States> new_C1 = new Matrix<>(new_C_Storage);
+        Matrix<N1, Inputs> new_D1 = new Matrix<>(new_D_Storage);
+        return new LinearSystem<>(m_A, m_B, new_C1, new_D1);
+    }
+  }
+
   @Override
   public String toString() {
     return String.format(
         "Linear System: A\n%s\n\nB:\n%s\n\nC:\n%s\n\nD:\n%s\n",
         m_A.toString(), m_B.toString(), m_C.toString(), m_D.toString());
+  }
+
+  /**
+   * Creates an implementation of the {@link Protobuf} interface for linear systems.
+   *
+   * @param <States> The number of states of the linear systems this serializer processes.
+   * @param <Inputs> The number of inputs of the linear systems this serializer processes.
+   * @param <Outputs> The number of outputs of the linear systems this serializer processes.
+   * @param states The number of states of the linear systems this serializer processes.
+   * @param inputs The number of inputs of the linear systems this serializer processes.
+   * @param outputs The number of outputs of the linear systems this serializer processes.
+   * @return The protobuf implementation.
+   */
+  public static <States extends Num, Inputs extends Num, Outputs extends Num>
+      LinearSystemProto<States, Inputs, Outputs> getProto(
+          Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs) {
+    return new LinearSystemProto<>(states, inputs, outputs);
+  }
+
+  /**
+   * Creates an implementation of the {@link Struct} interface for linear systems.
+   *
+   * @param <States> The number of states of the linear systems this serializer processes.
+   * @param <Inputs> The number of inputs of the linear systems this serializer processes.
+   * @param <Outputs> The number of outputs of the linear systems this serializer processes.
+   * @param states The number of states of the linear systems this serializer processes.
+   * @param inputs The number of inputs of the linear systems this serializer processes.
+   * @param outputs The number of outputs of the linear systems this serializer processes.
+   * @return The struct implementation.
+   */
+  public static <States extends Num, Inputs extends Num, Outputs extends Num>
+      LinearSystemStruct<States, Inputs, Outputs> getStruct(
+          Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs) {
+    return new LinearSystemStruct<>(states, inputs, outputs);
   }
 }

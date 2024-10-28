@@ -4,6 +4,10 @@
 
 #include "Sftp.h"
 
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <fmt/format.h>
 
 using namespace sftp;
@@ -67,25 +71,6 @@ size_t File::Read(void* buf, uint32_t count) {
   auto rv = sftp_read(m_handle, buf, count);
   if (rv < 0) {
     throw Exception{m_handle->sftp};
-  }
-  return rv;
-}
-
-File::AsyncId File::AsyncReadBegin(uint32_t len) const {
-  int rv = sftp_async_read_begin(m_handle, len);
-  if (rv < 0) {
-    throw Exception{m_handle->sftp};
-  }
-  return rv;
-}
-
-size_t File::AsyncRead(void* data, uint32_t len, AsyncId id) {
-  auto rv = sftp_async_read(m_handle, data, len, id);
-  if (rv == SSH_ERROR) {
-    throw Exception{ssh_get_error(m_handle->sftp->session)};
-  }
-  if (rv == SSH_AGAIN) {
-    return 0;
   }
   return rv;
 }

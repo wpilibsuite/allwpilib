@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <cmath>
 #include <functional>
 #include <memory>
+#include <utility>
 
 #include <frc/Timer.h>
 #include <frc/controller/HolonomicDriveController.h>
@@ -93,7 +93,15 @@ class SwerveControllerCommand
       std::function<frc::Rotation2d()> desiredRotation,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
-      Requirements requirements = {});
+      Requirements requirements = {})
+      : m_trajectory(std::move(trajectory)),
+        m_pose(std::move(pose)),
+        m_kinematics(kinematics),
+        m_controller(xController, yController, thetaController),
+        m_desiredRotation(std::move(desiredRotation)),
+        m_outputStates(output) {
+    this->AddRequirements(requirements);
+  }
 
   /**
    * Constructs a new SwerveControllerCommand that when executed will follow the
@@ -131,7 +139,14 @@ class SwerveControllerCommand
       frc::ProfiledPIDController<units::radians> thetaController,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
-      Requirements requirements = {});
+      Requirements requirements = {})
+      : m_trajectory(std::move(trajectory)),
+        m_pose(std::move(pose)),
+        m_kinematics(kinematics),
+        m_controller(xController, yController, thetaController),
+        m_outputStates(output) {
+    this->AddRequirements(requirements);
+  }
 
   /**
    * Constructs a new SwerveControllerCommand that when executed will follow the
@@ -161,7 +176,15 @@ class SwerveControllerCommand
       std::function<frc::Rotation2d()> desiredRotation,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
-      Requirements requirements = {});
+      Requirements requirements = {})
+      : m_trajectory(std::move(trajectory)),
+        m_pose(std::move(pose)),
+        m_kinematics(kinematics),
+        m_controller(std::move(controller)),
+        m_desiredRotation(std::move(desiredRotation)),
+        m_outputStates(output) {
+    this->AddRequirements(requirements);
+  }
 
   /**
    * Constructs a new SwerveControllerCommand that when executed will follow the
@@ -193,15 +216,41 @@ class SwerveControllerCommand
       frc::HolonomicDriveController controller,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
-      Requirements requirements = {});
+      Requirements requirements = {})
+      : m_trajectory(std::move(trajectory)),
+        m_pose(std::move(pose)),
+        m_kinematics(kinematics),
+        m_controller(std::move(controller)),
+        m_outputStates(output) {
+    this->AddRequirements(requirements);
+  }
 
-  void Initialize() override;
+  void Initialize() override {
+    if (m_desiredRotation == nullptr) {
+      m_desiredRotation = [&] {
+        return m_trajectory.States().back().pose.Rotation();
+      };
+    }
+    m_timer.Restart();
+  }
 
-  void Execute() override;
+  void Execute() override {
+    auto curTime = m_timer.Get();
+    auto m_desiredState = m_trajectory.Sample(curTime);
 
-  void End(bool interrupted) override;
+    auto targetChassisSpeeds =
+        m_controller.Calculate(m_pose(), m_desiredState, m_desiredRotation());
+    auto targetModuleStates =
+        m_kinematics.ToSwerveModuleStates(targetChassisSpeeds);
 
-  bool IsFinished() override;
+    m_outputStates(targetModuleStates);
+  }
+
+  void End(bool interrupted) override { m_timer.Stop(); }
+
+  bool IsFinished() override {
+    return m_timer.HasElapsed(m_trajectory.TotalTime());
+  }
 
  private:
   frc::Trajectory m_trajectory;
@@ -217,6 +266,5 @@ class SwerveControllerCommand
   units::second_t m_prevTime;
   frc::Rotation2d m_finalRotation;
 };
-}  // namespace frc2
 
-#include "SwerveControllerCommand.inc"
+}  // namespace frc2

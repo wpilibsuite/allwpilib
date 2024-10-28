@@ -128,7 +128,7 @@ Notifier::~Notifier() {
     m_thread.join();
   }
 
-  HAL_CleanNotifier(handle, &status);
+  HAL_CleanNotifier(handle);
 }
 
 Notifier::Notifier(Notifier&& rhs)
@@ -159,11 +159,6 @@ void Notifier::SetName(std::string_view name) {
   buf.push_back('\0');  // null terminate
   int32_t status = 0;
   HAL_SetNotifierName(m_notifier, buf.data(), &status);
-}
-
-void Notifier::SetHandler(std::function<void()> callback) {
-  std::scoped_lock lock(m_processMutex);
-  m_callback = callback;
 }
 
 void Notifier::SetCallback(std::function<void()> callback) {

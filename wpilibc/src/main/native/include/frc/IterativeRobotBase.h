@@ -63,10 +63,8 @@ class IterativeRobotBase : public RobotBase {
    * which will be called when the robot is first powered on. It will be called
    * exactly one time.
    *
-   * Warning: the Driver Station "Robot Code" light and FMS "Robot Ready"
-   * indicators will be off until RobotInit() exits. Code in RobotInit() that
-   * waits for enable will cause the robot to never indicate that the code is
-   * ready, causing the robot to be bypassed in a match.
+   * Note: This method is functionally identical to the class constructor so
+   * that should be used instead.
    */
   virtual void RobotInit();
 
@@ -209,7 +207,9 @@ class IterativeRobotBase : public RobotBase {
    * By default, this is enabled.
    *
    * @param enabled True to enable, false to disable
+   * @deprecated Deprecated without replacement.
    */
+  [[deprecated("Deprecated without replacement.")]]
   void SetNetworkTablesFlushEnabled(bool enabled);
 
   /**
@@ -229,6 +229,11 @@ class IterativeRobotBase : public RobotBase {
    * Gets time period between calls to Periodic() functions.
    */
   units::second_t GetPeriod() const;
+
+  /**
+   * Prints list of epochs added so far and their times.
+   */
+  void PrintWatchdogEpochs();
 
   /**
    * Constructor for IterativeRobotBase.

@@ -24,26 +24,32 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:4.1.0'
 }
 
+sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
+
 nativeUtils.exportsConfigs {
     wpilibNewCommands {
-        x64ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
     }
 }
 
 model {
-    components {}
+    components {
+        "${nativeName}Base" {
+            it.sources.cpp {
+                source {
+                    srcDirs 'src/generated/main/native/cpp'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/generated/main/native/include'
+                }
+            }
+        }
+        "${nativeName}" {
+            it.sources.cpp.exportedHeaders {
+                srcDirs 'src/generated/main/native/include'
+            }
+        }
+    }
     binaries {
         all {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {

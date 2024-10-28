@@ -187,6 +187,8 @@ class HouseholderQR : public SolverBase<HouseholderQR<MatrixType_>> {
    * \warning a determinant can be very big or small, so for matrices
    * of large enough dimension, there is a risk of overflow/underflow.
    * One way to work around that is to use logAbsDeterminant() instead.
+   * Also, do not rely on the determinant being exactly zero for testing
+   * singularity or rank-deficiency.
    *
    * \sa absDeterminant(), logAbsDeterminant(), MatrixBase::determinant()
    */
@@ -202,6 +204,8 @@ class HouseholderQR : public SolverBase<HouseholderQR<MatrixType_>> {
    * \warning a determinant can be very big or small, so for matrices
    * of large enough dimension, there is a risk of overflow/underflow.
    * One way to work around that is to use logAbsDeterminant() instead.
+   * Also, do not rely on the determinant being exactly zero for testing
+   * singularity or rank-deficiency.
    *
    * \sa determinant(), logAbsDeterminant(), MatrixBase::determinant()
    */
@@ -217,9 +221,29 @@ class HouseholderQR : public SolverBase<HouseholderQR<MatrixType_>> {
    * \note This method is useful to work around the risk of overflow/underflow that's inherent
    * to determinant computation.
    *
+   * \warning Do not rely on the determinant being exactly zero for testing
+   * singularity or rank-deficiency.
+   *
    * \sa determinant(), absDeterminant(), MatrixBase::determinant()
    */
   typename MatrixType::RealScalar logAbsDeterminant() const;
+
+  /** \returns the sign of the determinant of the matrix of which
+   * *this is the QR decomposition. It has only linear complexity
+   * (that is, O(n) where n is the dimension of the square matrix)
+   * as the QR decomposition has already been computed.
+   *
+   * \note This is only for square matrices.
+   *
+   * \note This method is useful to work around the risk of overflow/underflow that's inherent
+   * to determinant computation.
+   *
+   * \warning Do not rely on the determinant being exactly zero for testing
+   * singularity or rank-deficiency.
+   *
+   * \sa determinant(), absDeterminant(), MatrixBase::determinant()
+   */
+  typename MatrixType::Scalar signDeterminant() const;
 
   inline Index rows() const { return m_qr.rows(); }
   inline Index cols() const { return m_qr.cols(); }
@@ -304,6 +328,15 @@ typename MatrixType::RealScalar HouseholderQR<MatrixType>::logAbsDeterminant() c
   eigen_assert(m_isInitialized && "HouseholderQR is not initialized.");
   eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a non-square matrix!");
   return m_qr.diagonal().cwiseAbs().array().log().sum();
+}
+
+template <typename MatrixType>
+typename MatrixType::Scalar HouseholderQR<MatrixType>::signDeterminant() const {
+  eigen_assert(m_isInitialized && "HouseholderQR is not initialized.");
+  eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a non-square matrix!");
+  Scalar detQ;
+  internal::householder_determinant<HCoeffsType, Scalar, NumTraits<Scalar>::IsComplex>::run(m_hCoeffs, detQ);
+  return detQ * m_qr.diagonal().array().sign().prod();
 }
 
 namespace internal {

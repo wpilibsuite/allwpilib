@@ -4,13 +4,10 @@
 
 #pragma once
 
-#include <functional>
 #include <memory>
-#include <optional>
 #include <string>
 #include <string_view>
 #include <thread>
-#include <vector>
 
 #include <glass/View.h>
 #include <implot.h>
@@ -21,7 +18,6 @@
 #include <wpi/StringMap.h>
 
 #include "sysid/analysis/AnalysisManager.h"
-#include "sysid/analysis/AnalysisType.h"
 #include "sysid/analysis/FeedbackAnalysis.h"
 #include "sysid/analysis/FeedbackControllerPreset.h"
 #include "sysid/view/AnalyzerPlot.h"
@@ -47,7 +43,7 @@ class Analyzer : public glass::View {
   enum class AnalyzerState {
     kWaitingForData,
     kNominalDisplay,
-    kMotionThresholdError,
+    kVelocityThresholdError,
     kTestDurationError,
     kGeneralDataError,
     kFileError
@@ -56,11 +52,10 @@ class Analyzer : public glass::View {
    * The different motor controller timing presets that can be used.
    */
   static constexpr const char* kPresetNames[] = {"Default",
-                                                 "WPILib (2020-)",
-                                                 "WPILib (Pre-2020)",
-                                                 "CANCoder",
-                                                 "CTRE (Pro)",
-                                                 "CTRE",
+                                                 "WPILib",
+                                                 "CTRE Phoenix 5 CANcoder",
+                                                 "CTRE Phoenix 5",
+                                                 "CTRE Phoenix 6",
                                                  "REV Brushless Encoder Port",
                                                  "REV Brushed Encoder Port",
                                                  "REV Data Port",
@@ -182,9 +177,17 @@ class Analyzer : public glass::View {
   void UpdateFeedbackGains();
 
   /**
-   * Handles logic of displaying a gain on ImGui
+   * Handles logic of displaying a double on ImGui.
    */
-  bool DisplayGain(const char* text, double* data, bool readOnly);
+  bool DisplayDouble(const char* text, double* data, bool readOnly);
+
+  /**
+   * Displays a Feedforward gain, including the gain itself along with its
+   * validity and message.
+   */
+  void DisplayFeedforwardGain(const char* text,
+                              AnalysisManager::FeedforwardGain& ffGain,
+                              bool readOnly);
 
   /**
    * Handles errors when they pop up.
@@ -210,12 +213,13 @@ class Analyzer : public glass::View {
   int m_selectedPreset = 0;
 
   // Feedforward and feedback gains.
-  std::vector<double> m_ff;
+  AnalysisManager::FeedforwardGains m_feedforwardGains;
   double m_accelRSquared;
   double m_accelRMSE;
   double m_Kp;
   double m_Kd;
   units::millisecond_t m_timescale;
+  bool m_timescaleValid = false;
 
   // Units
   int m_selectedOverrideUnit = 0;
@@ -225,10 +229,7 @@ class Analyzer : public glass::View {
   int m_dataset = 0;
   int m_window = 8;
   double m_threshold = 0.2;
-  float m_stepTestDuration = 10;
-
-  double m_gearingNumerator = 1.0;
-  double m_gearingDenominator = 1.0;
+  float m_stepTestDuration = 0;
 
   bool combinedGraphFit = false;
 

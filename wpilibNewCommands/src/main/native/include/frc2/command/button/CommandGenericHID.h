@@ -9,15 +9,29 @@
 #include "frc2/command/CommandScheduler.h"
 
 namespace frc2 {
+
 /**
- * A subclass of {@link GenericHID} with {@link Trigger} factories for
+ * A version of {@link frc::GenericHID} with {@link Trigger} factories for
  * command-based.
  *
  * @see GenericHID
  */
-class CommandGenericHID : public frc::GenericHID {
+class CommandGenericHID {
  public:
-  using GenericHID::GenericHID;
+  /**
+   * Construct an instance of a device.
+   *
+   * @param port The port index on the Driver Station that the device is plugged
+   * into.
+   */
+  explicit CommandGenericHID(int port);
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  frc::GenericHID& GetHID();
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -215,5 +229,40 @@ class CommandGenericHID : public frc::GenericHID {
       int axis, double threshold,
       frc::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is
+   * greater than {@code threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis magnitude value is
+   * greater than the provided threshold.
+   */
+  Trigger AxisMagnitudeGreaterThan(
+      int axis, double threshold,
+      frc::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+
+  /**
+   * Set the rumble output for the HID.
+   *
+   * The DS currently supports 2 rumble values, left rumble and right rumble.
+   *
+   * @param type  Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
+   */
+  void SetRumble(frc::GenericHID::RumbleType type, double value);
+
+  /**
+   * Get if the HID is connected.
+   *
+   * @return true if the HID is connected
+   */
+  bool IsConnected() const;
+
+ private:
+  frc::GenericHID m_hid;
 };
 }  // namespace frc2

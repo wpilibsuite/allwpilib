@@ -28,7 +28,7 @@ namespace wpi
         /// It shall return a \c nullptr if no memory is available.
         /// It must be thread safe.
         /// \defaultbe On a hosted implementation this function uses OS specific facilities, \c std::malloc is used as fallback.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         void* heap_alloc(std::size_t size) noexcept;
 
         /// Deallocates heap memory.
@@ -39,7 +39,7 @@ namespace wpi
         /// The pointer will not be zero.
         /// It must be thread safe.
         /// \defaultbe On a hosted implementation this function uses OS specific facilities, \c std::free is used as fallback.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         void heap_dealloc(void* ptr, std::size_t size) noexcept;
 
         namespace detail
@@ -65,10 +65,10 @@ namespace wpi
                                                        heap_alloator_leak_checker)
         } // namespace detail
 
-        /// A stateless \concept{concept_rawallocator,RawAllocator} that allocates memory from the heap.
+        /// A stateless RawAllocator that allocates memory from the heap.
         /// It uses the two functions \ref heap_alloc and \ref heap_dealloc for the allocation,
         /// which default to \c std::malloc and \c std::free.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         using heap_allocator =
             WPI_IMPL_DEFINED(detail::lowlevel_allocator<detail::heap_allocator_impl>);
 

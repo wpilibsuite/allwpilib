@@ -23,11 +23,6 @@ public class MecanumDriveKinematicsProto
   }
 
   @Override
-  public Protobuf<?, ?>[] getNested() {
-    return new Protobuf<?, ?>[] {Translation2d.proto};
-  }
-
-  @Override
   public ProtobufMecanumDriveKinematics createMessage() {
     return ProtobufMecanumDriveKinematics.newInstance();
   }

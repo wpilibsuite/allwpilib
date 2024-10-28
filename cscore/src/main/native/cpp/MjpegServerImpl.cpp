@@ -5,17 +5,19 @@
 #include "MjpegServerImpl.h"
 
 #include <chrono>
+#include <memory>
+#include <string>
+#include <utility>
 
-#include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fmt/raw_ostream.h>
+#include <wpi/print.h>
 #include <wpinet/HttpUtil.h>
 #include <wpinet/TCPAcceptor.h>
 #include <wpinet/raw_socket_istream.h>
 #include <wpinet/raw_socket_ostream.h>
 
-#include "Handle.h"
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
@@ -135,7 +137,7 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
 static void SendHeader(wpi::raw_ostream& os, int code,
                        std::string_view codeText, std::string_view contentType,
                        std::string_view extra = {}) {
-  fmt::print(os, "HTTP/1.0 {} {}\r\n", code, codeText);
+  wpi::print(os, "HTTP/1.0 {} {}\r\n", code, codeText);
   os << "Connection: close\r\n"
         "Server: CameraServer/1.0\r\n"
         "Cache-Control: no-store, no-cache, must-revalidate, pre-check=0, "
@@ -302,7 +304,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::raw_ostream& os,
       case CS_PROP_INTEGER:
       case CS_PROP_ENUM: {
         if (auto v = wpi::parse_integer<int>(value, 10)) {
-          fmt::print(response, "{}: {}\r\n", param, v.value());
+          wpi::print(response, "{}: {}\r\n", param, v.value());
           SDEBUG4("HTTP parameter \"{}\" value {}", param, value);
           source.SetProperty(prop, v.value(), &status);
         } else {
@@ -356,10 +358,10 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
       continue;
     }
     auto kind = source.GetPropertyKind(prop);
-    fmt::print(os, "<p /><label for=\"{0}\">{0}</label>\n", name);
+    wpi::print(os, "<p /><label for=\"{0}\">{0}</label>\n", name);
     switch (kind) {
       case CS_PROP_BOOLEAN:
-        fmt::print(os,
+        wpi::print(os,
                    "<input id=\"{0}\" type=\"checkbox\" "
                    "onclick=\"update('{0}', this.checked ? 1 : 0)\" ",
                    name);
@@ -374,12 +376,12 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
         auto min = source.GetPropertyMin(prop, &status);
         auto max = source.GetPropertyMax(prop, &status);
         auto step = source.GetPropertyStep(prop, &status);
-        fmt::print(os,
+        wpi::print(os,
                    "<input type=\"range\" min=\"{1}\" max=\"{2}\" "
                    "value=\"{3}\" id=\"{0}\" step=\"{4}\" "
                    "oninput=\"updateInt('#{0}op', '{0}', value)\" />\n",
                    name, min, max, valI, step);
-        fmt::print(os, "<output for=\"{0}\" id=\"{0}op\">{1}</output>\n", name,
+        wpi::print(os, "<output for=\"{0}\" id=\"{0}op\">{1}</output>\n", name,
                    valI);
         break;
       }
@@ -397,25 +399,25 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
           for (char ch : *choice) {
             ch_name.push_back(wpi::isPrint(ch) ? ch : ' ');
           }
-          fmt::print(os,
+          wpi::print(os,
                      "<input id=\"{0}{1}\" type=\"radio\" name=\"{0}\" "
                      "value=\"{2}\" onclick=\"update('{0}', {1})\"",
                      name, j, ch_name.str());
           if (j == valE) {
             os << " checked";
           }
-          fmt::print(os, " /><label for=\"{}{}\">{}</label>\n", name, j,
+          wpi::print(os, " /><label for=\"{}{}\">{}</label>\n", name, j,
                      ch_name.str());
         }
         break;
       }
       case CS_PROP_STRING: {
         wpi::SmallString<128> strval_buf;
-        fmt::print(os,
+        wpi::print(os,
                    "<input type=\"text\" id=\"{0}box\" name=\"{0}\" "
                    "value=\"{1}\" />\n",
                    name, source.GetStringProperty(prop, strval_buf, &status));
-        fmt::print(os,
+        wpi::print(os,
                    "<input type=\"button\" value =\"Submit\" "
                    "onclick=\"update('{0}', {0}box.value)\" />\n",
                    name);
@@ -438,9 +440,7 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
 
   os << "<p>Supported Video Modes:</p>\n";
   os << "<table cols=\"4\" style=\"border: 1px solid black\">\n";
-  os << "<tr><th>Pixel Format</th>"
-     << "<th>Width</th>"
-     << "<th>Height</th>"
+  os << "<tr><th>Pixel Format</th>" << "<th>Width</th>" << "<th>Height</th>"
      << "<th>FPS</th></tr>";
   for (auto mode : source.EnumerateVideoModes(&status)) {
     os << "<tr><td>";
@@ -457,6 +457,9 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
       case VideoMode::kBGR:
         os << "BGR";
         break;
+      case VideoMode::kBGRA:
+        os << "BGRA";
+        break;
       case VideoMode::kGray:
         os << "gray";
         break;
@@ -470,7 +473,7 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
         os << "unknown";
         break;
     }
-    fmt::print(os, "</td><td>{}</td><td>{}</td><td>{}</td></tr>", mode.width,
+    wpi::print(os, "</td><td>{}</td><td>{}</td><td>{}</td></tr>", mode.width,
                mode.height, mode.fps);
   }
   os << "</table>\n";
@@ -499,21 +502,21 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
     wpi::SmallString<128> name_buf;
     auto name = source.GetPropertyName(prop, name_buf, &status);
     auto kind = source.GetPropertyKind(prop);
-    fmt::print(os, "\n\"name\": \"{}\"", name);
-    fmt::print(os, ",\n\"id\": \"{}\"", prop);
-    fmt::print(os, ",\n\"type\": \"{}\"", static_cast<int>(kind));
-    fmt::print(os, ",\n\"min\": \"{}\"", source.GetPropertyMin(prop, &status));
-    fmt::print(os, ",\n\"max\": \"{}\"", source.GetPropertyMax(prop, &status));
-    fmt::print(os, ",\n\"step\": \"{}\"",
+    wpi::print(os, "\n\"name\": \"{}\"", name);
+    wpi::print(os, ",\n\"id\": \"{}\"", prop);
+    wpi::print(os, ",\n\"type\": \"{}\"", static_cast<int>(kind));
+    wpi::print(os, ",\n\"min\": \"{}\"", source.GetPropertyMin(prop, &status));
+    wpi::print(os, ",\n\"max\": \"{}\"", source.GetPropertyMax(prop, &status));
+    wpi::print(os, ",\n\"step\": \"{}\"",
                source.GetPropertyStep(prop, &status));
-    fmt::print(os, ",\n\"default\": \"{}\"",
+    wpi::print(os, ",\n\"default\": \"{}\"",
                source.GetPropertyDefault(prop, &status));
     os << ",\n\"value\": \"";
     switch (kind) {
       case CS_PROP_BOOLEAN:
       case CS_PROP_INTEGER:
       case CS_PROP_ENUM:
-        fmt::print(os, "{}", source.GetProperty(prop, &status));
+        wpi::print(os, "{}", source.GetProperty(prop, &status));
         break;
       case CS_PROP_STRING: {
         wpi::SmallString<128> strval_buf;
@@ -543,7 +546,7 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
         for (char ch : *choice) {
           ch_name.push_back(std::isprint(ch) ? ch : ' ');
         }
-        fmt::print(os, "\"{}\": \"{}\"", j, ch_name.str());
+        wpi::print(os, "\"{}\": \"{}\"", j, ch_name.str());
       }
       os << "}\n";
     }
@@ -585,9 +588,9 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
         os << "unknown";
         break;
     }
-    fmt::print(os, "\",\n\"width\": \"{}\"", mode.width);
-    fmt::print(os, ",\n\"height\": \"{}\"", mode.height);
-    fmt::print(os, ",\n\"fps\": \"{}\"", mode.fps);
+    wpi::print(os, "\",\n\"width\": \"{}\"", mode.width);
+    wpi::print(os, ",\n\"height\": \"{}\"", mode.height);
+    wpi::print(os, ",\n\"fps\": \"{}\"", mode.fps);
     os << '}';
   }
   os << "\n]\n}\n";
@@ -772,8 +775,8 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
     header.clear();
     oss << "\r\n--" BOUNDARY "\r\n"
         << "Content-Type: image/jpeg\r\n";
-    fmt::print(oss, "Content-Length: {}\r\n", size);
-    fmt::print(oss, "X-Timestamp: {}\r\n", timestamp);
+    wpi::print(oss, "Content-Length: {}\r\n", size);
+    wpi::print(oss, "X-Timestamp: {}\r\n", timestamp);
     oss << "\r\n";
     os << oss.str();
     if (addDHT) {
@@ -878,8 +881,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
         ProcessCommand(os, *source, parameters, true);
       } else {
         SendHeader(os, 200, "OK", "text/plain");
-        os << "Ignored due to no connected source."
-           << "\r\n";
+        os << "Ignored due to no connected source." << "\r\n";
         SDEBUG("Ignored due to no connected source.");
       }
       break;
@@ -1047,13 +1049,17 @@ int GetMjpegServerPort(CS_Sink sink, CS_Status* status) {
 
 extern "C" {
 
-CS_Sink CS_CreateMjpegServer(const char* name, const char* listenAddress,
-                             int port, CS_Status* status) {
-  return cs::CreateMjpegServer(name, listenAddress, port, status);
+CS_Sink CS_CreateMjpegServer(const struct WPI_String* name,
+                             const struct WPI_String* listenAddress, int port,
+                             CS_Status* status) {
+  return cs::CreateMjpegServer(wpi::to_string_view(name),
+                               wpi::to_string_view(listenAddress), port,
+                               status);
 }
 
-char* CS_GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status) {
-  return ConvertToC(cs::GetMjpegServerListenAddress(sink, status));
+void CS_GetMjpegServerListenAddress(CS_Sink sink, WPI_String* listenAddress,
+                                    CS_Status* status) {
+  cs::ConvertToC(listenAddress, cs::GetMjpegServerListenAddress(sink, status));
 }
 
 int CS_GetMjpegServerPort(CS_Sink sink, CS_Status* status) {

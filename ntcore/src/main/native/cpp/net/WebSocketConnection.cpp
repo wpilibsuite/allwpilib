@@ -8,6 +8,7 @@
 #include <span>
 
 #include <wpi/Endian.h>
+#include <wpi/Logger.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
@@ -52,7 +53,11 @@ class WebSocketConnection::Stream final : public wpi::raw_ostream {
 void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
   if (data == m_conn.m_bufs.back().base) {
     // flush_nonempty() case
+    size_t amt = len - m_conn.m_bufs.back().len;
+    WPI_DEBUG4(m_conn.m_logger, "conn: writing {} bytes (nonempty)", amt);
     m_conn.m_bufs.back().len = len;
+    m_conn.m_framePos += amt;
+    m_conn.m_written += amt;
     if (!m_disableAlloc) {
 #ifdef NT_ENABLE_WS_FRAG
       m_conn.m_frames.back().opcode &= ~wpi::WebSocket::kFlagFin;
@@ -74,6 +79,7 @@ void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
     size_t amt = (std::min)(static_cast<int>(kAllocSize - buf.len),
                             static_cast<int>(len));
     if (amt > 0) {
+      WPI_DEBUG4(m_conn.m_logger, "conn: writing {} bytes", amt);
       std::memcpy(buf.base + buf.len, data, amt);
       buf.len += amt;
       m_conn.m_framePos += amt;
@@ -101,8 +107,9 @@ void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
 }
 
 WebSocketConnection::WebSocketConnection(wpi::WebSocket& ws,
-                                         unsigned int version)
-    : m_ws{ws}, m_version{version} {}
+                                         unsigned int version,
+                                         wpi::Logger& logger)
+    : m_ws{ws}, m_logger{logger}, m_version{version} {}
 
 WebSocketConnection::~WebSocketConnection() {
   for (auto&& buf : m_bufs) {
@@ -113,22 +120,11 @@ WebSocketConnection::~WebSocketConnection() {
   }
 }
 
-void WebSocketConnection::Start() {
-  m_ws.pong.connect([selfweak = weak_from_this()](auto data) {
-    if (data.size() != 8) {
-      return;
-    }
-    if (auto self = selfweak.lock()) {
-      self->m_lastPingResponse =
-          wpi::support::endian::read64<wpi::support::native>(data.data());
-    }
-  });
-}
-
 void WebSocketConnection::SendPing(uint64_t time) {
+  WPI_DEBUG4(m_logger, "conn: sending ping {}", time);
   auto buf = AllocBuf();
   buf.len = 8;
-  wpi::support::endian::write64<wpi::support::native>(buf.base, time);
+  wpi::support::endian::write64<wpi::endianness::native>(buf.base, time);
   m_ws.SendPing({buf}, [selfweak = weak_from_this()](auto bufs, auto err) {
     if (auto self = selfweak.lock()) {
       self->m_err = err;
@@ -142,6 +138,8 @@ void WebSocketConnection::SendPing(uint64_t time) {
 }
 
 void WebSocketConnection::StartFrame(uint8_t opcode) {
+  WPI_DEBUG4(m_logger, "conn: starting frame {}",
+             static_cast<unsigned int>(opcode));
   m_frames.emplace_back(opcode, m_bufs.size(), m_bufs.size() + 1);
   m_bufs.emplace_back(AllocBuf());
   m_bufs.back().len = 0;
@@ -177,6 +175,7 @@ int WebSocketConnection::Write(
     if (kind == kText) {
       os << (first ? '[' : ',');
     }
+    WPI_DEBUG4(m_logger, "writing");
     writer(os);
   }
   ++m_frames.back().count;
@@ -188,6 +187,7 @@ int WebSocketConnection::Write(
 }
 
 int WebSocketConnection::Flush() {
+  WPI_DEBUG4(m_logger, "conn: flushing");
   m_lastFlushTime = wpi::Now();
   if (m_state == kEmpty) {
     return 0;
@@ -233,6 +233,8 @@ int WebSocketConnection::Flush() {
   int count = 0;
   for (auto&& frame :
        wpi::take_back(std::span{m_frames}, unsentFrames.size())) {
+    ReleaseBufs(
+        std::span{m_bufs}.subspan(frame.start, frame.end - frame.start));
     count += frame.count;
   }
   m_frames.clear();
@@ -252,6 +254,7 @@ void WebSocketConnection::Send(
     os << ']';
   }
   wpi::WebSocket::Frame frame{opcode, os.bufs()};
+  WPI_DEBUG4(m_logger, "Send({})", static_cast<uint8_t>(opcode));
   m_ws.SendFrames({{frame}}, [selfweak = weak_from_this()](auto bufs, auto) {
     if (auto self = selfweak.lock()) {
       self->ReleaseBufs(bufs);
@@ -265,7 +268,7 @@ void WebSocketConnection::Send(
 
 void WebSocketConnection::Disconnect(std::string_view reason) {
   m_reason = reason;
-  m_ws.Fail(1005, reason);
+  m_ws.Fail(1001, reason);
 }
 
 wpi::uv::Buffer WebSocketConnection::AllocBuf() {

@@ -16,8 +16,8 @@ public class DifferentialDriveWheelVoltagesStruct
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:DifferentialDriveWheelVoltages";
+  public String getTypeName() {
+    return "DifferentialDriveWheelVoltages";
   }
 
   @Override

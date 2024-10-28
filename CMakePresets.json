@@ -1,0 +1,50 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Config",
+      "description": "Default build using Ninja generator",
+      "binaryDir": "build-cmake",
+      "generator": "Ninja",
+      "cacheVariables": {}
+    },
+    {
+      "name": "with-sccache",
+      "displayName": "",
+      "description": "Ninja config with sccache",
+      "generator": "Ninja",
+      "binaryDir": "build-cmake",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER_LAUNCHER": "sccache",
+        "CMAKE_CXX_COMPILER_LAUNCHER": "sccache"
+      }
+    },
+    {
+      "name": "with-java",
+      "displayName": "",
+      "description": "Ninja config with Java",
+      "generator": "Ninja",
+      "binaryDir": "build-cmake",
+      "cacheVariables": {
+        "WITH_JAVA": "ON"
+      }
+    },
+    {
+      "name": "with-java-and-sccache",
+      "displayName": "",
+      "description": "Ninja config with Java and sccache",
+      "generator": "Ninja",
+      "inherits": "with-sccache",
+      "binaryDir": "build-cmake",
+      "cacheVariables": {
+        "WITH_JAVA": "ON"
+      }
+    }
+  ]
+}

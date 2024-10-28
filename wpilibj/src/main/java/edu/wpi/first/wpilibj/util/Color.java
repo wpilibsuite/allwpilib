@@ -105,41 +105,11 @@ public class Color {
    * @return The color
    */
   public static Color fromHSV(int h, int s, int v) {
-    // Loosely based on
-    // https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
-    // The hue range is split into 60 degree regions where in each region there
-    // is one rgb component at a low value (m), one at a high value (v) and one
-    // that changes (X) from low to high (X+m) or high to low (v-X)
-
-    // Difference between highest and lowest value of any rgb component
-    final int chroma = (s * v) / 255;
-
-    // Because hue is 0-180 rather than 0-360 use 30 not 60
-    final int region = (h / 30) % 6;
-
-    // Remainder converted from 0-30 to 0-255
-    final int remainder = (int) Math.round((h % 30) * (255 / 30.0));
-
-    // Value of the lowest rgb component
-    final int m = v - chroma;
-
-    // Goes from 0 to chroma as hue increases
-    final int X = (chroma * remainder) >> 8;
-
-    switch (region) {
-      case 0:
-        return new Color(v, X + m, m);
-      case 1:
-        return new Color(v - X, v, m);
-      case 2:
-        return new Color(m, v, X + m);
-      case 3:
-        return new Color(m, v - X, v);
-      case 4:
-        return new Color(X + m, m, v);
-      default:
-        return new Color(v, m, v - X);
-    }
+    int rgb = hsvToRgb(h, s, v);
+    return new Color(
+        unpackRGB(rgb, RGBChannel.kRed),
+        unpackRGB(rgb, RGBChannel.kGreen),
+        unpackRGB(rgb, RGBChannel.kBlue));
   }
 
   @Override
@@ -147,12 +117,12 @@ public class Color {
     if (this == other) {
       return true;
     }
-    if (other == null || getClass() != other.getClass()) {
+    if (other == null) {
       return false;
     }
 
-    Color color = (Color) other;
-    return Double.compare(color.red, red) == 0
+    return other instanceof Color color
+        && Double.compare(color.red, red) == 0
         && Double.compare(color.green, green) == 0
         && Double.compare(color.blue, blue) == 0;
   }
@@ -183,6 +153,184 @@ public class Color {
 
   private static double roundAndClamp(double value) {
     return MathUtil.clamp(Math.ceil(value * (1 << 12)) / (1 << 12), 0.0, 1.0);
+  }
+
+  // Helper methods
+
+  /**
+   * Converts HSV values to RGB values. The returned RGB color is packed into a 32-bit integer for
+   * memory performance reasons.
+   *
+   * @param h The h value [0-180)
+   * @param s The s value [0-255]
+   * @param v The v value [0-255]
+   * @return the packed RGB color
+   */
+  public static int hsvToRgb(int h, int s, int v) {
+    // Loosely based on
+    // https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
+    // The hue range is split into 60 degree regions where in each region there
+    // is one rgb component at a low value (m), one at a high value (v) and one
+    // that changes (X) from low to high (X+m) or high to low (v-X)
+
+    // Difference between highest and lowest value of any rgb component
+    final int chroma = (s * v) / 255;
+
+    // Because hue is 0-180 rather than 0-360 use 30 not 60
+    final int region = (h / 30) % 6;
+
+    // Remainder converted from 0-30 to 0-255
+    final int remainder = (int) Math.round((h % 30) * (255 / 30.0));
+
+    // Value of the lowest rgb component
+    final int m = v - chroma;
+
+    // Goes from 0 to chroma as hue increases
+    final int X = (chroma * remainder) >> 8;
+
+    int red;
+    int green;
+    int blue;
+    switch (region) {
+      case 0:
+        red = v;
+        green = X + m;
+        blue = m;
+        break;
+      case 1:
+        red = v - X;
+        green = v;
+        blue = m;
+        break;
+      case 2:
+        red = m;
+        green = v;
+        blue = X + m;
+        break;
+      case 3:
+        red = m;
+        green = v - X;
+        blue = v;
+        break;
+      case 4:
+        red = X + m;
+        green = m;
+        blue = v;
+        break;
+      default:
+        red = v;
+        green = m;
+        blue = v - X;
+        break;
+    }
+    return packRGB(red, green, blue);
+  }
+
+  /** Represents a color channel in an RGB color. */
+  public enum RGBChannel {
+    /** The red channel of an RGB color. */
+    kRed,
+    /** The green channel of an RGB color. */
+    kGreen,
+    /** The blue channel of an RGB color. */
+    kBlue
+  }
+
+  /**
+   * Packs 3 RGB values into a single 32-bit integer. These values can be unpacked with {@link
+   * #unpackRGB(int, RGBChannel)} to retrieve the values. This is helpful for avoiding memory
+   * allocations of new {@code Color} objects and its resulting garbage collector pressure.
+   *
+   * @param r the value of the first channel to pack
+   * @param g the value of the second channel to pack
+   * @param b the value of the third channel to pack
+   * @return the packed integer
+   */
+  public static int packRGB(int r, int g, int b) {
+    return (r & 0xFF) << 16 | (g & 0xFF) << 8 | (b & 0xFF);
+  }
+
+  /**
+   * Unpacks a single color channel from a packed 32-bit RGB integer.
+   *
+   * <p>Note: Packed RGB colors are expected to be in byte order [empty][red][green][blue].
+   *
+   * @param packedColor the packed color to extract from
+   * @param channel the color channel to unpack
+   * @return the value of the stored color channel
+   */
+  public static int unpackRGB(int packedColor, RGBChannel channel) {
+    return switch (channel) {
+      case kRed -> (packedColor >> 16) & 0xFF;
+      case kGreen -> (packedColor >> 8) & 0xFF;
+      case kBlue -> packedColor & 0xFF;
+    };
+  }
+
+  /**
+   * Performs a linear interpolation between two colors in the RGB colorspace.
+   *
+   * @param a the first color to interpolate from
+   * @param b the second color to interpolate from
+   * @param t the interpolation scale in [0, 1]
+   * @return the interpolated color
+   */
+  public static Color lerpRGB(Color a, Color b, double t) {
+    int packedRGB = lerpRGB(a.red, a.green, a.blue, b.red, b.green, b.blue, t);
+
+    return new Color(
+        unpackRGB(packedRGB, RGBChannel.kRed),
+        unpackRGB(packedRGB, RGBChannel.kGreen),
+        unpackRGB(packedRGB, RGBChannel.kBlue));
+  }
+
+  /**
+   * Linearly interpolates between two RGB colors represented by the (r1, g1, b1) and (r2, g2, b2)
+   * triplets. For memory performance reasons, the output color is returned packed into a single
+   * 32-bit integer; use {@link #unpackRGB(int, RGBChannel)} to extract the values for the
+   * individual red, green, and blue channels.
+   *
+   * @param r1 the red value of the first color, in [0, 1]
+   * @param g1 the green value of the first color, in [0, 1]
+   * @param b1 the blue value of the first color, in [0, 1]
+   * @param r2 the red value of the second color, in [0, 1]
+   * @param g2 the green value of the second color, in [0, 1]
+   * @param b2 the blue value of the second color, in [0, 1]
+   * @param t the interpolation value, in [0, 1]
+   * @return the interpolated color, packed in a 32-bit integer
+   */
+  public static int lerpRGB(
+      double r1, double g1, double b1, double r2, double g2, double b2, double t) {
+    return lerpRGB(
+        (int) (r1 * 255),
+        (int) (g1 * 255),
+        (int) (b1 * 255),
+        (int) (r2 * 255),
+        (int) (g2 * 255),
+        (int) (b2 * 255),
+        t);
+  }
+
+  /**
+   * Linearly interpolates between two RGB colors represented by the (r1, g1, b1) and (r2, g2, b2)
+   * triplets. For memory performance reasons, the output color is returned packed into a single
+   * 32-bit integer; use {@link #unpackRGB(int, RGBChannel)} to extract the values for the
+   * individual red, green, and blue channels.
+   *
+   * @param r1 the red value of the first color, in [0, 255]
+   * @param g1 the green value of the first color, in [0, 255]
+   * @param b1 the blue value of the first color, in [0, 255]
+   * @param r2 the red value of the second color, in [0, 255]
+   * @param g2 the green value of the second color, in [0, 255]
+   * @param b2 the blue value of the second color, in [0, 255]
+   * @param t the interpolation value, in [0, 1]
+   * @return the interpolated color, packed in a 32-bit integer
+   */
+  public static int lerpRGB(int r1, int g1, int b1, int r2, int g2, int b2, double t) {
+    return packRGB(
+        (int) MathUtil.interpolate(r1, r2, t),
+        (int) MathUtil.interpolate(g1, g2, t),
+        (int) MathUtil.interpolate(b1, b2, t));
   }
 
   /*

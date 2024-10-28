@@ -12,8 +12,13 @@
 #include <wpi/function_ref.h>
 #include <wpinet/WebSocket.h>
 #include <wpinet/uv/Buffer.h>
+#include <wpinet/uv/Stream.h>
 
 #include "WireConnection.h"
+
+namespace wpi {
+class Logger;
+}  // namespace wpi
 
 namespace nt::net {
 
@@ -21,12 +26,11 @@ class WebSocketConnection final
     : public WireConnection,
       public std::enable_shared_from_this<WebSocketConnection> {
  public:
-  WebSocketConnection(wpi::WebSocket& ws, unsigned int version);
+  WebSocketConnection(wpi::WebSocket& ws, unsigned int version,
+                      wpi::Logger& logger);
   ~WebSocketConnection() override;
   WebSocketConnection(const WebSocketConnection&) = delete;
   WebSocketConnection& operator=(const WebSocketConnection&) = delete;
-
-  void Start();
 
   unsigned int GetVersion() const final { return m_version; }
 
@@ -51,7 +55,22 @@ class WebSocketConnection final
 
   uint64_t GetLastFlushTime() const final { return m_lastFlushTime; }
 
-  uint64_t GetLastPingResponse() const final { return m_lastPingResponse; }
+  uint64_t GetLastReceivedTime() const final {
+    return m_ws.GetLastReceivedTime();
+  }
+
+  void StopRead() final {
+    if (m_readActive) {
+      m_ws.GetStream().StopRead();
+      m_readActive = false;
+    }
+  }
+  void StartRead() final {
+    if (!m_readActive) {
+      m_ws.GetStream().StartRead();
+      m_readActive = true;
+    }
+  }
 
   void Disconnect(std::string_view reason) final;
 
@@ -70,6 +89,8 @@ class WebSocketConnection final
   void ReleaseBufs(std::span<wpi::uv::Buffer> bufs);
 
   wpi::WebSocket& m_ws;
+  wpi::Logger& m_logger;
+  bool m_readActive = true;
 
   class Stream;
 
@@ -92,7 +113,6 @@ class WebSocketConnection final
   State m_state = kEmpty;
   std::string m_reason;
   uint64_t m_lastFlushTime = 0;
-  uint64_t m_lastPingResponse = 0;
   unsigned int m_version;
 };
 

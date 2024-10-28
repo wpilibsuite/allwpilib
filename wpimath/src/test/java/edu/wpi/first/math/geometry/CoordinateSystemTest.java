@@ -51,7 +51,7 @@ class CoordinateSystemTest {
   void testPose3dEDNtoNWU() {
     // No rotation from EDN to NWU
     checkPose3dConvert(
-        new Pose3d(1.0, 2.0, 3.0, new Rotation3d()),
+        new Pose3d(1.0, 2.0, 3.0, Rotation3d.kZero),
         new Pose3d(
             3.0,
             -1.0,
@@ -101,7 +101,7 @@ class CoordinateSystemTest {
   void testPose3dEDNtoNED() {
     // No rotation from EDN to NED
     checkPose3dConvert(
-        new Pose3d(1.0, 2.0, 3.0, new Rotation3d()),
+        new Pose3d(1.0, 2.0, 3.0, Rotation3d.kZero),
         new Pose3d(
             3.0,
             1.0,
@@ -151,8 +151,8 @@ class CoordinateSystemTest {
   void testTransform3dEDNtoNWU() {
     // No rotation from EDN to NWU
     checkTransform3dConvert(
-        new Transform3d(new Translation3d(1.0, 2.0, 3.0), new Rotation3d()),
-        new Transform3d(new Translation3d(3.0, -1.0, -2.0), new Rotation3d()),
+        new Transform3d(new Translation3d(1.0, 2.0, 3.0), Rotation3d.kZero),
+        new Transform3d(new Translation3d(3.0, -1.0, -2.0), Rotation3d.kZero),
         CoordinateSystem.EDN(),
         CoordinateSystem.NWU());
 
@@ -194,8 +194,8 @@ class CoordinateSystemTest {
   void testTransform3dEDNtoNED() {
     // No rotation from EDN to NED
     checkTransform3dConvert(
-        new Transform3d(new Translation3d(1.0, 2.0, 3.0), new Rotation3d()),
-        new Transform3d(new Translation3d(3.0, 1.0, 2.0), new Rotation3d()),
+        new Transform3d(new Translation3d(1.0, 2.0, 3.0), Rotation3d.kZero),
+        new Transform3d(new Translation3d(3.0, 1.0, 2.0), Rotation3d.kZero),
         CoordinateSystem.EDN(),
         CoordinateSystem.NED());
 

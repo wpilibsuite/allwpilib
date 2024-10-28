@@ -28,28 +28,16 @@ class AnalogEncoderSim {
   explicit AnalogEncoderSim(const AnalogEncoder& encoder);
 
   /**
-   * Set the position using an Rotation2d.
+   * Set the position.
    *
-   * @param angle The angle.
+   * @param value The position.
    */
-  void SetPosition(Rotation2d angle);
-
-  /**
-   * Set the position of the encoder.
-   *
-   * @param turns The position.
-   */
-  void SetTurns(units::turn_t turns);
+  void Set(double value);
 
   /**
    * Get the simulated position.
    */
-  units::turn_t GetTurns();
-
-  /**
-   * Get the position as a Rotation2d.
-   */
-  Rotation2d GetPosition();
+  double Get();
 
  private:
   hal::SimDouble m_positionSim;

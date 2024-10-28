@@ -15,8 +15,8 @@ public class Translation2dStruct implements Struct<Translation2d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Translation2d";
+  public String getTypeName() {
+    return "Translation2d";
   }
 
   @Override
@@ -40,5 +40,10 @@ public class Translation2dStruct implements Struct<Translation2d> {
   public void pack(ByteBuffer bb, Translation2d value) {
     bb.putDouble(value.getX());
     bb.putDouble(value.getY());
+  }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
   }
 }

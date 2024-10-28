@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 
+#include <atomic>
 #include <thread>
 
 #include <hal/SimDevice.h>
@@ -105,16 +106,16 @@ class ADIS16470_IMU : public wpi::Sendable,
   /**
    * Creates a new ADIS16740 IMU object.
    *
-   * The default setup is the onboard SPI port with a calibration time of 4
-   * seconds. Yaw, pitch, and roll are kZ, kX, and kY respectively.
+   * The default setup is the onboard SPI port with a calibration time of 1
+   * second. Yaw, pitch, and roll are kZ, kX, and kY respectively.
    */
   ADIS16470_IMU();
 
   /**
    * Creates a new ADIS16740 IMU object.
    *
-   * The default setup is the onboard SPI port with a calibration time of 4
-   * seconds.
+   * The default setup is the onboard SPI port with a calibration time of 1
+   * second.
    *
    * <b><i>Input axes limited to kX, kY and kZ. Specifying kYaw, kPitch,or kRoll
    * will result in an error.</i></b>
@@ -143,8 +144,8 @@ class ADIS16470_IMU : public wpi::Sendable,
 
   ~ADIS16470_IMU() override;
 
-  ADIS16470_IMU(ADIS16470_IMU&&) = default;
-  ADIS16470_IMU& operator=(ADIS16470_IMU&&) = default;
+  ADIS16470_IMU(ADIS16470_IMU&& other);
+  ADIS16470_IMU& operator=(ADIS16470_IMU&& other);
 
   /**
    * Configures the decimation rate of the IMU.
@@ -161,8 +162,10 @@ class ADIS16470_IMU : public wpi::Sendable,
   void Calibrate();
 
   /**
-   * @brief Switches the active SPI port to standard SPI mode, writes a new
-   * value to the NULL_CNFG register in the IMU, and re-enables auto SPI.
+   * Configures calibration time.
+   *
+   * @param new_cal_time New calibration time
+   * @return 0 if success, 1 if no change, 2 if error.
    */
   int ConfigCalTime(CalibrationTime new_cal_time);
 
@@ -417,13 +420,13 @@ class ADIS16470_IMU : public wpi::Sendable,
       Y_ACCL_OUT,    FLASH_CNT,     Z_ACCL_OUT,    FLASH_CNT};
 
   static constexpr double delta_angle_sf = 2160.0 / 2147483648.0;
-  static constexpr double rad_to_deg = 57.2957795;
-  static constexpr double deg_to_rad = 0.0174532;
-  static constexpr double grav = 9.81;
+  static constexpr double kRadToDeg = 57.2957795;
+  static constexpr double kDegToRad = 0.0174532;
+  static constexpr double kGrav = 9.81;
 
-  /** @brief Resources **/
-  DigitalInput* m_reset_in;
-  DigitalOutput* m_status_led;
+  // Resources
+  DigitalInput* m_reset_in = nullptr;
+  DigitalOutput* m_status_led = nullptr;
 
   /**
    * @brief Switches to standard SPI operation. Primarily used when exiting auto
@@ -486,23 +489,21 @@ class ADIS16470_IMU : public wpi::Sendable,
   double m_accel_z = 0.0;
 
   // Complementary filter variables
-  double m_tau = 1.0;
   double m_dt, m_alpha = 0.0;
+  static constexpr double kTau = 1.0;
   double m_compAngleX, m_compAngleY, m_accelAngleX, m_accelAngleY = 0.0;
 
   // Complementary filter functions
   double FormatFastConverge(double compAngle, double accAngle);
-
-  double FormatRange0to2PI(double compAngle);
 
   double FormatAccelRange(double accelAngle, double accelZ);
 
   double CompFilterProcess(double compAngle, double accelAngle, double omega);
 
   // State and resource variables
-  volatile bool m_thread_active = false;
-  volatile bool m_first_run = true;
-  volatile bool m_thread_idle = false;
+  std::atomic<bool> m_thread_active = false;
+  std::atomic<bool> m_first_run = true;
+  std::atomic<bool> m_thread_idle = false;
   bool m_auto_configured = false;
   SPI::Port m_spi_port;
   uint16_t m_calibration_time = 0;

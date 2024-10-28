@@ -4,10 +4,11 @@
 
 #include "hal/REVPH.h"
 
+#include <string>
+
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/CANAPI.h"
 #include "hal/Errors.h"
 #include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/REVPHDataInternal.h"
@@ -39,14 +40,16 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
                                     int32_t* status) {
   hal::init::CheckInit();
 
-  if (module == 0) {
+  if (!HAL_CheckREVPHModuleNumber(module)) {
+    *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
                                      kNumREVPHModules, module);
     return HAL_kInvalidHandle;
   }
 
   HAL_REVPHHandle handle;
-  auto pcm = pcmHandles->Allocate(module, &handle, status);
+  // Module starts at 1
+  auto pcm = pcmHandles->Allocate(module - 1, &handle, status);
 
   if (*status != 0) {
     if (pcm) {
@@ -81,7 +84,7 @@ void HAL_FreeREVPH(HAL_REVPHHandle handle) {
 }
 
 HAL_Bool HAL_CheckREVPHModuleNumber(int32_t module) {
-  return module >= 1 && module < kNumREVPDHModules;
+  return module >= 1 && module <= kNumREVPHModules;
 }
 
 HAL_Bool HAL_CheckREVPHSolenoidChannel(int32_t channel) {
@@ -253,5 +256,10 @@ void HAL_GetREVPHFaults(HAL_REVPHHandle handle, HAL_REVPHFaults* faults,
 void HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
                               HAL_REVPHStickyFaults* stickyFaults,
                               int32_t* status) {}
+
+int32_t HAL_GetREVPHSolenoidDisabledList(HAL_REVPHHandle handle,
+                                         int32_t* status) {
+  return 0;
+}
 
 void HAL_ClearREVPHStickyFaults(HAL_REVPHHandle handle, int32_t* status) {}

@@ -32,11 +32,31 @@ namespace sys {
 template <typename D = std::chrono::nanoseconds>
 using TimePoint = std::chrono::time_point<std::chrono::system_clock, D>;
 
+// utc_clock and utc_time are only available since C++20. Add enough code to
+// support formatting date/time in UTC.
+class UtcClock : public std::chrono::system_clock {};
+
+template <typename D = std::chrono::nanoseconds>
+using UtcTime = std::chrono::time_point<UtcClock, D>;
+
+/// Convert a std::time_t to a UtcTime
+inline UtcTime<std::chrono::seconds> toUtcTime(std::time_t T) {
+  using namespace std::chrono;
+  return UtcTime<seconds>(seconds(T));
+}
+
 /// Convert a TimePoint to std::time_t
 inline std::time_t toTimeT(TimePoint<> TP) {
   using namespace std::chrono;
   return system_clock::to_time_t(
       time_point_cast<system_clock::time_point::duration>(TP));
+}
+
+/// Convert a UtcTime to std::time_t
+inline std::time_t toTimeT(UtcTime<> TP) {
+  using namespace std::chrono;
+  return system_clock::to_time_t(time_point<system_clock, seconds>(
+      duration_cast<seconds>(TP.time_since_epoch())));
 }
 
 /// Convert a std::time_t to a TimePoint
@@ -57,6 +77,7 @@ toTimePoint(std::time_t T, uint32_t nsec) {
 } // namespace sys
 
 raw_ostream &operator<<(raw_ostream &OS, sys::TimePoint<> TP);
+raw_ostream &operator<<(raw_ostream &OS, sys::UtcTime<> TP);
 
 } // namespace wpi
 

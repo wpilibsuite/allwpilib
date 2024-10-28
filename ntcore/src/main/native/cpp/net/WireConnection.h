@@ -51,8 +51,11 @@ class WireConnection {
 
   virtual uint64_t GetLastFlushTime() const = 0;  // in microseconds
 
-  // Gets the timestamp of the last ping we got a reply to
-  virtual uint64_t GetLastPingResponse() const = 0;  // in microseconds
+  // Gets the timestamp of the last incoming data
+  virtual uint64_t GetLastReceivedTime() const = 0;  // in microseconds
+
+  virtual void StopRead() = 0;
+  virtual void StartRead() = 0;
 
   virtual void Disconnect(std::string_view reason) = 0;
 };

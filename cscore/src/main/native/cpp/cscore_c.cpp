@@ -4,28 +4,29 @@
 
 #include "cscore_c.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdlib>
+#include <utility>
+#include <vector>
 
-#include <opencv2/core/core.hpp>
 #include <wpi/MemAlloc.h>
 #include <wpi/SmallString.h>
 
 #include "c_util.h"
 #include "cscore_cpp.h"
-#include "cscore_raw.h"
 
 static CS_Event ConvertToC(const cs::RawEvent& rawEvent) {
   CS_Event event;
   event.kind = static_cast<CS_EventKind>(static_cast<int>(rawEvent.kind));
   event.source = rawEvent.sourceHandle;
   event.sink = rawEvent.sinkHandle;
-  event.name = rawEvent.name.c_str();
+  cs::ConvertToC(&event.name, rawEvent.name);
   event.mode = rawEvent.mode;
   event.property = rawEvent.propertyHandle;
   event.propertyKind = rawEvent.propertyKind;
   event.value = rawEvent.value;
-  event.valueStr = rawEvent.valueStr.c_str();
+  cs::ConvertToC(&event.name, rawEvent.valueStr);
   event.listener = rawEvent.listener;
   return event;
 }
@@ -54,13 +55,10 @@ CS_PropertyKind CS_GetPropertyKind(CS_Property property, CS_Status* status) {
   return cs::GetPropertyKind(property, status);
 }
 
-char* CS_GetPropertyName(CS_Property property, CS_Status* status) {
+void CS_GetPropertyName(CS_Property property, WPI_String* name,
+                        CS_Status* status) {
   wpi::SmallString<128> buf;
-  auto str = cs::GetPropertyName(property, buf, status);
-  if (*status != 0) {
-    return nullptr;
-  }
-  return cs::ConvertToC(str);
+  cs::ConvertToC(name, cs::GetPropertyName(property, buf, status));
 }
 
 int CS_GetProperty(CS_Property property, CS_Status* status) {
@@ -87,28 +85,24 @@ int CS_GetPropertyDefault(CS_Property property, CS_Status* status) {
   return cs::GetPropertyDefault(property, status);
 }
 
-char* CS_GetStringProperty(CS_Property property, CS_Status* status) {
-  wpi::SmallString<128> buf;
-  auto str = cs::GetStringProperty(property, buf, status);
-  if (*status != 0) {
-    return nullptr;
-  }
-  return cs::ConvertToC(str);
-}
-
-void CS_SetStringProperty(CS_Property property, const char* value,
+void CS_GetStringProperty(CS_Property property, WPI_String* value,
                           CS_Status* status) {
-  return cs::SetStringProperty(property, value, status);
+  wpi::SmallString<128> buf;
+  cs::ConvertToC(value, cs::GetStringProperty(property, buf, status));
 }
 
-char** CS_GetEnumPropertyChoices(CS_Property property, int* count,
-                                 CS_Status* status) {
+void CS_SetStringProperty(CS_Property property, const struct WPI_String* value,
+                          CS_Status* status) {
+  return cs::SetStringProperty(property, wpi::to_string_view(value), status);
+}
+
+WPI_String* CS_GetEnumPropertyChoices(CS_Property property, int* count,
+                                      CS_Status* status) {
   auto choices = cs::GetEnumPropertyChoices(property, status);
-  char** out =
-      static_cast<char**>(wpi::safe_malloc(choices.size() * sizeof(char*)));
+  WPI_String* out = WPI_AllocateStringArray(choices.size());
   *count = choices.size();
   for (size_t i = 0; i < choices.size(); ++i) {
-    out[i] = cs::ConvertToC(choices[i]);
+    cs::ConvertToC(&out[i], choices[i]);
   }
   return out;
 }
@@ -117,22 +111,15 @@ CS_SourceKind CS_GetSourceKind(CS_Source source, CS_Status* status) {
   return cs::GetSourceKind(source, status);
 }
 
-char* CS_GetSourceName(CS_Source source, CS_Status* status) {
+void CS_GetSourceName(CS_Source source, WPI_String* name, CS_Status* status) {
   wpi::SmallString<128> buf;
-  auto str = cs::GetSourceName(source, buf, status);
-  if (*status != 0) {
-    return nullptr;
-  }
-  return cs::ConvertToC(str);
+  cs::ConvertToC(name, cs::GetSourceName(source, buf, status));
 }
 
-char* CS_GetSourceDescription(CS_Source source, CS_Status* status) {
+void CS_GetSourceDescription(CS_Source source, WPI_String* description,
+                             CS_Status* status) {
   wpi::SmallString<128> buf;
-  auto str = cs::GetSourceDescription(source, buf, status);
-  if (*status != 0) {
-    return nullptr;
-  }
-  return cs::ConvertToC(str);
+  cs::ConvertToC(description, cs::GetSourceDescription(source, buf, status));
 }
 
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
@@ -153,9 +140,10 @@ CS_Bool CS_IsSourceEnabled(CS_Source source, CS_Status* status) {
   return cs::IsSourceEnabled(source, status);
 }
 
-CS_Property CS_GetSourceProperty(CS_Source source, const char* name,
+CS_Property CS_GetSourceProperty(CS_Source source,
+                                 const struct WPI_String* name,
                                  CS_Status* status) {
-  return cs::GetSourceProperty(source, name, status);
+  return cs::GetSourceProperty(source, wpi::to_string_view(name), status);
 }
 
 CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
@@ -210,13 +198,15 @@ CS_Bool CS_SetSourceFPS(CS_Source source, int fps, CS_Status* status) {
   return cs::SetSourceFPS(source, fps, status);
 }
 
-CS_Bool CS_SetSourceConfigJson(CS_Source source, const char* config,
+CS_Bool CS_SetSourceConfigJson(CS_Source source,
+                               const struct WPI_String* config,
                                CS_Status* status) {
-  return cs::SetSourceConfigJson(source, config, status);
+  return cs::SetSourceConfigJson(source, wpi::to_string_view(config), status);
 }
 
-char* CS_GetSourceConfigJson(CS_Source source, CS_Status* status) {
-  return cs::ConvertToC(cs::GetSourceConfigJson(source, status));
+void CS_GetSourceConfigJson(CS_Source source, WPI_String* config,
+                            CS_Status* status) {
+  cs::ConvertToC(config, cs::GetSourceConfigJson(source, status));
 }
 
 CS_VideoMode* CS_EnumerateSourceVideoModes(CS_Source source, int* count,
@@ -287,27 +277,20 @@ CS_SinkKind CS_GetSinkKind(CS_Sink sink, CS_Status* status) {
   return cs::GetSinkKind(sink, status);
 }
 
-char* CS_GetSinkName(CS_Sink sink, CS_Status* status) {
+void CS_GetSinkName(CS_Sink sink, WPI_String* name, CS_Status* status) {
   wpi::SmallString<128> buf;
-  auto str = cs::GetSinkName(sink, buf, status);
-  if (*status != 0) {
-    return nullptr;
-  }
-  return cs::ConvertToC(str);
+  cs::ConvertToC(name, cs::GetSinkName(sink, buf, status));
 }
 
-char* CS_GetSinkDescription(CS_Sink sink, CS_Status* status) {
+void CS_GetSinkDescription(CS_Sink sink, WPI_String* description,
+                           CS_Status* status) {
   wpi::SmallString<128> buf;
-  auto str = cs::GetSinkDescription(sink, buf, status);
-  if (*status != 0) {
-    return nullptr;
-  }
-  return cs::ConvertToC(str);
+  cs::ConvertToC(description, cs::GetSinkDescription(sink, buf, status));
 }
 
-CS_Property CS_GetSinkProperty(CS_Sink sink, const char* name,
+CS_Property CS_GetSinkProperty(CS_Sink sink, const struct WPI_String* name,
                                CS_Status* status) {
-  return cs::GetSinkProperty(sink, name, status);
+  return cs::GetSinkProperty(sink, wpi::to_string_view(name), status);
 }
 
 CS_Property* CS_EnumerateSinkProperties(CS_Sink sink, int* count,
@@ -321,13 +304,13 @@ CS_Property* CS_EnumerateSinkProperties(CS_Sink sink, int* count,
   return out;
 }
 
-CS_Bool CS_SetSinkConfigJson(CS_Sink sink, const char* config,
+CS_Bool CS_SetSinkConfigJson(CS_Sink sink, const struct WPI_String* config,
                              CS_Status* status) {
-  return cs::SetSinkConfigJson(sink, config, status);
+  return cs::SetSinkConfigJson(sink, wpi::to_string_view(config), status);
 }
 
-char* CS_GetSinkConfigJson(CS_Sink sink, CS_Status* status) {
-  return cs::ConvertToC(cs::GetSinkConfigJson(sink, status));
+void CS_GetSinkConfigJson(CS_Sink sink, WPI_String* config, CS_Status* status) {
+  cs::ConvertToC(config, cs::GetSinkConfigJson(sink, status));
 }
 
 void CS_SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {
@@ -338,9 +321,10 @@ CS_Source CS_GetSinkSource(CS_Sink sink, CS_Status* status) {
   return cs::GetSinkSource(sink, status);
 }
 
-CS_Property CS_GetSinkSourceProperty(CS_Sink sink, const char* name,
+CS_Property CS_GetSinkSourceProperty(CS_Sink sink,
+                                     const struct WPI_String* name,
                                      CS_Status* status) {
-  return cs::GetSinkSourceProperty(sink, name, status);
+  return cs::GetSinkSourceProperty(sink, wpi::to_string_view(name), status);
 }
 
 CS_Sink CS_CopySink(CS_Sink sink, CS_Status* status) {
@@ -361,7 +345,7 @@ void CS_SetListenerOnExit(void (*onExit)(void* data), void* data) {
 
 CS_Listener CS_AddListener(void* data,
                            void (*callback)(void* data, const CS_Event* event),
-                           int eventMask, int immediateNotify,
+                           int eventMask, CS_Bool immediateNotify,
                            CS_Status* status) {
   return cs::AddListener(
       [=](const cs::RawEvent& rawEvent) {
@@ -436,8 +420,15 @@ double CS_GetTelemetryAverageValue(CS_Handle handle, CS_TelemetryKind kind,
   return cs::GetTelemetryAverageValue(handle, kind, status);
 }
 
-void CS_SetLogger(CS_LogFunc func, unsigned int min_level) {
-  cs::SetLogger(func, min_level);
+void CS_SetLogger(CS_LogFunc func, void* data, unsigned int min_level) {
+  cs::SetLogger(
+      [=](unsigned int level, const char* file, unsigned int line,
+          const char* msg) {
+        auto fileStr = wpi::make_string(file);
+        auto msgStr = wpi::make_string(msg);
+        func(data, level, &fileStr, line, &msgStr);
+      },
+      min_level);
 }
 
 void CS_SetDefaultLogger(unsigned int min_level) {
@@ -494,20 +485,6 @@ void CS_ReleaseEnumeratedSinks(CS_Sink* sinks, int count) {
   std::free(sinks);
 }
 
-void CS_FreeString(char* str) {
-  std::free(str);
-}
-
-void CS_FreeEnumPropertyChoices(char** choices, int count) {
-  if (!choices) {
-    return;
-  }
-  for (int i = 0; i < count; ++i) {
-    std::free(choices[i]);
-  }
-  std::free(choices);
-}
-
 void CS_FreeEnumeratedProperties(CS_Property* properties, int count) {
   std::free(properties);
 }
@@ -516,29 +493,18 @@ void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count) {
   std::free(modes);
 }
 
-char* CS_GetHostname(void) {
-  return cs::ConvertToC(cs::GetHostname());
+void CS_GetHostname(struct WPI_String* hostname) {
+  cs::ConvertToC(hostname, cs::GetHostname());
 }
 
-char** CS_GetNetworkInterfaces(int* count) {
+WPI_String* CS_GetNetworkInterfaces(int* count) {
   auto interfaces = cs::GetNetworkInterfaces();
-  char** out =
-      static_cast<char**>(wpi::safe_malloc(interfaces.size() * sizeof(char*)));
+  WPI_String* out = WPI_AllocateStringArray(interfaces.size());
   *count = interfaces.size();
   for (size_t i = 0; i < interfaces.size(); ++i) {
-    out[i] = cs::ConvertToC(interfaces[i]);
+    cs::ConvertToC(&out[i], interfaces[i]);
   }
   return out;
-}
-
-void CS_FreeNetworkInterfaces(char** interfaces, int count) {
-  if (!interfaces) {
-    return;
-  }
-  for (int i = 0; i < count; ++i) {
-    std::free(interfaces[i]);
-  }
-  std::free(interfaces);
 }
 
 }  // extern "C"

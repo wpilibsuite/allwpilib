@@ -14,9 +14,9 @@ import java.util.EnumSet;
 import java.util.OptionalLong;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/** NetworkTables JNI. */
 public final class NetworkTablesJNI {
   static boolean libraryLoaded = false;
-  static RuntimeLoader<NetworkTablesJNI> loader = null;
 
   /** Sets whether JNI should be loaded in the static block. */
   public static class Helper {
@@ -47,10 +47,7 @@ public final class NetworkTablesJNI {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        loader =
-            new RuntimeLoader<>(
-                "ntcorejni", RuntimeLoader.getDefaultExtractionRoot(), NetworkTablesJNI.class);
-        loader.loadLibrary();
+        RuntimeLoader.loadLibrary("ntcorejni");
       } catch (IOException ex) {
         ex.printStackTrace();
         System.exit(1);
@@ -68,10 +65,7 @@ public final class NetworkTablesJNI {
     if (libraryLoaded) {
       return;
     }
-    loader =
-        new RuntimeLoader<>(
-            "ntcorejni", RuntimeLoader.getDefaultExtractionRoot(), NetworkTablesJNI.class);
-    loader.loadLibrary();
+    RuntimeLoader.loadLibrary("ntcorejni");
     libraryLoaded = true;
   }
 
@@ -82,209 +76,774 @@ public final class NetworkTablesJNI {
     return new PubSubOptions(options);
   }
 
+  /**
+   * Returns default instance handle.
+   *
+   * @return Default instance handle.
+   */
   public static native int getDefaultInstance();
 
+  /**
+   * Creates an NT instance.
+   *
+   * @return NT instance handle.
+   */
   public static native int createInstance();
 
+  /**
+   * Destroys an NT instance.
+   *
+   * @param inst NT instance handle.
+   */
   public static native void destroyInstance(int inst);
 
+  /**
+   * Returns NT instance from handle.
+   *
+   * @param handle NT instance handle.
+   * @return NT instance.
+   */
   public static native int getInstanceFromHandle(int handle);
 
   private static native int getEntryImpl(
       int topic, int type, String typeStr, PubSubOptions options);
 
+  /**
+   * Returns NT entry handle.
+   *
+   * @param inst NT instance handle.
+   * @param key NT entry key.
+   * @return NT entry handle.
+   */
   public static native int getEntry(int inst, String key);
 
+  /**
+   * Returns NT entry handle.
+   *
+   * @param topic NT entry topic.
+   * @param type NT entry type.
+   * @param typeStr NT entry type as a string.
+   * @param options NT entry pubsub options.
+   * @return NT entry handle.
+   */
   public static int getEntry(
       int topic, int type, String typeStr, PubSubOptions options) {
     return getEntryImpl(topic, type, typeStr, options);
   }
 
+  /**
+   * Returns NT entry handle.
+   *
+   * @param topic NT entry topic.
+   * @param type NT entry type.
+   * @param typeStr NT entry type as a string.
+   * @param options NT entry pubsub options.
+   * @return NT entry handle.
+   */
   public static int getEntry(
       int topic, int type, String typeStr, PubSubOption... options) {
     return getEntryImpl(topic, type, typeStr, buildOptions(options));
   }
 
+  /**
+   * Returns NT entry name.
+   *
+   * @param entry NT entry handle.
+   * @return NT entry name.
+   */
   public static native String getEntryName(int entry);
 
+  /**
+   * Returns NT entry last change time in microseconds.
+   *
+   * @param entry NT entry handle.
+   * @return NT entry last change time in microseconds.
+   */
   public static native long getEntryLastChange(int entry);
 
+  /**
+   * Returns NT entry type.
+   *
+   * @param entry NT entry handle.
+   * @return NT entry type.
+   */
   public static native int getType(int entry);
 
   /* Topic functions */
 
+  /**
+   * Returns list of topic handles.
+   *
+   * @param inst NT instance handle.
+   * @param prefix Topic prefix.
+   * @param types Topic types.
+   * @return List of topic handles.
+   */
   public static native int[] getTopics(int inst, String prefix, int types);
 
+  /**
+   * Returns list of topic handles.
+   *
+   * @param inst NT instance handle.
+   * @param prefix Topic prefix.
+   * @param types Topic types as strings.
+   * @return List of topic handles.
+   */
   public static native int[] getTopicsStr(int inst, String prefix, String[] types);
 
+  /**
+   * Returns list of topic infos.
+   *
+   * @param instObject NT instance.
+   * @param inst NT instance handle.
+   * @param prefix Topic prefix.
+   * @param types Topic types.
+   * @return List of topic infos.
+   */
   public static native TopicInfo[] getTopicInfos(
       NetworkTableInstance instObject, int inst, String prefix, int types);
 
+  /**
+   * Returns list of topic infos.
+   *
+   * @param instObject NT instance.
+   * @param inst NT instance handle.
+   * @param prefix Topic prefix.
+   * @param types Topic types as strings.
+   * @return List of topic infos.
+   */
   public static native TopicInfo[] getTopicInfosStr(
       NetworkTableInstance instObject, int inst, String prefix, String[] types);
 
+  /**
+   * Returns Topic handle.
+   *
+   * @param inst NT instance handle.
+   * @param name Topic name.
+   * @return Topic handle.
+   */
   public static native int getTopic(int inst, String name);
 
+  /**
+   * Returns topic name.
+   *
+   * @param topic Topic handle.
+   * @return Topic name.
+   */
   public static native String getTopicName(int topic);
 
+  /**
+   * Returns topic type.
+   *
+   * @param topic Topic handle.
+   * @return Topic type.
+   */
   public static native int getTopicType(int topic);
 
+  /**
+   * Sets topic persistency.
+   *
+   * @param topic Topic handle.
+   * @param value True if topic should be persistent.
+   */
   public static native void setTopicPersistent(int topic, boolean value);
 
+  /**
+   * Returns true if topic is persistent.
+   *
+   * @param topic Topic handle.
+   * @return True if topic is persistent.
+   */
   public static native boolean getTopicPersistent(int topic);
 
+  /**
+   * Sets whether topic is retained.
+   *
+   * @param topic Topic handle.
+   * @param value True if topic should be retained.
+   */
   public static native void setTopicRetained(int topic, boolean value);
 
+  /**
+   * Returns true if topic is retained.
+   *
+   * @param topic Topic handle.
+   * @return True if topic is retained.
+   */
   public static native boolean getTopicRetained(int topic);
 
+  /**
+   * Sets topic caching.
+   *
+   * @param topic Topic handle.
+   * @param value True if topic should be cached.
+   */
   public static native void setTopicCached(int topic, boolean value);
 
+  /**
+   * Returns true if topic is cached.
+   *
+   * @param topic Topic handle.
+   * @return True if topic is cached.
+   */
   public static native boolean getTopicCached(int topic);
 
+  /**
+   * Returns topic type as string.
+   *
+   * @param topic Topic handle.
+   * @return Topic type as string.
+   */
   public static native String getTopicTypeString(int topic);
 
+  /**
+   * Returns true if topic exists.
+   *
+   * @param topic Topic handle.
+   * @return True if topic exists.
+   */
   public static native boolean getTopicExists(int topic);
 
+  /**
+   * Returns topic property.
+   *
+   * @param topic Topic handle.
+   * @param name Property name.
+   * @return Topic property.
+   */
   public static native String getTopicProperty(int topic, String name);
 
+  /**
+   * Sets topic property.
+   *
+   * @param topic Topic handle.
+   * @param name Property name.
+   * @param value Property value.
+   */
   public static native void setTopicProperty(int topic, String name, String value);
 
+  /**
+   * Deletes topic property.
+   *
+   * @param topic Topic handle.
+   * @param name Property name.
+   */
   public static native void deleteTopicProperty(int topic, String name);
 
+  /**
+   * Returns topic properties.
+   *
+   * @param topic Topic handle.
+   * @return Topic properties.
+   */
   public static native String getTopicProperties(int topic);
 
+  /**
+   * Sets topic properties.
+   *
+   * @param topic Topic handle.
+   * @param properties Topic properties.
+   */
   public static native void setTopicProperties(int topic, String properties);
 
+  /**
+   * Subscribes to topic.
+   *
+   * @param topic Topic handle.
+   * @param type Topic type.
+   * @param typeStr Topic type as a string.
+   * @param options Pubsub options.
+   * @return Subscriber handle.
+   */
   public static native int subscribe(
       int topic, int type, String typeStr, PubSubOptions options);
 
+  /**
+   * Subscribes to topic.
+   *
+   * @param topic Topic handle.
+   * @param type Topic type.
+   * @param typeStr Topic type as a string.
+   * @param options Pubsub options.
+   * @return Subscriber handle.
+   */
   public static int subscribe(
       int topic, int type, String typeStr, PubSubOption... options) {
     return subscribe(topic, type, typeStr, buildOptions(options));
   }
 
+  /**
+   * Unsubscribes from topic.
+   *
+   * @param sub Subscriber handle.
+   */
   public static native void unsubscribe(int sub);
 
+  /**
+   * Publishes topic.
+   *
+   * @param topic Topic handle.
+   * @param type Topic type.
+   * @param typeStr Topic type as a string.
+   * @param options Pubsub options.
+   * @return Publish handle.
+   */
   public static native int publish(
       int topic, int type, String typeStr, PubSubOptions options);
 
+  /**
+   * Publishes topic.
+   *
+   * @param topic Topic handle.
+   * @param type Topic type.
+   * @param typeStr Topic type as a string.
+   * @param options Pubsub options.
+   * @return Publish handle.
+   */
   public static int publish(
       int topic, int type, String typeStr, PubSubOption... options) {
     return publish(topic, type, typeStr, buildOptions(options));
   }
 
+  /**
+   * Publishes topic.
+   *
+   * @param topic Topic handle.
+   * @param type Topic type.
+   * @param typeStr Topic type as a string.
+   * @param properties Topic properties.
+   * @param options Pubsub options.
+   * @return Publish handle.
+   */
   public static native int publishEx(
       int topic, int type, String typeStr, String properties, PubSubOptions options);
 
+  /**
+   * Publishes topic.
+   *
+   * @param topic Topic handle.
+   * @param type Topic type.
+   * @param typeStr Topic type as a string.
+   * @param properties Topic properties.
+   * @param options Pubsub options.
+   * @return Publish handle.
+   */
   public static int publishEx(
       int topic, int type, String typeStr, String properties, PubSubOption... options) {
     return publishEx(topic, type, typeStr, properties, buildOptions(options));
   }
 
+  /**
+   * Unpublishes topic.
+   *
+   * @param pubentry Publish entry handle.
+   */
   public static native void unpublish(int pubentry);
 
+  /**
+   * Releases NT entry.
+   *
+   * @param entry NT entry handle.
+   */
   public static native void releaseEntry(int entry);
 
+  /**
+   * Releases pubsub entry.
+   *
+   * @param pubsubentry Pubsub entry handle.
+   */
   public static native void release(int pubsubentry);
 
+  /**
+   * Returns topic from pubsub entry handle.
+   *
+   * @param pubsubentry Pubsub entry handle.
+   * @return Topic handle.
+   */
   public static native int getTopicFromHandle(int pubsubentry);
 
+  /**
+   * Subscribes to multiple topics.
+   *
+   * @param inst NT instance handle.
+   * @param prefixes List of topic prefixes.
+   * @param options Pubsub options.
+   * @return Subscribe handle.
+   */
   public static native int subscribeMultiple(int inst, String[] prefixes, PubSubOptions options);
 
+  /**
+   * Subscribes to multiple topics.
+   *
+   * @param inst NT instance handle.
+   * @param prefixes List of topic prefixes.
+   * @param options Pubsub options.
+   * @return Subscribe handle.
+   */
   public static int subscribeMultiple(int inst, String[] prefixes, PubSubOption... options) {
     return subscribeMultiple(inst, prefixes, buildOptions(options));
   }
 
+  /**
+   * Unsubscribes from multiple topics.
+   *
+   * @param sub Subscribe handle.
+   */
   public static native void unsubscribeMultiple(int sub);
 
+  /**
+   * Returns timestamped topic value as an atomic Boolean.
+   *
+   * @param subentry Subentry handle.
+   * @param defaultValue Default value.
+   * @return Timestamped topic value.
+   */
   public static native TimestampedBoolean getAtomicBoolean(
       int subentry, boolean defaultValue);
 
+  /**
+   * Returns queued timestamped topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of timestamped topic values.
+   */
   public static native TimestampedBoolean[] readQueueBoolean(int subentry);
 
+  /**
+   * Returns queued topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of topic values.
+   */
   public static native boolean[] readQueueValuesBoolean(int subentry);
 
+  /**
+   * Sets topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Topic value.
+   * @return True if set succeeded.
+   */
   public static native boolean setBoolean(int entry, long time, boolean value);
 
+  /**
+   * Returns topic value.
+   *
+   * @param entry Entry handle.
+   * @param defaultValue Default value.
+   * @return Topic value.
+   */
   public static native boolean getBoolean(int entry, boolean defaultValue);
 
+  /**
+   * Sets default topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @return True if set succeeded.
+   */
   public static native boolean setDefaultBoolean(int entry, long time, boolean defaultValue);
 
 
+  /**
+   * Returns timestamped topic value as an atomic Integer.
+   *
+   * @param subentry Subentry handle.
+   * @param defaultValue Default value.
+   * @return Timestamped topic value.
+   */
   public static native TimestampedInteger getAtomicInteger(
       int subentry, long defaultValue);
 
+  /**
+   * Returns queued timestamped topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of timestamped topic values.
+   */
   public static native TimestampedInteger[] readQueueInteger(int subentry);
 
+  /**
+   * Returns queued topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of topic values.
+   */
   public static native long[] readQueueValuesInteger(int subentry);
 
+  /**
+   * Sets topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Topic value.
+   * @return True if set succeeded.
+   */
   public static native boolean setInteger(int entry, long time, long value);
 
+  /**
+   * Returns topic value.
+   *
+   * @param entry Entry handle.
+   * @param defaultValue Default value.
+   * @return Topic value.
+   */
   public static native long getInteger(int entry, long defaultValue);
 
+  /**
+   * Sets default topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @return True if set succeeded.
+   */
   public static native boolean setDefaultInteger(int entry, long time, long defaultValue);
 
 
+  /**
+   * Returns timestamped topic value as an atomic Float.
+   *
+   * @param subentry Subentry handle.
+   * @param defaultValue Default value.
+   * @return Timestamped topic value.
+   */
   public static native TimestampedFloat getAtomicFloat(
       int subentry, float defaultValue);
 
+  /**
+   * Returns queued timestamped topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of timestamped topic values.
+   */
   public static native TimestampedFloat[] readQueueFloat(int subentry);
 
+  /**
+   * Returns queued topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of topic values.
+   */
   public static native float[] readQueueValuesFloat(int subentry);
 
+  /**
+   * Sets topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Topic value.
+   * @return True if set succeeded.
+   */
   public static native boolean setFloat(int entry, long time, float value);
 
+  /**
+   * Returns topic value.
+   *
+   * @param entry Entry handle.
+   * @param defaultValue Default value.
+   * @return Topic value.
+   */
   public static native float getFloat(int entry, float defaultValue);
 
+  /**
+   * Sets default topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @return True if set succeeded.
+   */
   public static native boolean setDefaultFloat(int entry, long time, float defaultValue);
 
 
+  /**
+   * Returns timestamped topic value as an atomic Double.
+   *
+   * @param subentry Subentry handle.
+   * @param defaultValue Default value.
+   * @return Timestamped topic value.
+   */
   public static native TimestampedDouble getAtomicDouble(
       int subentry, double defaultValue);
 
+  /**
+   * Returns queued timestamped topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of timestamped topic values.
+   */
   public static native TimestampedDouble[] readQueueDouble(int subentry);
 
+  /**
+   * Returns queued topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of topic values.
+   */
   public static native double[] readQueueValuesDouble(int subentry);
 
+  /**
+   * Sets topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Topic value.
+   * @return True if set succeeded.
+   */
   public static native boolean setDouble(int entry, long time, double value);
 
+  /**
+   * Returns topic value.
+   *
+   * @param entry Entry handle.
+   * @param defaultValue Default value.
+   * @return Topic value.
+   */
   public static native double getDouble(int entry, double defaultValue);
 
+  /**
+   * Sets default topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @return True if set succeeded.
+   */
   public static native boolean setDefaultDouble(int entry, long time, double defaultValue);
 
 
+  /**
+   * Returns timestamped topic value as an atomic String.
+   *
+   * @param subentry Subentry handle.
+   * @param defaultValue Default value.
+   * @return Timestamped topic value.
+   */
   public static native TimestampedString getAtomicString(
       int subentry, String defaultValue);
 
+  /**
+   * Returns queued timestamped topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of timestamped topic values.
+   */
   public static native TimestampedString[] readQueueString(int subentry);
 
+  /**
+   * Returns queued topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of topic values.
+   */
   public static native String[] readQueueValuesString(int subentry);
 
+  /**
+   * Sets topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Topic value.
+   * @return True if set succeeded.
+   */
   public static native boolean setString(int entry, long time, String value);
 
+  /**
+   * Returns topic value.
+   *
+   * @param entry Entry handle.
+   * @param defaultValue Default value.
+   * @return Topic value.
+   */
   public static native String getString(int entry, String defaultValue);
 
+  /**
+   * Sets default topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @return True if set succeeded.
+   */
   public static native boolean setDefaultString(int entry, long time, String defaultValue);
 
 
+  /**
+   * Returns timestamped topic value as an atomic Raw.
+   *
+   * @param subentry Subentry handle.
+   * @param defaultValue Default value.
+   * @return Timestamped topic value.
+   */
   public static native TimestampedRaw getAtomicRaw(
       int subentry, byte[] defaultValue);
 
+  /**
+   * Returns queued timestamped topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of timestamped topic values.
+   */
   public static native TimestampedRaw[] readQueueRaw(int subentry);
 
+  /**
+   * Returns queued topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of topic values.
+   */
   public static native byte[][] readQueueValuesRaw(int subentry);
 
+  /**
+   * Sets raw topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Raw value buffer.
+   * @return True if set succeeded.
+   */
   public static boolean setRaw(int entry, long time, byte[] value) {
     return setRaw(entry, time, value, 0, value.length);
   }
 
+  /**
+   * Sets raw topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Raw value buffer.
+   * @param start Value's offset into buffer.
+   * @param len Length of value in buffer.
+   * @return True if set succeeded.
+   */
   public static native boolean setRaw(int entry, long time, byte[] value, int start, int len);
 
+  /**
+   * Sets raw topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Raw value buffer.
+   * @return True if set succeeded.
+   */
   public static boolean setRaw(int entry, long time, ByteBuffer value) {
     int pos = value.position();
     return setRaw(entry, time, value, pos, value.capacity() - pos);
   }
 
+  /**
+   * Sets raw topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Raw value buffer.
+   * @param start Value's offset into buffer.
+   * @param len Length of value in buffer.
+   * @return True if set succeeded.
+   */
   public static boolean setRaw(int entry, long time, ByteBuffer value, int start, int len) {
     if (value.isDirect()) {
       if (start < 0) {
@@ -304,21 +863,74 @@ public final class NetworkTablesJNI {
     }
   }
 
+  /**
+   * Sets raw topic value buffer.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Raw value buffer.
+   * @param start Value's offset into buffer.
+   * @param len Length of value in buffer.
+   * @return True if set succeeded.
+   */
   private static native boolean setRawBuffer(int entry, long time, ByteBuffer value, int start, int len);
 
+  /**
+   * Returns topic value.
+   *
+   * @param entry Entry handle.
+   * @param defaultValue Default value.
+   * @return Topic value.
+   */
   public static native byte[] getRaw(int entry, byte[] defaultValue);
 
+  /**
+   * Sets default raw topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @return True if set succeeded.
+   */
   public static boolean setDefaultRaw(int entry, long time, byte[] defaultValue) {
     return setDefaultRaw(entry, time, defaultValue, 0, defaultValue.length);
   }
 
+  /**
+   * Sets default raw topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @param start Value's offset into buffer.
+   * @param len Length of value in buffer.
+   * @return True if set succeeded.
+   */
   public static native boolean setDefaultRaw(int entry, long time, byte[] defaultValue, int start, int len);
 
+  /**
+   * Sets default raw topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @return True if set succeeded.
+   */
   public static boolean setDefaultRaw(int entry, long time, ByteBuffer defaultValue) {
     int pos = defaultValue.position();
     return setDefaultRaw(entry, time, defaultValue, pos, defaultValue.limit() - pos);
   }
 
+  /**
+   * Sets default raw topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @param start Value's offset into buffer.
+   * @param len Length of value in buffer.
+   * @return True if set succeeded.
+   */
   public static boolean setDefaultRaw(int entry, long time, ByteBuffer defaultValue, int start, int len) {
     if (defaultValue.isDirect()) {
       if (start < 0) {
@@ -338,93 +950,361 @@ public final class NetworkTablesJNI {
     }
   }
 
+  /**
+   * Sets default raw topic value buffer.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @param start Value's offset into buffer.
+   * @param len Length of value in buffer.
+   * @return True if set succeeded.
+   */
   private static native boolean setDefaultRawBuffer(int entry, long time, ByteBuffer defaultValue, int start, int len);
 
 
+  /**
+   * Returns timestamped topic value as an atomic BooleanArray.
+   *
+   * @param subentry Subentry handle.
+   * @param defaultValue Default value.
+   * @return Timestamped topic value.
+   */
   public static native TimestampedBooleanArray getAtomicBooleanArray(
       int subentry, boolean[] defaultValue);
 
+  /**
+   * Returns queued timestamped topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of timestamped topic values.
+   */
   public static native TimestampedBooleanArray[] readQueueBooleanArray(int subentry);
 
+  /**
+   * Returns queued topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of topic values.
+   */
   public static native boolean[][] readQueueValuesBooleanArray(int subentry);
 
+  /**
+   * Sets topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Topic value.
+   * @return True if set succeeded.
+   */
   public static native boolean setBooleanArray(int entry, long time, boolean[] value);
 
+  /**
+   * Returns topic value.
+   *
+   * @param entry Entry handle.
+   * @param defaultValue Default value.
+   * @return Topic value.
+   */
   public static native boolean[] getBooleanArray(int entry, boolean[] defaultValue);
 
+  /**
+   * Sets default topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @return True if set succeeded.
+   */
   public static native boolean setDefaultBooleanArray(int entry, long time, boolean[] defaultValue);
 
 
+  /**
+   * Returns timestamped topic value as an atomic IntegerArray.
+   *
+   * @param subentry Subentry handle.
+   * @param defaultValue Default value.
+   * @return Timestamped topic value.
+   */
   public static native TimestampedIntegerArray getAtomicIntegerArray(
       int subentry, long[] defaultValue);
 
+  /**
+   * Returns queued timestamped topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of timestamped topic values.
+   */
   public static native TimestampedIntegerArray[] readQueueIntegerArray(int subentry);
 
+  /**
+   * Returns queued topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of topic values.
+   */
   public static native long[][] readQueueValuesIntegerArray(int subentry);
 
+  /**
+   * Sets topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Topic value.
+   * @return True if set succeeded.
+   */
   public static native boolean setIntegerArray(int entry, long time, long[] value);
 
+  /**
+   * Returns topic value.
+   *
+   * @param entry Entry handle.
+   * @param defaultValue Default value.
+   * @return Topic value.
+   */
   public static native long[] getIntegerArray(int entry, long[] defaultValue);
 
+  /**
+   * Sets default topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @return True if set succeeded.
+   */
   public static native boolean setDefaultIntegerArray(int entry, long time, long[] defaultValue);
 
 
+  /**
+   * Returns timestamped topic value as an atomic FloatArray.
+   *
+   * @param subentry Subentry handle.
+   * @param defaultValue Default value.
+   * @return Timestamped topic value.
+   */
   public static native TimestampedFloatArray getAtomicFloatArray(
       int subentry, float[] defaultValue);
 
+  /**
+   * Returns queued timestamped topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of timestamped topic values.
+   */
   public static native TimestampedFloatArray[] readQueueFloatArray(int subentry);
 
+  /**
+   * Returns queued topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of topic values.
+   */
   public static native float[][] readQueueValuesFloatArray(int subentry);
 
+  /**
+   * Sets topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Topic value.
+   * @return True if set succeeded.
+   */
   public static native boolean setFloatArray(int entry, long time, float[] value);
 
+  /**
+   * Returns topic value.
+   *
+   * @param entry Entry handle.
+   * @param defaultValue Default value.
+   * @return Topic value.
+   */
   public static native float[] getFloatArray(int entry, float[] defaultValue);
 
+  /**
+   * Sets default topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @return True if set succeeded.
+   */
   public static native boolean setDefaultFloatArray(int entry, long time, float[] defaultValue);
 
 
+  /**
+   * Returns timestamped topic value as an atomic DoubleArray.
+   *
+   * @param subentry Subentry handle.
+   * @param defaultValue Default value.
+   * @return Timestamped topic value.
+   */
   public static native TimestampedDoubleArray getAtomicDoubleArray(
       int subentry, double[] defaultValue);
 
+  /**
+   * Returns queued timestamped topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of timestamped topic values.
+   */
   public static native TimestampedDoubleArray[] readQueueDoubleArray(int subentry);
 
+  /**
+   * Returns queued topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of topic values.
+   */
   public static native double[][] readQueueValuesDoubleArray(int subentry);
 
+  /**
+   * Sets topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Topic value.
+   * @return True if set succeeded.
+   */
   public static native boolean setDoubleArray(int entry, long time, double[] value);
 
+  /**
+   * Returns topic value.
+   *
+   * @param entry Entry handle.
+   * @param defaultValue Default value.
+   * @return Topic value.
+   */
   public static native double[] getDoubleArray(int entry, double[] defaultValue);
 
+  /**
+   * Sets default topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @return True if set succeeded.
+   */
   public static native boolean setDefaultDoubleArray(int entry, long time, double[] defaultValue);
 
 
+  /**
+   * Returns timestamped topic value as an atomic StringArray.
+   *
+   * @param subentry Subentry handle.
+   * @param defaultValue Default value.
+   * @return Timestamped topic value.
+   */
   public static native TimestampedStringArray getAtomicStringArray(
       int subentry, String[] defaultValue);
 
+  /**
+   * Returns queued timestamped topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of timestamped topic values.
+   */
   public static native TimestampedStringArray[] readQueueStringArray(int subentry);
 
+  /**
+   * Returns queued topic values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of topic values.
+   */
   public static native String[][] readQueueValuesStringArray(int subentry);
 
+  /**
+   * Sets topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param value Topic value.
+   * @return True if set succeeded.
+   */
   public static native boolean setStringArray(int entry, long time, String[] value);
 
+  /**
+   * Returns topic value.
+   *
+   * @param entry Entry handle.
+   * @param defaultValue Default value.
+   * @return Topic value.
+   */
   public static native String[] getStringArray(int entry, String[] defaultValue);
 
+  /**
+   * Sets default topic value.
+   *
+   * @param entry Entry handle.
+   * @param time Time in microseconds.
+   * @param defaultValue Default value.
+   * @return True if set succeeded.
+   */
   public static native boolean setDefaultStringArray(int entry, long time, String[] defaultValue);
 
 
+  /**
+   * Returns queued subentry values.
+   *
+   * @param subentry Subentry handle.
+   * @return List of queued subentry values.
+   */
   public static native NetworkTableValue[] readQueueValue(int subentry);
 
+  /**
+   * Returns entry's NT value.
+   *
+   * @param entry Entry handle.
+   * @return Entry's NT value.
+   */
   public static native NetworkTableValue getValue(int entry);
 
+  /**
+   * Sets entry flags.
+   *
+   * @param entry Entry handle.
+   * @param flags Entry flags.
+   */
   public static native void setEntryFlags(int entry, int flags);
 
+  /**
+   * Returns entry flags.
+   *
+   * @param entry Entry handle.
+   * @return Entry flags.
+   */
   public static native int getEntryFlags(int entry);
 
+  /**
+   * Returns topic info.
+   *
+   * @param inst NT instance handle.
+   * @param topic Topic handle.
+   * @return Topic info.
+   */
   public static native TopicInfo getTopicInfo(NetworkTableInstance inst, int topic);
 
+  /**
+   * Creates a listener poller.
+   *
+   * @param inst NT instance handle.
+   * @return Listener poller handle.
+   */
   public static native int createListenerPoller(int inst);
 
+  /**
+   * Destroys listener poller.
+   *
+   * @param poller Listener poller handle.
+   */
   public static native void destroyListenerPoller(int poller);
 
+  /**
+   * Converts NT event kinds to mask.
+   *
+   * @param kinds Enum set of NT event kinds.
+   * @return NT event mask.
+   */
   private static int kindsToMask(EnumSet<NetworkTableEvent.Kind> kinds) {
     int mask = 0;
     for (NetworkTableEvent.Kind kind : kinds) {
@@ -433,80 +1313,316 @@ public final class NetworkTablesJNI {
     return mask;
   }
 
+  /**
+   * Adds listener.
+   *
+   * @param poller Listener poller handle.
+   * @param prefixes Topic prefixes.
+   * @param kinds Enum set of NT event kinds.
+   * @return Listener handle.
+   */
   public static int addListener(int poller, String[] prefixes, EnumSet<NetworkTableEvent.Kind> kinds) {
     return addListener(poller, prefixes, kindsToMask(kinds));
   }
 
+  /**
+   * Adds listener.
+   *
+   * @param poller Listener poller handle.
+   * @param handle Topic handle.
+   * @param kinds Enum set of NT event kinds.
+   * @return Listener handle.
+   */
   public static int addListener(int poller, int handle, EnumSet<NetworkTableEvent.Kind> kinds) {
     return addListener(poller, handle, kindsToMask(kinds));
   }
 
+  /**
+   * Adds listener.
+   *
+   * @param poller Listener poller handle.
+   * @param prefixes Topic prefixes.
+   * @param mask NT event mask.
+   * @return Listener handle.
+   */
   public static native int addListener(int poller, String[] prefixes, int mask);
 
+  /**
+   * Adds listener.
+   *
+   * @param poller Listener poller handle.
+   * @param handle Topic handle.
+   * @param mask NT event mask.
+   * @return Listener handle.
+   */
   public static native int addListener(int poller, int handle, int mask);
 
+  /**
+   * Returns NT events from listener queue.
+   *
+   * @param inst NT instance handle.
+   * @param poller Listener poller handle.
+   * @return List of NT events.
+   */
   public static native NetworkTableEvent[] readListenerQueue(
       NetworkTableInstance inst, int poller);
 
+  /**
+   * Removes listener.
+   *
+   * @param listener Listener handle.
+   */
   public static native void removeListener(int listener);
 
+  /**
+   * Returns network mode.
+   *
+   * @param inst NT instance handle.
+   * @return Network mode.
+   */
   public static native int getNetworkMode(int inst);
 
+  /**
+   * Starts local-only operation. Prevents calls to startServer or startClient from taking effect.
+   * Has no effect if startServer or startClient has already been called.
+   *
+   * @param inst NT instance handle.
+   */
   public static native void startLocal(int inst);
 
+  /**
+   * Stops local-only operation. startServer or startClient can be called after this call to start
+   * a server or client.
+   *
+   * @param inst NT instance handle.
+   */
   public static native void stopLocal(int inst);
 
+  /**
+   * Starts a server using the specified filename, listening address, and port.
+   *
+   * @param inst NT instance handle.
+   * @param persistFilename the name of the persist file to use
+   * @param listenAddress the address to listen on, or empty to listen on any address
+   * @param port3 port to communicate over (NT3)
+   * @param port4 port to communicate over (NT4)
+   */
   public static native void startServer(
       int inst, String persistFilename, String listenAddress, int port3, int port4);
 
+  /**
+   * Stops the server if it is running.
+   *
+   * @param inst NT instance handle.
+   */
   public static native void stopServer(int inst);
 
+  /**
+   * Starts a NT3 client. Use SetServer or SetServerTeam to set the server name and port.
+   *
+   * @param inst NT instance handle.
+   * @param identity network identity to advertise (cannot be empty string)
+   */
   public static native void startClient3(int inst, String identity);
 
+  /**
+   * Starts a NT4 client. Use SetServer or SetServerTeam to set the server name and port.
+   *
+   * @param inst NT instance handle.
+   * @param identity network identity to advertise (cannot be empty string)
+   */
   public static native void startClient4(int inst, String identity);
 
+  /**
+   * Stops the client if it is running.
+   *
+   * @param inst NT instance handle.
+   */
   public static native void stopClient(int inst);
 
+  /**
+   * Sets server address and port for client (without restarting client).
+   *
+   * @param inst NT instance handle.
+   * @param serverName server name
+   * @param port port to communicate over
+   */
   public static native void setServer(int inst, String serverName, int port);
 
+  /**
+   * Sets server addresses and ports for client (without restarting client). The client will
+   * attempt to connect to each server in round robin fashion.
+   *
+   * @param inst NT instance handle.
+   * @param serverNames array of server names
+   * @param ports array of port numbers (0=default)
+   */
   public static native void setServer(int inst, String[] serverNames, int[] ports);
 
+  /**
+   * Sets server addresses and port for client (without restarting client). Connects using commonly
+   * known robot addresses for the specified team.
+   *
+   * @param inst NT instance handle.
+   * @param team team number
+   * @param port port to communicate over
+   */
   public static native void setServerTeam(int inst, int team, int port);
 
+  /**
+   * Disconnects the client if it's running and connected. This will automatically start
+   * reconnection attempts to the current server list.
+   *
+   * @param inst NT instance handle.
+   */
   public static native void disconnect(int inst);
 
+  /**
+   * Starts requesting server address from Driver Station. This connects to the Driver Station
+   * running on localhost to obtain the server IP address.
+   *
+   * @param inst NT instance handle.
+   * @param port server port to use in combination with IP from DS
+   */
   public static native void startDSClient(int inst, int port);
 
+  /**
+   * Stops requesting server address from Driver Station.
+   *
+   * @param inst NT instance handle.
+   */
   public static native void stopDSClient(int inst);
 
+  /**
+   * Flushes all updated values immediately to the local client/server. This does not flush to the
+   * network.
+   *
+   * @param inst NT instance handle.
+   */
   public static native void flushLocal(int inst);
 
+  /**
+   * Flushes all updated values immediately to the network. Note: This is rate-limited to protect
+   * the network from flooding. This is primarily useful for synchronizing network updates with
+   * user code.
+   *
+   * @param inst NT instance handle.
+   */
   public static native void flush(int inst);
 
+  /**
+   * Gets information on the currently established network connections. If operating as a client,
+   * this will return either zero or one values.
+   *
+   * @param inst NT instance handle.
+   * @return array of connection information
+   */
   public static native ConnectionInfo[] getConnections(int inst);
 
+  /**
+   * Return whether or not the instance is connected to another node.
+   *
+   * @param inst NT instance handle.
+   * @return True if connected.
+   */
   public static native boolean isConnected(int inst);
 
+  /**
+   * Get the time offset between server time and local time. Add this value to local time to get
+   * the estimated equivalent server time. In server mode, this always returns 0. In client mode,
+   * this returns the time offset only if the client and server are connected and have exchanged
+   * synchronization messages. Note the time offset may change over time as it is periodically
+   * updated; to receive updates as events, add a listener to the "time sync" event.
+   *
+   * @param inst NT instance handle.
+   * @return Time offset in microseconds (optional)
+   */
   public static native OptionalLong getServerTimeOffset(int inst);
 
+  /**
+   * Returns the current timestamp in microseconds.
+   *
+   * @return The current timestamp in microseconds.
+   */
   public static native long now();
 
+  /**
+   * Starts logging entry changes to a DataLog.
+   *
+   * @param inst NT instance handle.
+   * @param log data log handle; lifetime must extend until StopEntryDataLog is called or the
+   *     instance is destroyed
+   * @param prefix only store entries with names that start with this prefix; the prefix is not
+   *     included in the data log entry name
+   * @param logPrefix prefix to add to data log entry names
+   * @return Data logger handle
+   */
   private static native int startEntryDataLog(int inst, long log, String prefix, String logPrefix);
 
+  /**
+   * Starts logging entry changes to a DataLog.
+   *
+   * @param inst NT instance handle.
+   * @param log data log object; lifetime must extend until StopEntryDataLog is called or the
+   *     instance is destroyed
+   * @param prefix only store entries with names that start with this prefix; the prefix is not
+   *     included in the data log entry name
+   * @param logPrefix prefix to add to data log entry names
+   * @return Data logger handle
+   */
   public static int startEntryDataLog(int inst, DataLog log, String prefix, String logPrefix) {
     return startEntryDataLog(inst, log.getImpl(), prefix, logPrefix);
   }
 
+  /**
+   * Stops logging entry changes to a DataLog.
+   *
+   * @param logger data logger handle
+   */
   public static native void stopEntryDataLog(int logger);
 
+  /**
+   * Starts logging connection changes to a DataLog.
+   *
+   * @param inst NT instance handle.
+   * @param log data log handle; lifetime must extend until StopConnectionDataLog is called or the
+   *     instance is destroyed
+   * @param name data log entry name
+   * @return Data logger handle
+   */
   private static native int startConnectionDataLog(int inst, long log, String name);
 
+  /**
+   * Starts logging connection changes to a DataLog.
+   *
+   * @param inst NT instance handle.
+   * @param log data log object; lifetime must extend until StopConnectionDataLog is called or the
+   *     instance is destroyed
+   * @param name data log entry name
+   * @return Data logger handle
+   */
   public static int startConnectionDataLog(int inst, DataLog log, String name) {
     return startConnectionDataLog(inst, log.getImpl(), name);
   }
 
+  /**
+   * Stops logging connection changes to a DataLog.
+   *
+   * @param logger data logger handle
+   */
   public static native void stopConnectionDataLog(int logger);
 
+  /**
+   * Add logger callback function. By default, log messages are sent to stderr; this function sends
+   * log messages with the specified levels to the provided callback function instead. The callback
+   * function will only be called for log messages with level greater than or equal to minLevel and
+   * less than or equal to maxLevel; messages outside this range will be silently ignored.
+   *
+   * @param poller Listener poller handle.
+   * @param minLevel minimum log level
+   * @param maxLevel maximum log level
+   * @return Listener handle
+   */
   public static native int addLogger(int poller, int minLevel, int maxLevel);
 
   /** Utility class. */

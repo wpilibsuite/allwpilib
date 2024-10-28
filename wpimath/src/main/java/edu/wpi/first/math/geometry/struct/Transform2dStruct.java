@@ -17,8 +17,8 @@ public class Transform2dStruct implements Struct<Transform2d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Transform2d";
+  public String getTypeName() {
+    return "Transform2d";
   }
 
   @Override
@@ -47,5 +47,10 @@ public class Transform2dStruct implements Struct<Transform2d> {
   public void pack(ByteBuffer bb, Transform2d value) {
     Translation2d.struct.pack(bb, value.getTranslation());
     Rotation2d.struct.pack(bb, value.getRotation());
+  }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
   }
 }

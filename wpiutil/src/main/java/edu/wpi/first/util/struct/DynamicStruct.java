@@ -378,6 +378,7 @@ public final class DynamicStruct {
    * @throws IllegalArgumentException if field is not a member of this struct
    * @throws IllegalStateException if struct descriptor is invalid
    */
+  @SuppressWarnings({"PMD.CollapsibleIfStatements", "PMD.AvoidDeeplyNestedIfStmts"})
   public String getStringField(StructFieldDescriptor field) {
     if (field.getType() != StructFieldType.kChar) {
       throw new UnsupportedOperationException("field is not char type");
@@ -390,7 +391,56 @@ public final class DynamicStruct {
     }
     byte[] bytes = new byte[field.m_arraySize];
     m_data.position(field.m_offset).get(bytes, 0, field.m_arraySize);
-    return new String(bytes, StandardCharsets.UTF_8);
+    // Find last non zero character
+    int stringLength = bytes.length;
+    for (; stringLength > 0; stringLength--) {
+      if (bytes[stringLength - 1] != 0) {
+        break;
+      }
+    }
+    // If string is all zeroes, its empty and return an empty string.
+    if (stringLength == 0) {
+      return "";
+    }
+    // Check if the end of the string is in the middle of a continuation byte or
+    // not.
+    if ((bytes[stringLength - 1] & 0x80) != 0) {
+      // This is a UTF8 continuation byte. Make sure its valid.
+      // Walk back until initial byte is found
+      int utf8StartByte = stringLength;
+      for (; utf8StartByte > 0; utf8StartByte--) {
+        if ((bytes[utf8StartByte - 1] & 0x40) != 0) {
+          // Having 2nd bit set means start byte
+          break;
+        }
+      }
+      if (utf8StartByte == 0) {
+        // This case means string only contains continuation bytes
+        return "";
+      }
+      utf8StartByte--;
+      // Check if its a 2, 3, or 4 byte
+      byte checkByte = bytes[utf8StartByte];
+      if ((checkByte & 0xE0) == 0xC0) {
+        // 2 byte, need 1 more byte
+        if (utf8StartByte != stringLength - 2) {
+          stringLength = utf8StartByte;
+        }
+      } else if ((checkByte & 0xF0) == 0xE0) {
+        // 3 byte, need 2 more bytes
+        if (utf8StartByte != stringLength - 3) {
+          stringLength = utf8StartByte;
+        }
+      } else if ((checkByte & 0xF8) == 0xF0) {
+        // 4 byte, need 3 more bytes
+        if (utf8StartByte != stringLength - 4) {
+          stringLength = utf8StartByte;
+        }
+      }
+      // If we get here, the string is either completely garbage or fine.
+    }
+
+    return new String(bytes, 0, stringLength, StandardCharsets.UTF_8);
   }
 
   /**
@@ -398,11 +448,12 @@ public final class DynamicStruct {
    *
    * @param field field descriptor
    * @param value field value
+   * @return true if the full value fit in the struct, false if truncated
    * @throws UnsupportedOperationException if field is not char type
    * @throws IllegalArgumentException if field is not a member of this struct
    * @throws IllegalStateException if struct descriptor is invalid
    */
-  public void setStringField(StructFieldDescriptor field, String value) {
+  public boolean setStringField(StructFieldDescriptor field, String value) {
     if (field.getType() != StructFieldType.kChar) {
       throw new UnsupportedOperationException("field is not char type");
     }
@@ -414,10 +465,12 @@ public final class DynamicStruct {
     }
     ByteBuffer bb = StandardCharsets.UTF_8.encode(value);
     int len = Math.min(bb.remaining(), field.m_arraySize);
+    boolean copiedFull = len == bb.remaining();
     m_data.position(field.m_offset).put(bb.limit(len));
     for (int i = len; i < field.m_arraySize; i++) {
       m_data.put((byte) 0);
     }
+    return copiedFull;
   }
 
   /**
@@ -526,23 +579,14 @@ public final class DynamicStruct {
           "arrIndex (" + arrIndex + ") is larger than array size (" + field.m_arraySize + ")");
     }
 
-    long val;
-    switch (field.m_size) {
-      case 1:
-        val = m_data.get(field.m_offset + arrIndex);
-        break;
-      case 2:
-        val = m_data.getShort(field.m_offset + arrIndex * 2);
-        break;
-      case 4:
-        val = m_data.getInt(field.m_offset + arrIndex * 4);
-        break;
-      case 8:
-        val = m_data.getLong(field.m_offset + arrIndex * 8);
-        break;
-      default:
-        throw new IllegalStateException("invalid field size");
-    }
+    long val =
+        switch (field.m_size) {
+          case 1 -> m_data.get(field.m_offset + arrIndex);
+          case 2 -> m_data.getShort(field.m_offset + arrIndex * 2);
+          case 4 -> m_data.getInt(field.m_offset + arrIndex * 4);
+          case 8 -> m_data.getLong(field.m_offset + arrIndex * 8);
+          default -> throw new IllegalStateException("invalid field size");
+        };
 
     if (field.isUint() || field.getType() == StructFieldType.kBool) {
       // for unsigned fields, we can simply logical shift and mask
@@ -570,60 +614,42 @@ public final class DynamicStruct {
     // common case is no bit shift and no masking
     if (!field.isBitField()) {
       switch (field.m_size) {
-        case 1:
-          m_data.put(field.m_offset + arrIndex, (byte) value);
-          break;
-        case 2:
-          m_data.putShort(field.m_offset + arrIndex * 2, (short) value);
-          break;
-        case 4:
-          m_data.putInt(field.m_offset + arrIndex * 4, (int) value);
-          break;
-        case 8:
-          m_data.putLong(field.m_offset + arrIndex * 8, value);
-          break;
-        default:
-          throw new IllegalStateException("invalid field size");
+        case 1 -> m_data.put(field.m_offset + arrIndex, (byte) value);
+        case 2 -> m_data.putShort(field.m_offset + arrIndex * 2, (short) value);
+        case 4 -> m_data.putInt(field.m_offset + arrIndex * 4, (int) value);
+        case 8 -> m_data.putLong(field.m_offset + arrIndex * 8, value);
+        default -> throw new IllegalStateException("invalid field size");
       }
       return;
     }
 
     // handle bit shifting and masking into current value
     switch (field.m_size) {
-      case 1:
-        {
-          byte val = m_data.get(field.m_offset + arrIndex);
-          val &= (byte) ~(field.getBitMask() << field.m_bitShift);
-          val |= (byte) ((value & field.getBitMask()) << field.m_bitShift);
-          m_data.put(field.m_offset + arrIndex, val);
-          break;
-        }
-      case 2:
-        {
-          short val = m_data.getShort(field.m_offset + arrIndex * 2);
-          val &= (short) ~(field.getBitMask() << field.m_bitShift);
-          val |= (short) ((value & field.getBitMask()) << field.m_bitShift);
-          m_data.putShort(field.m_offset + arrIndex * 2, val);
-          break;
-        }
-      case 4:
-        {
-          int val = m_data.getInt(field.m_offset + arrIndex * 4);
-          val &= (int) ~(field.getBitMask() << field.m_bitShift);
-          val |= (int) ((value & field.getBitMask()) << field.m_bitShift);
-          m_data.putInt(field.m_offset + arrIndex * 4, val);
-          break;
-        }
-      case 8:
-        {
-          long val = m_data.getLong(field.m_offset + arrIndex * 8);
-          val &= ~(field.getBitMask() << field.m_bitShift);
-          val |= (value & field.getBitMask()) << field.m_bitShift;
-          m_data.putLong(field.m_offset + arrIndex * 8, val);
-          break;
-        }
-      default:
-        throw new IllegalStateException("invalid field size");
+      case 1 -> {
+        byte val = m_data.get(field.m_offset + arrIndex);
+        val &= (byte) ~(field.getBitMask() << field.m_bitShift);
+        val |= (byte) ((value & field.getBitMask()) << field.m_bitShift);
+        m_data.put(field.m_offset + arrIndex, val);
+      }
+      case 2 -> {
+        short val = m_data.getShort(field.m_offset + arrIndex * 2);
+        val &= (short) ~(field.getBitMask() << field.m_bitShift);
+        val |= (short) ((value & field.getBitMask()) << field.m_bitShift);
+        m_data.putShort(field.m_offset + arrIndex * 2, val);
+      }
+      case 4 -> {
+        int val = m_data.getInt(field.m_offset + arrIndex * 4);
+        val &= (int) ~(field.getBitMask() << field.m_bitShift);
+        val |= (int) ((value & field.getBitMask()) << field.m_bitShift);
+        m_data.putInt(field.m_offset + arrIndex * 4, val);
+      }
+      case 8 -> {
+        long val = m_data.getLong(field.m_offset + arrIndex * 8);
+        val &= ~(field.getBitMask() << field.m_bitShift);
+        val |= (value & field.getBitMask()) << field.m_bitShift;
+        m_data.putLong(field.m_offset + arrIndex * 8, val);
+      }
+      default -> throw new IllegalStateException("invalid field size");
     }
   }
 

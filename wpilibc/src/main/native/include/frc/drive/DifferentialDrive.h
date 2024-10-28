@@ -90,8 +90,9 @@ class DifferentialDrive : public RobotDriveBase,
   /**
    * Construct a DifferentialDrive.
    *
-   * To pass multiple motors per side, use a MotorControllerGroup. If a motor
-   * needs to be inverted, do so before passing it in.
+   * To pass multiple motors per side, use CAN motor controller followers or
+   * PWMSpeedController::AddFollower(). If a motor needs to be inverted, do so
+   * before passing it in.
    *
    * @param leftMotor Left motor setter.
    * @param rightMotor Right motor setter.

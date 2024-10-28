@@ -53,9 +53,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_CounterJNI_freeCounter
   (JNIEnv* env, jclass, jint id)
 {
-  int32_t status = 0;
-  HAL_FreeCounter((HAL_CounterHandle)id, &status);
-  CheckStatus(env, status);
+  if (id != HAL_kInvalidHandle) {
+    HAL_FreeCounter((HAL_CounterHandle)id);
+  }
 }
 
 /*

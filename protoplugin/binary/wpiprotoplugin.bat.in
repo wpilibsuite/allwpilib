@@ -1,0 +1,2 @@
+@ECHO OFF
+"@Java_JAVA_EXECUTABLE@" -jar "@PROTO_JAR@" %*

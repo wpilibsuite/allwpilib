@@ -4,6 +4,9 @@
 
 #include "hal/Counter.h"
 
+#include <limits>
+#include <memory>
+
 #include <fmt/format.h>
 
 #include "ConstantsInternal.h"
@@ -61,7 +64,7 @@ HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
   return handle;
 }
 
-void HAL_FreeCounter(HAL_CounterHandle counterHandle, int32_t* status) {
+void HAL_FreeCounter(HAL_CounterHandle counterHandle) {
   counterHandles->Free(counterHandle);
 }
 
@@ -300,19 +303,14 @@ double HAL_GetCounterPeriod(HAL_CounterHandle counterHandle, int32_t* status) {
     return 0.0;
   }
   tCounter::tTimerOutput output = counter->counter->readTimerOutput(status);
-  double period;
   if (output.Stalled) {
-    // Return infinity
-    double zero = 0.0;
-    period = 1.0 / zero;
-  } else {
-    // output.Period is a fixed point number that counts by 2 (24 bits, 25
-    // integer bits)
-    period = static_cast<double>(output.Period << 1) /
-             static_cast<double>(output.Count);
+    return std::numeric_limits<double>::infinity();
   }
-  return static_cast<double>(period *
-                             2.5e-8);  // result * timebase (currently 25ns)
+  // output.Period is a fixed point number that counts by 2 (24 bits, 25
+  // integer bits)
+  double period = static_cast<double>(output.Period << 1) /
+                  static_cast<double>(output.Count);
+  return period * 2.5e-8;  // result * timebase (currently 25ns)
 }
 
 void HAL_SetCounterMaxPeriod(HAL_CounterHandle counterHandle, double maxPeriod,

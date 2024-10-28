@@ -4,10 +4,12 @@
 
 #include "wpinet/WebSocketServer.h"
 
+#include <memory>
 #include <utility>
 
 #include <wpi/StringExtras.h>
 #include <wpi/fmt/raw_ostream.h>
+#include <wpi/print.h>
 
 #include "wpinet/raw_uv_ostream.h"
 #include "wpinet/uv/Buffer.h"
@@ -158,7 +160,7 @@ void WebSocketServer::Abort(uint16_t code, std::string_view reason) {
   raw_uv_ostream os{bufs, 1024};
 
   // Handle unsupported version
-  fmt::print(os, "HTTP/1.1 {} {}\r\n", code, reason);
+  wpi::print(os, "HTTP/1.1 {} {}\r\n", code, reason);
   if (code == 426) {
     os << "Upgrade: WebSocket\r\n";
   }

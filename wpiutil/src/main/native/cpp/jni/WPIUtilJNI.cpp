@@ -6,12 +6,13 @@
 
 #include <jni.h>
 
-#include <fmt/format.h>
-
 #include "edu_wpi_first_util_WPIUtilJNI.h"
+#include "wpi/DataLog.h"
+#include "wpi/FileLogger.h"
 #include "wpi/RawFrame.h"
 #include "wpi/Synchronization.h"
 #include "wpi/jni_util.h"
+#include "wpi/print.h"
 #include "wpi/timestamp.h"
 
 using namespace wpi::java;
@@ -22,12 +23,14 @@ static uint64_t mockNow = 0;
 static JException illegalArgEx;
 static JException indexOobEx;
 static JException interruptedEx;
+static JException ioEx;
 static JException nullPointerEx;
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgEx},
     {"java/lang/IndexOutOfBoundsException", &indexOobEx},
     {"java/lang/InterruptedException", &interruptedEx},
+    {"java/io/IOException", &ioEx},
     {"java/lang/NullPointerException", &nullPointerEx}};
 
 void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
@@ -36,6 +39,10 @@ void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
 
 void wpi::ThrowIndexOobException(JNIEnv* env, std::string_view msg) {
   indexOobEx.Throw(env, msg);
+}
+
+void wpi::ThrowIOException(JNIEnv* env, std::string_view msg) {
+  ioEx.Throw(env, msg);
 }
 
 void wpi::ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
@@ -80,7 +87,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_writeStderr
   (JNIEnv* env, jclass, jstring str)
 {
-  fmt::print(stderr, "{}", JStringRef{env, str}.str());
+  wpi::print(stderr, "{}", JStringRef{env, str}.str());
 }
 
 /*
@@ -93,7 +100,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_enableMockTime
   (JNIEnv*, jclass)
 {
 #ifdef __FRC_ROBORIO__
-  fmt::print(stderr, "WPIUtil: Mocking time is not available on the Rio\n");
+  wpi::print(stderr, "WPIUtil: Mocking time is not available on the Rio\n");
 #else
   mockTimeEnabled = true;
   wpi::SetNowImpl([] { return mockNow; });
@@ -409,4 +416,41 @@ Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameInfo
   f->pixelFormat = pixelFormat;
 }
 
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    createFileLogger
+ * Signature: (Ljava/lang/String;JLjava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_createFileLogger
+  (JNIEnv* env, jclass, jstring file, jlong log, jstring key)
+{
+  if (!file) {
+    wpi::ThrowNullPointerException(env, "file is null");
+    return 0;
+  }
+  auto* f = reinterpret_cast<wpi::log::DataLog*>(log);
+  if (!f) {
+    wpi::ThrowNullPointerException(env, "log is null");
+    return 0;
+  }
+  if (!key) {
+    wpi::ThrowNullPointerException(env, "key is null");
+    return 0;
+  }
+  return reinterpret_cast<jlong>(
+      new wpi::FileLogger{JStringRef{env, file}, *f, JStringRef{env, key}});
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    freeFileLogger
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_freeFileLogger
+  (JNIEnv* env, jclass, jlong fileTail)
+{
+  delete reinterpret_cast<wpi::FileLogger*>(fileTail);
+}
 }  // extern "C"

@@ -7,7 +7,7 @@ The subheaders now have namespace declarations so C++ standard library
 headers can be included in the global namespace. Doing otherwise can
 cause ambiguous declarations of cmath functions.
 ---
- include/gcem.hpp                              | 151 +++++++++---------
+ include/gcem.hpp                              | 157 +++++++++---------
  include/gcem_incl/abs.hpp                     |  12 ++
  include/gcem_incl/acos.hpp                    |  12 ++
  include/gcem_incl/acosh.hpp                   |  12 ++
@@ -26,6 +26,9 @@ cause ambiguous declarations of cmath functions.
  include/gcem_incl/erf_inv.hpp                 |   4 +
  include/gcem_incl/exp.hpp                     |  12 ++
  include/gcem_incl/expm1.hpp                   |  12 ++
+ include/gcem_incl/fabs.hpp                    |   5 +
+ include/gcem_incl/fabsf.hpp                   |   5 +
+ include/gcem_incl/fabsl.hpp                   |   5 +
  include/gcem_incl/factorial.hpp               |   5 +
  include/gcem_incl/find_exponent.hpp           |   5 +
  include/gcem_incl/find_fraction.hpp           |   5 +
@@ -71,13 +74,13 @@ cause ambiguous declarations of cmath functions.
  include/gcem_incl/tanh.hpp                    |  12 ++
  include/gcem_incl/tgamma.hpp                  |  12 ++
  include/gcem_incl/trunc.hpp                   |  12 ++
- 64 files changed, 645 insertions(+), 79 deletions(-)
+ 67 files changed, 663 insertions(+), 82 deletions(-)
 
 diff --git a/include/gcem.hpp b/include/gcem.hpp
-index 650d05d894786b123aefbc6d88c93604164d56d2..8ea7b2a279ecf4dcf684a39ee7e96db84e61a421 100644
+index 4da27db32678d62515bd90846852df3d3cd3682c..fee151e28fb59bd37d0e45c4bc5aa6ce166843f9 100644
 --- a/include/gcem.hpp
 +++ b/include/gcem.hpp
-@@ -23,82 +23,79 @@
+@@ -23,85 +23,82 @@
  
  #include "gcem_incl/gcem_options.hpp"
  
@@ -95,6 +98,9 @@ index 650d05d894786b123aefbc6d88c93604164d56d2..8ea7b2a279ecf4dcf684a39ee7e96db8
 -    #include "gcem_incl/sgn.hpp"
 -
 -    #include "gcem_incl/abs.hpp"
+-    #include "gcem_incl/fabs.hpp"
+-    #include "gcem_incl/fabsf.hpp"
+-    #include "gcem_incl/fabsl.hpp"
 -    #include "gcem_incl/ceil.hpp"
 -    #include "gcem_incl/floor.hpp"
 -    #include "gcem_incl/trunc.hpp"
@@ -170,6 +176,9 @@ index 650d05d894786b123aefbc6d88c93604164d56d2..8ea7b2a279ecf4dcf684a39ee7e96db8
 +#include "gcem_incl/sgn.hpp"
 +
 +#include "gcem_incl/abs.hpp"
++#include "gcem_incl/fabs.hpp"
++#include "gcem_incl/fabsf.hpp"
++#include "gcem_incl/fabsl.hpp"
 +#include "gcem_incl/ceil.hpp"
 +#include "gcem_incl/floor.hpp"
 +#include "gcem_incl/trunc.hpp"
@@ -235,7 +244,7 @@ index 650d05d894786b123aefbc6d88c93604164d56d2..8ea7b2a279ecf4dcf684a39ee7e96db8
  
  #endif
 diff --git a/include/gcem_incl/abs.hpp b/include/gcem_incl/abs.hpp
-index 6d7b66d91bc9f4d0c05fd0c3dd1571b552d8a19a..8e8330b198a206ea4f422d6782c66fe92bdd6522 100644
+index 26b055a5776e23f4f32d941d5f6821e4f6a4ae21..66532d90128ac739ea16ffeef4ef0f0370ea1ac4 100644
 --- a/include/gcem_incl/abs.hpp
 +++ b/include/gcem_incl/abs.hpp
 @@ -21,6 +21,12 @@
@@ -271,7 +280,7 @@ index 6d7b66d91bc9f4d0c05fd0c3dd1571b552d8a19a..8e8330b198a206ea4f422d6782c66fe9
  
  #endif
 diff --git a/include/gcem_incl/acos.hpp b/include/gcem_incl/acos.hpp
-index a47003d61d8ab2fb7dd0226410e1457809a73458..2e24d2acb61b5a5b647e707950cded8850b0ea66 100644
+index 6bce7a599812b4641627ae152e177fe866e59251..6f9edc450e6ebe51d589c406b50b336be669340e 100644
 --- a/include/gcem_incl/acos.hpp
 +++ b/include/gcem_incl/acos.hpp
 @@ -25,6 +25,12 @@
@@ -302,7 +311,7 @@ index a47003d61d8ab2fb7dd0226410e1457809a73458..2e24d2acb61b5a5b647e707950cded88
  
  #endif
 diff --git a/include/gcem_incl/acosh.hpp b/include/gcem_incl/acosh.hpp
-index 8767200778168aeb409f16945b2ceac75b69158d..778c36cad6ebd849696aaa68d2697a5145a410a3 100644
+index 10b1957f395faa8e0e55649d07122597b1b97cce..7059d4de907f61b089aa830b4cb0ef5756093e2e 100644
 --- a/include/gcem_incl/acosh.hpp
 +++ b/include/gcem_incl/acosh.hpp
 @@ -25,6 +25,12 @@
@@ -333,7 +342,7 @@ index 8767200778168aeb409f16945b2ceac75b69158d..778c36cad6ebd849696aaa68d2697a51
  
  #endif
 diff --git a/include/gcem_incl/asin.hpp b/include/gcem_incl/asin.hpp
-index 6a79e87df435c7e60b140b7c7133b22deea7fd73..39784aa10eb07ea9328ab819a1f396dd036719b4 100644
+index be4ee1ec3fb911a94278f394228aea482ce7acef..798ab5f9ae7b4d4dd21ca537cde5c9f8bea82085 100644
 --- a/include/gcem_incl/asin.hpp
 +++ b/include/gcem_incl/asin.hpp
 @@ -25,6 +25,12 @@
@@ -364,7 +373,7 @@ index 6a79e87df435c7e60b140b7c7133b22deea7fd73..39784aa10eb07ea9328ab819a1f396dd
  
  #endif
 diff --git a/include/gcem_incl/asinh.hpp b/include/gcem_incl/asinh.hpp
-index a5f3ff62a0208d350f4027d736ce3fc035c16ded..0a5969369a7a7856e41de1d891d571d5dd3c481f 100644
+index 15b1114b5118300cc78b43863b5e8e87cbf65d02..8e90dbbab65fecea0bb5fead133068005a951aa2 100644
 --- a/include/gcem_incl/asinh.hpp
 +++ b/include/gcem_incl/asinh.hpp
 @@ -25,6 +25,12 @@
@@ -395,7 +404,7 @@ index a5f3ff62a0208d350f4027d736ce3fc035c16ded..0a5969369a7a7856e41de1d891d571d5
  
  #endif
 diff --git a/include/gcem_incl/atan.hpp b/include/gcem_incl/atan.hpp
-index 3f46974c07920fca6396e42e93261d8167a27eb1..19b9d4e10d75b067527133060d3b07719f6cfb4c 100644
+index 3bfeab0d90464206838f2474937dac57e6203aaa..fdcb522825b7e3ecdf4cc103564b978d58ce2e87 100644
 --- a/include/gcem_incl/atan.hpp
 +++ b/include/gcem_incl/atan.hpp
 @@ -29,6 +29,12 @@
@@ -411,7 +420,7 @@ index 3f46974c07920fca6396e42e93261d8167a27eb1..19b9d4e10d75b067527133060d3b0771
  namespace internal
  {
  
-@@ -149,7 +155,13 @@ return_t<T>
+@@ -211,7 +217,13 @@ return_t<T>
  atan(const T x)
  noexcept
  {
@@ -426,7 +435,7 @@ index 3f46974c07920fca6396e42e93261d8167a27eb1..19b9d4e10d75b067527133060d3b0771
  
  #endif
 diff --git a/include/gcem_incl/atan2.hpp b/include/gcem_incl/atan2.hpp
-index 5ca55b79c8e11569511fb6d4842c74be50c70c67..07a02cf4a2e134705b514a1031d1d7f47294bdf1 100644
+index 4797de21348137cb50dc1974d90d72db9005ef33..79dccc83da93d25882168d8f4acba98d5cf55b96 100644
 --- a/include/gcem_incl/atan2.hpp
 +++ b/include/gcem_incl/atan2.hpp
 @@ -25,6 +25,12 @@
@@ -457,7 +466,7 @@ index 5ca55b79c8e11569511fb6d4842c74be50c70c67..07a02cf4a2e134705b514a1031d1d7f4
  
  #endif
 diff --git a/include/gcem_incl/atanh.hpp b/include/gcem_incl/atanh.hpp
-index dfb4dc312d479e2c6dd837d2391bc658e3b678ed..5c4475bead1034c1b5b1583ad3050a85d380d629 100644
+index 54f7f4983f906e3e950222599f2f41d503308ad8..ea45df8f37bb55988dded9068743c8cb313f4e30 100644
 --- a/include/gcem_incl/atanh.hpp
 +++ b/include/gcem_incl/atanh.hpp
 @@ -25,6 +25,12 @@
@@ -488,7 +497,7 @@ index dfb4dc312d479e2c6dd837d2391bc658e3b678ed..5c4475bead1034c1b5b1583ad3050a85
  
  #endif
 diff --git a/include/gcem_incl/beta.hpp b/include/gcem_incl/beta.hpp
-index e43d4fcd9a10e37e16652351ec7092cb7200f808..3439af1b57e0135eb1c53a15d14dbbbfbe57bc13 100644
+index d7222c7422737b913db48b7af6426d88ad270a1a..b135bdcd6201d5a0a3190c325e593e4f292d0d39 100644
 --- a/include/gcem_incl/beta.hpp
 +++ b/include/gcem_incl/beta.hpp
 @@ -21,6 +21,12 @@
@@ -523,7 +532,7 @@ index e43d4fcd9a10e37e16652351ec7092cb7200f808..3439af1b57e0135eb1c53a15d14dbbbf
  
  #endif
 diff --git a/include/gcem_incl/binomial_coef.hpp b/include/gcem_incl/binomial_coef.hpp
-index 0fc17f384d708b4bd81905d49b20f8037c4701ae..a1f764b97b78cbaf8fb66117dab374dc55f04d49 100644
+index 79200aa2e7367fb99565dff9a21def077b4b2499..c63d138f9de0d3fd21da66dc7a145d9deb69b445 100644
 --- a/include/gcem_incl/binomial_coef.hpp
 +++ b/include/gcem_incl/binomial_coef.hpp
 @@ -21,6 +21,9 @@
@@ -546,7 +555,7 @@ index 0fc17f384d708b4bd81905d49b20f8037c4701ae..a1f764b97b78cbaf8fb66117dab374dc
 +
 +#endif
 diff --git a/include/gcem_incl/ceil.hpp b/include/gcem_incl/ceil.hpp
-index ff1097bac2f53c3f6a4b3d4bfc612e0fcd34a63b..2611e6560bfefc4efe782849c88d74bc3ebf9d76 100644
+index eed0c1c76b6ff7ca41ba73b95977d63e30385e60..f8fd82b2550a84e1cfc6729e22935fe8efb4812a 100644
 --- a/include/gcem_incl/ceil.hpp
 +++ b/include/gcem_incl/ceil.hpp
 @@ -21,6 +21,12 @@
@@ -577,7 +586,7 @@ index ff1097bac2f53c3f6a4b3d4bfc612e0fcd34a63b..2611e6560bfefc4efe782849c88d74bc
  
  #endif
 diff --git a/include/gcem_incl/copysign.hpp b/include/gcem_incl/copysign.hpp
-index c1741f7f321110ff3cf52cb9035d5f2dca5f0ffc..d1181995c7d0fd92668c766f7fd9288c17312159 100644
+index 43c189eee325278f624df613f89229d617e98e25..c97e024b4e5919089e090518d535d28e8c4511a6 100644
 --- a/include/gcem_incl/copysign.hpp
 +++ b/include/gcem_incl/copysign.hpp
 @@ -21,6 +21,12 @@
@@ -608,7 +617,7 @@ index c1741f7f321110ff3cf52cb9035d5f2dca5f0ffc..d1181995c7d0fd92668c766f7fd9288c
  
  #endif
 diff --git a/include/gcem_incl/cos.hpp b/include/gcem_incl/cos.hpp
-index 82f4c609f5268d19771e281987ed1653e81ef173..be73b55e3f2023538d33eedc78c9ed3e93014384 100644
+index 3f674602d737044f021a52b57b7f850c1ee7c59e..cf25ffef3b2a63ca3aca6876b19fa6973aacc5a4 100644
 --- a/include/gcem_incl/cos.hpp
 +++ b/include/gcem_incl/cos.hpp
 @@ -25,6 +25,12 @@
@@ -639,7 +648,7 @@ index 82f4c609f5268d19771e281987ed1653e81ef173..be73b55e3f2023538d33eedc78c9ed3e
  
  #endif
 diff --git a/include/gcem_incl/cosh.hpp b/include/gcem_incl/cosh.hpp
-index fc89c0d06482a687442998da511eb1e7b17f95d5..53e5bb12641b4f13d43aee7a77c0d02bf845688a 100644
+index 36a232072b35b73c9fb69784a076475eb1868857..d56d2bc4d277ed811a4e893511d49a80f05b8cc5 100644
 --- a/include/gcem_incl/cosh.hpp
 +++ b/include/gcem_incl/cosh.hpp
 @@ -25,6 +25,12 @@
@@ -670,7 +679,7 @@ index fc89c0d06482a687442998da511eb1e7b17f95d5..53e5bb12641b4f13d43aee7a77c0d02b
  
  #endif
 diff --git a/include/gcem_incl/erf.hpp b/include/gcem_incl/erf.hpp
-index d0bc83ada14af7a4b50262541c8558016823303a..319669d7f0d0bfd0cd91e3bd94e9bbd0c92c66ea 100644
+index 7d74d2e9b78b3bfd9f88420ce3b364837ebf161b..d48edea430f2a5b5e695c0c3aeb57bff0b7626f9 100644
 --- a/include/gcem_incl/erf.hpp
 +++ b/include/gcem_incl/erf.hpp
 @@ -25,6 +25,12 @@
@@ -686,7 +695,7 @@ index d0bc83ada14af7a4b50262541c8558016823303a..319669d7f0d0bfd0cd91e3bd94e9bbd0
  namespace internal
  {
  
-@@ -137,7 +143,13 @@ return_t<T>
+@@ -185,7 +191,13 @@ return_t<T>
  erf(const T x)
  noexcept
  {
@@ -701,7 +710,7 @@ index d0bc83ada14af7a4b50262541c8558016823303a..319669d7f0d0bfd0cd91e3bd94e9bbd0
  
  #endif
 diff --git a/include/gcem_incl/erf_inv.hpp b/include/gcem_incl/erf_inv.hpp
-index 412d686be268dd7668ca517e10e5e4be4263f0d7..c4f0d9d5abb46172fda7c6702bc31561f5680a37 100644
+index be580e5aa8d08161986d1c09943b62be0fedbf83..f9b45e08fbb38109ba2ab39cb6485873b122517e 100644
 --- a/include/gcem_incl/erf_inv.hpp
 +++ b/include/gcem_incl/erf_inv.hpp
 @@ -28,6 +28,9 @@
@@ -722,7 +731,7 @@ index 412d686be268dd7668ca517e10e5e4be4263f0d7..c4f0d9d5abb46172fda7c6702bc31561
  
  #endif
 diff --git a/include/gcem_incl/exp.hpp b/include/gcem_incl/exp.hpp
-index 595ffc2a6202d763560fd879f27fcef32c6b2d64..1708542df5153aeb6c2366078f32660ea002d51c 100644
+index 03a8db8a2ecbf95e91ae6b0b18de3a22b70f1d2b..d4a36f3c9b05d70a4fec6b8d2078c44c0871601a 100644
 --- a/include/gcem_incl/exp.hpp
 +++ b/include/gcem_incl/exp.hpp
 @@ -25,6 +25,12 @@
@@ -753,7 +762,7 @@ index 595ffc2a6202d763560fd879f27fcef32c6b2d64..1708542df5153aeb6c2366078f32660e
  
  #endif
 diff --git a/include/gcem_incl/expm1.hpp b/include/gcem_incl/expm1.hpp
-index 70c9ecf5a4a241bfef617e6e4ee0000a80978355..6adddc929aff7c87395a6b78070c65646ad61f2f 100644
+index a3bb7649195a48a2a58cc41f8a660046e35721e4..91c6a66163c668ea01c22307d0d30dce98e5b8f4 100644
 --- a/include/gcem_incl/expm1.hpp
 +++ b/include/gcem_incl/expm1.hpp
 @@ -25,6 +25,12 @@
@@ -783,8 +792,71 @@ index 70c9ecf5a4a241bfef617e6e4ee0000a80978355..6adddc929aff7c87395a6b78070c6564
  }
  
  #endif
+diff --git a/include/gcem_incl/fabs.hpp b/include/gcem_incl/fabs.hpp
+index 58db0466e0778c61fc1da8b83db588911e59eb65..515aa2197ce7d4cacbabe5ba12f38c8e9b1cb680 100644
+--- a/include/gcem_incl/fabs.hpp
++++ b/include/gcem_incl/fabs.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_fabs_HPP
+ #define _gcem_fabs_HPP
+ 
++namespace gcem
++{
++
+ /**
+  * Compile-time floating-point absolute value function
+  *
+@@ -37,4 +40,6 @@ noexcept
+     return gcem::abs( static_cast<return_t<T>>(x) );
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/fabsf.hpp b/include/gcem_incl/fabsf.hpp
+index 9377b0cef984cc817dc24440d803b8af0100ad26..e2086bc859ae0677cae2b399e45a63680d788e29 100644
+--- a/include/gcem_incl/fabsf.hpp
++++ b/include/gcem_incl/fabsf.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_fabsf_HPP
+ #define _gcem_fabsf_HPP
+ 
++namespace gcem
++{
++
+ /**
+  * Compile-time floating-point absolute value function
+  *
+@@ -37,4 +40,6 @@ noexcept
+     return gcem::abs( static_cast<float>(x) );
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/fabsl.hpp b/include/gcem_incl/fabsl.hpp
+index 99aae95f54511e5e8788b5ca89363dc540cbf5c9..9dcdc9485413b49971e979de33338e98c2063f52 100644
+--- a/include/gcem_incl/fabsl.hpp
++++ b/include/gcem_incl/fabsl.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_fabsl_HPP
+ #define _gcem_fabsl_HPP
+ 
++namespace gcem
++{
++
+ /**
+  * Compile-time floating-point absolute value function
+  *
+@@ -37,4 +40,6 @@ noexcept
+     return gcem::abs( static_cast<long double>(x) );
+ }
+ 
++}
++
+ #endif
 diff --git a/include/gcem_incl/factorial.hpp b/include/gcem_incl/factorial.hpp
-index ffb9c824751a572c0982e11b9cddbe40cb567a3f..977e6970e4479ab39e65affbdd400827d29e7809 100644
+index d7762539c1b77c92057870f9ae5bf9f39426dbee..5d74bc24e7b3a95cb77dd1e25df3baecbbd221cc 100644
 --- a/include/gcem_incl/factorial.hpp
 +++ b/include/gcem_incl/factorial.hpp
 @@ -25,6 +25,9 @@
@@ -797,7 +869,7 @@ index ffb9c824751a572c0982e11b9cddbe40cb567a3f..977e6970e4479ab39e65affbdd400827
  namespace internal
  {
  
-@@ -95,4 +98,6 @@ noexcept
+@@ -97,4 +100,6 @@ noexcept
      return internal::factorial_recur(x);
  }
  
@@ -805,7 +877,7 @@ index ffb9c824751a572c0982e11b9cddbe40cb567a3f..977e6970e4479ab39e65affbdd400827
 +
  #endif
 diff --git a/include/gcem_incl/find_exponent.hpp b/include/gcem_incl/find_exponent.hpp
-index 200e4e9be1558a61ed608be290bde5a6921363ea..4ffbcf294e61aa847d3e769e50ad9c3eddd8927a 100644
+index fc14a6b516d37fd6440f04702b874989d4fb7f50..b8c09d22786cf94bc587eb3cbf30a11198c7b2b2 100644
 --- a/include/gcem_incl/find_exponent.hpp
 +++ b/include/gcem_incl/find_exponent.hpp
 @@ -25,6 +25,9 @@
@@ -826,7 +898,7 @@ index 200e4e9be1558a61ed608be290bde5a6921363ea..4ffbcf294e61aa847d3e769e50ad9c3e
 +
  #endif
 diff --git a/include/gcem_incl/find_fraction.hpp b/include/gcem_incl/find_fraction.hpp
-index 5ed3d269ab54b3c90b3d681b76e8420e89e4527f..76893135383e5f6f5993d335c7b232114fdd90e3 100644
+index 7af2d9df95fe25d4d32a85073e0b79983c9a7016..cf359711451f7b6c14c2b1d9fd28fd3a3425efc7 100644
 --- a/include/gcem_incl/find_fraction.hpp
 +++ b/include/gcem_incl/find_fraction.hpp
 @@ -25,6 +25,9 @@
@@ -847,7 +919,7 @@ index 5ed3d269ab54b3c90b3d681b76e8420e89e4527f..76893135383e5f6f5993d335c7b23211
 +
  #endif
 diff --git a/include/gcem_incl/find_whole.hpp b/include/gcem_incl/find_whole.hpp
-index d19363219871803f8cfeafadb0a88189d2f98f0e..561050e91f9e43faf4d80fd08b7e63537b622422 100644
+index d18133278132ba585f8778561605417ffeed55a8..b9a8ef6b3f9d9dba0078bd33de2a51dbfa87c3fc 100644
 --- a/include/gcem_incl/find_whole.hpp
 +++ b/include/gcem_incl/find_whole.hpp
 @@ -25,6 +25,9 @@
@@ -868,7 +940,7 @@ index d19363219871803f8cfeafadb0a88189d2f98f0e..561050e91f9e43faf4d80fd08b7e6353
 +
  #endif
 diff --git a/include/gcem_incl/floor.hpp b/include/gcem_incl/floor.hpp
-index 8b260ff8a10fb8b9d048307c7d9b18a7e91900c1..3b3b86a12aa49e1c51957d170744a65690aeefdc 100644
+index 45020be5de6778b4595262cde0faaae2bcd638d8..d4bb1d61aa89eb555b93222b9af6b7388c477cc4 100644
 --- a/include/gcem_incl/floor.hpp
 +++ b/include/gcem_incl/floor.hpp
 @@ -21,6 +21,12 @@
@@ -899,7 +971,7 @@ index 8b260ff8a10fb8b9d048307c7d9b18a7e91900c1..3b3b86a12aa49e1c51957d170744a656
  
  #endif
 diff --git a/include/gcem_incl/fmod.hpp b/include/gcem_incl/fmod.hpp
-index 02459efd4b3a016939a306c9fd1a7ead12ff123b..58c454455edf132c078779ec15e254c96228b514 100644
+index 965cf4a48d95878ed004360c4eded3667df40ad4..db336a6958f3d6de5e801b277620131ec21b25b2 100644
 --- a/include/gcem_incl/fmod.hpp
 +++ b/include/gcem_incl/fmod.hpp
 @@ -21,6 +21,12 @@
@@ -930,7 +1002,7 @@ index 02459efd4b3a016939a306c9fd1a7ead12ff123b..58c454455edf132c078779ec15e254c9
  
  #endif
 diff --git a/include/gcem_incl/gcd.hpp b/include/gcem_incl/gcd.hpp
-index 1e277fbab61a06a20758f55d2c71ca57037f9d57..c5b14a22aafe7738dd14d120cab4dc6b31a5ad91 100644
+index cfa548a19a532a6f1d5946dc1a68eaadc6578cd7..41d07de2e51da5b86ad25e2c2b1e3539a8eba6ee 100644
 --- a/include/gcem_incl/gcd.hpp
 +++ b/include/gcem_incl/gcd.hpp
 @@ -21,6 +21,9 @@
@@ -951,7 +1023,7 @@ index 1e277fbab61a06a20758f55d2c71ca57037f9d57..c5b14a22aafe7738dd14d120cab4dc6b
 +
  #endif
 diff --git a/include/gcem_incl/hypot.hpp b/include/gcem_incl/hypot.hpp
-index 01ad4e9212547c649113e50954a73ee9f7394334..00e10f899ace8f0da925fa9e46fa3f79f7e83aa0 100644
+index fe67c1bd43b0f04ef64f0be19cba2651958ed737..22a402066430f4fde68f9d622ccdf7c646a3cbd6 100644
 --- a/include/gcem_incl/hypot.hpp
 +++ b/include/gcem_incl/hypot.hpp
 @@ -27,6 +27,12 @@
@@ -982,7 +1054,7 @@ index 01ad4e9212547c649113e50954a73ee9f7394334..00e10f899ace8f0da925fa9e46fa3f79
  
  #endif
 diff --git a/include/gcem_incl/incomplete_beta.hpp b/include/gcem_incl/incomplete_beta.hpp
-index dbb9f60341b09102b137de2b9ded75280a315d57..681cc59953f0f2b1bd3603216286edce06ce46cc 100644
+index 12287f551e1f89ab9525517dcec0762cc341845e..2ead5a1c83d3d093b10627a4d05bbc0fe7249746 100644
 --- a/include/gcem_incl/incomplete_beta.hpp
 +++ b/include/gcem_incl/incomplete_beta.hpp
 @@ -27,6 +27,9 @@
@@ -1003,7 +1075,7 @@ index dbb9f60341b09102b137de2b9ded75280a315d57..681cc59953f0f2b1bd3603216286edce
 +
  #endif
 diff --git a/include/gcem_incl/incomplete_beta_inv.hpp b/include/gcem_incl/incomplete_beta_inv.hpp
-index 9f575a360427d8b4ba9ebb940c2baf7ee242251c..3878d37db3bbef56e14bc053b9577b4f96c6c63c 100644
+index f00b362622c1b92ac327734c3fa539345d401042..a8c6fef8a66311201479871fc174668f945a4aec 100644
 --- a/include/gcem_incl/incomplete_beta_inv.hpp
 +++ b/include/gcem_incl/incomplete_beta_inv.hpp
 @@ -25,6 +25,9 @@
@@ -1024,7 +1096,7 @@ index 9f575a360427d8b4ba9ebb940c2baf7ee242251c..3878d37db3bbef56e14bc053b9577b4f
 +
  #endif
 diff --git a/include/gcem_incl/incomplete_gamma.hpp b/include/gcem_incl/incomplete_gamma.hpp
-index 9ee4146de0aacffee1f418bd91069c921e0a6a29..0432b7d3c6f75a726847c9d84d52e387df16f618 100644
+index 21d3de564749e0e4be45bf59c95528cda06c269b..10e1a320071eabd708a1ac46ef391dc155429e2d 100644
 --- a/include/gcem_incl/incomplete_gamma.hpp
 +++ b/include/gcem_incl/incomplete_gamma.hpp
 @@ -25,6 +25,9 @@
@@ -1045,7 +1117,7 @@ index 9ee4146de0aacffee1f418bd91069c921e0a6a29..0432b7d3c6f75a726847c9d84d52e387
 +
  #endif
 diff --git a/include/gcem_incl/incomplete_gamma_inv.hpp b/include/gcem_incl/incomplete_gamma_inv.hpp
-index e5976d08fddb5eb83ad40d200c5973d8ce2d6a36..6b1575b89c8e7284aee55882d12f1ee308d0cba3 100644
+index bad75cd21184a34e0ab981398fe2425da68a011c..0a5709741eaef577b8a27b082f1bcc8ea7e26040 100644
 --- a/include/gcem_incl/incomplete_gamma_inv.hpp
 +++ b/include/gcem_incl/incomplete_gamma_inv.hpp
 @@ -25,6 +25,9 @@
@@ -1066,7 +1138,7 @@ index e5976d08fddb5eb83ad40d200c5973d8ce2d6a36..6b1575b89c8e7284aee55882d12f1ee3
 +
  #endif
 diff --git a/include/gcem_incl/inv_sqrt.hpp b/include/gcem_incl/inv_sqrt.hpp
-index d0e33fb743b09e7c72506599414f7a4e0e7e5058..466e76fc5e844ba4b3c6be1a6a2a5f20b4e3607f 100644
+index 62fa56eb3f20fdc649e2bb3eb55f80f2dc77ba73..b18eb793f39e014b7f887d2002cc29b2ebe34274 100644
 --- a/include/gcem_incl/inv_sqrt.hpp
 +++ b/include/gcem_incl/inv_sqrt.hpp
 @@ -25,6 +25,9 @@
@@ -1087,7 +1159,7 @@ index d0e33fb743b09e7c72506599414f7a4e0e7e5058..466e76fc5e844ba4b3c6be1a6a2a5f20
 +
  #endif
 diff --git a/include/gcem_incl/is_even.hpp b/include/gcem_incl/is_even.hpp
-index de0641d85299a77380ba204e5e1d88538106468f..5aff6a3fa634d84b3fad6c831e3bb93797daee37 100644
+index 20c8cc96128c1da1c3943245579520eaaa726c43..8f9e7a4022f15ed0ea5ab01ed20bdafc6e941593 100644
 --- a/include/gcem_incl/is_even.hpp
 +++ b/include/gcem_incl/is_even.hpp
 @@ -25,6 +25,9 @@
@@ -1108,7 +1180,7 @@ index de0641d85299a77380ba204e5e1d88538106468f..5aff6a3fa634d84b3fad6c831e3bb937
 +
  #endif
 diff --git a/include/gcem_incl/is_finite.hpp b/include/gcem_incl/is_finite.hpp
-index b632fa34728ea66b595be68d48185474c3fe775e..805cbc4ab6708a51c95186801a1b0b02e0083e92 100644
+index ff39a4677887b113daaa3ec6dc6810421389c7b3..e94afbec9fe41fc1ff5748faec90089517eaed44 100644
 --- a/include/gcem_incl/is_finite.hpp
 +++ b/include/gcem_incl/is_finite.hpp
 @@ -25,6 +25,9 @@
@@ -1129,7 +1201,7 @@ index b632fa34728ea66b595be68d48185474c3fe775e..805cbc4ab6708a51c95186801a1b0b02
 +
  #endif
 diff --git a/include/gcem_incl/is_inf.hpp b/include/gcem_incl/is_inf.hpp
-index 568614f8efa0e25fad4f87e1b71080849127378d..fdc31de71a3e73fda17216fb29e962c9f8a00958 100644
+index 703e6a132f2a1f526d1c13c66153393e4f46e90b..2153abe6116af2cbe240004b4455902808cd71e4 100644
 --- a/include/gcem_incl/is_inf.hpp
 +++ b/include/gcem_incl/is_inf.hpp
 @@ -25,6 +25,9 @@
@@ -1150,7 +1222,7 @@ index 568614f8efa0e25fad4f87e1b71080849127378d..fdc31de71a3e73fda17216fb29e962c9
 +
  #endif
 diff --git a/include/gcem_incl/is_nan.hpp b/include/gcem_incl/is_nan.hpp
-index a3fcbc6c7cf6593965bee84b0eda0fc148f8f7ff..74092e6b087e47df45f70c6fcb5e62da53317f29 100644
+index 2fb1ed5c603793f3d16e8beaea388b4e72da7316..2ba70e455f20320d9c57944a4e824d024f183ae2 100644
 --- a/include/gcem_incl/is_nan.hpp
 +++ b/include/gcem_incl/is_nan.hpp
 @@ -25,6 +25,9 @@
@@ -1171,7 +1243,7 @@ index a3fcbc6c7cf6593965bee84b0eda0fc148f8f7ff..74092e6b087e47df45f70c6fcb5e62da
 +
  #endif
 diff --git a/include/gcem_incl/is_odd.hpp b/include/gcem_incl/is_odd.hpp
-index a74a8d34f20da4a060b000b58fe7abd5b53f38b0..a76802f7ffc9b0faecae4f64c981ea76116e7c2a 100644
+index db9767c3f07704df8892bf6f39996c564a4499ba..114397ab499d81e0289b4f94cf9a665a807b14cb 100644
 --- a/include/gcem_incl/is_odd.hpp
 +++ b/include/gcem_incl/is_odd.hpp
 @@ -25,6 +25,9 @@
@@ -1192,7 +1264,7 @@ index a74a8d34f20da4a060b000b58fe7abd5b53f38b0..a76802f7ffc9b0faecae4f64c981ea76
 +
  #endif
 diff --git a/include/gcem_incl/lbeta.hpp b/include/gcem_incl/lbeta.hpp
-index 60c87b4f53ec120121f1755635531dc4cc5ab26c..78f6849e72f56c35896e7e00ed9c3227a98114ba 100644
+index c111c05d4a561d4c21ea865036063662fe1caa35..8ada34d05fad2db3ad685a165df020652d9f13ed 100644
 --- a/include/gcem_incl/lbeta.hpp
 +++ b/include/gcem_incl/lbeta.hpp
 @@ -21,6 +21,9 @@
@@ -1213,7 +1285,7 @@ index 60c87b4f53ec120121f1755635531dc4cc5ab26c..78f6849e72f56c35896e7e00ed9c3227
 +
  #endif
 diff --git a/include/gcem_incl/lcm.hpp b/include/gcem_incl/lcm.hpp
-index a7ca7766f8906c1d26c071146aba3543880d8dd9..aa1f3397309a8a4517fed63d954737e043e28d1b 100644
+index a122ed147a3918ecb4238c2337b4c77686b7e915..e99ae7152dbd096dd22c2c120329549b642c1695 100644
 --- a/include/gcem_incl/lcm.hpp
 +++ b/include/gcem_incl/lcm.hpp
 @@ -21,6 +21,9 @@
@@ -1234,7 +1306,7 @@ index a7ca7766f8906c1d26c071146aba3543880d8dd9..aa1f3397309a8a4517fed63d954737e0
 +
  #endif
 diff --git a/include/gcem_incl/lgamma.hpp b/include/gcem_incl/lgamma.hpp
-index 507c6d4c91423b31be55426f494f67b0cb085c9f..e349ee88dba2d23982a6d4485bc33da076c70e22 100644
+index c613d34e2cc22991347cfff778c31a3dabbf6263..5bcc90aed53d85875f945578b44c271e447ee98a 100644
 --- a/include/gcem_incl/lgamma.hpp
 +++ b/include/gcem_incl/lgamma.hpp
 @@ -28,6 +28,12 @@
@@ -1265,7 +1337,7 @@ index 507c6d4c91423b31be55426f494f67b0cb085c9f..e349ee88dba2d23982a6d4485bc33da0
  
  #endif
 diff --git a/include/gcem_incl/lmgamma.hpp b/include/gcem_incl/lmgamma.hpp
-index 58915dc1e1a2edbbfdea58b57137cd22aaf4b717..b009de18e71c4360b55d0c1d80763f140190706f 100644
+index c5899d4fab22d72ccaf2028c9285725f9246a9ee..f50ad734df1c1547ac8de515878d7fabcfc70d6b 100644
 --- a/include/gcem_incl/lmgamma.hpp
 +++ b/include/gcem_incl/lmgamma.hpp
 @@ -25,6 +25,9 @@
@@ -1286,7 +1358,7 @@ index 58915dc1e1a2edbbfdea58b57137cd22aaf4b717..b009de18e71c4360b55d0c1d80763f14
 +
  #endif
 diff --git a/include/gcem_incl/log.hpp b/include/gcem_incl/log.hpp
-index c2e24b006c2fdd01196b189220f35ca982d8bf9e..15577c8bacca3f4d0036997a2a34603ff56b4b24 100644
+index 41fc5db7fe52af36fa3c6d1eea6e33e73271e9eb..6d1b8609ed81da88a7676af2d590c74f64962e5d 100644
 --- a/include/gcem_incl/log.hpp
 +++ b/include/gcem_incl/log.hpp
 @@ -25,6 +25,12 @@
@@ -1317,7 +1389,7 @@ index c2e24b006c2fdd01196b189220f35ca982d8bf9e..15577c8bacca3f4d0036997a2a34603f
  
  #endif
 diff --git a/include/gcem_incl/log10.hpp b/include/gcem_incl/log10.hpp
-index cda8894fdd62054f11ec4c3c3e6402c3752e0dd7..0e9a4dbdf58e2ed077e2f682706d98e71d794d67 100644
+index b87da556c7dc4cb3772d23e6aa0e0c40e46b000a..b361f1485347077fdf050aff3760db9fe639af1e 100644
 --- a/include/gcem_incl/log10.hpp
 +++ b/include/gcem_incl/log10.hpp
 @@ -25,6 +25,12 @@
@@ -1348,7 +1420,7 @@ index cda8894fdd62054f11ec4c3c3e6402c3752e0dd7..0e9a4dbdf58e2ed077e2f682706d98e7
  
  #endif
 diff --git a/include/gcem_incl/log1p.hpp b/include/gcem_incl/log1p.hpp
-index ccd08b8cb8799f2d4d34d5634dbc2fcabb3fd5b3..ed41daf39ec7e7062dc1da51ef0b0e106b56cf4e 100644
+index 8b33686d9633c4c2445f5f1e5eea6e2eebbcb2a5..7186f214d5f96a30a1ee78e3b97f60b7a20aef08 100644
 --- a/include/gcem_incl/log1p.hpp
 +++ b/include/gcem_incl/log1p.hpp
 @@ -25,6 +25,12 @@
@@ -1379,7 +1451,7 @@ index ccd08b8cb8799f2d4d34d5634dbc2fcabb3fd5b3..ed41daf39ec7e7062dc1da51ef0b0e10
  
  #endif
 diff --git a/include/gcem_incl/log2.hpp b/include/gcem_incl/log2.hpp
-index a97fed4c7236f816fa07ac2494f243adbac6742b..f8dc729f4f08348b8cc046468f40cfc84f1c9cb2 100644
+index eb255fef0512be92f3b08631a6d5bd827ac9cfbc..5530344578d9dc700585c588eabcb67990d37ffd 100644
 --- a/include/gcem_incl/log2.hpp
 +++ b/include/gcem_incl/log2.hpp
 @@ -25,6 +25,12 @@
@@ -1410,7 +1482,7 @@ index a97fed4c7236f816fa07ac2494f243adbac6742b..f8dc729f4f08348b8cc046468f40cfc8
  
  #endif
 diff --git a/include/gcem_incl/log_binomial_coef.hpp b/include/gcem_incl/log_binomial_coef.hpp
-index 2bcaadd8bc1c64744eb082955522339d48589aec..c4ba2fa3de9f4f77ac772d24c1432fc93cc51840 100644
+index 52606eeec77f7e3f461960eed747dc27d5848f4a..3766063c7d6178d577c15d5b05159785513d1d9b 100644
 --- a/include/gcem_incl/log_binomial_coef.hpp
 +++ b/include/gcem_incl/log_binomial_coef.hpp
 @@ -21,6 +21,9 @@
@@ -1433,7 +1505,7 @@ index 2bcaadd8bc1c64744eb082955522339d48589aec..c4ba2fa3de9f4f77ac772d24c1432fc9
 +
 +#endif
 diff --git a/include/gcem_incl/mantissa.hpp b/include/gcem_incl/mantissa.hpp
-index af23ea21d247327fa224370544e5f4410eac214b..4c95110d627568577440e5e662e72fdeffd95ade 100644
+index 869c00b0089cde7b628033b4379b9d1680cc93c2..718170cffafa48eca46623a6599e481adac398ca 100644
 --- a/include/gcem_incl/mantissa.hpp
 +++ b/include/gcem_incl/mantissa.hpp
 @@ -25,6 +25,9 @@
@@ -1454,14 +1526,14 @@ index af23ea21d247327fa224370544e5f4410eac214b..4c95110d627568577440e5e662e72fde
 +
  #endif
 diff --git a/include/gcem_incl/max.hpp b/include/gcem_incl/max.hpp
-index ddc3e4e6caff1a781e662a3ded8909cb703729ab..9f3901b4b19eb35331cd22be16c5b3a1ab5f65d6 100644
+index 1e34c93667830fae913f254846dda0d330df10d7..7a3c42fb7894e5c251450b7c41ecfa8072b96cb0 100644
 --- a/include/gcem_incl/max.hpp
 +++ b/include/gcem_incl/max.hpp
 @@ -21,6 +21,12 @@
  #ifndef _gcem_max_HPP
  #define _gcem_max_HPP
  
-+#include <cmath>
++#include <algorithm>
 +#include <type_traits>
 +
 +namespace gcem
@@ -1485,14 +1557,14 @@ index ddc3e4e6caff1a781e662a3ded8909cb703729ab..9f3901b4b19eb35331cd22be16c5b3a1
  
  #endif
 diff --git a/include/gcem_incl/min.hpp b/include/gcem_incl/min.hpp
-index 5ce70b38e6d243267a053ec33fae31e59f6a359f..a35bcf6e2cb65f8712b873d3ef2827aca2d4d0f0 100644
+index a41f6eb8b512647586cad10bb0b925c67ceac163..9e42b45d3b7612caa3914d6b1252d6791331bbc6 100644
 --- a/include/gcem_incl/min.hpp
 +++ b/include/gcem_incl/min.hpp
 @@ -21,6 +21,12 @@
  #ifndef _gcem_min_HPP
  #define _gcem_min_HPP
  
-+#include <cmath>
++#include <algorithm>
 +#include <type_traits>
 +
 +namespace gcem
@@ -1516,7 +1588,7 @@ index 5ce70b38e6d243267a053ec33fae31e59f6a359f..a35bcf6e2cb65f8712b873d3ef2827ac
  
  #endif
 diff --git a/include/gcem_incl/neg_zero.hpp b/include/gcem_incl/neg_zero.hpp
-index 79d24a4dd56f4c361774135bc9450c71a9f61627..90923035419d8b7a88ca46c9dcb3294f601312fb 100644
+index 3c6d464393f372a124ee2a263f890bc197b9f190..97547ac73405da7313c0ad4b277fcff4f7ef8437 100644
 --- a/include/gcem_incl/neg_zero.hpp
 +++ b/include/gcem_incl/neg_zero.hpp
 @@ -22,6 +22,9 @@
@@ -1536,7 +1608,7 @@ index 79d24a4dd56f4c361774135bc9450c71a9f61627..90923035419d8b7a88ca46c9dcb3294f
 +
 +}
 diff --git a/include/gcem_incl/pow.hpp b/include/gcem_incl/pow.hpp
-index 3891edef0e8f1e7b64e8632f46e87fd39bdba162..372166d40644ec5403d9308b5325a36a78ad2589 100644
+index b2b688c12d6a204b9305bb9ad02aac53908855de..293d9ae1bd3b300e7e281d64df8cf5a3749967cd 100644
 --- a/include/gcem_incl/pow.hpp
 +++ b/include/gcem_incl/pow.hpp
 @@ -25,6 +25,12 @@
@@ -1567,7 +1639,7 @@ index 3891edef0e8f1e7b64e8632f46e87fd39bdba162..372166d40644ec5403d9308b5325a36a
  
  #endif
 diff --git a/include/gcem_incl/pow_integral.hpp b/include/gcem_incl/pow_integral.hpp
-index 4e671557071e6377721f3ca721a7b5875f2ffd83..589d16406576bb637963aae33e40aeddf164079a 100644
+index ddb8643d0f48988ac41645d6c6306b222be2e6a7..765c30eb87c7f166227d1c586912d1e0bdc51383 100644
 --- a/include/gcem_incl/pow_integral.hpp
 +++ b/include/gcem_incl/pow_integral.hpp
 @@ -25,6 +25,9 @@
@@ -1588,7 +1660,7 @@ index 4e671557071e6377721f3ca721a7b5875f2ffd83..589d16406576bb637963aae33e40aedd
 +
  #endif
 diff --git a/include/gcem_incl/quadrature/gauss_legendre_30.hpp b/include/gcem_incl/quadrature/gauss_legendre_30.hpp
-index 295f43d9522dcdd7cae358dfc5b6382cfa7bd782..a80d2bb6f9b0dbc9936f3ed3e4f3770b4c307b7d 100644
+index 2c31fa5d3a104dcaf0dd1b82863ffd9030ea6d7d..987436892dbea0c43e6854db0a4aa16ec86537ac 100644
 --- a/include/gcem_incl/quadrature/gauss_legendre_30.hpp
 +++ b/include/gcem_incl/quadrature/gauss_legendre_30.hpp
 @@ -22,6 +22,9 @@
@@ -1608,7 +1680,7 @@ index 295f43d9522dcdd7cae358dfc5b6382cfa7bd782..a80d2bb6f9b0dbc9936f3ed3e4f3770b
 +
 +}
 diff --git a/include/gcem_incl/quadrature/gauss_legendre_50.hpp b/include/gcem_incl/quadrature/gauss_legendre_50.hpp
-index d4e448c56e923876f2f8627df4caa5d29eb1c501..85244daf1057aa2f07979a19765bcec3865950e2 100644
+index 953477e7c6eab7da3623bf042e0d3053fcb0e1bc..52df7c756d5935498cf50da75d596902557fd47e 100644
 --- a/include/gcem_incl/quadrature/gauss_legendre_50.hpp
 +++ b/include/gcem_incl/quadrature/gauss_legendre_50.hpp
 @@ -22,6 +22,9 @@
@@ -1628,7 +1700,7 @@ index d4e448c56e923876f2f8627df4caa5d29eb1c501..85244daf1057aa2f07979a19765bcec3
 +
 +}
 diff --git a/include/gcem_incl/round.hpp b/include/gcem_incl/round.hpp
-index 9ac4a09f0a9e7b09a303795d30ccee32ebe841b1..10fae649f89b0320e4f38f87fa8f8ffb41d75b9f 100644
+index 8f85203adaa233c07be00d03fb8f39fa0be7ff2b..b52140a06ae97feda0dd451c9b3c1e257b9d3c49 100644
 --- a/include/gcem_incl/round.hpp
 +++ b/include/gcem_incl/round.hpp
 @@ -21,6 +21,12 @@
@@ -1659,7 +1731,7 @@ index 9ac4a09f0a9e7b09a303795d30ccee32ebe841b1..10fae649f89b0320e4f38f87fa8f8ffb
  
  #endif
 diff --git a/include/gcem_incl/sgn.hpp b/include/gcem_incl/sgn.hpp
-index e2eec9e80b57e73396f3cf7f335692d88dcd752b..4c4adfa5a8d9da0e04c55195ec596ce58f63c0a8 100644
+index 8a516b263889769ee742e42967955fcd46c8cfd9..30ed611ece046b0004185c69af9247c95c1632c8 100644
 --- a/include/gcem_incl/sgn.hpp
 +++ b/include/gcem_incl/sgn.hpp
 @@ -21,6 +21,9 @@
@@ -1680,7 +1752,7 @@ index e2eec9e80b57e73396f3cf7f335692d88dcd752b..4c4adfa5a8d9da0e04c55195ec596ce5
 +
  #endif
 diff --git a/include/gcem_incl/signbit.hpp b/include/gcem_incl/signbit.hpp
-index 282e24403345dccfa8bf580112c129b43df5aa6d..40ec1dd157a687112f8258f76ea2ceb62d8ae22f 100644
+index 64db9c9051439f2c9349ef155d0b2e0784bed20c..b142384253a8bff04a3df239e49f9a843442e4d1 100644
 --- a/include/gcem_incl/signbit.hpp
 +++ b/include/gcem_incl/signbit.hpp
 @@ -21,6 +21,12 @@
@@ -1715,7 +1787,7 @@ index 282e24403345dccfa8bf580112c129b43df5aa6d..40ec1dd157a687112f8258f76ea2ceb6
  
  #endif
 diff --git a/include/gcem_incl/sin.hpp b/include/gcem_incl/sin.hpp
-index 56c8dcaf62dc22207ee7f41ec84d272e4535ab4e..c7c17600db0c8cb862c433183139d1f727fcea8b 100644
+index 8aa352d261d8fc227783b3f77481d315c408c38e..b9e79829d09a54d8c54d36ce83798fe3ab6eae72 100644
 --- a/include/gcem_incl/sin.hpp
 +++ b/include/gcem_incl/sin.hpp
 @@ -27,6 +27,12 @@
@@ -1746,7 +1818,7 @@ index 56c8dcaf62dc22207ee7f41ec84d272e4535ab4e..c7c17600db0c8cb862c433183139d1f7
  
  #endif
 diff --git a/include/gcem_incl/sinh.hpp b/include/gcem_incl/sinh.hpp
-index fe3ecdd0e719856c8bcc0e8d692d93c98c496942..9174d5d64a0622b56efac56fbfdc44994f78e78d 100644
+index c8c2ad86517b0d80d64f77e2691ce8d1741cec62..069a592819603c77bfde398249f2297132f30adb 100644
 --- a/include/gcem_incl/sinh.hpp
 +++ b/include/gcem_incl/sinh.hpp
 @@ -25,6 +25,12 @@
@@ -1777,7 +1849,7 @@ index fe3ecdd0e719856c8bcc0e8d692d93c98c496942..9174d5d64a0622b56efac56fbfdc4499
  
  #endif
 diff --git a/include/gcem_incl/sqrt.hpp b/include/gcem_incl/sqrt.hpp
-index 1b2753c99ede5189fc2272080828c83ca63a184c..201d89fa0df5680ceb53ec3aabb20213b4326325 100644
+index 4d5555dc3c55ff4c81e5f58a25b8dbb415b95b95..d2246bdd1b493adcf18ad37fbeb13bb87c05072d 100644
 --- a/include/gcem_incl/sqrt.hpp
 +++ b/include/gcem_incl/sqrt.hpp
 @@ -25,6 +25,12 @@
@@ -1808,7 +1880,7 @@ index 1b2753c99ede5189fc2272080828c83ca63a184c..201d89fa0df5680ceb53ec3aabb20213
  
  #endif
 diff --git a/include/gcem_incl/tan.hpp b/include/gcem_incl/tan.hpp
-index 386cce0f412107f65183031b3458455059f55d54..08c12d4ea07ee06d1bd25bfd7cea2c3204a72e6c 100644
+index 8872570b2ae72d265456f25d409ea75400f70763..bd47b78ae3b9706a9e61ffe0c3a1d9b785b5cc3d 100644
 --- a/include/gcem_incl/tan.hpp
 +++ b/include/gcem_incl/tan.hpp
 @@ -25,6 +25,12 @@
@@ -1839,7 +1911,7 @@ index 386cce0f412107f65183031b3458455059f55d54..08c12d4ea07ee06d1bd25bfd7cea2c32
  
  #endif
 diff --git a/include/gcem_incl/tanh.hpp b/include/gcem_incl/tanh.hpp
-index 30b431886601ec9f77ca9a93a6ca62b3cabd9e57..f25dabdb0f075d5597530cb9c1c41d0ba02e3783 100644
+index 3904921fe40ba9f13c2cde22bcd47c56f9884a8c..a4c20c16c2e7f825a6fcd0555d042b09c8d5cec3 100644
 --- a/include/gcem_incl/tanh.hpp
 +++ b/include/gcem_incl/tanh.hpp
 @@ -25,6 +25,12 @@
@@ -1855,7 +1927,7 @@ index 30b431886601ec9f77ca9a93a6ca62b3cabd9e57..f25dabdb0f075d5597530cb9c1c41d0b
  namespace internal
  {
  
-@@ -83,7 +89,13 @@ return_t<T>
+@@ -107,7 +113,13 @@ return_t<T>
  tanh(const T x)
  noexcept
  {
@@ -1870,7 +1942,7 @@ index 30b431886601ec9f77ca9a93a6ca62b3cabd9e57..f25dabdb0f075d5597530cb9c1c41d0b
  
  #endif
 diff --git a/include/gcem_incl/tgamma.hpp b/include/gcem_incl/tgamma.hpp
-index deffd3a8e77c34a9ebfd5209ee32594dc5b241e2..1d9fceecf8f9e062f2f1fa6080091b64cf533849 100644
+index 1ce05ba58628a4c187149bd33e3b7ad9f8415e96..bdec6f881810ebe2fb7c795c5912a61340545a48 100644
 --- a/include/gcem_incl/tgamma.hpp
 +++ b/include/gcem_incl/tgamma.hpp
 @@ -25,6 +25,12 @@
@@ -1901,7 +1973,7 @@ index deffd3a8e77c34a9ebfd5209ee32594dc5b241e2..1d9fceecf8f9e062f2f1fa6080091b64
  
  #endif
 diff --git a/include/gcem_incl/trunc.hpp b/include/gcem_incl/trunc.hpp
-index af3f448915f0f9a1b5f2d843596331f7874a6da5..f7a31ce7271339626127d6ca80dfb936fe53cc03 100644
+index 1d58cb3761cd9c4a8a451882b847a48697eaa2ee..396e95e3867d592d23717c6805ed0d0d9bcd8ff3 100644
 --- a/include/gcem_incl/trunc.hpp
 +++ b/include/gcem_incl/trunc.hpp
 @@ -21,6 +21,12 @@

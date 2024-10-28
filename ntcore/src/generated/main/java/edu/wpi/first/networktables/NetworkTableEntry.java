@@ -16,14 +16,6 @@ import java.nio.ByteBuffer;
 @SuppressWarnings("UnnecessaryParentheses")
 public final class NetworkTableEntry implements Publisher, Subscriber {
   /**
-   * Flag values (as returned by {@link #getFlags()}).
-   *
-   * @deprecated Use isPersistent() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public static final int kPersistent = 0x01;
-
-  /**
    * Construct from native handle.
    *
    * @param inst Instance
@@ -112,17 +104,6 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    */
   public NetworkTableType getType() {
     return NetworkTableType.getFromInt(NetworkTablesJNI.getType(m_handle));
-  }
-
-  /**
-   * Returns the flags.
-   *
-   * @return the flags (bitmask)
-   * @deprecated Use isPersistent() or topic properties instead
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public int getFlags() {
-    return NetworkTablesJNI.getEntryFlags(m_handle);
   }
 
   /**
@@ -935,28 +916,6 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
     return setDoubleArray(NetworkTableValue.toNativeDoubleArray(value));
   }
 
-  /**
-   * Sets flags.
-   *
-   * @param flags the flags to set (bitmask)
-   * @deprecated Use setPersistent() or topic properties instead
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public void setFlags(int flags) {
-    NetworkTablesJNI.setEntryFlags(m_handle, getFlags() | flags);
-  }
-
-  /**
-   * Clears flags.
-   *
-   * @param flags the flags to clear (bitmask)
-   * @deprecated Use setPersistent() or topic properties instead
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public void clearFlags(int flags) {
-    NetworkTablesJNI.setEntryFlags(m_handle, getFlags() & ~flags);
-  }
-
   /** Make value persistent through program restarts. */
   public void setPersistent() {
     NetworkTablesJNI.setTopicPersistent(m_topic.getHandle(), true);
@@ -981,26 +940,9 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
     NetworkTablesJNI.unpublish(m_handle);
   }
 
-  /**
-   * Deletes the entry.
-   *
-   * @deprecated Use unpublish() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public void delete() {
-    unpublish();
-  }
-
   @Override
   public boolean equals(Object other) {
-    if (other == this) {
-      return true;
-    }
-    if (!(other instanceof NetworkTableEntry)) {
-      return false;
-    }
-
-    return m_handle == ((NetworkTableEntry) other).m_handle;
+    return other == this || other instanceof NetworkTableEntry entry && m_handle == entry.m_handle;
   }
 
   @Override
@@ -1009,5 +951,5 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
   }
 
   private final Topic m_topic;
-  protected int m_handle;
+  private final int m_handle;
 }

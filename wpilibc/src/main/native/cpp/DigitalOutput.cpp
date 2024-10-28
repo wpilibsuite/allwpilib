@@ -4,7 +4,7 @@
 
 #include "frc/DigitalOutput.h"
 
-#include <limits>
+#include <string>
 
 #include <hal/DIO.h>
 #include <hal/FRCUsageReporting.h>
@@ -37,14 +37,14 @@ DigitalOutput::DigitalOutput(int channel) {
 }
 
 DigitalOutput::~DigitalOutput() {
-  // Disable the PWM in case it was running.
-  try {
-    DisablePWM();
-  } catch (const RuntimeError& e) {
-    e.Report();
+  if (m_handle != HAL_kInvalidHandle) {
+    // Disable the PWM in case it was running.
+    try {
+      DisablePWM();
+    } catch (const RuntimeError& e) {
+      e.Report();
+    }
   }
-
-  HAL_FreeDIOPort(m_handle);
 }
 
 void DigitalOutput::Set(bool value) {
@@ -78,7 +78,7 @@ int DigitalOutput::GetChannel() const {
 
 void DigitalOutput::Pulse(units::second_t pulseLength) {
   int32_t status = 0;
-  HAL_Pulse(m_handle, pulseLength.to<double>(), &status);
+  HAL_Pulse(m_handle, pulseLength.value(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
@@ -137,12 +137,11 @@ void DigitalOutput::DisablePWM() {
   int32_t status = 0;
 
   // Disable the output by routing to a dead bit.
-  HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, SensorUtil::kDigitalChannels,
-                                 &status);
+  HAL_SetDigitalPWMOutputChannel(m_pwmGenerator,
+                                 SensorUtil::GetNumDigitalChannels(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 
-  HAL_FreeDigitalPWM(m_pwmGenerator, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
+  HAL_FreeDigitalPWM(m_pwmGenerator);
 
   m_pwmGenerator = HAL_kInvalidHandle;
 }

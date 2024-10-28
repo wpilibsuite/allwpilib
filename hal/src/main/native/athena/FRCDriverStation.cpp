@@ -4,6 +4,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
@@ -272,10 +273,10 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     std::string_view locationRef{location};
     std::string_view callStackRef{callStack};
 
-    // 1 tag, 4 timestamp, 2 seqnum
+    // 2 size, 1 tag, 4 timestamp, 2 seqnum
     // 2 numOccur, 4 error code, 1 flags, 6 strlen
     // 1 extra needed for padding on Netcomm end.
-    size_t baseLength = 21;
+    size_t baseLength = 23;
 
     if (baseLength + detailsRef.size() + locationRef.size() +
             callStackRef.size() <=
@@ -424,22 +425,15 @@ int32_t HAL_GetJoystickType(int32_t joystickNum) {
   }
 }
 
-char* HAL_GetJoystickName(int32_t joystickNum) {
+void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
+  const char* cName = joystickDesc.name;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
-    char* name = static_cast<char*>(std::malloc(1));
-    name[0] = '\0';
-    return name;
-  } else {
-    const size_t len = std::strlen(joystickDesc.name) + 1;
-    char* name = static_cast<char*>(std::malloc(len));
-    std::memcpy(name, joystickDesc.name, len);
-    return name;
+    cName = "";
   }
-}
-
-void HAL_FreeJoystickName(char* name) {
-  std::free(name);
+  auto len = std::strlen(cName);
+  auto write = WPI_AllocateString(name, len);
+  std::memcpy(write, cName, len);
 }
 
 int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
@@ -539,15 +533,25 @@ HAL_Bool HAL_RefreshDSData(void) {
     }
     // If newest state shows we have a DS attached, just use the
     // control word out of the cache, As it will be the one in sync
-    // with the data. Otherwise use the state that shows disconnected.
-    if (controlWord.dsAttached) {
-      newestControlWord = currentRead->controlWord;
-    } else {
-      // Zero out the control word. When the DS has never been connected
-      // this returns garbage. And there is no way we can detect that.
-      std::memset(&controlWord, 0, sizeof(controlWord));
-      newestControlWord = controlWord;
+    // with the data. If no data has been updated, at this point,
+    // and a DS wasn't attached previously, this will still return
+    // a zeroed out control word, with is the correct state for
+    // no new data.
+    if (!controlWord.dsAttached) {
+      // If the DS is not attached, we need to zero out the control word.
+      // This is because HAL_RefreshDSData is called asynchronously from
+      // the DS data. The dsAttached variable comes directly from netcomm
+      // and could be updated before the caches are. If that happens,
+      // we would end up returning the previous cached control word,
+      // which is out of sync with the current control word and could
+      // break invariants such as which alliance station is in used.
+      // Also, when the DS has never been connected the rest of the fields
+      // in control word are garbage, so we also need to zero out in that
+      // case too
+      std::memset(&currentRead->controlWord, 0,
+                  sizeof(currentRead->controlWord));
     }
+    newestControlWord = currentRead->controlWord;
   }
 
   uint32_t mask = tcpMask.exchange(0);

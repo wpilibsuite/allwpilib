@@ -99,7 +99,7 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
     std::vector<PoseWithCurvature> splinePoints;
 
     // Add the first point to the vector.
-    splinePoints.push_back(splines.front().GetPoint(0.0));
+    splinePoints.push_back(splines.front().GetPoint(0.0).value());
 
     // Iterate through the vector and parameterize each spline, adding the
     // parameterized points to the final vector.

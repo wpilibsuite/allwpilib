@@ -23,11 +23,6 @@ public class Transform2dProto implements Protobuf<Transform2d, ProtobufTransform
   }
 
   @Override
-  public Protobuf<?, ?>[] getNested() {
-    return new Protobuf<?, ?>[] {Translation2d.proto, Rotation2d.proto};
-  }
-
-  @Override
   public ProtobufTransform2d createMessage() {
     return ProtobufTransform2d.newInstance();
   }
@@ -43,5 +38,10 @@ public class Transform2dProto implements Protobuf<Transform2d, ProtobufTransform
   public void pack(ProtobufTransform2d msg, Transform2d value) {
     Translation2d.proto.pack(msg.getMutableTranslation(), value.getTranslation());
     Rotation2d.proto.pack(msg.getMutableRotation(), value.getRotation());
+  }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
   }
 }

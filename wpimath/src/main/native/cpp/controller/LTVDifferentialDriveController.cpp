@@ -24,7 +24,8 @@ namespace {
 class State {
  public:
   /// X position in global coordinate frame.
-  [[maybe_unused]] static constexpr int kX = 0;
+  [[maybe_unused]]
+  static constexpr int kX = 0;
 
   /// Y position in global coordinate frame.
   static constexpr int kY = 1;
@@ -33,10 +34,12 @@ class State {
   static constexpr int kHeading = 2;
 
   /// Left encoder velocity.
-  [[maybe_unused]] static constexpr int kLeftVelocity = 3;
+  [[maybe_unused]]
+  static constexpr int kLeftVelocity = 3;
 
   /// Right encoder velocity.
-  [[maybe_unused]] static constexpr int kRightVelocity = 4;
+  [[maybe_unused]]
+  static constexpr int kRightVelocity = 4;
 };
 
 }  // namespace

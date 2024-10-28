@@ -22,9 +22,9 @@ import edu.wpi.first.math.util.Units;
  * point toward. This heading reference is profiled for smoothness.
  */
 public class HolonomicDriveController {
-  private Pose2d m_poseError = new Pose2d();
-  private Rotation2d m_rotationError = new Rotation2d();
-  private Pose2d m_poseTolerance = new Pose2d();
+  private Pose2d m_poseError = Pose2d.kZero;
+  private Rotation2d m_rotationError = Rotation2d.kZero;
+  private Pose2d m_poseTolerance = Pose2d.kZero;
   private boolean m_enabled = true;
 
   private final PIDController m_xController;
@@ -102,9 +102,10 @@ public class HolonomicDriveController {
 
     m_poseError = trajectoryPose.relativeTo(currentPose);
     m_rotationError = desiredHeading.minus(currentPose.getRotation());
-
+    ChassisSpeeds speeds = new ChassisSpeeds(xFF, yFF, thetaFF);
     if (!m_enabled) {
-      return ChassisSpeeds.fromFieldRelativeSpeeds(xFF, yFF, thetaFF, currentPose.getRotation());
+      speeds.toRobotRelativeSpeeds(currentPose.getRotation());
+      return speeds;
     }
 
     // Calculate feedback velocities (based on position error).
@@ -112,8 +113,10 @@ public class HolonomicDriveController {
     double yFeedback = m_yController.calculate(currentPose.getY(), trajectoryPose.getY());
 
     // Return next output.
-    return ChassisSpeeds.fromFieldRelativeSpeeds(
-        xFF + xFeedback, yFF + yFeedback, thetaFF, currentPose.getRotation());
+    speeds.vxMetersPerSecond += xFeedback;
+    speeds.vyMetersPerSecond += yFeedback;
+    speeds.toRobotRelativeSpeeds(currentPose.getRotation());
+    return speeds;
   }
 
   /**

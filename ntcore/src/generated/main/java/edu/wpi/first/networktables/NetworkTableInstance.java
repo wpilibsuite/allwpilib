@@ -43,7 +43,6 @@ import us.hebi.quickbuf.ProtoMessage;
  * kept to the NetworkTableInstance returned by this function to keep it from being garbage
  * collected.
  */
-@SuppressWarnings("PMD.CouplingBetweenObjects")
 public final class NetworkTableInstance implements AutoCloseable {
   /** Client/server mode flag values (as returned by {@link #getNetworkMode()}). */
   public enum NetworkMode {
@@ -68,6 +67,11 @@ public final class NetworkTableInstance implements AutoCloseable {
       this.value = value;
     }
 
+    /**
+     * Returns the network mode value.
+     *
+     * @return The network mode value.
+     */
     public int getValue() {
       return value;
     }
@@ -174,8 +178,8 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public BooleanTopic getBooleanTopic(String name) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof BooleanTopic) {
-      return (BooleanTopic) topic;
+    if (topic instanceof BooleanTopic t) {
+      return t;
     }
 
     int handle;
@@ -202,8 +206,8 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public IntegerTopic getIntegerTopic(String name) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof IntegerTopic) {
-      return (IntegerTopic) topic;
+    if (topic instanceof IntegerTopic t) {
+      return t;
     }
 
     int handle;
@@ -230,8 +234,8 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public FloatTopic getFloatTopic(String name) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof FloatTopic) {
-      return (FloatTopic) topic;
+    if (topic instanceof FloatTopic t) {
+      return t;
     }
 
     int handle;
@@ -258,8 +262,8 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public DoubleTopic getDoubleTopic(String name) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof DoubleTopic) {
-      return (DoubleTopic) topic;
+    if (topic instanceof DoubleTopic t) {
+      return t;
     }
 
     int handle;
@@ -286,8 +290,8 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public StringTopic getStringTopic(String name) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof StringTopic) {
-      return (StringTopic) topic;
+    if (topic instanceof StringTopic t) {
+      return t;
     }
 
     int handle;
@@ -314,8 +318,8 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public RawTopic getRawTopic(String name) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof RawTopic) {
-      return (RawTopic) topic;
+    if (topic instanceof RawTopic t) {
+      return t;
     }
 
     int handle;
@@ -342,8 +346,8 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public BooleanArrayTopic getBooleanArrayTopic(String name) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof BooleanArrayTopic) {
-      return (BooleanArrayTopic) topic;
+    if (topic instanceof BooleanArrayTopic t) {
+      return t;
     }
 
     int handle;
@@ -370,8 +374,8 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public IntegerArrayTopic getIntegerArrayTopic(String name) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof IntegerArrayTopic) {
-      return (IntegerArrayTopic) topic;
+    if (topic instanceof IntegerArrayTopic t) {
+      return t;
     }
 
     int handle;
@@ -398,8 +402,8 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public FloatArrayTopic getFloatArrayTopic(String name) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof FloatArrayTopic) {
-      return (FloatArrayTopic) topic;
+    if (topic instanceof FloatArrayTopic t) {
+      return t;
     }
 
     int handle;
@@ -426,8 +430,8 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public DoubleArrayTopic getDoubleArrayTopic(String name) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof DoubleArrayTopic) {
-      return (DoubleArrayTopic) topic;
+    if (topic instanceof DoubleArrayTopic t) {
+      return t;
     }
 
     int handle;
@@ -454,8 +458,8 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public StringArrayTopic getStringArrayTopic(String name) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof StringArrayTopic) {
-      return (StringArrayTopic) topic;
+    if (topic instanceof StringArrayTopic t) {
+      return t;
     }
 
     int handle;
@@ -487,8 +491,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   public <T, MessageType extends ProtoMessage<?>>
       ProtobufTopic<T> getProtobufTopic(String name, Protobuf<T, MessageType> proto) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof ProtobufTopic<?>
-        && ((ProtobufTopic<?>) topic).getProto().equals(proto)) {
+    if (topic instanceof ProtobufTopic<?> t && t.getProto().equals(proto)) {
       @SuppressWarnings("unchecked")
       ProtobufTopic<T> wrapTopic = (ProtobufTopic<T>) topic;
       return wrapTopic;
@@ -521,8 +524,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   public <T>
       StructTopic<T> getStructTopic(String name, Struct<T> struct) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof StructTopic<?>
-        && ((StructTopic<?>) topic).getStruct().equals(struct)) {
+    if (topic instanceof StructTopic<?> t && t.getStruct().equals(struct)) {
       @SuppressWarnings("unchecked")
       StructTopic<T> wrapTopic = (StructTopic<T>) topic;
       return wrapTopic;
@@ -555,8 +557,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   public <T>
       StructArrayTopic<T> getStructArrayTopic(String name, Struct<T> struct) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof StructArrayTopic<?>
-        && ((StructArrayTopic<?>) topic).getStruct().equals(struct)) {
+    if (topic instanceof StructArrayTopic<?> t && t.getStruct().equals(struct)) {
       @SuppressWarnings("unchecked")
       StructArrayTopic<T> wrapTopic = (StructArrayTopic<T>) topic;
       return wrapTopic;
@@ -771,7 +772,10 @@ public final class NetworkTableInstance implements AutoCloseable {
   private static class ListenerStorage implements AutoCloseable {
     private final ReentrantLock m_lock = new ReentrantLock();
     private final Map<Integer, Consumer<NetworkTableEvent>> m_listeners = new HashMap<>();
+
+    @SuppressWarnings("PMD.SingularField")
     private Thread m_thread;
+
     private int m_poller;
     private boolean m_waitQueue;
     private final Event m_waitQueueEvent = new Event();
@@ -1517,14 +1521,7 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this) {
-      return true;
-    }
-    if (!(other instanceof NetworkTableInstance)) {
-      return false;
-    }
-
-    return m_handle == ((NetworkTableInstance) other).m_handle;
+    return other == this || other instanceof NetworkTableInstance inst && m_handle == inst.m_handle;
   }
 
   @Override

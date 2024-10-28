@@ -3,13 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstdio>
+#include <memory>
 
-#include <fmt/format.h>
 #include <wpi/Logger.h>
+#include <wpi/print.h>
 
 #include "wpinet/DsClient.h"
 #include "wpinet/EventLoopRunner.h"
-#include "wpinet/uv/Error.h"
 
 namespace uv = wpi::uv;
 
@@ -27,7 +27,7 @@ int main() {
   loop.ExecAsync([&](uv::Loop& loop) {
     client = wpi::DsClient::Create(loop, logger);
     client->setIp.connect(
-        [](std::string_view ip) { fmt::print("got IP: {}\n", ip); });
+        [](std::string_view ip) { wpi::print("got IP: {}\n", ip); });
     client->clearIp.connect([] { std::fputs("cleared IP\n", stdout); });
   });
 

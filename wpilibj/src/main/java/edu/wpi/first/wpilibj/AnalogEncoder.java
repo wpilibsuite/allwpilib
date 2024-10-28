@@ -11,167 +11,140 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 
 /** Class for supporting continuous analog encoders, such as the US Digital MA3. */
 public class AnalogEncoder implements Sendable, AutoCloseable {
   private final AnalogInput m_analogInput;
-  private AnalogTrigger m_analogTrigger;
-  private Counter m_counter;
-  private double m_positionOffset;
-  private double m_distancePerRotation = 1.0;
-  private double m_lastPosition;
+  private boolean m_ownsAnalogInput;
+  private double m_fullRange;
+  private double m_expectedZero;
+  private double m_sensorMin;
+  private double m_sensorMax = 1.0;
+  private boolean m_isInverted;
 
   private SimDevice m_simDevice;
   private SimDouble m_simPosition;
-  private SimDouble m_simAbsolutePosition;
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
    *
    * @param channel the analog input channel to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
    */
-  public AnalogEncoder(int channel) {
-    this(new AnalogInput(channel));
+  public AnalogEncoder(int channel, double fullRange, double expectedZero) {
+    this(new AnalogInput(channel), fullRange, expectedZero);
+    m_ownsAnalogInput = true;
   }
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
    * @param analogInput the analog input to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
+   */
+  @SuppressWarnings("this-escape")
+  public AnalogEncoder(AnalogInput analogInput, double fullRange, double expectedZero) {
+    m_analogInput = analogInput;
+    init(fullRange, expectedZero);
+  }
+
+  /**
+   * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
+   *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   *
+   * @param channel the analog input channel to attach to
+   */
+  public AnalogEncoder(int channel) {
+    this(channel, 1.0, 0.0);
+  }
+
+  /**
+   * Construct a new AnalogEncoder attached to a specific AnalogInput.
+   *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   *
+   * @param analogInput the analog input to attach to
    */
   @SuppressWarnings("this-escape")
   public AnalogEncoder(AnalogInput analogInput) {
-    m_analogInput = analogInput;
-    init();
+    this(analogInput, 1.0, 0.0);
   }
 
-  private void init() {
-    m_analogTrigger = new AnalogTrigger(m_analogInput);
-    m_counter = new Counter();
-
+  private void init(double fullRange, double expectedZero) {
     m_simDevice = SimDevice.create("AnalogEncoder", m_analogInput.getChannel());
 
     if (m_simDevice != null) {
       m_simPosition = m_simDevice.createDouble("Position", Direction.kInput, 0.0);
-      m_simAbsolutePosition = m_simDevice.createDouble("absPosition", Direction.kInput, 0.0);
     }
 
-    // Limits need to be 25% from each end
-    m_analogTrigger.setLimitsVoltage(1.25, 3.75);
-    m_counter.setUpSource(m_analogTrigger, AnalogTriggerType.kRisingPulse);
-    m_counter.setDownSource(m_analogTrigger, AnalogTriggerType.kFallingPulse);
+    m_fullRange = fullRange;
+    m_expectedZero = expectedZero;
 
     SendableRegistry.addLW(this, "Analog Encoder", m_analogInput.getChannel());
   }
 
-  private boolean doubleEquals(double a, double b) {
-    double epsilon = 0.00001d;
-    return Math.abs(a - b) < epsilon;
+  private double mapSensorRange(double pos) {
+    // map sensor range
+    if (pos < m_sensorMin) {
+      pos = m_sensorMin;
+    }
+    if (pos > m_sensorMax) {
+      pos = m_sensorMax;
+    }
+    pos = (pos - m_sensorMin) / (m_sensorMax - m_sensorMin);
+    return pos;
   }
 
   /**
-   * Get the encoder value since the last reset.
+   * Get the encoder value.
    *
-   * <p>This is reported in rotations since the last reset.
-   *
-   * @return the encoder value in rotations
+   * @return the encoder value scaled by the full range input
    */
   public double get() {
     if (m_simPosition != null) {
       return m_simPosition.get();
     }
 
-    // As the values are not atomic, keep trying until we get 2 reads of the same
-    // value. If we don't within 10 attempts, warn
-    for (int i = 0; i < 10; i++) {
-      double counter = m_counter.get();
-      double pos = m_analogInput.getVoltage();
-      double counter2 = m_counter.get();
-      double pos2 = m_analogInput.getVoltage();
-      if (counter == counter2 && doubleEquals(pos, pos2)) {
-        pos = pos / RobotController.getVoltage5V();
-        double position = counter + pos - m_positionOffset;
-        m_lastPosition = position;
-        return position;
-      }
+    double analog = m_analogInput.getVoltage();
+    double pos = analog / RobotController.getVoltage5V();
+
+    // Map sensor range if range isn't full
+    pos = mapSensorRange(pos);
+
+    // Compute full range and offset
+    pos = pos * m_fullRange - m_expectedZero;
+
+    // Map from 0 - Full Range
+    double result = MathUtil.inputModulus(pos, 0, m_fullRange);
+    // Invert if necessary
+    if (m_isInverted) {
+      return m_fullRange - result;
     }
-
-    DriverStation.reportWarning(
-        "Failed to read Analog Encoder. Potential Speed Overrun. Returning last value", false);
-    return m_lastPosition;
+    return result;
   }
 
   /**
-   * Get the absolute position of the analog encoder.
+   * Set the encoder voltage percentage range. Analog sensors are not always fully stable at the end
+   * of their travel ranges. Shrinking this range down can help mitigate issues with that.
    *
-   * <p>getAbsolutePosition() - getPositionOffset() will give an encoder absolute position relative
-   * to the last reset. This could potentially be negative, which needs to be accounted for.
-   *
-   * <p>This will not account for rollovers, and will always be just the raw absolute position.
-   *
-   * @return the absolute position
+   * @param min minimum voltage percentage (0-1 range)
+   * @param max maximum voltage percentage (0-1 range)
    */
-  public double getAbsolutePosition() {
-    if (m_simAbsolutePosition != null) {
-      return m_simAbsolutePosition.get();
-    }
-
-    return m_analogInput.getVoltage() / RobotController.getVoltage5V();
+  public void setVoltagePercentageRange(double min, double max) {
+    m_sensorMin = MathUtil.clamp(min, 0.0, 1.0);
+    m_sensorMax = MathUtil.clamp(max, 0.0, 1.0);
   }
 
   /**
-   * Get the offset of position relative to the last reset.
+   * Set if this encoder is inverted.
    *
-   * <p>getAbsolutePosition() - getPositionOffset() will give an encoder absolute position relative
-   * to the last reset. This could potentially be negative, which needs to be accounted for.
-   *
-   * @return the position offset
+   * @param inverted true to invert the encoder, false otherwise
    */
-  public double getPositionOffset() {
-    return m_positionOffset;
-  }
-
-  /**
-   * Set the position offset.
-   *
-   * <p>This must be in the range of 0-1.
-   *
-   * @param offset the offset
-   */
-  public void setPositionOffset(double offset) {
-    m_positionOffset = MathUtil.clamp(offset, 0.0, 1.0);
-  }
-
-  /**
-   * Set the distance per rotation of the encoder. This sets the multiplier used to determine the
-   * distance driven based on the rotation value from the encoder. Set this value based on how far
-   * the mechanism travels in 1 rotation of the encoder, and factor in gearing reductions following
-   * the encoder shaft. This distance can be in any units you like, linear or angular.
-   *
-   * @param distancePerRotation the distance per rotation of the encoder
-   */
-  public void setDistancePerRotation(double distancePerRotation) {
-    m_distancePerRotation = distancePerRotation;
-  }
-
-  /**
-   * Get the distance per rotation for this encoder.
-   *
-   * @return The scale factor that will be used to convert rotation to useful units.
-   */
-  public double getDistancePerRotation() {
-    return m_distancePerRotation;
-  }
-
-  /**
-   * Get the distance the sensor has driven since the last reset as scaled by the value from {@link
-   * #setDistancePerRotation(double)}.
-   *
-   * @return The distance driven since the last reset
-   */
-  public double getDistance() {
-    return get() * getDistancePerRotation();
+  public void setInverted(boolean inverted) {
+    m_isInverted = inverted;
   }
 
   /**
@@ -183,16 +156,11 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     return m_analogInput.getChannel();
   }
 
-  /** Reset the Encoder distance to zero. */
-  public void reset() {
-    m_counter.reset();
-    m_positionOffset = m_analogInput.getVoltage() / RobotController.getVoltage5V();
-  }
-
   @Override
   public void close() {
-    m_counter.close();
-    m_analogTrigger.close();
+    if (m_ownsAnalogInput) {
+      m_analogInput.close();
+    }
     if (m_simDevice != null) {
       m_simDevice.close();
     }
@@ -201,7 +169,6 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("AbsoluteEncoder");
-    builder.addDoubleProperty("Distance", this::getDistance, null);
-    builder.addDoubleProperty("Distance Per Rotation", this::getDistancePerRotation, null);
+    builder.addDoubleProperty("Position", this::get, null);
   }
 }

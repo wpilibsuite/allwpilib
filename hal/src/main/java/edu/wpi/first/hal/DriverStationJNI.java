@@ -147,12 +147,25 @@ public class DriverStationJNI extends JNIWrapper {
    */
   private static native int nativeGetAllianceStation();
 
+  /** Unknown Alliance Station ID. */
   public static final int kUnknownAllianceStation = 0;
+
+  /** Red Alliance Station 1 ID. */
   public static final int kRed1AllianceStation = 1;
+
+  /** Red Alliance Station 2 ID. */
   public static final int kRed2AllianceStation = 2;
+
+  /** Red Alliance Station 3 ID. */
   public static final int kRed3AllianceStation = 3;
+
+  /** Blue Alliance Station 1 ID. */
   public static final int kBlue1AllianceStation = 4;
+
+  /** Blue Alliance Station 2 ID. */
   public static final int kBlue2AllianceStation = 5;
+
+  /** Blue Alliance Station 3 ID. */
   public static final int kBlue3AllianceStation = 6;
 
   /**
@@ -162,28 +175,25 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_GetAllianceStation"
    */
   public static AllianceStationID getAllianceStation() {
-    switch (nativeGetAllianceStation()) {
-      case kUnknownAllianceStation:
-        return AllianceStationID.Unknown;
-      case kRed1AllianceStation:
-        return AllianceStationID.Red1;
-      case kRed2AllianceStation:
-        return AllianceStationID.Red2;
-      case kRed3AllianceStation:
-        return AllianceStationID.Red3;
-      case kBlue1AllianceStation:
-        return AllianceStationID.Blue1;
-      case kBlue2AllianceStation:
-        return AllianceStationID.Blue2;
-      case kBlue3AllianceStation:
-        return AllianceStationID.Blue3;
-      default:
-        return null;
-    }
+    return switch (nativeGetAllianceStation()) {
+      case kUnknownAllianceStation -> AllianceStationID.Unknown;
+      case kRed1AllianceStation -> AllianceStationID.Red1;
+      case kRed2AllianceStation -> AllianceStationID.Red2;
+      case kRed3AllianceStation -> AllianceStationID.Red3;
+      case kBlue1AllianceStation -> AllianceStationID.Blue1;
+      case kBlue2AllianceStation -> AllianceStationID.Blue2;
+      case kBlue3AllianceStation -> AllianceStationID.Blue3;
+      default -> null;
+    };
   }
 
+  /** The maximum number of axes. */
   public static final int kMaxJoystickAxes = 12;
+
+  /** The maximum number of POVs. */
   public static final int kMaxJoystickPOVs = 12;
+
+  /** The maximum number of joysticks. */
   public static final int kMaxJoysticks = 6;
 
   /**
@@ -233,7 +243,7 @@ public class DriverStationJNI extends JNIWrapper {
    * @param rawAxesArray all joystick axes as int
    * @param povsArray all povs
    * @param buttonsAndMetadata array of long joystick axes count, long joystick povs count, long
-   *     jostick buttons count, long joystick buttons values
+   *     joystick buttons count, long joystick buttons values
    * @see "HAL_GetAllJoystickData"
    */
   public static native void getAllJoystickData(
@@ -250,7 +260,7 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_SetJoystickOutputs"
    */
   public static native int setJoystickOutputs(
-      byte joystickNum, int outputs, short leftRumble, short rightRumble);
+      byte joystickNum, int outputs, int leftRumble, int rightRumble);
 
   /**
    * Gets whether a specific joystick is considered to be an XBox controller.
@@ -361,8 +371,18 @@ public class DriverStationJNI extends JNIWrapper {
    */
   public static native boolean refreshDSData();
 
+  /**
+   * Adds an event handle to be signalled when new data arrives.
+   *
+   * @param handle the event handle to be signalled
+   */
   public static native void provideNewDataEventHandle(int handle);
 
+  /**
+   * Removes the event handle from being signalled when new data arrives.
+   *
+   * @param handle the event handle to remove
+   */
   public static native void removeNewDataEventHandle(int handle);
 
   /**

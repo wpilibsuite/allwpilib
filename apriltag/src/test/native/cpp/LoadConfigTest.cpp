@@ -2,8 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <vector>
+
 #include <gtest/gtest.h>
 
+#include "frc/apriltag/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagFields.h"
 
 namespace frc {
@@ -20,7 +23,7 @@ std::vector<AprilTagField> GetAllFields() {
 
 TEST(AprilTagFieldsTest, TestLoad2022RapidReact) {
   AprilTagFieldLayout layout =
-      LoadAprilTagLayoutField(AprilTagField::k2022RapidReact);
+      AprilTagFieldLayout::LoadField(AprilTagField::k2022RapidReact);
 
   // Blue Hangar Truss - Hub
   auto expectedPose =
@@ -53,7 +56,7 @@ class AllFieldsFixtureTest : public ::testing::TestWithParam<AprilTagField> {};
 
 TEST_P(AllFieldsFixtureTest, CheckEntireEnum) {
   AprilTagField field = GetParam();
-  EXPECT_NO_THROW(LoadAprilTagLayoutField(field));
+  EXPECT_NO_THROW(AprilTagFieldLayout::LoadField(field));
 }
 
 INSTANTIATE_TEST_SUITE_P(ValuesEnumTestInstTests, AllFieldsFixtureTest,

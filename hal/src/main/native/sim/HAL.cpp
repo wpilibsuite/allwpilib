@@ -5,6 +5,8 @@
 #include "hal/HAL.h"
 
 #include <cstdio>
+#include <cstring>
+#include <utility>
 #include <vector>
 
 #include <wpi/mutex.h>
@@ -13,12 +15,17 @@
 #ifdef _WIN32
 #include <Windows.h>
 #pragma comment(lib, "Winmm.lib")
+#pragma comment(lib, "ntdll.lib")
+extern "C" NTSYSAPI NTSTATUS NTAPI NtSetTimerResolution(
+    ULONG DesiredResolution, BOOLEAN SetResolution, PULONG CurrentResolution);
+extern "C" NTSYSAPI NTSTATUS NTAPI
+NtQueryTimerResolution(PULONG MinimumResolution, PULONG MaximumResolution,
+                       PULONG CurrentResolution);
 #endif  // _WIN32
 
 #include "ErrorsInternal.h"
 #include "HALInitializer.h"
 #include "MockHooksInternal.h"
-#include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/Extensions.h"
 #include "hal/handles/HandlesInternal.h"
@@ -37,11 +44,7 @@ class SimPeriodicCallbackRegistry : public impl::SimCallbackRegistryBase {
   }
 
   void operator()() const {
-#ifdef _MSC_VER  // work around VS2019 16.4.0 bug
-    std::scoped_lock<wpi::recursive_spinlock> lock(m_mutex);
-#else
     std::scoped_lock lock(m_mutex);
-#endif
     if (m_callbacks) {
       for (auto&& cb : *m_callbacks) {
         reinterpret_cast<HALSIM_SimPeriodicCallback>(cb.callback)(cb.param);
@@ -280,12 +283,12 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
   return 0;  // TODO: Find a better number to return;
 }
 
-size_t HAL_GetSerialNumber(char* buffer, size_t size) {
-  return HALSIM_GetRoboRioSerialNumber(buffer, size);
+void HAL_GetSerialNumber(struct WPI_String* serialNumber) {
+  HALSIM_GetRoboRioSerialNumber(serialNumber);
 }
 
-size_t HAL_GetComments(char* buffer, size_t size) {
-  return HALSIM_GetRoboRioComments(buffer, size);
+void HAL_GetComments(struct WPI_String* comments) {
+  HALSIM_GetRoboRioComments(comments);
 }
 
 int32_t HAL_GetTeamNumber(void) {
@@ -332,6 +335,10 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return false;  // Figure out if we need to detect a brownout condition
 }
 
+int32_t HAL_GetCommsDisableCount(int32_t* status) {
+  return 0;
+}
+
 HAL_Bool HAL_GetRSLState(int32_t* status) {
   return false;
 }
@@ -363,19 +370,66 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   initialized = true;
 
-// Set Timer Precision to 1ms on Windows
+// Set Timer Precision to 0.5ms on Windows
 #ifdef _WIN32
+  // Use timeGetDevCaps as well to prevent Java from interfering
   TIMECAPS tc;
   if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
-    UINT target = (std::min)(static_cast<UINT>(1), tc.wPeriodMin);
+    UINT target = (std::max)(static_cast<UINT>(1), tc.wPeriodMin);
     timeBeginPeriod(target);
     std::atexit([]() {
       TIMECAPS tc;
       if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
-        UINT target = (std::min)(static_cast<UINT>(1), tc.wPeriodMin);
+        UINT target = (std::max)(static_cast<UINT>(1), tc.wPeriodMin);
         timeEndPeriod(target);
       }
     });
+  }
+  // https://stackoverflow.com/questions/3141556/how-to-setup-timer-resolution-to-0-5-ms
+  ULONG min, max, current;
+  if (NtQueryTimerResolution(&min, &max, &current) == 0) {
+    ULONG currentRes;
+    if (NtSetTimerResolution(max, TRUE, &currentRes) == 0) {
+      std::atexit([]() {
+        ULONG currentRes;
+        NtSetTimerResolution(0, FALSE, &currentRes);
+      });
+    }
+  }
+
+  // https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setprocessinformation
+  // Enable HighQoS to achieve maximum performance, and turn off power saving.
+
+  // https://forums.oculusvr.com/t5/General/SteamVR-has-fixed-the-problems-with-Windows-11/td-p/956413
+  // Always honor Timer Resolution Requests. This is to ensure that the timer
+  // resolution set-up above sticks through transitions of the main window (eg:
+  // minimization).
+  // This setting was introduced in Windows 11 and the definition is not
+  // available in older headers.
+#ifndef PROCESS_POWER_THROTTLING_IGNORE_TIMER_RESOLUTION
+  const auto PROCESS_POWER_THROTTLING_IGNORE_TIMER_RESOLUTION = 0x4U;
+#endif
+
+  // Try both at once, and if that doesn't succeed, only set HighQoS
+  PROCESS_POWER_THROTTLING_STATE PowerThrottling{};
+  PowerThrottling.Version = PROCESS_POWER_THROTTLING_CURRENT_VERSION;
+  PowerThrottling.ControlMask =
+      PROCESS_POWER_THROTTLING_IGNORE_TIMER_RESOLUTION |
+      PROCESS_POWER_THROTTLING_EXECUTION_SPEED;
+  PowerThrottling.StateMask = 0;
+
+  auto status =
+      SetProcessInformation(GetCurrentProcess(), ProcessPowerThrottling,
+                            &PowerThrottling, sizeof(PowerThrottling));
+
+  // setting both failed, fall back to HighQoS only
+  if (status == 0) {
+    PowerThrottling.Version = PROCESS_POWER_THROTTLING_CURRENT_VERSION;
+    PowerThrottling.ControlMask = PROCESS_POWER_THROTTLING_EXECUTION_SPEED;
+    PowerThrottling.StateMask = 0;
+
+    SetProcessInformation(GetCurrentProcess(), ProcessPowerThrottling,
+                          &PowerThrottling, sizeof(PowerThrottling));
   }
 #endif  // _WIN32
 

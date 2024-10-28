@@ -5,7 +5,6 @@
 #include <cstring>
 
 #include "DriverStationDataInternal.h"
-#include "hal/DriverStation.h"
 
 using namespace hal;
 
@@ -28,7 +27,7 @@ void DriverStationData::ResetData() {
   test.Reset(false);
   eStop.Reset(false);
   fmsAttached.Reset(false);
-  dsAttached.Reset(true);
+  dsAttached.Reset(false);
   allianceStationId.Reset(static_cast<HAL_AllianceStationID>(0));
   matchTime.Reset(-1.0);
 
@@ -339,17 +338,14 @@ void DriverStationData::SetJoystickType(int32_t stick, int32_t type) {
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
-void DriverStationData::SetJoystickName(int32_t stick, const char* name,
-                                        size_t size) {
+void DriverStationData::SetJoystickName(int32_t stick, std::string_view name) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
-  if (size > sizeof(m_joystickData[stick].descriptor.name) - 1) {
-    size = sizeof(m_joystickData[stick].descriptor.name) - 1;
-  }
-  std::strncpy(m_joystickData[stick].descriptor.name, name, size);
-  m_joystickData[stick].descriptor.name[size] = '\0';
+  auto copied = name.copy(m_joystickData[stick].descriptor.name,
+                          sizeof(m_joystickData[stick].descriptor.name) - 1);
+  m_joystickData[stick].descriptor.name[copied] = '\0';
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
@@ -366,27 +362,20 @@ void DriverStationData::SetJoystickAxisType(int32_t stick, int32_t axis,
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
-void DriverStationData::SetGameSpecificMessage(const char* message,
-                                               size_t size) {
+void DriverStationData::SetGameSpecificMessage(std::string_view message) {
   std::scoped_lock lock(m_matchInfoMutex);
-  if (size > sizeof(m_matchInfo.gameSpecificMessage) - 1) {
-    size = sizeof(m_matchInfo.gameSpecificMessage) - 1;
-  }
-  std::strncpy(reinterpret_cast<char*>(m_matchInfo.gameSpecificMessage),
-               message, size);
-  m_matchInfo.gameSpecificMessage[size] = '\0';
-  m_matchInfo.gameSpecificMessageSize =
-      std::strlen(reinterpret_cast<char*>(m_matchInfo.gameSpecificMessage));
+  auto copied =
+      message.copy(reinterpret_cast<char*>(m_matchInfo.gameSpecificMessage),
+                   sizeof(m_matchInfo.gameSpecificMessage));
+  m_matchInfo.gameSpecificMessageSize = copied;
   m_matchInfoCallbacks(&m_matchInfo);
 }
 
-void DriverStationData::SetEventName(const char* name, size_t size) {
+void DriverStationData::SetEventName(std::string_view name) {
   std::scoped_lock lock(m_matchInfoMutex);
-  if (size > sizeof(m_matchInfo.eventName) - 1) {
-    size = sizeof(m_matchInfo.eventName) - 1;
-  }
-  std::strncpy(m_matchInfo.eventName, name, size);
-  m_matchInfo.eventName[size] = '\0';
+  auto copied =
+      name.copy(m_matchInfo.eventName, sizeof(m_matchInfo.eventName) - 1);
+  m_matchInfo.eventName[copied] = '\0';
   m_matchInfoCallbacks(&m_matchInfo);
 }
 
@@ -551,20 +540,20 @@ void HALSIM_SetJoystickType(int32_t stick, int32_t type) {
   SimDriverStationData->SetJoystickType(stick, type);
 }
 
-void HALSIM_SetJoystickName(int32_t stick, const char* name, size_t size) {
-  SimDriverStationData->SetJoystickName(stick, name, size);
+void HALSIM_SetJoystickName(int32_t stick, const WPI_String* name) {
+  SimDriverStationData->SetJoystickName(stick, wpi::to_string_view(name));
 }
 
 void HALSIM_SetJoystickAxisType(int32_t stick, int32_t axis, int32_t type) {
   SimDriverStationData->SetJoystickAxisType(stick, axis, type);
 }
 
-void HALSIM_SetGameSpecificMessage(const char* message, size_t size) {
-  SimDriverStationData->SetGameSpecificMessage(message, size);
+void HALSIM_SetGameSpecificMessage(const WPI_String* message) {
+  SimDriverStationData->SetGameSpecificMessage(wpi::to_string_view(message));
 }
 
-void HALSIM_SetEventName(const char* name, size_t size) {
-  SimDriverStationData->SetEventName(name, size);
+void HALSIM_SetEventName(const WPI_String* name) {
+  SimDriverStationData->SetEventName(wpi::to_string_view(name));
 }
 
 void HALSIM_SetMatchType(HAL_MatchType type) {

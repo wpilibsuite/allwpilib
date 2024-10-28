@@ -4,10 +4,13 @@
 
 #include "frc/livewindow/LiveWindow.h"
 
+#include <memory>
+
 #include <networktables/BooleanTopic.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringTopic.h>
+#include <wpi/json.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -15,6 +18,8 @@
 #include "frc/smartdashboard/SendableBuilderImpl.h"
 
 using namespace frc;
+
+static constexpr std::string_view kSmartDashboardType = "LW Subsystem";
 
 namespace {
 struct Component {
@@ -207,8 +212,10 @@ void LiveWindow::UpdateValuesUnsafe() {
       comp.namePub.Set(cbdata.name);
       static_cast<SendableBuilderImpl&>(cbdata.builder).SetTable(table);
       cbdata.sendable->InitSendable(cbdata.builder);
-      comp.typePub = nt::StringTopic{ssTable->GetTopic(".type")}.Publish();
-      comp.typePub.Set("LW Subsystem");
+      comp.typePub = nt::StringTopic{ssTable->GetTopic(".type")}.PublishEx(
+          nt::StringTopic::kTypeString,
+          {{"SmartDashboard", kSmartDashboardType}});
+      comp.typePub.Set(kSmartDashboardType);
 
       comp.firstTime = false;
     }

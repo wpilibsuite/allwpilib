@@ -5,9 +5,7 @@ include(CompileWarnings)
 include(AddTest)
 
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     add_jar(
@@ -23,7 +21,9 @@ if(WITH_JAVA)
             wpiutil_jar
             wpilibj_jar
         OUTPUT_NAME romiVendordep
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
+    set_property(TARGET romiVendordep_jar PROPERTY FOLDER "java")
 
     install_jar(romiVendordep_jar DESTINATION ${java_lib_dest})
     install_jar_exports(
@@ -34,20 +34,17 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
-    file(GLOB_RECURSE ROMIVENDORDEP_SOURCES src/main/java/*.java)
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         romiVendordep_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/wpilibj/romi" ${ROMIVENDORDEP_SOURCES}
+        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
         OUTPUT_NAME romiVendordep-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(ROMIVENDORDEP_SRC_JAR_FILE TARGET romiVendordep_src_jar PROPERTY JAR_FILE)
-    install(FILES ${ROMIVENDORDEP_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET romiVendordep_src_jar PROPERTY FOLDER "java")
+
+    install_jar(romiVendordep_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 file(GLOB_RECURSE romiVendordep_native_src src/main/native/cpp/*.cpp)
@@ -66,7 +63,8 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/romiVendordep>
 )
 
-install(TARGETS romiVendordep EXPORT romivendordep DESTINATION "${main_lib_dest}")
+install(TARGETS romiVendordep EXPORT romivendordep)
+export(TARGETS romiVendordep FILE romivendordep.cmake NAMESPACE romivendordep::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/romiVendordep")
 
 configure_file(romivendordep-config.cmake.in ${WPILIB_BINARY_DIR}/romivendordep-config.cmake)
@@ -76,5 +74,5 @@ install(EXPORT romivendordep DESTINATION share/romiVendordep)
 if(WITH_TESTS)
     wpilib_add_test(romiVendordep src/test/native/cpp)
     target_include_directories(romiVendordep_test PRIVATE src/test/native/include)
-    target_link_libraries(romiVendordep_test romiVendordep gmock_main)
+    target_link_libraries(romiVendordep_test romiVendordep googletest)
 endif()

@@ -125,7 +125,7 @@ class QuaternionTest {
     // Identity
     var q =
         new Quaternion(
-            0.72760687510899891, 0.29104275004359953, 0.38805700005813276, 0.48507125007266594);
+            0.7276068751089989, 0.29104275004359953, 0.38805700005813276, 0.48507125007266594);
     final var actual2 = q.times(q.inverse());
     assertAll(
         () -> assertEquals(1.0, actual2.getW()),

@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <memory>
+#include <string>
 
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
@@ -62,7 +63,7 @@ static void NtInitialize() {
   auto inst = nt::GetDefaultInstance();
   auto poller = nt::CreateListenerPoller(inst);
   nt::AddPolledListener(poller, inst, NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE);
-  nt::AddPolledLogger(poller, 0, 100);
+  nt::AddPolledLogger(poller, NT_LOG_INFO, 100);
   gui::AddEarlyExecute([inst, poller] {
     auto win = gui::GetSystemWindow();
     if (!win) {

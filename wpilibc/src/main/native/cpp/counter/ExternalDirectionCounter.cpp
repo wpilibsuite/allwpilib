@@ -4,6 +4,8 @@
 
 #include "frc/counter/ExternalDirectionCounter.h"
 
+#include <memory>
+
 #include <hal/Counter.h>
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>
@@ -61,11 +63,6 @@ ExternalDirectionCounter::ExternalDirectionCounter(
   wpi::SendableRegistry::AddLW(this, "External Direction Counter", m_index);
 }
 
-ExternalDirectionCounter::~ExternalDirectionCounter() {
-  int32_t status = 0;
-  HAL_FreeCounter(m_handle, &status);
-}
-
 int ExternalDirectionCounter::GetCount() const {
   int32_t status = 0;
   int val = HAL_GetCounter(m_handle, &status);
@@ -98,6 +95,5 @@ void ExternalDirectionCounter::SetEdgeConfiguration(
 
 void ExternalDirectionCounter::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("External Direction Counter");
-  builder.AddDoubleProperty(
-      "Count", [&] { return GetCount(); }, nullptr);
+  builder.AddDoubleProperty("Count", [&] { return GetCount(); }, nullptr);
 }

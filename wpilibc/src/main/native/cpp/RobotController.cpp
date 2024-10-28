@@ -4,7 +4,7 @@
 
 #include "frc/RobotController.h"
 
-#include <cstddef>
+#include <string>
 
 #include <hal/CAN.h>
 #include <hal/HALBase.h>
@@ -30,16 +30,19 @@ int64_t RobotController::GetFPGARevision() {
 }
 
 std::string RobotController::GetSerialNumber() {
-  // Serial number is 8 characters
-  char serialNum[9];
-  size_t len = HAL_GetSerialNumber(serialNum, sizeof(serialNum));
-  return std::string(serialNum, len);
+  WPI_String serialNum;
+  HAL_GetSerialNumber(&serialNum);
+  std::string ret{wpi::to_string_view(&serialNum)};
+  WPI_FreeString(&serialNum);
+  return ret;
 }
 
 std::string RobotController::GetComments() {
-  char comments[65];
-  size_t len = HAL_GetComments(comments, sizeof(comments));
-  return std::string(comments, len);
+  WPI_String comments;
+  HAL_GetComments(&comments);
+  std::string ret{wpi::to_string_view(&comments)};
+  WPI_FreeString(&comments);
+  return ret;
 }
 
 int32_t RobotController::GetTeamNumber() {
@@ -78,6 +81,13 @@ bool RobotController::IsBrownedOut() {
   int32_t status = 0;
   bool retVal = HAL_GetBrownedOut(&status);
   FRC_CheckErrorStatus(status, "IsBrownedOut");
+  return retVal;
+}
+
+int RobotController::GetCommsDisableCount() {
+  int32_t status = 0;
+  int retVal = HAL_GetCommsDisableCount(&status);
+  FRC_CheckErrorStatus(status, "GetCommsDisableCount");
   return retVal;
 }
 
@@ -209,6 +219,12 @@ int RobotController::GetFaultCount6V() {
   int retVal = HAL_GetUserCurrentFaults6V(&status);
   FRC_CheckErrorStatus(status, "GetFaultCount6V");
   return retVal;
+}
+
+void RobotController::ResetRailFaultCounts() {
+  int32_t status = 0;
+  HAL_ResetUserCurrentFaults(&status);
+  FRC_CheckErrorStatus(status, "ResetRailFaultCounts");
 }
 
 units::volt_t RobotController::GetBrownoutVoltage() {

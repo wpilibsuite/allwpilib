@@ -1,0 +1,27 @@
+name: Comment on PR for robotpy
+
+on:
+  pull_request_target:
+    types:
+      - opened
+    paths:
+      - 'wpilibNewCommands/src/**/*.java'
+
+jobs:
+  comment:
+    permissions:
+      pull-requests: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on PR
+        if: github.repository == 'wpilibsuite/allwpilib'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: 'This PR modifies commands. Please open a corresponding PR in [Python Commands](https://github.com/robotpy/robotpy-commands-v2/) and include a link to this PR.'
+            })

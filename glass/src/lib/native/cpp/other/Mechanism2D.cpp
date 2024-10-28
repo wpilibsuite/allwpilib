@@ -8,10 +8,11 @@
 #include <cmath>
 #include <cstdio>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
-#include <fmt/format.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Transform2d.h>
@@ -24,6 +25,7 @@
 #include <portable-file-dialogs.h>
 #include <units/angle.h>
 #include <units/length.h>
+#include <wpi/print.h>
 #include <wpigui.h>
 
 #include "glass/Context.h"
@@ -126,7 +128,7 @@ void BackgroundInfo::LoadImage() {
 }
 
 bool BackgroundInfo::LoadImageImpl(const std::string& fn) {
-  fmt::print("GUI: loading background image '{}'\n", fn);
+  wpi::print("GUI: loading background image '{}'\n", fn);
   auto texture = gui::Texture::CreateFromFile(fn.c_str());
   if (!texture) {
     std::puts("GUI: could not read background image");

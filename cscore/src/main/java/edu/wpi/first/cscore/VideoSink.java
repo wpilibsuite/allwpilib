@@ -5,7 +5,7 @@
 package edu.wpi.first.cscore;
 
 /**
- * A source for video that provides a sequence of frames. Each frame may consist of multiple images
+ * A sink for video that accepts a sequence of frames. Each frame may consist of multiple images
  * (e.g. from a stereo or depth camera); these are called channels.
  */
 public class VideoSink implements AutoCloseable {
@@ -26,6 +26,11 @@ public class VideoSink implements AutoCloseable {
       this.value = value;
     }
 
+    /**
+     * Returns the Kind value.
+     *
+     * @return The Kind value.
+     */
     public int getValue() {
       return value;
     }
@@ -38,16 +43,19 @@ public class VideoSink implements AutoCloseable {
    * @return The kind
    */
   public static Kind getKindFromInt(int kind) {
-    switch (kind) {
-      case 2:
-        return Kind.kMjpeg;
-      case 4:
-        return Kind.kCv;
-      default:
-        return Kind.kUnknown;
-    }
+    return switch (kind) {
+      case 2 -> Kind.kMjpeg;
+      case 4 -> Kind.kCv;
+      case 8 -> Kind.kRaw;
+      default -> Kind.kUnknown;
+    };
   }
 
+  /**
+   * Constructs a VideoSink.
+   *
+   * @param handle The video sink handle.
+   */
   protected VideoSink(int handle) {
     m_handle = handle;
   }
@@ -60,10 +68,20 @@ public class VideoSink implements AutoCloseable {
     m_handle = 0;
   }
 
+  /**
+   * Returns true if the VideoSink is valid.
+   *
+   * @return True if the VideoSink is valid.
+   */
   public boolean isValid() {
     return m_handle != 0;
   }
 
+  /**
+   * Returns the video sink handle.
+   *
+   * @return The video sink handle.
+   */
   public int getHandle() {
     return m_handle;
   }
@@ -76,11 +94,7 @@ public class VideoSink implements AutoCloseable {
     if (other == null) {
       return false;
     }
-    if (getClass() != other.getClass()) {
-      return false;
-    }
-    VideoSink sink = (VideoSink) other;
-    return m_handle == sink.m_handle;
+    return other instanceof VideoSink sink && m_handle == sink.m_handle;
   }
 
   @Override
@@ -222,5 +236,6 @@ public class VideoSink implements AutoCloseable {
     return rv;
   }
 
+  /** The VideoSink handle. */
   protected int m_handle;
 }

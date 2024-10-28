@@ -44,7 +44,11 @@ public class XRPMotor implements MotorController {
   private final SimDouble m_simSpeed;
   private final SimBoolean m_simInverted;
 
-  /** XRPMotor. */
+  /**
+   * Constructs an XRPMotor.
+   *
+   * @param deviceNum the motor channel
+   */
   public XRPMotor(int deviceNum) {
     checkDeviceAllocation(deviceNum);
 
@@ -92,10 +96,7 @@ public class XRPMotor implements MotorController {
 
   @Override
   public boolean getInverted() {
-    if (m_simInverted != null) {
-      return m_simInverted.get();
-    }
-    return false;
+    return m_simInverted != null && m_simInverted.get();
   }
 
   @Override

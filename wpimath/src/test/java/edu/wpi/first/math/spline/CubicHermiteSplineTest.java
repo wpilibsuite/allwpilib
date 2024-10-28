@@ -36,7 +36,7 @@ class CubicHermiteSplineTest {
 
     var poses = new ArrayList<PoseWithCurvature>();
 
-    poses.add(splines[0].getPoint(0.0));
+    poses.add(splines[0].getPoint(0.0).get());
 
     for (var spline : splines) {
       poses.addAll(SplineParameterizer.parameterize(spline));
@@ -97,33 +97,33 @@ class CubicHermiteSplineTest {
 
   @Test
   void testStraightLine() {
-    run(new Pose2d(), new ArrayList<>(), new Pose2d(3, 0, new Rotation2d()));
+    run(Pose2d.kZero, new ArrayList<>(), new Pose2d(3, 0, Rotation2d.kZero));
   }
 
   @Test
   void testSCurve() {
-    var start = new Pose2d(0, 0, Rotation2d.fromDegrees(90.0));
+    var start = new Pose2d(0, 0, Rotation2d.kCCW_Pi_2);
     ArrayList<Translation2d> waypoints = new ArrayList<>();
     waypoints.add(new Translation2d(1, 1));
     waypoints.add(new Translation2d(2, -1));
-    var end = new Pose2d(3, 0, Rotation2d.fromDegrees(90.0));
+    var end = new Pose2d(3, 0, Rotation2d.kCCW_Pi_2);
 
     run(start, waypoints, end);
   }
 
   @Test
   void testOneInterior() {
-    var start = new Pose2d(0, 0, Rotation2d.fromDegrees(0.0));
+    var start = Pose2d.kZero;
     ArrayList<Translation2d> waypoints = new ArrayList<>();
     waypoints.add(new Translation2d(2.0, 0.0));
-    var end = new Pose2d(4, 0, Rotation2d.fromDegrees(0.0));
+    var end = new Pose2d(4, 0, Rotation2d.kZero);
 
     run(start, waypoints, end);
   }
 
   @Test
   void testWindyPath() {
-    final var start = new Pose2d(0, 0, Rotation2d.fromDegrees(0.0));
+    final var start = Pose2d.kZero;
     final ArrayList<Translation2d> waypoints = new ArrayList<>();
     waypoints.add(new Translation2d(0.5, 0.5));
     waypoints.add(new Translation2d(0.5, 0.5));
@@ -131,7 +131,7 @@ class CubicHermiteSplineTest {
     waypoints.add(new Translation2d(1.5, 0.5));
     waypoints.add(new Translation2d(2.0, 0.0));
     waypoints.add(new Translation2d(2.5, 0.5));
-    final var end = new Pose2d(3.0, 0.0, Rotation2d.fromDegrees(0.0));
+    final var end = new Pose2d(3.0, 0.0, Rotation2d.kZero);
 
     run(start, waypoints, end);
   }
@@ -142,15 +142,15 @@ class CubicHermiteSplineTest {
         MalformedSplineException.class,
         () ->
             run(
-                new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+                new Pose2d(0, 0, Rotation2d.kZero),
                 new ArrayList<>(),
-                new Pose2d(1, 0, Rotation2d.fromDegrees(180))));
+                new Pose2d(1, 0, Rotation2d.kPi)));
     assertThrows(
         MalformedSplineException.class,
         () ->
             run(
-                new Pose2d(10, 10, Rotation2d.fromDegrees(90)),
+                new Pose2d(10, 10, Rotation2d.kCCW_Pi_2),
                 List.of(new Translation2d(10, 10.5)),
-                new Pose2d(10, 11, Rotation2d.fromDegrees(-90))));
+                new Pose2d(10, 11, Rotation2d.kCW_Pi_2)));
   }
 }

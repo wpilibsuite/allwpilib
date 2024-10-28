@@ -5,9 +5,12 @@
 #include "WebServerClientTest.h"
 
 #include <cstdio>
+#include <memory>
+#include <string>
 
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
+#include <wpi/print.h>
 #include <wpinet/raw_uv_ostream.h>
 #include <wpinet/uv/util.h>
 
@@ -20,7 +23,7 @@ namespace wpilibws {
 // Create Web Socket and specify event callbacks
 void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
                                               const std::string& uri) {
-  fmt::print("Will attempt to connect to: {}:{}{}\n", host, port, uri);
+  wpi::print("Will attempt to connect to: {}:{}{}\n", host, port, uri);
   m_websocket = wpi::WebSocket::CreateClient(*m_tcp_client.get(), uri,
                                              fmt::format("{}:{}", host, port));
 
@@ -46,7 +49,7 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
     } catch (const wpi::json::parse_error& e) {
       std::string err("JSON parse failed: ");
       err += e.what();
-      fmt::print(stderr, "{}\n", err);
+      wpi::print(stderr, "{}\n", err);
       m_websocket->Fail(1003, err);
       return;
     }
@@ -65,7 +68,7 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
 // Create tcp client, specify callbacks, and create timers for loop
 bool WebServerClientTest::Initialize() {
   m_loop.error.connect(
-      [](uv::Error err) { fmt::print(stderr, "uv Error: {}\n", err.str()); });
+      [](uv::Error err) { wpi::print(stderr, "uv Error: {}\n", err.str()); });
 
   m_tcp_client = uv::Tcp::Create(m_loop);
   if (!m_tcp_client) {
@@ -106,7 +109,7 @@ bool WebServerClientTest::Initialize() {
 
 void WebServerClientTest::AttemptConnect() {
   m_connect_attempts++;
-  fmt::print("Test Client Connection Attempt {}\n", m_connect_attempts);
+  wpi::print("Test Client Connection Attempt {}\n", m_connect_attempts);
 
   if (m_connect_attempts >= 5) {
     std::fputs("Test Client Timeout. Unable to connect\n", stderr);
@@ -144,7 +147,7 @@ void WebServerClientTest::SendMessage(const wpi::json& msg) {
         m_buffers->Release(bufs);
       }
       if (err) {
-        fmt::print(stderr, "{}\n", err.str());
+        wpi::print(stderr, "{}\n", err.str());
         std::fflush(stderr);
       }
     });

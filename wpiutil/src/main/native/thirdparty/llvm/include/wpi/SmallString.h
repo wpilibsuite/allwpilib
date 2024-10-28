@@ -88,9 +88,10 @@ public:
   /// @name String Comparison
   /// @{
 
-  /// Compare two strings; the result is -1, 0, or 1 if this string is
-  /// lexicographically less than, equal to, or greater than the \p RHS.
-  int compare(std::string_view RHS) const {
+  /// compare - Compare two strings; the result is negative, zero, or positive
+  /// if this string is lexicographically less than, equal to, or greater than
+  /// the \p RHS.
+  [[nodiscard]] int compare(std::string_view RHS) const {
     return str().compare(RHS);
   }
 
@@ -102,7 +103,7 @@ public:
   ///
   /// \return - The index of the first occurrence of \p C, or npos if not
   /// found.
-  size_t find(char C, size_t From = 0) const {
+  [[nodiscard]] size_t find(char C, size_t From = 0) const {
     return str().find(C, From);
   }
 
@@ -110,7 +111,7 @@ public:
   ///
   /// \returns The index of the first occurrence of \p Str, or npos if not
   /// found.
-  size_t find(std::string_view Str, size_t From = 0) const {
+  [[nodiscard]] size_t find(std::string_view Str, size_t From = 0) const {
     return str().find(Str, From);
   }
 
@@ -118,7 +119,8 @@ public:
   ///
   /// \returns The index of the last occurrence of \p C, or npos if not
   /// found.
-  size_t rfind(char C, size_t From = std::string_view::npos) const {
+  [[nodiscard]] size_t rfind(char C,
+                             size_t From = std::string_view::npos) const {
     return str().rfind(C, From);
   }
 
@@ -126,13 +128,13 @@ public:
   ///
   /// \returns The index of the last occurrence of \p Str, or npos if not
   /// found.
-  size_t rfind(std::string_view Str) const {
+  [[nodiscard]] size_t rfind(std::string_view Str) const {
     return str().rfind(Str);
   }
 
   /// Find the first character in the string that is \p C, or npos if not
   /// found. Same as find.
-  size_t find_first_of(char C, size_t From = 0) const {
+  [[nodiscard]] size_t find_first_of(char C, size_t From = 0) const {
     return str().find_first_of(C, From);
   }
 
@@ -140,13 +142,14 @@ public:
   /// not found.
   ///
   /// Complexity: O(size() + Chars.size())
-  size_t find_first_of(std::string_view Chars, size_t From = 0) const {
+  [[nodiscard]] size_t find_first_of(std::string_view Chars,
+                                     size_t From = 0) const {
     return str().find_first_of(Chars, From);
   }
 
   /// Find the first character in the string that is not \p C or npos if not
   /// found.
-  size_t find_first_not_of(char C, size_t From = 0) const {
+  [[nodiscard]] size_t find_first_not_of(char C, size_t From = 0) const {
     return str().find_first_not_of(C, From);
   }
 
@@ -154,13 +157,15 @@ public:
   /// \p Chars, or npos if not found.
   ///
   /// Complexity: O(size() + Chars.size())
-  size_t find_first_not_of(std::string_view Chars, size_t From = 0) const {
+  [[nodiscard]] size_t find_first_not_of(std::string_view Chars,
+                                         size_t From = 0) const {
     return str().find_first_not_of(Chars, From);
   }
 
   /// Find the last character in the string that is \p C, or npos if not
   /// found.
-  size_t find_last_of(char C, size_t From = std::string_view::npos) const {
+  [[nodiscard]] size_t find_last_of(
+      char C, size_t From = std::string_view::npos) const {
     return str().find_last_of(C, From);
   }
 
@@ -168,7 +173,7 @@ public:
   /// found.
   ///
   /// Complexity: O(size() + Chars.size())
-  size_t find_last_of(
+  [[nodiscard]] size_t find_last_of(
       std::string_view Chars, size_t From = std::string_view::npos) const {
     return str().find_last_of(Chars, From);
   }
@@ -178,7 +183,9 @@ public:
   // Extra methods.
 
   /// Explicit conversion to std::string_view.
-  std::string_view str() const { return std::string_view(this->begin(), this->size()); }
+  [[nodiscard]] std::string_view str() const {
+    return std::string_view(this->begin(), this->size());
+  }
 
   // TODO: Make this const, if it's safe...
   const char* c_str() {

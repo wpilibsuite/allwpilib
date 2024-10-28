@@ -23,10 +23,6 @@ TEST(ElevatorFeedforwardTest, Calculate) {
 
   EXPECT_NEAR(elevatorFF.Calculate(0_m / 1_s).value(), Kg.value(), 0.002);
   EXPECT_NEAR(elevatorFF.Calculate(2_m / 1_s).value(), 4.5, 0.002);
-  EXPECT_NEAR(elevatorFF.Calculate(2_m / 1_s, 1_m / 1_s / 1_s).value(), 6.5,
-              0.002);
-  EXPECT_NEAR(elevatorFF.Calculate(-2_m / 1_s, 1_m / 1_s / 1_s).value(), -0.5,
-              0.002);
 
   frc::Matrixd<1, 1> A{-Kv.value() / Ka.value()};
   frc::Matrixd<1, 1> B{1.0 / Ka.value()};
@@ -36,7 +32,7 @@ TEST(ElevatorFeedforwardTest, Calculate) {
   frc::Vectord<1> r{2.0};
   frc::Vectord<1> nextR{3.0};
   EXPECT_NEAR(plantInversion.Calculate(r, nextR)(0) + Ks.value() + Kg.value(),
-              elevatorFF.Calculate(2_mps, 3_mps, dt).value(), 0.002);
+              elevatorFF.Calculate(2_mps, 3_mps).value(), 0.002);
 }
 
 TEST(ElevatorFeedforwardTest, AchievableVelocity) {
@@ -57,4 +53,10 @@ TEST(ElevatorFeedforwardTest, AchievableAcceleration) {
               -8.25, 0.002);
   EXPECT_NEAR(elevatorFF.MinAchievableAcceleration(12_V, -2_m / 1_s).value(),
               -4.75, 0.002);
+}
+
+TEST(ElevatorFeedforwardTest, NegativeGains) {
+  frc::ElevatorFeedforward elevatorFF{Ks, Kg, -Kv, -Ka};
+  EXPECT_EQ(elevatorFF.GetKv().value(), 0);
+  EXPECT_EQ(elevatorFF.GetKa().value(), 0);
 }

@@ -66,6 +66,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   SimDIOData[channel].initialized = true;
   SimDIOData[channel].isInput = input;
   SimDIOData[channel].simDevice = 0;
+  SimDIOData[channel].value = true;
   port->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
@@ -112,7 +113,7 @@ HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
   return handle;
 }
 
-void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status) {
+void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator) {
   auto port = digitalPWMHandles->Get(pwmGenerator);
   digitalPWMHandles->Free(pwmGenerator);
   if (port == nullptr) {
@@ -276,8 +277,8 @@ void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-
-  // TODO(Thad) Figure this out
+  // mimics athena HAL
+  port->filterIndex = filterIndex % 4;
 }
 
 int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
@@ -286,8 +287,7 @@ int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
-  return 0;
-  // TODO(Thad) Figure this out
+  return port->filterIndex;
 }
 
 void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {

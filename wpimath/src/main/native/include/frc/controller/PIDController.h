@@ -122,18 +122,44 @@ class WPILIB_DLLEXPORT PIDController
   units::second_t GetPeriod() const;
 
   /**
+   * Gets the error tolerance of this controller.
+   *
+   * @return The error tolerance of the controller.
+   */
+  double GetErrorTolerance() const;
+
+  /**
+   * Gets the error derivative tolerance of this controller.
+   *
+   * @return The error derivative tolerance of the controller.
+   */
+  double GetErrorDerivativeTolerance() const;
+
+  /**
    * Gets the position tolerance of this controller.
    *
    * @return The position tolerance of the controller.
+   * @deprecated Use GetErrorTolerance() instead.
    */
+  [[deprecated("Use the GetErrorTolerance method instead.")]]
   double GetPositionTolerance() const;
 
   /**
    * Gets the velocity tolerance of this controller.
    *
    * @return The velocity tolerance of the controller.
+   * @deprecated Use GetErrorDerivativeTolerance() instead.
    */
+  [[deprecated("Use the GetErrorDerivativeTolerance method instead.")]]
   double GetVelocityTolerance() const;
+
+  /**
+   * Gets the accumulated error used in the integral calculation of this
+   * controller.
+   *
+   * @return The accumulated error of this controller.
+   */
+  double GetAccumulatedError() const;
 
   /**
    * Sets the setpoint for the PIDController.
@@ -179,34 +205,49 @@ class WPILIB_DLLEXPORT PIDController
   bool IsContinuousInputEnabled() const;
 
   /**
-   * Sets the minimum and maximum values for the integrator.
+   * Sets the minimum and maximum contributions of the integral term.
    *
-   * When the cap is reached, the integrator value is added to the controller
-   * output rather than the integrator value times the integral gain.
+   * The internal integrator is clamped so that the integral term's contribution
+   * to the output stays between minimumIntegral and maximumIntegral. This
+   * prevents integral windup.
    *
-   * @param minimumIntegral The minimum value of the integrator.
-   * @param maximumIntegral The maximum value of the integrator.
+   * @param minimumIntegral The minimum contribution of the integral term.
+   * @param maximumIntegral The maximum contribution of the integral term.
    */
   void SetIntegratorRange(double minimumIntegral, double maximumIntegral);
 
   /**
    * Sets the error which is considered tolerable for use with AtSetpoint().
    *
-   * @param positionTolerance Position error which is tolerable.
-   * @param velocityTolerance Velocity error which is tolerable.
+   * @param errorTolerance error which is tolerable.
+   * @param errorDerivativeTolerance error derivative which is tolerable.
    */
-  void SetTolerance(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity());
+  void SetTolerance(double errorTolerance,
+                    double errorDerivativeTolerance =
+                        std::numeric_limits<double>::infinity());
 
   /**
    * Returns the difference between the setpoint and the measurement.
    */
+  double GetError() const;
+
+  /**
+   * Returns the error derivative.
+   */
+  double GetErrorDerivative() const;
+
+  /**
+   * Returns the difference between the setpoint and the measurement.
+   * @deprecated Use GetError() instead.
+   */
+  [[deprecated("Use GetError method instead.")]]
   double GetPositionError() const;
 
   /**
    * Returns the velocity error.
+   * @deprecated Use GetErrorDerivative() instead.
    */
+  [[deprecated("Use GetErrorDerivative method instead.")]]
   double GetVelocityError() const;
 
   /**
@@ -259,8 +300,8 @@ class WPILIB_DLLEXPORT PIDController
   bool m_continuous = false;
 
   // The error at the time of the most recent call to Calculate()
-  double m_positionError = 0;
-  double m_velocityError = 0;
+  double m_error = 0;
+  double m_errorDerivative = 0;
 
   // The error at the time of the second-most-recent call to Calculate() (used
   // to compute velocity)
@@ -270,8 +311,8 @@ class WPILIB_DLLEXPORT PIDController
   double m_totalError = 0;
 
   // The error that is considered at setpoint.
-  double m_positionTolerance = 0.05;
-  double m_velocityTolerance = std::numeric_limits<double>::infinity();
+  double m_errorTolerance = 0.05;
+  double m_errorDerivativeTolerance = std::numeric_limits<double>::infinity();
 
   double m_setpoint = 0;
   double m_measurement = 0;

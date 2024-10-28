@@ -52,9 +52,8 @@ struct traits<BDCSVD<MatrixType_, Options> > : svd_traits<MatrixType_, Options> 
 
 template <typename MatrixType, int Options>
 struct allocate_small_svd {
-  static void run(JacobiSVD<MatrixType, Options>& smallSvd, Index rows, Index cols, unsigned int computationOptions) {
-    (void)computationOptions;
-    smallSvd = JacobiSVD<MatrixType, Options>(rows, cols);
+  static void run(JacobiSVD<MatrixType, Options>& smallSvd, Index rows, Index cols, unsigned int) {
+    internal::construct_at(&smallSvd, rows, cols);
   }
 };
 
@@ -64,7 +63,7 @@ EIGEN_DISABLE_DEPRECATED_WARNING
 template <typename MatrixType>
 struct allocate_small_svd<MatrixType, 0> {
   static void run(JacobiSVD<MatrixType>& smallSvd, Index rows, Index cols, unsigned int computationOptions) {
-    smallSvd = JacobiSVD<MatrixType>(rows, cols, computationOptions);
+    internal::construct_at(&smallSvd, rows, cols, computationOptions);
   }
 };
 
@@ -164,10 +163,10 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
    * Like the default constructor but with preallocation of the internal data
    * according to the specified problem size and the \a computationOptions.
    *
-   * One \b cannot request unitiaries using both the \a Options template parameter
+   * One \b cannot request unitaries using both the \a Options template parameter
    * and the constructor. If possible, prefer using the \a Options template parameter.
    *
-   * \param computationOptions specifification for computing Thin/Full unitaries U/V
+   * \param computationOptions specification for computing Thin/Full unitaries U/V
    * \sa BDCSVD()
    *
    * \deprecated Will be removed in the next major Eigen version. Options should
@@ -179,7 +178,7 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
   }
 
   /** \brief Constructor performing the decomposition of given matrix, using the custom options specified
-   *         with the \a Options template paramter.
+   *         with the \a Options template parameter.
    *
    * \param matrix the matrix to decompose
    */
@@ -190,11 +189,11 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
   /** \brief Constructor performing the decomposition of given matrix using specified options
    *         for computing unitaries.
    *
-   *  One \b cannot request unitiaries using both the \a Options template parameter
+   *  One \b cannot request unitaries using both the \a Options template parameter
    *  and the constructor. If possible, prefer using the \a Options template parameter.
    *
    * \param matrix the matrix to decompose
-   * \param computationOptions specifification for computing Thin/Full unitaries U/V
+   * \param computationOptions specification for computing Thin/Full unitaries U/V
    *
    * \deprecated Will be removed in the next major Eigen version. Options should
    * be specified in the \a Options template parameter.
@@ -1048,7 +1047,7 @@ void BDCSVD<MatrixType, Options>::computeSingVals(const ArrayRef& col0, const Ar
       } else {
         // We have a problem as shifting on the left or right give either a positive or negative value
         // at the middle of [left,right]...
-        // Instead fo abbording or entering an infinite loop,
+        // Instead of abbording or entering an infinite loop,
         // let's just use the middle as the estimated zero-crossing:
         muCur = (right - left) * RealScalar(0.5);
         // we can test exact equality here, because shift comes from `... ? left : right`
@@ -1126,13 +1125,6 @@ void BDCSVD<MatrixType, Options>::perturbCol0(const ArrayRef& col0, const ArrayR
                       << "j=" << j << "\n";
           }
 #endif
-          // Avoid index out of bounds.
-          // Will end up setting zhat(k) = 0.
-          if (i >= k && l == 0) {
-            m_info = NumericalIssue;
-            prod = 0;
-            break;
-          }
           Index j = i < k ? i : l > 0 ? perm(l - 1) : i;
 #ifdef EIGEN_BDCSVD_SANITY_CHECKS
           if (!(dk != Literal(0) || diag(i) != Literal(0))) {
@@ -1205,7 +1197,7 @@ void BDCSVD<MatrixType, Options>::computeSingVecs(const ArrayRef& zhat, const Ar
 
 // page 12_13
 // i >= 1, di almost null and zi non null.
-// We use a rotation to zero out zi applied to the left of M
+// We use a rotation to zero out zi applied to the left of M, and set di = 0.
 template <typename MatrixType, int Options>
 void BDCSVD<MatrixType, Options>::deflation43(Index firstCol, Index shift, Index i, Index size) {
   using std::abs;
@@ -1231,9 +1223,8 @@ void BDCSVD<MatrixType, Options>::deflation43(Index firstCol, Index shift, Index
 }  // end deflation 43
 
 // page 13
-// i,j >= 1, i!=j and |di - dj| < epsilon * norm2(M)
-// We apply two rotations to have zj = 0;
-// TODO deflation44 is still broken and not properly tested
+// i,j >= 1, i > j, and |di - dj| < epsilon * norm2(M)
+// We apply two rotations to have zi = 0, and dj = di.
 template <typename MatrixType, int Options>
 void BDCSVD<MatrixType, Options>::deflation44(Index firstColu, Index firstColm, Index firstRowW, Index firstColW,
                                               Index i, Index j, Index size) {
@@ -1241,9 +1232,10 @@ void BDCSVD<MatrixType, Options>::deflation44(Index firstColu, Index firstColm, 
   using std::conj;
   using std::pow;
   using std::sqrt;
-  RealScalar c = m_computed(firstColm + i, firstColm);
-  RealScalar s = m_computed(firstColm + j, firstColm);
-  RealScalar r = sqrt(numext::abs2(c) + numext::abs2(s));
+
+  RealScalar s = m_computed(firstColm + i, firstColm);
+  RealScalar c = m_computed(firstColm + j, firstColm);
+  RealScalar r = numext::hypot(c, s);
 #ifdef EIGEN_BDCSVD_DEBUG_VERBOSE
   std::cout << "deflation 4.4: " << i << "," << j << " -> " << c << " " << s << " " << r << " ; "
             << m_computed(firstColm + i - 1, firstColm) << " " << m_computed(firstColm + i, firstColm) << " "
@@ -1253,21 +1245,21 @@ void BDCSVD<MatrixType, Options>::deflation44(Index firstColu, Index firstColm, 
             << m_computed(firstColm + i + 2, firstColm + i + 2) << "\n";
 #endif
   if (numext::is_exactly_zero(r)) {
-    m_computed(firstColm + i, firstColm + i) = m_computed(firstColm + j, firstColm + j);
+    m_computed(firstColm + j, firstColm + j) = m_computed(firstColm + i, firstColm + i);
     return;
   }
   c /= r;
   s /= r;
-  m_computed(firstColm + i, firstColm) = r;
+  m_computed(firstColm + j, firstColm) = r;
   m_computed(firstColm + j, firstColm + j) = m_computed(firstColm + i, firstColm + i);
-  m_computed(firstColm + j, firstColm) = Literal(0);
+  m_computed(firstColm + i, firstColm) = Literal(0);
 
   JacobiRotation<RealScalar> J(c, -s);
   if (m_compU)
-    m_naiveU.middleRows(firstColu, size + 1).applyOnTheRight(firstColu + i, firstColu + j, J);
+    m_naiveU.middleRows(firstColu, size + 1).applyOnTheRight(firstColu + j, firstColu + i, J);
   else
-    m_naiveU.applyOnTheRight(firstColu + i, firstColu + j, J);
-  if (m_compV) m_naiveV.middleRows(firstRowW, size).applyOnTheRight(firstColW + i, firstColW + j, J);
+    m_naiveU.applyOnTheRight(firstColu + j, firstColu + i, J);
+  if (m_compV) m_naiveV.middleRows(firstRowW, size).applyOnTheRight(firstColW + j, firstColW + i, J);
 }  // end deflation 44
 
 // acts on block from (firstCol+shift, firstCol+shift) to (lastCol+shift, lastCol+shift) [inclusive]
@@ -1350,7 +1342,7 @@ void BDCSVD<MatrixType, Options>::deflation(Index firstCol, Index lastCol, Index
 
       // Move deflated diagonal entries at the end.
       for (Index i = 1; i < length; ++i)
-        if (abs(diag(i)) < considerZero) permutation[p++] = i;
+        if (diag(i) < considerZero) permutation[p++] = i;
 
       Index i = 1, j = k + 1;
       for (; p < length; ++p) {
@@ -1369,7 +1361,7 @@ void BDCSVD<MatrixType, Options>::deflation(Index firstCol, Index lastCol, Index
     if (total_deflation) {
       for (Index i = 1; i < length; ++i) {
         Index pi = permutation[i];
-        if (abs(diag(pi)) < considerZero || diag(0) < diag(pi))
+        if (diag(pi) < considerZero || diag(0) < diag(pi))
           permutation[i - 1] = permutation[i];
         else {
           permutation[i - 1] = 0;
@@ -1424,17 +1416,18 @@ void BDCSVD<MatrixType, Options>::deflation(Index firstCol, Index lastCol, Index
   // condition 4.4
   {
     Index i = length - 1;
-    while (i > 0 && (abs(diag(i)) < considerZero || abs(col0(i)) < considerZero)) --i;
+    // Find last non-deflated entry.
+    while (i > 0 && (diag(i) < considerZero || abs(col0(i)) < considerZero)) --i;
+
     for (; i > 1; --i)
-      if ((diag(i) - diag(i - 1)) < NumTraits<RealScalar>::epsilon() * maxDiag) {
+      if ((diag(i) - diag(i - 1)) < epsilon_strict) {
 #ifdef EIGEN_BDCSVD_DEBUG_VERBOSE
         std::cout << "deflation 4.4 with i = " << i << " because " << diag(i) << " - " << diag(i - 1)
-                  << " == " << (diag(i) - diag(i - 1)) << " < "
-                  << NumTraits<RealScalar>::epsilon() * /*diag(i)*/ maxDiag << "\n";
+                  << " == " << (diag(i) - diag(i - 1)) << " < " << epsilon_strict << "\n";
 #endif
         eigen_internal_assert(abs(diag(i) - diag(i - 1)) < epsilon_coarse &&
                               " diagonal entries are not properly sorted");
-        deflation44(firstCol, firstCol + shift, firstRowW, firstColW, i - 1, i, length);
+        deflation44(firstCol, firstCol + shift, firstRowW, firstColW, i, i - 1, length);
       }
   }
 

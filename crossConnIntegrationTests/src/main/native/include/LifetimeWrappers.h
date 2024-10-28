@@ -10,192 +10,77 @@
 
 namespace hlt {
 
-struct InterruptHandle {
+struct InterruptHandle : hal::Handle<HAL_InterruptHandle, HAL_CleanInterrupts> {
  public:
-  explicit InterruptHandle(int32_t* status) {
-    handle = HAL_InitializeInterrupts(status);
-  }
-  InterruptHandle(const InterruptHandle&) = delete;
-  InterruptHandle operator=(const InterruptHandle&) = delete;
-
-  InterruptHandle(InterruptHandle&&) = default;
-  InterruptHandle& operator=(InterruptHandle&&) = default;
-
-  ~InterruptHandle() { HAL_CleanInterrupts(handle); }
-
-  operator HAL_InterruptHandle() const { return handle; }
-
- private:
-  HAL_InterruptHandle handle = 0;
+  explicit InterruptHandle(int32_t* status)
+      : Handle{HAL_InitializeInterrupts(status)} {}
 };
 
-struct DMAHandle {
+struct DMAHandle : hal::Handle<HAL_DMAHandle, HAL_FreeDMA> {
  public:
-  explicit DMAHandle(int32_t* status) { handle = HAL_InitializeDMA(status); }
-  DMAHandle(const DMAHandle&) = delete;
-  DMAHandle operator=(const DMAHandle&) = delete;
-
-  DMAHandle(DMAHandle&&) = default;
-  DMAHandle& operator=(DMAHandle&&) = default;
-
-  ~DMAHandle() { HAL_FreeDMA(handle); }
-
-  operator HAL_DMAHandle() const { return handle; }
-
- private:
-  HAL_DMAHandle handle = 0;
+  explicit DMAHandle(int32_t* status) : Handle{HAL_InitializeDMA(status)} {}
 };
 
-struct AnalogInputHandle {
+struct AnalogInputHandle
+    : hal::Handle<HAL_AnalogInputHandle, HAL_FreeAnalogInputPort> {
  public:
-  AnalogInputHandle(int32_t port, int32_t* status) {
-    handle = HAL_InitializeAnalogInputPort(HAL_GetPort(port), nullptr, status);
-  }
-  AnalogInputHandle(const AnalogInputHandle&) = delete;
-  AnalogInputHandle operator=(const AnalogInputHandle&) = delete;
-
-  AnalogInputHandle(AnalogInputHandle&&) = default;
-  AnalogInputHandle& operator=(AnalogInputHandle&&) = default;
-
-  ~AnalogInputHandle() { HAL_FreeAnalogInputPort(handle); }
-
-  operator HAL_AnalogInputHandle() const { return handle; }
-
- private:
-  HAL_AnalogInputHandle handle = 0;
+  AnalogInputHandle(int32_t port, int32_t* status)
+      : Handle{HAL_InitializeAnalogInputPort(HAL_GetPort(port), nullptr,
+                                             status)} {}
 };
 
-struct AnalogOutputHandle {
+struct AnalogOutputHandle
+    : hal::Handle<HAL_AnalogOutputHandle, HAL_FreeAnalogOutputPort> {
  public:
-  AnalogOutputHandle(int32_t port, int32_t* status) {
-    handle = HAL_InitializeAnalogOutputPort(HAL_GetPort(port), nullptr, status);
-  }
-  AnalogOutputHandle(const AnalogOutputHandle&) = delete;
-  AnalogOutputHandle operator=(const AnalogOutputHandle&) = delete;
-
-  AnalogOutputHandle(AnalogOutputHandle&&) = default;
-  AnalogOutputHandle& operator=(AnalogOutputHandle&&) = default;
-
-  ~AnalogOutputHandle() { HAL_FreeAnalogOutputPort(handle); }
-
-  operator HAL_AnalogOutputHandle() const { return handle; }
-
- private:
-  HAL_AnalogOutputHandle handle = 0;
+  AnalogOutputHandle(int32_t port, int32_t* status)
+      : Handle{HAL_InitializeAnalogOutputPort(HAL_GetPort(port), nullptr,
+                                              status)} {}
 };
 
-struct AnalogTriggerHandle {
+struct AnalogTriggerHandle
+    : hal::Handle<HAL_AnalogTriggerHandle, HAL_CleanAnalogTrigger> {
  public:
-  explicit AnalogTriggerHandle(HAL_AnalogInputHandle port, int32_t* status) {
-    handle = HAL_InitializeAnalogTrigger(port, status);
-  }
-  AnalogTriggerHandle(const AnalogTriggerHandle&) = delete;
-  AnalogTriggerHandle operator=(const AnalogTriggerHandle&) = delete;
-
-  AnalogTriggerHandle(AnalogTriggerHandle&&) = default;
-  AnalogTriggerHandle& operator=(AnalogTriggerHandle&&) = default;
-
-  ~AnalogTriggerHandle() {
-    int32_t status = 0;
-    HAL_CleanAnalogTrigger(handle, &status);
-  }
-
-  operator HAL_AnalogTriggerHandle() const { return handle; }
-
- private:
-  HAL_AnalogTriggerHandle handle = 0;
+  explicit AnalogTriggerHandle(HAL_AnalogInputHandle port, int32_t* status)
+      : Handle{HAL_InitializeAnalogTrigger(port, status)} {}
 };
 
-struct DutyCycleHandle {
+struct DutyCycleHandle : hal::Handle<HAL_DutyCycleHandle, HAL_FreeDutyCycle> {
  public:
-  DutyCycleHandle(HAL_DigitalHandle port, int32_t* status) {
-    handle = HAL_InitializeDutyCycle(
-        port, HAL_AnalogTriggerType::HAL_Trigger_kInWindow, status);
-  }
-  DutyCycleHandle(const DutyCycleHandle&) = delete;
-  DutyCycleHandle operator=(const DutyCycleHandle&) = delete;
-
-  DutyCycleHandle(DutyCycleHandle&&) = default;
-  DutyCycleHandle& operator=(DutyCycleHandle&&) = default;
-
-  ~DutyCycleHandle() { HAL_FreeDutyCycle(handle); }
-
-  operator HAL_DutyCycleHandle() const { return handle; }
-
- private:
-  HAL_DutyCycleHandle handle = 0;
+  DutyCycleHandle(HAL_DigitalHandle port, int32_t* status)
+      : Handle{HAL_InitializeDutyCycle(
+            port, HAL_AnalogTriggerType::HAL_Trigger_kInWindow, status)} {}
 };
 
-struct DIOHandle {
+struct DIOHandle : hal::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> {
  public:
   DIOHandle() {}
-  DIOHandle(const DIOHandle&) = delete;
-  DIOHandle operator=(const DIOHandle&) = delete;
 
-  DIOHandle(DIOHandle&&) = default;
-  DIOHandle& operator=(DIOHandle&&) = default;
-
-  DIOHandle(int32_t port, HAL_Bool input, int32_t* status) {
-    handle = HAL_InitializeDIOPort(HAL_GetPort(port), input, nullptr, status);
-  }
-
-  ~DIOHandle() { HAL_FreeDIOPort(handle); }
-
-  operator HAL_DigitalHandle() const { return handle; }
-
- private:
-  HAL_DigitalHandle handle = 0;
+  DIOHandle(int32_t port, HAL_Bool input, int32_t* status)
+      : Handle{
+            HAL_InitializeDIOPort(HAL_GetPort(port), input, nullptr, status)} {}
 };
 
-struct PWMHandle {
+struct PWMHandle : hal::Handle<HAL_DigitalHandle, HAL_FreePWMPort> {
  public:
   PWMHandle() {}
-  PWMHandle(const PWMHandle&) = delete;
-  PWMHandle operator=(const PWMHandle&) = delete;
 
-  PWMHandle(PWMHandle&&) = default;
-  PWMHandle& operator=(PWMHandle&&) = default;
-
-  PWMHandle(int32_t port, int32_t* status) {
-    handle = HAL_InitializePWMPort(HAL_GetPort(port), nullptr, status);
-  }
-
-  ~PWMHandle() {
-    int32_t status = 0;
-    HAL_FreePWMPort(handle, &status);
-  }
-
-  operator HAL_DigitalHandle() const { return handle; }
-
- private:
-  HAL_DigitalHandle handle = 0;
+  PWMHandle(int32_t port, int32_t* status)
+      : Handle{HAL_InitializePWMPort(HAL_GetPort(port), nullptr, status)} {}
 };
 
-struct RelayHandle {
+struct RelayHandle : hal::Handle<HAL_RelayHandle, HAL_FreeRelayPort> {
  public:
-  RelayHandle(int32_t port, HAL_Bool fwd, int32_t* status) {
-    handle = HAL_InitializeRelayPort(HAL_GetPort(port), fwd, nullptr, status);
-  }
-  RelayHandle(const RelayHandle&) = delete;
-  RelayHandle operator=(const RelayHandle&) = delete;
-
-  RelayHandle(RelayHandle&&) = default;
-  RelayHandle& operator=(RelayHandle&&) = default;
-
-  ~RelayHandle() { HAL_FreeRelayPort(handle); }
-
-  operator HAL_RelayHandle() const { return handle; }
-
- private:
-  HAL_RelayHandle handle = 0;
+  RelayHandle(int32_t port, HAL_Bool fwd, int32_t* status)
+      : Handle{
+            HAL_InitializeRelayPort(HAL_GetPort(port), fwd, nullptr, status)} {}
 };
 
-#define ASSERT_LAST_ERROR_STATUS(status, x)                \
-  do {                                                     \
-    ASSERT_EQ(status, HAL_USE_LAST_ERROR);                 \
-    [[maybe_unused]] const char* lastErrorMessageInMacro = \
-        HAL_GetLastError(&status);                         \
-    ASSERT_EQ(status, x);                                  \
+#define ASSERT_LAST_ERROR_STATUS(status, x)                          \
+  do {                                                               \
+    ASSERT_EQ(status, HAL_USE_LAST_ERROR);                           \
+    [[maybe_unused]]                                                 \
+    const char* lastErrorMessageInMacro = HAL_GetLastError(&status); \
+    ASSERT_EQ(status, x);                                            \
   } while (0)
 
 }  // namespace hlt

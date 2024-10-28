@@ -6,8 +6,14 @@
 
 using namespace frc2;
 
+CommandGenericHID::CommandGenericHID(int port) : m_hid{port} {}
+
+frc::GenericHID& CommandGenericHID::GetHID() {
+  return m_hid;
+}
+
 Trigger CommandGenericHID::Button(int button, frc::EventLoop* loop) const {
-  return GenericHID::Button(button, loop).CastTo<Trigger>();
+  return Trigger(loop, [this, button] { return m_hid.GetRawButton(button); });
 }
 
 Trigger CommandGenericHID::POV(int angle, frc::EventLoop* loop) const {
@@ -16,7 +22,7 @@ Trigger CommandGenericHID::POV(int angle, frc::EventLoop* loop) const {
 
 Trigger CommandGenericHID::POV(int pov, int angle, frc::EventLoop* loop) const {
   return Trigger(loop,
-                 [this, pov, angle] { return this->GetPOV(pov) == angle; });
+                 [this, pov, angle] { return m_hid.GetPOV(pov) == angle; });
 }
 
 Trigger CommandGenericHID::POVUp(frc::EventLoop* loop) const {
@@ -58,13 +64,29 @@ Trigger CommandGenericHID::POVCenter(frc::EventLoop* loop) const {
 Trigger CommandGenericHID::AxisLessThan(int axis, double threshold,
                                         frc::EventLoop* loop) const {
   return Trigger(loop, [this, axis, threshold]() {
-    return this->GetRawAxis(axis) < threshold;
+    return m_hid.GetRawAxis(axis) < threshold;
   });
 }
 
 Trigger CommandGenericHID::AxisGreaterThan(int axis, double threshold,
                                            frc::EventLoop* loop) const {
   return Trigger(loop, [this, axis, threshold]() {
-    return this->GetRawAxis(axis) > threshold;
+    return m_hid.GetRawAxis(axis) > threshold;
   });
+}
+
+Trigger CommandGenericHID::AxisMagnitudeGreaterThan(
+    int axis, double threshold, frc::EventLoop* loop) const {
+  return Trigger(loop, [this, axis, threshold]() {
+    return std::abs(m_hid.GetRawAxis(axis)) > threshold;
+  });
+}
+
+void CommandGenericHID::SetRumble(frc::GenericHID::RumbleType type,
+                                  double value) {
+  m_hid.SetRumble(type, value);
+}
+
+bool CommandGenericHID::IsConnected() const {
+  return m_hid.IsConnected();
 }

@@ -10,9 +10,16 @@ package edu.wpi.first.hal;
  * @see "REVPH.h"
  */
 public class REVPHJNI extends JNIWrapper {
+  /** Disabled. */
   public static final int COMPRESSOR_CONFIG_TYPE_DISABLED = 0;
+
+  /** Digital. */
   public static final int COMPRESSOR_CONFIG_TYPE_DIGITAL = 1;
+
+  /** Analog. */
   public static final int COMPRESSOR_CONFIG_TYPE_ANALOG = 2;
+
+  /** Hybrid. */
   public static final int COMPRESSOR_CONFIG_TYPE_HYBRID = 3;
 
   /**
@@ -20,7 +27,7 @@ public class REVPHJNI extends JNIWrapper {
    *
    * @param module the CAN ID to initialize
    * @return the created PH handle
-   * @see "HAL_InitializeREVP"
+   * @see "HAL_InitializeREVPH"
    */
   public static native int initialize(int module);
 
@@ -169,7 +176,7 @@ public class REVPHJNI extends JNIWrapper {
    * Gets a bitmask of solenoid values.
    *
    * @param handle the PH handle
-   * @return solenoid values
+   * @return Bitmask containing the state of the solenoids. The LSB represents solenoid 0.
    * @see "HAL_GetREVPHSolenoids"
    */
   public static native int getSolenoids(int handle);
@@ -178,8 +185,9 @@ public class REVPHJNI extends JNIWrapper {
    * Sets solenoids on a PH.
    *
    * @param handle the PH handle
-   * @param mask bitmask to set
-   * @param values solenoid values
+   * @param mask Bitmask indicating which solenoids to set. The LSB represents solenoid 0.
+   * @param values Bitmask indicating the desired states of the solenoids. The LSB represents
+   *     solenoid 0.
    * @see "HAL_SetREVPHSolenoids"
    */
   public static native void setSolenoids(int handle, int mask, int values);
@@ -277,6 +285,15 @@ public class REVPHJNI extends JNIWrapper {
   public static REVPHFaults getFaults(int handle) {
     return new REVPHFaults(getFaultsNative(handle));
   }
+
+  /**
+   * Get a bitmask of disabled solenoids.
+   *
+   * @param handle the PH handle
+   * @return Bitmask indicating disabled solenoids. The LSB represents solenoid 0.
+   * @see "HAL_GetREVPHSolenoidDisabledList"
+   */
+  public static native int getSolenoidDisabledList(int handle);
 
   /**
    * Returns the hardware and firmware versions of the PH.

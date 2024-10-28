@@ -5,9 +5,7 @@ include(CompileWarnings)
 include(AddTest)
 
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     add_jar(
@@ -23,7 +21,9 @@ if(WITH_JAVA)
             wpiutil_jar
             wpilibj_jar
         OUTPUT_NAME xrpVendordep
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
+    set_property(TARGET xrpVendordep_jar PROPERTY FOLDER "java")
 
     install_jar(xrpVendordep_jar DESTINATION ${java_lib_dest})
     install_jar_exports(
@@ -34,20 +34,17 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
-    file(GLOB XRPVENDORDEP_SOURCES src/main/java/edu/wpi/first/wpilibj/xrp/*.java)
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         xrpVendordep_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/wpilibj/xrp" ${XRPVENDORDEP_SOURCES}
+        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
         OUTPUT_NAME xrpVendordep-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(xrpVendordep_src_JAR_FILE TARGET xrpVendordep_src_jar PROPERTY JAR_FILE)
-    install(FILES ${xrpVendordep_src_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET xrpVendordep_src_jar PROPERTY FOLDER "java")
+
+    install_jar(xrpVendordep_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 file(GLOB_RECURSE xrpVendordep_native_src src/main/native/cpp/*.cpp)
@@ -66,7 +63,8 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/xrpVendordep>
 )
 
-install(TARGETS xrpVendordep EXPORT xrpvendordep DESTINATION "${main_lib_dest}")
+install(TARGETS xrpVendordep EXPORT xrpvendordep)
+export(TARGETS xrpVendordep FILE xrpvendordep.cmake NAMESPACE xrpvendordep::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/xrpVendordep")
 
 configure_file(xrpvendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake)
@@ -76,5 +74,5 @@ install(EXPORT xrpvendordep DESTINATION share/xrpVendordep)
 if(WITH_TESTS)
     wpilib_add_test(xrpVendordep src/test/native/cpp)
     target_include_directories(xrpVendordep_test PRIVATE src/test/native/include)
-    target_link_libraries(xrpVendordep_test xrpVendordep gmock_main)
+    target_link_libraries(xrpVendordep_test xrpVendordep googletest)
 endif()

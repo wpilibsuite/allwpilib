@@ -34,13 +34,13 @@ namespace internal {
 template <typename MatrixType, unsigned int Mode>
 struct traits<SparseSelfAdjointView<MatrixType, Mode> > : traits<MatrixType> {};
 
-template <int SrcMode, int DstMode, typename MatrixType, int DestOrder>
+template <int SrcMode, int DstMode, bool NonHermitian, typename MatrixType, int DestOrder>
 void permute_symm_to_symm(
     const MatrixType& mat,
     SparseMatrix<typename MatrixType::Scalar, DestOrder, typename MatrixType::StorageIndex>& _dest,
     const typename MatrixType::StorageIndex* perm = 0);
 
-template <int Mode, typename MatrixType, int DestOrder>
+template <int Mode, bool NonHermitian, typename MatrixType, int DestOrder>
 void permute_symm_to_fullsymm(
     const MatrixType& mat,
     SparseMatrix<typename MatrixType::Scalar, DestOrder, typename MatrixType::StorageIndex>& _dest,
@@ -53,7 +53,7 @@ class SparseSelfAdjointView : public EigenBase<SparseSelfAdjointView<MatrixType,
  public:
   enum {
     Mode = Mode_,
-    TransposeMode = ((Mode & Upper) ? Lower : 0) | ((Mode & Lower) ? Upper : 0),
+    TransposeMode = ((int(Mode) & int(Upper)) ? Lower : 0) | ((int(Mode) & int(Lower)) ? Upper : 0),
     RowsAtCompileTime = internal::traits<SparseSelfAdjointView>::RowsAtCompileTime,
     ColsAtCompileTime = internal::traits<SparseSelfAdjointView>::ColsAtCompileTime
   };
@@ -143,7 +143,7 @@ class SparseSelfAdjointView : public EigenBase<SparseSelfAdjointView<MatrixType,
     return *this = src.twistedBy(pnull);
   }
 
-  // Since we override the copy-assignment operator, we need to explicitly re-declare the copy-constructor
+  // Since we override the copy-assignment operator, we need to explicitly redeclare the copy-constructor
   EIGEN_DEFAULT_COPY_CONSTRUCTOR(SparseSelfAdjointView)
 
   template <typename SrcMatrixType, unsigned int SrcMode>
@@ -234,7 +234,7 @@ struct Assignment<DstXprType, SrcXprType, Functor, SparseSelfAdjoint2Sparse> {
   template <typename DestScalar, int StorageOrder>
   static void run(SparseMatrix<DestScalar, StorageOrder, StorageIndex>& dst, const SrcXprType& src,
                   const AssignOpType& /*func*/) {
-    internal::permute_symm_to_fullsymm<SrcXprType::Mode>(src.matrix(), dst);
+    internal::permute_symm_to_fullsymm<SrcXprType::Mode, false>(src.matrix(), dst);
   }
 
   // FIXME: the handling of += and -= in sparse matrices should be cleanup so that next two overloads could be reduced
@@ -405,7 +405,7 @@ struct product_evaluator<Product<Lhs, RhsView, DefaultProduct>, ProductTag, Spar
  ***************************************************************************/
 namespace internal {
 
-template <int Mode, typename MatrixType, int DestOrder>
+template <int Mode, bool NonHermitian, typename MatrixType, int DestOrder>
 void permute_symm_to_fullsymm(
     const MatrixType& mat,
     SparseMatrix<typename MatrixType::Scalar, DestOrder, typename MatrixType::StorageIndex>& _dest,
@@ -476,13 +476,13 @@ void permute_symm_to_fullsymm(
         dest.valuePtr()[k] = it.value();
         k = count[ip]++;
         dest.innerIndexPtr()[k] = jp;
-        dest.valuePtr()[k] = numext::conj(it.value());
+        dest.valuePtr()[k] = (NonHermitian ? it.value() : numext::conj(it.value()));
       }
     }
   }
 }
 
-template <int SrcMode_, int DstMode_, typename MatrixType, int DstOrder>
+template <int SrcMode_, int DstMode_, bool NonHermitian, typename MatrixType, int DstOrder>
 void permute_symm_to_symm(const MatrixType& mat,
                           SparseMatrix<typename MatrixType::Scalar, DstOrder, typename MatrixType::StorageIndex>& _dest,
                           const typename MatrixType::StorageIndex* perm) {
@@ -534,7 +534,7 @@ void permute_symm_to_symm(const MatrixType& mat,
 
       if (!StorageOrderMatch) std::swap(ip, jp);
       if (((int(DstMode) == int(Lower) && ip < jp) || (int(DstMode) == int(Upper) && ip > jp)))
-        dest.valuePtr()[k] = numext::conj(it.value());
+        dest.valuePtr()[k] = (NonHermitian ? it.value() : numext::conj(it.value()));
       else
         dest.valuePtr()[k] = it.value();
     }
@@ -595,14 +595,14 @@ struct Assignment<DstXprType, SparseSymmetricPermutationProduct<MatrixType, Mode
                   const internal::assign_op<Scalar, typename MatrixType::Scalar>&) {
     // internal::permute_symm_to_fullsymm<Mode>(m_matrix,_dest,m_perm.indices().data());
     SparseMatrix<Scalar, (Options & RowMajor) == RowMajor ? ColMajor : RowMajor, DstIndex> tmp;
-    internal::permute_symm_to_fullsymm<Mode>(src.matrix(), tmp, src.perm().indices().data());
+    internal::permute_symm_to_fullsymm<Mode, false>(src.matrix(), tmp, src.perm().indices().data());
     dst = tmp;
   }
 
   template <typename DestType, unsigned int DestMode>
   static void run(SparseSelfAdjointView<DestType, DestMode>& dst, const SrcXprType& src,
                   const internal::assign_op<Scalar, typename MatrixType::Scalar>&) {
-    internal::permute_symm_to_symm<Mode, DestMode>(src.matrix(), dst.matrix(), src.perm().indices().data());
+    internal::permute_symm_to_symm<Mode, DestMode, false>(src.matrix(), dst.matrix(), src.perm().indices().data());
   }
 };
 

@@ -17,6 +17,7 @@
 #include <wpi/Logger.h>
 #include <wpi/spinlock.h>
 
+#include "sysid/analysis/AnalysisManager.h"
 #include "sysid/analysis/AnalysisType.h"
 #include "sysid/analysis/Storage.h"
 
@@ -44,15 +45,16 @@ class AnalyzerPlot {
    * @param rawData      Raw data storage.
    * @param filteredData Filtered data storage.
    * @param unit         Unit of the dataset
-   * @param ff           List of feedforward gains (Ks, Kv, Ka, and optionally
-   *                     Kg).
+   * @param ff           Feedforward gains (Ks, Kv, Ka, optionally
+   *                     Kg and offset).
    * @param startTimes   Array of dataset start times.
    * @param type         Type of analysis.
    * @param abort        Aborts analysis early if set to true from another
    *                     thread.
    */
   void SetData(const Storage& rawData, const Storage& filteredData,
-               std::string_view unit, const std::vector<double>& ff,
+               std::string_view unit,
+               const AnalysisManager::FeedforwardGains& ff,
                const std::array<units::second_t, 4>& startTimes,
                AnalysisType type, std::atomic<bool>& abort);
 

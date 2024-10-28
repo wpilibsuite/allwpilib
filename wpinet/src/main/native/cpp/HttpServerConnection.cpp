@@ -4,12 +4,14 @@
 
 #include "wpinet/HttpServerConnection.h"
 
-#include <fmt/format.h>
+#include <memory>
+
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fmt/raw_ostream.h>
+#include <wpi/print.h>
 
 #include "wpinet/raw_uv_ostream.h"
 
@@ -65,7 +67,7 @@ void HttpServerConnection::BuildHeader(raw_ostream& os, int code,
                                        std::string_view contentType,
                                        uint64_t contentLength,
                                        std::string_view extra) {
-  fmt::print(os, "HTTP/{}.{} {} {}\r\n", m_request.GetMajor(),
+  wpi::print(os, "HTTP/{}.{} {} {}\r\n", m_request.GetMajor(),
              m_request.GetMinor(), code, codeText);
   if (contentLength == 0) {
     m_keepAlive = false;
@@ -76,7 +78,7 @@ void HttpServerConnection::BuildHeader(raw_ostream& os, int code,
   BuildCommonHeaders(os);
   os << "Content-Type: " << contentType << "\r\n";
   if (contentLength != 0) {
-    fmt::print(os, "Content-Length: {}\r\n", contentLength);
+    wpi::print(os, "Content-Length: {}\r\n", contentLength);
   }
   os << "Access-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\n";
   if (!extra.empty()) {

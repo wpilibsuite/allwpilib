@@ -472,13 +472,7 @@ class DynamicStruct {
    * @param field field descriptor
    * @return field value
    */
-  std::string_view GetStringField(const StructFieldDescriptor* field) const {
-    assert(field->m_type == StructFieldType::kChar);
-    assert(field->m_parent == m_desc);
-    assert(m_desc->IsValid());
-    return {reinterpret_cast<const char*>(&m_data[field->m_offset]),
-            field->m_arraySize};
-  }
+  std::string_view GetStringField(const StructFieldDescriptor* field) const;
 
   /**
    * Gets the value of a struct field.
@@ -610,8 +604,9 @@ class MutableDynamicStruct : public DynamicStruct {
    *
    * @param field field descriptor
    * @param value field value
+   * @return true if the full value fit in the struct, false if truncated
    */
-  void SetStringField(const StructFieldDescriptor* field,
+  bool SetStringField(const StructFieldDescriptor* field,
                       std::string_view value);
 
   /**

@@ -4,7 +4,10 @@
 
 #include "glass/other/FMS.h"
 
+#include <string>
+
 #include <imgui.h>
+#include <imgui_stdlib.h>
 #include <wpi/SmallString.h>
 
 #include "glass/DataSource.h"
@@ -14,7 +17,7 @@ using namespace glass;
 static const char* stations[] = {"Invalid", "Red 1",  "Red 2", "Red 3",
                                  "Blue 1",  "Blue 2", "Blue 3"};
 
-void glass::DisplayFMS(FMSModel* model) {
+void glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
   if (!model->Exists() || model->IsReadOnly()) {
     return DisplayFMSReadOnly(model);
   }
@@ -31,10 +34,17 @@ void glass::DisplayFMS(FMSModel* model) {
   // DS Attached
   if (auto data = model->GetDsAttachedData()) {
     bool val = data->GetValue();
-    if (ImGui::Checkbox("DS Attached", &val)) {
-      model->SetDsAttached(val);
+    if (editableDsAttached) {
+      if (ImGui::Checkbox("DS Attached", &val)) {
+        model->SetDsAttached(val);
+      }
+      data->EmitDrag();
+    } else {
+      ImGui::Selectable("DS Attached: ");
+      data->EmitDrag();
+      ImGui::SameLine();
+      ImGui::TextUnformatted(val ? "Yes" : "No");
     }
-    data->EmitDrag();
   }
 
   // Alliance Station
@@ -51,8 +61,7 @@ void glass::DisplayFMS(FMSModel* model) {
   if (auto data = model->GetMatchTimeData()) {
     double val = data->GetValue();
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-    if (ImGui::InputDouble("Match Time", &val, 0, 0, "%.1f",
-                           ImGuiInputTextFlags_EnterReturnsTrue)) {
+    if (ImGui::InputDouble("Match Time", &val, 0, 0, "%.1f")) {
       model->SetMatchTime(val);
     }
     data->EmitDrag();
@@ -71,16 +80,12 @@ void glass::DisplayFMS(FMSModel* model) {
   }
 
   // Game Specific Message
-  // make buffer full 64 width, null terminated, for editability
-  wpi::SmallString<64> gameSpecificMessage;
-  model->GetGameSpecificMessage(gameSpecificMessage);
-  gameSpecificMessage.resize(63);
-  gameSpecificMessage.push_back('\0');
+  wpi::SmallString<64> gameSpecificMessageBuf;
+  std::string gameSpecificMessage{
+      model->GetGameSpecificMessage(gameSpecificMessageBuf)};
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-  if (ImGui::InputText("Game Specific", gameSpecificMessage.data(),
-                       gameSpecificMessage.size(),
-                       ImGuiInputTextFlags_EnterReturnsTrue)) {
-    model->SetGameSpecificMessage(gameSpecificMessage.data());
+  if (ImGui::InputText("Game Specific", &gameSpecificMessage)) {
+    model->SetGameSpecificMessage(gameSpecificMessage);
   }
 }
 
@@ -144,9 +149,10 @@ void glass::DisplayFMSReadOnly(FMSModel* model) {
     }
   }
 
-  wpi::SmallString<64> gameSpecificMessage;
-  model->GetGameSpecificMessage(gameSpecificMessage);
-  ImGui::Text("Game Specific: %s", exists ? gameSpecificMessage.c_str() : "?");
+  wpi::SmallString<64> gameSpecificMessageBuf;
+  std::string_view gameSpecificMessage =
+      model->GetGameSpecificMessage(gameSpecificMessageBuf);
+  ImGui::Text("Game Specific: %s", exists ? gameSpecificMessage.data() : "?");
 
   if (!exists) {
     ImGui::PopStyleColor();

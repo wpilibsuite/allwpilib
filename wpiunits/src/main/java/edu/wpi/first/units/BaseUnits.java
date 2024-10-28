@@ -11,36 +11,30 @@ public final class BaseUnits {
   }
 
   /** The standard unit of distance, meters. */
-  public static final Distance Distance = new Distance(1, "Meter", "m");
+  public static final DistanceUnit DistanceUnit = new DistanceUnit(null, 1, "Meter", "m");
 
   /** The standard unit of time, seconds. */
-  public static final Time Time = new Time(1, "Second", "s");
-
-  /** The standard unit of velocity, meters per second. */
-  public static final Velocity<Distance> Velocity =
-      new Velocity<>(Distance, Time, "Meter per Second", "m/s");
+  public static final TimeUnit TimeUnit = new TimeUnit(null, 1, "Second", "s");
 
   /** The standard unit of mass, kilograms. */
-  public static final Mass Mass = new Mass(1, "Kilogram", "Kg");
+  public static final MassUnit MassUnit = new MassUnit(null, 1, "Kilogram", "Kg");
 
   /** The standard unit of angles, radians. */
-  public static final Angle Angle = new Angle(1, "Radian", "rad");
+  public static final AngleUnit AngleUnit = new AngleUnit(null, 1, "Radian", "rad");
 
   /** The standard "unitless" unit. */
-  public static final Dimensionless Value = new Dimensionless(1, "<?>", "<?>");
+  public static final DimensionlessUnit Value = new DimensionlessUnit(null, 1, "<?>", "<?>");
 
   /** The standard unit of voltage, volts. */
-  public static final Voltage Voltage = new Voltage(1, "Volt", "V");
+  public static final VoltageUnit VoltageUnit = new VoltageUnit(null, 1, "Volt", "V");
 
   /** The standard unit of electric current, amperes. */
-  public static final Current Current = new Current(1, "Amp", "A");
+  public static final CurrentUnit CurrentUnit = new CurrentUnit(null, 1, "Amp", "A");
 
   /** The standard unit of energy, joules. */
-  public static final Energy Energy = new Energy(1, "Joule", "J");
-
-  /** The standard unit of power, watts. */
-  public static final Power Power = new Power(1, "Watt", "W");
+  public static final EnergyUnit EnergyUnit = new EnergyUnit(null, 1, "Joule", "J");
 
   /** The standard unit of temperature, kelvin. */
-  public static final Temperature Temperature = new Temperature(x -> x, x -> x, "Kelvin", "K");
+  public static final TemperatureUnit TemperatureUnit =
+      new TemperatureUnit(null, x -> x, x -> x, "Kelvin", "K");
 }

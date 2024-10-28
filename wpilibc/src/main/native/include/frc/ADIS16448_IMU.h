@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 
+#include <atomic>
 #include <thread>
 
 #include <hal/SimDevice.h>
@@ -114,8 +115,8 @@ class ADIS16448_IMU : public wpi::Sendable,
 
   ~ADIS16448_IMU() override;
 
-  ADIS16448_IMU(ADIS16448_IMU&&) = default;
-  ADIS16448_IMU& operator=(ADIS16448_IMU&&) = default;
+  ADIS16448_IMU(ADIS16448_IMU&&);
+  ADIS16448_IMU& operator=(ADIS16448_IMU&&);
 
   /**
    * Initialize the IMU.
@@ -280,7 +281,7 @@ class ADIS16448_IMU : public wpi::Sendable,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  /** @brief ADIS16448 Register Map Declaration */
+  // ADIS16448 Register Map Declaration
   static constexpr uint8_t FLASH_CNT = 0x00;  // Flash memory write count
   static constexpr uint8_t XGYRO_OUT = 0x04;  // X-axis gyroscope output
   static constexpr uint8_t YGYRO_OUT = 0x06;  // Y-axis gyroscope output
@@ -337,9 +338,9 @@ class ADIS16448_IMU : public wpi::Sendable,
   static constexpr uint8_t SERIAL_NUM = 0x58;  // Lot-specific serial number
 
   /** @brief ADIS16448 Static Constants */
-  static constexpr double rad_to_deg = 57.2957795;
-  static constexpr double deg_to_rad = 0.0174532;
-  static constexpr double grav = 9.81;
+  static constexpr double kRadToDeg = 57.2957795;
+  static constexpr double kDegToRad = 0.0174532;
+  static constexpr double kGrav = 9.81;
 
   /** @brief struct to store offset data */
   struct OffsetData {
@@ -349,8 +350,8 @@ class ADIS16448_IMU : public wpi::Sendable,
   };
 
   /** @brief Internal Resources **/
-  DigitalInput* m_reset_in;
-  DigitalOutput* m_status_led;
+  DigitalInput* m_reset_in = nullptr;
+  DigitalOutput* m_status_led = nullptr;
 
   bool SwitchToStandardSPI();
 
@@ -381,8 +382,8 @@ class ADIS16448_IMU : public wpi::Sendable,
   double m_temp = 0.0;
 
   // Complementary filter variables
-  double m_tau = 0.5;
   double m_dt, m_alpha = 0.0;
+  static constexpr double kTau = 0.5;
   double m_compAngleX, m_compAngleY, m_accelAngleX, m_accelAngleY = 0.0;
 
   // vector for storing most recent imu values
@@ -407,17 +408,15 @@ class ADIS16448_IMU : public wpi::Sendable,
   // Complementary filter functions
   double FormatFastConverge(double compAngle, double accAngle);
 
-  double FormatRange0to2PI(double compAngle);
-
   double FormatAccelRange(double accelAngle, double accelZ);
 
   double CompFilterProcess(double compAngle, double accelAngle, double omega);
 
   // State and resource variables
-  volatile bool m_thread_active = false;
-  volatile bool m_first_run = true;
-  volatile bool m_thread_idle = false;
-  volatile bool m_start_up_mode = true;
+  std::atomic<bool> m_thread_active = false;
+  std::atomic<bool> m_first_run = true;
+  std::atomic<bool> m_thread_idle = false;
+  std::atomic<bool> m_start_up_mode = true;
 
   bool m_auto_configured = false;
   SPI::Port m_spi_port;
@@ -462,7 +461,7 @@ class ADIS16448_IMU : public wpi::Sendable,
   mutable NonMovableMutexWrapper m_mutex;
 
   // CRC-16 Look-Up Table
-  static constexpr uint16_t adiscrc[256] = {
+  static constexpr uint16_t m_adiscrc[256] = {
       0x0000, 0x17CE, 0x0FDF, 0x1811, 0x1FBE, 0x0870, 0x1061, 0x07AF, 0x1F3F,
       0x08F1, 0x10E0, 0x072E, 0x0081, 0x174F, 0x0F5E, 0x1890, 0x1E3D, 0x09F3,
       0x11E2, 0x062C, 0x0183, 0x164D, 0x0E5C, 0x1992, 0x0102, 0x16CC, 0x0EDD,

@@ -6,9 +6,11 @@
 #include <numbers>
 #include <random>
 #include <tuple>
+#include <vector>
 
 #include <fmt/format.h>
 #include <gtest/gtest.h>
+#include <wpi/print.h>
 #include <wpi/timestamp.h>
 
 #include "frc/estimator/SwerveDrivePoseEstimator.h"
@@ -45,7 +47,7 @@ void testFollowTrajectory(
   double errorSum = 0;
 
   if (debug) {
-    fmt::print("time, est_x, est_y, est_theta, true_x, true_y, true_theta\n");
+    wpi::print("time, est_x, est_y, est_theta, true_x, true_y, true_theta\n");
   }
 
   while (t < trajectory.TotalTime()) {
@@ -90,7 +92,7 @@ void testFollowTrajectory(
         positions);
 
     if (debug) {
-      fmt::print("{}, {}, {}, {}, {}, {}, {}\n", t.value(), xhat.X().value(),
+      wpi::print("{}, {}, {}, {}, {}, {}, {}\n", t.value(), xhat.X().value(),
                  xhat.Y().value(), xhat.Rotation().Radians().value(),
                  groundTruthState.pose.X().value(),
                  groundTruthState.pose.Y().value(),
@@ -110,14 +112,14 @@ void testFollowTrajectory(
   }
 
   if (debug) {
-    fmt::print("apply_time, measured_time, vision_x, vision_y, vision_theta\n");
+    wpi::print("apply_time, measured_time, vision_x, vision_y, vision_theta\n");
 
     units::second_t apply_time;
     units::second_t measure_time;
     frc::Pose2d vision_pose;
     for (auto record : visionLog) {
       std::tie(apply_time, measure_time, vision_pose) = record;
-      fmt::print("{}, {}, {}, {}, {}\n", apply_time.value(),
+      wpi::print("{}, {}, {}, {}, {}\n", apply_time.value(),
                  measure_time.value(), vision_pose.X().value(),
                  vision_pose.Y().value(),
                  vision_pose.Rotation().Radians().value());
@@ -168,7 +170,7 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
       },
       [&](frc::Trajectory::State& state) { return state.pose; },
       {0_m, 0_m, frc::Rotation2d{45_deg}}, {0_m, 0_m, frc::Rotation2d{45_deg}},
-      0.02_s, 0.1_s, 0.25_s, true, false);
+      20_ms, 100_ms, 250_ms, true, false);
 }
 
 TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
@@ -212,14 +214,14 @@ TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
                                       state.velocity * state.curvature};
           },
           [&](frc::Trajectory::State& state) { return state.pose; },
-          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s, 0.1_s,
-          0.25_s, false, false);
+          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms, 100_ms,
+          250_ms, false, false);
     }
   }
 }
 
 TEST(SwerveDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
-  // This tests for multiple vision measurements appled at the same time.
+  // This tests for multiple vision measurements applied at the same time.
   // The expected behavior is that all measurements affect the estimated pose.
   // The alternative result is that only one vision measurement affects the
   // outcome. If that were the case, after 1000 measurements, the estimated
@@ -292,7 +294,7 @@ TEST(SwerveDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
       frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.45, 0.45, 0.45}};
 
   // Add enough measurements to fill up the buffer
-  for (auto time = 0.0_s; time < 4_s; time += 0.02_s) {
+  for (auto time = 0_s; time < 4_s; time += 20_ms) {
     estimator.UpdateWithTime(time, frc::Rotation2d{}, {fl, fr, bl, br});
   }
 
@@ -310,4 +312,153 @@ TEST(SwerveDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
   EXPECT_NEAR(odometryPose.Rotation().Radians().value(),
               estimator.GetEstimatedPosition().Rotation().Radians().value(),
               1e-6);
+}
+
+TEST(SwerveDrivePoseEstimatorTest, TestSampleAt) {
+  frc::SwerveDriveKinematics<4> kinematics{
+      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
+      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+  frc::SwerveDrivePoseEstimator estimator{
+      kinematics,
+      frc::Rotation2d{},
+      {frc::SwerveModulePosition{}, frc::SwerveModulePosition{},
+       frc::SwerveModulePosition{}, frc::SwerveModulePosition{}},
+      frc::Pose2d{},
+      {1.0, 1.0, 1.0},
+      {1.0, 1.0, 1.0}};
+
+  // Returns empty when null
+  EXPECT_EQ(std::nullopt, estimator.SampleAt(1_s));
+
+  // Add odometry measurements, but don't fill up the buffer
+  // Add a tiny tolerance for the upper bound because of floating point rounding
+  // error
+  for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
+    wpi::array<frc::SwerveModulePosition, 4> wheelPositions{
+        {frc::SwerveModulePosition{units::meter_t{time}, frc::Rotation2d{}},
+         frc::SwerveModulePosition{units::meter_t{time}, frc::Rotation2d{}},
+         frc::SwerveModulePosition{units::meter_t{time}, frc::Rotation2d{}},
+         frc::SwerveModulePosition{units::meter_t{time}, frc::Rotation2d{}}}};
+    estimator.UpdateWithTime(units::second_t{time}, frc::Rotation2d{},
+                             wheelPositions);
+  }
+
+  // Sample at an added time
+  EXPECT_EQ(std::optional(frc::Pose2d{1.02_m, 0_m, frc::Rotation2d{}}),
+            estimator.SampleAt(1.02_s));
+  // Sample between updates (test interpolation)
+  EXPECT_EQ(std::optional(frc::Pose2d{1.01_m, 0_m, frc::Rotation2d{}}),
+            estimator.SampleAt(1.01_s));
+  // Sampling before the oldest value returns the oldest value
+  EXPECT_EQ(std::optional(frc::Pose2d{1_m, 0_m, frc::Rotation2d{}}),
+            estimator.SampleAt(0.5_s));
+  // Sampling after the newest value returns the newest value
+  EXPECT_EQ(std::optional(frc::Pose2d{2_m, 0_m, frc::Rotation2d{}}),
+            estimator.SampleAt(2.5_s));
+
+  // Add a vision measurement after the odometry measurements (while keeping all
+  // of the old odometry measurements)
+  estimator.AddVisionMeasurement(frc::Pose2d{2_m, 0_m, frc::Rotation2d{1_rad}},
+                                 2.2_s);
+
+  // Make sure nothing changed (except the newest value)
+  EXPECT_EQ(std::optional(frc::Pose2d{1.02_m, 0_m, frc::Rotation2d{}}),
+            estimator.SampleAt(1.02_s));
+  EXPECT_EQ(std::optional(frc::Pose2d{1.01_m, 0_m, frc::Rotation2d{}}),
+            estimator.SampleAt(1.01_s));
+  EXPECT_EQ(std::optional(frc::Pose2d{1_m, 0_m, frc::Rotation2d{}}),
+            estimator.SampleAt(0.5_s));
+
+  // Add a vision measurement before the odometry measurements that's still in
+  // the buffer
+  estimator.AddVisionMeasurement(frc::Pose2d{1_m, 0.2_m, frc::Rotation2d{}},
+                                 0.9_s);
+
+  // Everything should be the same except Y is 0.1 (halfway between 0 and 0.2)
+  EXPECT_EQ(std::optional(frc::Pose2d{1.02_m, 0.1_m, frc::Rotation2d{}}),
+            estimator.SampleAt(1.02_s));
+  EXPECT_EQ(std::optional(frc::Pose2d{1.01_m, 0.1_m, frc::Rotation2d{}}),
+            estimator.SampleAt(1.01_s));
+  EXPECT_EQ(std::optional(frc::Pose2d{1_m, 0.1_m, frc::Rotation2d{}}),
+            estimator.SampleAt(0.5_s));
+  EXPECT_EQ(std::optional(frc::Pose2d{2_m, 0.1_m, frc::Rotation2d{}}),
+            estimator.SampleAt(2.5_s));
+}
+
+TEST(SwerveDrivePoseEstimatorTest, TestReset) {
+  frc::SwerveDriveKinematics<4> kinematics{
+      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
+      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+  frc::SwerveDrivePoseEstimator estimator{
+      kinematics,
+      frc::Rotation2d{},
+      {frc::SwerveModulePosition{}, frc::SwerveModulePosition{},
+       frc::SwerveModulePosition{}, frc::SwerveModulePosition{}},
+      frc::Pose2d{-1_m, -1_m, frc::Rotation2d{1_rad}},
+      {1.0, 1.0, 1.0},
+      {1.0, 1.0, 1.0}};
+
+  // Test initial pose
+  EXPECT_EQ(-1, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(-1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(1, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset position
+  {
+    frc::SwerveModulePosition modulePosition{1_m, frc::Rotation2d{}};
+    estimator.ResetPosition(
+        frc::Rotation2d{},
+        {modulePosition, modulePosition, modulePosition, modulePosition},
+        frc::Pose2d{1_m, 0_m, frc::Rotation2d{}});
+  }
+
+  EXPECT_EQ(1, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test orientation and wheel positions
+  {
+    frc::SwerveModulePosition modulePosition{2_m, frc::Rotation2d{}};
+    estimator.Update(frc::Rotation2d{}, {modulePosition, modulePosition,
+                                         modulePosition, modulePosition});
+  }
+
+  EXPECT_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset rotation
+  estimator.ResetRotation(frc::Rotation2d{90_deg});
+
+  EXPECT_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(std::numbers::pi / 2,
+            estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test orientation
+  {
+    frc::SwerveModulePosition modulePosition{3_m, frc::Rotation2d{}};
+    estimator.Update(frc::Rotation2d{}, {modulePosition, modulePosition,
+                                         modulePosition, modulePosition});
+  }
+
+  EXPECT_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(std::numbers::pi / 2,
+            estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset translation
+  estimator.ResetTranslation(frc::Translation2d{-1_m, -1_m});
+
+  EXPECT_EQ(-1, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(-1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(std::numbers::pi / 2,
+            estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset pose
+  estimator.ResetPose(frc::Pose2d{});
+
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().X().value());
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_EQ(0, estimator.GetEstimatedPosition().Rotation().Radians().value());
 }

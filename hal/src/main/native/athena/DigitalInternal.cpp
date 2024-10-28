@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <cmath>
+#include <memory>
 #include <thread>
 
 #include <FRC_NetworkCommunication/LoadOut.h>
@@ -47,7 +48,7 @@ namespace detail {
 wpi::mutex& UnsafeGetDIOMutex() {
   return digitalDIOMutex;
 }
-tDIO* UnsafeGetDigialSystem() {
+tDIO* UnsafeGetDigitalSystem() {
   return digitalSystem.get();
 }
 int32_t ComputeDigitalMask(HAL_DigitalHandle handle, int32_t* status) {

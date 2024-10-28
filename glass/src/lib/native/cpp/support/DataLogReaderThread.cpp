@@ -4,10 +4,11 @@
 
 #include "glass/support/DataLogReaderThread.h"
 
+#include <string>
 #include <utility>
 
-#include <fmt/format.h>
 #include <wpi/StringExtras.h>
+#include <wpi/print.h>
 
 using namespace glass;
 
@@ -36,7 +37,7 @@ void DataLogReaderThread::ReadMain() {
         std::scoped_lock lock{m_mutex};
         auto& entryPtr = m_entriesById[data.entry];
         if (entryPtr) {
-          fmt::print("...DUPLICATE entry ID, overriding\n");
+          wpi::print("...DUPLICATE entry ID, overriding\n");
         }
         auto [it, isNew] = m_entriesByName.emplace(data.name, data);
         if (isNew) {
@@ -50,7 +51,7 @@ void DataLogReaderThread::ReadMain() {
         }
         sigEntryAdded(data);
       } else {
-        fmt::print("Start(INVALID)\n");
+        wpi::print("Start(INVALID)\n");
       }
     } else if (record.IsFinish()) {
       int entry;
@@ -58,13 +59,13 @@ void DataLogReaderThread::ReadMain() {
         std::scoped_lock lock{m_mutex};
         auto it = m_entriesById.find(entry);
         if (it == m_entriesById.end()) {
-          fmt::print("...ID not found\n");
+          wpi::print("...ID not found\n");
         } else {
           it->second->ranges.back().m_end = recordIt;
           m_entriesById.erase(it);
         }
       } else {
-        fmt::print("Finish(INVALID)\n");
+        wpi::print("Finish(INVALID)\n");
       }
     } else if (record.IsSetMetadata()) {
       wpi::log::MetadataRecordData data;
@@ -72,15 +73,15 @@ void DataLogReaderThread::ReadMain() {
         std::scoped_lock lock{m_mutex};
         auto it = m_entriesById.find(data.entry);
         if (it == m_entriesById.end()) {
-          fmt::print("...ID not found\n");
+          wpi::print("...ID not found\n");
         } else {
           it->second->metadata = data.metadata;
         }
       } else {
-        fmt::print("SetMetadata(INVALID)\n");
+        wpi::print("SetMetadata(INVALID)\n");
       }
     } else if (record.IsControl()) {
-      fmt::print("Unrecognized control record\n");
+      wpi::print("Unrecognized control record\n");
     } else {
       auto it = schemaEntries.find(record.GetEntry());
       if (it != schemaEntries.end()) {
@@ -96,26 +97,26 @@ void DataLogReaderThread::ReadMain() {
     if (data.empty()) {
       continue;
     }
-    if (wpi::starts_with(name, "NT:")) {
-      name = wpi::drop_front(name, 3);
+    if (auto strippedName = wpi::remove_prefix(name, "NT:")) {
+      name = *strippedName;
     }
-    if (wpi::starts_with(name, "/.schema/struct:")) {
-      auto typeStr = wpi::drop_front(name, 16);
+    if (auto typeStr = wpi::remove_prefix(name, "/.schema/struct:")) {
       std::string_view schema{reinterpret_cast<const char*>(data.data()),
                               data.size()};
       std::string err;
-      auto desc = m_structDb.Add(typeStr, schema, &err);
+      auto desc = m_structDb.Add(*typeStr, schema, &err);
       if (!desc) {
-        fmt::print("could not decode struct '{}' schema '{}': {}\n", name,
+        wpi::print("could not decode struct '{}' schema '{}': {}\n", name,
                    schema, err);
       }
-    } else if (wpi::starts_with(name, "/.schema/proto:")) {
+    } else if (auto filename = wpi::remove_prefix(name, "/.schema/proto:")) {
+#ifndef NO_PROTOBUF
       // protobuf descriptor handling
-      auto filename = wpi::drop_front(name, 15);
-      if (!m_protoDb.Add(filename, data)) {
-        fmt::print("could not decode protobuf '{}' filename '{}'\n", name,
-                   filename);
+      if (!m_protoDb.Add(*filename, data)) {
+        wpi::print("could not decode protobuf '{}' filename '{}'\n", name,
+                   *filename);
       }
+#endif
     }
   }
 

@@ -27,7 +27,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
 
   /** Power distribution module type. */
   public enum ModuleType {
-    /** CTRE (Cross The Road Electronics) CTRE Power Distribution Panel (PDP). */
+    /** CTRE (Cross The Road Electronics) Power Distribution Panel (PDP). */
     kCTRE(PowerDistributionJNI.CTRE_TYPE),
     /** REV Power Distribution Hub (PDH). */
     kRev(PowerDistributionJNI.REV_TYPE);
@@ -93,7 +93,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
-   * Query the temperature of the PDP/PDH.
+   * Query the temperature of the PDP.
+   *
+   * <p>Not supported on the Rev PDH and returns 0.
    *
    * @return The temperature in degrees Celsius
    */
@@ -112,6 +114,17 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
+   * Query all currents of the PDP.
+   *
+   * @return The current of each channel in Amperes
+   */
+  public double[] getAllCurrents() {
+    double[] currents = new double[getNumChannels()];
+    PowerDistributionJNI.getAllCurrents(m_handle, currents);
+    return currents;
+  }
+
+  /**
    * Query the current of all monitored channels.
    *
    * @return The current of all the channels in Amperes
@@ -121,7 +134,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
-   * Query the total power drawn from the monitored channels.
+   * Query the total power drawn from the monitored channels of the PDP.
+   *
+   * <p>Not supported on the Rev PDH and returns 0.
    *
    * @return the total power in Watts
    */
@@ -130,7 +145,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
-   * Query the total energy drawn from the monitored channels.
+   * Query the total energy drawn from the monitored channels of the PDP.
+   *
+   * <p>Not supported on the Rev PDH and returns 0.
    *
    * @return the total energy in Joules
    */
@@ -138,7 +155,11 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     return PowerDistributionJNI.getTotalEnergy(m_handle);
   }
 
-  /** Reset the total energy to 0. */
+  /**
+   * Reset the total energy to 0 of the PDP.
+   *
+   * <p>Not supported on the Rev PDH and does nothing.
+   */
   public void resetTotalEnergy() {
     PowerDistributionJNI.resetTotalEnergy(m_handle);
   }
@@ -201,6 +222,8 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   /**
    * Returns the power distribution faults.
    *
+   * <p>On a CTRE PDP, this will return an object with no faults active.
+   *
    * @return The power distribution faults.
    */
   public PowerDistributionFaults getFaults() {
@@ -209,6 +232,8 @@ public class PowerDistribution implements Sendable, AutoCloseable {
 
   /**
    * Returns the power distribution sticky faults.
+   *
+   * <p>On a CTRE PDP, this will return an object with no faults active.
    *
    * @return The power distribution sticky faults.
    */

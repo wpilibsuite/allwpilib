@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include <hal/Counter.h>
 #include <hal/Types.h>
 #include <units/time.h>
 #include <wpi/sendable/Sendable.h>
@@ -47,8 +48,8 @@ class Counter : public CounterBase,
   /**
    * Create an instance of a counter where no sources are selected.
    *
-   * They all must be selected by calling functions to specify the upsource and
-   * the downsource independently.
+   * They all must be selected by calling functions to specify the up source and
+   * the down source independently.
    *
    * This creates a ChipObject counter and initializes status variables
    * appropriately.
@@ -142,13 +143,13 @@ class Counter : public CounterBase,
   Counter(EncodingType encodingType, std::shared_ptr<DigitalSource> upSource,
           std::shared_ptr<DigitalSource> downSource, bool inverted);
 
-  ~Counter() override;
-
   Counter(Counter&&) = default;
   Counter& operator=(Counter&&) = default;
 
+  ~Counter() override;
+
   /**
-   * Set the upsource for the counter as a digital input channel.
+   * Set the up source for the counter as a digital input channel.
    *
    * @param channel The DIO channel to use as the up source. 0-9 are on-board,
    *                10-25 are on the MXP
@@ -458,7 +459,7 @@ class Counter : public CounterBase,
   std::shared_ptr<DigitalSource> m_downSource;
 
   /// The FPGA counter object
-  hal::Handle<HAL_CounterHandle> m_counter;
+  hal::Handle<HAL_CounterHandle, HAL_FreeCounter> m_counter;
 
  private:
   /// The index of this counter.

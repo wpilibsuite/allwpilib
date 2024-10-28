@@ -10,6 +10,8 @@
 #include <memory>
 #include <type_traits>
 
+#include <wpi/print.h>
+
 #include "AnalogInternal.h"
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
@@ -157,8 +159,8 @@ void HAL_SetDMAPause(HAL_DMAHandle handle, HAL_Bool pause, int32_t* status) {
 
 void HAL_SetDMATimedTrigger(HAL_DMAHandle handle, double seconds,
                             int32_t* status) {
-  constexpr double baseMultipler = kSystemClockTicksPerMicrosecond * 1000000;
-  uint32_t cycles = static_cast<uint32_t>(baseMultipler * seconds);
+  constexpr double baseMultiplier = kSystemClockTicksPerMicrosecond * 1000000;
+  uint32_t cycles = static_cast<uint32_t>(baseMultiplier * seconds);
   HAL_SetDMATimedTriggerCycles(handle, cycles, status);
 }
 
@@ -562,7 +564,7 @@ int32_t HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
   if (!success) {
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(status,
-                      "Digital Source unabled to be mapped properly. Likely "
+                      "Digital Source unable to be mapped properly. Likely "
                       "invalid handle passed.");
     return 0;
   }
@@ -676,7 +678,7 @@ void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
     SET_SIZE(Enable_DutyCycle_Low);
     SET_SIZE(Enable_DutyCycle_High);
 #undef SET_SIZE
-    dma->captureStore.captureSize = accum_size + 1;
+    dma->captureStore.captureSize = accum_size + 2;
   }
 
   uint32_t byteDepth = queueDepth * dma->captureStore.captureSize;
@@ -734,12 +736,22 @@ enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
                      static_cast<uint32_t>(timeoutSeconds * 1000),
                      &remainingBytes, status);
 
+  if ((remainingBytes % dma->captureStore.captureSize) != 0) {
+    wpi::print(
+        "Remaining bytes {} is not a multiple of capture size {}. This is "
+        "likely a "
+        "bug in WPILib. Please report this issue with a copy of your code.\n",
+        remainingBytes, dma->captureStore.captureSize);
+  }
+
   *remainingOut = remainingBytes / dma->captureStore.captureSize;
 
   if (*status == 0) {
-    uint32_t lower_sample =
+    uint64_t upper_sample =
         dmaSample->readBuffer[dma->captureStore.captureSize - 1];
-    dmaSample->timeStamp = HAL_ExpandFPGATime(lower_sample, status);
+    uint64_t lower_sample =
+        dmaSample->readBuffer[dma->captureStore.captureSize - 2];
+    dmaSample->timeStamp = (upper_sample << 32) + lower_sample;
     if (*status != 0) {
       return HAL_DMA_ERROR;
     }

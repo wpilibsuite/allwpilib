@@ -38,6 +38,15 @@
 #define EIGEN_ALIGNOF(x) alignof(x)
 #endif
 
+// Align to the boundary that avoids false sharing.
+// https://en.cppreference.com/w/cpp/thread/hardware_destructive_interference_size
+#ifdef __cpp_lib_hardware_interference_size
+#define EIGEN_ALIGN_TO_AVOID_FALSE_SHARING EIGEN_ALIGN_TO_BOUNDARY(std::hardware_destructive_interference_size)
+#else
+// Overalign for the cache line size of 128 bytes (Apple M1)
+#define EIGEN_ALIGN_TO_AVOID_FALSE_SHARING EIGEN_ALIGN_TO_BOUNDARY(128)
+#endif
+
 // If the user explicitly disable vectorization, then we also disable alignment
 #if defined(EIGEN_DONT_VECTORIZE)
 #if defined(EIGEN_GPUCC)
@@ -165,6 +174,13 @@
 
 //----------------------------------------------------------------------
 
+// Disable vectorization in intellisense
+#ifdef __INTELLISENSE__
+#ifndef EIGEN_DONT_VECTORIZE
+#define EIGEN_DONT_VECTORIZE
+#endif
+#endif
+
 // if alignment is disabled, then disable vectorization. Note: EIGEN_MAX_ALIGN_BYTES is the proper check, it takes into
 // account both the user's will (EIGEN_MAX_ALIGN_BYTES,EIGEN_DONT_ALIGN) and our own platform checks
 #if EIGEN_MAX_ALIGN_BYTES == 0
@@ -266,6 +282,9 @@
 #ifdef __AVX512BF16__
 #define EIGEN_VECTORIZE_AVX512BF16
 #endif
+#ifdef __AVX512VL__
+#define EIGEN_VECTORIZE_AVX512VL
+#endif
 #ifdef __AVX512FP16__
 #ifdef __AVX512VL__
 #define EIGEN_VECTORIZE_AVX512FP16
@@ -354,6 +373,7 @@ extern "C" {
 
 #define EIGEN_VECTORIZE
 #define EIGEN_VECTORIZE_VSX 1
+#define EIGEN_VECTORIZE_FMA
 #include <altivec.h>
 // We need to #undef all these ugly tokens defined in <altivec.h>
 // => use __vector instead of vector
@@ -365,6 +385,7 @@ extern "C" {
 
 #define EIGEN_VECTORIZE
 #define EIGEN_VECTORIZE_ALTIVEC
+#define EIGEN_VECTORIZE_FMA
 #include <altivec.h>
 // We need to #undef all these ugly tokens defined in <altivec.h>
 // => use __vector instead of vector
@@ -429,6 +450,11 @@ extern "C" {
 // See also: https://bugs.llvm.org/show_bug.cgi?id=47955
 #if defined(EIGEN_HAS_ARM64_FP16_SCALAR_ARITHMETIC)
 #include <arm_fp16.h>
+#endif
+
+// Enable FMA for ARM.
+#if defined(__ARM_FEATURE_FMA)
+#define EIGEN_VECTORIZE_FMA
 #endif
 
 #if defined(__F16C__) && !defined(EIGEN_GPUCC) && (!EIGEN_COMP_CLANG_STRICT || EIGEN_CLANG_STRICT_AT_LEAST(3, 8, 0))

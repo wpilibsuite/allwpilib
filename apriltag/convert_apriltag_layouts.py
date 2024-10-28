@@ -21,7 +21,6 @@ import json
 import os
 
 from wpimath import geometry, units
-import numpy as np
 
 
 def main():
@@ -82,6 +81,7 @@ def main():
         # Write JSON
         with open(filename.replace(".csv", ".json"), "w") as f:
             json.dump(json_data, f, indent=2)
+            f.write("\n")
 
 
 if __name__ == "__main__":

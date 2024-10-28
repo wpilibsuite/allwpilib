@@ -171,7 +171,7 @@ class DifferentialDriveAccelerationLimiterTest {
   }
 
   @Test
-  void testSeperateMinMaxLowLimits() {
+  void testSeparateMinMaxLowLimits() {
     final double trackwidth = 0.9;
     final double dt = 0.005;
     final double minA = -1.0;

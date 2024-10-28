@@ -11,15 +11,15 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.proto.ChassisSpeedsProto;
 import edu.wpi.first.math.kinematics.struct.ChassisSpeedsStruct;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
-import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.util.Objects;
 
 /**
  * Represents the speed of a robot chassis. Although this class contains similar members compared to
@@ -70,11 +70,21 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @param vy Sideways velocity.
    * @param omega Angular velocity.
    */
-  public ChassisSpeeds(
-      Measure<Velocity<Distance>> vx,
-      Measure<Velocity<Distance>> vy,
-      Measure<Velocity<Angle>> omega) {
+  public ChassisSpeeds(LinearVelocity vx, LinearVelocity vy, AngularVelocity omega) {
     this(vx.in(MetersPerSecond), vy.in(MetersPerSecond), omega.in(RadiansPerSecond));
+  }
+
+  /**
+   * Creates a Twist2d from ChassisSpeeds.
+   *
+   * @param dtSeconds The duration of the timestep.
+   * @return Twist2d.
+   */
+  public Twist2d toTwist2d(double dtSeconds) {
+    return new Twist2d(
+        vxMetersPerSecond * dtSeconds,
+        vyMetersPerSecond * dtSeconds,
+        omegaRadiansPerSecond * dtSeconds);
   }
 
   /**
@@ -93,18 +103,27 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @param omegaRadiansPerSecond Angular velocity.
    * @param dtSeconds The duration of the timestep the speeds should be applied for.
    * @return Discretized ChassisSpeeds.
+   * @deprecated Use instance method instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds discretize(
       double vxMetersPerSecond,
       double vyMetersPerSecond,
       double omegaRadiansPerSecond,
       double dtSeconds) {
+    // Construct the desired pose after a timestep, relative to the current pose. The desired pose
+    // has decoupled translation and rotation.
     var desiredDeltaPose =
         new Pose2d(
             vxMetersPerSecond * dtSeconds,
             vyMetersPerSecond * dtSeconds,
             new Rotation2d(omegaRadiansPerSecond * dtSeconds));
-    var twist = new Pose2d().log(desiredDeltaPose);
+
+    // Find the chassis translation/rotation deltas in the robot frame that move the robot from its
+    // current pose to the desired pose
+    var twist = Pose2d.kZero.log(desiredDeltaPose);
+
+    // Turn the chassis translation/rotation deltas into average velocities
     return new ChassisSpeeds(twist.dx / dtSeconds, twist.dy / dtSeconds, twist.dtheta / dtSeconds);
   }
 
@@ -124,12 +143,11 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @param omega Angular velocity.
    * @param dt The duration of the timestep the speeds should be applied for.
    * @return Discretized ChassisSpeeds.
+   * @deprecated Use instance method instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds discretize(
-      Measure<Velocity<Distance>> vx,
-      Measure<Velocity<Distance>> vy,
-      Measure<Velocity<Angle>> omega,
-      Measure<Time> dt) {
+      LinearVelocity vx, LinearVelocity vy, AngularVelocity omega, Time dt) {
     return discretize(
         vx.in(MetersPerSecond), vy.in(MetersPerSecond), omega.in(RadiansPerSecond), dt.in(Seconds));
   }
@@ -137,7 +155,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   /**
    * Discretizes a continuous-time chassis speed.
    *
-   * <p>This function converts a continous-time chassis speed into a discrete-time one such that
+   * <p>This function converts a continuous-time chassis speed into a discrete-time one such that
    * when the discrete-time chassis speed is applied for one timestep, the robot moves as if the
    * velocity components are independent (i.e., the robot moves v_x * dt along the x-axis, v_y * dt
    * along the y-axis, and omega * dt around the z-axis).
@@ -148,13 +166,45 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @param continuousSpeeds The continuous speeds.
    * @param dtSeconds The duration of the timestep the speeds should be applied for.
    * @return Discretized ChassisSpeeds.
+   * @deprecated Use instance method instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds discretize(ChassisSpeeds continuousSpeeds, double dtSeconds) {
     return discretize(
         continuousSpeeds.vxMetersPerSecond,
         continuousSpeeds.vyMetersPerSecond,
         continuousSpeeds.omegaRadiansPerSecond,
         dtSeconds);
+  }
+
+  /**
+   * Discretizes a continuous-time chassis speed.
+   *
+   * <p>This function converts this continuous-time chassis speed into a discrete-time one such that
+   * when the discrete-time chassis speed is applied for one timestep, the robot moves as if the
+   * velocity components are independent (i.e., the robot moves v_x * dt along the x-axis, v_y * dt
+   * along the y-axis, and omega * dt around the z-axis).
+   *
+   * <p>This is useful for compensating for translational skew when translating and rotating a
+   * swerve drivetrain.
+   *
+   * @param dtSeconds The duration of the timestep the speeds should be applied for.
+   */
+  public void discretize(double dtSeconds) {
+    var desiredDeltaPose =
+        new Pose2d(
+            vxMetersPerSecond * dtSeconds,
+            vyMetersPerSecond * dtSeconds,
+            new Rotation2d(omegaRadiansPerSecond * dtSeconds));
+
+    // Find the chassis translation/rotation deltas in the robot frame that move the robot from its
+    // current pose to the desired pose
+    var twist = Pose2d.kZero.log(desiredDeltaPose);
+
+    // Turn the chassis translation/rotation deltas into average velocities
+    vxMetersPerSecond = twist.dx / dtSeconds;
+    vyMetersPerSecond = twist.dy / dtSeconds;
+    omegaRadiansPerSecond = twist.dtheta / dtSeconds;
   }
 
   /**
@@ -170,7 +220,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
    * @return ChassisSpeeds object representing the speeds in the robot's frame of reference.
+   * @deprecated Use toRobotRelativeSpeeds instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromFieldRelativeSpeeds(
       double vxMetersPerSecond,
       double vyMetersPerSecond,
@@ -195,12 +247,11 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
    * @return ChassisSpeeds object representing the speeds in the robot's frame of reference.
+   * @deprecated Use toRobotRelativeSpeeds instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromFieldRelativeSpeeds(
-      Measure<Velocity<Distance>> vx,
-      Measure<Velocity<Distance>> vy,
-      Measure<Velocity<Angle>> omega,
-      Rotation2d robotAngle) {
+      LinearVelocity vx, LinearVelocity vy, AngularVelocity omega, Rotation2d robotAngle) {
     return fromFieldRelativeSpeeds(
         vx.in(MetersPerSecond), vy.in(MetersPerSecond), omega.in(RadiansPerSecond), robotAngle);
   }
@@ -216,7 +267,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
    * @return ChassisSpeeds object representing the speeds in the robot's frame of reference.
+   * @deprecated Use toRobotRelativeSpeeds instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromFieldRelativeSpeeds(
       ChassisSpeeds fieldRelativeSpeeds, Rotation2d robotAngle) {
     return fromFieldRelativeSpeeds(
@@ -224,6 +277,21 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
         fieldRelativeSpeeds.vyMetersPerSecond,
         fieldRelativeSpeeds.omegaRadiansPerSecond,
         robotAngle);
+  }
+
+  /**
+   * Converts this field-relative set of speeds into a robot-relative ChassisSpeeds object.
+   *
+   * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
+   *     considered to be zero when it is facing directly away from your alliance station wall.
+   *     Remember that this should be CCW positive.
+   */
+  public void toRobotRelativeSpeeds(Rotation2d robotAngle) {
+    // CW rotation into chassis frame
+    var rotated =
+        new Translation2d(vxMetersPerSecond, vyMetersPerSecond).rotateBy(robotAngle.unaryMinus());
+    vxMetersPerSecond = rotated.getX();
+    vyMetersPerSecond = rotated.getY();
   }
 
   /**
@@ -239,7 +307,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
    * @return ChassisSpeeds object representing the speeds in the field's frame of reference.
+   * @deprecated Use toFieldRelativeSpeeds instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromRobotRelativeSpeeds(
       double vxMetersPerSecond,
       double vyMetersPerSecond,
@@ -263,12 +333,11 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
    * @return ChassisSpeeds object representing the speeds in the field's frame of reference.
+   * @deprecated Use toFieldRelativeSpeeds instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromRobotRelativeSpeeds(
-      Measure<Velocity<Distance>> vx,
-      Measure<Velocity<Distance>> vy,
-      Measure<Velocity<Angle>> omega,
-      Rotation2d robotAngle) {
+      LinearVelocity vx, LinearVelocity vy, AngularVelocity omega, Rotation2d robotAngle) {
     return fromRobotRelativeSpeeds(
         vx.in(MetersPerSecond), vy.in(MetersPerSecond), omega.in(RadiansPerSecond), robotAngle);
   }
@@ -284,7 +353,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
    * @return ChassisSpeeds object representing the speeds in the field's frame of reference.
+   * @deprecated Use toFieldRelativeSpeeds instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromRobotRelativeSpeeds(
       ChassisSpeeds robotRelativeSpeeds, Rotation2d robotAngle) {
     return fromRobotRelativeSpeeds(
@@ -292,6 +363,20 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
         robotRelativeSpeeds.vyMetersPerSecond,
         robotRelativeSpeeds.omegaRadiansPerSecond,
         robotAngle);
+  }
+
+  /**
+   * Converts this robot-relative set of speeds into a field-relative ChassisSpeeds object.
+   *
+   * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
+   *     considered to be zero when it is facing directly away from your alliance station wall.
+   *     Remember that this should be CCW positive.
+   */
+  public void toFieldRelativeSpeeds(Rotation2d robotAngle) {
+    // CCW rotation out of chassis frame
+    var rotated = new Translation2d(vxMetersPerSecond, vyMetersPerSecond).rotateBy(robotAngle);
+    vxMetersPerSecond = rotated.getX();
+    vyMetersPerSecond = rotated.getY();
   }
 
   /**
@@ -360,6 +445,20 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   public ChassisSpeeds div(double scalar) {
     return new ChassisSpeeds(
         vxMetersPerSecond / scalar, vyMetersPerSecond / scalar, omegaRadiansPerSecond / scalar);
+  }
+
+  @Override
+  public final int hashCode() {
+    return Objects.hash(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return o == this
+        || o instanceof ChassisSpeeds c
+            && vxMetersPerSecond == c.vxMetersPerSecond
+            && vyMetersPerSecond == c.vyMetersPerSecond
+            && omegaRadiansPerSecond == c.omegaRadiansPerSecond;
   }
 
   @Override

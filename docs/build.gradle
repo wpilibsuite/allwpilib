@@ -1,11 +1,12 @@
 plugins {
     id 'java'
-    id "org.ysb33r.doxygen" version "0.7.0"
+    id "org.ysb33r.doxygen" version "1.0.4"
 }
 
 evaluationDependsOn(':apriltag')
 evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':cscore')
+evaluationDependsOn(':epilogue-runtime')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':wpilibNewCommands')
@@ -15,6 +16,8 @@ evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpinet')
 evaluationDependsOn(':wpiunits')
 evaluationDependsOn(':wpiutil')
+evaluationDependsOn(':romiVendordep')
+evaluationDependsOn(':xrpVendordep')
 
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
@@ -39,24 +42,28 @@ cppProjectZips.add(project(':wpilibc').cppHeadersZip)
 cppProjectZips.add(project(':wpimath').cppHeadersZip)
 cppProjectZips.add(project(':wpinet').cppHeadersZip)
 cppProjectZips.add(project(':wpiutil').cppHeadersZip)
+cppProjectZips.add(project(':romiVendordep').cppHeadersZip)
+cppProjectZips.add(project(':xrpVendordep').cppHeadersZip)
 
 doxygen {
     // Doxygen binaries are only provided for x86_64 platforms
     // Other platforms will need to provide doxygen via their system
     // See below maven and https://doxygen.nl/download.html for provided binaries
+    // Ensure theme.css (from https://github.com/jothepro/doxygen-awesome-css) is compatible with
+    // doxygen version when updating
 
     String arch = System.getProperty("os.arch");
     if (arch.equals("x86_64") || arch.equals("amd64")) {
         executables {
-            doxygen version : '1.9.4',
-            baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
+            doxygen {
+                executableByVersion('1.12.0')
+            }
         }
     }
 }
 
 doxygen {
-    generate_html true
-    html_extra_stylesheet 'theme.css'
+    template 'Doxyfile'
 
     cppProjectZips.each {
         dependsOn it
@@ -65,9 +72,11 @@ doxygen {
             cppIncludeRoots.add(it.absolutePath)
         }
     }
-    cppIncludeRoots << '../ntcore/build/generated/main/native/include/'
 
     if (project.hasProperty('docWarningsAsErrors')) {
+        // apriltag
+        exclude 'apriltag_pose.h'
+
         // Eigen
         exclude 'Eigen/**'
         exclude 'unsupported/**'
@@ -139,57 +148,24 @@ doxygen {
         exclude 'units/**'
     }
 
-    //TODO: building memory docs causes search to break
-    exclude 'wpi/memory/**'
-
     exclude '*.pb.h'
 
     // Save space by excluding protobuf and eigen
     exclude 'Eigen/**'
+    exclude 'unsupported/**'
     exclude 'google/protobuf/**'
 
-    aliases 'effects=\\par <i>Effects:</i>^^',
-            'notes=\\par <i>Notes:</i>^^',
-            'requires=\\par <i>Requires:</i>^^',
-            'requiredbe=\\par <i>Required Behavior:</i>^^',
-            'concept{2}=<a href=\"md_doc_concepts.html#\1\">\2</a>',
-            'defaultbe=\\par <i>Default Behavior:</i>^^'
-    case_sense_names false
-    extension_mapping 'inc=C++', 'no_extension=C++'
-    extract_all true
-    extract_static true
-    file_patterns '*'
-    full_path_names true
-    generate_html true
-    generate_latex false
-    generate_treeview true
-    html_extra_stylesheet 'theme.css'
-    html_timestamp true
-    javadoc_autobrief true
-    project_name 'WPILibC++'
-    project_logo '../wpiutil/src/main/native/resources/wpilib-128.png'
-    project_number wpilibVersioning.version.get()
-    quiet true
-    recursive true
-    strip_code_comments false
-    strip_from_inc_path cppIncludeRoots as String[]
-    strip_from_path cppIncludeRoots as String[]
-    use_mathjax true
-    warnings false
-    warn_if_incomplete_doc true
-    warn_if_undocumented false
-    warn_no_paramdoc true
+    exclude '**/.clang-tidy'
+    exclude '**/.clang-format'
 
-    //enable doxygen preprocessor expansion of WPI_DEPRECATED to fix MotorController docs
-    enable_preprocessing true
-    macro_expansion true
-    expand_only_predef true
-    predefined "WPI_DEPRECATED(x)=[[deprecated(x)]]\"\\\n" +
-            "\"__cplusplus\"\\\n" +
-            "\"HAL_ENUM(name)=enum name : int32_t"
+    option 'project_name', 'WPILibC++'
+    option 'project_logo', '../wpiutil/src/main/native/resources/wpilib-128.png'
+    option 'project_number', wpilibVersioning.version.get()
+    option 'strip_from_inc_path', cppIncludeRoots
+    option 'strip_from_path', cppIncludeRoots
 
     if (project.hasProperty('docWarningsAsErrors')) {
-        warn_as_error 'FAIL_ON_WARNINGS'
+        option 'warn_as_error', 'FAIL_ON_WARNINGS_PRINT'
     }
 }
 
@@ -213,16 +189,29 @@ task generateJavaDocs(type: Javadoc) {
     options.links("https://docs.oracle.com/en/java/javase/17/docs/api/")
     options.links("https://docs.opencv.org/4.x/javadoc/")
     options.addStringOption("tag", "pre:a:Pre-Condition")
-    options.addBooleanOption("Xdoclint/package:-edu.wpi.first.math.proto," +
+    options.addBooleanOption("Xdoclint/package:" +
+            // TODO: v Document these, then remove them from the list
+            "-edu.wpi.first.hal," +
+            "-edu.wpi.first.hal.simulation," +
+            // TODO: ^ Document these, then remove them from the list
+            "-edu.wpi.first.math.proto," +
+            "-edu.wpi.first.math.struct," +
             "-edu.wpi.first.math.controller.proto," +
             "-edu.wpi.first.math.controller.struct," +
             "-edu.wpi.first.math.geometry.proto," +
             "-edu.wpi.first.math.geometry.struct," +
             "-edu.wpi.first.math.kinematics.proto," +
             "-edu.wpi.first.math.kinematics.struct," +
+            "-edu.wpi.first.math.spline.proto," +
+            "-edu.wpi.first.math.spline.struct," +
+            "-edu.wpi.first.math.system.proto," +
+            "-edu.wpi.first.math.system.struct," +
             "-edu.wpi.first.math.system.plant.proto," +
             "-edu.wpi.first.math.system.plant.struct," +
-            "-edu.wpi.first.math.trajectory.proto", true)
+            "-edu.wpi.first.math.trajectory.proto," +
+            // The .measure package contains generated source files for which automatic javadoc
+            // generation is very difficult to do meaningfully.
+            "-edu.wpi.first.units.measure", true)
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     options.linkSource(true)
@@ -230,6 +219,7 @@ task generateJavaDocs(type: Javadoc) {
     source project(':apriltag').sourceSets.main.java
     source project(':cameraserver').sourceSets.main.java
     source project(':cscore').sourceSets.main.java
+    source project(':epilogue-runtime').sourceSets.main.java
     source project(':hal').sourceSets.main.java
     source project(':ntcore').sourceSets.main.java
     source project(':wpilibNewCommands').sourceSets.main.java
@@ -238,6 +228,8 @@ task generateJavaDocs(type: Javadoc) {
     source project(':wpinet').sourceSets.main.java
     source project(':wpiunits').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
+    source project(':romiVendordep').sourceSets.main.java
+    source project(':xrpVendordep').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
     failOnError = true
@@ -251,23 +243,7 @@ task generateJavaDocs(type: Javadoc) {
         // The second argument '-quiet' is a hack. The one parameter
         // addStringOption() doesn't work, so we add '-quiet', which is added
         // anyway by gradle. See https://github.com/gradle/gradle/issues/2354.
-        //
-        // See JDK-8200363 (https://bugs.openjdk.java.net/browse/JDK-8200363)
-        // for information about the nonstandard -Xwerror option. JDK 15+ has
-        // -Werror.
-        options.addStringOption('Xwerror', '-quiet')
-    }
-
-    if (JavaVersion.current().isJava11Compatible()) {
-        if (!JavaVersion.current().isJava12Compatible()) {
-            options.addBooleanOption('-no-module-directories', true)
-        }
-        doLast {
-            // This is a work-around for https://bugs.openjdk.java.net/browse/JDK-8211194. Can be removed once that issue is fixed on JDK's side
-            // Since JDK 11, package-list is missing from javadoc output files and superseded by element-list file, but a lot of external tools still need it
-            // Here we generate this file manually
-            new File(destinationDir, 'package-list').text = new File(destinationDir, 'element-list').text
-        }
+        options.addStringOption('Werror', '-quiet')
     }
 }
 

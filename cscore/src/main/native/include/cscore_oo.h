@@ -13,6 +13,8 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/deprecated.h>
+
 #include "cscore_cpp.h"
 
 namespace cs {
@@ -58,38 +60,187 @@ class VideoProperty {
 
   VideoProperty() = default;
 
-  std::string GetName() const;
+  /**
+   * Returns property name.
+   *
+   * @return Property name.
+   */
+  std::string GetName() const {
+    m_status = 0;
+    return GetPropertyName(m_handle, &m_status);
+  }
 
+  /**
+   * Returns property kind.
+   *
+   * @return Property kind.
+   */
   Kind GetKind() const { return m_kind; }
 
+  /**
+   * Returns true if property is valid.
+   *
+   * @return True if property is valid.
+   */
   explicit operator bool() const { return m_kind != kNone; }
 
-  // Kind checkers
+  /**
+   * Returns true if property is a boolean.
+   *
+   * @return True if property is a boolean.
+   */
   bool IsBoolean() const { return m_kind == kBoolean; }
+
+  /**
+   * Returns true if property is an integer.
+   *
+   * @return True if property is an integer.
+   */
   bool IsInteger() const { return m_kind == kInteger; }
+
+  /**
+   * Returns true if property is a string.
+   *
+   * @return True if property is a string.
+   */
   bool IsString() const { return m_kind == kString; }
+
+  /**
+   * Returns true if property is an enum.
+   *
+   * @return True if property is an enum.
+   */
   bool IsEnum() const { return m_kind == kEnum; }
 
-  int Get() const;
-  void Set(int value);
-  int GetMin() const;
-  int GetMax() const;
-  int GetStep() const;
-  int GetDefault() const;
+  /**
+   * Returns property value.
+   *
+   * @return Property value.
+   */
+  int Get() const {
+    m_status = 0;
+    return GetProperty(m_handle, &m_status);
+  }
 
-  // String-specific functions
-  std::string GetString() const;
-  std::string_view GetString(wpi::SmallVectorImpl<char>& buf) const;
-  void SetString(std::string_view value);
+  /**
+   * Sets property value.
+   *
+   * @param value Property value.
+   */
+  void Set(int value) {
+    m_status = 0;
+    SetProperty(m_handle, value, &m_status);
+  }
 
-  // Enum-specific functions
-  std::vector<std::string> GetChoices() const;
+  /**
+   * Returns property minimum value.
+   *
+   * @return Property minimum value.
+   */
+  int GetMin() const {
+    m_status = 0;
+    return GetPropertyMin(m_handle, &m_status);
+  }
 
+  /**
+   * Returns property maximum value.
+   *
+   * @return Property maximum value.
+   */
+  int GetMax() const {
+    m_status = 0;
+    return GetPropertyMax(m_handle, &m_status);
+  }
+
+  /**
+   * Returns property step size.
+   *
+   * @return Property step size.
+   */
+  int GetStep() const {
+    m_status = 0;
+    return GetPropertyStep(m_handle, &m_status);
+  }
+
+  /**
+   * Returns property default value.
+   *
+   * @return Property default value.
+   */
+  int GetDefault() const {
+    m_status = 0;
+    return GetPropertyDefault(m_handle, &m_status);
+  }
+
+  /**
+   * Returns the string property value.
+   *
+   * <p>This function is string-specific.
+   *
+   * @return The string property value.
+   */
+  std::string GetString() const {
+    m_status = 0;
+    return GetStringProperty(m_handle, &m_status);
+  }
+
+  /**
+   * Returns the string property value as a reference to the given buffer.
+   *
+   * This function is string-specific.
+   *
+   * @param buf The backing storage to which to write the property value.
+   * @return The string property value as a reference to the given buffer.
+   */
+  std::string_view GetString(wpi::SmallVectorImpl<char>& buf) const {
+    m_status = 0;
+    return GetStringProperty(m_handle, buf, &m_status);
+  }
+
+  /**
+   * Sets the string property value.
+   *
+   * This function is string-specific.
+   *
+   * @param value String property value.
+   */
+  void SetString(std::string_view value) {
+    m_status = 0;
+    SetStringProperty(m_handle, value, &m_status);
+  }
+
+  /**
+   * Returns the possible values for the enum property value.
+   *
+   * This function is enum-specific.
+   *
+   * @return The possible values for the enum property value.
+   */
+  std::vector<std::string> GetChoices() const {
+    m_status = 0;
+    return GetEnumPropertyChoices(m_handle, &m_status);
+  }
+
+  /**
+   * Returns the last status.
+   *
+   * @return The last status.
+   */
   CS_Status GetLastStatus() const { return m_status; }
 
  private:
-  explicit VideoProperty(CS_Property handle);
-  VideoProperty(CS_Property handle, Kind kind);
+  explicit VideoProperty(CS_Property handle) : m_handle(handle) {
+    m_status = 0;
+    if (handle == 0) {
+      m_kind = kNone;
+    } else {
+      m_kind = static_cast<Kind>(
+          static_cast<int>(GetPropertyKind(handle, &m_status)));
+    }
+  }
+
+  VideoProperty(CS_Property handle, Kind kind)
+      : m_handle(handle), m_kind(kind) {}
 
   mutable CS_Status m_status{0};
   CS_Property m_handle{0};
@@ -104,6 +255,9 @@ class VideoSource {
   friend class VideoSink;
 
  public:
+  /**
+   * Video source kind.
+   */
   enum Kind {
     /// Unknown video source.
     kUnknown = CS_SOURCE_UNKNOWN,
@@ -112,7 +266,9 @@ class VideoSource {
     /// HTTP video source.
     kHttp = CS_SOURCE_HTTP,
     /// CV video source.
-    kCv = CS_SOURCE_CV
+    kCv = CS_SOURCE_CV,
+    /// Raw video source.
+    kRaw = CS_SOURCE_RAW,
   };
 
   /** Connection strategy.  Used for SetConnectionStrategy(). */
@@ -137,10 +293,27 @@ class VideoSource {
   };
 
   VideoSource() noexcept = default;
-  VideoSource(const VideoSource& source);
-  VideoSource(VideoSource&& other) noexcept;
-  VideoSource& operator=(VideoSource other) noexcept;
-  ~VideoSource();
+
+  VideoSource(const VideoSource& source)
+      : m_handle(
+            source.m_handle == 0 ? 0 : CopySource(source.m_handle, &m_status)) {
+  }
+
+  VideoSource(VideoSource&& other) noexcept : VideoSource() {
+    swap(*this, other);
+  }
+
+  VideoSource& operator=(VideoSource other) noexcept {
+    swap(*this, other);
+    return *this;
+  }
+
+  ~VideoSource() {
+    m_status = 0;
+    if (m_handle != 0) {
+      ReleaseSource(m_handle, &m_status);
+    }
+  }
 
   explicit operator bool() const { return m_handle != 0; }
 
@@ -153,18 +326,27 @@ class VideoSource {
   /**
    * Get the kind of the source.
    */
-  Kind GetKind() const;
+  Kind GetKind() const {
+    m_status = 0;
+    return static_cast<VideoSource::Kind>(GetSourceKind(m_handle, &m_status));
+  }
 
   /**
    * Get the name of the source.  The name is an arbitrary identifier
    * provided when the source is created, and should be unique.
    */
-  std::string GetName() const;
+  std::string GetName() const {
+    m_status = 0;
+    return GetSourceName(m_handle, &m_status);
+  }
 
   /**
    * Get the source description.  This is source-kind specific.
    */
-  std::string GetDescription() const;
+  std::string GetDescription() const {
+    m_status = 0;
+    return GetSourceDescription(m_handle, &m_status);
+  }
 
   /**
    * Get the last time a frame was captured.
@@ -172,7 +354,10 @@ class VideoSource {
    *
    * @return Time in 1 us increments.
    */
-  uint64_t GetLastFrameTime() const;
+  uint64_t GetLastFrameTime() const {
+    m_status = 0;
+    return GetSourceLastFrameTime(m_handle, &m_status);
+  }
 
   /**
    * Sets the connection strategy.  By default, the source will automatically
@@ -183,12 +368,21 @@ class VideoSource {
    *
    * @param strategy connection strategy (auto, keep open, or force close)
    */
-  void SetConnectionStrategy(ConnectionStrategy strategy);
+  void SetConnectionStrategy(ConnectionStrategy strategy) {
+    m_status = 0;
+    SetSourceConnectionStrategy(
+        m_handle,
+        static_cast<CS_ConnectionStrategy>(static_cast<int>(strategy)),
+        &m_status);
+  }
 
   /**
    * Is the source currently connected to whatever is providing the images?
    */
-  bool IsConnected() const;
+  bool IsConnected() const {
+    m_status = 0;
+    return IsSourceConnected(m_handle, &m_status);
+  }
 
   /**
    * Gets source enable status.  This is determined with a combination of
@@ -196,7 +390,10 @@ class VideoSource {
    *
    * @return True if enabled, false otherwise.
    */
-  bool IsEnabled() const;
+  bool IsEnabled() const {
+    m_status = 0;
+    return IsSourceEnabled(m_handle, &m_status);
+  }
 
   /** Get a property.
    *
@@ -204,7 +401,10 @@ class VideoSource {
    * @return Property contents (of kind Property::kNone if no property with
    *         the given name exists)
    */
-  VideoProperty GetProperty(std::string_view name);
+  VideoProperty GetProperty(std::string_view name) {
+    m_status = 0;
+    return VideoProperty{GetSourceProperty(m_handle, name, &m_status)};
+  }
 
   /**
    * Enumerate all properties of this source.
@@ -214,14 +414,20 @@ class VideoSource {
   /**
    * Get the current video mode.
    */
-  VideoMode GetVideoMode() const;
+  VideoMode GetVideoMode() const {
+    m_status = 0;
+    return GetSourceVideoMode(m_handle, &m_status);
+  }
 
   /**
    * Set the video mode.
    *
    * @param mode Video mode
    */
-  bool SetVideoMode(const VideoMode& mode);
+  bool SetVideoMode(const VideoMode& mode) {
+    m_status = 0;
+    return SetSourceVideoMode(m_handle, mode, &m_status);
+  }
 
   /**
    * Set the video mode.
@@ -233,7 +439,11 @@ class VideoSource {
    * @return True if set successfully
    */
   bool SetVideoMode(VideoMode::PixelFormat pixelFormat, int width, int height,
-                    int fps);
+                    int fps) {
+    m_status = 0;
+    return SetSourceVideoMode(
+        m_handle, VideoMode{pixelFormat, width, height, fps}, &m_status);
+  }
 
   /**
    * Set the pixel format.
@@ -241,7 +451,10 @@ class VideoSource {
    * @param pixelFormat desired pixel format
    * @return True if set successfully
    */
-  bool SetPixelFormat(VideoMode::PixelFormat pixelFormat);
+  bool SetPixelFormat(VideoMode::PixelFormat pixelFormat) {
+    m_status = 0;
+    return SetSourcePixelFormat(m_handle, pixelFormat, &m_status);
+  }
 
   /**
    * Set the resolution.
@@ -250,7 +463,10 @@ class VideoSource {
    * @param height desired height
    * @return True if set successfully
    */
-  bool SetResolution(int width, int height);
+  bool SetResolution(int width, int height) {
+    m_status = 0;
+    return SetSourceResolution(m_handle, width, height, &m_status);
+  }
 
   /**
    * Set the frames per second (FPS).
@@ -258,7 +474,10 @@ class VideoSource {
    * @param fps desired FPS
    * @return True if set successfully
    */
-  bool SetFPS(int fps);
+  bool SetFPS(int fps) {
+    m_status = 0;
+    return SetSourceFPS(m_handle, fps, &m_status);
+  }
 
   /**
    * Set video mode and properties from a JSON configuration string.
@@ -286,7 +505,10 @@ class VideoSource {
    * @param config configuration
    * @return True if set successfully
    */
-  bool SetConfigJson(std::string_view config);
+  bool SetConfigJson(std::string_view config) {
+    m_status = 0;
+    return SetSourceConfigJson(m_handle, config, &m_status);
+  }
 
   /**
    * Set video mode and properties from a JSON configuration object.
@@ -294,14 +516,20 @@ class VideoSource {
    * @param config configuration
    * @return True if set successfully
    */
-  bool SetConfigJson(const wpi::json& config);
+  bool SetConfigJson(const wpi::json& config) {
+    m_status = 0;
+    return SetSourceConfigJson(m_handle, config, &m_status);
+  }
 
   /**
    * Get a JSON configuration string.
    *
    * @return JSON configuration string
    */
-  std::string GetConfigJson() const;
+  std::string GetConfigJson() const {
+    m_status = 0;
+    return GetSourceConfigJson(m_handle, &m_status);
+  }
 
   /**
    * Get a JSON configuration object.
@@ -317,7 +545,11 @@ class VideoSource {
    *
    * @return Actual FPS averaged over the telemetry period.
    */
-  double GetActualFPS() const;
+  double GetActualFPS() const {
+    m_status = 0;
+    return cs::GetTelemetryAverageValue(m_handle, CS_SOURCE_FRAMES_RECEIVED,
+                                        &m_status);
+  }
 
   /**
    * Get the data rate (in bytes per second).
@@ -326,12 +558,19 @@ class VideoSource {
    *
    * @return Data rate averaged over the telemetry period.
    */
-  double GetActualDataRate() const;
+  double GetActualDataRate() const {
+    m_status = 0;
+    return cs::GetTelemetryAverageValue(m_handle, CS_SOURCE_BYTES_RECEIVED,
+                                        &m_status);
+  }
 
   /**
    * Enumerate all known video modes for this source.
    */
-  std::vector<VideoMode> EnumerateVideoModes() const;
+  std::vector<VideoMode> EnumerateVideoModes() const {
+    CS_Status status = 0;
+    return EnumerateSourceVideoModes(m_handle, &status);
+  }
 
   CS_Status GetLastStatus() const { return m_status; }
 
@@ -359,6 +598,8 @@ class VideoSource {
   explicit VideoSource(CS_Source handle) : m_handle(handle) {}
 
   mutable CS_Status m_status = 0;
+
+  /// Video source handle.
   CS_Source m_handle{0};
 };
 
@@ -367,11 +608,19 @@ class VideoSource {
  */
 class VideoCamera : public VideoSource {
  public:
+  /**
+   * White balance.
+   */
   enum WhiteBalance {
+    /// Fixed indoor white balance.
     kFixedIndoor = 3000,
+    /// Fixed outdoor white balance 1.
     kFixedOutdoor1 = 4000,
+    /// Fixed outdoor white balance 2.
     kFixedOutdoor2 = 5000,
+    /// Fixed fluorescent white balance 1.
     kFixedFluorescent1 = 5100,
+    /// Fixed fluorescent white balance 2.
     kFixedFlourescent2 = 5200
   };
 
@@ -380,42 +629,66 @@ class VideoCamera : public VideoSource {
   /**
    * Set the brightness, as a percentage (0-100).
    */
-  void SetBrightness(int brightness);
+  void SetBrightness(int brightness) {
+    m_status = 0;
+    SetCameraBrightness(m_handle, brightness, &m_status);
+  }
 
   /**
    * Get the brightness, as a percentage (0-100).
    */
-  int GetBrightness();
+  int GetBrightness() {
+    m_status = 0;
+    return GetCameraBrightness(m_handle, &m_status);
+  }
 
   /**
    * Set the white balance to auto.
    */
-  void SetWhiteBalanceAuto();
+  void SetWhiteBalanceAuto() {
+    m_status = 0;
+    SetCameraWhiteBalanceAuto(m_handle, &m_status);
+  }
 
   /**
    * Set the white balance to hold current.
    */
-  void SetWhiteBalanceHoldCurrent();
+  void SetWhiteBalanceHoldCurrent() {
+    m_status = 0;
+    SetCameraWhiteBalanceHoldCurrent(m_handle, &m_status);
+  }
 
   /**
    * Set the white balance to manual, with specified color temperature.
    */
-  void SetWhiteBalanceManual(int value);
+  void SetWhiteBalanceManual(int value) {
+    m_status = 0;
+    SetCameraWhiteBalanceManual(m_handle, value, &m_status);
+  }
 
   /**
-   * Set the exposure to auto aperature.
+   * Set the exposure to auto aperture.
    */
-  void SetExposureAuto();
+  void SetExposureAuto() {
+    m_status = 0;
+    SetCameraExposureAuto(m_handle, &m_status);
+  }
 
   /**
    * Set the exposure to hold current.
    */
-  void SetExposureHoldCurrent();
+  void SetExposureHoldCurrent() {
+    m_status = 0;
+    SetCameraExposureHoldCurrent(m_handle, &m_status);
+  }
 
   /**
    * Set the exposure to manual, as a percentage (0-100).
    */
-  void SetExposureManual(int value);
+  void SetExposureManual(int value) {
+    m_status = 0;
+    SetCameraExposureManual(m_handle, value, &m_status);
+  }
 
  protected:
   explicit VideoCamera(CS_Source handle) : VideoSource(handle) {}
@@ -434,7 +707,9 @@ class UsbCamera : public VideoCamera {
    * @param name Source name (arbitrary unique identifier)
    * @param dev Device number (e.g. 0 for /dev/video0)
    */
-  UsbCamera(std::string_view name, int dev);
+  UsbCamera(std::string_view name, int dev) {
+    m_handle = CreateUsbCameraDev(name, dev, &m_status);
+  }
 
   /**
    * Create a source for a USB camera based on device path.
@@ -442,36 +717,54 @@ class UsbCamera : public VideoCamera {
    * @param name Source name (arbitrary unique identifier)
    * @param path Path to device (e.g. "/dev/video0" on Linux)
    */
-  UsbCamera(std::string_view name, std::string_view path);
+  UsbCamera(std::string_view name, std::string_view path) {
+    m_handle = CreateUsbCameraPath(name, path, &m_status);
+  }
 
   /**
    * Enumerate USB cameras on the local system.
    *
    * @return Vector of USB camera information (one for each camera)
    */
-  static std::vector<UsbCameraInfo> EnumerateUsbCameras();
+  static std::vector<UsbCameraInfo> EnumerateUsbCameras() {
+    CS_Status status = 0;
+    return ::cs::EnumerateUsbCameras(&status);
+  }
 
   /**
    * Change the path to the device.
    */
-  void SetPath(std::string_view path);
+  void SetPath(std::string_view path) {
+    m_status = 0;
+    return ::cs::SetUsbCameraPath(m_handle, path, &m_status);
+  }
 
   /**
    * Get the path to the device.
    */
-  std::string GetPath() const;
+  std::string GetPath() const {
+    m_status = 0;
+    return ::cs::GetUsbCameraPath(m_handle, &m_status);
+  }
 
   /**
    * Get the full camera information for the device.
    */
-  UsbCameraInfo GetInfo() const;
+  UsbCameraInfo GetInfo() const {
+    m_status = 0;
+    return ::cs::GetUsbCameraInfo(m_handle, &m_status);
+  }
 
   /**
    * Set how verbose the camera connection messages are.
    *
    * @param level 0=don't display Connecting message, 1=do display message
    */
-  void SetConnectVerbose(int level);
+  void SetConnectVerbose(int level) {
+    m_status = 0;
+    SetProperty(GetSourceProperty(m_handle, "connect_verbose", &m_status),
+                level, &m_status);
+  }
 };
 
 /**
@@ -479,6 +772,9 @@ class UsbCamera : public VideoCamera {
  */
 class HttpCamera : public VideoCamera {
  public:
+  /**
+   * HTTP camera kind.
+   */
   enum HttpCameraKind {
     /// Unknown camera kind.
     kUnknown = CS_HTTP_UNKNOWN,
@@ -498,7 +794,11 @@ class HttpCamera : public VideoCamera {
    * @param kind Camera kind (e.g. kAxis)
    */
   HttpCamera(std::string_view name, std::string_view url,
-             HttpCameraKind kind = kUnknown);
+             HttpCameraKind kind = kUnknown) {
+    m_handle = CreateHttpCamera(
+        name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
+        &m_status);
+  }
 
   /**
    * Create a source for a MJPEG-over-HTTP (IP) camera.
@@ -508,7 +808,11 @@ class HttpCamera : public VideoCamera {
    * @param kind Camera kind (e.g. kAxis)
    */
   HttpCamera(std::string_view name, const char* url,
-             HttpCameraKind kind = kUnknown);
+             HttpCameraKind kind = kUnknown) {
+    m_handle = CreateHttpCamera(
+        name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
+        &m_status);
+  }
 
   /**
    * Create a source for a MJPEG-over-HTTP (IP) camera.
@@ -518,7 +822,8 @@ class HttpCamera : public VideoCamera {
    * @param kind Camera kind (e.g. kAxis)
    */
   HttpCamera(std::string_view name, const std::string& url,
-             HttpCameraKind kind = kUnknown);
+             HttpCameraKind kind = kUnknown)
+      : HttpCamera(name, std::string_view{url}, kind) {}
 
   /**
    * Create a source for a MJPEG-over-HTTP (IP) camera.
@@ -528,7 +833,11 @@ class HttpCamera : public VideoCamera {
    * @param kind Camera kind (e.g. kAxis)
    */
   HttpCamera(std::string_view name, std::span<const std::string> urls,
-             HttpCameraKind kind = kUnknown);
+             HttpCameraKind kind = kUnknown) {
+    m_handle = CreateHttpCamera(
+        name, urls, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
+        &m_status);
+  }
 
   /**
    * Create a source for a MJPEG-over-HTTP (IP) camera.
@@ -539,7 +848,16 @@ class HttpCamera : public VideoCamera {
    */
   template <typename T>
   HttpCamera(std::string_view name, std::initializer_list<T> urls,
-             HttpCameraKind kind = kUnknown);
+             HttpCameraKind kind = kUnknown) {
+    std::vector<std::string> vec;
+    vec.reserve(urls.size());
+    for (const auto& url : urls) {
+      vec.emplace_back(url);
+    }
+    m_handle = CreateHttpCamera(
+        name, vec, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
+        &m_status);
+  }
 
   /**
    * Get the kind of HTTP camera.
@@ -547,33 +865,70 @@ class HttpCamera : public VideoCamera {
    * <p>Autodetection can result in returning a different value than the camera
    * was created with.
    */
-  HttpCameraKind GetHttpCameraKind() const;
+  HttpCameraKind GetHttpCameraKind() const {
+    m_status = 0;
+    return static_cast<HttpCameraKind>(
+        static_cast<int>(::cs::GetHttpCameraKind(m_handle, &m_status)));
+  }
 
   /**
    * Change the URLs used to connect to the camera.
    */
-  void SetUrls(std::span<const std::string> urls);
+  void SetUrls(std::span<const std::string> urls) {
+    m_status = 0;
+    ::cs::SetHttpCameraUrls(m_handle, urls, &m_status);
+  }
 
   /**
    * Change the URLs used to connect to the camera.
    */
   template <typename T>
-  void SetUrls(std::initializer_list<T> urls);
+  void SetUrls(std::initializer_list<T> urls) {
+    std::vector<std::string> vec;
+    vec.reserve(urls.size());
+    for (const auto& url : urls) {
+      vec.emplace_back(url);
+    }
+    m_status = 0;
+    ::cs::SetHttpCameraUrls(m_handle, vec, &m_status);
+  }
 
   /**
    * Get the URLs used to connect to the camera.
    */
-  std::vector<std::string> GetUrls() const;
+  std::vector<std::string> GetUrls() const {
+    m_status = 0;
+    return ::cs::GetHttpCameraUrls(m_handle, &m_status);
+  }
 };
 
 /**
  * A source that represents an Axis IP camera.
+ *
+ * @deprecated Use HttpCamera instead.
  */
-class AxisCamera : public HttpCamera {
+class [[deprecated("Use HttpCamera instead.")]] AxisCamera : public HttpCamera {
   static std::string HostToUrl(std::string_view host);
-  static std::vector<std::string> HostToUrl(std::span<const std::string> hosts);
+
+  static std::vector<std::string> HostToUrl(
+      std::span<const std::string> hosts) {
+    std::vector<std::string> rv;
+    rv.reserve(hosts.size());
+    for (const auto& host : hosts) {
+      rv.emplace_back(HostToUrl(std::string_view{host}));
+    }
+    return rv;
+  }
+
   template <typename T>
-  static std::vector<std::string> HostToUrl(std::initializer_list<T> hosts);
+  static std::vector<std::string> HostToUrl(std::initializer_list<T> hosts) {
+    std::vector<std::string> rv;
+    rv.reserve(hosts.size());
+    for (const auto& host : hosts) {
+      rv.emplace_back(HostToUrl(std::string_view{host}));
+    }
+    return rv;
+  }
 
  public:
   /**
@@ -582,7 +937,8 @@ class AxisCamera : public HttpCamera {
    * @param name Source name (arbitrary unique identifier)
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
-  AxisCamera(std::string_view name, std::string_view host);
+  AxisCamera(std::string_view name, std::string_view host)
+      : HttpCamera(name, HostToUrl(host), kAxis) {}
 
   /**
    * Create a source for an Axis IP camera.
@@ -590,7 +946,8 @@ class AxisCamera : public HttpCamera {
    * @param name Source name (arbitrary unique identifier)
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
-  AxisCamera(std::string_view name, const char* host);
+  AxisCamera(std::string_view name, const char* host)
+      : HttpCamera(name, HostToUrl(host), kAxis) {}
 
   /**
    * Create a source for an Axis IP camera.
@@ -598,7 +955,8 @@ class AxisCamera : public HttpCamera {
    * @param name Source name (arbitrary unique identifier)
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
-  AxisCamera(std::string_view name, const std::string& host);
+  AxisCamera(std::string_view name, const std::string& host)
+      : HttpCamera(name, HostToUrl(std::string_view{host}), kAxis) {}
 
   /**
    * Create a source for an Axis IP camera.
@@ -606,7 +964,8 @@ class AxisCamera : public HttpCamera {
    * @param name Source name (arbitrary unique identifier)
    * @param hosts Array of Camera host IPs/DNS names
    */
-  AxisCamera(std::string_view name, std::span<const std::string> hosts);
+  AxisCamera(std::string_view name, std::span<const std::string> hosts)
+      : HttpCamera(name, HostToUrl(hosts), kAxis) {}
 
   /**
    * Create a source for an Axis IP camera.
@@ -615,7 +974,8 @@ class AxisCamera : public HttpCamera {
    * @param hosts Array of Camera host IPs/DNS names
    */
   template <typename T>
-  AxisCamera(std::string_view name, std::initializer_list<T> hosts);
+  AxisCamera(std::string_view name, std::initializer_list<T> hosts)
+      : HttpCamera(name, HostToUrl(hosts), kAxis) {}
 };
 
 /**
@@ -632,21 +992,30 @@ class ImageSource : public VideoSource {
    *
    * @param msg Notification message.
    */
-  void NotifyError(std::string_view msg);
+  void NotifyError(std::string_view msg) {
+    m_status = 0;
+    NotifySourceError(m_handle, msg, &m_status);
+  }
 
   /**
    * Set source connection status.  Defaults to true.
    *
    * @param connected True for connected, false for disconnected
    */
-  void SetConnected(bool connected);
+  void SetConnected(bool connected) {
+    m_status = 0;
+    SetSourceConnected(m_handle, connected, &m_status);
+  }
 
   /**
    * Set source description.
    *
    * @param description Description
    */
-  void SetDescription(std::string_view description);
+  void SetDescription(std::string_view description) {
+    m_status = 0;
+    SetSourceDescription(m_handle, description, &m_status);
+  }
 
   /**
    * Create a property.
@@ -662,7 +1031,12 @@ class ImageSource : public VideoSource {
    */
   VideoProperty CreateProperty(std::string_view name, VideoProperty::Kind kind,
                                int minimum, int maximum, int step,
-                               int defaultValue, int value);
+                               int defaultValue, int value) {
+    m_status = 0;
+    return VideoProperty{CreateSourceProperty(
+        m_handle, name, static_cast<CS_PropertyKind>(static_cast<int>(kind)),
+        minimum, maximum, step, defaultValue, value, &m_status)};
+  }
 
   /**
    * Create an integer property.
@@ -677,7 +1051,14 @@ class ImageSource : public VideoSource {
    */
   VideoProperty CreateIntegerProperty(std::string_view name, int minimum,
                                       int maximum, int step, int defaultValue,
-                                      int value);
+                                      int value) {
+    m_status = 0;
+    return VideoProperty{CreateSourceProperty(
+        m_handle, name,
+        static_cast<CS_PropertyKind>(
+            static_cast<int>(VideoProperty::Kind::kInteger)),
+        minimum, maximum, step, defaultValue, value, &m_status)};
+  }
 
   /**
    * Create a boolean property.
@@ -688,7 +1069,14 @@ class ImageSource : public VideoSource {
    * @return Property
    */
   VideoProperty CreateBooleanProperty(std::string_view name, bool defaultValue,
-                                      bool value);
+                                      bool value) {
+    m_status = 0;
+    return VideoProperty{CreateSourceProperty(
+        m_handle, name,
+        static_cast<CS_PropertyKind>(
+            static_cast<int>(VideoProperty::Kind::kBoolean)),
+        0, 1, 1, defaultValue ? 1 : 0, value ? 1 : 0, &m_status)};
+  }
 
   /**
    * Create a string property.
@@ -698,7 +1086,16 @@ class ImageSource : public VideoSource {
    * @return Property
    */
   VideoProperty CreateStringProperty(std::string_view name,
-                                     std::string_view value);
+                                     std::string_view value) {
+    m_status = 0;
+    auto prop = VideoProperty{CreateSourceProperty(
+        m_handle, name,
+        static_cast<CS_PropertyKind>(
+            static_cast<int>(VideoProperty::Kind::kString)),
+        0, 0, 0, 0, 0, &m_status)};
+    prop.SetString(value);
+    return prop;
+  }
 
   /**
    * Configure enum property choices.
@@ -707,7 +1104,11 @@ class ImageSource : public VideoSource {
    * @param choices Choices
    */
   void SetEnumPropertyChoices(const VideoProperty& property,
-                              std::span<const std::string> choices);
+                              std::span<const std::string> choices) {
+    m_status = 0;
+    SetSourceEnumPropertyChoices(m_handle, property.m_handle, choices,
+                                 &m_status);
+  }
 
   /**
    * Configure enum property choices.
@@ -717,7 +1118,15 @@ class ImageSource : public VideoSource {
    */
   template <typename T>
   void SetEnumPropertyChoices(const VideoProperty& property,
-                              std::initializer_list<T> choices);
+                              std::initializer_list<T> choices) {
+    std::vector<std::string> vec;
+    vec.reserve(choices.size());
+    for (const auto& choice : choices) {
+      vec.emplace_back(choice);
+    }
+    m_status = 0;
+    SetSourceEnumPropertyChoices(m_handle, property.m_handle, vec, &m_status);
+  }
 };
 
 /**
@@ -734,17 +1143,42 @@ class VideoSink {
     /// MJPEG video sink.
     kMjpeg = CS_SINK_MJPEG,
     /// CV video sink.
-    kCv = CS_SINK_CV
+    kCv = CS_SINK_CV,
+    /// Raw video sink.
+    kRaw = CS_SINK_RAW,
   };
 
   VideoSink() noexcept = default;
-  VideoSink(const VideoSink& sink);
-  VideoSink(VideoSink&& sink) noexcept;
-  VideoSink& operator=(VideoSink other) noexcept;
-  ~VideoSink();
 
+  VideoSink(const VideoSink& sink)
+      : m_handle(sink.m_handle == 0 ? 0 : CopySink(sink.m_handle, &m_status)) {}
+
+  VideoSink(VideoSink&& other) noexcept : VideoSink() { swap(*this, other); }
+
+  VideoSink& operator=(VideoSink other) noexcept {
+    swap(*this, other);
+    return *this;
+  }
+
+  ~VideoSink() {
+    m_status = 0;
+    if (m_handle != 0) {
+      ReleaseSink(m_handle, &m_status);
+    }
+  }
+
+  /**
+   * Returns true if the VideoSink is valid.
+   *
+   * @return True if the VideoSink is valid.
+   */
   explicit operator bool() const { return m_handle != 0; }
 
+  /**
+   * Returns the VideoSink handle.
+   *
+   * @return The VideoSink handle.
+   */
   int GetHandle() const { return m_handle; }
 
   bool operator==(const VideoSink& other) const {
@@ -754,18 +1188,27 @@ class VideoSink {
   /**
    * Get the kind of the sink.
    */
-  Kind GetKind() const;
+  Kind GetKind() const {
+    m_status = 0;
+    return static_cast<VideoSink::Kind>(GetSinkKind(m_handle, &m_status));
+  }
 
   /**
    * Get the name of the sink.  The name is an arbitrary identifier
    * provided when the sink is created, and should be unique.
    */
-  std::string GetName() const;
+  std::string GetName() const {
+    m_status = 0;
+    return GetSinkName(m_handle, &m_status);
+  }
 
   /**
    * Get the sink description.  This is sink-kind specific.
    */
-  std::string GetDescription() const;
+  std::string GetDescription() const {
+    m_status = 0;
+    return GetSinkDescription(m_handle, &m_status);
+  }
 
   /**
    * Get a property of the sink.
@@ -774,7 +1217,10 @@ class VideoSink {
    * @return Property (kind Property::kNone if no property with
    *         the given name exists)
    */
-  VideoProperty GetProperty(std::string_view name);
+  VideoProperty GetProperty(std::string_view name) {
+    m_status = 0;
+    return VideoProperty{GetSinkProperty(m_handle, name, &m_status)};
+  }
 
   /**
    * Enumerate all properties of this sink.
@@ -800,7 +1246,10 @@ class VideoSink {
    * @param config configuration
    * @return True if set successfully
    */
-  bool SetConfigJson(std::string_view config);
+  bool SetConfigJson(std::string_view config) {
+    m_status = 0;
+    return SetSinkConfigJson(m_handle, config, &m_status);
+  }
 
   /**
    * Set properties from a JSON configuration object.
@@ -808,14 +1257,20 @@ class VideoSink {
    * @param config configuration
    * @return True if set successfully
    */
-  bool SetConfigJson(const wpi::json& config);
+  bool SetConfigJson(const wpi::json& config) {
+    m_status = 0;
+    return SetSinkConfigJson(m_handle, config, &m_status);
+  }
 
   /**
    * Get a JSON configuration string.
    *
    * @return JSON configuration string
    */
-  std::string GetConfigJson() const;
+  std::string GetConfigJson() const {
+    m_status = 0;
+    return GetSinkConfigJson(m_handle, &m_status);
+  }
 
   /**
    * Get a JSON configuration object.
@@ -831,14 +1286,25 @@ class VideoSink {
    *
    * @param source Source
    */
-  void SetSource(VideoSource source);
+  void SetSource(VideoSource source) {
+    m_status = 0;
+    if (!source) {
+      SetSinkSource(m_handle, 0, &m_status);
+    } else {
+      SetSinkSource(m_handle, source.m_handle, &m_status);
+    }
+  }
 
   /**
    * Get the connected source.
    *
    * @return Connected source (empty if none connected).
    */
-  VideoSource GetSource() const;
+  VideoSource GetSource() const {
+    m_status = 0;
+    auto handle = GetSinkSource(m_handle, &m_status);
+    return VideoSource{handle == 0 ? 0 : CopySource(handle, &m_status)};
+  }
 
   /**
    * Get a property of the associated source.
@@ -847,7 +1313,10 @@ class VideoSink {
    * @return Property (kind Property::kNone if no property with
    *         the given name exists or no source connected)
    */
-  VideoProperty GetSourceProperty(std::string_view name);
+  VideoProperty GetSourceProperty(std::string_view name) {
+    m_status = 0;
+    return VideoProperty{GetSinkSourceProperty(m_handle, name, &m_status)};
+  }
 
   CS_Status GetLastStatus() const { return m_status; }
 
@@ -885,7 +1354,9 @@ class MjpegServer : public VideoSink {
    * @param listenAddress TCP listen address (empty string for all addresses)
    * @param port TCP port number
    */
-  MjpegServer(std::string_view name, std::string_view listenAddress, int port);
+  MjpegServer(std::string_view name, std::string_view listenAddress, int port) {
+    m_handle = CreateMjpegServer(name, listenAddress, port, &m_status);
+  }
 
   /**
    * Create a MJPEG-over-HTTP server sink.
@@ -898,12 +1369,18 @@ class MjpegServer : public VideoSink {
   /**
    * Get the listen address of the server.
    */
-  std::string GetListenAddress() const;
+  std::string GetListenAddress() const {
+    m_status = 0;
+    return cs::GetMjpegServerListenAddress(m_handle, &m_status);
+  }
 
   /**
    * Get the port number of the server.
    */
-  int GetPort() const;
+  int GetPort() const {
+    m_status = 0;
+    return cs::GetMjpegServerPort(m_handle, &m_status);
+  }
 
   /**
    * Set the stream resolution for clients that don't specify it.
@@ -919,7 +1396,13 @@ class MjpegServer : public VideoSink {
    * @param width width, 0 for unspecified
    * @param height height, 0 for unspecified
    */
-  void SetResolution(int width, int height);
+  void SetResolution(int width, int height) {
+    m_status = 0;
+    SetProperty(GetSinkProperty(m_handle, "width", &m_status), width,
+                &m_status);
+    SetProperty(GetSinkProperty(m_handle, "height", &m_status), height,
+                &m_status);
+  }
 
   /**
    * Set the stream frames per second (FPS) for clients that don't specify it.
@@ -928,7 +1411,10 @@ class MjpegServer : public VideoSink {
    *
    * @param fps FPS, 0 for unspecified
    */
-  void SetFPS(int fps);
+  void SetFPS(int fps) {
+    m_status = 0;
+    SetProperty(GetSinkProperty(m_handle, "fps", &m_status), fps, &m_status);
+  }
 
   /**
    * Set the compression for clients that don't specify it.
@@ -939,7 +1425,11 @@ class MjpegServer : public VideoSink {
    *
    * @param quality JPEG compression quality (0-100), -1 for unspecified
    */
-  void SetCompression(int quality);
+  void SetCompression(int quality) {
+    m_status = 0;
+    SetProperty(GetSinkProperty(m_handle, "compression", &m_status), quality,
+                &m_status);
+  }
 
   /**
    * Set the default compression used for non-MJPEG sources.  If not set,
@@ -948,7 +1438,11 @@ class MjpegServer : public VideoSink {
    *
    * @param quality JPEG compression quality (0-100)
    */
-  void SetDefaultCompression(int quality);
+  void SetDefaultCompression(int quality) {
+    m_status = 0;
+    SetProperty(GetSinkProperty(m_handle, "default_compression", &m_status),
+                quality, &m_status);
+  }
 };
 
 /**
@@ -964,13 +1458,19 @@ class ImageSink : public VideoSink {
    *
    * @param description Description
    */
-  void SetDescription(std::string_view description);
+  void SetDescription(std::string_view description) {
+    m_status = 0;
+    SetSinkDescription(m_handle, description, &m_status);
+  }
 
   /**
    * Get error string.  Call this if WaitForFrame() returns 0 to determine
    * what the error is.
    */
-  std::string GetError() const;
+  std::string GetError() const {
+    m_status = 0;
+    return GetSinkError(m_handle, &m_status);
+  }
 
   /**
    * Enable or disable getting new frames.
@@ -979,7 +1479,10 @@ class ImageSink : public VideoSink {
    * be called and WaitForFrame() to not return.  This can be used to save
    * processor resources when frames are not needed.
    */
-  void SetEnabled(bool enabled);
+  void SetEnabled(bool enabled) {
+    m_status = 0;
+    SetSinkEnabled(m_handle, enabled, &m_status);
+  }
 };
 
 /**
@@ -988,23 +1491,39 @@ class ImageSink : public VideoSink {
 class VideoEvent : public RawEvent {
  public:
   /**
-   * Get the source associated with the event (if any).
+   * Returns the source associated with the event (if any).
+   *
+   * @return The source associated with the event (if any).
    */
-  VideoSource GetSource() const;
+  VideoSource GetSource() const {
+    CS_Status status = 0;
+    return VideoSource{sourceHandle == 0 ? 0
+                                         : CopySource(sourceHandle, &status)};
+  }
 
   /**
-   * Get the sink associated with the event (if any).
+   * Returns the sink associated with the event (if any).
+   *
+   * @return The sink associated with the event (if any).
    */
-  VideoSink GetSink() const;
+  VideoSink GetSink() const {
+    CS_Status status = 0;
+    return VideoSink{sinkHandle == 0 ? 0 : CopySink(sinkHandle, &status)};
+  }
 
   /**
-   * Get the property associated with the event (if any).
+   * Returns the property associated with the event (if any).
+   *
+   * @return The property associated with the event (if any).
    */
-  VideoProperty GetProperty() const;
+  VideoProperty GetProperty() const {
+    return VideoProperty{propertyHandle,
+                         static_cast<VideoProperty::Kind>(propertyKind)};
+  }
 };
 
 /**
- * An event listener.  This calls back to a desigated callback function when
+ * An event listener.  This calls back to a designated callback function when
  * an event matching the specified mask is generated by the library.
  */
 class VideoListener {
@@ -1020,13 +1539,33 @@ class VideoListener {
    *        a representative set of events for the current library state.
    */
   VideoListener(std::function<void(const VideoEvent& event)> callback,
-                int eventMask, bool immediateNotify);
+                int eventMask, bool immediateNotify) {
+    CS_Status status = 0;
+    m_handle = AddListener(
+        [=](const RawEvent& event) {
+          callback(static_cast<const VideoEvent&>(event));
+        },
+        eventMask, immediateNotify, &status);
+  }
 
   VideoListener(const VideoListener&) = delete;
   VideoListener& operator=(const VideoListener&) = delete;
-  VideoListener(VideoListener&& other) noexcept;
-  VideoListener& operator=(VideoListener&& other) noexcept;
-  ~VideoListener();
+
+  VideoListener(VideoListener&& other) noexcept : VideoListener() {
+    swap(*this, other);
+  }
+
+  VideoListener& operator=(VideoListener&& other) noexcept {
+    swap(*this, other);
+    return *this;
+  }
+
+  ~VideoListener() {
+    CS_Status status = 0;
+    if (m_handle != 0) {
+      RemoveListener(m_handle, &status);
+    }
+  }
 
   friend void swap(VideoListener& first, VideoListener& second) noexcept {
     using std::swap;
@@ -1040,7 +1579,5 @@ class VideoListener {
 /** @} */
 
 }  // namespace cs
-
-#include "cscore_oo.inc"
 
 #endif  // CSCORE_CSCORE_OO_H_

@@ -6,7 +6,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <functional>
 #include <mutex>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <units/math.h>
@@ -127,16 +130,16 @@ void AnalyzerPlot::SetRawData(const Storage& data, std::string_view unit,
 
 void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
                            std::string_view unit,
-                           const std::vector<double>& ffGains,
+                           const AnalysisManager::FeedforwardGains& ffGains,
                            const std::array<units::second_t, 4>& startTimes,
                            AnalysisType type, std::atomic<bool>& abort) {
   double simSquaredErrorSum = 0;
   double squaredVariationSum = 0;
   int timeSeriesPoints = 0;
 
-  const auto& Ks = ffGains[0];
-  const auto& Kv = ffGains[1];
-  const auto& Ka = ffGains[2];
+  const auto& Ks = ffGains.Ks.gain;
+  const auto& Kv = ffGains.Kv.gain;
+  const auto& Ka = ffGains.Ka.gain;
 
   auto& [slowForward, slowBackward, fastForward, fastBackward] = filteredData;
   auto& [rawSlowForward, rawSlowBackward, rawFastForward, rawFastBackward] =
@@ -223,7 +226,7 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
 
     // Populate simulated time domain data
     if (type == analysis::kElevator) {
-      const auto& Kg = ffGains[3];
+      const auto& Kg = ffGains.Kg.gain;
       m_quasistaticData.simData = PopulateTimeDomainSim(
           rawSlow, startTimes, fastStep, sysid::ElevatorSim{Ks, Kv, Ka, Kg},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
@@ -231,8 +234,8 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
           rawFast, startTimes, fastStep, sysid::ElevatorSim{Ks, Kv, Ka, Kg},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
     } else if (type == analysis::kArm) {
-      const auto& Kg = ffGains[3];
-      const auto& offset = ffGains[4];
+      const auto& Kg = ffGains.Kg.gain;
+      const auto& offset = ffGains.offset.gain;
       m_quasistaticData.simData = PopulateTimeDomainSim(
           rawSlow, startTimes, fastStep, sysid::ArmSim{Ks, Kv, Ka, Kg, offset},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
@@ -288,10 +291,10 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
                           std::copysign(Ks / Ka, slow[i].velocity);
 
     if (type == analysis::kElevator) {
-      const auto& Kg = ffGains[3];
+      const auto& Kg = ffGains.Kg.gain;
       accelPortion -= Kg / Ka;
     } else if (type == analysis::kArm) {
-      const auto& Kg = ffGains[3];
+      const auto& Kg = ffGains.Kg.gain;
       accelPortion -= Kg / Ka * slow[i].cos;
     }
 
@@ -307,10 +310,10 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
                           std::copysign(Ks / Ka, fast[i].velocity);
 
     if (type == analysis::kElevator) {
-      const auto& Kg = ffGains[3];
+      const auto& Kg = ffGains.Kg.gain;
       accelPortion -= Kg / Ka;
     } else if (type == analysis::kArm) {
-      const auto& Kg = ffGains[3];
+      const auto& Kg = ffGains.Kg.gain;
       accelPortion -= Kg / Ka * fast[i].cos;
     }
 

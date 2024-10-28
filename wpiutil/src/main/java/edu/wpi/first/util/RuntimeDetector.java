@@ -8,7 +8,10 @@ import java.io.File;
 
 /**
  * A utility class for detecting and providing platform-specific such as OS and CPU architecture.
+ *
+ * @deprecated platform detection is brittle and may be removed in the future.
  */
+@Deprecated(since = "2025", forRemoval = true)
 public final class RuntimeDetector {
   private static String filePrefix;
   private static String fileExtension;

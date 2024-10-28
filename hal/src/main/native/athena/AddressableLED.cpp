@@ -5,6 +5,7 @@
 #include "hal/AddressableLED.h"
 
 #include <cstring>
+#include <memory>
 
 #include <fmt/format.h>
 
@@ -195,6 +196,10 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
         fmt::format(
             "Data length must be less than or equal to {}. {} was requested",
             led->stringLength, length));
+    return;
+  }
+
+  if (length == 0) {
     return;
   }
 

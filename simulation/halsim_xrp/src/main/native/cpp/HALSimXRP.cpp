@@ -5,11 +5,12 @@
 #include "HALSimXRP.h"
 
 #include <cstdio>
+#include <string>
 
-#include <fmt/format.h>
 #include <wpi/Endian.h>
 #include <wpi/MathExtras.h>
 #include <wpi/SmallString.h>
+#include <wpi/print.h>
 #include <wpinet/raw_uv_ostream.h>
 #include <wpinet/uv/util.h>
 
@@ -24,7 +25,7 @@ HALSimXRP::HALSimXRP(wpi::uv::Loop& loop,
       m_providers(providers),
       m_simDevicesProvider(simDevicesProvider) {
   m_loop.error.connect([](uv::Error err) {
-    fmt::print(stderr, "HALSim XRP Client libuv Error: {}\n", err.str());
+    wpi::print(stderr, "HALSim XRP Client libuv Error: {}\n", err.str());
   });
 
   m_udp_client = uv::Udp::Create(m_loop);
@@ -51,7 +52,7 @@ bool HALSimXRP::Initialize() {
     try {
       m_port = std::stoi(port);
     } catch (const std::invalid_argument& err) {
-      fmt::print(stderr, "Error decoding HALSIMXRP_PORT ({})\n", err.what());
+      wpi::print(stderr, "Error decoding HALSIMXRP_PORT ({})\n", err.what());
       return false;
     }
   } else {
@@ -79,7 +80,7 @@ void HALSimXRP::Start() {
         ParsePacket({reinterpret_cast<uint8_t*>(data.base), len});
       });
 
-  m_udp_client->closed.connect([]() { fmt::print("Socket Closed\n"); });
+  m_udp_client->closed.connect([]() { wpi::print("Socket Closed\n"); });
 
   // Fake the OnNetworkConnected call
   auto hws = shared_from_this();
@@ -120,7 +121,7 @@ void HALSimXRP::OnNetValueChanged(const wpi::json& msg) {
       provider->OnNetValueChanged(msg.at("data"));
     }
   } catch (wpi::json::exception& e) {
-    fmt::print(stderr, "Error with incoming message: {}\n", e.what());
+    wpi::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 }
 

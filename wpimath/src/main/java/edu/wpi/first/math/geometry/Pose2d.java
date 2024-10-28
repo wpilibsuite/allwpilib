@@ -13,8 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.geometry.proto.Pose2dProto;
 import edu.wpi.first.math.geometry.struct.Pose2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Collections;
@@ -26,13 +25,20 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Pose2d representing the origin.
+   *
+   * <p>This exists to avoid allocations for common poses.
+   */
+  public static final Pose2d kZero = new Pose2d();
+
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
 
   /** Constructs a pose at the origin facing toward the positive X axis. */
   public Pose2d() {
-    m_translation = new Translation2d();
-    m_rotation = new Rotation2d();
+    m_translation = Translation2d.kZero;
+    m_rotation = Rotation2d.kZero;
   }
 
   /**
@@ -69,7 +75,7 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
    * @param y The y component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  public Pose2d(Measure<Distance> x, Measure<Distance> y, Rotation2d rotation) {
+  public Pose2d(Distance x, Distance y, Rotation2d rotation) {
     this(x.in(Meters), y.in(Meters), rotation);
   }
 
@@ -126,6 +132,24 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
    */
   public double getY() {
     return m_translation.getY();
+  }
+
+  /**
+   * Returns the X component of the pose's translation in a measure.
+   *
+   * @return The x component of the pose's translation in a measure.
+   */
+  public Distance getMeasureX() {
+    return m_translation.getMeasureX();
+  }
+
+  /**
+   * Returns the Y component of the pose's translation in a measure.
+   *
+   * @return The y component of the pose's translation in a measure.
+   */
+  public Distance getMeasureY() {
+    return m_translation.getMeasureY();
   }
 
   /**
@@ -301,11 +325,9 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Pose2d) {
-      return ((Pose2d) obj).m_translation.equals(m_translation)
-          && ((Pose2d) obj).m_rotation.equals(m_rotation);
-    }
-    return false;
+    return obj instanceof Pose2d pose
+        && m_translation.equals(pose.m_translation)
+        && m_rotation.equals(pose.m_rotation);
   }
 
   @Override

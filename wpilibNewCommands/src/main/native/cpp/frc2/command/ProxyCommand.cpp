@@ -4,10 +4,16 @@
 
 #include "frc2/command/ProxyCommand.h"
 
+#include <string>
+#include <utility>
+
+#include <fmt/format.h>
+#include <wpi/deprecated.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc2;
 
+WPI_IGNORE_DEPRECATED
 ProxyCommand::ProxyCommand(wpi::unique_function<Command*()> supplier)
     : m_supplier(std::move(supplier)) {}
 
@@ -17,14 +23,15 @@ ProxyCommand::ProxyCommand(wpi::unique_function<CommandPtr()> supplier)
         holder = supplier();
         return holder->get();
       }) {}
+WPI_UNIGNORE_DEPRECATED
 
 ProxyCommand::ProxyCommand(Command* command)
-    : ProxyCommand([command] { return command; }) {
-  SetName(std::string{"Proxy("}.append(command->GetName()).append(")"));
+    : m_supplier([command] { return command; }) {
+  SetName(fmt::format("Proxy({})", command->GetName()));
 }
 
 ProxyCommand::ProxyCommand(std::unique_ptr<Command> command) {
-  SetName(std::string{"Proxy("}.append(command->GetName()).append(")"));
+  SetName(fmt::format("Proxy({})", command->GetName()));
   m_supplier = [command = std::move(command)] { return command.get(); };
 }
 

@@ -10,9 +10,16 @@ package edu.wpi.first.hal;
  * @see "hal/PowerDistribution.h"
  */
 public class PowerDistributionJNI extends JNIWrapper {
+  /** Automatically determines the module type. */
   public static final int AUTOMATIC_TYPE = 0;
+
+  /** CTRE (Cross The Road Electronics) Power Distribution Panel (PDP). */
   public static final int CTRE_TYPE = 1;
+
+  /** REV Power Distribution Hub (PDH). */
   public static final int REV_TYPE = 2;
+
+  /** Use the default module number for the selected module type. */
   public static final int DEFAULT_MODULE = -1;
 
   /**
@@ -83,6 +90,8 @@ public class PowerDistributionJNI extends JNIWrapper {
   /**
    * Gets the temperature of the PowerDistribution.
    *
+   * <p>Not supported on the Rev PDH and returns 0.
+   *
    * @param handle the module handle
    * @return the module temperature (celsius)
    * @see "HAL_GetPowerDistributionTemperature"
@@ -129,7 +138,9 @@ public class PowerDistributionJNI extends JNIWrapper {
   public static native double getTotalCurrent(int handle);
 
   /**
-   * Gets the total power of the PowerDistribution.
+   * Gets the total power of the Power Distribution Panel.
+   *
+   * <p>Not supported on the Rev PDH and returns 0.
    *
    * @param handle the module handle
    * @return the total power (watts)
@@ -138,7 +149,9 @@ public class PowerDistributionJNI extends JNIWrapper {
   public static native double getTotalPower(int handle);
 
   /**
-   * Gets the total energy of the PowerDistribution.
+   * Gets the total energy of the Power Distribution Panel.
+   *
+   * <p>Not supported on the Rev PDH and does nothing.
    *
    * @param handle the module handle
    * @return the total energy (joules)
@@ -147,7 +160,9 @@ public class PowerDistributionJNI extends JNIWrapper {
   public static native double getTotalEnergy(int handle);
 
   /**
-   * Resets the PowerDistribution accumulated energy.
+   * Resets the Power Distribution Panel accumulated energy.
+   *
+   * <p>Not supported on the Rev PDH and returns 0.
    *
    * @param handle the module handle
    * @see "HAL_ClearPowerDistributionStickyFaults"

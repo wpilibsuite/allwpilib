@@ -72,28 +72,41 @@ class WPILIB_DLLEXPORT SplineParameterizer {
   static std::vector<PoseWithCurvature> Parameterize(const Spline<Dim>& spline,
                                                      double t0 = 0.0,
                                                      double t1 = 1.0) {
+    constexpr const char* kMalformedSplineExceptionMsg =
+        "Could not parameterize a malformed spline. This means that you "
+        "probably had two or more adjacent waypoints that were very close "
+        "together with headings in opposing directions.";
     std::vector<PoseWithCurvature> splinePoints;
 
     // The parameterization does not add the initial point. Let's add that.
-    splinePoints.push_back(spline.GetPoint(t0));
+    if (auto point = spline.GetPoint(t0)) {
+      splinePoints.push_back(point.value());
+    } else {
+      throw MalformedSplineException(kMalformedSplineExceptionMsg);
+    }
 
     // We use an "explicit stack" to simulate recursion, instead of a recursive
     // function call This give us greater control, instead of a stack overflow
     std::stack<StackContents> stack;
     stack.emplace(StackContents{t0, t1});
 
-    StackContents current;
-    PoseWithCurvature start;
-    PoseWithCurvature end;
     int iterations = 0;
 
     while (!stack.empty()) {
-      current = stack.top();
+      auto current = stack.top();
       stack.pop();
-      start = spline.GetPoint(current.t0);
-      end = spline.GetPoint(current.t1);
 
-      const auto twist = start.first.Log(end.first);
+      auto start = spline.GetPoint(current.t0);
+      if (!start) {
+        throw MalformedSplineException(kMalformedSplineExceptionMsg);
+      }
+
+      auto end = spline.GetPoint(current.t1);
+      if (!end) {
+        throw MalformedSplineException(kMalformedSplineExceptionMsg);
+      }
+
+      const auto twist = start.value().first.Log(end.value().first);
 
       if (units::math::abs(twist.dy) > kMaxDy ||
           units::math::abs(twist.dx) > kMaxDx ||
@@ -101,15 +114,11 @@ class WPILIB_DLLEXPORT SplineParameterizer {
         stack.emplace(StackContents{(current.t0 + current.t1) / 2, current.t1});
         stack.emplace(StackContents{current.t0, (current.t0 + current.t1) / 2});
       } else {
-        splinePoints.push_back(spline.GetPoint(current.t1));
+        splinePoints.push_back(end.value());
       }
 
       if (iterations++ >= kMaxIterations) {
-        throw MalformedSplineException(
-            "Could not parameterize a malformed spline. "
-            "This means that you probably had two or more adjacent "
-            "waypoints that were very close together with headings "
-            "in opposing directions.");
+        throw MalformedSplineException(kMalformedSplineExceptionMsg);
       }
     }
 
@@ -118,9 +127,9 @@ class WPILIB_DLLEXPORT SplineParameterizer {
 
  private:
   // Constraints for spline parameterization.
-  static constexpr units::meter_t kMaxDx = 5_in;
-  static constexpr units::meter_t kMaxDy = 0.05_in;
-  static constexpr units::radian_t kMaxDtheta = 0.0872_rad;
+  static inline constexpr units::meter_t kMaxDx = 5_in;
+  static inline constexpr units::meter_t kMaxDy = 0.05_in;
+  static inline constexpr units::radian_t kMaxDtheta = 0.0872_rad;
 
   struct StackContents {
     double t0;

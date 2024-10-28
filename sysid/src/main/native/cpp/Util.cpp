@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <stdexcept>
 
+#include <IconsFontAwesome6.h>
 #include <imgui.h>
 #include <wpi/raw_ostream.h>
 
@@ -18,6 +19,20 @@ void sysid::CreateTooltip(const char* text) {
     ImGui::BeginTooltip();
     ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
     ImGui::TextUnformatted(text);
+    ImGui::PopTextWrapPos();
+    ImGui::EndTooltip();
+  }
+}
+
+void sysid::CreateErrorTooltip(const char* text) {
+  ImGui::SameLine();
+  ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f),
+                     ICON_FA_TRIANGLE_EXCLAMATION);
+
+  if (ImGui::IsItemHovered()) {
+    ImGui::BeginTooltip();
+    ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+    ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "%s", text);
     ImGui::PopTextWrapPos();
     ImGui::EndTooltip();
   }
@@ -43,24 +58,6 @@ void sysid::CreateErrorPopup(bool& isError, std::string_view errorMessage) {
   }
 }
 
-std::string_view sysid::GetAbbreviation(std::string_view unit) {
-  if (unit == "Meters") {
-    return "m";
-  } else if (unit == "Feet") {
-    return "ft";
-  } else if (unit == "Inches") {
-    return "in";
-  } else if (unit == "Radians") {
-    return "rad";
-  } else if (unit == "Degrees") {
-    return "deg";
-  } else if (unit == "Rotations") {
-    return "rot";
-  } else {
-    throw std::runtime_error("Invalid Unit");
-  }
-}
-
 void sysid::SaveFile(std::string_view contents,
                      const std::filesystem::path& path) {
   // Create the path if it doesn't already exist.
@@ -68,6 +65,7 @@ void sysid::SaveFile(std::string_view contents,
 
   // Open a fd_ostream to write to file.
   std::error_code ec;
+  // NOLINTNEXTLINE(build/include_what_you_use)
   wpi::raw_fd_ostream ostream{path.string(), ec};
 
   // Check error code.

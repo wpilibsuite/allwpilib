@@ -7,18 +7,30 @@
 #include <stdint.h>
 
 /**
- * @defgroup hal_canstream CAN Stream Functions
+ * @defgroup hal_can CAN Functions
  * @ingroup hal_capi
  * @{
  */
-
 // These are copies of defines located in CANSessionMux.h prepended with HAL_
 
+/**
+ * Flag for sending a CAN message once.
+ */
 #define HAL_CAN_SEND_PERIOD_NO_REPEAT 0
+
+/**
+ * Flag for stopping periodic CAN message sends.
+ */
 #define HAL_CAN_SEND_PERIOD_STOP_REPEATING -1
 
-/* Flags in the upper bits of the messageID */
+/**
+ * Mask for "is frame remote" in message ID.
+ */
 #define HAL_CAN_IS_FRAME_REMOTE 0x80000000
+
+/**
+ * Mask for "is frame 11 bits" in message ID.
+ */
 #define HAL_CAN_IS_FRAME_11BIT 0x40000000
 
 #define HAL_ERR_CANSessionMux_InvalidBuffer -44086
@@ -27,21 +39,34 @@
 #define HAL_ERR_CANSessionMux_NotAllowed -44088
 #define HAL_ERR_CANSessionMux_NotInitialized -44089
 #define HAL_ERR_CANSessionMux_SessionOverrun 44050
+/** @} */
 
+/**
+ * @defgroup hal_canstream CAN Stream Functions
+ * @ingroup hal_capi
+ * @{
+ */
 /**
  * Storage for CAN Stream Messages.
  */
 struct HAL_CANStreamMessage {
+  /** The message ID */
   uint32_t messageID;
+  /** The packet received timestamp (based off of CLOCK_MONOTONIC) */
   uint32_t timeStamp;
+  /** The message data */
   uint8_t data[8];
+  /** The size of the data received (0-8 bytes) */
   uint8_t dataSize;
 };
-
+/** @} */
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+/**
+ * @ingroup hal_can
+ * @{
+ */
 /**
  * Sends a CAN message.
  *
@@ -69,13 +94,30 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
 void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
                             uint8_t* data, uint8_t* dataSize,
                             uint32_t* timeStamp, int32_t* status);
-
+/**
+ * Gets CAN status information.
+ *
+ * @param[out] percentBusUtilization the bus utilization
+ * @param[out] busOffCount           the number of bus off errors
+ * @param[out] txFullCount           the number of tx full errors
+ * @param[out] receiveErrorCount     the number of receive errors
+ * @param[out] transmitErrorCount    the number of transmit errors
+ * @param[out] status                Error status variable. 0 on success.
+ */
+void HAL_CAN_GetCANStatus(float* percentBusUtilization, uint32_t* busOffCount,
+                          uint32_t* txFullCount, uint32_t* receiveErrorCount,
+                          uint32_t* transmitErrorCount, int32_t* status);
+/** @} */
+/**
+ * @ingroup hal_canstream
+ * @{
+ */
 /**
  * Opens a CAN stream.
  *
  * @param[out] sessionHandle output for the session handle
  * @param[in] messageID     the message ID to read
- * @param[in] messageIDMask the mssage ID mask
+ * @param[in] messageIDMask the message ID mask
  * @param[in] maxMessages   the maximum number of messages to stream
  * @param[out] status        Error status variable. 0 on success.
  */
@@ -103,21 +145,6 @@ void HAL_CAN_ReadStreamSession(uint32_t sessionHandle,
                                struct HAL_CANStreamMessage* messages,
                                uint32_t messagesToRead, uint32_t* messagesRead,
                                int32_t* status);
-
-/**
- * Gets CAN status information.
- *
- * @param[out] percentBusUtilization the bus utilization
- * @param[out] busOffCount           the number of bus off errors
- * @param[out] txFullCount           the number of tx full errors
- * @param[out] receiveErrorCount     the number of receive errors
- * @param[out] transmitErrorCount    the number of transmit errors
- * @param[out] status                Error status variable. 0 on success.
- */
-void HAL_CAN_GetCANStatus(float* percentBusUtilization, uint32_t* busOffCount,
-                          uint32_t* txFullCount, uint32_t* receiveErrorCount,
-                          uint32_t* transmitErrorCount, int32_t* status);
-
 #ifdef __cplusplus
 }  // extern "C"
 #endif

@@ -97,9 +97,8 @@ public abstract class IterativeRobotBase extends RobotBase {
    * <p>Users should override this method for default Robot-wide initialization which will be called
    * when the robot is first powered on. It will be called exactly one time.
    *
-   * <p>Warning: the Driver Station "Robot Code" light and FMS "Robot Ready" indicators will be off
-   * until RobotInit() exits. Code in RobotInit() that waits for enable will cause the robot to
-   * never indicate that the code is ready, causing the robot to be bypassed in a match.
+   * <p>Note: This method is functionally identical to the class constructor so that should be used
+   * instead.
    */
   public void robotInit() {}
 
@@ -254,7 +253,9 @@ public abstract class IterativeRobotBase extends RobotBase {
    * Enables or disables flushing NetworkTables every loop iteration. By default, this is enabled.
    *
    * @param enabled True to enable, false to disable
+   * @deprecated Deprecated without replacement.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public void setNetworkTablesFlushEnabled(boolean enabled) {
     m_ntFlushEnabled = enabled;
   }
@@ -323,59 +324,77 @@ public abstract class IterativeRobotBase extends RobotBase {
     // If mode changed, call mode exit and entry functions
     if (m_lastMode != mode) {
       // Call last mode's exit function
-      if (m_lastMode == Mode.kDisabled) {
-        disabledExit();
-      } else if (m_lastMode == Mode.kAutonomous) {
-        autonomousExit();
-      } else if (m_lastMode == Mode.kTeleop) {
-        teleopExit();
-      } else if (m_lastMode == Mode.kTest) {
-        if (m_lwEnabledInTest) {
-          LiveWindow.setEnabled(false);
-          Shuffleboard.disableActuatorWidgets();
+      switch (m_lastMode) {
+        case kDisabled -> disabledExit();
+        case kAutonomous -> autonomousExit();
+        case kTeleop -> teleopExit();
+        case kTest -> {
+          if (m_lwEnabledInTest) {
+            LiveWindow.setEnabled(false);
+            Shuffleboard.disableActuatorWidgets();
+          }
+          testExit();
         }
-        testExit();
+        default -> {
+          // NOP
+        }
       }
 
       // Call current mode's entry function
-      if (mode == Mode.kDisabled) {
-        disabledInit();
-        m_watchdog.addEpoch("disabledInit()");
-      } else if (mode == Mode.kAutonomous) {
-        autonomousInit();
-        m_watchdog.addEpoch("autonomousInit()");
-      } else if (mode == Mode.kTeleop) {
-        teleopInit();
-        m_watchdog.addEpoch("teleopInit()");
-      } else if (mode == Mode.kTest) {
-        if (m_lwEnabledInTest) {
-          LiveWindow.setEnabled(true);
-          Shuffleboard.enableActuatorWidgets();
+      switch (mode) {
+        case kDisabled -> {
+          disabledInit();
+          m_watchdog.addEpoch("disabledInit()");
         }
-        testInit();
-        m_watchdog.addEpoch("testInit()");
+        case kAutonomous -> {
+          autonomousInit();
+          m_watchdog.addEpoch("autonomousInit()");
+        }
+        case kTeleop -> {
+          teleopInit();
+          m_watchdog.addEpoch("teleopInit()");
+        }
+        case kTest -> {
+          if (m_lwEnabledInTest) {
+            LiveWindow.setEnabled(true);
+            Shuffleboard.enableActuatorWidgets();
+          }
+          testInit();
+          m_watchdog.addEpoch("testInit()");
+        }
+        default -> {
+          // NOP
+        }
       }
 
       m_lastMode = mode;
     }
 
     // Call the appropriate function depending upon the current robot mode
-    if (mode == Mode.kDisabled) {
-      DriverStationJNI.observeUserProgramDisabled();
-      disabledPeriodic();
-      m_watchdog.addEpoch("disabledPeriodic()");
-    } else if (mode == Mode.kAutonomous) {
-      DriverStationJNI.observeUserProgramAutonomous();
-      autonomousPeriodic();
-      m_watchdog.addEpoch("autonomousPeriodic()");
-    } else if (mode == Mode.kTeleop) {
-      DriverStationJNI.observeUserProgramTeleop();
-      teleopPeriodic();
-      m_watchdog.addEpoch("teleopPeriodic()");
-    } else {
-      DriverStationJNI.observeUserProgramTest();
-      testPeriodic();
-      m_watchdog.addEpoch("testPeriodic()");
+    switch (mode) {
+      case kDisabled -> {
+        DriverStationJNI.observeUserProgramDisabled();
+        disabledPeriodic();
+        m_watchdog.addEpoch("disabledPeriodic()");
+      }
+      case kAutonomous -> {
+        DriverStationJNI.observeUserProgramAutonomous();
+        autonomousPeriodic();
+        m_watchdog.addEpoch("autonomousPeriodic()");
+      }
+      case kTeleop -> {
+        DriverStationJNI.observeUserProgramTeleop();
+        teleopPeriodic();
+        m_watchdog.addEpoch("teleopPeriodic()");
+      }
+      case kTest -> {
+        DriverStationJNI.observeUserProgramTest();
+        testPeriodic();
+        m_watchdog.addEpoch("testPeriodic()");
+      }
+      default -> {
+        // NOP
+      }
     }
 
     robotPeriodic();
@@ -406,6 +425,11 @@ public abstract class IterativeRobotBase extends RobotBase {
     if (m_watchdog.isExpired()) {
       m_watchdog.printEpochs();
     }
+  }
+
+  /** Prints list of epochs added so far and their times. */
+  public void printWatchdogEpochs() {
+    m_watchdog.printEpochs();
   }
 
   private void printLoopOverrunMessage() {

@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math;
 
+import java.util.Objects;
+
 /**
  * Represents a pair of two objects.
  *
@@ -54,5 +56,29 @@ public class Pair<A, B> {
    */
   public static <A, B> Pair<A, B> of(A a, B b) {
     return new Pair<>(a, b);
+  }
+
+  @Override
+  public String toString() {
+    return String.format("Pair(%s, %s)", m_first, m_second);
+  }
+
+  /**
+   * Checks equality between this Pair and another object.
+   *
+   * @param obj The other object.
+   * @return Whether the two objects are equal or not.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    return obj == this
+        || obj instanceof Pair<?, ?> other
+            && Objects.equals(m_first, other.getFirst())
+            && Objects.equals(m_second, other.getSecond());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_first, m_second);
   }
 }

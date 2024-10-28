@@ -4,10 +4,12 @@
 
 #include "LoggerImpl.h"
 
-#include <fmt/format.h>
+#include <string>
+
 #include <wpi/Logger.h>
 #include <wpi/SmallVector.h>
 #include <wpi/fs.h>
+#include <wpi/print.h>
 
 #include "IListenerStorage.h"
 
@@ -16,7 +18,7 @@ using namespace nt;
 static void DefaultLogger(unsigned int level, const char* file,
                           unsigned int line, const char* msg) {
   if (level == wpi::WPI_LOG_INFO) {
-    fmt::print(stderr, "NT: {}\n", msg);
+    wpi::print(stderr, "NT: {}\n", msg);
     return;
   }
 
@@ -30,7 +32,7 @@ static void DefaultLogger(unsigned int level, const char* file,
   } else {
     return;
   }
-  fmt::print(stderr, "NT: {}: {} ({}:{})\n", levelmsg, msg, file, line);
+  wpi::print(stderr, "NT: {}: {} ({}:{})\n", levelmsg, msg, file, line);
 }
 
 static constexpr unsigned int kFlagCritical = 1u << 16;

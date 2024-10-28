@@ -11,9 +11,7 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::ArmFeedforward> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:ArmFeedforward";
-  }
+  static constexpr std::string_view GetTypeName() { return "ArmFeedforward"; }
   static constexpr size_t GetSize() { return 32; }
   static constexpr std::string_view GetSchema() {
     return "double ks;double kg;double kv;double ka";

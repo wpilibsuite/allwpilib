@@ -277,25 +277,6 @@
     "commandversion": 2
   },
   {
-    "name": "GearsBot",
-    "description": "A fully functional Command-Based program for WPI's GearsBot robot.",
-    "tags": [
-      "Complete Robot",
-      "Command-based",
-      "Differential Drive",
-      "Elevator",
-      "Arm",
-      "Analog",
-      "Digital Input",
-      "SmartDashboard",
-      "XboxController"
-    ],
-    "foldername": "gearsbot",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
     "name": "Simple Vision",
     "description": "Use the CameraServer class to stream from a USB Webcam without processing the images.",
     "tags": [
@@ -318,12 +299,12 @@
     "commandversion": 2
   },
   {
-    "name": "Axis Camera Sample",
-    "description": "Acquire images from an Axis network camera and adds some annotation to the image (as you might do for showing operators the result of some image recognition), and sends it to the dashboard for display.",
+    "name": "HTTP Camera",
+    "description": "Acquire images from an HTTP network camera and adds some annotation to the image (as you might do for showing operators the result of some image recognition), and sends it to the dashboard for display.",
     "tags": [
       "Vision"
     ],
-    "foldername": "axiscamera",
+    "foldername": "httpcamera",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -407,6 +388,8 @@
       "Pneumatics",
       "Digital Input",
       "PID",
+      "Gyro",
+      "Profiled PID",
       "XboxController"
     ],
     "foldername": "rapidreactcommandbot",
@@ -421,40 +404,6 @@
       "Command-based"
     ],
     "foldername": "selectcommand",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "Frisbeebot",
-    "description": "A simple frisbee shooter for the 2013 game, demonstrating use of PIDSubsystem.",
-    "tags": [
-      "Complete Robot",
-      "Command-based",
-      "Differential Drive",
-      "Flywheel",
-      "Encoder",
-      "XboxController",
-      "PID"
-    ],
-    "foldername": "frisbeebot",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "Gyro Drive Commands",
-    "description": "Control a robot's angle with PID and a gyro, in command-based.",
-    "tags": [
-      "Command-based",
-      "Differential Drive",
-      "Encoder",
-      "PS4Controller",
-      "PID",
-      "Profiled PID",
-      "Gyro"
-    ],
-    "foldername": "gyrodrivecommands",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -500,25 +449,6 @@
       "XboxController"
     ],
     "foldername": "differentialdrivebot",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "RamseteCommand",
-    "description": "Follow a pre-generated trajectory with a differential drive using RamseteCommand.",
-    "tags": [
-      "Differential Drive",
-      "Command-based",
-      "Ramsete",
-      "Trajectory",
-      "Path Following",
-      "Odometry",
-      "Encoder",
-      "Gyro",
-      "XboxController"
-    ],
-    "foldername": "ramsetecommand",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -603,38 +533,6 @@
     "commandversion": 2
   },
   {
-    "name": "ArmBot",
-    "description": "Control an arm with ProfiledPIDSubsystem.",
-    "tags": [
-      "Command-based",
-      "Arm",
-      "Encoder",
-      "Profiled PID",
-      "XboxController",
-      "Differential Drive"
-    ],
-    "foldername": "armbot",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "ArmBotOffboard",
-    "description": "Control an arm with TrapezoidProfileSubsystem and smart motor controller PID.",
-    "tags": [
-      "Command-based",
-      "Arm",
-      "Smart Motor Controller",
-      "Trapezoid Profile",
-      "XboxController",
-      "Differential Drive"
-    ],
-    "foldername": "armbotoffboard",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
     "name": "DriveDistanceOffboard",
     "description": "Drive a differential drivetrain a set distance using TrapezoidProfileCommand and smart motor controller PID.",
     "tags": [
@@ -681,24 +579,6 @@
       "XboxController"
     ],
     "foldername": "swervecontrollercommand",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "RamseteController",
-    "description": "Follow a pre-generated trajectory with a differential drive using RamseteController.",
-    "tags": [
-      "Basic Robot",
-      "Differential Drive",
-      "Ramsete",
-      "PID",
-      "Odometry",
-      "Path Following",
-      "Trajectory",
-      "XboxController"
-    ],
-    "foldername": "ramsetecontroller",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -782,21 +662,6 @@
       "Simulation"
     ],
     "foldername": "simpledifferentialdrivesimulation",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "StateSpaceDriveSimulation",
-    "description": "Simulate a differential drivetrain and follow trajectories with RamseteCommand (command-based).",
-    "tags": [
-      "Command-based",
-      "Differential Drive",
-      "State-Space",
-      "XboxController",
-      "Simulation"
-    ],
-    "foldername": "statespacedifferentialdrivesimulation",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -992,7 +857,7 @@
       "Command-based",
       "DataLog"
     ],
-    "foldername": "sysid",
+    "foldername": "sysidroutine",
     "gradlebase": "java",
     "commandversion": 2,
     "mainclass": "Main"

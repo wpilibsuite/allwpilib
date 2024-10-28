@@ -87,10 +87,6 @@
     <Source name="CombinedRuntimeLoader.java" />
   </Match>
   <Match>
-    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
-    <Source name="RuntimeLoader.java" />
-  </Match>
-  <Match>
     <Bug pattern="SF_SWITCH_FALLTHROUGH" />
     <Source name="CameraServer.java" />
   </Match>
@@ -154,5 +150,18 @@
   <Match>
     <Bug pattern="RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED" />
     <Class name="edu.wpi.first.networktables.NetworkTableInstance" />
+  </Match>
+  <!--
+  Strict reading of Object.equals() contract means that whenever equals() behaviour is defined, all implementations
+  need to adhere to it. The only reason to override the method (assuming correct API design, of course) is to provide
+  a more efficient implementation. This rule would be forcing a @SuppressFBWarnings on perfectly compliant classes.
+  More information at https://github.com/spotbugs/spotbugs/issues/511
+  -->
+  <Match>
+    <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
+  </Match>
+  <Match>
+    <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
+    <Class name="edu.wpi.first.epilogue.EpilogueConfiguration" />
   </Match>
 </FindBugsFilter>

@@ -5,6 +5,10 @@
 #include "frc2/command/CommandScheduler.h"
 
 #include <cstdio>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <frc/RobotBase.h>
 #include <frc/RobotState.h>
@@ -426,6 +430,10 @@ void CommandScheduler::Disable() {
 
 void CommandScheduler::Enable() {
   m_impl->disabled = false;
+}
+
+void CommandScheduler::PrintWatchdogEpochs() {
+  m_watchdog.PrintEpochs();
 }
 
 void CommandScheduler::OnCommandInitialize(Action action) {

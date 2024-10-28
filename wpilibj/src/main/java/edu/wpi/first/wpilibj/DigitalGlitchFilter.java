@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.DigitalGlitchFilterJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -22,21 +23,12 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   /** Configures the Digital Glitch Filter to its default settings. */
   @SuppressWarnings("this-escape")
   public DigitalGlitchFilter() {
-    m_mutex.lock();
-    try {
-      int index = 0;
-      while (m_filterAllocated[index] && index < m_filterAllocated.length) {
-        index++;
-      }
-      if (index != m_filterAllocated.length) {
-        m_channelIndex = index;
-        m_filterAllocated[index] = true;
-        HAL.report(tResourceType.kResourceType_DigitalGlitchFilter, m_channelIndex + 1, 0);
-        SendableRegistry.addLW(this, "DigitalGlitchFilter", index);
-      }
-    } finally {
-      m_mutex.unlock();
+    m_channelIndex = allocateFilterIndex();
+    if (m_channelIndex < 0) {
+      throw new AllocationException("No filters available to allocate.");
     }
+    HAL.report(tResourceType.kResourceType_DigitalGlitchFilter, m_channelIndex + 1, 0);
+    SendableRegistry.addLW(this, "DigitalGlitchFilter", m_channelIndex);
   }
 
   @Override
@@ -52,6 +44,26 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
 
       m_channelIndex = -1;
     }
+  }
+
+  /**
+   * Allocates the next available filter index, or -1 if there are no filters available.
+   *
+   * @return the filter index
+   */
+  private static int allocateFilterIndex() {
+    m_mutex.lock();
+    try {
+      for (int index = 0; index < m_filterAllocated.length; index++) {
+        if (!m_filterAllocated[index]) {
+          m_filterAllocated[index] = true;
+          return index;
+        }
+      }
+    } finally {
+      m_mutex.unlock();
+    }
+    return -1;
   }
 
   private static void setFilter(DigitalSource input, int channelIndex) {
@@ -168,13 +180,13 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   public long getPeriodNanoSeconds() {
     int fpgaCycles = getPeriodCycles();
 
-    return (long) fpgaCycles * 1000L / (long) (SensorUtil.kSystemClockTicksPerMicrosecond / 4);
+    return fpgaCycles * 1000L / (SensorUtil.kSystemClockTicksPerMicrosecond / 4);
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {}
 
-  private int m_channelIndex = -1;
+  private int m_channelIndex;
   private static final Lock m_mutex = new ReentrantLock(true);
   private static final boolean[] m_filterAllocated = new boolean[3];
 }

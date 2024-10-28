@@ -4,6 +4,8 @@
 
 #include "WSProvider_AddressableLED.h"
 
+#include <vector>
+
 #include <hal/Ports.h>
 #include <hal/simulation/AddressableLEDData.h>
 
@@ -51,7 +53,7 @@ void HALSimWSProviderAddressableLED::RegisterCallbacks() {
         }
 
         wpi::json payload;
-        payload[">data"] = jsonData;
+        payload["<data"] = jsonData;
 
         provider->ProcessHalCallback(payload);
       },

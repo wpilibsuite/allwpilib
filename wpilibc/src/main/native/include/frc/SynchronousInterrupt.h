@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include <hal/Interrupts.h>
 #include <hal/Types.h>
 #include <units/time.h>
 
@@ -55,8 +56,6 @@ class SynchronousInterrupt {
    * @param source the DigitalSource the interrupts are triggered from
    */
   explicit SynchronousInterrupt(std::shared_ptr<DigitalSource> source);
-
-  ~SynchronousInterrupt();
 
   SynchronousInterrupt(SynchronousInterrupt&&) = default;
   SynchronousInterrupt& operator=(SynchronousInterrupt&&) = default;
@@ -108,6 +107,6 @@ class SynchronousInterrupt {
  private:
   void InitSynchronousInterrupt();
   std::shared_ptr<DigitalSource> m_source;
-  hal::Handle<HAL_InterruptHandle> m_handle;
+  hal::Handle<HAL_InterruptHandle, HAL_CleanInterrupts> m_handle;
 };
 }  // namespace frc

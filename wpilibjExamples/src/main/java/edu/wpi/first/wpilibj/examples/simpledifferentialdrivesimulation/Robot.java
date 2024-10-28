@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.simpledifferentialdrivesimulation;
 
-import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.LTVUnicycleController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,17 +26,17 @@ public class Robot extends TimedRobot {
   private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
 
   private final Drivetrain m_drive = new Drivetrain();
-  private final RamseteController m_ramsete = new RamseteController();
+  private final LTVUnicycleController m_feedback = new LTVUnicycleController(0.020);
   private final Timer m_timer = new Timer();
-  private Trajectory m_trajectory;
+  private final Trajectory m_trajectory;
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     m_trajectory =
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(2, 2, new Rotation2d()),
+            new Pose2d(2, 2, Rotation2d.kZero),
             List.of(),
-            new Pose2d(6, 4, new Rotation2d()),
+            new Pose2d(6, 4, Rotation2d.kZero),
             new TrajectoryConfig(2, 2));
   }
 
@@ -55,7 +55,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     double elapsed = m_timer.get();
     Trajectory.State reference = m_trajectory.sample(elapsed);
-    ChassisSpeeds speeds = m_ramsete.calculate(m_drive.getPose(), reference);
+    ChassisSpeeds speeds = m_feedback.calculate(m_drive.getPose(), reference);
     m_drive.drive(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);
   }
 

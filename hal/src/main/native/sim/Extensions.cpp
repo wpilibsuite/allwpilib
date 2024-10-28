@@ -5,13 +5,15 @@
 #include "hal/Extensions.h"
 
 #include <cstdio>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
+#include <wpi/print.h>
 #include <wpi/spinlock.h>
 
 #if defined(WIN32) || defined(_WIN32)
@@ -55,7 +57,7 @@ extern "C" {
 
 int HAL_LoadOneExtension(const char* library) {
   int rc = 1;  // It is expected and reasonable not to find an extra simulation
-  fmt::print("HAL Extensions: Attempting to load: {}\n",
+  wpi::print("HAL Extensions: Attempting to load: {}\n",
              fs::path{library}.stem().string());
   std::fflush(stdout);
   HTYPE handle = DLOPEN(library);
@@ -66,14 +68,14 @@ int HAL_LoadOneExtension(const char* library) {
 #else
     auto libraryName = fmt::format("lib{}.so", library);
 #endif
-    fmt::print("HAL Extensions: Load failed: {}\nTrying modified name: {}\n",
+    wpi::print("HAL Extensions: Load failed: {}\nTrying modified name: {}\n",
                DLERROR, fs::path{libraryName}.stem().string());
     std::fflush(stdout);
     handle = DLOPEN(libraryName.c_str());
   }
 #endif
   if (!handle) {
-    fmt::print("HAL Extensions: Failed to load library: {}\n", DLERROR);
+    wpi::print("HAL Extensions: Failed to load library: {}\n", DLERROR);
     std::fflush(stdout);
     return rc;
   }

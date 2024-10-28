@@ -17,11 +17,12 @@
 #include <cstdio>
 #include <cstring>
 #include <exception>
+#include <memory>
 #include <string_view>
 
 #include <DSCommPacket.h>
-#include <fmt/format.h>
 #include <hal/Extensions.h>
+#include <wpi/print.h>
 #include <wpinet/EventLoopRunner.h>
 #include <wpinet/raw_uv_ostream.h>
 #include <wpinet/uv/Tcp.h>
@@ -119,7 +120,7 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   simLoopTimer->timeout.connect([udpLocal = udp.get(), simAddr] {
     udpLocal->Send(simAddr, {singleByte.get(), 1}, [](auto buf, Error err) {
       if (err) {
-        fmt::print(stderr, "{}\n", err.str());
+        wpi::print(stderr, "{}\n", err.str());
         std::fflush(stderr);
       }
     });
@@ -131,7 +132,7 @@ static void SetupUdp(wpi::uv::Loop& loop) {
     try {
       timeoutMs = std::stoi(envTimeout);
     } catch (const std::exception& e) {
-      fmt::print(stderr, "Error parsing DS_TIMEOUT_MS: {}\n", e.what());
+      wpi::print(stderr, "Error parsing DS_TIMEOUT_MS: {}\n", e.what());
     }
   }
   auto autoDisableTimer = Timer::Create(loop);
@@ -158,7 +159,7 @@ static void SetupUdp(wpi::uv::Loop& loop) {
         udpLocal->Send(outAddr, sendBufs, [](auto bufs, Error err) {
           GetBufferPool().Release(bufs);
           if (err) {
-            fmt::print(stderr, "{}\n", err.str());
+            wpi::print(stderr, "{}\n", err.str());
             std::fflush(stderr);
           }
         });

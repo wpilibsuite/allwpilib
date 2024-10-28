@@ -3,8 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstdio>
+#include <memory>
 
-#include <fmt/format.h>
+#include <wpi/print.h>
 
 #include "wpinet/EventLoopRunner.h"
 #include "wpinet/HttpServerConnection.h"
@@ -24,7 +25,7 @@ class MyHttpServerConnection : public wpi::HttpServerConnection {
 };
 
 void MyHttpServerConnection::ProcessRequest() {
-  fmt::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
+  wpi::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
   wpi::UrlParser url{m_request.GetUrl(),
                      m_request.GetMethod() == wpi::HTTP_CONNECT};
   if (!url.IsValid()) {
@@ -37,13 +38,13 @@ void MyHttpServerConnection::ProcessRequest() {
   if (url.HasPath()) {
     path = url.GetPath();
   }
-  fmt::print(stderr, "path: \"{}\"\n", path);
+  wpi::print(stderr, "path: \"{}\"\n", path);
 
   std::string_view query;
   if (url.HasQuery()) {
     query = url.GetQuery();
   }
-  fmt::print(stderr, "query: \"{}\"\n", query);
+  wpi::print(stderr, "query: \"{}\"\n", query);
 
   const bool isGET = m_request.GetMethod() == wpi::HTTP_GET;
   if (isGET && path == "/") {

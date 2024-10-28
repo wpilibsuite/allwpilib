@@ -2,15 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <string>
+
 #include <gtest/gtest.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
 #include "../MockLogger.h"
+#include "../PubSubOptionsMatcher.h"
 #include "../TestPrinters.h"
-#include "Handle.h"
+#include "MockMessageHandler.h"
+#include "PubSubOptions.h"
 #include "gmock/gmock.h"
-#include "net/Message.h"
+#include "net/MessageHandler.h"
 #include "net/WireDecoder.h"
 #include "networktables/NetworkTableValue.h"
 
@@ -21,40 +25,15 @@ using testing::StrictMock;
 
 namespace nt {
 
-class MockClientMessageHandler : public net::ClientMessageHandler {
- public:
-  MOCK_METHOD4(ClientPublish,
-               void(int64_t pubuid, std::string_view name,
-                    std::string_view typeStr, const wpi::json& properties));
-  MOCK_METHOD1(ClientUnpublish, void(int64_t pubuid));
-  MOCK_METHOD2(ClientSetProperties,
-               void(std::string_view name, const wpi::json& update));
-  MOCK_METHOD3(ClientSubscribe,
-               void(int64_t subuid, std::span<const std::string> prefixes,
-                    const PubSubOptionsImpl& options));
-  MOCK_METHOD1(ClientUnsubscribe, void(int64_t subuid));
-};
-
-class MockServerMessageHandler : public net::ServerMessageHandler {
- public:
-  MOCK_METHOD5(ServerAnnounce,
-               void(std::string_view name, int64_t id, std::string_view typeStr,
-                    const wpi::json& properties,
-                    std::optional<int64_t> pubuid));
-  MOCK_METHOD2(ServerUnannounce, void(std::string_view name, int64_t id));
-  MOCK_METHOD3(ServerPropertiesUpdate,
-               void(std::string_view name, const wpi::json& update, bool ack));
-};
-
 class WireDecodeTextClientTest : public ::testing::Test {
  public:
-  StrictMock<MockClientMessageHandler> handler;
+  StrictMock<net::MockClientMessageHandler> handler;
   StrictMock<wpi::MockLogger> logger;
 };
 
 class WireDecodeTextServerTest : public ::testing::Test {
  public:
-  StrictMock<MockServerMessageHandler> handler;
+  StrictMock<net::MockServerMessageHandler> handler;
   StrictMock<wpi::MockLogger> logger;
 };
 
@@ -67,8 +46,9 @@ TEST_F(WireDecodeTextClientTest, ErrorEmpty) {
       logger,
       Call(_, _, _,
            "could not decode JSON message: [json.exception.parse_error.101] "
-           "parse error at line 1, column 1: syntax error while parsing value "
-           "- unexpected end of input; expected '[', '{', or a literal"sv));
+           "parse error at line 1, column 1: attempting to parse an empty "
+           "input; check that your input string or stream contains the "
+           "expected JSON"sv));
   net::WireDecodeText("", handler, logger);
 }
 
@@ -128,17 +108,17 @@ TEST_F(WireDecodeTextClientTest, ErrorUnknownMethod) {
 }
 
 TEST_F(WireDecodeTextClientTest, PublishPropsEmpty) {
-  EXPECT_CALL(handler,
-              ClientPublish(5, std::string_view{"test"},
-                            std::string_view{"double"}, wpi::json::object()));
+  EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
+                                     std::string_view{"double"},
+                                     wpi::json::object(), PubSubOptionsEq({})));
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"properties\":{},\"pubuid\":5,\"type\":\"double\"}}]",
       handler, logger);
 
-  EXPECT_CALL(handler,
-              ClientPublish(5, std::string_view{"test"},
-                            std::string_view{"double"}, wpi::json::object()));
+  EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
+                                     std::string_view{"double"},
+                                     wpi::json::object(), PubSubOptionsEq({})));
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"pubuid\":5,\"type\":\"double\"}}]",
@@ -148,7 +128,8 @@ TEST_F(WireDecodeTextClientTest, PublishPropsEmpty) {
 TEST_F(WireDecodeTextClientTest, PublishProps) {
   wpi::json props = {{"k", 6}};
   EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
-                                     std::string_view{"double"}, props));
+                                     std::string_view{"double"}, props,
+                                     PubSubOptionsEq({})));
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"properties\":{\"k\":6},"

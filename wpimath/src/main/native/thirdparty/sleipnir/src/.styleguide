@@ -1,0 +1,12 @@
+cppHeaderFileInclude {
+  \.hpp$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+includeOtherLibs {
+  ^Eigen/
+  ^wpi/
+}

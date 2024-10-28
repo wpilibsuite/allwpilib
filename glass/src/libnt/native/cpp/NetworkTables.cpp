@@ -4,18 +4,21 @@
 
 #include "glass/networktables/NetworkTables.h"
 
+#include <algorithm>
 #include <cinttypes>
 #include <concepts>
 #include <cstring>
+#include <functional>
 #include <initializer_list>
+#include <map>
 #include <memory>
 #include <span>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/message.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <networktables/NetworkTableInstance.h>
@@ -28,11 +31,18 @@
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/mpack.h>
+#include <wpi/print.h>
 #include <wpi/raw_ostream.h>
+
+#ifndef NO_PROTOBUF
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
+#endif
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
 #include "glass/Storage.h"
+#include "glass/support/ExtraGuiWidgets.h"
 
 using namespace glass;
 using namespace mpack;
@@ -344,6 +354,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
   }
 }
 
+#ifndef NO_PROTOBUF
 static void UpdateProtobufValueSource(NetworkTablesModel& model,
                                       NetworkTablesModel::ValueSource* out,
                                       const google::protobuf::Message& msg,
@@ -532,6 +543,7 @@ static void UpdateProtobufValueSource(NetworkTablesModel& model,
     }
   }
 }
+#endif
 
 static void UpdateJsonValueSource(NetworkTablesModel& model,
                                   NetworkTablesModel::ValueSource* out,
@@ -725,14 +737,15 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
         mpack_reader_init_data(&r, value.GetRaw());
         UpdateMsgpackValueSource(model, this, r, name, value.last_change());
         mpack_reader_destroy(&r);
-      } else if (wpi::starts_with(typeStr, "struct:")) {
-        auto structName = wpi::drop_front(typeStr, 7);
-        bool isArray = structName.ends_with("[]");
+      } else if (auto structNameOpt = wpi::remove_prefix(typeStr, "struct:")) {
+        auto structName = *structNameOpt;
+        auto withoutArray = wpi::remove_suffix(structName, "[]");
+        bool isArray = withoutArray.has_value();
         if (isArray) {
-          structName = wpi::drop_back(structName, 2);
+          structName = *withoutArray;
         }
         auto desc = model.m_structDb.Find(structName);
-        if (desc && desc->IsValid()) {
+        if (desc && desc->IsValid() && desc->GetSize() != 0) {
           if (isArray) {
             // array of struct at top level
             if (valueChildrenMap) {
@@ -760,8 +773,9 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
         } else {
           valueChildren.clear();
         }
-      } else if (wpi::starts_with(typeStr, "proto:")) {
-        auto msg = model.m_protoDb.Find(wpi::drop_front(typeStr, 6));
+      } else if (auto filename = wpi::remove_prefix(typeStr, "proto:")) {
+#ifndef NO_PROTOBUF
+        auto msg = model.m_protoDb.Find(*filename);
         if (msg) {
           msg->Clear();
           auto raw = value.GetRaw();
@@ -774,6 +788,9 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
         } else {
           valueChildren.clear();
         }
+#else
+        valueChildren.clear();
+#endif
       } else {
         valueChildren.clear();
       }
@@ -806,13 +823,15 @@ void NetworkTablesModel::Update() {
             m_server.publishers.clear();
           } else if (info->name == "$serversub") {
             m_server.subscribers.clear();
-          } else if (wpi::starts_with(info->name, "$clientpub$")) {
-            auto it = m_clients.find(wpi::drop_front(info->name, 11));
+          } else if (auto client =
+                         wpi::remove_prefix(info->name, "$clientpub$")) {
+            auto it = m_clients.find(*client);
             if (it != m_clients.end()) {
               it->second.publishers.clear();
             }
-          } else if (wpi::starts_with(info->name, "$clientsub$")) {
-            auto it = m_clients.find(wpi::drop_front(info->name, 11));
+          } else if (auto client =
+                         wpi::remove_prefix(info->name, "$clientsub$")) {
+            auto it = m_clients.find(*client);
             if (it != m_clients.end()) {
               it->second.subscribers.clear();
             }
@@ -852,29 +871,31 @@ void NetworkTablesModel::Update() {
             m_server.UpdatePublishers(entry->value.GetRaw());
           } else if (entry->info.name == "$serversub") {
             m_server.UpdateSubscribers(entry->value.GetRaw());
-          } else if (wpi::starts_with(entry->info.name, "$clientpub$")) {
-            auto it = m_clients.find(wpi::drop_front(entry->info.name, 11));
+          } else if (auto client =
+                         wpi::remove_prefix(entry->info.name, "$clientpub$")) {
+            auto it = m_clients.find(*client);
             if (it != m_clients.end()) {
               it->second.UpdatePublishers(entry->value.GetRaw());
             }
-          } else if (wpi::starts_with(entry->info.name, "$clientsub$")) {
-            auto it = m_clients.find(wpi::drop_front(entry->info.name, 11));
+          } else if (auto client =
+                         wpi::remove_prefix(entry->info.name, "$clientsub$")) {
+            auto it = m_clients.find(*client);
             if (it != m_clients.end()) {
               it->second.UpdateSubscribers(entry->value.GetRaw());
             }
           }
-        } else if (entry->value.IsRaw() &&
-                   wpi::starts_with(entry->info.name, "/.schema/struct:") &&
+        } else if (auto typeStr =
+                       wpi::remove_prefix(entry->info.name, "/.schema/struct:");
+                   entry->value.IsRaw() && typeStr &&
                    entry->info.type_str == "structschema") {
           // struct schema handling
-          auto typeStr = wpi::drop_front(entry->info.name, 16);
           std::string_view schema{
               reinterpret_cast<const char*>(entry->value.GetRaw().data()),
               entry->value.GetRaw().size()};
           std::string err;
-          auto desc = m_structDb.Add(typeStr, schema, &err);
+          auto desc = m_structDb.Add(*typeStr, schema, &err);
           if (!desc) {
-            fmt::print("could not decode struct '{}' schema '{}': {}\n",
+            wpi::print("could not decode struct '{}' schema '{}': {}\n",
                        entry->info.name, schema, err);
           } else if (desc->IsValid()) {
             // loop over all entries with this type and update
@@ -882,25 +903,24 @@ void NetworkTablesModel::Update() {
               if (!entryPair.second) {
                 continue;
               }
-              std::string_view ts = entryPair.second->info.type_str;
-              if (!wpi::starts_with(ts, "struct:")) {
-                continue;
-              }
-              ts = wpi::drop_front(ts, 7);
-              if (ts == typeStr || (wpi::ends_with(ts, "[]") &&
-                                    wpi::drop_back(ts, 2) == typeStr)) {
-                entryPair.second->UpdateFromValue(*this);
+              if (auto ts = wpi::remove_prefix(entryPair.second->info.type_str,
+                                               "struct:")) {
+                if (*ts == *typeStr ||
+                    wpi::remove_suffix(*ts, "[]").value_or(*ts) == *typeStr) {
+                  entryPair.second->UpdateFromValue(*this);
+                }
               }
             }
           }
-        } else if (entry->value.IsRaw() &&
-                   wpi::starts_with(entry->info.name, "/.schema/proto:") &&
+        } else if (auto filename =
+                       wpi::remove_prefix(entry->info.name, "/.schema/proto:");
+                   entry->value.IsRaw() && filename &&
                    entry->info.type_str == "proto:FileDescriptorProto") {
+#ifndef NO_PROTOBUF
           // protobuf descriptor handling
-          auto filename = wpi::drop_front(entry->info.name, 15);
-          if (!m_protoDb.Add(filename, entry->value.GetRaw())) {
-            fmt::print("could not decode protobuf '{}' filename '{}'\n",
-                       entry->info.name, filename);
+          if (!m_protoDb.Add(*filename, entry->value.GetRaw())) {
+            wpi::print("could not decode protobuf '{}' filename '{}'\n",
+                       entry->info.name, *filename);
           } else {
             // loop over all protobuf entries and update (conservatively)
             for (auto&& entryPair : m_entries) {
@@ -913,6 +933,7 @@ void NetworkTablesModel::Update() {
               }
             }
           }
+#endif
         }
       }
     }
@@ -1025,7 +1046,7 @@ void NetworkTablesModel::Client::UpdatePublishers(
   if (auto pubs = nt::meta::DecodeClientPublishers(data)) {
     publishers = std::move(*pubs);
   } else {
-    fmt::print(stderr, "Failed to update publishers\n");
+    wpi::print(stderr, "Failed to update publishers\n");
   }
 }
 
@@ -1038,7 +1059,7 @@ void NetworkTablesModel::Client::UpdateSubscribers(
       subscribers.emplace_back(std::move(sub));
     }
   } else {
-    fmt::print(stderr, "Failed to update subscribers\n");
+    wpi::print(stderr, "Failed to update subscribers\n");
   }
 }
 
@@ -1078,18 +1099,18 @@ void NetworkTablesModel::UpdateClients(std::span<const uint8_t> data) {
 }
 
 static bool GetHeadingTypeString(std::string_view* ts) {
-  if (wpi::starts_with(*ts, "proto:")) {
-    *ts = wpi::drop_front(*ts, 6);
+  if (auto withoutProto = wpi::remove_prefix(*ts, "proto:")) {
+    *ts = *withoutProto;
     auto lastdot = ts->rfind('.');
     if (lastdot != std::string_view::npos) {
       *ts = wpi::substr(*ts, lastdot + 1);
     }
-    if (wpi::starts_with(*ts, "Protobuf")) {
-      *ts = wpi::drop_front(*ts, 8);
+    if (auto withoutProtobuf = wpi::remove_prefix(*ts, "Protobuf")) {
+      *ts = *withoutProtobuf;
     }
     return true;
-  } else if (wpi::starts_with(*ts, "struct:")) {
-    *ts = wpi::drop_front(*ts, 7);
+  } else if (auto withoutStruct = wpi::remove_prefix(*ts, "struct:")) {
+    *ts = *withoutStruct;
     return true;
   }
   return false;
@@ -1383,8 +1404,8 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_INTEGER: {
       int64_t v = val.GetInteger();
-      if (ImGui::InputScalar(typeStr, ImGuiDataType_S64, &v, nullptr, nullptr,
-                             nullptr, ImGuiInputTextFlags_EnterReturnsTrue)) {
+      if (InputExpr<int64_t>(typeStr, &v, "%d",
+                             ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
           entry.publisher = nt::Publish(entry.info.topic, NT_INTEGER, "int");
         }
@@ -1394,8 +1415,8 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_FLOAT: {
       float v = val.GetFloat();
-      if (ImGui::InputFloat(typeStr, &v, 0, 0, "%.6f",
-                            ImGuiInputTextFlags_EnterReturnsTrue)) {
+      if (InputExpr<float>(typeStr, &v, "%.6f",
+                           ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
           entry.publisher = nt::Publish(entry.info.topic, NT_FLOAT, "float");
         }
@@ -1411,9 +1432,9 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
-      if (ImGui::InputDouble(typeStr, &v, 0, 0,
-                             fmt::format("%.{}f", precision).c_str(),
-                             ImGuiInputTextFlags_EnterReturnsTrue)) {
+      if (InputExpr<double>(typeStr, &v,
+                            fmt::format("%.{}f", precision).c_str(),
+                            ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
           entry.publisher = nt::Publish(entry.info.topic, NT_DOUBLE, "double");
         }
@@ -1426,8 +1447,9 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_STRING: {
       char* v = GetTextBuffer(entry.valueStr);
-      if (ImGui::InputText(typeStr, v, kTextBufferSize,
-                           ImGuiInputTextFlags_EnterReturnsTrue)) {
+      ImGui::InputText(typeStr, v, kTextBufferSize,
+                       ImGuiInputTextFlags_EnterReturnsTrue);
+      if (ImGui::IsItemDeactivatedAfterEdit()) {
         if (v[0] == '"') {
           if (entry.publisher == 0) {
             entry.publisher =

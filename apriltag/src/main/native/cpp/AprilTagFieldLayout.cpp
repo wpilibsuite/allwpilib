@@ -5,6 +5,8 @@
 #include "frc/apriltag/AprilTagFieldLayout.h"
 
 #include <system_error>
+#include <utility>
+#include <vector>
 
 #include <units/angle.h>
 #include <units/length.h>
@@ -15,14 +17,12 @@
 using namespace frc;
 
 AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(path, ec);
-  if (fileBuffer == nullptr || ec) {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(path);
+  if (!fileBuffer) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
-  wpi::json json = wpi::json::parse(fileBuffer->GetCharBuffer());
+  wpi::json json = wpi::json::parse(fileBuffer.value()->GetCharBuffer());
 
   for (const auto& tag : json.at("tags").get<std::vector<AprilTag>>()) {
     m_apriltags[tag.ID] = tag;
@@ -124,4 +124,38 @@ void frc::from_json(const wpi::json& json, AprilTagFieldLayout& layout) {
       units::meter_t{json.at("field").at("length").get<double>()};
   layout.m_fieldWidth =
       units::meter_t{json.at("field").at("width").get<double>()};
+}
+
+// Use namespace declaration for forward declaration
+namespace frc {
+
+// C++ generated from resource files
+std::string_view GetResource_2022_rapidreact_json();
+std::string_view GetResource_2023_chargedup_json();
+std::string_view GetResource_2024_crescendo_json();
+
+}  // namespace frc
+
+AprilTagFieldLayout AprilTagFieldLayout::LoadField(AprilTagField field) {
+  std::string_view fieldString;
+  switch (field) {
+    case AprilTagField::k2022RapidReact:
+      fieldString = GetResource_2022_rapidreact_json();
+      break;
+    case AprilTagField::k2023ChargedUp:
+      fieldString = GetResource_2023_chargedup_json();
+      break;
+    case AprilTagField::k2024Crescendo:
+      fieldString = GetResource_2024_crescendo_json();
+      break;
+    case AprilTagField::kNumFields:
+      throw std::invalid_argument("Invalid Field");
+  }
+
+  wpi::json json = wpi::json::parse(fieldString);
+  return json.get<AprilTagFieldLayout>();
+}
+
+AprilTagFieldLayout frc::LoadAprilTagLayoutField(AprilTagField field) {
+  return AprilTagFieldLayout::LoadField(field);
 }

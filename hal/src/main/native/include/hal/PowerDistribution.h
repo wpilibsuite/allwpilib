@@ -19,11 +19,15 @@
  * The types of power distribution devices.
  */
 HAL_ENUM(HAL_PowerDistributionType) {
+  /** Automatically determines the module type */
   HAL_PowerDistributionType_kAutomatic = 0,
+  /** CTRE (Cross The Road Electronics) Power Distribution Panel (PDP). */
   HAL_PowerDistributionType_kCTRE = 1,
+  /** REV Power Distribution Hub (PDH). */
   HAL_PowerDistributionType_kRev = 2,
 };
 
+/** Use the default module number for the selected module type */
 #define HAL_DEFAULT_POWER_DISTRIBUTION_MODULE -1
 
 #ifdef __cplusplus
@@ -101,7 +105,9 @@ int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,
                                             int32_t* status);
 
 /**
- * Gets the temperature of the PowerDistribution.
+ * Gets the temperature of the Power Distribution Panel.
+ *
+ * Not supported on the Rev PDH and returns 0.
  *
  * @param[in] handle the module handle
  * @param[out] status Error status variable. 0 on success.
@@ -156,7 +162,9 @@ double HAL_GetPowerDistributionTotalCurrent(HAL_PowerDistributionHandle handle,
                                             int32_t* status);
 
 /**
- * Gets the total power of the PowerDistribution.
+ * Gets the total power of the Power Distribution Panel.
+ *
+ * Not supported on the Rev PDH and returns 0.
  *
  * @param[in] handle the module handle
  * @param[out] status Error status variable. 0 on success.
@@ -166,7 +174,9 @@ double HAL_GetPowerDistributionTotalPower(HAL_PowerDistributionHandle handle,
                                           int32_t* status);
 
 /**
- * Gets the total energy of the PowerDistribution.
+ * Gets the total energy of the Power Distribution Panel.
+ *
+ * Not supported on the Rev PDH and returns 0.
  *
  * @param[in] handle the module handle
  * @param[out] status Error status variable. 0 on success.
@@ -177,6 +187,8 @@ double HAL_GetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle,
 
 /**
  * Resets the PowerDistribution accumulated energy.
+ *
+ * Not supported on the Rev PDH and does nothing.
  *
  * @param[in] handle the module handle
  * @param[out] status Error status variable. 0 on success.
@@ -236,32 +248,59 @@ struct HAL_PowerDistributionVersion {
 };
 
 struct HAL_PowerDistributionFaults {
+  /** Breaker fault on channel 0. */
   uint32_t channel0BreakerFault : 1;
+  /** Breaker fault on channel 1. */
   uint32_t channel1BreakerFault : 1;
+  /** Breaker fault on channel 2. */
   uint32_t channel2BreakerFault : 1;
+  /** Breaker fault on channel 3. */
   uint32_t channel3BreakerFault : 1;
+  /** Breaker fault on channel 4. */
   uint32_t channel4BreakerFault : 1;
+  /** Breaker fault on channel 5. */
   uint32_t channel5BreakerFault : 1;
+  /** Breaker fault on channel 6. */
   uint32_t channel6BreakerFault : 1;
+  /** Breaker fault on channel 7. */
   uint32_t channel7BreakerFault : 1;
+  /** Breaker fault on channel 8. */
   uint32_t channel8BreakerFault : 1;
+  /** Breaker fault on channel 9. */
   uint32_t channel9BreakerFault : 1;
+  /** Breaker fault on channel 10. */
   uint32_t channel10BreakerFault : 1;
+  /** Breaker fault on channel 12. */
   uint32_t channel11BreakerFault : 1;
+  /** Breaker fault on channel 13. */
   uint32_t channel12BreakerFault : 1;
+  /** Breaker fault on channel 14. */
   uint32_t channel13BreakerFault : 1;
+  /** Breaker fault on channel 15. */
   uint32_t channel14BreakerFault : 1;
+  /** Breaker fault on channel 16. */
   uint32_t channel15BreakerFault : 1;
+  /** Breaker fault on channel 17. */
   uint32_t channel16BreakerFault : 1;
+  /** Breaker fault on channel 18. */
   uint32_t channel17BreakerFault : 1;
+  /** Breaker fault on channel 19. */
   uint32_t channel18BreakerFault : 1;
+  /** Breaker fault on channel 20. */
   uint32_t channel19BreakerFault : 1;
+  /** Breaker fault on channel 21. */
   uint32_t channel20BreakerFault : 1;
+  /** Breaker fault on channel 22. */
   uint32_t channel21BreakerFault : 1;
+  /** Breaker fault on channel 23. */
   uint32_t channel22BreakerFault : 1;
+  /** Breaker fault on channel 24. */
   uint32_t channel23BreakerFault : 1;
+  /** The input voltage is below the minimum voltage. */
   uint32_t brownout : 1;
+  /** A warning was raised by the device's CAN controller. */
   uint32_t canWarning : 1;
+  /** The hardware on the device has malfunctioned. */
   uint32_t hardwareFault : 1;
 };
 
@@ -269,33 +308,65 @@ struct HAL_PowerDistributionFaults {
  * Storage for REV PDH Sticky Faults
  */
 struct HAL_PowerDistributionStickyFaults {
+  /** Breaker fault on channel 0. */
   uint32_t channel0BreakerFault : 1;
+  /** Breaker fault on channel 1. */
   uint32_t channel1BreakerFault : 1;
+  /** Breaker fault on channel 2. */
   uint32_t channel2BreakerFault : 1;
+  /** Breaker fault on channel 3. */
   uint32_t channel3BreakerFault : 1;
+  /** Breaker fault on channel 4. */
   uint32_t channel4BreakerFault : 1;
+  /** Breaker fault on channel 5. */
   uint32_t channel5BreakerFault : 1;
+  /** Breaker fault on channel 6. */
   uint32_t channel6BreakerFault : 1;
+  /** Breaker fault on channel 7. */
   uint32_t channel7BreakerFault : 1;
+  /** Breaker fault on channel 8. */
   uint32_t channel8BreakerFault : 1;
+  /** Breaker fault on channel 9. */
   uint32_t channel9BreakerFault : 1;
+  /** Breaker fault on channel 10. */
   uint32_t channel10BreakerFault : 1;
+  /** Breaker fault on channel 12. */
   uint32_t channel11BreakerFault : 1;
+  /** Breaker fault on channel 13. */
   uint32_t channel12BreakerFault : 1;
+  /** Breaker fault on channel 14. */
   uint32_t channel13BreakerFault : 1;
+  /** Breaker fault on channel 15. */
   uint32_t channel14BreakerFault : 1;
+  /** Breaker fault on channel 16. */
   uint32_t channel15BreakerFault : 1;
+  /** Breaker fault on channel 17. */
   uint32_t channel16BreakerFault : 1;
+  /** Breaker fault on channel 18. */
   uint32_t channel17BreakerFault : 1;
+  /** Breaker fault on channel 19. */
   uint32_t channel18BreakerFault : 1;
+  /** Breaker fault on channel 20. */
   uint32_t channel19BreakerFault : 1;
+  /** Breaker fault on channel 21. */
   uint32_t channel20BreakerFault : 1;
+  /** Breaker fault on channel 22. */
   uint32_t channel21BreakerFault : 1;
+  /** Breaker fault on channel 23. */
   uint32_t channel22BreakerFault : 1;
+  /** Breaker fault on channel 24. */
   uint32_t channel23BreakerFault : 1;
+  /** The input voltage is below the minimum voltage. */
   uint32_t brownout : 1;
+  /** A warning was raised by the device's CAN controller. */
   uint32_t canWarning : 1;
+  /** The device's CAN controller experienced a "Bus Off" event. */
   uint32_t canBusOff : 1;
+  /** The hardware on the device has malfunctioned. */
+  uint32_t hardwareFault : 1;
+  /** The firmware on the device has malfunctioned. */
+  uint32_t firmwareFault : 1;
+  /** The device has rebooted. */
   uint32_t hasReset : 1;
 };
 
@@ -312,6 +383,8 @@ void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle,
 /**
  * Get the current faults of the PowerDistribution.
  *
+ * On a CTRE PDP, this will return an object with no faults active.
+ *
  * @param[in] handle the module handle
  * @param[out] faults the HAL_PowerDistributionFaults to populate
  * @param[out] status Error status variable. 0 on success.
@@ -322,6 +395,8 @@ void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle,
 
 /**
  * Gets the sticky faults of the PowerDistribution.
+ *
+ * On a CTRE PDP, this will return an object with no faults active.
  *
  * @param[in] handle the module handle
  * @param[out] stickyFaults the HAL_PowerDistributionStickyFaults to populate

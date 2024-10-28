@@ -11,8 +11,8 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.controller.LTVUnicycleController;
 import edu.wpi.first.math.controller.LinearPlantInversionFeedforward;
-import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
@@ -47,7 +47,7 @@ class DifferentialDrivetrainSimTest {
             VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
     var feedforward = new LinearPlantInversionFeedforward<>(plant, 0.020);
-    var ramsete = new RamseteController();
+    var feedback = new LTVUnicycleController(0.020);
     feedforward.reset(VecBuilder.fill(0, 0));
 
     // ground truth
@@ -55,17 +55,17 @@ class DifferentialDrivetrainSimTest {
 
     var traj =
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(),
+            Pose2d.kZero,
             List.of(),
-            new Pose2d(2, 2, new Rotation2d()),
+            new Pose2d(2, 2, Rotation2d.kZero),
             new TrajectoryConfig(1, 1)
                 .addConstraint(new DifferentialDriveKinematicsConstraint(kinematics, 1)));
 
     for (double t = 0; t < traj.getTotalTimeSeconds(); t += 0.020) {
       var state = traj.sample(t);
-      var ramseteOut = ramsete.calculate(sim.getPose(), state);
+      var feedbackOut = feedback.calculate(sim.getPose(), state);
 
-      var wheelSpeeds = kinematics.toWheelSpeeds(ramseteOut);
+      var wheelSpeeds = kinematics.toWheelSpeeds(feedbackOut);
 
       var voltages =
           feedforward.calculate(

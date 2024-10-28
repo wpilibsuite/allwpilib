@@ -50,6 +50,7 @@ public final class CANAPITypes {
     /** Firmware update. */
     kFirmwareUpdate(31);
 
+    /** The device type ID. */
     @SuppressWarnings("PMD.MemberName")
     public final int id;
 
@@ -104,6 +105,7 @@ public final class CANAPITypes {
     /** Vivid-Hosting. */
     kVividHosting(16);
 
+    /** The manufacturer ID. */
     @SuppressWarnings("PMD.MemberName")
     public final int id;
 

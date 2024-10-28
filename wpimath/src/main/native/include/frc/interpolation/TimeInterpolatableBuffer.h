@@ -5,9 +5,7 @@
 #pragma once
 
 #include <algorithm>
-#include <array>
 #include <functional>
-#include <map>
 #include <optional>
 #include <utility>
 #include <vector>
@@ -100,7 +98,7 @@ class TimeInterpolatableBuffer {
    *
    * @param time The time at which to sample the buffer.
    */
-  std::optional<T> Sample(units::second_t time) {
+  std::optional<T> Sample(units::second_t time) const {
     if (m_pastSnapshots.empty()) {
       return {};
     }
@@ -141,6 +139,13 @@ class TimeInterpolatableBuffer {
    * replay odometry inputs stored within this buffer.
    */
   std::vector<std::pair<units::second_t, T>>& GetInternalBuffer() {
+    return m_pastSnapshots;
+  }
+
+  /**
+   * Grant access to the internal sample buffer.
+   */
+  const std::vector<std::pair<units::second_t, T>>& GetInternalBuffer() const {
     return m_pastSnapshots;
   }
 

@@ -22,7 +22,7 @@ static const auto KICKER_THRESHOLD = 15_mm;
 
 class Robot : public frc::TimedRobot {
  public:
-  void RobotInit() override {
+  Robot() {
     m_controller.SetTolerance(TOLERANCE.value());
 
     frc::BooleanEvent isBallAtKicker{&m_loop, [&kickerSensor = m_kickerSensor] {
@@ -54,9 +54,10 @@ class Robot : public frc::TimedRobot {
         // accelerate the shooter wheel
         .IfHigh([&shooter = m_shooter, &controller = m_controller, &ff = m_ff,
                  &encoder = m_shooterEncoder] {
-          shooter.SetVoltage(units::volt_t{controller.Calculate(
-                                 encoder.GetRate(), SHOT_VELOCITY.value())} +
-                             ff.Calculate(SHOT_VELOCITY));
+          shooter.SetVoltage(
+              units::volt_t{controller.Calculate(encoder.GetRate(),
+                                                 SHOT_VELOCITY.value())} +
+              ff.Calculate(units::radians_per_second_t{SHOT_VELOCITY}));
         });
     // if not, stop
     (!shootTrigger).IfHigh([&shooter = m_shooter] { shooter.Set(0.0); });

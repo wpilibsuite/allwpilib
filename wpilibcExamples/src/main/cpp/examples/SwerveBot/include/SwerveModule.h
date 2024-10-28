@@ -25,7 +25,7 @@ class SwerveModule {
                int turningEncoderChannelA, int turningEncoderChannelB);
   frc::SwerveModuleState GetState() const;
   frc::SwerveModulePosition GetPosition() const;
-  void SetDesiredState(const frc::SwerveModuleState& state);
+  void SetDesiredState(frc::SwerveModuleState& state);
 
  private:
   static constexpr double kWheelRadius = 0.0508;

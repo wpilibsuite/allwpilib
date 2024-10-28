@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.cameraserver.CameraServerShared;
 import edu.wpi.first.cameraserver.CameraServerSharedStore;
-import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -92,43 +91,28 @@ public abstract class RobotBase implements AutoCloseable {
           @Override
           public void reportUsage(MathUsageId id, int count) {
             switch (id) {
-              case kKinematics_DifferentialDrive:
-                HAL.report(
-                    tResourceType.kResourceType_Kinematics,
-                    tInstances.kKinematics_DifferentialDrive);
-                break;
-              case kKinematics_MecanumDrive:
-                HAL.report(
-                    tResourceType.kResourceType_Kinematics, tInstances.kKinematics_MecanumDrive);
-                break;
-              case kKinematics_SwerveDrive:
-                HAL.report(
-                    tResourceType.kResourceType_Kinematics, tInstances.kKinematics_SwerveDrive);
-                break;
-              case kTrajectory_TrapezoidProfile:
-                HAL.report(tResourceType.kResourceType_TrapezoidProfile, count);
-                break;
-              case kFilter_Linear:
-                HAL.report(tResourceType.kResourceType_LinearFilter, count);
-                break;
-              case kOdometry_DifferentialDrive:
-                HAL.report(
-                    tResourceType.kResourceType_Odometry, tInstances.kOdometry_DifferentialDrive);
-                break;
-              case kOdometry_SwerveDrive:
-                HAL.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_SwerveDrive);
-                break;
-              case kOdometry_MecanumDrive:
-                HAL.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_MecanumDrive);
-                break;
-              case kController_PIDController2:
-                HAL.report(tResourceType.kResourceType_PIDController2, count);
-                break;
-              case kController_ProfiledPIDController:
-                HAL.report(tResourceType.kResourceType_ProfiledPIDController, count);
-                break;
-              default:
-                break;
+              case kKinematics_DifferentialDrive -> HAL.report(
+                  tResourceType.kResourceType_Kinematics, tInstances.kKinematics_DifferentialDrive);
+              case kKinematics_MecanumDrive -> HAL.report(
+                  tResourceType.kResourceType_Kinematics, tInstances.kKinematics_MecanumDrive);
+              case kKinematics_SwerveDrive -> HAL.report(
+                  tResourceType.kResourceType_Kinematics, tInstances.kKinematics_SwerveDrive);
+              case kTrajectory_TrapezoidProfile -> HAL.report(
+                  tResourceType.kResourceType_TrapezoidProfile, count);
+              case kFilter_Linear -> HAL.report(tResourceType.kResourceType_LinearFilter, count);
+              case kOdometry_DifferentialDrive -> HAL.report(
+                  tResourceType.kResourceType_Odometry, tInstances.kOdometry_DifferentialDrive);
+              case kOdometry_SwerveDrive -> HAL.report(
+                  tResourceType.kResourceType_Odometry, tInstances.kOdometry_SwerveDrive);
+              case kOdometry_MecanumDrive -> HAL.report(
+                  tResourceType.kResourceType_Odometry, tInstances.kOdometry_MecanumDrive);
+              case kController_PIDController2 -> HAL.report(
+                  tResourceType.kResourceType_PIDController2, count);
+              case kController_ProfiledPIDController -> HAL.report(
+                  tResourceType.kResourceType_ProfiledPIDController, count);
+              default -> {
+                // NOP
+              }
             }
           }
 
@@ -420,10 +404,6 @@ public abstract class RobotBase implements AutoCloseable {
     // Force refresh DS data
     DriverStation.refreshData();
 
-    // Call a CameraServer JNI function to force OpenCV native library loading
-    // Needed because all the OpenCV JNI functions don't have built in loading
-    CameraServerJNI.enumerateSinks();
-
     HAL.report(
         tResourceType.kResourceType_Language, tInstances.kLanguage_Java, 0, WPILibVersion.Version);
 
@@ -457,6 +437,11 @@ public abstract class RobotBase implements AutoCloseable {
     } else {
       runRobot(robotSupplier);
     }
+
+    // On RIO, this will just terminate rather than shutting down cleanly (it's a no-op in sim).
+    // It's not worth the risk of hanging on shutdown when we want the code to restart as quickly
+    // as possible.
+    HAL.terminate();
 
     HAL.shutdown();
 

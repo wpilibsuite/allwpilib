@@ -84,7 +84,7 @@ public class Servo extends PWM {
       degrees = kMaxServoAngle;
     }
 
-    setPosition(((degrees - kMinServoAngle)) / getServoAngleRange());
+    setPosition((degrees - kMinServoAngle) / getServoAngleRange());
   }
 
   /**

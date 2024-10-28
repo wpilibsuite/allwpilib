@@ -7,6 +7,7 @@
 #include <numbers>
 #include <type_traits>
 
+#include <gcem.hpp>
 #include <wpi/SymbolExports.h>
 
 #include "units/angle.h"
@@ -28,10 +29,10 @@ namespace frc {
  */
 template <typename T>
   requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
-T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
+constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
   T magnitude;
   if constexpr (std::is_arithmetic_v<T>) {
-    magnitude = std::abs(value);
+    magnitude = gcem::abs(value);
   } else {
     magnitude = units::math::abs(value);
   }
@@ -169,4 +170,41 @@ constexpr units::radian_t AngleModulus(units::radian_t angle) {
                                        units::radian_t{std::numbers::pi});
 }
 
+// floorDiv and floorMod algorithms taken from Java
+
+/**
+ * Returns the largest (closest to positive infinity)
+ * {@code int} value that is less than or equal to the algebraic quotient.
+ *
+ * @param x the dividend
+ * @param y the divisor
+ * @return the largest (closest to positive infinity)
+ *   {@code int} value that is less than or equal to the algebraic quotient.
+ */
+constexpr std::signed_integral auto FloorDiv(std::signed_integral auto x,
+                                             std::signed_integral auto y) {
+  auto quot = x / y;
+  auto rem = x % y;
+  // if the signs are different and modulo not zero, round down
+  if ((x < 0) != (y < 0) && rem != 0) {
+    --quot;
+  }
+  return quot;
+}
+
+/**
+ * Returns the floor modulus of the {@code int} arguments.
+ * <p>
+ * The floor modulus is {@code r = x - (floorDiv(x, y) * y)},
+ * has the same sign as the divisor {@code y} or is zero, and
+ * is in the range of {@code -std::abs(y) < r < +std::abs(y)}.
+ *
+ * @param x the dividend
+ * @param y the divisor
+ * @return the floor modulus {@code x - (floorDiv(x, y) * y)}
+ */
+constexpr std::signed_integral auto FloorMod(std::signed_integral auto x,
+                                             std::signed_integral auto y) {
+  return x - FloorDiv(x, y) * y;
+}
 }  // namespace frc

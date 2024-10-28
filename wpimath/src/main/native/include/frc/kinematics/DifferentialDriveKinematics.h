@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Twist2d.h"
@@ -36,10 +38,12 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    * empirical value may be larger than the physical measured value due to
    * scrubbing effects.
    */
-  explicit DifferentialDriveKinematics(units::meter_t trackWidth)
+  constexpr explicit DifferentialDriveKinematics(units::meter_t trackWidth)
       : trackWidth(trackWidth) {
-    wpi::math::MathSharedStore::ReportUsage(
-        wpi::math::MathUsageId::kKinematics_DifferentialDrive, 1);
+    if (!std::is_constant_evaluated()) {
+      wpi::math::MathSharedStore::ReportUsage(
+          wpi::math::MathUsageId::kKinematics_DifferentialDrive, 1);
+    }
   }
 
   /**
@@ -83,9 +87,16 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
             (rightDistance - leftDistance) / trackWidth * 1_rad};
   }
 
-  Twist2d ToTwist2d(const DifferentialDriveWheelPositions& start,
-                    const DifferentialDriveWheelPositions& end) const override {
+  constexpr Twist2d ToTwist2d(
+      const DifferentialDriveWheelPositions& start,
+      const DifferentialDriveWheelPositions& end) const override {
     return ToTwist2d(end.left - start.left, end.right - start.right);
+  }
+
+  constexpr DifferentialDriveWheelPositions Interpolate(
+      const DifferentialDriveWheelPositions& start,
+      const DifferentialDriveWheelPositions& end, double t) const override {
+    return start.Interpolate(end, t);
   }
 
   /// Differential drive trackwidth.
@@ -93,5 +104,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
 };
 }  // namespace frc
 
+#ifndef NO_PROTOBUF
 #include "frc/kinematics/proto/DifferentialDriveKinematicsProto.h"
+#endif
 #include "frc/kinematics/struct/DifferentialDriveKinematicsStruct.h"

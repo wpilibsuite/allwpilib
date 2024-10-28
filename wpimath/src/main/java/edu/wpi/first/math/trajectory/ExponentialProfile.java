@@ -70,7 +70,7 @@ public class ExponentialProfile {
   }
 
   /** Profile constraints. */
-  public static class Constraints {
+  public static final class Constraints {
     /** Maximum unsigned input voltage. */
     public final double maxInput;
 
@@ -81,7 +81,7 @@ public class ExponentialProfile {
     public final double B;
 
     /**
-     * Construct constraints for an ExponentialProfile.
+     * Constructs constraints for an ExponentialProfile.
      *
      * @param maxInput maximum unsigned input voltage
      * @param A The State-Space 1x1 system matrix.
@@ -96,14 +96,14 @@ public class ExponentialProfile {
     /**
      * Computes the max achievable velocity for an Exponential Profile.
      *
-     * @return The seady-state velocity achieved by this profile.
+     * @return The steady-state velocity achieved by this profile.
      */
     public double maxVelocity() {
       return -maxInput * B / A;
     }
 
     /**
-     * Construct constraints for an ExponentialProfile from characteristics.
+     * Constructs constraints for an ExponentialProfile from characteristics.
      *
      * @param maxInput maximum unsigned input voltage
      * @param kV The velocity gain.
@@ -115,7 +115,7 @@ public class ExponentialProfile {
     }
 
     /**
-     * Construct constraints for an ExponentialProfile from State-Space parameters.
+     * Constructs constraints for an ExponentialProfile from State-Space parameters.
      *
      * @param maxInput maximum unsigned input voltage
      * @param A The State-Space 1x1 system matrix.
@@ -139,7 +139,7 @@ public class ExponentialProfile {
     public State() {}
 
     /**
-     * Construct a state within an exponential profile.
+     * Constructs a state within an exponential profile.
      *
      * @param position The position at this state.
      * @param velocity The velocity at this state.
@@ -151,12 +151,9 @@ public class ExponentialProfile {
 
     @Override
     public boolean equals(Object other) {
-      if (other instanceof State) {
-        State rhs = (State) other;
-        return this.position == rhs.position && this.velocity == rhs.velocity;
-      } else {
-        return false;
-      }
+      return other instanceof State rhs
+          && this.position == rhs.position
+          && this.velocity == rhs.velocity;
     }
 
     @Override
@@ -166,7 +163,7 @@ public class ExponentialProfile {
   }
 
   /**
-   * Construct an ExponentialProfile.
+   * Constructs an ExponentialProfile.
    *
    * @param constraints The constraints on the profile, like maximum input.
    */
@@ -175,10 +172,10 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the correct position and velocity for the profile at a time t where the current state
-   * is at time t = 0.
+   * Calculates the position and velocity for the profile at a time t where the current state is at
+   * time t = 0.
    *
-   * @param t The time since the beginning of the profile.
+   * @param t How long to advance from the current state toward the desired state.
    * @param current The current state.
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
@@ -191,7 +188,7 @@ public class ExponentialProfile {
     var timing = calculateProfileTiming(current, inflectionPoint, goal, u);
 
     if (t < 0) {
-      return current;
+      return new State(current.position, current.velocity);
     } else if (t < timing.inflectionTime) {
       return new State(
           computeDistanceFromTime(t, u, current), computeVelocityFromTime(t, u, current));
@@ -200,12 +197,12 @@ public class ExponentialProfile {
           computeDistanceFromTime(t - timing.totalTime, -u, goal),
           computeVelocityFromTime(t - timing.totalTime, -u, goal));
     } else {
-      return goal;
+      return new State(goal.position, goal.velocity);
     }
   }
 
   /**
-   * Calculate the point after which the fastest way to reach the goal state is to apply input in
+   * Calculates the point after which the fastest way to reach the goal state is to apply input in
    * the opposite direction.
    *
    * @param current The current state.
@@ -220,7 +217,7 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the point after which the fastest way to reach the goal state is to apply input in
+   * Calculates the point after which the fastest way to reach the goal state is to apply input in
    * the opposite direction.
    *
    * @param current The current state.
@@ -242,7 +239,7 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the time it will take for this profile to reach the goal state.
+   * Calculates the time it will take for this profile to reach the goal state.
    *
    * @param current The current state.
    * @param goal The desired state when the profile is complete.
@@ -255,8 +252,8 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the time it will take for this profile to reach the inflection point, and the time it
-   * will take for this profile to reach the goal state.
+   * Calculates the time it will take for this profile to reach the inflection point, and the time
+   * it will take for this profile to reach the goal state.
    *
    * @param current The current state.
    * @param goal The desired state when the profile is complete.
@@ -271,8 +268,8 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the time it will take for this profile to reach the inflection point, and the time it
-   * will take for this profile to reach the goal state.
+   * Calculates the time it will take for this profile to reach the inflection point, and the time
+   * it will take for this profile to reach the goal state.
    *
    * @param current The current state.
    * @param inflectionPoint The inflection point of this profile.
@@ -332,7 +329,7 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the position reached after t seconds when applying an input from the initial state.
+   * Calculates the position reached after t seconds when applying an input from the initial state.
    *
    * @param t The time since the initial state.
    * @param input The signed input applied to this profile from the initial state.
@@ -349,7 +346,7 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the velocity reached after t seconds when applying an input from the initial state.
+   * Calculates the velocity reached after t seconds when applying an input from the initial state.
    *
    * @param t The time since the initial state.
    * @param input The signed input applied to this profile from the initial state.
@@ -365,7 +362,7 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the time required to reach a specified velocity given the initial velocity.
+   * Calculates the time required to reach a specified velocity given the initial velocity.
    *
    * @param velocity The goal velocity.
    * @param input The signed input applied to this profile from the initial state.
@@ -381,7 +378,7 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the distance reached at the same time as the given velocity when applying the given
+   * Calculates the distance reached at the same time as the given velocity when applying the given
    * input from the initial state.
    *
    * @param velocity The velocity reached by this profile
@@ -400,7 +397,7 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the velocity at which input should be reversed in order to reach the goal state from
+   * Calculates the velocity at which input should be reversed in order to reach the goal state from
    * the current state.
    *
    * @param input The signed input applied to this profile from the current state.

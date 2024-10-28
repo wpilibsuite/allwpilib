@@ -9,9 +9,12 @@ include(LinkMacOSGUI)
 #
 file(GLOB_RECURSE libglass_src src/lib/native/cpp/*.cpp)
 
-add_library(libglass ${libglass_src})
-set_target_properties(libglass PROPERTIES DEBUG_POSTFIX "d" OUTPUT_NAME "glass")
-set_property(TARGET libglass PROPERTY POSITION_INDEPENDENT_CODE ON)
+add_library(libglass STATIC ${libglass_src})
+set_target_properties(libglass PROPERTIES DEBUG_POSTFIX "d")
+# Library name can't be glass on Windows or else it will overwrite the Glass app PDB file
+if(NOT MSVC)
+    set_target_properties(libglass PROPERTIES OUTPUT_NAME "glass")
+endif()
 
 set_property(TARGET libglass PROPERTY FOLDER "libraries")
 
@@ -26,6 +29,7 @@ target_include_directories(
 )
 
 install(TARGETS libglass EXPORT libglass)
+export(TARGETS libglass FILE libglass.cmake NAMESPACE libglass::)
 install(DIRECTORY src/lib/native/include/ DESTINATION "${include_dest}/glass")
 
 #
@@ -33,9 +37,11 @@ install(DIRECTORY src/lib/native/include/ DESTINATION "${include_dest}/glass")
 #
 file(GLOB_RECURSE libglassnt_src src/libnt/native/cpp/*.cpp)
 
-add_library(libglassnt ${libglassnt_src})
-set_target_properties(libglassnt PROPERTIES DEBUG_POSTFIX "d" OUTPUT_NAME "glassnt")
-set_property(TARGET libglassnt PROPERTY POSITION_INDEPENDENT_CODE ON)
+add_library(libglassnt STATIC ${libglassnt_src})
+set_target_properties(libglassnt PROPERTIES DEBUG_POSTFIX "d")
+if(NOT MSVC)
+    set_target_properties(libglassnt PROPERTIES OUTPUT_NAME "glassnt")
+endif()
 
 set_property(TARGET libglassnt PROPERTY FOLDER "libraries")
 
@@ -50,6 +56,7 @@ target_include_directories(
 )
 
 install(TARGETS libglassnt EXPORT libglassnt)
+export(TARGETS libglassnt FILE libglassnt.cmake NAMESPACE libglassnt::)
 install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
 
 #

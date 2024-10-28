@@ -8,7 +8,6 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/system/plant/LinearSystemId.h"
 #include "units/length.h"
 #include "units/mass.h"
 
@@ -28,7 +27,8 @@ TEST(LinearSystemIDTest, IdentifyDrivetrainVelocitySystem) {
 
 TEST(LinearSystemIDTest, ElevatorSystem) {
   auto model = frc::LinearSystemId::ElevatorSystem(frc::DCMotor::NEO(2), 5_kg,
-                                                   0.05_m, 12);
+                                                   0.05_m, 12)
+                   .Slice(0);
   ASSERT_TRUE(model.A().isApprox(
       frc::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -99.05473}}, 0.001));
   ASSERT_TRUE(model.B().isApprox(frc::Matrixd<2, 1>{0.0, 20.8}, 0.001));

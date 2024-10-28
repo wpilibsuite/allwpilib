@@ -17,8 +17,8 @@ public class Pose3dStruct implements Struct<Pose3d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Pose3d";
+  public String getTypeName() {
+    return "Pose3d";
   }
 
   @Override
@@ -47,5 +47,10 @@ public class Pose3dStruct implements Struct<Pose3d> {
   public void pack(ByteBuffer bb, Pose3d value) {
     Translation3d.struct.pack(bb, value.getTranslation());
     Rotation3d.struct.pack(bb, value.getRotation());
+  }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
   }
 }

@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <cstddef>
 #include <vector>
 
 #include <Eigen/Core>
@@ -12,7 +11,7 @@
 namespace sysid {
 
 struct OLSResult {
-  /// Regression coeficients.
+  /// Regression coefficients.
   std::vector<double> coeffs;
 
   /// R² (coefficient of determination)

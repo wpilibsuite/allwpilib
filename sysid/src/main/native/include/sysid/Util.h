@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <array>
 #include <filesystem>
-#include <string>
+#include <stdexcept>
 #include <string_view>
 
 // The generated AppleScript by portable-file-dialogs for just *.json does not
@@ -46,6 +46,14 @@ inline constexpr const char* kUnits[] = {"Meters",  "Feet",      "Inches",
 void CreateTooltip(const char* text);
 
 /**
+ * Displays an error tooltip beside the widget that this method is called after
+ * with the provided text.
+ *
+ * @param text The text to show in the error tooltip.
+ */
+void CreateErrorTooltip(const char* text);
+
+/**
  * Utility function to launch an error popup if an exception is detected.
  *
  * @param isError True if an exception is detected
@@ -59,7 +67,23 @@ void CreateErrorPopup(bool& isError, std::string_view errorMessage);
  * @param unit The unit to return the abbreviation for.
  * @return The abbreviation for the unit.
  */
-std::string_view GetAbbreviation(std::string_view unit);
+constexpr std::string_view GetAbbreviation(std::string_view unit) {
+  if (unit == "Meters") {
+    return "m";
+  } else if (unit == "Feet") {
+    return "ft";
+  } else if (unit == "Inches") {
+    return "in";
+  } else if (unit == "Radians") {
+    return "rad";
+  } else if (unit == "Degrees") {
+    return "deg";
+  } else if (unit == "Rotations") {
+    return "rot";
+  } else {
+    throw std::runtime_error("Invalid Unit");
+  }
+}
 
 /**
  * Saves a file with the provided contents to a specified location.

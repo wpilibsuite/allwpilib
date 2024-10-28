@@ -10,8 +10,7 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Distance;
 
 /**
  * Class for differential drive odometry. Odometry allows you to track the robot's position on the
@@ -55,8 +54,8 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    */
   public DifferentialDriveOdometry(
       Rotation2d gyroAngle,
-      Measure<Distance> leftDistance,
-      Measure<Distance> rightDistance,
+      Distance leftDistance,
+      Distance rightDistance,
       Pose2d initialPoseMeters) {
     this(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), initialPoseMeters);
   }
@@ -70,7 +69,7 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    */
   public DifferentialDriveOdometry(
       Rotation2d gyroAngle, double leftDistanceMeters, double rightDistanceMeters) {
-    this(gyroAngle, leftDistanceMeters, rightDistanceMeters, new Pose2d());
+    this(gyroAngle, leftDistanceMeters, rightDistanceMeters, Pose2d.kZero);
   }
 
   /**
@@ -81,8 +80,8 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    * @param rightDistance The distance traveled by the right encoder.
    */
   public DifferentialDriveOdometry(
-      Rotation2d gyroAngle, Measure<Distance> leftDistance, Measure<Distance> rightDistance) {
-    this(gyroAngle, leftDistance, rightDistance, new Pose2d());
+      Rotation2d gyroAngle, Distance leftDistance, Distance rightDistance) {
+    this(gyroAngle, leftDistance, rightDistance, Pose2d.kZero);
   }
 
   /**
@@ -119,10 +118,7 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    * @param poseMeters The position on the field that your robot is at.
    */
   public void resetPosition(
-      Rotation2d gyroAngle,
-      Measure<Distance> leftDistance,
-      Measure<Distance> rightDistance,
-      Pose2d poseMeters) {
+      Rotation2d gyroAngle, Distance leftDistance, Distance rightDistance, Pose2d poseMeters) {
     resetPosition(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), poseMeters);
   }
 

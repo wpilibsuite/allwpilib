@@ -5,6 +5,9 @@
 #include <jni.h>
 
 #include <cassert>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <wpi/ConvertUTF.h>
@@ -139,6 +142,7 @@ static nt::PubSubOptions FromJavaPubSubOptions(JNIEnv* env, jobject joptions) {
   FIELD(disableRemote, "Z");
   FIELD(disableLocal, "Z");
   FIELD(excludeSelf, "Z");
+  FIELD(hidden, "Z");
 
 #undef FIELD
 
@@ -154,7 +158,8 @@ static nt::PubSubOptions FromJavaPubSubOptions(JNIEnv* env, jobject joptions) {
           FIELD(bool, Boolean, prefixMatch),
           FIELD(bool, Boolean, disableRemote),
           FIELD(bool, Boolean, disableLocal),
-          FIELD(bool, Boolean, excludeSelf)};
+          FIELD(bool, Boolean, excludeSelf),
+          FIELD(bool, Boolean, hidden)};
 
 #undef GET
 #undef FIELD

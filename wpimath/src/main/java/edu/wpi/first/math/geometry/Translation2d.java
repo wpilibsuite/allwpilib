@@ -11,11 +11,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.proto.Translation2dProto;
 import edu.wpi.first.math.geometry.struct.Translation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Collections;
@@ -33,6 +35,13 @@ import java.util.Objects;
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Translation2d
     implements Interpolatable<Translation2d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Translation2d representing the origin.
+   *
+   * <p>This exists to avoid allocations for common translations.
+   */
+  public static final Translation2d kZero = new Translation2d();
+
   private final double m_x;
   private final double m_y;
 
@@ -74,8 +83,18 @@ public class Translation2d
    * @param x The x component of the translation.
    * @param y The y component of the translation.
    */
-  public Translation2d(Measure<Distance> x, Measure<Distance> y) {
+  public Translation2d(Distance x, Distance y) {
     this(x.in(Meters), y.in(Meters));
+  }
+
+  /**
+   * Constructs a Translation2d from the provided translation vector's X and Y components. The
+   * values are assumed to be in meters.
+   *
+   * @param vector The translation vector to represent.
+   */
+  public Translation2d(Vector<N2> vector) {
+    this(vector.get(0), vector.get(1));
   }
 
   /**
@@ -108,6 +127,33 @@ public class Translation2d
   @JsonProperty
   public double getY() {
     return m_y;
+  }
+
+  /**
+   * Returns the X component of the translation in a measure.
+   *
+   * @return The x component of the translation in a measure.
+   */
+  public Distance getMeasureX() {
+    return Meters.of(m_x);
+  }
+
+  /**
+   * Returns the Y component of the translation in a measure.
+   *
+   * @return The y component of the translation in a measure.
+   */
+  public Distance getMeasureY() {
+    return Meters.of(m_y);
+  }
+
+  /**
+   * Returns a vector representation of this translation.
+   *
+   * @return A Vector representation of this translation.
+   */
+  public Vector<N2> toVector() {
+    return VecBuilder.fill(m_x, m_y);
   }
 
   /**
@@ -148,6 +194,24 @@ public class Translation2d
   public Translation2d rotateBy(Rotation2d other) {
     return new Translation2d(
         m_x * other.getCos() - m_y * other.getSin(), m_x * other.getSin() + m_y * other.getCos());
+  }
+
+  /**
+   * Rotates this translation around another translation in 2D space.
+   *
+   * <pre>
+   * [x_new]   [rot.cos, -rot.sin][x - other.x]   [other.x]
+   * [y_new] = [rot.sin,  rot.cos][y - other.y] + [other.y]
+   * </pre>
+   *
+   * @param other The other translation to rotate around.
+   * @param rot The rotation to rotate the translation by.
+   * @return The new rotated translation.
+   */
+  public Translation2d rotateAround(Translation2d other, Rotation2d rot) {
+    return new Translation2d(
+        (m_x - other.getX()) * rot.getCos() - (m_y - other.getY()) * rot.getSin() + other.getX(),
+        (m_x - other.getX()) * rot.getSin() + (m_y - other.getY()) * rot.getCos() + other.getY());
   }
 
   /**
@@ -231,11 +295,9 @@ public class Translation2d
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Translation2d) {
-      return Math.abs(((Translation2d) obj).m_x - m_x) < 1E-9
-          && Math.abs(((Translation2d) obj).m_y - m_y) < 1E-9;
-    }
-    return false;
+    return obj instanceof Translation2d other
+        && Math.abs(other.m_x - m_x) < 1E-9
+        && Math.abs(other.m_y - m_y) < 1E-9;
   }
 
   @Override

@@ -56,6 +56,7 @@ public class LinearFilter {
   private final DoubleCircularBuffer m_outputs;
   private final double[] m_inputGains;
   private final double[] m_outputGains;
+  private double m_lastOutput;
 
   private static int instances;
 
@@ -310,7 +311,17 @@ public class LinearFilter {
       m_outputs.addFirst(retVal);
     }
 
+    m_lastOutput = retVal;
     return retVal;
+  }
+
+  /**
+   * Returns the last value calculated by the LinearFilter.
+   *
+   * @return The last value.
+   */
+  public double lastValue() {
+    return m_lastOutput;
   }
 
   /**

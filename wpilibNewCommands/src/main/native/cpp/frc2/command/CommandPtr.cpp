@@ -4,6 +4,10 @@
 
 #include "frc2/command/CommandPtr.h"
 
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include <frc/Errors.h>
 
 #include "frc2/command/CommandScheduler.h"
@@ -12,7 +16,6 @@
 #include "frc2/command/ParallelCommandGroup.h"
 #include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/PrintCommand.h"
 #include "frc2/command/ProxyCommand.h"
 #include "frc2/command/RepeatCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
@@ -132,8 +135,8 @@ CommandPtr CommandPtr::BeforeStarting(CommandPtr&& before) && {
 CommandPtr CommandPtr::WithTimeout(units::second_t duration) && {
   AssertValid();
   std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(std::make_unique<WaitCommand>(duration));
   temp.emplace_back(std::move(m_ptr));
+  temp.emplace_back(std::make_unique<WaitCommand>(duration));
   m_ptr = std::make_unique<ParallelRaceGroup>(std::move(temp));
   return std::move(*this);
 }
@@ -141,8 +144,8 @@ CommandPtr CommandPtr::WithTimeout(units::second_t duration) && {
 CommandPtr CommandPtr::Until(std::function<bool()> condition) && {
   AssertValid();
   std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));
   temp.emplace_back(std::move(m_ptr));
+  temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));
   m_ptr = std::make_unique<ParallelRaceGroup>(std::move(temp));
   return std::move(*this);
 }
@@ -166,6 +169,15 @@ CommandPtr CommandPtr::OnlyIf(std::function<bool()> condition) && {
 }
 
 CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {
+  AssertValid();
+  std::vector<std::unique_ptr<Command>> vec;
+  vec.emplace_back(std::move(parallel).Unwrap());
+  m_ptr =
+      std::make_unique<ParallelDeadlineGroup>(std::move(m_ptr), std::move(vec));
+  return std::move(*this);
+}
+
+CommandPtr CommandPtr::DeadlineFor(CommandPtr&& parallel) && {
   AssertValid();
   std::vector<std::unique_ptr<Command>> vec;
   vec.emplace_back(std::move(parallel).Unwrap());

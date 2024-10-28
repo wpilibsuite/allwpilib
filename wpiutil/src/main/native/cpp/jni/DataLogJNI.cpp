@@ -4,25 +4,43 @@
 
 #include <jni.h>
 
+#include <algorithm>
+#include <string>
+#include <vector>
+
 #include <fmt/format.h>
 
 #include "WPIUtilJNI.h"
 #include "edu_wpi_first_util_datalog_DataLogJNI.h"
 #include "wpi/DataLog.h"
+#include "wpi/DataLogBackgroundWriter.h"
+#include "wpi/DataLogWriter.h"
 #include "wpi/jni_util.h"
 
 using namespace wpi::java;
 using namespace wpi::log;
 
+namespace {
+class buf_ostream : public wpi::raw_uvector_ostream {
+ private:
+  std::vector<uint8_t> data;
+
+ public:
+  buf_ostream() : raw_uvector_ostream{data} {}
+
+  void clear() { data.clear(); }
+};
+}  // namespace
+
 extern "C" {
 
 /*
  * Class:     edu_wpi_first_util_datalog_DataLogJNI
- * Method:    create
+ * Method:    bgCreate
  * Signature: (Ljava/lang/String;Ljava/lang/String;DLjava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_create
+Java_edu_wpi_first_util_datalog_DataLogJNI_bgCreate
   (JNIEnv* env, jclass, jstring dir, jstring filename, jdouble period,
    jstring extraHeader)
 {
@@ -38,18 +56,18 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_create
     wpi::ThrowNullPointerException(env, "extraHeader is null");
     return 0;
   }
-  return reinterpret_cast<jlong>(new DataLog{JStringRef{env, dir},
-                                             JStringRef{env, filename}, period,
-                                             JStringRef{env, extraHeader}});
+  return reinterpret_cast<jlong>(new DataLogBackgroundWriter{
+      JStringRef{env, dir}, JStringRef{env, filename}, period,
+      JStringRef{env, extraHeader}});
 }
 
 /*
  * Class:     edu_wpi_first_util_datalog_DataLogJNI
- * Method:    setFilename
+ * Method:    bgSetFilename
  * Signature: (JLjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_setFilename
+Java_edu_wpi_first_util_datalog_DataLogJNI_bgSetFilename
   (JNIEnv* env, jclass, jlong impl, jstring filename)
 {
   if (impl == 0) {
@@ -60,7 +78,54 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_setFilename
     wpi::ThrowNullPointerException(env, "filename is null");
     return;
   }
-  reinterpret_cast<DataLog*>(impl)->SetFilename(JStringRef{env, filename});
+  reinterpret_cast<DataLogBackgroundWriter*>(impl)->SetFilename(
+      JStringRef{env, filename});
+}
+
+/*
+ * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Method:    fgCreate
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_util_datalog_DataLogJNI_fgCreate
+  (JNIEnv* env, jclass, jstring filename, jstring extraHeader)
+{
+  if (!filename) {
+    wpi::ThrowNullPointerException(env, "filename is null");
+    return 0;
+  }
+  if (!extraHeader) {
+    wpi::ThrowNullPointerException(env, "extraHeader is null");
+    return 0;
+  }
+  std::error_code ec;
+  auto writer = new DataLogWriter{JStringRef{env, filename}, ec,
+                                  JStringRef{env, extraHeader}};
+  if (ec) {
+    wpi::ThrowIOException(env, ec.message());
+    delete writer;
+    return 0;
+  }
+  return reinterpret_cast<jlong>(writer);
+}
+
+/*
+ * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Method:    fgCreateMemory
+ * Signature: (Ljava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_util_datalog_DataLogJNI_fgCreateMemory
+  (JNIEnv* env, jclass, jstring extraHeader)
+{
+  if (!extraHeader) {
+    wpi::ThrowNullPointerException(env, "extraHeader is null");
+    return 0;
+  }
+  auto writer = new DataLogWriter{std::make_unique<buf_ostream>(),
+                                  JStringRef{env, extraHeader}};
+  return reinterpret_cast<jlong>(writer);
 }
 
 /*
@@ -77,6 +142,33 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_flush
     return;
   }
   reinterpret_cast<DataLog*>(impl)->Flush();
+}
+
+/*
+ * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Method:    copyWriteBuffer
+ * Signature: (J[BI)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_util_datalog_DataLogJNI_copyWriteBuffer
+  (JNIEnv* env, jclass, jlong impl, jbyteArray buf, jint start)
+{
+  if (impl == 0) {
+    wpi::ThrowNullPointerException(env, "impl is null");
+    return 0;
+  }
+  auto writer = reinterpret_cast<DataLogWriter*>(impl);
+  writer->Flush();
+  auto& stream = static_cast<buf_ostream&>(writer->GetStream());
+  JSpan<jbyte> jbuf{env, buf};
+  auto arr = stream.array();
+  if (start < 0 || static_cast<size_t>(start) >= arr.size()) {
+    stream.clear();
+    return 0;
+  }
+  size_t qty = (std::min)(jbuf.size(), arr.size() - start);
+  std::copy(arr.begin(), arr.begin() + qty, jbuf.begin());
+  return qty;
 }
 
 /*

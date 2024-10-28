@@ -140,13 +140,9 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Quaternion) {
-      var other = (Quaternion) obj;
-
-      return Math.abs(dot(other) - norm() * other.norm()) < 1e-9
-          && Math.abs(norm() - other.norm()) < 1e-9;
-    }
-    return false;
+    return obj instanceof Quaternion other
+        && Math.abs(dot(other) - norm() * other.norm()) < 1e-9
+        && Math.abs(norm() - other.norm()) < 1e-9;
   }
 
   @Override
@@ -285,11 +281,12 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    * @return The logarithm of this quaternion.
    */
   public Quaternion log() {
-    var scalar = Math.log(norm());
+    var norm = norm();
+    var scalar = Math.log(norm);
 
     var v_norm = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
 
-    var s_norm = getW() / norm();
+    var s_norm = getW() / norm;
 
     if (Math.abs(s_norm + 1) < 1e-9) {
       return new Quaternion(scalar, -Math.PI, 0, 0);
@@ -298,7 +295,9 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
     double v_scalar;
 
     if (v_norm < 1e-9) {
-      // Taylor series expansion of atan2(y / x) / y around y = 0 => 1/x - y²/3*x³ + O(y⁴)
+      // Taylor series expansion of atan2(y/x)/y at y = 0:
+      //
+      //   1/x - 1/3 y²/x³ + O(y⁴)
       v_scalar = 1.0 / getW() - 1.0 / 3.0 * v_norm * v_norm / (getW() * getW() * getW());
     } else {
       v_scalar = Math.atan2(v_norm, getW()) / v_norm;

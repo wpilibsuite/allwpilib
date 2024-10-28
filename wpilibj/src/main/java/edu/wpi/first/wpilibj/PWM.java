@@ -211,22 +211,14 @@ public class PWM implements Sendable, AutoCloseable {
    * @param mult The period multiplier to apply to this channel
    */
   public void setPeriodMultiplier(PeriodMultiplier mult) {
-    switch (mult) {
-      case k4X:
-        // Squelch 3 out of 4 outputs
-        PWMJNI.setPWMPeriodScale(m_handle, 3);
-        break;
-      case k2X:
-        // Squelch 1 out of 2 outputs
-        PWMJNI.setPWMPeriodScale(m_handle, 1);
-        break;
-      case k1X:
-        // Don't squelch any outputs
-        PWMJNI.setPWMPeriodScale(m_handle, 0);
-        break;
-      default:
-        // Cannot hit this, limited by PeriodMultiplier enum
-    }
+    int scale =
+        switch (mult) {
+          case k4X -> 3; // Squelch 3 out of 4 outputs
+          case k2X -> 1; // Squelch 1 out of 2 outputs
+          case k1X -> 0; // Don't squelch any outputs
+        };
+
+    PWMJNI.setPWMPeriodScale(m_handle, scale);
   }
 
   /** Latches PWM to zero. */

@@ -21,7 +21,13 @@ struct CANStatus {
   int transmitErrorCount;
 };
 
-enum RadioLEDState { kOff = 0, kGreen = 1, kRed = 2, kOrange = 3 };
+/** State for the radio led. */
+enum RadioLEDState {
+  kOff = 0,    ///< Off.
+  kGreen = 1,  ///< Green.
+  kRed = 2,    ///< Red.
+  kOrange = 3  ///< Orange.
+};
 
 class RobotController {
  public:
@@ -116,6 +122,14 @@ class RobotController {
   static bool IsBrownedOut();
 
   /**
+   * Gets the number of times the system has been disabled due to communication
+   * errors with the Driver Station.
+   *
+   * @return number of disables due to communication errors.
+   */
+  static int GetCommsDisableCount();
+
+  /**
    * Gets the current state of the Robot Signal Light (RSL)
    * @return The current state of the RSL- true if on, false if off
    */
@@ -174,7 +188,7 @@ class RobotController {
 
   /**
    * Get the count of the total current faults on the 3.3V rail since the
-   * controller has booted.
+   * code started.
    *
    * @return The number of faults
    */
@@ -212,7 +226,7 @@ class RobotController {
 
   /**
    * Get the count of the total current faults on the 5V rail since the
-   * controller has booted.
+   * code started.
    *
    * @return The number of faults
    */
@@ -250,11 +264,14 @@ class RobotController {
 
   /**
    * Get the count of the total current faults on the 6V rail since the
-   * controller has booted.
+   * code started.
    *
    * @return The number of faults.
    */
   static int GetFaultCount6V();
+
+  /** Reset the overcurrent fault counters for all user rails to 0. */
+  static void ResetRailFaultCounts();
 
   /**
    * Get the current brownout voltage setting.

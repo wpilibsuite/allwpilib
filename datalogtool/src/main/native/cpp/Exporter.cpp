@@ -6,16 +6,19 @@
 
 #include <atomic>
 #include <ctime>
+#include <functional>
 #include <future>
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 #include <glass/Storage.h>
 #include <glass/support/DataLogReaderThread.h>
 #include <imgui.h>
@@ -30,6 +33,7 @@
 #include <wpi/fmt/raw_ostream.h>
 #include <wpi/fs.h>
 #include <wpi/mutex.h>
+#include <wpi/print.h>
 #include <wpi/raw_ostream.h>
 
 #include "App.h"
@@ -178,17 +182,16 @@ InputFile::~InputFile() {
 }
 
 static std::unique_ptr<InputFile> LoadDataLog(std::string_view filename) {
-  std::error_code ec;
-  auto buf = wpi::MemoryBuffer::GetFile(filename, ec);
-  std::string fn{filename};
-  if (ec) {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(filename);
+  if (!fileBuffer) {
     return std::make_unique<InputFile>(
-        fn, fmt::format("Could not open file: {}", ec.message()));
+        filename,
+        fmt::format("Could not open file: {}", fileBuffer.error().message()));
   }
 
-  wpi::log::DataLogReader reader{std::move(buf)};
+  wpi::log::DataLogReader reader{std::move(*fileBuffer)};
   if (!reader.IsValid()) {
-    return std::make_unique<InputFile>(fn, "Not a valid datalog file");
+    return std::make_unique<InputFile>(filename, "Not a valid datalog file");
   }
 
   return std::make_unique<InputFile>(
@@ -457,21 +460,21 @@ static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
     int64_t val;
     if (record.GetInteger(&val)) {
       std::time_t timeval = val / 1000000;
-      fmt::print(os, "{:%Y-%m-%d %H:%M:%S}.{:06}", *std::localtime(&timeval),
+      wpi::print(os, "{:%Y-%m-%d %H:%M:%S}.{:06}", *std::localtime(&timeval),
                  val % 1000000);
       return;
     }
   } else if (entry.type == "double") {
     double val;
     if (record.GetDouble(&val)) {
-      fmt::print(os, "{}", val);
+      wpi::print(os, "{}", val);
       return;
     }
   } else if (entry.type == "int64" || entry.type == "int") {
     // support "int" for compatibility with old NT4 datalogs
     int64_t val;
     if (record.GetInteger(&val)) {
-      fmt::print(os, "{}", val);
+      wpi::print(os, "{}", val);
       return;
     }
   } else if (entry.type == "string" || entry.type == "json") {
@@ -484,31 +487,31 @@ static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
   } else if (entry.type == "boolean") {
     bool val;
     if (record.GetBoolean(&val)) {
-      fmt::print(os, "{}", val);
+      wpi::print(os, "{}", val);
       return;
     }
   } else if (entry.type == "boolean[]") {
     std::vector<int> val;
     if (record.GetBooleanArray(&val)) {
-      fmt::print(os, "{}", fmt::join(val, ";"));
+      wpi::print(os, "{}", fmt::join(val, ";"));
       return;
     }
   } else if (entry.type == "double[]") {
     std::vector<double> val;
     if (record.GetDoubleArray(&val)) {
-      fmt::print(os, "{}", fmt::join(val, ";"));
+      wpi::print(os, "{}", fmt::join(val, ";"));
       return;
     }
   } else if (entry.type == "float[]") {
     std::vector<float> val;
     if (record.GetFloatArray(&val)) {
-      fmt::print(os, "{}", fmt::join(val, ";"));
+      wpi::print(os, "{}", fmt::join(val, ";"));
       return;
     }
   } else if (entry.type == "int64[]") {
     std::vector<int64_t> val;
     if (record.GetIntegerArray(&val)) {
-      fmt::print(os, "{}", fmt::join(val, ";"));
+      wpi::print(os, "{}", fmt::join(val, ";"));
       return;
     }
   } else if (entry.type == "string[]") {
@@ -527,7 +530,7 @@ static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
       return;
     }
   }
-  fmt::print(os, "<invalid>");
+  wpi::print(os, "<invalid>");
 }
 
 static void ExportCsvFile(InputFile& f, wpi::raw_ostream& os, int style) {
@@ -575,13 +578,13 @@ static void ExportCsvFile(InputFile& f, wpi::raw_ostream& os, int style) {
       Entry* entry = entryIt->second;
 
       if (style == 0) {
-        fmt::print(os, "{},\"", record.GetTimestamp() / 1000000.0);
+        wpi::print(os, "{},\"", record.GetTimestamp() / 1000000.0);
         PrintEscapedCsvString(os, entry->name);
         os << '"' << ',';
         ValueToCsv(os, *entry, record);
         os << '\n';
       } else if (style == 1 && entry->column != -1) {
-        fmt::print(os, "{},", record.GetTimestamp() / 1000000.0);
+        wpi::print(os, "{},", record.GetTimestamp() / 1000000.0);
         for (int i = 0; i < entry->column; ++i) {
           os << ',';
         }

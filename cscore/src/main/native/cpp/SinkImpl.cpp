@@ -4,11 +4,15 @@
 
 #include "SinkImpl.h"
 
+#include <string>
+
+#include <wpi/SmallString.h>
 #include <wpi/json.h>
 
 #include "Instance.h"
 #include "Notifier.h"
 #include "SourceImpl.h"
+#include "c_util.h"
 
 using namespace cs;
 
@@ -195,3 +199,64 @@ void SinkImpl::UpdatePropertyValue(int property, bool setString, int value,
 }
 
 void SinkImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {}
+
+namespace cs {
+static constexpr unsigned SinkMask = CS_SINK_CV | CS_SINK_RAW;
+
+void SetSinkDescription(CS_Sink sink, std::string_view description,
+                        CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data || (data->kind & SinkMask) == 0) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  data->sink->SetDescription(description);
+}
+
+std::string GetSinkError(CS_Sink sink, CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data || (data->kind & SinkMask) == 0) {
+    *status = CS_INVALID_HANDLE;
+    return std::string{};
+  }
+  return data->sink->GetError();
+}
+
+std::string_view GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
+                              CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data || (data->kind & SinkMask) == 0) {
+    *status = CS_INVALID_HANDLE;
+    return {};
+  }
+  return data->sink->GetError(buf);
+}
+
+void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data || (data->kind & SinkMask) == 0) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  data->sink->SetEnabled(enabled);
+}
+
+}  // namespace cs
+
+extern "C" {
+void CS_SetSinkDescription(CS_Sink sink, const struct WPI_String* description,
+                           CS_Status* status) {
+  return cs::SetSinkDescription(sink, wpi::to_string_view(description), status);
+}
+
+void CS_GetSinkError(CS_Sink sink, struct WPI_String* error,
+                     CS_Status* status) {
+  wpi::SmallString<128> buf;
+  cs::ConvertToC(error, cs::GetSinkError(sink, buf, status));
+}
+
+void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status) {
+  return cs::SetSinkEnabled(sink, enabled, status);
+}
+
+}  // extern "C"

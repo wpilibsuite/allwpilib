@@ -6,6 +6,7 @@ package edu.wpi.first.cscore;
 
 /** A source that represents a MJPEG-over-HTTP (IP) camera. */
 public class HttpCamera extends VideoCamera {
+  /** HTTP camera kind. */
   public enum HttpCameraKind {
     /** Unknown camera kind. */
     kUnknown(0),
@@ -22,6 +23,11 @@ public class HttpCamera extends VideoCamera {
       this.value = value;
     }
 
+    /**
+     * Returns HttpCameraKind value.
+     *
+     * @return HttpCameraKind value.
+     */
     public int getValue() {
       return value;
     }
@@ -34,16 +40,12 @@ public class HttpCamera extends VideoCamera {
    * @return The kind
    */
   public static HttpCameraKind getHttpCameraKindFromInt(int kind) {
-    switch (kind) {
-      case 1:
-        return HttpCameraKind.kMJPGStreamer;
-      case 2:
-        return HttpCameraKind.kCSCore;
-      case 3:
-        return HttpCameraKind.kAxis;
-      default:
-        return HttpCameraKind.kUnknown;
-    }
+    return switch (kind) {
+      case 1 -> HttpCameraKind.kMJPGStreamer;
+      case 2 -> HttpCameraKind.kCSCore;
+      case 3 -> HttpCameraKind.kAxis;
+      default -> HttpCameraKind.kUnknown;
+    };
   }
 
   /**

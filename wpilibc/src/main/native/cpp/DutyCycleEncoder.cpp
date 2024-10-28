@@ -4,111 +4,142 @@
 
 #include "frc/DutyCycleEncoder.h"
 
+#include <memory>
+#include <utility>
+
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 
-#include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/DigitalSource.h"
 #include "frc/DutyCycle.h"
-#include "frc/Errors.h"
+#include "frc/MathUtil.h"
 
 using namespace frc;
 
 DutyCycleEncoder::DutyCycleEncoder(int channel)
     : m_dutyCycle{std::make_shared<DutyCycle>(
           std::make_shared<DigitalInput>(channel))} {
-  Init();
+  Init(1.0, 0.0);
 }
 
 DutyCycleEncoder::DutyCycleEncoder(DutyCycle& dutyCycle)
     : m_dutyCycle{&dutyCycle, wpi::NullDeleter<DutyCycle>{}} {
-  Init();
+  Init(1.0, 0.0);
 }
 
 DutyCycleEncoder::DutyCycleEncoder(DutyCycle* dutyCycle)
     : m_dutyCycle{dutyCycle, wpi::NullDeleter<DutyCycle>{}} {
-  Init();
+  Init(1.0, 0.0);
 }
 
 DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle)
     : m_dutyCycle{std::move(dutyCycle)} {
-  Init();
+  Init(1.0, 0.0);
 }
 
 DutyCycleEncoder::DutyCycleEncoder(DigitalSource& digitalSource)
     : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
-  Init();
+  Init(1.0, 0.0);
 }
 
 DutyCycleEncoder::DutyCycleEncoder(DigitalSource* digitalSource)
     : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
-  Init();
+  Init(1.0, 0.0);
 }
 
 DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource)
     : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
-  Init();
+  Init(1.0, 0.0);
 }
 
-void DutyCycleEncoder::Init() {
+DutyCycleEncoder::DutyCycleEncoder(int channel, double fullRange,
+                                   double expectedZero)
+    : m_dutyCycle{std::make_shared<DutyCycle>(
+          std::make_shared<DigitalInput>(channel))} {
+  Init(fullRange, expectedZero);
+}
+
+DutyCycleEncoder::DutyCycleEncoder(DutyCycle& dutyCycle, double fullRange,
+                                   double expectedZero)
+    : m_dutyCycle{&dutyCycle, wpi::NullDeleter<DutyCycle>{}} {
+  Init(fullRange, expectedZero);
+}
+
+DutyCycleEncoder::DutyCycleEncoder(DutyCycle* dutyCycle, double fullRange,
+                                   double expectedZero)
+    : m_dutyCycle{dutyCycle, wpi::NullDeleter<DutyCycle>{}} {
+  Init(fullRange, expectedZero);
+}
+
+DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle,
+                                   double fullRange, double expectedZero)
+    : m_dutyCycle{std::move(dutyCycle)} {
+  Init(fullRange, expectedZero);
+}
+
+DutyCycleEncoder::DutyCycleEncoder(DigitalSource& digitalSource,
+                                   double fullRange, double expectedZero)
+    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
+  Init(fullRange, expectedZero);
+}
+
+DutyCycleEncoder::DutyCycleEncoder(DigitalSource* digitalSource,
+                                   double fullRange, double expectedZero)
+    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
+  Init(fullRange, expectedZero);
+}
+
+DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource,
+                                   double fullRange, double expectedZero)
+    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
+  Init(fullRange, expectedZero);
+}
+
+void DutyCycleEncoder::Init(double fullRange, double expectedZero) {
   m_simDevice = hal::SimDevice{"DutyCycle:DutyCycleEncoder",
                                m_dutyCycle->GetSourceChannel()};
 
   if (m_simDevice) {
-    m_simPosition =
-        m_simDevice.CreateDouble("position", hal::SimDevice::kInput, 0.0);
-    m_simDistancePerRotation = m_simDevice.CreateDouble(
-        "distance_per_rot", hal::SimDevice::kOutput, 1.0);
-    m_simAbsolutePosition =
-        m_simDevice.CreateDouble("absPosition", hal::SimDevice::kInput, 0.0);
+    m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
     m_simIsConnected =
-        m_simDevice.CreateBoolean("connected", hal::SimDevice::kInput, true);
-  } else {
-    m_analogTrigger = std::make_unique<AnalogTrigger>(m_dutyCycle.get());
-    m_analogTrigger->SetLimitsDutyCycle(0.25, 0.75);
-    m_counter = std::make_unique<Counter>();
-    m_counter->SetUpSource(
-        m_analogTrigger->CreateOutput(AnalogTriggerType::kRisingPulse));
-    m_counter->SetDownSource(
-        m_analogTrigger->CreateOutput(AnalogTriggerType::kFallingPulse));
+        m_simDevice.CreateBoolean("Connected", hal::SimDevice::kInput, true);
   }
+
+  m_fullRange = fullRange;
+  m_expectedZero = expectedZero;
 
   wpi::SendableRegistry::AddLW(this, "DutyCycle Encoder",
                                m_dutyCycle->GetSourceChannel());
 }
 
-static bool DoubleEquals(double a, double b) {
-  constexpr double epsilon = 0.00001;
-  return std::abs(a - b) < epsilon;
-}
-
-units::turn_t DutyCycleEncoder::Get() const {
+double DutyCycleEncoder::Get() const {
   if (m_simPosition) {
-    return units::turn_t{m_simPosition.Get()};
+    return m_simPosition.Get();
   }
 
-  // As the values are not atomic, keep trying until we get 2 reads of the same
-  // value If we don't within 10 attempts, error
-  for (int i = 0; i < 10; i++) {
-    auto counter = m_counter->Get();
-    auto pos = m_dutyCycle->GetOutput();
-    auto counter2 = m_counter->Get();
-    auto pos2 = m_dutyCycle->GetOutput();
-    if (counter == counter2 && DoubleEquals(pos, pos2)) {
-      // map sensor range
-      pos = MapSensorRange(pos);
-      units::turn_t turns{counter + pos - m_positionOffset};
-      m_lastPosition = turns;
-      return turns;
-    }
+  double pos;
+  // Compute output percentage (0-1)
+  if (m_period.value() == 0.0) {
+    pos = m_dutyCycle->GetOutput();
+  } else {
+    auto highTime = m_dutyCycle->GetHighTime();
+    pos = highTime / m_period;
   }
 
-  FRC_ReportError(
-      warn::Warning,
-      "Failed to read DutyCycle Encoder. Potential Speed Overrun. Returning "
-      "last value");
-  return m_lastPosition;
+  // Map sensor range if range isn't full
+  pos = MapSensorRange(pos);
+
+  // Compute full range and offset
+  pos = pos * m_fullRange - m_expectedZero;
+
+  // Map from 0 - Full Range
+  double result = InputModulus(pos, 0.0, m_fullRange);
+  // Invert if necessary
+  if (m_isInverted) {
+    return m_fullRange - result;
+  }
+  return result;
 }
 
 double DutyCycleEncoder::MapSensorRange(double pos) const {
@@ -122,52 +153,13 @@ double DutyCycleEncoder::MapSensorRange(double pos) const {
   return pos;
 }
 
-double DutyCycleEncoder::GetAbsolutePosition() const {
-  if (m_simAbsolutePosition) {
-    return m_simAbsolutePosition.Get();
-  }
-
-  return MapSensorRange(m_dutyCycle->GetOutput());
-}
-
-double DutyCycleEncoder::GetPositionOffset() const {
-  return m_positionOffset;
-}
-
-void DutyCycleEncoder::SetPositionOffset(double offset) {
-  m_positionOffset = std::clamp(offset, 0.0, 1.0);
-}
-
 void DutyCycleEncoder::SetDutyCycleRange(double min, double max) {
   m_sensorMin = std::clamp(min, 0.0, 1.0);
   m_sensorMax = std::clamp(max, 0.0, 1.0);
 }
 
-void DutyCycleEncoder::SetDistancePerRotation(double distancePerRotation) {
-  m_distancePerRotation = distancePerRotation;
-  m_simDistancePerRotation.Set(distancePerRotation);
-}
-
-double DutyCycleEncoder::GetDistancePerRotation() const {
-  return m_distancePerRotation;
-}
-
-double DutyCycleEncoder::GetDistance() const {
-  return Get().value() * GetDistancePerRotation();
-}
-
 int DutyCycleEncoder::GetFrequency() const {
   return m_dutyCycle->GetFrequency();
-}
-
-void DutyCycleEncoder::Reset() {
-  if (m_counter) {
-    m_counter->Reset();
-  }
-  if (m_simPosition) {
-    m_simPosition.Set(0);
-  }
-  m_positionOffset = GetAbsolutePosition();
 }
 
 bool DutyCycleEncoder::IsConnected() const {
@@ -184,6 +176,18 @@ void DutyCycleEncoder::SetConnectedFrequencyThreshold(int frequency) {
   m_frequencyThreshold = frequency;
 }
 
+void DutyCycleEncoder::SetInverted(bool inverted) {
+  m_isInverted = inverted;
+}
+
+void DutyCycleEncoder::SetAssumedFrequency(units::hertz_t frequency) {
+  if (frequency.value() == 0) {
+    m_period = 0_s;
+  } else {
+    m_period = 1.0 / frequency;
+  }
+}
+
 int DutyCycleEncoder::GetFPGAIndex() const {
   return m_dutyCycle->GetFPGAIndex();
 }
@@ -195,10 +199,7 @@ int DutyCycleEncoder::GetSourceChannel() const {
 void DutyCycleEncoder::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder");
   builder.AddDoubleProperty(
-      "Distance", [this] { return this->GetDistance(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Distance Per Rotation",
-      [this] { return this->GetDistancePerRotation(); }, nullptr);
+      "Position", [this] { return this->Get(); }, nullptr);
   builder.AddDoubleProperty(
       "Is Connected", [this] { return this->IsConnected(); }, nullptr);
 }

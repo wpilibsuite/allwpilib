@@ -16,8 +16,8 @@ public class MecanumDriveKinematicsStruct implements Struct<MecanumDriveKinemati
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:MecanumDriveKinematics";
+  public String getTypeName() {
+    return "MecanumDriveKinematics";
   }
 
   @Override

@@ -2,6 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <memory>
+
+#include "glass/networktables/NTAlerts.h"
 #include "glass/networktables/NTCommandScheduler.h"
 #include "glass/networktables/NTCommandSelector.h"
 #include "glass/networktables/NTDifferentialDrive.h"
@@ -22,6 +25,16 @@
 using namespace glass;
 
 void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
+  provider.Register(
+      NTAlertsModel::kType,
+      [](nt::NetworkTableInstance inst, const char* path) {
+        return std::make_unique<NTAlertsModel>(inst, path);
+      },
+      [](Window* win, Model* model, const char*) {
+        win->SetDefaultSize(300, 150);
+        return MakeFunctionView(
+            [=] { DisplayAlerts(static_cast<NTAlertsModel*>(model)); });
+      });
   provider.Register(
       NTCommandSchedulerModel::kType,
       [](nt::NetworkTableInstance inst, const char* path) {
@@ -63,7 +76,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
       [](Window* win, Model* model, const char*) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         return MakeFunctionView(
-            [=] { DisplayFMS(static_cast<FMSModel*>(model)); });
+            [=] { DisplayFMS(static_cast<FMSModel*>(model), true); });
       });
   provider.Register(
       NTDigitalInputModel::kType,

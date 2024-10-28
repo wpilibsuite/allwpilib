@@ -5,15 +5,17 @@
 #include "sysid/analysis/AnalysisManager.h"
 
 #include <cmath>
-#include <functional>
+#include <limits>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <units/angle.h>
 #include <wpi/MathExtras.h>
-#include <wpi/MemoryBuffer.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 
+#include "sysid/analysis/FeedforwardAnalysis.h"
 #include "sysid/analysis/FilteringUtils.h"
 
 using namespace sysid;
@@ -172,8 +174,8 @@ AnalysisManager::AnalysisManager(TestData data, Settings& settings,
                                  wpi::Logger& logger)
     : m_data{std::move(data)}, m_logger{logger}, m_settings{settings} {
   // Reset settings for Dynamic Test Limits
-  m_settings.stepTestDuration = units::second_t{0.0};
-  m_settings.motionThreshold = std::numeric_limits<double>::infinity();
+  m_settings.stepTestDuration = 0_s;
+  m_settings.velocityThreshold = std::numeric_limits<double>::infinity();
 }
 
 void AnalysisManager::PrepareData() {
@@ -192,41 +194,90 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
 
   WPI_INFO(m_logger, "{}", "Calculating Gains");
   // Calculate feedforward gains from the data.
-  const auto& ff = sysid::CalculateFeedforwardGains(
-      GetFilteredData(), m_data.mechanismType, false);
-  FeedforwardGains ffGains = {ff};
+  const auto& analysisType = m_data.mechanismType;
+  const auto& ff =
+      sysid::CalculateFeedforwardGains(GetFilteredData(), analysisType, false);
 
   const auto& Ks = ff.coeffs[0];
-  const auto& Kv = ff.coeffs[1];
-  const auto& Ka = ff.coeffs[2];
-
-  if (Ka <= 0 || Kv < 0) {
-    throw InvalidDataError(
-        fmt::format("The calculated feedforward gains of kS: {}, Kv: {}, Ka: "
-                    "{} are erroneous. Your Ka should be > 0 while your Kv and "
-                    "Ks constants should both >= 0. Try adjusting the "
-                    "filtering and trimming settings or collect better data.",
-                    Ks, Kv, Ka));
+  FeedforwardGain KsGain = {
+      .gain = Ks, .descriptor = "Voltage needed to overcome static friction."};
+  if (Ks < 0) {
+    KsGain.isValidGain = false;
+    KsGain.errorMessage = fmt::format(
+        "Calculated Ks gain of: {0:.3f} is erroneous! Ks should be >= 0.", Ks);
   }
 
-  return ffGains;
+  const auto& Kv = ff.coeffs[1];
+  FeedforwardGain KvGain = {
+      .gain = Kv,
+      .descriptor =
+          "Voltage needed to hold/cruise at a constant velocity while "
+          "overcoming the counter-electromotive force and any additional "
+          "friction."};
+  if (Kv < 0) {
+    KvGain.isValidGain = false;
+    KvGain.errorMessage = fmt::format(
+        "Calculated Kv gain of: {0:.3f} is erroneous! Kv should be >= 0.", Kv);
+  }
+
+  const auto& Ka = ff.coeffs[2];
+  FeedforwardGain KaGain = {
+      .gain = Ka,
+      .descriptor =
+          "Voltage needed to induce a given acceleration in the motor shaft."};
+  if (Ka <= 0) {
+    KaGain.isValidGain = false;
+    KaGain.errorMessage = fmt::format(
+        "Calculated Ka gain of: {0:.3f} is erroneous! Ka should be > 0.", Ka);
+  }
+
+  if (analysisType == analysis::kSimple) {
+    return FeedforwardGains{
+        .olsResult = ff, .Ks = KsGain, .Kv = KvGain, .Ka = KaGain};
+  }
+
+  if (analysisType == analysis::kElevator || analysisType == analysis::kArm) {
+    const auto& Kg = ff.coeffs[3];
+    FeedforwardGain KgGain = {
+        Kg, "Voltage needed to counteract the force of gravity."};
+    if (Kg < 0) {
+      KgGain.isValidGain = false;
+      KgGain.errorMessage = fmt::format(
+          "Calculated Kg gain of: {0:.3f} is erroneous! Kg should be >= 0.",
+          Ka);
+    }
+
+    // Elevator analysis only requires Kg
+    if (analysisType == analysis::kElevator) {
+      return FeedforwardGains{.olsResult = ff,
+                              .Ks = KsGain,
+                              .Kv = KvGain,
+                              .Ka = KaGain,
+                              .Kg = KgGain};
+    } else {
+      // Arm analysis requires Kg and an angle offset
+      FeedforwardGain offset = {
+          .gain = ff.coeffs[4],
+          .descriptor =
+              "This is the angle offset which, when added to the angle "
+              "measurement, zeroes it out when the arm is horizontal. This is "
+              "needed for the arm feedforward to work."};
+      return FeedforwardGains{ff, KsGain, KvGain, KaGain, KgGain, offset};
+    }
+  }
+
+  return FeedforwardGains{.olsResult = ff};
 }
 
 sysid::FeedbackGains AnalysisManager::CalculateFeedback(
-    std::vector<double> ff) {
-  const auto& Kv = ff[1];
-  const auto& Ka = ff[2];
+    const FeedforwardGain& Kv, const FeedforwardGain& Ka) {
   FeedbackGains fb;
   if (m_settings.type == FeedbackControllerLoopType::kPosition) {
     fb = sysid::CalculatePositionFeedbackGains(
-        m_settings.preset, m_settings.lqr, Kv, Ka,
-        m_settings.convertGainsToEncTicks ? m_settings.gearing * m_settings.cpr
-                                          : 1);
+        m_settings.preset, m_settings.lqr, Kv.gain, Ka.gain);
   } else {
     fb = sysid::CalculateVelocityFeedbackGains(
-        m_settings.preset, m_settings.lqr, Kv, Ka,
-        m_settings.convertGainsToEncTicks ? m_settings.gearing * m_settings.cpr
-                                          : 1);
+        m_settings.preset, m_settings.lqr, Kv.gain, Ka.gain);
   }
 
   return fb;

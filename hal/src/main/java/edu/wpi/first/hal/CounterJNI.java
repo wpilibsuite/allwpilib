@@ -12,9 +12,16 @@ import java.nio.IntBuffer;
  * @see "hal/Counter.h"
  */
 public class CounterJNI extends JNIWrapper {
+  /** Two pulse mode. */
   public static final int TWO_PULSE = 0;
+
+  /** Semi-period mode. */
   public static final int SEMI_PERIOD = 1;
+
+  /** Pulse length mode. */
   public static final int PULSE_LENGTH = 2;
+
+  /** External direction mode. */
   public static final int EXTERNAL_DIRECTION = 3;
 
   /**

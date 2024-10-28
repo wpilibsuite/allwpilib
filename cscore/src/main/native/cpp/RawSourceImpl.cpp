@@ -4,11 +4,11 @@
 
 #include "RawSourceImpl.h"
 
+#include <memory>
+
 #include <wpi/timestamp.h>
 
-#include "Handle.h"
 #include "Instance.h"
-#include "Log.h"
 #include "Notifier.h"
 #include "cscore_raw.h"
 
@@ -22,62 +22,46 @@ RawSourceImpl::RawSourceImpl(std::string_view name, wpi::Logger& logger,
 RawSourceImpl::~RawSourceImpl() = default;
 
 void RawSourceImpl::PutFrame(const WPI_RawFrame& image) {
-  int type;
-  switch (image.pixelFormat) {
-    case VideoMode::kYUYV:
-    case VideoMode::kRGB565:
-    case VideoMode::kY16:
-    case VideoMode::kUYVY:
-      type = CV_8UC2;
-      break;
-    case VideoMode::kBGR:
-      type = CV_8UC3;
-      break;
-    case VideoMode::kGray:
-    case VideoMode::kMJPEG:
-    default:
-      type = CV_8UC1;
-      break;
-  }
-  cv::Mat finalImage{image.height, image.width, type, image.data,
-                     static_cast<size_t>(image.stride)};
-  std::unique_ptr<Image> dest =
-      AllocImage(static_cast<VideoMode::PixelFormat>(image.pixelFormat),
-                 image.width, image.height, image.size);
-  finalImage.copyTo(dest->AsMat());
-
-  SourceImpl::PutFrame(std::move(dest), wpi::Now());
+  auto currentTime = wpi::Now();
+  std::string_view data_view{reinterpret_cast<char*>(image.data), image.size};
+  SourceImpl::PutFrame(static_cast<VideoMode::PixelFormat>(image.pixelFormat),
+                       image.width, image.height, data_view, currentTime);
 }
 
 namespace cs {
-CS_Source CreateRawSource(std::string_view name, const VideoMode& mode,
-                          CS_Status* status) {
+static constexpr unsigned SourceMask = CS_SOURCE_CV | CS_SOURCE_RAW;
+
+CS_Source CreateRawSource(std::string_view name, bool isCv,
+                          const VideoMode& mode, CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  return inst.CreateSource(CS_SOURCE_RAW, std::make_shared<RawSourceImpl>(
-                                              name, inst.logger, inst.notifier,
-                                              inst.telemetry, mode));
+  return inst.CreateSource(
+      isCv ? CS_SOURCE_CV : CS_SOURCE_RAW,
+      std::make_shared<RawSourceImpl>(name, inst.logger, inst.notifier,
+                                      inst.telemetry, mode));
 }
 
 void PutSourceFrame(CS_Source source, const WPI_RawFrame& image,
                     CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
-  if (!data || data->kind != CS_SOURCE_RAW) {
+  if (!data || (data->kind & SourceMask) == 0) {
     *status = CS_INVALID_HANDLE;
     return;
   }
   static_cast<RawSourceImpl&>(*data->source).PutFrame(image);
 }
+
 }  // namespace cs
 
 extern "C" {
-CS_Source CS_CreateRawSource(const char* name, const CS_VideoMode* mode,
-                             CS_Status* status) {
-  return cs::CreateRawSource(name, static_cast<const cs::VideoMode&>(*mode),
-                             status);
+CS_Source CS_CreateRawSource(const struct WPI_String* name, CS_Bool isCv,
+                             const CS_VideoMode* mode, CS_Status* status) {
+  return cs::CreateRawSource(wpi::to_string_view(name), isCv,
+                             static_cast<const cs::VideoMode&>(*mode), status);
 }
 
 void CS_PutRawSourceFrame(CS_Source source, const struct WPI_RawFrame* image,
                           CS_Status* status) {
   return cs::PutSourceFrame(source, *image, status);
 }
+
 }  // extern "C"

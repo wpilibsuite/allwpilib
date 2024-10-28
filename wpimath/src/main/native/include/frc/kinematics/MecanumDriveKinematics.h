@@ -166,6 +166,12 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
    */
   const Translation2d& GetRearRight() const { return m_rearRightWheel; }
 
+  MecanumDriveWheelPositions Interpolate(
+      const MecanumDriveWheelPositions& start,
+      const MecanumDriveWheelPositions& end, double t) const override {
+    return start.Interpolate(end, t);
+  }
+
  private:
   mutable Matrixd<4, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Matrixd<4, 3>> m_forwardKinematics;
@@ -194,5 +200,7 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
 
 }  // namespace frc
 
+#ifndef NO_PROTOBUF
 #include "frc/kinematics/proto/MecanumDriveKinematicsProto.h"
+#endif
 #include "frc/kinematics/struct/MecanumDriveKinematicsStruct.h"

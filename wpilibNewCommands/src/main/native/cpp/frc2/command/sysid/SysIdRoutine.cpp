@@ -18,11 +18,7 @@ frc2::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
 
   double outputSign = direction == Direction::kForward ? 1.0 : -1.0;
 
-  return m_mechanism.m_subsystem
-      ->RunOnce([this] {
-        timer.Reset();
-        timer.Start();
-      })
+  return m_mechanism.m_subsystem->RunOnce([this] { timer.Restart(); })
       .AndThen(
           m_mechanism.m_subsystem
               ->Run([this, state, outputSign] {

@@ -4,12 +4,13 @@
 
 #include "frc/kinematics/proto/SwerveModuleStateProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "kinematics.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::SwerveModuleState>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufSwerveModuleState>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufSwerveModuleState>(arena);
 }
 
 frc::SwerveModuleState wpi::Protobuf<frc::SwerveModuleState>::Unpack(
@@ -17,7 +18,7 @@ frc::SwerveModuleState wpi::Protobuf<frc::SwerveModuleState>::Unpack(
   auto m = static_cast<const wpi::proto::ProtobufSwerveModuleState*>(&msg);
   return frc::SwerveModuleState{
       units::meters_per_second_t{m->speed()},
-      wpi::UnpackProtobuf<frc::Rotation2d>(m->angle()),
+      wpi::UnpackProtobuf<frc::Rotation2d>(m->wpi_angle()),
   };
 }
 

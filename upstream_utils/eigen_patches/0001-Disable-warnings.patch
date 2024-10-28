@@ -4,24 +4,21 @@ Date: Wed, 18 May 2022 09:14:24 -0700
 Subject: [PATCH 1/2] Disable warnings
 
 ---
- Eigen/src/Core/util/DisableStupidWarnings.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ Eigen/src/Core/util/DisableStupidWarnings.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/Eigen/src/Core/util/DisableStupidWarnings.h b/Eigen/src/Core/util/DisableStupidWarnings.h
-index 32a427d852355a51dc4263d81498554ff4c3cbba..eb259433c054c21accd2b8a5d744638f8004da40 100644
+index 32a427d852355a51dc4263d81498554ff4c3cbba..1182198231ab784346f8d80838363e4a0abba2ba 100644
 --- a/Eigen/src/Core/util/DisableStupidWarnings.h
 +++ b/Eigen/src/Core/util/DisableStupidWarnings.h
-@@ -81,6 +81,15 @@
+@@ -81,6 +81,12 @@
  // See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89325
  #pragma GCC diagnostic ignored "-Wattributes"
  #endif
-+#if __GNUC__>=8
-+#pragma GCC diagnostic ignored "-Wclass-memaccess"
-+#endif
-+#if __GNUC__>=11
++#if __GNUC__ >= 11
 +#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 +#endif
-+#if __GNUC__>=12
++#if __GNUC__ >= 12
 +#pragma GCC diagnostic ignored "-Warray-bounds"
 +#endif
  #endif

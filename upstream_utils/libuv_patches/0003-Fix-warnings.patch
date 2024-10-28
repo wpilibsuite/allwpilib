@@ -10,6 +10,7 @@ Subject: [PATCH 3/9] Fix warnings
  src/threadpool.c    |  4 ++++
  src/unix/core.c     | 12 ++++++++++--
  src/unix/internal.h |  4 ++--
+ src/unix/linux.c    |  2 +-
  src/unix/thread.c   |  6 ------
  src/uv-common.c     |  8 ++++++++
  src/win/fs-event.c  |  2 ++
@@ -18,10 +19,10 @@ Subject: [PATCH 3/9] Fix warnings
  src/win/process.c   |  2 ++
  src/win/thread.c    |  4 ++--
  src/win/tty.c       |  2 ++
- 14 files changed, 47 insertions(+), 14 deletions(-)
+ 15 files changed, 48 insertions(+), 15 deletions(-)
 
 diff --git a/include/uv/win.h b/include/uv/win.h
-index eb74776978340a4910194bae35a9da6493e8c0a6..6d0afe69e7dd4caf4c9459e548fe75cf0c51b501 100644
+index d4c271d4d856a5ec847439825cace5bafb0d4acd..48e1402d155ceb80e35a904815cb5739cab2fbe8 100644
 --- a/include/uv/win.h
 +++ b/include/uv/win.h
 @@ -201,11 +201,16 @@ typedef int (WSAAPI* LPFN_WSARECVFROM)
@@ -42,7 +43,7 @@ index eb74776978340a4910194bae35a9da6493e8c0a6..6d0afe69e7dd4caf4c9459e548fe75cf
    typedef PVOID CONDITION_VARIABLE, *PCONDITION_VARIABLE;
  #endif
 diff --git a/src/idna.c b/src/idna.c
-index 0c952cf605a88136ed9035f9385f9b1080c30c28..fe60fb59bea59986a612cfa1747802b0636482d9 100644
+index 765e12e8f2e030cffa9d498f381c0640aa43a647..17a0e7e74c0204c662594198c1f5b545534ee85e 100644
 --- a/src/idna.c
 +++ b/src/idna.c
 @@ -153,7 +153,7 @@ static int uv__idna_toascii_label(const char* s, const char* se,
@@ -54,7 +55,7 @@ index 0c952cf605a88136ed9035f9385f9b1080c30c28..fe60fb59bea59986a612cfa1747802b0
    unsigned h;
    unsigned k;
    unsigned n;
-@@ -382,7 +382,7 @@ ssize_t uv_wtf8_length_as_utf16(const char* source_ptr) {
+@@ -386,7 +386,7 @@ ssize_t uv_wtf8_length_as_utf16(const char* source_ptr) {
  
  void uv_wtf8_to_utf16(const char* source_ptr,
                        uint16_t* w_target,
@@ -79,7 +80,7 @@ index dd94bea3886ca37945fcad7909d765e3700e3c21..71c9e5b774d64d505e6c6d6ed2637178
  #define UV__INET6_ADDRSTRLEN        46
  
 diff --git a/src/threadpool.c b/src/threadpool.c
-index f572de5aaf1a1b150e58c7b989949441cac279c4..aa282af468935b680140295a175e503ca82d8fa4 100644
+index ccb5249893df2733fc607fec6e8d3037ebe2e212..a08832cd4c292f9e7c83b2e8b6c326f542e49cd8 100644
 --- a/src/threadpool.c
 +++ b/src/threadpool.c
 @@ -27,6 +27,10 @@
@@ -94,10 +95,10 @@ index f572de5aaf1a1b150e58c7b989949441cac279c4..aa282af468935b680140295a175e503c
  
  static uv_once_t once = UV_ONCE_INIT;
 diff --git a/src/unix/core.c b/src/unix/core.c
-index 28c036f94f3e76717afa651451969f128c5a573c..268fc9652f437eb0d0cda2a9e0b06b9e91eb9742 100644
+index b72a24e94b0c70455a8ac748a53556ddefb09f49..18f0ce06336e4b3690f84d95b4be954a4466cdf6 100644
 --- a/src/unix/core.c
 +++ b/src/unix/core.c
-@@ -575,6 +575,16 @@ int uv__accept(int sockfd) {
+@@ -586,6 +586,16 @@ int uv__accept(int sockfd) {
    return peerfd;
  }
  
@@ -114,7 +115,7 @@ index 28c036f94f3e76717afa651451969f128c5a573c..268fc9652f437eb0d0cda2a9e0b06b9e
  
  /* close() on macos has the "interesting" quirk that it fails with EINTR
   * without closing the file descriptor when a thread is in the cancel state.
-@@ -589,10 +599,8 @@ int uv__close_nocancel(int fd) {
+@@ -600,10 +610,8 @@ int uv__close_nocancel(int fd) {
  #pragma GCC diagnostic push
  #pragma GCC diagnostic ignored "-Wdollar-in-identifier-extension"
  #if defined(__LP64__) || TARGET_OS_IPHONE
@@ -126,10 +127,10 @@ index 28c036f94f3e76717afa651451969f128c5a573c..268fc9652f437eb0d0cda2a9e0b06b9e
  #endif
  #pragma GCC diagnostic pop
 diff --git a/src/unix/internal.h b/src/unix/internal.h
-index fe5885136039d5332623467b86bf52cd4b32ca0f..98c437dcadec5b5106d697e82d5394d459f55e47 100644
+index 8d586b0b64a96ca53a18f22d957a81c5600098c1..1daf4d81da3a5bf931c4a5db8fd9116c4c303012 100644
 --- a/src/unix/internal.h
 +++ b/src/unix/internal.h
-@@ -384,8 +384,8 @@ UV_UNUSED(static void uv__update_time(uv_loop_t* loop)) {
+@@ -394,8 +394,8 @@ UV_UNUSED(static void uv__update_time(uv_loop_t* loop)) {
    loop->time = uv__hrtime(UV_CLOCK_FAST) / 1000000;
  }
  
@@ -140,6 +141,19 @@ index fe5885136039d5332623467b86bf52cd4b32ca0f..98c437dcadec5b5106d697e82d5394d4
  
    s = strrchr(path, '/');
    if (s == NULL)
+diff --git a/src/unix/linux.c b/src/unix/linux.c
+index 22f76054ef0987f215afb9d1e20aa18f97489ea4..b8063cc8900d4cf255a46a9620d01815c65c6d21 100644
+--- a/src/unix/linux.c
++++ b/src/unix/linux.c
+@@ -2309,7 +2309,7 @@ static int uv__get_cgroupv2_constrained_cpu(const char* cgroup,
+   if (uv__slurp(path, buf, sizeof(buf)) < 0)
+     return UV_EIO;
+ 
+-  if (sscanf(buf, "%15s %llu", quota_buf, &constraint->period_length) != 2)
++  if (sscanf(buf, "%15s %lld", quota_buf, &constraint->period_length) != 2)
+     return UV_EINVAL;
+ 
+   if (strncmp(quota_buf, "max", 3) == 0)
 diff --git a/src/unix/thread.c b/src/unix/thread.c
 index 20409541de3cb300504b823472a73bc95fa38f62..688c042e1aedf379264900c29758c8b01a4a90ed 100644
 --- a/src/unix/thread.c
@@ -184,7 +198,7 @@ index 69e95801a18104ea910abf86db236d85f62afb66..49126e50f07bac16d198775454b731f4
  static uv_loop_t default_loop_struct;
  static uv_loop_t* default_loop_ptr;
 diff --git a/src/win/fs-event.c b/src/win/fs-event.c
-index 5a07acfe54efe90cf2ab0bca5b5998a961e72ebd..381220bf241d9572ff64576cf25700d9746d2806 100644
+index 3754437b4989d67f688153e066ef047268911708..2fdcbcb73a9ee29dd282b366011a6878fc431a47 100644
 --- a/src/win/fs-event.c
 +++ b/src/win/fs-event.c
 @@ -19,6 +19,8 @@
@@ -197,7 +211,7 @@ index 5a07acfe54efe90cf2ab0bca5b5998a961e72ebd..381220bf241d9572ff64576cf25700d9
  #include <errno.h>
  #include <stdio.h>
 diff --git a/src/win/fs.c b/src/win/fs.c
-index d9c2a4f728c7fb491995c6153b2a63a835b206b7..7df1df2b9ba23c0ecb96e82a6cfcaae824826b69 100644
+index cc095491d7ff14a7f7a850005f02a45860636446..f1966ab5c0245af0f56ca407a1697a5c8609ebb4 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
 @@ -19,6 +19,8 @@
@@ -210,7 +224,7 @@ index d9c2a4f728c7fb491995c6153b2a63a835b206b7..7df1df2b9ba23c0ecb96e82a6cfcaae8
  #include <stdlib.h>
  #include <direct.h>
 diff --git a/src/win/pipe.c b/src/win/pipe.c
-index 0f045a873073cf9b07feb457ea199990df521e5f..b2348bd0430aada98ff10313f6f926ea2f1c4491 100644
+index 9b2723320b72691d5ada0f8e97f0589ce53e82f8..9993f281409345d8163a9c69c103b94e7cb258d3 100644
 --- a/src/win/pipe.c
 +++ b/src/win/pipe.c
 @@ -19,6 +19,8 @@
@@ -223,7 +237,7 @@ index 0f045a873073cf9b07feb457ea199990df521e5f..b2348bd0430aada98ff10313f6f926ea
  #include <io.h>
  #include <stdio.h>
 diff --git a/src/win/process.c b/src/win/process.c
-index 0103004c565bb09b7b9c150e874f9c68486ab26c..eeb0f6a984bb0f61b956cb4b907fbfdb3b4ac7e2 100644
+index 5a648494ae03688f6a56705f2c3d65b026605818..d6b61c14015b8d72d8a9aca71bd0483c06a16820 100644
 --- a/src/win/process.c
 +++ b/src/win/process.c
 @@ -19,6 +19,8 @@
@@ -236,10 +250,10 @@ index 0103004c565bb09b7b9c150e874f9c68486ab26c..eeb0f6a984bb0f61b956cb4b907fbfdb
  #include <io.h>
  #include <stdio.h>
 diff --git a/src/win/thread.c b/src/win/thread.c
-index 57f1698f595e2410a51044f7f228b5a235206819..03b33e9b4de6fe2532095d717a8639e8df454cce 100644
+index dd958ccd782772869d5448d788a563c1526a89f6..6a4d4498577b0abaa8408052051b0472dde5afec 100644
 --- a/src/win/thread.c
 +++ b/src/win/thread.c
-@@ -204,8 +204,8 @@ int uv_thread_setaffinity(uv_thread_t* tid,
+@@ -182,8 +182,8 @@ int uv_thread_setaffinity(uv_thread_t* tid,
    threadmask = 0;
    for (i = 0; i < cpumasksize; i++) {
      if (cpumask[i]) {
@@ -251,7 +265,7 @@ index 57f1698f595e2410a51044f7f228b5a235206819..03b33e9b4de6fe2532095d717a8639e8
          return UV_EINVAL;
      }
 diff --git a/src/win/tty.c b/src/win/tty.c
-index 3aacaaf0b514ba71755dc51f1bd7263de5cbc308..c90995afb6166a7cab0a267f5eb513705ce05148 100644
+index 145706e27a7b596dc003d43d94b54f6ceb0eabee..62ddf32f0fbd29664dd05c6ba426532a2faf4668 100644
 --- a/src/win/tty.c
 +++ b/src/win/tty.c
 @@ -19,6 +19,8 @@

@@ -8,7 +8,7 @@ Subject: [PATCH 5/9] Cleanup problematic language
  1 file changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/src/unix/tty.c b/src/unix/tty.c
-index d099bdb3b677212d21e06ac7bb1031c8e5386499..1bd217b5a15eed13a8349c479b53471dd36ca216 100644
+index 793054ba5a9bffe4e2db9040ca09a7fff0ec6b23..699a092da2dea77277557211065f6594bcad4e0b 100644
 --- a/src/unix/tty.c
 +++ b/src/unix/tty.c
 @@ -79,7 +79,7 @@ int uv__tcsetattr(int fd, int how, const struct termios *term) {

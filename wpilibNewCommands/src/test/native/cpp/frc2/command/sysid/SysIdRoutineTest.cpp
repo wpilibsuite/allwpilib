@@ -5,7 +5,8 @@
 #include <frc2/command/Subsystem.h>
 #include <frc2/command/sysid/SysIdRoutine.h>
 
-#include <numbers>
+#include <utility>
+#include <vector>
 
 #include <frc/Timer.h>
 #include <frc/simulation/SimHooks.h>
@@ -63,6 +64,7 @@ class SysIdRoutineTest : public ::testing::Test {
             log->Motor("Mock Motor").position(0_m).velocity(0_mps).voltage(0_V);
           },
           &m_subsystem}};
+
   frc2::CommandPtr m_quasistaticForward{
       m_sysidRoutine.Quasistatic(frc2::sysid::Direction::kForward)};
   frc2::CommandPtr m_quasistaticReverse{
@@ -71,6 +73,14 @@ class SysIdRoutineTest : public ::testing::Test {
       m_sysidRoutine.Dynamic(frc2::sysid::Direction::kForward)};
   frc2::CommandPtr m_dynamicReverse{
       m_sysidRoutine.Dynamic(frc2::sysid::Direction::kReverse)};
+
+  frc2::sysid::SysIdRoutine m_emptySysidRoutine{
+      frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
+      frc2::sysid::Mechanism{[](units::volt_t driveVoltage) {}, nullptr,
+                             &m_subsystem}};
+
+  frc2::CommandPtr m_emptyRoutineForward{
+      m_emptySysidRoutine.Quasistatic(frc2::sysid::Direction::kForward)};
 
   void RunCommand(frc2::CommandPtr command) {
     command.get()->Initialize();
@@ -167,4 +177,9 @@ TEST_F(SysIdRoutineTest, OutputCorrectVoltage) {
   EXPECT_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
   currentStateList.clear();
   sentVoltages.clear();
+}
+
+TEST_F(SysIdRoutineTest, EmptyLogFunc) {
+  RunCommand(std::move(m_emptyRoutineForward));
+  SUCCEED();
 }

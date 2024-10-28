@@ -65,7 +65,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     void accept(T value, long time);
   }
 
-  private static class Property<P extends Publisher, S extends Subscriber>
+  private static final class Property<P extends Publisher, S extends Subscriber>
       implements AutoCloseable {
     @Override
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
@@ -251,7 +251,10 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   public void setSmartDashboardType(String type) {
     if (m_typePub == null) {
-      m_typePub = m_table.getStringTopic(".type").publish();
+      m_typePub =
+          m_table
+              .getStringTopic(".type")
+              .publishEx(StringTopic.kTypeString, "{\"SmartDashboard\":\"" + type + "\"}");
     }
     m_typePub.set(type);
   }

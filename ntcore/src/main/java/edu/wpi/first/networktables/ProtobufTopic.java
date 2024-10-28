@@ -153,20 +153,21 @@ public final class ProtobufTopic<T> extends Topic {
         false);
   }
 
+  /**
+   * Returns the protobuf.
+   *
+   * @return The protobuf.
+   */
   public Protobuf<T, ?> getProto() {
     return m_proto;
   }
 
   @Override
   public boolean equals(Object other) {
-    if (other == this) {
-      return true;
-    }
-    if (!(other instanceof ProtobufTopic)) {
-      return false;
-    }
-
-    return super.equals(other) && m_proto == ((ProtobufTopic<?>) other).m_proto;
+    return other == this
+        || other instanceof ProtobufTopic<?> topic
+            && super.equals(topic)
+            && m_proto == topic.m_proto;
   }
 
   @Override

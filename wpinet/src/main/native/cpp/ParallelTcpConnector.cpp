@@ -5,6 +5,10 @@
 #include "wpinet/ParallelTcpConnector.h"
 
 #include <cstring>
+#include <functional>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include <fmt/format.h>
 #include <wpi/Logger.h>
@@ -20,10 +24,11 @@ using namespace wpi;
 ParallelTcpConnector::ParallelTcpConnector(
     wpi::uv::Loop& loop, wpi::uv::Timer::Time reconnectRate,
     wpi::Logger& logger, std::function<void(wpi::uv::Tcp& tcp)> connected,
-    const private_init&)
+    bool ipv4Only, const private_init&)
     : m_loop{loop},
       m_logger{logger},
       m_reconnectRate{reconnectRate},
+      m_ipv4Only{ipv4Only},
       m_connected{std::move(connected)},
       m_reconnectTimer{uv::Timer::Create(loop)} {
   if (!m_reconnectTimer) {
@@ -189,12 +194,12 @@ void ParallelTcpConnector::Connect() {
                static_cast<void*>(req.get()), server.first, server.second);
     addrinfo hints;
     std::memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_UNSPEC;
+    hints.ai_family = m_ipv4Only ? AF_INET : AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_NUMERICSERV | AI_ADDRCONFIG;
     uv::GetAddrInfo(m_loop, req, server.first, fmt::format("{}", server.second),
-                    &hints);
+                    hints);
   }
 }
 
