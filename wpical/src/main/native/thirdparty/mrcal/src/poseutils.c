@@ -950,7 +950,7 @@ void mrcal_r_from_R_full( // output
                 (P2(R,2,2) + 1.) /2.
             };
         // This is abs(v) initially
-        double v[3] = {0.0, 0.0, 0.0};
+        double v[3] = {};
         for(int i=0; i<3; i++)
             if(vsq[i] > 0.0)
                 v[i] = sqrt(vsq[i]);
@@ -1048,7 +1048,7 @@ void mrcal_r_from_R_full( // output
 
         ////// transpose(dRflat_dr) * dRflat_dr
         // 3x3 symmetric matrix; packed,dense storage; row-first
-        double dRflat_drT__dRflat_dr[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        double dRflat_drT__dRflat_dr[6] = {};
         int i_result = 0;
         for(int i=0; i<3; i++)
             for(int j=i;j<3;j++)
@@ -1069,7 +1069,7 @@ void mrcal_r_from_R_full( // output
             for(int j=0; j<3; j++)
             {
                 // computing dr/dR[i,j]
-                double dr[3] = {0.0, 0.0, 0.0};
+                double dr[3] = {};
                 mul_vec3_sym33_vout_scaled( &dRflat_dr[3*(j + 3*i)], m.det_inv_dRflat_drT__dRflat_dr,
                                             dr,
                                             inv_det);

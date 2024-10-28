@@ -76,19 +76,16 @@ nativeUtils.platformConfigs.each {
     if (it.name.contains('windows')) {
         it.cppCompiler.args.add("/wd4200")
         it.cppCompiler.args.add("/wd4576")
-        it.cppCompiler.args.add("-DGLOG_NO_EXPORT")
     } else if (it.name.contains('osx')) {
         it.cCompiler.args.add("-Wno-format-nonliteral")
         it.cCompiler.args.add("-Wno-unused-function")
         it.cppCompiler.args.add("-Wno-extern-c-compat")
         it.cppCompiler.args.add("-Wno-missing-braces")
         it.cppCompiler.args.remove("-pedantic")
-        it.cppCompiler.args.add("-DGLOG_NO_EXPORT")
     } else {
         it.cCompiler.args.add("-Wno-format-nonliteral")
         it.cppCompiler.args.add("-Wno-missing-field-initializers")
         it.cppCompiler.args.remove("-pedantic")
-        it.cppCompiler.args.add("-DGLOG_NO_EXPORT")
     }
 }
 
@@ -135,6 +132,7 @@ model {
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
+                it.cppCompiler.define 'GLOG_NO_EXPORT'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {

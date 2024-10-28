@@ -92,8 +92,8 @@ bool mrcal_rectified_resolution( // output and input
                              v);
 
         // dv0_dazel  = nps.matmult(R_cam0_rect0, dv_dazel)
-        double dv0_daz[3] = {0.0, 0.0, 0.0};
-        double dv0_del[3] = {0.0, 0.0, 0.0};
+        double dv0_daz[3] = {};
+        double dv0_del[3] = {};
         for(int j=0; j<3; j++)
             for(int k=0; k<3; k++)
             {
@@ -298,7 +298,7 @@ bool mrcal_rectified_system(// output
 
     // Rotation relating camera0 coords to the rectified camera coords. I fill in
     // each row separately
-    double Rt_rect0_cam0[4*3] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    double Rt_rect0_cam0[4*3] = {};
     double* R_rect0_cam0 = Rt_rect0_cam0;
 
     // Axes of the rectified system, in the cam0 coord system

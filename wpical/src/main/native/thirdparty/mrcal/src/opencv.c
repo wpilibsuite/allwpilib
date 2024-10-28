@@ -63,7 +63,7 @@ void _mrcal_project_internal_opencv( // outputs
     const double cx = intrinsics[2];
     const double cy = intrinsics[3];
 
-    double k[12] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    double k[12] = {};
     for(int i=0; i<Nintrinsics-4; i++)
         k[i] = intrinsics[i+4];
 

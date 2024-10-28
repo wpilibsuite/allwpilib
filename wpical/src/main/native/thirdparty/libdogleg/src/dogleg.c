@@ -15,7 +15,7 @@
 #include "dogleg.h"
 
 #if (CHOLMOD_VERSION > (CHOLMOD_VER_CODE(2,2))) && (CHOLMOD_VERSION < (CHOLMOD_VER_CODE(4,0)))
-#include <cholmod_function.h>
+#include <suitesparse/cholmod_function.h>
 #endif
 
 
@@ -431,13 +431,13 @@ void dogleg_testGradient(unsigned int var, const double* p0,
     SAY( "I must have NJnnz > 0, instead I have %d", NJnnz);
     return;
   }
-  _dogleg_testGradient(var, p0, Nstate, Nmeas, NJnnz, f, cookie);
+  return _dogleg_testGradient(var, p0, Nstate, Nmeas, NJnnz, f, cookie);
 }
 void dogleg_testGradient_dense(unsigned int var, const double* p0,
                                unsigned int Nstate, unsigned int Nmeas,
                                dogleg_callback_dense_t* f, void* cookie)
 {
-  _dogleg_testGradient(var, p0, Nstate, Nmeas, 0, (dogleg_callback_t*)f, cookie);
+  return _dogleg_testGradient(var, p0, Nstate, Nmeas, 0, (dogleg_callback_t*)f, cookie);
 }
 
 
@@ -2248,7 +2248,7 @@ double dogleg_getOutliernessTrace_newFeature_sparse(const double*            Jqu
 
   // haven't implemented anything else yet
   ASSERT(featureSize == 2);
-  double A[4] = {0.0, 0.0, 0.0, 0.0}; // gah. only elements 0,1,3 will be stored.
+  double A[4] = {}; // gah. only elements 0,1,3 will be stored.
 
   for(int i=0; i<featureSize; i++)
   {
