@@ -56,7 +56,7 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "libuv"
     url = "https://github.com/libuv/libuv"
-    tag = "v1.49.0"
+    tag = "v1.49.2"
 
     libuv = Lib(name, url, tag, copy_upstream_src)
     libuv.main()

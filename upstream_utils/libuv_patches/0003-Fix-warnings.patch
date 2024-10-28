@@ -95,7 +95,7 @@ index ccb5249893df2733fc607fec6e8d3037ebe2e212..a08832cd4c292f9e7c83b2e8b6c326f5
  
  static uv_once_t once = UV_ONCE_INIT;
 diff --git a/src/unix/core.c b/src/unix/core.c
-index d8c09f5e41ff96dae4d0df9982f227eaac3c8576..d9f868b13b4fa2c340c542fe567b4193cf079748 100644
+index b72a24e94b0c70455a8ac748a53556ddefb09f49..18f0ce06336e4b3690f84d95b4be954a4466cdf6 100644
 --- a/src/unix/core.c
 +++ b/src/unix/core.c
 @@ -586,6 +586,16 @@ int uv__accept(int sockfd) {
@@ -127,10 +127,10 @@ index d8c09f5e41ff96dae4d0df9982f227eaac3c8576..d9f868b13b4fa2c340c542fe567b4193
  #endif
  #pragma GCC diagnostic pop
 diff --git a/src/unix/internal.h b/src/unix/internal.h
-index 529c783e6e93200e52dab98ea9a3c1e0aea557ce..0bf3736cd682e43beedcf4c701a147787f1329fc 100644
+index 8d586b0b64a96ca53a18f22d957a81c5600098c1..1daf4d81da3a5bf931c4a5db8fd9116c4c303012 100644
 --- a/src/unix/internal.h
 +++ b/src/unix/internal.h
-@@ -396,8 +396,8 @@ UV_UNUSED(static void uv__update_time(uv_loop_t* loop)) {
+@@ -394,8 +394,8 @@ UV_UNUSED(static void uv__update_time(uv_loop_t* loop)) {
    loop->time = uv__hrtime(UV_CLOCK_FAST) / 1000000;
  }
  
@@ -142,10 +142,10 @@ index 529c783e6e93200e52dab98ea9a3c1e0aea557ce..0bf3736cd682e43beedcf4c701a14778
    s = strrchr(path, '/');
    if (s == NULL)
 diff --git a/src/unix/linux.c b/src/unix/linux.c
-index 96c8b1dfe060e896f768493448ec20cfb9203592..cfb0c6eebf2fb231f610020be35187a488127477 100644
+index 22f76054ef0987f215afb9d1e20aa18f97489ea4..b8063cc8900d4cf255a46a9620d01815c65c6d21 100644
 --- a/src/unix/linux.c
 +++ b/src/unix/linux.c
-@@ -2294,7 +2294,7 @@ static int uv__get_cgroupv2_constrained_cpu(const char* cgroup,
+@@ -2309,7 +2309,7 @@ static int uv__get_cgroupv2_constrained_cpu(const char* cgroup,
    if (uv__slurp(path, buf, sizeof(buf)) < 0)
      return UV_EIO;
  
@@ -211,7 +211,7 @@ index 3754437b4989d67f688153e066ef047268911708..2fdcbcb73a9ee29dd282b366011a6878
  #include <errno.h>
  #include <stdio.h>
 diff --git a/src/win/fs.c b/src/win/fs.c
-index b90d2368aa769cb66f9367e97f004fa8bd4da3c0..a4b47fe5ec4135059b8e08be6a232ddd7798bebe 100644
+index cc095491d7ff14a7f7a850005f02a45860636446..f1966ab5c0245af0f56ca407a1697a5c8609ebb4 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
 @@ -19,6 +19,8 @@
@@ -224,7 +224,7 @@ index b90d2368aa769cb66f9367e97f004fa8bd4da3c0..a4b47fe5ec4135059b8e08be6a232ddd
  #include <stdlib.h>
  #include <direct.h>
 diff --git a/src/win/pipe.c b/src/win/pipe.c
-index 8226369294299fd2a9d7d05a91d3d711015b7fd0..43ea270e618fd9fd0c0cb30981a3425967b6dbcd 100644
+index 9b2723320b72691d5ada0f8e97f0589ce53e82f8..9993f281409345d8163a9c69c103b94e7cb258d3 100644
 --- a/src/win/pipe.c
 +++ b/src/win/pipe.c
 @@ -19,6 +19,8 @@

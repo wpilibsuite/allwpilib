@@ -320,24 +320,6 @@
     "commandversion": 2
   },
   {
-    "name": "GearsBot",
-    "description": "A fully functional Command-Based program for WPI's GearsBot robot.",
-    "tags": [
-      "Complete Robot",
-      "Command-based",
-      "Differential Drive",
-      "Elevator",
-      "Arm",
-      "Analog",
-      "Digital Input",
-      "SmartDashboard",
-      "XboxController"
-    ],
-    "foldername": "GearsBot",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
     "name": "HAL",
     "description": "Use the low-level HAL C functions. This example is for advanced users.",
     "tags": [
@@ -412,6 +394,8 @@
       "Pneumatics",
       "Digital Input",
       "PID",
+      "Gyro",
+      "Profiled PID",
       "XboxController"
     ],
     "foldername": "RapidReactCommandBot",
@@ -425,38 +409,6 @@
       "Command-based"
     ],
     "foldername": "SelectCommand",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "Frisbeebot",
-    "description": "A simple frisbee shooter for the 2013 game, demonstrating use of PIDSubsystem.",
-    "tags": [
-      "Complete Robot",
-      "Command-based",
-      "Differential Drive",
-      "Flywheel",
-      "Encoder",
-      "XboxController",
-      "PID"
-    ],
-    "foldername": "Frisbeebot",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "Gyro Drive Commands",
-    "description": "Control a robot's angle with PID and a gyro, in command-based.",
-    "tags": [
-      "Command-based",
-      "Differential Drive",
-      "Encoder",
-      "PS4Controller",
-      "PID",
-      "Profiled PID",
-      "Gyro"
-    ],
-    "foldername": "GyroDriveCommands",
     "gradlebase": "cpp",
     "commandversion": 2
   },
@@ -606,36 +558,6 @@
       "XboxController"
     ],
     "foldername": "SwerveControllerCommand",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "ArmBot",
-    "description": "Control an arm with ProfiledPIDSubsystem.",
-    "tags": [
-      "Command-based",
-      "Arm",
-      "Encoder",
-      "Profiled PID",
-      "XboxController",
-      "Differential Drive"
-    ],
-    "foldername": "ArmBot",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "ArmBotOffboard",
-    "description": "Control an arm with TrapezoidProfileSubsystem and smart motor controller PID.",
-    "tags": [
-      "Command-based",
-      "Arm",
-      "Smart Motor Controller",
-      "Trapezoid Profile",
-      "XboxController",
-      "Differential Drive"
-    ],
-    "foldername": "ArmBotOffboard",
     "gradlebase": "cpp",
     "commandversion": 2
   },
@@ -887,7 +809,7 @@
       "Command-based",
       "DataLog"
     ],
-    "foldername": "SysId",
+    "foldername": "SysIdRoutine",
     "gradlebase": "cpp",
     "commandversion": 2
   }

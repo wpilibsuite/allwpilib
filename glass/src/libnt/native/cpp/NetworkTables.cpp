@@ -745,7 +745,7 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
           structName = *withoutArray;
         }
         auto desc = model.m_structDb.Find(structName);
-        if (desc && desc->IsValid()) {
+        if (desc && desc->IsValid() && desc->GetSize() != 0) {
           if (isArray) {
             // array of struct at top level
             if (valueChildrenMap) {

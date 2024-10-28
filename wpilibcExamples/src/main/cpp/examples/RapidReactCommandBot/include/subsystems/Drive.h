@@ -6,11 +6,15 @@
 
 #include <functional>
 
+#include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
+#include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
+#include <units/angle.h>
 #include <units/length.h>
 
 #include "Constants.h"
@@ -38,6 +42,15 @@ class Drive : public frc2::SubsystemBase {
   [[nodiscard]]
   frc2::CommandPtr DriveDistanceCommand(units::meter_t distance, double speed);
 
+  /**
+   * Returns a command that turns to robot to the specified angle using a motion
+   * profile and PID controller.
+   *
+   * @param angle The angle to turn to
+   */
+  [[nodiscard]]
+  frc2::CommandPtr TurnToAngleCommand(units::degree_t angle);
+
  private:
   frc::PWMSparkMax m_leftLeader{DriveConstants::kLeftMotor1Port};
   frc::PWMSparkMax m_leftFollower{DriveConstants::kLeftMotor2Port};
@@ -54,4 +67,14 @@ class Drive : public frc2::SubsystemBase {
   frc::Encoder m_rightEncoder{DriveConstants::kRightEncoderPorts[0],
                               DriveConstants::kRightEncoderPorts[1],
                               DriveConstants::kRightEncoderReversed};
+
+  frc::ADXRS450_Gyro m_gyro;
+
+  frc::ProfiledPIDController<units::radians> m_controller{
+      DriveConstants::kTurnP,
+      DriveConstants::kTurnI,
+      DriveConstants::kTurnD,
+      {DriveConstants::kMaxTurnRate, DriveConstants::kMaxTurnAcceleration}};
+  frc::SimpleMotorFeedforward<units::radians> m_feedforward{
+      DriveConstants::ks, DriveConstants::kv, DriveConstants::ka};
 };
