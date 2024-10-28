@@ -49,7 +49,7 @@ def generate_usage_reporting(output_directory: Path, template_directory: Path):
         )
 
         frc_net_comm = output_directory / f"main/java/{java_package}/FRCNetComm.java"
-        frc_net_comm.write_text(contents, encoding="utf-8")
+        frc_net_comm.write_text(contents, encoding="utf-8", newline="\n")
 
     with (template_directory / "FRCUsageReporting.h.in").open(
         encoding="utf-8"
@@ -65,7 +65,7 @@ def generate_usage_reporting(output_directory: Path, template_directory: Path):
         usage_reporting_hdr = (
             output_directory / "main/native/include/hal/FRCUsageReporting.h"
         )
-        usage_reporting_hdr.write_text(contents, encoding="utf-8")
+        usage_reporting_hdr.write_text(contents, encoding="utf-8", newline="\n")
 
 
 def main(argv):
