@@ -71,6 +71,24 @@ tasks.withType(CppCompile) {
     dependsOn generateCppVersion
 }
 
+// Suppress warnings
+nativeUtils.platformConfigs.each {
+    if (it.name.contains('windows')) {
+        it.cppCompiler.args.add("/wd4200")
+        it.cppCompiler.args.add("/wd4576")
+    } else if (it.name.contains('osx')) {
+        it.cCompiler.args.add("-Wno-format-nonliteral")
+        it.cCompiler.args.add("-Wno-unused-function")
+        it.cppCompiler.args.add("-Wno-extern-c-compat")
+        it.cppCompiler.args.add("-Wno-missing-braces")
+        it.cppCompiler.args.remove("-pedantic")
+    } else {
+        it.cCompiler.args.add("-Wno-format-nonliteral")
+        it.cppCompiler.args.add("-Wno-missing-field-initializers")
+        it.cppCompiler.args.remove("-pedantic")
+    }
+}
+
 model {
     components {
         // By default, a development executable will be generated. This is to help the case of
