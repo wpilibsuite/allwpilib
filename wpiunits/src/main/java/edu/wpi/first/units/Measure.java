@@ -108,7 +108,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   }
 
   /**
-   * Take the sign of another measure
+   * Take the sign of another measure.
    * @param other measure from which to take sign
    * @return a new measure with the sign from another measure
    */
