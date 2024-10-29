@@ -84,6 +84,7 @@ nativeUtils.platformConfigs.each {
         it.cCompiler.args.add("-Wno-unused-variable")
         it.cCompiler.args.add("-Wno-unused-function")
         it.cCompiler.args.add("-Wno-sign-compare")
+        it.cCompiler.args.add("-Wno-deprecated-declarations")
         it.cppCompiler.args.add("-Wno-extern-c-compat")
         it.cppCompiler.args.add("-Wno-missing-braces")
         it.cppCompiler.args.remove("-pedantic")
@@ -92,7 +93,7 @@ nativeUtils.platformConfigs.each {
         it.cppCompiler.args.add("-Wno-unused-function")
         it.cppCompiler.args.add("-Wno-deprecated-enum-enum-conversion")
         it.cppCompiler.args.add("-Wno-sign-compare")
-
+        it.cppCompiler.args.add("-Wno-deprecated-declarations")
     } else {
         it.cCompiler.args.add("-Wno-format-nonliteral")
         it.cCompiler.args.remove("-pedantic")
@@ -100,6 +101,7 @@ nativeUtils.platformConfigs.each {
         it.cCompiler.args.add("-Wno-unused-variable")
         it.cCompiler.args.add("-Wno-unused-function")
         it.cCompiler.args.add("-Wno-sign-compare")
+        it.cCompiler.args.add("-Wno-deprecated-declarations")
         it.cppCompiler.args.add("-Wno-missing-field-initializers")
         it.cppCompiler.args.remove("-pedantic")
         it.cppCompiler.args.add("-Wno-cpp")
@@ -107,6 +109,7 @@ nativeUtils.platformConfigs.each {
         it.cppCompiler.args.add("-Wno-unused-function")
         it.cppCompiler.args.add("-Wno-deprecated-enum-enum-conversion")
         it.cppCompiler.args.add("-Wno-sign-compare")
+        it.cppCompiler.args.add("-Wno-deprecated-declarations")
     }
 }
 
