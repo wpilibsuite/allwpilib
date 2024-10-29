@@ -8,12 +8,12 @@
 # those interfaces.
 # Generated files will be located in wpiunits/src/generated/main/
 
+import argparse
 import inspect
 import re
-from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
-import argparse
-import sys
+
+from jinja2 import Environment, FileSystemLoader
 
 
 def output(output_dir, outfn: str, contents: str):
@@ -390,7 +390,7 @@ def generate_units(output_directory: Path, template_directory: Path):
         output(rootPath / "measure", f"Mut{unit_name}.java", mutableContents)
 
 
-def main(argv):
+def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
@@ -407,10 +407,10 @@ def main(argv):
         default=dirname / "src/generate",
         type=Path,
     )
-    args = parser.parse_args(argv)
+    args = parser.parse_args()
 
     generate_units(args.output_directory, args.template_root)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
