@@ -223,6 +223,24 @@ public final class Commands {
   }
 
   /**
+   * Runs individual commands in a series without grouped behavior.
+   *
+   * <p>Each command is run independently by proxy. The requirements of
+   * each command are reserved only for the duration of that command and
+   * are not reserved for an entire group process as they are in a
+   * grouped sequence.
+   * 
+   * <p>disjoint...() does not propagate to interior groups. Use additional disjoint...() as needed.
+   *
+   * @param commands the commands to include in the series
+   * @return the command to run the series of commands
+   * @see #sequence(Command...) use sequence() to invoke group sequence behavior
+   */
+  public static Command disjointSequence(Command... commands) {
+    return sequence(proxyAll(commands));
+  }
+
+  /**
    * Runs a group of commands in series, one after the other. Once the last command ends, the group
    * is restarted.
    *
@@ -236,6 +254,26 @@ public final class Commands {
   }
 
   /**
+   * Runs individual commands in a series without grouped behavior; once the last command ends, the series is restarted.
+   *
+   * <p>Each command is run independently by proxy. The requirements of
+   * each command are reserved only for the duration of that command and
+   * are not reserved for an entire group process as they are in a
+   * grouped sequence.
+   * 
+   * <p>disjoint...() does not propagate to interior groups. Use additional disjoint...() as needed.
+   *
+   * @param commands the commands to include in the series
+   * @return the command to run the series of commands repeatedly
+   * @see #repeatingSequence(Command...) use sequenceRepeatedly() to invoke repeated group sequence behavior
+   * @see #disjointSequence(Command...) use disjointSequence() for no repeating behavior
+   */
+  public static Command repeatingDisjointSequence(Command... commands) {
+    throw new IllegalArgumentException("Not Supported - RepeatCommand bug prevents correct use of Proxy");
+    // return disjointSequence(commands).repeatedly();
+  }
+
+  /**
    * Runs a group of commands at the same time. Ends once all commands in the group finish.
    *
    * @param commands the commands to include
@@ -244,6 +282,26 @@ public final class Commands {
    */
   public static Command parallel(Command... commands) {
     return new ParallelCommandGroup(commands);
+  }
+  
+/**
+   * Runs individual commands at the same time without grouped behavior and ends once all commands finish.
+   *
+   * <p>Each command is run independently by proxy. The requirements of
+   * each command are reserved only for the duration of that command and
+   * are not reserved for an entire group process as they are in a
+   * grouped parallel.
+   * 
+   * <p>disjoint...() does not propagate to interior groups. Use additional disjoint...() as needed.
+   *
+   * @param commands the commands to run in parallel
+   * @return the command to run the commands in parallel
+   * @see #parallel(Command...) use parallel() to invoke group parallel behavior
+   */
+  public static Command disjointParallel(Command... commands) {
+    new ParallelCommandGroup(commands); // check parallel constraints
+    for (Command cmd : commands) CommandScheduler.getInstance().removeComposedCommand(cmd);
+    return parallel(proxyAll(commands));
   }
 
   /**
@@ -259,6 +317,22 @@ public final class Commands {
   }
 
   /**
+   * Runs a group of commands at the same time. Ends once any command in the group finishes, and
+   * cancels the others.
+   *
+   * <p>disjoint...() does not propagate to interior groups. Use additional disjoint...() as needed.
+   *
+   * @param commands the commands to include
+   * @return the command group
+   * @see ParallelRaceGroup
+   */
+  public static Command disjointRace(Command... commands) {
+    new ParallelRaceGroup(commands); // check parallel constraints
+    for (Command cmd : commands) CommandScheduler.getInstance().removeComposedCommand(cmd);
+    return race(proxyAll(commands));
+  }
+  
+  /**
    * Runs a group of commands at the same time. Ends once a specific command finishes, and cancels
    * the others.
    *
@@ -271,6 +345,56 @@ public final class Commands {
   public static Command deadline(Command deadline, Command... otherCommands) {
     return new ParallelDeadlineGroup(deadline, otherCommands);
   }
+
+ /**
+   * Runs individual commands at the same time without grouped behavior; when the deadline command ends the otherCommands are cancelled.
+   *
+   * <p>Each otherCommand is run independently by proxy. The requirements of
+   * each command are reserved only for the duration of that command and are
+   * not reserved for an entire group process as they are in a grouped deadline.
+   *
+   * <p>disjoint...() does not propagate to interior groups. Use additional disjoint...() as needed.
+   *
+   * @param deadline the deadline command
+   * @param otherCommands the other commands to include and will be cancelled when the deadline ends
+   * @return the command to run the deadline command and otherCommands
+   * @see #deadline(Command, Command...) use deadline() to invoke group parallel deadline behavior
+   * @throws IllegalArgumentException if the deadline command is also in the otherCommands argument
+   */
+  public static Command disjointDeadline(Command deadline, Command... otherCommands) {
+    new ParallelDeadlineGroup(deadline, otherCommands); // check parallel deadline constraints
+    CommandScheduler.getInstance().removeComposedCommand(deadline);
+    for (Command cmd : otherCommands) {
+      CommandScheduler.getInstance().removeComposedCommand(cmd);
+    }
+    if ( ! deadline.getRequirements().isEmpty()) {
+      deadline = deadline.asProxy();
+    }
+    return deadline(deadline, proxyAll(otherCommands));
+  }
+
+  /**
+   * Maps an array of commands by adding proxy to every element that has requirements using {@link Command#asProxy()}.
+   *
+   * <p>This is useful to ensure that default commands of subsystems within a command group are
+   * still triggered despite command groups requiring the union of their members' requirements
+   *
+   * @param commands an array of commands
+   * @return an array of commands to run by proxy if a command has requirements
+   */
+  public static Command[] proxyAll(Command... commands) {
+    Command[] out = new Command[commands.length];
+    for (int i = 0; i < commands.length; i++) {
+      if (commands[i].getRequirements().isEmpty()) {
+        out[i] = commands[i];
+      }
+      else {
+        out[i] = commands[i].asProxy();
+      }
+    }
+    return out;
+  }
+}
 
   private Commands() {
     throw new UnsupportedOperationException("This is a utility class");
