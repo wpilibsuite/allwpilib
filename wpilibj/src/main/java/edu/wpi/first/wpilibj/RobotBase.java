@@ -176,7 +176,7 @@ public abstract class RobotBase implements AutoCloseable {
             } else if (t.connInfo.remote_id.startsWith("shuffleboard")) {
               HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Shuffleboard);
               m_detected = true;
-            } else if (t.connInfo.remote_id.startsWith("elastic")) {
+            } else if (t.connInfo.remote_id.regionMatches(true, 0, "elastic", 0, 7)) {
               HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Elastic);
               m_detected = true;
             } else if (t.connInfo.remote_id.startsWith("Dashboard")) {
