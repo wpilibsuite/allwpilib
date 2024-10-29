@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 
-def main(argv):
+def main():
     script_path = Path(__file__).resolve()
     REPO_ROOT = script_path.parent.parent.parent
     parser = argparse.ArgumentParser()
@@ -15,7 +15,7 @@ def main(argv):
         help="Path to the quickbuf protoc plugin",
         required=True,
     )
-    args = parser.parse_args(argv)
+    args = parser.parse_args()
     subprocess.run(
         [sys.executable, f"{REPO_ROOT}/hal/generate_usage_reporting.py"], check=True
     )
@@ -61,4 +61,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

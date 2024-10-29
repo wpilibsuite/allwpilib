@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-import os
-import sys
 import argparse
+import os
 from pathlib import Path
+import sys
 
-def main(argv):
+def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
@@ -16,8 +16,8 @@ def main(argv):
         default=dirname / "generated/gl3w",
         type=Path,
     )
-    args = parser.parse_args(argv)
-    
+    args = parser.parse_args()
+
     sys.path.append(str(dirname / "gl3w"))
 
     args.output_directory.mkdir(parents=True, exist_ok=True)
@@ -27,4 +27,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
