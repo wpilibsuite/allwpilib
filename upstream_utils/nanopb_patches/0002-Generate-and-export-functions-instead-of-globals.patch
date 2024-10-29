@@ -1,0 +1,72 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thad House <thadhouse1@gmail.com>
+Date: Mon, 28 Oct 2024 17:01:29 -0700
+Subject: [PATCH 2/3] Generate and export functions instead of globals
+
+---
+ generator/nanopb_generator.py | 9 +--------
+ pb.h                          | 9 +++++----
+ 2 files changed, 6 insertions(+), 12 deletions(-)
+
+diff --git a/generator/nanopb_generator.py b/generator/nanopb_generator.py
+index 69bed8d7063995785b5e0f7e6b15c4d004f84b17..d83308e3cd72826fd980b098567f32d3f016993c 100755
+--- a/generator/nanopb_generator.py
++++ b/generator/nanopb_generator.py
+@@ -2123,14 +2123,7 @@ class ProtoFile:
+             for msg in self.messages:
+                 yield msg.fields_declaration(self.dependencies) + '\n'
+             for msg in self.messages:
+-                yield 'extern const pb_msgdesc_t %s_msg;\n' % Globals.naming_style.type_name(msg.name)
+-            yield '\n'
+-
+-            yield '/* Defines for backwards compatibility with code written before nanopb-0.4.0 */\n'
+-            for msg in self.messages:
+-              yield '#define %s &%s_msg\n' % (
+-                Globals.naming_style.define_name('%s_fields' % msg.name),
+-                Globals.naming_style.type_name(msg.name))
++                yield 'const pb_msgdesc_t *get_%s_msg(void);\n' % Globals.naming_style.type_name(msg.name)
+             yield '\n'
+ 
+             yield '/* Maximum encoded size of messages (where known) */\n'
+diff --git a/pb.h b/pb.h
+index 179d9d29e223764bfe7e20e28854b5efaad76ac4..d533dac045f053efc06421c0bc65f3e35f79432d 100644
+--- a/pb.h
++++ b/pb.h
+@@ -499,17 +499,17 @@ struct pb_extension_s {
+ 
+ /* Binding of a message field set into a specific structure */
+ #define PB_BIND(msgname, structname, width) \
+-    const uint32_t structname ## _field_info[] PB_PROGMEM = \
++    static const uint32_t structname ## _field_info[] PB_PROGMEM = \
+     { \
+         msgname ## _FIELDLIST(PB_GEN_FIELD_INFO_ ## width, structname) \
+         0 \
+     }; \
+-    const pb_msgdesc_t* const structname ## _submsg_info[] = \
++    static const pb_msgdesc_t* const structname ## _submsg_info[] = \
+     { \
+         msgname ## _FIELDLIST(PB_GEN_SUBMSG_INFO, structname) \
+         NULL \
+     }; \
+-    const pb_msgdesc_t structname ## _msg = \
++    static const pb_msgdesc_t structname ## _msg = \
+     { \
+        structname ## _field_info, \
+        structname ## _submsg_info, \
+@@ -519,6 +519,7 @@ struct pb_extension_s {
+        0 msgname ## _FIELDLIST(PB_GEN_REQ_FIELD_COUNT, structname), \
+        0 msgname ## _FIELDLIST(PB_GEN_LARGEST_TAG, structname), \
+     }; \
++    const pb_msgdesc_t* get_ ## structname ## _msg(void) { return &(structname ## _msg); } \
+     msgname ## _FIELDLIST(PB_GEN_FIELD_INFO_ASSERT_ ## width, structname)
+ 
+ #define PB_GEN_FIELD_COUNT(structname, atype, htype, ltype, fieldname, tag) +1
+@@ -724,7 +725,7 @@ struct pb_extension_s {
+ #define PB_SI_PB_LTYPE_UINT64(t)
+ #define PB_SI_PB_LTYPE_EXTENSION(t)
+ #define PB_SI_PB_LTYPE_FIXED_LENGTH_BYTES(t)
+-#define PB_SUBMSG_DESCRIPTOR(t)    &(t ## _msg),
++#define PB_SUBMSG_DESCRIPTOR(t)    (get_ ## t ## _msg()),
+ 
+ /* The field descriptors use a variable width format, with width of either
+  * 1, 2, 4 or 8 of 32-bit words. The two lowest bytes of the first byte always

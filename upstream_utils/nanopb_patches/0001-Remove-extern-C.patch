@@ -1,0 +1,145 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thad House <thadhouse1@gmail.com>
+Date: Mon, 28 Oct 2024 16:58:15 -0700
+Subject: [PATCH 1/3] Remove extern C
+
+---
+ generator/nanopb_generator.py |  8 --------
+ pb.h                          |  8 --------
+ pb_common.h                   |  9 ---------
+ pb_decode.h                   | 16 ++++------------
+ 4 files changed, 4 insertions(+), 37 deletions(-)
+
+diff --git a/generator/nanopb_generator.py b/generator/nanopb_generator.py
+index 6068042b59da04842ff13d4d56dfc35366003a5f..69bed8d7063995785b5e0f7e6b15c4d004f84b17 100755
+--- a/generator/nanopb_generator.py
++++ b/generator/nanopb_generator.py
+@@ -2084,10 +2084,6 @@ class ProtoFile:
+                 yield extension.extension_decl()
+             yield '\n'
+ 
+-        yield '#ifdef __cplusplus\n'
+-        yield 'extern "C" {\n'
+-        yield '#endif\n\n'
+-
+         if self.enums:
+                 yield '/* Helper constants for enums */\n'
+                 for enum in self.enums:
+@@ -2222,10 +2218,6 @@ class ProtoFile:
+                 yield '#define %s %s\n' % (longname, shortname)
+             yield '\n'
+ 
+-        yield '#ifdef __cplusplus\n'
+-        yield '} /* extern "C" */\n'
+-        yield '#endif\n'
+-
+         if options.cpp_descriptors:
+             yield '\n'
+             yield '#ifdef __cplusplus\n'
+diff --git a/pb.h b/pb.h
+index 1bff70e4e6fbf029e3d6140f5ffd812b9bc7d12e..179d9d29e223764bfe7e20e28854b5efaad76ac4 100644
+--- a/pb.h
++++ b/pb.h
+@@ -92,10 +92,6 @@
+ #endif
+ #endif
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+-
+ /* Macro for defining packed structures (compiler dependent).
+  * This just reduces memory requirements, but is not required.
+  */
+@@ -893,10 +889,6 @@ struct pb_extension_s {
+ 
+ #define PB_RETURN_ERROR(stream, msg) return PB_SET_ERROR(stream, msg), false
+ 
+-#ifdef __cplusplus
+-} /* extern "C" */
+-#endif
+-
+ #ifdef __cplusplus
+ #if __cplusplus >= 201103L
+ #define PB_CONSTEXPR constexpr
+diff --git a/pb_common.h b/pb_common.h
+index 58aa90f76d58596d3f45a120b65b4a0bff7fd688..c3b68f0d3399fdfc2797c1c0f05190315c1e066e 100644
+--- a/pb_common.h
++++ b/pb_common.h
+@@ -7,10 +7,6 @@
+ 
+ #include "pb.h"
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+-
+ /* Initialize the field iterator structure to beginning.
+  * Returns false if the message type is empty. */
+ bool pb_field_iter_begin(pb_field_iter_t *iter, const pb_msgdesc_t *desc, void *message);
+@@ -41,9 +37,4 @@ bool pb_field_iter_find_extension(pb_field_iter_t *iter);
+ bool pb_validate_utf8(const char *s);
+ #endif
+ 
+-#ifdef __cplusplus
+-} /* extern "C" */
+ #endif
+-
+-#endif
+-
+diff --git a/pb_decode.h b/pb_decode.h
+index 3f392b29386e3dbbc69337316eb98029d239690a..ace86da351a4a1900d753b05e045c32b5e213cd8 100644
+--- a/pb_decode.h
++++ b/pb_decode.h
+@@ -8,14 +8,10 @@
+ 
+ #include "pb.h"
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+-
+ /* Structure for defining custom input streams. You will need to provide
+  * a callback function to read the bytes from your storage, which can be
+  * for example a file or a network socket.
+- * 
++ *
+  * The callback must conform to these rules:
+  *
+  * 1) Return false on IO errors. This will cause decoding to abort.
+@@ -49,7 +45,7 @@ struct pb_istream_s
+      * denial-of-service by excessively long messages.
+      */
+     size_t bytes_left;
+-    
++
+ #ifndef PB_NO_ERRMSG
+     /* Pointer to constant (ROM) string when decoding function returns error */
+     const char *errmsg;
+@@ -65,7 +61,7 @@ struct pb_istream_s
+ /***************************
+  * Main decoding functions *
+  ***************************/
+- 
++
+ /* Decode a single protocol buffers message from input stream into a C structure.
+  * Returns true on success, false on any failure.
+  * The actual struct pointed to by dest must match the description in fields.
+@@ -76,7 +72,7 @@ struct pb_istream_s
+  *    MyMessage msg = {};
+  *    uint8_t buffer[64];
+  *    pb_istream_t stream;
+- *    
++ *
+  *    // ... read some data into buffer ...
+  *
+  *    stream = pb_istream_from_buffer(buffer, count);
+@@ -197,8 +193,4 @@ bool pb_decode_double_as_float(pb_istream_t *stream, float *dest);
+ bool pb_make_string_substream(pb_istream_t *stream, pb_istream_t *substream);
+ bool pb_close_string_substream(pb_istream_t *stream, pb_istream_t *substream);
+ 
+-#ifdef __cplusplus
+-} /* extern "C" */
+-#endif
+-
+ #endif
