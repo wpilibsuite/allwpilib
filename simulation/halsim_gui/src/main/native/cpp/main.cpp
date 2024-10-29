@@ -19,6 +19,7 @@
 #include <glass/hardware/PWM.h>
 #include <glass/hardware/Relay.h>
 #include <glass/hardware/RoboRio.h>
+#include <glass/networktables/NetworkTables.h>
 #include <glass/other/DeviceTree.h>
 #include <glass/other/Plot.h>
 #include <hal/Extensions.h>
@@ -36,7 +37,6 @@
 #include "EncoderSimGui.h"
 #include "HALSimGui.h"
 #include "HALSimGuiExt.h"
-#include "NetworkTablesSimGui.h"
 #include "PCMSimGui.h"
 #include "PHSimGui.h"
 #include "PWMSimGui.h"
@@ -52,6 +52,7 @@ namespace gui = wpi::gui;
 
 static std::unique_ptr<glass::PlotProvider> gPlotProvider;
 
+static glass::NetworkTablesModel* gNetworkTablesModel;
 static glass::AnalogInputsModel* gAnalogInputsModel;
 static glass::DIOsModel* gDIOsModel;
 static glass::EncodersModel* gEncodersModel;
@@ -65,6 +66,8 @@ static glass::PneumaticControlsModel* gPHsModel;
 static SimDevicesModel* gSimDevicesModel;
 static glass::DeviceTreeModel* gDeviceTreeModel;
 
+static glass::Window* gNetworkTablesWindow;
+static glass::Window* gNetworkTablesInfoWindow;
 static glass::Window* gAnalogInputsWindow;
 static glass::Window* gDIOsWindow;
 static glass::Window* gEncodersWindow;
@@ -116,6 +119,22 @@ __declspec(dllexport)
       glass::GetStorageRoot().GetChild("Plot"));
   gPlotProvider->GlobalInit();
 
+  glass::PushStorageStack("NetworkTables");
+
+  gNetworkTablesModel = glass::CreateModel<glass::NetworkTablesModel>();
+
+  gNetworkTablesWindow = glass::imm::CreateWindow("NetworkTables View");
+  gNetworkTablesWindow->SetDefaultPos(250, 277);
+  gNetworkTablesWindow->SetDefaultSize(750, 185);
+
+  // NetworkTables info window
+  gNetworkTablesInfoWindow = glass::imm::CreateWindow(
+      "NetworkTables Info", false, glass::Window::kHide);
+  gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
+  gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
+
+  glass::PopStorageStack();
+
   glass::PushStorageStack("HAL");
 
   // Models
@@ -132,7 +151,6 @@ __declspec(dllexport)
   gAnalogInputsModel = CreateAnalogInputsModel();
   InitializeAnalogOutputs(*gDeviceTreeModel);
   gDIOsModel = CreateDIOsModel(*gEncodersModel);
-  NetworkTablesSimGui::Initialize();
   gPCMsModel = CreatePCMsModel();
   InitializePCMs(*gDeviceTreeModel, gPCMsModel);
   gPowerDistributionsModel = CreatePowerDistributionsModel();
@@ -220,7 +238,8 @@ __declspec(dllexport)
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("NetworkTables")) {
-      NetworkTablesSimGui::DisplayMenu();
+      gNetworkTablesWindow->DisplayMenuItem();
+      gNetworkTablesInfoWindow->DisplayMenuItem();
       ImGui::Separator();
       HALSimGui::ntProvider->DisplayMenu();
       ImGui::EndMenu();
@@ -247,6 +266,24 @@ __declspec(dllexport)
   wpi::gui::AddEarlyExecute([] { glass::UpdateModels(); });
 
   wpi::gui::AddLateExecute([] {
+    if (glass::imm::BeginWindow(gNetworkTablesWindow)) {
+      auto& settings =
+          glass::GetStorage().GetOrNewData<glass::NetworkTablesFlagsSettings>();
+      if (glass::imm::BeginWindowSettingsPopup()) {
+        settings.DisplayMenu();
+        glass::DisplayNetworkTablesAddMenu(gNetworkTablesModel, {},
+                                           settings.GetFlags());
+        ImGui::EndPopup();
+      }
+      DisplayNetworkTables(gNetworkTablesModel, settings.GetFlags());
+    }
+    glass::imm::EndWindow();
+
+    if (glass::imm::BeginWindow(gNetworkTablesInfoWindow)) {
+      glass::DisplayNetworkTablesInfo(gNetworkTablesModel);
+    }
+    glass::imm::EndWindow();
+
     if (glass::imm::BeginWindow(gLEDsWindow)) {
       glass::DisplayLEDDisplays(gLEDsModel);
     }
