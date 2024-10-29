@@ -23,11 +23,11 @@ ext {
             }
             nanopbCpp(CppSourceSet) {
                 source {
-                    srcDirs 'src/generated/main/cpp'
+                    srcDirs 'src/generated/main/native/cpp'
                     include '**/*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/generated/main/cpp'
+                    srcDirs 'src/generated/main/native/cpp'
                 }
             }
         }
@@ -47,7 +47,7 @@ cppHeadersZip {
         into '/wpimath/protobuf'
         include '*.h'
     }
-    from("src/generated/main/cpp") {
+    from("src/generated/main/native/cpp") {
         into '/wpimath/protobuf'
         include '*.h'
     }
@@ -67,7 +67,7 @@ model {
                             'src/main/native/thirdparty/eigen/include',
                             'src/main/native/thirdparty/gcem/include',
                             'src/main/native/thirdparty/sleipnir/include',
-                            'src/generated/main/cpp'
+                            'src/generated/main/native/cpp'
                 }
             }
         }

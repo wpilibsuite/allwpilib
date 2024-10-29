@@ -8,6 +8,38 @@
 
 #include "geometry2d.pb.h"
 
+#include "pb_encode.h"
+#include "pb_decode.h"
+
+#include "geometry2d.npb.h"
+
+std::optional<frc::Pose2d> wpi::Protobuf<frc::Pose2d>::Unpack(
+    pb_istream_t& stream) {
+  frc::Rotation2d rot;
+  frc::Translation2d tsln;
+  wpi_proto_ProtobufPose2d msg{
+      .translation = wpi::UnpackCallback(tsln),
+      .rotation = wpi::UnpackCallback(rot),
+
+  };
+  if (!pb_decode(stream, *get_wpi_proto_ProtobufPose2d_msg(), msg,
+                 PB_DECODE_NOINIT)) {
+    return {};
+  }
+
+  return frc::Pose2d{tsln, rot};
+}
+
+bool wpi::Protobuf<frc::Pose2d>::Pack(pb_ostream_t& stream,
+                                      const frc::Pose2d& value) {
+  wpi_proto_ProtobufPose2d msg{
+      .translation = wpi::PackCallback(value.Translation()),
+      .rotation = wpi::PackCallback(value.Rotation()),
+
+  };
+  return pb_encode(stream, *get_wpi_proto_ProtobufPose2d_msg(), msg);
+}
+
 google::protobuf::Message* wpi::Protobuf<frc::Pose2d>::New(
     google::protobuf::Arena* arena) {
   return wpi::CreateMessage<wpi::proto::ProtobufPose2d>(arena);

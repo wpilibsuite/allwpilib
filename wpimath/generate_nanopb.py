@@ -26,7 +26,7 @@ def generate_nanopb(nanopb: Path, output_directory: Path, proto_dir: Path):
                 f"-I{absolute_filename.parent}",
                 f"-D{output_directory.absolute()}",
                 "-S.cpp",
-                "-e.nbp",
+                "-e.npb",
                 absolute_filename,
             ]
         )
@@ -68,7 +68,7 @@ def main(argv):
     parser.add_argument(
         "--output_directory",
         help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-        default=dirname / "src/generated/main/cpp",
+        default=dirname / "src/generated/main/native/cpp",
         type=Path,
     )
     parser.add_argument(

@@ -8,6 +8,7 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/geometry/Rotation2d.h"
+#include "pb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Rotation2d> {
@@ -15,4 +16,7 @@ struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Rotation2d> {
   static frc::Rotation2d Unpack(const google::protobuf::Message& msg);
   static void Pack(google::protobuf::Message* msg,
                    const frc::Rotation2d& value);
+
+  static std::optional<frc::Rotation2d> Unpack(pb_istream_t& stream);
+  static bool Pack(pb_ostream_t& stream, const frc::Rotation2d& value, bool is_subobject = false);
 };

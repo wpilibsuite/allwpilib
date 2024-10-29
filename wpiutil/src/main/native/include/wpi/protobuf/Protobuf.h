@@ -17,6 +17,8 @@
 #include "wpi/array.h"
 #include "wpi/function_ref.h"
 
+#include "pb.h"
+
 namespace google::protobuf {
 class Arena;
 class Message;
@@ -40,6 +42,39 @@ class SmallVectorImpl;
  */
 template <typename T>
 struct Protobuf {};
+
+template <typename T>
+pb_callback_t UnpackCallback(T& value) {
+  return pb_callback_t{
+      .funcs{
+          .decode = [](pb_istream_t* stream, const pb_field_t* field,
+                       void** arg) -> bool {
+            T* value = reinterpret_cast<T*>(*arg);
+            auto attempt = wpi::Protobuf<T>::Unpack(*stream);
+            if (attempt.has_value()) {
+              *value = *attempt;
+              return true;
+            }
+            return false;
+          },
+      },
+      .arg = &value,
+  };
+}
+
+template <typename T>
+inline pb_callback_t PackCallback(const T& value) {
+  return pb_callback_t{
+      .funcs{
+          .encode = [](pb_ostream_t* stream, const pb_field_t* field,
+                       void* const* arg) -> bool {
+            const T* value = reinterpret_cast<const T*>(*arg);
+            return wpi::Protobuf<T>::Pack(*stream, *value);
+          },
+      },
+      .arg = const_cast<T*>(&value),
+  };
+}
 
 /**
  * Specifies that a type is capable of protobuf serialization and

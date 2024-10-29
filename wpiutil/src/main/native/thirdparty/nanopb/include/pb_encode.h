@@ -10,10 +10,6 @@
 
 #include "pb.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Structure for defining custom output streams. You will need to provide
  * a callback function to write the bytes to your storage, which can be
  * for example a file or a network socket.
@@ -78,6 +74,11 @@ struct pb_ostream_s
  */
 bool pb_encode(pb_ostream_t *stream, const pb_msgdesc_t *fields, const void *src_struct);
 
+template<typename T>
+inline bool pb_encode(pb_ostream_t& stream, const pb_msgdesc_t& fields, const T& dest_struct) {
+    return pb_encode(&stream, &fields, reinterpret_cast<const void*>(&dest_struct));
+}
+
 /* Extended version of pb_encode, with several options to control the
  * encoding process:
  *
@@ -93,6 +94,11 @@ bool pb_encode(pb_ostream_t *stream, const pb_msgdesc_t *fields, const void *src
 #define PB_ENCODE_DELIMITED       0x02U
 #define PB_ENCODE_NULLTERMINATED  0x04U
 bool pb_encode_ex(pb_ostream_t *stream, const pb_msgdesc_t *fields, const void *src_struct, unsigned int flags);
+
+template<typename T>
+inline bool pb_encode(pb_ostream_t& stream, const pb_msgdesc_t& fields, const T& dest_struct, unsigned int flags) {
+    return pb_encode_ex(&stream, &fields, reinterpret_cast<const void*>(&dest_struct), flags);
+}
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
 #define pb_encode_delimited(s,f,d) pb_encode_ex(s,f,d, PB_ENCODE_DELIMITED)
@@ -190,8 +196,9 @@ bool pb_encode_float_as_double(pb_ostream_t *stream, float value);
  */
 bool pb_encode_submessage(pb_ostream_t *stream, const pb_msgdesc_t *fields, const void *src_struct);
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+template<typename T>
+inline bool pb_encode_submessage(pb_ostream_t& stream, const pb_msgdesc_t& fields, const T& dest_struct) {
+    return pb_encode_submessage(&stream, &fields, reinterpret_cast<const void*>(&dest_struct));
+}
 
 #endif

@@ -683,10 +683,12 @@ class Field(ProtoElement):
 
         # Decide how the field data will be allocated
         if field_options.type == nanopb_pb2.FT_DEFAULT:
-            if can_be_static:
+            if desc.type == FieldD.TYPE_MESSAGE:
+                field_options.type = nanopb_pb2.FT_CALLBACK
+            elif can_be_static:
                 field_options.type = nanopb_pb2.FT_STATIC
             else:
-                field_options.type = field_options.fallback_type
+                field_options.type = nanopb_pb2.FT_POINTER
 
         if field_options.type == nanopb_pb2.FT_STATIC and not can_be_static:
             raise Exception("Field '%s' is defined as static, but max_size or "
