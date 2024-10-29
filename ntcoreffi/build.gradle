@@ -119,10 +119,6 @@ task cppHeadersZip(type: Zip) {
     }
 }
 
-artifacts {
-    archives cppHeadersZip
-}
-
 addTaskToCopyAllOutputs(cppHeadersZip)
 
 model {
