@@ -74,11 +74,6 @@ struct pb_ostream_s
  */
 bool pb_encode(pb_ostream_t *stream, const pb_msgdesc_t *fields, const void *src_struct);
 
-template<typename T>
-inline bool pb_encode(pb_ostream_t& stream, const pb_msgdesc_t& fields, const T& dest_struct) {
-    return pb_encode(&stream, &fields, reinterpret_cast<const void*>(&dest_struct));
-}
-
 /* Extended version of pb_encode, with several options to control the
  * encoding process:
  *
@@ -94,11 +89,6 @@ inline bool pb_encode(pb_ostream_t& stream, const pb_msgdesc_t& fields, const T&
 #define PB_ENCODE_DELIMITED       0x02U
 #define PB_ENCODE_NULLTERMINATED  0x04U
 bool pb_encode_ex(pb_ostream_t *stream, const pb_msgdesc_t *fields, const void *src_struct, unsigned int flags);
-
-template<typename T>
-inline bool pb_encode(pb_ostream_t& stream, const pb_msgdesc_t& fields, const T& dest_struct, unsigned int flags) {
-    return pb_encode_ex(&stream, &fields, reinterpret_cast<const void*>(&dest_struct), flags);
-}
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
 #define pb_encode_delimited(s,f,d) pb_encode_ex(s,f,d, PB_ENCODE_DELIMITED)
@@ -195,10 +185,5 @@ bool pb_encode_float_as_double(pb_ostream_t *stream, float value);
  * calculate message size and then to actually write it out.
  */
 bool pb_encode_submessage(pb_ostream_t *stream, const pb_msgdesc_t *fields, const void *src_struct);
-
-template<typename T>
-inline bool pb_encode_submessage(pb_ostream_t& stream, const pb_msgdesc_t& fields, const T& dest_struct) {
-    return pb_encode_submessage(&stream, &fields, reinterpret_cast<const void*>(&dest_struct));
-}
 
 #endif

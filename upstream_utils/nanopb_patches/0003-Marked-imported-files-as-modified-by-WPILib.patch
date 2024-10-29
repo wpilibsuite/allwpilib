@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Thad House <thadhouse1@gmail.com>
 Date: Mon, 28 Oct 2024 17:38:55 -0700
-Subject: [PATCH 3/3] Marked imported files as modified by WPILib
+Subject: [PATCH 3/5] Marked imported files as modified by WPILib
 
 ---
  generator/nanopb_generator.py |   2 +
@@ -11,8 +11,8 @@ Subject: [PATCH 3/3] Marked imported files as modified by WPILib
  pb_decode.c                   | 144 +++++++++++++++++-----------------
  pb_decode.h                   |   2 +
  pb_encode.c                   |  80 ++++++++++---------
- pb_encode.h                   |   6 +-
- 8 files changed, 128 insertions(+), 113 deletions(-)
+ pb_encode.h                   |   2 +
+ 8 files changed, 126 insertions(+), 111 deletions(-)
 
 diff --git a/generator/nanopb_generator.py b/generator/nanopb_generator.py
 index d83308e3cd72826fd980b098567f32d3f016993c..d28f4cd191dda564c8599eaea34ee7595ce6153c 100755
@@ -895,7 +895,7 @@ index f9034a542848f0be0656e2e9eb2b467b2a83cf41..270a721863fd0a218a9667d5f4cadb6f
  }
  
 diff --git a/pb_encode.h b/pb_encode.h
-index 6dc089da307a10a6d440e70acb2775ed6e7fb07c..bcb2fa22a09f354c55941c1cae8424d01a972ba5 100644
+index 4d8da580d141d01b47942ed0d9853fdbe676bea5..961bde1e3542392c1da6ea64cd15904af6289d22 100644
 --- a/pb_encode.h
 +++ b/pb_encode.h
 @@ -1,6 +1,8 @@
@@ -907,21 +907,3 @@ index 6dc089da307a10a6d440e70acb2775ed6e7fb07c..bcb2fa22a09f354c55941c1cae8424d0
   */
  
  #ifndef PB_ENCODE_H_INCLUDED
-@@ -49,7 +51,7 @@ struct pb_ostream_s
- 
-     /* Number of bytes written so far. */
-     size_t bytes_written;
--    
-+
- #ifndef PB_NO_ERRMSG
-     /* Pointer to constant (ROM) string when decoding function returns error */
-     const char *errmsg;
-@@ -115,7 +117,7 @@ pb_ostream_t pb_ostream_from_buffer(pb_byte_t *buf, size_t bufsize);
- 
- /* Pseudo-stream for measuring the size of a message without actually storing
-  * the encoded data.
-- * 
-+ *
-  * Example usage:
-  *    MyMessage msg = {};
-  *    pb_ostream_t stream = PB_OSTREAM_SIZING;

@@ -82,11 +82,6 @@ struct pb_istream_s
  */
 bool pb_decode(pb_istream_t *stream, const pb_msgdesc_t *fields, void *dest_struct);
 
-template<typename T>
-inline bool pb_decode(pb_istream_t& stream, const pb_msgdesc_t& fields, T& dest_struct) {
-    return pb_decode(&stream, &fields, reinterpret_cast<void*>(&dest_struct));
-}
-
 /* Extended version of pb_decode, with several options to control
  * the decoding process:
  *
@@ -114,11 +109,6 @@ inline bool pb_decode(pb_istream_t& stream, const pb_msgdesc_t& fields, T& dest_
 #define PB_DECODE_DELIMITED       0x02U
 #define PB_DECODE_NULLTERMINATED  0x04U
 bool pb_decode_ex(pb_istream_t *stream, const pb_msgdesc_t *fields, void *dest_struct, unsigned int flags);
-
-template<typename T>
-inline bool pb_decode(pb_istream_t& stream, const pb_msgdesc_t& fields, T& dest_struct, unsigned int flags) {
-    return pb_decode_ex(&stream, &fields, reinterpret_cast<void*>(&dest_struct), flags);
-}
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
 #define pb_decode_noinit(s,f,d) pb_decode_ex(s,f,d, PB_DECODE_NOINIT)

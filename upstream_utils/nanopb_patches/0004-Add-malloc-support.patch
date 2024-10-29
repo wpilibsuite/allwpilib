@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thad House <thadhouse1@gmail.com>
+Date: Tue, 29 Oct 2024 15:55:54 -0700
+Subject: [PATCH 4/5] Add malloc support
+
+---
+ pb.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pb.h b/pb.h
+index 476a124a5874bd71ea4cabc8a0e1fea86216bde0..f7e6f5adbcb438b364d416aa8bb13eb70fbce678 100644
+--- a/pb.h
++++ b/pb.h
+@@ -13,7 +13,7 @@
+  *****************************************************************/
+ 
+ /* Enable support for dynamically allocated fields */
+-/* #define PB_ENABLE_MALLOC 1 */
++#define PB_ENABLE_MALLOC 1
+ 
+ /* Define this if your CPU / compiler combination does not support
+  * unaligned memory access to packed structures. Note that packed
