@@ -58,24 +58,6 @@ void sysid::CreateErrorPopup(bool& isError, std::string_view errorMessage) {
   }
 }
 
-std::string_view sysid::GetAbbreviation(std::string_view unit) {
-  if (unit == "Meters") {
-    return "m";
-  } else if (unit == "Feet") {
-    return "ft";
-  } else if (unit == "Inches") {
-    return "in";
-  } else if (unit == "Radians") {
-    return "rad";
-  } else if (unit == "Degrees") {
-    return "deg";
-  } else if (unit == "Rotations") {
-    return "rot";
-  } else {
-    throw std::runtime_error("Invalid Unit");
-  }
-}
-
 void sysid::SaveFile(std::string_view contents,
                      const std::filesystem::path& path) {
   // Create the path if it doesn't already exist.
