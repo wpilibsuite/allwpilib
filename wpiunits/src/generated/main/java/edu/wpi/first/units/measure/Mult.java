@@ -278,6 +278,17 @@ public interface Mult<A extends Unit, B extends Unit> extends Measure<MultUnit<A
 
 
   @Override
+  default Mult<MultUnit<A, B>, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<MultUnit<A, B>, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<MultUnit<A, B>, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<MultUnit<A, B>, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<MultUnit<A, B>, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<MultUnit<A, B>, TemperatureUnit>) Measure.super.times(multiplier);
   }

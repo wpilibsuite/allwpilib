@@ -278,6 +278,17 @@ public interface Angle extends Measure<AngleUnit> {
 
 
   @Override
+  default Mult<AngleUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<AngleUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<AngleUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<AngleUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<AngleUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<AngleUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }

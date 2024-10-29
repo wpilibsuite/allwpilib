@@ -318,12 +318,12 @@ class HttpRequest {
   template <typename T>
   HttpRequest(const HttpLocation& loc, const T& extraParams)
       : host{loc.host}, port{loc.port} {
-    StringMap<std::string_view> params;
+    SmallVector<std::pair<std::string_view, std::string_view>, 4> params;
     for (const auto& p : loc.params) {
-      params.insert(std::make_pair(GetFirst(p), GetSecond(p)));
+      params.emplace_back(std::make_pair(GetFirst(p), GetSecond(p)));
     }
     for (const auto& p : extraParams) {
-      params.insert(std::make_pair(GetFirst(p), GetSecond(p)));
+      params.emplace_back(std::make_pair(GetFirst(p), GetSecond(p)));
     }
     SetPath(loc.path, params);
     SetAuth(loc);

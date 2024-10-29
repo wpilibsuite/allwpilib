@@ -229,7 +229,7 @@ class VideoProperty {
   CS_Status GetLastStatus() const { return m_status; }
 
  private:
-  explicit VideoProperty(CS_Property handle) {
+  explicit VideoProperty(CS_Property handle) : m_handle(handle) {
     m_status = 0;
     if (handle == 0) {
       m_kind = kNone;

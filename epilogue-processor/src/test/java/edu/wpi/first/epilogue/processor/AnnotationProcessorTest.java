@@ -6,6 +6,7 @@ package edu.wpi.first.epilogue.processor;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
+import static edu.wpi.first.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -910,6 +911,7 @@ class AnnotationProcessorTest {
 
     Compilation compilation =
         javac()
+            .withOptions(kJavaVersionOptions)
             .withProcessors(new AnnotationProcessor())
             .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
 
@@ -1123,6 +1125,7 @@ class AnnotationProcessorTest {
 
     Compilation compilation =
         javac()
+            .withOptions(kJavaVersionOptions)
             .withProcessors(new AnnotationProcessor())
             .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
 
@@ -1149,6 +1152,7 @@ class AnnotationProcessorTest {
   private void assertLoggerGenerates(String loggedClassContent, String loggerClassContent) {
     Compilation compilation =
         javac()
+            .withOptions(kJavaVersionOptions)
             .withProcessors(new AnnotationProcessor())
             .compile(
                 JavaFileObjects.forSourceString(

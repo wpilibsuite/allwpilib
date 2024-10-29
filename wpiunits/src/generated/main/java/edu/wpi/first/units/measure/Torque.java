@@ -278,6 +278,17 @@ public interface Torque extends Measure<TorqueUnit> {
 
 
   @Override
+  default Mult<TorqueUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<TorqueUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<TorqueUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<TorqueUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<TorqueUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<TorqueUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }

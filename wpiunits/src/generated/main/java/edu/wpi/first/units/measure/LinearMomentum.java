@@ -278,6 +278,17 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
 
 
   @Override
+  default Mult<LinearMomentumUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<LinearMomentumUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<LinearMomentumUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<LinearMomentumUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<LinearMomentumUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<LinearMomentumUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }
