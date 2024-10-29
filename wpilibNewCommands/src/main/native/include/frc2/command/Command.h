@@ -310,6 +310,16 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   CommandPtr OnlyIf(std::function<bool()> condition) &&;
 
   /**
+   * Creates a new command that runs this command
+   * and the deadline in parallel, finishing when
+   * the deadline finishes.
+   *
+   * @param deadline the deadline of the command group
+   * @return the decorated command
+   */
+  CommandPtr WithDeadline(CommandPtr&& deadline) &&;
+
+  /**
    * Decorates this command with a set of commands to run parallel to it, ending
    * when the calling command ends and interrupting all the others. Often more
    * convenient/less-verbose than constructing a new {@link
@@ -321,6 +331,7 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    */
   [[nodiscard]]
   CommandPtr DeadlineFor(CommandPtr&& parallel) &&;
+
   /**
    * Decorates this command with a set of commands to run parallel to it, ending
    * when the last command ends. Often more convenient/less-verbose than

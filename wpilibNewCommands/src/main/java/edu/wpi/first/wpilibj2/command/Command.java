@@ -288,6 +288,18 @@ public abstract class Command implements Sendable {
   }
 
   /**
+   * Creates a new command that runs this command
+   * and the deadline in parallel, finishing when
+   * the deadline finishes.
+   *
+   * @param deadline the deadline of the command group
+   * @return the decorated command
+   */
+  public ParallelDeadlineGroup withDeadline(Command deadline) {
+    return new ParallelDeadlineGroup(deadline, this);
+  }
+
+  /**
    * Decorates this command with a set of commands to run parallel to it, ending when the calling
    * command ends and interrupting all the others. Often more convenient/less-verbose than
    * constructing a new {@link ParallelDeadlineGroup} explicitly.
