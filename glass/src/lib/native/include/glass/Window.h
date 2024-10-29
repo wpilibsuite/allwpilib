@@ -117,9 +117,10 @@ class Window {
    * Displays menu item for the window.
    * @param label what to display as the menu item label; defaults to
    *              window ID if nullptr
+   * @param enabled false to force-disable menu item (if window not visible)
    * @return True if window went from invisible to visible.
    */
-  bool DisplayMenuItem(const char* label = nullptr);
+  bool DisplayMenuItem(const char* label = nullptr, bool enabled = true);
 
   /**
    * Scale default window position and size.

@@ -14,6 +14,7 @@
 #include <wpi/StringMap.h>
 
 #include "glass/Context.h"
+#include "glass/Model.h"
 #include "glass/Storage.h"
 
 namespace glass {
@@ -35,6 +36,7 @@ class Context {
   wpi::SmallVector<Storage*, 32> storageStack;
   wpi::StringMap<Storage> storageRoots;
   wpi::StringMap<bool> deviceHidden;
+  std::vector<std::unique_ptr<Model>> models;
   wpi::StringMap<DataSource*> sources;
   Storage& sourceNameStorage;
   uint64_t zeroTime = 0;

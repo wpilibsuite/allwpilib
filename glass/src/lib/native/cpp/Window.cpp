@@ -59,11 +59,11 @@ void Window::Display() {
   EndWindow();
 }
 
-bool Window::DisplayMenuItem(const char* label) {
+bool Window::DisplayMenuItem(const char* label, bool enabled) {
   bool wasVisible = m_visible;
   ImGui::MenuItem(
       label ? label : (m_name.empty() ? m_id.c_str() : m_name.c_str()), nullptr,
-      &m_visible, m_enabled);
+      &m_visible, m_visible || (enabled && m_enabled));
   return !wasVisible && m_visible;
 }
 

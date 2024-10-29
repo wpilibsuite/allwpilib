@@ -18,7 +18,6 @@
 
 #include "EncoderSimGui.h"
 #include "HALDataSource.h"
-#include "HALSimGui.h"
 
 using namespace halsimgui;
 
@@ -129,19 +128,21 @@ class DIOSimModel : public glass::DIOModel {
 
 class DIOsSimModel : public glass::DIOsModel {
  public:
-  DIOsSimModel()
-      : m_dioModels(HAL_GetNumDigitalChannels()),
+  explicit DIOsSimModel(glass::EncodersModel& encodersModel)
+      : m_encodersModel{encodersModel},
+        m_dioModels(HAL_GetNumDigitalChannels()),
         m_dpwmModels(HAL_GetNumDigitalPWMOutputs()),
         m_dutyCycleModels(HAL_GetNumDutyCycles()) {}
 
   void Update() override;
 
-  bool Exists() override { return true; }
+  bool Exists() override;
 
   void ForEachDIO(
       wpi::function_ref<void(glass::DIOModel& model, int index)> func) override;
 
  private:
+  glass::EncodersModel& m_encodersModel;
   // indexed by channel
   std::vector<std::unique_ptr<DIOSimModel>> m_dioModels;
   // indexed by index
@@ -198,7 +199,7 @@ void DIOsSimModel::Update() {
     }
   }
 
-  EncoderSimGui::GetEncodersModel().ForEachEncoder([&](auto& encoder, int i) {
+  m_encodersModel.ForEachEncoder([&](auto& encoder, int i) {
     int channel = encoder.GetChannelA();
     if (channel >= 0 && channel < numDIO && m_dioModels[channel]) {
       m_dioModels[channel]->SetEncoder(&encoder);
@@ -208,6 +209,15 @@ void DIOsSimModel::Update() {
       m_dioModels[channel]->SetEncoder(&encoder);
     }
   });
+}
+
+bool DIOsSimModel::Exists() {
+  for (auto&& model : m_dioModels) {
+    if (model && model->Exists()) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void DIOsSimModel::ForEachDIO(
@@ -220,25 +230,7 @@ void DIOsSimModel::ForEachDIO(
   }
 }
 
-static bool DIOAnyInitialized() {
-  static const int32_t num = HAL_GetNumDigitalChannels();
-  for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetDIOInitialized(i)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-void DIOSimGui::Initialize() {
-  HALSimGui::halProvider->Register(
-      "DIO", DIOAnyInitialized, [] { return std::make_unique<DIOsSimModel>(); },
-      [](glass::Window* win, glass::Model* model) {
-        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-        win->SetDefaultPos(470, 20);
-        return glass::MakeFunctionView([=] {
-          glass::DisplayDIOs(static_cast<DIOsSimModel*>(model),
-                             HALSimGui::halProvider->AreOutputsEnabled());
-        });
-      });
+glass::DIOsModel* halsimgui::CreateDIOsModel(
+    glass::EncodersModel& encodersModel) {
+  return glass::CreateModel<DIOsSimModel>(encodersModel);
 }

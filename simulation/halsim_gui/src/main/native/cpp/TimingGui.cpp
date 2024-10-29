@@ -6,29 +6,16 @@
 
 #include <cstdio>
 #include <cstring>
-#include <memory>
 #include <vector>
 
-#include <glass/Model.h>
-#include <glass/View.h>
 #include <hal/HALBase.h>
 #include <hal/simulation/MockHooks.h>
 #include <hal/simulation/NotifierData.h>
 #include <imgui.h>
 
-#include "HALSimGui.h"
-
 using namespace halsimgui;
 
-namespace {
-class TimingModel : public glass::Model {
- public:
-  void Update() override {}
-  bool Exists() override { return true; }
-};
-}  // namespace
-
-static void DisplayTiming() {
+void halsimgui::DisplayTiming() {
   int32_t status = 0;
   uint64_t curTime = HAL_GetFPGATime(&status);
 
@@ -68,17 +55,4 @@ static void DisplayTiming() {
                      notifiers[i].timeout / 1000000.0);
   }
   ImGui::PopItemWidth();
-}
-
-void TimingGui::Initialize() {
-  HALSimGui::halProvider->Register(
-      "Timing", [] { return true; },
-      [] { return std::make_unique<TimingModel>(); },
-      [](glass::Window* win, glass::Model* model) {
-        win->DisableRenamePopup();
-        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-        win->SetDefaultPos(5, 150);
-        return glass::MakeFunctionView(DisplayTiming);
-      });
-  HALSimGui::halProvider->ShowDefault("Timing");
 }

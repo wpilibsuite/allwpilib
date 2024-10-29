@@ -16,7 +16,6 @@
 
 #include "HALDataSource.h"
 #include "HALSimGui.h"
-#include "SimDeviceGui.h"
 
 using namespace halsimgui;
 
@@ -99,7 +98,7 @@ class PCMSimModel : public glass::PneumaticControlModel {
 
   void Update() override;
 
-  bool Exists() override { return true; }
+  bool Exists() override { return HALSIM_GetCTREPCMInitialized(m_index); }
 
   CompressorSimModel* GetCompressor() override { return &m_compressor; }
 
@@ -124,7 +123,9 @@ class PCMsSimModel : public glass::PneumaticControlsModel {
 
   void Update() override;
 
-  bool Exists() override { return true; }
+  bool Exists() override;
+
+  bool AnySolenoids() override;
 
   void ForEachPneumaticControl(
       wpi::function_ref<void(glass::PneumaticControlModel& model, int index)>
@@ -179,6 +180,24 @@ void PCMsSimModel::Update() {
   }
 }
 
+bool PCMsSimModel::Exists() {
+  for (auto&& model : m_models) {
+    if (model) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool PCMsSimModel::AnySolenoids() {
+  for (auto&& model : m_models) {
+    if (model && model->GetNumSolenoids() > 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void PCMsSimModel::ForEachPneumaticControl(
     wpi::function_ref<void(glass::PneumaticControlModel& model, int index)>
         func) {
@@ -190,40 +209,14 @@ void PCMsSimModel::ForEachPneumaticControl(
   }
 }
 
-bool PCMSimGui::PCMsAnyInitialized() {
-  static const int32_t num = HAL_GetNumCTREPCMModules();
-  for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetCTREPCMInitialized(i)) {
-      return true;
-    }
-  }
-  return false;
+glass::PneumaticControlsModel* halsimgui::CreatePCMsModel() {
+  return glass::CreateModel<PCMsSimModel>();
 }
 
-bool PCMSimGui::PCMsAnySolenoids(glass::PneumaticControlsModel* model) {
-  bool any = false;
-  static_cast<PCMsSimModel*>(model)->ForEachPneumaticControl(
-      [&](glass::PneumaticControlModel& CTREPCM, int) {
-        if (static_cast<PCMSimModel*>(&CTREPCM)->GetNumSolenoids() > 0) {
-          any = true;
-        }
-      });
-  return any;
-}
-
-std::unique_ptr<glass::PneumaticControlsModel> PCMSimGui::GetPCMsModel() {
-  return std::make_unique<PCMsSimModel>();
-}
-
-void PCMSimGui::Initialize() {
-  HALSimGui::halProvider->RegisterModel(
-      "CTREPCMs", PCMSimGui::PCMsAnyInitialized,
-      [] { return std::make_unique<PCMsSimModel>(); });
-
-  SimDeviceGui::GetDeviceTree().Add(
-      HALSimGui::halProvider->GetModel("CTREPCMs"), [](glass::Model* model) {
-        glass::DisplayCompressorsDevice(
-            static_cast<PCMsSimModel*>(model),
-            HALSimGui::halProvider->AreOutputsEnabled());
-      });
+void halsimgui::InitializePCMs(glass::DeviceTreeModel& deviceTree,
+                               glass::PneumaticControlsModel* model) {
+  deviceTree.Add(model, [](glass::Model* model) {
+    glass::DisplayCompressorsDevice(static_cast<PCMsSimModel*>(model),
+                                    AreOutputsEnabled());
+  });
 }

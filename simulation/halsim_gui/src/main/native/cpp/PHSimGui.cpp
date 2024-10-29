@@ -16,7 +16,6 @@
 
 #include "HALDataSource.h"
 #include "HALSimGui.h"
-#include "SimDeviceGui.h"
 
 using namespace halsimgui;
 
@@ -119,7 +118,9 @@ class PHsSimModel : public glass::PneumaticControlsModel {
 
   void Update() override;
 
-  bool Exists() override { return true; }
+  bool Exists() override;
+
+  bool AnySolenoids() override;
 
   void ForEachPneumaticControl(
       wpi::function_ref<void(glass::PneumaticControlModel& model, int index)>
@@ -174,6 +175,24 @@ void PHsSimModel::Update() {
   }
 }
 
+bool PHsSimModel::Exists() {
+  for (auto&& model : m_models) {
+    if (model) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool PHsSimModel::AnySolenoids() {
+  for (auto&& model : m_models) {
+    if (model && model->GetNumSolenoids() > 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void PHsSimModel::ForEachPneumaticControl(
     wpi::function_ref<void(glass::PneumaticControlModel& model, int index)>
         func) {
@@ -185,40 +204,14 @@ void PHsSimModel::ForEachPneumaticControl(
   }
 }
 
-bool PHSimGui::PHsAnyInitialized() {
-  static const int32_t num = HAL_GetNumREVPHModules();
-  for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetREVPHInitialized(i)) {
-      return true;
-    }
-  }
-  return false;
+glass::PneumaticControlsModel* halsimgui::CreatePHsModel() {
+  return glass::CreateModel<PHsSimModel>();
 }
 
-bool PHSimGui::PHsAnySolenoids(glass::PneumaticControlsModel* model) {
-  bool any = false;
-  static_cast<PHsSimModel*>(model)->ForEachPneumaticControl(
-      [&](glass::PneumaticControlModel& REVPH, int) {
-        if (static_cast<PHSimModel*>(&REVPH)->GetNumSolenoids() > 0) {
-          any = true;
-        }
-      });
-  return any;
-}
-
-std::unique_ptr<glass::PneumaticControlsModel> PHSimGui::GetPHsModel() {
-  return std::make_unique<PHsSimModel>();
-}
-
-void PHSimGui::Initialize() {
-  HALSimGui::halProvider->RegisterModel(
-      "REVPHs", PHSimGui::PHsAnyInitialized,
-      [] { return std::make_unique<PHsSimModel>(); });
-
-  SimDeviceGui::GetDeviceTree().Add(
-      HALSimGui::halProvider->GetModel("REVPHs"), [](glass::Model* model) {
-        glass::DisplayCompressorsDevice(
-            static_cast<PHsSimModel*>(model),
-            HALSimGui::halProvider->AreOutputsEnabled());
-      });
+void halsimgui::InitializePHs(glass::DeviceTreeModel& deviceTree,
+                              glass::PneumaticControlsModel* model) {
+  deviceTree.Add(model, [](glass::Model* model) {
+    glass::DisplayCompressorsDevice(static_cast<PHsSimModel*>(model),
+                                    AreOutputsEnabled());
+  });
 }

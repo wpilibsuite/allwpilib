@@ -4,11 +4,12 @@
 
 #pragma once
 
+namespace glass {
+class RoboRioModel;
+}  // namespace glass
+
 namespace halsimgui {
 
-class RoboRioSimGui {
- public:
-  static void Initialize();
-};
+glass::RoboRioModel* CreateRoboRioModel();
 
 }  // namespace halsimgui

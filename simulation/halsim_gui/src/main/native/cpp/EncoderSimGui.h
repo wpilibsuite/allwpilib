@@ -10,10 +10,6 @@ class EncodersModel;
 
 namespace halsimgui {
 
-class EncoderSimGui {
- public:
-  static void Initialize();
-  static glass::EncodersModel& GetEncodersModel();
-};
+glass::EncodersModel* CreateEncodersModel();
 
 }  // namespace halsimgui

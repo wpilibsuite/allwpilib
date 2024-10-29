@@ -12,13 +12,11 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <glass/DataSource.h>
 #include <glass/hardware/Encoder.h>
 #include <hal/Ports.h>
 #include <hal/simulation/EncoderData.h>
 #include <hal/simulation/SimDeviceData.h>
-
-#include "HALDataSource.h"
-#include "HALSimGui.h"
 
 using namespace halsimgui;
 
@@ -200,7 +198,7 @@ class EncodersSimModel : public glass::EncodersModel {
 
   void Update() override;
 
-  bool Exists() override { return true; }
+  bool Exists() override;
 
   void ForEachEncoder(
       wpi::function_ref<void(glass::EncoderModel& model, int index)> func)
@@ -225,6 +223,15 @@ void EncodersSimModel::Update() {
   }
 }
 
+bool EncodersSimModel::Exists() {
+  for (auto&& model : m_models) {
+    if (model) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void EncodersSimModel::ForEachEncoder(
     wpi::function_ref<void(glass::EncoderModel& model, int index)> func) {
   for (int32_t i = 0, iend = static_cast<int32_t>(m_models.size()); i < iend;
@@ -235,30 +242,6 @@ void EncodersSimModel::ForEachEncoder(
   }
 }
 
-static bool EncodersAnyInitialized() {
-  static const int32_t num = HAL_GetNumEncoders();
-  for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetEncoderInitialized(i)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-void EncoderSimGui::Initialize() {
-  HALSimGui::halProvider->Register(
-      "Encoders", EncodersAnyInitialized,
-      [] { return std::make_unique<EncodersSimModel>(); },
-      [](glass::Window* win, glass::Model* model) {
-        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-        win->SetDefaultPos(5, 250);
-        return glass::MakeFunctionView(
-            [=] { DisplayEncoders(static_cast<EncodersSimModel*>(model)); });
-      });
-}
-
-glass::EncodersModel& EncoderSimGui::GetEncodersModel() {
-  static auto model = HALSimGui::halProvider->GetModel("Encoders");
-  assert(model);
-  return *static_cast<glass::EncodersModel*>(model);
+glass::EncodersModel* halsimgui::CreateEncodersModel() {
+  return glass::CreateModel<EncodersSimModel>();
 }

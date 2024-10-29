@@ -13,8 +13,6 @@
 #include <hal/simulation/AnalogOutData.h>
 
 #include "HALDataSource.h"
-#include "HALSimGui.h"
-#include "SimDeviceGui.h"
 
 using namespace halsimgui;
 
@@ -83,10 +81,10 @@ void AnalogOutputsSimModel::ForEachAnalogOutput(
   }
 }
 
-void AnalogOutputSimGui::Initialize() {
-  SimDeviceGui::GetDeviceTree().Add(
-      std::make_unique<AnalogOutputsSimModel>(), [](glass::Model* model) {
-        glass::DisplayAnalogOutputsDevice(
-            static_cast<AnalogOutputsSimModel*>(model));
-      });
+void halsimgui::InitializeAnalogOutputs(glass::DeviceTreeModel& deviceTree) {
+  deviceTree.Add(std::make_unique<AnalogOutputsSimModel>(),
+                 [](glass::Model* model) {
+                   glass::DisplayAnalogOutputsDevice(
+                       static_cast<AnalogOutputsSimModel*>(model));
+                 });
 }
