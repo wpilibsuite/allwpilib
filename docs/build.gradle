@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id "org.ysb33r.doxygen" version "1.0.3"
+    id "org.ysb33r.doxygen" version "1.0.4"
 }
 
 evaluationDependsOn(':apriltag')
