@@ -45,8 +45,8 @@ const pb_msgdesc_t* wpi::Protobuf<TestProto>::Message() {
 
 std::optional<TestProto> wpi::Protobuf<TestProto>::Unpack(
     wpi::ProtoInputStream& stream) {
-  wpi::StringUnpackCallback str;
-  wpi::StdVectorBytesUnpackCallback bytes;
+  wpi::UnpackCallback<std::string> str;
+  wpi::UnpackCallback<std::vector<uint8_t>> bytes;
   wpi::UnpackCallback<TestProtoInner> inner;
   wpi_proto_TestProto msg;
   msg.string_msg = str.Callback();
