@@ -5,6 +5,8 @@
 #include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
 
+#include <wpi/SmallVector.h>
+
 #include "frc/geometry/Pose2d.h"
 
 using namespace frc;
@@ -25,4 +27,18 @@ TEST(Pose2dProtoTest, Roundtrip) {
   Pose2d unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.Translation(), unpacked_data.Translation());
   EXPECT_EQ(kExpectedData.Rotation(), unpacked_data.Rotation());
+}
+
+TEST(Pose2dProtoTest, RoundtripNanopb) {
+  wpi::SmallVector<uint8_t, 64> buf;
+  wpi::ProtoOutputStream ostream{buf, ProtoType::Message()};
+
+  ASSERT_TRUE(ProtoType::Pack(ostream, kExpectedData));
+
+  wpi::ProtoInputStream istream{buf, ProtoType::Message()};
+  std::optional<Pose2d> unpacked_data = ProtoType::Unpack(istream);
+  ASSERT_TRUE(unpacked_data.has_value());
+
+  EXPECT_EQ(kExpectedData.Translation(), unpacked_data->Translation());
+  EXPECT_EQ(kExpectedData.Rotation(), unpacked_data->Rotation());
 }

@@ -16,6 +16,7 @@ struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Pose2d> {
   static frc::Pose2d Unpack(const google::protobuf::Message& msg);
   static void Pack(google::protobuf::Message* msg, const frc::Pose2d& value);
 
-  static std::optional<frc::Pose2d> Unpack(pb_istream_t& stream);
-  static bool Pack(pb_ostream_t& stream, const frc::Pose2d& value, bool is_subobject = false);
+  static const pb_msgdesc_t* Message();
+  static std::optional<frc::Pose2d> Unpack(wpi::ProtoInputStream& stream);
+  static bool Pack(wpi::ProtoOutputStream& stream, const frc::Pose2d& value);
 };

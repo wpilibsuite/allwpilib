@@ -18,6 +18,8 @@
 #include "wpi/function_ref.h"
 
 #include "pb.h"
+#include "pb_decode.h"
+#include "pb_encode.h"
 
 namespace google::protobuf {
 class Arena;
@@ -43,38 +45,86 @@ class SmallVectorImpl;
 template <typename T>
 struct Protobuf {};
 
-template <typename T>
-pb_callback_t UnpackCallback(T& value) {
-  return pb_callback_t{
-      .funcs{
-          .decode = [](pb_istream_t* stream, const pb_field_t* field,
-                       void** arg) -> bool {
-            T* value = reinterpret_cast<T*>(*arg);
-            auto attempt = wpi::Protobuf<T>::Unpack(*stream);
-            if (attempt.has_value()) {
-              *value = *attempt;
-              return true;
-            }
-            return false;
-          },
-      },
-      .arg = &value,
-  };
-}
+class ProtoInputStream {
+ public:
+  ProtoInputStream(pb_istream_t* stream, const pb_msgdesc_t* msgDesc)
+      : m_streamMsg{stream}, m_msgDesc{msgDesc} {}
 
-template <typename T>
-inline pb_callback_t PackCallback(const T& value) {
-  return pb_callback_t{
-      .funcs{
-          .encode = [](pb_ostream_t* stream, const pb_field_t* field,
-                       void* const* arg) -> bool {
-            const T* value = reinterpret_cast<const T*>(*arg);
-            return wpi::Protobuf<T>::Pack(*stream, *value);
-          },
-      },
-      .arg = const_cast<T*>(&value),
-  };
-}
+  ProtoInputStream(std::span<const uint8_t> stream, const pb_msgdesc_t* msgDesc)
+      : m_streamLocal{pb_istream_from_buffer(
+            reinterpret_cast<const pb_byte_t*>(stream.data()), stream.size())},
+        m_msgDesc{msgDesc} {}
+
+  pb_istream_t* Stream() noexcept {
+    return m_streamMsg ? m_streamMsg : &m_streamLocal;
+  }
+  const pb_msgdesc_t* MsgDesc() const noexcept { return m_msgDesc; }
+
+  template <typename T>
+  bool Decode(T& msg) {
+    return pb_decode(Stream(), m_msgDesc, &msg);
+  }
+
+  template <typename T>
+  bool DecodeNoInit(T& msg) {
+    return pb_decode_ex(Stream(), m_msgDesc, &msg, PB_DECODE_NOINIT);
+  }
+
+ private:
+  pb_istream_t m_streamLocal;
+  pb_istream_t* m_streamMsg{nullptr};
+  const pb_msgdesc_t* m_msgDesc;
+};
+
+class ProtoOutputStream {
+ public:
+  using SmallVectorType = wpi::SmallVectorImpl<uint8_t>;
+  using StdVectorType = std::vector<uint8_t>;
+
+  ProtoOutputStream(pb_ostream_t* stream, const pb_msgdesc_t* msgDesc)
+      : m_streamMsg{stream}, m_msgDesc{msgDesc} {}
+
+  ProtoOutputStream(SmallVectorType& out, const pb_msgdesc_t* msgDesc)
+      : m_msgDesc{msgDesc} {
+    m_streamLocal.callback = WriteFromSmallVector;
+    m_streamLocal.state = &out;
+    m_streamLocal.max_size = SIZE_MAX;
+    m_streamLocal.bytes_written = 0;
+  }
+
+  ProtoOutputStream(StdVectorType& out, const pb_msgdesc_t* msgDesc)
+      : m_msgDesc{msgDesc} {
+    m_streamLocal.callback = WriteFromStdVector;
+    m_streamLocal.state = &out;
+    m_streamLocal.max_size = SIZE_MAX;
+    m_streamLocal.bytes_written = 0;
+  }
+
+  pb_ostream_t* Stream() noexcept {
+    return m_streamMsg ? m_streamMsg : &m_streamLocal;
+  }
+  bool IsSubmessage() const noexcept { return m_streamMsg; }
+  const pb_msgdesc_t* MsgDesc() const noexcept { return m_msgDesc; }
+
+  template <typename T>
+  bool Encode(const T& msg) {
+    if (m_streamMsg) {
+      return pb_encode_submessage(m_streamMsg, m_msgDesc, &msg);
+    }
+    return pb_encode(&m_streamLocal, m_msgDesc, &msg);
+  }
+
+ private:
+  static bool WriteFromSmallVector(pb_ostream_t* stream, const pb_byte_t* buf,
+                                   size_t count);
+
+  static bool WriteFromStdVector(pb_ostream_t* stream, const pb_byte_t* buf,
+                                 size_t count);
+
+  pb_ostream_t m_streamLocal;
+  pb_ostream_t* m_streamMsg{nullptr};
+  const pb_msgdesc_t* m_msgDesc;
+};
 
 /**
  * Specifies that a type is capable of protobuf serialization and
@@ -375,6 +425,64 @@ class ProtobufMessage {
 
  private:
   google::protobuf::Message* m_msg = nullptr;
+};
+
+template <typename T>
+class NanopbMessage {
+ public:
+  /**
+   * Unpacks from a byte array.
+   *
+   * @param data byte array
+   * @return Optional; empty if parsing failed
+   */
+  std::optional<T> Unpack(std::span<const uint8_t> data) {
+    ProtoInputStream stream{data, Protobuf<T>::Message()};
+    return Protobuf<T>::Unpack(stream);
+  }
+
+  // This will work, just needs the rest of the infrastructure built out to do
+  // so
+  // /**
+  //  * Unpacks from a byte array into an existing object.
+  //  *
+  //  * @param[out] out output object
+  //  * @param[in] data byte array
+  //  * @return true if successful
+  //  */
+  // bool UnpackInto(T* out, std::span<const uint8_t> data) {
+  //   ProtoInputStream stream{data, Protobuf<T>::Message()};
+  //   Protobuf<T>::Unpack(stream);
+  //   if (!detail::ParseProtobuf(m_msg, data)) {
+  //     return false;
+  //   }
+  //   UnpackProtobufInto(out, *m_msg);
+  //   return true;
+  // }
+
+  /**
+   * Packs object into a SmallVector.
+   *
+   * @param[out] out output bytes
+   * @param[in] value value
+   * @return true if successful
+   */
+  bool Pack(wpi::SmallVectorImpl<uint8_t>& out, const T& value) {
+    ProtoOutputStream stream{out, Protobuf<T>::Message()};
+    return Protobuf<T>::Pack(stream, value);
+  }
+
+  /**
+   * Packs object into a std::vector.
+   *
+   * @param[out] out output bytes
+   * @param[in] value value
+   * @return true if successful
+   */
+  bool Pack(std::vector<uint8_t>& out, const T& value) {
+    ProtoOutputStream stream{out, Protobuf<T>::Message()};
+    return Protobuf<T>::Pack(stream, value);
+  }
 };
 
 }  // namespace wpi

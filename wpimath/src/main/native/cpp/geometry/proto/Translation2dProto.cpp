@@ -13,11 +13,14 @@
 
 #include "geometry2d.npb.h"
 
+const pb_msgdesc_t* wpi::Protobuf<frc::Translation2d>::Message() {
+  return get_wpi_proto_ProtobufTranslation2d_msg();
+}
+
 std::optional<frc::Translation2d> wpi::Protobuf<frc::Translation2d>::Unpack(
-    pb_istream_t& stream) {
+    wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufTranslation2d msg;
-  if (!pb_decode(stream, *get_wpi_proto_ProtobufTranslation2d_msg(), msg,
-                 PB_DECODE_NOINIT)) {
+  if (!stream.DecodeNoInit(msg)) {
     return {};
   }
 
@@ -27,17 +30,13 @@ std::optional<frc::Translation2d> wpi::Protobuf<frc::Translation2d>::Unpack(
   };
 }
 
-bool wpi::Protobuf<frc::Translation2d>::Pack(pb_ostream_t& stream,
-                                             const frc::Translation2d& value, bool is_subobject) {
+bool wpi::Protobuf<frc::Translation2d>::Pack(wpi::ProtoOutputStream& stream,
+                                             const frc::Translation2d& value) {
   wpi_proto_ProtobufTranslation2d msg{
       .x = value.X().value(),
       .y = value.Y().value(),
   };
-  if (is_subobject) {
-    return pb_encode_submessage(stream, *get_wpi_proto_ProtobufTranslation2d_msg(), msg);
-  } else {
-    return pb_encode(stream, *get_wpi_proto_ProtobufTranslation2d_msg(), msg);
-  }
+  return stream.Encode(msg);
 }
 
 google::protobuf::Message* wpi::Protobuf<frc::Translation2d>::New(

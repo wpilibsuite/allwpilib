@@ -17,6 +17,7 @@ struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Rotation2d> {
   static void Pack(google::protobuf::Message* msg,
                    const frc::Rotation2d& value);
 
-  static std::optional<frc::Rotation2d> Unpack(pb_istream_t& stream);
-  static bool Pack(pb_ostream_t& stream, const frc::Rotation2d& value, bool is_subobject = false);
+  static const pb_msgdesc_t* Message();
+  static std::optional<frc::Rotation2d> Unpack(wpi::ProtoInputStream& stream);
+  static bool Pack(wpi::ProtoOutputStream& stream, const frc::Rotation2d& value);
 };

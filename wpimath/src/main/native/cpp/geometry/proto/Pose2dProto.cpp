@@ -13,31 +13,45 @@
 
 #include "geometry2d.npb.h"
 
+#include "wpi/protobuf/ProtobufCallbacks.h"
+
+const pb_msgdesc_t* wpi::Protobuf<frc::Pose2d>::Message() {
+  return get_wpi_proto_ProtobufPose2d_msg();
+}
+
 std::optional<frc::Pose2d> wpi::Protobuf<frc::Pose2d>::Unpack(
-    pb_istream_t& stream) {
-  frc::Rotation2d rot;
-  frc::Translation2d tsln;
+    wpi::ProtoInputStream& stream) {
+  wpi::UnpackCallback<frc::Translation2d> tsln;
+  wpi::UnpackCallback<frc::Rotation2d> rot;
   wpi_proto_ProtobufPose2d msg{
-      .translation = wpi::UnpackCallback(tsln),
-      .rotation = wpi::UnpackCallback(rot),
+      .translation = tsln.Callback(),
+      .rotation = rot.Callback(),
 
   };
-  if (!pb_decode(stream, *get_wpi_proto_ProtobufPose2d_msg(), msg,
-                 PB_DECODE_NOINIT)) {
+  if (!stream.DecodeNoInit(msg)) {
     return {};
   }
 
-  return frc::Pose2d{tsln, rot};
+  auto itsln = tsln.Items();
+  auto irot = rot.Items();
+
+  if (itsln.empty() || irot.empty()) {
+    return {};
+  }
+
+  return frc::Pose2d{itsln[0], irot[0]};
 }
 
-bool wpi::Protobuf<frc::Pose2d>::Pack(pb_ostream_t& stream,
+bool wpi::Protobuf<frc::Pose2d>::Pack(wpi::ProtoOutputStream& stream,
                                       const frc::Pose2d& value) {
+  wpi::PackCallback tsln{value.Translation()};
+  wpi::PackCallback rot{value.Rotation()};
   wpi_proto_ProtobufPose2d msg{
-      .translation = wpi::PackCallback(value.Translation()),
-      .rotation = wpi::PackCallback(value.Rotation()),
+      .translation = tsln.Callback(),
+      .rotation = rot.Callback(),
 
   };
-  return pb_encode(stream, *get_wpi_proto_ProtobufPose2d_msg(), msg);
+  return stream.Encode(msg);
 }
 
 google::protobuf::Message* wpi::Protobuf<frc::Pose2d>::New(
