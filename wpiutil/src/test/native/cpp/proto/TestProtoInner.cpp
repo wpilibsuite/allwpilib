@@ -36,7 +36,7 @@ std::optional<TestProtoInner> wpi::Protobuf<TestProtoInner>::Unpack(
 
 bool wpi::Protobuf<TestProtoInner>::Pack(wpi::ProtoOutputStream& stream,
                                          const TestProtoInner& value) {
-  wpi::StringPackCallback str{{{value.msg}}};
+  wpi::PackCallback str{&value.msg};
   wpi_proto_TestProtoInner msg{
       .msg = str.Callback(),
   };

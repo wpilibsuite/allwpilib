@@ -18,9 +18,6 @@ namespace wpi {
 using UnpackStringType = std::string;
 using UnpackBytesType = wpi::SmallVector<uint8_t, 128>;
 
-using PackStringType = std::string_view;
-using PackBytesType = std::span<const uint8_t>;
-
 template <typename T, size_t N = 1>
 class UnpackCallback {
  public:
@@ -107,7 +104,7 @@ class PackCallback {
     m_callback.funcs.encode = CallbackFunc;
     m_callback.arg = this;
   }
-  PackCallback(const T& element) : m_buffer{std::span<const T>{&element, 1}} {
+  PackCallback(const T* element) : m_buffer{std::span<const T>{element, 1}} {
     m_callback.funcs.encode = CallbackFunc;
     m_callback.arg = this;
   }
@@ -123,8 +120,11 @@ class PackCallback {
  private:
   bool CallbackFunc(pb_ostream_t* stream, const pb_field_t* field) {
     const pb_msgdesc_t* desc = nullptr;
-    if constexpr (!std::same_as<T, std::string_view> &&
-                  !std::same_as<T, std::span<const uint8_t>>) {
+    if constexpr (!(std::same_as<T, std::string_view> ||
+                    std::same_as<T, std::string> ||
+                    std::same_as<T, std::span<const uint8_t>> ||
+                    std::same_as<T, std::vector<uint8_t>> ||
+                    std::same_as<T, wpi::SmallVectorImpl<uint8_t>>)) {
       desc = wpi::Protobuf<T>::Message();
     }
     ProtoOutputStream ostream{stream, desc};
@@ -133,10 +133,11 @@ class PackCallback {
         return false;
       }
       bool success;
-      if constexpr (std::same_as<T, std::string_view>) {
-        success = pb_encode_string(
-            stream, reinterpret_cast<const pb_byte_t*>(i.data()), i.size());
-      } else if constexpr (std::same_as<T, std::span<const uint8_t>>) {
+      if constexpr (std::same_as<T, std::string_view> ||
+                    std::same_as<T, std::string> ||
+                    std::same_as<T, std::span<const uint8_t>> ||
+                    std::same_as<T, std::vector<uint8_t>> ||
+                    std::same_as<T, wpi::SmallVectorImpl<uint8_t>>) {
         success = pb_encode_string(
             stream, reinterpret_cast<const pb_byte_t*>(i.data()), i.size());
       } else {
@@ -156,12 +157,5 @@ class PackCallback {
   std::span<const T> m_buffer;
   pb_callback_t m_callback;
 };
-
-struct StringPackCallback : PackCallback<PackStringType> {
-  StringPackCallback(std::span<const std::string_view> buffers)
-      : PackCallback{buffers} {}
-};
-
-struct BytesPackCallback : PackCallback<PackBytesType> {};
 
 }  // namespace wpi
