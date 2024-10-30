@@ -1,6 +1,7 @@
 apply from: "${rootDir}/shared/resources.gradle"
 
 ext {
+    skipproto = true
     noWpiutil = true
     skipJniSymbols = [
         'Java_edu_wpi_first_util_CombinedRuntimeLoader_setDllDirectory'
@@ -230,6 +231,26 @@ model {
             it.sources.each {
                 it.exportedHeaders {
                     srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include', 'src/main/native/thirdparty/nanopb/include'
+                }
+            }
+        }
+    }
+    testSuites {
+        withType(GoogleTestTestSuiteSpec) {
+            sources {
+                protobufGenCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/generated/test/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/generated/test/native/cpp'
+                    }
+                }
+            }
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/test/native/include', 'src/generated/test/native/cpp'
                 }
             }
         }
