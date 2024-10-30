@@ -16,21 +16,19 @@
 typedef struct _wpi_proto_ProtobufMatrix {
     uint32_t num_rows;
     uint32_t num_cols;
-    pb_size_t data_count;
-    double *data;
+    pb_callback_t data;
 } wpi_proto_ProtobufMatrix;
 
 typedef struct _wpi_proto_ProtobufVector {
-    pb_size_t rows_count;
-    double *rows;
+    pb_callback_t rows;
 } wpi_proto_ProtobufVector;
 
 
 /* Initializer values for message structs */
-#define wpi_proto_ProtobufMatrix_init_default    {0, 0, 0, NULL}
-#define wpi_proto_ProtobufVector_init_default    {0, NULL}
-#define wpi_proto_ProtobufMatrix_init_zero       {0, 0, 0, NULL}
-#define wpi_proto_ProtobufVector_init_zero       {0, NULL}
+#define wpi_proto_ProtobufMatrix_init_default    {0, 0, {{NULL}, NULL}}
+#define wpi_proto_ProtobufVector_init_default    {{{NULL}, NULL}}
+#define wpi_proto_ProtobufMatrix_init_zero       {0, 0, {{NULL}, NULL}}
+#define wpi_proto_ProtobufVector_init_zero       {{{NULL}, NULL}}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define wpi_proto_ProtobufMatrix_num_rows_tag    1
@@ -42,13 +40,13 @@ typedef struct _wpi_proto_ProtobufVector {
 #define wpi_proto_ProtobufMatrix_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, UINT32,   num_rows,          1) \
 X(a, STATIC,   SINGULAR, UINT32,   num_cols,          2) \
-X(a, POINTER,  REPEATED, DOUBLE,   data,              3)
-#define wpi_proto_ProtobufMatrix_CALLBACK NULL
+X(a, CALLBACK, REPEATED, DOUBLE,   data,              3)
+#define wpi_proto_ProtobufMatrix_CALLBACK pb_default_field_callback
 #define wpi_proto_ProtobufMatrix_DEFAULT NULL
 
 #define wpi_proto_ProtobufVector_FIELDLIST(X, a) \
-X(a, POINTER,  REPEATED, DOUBLE,   rows,              1)
-#define wpi_proto_ProtobufVector_CALLBACK NULL
+X(a, CALLBACK, REPEATED, DOUBLE,   rows,              1)
+#define wpi_proto_ProtobufVector_CALLBACK pb_default_field_callback
 #define wpi_proto_ProtobufVector_DEFAULT NULL
 
 const pb_msgdesc_t *get_wpi_proto_ProtobufMatrix_msg(void);

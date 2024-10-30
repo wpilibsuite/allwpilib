@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Thad House <thadhouse1@gmail.com>
 Date: Mon, 28 Oct 2024 17:01:29 -0700
-Subject: [PATCH 2/5] Generate and export functions instead of globals
+Subject: [PATCH 2/4] Generate and export functions instead of globals
 
 ---
  generator/nanopb_generator.py | 9 +--------

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Thad House <thadhouse1@gmail.com>
 Date: Mon, 28 Oct 2024 16:58:15 -0700
-Subject: [PATCH 1/5] Remove extern C
+Subject: [PATCH 1/4] Remove extern C
 
 ---
  generator/nanopb_generator.py |  8 --------

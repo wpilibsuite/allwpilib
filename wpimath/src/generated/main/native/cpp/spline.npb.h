@@ -14,33 +14,25 @@
 
 /* Struct definitions */
 typedef struct _wpi_proto_ProtobufCubicHermiteSpline {
-    pb_size_t x_initial_count;
-    double *x_initial;
-    pb_size_t x_final_count;
-    double *x_final;
-    pb_size_t y_initial_count;
-    double *y_initial;
-    pb_size_t y_final_count;
-    double *y_final;
+    pb_callback_t x_initial;
+    pb_callback_t x_final;
+    pb_callback_t y_initial;
+    pb_callback_t y_final;
 } wpi_proto_ProtobufCubicHermiteSpline;
 
 typedef struct _wpi_proto_ProtobufQuinticHermiteSpline {
-    pb_size_t x_initial_count;
-    double *x_initial;
-    pb_size_t x_final_count;
-    double *x_final;
-    pb_size_t y_initial_count;
-    double *y_initial;
-    pb_size_t y_final_count;
-    double *y_final;
+    pb_callback_t x_initial;
+    pb_callback_t x_final;
+    pb_callback_t y_initial;
+    pb_callback_t y_final;
 } wpi_proto_ProtobufQuinticHermiteSpline;
 
 
 /* Initializer values for message structs */
-#define wpi_proto_ProtobufCubicHermiteSpline_init_default {0, NULL, 0, NULL, 0, NULL, 0, NULL}
-#define wpi_proto_ProtobufQuinticHermiteSpline_init_default {0, NULL, 0, NULL, 0, NULL, 0, NULL}
-#define wpi_proto_ProtobufCubicHermiteSpline_init_zero {0, NULL, 0, NULL, 0, NULL, 0, NULL}
-#define wpi_proto_ProtobufQuinticHermiteSpline_init_zero {0, NULL, 0, NULL, 0, NULL, 0, NULL}
+#define wpi_proto_ProtobufCubicHermiteSpline_init_default {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
+#define wpi_proto_ProtobufQuinticHermiteSpline_init_default {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
+#define wpi_proto_ProtobufCubicHermiteSpline_init_zero {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
+#define wpi_proto_ProtobufQuinticHermiteSpline_init_zero {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define wpi_proto_ProtobufCubicHermiteSpline_x_initial_tag 1
@@ -54,19 +46,19 @@ typedef struct _wpi_proto_ProtobufQuinticHermiteSpline {
 
 /* Struct field encoding specification for nanopb */
 #define wpi_proto_ProtobufCubicHermiteSpline_FIELDLIST(X, a) \
-X(a, POINTER,  REPEATED, DOUBLE,   x_initial,         1) \
-X(a, POINTER,  REPEATED, DOUBLE,   x_final,           2) \
-X(a, POINTER,  REPEATED, DOUBLE,   y_initial,         3) \
-X(a, POINTER,  REPEATED, DOUBLE,   y_final,           4)
-#define wpi_proto_ProtobufCubicHermiteSpline_CALLBACK NULL
+X(a, CALLBACK, REPEATED, DOUBLE,   x_initial,         1) \
+X(a, CALLBACK, REPEATED, DOUBLE,   x_final,           2) \
+X(a, CALLBACK, REPEATED, DOUBLE,   y_initial,         3) \
+X(a, CALLBACK, REPEATED, DOUBLE,   y_final,           4)
+#define wpi_proto_ProtobufCubicHermiteSpline_CALLBACK pb_default_field_callback
 #define wpi_proto_ProtobufCubicHermiteSpline_DEFAULT NULL
 
 #define wpi_proto_ProtobufQuinticHermiteSpline_FIELDLIST(X, a) \
-X(a, POINTER,  REPEATED, DOUBLE,   x_initial,         1) \
-X(a, POINTER,  REPEATED, DOUBLE,   x_final,           2) \
-X(a, POINTER,  REPEATED, DOUBLE,   y_initial,         3) \
-X(a, POINTER,  REPEATED, DOUBLE,   y_final,           4)
-#define wpi_proto_ProtobufQuinticHermiteSpline_CALLBACK NULL
+X(a, CALLBACK, REPEATED, DOUBLE,   x_initial,         1) \
+X(a, CALLBACK, REPEATED, DOUBLE,   x_final,           2) \
+X(a, CALLBACK, REPEATED, DOUBLE,   y_initial,         3) \
+X(a, CALLBACK, REPEATED, DOUBLE,   y_final,           4)
+#define wpi_proto_ProtobufQuinticHermiteSpline_CALLBACK pb_default_field_callback
 #define wpi_proto_ProtobufQuinticHermiteSpline_DEFAULT NULL
 
 const pb_msgdesc_t *get_wpi_proto_ProtobufCubicHermiteSpline_msg(void);
