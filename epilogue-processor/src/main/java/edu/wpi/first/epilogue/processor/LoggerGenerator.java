@@ -338,6 +338,11 @@ public class LoggerGenerator {
       return false;
     }
 
+    if (methodTree.getBody() == null) {
+      // Abstract or native method, can't be determined to be a getter
+      return false;
+    }
+
     var statements = methodTree.getBody().getStatements();
     if (statements.size() != 1) {
       // More complex than a simple `return m_field` statement
