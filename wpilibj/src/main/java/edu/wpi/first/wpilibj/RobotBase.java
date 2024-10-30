@@ -166,39 +166,42 @@ public abstract class RobotBase implements AutoCloseable {
 
           @Override
           public void accept(NetworkTableEvent t) {
-            if (t.connInfo.remote_id.startsWith("glass")) {
-              HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Glass);
-              m_detected = true;
-            } else if (t.connInfo.remote_id.startsWith("SmartDashboard")) {
-              HAL.report(
-                  tResourceType.kResourceType_Dashboard, tInstances.kDashboard_SmartDashboard);
-              m_detected = true;
-            } else if (t.connInfo.remote_id.startsWith("shuffleboard")) {
-              HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Shuffleboard);
-              m_detected = true;
-            } else if (t.connInfo.remote_id.regionMatches(true, 0, "elastic", 0, 7)) {
-              HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Elastic);
-              m_detected = true;
-            } else if (t.connInfo.remote_id.startsWith("Dashboard")) {
-              HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_LabVIEW);
-              m_detected = true;
-            } else if (t.connInfo.remote_id.startsWith("AdvantageScope")) {
-              HAL.report(
-                  tResourceType.kResourceType_Dashboard, tInstances.kDashboard_AdvantageScope);
-              m_detected = true;
-            } else if (t.connInfo.remote_id.startsWith("QFRCDashboard")) {
-              HAL.report(
-                  tResourceType.kResourceType_Dashboard, tInstances.kDashboard_QFRCDashboard);
-              m_detected = true;
-            } else if (t.connInfo.remote_id.startsWith("FRC Web Components")) {
-              HAL.report(
-                  tResourceType.kResourceType_Dashboard, tInstances.kDashboard_FRCWebComponents);
-              m_detected = true;
-            } else {
-              // Only report unknown if there wasn't another dashboard already reported
-              // (unknown could also be another device)
-              if (!m_detected) {
-                HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Unknown);
+            if (t.is(NetworkTableEvent.Kind.kConnected)) {
+              if (t.connInfo.remote_id.startsWith("glass")) {
+                HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Glass);
+                m_detected = true;
+              } else if (t.connInfo.remote_id.startsWith("SmartDashboard")) {
+                HAL.report(
+                    tResourceType.kResourceType_Dashboard, tInstances.kDashboard_SmartDashboard);
+                m_detected = true;
+              } else if (t.connInfo.remote_id.startsWith("shuffleboard")) {
+                HAL.report(
+                    tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Shuffleboard);
+                m_detected = true;
+              } else if (t.connInfo.remote_id.regionMatches(true, 0, "elastic", 0, 7)) {
+                HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Elastic);
+                m_detected = true;
+              } else if (t.connInfo.remote_id.startsWith("Dashboard")) {
+                HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_LabVIEW);
+                m_detected = true;
+              } else if (t.connInfo.remote_id.startsWith("AdvantageScope")) {
+                HAL.report(
+                    tResourceType.kResourceType_Dashboard, tInstances.kDashboard_AdvantageScope);
+                m_detected = true;
+              } else if (t.connInfo.remote_id.startsWith("QFRCDashboard")) {
+                HAL.report(
+                    tResourceType.kResourceType_Dashboard, tInstances.kDashboard_QFRCDashboard);
+                m_detected = true;
+              } else if (t.connInfo.remote_id.startsWith("FRC Web Components")) {
+                HAL.report(
+                    tResourceType.kResourceType_Dashboard, tInstances.kDashboard_FRCWebComponents);
+                m_detected = true;
+              } else {
+                // Only report unknown if there wasn't another dashboard already reported
+                // (unknown could also be another device)
+                if (!m_detected) {
+                  HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Unknown);
+                }
               }
             }
           }
