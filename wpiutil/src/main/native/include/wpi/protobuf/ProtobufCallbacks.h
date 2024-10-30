@@ -97,6 +97,12 @@ struct StringUnpackCallback : UnpackCallback<UnpackStringType, N> {};
 template <size_t N = 1>
 struct BytesUnpackCallback : UnpackCallback<UnpackBytesType, N> {};
 
+template<class T>
+concept StringLike = std::is_convertible_v<T, std::string_view>;
+
+template<class T>
+concept VectorLike = std::is_convertible_v<T, std::span<const uint8_t>>;
+
 template <typename T>
 class PackCallback {
  public:
@@ -120,11 +126,7 @@ class PackCallback {
  private:
   bool CallbackFunc(pb_ostream_t* stream, const pb_field_t* field) {
     const pb_msgdesc_t* desc = nullptr;
-    if constexpr (!(std::same_as<T, std::string_view> ||
-                    std::same_as<T, std::string> ||
-                    std::same_as<T, std::span<const uint8_t>> ||
-                    std::same_as<T, std::vector<uint8_t>> ||
-                    std::same_as<T, wpi::SmallVectorImpl<uint8_t>>)) {
+    if constexpr (!(StringLike<T> || VectorLike<T>)) {
       desc = wpi::Protobuf<T>::Message();
     }
     ProtoOutputStream ostream{stream, desc};
@@ -133,13 +135,14 @@ class PackCallback {
         return false;
       }
       bool success;
-      if constexpr (std::same_as<T, std::string_view> ||
-                    std::same_as<T, std::string> ||
-                    std::same_as<T, std::span<const uint8_t>> ||
-                    std::same_as<T, std::vector<uint8_t>> ||
-                    std::same_as<T, wpi::SmallVectorImpl<uint8_t>>) {
+      if constexpr (StringLike<T>) {
+        std::string_view view{i};
         success = pb_encode_string(
-            stream, reinterpret_cast<const pb_byte_t*>(i.data()), i.size());
+            stream, reinterpret_cast<const pb_byte_t*>(view.data()), view.size());
+      } else if constexpr (VectorLike<T>) {
+        std::span<const uint8_t> view{i};
+        success = pb_encode_string(
+            stream, reinterpret_cast<const pb_byte_t*>(view.data()), view.size());
       } else {
         success = wpi::Protobuf<T>::Pack(ostream, i);
       }
