@@ -114,7 +114,7 @@ __declspec(dllexport)
                         reinterpret_cast<void*>((GuiExitFn)&GuiExit));
 
   HALSimGui::GlobalInit();
-  DriverStationGui::GlobalInit();
+  InitializeDS();
   gPlotProvider = std::make_unique<glass::PlotProvider>(
       glass::GetStorageRoot().GetChild("Plot"));
   gPlotProvider->GlobalInit();
@@ -245,7 +245,7 @@ __declspec(dllexport)
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("DS")) {
-      DriverStationGui::dsManager->DisplayMenu();
+      DisplayDSMenu();
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Plot")) {
@@ -339,18 +339,20 @@ __declspec(dllexport)
       DisplayDeviceTree(gDeviceTreeModel);
     }
     glass::imm::EndWindow();
+
+    DisplayDS();
   });
 
   if (!gui::Initialize("Robot Simulation", 1280, 720,
                        ImGuiConfigFlags_DockingEnable)) {
     return 0;
   }
-  HAL_RegisterExtensionListener(
-      nullptr, [](void*, const char* name, void* data) {
-        if (std::string_view{name} == "ds_socket") {
-          DriverStationGui::SetDSSocketExtension(data);
-        }
-      });
+  HAL_RegisterExtensionListener(nullptr,
+                                [](void*, const char* name, void* data) {
+                                  if (std::string_view{name} == "ds_socket") {
+                                    SetDSSocketExtension(data);
+                                  }
+                                });
   HAL_SetMain(
       nullptr,
       [](void*) {
