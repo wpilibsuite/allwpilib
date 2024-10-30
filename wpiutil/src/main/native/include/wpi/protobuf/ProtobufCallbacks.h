@@ -81,7 +81,7 @@ class PackCallback {
     m_callback.funcs.encode = CallbackFunc;
     m_callback.arg = this;
   }
-  PackCallback(const T& element) : m_buffer{{element}} {
+  PackCallback(const T& element) : m_buffer{std::span<const T>{&element, 1}} {
     m_callback.funcs.encode = CallbackFunc;
     m_callback.arg = this;
   }
