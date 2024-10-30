@@ -31,7 +31,7 @@ std::optional<TestProtoInner> wpi::Protobuf<TestProtoInner>::Unpack(
     return {};
   }
 
-  return TestProtoInner{istr[0]};
+  return TestProtoInner{std::move(istr[0])};
 }
 
 bool wpi::Protobuf<TestProtoInner>::Pack(wpi::ProtoOutputStream& stream,
@@ -47,7 +47,7 @@ namespace {
 using ProtoType = wpi::Protobuf<TestProtoInner>;
 }  // namespace
 
-TEST(TestProtoRunner, RoundtripNanopb) {
+TEST(TestProtoInner, RoundtripNanopb) {
   const TestProtoInner kExpectedData = TestProtoInner{"Hello!"};
 
   wpi::SmallVector<uint8_t, 64> buf;
@@ -62,7 +62,7 @@ TEST(TestProtoRunner, RoundtripNanopb) {
   EXPECT_EQ(kExpectedData.msg, unpacked_data->msg);
 }
 
-TEST(TestProtoRunner, RoundtripNanopbEmpty) {
+TEST(TestProtoInner, RoundtripNanopbEmpty) {
   const TestProtoInner kExpectedData = TestProtoInner{""};
 
   wpi::SmallVector<uint8_t, 64> buf;

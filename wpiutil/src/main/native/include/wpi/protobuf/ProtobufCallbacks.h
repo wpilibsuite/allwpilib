@@ -17,6 +17,13 @@ namespace wpi {
 
 using UnpackStringType = std::string;
 using UnpackBytesType = wpi::SmallVector<uint8_t, 128>;
+using StdVectorUnpackBytesType = std::vector<uint8_t>;
+
+template <class T>
+concept IntegerLike = std::is_integral_v<T>;
+
+template <class T>
+concept FloatingPointLike = std::is_floating_point_v<T>;
 
 template <typename T, size_t N = 1>
 class UnpackCallback {
@@ -61,13 +68,10 @@ class UnpackCallback {
       }
     }
 
-    if constexpr (std::same_as<T, UnpackStringType>) {
-      T& space = m_storage.emplace_back(UnpackStringType{});
-      space.resize(stream->bytes_left);
-      return pb_read(stream, reinterpret_cast<pb_byte_t*>(space.data()),
-                     space.size());
-    } else if constexpr (std::same_as<T, UnpackBytesType>) {
-      T& space = m_storage.emplace_back(UnpackBytesType{});
+    if constexpr (std::same_as<T, UnpackStringType> ||
+                  std::same_as<T, UnpackBytesType> ||
+                  std::same_as<T, StdVectorUnpackBytesType>) {
+      T& space = m_storage.emplace_back(T{});
       space.resize(stream->bytes_left);
       return pb_read(stream, reinterpret_cast<pb_byte_t*>(space.data()),
                      space.size());
@@ -97,10 +101,14 @@ struct StringUnpackCallback : UnpackCallback<UnpackStringType, N> {};
 template <size_t N = 1>
 struct BytesUnpackCallback : UnpackCallback<UnpackBytesType, N> {};
 
-template<class T>
+template <size_t N = 1>
+struct StdVectorBytesUnpackCallback
+    : UnpackCallback<StdVectorUnpackBytesType, N> {};
+
+template <class T>
 concept StringLike = std::is_convertible_v<T, std::string_view>;
 
-template<class T>
+template <class T>
 concept VectorLike = std::is_convertible_v<T, std::span<const uint8_t>>;
 
 template <typename T>
@@ -138,11 +146,13 @@ class PackCallback {
       if constexpr (StringLike<T>) {
         std::string_view view{i};
         success = pb_encode_string(
-            stream, reinterpret_cast<const pb_byte_t*>(view.data()), view.size());
+            stream, reinterpret_cast<const pb_byte_t*>(view.data()),
+            view.size());
       } else if constexpr (VectorLike<T>) {
         std::span<const uint8_t> view{i};
         success = pb_encode_string(
-            stream, reinterpret_cast<const pb_byte_t*>(view.data()), view.size());
+            stream, reinterpret_cast<const pb_byte_t*>(view.data()),
+            view.size());
       } else {
         success = wpi::Protobuf<T>::Pack(ostream, i);
       }
