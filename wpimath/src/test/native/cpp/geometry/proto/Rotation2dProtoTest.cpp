@@ -18,14 +18,11 @@ const Rotation2d kExpectedData = Rotation2d{1.91_rad};
 }  // namespace
 
 TEST(Rotation2dProtoTest, Roundtrip) {
+  wpi::ProtobufMessage<Rotation2d> message;
   wpi::SmallVector<uint8_t, 64> buf;
-  wpi::ProtoOutputStream ostream{buf, ProtoType::Message()};
 
-  ASSERT_TRUE(ProtoType::Pack(ostream, kExpectedData));
-
-  wpi::ProtoInputStream istream{buf, ProtoType::Message()};
-  std::optional<Rotation2d> unpacked_data = ProtoType::Unpack(istream);
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  std::optional<Rotation2d> unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
-
   EXPECT_EQ(kExpectedData.Radians().value(), unpacked_data->Radians().value());
 }

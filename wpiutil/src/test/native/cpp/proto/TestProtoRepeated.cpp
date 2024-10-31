@@ -5,8 +5,6 @@
 #include "TestProtoInner.h"
 #include <gtest/gtest.h>
 
-#include <wpi/ProtoHelper.h>
-
 #include <vector>
 
 #include "wpiutil.npb.h"

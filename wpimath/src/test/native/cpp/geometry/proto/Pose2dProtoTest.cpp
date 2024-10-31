@@ -19,13 +19,11 @@ const Pose2d kExpectedData =
 }  // namespace
 
 TEST(Pose2dProtoTest, Roundtrip) {
+  wpi::ProtobufMessage<Pose2d> message;
   wpi::SmallVector<uint8_t, 64> buf;
-  wpi::ProtoOutputStream ostream{buf, ProtoType::Message()};
 
-  ASSERT_TRUE(ProtoType::Pack(ostream, kExpectedData));
-
-  wpi::ProtoInputStream istream{buf, ProtoType::Message()};
-  std::optional<Pose2d> unpacked_data = ProtoType::Unpack(istream);
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  std::optional<Pose2d> unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
   EXPECT_EQ(kExpectedData.Translation(), unpacked_data->Translation());

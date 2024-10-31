@@ -5,8 +5,6 @@
 #include "TestProtoInner.h"
 #include <gtest/gtest.h>
 
-#include <wpi/ProtoHelper.h>
-
 #include "wpiutil.npb.h"
 
 #include "wpi/protobuf/ProtobufCallbacks.h"
@@ -50,29 +48,23 @@ using ProtoType = wpi::Protobuf<TestProtoInner>;
 TEST(TestProtoInner, RoundtripNanopb) {
   const TestProtoInner kExpectedData = TestProtoInner{"Hello!"};
 
+  wpi::ProtobufMessage<TestProtoInner> message;
   wpi::SmallVector<uint8_t, 64> buf;
-  wpi::ProtoOutputStream ostream{buf, ProtoType::Message()};
 
-  ASSERT_TRUE(ProtoType::Pack(ostream, kExpectedData));
-
-  wpi::ProtoInputStream istream{buf, ProtoType::Message()};
-  std::optional<TestProtoInner> unpacked_data = ProtoType::Unpack(istream);
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  std::optional<TestProtoInner> unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
-
   EXPECT_EQ(kExpectedData.msg, unpacked_data->msg);
 }
 
 TEST(TestProtoInner, RoundtripNanopbEmpty) {
-  const TestProtoInner kExpectedData = TestProtoInner{""};
+  const TestProtoInner kExpectedData = TestProtoInner{"Hello!"};
 
+  wpi::ProtobufMessage<TestProtoInner> message;
   wpi::SmallVector<uint8_t, 64> buf;
-  wpi::ProtoOutputStream ostream{buf, ProtoType::Message()};
 
-  ASSERT_TRUE(ProtoType::Pack(ostream, kExpectedData));
-
-  wpi::ProtoInputStream istream{buf, ProtoType::Message()};
-  std::optional<TestProtoInner> unpacked_data = ProtoType::Unpack(istream);
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  std::optional<TestProtoInner> unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
-
   EXPECT_EQ(kExpectedData.msg, unpacked_data->msg);
 }
