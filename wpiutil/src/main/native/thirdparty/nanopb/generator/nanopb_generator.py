@@ -2047,6 +2047,7 @@ class ProtoFile:
             yield options.libformat
         yield '\n'
         yield "#include <span>\n"
+        yield "#include <string_view>\n"
 
         for incfile in self.file_options.include:
             # allow including system headers
@@ -2130,6 +2131,7 @@ class ProtoFile:
             for msg in self.messages:
                 yield 'const pb_msgdesc_t *get_%s_msg(void);\n' % Globals.naming_style.type_name(msg.name)
                 yield 'std::span<const uint8_t> get_%s_file_descriptor(void);\n' % Globals.naming_style.type_name(msg.name)
+                yield 'std::string_view get_%s_name(void);\n' % Globals.naming_style.type_name(msg.name)
             yield '\n'
 
             yield '/* Maximum encoded size of messages (where known) */\n'
@@ -2254,6 +2256,23 @@ class ProtoFile:
         yield '#endif\n'
         yield '\n'
 
+        yield "#include <span>\n"
+        yield "#include <string_view>\n"
+
+        yield "static const uint8_t file_descriptor[] {\n"
+
+        line_count = 0
+
+        for b in self.fdesc.SerializeToString():
+            yield '0x' + format(b, '02x') + ','
+            line_count += 1
+            if line_count == 10:
+                yield '\n'
+                line_count = 0
+        yield '\n'
+
+        yield "};\n"
+
         # Check if any messages exceed the 64 kB limit of 16-bit pb_size_t
         exceeds_64kB = []
         for msg in self.messages:
@@ -2270,7 +2289,11 @@ class ProtoFile:
 
         # Generate the message field definitions (PB_BIND() call)
         for msg in self.messages:
+            yield 'static const char %s_name[] = "%s";\n' % (msg.name, msg.name)
+            yield 'std::string_view get_%s_name(void) { return %s_name; }\n' % (msg.name, msg.name)
+            yield 'std::span<const uint8_t> get_%s_file_descriptor(void) { return file_descriptor; }\n' % msg.name
             yield msg.fields_definition(self.dependencies) + '\n\n'
+            
 
         # Generate pb_extension_type_t definitions if extensions are used in proto file
         for ext in self.extensions:
@@ -2312,26 +2335,6 @@ class ProtoFile:
             yield 'PB_STATIC_ASSERT(sizeof(double) == 8, DOUBLE_MUST_BE_8_BYTES)\n'
             yield '#endif\n'
 
-        yield '\n'
-
-        yield "static const uint8_t file_descriptor[] {\n"
-
-        line_count = 0
-
-        for b in self.fdesc.SerializeToString():
-            yield '0x' + format(b, '02x') + ','
-            line_count += 1
-            if line_count == 10:
-                yield '\n'
-                line_count = 0
-        yield '\n'
-
-        yield "};\n"
-
-        yield "#include <span>\n"
-
-        for msg in self.messages:
-            yield 'std::span<const uint8_t> get_%s_file_descriptor(void) { return file_descriptor; }\n' % Globals.naming_style.type_name(msg.name)
         yield '\n'
 
         if Globals.protoc_insertion_points:

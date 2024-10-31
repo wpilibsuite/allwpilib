@@ -89,6 +89,9 @@
 #include <string.h>
 #include <limits.h>
 
+#include <span>
+#include <string_view>
+
 #ifdef PB_ENABLE_MALLOC
 #include <stdlib.h>
 #endif
@@ -329,6 +332,9 @@ struct pb_msgdesc_s {
     pb_size_t field_count;
     pb_size_t required_field_count;
     pb_size_t largest_tag;
+
+    std::span<const uint8_t> file_descriptor;
+    std::string_view proto_name;
 };
 
 /* Iterator for message descriptor */
@@ -520,6 +526,8 @@ struct pb_extension_s {
        0 msgname ## _FIELDLIST(PB_GEN_FIELD_COUNT, structname), \
        0 msgname ## _FIELDLIST(PB_GEN_REQ_FIELD_COUNT, structname), \
        0 msgname ## _FIELDLIST(PB_GEN_LARGEST_TAG, structname), \
+       get_ ## structname ## _file_descriptor(), \
+       get_ ## structname ## _name(),  \
     }; \
     const pb_msgdesc_t* get_ ## structname ## _msg(void) { return &(structname ## _msg); } \
     msgname ## _FIELDLIST(PB_GEN_FIELD_INFO_ASSERT_ ## width, structname)

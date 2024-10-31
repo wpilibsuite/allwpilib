@@ -7,6 +7,8 @@
 #ifndef PB_WPI_PROTO_GEOMETRY2D_NPB_H_INCLUDED
 #define PB_WPI_PROTO_GEOMETRY2D_NPB_H_INCLUDED
 #include <pb.h>
+#include <span>
+#include <string_view>
 
 #if PB_PROTO_HEADER_VERSION != 40
 #error Regenerate this file with the current version of nanopb generator.
@@ -137,12 +139,26 @@ X(a, STATIC,   SINGULAR, DOUBLE,   ySemiAxis,         3)
 #define wpi_proto_ProtobufEllipse2d_center_MSGTYPE wpi_proto_ProtobufPose2d
 
 const pb_msgdesc_t *get_wpi_proto_ProtobufTranslation2d_msg(void);
+std::span<const uint8_t> get_wpi_proto_ProtobufTranslation2d_file_descriptor(void);
+std::string_view get_wpi_proto_ProtobufTranslation2d_name(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufRotation2d_msg(void);
+std::span<const uint8_t> get_wpi_proto_ProtobufRotation2d_file_descriptor(void);
+std::string_view get_wpi_proto_ProtobufRotation2d_name(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufPose2d_msg(void);
+std::span<const uint8_t> get_wpi_proto_ProtobufPose2d_file_descriptor(void);
+std::string_view get_wpi_proto_ProtobufPose2d_name(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufTransform2d_msg(void);
+std::span<const uint8_t> get_wpi_proto_ProtobufTransform2d_file_descriptor(void);
+std::string_view get_wpi_proto_ProtobufTransform2d_name(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufTwist2d_msg(void);
+std::span<const uint8_t> get_wpi_proto_ProtobufTwist2d_file_descriptor(void);
+std::string_view get_wpi_proto_ProtobufTwist2d_name(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufRectangle2d_msg(void);
+std::span<const uint8_t> get_wpi_proto_ProtobufRectangle2d_file_descriptor(void);
+std::string_view get_wpi_proto_ProtobufRectangle2d_name(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufEllipse2d_msg(void);
+std::span<const uint8_t> get_wpi_proto_ProtobufEllipse2d_file_descriptor(void);
+std::string_view get_wpi_proto_ProtobufEllipse2d_name(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufPose2d_size depends on runtime parameters */

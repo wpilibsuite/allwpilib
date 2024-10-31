@@ -7,6 +7,8 @@
 #ifndef PB_WPI_PROTO_TRAJECTORY_NPB_H_INCLUDED
 #define PB_WPI_PROTO_TRAJECTORY_NPB_H_INCLUDED
 #include <pb.h>
+#include <span>
+#include <string_view>
 #include "geometry2d.npb.h"
 
 #if PB_PROTO_HEADER_VERSION != 40
@@ -59,7 +61,11 @@ X(a, CALLBACK, REPEATED, MESSAGE,  states,            2)
 #define wpi_proto_ProtobufTrajectory_states_MSGTYPE wpi_proto_ProtobufTrajectoryState
 
 const pb_msgdesc_t *get_wpi_proto_ProtobufTrajectoryState_msg(void);
+std::span<const uint8_t> get_wpi_proto_ProtobufTrajectoryState_file_descriptor(void);
+std::string_view get_wpi_proto_ProtobufTrajectoryState_name(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufTrajectory_msg(void);
+std::span<const uint8_t> get_wpi_proto_ProtobufTrajectory_file_descriptor(void);
+std::string_view get_wpi_proto_ProtobufTrajectory_name(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufTrajectoryState_size depends on runtime parameters */

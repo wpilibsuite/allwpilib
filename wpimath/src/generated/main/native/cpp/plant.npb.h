@@ -7,6 +7,8 @@
 #ifndef PB_WPI_PROTO_PLANT_NPB_H_INCLUDED
 #define PB_WPI_PROTO_PLANT_NPB_H_INCLUDED
 #include <pb.h>
+#include <span>
+#include <string_view>
 
 #if PB_PROTO_HEADER_VERSION != 40
 #error Regenerate this file with the current version of nanopb generator.
@@ -44,6 +46,8 @@ X(a, STATIC,   SINGULAR, DOUBLE,   free_speed,        5)
 #define wpi_proto_ProtobufDCMotor_DEFAULT NULL
 
 const pb_msgdesc_t *get_wpi_proto_ProtobufDCMotor_msg(void);
+std::span<const uint8_t> get_wpi_proto_ProtobufDCMotor_file_descriptor(void);
+std::string_view get_wpi_proto_ProtobufDCMotor_name(void);
 
 /* Maximum encoded size of messages (where known) */
 #define WPI_PROTO_PLANT_NPB_H_MAX_SIZE           wpi_proto_ProtobufDCMotor_size
