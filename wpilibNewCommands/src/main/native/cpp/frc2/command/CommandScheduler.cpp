@@ -7,7 +7,6 @@
 #include <cstdio>
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -67,7 +66,7 @@ class CommandScheduler::Impl {
   // Map of Command* -> CommandPtr for CommandPtrs transferred to the scheduler
   // via Schedule(CommandPtr&&). These are erased (destroyed) at the very end of
   // the loop cycle when the command lifecycle is complete.
-  std::unordered_map<Command*, CommandPtr> ownedCommands;
+  wpi::DenseMap<Command*, CommandPtr> ownedCommands;
 };
 
 template <typename TMap, typename TKey>
@@ -182,7 +181,7 @@ void CommandScheduler::Schedule(const CommandPtr& command) {
 
 void CommandScheduler::Schedule(CommandPtr&& command) {
   auto ptr = command.get();
-  m_impl->ownedCommands.emplace(ptr, std::move(command));
+  m_impl->ownedCommands.try_emplace(ptr, std::move(command));
   Schedule(ptr);
 }
 
