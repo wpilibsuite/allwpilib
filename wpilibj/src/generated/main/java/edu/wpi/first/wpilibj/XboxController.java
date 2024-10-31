@@ -612,7 +612,8 @@ public class XboxController extends GenericHID implements Sendable {
    * Read the value of the left bumper (LB) button on the controller.
    *
    * @return The state of the button.
-   * @deprecated Use {@link getLeftBumperButton} instead
+   * @deprecated Use {@link getLeftBumperButton} instead. This function is deprecated for removal
+   *     to make function names consistent to allow the HID classes to be automatically generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumper() {
@@ -623,7 +624,8 @@ public class XboxController extends GenericHID implements Sendable {
    * Read the value of the right bumper (RB) button on the controller.
    *
    * @return The state of the button.
-   * @deprecated Use {@link getRightBumperButton} instead
+   * @deprecated Use {@link getRightBumperButton} instead. This function is deprecated for removal
+   *     to make function names consistent to allow the HID classes to be automatically generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumper() {
@@ -634,7 +636,9 @@ public class XboxController extends GenericHID implements Sendable {
    * Whether the left bumper (LB) was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
-   * @deprecated Use {@link getLeftBumperButtonPressed} instead
+   * @deprecated Use {@link getLeftBumperButtonPressed} instead. This function is deprecated for
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumperPressed() {
@@ -645,7 +649,9 @@ public class XboxController extends GenericHID implements Sendable {
    * Whether the right bumper (RB) was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
-   * @deprecated Use {@link getRightBumperButtonPressed} instead
+   * @deprecated Use {@link getRightBumperButtonPressed} instead. This function is deprecated for
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumperPressed() {
@@ -656,7 +662,9 @@ public class XboxController extends GenericHID implements Sendable {
    * Whether the left bumper (LB) was released since the last check.
    *
    * @return Whether the button was released since the last check.
-   * @deprecated Use {@link getLeftBumperButtonReleased} instead
+   * @deprecated Use {@link getLeftBumperButtonReleased} instead. This function is deprecated for
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumperReleased() {
@@ -667,7 +675,9 @@ public class XboxController extends GenericHID implements Sendable {
    * Whether the right bumper (RB) was released since the last check.
    *
    * @return Whether the button was released since the last check.
-   * @deprecated Use {@link getRightBumperButtonReleased} instead
+   * @deprecated Use {@link getRightBumperButtonReleased} instead. This function is deprecated for
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumperReleased() {

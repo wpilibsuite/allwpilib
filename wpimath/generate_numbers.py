@@ -13,7 +13,7 @@ from pathlib import Path
 def output(output_dir: Path, outfn: str, contents: str):
     output_dir.mkdir(parents=True, exist_ok=True)
     output_file = output_dir / outfn
-    output_file.write_text(contents, encoding="utf-8")
+    output_file.write_text(contents, encoding="utf-8", newline="\n")
 
 
 def generate_numbers(output_directory: Path, template_root: Path):

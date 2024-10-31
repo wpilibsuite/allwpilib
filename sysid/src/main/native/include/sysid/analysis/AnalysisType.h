@@ -56,6 +56,14 @@ inline constexpr AnalysisType kElevator{4, 4, "Elevator"};
 inline constexpr AnalysisType kArm{5, 4, "Arm"};
 inline constexpr AnalysisType kSimple{3, 4, "Simple"};
 
-AnalysisType FromName(std::string_view name);
+constexpr AnalysisType FromName(std::string_view name) {
+  if (name == "Elevator") {
+    return sysid::analysis::kElevator;
+  }
+  if (name == "Arm") {
+    return sysid::analysis::kArm;
+  }
+  return sysid::analysis::kSimple;
+}
 }  // namespace analysis
 }  // namespace sysid

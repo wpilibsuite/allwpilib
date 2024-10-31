@@ -14,7 +14,7 @@ from jinja2 import Environment, FileSystemLoader
 def write_controller_file(output_dir: Path, controller_name: str, contents: str):
     output_dir.mkdir(parents=True, exist_ok=True)
     output_file = output_dir / controller_name
-    output_file.write_text(contents, encoding="utf-8")
+    output_file.write_text(contents, encoding="utf-8", newline="\n")
 
 
 def generate_hids(output_directory: Path, template_directory: Path, schema_file: Path):

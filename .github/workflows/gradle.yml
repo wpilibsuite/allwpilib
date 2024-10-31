@@ -121,7 +121,7 @@ jobs:
           matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
       - name: Set Keychain Lock Timeout
-        run: security set-keychain-settings -lut 3600
+        run: security set-keychain-settings -lut 21600
         if: |
           matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
