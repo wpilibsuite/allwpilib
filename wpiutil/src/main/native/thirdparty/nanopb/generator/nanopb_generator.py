@@ -2290,7 +2290,11 @@ class ProtoFile:
 
         # Generate the message field definitions (PB_BIND() call)
         for msg in self.messages:
-            yield 'static const char %s_name[] = "%s";\n' % (msg.name, msg.name)
+            if self.fdesc.package:
+                full_name = self.fdesc.package + '.' + msg.desc.name
+            else:
+                full_name = msg.desc.name
+            yield 'static const char %s_name[] = "%s";\n' % (msg.name, full_name)
             yield 'std::string_view get_%s_name(void) { return %s_name; }\n' % (msg.name, msg.name)
             yield 'pb_filedesc_t get_%s_file_descriptor(void) { return {file_name, file_descriptor,}; }\n' % msg.name
             yield msg.fields_definition(self.dependencies) + '\n\n'

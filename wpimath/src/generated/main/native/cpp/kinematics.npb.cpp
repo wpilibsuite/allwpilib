@@ -357,67 +357,67 @@ static const uint8_t file_descriptor[] {
 0x06,0x70,0x72,0x6f,0x74,0x6f,0x33,
 };
 static const char file_name[] = "kinematics.proto";
-static const char wpi_proto_ProtobufChassisSpeeds_name[] = "wpi_proto_ProtobufChassisSpeeds";
+static const char wpi_proto_ProtobufChassisSpeeds_name[] = "wpi.proto.ProtobufChassisSpeeds";
 std::string_view get_wpi_proto_ProtobufChassisSpeeds_name(void) { return wpi_proto_ProtobufChassisSpeeds_name; }
 pb_filedesc_t get_wpi_proto_ProtobufChassisSpeeds_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufChassisSpeeds, wpi_proto_ProtobufChassisSpeeds, AUTO)
 
 
-static const char wpi_proto_ProtobufDifferentialDriveKinematics_name[] = "wpi_proto_ProtobufDifferentialDriveKinematics";
+static const char wpi_proto_ProtobufDifferentialDriveKinematics_name[] = "wpi.proto.ProtobufDifferentialDriveKinematics";
 std::string_view get_wpi_proto_ProtobufDifferentialDriveKinematics_name(void) { return wpi_proto_ProtobufDifferentialDriveKinematics_name; }
 pb_filedesc_t get_wpi_proto_ProtobufDifferentialDriveKinematics_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufDifferentialDriveKinematics, wpi_proto_ProtobufDifferentialDriveKinematics, AUTO)
 
 
-static const char wpi_proto_ProtobufDifferentialDriveWheelSpeeds_name[] = "wpi_proto_ProtobufDifferentialDriveWheelSpeeds";
+static const char wpi_proto_ProtobufDifferentialDriveWheelSpeeds_name[] = "wpi.proto.ProtobufDifferentialDriveWheelSpeeds";
 std::string_view get_wpi_proto_ProtobufDifferentialDriveWheelSpeeds_name(void) { return wpi_proto_ProtobufDifferentialDriveWheelSpeeds_name; }
 pb_filedesc_t get_wpi_proto_ProtobufDifferentialDriveWheelSpeeds_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufDifferentialDriveWheelSpeeds, wpi_proto_ProtobufDifferentialDriveWheelSpeeds, AUTO)
 
 
-static const char wpi_proto_ProtobufDifferentialDriveWheelPositions_name[] = "wpi_proto_ProtobufDifferentialDriveWheelPositions";
+static const char wpi_proto_ProtobufDifferentialDriveWheelPositions_name[] = "wpi.proto.ProtobufDifferentialDriveWheelPositions";
 std::string_view get_wpi_proto_ProtobufDifferentialDriveWheelPositions_name(void) { return wpi_proto_ProtobufDifferentialDriveWheelPositions_name; }
 pb_filedesc_t get_wpi_proto_ProtobufDifferentialDriveWheelPositions_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufDifferentialDriveWheelPositions, wpi_proto_ProtobufDifferentialDriveWheelPositions, AUTO)
 
 
-static const char wpi_proto_ProtobufMecanumDriveKinematics_name[] = "wpi_proto_ProtobufMecanumDriveKinematics";
+static const char wpi_proto_ProtobufMecanumDriveKinematics_name[] = "wpi.proto.ProtobufMecanumDriveKinematics";
 std::string_view get_wpi_proto_ProtobufMecanumDriveKinematics_name(void) { return wpi_proto_ProtobufMecanumDriveKinematics_name; }
 pb_filedesc_t get_wpi_proto_ProtobufMecanumDriveKinematics_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufMecanumDriveKinematics, wpi_proto_ProtobufMecanumDriveKinematics, AUTO)
 
 
-static const char wpi_proto_ProtobufMecanumDriveMotorVoltages_name[] = "wpi_proto_ProtobufMecanumDriveMotorVoltages";
+static const char wpi_proto_ProtobufMecanumDriveMotorVoltages_name[] = "wpi.proto.ProtobufMecanumDriveMotorVoltages";
 std::string_view get_wpi_proto_ProtobufMecanumDriveMotorVoltages_name(void) { return wpi_proto_ProtobufMecanumDriveMotorVoltages_name; }
 pb_filedesc_t get_wpi_proto_ProtobufMecanumDriveMotorVoltages_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufMecanumDriveMotorVoltages, wpi_proto_ProtobufMecanumDriveMotorVoltages, AUTO)
 
 
-static const char wpi_proto_ProtobufMecanumDriveWheelPositions_name[] = "wpi_proto_ProtobufMecanumDriveWheelPositions";
+static const char wpi_proto_ProtobufMecanumDriveWheelPositions_name[] = "wpi.proto.ProtobufMecanumDriveWheelPositions";
 std::string_view get_wpi_proto_ProtobufMecanumDriveWheelPositions_name(void) { return wpi_proto_ProtobufMecanumDriveWheelPositions_name; }
 pb_filedesc_t get_wpi_proto_ProtobufMecanumDriveWheelPositions_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufMecanumDriveWheelPositions, wpi_proto_ProtobufMecanumDriveWheelPositions, AUTO)
 
 
-static const char wpi_proto_ProtobufMecanumDriveWheelSpeeds_name[] = "wpi_proto_ProtobufMecanumDriveWheelSpeeds";
+static const char wpi_proto_ProtobufMecanumDriveWheelSpeeds_name[] = "wpi.proto.ProtobufMecanumDriveWheelSpeeds";
 std::string_view get_wpi_proto_ProtobufMecanumDriveWheelSpeeds_name(void) { return wpi_proto_ProtobufMecanumDriveWheelSpeeds_name; }
 pb_filedesc_t get_wpi_proto_ProtobufMecanumDriveWheelSpeeds_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufMecanumDriveWheelSpeeds, wpi_proto_ProtobufMecanumDriveWheelSpeeds, AUTO)
 
 
-static const char wpi_proto_ProtobufSwerveDriveKinematics_name[] = "wpi_proto_ProtobufSwerveDriveKinematics";
+static const char wpi_proto_ProtobufSwerveDriveKinematics_name[] = "wpi.proto.ProtobufSwerveDriveKinematics";
 std::string_view get_wpi_proto_ProtobufSwerveDriveKinematics_name(void) { return wpi_proto_ProtobufSwerveDriveKinematics_name; }
 pb_filedesc_t get_wpi_proto_ProtobufSwerveDriveKinematics_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufSwerveDriveKinematics, wpi_proto_ProtobufSwerveDriveKinematics, AUTO)
 
 
-static const char wpi_proto_ProtobufSwerveModulePosition_name[] = "wpi_proto_ProtobufSwerveModulePosition";
+static const char wpi_proto_ProtobufSwerveModulePosition_name[] = "wpi.proto.ProtobufSwerveModulePosition";
 std::string_view get_wpi_proto_ProtobufSwerveModulePosition_name(void) { return wpi_proto_ProtobufSwerveModulePosition_name; }
 pb_filedesc_t get_wpi_proto_ProtobufSwerveModulePosition_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufSwerveModulePosition, wpi_proto_ProtobufSwerveModulePosition, AUTO)
 
 
-static const char wpi_proto_ProtobufSwerveModuleState_name[] = "wpi_proto_ProtobufSwerveModuleState";
+static const char wpi_proto_ProtobufSwerveModuleState_name[] = "wpi.proto.ProtobufSwerveModuleState";
 std::string_view get_wpi_proto_ProtobufSwerveModuleState_name(void) { return wpi_proto_ProtobufSwerveModuleState_name; }
 pb_filedesc_t get_wpi_proto_ProtobufSwerveModuleState_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufSwerveModuleState, wpi_proto_ProtobufSwerveModuleState, AUTO)

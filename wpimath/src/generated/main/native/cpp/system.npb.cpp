@@ -98,7 +98,7 @@ static const uint8_t file_descriptor[] {
 0x6f,0x33,
 };
 static const char file_name[] = "system.proto";
-static const char wpi_proto_ProtobufLinearSystem_name[] = "wpi_proto_ProtobufLinearSystem";
+static const char wpi_proto_ProtobufLinearSystem_name[] = "wpi.proto.ProtobufLinearSystem";
 std::string_view get_wpi_proto_ProtobufLinearSystem_name(void) { return wpi_proto_ProtobufLinearSystem_name; }
 pb_filedesc_t get_wpi_proto_ProtobufLinearSystem_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufLinearSystem, wpi_proto_ProtobufLinearSystem, AUTO)

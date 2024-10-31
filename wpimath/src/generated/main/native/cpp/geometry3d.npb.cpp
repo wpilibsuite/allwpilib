@@ -202,37 +202,37 @@ static const uint8_t file_descriptor[] {
 0x72,0x6f,0x74,0x6f,0x33,
 };
 static const char file_name[] = "geometry3d.proto";
-static const char wpi_proto_ProtobufTranslation3d_name[] = "wpi_proto_ProtobufTranslation3d";
+static const char wpi_proto_ProtobufTranslation3d_name[] = "wpi.proto.ProtobufTranslation3d";
 std::string_view get_wpi_proto_ProtobufTranslation3d_name(void) { return wpi_proto_ProtobufTranslation3d_name; }
 pb_filedesc_t get_wpi_proto_ProtobufTranslation3d_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufTranslation3d, wpi_proto_ProtobufTranslation3d, AUTO)
 
 
-static const char wpi_proto_ProtobufQuaternion_name[] = "wpi_proto_ProtobufQuaternion";
+static const char wpi_proto_ProtobufQuaternion_name[] = "wpi.proto.ProtobufQuaternion";
 std::string_view get_wpi_proto_ProtobufQuaternion_name(void) { return wpi_proto_ProtobufQuaternion_name; }
 pb_filedesc_t get_wpi_proto_ProtobufQuaternion_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufQuaternion, wpi_proto_ProtobufQuaternion, AUTO)
 
 
-static const char wpi_proto_ProtobufRotation3d_name[] = "wpi_proto_ProtobufRotation3d";
+static const char wpi_proto_ProtobufRotation3d_name[] = "wpi.proto.ProtobufRotation3d";
 std::string_view get_wpi_proto_ProtobufRotation3d_name(void) { return wpi_proto_ProtobufRotation3d_name; }
 pb_filedesc_t get_wpi_proto_ProtobufRotation3d_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufRotation3d, wpi_proto_ProtobufRotation3d, AUTO)
 
 
-static const char wpi_proto_ProtobufPose3d_name[] = "wpi_proto_ProtobufPose3d";
+static const char wpi_proto_ProtobufPose3d_name[] = "wpi.proto.ProtobufPose3d";
 std::string_view get_wpi_proto_ProtobufPose3d_name(void) { return wpi_proto_ProtobufPose3d_name; }
 pb_filedesc_t get_wpi_proto_ProtobufPose3d_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufPose3d, wpi_proto_ProtobufPose3d, AUTO)
 
 
-static const char wpi_proto_ProtobufTransform3d_name[] = "wpi_proto_ProtobufTransform3d";
+static const char wpi_proto_ProtobufTransform3d_name[] = "wpi.proto.ProtobufTransform3d";
 std::string_view get_wpi_proto_ProtobufTransform3d_name(void) { return wpi_proto_ProtobufTransform3d_name; }
 pb_filedesc_t get_wpi_proto_ProtobufTransform3d_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufTransform3d, wpi_proto_ProtobufTransform3d, AUTO)
 
 
-static const char wpi_proto_ProtobufTwist3d_name[] = "wpi_proto_ProtobufTwist3d";
+static const char wpi_proto_ProtobufTwist3d_name[] = "wpi.proto.ProtobufTwist3d";
 std::string_view get_wpi_proto_ProtobufTwist3d_name(void) { return wpi_proto_ProtobufTwist3d_name; }
 pb_filedesc_t get_wpi_proto_ProtobufTwist3d_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufTwist3d, wpi_proto_ProtobufTwist3d, AUTO)

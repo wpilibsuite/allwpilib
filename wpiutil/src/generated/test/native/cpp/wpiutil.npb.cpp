@@ -549,25 +549,25 @@ static const uint8_t file_descriptor[] {
 0x74,0x6f,0x33,
 };
 static const char file_name[] = "wpiutil.proto";
-static const char wpi_proto_TestProtoInner_name[] = "wpi_proto_TestProtoInner";
+static const char wpi_proto_TestProtoInner_name[] = "wpi.proto.TestProtoInner";
 std::string_view get_wpi_proto_TestProtoInner_name(void) { return wpi_proto_TestProtoInner_name; }
 pb_filedesc_t get_wpi_proto_TestProtoInner_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_TestProtoInner, wpi_proto_TestProtoInner, AUTO)
 
 
-static const char wpi_proto_TestProto_name[] = "wpi_proto_TestProto";
+static const char wpi_proto_TestProto_name[] = "wpi.proto.TestProto";
 std::string_view get_wpi_proto_TestProto_name(void) { return wpi_proto_TestProto_name; }
 pb_filedesc_t get_wpi_proto_TestProto_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_TestProto, wpi_proto_TestProto, AUTO)
 
 
-static const char wpi_proto_OptionalTestProto_name[] = "wpi_proto_OptionalTestProto";
+static const char wpi_proto_OptionalTestProto_name[] = "wpi.proto.OptionalTestProto";
 std::string_view get_wpi_proto_OptionalTestProto_name(void) { return wpi_proto_OptionalTestProto_name; }
 pb_filedesc_t get_wpi_proto_OptionalTestProto_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_OptionalTestProto, wpi_proto_OptionalTestProto, AUTO)
 
 
-static const char wpi_proto_RepeatedTestProto_name[] = "wpi_proto_RepeatedTestProto";
+static const char wpi_proto_RepeatedTestProto_name[] = "wpi.proto.RepeatedTestProto";
 std::string_view get_wpi_proto_RepeatedTestProto_name(void) { return wpi_proto_RepeatedTestProto_name; }
 pb_filedesc_t get_wpi_proto_RepeatedTestProto_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_RepeatedTestProto, wpi_proto_RepeatedTestProto, 2)
