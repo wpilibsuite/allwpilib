@@ -7,6 +7,7 @@
 #ifndef PB_WPI_PROTO_WPIUTIL_NPB_H_INCLUDED
 #define PB_WPI_PROTO_WPIUTIL_NPB_H_INCLUDED
 #include <pb.h>
+#include <span>
 
 #if PB_PROTO_HEADER_VERSION != 40
 #error Regenerate this file with the current version of nanopb generator.
@@ -219,9 +220,13 @@ X(a, CALLBACK, REPEATED, MESSAGE,  TestProtoInner_msg,  16)
 #define wpi_proto_RepeatedTestProto_TestProtoInner_msg_MSGTYPE wpi_proto_TestProtoInner
 
 const pb_msgdesc_t *get_wpi_proto_TestProtoInner_msg(void);
+std::span<const uint8_t> get_wpi_proto_TestProtoInner_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_TestProto_msg(void);
+std::span<const uint8_t> get_wpi_proto_TestProto_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_OptionalTestProto_msg(void);
+std::span<const uint8_t> get_wpi_proto_OptionalTestProto_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_RepeatedTestProto_msg(void);
+std::span<const uint8_t> get_wpi_proto_RepeatedTestProto_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_TestProtoInner_size depends on runtime parameters */

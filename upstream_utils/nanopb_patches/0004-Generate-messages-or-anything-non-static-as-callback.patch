@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Thad House <thadhouse1@gmail.com>
 Date: Tue, 29 Oct 2024 20:23:48 -0700
-Subject: [PATCH 4/4] Generate messages or anything non static as callback
+Subject: [PATCH 4/5] Generate messages or anything non static as callback
 
 ---
  generator/nanopb_generator.py | 6 ++++--

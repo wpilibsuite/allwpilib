@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Thad House <thadhouse1@gmail.com>
 Date: Mon, 28 Oct 2024 17:38:55 -0700
-Subject: [PATCH 3/4] Marked imported files as modified by WPILib
+Subject: [PATCH 3/5] Marked imported files as modified by WPILib
 
 ---
  generator/nanopb_generator.py |   2 +

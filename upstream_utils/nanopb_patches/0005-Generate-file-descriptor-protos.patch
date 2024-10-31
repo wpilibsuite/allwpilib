@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thad House <thadhouse1@gmail.com>
+Date: Wed, 30 Oct 2024 20:15:43 -0700
+Subject: [PATCH 5/5] Generate file descriptor protos
+
+---
+ generator/nanopb_generator.py | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/generator/nanopb_generator.py b/generator/nanopb_generator.py
+index c7a0d0f1f2fb3f5da9a59373ace20c87bad35441..414859763bd1b0d48ff1a859985db3e0dd317be0 100755
+--- a/generator/nanopb_generator.py
++++ b/generator/nanopb_generator.py
+@@ -2046,6 +2046,7 @@ class ProtoFile:
+             # no %s specified - use whatever was passed in as options.libformat
+             yield options.libformat
+         yield '\n'
++        yield "#include <span>\n"
+ 
+         for incfile in self.file_options.include:
+             # allow including system headers
+@@ -2128,6 +2129,7 @@ class ProtoFile:
+                 yield msg.fields_declaration(self.dependencies) + '\n'
+             for msg in self.messages:
+                 yield 'const pb_msgdesc_t *get_%s_msg(void);\n' % Globals.naming_style.type_name(msg.name)
++                yield 'std::span<const uint8_t> get_%s_file_descriptor(void);\n' % Globals.naming_style.type_name(msg.name)
+             yield '\n'
+ 
+             yield '/* Maximum encoded size of messages (where known) */\n'
+@@ -2312,6 +2314,26 @@ class ProtoFile:
+ 
+         yield '\n'
+ 
++        yield "static const uint8_t file_descriptor[] {\n"
++
++        line_count = 0
++
++        for b in self.fdesc.SerializeToString():
++            yield '0x' + format(b, '02x') + ','
++            line_count += 1
++            if line_count == 10:
++                yield '\n'
++                line_count = 0
++        yield '\n'
++
++        yield "};\n"
++
++        yield "#include <span>\n"
++
++        for msg in self.messages:
++            yield 'std::span<const uint8_t> get_%s_file_descriptor(void) { return file_descriptor; }\n' % Globals.naming_style.type_name(msg.name)
++        yield '\n'
++
+         if Globals.protoc_insertion_points:
+             yield '/* @@protoc_insertion_point(eof) */\n'
+ 
