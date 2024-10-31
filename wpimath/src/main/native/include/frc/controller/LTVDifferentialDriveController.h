@@ -16,7 +16,6 @@
 #include "units/length.h"
 #include "units/time.h"
 #include "units/velocity.h"
-#include "units/voltage.h"
 
 namespace frc {
 
