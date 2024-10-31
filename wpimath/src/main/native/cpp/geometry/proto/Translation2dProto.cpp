@@ -4,13 +4,6 @@
 
 #include "frc/geometry/proto/Translation2dProto.h"
 
-#include <wpi/ProtoHelper.h>
-
-#include "geometry2d.pb.h"
-
-#include "pb_encode.h"
-#include "pb_decode.h"
-
 #include "geometry2d.npb.h"
 
 const pb_msgdesc_t* wpi::Protobuf<frc::Translation2d>::Message() {
@@ -37,25 +30,4 @@ bool wpi::Protobuf<frc::Translation2d>::Pack(wpi::ProtoOutputStream& stream,
       .y = value.Y().value(),
   };
   return stream.Encode(msg);
-}
-
-google::protobuf::Message* wpi::Protobuf<frc::Translation2d>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufTranslation2d>(arena);
-}
-
-frc::Translation2d wpi::Protobuf<frc::Translation2d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufTranslation2d*>(&msg);
-  return frc::Translation2d{
-      units::meter_t{m->x()},
-      units::meter_t{m->y()},
-  };
-}
-
-void wpi::Protobuf<frc::Translation2d>::Pack(google::protobuf::Message* msg,
-                                             const frc::Translation2d& value) {
-  auto m = static_cast<wpi::proto::ProtobufTranslation2d*>(msg);
-  m->set_x(value.X().value());
-  m->set_y(value.Y().value());
 }

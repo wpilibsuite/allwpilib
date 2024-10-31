@@ -4,16 +4,7 @@
 
 #include "frc/geometry/proto/Rotation2dProto.h"
 
-#include <wpi/ProtoHelper.h>
-
-#include "geometry2d.pb.h"
-
-#include "pb_encode.h"
-#include "pb_decode.h"
-
 #include "geometry2d.npb.h"
-
-#include "wpi/protobuf/ProtobufCallbacks.h"
 
 const pb_msgdesc_t* wpi::Protobuf<frc::Rotation2d>::Message() {
   return get_wpi_proto_ProtobufRotation2d_msg();
@@ -37,23 +28,4 @@ bool wpi::Protobuf<frc::Rotation2d>::Pack(wpi::ProtoOutputStream& stream,
       .value = value.Radians().value(),
   };
   return stream.Encode(msg);
-}
-
-google::protobuf::Message* wpi::Protobuf<frc::Rotation2d>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufRotation2d>(arena);
-}
-
-frc::Rotation2d wpi::Protobuf<frc::Rotation2d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufRotation2d*>(&msg);
-  return frc::Rotation2d{
-      units::radian_t{m->value()},
-  };
-}
-
-void wpi::Protobuf<frc::Rotation2d>::Pack(google::protobuf::Message* msg,
-                                          const frc::Rotation2d& value) {
-  auto m = static_cast<wpi::proto::ProtobufRotation2d*>(msg);
-  m->set_value(value.Radians().value());
 }
