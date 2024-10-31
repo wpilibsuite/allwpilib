@@ -21,15 +21,6 @@
 #include "pb_decode.h"
 #include "pb_encode.h"
 
-namespace google::protobuf {
-class Arena;
-class Message;
-template <typename T>
-class RepeatedPtrField;
-template <typename T>
-class RepeatedField;
-}  // namespace google::protobuf
-
 namespace wpi {
 
 template <typename T>
@@ -152,18 +143,20 @@ class ProtoOutputStream {
  * register the class
  */
 template <typename T>
-concept ProtobufSerializable = requires(
-    google::protobuf::Arena* arena, const google::protobuf::Message& inmsg,
-    google::protobuf::Message* outmsg, const T& value) {
-  typename Protobuf<typename std::remove_cvref_t<T>>;
-  {
-    Protobuf<typename std::remove_cvref_t<T>>::New(arena)
-  } -> std::same_as<google::protobuf::Message*>;
-  {
-    Protobuf<typename std::remove_cvref_t<T>>::Unpack(inmsg)
-  } -> std::same_as<typename std::remove_cvref_t<T>>;
-  Protobuf<typename std::remove_cvref_t<T>>::Pack(outmsg, value);
-};
+concept ProtobufSerializable =
+    requires(wpi::ProtoOutputStream& ostream, wpi::ProtoInputStream& istream,
+             const T& value) {
+      typename Protobuf<typename std::remove_cvref_t<T>>;
+      {
+        Protobuf<typename std::remove_cvref_t<T>>::Message()
+      } -> std::same_as<const pb_msgdesc_t*>;
+      {
+        Protobuf<typename std::remove_cvref_t<T>>::Unpack(istream)
+      } -> std::same_as<std::optional<typename std::remove_cvref_t<T>>>;
+      {
+        Protobuf<typename std::remove_cvref_t<T>>::Pack(ostream, value)
+      } -> std::same_as<bool>;
+    };
 
 /**
  * Specifies that a type is capable of in-place protobuf deserialization.
@@ -176,145 +169,9 @@ concept ProtobufSerializable = requires(
 template <typename T>
 concept MutableProtobufSerializable =
     ProtobufSerializable<T> &&
-    requires(T* out, const google::protobuf::Message& msg) {
-      Protobuf<typename std::remove_cvref_t<T>>::UnpackInto(out, msg);
+    requires(T* out, wpi::ProtoInputStream& istream) {
+      Protobuf<typename std::remove_cvref_t<T>>::UnpackInto(out, istream);
     };
-
-/**
- * Unpack a serialized protobuf message.
- *
- * @tparam T object type
- * @param msg protobuf message
- * @return Deserialized object
- */
-template <ProtobufSerializable T>
-inline T UnpackProtobuf(const google::protobuf::Message& msg) {
-  return Protobuf<T>::Unpack(msg);
-}
-
-/**
- * Unpack a serialized protobuf array message.
- *
- * @tparam Proto element type of the protobuf array
- * @tparam T object type
- * @tparam N number of objects
- * @param msg protobuf array message
- * @return Deserialized array
- */
-template <std::derived_from<google::protobuf::Message> Proto,
-          ProtobufSerializable T, size_t N>
-wpi::array<T, N> UnpackProtobufArray(
-    const google::protobuf::RepeatedPtrField<Proto>& msg) {
-  if (N != std::dynamic_extent && msg.size() != N) {
-    // TODO
-  }
-  wpi::array<T, N> arr(wpi::empty_array);
-  for (size_t i = 0; i < N; i++) {
-    arr[i] = wpi::UnpackProtobuf<T>(msg.Get(i));
-  }
-  return arr;
-}
-
-/**
- * Unpack a serialized protobuf array message.
- *
- * @tparam T element type of the protobuf array
- * @tparam N number of objects
- * @param msg protobuf array message
- * @return Deserialized array
- */
-template <typename T, size_t N>
-wpi::array<T, N> UnpackProtobufArray(
-    const google::protobuf::RepeatedField<T>& msg) {
-  if (N != std::dynamic_extent && msg.size() != N) {
-    // TODO
-  }
-  wpi::array<T, N> arr(wpi::empty_array);
-  for (size_t i = 0; i < N; i++) {
-    arr[i] = msg.Get(i);
-  }
-  return arr;
-}
-
-/**
- * Pack a serialized protobuf message.
- *
- * @param msg protobuf message (mutable, output)
- * @param value object
- */
-template <ProtobufSerializable T>
-inline void PackProtobuf(google::protobuf::Message* msg, const T& value) {
-  Protobuf<typename std::remove_cvref_t<T>>::Pack(msg, value);
-}
-
-/**
- * Pack a serialized protobuf array message.
- *
- * @tparam Proto element type of the protobuf array
- * @tparam T object type
- * @tparam N number of objects
- * @param msg protobuf message (mutable, output)
- * @param arr array of objects
- */
-template <std::derived_from<google::protobuf::Message> Proto,
-          ProtobufSerializable T, size_t N>
-void PackProtobufArray(google::protobuf::RepeatedPtrField<Proto>* msg,
-                       const wpi::array<T, N>& arr) {
-  msg->Clear();
-  msg->Reserve(N);
-  for (const auto& obj : arr) {
-    PackProtobuf(msg->Add(), obj);
-  }
-}
-
-/**
- * Pack a serialized protobuf array message.
- *
- * @tparam T object type
- * @tparam N number of objects
- * @param msg protobuf message (mutable, output)
- * @param arr array of objects
- */
-template <typename T, size_t N>
-void PackProtobufArray(google::protobuf::RepeatedField<T>* msg,
-                       const wpi::array<T, N>& arr) {
-  msg->Clear();
-  msg->Reserve(N);
-  msg->Add(arr.begin(), arr.end());
-}
-
-/**
- * Unpack a serialized struct into an existing object, overwriting its contents.
- *
- * @param out object (output)
- * @param msg protobuf message
- */
-template <ProtobufSerializable T>
-inline void UnpackProtobufInto(T* out, const google::protobuf::Message& msg) {
-  if constexpr (MutableProtobufSerializable<T>) {
-    Protobuf<T>::UnpackInto(out, msg);
-  } else {
-    *out = UnpackProtobuf<T>(msg);
-  }
-}
-
-// these detail functions avoid the need to include protobuf headers
-namespace detail {
-void DeleteProtobuf(google::protobuf::Message* msg);
-bool ParseProtobuf(google::protobuf::Message* msg,
-                   std::span<const uint8_t> data);
-bool SerializeProtobuf(wpi::SmallVectorImpl<uint8_t>& out,
-                       const google::protobuf::Message& msg);
-bool SerializeProtobuf(std::vector<uint8_t>& out,
-                       const google::protobuf::Message& msg);
-std::string GetTypeString(const google::protobuf::Message& msg);
-void ForEachProtobufDescriptor(
-    const google::protobuf::Message& msg,
-    function_ref<bool(std::string_view filename)> wants,
-    function_ref<void(std::string_view filename,
-                      std::span<const uint8_t> descriptor)>
-        fn);
-}  // namespace detail
 
 /**
  * Owning wrapper (ala std::unique_ptr) for google::protobuf::Message* that does
@@ -327,27 +184,6 @@ void ForEachProtobufDescriptor(
 template <ProtobufSerializable T>
 class ProtobufMessage {
  public:
-  explicit ProtobufMessage(google::protobuf::Arena* arena = nullptr)
-      : m_msg{Protobuf<T>::New(arena)} {}
-  ~ProtobufMessage() { detail::DeleteProtobuf(m_msg); }
-  ProtobufMessage(const ProtobufMessage&) = delete;
-  ProtobufMessage& operator=(const ProtobufMessage&) = delete;
-  ProtobufMessage(ProtobufMessage&& rhs) : m_msg{rhs.m_msg} {
-    rhs.m_msg = nullptr;
-  }
-  ProtobufMessage& operator=(ProtobufMessage&& rhs) {
-    std::swap(m_msg, rhs.m_msg);
-    return *this;
-  }
-
-  /**
-   * Gets the stored message object.
-   *
-   * @return google::protobuf::Message*
-   */
-  google::protobuf::Message* GetMessage() { return m_msg; }
-  const google::protobuf::Message* GetMessage() const { return m_msg; }
-
   /**
    * Unpacks from a byte array.
    *
@@ -355,10 +191,8 @@ class ProtobufMessage {
    * @return Optional; empty if parsing failed
    */
   std::optional<T> Unpack(std::span<const uint8_t> data) {
-    if (!detail::ParseProtobuf(m_msg, data)) {
-      return std::nullopt;
-    }
-    return Protobuf<T>::Unpack(*m_msg);
+    ProtoInputStream stream{data, Protobuf<T>::Message()};
+    return Protobuf<T>::Unpack(stream);
   }
 
   /**
@@ -369,11 +203,17 @@ class ProtobufMessage {
    * @return true if successful
    */
   bool UnpackInto(T* out, std::span<const uint8_t> data) {
-    if (!detail::ParseProtobuf(m_msg, data)) {
-      return false;
+    if constexpr (MutableProtobufSerializable<T>) {
+      ProtoInputStream stream{data, Protobuf<T>::Message()};
+      return Protobuf<T>::UnpackInto(out, stream);
+    } else {
+      auto unpacked = Unpack(data);
+      if (!unpacked) {
+        return false;
+      }
+      *out = std::move(unpacked.value());
+      return true;
     }
-    UnpackProtobufInto(out, *m_msg);
-    return true;
   }
 
   /**
@@ -384,8 +224,8 @@ class ProtobufMessage {
    * @return true if successful
    */
   bool Pack(wpi::SmallVectorImpl<uint8_t>& out, const T& value) {
-    Protobuf<T>::Pack(m_msg, value);
-    return detail::SerializeProtobuf(out, *m_msg);
+    ProtoOutputStream stream{out, Protobuf<T>::Message()};
+    return Protobuf<T>::Pack(stream, value);
   }
 
   /**
@@ -396,8 +236,8 @@ class ProtobufMessage {
    * @return true if successful
    */
   bool Pack(std::vector<uint8_t>& out, const T& value) {
-    Protobuf<T>::Pack(m_msg, value);
-    return detail::SerializeProtobuf(out, *m_msg);
+    ProtoOutputStream stream{out, Protobuf<T>::Message()};
+    return Protobuf<T>::Pack(stream, value);
   }
 
   /**
@@ -405,7 +245,9 @@ class ProtobufMessage {
    *
    * @return type string
    */
-  std::string GetTypeString() const { return detail::GetTypeString(*m_msg); }
+  std::string GetTypeString() const {
+    return Protobuf<T>::Message()->proto_name;
+  }
 
   /**
    * Loops over all protobuf descriptors including nested/referenced
@@ -420,68 +262,7 @@ class ProtobufMessage {
       function_ref<void(std::string_view filename,
                         std::span<const uint8_t> descriptor)>
           fn) {
-    detail::ForEachProtobufDescriptor(*m_msg, exists, fn);
-  }
-
- private:
-  google::protobuf::Message* m_msg = nullptr;
-};
-
-template <typename T>
-class NanopbMessage {
- public:
-  /**
-   * Unpacks from a byte array.
-   *
-   * @param data byte array
-   * @return Optional; empty if parsing failed
-   */
-  std::optional<T> Unpack(std::span<const uint8_t> data) {
-    ProtoInputStream stream{data, Protobuf<T>::Message()};
-    return Protobuf<T>::Unpack(stream);
-  }
-
-  // This will work, just needs the rest of the infrastructure built out to do
-  // so
-  // /**
-  //  * Unpacks from a byte array into an existing object.
-  //  *
-  //  * @param[out] out output object
-  //  * @param[in] data byte array
-  //  * @return true if successful
-  //  */
-  // bool UnpackInto(T* out, std::span<const uint8_t> data) {
-  //   ProtoInputStream stream{data, Protobuf<T>::Message()};
-  //   Protobuf<T>::Unpack(stream);
-  //   if (!detail::ParseProtobuf(m_msg, data)) {
-  //     return false;
-  //   }
-  //   UnpackProtobufInto(out, *m_msg);
-  //   return true;
-  // }
-
-  /**
-   * Packs object into a SmallVector.
-   *
-   * @param[out] out output bytes
-   * @param[in] value value
-   * @return true if successful
-   */
-  bool Pack(wpi::SmallVectorImpl<uint8_t>& out, const T& value) {
-    ProtoOutputStream stream{out, Protobuf<T>::Message()};
-    return Protobuf<T>::Pack(stream, value);
-  }
-
-  /**
-   * Packs object into a std::vector.
-   *
-   * @param[out] out output bytes
-   * @param[in] value value
-   * @return true if successful
-   */
-  bool Pack(std::vector<uint8_t>& out, const T& value) {
-    ProtoOutputStream stream{out, Protobuf<T>::Message()};
-    return Protobuf<T>::Pack(stream, value);
+    // TODO do this
   }
 };
 

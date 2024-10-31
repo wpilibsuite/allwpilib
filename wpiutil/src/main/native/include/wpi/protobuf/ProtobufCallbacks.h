@@ -38,22 +38,6 @@ static_assert(UnpackBytes<std::string>);
 static_assert(UnpackBytes<std::vector<uint8_t>>);
 static_assert(UnpackBytes<wpi::SmallVector<uint8_t, 128>>);
 
-template <typename T>
-concept NanoProtobufSerializable =
-    requires(wpi::ProtoOutputStream& ostream, wpi::ProtoInputStream& istream,
-             const T& value) {
-      typename Protobuf<typename std::remove_cvref_t<T>>;
-      {
-        Protobuf<typename std::remove_cvref_t<T>>::Message()
-      } -> std::same_as<const pb_msgdesc_t*>;
-      {
-        Protobuf<typename std::remove_cvref_t<T>>::Unpack(istream)
-      } -> std::same_as<std::optional<typename std::remove_cvref_t<T>>>;
-      {
-        Protobuf<typename std::remove_cvref_t<T>>::Pack(ostream, value)
-      } -> std::same_as<bool>;
-    };
-
 enum class DecodeLimits {
   Ignore,
   Add,
@@ -87,7 +71,7 @@ constexpr bool ValidateType(pb_type_t type) {
     case PB_LTYPE_STRING:
       return PackBytes<T> || UnpackBytes<T>;
     case PB_LTYPE_SUBMESSAGE:
-      return NanoProtobufSerializable<T>;
+      return ProtobufSerializable<T>;
     default:
       return false;
   }
@@ -237,7 +221,7 @@ class DirectUnpackCallback {
       space.resize(stream->bytes_left);
       return pb_read(stream, reinterpret_cast<pb_byte_t*>(space.data()),
                      space.size());
-    } else if constexpr (NanoProtobufSerializable<T>) {
+    } else if constexpr (ProtobufSerializable<T>) {
       ProtoInputStream istream{stream, wpi::Protobuf<T>::Message()};
       auto decoded = wpi::Protobuf<T>::Unpack(istream);
       if (decoded.has_value()) {
@@ -310,7 +294,7 @@ class UnpackCallback
 };
 
 template <typename T>
-concept ProtoPackable = NanoProtobufSerializable<T> || PackBytes<T> ||
+concept ProtoPackable = ProtobufSerializable<T> || PackBytes<T> ||
                         std::integral<T> || std::floating_point<T>;
 
 template <ProtoPackable T>
@@ -380,7 +364,7 @@ class PackCallback {
       return pb_encode_string(stream.Stream(),
                               reinterpret_cast<const pb_byte_t*>(view.data()),
                               view.size());
-    } else if constexpr (NanoProtobufSerializable<T>) {
+    } else if constexpr (ProtobufSerializable<T>) {
       return wpi::Protobuf<T>::Pack(stream, value);
     }
   }
@@ -388,7 +372,7 @@ class PackCallback {
   bool EncodeLoop(pb_ostream_t* stream, const pb_field_t* field,
                   bool writeTag) const {
     const pb_msgdesc_t* desc = nullptr;
-    if constexpr (NanoProtobufSerializable<T>) {
+    if constexpr (ProtobufSerializable<T>) {
       desc = wpi::Protobuf<T>::Message();
     }
     ProtoOutputStream ostream{stream, desc};
