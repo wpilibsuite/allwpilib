@@ -173,6 +173,15 @@ concept MutableProtobufSerializable =
       Protobuf<typename std::remove_cvref_t<T>>::UnpackInto(out, istream);
     };
 
+namespace detail {
+void ForEachProtobufDescriptor(
+    const pb_msgdesc_t* msg,
+    function_ref<bool(std::string_view filename)> wants,
+    function_ref<void(std::string_view filename,
+                      std::span<const uint8_t> descriptor)>
+        fn);
+}  // namespace detail
+
 /**
  * Owning wrapper (ala std::unique_ptr) for google::protobuf::Message* that does
  * not require the protobuf headers be included. Note this object is not thread
@@ -262,7 +271,7 @@ class ProtobufMessage {
       function_ref<void(std::string_view filename,
                         std::span<const uint8_t> descriptor)>
           fn) {
-    // TODO do this
+    detail::ForEachProtobufDescriptor(Protobuf<T>::Message(), exists, fn);
   }
 };
 

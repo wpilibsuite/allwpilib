@@ -7,9 +7,28 @@
 #include <string>
 #include <vector>
 
+#include <fmt/format.h>
 #include "wpi/SmallVector.h"
 
 using namespace wpi;
+
+void detail::ForEachProtobufDescriptor(
+    const pb_msgdesc_t* msg,
+    function_ref<bool(std::string_view filename)> exists,
+    function_ref<void(std::string_view filename,
+                      std::span<const uint8_t> descriptor)>
+        fn) {
+  std::string name = fmt::format("proto:{}", msg->proto_name);
+  if (exists(name)) {
+    return;
+  }
+  const pb_msgdesc_t* const* nested = msg->submsg_info;
+  while (*nested) {
+    ForEachProtobufDescriptor(*nested, exists, fn);
+    nested++;
+  }
+  fn(name, msg->file_descriptor.file_descriptor);
+}
 
 bool ProtoOutputStream::WriteFromSmallVector(pb_ostream_t* stream,
                                              const pb_byte_t* buf,
