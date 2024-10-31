@@ -4,13 +4,10 @@
 
 #pragma once
 
-#include <functional>
 #include <memory>
-#include <optional>
 #include <string>
 #include <string_view>
 #include <thread>
-#include <vector>
 
 #include <glass/View.h>
 #include <implot.h>
@@ -21,7 +18,6 @@
 #include <wpi/StringMap.h>
 
 #include "sysid/analysis/AnalysisManager.h"
-#include "sysid/analysis/AnalysisType.h"
 #include "sysid/analysis/FeedbackAnalysis.h"
 #include "sysid/analysis/FeedbackControllerPreset.h"
 #include "sysid/view/AnalyzerPlot.h"
