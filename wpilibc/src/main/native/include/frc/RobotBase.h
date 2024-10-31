@@ -10,6 +10,7 @@
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
 #include <hal/Main.h>
+#include <networktables/NetworkTable.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
@@ -257,6 +258,7 @@ class RobotBase {
   RobotBase& operator=(RobotBase&&) = default;
 
   static std::thread::id m_threadId;
+  NT_Listener connListenerHandle;
 };
 
 }  // namespace frc
