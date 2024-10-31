@@ -292,6 +292,12 @@ public abstract class Command implements Sendable {
    * and the deadline in parallel, finishing when
    * the deadline finishes.
    *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
    * @param deadline the deadline of the command group
    * @return the decorated command
    */
