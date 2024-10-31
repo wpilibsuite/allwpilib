@@ -12,13 +12,17 @@
 
 using namespace wpi;
 
+std::string detail::GetTypeString(const pb_msgdesc_t* msg) {
+  return fmt::format("proto:{}", msg->proto_name);
+}
+
 void detail::ForEachProtobufDescriptor(
     const pb_msgdesc_t* msg,
     function_ref<bool(std::string_view filename)> exists,
     function_ref<void(std::string_view filename,
                       std::span<const uint8_t> descriptor)>
         fn) {
-  std::string name = fmt::format("proto:{}", msg->proto_name);
+  std::string name = fmt::format("proto:{}", msg->file_descriptor.file_name);
   if (exists(name)) {
     return;
   }

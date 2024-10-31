@@ -91,6 +91,9 @@ class ProtoOutputStream {
     m_streamLocal.bytes_written = 0;
   }
 
+  explicit ProtoOutputStream(const pb_msgdesc_t* msgDesc)
+      : m_msgDesc{msgDesc} {}
+
   pb_ostream_t* Stream() noexcept {
     return m_streamMsg ? m_streamMsg : &m_streamLocal;
   }
@@ -174,6 +177,7 @@ concept MutableProtobufSerializable =
     };
 
 namespace detail {
+std::string GetTypeString(const pb_msgdesc_t* msg);
 void ForEachProtobufDescriptor(
     const pb_msgdesc_t* msg,
     function_ref<bool(std::string_view filename)> wants,
@@ -255,7 +259,7 @@ class ProtobufMessage {
    * @return type string
    */
   std::string GetTypeString() const {
-    return Protobuf<T>::Message()->proto_name;
+    return detail::GetTypeString(Protobuf<T>::Message());
   }
 
   /**
