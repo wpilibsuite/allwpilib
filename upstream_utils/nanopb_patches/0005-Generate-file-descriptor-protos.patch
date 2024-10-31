@@ -4,12 +4,12 @@ Date: Wed, 30 Oct 2024 20:15:43 -0700
 Subject: [PATCH 5/5] Generate file descriptor protos
 
 ---
- generator/nanopb_generator.py | 25 +++++++++++++++++++++++++
- pb.h                          |  8 ++++++++
- 2 files changed, 33 insertions(+)
+ generator/nanopb_generator.py | 26 ++++++++++++++++++++++++++
+ pb.h                          | 14 ++++++++++++++
+ 2 files changed, 40 insertions(+)
 
 diff --git a/generator/nanopb_generator.py b/generator/nanopb_generator.py
-index c7a0d0f1f2fb3f5da9a59373ace20c87bad35441..eada6191b12671aeaabced3a75072a69c449af1b 100755
+index c7a0d0f1f2fb3f5da9a59373ace20c87bad35441..1f0ab558ecb62e06e9511f62f435e1d96fa16568 100755
 --- a/generator/nanopb_generator.py
 +++ b/generator/nanopb_generator.py
 @@ -2046,6 +2046,8 @@ class ProtoFile:
@@ -25,12 +25,12 @@ index c7a0d0f1f2fb3f5da9a59373ace20c87bad35441..eada6191b12671aeaabced3a75072a69
                  yield msg.fields_declaration(self.dependencies) + '\n'
              for msg in self.messages:
                  yield 'const pb_msgdesc_t *get_%s_msg(void);\n' % Globals.naming_style.type_name(msg.name)
-+                yield 'std::span<const uint8_t> get_%s_file_descriptor(void);\n' % Globals.naming_style.type_name(msg.name)
 +                yield 'std::string_view get_%s_name(void);\n' % Globals.naming_style.type_name(msg.name)
++                yield 'pb_filedesc_t get_%s_file_descriptor(void);\n' % Globals.naming_style.type_name(msg.name)
              yield '\n'
  
              yield '/* Maximum encoded size of messages (where known) */\n'
-@@ -2252,6 +2256,23 @@ class ProtoFile:
+@@ -2252,6 +2256,24 @@ class ProtoFile:
          yield '#endif\n'
          yield '\n'
  
@@ -50,24 +50,25 @@ index c7a0d0f1f2fb3f5da9a59373ace20c87bad35441..eada6191b12671aeaabced3a75072a69
 +        yield '\n'
 +
 +        yield "};\n"
++        yield 'static const char file_name[] = "%s";\n' % self.fdesc.name
 +
          # Check if any messages exceed the 64 kB limit of 16-bit pb_size_t
          exceeds_64kB = []
          for msg in self.messages:
-@@ -2268,7 +2289,11 @@ class ProtoFile:
+@@ -2268,7 +2290,11 @@ class ProtoFile:
  
          # Generate the message field definitions (PB_BIND() call)
          for msg in self.messages:
 +            yield 'static const char %s_name[] = "%s";\n' % (msg.name, msg.name)
 +            yield 'std::string_view get_%s_name(void) { return %s_name; }\n' % (msg.name, msg.name)
-+            yield 'std::span<const uint8_t> get_%s_file_descriptor(void) { return file_descriptor; }\n' % msg.name
++            yield 'pb_filedesc_t get_%s_file_descriptor(void) { return {file_name, file_descriptor,}; }\n' % msg.name
              yield msg.fields_definition(self.dependencies) + '\n\n'
 +            
  
          # Generate pb_extension_type_t definitions if extensions are used in proto file
          for ext in self.extensions:
 diff --git a/pb.h b/pb.h
-index 476a124a5874bd71ea4cabc8a0e1fea86216bde0..95549b7ba1066b1775e08445ad4b62f831cd128e 100644
+index 476a124a5874bd71ea4cabc8a0e1fea86216bde0..82e27328c596dac21cb269a4946bbfdfb0d25e7a 100644
 --- a/pb.h
 +++ b/pb.h
 @@ -89,6 +89,9 @@
@@ -80,17 +81,30 @@ index 476a124a5874bd71ea4cabc8a0e1fea86216bde0..95549b7ba1066b1775e08445ad4b62f8
  #ifdef PB_ENABLE_MALLOC
  #include <stdlib.h>
  #endif
-@@ -329,6 +332,9 @@ struct pb_msgdesc_s {
+@@ -315,6 +318,12 @@ typedef struct pb_istream_s pb_istream_t;
+ typedef struct pb_ostream_s pb_ostream_t;
+ typedef struct pb_field_iter_s pb_field_iter_t;
+ 
++typedef struct pb_filedesc_s pb_filedesc_t;
++struct pb_filedesc_s {
++    std::string_view file_name;
++    std::span<const uint8_t> file_descriptor;
++};
++
+ /* This structure is used in auto-generated constants
+  * to specify struct fields.
+  */
+@@ -329,6 +338,9 @@ struct pb_msgdesc_s {
      pb_size_t field_count;
      pb_size_t required_field_count;
      pb_size_t largest_tag;
 +
-+    std::span<const uint8_t> file_descriptor;
++    pb_filedesc_t file_descriptor;
 +    std::string_view proto_name;
  };
  
  /* Iterator for message descriptor */
-@@ -520,6 +526,8 @@ struct pb_extension_s {
+@@ -520,6 +532,8 @@ struct pb_extension_s {
         0 msgname ## _FIELDLIST(PB_GEN_FIELD_COUNT, structname), \
         0 msgname ## _FIELDLIST(PB_GEN_REQ_FIELD_COUNT, structname), \
         0 msgname ## _FIELDLIST(PB_GEN_LARGEST_TAG, structname), \

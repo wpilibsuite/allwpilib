@@ -127,20 +127,20 @@ X(a, STATIC,   SINGULAR, DOUBLE,   right,             2)
 #define wpi_proto_ProtobufDifferentialDriveWheelVoltages_DEFAULT NULL
 
 const pb_msgdesc_t *get_wpi_proto_ProtobufArmFeedforward_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufArmFeedforward_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufArmFeedforward_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufArmFeedforward_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufDifferentialDriveFeedforward_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufDifferentialDriveFeedforward_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufDifferentialDriveFeedforward_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufDifferentialDriveFeedforward_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufElevatorFeedforward_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufElevatorFeedforward_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufElevatorFeedforward_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufElevatorFeedforward_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufSimpleMotorFeedforward_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufSimpleMotorFeedforward_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufSimpleMotorFeedforward_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufSimpleMotorFeedforward_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufDifferentialDriveWheelVoltages_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufDifferentialDriveWheelVoltages_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufDifferentialDriveWheelVoltages_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufDifferentialDriveWheelVoltages_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 #define WPI_PROTO_CONTROLLER_NPB_H_MAX_SIZE      wpi_proto_ProtobufArmFeedforward_size

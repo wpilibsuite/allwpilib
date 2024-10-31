@@ -64,11 +64,11 @@ X(a, CALLBACK, REPEATED, DOUBLE,   y_final,           4)
 #define wpi_proto_ProtobufQuinticHermiteSpline_DEFAULT NULL
 
 const pb_msgdesc_t *get_wpi_proto_ProtobufCubicHermiteSpline_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufCubicHermiteSpline_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufCubicHermiteSpline_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufCubicHermiteSpline_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufQuinticHermiteSpline_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufQuinticHermiteSpline_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufQuinticHermiteSpline_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufQuinticHermiteSpline_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufCubicHermiteSpline_size depends on runtime parameters */

@@ -318,6 +318,12 @@ typedef struct pb_istream_s pb_istream_t;
 typedef struct pb_ostream_s pb_ostream_t;
 typedef struct pb_field_iter_s pb_field_iter_t;
 
+typedef struct pb_filedesc_s pb_filedesc_t;
+struct pb_filedesc_s {
+    std::string_view file_name;
+    std::span<const uint8_t> file_descriptor;
+};
+
 /* This structure is used in auto-generated constants
  * to specify struct fields.
  */
@@ -333,7 +339,7 @@ struct pb_msgdesc_s {
     pb_size_t required_field_count;
     pb_size_t largest_tag;
 
-    std::span<const uint8_t> file_descriptor;
+    pb_filedesc_t file_descriptor;
     std::string_view proto_name;
 };
 

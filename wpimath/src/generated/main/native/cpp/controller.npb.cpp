@@ -203,33 +203,34 @@ static const uint8_t file_descriptor[] {
 0x04,0x02,0x01,0x03,0x12,0x03,0x26,0x11,0x12,0x62,
 0x06,0x70,0x72,0x6f,0x74,0x6f,0x33,
 };
+static const char file_name[] = "controller.proto";
 static const char wpi_proto_ProtobufArmFeedforward_name[] = "wpi_proto_ProtobufArmFeedforward";
 std::string_view get_wpi_proto_ProtobufArmFeedforward_name(void) { return wpi_proto_ProtobufArmFeedforward_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufArmFeedforward_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufArmFeedforward_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufArmFeedforward, wpi_proto_ProtobufArmFeedforward, AUTO)
 
 
 static const char wpi_proto_ProtobufDifferentialDriveFeedforward_name[] = "wpi_proto_ProtobufDifferentialDriveFeedforward";
 std::string_view get_wpi_proto_ProtobufDifferentialDriveFeedforward_name(void) { return wpi_proto_ProtobufDifferentialDriveFeedforward_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufDifferentialDriveFeedforward_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufDifferentialDriveFeedforward_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufDifferentialDriveFeedforward, wpi_proto_ProtobufDifferentialDriveFeedforward, AUTO)
 
 
 static const char wpi_proto_ProtobufElevatorFeedforward_name[] = "wpi_proto_ProtobufElevatorFeedforward";
 std::string_view get_wpi_proto_ProtobufElevatorFeedforward_name(void) { return wpi_proto_ProtobufElevatorFeedforward_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufElevatorFeedforward_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufElevatorFeedforward_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufElevatorFeedforward, wpi_proto_ProtobufElevatorFeedforward, AUTO)
 
 
 static const char wpi_proto_ProtobufSimpleMotorFeedforward_name[] = "wpi_proto_ProtobufSimpleMotorFeedforward";
 std::string_view get_wpi_proto_ProtobufSimpleMotorFeedforward_name(void) { return wpi_proto_ProtobufSimpleMotorFeedforward_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufSimpleMotorFeedforward_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufSimpleMotorFeedforward_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufSimpleMotorFeedforward, wpi_proto_ProtobufSimpleMotorFeedforward, AUTO)
 
 
 static const char wpi_proto_ProtobufDifferentialDriveWheelVoltages_name[] = "wpi_proto_ProtobufDifferentialDriveWheelVoltages";
 std::string_view get_wpi_proto_ProtobufDifferentialDriveWheelVoltages_name(void) { return wpi_proto_ProtobufDifferentialDriveWheelVoltages_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufDifferentialDriveWheelVoltages_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufDifferentialDriveWheelVoltages_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufDifferentialDriveWheelVoltages, wpi_proto_ProtobufDifferentialDriveWheelVoltages, AUTO)
 
 

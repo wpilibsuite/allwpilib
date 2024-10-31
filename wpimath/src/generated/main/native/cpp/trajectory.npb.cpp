@@ -94,15 +94,16 @@ static const uint8_t file_descriptor[] {
 0x05,0x04,0x01,0x02,0x00,0x03,0x12,0x03,0x11,0x2c,
 0x2d,0x62,0x06,0x70,0x72,0x6f,0x74,0x6f,0x33,
 };
+static const char file_name[] = "trajectory.proto";
 static const char wpi_proto_ProtobufTrajectoryState_name[] = "wpi_proto_ProtobufTrajectoryState";
 std::string_view get_wpi_proto_ProtobufTrajectoryState_name(void) { return wpi_proto_ProtobufTrajectoryState_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufTrajectoryState_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufTrajectoryState_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufTrajectoryState, wpi_proto_ProtobufTrajectoryState, AUTO)
 
 
 static const char wpi_proto_ProtobufTrajectory_name[] = "wpi_proto_ProtobufTrajectory";
 std::string_view get_wpi_proto_ProtobufTrajectory_name(void) { return wpi_proto_ProtobufTrajectory_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufTrajectory_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufTrajectory_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufTrajectory, wpi_proto_ProtobufTrajectory, AUTO)
 
 

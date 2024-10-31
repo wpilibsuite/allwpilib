@@ -139,26 +139,26 @@ X(a, STATIC,   SINGULAR, DOUBLE,   ySemiAxis,         3)
 #define wpi_proto_ProtobufEllipse2d_center_MSGTYPE wpi_proto_ProtobufPose2d
 
 const pb_msgdesc_t *get_wpi_proto_ProtobufTranslation2d_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufTranslation2d_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufTranslation2d_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufTranslation2d_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufRotation2d_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufRotation2d_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufRotation2d_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufRotation2d_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufPose2d_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufPose2d_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufPose2d_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufPose2d_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufTransform2d_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufTransform2d_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufTransform2d_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufTransform2d_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufTwist2d_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufTwist2d_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufTwist2d_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufTwist2d_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufRectangle2d_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufRectangle2d_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufRectangle2d_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufRectangle2d_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufEllipse2d_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufEllipse2d_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufEllipse2d_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufEllipse2d_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufPose2d_size depends on runtime parameters */

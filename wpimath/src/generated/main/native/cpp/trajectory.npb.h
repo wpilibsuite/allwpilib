@@ -61,11 +61,11 @@ X(a, CALLBACK, REPEATED, MESSAGE,  states,            2)
 #define wpi_proto_ProtobufTrajectory_states_MSGTYPE wpi_proto_ProtobufTrajectoryState
 
 const pb_msgdesc_t *get_wpi_proto_ProtobufTrajectoryState_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufTrajectoryState_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufTrajectoryState_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufTrajectoryState_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufTrajectory_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufTrajectory_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufTrajectory_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufTrajectory_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufTrajectoryState_size depends on runtime parameters */

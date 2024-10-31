@@ -135,23 +135,23 @@ X(a, STATIC,   SINGULAR, DOUBLE,   rz,                6)
 #define wpi_proto_ProtobufTwist3d_DEFAULT NULL
 
 const pb_msgdesc_t *get_wpi_proto_ProtobufTranslation3d_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufTranslation3d_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufTranslation3d_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufTranslation3d_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufQuaternion_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufQuaternion_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufQuaternion_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufQuaternion_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufRotation3d_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufRotation3d_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufRotation3d_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufRotation3d_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufPose3d_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufPose3d_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufPose3d_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufPose3d_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufTransform3d_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufTransform3d_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufTransform3d_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufTransform3d_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufTwist3d_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufTwist3d_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufTwist3d_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufTwist3d_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufRotation3d_size depends on runtime parameters */

@@ -548,27 +548,28 @@ static const uint8_t file_descriptor[] {
 0x12,0x03,0x3e,0x2f,0x31,0x62,0x06,0x70,0x72,0x6f,
 0x74,0x6f,0x33,
 };
+static const char file_name[] = "wpiutil.proto";
 static const char wpi_proto_TestProtoInner_name[] = "wpi_proto_TestProtoInner";
 std::string_view get_wpi_proto_TestProtoInner_name(void) { return wpi_proto_TestProtoInner_name; }
-std::span<const uint8_t> get_wpi_proto_TestProtoInner_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_TestProtoInner_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_TestProtoInner, wpi_proto_TestProtoInner, AUTO)
 
 
 static const char wpi_proto_TestProto_name[] = "wpi_proto_TestProto";
 std::string_view get_wpi_proto_TestProto_name(void) { return wpi_proto_TestProto_name; }
-std::span<const uint8_t> get_wpi_proto_TestProto_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_TestProto_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_TestProto, wpi_proto_TestProto, AUTO)
 
 
 static const char wpi_proto_OptionalTestProto_name[] = "wpi_proto_OptionalTestProto";
 std::string_view get_wpi_proto_OptionalTestProto_name(void) { return wpi_proto_OptionalTestProto_name; }
-std::span<const uint8_t> get_wpi_proto_OptionalTestProto_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_OptionalTestProto_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_OptionalTestProto, wpi_proto_OptionalTestProto, AUTO)
 
 
 static const char wpi_proto_RepeatedTestProto_name[] = "wpi_proto_RepeatedTestProto";
 std::string_view get_wpi_proto_RepeatedTestProto_name(void) { return wpi_proto_RepeatedTestProto_name; }
-std::span<const uint8_t> get_wpi_proto_RepeatedTestProto_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_RepeatedTestProto_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_RepeatedTestProto, wpi_proto_RepeatedTestProto, 2)
 
 

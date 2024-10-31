@@ -46,8 +46,8 @@ X(a, STATIC,   SINGULAR, DOUBLE,   free_speed,        5)
 #define wpi_proto_ProtobufDCMotor_DEFAULT NULL
 
 const pb_msgdesc_t *get_wpi_proto_ProtobufDCMotor_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufDCMotor_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufDCMotor_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufDCMotor_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 #define WPI_PROTO_PLANT_NPB_H_MAX_SIZE           wpi_proto_ProtobufDCMotor_size

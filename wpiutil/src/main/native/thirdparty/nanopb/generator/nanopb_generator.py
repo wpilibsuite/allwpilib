@@ -2130,8 +2130,8 @@ class ProtoFile:
                 yield msg.fields_declaration(self.dependencies) + '\n'
             for msg in self.messages:
                 yield 'const pb_msgdesc_t *get_%s_msg(void);\n' % Globals.naming_style.type_name(msg.name)
-                yield 'std::span<const uint8_t> get_%s_file_descriptor(void);\n' % Globals.naming_style.type_name(msg.name)
                 yield 'std::string_view get_%s_name(void);\n' % Globals.naming_style.type_name(msg.name)
+                yield 'pb_filedesc_t get_%s_file_descriptor(void);\n' % Globals.naming_style.type_name(msg.name)
             yield '\n'
 
             yield '/* Maximum encoded size of messages (where known) */\n'
@@ -2272,6 +2272,7 @@ class ProtoFile:
         yield '\n'
 
         yield "};\n"
+        yield 'static const char file_name[] = "%s";\n' % self.fdesc.name
 
         # Check if any messages exceed the 64 kB limit of 16-bit pb_size_t
         exceeds_64kB = []
@@ -2291,7 +2292,7 @@ class ProtoFile:
         for msg in self.messages:
             yield 'static const char %s_name[] = "%s";\n' % (msg.name, msg.name)
             yield 'std::string_view get_%s_name(void) { return %s_name; }\n' % (msg.name, msg.name)
-            yield 'std::span<const uint8_t> get_%s_file_descriptor(void) { return file_descriptor; }\n' % msg.name
+            yield 'pb_filedesc_t get_%s_file_descriptor(void) { return {file_name, file_descriptor,}; }\n' % msg.name
             yield msg.fields_definition(self.dependencies) + '\n\n'
             
 

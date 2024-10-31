@@ -202,45 +202,46 @@ static const uint8_t file_descriptor[] {
 0x05,0x04,0x06,0x02,0x02,0x03,0x12,0x03,0x28,0x15,
 0x16,0x62,0x06,0x70,0x72,0x6f,0x74,0x6f,0x33,
 };
+static const char file_name[] = "geometry2d.proto";
 static const char wpi_proto_ProtobufTranslation2d_name[] = "wpi_proto_ProtobufTranslation2d";
 std::string_view get_wpi_proto_ProtobufTranslation2d_name(void) { return wpi_proto_ProtobufTranslation2d_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufTranslation2d_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufTranslation2d_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufTranslation2d, wpi_proto_ProtobufTranslation2d, AUTO)
 
 
 static const char wpi_proto_ProtobufRotation2d_name[] = "wpi_proto_ProtobufRotation2d";
 std::string_view get_wpi_proto_ProtobufRotation2d_name(void) { return wpi_proto_ProtobufRotation2d_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufRotation2d_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufRotation2d_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufRotation2d, wpi_proto_ProtobufRotation2d, AUTO)
 
 
 static const char wpi_proto_ProtobufPose2d_name[] = "wpi_proto_ProtobufPose2d";
 std::string_view get_wpi_proto_ProtobufPose2d_name(void) { return wpi_proto_ProtobufPose2d_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufPose2d_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufPose2d_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufPose2d, wpi_proto_ProtobufPose2d, AUTO)
 
 
 static const char wpi_proto_ProtobufTransform2d_name[] = "wpi_proto_ProtobufTransform2d";
 std::string_view get_wpi_proto_ProtobufTransform2d_name(void) { return wpi_proto_ProtobufTransform2d_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufTransform2d_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufTransform2d_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufTransform2d, wpi_proto_ProtobufTransform2d, AUTO)
 
 
 static const char wpi_proto_ProtobufTwist2d_name[] = "wpi_proto_ProtobufTwist2d";
 std::string_view get_wpi_proto_ProtobufTwist2d_name(void) { return wpi_proto_ProtobufTwist2d_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufTwist2d_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufTwist2d_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufTwist2d, wpi_proto_ProtobufTwist2d, AUTO)
 
 
 static const char wpi_proto_ProtobufRectangle2d_name[] = "wpi_proto_ProtobufRectangle2d";
 std::string_view get_wpi_proto_ProtobufRectangle2d_name(void) { return wpi_proto_ProtobufRectangle2d_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufRectangle2d_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufRectangle2d_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufRectangle2d, wpi_proto_ProtobufRectangle2d, AUTO)
 
 
 static const char wpi_proto_ProtobufEllipse2d_name[] = "wpi_proto_ProtobufEllipse2d";
 std::string_view get_wpi_proto_ProtobufEllipse2d_name(void) { return wpi_proto_ProtobufEllipse2d_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufEllipse2d_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufEllipse2d_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufEllipse2d, wpi_proto_ProtobufEllipse2d, AUTO)
 
 

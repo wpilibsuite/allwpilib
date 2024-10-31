@@ -52,11 +52,11 @@ X(a, CALLBACK, REPEATED, DOUBLE,   rows,              1)
 #define wpi_proto_ProtobufVector_DEFAULT NULL
 
 const pb_msgdesc_t *get_wpi_proto_ProtobufMatrix_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufMatrix_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufMatrix_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufMatrix_file_descriptor(void);
 const pb_msgdesc_t *get_wpi_proto_ProtobufVector_msg(void);
-std::span<const uint8_t> get_wpi_proto_ProtobufVector_file_descriptor(void);
 std::string_view get_wpi_proto_ProtobufVector_name(void);
+pb_filedesc_t get_wpi_proto_ProtobufVector_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufMatrix_size depends on runtime parameters */

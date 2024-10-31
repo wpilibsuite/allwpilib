@@ -75,9 +75,10 @@ static const uint8_t file_descriptor[] {
 0x16,0x17,0x62,0x06,0x70,0x72,0x6f,0x74,0x6f,0x33,
 
 };
+static const char file_name[] = "plant.proto";
 static const char wpi_proto_ProtobufDCMotor_name[] = "wpi_proto_ProtobufDCMotor";
 std::string_view get_wpi_proto_ProtobufDCMotor_name(void) { return wpi_proto_ProtobufDCMotor_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufDCMotor_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufDCMotor_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufDCMotor, wpi_proto_ProtobufDCMotor, AUTO)
 
 

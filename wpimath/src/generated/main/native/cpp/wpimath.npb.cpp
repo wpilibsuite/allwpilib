@@ -68,15 +68,16 @@ static const uint8_t file_descriptor[] {
 0x19,0x1a,0x62,0x06,0x70,0x72,0x6f,0x74,0x6f,0x33,
 
 };
+static const char file_name[] = "wpimath.proto";
 static const char wpi_proto_ProtobufMatrix_name[] = "wpi_proto_ProtobufMatrix";
 std::string_view get_wpi_proto_ProtobufMatrix_name(void) { return wpi_proto_ProtobufMatrix_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufMatrix_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufMatrix_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufMatrix, wpi_proto_ProtobufMatrix, AUTO)
 
 
 static const char wpi_proto_ProtobufVector_name[] = "wpi_proto_ProtobufVector";
 std::string_view get_wpi_proto_ProtobufVector_name(void) { return wpi_proto_ProtobufVector_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufVector_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufVector_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufVector, wpi_proto_ProtobufVector, AUTO)
 
 

@@ -113,15 +113,16 @@ static const uint8_t file_descriptor[] {
 0x12,0x03,0x11,0x1c,0x1d,0x62,0x06,0x70,0x72,0x6f,
 0x74,0x6f,0x33,
 };
+static const char file_name[] = "spline.proto";
 static const char wpi_proto_ProtobufCubicHermiteSpline_name[] = "wpi_proto_ProtobufCubicHermiteSpline";
 std::string_view get_wpi_proto_ProtobufCubicHermiteSpline_name(void) { return wpi_proto_ProtobufCubicHermiteSpline_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufCubicHermiteSpline_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufCubicHermiteSpline_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufCubicHermiteSpline, wpi_proto_ProtobufCubicHermiteSpline, AUTO)
 
 
 static const char wpi_proto_ProtobufQuinticHermiteSpline_name[] = "wpi_proto_ProtobufQuinticHermiteSpline";
 std::string_view get_wpi_proto_ProtobufQuinticHermiteSpline_name(void) { return wpi_proto_ProtobufQuinticHermiteSpline_name; }
-std::span<const uint8_t> get_wpi_proto_ProtobufQuinticHermiteSpline_file_descriptor(void) { return file_descriptor; }
+pb_filedesc_t get_wpi_proto_ProtobufQuinticHermiteSpline_file_descriptor(void) { return {file_name, file_descriptor,}; }
 PB_BIND(wpi_proto_ProtobufQuinticHermiteSpline, wpi_proto_ProtobufQuinticHermiteSpline, AUTO)
 
 
