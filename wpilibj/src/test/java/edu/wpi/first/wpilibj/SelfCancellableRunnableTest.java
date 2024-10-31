@@ -130,13 +130,12 @@ class SelfCancellableRunnableTest {
     }
   }
 
-  private static class TestSelfCancellingRunnable
-      extends SelfCancellableRunnable {
+  private static final class DummySelfCancellingRunnable extends SelfCancellableRunnable {
 
-    private AtomicInteger m_invocationCount;
+    private final AtomicInteger m_invocationCount;
     private final int m_cancelAfter;
 
-    private TestSelfCancellingRunnable(int cancelAfter) {
+    private DummySelfCancellingRunnable(int cancelAfter) {
       m_cancelAfter = cancelAfter;
       m_invocationCount = new AtomicInteger(0);
     }
@@ -167,14 +166,17 @@ class SelfCancellableRunnableTest {
 
   @AfterEach
   public void cleanup() {
-    m_robot.endCompetition();
-    try {
+    // Note: we use try with resources to guarantee that the robot is always
+    // closed, which means that we need an "effectively final" resource,
+    // hence the final local variable.
+    try (var robot = m_robot) {
+      m_robot = null;
+      robot.endCompetition();
       m_robotThread.interrupt();
       m_robotThread.join();
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
     } finally {
-      m_robot.close();
       SimHooks.resumeTiming();
     }
   }
@@ -192,8 +194,7 @@ class SelfCancellableRunnableTest {
   void schedulePeriodicPeriodSecondsNoDelayOneIteration() {
     double timeStep = MockRobot.period() / 2.0;
 
-    TestSelfCancellingRunnable callback =
-        new TestSelfCancellingRunnable(1);
+    DummySelfCancellingRunnable callback = new DummySelfCancellingRunnable(1);
     assertNotNull(callback.schedulePeriodic(m_robot, timeStep));
 
     startSimulation();
@@ -206,13 +207,13 @@ class SelfCancellableRunnableTest {
 
     assertEquals(0, m_robot.m_disabledInitCount.get());
     assertEquals(0, m_robot.m_disabledPeriodicCount.get());
-    assertEquals(1,  callback.invocationCount());
+    assertEquals(1, callback.invocationCount());
 
     SimHooks.stepTiming(timeStep);
 
     assertEquals(1, m_robot.m_disabledInitCount.get());
     assertEquals(1, m_robot.m_disabledPeriodicCount.get());
-    assertEquals(1,  callback.invocationCount());
+    assertEquals(1, callback.invocationCount());
   }
 
   @Test
@@ -220,8 +221,7 @@ class SelfCancellableRunnableTest {
   void schedulePeriodicPeriodSecondsNoDelayTwoIterations() {
     double timeStep = MockRobot.period() / 2.0;
 
-    TestSelfCancellingRunnable callback =
-        new TestSelfCancellingRunnable(2);
+    DummySelfCancellingRunnable callback = new DummySelfCancellingRunnable(2);
     callback.schedulePeriodic(m_robot, timeStep);
 
     startSimulation();
@@ -258,13 +258,12 @@ class SelfCancellableRunnableTest {
   @Test
   @ResourceLock("timing")
   void testSchedulePeriodicSecondsWithOffsetTwoIterations() {
-    double periodSeconds = MockRobot.period() / 2.0;
-    double offsetSeconds = MockRobot.period() / 4.0;
-    double threeEightsSecond = MockRobot.period() * 3.0 / 8.0;
-    double oneQuarterSecond = MockRobot.period() / 4.0;
+    final double periodSeconds = MockRobot.period() / 2.0;
+    final double offsetSeconds = MockRobot.period() / 4.0;
+    final double threeEightsSecond = MockRobot.period() * 3.0 / 8.0;
+    final double oneQuarterSecond = MockRobot.period() / 4.0;
 
-    TestSelfCancellingRunnable callback =
-        new TestSelfCancellingRunnable(2);
+    DummySelfCancellingRunnable callback = new DummySelfCancellingRunnable(2);
     callback.schedulePeriodic(m_robot, periodSeconds, offsetSeconds);
 
     // Expirations in this test (ms)
@@ -278,7 +277,6 @@ class SelfCancellableRunnableTest {
 
     startSimulation();
 
-
     assertEquals(0, m_robot.m_disabledInitCount.get());
     assertEquals(0, m_robot.m_disabledPeriodicCount.get());
     assertEquals(0, callback.invocationCount());
@@ -318,9 +316,5 @@ class SelfCancellableRunnableTest {
     assertEquals(1, m_robot.m_disabledInitCount.get());
     assertEquals(1, m_robot.m_disabledPeriodicCount.get());
     assertEquals(2, callback.invocationCount());
-  }
-
-  @Test
-  void testSchedulePeriodic1() {
   }
 }

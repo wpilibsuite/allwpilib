@@ -674,7 +674,7 @@ class TimedRobotTest {
     MockRobot robot = new MockRobot();
 
     final AtomicInteger callbackCount = new AtomicInteger(0);
-    TimedRobot.Cancellable periodicHandle =
+    final TimedRobot.Cancellable periodicHandle =
         robot.addPeriodic(() -> callbackCount.addAndGet(1), kPeriod / 2.0);
 
     Thread robotThread = new Thread(robot::startCompetition);
@@ -780,7 +780,7 @@ class TimedRobotTest {
     MockRobot robot = new MockRobot();
 
     final AtomicInteger callbackCount = new AtomicInteger(0);
-    robot.addOneShot(() -> callbackCount.addAndGet(1),kPeriod / 2.0);
+    robot.addOneShot(() -> callbackCount.addAndGet(1), kPeriod / 2.0);
 
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();

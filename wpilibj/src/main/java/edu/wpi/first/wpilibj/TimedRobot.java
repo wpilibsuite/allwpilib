@@ -25,13 +25,9 @@ import java.util.PriorityQueue;
  */
 public class TimedRobot extends IterativeRobotBase {
 
-  /**
-   * Callback schedule types
-   */
+  /** Callback schedule types. */
   enum CallbackScheduleType {
-    /**
-     * Run the callback indefinitely at a preset interval
-     */
+    /** Run the callback indefinitely at a preset interval. */
     PERIODIC {
       @Override
       boolean invoke(Runnable action) {
@@ -39,9 +35,7 @@ public class TimedRobot extends IterativeRobotBase {
         return true;
       }
     },
-    /**
-     * Run the callback only once
-     */
+    /** Run the callback only once. */
     ONE_SHOT {
       @Override
       boolean invoke(Runnable action) {
@@ -49,9 +43,7 @@ public class TimedRobot extends IterativeRobotBase {
         return false;
       }
     },
-    /**
-     * Callback is cancelled. Don't run it at all.
-     */
+    /** Callback is cancelled. Don't run it at all. */
     CANCELLED {
       @Override
       boolean invoke(Runnable action) {
@@ -60,11 +52,10 @@ public class TimedRobot extends IterativeRobotBase {
     };
 
     /**
-     * Invoke the specified {@code action} if it should run
+     * Invoke the specified {@code action} if it should run.
      *
      * @param action action to invoke, provided that it should run.
-     * @return {@code true} if the action should be rescheduled,
-     *         {@code false} otherwise.
+     * @return {@code true} if the action should be rescheduled, {@code false} otherwise.
      */
     abstract boolean invoke(Runnable action);
   }
@@ -73,28 +64,30 @@ public class TimedRobot extends IterativeRobotBase {
     void cancel();
   }
 
-  /**
-   * Holds and invokes the action (a {@link Runnable}) to invoke at a set time.
-   */
+  /** Holds and invokes the action (a {@link Runnable}) to invoke at a set time. */
   @SuppressWarnings("MemberName")
   static class Callback implements Comparable<Callback>, Cancellable {
-    private final Runnable func;  // Scheduled action
-    public long period;  // Time between invocations of a periodic callback
-    public long expirationTime;  // The next time to invoke the callback
+    private final Runnable func; // Scheduled action
+    public long period; // Time between invocations of a periodic callback
+    public long expirationTime; // The next time to invoke the callback
     public volatile CallbackScheduleType m_scheduleType;
 
     /**
      * Construct a callback container.
      *
-     * @param func         The callback to run.
-     * @param startTimeUs  The common starting point for all callback scheduling in
-     *                     microseconds.
-     * @param periodUs     The period at which to run the callback in microseconds.
-     * @param offsetUs     The offset from the common starting time in microseconds.
-     * @param scheduleType How to schedule the callback. Meaningful options are
-     *                     periodic or one-shot.
+     * @param func The callback to run.
+     * @param startTimeUs The common starting point for all callback scheduling in microseconds.
+     * @param periodUs The period at which to run the callback in microseconds.
+     * @param offsetUs The offset from the common starting time in microseconds.
+     * @param scheduleType How to schedule the callback. Meaningful options are periodic or
+     *     one-shot.
      */
-    Callback(Runnable func, long startTimeUs, long periodUs, long offsetUs, CallbackScheduleType scheduleType) {
+    Callback(
+        Runnable func,
+        long startTimeUs,
+        long periodUs,
+        long offsetUs,
+        CallbackScheduleType scheduleType) {
       this.func = func;
       this.period = periodUs;
       this.expirationTime =
@@ -224,12 +217,16 @@ public class TimedRobot extends IterativeRobotBase {
    *
    * @param callback The callback to run.
    * @param periodSeconds The period at which to run the callback in seconds.
-   * @return a {@link Cancellable} that allows the user to cancel periodic
-   *     invocation.
+   * @return a {@link Cancellable} that allows the user to cancel periodic invocation.
    */
   public final Cancellable addPeriodic(Runnable callback, double periodSeconds) {
     Callback scheduledCallback =
-        new Callback(callback, m_startTimeUs, (long) (periodSeconds * 1e6), 0, CallbackScheduleType.PERIODIC);
+        new Callback(
+            callback,
+            m_startTimeUs,
+            (long) (periodSeconds * 1e6),
+            0,
+            CallbackScheduleType.PERIODIC);
     m_callbacks.add(scheduledCallback);
     return scheduledCallback;
   }
@@ -244,15 +241,17 @@ public class TimedRobot extends IterativeRobotBase {
    * @param periodSeconds The period at which to run the callback in seconds.
    * @param offsetSeconds The offset from the common starting time in seconds. This is useful for
    *     scheduling a callback in a different timeslot relative to TimedRobot.
-   * @return a {@link Cancellable} that allows the user to cancel periodic
-   *     invocation.
+   * @return a {@link Cancellable} that allows the user to cancel periodic invocation.
    */
-  public final Cancellable addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
-    Callback scheduledCallback = new Callback(
-        callback, m_startTimeUs,
-        (long) (periodSeconds * 1e6),
-        (long) (offsetSeconds * 1e6),
-        CallbackScheduleType.PERIODIC);
+  public final Cancellable addPeriodic(
+      Runnable callback, double periodSeconds, double offsetSeconds) {
+    Callback scheduledCallback =
+        new Callback(
+            callback,
+            m_startTimeUs,
+            (long) (periodSeconds * 1e6),
+            (long) (offsetSeconds * 1e6),
+            CallbackScheduleType.PERIODIC);
     m_callbacks.add(scheduledCallback);
     return scheduledCallback;
   }
@@ -265,8 +264,7 @@ public class TimedRobot extends IterativeRobotBase {
    *
    * @param callback The callback to run.
    * @param period The period at which to run the callback.
-   * @return a {@link Cancellable} that allows the user to cancel periodic
-   *     invocation.
+   * @return a {@link Cancellable} that allows the user to cancel periodic invocation.
    */
   public final Cancellable addPeriodic(Runnable callback, Time period) {
     return addPeriodic(callback, period.in(Seconds));
@@ -282,16 +280,14 @@ public class TimedRobot extends IterativeRobotBase {
    * @param period The period at which to run the callback.
    * @param offset The offset from the common starting time. This is useful for scheduling a
    *     callback in a different timeslot relative to TimedRobot.
-   * @return a {@link Cancellable} that allows the user to cancel periodic
-   *     invocation.
+   * @return a {@link Cancellable} that allows the user to cancel periodic invocation.
    */
   public final Cancellable addPeriodic(Runnable callback, Time period, Time offset) {
     return addPeriodic(callback, period.in(Seconds), offset.in(Seconds));
   }
 
   /**
-   * Add a one-shot that, unless cancelled, invokes an action exactly once after
-   * a specified delay.
+   * Add a one-shot that, unless cancelled, invokes an action exactly once after a specified delay.
    *
    * @param callback action to run
    * @param delaySeconds the number of seconds to wait before running the action
@@ -299,7 +295,8 @@ public class TimedRobot extends IterativeRobotBase {
    */
   public final Cancellable addOneShot(Runnable callback, double delaySeconds) {
     Callback scheduledCallback =
-        new Callback(callback, m_startTimeUs, (long) (delaySeconds * 1e6), 0, CallbackScheduleType.ONE_SHOT);
+        new Callback(
+            callback, m_startTimeUs, (long) (delaySeconds * 1e6), 0, CallbackScheduleType.ONE_SHOT);
     m_callbacks.add(scheduledCallback);
     return scheduledCallback;
   }
