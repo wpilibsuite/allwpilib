@@ -10,7 +10,7 @@
 
 #include "frc/EigenCore.h"
 #include "frc/geometry/Pose2d.h"
-#include "frc/kinematics/DifferentialDriveKinematics.h"
+#include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/trajectory/Trajectory.h"
 #include "units/angular_velocity.h"
 #include "units/time.h"

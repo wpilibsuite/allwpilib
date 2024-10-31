@@ -288,9 +288,8 @@ public abstract class Command implements Sendable {
   }
 
   /**
-   * Creates a new command that runs this command
-   * and the deadline in parallel, finishing when
-   * the deadline finishes.
+   * Creates a new command that runs this command and the deadline in parallel, finishing when the
+   * deadline finishes.
    *
    * <p>Note: This decorator works by adding this command to a composition. The command the
    * decorator was called on cannot be scheduled independently or be added to a different
