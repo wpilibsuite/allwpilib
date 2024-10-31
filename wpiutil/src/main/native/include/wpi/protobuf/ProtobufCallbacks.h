@@ -32,22 +32,70 @@ concept UnpackBytes = requires(T& t) {
   { t.resize(size_t()) };
   { t.size() } -> std::same_as<size_t>;
   { t.data() } -> std::convertible_to<void*>;
-} && (PackBytes<T> || MutableVectorLike<T> || ConstVectorLike<T>);
+} && (PackBytes<T> || MutableVectorLike<T>);
 
 static_assert(UnpackBytes<std::string>);
 static_assert(UnpackBytes<std::vector<uint8_t>>);
 static_assert(UnpackBytes<wpi::SmallVector<uint8_t, 128>>);
 
-  enum class Limits {
-    Ignore,
-    Add,
-    Fail,
-  };
+template <typename T>
+concept NanoProtobufSerializable =
+    requires(wpi::ProtoOutputStream& ostream, wpi::ProtoInputStream& istream,
+             const T& value) {
+      typename Protobuf<typename std::remove_cvref_t<T>>;
+      {
+        Protobuf<typename std::remove_cvref_t<T>>::Message()
+      } -> std::same_as<const pb_msgdesc_t*>;
+      {
+        Protobuf<typename std::remove_cvref_t<T>>::Unpack(istream)
+      } -> std::same_as<std::optional<typename std::remove_cvref_t<T>>>;
+      {
+        Protobuf<typename std::remove_cvref_t<T>>::Pack(ostream, value)
+      } -> std::same_as<bool>;
+    };
+
+enum class DecodeLimits {
+  Ignore,
+  Add,
+  Fail,
+};
+
+namespace detail {
+template <typename T>
+concept enumeration = std::is_enum_v<T>;
+
+template <typename T>
+concept Packable = enumeration<T> || std::integral<T> || std::floating_point<T>;
+}  // namespace detail
+
+template <typename T>
+constexpr bool ValidateType(pb_type_t type) {
+  switch (type) {
+    case PB_LTYPE_BOOL:
+      return std::integral<T>;
+    case PB_LTYPE_VARINT:
+      return std::signed_integral<T> || detail::enumeration<T>;
+    case PB_LTYPE_UVARINT:
+      return std::unsigned_integral<T>;
+    case PB_LTYPE_SVARINT:
+      return std::signed_integral<T>;
+    case PB_LTYPE_FIXED32:
+      return std::integral<T> || std::floating_point<T>;
+    case PB_LTYPE_FIXED64:
+      return std::integral<T> || std::floating_point<T>;
+    case PB_LTYPE_BYTES:
+    case PB_LTYPE_STRING:
+      return PackBytes<T> || UnpackBytes<T>;
+    case PB_LTYPE_SUBMESSAGE:
+      return NanoProtobufSerializable<T>;
+    default:
+      return false;
+  }
+}
 
 template <typename T, typename U, size_t N = 1>
 class DirectUnpackCallback {
  public:
-
   DirectUnpackCallback(U& storage) : m_storage{storage} {
     m_callback.funcs.decode = CallbackFunc;
     m_callback.arg = this;
@@ -59,7 +107,7 @@ class DirectUnpackCallback {
 
   // TODO, do we want a limit that is higher then the small size?
 
-  void SetLimits(Limits limit) noexcept { m_limits = limit; }
+  void SetLimits(DecodeLimits limit) noexcept { m_limits = limit; }
 
   pb_callback_t Callback() const { return m_callback; }
 
@@ -67,11 +115,11 @@ class DirectUnpackCallback {
   bool SizeCheck(bool* retVal) const {
     if (m_storage.size() >= N) {
       switch (m_limits) {
-        case Limits::Ignore:
+        case DecodeLimits::Ignore:
           *retVal = true;
           return false;
 
-        case Limits::Add:
+        case DecodeLimits::Add:
           break;
 
         default:
@@ -82,156 +130,175 @@ class DirectUnpackCallback {
     return true;
   }
 
-  bool FixedDecodeFunc(pb_istream_t* stream, const pb_field_t* field) {
-    bool sizeRetVal = 0;
-    if (!SizeCheck(&sizeRetVal)) {
-      return sizeRetVal;
-    }
-
-    pb_type_t fieldType = PB_LTYPE(field->type);
-
-    if constexpr (std::floating_point<T>) {
+  bool Decode(pb_istream_t* stream, pb_type_t fieldType) {
+    if constexpr (detail::Packable<T>) {
       switch (fieldType) {
-        case PB_LTYPE_FIXED32: {
-          float flt = 0;
-          if (!pb_decode_fixed32(stream, &flt)) {
+        case PB_LTYPE_BOOL:
+          if constexpr (std::integral<T>) {
+            bool val = false;
+            if (!pb_decode_bool(stream, &val)) {
+              return false;
+            }
+            m_storage.emplace_back(static_cast<T>(val));
+            return true;
+          } else {
             return false;
           }
-          m_storage.emplace_back(static_cast<T>(flt));
-          return true;
-        }
-        case PB_LTYPE_FIXED64: {
-          double dbl = 0;
-          if (!pb_decode_fixed64(stream, &dbl)) {
+        case PB_LTYPE_VARINT:
+          if constexpr (std::signed_integral<T> || detail::enumeration<T>) {
+            int64_t val = 0;
+            if (!pb_decode_varint(stream, reinterpret_cast<uint64_t*>(&val))) {
+              return false;
+            }
+            m_storage.emplace_back(static_cast<T>(val));
+            return true;
+          } else {
             return false;
           }
-          m_storage.emplace_back(static_cast<T>(dbl));
-          return true;
-        }
+        case PB_LTYPE_UVARINT:
+          if constexpr (std::unsigned_integral<T>) {
+            uint64_t val = 0;
+            if (!pb_decode_varint(stream, &val)) {
+              return false;
+            }
+            m_storage.emplace_back(static_cast<T>(val));
+            return true;
+          } else {
+            return false;
+          }
+        case PB_LTYPE_SVARINT:
+          if constexpr (std::signed_integral<T>) {
+            int64_t val = 0;
+            if (!pb_decode_svarint(stream, &val)) {
+              return false;
+            }
+            m_storage.emplace_back(static_cast<T>(val));
+            return true;
+          } else {
+            return false;
+          }
+        case PB_LTYPE_FIXED32:
+          if constexpr (std::signed_integral<T>) {
+            int32_t val = 0;
+            if (!pb_decode_fixed32(stream, &val)) {
+              return false;
+            }
+            m_storage.emplace_back(static_cast<T>(val));
+            return true;
+          } else if constexpr (std::unsigned_integral<T>) {
+            uint32_t val = 0;
+            if (!pb_decode_fixed32(stream, &val)) {
+              return false;
+            }
+            m_storage.emplace_back(static_cast<T>(val));
+            return true;
+          }
+          if constexpr (std::floating_point<T>) {
+            float val = 0;
+            if (!pb_decode_fixed32(stream, &val)) {
+              return false;
+            }
+            m_storage.emplace_back(static_cast<T>(val));
+            return true;
+          } else {
+            return false;
+          }
+        case PB_LTYPE_FIXED64:
+          if constexpr (std::signed_integral<T>) {
+            int64_t val = 0;
+            if (!pb_decode_fixed64(stream, &val)) {
+              return false;
+            }
+            m_storage.emplace_back(static_cast<T>(val));
+            return true;
+          } else if constexpr (std::unsigned_integral<T>) {
+            uint64_t val = 0;
+            if (!pb_decode_fixed64(stream, &val)) {
+              return false;
+            }
+            m_storage.emplace_back(static_cast<T>(val));
+            return true;
+          }
+          if constexpr (std::floating_point<T>) {
+            double val = 0;
+            if (!pb_decode_fixed64(stream, &val)) {
+              return false;
+            }
+            m_storage.emplace_back(static_cast<T>(val));
+            return true;
+          } else {
+            return false;
+          }
         default:
           return false;
       }
-    } else if constexpr (std::integral<T>) {
-      switch (fieldType) {
-        case PB_LTYPE_BOOL: {
-          bool bl = 0;
-          if (!pb_decode_bool(stream, &bl)) {
-            return false;
-          }
-          m_storage.emplace_back(static_cast<T>(bl));
-          return true;
-        }
-        case PB_LTYPE_VARINT: {
-          int64_t vint = 0;
-          if (!pb_decode_varint(stream, reinterpret_cast<uint64_t*>(&vint))) {
-            return false;
-          }
-          m_storage.emplace_back(static_cast<T>(vint));
-          return true;
-        }
-        case PB_LTYPE_UVARINT: {
-          uint64_t uvint = 0;
-          if (!pb_decode_varint(stream, &uvint)) {
-            return false;
-          }
-          m_storage.emplace_back(static_cast<T>(uvint));
-          return true;
-        }
-        case PB_LTYPE_SVARINT: {
-          int64_t svint = 0;
-          if (!pb_decode_svarint(stream, &svint)) {
-            return false;
-          }
-          m_storage.emplace_back(static_cast<T>(svint));
-          return true;
-        }
-        case PB_LTYPE_FIXED32: {
-          // See if we're signed or unsigned
-          if constexpr (std::signed_integral<T>) {
-            int32_t flt = 0;
-            if (!pb_decode_fixed32(stream, &flt)) {
-              return false;
-            }
-            m_storage.emplace_back(static_cast<T>(flt));
-          } else {
-            uint32_t flt = 0;
-            if (!pb_decode_fixed32(stream, &flt)) {
-              return false;
-            }
-            m_storage.emplace_back(static_cast<T>(flt));
-          }
-
-          return true;
-        }
-        case PB_LTYPE_FIXED64: {
-          // See if we're signed or unsigned
-          if constexpr (std::signed_integral<T>) {
-            int64_t flt = 0;
-            if (!pb_decode_fixed64(stream, &flt)) {
-              return false;
-            }
-            m_storage.emplace_back(static_cast<T>(flt));
-          } else {
-            uint64_t flt = 0;
-            if (!pb_decode_fixed64(stream, &flt)) {
-              return false;
-            }
-            m_storage.emplace_back(static_cast<T>(flt));
-          }
-          return true;
-        }
-        default:
-          return false;
+    } else if constexpr (UnpackBytes<T>) {
+      T& space = m_storage.emplace_back(T{});
+      space.resize(stream->bytes_left);
+      return pb_read(stream, reinterpret_cast<pb_byte_t*>(space.data()),
+                     space.size());
+    } else if constexpr (NanoProtobufSerializable<T>) {
+      ProtoInputStream istream{stream, wpi::Protobuf<T>::Message()};
+      auto decoded = wpi::Protobuf<T>::Unpack(istream);
+      if (decoded.has_value()) {
+        m_storage.emplace_back(std::move(decoded.value()));
+        return true;
       }
+      return false;
     }
   }
 
   bool CallbackFunc(pb_istream_t* stream, const pb_field_t* field) {
-    if constexpr (std::integral<T> || std::floating_point<T>) {
+    pb_type_t fieldType = PB_LTYPE(field->type);
+
+    if (!ValidateType<T>(fieldType)) {
+      return false;
+    }
+
+    // Validate our types
+    if constexpr (detail::Packable<T>) {
+      // Handle decode loop
       while (stream->bytes_left > 0) {
-        bool status = FixedDecodeFunc(stream, field);
-        if (!status) {
+        bool sizeRetVal = 0;
+        if (!SizeCheck(&sizeRetVal)) {
+          return sizeRetVal;
+        }
+
+        if (!Decode(stream, fieldType)) {
           return false;
         }
       }
       return true;
     } else {
+      // At this point, do the size check
       bool sizeRetVal = 0;
       if (!SizeCheck(&sizeRetVal)) {
         return sizeRetVal;
       }
-      if constexpr (UnpackBytes<T>) {
-        T& space = m_storage.emplace_back(T{});
-        space.resize(stream->bytes_left);
-        return pb_read(stream, reinterpret_cast<pb_byte_t*>(space.data()),
-                       space.size());
-      } else {
-        ProtoInputStream istream{stream, wpi::Protobuf<T>::Message()};
-        std::optional<T> decoded = wpi::Protobuf<T>::Unpack(istream);
-        if (decoded.has_value()) {
-          m_storage.emplace_back(std::move(decoded.value()));
-          return true;
-        }
-        return false;
-      }
+
+      // At this point, we're good to decode
+      return Decode(stream, fieldType);
     }
   }
+
   static bool CallbackFunc(pb_istream_t* stream, const pb_field_t* field,
                            void** arg) {
-    return reinterpret_cast<DirectUnpackCallback*>(*arg)->CallbackFunc(stream, field);
+    return reinterpret_cast<DirectUnpackCallback*>(*arg)->CallbackFunc(stream,
+                                                                       field);
   }
 
   U& m_storage;
   pb_callback_t m_callback;
-  Limits m_limits{Limits::Add};
+  DecodeLimits m_limits{DecodeLimits::Add};
 };
 
 template <typename T, size_t N = 1>
 class UnpackCallback
     : public DirectUnpackCallback<T, wpi::SmallVector<T, N>, N> {
  public:
-  UnpackCallback() : DirectUnpackCallback<T, wpi::SmallVector<T, N>, N> {m_storedBuffer} {
-    this->SetLimits(Limits::Ignore);
+  UnpackCallback()
+      : DirectUnpackCallback<T, wpi::SmallVector<T, N>, N>{m_storedBuffer} {
+    this->SetLimits(DecodeLimits::Ignore);
   }
 
   std::span<T> Items() noexcept { return m_storedBuffer; }
@@ -243,6 +310,10 @@ class UnpackCallback
 };
 
 template <typename T>
+concept ProtoPackable = NanoProtobufSerializable<T> || PackBytes<T> ||
+                        std::integral<T> || std::floating_point<T>;
+
+template <ProtoPackable T>
 class PackCallback {
  public:
   PackCallback(std::span<const T> buffer) : m_buffer{buffer} {
@@ -263,89 +334,98 @@ class PackCallback {
   std::span<const T> Bufs() const { return m_buffer; }
 
  private:
-  bool FixedFieldFunc(pb_ostream_t* stream, const pb_field_t* field,
-                      T value) const {
-    pb_type_t fieldType = PB_LTYPE(field->type);
-
-    // First, check float or double.
+  bool EncodeItem(ProtoOutputStream& stream, const pb_field_t* field,
+                  const T& value) const {
     if constexpr (std::floating_point<T>) {
+      pb_type_t fieldType = PB_LTYPE(field->type);
       switch (fieldType) {
         case PB_LTYPE_FIXED32: {
           float flt = static_cast<float>(value);
-          return pb_encode_fixed32(stream, &flt);
+          return pb_encode_fixed32(stream.Stream(), &flt);
         }
         case PB_LTYPE_FIXED64: {
           double dbl = static_cast<double>(value);
-          return pb_encode_fixed64(stream, &dbl);
+          return pb_encode_fixed64(stream.Stream(), &dbl);
         }
         default:
           return false;
       }
-    } else if constexpr (std::integral<T>) {
+    } else if constexpr (std::integral<T> || detail::enumeration<T>) {
+      pb_type_t fieldType = PB_LTYPE(field->type);
       switch (fieldType) {
         case PB_LTYPE_BOOL:
         case PB_LTYPE_VARINT:
         case PB_LTYPE_UVARINT:
-          return pb_encode_varint(stream, value);
+          return pb_encode_varint(stream.Stream(), value);
         case PB_LTYPE_SVARINT:
-          return pb_encode_svarint(stream, value);
+          return pb_encode_svarint(stream.Stream(), value);
         case PB_LTYPE_FIXED32: {
           uint32_t f = value;
-          return pb_encode_fixed32(stream, &f);
+          return pb_encode_fixed32(stream.Stream(), &f);
         }
         case PB_LTYPE_FIXED64: {
           uint64_t f = value;
-          return pb_encode_fixed64(stream, &f);
+          return pb_encode_fixed64(stream.Stream(), &f);
         }
         default:
           return false;
       }
-    } else {
-      // We don't know how to encode this, just return false
-      return false;
+    } else if constexpr (StringLike<T>) {
+      std::string_view view{value};
+      return pb_encode_string(stream.Stream(),
+                              reinterpret_cast<const pb_byte_t*>(view.data()),
+                              view.size());
+    } else if constexpr (ConstVectorLike<T>) {
+      std::span<const uint8_t> view{value};
+      return pb_encode_string(stream.Stream(),
+                              reinterpret_cast<const pb_byte_t*>(view.data()),
+                              view.size());
+    } else if constexpr (NanoProtobufSerializable<T>) {
+      return wpi::Protobuf<T>::Pack(stream, value);
     }
   }
 
-  bool FixedCallbackFuncInternal(pb_ostream_t* stream,
-                                 const pb_field_t* field) const {
-    if constexpr (std::integral<T> || std::floating_point<T>) {
-      for (auto&& i : m_buffer) {
-        bool status = FixedFieldFunc(stream, field, i);
-        if (!status) {
+  bool EncodeLoop(pb_ostream_t* stream, const pb_field_t* field,
+                  bool writeTag) const {
+    const pb_msgdesc_t* desc = nullptr;
+    if constexpr (NanoProtobufSerializable<T>) {
+      desc = wpi::Protobuf<T>::Message();
+    }
+    ProtoOutputStream ostream{stream, desc};
+    for (auto&& i : m_buffer) {
+      if (writeTag) {
+        if (!pb_encode_tag_for_field(stream, field)) {
           return false;
         }
       }
-      return true;
-    } else {
-      return false;
+      if (!EncodeItem(ostream, field, i)) {
+        return false;
+      }
     }
+    return true;
   }
 
-  bool FixedCallbackFunc(pb_ostream_t* stream, const pb_field_t* field) const {
-    if constexpr (std::integral<T> || std::floating_point<T>) {
-      // We're always going to used packed encoding.
-      // So first we need to get the packed size.
+  bool PackedEncode(pb_ostream_t* stream, const pb_field_t* field) const {
+    // We're always going to used packed encoding.
+    // So first we need to get the packed size.
 
-      pb_ostream_t substream = PB_OSTREAM_SIZING;
-      if (!FixedCallbackFuncInternal(&substream, field)) {
-        return false;
-      }
-
-      // Encode as a string tag
-      if (!pb_encode_tag(stream, PB_WT_STRING, field->tag)) {
-        return false;
-      }
-
-      // Write length as varint
-      size_t size = substream.bytes_written;
-      if (!pb_encode_varint(stream, static_cast<uint64_t>(size))) {
-        return false;
-      }
-
-      return FixedCallbackFuncInternal(stream, field);
-    } else {
+    pb_ostream_t substream = PB_OSTREAM_SIZING;
+    if (!EncodeLoop(&substream, field, false)) {
       return false;
     }
+
+    // Encode as a string tag
+    if (!pb_encode_tag(stream, PB_WT_STRING, field->tag)) {
+      return false;
+    }
+
+    // Write length as varint
+    size_t size = substream.bytes_written;
+    if (!pb_encode_varint(stream, static_cast<uint64_t>(size))) {
+      return false;
+    }
+
+    return EncodeLoop(stream, field, false);
   }
 
   bool CallbackFunc(pb_ostream_t* stream, const pb_field_t* field) const {
@@ -354,46 +434,19 @@ class PackCallback {
       return true;
     }
 
-    if (PB_LTYPE(field->type) <= PB_LTYPE_LAST_PACKABLE) {
-      if constexpr (std::integral<T> || std::floating_point<T>) {
-        return FixedCallbackFunc(stream, field);
-      } else {
-        return false;
-      }
+    pb_type_t fieldType = PB_LTYPE(field->type);
+
+    if (!ValidateType<T>(fieldType)) {
+      return false;
     }
 
-    const pb_msgdesc_t* desc = nullptr;
-    if constexpr (!(PackBytes<T> || std::integral<T> || std::floating_point<T>)) {
-      desc = wpi::Protobuf<T>::Message();
+    if constexpr (detail::Packable<T>) {
+      return PackedEncode(stream, field);
+    } else {
+      return EncodeLoop(stream, field, true);
     }
-    ProtoOutputStream ostream{stream, desc};
-    for (auto&& i : m_buffer) {
-      if (!pb_encode_tag_for_field(stream, field)) {
-        return false;
-      }
-
-      bool success;
-      if constexpr (StringLike<T>) {
-        std::string_view view{i};
-        success = pb_encode_string(
-            stream, reinterpret_cast<const pb_byte_t*>(view.data()),
-            view.size());
-      } else if constexpr (ConstVectorLike<T>) {
-        std::span<const uint8_t> view{i};
-        success = pb_encode_string(
-            stream, reinterpret_cast<const pb_byte_t*>(view.data()),
-            view.size());
-      } else if constexpr (std::integral<T> || std::floating_point<T>) {
-        return false;
-      } else {
-        success = wpi::Protobuf<T>::Pack(ostream, i);
-      }
-      if (!success) {
-        return false;
-      }
-    }
-    return true;
   }
+
   static bool CallbackFunc(pb_ostream_t* stream, const pb_field_t* field,
                            void* const* arg) {
     return reinterpret_cast<const PackCallback*>(*arg)->CallbackFunc(stream,
