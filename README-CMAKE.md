@@ -66,6 +66,8 @@ The following build options are available:
   * This option will build the HAL and wpilibc/j during the build. The HAL is the simulation HAL, unless the external HAL options are used. The CMake build has no capability to build for the roboRIO.
 * `WITH_WPIMATH` (ON Default)
   * This option will build the wpimath library. This option must be on to build wpilib.
+* `WITH_PROTOBUF` (ON Default)
+  * This option will build with the protobuf library.
 * `WITH_WPIUNITS` (`WITH_JAVA` Default)
   * This option will build the wpiunits library. This option must be on to build the Java wpimath library and requires `WITH_JAVA` to also be on.
 * `OPENCV_JAVA_INSTALL_DIR`
