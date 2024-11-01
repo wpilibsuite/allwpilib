@@ -120,7 +120,7 @@ Alert::SendableAlerts::GetActiveAlertsStorage(AlertType type) const {
 
 std::vector<std::string> Alert::SendableAlerts::GetStrings(
     AlertType type) const {
-  auto set = GetActiveAlertsStorage(type);
+  auto& set = GetActiveAlertsStorage(type);
   std::vector<std::string> output;
   output.reserve(set.size());
   for (auto& alert : set) {
