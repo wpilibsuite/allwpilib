@@ -7,41 +7,56 @@
 #include <stdexcept>
 
 #include <fmt/format.h>
-#include <wpi/ProtoHelper.h>
 #include <wpi/protobuf/Protobuf.h>
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "frc/EigenCore.h"
-#include "wpimath.pb.h"
+#include "wpimath.npb.h"
 
 template <int Size, int Options, int MaxRows, int MaxCols>
 struct wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena) {
-    return wpi::CreateMessage<wpi::proto::ProtobufVector>(arena);
+  static const pb_msgdesc_t* Message() {
+    return get_wpi_proto_ProtobufVector_msg();
   }
 
-  static frc::Matrixd<Size, 1, Options, MaxRows, MaxCols> Unpack(
-      const google::protobuf::Message& msg) {
-    auto m = static_cast<const wpi::proto::ProtobufVector*>(&msg);
-    if (m->rows_size() != Size) {
-      throw std::invalid_argument(
-          fmt::format("Tried to unpack message with {} elements in rows into "
-                      "Vector with {} rows",
-                      m->rows_size(), Size));
+  static std::optional<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> Unpack(
+      wpi::ProtoInputStream& stream) {
+    using UnpackType =
+        std::conditional_t<Size * sizeof(double) < 256,
+                           wpi::UnpackCallback<double, Size>,
+                           wpi::StdVectorUnpackCallback<double, Size>>;
+    UnpackType rows;
+    rows.Vec().reserve(Size);
+    rows.SetLimits(wpi::DecodeLimits::Fail);
+    _wpi_proto_ProtobufVector msg{
+        .rows = rows.Callback(),
+    };
+    if (!stream.DecodeNoInit(msg)) {
+      return {};
     }
-    frc::Matrixd<Size, 1, Options, MaxRows, MaxCols> vec;
+
+    auto items = rows.Items();
+
+    if (items.size() != Size) {
+      return {};
+    }
+
+    frc::Matrixd<Size, 1, Options, MaxRows, MaxCols> mat;
     for (int i = 0; i < Size; i++) {
-      vec(i) = m->rows(i);
+      mat(i) = items[i];
     }
-    return vec;
+
+    return mat;
   }
 
-  static void Pack(
-      google::protobuf::Message* msg,
+  static bool Pack(
+      wpi::ProtoOutputStream& stream,
       const frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>& value) {
-    auto m = static_cast<wpi::proto::ProtobufVector*>(msg);
-    m->clear_rows();
-    for (int i = 0; i < Size; i++) {
-      m->add_rows(value(i));
-    }
+    std::span<const double> rowsSpan{value.data(), static_cast<size_t>(Size)};
+    wpi::PackCallback<double> rows{rowsSpan};
+    wpi_proto_ProtobufVector msg{
+        .rows = rows.Callback(),
+    };
+    return stream.Encode(msg);
   }
 };

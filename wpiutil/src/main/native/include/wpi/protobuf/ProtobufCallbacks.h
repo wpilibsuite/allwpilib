@@ -291,6 +291,8 @@ class UnpackCallback
 
   std::span<const T> Items() const noexcept { return m_storedBuffer; }
 
+  wpi::SmallVector<T, N>& Vec() noexcept { return m_storedBuffer; }
+
  private:
   wpi::SmallVector<T, N> m_storedBuffer;
 };
@@ -308,7 +310,7 @@ class StdVectorUnpackCallback
 
   std::span<const T> Items() const noexcept { return m_storedBuffer; }
 
-  const std::vector<T> Vec() const noexcept { return m_storedBuffer; }
+  std::vector<T>& Vec() noexcept { return m_storedBuffer; }
 
  private:
   std::vector<T> m_storedBuffer;
