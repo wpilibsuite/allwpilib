@@ -147,7 +147,7 @@ public class Alert implements AutoCloseable {
     if (m_active) {
       var set = m_group.getSetForType(m_type);
       set.remove(
-          new PublishedAlert(m_activeStartTime, oldText)); // TODO: cache instead of constructing
+          new PublishedAlert(m_activeStartTime, oldText));
       set.add(new PublishedAlert(m_activeStartTime, m_text));
     }
   }
@@ -195,7 +195,7 @@ public class Alert implements AutoCloseable {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     set(false);
   }
 

@@ -159,6 +159,6 @@ std::string frc::format_as(Alert::AlertType type) {
     case Alert::AlertType::kError:
       return "kError";
     default:
-      return fmt::format("{}", fmt::underlying(type));
+      return std::to_string(static_cast<int>(type));
   }
 }

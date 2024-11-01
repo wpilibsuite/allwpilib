@@ -28,11 +28,6 @@ class AlertsTest : public ::testing::Test {
     EXPECT_EQ(GetSubscriberForType(kInfo).Get().size(), 0ul);
   }
 
-  template <typename... Args>
-  Alert MakeAlert(Args&&... args) {
-    return Alert(GetGroupName(), std::forward<Args>(args)...);
-  }
-
   std::string GetGroupName() {
     const ::testing::TestInfo* testInfo =
         ::testing::UnitTest::GetInstance()->current_test_info();
@@ -40,8 +35,10 @@ class AlertsTest : public ::testing::Test {
                        testInfo->test_case_name());
   }
 
-  // todo: this
-  void ExpectAlertsState() {}
+  template <typename... Args>
+  Alert MakeAlert(Args&&... args) {
+    return Alert(GetGroupName(), std::forward<Args>(args)...);
+  }
 
   bool IsAlertActive(std::string_view text, Alert::AlertType type) {
     Update();
@@ -66,20 +63,11 @@ class AlertsTest : public ::testing::Test {
     }
   }
 
-  std::map<Alert::AlertType, nt::StringArraySubscriber> m_subs;
-  const nt::StringArraySubscriber& GetSubscriberForType(Alert::AlertType type) {
-    if (m_subs.contains(type)) {
-      return m_subs[type];
-    } else {
-      return m_subs
-          .emplace(std::make_pair(
-              type, nt::NetworkTableInstance::GetDefault()
-                        .GetStringArrayTopic(
-                            fmt::format("/SmartDashboard/{}/{}", GetGroupName(),
-                                        GetSubtableName(type)))
-                        .Subscribe({})))
-          .first->second;
-    }
+  const nt::StringArraySubscriber GetSubscriberForType(Alert::AlertType type) {
+    return nt::NetworkTableInstance::GetDefault()
+        .GetStringArrayTopic(fmt::format("/SmartDashboard/{}/{}",
+                                         GetGroupName(), GetSubtableName(type)))
+        .Subscribe({});
   }
 };
 

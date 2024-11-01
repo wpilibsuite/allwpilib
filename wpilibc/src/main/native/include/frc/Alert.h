@@ -127,11 +127,10 @@ class Alert {
  private:
   class PublishedAlert {
    public:
-    PublishedAlert(uint64_t timestamp, const std::string_view text)
+    PublishedAlert(uint64_t timestamp, std::string_view text)
         : timestamp{timestamp}, text{text} {}
     uint64_t timestamp;
-    std::string text;  // todo: This could be a string_view since deleting the
-                       // Alert will erase this from the set
+    std::string text;
     auto operator<=>(const PublishedAlert&) const = default;
   };
 
@@ -142,8 +141,6 @@ class Alert {
     void InitSendable(nt::NTSendableBuilder& builder) override;
 
     std::set<PublishedAlert>& GetSetForType(AlertType type);
-    // todo: not sure why i needed this, maybe when i was testing different
-    // container types?
     const std::set<PublishedAlert>& GetSetForType(AlertType type) const;
 
    private:
