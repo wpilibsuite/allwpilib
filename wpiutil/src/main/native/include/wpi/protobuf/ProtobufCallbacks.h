@@ -7,6 +7,8 @@
 #include "wpi/protobuf/Protobuf.h"
 #include "wpi/SmallVector.h"
 
+#include "wpi/array.h"
+
 #include <span>
 
 #include "pb.h"
@@ -291,6 +293,61 @@ class UnpackCallback
 
  private:
   wpi::SmallVector<T, N> m_storedBuffer;
+};
+
+template <typename T, size_t N = 1>
+class StdVectorUnpackCallback
+    : public DirectUnpackCallback<T, std::vector<T>, N> {
+ public:
+  StdVectorUnpackCallback()
+      : DirectUnpackCallback<T, std::vector<T>, N>{m_storedBuffer} {
+    this->SetLimits(DecodeLimits::Ignore);
+  }
+
+  std::span<T> Items() noexcept { return m_storedBuffer; }
+
+  std::span<const T> Items() const noexcept { return m_storedBuffer; }
+
+  const std::vector<T> Vec() const noexcept { return m_storedBuffer; }
+
+ private:
+  std::vector<T> m_storedBuffer;
+};
+
+template <typename T, size_t N>
+struct WpiArrayEmplaceWrapper {
+  wpi::array<T, N> m_array{wpi::empty_array_t{}};
+  size_t m_currentIndex = 0;
+
+  size_t size() const {
+    return m_currentIndex;
+  }
+
+  template <typename... ArgTypes> T& emplace_back(ArgTypes &&... Args) {
+    m_array[m_currentIndex] = T(std::forward<ArgTypes>(Args)...);
+    m_currentIndex++;
+    return m_array[m_currentIndex -1 ];
+  }
+};
+
+template <typename T, size_t N>
+struct WpiArrayUnpackCallback
+    : public DirectUnpackCallback<T, WpiArrayEmplaceWrapper<T, N>, N> {
+  WpiArrayUnpackCallback()
+      : DirectUnpackCallback<T, WpiArrayEmplaceWrapper<T, N>, N>{m_array} {
+    this->SetLimits(DecodeLimits::Fail);
+  }
+
+  bool IsFull() const noexcept {
+    return m_array.m_currentIndex == N;
+  }
+
+  size_t Size() const noexcept { return m_array.m_currentIndex; }
+
+  wpi::array<T, N> Array() const noexcept { return m_array.m_array; }
+
+ private:
+  WpiArrayEmplaceWrapper<T, N> m_array;
 };
 
 template <typename T>

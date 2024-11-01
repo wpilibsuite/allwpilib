@@ -16,21 +16,13 @@
 
 template <size_t NumModules>
 struct wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>> {
-  struct ArrayEmplaceWrapper {
-    wpi::array<frc::Translation2d, NumModules> array;
-    size_t current_index = 0;
-  };
-
   static const pb_msgdesc_t* Message() {
     return get_wpi_proto_ProtobufSwerveDriveKinematics_msg();
   }
 
   static std::optional<frc::SwerveDriveKinematics<NumModules>> Unpack(
       wpi::ProtoInputStream& msg) {
-    ArrayEmplaceWrapper modulesArray;
-    wpi::DirectUnpackCallback<frc::Translation2d, ArrayEmplaceWrapper,
-                              NumModules>
-        modules{modulesArray};
+    wpi::WpiArrayUnpackCallback<frc::Translation2d, NumModules> modules;
 
     wpi_proto_ProtobufSwerveDriveKinematics msg {
       .modules = modules.Callback();
@@ -46,10 +38,9 @@ struct wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>> {
 
   static bool Pack(wpi::ProtoOutputStream& stream,
                    const frc::SwerveDriveKinematics<NumModules>& value) {
-    auto modulesArray = value.GetModules();
-    wpi::PackCallback modules{&modulesArray};
-    wpi_proto_ProtobufSwerveDriveKinematics msg {
-      .modules = modules.Callback(),
+    wpi::PackCallback modules{value.GetModules()};
+    wpi_proto_ProtobufSwerveDriveKinematics msg{
+        .modules = modules.Callback(),
     };
     return stream.Encode(msg);
   }

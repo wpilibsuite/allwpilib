@@ -12,19 +12,17 @@ using namespace frc;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::Pose3d>;
-
 const Pose3d kExpectedData =
     Pose3d{Translation3d{1.1_m, 2.2_m, 1.1_m},
            Rotation3d{Quaternion{1.91, 0.3504, 3.3, 1.74}}};
 }  // namespace
 
 TEST(Pose3dProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<Pose3d> message;
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
-  std::optional<Pose3d> unpacked_data = message.Unpack(buf);
+  auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
   EXPECT_EQ(kExpectedData.Translation(), unpacked_data->Translation());

@@ -16,6 +16,8 @@ std::optional<frc::Rectangle2d> wpi::Protobuf<frc::Rectangle2d>::Unpack(
   wpi::UnpackCallback<frc::Pose2d> pose;
   wpi_proto_ProtobufRectangle2d msg{
       .center = pose.Callback(),
+      .xWidth = 0,
+      .yWidth = 0,
   };
   if (!stream.DecodeNoInit(msg)) {
     return {};

@@ -12,18 +12,16 @@ using namespace frc;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::SwerveModulePosition>;
-
 const SwerveModulePosition kExpectedData =
     SwerveModulePosition{3.504_m, Rotation2d{17.4_rad}};
 }  // namespace
 
 TEST(SwerveModulePositionProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<SwerveModulePosition> message;
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
-  std::optional<SwerveModulePosition> unpacked_data = message.Unpack(buf);
+  auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
   EXPECT_EQ(kExpectedData.distance.value(), unpacked_data->distance.value());

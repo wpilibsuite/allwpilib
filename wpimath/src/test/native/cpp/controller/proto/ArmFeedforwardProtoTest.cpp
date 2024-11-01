@@ -12,8 +12,6 @@ using namespace frc;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::ArmFeedforward>;
-
 static constexpr auto Ks = 1.91_V;
 static constexpr auto Kg = 2.29_V;
 static constexpr auto Kv = 35.04_V * 1_s / 1_rad;
@@ -22,11 +20,11 @@ const ArmFeedforward kExpectedData{Ks, Kg, Kv, Ka};
 }  // namespace
 
 TEST(ArmFeedforwardProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<ArmFeedforward> message;
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
-  std::optional<ArmFeedforward> unpacked_data = message.Unpack(buf);
+  auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
   EXPECT_EQ(kExpectedData.GetKs().value(), unpacked_data->GetKs().value());

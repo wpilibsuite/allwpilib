@@ -12,18 +12,16 @@ using namespace frc;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::ChassisSpeeds>;
-
 const ChassisSpeeds kExpectedData =
     ChassisSpeeds{2.29_mps, 2.2_mps, 0.3504_rad_per_s};
 }  // namespace
 
 TEST(ChassisSpeedsProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<ChassisSpeeds> message;
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
-  std::optional<ChassisSpeeds> unpacked_data = message.Unpack(buf);
+  auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
   EXPECT_EQ(kExpectedData.vx.value(), unpacked_data->vx.value());

@@ -15,6 +15,7 @@ std::optional<frc::SwerveModulePosition> wpi::Protobuf<
     frc::SwerveModulePosition>::Unpack(wpi::ProtoInputStream& stream) {
   wpi::UnpackCallback<frc::Rotation2d> angle;
   wpi_proto_ProtobufSwerveModulePosition msg{
+      .distance = 0,
       .angle = angle.Callback(),
   };
   if (!stream.DecodeNoInit(msg)) {

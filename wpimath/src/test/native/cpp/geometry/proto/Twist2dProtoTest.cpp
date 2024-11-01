@@ -12,17 +12,15 @@ using namespace frc;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::Twist2d>;
-
 const Twist2d kExpectedData = Twist2d{2.29_m, 35.04_m, 35.04_rad};
 }  // namespace
 
 TEST(Twist2dProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<Twist2d> message;
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
-  std::optional<Twist2d> unpacked_data = message.Unpack(buf);
+  auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
   EXPECT_EQ(kExpectedData.dx.value(), unpacked_data->dx.value());

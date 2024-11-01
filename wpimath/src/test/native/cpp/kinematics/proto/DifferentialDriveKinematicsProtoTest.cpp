@@ -13,19 +13,16 @@ using namespace frc;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::DifferentialDriveKinematics>;
-
 const DifferentialDriveKinematics kExpectedData =
     DifferentialDriveKinematics{1.74_m};
 }  // namespace
 
 TEST(DifferentialDriveKinematicsProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<DifferentialDriveKinematics> message;
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
-  std::optional<DifferentialDriveKinematics> unpacked_data =
-      message.Unpack(buf);
+  auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
   EXPECT_EQ(kExpectedData.trackWidth.value(), unpacked_data->trackWidth.value());

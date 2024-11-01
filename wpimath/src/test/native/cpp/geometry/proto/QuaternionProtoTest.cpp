@@ -12,17 +12,15 @@ using namespace frc;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::Quaternion>;
-
 const Quaternion kExpectedData = Quaternion{1.1, 0.191, 35.04, 19.1};
 }  // namespace
 
 TEST(QuaternionProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<Quaternion> message;
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
-  std::optional<Quaternion> unpacked_data = message.Unpack(buf);
+  auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
   EXPECT_EQ(kExpectedData.W(), unpacked_data->W());

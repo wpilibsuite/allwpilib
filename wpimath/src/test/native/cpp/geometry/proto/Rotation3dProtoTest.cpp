@@ -12,18 +12,16 @@ using namespace frc;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::Rotation3d>;
-
 const Rotation3d kExpectedData =
     Rotation3d{Quaternion{2.29, 0.191, 0.191, 17.4}};
 }  // namespace
 
 TEST(Rotation3dProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<Rotation3d> message;
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
-  std::optional<Rotation3d> unpacked_data = message.Unpack(buf);
+  auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
   EXPECT_EQ(kExpectedData.GetQuaternion(), unpacked_data->GetQuaternion());

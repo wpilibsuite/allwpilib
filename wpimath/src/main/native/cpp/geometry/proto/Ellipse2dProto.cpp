@@ -16,6 +16,8 @@ std::optional<frc::Ellipse2d> wpi::Protobuf<frc::Ellipse2d>::Unpack(
   wpi::UnpackCallback<frc::Pose2d> pose;
   wpi_proto_ProtobufEllipse2d msg{
       .center = pose.Callback(),
+      .xSemiAxis = 0,
+      .ySemiAxis = 0,
   };
   if (!stream.DecodeNoInit(msg)) {
     return {};

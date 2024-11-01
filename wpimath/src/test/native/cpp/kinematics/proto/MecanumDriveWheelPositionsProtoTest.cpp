@@ -12,18 +12,16 @@ using namespace frc;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::MecanumDriveWheelPositions>;
-
 const MecanumDriveWheelPositions kExpectedData =
     MecanumDriveWheelPositions{17.4_m, 2.29_m, 22.9_m, 1.74_m};
 }  // namespace
 
 TEST(MecanumDriveWheelPositionsProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<MecanumDriveWheelPositions> message;
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
-  std::optional<MecanumDriveWheelPositions> unpacked_data = message.Unpack(buf);
+  auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
   EXPECT_EQ(kExpectedData.frontLeft.value(), unpacked_data->frontLeft.value());

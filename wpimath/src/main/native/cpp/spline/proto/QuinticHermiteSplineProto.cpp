@@ -4,32 +4,58 @@
 
 #include "frc/spline/proto/QuinticHermiteSplineProto.h"
 
-#include <wpi/ProtoHelper.h>
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "spline.pb.h"
+#include "spline.npb.h"
 
-google::protobuf::Message* wpi::Protobuf<frc::QuinticHermiteSpline>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufQuinticHermiteSpline>(arena);
+const pb_msgdesc_t* wpi::Protobuf<frc::QuinticHermiteSpline>::Message() {
+  return get_wpi_proto_ProtobufQuinticHermiteSpline_msg();
 }
 
-frc::QuinticHermiteSpline wpi::Protobuf<frc::QuinticHermiteSpline>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufQuinticHermiteSpline*>(&msg);
+std::optional<frc::QuinticHermiteSpline>
+wpi::Protobuf<frc::QuinticHermiteSpline>::Unpack(wpi::ProtoInputStream& stream) {
+  wpi::WpiArrayUnpackCallback<double, 3> xInitial;
+  wpi::WpiArrayUnpackCallback<double, 3> xFinal;
+  wpi::WpiArrayUnpackCallback<double, 3> yInitial;
+  wpi::WpiArrayUnpackCallback<double, 3> yFinal;
+
+  wpi_proto_ProtobufQuinticHermiteSpline msg{
+      .x_initial = xInitial.Callback(),
+      .x_final = xFinal.Callback(),
+      .y_initial = yInitial.Callback(),
+      .y_final = yFinal.Callback(),
+  };
+
+  if (!stream.DecodeNoInit(msg)) {
+    return {};
+  }
+
+  if (!xInitial.IsFull() || !yInitial.IsFull() || !xFinal.IsFull() ||
+      !yFinal.IsFull()) {
+    return {};
+  }
+
   return frc::QuinticHermiteSpline{
-      wpi::UnpackProtobufArray<double, 3>(m->x_initial()),
-      wpi::UnpackProtobufArray<double, 3>(m->x_final()),
-      wpi::UnpackProtobufArray<double, 3>(m->y_initial()),
-      wpi::UnpackProtobufArray<double, 3>(m->y_final())};
+      xInitial.Array(),
+      xFinal.Array(),
+      yInitial.Array(),
+      yFinal.Array(),
+  };
 }
 
-void wpi::Protobuf<frc::QuinticHermiteSpline>::Pack(
-    google::protobuf::Message* msg, const frc::QuinticHermiteSpline& value) {
-  auto m = static_cast<wpi::proto::ProtobufQuinticHermiteSpline*>(msg);
-  wpi::PackProtobufArray(m->mutable_x_initial(),
-                         value.GetInitialControlVector().x);
-  wpi::PackProtobufArray(m->mutable_x_final(), value.GetFinalControlVector().x);
-  wpi::PackProtobufArray(m->mutable_y_initial(),
-                         value.GetInitialControlVector().y);
-  wpi::PackProtobufArray(m->mutable_y_final(), value.GetFinalControlVector().y);
+bool wpi::Protobuf<frc::QuinticHermiteSpline>::Pack(
+    wpi::ProtoOutputStream& stream, const frc::QuinticHermiteSpline& value) {
+  wpi::PackCallback<double> xInitial{value.GetInitialControlVector().x};
+  wpi::PackCallback<double> xFinal{value.GetFinalControlVector().x};
+  wpi::PackCallback<double> yInitial{value.GetInitialControlVector().y};
+  wpi::PackCallback<double> yFinal{value.GetFinalControlVector().y};
+
+  wpi_proto_ProtobufQuinticHermiteSpline msg{
+      .x_initial = xInitial.Callback(),
+      .x_final = xFinal.Callback(),
+      .y_initial = yInitial.Callback(),
+      .y_final = yFinal.Callback(),
+  };
+
+  return stream.Encode(msg);
 }

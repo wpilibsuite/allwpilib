@@ -12,18 +12,16 @@ using namespace frc;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::Rectangle2d>;
-
 const Rectangle2d kExpectedData{
     Pose2d{Translation2d{0.191_m, 2.2_m}, Rotation2d{22.9_rad}}, 1.2_m, 2.3_m};
 }  // namespace
 
 TEST(Rectangle2dProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<Rectangle2d> message;
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
-  std::optional<Rectangle2d> unpacked_data = message.Unpack(buf);
+  auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
   EXPECT_EQ(kExpectedData.Center(), unpacked_data->Center());

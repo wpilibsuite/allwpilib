@@ -12,17 +12,15 @@ using namespace frc;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::Translation2d>;
-
 const Translation2d kExpectedData = Translation2d{3.504_m, 22.9_m};
 }  // namespace
 
 TEST(Translation2dProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<Translation2d> message;
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
-  std::optional<Translation2d> unpacked_data = message.Unpack(buf);
+  auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
   EXPECT_EQ(kExpectedData.X().value(), unpacked_data->X().value());
   EXPECT_EQ(kExpectedData.Y().value(), unpacked_data->Y().value());

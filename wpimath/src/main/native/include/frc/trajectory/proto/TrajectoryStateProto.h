@@ -11,8 +11,9 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Trajectory::State> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Trajectory::State Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
+  static const pb_msgdesc_t* Message();
+  static std::optional<frc::Trajectory::State> Unpack(
+      wpi::ProtoInputStream& stream);
+  static bool Pack(wpi::ProtoOutputStream& stream,
                    const frc::Trajectory::State& value);
 };

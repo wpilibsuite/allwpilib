@@ -4,33 +4,48 @@
 
 #include "frc/trajectory/proto/TrajectoryStateProto.h"
 
-#include <wpi/ProtoHelper.h>
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "trajectory.pb.h"
+#include "trajectory.npb.h"
 
-google::protobuf::Message* wpi::Protobuf<frc::Trajectory::State>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufTrajectoryState>(arena);
+const pb_msgdesc_t* wpi::Protobuf<frc::Trajectory::State>::Message() {
+  return get_wpi_proto_ProtobufTrajectoryState_msg();
 }
 
-frc::Trajectory::State wpi::Protobuf<frc::Trajectory::State>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufTrajectoryState*>(&msg);
+std::optional<frc::Trajectory::State>
+wpi::Protobuf<frc::Trajectory::State>::Unpack(wpi::ProtoInputStream& stream) {
+  wpi::UnpackCallback<frc::Pose2d> pose;
+  wpi_proto_ProtobufTrajectoryState msg;
+  msg.pose = pose.Callback();
+
+  if (!stream.DecodeNoInit(msg)) {
+    return {};
+  }
+
+  auto ipose = pose.Items();
+
+  if (ipose.empty()) {
+    return {};
+  }
+
   return frc::Trajectory::State{
-      units::second_t{m->time()},
-      units::meters_per_second_t{m->velocity()},
-      units::meters_per_second_squared_t{m->acceleration()},
-      wpi::UnpackProtobuf<frc::Pose2d>(m->wpi_pose()),
-      units::curvature_t{m->curvature()},
+      units::second_t{msg.time},
+      units::meters_per_second_t{msg.velocity},
+      units::meters_per_second_squared_t{msg.acceleration},
+      std::move(ipose[0]),
+      units::curvature_t{msg.curvature},
   };
 }
 
-void wpi::Protobuf<frc::Trajectory::State>::Pack(
-    google::protobuf::Message* msg, const frc::Trajectory::State& value) {
-  auto m = static_cast<wpi::proto::ProtobufTrajectoryState*>(msg);
-  m->set_time(value.t.value());
-  m->set_velocity(value.velocity.value());
-  m->set_acceleration(value.acceleration.value());
-  wpi::PackProtobuf(m->mutable_pose(), value.pose);
-  m->set_curvature(value.curvature.value());
+bool wpi::Protobuf<frc::Trajectory::State>::Pack(
+    wpi::ProtoOutputStream& stream, const frc::Trajectory::State& value) {
+  wpi::PackCallback pose{&value.pose};
+  wpi_proto_ProtobufTrajectoryState msg{
+      .time = value.t.value(),
+      .velocity = value.velocity.value(),
+      .acceleration = value.acceleration.value(),
+      .pose = pose.Callback(),
+      .curvature = value.curvature.value(),
+  };
+  return stream.Encode(msg);
 }
