@@ -13,6 +13,8 @@
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Translation2d> {
   static const pb_msgdesc_t* Message();
-  static std::optional<frc::Translation2d> Unpack(wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream, const frc::Translation2d& value);
+  static std::optional<frc::Translation2d> Unpack(
+      wpi::ProtoInputStream& stream);
+  static bool Pack(wpi::ProtoOutputStream& stream,
+                   const frc::Translation2d& value);
 };

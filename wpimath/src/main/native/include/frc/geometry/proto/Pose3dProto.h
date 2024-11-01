@@ -11,7 +11,7 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Pose3d> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Pose3d Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg, const frc::Pose3d& value);
+  static const pb_msgdesc_t* Message();
+  static std::optional<frc::Pose3d> Unpack(wpi::ProtoInputStream& stream);
+  static bool Pack(wpi::ProtoOutputStream& stream, const frc::Pose3d& value);
 };

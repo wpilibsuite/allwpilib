@@ -3,26 +3,40 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/geometry/proto/Rotation3dProto.h"
+#include "wpi/protobuf/ProtobufCallbacks.h"
 
-#include <wpi/ProtoHelper.h>
+#include "geometry3d.npb.h"
 
-#include "geometry3d.pb.h"
-
-google::protobuf::Message* wpi::Protobuf<frc::Rotation3d>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufRotation3d>(arena);
+const pb_msgdesc_t* wpi::Protobuf<frc::Rotation3d>::Message() {
+  return get_wpi_proto_ProtobufRotation3d_msg();
 }
 
-frc::Rotation3d wpi::Protobuf<frc::Rotation3d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufRotation3d*>(&msg);
+std::optional<frc::Rotation3d> wpi::Protobuf<frc::Rotation3d>::Unpack(
+    wpi::ProtoInputStream& stream) {
+  wpi::UnpackCallback<frc::Quaternion> quat;
+  wpi_proto_ProtobufRotation3d msg{
+      .q = quat.Callback(),
+  };
+  if (!stream.DecodeNoInit(msg)) {
+    return {};
+  }
+
+  auto iquat = quat.Items();
+
+  if (iquat.empty()) {
+    return {};
+  }
+
   return frc::Rotation3d{
-      wpi::UnpackProtobuf<frc::Quaternion>(m->wpi_q()),
+      iquat[0],
   };
 }
 
-void wpi::Protobuf<frc::Rotation3d>::Pack(google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::Rotation3d>::Pack(wpi::ProtoOutputStream& stream,
                                           const frc::Rotation3d& value) {
-  auto m = static_cast<wpi::proto::ProtobufRotation3d*>(msg);
-  wpi::PackProtobuf(m->mutable_q(), value.GetQuaternion());
+  wpi::PackCallback quat{&value.GetQuaternion()};
+  wpi_proto_ProtobufRotation3d msg{
+      .q = quat.Callback(),
+  };
+  return stream.Encode(msg);
 }

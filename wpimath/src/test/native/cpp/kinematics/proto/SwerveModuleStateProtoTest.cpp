@@ -18,11 +18,13 @@ const SwerveModuleState kExpectedData =
 }  // namespace
 
 TEST(SwerveModuleStateProtoTest, Roundtrip) {
-  google::protobuf::Arena arena;
-  google::protobuf::Message* proto = ProtoType::New(&arena);
-  ProtoType::Pack(proto, kExpectedData);
+  wpi::ProtobufMessage<SwerveModuleState> message;
+  wpi::SmallVector<uint8_t, 64> buf;
 
-  SwerveModuleState unpacked_data = ProtoType::Unpack(*proto);
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  std::optional<SwerveModuleState> unpacked_data = message.Unpack(buf);
+  ASSERT_TRUE(unpacked_data.has_value());
+
   EXPECT_EQ(kExpectedData.speed.value(), unpacked_data.speed.value());
   EXPECT_EQ(kExpectedData.angle, unpacked_data.angle);
 }

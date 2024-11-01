@@ -4,33 +4,35 @@
 
 #include "frc/controller/proto/DifferentialDriveWheelVoltagesProto.h"
 
-#include <wpi/ProtoHelper.h>
+#include <optional>
 
-#include "controller.pb.h"
+#include "controller.npb.h"
 
-google::protobuf::Message* wpi::Protobuf<
-    frc::DifferentialDriveWheelVoltages>::New(google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufDifferentialDriveWheelVoltages>(
-      arena);
+const pb_msgdesc_t*
+wpi::Protobuf<frc::DifferentialDriveWheelVoltages>::Message() {
+  return get_wpi_proto_ProtobufDifferentialDriveWheelVoltages_msg();
 }
 
-frc::DifferentialDriveWheelVoltages
+std::optional<frc::DifferentialDriveWheelVoltages>
 wpi::Protobuf<frc::DifferentialDriveWheelVoltages>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m =
-      static_cast<const wpi::proto::ProtobufDifferentialDriveWheelVoltages*>(
-          &msg);
+    wpi::ProtoInputStream& stream) {
+  wpi_proto_ProtobufDifferentialDriveWheelVoltages msg;
+  if (!stream.DecodeNoInit(msg)) {
+    return {};
+  }
+
   return frc::DifferentialDriveWheelVoltages{
-      units::volt_t{m->left()},
-      units::volt_t{m->right()},
+      units::volt_t{msg.left},
+      units::volt_t{msg.right},
   };
 }
 
-void wpi::Protobuf<frc::DifferentialDriveWheelVoltages>::Pack(
-    google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::DifferentialDriveWheelVoltages>::Pack(
+    wpi::ProtoOutputStream& stream,
     const frc::DifferentialDriveWheelVoltages& value) {
-  auto m =
-      static_cast<wpi::proto::ProtobufDifferentialDriveWheelVoltages*>(msg);
-  m->set_left(value.left.value());
-  m->set_right(value.right.value());
+  wpi_proto_ProtobufDifferentialDriveWheelVoltages msg{
+      .left = value.left.value(),
+      .right = value.right.value(),
+  };
+  return stream.Encode(msg);
 }

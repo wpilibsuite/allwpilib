@@ -18,11 +18,13 @@ const Twist3d kExpectedData =
 }  // namespace
 
 TEST(Twist3dProtoTest, Roundtrip) {
-  google::protobuf::Arena arena;
-  google::protobuf::Message* proto = ProtoType::New(&arena);
-  ProtoType::Pack(proto, kExpectedData);
+  wpi::ProtobufMessage<Twist3d> message;
+  wpi::SmallVector<uint8_t, 64> buf;
 
-  Twist3d unpacked_data = ProtoType::Unpack(*proto);
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  std::optional<Twist3d> unpacked_data = message.Unpack(buf);
+  ASSERT_TRUE(unpacked_data.has_value());
+
   EXPECT_EQ(kExpectedData.dx.value(), unpacked_data.dx.value());
   EXPECT_EQ(kExpectedData.dy.value(), unpacked_data.dy.value());
   EXPECT_EQ(kExpectedData.dz.value(), unpacked_data.dz.value());

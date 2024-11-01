@@ -19,7 +19,6 @@ std::optional<frc::Pose2d> wpi::Protobuf<frc::Pose2d>::Unpack(
   wpi_proto_ProtobufPose2d msg{
       .translation = tsln.Callback(),
       .rotation = rot.Callback(),
-
   };
   if (!stream.DecodeNoInit(msg)) {
     return {};

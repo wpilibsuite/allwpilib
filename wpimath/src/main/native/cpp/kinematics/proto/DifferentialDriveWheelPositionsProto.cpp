@@ -4,33 +4,33 @@
 
 #include "frc/kinematics/proto/DifferentialDriveWheelPositionsProto.h"
 
-#include <wpi/ProtoHelper.h>
+#include "kinematics.npb.h"
 
-#include "kinematics.pb.h"
-
-google::protobuf::Message* wpi::Protobuf<
-    frc::DifferentialDriveWheelPositions>::New(google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<
-      wpi::proto::ProtobufDifferentialDriveWheelPositions>(arena);
+const pb_msgdesc_t*
+wpi::Protobuf<frc::DifferentialDriveWheelPositions>::Message() {
+  return get_wpi_proto_ProtobufDifferentialDriveWheelPositions_msg();
 }
 
-frc::DifferentialDriveWheelPositions
+std::optional<frc::DifferentialDriveWheelPositions>
 wpi::Protobuf<frc::DifferentialDriveWheelPositions>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m =
-      static_cast<const wpi::proto::ProtobufDifferentialDriveWheelPositions*>(
-          &msg);
+    wpi::ProtoInputStream& stream) {
+  wpi_proto_ProtobufDifferentialDriveWheelPositions msg;
+  if (!stream.DecodeNoInit(msg)) {
+    return {};
+  }
+
   return frc::DifferentialDriveWheelPositions{
-      units::meter_t{m->left()},
-      units::meter_t{m->right()},
+      units::meter_t{msg.left},
+      units::meter_t{msg.right},
   };
 }
 
-void wpi::Protobuf<frc::DifferentialDriveWheelPositions>::Pack(
-    google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::DifferentialDriveWheelPositions>::Pack(
+    wpi::ProtoOutputStream& stream,
     const frc::DifferentialDriveWheelPositions& value) {
-  auto m =
-      static_cast<wpi::proto::ProtobufDifferentialDriveWheelPositions*>(msg);
-  m->set_left(value.left.value());
-  m->set_right(value.right.value());
+  wpi_proto_ProtobufDifferentialDriveWheelPositions msg{
+      .left = value.left.value(),
+      .right = value.right.value(),
+  };
+  return stream.Encode(msg);
 }

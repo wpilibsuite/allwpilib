@@ -4,29 +4,32 @@
 
 #include "frc/geometry/proto/Twist2dProto.h"
 
-#include <wpi/ProtoHelper.h>
+#include "geometry2d.npb.h"
 
-#include "geometry2d.pb.h"
-
-google::protobuf::Message* wpi::Protobuf<frc::Twist2d>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufTwist2d>(arena);
+const pb_msgdesc_t* wpi::Protobuf<frc::Twist2d>::Message() {
+  return get_wpi_proto_ProtobufTwist2d_msg();
 }
 
-frc::Twist2d wpi::Protobuf<frc::Twist2d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufTwist2d*>(&msg);
+std::optional<frc::Twist2d> wpi::Protobuf<frc::Twist2d>::Unpack(
+    wpi::ProtoInputStream& stream) {
+  wpi_proto_ProtobufTwist2d msg;
+  if (!stream.DecodeNoInit(msg)) {
+    return {};
+  }
+
   return frc::Twist2d{
-      units::meter_t{m->dx()},
-      units::meter_t{m->dy()},
-      units::radian_t{m->dtheta()},
+      units::meter_t{msg.dx},
+      units::meter_t{msg.dy},
+      units::radian_t{msg.dtheta},
   };
 }
 
-void wpi::Protobuf<frc::Twist2d>::Pack(google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::Twist2d>::Pack(wpi::ProtoOutputStream& stream,
                                        const frc::Twist2d& value) {
-  auto m = static_cast<wpi::proto::ProtobufTwist2d*>(msg);
-  m->set_dx(value.dx.value());
-  m->set_dy(value.dy.value());
-  m->set_dtheta(value.dtheta.value());
+  wpi_proto_ProtobufTwist2d msg{
+      .dx = value.dx.value(),
+      .dy = value.dy.value(),
+      .dtheta = value.dtheta.value(),
+  };
+  return stream.Encode(msg);
 }

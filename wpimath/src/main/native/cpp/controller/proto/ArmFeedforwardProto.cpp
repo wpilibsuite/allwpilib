@@ -3,32 +3,36 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/controller/proto/ArmFeedforwardProto.h"
+#include <optional>
 
-#include <wpi/ProtoHelper.h>
+#include "controller.npb.h"
 
-#include "controller.pb.h"
-
-google::protobuf::Message* wpi::Protobuf<frc::ArmFeedforward>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufArmFeedforward>(arena);
+const pb_msgdesc_t* wpi::Protobuf<frc::ArmFeedforward>::Message() {
+  return get_wpi_proto_ProtobufArmFeedforward_msg();
 }
 
-frc::ArmFeedforward wpi::Protobuf<frc::ArmFeedforward>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufArmFeedforward*>(&msg);
+std::optional<frc::ArmFeedforward> wpi::Protobuf<frc::ArmFeedforward>::Unpack(
+    wpi::ProtoInputStream& stream) {
+  wpi_proto_ProtobufArmFeedforward msg;
+  if (!stream.DecodeNoInit(msg)) {
+    return {};
+  }
+
   return frc::ArmFeedforward{
-      units::volt_t{m->ks()},
-      units::volt_t{m->kg()},
-      units::unit_t<frc::ArmFeedforward::kv_unit>{m->kv()},
-      units::unit_t<frc::ArmFeedforward::ka_unit>{m->ka()},
+      units::volt_t{msg.ks},
+      units::volt_t{msg.kg},
+      units::unit_t<frc::ArmFeedforward::kv_unit>{msg.kv},
+      units::unit_t<frc::ArmFeedforward::ka_unit>{msg.ka},
   };
 }
 
-void wpi::Protobuf<frc::ArmFeedforward>::Pack(
-    google::protobuf::Message* msg, const frc::ArmFeedforward& value) {
-  auto m = static_cast<wpi::proto::ProtobufArmFeedforward*>(msg);
-  m->set_ks(value.GetKs().value());
-  m->set_kg(value.GetKg().value());
-  m->set_kv(value.GetKv().value());
-  m->set_ka(value.GetKa().value());
+bool wpi::Protobuf<frc::ArmFeedforward>::Pack(
+    wpi::ProtoOutputStream& stream, const frc::ArmFeedforward& value) {
+  wpi_proto_ProtobufArmFeedforward msg{
+      .ks = value.GetKs().value(),
+      .kg = value.GetKg().value(),
+      .kv = value.GetKv().value(),
+      .ka = value.GetKa().value(),
+  };
+  return stream.Encode(msg);
 }

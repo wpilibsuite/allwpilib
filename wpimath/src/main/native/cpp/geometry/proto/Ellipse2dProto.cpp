@@ -3,30 +3,44 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/geometry/proto/Ellipse2dProto.h"
+#include "wpi/protobuf/ProtobufCallbacks.h"
 
-#include <wpi/ProtoHelper.h>
+#include "geometry2d.npb.h"
 
-#include "geometry2d.pb.h"
-
-google::protobuf::Message* wpi::Protobuf<frc::Ellipse2d>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufEllipse2d>(arena);
+const pb_msgdesc_t* wpi::Protobuf<frc::Ellipse2d>::Message() {
+  return get_wpi_proto_ProtobufEllipse2d_msg();
 }
 
-frc::Ellipse2d wpi::Protobuf<frc::Ellipse2d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufEllipse2d*>(&msg);
+std::optional<frc::Ellipse2d> wpi::Protobuf<frc::Ellipse2d>::Unpack(
+    wpi::ProtoInputStream& stream) {
+  wpi::UnpackCallback<frc::Pose2d> pose;
+  wpi_proto_ProtobufEllipse2d msg{
+      .center = pose.Callback(),
+  };
+  if (!stream.DecodeNoInit(msg)) {
+    return {};
+  }
+
+  auto ipose = pose.Items();
+
+  if (ipose.empty()) {
+    return {};
+  }
+
   return frc::Ellipse2d{
-      wpi::UnpackProtobuf<frc::Pose2d>(m->wpi_center()),
-      units::meter_t{m->xsemiaxis()},
-      units::meter_t{m->ysemiaxis()},
+      ipose[0],
+      units::meter_t{msg.xSemiAxis},
+      units::meter_t{msg.ySemiAxis},
   };
 }
 
-void wpi::Protobuf<frc::Ellipse2d>::Pack(google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::Ellipse2d>::Pack(wpi::ProtoOutputStream& stream,
                                          const frc::Ellipse2d& value) {
-  auto m = static_cast<wpi::proto::ProtobufEllipse2d*>(msg);
-  wpi::PackProtobuf(m->mutable_center(), value.Center());
-  m->set_xsemiaxis(value.XSemiAxis().value());
-  m->set_ysemiaxis(value.YSemiAxis().value());
+  wpi::PackCallback pose{&value.Center()};
+  wpi_proto_ProtobufEllipse2d msg{
+      .center = pose.Callback(),
+      .xSemiAxis = value.XSemiAxis().value(),
+      .ySemiAxis = value.YSemiAxis().value(),
+  };
+  return stream.Encode(msg);
 }

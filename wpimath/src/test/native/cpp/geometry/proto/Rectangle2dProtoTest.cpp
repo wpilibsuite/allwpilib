@@ -18,11 +18,13 @@ const Rectangle2d kExpectedData{
 }  // namespace
 
 TEST(Rectangle2dProtoTest, Roundtrip) {
-  google::protobuf::Arena arena;
-  google::protobuf::Message* proto = ProtoType::New(&arena);
-  ProtoType::Pack(proto, kExpectedData);
+  wpi::ProtobufMessage<Rectangle2d> message;
+  wpi::SmallVector<uint8_t, 64> buf;
 
-  Rectangle2d unpacked_data = ProtoType::Unpack(*proto);
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  std::optional<Rectangle2d> unpacked_data = message.Unpack(buf);
+  ASSERT_TRUE(unpacked_data.has_value());
+
   EXPECT_EQ(kExpectedData.Center(), unpacked_data.Center());
   EXPECT_EQ(kExpectedData.XWidth(), unpacked_data.XWidth());
   EXPECT_EQ(kExpectedData.YWidth(), unpacked_data.YWidth());

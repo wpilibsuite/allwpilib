@@ -21,11 +21,13 @@ const ArmFeedforward kExpectedData{Ks, Kg, Kv, Ka};
 }  // namespace
 
 TEST(ArmFeedforwardProtoTest, Roundtrip) {
-  google::protobuf::Arena arena;
-  google::protobuf::Message* proto = ProtoType::New(&arena);
-  ProtoType::Pack(proto, kExpectedData);
+  wpi::ProtobufMessage<ArmFeedforward> message;
+  wpi::SmallVector<uint8_t, 64> buf;
 
-  ArmFeedforward unpacked_data = ProtoType::Unpack(*proto);
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  std::optional<ArmFeedforward> unpacked_data = message.Unpack(buf);
+  ASSERT_TRUE(unpacked_data.has_value());
+
   EXPECT_EQ(kExpectedData.GetKs().value(), unpacked_data.GetKs().value());
   EXPECT_EQ(kExpectedData.GetKg().value(), unpacked_data.GetKg().value());
   EXPECT_EQ(kExpectedData.GetKv().value(), unpacked_data.GetKv().value());

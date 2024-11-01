@@ -18,11 +18,13 @@ const Transform2d kExpectedData =
 }  // namespace
 
 TEST(Transform2dProtoTest, Roundtrip) {
-  google::protobuf::Arena arena;
-  google::protobuf::Message* proto = ProtoType::New(&arena);
-  ProtoType::Pack(proto, kExpectedData);
+  wpi::ProtobufMessage<Transform2d> message;
+  wpi::SmallVector<uint8_t, 64> buf;
 
-  Transform2d unpacked_data = ProtoType::Unpack(*proto);
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  std::optional<Transform2d> unpacked_data = message.Unpack(buf);
+  ASSERT_TRUE(unpacked_data.has_value());
+
   EXPECT_EQ(kExpectedData.Translation(), unpacked_data.Translation());
   EXPECT_EQ(kExpectedData.Rotation(), unpacked_data.Rotation());
 }

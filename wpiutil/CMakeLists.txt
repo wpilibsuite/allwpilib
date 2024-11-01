@@ -119,6 +119,7 @@ file(
     src/main/native/thirdparty/json/cpp/*.cpp
     src/main/native/thirdparty/llvm/cpp/*.cpp
     src/main/native/thirdparty/mpack/src/*.cpp
+    src/main/native/thirdparty/nanopb/src/*.cpp
 )
 list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
 if(NOT WITH_PROTOBUF)
@@ -200,6 +201,7 @@ install(
         src/main/native/thirdparty/llvm/include/
         src/main/native/thirdparty/memory/include/
         src/main/native/thirdparty/mpack/include/
+        src/main/native/thirdparty/nanopb/include/
         src/main/native/thirdparty/sigslot/include/
     DESTINATION "${include_dest}/wpiutil"
 )
@@ -213,6 +215,7 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/memory/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/nanopb/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sigslot/include>
         $<INSTALL_INTERFACE:${include_dest}/wpiutil>
 )

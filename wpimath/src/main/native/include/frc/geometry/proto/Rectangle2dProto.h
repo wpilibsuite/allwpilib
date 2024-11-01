@@ -11,8 +11,8 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Rectangle2d> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Rectangle2d Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
+  static const pb_msgdesc_t* Message();
+  static std::optional<frc::Rectangle2d> Unpack(wpi::ProtoInputStream& stream);
+  static bool Pack(wpi::ProtoOutputStream& stream,
                    const frc::Rectangle2d& value);
 };

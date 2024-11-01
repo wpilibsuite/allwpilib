@@ -11,9 +11,9 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::MecanumDriveWheelSpeeds> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::MecanumDriveWheelSpeeds Unpack(
-      const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
+  static const pb_msgdesc_t* Message();
+  static std::optional<frc::MecanumDriveWheelSpeeds> Unpack(
+      wpi::ProtoInputStream& stream);
+  static bool Pack(wpi::ProtoOutputStream& stream,
                    const frc::MecanumDriveWheelSpeeds& value);
 };

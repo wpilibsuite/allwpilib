@@ -15,11 +15,13 @@ inline constexpr DCMotor kExpectedData =
     DCMotor{1.91_V, 19.1_Nm, 1.74_A, 2.29_A, 2.2_rad_per_s, 2};
 
 TEST(DCMotorProtoTest, Roundtrip) {
-  google::protobuf::Arena arena;
-  google::protobuf::Message* proto = ProtoType::New(&arena);
-  ProtoType::Pack(proto, kExpectedData);
+  wpi::ProtobufMessage<DCMotor> message;
+  wpi::SmallVector<uint8_t, 64> buf;
 
-  DCMotor unpacked_data = ProtoType::Unpack(*proto);
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  std::optional<DCMotor> unpacked_data = message.Unpack(buf);
+  ASSERT_TRUE(unpacked_data.has_value());
+
   EXPECT_EQ(kExpectedData.nominalVoltage.value(),
             unpacked_data.nominalVoltage.value());
   EXPECT_EQ(kExpectedData.stallTorque.value(),

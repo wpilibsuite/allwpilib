@@ -8,12 +8,13 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/controller/DifferentialDriveWheelVoltages.h"
+#include "pb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DifferentialDriveWheelVoltages> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::DifferentialDriveWheelVoltages Unpack(
-      const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
+  static const pb_msgdesc_t* Message();
+  static std::optional<frc::DifferentialDriveWheelVoltages> Unpack(
+      wpi::ProtoInputStream& stream);
+  static bool Pack(wpi::ProtoOutputStream& stream,
                    const frc::DifferentialDriveWheelVoltages& value);
 };

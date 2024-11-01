@@ -4,35 +4,35 @@
 
 #include "frc/kinematics/proto/MecanumDriveWheelPositionsProto.h"
 
-#include <wpi/ProtoHelper.h>
+#include "kinematics.npb.h"
 
-#include "kinematics.pb.h"
-
-google::protobuf::Message* wpi::Protobuf<frc::MecanumDriveWheelPositions>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufMecanumDriveWheelPositions>(
-      arena);
+const pb_msgdesc_t* wpi::Protobuf<frc::MecanumDriveWheelPositions>::Message() {
+  return get_wpi_proto_ProtobufMecanumDriveWheelPositions_msg();
 }
 
-frc::MecanumDriveWheelPositions
-wpi::Protobuf<frc::MecanumDriveWheelPositions>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m =
-      static_cast<const wpi::proto::ProtobufMecanumDriveWheelPositions*>(&msg);
+std::optional<frc::MecanumDriveWheelPositions> wpi::Protobuf<
+    frc::MecanumDriveWheelPositions>::Unpack(wpi::ProtoInputStream& stream) {
+  wpi_proto_ProtobufMecanumDriveWheelPositions msg;
+  if (!stream.DecodeNoInit(msg)) {
+    return {};
+  }
+
   return frc::MecanumDriveWheelPositions{
-      units::meter_t{m->front_left()},
-      units::meter_t{m->front_right()},
-      units::meter_t{m->rear_left()},
-      units::meter_t{m->rear_right()},
+      units::meter_t{msg.front_left},
+      units::meter_t{msg.front_right},
+      units::meter_t{msg.rear_left},
+      units::meter_t{msg.rear_right},
   };
 }
 
-void wpi::Protobuf<frc::MecanumDriveWheelPositions>::Pack(
-    google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::MecanumDriveWheelPositions>::Pack(
+    wpi::ProtoOutputStream& stream,
     const frc::MecanumDriveWheelPositions& value) {
-  auto m = static_cast<wpi::proto::ProtobufMecanumDriveWheelPositions*>(msg);
-  m->set_front_left(value.frontLeft.value());
-  m->set_front_right(value.frontRight.value());
-  m->set_rear_left(value.rearLeft.value());
-  m->set_rear_right(value.rearRight.value());
+  wpi_proto_ProtobufMecanumDriveWheelPositions msg{
+      .front_left = value.frontLeft.value(),
+      .front_right = value.frontRight.value(),
+      .rear_left = value.rearLeft.value(),
+      .rear_right = value.rearRight.value(),
+  };
+  return stream.Encode(msg);
 }

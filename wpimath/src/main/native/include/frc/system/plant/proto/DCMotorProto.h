@@ -11,7 +11,7 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DCMotor> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::DCMotor Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg, const frc::DCMotor& value);
+  static const pb_msgdesc_t* Message();
+  static std::optional<frc::DCMotor> Unpack(wpi::ProtoInputStream& stream);
+  static bool Pack(wpi::ProtoOutputStream& stream, const frc::DCMotor& value);
 };

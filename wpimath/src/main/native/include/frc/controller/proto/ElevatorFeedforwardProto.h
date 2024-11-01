@@ -8,11 +8,13 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/controller/ElevatorFeedforward.h"
+#include "pb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::ElevatorFeedforward> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::ElevatorFeedforward Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
+  static const pb_msgdesc_t* Message();
+  static std::optional<frc::ElevatorFeedforward> Unpack(
+      wpi::ProtoInputStream& stream);
+  static bool Pack(wpi::ProtoOutputStream& stream,
                    const frc::ElevatorFeedforward& value);
 };

@@ -19,11 +19,13 @@ const MecanumDriveKinematics kExpectedData = MecanumDriveKinematics{
 }  // namespace
 
 TEST(MecanumDriveKinematicsProtoTest, Roundtrip) {
-  google::protobuf::Arena arena;
-  google::protobuf::Message* proto = ProtoType::New(&arena);
-  ProtoType::Pack(proto, kExpectedData);
+  wpi::ProtobufMessage<MecanumDriveKinematics> message;
+  wpi::SmallVector<uint8_t, 64> buf;
 
-  MecanumDriveKinematics unpacked_data = ProtoType::Unpack(*proto);
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  std::optional<MecanumDriveKinematics> unpacked_data = message.Unpack(buf);
+  ASSERT_TRUE(unpacked_data.has_value());
+
   EXPECT_EQ(kExpectedData.GetFrontLeft(), unpacked_data.GetFrontLeft());
   EXPECT_EQ(kExpectedData.GetFrontRight(), unpacked_data.GetFrontRight());
   EXPECT_EQ(kExpectedData.GetRearLeft(), unpacked_data.GetRearLeft());

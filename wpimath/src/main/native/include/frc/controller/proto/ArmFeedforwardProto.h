@@ -8,11 +8,13 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/controller/ArmFeedforward.h"
+#include "pb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::ArmFeedforward> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::ArmFeedforward Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
+  static const pb_msgdesc_t* Message();
+  static std::optional<frc::ArmFeedforward> Unpack(
+      wpi::ProtoInputStream& stream);
+  static bool Pack(wpi::ProtoOutputStream& stream,
                    const frc::ArmFeedforward& value);
 };

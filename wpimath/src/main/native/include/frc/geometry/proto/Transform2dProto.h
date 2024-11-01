@@ -11,8 +11,8 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Transform2d> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Transform2d Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
+  static const pb_msgdesc_t* Message();
+  static std::optional<frc::Transform2d> Unpack(wpi::ProtoInputStream& stream);
+  static bool Pack(wpi::ProtoOutputStream& stream,
                    const frc::Transform2d& value);
 };

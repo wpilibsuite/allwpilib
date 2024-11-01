@@ -18,11 +18,13 @@ const Ellipse2d kExpectedData{
 }  // namespace
 
 TEST(Ellipse2dProtoTest, Roundtrip) {
-  google::protobuf::Arena arena;
-  google::protobuf::Message* proto = ProtoType::New(&arena);
-  ProtoType::Pack(proto, kExpectedData);
+  wpi::ProtobufMessage<Ellipse2d> message;
+  wpi::SmallVector<uint8_t, 64> buf;
 
-  Ellipse2d unpacked_data = ProtoType::Unpack(*proto);
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  std::optional<Ellipse2d> unpacked_data = message.Unpack(buf);
+  ASSERT_TRUE(unpacked_data.has_value());
+
   EXPECT_EQ(kExpectedData.Center(), unpacked_data.Center());
   EXPECT_EQ(kExpectedData.XSemiAxis(), unpacked_data.XSemiAxis());
   EXPECT_EQ(kExpectedData.YSemiAxis(), unpacked_data.YSemiAxis());

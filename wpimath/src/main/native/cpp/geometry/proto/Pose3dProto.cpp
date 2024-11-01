@@ -4,27 +4,47 @@
 
 #include "frc/geometry/proto/Pose3dProto.h"
 
-#include <wpi/ProtoHelper.h>
+#include "frc/geometry/Pose3d.h"
+#include "wpi/protobuf/Protobuf.h"
+#include "wpi/protobuf/ProtobufCallbacks.h"
+#include "geometry3d.npb.h"
 
-#include "geometry3d.pb.h"
-
-google::protobuf::Message* wpi::Protobuf<frc::Pose3d>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufPose3d>(arena);
+const pb_msgdesc_t* wpi::Protobuf<frc::Pose3d>::Message() {
+  return get_wpi_proto_ProtobufPose3d_msg();
 }
 
-frc::Pose3d wpi::Protobuf<frc::Pose3d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufPose3d*>(&msg);
+std::optional<frc::Pose3d> wpi::Protobuf<frc::Pose3d>::Unpack(
+    wpi::ProtoInputStream& stream) {
+  wpi::UnpackCallback<frc::Translation3d> tsln;
+  wpi::UnpackCallback<frc::Rotation3d> rot;
+  wpi_proto_ProtobufPose3d msg{
+      .translation = tsln.Callback(),
+      .rotation = rot.Callback(),
+  };
+  if (!stream.DecodeNoInit(msg)) {
+    return {};
+  }
+
+  auto itsln = tsln.Items();
+  auto irot = rot.Items();
+
+  if (itsln.empty() || irot.empty()) {
+    return {};
+  }
+
   return frc::Pose3d{
-      wpi::UnpackProtobuf<frc::Translation3d>(m->wpi_translation()),
-      wpi::UnpackProtobuf<frc::Rotation3d>(m->wpi_rotation()),
+      itsln[0],
+      irot[0],
   };
 }
 
-void wpi::Protobuf<frc::Pose3d>::Pack(google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::Pose3d>::Pack(wpi::ProtoOutputStream& stream,
                                       const frc::Pose3d& value) {
-  auto m = static_cast<wpi::proto::ProtobufPose3d*>(msg);
-  wpi::PackProtobuf(m->mutable_translation(), value.Translation());
-  wpi::PackProtobuf(m->mutable_rotation(), value.Rotation());
+  wpi::PackCallback tsln{&value.Translation()};
+  wpi::PackCallback rot{&value.Rotation()};
+  wpi_proto_ProtobufPose3d msg{
+      .translation = tsln.Callback(),
+      .rotation = rot.Callback(),
+  };
+  return stream.Encode(msg);
 }

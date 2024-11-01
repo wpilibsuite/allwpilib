@@ -14,5 +14,6 @@ template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Rotation2d> {
   static const pb_msgdesc_t* Message();
   static std::optional<frc::Rotation2d> Unpack(wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream, const frc::Rotation2d& value);
+  static bool Pack(wpi::ProtoOutputStream& stream,
+                   const frc::Rotation2d& value);
 };

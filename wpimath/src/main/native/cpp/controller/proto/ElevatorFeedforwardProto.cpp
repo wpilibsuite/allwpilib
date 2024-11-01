@@ -3,32 +3,36 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/controller/proto/ElevatorFeedforwardProto.h"
+#include <optional>
 
-#include <wpi/ProtoHelper.h>
+#include "controller.npb.h"
 
-#include "controller.pb.h"
-
-google::protobuf::Message* wpi::Protobuf<frc::ElevatorFeedforward>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufElevatorFeedforward>(arena);
+const pb_msgdesc_t* wpi::Protobuf<frc::ElevatorFeedforward>::Message() {
+  return get_wpi_proto_ProtobufElevatorFeedforward_msg();
 }
 
-frc::ElevatorFeedforward wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufElevatorFeedforward*>(&msg);
+std::optional<frc::ElevatorFeedforward>
+wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(wpi::ProtoInputStream& stream) {
+  wpi_proto_ProtobufElevatorFeedforward msg;
+  if (!stream.DecodeNoInit(msg)) {
+    return {};
+  }
+
   return frc::ElevatorFeedforward{
-      units::volt_t{m->ks()},
-      units::volt_t{m->kg()},
-      units::unit_t<frc::ElevatorFeedforward::kv_unit>{m->kv()},
-      units::unit_t<frc::ElevatorFeedforward::ka_unit>{m->ka()},
+      units::volt_t{msg.ks},
+      units::volt_t{msg.kg},
+      units::unit_t<frc::ElevatorFeedforward::kv_unit>{msg.kv},
+      units::unit_t<frc::ElevatorFeedforward::ka_unit>{msg.ka},
   };
 }
 
-void wpi::Protobuf<frc::ElevatorFeedforward>::Pack(
-    google::protobuf::Message* msg, const frc::ElevatorFeedforward& value) {
-  auto m = static_cast<wpi::proto::ProtobufElevatorFeedforward*>(msg);
-  m->set_ks(value.GetKs().value());
-  m->set_kg(value.GetKg().value());
-  m->set_kv(value.GetKv().value());
-  m->set_ka(value.GetKa().value());
+bool wpi::Protobuf<frc::ElevatorFeedforward>::Pack(
+    wpi::ProtoOutputStream& stream, const frc::ElevatorFeedforward& value) {
+  wpi_proto_ProtobufElevatorFeedforward msg{
+      .ks = value.GetKs().value(),
+      .kg = value.GetKg().value(),
+      .kv = value.GetKv().value(),
+      .ka = value.GetKa().value(),
+  };
+  return stream.Encode(msg);
 }

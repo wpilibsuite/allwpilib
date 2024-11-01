@@ -4,29 +4,43 @@
 
 #include "frc/geometry/proto/Rectangle2dProto.h"
 
-#include <wpi/ProtoHelper.h>
+#include "geometry2d.npb.h"
+#include "wpi/protobuf/ProtobufCallbacks.h"
 
-#include "geometry2d.pb.h"
-
-google::protobuf::Message* wpi::Protobuf<frc::Rectangle2d>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufRectangle2d>(arena);
+const pb_msgdesc_t* wpi::Protobuf<frc::Rectangle2d>::Message() {
+  return get_wpi_proto_ProtobufRectangle2d_msg();
 }
 
-frc::Rectangle2d wpi::Protobuf<frc::Rectangle2d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufRectangle2d*>(&msg);
+std::optional<frc::Rectangle2d> wpi::Protobuf<frc::Rectangle2d>::Unpack(
+    wpi::ProtoInputStream& stream) {
+  wpi::UnpackCallback<frc::Pose2d> pose;
+  wpi_proto_ProtobufRectangle2d msg{
+      .center = pose.Callback(),
+  };
+  if (!stream.DecodeNoInit(msg)) {
+    return {};
+  }
+
+  auto ipose = pose.Items();
+
+  if (ipose.empty()) {
+    return {};
+  }
+
   return frc::Rectangle2d{
-      wpi::UnpackProtobuf<frc::Pose2d>(m->wpi_center()),
-      units::meter_t{m->xwidth()},
-      units::meter_t{m->ywidth()},
+      ipose[0],
+      units::meter_t{msg.xWidth},
+      units::meter_t{msg.yWidth},
   };
 }
 
-void wpi::Protobuf<frc::Rectangle2d>::Pack(google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::Rectangle2d>::Pack(wpi::ProtoOutputStream& stream,
                                            const frc::Rectangle2d& value) {
-  auto m = static_cast<wpi::proto::ProtobufRectangle2d*>(msg);
-  wpi::PackProtobuf(m->mutable_center(), value.Center());
-  m->set_xwidth(value.XWidth().value());
-  m->set_ywidth(value.YWidth().value());
+  wpi::PackCallback pose{&value.Center()};
+  wpi_proto_ProtobufRectangle2d msg{
+      .center = pose.Callback(),
+      .xWidth = value.XWidth().value(),
+      .yWidth = value.YWidth().value(),
+  };
+  return stream.Encode(msg);
 }
