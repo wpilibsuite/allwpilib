@@ -108,7 +108,7 @@ class Alert {
    * Gets whether the alert is active.
    * @return whether the alert is active.
    */
-  bool Get() const;
+  bool Get() const { return m_active; }
 
   /**
    * Updates current alert text. Use this method to dynamically change the
@@ -122,7 +122,13 @@ class Alert {
    * Gets the current alert text.
    * @return the current text.
    */
-  std::string GetText() const;
+  std::string GetText() const { return m_text; }
+
+  /**
+   * Get the type of this alert.
+   * @return the type
+   */
+  AlertType GetType() const { return m_type; }
 
  private:
   class PublishedAlert {
@@ -141,7 +147,7 @@ class Alert {
     void InitSendable(nt::NTSendableBuilder& builder) override;
 
     /**
-     * Returns a reference to the set of active alerts for the given type
+     * Returns a reference to the set of active alerts for the given type.
      * @param type the type
      * @return reference to the set of active alerts for the type
      */

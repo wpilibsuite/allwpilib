@@ -69,10 +69,6 @@ void Alert::Set(bool active) {
   m_active = active;
 }
 
-bool Alert::Get() const {
-  return m_active;
-}
-
 void Alert::SetText(std::string_view text) {
   if (text == m_text) {
     return;
@@ -86,10 +82,6 @@ void Alert::SetText(std::string_view text) {
     auto hint = m_activeAlerts->erase(iter);
     m_activeAlerts->emplace_hint(hint, m_activeStartTime, m_text);
   }
-}
-
-std::string Alert::GetText() const {
-  return m_text;
 }
 
 Alert::SendableAlerts::SendableAlerts() {

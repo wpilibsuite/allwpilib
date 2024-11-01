@@ -18,7 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
-public class AlertTest {
+class AlertTest {
   String m_groupName;
 
   @BeforeEach
@@ -34,7 +34,7 @@ public class AlertTest {
     assertEquals(0, getActiveAlerts(AlertType.kInfo).length);
   }
 
-  String getSubtableName(Alert.AlertType type) {
+  private String getSubtableName(Alert.AlertType type) {
     switch (type) {
       case kError:
         return "errors";
@@ -47,28 +47,28 @@ public class AlertTest {
     }
   }
 
-  StringArraySubscriber getSubscriberForType(Alert.AlertType type) {
+  private StringArraySubscriber getSubscriberForType(Alert.AlertType type) {
     return NetworkTableInstance.getDefault()
         .getStringArrayTopic("/SmartDashboard/" + m_groupName + "/" + getSubtableName(type))
         .subscribe(new String[] {});
   }
 
-  String[] getActiveAlerts(AlertType type) {
+  private String[] getActiveAlerts(AlertType type) {
     try (var sub = getSubscriberForType(type)) {
       return sub.get();
     }
   }
 
-  void update() {
+  private void update() {
     SmartDashboard.updateValues();
   }
 
-  boolean isAlertActive(String text, Alert.AlertType type) {
+  private boolean isAlertActive(String text, Alert.AlertType type) {
     update();
     return Arrays.asList(getActiveAlerts(type)).contains(text);
   }
 
-  Alert makeAlert(String text, Alert.AlertType type) {
+  private Alert makeAlert(String text, Alert.AlertType type) {
     return new Alert(m_groupName, text, type);
   }
 

@@ -159,6 +159,15 @@ public class Alert implements AutoCloseable {
     return m_text;
   }
 
+  /**
+   * Get the type of this alert.
+   *
+   * @return the type
+   */
+  public AlertType getType() {
+    return m_type;
+  }
+
   private record PublishedAlert(long timestamp, String text) implements Comparable<PublishedAlert> {
     private static final Comparator<PublishedAlert> comparator =
         Comparator.comparingLong((PublishedAlert alert) -> alert.timestamp())
@@ -175,7 +184,7 @@ public class Alert implements AutoCloseable {
     private final Map<AlertType, Set<PublishedAlert>> m_alerts = new HashMap<>();
 
     /**
-     * Returns a reference to the set of active alerts for the given type
+     * Returns a reference to the set of active alerts for the given type.
      *
      * @param type the type
      * @return reference to the set of active alerts for the type
