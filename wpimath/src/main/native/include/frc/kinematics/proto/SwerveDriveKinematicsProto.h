@@ -21,24 +21,24 @@ struct wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>> {
   }
 
   static std::optional<frc::SwerveDriveKinematics<NumModules>> Unpack(
-      wpi::ProtoInputStream& msg) {
+      wpi::ProtoInputStream& stream) {
     wpi::WpiArrayUnpackCallback<frc::Translation2d, NumModules> modules;
 
     wpi_proto_ProtobufSwerveDriveKinematics msg {
-      .modules = modules.Callback();
+      .modules = modules.Callback(),
     };
 
     modules.SetLimits(wpi::DecodeLimits::Fail);
 
-    if (!msg.DecodeNoInit(msg)) {
-      return false;
+    if (!stream.DecodeNoInit(msg)) {
+      return {};
     }
-    return frc::SwerveDriveKinematics<NumModules>{modulesArray.array};
+    return frc::SwerveDriveKinematics<NumModules>{modules.Array()};
   }
 
   static bool Pack(wpi::ProtoOutputStream& stream,
                    const frc::SwerveDriveKinematics<NumModules>& value) {
-    wpi::PackCallback modules{value.GetModules()};
+    wpi::PackCallback<frc::Translation2d> modules{value.GetModules()};
     wpi_proto_ProtobufSwerveDriveKinematics msg{
         .modules = modules.Callback(),
     };

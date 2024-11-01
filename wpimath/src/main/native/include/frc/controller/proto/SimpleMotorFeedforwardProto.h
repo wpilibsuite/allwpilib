@@ -16,7 +16,7 @@
 
 template <class Distance>
 struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>> {
-  const pb_msgdesc_t* Message() {
+  static const pb_msgdesc_t* Message() {
     return get_wpi_proto_ProtobufSimpleMotorFeedforward_msg();
   }
 
@@ -27,7 +27,7 @@ struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>> {
       return {};
     }
 
-    return {
+    return frc::SimpleMotorFeedforward<Distance>{
         units::volt_t{msg.ks},
         units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{
             msg.kv},

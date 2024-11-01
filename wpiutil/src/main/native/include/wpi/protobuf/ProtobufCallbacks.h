@@ -344,7 +344,7 @@ struct WpiArrayUnpackCallback
 
   size_t Size() const noexcept { return m_array.m_currentIndex; }
 
-  wpi::array<T, N> Array() const noexcept { return m_array.m_array; }
+  wpi::array<T, N>& Array() noexcept { return m_array.m_array; }
 
  private:
   WpiArrayEmplaceWrapper<T, N> m_array;

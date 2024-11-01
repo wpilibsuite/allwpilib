@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
+#include <wpi/SmallVector.h>
 #include <wpi/protobuf/Protobuf.h>
 
 template <typename T>

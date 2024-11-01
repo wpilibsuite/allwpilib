@@ -203,9 +203,9 @@ class ProtobufMessage {
    * @param data byte array
    * @return Optional; empty if parsing failed
    */
-  std::optional<T> Unpack(std::span<const uint8_t> data) {
-    ProtoInputStream stream{data, Protobuf<T>::Message()};
-    return Protobuf<T>::Unpack(stream);
+  std::optional<std::remove_cvref_t<T>> Unpack(std::span<const uint8_t> data) {
+    ProtoInputStream stream{data, Protobuf<std::remove_cvref_t<T>>::Message()};
+    return Protobuf<std::remove_cvref_t<T>>::Unpack(stream);
   }
 
   /**
@@ -217,8 +217,8 @@ class ProtobufMessage {
    */
   bool UnpackInto(T* out, std::span<const uint8_t> data) {
     if constexpr (MutableProtobufSerializable<T>) {
-      ProtoInputStream stream{data, Protobuf<T>::Message()};
-      return Protobuf<T>::UnpackInto(out, stream);
+      ProtoInputStream stream{data, Protobuf<std::remove_cvref_t<T>>::Message()};
+      return Protobuf<std::remove_cvref_t<T>>::UnpackInto(out, stream);
     } else {
       auto unpacked = Unpack(data);
       if (!unpacked) {
@@ -237,8 +237,8 @@ class ProtobufMessage {
    * @return true if successful
    */
   bool Pack(wpi::SmallVectorImpl<uint8_t>& out, const T& value) {
-    ProtoOutputStream stream{out, Protobuf<T>::Message()};
-    return Protobuf<T>::Pack(stream, value);
+    ProtoOutputStream stream{out, Protobuf<std::remove_cvref_t<T>>::Message()};
+    return Protobuf<std::remove_cvref_t<T>>::Pack(stream, value);
   }
 
   /**
@@ -249,8 +249,8 @@ class ProtobufMessage {
    * @return true if successful
    */
   bool Pack(std::vector<uint8_t>& out, const T& value) {
-    ProtoOutputStream stream{out, Protobuf<T>::Message()};
-    return Protobuf<T>::Pack(stream, value);
+    ProtoOutputStream stream{out, Protobuf<std::remove_cvref_t<T>>::Message()};
+    return Protobuf<std::remove_cvref_t<T>>::Pack(stream, value);
   }
 
   /**
@@ -259,7 +259,7 @@ class ProtobufMessage {
    * @return type string
    */
   std::string GetTypeString() const {
-    return detail::GetTypeString(Protobuf<T>::Message());
+    return detail::GetTypeString(Protobuf<std::remove_cvref_t<T>>::Message());
   }
 
   /**
@@ -275,7 +275,7 @@ class ProtobufMessage {
       function_ref<void(std::string_view filename,
                         std::span<const uint8_t> descriptor)>
           fn) {
-    detail::ForEachProtobufDescriptor(Protobuf<T>::Message(), exists, fn);
+    detail::ForEachProtobufDescriptor(Protobuf<std::remove_cvref_t<T>>::Message(), exists, fn);
   }
 };
 
