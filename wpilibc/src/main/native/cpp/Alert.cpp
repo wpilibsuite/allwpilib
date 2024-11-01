@@ -4,22 +4,84 @@
 
 #include "frc/Alert.h"
 
-#include <frc/RobotController.h>
-
-#include <algorithm>
 #include <set>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <fmt/format.h>
+#include <networktables/NTSendable.h>
 #include <networktables/NTSendableBuilder.h>
+#include <wpi/StringMap.h>
+#include <wpi/sendable/SendableHelper.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
+#include "frc/RobotController.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
 using namespace frc;
+
+class Alert::PublishedAlert {
+ public:
+  PublishedAlert(uint64_t timestamp, std::string_view text)
+      : timestamp{timestamp}, text{text} {}
+  uint64_t timestamp;
+  std::string text;
+  auto operator<=>(const PublishedAlert&) const = default;
+};
+
+class Alert::SendableAlerts : public nt::NTSendable,
+                              public wpi::SendableHelper<SendableAlerts> {
+ public:
+  SendableAlerts() { m_alerts.fill({}); }
+
+  void InitSendable(nt::NTSendableBuilder& builder) override {
+    builder.SetSmartDashboardType("Alerts");
+    builder.AddStringArrayProperty(
+        "errors", [this]() { return GetStrings(AlertType::kError); }, nullptr);
+    builder.AddStringArrayProperty(
+        "warnings", [this]() { return GetStrings(AlertType::kWarning); },
+        nullptr);
+    builder.AddStringArrayProperty(
+        "infos", [this]() { return GetStrings(AlertType::kInfo); }, nullptr);
+  }
+
+  /**
+   * Returns a reference to the set of active alerts for the given type.
+   * @param type the type
+   * @return reference to the set of active alerts for the type
+   */
+  std::set<PublishedAlert>& GetActiveAlertsStorage(AlertType type) {
+    return const_cast<std::set<Alert::PublishedAlert>&>(
+        std::as_const(*this).GetActiveAlertsStorage(type));
+  }
+
+  const std::set<PublishedAlert>& GetActiveAlertsStorage(AlertType type) const {
+    switch (type) {
+      case AlertType::kInfo:
+      case AlertType::kWarning:
+      case AlertType::kError:
+        return m_alerts[static_cast<int32_t>(type)];
+      default:
+        throw FRC_MakeError(frc::err::InvalidParameter,
+                            "Invalid Alert Type: {}", type);
+    }
+  }
+
+ private:
+  std::vector<std::string> GetStrings(AlertType type) const {
+    auto& set = GetActiveAlertsStorage(type);
+    std::vector<std::string> output;
+    output.reserve(set.size());
+    for (auto& alert : set) {
+      output.emplace_back(alert.text);
+    }
+    return output;
+  }
+
+  std::array<std::set<PublishedAlert>, 3> m_alerts;
+};
 
 // TODO: throw if matching (group, text, type) already constructed
 Alert::Alert(std::string_view text, AlertType type)
@@ -82,51 +144,6 @@ void Alert::SetText(std::string_view text) {
     auto hint = m_activeAlerts->erase(iter);
     m_activeAlerts->emplace_hint(hint, m_activeStartTime, m_text);
   }
-}
-
-Alert::SendableAlerts::SendableAlerts() {
-  m_alerts.fill({});
-}
-
-void Alert::SendableAlerts::InitSendable(nt::NTSendableBuilder& builder) {
-  builder.SetSmartDashboardType("Alerts");
-  builder.AddStringArrayProperty(
-      "errors", [this]() { return GetStrings(AlertType::kError); }, nullptr);
-  builder.AddStringArrayProperty(
-      "warnings", [this]() { return GetStrings(AlertType::kWarning); },
-      nullptr);
-  builder.AddStringArrayProperty(
-      "infos", [this]() { return GetStrings(AlertType::kInfo); }, nullptr);
-}
-
-std::set<Alert::PublishedAlert>& Alert::SendableAlerts::GetActiveAlertsStorage(
-    AlertType type) {
-  return const_cast<std::set<Alert::PublishedAlert>&>(
-      std::as_const(*this).GetActiveAlertsStorage(type));
-}
-
-const std::set<Alert::PublishedAlert>&
-Alert::SendableAlerts::GetActiveAlertsStorage(AlertType type) const {
-  switch (type) {
-    case AlertType::kInfo:
-    case AlertType::kWarning:
-    case AlertType::kError:
-      return m_alerts[static_cast<int32_t>(type)];
-    default:
-      throw FRC_MakeError(frc::err::InvalidParameter, "Invalid Alert Type: {}",
-                          type);
-  }
-}
-
-std::vector<std::string> Alert::SendableAlerts::GetStrings(
-    AlertType type) const {
-  auto& set = GetActiveAlertsStorage(type);
-  std::vector<std::string> output;
-  output.reserve(set.size());
-  for (auto& alert : set) {
-    output.emplace_back(alert.text);
-  }
-  return output;
 }
 
 Alert::SendableAlerts& Alert::GetGroupSendable(std::string_view group) {

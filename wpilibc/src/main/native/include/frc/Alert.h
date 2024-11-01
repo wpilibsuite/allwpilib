@@ -6,16 +6,8 @@
 
 #include <stdint.h>
 
-#include <array>
-#include <memory>
 #include <set>
 #include <string>
-#include <vector>
-
-#include <networktables/NTSendable.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringMap.h>
-#include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
 
@@ -131,34 +123,8 @@ class Alert {
   AlertType GetType() const { return m_type; }
 
  private:
-  class PublishedAlert {
-   public:
-    PublishedAlert(uint64_t timestamp, std::string_view text)
-        : timestamp{timestamp}, text{text} {}
-    uint64_t timestamp;
-    std::string text;
-    auto operator<=>(const PublishedAlert&) const = default;
-  };
-
-  class SendableAlerts : public nt::NTSendable,
-                         public wpi::SendableHelper<SendableAlerts> {
-   public:
-    SendableAlerts();
-    void InitSendable(nt::NTSendableBuilder& builder) override;
-
-    /**
-     * Returns a reference to the set of active alerts for the given type.
-     * @param type the type
-     * @return reference to the set of active alerts for the type
-     */
-    std::set<PublishedAlert>& GetActiveAlertsStorage(AlertType type);
-    const std::set<PublishedAlert>& GetActiveAlertsStorage(
-        AlertType type) const;
-
-   private:
-    std::vector<std::string> GetStrings(AlertType type) const;
-    std::array<std::set<PublishedAlert>, 3> m_alerts;
-  };
+  class PublishedAlert;
+  class SendableAlerts;
 
   AlertType m_type;
   std::string m_text;
