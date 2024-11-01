@@ -2,8 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
+
+#include <wpi/SmallVector.h>
 
 #include "frc/geometry/Twist2d.h"
 
@@ -24,7 +25,7 @@ TEST(Twist2dProtoTest, Roundtrip) {
   std::optional<Twist2d> unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.dx.value(), unpacked_data.dx.value());
-  EXPECT_EQ(kExpectedData.dy.value(), unpacked_data.dy.value());
-  EXPECT_EQ(kExpectedData.dtheta.value(), unpacked_data.dtheta.value());
+  EXPECT_EQ(kExpectedData.dx.value(), unpacked_data->dx.value());
+  EXPECT_EQ(kExpectedData.dy.value(), unpacked_data->dy.value());
+  EXPECT_EQ(kExpectedData.dtheta.value(), unpacked_data->dtheta.value());
 }

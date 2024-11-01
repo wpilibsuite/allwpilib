@@ -2,8 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
+
+#include <wpi/SmallVector.h>
 
 #include "frc/kinematics/ChassisSpeeds.h"
 
@@ -25,7 +26,7 @@ TEST(ChassisSpeedsProtoTest, Roundtrip) {
   std::optional<ChassisSpeeds> unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.vx.value(), unpacked_data.vx.value());
-  EXPECT_EQ(kExpectedData.vy.value(), unpacked_data.vy.value());
-  EXPECT_EQ(kExpectedData.omega.value(), unpacked_data.omega.value());
+  EXPECT_EQ(kExpectedData.vx.value(), unpacked_data->vx.value());
+  EXPECT_EQ(kExpectedData.vy.value(), unpacked_data->vy.value());
+  EXPECT_EQ(kExpectedData.omega.value(), unpacked_data->omega.value());
 }

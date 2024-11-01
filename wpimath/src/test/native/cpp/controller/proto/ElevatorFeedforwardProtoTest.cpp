@@ -2,8 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
+
+#include <wpi/SmallVector.h>
 
 #include "frc/controller/ElevatorFeedforward.h"
 
@@ -29,8 +30,8 @@ TEST(ElevatorFeedforwardProtoTest, Roundtrip) {
   std::optional<ElevatorFeedforward> unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.GetKs().value(), unpacked_data.GetKs().value());
-  EXPECT_EQ(kExpectedData.GetKg().value(), unpacked_data.GetKg().value());
-  EXPECT_EQ(kExpectedData.GetKv().value(), unpacked_data.GetKv().value());
-  EXPECT_EQ(kExpectedData.GetKa().value(), unpacked_data.GetKa().value());
+  EXPECT_EQ(kExpectedData.GetKs().value(), unpacked_data->GetKs().value());
+  EXPECT_EQ(kExpectedData.GetKg().value(), unpacked_data->GetKg().value());
+  EXPECT_EQ(kExpectedData.GetKv().value(), unpacked_data->GetKv().value());
+  EXPECT_EQ(kExpectedData.GetKa().value(), unpacked_data->GetKa().value());
 }

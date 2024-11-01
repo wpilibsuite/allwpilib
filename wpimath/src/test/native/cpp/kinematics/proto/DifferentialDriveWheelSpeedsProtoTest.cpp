@@ -2,8 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
+
+#include <wpi/SmallVector.h>
 
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
 
@@ -26,6 +27,6 @@ TEST(DifferentialDriveWheelSpeedsProtoTest, Roundtrip) {
       message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.left.value(), unpacked_data.left.value());
-  EXPECT_EQ(kExpectedData.right.value(), unpacked_data.right.value());
+  EXPECT_EQ(kExpectedData.left.value(), unpacked_data->left.value());
+  EXPECT_EQ(kExpectedData.right.value(), unpacked_data->right.value());
 }

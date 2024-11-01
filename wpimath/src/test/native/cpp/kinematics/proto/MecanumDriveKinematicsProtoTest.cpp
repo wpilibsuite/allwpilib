@@ -2,8 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
+
+#include <wpi/SmallVector.h>
 
 #include "frc/kinematics/MecanumDriveKinematics.h"
 
@@ -26,8 +27,8 @@ TEST(MecanumDriveKinematicsProtoTest, Roundtrip) {
   std::optional<MecanumDriveKinematics> unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.GetFrontLeft(), unpacked_data.GetFrontLeft());
-  EXPECT_EQ(kExpectedData.GetFrontRight(), unpacked_data.GetFrontRight());
-  EXPECT_EQ(kExpectedData.GetRearLeft(), unpacked_data.GetRearLeft());
-  EXPECT_EQ(kExpectedData.GetRearRight(), unpacked_data.GetRearRight());
+  EXPECT_EQ(kExpectedData.GetFrontLeft(), unpacked_data->GetFrontLeft());
+  EXPECT_EQ(kExpectedData.GetFrontRight(), unpacked_data->GetFrontRight());
+  EXPECT_EQ(kExpectedData.GetRearLeft(), unpacked_data->GetRearLeft());
+  EXPECT_EQ(kExpectedData.GetRearRight(), unpacked_data->GetRearRight());
 }

@@ -5,6 +5,8 @@
 #include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
 
+#include <wpi/SmallVector.h>
+
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 
 using namespace frc;
@@ -26,5 +28,5 @@ TEST(DifferentialDriveKinematicsProtoTest, Roundtrip) {
       message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.trackWidth.value(), unpacked_data.trackWidth.value());
+  EXPECT_EQ(kExpectedData.trackWidth.value(), unpacked_data->trackWidth.value());
 }

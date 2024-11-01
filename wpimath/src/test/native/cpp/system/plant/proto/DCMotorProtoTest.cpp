@@ -2,8 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
+
+#include <wpi/SmallVector.h>
 
 #include "frc/system/plant/DCMotor.h"
 
@@ -23,15 +24,15 @@ TEST(DCMotorProtoTest, Roundtrip) {
   ASSERT_TRUE(unpacked_data.has_value());
 
   EXPECT_EQ(kExpectedData.nominalVoltage.value(),
-            unpacked_data.nominalVoltage.value());
+            unpacked_data->nominalVoltage.value());
   EXPECT_EQ(kExpectedData.stallTorque.value(),
-            unpacked_data.stallTorque.value());
+            unpacked_data->stallTorque.value());
   EXPECT_EQ(kExpectedData.stallCurrent.value(),
-            unpacked_data.stallCurrent.value());
+            unpacked_data->stallCurrent.value());
   EXPECT_EQ(kExpectedData.freeCurrent.value(),
-            unpacked_data.freeCurrent.value());
-  EXPECT_EQ(kExpectedData.freeSpeed.value(), unpacked_data.freeSpeed.value());
-  EXPECT_EQ(kExpectedData.R.value(), unpacked_data.R.value());
-  EXPECT_EQ(kExpectedData.Kv.value(), unpacked_data.Kv.value());
-  EXPECT_EQ(kExpectedData.Kt.value(), unpacked_data.Kt.value());
+            unpacked_data->freeCurrent.value());
+  EXPECT_EQ(kExpectedData.freeSpeed.value(), unpacked_data->freeSpeed.value());
+  EXPECT_EQ(kExpectedData.R.value(), unpacked_data->R.value());
+  EXPECT_EQ(kExpectedData.Kv.value(), unpacked_data->Kv.value());
+  EXPECT_EQ(kExpectedData.Kt.value(), unpacked_data->Kt.value());
 }

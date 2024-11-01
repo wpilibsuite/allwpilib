@@ -2,8 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
+
+#include <wpi/SmallVector.h>
 
 #include "frc/geometry/Twist3d.h"
 
@@ -25,10 +26,10 @@ TEST(Twist3dProtoTest, Roundtrip) {
   std::optional<Twist3d> unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.dx.value(), unpacked_data.dx.value());
-  EXPECT_EQ(kExpectedData.dy.value(), unpacked_data.dy.value());
-  EXPECT_EQ(kExpectedData.dz.value(), unpacked_data.dz.value());
-  EXPECT_EQ(kExpectedData.rx.value(), unpacked_data.rx.value());
-  EXPECT_EQ(kExpectedData.ry.value(), unpacked_data.ry.value());
-  EXPECT_EQ(kExpectedData.rz.value(), unpacked_data.rz.value());
+  EXPECT_EQ(kExpectedData.dx.value(), unpacked_data->dx.value());
+  EXPECT_EQ(kExpectedData.dy.value(), unpacked_data->dy.value());
+  EXPECT_EQ(kExpectedData.dz.value(), unpacked_data->dz.value());
+  EXPECT_EQ(kExpectedData.rx.value(), unpacked_data->rx.value());
+  EXPECT_EQ(kExpectedData.ry.value(), unpacked_data->ry.value());
+  EXPECT_EQ(kExpectedData.rz.value(), unpacked_data->rz.value());
 }

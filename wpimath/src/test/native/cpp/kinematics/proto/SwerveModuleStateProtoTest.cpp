@@ -2,8 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
+
+#include <wpi/SmallVector.h>
 
 #include "frc/kinematics/SwerveModuleState.h"
 
@@ -25,6 +26,6 @@ TEST(SwerveModuleStateProtoTest, Roundtrip) {
   std::optional<SwerveModuleState> unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.speed.value(), unpacked_data.speed.value());
-  EXPECT_EQ(kExpectedData.angle, unpacked_data.angle);
+  EXPECT_EQ(kExpectedData.speed.value(), unpacked_data->speed.value());
+  EXPECT_EQ(kExpectedData.angle, unpacked_data->angle);
 }
