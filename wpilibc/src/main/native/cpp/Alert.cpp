@@ -26,12 +26,14 @@ Alert::Alert(std::string_view text, AlertType type)
     : Alert("Alerts", text, type) {}
 
 Alert::Alert(std::string_view group, std::string_view text, AlertType type)
-    : m_type(type), m_text(text), m_group{&GetGroupSendable(group)} {}
+    : m_type(type),
+      m_text(text),
+      m_activeAlerts{&GetGroupSendable(group).GetActiveAlertsStorage(m_type)} {}
 
 Alert::Alert(Alert&& other)
     : m_type{other.m_type},
       m_text{std::move(other.m_text)},
-      m_group{std::exchange(other.m_group, nullptr)},
+      m_activeAlerts{std::exchange(other.m_activeAlerts, nullptr)},
       m_active{std::exchange(other.m_active, false)},
       m_activeStartTime{other.m_activeStartTime} {}
 
@@ -42,7 +44,7 @@ Alert& Alert::operator=(Alert&& other) {
     // Now, swap moved-from state with other state
     std::swap(m_type, other.m_type);
     std::swap(m_text, other.m_text);
-    std::swap(m_group, other.m_group);
+    std::swap(m_activeAlerts, other.m_activeAlerts);
     std::swap(m_active, other.m_active);
     std::swap(m_activeStartTime, other.m_activeStartTime);
   }
@@ -60,9 +62,9 @@ void Alert::Set(bool active) {
 
   if (active) {
     m_activeStartTime = frc::RobotController::GetFPGATime();
-    m_group->GetSetForType(m_type).emplace(m_activeStartTime, m_text);
+    m_activeAlerts->emplace(m_activeStartTime, m_text);
   } else {
-    m_group->GetSetForType(m_type).erase({m_activeStartTime, m_text});
+    m_activeAlerts->erase({m_activeStartTime, m_text});
   }
   m_active = active;
 }
@@ -80,10 +82,9 @@ void Alert::SetText(std::string_view text) {
   m_text = text;
 
   if (m_active) {
-    auto& set = m_group->GetSetForType(m_type);
-    auto iter = set.find({m_activeStartTime, oldText});
-    auto hint = set.erase(iter);
-    set.emplace_hint(hint, m_activeStartTime, m_text);
+    auto iter = m_activeAlerts->find({m_activeStartTime, oldText});
+    auto hint = m_activeAlerts->erase(iter);
+    m_activeAlerts->emplace_hint(hint, m_activeStartTime, m_text);
   }
 }
 
@@ -106,14 +107,14 @@ void Alert::SendableAlerts::InitSendable(nt::NTSendableBuilder& builder) {
       "infos", [this]() { return GetStrings(AlertType::kInfo); }, nullptr);
 }
 
-std::set<Alert::PublishedAlert>& Alert::SendableAlerts::GetSetForType(
+std::set<Alert::PublishedAlert>& Alert::SendableAlerts::GetActiveAlertsStorage(
     AlertType type) {
   return const_cast<std::set<Alert::PublishedAlert>&>(
-      std::as_const(*this).GetSetForType(type));
+      std::as_const(*this).GetActiveAlertsStorage(type));
 }
 
-const std::set<Alert::PublishedAlert>& Alert::SendableAlerts::GetSetForType(
-    AlertType type) const {
+const std::set<Alert::PublishedAlert>&
+Alert::SendableAlerts::GetActiveAlertsStorage(AlertType type) const {
   switch (type) {
     case AlertType::kInfo:
     case AlertType::kWarning:
@@ -127,7 +128,7 @@ const std::set<Alert::PublishedAlert>& Alert::SendableAlerts::GetSetForType(
 
 std::vector<std::string> Alert::SendableAlerts::GetStrings(
     AlertType type) const {
-  auto set = GetSetForType(type);
+  auto set = GetActiveAlertsStorage(type);
   std::vector<std::string> output;
   output.reserve(set.size());
   for (auto& alert : set) {

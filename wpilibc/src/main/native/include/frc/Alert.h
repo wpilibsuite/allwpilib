@@ -140,8 +140,14 @@ class Alert {
     SendableAlerts();
     void InitSendable(nt::NTSendableBuilder& builder) override;
 
-    std::set<PublishedAlert>& GetSetForType(AlertType type);
-    const std::set<PublishedAlert>& GetSetForType(AlertType type) const;
+    /**
+     * Returns a reference to the set of active alerts for the given type
+     * @param type the type
+     * @return reference to the set of active alerts for the type
+     */
+    std::set<PublishedAlert>& GetActiveAlertsStorage(AlertType type);
+    const std::set<PublishedAlert>& GetActiveAlertsStorage(
+        AlertType type) const;
 
    private:
     std::vector<std::string> GetStrings(AlertType type) const;
@@ -150,7 +156,7 @@ class Alert {
 
   AlertType m_type;
   std::string m_text;
-  SendableAlerts* m_group;  // could replace with pointer to type set
+  std::set<PublishedAlert>* m_activeAlerts;
   bool m_active = false;
   uint64_t m_activeStartTime;
 

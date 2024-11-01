@@ -75,7 +75,7 @@ public class Alert implements AutoCloseable {
   private boolean m_active;
   private long m_activeStartTime;
   private String m_text;
-  private SendableAlerts m_group;
+  private Set<PublishedAlert> m_activeAlerts;
 
   /**
    * Creates a new alert in the default group - "Alerts". If this is the first to be instantiated,
@@ -100,7 +100,7 @@ public class Alert implements AutoCloseable {
   public Alert(String group, String text, AlertType type) {
     m_type = type;
     m_text = text;
-    m_group = getGroupSendable(group);
+    m_activeAlerts = getGroupSendable(group).getActiveAlertsStorage(type);
   }
 
   /**
@@ -116,9 +116,9 @@ public class Alert implements AutoCloseable {
 
     if (active) {
       m_activeStartTime = RobotController.getFPGATime();
-      m_group.getSetForType(m_type).add(new PublishedAlert(m_activeStartTime, m_text));
+      m_activeAlerts.add(new PublishedAlert(m_activeStartTime, m_text));
     } else {
-      m_group.getSetForType(m_type).remove(new PublishedAlert(m_activeStartTime, m_text));
+      m_activeAlerts.remove(new PublishedAlert(m_activeStartTime, m_text));
     }
     m_active = active;
   }
@@ -145,10 +145,8 @@ public class Alert implements AutoCloseable {
     var oldText = m_text;
     m_text = text;
     if (m_active) {
-      var set = m_group.getSetForType(m_type);
-      set.remove(
-          new PublishedAlert(m_activeStartTime, oldText));
-      set.add(new PublishedAlert(m_activeStartTime, m_text));
+      m_activeAlerts.remove(new PublishedAlert(m_activeStartTime, oldText));
+      m_activeAlerts.add(new PublishedAlert(m_activeStartTime, m_text));
     }
   }
 
@@ -174,15 +172,20 @@ public class Alert implements AutoCloseable {
 
   private static final class SendableAlerts implements Sendable {
     // TODO: I think we could use WeakReference here to automatically remove dangling alerts
-
     private final Map<AlertType, Set<PublishedAlert>> m_alerts = new HashMap<>();
 
-    public Set<PublishedAlert> getSetForType(AlertType type) {
+    /**
+     * Returns a reference to the set of active alerts for the given type
+     *
+     * @param type the type
+     * @return reference to the set of active alerts for the type
+     */
+    public Set<PublishedAlert> getActiveAlertsStorage(AlertType type) {
       return m_alerts.computeIfAbsent(type, _type -> new TreeSet<>());
     }
 
     private String[] getStrings(AlertType type) {
-      return getSetForType(type).stream().map(a -> a.text()).toArray(String[]::new);
+      return getActiveAlertsStorage(type).stream().map(a -> a.text()).toArray(String[]::new);
     }
 
     @Override
