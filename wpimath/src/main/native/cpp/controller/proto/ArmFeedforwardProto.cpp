@@ -33,6 +33,7 @@ bool wpi::Protobuf<frc::ArmFeedforward>::Pack(
       .kg = value.GetKg().value(),
       .kv = value.GetKv().value(),
       .ka = value.GetKa().value(),
+      .dt = 0,
   };
   return stream.Encode(msg);
 }
