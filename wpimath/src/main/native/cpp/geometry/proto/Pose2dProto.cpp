@@ -31,7 +31,10 @@ std::optional<frc::Pose2d> wpi::Protobuf<frc::Pose2d>::Unpack(
     return {};
   }
 
-  return frc::Pose2d{itsln[0], irot[0]};
+  return frc::Pose2d{
+      itsln[0],
+      irot[0],
+  };
 }
 
 bool wpi::Protobuf<frc::Pose2d>::Pack(wpi::ProtoOutputStream& stream,
@@ -41,7 +44,6 @@ bool wpi::Protobuf<frc::Pose2d>::Pack(wpi::ProtoOutputStream& stream,
   wpi_proto_ProtobufPose2d msg{
       .translation = tsln.Callback(),
       .rotation = rot.Callback(),
-
   };
   return stream.Encode(msg);
 }

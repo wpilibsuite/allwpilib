@@ -18,14 +18,12 @@ wpi::Protobuf<frc::QuinticHermiteSpline>::Unpack(wpi::ProtoInputStream& stream) 
   wpi::WpiArrayUnpackCallback<double, 3> xFinal;
   wpi::WpiArrayUnpackCallback<double, 3> yInitial;
   wpi::WpiArrayUnpackCallback<double, 3> yFinal;
-
   wpi_proto_ProtobufQuinticHermiteSpline msg{
       .x_initial = xInitial.Callback(),
       .x_final = xFinal.Callback(),
       .y_initial = yInitial.Callback(),
       .y_final = yFinal.Callback(),
   };
-
   if (!stream.DecodeNoInit(msg)) {
     return {};
   }
@@ -49,13 +47,11 @@ bool wpi::Protobuf<frc::QuinticHermiteSpline>::Pack(
   wpi::PackCallback<double> xFinal{value.GetFinalControlVector().x};
   wpi::PackCallback<double> yInitial{value.GetInitialControlVector().y};
   wpi::PackCallback<double> yFinal{value.GetFinalControlVector().y};
-
   wpi_proto_ProtobufQuinticHermiteSpline msg{
       .x_initial = xInitial.Callback(),
       .x_final = xFinal.Callback(),
       .y_initial = yInitial.Callback(),
       .y_final = yFinal.Callback(),
   };
-
   return stream.Encode(msg);
 }

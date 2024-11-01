@@ -16,11 +16,11 @@ inline constexpr DCMotor kExpectedData =
     DCMotor{1.91_V, 19.1_Nm, 1.74_A, 2.29_A, 2.2_rad_per_s, 2};
 
 TEST(DCMotorProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<DCMotor> message;
+  wpi::ProtobufMessage<decltype(kExpectedData> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
-  std::optional<DCMotor> unpacked_data = message.Unpack(buf);
+  auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
   EXPECT_EQ(kExpectedData.nominalVoltage.value(),

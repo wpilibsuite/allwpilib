@@ -26,7 +26,6 @@ struct wpi::Protobuf<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
         std::conditional_t<Rows * Cols * sizeof(double) < 256,
                            wpi::UnpackCallback<double, Rows * Cols>,
                            wpi::StdVectorUnpackCallback<double, Rows * Cols>>;
-
     UnpackType data;
     data.Vec().reserve(Rows * Cols);
     data.SetLimits(wpi::DecodeLimits::Fail);
