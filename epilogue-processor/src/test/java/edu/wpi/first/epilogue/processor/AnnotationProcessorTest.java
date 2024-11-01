@@ -301,9 +301,9 @@ class AnnotationProcessorTest {
         byte[] arr1;   // Should be logged
         byte[][] arr2; // Should not be logged
 
-        public byte getX() { return x; }
-        public byte[] getArr1() { return arr1; }
-        public byte[][] getArr2() { return arr2; }
+        public byte getX() { return 0; }
+        public byte[] getArr1() { return null; }
+        public byte[][] getArr2() { return null; }
       }
       """;
 
@@ -348,9 +348,9 @@ class AnnotationProcessorTest {
         char[] arr1;   // Should not be logged
         char[][] arr2; // Should not be logged
 
-        public char getX() { return x; }
-        public char[] getArr1() { return arr1; }
-        public char[][] getArr2() { return arr2; }
+        public char getX() { return 'x'; }
+        public char[] getArr1() { return null; }
+        public char[][] getArr2() { return null; }
       }
       """;
 
@@ -393,9 +393,9 @@ class AnnotationProcessorTest {
         short[] arr1;   // Should not be logged
         short[][] arr2; // Should not be logged
 
-        public short getX() { return x; }
-        public short[] getArr1() { return arr1; }
-        public short[][] getArr2() { return arr2; }
+        public short getX() { return 0; }
+        public short[] getArr1() { return null; }
+        public short[][] getArr2() { return null; }
       }
       """;
 
@@ -438,9 +438,9 @@ class AnnotationProcessorTest {
         int[] arr1;   // Should be logged
         int[][] arr2; // Should not be logged
 
-        public int getX() { return x; }
-        public int[] getArr1() { return arr1; }
-        public int[][] getArr2() { return arr2; }
+        public int getX() { return 0; }
+        public int[] getArr1() { return null; }
+        public int[][] getArr2() { return null; }
       }
       """;
 
@@ -485,9 +485,9 @@ class AnnotationProcessorTest {
         long[] arr1;   // Should be logged
         long[][] arr2; // Should not be logged
 
-        public long getX() { return x; }
-        public long[] getArr1() { return arr1; }
-        public long[][] getArr2() { return arr2; }
+        public long getX() { return 0; }
+        public long[] getArr1() { return null; }
+        public long[][] getArr2() { return null; }
       }
       """;
 
@@ -532,9 +532,9 @@ class AnnotationProcessorTest {
         float[] arr1;   // Should be logged
         float[][] arr2; // Should not be logged
 
-        public float getX() { return x; }
-        public float[] getArr1() { return arr1; }
-        public float[][] getArr2() { return arr2; }
+        public float getX() { return 0; }
+        public float[] getArr1() { return null; }
+        public float[][] getArr2() { return null; }
       }
       """;
 
@@ -582,9 +582,9 @@ class AnnotationProcessorTest {
         double[][] arr2; // Should not be logged
         List<Double> list; // Should not be logged
 
-        public double getX() { return x; }
-        public double[] getArr1() { return arr1; }
-        public double[][] getArr2() { return arr2; }
+        public double getX() { return 0; }
+        public double[] getArr1() { return null; }
+        public double[][] getArr2() { return null; }
       }
       """;
 
@@ -631,9 +631,9 @@ class AnnotationProcessorTest {
         boolean[][] arr2; // Should not be logged
         List<Boolean> list; // Should not be logged
 
-        public boolean getX() { return x; }
-        public boolean[] getArr1() { return arr1; }
-        public boolean[][] getArr2() { return arr2; }
+        public boolean getX() { return false; }
+        public boolean[] getArr1() { return null; }
+        public boolean[][] getArr2() { return null; }
       }
       """;
 
@@ -681,9 +681,9 @@ class AnnotationProcessorTest {
         String[][] arr2; // Should not be logged
         List<String> list;  // Should be logged
 
-        public String getX() { return x; }
-        public String[] getArr1() { return arr1; }
-        public String[][] getArr2() { return arr2; }
+        public String getX() { return null; }
+        public String[] getArr1() { return null; }
+        public String[][] getArr2() { return null; }
       }
       """;
 
@@ -740,9 +740,9 @@ class AnnotationProcessorTest {
         Structable[][] arr2; // Should not be logged
         List<Structable> list; // Should be logged
 
-        public Structable getX() { return x; }
-        public Structable[] getArr1() { return arr1; }
-        public Structable[][] getArr2() { return arr2; }
+        public Structable getX() { return null; }
+        public Structable[] getArr1() { return null; }
+        public Structable[][] getArr2() { return null; }
       }
       """;
 
@@ -1136,6 +1136,187 @@ class AnnotationProcessorTest {
     assertEquals(
         "[EPILOGUE] Excluded from logs because java.lang.Throwable is not a loggable data type",
         message);
+  }
+
+  @Test
+  void loggingRecords() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        @Logged
+        record Example(double x, double y) { }
+        """;
+
+    String expectedRootLogger =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              dataLogger.log("x", object.x());
+              dataLogger.log("y", object.y());
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void errorsOnFieldNameConflicts() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        @Logged
+        class Example {
+          @Logged(name = "Custom Name") double x;
+          @Logged(name = "Custom Name") double y;
+          @Logged(name = "Custom Name") double z;
+        }
+        """;
+
+    Compilation compilation =
+        javac()
+            .withProcessors(new AnnotationProcessor())
+            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+
+    assertThat(compilation).failed();
+    assertThat(compilation).hadErrorCount(3);
+
+    List<Diagnostic<? extends JavaFileObject>> errors = compilation.errors();
+    assertAll(
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.y, Example.z",
+                5,
+                40,
+                errors.get(0)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.x, Example.z",
+                6,
+                40,
+                errors.get(1)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.x, Example.y",
+                7,
+                40,
+                errors.get(2)));
+  }
+
+  @Test
+  void doesNotErrorOnGetterMethod() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        @Logged
+        class Example {
+          double x;
+          public double x() { return x; }
+          public double getX() { return x; }
+          public double aTotallyArbitraryNameForAnAccessorMethod() { return x; }
+          public double withANoOpTransform() { return x + 0; }
+          public double withTemp() { var temp = x; return temp; }
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              dataLogger.log("x", object.x);
+              dataLogger.log("withANoOpTransform", object.withANoOpTransform());
+              dataLogger.log("withTemp", object.withTemp());
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void configuredDefaultNaming() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        @Logged(defaultNaming = Logged.Naming.USE_HUMAN_NAME)
+        class Example {
+          double m_memberPrefix;
+          double kConstantPrefix;
+          double k_otherConstantPrefix;
+          double s_otherPrefix;
+
+          public double getTheGetterMethod() {
+            return 0;
+          }
+
+          @Logged(defaultNaming = Logged.Naming.USE_CODE_NAME)
+          public double optedOut() {
+            return 0;
+          }
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              dataLogger.log("Member Prefix", object.m_memberPrefix);
+              dataLogger.log("Constant Prefix", object.kConstantPrefix);
+              dataLogger.log("Other Constant Prefix", object.k_otherConstantPrefix);
+              dataLogger.log("Other Prefix", object.s_otherPrefix);
+              dataLogger.log("The Getter Method", object.getTheGetterMethod());
+              dataLogger.log("optedOut", object.optedOut());
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
   }
 
   private void assertCompilationError(
