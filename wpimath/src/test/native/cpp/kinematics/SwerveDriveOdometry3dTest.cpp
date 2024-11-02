@@ -31,17 +31,10 @@ class SwerveDriveOdometry3dTest : public ::testing::Test {
 };
 
 TEST_F(SwerveDriveOdometry3dTest, Initialize) {
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Werror=maybe-uninitialized"
-#endif  // defined(__GNUC__) && !defined(__clang__)
   SwerveDriveOdometry3d odometry{m_kinematics,
                                  0_rad,
                                  {zero, zero, zero, zero},
                                  frc::Pose2d{1_m, 2_m, 45_deg}};
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__) && !defined(__clang__)
 
   const frc::Pose2d& pose = odometry.GetPose();
 
