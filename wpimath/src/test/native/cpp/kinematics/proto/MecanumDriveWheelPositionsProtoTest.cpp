@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-
 #include <wpi/SmallVector.h>
 
 #include "frc/kinematics/MecanumDriveWheelPositions.h"
@@ -25,7 +24,8 @@ TEST(MecanumDriveWheelPositionsProtoTest, Roundtrip) {
   ASSERT_TRUE(unpacked_data.has_value());
 
   EXPECT_EQ(kExpectedData.frontLeft.value(), unpacked_data->frontLeft.value());
-  EXPECT_EQ(kExpectedData.frontRight.value(), unpacked_data->frontRight.value());
+  EXPECT_EQ(kExpectedData.frontRight.value(),
+            unpacked_data->frontRight.value());
   EXPECT_EQ(kExpectedData.rearLeft.value(), unpacked_data->rearLeft.value());
   EXPECT_EQ(kExpectedData.rearRight.value(), unpacked_data->rearRight.value());
 }

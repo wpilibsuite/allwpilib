@@ -8,7 +8,6 @@
 
 #include <fmt/format.h>
 #include <wpi/protobuf/Protobuf.h>
-
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "frc/kinematics/SwerveDriveKinematics.h"
@@ -24,7 +23,7 @@ struct wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>> {
       wpi::ProtoInputStream& stream) {
     wpi::WpiArrayUnpackCallback<frc::Translation2d, NumModules> modules;
     wpi_proto_ProtobufSwerveDriveKinematics msg{
-      .modules = modules.Callback(),
+        .modules = modules.Callback(),
     };
     modules.SetLimits(wpi::DecodeLimits::Fail);
     if (!stream.DecodeNoInit(msg)) {

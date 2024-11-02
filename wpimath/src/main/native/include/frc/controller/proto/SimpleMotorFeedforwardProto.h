@@ -8,8 +8,8 @@
 
 #include "controller.npb.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
-#include "units/length.h"
 #include "pb.h"
+#include "units/length.h"
 
 // Everything is converted into units for
 // frc::SimpleMotorFeedforward<units::meters>

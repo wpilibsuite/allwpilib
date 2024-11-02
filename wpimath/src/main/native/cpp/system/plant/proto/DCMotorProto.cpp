@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/system/plant/proto/DCMotorProto.h"
+
 #include <optional>
 
 #include "plant.npb.h"

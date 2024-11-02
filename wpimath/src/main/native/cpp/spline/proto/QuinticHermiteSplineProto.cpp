@@ -12,8 +12,8 @@ const pb_msgdesc_t* wpi::Protobuf<frc::QuinticHermiteSpline>::Message() {
   return get_wpi_proto_ProtobufQuinticHermiteSpline_msg();
 }
 
-std::optional<frc::QuinticHermiteSpline>
-wpi::Protobuf<frc::QuinticHermiteSpline>::Unpack(wpi::ProtoInputStream& stream) {
+std::optional<frc::QuinticHermiteSpline> wpi::Protobuf<
+    frc::QuinticHermiteSpline>::Unpack(wpi::ProtoInputStream& stream) {
   wpi::WpiArrayUnpackCallback<double, 3> xInitial;
   wpi::WpiArrayUnpackCallback<double, 3> xFinal;
   wpi::WpiArrayUnpackCallback<double, 3> yInitial;

@@ -11,7 +11,7 @@
 #include "pb.h"
 
 struct TestProtoInner {
-    std::string msg;
+  std::string msg;
 };
 
 template <>

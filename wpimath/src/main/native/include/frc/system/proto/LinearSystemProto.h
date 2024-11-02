@@ -42,8 +42,8 @@ struct wpi::Protobuf<frc::LinearSystem<States, Inputs, Outputs>> {
       return {};
     }
 
-    if (msg.num_inputs != Inputs || msg.num_outputs !=
-        Outputs || msg.num_states != States) {
+    if (msg.num_inputs != Inputs || msg.num_outputs != Outputs ||
+        msg.num_states != States) {
       return {};
     }
 
@@ -71,14 +71,14 @@ struct wpi::Protobuf<frc::LinearSystem<States, Inputs, Outputs>> {
     wpi::PackCallback c{&value.C()};
     wpi::PackCallback d{&value.D()};
 
-    wpi_proto_ProtobufLinearSystem msg {
-      .num_states = States,
-      .num_inputs = Inputs,
-      .num_outputs = Outputs,
-      .a = a.Callback(),
-      .b = b.Callback(),
-      .c = c.Callback(),
-      .d = d.Callback(),
+    wpi_proto_ProtobufLinearSystem msg{
+        .num_states = States,
+        .num_inputs = Inputs,
+        .num_outputs = Outputs,
+        .a = a.Callback(),
+        .b = b.Callback(),
+        .c = c.Callback(),
+        .d = d.Callback(),
     };
 
     return stream.Encode(msg);

@@ -4,9 +4,9 @@
 
 #include "frc/geometry/proto/Pose2dProto.h"
 
-#include "geometry2d.npb.h"
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "wpi/protobuf/ProtobufCallbacks.h"
+#include "geometry2d.npb.h"
 
 const pb_msgdesc_t* wpi::Protobuf<frc::Pose2d>::Message() {
   return get_wpi_proto_ProtobufPose2d_msg();

@@ -12,8 +12,7 @@
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Trajectory> {
   static const pb_msgdesc_t* Message();
-  static std::optional<frc::Trajectory> Unpack(
-      wpi::ProtoInputStream& stream);
+  static std::optional<frc::Trajectory> Unpack(wpi::ProtoInputStream& stream);
   static bool Pack(wpi::ProtoOutputStream& stream,
                    const frc::Trajectory& value);
 };

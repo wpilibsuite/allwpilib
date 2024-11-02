@@ -4,18 +4,16 @@
 
 #pragma once
 
-#include "wpi/protobuf/Protobuf.h"
-#include "wpi/SmallVector.h"
-
-#include "wpi/array.h"
-
 #include <span>
 #include <utility>
 #include <vector>
 
-#include "pb.h"
-
 #include <fmt/format.h>
+
+#include "pb.h"
+#include "wpi/SmallVector.h"
+#include "wpi/array.h"
+#include "wpi/protobuf/Protobuf.h"
 
 namespace wpi {
 

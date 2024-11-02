@@ -4,8 +4,9 @@
 
 #include "frc/geometry/proto/Transform2dProto.h"
 
+#include <wpi/protobuf/ProtobufCallbacks.h>
+
 #include "geometry2d.npb.h"
-#include "wpi/protobuf/ProtobufCallbacks.h"
 
 const pb_msgdesc_t* wpi::Protobuf<frc::Transform2d>::Message() {
   return get_wpi_proto_ProtobufTransform2d_msg();

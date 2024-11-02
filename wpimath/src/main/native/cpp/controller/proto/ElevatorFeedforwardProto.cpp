@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/controller/proto/ElevatorFeedforwardProto.h"
+
 #include <optional>
 
 #include "controller.npb.h"

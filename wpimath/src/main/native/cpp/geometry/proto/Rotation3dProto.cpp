@@ -3,7 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/geometry/proto/Rotation3dProto.h"
-#include "wpi/protobuf/ProtobufCallbacks.h"
+
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "geometry3d.npb.h"
 

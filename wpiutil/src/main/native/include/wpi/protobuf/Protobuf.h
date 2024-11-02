@@ -14,12 +14,11 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/array.h"
-#include "wpi/function_ref.h"
-
 #include "pb.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
+#include "wpi/array.h"
+#include "wpi/function_ref.h"
 
 namespace wpi {
 
@@ -217,7 +216,8 @@ class ProtobufMessage {
    */
   bool UnpackInto(T* out, std::span<const uint8_t> data) {
     if constexpr (MutableProtobufSerializable<T>) {
-      ProtoInputStream stream{data, Protobuf<std::remove_cvref_t<T>>::Message()};
+      ProtoInputStream stream{data,
+                              Protobuf<std::remove_cvref_t<T>>::Message()};
       return Protobuf<std::remove_cvref_t<T>>::UnpackInto(out, stream);
     } else {
       auto unpacked = Unpack(data);
@@ -275,7 +275,8 @@ class ProtobufMessage {
       function_ref<void(std::string_view filename,
                         std::span<const uint8_t> descriptor)>
           fn) {
-    detail::ForEachProtobufDescriptor(Protobuf<std::remove_cvref_t<T>>::Message(), exists, fn);
+    detail::ForEachProtobufDescriptor(
+        Protobuf<std::remove_cvref_t<T>>::Message(), exists, fn);
   }
 };
 

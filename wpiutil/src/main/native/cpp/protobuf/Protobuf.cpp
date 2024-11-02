@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <fmt/format.h>
+
 #include "wpi/SmallVector.h"
 
 using namespace wpi;

@@ -3,14 +3,14 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "TestProtoInner.h"
-#include <gtest/gtest.h>
 
 #include <string>
 #include <utility>
 
-#include "wpiutil.npb.h"
+#include <gtest/gtest.h>
 
 #include "wpi/protobuf/ProtobufCallbacks.h"
+#include "wpiutil.npb.h"
 
 const pb_msgdesc_t* wpi::Protobuf<TestProtoInner>::Message() {
   return get_wpi_proto_TestProtoInner_msg();
@@ -48,7 +48,7 @@ namespace {
 using ProtoType = wpi::Protobuf<TestProtoInner>;
 }  // namespace
 
-TEST(TestProtoInner, RoundtripNanopb) {
+TEST(TestProtoInnerTest, RoundtripNanopb) {
   const TestProtoInner kExpectedData = TestProtoInner{"Hello!"};
 
   wpi::ProtobufMessage<TestProtoInner> message;
@@ -60,7 +60,7 @@ TEST(TestProtoInner, RoundtripNanopb) {
   EXPECT_EQ(kExpectedData.msg, unpacked_data->msg);
 }
 
-TEST(TestProtoInner, RoundtripNanopbEmpty) {
+TEST(TestProtoInnerTest, RoundtripNanopbEmpty) {
   const TestProtoInner kExpectedData = TestProtoInner{"Hello!"};
 
   wpi::ProtobufMessage<TestProtoInner> message;

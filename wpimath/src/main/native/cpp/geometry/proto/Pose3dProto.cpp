@@ -4,9 +4,10 @@
 
 #include "frc/geometry/proto/Pose3dProto.h"
 
+#include <wpi/protobuf/Protobuf.h>
+#include <wpi/protobuf/ProtobufCallbacks.h>
+
 #include "frc/geometry/Pose3d.h"
-#include "wpi/protobuf/Protobuf.h"
-#include "wpi/protobuf/ProtobufCallbacks.h"
 #include "geometry3d.npb.h"
 
 const pb_msgdesc_t* wpi::Protobuf<frc::Pose3d>::Message() {
