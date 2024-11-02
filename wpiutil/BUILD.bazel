@@ -228,7 +228,10 @@ cc_library(
 cc_test(
     name = "wpiutil-cpp-test",
     size = "small",
-    srcs = glob(["src/test/native/cpp/**", "src/generated/test/native/cpp/*.cpp"]),
+    srcs = glob([
+        "src/test/native/cpp/**", 
+        "src/generated/test/native/cpp/*.cpp"
+    ]),
     linkstatic = True,
     tags = ["no-tsan"],  # TODO(pj.reiniger) Find problem
     deps = [
