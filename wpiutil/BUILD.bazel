@@ -230,7 +230,7 @@ cc_test(
     size = "small",
     srcs = glob([
         "src/test/native/cpp/**",
-        "src/generated/test/native/cpp/*.cpp",
+        "src/generated/test/native/cpp/*",
     ]),
     linkstatic = True,
     tags = ["no-tsan"],  # TODO(pj.reiniger) Find problem
