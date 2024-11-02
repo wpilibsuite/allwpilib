@@ -6,6 +6,8 @@
 
 #include <wpi/protobuf/Protobuf.h>
 
+#include <string>
+
 #include "pb.h"
 
 struct TestProtoInner {

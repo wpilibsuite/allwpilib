@@ -10,6 +10,8 @@
 #include "wpi/array.h"
 
 #include <span>
+#include <utility>
+#include <vector>
 
 #include "pb.h"
 
@@ -35,10 +37,6 @@ concept UnpackBytes = requires(T& t) {
   { t.size() } -> std::same_as<size_t>;
   { t.data() } -> std::convertible_to<void*>;
 } && (PackBytes<T> || MutableVectorLike<T>);
-
-static_assert(UnpackBytes<std::string>);
-static_assert(UnpackBytes<std::vector<uint8_t>>);
-static_assert(UnpackBytes<wpi::SmallVector<uint8_t, 128>>);
 
 enum class DecodeLimits {
   Ignore,
@@ -82,7 +80,7 @@ constexpr bool ValidateType(pb_type_t type) {
 template <typename T, typename U, size_t N = 1>
 class DirectUnpackCallback {
  public:
-  DirectUnpackCallback(U& storage) : m_storage{storage} {
+  explicit DirectUnpackCallback(U& storage) : m_storage{storage} {
     m_callback.funcs.decode = CallbackFunc;
     m_callback.arg = this;
   }
@@ -90,8 +88,6 @@ class DirectUnpackCallback {
   DirectUnpackCallback(DirectUnpackCallback&&) = delete;
   DirectUnpackCallback& operator=(const DirectUnpackCallback&) = delete;
   DirectUnpackCallback& operator=(DirectUnpackCallback&&) = delete;
-
-  // TODO, do we want a limit that is higher then the small size?
 
   void SetLimits(DecodeLimits limit) noexcept { m_limits = limit; }
 
@@ -359,11 +355,11 @@ concept ProtoPackable = ProtobufSerializable<T> || PackBytes<T> ||
 template <ProtoPackable T>
 class PackCallback {
  public:
-  PackCallback(std::span<const T> buffer) : m_buffer{buffer} {
+  explicit PackCallback(std::span<const T> buffer) : m_buffer{buffer} {
     m_callback.funcs.encode = CallbackFunc;
     m_callback.arg = this;
   }
-  PackCallback(const T* element) : m_buffer{std::span<const T>{element, 1}} {
+  explicit PackCallback(const T* element) : m_buffer{std::span<const T>{element, 1}} {
     m_callback.funcs.encode = CallbackFunc;
     m_callback.arg = this;
   }

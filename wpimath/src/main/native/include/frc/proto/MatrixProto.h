@@ -56,7 +56,8 @@ struct wpi::Protobuf<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
   static bool Pack(
       wpi::ProtoOutputStream& stream,
       const frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>& value) {
-    std::span<const double> dataSpan{value.data(), static_cast<size_t>(Rows * Cols)};
+    std::span<const double> dataSpan{value.data(),
+                                     static_cast<size_t>(Rows * Cols)};
     wpi::PackCallback<double> data{dataSpan};
     wpi_proto_ProtobufMatrix msg{
         .num_rows = Rows,

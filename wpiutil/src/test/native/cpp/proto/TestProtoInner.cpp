@@ -5,6 +5,9 @@
 #include "TestProtoInner.h"
 #include <gtest/gtest.h>
 
+#include <string>
+#include <utility>
+
 #include "wpiutil.npb.h"
 
 #include "wpi/protobuf/ProtobufCallbacks.h"

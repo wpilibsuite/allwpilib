@@ -4,6 +4,8 @@
 
 #include "frc/trajectory/proto/TrajectoryStateProto.h"
 
+#include <utility>
+
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "trajectory.npb.h"

@@ -7,6 +7,8 @@
 
 #include <wpi/ProtoHelper.h>
 
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "wpiutil.npb.h"
