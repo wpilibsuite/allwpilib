@@ -14,8 +14,8 @@
 // Everything is converted into units for
 // frc::SimpleMotorFeedforward<units::meters>
 
-template <typename Distance>
-struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>> {
+template <class Distance>
+struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>> {  // NOLINT
   static const pb_msgdesc_t* Message() {
     return get_wpi_proto_ProtobufSimpleMotorFeedforward_msg();
   }
