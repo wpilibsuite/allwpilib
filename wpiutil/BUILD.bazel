@@ -225,6 +225,14 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
+cc_library(
+    name = "nanopb-test-headers",
+    hdrs = glob(["src/generated/test/native/cpp/*.h"]),
+    includes = ["src/generated/test/native/cpp"],
+    strip_include_prefix = "src/generated/test/native/cpp",
+    visibility = ["//wpiutil:__subpackages__"],
+)
+
 cc_test(
     name = "wpiutil-cpp-test",
     size = "small",
@@ -237,6 +245,7 @@ cc_test(
     deps = [
         ":wpiutil.static",
         ":wpiutil-testlib",
+        ":nanopb-test-headers",
         "//thirdparty/googletest:googletest.static",
     ],
 )
