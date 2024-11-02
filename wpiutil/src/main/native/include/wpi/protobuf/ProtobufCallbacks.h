@@ -33,7 +33,7 @@ concept PackBytes = StringLike<T> || ConstVectorLike<T>;
 
 template <typename T>
 concept UnpackBytes = requires(T& t) {
-  { t.resize(size_t()) };
+  { t.resize(size_t()) };  // NOLINT
   { t.size() } -> std::same_as<size_t>;
   { t.data() } -> std::convertible_to<void*>;
 } && (PackBytes<T> || MutableVectorLike<T>);
@@ -317,14 +317,13 @@ struct WpiArrayEmplaceWrapper {
   wpi::array<T, N> m_array{wpi::empty_array_t{}};
   size_t m_currentIndex = 0;
 
-  size_t size() const {
-    return m_currentIndex;
-  }
+  size_t size() const { return m_currentIndex; }
 
-  template <typename... ArgTypes> T& emplace_back(ArgTypes &&... Args) {
+  template <typename... ArgTypes>
+  T& emplace_back(ArgTypes&&... Args) {
     m_array[m_currentIndex] = T(std::forward<ArgTypes>(Args)...);
     m_currentIndex++;
-    return m_array[m_currentIndex -1 ];
+    return m_array[m_currentIndex - 1];
   }
 };
 
@@ -336,9 +335,7 @@ struct WpiArrayUnpackCallback
     this->SetLimits(DecodeLimits::Fail);
   }
 
-  bool IsFull() const noexcept {
-    return m_array.m_currentIndex == N;
-  }
+  bool IsFull() const noexcept { return m_array.m_currentIndex == N; }
 
   size_t Size() const noexcept { return m_array.m_currentIndex; }
 
@@ -359,7 +356,8 @@ class PackCallback {
     m_callback.funcs.encode = CallbackFunc;
     m_callback.arg = this;
   }
-  explicit PackCallback(const T* element) : m_buffer{std::span<const T>{element, 1}} {
+  explicit PackCallback(const T* element)
+      : m_buffer{std::span<const T>{element, 1}} {
     m_callback.funcs.encode = CallbackFunc;
     m_callback.arg = this;
   }
