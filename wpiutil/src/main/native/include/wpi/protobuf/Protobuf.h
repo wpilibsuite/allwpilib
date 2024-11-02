@@ -80,6 +80,7 @@ class ProtoOutputStream {
     m_streamLocal.state = &out;
     m_streamLocal.max_size = SIZE_MAX;
     m_streamLocal.bytes_written = 0;
+    m_streamLocal.errmsg = nullptr;
   }
 
   ProtoOutputStream(StdVectorType& out, const pb_msgdesc_t* msgDesc)
@@ -88,6 +89,7 @@ class ProtoOutputStream {
     m_streamLocal.state = &out;
     m_streamLocal.max_size = SIZE_MAX;
     m_streamLocal.bytes_written = 0;
+    m_streamLocal.errmsg = nullptr;
   }
 
   explicit ProtoOutputStream(const pb_msgdesc_t* msgDesc)
