@@ -19,7 +19,7 @@ def render_template(
     output_dir.mkdir(parents=True, exist_ok=True)
 
     output_file = output_dir / filename
-    output_file.write_text(template.render(controller), encoding="utf-8")
+    output_file.write_text(template.render(controller), encoding="utf-8", newline="\n")
 
 
 def generate_pwm_motor_controllers(output_root, template_root):

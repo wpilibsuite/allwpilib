@@ -278,6 +278,17 @@ public interface Distance extends Measure<DistanceUnit> {
 
 
   @Override
+  default Mult<DistanceUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<DistanceUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<DistanceUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<DistanceUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<DistanceUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<DistanceUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }

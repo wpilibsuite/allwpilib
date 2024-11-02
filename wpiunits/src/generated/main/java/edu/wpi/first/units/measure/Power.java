@@ -278,6 +278,17 @@ public interface Power extends Measure<PowerUnit> {
 
 
   @Override
+  default Mult<PowerUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<PowerUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<PowerUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<PowerUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<PowerUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<PowerUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }

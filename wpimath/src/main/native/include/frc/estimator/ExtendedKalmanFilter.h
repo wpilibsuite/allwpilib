@@ -5,6 +5,7 @@
 #pragma once
 
 #include <functional>
+#include <string>
 #include <utility>
 
 #include <Eigen/Cholesky>
@@ -13,6 +14,7 @@
 #include "frc/DARE.h"
 #include "frc/EigenCore.h"
 #include "frc/StateSpaceUtil.h"
+#include "frc/fmt/Eigen.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/NumericalJacobian.h"
@@ -100,8 +102,37 @@ class ExtendedKalmanFilter {
     Matrixd<Outputs, Outputs> discR = DiscretizeR<Outputs>(m_contR, dt);
 
     if (IsDetectable<States, Outputs>(discA, C) && Outputs <= States) {
-      m_initP =
-          DARE<States, Outputs>(discA.transpose(), C.transpose(), discQ, discR);
+      if (auto P = DARE<States, Outputs>(discA.transpose(), C.transpose(),
+                                         discQ, discR)) {
+        m_initP = P.value();
+      } else if (P.error() == DAREError::QNotSymmetric ||
+                 P.error() == DAREError::QNotPositiveSemidefinite) {
+        std::string msg =
+            fmt::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
+
+        wpi::math::MathSharedStore::ReportError(msg);
+        throw std::invalid_argument(msg);
+      } else if (P.error() == DAREError::RNotSymmetric ||
+                 P.error() == DAREError::RNotPositiveDefinite) {
+        std::string msg =
+            fmt::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
+
+        wpi::math::MathSharedStore::ReportError(msg);
+        throw std::invalid_argument(msg);
+      } else if (P.error() == DAREError::ABNotStabilizable) {
+        std::string msg = fmt::format(
+            "The (A, C) pair is not detectable.\n\nA =\n{}\nC =\n{}\n",
+            to_string(P.error()), discA, C);
+
+        wpi::math::MathSharedStore::ReportError(msg);
+        throw std::invalid_argument(msg);
+      } else if (P.error() == DAREError::ACNotDetectable) {
+        std::string msg = fmt::format("{}\n\nA =\n{}\nQ =\n{}\n",
+                                      to_string(P.error()), discA, discQ);
+
+        wpi::math::MathSharedStore::ReportError(msg);
+        throw std::invalid_argument(msg);
+      }
     } else {
       m_initP = StateMatrix::Zero();
     }
@@ -155,8 +186,37 @@ class ExtendedKalmanFilter {
     Matrixd<Outputs, Outputs> discR = DiscretizeR<Outputs>(m_contR, dt);
 
     if (IsDetectable<States, Outputs>(discA, C) && Outputs <= States) {
-      m_initP =
-          DARE<States, Outputs>(discA.transpose(), C.transpose(), discQ, discR);
+      if (auto P = DARE<States, Outputs>(discA.transpose(), C.transpose(),
+                                         discQ, discR)) {
+        m_initP = P.value();
+      } else if (P.error() == DAREError::QNotSymmetric ||
+                 P.error() == DAREError::QNotPositiveSemidefinite) {
+        std::string msg =
+            fmt::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
+
+        wpi::math::MathSharedStore::ReportError(msg);
+        throw std::invalid_argument(msg);
+      } else if (P.error() == DAREError::RNotSymmetric ||
+                 P.error() == DAREError::RNotPositiveDefinite) {
+        std::string msg =
+            fmt::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
+
+        wpi::math::MathSharedStore::ReportError(msg);
+        throw std::invalid_argument(msg);
+      } else if (P.error() == DAREError::ABNotStabilizable) {
+        std::string msg = fmt::format(
+            "The (A, C) pair is not detectable.\n\nA =\n{}\nC =\n{}\n",
+            to_string(P.error()), discA, C);
+
+        wpi::math::MathSharedStore::ReportError(msg);
+        throw std::invalid_argument(msg);
+      } else if (P.error() == DAREError::ACNotDetectable) {
+        std::string msg = fmt::format("{}\n\nA =\n{}\nQ =\n{}\n",
+                                      to_string(P.error()), discA, discQ);
+
+        wpi::math::MathSharedStore::ReportError(msg);
+        throw std::invalid_argument(msg);
+      }
     } else {
       m_initP = StateMatrix::Zero();
     }

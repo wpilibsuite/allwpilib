@@ -22,10 +22,10 @@ jobs:
         run: |
           git checkout -b pr
           git branch -f main origin/main
-      - name: Set up Python 3.9
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: '3.12'
       - name: Configure committer identity
         run: |
           git config --global user.email "you@example.com"

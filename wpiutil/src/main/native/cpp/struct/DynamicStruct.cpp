@@ -5,7 +5,6 @@
 #include "wpi/struct/DynamicStruct.h"
 
 #include <algorithm>
-#include <memory>
 #include <string>
 #include <utility>
 
@@ -195,14 +194,12 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
   }
 
   // turn parsed schema into descriptors
-  auto& theStruct = m_structs[name];
-  if (!theStruct) {
-    theStruct = std::make_unique<StructDescriptor>(
-        name, StructDescriptor::private_init{});
-  }
-  theStruct->m_schema = schema;
-  theStruct->m_fields.clear();
-  theStruct->m_fields.reserve(parsed.declarations.size());
+  auto& theStruct =
+      m_structs.try_emplace(name, name, StructDescriptor::private_init{})
+          .first->second;
+  theStruct.m_schema = schema;
+  theStruct.m_fields.clear();
+  theStruct.m_fields.reserve(parsed.declarations.size());
   bool isValid = true;
   for (auto&& decl : parsed.declarations) {
     auto type = TypeStringToType(decl.typeString);
@@ -251,43 +248,41 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
       }
 
       // cross-reference struct, creating a placeholder if necessary
-      auto& aStruct = m_structs[decl.typeString];
-      if (!aStruct) {
-        aStruct = std::make_unique<StructDescriptor>(
-            decl.typeString, StructDescriptor::private_init{});
-      }
+      auto& aStruct = m_structs
+                          .try_emplace(decl.typeString, decl.typeString,
+                                       StructDescriptor::private_init{})
+                          .first->second;
 
       // if the struct isn't valid, we can't be valid either
-      if (aStruct->IsValid()) {
-        size = aStruct->GetSize();
+      if (aStruct.IsValid()) {
+        size = aStruct.GetSize();
       } else {
         isValid = false;
       }
 
       // add to cross-references for when the struct does become valid
-      aStruct->m_references.emplace_back(theStruct.get());
-      structDesc = aStruct.get();
+      aStruct.m_references.emplace_back(&theStruct);
+      structDesc = &aStruct;
     }
 
     // create field
-    if (!theStruct->m_fieldsByName
-             .insert({decl.name, theStruct->m_fields.size()})
+    if (!theStruct.m_fieldsByName.insert({decl.name, theStruct.m_fields.size()})
              .second) {
       *err = fmt::format("duplicate field {}", decl.name);
       [[unlikely]] return nullptr;
     }
 
-    theStruct->m_fields.emplace_back(theStruct.get(), decl.name, type, size,
-                                     decl.arraySize, decl.bitWidth,
-                                     std::move(decl.enumValues), structDesc,
-                                     StructFieldDescriptor::private_init{});
+    theStruct.m_fields.emplace_back(&theStruct, decl.name, type, size,
+                                    decl.arraySize, decl.bitWidth,
+                                    std::move(decl.enumValues), structDesc,
+                                    StructFieldDescriptor::private_init{});
   }
 
-  theStruct->m_valid = isValid;
+  theStruct.m_valid = isValid;
   if (isValid) {
     // we have all the info needed, so calculate field offset & shift
     wpi::SmallVector<const StructDescriptor*, 16> stack;
-    auto err2 = theStruct->CalculateOffsets(stack);
+    auto err2 = theStruct.CalculateOffsets(stack);
     if (!err2.empty()) {
       *err = std::move(err2);
       [[unlikely]] return nullptr;
@@ -295,7 +290,7 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
   } else {
     // check for circular reference
     wpi::SmallVector<const StructDescriptor*, 16> stack;
-    if (!theStruct->CheckCircular(stack)) {
+    if (!theStruct.CheckCircular(stack)) {
       wpi::SmallString<128> buf;
       wpi::raw_svector_ostream os{buf};
       for (auto&& elem : stack) {
@@ -309,7 +304,7 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
     }
   }
 
-  return theStruct.get();
+  return &theStruct;
 }
 
 const StructDescriptor* StructDescriptorDatabase::Find(
@@ -318,7 +313,7 @@ const StructDescriptor* StructDescriptorDatabase::Find(
   if (it == m_structs.end()) {
     return nullptr;
   }
-  return it->second.get();
+  return &it->second;
 }
 
 uint64_t DynamicStruct::GetFieldImpl(const StructFieldDescriptor* field,

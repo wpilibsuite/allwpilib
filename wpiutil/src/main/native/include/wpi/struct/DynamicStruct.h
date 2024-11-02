@@ -7,14 +7,12 @@
 #include <stdint.h>
 
 #include <cassert>
-#include <memory>
 #include <span>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include "wpi/MathExtras.h"
 #include "wpi/StringMap.h"
 #include "wpi/bit.h"
 
@@ -357,7 +355,7 @@ class StructDescriptorDatabase {
   const StructDescriptor* Find(std::string_view name) const;
 
  private:
-  StringMap<std::unique_ptr<StructDescriptor>> m_structs;
+  StringMap<StructDescriptor> m_structs;
 };
 
 /**

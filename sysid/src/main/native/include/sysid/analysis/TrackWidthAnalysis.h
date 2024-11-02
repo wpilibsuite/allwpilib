@@ -4,9 +4,11 @@
 
 #pragma once
 
+#include <gcem.hpp>
 #include <units/angle.h>
 
 namespace sysid {
+
 /**
  * Calculates the track width given the left distance, right distance, and
  * accumulated gyro angle.
@@ -15,5 +17,10 @@ namespace sysid {
  * @param r     The distance traveled by the right side of the drivetrain.
  * @param accum The accumulated gyro angle.
  */
-double CalculateTrackWidth(double l, double r, units::radian_t accum);
+constexpr double CalculateTrackWidth(double l, double r,
+                                     units::radian_t accum) {
+  // The below comes from solving ω = (vr − vl) / 2r for 2r.
+  return (gcem::abs(r) + gcem::abs(l)) / gcem::abs(accum.value());
+}
+
 }  // namespace sysid
