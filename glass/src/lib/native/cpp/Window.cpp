@@ -42,7 +42,7 @@ void Window::Display() {
 
   if (BeginWindow()) {
     if (m_renamePopupEnabled || m_view->HasSettings()) {
-      if (BeginWindowSettingsPopup()) {
+      if (imm::BeginWindowSettingsPopup()) {
         if (m_renamePopupEnabled) {
           EditName();
         }
@@ -118,7 +118,7 @@ void Window::EndWindow() {
   }
 }
 
-bool Window::BeginWindowSettingsPopup() {
+bool imm::BeginWindowSettingsPopup() {
   bool isClicked = (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
                     ImGui::IsItemHovered());
   ImGuiWindow* window = ImGui::GetCurrentWindow();

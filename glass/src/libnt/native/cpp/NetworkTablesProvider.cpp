@@ -15,6 +15,7 @@
 #include <wpigui.h>
 
 #include "glass/Storage.h"
+#include "glass/Window.h"
 
 using namespace glass;
 
@@ -23,14 +24,14 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage)
 
 NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
                                              nt::NetworkTableInstance inst)
-    : Provider{storage.GetChild("windows")},
+    : m_windows{storage.GetChild("windows")},
       m_inst{inst},
       m_poller{inst},
       m_typeCache{storage.GetChild("types")} {
-  storage.SetCustomApply([this] {
+  m_windows.SetCustomApply([this] {
     m_listener = m_poller.AddListener(
         {{""}}, nt::EventFlags::kImmediate | nt::EventFlags::kTopic);
-    for (auto&& childIt : m_storage.GetChildren()) {
+    for (auto&& childIt : m_windows.GetChildren()) {
       auto id = childIt.key();
       auto typePtr = m_typeCache.FindValue(id);
       if (!typePtr || typePtr->type != Storage::Value::kString) {
@@ -53,11 +54,7 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
   storage.SetCustomClear([this, &storage] {
     m_poller.RemoveListener(m_listener);
     m_listener = 0;
-    for (auto&& modelEntry : m_modelEntries) {
-      modelEntry->model.reset();
-    }
-    m_viewEntries.clear();
-    m_windows.clear();
+    m_windows.EraseAll();
     m_typeCache.EraseAll();
     storage.ClearValues();
   });
@@ -66,9 +63,9 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
 void NetworkTablesProvider::DisplayMenu() {
   wpi::SmallVector<std::string_view, 6> path;
   wpi::SmallString<64> name;
-  for (auto&& entry : m_viewEntries) {
+  for (auto&& entry : m_windows.GetChildren()) {
     path.clear();
-    wpi::split(entry->name, path, '/', -1, false);
+    wpi::split(entry.key(), path, '/', -1, false);
 
     bool fullDepth = true;
     int depth = 0;
@@ -81,14 +78,16 @@ void NetworkTablesProvider::DisplayMenu() {
     }
 
     if (fullDepth) {
-      bool visible = entry->window && entry->window->IsVisible();
+      auto* data = entry.value().GetData<Entry>();
+      assert(data);
+      bool visible = data->window && data->window->IsVisible();
       bool wasVisible = visible;
       // FIXME: enabled?
       // data is the last item, so is guaranteed to be null-terminated
       ImGui::MenuItem(path.back().data(), nullptr, &visible, true);
       // Add type label to smartdashboard sendables
-      if (wpi::starts_with(entry->name, "/SmartDashboard/")) {
-        auto typeEntry = m_typeCache.FindValue(entry->name);
+      if (wpi::starts_with(entry.key(), "/SmartDashboard/")) {
+        auto typeEntry = m_typeCache.FindValue(entry.key());
         if (typeEntry) {
           ImGui::SameLine();
           ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
@@ -99,9 +98,10 @@ void NetworkTablesProvider::DisplayMenu() {
         }
       }
       if (!wasVisible && visible) {
-        Show(entry.get(), entry->window);
-      } else if (wasVisible && !visible && entry->window) {
-        entry->window->SetVisible(false);
+        Show(entry.key(), data);
+      } else if (wasVisible && !visible && data->window) {
+        data->window.reset();
+        data->model.reset();
       }
     }
 
@@ -112,8 +112,6 @@ void NetworkTablesProvider::DisplayMenu() {
 }
 
 void NetworkTablesProvider::Update() {
-  Provider::Update();
-
   for (auto&& event : m_poller.ReadQueue()) {
     if (auto info = event.GetTopicInfo()) {
       // add/remove entries from NT changes
@@ -163,6 +161,8 @@ void NetworkTablesProvider::Update() {
       auto tableName =
           wpi::remove_suffix(topicName, "/.type").value_or(topicName);
 
+      auto& storage = m_windows.GetChild(tableName);
+      storage.GetOrNewData<>();
       GetOrCreateView(builderIt->second, nt::Topic{valueData->topic},
                       tableName);
       // cache the type
@@ -173,8 +173,9 @@ void NetworkTablesProvider::Update() {
 
 void NetworkTablesProvider::Register(std::string_view typeName,
                                      CreateModelFunc createModel,
-                                     CreateViewFunc createView) {
-  m_typeMap[typeName] = Builder{std::move(createModel), std::move(createView)};
+                                     SetupWindowFunc setupWindow,
+                                     DisplayFunc display) {
+  m_typeMap[typeName] = Builder{std::move(createModel), std::move(setupWindow), std::move(display)};
 }
 
 void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {

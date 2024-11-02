@@ -130,8 +130,6 @@ class Window {
   [[nodiscard]]
   bool BeginWindow();
   void EndWindow();
-  [[nodiscard]]
-  bool BeginWindowSettingsPopup();
 
   bool EditName() { return ItemEditName(&m_name); }
 
@@ -201,9 +199,7 @@ inline void EndWindow() {
 }
 
 [[nodiscard]]
-inline bool BeginWindowSettingsPopup() {
-  return GetWindow()->BeginWindowSettingsPopup();
-}
+bool BeginWindowSettingsPopup();
 
 }  // namespace imm
 
