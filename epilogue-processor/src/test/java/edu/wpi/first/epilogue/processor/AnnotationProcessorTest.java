@@ -1228,6 +1228,69 @@ class AnnotationProcessorTest {
   }
 
   @Test
+  void instanceofChainWithField() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        @Logged
+        interface I {}
+
+        @Logged
+        class Base implements I {}
+
+        @Logged
+        class Example {
+          private I theField;
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+        import java.lang.invoke.MethodHandles;
+        import java.lang.invoke.VarHandle;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          private static final VarHandle $theField;
+
+          static {
+            try {
+              var lookup = MethodHandles.privateLookupIn(Example.class, MethodHandles.lookup());
+              $theField = lookup.findVarHandle(Example.class, "theField", edu.wpi.first.epilogue.I.class);
+            } catch (ReflectiveOperationException e) {
+              throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+            }
+          }
+
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              var $$theField = (edu.wpi.first.epilogue.I) $theField.get(object);
+              if ($$theField instanceof edu.wpi.first.epilogue.Base edu_wpi_first_epilogue_Base) {
+                Epilogue.baseLogger.tryUpdate(dataLogger.getSubLogger("theField"), edu_wpi_first_epilogue_Base, Epilogue.getConfig().errorHandler);
+              } else {
+                // Base type edu.wpi.first.epilogue.I
+                Epilogue.iLogger.tryUpdate(dataLogger.getSubLogger("theField"), $$theField, Epilogue.getConfig().errorHandler);
+              };
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
   void customLogger() {
     String source =
         """
