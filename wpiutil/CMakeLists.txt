@@ -245,9 +245,9 @@ if(WITH_TESTS)
 
 
     wpilib_add_test(wpiutil src/test/native/cpp)
-    target_include_directories(wpiutil_test src/generated/test/native/cpp)
+    target_include_directories(wpiutil_test PRIVATE src/generated/test/native/cpp)
     file(GLOB_RECURSE wpiutil_nanopb_test_src src/generated/test/native/cpp/*.cpp)
-    target_sources(wpiutil_test ${wpiutil_nanopb_test_src})
+    target_sources(wpiutil_test PRIVATE ${wpiutil_nanopb_test_src})
     target_link_libraries(wpiutil_test wpiutil googletest wpiutil_testlib)
     if(MSVC)
         target_compile_options(wpiutil_test PRIVATE /utf-8)
