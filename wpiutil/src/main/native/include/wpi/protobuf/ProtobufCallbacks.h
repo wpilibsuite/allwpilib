@@ -32,11 +32,11 @@ template <typename T>
 concept PackBytes = StringLike<T> || ConstVectorLike<T>;
 
 template <typename T>
-concept UnpackBytes = (PackBytes<T> || MutableVectorLike<T>) && requires(T& t) {
-  { t.resize(size_t()) };
+concept UnpackBytes = requires(T& t) {
+  { t.resize(size_t()) };  // NOLINT
   { t.size() } -> std::same_as<size_t>;
   { t.data() } -> std::convertible_to<void*>;
-};
+} && (PackBytes<T> || MutableVectorLike<T>);
 
 enum class DecodeLimits {
   Ignore,
