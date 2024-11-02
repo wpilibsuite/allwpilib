@@ -41,11 +41,13 @@ struct wpi::Protobuf<TestProto> {
 };
 
 const pb_msgdesc_t* wpi::Protobuf<TestProto>::Message() {
+  printf("Getting msg\n");
   return get_wpi_proto_TestProto_msg();
 }
 
 std::optional<TestProto> wpi::Protobuf<TestProto>::Unpack(
     wpi::ProtoInputStream& stream) {
+      printf("unpacking\n");
   wpi::UnpackCallback<std::string> str;
   wpi::UnpackCallback<std::vector<uint8_t>> bytes;
   wpi::UnpackCallback<TestProtoInner> inner;
@@ -54,6 +56,7 @@ std::optional<TestProto> wpi::Protobuf<TestProto>::Unpack(
   msg.bytes_msg = bytes.Callback();
   msg.TestProtoInner_msg = inner.Callback();
   if (!stream.DecodeNoInit(msg)) {
+    printf("failed unpack\n");
     return {};
   }
 
@@ -62,8 +65,11 @@ std::optional<TestProto> wpi::Protobuf<TestProto>::Unpack(
   auto iinner = inner.Items();
 
   if (istr.empty() || ibytes.empty() || iinner.empty()) {
+    printf("failed unpack 2\n");
     return {};
   }
+
+  printf("%d\n", (int)msg.bool_msg);
 
   return TestProto{
       .double_msg = msg.double_msg,
@@ -118,6 +124,8 @@ using ProtoType = wpi::Protobuf<TestProto>;
 TEST(TestProtoTest, RoundtripNanopb) {
   const TestProto kExpectedData = TestProto{};
 
+  printf("expected %d\n", (int)kExpectedData.bool_msg);
+
   wpi::SmallVector<uint8_t, 64> buf;
   wpi::ProtoOutputStream ostream{buf, ProtoType::Message()};
 
@@ -125,5 +133,6 @@ TEST(TestProtoTest, RoundtripNanopb) {
 
   wpi::ProtoInputStream istream{buf, ProtoType::Message()};
   std::optional<TestProto> unpacked_data = ProtoType::Unpack(istream);
+  printf("Unpacked\n");
   ASSERT_TRUE(unpacked_data.has_value());
 }
