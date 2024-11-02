@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <numeric>
 #include <span>
 
@@ -33,8 +34,8 @@ class BatterySim {
   static units::volt_t Calculate(units::volt_t nominalVoltage,
                                  units::ohm_t resistance,
                                  std::span<const units::ampere_t> currents) {
-    return nominalVoltage -
-           std::accumulate(currents.begin(), currents.end(), 0_A) * resistance;
+    return std::max(nominalVoltage -
+           std::accumulate(currents.begin(), currents.end(), 0_A) * resistance, 0_V);
   }
 
   /**
@@ -52,8 +53,8 @@ class BatterySim {
   static units::volt_t Calculate(
       units::volt_t nominalVoltage, units::ohm_t resistance,
       std::initializer_list<units::ampere_t> currents) {
-    return nominalVoltage -
-           std::accumulate(currents.begin(), currents.end(), 0_A) * resistance;
+    return std::max(nominalVoltage -
+           std::accumulate(currents.begin(), currents.end(), 0_A) * resistance, 0_V);
   }
 
   /**

@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import java.lang.Math;
+
 /** A utility class to simulate the robot battery. */
 public final class BatterySim {
   private BatterySim() {
@@ -27,7 +29,7 @@ public final class BatterySim {
     for (var current : currents) {
       retval -= current * resistanceOhms;
     }
-    return retval;
+    return Math.max(0, retval);
   }
 
   /**
