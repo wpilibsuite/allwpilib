@@ -22,9 +22,9 @@ struct wpi::Protobuf<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
 
   static std::optional<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>
   Unpack(wpi::ProtoInputStream& stream) {
+    constexpr bool isSmall = Rows * Cols * sizeof(double) < 256;
     using UnpackType =
-        std::conditional_t<Rows * Cols * sizeof(double) < 256,  // NOLINT
-                           wpi::UnpackCallback<double, Rows * Cols>,
+        std::conditional_t<isSmall, wpi::UnpackCallback<double, Rows * Cols>,
                            wpi::StdVectorUnpackCallback<double, Rows * Cols>>;
     UnpackType data;
     data.Vec().reserve(Rows * Cols);
