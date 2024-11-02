@@ -28,7 +28,7 @@ generatedFileExclude {
   src/test/native/cpp/llvm/
   src/test/native/cpp/span/
   src/test/native/cpp/json/
-  src/generated/main/native/cpp
+  src/generated/test/native/cpp
 }
 
 licenseUpdateExclude {
