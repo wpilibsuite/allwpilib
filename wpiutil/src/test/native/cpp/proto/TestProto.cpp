@@ -15,19 +15,19 @@
 #include "wpiutil.npb.h"
 
 struct TestProto {
-  double double_msg;
-  float float_msg;
-  int32_t int32_msg;
-  int64_t int64_msg;
-  uint32_t uint32_msg;
-  uint64_t uint64_msg;
-  int32_t sint32_msg;
-  int64_t sint64_msg;
-  uint32_t fixed32_msg;
-  uint64_t fixed64_msg;
-  int32_t sfixed32_msg;
-  int64_t sfixed64_msg;
-  bool bool_msg;
+  double double_msg{0};
+  float float_msg{0};
+  int32_t int32_msg{0};
+  int64_t int64_msg{0};
+  uint32_t uint32_msg{0};
+  uint64_t uint64_msg{0};
+  int32_t sint32_msg{0};
+  int64_t sint64_msg{0};
+  uint32_t fixed32_msg{0};
+  uint64_t fixed64_msg{0};
+  int32_t sfixed32_msg{0};
+  int64_t sfixed64_msg{0};
+  bool bool_msg{false};
   std::string string_msg;
   std::vector<uint8_t> bytes_msg;
   TestProtoInner TestProtoInner_msg;
