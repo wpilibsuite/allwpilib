@@ -177,6 +177,9 @@ class PS4ControllerSim : public GenericHIDSim {
    * Change the value of the touchpad button on the controller.
    *
    * @param value the new value
+   * @deprecated Use SetTouchpadButton instead. This function is deprecated for
+   * removal to make function names consistent to allow the HID classes to be
+   * automatically generated.
    */
   [[deprecated("Use SetTouchpadButton instead")]]
   void SetTouchpad(bool value);

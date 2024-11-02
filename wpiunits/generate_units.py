@@ -8,26 +8,18 @@
 # those interfaces.
 # Generated files will be located in wpiunits/src/generated/main/
 
+import argparse
 import inspect
-import os
 import re
+from pathlib import Path
+
 from jinja2 import Environment, FileSystemLoader
 
 
-def output(outPath, outfn, contents):
-    if not os.path.exists(outPath):
-        os.makedirs(outPath)
-
-    outpathname = f"{outPath}/{outfn}"
-
-    if os.path.exists(outpathname):
-        with open(outpathname, "r") as f:
-            if f.read() == contents:
-                return
-
-    # File either doesn't exist or has different contents
-    with open(outpathname, "w", newline="\n") as f:
-        f.write(contents)
+def output(output_dir, outfn: str, contents: str):
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_file = output_dir / outfn
+    output_file.write_text(contents, encoding="utf-8", newline="\n")
 
 
 # The units for which multiply and divide mathematical operations are defined
@@ -352,11 +344,9 @@ def indent(multiline_string, indentation):
     )
 
 
-def main():
-    dirname, _ = os.path.split(os.path.abspath(__file__))
-
+def generate_units(output_directory: Path, template_directory: Path):
     env = Environment(
-        loader=FileSystemLoader(f"{dirname}/src/generate/main/java"),
+        loader=FileSystemLoader(template_directory / "main/java"),
         autoescape=False,
         keep_trailing_newline=True,
     )
@@ -364,7 +354,7 @@ def main():
     interfaceTemplate = env.get_template("Measure-interface.java.jinja")
     immutableTemplate = env.get_template("Measure-immutable.java.jinja")
     mutableTemplate = env.get_template("Measure-mutable.java.jinja")
-    rootPath = f"{dirname}/src/generated/main/java/edu/wpi/first/units"
+    rootPath = output_directory / "main/java/edu/wpi/first/units"
 
     helpers = {
         "type_decl": type_decl,
@@ -395,9 +385,31 @@ def main():
             helpers=helpers,
         )
 
-        output(f"{rootPath}/measure", f"{unit_name}.java", interfaceContents)
-        output(f"{rootPath}/measure", f"Immutable{unit_name}.java", immutableContents)
-        output(f"{rootPath}/measure", f"Mut{unit_name}.java", mutableContents)
+        output(rootPath / "measure", f"{unit_name}.java", interfaceContents)
+        output(rootPath / "measure", f"Immutable{unit_name}.java", immutableContents)
+        output(rootPath / "measure", f"Mut{unit_name}.java", mutableContents)
+
+
+def main():
+    script_path = Path(__file__).resolve()
+    dirname = script_path.parent
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--output_directory",
+        help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
+        default=dirname / "src/generated",
+        type=Path,
+    )
+    parser.add_argument(
+        "--template_root",
+        help="Optional. If set, will use this directory as the root for the jinja templates",
+        default=dirname / "src/generate",
+        type=Path,
+    )
+    args = parser.parse_args()
+
+    generate_units(args.output_directory, args.template_root)
 
 
 if __name__ == "__main__":

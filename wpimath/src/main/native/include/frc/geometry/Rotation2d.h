@@ -67,8 +67,8 @@ class WPILIB_DLLEXPORT Rotation2d {
   }
 
   /**
-   * Adds two rotations together, with the result being bounded between -pi and
-   * pi.
+   * Adds two rotations together, with the result being bounded between -π and
+   * π.
    *
    * For example, <code>Rotation2d{30_deg} + Rotation2d{60_deg}</code> equals
    * <code>Rotation2d{units::radian_t{std::numbers::pi/2.0}}</code>
@@ -158,7 +158,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    * Returns the radian value of the rotation.
    *
    * @return The radian value of the rotation.
-   * @see AngleModulus to constrain the angle within (-pi, pi]
+   * @see AngleModulus to constrain the angle within (-π, π]
    */
   constexpr units::radian_t Radians() const { return m_value; }
 

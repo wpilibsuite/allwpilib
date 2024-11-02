@@ -16,24 +16,48 @@ def main(argv):
         required=True,
     )
     args = parser.parse_args(argv)
-    subprocess.run(["python", f"{REPO_ROOT}/hal/generate_usage_reporting.py"])
-    subprocess.run(["python", f"{REPO_ROOT}/ntcore/generate_topics.py"])
-    subprocess.run(["python", f"{REPO_ROOT}/wpimath/generate_numbers.py"])
+    subprocess.run(
+        [sys.executable, f"{REPO_ROOT}/hal/generate_usage_reporting.py"], check=True
+    )
+    subprocess.run(
+        [sys.executable, f"{REPO_ROOT}/ntcore/generate_topics.py"], check=True
+    )
+    subprocess.run(
+        [sys.executable, f"{REPO_ROOT}/wpimath/generate_numbers.py"], check=True
+    )
     subprocess.run(
         [
-            "python",
+            sys.executable,
             f"{REPO_ROOT}/wpimath/generate_quickbuf.py",
             f"--quickbuf_plugin={args.quickbuf_plugin}",
-        ]
+        ],
+        check=True,
     )
-    subprocess.run(["python", f"{REPO_ROOT}/wpiunits/generate_units.py"])
-    subprocess.run(["python", f"{REPO_ROOT}/wpilibc/generate_hids.py"])
-    subprocess.run(["python", f"{REPO_ROOT}/wpilibj/generate_hids.py"])
-    subprocess.run(["python", f"{REPO_ROOT}/wpilibNewCommands/generate_hids.py"])
-    subprocess.run(["python", f"{REPO_ROOT}/wpilibc/generate_pwm_motor_controllers.py"])
-    subprocess.run(["python", f"{REPO_ROOT}/wpilibj/generate_pwm_motor_controllers.py"])
-    subprocess.run(["python", f"{REPO_ROOT}/thirdparty/imgui_suite/generate_gl3w.py"])
-    subprocess.run(f"{REPO_ROOT}/thirdparty/imgui_suite/generate_fonts.sh")
+    subprocess.run(
+        [sys.executable, f"{REPO_ROOT}/wpiunits/generate_units.py"], check=True
+    )
+    subprocess.run(
+        [sys.executable, f"{REPO_ROOT}/wpilibc/generate_hids.py"], check=True
+    )
+    subprocess.run(
+        [sys.executable, f"{REPO_ROOT}/wpilibj/generate_hids.py"], check=True
+    )
+    subprocess.run(
+        [sys.executable, f"{REPO_ROOT}/wpilibNewCommands/generate_hids.py"], check=True
+    )
+    subprocess.run(
+        [sys.executable, f"{REPO_ROOT}/wpilibc/generate_pwm_motor_controllers.py"],
+        check=True,
+    )
+    subprocess.run(
+        [sys.executable, f"{REPO_ROOT}/wpilibj/generate_pwm_motor_controllers.py"],
+        check=True,
+    )
+    subprocess.run(
+        [sys.executable, f"{REPO_ROOT}/thirdparty/imgui_suite/generate_gl3w.py"],
+        check=True,
+    )
+    subprocess.run(f"{REPO_ROOT}/thirdparty/imgui_suite/generate_fonts.sh", check=True)
 
 
 if __name__ == "__main__":
