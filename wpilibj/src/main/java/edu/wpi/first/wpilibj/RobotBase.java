@@ -238,6 +238,7 @@ public abstract class RobotBase implements AutoCloseable {
   @Override
   public void close() {
     m_suball.close();
+    NetworkTableInstance.getDefault().removeListener(m_connListenerHandle);
   }
 
   /**
