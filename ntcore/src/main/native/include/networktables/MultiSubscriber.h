@@ -14,7 +14,7 @@ namespace nt {
 
 /**
  * Subscribe to multiple topics based on one or more topic name prefixes. Can be
- * used in combination with ValueListenerPoller to listen for value changes
+ * used in combination with NetworkTableListenerPoller to listen for value changes
  * across all matching topics.
  */
 class MultiSubscriber final {
