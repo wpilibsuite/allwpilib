@@ -135,7 +135,7 @@ class ProtoOutputStream {
    *
    * This constructor will cause `Encode` to call pb_encode_ex`
    *
-   * @param[in] stream the stream buffer
+   * @param[in] out the stream buffer
    */
   explicit ProtoOutputStream(detail::SmallVectorType& out)
       : m_msgDesc{
@@ -152,7 +152,7 @@ class ProtoOutputStream {
    *
    * This constructor will cause `Encode` to call pb_encode_ex`
    *
-   * @param[in] stream the stream buffer
+   * @param[in] out the stream buffer
    */
   explicit ProtoOutputStream(detail::StdVectorType& out)
       : m_msgDesc{
