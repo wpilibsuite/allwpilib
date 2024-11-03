@@ -92,11 +92,9 @@ class ProtoInputStream {
   const pb_msgdesc_t* MsgDesc() const noexcept { return m_msgDesc; }
 
   /**
-   * Decodes a protobuf. Flags are the same flags passed to pb_decode_ex
+   * Decodes a protobuf. Flags are the same flags passed to pb_decode_ex.
    *
-   * std::is_same_v<Protobuf<std::remove_cvref_t<T>>::MessageStruct, T>
-   *
-   * @param[in] msg The message to send
+   * @param[in] msg The message to decode into
    * @param[in] flags Flags to pass
    * @return true if decoding was successful, false otherwise
    */
@@ -111,15 +109,34 @@ class ProtoInputStream {
   const pb_msgdesc_t* m_msgDesc;
 };
 
+/**
+ * Class for wrapping a nanopb ostream
+ */
 template <typename T>
 class ProtoOutputStream {
  public:
+  /**
+   * Constructs a nanopb ostream from an existing ostream object
+   * Generally used internally for encoding messages.
+   *
+   * This constructor will cause `Encode` to call pb_encode_submessage
+   * instead of `pb_encode_ex`
+   *
+   * @param[in] stream the nanopb ostream
+   */
   explicit ProtoOutputStream(pb_ostream_t* stream)
       : m_streamMsg{stream},
         m_msgDesc{
             Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
   }
 
+  /**
+   * Constructs a nanopb ostream from a buffer.
+   *
+   * This constructor will cause `Encode` to call pb_encode_ex`
+   *
+   * @param[in] stream the stream buffer
+   */
   explicit ProtoOutputStream(detail::SmallVectorType& out)
       : m_msgDesc{
             Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
@@ -130,6 +147,13 @@ class ProtoOutputStream {
     m_streamLocal.errmsg = nullptr;
   }
 
+  /**
+   * Constructs a nanopb ostream from a buffer.
+   *
+   * This constructor will cause `Encode` to call pb_encode_ex`
+   *
+   * @param[in] stream the stream buffer
+   */
   explicit ProtoOutputStream(detail::StdVectorType& out)
       : m_msgDesc{
             Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
@@ -140,16 +164,47 @@ class ProtoOutputStream {
     m_streamLocal.errmsg = nullptr;
   }
 
+  /**
+   * Constructs a empty nanopb stream. You must fill out the stream
+   * returned from `Stream` before calling Encode.
+   *
+   * This constructor exists to cause `Encode` to call pb_encode_ex`,
+   * but allow manipulating the stream manually.
+   */
   ProtoOutputStream()
       : m_msgDesc{Protobuf<
             std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {}
 
+  /**
+   * Gets the backing nanopb stream object.
+   *
+   * @return nanopb stream
+   */
   pb_ostream_t* Stream() noexcept {
     return m_streamMsg ? m_streamMsg : &m_streamLocal;
   }
+
+  /**
+   * Gets if this stream points to a submessage, and will call
+   * pb_encode_submessage instead of pb_encode
+   *
+   * @return true if submessage, false otherwise
+   */
   bool IsSubmessage() const noexcept { return m_streamMsg; }
+
+  /**
+   * Gets the nanopb message descriptor
+   *
+   * @return the nanopb message descriptor
+   */
   const pb_msgdesc_t* MsgDesc() const noexcept { return m_msgDesc; }
 
+  /**
+   * Decodes a protobuf. Flags are the same flags passed to pb_decode_ex.
+   *
+   * @param[in] msg The message to encode from
+   * @return true if encoding was successful, false otherwise
+   */
   bool Encode(
       const typename Protobuf<std::remove_cvref_t<T>>::MessageStruct& msg) {
     if (m_streamMsg) {
@@ -170,24 +225,23 @@ class ProtoOutputStream {
  *
  * This is designed for serializing complex flexible data structures using
  * code generated from a .proto file. Serialization consists of writing
- * values into a mutable protobuf Message and deserialization consists of
- * reading values from an immutable protobuf Message.
+ * values into a nanopb Stream and deserialization consists of
+ * reading values from nanopb Stream.
  *
  * Implementations must define a template specialization for wpi::Protobuf with
  * T being the type that is being serialized/deserialized, with the following
  * static members (as enforced by this concept):
- * - google::protobuf::Message* New(google::protobuf::Arena*): create a protobuf
- *   message
- * - T Unpack(const google::protobuf::Message&): function for deserialization
- * - void Pack(google::protobuf::Message*, T&& value): function for
- *   serialization
+ * - using MessageStruct = nanopb_message_struct_here: typedef to the wpilib
+ *   modified nanopb message struct
+ * - std::optional<T> Unpack(wpi::ProtoInputStream<T>&): function
+ *   for deserialization
+ * - bool Pack(wpi::ProtoOutputStream<T>&, T&& value): function
+ *   for serialization
  *
- * To avoid pulling in the protobuf headers, these functions use
- * google::protobuf::Message instead of a more specific type; implementations
- * will need to static_cast to the correct type as created by New().
- *
- * Additionally: In a static block, call StructRegistry.registerClass() to
- * register the class
+ * As a suggestion, 2 extra type usings can be added to simplify the stream
+ * definitions, however these are not required.
+ * - using InputStream = wpi::ProtoInputStream<T>;
+ * - using OutputStream = wpi::ProtoOutputStream<T>;
  */
 template <typename T>
 concept ProtobufSerializable = requires(
@@ -217,14 +271,16 @@ concept ProtobufSerializable = requires(
  *
  * In addition to meeting ProtobufSerializable, implementations must define a
  * wpi::Protobuf<T> static member
- * `void UnpackInto(T*, const google::protobuf::Message&)` to update the
- * pointed-to T with the contents of the message.
+ * - bool UnpackInto(T*, wpi::ProtoInputStream<T>&)` to update the
+ *   pointed-to T with the contents of the message.
  */
 template <typename T>
 concept MutableProtobufSerializable =
     ProtobufSerializable<T> &&
     requires(T* out, wpi::ProtoInputStream<T>& istream) {
-      Protobuf<typename std::remove_cvref_t<T>>::UnpackInto(out, istream);
+      {
+        Protobuf<typename std::remove_cvref_t<T>>::UnpackInto(out, istream)
+      } -> std::same_as<bool>;
     };
 
 namespace detail {
@@ -238,10 +294,8 @@ void ForEachProtobufDescriptor(
 }  // namespace detail
 
 /**
- * Owning wrapper (ala std::unique_ptr) for google::protobuf::Message* that does
- * not require the protobuf headers be included. Note this object is not thread
- * safe; users of this object are required to provide any necessary thread
- * safety.
+ * Ease of use wrapper to make nanopb streams more opaque to the user.
+ * This class is stateless and thread safe.
  *
  * @tparam T serialized object type
  */
