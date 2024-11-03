@@ -45,10 +45,24 @@ bool WriteFromStdVector(pb_ostream_t* stream, const pb_byte_t* buf,
                         size_t count);
 }  // namespace detail
 
+template <typename T>
+concept ProtobufStreamable = requires() {
+  typename Protobuf<typename std::remove_cvref_t<T>>::MessageStruct;
+  {
+    Protobuf<typename std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()
+  } -> std::same_as<const pb_msgdesc_t*>;
+  {
+    Protobuf<typename std::remove_cvref_t<T>>::MessageStruct::msg_name()
+  } -> std::same_as<std::string_view>;
+  {
+    Protobuf<typename std::remove_cvref_t<T>>::MessageStruct::file_descriptor()
+  } -> std::same_as<pb_filedesc_t>;
+};
+
 /**
  * Class for wrapping a nanopb istream.
  */
-template <typename T>
+template <ProtobufStreamable T>
 class ProtoInputStream {
  public:
   /**
@@ -59,7 +73,9 @@ class ProtoInputStream {
    */
   explicit ProtoInputStream(pb_istream_t* stream)
       : m_streamMsg{stream},
-        m_msgDesc{Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {}
+        m_msgDesc{
+            Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
+  }
 
   /**
    * Constructs a nanopb istream from a buffer.
@@ -69,7 +85,9 @@ class ProtoInputStream {
   explicit ProtoInputStream(std::span<const uint8_t> stream)
       : m_streamLocal{pb_istream_from_buffer(
             reinterpret_cast<const pb_byte_t*>(stream.data()), stream.size())},
-        m_msgDesc{Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {}
+        m_msgDesc{
+            Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
+  }
 
   /**
    * Gets the backing nanopb stream object.
@@ -107,15 +125,18 @@ class ProtoInputStream {
   const pb_msgdesc_t* m_msgDesc;
 };
 
-template <typename T>
+template <ProtobufStreamable T>
 class ProtoOutputStream {
  public:
   explicit ProtoOutputStream(pb_ostream_t* stream)
       : m_streamMsg{stream},
-        m_msgDesc{Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {}
+        m_msgDesc{
+            Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
+  }
 
   explicit ProtoOutputStream(detail::SmallVectorType& out)
-      : m_msgDesc{Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
+      : m_msgDesc{
+            Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
     m_streamLocal.callback = detail::WriteFromSmallVector;
     m_streamLocal.state = &out;
     m_streamLocal.max_size = SIZE_MAX;
@@ -124,7 +145,8 @@ class ProtoOutputStream {
   }
 
   explicit ProtoOutputStream(detail::StdVectorType& out)
-      : m_msgDesc{Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
+      : m_msgDesc{
+            Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
     m_streamLocal.callback = detail::WriteFromStdVector;
     m_streamLocal.state = &out;
     m_streamLocal.max_size = SIZE_MAX;
@@ -133,7 +155,8 @@ class ProtoOutputStream {
   }
 
   ProtoOutputStream()
-      : m_msgDesc{Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {}
+      : m_msgDesc{Protobuf<
+            std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {}
 
   pb_ostream_t* Stream() noexcept {
     return m_streamMsg ? m_streamMsg : &m_streamLocal;
@@ -141,7 +164,8 @@ class ProtoOutputStream {
   bool IsSubmessage() const noexcept { return m_streamMsg; }
   const pb_msgdesc_t* MsgDesc() const noexcept { return m_msgDesc; }
 
-  bool Encode(const typename Protobuf<std::remove_cvref_t<T>>::MessageStruct& msg) {
+  bool Encode(
+      const typename Protobuf<std::remove_cvref_t<T>>::MessageStruct& msg) {
     if (m_streamMsg) {
       return pb_encode_submessage(m_streamMsg, m_msgDesc, &msg);
     }
@@ -184,14 +208,13 @@ concept ProtobufSerializable = requires(
     wpi::ProtoOutputStream<std::remove_cvref_t<T>>& ostream,
     wpi::ProtoInputStream<std::remove_cvref_t<T>>& istream, const T& value) {
   typename Protobuf<typename std::remove_cvref_t<T>>;
-  typename Protobuf<typename std::remove_cvref_t<T>>::MessageStruct;
   {
     Protobuf<typename std::remove_cvref_t<T>>::Unpack(istream)
   } -> std::same_as<std::optional<typename std::remove_cvref_t<T>>>;
   {
     Protobuf<typename std::remove_cvref_t<T>>::Pack(ostream, value)
   } -> std::same_as<bool>;
-};
+} && ProtobufStreamable<T>;
 
 /**
  * Specifies that a type is capable of in-place protobuf deserialization.
@@ -309,7 +332,8 @@ class ProtobufMessage {
                         std::span<const uint8_t> descriptor)>
           fn) {
     detail::ForEachProtobufDescriptor(
-        Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor(), exists, fn);
+        Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor(),
+        exists, fn);
   }
 };
 

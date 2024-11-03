@@ -369,22 +369,27 @@ class PackCallback {
   std::span<const T> Bufs() const { return m_buffer; }
 
  private:
-  using EncodeStreamType =
-      std::conditional_t<ProtobufSerializable<T>, ProtoOutputStream<T>&,
-                         pb_ostream_t*>;
+  static auto EncodeStreamTypeFinder() {
+    if constexpr (ProtobufSerializable<T>) {
+      return ProtoOutputStream<T>(nullptr);
+    } else {
+      return pb_ostream_t{};
+    }
+  }
+  using EncodeStreamType = decltype(EncodeStreamTypeFinder());
 
-  bool EncodeItem(EncodeStreamType stream, const pb_field_t* field,
+  bool EncodeItem(EncodeStreamType& stream, const pb_field_t* field,
                   const T& value) const {
     if constexpr (std::floating_point<T>) {
       pb_type_t fieldType = PB_LTYPE(field->type);
       switch (fieldType) {
         case PB_LTYPE_FIXED32: {
           float flt = static_cast<float>(value);
-          return pb_encode_fixed32(stream, &flt);
+          return pb_encode_fixed32(&stream, &flt);
         }
         case PB_LTYPE_FIXED64: {
           double dbl = static_cast<double>(value);
-          return pb_encode_fixed64(stream, &dbl);
+          return pb_encode_fixed64(&stream, &dbl);
         }
         default:
           return false;
@@ -395,28 +400,30 @@ class PackCallback {
         case PB_LTYPE_BOOL:
         case PB_LTYPE_VARINT:
         case PB_LTYPE_UVARINT:
-          return pb_encode_varint(stream, value);
+          return pb_encode_varint(&stream, value);
         case PB_LTYPE_SVARINT:
-          return pb_encode_svarint(stream, value);
+          return pb_encode_svarint(&stream, value);
         case PB_LTYPE_FIXED32: {
           uint32_t f = value;
-          return pb_encode_fixed32(stream, &f);
+          return pb_encode_fixed32(&stream, &f);
         }
         case PB_LTYPE_FIXED64: {
           uint64_t f = value;
-          return pb_encode_fixed64(stream, &f);
+          return pb_encode_fixed64(&stream, &f);
         }
         default:
           return false;
       }
     } else if constexpr (StringLike<T>) {
       std::string_view view{value};
-      return pb_encode_string(
-          stream, reinterpret_cast<const pb_byte_t*>(view.data()), view.size());
+      return pb_encode_string(&stream,
+                              reinterpret_cast<const pb_byte_t*>(view.data()),
+                              view.size());
     } else if constexpr (ConstVectorLike<T>) {
       std::span<const uint8_t> view{value};
-      return pb_encode_string(
-          stream, reinterpret_cast<const pb_byte_t*>(view.data()), view.size());
+      return pb_encode_string(&stream,
+                              reinterpret_cast<const pb_byte_t*>(view.data()),
+                              view.size());
     } else if constexpr (ProtobufSerializable<T>) {
       return wpi::Protobuf<T>::Pack(stream, value);
     }
@@ -443,7 +450,7 @@ class PackCallback {
             return false;
           }
         }
-        if (!EncodeItem(stream, field, i)) {
+        if (!EncodeItem(*stream, field, i)) {
           return false;
         }
       }
