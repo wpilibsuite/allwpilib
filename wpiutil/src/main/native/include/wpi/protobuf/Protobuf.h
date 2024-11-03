@@ -96,7 +96,7 @@ class ProtoInputStream {
    * @param[in] flags Flags to pass
    * @return true if decoding was successful, false otherwise
    */
-  bool Decode(Protobuf<std::remove_cvref_t<T>>::MessageStruct& msg,
+  bool Decode(typename Protobuf<std::remove_cvref_t<T>>::MessageStruct& msg,
               unsigned int flags = 0) {
     return pb_decode_ex(Stream(), m_msgDesc, &msg, flags);
   }
@@ -141,7 +141,7 @@ class ProtoOutputStream {
   bool IsSubmessage() const noexcept { return m_streamMsg; }
   const pb_msgdesc_t* MsgDesc() const noexcept { return m_msgDesc; }
 
-  bool Encode(const Protobuf<std::remove_cvref_t<T>>::MessageStruct& msg) {
+  bool Encode(const typename Protobuf<std::remove_cvref_t<T>>::MessageStruct& msg) {
     if (m_streamMsg) {
       return pb_encode_submessage(m_streamMsg, m_msgDesc, &msg);
     }
