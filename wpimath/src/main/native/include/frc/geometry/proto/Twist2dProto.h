@@ -8,12 +8,11 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/geometry/Twist2d.h"
-
 #include "geometry2d.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Twist2d> {
-    using MessageStruct = wpi_proto_ProtobufTwist2d;
+  using MessageStruct = wpi_proto_ProtobufTwist2d;
   using InputStream = wpi::ProtoInputStream<frc::Twist2d>;
   using OutputStream = wpi::ProtoOutputStream<frc::Twist2d>;
   static std::optional<frc::Twist2d> Unpack(InputStream& stream);

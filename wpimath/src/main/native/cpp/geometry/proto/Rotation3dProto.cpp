@@ -8,8 +8,6 @@
 
 #include "geometry3d.npb.h"
 
-
-
 std::optional<frc::Rotation3d> wpi::Protobuf<frc::Rotation3d>::Unpack(
     InputStream& stream) {
   wpi::UnpackCallback<frc::Quaternion> quat;

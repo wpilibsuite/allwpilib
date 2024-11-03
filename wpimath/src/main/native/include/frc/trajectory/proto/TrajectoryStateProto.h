@@ -8,7 +8,6 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/trajectory/Trajectory.h"
-
 #include "trajectory.npb.h"
 
 template <>

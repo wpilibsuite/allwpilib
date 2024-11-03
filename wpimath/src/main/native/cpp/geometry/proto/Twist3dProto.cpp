@@ -6,8 +6,6 @@
 
 #include "geometry3d.npb.h"
 
-
-
 std::optional<frc::Twist3d> wpi::Protobuf<frc::Twist3d>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufTwist3d msg;

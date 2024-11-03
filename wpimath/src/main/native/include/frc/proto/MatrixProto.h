@@ -16,9 +16,11 @@
 template <int Rows, int Cols, int Options, int MaxRows, int MaxCols>
   requires(Cols != 1)
 struct wpi::Protobuf<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
-    using MessageStruct = wpi_proto_ProtobufMatrix;
-  using InputStream = wpi::ProtoInputStream<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>;
-  using OutputStream = wpi::ProtoOutputStream<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>;
+  using MessageStruct = wpi_proto_ProtobufMatrix;
+  using InputStream = wpi::ProtoInputStream<
+      frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>;
+  using OutputStream = wpi::ProtoOutputStream<
+      frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>;
 
   static std::optional<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>
   Unpack(InputStream& stream) {

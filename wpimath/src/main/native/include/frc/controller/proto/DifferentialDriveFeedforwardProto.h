@@ -7,16 +7,16 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 
+#include "controller.npb.h"
 #include "frc/controller/DifferentialDriveFeedforward.h"
 #include "pb.h"
 
-#include "controller.npb.h"
-
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DifferentialDriveFeedforward> {
-    using MessageStruct = wpi_proto_ProtobufDifferentialDriveFeedforward;
+  using MessageStruct = wpi_proto_ProtobufDifferentialDriveFeedforward;
   using InputStream = wpi::ProtoInputStream<frc::DifferentialDriveFeedforward>;
-  using OutputStream = wpi::ProtoOutputStream<frc::DifferentialDriveFeedforward>;
+  using OutputStream =
+      wpi::ProtoOutputStream<frc::DifferentialDriveFeedforward>;
   static std::optional<frc::DifferentialDriveFeedforward> Unpack(
       InputStream& stream);
   static bool Pack(OutputStream& stream,

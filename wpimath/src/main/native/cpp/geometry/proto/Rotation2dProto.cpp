@@ -6,8 +6,6 @@
 
 #include "geometry2d.npb.h"
 
-
-
 std::optional<frc::Rotation2d> wpi::Protobuf<frc::Rotation2d>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufRotation2d msg;

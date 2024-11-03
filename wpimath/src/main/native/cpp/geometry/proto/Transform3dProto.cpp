@@ -8,8 +8,6 @@
 
 #include "geometry3d.npb.h"
 
-
-
 std::optional<frc::Transform3d> wpi::Protobuf<frc::Transform3d>::Unpack(
     InputStream& stream) {
   wpi::UnpackCallback<frc::Translation3d> tsln;

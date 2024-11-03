@@ -7,18 +7,15 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 
+#include "controller.npb.h"
 #include "frc/controller/ArmFeedforward.h"
 #include "pb.h"
 
-#include "controller.npb.h"
-
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::ArmFeedforward> {
-    using MessageStruct = wpi_proto_ProtobufArmFeedforward;
+  using MessageStruct = wpi_proto_ProtobufArmFeedforward;
   using InputStream = wpi::ProtoInputStream<frc::ArmFeedforward>;
   using OutputStream = wpi::ProtoOutputStream<frc::ArmFeedforward>;
-  static std::optional<frc::ArmFeedforward> Unpack(
-      InputStream& stream);
-  static bool Pack(OutputStream& stream,
-                   const frc::ArmFeedforward& value);
+  static std::optional<frc::ArmFeedforward> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::ArmFeedforward& value);
 };

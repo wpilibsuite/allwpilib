@@ -8,8 +8,6 @@
 
 #include "kinematics.npb.h"
 
-
-
 std::optional<frc::SwerveModuleState>
 wpi::Protobuf<frc::SwerveModuleState>::Unpack(InputStream& stream) {
   wpi::UnpackCallback<frc::Rotation2d> angle;

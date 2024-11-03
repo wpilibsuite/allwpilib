@@ -8,13 +8,12 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/geometry/Pose2d.h"
-#include "pb.h"
-
 #include "geometry2d.npb.h"
+#include "pb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Pose2d> {
-    using MessageStruct = wpi_proto_ProtobufPose2d;
+  using MessageStruct = wpi_proto_ProtobufPose2d;
   using InputStream = wpi::ProtoInputStream<frc::Pose2d>;
   using OutputStream = wpi::ProtoOutputStream<frc::Pose2d>;
   static std::optional<frc::Pose2d> Unpack(InputStream& stream);

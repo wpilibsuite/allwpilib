@@ -8,10 +8,8 @@
 
 #include "spline.npb.h"
 
-
-
-std::optional<frc::QuinticHermiteSpline> wpi::Protobuf<
-    frc::QuinticHermiteSpline>::Unpack(InputStream& stream) {
+std::optional<frc::QuinticHermiteSpline>
+wpi::Protobuf<frc::QuinticHermiteSpline>::Unpack(InputStream& stream) {
   wpi::WpiArrayUnpackCallback<double, 3> xInitial;
   wpi::WpiArrayUnpackCallback<double, 3> xFinal;
   wpi::WpiArrayUnpackCallback<double, 3> yInitial;

@@ -8,14 +8,14 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
-
 #include "kinematics.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DifferentialDriveWheelSpeeds> {
-    using MessageStruct = wpi_proto_ProtobufDifferentialDriveWheelSpeeds;
+  using MessageStruct = wpi_proto_ProtobufDifferentialDriveWheelSpeeds;
   using InputStream = wpi::ProtoInputStream<frc::DifferentialDriveWheelSpeeds>;
-  using OutputStream = wpi::ProtoOutputStream<frc::DifferentialDriveWheelSpeeds>;
+  using OutputStream =
+      wpi::ProtoOutputStream<frc::DifferentialDriveWheelSpeeds>;
   static std::optional<frc::DifferentialDriveWheelSpeeds> Unpack(
       InputStream& stream);
   static bool Pack(OutputStream& stream,

@@ -8,8 +8,6 @@
 
 #include "controller.npb.h"
 
-
-
 std::optional<frc::ArmFeedforward> wpi::Protobuf<frc::ArmFeedforward>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufArmFeedforward msg;

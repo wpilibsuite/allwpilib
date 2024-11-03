@@ -8,8 +8,6 @@
 
 #include "geometry2d.npb.h"
 
-
-
 std::optional<frc::Ellipse2d> wpi::Protobuf<frc::Ellipse2d>::Unpack(
     InputStream& stream) {
   wpi::UnpackCallback<frc::Pose2d> pose;

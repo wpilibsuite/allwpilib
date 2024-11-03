@@ -6,8 +6,6 @@
 
 #include "geometry2d.npb.h"
 
-
-
 std::optional<frc::Translation2d> wpi::Protobuf<frc::Translation2d>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufTranslation2d msg;

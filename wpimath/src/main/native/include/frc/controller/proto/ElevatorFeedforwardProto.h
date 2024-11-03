@@ -7,18 +7,15 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 
+#include "controller.npb.h"
 #include "frc/controller/ElevatorFeedforward.h"
 #include "pb.h"
 
-#include "controller.npb.h"
-
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::ElevatorFeedforward> {
-    using MessageStruct = wpi_proto_ProtobufElevatorFeedforward;
+  using MessageStruct = wpi_proto_ProtobufElevatorFeedforward;
   using InputStream = wpi::ProtoInputStream<frc::ElevatorFeedforward>;
   using OutputStream = wpi::ProtoOutputStream<frc::ElevatorFeedforward>;
-  static std::optional<frc::ElevatorFeedforward> Unpack(
-      InputStream& stream);
-  static bool Pack(OutputStream& stream,
-                   const frc::ElevatorFeedforward& value);
+  static std::optional<frc::ElevatorFeedforward> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::ElevatorFeedforward& value);
 };

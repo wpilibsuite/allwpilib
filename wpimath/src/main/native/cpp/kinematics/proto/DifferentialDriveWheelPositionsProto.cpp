@@ -6,9 +6,8 @@
 
 #include "kinematics.npb.h"
 
-std::optional<frc::DifferentialDriveWheelPositions>
-wpi::Protobuf<frc::DifferentialDriveWheelPositions>::Unpack(
-    InputStream& stream) {
+std::optional<frc::DifferentialDriveWheelPositions> wpi::Protobuf<
+    frc::DifferentialDriveWheelPositions>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveWheelPositions msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -21,8 +20,7 @@ wpi::Protobuf<frc::DifferentialDriveWheelPositions>::Unpack(
 }
 
 bool wpi::Protobuf<frc::DifferentialDriveWheelPositions>::Pack(
-    OutputStream& stream,
-    const frc::DifferentialDriveWheelPositions& value) {
+    OutputStream& stream, const frc::DifferentialDriveWheelPositions& value) {
   wpi_proto_ProtobufDifferentialDriveWheelPositions msg{
       .left = value.left.value(),
       .right = value.right.value(),

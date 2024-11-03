@@ -10,8 +10,6 @@
 
 #include "trajectory.npb.h"
 
-
-
 std::optional<frc::Trajectory::State>
 wpi::Protobuf<frc::Trajectory::State>::Unpack(InputStream& stream) {
   wpi::UnpackCallback<frc::Pose2d> pose;

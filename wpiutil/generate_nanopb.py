@@ -5,11 +5,11 @@
 # the WPILib BSD license file in the root directory of this project.
 
 import argparse
-from pathlib import Path
 import os
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 
 def generate_nanopb(nanopb: Path, output_directory: Path, proto_dir: Path):

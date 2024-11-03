@@ -8,16 +8,14 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/kinematics/MecanumDriveKinematics.h"
-
 #include "kinematics.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::MecanumDriveKinematics> {
-    using MessageStruct = wpi_proto_ProtobufMecanumDriveKinematics;
+  using MessageStruct = wpi_proto_ProtobufMecanumDriveKinematics;
   using InputStream = wpi::ProtoInputStream<frc::MecanumDriveKinematics>;
   using OutputStream = wpi::ProtoOutputStream<frc::MecanumDriveKinematics>;
-  static std::optional<frc::MecanumDriveKinematics> Unpack(
-      InputStream& stream);
+  static std::optional<frc::MecanumDriveKinematics> Unpack(InputStream& stream);
   static bool Pack(OutputStream& stream,
                    const frc::MecanumDriveKinematics& value);
 };

@@ -8,7 +8,6 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/system/plant/DCMotor.h"
-
 #include "plant.npb.h"
 
 template <>

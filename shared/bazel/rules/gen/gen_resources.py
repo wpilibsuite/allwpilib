@@ -1,6 +1,6 @@
-import os
 import argparse
 import binascii
+import os
 
 
 def generate_file(resource_file, output_file, prefix, namespace):

@@ -8,9 +8,8 @@
 
 #include "controller.npb.h"
 
-std::optional<frc::DifferentialDriveWheelVoltages>
-wpi::Protobuf<frc::DifferentialDriveWheelVoltages>::Unpack(
-    InputStream& stream) {
+std::optional<frc::DifferentialDriveWheelVoltages> wpi::Protobuf<
+    frc::DifferentialDriveWheelVoltages>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveWheelVoltages msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -23,8 +22,7 @@ wpi::Protobuf<frc::DifferentialDriveWheelVoltages>::Unpack(
 }
 
 bool wpi::Protobuf<frc::DifferentialDriveWheelVoltages>::Pack(
-    OutputStream& stream,
-    const frc::DifferentialDriveWheelVoltages& value) {
+    OutputStream& stream, const frc::DifferentialDriveWheelVoltages& value) {
   wpi_proto_ProtobufDifferentialDriveWheelVoltages msg{
       .left = value.left.value(),
       .right = value.right.value(),

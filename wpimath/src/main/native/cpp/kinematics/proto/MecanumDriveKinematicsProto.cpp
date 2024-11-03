@@ -8,10 +8,8 @@
 
 #include "kinematics.npb.h"
 
-
-
-std::optional<frc::MecanumDriveKinematics> wpi::Protobuf<
-    frc::MecanumDriveKinematics>::Unpack(InputStream& stream) {
+std::optional<frc::MecanumDriveKinematics>
+wpi::Protobuf<frc::MecanumDriveKinematics>::Unpack(InputStream& stream) {
   wpi::UnpackCallback<frc::Translation2d> frontLeft;
   wpi::UnpackCallback<frc::Translation2d> frontRight;
   wpi::UnpackCallback<frc::Translation2d> rearLeft;

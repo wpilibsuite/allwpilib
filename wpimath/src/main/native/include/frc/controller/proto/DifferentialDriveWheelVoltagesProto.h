@@ -7,16 +7,17 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 
+#include "controller.npb.h"
 #include "frc/controller/DifferentialDriveWheelVoltages.h"
 #include "pb.h"
 
-#include "controller.npb.h"
-
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DifferentialDriveWheelVoltages> {
-    using MessageStruct = wpi_proto_ProtobufDifferentialDriveWheelVoltages;
-  using InputStream = wpi::ProtoInputStream<frc::DifferentialDriveWheelVoltages>;
-  using OutputStream = wpi::ProtoOutputStream<frc::DifferentialDriveWheelVoltages>;
+  using MessageStruct = wpi_proto_ProtobufDifferentialDriveWheelVoltages;
+  using InputStream =
+      wpi::ProtoInputStream<frc::DifferentialDriveWheelVoltages>;
+  using OutputStream =
+      wpi::ProtoOutputStream<frc::DifferentialDriveWheelVoltages>;
   static std::optional<frc::DifferentialDriveWheelVoltages> Unpack(
       InputStream& stream);
   static bool Pack(OutputStream& stream,

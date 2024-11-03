@@ -10,8 +10,6 @@
 
 #include "trajectory.npb.h"
 
-
-
 std::optional<frc::Trajectory> wpi::Protobuf<frc::Trajectory>::Unpack(
     InputStream& stream) {
   wpi::StdVectorUnpackCallback<frc::Trajectory::State, SIZE_MAX> states;

@@ -204,17 +204,19 @@ class ProtoOutputStream {
  * register the class
  */
 template <typename T>
-concept ProtobufSerializable = requires(
-    wpi::ProtoOutputStream<std::remove_cvref_t<T>>& ostream,
-    wpi::ProtoInputStream<std::remove_cvref_t<T>>& istream, const T& value) {
-  typename Protobuf<typename std::remove_cvref_t<T>>;
-  {
-    Protobuf<typename std::remove_cvref_t<T>>::Unpack(istream)
-  } -> std::same_as<std::optional<typename std::remove_cvref_t<T>>>;
-  {
-    Protobuf<typename std::remove_cvref_t<T>>::Pack(ostream, value)
-  } -> std::same_as<bool>;
-} && ProtobufStreamable<T>;
+concept ProtobufSerializable =
+    requires(wpi::ProtoOutputStream<std::remove_cvref_t<T>>& ostream,
+             wpi::ProtoInputStream<std::remove_cvref_t<T>>& istream,
+             const T& value) {
+      typename Protobuf<typename std::remove_cvref_t<T>>;
+      {
+        Protobuf<typename std::remove_cvref_t<T>>::Unpack(istream)
+      } -> std::same_as<std::optional<typename std::remove_cvref_t<T>>>;
+      {
+        Protobuf<typename std::remove_cvref_t<T>>::Pack(ostream, value)
+      } -> std::same_as<bool>;
+    } &&
+    ProtobufStreamable<T>;
 
 /**
  * Specifies that a type is capable of in-place protobuf deserialization.

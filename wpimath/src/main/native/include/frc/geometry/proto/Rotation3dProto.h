@@ -8,15 +8,13 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/geometry/Rotation3d.h"
-
 #include "geometry3d.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Rotation3d> {
-    using MessageStruct = wpi_proto_ProtobufRotation3d;
+  using MessageStruct = wpi_proto_ProtobufRotation3d;
   using InputStream = wpi::ProtoInputStream<frc::Rotation3d>;
   using OutputStream = wpi::ProtoOutputStream<frc::Rotation3d>;
   static std::optional<frc::Rotation3d> Unpack(InputStream& stream);
-  static bool Pack(OutputStream& stream,
-                   const frc::Rotation3d& value);
+  static bool Pack(OutputStream& stream, const frc::Rotation3d& value);
 };

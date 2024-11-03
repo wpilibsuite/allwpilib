@@ -8,12 +8,11 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/geometry/Ellipse2d.h"
-
 #include "geometry2d.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Ellipse2d> {
-    using MessageStruct = wpi_proto_ProtobufEllipse2d;
+  using MessageStruct = wpi_proto_ProtobufEllipse2d;
   using InputStream = wpi::ProtoInputStream<frc::Ellipse2d>;
   using OutputStream = wpi::ProtoOutputStream<frc::Ellipse2d>;
   static std::optional<frc::Ellipse2d> Unpack(InputStream& stream);

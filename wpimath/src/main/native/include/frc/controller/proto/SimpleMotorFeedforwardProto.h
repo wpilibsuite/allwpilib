@@ -11,8 +11,6 @@
 #include "pb.h"
 #include "units/length.h"
 
-#include "controller.npb.h"
-
 // Everything is converted into units for
 // frc::SimpleMotorFeedforward<units::meters>
 

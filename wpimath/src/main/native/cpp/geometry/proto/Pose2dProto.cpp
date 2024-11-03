@@ -8,8 +8,6 @@
 
 #include "geometry2d.npb.h"
 
-
-
 std::optional<frc::Pose2d> wpi::Protobuf<frc::Pose2d>::Unpack(
     InputStream& stream) {
   wpi::UnpackCallback<frc::Translation2d> tsln;

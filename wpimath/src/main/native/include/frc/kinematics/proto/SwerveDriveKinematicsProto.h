@@ -15,9 +15,11 @@
 
 template <size_t NumModules>
 struct wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>> {
-    using MessageStruct = wpi_proto_ProtobufSwerveDriveKinematics;
-  using InputStream = wpi::ProtoInputStream<frc::SwerveDriveKinematics<NumModules>>;
-  using OutputStream = wpi::ProtoOutputStream<frc::SwerveDriveKinematics<NumModules>>;
+  using MessageStruct = wpi_proto_ProtobufSwerveDriveKinematics;
+  using InputStream =
+      wpi::ProtoInputStream<frc::SwerveDriveKinematics<NumModules>>;
+  using OutputStream =
+      wpi::ProtoOutputStream<frc::SwerveDriveKinematics<NumModules>>;
 
   static std::optional<frc::SwerveDriveKinematics<NumModules>> Unpack(
       InputStream& stream) {

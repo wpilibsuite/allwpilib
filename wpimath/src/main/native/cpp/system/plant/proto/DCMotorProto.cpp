@@ -8,8 +8,6 @@
 
 #include "plant.npb.h"
 
-
-
 std::optional<frc::DCMotor> wpi::Protobuf<frc::DCMotor>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufDCMotor msg;

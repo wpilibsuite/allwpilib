@@ -6,8 +6,6 @@
 
 #include "geometry2d.npb.h"
 
-
-
 std::optional<frc::Twist2d> wpi::Protobuf<frc::Twist2d>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufTwist2d msg;

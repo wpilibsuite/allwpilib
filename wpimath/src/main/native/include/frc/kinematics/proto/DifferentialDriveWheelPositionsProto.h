@@ -8,14 +8,15 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/kinematics/DifferentialDriveWheelPositions.h"
-
 #include "kinematics.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DifferentialDriveWheelPositions> {
-    using MessageStruct = wpi_proto_ProtobufDifferentialDriveWheelPositions;
-  using InputStream = wpi::ProtoInputStream<frc::DifferentialDriveWheelPositions>;
-  using OutputStream = wpi::ProtoOutputStream<frc::DifferentialDriveWheelPositions>;
+  using MessageStruct = wpi_proto_ProtobufDifferentialDriveWheelPositions;
+  using InputStream =
+      wpi::ProtoInputStream<frc::DifferentialDriveWheelPositions>;
+  using OutputStream =
+      wpi::ProtoOutputStream<frc::DifferentialDriveWheelPositions>;
   static std::optional<frc::DifferentialDriveWheelPositions> Unpack(
       InputStream& stream);
   static bool Pack(OutputStream& stream,

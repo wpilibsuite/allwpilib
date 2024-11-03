@@ -8,8 +8,6 @@
 
 #include "controller.npb.h"
 
-
-
 std::optional<frc::ElevatorFeedforward>
 wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufElevatorFeedforward msg;

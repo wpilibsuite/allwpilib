@@ -8,8 +8,6 @@
 
 #include "spline.npb.h"
 
-
-
 std::optional<frc::CubicHermiteSpline>
 wpi::Protobuf<frc::CubicHermiteSpline>::Unpack(InputStream& stream) {
   wpi::WpiArrayUnpackCallback<double, 2> xInitial;

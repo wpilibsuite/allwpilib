@@ -8,10 +8,8 @@
 
 #include "kinematics.npb.h"
 
-
-
-std::optional<frc::SwerveModulePosition> wpi::Protobuf<
-    frc::SwerveModulePosition>::Unpack(InputStream& stream) {
+std::optional<frc::SwerveModulePosition>
+wpi::Protobuf<frc::SwerveModulePosition>::Unpack(InputStream& stream) {
   wpi::UnpackCallback<frc::Rotation2d> angle;
   wpi_proto_ProtobufSwerveModulePosition msg{
       .distance = 0,

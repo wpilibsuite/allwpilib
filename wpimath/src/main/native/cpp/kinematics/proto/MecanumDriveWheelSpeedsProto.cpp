@@ -6,10 +6,8 @@
 
 #include "kinematics.npb.h"
 
-
-
-std::optional<frc::MecanumDriveWheelSpeeds> wpi::Protobuf<
-    frc::MecanumDriveWheelSpeeds>::Unpack(InputStream& stream) {
+std::optional<frc::MecanumDriveWheelSpeeds>
+wpi::Protobuf<frc::MecanumDriveWheelSpeeds>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufMecanumDriveWheelSpeeds msg;
   if (!stream.Decode(msg)) {
     return {};

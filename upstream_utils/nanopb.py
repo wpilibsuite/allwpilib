@@ -3,11 +3,7 @@
 import os
 import shutil
 
-from upstream_utils import (
-    copy_to,
-    walk_if,
-    Lib,
-)
+from upstream_utils import Lib, copy_to, walk_if
 
 nanopb_sources = set(
     [

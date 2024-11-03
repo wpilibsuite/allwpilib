@@ -6,8 +6,6 @@
 
 #include "kinematics.npb.h"
 
-
-
 std::optional<frc::ChassisSpeeds> wpi::Protobuf<frc::ChassisSpeeds>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufChassisSpeeds msg;

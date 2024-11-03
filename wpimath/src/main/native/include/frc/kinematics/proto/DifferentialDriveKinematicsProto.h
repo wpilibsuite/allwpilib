@@ -8,12 +8,11 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/kinematics/DifferentialDriveKinematics.h"
-
 #include "kinematics.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DifferentialDriveKinematics> {
-    using MessageStruct = wpi_proto_ProtobufDifferentialDriveKinematics;
+  using MessageStruct = wpi_proto_ProtobufDifferentialDriveKinematics;
   using InputStream = wpi::ProtoInputStream<frc::DifferentialDriveKinematics>;
   using OutputStream = wpi::ProtoOutputStream<frc::DifferentialDriveKinematics>;
   static std::optional<frc::DifferentialDriveKinematics> Unpack(

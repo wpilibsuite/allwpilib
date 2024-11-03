@@ -6,8 +6,6 @@
 
 #include "geometry3d.npb.h"
 
-
-
 std::optional<frc::Translation3d> wpi::Protobuf<frc::Translation3d>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufTranslation3d msg;

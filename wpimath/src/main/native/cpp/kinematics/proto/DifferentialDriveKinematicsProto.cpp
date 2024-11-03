@@ -6,10 +6,8 @@
 
 #include "kinematics.npb.h"
 
-
-
-std::optional<frc::DifferentialDriveKinematics> wpi::Protobuf<
-    frc::DifferentialDriveKinematics>::Unpack(InputStream& stream) {
+std::optional<frc::DifferentialDriveKinematics>
+wpi::Protobuf<frc::DifferentialDriveKinematics>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveKinematics msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -21,8 +19,7 @@ std::optional<frc::DifferentialDriveKinematics> wpi::Protobuf<
 }
 
 bool wpi::Protobuf<frc::DifferentialDriveKinematics>::Pack(
-    OutputStream& stream,
-    const frc::DifferentialDriveKinematics& value) {
+    OutputStream& stream, const frc::DifferentialDriveKinematics& value) {
   wpi_proto_ProtobufDifferentialDriveKinematics msg{
       .track_width = value.trackWidth.value(),
   };

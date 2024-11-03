@@ -6,8 +6,6 @@
 
 #include "geometry3d.npb.h"
 
-
-
 std::optional<frc::Quaternion> wpi::Protobuf<frc::Quaternion>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufQuaternion msg;

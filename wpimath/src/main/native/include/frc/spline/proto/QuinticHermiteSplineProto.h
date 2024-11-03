@@ -8,7 +8,6 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/spline/QuinticHermiteSpline.h"
-
 #include "spline.npb.h"
 
 template <>
