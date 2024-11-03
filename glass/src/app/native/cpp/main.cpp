@@ -363,52 +363,6 @@ int main(int argc, char** argv) {
   gui::AddLateExecute([] {
     glass::Storage& cameras = glass::GetStorageRoot().GetChild("cameras");
 
-    if (glass::imm::BeginWindow(gCameraListWindow)) {
-      glass::DisplayCameraModelTable(cameras);
-      if (ImGui::Button("Add USB")) {
-        ImGui::OpenPopup("Add USB Camera");
-      }
-      if (ImGui::BeginPopup("Add USB Camera")) {
-        std::string path = gUsbCameraList->DisplayMenu();
-        if (!path.empty()) {
-          auto id = fmt::format("glass::usb::{}", path);
-          glass::CameraModel* model = glass::GetOrNewCameraModel(cameras, id);
-          if (!model->GetSource()) {
-            model->SetSource(cs::UsbCamera(id, path));
-          }
-          model->Start();
-        }
-        ImGui::EndPopup();
-      }
-      ImGui::SameLine();
-      ImGui::Button("Add HTTP");
-      ImGui::SameLine();
-      ImGui::Button("Add CameraServer");
-    }
-    glass::imm::EndWindow();
-
-    for (auto&& kv :
-         glass::GetStorageRoot().GetChild("camera views").GetChildren()) {
-      glass::PushStorageStack(kv.value());
-      if (!glass::imm::GetWindow()) {
-        glass::imm::CreateWindow(
-            glass::GetStorageRoot().GetChild("camera views"), kv.key());
-      }
-      if (glass::imm::BeginWindow()) {
-        if (glass::CameraModel* model = glass::GetCameraModel(
-                cameras, glass::GetStorage().GetString("camera"))) {
-          if (glass::imm::BeginWindowSettingsPopup()) {
-            glass::imm::GetWindow()->EditName();
-            glass::DisplayCameraSettings(model);
-            ImGui::EndPopup();
-          }
-          glass::DisplayCameraWindow(model);
-        }
-      }
-      glass::imm::EndWindow();
-      glass::PopStorageStack();
-    }
-
     if (gAbout) {
       ImGui::OpenPopup("About");
       gAbout = false;
