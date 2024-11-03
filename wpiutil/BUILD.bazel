@@ -243,9 +243,9 @@ cc_test(
     linkstatic = True,
     tags = ["no-tsan"],  # TODO(pj.reiniger) Find problem
     deps = [
+        ":nanopb-test-headers",
         ":wpiutil.static",
         ":wpiutil-testlib",
-        ":nanopb-test-headers",
         "//thirdparty/googletest:googletest.static",
     ],
 )
