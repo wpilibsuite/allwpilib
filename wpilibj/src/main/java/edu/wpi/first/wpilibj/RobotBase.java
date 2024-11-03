@@ -44,7 +44,7 @@ public abstract class RobotBase implements AutoCloseable {
 
   private final MultiSubscriber m_suball;
 
-  int connListenerHandle;
+  int m_connListenerHandle;
 
   private static void setupCameraServerShared() {
     CameraServerShared shared =
@@ -163,7 +163,7 @@ public abstract class RobotBase implements AutoCloseable {
       System.err.println("timed out while waiting for NT server to start");
     }
 
-    connListenerHandle =
+    m_connListenerHandle =
         inst.addConnectionListener(
             false,
             event -> {

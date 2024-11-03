@@ -10,6 +10,7 @@
 
 #include <cstdio>
 #include <memory>
+#include <string>
 #include <utility>
 
 #include <cameraserver/CameraServerShared.h>
