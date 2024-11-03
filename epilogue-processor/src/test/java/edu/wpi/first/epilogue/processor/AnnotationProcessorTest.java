@@ -1134,29 +1134,29 @@ class AnnotationProcessorTest {
           @Override
           public void update(DataLogger dataLogger, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              var $asInterface = object.asInterface;
-              if ($asInterface instanceof edu.wpi.first.epilogue.Impl1 edu_wpi_first_epilogue_Impl1) {
+              var $$asInterface = object.asInterface;
+              if ($$asInterface instanceof edu.wpi.first.epilogue.Impl1 edu_wpi_first_epilogue_Impl1) {
                 Epilogue.impl1Logger.tryUpdate(dataLogger.getSubLogger("asInterface"), edu_wpi_first_epilogue_Impl1, Epilogue.getConfig().errorHandler);
-              } else if ($asInterface instanceof edu.wpi.first.epilogue.Impl2 edu_wpi_first_epilogue_Impl2) {
+              } else if ($$asInterface instanceof edu.wpi.first.epilogue.Impl2 edu_wpi_first_epilogue_Impl2) {
                 Epilogue.impl2Logger.tryUpdate(dataLogger.getSubLogger("asInterface"), edu_wpi_first_epilogue_Impl2, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type edu.wpi.first.epilogue.IFace
-                Epilogue.iFaceLogger.tryUpdate(dataLogger.getSubLogger("asInterface"), $asInterface, Epilogue.getConfig().errorHandler);
+                Epilogue.iFaceLogger.tryUpdate(dataLogger.getSubLogger("asInterface"), $$asInterface, Epilogue.getConfig().errorHandler);
               };
               Epilogue.impl1Logger.tryUpdate(dataLogger.getSubLogger("firstImpl"), object.firstImpl, Epilogue.getConfig().errorHandler);
               Epilogue.impl2Logger.tryUpdate(dataLogger.getSubLogger("secondImpl"), object.secondImpl, Epilogue.getConfig().errorHandler);
-              var $complex = object.complex;
-              if ($complex instanceof edu.wpi.first.epilogue.ConcreteLogged edu_wpi_first_epilogue_ConcreteLogged) {
+              var $$complex = object.complex;
+              if ($$complex instanceof edu.wpi.first.epilogue.ConcreteLogged edu_wpi_first_epilogue_ConcreteLogged) {
                 Epilogue.concreteLoggedLogger.tryUpdate(dataLogger.getSubLogger("complex"), edu_wpi_first_epilogue_ConcreteLogged, Epilogue.getConfig().errorHandler);
-              } else if ($complex instanceof edu.wpi.first.epilogue.I4 edu_wpi_first_epilogue_I4) {
+              } else if ($$complex instanceof edu.wpi.first.epilogue.I4 edu_wpi_first_epilogue_I4) {
                 Epilogue.i4Logger.tryUpdate(dataLogger.getSubLogger("complex"), edu_wpi_first_epilogue_I4, Epilogue.getConfig().errorHandler);
-              } else if ($complex instanceof edu.wpi.first.epilogue.I2 edu_wpi_first_epilogue_I2) {
+              } else if ($$complex instanceof edu.wpi.first.epilogue.I2 edu_wpi_first_epilogue_I2) {
                 Epilogue.i2Logger.tryUpdate(dataLogger.getSubLogger("complex"), edu_wpi_first_epilogue_I2, Epilogue.getConfig().errorHandler);
-              } else if ($complex instanceof edu.wpi.first.epilogue.I3 edu_wpi_first_epilogue_I3) {
+              } else if ($$complex instanceof edu.wpi.first.epilogue.I3 edu_wpi_first_epilogue_I3) {
                 Epilogue.i3Logger.tryUpdate(dataLogger.getSubLogger("complex"), edu_wpi_first_epilogue_I3, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type edu.wpi.first.epilogue.I
-                Epilogue.iLogger.tryUpdate(dataLogger.getSubLogger("complex"), $complex, Epilogue.getConfig().errorHandler);
+                Epilogue.iLogger.tryUpdate(dataLogger.getSubLogger("complex"), $$complex, Epilogue.getConfig().errorHandler);
               };
             }
           }
@@ -1210,14 +1210,77 @@ class AnnotationProcessorTest {
           @Override
           public void update(DataLogger dataLogger, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              var $theField = object.theField;
-              if ($theField instanceof edu.wpi.first.epilogue.Base edu_wpi_first_epilogue_Base) {
+              var $$theField = object.theField;
+              if ($$theField instanceof edu.wpi.first.epilogue.Base edu_wpi_first_epilogue_Base) {
                 Epilogue.baseLogger.tryUpdate(dataLogger.getSubLogger("theField"), edu_wpi_first_epilogue_Base, Epilogue.getConfig().errorHandler);
-              } else if ($theField instanceof edu.wpi.first.epilogue.ExtendingInterface edu_wpi_first_epilogue_ExtendingInterface) {
+              } else if ($$theField instanceof edu.wpi.first.epilogue.ExtendingInterface edu_wpi_first_epilogue_ExtendingInterface) {
                 Epilogue.extendingInterfaceLogger.tryUpdate(dataLogger.getSubLogger("theField"), edu_wpi_first_epilogue_ExtendingInterface, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type edu.wpi.first.epilogue.I
-                Epilogue.iLogger.tryUpdate(dataLogger.getSubLogger("theField"), $theField, Epilogue.getConfig().errorHandler);
+                Epilogue.iLogger.tryUpdate(dataLogger.getSubLogger("theField"), $$theField, Epilogue.getConfig().errorHandler);
+              };
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void instanceofChainWithField() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        @Logged
+        interface I {}
+
+        @Logged
+        class Base implements I {}
+
+        @Logged
+        class Example {
+          private I theField;
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+        import java.lang.invoke.MethodHandles;
+        import java.lang.invoke.VarHandle;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          private static final VarHandle $theField;
+
+          static {
+            try {
+              var lookup = MethodHandles.privateLookupIn(Example.class, MethodHandles.lookup());
+              $theField = lookup.findVarHandle(Example.class, "theField", edu.wpi.first.epilogue.I.class);
+            } catch (ReflectiveOperationException e) {
+              throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+            }
+          }
+
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              var $$theField = (edu.wpi.first.epilogue.I) $theField.get(object);
+              if ($$theField instanceof edu.wpi.first.epilogue.Base edu_wpi_first_epilogue_Base) {
+                Epilogue.baseLogger.tryUpdate(dataLogger.getSubLogger("theField"), edu_wpi_first_epilogue_Base, Epilogue.getConfig().errorHandler);
+              } else {
+                // Base type edu.wpi.first.epilogue.I
+                Epilogue.iLogger.tryUpdate(dataLogger.getSubLogger("theField"), $$theField, Epilogue.getConfig().errorHandler);
               };
             }
           }
