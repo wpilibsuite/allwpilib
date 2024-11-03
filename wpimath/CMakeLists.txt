@@ -112,13 +112,47 @@ endif()
 file(
     GLOB_RECURSE wpimath_native_src
     src/main/native/cpp/*.cpp
-    src/generated/main/native/cpp/*.cpp
     src/main/native/thirdparty/sleipnir/src/*.cpp
 )
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
-add_library(wpimath ${wpimath_native_src})
+
+file(
+    GLOB_RECURSE wpimath_protobuf_native_src
+    src/generated/main/native/cpp/*.cpp
+)
+
+add_library(protobuf OBJECT ${wpimath_protobuf_native_src})
+target_link_libraries(protobuf wpiutil)
+
+add_library(wpimath ${wpimath_native_src} $<TARGET_OBJECTS:protobuf>)
+
+if (MSVC)
+
+    get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+    set(CONFIG_SUFFIX "$<$<BOOL:${IS_MULTI_CONFIG}>:_$<CONFIG>>")
+    file(
+        GENERATE OUTPUT
+        ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects${CONFIG_SUFFIX}.txt
+        CONTENT $<LIST:JOIN,$<TARGET_OBJECTS:protobuf>,\n>
+    )
+    add_custom_command(
+        TARGET wpimath
+        PRE_LINK
+        COMMAND
+            cmake -E __create_def
+            ${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports${CONFIG_SUFFIX}.def
+            ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects${CONFIG_SUFFIX}.txt
+    )
+    target_link_options(
+        wpimath
+        PRIVATE
+            /DEF:$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports${CONFIG_SUFFIX}.def>
+    )
+
+endif()
+
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 
