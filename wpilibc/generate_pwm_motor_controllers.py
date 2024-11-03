@@ -5,10 +5,10 @@
 # the WPILib BSD license file in the root directory of this project.
 import argparse
 import json
-import sys
 import os
-from typing import Dict, Any
+import sys
 from pathlib import Path
+from typing import Any, Dict
 
 from jinja2 import Environment, FileSystemLoader
 from jinja2.environment import Template
