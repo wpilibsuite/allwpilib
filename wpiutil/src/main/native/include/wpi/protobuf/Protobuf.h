@@ -45,24 +45,10 @@ bool WriteFromStdVector(pb_ostream_t* stream, const pb_byte_t* buf,
                         size_t count);
 }  // namespace detail
 
-template <typename T>
-concept ProtobufStreamable = requires() {
-  typename Protobuf<typename std::remove_cvref_t<T>>::MessageStruct;
-  {
-    Protobuf<typename std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()
-  } -> std::same_as<const pb_msgdesc_t*>;
-  {
-    Protobuf<typename std::remove_cvref_t<T>>::MessageStruct::msg_name()
-  } -> std::same_as<std::string_view>;
-  {
-    Protobuf<typename std::remove_cvref_t<T>>::MessageStruct::file_descriptor()
-  } -> std::same_as<pb_filedesc_t>;
-};
-
 /**
  * Class for wrapping a nanopb istream.
  */
-template <ProtobufStreamable T>
+template <typename T>
 class ProtoInputStream {
  public:
   /**
@@ -125,7 +111,7 @@ class ProtoInputStream {
   const pb_msgdesc_t* m_msgDesc;
 };
 
-template <ProtobufStreamable T>
+template <typename T>
 class ProtoOutputStream {
  public:
   explicit ProtoOutputStream(pb_ostream_t* stream)
@@ -204,19 +190,27 @@ class ProtoOutputStream {
  * register the class
  */
 template <typename T>
-concept ProtobufSerializable =
-    requires(wpi::ProtoOutputStream<std::remove_cvref_t<T>>& ostream,
-             wpi::ProtoInputStream<std::remove_cvref_t<T>>& istream,
-             const T& value) {
-      typename Protobuf<typename std::remove_cvref_t<T>>;
-      {
-        Protobuf<typename std::remove_cvref_t<T>>::Unpack(istream)
-      } -> std::same_as<std::optional<typename std::remove_cvref_t<T>>>;
-      {
-        Protobuf<typename std::remove_cvref_t<T>>::Pack(ostream, value)
-      } -> std::same_as<bool>;
-    } &&
-    ProtobufStreamable<T>;
+concept ProtobufSerializable = requires(
+    wpi::ProtoOutputStream<std::remove_cvref_t<T>>& ostream,
+    wpi::ProtoInputStream<std::remove_cvref_t<T>>& istream, const T& value) {
+  typename Protobuf<typename std::remove_cvref_t<T>>;
+  {
+    Protobuf<typename std::remove_cvref_t<T>>::Unpack(istream)
+  } -> std::same_as<std::optional<typename std::remove_cvref_t<T>>>;
+  {
+    Protobuf<typename std::remove_cvref_t<T>>::Pack(ostream, value)
+  } -> std::same_as<bool>;
+  typename Protobuf<typename std::remove_cvref_t<T>>::MessageStruct;
+  {
+    Protobuf<typename std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()
+  } -> std::same_as<const pb_msgdesc_t*>;
+  {
+    Protobuf<typename std::remove_cvref_t<T>>::MessageStruct::msg_name()
+  } -> std::same_as<std::string_view>;
+  {
+    Protobuf<typename std::remove_cvref_t<T>>::MessageStruct::file_descriptor()
+  } -> std::same_as<pb_filedesc_t>;
+};
 
 /**
  * Specifies that a type is capable of in-place protobuf deserialization.
