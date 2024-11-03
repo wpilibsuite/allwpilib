@@ -29,7 +29,7 @@ public final class BatterySim {
     for (var current : currents) {
       retval -= current * resistanceOhms;
     }
-    return Math.max(0, retval);
+    return Math.max(0.0, retval);
   }
 
   /**
