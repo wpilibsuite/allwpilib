@@ -3,9 +3,9 @@
 # Copyright (c) FIRST and other WPILib contributors.
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
+
 import argparse
 import json
-import sys
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
@@ -63,7 +63,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         write_controller_file(root_path, controllerName, output)
 
 
-def main(argv):
+def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
@@ -86,10 +86,10 @@ def main(argv):
         default="wpilibj/src/generate/hids.json",
         type=Path,
     )
-    args = parser.parse_args(argv)
+    args = parser.parse_args()
 
     generate_hids(args.output_directory, args.template_root, args.schema_file)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

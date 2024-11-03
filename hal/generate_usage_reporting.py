@@ -3,8 +3,8 @@
 # Copyright (c) FIRST and other WPILib contributors.
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
+
 import argparse
-import sys
 from pathlib import Path
 
 
@@ -68,8 +68,7 @@ def generate_usage_reporting(output_directory: Path, template_directory: Path):
         usage_reporting_hdr.write_text(contents, encoding="utf-8", newline="\n")
 
 
-def main(argv):
-
+def main():
     dirname = Path(__file__).parent
 
     parser = argparse.ArgumentParser()
@@ -85,10 +84,10 @@ def main(argv):
         default=dirname / "src/generate",
         type=Path,
     )
-    args = parser.parse_args(argv)
+    args = parser.parse_args()
 
     generate_usage_reporting(args.output_directory, args.template_root)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

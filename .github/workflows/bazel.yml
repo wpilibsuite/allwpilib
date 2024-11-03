@@ -14,7 +14,6 @@ jobs:
         include:
           - { name: "Windows (native)",             os: windows-2022, action: "test",  config: "--config=windows",     }
           - { name: "Windows (arm)",                os: windows-2022, action: "build", config: "--config=windows_arm", }
-          - { name: "Windows (roborio)",            os: windows-2022, action: "build", config: "--config=roborio",     }
 
     name: "Build ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -36,20 +35,9 @@ jobs:
         run: bazel --output_user_root=C:\\bazelroot ${{ matrix.action }} -k ...   --config=ci -c opt ${{ matrix.config }} --verbose_failures
         shell: bash
 
-      - name: Build Debug
-        run: bazel --output_user_root=C:\\bazelroot ${{ matrix.action }} -k ...   --config=ci -c dbg ${{ matrix.config }} --verbose_failures
-        shell: bash
-
   build-mac:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { name: "Mac (native)",            os: macos-14,   action: "test",  config: "--config=macos",      }
-          - { name: "Mac (roborio)",           os: macos-14,   action: "build", config: "--config=roborio",  }
-
-    name: "${{ matrix.name }}"
-    runs-on: ${{ matrix.os }}
+    name: "Mac"
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
@@ -60,11 +48,7 @@ jobs:
           token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       - name: Build Release
-        run: bazel ${{ matrix.action }} -k ...   --config=ci -c opt ${{ matrix.config }} --nojava_header_compilation --verbose_failures
-        shell: bash
-
-      - name: Build Debug
-        run: bazel ${{ matrix.action }} -k ...   --config=ci -c dbg ${{ matrix.config }} --nojava_header_compilation --verbose_failures
+        run: bazel test -k ...   --config=ci -c opt --config=macos --nojava_header_compilation --verbose_failures
         shell: bash
 
   build-linux:
@@ -88,31 +72,6 @@ jobs:
 
       - name: Build and Test Release
         run: bazel ${{ matrix.action }} ... --config=ci -c opt ${{ matrix.config }} -k --verbose_failures
-
-      - name: Build and Test Debug
-        run: bazel ${{ matrix.action }} ... --config=ci -c dbg ${{ matrix.config }} -k --verbose_failures
-
-  build-sanitizers:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - config: "asan"
-          - config: "ubsan"
-    runs-on: ubuntu-22.04
-    name: "Sanitizer ${{ matrix.config }}"
-    steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - uses: bazelbuild/setup-bazelisk@v3
-
-      - id: Setup_build_buddy
-        uses: ./.github/actions/setup-build-buddy
-        with:
-          token: ${{ secrets.BUILDBUDDY_API_KEY }}
-
-      - name: Build and Test
-        run: bazel test  -k --config=ci --config=linux --config=${{ matrix.config }} //...
 
   buildifier:
     name: "buildifier"

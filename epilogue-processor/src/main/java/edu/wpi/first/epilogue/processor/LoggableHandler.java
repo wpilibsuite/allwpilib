@@ -111,9 +111,9 @@ public class LoggableHandler extends ElementHandler {
   private static String cacheVariableName(Element element) {
     // Generate unique names in case a field and a method share the same name
     if (element instanceof VariableElement) {
-      return "$%s".formatted(element.getSimpleName().toString());
+      return "$$%s".formatted(element.getSimpleName().toString());
     } else if (element instanceof ExecutableElement) {
-      return "_%s".formatted(element.getSimpleName().toString());
+      return "__%s".formatted(element.getSimpleName().toString());
     } else {
       // Generic fallback (shouldn't get here, since only fields and methods are logged)
       return element.getSimpleName().toString();
