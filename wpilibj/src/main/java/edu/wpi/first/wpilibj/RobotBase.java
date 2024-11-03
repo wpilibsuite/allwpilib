@@ -26,7 +26,6 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -44,6 +43,8 @@ public abstract class RobotBase implements AutoCloseable {
   private static long m_threadId = -1;
 
   private final MultiSubscriber m_suball;
+
+  int connListenerHandle;
 
   private static void setupCameraServerShared() {
     CameraServerShared shared =
@@ -125,6 +126,8 @@ public abstract class RobotBase implements AutoCloseable {
         });
   }
 
+  private boolean m_detected;
+
   /**
    * Constructor for a generic robot program. User code can be placed in the constructor that runs
    * before the Autonomous or Operator Control period starts. The constructor will run to completion
@@ -160,55 +163,64 @@ public abstract class RobotBase implements AutoCloseable {
       System.err.println("timed out while waiting for NT server to start");
     }
 
-    Consumer<NetworkTableEvent> dashboardConsumer =
-        new Consumer<NetworkTableEvent>() {
-          private boolean m_detected;
-
-          @Override
-          public void accept(NetworkTableEvent t) {
-            if (t.is(NetworkTableEvent.Kind.kConnected)) {
-              if (t.connInfo.remote_id.startsWith("glass")) {
-                HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Glass);
-                m_detected = true;
-              } else if (t.connInfo.remote_id.startsWith("SmartDashboard")) {
-                HAL.report(
-                    tResourceType.kResourceType_Dashboard, tInstances.kDashboard_SmartDashboard);
-                m_detected = true;
-              } else if (t.connInfo.remote_id.startsWith("shuffleboard")) {
-                HAL.report(
-                    tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Shuffleboard);
-                m_detected = true;
-              } else if (t.connInfo.remote_id.startsWith("elastic")
-                  || t.connInfo.remote_id.startsWith("Elastic")) {
-                HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Elastic);
-                m_detected = true;
-              } else if (t.connInfo.remote_id.startsWith("Dashboard")) {
-                HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_LabVIEW);
-                m_detected = true;
-              } else if (t.connInfo.remote_id.startsWith("AdvantageScope")) {
-                HAL.report(
-                    tResourceType.kResourceType_Dashboard, tInstances.kDashboard_AdvantageScope);
-                m_detected = true;
-              } else if (t.connInfo.remote_id.startsWith("QFRCDashboard")) {
-                HAL.report(
-                    tResourceType.kResourceType_Dashboard, tInstances.kDashboard_QFRCDashboard);
-                m_detected = true;
-              } else if (t.connInfo.remote_id.startsWith("FRC Web Components")) {
-                HAL.report(
-                    tResourceType.kResourceType_Dashboard, tInstances.kDashboard_FRCWebComponents);
-                m_detected = true;
-              } else {
-                // Only report unknown if there wasn't another dashboard already reported
-                // (unknown could also be another device)
-                if (!m_detected) {
-                  HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Unknown);
+    connListenerHandle =
+        inst.addConnectionListener(
+            false,
+            event -> {
+              if (event.is(NetworkTableEvent.Kind.kConnected)) {
+                if (event.connInfo.remote_id.startsWith("glass")) {
+                  HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Glass);
+                  m_detected = true;
+                } else if (event.connInfo.remote_id.startsWith("SmartDashboard")) {
+                  HAL.report(
+                      tResourceType.kResourceType_Dashboard, tInstances.kDashboard_SmartDashboard);
+                  m_detected = true;
+                } else if (event.connInfo.remote_id.startsWith("shuffleboard")) {
+                  HAL.report(
+                      tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Shuffleboard);
+                  m_detected = true;
+                } else if (event.connInfo.remote_id.startsWith("elastic")
+                    || event.connInfo.remote_id.startsWith("Elastic")) {
+                  HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Elastic);
+                  m_detected = true;
+                } else if (event.connInfo.remote_id.startsWith("Dashboard")) {
+                  HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_LabVIEW);
+                  m_detected = true;
+                } else if (event.connInfo.remote_id.startsWith("AdvantageScope")) {
+                  HAL.report(
+                      tResourceType.kResourceType_Dashboard, tInstances.kDashboard_AdvantageScope);
+                  m_detected = true;
+                } else if (event.connInfo.remote_id.startsWith("QFRCDashboard")) {
+                  HAL.report(
+                      tResourceType.kResourceType_Dashboard, tInstances.kDashboard_QFRCDashboard);
+                  m_detected = true;
+                } else if (event.connInfo.remote_id.startsWith("FRC Web Components")) {
+                  HAL.report(
+                      tResourceType.kResourceType_Dashboard,
+                      tInstances.kDashboard_FRCWebComponents);
+                  m_detected = true;
+                } else {
+                  // Only report unknown if there wasn't another dashboard already reported
+                  // (unknown could also be another device)
+                  if (!m_detected) {
+                    int delim = event.connInfo.remote_id.indexOf('@');
+                    if (delim != -1) {
+                      HAL.report(
+                          tResourceType.kResourceType_Dashboard,
+                          tInstances.kDashboard_Unknown,
+                          0,
+                          event.connInfo.remote_id.substring(0, delim));
+                    } else {
+                      HAL.report(
+                          tResourceType.kResourceType_Dashboard,
+                          tInstances.kDashboard_Unknown,
+                          0,
+                          event.connInfo.remote_id);
+                    }
+                  }
                 }
               }
-            }
-          }
-        };
-
-    inst.addConnectionListener(true, dashboardConsumer);
+            });
 
     LiveWindow.setEnabled(false);
     Shuffleboard.disableActuatorWidgets();
