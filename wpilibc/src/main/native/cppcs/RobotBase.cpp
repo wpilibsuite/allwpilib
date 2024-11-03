@@ -257,44 +257,44 @@ RobotBase::RobotBase() {
       if (event.GetConnectionInfo()->remote_id.starts_with("glass")) {
         HAL_Report(HALUsageReporting::kResourceType_Dashboard,
                    HALUsageReporting::kDashboard_Glass);
-        m_detected = true;
+        m_dashboardDetected = true;
       } else if (event.GetConnectionInfo()->remote_id.starts_with(
                      "SmartDashboard")) {
         HAL_Report(HALUsageReporting::kResourceType_Dashboard,
                    HALUsageReporting::kDashboard_SmartDashboard);
-        m_detected = true;
+        m_dashboardDetected = true;
       } else if (event.GetConnectionInfo()->remote_id.starts_with(
                      "shuffleboard")) {
         HAL_Report(HALUsageReporting::kResourceType_Dashboard,
                    HALUsageReporting::kDashboard_Shuffleboard);
-        m_detected = true;
+        m_dashboardDetected = true;
       } else if (event.GetConnectionInfo()->remote_id.starts_with("elastic") ||
                  event.GetConnectionInfo()->remote_id.starts_with("Elastic")) {
         HAL_Report(HALUsageReporting::kResourceType_Dashboard,
                    HALUsageReporting::kDashboard_Elastic);
-        m_detected = true;
+        m_dashboardDetected = true;
       } else if (event.GetConnectionInfo()->remote_id.starts_with(
                      "Dashboard")) {
         HAL_Report(HALUsageReporting::kResourceType_Dashboard,
                    HALUsageReporting::kDashboard_LabVIEW);
-        m_detected = true;
+        m_dashboardDetected = true;
       } else if (event.GetConnectionInfo()->remote_id.starts_with(
                      "AdvantageScope")) {
         HAL_Report(HALUsageReporting::kResourceType_Dashboard,
                    HALUsageReporting::kDashboard_AdvantageScope);
-        m_detected = true;
+        m_dashboardDetected = true;
       } else if (event.GetConnectionInfo()->remote_id.starts_with(
                      "QFRCDashboard")) {
         HAL_Report(HALUsageReporting::kResourceType_Dashboard,
                    HALUsageReporting::kDashboard_QFRCDashboard);
-        m_detected = true;
+        m_dashboardDetected = true;
       } else if (event.GetConnectionInfo()->remote_id.starts_with(
                      "FRC Web Components")) {
         HAL_Report(HALUsageReporting::kResourceType_Dashboard,
                    HALUsageReporting::kDashboard_FRCWebComponents);
-        m_detected = true;
+        m_dashboardDetected = true;
       } else {
-        if (!m_detected) {
+        if (!m_dashboardDetected) {
           size_t delim = event.GetConnectionInfo()->remote_id.find('@');
           if (delim != std::string::npos) {
             HAL_Report(

@@ -259,7 +259,7 @@ class RobotBase {
 
   static std::thread::id m_threadId;
   NT_Listener connListenerHandle;
-  bool m_detected = false;
+  bool m_dashboardDetected = false;
 };
 
 }  // namespace frc
