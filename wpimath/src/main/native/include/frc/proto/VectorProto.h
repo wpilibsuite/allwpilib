@@ -11,7 +11,7 @@
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "frc/EigenCore.h"
-#include "wpimath.npb.h"
+#include "wpimath/protobuf/wpimath.npb.h"
 
 template <int Size, int Options, int MaxRows, int MaxCols>
 struct wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {

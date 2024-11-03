@@ -6,7 +6,7 @@
 
 #include <wpi/protobuf/Protobuf.h>
 
-#include "controller.npb.h"
+#include "wpimath/protobuf/controller.npb.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
 #include "pb.h"
 #include "units/length.h"

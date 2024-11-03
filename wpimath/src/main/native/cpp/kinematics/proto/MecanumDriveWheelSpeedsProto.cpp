@@ -4,7 +4,7 @@
 
 #include "frc/kinematics/proto/MecanumDriveWheelSpeedsProto.h"
 
-#include "kinematics.npb.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
 std::optional<frc::MecanumDriveWheelSpeeds>
 wpi::Protobuf<frc::MecanumDriveWheelSpeeds>::Unpack(InputStream& stream) {

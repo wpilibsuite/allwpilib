@@ -4,7 +4,7 @@
 
 #include "frc/kinematics/proto/DifferentialDriveKinematicsProto.h"
 
-#include "kinematics.npb.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
 std::optional<frc::DifferentialDriveKinematics>
 wpi::Protobuf<frc::DifferentialDriveKinematics>::Unpack(InputStream& stream) {

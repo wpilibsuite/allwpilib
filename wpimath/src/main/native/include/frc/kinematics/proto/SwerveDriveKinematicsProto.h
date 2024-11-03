@@ -11,7 +11,7 @@
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "frc/kinematics/SwerveDriveKinematics.h"
-#include "kinematics.npb.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
 template <size_t NumModules>
 struct wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>> {

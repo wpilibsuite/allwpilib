@@ -8,7 +8,7 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/spline/QuinticHermiteSpline.h"
-#include "spline.npb.h"
+#include "wpimath/protobuf/spline.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::QuinticHermiteSpline> {

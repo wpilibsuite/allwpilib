@@ -8,7 +8,7 @@
 
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "trajectory.npb.h"
+#include "wpimath/protobuf/trajectory.npb.h"
 
 std::optional<frc::Trajectory::State>
 wpi::Protobuf<frc::Trajectory::State>::Unpack(InputStream& stream) {

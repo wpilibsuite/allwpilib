@@ -8,7 +8,7 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/geometry/Translation2d.h"
-#include "geometry2d.npb.h"
+#include "wpimath/protobuf/geometry2d.npb.h"
 #include "pb.h"
 
 template <>

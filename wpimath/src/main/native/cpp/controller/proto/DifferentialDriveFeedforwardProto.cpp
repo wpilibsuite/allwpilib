@@ -4,7 +4,7 @@
 
 #include "frc/controller/proto/DifferentialDriveFeedforwardProto.h"
 
-#include "controller.npb.h"
+#include "wpimath/protobuf/controller.npb.h"
 
 std::optional<frc::DifferentialDriveFeedforward>
 wpi::Protobuf<frc::DifferentialDriveFeedforward>::Unpack(InputStream& stream) {

@@ -4,7 +4,7 @@
 
 #include "frc/geometry/proto/QuaternionProto.h"
 
-#include "geometry3d.npb.h"
+#include "wpimath/protobuf/geometry3d.npb.h"
 
 std::optional<frc::Quaternion> wpi::Protobuf<frc::Quaternion>::Unpack(
     InputStream& stream) {

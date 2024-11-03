@@ -8,7 +8,7 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/kinematics/MecanumDriveWheelSpeeds.h"
-#include "kinematics.npb.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::MecanumDriveWheelSpeeds> {

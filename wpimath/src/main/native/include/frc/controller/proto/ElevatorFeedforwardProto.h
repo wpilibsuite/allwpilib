@@ -7,7 +7,7 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 
-#include "controller.npb.h"
+#include "wpimath/protobuf/controller.npb.h"
 #include "frc/controller/ElevatorFeedforward.h"
 #include "pb.h"
 

@@ -4,7 +4,7 @@
 
 #include "frc/geometry/proto/Twist3dProto.h"
 
-#include "geometry3d.npb.h"
+#include "wpimath/protobuf/geometry3d.npb.h"
 
 std::optional<frc::Twist3d> wpi::Protobuf<frc::Twist3d>::Unpack(
     InputStream& stream) {

@@ -70,7 +70,7 @@ def main():
     parser.add_argument(
         "--output_directory",
         help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-        default=dirname / "src/generated/main/native/cpp",
+        default=dirname / "src/generated/main/native/cpp/wpimath/protobuf",
         type=Path,
     )
     parser.add_argument(

@@ -8,7 +8,7 @@
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "frc/geometry/Pose3d.h"
-#include "geometry3d.npb.h"
+#include "wpimath/protobuf/geometry3d.npb.h"
 
 std::optional<frc::Pose3d> wpi::Protobuf<frc::Pose3d>::Unpack(
     InputStream& stream) {

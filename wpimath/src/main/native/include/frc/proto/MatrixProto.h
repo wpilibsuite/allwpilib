@@ -11,7 +11,7 @@
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "frc/EigenCore.h"
-#include "wpimath.npb.h"
+#include "wpimath/protobuf/wpimath.npb.h"
 
 template <int Rows, int Cols, int Options, int MaxRows, int MaxCols>
   requires(Cols != 1)

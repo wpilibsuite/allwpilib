@@ -8,7 +8,7 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/system/plant/DCMotor.h"
-#include "plant.npb.h"
+#include "wpimath/protobuf/plant.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DCMotor> {

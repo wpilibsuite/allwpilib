@@ -13,7 +13,7 @@
 
 #include "frc/proto/MatrixProto.h"
 #include "frc/system/LinearSystem.h"
-#include "system.npb.h"
+#include "wpimath/protobuf/system.npb.h"
 
 template <int States, int Inputs, int Outputs>
 struct wpi::Protobuf<frc::LinearSystem<States, Inputs, Outputs>> {

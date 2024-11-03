@@ -6,7 +6,7 @@
 
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "kinematics.npb.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
 std::optional<frc::SwerveModuleState>
 wpi::Protobuf<frc::SwerveModuleState>::Unpack(InputStream& stream) {

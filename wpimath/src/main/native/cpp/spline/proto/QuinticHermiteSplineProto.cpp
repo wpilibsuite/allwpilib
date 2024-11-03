@@ -6,7 +6,7 @@
 
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "spline.npb.h"
+#include "wpimath/protobuf/spline.npb.h"
 
 std::optional<frc::QuinticHermiteSpline>
 wpi::Protobuf<frc::QuinticHermiteSpline>::Unpack(InputStream& stream) {

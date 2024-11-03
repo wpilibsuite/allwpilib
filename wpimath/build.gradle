@@ -47,9 +47,9 @@ cppHeadersZip {
         into '/wpimath/protobuf'
         include '*.h'
     }
-    from("src/generated/main/native/cpp") {
+    from("src/generated/main/native/cpp/wpimath/protobuf") {
         into '/wpimath/protobuf'
-        include '*.h'
+        include '**/*.h'
     }
     from('src/main/native/thirdparty/sleipnir/include') {
         into '/'

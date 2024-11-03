@@ -8,7 +8,7 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/trajectory/Trajectory.h"
-#include "trajectory.npb.h"
+#include "wpimath/protobuf/trajectory.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Trajectory::State> {

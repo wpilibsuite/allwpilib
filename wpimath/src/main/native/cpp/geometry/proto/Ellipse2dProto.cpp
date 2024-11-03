@@ -6,7 +6,7 @@
 
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "geometry2d.npb.h"
+#include "wpimath/protobuf/geometry2d.npb.h"
 
 std::optional<frc::Ellipse2d> wpi::Protobuf<frc::Ellipse2d>::Unpack(
     InputStream& stream) {
