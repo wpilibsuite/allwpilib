@@ -8,8 +8,8 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/geometry/Translation2d.h"
-#include "wpimath/protobuf/geometry2d.npb.h"
 #include "pb.h"
+#include "wpimath/protobuf/geometry2d.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Translation2d> {

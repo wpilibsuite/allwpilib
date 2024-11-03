@@ -6,10 +6,10 @@
 
 #include <wpi/protobuf/Protobuf.h>
 
-#include "wpimath/protobuf/controller.npb.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
 #include "pb.h"
 #include "units/length.h"
+#include "wpimath/protobuf/controller.npb.h"
 
 // Everything is converted into units for
 // frc::SimpleMotorFeedforward<units::meters>
