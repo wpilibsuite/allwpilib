@@ -118,7 +118,7 @@ list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
 
-file(GLOB_RECURSE wpimath_protobuf_native_src src/generated/main/native/cpp/*.cpp)
+file(GLOB_RECURSE wpimath_protobuf_native_src src/generated/main/native/cpp/wpimath/protobuf/*.cpp)
 
 add_library(protobuf OBJECT ${wpimath_protobuf_native_src})
 target_link_libraries(protobuf wpiutil)
