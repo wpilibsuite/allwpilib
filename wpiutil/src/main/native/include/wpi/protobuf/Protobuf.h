@@ -57,7 +57,7 @@ class ProtoInputStream {
    *
    * @param[in] stream the nanopb istream
    */
-  ProtoInputStream(pb_istream_t* stream)
+  explicit ProtoInputStream(pb_istream_t* stream)
       : m_streamMsg{stream},
         m_msgDesc{Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {}
 
@@ -66,7 +66,7 @@ class ProtoInputStream {
    *
    * @param[in] stream the stream buffer
    */
-  ProtoInputStream(std::span<const uint8_t> stream)
+  explicit ProtoInputStream(std::span<const uint8_t> stream)
       : m_streamLocal{pb_istream_from_buffer(
             reinterpret_cast<const pb_byte_t*>(stream.data()), stream.size())},
         m_msgDesc{Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {}
