@@ -203,38 +203,38 @@ static const uint8_t file_descriptor[] {
 };
 static const char file_name[] = "geometry3d.proto";
 static const char wpi_proto_ProtobufTranslation3d_name[] = "wpi.proto.ProtobufTranslation3d";
-std::string_view get_wpi_proto_ProtobufTranslation3d_name(void) { return wpi_proto_ProtobufTranslation3d_name; }
-pb_filedesc_t get_wpi_proto_ProtobufTranslation3d_file_descriptor(void) { return {file_name, file_descriptor,}; }
+std::string_view wpi_proto_ProtobufTranslation3d::msg_name(void) noexcept { return wpi_proto_ProtobufTranslation3d_name; }
+pb_filedesc_t wpi_proto_ProtobufTranslation3d::file_descriptor(void) noexcept { return {::file_name, ::file_descriptor}; }
 PB_BIND(wpi_proto_ProtobufTranslation3d, wpi_proto_ProtobufTranslation3d, AUTO)
 
 
 static const char wpi_proto_ProtobufQuaternion_name[] = "wpi.proto.ProtobufQuaternion";
-std::string_view get_wpi_proto_ProtobufQuaternion_name(void) { return wpi_proto_ProtobufQuaternion_name; }
-pb_filedesc_t get_wpi_proto_ProtobufQuaternion_file_descriptor(void) { return {file_name, file_descriptor,}; }
+std::string_view wpi_proto_ProtobufQuaternion::msg_name(void) noexcept { return wpi_proto_ProtobufQuaternion_name; }
+pb_filedesc_t wpi_proto_ProtobufQuaternion::file_descriptor(void) noexcept { return {::file_name, ::file_descriptor}; }
 PB_BIND(wpi_proto_ProtobufQuaternion, wpi_proto_ProtobufQuaternion, AUTO)
 
 
 static const char wpi_proto_ProtobufRotation3d_name[] = "wpi.proto.ProtobufRotation3d";
-std::string_view get_wpi_proto_ProtobufRotation3d_name(void) { return wpi_proto_ProtobufRotation3d_name; }
-pb_filedesc_t get_wpi_proto_ProtobufRotation3d_file_descriptor(void) { return {file_name, file_descriptor,}; }
+std::string_view wpi_proto_ProtobufRotation3d::msg_name(void) noexcept { return wpi_proto_ProtobufRotation3d_name; }
+pb_filedesc_t wpi_proto_ProtobufRotation3d::file_descriptor(void) noexcept { return {::file_name, ::file_descriptor}; }
 PB_BIND(wpi_proto_ProtobufRotation3d, wpi_proto_ProtobufRotation3d, AUTO)
 
 
 static const char wpi_proto_ProtobufPose3d_name[] = "wpi.proto.ProtobufPose3d";
-std::string_view get_wpi_proto_ProtobufPose3d_name(void) { return wpi_proto_ProtobufPose3d_name; }
-pb_filedesc_t get_wpi_proto_ProtobufPose3d_file_descriptor(void) { return {file_name, file_descriptor,}; }
+std::string_view wpi_proto_ProtobufPose3d::msg_name(void) noexcept { return wpi_proto_ProtobufPose3d_name; }
+pb_filedesc_t wpi_proto_ProtobufPose3d::file_descriptor(void) noexcept { return {::file_name, ::file_descriptor}; }
 PB_BIND(wpi_proto_ProtobufPose3d, wpi_proto_ProtobufPose3d, AUTO)
 
 
 static const char wpi_proto_ProtobufTransform3d_name[] = "wpi.proto.ProtobufTransform3d";
-std::string_view get_wpi_proto_ProtobufTransform3d_name(void) { return wpi_proto_ProtobufTransform3d_name; }
-pb_filedesc_t get_wpi_proto_ProtobufTransform3d_file_descriptor(void) { return {file_name, file_descriptor,}; }
+std::string_view wpi_proto_ProtobufTransform3d::msg_name(void) noexcept { return wpi_proto_ProtobufTransform3d_name; }
+pb_filedesc_t wpi_proto_ProtobufTransform3d::file_descriptor(void) noexcept { return {::file_name, ::file_descriptor}; }
 PB_BIND(wpi_proto_ProtobufTransform3d, wpi_proto_ProtobufTransform3d, AUTO)
 
 
 static const char wpi_proto_ProtobufTwist3d_name[] = "wpi.proto.ProtobufTwist3d";
-std::string_view get_wpi_proto_ProtobufTwist3d_name(void) { return wpi_proto_ProtobufTwist3d_name; }
-pb_filedesc_t get_wpi_proto_ProtobufTwist3d_file_descriptor(void) { return {file_name, file_descriptor,}; }
+std::string_view wpi_proto_ProtobufTwist3d::msg_name(void) noexcept { return wpi_proto_ProtobufTwist3d_name; }
+pb_filedesc_t wpi_proto_ProtobufTwist3d::file_descriptor(void) noexcept { return {::file_name, ::file_descriptor}; }
 PB_BIND(wpi_proto_ProtobufTwist3d, wpi_proto_ProtobufTwist3d, AUTO)
 
 

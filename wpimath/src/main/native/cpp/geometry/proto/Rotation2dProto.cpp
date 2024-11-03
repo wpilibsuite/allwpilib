@@ -6,12 +6,10 @@
 
 #include "geometry2d.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::Rotation2d>::Message() {
-  return get_wpi_proto_ProtobufRotation2d_msg();
-}
+
 
 std::optional<frc::Rotation2d> wpi::Protobuf<frc::Rotation2d>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi_proto_ProtobufRotation2d msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -22,7 +20,7 @@ std::optional<frc::Rotation2d> wpi::Protobuf<frc::Rotation2d>::Unpack(
   };
 }
 
-bool wpi::Protobuf<frc::Rotation2d>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<frc::Rotation2d>::Pack(OutputStream& stream,
                                           const frc::Rotation2d& value) {
   wpi_proto_ProtobufRotation2d msg{
       .value = value.Radians().value(),

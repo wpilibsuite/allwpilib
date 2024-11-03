@@ -10,12 +10,10 @@
 #include "frc/geometry/Pose3d.h"
 #include "geometry3d.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::Pose3d>::Message() {
-  return get_wpi_proto_ProtobufPose3d_msg();
-}
+
 
 std::optional<frc::Pose3d> wpi::Protobuf<frc::Pose3d>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi::UnpackCallback<frc::Translation3d> tsln;
   wpi::UnpackCallback<frc::Rotation3d> rot;
   wpi_proto_ProtobufPose3d msg{
@@ -39,7 +37,7 @@ std::optional<frc::Pose3d> wpi::Protobuf<frc::Pose3d>::Unpack(
   };
 }
 
-bool wpi::Protobuf<frc::Pose3d>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<frc::Pose3d>::Pack(OutputStream& stream,
                                       const frc::Pose3d& value) {
   wpi::PackCallback tsln{&value.Translation()};
   wpi::PackCallback rot{&value.Rotation()};

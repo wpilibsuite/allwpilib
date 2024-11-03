@@ -16,12 +16,12 @@
 template <int Rows, int Cols, int Options, int MaxRows, int MaxCols>
   requires(Cols != 1)
 struct wpi::Protobuf<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
-  static const pb_msgdesc_t* Message() {
-    return get_wpi_proto_ProtobufMatrix_msg();
-  }
+    using MessageStruct = wpi_proto_ProtobufMatrix;
+  using InputStream = wpi::ProtoInputStream<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>;
 
   static std::optional<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>
-  Unpack(wpi::ProtoInputStream& stream) {
+  Unpack(InputStream& stream) {
     constexpr bool isSmall = Rows * Cols * sizeof(double) < 256;
     using UnpackType =
         std::conditional_t<isSmall, wpi::UnpackCallback<double, Rows * Cols>,
@@ -54,7 +54,7 @@ struct wpi::Protobuf<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
   }
 
   static bool Pack(
-      wpi::ProtoOutputStream& stream,
+      OutputStream& stream,
       const frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>& value) {
     std::span<const double> dataSpan{value.data(),
                                      static_cast<size_t>(Rows * Cols)};

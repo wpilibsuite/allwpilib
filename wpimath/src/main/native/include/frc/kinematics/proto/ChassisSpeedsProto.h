@@ -9,11 +9,15 @@
 
 #include "frc/kinematics/ChassisSpeeds.h"
 
+#include "kinematics.npb.h"
+
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::ChassisSpeeds> {
-  static const pb_msgdesc_t* Message();
+    using MessageStruct = wpi_proto_ProtobufChassisSpeeds;
+  using InputStream = wpi::ProtoInputStream<frc::ChassisSpeeds>;
+  using OutputStream = wpi::ProtoOutputStream<frc::ChassisSpeeds>;
   static std::optional<frc::ChassisSpeeds> Unpack(
-      wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream,
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
                    const frc::ChassisSpeeds& value);
 };

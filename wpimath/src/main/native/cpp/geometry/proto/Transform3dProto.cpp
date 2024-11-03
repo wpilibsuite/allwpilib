@@ -8,12 +8,10 @@
 
 #include "geometry3d.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::Transform3d>::Message() {
-  return get_wpi_proto_ProtobufTransform3d_msg();
-}
+
 
 std::optional<frc::Transform3d> wpi::Protobuf<frc::Transform3d>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi::UnpackCallback<frc::Translation3d> tsln;
   wpi::UnpackCallback<frc::Rotation3d> rot;
   wpi_proto_ProtobufTransform3d msg{
@@ -37,7 +35,7 @@ std::optional<frc::Transform3d> wpi::Protobuf<frc::Transform3d>::Unpack(
   };
 }
 
-bool wpi::Protobuf<frc::Transform3d>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<frc::Transform3d>::Pack(OutputStream& stream,
                                            const frc::Transform3d& value) {
   wpi::PackCallback tsln{&value.Translation()};
   wpi::PackCallback rot{&value.Rotation()};

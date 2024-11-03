@@ -6,12 +6,10 @@
 
 #include "geometry3d.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::Translation3d>::Message() {
-  return get_wpi_proto_ProtobufTranslation3d_msg();
-}
+
 
 std::optional<frc::Translation3d> wpi::Protobuf<frc::Translation3d>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi_proto_ProtobufTranslation3d msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -24,7 +22,7 @@ std::optional<frc::Translation3d> wpi::Protobuf<frc::Translation3d>::Unpack(
   };
 }
 
-bool wpi::Protobuf<frc::Translation3d>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<frc::Translation3d>::Pack(OutputStream& stream,
                                              const frc::Translation3d& value) {
   wpi_proto_ProtobufTranslation3d msg{
       .x = value.X().value(),

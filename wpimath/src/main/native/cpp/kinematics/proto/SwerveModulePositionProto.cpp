@@ -8,12 +8,10 @@
 
 #include "kinematics.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::SwerveModulePosition>::Message() {
-  return get_wpi_proto_ProtobufSwerveModulePosition_msg();
-}
+
 
 std::optional<frc::SwerveModulePosition> wpi::Protobuf<
-    frc::SwerveModulePosition>::Unpack(wpi::ProtoInputStream& stream) {
+    frc::SwerveModulePosition>::Unpack(InputStream& stream) {
   wpi::UnpackCallback<frc::Rotation2d> angle;
   wpi_proto_ProtobufSwerveModulePosition msg{
       .distance = 0,
@@ -36,7 +34,7 @@ std::optional<frc::SwerveModulePosition> wpi::Protobuf<
 }
 
 bool wpi::Protobuf<frc::SwerveModulePosition>::Pack(
-    wpi::ProtoOutputStream& stream, const frc::SwerveModulePosition& value) {
+    OutputStream& stream, const frc::SwerveModulePosition& value) {
   wpi::PackCallback angle{&value.angle};
   wpi_proto_ProtobufSwerveModulePosition msg{
       .distance = value.distance.value(),

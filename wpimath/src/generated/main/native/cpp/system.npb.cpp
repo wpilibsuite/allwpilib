@@ -99,8 +99,8 @@ static const uint8_t file_descriptor[] {
 };
 static const char file_name[] = "system.proto";
 static const char wpi_proto_ProtobufLinearSystem_name[] = "wpi.proto.ProtobufLinearSystem";
-std::string_view get_wpi_proto_ProtobufLinearSystem_name(void) { return wpi_proto_ProtobufLinearSystem_name; }
-pb_filedesc_t get_wpi_proto_ProtobufLinearSystem_file_descriptor(void) { return {file_name, file_descriptor,}; }
+std::string_view wpi_proto_ProtobufLinearSystem::msg_name(void) noexcept { return wpi_proto_ProtobufLinearSystem_name; }
+pb_filedesc_t wpi_proto_ProtobufLinearSystem::file_descriptor(void) noexcept { return {::file_name, ::file_descriptor}; }
 PB_BIND(wpi_proto_ProtobufLinearSystem, wpi_proto_ProtobufLinearSystem, AUTO)
 
 

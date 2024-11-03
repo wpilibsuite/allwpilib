@@ -8,12 +8,10 @@
 
 #include "controller.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::ElevatorFeedforward>::Message() {
-  return get_wpi_proto_ProtobufElevatorFeedforward_msg();
-}
+
 
 std::optional<frc::ElevatorFeedforward>
-wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(wpi::ProtoInputStream& stream) {
+wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufElevatorFeedforward msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -28,7 +26,7 @@ wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(wpi::ProtoInputStream& stream) {
 }
 
 bool wpi::Protobuf<frc::ElevatorFeedforward>::Pack(
-    wpi::ProtoOutputStream& stream, const frc::ElevatorFeedforward& value) {
+    OutputStream& stream, const frc::ElevatorFeedforward& value) {
   wpi_proto_ProtobufElevatorFeedforward msg{
       .ks = value.GetKs().value(),
       .kg = value.GetKg().value(),

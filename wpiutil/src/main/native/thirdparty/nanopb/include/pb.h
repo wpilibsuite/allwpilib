@@ -532,10 +532,10 @@ struct pb_extension_s {
        0 msgname ## _FIELDLIST(PB_GEN_FIELD_COUNT, structname), \
        0 msgname ## _FIELDLIST(PB_GEN_REQ_FIELD_COUNT, structname), \
        0 msgname ## _FIELDLIST(PB_GEN_LARGEST_TAG, structname), \
-       get_ ## structname ## _file_descriptor(), \
-       get_ ## structname ## _name(),  \
+       structname::file_descriptor(), \
+       structname::msg_name(),  \
     }; \
-    const pb_msgdesc_t* get_ ## structname ## _msg(void) { return &(structname ## _msg); } \
+    const pb_msgdesc_t* structname::msg_descriptor(void) noexcept { return &(structname ## _msg); } \
     msgname ## _FIELDLIST(PB_GEN_FIELD_INFO_ASSERT_ ## width, structname)
 
 #define PB_GEN_FIELD_COUNT(structname, atype, htype, ltype, fieldname, tag) +1
@@ -741,7 +741,7 @@ struct pb_extension_s {
 #define PB_SI_PB_LTYPE_UINT64(t)
 #define PB_SI_PB_LTYPE_EXTENSION(t)
 #define PB_SI_PB_LTYPE_FIXED_LENGTH_BYTES(t)
-#define PB_SUBMSG_DESCRIPTOR(t)    (get_ ## t ## _msg()),
+#define PB_SUBMSG_DESCRIPTOR(t)    (t::msg_descriptor()),
 
 /* The field descriptors use a variable width format, with width of either
  * 1, 2, 4 or 8 of 32-bit words. The two lowest bytes of the first byte always

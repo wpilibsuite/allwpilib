@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Thad House <thadhouse1@gmail.com>
 Date: Tue, 29 Oct 2024 20:23:48 -0700
-Subject: [PATCH 4/5] Generate messages or anything non static as callback
+Subject: [PATCH 3/4] Generate messages or anything non static as callback
 
 ---
  generator/nanopb_generator.py | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/generator/nanopb_generator.py b/generator/nanopb_generator.py
-index d28f4cd191dda564c8599eaea34ee7595ce6153c..c7a0d0f1f2fb3f5da9a59373ace20c87bad35441 100755
+index 239aed4f379b5d454e3b65c48ca11e9f92b6bc4d..3b59ba59e6fc997350b1368a2faebc051cd6176a 100755
 --- a/generator/nanopb_generator.py
 +++ b/generator/nanopb_generator.py
 @@ -683,10 +683,12 @@ class Field(ProtoElement):

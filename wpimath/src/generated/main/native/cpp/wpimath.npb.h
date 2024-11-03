@@ -16,12 +16,20 @@
 
 /* Struct definitions */
 typedef struct _wpi_proto_ProtobufMatrix {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     uint32_t num_rows;
     uint32_t num_cols;
     pb_callback_t data;
 } wpi_proto_ProtobufMatrix;
 
 typedef struct _wpi_proto_ProtobufVector {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t rows;
 } wpi_proto_ProtobufVector;
 
@@ -50,13 +58,6 @@ X(a, CALLBACK, REPEATED, DOUBLE,   data,              3)
 X(a, CALLBACK, REPEATED, DOUBLE,   rows,              1)
 #define wpi_proto_ProtobufVector_CALLBACK pb_default_field_callback
 #define wpi_proto_ProtobufVector_DEFAULT NULL
-
-const pb_msgdesc_t *get_wpi_proto_ProtobufMatrix_msg(void);
-std::string_view get_wpi_proto_ProtobufMatrix_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufMatrix_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufVector_msg(void);
-std::string_view get_wpi_proto_ProtobufVector_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufVector_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufMatrix_size depends on runtime parameters */

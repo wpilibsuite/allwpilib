@@ -10,11 +10,15 @@
 #include "frc/controller/ArmFeedforward.h"
 #include "pb.h"
 
+#include "controller.npb.h"
+
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::ArmFeedforward> {
-  static const pb_msgdesc_t* Message();
+    using MessageStruct = wpi_proto_ProtobufArmFeedforward;
+  using InputStream = wpi::ProtoInputStream<frc::ArmFeedforward>;
+  using OutputStream = wpi::ProtoOutputStream<frc::ArmFeedforward>;
   static std::optional<frc::ArmFeedforward> Unpack(
-      wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream,
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
                    const frc::ArmFeedforward& value);
 };

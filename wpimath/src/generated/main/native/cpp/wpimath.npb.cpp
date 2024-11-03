@@ -70,14 +70,14 @@ static const uint8_t file_descriptor[] {
 };
 static const char file_name[] = "wpimath.proto";
 static const char wpi_proto_ProtobufMatrix_name[] = "wpi.proto.ProtobufMatrix";
-std::string_view get_wpi_proto_ProtobufMatrix_name(void) { return wpi_proto_ProtobufMatrix_name; }
-pb_filedesc_t get_wpi_proto_ProtobufMatrix_file_descriptor(void) { return {file_name, file_descriptor,}; }
+std::string_view wpi_proto_ProtobufMatrix::msg_name(void) noexcept { return wpi_proto_ProtobufMatrix_name; }
+pb_filedesc_t wpi_proto_ProtobufMatrix::file_descriptor(void) noexcept { return {::file_name, ::file_descriptor}; }
 PB_BIND(wpi_proto_ProtobufMatrix, wpi_proto_ProtobufMatrix, AUTO)
 
 
 static const char wpi_proto_ProtobufVector_name[] = "wpi.proto.ProtobufVector";
-std::string_view get_wpi_proto_ProtobufVector_name(void) { return wpi_proto_ProtobufVector_name; }
-pb_filedesc_t get_wpi_proto_ProtobufVector_file_descriptor(void) { return {file_name, file_descriptor,}; }
+std::string_view wpi_proto_ProtobufVector::msg_name(void) noexcept { return wpi_proto_ProtobufVector_name; }
+pb_filedesc_t wpi_proto_ProtobufVector::file_descriptor(void) noexcept { return {::file_name, ::file_descriptor}; }
 PB_BIND(wpi_proto_ProtobufVector, wpi_proto_ProtobufVector, AUTO)
 
 

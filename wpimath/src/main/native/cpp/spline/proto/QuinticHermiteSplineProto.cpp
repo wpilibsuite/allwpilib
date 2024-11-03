@@ -8,12 +8,10 @@
 
 #include "spline.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::QuinticHermiteSpline>::Message() {
-  return get_wpi_proto_ProtobufQuinticHermiteSpline_msg();
-}
+
 
 std::optional<frc::QuinticHermiteSpline> wpi::Protobuf<
-    frc::QuinticHermiteSpline>::Unpack(wpi::ProtoInputStream& stream) {
+    frc::QuinticHermiteSpline>::Unpack(InputStream& stream) {
   wpi::WpiArrayUnpackCallback<double, 3> xInitial;
   wpi::WpiArrayUnpackCallback<double, 3> xFinal;
   wpi::WpiArrayUnpackCallback<double, 3> yInitial;
@@ -42,7 +40,7 @@ std::optional<frc::QuinticHermiteSpline> wpi::Protobuf<
 }
 
 bool wpi::Protobuf<frc::QuinticHermiteSpline>::Pack(
-    wpi::ProtoOutputStream& stream, const frc::QuinticHermiteSpline& value) {
+    OutputStream& stream, const frc::QuinticHermiteSpline& value) {
   wpi::PackCallback<double> xInitial{value.GetInitialControlVector().x};
   wpi::PackCallback<double> xFinal{value.GetFinalControlVector().x};
   wpi::PackCallback<double> yInitial{value.GetInitialControlVector().y};

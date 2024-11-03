@@ -6,13 +6,8 @@
 
 #include "controller.npb.h"
 
-const pb_msgdesc_t*
-wpi::Protobuf<frc::DifferentialDriveFeedforward>::Message() {
-  return get_wpi_proto_ProtobufDifferentialDriveFeedforward_msg();
-}
-
 std::optional<frc::DifferentialDriveFeedforward> wpi::Protobuf<
-    frc::DifferentialDriveFeedforward>::Unpack(wpi::ProtoInputStream& stream) {
+    frc::DifferentialDriveFeedforward>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveFeedforward msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -27,7 +22,7 @@ std::optional<frc::DifferentialDriveFeedforward> wpi::Protobuf<
 }
 
 bool wpi::Protobuf<frc::DifferentialDriveFeedforward>::Pack(
-    wpi::ProtoOutputStream& stream,
+    OutputStream& stream,
     const frc::DifferentialDriveFeedforward& value) {
   wpi_proto_ProtobufDifferentialDriveFeedforward msg{
       .kv_linear = value.m_kVLinear.value(),

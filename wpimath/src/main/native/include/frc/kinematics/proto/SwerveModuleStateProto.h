@@ -9,11 +9,15 @@
 
 #include "frc/kinematics/SwerveModuleState.h"
 
+#include "kinematics.npb.h"
+
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::SwerveModuleState> {
-  static const pb_msgdesc_t* Message();
+    using MessageStruct = wpi_proto_ProtobufSwerveModuleState;
+  using InputStream = wpi::ProtoInputStream<frc::SwerveModuleState>;
+  using OutputStream = wpi::ProtoOutputStream<frc::SwerveModuleState>;
   static std::optional<frc::SwerveModuleState> Unpack(
-      wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream,
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
                    const frc::SwerveModuleState& value);
 };

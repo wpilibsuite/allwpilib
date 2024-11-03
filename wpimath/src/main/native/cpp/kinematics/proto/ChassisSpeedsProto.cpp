@@ -6,12 +6,10 @@
 
 #include "kinematics.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::ChassisSpeeds>::Message() {
-  return get_wpi_proto_ProtobufChassisSpeeds_msg();
-}
+
 
 std::optional<frc::ChassisSpeeds> wpi::Protobuf<frc::ChassisSpeeds>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi_proto_ProtobufChassisSpeeds msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -24,7 +22,7 @@ std::optional<frc::ChassisSpeeds> wpi::Protobuf<frc::ChassisSpeeds>::Unpack(
   };
 }
 
-bool wpi::Protobuf<frc::ChassisSpeeds>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<frc::ChassisSpeeds>::Pack(OutputStream& stream,
                                              const frc::ChassisSpeeds& value) {
   wpi_proto_ProtobufChassisSpeeds msg{
       .vx = value.vx.value(),

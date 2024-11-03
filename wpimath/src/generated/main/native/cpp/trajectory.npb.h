@@ -17,6 +17,10 @@
 
 /* Struct definitions */
 typedef struct _wpi_proto_ProtobufTrajectoryState {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double time;
     double velocity;
     double acceleration;
@@ -25,6 +29,10 @@ typedef struct _wpi_proto_ProtobufTrajectoryState {
 } wpi_proto_ProtobufTrajectoryState;
 
 typedef struct _wpi_proto_ProtobufTrajectory {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t states;
 } wpi_proto_ProtobufTrajectory;
 
@@ -59,13 +67,6 @@ X(a, CALLBACK, REPEATED, MESSAGE,  states,            2)
 #define wpi_proto_ProtobufTrajectory_CALLBACK pb_default_field_callback
 #define wpi_proto_ProtobufTrajectory_DEFAULT NULL
 #define wpi_proto_ProtobufTrajectory_states_MSGTYPE wpi_proto_ProtobufTrajectoryState
-
-const pb_msgdesc_t *get_wpi_proto_ProtobufTrajectoryState_msg(void);
-std::string_view get_wpi_proto_ProtobufTrajectoryState_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufTrajectoryState_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufTrajectory_msg(void);
-std::string_view get_wpi_proto_ProtobufTrajectory_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufTrajectory_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufTrajectoryState_size depends on runtime parameters */

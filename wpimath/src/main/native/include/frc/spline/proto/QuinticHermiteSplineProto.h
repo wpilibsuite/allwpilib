@@ -9,11 +9,14 @@
 
 #include "frc/spline/QuinticHermiteSpline.h"
 
+#include "spline.npb.h"
+
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::QuinticHermiteSpline> {
-  static const pb_msgdesc_t* Message();
-  static std::optional<frc::QuinticHermiteSpline> Unpack(
-      wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream,
+  using MessageStruct = wpi_proto_ProtobufQuinticHermiteSpline;
+  using InputStream = wpi::ProtoInputStream<frc::QuinticHermiteSpline>;
+  using OutputStream = wpi::ProtoOutputStream<frc::QuinticHermiteSpline>;
+  static std::optional<frc::QuinticHermiteSpline> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream,
                    const frc::QuinticHermiteSpline& value);
 };

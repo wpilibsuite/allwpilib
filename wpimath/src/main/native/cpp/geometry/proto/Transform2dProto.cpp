@@ -8,12 +8,10 @@
 
 #include "geometry2d.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::Transform2d>::Message() {
-  return get_wpi_proto_ProtobufTransform2d_msg();
-}
+
 
 std::optional<frc::Transform2d> wpi::Protobuf<frc::Transform2d>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi::UnpackCallback<frc::Translation2d> tsln;
   wpi::UnpackCallback<frc::Rotation2d> rot;
   wpi_proto_ProtobufTransform2d msg{
@@ -37,7 +35,7 @@ std::optional<frc::Transform2d> wpi::Protobuf<frc::Transform2d>::Unpack(
   };
 }
 
-bool wpi::Protobuf<frc::Transform2d>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<frc::Transform2d>::Pack(OutputStream& stream,
                                            const frc::Transform2d& value) {
   wpi::PackCallback tsln{&value.Translation()};
   wpi::PackCallback rot{&value.Rotation()};

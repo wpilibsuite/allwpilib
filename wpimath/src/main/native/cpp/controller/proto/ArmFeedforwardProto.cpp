@@ -8,12 +8,10 @@
 
 #include "controller.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::ArmFeedforward>::Message() {
-  return get_wpi_proto_ProtobufArmFeedforward_msg();
-}
+
 
 std::optional<frc::ArmFeedforward> wpi::Protobuf<frc::ArmFeedforward>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi_proto_ProtobufArmFeedforward msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -28,7 +26,7 @@ std::optional<frc::ArmFeedforward> wpi::Protobuf<frc::ArmFeedforward>::Unpack(
 }
 
 bool wpi::Protobuf<frc::ArmFeedforward>::Pack(
-    wpi::ProtoOutputStream& stream, const frc::ArmFeedforward& value) {
+    OutputStream& stream, const frc::ArmFeedforward& value) {
   wpi_proto_ProtobufArmFeedforward msg{
       .ks = value.GetKs().value(),
       .kg = value.GetKg().value(),

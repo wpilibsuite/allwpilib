@@ -6,12 +6,10 @@
 
 #include "geometry2d.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::Twist2d>::Message() {
-  return get_wpi_proto_ProtobufTwist2d_msg();
-}
+
 
 std::optional<frc::Twist2d> wpi::Protobuf<frc::Twist2d>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi_proto_ProtobufTwist2d msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -24,7 +22,7 @@ std::optional<frc::Twist2d> wpi::Protobuf<frc::Twist2d>::Unpack(
   };
 }
 
-bool wpi::Protobuf<frc::Twist2d>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<frc::Twist2d>::Pack(OutputStream& stream,
                                        const frc::Twist2d& value) {
   wpi_proto_ProtobufTwist2d msg{
       .dx = value.dx.value(),

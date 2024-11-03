@@ -10,11 +10,15 @@
 #include "frc/geometry/Translation2d.h"
 #include "pb.h"
 
+#include "geometry2d.npb.h"
+
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Translation2d> {
-  static const pb_msgdesc_t* Message();
+    using MessageStruct = wpi_proto_ProtobufTranslation2d;
+  using InputStream = wpi::ProtoInputStream<frc::Translation2d>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Translation2d>;
   static std::optional<frc::Translation2d> Unpack(
-      wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream,
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
                    const frc::Translation2d& value);
 };

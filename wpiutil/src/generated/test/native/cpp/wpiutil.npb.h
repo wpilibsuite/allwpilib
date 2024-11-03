@@ -16,10 +16,18 @@
 
 /* Struct definitions */
 typedef struct _wpi_proto_TestProtoInner {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t msg;
 } wpi_proto_TestProtoInner;
 
 typedef struct _wpi_proto_TestProto {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double double_msg;
     float float_msg;
     int32_t int32_msg;
@@ -39,6 +47,10 @@ typedef struct _wpi_proto_TestProto {
 } wpi_proto_TestProto;
 
 typedef struct _wpi_proto_OptionalTestProto {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     bool has_double_msg;
     double double_msg;
     bool has_float_msg;
@@ -71,6 +83,10 @@ typedef struct _wpi_proto_OptionalTestProto {
 } wpi_proto_OptionalTestProto;
 
 typedef struct _wpi_proto_RepeatedTestProto {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t double_msg;
     pb_callback_t float_msg;
     pb_callback_t int32_msg;
@@ -219,19 +235,6 @@ X(a, CALLBACK, REPEATED, MESSAGE,  TestProtoInner_msg,  16)
 #define wpi_proto_RepeatedTestProto_CALLBACK pb_default_field_callback
 #define wpi_proto_RepeatedTestProto_DEFAULT NULL
 #define wpi_proto_RepeatedTestProto_TestProtoInner_msg_MSGTYPE wpi_proto_TestProtoInner
-
-const pb_msgdesc_t *get_wpi_proto_TestProtoInner_msg(void);
-std::string_view get_wpi_proto_TestProtoInner_name(void);
-pb_filedesc_t get_wpi_proto_TestProtoInner_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_TestProto_msg(void);
-std::string_view get_wpi_proto_TestProto_name(void);
-pb_filedesc_t get_wpi_proto_TestProto_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_OptionalTestProto_msg(void);
-std::string_view get_wpi_proto_OptionalTestProto_name(void);
-pb_filedesc_t get_wpi_proto_OptionalTestProto_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_RepeatedTestProto_msg(void);
-std::string_view get_wpi_proto_RepeatedTestProto_name(void);
-pb_filedesc_t get_wpi_proto_RepeatedTestProto_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_TestProtoInner_size depends on runtime parameters */

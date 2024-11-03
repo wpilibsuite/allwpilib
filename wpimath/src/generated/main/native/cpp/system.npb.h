@@ -17,6 +17,10 @@
 
 /* Struct definitions */
 typedef struct _wpi_proto_ProtobufLinearSystem {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     uint32_t num_states;
     uint32_t num_inputs;
     uint32_t num_outputs;
@@ -55,10 +59,6 @@ X(a_, CALLBACK, OPTIONAL, MESSAGE,  d,                 7)
 #define wpi_proto_ProtobufLinearSystem_b_MSGTYPE wpi_proto_ProtobufMatrix
 #define wpi_proto_ProtobufLinearSystem_c_MSGTYPE wpi_proto_ProtobufMatrix
 #define wpi_proto_ProtobufLinearSystem_d_MSGTYPE wpi_proto_ProtobufMatrix
-
-const pb_msgdesc_t *get_wpi_proto_ProtobufLinearSystem_msg(void);
-std::string_view get_wpi_proto_ProtobufLinearSystem_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufLinearSystem_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufLinearSystem_size depends on runtime parameters */

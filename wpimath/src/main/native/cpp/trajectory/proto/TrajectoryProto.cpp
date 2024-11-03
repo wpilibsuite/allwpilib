@@ -10,12 +10,10 @@
 
 #include "trajectory.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::Trajectory>::Message() {
-  return get_wpi_proto_ProtobufTrajectory_msg();
-}
+
 
 std::optional<frc::Trajectory> wpi::Protobuf<frc::Trajectory>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi::StdVectorUnpackCallback<frc::Trajectory::State, SIZE_MAX> states;
   wpi_proto_ProtobufTrajectory msg{
       .states = states.Callback(),
@@ -27,7 +25,7 @@ std::optional<frc::Trajectory> wpi::Protobuf<frc::Trajectory>::Unpack(
   return frc::Trajectory{states.Vec()};
 }
 
-bool wpi::Protobuf<frc::Trajectory>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<frc::Trajectory>::Pack(OutputStream& stream,
                                           const frc::Trajectory& value) {
   wpi::PackCallback<frc::Trajectory::State> states{value.States()};
   wpi_proto_ProtobufTrajectory msg{

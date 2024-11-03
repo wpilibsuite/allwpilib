@@ -9,11 +9,13 @@
 
 #include "frc/trajectory/Trajectory.h"
 
+#include "trajectory.npb.h"
+
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Trajectory::State> {
-  static const pb_msgdesc_t* Message();
-  static std::optional<frc::Trajectory::State> Unpack(
-      wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream,
-                   const frc::Trajectory::State& value);
+  using MessageStruct = wpi_proto_ProtobufTrajectoryState;
+  using InputStream = wpi::ProtoInputStream<frc::Trajectory::State>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Trajectory::State>;
+  static std::optional<frc::Trajectory::State> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::Trajectory::State& value);
 };

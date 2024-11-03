@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Thad House <thadhouse1@gmail.com>
 Date: Mon, 28 Oct 2024 17:38:55 -0700
-Subject: [PATCH 3/5] Marked imported files as modified by WPILib
+Subject: [PATCH 1/4] Marked imported files as modified by WPILib
 
 ---
  generator/nanopb_generator.py |   2 +
@@ -15,7 +15,7 @@ Subject: [PATCH 3/5] Marked imported files as modified by WPILib
  8 files changed, 126 insertions(+), 111 deletions(-)
 
 diff --git a/generator/nanopb_generator.py b/generator/nanopb_generator.py
-index d83308e3cd72826fd980b098567f32d3f016993c..d28f4cd191dda564c8599eaea34ee7595ce6153c 100755
+index 6068042b59da04842ff13d4d56dfc35366003a5f..735e4b7b31cdb66a1cdfbd2da6ae8fcde5986147 100755
 --- a/generator/nanopb_generator.py
 +++ b/generator/nanopb_generator.py
 @@ -1,6 +1,8 @@
@@ -28,7 +28,7 @@ index d83308e3cd72826fd980b098567f32d3f016993c..d28f4cd191dda564c8599eaea34ee759
  
  '''Generate header file for nanopb from a ProtoBuf FileDescriptorSet.'''
 diff --git a/pb.h b/pb.h
-index d533dac045f053efc06421c0bc65f3e35f79432d..476a124a5874bd71ea4cabc8a0e1fea86216bde0 100644
+index 1bff70e4e6fbf029e3d6140f5ffd812b9bc7d12e..cec078fe40d526712eda771db077ebf31c95e076 100644
 --- a/pb.h
 +++ b/pb.h
 @@ -1,5 +1,7 @@
@@ -56,7 +56,7 @@ index 6aee76b1efa1e6f2f3fe7d43629da9b2114eea19..73698dd7c5b64f122f00a3a3dd8312b6
  #endif
 -
 diff --git a/pb_common.h b/pb_common.h
-index c3b68f0d3399fdfc2797c1c0f05190315c1e066e..f08a87389b89e6d73468fd0d8e58af7f998cbbf3 100644
+index 58aa90f76d58596d3f45a120b65b4a0bff7fd688..d1d8bf55b13412887ab6d8fc6cfaf51348da9605 100644
 --- a/pb_common.h
 +++ b/pb_common.h
 @@ -1,5 +1,7 @@
@@ -600,7 +600,7 @@ index 068306a05339af05b3b3fb80894746ed9a077bf8..03143e02a596b2f03023437e5f18e5f1
          return false;
  
 diff --git a/pb_decode.h b/pb_decode.h
-index ace86da351a4a1900d753b05e045c32b5e213cd8..a96f18169127c3d2cd80ba89138421f2340b1fe2 100644
+index 3f392b29386e3dbbc69337316eb98029d239690a..c65d8ec716ea7282f68fdc2077a6a11130dd93fc 100644
 --- a/pb_decode.h
 +++ b/pb_decode.h
 @@ -1,6 +1,8 @@
@@ -895,7 +895,7 @@ index f9034a542848f0be0656e2e9eb2b467b2a83cf41..270a721863fd0a218a9667d5f4cadb6f
  }
  
 diff --git a/pb_encode.h b/pb_encode.h
-index 4d8da580d141d01b47942ed0d9853fdbe676bea5..961bde1e3542392c1da6ea64cd15904af6289d22 100644
+index 6dc089da307a10a6d440e70acb2775ed6e7fb07c..22491a7f5e0d787e3c62b0a45dbae31a3c191f58 100644
 --- a/pb_encode.h
 +++ b/pb_encode.h
 @@ -1,6 +1,8 @@

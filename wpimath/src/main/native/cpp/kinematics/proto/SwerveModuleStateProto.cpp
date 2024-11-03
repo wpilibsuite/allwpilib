@@ -8,12 +8,10 @@
 
 #include "kinematics.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::SwerveModuleState>::Message() {
-  return get_wpi_proto_ProtobufSwerveModuleState_msg();
-}
+
 
 std::optional<frc::SwerveModuleState>
-wpi::Protobuf<frc::SwerveModuleState>::Unpack(wpi::ProtoInputStream& stream) {
+wpi::Protobuf<frc::SwerveModuleState>::Unpack(InputStream& stream) {
   wpi::UnpackCallback<frc::Rotation2d> angle;
   wpi_proto_ProtobufSwerveModuleState msg{
       .speed = 0,
@@ -36,7 +34,7 @@ wpi::Protobuf<frc::SwerveModuleState>::Unpack(wpi::ProtoInputStream& stream) {
 }
 
 bool wpi::Protobuf<frc::SwerveModuleState>::Pack(
-    wpi::ProtoOutputStream& stream, const frc::SwerveModuleState& value) {
+    OutputStream& stream, const frc::SwerveModuleState& value) {
   wpi::PackCallback angle{&value.angle};
   wpi_proto_ProtobufSwerveModuleState msg{
       .speed = value.speed.value(),

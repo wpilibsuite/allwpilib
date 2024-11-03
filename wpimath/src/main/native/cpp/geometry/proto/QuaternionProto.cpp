@@ -6,12 +6,10 @@
 
 #include "geometry3d.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::Quaternion>::Message() {
-  return get_wpi_proto_ProtobufQuaternion_msg();
-}
+
 
 std::optional<frc::Quaternion> wpi::Protobuf<frc::Quaternion>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi_proto_ProtobufQuaternion msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -25,7 +23,7 @@ std::optional<frc::Quaternion> wpi::Protobuf<frc::Quaternion>::Unpack(
   };
 }
 
-bool wpi::Protobuf<frc::Quaternion>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<frc::Quaternion>::Pack(OutputStream& stream,
                                           const frc::Quaternion& value) {
   wpi_proto_ProtobufQuaternion msg{
       .w = value.W(),

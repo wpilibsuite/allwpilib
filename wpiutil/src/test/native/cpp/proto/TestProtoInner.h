@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include "pb.h"
+#include "wpiutil.npb.h"
 
 struct TestProtoInner {
   std::string msg;
@@ -16,7 +16,9 @@ struct TestProtoInner {
 
 template <>
 struct wpi::Protobuf<TestProtoInner> {
-  static const pb_msgdesc_t* Message();
-  static std::optional<TestProtoInner> Unpack(wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream, const TestProtoInner& value);
+  using MessageStruct = wpi_proto_TestProtoInner;
+  using InputStream = wpi::ProtoInputStream<TestProtoInner>;
+  using OutputStream = wpi::ProtoOutputStream<TestProtoInner>;
+  static std::optional<TestProtoInner> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const TestProtoInner& value);
 };

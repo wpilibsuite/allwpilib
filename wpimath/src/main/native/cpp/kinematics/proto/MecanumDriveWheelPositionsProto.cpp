@@ -6,12 +6,10 @@
 
 #include "kinematics.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::MecanumDriveWheelPositions>::Message() {
-  return get_wpi_proto_ProtobufMecanumDriveWheelPositions_msg();
-}
+
 
 std::optional<frc::MecanumDriveWheelPositions> wpi::Protobuf<
-    frc::MecanumDriveWheelPositions>::Unpack(wpi::ProtoInputStream& stream) {
+    frc::MecanumDriveWheelPositions>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufMecanumDriveWheelPositions msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -26,7 +24,7 @@ std::optional<frc::MecanumDriveWheelPositions> wpi::Protobuf<
 }
 
 bool wpi::Protobuf<frc::MecanumDriveWheelPositions>::Pack(
-    wpi::ProtoOutputStream& stream,
+    OutputStream& stream,
     const frc::MecanumDriveWheelPositions& value) {
   wpi_proto_ProtobufMecanumDriveWheelPositions msg{
       .front_left = value.frontLeft.value(),

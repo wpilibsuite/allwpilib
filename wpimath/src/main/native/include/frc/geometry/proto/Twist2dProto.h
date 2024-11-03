@@ -9,9 +9,13 @@
 
 #include "frc/geometry/Twist2d.h"
 
+#include "geometry2d.npb.h"
+
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Twist2d> {
-  static const pb_msgdesc_t* Message();
-  static std::optional<frc::Twist2d> Unpack(wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream, const frc::Twist2d& value);
+    using MessageStruct = wpi_proto_ProtobufTwist2d;
+  using InputStream = wpi::ProtoInputStream<frc::Twist2d>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Twist2d>;
+  static std::optional<frc::Twist2d> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::Twist2d& value);
 };

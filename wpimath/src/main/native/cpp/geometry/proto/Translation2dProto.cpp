@@ -6,12 +6,10 @@
 
 #include "geometry2d.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::Translation2d>::Message() {
-  return get_wpi_proto_ProtobufTranslation2d_msg();
-}
+
 
 std::optional<frc::Translation2d> wpi::Protobuf<frc::Translation2d>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi_proto_ProtobufTranslation2d msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -23,7 +21,7 @@ std::optional<frc::Translation2d> wpi::Protobuf<frc::Translation2d>::Unpack(
   };
 }
 
-bool wpi::Protobuf<frc::Translation2d>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<frc::Translation2d>::Pack(OutputStream& stream,
                                              const frc::Translation2d& value) {
   wpi_proto_ProtobufTranslation2d msg{
       .x = value.X().value(),

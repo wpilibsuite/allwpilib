@@ -17,26 +17,46 @@
 
 /* Struct definitions */
 typedef struct _wpi_proto_ProtobufChassisSpeeds {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double vx;
     double vy;
     double omega;
 } wpi_proto_ProtobufChassisSpeeds;
 
 typedef struct _wpi_proto_ProtobufDifferentialDriveKinematics {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double track_width;
 } wpi_proto_ProtobufDifferentialDriveKinematics;
 
 typedef struct _wpi_proto_ProtobufDifferentialDriveWheelSpeeds {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double left;
     double right;
 } wpi_proto_ProtobufDifferentialDriveWheelSpeeds;
 
 typedef struct _wpi_proto_ProtobufDifferentialDriveWheelPositions {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double left;
     double right;
 } wpi_proto_ProtobufDifferentialDriveWheelPositions;
 
 typedef struct _wpi_proto_ProtobufMecanumDriveKinematics {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t front_left;
     pb_callback_t front_right;
     pb_callback_t rear_left;
@@ -44,6 +64,10 @@ typedef struct _wpi_proto_ProtobufMecanumDriveKinematics {
 } wpi_proto_ProtobufMecanumDriveKinematics;
 
 typedef struct _wpi_proto_ProtobufMecanumDriveMotorVoltages {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double front_left;
     double front_right;
     double rear_left;
@@ -51,6 +75,10 @@ typedef struct _wpi_proto_ProtobufMecanumDriveMotorVoltages {
 } wpi_proto_ProtobufMecanumDriveMotorVoltages;
 
 typedef struct _wpi_proto_ProtobufMecanumDriveWheelPositions {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double front_left;
     double front_right;
     double rear_left;
@@ -58,6 +86,10 @@ typedef struct _wpi_proto_ProtobufMecanumDriveWheelPositions {
 } wpi_proto_ProtobufMecanumDriveWheelPositions;
 
 typedef struct _wpi_proto_ProtobufMecanumDriveWheelSpeeds {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double front_left;
     double front_right;
     double rear_left;
@@ -65,15 +97,27 @@ typedef struct _wpi_proto_ProtobufMecanumDriveWheelSpeeds {
 } wpi_proto_ProtobufMecanumDriveWheelSpeeds;
 
 typedef struct _wpi_proto_ProtobufSwerveDriveKinematics {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t modules;
 } wpi_proto_ProtobufSwerveDriveKinematics;
 
 typedef struct _wpi_proto_ProtobufSwerveModulePosition {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double distance;
     pb_callback_t angle;
 } wpi_proto_ProtobufSwerveModulePosition;
 
 typedef struct _wpi_proto_ProtobufSwerveModuleState {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double speed;
     pb_callback_t angle;
 } wpi_proto_ProtobufSwerveModuleState;
@@ -214,40 +258,6 @@ X(a, CALLBACK, OPTIONAL, MESSAGE,  angle,             2)
 #define wpi_proto_ProtobufSwerveModuleState_CALLBACK pb_default_field_callback
 #define wpi_proto_ProtobufSwerveModuleState_DEFAULT NULL
 #define wpi_proto_ProtobufSwerveModuleState_angle_MSGTYPE wpi_proto_ProtobufRotation2d
-
-const pb_msgdesc_t *get_wpi_proto_ProtobufChassisSpeeds_msg(void);
-std::string_view get_wpi_proto_ProtobufChassisSpeeds_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufChassisSpeeds_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufDifferentialDriveKinematics_msg(void);
-std::string_view get_wpi_proto_ProtobufDifferentialDriveKinematics_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufDifferentialDriveKinematics_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufDifferentialDriveWheelSpeeds_msg(void);
-std::string_view get_wpi_proto_ProtobufDifferentialDriveWheelSpeeds_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufDifferentialDriveWheelSpeeds_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufDifferentialDriveWheelPositions_msg(void);
-std::string_view get_wpi_proto_ProtobufDifferentialDriveWheelPositions_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufDifferentialDriveWheelPositions_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufMecanumDriveKinematics_msg(void);
-std::string_view get_wpi_proto_ProtobufMecanumDriveKinematics_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufMecanumDriveKinematics_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufMecanumDriveMotorVoltages_msg(void);
-std::string_view get_wpi_proto_ProtobufMecanumDriveMotorVoltages_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufMecanumDriveMotorVoltages_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufMecanumDriveWheelPositions_msg(void);
-std::string_view get_wpi_proto_ProtobufMecanumDriveWheelPositions_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufMecanumDriveWheelPositions_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufMecanumDriveWheelSpeeds_msg(void);
-std::string_view get_wpi_proto_ProtobufMecanumDriveWheelSpeeds_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufMecanumDriveWheelSpeeds_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufSwerveDriveKinematics_msg(void);
-std::string_view get_wpi_proto_ProtobufSwerveDriveKinematics_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufSwerveDriveKinematics_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufSwerveModulePosition_msg(void);
-std::string_view get_wpi_proto_ProtobufSwerveModulePosition_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufSwerveModulePosition_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufSwerveModuleState_msg(void);
-std::string_view get_wpi_proto_ProtobufSwerveModuleState_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufSwerveModuleState_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufMecanumDriveKinematics_size depends on runtime parameters */

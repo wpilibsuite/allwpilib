@@ -8,12 +8,10 @@
 
 #include "geometry2d.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::Rectangle2d>::Message() {
-  return get_wpi_proto_ProtobufRectangle2d_msg();
-}
+
 
 std::optional<frc::Rectangle2d> wpi::Protobuf<frc::Rectangle2d>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi::UnpackCallback<frc::Pose2d> pose;
   wpi_proto_ProtobufRectangle2d msg{
       .center = pose.Callback(),
@@ -37,7 +35,7 @@ std::optional<frc::Rectangle2d> wpi::Protobuf<frc::Rectangle2d>::Unpack(
   };
 }
 
-bool wpi::Protobuf<frc::Rectangle2d>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<frc::Rectangle2d>::Pack(OutputStream& stream,
                                            const frc::Rectangle2d& value) {
   wpi::PackCallback pose{&value.Center()};
   wpi_proto_ProtobufRectangle2d msg{

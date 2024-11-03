@@ -16,37 +16,65 @@
 
 /* Struct definitions */
 typedef struct _wpi_proto_ProtobufTranslation2d {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double x;
     double y;
 } wpi_proto_ProtobufTranslation2d;
 
 typedef struct _wpi_proto_ProtobufRotation2d {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double value;
 } wpi_proto_ProtobufRotation2d;
 
 typedef struct _wpi_proto_ProtobufPose2d {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t translation;
     pb_callback_t rotation;
 } wpi_proto_ProtobufPose2d;
 
 typedef struct _wpi_proto_ProtobufTransform2d {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t translation;
     pb_callback_t rotation;
 } wpi_proto_ProtobufTransform2d;
 
 typedef struct _wpi_proto_ProtobufTwist2d {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double dx;
     double dy;
     double dtheta;
 } wpi_proto_ProtobufTwist2d;
 
 typedef struct _wpi_proto_ProtobufRectangle2d {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t center;
     double xWidth;
     double yWidth;
 } wpi_proto_ProtobufRectangle2d;
 
 typedef struct _wpi_proto_ProtobufEllipse2d {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t center;
     double xSemiAxis;
     double ySemiAxis;
@@ -137,28 +165,6 @@ X(a, STATIC,   SINGULAR, DOUBLE,   ySemiAxis,         3)
 #define wpi_proto_ProtobufEllipse2d_CALLBACK pb_default_field_callback
 #define wpi_proto_ProtobufEllipse2d_DEFAULT NULL
 #define wpi_proto_ProtobufEllipse2d_center_MSGTYPE wpi_proto_ProtobufPose2d
-
-const pb_msgdesc_t *get_wpi_proto_ProtobufTranslation2d_msg(void);
-std::string_view get_wpi_proto_ProtobufTranslation2d_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufTranslation2d_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufRotation2d_msg(void);
-std::string_view get_wpi_proto_ProtobufRotation2d_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufRotation2d_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufPose2d_msg(void);
-std::string_view get_wpi_proto_ProtobufPose2d_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufPose2d_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufTransform2d_msg(void);
-std::string_view get_wpi_proto_ProtobufTransform2d_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufTransform2d_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufTwist2d_msg(void);
-std::string_view get_wpi_proto_ProtobufTwist2d_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufTwist2d_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufRectangle2d_msg(void);
-std::string_view get_wpi_proto_ProtobufRectangle2d_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufRectangle2d_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufEllipse2d_msg(void);
-std::string_view get_wpi_proto_ProtobufEllipse2d_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufEllipse2d_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufPose2d_size depends on runtime parameters */

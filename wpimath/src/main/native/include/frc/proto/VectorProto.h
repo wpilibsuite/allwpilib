@@ -15,12 +15,12 @@
 
 template <int Size, int Options, int MaxRows, int MaxCols>
 struct wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
-  static const pb_msgdesc_t* Message() {
-    return get_wpi_proto_ProtobufVector_msg();
-  }
+    using MessageStruct = wpi_proto_ProtobufVector;
+  using InputStream = wpi::ProtoInputStream<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>>;
 
   static std::optional<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> Unpack(
-      wpi::ProtoInputStream& stream) {
+      InputStream& stream) {
     constexpr bool isSmall = Size * sizeof(double) < 256;
     using UnpackType =
         std::conditional_t<isSmall, wpi::UnpackCallback<double, Size>,
@@ -28,7 +28,7 @@ struct wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
     UnpackType rows;
     rows.Vec().reserve(Size);
     rows.SetLimits(wpi::DecodeLimits::Fail);
-    _wpi_proto_ProtobufVector msg{
+    wpi_proto_ProtobufVector msg{
         .rows = rows.Callback(),
     };
     if (!stream.Decode(msg)) {
@@ -50,7 +50,7 @@ struct wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
   }
 
   static bool Pack(
-      wpi::ProtoOutputStream& stream,
+      OutputStream& stream,
       const frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>& value) {
     std::span<const double> rowsSpan{value.data(), static_cast<size_t>(Size)};
     wpi::PackCallback<double> rows{rowsSpan};

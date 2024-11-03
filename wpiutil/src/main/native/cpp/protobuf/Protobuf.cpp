@@ -35,7 +35,7 @@ void detail::ForEachProtobufDescriptor(
   fn(name, msg->file_descriptor.file_descriptor);
 }
 
-bool ProtoOutputStream::WriteFromSmallVector(pb_ostream_t* stream,
+bool detail::WriteFromSmallVector(pb_ostream_t* stream,
                                              const pb_byte_t* buf,
                                              size_t count) {
   SmallVectorType* vec = reinterpret_cast<SmallVectorType*>(stream->state);
@@ -43,7 +43,7 @@ bool ProtoOutputStream::WriteFromSmallVector(pb_ostream_t* stream,
   return true;
 }
 
-bool ProtoOutputStream::WriteFromStdVector(pb_ostream_t* stream,
+bool detail::WriteFromStdVector(pb_ostream_t* stream,
                                            const pb_byte_t* buf, size_t count) {
   StdVectorType* vec = reinterpret_cast<StdVectorType*>(stream->state);
   vec->insert(vec->end(), buf, buf + count);

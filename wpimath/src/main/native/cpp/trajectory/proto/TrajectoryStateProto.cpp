@@ -10,12 +10,10 @@
 
 #include "trajectory.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::Trajectory::State>::Message() {
-  return get_wpi_proto_ProtobufTrajectoryState_msg();
-}
+
 
 std::optional<frc::Trajectory::State>
-wpi::Protobuf<frc::Trajectory::State>::Unpack(wpi::ProtoInputStream& stream) {
+wpi::Protobuf<frc::Trajectory::State>::Unpack(InputStream& stream) {
   wpi::UnpackCallback<frc::Pose2d> pose;
   wpi_proto_ProtobufTrajectoryState msg;
   msg.pose = pose.Callback();
@@ -40,7 +38,7 @@ wpi::Protobuf<frc::Trajectory::State>::Unpack(wpi::ProtoInputStream& stream) {
 }
 
 bool wpi::Protobuf<frc::Trajectory::State>::Pack(
-    wpi::ProtoOutputStream& stream, const frc::Trajectory::State& value) {
+    OutputStream& stream, const frc::Trajectory::State& value) {
   wpi::PackCallback pose{&value.pose};
   wpi_proto_ProtobufTrajectoryState msg{
       .time = value.t.value(),

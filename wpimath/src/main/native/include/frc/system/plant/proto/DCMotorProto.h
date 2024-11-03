@@ -9,9 +9,13 @@
 
 #include "frc/system/plant/DCMotor.h"
 
+#include "plant.npb.h"
+
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DCMotor> {
-  static const pb_msgdesc_t* Message();
-  static std::optional<frc::DCMotor> Unpack(wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream, const frc::DCMotor& value);
+  using MessageStruct = wpi_proto_ProtobufDCMotor;
+  using InputStream = wpi::ProtoInputStream<frc::DCMotor>;
+  using OutputStream = wpi::ProtoOutputStream<frc::DCMotor>;
+  static std::optional<frc::DCMotor> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::DCMotor& value);
 };

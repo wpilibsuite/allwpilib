@@ -9,10 +9,14 @@
 
 #include "frc/geometry/Transform2d.h"
 
+#include "geometry2d.npb.h"
+
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Transform2d> {
-  static const pb_msgdesc_t* Message();
-  static std::optional<frc::Transform2d> Unpack(wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream,
+    using MessageStruct = wpi_proto_ProtobufTransform2d;
+  using InputStream = wpi::ProtoInputStream<frc::Transform2d>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Transform2d>;
+  static std::optional<frc::Transform2d> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream,
                    const frc::Transform2d& value);
 };

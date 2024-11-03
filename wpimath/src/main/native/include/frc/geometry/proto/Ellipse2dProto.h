@@ -9,9 +9,13 @@
 
 #include "frc/geometry/Ellipse2d.h"
 
+#include "geometry2d.npb.h"
+
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Ellipse2d> {
-  static const pb_msgdesc_t* Message();
-  static std::optional<frc::Ellipse2d> Unpack(wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream, const frc::Ellipse2d& value);
+    using MessageStruct = wpi_proto_ProtobufEllipse2d;
+  using InputStream = wpi::ProtoInputStream<frc::Ellipse2d>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Ellipse2d>;
+  static std::optional<frc::Ellipse2d> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::Ellipse2d& value);
 };

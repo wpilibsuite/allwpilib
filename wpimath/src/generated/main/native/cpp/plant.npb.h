@@ -16,6 +16,10 @@
 
 /* Struct definitions */
 typedef struct _wpi_proto_ProtobufDCMotor {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double nominal_voltage;
     double stall_torque;
     double stall_current;
@@ -44,10 +48,6 @@ X(a, STATIC,   SINGULAR, DOUBLE,   free_current,      4) \
 X(a, STATIC,   SINGULAR, DOUBLE,   free_speed,        5)
 #define wpi_proto_ProtobufDCMotor_CALLBACK NULL
 #define wpi_proto_ProtobufDCMotor_DEFAULT NULL
-
-const pb_msgdesc_t *get_wpi_proto_ProtobufDCMotor_msg(void);
-std::string_view get_wpi_proto_ProtobufDCMotor_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufDCMotor_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 #define WPI_PROTO_PLANT_NPB_H_MAX_SIZE           wpi_proto_ProtobufDCMotor_size

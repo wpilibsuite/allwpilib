@@ -35,23 +35,69 @@ class SmallVectorImpl;
 template <typename T>
 struct Protobuf {};
 
+namespace detail {
+using SmallVectorType = wpi::SmallVectorImpl<uint8_t>;
+using StdVectorType = std::vector<uint8_t>;
+bool WriteFromSmallVector(pb_ostream_t* stream, const pb_byte_t* buf,
+                          size_t count);
+
+bool WriteFromStdVector(pb_ostream_t* stream, const pb_byte_t* buf,
+                        size_t count);
+}  // namespace detail
+
+/**
+ * Class for wrapping a nanopb istream.
+ */
+template <typename T>
 class ProtoInputStream {
  public:
-  ProtoInputStream(pb_istream_t* stream, const pb_msgdesc_t* msgDesc)
-      : m_streamMsg{stream}, m_msgDesc{msgDesc} {}
+  /**
+   * Constructs a nanopb istream from an existing istream object.
+   * Generally used internally for decoding submessages
+   *
+   * @param[in] stream the nanopb istream
+   */
+  ProtoInputStream(pb_istream_t* stream)
+      : m_streamMsg{stream},
+        m_msgDesc{Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {}
 
-  ProtoInputStream(std::span<const uint8_t> stream, const pb_msgdesc_t* msgDesc)
+  /**
+   * Constructs a nanopb istream from a buffer.
+   *
+   * @param[in] stream the stream buffer
+   */
+  ProtoInputStream(std::span<const uint8_t> stream)
       : m_streamLocal{pb_istream_from_buffer(
             reinterpret_cast<const pb_byte_t*>(stream.data()), stream.size())},
-        m_msgDesc{msgDesc} {}
+        m_msgDesc{Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {}
 
+  /**
+   * Gets the backing nanopb stream object.
+   *
+   * @return nanopb stream
+   */
   pb_istream_t* Stream() noexcept {
     return m_streamMsg ? m_streamMsg : &m_streamLocal;
   }
+
+  /**
+   * Gets the nanopb message descriptor
+   *
+   * @return the nanopb message descriptor
+   */
   const pb_msgdesc_t* MsgDesc() const noexcept { return m_msgDesc; }
 
-  template <typename T>
-  bool Decode(T& msg, unsigned int flags = 0) {
+  /**
+   * Decodes a protobuf. Flags are the same flags passed to pb_decode_ex
+   *
+   * std::is_same_v<Protobuf<std::remove_cvref_t<T>>::MessageStruct, T>
+   *
+   * @param[in] msg The message to send
+   * @param[in] flags Flags to pass
+   * @return true if decoding was successful, false otherwise
+   */
+  bool Decode(Protobuf<std::remove_cvref_t<T>>::MessageStruct& msg,
+              unsigned int flags = 0) {
     return pb_decode_ex(Stream(), m_msgDesc, &msg, flags);
   }
 
@@ -61,34 +107,33 @@ class ProtoInputStream {
   const pb_msgdesc_t* m_msgDesc;
 };
 
+template <typename T>
 class ProtoOutputStream {
  public:
-  using SmallVectorType = wpi::SmallVectorImpl<uint8_t>;
-  using StdVectorType = std::vector<uint8_t>;
+  explicit ProtoOutputStream(pb_ostream_t* stream)
+      : m_streamMsg{stream},
+        m_msgDesc{Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {}
 
-  ProtoOutputStream(pb_ostream_t* stream, const pb_msgdesc_t* msgDesc)
-      : m_streamMsg{stream}, m_msgDesc{msgDesc} {}
-
-  ProtoOutputStream(SmallVectorType& out, const pb_msgdesc_t* msgDesc)
-      : m_msgDesc{msgDesc} {
-    m_streamLocal.callback = WriteFromSmallVector;
+  explicit ProtoOutputStream(detail::SmallVectorType& out)
+      : m_msgDesc{Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
+    m_streamLocal.callback = detail::WriteFromSmallVector;
     m_streamLocal.state = &out;
     m_streamLocal.max_size = SIZE_MAX;
     m_streamLocal.bytes_written = 0;
     m_streamLocal.errmsg = nullptr;
   }
 
-  ProtoOutputStream(StdVectorType& out, const pb_msgdesc_t* msgDesc)
-      : m_msgDesc{msgDesc} {
-    m_streamLocal.callback = WriteFromStdVector;
+  explicit ProtoOutputStream(detail::StdVectorType& out)
+      : m_msgDesc{Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
+    m_streamLocal.callback = detail::WriteFromStdVector;
     m_streamLocal.state = &out;
     m_streamLocal.max_size = SIZE_MAX;
     m_streamLocal.bytes_written = 0;
     m_streamLocal.errmsg = nullptr;
   }
 
-  explicit ProtoOutputStream(const pb_msgdesc_t* msgDesc)
-      : m_msgDesc{msgDesc} {}
+  ProtoOutputStream()
+      : m_msgDesc{Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {}
 
   pb_ostream_t* Stream() noexcept {
     return m_streamMsg ? m_streamMsg : &m_streamLocal;
@@ -96,8 +141,7 @@ class ProtoOutputStream {
   bool IsSubmessage() const noexcept { return m_streamMsg; }
   const pb_msgdesc_t* MsgDesc() const noexcept { return m_msgDesc; }
 
-  template <typename T>
-  bool Encode(const T& msg) {
+  bool Encode(const Protobuf<std::remove_cvref_t<T>>::MessageStruct& msg) {
     if (m_streamMsg) {
       return pb_encode_submessage(m_streamMsg, m_msgDesc, &msg);
     }
@@ -105,12 +149,6 @@ class ProtoOutputStream {
   }
 
  private:
-  static bool WriteFromSmallVector(pb_ostream_t* stream, const pb_byte_t* buf,
-                                   size_t count);
-
-  static bool WriteFromStdVector(pb_ostream_t* stream, const pb_byte_t* buf,
-                                 size_t count);
-
   pb_ostream_t m_streamLocal;
   pb_ostream_t* m_streamMsg{nullptr};
   const pb_msgdesc_t* m_msgDesc;
@@ -142,20 +180,18 @@ class ProtoOutputStream {
  * register the class
  */
 template <typename T>
-concept ProtobufSerializable =
-    requires(wpi::ProtoOutputStream& ostream, wpi::ProtoInputStream& istream,
-             const T& value) {
-      typename Protobuf<typename std::remove_cvref_t<T>>;
-      {
-        Protobuf<typename std::remove_cvref_t<T>>::Message()
-      } -> std::same_as<const pb_msgdesc_t*>;
-      {
-        Protobuf<typename std::remove_cvref_t<T>>::Unpack(istream)
-      } -> std::same_as<std::optional<typename std::remove_cvref_t<T>>>;
-      {
-        Protobuf<typename std::remove_cvref_t<T>>::Pack(ostream, value)
-      } -> std::same_as<bool>;
-    };
+concept ProtobufSerializable = requires(
+    wpi::ProtoOutputStream<std::remove_cvref_t<T>>& ostream,
+    wpi::ProtoInputStream<std::remove_cvref_t<T>>& istream, const T& value) {
+  typename Protobuf<typename std::remove_cvref_t<T>>;
+  typename Protobuf<typename std::remove_cvref_t<T>>::MessageStruct;
+  {
+    Protobuf<typename std::remove_cvref_t<T>>::Unpack(istream)
+  } -> std::same_as<std::optional<typename std::remove_cvref_t<T>>>;
+  {
+    Protobuf<typename std::remove_cvref_t<T>>::Pack(ostream, value)
+  } -> std::same_as<bool>;
+};
 
 /**
  * Specifies that a type is capable of in-place protobuf deserialization.
@@ -168,7 +204,7 @@ concept ProtobufSerializable =
 template <typename T>
 concept MutableProtobufSerializable =
     ProtobufSerializable<T> &&
-    requires(T* out, wpi::ProtoInputStream& istream) {
+    requires(T* out, wpi::ProtoInputStream<T>& istream) {
       Protobuf<typename std::remove_cvref_t<T>>::UnpackInto(out, istream);
     };
 
@@ -200,7 +236,7 @@ class ProtobufMessage {
    * @return Optional; empty if parsing failed
    */
   std::optional<std::remove_cvref_t<T>> Unpack(std::span<const uint8_t> data) {
-    ProtoInputStream stream{data, Protobuf<std::remove_cvref_t<T>>::Message()};
+    ProtoInputStream<std::remove_cvref_t<T>> stream{data};
     return Protobuf<std::remove_cvref_t<T>>::Unpack(stream);
   }
 
@@ -213,8 +249,7 @@ class ProtobufMessage {
    */
   bool UnpackInto(T* out, std::span<const uint8_t> data) {
     if constexpr (MutableProtobufSerializable<T>) {
-      ProtoInputStream stream{data,
-                              Protobuf<std::remove_cvref_t<T>>::Message()};
+      ProtoInputStream<std::remove_cvref_t<T>> stream{data};
       return Protobuf<std::remove_cvref_t<T>>::UnpackInto(out, stream);
     } else {
       auto unpacked = Unpack(data);
@@ -234,7 +269,7 @@ class ProtobufMessage {
    * @return true if successful
    */
   bool Pack(wpi::SmallVectorImpl<uint8_t>& out, const T& value) {
-    ProtoOutputStream stream{out, Protobuf<std::remove_cvref_t<T>>::Message()};
+    ProtoOutputStream<std::remove_cvref_t<T>> stream{out};
     return Protobuf<std::remove_cvref_t<T>>::Pack(stream, value);
   }
 
@@ -246,7 +281,7 @@ class ProtobufMessage {
    * @return true if successful
    */
   bool Pack(std::vector<uint8_t>& out, const T& value) {
-    ProtoOutputStream stream{out, Protobuf<std::remove_cvref_t<T>>::Message()};
+    ProtoOutputStream<std::remove_cvref_t<T>> stream{out};
     return Protobuf<std::remove_cvref_t<T>>::Pack(stream, value);
   }
 
@@ -256,7 +291,8 @@ class ProtobufMessage {
    * @return type string
    */
   std::string GetTypeString() const {
-    return detail::GetTypeString(Protobuf<std::remove_cvref_t<T>>::Message());
+    return detail::GetTypeString(
+        Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor());
   }
 
   /**
@@ -273,7 +309,7 @@ class ProtobufMessage {
                         std::span<const uint8_t> descriptor)>
           fn) {
     detail::ForEachProtobufDescriptor(
-        Protobuf<std::remove_cvref_t<T>>::Message(), exists, fn);
+        Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor(), exists, fn);
   }
 };
 

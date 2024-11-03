@@ -96,14 +96,14 @@ static const uint8_t file_descriptor[] {
 };
 static const char file_name[] = "trajectory.proto";
 static const char wpi_proto_ProtobufTrajectoryState_name[] = "wpi.proto.ProtobufTrajectoryState";
-std::string_view get_wpi_proto_ProtobufTrajectoryState_name(void) { return wpi_proto_ProtobufTrajectoryState_name; }
-pb_filedesc_t get_wpi_proto_ProtobufTrajectoryState_file_descriptor(void) { return {file_name, file_descriptor,}; }
+std::string_view wpi_proto_ProtobufTrajectoryState::msg_name(void) noexcept { return wpi_proto_ProtobufTrajectoryState_name; }
+pb_filedesc_t wpi_proto_ProtobufTrajectoryState::file_descriptor(void) noexcept { return {::file_name, ::file_descriptor}; }
 PB_BIND(wpi_proto_ProtobufTrajectoryState, wpi_proto_ProtobufTrajectoryState, AUTO)
 
 
 static const char wpi_proto_ProtobufTrajectory_name[] = "wpi.proto.ProtobufTrajectory";
-std::string_view get_wpi_proto_ProtobufTrajectory_name(void) { return wpi_proto_ProtobufTrajectory_name; }
-pb_filedesc_t get_wpi_proto_ProtobufTrajectory_file_descriptor(void) { return {file_name, file_descriptor,}; }
+std::string_view wpi_proto_ProtobufTrajectory::msg_name(void) noexcept { return wpi_proto_ProtobufTrajectory_name; }
+pb_filedesc_t wpi_proto_ProtobufTrajectory::file_descriptor(void) noexcept { return {::file_name, ::file_descriptor}; }
 PB_BIND(wpi_proto_ProtobufTrajectory, wpi_proto_ProtobufTrajectory, AUTO)
 
 

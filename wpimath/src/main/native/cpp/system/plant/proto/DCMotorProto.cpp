@@ -8,12 +8,10 @@
 
 #include "plant.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::DCMotor>::Message() {
-  return get_wpi_proto_ProtobufDCMotor_msg();
-}
+
 
 std::optional<frc::DCMotor> wpi::Protobuf<frc::DCMotor>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi_proto_ProtobufDCMotor msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -28,7 +26,7 @@ std::optional<frc::DCMotor> wpi::Protobuf<frc::DCMotor>::Unpack(
   };
 }
 
-bool wpi::Protobuf<frc::DCMotor>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<frc::DCMotor>::Pack(OutputStream& stream,
                                        const frc::DCMotor& value) {
   wpi_proto_ProtobufDCMotor msg{
       .nominal_voltage = value.nominalVoltage.value(),

@@ -8,12 +8,10 @@
 
 #include "kinematics.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::MecanumDriveKinematics>::Message() {
-  return get_wpi_proto_ProtobufMecanumDriveKinematics_msg();
-}
+
 
 std::optional<frc::MecanumDriveKinematics> wpi::Protobuf<
-    frc::MecanumDriveKinematics>::Unpack(wpi::ProtoInputStream& stream) {
+    frc::MecanumDriveKinematics>::Unpack(InputStream& stream) {
   wpi::UnpackCallback<frc::Translation2d> frontLeft;
   wpi::UnpackCallback<frc::Translation2d> frontRight;
   wpi::UnpackCallback<frc::Translation2d> rearLeft;
@@ -47,7 +45,7 @@ std::optional<frc::MecanumDriveKinematics> wpi::Protobuf<
 }
 
 bool wpi::Protobuf<frc::MecanumDriveKinematics>::Pack(
-    wpi::ProtoOutputStream& stream, const frc::MecanumDriveKinematics& value) {
+    OutputStream& stream, const frc::MecanumDriveKinematics& value) {
   wpi::PackCallback frontLeft{&value.GetFrontLeft()};
   wpi::PackCallback frontRight{&value.GetFrontRight()};
   wpi::PackCallback rearLeft{&value.GetRearLeft()};

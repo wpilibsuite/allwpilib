@@ -6,13 +6,8 @@
 
 #include "kinematics.npb.h"
 
-const pb_msgdesc_t*
-wpi::Protobuf<frc::DifferentialDriveWheelSpeeds>::Message() {
-  return get_wpi_proto_ProtobufDifferentialDriveWheelSpeeds_msg();
-}
-
 std::optional<frc::DifferentialDriveWheelSpeeds> wpi::Protobuf<
-    frc::DifferentialDriveWheelSpeeds>::Unpack(wpi::ProtoInputStream& stream) {
+    frc::DifferentialDriveWheelSpeeds>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveWheelSpeeds msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -25,7 +20,7 @@ std::optional<frc::DifferentialDriveWheelSpeeds> wpi::Protobuf<
 }
 
 bool wpi::Protobuf<frc::DifferentialDriveWheelSpeeds>::Pack(
-    wpi::ProtoOutputStream& stream,
+    OutputStream& stream,
     const frc::DifferentialDriveWheelSpeeds& value) {
   wpi_proto_ProtobufDifferentialDriveWheelSpeeds msg{
       .left = value.left.value(),

@@ -16,12 +16,20 @@
 
 /* Struct definitions */
 typedef struct _wpi_proto_ProtobufTranslation3d {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double x;
     double y;
     double z;
 } wpi_proto_ProtobufTranslation3d;
 
 typedef struct _wpi_proto_ProtobufQuaternion {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double w;
     double x;
     double y;
@@ -29,20 +37,36 @@ typedef struct _wpi_proto_ProtobufQuaternion {
 } wpi_proto_ProtobufQuaternion;
 
 typedef struct _wpi_proto_ProtobufRotation3d {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t q;
 } wpi_proto_ProtobufRotation3d;
 
 typedef struct _wpi_proto_ProtobufPose3d {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t translation;
     pb_callback_t rotation;
 } wpi_proto_ProtobufPose3d;
 
 typedef struct _wpi_proto_ProtobufTransform3d {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t translation;
     pb_callback_t rotation;
 } wpi_proto_ProtobufTransform3d;
 
 typedef struct _wpi_proto_ProtobufTwist3d {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double dx;
     double dy;
     double dz;
@@ -133,25 +157,6 @@ X(a, STATIC,   SINGULAR, DOUBLE,   ry,                5) \
 X(a, STATIC,   SINGULAR, DOUBLE,   rz,                6)
 #define wpi_proto_ProtobufTwist3d_CALLBACK NULL
 #define wpi_proto_ProtobufTwist3d_DEFAULT NULL
-
-const pb_msgdesc_t *get_wpi_proto_ProtobufTranslation3d_msg(void);
-std::string_view get_wpi_proto_ProtobufTranslation3d_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufTranslation3d_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufQuaternion_msg(void);
-std::string_view get_wpi_proto_ProtobufQuaternion_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufQuaternion_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufRotation3d_msg(void);
-std::string_view get_wpi_proto_ProtobufRotation3d_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufRotation3d_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufPose3d_msg(void);
-std::string_view get_wpi_proto_ProtobufPose3d_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufPose3d_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufTransform3d_msg(void);
-std::string_view get_wpi_proto_ProtobufTransform3d_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufTransform3d_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufTwist3d_msg(void);
-std::string_view get_wpi_proto_ProtobufTwist3d_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufTwist3d_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufRotation3d_size depends on runtime parameters */

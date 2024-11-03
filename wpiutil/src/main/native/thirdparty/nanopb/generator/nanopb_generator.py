@@ -1406,6 +1406,12 @@ class Message(ProtoElement):
 
         result += '\n'
 
+        result += '    static const pb_msgdesc_t* msg_descriptor(void) noexcept;\n'
+        result += '    static std::string_view msg_name(void) noexcept;\n'
+        result += '    static pb_filedesc_t file_descriptor(void) noexcept;\n'
+
+        result += '\n'
+
         if not self.fields:
             # Empty structs are not allowed in C standard.
             # Therefore add a dummy field if an empty message occurs.
@@ -2128,11 +2134,6 @@ class ProtoFile:
             yield '/* Struct field encoding specification for nanopb */\n'
             for msg in self.messages:
                 yield msg.fields_declaration(self.dependencies) + '\n'
-            for msg in self.messages:
-                yield 'const pb_msgdesc_t *get_%s_msg(void);\n' % Globals.naming_style.type_name(msg.name)
-                yield 'std::string_view get_%s_name(void);\n' % Globals.naming_style.type_name(msg.name)
-                yield 'pb_filedesc_t get_%s_file_descriptor(void);\n' % Globals.naming_style.type_name(msg.name)
-            yield '\n'
 
             yield '/* Maximum encoded size of messages (where known) */\n'
             messagesizes = []
@@ -2295,10 +2296,9 @@ class ProtoFile:
             else:
                 full_name = msg.desc.name
             yield 'static const char %s_name[] = "%s";\n' % (msg.name, full_name)
-            yield 'std::string_view get_%s_name(void) { return %s_name; }\n' % (msg.name, msg.name)
-            yield 'pb_filedesc_t get_%s_file_descriptor(void) { return {file_name, file_descriptor,}; }\n' % msg.name
+            yield 'std::string_view %s::msg_name(void) noexcept { return %s_name; }\n' % (msg.name, msg.name)
+            yield 'pb_filedesc_t %s::file_descriptor(void) noexcept { return {::file_name, ::file_descriptor}; }\n' % msg.name
             yield msg.fields_definition(self.dependencies) + '\n\n'
-            
 
         # Generate pb_extension_type_t definitions if extensions are used in proto file
         for ext in self.extensions:

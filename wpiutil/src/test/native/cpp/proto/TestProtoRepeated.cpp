@@ -33,18 +33,15 @@ struct RepeatedTestProto {
 
 template <>
 struct wpi::Protobuf<RepeatedTestProto> {
-  static const pb_msgdesc_t* Message();
-  static std::optional<RepeatedTestProto> Unpack(wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream,
-                   const RepeatedTestProto& value);
+  using MessageStruct = wpi_proto_RepeatedTestProto;
+  using InputStream = wpi::ProtoInputStream<RepeatedTestProto>;
+  using OutputStream = wpi::ProtoOutputStream<RepeatedTestProto>;
+  static std::optional<RepeatedTestProto> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const RepeatedTestProto& value);
 };
 
-const pb_msgdesc_t* wpi::Protobuf<RepeatedTestProto>::Message() {
-  return get_wpi_proto_RepeatedTestProto_msg();
-}
-
 std::optional<RepeatedTestProto> wpi::Protobuf<RepeatedTestProto>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   RepeatedTestProto toRet;
 
   wpi::DirectUnpackCallback<double, std::vector<double>> double_msg{
@@ -107,7 +104,7 @@ std::optional<RepeatedTestProto> wpi::Protobuf<RepeatedTestProto>::Unpack(
   return toRet;
 }
 
-bool wpi::Protobuf<RepeatedTestProto>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<RepeatedTestProto>::Pack(OutputStream& stream,
                                             const RepeatedTestProto& value) {
   wpi::PackCallback<double> double_msg{value.double_msg};
   wpi::PackCallback<float> float_msg{value.float_msg};
@@ -158,13 +155,11 @@ TEST(RepeatedTestProtoTest, RoundtripNanopb) {
 
   kExpectedData.double_msg.emplace_back(5.05);
 
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
   wpi::SmallVector<uint8_t, 64> buf;
-  wpi::ProtoOutputStream ostream{buf, ProtoType::Message()};
 
-  ASSERT_TRUE(ProtoType::Pack(ostream, kExpectedData));
-
-  wpi::ProtoInputStream istream{buf, ProtoType::Message()};
-  std::optional<RepeatedTestProto> unpacked_data = ProtoType::Unpack(istream);
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
   ASSERT_EQ(kExpectedData.double_msg.size(), unpacked_data->double_msg.size());

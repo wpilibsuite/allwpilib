@@ -11,17 +11,21 @@
 #include "pb.h"
 #include "units/length.h"
 
+#include "controller.npb.h"
+
 // Everything is converted into units for
 // frc::SimpleMotorFeedforward<units::meters>
 
 template <class Distance>
 struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>> {  // NOLINT
-  static const pb_msgdesc_t* Message() {
-    return get_wpi_proto_ProtobufSimpleMotorFeedforward_msg();
-  }
+  using MessageStruct = wpi_proto_ProtobufSimpleMotorFeedforward;
+  using InputStream =
+      wpi::ProtoInputStream<frc::SimpleMotorFeedforward<Distance>>;
+  using OutputStream =
+      wpi::ProtoOutputStream<frc::SimpleMotorFeedforward<Distance>>;
 
   static std::optional<frc::SimpleMotorFeedforward<Distance>> Unpack(
-      wpi::ProtoInputStream& stream) {
+      InputStream& stream) {
     wpi_proto_ProtobufSimpleMotorFeedforward msg;
     if (!stream.Decode(msg)) {
       return {};
@@ -37,7 +41,7 @@ struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>> {  // NOLINT
     };
   }
 
-  static bool Pack(wpi::ProtoOutputStream& stream,
+  static bool Pack(OutputStream& stream,
                    const frc::SimpleMotorFeedforward<Distance>& value) {
     wpi_proto_ProtobufSimpleMotorFeedforward msg{
         .ks = value.GetKs().value(),

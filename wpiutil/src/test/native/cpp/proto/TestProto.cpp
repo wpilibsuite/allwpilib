@@ -35,17 +35,14 @@ struct TestProto {
 
 template <>
 struct wpi::Protobuf<TestProto> {
-  static const pb_msgdesc_t* Message();
-  static std::optional<TestProto> Unpack(wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream, const TestProto& value);
+  using MessageStruct = wpi_proto_TestProto;
+  using InputStream = wpi::ProtoInputStream<TestProto>;
+  using OutputStream = wpi::ProtoOutputStream<TestProto>;
+  static std::optional<TestProto> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const TestProto& value);
 };
 
-const pb_msgdesc_t* wpi::Protobuf<TestProto>::Message() {
-  return get_wpi_proto_TestProto_msg();
-}
-
-std::optional<TestProto> wpi::Protobuf<TestProto>::Unpack(
-    wpi::ProtoInputStream& stream) {
+std::optional<TestProto> wpi::Protobuf<TestProto>::Unpack(InputStream& stream) {
   wpi::UnpackCallback<std::string> str;
   wpi::UnpackCallback<std::vector<uint8_t>> bytes;
   wpi::UnpackCallback<TestProtoInner> inner;
@@ -85,7 +82,7 @@ std::optional<TestProto> wpi::Protobuf<TestProto>::Unpack(
   };
 }
 
-bool wpi::Protobuf<TestProto>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<TestProto>::Pack(OutputStream& stream,
                                     const TestProto& value) {
   wpi::PackCallback str{&value.string_msg};
   wpi::PackCallback bytes{&value.bytes_msg};
@@ -118,12 +115,11 @@ using ProtoType = wpi::Protobuf<TestProto>;
 TEST(TestProtoTest, RoundtripNanopb) {
   const TestProto kExpectedData = TestProto{};
 
+  wpi::ProtobufMessage<TestProto> message;
   wpi::SmallVector<uint8_t, 64> buf;
-  wpi::ProtoOutputStream ostream{buf, ProtoType::Message()};
 
-  ASSERT_TRUE(ProtoType::Pack(ostream, kExpectedData));
-
-  wpi::ProtoInputStream istream{buf, ProtoType::Message()};
-  std::optional<TestProto> unpacked_data = ProtoType::Unpack(istream);
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  std::optional<TestProto> unpacked_data = message.Unpack(buf);
+  ASSERT_TRUE(unpacked_data.has_value());
   ASSERT_TRUE(unpacked_data.has_value());
 }

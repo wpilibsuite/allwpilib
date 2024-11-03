@@ -16,6 +16,10 @@
 
 /* Struct definitions */
 typedef struct _wpi_proto_ProtobufArmFeedforward {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double ks;
     double kg;
     double kv;
@@ -24,6 +28,10 @@ typedef struct _wpi_proto_ProtobufArmFeedforward {
 } wpi_proto_ProtobufArmFeedforward;
 
 typedef struct _wpi_proto_ProtobufDifferentialDriveFeedforward {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double kv_linear;
     double ka_linear;
     double kv_angular;
@@ -31,6 +39,10 @@ typedef struct _wpi_proto_ProtobufDifferentialDriveFeedforward {
 } wpi_proto_ProtobufDifferentialDriveFeedforward;
 
 typedef struct _wpi_proto_ProtobufElevatorFeedforward {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double ks;
     double kg;
     double kv;
@@ -39,6 +51,10 @@ typedef struct _wpi_proto_ProtobufElevatorFeedforward {
 } wpi_proto_ProtobufElevatorFeedforward;
 
 typedef struct _wpi_proto_ProtobufSimpleMotorFeedforward {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double ks;
     double kv;
     double ka;
@@ -46,6 +62,10 @@ typedef struct _wpi_proto_ProtobufSimpleMotorFeedforward {
 } wpi_proto_ProtobufSimpleMotorFeedforward;
 
 typedef struct _wpi_proto_ProtobufDifferentialDriveWheelVoltages {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     double left;
     double right;
 } wpi_proto_ProtobufDifferentialDriveWheelVoltages;
@@ -125,22 +145,6 @@ X(a, STATIC,   SINGULAR, DOUBLE,   left,              1) \
 X(a, STATIC,   SINGULAR, DOUBLE,   right,             2)
 #define wpi_proto_ProtobufDifferentialDriveWheelVoltages_CALLBACK NULL
 #define wpi_proto_ProtobufDifferentialDriveWheelVoltages_DEFAULT NULL
-
-const pb_msgdesc_t *get_wpi_proto_ProtobufArmFeedforward_msg(void);
-std::string_view get_wpi_proto_ProtobufArmFeedforward_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufArmFeedforward_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufDifferentialDriveFeedforward_msg(void);
-std::string_view get_wpi_proto_ProtobufDifferentialDriveFeedforward_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufDifferentialDriveFeedforward_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufElevatorFeedforward_msg(void);
-std::string_view get_wpi_proto_ProtobufElevatorFeedforward_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufElevatorFeedforward_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufSimpleMotorFeedforward_msg(void);
-std::string_view get_wpi_proto_ProtobufSimpleMotorFeedforward_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufSimpleMotorFeedforward_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufDifferentialDriveWheelVoltages_msg(void);
-std::string_view get_wpi_proto_ProtobufDifferentialDriveWheelVoltages_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufDifferentialDriveWheelVoltages_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 #define WPI_PROTO_CONTROLLER_NPB_H_MAX_SIZE      wpi_proto_ProtobufArmFeedforward_size

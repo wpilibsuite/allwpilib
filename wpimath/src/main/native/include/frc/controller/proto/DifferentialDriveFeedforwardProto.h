@@ -10,11 +10,15 @@
 #include "frc/controller/DifferentialDriveFeedforward.h"
 #include "pb.h"
 
+#include "controller.npb.h"
+
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DifferentialDriveFeedforward> {
-  static const pb_msgdesc_t* Message();
+    using MessageStruct = wpi_proto_ProtobufDifferentialDriveFeedforward;
+  using InputStream = wpi::ProtoInputStream<frc::DifferentialDriveFeedforward>;
+  using OutputStream = wpi::ProtoOutputStream<frc::DifferentialDriveFeedforward>;
   static std::optional<frc::DifferentialDriveFeedforward> Unpack(
-      wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream,
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
                    const frc::DifferentialDriveFeedforward& value);
 };

@@ -8,12 +8,10 @@
 
 #include "geometry2d.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::Ellipse2d>::Message() {
-  return get_wpi_proto_ProtobufEllipse2d_msg();
-}
+
 
 std::optional<frc::Ellipse2d> wpi::Protobuf<frc::Ellipse2d>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi::UnpackCallback<frc::Pose2d> pose;
   wpi_proto_ProtobufEllipse2d msg{
       .center = pose.Callback(),
@@ -37,7 +35,7 @@ std::optional<frc::Ellipse2d> wpi::Protobuf<frc::Ellipse2d>::Unpack(
   };
 }
 
-bool wpi::Protobuf<frc::Ellipse2d>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<frc::Ellipse2d>::Pack(OutputStream& stream,
                                          const frc::Ellipse2d& value) {
   wpi::PackCallback pose{&value.Center()};
   wpi_proto_ProtobufEllipse2d msg{

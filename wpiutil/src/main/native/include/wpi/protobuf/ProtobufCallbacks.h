@@ -218,7 +218,7 @@ class DirectUnpackCallback {
       return pb_read(stream, reinterpret_cast<pb_byte_t*>(space.data()),
                      space.size());
     } else if constexpr (ProtobufSerializable<T>) {
-      ProtoInputStream istream{stream, wpi::Protobuf<T>::Message()};
+      ProtoInputStream<T> istream{stream};
       auto decoded = wpi::Protobuf<T>::Unpack(istream);
       if (decoded.has_value()) {
         m_storage.emplace_back(std::move(decoded.value()));
@@ -369,18 +369,22 @@ class PackCallback {
   std::span<const T> Bufs() const { return m_buffer; }
 
  private:
-  bool EncodeItem(ProtoOutputStream& stream, const pb_field_t* field,
+  using EncodeStreamType =
+      std::conditional_t<ProtobufSerializable<T>, ProtoOutputStream<T>&,
+                         pb_ostream_t*>;
+
+  bool EncodeItem(EncodeStreamType stream, const pb_field_t* field,
                   const T& value) const {
     if constexpr (std::floating_point<T>) {
       pb_type_t fieldType = PB_LTYPE(field->type);
       switch (fieldType) {
         case PB_LTYPE_FIXED32: {
           float flt = static_cast<float>(value);
-          return pb_encode_fixed32(stream.Stream(), &flt);
+          return pb_encode_fixed32(stream, &flt);
         }
         case PB_LTYPE_FIXED64: {
           double dbl = static_cast<double>(value);
-          return pb_encode_fixed64(stream.Stream(), &dbl);
+          return pb_encode_fixed64(stream, &dbl);
         }
         default:
           return false;
@@ -391,30 +395,28 @@ class PackCallback {
         case PB_LTYPE_BOOL:
         case PB_LTYPE_VARINT:
         case PB_LTYPE_UVARINT:
-          return pb_encode_varint(stream.Stream(), value);
+          return pb_encode_varint(stream, value);
         case PB_LTYPE_SVARINT:
-          return pb_encode_svarint(stream.Stream(), value);
+          return pb_encode_svarint(stream, value);
         case PB_LTYPE_FIXED32: {
           uint32_t f = value;
-          return pb_encode_fixed32(stream.Stream(), &f);
+          return pb_encode_fixed32(stream, &f);
         }
         case PB_LTYPE_FIXED64: {
           uint64_t f = value;
-          return pb_encode_fixed64(stream.Stream(), &f);
+          return pb_encode_fixed64(stream, &f);
         }
         default:
           return false;
       }
     } else if constexpr (StringLike<T>) {
       std::string_view view{value};
-      return pb_encode_string(stream.Stream(),
-                              reinterpret_cast<const pb_byte_t*>(view.data()),
-                              view.size());
+      return pb_encode_string(
+          stream, reinterpret_cast<const pb_byte_t*>(view.data()), view.size());
     } else if constexpr (ConstVectorLike<T>) {
       std::span<const uint8_t> view{value};
-      return pb_encode_string(stream.Stream(),
-                              reinterpret_cast<const pb_byte_t*>(view.data()),
-                              view.size());
+      return pb_encode_string(
+          stream, reinterpret_cast<const pb_byte_t*>(view.data()), view.size());
     } else if constexpr (ProtobufSerializable<T>) {
       return wpi::Protobuf<T>::Pack(stream, value);
     }
@@ -422,21 +424,31 @@ class PackCallback {
 
   bool EncodeLoop(pb_ostream_t* stream, const pb_field_t* field,
                   bool writeTag) const {
-    const pb_msgdesc_t* desc = nullptr;
     if constexpr (ProtobufSerializable<T>) {
-      desc = wpi::Protobuf<T>::Message();
-    }
-    ProtoOutputStream ostream{stream, desc};
-    for (auto&& i : m_buffer) {
-      if (writeTag) {
-        if (!pb_encode_tag_for_field(stream, field)) {
+      ProtoOutputStream<T> ostream{stream};
+      for (auto&& i : m_buffer) {
+        if (writeTag) {
+          if (!pb_encode_tag_for_field(stream, field)) {
+            return false;
+          }
+        }
+        if (!EncodeItem(ostream, field, i)) {
           return false;
         }
       }
-      if (!EncodeItem(ostream, field, i)) {
-        return false;
+    } else {
+      for (auto&& i : m_buffer) {
+        if (writeTag) {
+          if (!pb_encode_tag_for_field(stream, field)) {
+            return false;
+          }
+        }
+        if (!EncodeItem(stream, field, i)) {
+          return false;
+        }
       }
     }
+
     return true;
   }
 

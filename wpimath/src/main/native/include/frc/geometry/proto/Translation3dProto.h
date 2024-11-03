@@ -9,11 +9,15 @@
 
 #include "frc/geometry/Translation3d.h"
 
+#include "geometry3d.npb.h"
+
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Translation3d> {
-  static const pb_msgdesc_t* Message();
+    using MessageStruct = wpi_proto_ProtobufTranslation3d;
+  using InputStream = wpi::ProtoInputStream<frc::Translation3d>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Translation3d>;
   static std::optional<frc::Translation3d> Unpack(
-      wpi::ProtoInputStream& stream);
-  static bool Pack(wpi::ProtoOutputStream& stream,
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
                    const frc::Translation3d& value);
 };

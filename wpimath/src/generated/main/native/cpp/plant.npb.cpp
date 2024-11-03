@@ -77,8 +77,8 @@ static const uint8_t file_descriptor[] {
 };
 static const char file_name[] = "plant.proto";
 static const char wpi_proto_ProtobufDCMotor_name[] = "wpi.proto.ProtobufDCMotor";
-std::string_view get_wpi_proto_ProtobufDCMotor_name(void) { return wpi_proto_ProtobufDCMotor_name; }
-pb_filedesc_t get_wpi_proto_ProtobufDCMotor_file_descriptor(void) { return {file_name, file_descriptor,}; }
+std::string_view wpi_proto_ProtobufDCMotor::msg_name(void) noexcept { return wpi_proto_ProtobufDCMotor_name; }
+pb_filedesc_t wpi_proto_ProtobufDCMotor::file_descriptor(void) noexcept { return {::file_name, ::file_descriptor}; }
 PB_BIND(wpi_proto_ProtobufDCMotor, wpi_proto_ProtobufDCMotor, AUTO)
 
 

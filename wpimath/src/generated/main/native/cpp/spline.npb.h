@@ -16,6 +16,10 @@
 
 /* Struct definitions */
 typedef struct _wpi_proto_ProtobufCubicHermiteSpline {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t x_initial;
     pb_callback_t x_final;
     pb_callback_t y_initial;
@@ -23,6 +27,10 @@ typedef struct _wpi_proto_ProtobufCubicHermiteSpline {
 } wpi_proto_ProtobufCubicHermiteSpline;
 
 typedef struct _wpi_proto_ProtobufQuinticHermiteSpline {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
     pb_callback_t x_initial;
     pb_callback_t x_final;
     pb_callback_t y_initial;
@@ -62,13 +70,6 @@ X(a, CALLBACK, REPEATED, DOUBLE,   y_initial,         3) \
 X(a, CALLBACK, REPEATED, DOUBLE,   y_final,           4)
 #define wpi_proto_ProtobufQuinticHermiteSpline_CALLBACK pb_default_field_callback
 #define wpi_proto_ProtobufQuinticHermiteSpline_DEFAULT NULL
-
-const pb_msgdesc_t *get_wpi_proto_ProtobufCubicHermiteSpline_msg(void);
-std::string_view get_wpi_proto_ProtobufCubicHermiteSpline_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufCubicHermiteSpline_file_descriptor(void);
-const pb_msgdesc_t *get_wpi_proto_ProtobufQuinticHermiteSpline_msg(void);
-std::string_view get_wpi_proto_ProtobufQuinticHermiteSpline_name(void);
-pb_filedesc_t get_wpi_proto_ProtobufQuinticHermiteSpline_file_descriptor(void);
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufCubicHermiteSpline_size depends on runtime parameters */

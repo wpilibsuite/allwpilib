@@ -6,12 +6,10 @@
 
 #include "geometry3d.npb.h"
 
-const pb_msgdesc_t* wpi::Protobuf<frc::Twist3d>::Message() {
-  return get_wpi_proto_ProtobufTwist3d_msg();
-}
+
 
 std::optional<frc::Twist3d> wpi::Protobuf<frc::Twist3d>::Unpack(
-    wpi::ProtoInputStream& stream) {
+    InputStream& stream) {
   wpi_proto_ProtobufTwist3d msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -23,7 +21,7 @@ std::optional<frc::Twist3d> wpi::Protobuf<frc::Twist3d>::Unpack(
   };
 }
 
-bool wpi::Protobuf<frc::Twist3d>::Pack(wpi::ProtoOutputStream& stream,
+bool wpi::Protobuf<frc::Twist3d>::Pack(OutputStream& stream,
                                        const frc::Twist3d& value) {
   wpi_proto_ProtobufTwist3d msg{
       .dx = value.dx.value(),
