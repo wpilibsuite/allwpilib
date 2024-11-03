@@ -100,7 +100,7 @@ std::optional<RepeatedTestProto> wpi::Protobuf<RepeatedTestProto>::Unpack(
       .TestProtoInner_msg = TestProtoInner_msg.Callback(),
   };
 
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

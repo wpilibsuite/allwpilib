@@ -20,7 +20,7 @@ std::optional<frc::Ellipse2d> wpi::Protobuf<frc::Ellipse2d>::Unpack(
       .xSemiAxis = 0,
       .ySemiAxis = 0,
   };
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

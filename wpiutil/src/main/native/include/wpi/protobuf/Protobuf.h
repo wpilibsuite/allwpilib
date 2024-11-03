@@ -51,13 +51,8 @@ class ProtoInputStream {
   const pb_msgdesc_t* MsgDesc() const noexcept { return m_msgDesc; }
 
   template <typename T>
-  bool Decode(T& msg) {
-    return pb_decode(Stream(), m_msgDesc, &msg);
-  }
-
-  template <typename T>
-  bool DecodeNoInit(T& msg) {
-    return pb_decode_ex(Stream(), m_msgDesc, &msg, PB_DECODE_NOINIT);
+  bool Decode(T& msg, unsigned int flags = 0) {
+    return pb_decode_ex(Stream(), m_msgDesc, &msg, flags);
   }
 
  private:

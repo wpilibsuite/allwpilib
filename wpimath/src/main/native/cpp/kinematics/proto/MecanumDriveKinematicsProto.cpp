@@ -24,7 +24,7 @@ std::optional<frc::MecanumDriveKinematics> wpi::Protobuf<
       .rear_left = rearLeft.Callback(),
       .rear_right = rearRight.Callback(),
   };
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

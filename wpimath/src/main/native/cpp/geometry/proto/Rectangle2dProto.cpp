@@ -20,7 +20,7 @@ std::optional<frc::Rectangle2d> wpi::Protobuf<frc::Rectangle2d>::Unpack(
       .xWidth = 0,
       .yWidth = 0,
   };
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

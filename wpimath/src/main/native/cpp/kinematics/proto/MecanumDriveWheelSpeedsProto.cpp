@@ -13,7 +13,7 @@ const pb_msgdesc_t* wpi::Protobuf<frc::MecanumDriveWheelSpeeds>::Message() {
 std::optional<frc::MecanumDriveWheelSpeeds> wpi::Protobuf<
     frc::MecanumDriveWheelSpeeds>::Unpack(wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufMecanumDriveWheelSpeeds msg;
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

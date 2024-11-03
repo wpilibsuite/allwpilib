@@ -13,7 +13,7 @@ const pb_msgdesc_t* wpi::Protobuf<frc::Translation3d>::Message() {
 std::optional<frc::Translation3d> wpi::Protobuf<frc::Translation3d>::Unpack(
     wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufTranslation3d msg;
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

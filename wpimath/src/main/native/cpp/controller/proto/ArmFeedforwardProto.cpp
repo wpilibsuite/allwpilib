@@ -15,7 +15,7 @@ const pb_msgdesc_t* wpi::Protobuf<frc::ArmFeedforward>::Message() {
 std::optional<frc::ArmFeedforward> wpi::Protobuf<frc::ArmFeedforward>::Unpack(
     wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufArmFeedforward msg;
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

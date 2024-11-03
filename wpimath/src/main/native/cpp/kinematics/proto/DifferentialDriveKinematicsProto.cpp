@@ -13,7 +13,7 @@ const pb_msgdesc_t* wpi::Protobuf<frc::DifferentialDriveKinematics>::Message() {
 std::optional<frc::DifferentialDriveKinematics> wpi::Protobuf<
     frc::DifferentialDriveKinematics>::Unpack(wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveKinematics msg;
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

@@ -13,7 +13,7 @@ const pb_msgdesc_t* wpi::Protobuf<frc::Quaternion>::Message() {
 std::optional<frc::Quaternion> wpi::Protobuf<frc::Quaternion>::Unpack(
     wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufQuaternion msg;
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

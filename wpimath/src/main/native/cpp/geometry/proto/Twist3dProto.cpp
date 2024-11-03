@@ -13,7 +13,7 @@ const pb_msgdesc_t* wpi::Protobuf<frc::Twist3d>::Message() {
 std::optional<frc::Twist3d> wpi::Protobuf<frc::Twist3d>::Unpack(
     wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufTwist3d msg;
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

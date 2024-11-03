@@ -18,7 +18,7 @@ std::optional<frc::Rotation3d> wpi::Protobuf<frc::Rotation3d>::Unpack(
   wpi_proto_ProtobufRotation3d msg{
       .q = quat.Callback(),
   };
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

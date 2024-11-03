@@ -15,7 +15,7 @@ const pb_msgdesc_t* wpi::Protobuf<frc::DCMotor>::Message() {
 std::optional<frc::DCMotor> wpi::Protobuf<frc::DCMotor>::Unpack(
     wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufDCMotor msg;
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

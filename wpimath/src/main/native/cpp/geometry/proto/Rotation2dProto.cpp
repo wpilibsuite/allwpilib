@@ -13,7 +13,7 @@ const pb_msgdesc_t* wpi::Protobuf<frc::Rotation2d>::Message() {
 std::optional<frc::Rotation2d> wpi::Protobuf<frc::Rotation2d>::Unpack(
     wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufRotation2d msg;
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

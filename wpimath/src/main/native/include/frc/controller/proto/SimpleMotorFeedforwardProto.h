@@ -23,7 +23,7 @@ struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>> {  // NOLINT
   static std::optional<frc::SimpleMotorFeedforward<Distance>> Unpack(
       wpi::ProtoInputStream& stream) {
     wpi_proto_ProtobufSimpleMotorFeedforward msg;
-    if (!stream.DecodeNoInit(msg)) {
+    if (!stream.Decode(msg)) {
       return {};
     }
 

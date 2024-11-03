@@ -38,7 +38,7 @@ struct wpi::Protobuf<frc::LinearSystem<States, Inputs, Outputs>> {
     msg.c = c.Callback();
     msg.d = d.Callback();
 
-    if (!stream.DecodeNoInit(msg)) {
+    if (!stream.Decode(msg)) {
       return {};
     }
 

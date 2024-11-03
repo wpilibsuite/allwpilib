@@ -26,7 +26,7 @@ struct wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>> {
         .modules = modules.Callback(),
     };
     modules.SetLimits(wpi::DecodeLimits::Fail);
-    if (!stream.DecodeNoInit(msg)) {
+    if (!stream.Decode(msg)) {
       return {};
     }
 

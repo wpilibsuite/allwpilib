@@ -24,7 +24,7 @@ wpi::Protobuf<frc::CubicHermiteSpline>::Unpack(wpi::ProtoInputStream& stream) {
       .y_initial = yInitial.Callback(),
       .y_final = yFinal.Callback(),
   };
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

@@ -19,7 +19,7 @@ wpi::Protobuf<frc::SwerveModuleState>::Unpack(wpi::ProtoInputStream& stream) {
       .speed = 0,
       .angle = angle.Callback(),
   };
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

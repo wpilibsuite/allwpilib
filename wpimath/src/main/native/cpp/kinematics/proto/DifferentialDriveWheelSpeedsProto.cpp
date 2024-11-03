@@ -14,7 +14,7 @@ wpi::Protobuf<frc::DifferentialDriveWheelSpeeds>::Message() {
 std::optional<frc::DifferentialDriveWheelSpeeds> wpi::Protobuf<
     frc::DifferentialDriveWheelSpeeds>::Unpack(wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveWheelSpeeds msg;
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

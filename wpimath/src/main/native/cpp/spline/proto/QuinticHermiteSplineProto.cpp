@@ -24,7 +24,7 @@ std::optional<frc::QuinticHermiteSpline> wpi::Protobuf<
       .y_initial = yInitial.Callback(),
       .y_final = yFinal.Callback(),
   };
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

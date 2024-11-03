@@ -14,7 +14,7 @@ wpi::Protobuf<frc::DifferentialDriveFeedforward>::Message() {
 std::optional<frc::DifferentialDriveFeedforward> wpi::Protobuf<
     frc::DifferentialDriveFeedforward>::Unpack(wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveFeedforward msg;
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

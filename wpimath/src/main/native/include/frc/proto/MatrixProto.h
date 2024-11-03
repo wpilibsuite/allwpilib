@@ -31,7 +31,7 @@ struct wpi::Protobuf<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
     data.SetLimits(wpi::DecodeLimits::Fail);
     wpi_proto_ProtobufMatrix msg;
     msg.data = data.Callback();
-    if (!stream.DecodeNoInit(msg)) {
+    if (!stream.Decode(msg)) {
       return {};
     }
 

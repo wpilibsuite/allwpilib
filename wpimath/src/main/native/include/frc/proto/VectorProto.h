@@ -31,7 +31,7 @@ struct wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
     _wpi_proto_ProtobufVector msg{
         .rows = rows.Callback(),
     };
-    if (!stream.DecodeNoInit(msg)) {
+    if (!stream.Decode(msg)) {
       return {};
     }
 

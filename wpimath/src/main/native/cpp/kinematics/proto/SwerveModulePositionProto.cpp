@@ -19,7 +19,7 @@ std::optional<frc::SwerveModulePosition> wpi::Protobuf<
       .distance = 0,
       .angle = angle.Callback(),
   };
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

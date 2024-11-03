@@ -20,7 +20,7 @@ std::optional<frc::Transform3d> wpi::Protobuf<frc::Transform3d>::Unpack(
       .translation = tsln.Callback(),
       .rotation = rot.Callback(),
   };
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

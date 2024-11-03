@@ -20,7 +20,7 @@ wpi::Protobuf<frc::Trajectory::State>::Unpack(wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufTrajectoryState msg;
   msg.pose = pose.Callback();
 
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

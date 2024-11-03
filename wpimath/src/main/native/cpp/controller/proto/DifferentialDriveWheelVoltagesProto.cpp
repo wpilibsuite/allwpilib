@@ -17,7 +17,7 @@ std::optional<frc::DifferentialDriveWheelVoltages>
 wpi::Protobuf<frc::DifferentialDriveWheelVoltages>::Unpack(
     wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveWheelVoltages msg;
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

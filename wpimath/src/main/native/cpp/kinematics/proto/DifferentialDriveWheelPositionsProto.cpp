@@ -15,7 +15,7 @@ std::optional<frc::DifferentialDriveWheelPositions>
 wpi::Protobuf<frc::DifferentialDriveWheelPositions>::Unpack(
     wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveWheelPositions msg;
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

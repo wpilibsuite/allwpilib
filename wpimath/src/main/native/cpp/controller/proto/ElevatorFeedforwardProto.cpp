@@ -15,7 +15,7 @@ const pb_msgdesc_t* wpi::Protobuf<frc::ElevatorFeedforward>::Message() {
 std::optional<frc::ElevatorFeedforward>
 wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufElevatorFeedforward msg;
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

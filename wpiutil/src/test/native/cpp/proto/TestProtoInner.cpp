@@ -22,7 +22,7 @@ std::optional<TestProtoInner> wpi::Protobuf<TestProtoInner>::Unpack(
   wpi_proto_TestProtoInner msg{
       .msg = str.Callback(),
   };
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

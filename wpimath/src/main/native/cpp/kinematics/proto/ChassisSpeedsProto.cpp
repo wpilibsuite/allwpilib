@@ -13,7 +13,7 @@ const pb_msgdesc_t* wpi::Protobuf<frc::ChassisSpeeds>::Message() {
 std::optional<frc::ChassisSpeeds> wpi::Protobuf<frc::ChassisSpeeds>::Unpack(
     wpi::ProtoInputStream& stream) {
   wpi_proto_ProtobufChassisSpeeds msg;
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 

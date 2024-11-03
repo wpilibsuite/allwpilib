@@ -20,7 +20,7 @@ std::optional<frc::Trajectory> wpi::Protobuf<frc::Trajectory>::Unpack(
   wpi_proto_ProtobufTrajectory msg{
       .states = states.Callback(),
   };
-  if (!stream.DecodeNoInit(msg)) {
+  if (!stream.Decode(msg)) {
     return {};
   }
 
