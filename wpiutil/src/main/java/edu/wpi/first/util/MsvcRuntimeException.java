@@ -5,7 +5,7 @@
 package edu.wpi.first.util;
 
 /**
- * Exception thrown due to a bad MSVC Runtime
+ * Exception thrown due to a bad MSVC Runtime.
  */
 public class MsvcRuntimeException extends RuntimeException {
     private static final long serialVersionUID = -9155939328084105142L;
