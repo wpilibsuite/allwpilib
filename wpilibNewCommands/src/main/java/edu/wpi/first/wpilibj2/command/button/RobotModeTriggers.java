@@ -14,23 +14,15 @@ public final class RobotModeTriggers {
   // Utility class
   private RobotModeTriggers() {}
 
-  /**
-   * A trigger that is true when the robot is enabled in autonomous mode.
-   */
+  /** A trigger that is true when the robot is enabled in autonomous mode. */
   public static Trigger autonomous = new Trigger(DriverStation::isAutonomousEnabled);
 
-  /**
-   * A trigger that is true when the robot is enabled in teleop mode.
-   */
+  /** A trigger that is true when the robot is enabled in teleop mode. */
   public static Trigger teleop = new Trigger(DriverStation::isTeleopEnabled);
 
-  /**
-   * A trigger that is true when the robot is disabled.
-   */
+  /** A trigger that is true when the robot is disabled. */
   public static Trigger disabled = new Trigger(DriverStation::isDisabled);
 
-  /**
-   * A trigger that is true when the robot is enabled in test mode.
-   */
+  /** A trigger that is true when the robot is enabled in test mode. */
   public static Trigger test = new Trigger(DriverStation::isTestEnabled);
 }
