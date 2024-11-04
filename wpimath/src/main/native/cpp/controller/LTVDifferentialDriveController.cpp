@@ -97,7 +97,7 @@ LTVDifferentialDriveController::LTVDifferentialDriveController(
     Matrixd<5, 2> discB;
     DiscretizeAB(A, B, dt, &discA, &discB);
 
-    Matrixd<5, 5> S = detail::DARE<5, 2>(discA, discB, Q, R_llt);
+    auto S = detail::DARE<5, 2>(discA, discB, Q, R_llt);
 
     // K = (BᵀSB + R)⁻¹BᵀSA
     m_table.insert(velocity, (discB.transpose() * S * discB + R)

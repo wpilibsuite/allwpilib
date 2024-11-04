@@ -164,7 +164,7 @@ public class Rotation2d
   }
 
   /**
-   * Adds two rotations together, with the result being bounded between -pi and pi.
+   * Adds two rotations together, with the result being bounded between -π and π.
    *
    * <p>For example, <code>Rotation2d.fromDegrees(30).plus(Rotation2d.fromDegrees(60))</code> equals
    * <code>Rotation2d(Math.PI/2.0)</code>
@@ -251,7 +251,7 @@ public class Rotation2d
    * Returns the radian value of the Rotation2d.
    *
    * @return The radian value of the Rotation2d.
-   * @see edu.wpi.first.math.MathUtil#angleModulus(double) to constrain the angle within (-pi, pi]
+   * @see edu.wpi.first.math.MathUtil#angleModulus(double) to constrain the angle within (-π, π]
    */
   @JsonProperty
   public double getRadians() {

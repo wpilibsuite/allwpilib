@@ -160,18 +160,14 @@ class ClientImpl3 final : private MessageHandler3 {
 
   std::vector<std::pair<unsigned int, unsigned int>> m_outgoingFlags;
 
-  using NameMap = wpi::StringMap<std::unique_ptr<Entry>>;
+  using NameMap = wpi::StringMap<Entry>;
   using IdMap = std::vector<Entry*>;
 
   NameMap m_nameMap;
   IdMap m_idMap;
 
   Entry* GetOrNewEntry(std::string_view name) {
-    auto& entry = m_nameMap[name];
-    if (!entry) {
-      entry = std::make_unique<Entry>(name);
-    }
-    return entry.get();
+    return &m_nameMap.try_emplace(name, name).first->second;
   }
   Entry* LookupId(unsigned int id) {
     return id < m_idMap.size() ? m_idMap[id] : nullptr;

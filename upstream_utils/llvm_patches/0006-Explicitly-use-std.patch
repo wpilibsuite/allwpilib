@@ -8,7 +8,6 @@ Subject: [PATCH 06/38] Explicitly use std::
  llvm/lib/Support/ErrorHandling.cpp     |  2 +-
  llvm/unittests/ADT/SmallPtrSetTest.cpp |  2 +-
  llvm/unittests/ADT/SmallSetTest.cpp    | 10 +++++-----
- llvm/unittests/ADT/StringMapTest.cpp   |  2 +-
  5 files changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallSet.h b/llvm/include/llvm/ADT/SmallSet.h
@@ -100,16 +99,3 @@ index b50b368ae663614f050c220432c05b32c201db00..f9d84fa8a42a7feaaffa3aa080e84574
    EXPECT_EQ(4u, s1.size());
    EXPECT_EQ("str 0", V[0]);
    EXPECT_EQ("str 1", V[1]);
-diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
-index 7f10b3d7d3a8894b1ab0ac660268d94a8b89e082..acd8b566f9c7a6efc2c9204624c01104dd34daf6 100644
---- a/llvm/unittests/ADT/StringMapTest.cpp
-+++ b/llvm/unittests/ADT/StringMapTest.cpp
-@@ -343,7 +343,7 @@ TEST_F(StringMapTest, IterMapKeysSmallVector) {
-   Map["D"] = 3;
- 
-   auto Keys = to_vector<4>(Map.keys());
--  llvm::sort(Keys);
-+  std::sort(Keys.begin(), Keys.end());
- 
-   SmallVector<std::string_view, 4> Expected = {"A", "B", "C", "D"};
-   EXPECT_EQ(Expected, Keys);
