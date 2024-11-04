@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <cstdlib>
 #include "frc2/command/button/Trigger.h"
 
 namespace frc2 {
@@ -23,8 +22,7 @@ class RobotModeTriggers {
    */
   static Trigger Autonomous;
 
-  /**
-   * A trigger that is true when the robot is enabled in teleop mode.
+  /** A trigger that is true when the robot is enabled in teleop mode.
    */
   static Trigger Teleop;
 
@@ -39,9 +37,9 @@ class RobotModeTriggers {
   static Trigger Test;
 };
 
-RobotModeTriggers::Autonomous = Trigger{&frc::DriverStation::IsAutonomousEnabled};
-RobotModeTriggers::Teleop = Trigger{&frc::DriverStation::IsTeleopEnabled};
-RobotModeTriggers::Disabled = Trigger{&frc::DriverStation::IsDisabled};
-RobotModeTriggers::Test = Trigger{&frc::DriverStation::IsTestEnabled};
+Trigger RobotModeTriggers::Autonomous = Trigger{&frc::DriverStation::IsAutonomousEnabled};
+Trigger RobotModeTriggers::Teleop = Trigger{&frc::DriverStation::IsTeleopEnabled};
+Trigger RobotModeTriggers::Disabled = Trigger{&frc::DriverStation::IsDisabled};
+Trigger RobotModeTriggers::Test = Trigger{&frc::DriverStation::IsTestEnabled};
 
 }  // namespace frc2
