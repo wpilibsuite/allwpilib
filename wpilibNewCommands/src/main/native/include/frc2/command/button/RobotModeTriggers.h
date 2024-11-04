@@ -37,8 +37,10 @@ class RobotModeTriggers {
   static Trigger Test;
 };
 
-Trigger RobotModeTriggers::Autonomous = Trigger{&frc::DriverStation::IsAutonomousEnabled};
-Trigger RobotModeTriggers::Teleop = Trigger{&frc::DriverStation::IsTeleopEnabled};
+Trigger RobotModeTriggers::Autonomous =
+    Trigger{&frc::DriverStation::IsAutonomousEnabled};
+Trigger RobotModeTriggers::Teleop =
+    Trigger{&frc::DriverStation::IsTeleopEnabled};
 Trigger RobotModeTriggers::Disabled = Trigger{&frc::DriverStation::IsDisabled};
 Trigger RobotModeTriggers::Test = Trigger{&frc::DriverStation::IsTestEnabled};
 
