@@ -199,6 +199,7 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
           .first->second;
   theStruct.m_schema = schema;
   theStruct.m_fields.clear();
+  theStruct.m_fieldsByName.clear();
   theStruct.m_fields.reserve(parsed.declarations.size());
   bool isValid = true;
   for (auto&& decl : parsed.declarations) {
