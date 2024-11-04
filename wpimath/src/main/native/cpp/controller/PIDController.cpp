@@ -103,11 +103,11 @@ units::second_t PIDController::GetPeriod() const {
 }
 
 double PIDController::GetPositionTolerance() const {
-  return m_error;
+  return m_errorTolerance;
 }
 
 double PIDController::GetVelocityTolerance() const {
-  return m_errorDerivative;
+  return m_errorDerivativeTolerance;
 }
 
 double PIDController::GetAccumulatedError() const {
@@ -166,7 +166,7 @@ void PIDController::SetTolerance(double errorTolerance,
 }
 
 double PIDController::GetErrorTolerance() const {
-  return m_error;
+  return m_errorTolerance;
 }
 
 double PIDController::GetErrorDerivativeTolerance() const {
