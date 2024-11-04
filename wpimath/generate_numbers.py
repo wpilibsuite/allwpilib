@@ -4,11 +4,10 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 
-import argparse
 import sys
-from pathlib import Path
-
+import argparse
 from jinja2 import Environment, FileSystemLoader
+from pathlib import Path
 
 
 def output(output_dir: Path, outfn: str, contents: str):

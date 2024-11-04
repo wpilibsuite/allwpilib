@@ -3,7 +3,11 @@
 import os
 import shutil
 
-from upstream_utils import Lib, walk_cwd_and_copy_if, walk_if
+from upstream_utils import (
+    walk_cwd_and_copy_if,
+    walk_if,
+    Lib,
+)
 
 EXCLUDED_FILES = [
     "gtest_main.cc",

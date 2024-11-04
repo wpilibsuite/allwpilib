@@ -3,7 +3,11 @@
 import os
 import shutil
 
-from upstream_utils import Lib, copy_to, walk_if
+from upstream_utils import (
+    walk_if,
+    copy_to,
+    Lib,
+)
 
 
 def run_source_replacements(memory_files):

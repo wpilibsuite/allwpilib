@@ -7,7 +7,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict
+from typing import Dict, Any
 
 from jinja2 import Environment, FileSystemLoader
 from jinja2.environment import Template

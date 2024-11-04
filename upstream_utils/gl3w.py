@@ -2,7 +2,10 @@
 
 import os
 
-from upstream_utils import Lib, walk_cwd_and_copy_if
+from upstream_utils import (
+    walk_cwd_and_copy_if,
+    Lib,
+)
 
 
 def copy_upstream_src(wpilib_root):

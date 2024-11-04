@@ -4,7 +4,11 @@ import os
 import re
 import shutil
 
-from upstream_utils import Lib, comment_out_invalid_includes, walk_cwd_and_copy_if
+from upstream_utils import (
+    comment_out_invalid_includes,
+    walk_cwd_and_copy_if,
+    Lib,
+)
 
 
 def eigen_inclusions(dp, f):

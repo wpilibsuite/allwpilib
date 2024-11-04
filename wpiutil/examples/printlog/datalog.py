@@ -5,9 +5,8 @@
 
 import array
 import struct
-from typing import List, SupportsBytes
-
 import msgpack
+from typing import List, SupportsBytes
 
 __all__ = ["StartRecordData", "MetadataRecordData", "DataLogRecord", "DataLogReader"]
 
@@ -261,9 +260,9 @@ class DataLogReader:
 
 
 if __name__ == "__main__":
+    from datetime import datetime
     import mmap
     import sys
-    from datetime import datetime
 
     if len(sys.argv) != 2:
         print("Usage: datalog.py <file>", file=sys.stderr)
