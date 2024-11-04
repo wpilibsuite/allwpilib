@@ -34,9 +34,7 @@ CommandPtr None();
 
 /**
  * Constructs a command that does nothing until interrupted.
- *
- * @param requirements Subsystems to require
- * @return the command
+ * @param requirements Subsystems to require @return the command
  */
 [[nodiscard]]
 CommandPtr Idle(Requirements requirements = {});
@@ -165,6 +163,14 @@ CommandPtr Select(std::function<Key()> selector,
 [[nodiscard]]
 CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
                  Requirements requirements);
+
+/**
+ * Runs the command supplied by the supplier.
+ *
+ * @param supplier the command supplier
+ */
+[[nodiscard]]
+CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier);
 
 /**
  * Constructs a command that schedules the command returned from the supplier
