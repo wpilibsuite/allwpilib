@@ -198,7 +198,15 @@ Storage::Value* Storage::FindValue(std::string_view key) {
   if (it == m_values.end()) {
     return nullptr;
   }
-  return &it->second;
+  return it->second.get();
+}
+
+Storage::Value& Storage::GetValue(std::string_view key) {
+  auto& val = m_values[key];
+  if (!val) {
+    val = std::make_unique<Value>();
+  }
+  return *val;
 }
 
 #define DEFUN(CapsName, LowerName, CType, CParamType, ArrCType)                \
@@ -208,7 +216,7 @@ Storage::Value* Storage::FindValue(std::string_view key) {
     if (it == m_values.end()) {                                                \
       return CType{defaultVal};                                                \
     }                                                                          \
-    Value& value = it->second;                                                 \
+    Value& value = *it->second;                                                \
     if (value.type != Value::k##CapsName) {                                    \
       if (!Convert##CapsName(&value)) {                                        \
         value.Reset(Value::k##CapsName);                                       \
@@ -221,59 +229,66 @@ Storage::Value* Storage::FindValue(std::string_view key) {
   }                                                                            \
                                                                                \
   void Storage::Set##CapsName(std::string_view key, CParamType val) {          \
-    auto [it, isNew] = m_values.try_emplace(key, Value::k##CapsName);          \
-    if (!isNew) {                                                              \
-      it->second.Reset(Value::k##CapsName);                                    \
+    auto& valuePtr = m_values[key];                                            \
+    if (!valuePtr) {                                                           \
+      valuePtr = std::make_unique<Value>(Value::k##CapsName);                  \
+    } else {                                                                   \
+      valuePtr->Reset(Value::k##CapsName);                                     \
     }                                                                          \
-    it->second.LowerName##Val = val;                                           \
-    it->second.LowerName##Default = {};                                        \
+    valuePtr->LowerName##Val = val;                                            \
+    valuePtr->LowerName##Default = {};                                         \
   }                                                                            \
                                                                                \
   CType& Storage::Get##CapsName(std::string_view key, CParamType defaultVal) { \
-    auto [it, setValue] = m_values.try_emplace(key, Value::k##CapsName);       \
-    if (!setValue && it->second.type != Value::k##CapsName) {                  \
-      if (!Convert##CapsName(&it->second)) {                                   \
-        it->second.Reset(Value::k##CapsName);                                  \
+    auto& valuePtr = m_values[key];                                            \
+    bool setValue = false;                                                     \
+    if (!valuePtr) {                                                           \
+      valuePtr = std::make_unique<Value>(Value::k##CapsName);                  \
+      setValue = true;                                                         \
+    } else if (valuePtr->type != Value::k##CapsName) {                         \
+      if (!Convert##CapsName(valuePtr.get())) {                                \
+        valuePtr->Reset(Value::k##CapsName);                                   \
         setValue = true;                                                       \
       }                                                                        \
     }                                                                          \
-    Value& value = it->second;                                                 \
     if (setValue) {                                                            \
-      value.LowerName##Val = defaultVal;                                       \
+      valuePtr->LowerName##Val = defaultVal;                                   \
     }                                                                          \
-    if (!value.hasDefault) {                                                   \
-      value.LowerName##Default = defaultVal;                                   \
-      value.hasDefault = true;                                                 \
+    if (!valuePtr->hasDefault) {                                               \
+      valuePtr->LowerName##Default = defaultVal;                               \
+      valuePtr->hasDefault = true;                                             \
     }                                                                          \
-    return value.LowerName##Val;                                               \
+    return valuePtr->LowerName##Val;                                           \
   }                                                                            \
                                                                                \
   std::vector<ArrCType>& Storage::Get##CapsName##Array(                        \
       std::string_view key, std::span<const ArrCType> defaultVal) {            \
-    auto [it, setValue] =                                                      \
-        m_values.try_emplace(key, Value::k##CapsName##Array);                  \
-    if (!setValue && it->second.type != Value::k##CapsName##Array) {           \
-      if (!Convert##CapsName##Array(&it->second)) {                            \
-        it->second.Reset(Value::k##CapsName##Array);                           \
+    auto& valuePtr = m_values[key];                                            \
+    bool setValue = false;                                                     \
+    if (!valuePtr) {                                                           \
+      valuePtr = std::make_unique<Value>(Value::k##CapsName##Array);           \
+      setValue = true;                                                         \
+    } else if (valuePtr->type != Value::k##CapsName##Array) {                  \
+      if (!Convert##CapsName##Array(valuePtr.get())) {                         \
+        valuePtr->Reset(Value::k##CapsName##Array);                            \
         setValue = true;                                                       \
       }                                                                        \
     }                                                                          \
-    Value& value = it->second;                                                 \
     if (setValue) {                                                            \
-      value.LowerName##Array =                                                 \
+      valuePtr->LowerName##Array =                                             \
           new std::vector<ArrCType>{defaultVal.begin(), defaultVal.end()};     \
     }                                                                          \
-    if (!value.hasDefault) {                                                   \
+    if (!valuePtr->hasDefault) {                                               \
       if (defaultVal.empty()) {                                                \
-        value.LowerName##ArrayDefault = nullptr;                               \
+        valuePtr->LowerName##ArrayDefault = nullptr;                           \
       } else {                                                                 \
-        value.LowerName##ArrayDefault =                                        \
+        valuePtr->LowerName##ArrayDefault =                                    \
             new std::vector<ArrCType>{defaultVal.begin(), defaultVal.end()};   \
       }                                                                        \
-      value.hasDefault = true;                                                 \
+      valuePtr->hasDefault = true;                                             \
     }                                                                          \
-    assert(value.LowerName##Array);                                            \
-    return *value.LowerName##Array;                                            \
+    assert(valuePtr->LowerName##Array);                                        \
+    return *valuePtr->LowerName##Array;                                        \
   }
 
 DEFUN(Int, int, int, int, int)
@@ -288,35 +303,45 @@ Storage& Storage::GetChild(std::string_view label_id) {
   if (id.empty()) {
     id = label;
   }
-  Value& childValue = GetValue(id);
-  if (childValue.type != Value::kChild) {
-    childValue.Reset(Value::kChild);
-    childValue.child = new Storage;
+  auto& childPtr = m_values[id];
+  if (!childPtr) {
+    childPtr = std::make_unique<Value>();
   }
-  return *childValue.child;
+  if (childPtr->type != Value::kChild) {
+    childPtr->Reset(Value::kChild);
+    childPtr->child = new Storage;
+  }
+  return *childPtr->child;
 }
 
 std::vector<std::unique_ptr<Storage>>& Storage::GetChildArray(
     std::string_view key) {
-  auto [it, isNew] = m_values.try_emplace(key, Value::kChildArray);
-  if (!isNew && it->second.type != Value::kChildArray) {
-    it->second.Reset(Value::kChildArray);
-    it->second.childArray = new std::vector<std::unique_ptr<Storage>>();
+  auto& valuePtr = m_values[key];
+  if (!valuePtr) {
+    valuePtr = std::make_unique<Value>(Value::kChildArray);
+    valuePtr->childArray = new std::vector<std::unique_ptr<Storage>>();
+  } else if (valuePtr->type != Value::kChildArray) {
+    valuePtr->Reset(Value::kChildArray);
+    valuePtr->childArray = new std::vector<std::unique_ptr<Storage>>();
   }
 
-  return *it->second.childArray;
+  return *valuePtr->childArray;
 }
 
-void Storage::Erase(std::string_view key) {
+std::unique_ptr<Storage::Value> Storage::Erase(std::string_view key) {
   auto it = m_values.find(key);
   if (it != m_values.end()) {
+    auto rv = std::move(it->second);
     m_values.erase(it);
+    return rv;
   }
+  return nullptr;
 }
 
 void Storage::EraseChildren() {
-  std::erase_if(m_values,
-                [](const auto& kv) { return kv.second.type == Value::kChild; });
+  std::erase_if(m_values, [](const auto& kv) {
+    return kv.second->type == Value::kChild;
+  });
 }
 
 static bool JsonArrayToStorage(Storage::Value* valuePtr, const wpi::json& jarr,
@@ -448,47 +473,52 @@ bool Storage::FromJson(const wpi::json& json, const char* filename) {
     return false;
   }
   for (auto&& jkv : json.items()) {
-    auto [it, created] = m_values.try_emplace(jkv.key());
+    auto& valuePtr = m_values[jkv.key()];
+    bool created = false;
+    if (!valuePtr) {
+      valuePtr = std::make_unique<Value>();
+      created = true;
+    }
     auto& jvalue = jkv.value();
     switch (jvalue.type()) {
       case wpi::json::value_t::boolean:
-        it->second.Reset(Value::kBool);
-        it->second.boolVal = jvalue.get<bool>();
+        valuePtr->Reset(Value::kBool);
+        valuePtr->boolVal = jvalue.get<bool>();
         break;
       case wpi::json::value_t::number_float:
-        it->second.Reset(Value::kDouble);
-        it->second.doubleVal = jvalue.get<double>();
+        valuePtr->Reset(Value::kDouble);
+        valuePtr->doubleVal = jvalue.get<double>();
         break;
       case wpi::json::value_t::number_integer:
-        it->second.Reset(Value::kInt64);
-        it->second.int64Val = jvalue.get<int64_t>();
+        valuePtr->Reset(Value::kInt64);
+        valuePtr->int64Val = jvalue.get<int64_t>();
         break;
       case wpi::json::value_t::number_unsigned:
-        it->second.Reset(Value::kInt64);
-        it->second.int64Val = jvalue.get<uint64_t>();
+        valuePtr->Reset(Value::kInt64);
+        valuePtr->int64Val = jvalue.get<uint64_t>();
         break;
       case wpi::json::value_t::string:
-        it->second.Reset(Value::kString);
-        it->second.stringVal = jvalue.get_ref<const std::string&>();
+        valuePtr->Reset(Value::kString);
+        valuePtr->stringVal = jvalue.get_ref<const std::string&>();
         break;
       case wpi::json::value_t::object:
-        if (it->second.type != Value::kChild) {
-          it->second.Reset(Value::kChild);
-          it->second.child = new Storage;
+        if (valuePtr->type != Value::kChild) {
+          valuePtr->Reset(Value::kChild);
+          valuePtr->child = new Storage;
         }
-        it->second.child->FromJson(jvalue, filename);  // recurse
+        valuePtr->child->FromJson(jvalue, filename);  // recurse
         break;
       case wpi::json::value_t::array:
-        if (!JsonArrayToStorage(&it->second, jvalue, filename)) {
+        if (!JsonArrayToStorage(valuePtr.get(), jvalue, filename)) {
           if (created) {
-            m_values.erase(it);
+            m_values.erase(jkv.key());
           }
         }
         break;
       default:
         ImGui::LogText("null value in %s, ignoring", filename);
         if (created) {
-          m_values.erase(it);
+          m_values.erase(jkv.key());
         }
         break;
     }
@@ -527,7 +557,7 @@ wpi::json Storage::ToJson() const {
   wpi::json j = wpi::json::object();
   for (auto&& kv : m_values) {
     wpi::json jelem;
-    Value& value = kv.second;
+    auto& value = *kv.second;
     switch (value.type) {
 #define CASE(CapsName, LowerName)                                        \
   case Value::k##CapsName:                                               \
@@ -585,7 +615,7 @@ void Storage::Clear() {
 
 void Storage::ClearValues() {
   for (auto&& kv : m_values) {
-    Value& value = kv.second;
+    auto& value = *kv.second;
     switch (value.type) {
       case Value::kInt:
         value.intVal = value.intDefault;
@@ -671,7 +701,7 @@ void Storage::Apply() {
 
 void Storage::ApplyChildren() {
   for (auto&& kv : m_values) {
-    Value& value = kv.second;
+    auto& value = *kv.second;
     switch (value.type) {
       case Value::kChild:
         value.child->Apply();
