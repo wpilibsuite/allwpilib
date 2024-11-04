@@ -5,6 +5,7 @@
 #pragma once
 
 #include <stdint.h>
+
 #include "wpi/string.h"
 
 #ifdef __cplusplus
@@ -16,5 +17,5 @@ int32_t WPI_IsRuntimeValid(uint32_t* FoundMajor, uint32_t* FoundMinor,
                            WPI_String* RuntimePath);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

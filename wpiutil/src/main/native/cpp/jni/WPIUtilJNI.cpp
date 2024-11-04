@@ -10,12 +10,11 @@
 #include "wpi/DataLog.h"
 #include "wpi/FileLogger.h"
 #include "wpi/RawFrame.h"
+#include "wpi/RuntimeCheck.h"
 #include "wpi/Synchronization.h"
 #include "wpi/jni_util.h"
 #include "wpi/print.h"
 #include "wpi/timestamp.h"
-
-#include "wpi/RuntimeCheck.h"
 
 using namespace wpi::java;
 

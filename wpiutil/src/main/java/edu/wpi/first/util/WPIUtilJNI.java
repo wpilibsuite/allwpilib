@@ -63,9 +63,7 @@ public class WPIUtilJNI {
     libraryLoaded = true;
   }
 
-  /**
-   * Checks if the MSVC runtime is valid. Throws a runtime exception if not.
-   */
+  /** Checks if the MSVC runtime is valid. Throws a runtime exception if not. */
   public static native void checkMsvcRuntime();
 
   /**
