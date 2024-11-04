@@ -18,8 +18,7 @@ class RobotModeTriggersTest extends CommandTestBase {
     DriverStationSim.setTest(false);
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    Trigger auto = RobotModeTriggers.autonomous();
-    assertTrue(auto.getAsBoolean());
+    assertTrue(RobotModeTriggers.auto.getAsBoolean());
   }
 
   @Test
@@ -29,8 +28,7 @@ class RobotModeTriggersTest extends CommandTestBase {
     DriverStationSim.setTest(false);
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    Trigger teleop = RobotModeTriggers.teleop();
-    assertTrue(teleop.getAsBoolean());
+    assertTrue(RobotModeTriggers.teleop.getAsBoolean());
   }
 
   @Test
@@ -40,8 +38,7 @@ class RobotModeTriggersTest extends CommandTestBase {
     DriverStationSim.setTest(true);
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    Trigger test = RobotModeTriggers.test();
-    assertTrue(test.getAsBoolean());
+    assertTrue(RobotModeTriggers.test.getAsBoolean());
   }
 
   @Test
@@ -51,7 +48,6 @@ class RobotModeTriggersTest extends CommandTestBase {
     DriverStationSim.setTest(false);
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
-    Trigger disabled = RobotModeTriggers.disabled();
-    assertTrue(disabled.getAsBoolean());
+    assertTrue(RobotModeTriggers.disabled.getAsBoolean());
   }
 }

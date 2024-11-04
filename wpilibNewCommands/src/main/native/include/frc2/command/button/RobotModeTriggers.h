@@ -9,7 +9,7 @@
 namespace frc2 {
 
 /**
- * A class containing static Trigger factories for running callbacks when robot
+ * A class containing static Triggers for running callbacks when robot
  * mode changes.
  */
 class RobotModeTriggers {
@@ -17,34 +17,25 @@ class RobotModeTriggers {
   RobotModeTriggers() = delete;
 
   /**
-   * Returns a trigger that is true when the robot is enabled in autonomous
-   * mode.
-   *
-   * @return A trigger that is true when the robot is enabled in autonomous
+   * A trigger that is true when the robot is enabled in autonomous
    * mode.
    */
-  static Trigger Autonomous();
+  static Trigger Autonomous{&frc::DriverStation::IsAutonomousEnabled};
 
   /**
-   * Returns a trigger that is true when the robot is enabled in teleop mode.
-   *
-   * @return A trigger that is true when the robot is enabled in teleop mode.
+   * A trigger that is true when the robot is enabled in teleop mode.
    */
-  static Trigger Teleop();
+  static Trigger Teleop{&frc::DriverStation::IsTeleopEnabled};
 
   /**
-   * Returns a trigger that is true when the robot is disabled.
-   *
-   * @return A trigger that is true when the robot is disabled.
+   * A trigger that is true when the robot is disabled.
    */
-  static Trigger Disabled();
+  static Trigger Disabled{&frc::DriverStation::IsDisabled};
 
   /**
-   * Returns a trigger that is true when the robot is enabled in test mode.
-   *
-   * @return A trigger that is true when the robot is enabled in test mode.
+   * A trigger that is true when the robot is enabled in test mode.
    */
-  static Trigger Test();
+  static Trigger Test{&frc::DriverStation::IsTestEnabled};
 };
 
 }  // namespace frc2

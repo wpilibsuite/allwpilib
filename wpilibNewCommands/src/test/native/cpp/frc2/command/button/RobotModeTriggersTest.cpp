@@ -19,8 +19,7 @@ TEST(RobotModeTriggersTest, Autonomous) {
   DriverStationSim::SetTest(false);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
-  Trigger autonomous = RobotModeTriggers::Autonomous();
-  EXPECT_TRUE(autonomous.Get());
+  EXPECT_TRUE(RobotModeTriggers::Autonomous.Get());
 }
 
 TEST(RobotModeTriggersTest, Teleop) {
@@ -29,8 +28,7 @@ TEST(RobotModeTriggersTest, Teleop) {
   DriverStationSim::SetTest(false);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
-  Trigger teleop = RobotModeTriggers::Teleop();
-  EXPECT_TRUE(teleop.Get());
+  EXPECT_TRUE(RobotModeTriggers::Teleop.Get());
 }
 
 TEST(RobotModeTriggersTest, Disabled) {
@@ -39,8 +37,7 @@ TEST(RobotModeTriggersTest, Disabled) {
   DriverStationSim::SetTest(false);
   DriverStationSim::SetEnabled(false);
   DriverStationSim::NotifyNewData();
-  Trigger disabled = RobotModeTriggers::Disabled();
-  EXPECT_TRUE(disabled.Get());
+  EXPECT_TRUE(RobotModeTriggers::Disabled.Get());
 }
 
 TEST(RobotModeTriggersTest, TestMode) {
@@ -49,6 +46,5 @@ TEST(RobotModeTriggersTest, TestMode) {
   DriverStationSim::SetTest(true);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
-  Trigger test = RobotModeTriggers::Test();
-  EXPECT_TRUE(test.Get());
+  EXPECT_TRUE(RobotModeTriggers::Test.Get());
 }
