@@ -166,6 +166,8 @@ CommandPtr Select(std::function<Key()> selector,
 CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
                  Requirements requirements);
 
+CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier);
+
 /**
  * Constructs a command that schedules the command returned from the supplier
  * when initialized, and ends when it is no longer scheduled. The supplier is
