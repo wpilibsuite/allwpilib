@@ -198,7 +198,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_createEvent
   (JNIEnv*, jclass, jboolean manualReset, jboolean initialState)
 {
-  return wpi::CreateEvent(manualReset, initialState);
+  return wpi::MakeEvent(manualReset, initialState);
 }
 
 /*

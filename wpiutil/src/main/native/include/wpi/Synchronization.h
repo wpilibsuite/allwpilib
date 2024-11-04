@@ -58,7 +58,7 @@ constexpr int kHandleTypeUserBase = 80;
  * @param initialState true to make the event initially in signaled state
  * @return Event handle
  */
-WPI_EventHandle CreateEvent(bool manualReset = false,
+WPI_EventHandle MakeEvent(bool manualReset = false,
                             bool initialState = false);
 
 /**
@@ -256,7 +256,7 @@ class Event final {
    * @param initialState true to make the event initially in signaled state
    */
   explicit Event(bool manualReset = false, bool initialState = false)
-      : m_handle{CreateEvent(manualReset, initialState)} {}
+      : m_handle{MakeEvent(manualReset, initialState)} {}
   ~Event() {
     if (m_handle != 0) {
       DestroyEvent(m_handle);
@@ -460,7 +460,7 @@ extern "C" {
  * @param initial_state true to make the event initially in signaled state
  * @return Event handle
  */
-WPI_EventHandle WPI_CreateEvent(int manual_reset, int initial_state);
+WPI_EventHandle WPI_MakeEvent(int manual_reset, int initial_state);
 
 /**
  * Destroys an event.  Destruction wakes up any waiters.

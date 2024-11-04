@@ -43,7 +43,7 @@ static HandleManager& GetManager() {
   return manager;
 }
 
-WPI_EventHandle wpi::CreateEvent(bool manualReset, bool initialState) {
+WPI_EventHandle wpi::MakeEvent(bool manualReset, bool initialState) {
   auto& manager = GetManager();
   if (gShutdown) {
     return {};
@@ -325,8 +325,8 @@ void wpi::DestroySignalObject(WPI_Handle handle) {
 
 extern "C" {
 
-WPI_EventHandle WPI_CreateEvent(int manual_reset, int initial_state) {
-  return wpi::CreateEvent(manual_reset != 0, initial_state != 0);
+WPI_EventHandle WPI_MakeEvent(int manual_reset, int initial_state) {
+  return wpi::MakeEvent(manual_reset != 0, initial_state != 0);
 }
 
 void WPI_DestroyEvent(WPI_EventHandle handle) {
