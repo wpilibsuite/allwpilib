@@ -60,7 +60,7 @@ extern "C" int32_t WPI_IsRuntimeValid(uint32_t* foundMajor,
   *expectedMinor = 40;
 
   bool ValidRuntime =
-      *foundMajor >= *expectedMajor && *foundMinor >= *expectedMinor;
+      *foundMajor != *expectedMajor || *foundMinor >= *expectedMinor;
   if (!ValidRuntime) {
     DWORD Size = MAX_PATH;
 

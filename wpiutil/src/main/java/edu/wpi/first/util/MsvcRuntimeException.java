@@ -17,7 +17,7 @@ public class MsvcRuntimeException extends RuntimeException {
                 foundMajor, foundMinor));
         builder.append(String.format("JVM Location: %s\n", jvmLocation));
         builder.append(String.format("Runtime DLL Location: %s\n", runtimePath));
-        builder.append(String.format("See https://wpilib.org/jvmruntime for more information\n", runtimePath));
+        builder.append("See https://wpilib.org/jvmruntime for more information\n");
 
         return builder.toString();
     }
