@@ -229,7 +229,7 @@ NT_WaitForListenerQueue
 WPI_AllocateString
 WPI_AllocateStringArray
 WPI_MakeEvent
-WPI_CreateSemaphore
+WPI_MakeSemaphore
 WPI_CreateSignalObject
 WPI_DataLog_AppendBoolean
 WPI_DataLog_AppendBooleanArray

@@ -246,7 +246,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_createSemaphore
   (JNIEnv*, jclass, jint initialCount, jint maximumCount)
 {
-  return wpi::CreateSemaphore(initialCount, maximumCount);
+  return wpi::MakeSemaphore(initialCount, maximumCount);
 }
 
 /*
