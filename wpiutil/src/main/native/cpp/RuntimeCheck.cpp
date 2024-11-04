@@ -41,8 +41,8 @@ extern "C" int32_t WPI_IsRuntimeValid(uint32_t* foundMajor,
     return 1;
   }
 
-  std::unique_ptr<char[]> resourceBuffer =
-      std::make_unique<char[]>(resourceSize);
+  std::unique_ptr<char[]> resourceBuffer =     // NOLINT
+      std::make_unique<char[]>(resourceSize);  // NOLINT
   std::memcpy(resourceBuffer.get(), lockedResource, resourceSize);
 
   VS_FIXEDFILEINFO* fileInfo = nullptr;
