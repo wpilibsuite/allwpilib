@@ -18,7 +18,7 @@ class RobotModeTriggersTest extends CommandTestBase {
     DriverStationSim.setTest(false);
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    assertTrue(RobotModeTriggers.auto.getAsBoolean());
+    assertTrue(RobotModeTriggers.autonomous.getAsBoolean());
   }
 
   @Test
