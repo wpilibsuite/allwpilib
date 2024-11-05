@@ -591,8 +591,8 @@ TEST_P(DynamicSimpleStructTest, IntRoundTrip) {
 }
 
 static SimpleTestParam simpleTests[] = {
-    {"bool a", 1, StructFieldType::kBool, false, false, 8, UINT8_MAX},
-    {"char a", 1, StructFieldType::kChar, false, false, 8, UINT8_MAX},
+    {"bool a", 1, StructFieldType::kBool, false, false, 8, UINT8_MAX, 0, 0},
+    {"char a", 1, StructFieldType::kChar, false, false, 8, UINT8_MAX, 0, 0},
     {"int8 a", 1, StructFieldType::kInt8, true, false, 8, UINT8_MAX,
      std::numeric_limits<int8_t>::min(), std::numeric_limits<int8_t>::max()},
     {"int16 a", 2, StructFieldType::kInt16, true, false, 16, UINT16_MAX,
@@ -612,11 +612,14 @@ static SimpleTestParam simpleTests[] = {
     {"uint64 a", 8, StructFieldType::kUint64, false, true, 64, UINT64_MAX,
      std::numeric_limits<uint64_t>::min(),
      std::numeric_limits<uint64_t>::max()},
-    {"float a", 4, StructFieldType::kFloat, false, false, 32, UINT32_MAX},
-    {"float32 a", 4, StructFieldType::kFloat, false, false, 32, UINT32_MAX},
-    {"double a", 8, StructFieldType::kDouble, false, false, 64, UINT64_MAX},
-    {"float64 a", 8, StructFieldType::kDouble, false, false, 64, UINT64_MAX},
-    {"foo a", 0, StructFieldType::kStruct, false, false, 0, 0},
+    {"float a", 4, StructFieldType::kFloat, false, false, 32, UINT32_MAX, 0, 0},
+    {"float32 a", 4, StructFieldType::kFloat, false, false, 32, UINT32_MAX, 0,
+     0},
+    {"double a", 8, StructFieldType::kDouble, false, false, 64, UINT64_MAX, 0,
+     0},
+    {"float64 a", 8, StructFieldType::kDouble, false, false, 64, UINT64_MAX, 0,
+     0},
+    {"foo a", 0, StructFieldType::kStruct, false, false, 0, 0, 0, 0},
 };
 
 INSTANTIATE_TEST_SUITE_P(DynamicSimpleStructTests, DynamicSimpleStructTest,
