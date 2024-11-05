@@ -235,7 +235,7 @@ class FieldInfo {
   FieldFrameData GetFrameData(ImVec2 min, ImVec2 max) const;
   void Draw(ImDrawList* drawList, const FieldFrameData& frameData) const;
 
-  wpi::StringMap<std::unique_ptr<ObjectInfo>> m_objects;
+  wpi::StringMap<ObjectInfo> m_objects;
 
  private:
   void Reset();
@@ -952,15 +952,12 @@ void glass::DisplayField2DSettings(Field2DModel* model) {
       return;
     }
     PushID(name);
-    auto& objRef = field->m_objects[name];
-    if (!objRef) {
-      objRef = std::make_unique<ObjectInfo>(GetStorage());
-    }
-    auto obj = objRef.get();
 
     wpi::SmallString<64> nameBuf{name};
     if (ImGui::CollapsingHeader(nameBuf.c_str())) {
-      obj->DisplaySettings();
+      auto& obj =
+          field->m_objects.try_emplace(name, GetStorage()).first->second;
+      obj.DisplaySettings();
     }
     PopID();
   });
@@ -1096,14 +1093,10 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
 void FieldDisplay::DisplayObject(FieldObjectModel& model,
                                  std::string_view name) {
   PushID(name);
-  auto& objRef = m_field->m_objects[name];
-  if (!objRef) {
-    objRef = std::make_unique<ObjectInfo>(GetStorage());
-  }
-  auto obj = objRef.get();
-  obj->LoadImage();
+  auto& obj = m_field->m_objects.try_emplace(name, GetStorage()).first->second;
+  obj.LoadImage();
 
-  auto displayOptions = obj->GetDisplayOptions();
+  auto displayOptions = obj.GetDisplayOptions();
 
   m_centerLine.resize(0);
   m_leftLine.resize(0);
@@ -1140,9 +1133,9 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
   }
 
   m_drawSplit.SetCurrentChannel(m_drawList, 0);
-  obj->DrawLine(m_drawList, m_centerLine);
-  obj->DrawLine(m_drawList, m_leftLine);
-  obj->DrawLine(m_drawList, m_rightLine);
+  obj.DrawLine(m_drawList, m_centerLine);
+  obj.DrawLine(m_drawList, m_leftLine);
+  obj.DrawLine(m_drawList, m_rightLine);
   m_drawSplit.Merge(m_drawList);
 
   PopID();
