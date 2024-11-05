@@ -15,8 +15,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/core.h>
-
 #include "wpi/StringMap.h"
 #include "wpi/bit.h"
 
