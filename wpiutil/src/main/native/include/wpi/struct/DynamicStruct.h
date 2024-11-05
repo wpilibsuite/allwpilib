@@ -10,6 +10,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -234,7 +235,8 @@ class StructFieldDescriptor {
    * @return true if bitfield
    */
   bool IsBitField() const {
-    return m_bitShift != 0 || m_bitWidth != (m_size * 8);
+    return (m_bitShift != 0 || m_bitWidth != (m_size * 8)) &&
+           m_struct == nullptr;
   }
 
  private:
