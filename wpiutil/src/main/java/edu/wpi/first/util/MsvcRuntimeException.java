@@ -9,7 +9,7 @@ public class MsvcRuntimeException extends RuntimeException {
     private static final long serialVersionUID = -9155939328084105142L;
 
     private static String generateMessage(
-            int foundMajor, int foundMinor, int expectedMajor, int expectedMinor, 
+            int foundMajor, int foundMinor, int expectedMajor, int expectedMinor,
             String runtimePath) {
         String jvmLocation = ProcessHandle.current().info().command().orElse("Unknown");
 
@@ -36,7 +36,7 @@ public class MsvcRuntimeException extends RuntimeException {
      * @param runtimePath   path of runtime
      */
     public MsvcRuntimeException(
-            int foundMajor, int foundMinor, int expectedMajor, int expectedMinor, 
+            int foundMajor, int foundMinor, int expectedMajor, int expectedMinor,
             String runtimePath) {
         super(generateMessage(foundMajor, foundMinor, expectedMajor, expectedMinor, runtimePath));
     }
