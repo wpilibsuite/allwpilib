@@ -44,6 +44,12 @@ public interface Frequency extends Measure<FrequencyUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  default Frequency negate() {
+    return (Frequency) unaryMinus();
+  }
+
+  @Override
   default Frequency plus(Measure<? extends FrequencyUnit> other) {
     return (Frequency) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

@@ -44,6 +44,12 @@ public interface Acceleration<D extends Unit> extends Measure<AccelerationUnit<D
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  default Acceleration<D> negate() {
+    return (Acceleration<D>) unaryMinus();
+  }
+
+  @Override
   default Acceleration<D> plus(Measure<? extends AccelerationUnit<D>> other) {
     return (Acceleration<D>) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

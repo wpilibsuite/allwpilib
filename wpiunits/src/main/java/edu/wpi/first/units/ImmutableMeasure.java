@@ -61,6 +61,12 @@ public record ImmutableMeasure<U extends Unit>(double magnitude, double baseUnit
   }
 
   @Override
+  @SuppressWarnings("deprecation")
+  public Measure<U> negate() {
+    return unaryMinus();
+  }
+
+  @Override
   public Measure<U> plus(Measure<? extends U> other) {
     return ofBaseUnits(baseUnitMagnitude + other.baseUnitMagnitude(), unit);
   }

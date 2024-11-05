@@ -44,6 +44,12 @@ public interface AngularMomentum extends Measure<AngularMomentumUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  default AngularMomentum negate() {
+    return (AngularMomentum) unaryMinus();
+  }
+
+  @Override
   default AngularMomentum plus(Measure<? extends AngularMomentumUnit> other) {
     return (AngularMomentum) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

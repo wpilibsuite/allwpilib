@@ -44,6 +44,12 @@ public interface Power extends Measure<PowerUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  default Power negate() {
+    return (Power) unaryMinus();
+  }
+
+  @Override
   default Power plus(Measure<? extends PowerUnit> other) {
     return (Power) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

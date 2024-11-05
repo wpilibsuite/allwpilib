@@ -44,6 +44,12 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  default Torque negate() {
+    return (Torque) unaryMinus();
+  }
+
+  @Override
   default Torque plus(Measure<? extends TorqueUnit> other) {
     return (Torque) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
