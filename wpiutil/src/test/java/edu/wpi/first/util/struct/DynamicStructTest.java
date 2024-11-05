@@ -49,16 +49,36 @@ class DynamicStructTest {
 
   @Test
   void testDelayedValid() {
-    var desc = assertDoesNotThrow(() -> db.add("test", "foo a"));
+    final var desc = assertDoesNotThrow(() -> db.add("test", "foo a"));
     assertFalse(desc.isValid());
-    var desc2 = assertDoesNotThrow(() -> db.add("test2", "foo a[2]"));
+    var desc2 = assertDoesNotThrow(() -> db.add("test2", "foo a; foo b;"));
     assertFalse(desc2.isValid());
-    var desc3 = assertDoesNotThrow(() -> db.add("foo", "int32 a"));
-    assertTrue(desc3.isValid());
+    var desc3 = assertDoesNotThrow(() -> db.add("test3", "foo a[2]"));
+    assertFalse(desc3.isValid());
+    var desc4 = assertDoesNotThrow(() -> db.add("foo", "int32 a"));
+    assertTrue(desc4.isValid());
     assertTrue(desc.isValid());
     assertEquals(desc.getSize(), 4);
     assertTrue(desc2.isValid());
     assertEquals(desc2.getSize(), 8);
+    assertTrue(desc3.isValid());
+    assertEquals(desc3.getSize(), 8);
+  }
+
+  @Test
+  void testReuseNestedStructDelayed() {
+    var desc2 = assertDoesNotThrow(() -> db.add("test2", "test a;test b;"));
+    var desc = assertDoesNotThrow(() -> db.add("test", "int32 a; uint16 b; int16 c;"));
+    assertTrue(desc.isValid());
+    assertTrue(desc2.isValid());
+    assertEquals(desc2.getSize(), 16);
+    var fields = desc2.getFields();
+    var field = fields.get(0);
+    assertEquals(field.getOffset(), 0);
+    assertEquals(field.getName(), "a");
+    field = fields.get(1);
+    assertEquals(field.getOffset(), 8);
+    assertEquals(field.getName(), "b");
   }
 
   @Test

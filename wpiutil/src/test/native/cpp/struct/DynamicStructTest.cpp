@@ -43,16 +43,36 @@ TEST_F(DynamicStructTest, DelayedValid) {
   auto desc = db.Add("test", "foo a", &err);
   ASSERT_TRUE(desc);
   ASSERT_FALSE(desc->IsValid());
-  auto desc2 = db.Add("test2", "foo a[2]", &err);
+  auto desc2 = db.Add("test2", "foo a;foo b;", &err);
   ASSERT_TRUE(desc2);
   ASSERT_FALSE(desc2->IsValid());
-  auto desc3 = db.Add("foo", "int32 a", &err);
+  auto desc3 = db.Add("test3", "foo a[2]", &err);
   ASSERT_TRUE(desc3);
-  ASSERT_TRUE(desc3->IsValid());
+  ASSERT_FALSE(desc3->IsValid());
+  auto desc4 = db.Add("foo", "int32 a", &err);
+  ASSERT_TRUE(desc4);
+  ASSERT_TRUE(desc4->IsValid());
   ASSERT_TRUE(desc->IsValid());
   ASSERT_EQ(desc->GetSize(), 4u);
   ASSERT_TRUE(desc2->IsValid());
   ASSERT_EQ(desc2->GetSize(), 8u);
+  ASSERT_TRUE(desc3->IsValid());
+  ASSERT_EQ(desc3->GetSize(), 8u);
+}
+
+TEST_F(DynamicStructTest, ReuseNestedStructDelayed) {
+  auto desc2 = db.Add("test2", "test a;test b;", &err);
+  auto desc = db.Add("test", "int32 a; uint16 b; int16 c;", &err);
+  ASSERT_TRUE(desc);
+  ASSERT_TRUE(desc->IsValid());
+  ASSERT_TRUE(desc2);
+  ASSERT_TRUE(desc2->IsValid());
+  ASSERT_EQ(desc2->GetSize(), 16u);
+  auto fields = desc2->GetFields();
+  ASSERT_EQ(fields[0].GetOffset(), 0u);
+  ASSERT_EQ(fields[0].GetName(), "a");
+  ASSERT_EQ(fields[1].GetOffset(), 8u);
+  ASSERT_EQ(fields[1].GetName(), "b");
 }
 
 TEST_F(DynamicStructTest, InvalidBitfield) {
