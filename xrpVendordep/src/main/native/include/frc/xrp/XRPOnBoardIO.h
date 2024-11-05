@@ -42,6 +42,8 @@ class XRPOnBoardIO {
 
   /**
    * Sets the yellow LED.
+   *
+   * @param value True to activate LED, false otherwise.
    */
   void SetLed(bool value);
 

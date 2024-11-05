@@ -26,6 +26,7 @@ class XRPServo {
  public:
   /**
    * Constructs an XRPServo.
+   *
    * @param deviceNum the servo channel
    */
   explicit XRPServo(int deviceNum);
