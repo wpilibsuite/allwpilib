@@ -5,7 +5,6 @@
 #include "frc/simulation/CTREPCMSim.h"
 
 #include <memory>
-#include <utility>
 
 #include <hal/simulation/CTREPCMData.h>
 

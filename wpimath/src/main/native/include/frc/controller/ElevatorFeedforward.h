@@ -77,8 +77,9 @@ class ElevatorFeedforward {
    * @deprecated Use the current/next velocity overload instead.
    */
   [[deprecated("Use the current/next velocity overload instead.")]]
-  units::volt_t Calculate(units::unit_t<Velocity> velocity,
-                          units::unit_t<Acceleration> acceleration) const {
+  constexpr units::volt_t Calculate(
+      units::unit_t<Velocity> velocity,
+      units::unit_t<Acceleration> acceleration) const {
     return kS * wpi::sgn(velocity) + kG + kV * velocity + kA * acceleration;
   }
 
@@ -99,8 +100,8 @@ class ElevatorFeedforward {
     auto plant = LinearSystemId::IdentifyVelocitySystem<Distance>(kV, kA);
     LinearPlantInversionFeedforward<1, 1> feedforward{plant, dt};
 
-    Vectord<1> r{currentVelocity.value()};
-    Vectord<1> nextR{nextVelocity.value()};
+    Vectord<1> r{{currentVelocity.value()}};
+    Vectord<1> nextR{{nextVelocity.value()}};
 
     return kG + kS * wpi::sgn(currentVelocity.value()) +
            units::volt_t{feedforward.Calculate(r, nextR)(0)};
@@ -220,28 +221,28 @@ class ElevatorFeedforward {
    *
    * @return The static gain.
    */
-  units::volt_t GetKs() const { return kS; }
+  constexpr units::volt_t GetKs() const { return kS; }
 
   /**
    * Returns the gravity gain.
    *
    * @return The gravity gain.
    */
-  units::volt_t GetKg() const { return kG; }
+  constexpr units::volt_t GetKg() const { return kG; }
 
   /**
    * Returns the velocity gain.
    *
    * @return The velocity gain.
    */
-  units::unit_t<kv_unit> GetKv() const { return kV; }
+  constexpr units::unit_t<kv_unit> GetKv() const { return kV; }
 
   /**
    * Returns the acceleration gain.
    *
    * @return The acceleration gain.
    */
-  units::unit_t<ka_unit> GetKa() const { return kA; }
+  constexpr units::unit_t<ka_unit> GetKa() const { return kA; }
 
  private:
   /// The static gain.

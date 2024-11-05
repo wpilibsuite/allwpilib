@@ -7,30 +7,8 @@
 #include <Eigen/Core>
 
 #include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "frc/system/plant/LinearSystemId.h"
 
 using namespace frc;
-
-DifferentialDriveFeedforward::DifferentialDriveFeedforward(
-    decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
-    decltype(1_V / 1_rad_per_s) kVAngular,
-    decltype(1_V / 1_rad_per_s_sq) kAAngular, units::meter_t trackwidth)
-    // See LinearSystemId::IdentifyDrivetrainSystem(decltype(1_V / 1_mps),
-    // decltype(1_V / 1_mps_sq), decltype(1_V / 1_rad_per_s), decltype(1_V /
-    // 1_rad_per_s_sq))
-    : DifferentialDriveFeedforward{kVLinear, kALinear,
-                                   kVAngular * 2.0 / trackwidth * 1_rad,
-                                   kAAngular * 2.0 / trackwidth * 1_rad} {}
-
-DifferentialDriveFeedforward::DifferentialDriveFeedforward(
-    decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
-    decltype(1_V / 1_mps) kVAngular, decltype(1_V / 1_mps_sq) kAAngular)
-    : m_plant{frc::LinearSystemId::IdentifyDrivetrainSystem(
-          kVLinear, kALinear, kVAngular, kAAngular)},
-      m_kVLinear{kVLinear},
-      m_kALinear{kALinear},
-      m_kVAngular{kVAngular},
-      m_kAAngular{kAAngular} {}
 
 DifferentialDriveWheelVoltages DifferentialDriveFeedforward::Calculate(
     units::meters_per_second_t currentLeftVelocity,
