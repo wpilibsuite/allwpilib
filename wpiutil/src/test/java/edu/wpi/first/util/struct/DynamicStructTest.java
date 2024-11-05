@@ -49,12 +49,12 @@ class DynamicStructTest {
 
   @Test
   void testDelayedValid() {
-    var desc = assertDoesNotThrow(() -> db.add("test", "foo a"));
+    final var desc = assertDoesNotThrow(() -> db.add("test", "foo a"));
     assertFalse(desc.isValid());
     var desc2 = assertDoesNotThrow(() -> db.add("test2", "foo a; foo b;"));
     assertFalse(desc2.isValid());
     var desc3 = assertDoesNotThrow(() -> db.add("test3", "foo a[2]"));
-    assertFalse(desc2.isValid());
+    assertFalse(desc3.isValid());
     var desc4 = assertDoesNotThrow(() -> db.add("foo", "int32 a"));
     assertTrue(desc4.isValid());
     assertTrue(desc.isValid());

@@ -47,8 +47,8 @@ TEST_F(DynamicStructTest, DelayedValid) {
   ASSERT_TRUE(desc2);
   ASSERT_FALSE(desc2->IsValid());
   auto desc3 = db.Add("test3", "foo a[2]", &err);
-  ASSERT_TRUE(desc2);
-  ASSERT_FALSE(desc2->IsValid());
+  ASSERT_TRUE(desc3);
+  ASSERT_FALSE(desc3->IsValid());
   auto desc4 = db.Add("foo", "int32 a", &err);
   ASSERT_TRUE(desc4);
   ASSERT_TRUE(desc4->IsValid());
