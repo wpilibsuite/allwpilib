@@ -118,7 +118,7 @@ class LinearFilter {
    *   y[n] = (1 - gain) x[n] + gain y[n-1]<br>
    * where gain = e<sup>-dt / T</sup>, T is the time constant in seconds
    *
-   * Note: T = 1 / (2 pi f) where f is the cutoff frequency in Hz, the frequency
+   * Note: T = 1 / (2πf) where f is the cutoff frequency in Hz, the frequency
    * above which the input starts to attenuate.
    *
    * This filter is stable for time constants greater than zero.
@@ -138,7 +138,7 @@ class LinearFilter {
    *   y[n] = gain x[n] + (-gain) x[n-1] + gain y[n-1]<br>
    * where gain = e<sup>-dt / T</sup>, T is the time constant in seconds
    *
-   * Note: T = 1 / (2 pi f) where f is the cutoff frequency in Hz, the frequency
+   * Note: T = 1 / (2πf) where f is the cutoff frequency in Hz, the frequency
    * below which the input starts to attenuate.
    *
    * This filter is stable for time constants greater than zero.

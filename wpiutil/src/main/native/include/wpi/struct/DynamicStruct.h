@@ -7,14 +7,13 @@
 #include <stdint.h>
 
 #include <cassert>
-#include <memory>
 #include <span>
 #include <string>
 #include <string_view>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
-#include "wpi/MathExtras.h"
 #include "wpi/StringMap.h"
 #include "wpi/bit.h"
 
@@ -236,7 +235,8 @@ class StructFieldDescriptor {
    * @return true if bitfield
    */
   bool IsBitField() const {
-    return m_bitShift != 0 || m_bitWidth != (m_size * 8);
+    return (m_bitShift != 0 || m_bitWidth != (m_size * 8)) &&
+           m_struct == nullptr;
   }
 
  private:
@@ -357,7 +357,7 @@ class StructDescriptorDatabase {
   const StructDescriptor* Find(std::string_view name) const;
 
  private:
-  StringMap<std::unique_ptr<StructDescriptor>> m_structs;
+  StringMap<StructDescriptor> m_structs;
 };
 
 /**

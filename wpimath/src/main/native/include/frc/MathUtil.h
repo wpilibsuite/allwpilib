@@ -159,7 +159,7 @@ constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
 }
 
 /**
- * Wraps an angle to the range -pi to pi radians (-180 to 180 degrees).
+ * Wraps an angle to the range -π to π radians (-180 to 180 degrees).
  *
  * @param angle Angle to wrap.
  */

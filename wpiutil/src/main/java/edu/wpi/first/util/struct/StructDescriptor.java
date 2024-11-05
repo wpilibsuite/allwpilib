@@ -6,8 +6,10 @@ package edu.wpi.first.util.struct;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 /** Raw struct dynamic struct descriptor. */
@@ -148,7 +150,7 @@ public class StructDescriptor {
 
   private final String m_name;
   String m_schema;
-  final List<StructDescriptor> m_references = new ArrayList<>();
+  final Set<StructDescriptor> m_references = new HashSet<>();
   final List<StructFieldDescriptor> m_fields = new ArrayList<>();
   final Map<String, StructFieldDescriptor> m_fieldsByName = new HashMap<>();
   int m_size;

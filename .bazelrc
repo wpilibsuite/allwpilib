@@ -38,7 +38,7 @@ build:build_buddy --experimental_profile_include_target_label
 build:build_buddy --experimental_profile_include_primary_output
 build:build_buddy --nolegacy_important_outputs
 
-build:build_buddy_readonly --noremote_upload_local_results
+common:build_buddy_readonly --noremote_upload_local_results
 
 # This config should be used locally. It downloads more than the CI version
 build:remote_user --config=build_buddy

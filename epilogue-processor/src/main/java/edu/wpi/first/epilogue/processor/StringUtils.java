@@ -5,6 +5,9 @@
 package edu.wpi.first.epilogue.processor;
 
 import edu.wpi.first.epilogue.Logged;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.lang.model.element.TypeElement;
 
 public final class StringUtils {
@@ -60,6 +63,33 @@ public final class StringUtils {
   }
 
   /**
+   * Splits a camel-cased string like "fooBar" into individual words like ["foo", "Bar"].
+   *
+   * @param camelCasedString the camel-cased string to split
+   * @return the individual words in the input
+   */
+  public static List<String> splitToWords(CharSequence camelCasedString) {
+    // Implementation from https://stackoverflow.com/a/2560017, refactored for readability
+
+    // Uppercase letter not followed by the first letter of the next word
+    // This allows for splitting "IOLayer" into "IO" and "Layer"
+    String penultimateUppercaseLetter = "(?<=[A-Z])(?=[A-Z][a-z])";
+
+    // Any character that's NOT an uppercase letter, immediately followed by an uppercase letter
+    // This allows for splitting "fooBar" into "foo" and "Bar", or "123Bang" into "123" and "Bang"
+    String lastNonUppercaseLetter = "(?<=[^A-Z])(?=[A-Z])";
+
+    // The final letter in a sequence, followed by a non-alpha character like a number or underscore
+    // This allows for splitting "foo123" into "foo" and "123"
+    String finalLetter = "(?<=[A-Za-z])(?=[^A-Za-z])";
+
+    String regex =
+        String.format("%s|%s|%s", penultimateUppercaseLetter, lastNonUppercaseLetter, finalLetter);
+
+    return Arrays.asList(camelCasedString.toString().split(regex));
+  }
+
+  /**
    * Gets the name of the field used to hold a logger for data of the given type.
    *
    * @param clazz the data type that the logger supports
@@ -106,5 +136,32 @@ public final class StringUtils {
     }
 
     return loggerClassName;
+  }
+
+  /**
+   * Converts a camelCase element name to separate words, removing common field and method name
+   * prefixes like "m_" and "get".
+   *
+   * @param elementName the camelcased element name
+   * @return the name split into separate words and sanitized
+   */
+  public static String toHumanName(String elementName) {
+    // Delete common field prefixes (k_name, m_name, s_name)
+    var sanitizedName = elementName.replaceFirst("^[msk]_", "");
+
+    // Drop leading "k" prefix from fields
+    // (though normally these should be static, and thus not logged)
+    if (sanitizedName.matches("^k[A-Z].*$")) {
+      sanitizedName = sanitizedName.substring(1);
+    }
+
+    // Drop leading "get" from accessor methods
+    if (sanitizedName.matches("^get[A-Z].*$")) {
+      sanitizedName = sanitizedName.substring(3);
+    }
+
+    return splitToWords(sanitizedName).stream()
+        .map(StringUtils::capitalize)
+        .collect(Collectors.joining(" "));
   }
 }
