@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #include <cassert>
-#include <concepts>
 #include <span>
 #include <string>
 #include <string_view>
