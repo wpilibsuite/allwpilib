@@ -104,19 +104,43 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
   void SetEnabled(bool enabled);
 
   /**
-   * Returns the rotation ProfiledPIDController
+   * Returns the X PIDController
+   *
+   * @deprecated Use GetXController() instead.
    */
+  [[deprecated("Use GetXController() instead")]]
+  PIDController& getXController();
+
+  /**
+   * Returns the Y PIDController
+   *
+   * @deprecated Use GetYController() instead.
+   */
+  [[deprecated("Use GetYController() instead")]]
+  PIDController& getYController();
+
+  /**
+   * Returns the rotation ProfiledPIDController
+   *
+   * @deprecated Use GetThetaController() instead.
+   */
+  [[deprecated("Use GetThetaController() instead")]]
   ProfiledPIDController<units::radian>& getThetaController();
 
   /**
    * Returns the X PIDController
    */
-  PIDController& getXController();
+  PIDController& GetXController();
 
   /**
    * Returns the Y PIDController
    */
-  PIDController& getYController();
+  PIDController& GetYController();
+
+  /**
+   * Returns the rotation ProfiledPIDController
+   */
+  ProfiledPIDController<units::radian>& GetThetaController();
 
  private:
   Pose2d m_poseError;
