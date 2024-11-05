@@ -172,8 +172,8 @@ CommandPtr CommandPtr::WithDeadline(CommandPtr&& deadline) && {
   AssertValid();
   std::vector<std::unique_ptr<Command>> vec;
   vec.emplace_back(std::move(m_ptr));
-  m_ptr =
-      std::make_unique<ParallelDeadlineGroup>(std::move(deadline).Unwrap(), std::move(vec));
+  m_ptr = std::make_unique<ParallelDeadlineGroup>(std::move(deadline).Unwrap(),
+                                                  std::move(vec));
   return std::move(*this);
 }
 
