@@ -305,9 +305,12 @@ For q ≠ 0 and r = 0,
 
 ### Conventions
 
-We'll use the extrinsic X-Y-Z rotation order for Euler angles. The direction of rotation is CCW looking into the positive axis. If you point your right thumb along the positive axis direction, your fingers curl in the direction of rotation.
+We'll use the extrinsic X-Y-Z rotation order for Euler angles. The direction of rotation is CCW
+looking into the positive axis. If you point your right thumb along the positive axis direction,
+your fingers curl in the direction of rotation.
 
-The angles are a\_x around the X-axis, a\_y around the Y-axis, and a\_z around the Z-axis, with the following constraints:
+The angles are a\_x around the X-axis, a\_y around the Y-axis, and a\_z around the Z-axis, with the
+following constraints:
 
 ```
   -π ≤ a_x ≤ π
@@ -315,7 +318,8 @@ The angles are a\_x around the X-axis, a\_y around the Y-axis, and a\_z around t
   -π ≤ a_z ≤ π
 ```
 
-The coordinate system is right-handed. If you point your right thumb along the +Z axis, your fingers curl from the +X axis to the +Y axis.
+The coordinate system is right-handed. If you point your right thumb along the +Z axis, your fingers
+curl from the +X axis to the +Y axis.
 
 The quaternion imaginary numbers are defined as follows:
 
@@ -331,7 +335,8 @@ The quaternion imaginary numbers are defined as follows:
 
 ### Quaternion representation of axis rotations
 
-We will take it as given that a rotation by θ radians around a normalized vector v is represented with the quaternion cos(θ/2) + sin(θ/2) (v\_x î + v\_y ĵ + v\_z k̂).
+We will take it as given that a rotation by θ radians around a normalized vector v is represented
+with the quaternion cos(θ/2) + sin(θ/2) (v\_x î + v\_y ĵ + v\_z k̂).
 
 ### Derivation
 
@@ -346,7 +351,8 @@ For convenience, we'll define the following variables:
   s_z = sin(a_z/2)
 ```
 
-We can calculate the quaternion corresponding to a set of Euler angles by applying each rotation in sequence. Recall that quaternions are composed with left multiplication, like matrices.
+We can calculate the quaternion corresponding to a set of Euler angles by applying each rotation in
+sequence. Recall that quaternions are composed with left multiplication, like matrices.
 
 ```
   q = (cos(a_z/2) + sin(a_z/2) k̂)(cos(a_y/2) + sin(a_y/2) ĵ)(cos(a_x/2) + sin(a_x/2) î)
@@ -490,7 +496,8 @@ If cos(a\_y) > 0:
   a_z = atan2(2 (q_w q_z + q_x q_y), 1 - 2 (q_y² + q_z²))
 ```
 
-Because -π/2 ≤ a\_y ≤ π/2, cos(a\_y) ≥ 0. Therefore, the only remaining case is cos(a\_y) = 0, whose only solutions in that range are a\_y = ±π/2.
+Because -π/2 ≤ a\_y ≤ π/2, cos(a\_y) ≥ 0. Therefore, the only remaining case is cos(a\_y) = 0, whose
+only solutions in that range are a\_y = ±π/2.
 
 ```
   a_y = ±π/2
@@ -522,7 +529,8 @@ Plugging into the quaternion components:
   q_z = √2/2 sin(a_z/2 ∓ a_x/2)
 ```
 
-In either case only the sum or the difference between a\_x and a\_z can be determined. We'll pick the solution where a\_x = 0.
+In either case only the sum or the difference between a\_x and a\_z can be determined. We'll pick
+the solution where a\_x = 0.
 
 ```
   q_w = √2/2 cos(a_z/2 ∓ 0)
@@ -553,7 +561,8 @@ When calculating a\_x:
   (cos(a_x) cos(a_y))² + (sin(a_x) cos(a_y))² ≈ 0
 ```
 
-Note that this reuses the cos(a\_x) cos(a\_y) and sin(a\_x) cos(a\_y) terms needed to calculate a\_x.
+Note that this reuses the cos(a\_x) cos(a\_y) and sin(a\_x) cos(a\_y) terms needed to calculate
+a\_x.
 
 When calculating a\_z:
 
@@ -564,11 +573,13 @@ When calculating a\_z:
   (cos(a_y) cos(a_z))² + (cos(a_y) sin(a_z))² ≈ 0
 ```
 
-Note that this reuses the cos(a\_y) cos(a\_z) and cos(a\_y) sin(a\_z) terms needed to calculate a\_z.
+Note that this reuses the cos(a\_y) cos(a\_z) and cos(a\_y) sin(a\_z) terms needed to calculate
+a\_z.
 
 ## Quaternion Exponential
 
-We will take it as given that a quaternion has scalar and vector components `𝑞 = s + 𝑣⃗`, with vector component 𝑣⃗ consisting of a unit vector and magnitude `𝑣⃗ = θ * v̂`.
+We will take it as given that a quaternion has scalar and vector components `𝑞 = s + 𝑣⃗`, with vector
+component 𝑣⃗ consisting of a unit vector and magnitude `𝑣⃗ = θ * v̂`.
 
 ```
 𝑞 = s + 𝑣⃗
@@ -599,12 +610,16 @@ exp(𝑞) = exp(s) * [cos(θ) + sin(θ) / θ * 𝑣⃗]
 
 ## Quaternion Logarithm
 
-We will take it as a given that for a given quaternion of the form `𝑞 = s + 𝑣⃗`, we can calculate the exponential: `exp(𝑞) = exp(s) * [cos(θ) + sin(θ) / θ * 𝑣⃗]` where `θ = ||𝑣⃗||`.
+We will take it as a given that for a given quaternion of the form `𝑞 = s + 𝑣⃗`, we can calculate the
+exponential: `exp(𝑞) = exp(s) * [cos(θ) + sin(θ) / θ * 𝑣⃗]` where `θ = ||𝑣⃗||`.
 
-Additionally, `exp(log(𝑞)) = q` for a given value of `log(𝑞)`. There are multiple solutions to `log(𝑞)` caused by the imaginary axes in 𝑣⃗, discussed here: https://en.wikipedia.org/wiki/Complex_logarithm
+Additionally, `exp(log(𝑞)) = q` for a given value of `log(𝑞)`. There are multiple solutions to
+`log(𝑞)` caused by the imaginary axes in 𝑣⃗, discussed here:
+https://en.wikipedia.org/wiki/Complex_logarithm
 
-We will demonstrate the principal solution of `log(𝑞)` satisfying `exp(log(𝑞)) = q`.
-This being `log(𝑞) = log(||𝑞||) + atan2(θ, s) / θ * 𝑣⃗`, is the principal solution to `log(𝑞)` because the function `atan2(θ, s)` returns the principal value corresponding to its arguments.
+We will demonstrate the principal solution of `log(𝑞)` satisfying `exp(log(𝑞)) = q`. This being
+`log(𝑞) = log(||𝑞||) + atan2(θ, s) / θ * 𝑣⃗`, is the principal solution to `log(𝑞)` because the
+function `atan2(θ, s)` returns the principal value corresponding to its arguments.
 
 Proof: `log(𝑞) = log(||𝑞||) + atan2(θ, s) / θ * 𝑣⃗` satisfies `exp(log(𝑞)) = q`.
 
@@ -639,9 +654,11 @@ exp(log(𝑞)) = 𝑞
 
 ## Unit Quaternion in SO(3) from Rotation Vector in 𝖘𝖔(3)
 
-We will take it as a given that members of 𝖘𝖔(3) take the form `𝑣⃗ = θ * v̂`, representing a rotation θ around a unit axis v̂.
+We will take it as a given that members of 𝖘𝖔(3) take the form `𝑣⃗ = θ * v̂`, representing a rotation
+θ around a unit axis v̂.
 
-We additionally take it as a given that quaternions in SO(3) are of the form `𝑞 = cos(θ / 2) + sin(θ / 2) * v̂`, representing a rotation of θ around unit axis v̂.
+We additionally take it as a given that quaternions in SO(3) are of the form `𝑞 = cos(θ / 2) +
+sin(θ / 2) * v̂`, representing a rotation of θ around unit axis v̂.
 
 ```
 θ = ||𝑣⃗||
@@ -653,9 +670,11 @@ v̂ = 𝑣⃗ / θ
 
 ## Rotation vector in 𝖘𝖔(3) from Unit Quaternion in SO(3)
 
-We will take it as a given that members of 𝖘𝖔(3) take the form  `𝑟⃗ = θ * r̂`, representing a rotation θ around a unit axis r̂.
+We will take it as a given that members of 𝖘𝖔(3) take the form  `𝑟⃗ = θ * r̂`, representing a rotation
+θ around a unit axis r̂.
 
-We additionally take it as a given that quaternions in SO(3) are of the form `𝑞 = s + 𝑣⃗ = cos(θ / 2) + sin(θ / 2) * v̂`, representing a rotation of θ around unit axis v̂.
+We additionally take it as a given that quaternions in SO(3) are of the form `𝑞 = s + 𝑣⃗ = cos(θ / 2)
++ sin(θ / 2) * v̂`, representing a rotation of θ around unit axis v̂.
 
 ```
 s + 𝑣⃗ = cos(θ / 2) + sin(θ / 2) * v̂
@@ -681,12 +700,18 @@ r̂ = 𝑣⃗ / ||𝑣⃗||
 
 Demonstration: https://www.desmos.com/calculator/3jamollwrk
 
-The fastest path possible for an exponential profile (and the placement of the inflection point) depend on boundary conditions.
+The fastest path possible for an exponential profile (and the placement of the inflection point)
+depend on boundary conditions.
 
-Specifically, the placement (xf, vf) relative to the possible trajectories that cross through (x0, v0) decides this. There are two possible trajectories to take from the initial state. In the desmos demo these are colored Green and Purple, which arise from applying +input and -input from the initial state respectively. Red and Yellow trajectories arise from applying -input and +input respectively from terminal conditions.
+Specifically, the placement (xf, vf) relative to the possible trajectories that cross through
+(x0, v0) decides this. There are two possible trajectories to take from the initial state. In the
+desmos demo these are colored Green and Purple, which arise from applying +input and -input from the
+initial state respectively. Red and Yellow trajectories arise from applying -input and +input
+respectively from terminal conditions.
 
-In order to reach the terminal state from the initial state by following Green in the +v direction, the second step is following Red in the -v direction.
-Likewise, Purple must be followed in the -v direction, and then Yellow must be followed in the +v direction.
+In order to reach the terminal state from the initial state by following Green in the +v direction,
+the second step is following Red in the -v direction. Likewise, Purple must be followed in the -v
+direction, and then Yellow must be followed in the +v direction.
 
 The specific conditions surrounding this decision are fourfold:
 - A: v0 >= 0
