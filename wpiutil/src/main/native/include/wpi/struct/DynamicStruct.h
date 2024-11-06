@@ -423,7 +423,17 @@ class DynamicStruct {
   int64_t GetIntField(const StructFieldDescriptor* field,
                       size_t arrIndex = 0) const {
     assert(field->IsInt());
-    return GetFieldImpl(field, arrIndex);
+    uint64_t raw = GetFieldImpl(field, arrIndex);
+    switch (field->m_size) {
+      case 1:
+        return static_cast<int8_t>(raw);
+      case 2:
+        return static_cast<int16_t>(raw);
+      case 4:
+        return static_cast<int32_t>(raw);
+      default:
+        return raw;
+    }
   }
 
   /**

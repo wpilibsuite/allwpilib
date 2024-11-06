@@ -7,7 +7,9 @@
 #include <stdint.h>
 
 #include <cstring>
+#include <limits>
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -473,6 +475,8 @@ struct SimpleTestParam {
   bool isUint;
   unsigned int bitWidth;
   uint64_t bitMask;
+  uint64_t minVal;
+  uint64_t maxVal;
 };
 
 std::ostream& operator<<(std::ostream& os, const SimpleTestParam& param) {
@@ -532,22 +536,94 @@ TEST_P(DynamicSimpleStructTest, Array) {
   }
 }
 
+static int64_t SignExtend(uint64_t value, size_t size) {
+  switch (size) {
+    case 1:
+      return static_cast<int8_t>(value);
+    case 2:
+      return static_cast<int16_t>(value);
+    case 4:
+      return static_cast<int32_t>(value);
+    default:
+      return value;
+  }
+}
+
+TEST_P(DynamicSimpleStructTest, IntRoundTrip) {
+  if (GetParam().type == StructFieldType::kStruct) {
+    return;
+  }
+  auto desc = db.Add("test", GetParam().schema, &err);
+  ASSERT_TRUE(desc);
+  ASSERT_TRUE(desc->IsValid());
+  std::vector<uint8_t> dest(desc->GetSize());
+  auto field = desc->FindFieldByName("a");
+  ASSERT_TRUE(field);
+  wpi::MutableDynamicStruct dynamic(desc, dest);
+  if (GetParam().isInt) {
+    {
+      int64_t value = SignExtend(GetParam().minVal, field->GetSize());
+      dynamic.SetIntField(field, value);
+      EXPECT_EQ(dynamic.GetIntField(field), value);
+    }
+    {
+      int64_t value = SignExtend(GetParam().maxVal, field->GetSize());
+      dynamic.SetIntField(field, value);
+      EXPECT_EQ(dynamic.GetIntField(field), value);
+    }
+  } else if (GetParam().isUint) {
+    {
+      uint64_t value = GetParam().minVal;
+      dynamic.SetUintField(field, value);
+      EXPECT_EQ(dynamic.GetUintField(field), value);
+    }
+    {
+      uint64_t value = GetParam().maxVal;
+      dynamic.SetUintField(field, value);
+      EXPECT_EQ(dynamic.GetUintField(field), value);
+    }
+  } else if (GetParam().type == StructFieldType::kBool) {
+    dynamic.SetBoolField(field, false);
+    EXPECT_FALSE(dynamic.GetBoolField(field));
+    dynamic.SetBoolField(field, true);
+    EXPECT_TRUE(dynamic.GetBoolField(field));
+  }
+}
+
 static SimpleTestParam simpleTests[] = {
-    {"bool a", 1, StructFieldType::kBool, false, false, 8, UINT8_MAX},
-    {"char a", 1, StructFieldType::kChar, false, false, 8, UINT8_MAX},
-    {"int8 a", 1, StructFieldType::kInt8, true, false, 8, UINT8_MAX},
-    {"int16 a", 2, StructFieldType::kInt16, true, false, 16, UINT16_MAX},
-    {"int32 a", 4, StructFieldType::kInt32, true, false, 32, UINT32_MAX},
-    {"int64 a", 8, StructFieldType::kInt64, true, false, 64, UINT64_MAX},
-    {"uint8 a", 1, StructFieldType::kUint8, false, true, 8, UINT8_MAX},
-    {"uint16 a", 2, StructFieldType::kUint16, false, true, 16, UINT16_MAX},
-    {"uint32 a", 4, StructFieldType::kUint32, false, true, 32, UINT32_MAX},
-    {"uint64 a", 8, StructFieldType::kUint64, false, true, 64, UINT64_MAX},
-    {"float a", 4, StructFieldType::kFloat, false, false, 32, UINT32_MAX},
-    {"float32 a", 4, StructFieldType::kFloat, false, false, 32, UINT32_MAX},
-    {"double a", 8, StructFieldType::kDouble, false, false, 64, UINT64_MAX},
-    {"float64 a", 8, StructFieldType::kDouble, false, false, 64, UINT64_MAX},
-    {"foo a", 0, StructFieldType::kStruct, false, false, 0, 0},
+    {"bool a", 1, StructFieldType::kBool, false, false, 8, UINT8_MAX, 0, 0},
+    {"char a", 1, StructFieldType::kChar, false, false, 8, UINT8_MAX, 0, 0},
+    {"int8 a", 1, StructFieldType::kInt8, true, false, 8, UINT8_MAX,
+     static_cast<uint64_t>(std::numeric_limits<int8_t>::min()),
+     std::numeric_limits<int8_t>::max()},
+    {"int16 a", 2, StructFieldType::kInt16, true, false, 16, UINT16_MAX,
+     static_cast<uint64_t>(std::numeric_limits<int16_t>::min()),
+     std::numeric_limits<int16_t>::max()},
+    {"int32 a", 4, StructFieldType::kInt32, true, false, 32, UINT32_MAX,
+     static_cast<uint64_t>(std::numeric_limits<int32_t>::min()),
+     std::numeric_limits<int32_t>::max()},
+    {"int64 a", 8, StructFieldType::kInt64, true, false, 64, UINT64_MAX,
+     static_cast<uint64_t>(std::numeric_limits<int64_t>::min()),
+     std::numeric_limits<int64_t>::max()},
+    {"uint8 a", 1, StructFieldType::kUint8, false, true, 8, UINT8_MAX,
+     std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max()},
+    {"uint16 a", 2, StructFieldType::kUint16, false, true, 16, UINT16_MAX,
+     std::numeric_limits<uint16_t>::min(),
+     std::numeric_limits<uint16_t>::max()},
+    {"uint32 a", 4, StructFieldType::kUint32, false, true, 32, UINT32_MAX,
+     std::numeric_limits<uint32_t>::min(),
+     std::numeric_limits<uint32_t>::max()},
+    {"uint64 a", 8, StructFieldType::kUint64, false, true, 64, UINT64_MAX,
+     std::numeric_limits<uint64_t>::min(),
+     std::numeric_limits<uint64_t>::max()},
+    {"float a", 4, StructFieldType::kFloat, false, false, 32, UINT32_MAX, 0, 0},
+    {"float32 a", 4, StructFieldType::kFloat, false, false, 32, UINT32_MAX, 0,
+     0},
+    {"double a", 8, StructFieldType::kDouble, false, false, 64, UINT64_MAX, 0,
+     0},
+    {"float64 a", 8, StructFieldType::kDouble, false, false, 64, UINT64_MAX, 0,
+     0},
+    {"foo a", 0, StructFieldType::kStruct, false, false, 0, 0, 0, 0},
 };
 
 INSTANTIATE_TEST_SUITE_P(DynamicSimpleStructTests, DynamicSimpleStructTest,

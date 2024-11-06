@@ -328,21 +328,40 @@ class DynamicStructTest {
 
   private static Stream<Arguments> provideSimpleTestParams() {
     return Stream.of(
-        Arguments.of("bool a", 1, StructFieldType.kBool, false, false, 8, 0xff),
-        Arguments.of("char a", 1, StructFieldType.kChar, false, false, 8, 0xff),
-        Arguments.of("int8 a", 1, StructFieldType.kInt8, true, false, 8, 0xff),
-        Arguments.of("int16 a", 2, StructFieldType.kInt16, true, false, 16, 0xffff),
-        Arguments.of("int32 a", 4, StructFieldType.kInt32, true, false, 32, 0xffffffffL),
-        Arguments.of("int64 a", 8, StructFieldType.kInt64, true, false, 64, -1),
-        Arguments.of("uint8 a", 1, StructFieldType.kUint8, false, true, 8, 0xff),
-        Arguments.of("uint16 a", 2, StructFieldType.kUint16, false, true, 16, 0xffff),
-        Arguments.of("uint32 a", 4, StructFieldType.kUint32, false, true, 32, 0xffffffffL),
-        Arguments.of("uint64 a", 8, StructFieldType.kUint64, false, true, 64, -1),
-        Arguments.of("float a", 4, StructFieldType.kFloat, false, false, 32, 0xffffffffL),
-        Arguments.of("float32 a", 4, StructFieldType.kFloat, false, false, 32, 0xffffffffL),
-        Arguments.of("double a", 8, StructFieldType.kDouble, false, false, 64, -1),
-        Arguments.of("float64 a", 8, StructFieldType.kDouble, false, false, 64, -1),
-        Arguments.of("foo a", 0, StructFieldType.kStruct, false, false, 0, 0));
+        Arguments.of("bool a", 1, StructFieldType.kBool, false, false, 8, 0xff, 0, 0),
+        Arguments.of("char a", 1, StructFieldType.kChar, false, false, 8, 0xff, 0, 0),
+        Arguments.of("int8 a", 1, StructFieldType.kInt8, true, false, 8, 0xff, -128, 127),
+        Arguments.of("int16 a", 2, StructFieldType.kInt16, true, false, 16, 0xffff, -32768, 32767),
+        Arguments.of(
+            "int32 a",
+            4,
+            StructFieldType.kInt32,
+            true,
+            false,
+            32,
+            0xffffffffL,
+            -2147483648,
+            2147483647),
+        Arguments.of(
+            "int64 a",
+            8,
+            StructFieldType.kInt64,
+            true,
+            false,
+            64,
+            -1,
+            -9223372036854775808L,
+            9223372036854775807L),
+        Arguments.of("uint8 a", 1, StructFieldType.kUint8, false, true, 8, 0xff, 0, 255),
+        Arguments.of("uint16 a", 2, StructFieldType.kUint16, false, true, 16, 0xffff, 0, 65535),
+        Arguments.of(
+            "uint32 a", 4, StructFieldType.kUint32, false, true, 32, 0xffffffffL, 0, 4294967295L),
+        Arguments.of("uint64 a", 8, StructFieldType.kUint64, false, true, 64, -1, 0, 0),
+        Arguments.of("float a", 4, StructFieldType.kFloat, false, false, 32, 0xffffffffL, 0, 0),
+        Arguments.of("float32 a", 4, StructFieldType.kFloat, false, false, 32, 0xffffffffL, 0, 0),
+        Arguments.of("double a", 8, StructFieldType.kDouble, false, false, 64, -1, 0, 0),
+        Arguments.of("float64 a", 8, StructFieldType.kDouble, false, false, 64, -1, 0, 0),
+        Arguments.of("foo a", 0, StructFieldType.kStruct, false, false, 0, 0, 0, 0));
   }
 
   @ParameterizedTest
@@ -406,6 +425,40 @@ class DynamicStructTest {
     } else {
       assertFalse(desc.isValid());
       assertNotNull(field.getStruct());
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideSimpleTestParams")
+  void testIntRoundTrip(
+      String schema,
+      int size,
+      StructFieldType type,
+      boolean isInt,
+      boolean isUint,
+      int bitWidth,
+      long bitMask,
+      long minVal,
+      long maxVal) {
+    if (type == StructFieldType.kStruct) {
+      return;
+    }
+    var desc = assertDoesNotThrow(() -> db.add("test", schema));
+    assertTrue(desc.isValid());
+    var dynamic = DynamicStruct.allocate(desc);
+    var field = desc.findFieldByName("a");
+    assertNotNull(field);
+    if ((isInt || isUint) && type != StructFieldType.kUint64) {
+      // Java can't represent uint64 max
+      dynamic.setIntField(field, minVal);
+      assertEquals(minVal, dynamic.getIntField(field));
+      dynamic.setIntField(field, maxVal);
+      assertEquals(maxVal, dynamic.getIntField(field));
+    } else if (type == StructFieldType.kBool) {
+      dynamic.setBoolField(field, false);
+      assertFalse(dynamic.getBoolField(field));
+      dynamic.setBoolField(field, true);
+      assertTrue(dynamic.getBoolField(field));
     }
   }
 
