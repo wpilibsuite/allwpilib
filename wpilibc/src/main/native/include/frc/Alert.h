@@ -4,15 +4,10 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-#include <vector>
+#include <stdint.h>
 
-#include <networktables/NTSendable.h>
-#include <units/time.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringMap.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <set>
+#include <string>
 
 namespace frc {
 
@@ -21,7 +16,7 @@ namespace frc {
  * of kError, kWarning, or kInfo to denote urgency. See Alert::AlertType for
  * suggested usage of each type. Alerts can be displayed on supported
  * dashboards, and are shown in a priority order based on type and recency of
- * activation.
+ * activation, with newly activated alerts first.
  *
  * Alerts should be created once and stored persistently, then updated to
  * "active" or "inactive" as necessary. Set(bool) can be safely called
@@ -88,6 +83,14 @@ class Alert {
    */
   Alert(std::string_view group, std::string_view text, AlertType type);
 
+  Alert(Alert&&);
+  Alert& operator=(Alert&&);
+
+  Alert(const Alert&) = default;
+  Alert& operator=(const Alert&) = default;
+
+  ~Alert();
+
   /**
    * Sets whether the alert should currently be displayed. This method can be
    * safely called periodically.
@@ -97,6 +100,12 @@ class Alert {
   void Set(bool active);
 
   /**
+   * Gets whether the alert is active.
+   * @return whether the alert is active.
+   */
+  bool Get() const { return m_active; }
+
+  /**
    * Updates current alert text. Use this method to dynamically change the
    * displayed alert, such as including more details about the detected problem.
    *
@@ -104,23 +113,29 @@ class Alert {
    */
   void SetText(std::string_view text);
 
+  /**
+   * Gets the current alert text.
+   * @return the current text.
+   */
+  std::string GetText() const { return m_text; }
+
+  /**
+   * Get the type of this alert.
+   * @return the type
+   */
+  AlertType GetType() const { return m_type; }
+
  private:
+  class PublishedAlert;
+  class SendableAlerts;
+
   AlertType m_type;
+  std::string m_text;
+  std::set<PublishedAlert>* m_activeAlerts;
   bool m_active = false;
-  units::second_t m_activeStartTime;
-  std::string_view m_text;
-
-  class SendableAlerts : public nt::NTSendable,
-                         public wpi::SendableHelper<SendableAlerts> {
-   public:
-    wpi::SmallVector<std::shared_ptr<Alert>> m_alerts;
-    void InitSendable(nt::NTSendableBuilder& builder) override;
-
-   private:
-    std::vector<std::string> GetStrings(AlertType type) const;
-  };
-
-  static wpi::StringMap<SendableAlerts> groups;
+  uint64_t m_activeStartTime;
 };
+
+std::string format_as(Alert::AlertType type);
 
 }  // namespace frc

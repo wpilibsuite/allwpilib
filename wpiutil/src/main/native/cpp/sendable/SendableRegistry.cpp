@@ -81,6 +81,10 @@ void ResetSendableRegistry() {
 }  // namespace wpi::impl
 #endif
 
+void SendableRegistry::EnsureInitialized() {
+  GetInstance();
+}
+
 void SendableRegistry::SetLiveWindowBuilderFactory(
     std::function<std::unique_ptr<SendableBuilder>()> factory) {
   GetInstance().liveWindowFactory = std::move(factory);
