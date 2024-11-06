@@ -285,7 +285,7 @@ public final class DriverStationSim {
 
   /** Updates DriverStation data so that new values are visible to the user program. */
   public static void notifyNewData() {
-    int handle = WPIUtilJNI.createEvent(false, false);
+    int handle = WPIUtilJNI.makeEvent(false, false);
     DriverStationJNI.provideNewDataEventHandle(handle);
     DriverStationDataJNI.notifyNewData();
     try {
