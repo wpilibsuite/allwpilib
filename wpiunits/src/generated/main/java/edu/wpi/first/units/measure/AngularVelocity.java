@@ -44,6 +44,13 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default AngularVelocity negate() {
+    return (AngularVelocity) unaryMinus();
+  }
+
+  @Override
   default AngularVelocity plus(Measure<? extends AngularVelocityUnit> other) {
     return (AngularVelocity) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

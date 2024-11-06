@@ -44,6 +44,13 @@ public interface Energy extends Measure<EnergyUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Energy negate() {
+    return (Energy) unaryMinus();
+  }
+
+  @Override
   default Energy plus(Measure<? extends EnergyUnit> other) {
     return (Energy) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

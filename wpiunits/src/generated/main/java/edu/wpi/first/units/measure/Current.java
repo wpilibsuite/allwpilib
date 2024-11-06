@@ -44,6 +44,13 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Current negate() {
+    return (Current) unaryMinus();
+  }
+
+  @Override
   default Current plus(Measure<? extends CurrentUnit> other) {
     return (Current) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

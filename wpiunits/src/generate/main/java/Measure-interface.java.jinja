@@ -44,6 +44,13 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default {{ helpers['type_usage'](name) }} negate() {
+    return ({{ helpers['type_usage'](name) }}) unaryMinus();
+  }
+
+  @Override
   default {{ helpers['type_usage'](name) }} plus(Measure<? extends {{ helpers['mtou'](name) }}> other) {
     return ({{ helpers['type_usage'](name) }}) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

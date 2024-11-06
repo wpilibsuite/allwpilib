@@ -44,6 +44,13 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default LinearMomentum negate() {
+    return (LinearMomentum) unaryMinus();
+  }
+
+  @Override
   default LinearMomentum plus(Measure<? extends LinearMomentumUnit> other) {
     return (LinearMomentum) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
