@@ -44,6 +44,13 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Voltage negate() {
+    return (Voltage) unaryMinus();
+  }
+
+  @Override
   default Voltage plus(Measure<? extends VoltageUnit> other) {
     return (Voltage) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

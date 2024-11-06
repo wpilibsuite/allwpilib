@@ -44,6 +44,13 @@ public interface Distance extends Measure<DistanceUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Distance negate() {
+    return (Distance) unaryMinus();
+  }
+
+  @Override
   default Distance plus(Measure<? extends DistanceUnit> other) {
     return (Distance) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

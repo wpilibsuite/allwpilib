@@ -44,6 +44,13 @@ public interface LinearAcceleration extends Measure<LinearAccelerationUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default LinearAcceleration negate() {
+    return (LinearAcceleration) unaryMinus();
+  }
+
+  @Override
   default LinearAcceleration plus(Measure<? extends LinearAccelerationUnit> other) {
     return (LinearAcceleration) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

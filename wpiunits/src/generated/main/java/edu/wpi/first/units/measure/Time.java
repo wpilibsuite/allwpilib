@@ -44,6 +44,13 @@ public interface Time extends Measure<TimeUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Time negate() {
+    return (Time) unaryMinus();
+  }
+
+  @Override
   default Time plus(Measure<? extends TimeUnit> other) {
     return (Time) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
