@@ -6,18 +6,17 @@
 
 #include "frc/controller/BangBangController.h"
 
-class BangBangToleranceTest : public testing::Test {
- protected:
+TEST(BangBangToleranceTest, InTolerance) {
   frc::BangBangController controller{0.1};
-};
 
-TEST_F(BangBangToleranceTest, InTolerance) {
   controller.SetSetpoint(1);
   controller.Calculate(1);
   EXPECT_TRUE(controller.AtSetpoint());
 }
 
-TEST_F(BangBangToleranceTest, OutOfTolerance) {
+TEST(BangBangToleranceTest, OutOfTolerance) {
+  frc::BangBangController controller{0.1};
+
   controller.SetSetpoint(1);
   controller.Calculate(0);
   EXPECT_FALSE(controller.AtSetpoint());
