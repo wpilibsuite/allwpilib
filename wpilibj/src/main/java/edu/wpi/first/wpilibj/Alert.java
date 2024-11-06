@@ -69,8 +69,6 @@ public class Alert implements AutoCloseable {
     kInfo
   }
 
-  private static final Map<String, SendableAlerts> groups = new HashMap<String, SendableAlerts>();
-
   private final AlertType m_type;
   private boolean m_active;
   private long m_activeStartTime;
@@ -100,7 +98,7 @@ public class Alert implements AutoCloseable {
   public Alert(String group, String text, AlertType type) {
     m_type = type;
     m_text = text;
-    m_activeAlerts = getGroupSendable(group).getActiveAlertsStorage(type);
+    m_activeAlerts = SendableAlerts.forGroup(group).getActiveAlertsStorage(type);
   }
 
   /**
@@ -168,6 +166,11 @@ public class Alert implements AutoCloseable {
     return m_type;
   }
 
+  @Override
+  public void close() {
+    set(false);
+  }
+
   private record PublishedAlert(long timestamp, String text) implements Comparable<PublishedAlert> {
     private static final Comparator<PublishedAlert> comparator =
         Comparator.comparingLong((PublishedAlert alert) -> alert.timestamp())
@@ -181,6 +184,8 @@ public class Alert implements AutoCloseable {
   }
 
   private static final class SendableAlerts implements Sendable {
+    private static final Map<String, SendableAlerts> groups = new HashMap<String, SendableAlerts>();
+
     private final Map<AlertType, Set<PublishedAlert>> m_alerts = new HashMap<>();
 
     /**
@@ -204,27 +209,22 @@ public class Alert implements AutoCloseable {
       builder.addStringArrayProperty("warnings", () -> getStrings(AlertType.kWarning), null);
       builder.addStringArrayProperty("infos", () -> getStrings(AlertType.kInfo), null);
     }
-  }
 
-  @Override
-  public void close() {
-    set(false);
-  }
-
-  /**
-   * Returns the SendableAlerts for a given group, initializing and publishing if it does not
-   * already exist.
-   *
-   * @param group the group name
-   * @return the SendableAlerts for the group
-   */
-  private static SendableAlerts getGroupSendable(String group) {
-    return groups.computeIfAbsent(
-        group,
-        _group -> {
-          var sendable = new SendableAlerts();
-          SmartDashboard.putData(_group, sendable);
-          return sendable;
-        });
+    /**
+     * Returns the SendableAlerts for a given group, initializing and publishing if it does not
+     * already exist.
+     *
+     * @param group the group name
+     * @return the SendableAlerts for the group
+     */
+    private static SendableAlerts forGroup(String group) {
+      return groups.computeIfAbsent(
+          group,
+          _group -> {
+            var sendable = new SendableAlerts();
+            SmartDashboard.putData(_group, sendable);
+            return sendable;
+          });
+    }
   }
 }

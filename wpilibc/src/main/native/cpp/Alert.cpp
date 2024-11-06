@@ -75,6 +75,26 @@ class Alert::SendableAlerts : public nt::NTSendable,
     }
   }
 
+  /**
+   * Returns the SendableAlerts for a given group, initializing and publishing
+   * if it does not already exist.
+   * @param group the group name
+   * @return the SendableAlerts for the group
+   */
+  static SendableAlerts& ForGroup(std::string_view group) {
+    // Force initialization of SendableRegistry before our magic static to
+    // prevent incorrect destruction order.
+    wpi::SendableRegistry::EnsureInitialized();
+    static wpi::StringMap<Alert::SendableAlerts> groups;
+
+    auto [iter, exists] = groups.try_emplace(group);
+    SendableAlerts& sendable = iter->second;
+    if (!exists) {
+      frc::SmartDashboard::PutData(group, &iter->second);
+    }
+    return sendable;
+  }
+
  private:
   std::vector<std::string> GetStrings(AlertType type) const {
     auto& set = GetActiveAlertsStorage(type);
@@ -95,7 +115,8 @@ Alert::Alert(std::string_view text, AlertType type)
 Alert::Alert(std::string_view group, std::string_view text, AlertType type)
     : m_type(type),
       m_text(text),
-      m_activeAlerts{&GetGroupSendable(group).GetActiveAlertsStorage(m_type)} {}
+      m_activeAlerts{
+          &SendableAlerts::ForGroup(group).GetActiveAlertsStorage(m_type)} {}
 
 Alert::Alert(Alert&& other)
     : m_type{other.m_type},
@@ -149,20 +170,6 @@ void Alert::SetText(std::string_view text) {
     auto hint = m_activeAlerts->erase(iter);
     m_activeAlerts->emplace_hint(hint, m_activeStartTime, m_text);
   }
-}
-
-Alert::SendableAlerts& Alert::GetGroupSendable(std::string_view group) {
-  // Force initialization of SendableRegistry before our magic static to prevent
-  // incorrect destruction order.
-  wpi::SendableRegistry::EnsureInitialized();
-  static wpi::StringMap<Alert::SendableAlerts> groups;
-
-  auto [iter, exists] = groups.try_emplace(group);
-  SendableAlerts& sendable = iter->second;
-  if (!exists) {
-    frc::SmartDashboard::PutData(group, &iter->second);
-  }
-  return sendable;
 }
 
 std::string frc::format_as(Alert::AlertType type) {

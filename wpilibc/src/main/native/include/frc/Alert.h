@@ -134,14 +134,6 @@ class Alert {
   std::set<PublishedAlert>* m_activeAlerts;
   bool m_active = false;
   uint64_t m_activeStartTime;
-
-  /**
-   * Returns the SendableAlerts for a given group, initializing and publishing
-   * if it does not already exist.
-   * @param group the group name
-   * @return the SendableAlerts for the group
-   */
-  static SendableAlerts& GetGroupSendable(std::string_view group);
 };
 
 std::string format_as(Alert::AlertType type);
