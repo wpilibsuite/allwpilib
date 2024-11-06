@@ -9,13 +9,13 @@ on:
 
 jobs:
   comment:
+    if: github.repository == 'wpilibsuite/allwpilib'
     permissions:
       pull-requests: write
 
     runs-on: ubuntu-latest
     steps:
       - name: Comment on PR
-        if: github.repository == 'wpilibsuite/allwpilib'
         uses: actions/github-script@v7
         with:
           script: |

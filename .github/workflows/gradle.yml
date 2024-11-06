@@ -196,14 +196,14 @@ jobs:
           path: docs/build/outputs
 
   combine:
+    if: |
+      github.repository == 'wpilibsuite/allwpilib' &&
+      (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     name: Combine
     needs: [build-docker, build-host, build-documentation]
     runs-on: ubuntu-22.04
     steps:
       - name: Free Disk Space
-        if: |
-          github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         uses: jlumbroso/free-disk-space@main
         with:
           tool-cache: false
@@ -214,64 +214,45 @@ jobs:
           docker-images: false
           swap-storage: false
       - uses: actions/checkout@v4
-        if: |
-          github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
           repository: wpilibsuite/build-tools
       - uses: actions/download-artifact@v4
-        if: |
-          github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
           path: combiner/products/build/allOutputs
       - name: Flatten Artifacts
-        if: |
-          github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         run: rsync -a --delete combiner/products/build/allOutputs/*/* combiner/products/build/allOutputs/
       - name: Check version number exists
-        if: |
-          github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         run: |
           cat combiner/products/build/allOutputs/version.txt
           test -s combiner/products/build/allOutputs/version.txt
       - uses: actions/setup-java@v4
-        if: |
-          github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
           distribution: 'temurin'
           java-version: 17
       - name: Combine (Main)
-        if: |
-          github.repository == 'wpilibsuite/allwpilib' &&
-          github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         run: cd combiner && ./gradlew publish -Pallwpilib
         env:
           RUN_AZURE_ARTIFACTORY_RELEASE: "TRUE"
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: Combine (Release)
-        if: |
-          github.repository == 'wpilibsuite/allwpilib' &&
-          startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v')
         run: cd combiner && ./gradlew publish -Pallwpilib -PreleaseRepoPublish
         env:
           RUN_AZURE_ARTIFACTORY_RELEASE: "TRUE"
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - uses: actions/upload-artifact@v4
-        if: |
-          github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
           name: Maven
           path: ~/releases
 
   dispatch:
     name: dispatch
+    if: |
+      github.repository == 'wpilibsuite/allwpilib' &&
+      startsWith(github.ref, 'refs/tags/v')
     needs: [combine]
     strategy:
       matrix:
@@ -279,9 +260,6 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: peter-evans/repository-dispatch@v3
-        if: |
-          github.repository == 'wpilibsuite/allwpilib' &&
-          startsWith(github.ref, 'refs/tags/v')
         with:
           token: ${{ secrets.TOOL_REPO_ACCESS_TOKEN }}
           repository: wpilibsuite/${{ matrix.repo }}
