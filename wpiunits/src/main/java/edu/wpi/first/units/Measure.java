@@ -134,8 +134,10 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @deprecated use unaryMinus() instead. This was renamed for consistancy with other WPILib
    *     classes like Rotation2d
    */
-  @SuppressWarnings("dep-ann")
-  Measure<U> negate();
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<U> negate() {
+    return unaryMinus();
+  }
 
   /**
    * Adds another measure of the same unit type to this one.

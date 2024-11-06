@@ -44,12 +44,6 @@ public interface Per<Dividend extends Unit, Divisor extends Unit> extends Measur
   }
 
   @Override
-  @Deprecated(since = "2025", forRemoval = true)
-  default Per<Dividend, Divisor> negate() {
-    return (Per<Dividend, Divisor>) unaryMinus();
-  }
-
-  @Override
   default Per<Dividend, Divisor> plus(Measure<? extends PerUnit<Dividend, Divisor>> other) {
     return (Per<Dividend, Divisor>) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

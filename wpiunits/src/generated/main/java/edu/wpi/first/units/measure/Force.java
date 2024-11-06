@@ -44,12 +44,6 @@ public interface Force extends Measure<ForceUnit> {
   }
 
   @Override
-  @Deprecated(since = "2025", forRemoval = true)
-  default Force negate() {
-    return (Force) unaryMinus();
-  }
-
-  @Override
   default Force plus(Measure<? extends ForceUnit> other) {
     return (Force) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

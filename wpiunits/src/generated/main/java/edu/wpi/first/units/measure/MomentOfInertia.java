@@ -44,12 +44,6 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   }
 
   @Override
-  @Deprecated(since = "2025", forRemoval = true)
-  default MomentOfInertia negate() {
-    return (MomentOfInertia) unaryMinus();
-  }
-
-  @Override
   default MomentOfInertia plus(Measure<? extends MomentOfInertiaUnit> other) {
     return (MomentOfInertia) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

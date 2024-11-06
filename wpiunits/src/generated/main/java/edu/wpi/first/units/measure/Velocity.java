@@ -44,12 +44,6 @@ public interface Velocity<D extends Unit> extends Measure<VelocityUnit<D>> {
   }
 
   @Override
-  @Deprecated(since = "2025", forRemoval = true)
-  default Velocity<D> negate() {
-    return (Velocity<D>) unaryMinus();
-  }
-
-  @Override
   default Velocity<D> plus(Measure<? extends VelocityUnit<D>> other) {
     return (Velocity<D>) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

@@ -47,12 +47,6 @@ public final class GenericMutableMeasureImpl<U extends Unit>
   }
 
   @Override
-  @SuppressWarnings("deprecation")
-  public Measure<U> negate() {
-    return unaryMinus();
-  }
-
-  @Override
   public Measure<U> plus(Measure<? extends U> other) {
     return ImmutableMeasure.ofBaseUnits(m_baseUnitMagnitude + other.baseUnitMagnitude(), m_unit);
   }
