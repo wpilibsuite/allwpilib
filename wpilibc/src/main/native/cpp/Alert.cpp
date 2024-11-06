@@ -89,7 +89,6 @@ class Alert::SendableAlerts : public nt::NTSendable,
   std::array<std::set<PublishedAlert>, 3> m_alerts;
 };
 
-// TODO: throw if matching (group, text, type) already constructed
 Alert::Alert(std::string_view text, AlertType type)
     : Alert("Alerts", text, type) {}
 
