@@ -2,19 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/Alert.h>
-#include <frc/smartdashboard/SmartDashboard.h>
-
 #include <algorithm>
 #include <chrono>
 #include <map>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringArrayTopic.h>
+
+#include "frc/Alert.h"
+#include "frc/simulation/SimHooks.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 
 using namespace frc;
 using enum Alert::AlertType;
@@ -40,9 +42,13 @@ class AlertsTest : public ::testing::Test {
     return Alert(GetGroupName(), std::forward<Args>(args)...);
   }
 
-  bool IsAlertActive(std::string_view text, Alert::AlertType type) {
+  std::vector<std::string> GetActiveAlerts(Alert::AlertType type) {
     Update();
-    auto activeAlerts = GetSubscriberForType(type).Get();
+    return GetSubscriberForType(type).Get();
+  }
+
+  bool IsAlertActive(std::string_view text, Alert::AlertType type) {
+    auto activeAlerts = GetActiveAlerts(type);
     return std::find(activeAlerts.begin(), activeAlerts.end(), text) !=
            activeAlerts.end();
   }
@@ -71,6 +77,9 @@ class AlertsTest : public ::testing::Test {
   }
 };
 
+#define EXPECT_STATE(type, ...) \
+  EXPECT_EQ(GetActiveAlerts(type), (std::vector<std::string>{__VA_ARGS__}))
+
 TEST_F(AlertsTest, SetUnset) {
   auto one = MakeAlert("one", kError);
   auto two = MakeAlert("two", kInfo);
@@ -86,6 +95,24 @@ TEST_F(AlertsTest, SetUnset) {
   one.Set(false);
   EXPECT_FALSE(IsAlertActive("one", kError));
   EXPECT_TRUE(IsAlertActive("two", kInfo));
+}
+
+TEST_F(AlertsTest, SetIsIdempotent) {
+  auto a = MakeAlert("A", kInfo);
+  auto b = MakeAlert("B", kInfo);
+  auto c = MakeAlert("C", kInfo);
+  a.Set(true);
+
+  b.Set(true);
+  c.Set(true);
+
+  const auto startState = GetActiveAlerts(kInfo);
+
+  b.Set(true);
+  EXPECT_STATE(kInfo, startState);
+
+  a.Set(true);
+  EXPECT_STATE(kInfo, startState);
 }
 
 TEST_F(AlertsTest, DestructorUnsetsAlert) {
@@ -122,6 +149,28 @@ TEST_F(AlertsTest, SetTextWhileSet) {
   EXPECT_TRUE(IsAlertActive("AFTER", kInfo));
 }
 
+TEST_F(AlertsTest, SetTextDoesNotAffectFirstOrderSort) {
+  frc::sim::PauseTiming();
+
+  auto a = MakeAlert("A", kError);
+  auto b = MakeAlert("B", kError);
+  auto c = MakeAlert("C", kError);
+
+  a.Set(true);
+  frc::sim::StepTiming(1_s);
+  b.Set(true);
+  frc::sim::StepTiming(1_s);
+  c.Set(true);
+
+  auto expectedEndState = GetActiveAlerts(kError);
+  std::replace(expectedEndState.begin(), expectedEndState.end(),
+               std::string("B"), std::string("AFTER"));
+  b.SetText("AFTER");
+
+  EXPECT_STATE(kError, expectedEndState);
+  frc::sim::ResumeTiming();
+}
+
 TEST_F(AlertsTest, MoveAssign) {
   auto outer = MakeAlert("outer", kInfo);
   outer.Set(true);
@@ -149,4 +198,45 @@ TEST_F(AlertsTest, MoveConstruct) {
   EXPECT_FALSE(IsAlertActive("A", kInfo));
   b.Set(true);
   EXPECT_TRUE(IsAlertActive("A", kInfo));
+}
+
+TEST_F(AlertsTest, SortOrder) {
+  frc::sim::PauseTiming();
+  auto a = MakeAlert("A", kInfo);
+  auto b = MakeAlert("B", kInfo);
+  auto c = MakeAlert("C", kInfo);
+  a.Set(true);
+  EXPECT_STATE(kInfo, "A");
+  frc::sim::StepTiming(1_s);
+  b.Set(true);
+  EXPECT_STATE(kInfo, "B", "A");
+  frc::sim::StepTiming(1_s);
+  c.Set(true);
+  EXPECT_STATE(kInfo, "C", "B", "A");
+
+  frc::sim::StepTiming(1_s);
+  c.Set(false);
+  EXPECT_STATE(kInfo, "B", "A");
+
+  frc::sim::StepTiming(1_s);
+  c.Set(true);
+  EXPECT_STATE(kInfo, "C", "B", "A");
+
+  frc::sim::StepTiming(1_s);
+  a.Set(false);
+  EXPECT_STATE(kInfo, "C", "B");
+
+  frc::sim::StepTiming(1_s);
+  b.Set(false);
+  EXPECT_STATE(kInfo, "C");
+
+  frc::sim::StepTiming(1_s);
+  b.Set(true);
+  EXPECT_STATE(kInfo, "B", "C");
+
+  frc::sim::StepTiming(1_s);
+  a.Set(true);
+  EXPECT_STATE(kInfo, "A", "B", "C");
+
+  frc::sim::ResumeTiming();
 }

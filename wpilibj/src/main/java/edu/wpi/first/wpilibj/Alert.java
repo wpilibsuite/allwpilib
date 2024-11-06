@@ -18,7 +18,7 @@ import java.util.TreeSet;
  * {@code kWarning}, or {@code kInfo} to denote urgency. See {@link
  * edu.wpi.first.wpilibj.Alert.AlertType AlertType} for suggested usage of each type. Alerts can be
  * displayed on supported dashboards, and are shown in a priority order based on type and recency of
- * activation.
+ * activation, with newly activated alerts first.
  *
  * <p>Alerts should be created once and stored persistently, then updated to "active" or "inactive"
  * as necessary. {@link #set(boolean)} can be safely called periodically.
@@ -171,6 +171,7 @@ public class Alert implements AutoCloseable {
   private record PublishedAlert(long timestamp, String text) implements Comparable<PublishedAlert> {
     private static final Comparator<PublishedAlert> comparator =
         Comparator.comparingLong((PublishedAlert alert) -> alert.timestamp())
+            .reversed()
             .thenComparing(Comparator.comparing((PublishedAlert alert) -> alert.text()));
 
     @Override
@@ -180,7 +181,6 @@ public class Alert implements AutoCloseable {
   }
 
   private static final class SendableAlerts implements Sendable {
-    // TODO: I think we could use WeakReference here to automatically remove dangling alerts
     private final Map<AlertType, Set<PublishedAlert>> m_alerts = new HashMap<>();
 
     /**

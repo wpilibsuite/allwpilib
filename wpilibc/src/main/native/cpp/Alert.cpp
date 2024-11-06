@@ -28,7 +28,13 @@ class Alert::PublishedAlert {
       : timestamp{timestamp}, text{text} {}
   uint64_t timestamp;
   std::string text;
-  auto operator<=>(const PublishedAlert&) const = default;
+  auto operator<=>(const PublishedAlert& other) const {
+    if (timestamp != other.timestamp) {
+      return other.timestamp <=> timestamp;
+    } else {
+      return text <=> other.text;
+    }
+  }
 };
 
 class Alert::SendableAlerts : public nt::NTSendable,

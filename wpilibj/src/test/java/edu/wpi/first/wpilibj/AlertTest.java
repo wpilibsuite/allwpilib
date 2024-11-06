@@ -11,12 +11,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringArraySubscriber;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 class AlertTest {
   String m_groupName;
@@ -54,6 +58,7 @@ class AlertTest {
   }
 
   private String[] getActiveAlerts(AlertType type) {
+    update();
     try (var sub = getSubscriberForType(type)) {
       return sub.get();
     }
@@ -64,8 +69,11 @@ class AlertTest {
   }
 
   private boolean isAlertActive(String text, Alert.AlertType type) {
-    update();
     return Arrays.asList(getActiveAlerts(type)).contains(text);
+  }
+
+  private void assertState(Alert.AlertType type, List<String> state) {
+    assertEquals(state, Arrays.asList(getActiveAlerts(type)));
   }
 
   private Alert makeAlert(String text, Alert.AlertType type) {
@@ -88,6 +96,25 @@ class AlertTest {
       one.set(false);
       assertFalse(isAlertActive("one", AlertType.kError));
       assertTrue(isAlertActive("two", AlertType.kInfo));
+    }
+  }
+
+  @Test
+  void setIsIdempotent() {
+    try (var a = makeAlert("A", AlertType.kInfo);
+        var b = makeAlert("B", AlertType.kInfo);
+        var c = makeAlert("C", AlertType.kInfo)) {
+      a.set(true);
+      b.set(true);
+      c.set(true);
+
+      var startState = List.of(getActiveAlerts(AlertType.kInfo));
+
+      b.set(true);
+      assertState(AlertType.kInfo, startState);
+
+      a.set(true);
+      assertState(AlertType.kInfo, startState);
     }
   }
 
@@ -126,6 +153,73 @@ class AlertTest {
       assertEquals("AFTER", alert.getText());
       assertFalse(isAlertActive("BEFORE", AlertType.kInfo));
       assertTrue(isAlertActive("AFTER", AlertType.kInfo));
+    }
+  }
+
+  @ResourceLock("timing")
+  @Test
+  void setTextDoesNotAffectFirstOrderSort() {
+    SimHooks.pauseTiming();
+    try (var a = makeAlert("A", AlertType.kInfo);
+        var b = makeAlert("B", AlertType.kInfo);
+        var c = makeAlert("C", AlertType.kInfo)) {
+      a.set(true);
+      SimHooks.stepTiming(1);
+      b.set(true);
+      SimHooks.stepTiming(1);
+      c.set(true);
+
+      var expectedEndState = new ArrayList<>(List.of(getActiveAlerts(AlertType.kInfo)));
+      expectedEndState.replaceAll(s -> "B".equals(s) ? "AFTER" : s);
+      b.setText("AFTER");
+
+      assertState(AlertType.kInfo, expectedEndState);
+    } finally {
+      SimHooks.resumeTiming();
+    }
+  }
+
+  @ResourceLock("timing")
+  @Test
+  void sortOrder() {
+    SimHooks.pauseTiming();
+    try (var a = makeAlert("A", AlertType.kInfo);
+        var b = makeAlert("B", AlertType.kInfo);
+        var c = makeAlert("C", AlertType.kInfo)) {
+      a.set(true);
+      assertState(AlertType.kInfo, List.of("A"));
+      SimHooks.stepTiming(1);
+      b.set(true);
+      assertState(AlertType.kInfo, List.of("B", "A"));
+      SimHooks.stepTiming(1);
+      c.set(true);
+      assertState(AlertType.kInfo, List.of("C", "B", "A"));
+
+      SimHooks.stepTiming(1);
+      c.set(false);
+      assertState(AlertType.kInfo, List.of("B", "A"));
+
+      SimHooks.stepTiming(1);
+      c.set(true);
+      assertState(AlertType.kInfo, List.of("C", "B", "A"));
+
+      SimHooks.stepTiming(1);
+      a.set(false);
+      assertState(AlertType.kInfo, List.of("C", "B"));
+
+      SimHooks.stepTiming(1);
+      b.set(false);
+      assertState(AlertType.kInfo, List.of("C"));
+
+      SimHooks.stepTiming(1);
+      b.set(true);
+      assertState(AlertType.kInfo, List.of("B", "C"));
+
+      SimHooks.stepTiming(1);
+      a.set(true);
+      assertState(AlertType.kInfo, List.of("A", "B", "C"));
+    } finally {
+      SimHooks.resumeTiming();
     }
   }
 }

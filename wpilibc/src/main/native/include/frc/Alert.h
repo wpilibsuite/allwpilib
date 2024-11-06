@@ -16,7 +16,7 @@ namespace frc {
  * of kError, kWarning, or kInfo to denote urgency. See Alert::AlertType for
  * suggested usage of each type. Alerts can be displayed on supported
  * dashboards, and are shown in a priority order based on type and recency of
- * activation.
+ * activation, with newly activated alerts first.
  *
  * Alerts should be created once and stored persistently, then updated to
  * "active" or "inactive" as necessary. Set(bool) can be safely called
@@ -85,6 +85,9 @@ class Alert {
 
   Alert(Alert&&);
   Alert& operator=(Alert&&);
+
+  Alert(const Alert&) = default;
+  Alert& operator=(const Alert&) = default;
 
   ~Alert();
 
