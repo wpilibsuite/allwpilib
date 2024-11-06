@@ -14,14 +14,15 @@
 #include <vector>
 
 class PoseGraphError {
- public:
-  explicit PoseGraphError(Pose t_ab_observed)
+public:
+  PoseGraphError(Pose t_ab_observed)
       : m_t_ab_observed(std::move(t_ab_observed)) {}
 
   template <typename T>
-  bool operator()(const T* const p_a_ptr, const T* const q_a_ptr,
-                  const T* const p_b_ptr, const T* const q_b_ptr,
-                  T* residuals_ptr) const {
+  bool operator()(const T *const p_a_ptr, const T *const q_a_ptr,
+                  const T *const p_b_ptr, const T *const q_b_ptr,
+                  T *residuals_ptr) const
+  {
     // Tag A
     Eigen::Map<const Eigen::Matrix<T, 3, 1>> p_a(p_a_ptr);
     Eigen::Map<const Eigen::Quaternion<T>> q_a(q_a_ptr);
@@ -50,19 +51,21 @@ class PoseGraphError {
     return true;
   }
 
-  static ceres::CostFunction* Create(const Pose& t_ab_observed) {
+  static ceres::CostFunction *Create(const Pose &t_ab_observed)
+  {
     return new ceres::AutoDiffCostFunction<PoseGraphError, 6, 3, 4, 3, 4>(
         new PoseGraphError(t_ab_observed));
   }
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
- private:
+private:
   const Pose m_t_ab_observed;
 };
 
 std::tuple<Eigen::Matrix<double, 3, 3>, Eigen::Matrix<double, 8, 1>>
-fieldcalibration::load_camera_model(std::string path) {
+fieldcalibration::load_camera_model(std::string path)
+{
   Eigen::Matrix<double, 3, 3> camera_matrix;
   Eigen::Matrix<double, 8, 1> camera_distortion;
 
@@ -70,52 +73,73 @@ fieldcalibration::load_camera_model(std::string path) {
 
   wpi::json json_data;
 
-  try {
+  try
+  {
     json_data = wpi::json::parse(file);
-  } catch (const wpi::json::parse_error& e) {
+  }
+  catch (const wpi::json::parse_error &e)
+  {
     std::cout << e.what() << std::endl;
   }
 
   bool isCalibdb = json_data.contains("camera");
 
-  if (!isCalibdb) {
-    for (int i = 0; i < camera_matrix.rows(); i++) {
-      for (int j = 0; j < camera_matrix.cols(); j++) {
+  if (!isCalibdb)
+  {
+    for (int i = 0; i < camera_matrix.rows(); i++)
+    {
+      for (int j = 0; j < camera_matrix.cols(); j++)
+      {
         camera_matrix(i, j) =
             json_data["camera_matrix"][(i * camera_matrix.cols()) + j];
       }
     }
 
-    for (int i = 0; i < camera_distortion.rows(); i++) {
-      for (int j = 0; j < camera_distortion.cols(); j++) {
+    for (int i = 0; i < camera_distortion.rows(); i++)
+    {
+      for (int j = 0; j < camera_distortion.cols(); j++)
+      {
         camera_distortion(i, j) = json_data["distortion_coefficients"]
                                            [(i * camera_distortion.cols()) + j];
       }
     }
-  } else {
-    for (int i = 0; i < camera_matrix.rows(); i++) {
-      for (int j = 0; j < camera_matrix.cols(); j++) {
-        try {
+  }
+  else
+  {
+    for (int i = 0; i < camera_matrix.rows(); i++)
+    {
+      for (int j = 0; j < camera_matrix.cols(); j++)
+      {
+        try
+        {
           camera_matrix(i, j) = json_data["camera_matrix"][i][j];
-        } catch (...) {
-          camera_matrix(i, j) = json_data["camera_matrix"]["data"]
-                                         [(i * camera_matrix.cols()) + j];
+        }
+        catch (...)
+        {
+          camera_matrix(i, j) =
+              json_data["camera_matrix"]["data"][(i * camera_matrix.cols()) + j];
         }
       }
     }
 
-    for (int i = 0; i < camera_distortion.rows(); i++) {
-      for (int j = 0; j < camera_distortion.cols(); j++) {
-        try {
-          camera_distortion(i, j) =
-              json_data["distortion_coefficients"]
-                       [(i * camera_distortion.cols()) + j];
-        } catch (...) {
-          try {
-            camera_distortion(i, j) =
-                json_data["distortion_coefficients"]
-                         [(i * camera_distortion.cols()) + j];
-          } catch (...) {
+    for (int i = 0; i < camera_distortion.rows(); i++)
+    {
+      for (int j = 0; j < camera_distortion.cols(); j++)
+      {
+        try
+        {
+          camera_distortion(i, j) = json_data["distortion_coefficients"]
+                                             [(i * camera_distortion.cols()) + j];
+        }
+        catch (...)
+        {
+          try
+          {
+            camera_distortion(i, j) = json_data["distortion_coefficients"]
+                                               [(i * camera_distortion.cols()) + j];
+          }
+          catch (...)
+          {
             camera_distortion(i, j) = 0.0;
           }
         }
@@ -127,12 +151,16 @@ fieldcalibration::load_camera_model(std::string path) {
 }
 
 std::tuple<Eigen::Matrix<double, 3, 3>, Eigen::Matrix<double, 8, 1>>
-fieldcalibration::load_camera_model(wpi::json json_data) {
+fieldcalibration::load_camera_model(wpi::json json_data)
+{
+
   // Camera matrix
   Eigen::Matrix<double, 3, 3> camera_matrix;
 
-  for (int i = 0; i < camera_matrix.rows(); i++) {
-    for (int j = 0; j < camera_matrix.cols(); j++) {
+  for (int i = 0; i < camera_matrix.rows(); i++)
+  {
+    for (int j = 0; j < camera_matrix.cols(); j++)
+    {
       camera_matrix(i, j) =
           json_data["camera_matrix"][(i * camera_matrix.cols()) + j];
     }
@@ -141,8 +169,10 @@ fieldcalibration::load_camera_model(wpi::json json_data) {
   // Distortion coefficients
   Eigen::Matrix<double, 8, 1> camera_distortion;
 
-  for (int i = 0; i < camera_distortion.rows(); i++) {
-    for (int j = 0; j < camera_distortion.cols(); j++) {
+  for (int i = 0; i < camera_distortion.rows(); i++)
+  {
+    for (int j = 0; j < camera_distortion.cols(); j++)
+    {
       camera_distortion(i, j) = json_data["distortion_coefficients"]
                                          [(i * camera_distortion.cols()) + j];
     }
@@ -151,12 +181,14 @@ fieldcalibration::load_camera_model(wpi::json json_data) {
   return std::make_tuple(camera_matrix, camera_distortion);
 }
 
-std::map<int, wpi::json> fieldcalibration::load_ideal_map(std::string path) {
+std::map<int, wpi::json> fieldcalibration::load_ideal_map(std::string path)
+{
   std::ifstream file(path);
   wpi::json json_data = wpi::json::parse(file);
   std::map<int, wpi::json> ideal_map;
 
-  for (const auto& element : json_data["tags"]) {
+  for (const auto &element : json_data["tags"])
+  {
     ideal_map[element["ID"]] = element;
   }
 
@@ -164,7 +196,8 @@ std::map<int, wpi::json> fieldcalibration::load_ideal_map(std::string path) {
 }
 
 Eigen::Matrix<double, 4, 4> fieldcalibration::get_tag_transform(
-    std::map<int, wpi::json>& ideal_map, int tag_id) {
+    std::map<int, wpi::json> &ideal_map, int tag_id)
+{
   Eigen::Matrix<double, 4, 4> transform =
       Eigen::Matrix<double, 4, 4>::Identity();
 
@@ -184,9 +217,10 @@ Eigen::Matrix<double, 4, 4> fieldcalibration::get_tag_transform(
 }
 
 Eigen::Matrix<double, 4, 4> fieldcalibration::estimate_tag_pose(
-    apriltag_detection_t* tag_detection,
-    const Eigen::Matrix<double, 3, 3>& camera_matrix,
-    const Eigen::Matrix<double, 8, 1>& camera_distortion, double tag_size) {
+    apriltag_detection_t *tag_detection,
+    const Eigen::Matrix<double, 3, 3> &camera_matrix,
+    const Eigen::Matrix<double, 8, 1> &camera_distortion, double tag_size)
+{
   cv::Mat camera_matrix_cv;
   cv::Mat camera_distortion_cv;
 
@@ -209,7 +243,8 @@ Eigen::Matrix<double, 4, 4> fieldcalibration::estimate_tag_pose(
   std::vector<double> t_vec;
 
   cv::solvePnP(points_3d_box_base, points_2d, camera_matrix_cv,
-               camera_distortion_cv, r_vec, t_vec, false, cv::SOLVEPNP_SQPNP);
+               camera_distortion_cv, r_vec, t_vec, false,
+               cv::SOLVEPNP_SQPNP);
 
   cv::Mat r_mat;
   cv::Rodrigues(r_vec, r_mat);
@@ -226,10 +261,11 @@ Eigen::Matrix<double, 4, 4> fieldcalibration::estimate_tag_pose(
   return camera_to_tag;
 }
 
-void fieldcalibration::draw_tag_cube(
-    cv::Mat& frame, Eigen::Matrix<double, 4, 4> camera_to_tag,
-    const Eigen::Matrix<double, 3, 3>& camera_matrix,
-    const Eigen::Matrix<double, 8, 1>& camera_distortion, double tag_size) {
+void fieldcalibration::draw_tag_cube(cv::Mat &frame, Eigen::Matrix<double, 4, 4> camera_to_tag,
+                                     const Eigen::Matrix<double, 3, 3> &camera_matrix,
+                                     const Eigen::Matrix<double, 8, 1> &camera_distortion,
+                                     double tag_size)
+{
   cv::Mat camera_matrix_cv;
   cv::Mat camera_distortion_cv;
 
@@ -270,15 +306,16 @@ void fieldcalibration::draw_tag_cube(
   cv::projectPoints(points_3d_box_top, r_vec_cv, t_vec_cv, camera_matrix_cv,
                     camera_distortion_cv, points_2d_box_top);
 
-  for (int i = 0; i < 4; i++) {
-    cv::Point2f& point_base = points_2d_box_base.at(i);
-    cv::Point2f& point_top = points_2d_box_top.at(i);
+  for (int i = 0; i < 4; i++)
+  {
+    cv::Point2f &point_base = points_2d_box_base.at(i);
+    cv::Point2f &point_top = points_2d_box_top.at(i);
 
     cv::line(frame, point_base, point_top, cv::Scalar(0, 255, 255), 5);
 
     int i_next = (i + 1) % 4;
-    cv::Point2f& point_base_next = points_2d_box_base.at(i_next);
-    cv::Point2f& point_top_next = points_2d_box_top.at(i_next);
+    cv::Point2f &point_base_next = points_2d_box_base.at(i_next);
+    cv::Point2f &point_top_next = points_2d_box_top.at(i_next);
 
     cv::line(frame, point_base, point_base_next, cv::Scalar(0, 255, 255), 5);
     cv::line(frame, point_top, point_top_next, cv::Scalar(0, 255, 255), 5);
@@ -286,18 +323,21 @@ void fieldcalibration::draw_tag_cube(
 }
 
 bool fieldcalibration::process_video_file(
-    apriltag_detector_t* tag_detector, int detection_fps,
-    const Eigen::Matrix<double, 3, 3>& camera_matrix,
-    const Eigen::Matrix<double, 8, 1>& camera_distortion, double tag_size,
-    const std::string& path,
+    apriltag_detector_t *tag_detector, int detection_fps,
+    const Eigen::Matrix<double, 3, 3> &camera_matrix,
+    const Eigen::Matrix<double, 8, 1> &camera_distortion, double tag_size,
+    const std::string &path,
     std::map<int, Pose, std::less<int>,
-             Eigen::aligned_allocator<std::pair<const int, Pose>>>& poses,
-    std::vector<Constraint, Eigen::aligned_allocator<Constraint>>& constraints,
-    bool show_debug_window) {
+             Eigen::aligned_allocator<std::pair<const int, Pose>>> &poses,
+    std::vector<Constraint, Eigen::aligned_allocator<Constraint>> &
+        constraints,
+    bool show_debug_window)
+{
   cv::namedWindow("Processing Frame", cv::WINDOW_NORMAL);
   cv::VideoCapture video_input(path);
 
-  if (!video_input.isOpened()) {
+  if (!video_input.isOpened())
+  {
     std::cout << "Unable to open video " << path << std::endl;
     return false;
   }
@@ -306,7 +346,8 @@ bool fieldcalibration::process_video_file(
   int video_height = video_input.get(cv::CAP_PROP_FRAME_HEIGHT);
   int video_fps = video_input.get(cv::CAP_PROP_FPS);
 
-  if (video_fps <= detection_fps) {
+  if (video_fps <= detection_fps)
+  {
     video_input.release();
     cv::destroyAllWindows();
     return false;
@@ -318,8 +359,10 @@ bool fieldcalibration::process_video_file(
 
   int frame_num = 0;
 
-  while (video_input.read(frame)) {
-    if (frame_num++ % (video_fps / detection_fps) != 0) {
+  while (video_input.read(frame))
+  {
+    if (frame_num++ % (video_fps / detection_fps) != 0)
+    {
       continue;
     }
 
@@ -334,24 +377,27 @@ bool fieldcalibration::process_video_file(
     // Detect tags
     image_u8_t tag_image = {frame_gray.cols, frame_gray.rows, frame_gray.cols,
                             frame_gray.data};
-    zarray_t* tag_detections =
+    zarray_t *tag_detections =
         apriltag_detector_detect(tag_detector, &tag_image);
 
     // Skip this loop if there are no tags detected
-    if (zarray_size(tag_detections) == 0) {
+    if (zarray_size(tag_detections) == 0)
+    {
       std::cout << "No tags detected" << std::endl;
       continue;
     }
 
     // Find detection with the smallest tag ID
-    apriltag_detection_t* tag_detection_min = nullptr;
+    apriltag_detection_t *tag_detection_min = nullptr;
     zarray_get(tag_detections, 0, &tag_detection_min);
 
-    for (int i = 0; i < zarray_size(tag_detections); i++) {
-      apriltag_detection_t* tag_detection_i;
+    for (int i = 0; i < zarray_size(tag_detections); i++)
+    {
+      apriltag_detection_t *tag_detection_i;
       zarray_get(tag_detections, i, &tag_detection_i);
 
-      if (tag_detection_i->id < tag_detection_min->id) {
+      if (tag_detection_i->id < tag_detection_min->id)
+      {
         tag_detection_min = tag_detection_i;
       }
     }
@@ -360,12 +406,14 @@ bool fieldcalibration::process_video_file(
         tag_detection_min, camera_matrix, camera_distortion, tag_size);
 
     // Find transformation from smallest tag ID
-    for (int i = 0; i < zarray_size(tag_detections); i++) {
-      apriltag_detection_t* tag_detection_i;
+    for (int i = 0; i < zarray_size(tag_detections); i++)
+    {
+      apriltag_detection_t *tag_detection_i;
       zarray_get(tag_detections, i, &tag_detection_i);
 
       // Add tag ID to poses
-      if (poses.find(tag_detection_i->id) == poses.end()) {
+      if (poses.find(tag_detection_i->id) == poses.end())
+      {
         poses[tag_detection_i->id] = {};
         poses[tag_detection_i->id].p = Eigen::Vector3d(0.0, 0.0, 0.0);
         poses[tag_detection_i->id].q = Eigen::Quaterniond(1.0, 0.0, 0.0, 0.0);
@@ -380,7 +428,8 @@ bool fieldcalibration::process_video_file(
                     camera_distortion, tag_size);
 
       // Skip finding transformation from smallest tag ID to itself
-      if (tag_detection_i->id == tag_detection_min->id) {
+      if (tag_detection_i->id == tag_detection_min->id)
+      {
         continue;
       }
 
@@ -401,7 +450,8 @@ bool fieldcalibration::process_video_file(
     apriltag_detections_destroy(tag_detections);
 
     // Show debug
-    if (show_debug_window) {
+    if (show_debug_window)
+    {
       cv::imshow("Processing Frame", frame_debug);
       cv::waitKey(1);
     }
@@ -413,11 +463,11 @@ bool fieldcalibration::process_video_file(
   return true;
 }
 
-int fieldcalibration::calibrate(std::string input_dir_path,
-                                std::string output_file_path,
-                                std::string camera_model_path,
-                                std::string ideal_map_path, int pinned_tag_id,
-                                int detection_fps, bool show_debug_window) {
+int fieldcalibration::calibrate(std::string input_dir_path, std::string output_file_path,
+                                std::string camera_model_path, std::string ideal_map_path,
+                                int pinned_tag_id, int detection_fps, bool show_debug_window)
+{
+
   // Silence OpenCV logging
   cv::utils::logging::setLogLevel(
       cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
@@ -426,32 +476,39 @@ int fieldcalibration::calibrate(std::string input_dir_path,
   Eigen::Matrix3d camera_matrix;
   Eigen::Matrix<double, 8, 1> camera_distortion;
 
-  try {
+  try
+  {
     auto camera_model = load_camera_model(camera_model_path);
     camera_matrix = std::get<0>(camera_model);
     camera_distortion = std::get<1>(camera_model);
-  } catch (...) {
+  }
+  catch (...)
+  {
     return 1;
   }
 
   wpi::json json = wpi::json::parse(std::ifstream(ideal_map_path));
-  if (!json.contains("tags")) {
+  if (!json.contains("tags"))
+  {
     return 1;
   }
 
   // Load ideal field map
   std::map<int, wpi::json> ideal_map;
-  try {
+  try
+  {
     ideal_map = load_ideal_map(ideal_map_path);
-  } catch (...) {
+  }
+  catch (...)
+  {
     return 1;
   }
 
   // Apriltag detector
-  apriltag_detector_t* tag_detector = apriltag_detector_create();
+  apriltag_detector_t *tag_detector = apriltag_detector_create();
   tag_detector->nthreads = 8;
 
-  apriltag_family_t* tag_family = tag36h11_create();
+  apriltag_family_t *tag_family = tag36h11_create();
   apriltag_detector_add_family(tag_detector, tag_family);
 
   // Find tag poses
@@ -460,19 +517,22 @@ int fieldcalibration::calibrate(std::string input_dir_path,
       poses;
   std::vector<Constraint, Eigen::aligned_allocator<Constraint>> constraints;
 
-  for (const auto& entry :
-       std::filesystem::directory_iterator(input_dir_path)) {
-    if (entry.path().filename().string()[0] == '.') {
+  for (const auto &entry :
+       std::filesystem::directory_iterator(input_dir_path))
+  {
+    if (entry.path().filename().string()[0] == '.')
+    {
       continue;
     }
 
     const std::string path = entry.path().string();
 
-    bool success = process_video_file(
-        tag_detector, detection_fps, camera_matrix, camera_distortion, 0.1651,
-        path, poses, constraints, show_debug_window);
+    bool success =
+        process_video_file(tag_detector, detection_fps, camera_matrix,
+                           camera_distortion, 0.1651, path, poses, constraints, show_debug_window);
 
-    if (!success) {
+    if (!success)
+    {
       std::cout << "Unable to process video" << std::endl;
       return 1;
     }
@@ -480,13 +540,14 @@ int fieldcalibration::calibrate(std::string input_dir_path,
 
   // Build optimization problem
   ceres::Problem problem;
-  ceres::Manifold* quaternion_manifold = new ceres::EigenQuaternionManifold;
+  ceres::Manifold *quaternion_manifold = new ceres::EigenQuaternionManifold;
 
-  for (const auto& constraint : constraints) {
+  for (const auto &constraint : constraints)
+  {
     auto pose_begin_iter = poses.find(constraint.id_begin);
     auto pose_end_iter = poses.find(constraint.id_end);
 
-    ceres::CostFunction* cost_function =
+    ceres::CostFunction *cost_function =
         PoseGraphError::Create(constraint.t_begin_end);
 
     problem.AddResidualBlock(cost_function, nullptr,
@@ -503,7 +564,8 @@ int fieldcalibration::calibrate(std::string input_dir_path,
 
   // Pin tag
   auto pinned_tag_iter = poses.find(pinned_tag_id);
-  if (pinned_tag_iter != poses.end()) {
+  if (pinned_tag_iter != poses.end())
+  {
     problem.SetParameterBlockConstant(pinned_tag_iter->second.p.data());
     problem.SetParameterBlockConstant(
         pinned_tag_iter->second.q.coeffs().data());
@@ -532,7 +594,8 @@ int fieldcalibration::calibrate(std::string input_dir_path,
   Eigen::Matrix<double, 4, 4> pinned_tag_transform =
       get_tag_transform(ideal_map, pinned_tag_id);
 
-  for (const auto& [tag_id, pose] : poses) {
+  for (const auto &[tag_id, pose] : poses)
+  {
     // Transformation from pinned tag
     Eigen::Matrix<double, 4, 4> transform =
         Eigen::Matrix<double, 4, 4>::Identity();
@@ -565,11 +628,14 @@ int fieldcalibration::calibrate(std::string input_dir_path,
 
   wpi::json observed_map_json;
 
-  for (const auto& [tag_id, tag_json] : observed_map) {
+  for (const auto &[tag_id, tag_json] : observed_map)
+  {
     observed_map_json["tags"].push_back(tag_json);
   }
 
-  observed_map_json["field"] = {{"length", 16.541}, {"width", 8.211}};
+  observed_map_json["field"] = {
+      {"length", 16.541},
+      {"width", 8.211}};
 
   // for (const auto& constraint : constraints)
   // {
