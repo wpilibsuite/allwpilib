@@ -68,8 +68,6 @@ class WrapperCommand : public CommandHelper<Command, WrapperCommand> {
 
   wpi::SmallSet<Subsystem*, 4> GetRequirements() const override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
-
  protected:
   /// Command being wrapped.
   std::unique_ptr<Command> m_command;
