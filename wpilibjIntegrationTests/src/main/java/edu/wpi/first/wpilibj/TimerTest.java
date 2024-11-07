@@ -23,11 +23,11 @@ public class TimerTest extends AbstractComsSetup {
   @Test
   public void delayTest() {
     // Given
-    long startTime = RobotController.getFPGATime();
+    long startTime = Timer.getTimestampMicros();
 
     // When
     Timer.delay(TIMER_RUNTIME / 1000000);
-    long endTime = RobotController.getFPGATime();
+    long endTime = Timer.getTimestampMicros();
     long difference = endTime - startTime;
 
     // Then

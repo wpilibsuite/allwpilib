@@ -30,7 +30,7 @@ public class Notifier implements AutoCloseable {
   private Runnable m_callback;
 
   // The time, in seconds, at which the callback should be called. Has the same
-  // zero as RobotController.getFPGATime().
+  // zero as Timer.getFPGATimestamp().
   private double m_expirationTimeSeconds;
 
   // If periodic, stores the callback period; if single, stores the time until
@@ -179,7 +179,7 @@ public class Notifier implements AutoCloseable {
     try {
       m_periodic = false;
       m_periodSeconds = delaySeconds;
-      m_expirationTimeSeconds = RobotController.getFPGATime() * 1e-6 + delaySeconds;
+      m_expirationTimeSeconds = Timer.getFPGATimestamp() * 1e-6 + delaySeconds;
       updateAlarm();
     } finally {
       m_processLock.unlock();
@@ -200,7 +200,7 @@ public class Notifier implements AutoCloseable {
     try {
       m_periodic = true;
       m_periodSeconds = periodSeconds;
-      m_expirationTimeSeconds = RobotController.getFPGATime() * 1e-6 + periodSeconds;
+      m_expirationTimeSeconds = Timer.getFPGATimestamp() * 1e-6 + periodSeconds;
       updateAlarm();
     } finally {
       m_processLock.unlock();

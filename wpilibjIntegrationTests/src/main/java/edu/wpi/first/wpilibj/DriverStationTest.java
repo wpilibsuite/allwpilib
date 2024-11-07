@@ -24,7 +24,7 @@ public class DriverStationTest extends AbstractComsSetup {
 
   @Test
   public void waitForDataTest() {
-    long startTime = RobotController.getFPGATime();
+    long startTime = Timer.getFPGATimestampMicros();
 
     int handle = WPIUtilJNI.createEvent(false, false);
     DriverStationJNI.provideNewDataEventHandle(handle);
@@ -37,7 +37,7 @@ public class DriverStationTest extends AbstractComsSetup {
         e.printStackTrace();
       }
     }
-    long endTime = RobotController.getFPGATime();
+    long endTime = Timer.getFPGATimestampMicros();
     long difference = endTime - startTime;
 
     DriverStationJNI.removeNewDataEventHandle(handle);

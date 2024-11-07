@@ -4,6 +4,13 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.units.Units.Microseconds;
+
+import edu.wpi.first.hal.HALUtil;
+import edu.wpi.first.units.measure.MutTime;
+import edu.wpi.first.units.measure.Time;
+import java.util.function.LongSupplier;
+
 /**
  * A timer class.
  *
@@ -11,6 +18,55 @@ package edu.wpi.first.wpilibj;
  * get() won't return a negative duration.
  */
 public class Timer {
+  private static LongSupplier m_timestampSupplier = RobotController::getFPGATime;
+
+  // Mutable measures
+  private static final MutTime m_mutTimestamp = Microseconds.mutable(0.0);
+  private static final MutTime m_mutFPGATimestamp = Microseconds.mutable(0.0);
+
+  /**
+   * Sets a new source to provide the system clock time in microseconds. Changing this affects the
+   * return value of {@code getTimestamp} in Java. Do not use this method unless you know what you
+   * are doing.
+   */
+  public static void setTimestampSupplier(LongSupplier supplier) {
+    m_timestampSupplier = supplier;
+  }
+
+  /**
+   * Return the clock time in seconds. By default, the time is based on the FPGA hardware clock in
+   * seconds since the FPGA started. However, the return value of this method may be modified to use
+   * any time base, including non-monotonic time bases.
+   *
+   * @return Robot running time in seconds.
+   */
+  public static double getTimestamp() {
+    return m_timestampSupplier.getAsLong() / 1000000.0;
+  }
+
+  /**
+   * Return the clock time in microseconds. By default, the time is based on the FPGA hardware clock
+   * in seconds since the FPGA started. However, the return value of this method may be modified to
+   * use any time base, including non-monotonic time bases.
+   *
+   * @return Robot running time in seconds.
+   */
+  public static long getTimestampMicros() {
+    return m_timestampSupplier.getAsLong();
+  }
+
+  /**
+   * Return the clock time. By default, the time is based on the FPGA hardware clock in seconds
+   * since the FPGA started. However, the return value of this method may be modified to use any
+   * time base, including non-monotonic time bases.
+   *
+   * @return Robot running time in seconds.
+   */
+  public static Time getMeasureTimestamp() {
+    m_mutTimestamp.mut_replace(getTimestampMicros(), Microseconds);
+    return m_mutTimestamp;
+  }
+
   /**
    * Return the system clock time in seconds. Return the time from the FPGA hardware clock in
    * seconds since the FPGA started.
@@ -18,7 +74,28 @@ public class Timer {
    * @return Robot running time in seconds.
    */
   public static double getFPGATimestamp() {
-    return RobotController.getFPGATime() / 1000000.0;
+    return HALUtil.getFPGATime() / 1000000.0;
+  }
+
+  /**
+   * Return the system clock time in microseconds. Return the time from the FPGA hardware clock in
+   * seconds since the FPGA started.
+   *
+   * @return Robot running time in seconds.
+   */
+  public static long getFPGATimestampMicros() {
+    return HALUtil.getFPGATime();
+  }
+
+  /**
+   * Return the system clock time. Return the time from the FPGA hardware clock in seconds since the
+   * FPGA started.
+   *
+   * @return Robot running time in seconds.
+   */
+  public static Time getMeasureFPGATimestamp() {
+    m_mutFPGATimestamp.mut_replace(getFPGATimestampMicros(), Microseconds);
+    return m_mutFPGATimestamp;
   }
 
   /**
@@ -60,7 +137,7 @@ public class Timer {
   }
 
   private double getMsClock() {
-    return RobotController.getFPGATime() / 1000.0;
+    return getTimestamp() / 1000.0;
   }
 
   /**
