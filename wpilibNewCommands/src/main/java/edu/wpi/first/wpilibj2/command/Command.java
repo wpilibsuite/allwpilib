@@ -581,6 +581,38 @@ public abstract class Command implements Sendable {
     return wrapper;
   }
 
+  /**
+   * Throws an error if a parallel group already shares
+   * one or more requirements with a command
+   * that will be added to it.
+   *
+   * @param parallelGroup The parallel group command.
+   * @param toAdd The command that will be added to the parallel group.
+   */
+  protected void ensureDisjointRequirements(Command parallelGroup, Command toAdd) {
+    var sharedRequirements = new HashSet<>(parallelGroup.getRequirements());
+    sharedRequirements.retainAll(toAdd.getRequirements());
+    if (!sharedRequirements.isEmpty()) {
+      StringBuilder sharedRequirementsStr = new StringBuilder();
+      boolean first = true;
+      for (Subsystem requirement: sharedRequirements) {
+        if (first) {
+          first = false;
+        } else {
+          sharedRequirementsStr.append(", ");
+        }
+        sharedRequirementsStr.append(requirement.getName());
+      }
+      throw new IllegalArgumentException(
+        String.format(
+          "Command %s could not be added to this parallel group"
+          + " because the subsystems [%s] are already required in this command."
+          + " Multiple commands in a parallel composition cannot require"
+          + " the same subsystems.",
+          toAdd.getName(), sharedRequirementsStr));
+    }
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Command");
