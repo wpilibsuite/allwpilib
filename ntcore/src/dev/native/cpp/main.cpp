@@ -32,13 +32,6 @@ void stress();
 void stress2();
 
 int main(int argc, char* argv[]) {
-  WPI_String Persist;
-  WPI_InitString(&Persist, "");
-  WPI_String ListenAddr;
-  WPI_InitString(&ListenAddr, "");
-  NT_StartServer(NT_GetDefaultInstance(), &Persist, &ListenAddr,
-                 NT_DEFAULT_PORT3, NT_DEFAULT_PORT4);
-
   wpi::impl::SetupNowDefaultOnRio();
 
   if (argc == 2 && std::string_view{argv[1]} == "bench") {
