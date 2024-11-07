@@ -225,7 +225,7 @@ public class Rotation2d
    * @return The absolute value
    */
   public Rotation2d abs() {
-    return m_value < 0.0 ? times(-1) : this;
+    return m_value > 0.0 ? this : times(-1);
   }
 
   /**
