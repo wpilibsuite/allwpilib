@@ -44,6 +44,13 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default AngularAcceleration negate() {
+    return (AngularAcceleration) unaryMinus();
+  }
+
+  @Override
   default AngularAcceleration plus(Measure<? extends AngularAccelerationUnit> other) {
     return (AngularAcceleration) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

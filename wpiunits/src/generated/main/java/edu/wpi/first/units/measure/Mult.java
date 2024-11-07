@@ -44,6 +44,13 @@ public interface Mult<A extends Unit, B extends Unit> extends Measure<MultUnit<A
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Mult<A, B> negate() {
+    return (Mult<A, B>) unaryMinus();
+  }
+
+  @Override
   default Mult<A, B> plus(Measure<? extends MultUnit<A, B>> other) {
     return (Mult<A, B>) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
