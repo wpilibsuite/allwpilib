@@ -493,11 +493,12 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
 };
 
 /**
- * Gets the shared requirements between two distinct commands.
+ * Throws an error if a parallel group already shares 
+ * one or more requirements with a command 
+ * that will be added to it.
  *
- * @param first The first command to check.
- * @param second The second command to check.
- * @return A vector of shared subsystem requirements.
+ * @param parallelGroup The parallel group command.
+ * @param toAdd The command that will be added to the parallel group.
  */
-std::vector<Subsystem*> GetSharedRequirements(Command* first, Command* second);
+void EnsureDisjointRequirements(Command* parallelGroup, Command* toAdd);
 }  // namespace frc2

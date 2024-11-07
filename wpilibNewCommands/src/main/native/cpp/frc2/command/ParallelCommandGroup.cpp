@@ -76,34 +76,14 @@ void ParallelCommandGroup::AddCommands(
   }
 
   for (auto&& command : commands) {
-    auto sharedRequirements = GetSharedRequirements(this, command.get());
-    if (sharedRequirements.empty()) {
-      command->SetComposed(true);
-      AddRequirements(command->GetRequirements());
-      m_runWhenDisabled &= command->RunsWhenDisabled();
-      if (command->GetInterruptionBehavior() ==
-          Command::InterruptionBehavior::kCancelSelf) {
-        m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
-      }
-      m_commands.emplace_back(std::move(command), false);
-    } else {
-      std::string formattedRequirements = "";
-      bool first = true;
-      for (auto&& requirement : sharedRequirements) {
-        if (first) {
-          first = false;
-        } else {
-          formattedRequirements += ", ";
-        }
-        formattedRequirements += requirement->GetName();
-      }
-      throw FRC_MakeError(
-          frc::err::CommandIllegalUse,
-          "Command {} could not be added to this ParallelCommandGroup"
-          " because the subsystems [{}] are already required in this command."
-          " Multiple commands in a parallel composition cannot require the "
-          "same subsystems.",
-          command->GetName(), formattedRequirements);
+    EnsureDisjointRequirements(this, command.get());
+    command->SetComposed(true);
+    AddRequirements(command->GetRequirements());
+    m_runWhenDisabled &= command->RunsWhenDisabled();
+    if (command->GetInterruptionBehavior() ==
+        Command::InterruptionBehavior::kCancelSelf) {
+      m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
     }
+    m_commands.emplace_back(std::move(command), false);
   }
 }

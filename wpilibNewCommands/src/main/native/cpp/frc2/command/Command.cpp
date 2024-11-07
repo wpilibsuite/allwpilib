@@ -220,14 +220,28 @@ void Command::InitSendable(wpi::SendableBuilder& builder) {
 
 namespace frc2 {
 
-std::vector<Subsystem*> GetSharedRequirements(Command* first, Command* second) {
-  std::vector<Subsystem*> shared;
-  auto&& requirementsOfSecond = second->GetRequirements();
-  for (auto&& requirement : first->GetRequirements()) {
-    if (requirementsOfSecond.find(requirement) != requirementsOfSecond.end()) {
-      shared.push_back(requirement);
+void EnsureDisjointRequirements(Command* parallelGroup, Command* toAdd) {
+  std::string sharedRequirementsStr = "";
+  bool hasSharedRequirements = false;
+  auto&& requirementsToAdd = toAdd->GetRequirements();
+  for (auto&& requirement : parallelGroup->GetRequirements()) {
+    if (requirementsToAdd.find(requirement) != requirementsToAdd.end()) {
+      sharedRequirementsStr.append(requirement->GetName());
+      if (!hasSharedRequirements) {
+        hasSharedRequirements = true; // ensures formatting like "a, b, c"
+      } else {
+        sharedRequirementsStr.append(", ");
+      }
     }
   }
-  return shared;
+  if (hasSharedRequirements) {
+    throw FRC_MakeError(
+          frc::err::CommandIllegalUse,
+          "Command {} could not be added to this parallel group"
+          " because the subsystems [{}] are already required in this command."
+          " Multiple commands in a parallel composition cannot require the "
+          "same subsystems.",
+          command->GetName(), sharedRequirementsStr);
+  }
 }
 }  // namespace frc2
