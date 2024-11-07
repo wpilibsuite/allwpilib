@@ -186,6 +186,31 @@ std::optional<std::string> Command::GetPreviousCompositionSite() const {
   return m_previousComposition;
 }
 
+void Command::EnsureDisjointRequirements(Command* toAdd) {
+  std::string sharedRequirementsStr = "";
+  bool hasSharedRequirements = false;
+  auto&& requirementsToAdd = toAdd->GetRequirements();
+  for (auto&& requirement : this->GetRequirements()) {
+    if (requirementsToAdd.find(requirement) != requirementsToAdd.end()) {
+      sharedRequirementsStr.append(requirement->GetName());
+      if (!hasSharedRequirements) {
+        hasSharedRequirements = true; // ensures formatting like "a, b, c"
+      } else {
+        sharedRequirementsStr.append(", ");
+      }
+    }
+  }
+  if (hasSharedRequirements) {
+    throw FRC_MakeError(
+      frc::err::CommandIllegalUse,
+      "Command {} could not be added to this Parallel Group"
+      " because the subsystems [{}] are already required in this command."
+      " Multiple commands in a parallel composition cannot require the "
+      "same subsystems.",
+      toAdd->GetName(), sharedRequirementsStr);
+  }
+}
+
 void Command::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Command");
   builder.AddStringProperty(".name", [this] { return GetName(); }, nullptr);
@@ -216,29 +241,4 @@ void Command::InitSendable(wpi::SendableBuilder& builder) {
       nullptr);
   builder.AddBooleanProperty(
       "runsWhenDisabled", [this] { return RunsWhenDisabled(); }, nullptr);
-}
-
-void EnsureDisjointRequirements(Command* toAdd) {
-  std::string sharedRequirementsStr = "";
-  bool hasSharedRequirements = false;
-  auto&& requirementsToAdd = toAdd->GetRequirements();
-  for (auto&& requirement : parallelGroup->GetRequirements()) {
-    if (requirementsToAdd.find(requirement) != requirementsToAdd.end()) {
-      sharedRequirementsStr.append(requirement->GetName());
-      if (!hasSharedRequirements) {
-        hasSharedRequirements = true; // ensures formatting like "a, b, c"
-      } else {
-        sharedRequirementsStr.append(", ");
-      }
-    }
-  }
-  if (hasSharedRequirements) {
-    throw FRC_MakeError(
-      frc::err::CommandIllegalUse,
-      "Command {} could not be added to this Parallel Group"
-      " because the subsystems [{}] are already required in this command."
-      " Multiple commands in a parallel composition cannot require the "
-      "same subsystems.",
-      command->GetName(), sharedRequirementsStr);
-  }
 }
