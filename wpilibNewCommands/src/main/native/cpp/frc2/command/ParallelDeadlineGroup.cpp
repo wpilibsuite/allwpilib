@@ -76,7 +76,7 @@ void ParallelDeadlineGroup::AddCommands(
   }
 
   for (auto&& command : commands) {
-    EnsureDisjointRequirements(this, command.get());
+    EnsureDisjointRequirements(command.get());
     command->SetComposed(true);
     AddRequirements(command->GetRequirements());
     m_runWhenDisabled &= command->RunsWhenDisabled();

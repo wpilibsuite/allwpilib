@@ -51,7 +51,7 @@ public class ParallelRaceGroup extends Command {
     CommandScheduler.getInstance().registerComposedCommands(commands);
 
     for (Command command : commands) {
-      Commands.ensureDisjointRequirements(this, command);
+      ensureDisjointRequirements(command);
       m_commands.add(command);
       addRequirements(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();

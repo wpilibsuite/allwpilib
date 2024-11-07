@@ -485,20 +485,19 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
  protected:
   Command();
 
+  /**
+   * Throws an error if a parallel group already shares
+   * one or more requirements with a command
+   * that will be added to it.
+   *
+   * @param parallelGroup The parallel group command.
+   * @param toAdd The command that will be added to the parallel group.
+   */
+  void EnsureDisjointRequirements(Command* toAdd);
+
  private:
   /// Requirements set.
   wpi::SmallSet<Subsystem*, 4> m_requirements;
 
   std::optional<std::string> m_previousComposition;
 };
-
-/**
- * Throws an error if a parallel group already shares 
- * one or more requirements with a command 
- * that will be added to it.
- *
- * @param parallelGroup The parallel group command.
- * @param toAdd The command that will be added to the parallel group.
- */
-void EnsureDisjointRequirements(Command* parallelGroup, Command* toAdd);
-}  // namespace frc2

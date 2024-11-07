@@ -218,9 +218,7 @@ void Command::InitSendable(wpi::SendableBuilder& builder) {
       "runsWhenDisabled", [this] { return RunsWhenDisabled(); }, nullptr);
 }
 
-namespace frc2 {
-
-void EnsureDisjointRequirements(Command* parallelGroup, Command* toAdd) {
+void EnsureDisjointRequirements(Command* toAdd) {
   std::string sharedRequirementsStr = "";
   bool hasSharedRequirements = false;
   auto&& requirementsToAdd = toAdd->GetRequirements();
@@ -236,12 +234,11 @@ void EnsureDisjointRequirements(Command* parallelGroup, Command* toAdd) {
   }
   if (hasSharedRequirements) {
     throw FRC_MakeError(
-          frc::err::CommandIllegalUse,
-          "Command {} could not be added to this parallel group"
-          " because the subsystems [{}] are already required in this command."
-          " Multiple commands in a parallel composition cannot require the "
-          "same subsystems.",
-          toAdd->GetName(), sharedRequirementsStr);
+      frc::err::CommandIllegalUse,
+      "Command {} could not be added to this Parallel Group"
+      " because the subsystems [{}] are already required in this command."
+      " Multiple commands in a parallel composition cannot require the "
+      "same subsystems.",
+      command->GetName(), sharedRequirementsStr);
   }
 }
-}  // namespace frc2

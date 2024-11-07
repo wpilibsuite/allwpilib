@@ -586,11 +586,10 @@ public abstract class Command implements Sendable {
    * one or more requirements with a command
    * that will be added to it.
    *
-   * @param parallelGroup The parallel group command.
    * @param toAdd The command that will be added to the parallel group.
    */
-  protected void ensureDisjointRequirements(Command parallelGroup, Command toAdd) {
-    var sharedRequirements = new HashSet<>(parallelGroup.getRequirements());
+  protected void ensureDisjointRequirements(Command toAdd) {
+    var sharedRequirements = new HashSet<>(getRequirements());
     sharedRequirements.retainAll(toAdd.getRequirements());
     if (!sharedRequirements.isEmpty()) {
       StringBuilder sharedRequirementsStr = new StringBuilder();

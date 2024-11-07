@@ -80,7 +80,7 @@ public class ParallelDeadlineGroup extends Command {
     CommandScheduler.getInstance().registerComposedCommands(commands);
 
     for (Command command : commands) {
-      Commands.ensureDisjointRequirements(this, command);
+      ensureDisjointRequirements(command);
       m_commands.put(command, false);
       addRequirements(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
