@@ -119,6 +119,7 @@ task cppHeadersZip(type: Zip) {
     }
 }
 
+build.dependsOn cppHeadersZip
 addTaskToCopyAllOutputs(cppHeadersZip)
 
 model {
