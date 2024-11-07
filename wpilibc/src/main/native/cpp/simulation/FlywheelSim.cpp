@@ -6,7 +6,7 @@
 
 #include <wpi/MathExtras.h>
 
-#include "frc/system/plant/LinearSystemId.h"
+#include "frc/RobotController.h"
 
 using namespace frc;
 using namespace frc::sim;

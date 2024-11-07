@@ -11,6 +11,7 @@
 #include <wpi/MathExtras.h>
 
 #include "frc/RobotController.h"
+#include "frc/StateSpaceUtil.h"
 #include "frc/system/NumericalIntegration.h"
 
 using namespace frc;

@@ -4,14 +4,20 @@
 
 #pragma once
 
-#include <functional>
+#include <algorithm>
+#include <cmath>
 #include <limits>
+#include <type_traits>
 
+#include <gcem.hpp>
 #include <wpi/SymbolExports.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/SendableRegistry.h>
 
+#include "frc/MathUtil.h"
 #include "units/time.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
@@ -31,15 +37,55 @@ class WPILIB_DLLEXPORT PIDController
    * @param period The period between controller updates in seconds. The
    *               default is 20 milliseconds. Must be positive.
    */
-  PIDController(double Kp, double Ki, double Kd,
-                units::second_t period = 20_ms);
+  constexpr PIDController(double Kp, double Ki, double Kd,
+                          units::second_t period = 20_ms)
+      : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
+    bool invalidGains = false;
+    if (Kp < 0.0) {
+      wpi::math::MathSharedStore::ReportError(
+          "Kp must be a non-negative number, got {}!", Kp);
+      invalidGains = true;
+    }
+    if (Ki < 0.0) {
+      wpi::math::MathSharedStore::ReportError(
+          "Ki must be a non-negative number, got {}!", Ki);
+      invalidGains = true;
+    }
+    if (Kd < 0.0) {
+      wpi::math::MathSharedStore::ReportError(
+          "Kd must be a non-negative number, got {}!", Kd);
+      invalidGains = true;
+    }
+    if (invalidGains) {
+      m_Kp = 0.0;
+      m_Ki = 0.0;
+      m_Kd = 0.0;
+      wpi::math::MathSharedStore::ReportWarning("PID gains defaulted to 0.");
+    }
 
-  ~PIDController() override = default;
+    if (period <= 0_s) {
+      wpi::math::MathSharedStore::ReportError(
+          "Controller period must be a positive number, got {}!",
+          period.value());
+      m_period = 20_ms;
+      wpi::math::MathSharedStore::ReportWarning(
+          "Controller period defaulted to 20ms.");
+    }
+    if (!std::is_constant_evaluated()) {
+      ++instances;
 
-  PIDController(const PIDController&) = default;
-  PIDController& operator=(const PIDController&) = default;
-  PIDController(PIDController&&) = default;
-  PIDController& operator=(PIDController&&) = default;
+      wpi::math::MathSharedStore::ReportUsage(
+          wpi::math::MathUsageId::kController_PIDController2, instances);
+      wpi::SendableRegistry::Add(this, "PIDController", instances);
+    }
+  }
+
+  constexpr ~PIDController() override = default;
+
+  constexpr PIDController(const PIDController&) = default;
+  constexpr PIDController& operator=(const PIDController&) = default;
+  constexpr PIDController(PIDController&&) = default;
+  constexpr PIDController& operator=(PIDController&&) = default;
 
   /**
    * Sets the PID Controller gain parameters.
@@ -50,28 +96,32 @@ class WPILIB_DLLEXPORT PIDController
    * @param Ki The integral coefficient. Must be >= 0.
    * @param Kd The differential coefficient. Must be >= 0.
    */
-  void SetPID(double Kp, double Ki, double Kd);
+  constexpr void SetPID(double Kp, double Ki, double Kd) {
+    m_Kp = Kp;
+    m_Ki = Ki;
+    m_Kd = Kd;
+  }
 
   /**
    * Sets the proportional coefficient of the PID controller gain.
    *
    * @param Kp The proportional coefficient. Must be >= 0.
    */
-  void SetP(double Kp);
+  constexpr void SetP(double Kp) { m_Kp = Kp; }
 
   /**
    * Sets the integral coefficient of the PID controller gain.
    *
    * @param Ki The integral coefficient. Must be >= 0.
    */
-  void SetI(double Ki);
+  constexpr void SetI(double Ki) { m_Ki = Ki; }
 
   /**
    * Sets the differential coefficient of the PID controller gain.
    *
    * @param Kd The differential coefficient. Must be >= 0.
    */
-  void SetD(double Kd);
+  constexpr void SetD(double Kd) { m_Kd = Kd; }
 
   /**
    * Sets the IZone range. When the absolute value of the position error is
@@ -84,56 +134,64 @@ class WPILIB_DLLEXPORT PIDController
    * @param iZone Maximum magnitude of error to allow integral control. Must be
    *   >= 0.
    */
-  void SetIZone(double iZone);
+  constexpr void SetIZone(double iZone) {
+    if (std::is_constant_evaluated() && iZone < 0) {
+      wpi::math::MathSharedStore::ReportError(
+          "IZone must be a non-negative number, got {}!", iZone);
+    }
+    m_iZone = iZone;
+  }
 
   /**
    * Gets the proportional coefficient.
    *
    * @return proportional coefficient
    */
-  double GetP() const;
+  constexpr double GetP() const { return m_Kp; }
 
   /**
    * Gets the integral coefficient.
    *
    * @return integral coefficient
    */
-  double GetI() const;
+  constexpr double GetI() const { return m_Ki; }
 
   /**
    * Gets the differential coefficient.
    *
    * @return differential coefficient
    */
-  double GetD() const;
+  constexpr double GetD() const { return m_Kd; }
 
   /**
    * Get the IZone range.
    *
    * @return Maximum magnitude of error to allow integral control.
    */
-  double GetIZone() const;
+  constexpr double GetIZone() const { return m_iZone; }
 
   /**
    * Gets the period of this controller.
    *
    * @return The period of the controller.
    */
-  units::second_t GetPeriod() const;
+  constexpr units::second_t GetPeriod() const { return m_period; }
 
   /**
    * Gets the error tolerance of this controller.
    *
    * @return The error tolerance of the controller.
    */
-  double GetErrorTolerance() const;
+  constexpr double GetErrorTolerance() const { return m_errorTolerance; }
 
   /**
    * Gets the error derivative tolerance of this controller.
    *
    * @return The error derivative tolerance of the controller.
    */
-  double GetErrorDerivativeTolerance() const;
+  constexpr double GetErrorDerivativeTolerance() const {
+    return m_errorDerivativeTolerance;
+  }
 
   /**
    * Gets the position tolerance of this controller.
@@ -142,7 +200,9 @@ class WPILIB_DLLEXPORT PIDController
    * @deprecated Use GetErrorTolerance() instead.
    */
   [[deprecated("Use the GetErrorTolerance method instead.")]]
-  double GetPositionTolerance() const;
+  constexpr double GetPositionTolerance() const {
+    return m_errorTolerance;
+  }
 
   /**
    * Gets the velocity tolerance of this controller.
@@ -151,7 +211,9 @@ class WPILIB_DLLEXPORT PIDController
    * @deprecated Use GetErrorDerivativeTolerance() instead.
    */
   [[deprecated("Use the GetErrorDerivativeTolerance method instead.")]]
-  double GetVelocityTolerance() const;
+  constexpr double GetVelocityTolerance() const {
+    return m_errorDerivativeTolerance;
+  }
 
   /**
    * Gets the accumulated error used in the integral calculation of this
@@ -159,28 +221,45 @@ class WPILIB_DLLEXPORT PIDController
    *
    * @return The accumulated error of this controller.
    */
-  double GetAccumulatedError() const;
+  constexpr double GetAccumulatedError() const { return m_totalError; }
 
   /**
    * Sets the setpoint for the PIDController.
    *
    * @param setpoint The desired setpoint.
    */
-  void SetSetpoint(double setpoint);
+  constexpr void SetSetpoint(double setpoint) {
+    m_setpoint = setpoint;
+    m_haveSetpoint = true;
+
+    if (m_continuous) {
+      double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
+      m_error =
+          InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+    } else {
+      m_error = m_setpoint - m_measurement;
+    }
+
+    m_errorDerivative = (m_error - m_prevError) / m_period.value();
+  }
 
   /**
    * Returns the current setpoint of the PIDController.
    *
    * @return The current setpoint.
    */
-  double GetSetpoint() const;
+  constexpr double GetSetpoint() const { return m_setpoint; }
 
   /**
    * Returns true if the error is within the tolerance of the setpoint.
    *
    * This will return false until at least one input value has been computed.
    */
-  bool AtSetpoint() const;
+  constexpr bool AtSetpoint() const {
+    return m_haveMeasurement && m_haveSetpoint &&
+           gcem::abs(m_error) < m_errorTolerance &&
+           gcem::abs(m_errorDerivative) < m_errorDerivativeTolerance;
+  }
 
   /**
    * Enables continuous input.
@@ -192,17 +271,22 @@ class WPILIB_DLLEXPORT PIDController
    * @param minimumInput The minimum value expected from the input.
    * @param maximumInput The maximum value expected from the input.
    */
-  void EnableContinuousInput(double minimumInput, double maximumInput);
+  constexpr void EnableContinuousInput(double minimumInput,
+                                       double maximumInput) {
+    m_continuous = true;
+    m_minimumInput = minimumInput;
+    m_maximumInput = maximumInput;
+  }
 
   /**
    * Disables continuous input.
    */
-  void DisableContinuousInput();
+  constexpr void DisableContinuousInput() { m_continuous = false; }
 
   /**
    * Returns true if continuous input is enabled.
    */
-  bool IsContinuousInputEnabled() const;
+  constexpr bool IsContinuousInputEnabled() const { return m_continuous; }
 
   /**
    * Sets the minimum and maximum contributions of the integral term.
@@ -214,7 +298,11 @@ class WPILIB_DLLEXPORT PIDController
    * @param minimumIntegral The minimum contribution of the integral term.
    * @param maximumIntegral The maximum contribution of the integral term.
    */
-  void SetIntegratorRange(double minimumIntegral, double maximumIntegral);
+  constexpr void SetIntegratorRange(double minimumIntegral,
+                                    double maximumIntegral) {
+    m_minimumIntegral = minimumIntegral;
+    m_maximumIntegral = maximumIntegral;
+  }
 
   /**
    * Sets the error which is considered tolerable for use with AtSetpoint().
@@ -222,40 +310,73 @@ class WPILIB_DLLEXPORT PIDController
    * @param errorTolerance error which is tolerable.
    * @param errorDerivativeTolerance error derivative which is tolerable.
    */
-  void SetTolerance(double errorTolerance,
-                    double errorDerivativeTolerance =
-                        std::numeric_limits<double>::infinity());
+  constexpr void SetTolerance(double errorTolerance,
+                              double errorDerivativeTolerance =
+                                  std::numeric_limits<double>::infinity()) {
+    m_errorTolerance = errorTolerance;
+    m_errorDerivativeTolerance = errorDerivativeTolerance;
+  }
 
   /**
    * Returns the difference between the setpoint and the measurement.
    */
-  double GetError() const;
+  constexpr double GetError() const { return m_error; }
 
   /**
    * Returns the error derivative.
    */
-  double GetErrorDerivative() const;
+  constexpr double GetErrorDerivative() const { return m_errorDerivative; }
 
   /**
    * Returns the difference between the setpoint and the measurement.
    * @deprecated Use GetError() instead.
    */
   [[deprecated("Use GetError method instead.")]]
-  double GetPositionError() const;
+  constexpr double GetPositionError() const {
+    return m_error;
+  }
 
   /**
    * Returns the velocity error.
    * @deprecated Use GetErrorDerivative() instead.
    */
   [[deprecated("Use GetErrorDerivative method instead.")]]
-  double GetVelocityError() const;
+  constexpr double GetVelocityError() const {
+    return m_errorDerivative;
+  }
 
   /**
    * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.
    */
-  double Calculate(double measurement);
+  constexpr double Calculate(double measurement) {
+    m_measurement = measurement;
+    m_prevError = m_error;
+    m_haveMeasurement = true;
+
+    if (m_continuous) {
+      double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
+      m_error =
+          InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+    } else {
+      m_error = m_setpoint - m_measurement;
+    }
+
+    m_errorDerivative = (m_error - m_prevError) / m_period.value();
+
+    // If the absolute value of the position error is outside of IZone, reset
+    // the total error
+    if (gcem::abs(m_error) > m_iZone) {
+      m_totalError = 0;
+    } else if (m_Ki != 0) {
+      m_totalError =
+          std::clamp(m_totalError + m_error * m_period.value(),
+                     m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
+    }
+
+    return m_Kp * m_error + m_Ki * m_totalError + m_Kd * m_errorDerivative;
+  }
 
   /**
    * Returns the next output of the PID controller.
@@ -263,12 +384,22 @@ class WPILIB_DLLEXPORT PIDController
    * @param measurement The current measurement of the process variable.
    * @param setpoint The new setpoint of the controller.
    */
-  double Calculate(double measurement, double setpoint);
+  constexpr double Calculate(double measurement, double setpoint) {
+    m_setpoint = setpoint;
+    m_haveSetpoint = true;
+    return Calculate(measurement);
+  }
 
   /**
    * Reset the previous error, the integral term, and disable the controller.
    */
-  void Reset();
+  constexpr void Reset() {
+    m_error = 0;
+    m_prevError = 0;
+    m_totalError = 0;
+    m_errorDerivative = 0;
+    m_haveMeasurement = false;
+  }
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
@@ -319,6 +450,9 @@ class WPILIB_DLLEXPORT PIDController
 
   bool m_haveSetpoint = false;
   bool m_haveMeasurement = false;
+
+  // Usage reporting instances
+  inline static int instances = 0;
 };
 
 }  // namespace frc
