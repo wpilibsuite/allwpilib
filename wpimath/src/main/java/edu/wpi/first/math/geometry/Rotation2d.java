@@ -220,6 +220,15 @@ public class Rotation2d
   }
 
   /**
+   * Get absolute value of current rotation
+   *
+   * @return The absolute value
+   */
+  public Rotation2d abs() {
+    return m_value < 0.0 ? times(-1) : this;
+  }
+
+  /**
    * Adds the new rotation to the current rotation using a rotation matrix.
    *
    * <p>The matrix multiplication is as follows:
