@@ -137,6 +137,25 @@ class WPILIB_DLLEXPORT Rotation2d {
   }
 
   /**
+   * Get absolute value of current rotation
+   *
+   * @return The absolute value
+   */
+  constexpr Rotation2d Abs() {
+    return m_value > 0.0 ? *this : *this * -1;
+  }
+
+  /**
+   * Copy sign of another rotation
+   *
+   * @param other Rotation to copy sign from
+   * @return New rotation with sign of other rotation
+   */
+  constexpr Rotation2d CopySign(Rotation2d other) {
+    return other.Radians().value() * m_value > 0.0 ? this : times(-1);
+  }
+
+  /**
    * Adds the new rotation to the current rotation using a rotation matrix.
    *
    * <pre>
