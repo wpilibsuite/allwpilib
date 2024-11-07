@@ -104,7 +104,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @return a new measure containing the result
    */
   default Measure<U> abs() {
-    return baseUnitMagnitude() < 0 ? times(-1) : this;
+    return baseUnitMagnitude() > 0 ? this : times(-1);
   }
 
   /**
@@ -113,7 +113,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @return a new measure with the sign from another measure
    */
   default Measure<U> copySign(Measure<U> other) {
-    return other.baseUnitMagnitude() < 0 ? times(-1) : this;
+    return Math.signum(other.baseUnitMagnitude()) == Math.signum(this.baseUnitMagnitude()) ? this : times(-1);
   }
 
   /**
