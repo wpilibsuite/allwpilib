@@ -551,8 +551,10 @@ void DataLogManager::SignalNewDSDataOccur() {
 
 extern "C" {
 
-void DLM_Start(const struct WPI_String* dir, const struct WPI_String* filename, double period) {
-  DataLogManager::Start(wpi::to_string_view(dir), wpi::to_string_view(filename), period);
+void DLM_Start(const struct WPI_String* dir, const struct WPI_String* filename,
+               double period) {
+  DataLogManager::Start(wpi::to_string_view(dir), wpi::to_string_view(filename),
+                        period);
 }
 
 void DLM_Stop(void) {
