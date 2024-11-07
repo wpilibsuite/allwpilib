@@ -229,6 +229,16 @@ public class Rotation2d
   }
 
   /**
+   * Copy sign of another rotation
+   *
+   * @param other Rotation to copy sign from
+   * @return New rotation with sign of other rotation
+   */
+  public Rotation2d copySign(Rotation2d other) {
+    return Math.signum(other.getRadians()) == Math.signum(m_value) ? this : times(-1);
+  }
+
+  /**
    * Adds the new rotation to the current rotation using a rotation matrix.
    *
    * <p>The matrix multiplication is as follows:
