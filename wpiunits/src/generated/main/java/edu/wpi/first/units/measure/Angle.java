@@ -44,6 +44,13 @@ public interface Angle extends Measure<AngleUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Angle negate() {
+    return (Angle) unaryMinus();
+  }
+
+  @Override
   default Angle plus(Measure<? extends AngleUnit> other) {
     return (Angle) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

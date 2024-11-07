@@ -59,37 +59,49 @@ class XRPGyro {
   double GetRate() const;
 
   /**
-   * Gets the rate of turn in degrees-per-second around the X-axis
+   * Gets the rate of turn in degrees-per-second around the X-axis.
+   *
+   * @return rate of turn in degrees-per-second
    */
   double GetRateX() const;
 
   /**
-   * Gets the rate of turn in degrees-per-second around the Y-axis
+   * Gets the rate of turn in degrees-per-second around the Y-axis.
+   *
+   * @return rate of turn in degrees-per-second
    */
   double GetRateY() const;
 
   /**
-   * Gets the rate of turn in degrees-per-second around the Z-axis
+   * Gets the rate of turn in degrees-per-second around the Z-axis.
+   *
+   * @return rate of turn in degrees-per-second
    */
   double GetRateZ() const;
 
   /**
-   * Gets the currently reported angle around the X-axis
+   * Gets the currently reported angle around the X-axis.
+   *
+   * @return current angle around X-axis in degrees
    */
   double GetAngleX() const;
 
   /**
-   * Gets the currently reported angle around the X-axis
+   * Gets the currently reported angle around the Y-axis.
+   *
+   * @return current angle around Y-axis in degrees
    */
   double GetAngleY() const;
 
   /**
-   * Gets the currently reported angle around the X-axis
+   * Gets the currently reported angle around the Z-axis.
+   *
+   * @return current angle around Z-axis in degrees
    */
   double GetAngleZ() const;
 
   /**
-   * Resets the gyro
+   * Reset the gyro angles to 0.
    */
   void Reset();
 

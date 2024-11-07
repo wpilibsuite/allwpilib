@@ -125,6 +125,21 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   Measure<U> unaryMinus();
 
   /**
+   * Returns a measure equivalent to this one equal to zero minus its current value. For non-linear
+   * unit types like temperature, the zero point is treated as the zero value of the base unit (eg
+   * Kelvin). In effect, this means code like {@code Celsius.of(10).negate()} returns a value
+   * equivalent to -10 Kelvin, and <i>not</i> -10° Celsius.
+   *
+   * @return a measure equal to zero minus this measure
+   * @deprecated use unaryMinus() instead. This was renamed for consistancy with other WPILib
+   *     classes like Rotation2d
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<U> negate() {
+    return unaryMinus();
+  }
+
+  /**
    * Adds another measure of the same unit type to this one.
    *
    * @param other the measurement to add
