@@ -241,7 +241,7 @@ void EnsureDisjointRequirements(Command* parallelGroup, Command* toAdd) {
           " because the subsystems [{}] are already required in this command."
           " Multiple commands in a parallel composition cannot require the "
           "same subsystems.",
-          command->GetName(), sharedRequirementsStr);
+          toAdd->GetName(), sharedRequirementsStr);
   }
 }
 }  // namespace frc2
