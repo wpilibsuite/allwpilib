@@ -31,7 +31,7 @@ void glass::DisplayAnalogOutputsDevice(AnalogOutputsModel* model) {
       PushID(i);
 
       // build label
-      std::string& name = GetStorage().GetString("name");
+      std::string& name = GetStorage().Get<std::string>("name");
       char label[128];
       if (!name.empty()) {
         wpi::format_to_n_c_str(label, sizeof(label), "{} [{}]###name", name, i);

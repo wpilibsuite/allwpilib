@@ -2057,23 +2057,23 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
 void NetworkTablesFlagsSettings::Update() {
   if (!m_pTreeView) {
     auto& storage = GetStorage();
-    m_pTreeView =
-        &storage.GetBool("tree", m_defaultFlags & NetworkTablesFlags_TreeView);
-    m_pCombinedView = &storage.GetBool(
+    m_pTreeView = &storage.Get<bool>(
+        "tree", m_defaultFlags & NetworkTablesFlags_TreeView);
+    m_pCombinedView = &storage.Get<bool>(
         "combined", m_defaultFlags & NetworkTablesFlags_CombinedView);
-    m_pShowSpecial = &storage.GetBool(
+    m_pShowSpecial = &storage.Get<bool>(
         "special", m_defaultFlags & NetworkTablesFlags_ShowSpecial);
-    m_pShowProperties = &storage.GetBool(
+    m_pShowProperties = &storage.Get<bool>(
         "properties", m_defaultFlags & NetworkTablesFlags_ShowProperties);
-    m_pShowTimestamp = &storage.GetBool(
+    m_pShowTimestamp = &storage.Get<bool>(
         "timestamp", m_defaultFlags & NetworkTablesFlags_ShowTimestamp);
-    m_pShowServerTimestamp = &storage.GetBool(
+    m_pShowServerTimestamp = &storage.Get<bool>(
         "serverTimestamp",
         m_defaultFlags & NetworkTablesFlags_ShowServerTimestamp);
-    m_pCreateNoncanonicalKeys = &storage.GetBool(
+    m_pCreateNoncanonicalKeys = &storage.Get<bool>(
         "createNonCanonical",
         m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
-    m_pPrecision = &storage.GetInt(
+    m_pPrecision = &storage.Get<int>(
         "precision", (m_defaultFlags & NetworkTablesFlags_Precision) >>
                          kNetworkTablesFlags_PrecisionBitShift);
   }

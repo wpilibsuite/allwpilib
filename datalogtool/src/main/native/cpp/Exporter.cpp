@@ -618,7 +618,7 @@ static void ExportCsv(std::string_view outputFolder, int style) {
 }
 
 void DisplayOutput(glass::Storage& storage) {
-  static std::string& outputFolder = storage.GetString("outputFolder");
+  static std::string& outputFolder = storage.Get<std::string>("outputFolder");
   static std::unique_ptr<pfd::select_folder> outputFolderSelector;
 
   SetNextWindowPos(ImVec2{380, 390}, ImGuiCond_FirstUseEver);
