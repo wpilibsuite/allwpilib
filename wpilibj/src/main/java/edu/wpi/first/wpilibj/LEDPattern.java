@@ -182,7 +182,7 @@ public interface LEDPattern {
     return (reader, writer) -> {
       int bufLen = reader.getLength();
       applyTo(
-          new LEDReader.OffsetLEDReader(reader, offset),
+          LEDReader.RemappedReader.offset(reader, offset),
           (i, r, g, b) -> {
             int shiftedIndex = Math.floorMod(i + offset, bufLen);
             writer.setRGB(shiftedIndex, r, g, b);
@@ -220,7 +220,7 @@ public interface LEDPattern {
       int offset = (int) (t * bufLen);
 
       applyTo(
-          new LEDReader.OffsetLEDReader(reader, offset),
+          LEDReader.RemappedReader.offset(reader, offset),
           (i, r, g, b) -> {
             // floorMod so if the offset is negative, we still get positive outputs
             int shiftedIndex = Math.floorMod(i + offset, bufLen);
@@ -267,10 +267,10 @@ public interface LEDPattern {
       long now = WPIUtilJNI.now();
 
       // every step in time that's a multiple of microsPerLED will increment the offset by 1
-      var offset = now / microsPerLED;
+      var offset = (int) (now / microsPerLED);
 
       applyTo(
-          new LEDReader.OffsetLEDReader(reader, offset),
+          LEDReader.RemappedReader.offset(reader, offset),
           (i, r, g, b) -> {
             // floorMod so if the offset is negative, we still get positive outputs
             int shiftedIndex = Math.floorMod(i + offset, bufLen);

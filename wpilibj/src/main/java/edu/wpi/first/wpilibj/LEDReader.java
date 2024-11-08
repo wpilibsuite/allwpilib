@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.util.ErrorMessages;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import java.util.function.IntUnaryOperator;
 
 /** Generic interface for reading data from an LED buffer. */
 public interface LEDReader {
@@ -99,22 +100,37 @@ public interface LEDReader {
   }
 
   /**
-   * An LED reader implementation that operates on offset indexes. Offsets are circular and will
-   * wrap around the end of the base reader back to the start.
+   * An LED reader implementation that operates on remapped indices. Remapping can be done using
+   * arbitrary mapping functions; a static factory function is also provided for the common use case
+   * of offset readers for things like scrolling animations.
    */
-  class OffsetLEDReader implements LEDReader {
+  class RemappedReader implements LEDReader {
     private final LEDReader m_reader;
-    private final long m_offset;
+    private final IntUnaryOperator m_mapping;
 
     /**
-     * Creates a new offset LED reader based on an existing reader and the integer offset.
+     * Creates a new remapping reader for a backing reader and an arbitrary index remapping
+     * function.
+     *
+     * @param reader the backing reader to use
+     * @param mapping the mapping function to use
+     */
+    public RemappedReader(LEDReader reader, IntUnaryOperator mapping) {
+      m_reader = ErrorMessages.requireNonNullParam(reader, "reader", "RemappedReader");
+      m_mapping = ErrorMessages.requireNonNullParam(mapping, "mapping", "RemappedReader");
+    }
+
+    /**
+     * Creates a new offset LED reader based on an existing reader and integer offset. The offset
+     * reader will be circular and wrap around.
      *
      * @param reader the backing reader to use
      * @param offset the offset to use when reading data
+     * @return the offset reader
      */
-    public OffsetLEDReader(LEDReader reader, long offset) {
-      m_reader = ErrorMessages.requireNonNullParam(reader, "reader", "OffsetLEDReader");
-      m_offset = offset;
+    public static RemappedReader offset(LEDReader reader, int offset) {
+      return new RemappedReader(
+          reader, original -> Math.floorMod(original + offset, reader.getLength()));
     }
 
     @Override
@@ -144,7 +160,7 @@ public interface LEDReader {
      * @return the remapped index
      */
     public int remapIndex(int index) {
-      return Math.floorMod(index + m_offset, getLength());
+      return m_mapping.applyAsInt(index);
     }
   }
 }
