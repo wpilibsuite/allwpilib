@@ -21,6 +21,15 @@ ext {
                             'src/main/native/thirdparty/sleipnir/src'
                 }
             }
+            nanopbCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/generated/main/native/cpp'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/generated/main/native/cpp'
+                }
+            }
         }
     }
 }
@@ -38,6 +47,10 @@ cppHeadersZip {
         into '/wpimath/protobuf'
         include '*.h'
     }
+    from("src/generated/main/native/cpp/wpimath/protobuf") {
+        into '/wpimath/protobuf'
+        include '**/*.h'
+    }
     from('src/main/native/thirdparty/sleipnir/include') {
         into '/'
     }
@@ -53,7 +66,8 @@ model {
                     srcDirs 'src/main/native/include',
                             'src/main/native/thirdparty/eigen/include',
                             'src/main/native/thirdparty/gcem/include',
-                            'src/main/native/thirdparty/sleipnir/include'
+                            'src/main/native/thirdparty/sleipnir/include',
+                            'src/generated/main/native/cpp'
                 }
             }
         }
@@ -68,7 +82,7 @@ model {
 nativeUtils.exportsConfigs {
     wpimath {
         objectFilterClosure = { file ->
-            return file.name.endsWith('.pb.obj')
+            return file.name.endsWith('.pb.obj') || file.name.endsWith('.npb.obj')
         }
     }
 }

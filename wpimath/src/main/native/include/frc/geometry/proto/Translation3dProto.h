@@ -8,11 +8,13 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/geometry/Translation3d.h"
+#include "wpimath/protobuf/geometry3d.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Translation3d> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Translation3d Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
-                   const frc::Translation3d& value);
+  using MessageStruct = wpi_proto_ProtobufTranslation3d;
+  using InputStream = wpi::ProtoInputStream<frc::Translation3d>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Translation3d>;
+  static std::optional<frc::Translation3d> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::Translation3d& value);
 };

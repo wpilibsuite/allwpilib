@@ -155,6 +155,13 @@ protobuf {
     }
     generateProtoTasks {
         all().configureEach { task ->
+            if (project.hasProperty('skipproto')) {
+                task.builtins {
+                    cpp {}
+                    remove java
+                }
+                return
+            }
             task.inputs.file(rootProject.file("protoplugin/binary/wpiprotoplugin.jar"))
             task.plugins {
                 wpilib {

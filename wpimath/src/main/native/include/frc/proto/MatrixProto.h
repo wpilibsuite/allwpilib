@@ -7,50 +7,65 @@
 #include <stdexcept>
 
 #include <fmt/format.h>
-#include <wpi/ProtoHelper.h>
 #include <wpi/protobuf/Protobuf.h>
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "frc/EigenCore.h"
-#include "wpimath.pb.h"
+#include "wpimath/protobuf/wpimath.npb.h"
 
 template <int Rows, int Cols, int Options, int MaxRows, int MaxCols>
   requires(Cols != 1)
 struct wpi::Protobuf<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena) {
-    return wpi::CreateMessage<wpi::proto::ProtobufMatrix>(arena);
-  }
+  using MessageStruct = wpi_proto_ProtobufMatrix;
+  using InputStream = wpi::ProtoInputStream<
+      frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>;
+  using OutputStream = wpi::ProtoOutputStream<
+      frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>;
 
-  static frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols> Unpack(
-      const google::protobuf::Message& msg) {
-    auto m = static_cast<const wpi::proto::ProtobufMatrix*>(&msg);
-    if (m->num_rows() != Rows || m->num_cols() != Cols) {
-      throw std::invalid_argument(fmt::format(
-          "Tried to unpack message with {} rows and {} columns into "
-          "Matrix with {} rows and {} columns",
-          m->num_rows(), m->num_cols(), Rows, Cols));
+  static std::optional<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>
+  Unpack(InputStream& stream) {
+    constexpr bool isSmall = Rows * Cols * sizeof(double) < 256;
+    using UnpackType =
+        std::conditional_t<isSmall, wpi::UnpackCallback<double, Rows * Cols>,
+                           wpi::StdVectorUnpackCallback<double, Rows * Cols>>;
+    UnpackType data;
+    data.Vec().reserve(Rows * Cols);
+    data.SetLimits(wpi::DecodeLimits::Fail);
+    wpi_proto_ProtobufMatrix msg;
+    msg.data = data.Callback();
+    if (!stream.Decode(msg)) {
+      return {};
     }
-    if (m->data_size() != Rows * Cols) {
-      throw std::invalid_argument(
-          fmt::format("Tried to unpack message with {} elements in data into "
-                      "Matrix with {} elements",
-                      m->data_size(), Rows * Cols));
+
+    if (msg.num_rows != Rows || msg.num_cols != Cols) {
+      return {};
     }
+
+    auto items = data.Items();
+
+    if (items.size() != Rows * Cols) {
+      return {};
+    }
+
     frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols> mat;
     for (int i = 0; i < Rows * Cols; i++) {
-      mat(i) = m->data(i);
+      mat(i) = items[i];
     }
+
     return mat;
   }
 
-  static void Pack(
-      google::protobuf::Message* msg,
+  static bool Pack(
+      OutputStream& stream,
       const frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>& value) {
-    auto m = static_cast<wpi::proto::ProtobufMatrix*>(msg);
-    m->set_num_rows(Rows);
-    m->set_num_cols(Cols);
-    m->clear_data();
-    for (int i = 0; i < Rows * Cols; i++) {
-      m->add_data(value(i));
-    }
+    std::span<const double> dataSpan{value.data(),
+                                     static_cast<size_t>(Rows * Cols)};
+    wpi::PackCallback<double> data{dataSpan};
+    wpi_proto_ProtobufMatrix msg{
+        .num_rows = Rows,
+        .num_cols = Cols,
+        .data = data.Callback(),
+    };
+    return stream.Encode(msg);
   }
 };

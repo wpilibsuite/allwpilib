@@ -1,0 +1,170 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thad House <thadhouse1@gmail.com>
+Date: Sat, 2 Nov 2024 20:25:45 -0700
+Subject: [PATCH 4/4] Generate as cpp and add wpilib requirements
+
+---
+ generator/nanopb_generator.py | 43 +++++++++++++++++++++++++++--------
+ pb.h                          | 23 +++++++++++++++----
+ 2 files changed, 52 insertions(+), 14 deletions(-)
+
+diff --git a/generator/nanopb_generator.py b/generator/nanopb_generator.py
+index 3b59ba59e6fc997350b1368a2faebc051cd6176a..01fc349538aec0c67ec3fd9bfaf3a356adc08e96 100755
+--- a/generator/nanopb_generator.py
++++ b/generator/nanopb_generator.py
+@@ -1406,6 +1406,12 @@ class Message(ProtoElement):
+ 
+         result += '\n'
+ 
++        result += '    static const pb_msgdesc_t* msg_descriptor(void) noexcept;\n'
++        result += '    static std::string_view msg_name(void) noexcept;\n'
++        result += '    static pb_filedesc_t file_descriptor(void) noexcept;\n'
++
++        result += '\n'
++
+         if not self.fields:
+             # Empty structs are not allowed in C standard.
+             # Therefore add a dummy field if an empty message occurs.
+@@ -2046,6 +2052,8 @@ class ProtoFile:
+             # no %s specified - use whatever was passed in as options.libformat
+             yield options.libformat
+         yield '\n'
++        yield "#include <span>\n"
++        yield "#include <string_view>\n"
+ 
+         for incfile in self.file_options.include:
+             # allow including system headers
+@@ -2126,16 +2134,6 @@ class ProtoFile:
+             yield '/* Struct field encoding specification for nanopb */\n'
+             for msg in self.messages:
+                 yield msg.fields_declaration(self.dependencies) + '\n'
+-            for msg in self.messages:
+-                yield 'extern const pb_msgdesc_t %s_msg;\n' % Globals.naming_style.type_name(msg.name)
+-            yield '\n'
+-
+-            yield '/* Defines for backwards compatibility with code written before nanopb-0.4.0 */\n'
+-            for msg in self.messages:
+-              yield '#define %s &%s_msg\n' % (
+-                Globals.naming_style.define_name('%s_fields' % msg.name),
+-                Globals.naming_style.type_name(msg.name))
+-            yield '\n'
+ 
+             yield '/* Maximum encoded size of messages (where known) */\n'
+             messagesizes = []
+@@ -2259,6 +2257,24 @@ class ProtoFile:
+         yield '#endif\n'
+         yield '\n'
+ 
++        yield "#include <span>\n"
++        yield "#include <string_view>\n"
++
++        yield "static const uint8_t file_descriptor[] {\n"
++
++        line_count = 0
++
++        for b in self.fdesc.SerializeToString():
++            yield '0x' + format(b, '02x') + ','
++            line_count += 1
++            if line_count == 10:
++                yield '\n'
++                line_count = 0
++        yield '\n'
++
++        yield "};\n"
++        yield 'static const char file_name[] = "%s";\n' % self.fdesc.name
++
+         # Check if any messages exceed the 64 kB limit of 16-bit pb_size_t
+         exceeds_64kB = []
+         for msg in self.messages:
+@@ -2275,6 +2291,13 @@ class ProtoFile:
+ 
+         # Generate the message field definitions (PB_BIND() call)
+         for msg in self.messages:
++            if self.fdesc.package:
++                full_name = self.fdesc.package + '.' + msg.desc.name
++            else:
++                full_name = msg.desc.name
++            yield 'static const char %s_name[] = "%s";\n' % (msg.name, full_name)
++            yield 'std::string_view %s::msg_name(void) noexcept { return %s_name; }\n' % (msg.name, msg.name)
++            yield 'pb_filedesc_t %s::file_descriptor(void) noexcept { return {::file_name, ::file_descriptor}; }\n' % msg.name
+             yield msg.fields_definition(self.dependencies) + '\n\n'
+ 
+         # Generate pb_extension_type_t definitions if extensions are used in proto file
+diff --git a/pb.h b/pb.h
+index a7fd771f05d7182e73ab346b46294c6fc5ac44c7..832364a60900cbcb9134b6e122576436a6df6a00 100644
+--- a/pb.h
++++ b/pb.h
+@@ -89,6 +89,9 @@
+ #include <string.h>
+ #include <limits.h>
+ 
++#include <span>
++#include <string_view>
++
+ #ifdef PB_ENABLE_MALLOC
+ #include <stdlib.h>
+ #endif
+@@ -315,6 +318,12 @@ typedef struct pb_istream_s pb_istream_t;
+ typedef struct pb_ostream_s pb_ostream_t;
+ typedef struct pb_field_iter_s pb_field_iter_t;
+ 
++typedef struct pb_filedesc_s pb_filedesc_t;
++struct pb_filedesc_s {
++    std::string_view file_name;
++    std::span<const uint8_t> file_descriptor;
++};
++
+ /* This structure is used in auto-generated constants
+  * to specify struct fields.
+  */
+@@ -329,6 +338,9 @@ struct pb_msgdesc_s {
+     pb_size_t field_count;
+     pb_size_t required_field_count;
+     pb_size_t largest_tag;
++
++    pb_filedesc_t file_descriptor;
++    std::string_view proto_name;
+ };
+ 
+ /* Iterator for message descriptor */
+@@ -501,17 +513,17 @@ struct pb_extension_s {
+ 
+ /* Binding of a message field set into a specific structure */
+ #define PB_BIND(msgname, structname, width) \
+-    const uint32_t structname ## _field_info[] PB_PROGMEM = \
++    static const uint32_t structname ## _field_info[] PB_PROGMEM = \
+     { \
+         msgname ## _FIELDLIST(PB_GEN_FIELD_INFO_ ## width, structname) \
+         0 \
+     }; \
+-    const pb_msgdesc_t* const structname ## _submsg_info[] = \
++    static const pb_msgdesc_t* const structname ## _submsg_info[] = \
+     { \
+         msgname ## _FIELDLIST(PB_GEN_SUBMSG_INFO, structname) \
+         NULL \
+     }; \
+-    const pb_msgdesc_t structname ## _msg = \
++    static const pb_msgdesc_t structname ## _msg = \
+     { \
+        structname ## _field_info, \
+        structname ## _submsg_info, \
+@@ -520,7 +532,10 @@ struct pb_extension_s {
+        0 msgname ## _FIELDLIST(PB_GEN_FIELD_COUNT, structname), \
+        0 msgname ## _FIELDLIST(PB_GEN_REQ_FIELD_COUNT, structname), \
+        0 msgname ## _FIELDLIST(PB_GEN_LARGEST_TAG, structname), \
++       structname::file_descriptor(), \
++       structname::msg_name(),  \
+     }; \
++    const pb_msgdesc_t* structname::msg_descriptor(void) noexcept { return &(structname ## _msg); } \
+     msgname ## _FIELDLIST(PB_GEN_FIELD_INFO_ASSERT_ ## width, structname)
+ 
+ #define PB_GEN_FIELD_COUNT(structname, atype, htype, ltype, fieldname, tag) +1
+@@ -726,7 +741,7 @@ struct pb_extension_s {
+ #define PB_SI_PB_LTYPE_UINT64(t)
+ #define PB_SI_PB_LTYPE_EXTENSION(t)
+ #define PB_SI_PB_LTYPE_FIXED_LENGTH_BYTES(t)
+-#define PB_SUBMSG_DESCRIPTOR(t)    &(t ## _msg),
++#define PB_SUBMSG_DESCRIPTOR(t)    (t::msg_descriptor()),
+ 
+ /* The field descriptors use a variable width format, with width of either
+  * 1, 2, 4 or 8 of 32-bit words. The two lowest bytes of the first byte always

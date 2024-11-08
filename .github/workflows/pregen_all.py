@@ -34,6 +34,13 @@ def main():
         check=True,
     )
     subprocess.run(
+        [
+            sys.executable,
+            f"{REPO_ROOT}/wpimath/generate_nanopb.py",
+        ],
+        check=True,
+    )
+    subprocess.run(
         [sys.executable, f"{REPO_ROOT}/wpiunits/generate_units.py"], check=True
     )
     subprocess.run(
@@ -51,6 +58,13 @@ def main():
     )
     subprocess.run(
         [sys.executable, f"{REPO_ROOT}/wpilibj/generate_pwm_motor_controllers.py"],
+        check=True,
+    )
+    subprocess.run(
+        [
+            sys.executable,
+            f"{REPO_ROOT}/wpiutil/generate_nanopb.py",
+        ],
         check=True,
     )
     subprocess.run(
