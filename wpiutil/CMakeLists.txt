@@ -124,6 +124,8 @@ file(
 list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
 if(NOT WITH_PROTOBUF)
     list(FILTER wpiutil_native_src EXCLUDE REGEX "/protobuf/")
+    # Don't filter out protobuf cpp file, it only uses nanopb
+    list(APPEND wpiutil_native_src src/main/native/cpp/protobuf/Protobuf.cpp)
 endif()
 file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
 file(GLOB_RECURSE wpiutil_linux_src src/main/native/linux/*.cpp)
