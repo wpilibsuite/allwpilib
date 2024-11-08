@@ -24,8 +24,8 @@ public class Timer {
   }
 
   /**
-   * Return the system clock time in seconds for the start of the current periodic loop. This is
-   * in the same time base as getFPGATimestamp(), but is stable through a loop. This value is only
+   * Return the system clock time in seconds for the start of the current periodic loop. This is in
+   * the same time base as getFPGATimestamp(), but is stable through a loop. This value is only
    * valid for robot programs that use TimedRobot. It is updated at the beginning of every periodic
    * callback (including the normal periodic loop). Calling this from threads other than than the
    * main periodic loop has undefined behavior.
