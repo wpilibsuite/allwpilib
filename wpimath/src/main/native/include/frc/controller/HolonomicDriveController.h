@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include <wpi/SymbolExports.h>
 
 #include "frc/controller/PIDController.h"
@@ -13,6 +15,7 @@
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/trajectory/Trajectory.h"
 #include "units/angle.h"
+#include "units/angular_velocity.h"
 #include "units/velocity.h"
 
 namespace frc {
@@ -41,20 +44,34 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
    * @param thetaController A profiled PID controller to respond to error in
    * angle.
    */
-  HolonomicDriveController(
+  constexpr HolonomicDriveController(
       PIDController xController, PIDController yController,
-      ProfiledPIDController<units::radian> thetaController);
+      ProfiledPIDController<units::radian> thetaController)
+      : m_xController(std::move(xController)),
+        m_yController(std::move(yController)),
+        m_thetaController(std::move(thetaController)) {
+    m_thetaController.EnableContinuousInput(0_deg, 360.0_deg);
+  }
 
-  HolonomicDriveController(const HolonomicDriveController&) = default;
-  HolonomicDriveController& operator=(const HolonomicDriveController&) =
+  constexpr HolonomicDriveController(const HolonomicDriveController&) = default;
+  constexpr HolonomicDriveController& operator=(
+      const HolonomicDriveController&) = default;
+  constexpr HolonomicDriveController(HolonomicDriveController&&) = default;
+  constexpr HolonomicDriveController& operator=(HolonomicDriveController&&) =
       default;
-  HolonomicDriveController(HolonomicDriveController&&) = default;
-  HolonomicDriveController& operator=(HolonomicDriveController&&) = default;
 
   /**
    * Returns true if the pose error is within tolerance of the reference.
    */
-  bool AtReference() const;
+  constexpr bool AtReference() const {
+    const auto& eTranslate = m_poseError.Translation();
+    const auto& eRotate = m_rotationError;
+    const auto& tolTranslate = m_poseTolerance.Translation();
+    const auto& tolRotate = m_poseTolerance.Rotation();
+    return units::math::abs(eTranslate.X()) < tolTranslate.X() &&
+           units::math::abs(eTranslate.Y()) < tolTranslate.Y() &&
+           units::math::abs(eRotate.Radians()) < tolRotate.Radians();
+  }
 
   /**
    * Sets the pose error which is considered tolerable for use with
@@ -62,7 +79,9 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
    *
    * @param tolerance Pose error which is tolerable.
    */
-  void SetTolerance(const Pose2d& tolerance);
+  constexpr void SetTolerance(const Pose2d& tolerance) {
+    m_poseTolerance = tolerance;
+  }
 
   /**
    * Returns the next output of the holonomic drive controller.
@@ -75,10 +94,41 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
    * @param desiredHeading The desired heading.
    * @return The next output of the holonomic drive controller.
    */
-  ChassisSpeeds Calculate(const Pose2d& currentPose,
-                          const Pose2d& trajectoryPose,
-                          units::meters_per_second_t desiredLinearVelocity,
-                          const Rotation2d& desiredHeading);
+  constexpr ChassisSpeeds Calculate(
+      const Pose2d& currentPose, const Pose2d& trajectoryPose,
+      units::meters_per_second_t desiredLinearVelocity,
+      const Rotation2d& desiredHeading) {
+    // If this is the first run, then we need to reset the theta controller to
+    // the current pose's heading.
+    if (m_firstRun) {
+      m_thetaController.Reset(currentPose.Rotation().Radians());
+      m_firstRun = false;
+    }
+
+    // Calculate feedforward velocities (field-relative)
+    auto xFF = desiredLinearVelocity * trajectoryPose.Rotation().Cos();
+    auto yFF = desiredLinearVelocity * trajectoryPose.Rotation().Sin();
+    auto thetaFF = units::radians_per_second_t{m_thetaController.Calculate(
+        currentPose.Rotation().Radians(), desiredHeading.Radians())};
+
+    m_poseError = trajectoryPose.RelativeTo(currentPose);
+    m_rotationError = desiredHeading - currentPose.Rotation();
+
+    if (!m_enabled) {
+      return ChassisSpeeds::FromFieldRelativeSpeeds(xFF, yFF, thetaFF,
+                                                    currentPose.Rotation());
+    }
+
+    // Calculate feedback velocities (based on position error).
+    auto xFeedback = units::meters_per_second_t{m_xController.Calculate(
+        currentPose.X().value(), trajectoryPose.X().value())};
+    auto yFeedback = units::meters_per_second_t{m_yController.Calculate(
+        currentPose.Y().value(), trajectoryPose.Y().value())};
+
+    // Return next output.
+    return ChassisSpeeds::FromFieldRelativeSpeeds(
+        xFF + xFeedback, yFF + yFeedback, thetaFF, currentPose.Rotation());
+  }
 
   /**
    * Returns the next output of the holonomic drive controller.
@@ -90,9 +140,12 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
    * @param desiredHeading The desired heading.
    * @return The next output of the holonomic drive controller.
    */
-  ChassisSpeeds Calculate(const Pose2d& currentPose,
-                          const Trajectory::State& desiredState,
-                          const Rotation2d& desiredHeading);
+  constexpr ChassisSpeeds Calculate(const Pose2d& currentPose,
+                                    const Trajectory::State& desiredState,
+                                    const Rotation2d& desiredHeading) {
+    return Calculate(currentPose, desiredState.pose, desiredState.velocity,
+                     desiredHeading);
+  }
 
   /**
    * Enables and disables the controller for troubleshooting purposes. When
@@ -101,22 +154,54 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
    *
    * @param enabled If the controller is enabled or not.
    */
-  void SetEnabled(bool enabled);
+  constexpr void SetEnabled(bool enabled) { m_enabled = enabled; }
+
+  /**
+   * Returns the X PIDController
+   *
+   * @deprecated Use GetXController() instead.
+   */
+  [[deprecated("Use GetXController() instead")]]
+  constexpr PIDController& getXController() {
+    return m_xController;
+  }
+
+  /**
+   * Returns the Y PIDController
+   *
+   * @deprecated Use GetYController() instead.
+   */
+  [[deprecated("Use GetYController() instead")]]
+  constexpr PIDController& getYController() {
+    return m_yController;
+  }
 
   /**
    * Returns the rotation ProfiledPIDController
+   *
+   * @deprecated Use GetThetaController() instead.
    */
-  ProfiledPIDController<units::radian>& getThetaController();
+  [[deprecated("Use GetThetaController() instead")]]
+  constexpr ProfiledPIDController<units::radian>& getThetaController() {
+    return m_thetaController;
+  }
 
   /**
    * Returns the X PIDController
    */
-  PIDController& getXController();
+  constexpr PIDController& GetXController() { return m_xController; }
 
   /**
    * Returns the Y PIDController
    */
-  PIDController& getYController();
+  constexpr PIDController& GetYController() { return m_yController; }
+
+  /**
+   * Returns the rotation ProfiledPIDController
+   */
+  constexpr ProfiledPIDController<units::radian>& GetThetaController() {
+    return m_thetaController;
+  }
 
  private:
   Pose2d m_poseError;

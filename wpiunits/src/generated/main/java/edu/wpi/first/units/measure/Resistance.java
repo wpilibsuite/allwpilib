@@ -44,6 +44,13 @@ public interface Resistance extends Measure<ResistanceUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Resistance negate() {
+    return (Resistance) unaryMinus();
+  }
+
+  @Override
   default Resistance plus(Measure<? extends ResistanceUnit> other) {
     return (Resistance) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

@@ -9,7 +9,7 @@ ext {
     groupId = 'edu.wpi.first.wpiutil'
 
     nativeName = 'wpiutil'
-    devMain = 'edu.wpi.first.wpiutil.DevMain'
+    devMain = 'edu.wpi.first.util.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
 
     splitSetup = {

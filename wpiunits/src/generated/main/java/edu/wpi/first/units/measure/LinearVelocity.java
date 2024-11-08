@@ -44,6 +44,13 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default LinearVelocity negate() {
+    return (LinearVelocity) unaryMinus();
+  }
+
+  @Override
   default LinearVelocity plus(Measure<? extends LinearVelocityUnit> other) {
     return (LinearVelocity) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

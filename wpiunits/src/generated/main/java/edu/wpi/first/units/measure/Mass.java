@@ -44,6 +44,13 @@ public interface Mass extends Measure<MassUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Mass negate() {
+    return (Mass) unaryMinus();
+  }
+
+  @Override
   default Mass plus(Measure<? extends MassUnit> other) {
     return (Mass) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }

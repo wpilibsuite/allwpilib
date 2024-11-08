@@ -5,7 +5,6 @@
 #include "frc/simulation/BuiltInAccelerometerSim.h"
 
 #include <memory>
-#include <utility>
 
 #include <hal/simulation/AccelerometerData.h>
 

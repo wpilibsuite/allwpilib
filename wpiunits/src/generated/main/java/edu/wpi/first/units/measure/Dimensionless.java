@@ -44,6 +44,13 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Dimensionless negate() {
+    return (Dimensionless) unaryMinus();
+  }
+
+  @Override
   default Dimensionless plus(Measure<? extends DimensionlessUnit> other) {
     return (Dimensionless) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
