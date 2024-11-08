@@ -4,252 +4,90 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.MutAngle;
-import edu.wpi.first.units.measure.MutAngularAcceleration;
-import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.math.system.plant.Gearbox;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 
-/** Represents a simulated DC motor mechanism. */
-public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
-  // Gearbox for the DC motor.
-  private final DCMotor m_gearbox;
-
-  // The gearing from the motors to the output.
-  private final double m_gearing;
-
-  // The moment of inertia for the DC motor mechanism.
-  private final double m_jKgMetersSquared;
-
-  // The angle of the system.
-  private final MutAngle m_angle = Radians.mutable(0.0);
-
-  // The angular velocity of the system.
-  private final MutAngularVelocity m_angularVelocity = RadiansPerSecond.mutable(0.0);
-
-  // The angular acceleration of the system.
-  private final MutAngularAcceleration m_angularAcceleration =
-      RadiansPerSecondPerSecond.mutable(0.0);
-
+/** Represents a simulated DC motor mechanism controlled by voltage input. */
+public class DCMotorSim extends DCMotorSimBase {
   /**
-   * Creates a simulated DC motor mechanism.
+   * Creates a simulated DC motor mechanism controlled by voltage input.
    *
-   * @param plant The linear system representing the DC motor. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(DCMotor, double,
-   *     double)} or {@link
-   *     edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}. If
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}
-   *     is used, the distance unit must be radians.
-   * @param gearbox The type of and number of motors in the DC motor gearbox.
+   * <p>If using physical constants create the plant using either {@link
+   * LinearSystemId#createDCMotorSystem(Gearbox, double)} or {@link
+   * LinearSystemId#createDCMotorSystem(Gearbox, MomentOfInertia)}.
+   *
+   * <p>If using system characterization create the plant using either {@link
+   * LinearSystemId#identifyPositionSystem(double, double)} or the units class overload. The
+   * distance unit must be radians. The input unit must be volts.
+   *
+   * @param plant The linear system that represents the simulated DC motor mechanism.
+   * @param gearbox The gearbox of the simulated DC motor mechanism.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
-   *     second element is for velocity.
+   *     second element is for velocity. The units should be radians for position and radians per
+   *     second for velocity.
    */
-  public DCMotorSim(LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double... measurementStdDevs) {
-    super(plant, measurementStdDevs);
-    m_gearbox = gearbox;
-
-    // By theorem 6.10.1 of https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
-    // the DC motor state-space model is:
+  public DCMotorSim(LinearSystem<N2, N1, N2> plant, Gearbox gearbox, double... measurementStdDevs) {
+    // By theorem 6.10.1 of
+    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
+    // the DC motor mechanism state-space model with voltage as input is:
     //
-    //   dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
-    //   A = -G²Kₜ/(KᵥRJ)
-    //   B = GKₜ/(RJ)
-    //
-    // Solve for G.
-    //
-    //   A/B = -G/Kᵥ
-    //   G = -KᵥA/B
+    // dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
+    // A = -G²Kₜ/(KᵥRJ)
+    // B = GKₜ/(RJ)
     //
     // Solve for J.
     //
-    //   B = GKₜ/(RJ)
-    //   J = GKₜ/(RB)
-    m_gearing = -gearbox.KvRadPerSecPerVolt * plant.getA(1, 1) / plant.getB(1, 0);
-    m_jKgMetersSquared = m_gearing * gearbox.KtNMPerAmp / (gearbox.rOhms * plant.getB(1, 0));
+    // B = GKₜ/(RJ)
+    // J = GKₜ/(RB)
+    super(
+        plant,
+        gearbox,
+        KilogramSquareMeters.of(
+            gearbox.numMotors
+                * gearbox.reduction
+                * gearbox.motorType.KtNMPerAmp
+                / gearbox.motorType.rOhms
+                / plant.getB(1, 0)),
+        measurementStdDevs);
   }
 
   /**
-   * Sets the state of the DC motor.
+   * Sets the input voltage of the simulated DC motor mechanism.
    *
-   * @param angularPositionRad The new position in radians.
-   * @param angularVelocityRadPerSec The new velocity in radians per second.
-   */
-  public void setState(double angularPositionRad, double angularVelocityRadPerSec) {
-    setState(VecBuilder.fill(angularPositionRad, angularVelocityRadPerSec));
-  }
-
-  /**
-   * Sets the DC motor's angular position.
-   *
-   * @param angularPositionRad The new position in radians.
-   */
-  public void setAngle(double angularPositionRad) {
-    setState(angularPositionRad, getAngularVelocityRadPerSec());
-  }
-
-  /**
-   * Sets the DC motor's angular velocity.
-   *
-   * @param angularVelocityRadPerSec The new velocity in radians per second.
-   */
-  public void setAngularVelocity(double angularVelocityRadPerSec) {
-    setState(getAngularPositionRad(), angularVelocityRadPerSec);
-  }
-
-  /**
-   * Returns the gear ratio of the DC motor.
-   *
-   * @return the DC motor's gear ratio.
-   */
-  public double getGearing() {
-    return m_gearing;
-  }
-
-  /**
-   * Returns the moment of inertia of the DC motor.
-   *
-   * @return The DC motor's moment of inertia.
-   */
-  public double getJKgMetersSquared() {
-    return m_jKgMetersSquared;
-  }
-
-  /**
-   * Returns the gearbox for the DC motor.
-   *
-   * @return The DC motor's gearbox.
-   */
-  public DCMotor getGearbox() {
-    return m_gearbox;
-  }
-
-  /**
-   * Returns the DC motor's position.
-   *
-   * @return The DC motor's position.
-   */
-  public double getAngularPositionRad() {
-    return getOutput(0);
-  }
-
-  /**
-   * Returns the DC motor's position in rotations.
-   *
-   * @return The DC motor's position in rotations.
-   */
-  public double getAngularPositionRotations() {
-    return Units.radiansToRotations(getAngularPositionRad());
-  }
-
-  /**
-   * Returns the DC motor's position.
-   *
-   * @return The DC motor's position
-   */
-  public Angle getAngularPosition() {
-    m_angle.mut_setMagnitude(getAngularPositionRad());
-    return m_angle;
-  }
-
-  /**
-   * Returns the DC motor's velocity.
-   *
-   * @return The DC motor's velocity.
-   */
-  public double getAngularVelocityRadPerSec() {
-    return getOutput(1);
-  }
-
-  /**
-   * Returns the DC motor's velocity in RPM.
-   *
-   * @return The DC motor's velocity in RPM.
-   */
-  public double getAngularVelocityRPM() {
-    return Units.radiansPerSecondToRotationsPerMinute(getAngularVelocityRadPerSec());
-  }
-
-  /**
-   * Returns the DC motor's velocity.
-   *
-   * @return The DC motor's velocity
-   */
-  public AngularVelocity getAngularVelocity() {
-    m_angularVelocity.mut_setMagnitude(getAngularVelocityRadPerSec());
-    return m_angularVelocity;
-  }
-
-  /**
-   * Returns the DC motor's acceleration in Radians Per Second Squared.
-   *
-   * @return The DC motor's acceleration in Radians Per Second Squared.
-   */
-  public double getAngularAccelerationRadPerSecSq() {
-    var acceleration = (m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u));
-    return acceleration.get(0, 0);
-  }
-
-  /**
-   * Returns the DC motor's acceleration.
-   *
-   * @return The DC motor's acceleration.
-   */
-  public AngularAcceleration getAngularAcceleration() {
-    m_angularAcceleration.mut_setMagnitude(getAngularAccelerationRadPerSecSq());
-    return m_angularAcceleration;
-  }
-
-  /**
-   * Returns the DC motor's torque in Newton-Meters.
-   *
-   * @return The DC motor's torque in Newton-Meters.
-   */
-  public double getTorqueNewtonMeters() {
-    return getAngularAccelerationRadPerSecSq() * m_jKgMetersSquared;
-  }
-
-  /**
-   * Returns the DC motor's current draw.
-   *
-   * @return The DC motor's current draw.
-   */
-  public double getCurrentDrawAmps() {
-    // I = V / R - omega / (Kv * R)
-    // Reductions are output over input, so a reduction of 2:1 means the motor is spinning
-    // 2x faster than the output
-    return m_gearbox.getCurrent(m_x.get(1, 0) * m_gearing, m_u.get(0, 0))
-        * Math.signum(m_u.get(0, 0));
-  }
-
-  /**
-   * Gets the input voltage for the DC motor.
-   *
-   * @return The DC motor's input voltage.
-   */
-  public double getInputVoltage() {
-    return getInput(0);
-  }
-
-  /**
-   * Sets the input voltage for the DC motor.
-   *
-   * @param volts The input voltage.
+   * @param volts The input voltage in volts.
    */
   public void setInputVoltage(double volts) {
     setInput(volts);
     clampInput(RobotController.getBatteryVoltage());
+    m_voltage.mut_replace(m_u.get(0, 0), Volts);
+  }
+
+  /**
+   * Sets the input voltage of the simulated DC motor mechanism.
+   *
+   * @param voltage The input voltage.
+   */
+  public void setInputVoltage(Voltage voltage) {
+    setInputVoltage(voltage.in(Volts));
+  }
+
+  @Override
+  public void update(double dtSeconds) {
+    super.update(dtSeconds);
+    m_currentDraw.mut_replace(
+        m_gearbox.currentAmps(m_x.get(1, 0), getInput(0)) * Math.signum(m_u.get(0, 0)), Amps);
+    m_voltage.mut_replace(getInput(0), Volts);
+    m_torque.mut_replace(m_gearbox.torque(m_currentDraw));
   }
 }

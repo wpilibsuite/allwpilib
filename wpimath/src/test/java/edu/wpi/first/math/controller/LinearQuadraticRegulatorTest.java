@@ -13,19 +13,22 @@ import edu.wpi.first.math.Num;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.system.plant.Wheel;
+import edu.wpi.first.math.util.Units;
 import org.junit.jupiter.api.Test;
 
 class LinearQuadraticRegulatorTest {
   @Test
   void testLQROnElevator() {
-    var motors = DCMotor.getVex775Pro(2);
-
     var m = 5.0;
     var r = 0.0181864;
     var G = 1.0;
 
-    var plant = LinearSystemId.createElevatorSystem(motors, m, r, G);
+    var drum = new Wheel(new Gearbox(2, DCMotor.Vex775Pro, G), r);
+
+    var plant = LinearSystemId.createElevatorSystem(drum, m);
 
     var qElms = VecBuilder.fill(0.02, 0.4);
     var rElms = VecBuilder.fill(12.0);
@@ -41,9 +44,9 @@ class LinearQuadraticRegulatorTest {
   void testFourMotorElevator() {
     var dt = 0.020;
 
-    var plant =
-        LinearSystemId.createElevatorSystem(
-            DCMotor.getVex775Pro(4), 8.0, 0.75 * 25.4 / 1000.0, 14.67);
+    var drum = new Wheel(new Gearbox(4, DCMotor.Vex775Pro, 14.67), Units.inchesToMeters(0.75));
+
+    var plant = LinearSystemId.createElevatorSystem(drum, 8.0);
 
     var K =
         new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt)
@@ -55,13 +58,13 @@ class LinearQuadraticRegulatorTest {
 
   @Test
   void testLQROnArm() {
-    var motors = DCMotor.getVex775Pro(2);
-
     var m = 4.0;
     var r = 0.4;
     var G = 100.0;
 
-    var plant = LinearSystemId.createSingleJointedArmSystem(motors, 1d / 3d * m * r * r, G);
+    var gearbox = new Gearbox(2, DCMotor.Vex775Pro, G);
+
+    var plant = LinearSystemId.createSingleJointedArmSystem(gearbox, m, r, r / 2.0);
 
     var qElms = VecBuilder.fill(0.01745, 0.08726);
     var rElms = VecBuilder.fill(12.0);
@@ -159,9 +162,9 @@ class LinearQuadraticRegulatorTest {
   void testLatencyCompensate() {
     var dt = 0.02;
 
-    var plant =
-        LinearSystemId.createElevatorSystem(
-            DCMotor.getVex775Pro(4), 8.0, 0.75 * 25.4 / 1000.0, 14.67);
+    var drum = new Wheel(new Gearbox(4, DCMotor.Vex775Pro, 14.67), Units.inchesToMeters(0.75));
+
+    var plant = LinearSystemId.createElevatorSystem(drum, 8.0);
 
     var regulator =
         new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt);

@@ -32,8 +32,7 @@ public class DCMotorProto implements Protobuf<DCMotor, ProtobufDCMotor> {
         msg.getStallTorque(),
         msg.getStallCurrent(),
         msg.getFreeCurrent(),
-        msg.getFreeSpeed(),
-        1);
+        msg.getFreeSpeed());
   }
 
   @Override
