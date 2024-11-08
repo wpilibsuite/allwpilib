@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <cmath>
 #include <numbers>
-#include <ranges>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -38,11 +37,6 @@ void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data,
 void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data) const {
   ApplyTo(data, [&](int index, Color color) { data[index].SetLED(color); });
 }
-
-// void LEDPattern:ApplyTo(std::range::views::reversed<AddressableLED::LEDData>
-// data) const {
-//   ApplyTo(data, [&](int index, Color color) { data[index].SetLED(color); });
-// }
 
 LEDPattern LEDPattern::Reversed() {
   return LEDPattern{[self = *this](auto data, auto writer) {
