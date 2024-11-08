@@ -127,7 +127,7 @@ public class TimedRobot extends IterativeRobotBase {
       if (currentTime == 0) {
         break;
       }
-      Timer.s_loopTimestamp = currentTime / 1000000.0;
+      Timer.setLoopTimestamp(currentTime / 1000000.0);
 
       callback.func.run();
 

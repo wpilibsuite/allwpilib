@@ -34,8 +34,6 @@ units::second_t GetTime();
  * the timer so Get() won't return a negative duration.
  */
 class Timer {
-  friend class TimedRobot;
-
  public:
   /**
    * Create a new timer object.
@@ -132,15 +130,26 @@ class Timer {
 
   /**
    * Return the system clock time in seconds for the start of the current
-   * periodic loop. This is in the same time base as getFPGATimestamp(), but is
+   * periodic loop. This is in the same time base as GetFPGATimestamp(), but is
    * stable through a loop. This value is only valid for robot programs that use
    * TimedRobot. It is updated at the beginning of every periodic callback
-   * (including the normal periodic loop).
+   * (including the normal periodic loop). Calling this from threads other than
+   * than the main periodic loop has undefined behavior.
    *
    * @return Robot running time in seconds, as of the start of the current
    * periodic function.
    */
   static units::second_t GetLoopTimestamp() { return s_loopTimestamp; }
+
+  /**
+   * Sets the timestamp returned by GetLoopTimestamp(). Intended for library
+   * use; calling this from team code may result in unexpected behavior.
+   *
+   * @param timestamp timestamp in seconds
+   */
+  static void SetLoopTimestamp(units::second_t timestamp) {
+    s_loopTimestamp = timestamp;
+  }
 
   /**
    * Return the approximate match time.

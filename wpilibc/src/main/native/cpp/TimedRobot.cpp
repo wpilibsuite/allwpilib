@@ -46,7 +46,7 @@ void TimedRobot::StartCompetition() {
     if (currentTime.count() == 0 || status != 0) {
       break;
     }
-    Timer::s_loopTimestamp = currentTime;
+    Timer::SetLoopTimestamp(currentTime);
 
     callback.func();
 

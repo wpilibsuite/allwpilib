@@ -11,7 +11,7 @@ package edu.wpi.first.wpilibj;
  * get() won't return a negative duration.
  */
 public class Timer {
-  static double s_loopTimestamp;
+  private static double s_loopTimestamp;
 
   /**
    * Return the system clock time in seconds. Return the time from the FPGA hardware clock in
@@ -27,12 +27,23 @@ public class Timer {
    * Return the system clock time in seconds for the start of the current periodic loop. This is
    * in the same time base as getFPGATimestamp(), but is stable through a loop. This value is only
    * valid for robot programs that use TimedRobot. It is updated at the beginning of every periodic
-   * callback (including the normal periodic loop).
+   * callback (including the normal periodic loop). Calling this from threads other than than the
+   * main periodic loop has undefined behavior.
    *
    * @return Robot running time in seconds, as of the start of the current periodic function.
    */
   public static double getLoopTimestamp() {
     return s_loopTimestamp;
+  }
+
+  /**
+   * Sets the timestamp returned by getLoopTimestamp(). Intended for library use; calling this from
+   * team code may result in unexpected behavior.
+   *
+   * @param timestamp timestamp in seconds
+   */
+  public static void setLoopTimestamp(double timestamp) {
+    s_loopTimestamp = timestamp;
   }
 
   /**
