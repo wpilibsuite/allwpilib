@@ -109,11 +109,13 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
 
   /**
    * Take the sign of another measure.
+   *
    * @param other measure from which to take sign
    * @return a new measure with the sign from another measure
    */
   default Measure<U> copySign(Measure<U> other) {
-    return Math.signum(other.baseUnitMagnitude()) == Math.signum(this.baseUnitMagnitude()) ? this : times(-1);
+    if (other.isEquivalent(baseUnit().zero()) && baseUnitMagnitude() < 0.0) return times(-1);
+    else return times(other).baseUnitMagnitude() >= 0.0 ? this : times(-1);
   }
 
   /**
