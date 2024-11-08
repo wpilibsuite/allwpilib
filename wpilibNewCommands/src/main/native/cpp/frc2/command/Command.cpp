@@ -192,12 +192,12 @@ void Command::EnsureDisjointRequirements(Command* toAdd) {
   auto&& requirementsToAdd = toAdd->GetRequirements();
   for (auto&& requirement : this->GetRequirements()) {
     if (requirementsToAdd.find(requirement) != requirementsToAdd.end()) {
-      sharedRequirementsStr.append(requirement->GetName());
       if (!hasSharedRequirements) {
         hasSharedRequirements = true; // ensures formatting like "a, b, c"
       } else {
         sharedRequirementsStr.append(", ");
       }
+      sharedRequirementsStr.append(requirement->GetName());
     }
   }
   if (hasSharedRequirements) {
