@@ -34,6 +34,8 @@ units::second_t GetTime();
  * the timer so Get() won't return a negative duration.
  */
 class Timer {
+  friend class TimedRobot;
+
  public:
   /**
    * Create a new timer object.
@@ -129,6 +131,18 @@ class Timer {
   static units::second_t GetFPGATimestamp();
 
   /**
+   * Return the system clock time in seconds for the start of the current
+   * periodic loop. This is in the same time base as getFPGATimestamp(), but is
+   * stable through a loop. This value is only valid for robot programs that use
+   * TimedRobot. It is updated at the beginning of every periodic callback
+   * (including the normal periodic loop).
+   *
+   * @return Robot running time in seconds, as of the start of the current
+   * periodic function.
+   */
+  static units::second_t GetLoopTimestamp() { return s_loopTimestamp; }
+
+  /**
    * Return the approximate match time.
    *
    * The FMS does not send an official match time to the robots, but does send
@@ -146,6 +160,7 @@ class Timer {
   static units::second_t GetMatchTime();
 
  private:
+  static units::second_t s_loopTimestamp;
   units::second_t m_startTime = 0_s;
   units::second_t m_accumulatedTime = 0_s;
   bool m_running = false;

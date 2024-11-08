@@ -14,6 +14,7 @@
 #include <hal/Notifier.h>
 
 #include "frc/Errors.h"
+#include "frc/Timer.h"
 
 using namespace frc;
 
@@ -45,6 +46,7 @@ void TimedRobot::StartCompetition() {
     if (currentTime.count() == 0 || status != 0) {
       break;
     }
+    Timer::s_loopTimestamp = currentTime;
 
     callback.func();
 

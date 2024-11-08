@@ -30,6 +30,8 @@ units::second_t GetTime() {
 
 using namespace frc;
 
+units::second_t Timer::s_loopTimestamp = 0_s;
+
 Timer::Timer() {
   Reset();
 }
