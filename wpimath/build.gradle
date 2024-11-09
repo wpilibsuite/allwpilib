@@ -52,8 +52,6 @@ cppHeadersZip {
     }
 }
 
-cppHeadersZip.dependsOn generateProto
-
 model {
     components {
         all {
