@@ -1,7 +1,6 @@
 apply from: "${rootDir}/shared/resources.gradle"
 
 ext {
-    skipproto = true
     noWpiutil = true
     skipJniSymbols = [
         'Java_edu_wpi_first_util_CombinedRuntimeLoader_setDllDirectory'

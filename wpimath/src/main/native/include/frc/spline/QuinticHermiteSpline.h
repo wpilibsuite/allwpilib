@@ -154,7 +154,5 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
 };
 }  // namespace frc
 
-#ifndef NO_PROTOBUF
 #include "frc/spline/proto/QuinticHermiteSplineProto.h"
-#endif
 #include "frc/spline/struct/QuinticHermiteSplineStruct.h"

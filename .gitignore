@@ -255,6 +255,3 @@ bazel_auth.rc
 
 # ctest
 /Testing/
-
-# protobuf
-!wpiprotoplugin.jar

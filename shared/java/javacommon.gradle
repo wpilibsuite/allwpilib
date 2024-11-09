@@ -1,7 +1,6 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
-apply plugin: 'com.google.protobuf'
 
 def baseArtifactId = project.baseId
 def artifactGroupId = project.groupId
@@ -141,37 +140,5 @@ jacocoTestReport {
     reports {
         xml.required = true
         html.required = true
-    }
-}
-
-protobuf {
-    protoc {
-        artifact = 'com.google.protobuf:protoc:3.21.12'
-    }
-    plugins {
-        wpilib {
-            path = rootProject.file("protoplugin/binary/wpiprotoplugin.jar")
-        }
-    }
-    generateProtoTasks {
-        all().configureEach { task ->
-            if (project.hasProperty('skipproto')) {
-                task.builtins {
-                    cpp {}
-                    remove java
-                }
-                return
-            }
-            task.inputs.file(rootProject.file("protoplugin/binary/wpiprotoplugin.jar"))
-            task.plugins {
-                wpilib {
-                    outputSubDir = 'cpp'
-                }
-            }
-            task.builtins {
-                cpp {}
-                remove java
-            }
-        }
     }
 }

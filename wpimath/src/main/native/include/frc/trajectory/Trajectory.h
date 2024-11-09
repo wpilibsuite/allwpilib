@@ -272,7 +272,5 @@ void from_json(const wpi::json& json, Trajectory::State& state);
 
 }  // namespace frc
 
-#ifndef NO_PROTOBUF
 #include "frc/trajectory/proto/TrajectoryProto.h"
 #include "frc/trajectory/proto/TrajectoryStateProto.h"
-#endif

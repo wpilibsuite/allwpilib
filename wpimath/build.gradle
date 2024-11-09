@@ -43,10 +43,6 @@ cppHeadersZip {
     from('src/main/native/thirdparty/gcem/include') {
         into '/'
     }
-    from("$buildDir/generated/source/proto/main/cpp") {
-        into '/wpimath/protobuf'
-        include '*.h'
-    }
     from("src/generated/main/native/cpp/wpimath/protobuf") {
         into '/wpimath/protobuf'
         include '**/*.h'
@@ -55,8 +51,6 @@ cppHeadersZip {
         into '/'
     }
 }
-
-cppHeadersZip.dependsOn generateProto
 
 model {
     components {

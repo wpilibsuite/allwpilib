@@ -163,7 +163,5 @@ constexpr Transform3d Transform3d::operator+(const Transform3d& other) const {
 
 }  // namespace frc
 
-#ifndef NO_PROTOBUF
 #include "frc/geometry/proto/Transform3dProto.h"
-#endif
 #include "frc/geometry/struct/Transform3dStruct.h"
