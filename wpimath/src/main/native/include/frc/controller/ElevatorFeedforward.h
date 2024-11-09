@@ -262,7 +262,5 @@ class ElevatorFeedforward {
 };
 }  // namespace frc
 
-#ifndef NO_PROTOBUF
 #include "frc/controller/proto/ElevatorFeedforwardProto.h"
-#endif
 #include "frc/controller/struct/ElevatorFeedforwardStruct.h"

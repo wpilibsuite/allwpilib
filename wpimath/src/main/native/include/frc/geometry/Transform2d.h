@@ -155,7 +155,5 @@ constexpr Transform2d Transform2d::operator+(const Transform2d& other) const {
 
 }  // namespace frc
 
-#ifndef NO_PROTOBUF
 #include "frc/geometry/proto/Transform2dProto.h"
-#endif
 #include "frc/geometry/struct/Transform2dStruct.h"
