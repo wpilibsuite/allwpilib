@@ -8,6 +8,11 @@
 
 using namespace nt::server;
 
+// Suppress false positive -Wmaybe-uninitialized warning from GCC 14
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 ServerClientLocal::ServerClientLocal(ServerStorage& storage, int id,
                                      wpi::Logger& logger)
     : ServerClient4Base{"", "", true, [](uint32_t) {}, storage, id, logger} {
@@ -19,6 +24,9 @@ ServerClientLocal::ServerClientLocal(ServerStorage& storage, int id,
   UpdateMetaClientPub();
   UpdateMetaClientSub();
 }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
 void ServerClientLocal::SendValue(ServerTopic* topic, const Value& value,
                                   net::ValueSendMode mode) {
