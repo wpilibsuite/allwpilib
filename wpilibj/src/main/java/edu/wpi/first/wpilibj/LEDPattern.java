@@ -93,6 +93,18 @@ import java.util.function.DoubleSupplier;
  */
 @FunctionalInterface
 public interface LEDPattern {
+  /** A functional interface for index mapping functions. */
+  @FunctionalInterface
+  interface IndexMapper {
+    /**
+     * Maps the index.
+     *
+     * @param bufLen Length of the buffer
+     * @param index The index to map
+     */
+    int apply(int bufLen, int index);
+  }
+
   /**
    * Writes the pattern to an LED buffer. Dynamic animations should be called periodically (such as
    * with a command or with a periodic method) to refresh the buffer over time.
@@ -130,6 +142,41 @@ public interface LEDPattern {
   }
 
   /**
+   * Creates a pattern with remapped indices.
+   *
+   * @param indexMapper the index mapper
+   * @return the mapped pattern
+   */
+  default LEDPattern mapIndex(IndexMapper indexMapper) {
+    return (reader, writer) -> {
+      int bufLen = reader.getLength();
+      applyTo(
+          new LEDReader() {
+            @Override
+            public int getLength() {
+              return reader.getLength();
+            }
+
+            @Override
+            public int getRed(int index) {
+              return reader.getRed(indexMapper.apply(bufLen, index));
+            }
+
+            @Override
+            public int getGreen(int index) {
+              return reader.getGreen(indexMapper.apply(bufLen, index));
+            }
+
+            @Override
+            public int getBlue(int index) {
+              return reader.getBlue(indexMapper.apply(bufLen, index));
+            }
+          },
+          (i, r, g, b) -> writer.setRGB(indexMapper.apply(bufLen, i), r, g, b));
+    };
+  }
+
+  /**
    * Creates a pattern that displays this one in reverse. Scrolling patterns will scroll in the
    * opposite direction (but at the same speed). It will treat the end of an LED strip as the start,
    * and the start of the strip as the end. This can be useful for making ping-pong patterns that
@@ -143,32 +190,7 @@ public interface LEDPattern {
    * @see AddressableLEDBufferView#reversed()
    */
   default LEDPattern reversed() {
-    return (reader, writer) -> {
-      int bufLen = reader.getLength();
-      applyTo(
-          new LEDReader() {
-            @Override
-            public int getLength() {
-              return reader.getLength();
-            }
-
-            @Override
-            public int getRed(int index) {
-              return reader.getRed(getLength() - 1 - index);
-            }
-
-            @Override
-            public int getGreen(int index) {
-              return reader.getGreen(getLength() - 1 - index);
-            }
-
-            @Override
-            public int getBlue(int index) {
-              return reader.getBlue(getLength() - 1 - index);
-            }
-          },
-          (i, r, g, b) -> writer.setRGB((bufLen - 1) - i, r, g, b));
-    };
+    return mapIndex((length, index) -> length - 1 - index);
   }
 
   /**
@@ -179,15 +201,7 @@ public interface LEDPattern {
    * @return the offset pattern
    */
   default LEDPattern offsetBy(int offset) {
-    return (reader, writer) -> {
-      int bufLen = reader.getLength();
-      applyTo(
-          LEDReader.RemappedReader.offset(reader, offset),
-          (i, r, g, b) -> {
-            int shiftedIndex = Math.floorMod(i + offset, bufLen);
-            writer.setRGB(shiftedIndex, r, g, b);
-          });
-    };
+    return mapIndex((length, index) -> Math.floorMod(index + offset, length));
   }
 
   /**
@@ -211,23 +225,16 @@ public interface LEDPattern {
   default LEDPattern scrollAtRelativeSpeed(Frequency velocity) {
     final double periodMicros = velocity.asPeriod().in(Microseconds);
 
-    return (reader, writer) -> {
-      int bufLen = reader.getLength();
-      long now = WPIUtilJNI.now();
+    return mapIndex(
+        (bufLen, index) -> {
+          long now = WPIUtilJNI.now();
 
-      // index should move by (buf.length) / (period)
-      double t = (now % (long) periodMicros) / periodMicros;
-      int offset = (int) (t * bufLen);
+          // index should move by (buf.length) / (period)
+          double t = (now % (long) periodMicros) / periodMicros;
+          int offset = (int) (t * bufLen);
 
-      applyTo(
-          LEDReader.RemappedReader.offset(reader, offset),
-          (i, r, g, b) -> {
-            // floorMod so if the offset is negative, we still get positive outputs
-            int shiftedIndex = Math.floorMod(i + offset, bufLen);
-
-            writer.setRGB(shiftedIndex, r, g, b);
-          });
-    };
+          return Math.floorMod(index + offset, bufLen);
+        });
   }
 
   /**
@@ -262,22 +269,16 @@ public interface LEDPattern {
     var metersPerMicro = velocity.in(Meters.per(Microsecond));
     var microsPerLED = (int) (ledSpacing.in(Meters) / metersPerMicro);
 
-    return (reader, writer) -> {
-      int bufLen = reader.getLength();
-      long now = WPIUtilJNI.now();
+    return mapIndex(
+        (bufLen, index) -> {
+          long now = WPIUtilJNI.now();
 
-      // every step in time that's a multiple of microsPerLED will increment the offset by 1
-      var offset = (int) (now / microsPerLED);
+          // every step in time that's a multiple of microsPerLED will increment the offset by 1
+          var offset = (int) (now / microsPerLED);
 
-      applyTo(
-          LEDReader.RemappedReader.offset(reader, offset),
-          (i, r, g, b) -> {
-            // floorMod so if the offset is negative, we still get positive outputs
-            int shiftedIndex = Math.floorMod(i + offset, bufLen);
-
-            writer.setRGB(shiftedIndex, r, g, b);
-          });
-    };
+          // floorMod so if the offset is negative, we still get positive outputs
+          return Math.floorMod(index + offset, bufLen);
+        });
   }
 
   /**
