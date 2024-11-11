@@ -24,15 +24,15 @@ namespace gui = wpi::gui;
 
 const char* GetWPILibVersion();
 
-namespace ov {
-std::string_view GetResource_ov_16_png();
-std::string_view GetResource_ov_32_png();
-std::string_view GetResource_ov_48_png();
-std::string_view GetResource_ov_64_png();
-std::string_view GetResource_ov_128_png();
-std::string_view GetResource_ov_256_png();
-std::string_view GetResource_ov_512_png();
-}  // namespace ov
+namespace wpical {
+std::string_view GetResource_wpical_16_png();
+std::string_view GetResource_wpical_32_png();
+std::string_view GetResource_wpical_48_png();
+std::string_view GetResource_wpical_64_png();
+std::string_view GetResource_wpical_128_png();
+std::string_view GetResource_wpical_256_png();
+std::string_view GetResource_wpical_512_png();
+}  // namespace wpical
 
 void drawCheck() {
   ImGui::SameLine();
@@ -554,13 +554,13 @@ int main(int argc, char** argv) {
 
   gui::CreateContext();
 
-  gui::AddIcon(ov::GetResource_ov_16_png());
-  gui::AddIcon(ov::GetResource_ov_32_png());
-  gui::AddIcon(ov::GetResource_ov_48_png());
-  gui::AddIcon(ov::GetResource_ov_64_png());
-  gui::AddIcon(ov::GetResource_ov_128_png());
-  gui::AddIcon(ov::GetResource_ov_256_png());
-  gui::AddIcon(ov::GetResource_ov_512_png());
+  gui::AddIcon(wpical::GetResource_wpical_16_png());
+  gui::AddIcon(wpical::GetResource_wpical_32_png());
+  gui::AddIcon(wpical::GetResource_wpical_48_png());
+  gui::AddIcon(wpical::GetResource_wpical_64_png());
+  gui::AddIcon(wpical::GetResource_wpical_128_png());
+  gui::AddIcon(wpical::GetResource_wpical_256_png());
+  gui::AddIcon(wpical::GetResource_wpical_512_png());
 
   gui::AddLateExecute(DisplayGui);
 

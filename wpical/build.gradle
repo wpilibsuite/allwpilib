@@ -94,6 +94,7 @@ nativeUtils.platformConfigs.each {
         it.cppCompiler.args.add("-Wno-deprecated-declarations")
         it.cppCompiler.args.remove("-permissive")
         it.cppCompiler.args.add("-fpermissive")
+        it.cppCompiler.args.add("-Wno-maybe-uninitialized")
     } else {
         it.cCompiler.args.add("-Wno-format-nonliteral")
         it.cCompiler.args.remove("-pedantic")
@@ -112,6 +113,7 @@ nativeUtils.platformConfigs.each {
         it.cppCompiler.args.add("-Wno-deprecated-declarations")
         it.cppCompiler.args.remove("-permissive")
         it.cppCompiler.args.add("-fpermissive")
+        it.cppCompiler.args.add("-Wno-maybe-uninitialized")
     }
 }
 
