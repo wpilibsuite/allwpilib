@@ -4,27 +4,39 @@
 
 #include "frc/kinematics/proto/SwerveModulePositionProto.h"
 
-#include <wpi/ProtoHelper.h>
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "kinematics.pb.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
-google::protobuf::Message* wpi::Protobuf<frc::SwerveModulePosition>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufSwerveModulePosition>(arena);
-}
+std::optional<frc::SwerveModulePosition>
+wpi::Protobuf<frc::SwerveModulePosition>::Unpack(InputStream& stream) {
+  wpi::UnpackCallback<frc::Rotation2d> angle;
+  wpi_proto_ProtobufSwerveModulePosition msg{
+      .distance = 0,
+      .angle = angle.Callback(),
+  };
+  if (!stream.Decode(msg)) {
+    return {};
+  }
 
-frc::SwerveModulePosition wpi::Protobuf<frc::SwerveModulePosition>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufSwerveModulePosition*>(&msg);
+  auto iangle = angle.Items();
+
+  if (iangle.empty()) {
+    return {};
+  }
+
   return frc::SwerveModulePosition{
-      units::meter_t{m->distance()},
-      wpi::UnpackProtobuf<frc::Rotation2d>(m->wpi_angle()),
+      units::meter_t{msg.distance},
+      iangle[0],
   };
 }
 
-void wpi::Protobuf<frc::SwerveModulePosition>::Pack(
-    google::protobuf::Message* msg, const frc::SwerveModulePosition& value) {
-  auto m = static_cast<wpi::proto::ProtobufSwerveModulePosition*>(msg);
-  m->set_distance(value.distance.value());
-  wpi::PackProtobuf(m->mutable_angle(), value.angle);
+bool wpi::Protobuf<frc::SwerveModulePosition>::Pack(
+    OutputStream& stream, const frc::SwerveModulePosition& value) {
+  wpi::PackCallback angle{&value.angle};
+  wpi_proto_ProtobufSwerveModulePosition msg{
+      .distance = value.distance.value(),
+      .angle = angle.Callback(),
+  };
+  return stream.Encode(msg);
 }

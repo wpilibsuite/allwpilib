@@ -119,10 +119,13 @@ file(
     src/main/native/thirdparty/json/cpp/*.cpp
     src/main/native/thirdparty/llvm/cpp/*.cpp
     src/main/native/thirdparty/mpack/src/*.cpp
+    src/main/native/thirdparty/nanopb/src/*.cpp
 )
 list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
 if(NOT WITH_PROTOBUF)
     list(FILTER wpiutil_native_src EXCLUDE REGEX "/protobuf/")
+    # Don't filter out protobuf cpp file, it only uses nanopb
+    list(APPEND wpiutil_native_src src/main/native/cpp/protobuf/Protobuf.cpp)
 endif()
 file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
 file(GLOB_RECURSE wpiutil_linux_src src/main/native/linux/*.cpp)
@@ -200,6 +203,7 @@ install(
         src/main/native/thirdparty/llvm/include/
         src/main/native/thirdparty/memory/include/
         src/main/native/thirdparty/mpack/include/
+        src/main/native/thirdparty/nanopb/include/
         src/main/native/thirdparty/sigslot/include/
     DESTINATION "${include_dest}/wpiutil"
 )
@@ -213,6 +217,7 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/memory/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/nanopb/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sigslot/include>
         $<INSTALL_INTERFACE:${include_dest}/wpiutil>
 )
@@ -241,6 +246,9 @@ if(WITH_TESTS)
     target_include_directories(wpiutil_testlib INTERFACE src/test/native/include)
 
     wpilib_add_test(wpiutil src/test/native/cpp)
+    target_include_directories(wpiutil_test PRIVATE src/generated/test/native/cpp)
+    file(GLOB_RECURSE wpiutil_nanopb_test_src src/generated/test/native/cpp/*.cpp)
+    target_sources(wpiutil_test PRIVATE ${wpiutil_nanopb_test_src})
     target_link_libraries(wpiutil_test wpiutil googletest wpiutil_testlib)
     if(MSVC)
         target_compile_options(wpiutil_test PRIVATE /utf-8)

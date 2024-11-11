@@ -10,7 +10,6 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.controller.proto.ElevatorFeedforwardProto;
 import edu.wpi.first.math.controller.struct.ElevatorFeedforwardStruct;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
@@ -34,9 +33,6 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
 
   /** The period, in seconds. */
   private final double m_dt;
-
-  /** The calculated output voltage measure. */
-  private final MutVoltage output = Volts.mutable(0.0);
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains and period.
@@ -189,25 +185,21 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
   public Voltage calculate(LinearVelocity currentVelocity, LinearVelocity nextVelocity) {
     // See wpimath/algorithms.md#Elevator_feedforward for derivation
     if (ka == 0.0) {
-      output.mut_replace(
+      return Volts.of(
           ks * Math.signum(nextVelocity.in(MetersPerSecond))
               + kg
-              + kv * nextVelocity.in(MetersPerSecond),
-          Volts);
-      return output;
+              + kv * nextVelocity.in(MetersPerSecond));
     } else {
       double A = -kv / ka;
       double B = 1.0 / ka;
       double A_d = Math.exp(A * m_dt);
       double B_d = 1.0 / A * (A_d - 1.0) * B;
-      output.mut_replace(
+      return Volts.of(
           kg
               + ks * Math.signum(currentVelocity.magnitude())
               + 1.0
                   / B_d
-                  * (nextVelocity.in(MetersPerSecond) - A_d * currentVelocity.in(MetersPerSecond)),
-          Volts);
-      return output;
+                  * (nextVelocity.in(MetersPerSecond) - A_d * currentVelocity.in(MetersPerSecond)));
     }
   }
 

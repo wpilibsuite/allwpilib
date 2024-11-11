@@ -1,2 +1,0 @@
-#!/bin/sh
-exec "@Java_JAVA_EXECUTABLE@" -jar "@PROTO_JAR@" "$@"

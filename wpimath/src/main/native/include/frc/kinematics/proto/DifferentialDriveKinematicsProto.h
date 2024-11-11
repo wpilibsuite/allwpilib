@@ -8,12 +8,15 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/kinematics/DifferentialDriveKinematics.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DifferentialDriveKinematics> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::DifferentialDriveKinematics Unpack(
-      const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
+  using MessageStruct = wpi_proto_ProtobufDifferentialDriveKinematics;
+  using InputStream = wpi::ProtoInputStream<frc::DifferentialDriveKinematics>;
+  using OutputStream = wpi::ProtoOutputStream<frc::DifferentialDriveKinematics>;
+  static std::optional<frc::DifferentialDriveKinematics> Unpack(
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
                    const frc::DifferentialDriveKinematics& value);
 };

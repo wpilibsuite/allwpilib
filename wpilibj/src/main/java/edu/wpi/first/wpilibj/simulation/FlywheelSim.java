@@ -15,8 +15,6 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.MutAngularAcceleration;
-import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated flywheel mechanism. */
@@ -29,12 +27,6 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
 
   // The moment of inertia for the flywheel mechanism.
   private final double m_jKgMetersSquared;
-
-  // The angular velocity of the system.
-  private final MutAngularVelocity m_angularVelocity = RadiansPerSecond.mutable(0);
-
-  // The angular acceleration of the system.
-  private final MutAngularAcceleration m_angularAcceleration = RadiansPerSecondPerSecond.mutable(0);
 
   /**
    * Creates a simulated flywheel mechanism.
@@ -132,8 +124,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @return The flywheel's velocity
    */
   public AngularVelocity getAngularVelocity() {
-    m_angularVelocity.mut_setMagnitude(getAngularVelocityRadPerSec());
-    return m_angularVelocity;
+    return RadiansPerSecond.of(getAngularVelocityRadPerSec());
   }
 
   /**
@@ -152,8 +143,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @return The flywheel's acceleration.
    */
   public AngularAcceleration getAngularAcceleration() {
-    m_angularAcceleration.mut_setMagnitude(getAngularAccelerationRadPerSecSq());
-    return m_angularAcceleration;
+    return RadiansPerSecondPerSecond.of(getAngularAccelerationRadPerSecSq());
   }
 
   /**

@@ -8,12 +8,15 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/kinematics/MecanumDriveWheelSpeeds.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::MecanumDriveWheelSpeeds> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::MecanumDriveWheelSpeeds Unpack(
-      const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
+  using MessageStruct = wpi_proto_ProtobufMecanumDriveWheelSpeeds;
+  using InputStream = wpi::ProtoInputStream<frc::MecanumDriveWheelSpeeds>;
+  using OutputStream = wpi::ProtoOutputStream<frc::MecanumDriveWheelSpeeds>;
+  static std::optional<frc::MecanumDriveWheelSpeeds> Unpack(
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
                    const frc::MecanumDriveWheelSpeeds& value);
 };

@@ -199,28 +199,28 @@ class SimpleMotorFeedforward {
    *
    * @return The static gain.
    */
-  units::volt_t GetKs() const { return kS; }
+  constexpr units::volt_t GetKs() const { return kS; }
 
   /**
    * Returns the velocity gain.
    *
    * @return The velocity gain.
    */
-  units::unit_t<kv_unit> GetKv() const { return kV; }
+  constexpr units::unit_t<kv_unit> GetKv() const { return kV; }
 
   /**
    * Returns the acceleration gain.
    *
    * @return The acceleration gain.
    */
-  units::unit_t<ka_unit> GetKa() const { return kA; }
+  constexpr units::unit_t<ka_unit> GetKa() const { return kA; }
 
   /**
    * Returns the period.
    *
    * @return The period.
    */
-  units::second_t GetDt() const { return m_dt; }
+  constexpr units::second_t GetDt() const { return m_dt; }
 
  private:
   /** The static gain. */
