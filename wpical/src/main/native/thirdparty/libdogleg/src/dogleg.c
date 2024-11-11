@@ -81,19 +81,19 @@ static void vnlog_debug_emit_legend(void)
   vnlog_debug_reset();
   printf("# iteration step_accepted" VNLOG_DEBUG_FIELDS(VNLOG_DEBUG_SPACE_FIELD_NAME) "\n");
 }
-__attribute__((unused))
+
 static void vnlog_emit_double(double x)
 {
   if(x == INFINITY) printf("- ");
   else              printf("%g ", x);
 }
-__attribute__((unused))
+
 static void vnlog_emit_int(int x)
 {
   if(x == -1) printf("- ");
   else        printf("%d ", x);
 }
-__attribute__((unused))
+
 static void vnlog_emit_vnlog_debug_step_type_t(vnlog_debug_step_type_t x)
 {
 #define VNLOG_DEBUG_STEP_TYPE_SWITCH_EMIT(name,shortname) case name: printf(shortname " "); break;
@@ -191,7 +191,7 @@ static double inner(const double* x, const double* y, unsigned int n)
     result += x[i]*y[i];
   return result;
 }
-__attribute__((unused))
+
 static double inner_withstride(const double* x, const double* y, unsigned int n, unsigned int stride)
 {
   double result = 0;
@@ -214,14 +214,14 @@ static void vec_copy_scaled(double* dest,
   for(int i=0; i<n; i++)
     dest[i] = scale * v[i];
 }
-__attribute__((unused))
+
 static void vec_add(double* dest,
                     const double* v0, const double* v1, int n)
 {
   for(int i=0; i<n; i++)
     dest[i] = v0[i] + v1[i];
 }
-__attribute__((unused))
+
 static void vec_accum(double* dest,
                       const double* v, int n)
 {
@@ -1790,9 +1790,9 @@ static void accum_outlierness_factor(// output
          x[1]*x[1]*B11_det) / det;
 
       // norm2(Bx)
-      __attribute__((unused)) double v1 = x[0]*B00_det + x[1]*B01_det;
-      __attribute__((unused)) double v2 = x[0]*B01_det + x[1]*B11_det;
-      __attribute__((unused)) double xBBx = (v1*v1 + v2*v2) / (det*det);
+       double v1 = x[0]*B00_det + x[1]*B01_det;
+       double v2 = x[0]*B01_det + x[1]*B11_det;
+       double xBBx = (v1*v1 + v2*v2) / (det*det);
 
       // // mine self+others
       // *factor = -xBx;
@@ -2277,10 +2277,10 @@ double dogleg_getOutliernessTrace_newFeature_sparse(const double*            Jqu
   double B00 =  invB11 * det_invB_recip;
   double B11 =  invB00 * det_invB_recip;
 
-  __attribute__((unused))
+  
   double B01 = -invB01 * det_invB_recip;
   double traceB = B00 + B11;
-  __attribute__((unused))
+  
   double traceBB = B00*B00 + 2.0*B01*B01 + B11*B11;
 
 

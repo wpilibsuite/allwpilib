@@ -43,10 +43,10 @@ bool lensmodel_one_validate_args(mrcal_lensmodel_t *mrcal_lensmodel,
                                  bool do_check_layout);
 
 // Empty vector just to pass in so it's not NULL?
-mrcal_point3_t observations_point[0];
+mrcal_point3_t observations_point[1];
 mrcal_pose_t
-    extrinsics_rt_fromref[0]; // Always zero for single camera, it seems?
-mrcal_point3_t points[0];     // Seems to always to be None for single camera?
+    extrinsics_rt_fromref[1]; // Always zero for single camera, it seems?
+mrcal_point3_t points[1];     // Seems to always to be None for single camera?
 
 static std::unique_ptr<mrcal_result> mrcal_calibrate(
     // List, depth is ordered array observation[N frames, object_height,
@@ -269,7 +269,7 @@ bool lensmodel_one_validate_args(mrcal_lensmodel_t *mrcal_lensmodel,
   int NlensParams = mrcal_lensmodel_num_params(mrcal_lensmodel);
   int NlensParams_have = intrinsics.size();
   if (NlensParams != NlensParams_have) {
-    BARF("intrinsics.shape[-1] MUST be %d. Instead got %d", NlensParams,
+    std::fprintf(stderr, "intrinsics.shape[-1] MUST be %d. Instead got %d", NlensParams,
          NlensParams_have);
     return false;
   }

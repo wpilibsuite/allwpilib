@@ -22,10 +22,11 @@ def copy_upstream_src(wpilib_root):
         and not dp.startswith(os.path.join(".", "test")),
         os.path.join(wpical, "src/main/native/thirdparty/mrcal/include"),
     )
-    files = walk_cwd_and_copy_if(
+    files = files + walk_cwd_and_copy_if(
         lambda dp, f: (f.endswith(".c") or f.endswith(".cc") or f.endswith(".pl"))
         and not f.endswith("mrcal-pywrap.c")
         and not f.endswith("image.c")
+        and not f.endswith("stereo.c")
         and not f.endswith("stereo-matching-libelas.cc")
         and not f.endswith("uncertainty.c")
         and not dp.startswith(os.path.join(".", "doc"))
@@ -37,8 +38,11 @@ def copy_upstream_src(wpilib_root):
         with open(f) as file:
             content = file.read()
         content = content.replace("#warning", "// #warning")
+        content = content.replace('__attribute__ ((visibility ("hidden")))', "")
+        content = content.replace("__attribute__((unused))", "")
         with open(f, "w") as file:
             file.write(content)
+
 
 def main():
     name = "mrcal"

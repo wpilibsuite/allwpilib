@@ -37,6 +37,7 @@ def copy_upstream_src(wpilib_root):
         with open(f) as file:
             content = file.read()
         content = content.replace("#warning", "// #warning")
+        content = content.replace("__attribute__((unused))", "")
         content = content.replace(
             "#include <cholmod_function.h>", "#include <suitesparse/cholmod_function.h>"
         )

@@ -45,23 +45,17 @@
 
 
 // parametric models have no extra configuration
-typedef struct {} mrcal_LENSMODEL_PINHOLE__config_t;
-typedef struct {} mrcal_LENSMODEL_STEREOGRAPHIC__config_t;
-typedef struct {} mrcal_LENSMODEL_LONLAT__config_t;
-typedef struct {} mrcal_LENSMODEL_LATLON__config_t;
-typedef struct {} mrcal_LENSMODEL_OPENCV4__config_t;
-typedef struct {} mrcal_LENSMODEL_OPENCV5__config_t;
-typedef struct {} mrcal_LENSMODEL_OPENCV8__config_t;
-typedef struct {} mrcal_LENSMODEL_OPENCV12__config_t;
-typedef struct {} mrcal_LENSMODEL_CAHVOR__config_t;
+typedef struct { int dummy; } mrcal_LENSMODEL_PINHOLE__config_t;
+typedef struct { int dummy; } mrcal_LENSMODEL_STEREOGRAPHIC__config_t;
+typedef struct { int dummy; } mrcal_LENSMODEL_LONLAT__config_t;
+typedef struct { int dummy; } mrcal_LENSMODEL_LATLON__config_t;
+typedef struct { int dummy; } mrcal_LENSMODEL_OPENCV4__config_t;
+typedef struct { int dummy; } mrcal_LENSMODEL_OPENCV5__config_t;
+typedef struct { int dummy; } mrcal_LENSMODEL_OPENCV8__config_t;
+typedef struct { int dummy; } mrcal_LENSMODEL_OPENCV12__config_t;
+typedef struct { int dummy; } mrcal_LENSMODEL_CAHVOR__config_t;
 
 #define _MRCAL_ITEM_DEFINE_ELEMENT(name, type, pybuildvaluecode, PRIcode,SCNcode, bitfield, cookie) type name bitfield;
-
-#ifndef __cplusplus
-// This barfs with g++ 4.8, so I disable it for C++ in general. Checking it for
-// C code is sufficient
-_Static_assert(sizeof(uint16_t) == sizeof(unsigned short int), "I need a short to be 16-bit. Py_BuildValue doesn't let me just specify that. H means 'unsigned short'");
-#endif
 
 // Configuration for CAHVORE. These are given as an an
 // "X macro": https://en.wikipedia.org/wiki/X_Macro
@@ -128,7 +122,7 @@ typedef struct
     union
     {
 #define CONFIG_STRUCT(s,n) mrcal_ ##s##__config_t s##__config;
-        MRCAL_LENSMODEL_LIST(CONFIG_STRUCT);
+        MRCAL_LENSMODEL_LIST(CONFIG_STRUCT)
 #undef CONFIG_STRUCT
     };
 } mrcal_lensmodel_t;
@@ -187,7 +181,7 @@ typedef struct
 // is used to identify a specific camera, while the "extrinsics" index is used
 // to locate a camera in space. If I have a camera that is moving over time, the
 // intrinsics index will remain the same, while the extrinsics index will change
-#warning "triangulated-solve: there should be a pool of these, and I should be indexing that pool"
+// #warning "triangulated-solve: there should be a pool of these, and I should be indexing that pool"
 typedef struct
 {
     // indexes the intrinsics array
@@ -221,26 +215,26 @@ typedef struct
     int                  i_point;
 } mrcal_observation_point_t;
 
-#warning "triangulated-solve: triangulated points into a pool. maybe allowing the intrinsics to move in the process"
+// #warning "triangulated-solve: triangulated points into a pool. maybe allowing the intrinsics to move in the process"
 
 // An observation of a discrete point where the point itself is NOT a part of
 // the optimization, but computed implicitly via triangulation. This structure
 // is very similar to mrcal_observation_point_t, except instead of i_point
 // identifying the point being observed we have
-#warning "triangulated-solve: FINISH DOC"
+// #warning "triangulated-solve: FINISH DOC"
 typedef struct
 {
     // which camera is making this observation
     mrcal_camera_index_t icam;
 
-#warning "triangulated-solve: DOCUMENT. CAN THIS BIT FIELD BE PACKED NICELY?"
+// #warning "triangulated-solve: DOCUMENT. CAN THIS BIT FIELD BE PACKED NICELY?"
     // Set if this is the last camera observing this point. Any set of N>=2
     // cameras can observe any point. All observations of a given point are
     // stored consecutively, the last one being noted by this bit
-#warning "triangulated-solve: do I really need this? I cannot look at the next observation to determine when this one is done?"
+// #warning "triangulated-solve: do I really need this? I cannot look at the next observation to determine when this one is done?"
     bool                 last_in_set : 1;
 
-#warning "triangulated-solve: this is temporary. Should be a weight in observations_point_pool like all the other observations"
+// #warning "triangulated-solve: this is temporary. Should be a weight in observations_point_pool like all the other observations"
     bool                 outlier     : 1;
 
     // Observed pixel coordinates. This works just like elements of
@@ -249,7 +243,7 @@ typedef struct
 } mrcal_observation_point_triangulated_t;
 
 
-#warning "triangulated-solve: need a function to identify a vanilla calibration problem. It needs to not include any triangulated points. The noise propagation is different"
+// #warning "triangulated-solve: need a function to identify a vanilla calibration problem. It needs to not include any triangulated points. The noise propagation is different"
 
 
 // Bits indicating which parts of the optimization problem being solved. We can
@@ -275,8 +269,8 @@ typedef struct
     // If true, optimize the shape of the calibration object
     bool do_optimize_calobject_warp         : 1;
 
-#warning "triangulated-solve: Need finer-grained regularization flags"
-#warning "triangulated-solve: Regularization flags should reflect do_optimize stuff and Ncameras stuff"
+// #warning "triangulated-solve: Need finer-grained regularization flags"
+// #warning "triangulated-solve: Regularization flags should reflect do_optimize stuff and Ncameras stuff"
     // If true, apply the regularization terms in the solver
     bool do_apply_regularization            : 1;
 
@@ -325,7 +319,7 @@ typedef struct
     /* observation produces two measurements. Note that this INCLUDES any */ \
     /* outliers that were passed-in at the start */                     \
     _(int,            Noutliers_triangulated_point,     PyLong_FromLong)
-#warning "triangulated-solve: implement stats.Noutliers_triangulated_point; add to c-api.org"
+// #warning "triangulated-solve: implement stats.Noutliers_triangulated_point; add to c-api.org"
 #define MRCAL_STATS_ITEM_DEFINE(type, name, pyconverter) type name;
 typedef struct
 {
