@@ -178,14 +178,14 @@ class WPILIB_DLLEXPORT PIDController
   constexpr units::second_t GetPeriod() const { return m_period; }
 
   /**
-   * Gets the error tolerance of this controller.
+   * Gets the error tolerance of this controller. Defaults to 0.05.
    *
    * @return The error tolerance of the controller.
    */
   constexpr double GetErrorTolerance() const { return m_errorTolerance; }
 
   /**
-   * Gets the error derivative tolerance of this controller.
+   * Gets the error derivative tolerance of this controller. Defaults to ∞.
    *
    * @return The error derivative tolerance of the controller.
    */
@@ -252,6 +252,8 @@ class WPILIB_DLLEXPORT PIDController
 
   /**
    * Returns true if the error is within the tolerance of the setpoint.
+   * The error tolerance defauls to 0.05, and the error derivative tolerance
+   * defaults to ∞.
    *
    * This will return false until at least one input value has been computed.
    */
