@@ -132,7 +132,7 @@ int cameracalibration::calibrate(const std::string &input_video, float square_wi
     }
 
     // Save calibration output
-    nlohmann::json camera_model = {
+    wpi::json camera_model = {
         {"camera_matrix", std::vector<double>(camera_matrix.begin<double>(), camera_matrix.end<double>())},
         {"distortion_coefficients", std::vector<double>(dist_coeffs.begin<double>(), dist_coeffs.end<double>())},
         {"avg_reprojection_error", repError}};
@@ -298,7 +298,7 @@ int cameracalibration::calibrate(const std::string &input_video, float square_wi
         0.0};
 
     // Save calibration output
-    nlohmann::json result = {
+    wpi::json result = {
         {"camera_matrix", camera_matrix},
         {"distortion_coefficients", distortion_coefficients},
         {"avg_reprojection_error", stats.rms_error}};
@@ -419,7 +419,7 @@ int cameracalibration::calibrate(const std::string &input_video, float square_wi
         0.0};
 
     // Save calibration output
-    nlohmann::json result = {
+    wpi::json result = {
         {"camera_matrix", camera_matrix},
         {"distortion_coefficients", distortion_coefficients},
         {"avg_reprojection_error", stats.rms_error}};
