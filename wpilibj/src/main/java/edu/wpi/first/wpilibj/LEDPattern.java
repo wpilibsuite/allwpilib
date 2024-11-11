@@ -113,14 +113,16 @@ public interface LEDPattern {
    * a write interface. This is most helpful for playing an animated pattern directly on an {@link
    * AddressableLEDBuffer} for the sake of code clarity.
    *
-   * <pre><code>
+   * <pre>
+   * <code>
    *   AddressableLEDBuffer data = new AddressableLEDBuffer(120);
    *   LEDPattern pattern = ...
    *
    *   void periodic() {
    *     pattern.applyTo(data);
    *   }
-   * </code></pre>
+   * </code>
+   * </pre>
    *
    * @param readWriter the object to use for both reading and writing to a set of LEDs
    * @param <T> the type of the object that can both read and write LED data
@@ -178,8 +180,8 @@ public interface LEDPattern {
    * regardless of the total number of LEDs on that strip:
    *
    * <pre>
-   *   LEDPattern rainbow = LEDPattern.rainbow(255, 255);
-   *   LEDPattern scrollingRainbow = rainbow.scrollAtRelativeSpeed(Percent.per(Second).of(25));
+   * LEDPattern rainbow = LEDPattern.rainbow(255, 255);
+   * LEDPattern scrollingRainbow = rainbow.scrollAtRelativeSpeed(Percent.per(Second).of(25));
    * </pre>
    *
    * @param velocity how fast the pattern should move, in terms of how long it takes to do a full
@@ -191,7 +193,7 @@ public interface LEDPattern {
 
     return (reader, writer) -> {
       int bufLen = reader.getLength();
-      long now = Timer.getTimestampMicros();
+      long now = RobotController.getTime();
 
       // index should move by (buf.length) / (period)
       double t = (now % (long) periodMicros) / periodMicros;
@@ -216,12 +218,12 @@ public interface LEDPattern {
    * meter:
    *
    * <pre>
-   *   // LEDs per meter, a known value taken from the spec sheet of our particular LED strip
-   *   Distance LED_SPACING = Meters.of(1.0 / 60);
+   * // LEDs per meter, a known value taken from the spec sheet of our
+   * // particular LED strip
+   * Distance LED_SPACING = Meters.of(1.0 / 60);
    *
-   *   LEDPattern rainbow = LEDPattern.rainbow();
-   *   LEDPattern scrollingRainbow =
-   *     rainbow.scrollAtAbsoluteSpeed(InchesPerSecond.of(4), LED_SPACING);
+   * LEDPattern rainbow = LEDPattern.rainbow();
+   * LEDPattern scrollingRainbow = rainbow.scrollAtAbsoluteSpeed(InchesPerSecond.of(4), LED_SPACING);
    * </pre>
    *
    * <p>Note that this pattern will scroll <i>faster</i> if applied to a less dense LED strip (such
@@ -242,9 +244,10 @@ public interface LEDPattern {
 
     return (reader, writer) -> {
       int bufLen = reader.getLength();
-      long now = Timer.getTimestampMicros();
+      long now = RobotController.getTime();
 
-      // every step in time that's a multiple of microsPerLED will increment the offset by 1
+      // every step in time that's a multiple of microsPerLED will increment the
+      // offset by 1
       var offset = now / microsPerLED;
 
       applyTo(
@@ -271,7 +274,7 @@ public interface LEDPattern {
     final long onTimeMicros = (long) onTime.in(Microseconds);
 
     return (reader, writer) -> {
-      if (Timer.getTimestampMicros() % totalTimeMicros < onTimeMicros) {
+      if (RobotController.getTime() % totalTimeMicros < onTimeMicros) {
         applyTo(reader, writer);
       } else {
         kOff.applyTo(reader, writer);
@@ -323,7 +326,7 @@ public interface LEDPattern {
           reader,
           (i, r, g, b) -> {
             // How far we are in the cycle, in the range [0, 1)
-            double t = (Timer.getTimestampMicros() % periodMicros) / (double) periodMicros;
+            double t = (RobotController.getTime() % periodMicros) / (double) periodMicros;
             double phase = t * 2 * Math.PI;
 
             // Apply the cosine function and shift its output from [-1, 1] to [0, 1]
@@ -433,11 +436,11 @@ public interface LEDPattern {
    * pattern:
    *
    * <pre>
-   *   // Solid red, but at 50% brightness
-   *   LEDPattern.solid(Color.kRed).atBrightness(Percent.of(50));
+   * // Solid red, but at 50% brightness
+   * LEDPattern.solid(Color.kRed).atBrightness(Percent.of(50));
    *
-   *   // Solid white, but at only 10% (i.e. ~0.5V)
-   *   LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(10));
+   * // Solid white, but at only 10% (i.e. ~0.5V)
+   * LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(10));
    * </pre>
    *
    * @param relativeBrightness the multiplier to apply to all channels to modify brightness

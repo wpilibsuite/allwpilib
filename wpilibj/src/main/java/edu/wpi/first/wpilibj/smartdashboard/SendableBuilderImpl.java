@@ -46,7 +46,7 @@ import edu.wpi.first.networktables.Topic;
 import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.function.FloatConsumer;
 import edu.wpi.first.util.function.FloatSupplier;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -180,7 +180,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   /** Update the network table values by calling the getters for all properties. */
   @Override
   public void update() {
-    long time = Timer.getTimestampMicros();
+    long time = RobotController.getTime();
     for (Property<?, ?> property : m_properties) {
       property.update(m_controllable, time);
     }

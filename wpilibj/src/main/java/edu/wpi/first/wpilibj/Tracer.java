@@ -37,7 +37,7 @@ public class Tracer {
 
   /** Restarts the epoch timer. */
   public final void resetTimer() {
-    m_startTime = Timer.getFPGATimestampMicros();
+    m_startTime = RobotController.getFPGATime();
   }
 
   /**
@@ -52,7 +52,7 @@ public class Tracer {
    * @param epochName The name to associate with the epoch.
    */
   public void addEpoch(String epochName) {
-    long currentTime = Timer.getFPGATimestampMicros();
+    long currentTime = RobotController.getFPGATime();
     m_epochs.put(epochName, currentTime - m_startTime);
     m_startTime = currentTime;
   }
@@ -70,7 +70,7 @@ public class Tracer {
    * @param output the stream that the output is sent to
    */
   public void printEpochs(Consumer<String> output) {
-    long now = Timer.getFPGATimestampMicros();
+    long now = RobotController.getFPGATime();
     if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
       StringBuilder sb = new StringBuilder();
       m_lastEpochsPrintTime = now;

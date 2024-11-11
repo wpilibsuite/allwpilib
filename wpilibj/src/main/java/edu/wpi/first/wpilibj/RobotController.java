@@ -23,9 +23,12 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import java.util.function.LongSupplier;
 
 /** Contains functions for roboRIO functionality. */
 public final class RobotController {
+  private static LongSupplier m_timeSource = RobotController::getFPGATime;
+
   // Mutable measures
   private static final MutTime m_mutFPGATime = Microseconds.mutable(0.0);
   private static final MutVoltage m_mutBatteryVoltage = Volts.mutable(0.0);
@@ -92,6 +95,25 @@ public final class RobotController {
    */
   public static int getTeamNumber() {
     return HALUtil.getTeamNumber();
+  }
+
+  /**
+   * Sets a new source to provide the clock time in microseconds. Changing this affects the return
+   * value of {@code getTime} in Java.
+   */
+  public static void setTimeSource(LongSupplier supplier) {
+    m_timeSource = supplier;
+  }
+
+  /**
+   * Read the microsecond timestamp. By default, the time is based on the FPGA hardware clock in
+   * microseconds since the FPGA started. However, the return value of this method may be modified
+   * to use any time base, including non-monotonic and non-continuous time bases.
+   *
+   * @return The current time in microseconds.
+   */
+  public static long getTime() {
+    return m_timeSource.getAsLong();
   }
 
   /**
