@@ -8,6 +8,7 @@
 
 #include <wpi/SymbolExports.h>
 
+#include "frc/geometry/Transform2d.h"
 #include "frc/geometry/Translation3d.h"
 
 namespace frc {
@@ -54,6 +55,17 @@ class WPILIB_DLLEXPORT Transform3d {
    * Constructs the identity transform -- maps an initial pose to itself.
    */
   constexpr Transform3d() = default;
+
+  /**
+   * Constructs a 3D transform from a 2D transform in the X-Y plane.
+   **
+   * @param transform The 2D transform.
+   * @see Rotation3d(Rotation2d)
+   * @see Translation3d(Translation2d)
+   */
+  constexpr explicit Transform3d(const frc::Transform2d& transform)
+      : m_translation{frc::Translation3d{transform.Translation()}},
+        m_rotation{frc::Rotation3d{transform.Rotation()}} {}
 
   /**
    * Returns the translation component of the transformation.
