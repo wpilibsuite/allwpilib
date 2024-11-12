@@ -101,6 +101,7 @@ public interface LEDPattern {
      *
      * @param bufLen Length of the buffer
      * @param index The index to map
+     * @return The mapped index
      */
     int apply(int bufLen, int index);
   }
