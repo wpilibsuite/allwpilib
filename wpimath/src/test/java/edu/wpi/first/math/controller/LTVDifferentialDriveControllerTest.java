@@ -107,7 +107,7 @@ class LTVDifferentialDriveControllerTest {
               robotPose, x.get(State.kLeftVelocity, 0), x.get(State.kRightVelocity, 0), state);
 
       x =
-          NumericalIntegration.rkdp(
+          NumericalIntegration.tsit5(
               LTVDifferentialDriveControllerTest::dynamics,
               x,
               VecBuilder.fill(output.left, output.right),

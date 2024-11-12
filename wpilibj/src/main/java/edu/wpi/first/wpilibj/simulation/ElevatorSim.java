@@ -235,7 +235,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
     // Calculate updated x-hat from Runge-Kutta.
     var updatedXhat =
-        NumericalIntegration.rkdp(
+        NumericalIntegration.tsit5(
             (x, _u) -> {
               Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
               if (m_simulateGravity) {

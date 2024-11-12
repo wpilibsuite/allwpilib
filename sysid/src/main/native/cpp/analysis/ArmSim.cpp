@@ -42,7 +42,7 @@ void ArmSim::Update(units::volt_t voltage, units::second_t dt) {
   // small for ill-conditioned data (e.g., high velocities with sharp spikes in
   // acceleration).
   Eigen::Vector<double, 1> u{voltage.value()};
-  m_x = frc::RKDP(f, m_x, u, dt, 0.25);
+  m_x = frc::Tsit5(f, m_x, u, dt, 0.25);
 }
 
 double ArmSim::GetPosition() const {
