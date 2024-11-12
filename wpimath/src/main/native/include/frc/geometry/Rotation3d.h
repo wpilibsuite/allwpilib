@@ -230,6 +230,16 @@ class WPILIB_DLLEXPORT Rotation3d {
   }
 
   /**
+   * Constructs a 3D rotation from a 2D rotation in the X-Y plane.
+   *
+   * @param rotation The 2D rotation.
+   * @see Pose3d(Pose2d)
+   * @see Transform3d(Transform2d)
+   */
+  constexpr explicit Rotation3d(const Rotation2d& rotation)
+      : Rotation3d{0_rad, 0_rad, rotation.Radians()} {}
+
+  /**
    * Adds two rotations together.
    *
    * @param other The rotation to add.
