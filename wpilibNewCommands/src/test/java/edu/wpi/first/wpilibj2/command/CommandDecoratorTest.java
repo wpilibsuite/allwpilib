@@ -441,7 +441,7 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
-  void repeatForTest() {
+  void repeatedlyCountTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger(0);
 

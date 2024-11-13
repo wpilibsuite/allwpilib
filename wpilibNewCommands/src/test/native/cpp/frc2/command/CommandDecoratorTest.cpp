@@ -400,7 +400,7 @@ TEST_F(CommandDecoratorTest, Repeatedly) {
   EXPECT_TRUE(scheduler.IsScheduled(command));
 }
 
-TEST_F(CommandDecoratorTest, RepeatFor) {
+TEST_F(CommandDecoratorTest, RepeatedlyCount) {
   CommandScheduler scheduler = GetScheduler();
 
   int counter = 0;
