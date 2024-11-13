@@ -16,6 +16,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/deprecated.h>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
 #include <wpimath/MathShared.h>
@@ -222,6 +223,7 @@ RuntimeType RobotBase::GetRuntimeType() {
   return static_cast<RuntimeType>(HAL_GetRuntimeType());
 }
 
+WPI_IGNORE_DEPRECATED
 RobotBase::RobotBase() {
   m_threadId = std::this_thread::get_id();
 
@@ -268,3 +270,4 @@ RobotBase::RobotBase() {
   // First and one-time initialization
   LiveWindow::SetEnabled(false);
 }
+WPI_UNIGNORE_DEPRECATED

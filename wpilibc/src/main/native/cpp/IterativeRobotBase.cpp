@@ -9,6 +9,7 @@
 #include <hal/DriverStation.h>
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/deprecated.h>
 #include <wpi/print.h>
 
 #include "frc/DSControlWord.h"
@@ -119,6 +120,7 @@ units::second_t IterativeRobotBase::GetPeriod() const {
   return m_period;
 }
 
+WPI_IGNORE_DEPRECATED
 void IterativeRobotBase::LoopFunc() {
   DriverStation::RefreshData();
   m_watchdog.Reset();
@@ -228,6 +230,7 @@ void IterativeRobotBase::LoopFunc() {
     m_watchdog.PrintEpochs();
   }
 }
+WPI_UNIGNORE_DEPRECATED
 
 void IterativeRobotBase::PrintLoopOverrunMessage() {
   FRC_ReportError(err::Error, "Loop time of {:.6f}s overrun", m_period.value());

@@ -9,7 +9,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.MockDS;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.BeforeClass;
@@ -47,7 +46,6 @@ public abstract class AbstractComsSetup {
         ds = new MockDS();
         ds.start();
 
-        LiveWindow.setEnabled(false);
         TestBench.out().println("Started coms");
       } catch (Exception ex) {
         TestBench.out().println("Exception during AbstractComsSetup initialization: " + ex);

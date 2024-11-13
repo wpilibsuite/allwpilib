@@ -46,7 +46,6 @@ void Robot::StartCompetition() {
         wpi::WaitForObject(event.GetHandle());
       }
     } else if (IsTest()) {
-      frc::LiveWindow::SetEnabled(true);
       frc::Shuffleboard::EnableActuatorWidgets();
       modeThread.InTest(true);
       Test();
@@ -54,7 +53,6 @@ void Robot::StartCompetition() {
       while (IsTest() && IsEnabled()) {
         wpi::WaitForObject(event.GetHandle());
       }
-      frc::LiveWindow::SetEnabled(false);
       frc::Shuffleboard::DisableActuatorWidgets();
     } else {
       modeThread.InTeleop(true);
