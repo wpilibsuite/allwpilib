@@ -105,7 +105,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @return the absolute value of this measure in the given unit
    */
   default double abs(U unit) {
-    return this.in(unit) > 0 ? this.in(unit) : times(-1).in(unit);
+    return Math.abs(this.in(unit));
   }
 
   /**
