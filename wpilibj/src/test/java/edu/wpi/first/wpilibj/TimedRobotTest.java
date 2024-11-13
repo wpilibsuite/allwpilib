@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -632,7 +633,7 @@ class TimedRobotTest {
     MockRobot robot = new MockRobot();
 
     final AtomicInteger callbackCount = new AtomicInteger(0);
-    robot.addPeriodic(() -> callbackCount.addAndGet(1), kPeriod / 2.0);
+    assertNotNull(robot.addPeriodic(() -> callbackCount.addAndGet(1), kPeriod / 2.0));
 
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
@@ -656,6 +657,50 @@ class TimedRobotTest {
     assertEquals(1, robot.m_disabledInitCount.get());
     assertEquals(1, robot.m_disabledPeriodicCount.get());
     assertEquals(2, callbackCount.get());
+
+    robot.endCompetition();
+    try {
+      robotThread.interrupt();
+      robotThread.join();
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
+    }
+    robot.close();
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void cancelPeriodicTest() {
+    MockRobot robot = new MockRobot();
+
+    final AtomicInteger callbackCount = new AtomicInteger(0);
+    final TimedRobot.Cancellable periodicHandle =
+        robot.addPeriodic(() -> callbackCount.addAndGet(1), kPeriod / 2.0);
+
+    Thread robotThread = new Thread(robot::startCompetition);
+    robotThread.start();
+
+    DriverStationSim.setEnabled(false);
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(0.0); // Wait for Notifiers
+
+    assertEquals(0, robot.m_disabledInitCount.get());
+    assertEquals(0, robot.m_disabledPeriodicCount.get());
+    assertEquals(0, callbackCount.get());
+
+    SimHooks.stepTiming(kPeriod / 2.0);
+
+    assertEquals(0, robot.m_disabledInitCount.get());
+    assertEquals(0, robot.m_disabledPeriodicCount.get());
+    assertEquals(1, callbackCount.get());
+
+    periodicHandle.cancel();
+
+    SimHooks.stepTiming(kPeriod / 2.0);
+
+    assertEquals(1, robot.m_disabledInitCount.get());
+    assertEquals(1, robot.m_disabledPeriodicCount.get());
+    assertEquals(1, callbackCount.get());
 
     robot.endCompetition();
     try {
@@ -718,6 +763,47 @@ class TimedRobotTest {
     assertEquals(1, robot.m_disabledInitCount.get());
     assertEquals(1, robot.m_disabledPeriodicCount.get());
     assertEquals(2, callbackCount.get());
+
+    robot.endCompetition();
+    try {
+      robotThread.interrupt();
+      robotThread.join();
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
+    }
+    robot.close();
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void addOneShotTest() {
+    MockRobot robot = new MockRobot();
+
+    final AtomicInteger callbackCount = new AtomicInteger(0);
+    robot.addOneShot(() -> callbackCount.addAndGet(1), kPeriod / 2.0);
+
+    Thread robotThread = new Thread(robot::startCompetition);
+    robotThread.start();
+
+    DriverStationSim.setEnabled(false);
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(0.0); // Wait for Notifiers
+
+    assertEquals(0, robot.m_disabledInitCount.get());
+    assertEquals(0, robot.m_disabledPeriodicCount.get());
+    assertEquals(0, callbackCount.get());
+
+    SimHooks.stepTiming(kPeriod / 2.0);
+
+    assertEquals(0, robot.m_disabledInitCount.get());
+    assertEquals(0, robot.m_disabledPeriodicCount.get());
+    assertEquals(1, callbackCount.get());
+
+    SimHooks.stepTiming(kPeriod / 2.0);
+
+    assertEquals(1, robot.m_disabledInitCount.get());
+    assertEquals(1, robot.m_disabledPeriodicCount.get());
+    assertEquals(1, callbackCount.get());
 
     robot.endCompetition();
     try {
