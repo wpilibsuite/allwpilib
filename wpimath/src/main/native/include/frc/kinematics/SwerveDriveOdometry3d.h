@@ -47,32 +47,6 @@ class SwerveDriveOdometry3d
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif  // defined(__GNUC__) && !defined(__clang__)
   SwerveDriveOdometry3d(
-      SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
-      const Pose2d& initialPose = Pose2d{})
-      : SwerveDriveOdometry3d::Odometry3d(m_kinematicsImpl, gyroAngle,
-                                          modulePositions, initialPose),
-        m_kinematicsImpl(kinematics) {
-    wpi::math::MathSharedStore::ReportUsage(
-        wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);
-  }
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__) && !defined(__clang__)
-
-  /**
-   * Constructs a SwerveDriveOdometry3d object.
-   *
-   * @param kinematics The swerve drive kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param modulePositions The wheel positions reported by each module.
-   * @param initialPose The starting position of the robot on the field.
-   */
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif  // defined(__GNUC__) && !defined(__clang__)
-  SwerveDriveOdometry3d(
       SwerveDriveKinematics<NumModules> kinematics, const Rotation3d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose3d& initialPose = Pose3d{})

@@ -37,19 +37,6 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry3d
    * @param initialPose The starting position of the robot on the field.
    */
   explicit MecanumDriveOdometry3d(
-      MecanumDriveKinematics kinematics, const Rotation2d& gyroAngle,
-      const MecanumDriveWheelPositions& wheelPositions,
-      const Pose2d& initialPose = Pose2d{});
-
-  /**
-   * Constructs a MecanumDriveOdometry3d object.
-   *
-   * @param kinematics The mecanum drive kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelPositions The current distances measured by each wheel.
-   * @param initialPose The starting position of the robot on the field.
-   */
-  explicit MecanumDriveOdometry3d(
       MecanumDriveKinematics kinematics, const Rotation3d& gyroAngle,
       const MecanumDriveWheelPositions& wheelPositions,
       const Pose3d& initialPose = Pose3d{});

@@ -9,15 +9,6 @@
 using namespace frc;
 
 MecanumDriveOdometry3d::MecanumDriveOdometry3d(
-    MecanumDriveKinematics kinematics, const Rotation2d& gyroAngle,
-    const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose)
-    : Odometry3d(m_kinematicsImpl, gyroAngle, wheelPositions, initialPose),
-      m_kinematicsImpl(kinematics) {
-  wpi::math::MathSharedStore::ReportUsage(
-      wpi::math::MathUsageId::kOdometry_MecanumDrive, 1);
-}
-
-MecanumDriveOdometry3d::MecanumDriveOdometry3d(
     MecanumDriveKinematics kinematics, const Rotation3d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions, const Pose3d& initialPose)
     : Odometry3d(m_kinematicsImpl, gyroAngle, wheelPositions, initialPose),

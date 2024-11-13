@@ -41,22 +41,6 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * @param rightDistance The distance traveled by the right encoder.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit DifferentialDriveOdometry3d(const Rotation2d& gyroAngle,
-                                       units::meter_t leftDistance,
-                                       units::meter_t rightDistance,
-                                       const Pose2d& initialPose = Pose2d{});
-
-  /**
-   * Constructs a DifferentialDriveOdometry3d object.
-   *
-   * IF leftDistance and rightDistance are unspecified,
-   * You NEED to reset your encoders (to zero).
-   *
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistance The distance traveled by the left encoder.
-   * @param rightDistance The distance traveled by the right encoder.
-   * @param initialPose The starting position of the robot on the field.
-   */
   explicit DifferentialDriveOdometry3d(const Rotation3d& gyroAngle,
                                        units::meter_t leftDistance,
                                        units::meter_t rightDistance,
@@ -76,44 +60,9 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    */
-  void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
-                     units::meter_t rightDistance, const Pose2d& pose) {
-    Odometry3d::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
-  }
-
-  /**
-   * Resets the robot's position on the field.
-   *
-   * IF leftDistance and rightDistance are unspecified,
-   * You NEED to reset your encoders (to zero).
-   *
-   * The gyroscope angle does not need to be reset here on the user's robot
-   * code. The library automatically takes care of offsetting the gyro angle.
-   *
-   * @param pose The position on the field that your robot is at.
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistance The distance traveled by the left encoder.
-   * @param rightDistance The distance traveled by the right encoder.
-   */
   void ResetPosition(const Rotation3d& gyroAngle, units::meter_t leftDistance,
                      units::meter_t rightDistance, const Pose3d& pose) {
     Odometry3d::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
-  }
-
-  /**
-   * Updates the robot position on the field using distance measurements from
-   * encoders. This method is more numerically accurate than using velocities to
-   * integrate the pose and is also advantageous for teams that are using lower
-   * CPR encoders.
-   *
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistance The distance traveled by the left encoder.
-   * @param rightDistance The distance traveled by the right encoder.
-   * @return The new pose of the robot.
-   */
-  const Pose2d& Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
-                       units::meter_t rightDistance) {
-    return Odometry3d::Update(gyroAngle, {leftDistance, rightDistance});
   }
 
   /**

@@ -41,46 +41,14 @@ class WPILIB_DLLEXPORT Odometry3d {
    * @param initialPose The starting position of the robot on the field.
    */
   explicit Odometry3d(const Kinematics<WheelSpeeds, WheelPositions>& kinematics,
-                      const Rotation2d& gyroAngle,
-                      const WheelPositions& wheelPositions,
-                      const Pose2d& initialPose = Pose2d{})
-      : Odometry3d{kinematics, Rotation3d{0_rad, 0_rad, gyroAngle.Radians()},
-                   wheelPositions, Pose3d{initialPose}} {}
-
-  /**
-   * Constructs an Odometry3d object.
-   *
-   * @param kinematics The kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelPositions The current distances measured by each wheel.
-   * @param initialPose The starting position of the robot on the field.
-   */
-  explicit Odometry3d(const Kinematics<WheelSpeeds, WheelPositions>& kinematics,
                       const Rotation3d& gyroAngle,
                       const WheelPositions& wheelPositions,
                       const Pose3d& initialPose = Pose3d{})
       : m_kinematics(kinematics),
         m_pose(initialPose),
         m_previousWheelPositions(wheelPositions) {
-    m_pose2d = m_pose.ToPose2d();
     m_previousAngle = m_pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;
-  }
-
-  /**
-   * Resets the robot's position on the field.
-   *
-   * The gyroscope angle does not need to be reset here on the user's robot
-   * code. The library automatically takes care of offsetting the gyro angle.
-   *
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelPositions The current distances measured by each wheel.
-   * @param pose The position on the field that your robot is at.
-   */
-  void ResetPosition(const Rotation2d& gyroAngle,
-                     const WheelPositions& wheelPositions, const Pose2d& pose) {
-    ResetPosition(Rotation3d{0_rad, 0_rad, gyroAngle.Radians()}, wheelPositions,
-                  Pose3d{pose});
   }
 
   /**
@@ -96,7 +64,6 @@ class WPILIB_DLLEXPORT Odometry3d {
   void ResetPosition(const Rotation3d& gyroAngle,
                      const WheelPositions& wheelPositions, const Pose3d& pose) {
     m_pose = pose;
-    m_pose2d = m_pose.ToPose2d();
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;
     m_previousWheelPositions = wheelPositions;
@@ -107,27 +74,10 @@ class WPILIB_DLLEXPORT Odometry3d {
    *
    * @param pose The pose to reset to.
    */
-  void ResetPose(const Pose2d& pose) { ResetPose(Pose3d{pose}); }
-
-  /**
-   * Resets the pose.
-   *
-   * @param pose The pose to reset to.
-   */
   void ResetPose(const Pose3d& pose) {
     m_gyroOffset = m_gyroOffset + (pose.Rotation() - m_pose.Rotation());
     m_pose = pose;
-    m_pose2d = m_pose.ToPose2d();
     m_previousAngle = pose.Rotation();
-  }
-
-  /**
-   * Resets the translation of the pose.
-   *
-   * @param translation The translation to reset to.
-   */
-  void ResetTranslation(const Translation2d& translation) {
-    ResetTranslation(Translation3d{translation.X(), translation.Y(), 0_m});
   }
 
   /**
@@ -137,16 +87,6 @@ class WPILIB_DLLEXPORT Odometry3d {
    */
   void ResetTranslation(const Translation3d& translation) {
     m_pose = Pose3d{translation, m_pose.Rotation()};
-    m_pose2d = m_pose.ToPose2d();
-  }
-
-  /**
-   * Resets the rotation of the pose.
-   *
-   * @param rotation The rotation to reset to.
-   */
-  void ResetRotation(const Rotation2d& rotation) {
-    ResetRotation(Rotation3d{0_rad, 0_rad, rotation.Radians()});
   }
 
   /**
@@ -157,7 +97,6 @@ class WPILIB_DLLEXPORT Odometry3d {
   void ResetRotation(const Rotation3d& rotation) {
     m_gyroOffset = m_gyroOffset + (rotation - m_pose.Rotation());
     m_pose = Pose3d{m_pose.Translation(), rotation};
-    m_pose2d = m_pose.ToPose2d();
     m_previousAngle = rotation;
   }
 
@@ -165,30 +104,7 @@ class WPILIB_DLLEXPORT Odometry3d {
    * Returns the position of the robot on the field.
    * @return The pose of the robot.
    */
-  const Pose2d& GetPose() const { return m_pose2d; }
-
-  /**
-   * Returns the position of the robot on the field.
-   * @return The pose of the robot.
-   */
-  const Pose3d& GetPose3d() const { return m_pose; }
-
-  /**
-   * Updates the robot's position on the field using forward kinematics and
-   * integration of the pose over time. This method takes in an angle parameter
-   * which is used instead of the angular rate that is calculated from forward
-   * kinematics, in addition to the current distance measurement at each wheel.
-   *
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelPositions The current distances measured by each wheel.
-   *
-   * @return The new pose of the robot.
-   */
-  const Pose2d& Update(const Rotation2d& gyroAngle,
-                       const WheelPositions& wheelPositions) {
-    Update(Rotation3d{0_rad, 0_rad, gyroAngle.Radians()}, wheelPositions);
-    return GetPose();
-  }
+  const Pose3d& GetPose() const { return m_pose; }
 
   /**
    * Updates the robot's position on the field using forward kinematics and
@@ -221,14 +137,12 @@ class WPILIB_DLLEXPORT Odometry3d {
     m_previousWheelPositions = wheelPositions;
     m_previousAngle = angle;
     m_pose = {newPose.Translation(), angle};
-    m_pose2d = m_pose.ToPose2d();
 
     return m_pose;
   }
 
  private:
   const Kinematics<WheelSpeeds, WheelPositions>& m_kinematics;
-  Pose2d m_pose2d;  // Only for GetPose()
   Pose3d m_pose;
 
   WheelPositions m_previousWheelPositions;

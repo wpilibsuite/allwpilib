@@ -10,9 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -35,12 +38,12 @@ class DifferentialDrivePoseEstimator3dTest {
     var estimator =
         new DifferentialDrivePoseEstimator3d(
             kinematics,
-            Rotation2d.kZero,
+            Rotation3d.kZero,
             0,
             0,
-            Pose2d.kZero,
-            VecBuilder.fill(0.02, 0.02, 0.01),
-            VecBuilder.fill(0.1, 0.1, 0.1));
+            Pose3d.kZero,
+            VecBuilder.fill(0.02, 0.02, 0.02, 0.01),
+            VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
             List.of(
@@ -76,12 +79,12 @@ class DifferentialDrivePoseEstimator3dTest {
     var estimator =
         new DifferentialDrivePoseEstimator3d(
             kinematics,
-            Rotation2d.kZero,
+            Rotation3d.kZero,
             0,
             0,
-            Pose2d.kZero,
-            VecBuilder.fill(0.02, 0.02, 0.01),
-            VecBuilder.fill(0.1, 0.1, 0.1));
+            Pose3d.kZero,
+            VecBuilder.fill(0.02, 0.02, 0.02, 0.01),
+            VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
@@ -142,7 +145,7 @@ class DifferentialDrivePoseEstimator3dTest {
     double rightDistanceMeters = 0;
 
     estimator.resetPosition(
-        Rotation2d.kZero, leftDistanceMeters, rightDistanceMeters, startingPose);
+        Rotation3d.kZero, leftDistanceMeters, rightDistanceMeters, new Pose3d(startingPose));
 
     var rand = new Random(3538);
 
@@ -173,7 +176,7 @@ class DifferentialDrivePoseEstimator3dTest {
       // since it was measured
       if (!visionUpdateQueue.isEmpty() && visionUpdateQueue.firstKey() + visionUpdateDelay < t) {
         var visionEntry = visionUpdateQueue.pollFirstEntry();
-        estimator.addVisionMeasurement(visionEntry.getValue(), visionEntry.getKey());
+        estimator.addVisionMeasurement(new Pose3d(visionEntry.getValue()), visionEntry.getKey());
       }
 
       var chassisSpeeds = chassisSpeedsGenerator.apply(groundTruthState);
@@ -186,16 +189,20 @@ class DifferentialDrivePoseEstimator3dTest {
       var xHat =
           estimator.updateWithTime(
               t,
-              groundTruthState
-                  .poseMeters
-                  .getRotation()
-                  .plus(new Rotation2d(rand.nextGaussian() * 0.05))
-                  .minus(trajectory.getInitialPose().getRotation()),
+              new Rotation3d(
+                  groundTruthState
+                      .poseMeters
+                      .getRotation()
+                      .plus(new Rotation2d(rand.nextGaussian() * 0.05))
+                      .minus(trajectory.getInitialPose().getRotation())),
               leftDistanceMeters,
               rightDistanceMeters);
 
       double error =
-          groundTruthState.poseMeters.getTranslation().getDistance(xHat.getTranslation());
+          groundTruthState
+              .poseMeters
+              .getTranslation()
+              .getDistance(xHat.getTranslation().toTranslation2d());
       if (error > maxError) {
         maxError = error;
       }
@@ -210,7 +217,7 @@ class DifferentialDrivePoseEstimator3dTest {
         endingPose.getY(), estimator.getEstimatedPosition().getY(), 0.08, "Incorrect Final Y");
     assertEquals(
         endingPose.getRotation().getRadians(),
-        estimator.getEstimatedPosition().getRotation().getRadians(),
+        estimator.getEstimatedPosition().getRotation().toRotation2d().getRadians(),
         0.15,
         "Incorrect Final Theta");
 
@@ -232,14 +239,14 @@ class DifferentialDrivePoseEstimator3dTest {
     var estimator =
         new DifferentialDrivePoseEstimator3d(
             kinematics,
-            Rotation2d.kZero,
+            Rotation3d.kZero,
             0,
             0,
-            new Pose2d(1, 2, Rotation2d.kCW_Pi_2),
-            VecBuilder.fill(0.02, 0.02, 0.01),
-            VecBuilder.fill(0.1, 0.1, 0.1));
+            new Pose3d(1, 2, 0, new Rotation3d(0, 0, -Math.PI / 2)),
+            VecBuilder.fill(0.02, 0.02, 0.02, 0.01),
+            VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
 
-    estimator.updateWithTime(0, Rotation2d.kZero, 0, 0);
+    estimator.updateWithTime(0, Rotation3d.kZero, 0, 0);
 
     var visionMeasurements =
         new Pose2d[] {
@@ -250,7 +257,7 @@ class DifferentialDrivePoseEstimator3dTest {
 
     for (int i = 0; i < 1000; i++) {
       for (var measurement : visionMeasurements) {
-        estimator.addVisionMeasurement(measurement, 0);
+        estimator.addVisionMeasurement(new Pose3d(measurement), 0);
       }
     }
 
@@ -266,7 +273,7 @@ class DifferentialDrivePoseEstimator3dTest {
       var dtheta =
           Math.abs(
               measurement.getRotation().getDegrees()
-                  - estimator.getEstimatedPosition().getRotation().getDegrees());
+                  - estimator.getEstimatedPosition().getRotation().toRotation2d().getDegrees());
 
       assertTrue(dx > 0.08 || dy > 0.08 || dtheta > 0.08, errorLog);
     }
@@ -278,18 +285,18 @@ class DifferentialDrivePoseEstimator3dTest {
     var estimator =
         new DifferentialDrivePoseEstimator3d(
             kinematics,
-            Rotation2d.kZero,
+            Rotation3d.kZero,
             0,
             0,
-            Pose2d.kZero,
-            VecBuilder.fill(0.1, 0.1, 0.1),
-            VecBuilder.fill(0.9, 0.9, 0.9));
+            Pose3d.kZero,
+            VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
+            VecBuilder.fill(0.9, 0.9, 0.9, 0.9));
 
     double time = 0;
 
     // Add enough measurements to fill up the buffer
     for (; time < 4; time += 0.02) {
-      estimator.updateWithTime(time, Rotation2d.kZero, 0, 0);
+      estimator.updateWithTime(time, Rotation3d.kZero, 0, 0);
     }
 
     var odometryPose = estimator.getEstimatedPosition();
@@ -297,16 +304,33 @@ class DifferentialDrivePoseEstimator3dTest {
     // Apply a vision measurement made 3 seconds ago
     // This test passes if this does not cause a ConcurrentModificationException.
     estimator.addVisionMeasurement(
-        new Pose2d(new Translation2d(10, 10), new Rotation2d(0.1)),
-        1,
-        VecBuilder.fill(0.1, 0.1, 0.1));
+        new Pose3d(10, 10, 0, new Rotation3d(0, 0, 0.1)), 1, VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
 
-    assertEquals(odometryPose.getX(), estimator.getEstimatedPosition().getX(), "Incorrect Final X");
-    assertEquals(odometryPose.getY(), estimator.getEstimatedPosition().getY(), "Incorrect Final Y");
-    assertEquals(
-        odometryPose.getRotation().getRadians(),
-        estimator.getEstimatedPosition().getRotation().getRadians(),
-        "Incorrect Final Theta");
+    assertAll(
+        () ->
+            assertEquals(
+                odometryPose.getX(), estimator.getEstimatedPosition().getX(), "Incorrect Final X"),
+        () ->
+            assertEquals(
+                odometryPose.getY(), estimator.getEstimatedPosition().getY(), "Incorrect Final Y"),
+        () ->
+            assertEquals(
+                odometryPose.getZ(), estimator.getEstimatedPosition().getZ(), "Incorrect Final Y"),
+        () ->
+            assertEquals(
+                odometryPose.getRotation().getX(),
+                estimator.getEstimatedPosition().getRotation().getX(),
+                "Incorrect Final Roll"),
+        () ->
+            assertEquals(
+                odometryPose.getRotation().getY(),
+                estimator.getEstimatedPosition().getRotation().getY(),
+                "Incorrect Final Pitch"),
+        () ->
+            assertEquals(
+                odometryPose.getRotation().getZ(),
+                estimator.getEstimatedPosition().getRotation().getZ(),
+                "Incorrect Final Yaw"));
   }
 
   @Test
@@ -315,12 +339,12 @@ class DifferentialDrivePoseEstimator3dTest {
     var estimator =
         new DifferentialDrivePoseEstimator3d(
             kinematics,
-            Rotation2d.kZero,
+            Rotation3d.kZero,
             0,
             0,
-            Pose2d.kZero,
-            VecBuilder.fill(1, 1, 1),
-            VecBuilder.fill(1, 1, 1));
+            Pose3d.kZero,
+            VecBuilder.fill(1, 1, 1, 1),
+            VecBuilder.fill(1, 1, 1, 1));
 
     // Returns empty when null
     assertEquals(Optional.empty(), estimator.sampleAt(1));
@@ -328,35 +352,35 @@ class DifferentialDrivePoseEstimator3dTest {
     // Add odometry measurements, but don't fill up the buffer
     // Add a tiny tolerance for the upper bound because of floating point rounding error
     for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
-      estimator.updateWithTime(time, Rotation2d.kZero, time, time);
+      estimator.updateWithTime(time, Rotation3d.kZero, time, time);
     }
 
     // Sample at an added time
-    assertEquals(Optional.of(new Pose2d(1.02, 0, Rotation2d.kZero)), estimator.sampleAt(1.02));
+    assertEquals(Optional.of(new Pose3d(1.02, 0, 0, Rotation3d.kZero)), estimator.sampleAt(1.02));
     // Sample between updates (test interpolation)
-    assertEquals(Optional.of(new Pose2d(1.01, 0, Rotation2d.kZero)), estimator.sampleAt(1.01));
+    assertEquals(Optional.of(new Pose3d(1.01, 0, 0, Rotation3d.kZero)), estimator.sampleAt(1.01));
     // Sampling before the oldest value returns the oldest value
-    assertEquals(Optional.of(new Pose2d(1, 0, Rotation2d.kZero)), estimator.sampleAt(0.5));
+    assertEquals(Optional.of(new Pose3d(1, 0, 0, Rotation3d.kZero)), estimator.sampleAt(0.5));
     // Sampling after the newest value returns the newest value
-    assertEquals(Optional.of(new Pose2d(2, 0, Rotation2d.kZero)), estimator.sampleAt(2.5));
+    assertEquals(Optional.of(new Pose3d(2, 0, 0, Rotation3d.kZero)), estimator.sampleAt(2.5));
 
     // Add a vision measurement after the odometry measurements (while keeping all of the old
     // odometry measurements)
-    estimator.addVisionMeasurement(new Pose2d(2, 0, new Rotation2d(1)), 2.2);
+    estimator.addVisionMeasurement(new Pose3d(2, 0, 0, new Rotation3d(0, 0, 1)), 2.2);
 
     // Make sure nothing changed (except the newest value)
-    assertEquals(Optional.of(new Pose2d(1.02, 0, Rotation2d.kZero)), estimator.sampleAt(1.02));
-    assertEquals(Optional.of(new Pose2d(1.01, 0, Rotation2d.kZero)), estimator.sampleAt(1.01));
-    assertEquals(Optional.of(new Pose2d(1, 0, Rotation2d.kZero)), estimator.sampleAt(0.5));
+    assertEquals(Optional.of(new Pose3d(1.02, 0, 0, Rotation3d.kZero)), estimator.sampleAt(1.02));
+    assertEquals(Optional.of(new Pose3d(1.01, 0, 0, Rotation3d.kZero)), estimator.sampleAt(1.01));
+    assertEquals(Optional.of(new Pose3d(1, 0, 0, Rotation3d.kZero)), estimator.sampleAt(0.5));
 
     // Add a vision measurement before the odometry measurements that's still in the buffer
-    estimator.addVisionMeasurement(new Pose2d(1, 0.2, Rotation2d.kZero), 0.9);
+    estimator.addVisionMeasurement(new Pose3d(1, 0.2, 0, Rotation3d.kZero), 0.9);
 
     // Everything should be the same except Y is 0.1 (halfway between 0 and 0.2)
-    assertEquals(Optional.of(new Pose2d(1.02, 0.1, Rotation2d.kZero)), estimator.sampleAt(1.02));
-    assertEquals(Optional.of(new Pose2d(1.01, 0.1, Rotation2d.kZero)), estimator.sampleAt(1.01));
-    assertEquals(Optional.of(new Pose2d(1, 0.1, Rotation2d.kZero)), estimator.sampleAt(0.5));
-    assertEquals(Optional.of(new Pose2d(2, 0.1, Rotation2d.kZero)), estimator.sampleAt(2.5));
+    assertEquals(Optional.of(new Pose3d(1.02, 0.1, 0, Rotation3d.kZero)), estimator.sampleAt(1.02));
+    assertEquals(Optional.of(new Pose3d(1.01, 0.1, 0, Rotation3d.kZero)), estimator.sampleAt(1.01));
+    assertEquals(Optional.of(new Pose3d(1, 0.1, 0, Rotation3d.kZero)), estimator.sampleAt(0.5));
+    assertEquals(Optional.of(new Pose3d(2, 0.1, 0, Rotation3d.kZero)), estimator.sampleAt(2.5));
   }
 
   @Test
@@ -365,74 +389,83 @@ class DifferentialDrivePoseEstimator3dTest {
     var estimator =
         new DifferentialDrivePoseEstimator3d(
             kinematics,
-            Rotation2d.kZero,
+            Rotation3d.kZero,
             0,
             0,
-            Pose2d.kZero,
-            VecBuilder.fill(1, 1, 1),
-            VecBuilder.fill(1, 1, 1));
+            Pose3d.kZero,
+            VecBuilder.fill(1, 1, 1, 1),
+            VecBuilder.fill(1, 1, 1, 1));
 
     // Test reset position
-    estimator.resetPosition(Rotation2d.kZero, 1, 1, new Pose2d(1, 0, Rotation2d.kZero));
+    estimator.resetPosition(Rotation3d.kZero, 1, 1, new Pose3d(1, 0, 0, Rotation3d.kZero));
 
     assertAll(
         () -> assertEquals(1, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
-        () ->
-            assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), kEpsilon));
+        () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test orientation and wheel positions
-    estimator.update(Rotation2d.kZero, 2, 2);
+    estimator.update(Rotation3d.kZero, 2, 2);
 
     assertAll(
         () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
-        () ->
-            assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), kEpsilon));
+        () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test reset rotation
-    estimator.resetRotation(Rotation2d.kCCW_Pi_2);
+    estimator.resetRotation(new Rotation3d(Rotation2d.kCCW_Pi_2));
 
     assertAll(
         () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
         () ->
             assertEquals(
-                Math.PI / 2,
-                estimator.getEstimatedPosition().getRotation().getRadians(),
-                kEpsilon));
+                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test orientation
-    estimator.update(Rotation2d.kZero, 3, 3);
+    estimator.update(Rotation3d.kZero, 3, 3);
 
     assertAll(
         () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(1, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
         () ->
             assertEquals(
-                Math.PI / 2,
-                estimator.getEstimatedPosition().getRotation().getRadians(),
-                kEpsilon));
+                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test reset translation
-    estimator.resetTranslation(new Translation2d(-1, -1));
+    estimator.resetTranslation(new Translation3d(-1, -1, -1));
 
     assertAll(
         () -> assertEquals(-1, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(-1, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () -> assertEquals(-1, estimator.getEstimatedPosition().getZ(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
         () ->
             assertEquals(
-                Math.PI / 2,
-                estimator.getEstimatedPosition().getRotation().getRadians(),
-                kEpsilon));
+                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test reset pose
-    estimator.resetPose(Pose2d.kZero);
+    estimator.resetPose(Pose3d.kZero);
 
     assertAll(
         () -> assertEquals(0, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
-        () ->
-            assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), kEpsilon));
+        () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
   }
 }

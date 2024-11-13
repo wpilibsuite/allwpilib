@@ -13,24 +13,6 @@
 using namespace frc;
 
 frc::MecanumDrivePoseEstimator3d::MecanumDrivePoseEstimator3d(
-    MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
-    const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose)
-    : MecanumDrivePoseEstimator3d{kinematics,      gyroAngle,
-                                  wheelPositions,  initialPose,
-                                  {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}} {}
-
-frc::MecanumDrivePoseEstimator3d::MecanumDrivePoseEstimator3d(
-    MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
-    const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose,
-    const wpi::array<double, 3>& stateStdDevs,
-    const wpi::array<double, 3>& visionMeasurementStdDevs)
-    : PoseEstimator3d(kinematics, m_odometryImpl, stateStdDevs,
-                      visionMeasurementStdDevs),
-      m_odometryImpl(kinematics, gyroAngle, wheelPositions, initialPose) {
-  ResetPose(initialPose);
-}
-
-frc::MecanumDrivePoseEstimator3d::MecanumDrivePoseEstimator3d(
     MecanumDriveKinematics& kinematics, const Rotation3d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions, const Pose3d& initialPose)
     : MecanumDrivePoseEstimator3d{

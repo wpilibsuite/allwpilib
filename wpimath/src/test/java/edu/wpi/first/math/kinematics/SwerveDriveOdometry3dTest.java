@@ -8,10 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
 import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
@@ -29,21 +33,22 @@ class SwerveDriveOdometry3dTest {
 
   private final SwerveDriveOdometry3d m_odometry =
       new SwerveDriveOdometry3d(
-          m_kinematics, Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
+          m_kinematics, Rotation3d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
 
   @Test
   void testInitialize() {
     SwerveDriveOdometry3d odometry =
         new SwerveDriveOdometry3d(
             m_kinematics,
-            Rotation2d.kZero,
+            Rotation3d.kZero,
             new SwerveModulePosition[] {zero, zero, zero, zero},
-            new Pose2d(1, 2, Rotation2d.fromDegrees(45)));
+            new Pose3d(1, 2, 0, new Rotation3d(0, 0, Units.degreesToRadians(45))));
     var pose = odometry.getPoseMeters();
     assertAll(
         () -> assertEquals(pose.getX(), 1.0, 1e-9),
         () -> assertEquals(pose.getY(), 2.0, 1e-9),
-        () -> assertEquals(pose.getRotation().getDegrees(), 45.0, 1e-9));
+        () -> assertEquals(pose.getZ(), 0.0, 1e-9),
+        () -> assertEquals(pose.getRotation().toRotation2d().getDegrees(), 45.0, 1e-9));
   }
 
   @Test
@@ -57,19 +62,20 @@ class SwerveDriveOdometry3dTest {
     };
 
     m_odometry.update(
-        Rotation2d.kZero,
+        Rotation3d.kZero,
         new SwerveModulePosition[] {
           new SwerveModulePosition(),
           new SwerveModulePosition(),
           new SwerveModulePosition(),
           new SwerveModulePosition()
         });
-    var pose = m_odometry.update(Rotation2d.kZero, wheelDeltas);
+    var pose = m_odometry.update(Rotation3d.kZero, wheelDeltas);
 
     assertAll(
         () -> assertEquals(5.0 / 10.0, pose.getX(), 0.01),
         () -> assertEquals(0, pose.getY(), 0.01),
-        () -> assertEquals(0.0, pose.getRotation().getDegrees(), 0.01));
+        () -> assertEquals(0, pose.getZ(), 0.01),
+        () -> assertEquals(0.0, pose.getRotation().toRotation2d().getDegrees(), 0.01));
   }
 
   @Test
@@ -88,23 +94,24 @@ class SwerveDriveOdometry3dTest {
     };
     final var zero = new SwerveModulePosition();
 
-    m_odometry.update(Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
-    final var pose = m_odometry.update(Rotation2d.kCCW_Pi_2, wheelDeltas);
+    m_odometry.update(Rotation3d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
+    final var pose = m_odometry.update(new Rotation3d(0, 0, Math.PI / 2), wheelDeltas);
 
     assertAll(
         () -> assertEquals(12.0, pose.getX(), 0.01),
         () -> assertEquals(12.0, pose.getY(), 0.01),
-        () -> assertEquals(90.0, pose.getRotation().getDegrees(), 0.01));
+        () -> assertEquals(0.0, pose.getZ(), 0.01),
+        () -> assertEquals(90.0, pose.getRotation().toRotation2d().getDegrees(), 0.01));
   }
 
   @Test
   void testGyroAngleReset() {
-    var gyro = Rotation2d.kCCW_Pi_2;
-    var fieldAngle = Rotation2d.kZero;
+    var gyro = new Rotation3d(0, 0, Math.PI / 2);
+    var fieldAngle = Rotation3d.kZero;
     m_odometry.resetPosition(
         gyro,
         new SwerveModulePosition[] {zero, zero, zero, zero},
-        new Pose2d(Translation2d.kZero, fieldAngle));
+        new Pose3d(Translation3d.kZero, fieldAngle));
     var delta = new SwerveModulePosition();
     m_odometry.update(gyro, new SwerveModulePosition[] {delta, delta, delta, delta});
     delta = new SwerveModulePosition(1.0, Rotation2d.kZero);
@@ -113,7 +120,8 @@ class SwerveDriveOdometry3dTest {
     assertAll(
         () -> assertEquals(1.0, pose.getX(), 0.1),
         () -> assertEquals(0.00, pose.getY(), 0.1),
-        () -> assertEquals(0.00, pose.getRotation().getRadians(), 0.1));
+        () -> assertEquals(0.00, pose.getZ(), 0.1),
+        () -> assertEquals(0.00, pose.getRotation().toRotation2d().getRadians(), 0.1));
   }
 
   @Test
@@ -126,7 +134,7 @@ class SwerveDriveOdometry3dTest {
             new Translation2d(-1, 1));
     var odometry =
         new SwerveDriveOdometry3d(
-            kinematics, Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
+            kinematics, Rotation3d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
 
     SwerveModulePosition fl = new SwerveModulePosition();
     SwerveModulePosition fr = new SwerveModulePosition();
@@ -177,14 +185,18 @@ class SwerveDriveOdometry3dTest {
 
       var xHat =
           odometry.update(
-              groundTruthState
-                  .poseMeters
-                  .getRotation()
-                  .plus(new Rotation2d(rand.nextGaussian() * 0.05)),
+              new Rotation3d(
+                  groundTruthState
+                      .poseMeters
+                      .getRotation()
+                      .plus(new Rotation2d(rand.nextGaussian() * 0.05))),
               new SwerveModulePosition[] {fl, fr, bl, br});
 
       double error =
-          groundTruthState.poseMeters.getTranslation().getDistance(xHat.getTranslation());
+          groundTruthState
+              .poseMeters
+              .getTranslation()
+              .getDistance(xHat.getTranslation().toTranslation2d());
       if (error > maxError) {
         maxError = error;
       }
@@ -195,9 +207,10 @@ class SwerveDriveOdometry3dTest {
 
     assertEquals(0.0, odometry.getPoseMeters().getX(), 1e-1, "Incorrect Final X");
     assertEquals(0.0, odometry.getPoseMeters().getY(), 1e-1, "Incorrect Final Y");
+    assertEquals(0.0, odometry.getPoseMeters().getZ(), 1e-1, "Incorrect Final Y");
     assertEquals(
         Math.PI / 4,
-        odometry.getPoseMeters().getRotation().getRadians(),
+        odometry.getPoseMeters().getRotation().toRotation2d().getRadians(),
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
@@ -216,7 +229,7 @@ class SwerveDriveOdometry3dTest {
             new Translation2d(-1, 1));
     var odometry =
         new SwerveDriveOdometry3d(
-            kinematics, Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
+            kinematics, Rotation3d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
 
     SwerveModulePosition fl = new SwerveModulePosition();
     SwerveModulePosition fr = new SwerveModulePosition();
@@ -263,11 +276,14 @@ class SwerveDriveOdometry3dTest {
 
       var xHat =
           odometry.update(
-              new Rotation2d(rand.nextGaussian() * 0.05),
+              new Rotation3d(0, 0, rand.nextGaussian() * 0.05),
               new SwerveModulePosition[] {fl, fr, bl, br});
 
       double error =
-          groundTruthState.poseMeters.getTranslation().getDistance(xHat.getTranslation());
+          groundTruthState
+              .poseMeters
+              .getTranslation()
+              .getDistance(xHat.getTranslation().toTranslation2d());
       if (error > maxError) {
         maxError = error;
       }
@@ -278,9 +294,10 @@ class SwerveDriveOdometry3dTest {
 
     assertEquals(0.0, odometry.getPoseMeters().getX(), 1e-1, "Incorrect Final X");
     assertEquals(0.0, odometry.getPoseMeters().getY(), 1e-1, "Incorrect Final Y");
+    assertEquals(0.0, odometry.getPoseMeters().getZ(), 1e-1, "Incorrect Final Y");
     assertEquals(
         0.0,
-        odometry.getPoseMeters().getRotation().getRadians(),
+        odometry.getPoseMeters().getRotation().toRotation2d().getRadians(),
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
