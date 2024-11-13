@@ -79,32 +79,44 @@ class Drivetrain : public frc2::SubsystemBase {
   units::meter_t GetAverageDistance();
 
   /**
-   * Returns the acceleration along the X-axis, in m/s².
+   * The acceleration in the X-axis.
+   *
+   * @return The acceleration of the XRP along the X-axis.
    */
   units::meters_per_second_squared_t GetAccelX();
 
   /**
-   * Returns the acceleration along the Y-axis, in m/s².
+   * The acceleration in the Y-axis.
+   *
+   * @return The acceleration of the XRP along the Y-axis.
    */
   units::meters_per_second_squared_t GetAccelY();
 
   /**
-   * Returns the acceleration along the Z-axis, in m/s².
+   * The acceleration in the Z-axis.
+   *
+   * @return The acceleration of the XRP along the Z-axis.
    */
   units::meters_per_second_squared_t GetAccelZ();
 
   /**
-   * Returns the current angle of the Romi around the X-axis, in degrees.
+   * Current angle of the XRP around the X-axis.
+   *
+   * @return The current angle of the XRP.
    */
   units::radian_t GetGyroAngleX();
 
   /**
-   * Returns the current angle of the Romi around the Y-axis, in degrees.
+   * Current angle of the XRP around the Y-axis.
+   *
+   * @return The current angle of the XRP.
    */
   units::radian_t GetGyroAngleY();
 
   /**
-   * Returns the current angle of the Romi around the Z-axis, in degrees.
+   * Current angle of the XRP around the Z-axis.
+   *
+   * @return The current angle of the XRP.
    */
   units::radian_t GetGyroAngleZ();
 
