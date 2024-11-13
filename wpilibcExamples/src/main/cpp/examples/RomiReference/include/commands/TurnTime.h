@@ -13,6 +13,13 @@
 
 class TurnTime : public frc2::CommandHelper<frc2::Command, TurnTime> {
  public:
+  /**
+   * Creates a new TurnTime.
+   *
+   * @param speed The speed which the robot will turn. Negative is in reverse.
+   * @param time How much time to turn
+   * @param drive The drive subsystem on which this command will run
+   */
   TurnTime(double speed, units::second_t time, Drivetrain* drive)
       : m_speed(speed), m_duration(time), m_drive(drive) {
     AddRequirements(m_drive);
