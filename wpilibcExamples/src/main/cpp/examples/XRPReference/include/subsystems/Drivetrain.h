@@ -10,6 +10,8 @@
 #include <frc/xrp/XRPGyro.h>
 #include <frc/xrp/XRPMotor.h>
 #include <frc2/command/SubsystemBase.h>
+#include <units/acceleration.h>
+#include <units/angle.h>
 #include <units/length.h>
 
 class Drivetrain : public frc2::SubsystemBase {
@@ -77,34 +79,34 @@ class Drivetrain : public frc2::SubsystemBase {
   units::meter_t GetAverageDistance();
 
   /**
-   * Returns the acceleration along the X-axis, in Gs.
+   * Returns the acceleration along the X-axis, in m/s².
    */
-  double GetAccelX();
+  units::meters_per_second_squared_t GetAccelX();
 
   /**
-   * Returns the acceleration along the Y-axis, in Gs.
+   * Returns the acceleration along the Y-axis, in m/s².
    */
-  double GetAccelY();
+  units::meters_per_second_squared_t GetAccelY();
 
   /**
-   * Returns the acceleration along the Z-axis, in Gs.
+   * Returns the acceleration along the Z-axis, in m/s².
    */
-  double GetAccelZ();
+  units::meters_per_second_squared_t GetAccelZ();
 
   /**
    * Returns the current angle of the Romi around the X-axis, in degrees.
    */
-  double GetGyroAngleX();
+  units::radian_t GetGyroAngleX();
 
   /**
    * Returns the current angle of the Romi around the Y-axis, in degrees.
    */
-  double GetGyroAngleY();
+  units::radian_t GetGyroAngleY();
 
   /**
    * Returns the current angle of the Romi around the Z-axis, in degrees.
    */
-  double GetGyroAngleZ();
+  units::radian_t GetGyroAngleZ();
 
   /**
    * Reset the gyro.
