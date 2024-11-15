@@ -5,12 +5,15 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/deprecated.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/trajectory/Trajectory.h"
+#include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/length.h"
+#include "units/math.h"
 #include "units/velocity.h"
 
 namespace frc {
@@ -59,7 +62,11 @@ class WPILIB_DLLEXPORT RamseteController {
    * @deprecated Use LTVUnicycleController instead.
    */
   [[deprecated("Use LTVUnicycleController instead.")]]
-  RamseteController(units::unit_t<b_unit> b, units::unit_t<zeta_unit> zeta);
+  constexpr RamseteController(units::unit_t<b_unit> b,
+                              units::unit_t<zeta_unit> zeta)
+      : m_b{b}, m_zeta{zeta} {}
+
+  WPI_IGNORE_DEPRECATED
 
   /**
    * Construct a Ramsete unicycle controller. The default arguments for
@@ -69,12 +76,24 @@ class WPILIB_DLLEXPORT RamseteController {
    * @deprecated Use LTVUnicycleController instead.
    */
   [[deprecated("Use LTVUnicycleController instead.")]]
-  RamseteController();
+  constexpr RamseteController()
+      : RamseteController{units::unit_t<b_unit>{2.0},
+                          units::unit_t<zeta_unit>{0.7}} {}
+
+  WPI_UNIGNORE_DEPRECATED
 
   /**
    * Returns true if the pose error is within tolerance of the reference.
    */
-  bool AtReference() const;
+  constexpr bool AtReference() const {
+    const auto& eTranslate = m_poseError.Translation();
+    const auto& eRotate = m_poseError.Rotation();
+    const auto& tolTranslate = m_poseTolerance.Translation();
+    const auto& tolRotate = m_poseTolerance.Rotation();
+    return units::math::abs(eTranslate.X()) < tolTranslate.X() &&
+           units::math::abs(eTranslate.Y()) < tolTranslate.Y() &&
+           units::math::abs(eRotate.Radians()) < tolRotate.Radians();
+  }
 
   /**
    * Sets the pose error which is considered tolerable for use with
@@ -82,7 +101,9 @@ class WPILIB_DLLEXPORT RamseteController {
    *
    * @param poseTolerance Pose error which is tolerable.
    */
-  void SetTolerance(const Pose2d& poseTolerance);
+  constexpr void SetTolerance(const Pose2d& poseTolerance) {
+    m_poseTolerance = poseTolerance;
+  }
 
   /**
    * Returns the next output of the Ramsete controller.
@@ -95,9 +116,34 @@ class WPILIB_DLLEXPORT RamseteController {
    * @param linearVelocityRef  The desired linear velocity.
    * @param angularVelocityRef The desired angular velocity.
    */
-  ChassisSpeeds Calculate(const Pose2d& currentPose, const Pose2d& poseRef,
-                          units::meters_per_second_t linearVelocityRef,
-                          units::radians_per_second_t angularVelocityRef);
+  constexpr ChassisSpeeds Calculate(
+      const Pose2d& currentPose, const Pose2d& poseRef,
+      units::meters_per_second_t linearVelocityRef,
+      units::radians_per_second_t angularVelocityRef) {
+    if (!m_enabled) {
+      return ChassisSpeeds{linearVelocityRef, 0_mps, angularVelocityRef};
+    }
+
+    m_poseError = poseRef.RelativeTo(currentPose);
+
+    // Aliases for equation readability
+    const auto& eX = m_poseError.X();
+    const auto& eY = m_poseError.Y();
+    const auto& eTheta = m_poseError.Rotation().Radians();
+    const auto& vRef = linearVelocityRef;
+    const auto& omegaRef = angularVelocityRef;
+
+    // k = 2ζ√(ω_ref² + b v_ref²)
+    auto k = 2.0 * m_zeta *
+             units::math::sqrt(units::math::pow<2>(omegaRef) +
+                               m_b * units::math::pow<2>(vRef));
+
+    // v_cmd = v_ref cos(e_θ) + k e_x
+    // ω_cmd = ω_ref + k e_θ + b v_ref sinc(e_θ) e_y
+    return ChassisSpeeds{
+        vRef * m_poseError.Rotation().Cos() + k * eX, 0_mps,
+        omegaRef + k * eTheta + m_b * vRef * Sinc(eTheta) * eY};
+  }
 
   /**
    * Returns the next output of the Ramsete controller.
@@ -109,15 +155,18 @@ class WPILIB_DLLEXPORT RamseteController {
    * @param desiredState The desired pose, linear velocity, and angular velocity
    *                     from a trajectory.
    */
-  ChassisSpeeds Calculate(const Pose2d& currentPose,
-                          const Trajectory::State& desiredState);
+  constexpr ChassisSpeeds Calculate(const Pose2d& currentPose,
+                                    const Trajectory::State& desiredState) {
+    return Calculate(currentPose, desiredState.pose, desiredState.velocity,
+                     desiredState.velocity * desiredState.curvature);
+  }
 
   /**
    * Enables and disables the controller for troubleshooting purposes.
    *
    * @param enabled If the controller is enabled or not.
    */
-  void SetEnabled(bool enabled);
+  constexpr void SetEnabled(bool enabled) { m_enabled = enabled; }
 
  private:
   units::unit_t<b_unit> m_b;
@@ -126,6 +175,19 @@ class WPILIB_DLLEXPORT RamseteController {
   Pose2d m_poseError;
   Pose2d m_poseTolerance;
   bool m_enabled = true;
+
+  /**
+   * Returns sin(x) / x.
+   *
+   * @param x Value of which to take sinc(x).
+   */
+  static constexpr decltype(1 / 1_rad) Sinc(units::radian_t x) {
+    if (units::math::abs(x) < 1e-9_rad) {
+      return decltype(1 / 1_rad){1.0 - 1.0 / 6.0 * x.value() * x.value()};
+    } else {
+      return units::math::sin(x) / x;
+    }
+  }
 };
 
 }  // namespace frc

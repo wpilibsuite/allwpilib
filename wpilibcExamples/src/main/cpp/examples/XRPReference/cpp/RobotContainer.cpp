@@ -26,12 +26,12 @@ void RobotContainer::ConfigureButtonBindings() {
       .OnFalse(frc2::cmd::Print("USER Button Released"));
 
   frc2::JoystickButton(&m_controller, 1)
-      .OnTrue(frc2::cmd::RunOnce([this] { m_arm.SetAngle(45.0); }, {}))
-      .OnFalse(frc2::cmd::RunOnce([this] { m_arm.SetAngle(0.0); }, {}));
+      .OnTrue(frc2::cmd::RunOnce([this] { m_arm.SetAngle(45_deg); }, {}))
+      .OnFalse(frc2::cmd::RunOnce([this] { m_arm.SetAngle(0_deg); }, {}));
 
   frc2::JoystickButton(&m_controller, 2)
-      .OnTrue(frc2::cmd::RunOnce([this] { m_arm.SetAngle(90.0); }, {}))
-      .OnFalse(frc2::cmd::RunOnce([this] { m_arm.SetAngle(0.0); }, {}));
+      .OnTrue(frc2::cmd::RunOnce([this] { m_arm.SetAngle(90_deg); }, {}))
+      .OnFalse(frc2::cmd::RunOnce([this] { m_arm.SetAngle(0_deg); }, {}));
 
   // Setup SmartDashboard options.
   m_chooser.SetDefaultOption("Auto Routine Distance", &m_autoDistance);

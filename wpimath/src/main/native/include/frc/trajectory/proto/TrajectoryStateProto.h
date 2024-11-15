@@ -8,11 +8,13 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/trajectory/Trajectory.h"
+#include "wpimath/protobuf/trajectory.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Trajectory::State> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Trajectory::State Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
-                   const frc::Trajectory::State& value);
+  using MessageStruct = wpi_proto_ProtobufTrajectoryState;
+  using InputStream = wpi::ProtoInputStream<frc::Trajectory::State>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Trajectory::State>;
+  static std::optional<frc::Trajectory::State> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::Trajectory::State& value);
 };

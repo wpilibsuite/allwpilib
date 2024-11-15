@@ -5,7 +5,6 @@
 #include "frc/simulation/REVPHSim.h"
 
 #include <memory>
-#include <utility>
 
 #include <hal/simulation/REVPHData.h>
 

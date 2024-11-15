@@ -35,7 +35,7 @@ void ResolverThread::AddServiceRef(DNSServiceRef serviceRef,
       thread.join();
     }
     running = true;
-    thread = std::thread([=] { ThreadMain(); });
+    thread = std::thread([this] { ThreadMain(); });
   }
 }
 

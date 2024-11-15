@@ -17,9 +17,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.MutAngle;
-import edu.wpi.first.units.measure.MutAngularAcceleration;
-import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated DC motor mechanism. */
@@ -32,16 +29,6 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
 
   // The moment of inertia for the DC motor mechanism.
   private final double m_jKgMetersSquared;
-
-  // The angle of the system.
-  private final MutAngle m_angle = Radians.mutable(0.0);
-
-  // The angular velocity of the system.
-  private final MutAngularVelocity m_angularVelocity = RadiansPerSecond.mutable(0.0);
-
-  // The angular acceleration of the system.
-  private final MutAngularAcceleration m_angularAcceleration =
-      RadiansPerSecondPerSecond.mutable(0.0);
 
   /**
    * Creates a simulated DC motor mechanism.
@@ -160,8 +147,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @return The DC motor's position
    */
   public Angle getAngularPosition() {
-    m_angle.mut_setMagnitude(getAngularPositionRad());
-    return m_angle;
+    return Radians.of(getAngularPositionRad());
   }
 
   /**
@@ -188,8 +174,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @return The DC motor's velocity
    */
   public AngularVelocity getAngularVelocity() {
-    m_angularVelocity.mut_setMagnitude(getAngularVelocityRadPerSec());
-    return m_angularVelocity;
+    return RadiansPerSecond.of(getAngularVelocityRadPerSec());
   }
 
   /**
@@ -208,8 +193,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @return The DC motor's acceleration.
    */
   public AngularAcceleration getAngularAcceleration() {
-    m_angularAcceleration.mut_setMagnitude(getAngularAccelerationRadPerSecSq());
-    return m_angularAcceleration;
+    return RadiansPerSecondPerSecond.of(getAngularAccelerationRadPerSecSq());
   }
 
   /**

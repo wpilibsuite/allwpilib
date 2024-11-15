@@ -21,7 +21,6 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
     id 'com.diffplug.spotless' version '6.20.0' apply false
     id 'com.github.spotbugs' version '6.0.2' apply false
-    id 'com.google.protobuf' version '0.9.3' apply false
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')

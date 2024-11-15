@@ -12,7 +12,7 @@ public class MsvcRuntimeException extends RuntimeException {
       int foundMajor, int foundMinor, int expectedMajor, int expectedMinor, String runtimePath) {
     String jvmLocation = ProcessHandle.current().info().command().orElse("Unknown");
 
-    StringBuffer builder = new StringBuffer(100);
+    StringBuilder builder = new StringBuilder(100);
     builder
         .append("Invalid MSVC Runtime Detected.\n")
         .append(

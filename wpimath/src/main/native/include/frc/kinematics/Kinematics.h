@@ -24,6 +24,8 @@ template <typename WheelSpeeds, typename WheelPositions>
            std::assignable_from<WheelPositions&, const WheelPositions&>
 class WPILIB_DLLEXPORT Kinematics {
  public:
+  virtual ~Kinematics() noexcept = default;
+
   /**
    * Performs forward kinematics to return the resulting chassis speed from the
    * wheel speeds. This method is often used for odometry -- determining the

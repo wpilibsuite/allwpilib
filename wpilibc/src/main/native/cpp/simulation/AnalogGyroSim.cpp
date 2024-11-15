@@ -5,7 +5,6 @@
 #include "frc/simulation/AnalogGyroSim.h"
 
 #include <memory>
-#include <utility>
 
 #include <hal/simulation/AnalogGyroData.h>
 

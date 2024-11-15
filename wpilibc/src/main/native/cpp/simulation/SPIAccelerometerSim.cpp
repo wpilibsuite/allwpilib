@@ -5,7 +5,6 @@
 #include "frc/simulation/SPIAccelerometerSim.h"
 
 #include <memory>
-#include <utility>
 
 #include <hal/simulation/SPIAccelerometerData.h>
 

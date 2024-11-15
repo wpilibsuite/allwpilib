@@ -6,51 +6,7 @@
 
 #include <wpi/sendable/SendableBuilder.h>
 
-#include "wpimath/MathShared.h"
-
 using namespace frc;
-
-BangBangController::BangBangController(double tolerance)
-    : m_tolerance(tolerance) {}
-
-void BangBangController::SetSetpoint(double setpoint) {
-  m_setpoint = setpoint;
-}
-
-double BangBangController::GetSetpoint() const {
-  return m_setpoint;
-}
-
-bool BangBangController::AtSetpoint() const {
-  return std::abs(m_setpoint - m_measurement) < m_tolerance;
-}
-
-void BangBangController::SetTolerance(double tolerance) {
-  m_tolerance = tolerance;
-}
-
-double BangBangController::GetTolerance() const {
-  return m_tolerance;
-}
-
-double BangBangController::GetMeasurement() const {
-  return m_measurement;
-}
-
-double BangBangController::GetError() const {
-  return m_setpoint - m_measurement;
-}
-
-double BangBangController::Calculate(double measurement, double setpoint) {
-  m_measurement = measurement;
-  m_setpoint = setpoint;
-
-  return measurement < setpoint ? 1 : 0;
-}
-
-double BangBangController::Calculate(double measurement) {
-  return Calculate(measurement, m_setpoint);
-}
 
 void BangBangController::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("BangBangController");
