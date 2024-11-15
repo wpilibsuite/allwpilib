@@ -101,6 +101,17 @@ public final class RobotController {
   }
 
   /**
+   * Read the microsecond timestamp. By default, the time is based on the FPGA hardware clock in
+   * microseconds since the FPGA started. However, the return value of this method may be modified
+   * to use any time base, including non-monotonic and non-continuous time bases.
+   *
+   * @return The current time in a measure.
+   */
+  public static Time getMeasureTime() {
+    return Microseconds.of(m_timeSource.getAsLong());
+  }
+
+  /**
    * Read the microsecond timer from the FPGA.
    *
    * @return The current time in microseconds according to the FPGA.
