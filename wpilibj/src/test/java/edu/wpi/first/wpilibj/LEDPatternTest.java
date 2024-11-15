@@ -695,8 +695,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
     blend.applyTo(buffer);
 
-    // Individual RGB channels are averaged; #0000FF blended with #FF0000 yields
-    // #7F007F
+    // Individual RGB channels are averaged; #0000FF blended with #FF0000 yields #7F007F
     assertColorEquals(new Color(127, 0, 127), buffer.getLED(0));
   }
 
