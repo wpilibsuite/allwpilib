@@ -25,7 +25,6 @@ import static edu.wpi.first.wpilibj.util.Color.kYellow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import java.util.Map;
@@ -36,37 +35,37 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class LEDPatternTest {
+  long m_mockTime;
+
   // Applies a pattern of White, Yellow, Purple to LED triplets
-  LEDPattern m_whiteYellowPurple =
-      (reader, writer) -> {
-        for (int led = 0; led < reader.getLength(); led++) {
-          switch (led % 3) {
-            case 0:
-              writer.setLED(led, kWhite);
-              break;
-            case 1:
-              writer.setLED(led, kYellow);
-              break;
-            case 2:
-              writer.setLED(led, kPurple);
-              break;
-            default:
-              fail("Bad test setup");
-              break;
-          }
-        }
-      };
+  LEDPattern m_whiteYellowPurple = (reader, writer) -> {
+    for (int led = 0; led < reader.getLength(); led++) {
+      switch (led % 3) {
+        case 0:
+          writer.setLED(led, kWhite);
+          break;
+        case 1:
+          writer.setLED(led, kYellow);
+          break;
+        case 2:
+          writer.setLED(led, kPurple);
+          break;
+        default:
+          fail("Bad test setup");
+          break;
+      }
+    }
+  };
 
   @BeforeEach
   void setUp() {
-    WPIUtilJNI.enableMockTime();
-    WPIUtilJNI.setMockTime(0L);
+    m_mockTime = 0;
+    RobotController.setTimeSource(() -> m_mockTime);
   }
 
   @AfterEach
   void tearDown() {
-    WPIUtilJNI.setMockTime(0L);
-    WPIUtilJNI.disableMockTime();
+    RobotController.setTimeSource(RobotController::getFPGATime);
   }
 
   @Test
@@ -209,27 +208,27 @@ class LEDPatternTest {
   void scrollForward() {
     var buffer = new AddressableLEDBuffer(256);
 
-    LEDPattern base =
-        (reader, writer) -> {
-          for (int led = 0; led < reader.getLength(); led++) {
-            writer.setRGB(led, led % 256, led % 256, led % 256);
-          }
-        };
+    LEDPattern base = (reader, writer) -> {
+      for (int led = 0; led < reader.getLength(); led++) {
+        writer.setRGB(led, led % 256, led % 256, led % 256);
+      }
+    };
 
     // scroll forwards 1/256th (1 LED) per microsecond - this makes mock time easier
     var scroll = base.scrollAtRelativeSpeed(Value.per(Microsecond).of(1 / 256.0));
 
     for (int time = 0; time < 500; time++) {
-      WPIUtilJNI.setMockTime(time);
+      m_mockTime = time;
       scroll.applyTo(buffer);
 
       for (int led = 0; led < buffer.getLength(); led++) {
         // Base: [(0, 0, 0) (1, 1, 1) (2, 2, 2) (3, 3, 3) (4, 4, 4) ... (255, 255, 255)]
-        // Value for every channel should DECREASE by 1 in each timestep, wrapping around 0 and 255
+        // Value for every channel should DECREASE by 1 in each timestep, wrapping
+        // around 0 and 255
 
-        // t=0,   channel value = (0, 1, 2, ..., 254, 255)
-        // t=1,   channel value = (255, 0, 1, ..., 253, 254)
-        // t=2,   channel value = (254, 255, 0, ..., 252, 253)
+        // t=0, channel value = (0, 1, 2, ..., 254, 255)
+        // t=1, channel value = (255, 0, 1, ..., 253, 254)
+        // t=2, channel value = (254, 255, 0, ..., 252, 253)
         // t=255, channel value = (1, 2, 3, ..., 255, 0)
         // t=256, channel value = (0, 1, 2, ..., 254, 255)
         int ch = Math.floorMod(led - time, 256);
@@ -243,27 +242,28 @@ class LEDPatternTest {
   void scrollBackward() {
     var buffer = new AddressableLEDBuffer(256);
 
-    LEDPattern base =
-        (reader, writer) -> {
-          for (int led = 0; led < reader.getLength(); led++) {
-            writer.setRGB(led, led % 256, led % 256, led % 256);
-          }
-        };
+    LEDPattern base = (reader, writer) -> {
+      for (int led = 0; led < reader.getLength(); led++) {
+        writer.setRGB(led, led % 256, led % 256, led % 256);
+      }
+    };
 
-    // scroll backwards 1/256th (1 LED) per microsecond - this makes mock time easier
+    // scroll backwards 1/256th (1 LED) per microsecond - this makes mock time
+    // easier
     var scroll = base.scrollAtRelativeSpeed(Value.per(Microsecond).of(-1 / 256.0));
 
     for (int time = 0; time < 500; time++) {
-      WPIUtilJNI.setMockTime(time);
+      m_mockTime = time;
       scroll.applyTo(buffer);
 
       for (int led = 0; led < buffer.getLength(); led++) {
         // Base: [(0, 0, 0) (1, 1, 1) (2, 2, 2) (3, 3, 3) (4, 4, 4) ... (255, 255, 255)]
-        // Value for every channel should INCREASE by 1 in each timestep, wrapping around 0 and 255
+        // Value for every channel should INCREASE by 1 in each timestep, wrapping
+        // around 0 and 255
 
-        // t=0,   channel value = (0, 1, 2, ..., 254, 255)
-        // t=1,   channel value = (1, 2, 3, ..., 255, 0)
-        // t=2,   channel value = (2, 3, 4, ..., 0, 1)
+        // t=0, channel value = (0, 1, 2, ..., 254, 255)
+        // t=1, channel value = (1, 2, 3, ..., 255, 0)
+        // t=2, channel value = (2, 3, 4, ..., 0, 1)
         // t=255, channel value = (255, 0, 1, ..., 253, 254)
         // t=256, channel value = (0, 1, 2, ..., 254, 255)
         int ch = Math.floorMod(led + time, 256);
@@ -277,29 +277,30 @@ class LEDPatternTest {
   void scrollAbsoluteSpeedForward() {
     var buffer = new AddressableLEDBuffer(256);
 
-    LEDPattern base =
-        (reader, writer) -> {
-          for (int led = 0; led < reader.getLength(); led++) {
-            writer.setRGB(led, led % 256, led % 256, led % 256);
-          }
-        };
+    LEDPattern base = (reader, writer) -> {
+      for (int led = 0; led < reader.getLength(); led++) {
+        writer.setRGB(led, led % 256, led % 256, led % 256);
+      }
+    };
 
     // scroll at 16 m/s, LED spacing = 2cm
     // buffer is 256 LEDs, so total length = 512cm = 5.12m
-    // scrolling at 16 m/s yields a period of 0.32 seconds, or 0.00125 seconds per LED (800 LEDs/s)
+    // scrolling at 16 m/s yields a period of 0.32 seconds, or 0.00125 seconds per
+    // LED (800 LEDs/s)
     var scroll = base.scrollAtAbsoluteSpeed(MetersPerSecond.of(16), Centimeters.of(2));
 
     for (int time = 0; time < 500; time++) {
-      WPIUtilJNI.setMockTime(time * 1_250); // 1.25ms per LED
+      m_mockTime = time * 1_250; // 1.25ms per LED
       scroll.applyTo(buffer);
 
       for (int led = 0; led < buffer.getLength(); led++) {
         // Base: [(0, 0, 0) (1, 1, 1) (2, 2, 2) (3, 3, 3) (4, 4, 4) ... (255, 255, 255)]
-        // Value for every channel should DECREASE by 1 in each timestep, wrapping around 0 and 255
+        // Value for every channel should DECREASE by 1 in each timestep, wrapping
+        // around 0 and 255
 
-        // t=0,   channel value = (0, 1, 2, ..., 254, 255)
-        // t=1,   channel value = (255, 0, 1, ..., 253, 254)
-        // t=2,   channel value = (254, 255, 0, ..., 252, 253)
+        // t=0, channel value = (0, 1, 2, ..., 254, 255)
+        // t=1, channel value = (255, 0, 1, ..., 253, 254)
+        // t=2, channel value = (254, 255, 0, ..., 252, 253)
         // t=255, channel value = (1, 2, 3, ..., 255, 0)
         // t=256, channel value = (0, 1, 2, ..., 254, 255)
         int ch = Math.floorMod(led - time, 256);
@@ -313,29 +314,30 @@ class LEDPatternTest {
   void scrollAbsoluteSpeedBackward() {
     var buffer = new AddressableLEDBuffer(256);
 
-    LEDPattern base =
-        (reader, writer) -> {
-          for (int led = 0; led < reader.getLength(); led++) {
-            writer.setRGB(led, led % 256, led % 256, led % 256);
-          }
-        };
+    LEDPattern base = (reader, writer) -> {
+      for (int led = 0; led < reader.getLength(); led++) {
+        writer.setRGB(led, led % 256, led % 256, led % 256);
+      }
+    };
 
     // scroll at 16 m/s, LED spacing = 2cm
     // buffer is 256 LEDs, so total length = 512cm = 5.12m
-    // scrolling at 16 m/s yields a period of 0.32 seconds, or 0.00125 seconds per LED (800 LEDs/s)
+    // scrolling at 16 m/s yields a period of 0.32 seconds, or 0.00125 seconds per
+    // LED (800 LEDs/s)
     var scroll = base.scrollAtAbsoluteSpeed(MetersPerSecond.of(-16), Centimeters.of(2));
 
     for (int time = 0; time < 500; time++) {
-      WPIUtilJNI.setMockTime(time * 1_250); // 1.25ms per LED
+      m_mockTime = time * 1_250; // 1.25ms per LED
       scroll.applyTo(buffer);
 
       for (int led = 0; led < buffer.getLength(); led++) {
         // Base: [(0, 0, 0) (1, 1, 1) (2, 2, 2) (3, 3, 3) (4, 4, 4) ... (255, 255, 255)]
-        // Value for every channel should DECREASE by 1 in each timestep, wrapping around 0 and 255
+        // Value for every channel should DECREASE by 1 in each timestep, wrapping
+        // around 0 and 255
 
-        // t=0,   channel value = (0, 1, 2, ..., 254, 255)
-        // t=1,   channel value = (255, 0, 1, ..., 253, 254)
-        // t=2,   channel value = (254, 255, 0, ..., 252, 253)
+        // t=0, channel value = (0, 1, 2, ..., 254, 255)
+        // t=1, channel value = (255, 0, 1, ..., 253, 254)
+        // t=2, channel value = (254, 255, 0, ..., 252, 253)
         // t=255, channel value = (1, 2, 3, ..., 255, 0)
         // t=256, channel value = (0, 1, 2, ..., 254, 255)
         int ch = Math.floorMod(led + time, 256);
@@ -539,7 +541,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
 
     for (int t = 0; t < 8; t++) {
-      WPIUtilJNI.setMockTime(t * 1_000_000L); // time travel 1 second
+      m_mockTime = t * 1_000_000L; // time travel 1 second
       pattern.applyTo(buffer);
 
       Color color = buffer.getLED(0);
@@ -571,7 +573,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
 
     for (int t = 0; t < 8; t++) {
-      WPIUtilJNI.setMockTime(t * 1_000_000L); // time travel 1 second
+      m_mockTime = t * 1_000_000L; // time travel 1 second
       pattern.applyTo(buffer);
 
       Color color = buffer.getLED(0);
@@ -623,31 +625,31 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
 
     {
-      WPIUtilJNI.setMockTime(0); // start
+      m_mockTime = 0; // start
       pattern.applyTo(buffer);
       assertColorEquals(kWhite, buffer.getLED(0));
     }
 
     {
-      WPIUtilJNI.setMockTime(1); // midway (down)
+      m_mockTime = 1; // midway (down)
       pattern.applyTo(buffer);
       assertColorEquals(midGray, buffer.getLED(0));
     }
 
     {
-      WPIUtilJNI.setMockTime(2); // bottom
+      m_mockTime = 2; // bottom
       pattern.applyTo(buffer);
       assertColorEquals(kBlack, buffer.getLED(0));
     }
 
     {
-      WPIUtilJNI.setMockTime(3); // midway (up)
+      m_mockTime = 3; // midway (up)
       pattern.applyTo(buffer);
       assertColorEquals(midGray, buffer.getLED(0));
     }
 
     {
-      WPIUtilJNI.setMockTime(4); // back to start
+      m_mockTime = 4; // back to start
       pattern.applyTo(buffer);
       assertColorEquals(kWhite, buffer.getLED(0));
     }
@@ -676,8 +678,7 @@ class LEDPatternTest {
 
   @Test
   void overlayMixed() {
-    var overlay =
-        LEDPattern.steps(Map.of(0, kYellow, 0.5, kBlack)).overlayOn(LEDPattern.solid(kWhite));
+    var overlay = LEDPattern.steps(Map.of(0, kYellow, 0.5, kBlack)).overlayOn(LEDPattern.solid(kWhite));
 
     var buffer = new AddressableLEDBuffer(2);
     overlay.applyTo(buffer);
@@ -695,7 +696,8 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
     blend.applyTo(buffer);
 
-    // Individual RGB channels are averaged; #0000FF blended with #FF0000 yields #7F007F
+    // Individual RGB channels are averaged; #0000FF blended with #FF0000 yields
+    // #7F007F
     assertColorEquals(new Color(127, 0, 127), buffer.getLED(0));
   }
 
@@ -725,8 +727,7 @@ class LEDPatternTest {
     Color halfGray = new Color(0.5, 0.5, 0.5);
     var base = LEDPattern.solid(baseColor);
 
-    var mask =
-        LEDPattern.steps(Map.of(0, kRed, 0.2, kLime, 0.4, kBlue, 0.6, halfGray, 0.8, kWhite));
+    var mask = LEDPattern.steps(Map.of(0, kRed, 0.2, kLime, 0.4, kBlue, 0.6, halfGray, 0.8, kWhite));
 
     var masked = base.mask(mask);
 
