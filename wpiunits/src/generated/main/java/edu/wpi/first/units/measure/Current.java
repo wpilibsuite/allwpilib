@@ -66,13 +66,13 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Current divide(double divisor) {
+  default Current div(double divisor) {
     return (Current) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
   }
 
   @Override
   default Velocity<CurrentUnit> per(TimeUnit period) {
-    return divide(period.of(1));
+    return div(period.of(1));
   }
 
 
@@ -82,8 +82,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
-    return (Per<CurrentUnit, AccelerationUnit<?>>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
+    return (Per<CurrentUnit, AccelerationUnit<?>>) Measure.super.div(divisor);
   }
 
 
@@ -93,8 +93,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, AngleUnit> divide(Angle divisor) {
-    return (Per<CurrentUnit, AngleUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, AngleUnit> div(Angle divisor) {
+    return (Per<CurrentUnit, AngleUnit>) Measure.super.div(divisor);
   }
 
 
@@ -104,8 +104,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
-    return (Per<CurrentUnit, AngularAccelerationUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
+    return (Per<CurrentUnit, AngularAccelerationUnit>) Measure.super.div(divisor);
   }
 
 
@@ -115,8 +115,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
-    return (Per<CurrentUnit, AngularMomentumUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
+    return (Per<CurrentUnit, AngularMomentumUnit>) Measure.super.div(divisor);
   }
 
 
@@ -126,8 +126,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
-    return (Per<CurrentUnit, AngularVelocityUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
+    return (Per<CurrentUnit, AngularVelocityUnit>) Measure.super.div(divisor);
   }
 
 
@@ -137,12 +137,12 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Dimensionless divide(Current divisor) {
+  default Dimensionless div(Current divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  default Current divide(Dimensionless divisor) {
+  default Current div(Dimensionless divisor) {
     return (Current) Amps.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -158,8 +158,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, DistanceUnit> divide(Distance divisor) {
-    return (Per<CurrentUnit, DistanceUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, DistanceUnit> div(Distance divisor) {
+    return (Per<CurrentUnit, DistanceUnit>) Measure.super.div(divisor);
   }
 
 
@@ -169,8 +169,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, EnergyUnit> divide(Energy divisor) {
-    return (Per<CurrentUnit, EnergyUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, EnergyUnit> div(Energy divisor) {
+    return (Per<CurrentUnit, EnergyUnit>) Measure.super.div(divisor);
   }
 
 
@@ -180,8 +180,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, ForceUnit> divide(Force divisor) {
-    return (Per<CurrentUnit, ForceUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, ForceUnit> div(Force divisor) {
+    return (Per<CurrentUnit, ForceUnit>) Measure.super.div(divisor);
   }
 
 
@@ -191,8 +191,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, FrequencyUnit> divide(Frequency divisor) {
-    return (Per<CurrentUnit, FrequencyUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, FrequencyUnit> div(Frequency divisor) {
+    return (Per<CurrentUnit, FrequencyUnit>) Measure.super.div(divisor);
   }
 
 
@@ -202,8 +202,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
-    return (Per<CurrentUnit, LinearAccelerationUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
+    return (Per<CurrentUnit, LinearAccelerationUnit>) Measure.super.div(divisor);
   }
 
 
@@ -213,8 +213,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
-    return (Per<CurrentUnit, LinearMomentumUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
+    return (Per<CurrentUnit, LinearMomentumUnit>) Measure.super.div(divisor);
   }
 
 
@@ -224,8 +224,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
-    return (Per<CurrentUnit, LinearVelocityUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
+    return (Per<CurrentUnit, LinearVelocityUnit>) Measure.super.div(divisor);
   }
 
 
@@ -235,8 +235,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, MassUnit> divide(Mass divisor) {
-    return (Per<CurrentUnit, MassUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, MassUnit> div(Mass divisor) {
+    return (Per<CurrentUnit, MassUnit>) Measure.super.div(divisor);
   }
 
 
@@ -246,8 +246,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
-    return (Per<CurrentUnit, MomentOfInertiaUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
+    return (Per<CurrentUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
   }
 
 
@@ -257,8 +257,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
-    return (Per<CurrentUnit, MultUnit<?, ?>>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
+    return (Per<CurrentUnit, MultUnit<?, ?>>) Measure.super.div(divisor);
   }
 
 
@@ -268,8 +268,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
-    return (Per<CurrentUnit, PerUnit<?, ?>>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, PerUnit<?, ?>> div(Per<?, ?> divisor) {
+    return (Per<CurrentUnit, PerUnit<?, ?>>) Measure.super.div(divisor);
   }
 
 
@@ -279,8 +279,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, PowerUnit> divide(Power divisor) {
-    return (Per<CurrentUnit, PowerUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, PowerUnit> div(Power divisor) {
+    return (Per<CurrentUnit, PowerUnit>) Measure.super.div(divisor);
   }
 
 
@@ -290,8 +290,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, ResistanceUnit> divide(Resistance divisor) {
-    return (Per<CurrentUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, ResistanceUnit> div(Resistance divisor) {
+    return (Per<CurrentUnit, ResistanceUnit>) Measure.super.div(divisor);
   }
 
 
@@ -301,8 +301,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, TemperatureUnit> divide(Temperature divisor) {
-    return (Per<CurrentUnit, TemperatureUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, TemperatureUnit> div(Temperature divisor) {
+    return (Per<CurrentUnit, TemperatureUnit>) Measure.super.div(divisor);
   }
 
 
@@ -312,7 +312,7 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Velocity<CurrentUnit> divide(Time divisor) {
+  default Velocity<CurrentUnit> div(Time divisor) {
     return VelocityUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -323,8 +323,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, TorqueUnit> divide(Torque divisor) {
-    return (Per<CurrentUnit, TorqueUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, TorqueUnit> div(Torque divisor) {
+    return (Per<CurrentUnit, TorqueUnit>) Measure.super.div(divisor);
   }
 
 
@@ -334,8 +334,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
-    return (Per<CurrentUnit, VelocityUnit<?>>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, VelocityUnit<?>> div(Velocity<?> divisor) {
+    return (Per<CurrentUnit, VelocityUnit<?>>) Measure.super.div(divisor);
   }
 
 
@@ -345,8 +345,8 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
-  default Per<CurrentUnit, VoltageUnit> divide(Voltage divisor) {
-    return (Per<CurrentUnit, VoltageUnit>) Measure.super.divide(divisor);
+  default Per<CurrentUnit, VoltageUnit> div(Voltage divisor) {
+    return (Per<CurrentUnit, VoltageUnit>) Measure.super.div(divisor);
   }
 
 }

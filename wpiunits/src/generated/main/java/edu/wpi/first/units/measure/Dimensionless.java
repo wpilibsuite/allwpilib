@@ -66,13 +66,13 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Dimensionless divide(double divisor) {
+  default Dimensionless div(double divisor) {
     return (Dimensionless) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
   }
 
   @Override
   default Frequency per(TimeUnit period) {
-    return divide(period.of(1));
+    return div(period.of(1));
   }
 
 
@@ -82,8 +82,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
-    return (Per<DimensionlessUnit, AccelerationUnit<?>>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
+    return (Per<DimensionlessUnit, AccelerationUnit<?>>) Measure.super.div(divisor);
   }
 
 
@@ -93,8 +93,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, AngleUnit> divide(Angle divisor) {
-    return (Per<DimensionlessUnit, AngleUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, AngleUnit> div(Angle divisor) {
+    return (Per<DimensionlessUnit, AngleUnit>) Measure.super.div(divisor);
   }
 
 
@@ -104,8 +104,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
-    return (Per<DimensionlessUnit, AngularAccelerationUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
+    return (Per<DimensionlessUnit, AngularAccelerationUnit>) Measure.super.div(divisor);
   }
 
 
@@ -115,8 +115,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
-    return (Per<DimensionlessUnit, AngularMomentumUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
+    return (Per<DimensionlessUnit, AngularMomentumUnit>) Measure.super.div(divisor);
   }
 
 
@@ -126,8 +126,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
-    return (Per<DimensionlessUnit, AngularVelocityUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
+    return (Per<DimensionlessUnit, AngularVelocityUnit>) Measure.super.div(divisor);
   }
 
 
@@ -137,12 +137,12 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, CurrentUnit> divide(Current divisor) {
-    return (Per<DimensionlessUnit, CurrentUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, CurrentUnit> div(Current divisor) {
+    return (Per<DimensionlessUnit, CurrentUnit>) Measure.super.div(divisor);
   }
 
   @Override
-  default Dimensionless divide(Dimensionless divisor) {
+  default Dimensionless div(Dimensionless divisor) {
     return (Dimensionless) Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -158,8 +158,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, DistanceUnit> divide(Distance divisor) {
-    return (Per<DimensionlessUnit, DistanceUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, DistanceUnit> div(Distance divisor) {
+    return (Per<DimensionlessUnit, DistanceUnit>) Measure.super.div(divisor);
   }
 
 
@@ -169,8 +169,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, EnergyUnit> divide(Energy divisor) {
-    return (Per<DimensionlessUnit, EnergyUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, EnergyUnit> div(Energy divisor) {
+    return (Per<DimensionlessUnit, EnergyUnit>) Measure.super.div(divisor);
   }
 
 
@@ -180,8 +180,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, ForceUnit> divide(Force divisor) {
-    return (Per<DimensionlessUnit, ForceUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, ForceUnit> div(Force divisor) {
+    return (Per<DimensionlessUnit, ForceUnit>) Measure.super.div(divisor);
   }
 
 
@@ -191,8 +191,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, FrequencyUnit> divide(Frequency divisor) {
-    return (Per<DimensionlessUnit, FrequencyUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, FrequencyUnit> div(Frequency divisor) {
+    return (Per<DimensionlessUnit, FrequencyUnit>) Measure.super.div(divisor);
   }
 
 
@@ -202,8 +202,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
-    return (Per<DimensionlessUnit, LinearAccelerationUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
+    return (Per<DimensionlessUnit, LinearAccelerationUnit>) Measure.super.div(divisor);
   }
 
 
@@ -213,8 +213,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
-    return (Per<DimensionlessUnit, LinearMomentumUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
+    return (Per<DimensionlessUnit, LinearMomentumUnit>) Measure.super.div(divisor);
   }
 
 
@@ -224,8 +224,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
-    return (Per<DimensionlessUnit, LinearVelocityUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
+    return (Per<DimensionlessUnit, LinearVelocityUnit>) Measure.super.div(divisor);
   }
 
 
@@ -235,8 +235,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, MassUnit> divide(Mass divisor) {
-    return (Per<DimensionlessUnit, MassUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, MassUnit> div(Mass divisor) {
+    return (Per<DimensionlessUnit, MassUnit>) Measure.super.div(divisor);
   }
 
 
@@ -246,8 +246,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
-    return (Per<DimensionlessUnit, MomentOfInertiaUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
+    return (Per<DimensionlessUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
   }
 
 
@@ -257,8 +257,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
-    return (Per<DimensionlessUnit, MultUnit<?, ?>>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
+    return (Per<DimensionlessUnit, MultUnit<?, ?>>) Measure.super.div(divisor);
   }
 
 
@@ -268,8 +268,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
-    return (Per<DimensionlessUnit, PerUnit<?, ?>>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, PerUnit<?, ?>> div(Per<?, ?> divisor) {
+    return (Per<DimensionlessUnit, PerUnit<?, ?>>) Measure.super.div(divisor);
   }
 
 
@@ -279,8 +279,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, PowerUnit> divide(Power divisor) {
-    return (Per<DimensionlessUnit, PowerUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, PowerUnit> div(Power divisor) {
+    return (Per<DimensionlessUnit, PowerUnit>) Measure.super.div(divisor);
   }
 
 
@@ -290,8 +290,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, ResistanceUnit> divide(Resistance divisor) {
-    return (Per<DimensionlessUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, ResistanceUnit> div(Resistance divisor) {
+    return (Per<DimensionlessUnit, ResistanceUnit>) Measure.super.div(divisor);
   }
 
 
@@ -301,8 +301,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, TemperatureUnit> divide(Temperature divisor) {
-    return (Per<DimensionlessUnit, TemperatureUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, TemperatureUnit> div(Temperature divisor) {
+    return (Per<DimensionlessUnit, TemperatureUnit>) Measure.super.div(divisor);
   }
 
 
@@ -312,7 +312,7 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Frequency divide(Time divisor) {
+  default Frequency div(Time divisor) {
     return Hertz.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -323,8 +323,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, TorqueUnit> divide(Torque divisor) {
-    return (Per<DimensionlessUnit, TorqueUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, TorqueUnit> div(Torque divisor) {
+    return (Per<DimensionlessUnit, TorqueUnit>) Measure.super.div(divisor);
   }
 
 
@@ -334,8 +334,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
-    return (Per<DimensionlessUnit, VelocityUnit<?>>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, VelocityUnit<?>> div(Velocity<?> divisor) {
+    return (Per<DimensionlessUnit, VelocityUnit<?>>) Measure.super.div(divisor);
   }
 
 
@@ -345,8 +345,8 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
-  default Per<DimensionlessUnit, VoltageUnit> divide(Voltage divisor) {
-    return (Per<DimensionlessUnit, VoltageUnit>) Measure.super.divide(divisor);
+  default Per<DimensionlessUnit, VoltageUnit> div(Voltage divisor) {
+    return (Per<DimensionlessUnit, VoltageUnit>) Measure.super.div(divisor);
   }
 
 }

@@ -134,9 +134,6 @@ if(WITH_JAVA OR WITH_JAVA_SOURCE)
     if(NOT ANDROID)
         find_package(JNI REQUIRED COMPONENTS JVM)
     endif()
-else()
-    # Protoc requires the java runtime
-    find_package(Java REQUIRED COMPONENTS Runtime)
 endif()
 
 if(WITH_DOCS)
