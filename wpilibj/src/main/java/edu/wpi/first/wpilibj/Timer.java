@@ -71,7 +71,7 @@ public class Timer {
   }
 
   private double getMsClock() {
-    return getTimestamp() / 1000.0;
+    return RobotController.getTime() / 1000.0;
   }
 
   /**
