@@ -225,12 +225,11 @@ class LEDPatternTest {
 
       for (int led = 0; led < buffer.getLength(); led++) {
         // Base: [(0, 0, 0) (1, 1, 1) (2, 2, 2) (3, 3, 3) (4, 4, 4) ... (255, 255, 255)]
-        // Value for every channel should DECREASE by 1 in each timestep, wrapping
-        // around 0 and 255
+        // Value for every channel should DECREASE by 1 in each timestep, wrapping around 0 and 255
 
-        // t=0, channel value = (0, 1, 2, ..., 254, 255)
-        // t=1, channel value = (255, 0, 1, ..., 253, 254)
-        // t=2, channel value = (254, 255, 0, ..., 252, 253)
+        // t=0,   channel value = (0, 1, 2, ..., 254, 255)
+        // t=1,   channel value = (255, 0, 1, ..., 253, 254)
+        // t=2,   channel value = (254, 255, 0, ..., 252, 253)
         // t=255, channel value = (1, 2, 3, ..., 255, 0)
         // t=256, channel value = (0, 1, 2, ..., 254, 255)
         int ch = Math.floorMod(led - time, 256);
@@ -251,8 +250,7 @@ class LEDPatternTest {
           }
         };
 
-    // scroll backwards 1/256th (1 LED) per microsecond - this makes mock time
-    // easier
+    // scroll backwards 1/256th (1 LED) per microsecond - this makes mock time easier
     var scroll = base.scrollAtRelativeSpeed(Value.per(Microsecond).of(-1 / 256.0));
 
     for (int time = 0; time < 500; time++) {
@@ -261,12 +259,11 @@ class LEDPatternTest {
 
       for (int led = 0; led < buffer.getLength(); led++) {
         // Base: [(0, 0, 0) (1, 1, 1) (2, 2, 2) (3, 3, 3) (4, 4, 4) ... (255, 255, 255)]
-        // Value for every channel should INCREASE by 1 in each timestep, wrapping
-        // around 0 and 255
+        // Value for every channel should INCREASE by 1 in each timestep, wrapping around 0 and 255
 
-        // t=0, channel value = (0, 1, 2, ..., 254, 255)
-        // t=1, channel value = (1, 2, 3, ..., 255, 0)
-        // t=2, channel value = (2, 3, 4, ..., 0, 1)
+        // t=0,   channel value = (0, 1, 2, ..., 254, 255)
+        // t=1,   channel value = (1, 2, 3, ..., 255, 0)
+        // t=2,   channel value = (2, 3, 4, ..., 0, 1)
         // t=255, channel value = (255, 0, 1, ..., 253, 254)
         // t=256, channel value = (0, 1, 2, ..., 254, 255)
         int ch = Math.floorMod(led + time, 256);
@@ -289,8 +286,7 @@ class LEDPatternTest {
 
     // scroll at 16 m/s, LED spacing = 2cm
     // buffer is 256 LEDs, so total length = 512cm = 5.12m
-    // scrolling at 16 m/s yields a period of 0.32 seconds, or 0.00125 seconds per
-    // LED (800 LEDs/s)
+    // scrolling at 16 m/s yields a period of 0.32 seconds, or 0.00125 seconds per LED (800 LEDs/s)
     var scroll = base.scrollAtAbsoluteSpeed(MetersPerSecond.of(16), Centimeters.of(2));
 
     for (int time = 0; time < 500; time++) {
@@ -299,12 +295,11 @@ class LEDPatternTest {
 
       for (int led = 0; led < buffer.getLength(); led++) {
         // Base: [(0, 0, 0) (1, 1, 1) (2, 2, 2) (3, 3, 3) (4, 4, 4) ... (255, 255, 255)]
-        // Value for every channel should DECREASE by 1 in each timestep, wrapping
-        // around 0 and 255
+        // Value for every channel should DECREASE by 1 in each timestep, wrapping around 0 and 255
 
-        // t=0, channel value = (0, 1, 2, ..., 254, 255)
-        // t=1, channel value = (255, 0, 1, ..., 253, 254)
-        // t=2, channel value = (254, 255, 0, ..., 252, 253)
+        // t=0,   channel value = (0, 1, 2, ..., 254, 255)
+        // t=1,   channel value = (255, 0, 1, ..., 253, 254)
+        // t=2,   channel value = (254, 255, 0, ..., 252, 253)
         // t=255, channel value = (1, 2, 3, ..., 255, 0)
         // t=256, channel value = (0, 1, 2, ..., 254, 255)
         int ch = Math.floorMod(led - time, 256);
@@ -327,8 +322,7 @@ class LEDPatternTest {
 
     // scroll at 16 m/s, LED spacing = 2cm
     // buffer is 256 LEDs, so total length = 512cm = 5.12m
-    // scrolling at 16 m/s yields a period of 0.32 seconds, or 0.00125 seconds per
-    // LED (800 LEDs/s)
+    // scrolling at 16 m/s yields a period of 0.32 seconds, or 0.00125 seconds per LED (800 LEDs/s)
     var scroll = base.scrollAtAbsoluteSpeed(MetersPerSecond.of(-16), Centimeters.of(2));
 
     for (int time = 0; time < 500; time++) {
@@ -337,12 +331,11 @@ class LEDPatternTest {
 
       for (int led = 0; led < buffer.getLength(); led++) {
         // Base: [(0, 0, 0) (1, 1, 1) (2, 2, 2) (3, 3, 3) (4, 4, 4) ... (255, 255, 255)]
-        // Value for every channel should DECREASE by 1 in each timestep, wrapping
-        // around 0 and 255
+        // Value for every channel should DECREASE by 1 in each timestep, wrapping around 0 and 255
 
-        // t=0, channel value = (0, 1, 2, ..., 254, 255)
-        // t=1, channel value = (255, 0, 1, ..., 253, 254)
-        // t=2, channel value = (254, 255, 0, ..., 252, 253)
+        // t=0,   channel value = (0, 1, 2, ..., 254, 255)
+        // t=1,   channel value = (255, 0, 1, ..., 253, 254)
+        // t=2,   channel value = (254, 255, 0, ..., 252, 253)
         // t=255, channel value = (1, 2, 3, ..., 255, 0)
         // t=256, channel value = (0, 1, 2, ..., 254, 255)
         int ch = Math.floorMod(led + time, 256);
