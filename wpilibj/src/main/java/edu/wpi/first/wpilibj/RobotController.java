@@ -57,10 +57,8 @@ public final class RobotController {
   }
 
   /**
-   * Return the FPGA Revision number. The format of the revision is 3 numbers. The
-   * 12 most
-   * significant bits are the Major Revision. the next 8 bits are the Minor
-   * Revision. The 12 least
+   * Return the FPGA Revision number. The format of the revision is 3 numbers. The 12 most
+   * significant bits are the Major Revision. the next 8 bits are the Minor Revision. The 12 least
    * significant bits are the Build Number.
    *
    * @return FPGA Revision number.
@@ -81,11 +79,8 @@ public final class RobotController {
   /**
    * Return the comments from the roboRIO web interface.
    *
-   * <p>
-   * The comments string is cached after the first call to this function on the
-   * RoboRIO - restart
-   * the robot code to reload the comments string after changing it in the web
-   * interface.
+   * <p>The comments string is cached after the first call to this function on the RoboRIO - restart
+   * the robot code to reload the comments string after changing it in the web interface.
    *
    * @return the comments from the roboRIO web interface.
    */
@@ -103,10 +98,9 @@ public final class RobotController {
   }
 
   /**
-   * Sets a new source to provide the clock time in microseconds. Changing this
-   * affects the return
+   * Sets a new source to provide the clock time in microseconds. Changing this affects the return
    * value of {@code getTime} in Java.
-   * 
+   *
    * @param supplier Function to return the time in microseconds.
    */
   public static void setTimeSource(LongSupplier supplier) {
@@ -114,10 +108,8 @@ public final class RobotController {
   }
 
   /**
-   * Read the microsecond timestamp. By default, the time is based on the FPGA
-   * hardware clock in
-   * microseconds since the FPGA started. However, the return value of this method
-   * may be modified
+   * Read the microsecond timestamp. By default, the time is based on the FPGA hardware clock in
+   * microseconds since the FPGA started. However, the return value of this method may be modified
    * to use any time base, including non-monotonic and non-continuous time bases.
    *
    * @return The current time in microseconds.
@@ -148,11 +140,8 @@ public final class RobotController {
   /**
    * Get the state of the "USER" button on the roboRIO.
    *
-   * <p>
-   * Warning: the User Button is used to stop user programs from automatically
-   * loading if it is
-   * held for more then 5 seconds. Because of this, it's not recommended to be
-   * used by teams for any
+   * <p>Warning: the User Button is used to stop user programs from automatically loading if it is
+   * held for more then 5 seconds. Because of this, it's not recommended to be used by teams for any
    * other purpose.
    *
    * @return true if the button is currently pressed down
@@ -181,10 +170,8 @@ public final class RobotController {
   }
 
   /**
-   * Gets a value indicating whether the FPGA outputs are enabled. The outputs may
-   * be disabled if
-   * the robot is disabled or e-stopped, the watchdog has expired, or if the
-   * roboRIO browns out.
+   * Gets a value indicating whether the FPGA outputs are enabled. The outputs may be disabled if
+   * the robot is disabled or e-stopped, the watchdog has expired, or if the roboRIO browns out.
    *
    * @return True if the FPGA outputs are enabled.
    */
@@ -202,8 +189,7 @@ public final class RobotController {
   }
 
   /**
-   * Gets the number of times the system has been disabled due to communication
-   * errors with the
+   * Gets the number of times the system has been disabled due to communication errors with the
    * Driver Station.
    *
    * @return number of disables due to communication errors.
@@ -316,8 +302,7 @@ public final class RobotController {
   }
 
   /**
-   * Get the enabled state of the 3.3V rail. The rail may be disabled due to a
-   * controller brownout,
+   * Get the enabled state of the 3.3V rail. The rail may be disabled due to a controller brownout,
    * a short circuit on the rail, or controller over-voltage.
    *
    * @return The controller 3.3V rail enabled value
@@ -327,8 +312,7 @@ public final class RobotController {
   }
 
   /**
-   * Get the count of the total current faults on the 3.3V rail since the code
-   * started.
+   * Get the count of the total current faults on the 3.3V rail since the code started.
    *
    * @return The number of faults
    */
@@ -384,8 +368,7 @@ public final class RobotController {
   }
 
   /**
-   * Get the enabled state of the 5V rail. The rail may be disabled due to a
-   * controller brownout, a
+   * Get the enabled state of the 5V rail. The rail may be disabled due to a controller brownout, a
    * short circuit on the rail, or controller over-voltage.
    *
    * @return The controller 5V rail enabled value
@@ -395,8 +378,7 @@ public final class RobotController {
   }
 
   /**
-   * Get the count of the total current faults on the 5V rail since the code
-   * started.
+   * Get the count of the total current faults on the 5V rail since the code started.
    *
    * @return The number of faults
    */
@@ -452,8 +434,7 @@ public final class RobotController {
   }
 
   /**
-   * Get the enabled state of the 6V rail. The rail may be disabled due to a
-   * controller brownout, a
+   * Get the enabled state of the 6V rail. The rail may be disabled due to a controller brownout, a
    * short circuit on the rail, or controller over-voltage.
    *
    * @return The controller 6V rail enabled value
@@ -463,8 +444,7 @@ public final class RobotController {
   }
 
   /**
-   * Get the count of the total current faults on the 6V rail since the code
-   * started.
+   * Get the count of the total current faults on the 6V rail since the code started.
    *
    * @return The number of faults
    */
@@ -499,9 +479,7 @@ public final class RobotController {
   /**
    * Set the voltage the roboRIO will brownout and disable all outputs.
    *
-   * <p>
-   * Note that this only does anything on the roboRIO 2. On the roboRIO it is a
-   * no-op.
+   * <p>Note that this only does anything on the roboRIO 2. On the roboRIO it is a no-op.
    *
    * @param brownoutVoltage The brownout voltage
    */
@@ -510,12 +488,9 @@ public final class RobotController {
   }
 
   /**
-   * Set the voltage in a measure the roboRIO will brownout and disable all
-   * outputs.
+   * Set the voltage in a measure the roboRIO will brownout and disable all outputs.
    *
-   * <p>
-   * Note that this only does anything on the roboRIO 2. On the roboRIO it is a
-   * no-op.
+   * <p>Note that this only does anything on the roboRIO 2. On the roboRIO it is a no-op.
    *
    * @param brownoutVoltage The brownout voltage in a measure
    */
@@ -578,8 +553,7 @@ public final class RobotController {
   }
 
   /**
-   * Set the state of the "Radio" LED. On the RoboRIO, this writes to sysfs, so
-   * this function should
+   * Set the state of the "Radio" LED. On the RoboRIO, this writes to sysfs, so this function should
    * not be called multiple times per loop cycle to avoid overruns.
    *
    * @param state The state to set the LED to.
@@ -589,8 +563,7 @@ public final class RobotController {
   }
 
   /**
-   * Get the state of the "Radio" LED. On the RoboRIO, this reads from sysfs, so
-   * this function
+   * Get the state of the "Radio" LED. On the RoboRIO, this reads from sysfs, so this function
    * should not be called multiple times per loop cycle to avoid overruns.
    *
    * @return The state of the LED.
