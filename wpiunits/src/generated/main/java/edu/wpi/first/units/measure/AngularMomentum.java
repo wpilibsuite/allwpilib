@@ -44,6 +44,13 @@ public interface AngularMomentum extends Measure<AngularMomentumUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default AngularMomentum negate() {
+    return (AngularMomentum) unaryMinus();
+  }
+
+  @Override
   default AngularMomentum plus(Measure<? extends AngularMomentumUnit> other) {
     return (AngularMomentum) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface AngularMomentum extends Measure<AngularMomentumUnit> {
   @Override
   default Per<AngularMomentumUnit, PowerUnit> divide(Power divisor) {
     return (Per<AngularMomentumUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<AngularMomentumUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<AngularMomentumUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<AngularMomentumUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<AngularMomentumUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

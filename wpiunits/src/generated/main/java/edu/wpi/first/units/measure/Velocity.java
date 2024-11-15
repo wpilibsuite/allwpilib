@@ -44,6 +44,13 @@ public interface Velocity<D extends Unit> extends Measure<VelocityUnit<D>> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Velocity<D> negate() {
+    return (Velocity<D>) unaryMinus();
+  }
+
+  @Override
   default Velocity<D> plus(Measure<? extends VelocityUnit<D>> other) {
     return (Velocity<D>) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Velocity<D extends Unit> extends Measure<VelocityUnit<D>> {
   @Override
   default Per<VelocityUnit<D>, PowerUnit> divide(Power divisor) {
     return (Per<VelocityUnit<D>, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<VelocityUnit<D>, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<VelocityUnit<D>, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<VelocityUnit<D>, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<VelocityUnit<D>, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

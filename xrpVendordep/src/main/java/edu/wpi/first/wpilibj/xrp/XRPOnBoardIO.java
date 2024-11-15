@@ -38,4 +38,13 @@ public class XRPOnBoardIO {
   public void setLed(boolean value) {
     m_led.set(value);
   }
+
+  /**
+   * Gets state of the onboard LED.
+   *
+   * @return True if LED is active, false otherwise.
+   */
+  public boolean getLed() {
+    return m_led.get();
+  }
 }

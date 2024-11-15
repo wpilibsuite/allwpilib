@@ -475,13 +475,8 @@ class Lib:
 
         self.copy_upstream_src(self.wpilib_root)
 
-    def main(self, argv=sys.argv[1:]):
-        """Processes the given arguments.
-
-        Keyword argument:
-        argv -- The arguments to process. Defaults to the arguments passed to
-        the program.
-        """
+    def main(self):
+        """Process arguments of upstream_utils script"""
         parser = argparse.ArgumentParser(
             description=f"CLI manager of the {self.name} upstream library"
         )
@@ -515,7 +510,7 @@ class Lib:
             help="Copies files from the upstream repository into the thirdparty directory in allwpilib",
         )
 
-        args = parser.parse_args(argv)
+        args = parser.parse_args()
 
         self.wpilib_root = get_repo_root()
         if args.subcommand == "info":

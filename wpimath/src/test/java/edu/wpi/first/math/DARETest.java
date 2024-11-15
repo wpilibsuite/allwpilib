@@ -223,7 +223,17 @@ class DARETest extends UtilityClassTest<DARE> {
   }
 
   @Test
-  void testQNotSymmetricPositiveSemidefinite_ABQR() {
+  void testQNotSymmetric_ABQR() {
+    var A = Matrix.eye(Nat.N2());
+    var B = Matrix.eye(Nat.N2());
+    var Q = new Matrix<>(Nat.N2(), Nat.N2(), new double[] {1.0, 1.0, 0.0, 1.0});
+    var R = Matrix.eye(Nat.N2());
+
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R));
+  }
+
+  @Test
+  void testQNotPositiveSemidefinite_ABQR() {
     var A = Matrix.eye(Nat.N2());
     var B = Matrix.eye(Nat.N2());
     var Q = new Matrix<>(Nat.N2(), Nat.N2(), new double[] {-1.0, 0.0, 0.0, -1.0});
@@ -233,18 +243,39 @@ class DARETest extends UtilityClassTest<DARE> {
   }
 
   @Test
-  void testQNotSymmetricPositiveSemidefinite_ABQRN() {
+  void testQNotSymmetric_ABQRN() {
     var A = Matrix.eye(Nat.N2());
     var B = Matrix.eye(Nat.N2());
-    var Q = Matrix.eye(Nat.N2());
-    var R = new Matrix<>(Nat.N2(), Nat.N2(), new double[] {-1.0, 0.0, 0.0, -1.0});
+    var Q = new Matrix<>(Nat.N2(), Nat.N2(), new double[] {1.0, 1.0, 0.0, 1.0});
+    var R = Matrix.eye(Nat.N2());
     var N = new Matrix<>(Nat.N2(), Nat.N2(), new double[] {2.0, 0.0, 0.0, 2.0});
 
     assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R, N));
   }
 
   @Test
-  void testRNotSymmetricPositiveDefinite_ABQR() {
+  void testQNotPositiveSemidefinite_ABQRN() {
+    var A = Matrix.eye(Nat.N2());
+    var B = Matrix.eye(Nat.N2());
+    var Q = Matrix.eye(Nat.N2());
+    var R = Matrix.eye(Nat.N2());
+    var N = new Matrix<>(Nat.N2(), Nat.N2(), new double[] {2.0, 0.0, 0.0, 2.0});
+
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R, N));
+  }
+
+  @Test
+  void testRNotSymmetric_ABQR() {
+    var A = Matrix.eye(Nat.N2());
+    var B = Matrix.eye(Nat.N2());
+    var Q = Matrix.eye(Nat.N2());
+    var R = new Matrix<>(Nat.N2(), Nat.N2(), new double[] {1.0, 1.0, 0.0, 1.0});
+
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R));
+  }
+
+  @Test
+  void testRNotPositiveDefinite_ABQR() {
     var A = Matrix.eye(Nat.N2());
     var B = Matrix.eye(Nat.N2());
     var Q = Matrix.eye(Nat.N2());
@@ -257,7 +288,18 @@ class DARETest extends UtilityClassTest<DARE> {
   }
 
   @Test
-  void testRNotSymmetricPositiveDefinite_ABQRN() {
+  void testRNotSymmetric_ABQRN() {
+    var A = Matrix.eye(Nat.N2());
+    var B = Matrix.eye(Nat.N2());
+    var Q = Matrix.eye(Nat.N2());
+    var N = Matrix.eye(Nat.N2());
+    var R = new Matrix<>(Nat.N2(), Nat.N2(), new double[] {1.0, 1.0, 0.0, 1.0});
+
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R, N));
+  }
+
+  @Test
+  void testRNotPositiveDefinite_ABQRN() {
     var A = Matrix.eye(Nat.N2());
     var B = Matrix.eye(Nat.N2());
     var Q = Matrix.eye(Nat.N2());

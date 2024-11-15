@@ -44,6 +44,13 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default LinearVelocity negate() {
+    return (LinearVelocity) unaryMinus();
+  }
+
+  @Override
   default LinearVelocity plus(Measure<? extends LinearVelocityUnit> other) {
     return (LinearVelocity) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   @Override
   default Per<LinearVelocityUnit, PowerUnit> divide(Power divisor) {
     return (Per<LinearVelocityUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<LinearVelocityUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<LinearVelocityUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<LinearVelocityUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<LinearVelocityUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

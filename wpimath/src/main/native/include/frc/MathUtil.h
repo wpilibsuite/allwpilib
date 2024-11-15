@@ -7,6 +7,7 @@
 #include <numbers>
 #include <type_traits>
 
+#include <gcem.hpp>
 #include <wpi/SymbolExports.h>
 
 #include "units/angle.h"
@@ -28,10 +29,10 @@ namespace frc {
  */
 template <typename T>
   requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
-T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
+constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
   T magnitude;
   if constexpr (std::is_arithmetic_v<T>) {
-    magnitude = std::abs(value);
+    magnitude = gcem::abs(value);
   } else {
     magnitude = units::math::abs(value);
   }
@@ -158,7 +159,7 @@ constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
 }
 
 /**
- * Wraps an angle to the range -pi to pi radians (-180 to 180 degrees).
+ * Wraps an angle to the range -π to π radians (-180 to 180 degrees).
  *
  * @param angle Angle to wrap.
  */

@@ -44,6 +44,13 @@ public interface Mult<A extends Unit, B extends Unit> extends Measure<MultUnit<A
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Mult<A, B> negate() {
+    return (Mult<A, B>) unaryMinus();
+  }
+
+  @Override
   default Mult<A, B> plus(Measure<? extends MultUnit<A, B>> other) {
     return (Mult<A, B>) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Mult<A extends Unit, B extends Unit> extends Measure<MultUnit<A
   @Override
   default Per<MultUnit<A, B>, PowerUnit> divide(Power divisor) {
     return (Per<MultUnit<A, B>, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<MultUnit<A, B>, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<MultUnit<A, B>, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<MultUnit<A, B>, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<MultUnit<A, B>, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

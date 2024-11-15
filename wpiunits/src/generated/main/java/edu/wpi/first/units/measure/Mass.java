@@ -44,6 +44,13 @@ public interface Mass extends Measure<MassUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Mass negate() {
+    return (Mass) unaryMinus();
+  }
+
+  @Override
   default Mass plus(Measure<? extends MassUnit> other) {
     return (Mass) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Mass extends Measure<MassUnit> {
   @Override
   default Per<MassUnit, PowerUnit> divide(Power divisor) {
     return (Per<MassUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<MassUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<MassUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<MassUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<MassUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

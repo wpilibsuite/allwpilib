@@ -44,6 +44,13 @@ public interface Acceleration<D extends Unit> extends Measure<AccelerationUnit<D
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Acceleration<D> negate() {
+    return (Acceleration<D>) unaryMinus();
+  }
+
+  @Override
   default Acceleration<D> plus(Measure<? extends AccelerationUnit<D>> other) {
     return (Acceleration<D>) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Acceleration<D extends Unit> extends Measure<AccelerationUnit<D
   @Override
   default Per<AccelerationUnit<D>, PowerUnit> divide(Power divisor) {
     return (Per<AccelerationUnit<D>, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<AccelerationUnit<D>, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<AccelerationUnit<D>, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<AccelerationUnit<D>, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<AccelerationUnit<D>, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

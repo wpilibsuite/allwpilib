@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #include <functional>
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -34,7 +33,7 @@ class Context {
   std::string storageAutoSaveDir = ".";
   std::string storageName = "imgui";
   wpi::SmallVector<Storage*, 32> storageStack;
-  wpi::StringMap<std::unique_ptr<Storage>> storageRoots;
+  wpi::StringMap<Storage> storageRoots;
   wpi::StringMap<bool> deviceHidden;
   wpi::StringMap<DataSource*> sources;
   Storage& sourceNameStorage;

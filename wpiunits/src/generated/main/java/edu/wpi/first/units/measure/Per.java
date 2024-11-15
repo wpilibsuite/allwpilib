@@ -44,6 +44,13 @@ public interface Per<Dividend extends Unit, Divisor extends Unit> extends Measur
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Per<Dividend, Divisor> negate() {
+    return (Per<Dividend, Divisor>) unaryMinus();
+  }
+
+  @Override
   default Per<Dividend, Divisor> plus(Measure<? extends PerUnit<Dividend, Divisor>> other) {
     return (Per<Dividend, Divisor>) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Per<Dividend extends Unit, Divisor extends Unit> extends Measur
   @Override
   default Per<PerUnit<Dividend, Divisor>, PowerUnit> divide(Power divisor) {
     return (Per<PerUnit<Dividend, Divisor>, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<PerUnit<Dividend, Divisor>, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<PerUnit<Dividend, Divisor>, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<PerUnit<Dividend, Divisor>, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<PerUnit<Dividend, Divisor>, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

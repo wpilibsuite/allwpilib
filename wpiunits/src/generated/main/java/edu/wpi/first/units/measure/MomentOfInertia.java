@@ -44,6 +44,13 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default MomentOfInertia negate() {
+    return (MomentOfInertia) unaryMinus();
+  }
+
+  @Override
   default MomentOfInertia plus(Measure<? extends MomentOfInertiaUnit> other) {
     return (MomentOfInertia) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   default Per<MomentOfInertiaUnit, PowerUnit> divide(Power divisor) {
     return (Per<MomentOfInertiaUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<MomentOfInertiaUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<MomentOfInertiaUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<MomentOfInertiaUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

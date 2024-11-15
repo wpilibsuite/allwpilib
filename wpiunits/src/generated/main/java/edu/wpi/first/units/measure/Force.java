@@ -44,6 +44,13 @@ public interface Force extends Measure<ForceUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Force negate() {
+    return (Force) unaryMinus();
+  }
+
+  @Override
   default Force plus(Measure<? extends ForceUnit> other) {
     return (Force) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Force extends Measure<ForceUnit> {
   @Override
   default Per<ForceUnit, PowerUnit> divide(Power divisor) {
     return (Per<ForceUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<ForceUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<ForceUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<ForceUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<ForceUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

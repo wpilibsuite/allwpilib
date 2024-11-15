@@ -44,6 +44,13 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default LinearMomentum negate() {
+    return (LinearMomentum) unaryMinus();
+  }
+
+  @Override
   default LinearMomentum plus(Measure<? extends LinearMomentumUnit> other) {
     return (LinearMomentum) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   @Override
   default Per<LinearMomentumUnit, PowerUnit> divide(Power divisor) {
     return (Per<LinearMomentumUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<LinearMomentumUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<LinearMomentumUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<LinearMomentumUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<LinearMomentumUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

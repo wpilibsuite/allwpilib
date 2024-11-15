@@ -44,6 +44,13 @@ public interface Frequency extends Measure<FrequencyUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Frequency negate() {
+    return (Frequency) unaryMinus();
+  }
+
+  @Override
   default Frequency plus(Measure<? extends FrequencyUnit> other) {
     return (Frequency) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Frequency extends Measure<FrequencyUnit> {
   @Override
   default Per<FrequencyUnit, PowerUnit> divide(Power divisor) {
     return (Per<FrequencyUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<FrequencyUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<FrequencyUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<FrequencyUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<FrequencyUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

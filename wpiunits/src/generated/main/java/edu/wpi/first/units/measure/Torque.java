@@ -44,6 +44,13 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Torque negate() {
+    return (Torque) unaryMinus();
+  }
+
+  @Override
   default Torque plus(Measure<? extends TorqueUnit> other) {
     return (Torque) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Torque extends Measure<TorqueUnit> {
   @Override
   default Per<TorqueUnit, PowerUnit> divide(Power divisor) {
     return (Per<TorqueUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<TorqueUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<TorqueUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<TorqueUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<TorqueUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

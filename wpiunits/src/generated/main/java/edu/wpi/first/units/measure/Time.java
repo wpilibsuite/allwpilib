@@ -44,6 +44,13 @@ public interface Time extends Measure<TimeUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Time negate() {
+    return (Time) unaryMinus();
+  }
+
+  @Override
   default Time plus(Measure<? extends TimeUnit> other) {
     return (Time) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Time extends Measure<TimeUnit> {
   @Override
   default Per<TimeUnit, PowerUnit> divide(Power divisor) {
     return (Per<TimeUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<TimeUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<TimeUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<TimeUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<TimeUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package wpi.proto;
+
+message TestProtoInner {
+  string msg = 1;
+}
+
+message TestProto {
+  double double_msg = 1;
+  float float_msg = 2;
+  int32 int32_msg = 3;
+  int64 int64_msg = 4;
+  uint32 uint32_msg = 5;
+  uint64 uint64_msg = 6;
+  sint32 sint32_msg = 7;
+  sint64 sint64_msg = 8;
+  fixed32 fixed32_msg = 9;
+  fixed64 fixed64_msg = 10;
+  sfixed32 sfixed32_msg = 11;
+  sfixed64 sfixed64_msg = 12;
+  bool bool_msg = 13;
+  string string_msg = 14;
+  bytes bytes_msg = 15;
+  TestProtoInner TestProtoInner_msg = 16;
+}
+
+message OptionalTestProto {
+  optional double double_msg = 1;
+  optional float float_msg = 2;
+  optional int32 int32_msg = 3;
+  optional int64 int64_msg = 4;
+  optional uint32 uint32_msg = 5;
+  optional uint64 uint64_msg = 6;
+  optional sint32 sint32_msg = 7;
+  optional sint64 sint64_msg = 8;
+  optional fixed32 fixed32_msg = 9;
+  optional fixed64 fixed64_msg = 10;
+  optional sfixed32 sfixed32_msg = 11;
+  optional sfixed64 sfixed64_msg = 12;
+  optional bool bool_msg = 13;
+  optional string string_msg = 14;
+  optional bytes bytes_msg = 15;
+  optional TestProtoInner TestProtoInner_msg = 16;
+}
+
+message RepeatedTestProto {
+  repeated double double_msg = 1;
+  repeated float float_msg = 2;
+  repeated int32 int32_msg = 3;
+  repeated int64 int64_msg = 4;
+  repeated uint32 uint32_msg = 5;
+  repeated uint64 uint64_msg = 6;
+  repeated sint32 sint32_msg = 7;
+  repeated sint64 sint64_msg = 8;
+  repeated fixed32 fixed32_msg = 9;
+  repeated fixed64 fixed64_msg = 10;
+  repeated sfixed32 sfixed32_msg = 11;
+  repeated sfixed64 sfixed64_msg = 12;
+  repeated bool bool_msg = 13;
+  repeated string string_msg = 14;
+  repeated bytes bytes_msg = 15;
+  repeated TestProtoInner TestProtoInner_msg = 16;
+}

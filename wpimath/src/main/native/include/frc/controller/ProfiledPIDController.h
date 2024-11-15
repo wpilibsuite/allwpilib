@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include <algorithm>
 #include <cmath>
-#include <functional>
 #include <limits>
+#include <type_traits>
 
 #include <wpi/SymbolExports.h>
 #include <wpi/sendable/Sendable.h>
@@ -56,23 +55,27 @@ class ProfiledPIDController
    * @param period      The period between controller updates in seconds. The
    *                    default is 20 milliseconds. Must be positive.
    */
-  ProfiledPIDController(double Kp, double Ki, double Kd,
-                        Constraints constraints, units::second_t period = 20_ms)
+  constexpr ProfiledPIDController(double Kp, double Ki, double Kd,
+                                  Constraints constraints,
+                                  units::second_t period = 20_ms)
       : m_controller{Kp, Ki, Kd, period},
         m_constraints{constraints},
         m_profile{m_constraints} {
-    int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
-    wpi::math::MathSharedStore::ReportUsage(
-        wpi::math::MathUsageId::kController_ProfiledPIDController, instances);
-    wpi::SendableRegistry::Add(this, "ProfiledPIDController", instances);
+    if (!std::is_constant_evaluated()) {
+      int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
+      wpi::math::MathSharedStore::ReportUsage(
+          wpi::math::MathUsageId::kController_ProfiledPIDController, instances);
+      wpi::SendableRegistry::Add(this, "ProfiledPIDController", instances);
+    }
   }
 
-  ~ProfiledPIDController() override = default;
+  constexpr ~ProfiledPIDController() override = default;
 
-  ProfiledPIDController(const ProfiledPIDController&) = default;
-  ProfiledPIDController& operator=(const ProfiledPIDController&) = default;
-  ProfiledPIDController(ProfiledPIDController&&) = default;
-  ProfiledPIDController& operator=(ProfiledPIDController&&) = default;
+  constexpr ProfiledPIDController(const ProfiledPIDController&) = default;
+  constexpr ProfiledPIDController& operator=(const ProfiledPIDController&) =
+      default;
+  constexpr ProfiledPIDController(ProfiledPIDController&&) = default;
+  constexpr ProfiledPIDController& operator=(ProfiledPIDController&&) = default;
 
   /**
    * Sets the PID Controller gain parameters.
@@ -83,7 +86,7 @@ class ProfiledPIDController
    * @param Ki The integral coefficient. Must be >= 0.
    * @param Kd The differential coefficient. Must be >= 0.
    */
-  void SetPID(double Kp, double Ki, double Kd) {
+  constexpr void SetPID(double Kp, double Ki, double Kd) {
     m_controller.SetPID(Kp, Ki, Kd);
   }
 
@@ -92,21 +95,21 @@ class ProfiledPIDController
    *
    * @param Kp The proportional coefficient. Must be >= 0.
    */
-  void SetP(double Kp) { m_controller.SetP(Kp); }
+  constexpr void SetP(double Kp) { m_controller.SetP(Kp); }
 
   /**
    * Sets the integral coefficient of the PID controller gain.
    *
    * @param Ki The integral coefficient. Must be >= 0.
    */
-  void SetI(double Ki) { m_controller.SetI(Ki); }
+  constexpr void SetI(double Ki) { m_controller.SetI(Ki); }
 
   /**
    * Sets the differential coefficient of the PID controller gain.
    *
    * @param Kd The differential coefficient. Must be >= 0.
    */
-  void SetD(double Kd) { m_controller.SetD(Kd); }
+  constexpr void SetD(double Kd) { m_controller.SetD(Kd); }
 
   /**
    * Sets the IZone range. When the absolute value of the position error is
@@ -119,49 +122,51 @@ class ProfiledPIDController
    * @param iZone Maximum magnitude of error to allow integral control. Must be
    *   >= 0.
    */
-  void SetIZone(double iZone) { m_controller.SetIZone(iZone); }
+  constexpr void SetIZone(double iZone) { m_controller.SetIZone(iZone); }
 
   /**
    * Gets the proportional coefficient.
    *
    * @return proportional coefficient
    */
-  double GetP() const { return m_controller.GetP(); }
+  constexpr double GetP() const { return m_controller.GetP(); }
 
   /**
    * Gets the integral coefficient.
    *
    * @return integral coefficient
    */
-  double GetI() const { return m_controller.GetI(); }
+  constexpr double GetI() const { return m_controller.GetI(); }
 
   /**
    * Gets the differential coefficient.
    *
    * @return differential coefficient
    */
-  double GetD() const { return m_controller.GetD(); }
+  constexpr double GetD() const { return m_controller.GetD(); }
 
   /**
    * Get the IZone range.
    *
    * @return Maximum magnitude of error to allow integral control.
    */
-  double GetIZone() const { return m_controller.GetIZone(); }
+  constexpr double GetIZone() const { return m_controller.GetIZone(); }
 
   /**
    * Gets the period of this controller.
    *
    * @return The period of the controller.
    */
-  units::second_t GetPeriod() const { return m_controller.GetPeriod(); }
+  constexpr units::second_t GetPeriod() const {
+    return m_controller.GetPeriod();
+  }
 
   /**
    * Gets the position tolerance of this controller.
    *
    * @return The position tolerance of the controller.
    */
-  double GetPositionTolerance() const {
+  constexpr double GetPositionTolerance() const {
     return m_controller.GetErrorTolerance();
   }
 
@@ -170,7 +175,7 @@ class ProfiledPIDController
    *
    * @return The velocity tolerance of the controller.
    */
-  double GetVelocityTolerance() const {
+  constexpr double GetVelocityTolerance() const {
     return m_controller.GetErrorDerivativeTolerance();
   }
 
@@ -180,7 +185,7 @@ class ProfiledPIDController
    *
    * @return The accumulated error of this controller.
    */
-  double GetAccumulatedError() const {
+  constexpr double GetAccumulatedError() const {
     return m_controller.GetAccumulatedError();
   }
 
@@ -189,33 +194,33 @@ class ProfiledPIDController
    *
    * @param goal The desired unprofiled setpoint.
    */
-  void SetGoal(State goal) { m_goal = goal; }
+  constexpr void SetGoal(State goal) { m_goal = goal; }
 
   /**
    * Sets the goal for the ProfiledPIDController.
    *
    * @param goal The desired unprofiled setpoint.
    */
-  void SetGoal(Distance_t goal) { m_goal = {goal, Velocity_t{0}}; }
+  constexpr void SetGoal(Distance_t goal) { m_goal = {goal, Velocity_t{0}}; }
 
   /**
    * Gets the goal for the ProfiledPIDController.
    */
-  State GetGoal() const { return m_goal; }
+  constexpr State GetGoal() const { return m_goal; }
 
   /**
    * Returns true if the error is within the tolerance of the error.
    *
    * This will return false until at least one input value has been computed.
    */
-  bool AtGoal() const { return AtSetpoint() && m_goal == m_setpoint; }
+  constexpr bool AtGoal() const { return AtSetpoint() && m_goal == m_setpoint; }
 
   /**
    * Set velocity and acceleration constraints for goal.
    *
    * @param constraints Velocity and acceleration constraints for goal.
    */
-  void SetConstraints(Constraints constraints) {
+  constexpr void SetConstraints(Constraints constraints) {
     m_constraints = constraints;
     m_profile = TrapezoidProfile<Distance>{m_constraints};
   }
@@ -224,14 +229,14 @@ class ProfiledPIDController
    * Get the velocity and acceleration constraints for this controller.
    * @return Velocity and acceleration constraints.
    */
-  Constraints GetConstraints() { return m_constraints; }
+  constexpr Constraints GetConstraints() { return m_constraints; }
 
   /**
    * Returns the current setpoint of the ProfiledPIDController.
    *
    * @return The current setpoint.
    */
-  State GetSetpoint() const { return m_setpoint; }
+  constexpr State GetSetpoint() const { return m_setpoint; }
 
   /**
    * Returns true if the error is within the tolerance of the error.
@@ -242,7 +247,7 @@ class ProfiledPIDController
    *
    * This will return false until at least one input value has been computed.
    */
-  bool AtSetpoint() const { return m_controller.AtSetpoint(); }
+  constexpr bool AtSetpoint() const { return m_controller.AtSetpoint(); }
 
   /**
    * Enables continuous input.
@@ -254,7 +259,8 @@ class ProfiledPIDController
    * @param minimumInput The minimum value expected from the input.
    * @param maximumInput The maximum value expected from the input.
    */
-  void EnableContinuousInput(Distance_t minimumInput, Distance_t maximumInput) {
+  constexpr void EnableContinuousInput(Distance_t minimumInput,
+                                       Distance_t maximumInput) {
     m_controller.EnableContinuousInput(minimumInput.value(),
                                        maximumInput.value());
     m_minimumInput = minimumInput;
@@ -264,7 +270,9 @@ class ProfiledPIDController
   /**
    * Disables continuous input.
    */
-  void DisableContinuousInput() { m_controller.DisableContinuousInput(); }
+  constexpr void DisableContinuousInput() {
+    m_controller.DisableContinuousInput();
+  }
 
   /**
    * Sets the minimum and maximum contributions of the integral term.
@@ -276,7 +284,8 @@ class ProfiledPIDController
    * @param minimumIntegral The minimum contribution of the integral term.
    * @param maximumIntegral The maximum contribution of the integral term.
    */
-  void SetIntegratorRange(double minimumIntegral, double maximumIntegral) {
+  constexpr void SetIntegratorRange(double minimumIntegral,
+                                    double maximumIntegral) {
     m_controller.SetIntegratorRange(minimumIntegral, maximumIntegral);
   }
 
@@ -287,9 +296,9 @@ class ProfiledPIDController
    * @param positionTolerance Position error which is tolerable.
    * @param velocityTolerance Velocity error which is tolerable.
    */
-  void SetTolerance(Distance_t positionTolerance,
-                    Velocity_t velocityTolerance = Velocity_t{
-                        std::numeric_limits<double>::infinity()}) {
+  constexpr void SetTolerance(Distance_t positionTolerance,
+                              Velocity_t velocityTolerance = Velocity_t{
+                                  std::numeric_limits<double>::infinity()}) {
     m_controller.SetTolerance(positionTolerance.value(),
                               velocityTolerance.value());
   }
@@ -299,14 +308,14 @@ class ProfiledPIDController
    *
    * @return The error.
    */
-  Distance_t GetPositionError() const {
+  constexpr Distance_t GetPositionError() const {
     return Distance_t{m_controller.GetError()};
   }
 
   /**
    * Returns the change in error per second.
    */
-  Velocity_t GetVelocityError() const {
+  constexpr Velocity_t GetVelocityError() const {
     return Velocity_t{m_controller.GetErrorDerivative()};
   }
 
@@ -315,7 +324,7 @@ class ProfiledPIDController
    *
    * @param measurement The current measurement of the process variable.
    */
-  double Calculate(Distance_t measurement) {
+  constexpr double Calculate(Distance_t measurement) {
     if (m_controller.IsContinuousInputEnabled()) {
       // Get error which is smallest distance between goal and measurement
       auto errorBound = (m_maximumInput - m_minimumInput) / 2.0;
@@ -345,7 +354,7 @@ class ProfiledPIDController
    * @param measurement The current measurement of the process variable.
    * @param goal The new goal of the controller.
    */
-  double Calculate(Distance_t measurement, State goal) {
+  constexpr double Calculate(Distance_t measurement, State goal) {
     SetGoal(goal);
     return Calculate(measurement);
   }
@@ -355,7 +364,7 @@ class ProfiledPIDController
    * @param measurement The current measurement of the process variable.
    * @param goal The new goal of the controller.
    */
-  double Calculate(Distance_t measurement, Distance_t goal) {
+  constexpr double Calculate(Distance_t measurement, Distance_t goal) {
     SetGoal(goal);
     return Calculate(measurement);
   }
@@ -367,7 +376,7 @@ class ProfiledPIDController
    * @param goal        The new goal of the controller.
    * @param constraints Velocity and acceleration constraints for goal.
    */
-  double Calculate(
+  constexpr double Calculate(
       Distance_t measurement, Distance_t goal,
       typename frc::TrapezoidProfile<Distance>::Constraints constraints) {
     SetConstraints(constraints);
@@ -379,7 +388,7 @@ class ProfiledPIDController
    *
    * @param measurement The current measured State of the system.
    */
-  void Reset(const State& measurement) {
+  constexpr void Reset(const State& measurement) {
     m_controller.Reset();
     m_setpoint = measurement;
   }
@@ -390,7 +399,8 @@ class ProfiledPIDController
    * @param measuredPosition The current measured position of the system.
    * @param measuredVelocity The current measured velocity of the system.
    */
-  void Reset(Distance_t measuredPosition, Velocity_t measuredVelocity) {
+  constexpr void Reset(Distance_t measuredPosition,
+                       Velocity_t measuredVelocity) {
     Reset(State{measuredPosition, measuredVelocity});
   }
 
@@ -400,7 +410,7 @@ class ProfiledPIDController
    * @param measuredPosition The current measured position of the system. The
    * velocity is assumed to be zero.
    */
-  void Reset(Distance_t measuredPosition) {
+  constexpr void Reset(Distance_t measuredPosition) {
     Reset(measuredPosition, Velocity_t{0});
   }
 

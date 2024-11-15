@@ -44,6 +44,13 @@ public interface Distance extends Measure<DistanceUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Distance negate() {
+    return (Distance) unaryMinus();
+  }
+
+  @Override
   default Distance plus(Measure<? extends DistanceUnit> other) {
     return (Distance) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Distance extends Measure<DistanceUnit> {
   @Override
   default Per<DistanceUnit, PowerUnit> divide(Power divisor) {
     return (Per<DistanceUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<DistanceUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<DistanceUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<DistanceUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<DistanceUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

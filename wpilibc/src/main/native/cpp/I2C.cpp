@@ -5,7 +5,6 @@
 #include "frc/I2C.h"
 
 #include <algorithm>
-#include <utility>
 
 #include <hal/FRCUsageReporting.h>
 #include <hal/I2C.h>

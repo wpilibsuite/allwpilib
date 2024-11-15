@@ -44,6 +44,13 @@ public interface Current extends Measure<CurrentUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Current negate() {
+    return (Current) unaryMinus();
+  }
+
+  @Override
   default Current plus(Measure<? extends CurrentUnit> other) {
     return (Current) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Current extends Measure<CurrentUnit> {
   @Override
   default Per<CurrentUnit, PowerUnit> divide(Power divisor) {
     return (Per<CurrentUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Voltage times(Resistance multiplier) {
+    return Volts.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  @Override
+  default Per<CurrentUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<CurrentUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

@@ -44,6 +44,13 @@ public interface Power extends Measure<PowerUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Power negate() {
+    return (Power) unaryMinus();
+  }
+
+  @Override
   default Power plus(Measure<? extends PowerUnit> other) {
     return (Power) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Power extends Measure<PowerUnit> {
   @Override
   default Dimensionless divide(Power divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+
+  @Override
+  default Mult<PowerUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<PowerUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<PowerUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<PowerUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

@@ -3,10 +3,7 @@
 import os
 import shutil
 
-from upstream_utils import (
-    copy_to,
-    Lib,
-)
+from upstream_utils import Lib, copy_to
 
 
 def copy_upstream_src(wpilib_root):

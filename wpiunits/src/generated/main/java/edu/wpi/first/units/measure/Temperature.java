@@ -44,6 +44,13 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Temperature negate() {
+    return (Temperature) unaryMinus();
+  }
+
+  @Override
   default Temperature plus(Measure<? extends TemperatureUnit> other) {
     return (Temperature) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Temperature extends Measure<TemperatureUnit> {
   @Override
   default Per<TemperatureUnit, PowerUnit> divide(Power divisor) {
     return (Per<TemperatureUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<TemperatureUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<TemperatureUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<TemperatureUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<TemperatureUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

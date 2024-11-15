@@ -44,6 +44,13 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Dimensionless negate() {
+    return (Dimensionless) unaryMinus();
+  }
+
+  @Override
   default Dimensionless plus(Measure<? extends DimensionlessUnit> other) {
     return (Dimensionless) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, PowerUnit> divide(Power divisor) {
     return (Per<DimensionlessUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Resistance times(Resistance multiplier) {
+    return Ohms.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  @Override
+  default Per<DimensionlessUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<DimensionlessUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

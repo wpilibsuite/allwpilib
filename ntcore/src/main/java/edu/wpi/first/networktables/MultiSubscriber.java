@@ -6,7 +6,7 @@ package edu.wpi.first.networktables;
 
 /**
  * Subscribe to multiple topics based on one or more topic name prefixes. Can be used in combination
- * with ValueListenerPoller to listen for value changes across all matching topics.
+ * with NetworkTableListenerPoller to listen for value changes across all matching topics.
  */
 public final class MultiSubscriber implements AutoCloseable {
   /**

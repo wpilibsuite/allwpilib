@@ -44,6 +44,13 @@ public interface Energy extends Measure<EnergyUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Energy negate() {
+    return (Energy) unaryMinus();
+  }
+
+  @Override
   default Energy plus(Measure<? extends EnergyUnit> other) {
     return (Energy) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Energy extends Measure<EnergyUnit> {
   @Override
   default Per<EnergyUnit, PowerUnit> divide(Power divisor) {
     return (Per<EnergyUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<EnergyUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<EnergyUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<EnergyUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<EnergyUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

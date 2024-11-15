@@ -44,6 +44,13 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default AngularVelocity negate() {
+    return (AngularVelocity) unaryMinus();
+  }
+
+  @Override
   default AngularVelocity plus(Measure<? extends AngularVelocityUnit> other) {
     return (AngularVelocity) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   default Per<AngularVelocityUnit, PowerUnit> divide(Power divisor) {
     return (Per<AngularVelocityUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<AngularVelocityUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<AngularVelocityUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<AngularVelocityUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

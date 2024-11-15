@@ -9,6 +9,7 @@
 #include <units/voltage.h>
 
 namespace sysid {
+
 /**
  * Simulation of a Simple Motor mechanism based off of a model from SysId
  * Feedforward gains.

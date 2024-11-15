@@ -44,6 +44,13 @@ public interface Angle extends Measure<AngleUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Angle negate() {
+    return (Angle) unaryMinus();
+  }
+
+  @Override
   default Angle plus(Measure<? extends AngleUnit> other) {
     return (Angle) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -274,6 +281,17 @@ public interface Angle extends Measure<AngleUnit> {
   @Override
   default Per<AngleUnit, PowerUnit> divide(Power divisor) {
     return (Per<AngleUnit, PowerUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
+  default Mult<AngleUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<AngleUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<AngleUnit, ResistanceUnit> divide(Resistance divisor) {
+    return (Per<AngleUnit, ResistanceUnit>) Measure.super.divide(divisor);
   }
 
 

@@ -18,8 +18,7 @@ void MechanismObject2d::Update(std::shared_ptr<nt::NetworkTable> table) {
   std::scoped_lock lock(m_mutex);
   m_table = table;
   UpdateEntries(m_table);
-  for (const wpi::StringMapEntry<std::unique_ptr<MechanismObject2d>>& entry :
-       m_objects) {
-    entry.getValue()->Update(m_table->GetSubTable(entry.getKey()));
+  for (const auto& entry : m_objects) {
+    entry.second->Update(m_table->GetSubTable(entry.first));
   }
 }

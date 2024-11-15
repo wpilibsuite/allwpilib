@@ -79,7 +79,8 @@ Frame SourceImpl::GetCurFrame() {
 Frame SourceImpl::GetNextFrame() {
   std::unique_lock lock{m_frameMutex};
   auto oldTime = m_frame.GetTime();
-  m_frameCv.wait(lock, [=, this] { return m_frame.GetTime() != oldTime; });
+  m_frameCv.wait(
+      lock, [=, this] { return oldTime == 0 || m_frame.GetTime() != oldTime; });
   return m_frame;
 }
 
