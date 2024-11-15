@@ -80,6 +80,15 @@ class LEDPattern {
   void ApplyTo(std::span<frc::AddressableLED::LEDData> data) const;
 
   /**
+   * Creates a pattern with remapped indices.
+   *
+   * @param indexMapper the index mapper
+   * @return the mapped pattern
+   */
+  [[nodiscard]]
+  LEDPattern MapIndex(std::function<size_t(size_t, size_t)> indexMapper);
+
+  /**
    * Creates a pattern that displays this one in reverse. Scrolling patterns
    * will scroll in the opposite direction (but at the same speed). It will
    * treat the end of an LED strip as the start, and the start of the strip as
