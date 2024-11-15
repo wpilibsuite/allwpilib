@@ -100,45 +100,6 @@ load("@bzlmodrio-opencv//:maven_java_deps.bzl", "setup_legacy_bzlmodrio_opencv_j
 setup_legacy_bzlmodrio_opencv_java_dependencies()
 
 http_archive(
-    name = "com_google_protobuf",
-    patch_args = ["-p1"],
-    patches = [
-        "//upstream_utils/protobuf_patches:0001-Fix-sign-compare-warnings.patch",
-        "//upstream_utils/protobuf_patches:0002-Remove-redundant-move.patch",
-        "//upstream_utils/protobuf_patches:0003-Fix-maybe-uninitialized-warnings.patch",
-        "//upstream_utils/protobuf_patches:0004-Fix-coded_stream-WriteRaw.patch",
-        "//upstream_utils/protobuf_patches:0005-Suppress-enum-enum-conversion-warning.patch",
-        "//upstream_utils/protobuf_patches:0006-Fix-noreturn-function-returning.patch",
-        "//upstream_utils/protobuf_patches:0007-Work-around-GCC-12-restrict-warning-compiler-bug.patch",
-        "//upstream_utils/protobuf_patches:0008-Disable-MSVC-switch-warning.patch",
-        "//upstream_utils/protobuf_patches:0009-Disable-unused-function-warning.patch",
-        "//upstream_utils/protobuf_patches:0010-Disable-pedantic-warning.patch",
-        "//upstream_utils/protobuf_patches:0011-Avoid-use-of-sprintf.patch",
-    ],
-    sha256 = "f7042d540c969b00db92e8e1066a9b8099c8379c33f40f360eb9e1d98a36ca26",
-    strip_prefix = "protobuf-3.21.12",
-    urls = [
-        "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.21.12.zip",
-    ],
-)
-
-load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
-
-protobuf_deps()
-
-# Rules Python
-http_archive(
-    name = "rules_python",
-    sha256 = "c68bdc4fbec25de5b5493b8819cfc877c4ea299c0dcb15c244c5a00208cde311",
-    strip_prefix = "rules_python-0.31.0",
-    url = "https://github.com/bazelbuild/rules_python/releases/download/0.31.0/rules_python-0.31.0.tar.gz",
-)
-
-load("@rules_python//python:repositories.bzl", "py_repositories")
-
-py_repositories()
-
-http_archive(
     name = "build_bazel_apple_support",
     sha256 = "c4bb2b7367c484382300aee75be598b92f847896fb31bbd22f3a2346adf66a80",
     url = "https://github.com/bazelbuild/apple_support/releases/download/1.15.1/apple_support.1.15.1.tar.gz",

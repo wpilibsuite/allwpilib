@@ -1,18 +1,11 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//protoplugin:wpi_proto_library.bzl", "wpi_proto_library")
 
 filegroup(
     name = "generated_java",
     srcs = glob(["src/generated/main/java/**/*.java"]),
     visibility = ["//wpimath:__subpackages__"],
-)
-
-wpi_proto_library(
-    name = "cc_proto",
-    include_prefix = "wpimath/src/main/proto",
-    proto_files = glob(["src/main/proto/*.proto"]),
 )
 
 cc_library(
@@ -52,14 +45,22 @@ filegroup(
 )
 
 cc_library(
+    name = "nanopb-generated-headers",
+    hdrs = glob(["src/generated/main/native/cpp/**/*.h"]),
+    includes = ["src/generated/main/native/cpp"],
+    strip_include_prefix = "src/generated/main/native/cpp",
+    visibility = ["//wpiutil:__subpackages__"],
+)
+
+cc_library(
     name = "wpimath.static",
     srcs = glob(
-        ["src/main/native/cpp/**"],
+        [
+            "src/main/native/cpp/**",
+            "src/generated/main/native/cpp/**/*.cpp",
+        ],
         exclude = ["src/main/native/cpp/jni/**"],
-    ) + [
-        ":cc_proto.srcs",
-        ":sleipnir-srcs",
-    ],
+    ) + [":sleipnir-srcs"],
     hdrs = glob(["src/main/native/include/**"]),
     defines = ["WPILIB_EXPORTS"],
     includes = [
@@ -69,9 +70,9 @@ cc_library(
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
-        ":cc_proto.hdrs",
         ":eigen-headers",
         ":gcem",
+        ":nanopb-generated-headers",
         ":sleipnir-headers",
         "//wpiutil:wpiutil.static",
     ],
