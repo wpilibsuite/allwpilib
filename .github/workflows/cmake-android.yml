@@ -33,6 +33,11 @@ jobs:
           ndk-version: r27c
           add-to-path: false
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
       - name: Install sccache
         uses: mozilla-actions/sccache-action@v0.0.5
 
