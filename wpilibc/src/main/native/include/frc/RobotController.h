@@ -6,8 +6,8 @@
 
 #include <stdint.h>
 
-#include <string>
 #include <functional>
+#include <string>
 
 #include <units/temperature.h>
 #include <units/voltage.h>

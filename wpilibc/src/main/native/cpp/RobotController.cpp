@@ -4,8 +4,8 @@
 
 #include "frc/RobotController.h"
 
-#include <string>
 #include <functional>
+#include <string>
 
 #include <hal/CAN.h>
 #include <hal/HALBase.h>
