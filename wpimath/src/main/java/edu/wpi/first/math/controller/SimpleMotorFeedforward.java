@@ -12,7 +12,6 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.PerUnit;
 import edu.wpi.first.units.TimeUnit;
 import edu.wpi.first.units.Unit;
-import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
@@ -30,9 +29,6 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
 
   /** The period, in seconds. */
   private final double m_dt;
-
-  // ** The calculated output voltage measure */
-  private final MutVoltage output = Volts.mutable(0.0);
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains and period.
@@ -189,19 +185,15 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
       Measure<? extends PerUnit<U, TimeUnit>> nextVelocity) {
     // See wpimath/algorithms.md#Simple_motor_feedforward for derivation
     if (ka == 0.0) {
-      output.mut_replace(
-          ks * Math.signum(nextVelocity.magnitude()) + kv * nextVelocity.magnitude(), Volts);
-      return output;
+      return Volts.of(ks * Math.signum(nextVelocity.magnitude()) + kv * nextVelocity.magnitude());
     } else {
       double A = -kv / ka;
       double B = 1.0 / ka;
       double A_d = Math.exp(A * m_dt);
       double B_d = 1.0 / A * (A_d - 1.0) * B;
-      output.mut_replace(
+      return Volts.of(
           ks * Math.signum(currentVelocity.magnitude())
-              + 1.0 / B_d * (nextVelocity.magnitude() - A_d * currentVelocity.magnitude()),
-          Volts);
-      return output;
+              + 1.0 / B_d * (nextVelocity.magnitude() - A_d * currentVelocity.magnitude()));
     }
   }
 

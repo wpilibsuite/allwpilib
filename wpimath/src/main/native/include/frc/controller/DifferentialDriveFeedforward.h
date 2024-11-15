@@ -99,7 +99,5 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
 };
 }  // namespace frc
 
-#ifndef NO_PROTOBUF
 #include "frc/controller/proto/DifferentialDriveFeedforwardProto.h"
-#endif
 #include "frc/controller/struct/DifferentialDriveFeedforwardStruct.h"

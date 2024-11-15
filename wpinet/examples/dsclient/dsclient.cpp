@@ -32,5 +32,5 @@ int main() {
   });
 
   // wait for a keypress to terminate
-  std::getchar();
+  static_cast<void>(std::getchar());
 }

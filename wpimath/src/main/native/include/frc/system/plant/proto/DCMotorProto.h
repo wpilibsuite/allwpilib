@@ -8,10 +8,13 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/system/plant/DCMotor.h"
+#include "wpimath/protobuf/plant.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DCMotor> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::DCMotor Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg, const frc::DCMotor& value);
+  using MessageStruct = wpi_proto_ProtobufDCMotor;
+  using InputStream = wpi::ProtoInputStream<frc::DCMotor>;
+  using OutputStream = wpi::ProtoOutputStream<frc::DCMotor>;
+  static std::optional<frc::DCMotor> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::DCMotor& value);
 };

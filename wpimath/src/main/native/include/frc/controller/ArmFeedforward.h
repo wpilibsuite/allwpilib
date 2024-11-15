@@ -288,7 +288,5 @@ class WPILIB_DLLEXPORT ArmFeedforward {
 };
 }  // namespace frc
 
-#ifndef NO_PROTOBUF
 #include "frc/controller/proto/ArmFeedforwardProto.h"
-#endif
 #include "frc/controller/struct/ArmFeedforwardStruct.h"
