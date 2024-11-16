@@ -110,10 +110,10 @@ void Tracer::TracerState::EndCycle() {
     // Create publishers for all new entries, add them to the heap
     // and set their times
     for (auto&& traceTime : m_traceTimes) {
-      auto topic = m_rootTable->GetDoubleTopic(traceTime.first());
+      auto topic = m_rootTable->GetDoubleTopic(traceTime.first);
       if (auto publisher = topic.Publish(); publisher) {
         publisher.Set(traceTime.second.value());
-        m_publishers.emplace_back(traceTime.first(), std::move(publisher));
+        m_publishers.emplace_back(traceTime.first, std::move(publisher));
       }
     }
   }
