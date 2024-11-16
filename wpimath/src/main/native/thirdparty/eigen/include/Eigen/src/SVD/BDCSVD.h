@@ -50,25 +50,6 @@ struct traits<BDCSVD<MatrixType_, Options> > : svd_traits<MatrixType_, Options> 
   typedef MatrixType_ MatrixType;
 };
 
-template <typename MatrixType, int Options>
-struct allocate_small_svd {
-  static void run(JacobiSVD<MatrixType, Options>& smallSvd, Index rows, Index cols, unsigned int) {
-    internal::construct_at(&smallSvd, rows, cols);
-  }
-};
-
-EIGEN_DIAGNOSTICS(push)
-EIGEN_DISABLE_DEPRECATED_WARNING
-
-template <typename MatrixType>
-struct allocate_small_svd<MatrixType, 0> {
-  static void run(JacobiSVD<MatrixType>& smallSvd, Index rows, Index cols, unsigned int computationOptions) {
-    internal::construct_at(&smallSvd, rows, cols, computationOptions);
-  }
-};
-
-EIGEN_DIAGNOSTICS(pop)
-
 }  // end namespace internal
 
 /** \ingroup SVD_Module
@@ -288,7 +269,7 @@ void BDCSVD<MatrixType, Options>::allocate(Index rows, Index cols, unsigned int 
   if (Base::allocate(rows, cols, computationOptions)) return;
 
   if (cols < m_algoswap)
-    internal::allocate_small_svd<MatrixType, ComputationOptions>::run(smallSvd, rows, cols, computationOptions);
+    smallSvd.allocate(rows, cols, Options == 0 ? computationOptions : internal::get_computation_options(Options));
 
   m_computed = MatrixXr::Zero(diagSize() + 1, diagSize());
   m_compU = computeV();

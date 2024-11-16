@@ -60,8 +60,7 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param vector The translation vector to represent.
    */
   constexpr explicit Translation2d(const Eigen::Vector2d& vector)
-      : m_x{units::meter_t{vector.coeff(0)}},
-        m_y{units::meter_t{vector.coeff(1)}} {}
+      : m_x{units::meter_t{vector(0)}}, m_y{units::meter_t{vector(1)}} {}
 
   /**
    * Calculates the distance between two translations in 2D space.

@@ -85,11 +85,10 @@ class WPILIB_DLLEXPORT Rotation3d {
     }
 
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Definition
-    Eigen::Vector3d v{{axis.coeff(0) / norm * units::math::sin(angle / 2.0),
-                       axis.coeff(1) / norm * units::math::sin(angle / 2.0),
-                       axis.coeff(2) / norm * units::math::sin(angle / 2.0)}};
-    m_q = Quaternion{units::math::cos(angle / 2.0), v.coeff(0), v.coeff(1),
-                     v.coeff(2)};
+    Eigen::Vector3d v{{axis(0) / norm * units::math::sin(angle / 2.0),
+                       axis(1) / norm * units::math::sin(angle / 2.0),
+                       axis(2) / norm * units::math::sin(angle / 2.0)}};
+    m_q = Quaternion{units::math::cos(angle / 2.0), v(0), v(1), v(2)};
   }
 
   /**
@@ -191,9 +190,9 @@ class WPILIB_DLLEXPORT Rotation3d {
       // rotation is required. Any other vector can be used to generate an
       // orthogonal one.
 
-      double x = gcem::abs(initial.coeff(0));
-      double y = gcem::abs(initial.coeff(1));
-      double z = gcem::abs(initial.coeff(2));
+      double x = gcem::abs(initial(0));
+      double y = gcem::abs(initial(1));
+      double z = gcem::abs(initial(2));
 
       // Find vector that is most orthogonal to initial vector
       Eigen::Vector3d other;
