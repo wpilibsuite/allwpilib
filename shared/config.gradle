@@ -39,11 +39,6 @@ nativeUtils.platformConfigs.each {
   }
 }
 
-// Disable std::mutex constexpr constructor on MSVC
-nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.windowsx64).configure {
-    it.cppCompiler.args.add("/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR")
-}
-
 nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")
 
 model {
