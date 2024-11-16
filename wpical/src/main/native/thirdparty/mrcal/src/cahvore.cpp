@@ -151,7 +151,7 @@ bool _project_cahvore_internals( // outputs
 // Not meant to be touched by the end user. Implemented separate from mrcal.c so
 // that I can get automated gradient propagation with c++
 extern "C"
-__attribute__ ((visibility ("hidden")))
+
 bool project_cahvore_internals( // outputs
                                 mrcal_point3_t* __restrict pdistorted,
                                 double*         __restrict dpdistorted_dintrinsics_nocore,

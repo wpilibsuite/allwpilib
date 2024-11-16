@@ -74,8 +74,13 @@ tasks.withType(CppCompile) {
 // Suppress warnings
 nativeUtils.platformConfigs.each {
     if (it.name.contains('windows')) {
+        it.cCompiler.args.add("/wd4047")
+        it.cCompiler.args.add("/wd4098")
+        it.cCompiler.args.add("/wd4267")
+        it.cppCompiler.args.add("/wd4101")
         it.cppCompiler.args.add("/wd4200")
         it.cppCompiler.args.add("/wd4576")
+        it.cppCompiler.args.add("/wd4715")
     } else if (it.name.contains('osx')) {
         it.cCompiler.args.add("-Wno-format-nonliteral")
         it.cCompiler.args.remove("-pedantic")
@@ -161,6 +166,7 @@ model {
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
+                it.cppCompiler.define('GLOG_DEPRECATED', '__declspec(deprecated)')
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
