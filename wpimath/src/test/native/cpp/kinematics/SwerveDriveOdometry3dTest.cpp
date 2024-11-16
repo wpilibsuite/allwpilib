@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 
 #include "frc/kinematics/SwerveDriveKinematics.h"
-#include "frc/kinematics/SwerveDriveOdometry.h"
+#include "frc/kinematics/SwerveDriveOdometry3d.h"
 #include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/TrajectoryConfig.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
@@ -17,7 +17,7 @@ using namespace frc;
 
 static constexpr double kEpsilon = 0.01;
 
-class SwerveDriveOdometryTest : public ::testing::Test {
+class SwerveDriveOdometry3dTest : public ::testing::Test {
  protected:
   Translation2d m_fl{12_m, 12_m};
   Translation2d m_fr{12_m, -12_m};
@@ -26,59 +26,81 @@ class SwerveDriveOdometryTest : public ::testing::Test {
 
   SwerveDriveKinematics<4> m_kinematics{m_fl, m_fr, m_bl, m_br};
   SwerveModulePosition zero;
-  SwerveDriveOdometry<4> m_odometry{
-      m_kinematics, 0_rad, {zero, zero, zero, zero}};
+  SwerveDriveOdometry3d<4> m_odometry{
+      m_kinematics, frc::Rotation3d{}, {zero, zero, zero, zero}};
 };
 
-TEST_F(SwerveDriveOdometryTest, TwoIterations) {
+TEST_F(SwerveDriveOdometry3dTest, Initialize) {
+  SwerveDriveOdometry3d odometry{
+      m_kinematics,
+      frc::Rotation3d{},
+      {zero, zero, zero, zero},
+      frc::Pose3d{1_m, 2_m, 0_m, frc::Rotation3d{0_deg, 0_deg, 45_deg}}};
+
+  const frc::Pose3d& pose = odometry.GetPose();
+
+  EXPECT_NEAR(pose.X().value(), 1, kEpsilon);
+  EXPECT_NEAR(pose.Y().value(), 2, kEpsilon);
+  EXPECT_NEAR(pose.Z().value(), 0, kEpsilon);
+  EXPECT_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 45, kEpsilon);
+}
+
+TEST_F(SwerveDriveOdometry3dTest, TwoIterations) {
   SwerveModulePosition position{0.5_m, 0_deg};
 
-  m_odometry.ResetPosition(0_rad, {zero, zero, zero, zero}, Pose2d{});
+  m_odometry.ResetPosition(frc::Rotation3d{}, {zero, zero, zero, zero},
+                           Pose3d{});
 
-  m_odometry.Update(0_deg, {zero, zero, zero, zero});
+  m_odometry.Update(frc::Rotation3d{}, {zero, zero, zero, zero});
 
-  auto pose =
-      m_odometry.Update(0_deg, {position, position, position, position});
+  auto pose = m_odometry.Update(frc::Rotation3d{},
+                                {position, position, position, position});
 
   EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
   EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Rotation().Degrees().value(), kEpsilon);
+  EXPECT_NEAR(0.0, pose.Z().value(), kEpsilon);
+  EXPECT_NEAR(0.0, pose.Rotation().ToRotation2d().Degrees().value(), kEpsilon);
 }
 
-TEST_F(SwerveDriveOdometryTest, 90DegreeTurn) {
+TEST_F(SwerveDriveOdometry3dTest, 90DegreeTurn) {
   SwerveModulePosition fl{18.85_m, 90_deg};
   SwerveModulePosition fr{42.15_m, 26.565_deg};
   SwerveModulePosition bl{18.85_m, -90_deg};
   SwerveModulePosition br{42.15_m, -26.565_deg};
 
-  m_odometry.ResetPosition(0_rad, {zero, zero, zero, zero}, Pose2d{});
-  auto pose = m_odometry.Update(90_deg, {fl, fr, bl, br});
+  m_odometry.ResetPosition(frc::Rotation3d{}, {zero, zero, zero, zero},
+                           Pose3d{});
+  auto pose = m_odometry.Update(frc::Rotation3d{0_deg, 0_deg, 90_deg},
+                                {fl, fr, bl, br});
 
   EXPECT_NEAR(12.0, pose.X().value(), kEpsilon);
   EXPECT_NEAR(12.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(90.0, pose.Rotation().Degrees().value(), kEpsilon);
+  EXPECT_NEAR(0.0, pose.Z().value(), kEpsilon);
+  EXPECT_NEAR(90.0, pose.Rotation().ToRotation2d().Degrees().value(), kEpsilon);
 }
 
-TEST_F(SwerveDriveOdometryTest, GyroAngleReset) {
-  m_odometry.ResetPosition(90_deg, {zero, zero, zero, zero}, Pose2d{});
+TEST_F(SwerveDriveOdometry3dTest, GyroAngleReset) {
+  m_odometry.ResetPosition(frc::Rotation3d{0_deg, 0_deg, 90_deg},
+                           {zero, zero, zero, zero}, Pose3d{});
 
   SwerveModulePosition position{0.5_m, 0_deg};
 
-  auto pose =
-      m_odometry.Update(90_deg, {position, position, position, position});
+  auto pose = m_odometry.Update(frc::Rotation3d{0_deg, 0_deg, 90_deg},
+                                {position, position, position, position});
 
   EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
   EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Rotation().Degrees().value(), kEpsilon);
+  EXPECT_NEAR(0.0, pose.Z().value(), kEpsilon);
+  EXPECT_NEAR(0.0, pose.Rotation().ToRotation2d().Degrees().value(), kEpsilon);
 }
 
-TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
+TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingTrajectory) {
   SwerveDriveKinematics<4> kinematics{
       Translation2d{1_m, 1_m}, Translation2d{1_m, -1_m},
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
 
-  SwerveDriveOdometry<4> odometry{
-      kinematics, frc::Rotation2d{}, {zero, zero, zero, zero}};
+  SwerveDriveOdometry3d<4> odometry{
+      kinematics, frc::Rotation3d{}, {zero, zero, zero, zero}};
 
   SwerveModulePosition fl;
   SwerveModulePosition fr;
@@ -117,12 +139,12 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
     bl.angle = moduleStates[2].angle;
     br.angle = moduleStates[3].angle;
 
-    auto xhat =
-        odometry.Update(groundTruthState.pose.Rotation() +
-                            frc::Rotation2d{distribution(generator) * 0.05_rad},
-                        {fl, fr, bl, br});
+    auto xhat = odometry.Update(
+        frc::Rotation3d{groundTruthState.pose.Rotation() +
+                        frc::Rotation2d{distribution(generator) * 0.05_rad}},
+        {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
-                       .Distance(xhat.Translation())
+                       .Distance(xhat.Translation().ToTranslation2d())
                        .value();
 
     if (error > maxError) {
@@ -137,13 +159,13 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
   EXPECT_LT(maxError, 0.125);
 }
 
-TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
+TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingXAxis) {
   SwerveDriveKinematics<4> kinematics{
       Translation2d{1_m, 1_m}, Translation2d{1_m, -1_m},
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
 
-  SwerveDriveOdometry<4> odometry{
-      kinematics, frc::Rotation2d{}, {zero, zero, zero, zero}};
+  SwerveDriveOdometry3d<4> odometry{
+      kinematics, frc::Rotation3d{}, {zero, zero, zero, zero}};
 
   SwerveModulePosition fl;
   SwerveModulePosition fr;
@@ -183,9 +205,10 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
     br.angle = groundTruthState.pose.Rotation();
 
     auto xhat = odometry.Update(
-        frc::Rotation2d{distribution(generator) * 0.05_rad}, {fl, fr, bl, br});
+        frc::Rotation3d{0_rad, 0_rad, distribution(generator) * 0.05_rad},
+        {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
-                       .Distance(xhat.Translation())
+                       .Distance(xhat.Translation().ToTranslation2d())
                        .value();
 
     if (error > maxError) {

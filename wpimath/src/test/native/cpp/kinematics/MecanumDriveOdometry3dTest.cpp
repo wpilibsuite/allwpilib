@@ -7,12 +7,12 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/MecanumDriveOdometry.h"
+#include "frc/kinematics/MecanumDriveOdometry3d.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 
 using namespace frc;
 
-class MecanumDriveOdometryTest : public ::testing::Test {
+class MecanumDriveOdometry3dTest : public ::testing::Test {
  protected:
   Translation2d m_fl{12_m, 12_m};
   Translation2d m_fr{12_m, -12_m};
@@ -22,70 +22,89 @@ class MecanumDriveOdometryTest : public ::testing::Test {
   MecanumDriveWheelPositions zero;
 
   MecanumDriveKinematics kinematics{m_fl, m_fr, m_bl, m_br};
-  MecanumDriveOdometry odometry{kinematics, 0_rad, zero};
+  MecanumDriveOdometry3d odometry{kinematics, frc::Rotation3d{}, zero};
 };
 
-TEST_F(MecanumDriveOdometryTest, MultipleConsecutiveUpdates) {
+TEST_F(MecanumDriveOdometry3dTest, Initialize) {
+  MecanumDriveOdometry3d odometry{
+      kinematics, frc::Rotation3d{}, zero,
+      frc::Pose3d{1_m, 2_m, 0_m, frc::Rotation3d{0_deg, 0_deg, 45_deg}}};
+
+  const frc::Pose3d& pose = odometry.GetPose();
+
+  EXPECT_NEAR(pose.X().value(), 1, 1e-9);
+  EXPECT_NEAR(pose.Y().value(), 2, 1e-9);
+  EXPECT_NEAR(pose.Z().value(), 0, 1e-9);
+  EXPECT_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 45, 1e-9);
+}
+
+TEST_F(MecanumDriveOdometry3dTest, MultipleConsecutiveUpdates) {
   MecanumDriveWheelPositions wheelDeltas{3.536_m, 3.536_m, 3.536_m, 3.536_m};
 
-  odometry.ResetPosition(0_rad, wheelDeltas, Pose2d{});
+  odometry.ResetPosition(frc::Rotation3d{}, wheelDeltas, Pose3d{});
 
-  odometry.Update(0_deg, wheelDeltas);
-  auto secondPose = odometry.Update(0_deg, wheelDeltas);
+  odometry.Update(frc::Rotation3d{}, wheelDeltas);
+  auto secondPose = odometry.Update(frc::Rotation3d{}, wheelDeltas);
 
   EXPECT_NEAR(secondPose.X().value(), 0.0, 0.01);
   EXPECT_NEAR(secondPose.Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Rotation().Radians().value(), 0.0, 0.01);
+  EXPECT_NEAR(secondPose.Z().value(), 0.0, 0.01);
+  EXPECT_NEAR(secondPose.Rotation().ToRotation2d().Radians().value(), 0.0,
+              0.01);
 }
 
-TEST_F(MecanumDriveOdometryTest, TwoIterations) {
-  odometry.ResetPosition(0_rad, zero, Pose2d{});
+TEST_F(MecanumDriveOdometry3dTest, TwoIterations) {
+  odometry.ResetPosition(frc::Rotation3d{}, zero, Pose3d{});
   MecanumDriveWheelPositions wheelDeltas{0.3536_m, 0.3536_m, 0.3536_m,
                                          0.3536_m};
 
-  odometry.Update(0_deg, MecanumDriveWheelPositions{});
-  auto pose = odometry.Update(0_deg, wheelDeltas);
+  odometry.Update(frc::Rotation3d{}, MecanumDriveWheelPositions{});
+  auto pose = odometry.Update(frc::Rotation3d{}, wheelDeltas);
 
   EXPECT_NEAR(pose.X().value(), 0.3536, 0.01);
   EXPECT_NEAR(pose.Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Rotation().Radians().value(), 0.0, 0.01);
+  EXPECT_NEAR(pose.Z().value(), 0.0, 0.01);
+  EXPECT_NEAR(pose.Rotation().ToRotation2d().Radians().value(), 0.0, 0.01);
 }
 
-TEST_F(MecanumDriveOdometryTest, 90DegreeTurn) {
-  odometry.ResetPosition(0_rad, zero, Pose2d{});
+TEST_F(MecanumDriveOdometry3dTest, 90DegreeTurn) {
+  odometry.ResetPosition(frc::Rotation3d{}, zero, Pose3d{});
   MecanumDriveWheelPositions wheelDeltas{-13.328_m, 39.986_m, -13.329_m,
                                          39.986_m};
-  odometry.Update(0_deg, MecanumDriveWheelPositions{});
-  auto pose = odometry.Update(90_deg, wheelDeltas);
+  odometry.Update(frc::Rotation3d{}, MecanumDriveWheelPositions{});
+  auto pose =
+      odometry.Update(frc::Rotation3d{0_deg, 0_deg, 90_deg}, wheelDeltas);
 
   EXPECT_NEAR(pose.X().value(), 8.4855, 0.01);
   EXPECT_NEAR(pose.Y().value(), 8.4855, 0.01);
-  EXPECT_NEAR(pose.Rotation().Degrees().value(), 90.0, 0.01);
+  EXPECT_NEAR(pose.Z().value(), 0, 0.01);
+  EXPECT_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 90.0, 0.01);
 }
 
-TEST_F(MecanumDriveOdometryTest, GyroAngleReset) {
-  odometry.ResetPosition(90_deg, zero, Pose2d{});
+TEST_F(MecanumDriveOdometry3dTest, GyroAngleReset) {
+  odometry.ResetPosition(frc::Rotation3d{0_deg, 0_deg, 90_deg}, zero, Pose3d{});
 
   MecanumDriveWheelPositions wheelDeltas{0.3536_m, 0.3536_m, 0.3536_m,
                                          0.3536_m};
 
-  odometry.Update(90_deg, MecanumDriveWheelPositions{});
-  auto pose = odometry.Update(90_deg, wheelDeltas);
+  auto pose =
+      odometry.Update(frc::Rotation3d{0_deg, 0_deg, 90_deg}, wheelDeltas);
 
   EXPECT_NEAR(pose.X().value(), 0.3536, 0.01);
   EXPECT_NEAR(pose.Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Rotation().Radians().value(), 0.0, 0.01);
+  EXPECT_NEAR(pose.Z().value(), 0.0, 0.01);
+  EXPECT_NEAR(pose.Rotation().ToRotation2d().Radians().value(), 0.0, 0.01);
 }
 
-TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
+TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
   frc::MecanumDriveKinematics kinematics{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
 
   frc::MecanumDriveWheelPositions wheelPositions;
 
-  frc::MecanumDriveOdometry odometry{kinematics, frc::Rotation2d{},
-                                     wheelPositions};
+  frc::MecanumDriveOdometry3d odometry{kinematics, frc::Rotation3d{},
+                                       wheelPositions};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -120,12 +139,12 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
     wheelPositions.rearLeft += wheelSpeeds.rearLeft * dt;
     wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
 
-    auto xhat =
-        odometry.Update(groundTruthState.pose.Rotation() +
-                            frc::Rotation2d{distribution(generator) * 0.05_rad},
-                        wheelPositions);
+    auto xhat = odometry.Update(
+        frc::Rotation3d{groundTruthState.pose.Rotation() +
+                        frc::Rotation2d{distribution(generator) * 0.05_rad}},
+        wheelPositions);
     double error = groundTruthState.pose.Translation()
-                       .Distance(xhat.Translation())
+                       .Distance(xhat.Translation().ToTranslation2d())
                        .value();
 
     if (error > maxError) {
@@ -140,15 +159,15 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
   EXPECT_LT(maxError, 0.125);
 }
 
-TEST_F(MecanumDriveOdometryTest, AccuracyFacingXAxis) {
+TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
   frc::MecanumDriveKinematics kinematics{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
 
   frc::MecanumDriveWheelPositions wheelPositions;
 
-  frc::MecanumDriveOdometry odometry{kinematics, frc::Rotation2d{},
-                                     wheelPositions};
+  frc::MecanumDriveOdometry3d odometry{kinematics, frc::Rotation3d{},
+                                       wheelPositions};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -185,9 +204,10 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingXAxis) {
     wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
 
     auto xhat = odometry.Update(
-        frc::Rotation2d{distribution(generator) * 0.05_rad}, wheelPositions);
+        frc::Rotation3d{0_rad, 0_rad, distribution(generator) * 0.05_rad},
+        wheelPositions);
     double error = groundTruthState.pose.Translation()
-                       .Distance(xhat.Translation())
+                       .Distance(xhat.Translation().ToTranslation2d())
                        .value();
 
     if (error > maxError) {

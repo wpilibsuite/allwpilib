@@ -9,11 +9,11 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "frc/estimator/PoseEstimator.h"
+#include "frc/estimator/PoseEstimator3d.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
-#include "frc/kinematics/SwerveDriveOdometry.h"
+#include "frc/kinematics/SwerveDriveOdometry3d.h"
 #include "units/time.h"
 
 namespace frc {
@@ -21,7 +21,11 @@ namespace frc {
 /**
  * This class wraps Swerve Drive Odometry to fuse latency-compensated
  * vision measurements with swerve drive encoder distance measurements. It is
- * intended to be a drop-in for SwerveDriveOdometry.
+ * intended to be a drop-in for SwerveDriveOdometry3d. It is also intended to be
+ * an easy replacement for PoseEstimator, only requiring the addition of a
+ * standard deviation for Z and appropriate conversions between 2D and 3D
+ * versions of geometry classes. (See Pose3d(Pose2d), Rotation3d(Rotation2d),
+ * Translation3d(Translation2d), and Pose3d.ToPose2d().)
  *
  * Update() should be called every robot loop.
  *
@@ -30,18 +34,19 @@ namespace frc {
  * odometry.
  */
 template <size_t NumModules>
-class SwerveDrivePoseEstimator
-    : public PoseEstimator<wpi::array<SwerveModuleState, NumModules>,
-                           wpi::array<SwerveModulePosition, NumModules>> {
+class SwerveDrivePoseEstimator3d
+    : public PoseEstimator3d<wpi::array<SwerveModuleState, NumModules>,
+                             wpi::array<SwerveModulePosition, NumModules>> {
  public:
   /**
-   * Constructs a SwerveDrivePoseEstimator with default standard deviations
+   * Constructs a SwerveDrivePoseEstimator3d with default standard deviations
    * for the model and vision measurements.
    *
    * The default standard deviations of the model states are
-   * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
-   * The default standard deviations of the vision measurements are
-   * 0.9 meters for x, 0.9 meters for y, and 0.9 radians for heading.
+   * 0.1 meters for x, 0.1 meters for y, 0.1 meters for z, and 0.1 radians for
+   * angle. The default standard deviations of the vision measurements are 0.9
+   * meters for x, 0.9 meters for y, 0.9 meters for z, and 0.9 radians for
+   * angle.
    *
    * @param kinematics A correctly-configured kinematics object for your
    *     drivetrain.
@@ -50,17 +55,18 @@ class SwerveDrivePoseEstimator
    *     the swerve modules.
    * @param initialPose The starting pose estimate.
    */
-  SwerveDrivePoseEstimator(
+  SwerveDrivePoseEstimator3d(
       SwerveDriveKinematics<NumModules>& kinematics,
-      const Rotation2d& gyroAngle,
+      const Rotation3d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
-      const Pose2d& initialPose)
-      : SwerveDrivePoseEstimator{kinematics,      gyroAngle,
-                                 modulePositions, initialPose,
-                                 {0.1, 0.1, 0.1}, {0.9, 0.9, 0.9}} {}
+      const Pose3d& initialPose)
+      : SwerveDrivePoseEstimator3d{kinematics,           gyroAngle,
+                                   modulePositions,      initialPose,
+                                   {0.1, 0.1, 0.1, 0.1}, {0.9, 0.9, 0.9, 0.9}} {
+  }
 
   /**
-   * Constructs a SwerveDrivePoseEstimator.
+   * Constructs a SwerveDrivePoseEstimator3d.
    *
    * @param kinematics A correctly-configured kinematics object for your
    *     drivetrain.
@@ -76,23 +82,23 @@ class SwerveDrivePoseEstimator
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  SwerveDrivePoseEstimator(
+  SwerveDrivePoseEstimator3d(
       SwerveDriveKinematics<NumModules>& kinematics,
-      const Rotation2d& gyroAngle,
+      const Rotation3d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
-      const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
-      const wpi::array<double, 3>& visionMeasurementStdDevs)
-      : SwerveDrivePoseEstimator::PoseEstimator(
+      const Pose3d& initialPose, const wpi::array<double, 4>& stateStdDevs,
+      const wpi::array<double, 4>& visionMeasurementStdDevs)
+      : SwerveDrivePoseEstimator3d::PoseEstimator3d(
             kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
         m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {
     this->ResetPose(initialPose);
   }
 
  private:
-  SwerveDriveOdometry<NumModules> m_odometryImpl;
+  SwerveDriveOdometry3d<NumModules> m_odometryImpl;
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
-    SwerveDrivePoseEstimator<4>;
+    SwerveDrivePoseEstimator3d<4>;
 
 }  // namespace frc
