@@ -43,9 +43,6 @@ model {
                     it.buildable = false
                     return
                 }
-                it.tasks.withType(CppCompile) {
-                    it.dependsOn generateProto
-                }
                 if (project.hasProperty('extraSetup')) {
                     extraSetup(it)
                 }

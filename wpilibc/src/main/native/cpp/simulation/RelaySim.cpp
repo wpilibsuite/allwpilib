@@ -5,7 +5,6 @@
 #include "frc/simulation/RelaySim.h"
 
 #include <memory>
-#include <utility>
 
 #include <hal/simulation/RelayData.h>
 

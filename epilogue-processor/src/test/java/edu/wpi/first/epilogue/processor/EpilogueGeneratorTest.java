@@ -172,7 +172,7 @@ class EpilogueGeneratorTest {
               config.loggingPeriod = Seconds.of(robot.getPeriod());
             }
             if (config.loggingPeriodOffset == null) {
-              config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+              config.loggingPeriodOffset = config.loggingPeriod.div(2);
             }
 
             robot.addPeriodic(() -> {
@@ -252,7 +252,7 @@ class EpilogueGeneratorTest {
               config.loggingPeriod = Seconds.of(robot.getPeriod());
             }
             if (config.loggingPeriodOffset == null) {
-              config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+              config.loggingPeriodOffset = config.loggingPeriod.div(2);
             }
 
             robot.addPeriodic(() -> {
@@ -284,7 +284,7 @@ class EpilogueGeneratorTest {
               config.loggingPeriod = Seconds.of(robot.getPeriod());
             }
             if (config.loggingPeriodOffset == null) {
-              config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+              config.loggingPeriodOffset = config.loggingPeriod.div(2);
             }
 
             robot.addPeriodic(() -> {

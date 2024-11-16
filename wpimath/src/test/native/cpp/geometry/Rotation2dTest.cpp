@@ -49,6 +49,19 @@ TEST(Rotation2dTest, Minus) {
   EXPECT_DOUBLE_EQ(40.0, (rot1 - rot2).Degrees().value());
 }
 
+TEST(Rotation2dTest, UnaryMinus) {
+  const auto rot = Rotation2d{20_deg};
+
+  EXPECT_DOUBLE_EQ(-20.0, (-rot).Degrees().value());
+}
+
+TEST(Rotation2dTest, Multiply) {
+  const auto rot = Rotation2d{10_deg};
+
+  EXPECT_DOUBLE_EQ(30.0, (rot * 3.0).Degrees().value());
+  EXPECT_DOUBLE_EQ(410.0, (rot * 41.0).Degrees().value());
+}
+
 TEST(Rotation2dTest, Equality) {
   auto rot1 = Rotation2d{43_deg};
   auto rot2 = Rotation2d{43_deg};

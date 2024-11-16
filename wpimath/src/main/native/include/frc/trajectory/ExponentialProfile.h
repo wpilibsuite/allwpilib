@@ -72,7 +72,9 @@ class ExponentialProfile {
      * @param t The time since the beginning of the profile.
      * @return if the profile is finished at time t.
      */
-    bool IsFinished(const units::second_t& t) const { return t >= totalTime; }
+    constexpr bool IsFinished(const units::second_t& t) const {
+      return t >= totalTime;
+    }
   };
 
   /**
@@ -87,7 +89,7 @@ class ExponentialProfile {
      * @param A The State-Space 1x1 system matrix.
      * @param B The State-Space 1x1 input matrix.
      */
-    Constraints(Input_t maxInput, A_t A, B_t B)
+    constexpr Constraints(Input_t maxInput, A_t A, B_t B)
         : maxInput{maxInput}, A{A}, B{B} {}
 
     /**
@@ -97,7 +99,7 @@ class ExponentialProfile {
      * @param kV The velocity gain.
      * @param kA The acceleration gain.
      */
-    Constraints(Input_t maxInput, kV_t kV, kA_t kA)
+    constexpr Constraints(Input_t maxInput, kV_t kV, kA_t kA)
         : maxInput{maxInput}, A{-kV / kA}, B{1 / kA} {}
 
     /**
@@ -105,7 +107,7 @@ class ExponentialProfile {
      *
      * @return The steady-state velocity achieved by this profile.
      */
-    Velocity_t MaxVelocity() const { return -maxInput * B / A; }
+    constexpr Velocity_t MaxVelocity() const { return -maxInput * B / A; }
 
     /// Maximum unsigned input voltage.
     Input_t maxInput{0};
@@ -126,7 +128,7 @@ class ExponentialProfile {
     /// The velocity at this state.
     Velocity_t velocity{0};
 
-    bool operator==(const State&) const = default;
+    constexpr bool operator==(const State&) const = default;
   };
 
   /**
@@ -134,13 +136,13 @@ class ExponentialProfile {
    *
    * @param constraints The constraints on the profile, like maximum input.
    */
-  explicit ExponentialProfile(Constraints constraints)
+  constexpr explicit ExponentialProfile(Constraints constraints)
       : m_constraints(constraints) {}
 
-  ExponentialProfile(const ExponentialProfile&) = default;
-  ExponentialProfile& operator=(const ExponentialProfile&) = default;
-  ExponentialProfile(ExponentialProfile&&) = default;
-  ExponentialProfile& operator=(ExponentialProfile&&) = default;
+  constexpr ExponentialProfile(const ExponentialProfile&) = default;
+  constexpr ExponentialProfile& operator=(const ExponentialProfile&) = default;
+  constexpr ExponentialProfile(ExponentialProfile&&) = default;
+  constexpr ExponentialProfile& operator=(ExponentialProfile&&) = default;
 
   /**
    * Calculates the position and velocity for the profile at a time t where the
@@ -152,8 +154,8 @@ class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
-  State Calculate(const units::second_t& t, const State& current,
-                  const State& goal) const {
+  constexpr State Calculate(const units::second_t& t, const State& current,
+                            const State& goal) const {
     auto direction = ShouldFlipInput(current, goal) ? -1 : 1;
     auto u = direction * m_constraints.maxInput;
 
@@ -181,8 +183,8 @@ class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at the inflection point.
    */
-  State CalculateInflectionPoint(const State& current,
-                                 const State& goal) const {
+  constexpr State CalculateInflectionPoint(const State& current,
+                                           const State& goal) const {
     auto direction = ShouldFlipInput(current, goal) ? -1 : 1;
     auto u = direction * m_constraints.maxInput;
 
@@ -196,7 +198,8 @@ class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    * @return The total duration of this profile.
    */
-  units::second_t TimeLeftUntil(const State& current, const State& goal) const {
+  constexpr units::second_t TimeLeftUntil(const State& current,
+                                          const State& goal) const {
     auto timing = CalculateProfileTiming(current, goal);
 
     return timing.totalTime;
@@ -210,8 +213,8 @@ class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    * @return The timing information for this profile.
    */
-  ProfileTiming CalculateProfileTiming(const State& current,
-                                       const State& goal) const {
+  constexpr ProfileTiming CalculateProfileTiming(const State& current,
+                                                 const State& goal) const {
     auto direction = ShouldFlipInput(current, goal) ? -1 : 1;
     auto u = direction * m_constraints.maxInput;
 
@@ -230,8 +233,9 @@ class ExponentialProfile {
    *     state.
    * @return The position and velocity of the profile at the inflection point.
    */
-  State CalculateInflectionPoint(const State& current, const State& goal,
-                                 const Input_t& input) const {
+  constexpr State CalculateInflectionPoint(const State& current,
+                                           const State& goal,
+                                           const Input_t& input) const {
     auto u = input;
 
     if (current == goal) {
@@ -256,10 +260,10 @@ class ExponentialProfile {
    *     state.
    * @return The timing information for this profile.
    */
-  ProfileTiming CalculateProfileTiming(const State& current,
-                                       const State& inflectionPoint,
-                                       const State& goal,
-                                       const Input_t& input) const {
+  constexpr ProfileTiming CalculateProfileTiming(const State& current,
+                                                 const State& inflectionPoint,
+                                                 const State& goal,
+                                                 const Input_t& input) const {
     auto u = input;
     auto u_dir = units::math::abs(u) / u;
 
@@ -323,9 +327,9 @@ class ExponentialProfile {
    * @param initial The initial state.
    * @return The distance travelled by this profile.
    */
-  Distance_t ComputeDistanceFromTime(const units::second_t& time,
-                                     const Input_t& input,
-                                     const State& initial) const {
+  constexpr Distance_t ComputeDistanceFromTime(const units::second_t& time,
+                                               const Input_t& input,
+                                               const State& initial) const {
     auto A = m_constraints.A;
     auto B = m_constraints.B;
     auto u = input;
@@ -346,9 +350,9 @@ class ExponentialProfile {
    * @param initial The initial state.
    * @return The distance travelled by this profile.
    */
-  Velocity_t ComputeVelocityFromTime(const units::second_t& time,
-                                     const Input_t& input,
-                                     const State& initial) const {
+  constexpr Velocity_t ComputeVelocityFromTime(const units::second_t& time,
+                                               const Input_t& input,
+                                               const State& initial) const {
     auto A = m_constraints.A;
     auto B = m_constraints.B;
     auto u = input;
@@ -367,9 +371,9 @@ class ExponentialProfile {
    * @param initial The initial velocity.
    * @return The time required to reach the goal velocity.
    */
-  units::second_t ComputeTimeFromVelocity(const Velocity_t& velocity,
-                                          const Input_t& input,
-                                          const Velocity_t& initial) const {
+  constexpr units::second_t ComputeTimeFromVelocity(
+      const Velocity_t& velocity, const Input_t& input,
+      const Velocity_t& initial) const {
     auto A = m_constraints.A;
     auto B = m_constraints.B;
     auto u = input;
@@ -387,9 +391,9 @@ class ExponentialProfile {
    * @param initial The initial state.
    * @return The distance reached when the given velocity is reached.
    */
-  Distance_t ComputeDistanceFromVelocity(const Velocity_t& velocity,
-                                         const Input_t& input,
-                                         const State& initial) const {
+  constexpr Distance_t ComputeDistanceFromVelocity(const Velocity_t& velocity,
+                                                   const Input_t& input,
+                                                   const State& initial) const {
     auto A = m_constraints.A;
     auto B = m_constraints.B;
     auto u = input;
@@ -410,9 +414,9 @@ class ExponentialProfile {
    * @param goal The goal state.
    * @return The inflection velocity.
    */
-  Velocity_t SolveForInflectionVelocity(const Input_t& input,
-                                        const State& current,
-                                        const State& goal) const {
+  constexpr Velocity_t SolveForInflectionVelocity(const Input_t& input,
+                                                  const State& current,
+                                                  const State& goal) const {
     auto A = m_constraints.A;
     auto B = m_constraints.B;
     auto u = input;
@@ -446,7 +450,8 @@ class ExponentialProfile {
    * @param current The initial state (usually the current state).
    * @param goal The desired state when the profile is complete.
    */
-  bool ShouldFlipInput(const State& current, const State& goal) const {
+  constexpr bool ShouldFlipInput(const State& current,
+                                 const State& goal) const {
     auto u = m_constraints.maxInput;
 
     auto v0 = current.velocity;

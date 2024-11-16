@@ -9,7 +9,6 @@
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Pose2d.h"
-#include "frc/spline/Spline.h"
 #include "units/acceleration.h"
 #include "units/curvature.h"
 #include "units/velocity.h"
@@ -21,15 +20,16 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT TrajectoryConstraint {
  public:
-  TrajectoryConstraint() = default;
+  constexpr TrajectoryConstraint() = default;
 
-  TrajectoryConstraint(const TrajectoryConstraint&) = default;
-  TrajectoryConstraint& operator=(const TrajectoryConstraint&) = default;
+  constexpr TrajectoryConstraint(const TrajectoryConstraint&) = default;
+  constexpr TrajectoryConstraint& operator=(const TrajectoryConstraint&) =
+      default;
 
-  TrajectoryConstraint(TrajectoryConstraint&&) = default;
-  TrajectoryConstraint& operator=(TrajectoryConstraint&&) = default;
+  constexpr TrajectoryConstraint(TrajectoryConstraint&&) = default;
+  constexpr TrajectoryConstraint& operator=(TrajectoryConstraint&&) = default;
 
-  virtual ~TrajectoryConstraint() = default;
+  constexpr virtual ~TrajectoryConstraint() = default;
 
   /**
    * Represents a minimum and maximum acceleration.
@@ -58,7 +58,7 @@ class WPILIB_DLLEXPORT TrajectoryConstraint {
    *
    * @return The absolute maximum velocity.
    */
-  virtual units::meters_per_second_t MaxVelocity(
+  constexpr virtual units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
       units::meters_per_second_t velocity) const = 0;
 
@@ -72,8 +72,8 @@ class WPILIB_DLLEXPORT TrajectoryConstraint {
    *
    * @return The min and max acceleration bounds.
    */
-  virtual MinMax MinMaxAcceleration(const Pose2d& pose,
-                                    units::curvature_t curvature,
-                                    units::meters_per_second_t speed) const = 0;
+  constexpr virtual MinMax MinMaxAcceleration(
+      const Pose2d& pose, units::curvature_t curvature,
+      units::meters_per_second_t speed) const = 0;
 };
 }  // namespace frc

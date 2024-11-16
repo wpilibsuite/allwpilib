@@ -8,11 +8,14 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/kinematics/SwerveModulePosition.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::SwerveModulePosition> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::SwerveModulePosition Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
+  using MessageStruct = wpi_proto_ProtobufSwerveModulePosition;
+  using InputStream = wpi::ProtoInputStream<frc::SwerveModulePosition>;
+  using OutputStream = wpi::ProtoOutputStream<frc::SwerveModulePosition>;
+  static std::optional<frc::SwerveModulePosition> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream,
                    const frc::SwerveModulePosition& value);
 };

@@ -4,31 +4,30 @@
 
 #include "frc/geometry/proto/QuaternionProto.h"
 
-#include <wpi/ProtoHelper.h>
+#include "wpimath/protobuf/geometry3d.npb.h"
 
-#include "geometry3d.pb.h"
+std::optional<frc::Quaternion> wpi::Protobuf<frc::Quaternion>::Unpack(
+    InputStream& stream) {
+  wpi_proto_ProtobufQuaternion msg;
+  if (!stream.Decode(msg)) {
+    return {};
+  }
 
-google::protobuf::Message* wpi::Protobuf<frc::Quaternion>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufQuaternion>(arena);
-}
-
-frc::Quaternion wpi::Protobuf<frc::Quaternion>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufQuaternion*>(&msg);
   return frc::Quaternion{
-      m->w(),
-      m->x(),
-      m->y(),
-      m->z(),
+      msg.w,
+      msg.x,
+      msg.y,
+      msg.z,
   };
 }
 
-void wpi::Protobuf<frc::Quaternion>::Pack(google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::Quaternion>::Pack(OutputStream& stream,
                                           const frc::Quaternion& value) {
-  auto m = static_cast<wpi::proto::ProtobufQuaternion*>(msg);
-  m->set_w(value.W());
-  m->set_x(value.X());
-  m->set_y(value.Y());
-  m->set_z(value.Z());
+  wpi_proto_ProtobufQuaternion msg{
+      .w = value.W(),
+      .x = value.X(),
+      .y = value.Y(),
+      .z = value.Z(),
+  };
+  return stream.Encode(msg);
 }

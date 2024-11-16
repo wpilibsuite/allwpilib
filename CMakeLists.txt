@@ -132,9 +132,6 @@ if(WITH_JAVA OR WITH_JAVA_SOURCE)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
     find_package(Java REQUIRED COMPONENTS Development)
     find_package(JNI REQUIRED COMPONENTS JVM)
-else()
-    # Protoc requires the java runtime
-    find_package(Java REQUIRED COMPONENTS Runtime)
 endif()
 
 if(WITH_DOCS)
@@ -292,8 +289,6 @@ if(WITH_NTCORE)
     add_subdirectory(wpinet)
     add_subdirectory(ntcore)
 endif()
-
-add_subdirectory(protoplugin)
 
 if(WITH_WPIMATH)
     if(WITH_JAVA)

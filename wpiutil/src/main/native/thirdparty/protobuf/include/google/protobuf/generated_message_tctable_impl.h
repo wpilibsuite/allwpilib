@@ -182,7 +182,7 @@ static_assert(kFmtShift + kFmtBits <= 16, "too many bits");
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
-#if __GNUC__ >= 12 || (__GNUC__ == 11 && __GNUC_MINOR >= 1)
+#if __GNUC__ >= 12 || (__GNUC__ == 11 && __GNUC_MINOR__ >= 1)
 #pragma GCC diagnostic ignored "-Wdeprecated-enum-enum-conversion"
 #endif
 #endif

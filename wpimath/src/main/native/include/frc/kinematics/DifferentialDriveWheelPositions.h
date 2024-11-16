@@ -42,7 +42,5 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelPositions {
 };
 }  // namespace frc
 
-#ifndef NO_PROTOBUF
 #include "frc/kinematics/proto/DifferentialDriveWheelPositionsProto.h"
-#endif
 #include "frc/kinematics/struct/DifferentialDriveWheelPositionsStruct.h"

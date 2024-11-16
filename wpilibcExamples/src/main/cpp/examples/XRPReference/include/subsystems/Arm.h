@@ -6,6 +6,7 @@
 
 #include <frc/xrp/XRPServo.h>
 #include <frc2/command/SubsystemBase.h>
+#include <units/angle.h>
 
 class Arm : public frc2::SubsystemBase {
  public:
@@ -15,11 +16,11 @@ class Arm : public frc2::SubsystemBase {
   void Periodic() override;
 
   /**
-   * Set the current angle of the arm (0 - 180 degrees).
+   * Set the current angle of the arm (0° - 180°).
    *
-   * @param angleDeg the commanded angle
+   * @param angle the commanded angle
    */
-  void SetAngle(double angleDeg);
+  void SetAngle(units::radian_t angle);
 
  private:
   frc::XRPServo m_armServo{4};

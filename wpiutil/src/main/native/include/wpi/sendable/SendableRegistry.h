@@ -27,6 +27,12 @@ class SendableRegistry final {
   using UID = size_t;
 
   /**
+   * Initializes the SendableRegistry. This is used to ensure initialization and
+   * destruction order relative to Sendables.
+   */
+  static void EnsureInitialized();
+
+  /**
    * Sets the factory for LiveWindow builders.
    *
    * @param factory factory function

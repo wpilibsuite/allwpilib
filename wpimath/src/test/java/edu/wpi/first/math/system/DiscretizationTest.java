@@ -72,7 +72,7 @@ class DiscretizationTest {
     // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
     //       0
     final var discQIntegrated =
-        RungeKuttaTimeVarying.rungeKuttaTimeVarying(
+        NumericalIntegration.rk4(
             (Double t, Matrix<N2, N2> x) ->
                 contA.times(t).exp().times(contQ).times(contA.transpose().times(t).exp()),
             0.0,
@@ -104,7 +104,7 @@ class DiscretizationTest {
     // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
     //       0
     final var discQIntegrated =
-        RungeKuttaTimeVarying.rungeKuttaTimeVarying(
+        NumericalIntegration.rk4(
             (Double t, Matrix<N2, N2> x) ->
                 contA.times(t).exp().times(contQ).times(contA.transpose().times(t).exp()),
             0.0,

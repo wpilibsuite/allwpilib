@@ -74,7 +74,7 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
 
   void CancelCallbacks();
 
-  wpi::StringMap<std::unique_ptr<SimDeviceValueData>> m_valueHandles;
+  wpi::StringMap<SimDeviceValueData> m_valueHandles;
   std::shared_mutex m_vhLock;
 
   HAL_SimDeviceHandle m_handle;
