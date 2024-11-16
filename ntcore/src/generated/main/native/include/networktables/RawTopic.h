@@ -15,7 +15,9 @@
 
 #include <wpi/json_fwd.h>
 
+#include "networktables/NetworkTableType.h"
 #include "networktables/Topic.h"
+#include "ntcore_cpp.h"
 
 namespace wpi {
 template <typename T>
@@ -50,7 +52,9 @@ class RawSubscriber : public Subscriber {
    * @param handle Native handle
    * @param defaultValue Default value
    */
-  RawSubscriber(NT_Subscriber handle, ParamType defaultValue);
+  RawSubscriber(NT_Subscriber handle, ParamType defaultValue)
+      : Subscriber{handle},
+        m_defaultValue{defaultValue.begin(), defaultValue.end()} {}
 
   /**
    * Get the last published value.
@@ -58,7 +62,9 @@ class RawSubscriber : public Subscriber {
    *
    * @return value
    */
-  ValueType Get() const;
+  ValueType Get() const {
+    return Get(m_defaultValue);
+  }
 
   /**
    * Get the last published value.
@@ -67,7 +73,9 @@ class RawSubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return value
    */
-  ValueType Get(ParamType defaultValue) const;
+  ValueType Get(ParamType defaultValue) const {
+    return ::nt::GetRaw(m_subHandle, defaultValue);
+  }
 
   /**
    * Get the last published value.
@@ -76,7 +84,9 @@ class RawSubscriber : public Subscriber {
    * @param buf storage for returned value
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf) const;
+  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf) const {
+    return Get(buf, m_defaultValue);
+  }
 
   /**
    * Get the last published value.
@@ -86,7 +96,9 @@ class RawSubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const;
+  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
+    return nt::GetRaw(m_subHandle, buf, defaultValue);
+  }
 
   /**
    * Get the last published value along with its timestamp
@@ -95,7 +107,9 @@ class RawSubscriber : public Subscriber {
    *
    * @return timestamped value
    */
-  TimestampedValueType GetAtomic() const;
+  TimestampedValueType GetAtomic() const {
+    return GetAtomic(m_defaultValue);
+  }
 
   /**
    * Get the last published value along with its timestamp.
@@ -105,7 +119,9 @@ class RawSubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return timestamped value
    */
-  TimestampedValueType GetAtomic(ParamType defaultValue) const;
+  TimestampedValueType GetAtomic(ParamType defaultValue) const {
+    return ::nt::GetAtomicRaw(m_subHandle, defaultValue);
+  }
 
   /**
    * Get the last published value along with its timestamp.
@@ -116,7 +132,9 @@ class RawSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf) const;
+      wpi::SmallVectorImpl<SmallElemType>& buf) const {
+    return GetAtomic(buf, m_defaultValue);
+  }
 
   /**
    * Get the last published value along with its timestamp.
@@ -129,7 +147,9 @@ class RawSubscriber : public Subscriber {
    */
   TimestampedValueViewType GetAtomic(
       wpi::SmallVectorImpl<SmallElemType>& buf,
-      ParamType defaultValue) const;
+      ParamType defaultValue) const {
+    return nt::GetAtomicRaw(m_subHandle, buf, defaultValue);
+  }
 
   /**
    * Get an array of all value changes since the last call to ReadQueue.
@@ -141,7 +161,9 @@ class RawSubscriber : public Subscriber {
    * @return Array of timestamped values; empty array if no new changes have
    *     been published since the previous call.
    */
-  std::vector<TimestampedValueType> ReadQueue();
+  std::vector<TimestampedValueType> ReadQueue() {
+    return ::nt::ReadQueueRaw(m_subHandle);
+  }
 
   /**
    * Get the corresponding topic.
@@ -176,7 +198,7 @@ class RawPublisher : public Publisher {
    *
    * @param handle Native handle
    */
-  explicit RawPublisher(NT_Publisher handle);
+  explicit RawPublisher(NT_Publisher handle) : Publisher{handle} {}
 
   /**
    * Publish a new value.
@@ -184,7 +206,9 @@ class RawPublisher : public Publisher {
    * @param value value to publish
    * @param time timestamp; 0 indicates current NT time should be used
    */
-  void Set(ParamType value, int64_t time = 0);
+  void Set(ParamType value, int64_t time = 0) {
+    ::nt::SetRaw(m_pubHandle, value, time);
+  }
 
   /**
    * Publish a default value.
@@ -193,7 +217,9 @@ class RawPublisher : public Publisher {
    *
    * @param value value
    */
-  void SetDefault(ParamType value);
+  void SetDefault(ParamType value) {
+    ::nt::SetDefaultRaw(m_pubHandle, value);
+  }
 
   /**
    * Get the corresponding topic.
@@ -231,7 +257,9 @@ class RawEntry final : public RawSubscriber,
    * @param handle Native handle
    * @param defaultValue Default value
    */
-  RawEntry(NT_Entry handle, ParamType defaultValue);
+  RawEntry(NT_Entry handle, ParamType defaultValue)
+      : RawSubscriber{handle, defaultValue},
+        RawPublisher{handle} {}
 
   /**
    * Determines if the native handle is valid.
@@ -257,7 +285,9 @@ class RawEntry final : public RawSubscriber,
   /**
    * Stops publishing the entry if it's published.
    */
-  void Unpublish();
+  void Unpublish() {
+    ::nt::Unpublish(m_pubHandle);
+  }
 };
 
 /**
@@ -309,7 +339,11 @@ class RawTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions);
+      const PubSubOptions& options = kDefaultPubSubOptions) {
+    return RawSubscriber{
+        ::nt::Subscribe(m_handle, NT_RAW, typeString, options),
+        defaultValue};
+  }
   /**
    * Create a new publisher to the topic.
    *
@@ -328,7 +362,10 @@ class RawTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(std::string_view typeString, const PubSubOptions& options = kDefaultPubSubOptions);
+  PublisherType Publish(std::string_view typeString, const PubSubOptions& options = kDefaultPubSubOptions) {
+    return RawPublisher{
+        ::nt::Publish(m_handle, NT_RAW, typeString, options)};
+  }
 
   /**
    * Create a new publisher to the topic, with type string and initial
@@ -350,7 +387,10 @@ class RawTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions);
+    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    return RawPublisher{
+        ::nt::PublishEx(m_handle, NT_RAW, typeString, properties, options)};
+  }
 
   /**
    * Create a new entry for the topic.
@@ -376,9 +416,23 @@ class RawTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(std::string_view typeString, ParamType defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions);
+                     const PubSubOptions& options = kDefaultPubSubOptions) {
+    return RawEntry{
+        ::nt::GetEntry(m_handle, NT_RAW, typeString, options),
+        defaultValue};
+  }
 };
 
-}  // namespace nt
+inline RawTopic RawSubscriber::GetTopic() const {
+  return RawTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
 
-#include "networktables/RawTopic.inc"
+inline RawTopic RawPublisher::GetTopic() const {
+  return RawTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+}
+
+inline RawTopic RawEntry::GetTopic() const {
+  return RawTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
+
+}  // namespace nt

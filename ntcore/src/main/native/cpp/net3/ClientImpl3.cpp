@@ -16,7 +16,6 @@
 #include <wpi/StringMap.h>
 #include <wpi/timestamp.h>
 
-#include "Handle.h"
 #include "Log.h"
 #include "Types_internal.h"
 #include "net/Message.h"
@@ -73,14 +72,14 @@ void ClientImpl3::HandleLocal(std::span<const net::ClientMessage> msgs) {
   for (const auto& elem : msgs) {  // NOLINT
     // common case is value
     if (auto msg = std::get_if<net::ClientValueMsg>(&elem.contents)) {
-      SetValue(msg->pubHandle, msg->value);
+      SetValue(msg->pubuid, msg->value);
     } else if (auto msg = std::get_if<net::PublishMsg>(&elem.contents)) {
-      Publish(msg->pubHandle, msg->topicHandle, msg->name, msg->typeStr,
-              msg->properties, msg->options);
+      Publish(msg->pubuid, msg->name, msg->typeStr, msg->properties,
+              msg->options);
     } else if (auto msg = std::get_if<net::UnpublishMsg>(&elem.contents)) {
-      Unpublish(msg->pubHandle, msg->topicHandle);
+      Unpublish(msg->pubuid);
     } else if (auto msg = std::get_if<net::SetPropertiesMsg>(&elem.contents)) {
-      SetProperties(msg->topicHandle, msg->name, msg->update);
+      SetProperties(msg->name, msg->update);
     }
   }
 }
@@ -176,23 +175,20 @@ bool ClientImpl3::CheckNetworkReady(uint64_t curTimeMs) {
   return true;
 }
 
-void ClientImpl3::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-                          std::string_view name, std::string_view typeStr,
-                          const wpi::json& properties,
+void ClientImpl3::Publish(int pubuid, std::string_view name,
+                          std::string_view typeStr, const wpi::json& properties,
                           const PubSubOptionsImpl& options) {
   DEBUG4("Publish('{}', '{}')", name, typeStr);
-  unsigned int index = Handle{pubHandle}.GetIndex();
-  if (index >= m_publishers.size()) {
-    m_publishers.resize(index + 1);
+  if (static_cast<unsigned int>(pubuid) >= m_publishers.size()) {
+    m_publishers.resize(pubuid + 1);
   }
-  auto& publisher = m_publishers[index];
+  auto& publisher = m_publishers[pubuid];
   if (!publisher) {
     publisher = std::make_unique<PublisherData>(GetOrNewEntry(name));
     publisher->entry->typeStr = typeStr;
     publisher->entry->type = StringToType3(typeStr);
     publisher->entry->publishers.emplace_back(publisher.get());
   }
-  publisher->handle = pubHandle;
   publisher->options = options;
   publisher->periodMs = std::lround(options.periodicMs / 10.0) * 10;
   if (publisher->periodMs < 10) {
@@ -204,13 +200,12 @@ void ClientImpl3::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
   m_setPeriodic(m_periodMs);
 }
 
-void ClientImpl3::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) {
-  DEBUG4("Unpublish({}, {})", pubHandle, topicHandle);
-  unsigned int index = Handle{pubHandle}.GetIndex();
-  if (index >= m_publishers.size()) {
+void ClientImpl3::Unpublish(int pubuid) {
+  DEBUG4("Unpublish({})", pubuid);
+  if (static_cast<unsigned int>(pubuid) >= m_publishers.size()) {
     return;
   }
-  auto& publisher = m_publishers[index];
+  auto& publisher = m_publishers[pubuid];
   publisher->entry->publishers.erase(
       std::remove(publisher->entry->publishers.begin(),
                   publisher->entry->publishers.end(), publisher.get()),
@@ -227,9 +222,9 @@ void ClientImpl3::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) {
   m_setPeriodic(m_periodMs);
 }
 
-void ClientImpl3::SetProperties(NT_Topic topicHandle, std::string_view name,
+void ClientImpl3::SetProperties(std::string_view name,
                                 const wpi::json& update) {
-  DEBUG4("SetProperties({}, {}, {})", topicHandle, name, update.dump());
+  DEBUG4("SetProperties({}, {})", name, update.dump());
   auto entry = GetOrNewEntry(name);
   bool updated = false;
   for (auto&& elem : update.items()) {
@@ -250,11 +245,11 @@ void ClientImpl3::SetProperties(NT_Topic topicHandle, std::string_view name,
   }
 }
 
-void ClientImpl3::SetValue(NT_Publisher pubHandle, const Value& value) {
-  DEBUG4("SetValue({})", pubHandle);
-  unsigned int index = Handle{pubHandle}.GetIndex();
-  assert(index < m_publishers.size() && m_publishers[index]);
-  auto& publisher = *m_publishers[index];
+void ClientImpl3::SetValue(int pubuid, const Value& value) {
+  DEBUG4("SetValue({})", pubuid);
+  assert(static_cast<unsigned int>(pubuid) < m_publishers.size() &&
+         m_publishers[pubuid]);
+  auto& publisher = *m_publishers[pubuid];
   if (value == publisher.entry->value) {
     return;
   }
@@ -365,13 +360,13 @@ void ClientImpl3::EntryAssign(std::string_view name, unsigned int id,
 
   if (m_local) {
     // XXX: need to handle type change specially? (e.g. with unannounce)
-    if (entry->topic == 0 || flagsChanged || typeChanged) {
+    if (!entry->topic || flagsChanged || typeChanged) {
       DEBUG4("NetworkAnnounce({}, {})", name, entry->typeStr);
-      entry->topic =
-          m_local->NetworkAnnounce(name, entry->typeStr, entry->properties, 0);
+      entry->topic = m_local->ServerAnnounce(name, 0, entry->typeStr,
+                                             entry->properties, std::nullopt);
     }
     if (valueChanged) {
-      m_local->NetworkSetValue(entry->topic, entry->value);
+      m_local->ServerSetValue(entry->topic.value(), entry->value);
     }
   }
 }
@@ -385,8 +380,8 @@ void ClientImpl3::EntryUpdate(unsigned int id, unsigned int seq_num,
   }
   if (auto entry = LookupId(id)) {
     entry->value = value;
-    if (m_local && entry->topic != 0) {
-      m_local->NetworkSetValue(entry->topic, entry->value);
+    if (m_local && entry->topic) {
+      m_local->ServerSetValue(entry->topic.value(), entry->value);
     }
   }
 }
@@ -400,7 +395,7 @@ void ClientImpl3::FlagsUpdate(unsigned int id, unsigned int flags) {
   if (auto entry = LookupId(id)) {
     wpi::json update = entry->SetFlags(flags);
     if (!update.empty() && m_local) {
-      m_local->NetworkPropertiesUpdate(entry->name, update, false);
+      m_local->ServerPropertiesUpdate(entry->name, update, false);
     }
   }
 
@@ -424,8 +419,8 @@ void ClientImpl3::EntryDelete(unsigned int id) {
     entry->value = Value{};
 
     // if we have no local publishers, unannounce
-    if (entry->publishers.empty() && m_local) {
-      m_local->NetworkUnannounce(entry->name);
+    if (entry->publishers.empty() && m_local && entry->topic) {
+      m_local->ServerUnannounce(entry->name, entry->topic.value());
     }
   }
 
@@ -448,8 +443,8 @@ void ClientImpl3::ClearEntries() {
       entry->value = Value{};
 
       // if we have no local publishers, unannounce
-      if (entry->publishers.empty() && m_local) {
-        m_local->NetworkUnannounce(entry->name);
+      if (entry->publishers.empty() && m_local && entry->topic) {
+        m_local->ServerUnannounce(entry->name, entry->topic.value());
       }
 
       entry = nullptr;  // clear id mapping

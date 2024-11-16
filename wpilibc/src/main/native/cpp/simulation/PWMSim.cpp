@@ -5,7 +5,6 @@
 #include "frc/simulation/PWMSim.h"
 
 #include <memory>
-#include <utility>
 
 #include <hal/simulation/PWMData.h>
 

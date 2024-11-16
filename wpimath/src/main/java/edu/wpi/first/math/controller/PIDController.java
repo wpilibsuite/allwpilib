@@ -42,8 +42,8 @@ public class PIDController implements Sendable, AutoCloseable {
   private boolean m_continuous;
 
   // The error at the time of the most recent call to calculate()
-  private double m_positionError;
-  private double m_velocityError;
+  private double m_error;
+  private double m_errorDerivative;
 
   // The error at the time of the second-most-recent call to calculate() (used to compute velocity)
   private double m_prevError;
@@ -52,8 +52,8 @@ public class PIDController implements Sendable, AutoCloseable {
   private double m_totalError;
 
   // The error that is considered at setpoint.
-  private double m_positionTolerance = 0.05;
-  private double m_velocityTolerance = Double.POSITIVE_INFINITY;
+  private double m_errorTolerance = 0.05;
+  private double m_errorDerivativeTolerance = Double.POSITIVE_INFINITY;
 
   private double m_setpoint;
   private double m_measurement;
@@ -227,18 +227,40 @@ public class PIDController implements Sendable, AutoCloseable {
    * Returns the position tolerance of this controller.
    *
    * @return the position tolerance of the controller.
+   * @deprecated Use getErrorTolerance() instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public double getPositionTolerance() {
-    return m_positionTolerance;
+    return m_errorTolerance;
   }
 
   /**
    * Returns the velocity tolerance of this controller.
    *
    * @return the velocity tolerance of the controller.
+   * @deprecated Use getErrorDerivativeTolerance() instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public double getVelocityTolerance() {
-    return m_velocityTolerance;
+    return m_errorDerivativeTolerance;
+  }
+
+  /**
+   * Returns the error tolerance of this controller. Defaults to 0.05.
+   *
+   * @return the error tolerance of the controller.
+   */
+  public double getErrorTolerance() {
+    return m_errorTolerance;
+  }
+
+  /**
+   * Returns the error derivative tolerance of this controller. Defaults to ∞.
+   *
+   * @return the error derivative tolerance of the controller.
+   */
+  public double getErrorDerivativeTolerance() {
+    return m_errorDerivativeTolerance;
   }
 
   /**
@@ -261,12 +283,12 @@ public class PIDController implements Sendable, AutoCloseable {
 
     if (m_continuous) {
       double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
-      m_positionError = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+      m_error = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
     } else {
-      m_positionError = m_setpoint - m_measurement;
+      m_error = m_setpoint - m_measurement;
     }
 
-    m_velocityError = (m_positionError - m_prevError) / m_period;
+    m_errorDerivative = (m_error - m_prevError) / m_period;
   }
 
   /**
@@ -279,7 +301,8 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
-   * Returns true if the error is within the tolerance of the setpoint.
+   * Returns true if the error is within the tolerance of the setpoint. The error tolerance defaults
+   * to 0.05, and the error derivative tolerance defaults to ∞.
    *
    * <p>This will return false until at least one input value has been computed.
    *
@@ -288,8 +311,8 @@ public class PIDController implements Sendable, AutoCloseable {
   public boolean atSetpoint() {
     return m_haveMeasurement
         && m_haveSetpoint
-        && Math.abs(m_positionError) < m_positionTolerance
-        && Math.abs(m_velocityError) < m_velocityTolerance;
+        && Math.abs(m_error) < m_errorTolerance
+        && Math.abs(m_errorDerivative) < m_errorDerivativeTolerance;
   }
 
   /**
@@ -338,21 +361,43 @@ public class PIDController implements Sendable, AutoCloseable {
   /**
    * Sets the error which is considered tolerable for use with atSetpoint().
    *
-   * @param positionTolerance Position error which is tolerable.
+   * @param errorTolerance Error which is tolerable.
    */
-  public void setTolerance(double positionTolerance) {
-    setTolerance(positionTolerance, Double.POSITIVE_INFINITY);
+  public void setTolerance(double errorTolerance) {
+    setTolerance(errorTolerance, Double.POSITIVE_INFINITY);
   }
 
   /**
    * Sets the error which is considered tolerable for use with atSetpoint().
    *
-   * @param positionTolerance Position error which is tolerable.
-   * @param velocityTolerance Velocity error which is tolerable.
+   * @param errorTolerance Error which is tolerable.
+   * @param errorDerivativeTolerance Error derivative which is tolerable.
    */
-  public void setTolerance(double positionTolerance, double velocityTolerance) {
-    m_positionTolerance = positionTolerance;
-    m_velocityTolerance = velocityTolerance;
+  public void setTolerance(double errorTolerance, double errorDerivativeTolerance) {
+    m_errorTolerance = errorTolerance;
+    m_errorDerivativeTolerance = errorDerivativeTolerance;
+  }
+
+  /**
+   * Returns the difference between the setpoint and the measurement.
+   *
+   * @return The error.
+   * @deprecated Use getError() instead.
+   */
+  @Deprecated(forRemoval = true, since = "2025")
+  public double getPositionError() {
+    return m_error;
+  }
+
+  /**
+   * Returns the velocity error.
+   *
+   * @return The velocity error.
+   * @deprecated Use getErrorDerivative() instead.
+   */
+  @Deprecated(forRemoval = true, since = "2025")
+  public double getVelocityError() {
+    return m_errorDerivative;
   }
 
   /**
@@ -360,17 +405,17 @@ public class PIDController implements Sendable, AutoCloseable {
    *
    * @return The error.
    */
-  public double getPositionError() {
-    return m_positionError;
+  public double getError() {
+    return m_error;
   }
 
   /**
-   * Returns the velocity error.
+   * Returns the error derivative.
    *
-   * @return The velocity error.
+   * @return The error derivative.
    */
-  public double getVelocityError() {
-    return m_velocityError;
+  public double getErrorDerivative() {
+    return m_errorDerivative;
   }
 
   /**
@@ -394,38 +439,38 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   public double calculate(double measurement) {
     m_measurement = measurement;
-    m_prevError = m_positionError;
+    m_prevError = m_error;
     m_haveMeasurement = true;
 
     if (m_continuous) {
       double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
-      m_positionError = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+      m_error = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
     } else {
-      m_positionError = m_setpoint - m_measurement;
+      m_error = m_setpoint - m_measurement;
     }
 
-    m_velocityError = (m_positionError - m_prevError) / m_period;
+    m_errorDerivative = (m_error - m_prevError) / m_period;
 
     // If the absolute value of the position error is greater than IZone, reset the total error
-    if (Math.abs(m_positionError) > m_iZone) {
+    if (Math.abs(m_error) > m_iZone) {
       m_totalError = 0;
     } else if (m_ki != 0) {
       m_totalError =
           MathUtil.clamp(
-              m_totalError + m_positionError * m_period,
+              m_totalError + m_error * m_period,
               m_minimumIntegral / m_ki,
               m_maximumIntegral / m_ki);
     }
 
-    return m_kp * m_positionError + m_ki * m_totalError + m_kd * m_velocityError;
+    return m_kp * m_error + m_ki * m_totalError + m_kd * m_errorDerivative;
   }
 
   /** Resets the previous error and the integral term. */
   public void reset() {
-    m_positionError = 0;
+    m_error = 0;
     m_prevError = 0;
     m_totalError = 0;
-    m_velocityError = 0;
+    m_errorDerivative = 0;
     m_haveMeasurement = false;
   }
 
@@ -446,5 +491,10 @@ public class PIDController implements Sendable, AutoCloseable {
           }
         });
     builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+    builder.addDoubleProperty("measurement", () -> m_measurement, null);
+    builder.addDoubleProperty("error", this::getError, null);
+    builder.addDoubleProperty("error derivative", this::getErrorDerivative, null);
+    builder.addDoubleProperty("previous error", () -> this.m_prevError, null);
+    builder.addDoubleProperty("total error", this::getAccumulatedError, null);
   }
 }

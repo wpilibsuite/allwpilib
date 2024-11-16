@@ -95,7 +95,10 @@ public class AnnotationProcessor extends AbstractProcessor {
     // in this list will determine how it gets logged.
     m_handlers =
         List.of(
-            new LoggableHandler(processingEnv), // prioritize epilogue logging over Sendable
+            new LoggableHandler(
+                processingEnv,
+                roundEnv.getElementsAnnotatedWith(
+                    Logged.class)), // prioritize epilogue logging over Sendable
             new ConfiguredLoggerHandler(
                 processingEnv, customLoggers), // then customized logging configs
             new ArrayHandler(processingEnv),

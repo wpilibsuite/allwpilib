@@ -153,7 +153,9 @@ class WPILIB_DLLEXPORT Ellipse2d {
    * @param point The point to check.
    * @return The distance (0, if the point is contained by the ellipse)
    */
-  units::meter_t Distance(const Translation2d& point) const;
+  units::meter_t Distance(const Translation2d& point) const {
+    return FindNearestPoint(point).Distance(point);
+  }
 
   /**
    * Returns the nearest point that is contained within the ellipse.
@@ -208,7 +210,5 @@ class WPILIB_DLLEXPORT Ellipse2d {
 
 }  // namespace frc
 
-#ifndef NO_PROTOBUF
 #include "frc/geometry/proto/Ellipse2dProto.h"
-#endif
 #include "frc/geometry/struct/Ellipse2dStruct.h"

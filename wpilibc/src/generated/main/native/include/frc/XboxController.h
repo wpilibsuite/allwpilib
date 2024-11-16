@@ -446,6 +446,9 @@ class XboxController : public GenericHID,
    * Read the value of the left bumper (LB) button on the controller.
    *
    * @return the state of the button
+   * @deprecated Use GetLeftBumperButton instead. This function is deprecated
+   * for removal to make function names consistent to allow the HID classes to
+   * be automatically generated.
    */
   [[deprecated("Use GetLeftBumperButton instead")]]
   bool GetLeftBumper() const;
@@ -454,6 +457,9 @@ class XboxController : public GenericHID,
    * Read the value of the right bumper (RB) button on the controller.
    *
    * @return the state of the button
+   * @deprecated Use GetRightBumperButton instead. This function is deprecated
+   * for removal to make function names consistent to allow the HID classes to
+   * be automatically generated.
    */
   [[deprecated("Use GetRightBumperButton instead")]]
   bool GetRightBumper() const;
@@ -462,6 +468,9 @@ class XboxController : public GenericHID,
    * Whether the left bumper (LB) was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check
+   * @deprecated Use GetLeftBumperButtonPressed instead. This function is
+   * deprecated for removal to make function names consistent to allow the HID
+   * classes to be automatically generated.
    */
   [[deprecated("Use GetLeftBumperButtonPressed instead")]]
   bool GetLeftBumperPressed();
@@ -470,6 +479,9 @@ class XboxController : public GenericHID,
    * Whether the right bumper (RB) was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check
+   * @deprecated Use GetRightBumperButtonPressed instead. This function is
+   * deprecated for removal to make function names consistent to allow the HID
+   * classes to be automatically generated.
    */
   [[deprecated("Use GetRightBumperButtonPressed instead")]]
   bool GetRightBumperPressed();
@@ -478,6 +490,9 @@ class XboxController : public GenericHID,
    * Whether the left bumper (LB) was released since the last check.
    *
    * @return Whether the button was released since the last check.
+   * @deprecated Use GetLeftBumperButtonReleased instead. This function is
+   * deprecated for removal to make function names consistent to allow the HID
+   * classes to be automatically generated.
    */
   [[deprecated("Use GetLeftBumperButtonReleased instead")]]
   bool GetLeftBumperReleased();
@@ -486,6 +501,9 @@ class XboxController : public GenericHID,
    * Whether the right bumper (RB) was released since the last check.
    *
    * @return Whether the button was released since the last check.
+   * @deprecated Use GetRightBumperButtonReleased instead. This function is
+   * deprecated for removal to make function names consistent to allow the HID
+   * classes to be automatically generated.
    */
   [[deprecated("Use GetRightBumperButtonReleased instead")]]
   bool GetRightBumperReleased();

@@ -1,0 +1,109 @@
+name: Bazel
+
+on: [pull_request, push]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: "Windows (native)",             os: windows-2022, action: "test",  config: "--config=windows",     }
+          - { name: "Windows (arm)",                os: windows-2022, action: "build", config: "--config=windows_arm", }
+
+    name: "Build ${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 17
+          architecture: x64
+
+      - id: Setup_build_buddy
+        uses: ./.github/actions/setup-build-buddy
+        with:
+          token: ${{ secrets.BUILDBUDDY_API_KEY }}
+
+      - name: Build Release
+        run: bazel --output_user_root=C:\\bazelroot ${{ matrix.action }} -k ...   --config=ci -c opt ${{ matrix.config }} --verbose_failures
+        shell: bash
+
+  build-mac:
+    name: "Mac"
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - id: Setup_build_buddy
+        uses: ./.github/actions/setup-build-buddy
+        with:
+          token: ${{ secrets.BUILDBUDDY_API_KEY }}
+
+      - name: Build Release
+        run: bazel test -k ...   --config=ci -c opt --config=macos --nojava_header_compilation --verbose_failures
+        shell: bash
+
+  build-linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: "Linux (native)",  os: ubuntu-22.04,   action: "test",  config: "--config=linux",    }
+          - { name: "Linux (roborio)", os: ubuntu-22.04,   action: "build", config: "--config=roborio",  }
+    name: "${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: bazelbuild/setup-bazelisk@v3
+
+      - id: Setup_build_buddy
+        uses: ./.github/actions/setup-build-buddy
+        with:
+          token: ${{ secrets.BUILDBUDDY_API_KEY }}
+
+      - name: Build and Test Release
+        run: bazel ${{ matrix.action }} ... --config=ci -c opt ${{ matrix.config }} -k --verbose_failures
+
+  buildifier:
+    name: "buildifier"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set up Go 1.15.x
+        uses: actions/setup-go@v5
+        with:
+          cache: false
+          go-version: 1.15.x
+        id: go
+
+      - name: Install Buildifier
+        run: |
+          cd $(mktemp -d)
+          GO111MODULE=on go get github.com/bazelbuild/buildtools/buildifier@6.0.0
+
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Run buildifier
+        run: buildifier -warnings all --lint=fix -r .
+
+      - name: Check Output
+        run: git --no-pager diff --exit-code HEAD
+
+      - name: Generate diff
+        run: git diff HEAD > bazel-lint-fixes.patch
+        if: ${{ failure() }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-bazel-lint-fixes
+          path: bazel-lint-fixes.patch
+        if: ${{ failure() }}

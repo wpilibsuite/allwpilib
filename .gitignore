@@ -15,6 +15,8 @@ networktables.json
 ntcore/connectionlistenertest.json
 ntcore/timesynctest.json
 
+nanopb_pb2.py
+
 # Created by the jenkins test script
 test-reports
 
@@ -239,7 +241,7 @@ compile_commands.json
 
 # clang configuration and clangd cache
 .clang
-.clangd/
+.clangd
 .cache/
 
 imgui.ini
@@ -249,9 +251,7 @@ imgui.ini
 /bazel-*
 user.bazelrc
 coverage_report/
+bazel_auth.rc
 
 # ctest
 /Testing/
-
-# protobuf
-!wpiprotoplugin.jar

@@ -8,11 +8,14 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/geometry/Translation2d.h"
+#include "pb.h"
+#include "wpimath/protobuf/geometry2d.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Translation2d> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Translation2d Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
-                   const frc::Translation2d& value);
+  using MessageStruct = wpi_proto_ProtobufTranslation2d;
+  using InputStream = wpi::ProtoInputStream<frc::Translation2d>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Translation2d>;
+  static std::optional<frc::Translation2d> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::Translation2d& value);
 };

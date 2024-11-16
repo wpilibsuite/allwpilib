@@ -41,16 +41,4 @@ HAL_ENUM(HAL_SPIMode) {
   /** Clock idle high, data sampled on rising edge. */
   HAL_SPI_kMode3 = 3,
 };
-
-#ifdef __cplusplus
-namespace hal {
-
-/**
- * A move-only C++ wrapper around HAL_SPIPort.
- * Does not ensure destruction.
- */
-using SPIPort = Handle<HAL_SPIPort, nullptr, HAL_SPI_kInvalid>;
-
-}  // namespace hal
-#endif
 /** @} */

@@ -151,4 +151,13 @@ public class Timer {
       return false;
     }
   }
+
+  /**
+   * Whether the timer is currently running.
+   *
+   * @return true if running.
+   */
+  public boolean isRunning() {
+    return m_running;
+  }
 }

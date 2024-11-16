@@ -7,23 +7,36 @@ package edu.wpi.first.epilogue.processor;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
+import com.sun.source.tree.IdentifierTree;
+import com.sun.source.tree.ReturnTree;
+import com.sun.source.util.SimpleTreeVisitor;
+import com.sun.source.util.Trees;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.tools.Diagnostic;
 
 /** Generates logger class files for {@link Logged @Logged}-annotated classes. */
 public class LoggerGenerator {
+  public static final Predicate<ExecutableElement> kIsBuiltInJavaMethod =
+      LoggerGenerator::isBuiltInJavaMethod;
   private final ProcessingEnvironment m_processingEnv;
   private final List<ElementHandler> m_handlers;
 
@@ -34,6 +47,19 @@ public class LoggerGenerator {
 
   private static boolean isNotSkipped(Element e) {
     return e.getAnnotation(NotLogged.class) == null;
+  }
+
+  /**
+   * Checks if a method is a method declared in java.lang.Object that should not be logged.
+   *
+   * @param e the method to check
+   * @return true if the method is toString, hashCode, or clone; false otherwise
+   */
+  private static boolean isBuiltInJavaMethod(ExecutableElement e) {
+    Name name = e.getSimpleName();
+    return name.contentEquals("toString")
+        || name.contentEquals("hashCode")
+        || name.contentEquals("clone");
   }
 
   /**
@@ -53,17 +79,23 @@ public class LoggerGenerator {
     Predicate<Element> optedIn =
         e -> !requireExplicitOptIn || e.getAnnotation(Logged.class) != null;
 
-    var fieldsToLog =
-        clazz.getEnclosedElements().stream()
-            .filter(e -> e instanceof VariableElement)
-            .map(e -> (VariableElement) e)
-            .filter(notSkipped)
-            .filter(optedIn)
-            .filter(e -> !e.getModifiers().contains(Modifier.STATIC))
-            .filter(this::isLoggable)
-            .toList();
+    List<VariableElement> fieldsToLog;
+    if (Objects.equals(clazz.getSuperclass().toString(), "java.lang.Record")) {
+      // Do not log record members - just use the accessor methods
+      fieldsToLog = List.of();
+    } else {
+      fieldsToLog =
+          clazz.getEnclosedElements().stream()
+              .filter(e -> e instanceof VariableElement)
+              .map(e -> (VariableElement) e)
+              .filter(notSkipped)
+              .filter(optedIn)
+              .filter(e -> !e.getModifiers().contains(Modifier.STATIC))
+              .filter(this::isLoggable)
+              .toList();
+    }
 
-    var methodsToLog =
+    List<ExecutableElement> methodsToLog =
         clazz.getEnclosedElements().stream()
             .filter(e -> e instanceof ExecutableElement)
             .map(e -> (ExecutableElement) e)
@@ -73,8 +105,50 @@ public class LoggerGenerator {
             .filter(e -> e.getModifiers().contains(Modifier.PUBLIC))
             .filter(e -> e.getParameters().isEmpty())
             .filter(e -> e.getReceiverType() != null)
+            .filter(kIsBuiltInJavaMethod.negate())
             .filter(this::isLoggable)
+            .filter(e -> !isSimpleGetterMethodForLoggedField(e, fieldsToLog))
             .toList();
+
+    // Validate no name collisions
+    Map<String, List<Element>> usedNames =
+        Stream.concat(fieldsToLog.stream(), methodsToLog.stream())
+            .reduce(
+                new HashMap<>(),
+                (map, element) -> {
+                  String name = ElementHandler.loggedName(element);
+                  map.computeIfAbsent(name, _k -> new ArrayList<>()).add(element);
+
+                  return map;
+                },
+                (left, right) -> {
+                  left.putAll(right);
+                  return left;
+                });
+
+    usedNames.forEach(
+        (name, elements) -> {
+          if (elements.size() > 1) {
+            // Collisions!
+            for (Element conflictingElement : elements) {
+              String conflicts =
+                  elements.stream()
+                      .filter(e -> !e.equals(conflictingElement))
+                      .map(e -> e.getEnclosingElement().getSimpleName() + "." + e)
+                      .collect(Collectors.joining(", "));
+
+              m_processingEnv
+                  .getMessager()
+                  .printMessage(
+                      Diagnostic.Kind.ERROR,
+                      "[EPILOGUE] Conflicting name detected: \""
+                          + name
+                          + "\" is also used by "
+                          + conflicts,
+                      conflictingElement);
+            }
+          }
+        });
 
     writeLoggerFile(clazz.getQualifiedName().toString(), config, fieldsToLog, methodsToLog);
   }
@@ -241,5 +315,56 @@ public class LoggerGenerator {
 
   private boolean isLoggable(Element element) {
     return m_handlers.stream().anyMatch(h -> h.isLoggable(element));
+  }
+
+  /**
+   * Checks if a method is a simple "getter" method for a field in the given list. Here, we define
+   * "getter" as a method with a single return statement that references the name of a field, with
+   * no other expressions. `getX() { return x; }` would be considered a "getter" method, while
+   * `getX() { return x.clone(); }` would not be. Note that the method name is irrelevant; only the
+   * method body is checked.
+   *
+   * @param ex the method to check
+   * @param fieldsToLog the fields that will already be logged
+   * @return true if the method is a simple "getter" method, false otherwise
+   */
+  private boolean isSimpleGetterMethodForLoggedField(
+      ExecutableElement ex, List<VariableElement> fieldsToLog) {
+    var trees = Trees.instance(m_processingEnv);
+    var methodTree = trees.getTree(ex);
+
+    if (methodTree == null) {
+      // probably a record's synthetic reader method
+      return false;
+    }
+
+    if (methodTree.getBody() == null) {
+      // Abstract or native method, can't be determined to be a getter
+      return false;
+    }
+
+    var statements = methodTree.getBody().getStatements();
+    if (statements.size() != 1) {
+      // More complex than a simple `return m_field` statement
+      return false;
+    }
+
+    var statement = statements.get(0);
+    if (!(statement instanceof ReturnTree ret)) {
+      // Shouldn't get here, since we've already filtered for methods that return a value
+      // and with a single statement - that one statement should be the return
+      return false;
+    }
+
+    var returnExpression = ret.getExpression();
+    return returnExpression.accept(
+        new SimpleTreeVisitor<Boolean, Void>(false) {
+          @Override
+          public Boolean visitIdentifier(IdentifierTree identifier, Void unused) {
+            return fieldsToLog.stream()
+                .anyMatch(v -> v.getSimpleName().contentEquals(identifier.getName()));
+          }
+        },
+        null);
   }
 }

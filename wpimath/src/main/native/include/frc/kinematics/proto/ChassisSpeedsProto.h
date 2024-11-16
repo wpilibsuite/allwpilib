@@ -8,11 +8,13 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::ChassisSpeeds> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::ChassisSpeeds Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
-                   const frc::ChassisSpeeds& value);
+  using MessageStruct = wpi_proto_ProtobufChassisSpeeds;
+  using InputStream = wpi::ProtoInputStream<frc::ChassisSpeeds>;
+  using OutputStream = wpi::ProtoOutputStream<frc::ChassisSpeeds>;
+  static std::optional<frc::ChassisSpeeds> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::ChassisSpeeds& value);
 };

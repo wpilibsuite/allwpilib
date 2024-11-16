@@ -16,8 +16,10 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  *
  * @see PIDController
+ * @deprecated Use a PIDController instead
  */
-class PIDSubsystem : public SubsystemBase {
+class [[deprecated("Use a PIDController instead")]] PIDSubsystem
+    : public SubsystemBase {
  public:
   /**
    * Creates a new PIDSubsystem.

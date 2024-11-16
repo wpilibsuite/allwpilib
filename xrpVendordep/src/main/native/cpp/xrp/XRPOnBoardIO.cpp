@@ -18,3 +18,7 @@ bool XRPOnBoardIO::GetUserButtonPressed() {
 void XRPOnBoardIO::SetLed(bool value) {
   m_led.Set(value);
 }
+
+bool XRPOnBoardIO::GetLed() const {
+  return m_led.Get();
+}

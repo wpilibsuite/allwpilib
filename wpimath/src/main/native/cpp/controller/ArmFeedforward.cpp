@@ -15,10 +15,9 @@
 
 using namespace frc;
 
-units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
-                                        units::unit_t<Velocity> currentVelocity,
-                                        units::unit_t<Velocity> nextVelocity,
-                                        units::second_t dt) const {
+units::volt_t ArmFeedforward::Calculate(
+    units::unit_t<Angle> currentAngle, units::unit_t<Velocity> currentVelocity,
+    units::unit_t<Velocity> nextVelocity) const {
   using VarMat = sleipnir::VariableMatrix;
 
   // Arm dynamics
@@ -36,12 +35,12 @@ units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
   sleipnir::Variable u_k;
 
   // Initial guess
-  auto acceleration = (nextVelocity - currentVelocity) / dt;
+  auto acceleration = (nextVelocity - currentVelocity) / m_dt;
   u_k.SetValue((kS * wpi::sgn(currentVelocity.value()) + kV * currentVelocity +
                 kA * acceleration + kG * units::math::cos(currentAngle))
                    .value());
 
-  auto r_k1 = RK4<decltype(f), VarMat, VarMat>(f, r_k, u_k, dt);
+  auto r_k1 = RK4<decltype(f), VarMat, VarMat>(f, r_k, u_k, m_dt);
 
   // Minimize difference between desired and actual next velocity
   auto cost =

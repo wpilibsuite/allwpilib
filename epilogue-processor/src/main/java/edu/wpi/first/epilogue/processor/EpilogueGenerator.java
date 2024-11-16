@@ -176,7 +176,7 @@ public class EpilogueGenerator {
             out.println("      config.loggingPeriod = Seconds.of(robot.getPeriod());");
             out.println("    }");
             out.println("    if (config.loggingPeriodOffset == null) {");
-            out.println("      config.loggingPeriodOffset = config.loggingPeriod.divide(2);");
+            out.println("      config.loggingPeriodOffset = config.loggingPeriod.div(2);");
             out.println("    }");
             out.println();
             out.println("    robot.addPeriodic(() -> {");

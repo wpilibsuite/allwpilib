@@ -75,6 +75,13 @@ Trigger CommandGenericHID::AxisGreaterThan(int axis, double threshold,
   });
 }
 
+Trigger CommandGenericHID::AxisMagnitudeGreaterThan(
+    int axis, double threshold, frc::EventLoop* loop) const {
+  return Trigger(loop, [this, axis, threshold]() {
+    return std::abs(m_hid.GetRawAxis(axis)) > threshold;
+  });
+}
+
 void CommandGenericHID::SetRumble(frc::GenericHID::RumbleType type,
                                   double value) {
   m_hid.SetRumble(type, value);

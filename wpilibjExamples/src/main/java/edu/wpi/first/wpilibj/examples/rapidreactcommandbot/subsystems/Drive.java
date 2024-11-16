@@ -4,10 +4,18 @@
 
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
@@ -44,6 +52,21 @@ public class Drive extends SubsystemBase {
           DriveConstants.kRightEncoderPorts[1],
           DriveConstants.kRightEncoderReversed);
 
+  private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
+  private final ProfiledPIDController m_controller =
+      new ProfiledPIDController(
+          DriveConstants.kTurnP,
+          DriveConstants.kTurnI,
+          DriveConstants.kTurnD,
+          new TrapezoidProfile.Constraints(
+              DriveConstants.kMaxTurnRateDegPerS,
+              DriveConstants.kMaxTurnAccelerationDegPerSSquared));
+  private final SimpleMotorFeedforward m_feedforward =
+      new SimpleMotorFeedforward(
+          DriveConstants.ksVolts,
+          DriveConstants.kvVoltSecondsPerDegree,
+          DriveConstants.kaVoltSecondsSquaredPerDegree);
+
   /** Creates a new Drive subsystem. */
   public Drive() {
     SendableRegistry.addChild(m_drive, m_leftLeader);
@@ -60,6 +83,13 @@ public class Drive extends SubsystemBase {
     // Sets the distance per pulse for the encoders
     m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
     m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+
+    // Set the controller to be continuous (because it is an angle controller)
+    m_controller.enableContinuousInput(-180, 180);
+    // Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
+    // setpoint before it is considered as having reached the reference
+    m_controller.setTolerance(
+        DriveConstants.kTurnToleranceDeg, DriveConstants.kTurnRateToleranceDegPerS);
   }
 
   /**
@@ -97,5 +127,27 @@ public class Drive extends SubsystemBase {
                     >= distanceMeters)
         // Stop the drive when the command ends
         .finallyDo(interrupted -> m_drive.stopMotor());
+  }
+
+  /**
+   * Returns a command that turns to robot to the specified angle using a motion profile and PID
+   * controller.
+   *
+   * @param angleDeg The angle to turn to
+   */
+  public Command turnToAngleCommand(double angleDeg) {
+    return startRun(
+            () -> m_controller.reset(m_gyro.getRotation2d().getDegrees()),
+            () ->
+                m_drive.arcadeDrive(
+                    0,
+                    m_controller.calculate(m_gyro.getRotation2d().getDegrees(), angleDeg)
+                        // Divide feedforward voltage by battery voltage to normalize it to [-1, 1]
+                        + m_feedforward
+                                .calculate(DegreesPerSecond.of(m_controller.getSetpoint().velocity))
+                                .in(Volts)
+                            / RobotController.getBatteryVoltage()))
+        .until(m_controller::atGoal)
+        .finallyDo(() -> m_drive.arcadeDrive(0, 0));
   }
 }

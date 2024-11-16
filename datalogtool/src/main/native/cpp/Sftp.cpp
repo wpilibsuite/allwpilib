@@ -75,25 +75,6 @@ size_t File::Read(void* buf, uint32_t count) {
   return rv;
 }
 
-File::AsyncId File::AsyncReadBegin(uint32_t len) const {
-  int rv = sftp_async_read_begin(m_handle, len);
-  if (rv < 0) {
-    throw Exception{m_handle->sftp};
-  }
-  return rv;
-}
-
-size_t File::AsyncRead(void* data, uint32_t len, AsyncId id) {
-  auto rv = sftp_async_read(m_handle, data, len, id);
-  if (rv == SSH_ERROR) {
-    throw Exception{ssh_get_error(m_handle->sftp->session)};
-  }
-  if (rv == SSH_AGAIN) {
-    return 0;
-  }
-  return rv;
-}
-
 size_t File::Write(std::span<const uint8_t> data) {
   auto rv = sftp_write(m_handle, data.data(), data.size());
   if (rv < 0) {

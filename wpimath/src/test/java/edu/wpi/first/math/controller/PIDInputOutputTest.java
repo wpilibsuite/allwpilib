@@ -6,73 +6,77 @@ package edu.wpi.first.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class PIDInputOutputTest {
-  private PIDController m_controller;
-
-  @BeforeEach
-  void setUp() {
-    m_controller = new PIDController(0, 0, 0);
-  }
-
   @Test
   void continuousInputTest() {
-    m_controller.setP(1);
-    m_controller.enableContinuousInput(-180, 180);
-    assertEquals(m_controller.calculate(-179, 179), -2, 1e-5);
+    var controller = new PIDController(0.0, 0.0, 0.0);
 
-    m_controller.enableContinuousInput(0, 360);
-    assertEquals(m_controller.calculate(1, 359), -2, 1e-5);
+    controller.setP(1);
+    controller.enableContinuousInput(-180, 180);
+    assertEquals(controller.calculate(-179, 179), -2, 1e-5);
+
+    controller.enableContinuousInput(0, 360);
+    assertEquals(controller.calculate(1, 359), -2, 1e-5);
   }
 
   @Test
   void proportionalGainOutputTest() {
-    m_controller.setP(4);
+    var controller = new PIDController(0.0, 0.0, 0.0);
 
-    assertEquals(-0.1, m_controller.calculate(0.025, 0), 1e-5);
+    controller.setP(4);
+
+    assertEquals(-0.1, controller.calculate(0.025, 0), 1e-5);
   }
 
   @Test
   void integralGainOutputTest() {
-    m_controller.setI(4);
+    var controller = new PIDController(0.0, 0.0, 0.0);
+
+    controller.setI(4);
 
     double out = 0;
 
     for (int i = 0; i < 5; i++) {
-      out = m_controller.calculate(0.025, 0);
+      out = controller.calculate(0.025, 0);
     }
 
-    assertEquals(-0.5 * m_controller.getPeriod(), out, 1e-5);
+    assertEquals(-0.5 * controller.getPeriod(), out, 1e-5);
   }
 
   @Test
   void derivativeGainOutputTest() {
-    m_controller.setD(4);
+    var controller = new PIDController(0.0, 0.0, 0.0);
 
-    m_controller.calculate(0, 0);
+    controller.setD(4);
 
-    assertEquals(-0.01 / m_controller.getPeriod(), m_controller.calculate(0.0025, 0), 1e-5);
+    controller.calculate(0, 0);
+
+    assertEquals(-0.01 / controller.getPeriod(), controller.calculate(0.0025, 0), 1e-5);
   }
 
   @Test
   void iZoneNoOutputTest() {
-    m_controller.setI(1);
-    m_controller.setIZone(1);
+    var controller = new PIDController(0.0, 0.0, 0.0);
 
-    double out = m_controller.calculate(2, 0);
+    controller.setI(1);
+    controller.setIZone(1);
+
+    double out = controller.calculate(2, 0);
 
     assertEquals(0, out, 1e-5);
   }
 
   @Test
   void iZoneOutputTest() {
-    m_controller.setI(1);
-    m_controller.setIZone(1);
+    var controller = new PIDController(0.0, 0.0, 0.0);
 
-    double out = m_controller.calculate(1, 0);
+    controller.setI(1);
+    controller.setIZone(1);
 
-    assertEquals(-1 * m_controller.getPeriod(), out, 1e-5);
+    double out = controller.calculate(1, 0);
+
+    assertEquals(-1 * controller.getPeriod(), out, 1e-5);
   }
 }

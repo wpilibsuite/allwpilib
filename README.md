@@ -17,6 +17,7 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
     - [Custom toolchain location](#custom-toolchain-location)
     - [Formatting/Linting](#formattinglinting)
     - [CMake](#cmake)
+    - [Bazel](#bazel)
   - [Running examples in simulation](#running-examples-in-simulation)
   - [Publishing](#publishing)
   - [Structure and Organization](#structure-and-organization)
@@ -145,11 +146,15 @@ If you only want to run the Java autoformatter, run `./gradlew spotlessApply`.
 
 ### Generated files
 
-Several files within WPILib are generated using Jinja. If a PR is opened that modifies these templates then the files can be generated through CI by commenting `/pregen` on the PR. A new commit will be pushed with the regenerated files.
+Several files within WPILib are generated using Jinja. If a PR is opened that modifies these templates then the files can be generated through CI by commenting `/pregen` on the PR. A new commit will be pushed with the regenerated files. See [GeneratedFiles.md](GeneratedFiles.md) for more information.
 
 ### CMake
 
-CMake is also supported for building. See [README-CMAKE.md](README-CMAKE.md).
+CMake is also supported for building. See [README-CMake.md](README-CMake.md).
+
+### Bazel
+
+Bazel is also supported for building. See [README-Bazel.md](README-Bazel.md).
 
 ## Running examples in simulation
 

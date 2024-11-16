@@ -8,10 +8,6 @@
 
 using namespace frc;
 
-units::meter_t Ellipse2d::Distance(const Translation2d& point) const {
-  return FindNearestPoint(point).Distance(point);
-}
-
 Translation2d Ellipse2d::FindNearestPoint(const Translation2d& point) const {
   // Check if already in ellipse
   if (Contains(point)) {
