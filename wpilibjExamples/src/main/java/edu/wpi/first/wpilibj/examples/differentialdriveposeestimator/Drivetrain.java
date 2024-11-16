@@ -245,7 +245,7 @@ public class Drivetrain {
 
     // Apply vision measurements. For simulation purposes only, we don't input a latency delay -- on
     // a real robot, this must be calculated based either on known latency or timestamps.
-    m_poseEstimator.addVisionMeasurement(visionMeasurement2d, Timer.getFPGATimestamp());
+    m_poseEstimator.addVisionMeasurement(visionMeasurement2d, Timer.getTimestamp());
   }
 
   /** This function is called periodically during simulation. */
