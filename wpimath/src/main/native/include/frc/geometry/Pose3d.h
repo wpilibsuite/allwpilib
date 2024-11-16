@@ -58,6 +58,8 @@ class WPILIB_DLLEXPORT Pose3d {
    * Constructs a 3D pose from a 2D pose in the X-Y plane.
    *
    * @param pose The 2D pose.
+   * @see Rotation3d(Rotation2d)
+   * @see Translation3d(Translation2d)
    */
   constexpr explicit Pose3d(const Pose2d& pose)
       : m_translation{pose.X(), pose.Y(), 0_m},

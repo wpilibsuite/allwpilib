@@ -83,6 +83,8 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    * Constructs a 3D pose from a 2D pose in the X-Y plane.
    *
    * @param pose The 2D pose.
+   * @see Rotation3d#Rotation3d(Rotation2d)
+   * @see Translation3d#Translation3d(Translation2d)
    */
   public Pose3d(Pose2d pose) {
     m_translation = new Translation3d(pose.getX(), pose.getY(), 0.0);

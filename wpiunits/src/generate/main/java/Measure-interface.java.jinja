@@ -66,18 +66,18 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   }
 
   @Override
-  default {{ helpers['type_usage'](name) }} divide(double divisor) {
+  default {{ helpers['type_usage'](name) }} div(double divisor) {
     return ({{ helpers['type_usage'](name) }}) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
   }
 
   @Override
   default {{ config[name]['divide']['Time'] or "Velocity<{}>".format(helpers['mtou'](name)) }} per(TimeUnit period) {
-    return divide(period.of(1));
+    return div(period.of(1));
   }
 {% for unit in math_units -%}
 {% if unit == "Dimensionless" %}
   @Override
-  default {{ helpers['type_usage'](name) }} divide({{ unit }} divisor) {
+  default {{ helpers['type_usage'](name) }} div({{ unit }} divisor) {
     return ({{ helpers['type_usage'](name) }}) {{ config[name]['base_unit'] }}.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -103,23 +103,23 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
 {% endif -%}
 {% if unit in config[name]['divide'] %}
   @Override
-  default {{ config[name]['divide'][unit] }} divide({{ unit }} divisor) {
+  default {{ config[name]['divide'][unit] }} div({{ unit }} divisor) {
     return {{ config[config[name]['divide'][unit]]['base_unit'] }}.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 {% elif unit == "Time" %}
   @Override
-  default Velocity<{{ helpers['mtou'](name) }}> divide({{ unit }} divisor) {
+  default Velocity<{{ helpers['mtou'](name) }}> div({{ unit }} divisor) {
     return VelocityUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 {% elif unit == name %}
   @Override
-  default Dimensionless divide({{ unit }} divisor) {
+  default Dimensionless div({{ unit }} divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 {% else %}
   @Override
-  default Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> divide({{ unit }} divisor) {
-    return (Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}>) Measure.super.divide(divisor);
+  default Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> div({{ unit }} divisor) {
+    return (Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}>) Measure.super.div(divisor);
   }
 {% endif -%}
 {% endif -%}

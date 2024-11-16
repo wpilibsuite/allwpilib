@@ -274,6 +274,17 @@ public class Rotation3d
   }
 
   /**
+   * Constructs a 3D rotation from a 2D rotation in the X-Y plane.
+   *
+   * @param rotation The 2D rotation.
+   * @see Pose3d#Pose3d(Pose2d)
+   * @see Transform3d#Transform3d(Transform2d)
+   */
+  public Rotation3d(Rotation2d rotation) {
+    this(0.0, 0.0, rotation.getRadians());
+  }
+
+  /**
    * Adds two rotations together.
    *
    * @param other The rotation to add.

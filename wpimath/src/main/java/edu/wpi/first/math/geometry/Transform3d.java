@@ -87,6 +87,18 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
+   * Constructs a 3D transform from a 2D transform in the X-Y plane.
+   *
+   * @param transform The 2D transform.
+   * @see Rotation3d#Rotation3d(Rotation2d)
+   * @see Translation3d#Translation3d(Translation2d)
+   */
+  public Transform3d(Transform2d transform) {
+    m_translation = new Translation3d(transform.getTranslation());
+    m_rotation = new Rotation3d(transform.getRotation());
+  }
+
+  /**
    * Multiplies the transform by the scalar.
    *
    * @param scalar The scalar.
