@@ -17,6 +17,7 @@
 
 #include "frc/Errors.h"
 #include "frc/RuntimeType.h"
+#include "frc/Tracer.h"
 
 namespace frc {
 
@@ -35,6 +36,7 @@ void RunRobot(wpi::mutex& m, Robot** robot) {
       std::scoped_lock lock{m};
       *robot = &theRobot;
     }
+    frc::Tracer::SetThreadName("RobotMain");
     theRobot.StartCompetition();
   } catch (const frc::RuntimeError& e) {
     e.Report();
