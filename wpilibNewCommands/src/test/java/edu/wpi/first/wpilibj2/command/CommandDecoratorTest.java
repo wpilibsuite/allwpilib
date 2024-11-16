@@ -272,6 +272,71 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
+  void withDeadlineTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicBoolean finish = new AtomicBoolean(false);
+
+      Command endsBeforeGroup = Commands.none().withDeadline(
+        Commands.waitUntil(finish::get)
+      );
+      Command endsAfterGroup = Commands.idle().withDeadline(
+        Commands.waitUntil(finish::get)
+      );
+
+      scheduler.schedule(endsBeforeGroup);
+      scheduler.run();
+
+      assertTrue(scheduler.isScheduled(endsBeforeGroup));
+
+      finish.set(true);
+      scheduler.run();
+
+      assertFalse(scheduler.isScheduled(endsBeforeGroup));
+
+      finish.set(false);
+      scheduler.schedule(endsAfterGroup);
+      scheduler.run();
+
+      assertTrue(scheduler.isScheduled(endsAfterGroup));
+
+      finish.set(true);
+      scheduler.run();
+
+      assertFalse(scheduler.isScheduled(endsAfterGroup));
+    }
+  }
+
+  @Test
+  void withDeadlineOrderTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicBoolean dictatorHasRun = new AtomicBoolean(false);
+      AtomicBoolean dictatorWasPolled = new AtomicBoolean(false);
+
+      Command dictator =
+          new FunctionalCommand(
+              () -> {},
+              () -> dictatorHasRun.set(true),
+              interrupted -> {},
+              () -> {
+                dictatorWasPolled.set(true);
+                return true;
+              });
+      Command other =
+          Commands.run(
+              () ->
+                  assertAll(
+                      () -> assertTrue(dictatorHasRun.get()),
+                      () -> assertTrue(dictatorWasPolled.get())));
+
+      Command group = other.withDeadline(dictator);
+      scheduler.schedule(group);
+      scheduler.run();
+
+      assertAll(() -> assertTrue(dictatorHasRun.get()), () -> assertTrue(dictatorWasPolled.get()));
+    }
+  }
+
+  @Test
   void alongWithTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean finish = new AtomicBoolean(false);
