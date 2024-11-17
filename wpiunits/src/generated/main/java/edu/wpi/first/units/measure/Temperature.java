@@ -44,6 +44,13 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Temperature negate() {
+    return (Temperature) unaryMinus();
+  }
+
+  @Override
   default Temperature plus(Measure<? extends TemperatureUnit> other) {
     return (Temperature) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
@@ -59,13 +66,13 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Temperature divide(double divisor) {
+  default Temperature div(double divisor) {
     return (Temperature) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
   }
 
   @Override
   default Velocity<TemperatureUnit> per(TimeUnit period) {
-    return divide(period.of(1));
+    return div(period.of(1));
   }
 
 
@@ -75,8 +82,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
-    return (Per<TemperatureUnit, AccelerationUnit<?>>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
+    return (Per<TemperatureUnit, AccelerationUnit<?>>) Measure.super.div(divisor);
   }
 
 
@@ -86,8 +93,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, AngleUnit> divide(Angle divisor) {
-    return (Per<TemperatureUnit, AngleUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, AngleUnit> div(Angle divisor) {
+    return (Per<TemperatureUnit, AngleUnit>) Measure.super.div(divisor);
   }
 
 
@@ -97,8 +104,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
-    return (Per<TemperatureUnit, AngularAccelerationUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
+    return (Per<TemperatureUnit, AngularAccelerationUnit>) Measure.super.div(divisor);
   }
 
 
@@ -108,8 +115,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
-    return (Per<TemperatureUnit, AngularMomentumUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
+    return (Per<TemperatureUnit, AngularMomentumUnit>) Measure.super.div(divisor);
   }
 
 
@@ -119,8 +126,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
-    return (Per<TemperatureUnit, AngularVelocityUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
+    return (Per<TemperatureUnit, AngularVelocityUnit>) Measure.super.div(divisor);
   }
 
 
@@ -130,12 +137,12 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, CurrentUnit> divide(Current divisor) {
-    return (Per<TemperatureUnit, CurrentUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, CurrentUnit> div(Current divisor) {
+    return (Per<TemperatureUnit, CurrentUnit>) Measure.super.div(divisor);
   }
 
   @Override
-  default Temperature divide(Dimensionless divisor) {
+  default Temperature div(Dimensionless divisor) {
     return (Temperature) Kelvin.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -151,8 +158,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, DistanceUnit> divide(Distance divisor) {
-    return (Per<TemperatureUnit, DistanceUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, DistanceUnit> div(Distance divisor) {
+    return (Per<TemperatureUnit, DistanceUnit>) Measure.super.div(divisor);
   }
 
 
@@ -162,8 +169,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, EnergyUnit> divide(Energy divisor) {
-    return (Per<TemperatureUnit, EnergyUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, EnergyUnit> div(Energy divisor) {
+    return (Per<TemperatureUnit, EnergyUnit>) Measure.super.div(divisor);
   }
 
 
@@ -173,8 +180,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, ForceUnit> divide(Force divisor) {
-    return (Per<TemperatureUnit, ForceUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, ForceUnit> div(Force divisor) {
+    return (Per<TemperatureUnit, ForceUnit>) Measure.super.div(divisor);
   }
 
 
@@ -184,8 +191,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, FrequencyUnit> divide(Frequency divisor) {
-    return (Per<TemperatureUnit, FrequencyUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, FrequencyUnit> div(Frequency divisor) {
+    return (Per<TemperatureUnit, FrequencyUnit>) Measure.super.div(divisor);
   }
 
 
@@ -195,8 +202,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
-    return (Per<TemperatureUnit, LinearAccelerationUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
+    return (Per<TemperatureUnit, LinearAccelerationUnit>) Measure.super.div(divisor);
   }
 
 
@@ -206,8 +213,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
-    return (Per<TemperatureUnit, LinearMomentumUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
+    return (Per<TemperatureUnit, LinearMomentumUnit>) Measure.super.div(divisor);
   }
 
 
@@ -217,8 +224,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
-    return (Per<TemperatureUnit, LinearVelocityUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
+    return (Per<TemperatureUnit, LinearVelocityUnit>) Measure.super.div(divisor);
   }
 
 
@@ -228,8 +235,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, MassUnit> divide(Mass divisor) {
-    return (Per<TemperatureUnit, MassUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, MassUnit> div(Mass divisor) {
+    return (Per<TemperatureUnit, MassUnit>) Measure.super.div(divisor);
   }
 
 
@@ -239,8 +246,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
-    return (Per<TemperatureUnit, MomentOfInertiaUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
+    return (Per<TemperatureUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
   }
 
 
@@ -250,8 +257,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
-    return (Per<TemperatureUnit, MultUnit<?, ?>>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
+    return (Per<TemperatureUnit, MultUnit<?, ?>>) Measure.super.div(divisor);
   }
 
 
@@ -261,8 +268,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
-    return (Per<TemperatureUnit, PerUnit<?, ?>>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, PerUnit<?, ?>> div(Per<?, ?> divisor) {
+    return (Per<TemperatureUnit, PerUnit<?, ?>>) Measure.super.div(divisor);
   }
 
 
@@ -272,8 +279,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, PowerUnit> divide(Power divisor) {
-    return (Per<TemperatureUnit, PowerUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, PowerUnit> div(Power divisor) {
+    return (Per<TemperatureUnit, PowerUnit>) Measure.super.div(divisor);
   }
 
 
@@ -283,8 +290,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, ResistanceUnit> divide(Resistance divisor) {
-    return (Per<TemperatureUnit, ResistanceUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, ResistanceUnit> div(Resistance divisor) {
+    return (Per<TemperatureUnit, ResistanceUnit>) Measure.super.div(divisor);
   }
 
 
@@ -294,7 +301,7 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Dimensionless divide(Temperature divisor) {
+  default Dimensionless div(Temperature divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -305,7 +312,7 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Velocity<TemperatureUnit> divide(Time divisor) {
+  default Velocity<TemperatureUnit> div(Time divisor) {
     return VelocityUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -316,8 +323,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, TorqueUnit> divide(Torque divisor) {
-    return (Per<TemperatureUnit, TorqueUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, TorqueUnit> div(Torque divisor) {
+    return (Per<TemperatureUnit, TorqueUnit>) Measure.super.div(divisor);
   }
 
 
@@ -327,8 +334,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
-    return (Per<TemperatureUnit, VelocityUnit<?>>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, VelocityUnit<?>> div(Velocity<?> divisor) {
+    return (Per<TemperatureUnit, VelocityUnit<?>>) Measure.super.div(divisor);
   }
 
 
@@ -338,8 +345,8 @@ public interface Temperature extends Measure<TemperatureUnit> {
   }
 
   @Override
-  default Per<TemperatureUnit, VoltageUnit> divide(Voltage divisor) {
-    return (Per<TemperatureUnit, VoltageUnit>) Measure.super.divide(divisor);
+  default Per<TemperatureUnit, VoltageUnit> div(Voltage divisor) {
+    return (Per<TemperatureUnit, VoltageUnit>) Measure.super.div(divisor);
   }
 
 }

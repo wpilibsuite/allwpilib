@@ -8,11 +8,14 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/geometry/Rotation2d.h"
+#include "pb.h"
+#include "wpimath/protobuf/geometry2d.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Rotation2d> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Rotation2d Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
-                   const frc::Rotation2d& value);
+  using MessageStruct = wpi_proto_ProtobufRotation2d;
+  using InputStream = wpi::ProtoInputStream<frc::Rotation2d>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Rotation2d>;
+  static std::optional<frc::Rotation2d> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::Rotation2d& value);
 };

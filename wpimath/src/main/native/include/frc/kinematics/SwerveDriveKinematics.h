@@ -429,7 +429,7 @@ class SwerveDriveKinematics
     return {result};
   }
 
-  const wpi::array<Translation2d, NumModules> GetModules() const {
+  const wpi::array<Translation2d, NumModules>& GetModules() const {
     return m_modules;
   }
 

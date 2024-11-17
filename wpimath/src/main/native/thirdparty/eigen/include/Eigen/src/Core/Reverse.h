@@ -127,19 +127,25 @@ EIGEN_DEVICE_FUNC inline typename DenseBase<Derived>::ReverseReturnType DenseBas
  * \sa VectorwiseOp::reverseInPlace(), reverse() */
 template <typename Derived>
 EIGEN_DEVICE_FUNC inline void DenseBase<Derived>::reverseInPlace() {
+  constexpr int HalfRowsAtCompileTime = RowsAtCompileTime == Dynamic ? Dynamic : RowsAtCompileTime / 2;
+  constexpr int HalfColsAtCompileTime = ColsAtCompileTime == Dynamic ? Dynamic : ColsAtCompileTime / 2;
   if (cols() > rows()) {
     Index half = cols() / 2;
-    leftCols(half).swap(rightCols(half).reverse());
+    this->template leftCols<HalfColsAtCompileTime>(half).swap(
+        this->template rightCols<HalfColsAtCompileTime>(half).reverse());
     if ((cols() % 2) == 1) {
       Index half2 = rows() / 2;
-      col(half).head(half2).swap(col(half).tail(half2).reverse());
+      col(half).template head<HalfRowsAtCompileTime>(half2).swap(
+          col(half).template tail<HalfRowsAtCompileTime>(half2).reverse());
     }
   } else {
     Index half = rows() / 2;
-    topRows(half).swap(bottomRows(half).reverse());
+    this->template topRows<HalfRowsAtCompileTime>(half).swap(
+        this->template bottomRows<HalfRowsAtCompileTime>(half).reverse());
     if ((rows() % 2) == 1) {
       Index half2 = cols() / 2;
-      row(half).head(half2).swap(row(half).tail(half2).reverse());
+      row(half).template head<HalfColsAtCompileTime>(half2).swap(
+          row(half).template tail<HalfColsAtCompileTime>(half2).reverse());
     }
   }
 }

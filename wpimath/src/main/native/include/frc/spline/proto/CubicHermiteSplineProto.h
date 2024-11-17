@@ -8,11 +8,13 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/spline/CubicHermiteSpline.h"
+#include "wpimath/protobuf/spline.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::CubicHermiteSpline> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::CubicHermiteSpline Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
-                   const frc::CubicHermiteSpline& value);
+  using MessageStruct = wpi_proto_ProtobufCubicHermiteSpline;
+  using InputStream = wpi::ProtoInputStream<frc::CubicHermiteSpline>;
+  using OutputStream = wpi::ProtoOutputStream<frc::CubicHermiteSpline>;
+  static std::optional<frc::CubicHermiteSpline> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::CubicHermiteSpline& value);
 };

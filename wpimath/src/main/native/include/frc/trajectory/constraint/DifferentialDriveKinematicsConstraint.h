@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include <wpi/SymbolExports.h>
 
 #include "frc/kinematics/DifferentialDriveKinematics.h"
@@ -20,15 +22,26 @@ namespace frc {
 class WPILIB_DLLEXPORT DifferentialDriveKinematicsConstraint
     : public TrajectoryConstraint {
  public:
-  DifferentialDriveKinematicsConstraint(DifferentialDriveKinematics kinematics,
-                                        units::meters_per_second_t maxSpeed);
+  constexpr DifferentialDriveKinematicsConstraint(
+      DifferentialDriveKinematics kinematics,
+      units::meters_per_second_t maxSpeed)
+      : m_kinematics(std::move(kinematics)), m_maxSpeed(maxSpeed) {}
 
-  units::meters_per_second_t MaxVelocity(
+  constexpr units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override;
+      units::meters_per_second_t velocity) const override {
+    auto wheelSpeeds =
+        m_kinematics.ToWheelSpeeds({velocity, 0_mps, velocity * curvature});
+    wheelSpeeds.Desaturate(m_maxSpeed);
 
-  MinMax MinMaxAcceleration(const Pose2d& pose, units::curvature_t curvature,
-                            units::meters_per_second_t speed) const override;
+    return m_kinematics.ToChassisSpeeds(wheelSpeeds).vx;
+  }
+
+  constexpr MinMax MinMaxAcceleration(
+      const Pose2d& pose, units::curvature_t curvature,
+      units::meters_per_second_t speed) const override {
+    return {};
+  }
 
  private:
   DifferentialDriveKinematics m_kinematics;

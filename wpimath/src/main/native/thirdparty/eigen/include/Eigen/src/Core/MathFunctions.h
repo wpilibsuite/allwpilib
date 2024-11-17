@@ -1477,6 +1477,63 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE std::complex<double> exp(const std::comple
 }
 #endif
 
+template <typename T>
+EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE T exp2(const T& x) {
+  EIGEN_USING_STD(exp2);
+  return exp2(x);
+}
+
+// MSVC screws up some edge-cases for std::exp2(complex).
+#ifdef EIGEN_COMP_MSVC
+template <typename RealScalar>
+EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE std::complex<RealScalar> exp2(const std::complex<RealScalar>& x) {
+  EIGEN_USING_STD(exp);
+  // If z is (x,±∞) (for any finite x), the result is (NaN,NaN) and FE_INVALID is raised.
+  // If z is (x,NaN) (for any finite x), the result is (NaN,NaN) and FE_INVALID may be raised.
+  if ((isfinite)(real_ref(x)) && !(isfinite)(imag_ref(x))) {
+    return std::complex<RealScalar>(NumTraits<RealScalar>::quiet_NaN(), NumTraits<RealScalar>::quiet_NaN());
+  }
+  // If z is (+∞,±∞), the result is (±∞,NaN) and FE_INVALID is raised (the sign of the real part is unspecified)
+  // If z is (+∞,NaN), the result is (±∞,NaN) (the sign of the real part is unspecified)
+  if ((real_ref(x) == NumTraits<RealScalar>::infinity() && !(isfinite)(imag_ref(x)))) {
+    return std::complex<RealScalar>(NumTraits<RealScalar>::infinity(), NumTraits<RealScalar>::quiet_NaN());
+  }
+  return exp2(x);
+}
+#endif
+
+#if defined(SYCL_DEVICE_ONLY)
+SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(exp2, exp2)
+#endif
+
+#if defined(EIGEN_GPUCC)
+template <>
+EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE float exp2(const float& x) {
+  return ::exp2f(x);
+}
+
+template <>
+EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE double exp2(const double& x) {
+  return ::exp2(x);
+}
+
+template <>
+EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE std::complex<float> exp2(const std::complex<float>& x) {
+  float com = ::exp2f(x.real());
+  float res_real = com * ::cosf(static_cast<float>(EIGEN_LN2) * x.imag());
+  float res_imag = com * ::sinf(static_cast<float>(EIGEN_LN2) * x.imag());
+  return std::complex<float>(res_real, res_imag);
+}
+
+template <>
+EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE std::complex<double> exp2(const std::complex<double>& x) {
+  double com = ::exp2(x.real());
+  double res_real = com * ::cos(static_cast<double>(EIGEN_LN2) * x.imag());
+  double res_imag = com * ::sin(static_cast<double>(EIGEN_LN2) * x.imag());
+  return std::complex<double>(res_real, res_imag);
+}
+#endif
+
 template <typename Scalar>
 EIGEN_DEVICE_FUNC inline EIGEN_MATHFUNC_RETVAL(expm1, Scalar) expm1(const Scalar& x) {
   return EIGEN_MATHFUNC_IMPL(expm1, Scalar)::run(x);

@@ -90,8 +90,8 @@ static void CopyRawData(wpi::StringMap<MotorData>* dataset) {
   auto& data = *dataset;
   // Loads the Raw Data
   for (auto& it : data) {
-    auto key = it.first();
-    auto& motorData = it.getValue();
+    auto& key = it.first;
+    auto& motorData = it.second;
 
     if (!wpi::contains(key, "raw")) {
       data[fmt::format("raw-{}", key)] = motorData;
@@ -126,7 +126,7 @@ void AnalysisManager::PrepareGeneralData() {
   WPI_INFO(m_logger, "{}", "Converting raw data to PreparedData struct.");
   // Convert data to PreparedData structs
   for (auto& it : m_data.motorData) {
-    auto key = it.first();
+    auto key = it.first;
     preparedData[key] = ConvertToPrepared(m_data.motorData[key]);
     WPI_INFO(m_logger, "SAMPLES {}", preparedData[key].size());
   }

@@ -25,7 +25,6 @@ import static edu.wpi.first.wpilibj.util.Color.kYellow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import java.util.Map;
@@ -36,6 +35,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class LEDPatternTest {
+  long m_mockTime;
+
   // Applies a pattern of White, Yellow, Purple to LED triplets
   LEDPattern m_whiteYellowPurple =
       (reader, writer) -> {
@@ -59,14 +60,13 @@ class LEDPatternTest {
 
   @BeforeEach
   void setUp() {
-    WPIUtilJNI.enableMockTime();
-    WPIUtilJNI.setMockTime(0L);
+    m_mockTime = 0;
+    RobotController.setTimeSource(() -> m_mockTime);
   }
 
   @AfterEach
   void tearDown() {
-    WPIUtilJNI.setMockTime(0L);
-    WPIUtilJNI.disableMockTime();
+    RobotController.setTimeSource(RobotController::getFPGATime);
   }
 
   @Test
@@ -220,7 +220,7 @@ class LEDPatternTest {
     var scroll = base.scrollAtRelativeSpeed(Value.per(Microsecond).of(1 / 256.0));
 
     for (int time = 0; time < 500; time++) {
-      WPIUtilJNI.setMockTime(time);
+      m_mockTime = time;
       scroll.applyTo(buffer);
 
       for (int led = 0; led < buffer.getLength(); led++) {
@@ -254,7 +254,7 @@ class LEDPatternTest {
     var scroll = base.scrollAtRelativeSpeed(Value.per(Microsecond).of(-1 / 256.0));
 
     for (int time = 0; time < 500; time++) {
-      WPIUtilJNI.setMockTime(time);
+      m_mockTime = time;
       scroll.applyTo(buffer);
 
       for (int led = 0; led < buffer.getLength(); led++) {
@@ -290,7 +290,7 @@ class LEDPatternTest {
     var scroll = base.scrollAtAbsoluteSpeed(MetersPerSecond.of(16), Centimeters.of(2));
 
     for (int time = 0; time < 500; time++) {
-      WPIUtilJNI.setMockTime(time * 1_250); // 1.25ms per LED
+      m_mockTime = time * 1_250; // 1.25ms per LED
       scroll.applyTo(buffer);
 
       for (int led = 0; led < buffer.getLength(); led++) {
@@ -326,7 +326,7 @@ class LEDPatternTest {
     var scroll = base.scrollAtAbsoluteSpeed(MetersPerSecond.of(-16), Centimeters.of(2));
 
     for (int time = 0; time < 500; time++) {
-      WPIUtilJNI.setMockTime(time * 1_250); // 1.25ms per LED
+      m_mockTime = time * 1_250; // 1.25ms per LED
       scroll.applyTo(buffer);
 
       for (int led = 0; led < buffer.getLength(); led++) {
@@ -539,7 +539,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
 
     for (int t = 0; t < 8; t++) {
-      WPIUtilJNI.setMockTime(t * 1_000_000L); // time travel 1 second
+      m_mockTime = t * 1_000_000L; // time travel 1 second
       pattern.applyTo(buffer);
 
       Color color = buffer.getLED(0);
@@ -571,7 +571,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
 
     for (int t = 0; t < 8; t++) {
-      WPIUtilJNI.setMockTime(t * 1_000_000L); // time travel 1 second
+      m_mockTime = t * 1_000_000L; // time travel 1 second
       pattern.applyTo(buffer);
 
       Color color = buffer.getLED(0);
@@ -623,31 +623,31 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
 
     {
-      WPIUtilJNI.setMockTime(0); // start
+      m_mockTime = 0; // start
       pattern.applyTo(buffer);
       assertColorEquals(kWhite, buffer.getLED(0));
     }
 
     {
-      WPIUtilJNI.setMockTime(1); // midway (down)
+      m_mockTime = 1; // midway (down)
       pattern.applyTo(buffer);
       assertColorEquals(midGray, buffer.getLED(0));
     }
 
     {
-      WPIUtilJNI.setMockTime(2); // bottom
+      m_mockTime = 2; // bottom
       pattern.applyTo(buffer);
       assertColorEquals(kBlack, buffer.getLED(0));
     }
 
     {
-      WPIUtilJNI.setMockTime(3); // midway (up)
+      m_mockTime = 3; // midway (up)
       pattern.applyTo(buffer);
       assertColorEquals(midGray, buffer.getLED(0));
     }
 
     {
-      WPIUtilJNI.setMockTime(4); // back to start
+      m_mockTime = 4; // back to start
       pattern.applyTo(buffer);
       assertColorEquals(kWhite, buffer.getLED(0));
     }

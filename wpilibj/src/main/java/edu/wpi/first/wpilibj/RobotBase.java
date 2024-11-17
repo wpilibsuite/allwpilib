@@ -123,7 +123,7 @@ public abstract class RobotBase implements AutoCloseable {
 
           @Override
           public double getTimestamp() {
-            return WPIUtilJNI.now() * 1.0e-6;
+            return Timer.getTimestamp();
           }
         });
   }
@@ -462,6 +462,9 @@ public abstract class RobotBase implements AutoCloseable {
    * @param robotSupplier Function that returns an instance of the robot subclass.
    */
   public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
+    // Check that the MSVC runtime is valid.
+    WPIUtilJNI.checkMsvcRuntime();
+
     if (!HAL.initialize(500, 0)) {
       throw new IllegalStateException("Failed to initialize. Terminating");
     }

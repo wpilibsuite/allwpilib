@@ -67,6 +67,16 @@ class WPILIB_DLLEXPORT Translation3d {
         m_z{units::meter_t{vector.z()}} {}
 
   /**
+   * Constructs a 3D translation from a 2D translation in the X-Y plane.
+   *
+   * @param translation The 2D translation.
+   * @see Pose3d(Pose2d)
+   * @see Transform3d(Transform2d)
+   */
+  constexpr explicit Translation3d(const Translation2d& translation)
+      : Translation3d{translation.X(), translation.Y(), 0_m} {}
+
+  /**
    * Calculates the distance between two translations in 3D space.
    *
    * The distance between translations is defined as
@@ -236,7 +246,5 @@ void from_json(const wpi::json& json, Translation3d& state);
 
 }  // namespace frc
 
-#ifndef NO_PROTOBUF
 #include "frc/geometry/proto/Translation3dProto.h"
-#endif
 #include "frc/geometry/struct/Translation3dStruct.h"

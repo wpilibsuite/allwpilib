@@ -16,29 +16,14 @@ import edu.wpi.first.hal.PowerJNI;
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.MutCurrent;
-import edu.wpi.first.units.measure.MutTemperature;
-import edu.wpi.first.units.measure.MutTime;
-import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import java.util.function.LongSupplier;
 
 /** Contains functions for roboRIO functionality. */
 public final class RobotController {
-  // Mutable measures
-  private static final MutTime m_mutFPGATime = Microseconds.mutable(0.0);
-  private static final MutVoltage m_mutBatteryVoltage = Volts.mutable(0.0);
-  private static final MutVoltage m_mutInputVoltage = Volts.mutable(0.0);
-  private static final MutCurrent m_mutInputCurrent = Amps.mutable(0.0);
-  private static final MutVoltage m_mutVoltage3V3 = Volts.mutable(0.0);
-  private static final MutCurrent m_mutCurrent3V3 = Amps.mutable(0.0);
-  private static final MutVoltage m_mutVoltage5V = Volts.mutable(0.0);
-  private static final MutCurrent m_mutCurrent5V = Amps.mutable(0.0);
-  private static final MutVoltage m_mutVoltage6V = Volts.mutable(0.0);
-  private static final MutCurrent m_mutCurrent6V = Amps.mutable(0.0);
-  private static final MutVoltage m_mutBrownoutVoltage = Volts.mutable(0.0);
-  private static final MutTemperature m_mutCPUTemp = Celsius.mutable(0.0);
+  private static LongSupplier m_timeSource = RobotController::getFPGATime;
 
   private RobotController() {
     throw new UnsupportedOperationException("This is a utility class!");
@@ -95,6 +80,38 @@ public final class RobotController {
   }
 
   /**
+   * Sets a new source to provide the clock time in microseconds. Changing this affects the return
+   * value of {@code getTime} in Java.
+   *
+   * @param supplier Function to return the time in microseconds.
+   */
+  public static void setTimeSource(LongSupplier supplier) {
+    m_timeSource = supplier;
+  }
+
+  /**
+   * Read the microsecond timestamp. By default, the time is based on the FPGA hardware clock in
+   * microseconds since the FPGA started. However, the return value of this method may be modified
+   * to use any time base, including non-monotonic and non-continuous time bases.
+   *
+   * @return The current time in microseconds.
+   */
+  public static long getTime() {
+    return m_timeSource.getAsLong();
+  }
+
+  /**
+   * Read the microsecond timestamp. By default, the time is based on the FPGA hardware clock in
+   * microseconds since the FPGA started. However, the return value of this method may be modified
+   * to use any time base, including non-monotonic and non-continuous time bases.
+   *
+   * @return The current time in a measure.
+   */
+  public static Time getMeasureTime() {
+    return Microseconds.of(m_timeSource.getAsLong());
+  }
+
+  /**
    * Read the microsecond timer from the FPGA.
    *
    * @return The current time in microseconds according to the FPGA.
@@ -109,8 +126,7 @@ public final class RobotController {
    * @return The current time according to the FPGA in a measure.
    */
   public static Time getMeasureFPGATime() {
-    m_mutFPGATime.mut_replace(HALUtil.getFPGATime(), Microseconds);
-    return m_mutFPGATime;
+    return Microseconds.of(HALUtil.getFPGATime());
   }
 
   /**
@@ -141,8 +157,7 @@ public final class RobotController {
    * @return The battery voltage in a measure.
    */
   public static Voltage getMeasureBatteryVoltage() {
-    m_mutBatteryVoltage.mut_replace(PowerJNI.getVinVoltage(), Volts);
-    return m_mutBatteryVoltage;
+    return Volts.of(PowerJNI.getVinVoltage());
   }
 
   /**
@@ -207,8 +222,7 @@ public final class RobotController {
    * @return The controller input voltage value in a measure.
    */
   public static Voltage getMeasureInputVoltage() {
-    m_mutInputVoltage.mut_replace(PowerJNI.getVinVoltage(), Volts);
-    return m_mutInputVoltage;
+    return Volts.of(PowerJNI.getVinVoltage());
   }
 
   /**
@@ -226,8 +240,7 @@ public final class RobotController {
    * @return The controller input current value in a measure.
    */
   public static Current getMeasureInputCurrent() {
-    m_mutInputCurrent.mut_replace(PowerJNI.getVinCurrent(), Amps);
-    return m_mutInputCurrent;
+    return Amps.of(PowerJNI.getVinCurrent());
   }
 
   /**
@@ -245,8 +258,7 @@ public final class RobotController {
    * @return The controller 3.3V rail voltage value in a measure.
    */
   public static Voltage getMeasureVoltage3V3() {
-    m_mutVoltage3V3.mut_replace(PowerJNI.getUserVoltage3V3(), Volts);
-    return m_mutVoltage3V3;
+    return Volts.of(PowerJNI.getUserVoltage3V3());
   }
 
   /**
@@ -264,8 +276,7 @@ public final class RobotController {
    * @return The controller 3.3V rail output current value in a measure.
    */
   public static Current getMeasureCurrent3V3() {
-    m_mutCurrent3V3.mut_replace(PowerJNI.getUserCurrent3V3(), Amps);
-    return m_mutCurrent3V3;
+    return Amps.of(PowerJNI.getUserCurrent3V3());
   }
 
   /**
@@ -311,8 +322,7 @@ public final class RobotController {
    * @return The controller 5V rail voltage value in a measure.
    */
   public static Voltage getMeasureVoltage5V() {
-    m_mutVoltage5V.mut_replace(PowerJNI.getUserVoltage5V(), Volts);
-    return m_mutVoltage5V;
+    return Volts.of(PowerJNI.getUserVoltage5V());
   }
 
   /**
@@ -330,8 +340,7 @@ public final class RobotController {
    * @return The controller 5V rail output current value in a measure.
    */
   public static Current getMeasureCurrent5V() {
-    m_mutCurrent5V.mut_replace(PowerJNI.getUserCurrent5V(), Amps);
-    return m_mutCurrent5V;
+    return Amps.of(PowerJNI.getUserCurrent5V());
   }
 
   /**
@@ -377,8 +386,7 @@ public final class RobotController {
    * @return The controller 6V rail voltage value in a measure.
    */
   public static Voltage getMeasureVoltage6V() {
-    m_mutVoltage6V.mut_replace(PowerJNI.getUserVoltage6V(), Volts);
-    return m_mutVoltage6V;
+    return Volts.of(PowerJNI.getUserVoltage6V());
   }
 
   /**
@@ -396,8 +404,7 @@ public final class RobotController {
    * @return The controller 6V rail output current value in a measure.
    */
   public static Current getMeasureCurrent6V() {
-    m_mutCurrent6V.mut_replace(PowerJNI.getUserCurrent6V(), Amps);
-    return m_mutCurrent6V;
+    return Amps.of(PowerJNI.getUserCurrent6V());
   }
 
   /**
@@ -448,8 +455,7 @@ public final class RobotController {
    * @return The brownout voltage in a measure.
    */
   public static Voltage getMeasureBrownoutVoltage() {
-    m_mutBrownoutVoltage.mut_replace(PowerJNI.getBrownoutVoltage(), Volts);
-    return m_mutBrownoutVoltage;
+    return Volts.of(PowerJNI.getBrownoutVoltage());
   }
 
   /**
@@ -489,8 +495,7 @@ public final class RobotController {
    * @return current CPU temperature in a measure.
    */
   public static Temperature getMeasureCPUTemp() {
-    m_mutCPUTemp.mut_replace(PowerJNI.getCPUTemp(), Celsius);
-    return m_mutCPUTemp;
+    return Celsius.of(PowerJNI.getCPUTemp());
   }
 
   /** State for the radio led. */

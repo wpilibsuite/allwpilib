@@ -58,6 +58,8 @@ class WPILIB_DLLEXPORT Pose3d {
    * Constructs a 3D pose from a 2D pose in the X-Y plane.
    *
    * @param pose The 2D pose.
+   * @see Rotation3d(Rotation2d)
+   * @see Translation3d(Translation2d)
    */
   constexpr explicit Pose3d(const Pose2d& pose)
       : m_translation{pose.X(), pose.Y(), 0_m},
@@ -236,9 +238,7 @@ void from_json(const wpi::json& json, Pose3d& pose);
 
 }  // namespace frc
 
-#ifndef NO_PROTOBUF
 #include "frc/geometry/proto/Pose3dProto.h"
-#endif
 #include "frc/geometry/struct/Pose3dStruct.h"
 
 #include "frc/geometry/Transform3d.h"
@@ -281,9 +281,9 @@ constexpr Eigen::Matrix3d RotationVectorToMatrix(
   //         [ 0 -c  b]
   // Omega = [ c  0 -a]
   //         [-b  a  0]
-  return Eigen::Matrix3d{{0.0, -rotation.coeff(2), rotation.coeff(1)},
-                         {rotation.coeff(2), 0.0, -rotation.coeff(0)},
-                         {-rotation.coeff(1), rotation.coeff(0), 0.0}};
+  return Eigen::Matrix3d{{0.0, -rotation(2), rotation(1)},
+                         {rotation(2), 0.0, -rotation(0)},
+                         {-rotation(1), rotation(0), 0.0}};
 }
 
 }  // namespace detail

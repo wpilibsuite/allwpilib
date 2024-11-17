@@ -4,48 +4,15 @@ Date: Sun, 8 May 2022 16:38:11 -0400
 Subject: [PATCH 16/38] Fixup includes
 
 ---
- llvm/include/llvm/ADT/StringMap.h                 |  4 ++++
- llvm/include/llvm/ADT/StringMapEntry.h            |  4 ++++
  llvm/include/llvm/Support/PointerLikeTypeTraits.h |  1 +
  llvm/lib/Support/ConvertUTFWrapper.cpp            |  1 +
  llvm/lib/Support/ErrorHandling.cpp                |  7 +++----
  llvm/lib/Support/raw_ostream.cpp                  | 11 ++++++-----
  llvm/unittests/ADT/SmallPtrSetTest.cpp            |  2 ++
  llvm/unittests/ADT/SmallVectorTest.cpp            |  1 +
- llvm/unittests/ADT/StringMapTest.cpp              |  1 +
  llvm/unittests/Support/ConvertUTFTest.cpp         |  2 ++
  10 files changed, 25 insertions(+), 9 deletions(-)
 
-diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index c133e84f9b2e3a225cdac782c011fadbf07adab2..2173a4159111e7fea70325de82dbfce628ae3ea8 100644
---- a/llvm/include/llvm/ADT/StringMap.h
-+++ b/llvm/include/llvm/ADT/StringMap.h
-@@ -17,6 +17,10 @@
- #include "llvm/ADT/StringMapEntry.h"
- #include "llvm/ADT/iterator.h"
- #include "llvm/Support/AllocatorBase.h"
-+#include "llvm/Support/MemAlloc.h"
-+#include "llvm/Support/SmallVector.h"
-+#include "llvm/Support/iterator.h"
-+#include "llvm/Support/iterator_range.h"
- #include "llvm/Support/PointerLikeTypeTraits.h"
- #include <initializer_list>
- #include <iterator>
-diff --git a/llvm/include/llvm/ADT/StringMapEntry.h b/llvm/include/llvm/ADT/StringMapEntry.h
-index 388e81c361642113937f7d5680de73a50635b07d..011806f5fd89ff738ed805a82b3ddbc6fc9b08ce 100644
---- a/llvm/include/llvm/ADT/StringMapEntry.h
-+++ b/llvm/include/llvm/ADT/StringMapEntry.h
-@@ -16,6 +16,10 @@
- #ifndef LLVM_ADT_STRINGMAPENTRY_H
- #define LLVM_ADT_STRINGMAPENTRY_H
- 
-+#include "wpi/MemAlloc.h"
-+
-+#include <cassert>
-+#include <cstring>
- #include <optional>
- #include <string_view>
- 
 diff --git a/llvm/include/llvm/Support/PointerLikeTypeTraits.h b/llvm/include/llvm/Support/PointerLikeTypeTraits.h
 index 1b15f930bd87d97d51824af5e62ea5f222a6b4c9..acadd5e89a1651cfbad67a5b1b0933d1f288d094 100644
 --- a/llvm/include/llvm/Support/PointerLikeTypeTraits.h
@@ -153,18 +120,6 @@ index f8c37820ef9fdfe0af067f5aa8d2297ed15e73bc..5e91f71bc9ac0e499a64dd1591e581d0
  #include <list>
  #include <span>
  #include <stdarg.h>
-diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
-index acd8b566f9c7a6efc2c9204624c01104dd34daf6..6b6cf564909f329c220eb225f3b7af6c35301029 100644
---- a/llvm/unittests/ADT/StringMapTest.cpp
-+++ b/llvm/unittests/ADT/StringMapTest.cpp
-@@ -9,6 +9,7 @@
- #include "llvm/ADT/StringMap.h"
- #include "llvm/Support/DataTypes.h"
- #include "gtest/gtest.h"
-+#include <algorithm>
- #include <limits>
- #include <tuple>
- using namespace llvm;
 diff --git a/llvm/unittests/Support/ConvertUTFTest.cpp b/llvm/unittests/Support/ConvertUTFTest.cpp
 index 3b07d344f15a555f11ad5f8177a0a65b8a4fa472..77e70a46d3621ecfaed923d87256184addfda721 100644
 --- a/llvm/unittests/Support/ConvertUTFTest.cpp

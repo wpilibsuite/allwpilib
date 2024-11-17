@@ -375,8 +375,8 @@ class HttpRequest {
     return elem.first;
   }
   template <typename T>
-  static std::string_view GetFirst(const StringMapEntry<T>& elem) {
-    return elem.getKey();
+  static std::string_view GetFirst(const std::pair<std::string, T>& elem) {
+    return elem.first;
   }
   template <typename T>
   static std::string_view GetSecond(const T& elem) {

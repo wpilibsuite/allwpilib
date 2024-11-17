@@ -23,6 +23,11 @@ WPI_IGNORE_DEPRECATED
  * @{
  */
 
+/**
+ * XRPMotor.
+ *
+ * <p>A SimDevice based motor controller representing the motors on an XRP robot
+ */
 class XRPMotor : public frc::MotorController, public frc::MotorSafety {
  public:
   /**
