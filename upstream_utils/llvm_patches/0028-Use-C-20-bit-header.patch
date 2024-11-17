@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 11 Jul 2023 22:56:09 -0700
-Subject: [PATCH 29/38] Use C++20 <bit> header
+Subject: [PATCH 28/36] Use C++20 <bit> header
 
 ---
  llvm/include/llvm/ADT/DenseMap.h       |   3 +-

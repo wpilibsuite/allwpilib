@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 19 May 2022 00:58:36 -0400
-Subject: [PATCH 24/38] Prefer to use static pointers in raw_ostream
+Subject: [PATCH 24/36] Prefer to use static pointers in raw_ostream
 
 See #1401
 ---
