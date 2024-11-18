@@ -223,6 +223,15 @@ namespace HALUsageReporting {
     kOdometry_DifferentialDrive = 1,
     kOdometry_MecanumDrive = 2,
     kOdometry_SwerveDrive = 3,
+    kDashboard_Unknown = 1,
+    kDashboard_Glass = 2,
+    kDashboard_SmartDashboard = 3,
+    kDashboard_Shuffleboard = 4,
+    kDashboard_Elastic = 5,
+    kDashboard_LabVIEW = 6,
+    kDashboard_AdvantageScope = 7,
+    kDashboard_QFRCDashboard = 8,
+    kDashboard_FRCWebComponents = 9,
   };
 }
 #endif

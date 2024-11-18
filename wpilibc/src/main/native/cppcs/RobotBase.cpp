@@ -10,11 +10,13 @@
 
 #include <cstdio>
 #include <memory>
+#include <string>
 #include <utility>
 
 #include <cameraserver/CameraServerShared.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
+#include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
@@ -248,6 +250,66 @@ RobotBase::RobotBase() {
       break;
     }
   }
+
+  connListenerHandle = inst.AddConnectionListener(false, [&](const nt::Event&
+                                                                 event) {
+    if (event.Is(nt::EventFlags::kConnected)) {
+      if (event.GetConnectionInfo()->remote_id.starts_with("glass")) {
+        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
+                   HALUsageReporting::kDashboard_Glass);
+        m_dashboardDetected = true;
+      } else if (event.GetConnectionInfo()->remote_id.starts_with(
+                     "SmartDashboard")) {
+        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
+                   HALUsageReporting::kDashboard_SmartDashboard);
+        m_dashboardDetected = true;
+      } else if (event.GetConnectionInfo()->remote_id.starts_with(
+                     "shuffleboard")) {
+        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
+                   HALUsageReporting::kDashboard_Shuffleboard);
+        m_dashboardDetected = true;
+      } else if (event.GetConnectionInfo()->remote_id.starts_with("elastic") ||
+                 event.GetConnectionInfo()->remote_id.starts_with("Elastic")) {
+        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
+                   HALUsageReporting::kDashboard_Elastic);
+        m_dashboardDetected = true;
+      } else if (event.GetConnectionInfo()->remote_id.starts_with(
+                     "Dashboard")) {
+        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
+                   HALUsageReporting::kDashboard_LabVIEW);
+        m_dashboardDetected = true;
+      } else if (event.GetConnectionInfo()->remote_id.starts_with(
+                     "AdvantageScope")) {
+        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
+                   HALUsageReporting::kDashboard_AdvantageScope);
+        m_dashboardDetected = true;
+      } else if (event.GetConnectionInfo()->remote_id.starts_with(
+                     "QFRCDashboard")) {
+        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
+                   HALUsageReporting::kDashboard_QFRCDashboard);
+        m_dashboardDetected = true;
+      } else if (event.GetConnectionInfo()->remote_id.starts_with(
+                     "FRC Web Components")) {
+        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
+                   HALUsageReporting::kDashboard_FRCWebComponents);
+        m_dashboardDetected = true;
+      } else {
+        if (!m_dashboardDetected) {
+          size_t delim = event.GetConnectionInfo()->remote_id.find('@');
+          if (delim != std::string::npos) {
+            HAL_Report(
+                HALUsageReporting::kResourceType_Dashboard,
+                HALUsageReporting::kDashboard_Unknown, 0,
+                event.GetConnectionInfo()->remote_id.substr(0, delim).c_str());
+          } else {
+            HAL_Report(HALUsageReporting::kResourceType_Dashboard,
+                       HALUsageReporting::kDashboard_Unknown, 0,
+                       event.GetConnectionInfo()->remote_id.c_str());
+          }
+        }
+      }
+    }
+  });
 
   SmartDashboard::init();
 

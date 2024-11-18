@@ -369,6 +369,24 @@ public final class FRCNetComm {
     public static final int kOdometry_MecanumDrive = 2;
     /** kOdometry_SwerveDrive = 3. */
     public static final int kOdometry_SwerveDrive = 3;
+    /** kDashboard_Unknown = 1. */
+    public static final int kDashboard_Unknown = 1;
+    /** kDashboard_Glass = 2. */
+    public static final int kDashboard_Glass = 2;
+    /** kDashboard_SmartDashboard = 3. */
+    public static final int kDashboard_SmartDashboard = 3;
+    /** kDashboard_Shuffleboard = 4. */
+    public static final int kDashboard_Shuffleboard = 4;
+    /** kDashboard_Elastic = 5. */
+    public static final int kDashboard_Elastic = 5;
+    /** kDashboard_LabVIEW = 6. */
+    public static final int kDashboard_LabVIEW = 6;
+    /** kDashboard_AdvantageScope = 7. */
+    public static final int kDashboard_AdvantageScope = 7;
+    /** kDashboard_QFRCDashboard = 8. */
+    public static final int kDashboard_QFRCDashboard = 8;
+    /** kDashboard_FRCWebComponents = 9. */
+    public static final int kDashboard_FRCWebComponents = 9;
   }
 
   /** Utility class. */
