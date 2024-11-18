@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sun, 30 Jul 2023 14:17:37 -0700
-Subject: [PATCH 30/38] Remove DenseMap GTest printer test
+Subject: [PATCH 29/36] Remove DenseMap GTest printer test
 
 LLVM modifies internal GTest headers to support it, which we can't do.
 ---

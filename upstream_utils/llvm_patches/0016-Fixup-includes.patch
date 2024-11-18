@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:38:11 -0400
-Subject: [PATCH 16/38] Fixup includes
+Subject: [PATCH 16/36] Fixup includes
 
 ---
  llvm/include/llvm/Support/PointerLikeTypeTraits.h |  1 +
@@ -11,7 +11,7 @@ Subject: [PATCH 16/38] Fixup includes
  llvm/unittests/ADT/SmallPtrSetTest.cpp            |  2 ++
  llvm/unittests/ADT/SmallVectorTest.cpp            |  1 +
  llvm/unittests/Support/ConvertUTFTest.cpp         |  2 ++
- 10 files changed, 25 insertions(+), 9 deletions(-)
+ 7 files changed, 16 insertions(+), 9 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/PointerLikeTypeTraits.h b/llvm/include/llvm/Support/PointerLikeTypeTraits.h
 index 1b15f930bd87d97d51824af5e62ea5f222a6b4c9..acadd5e89a1651cfbad67a5b1b0933d1f288d094 100644

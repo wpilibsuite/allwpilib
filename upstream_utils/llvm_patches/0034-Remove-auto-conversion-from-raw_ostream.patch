@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sun, 17 Mar 2024 14:51:11 -0700
-Subject: [PATCH 35/38] Remove auto-conversion from raw_ostream
+Subject: [PATCH 34/36] Remove auto-conversion from raw_ostream
 
 ---
  llvm/lib/Support/raw_ostream.cpp | 9 ---------

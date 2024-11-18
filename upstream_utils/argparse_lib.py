@@ -26,7 +26,7 @@ def copy_upstream_src(wpilib_root):
 
 
 def main():
-    name = "argparse"
+    name = "argparse_lib"
     url = "https://github.com/p-ranav/argparse"
     # master on 2024-09-11
     tag = "fd13c2859131ab463e617a5a8abcc69eb7e1d897"

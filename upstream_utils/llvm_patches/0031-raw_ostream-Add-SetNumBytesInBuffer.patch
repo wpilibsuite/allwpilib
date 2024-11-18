@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Sun, 29 Oct 2023 23:00:08 -0700
-Subject: [PATCH 32/38] raw_ostream: Add SetNumBytesInBuffer
+Subject: [PATCH 31/36] raw_ostream: Add SetNumBytesInBuffer
 
 ---
  llvm/include/llvm/Support/raw_ostream.h | 5 +++++
