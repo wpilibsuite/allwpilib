@@ -288,8 +288,8 @@ public abstract class Command implements Sendable {
   }
 
   /**
-   * Creates a new command that runs this command and the deadline in parallel, finishing when the
-   * deadline finishes.
+   * Creates a new command that runs this command and the deadline in parallel, finishing
+   * (and interrupting this command) when the deadline finishes.
    *
    * <p>Note: This decorator works by adding this command to a composition. The command the
    * decorator was called on cannot be scheduled independently or be added to a different
@@ -299,6 +299,7 @@ public abstract class Command implements Sendable {
    *
    * @param deadline the deadline of the command group
    * @return the decorated command
+   * @see Command#deadlineFor
    */
   public ParallelDeadlineGroup withDeadline(Command deadline) {
     return new ParallelDeadlineGroup(deadline, this);
@@ -338,6 +339,7 @@ public abstract class Command implements Sendable {
    * @param parallel the commands to run in parallel. Note the parallel commands will be interrupted
    *     when the deadline command ends
    * @return the decorated command
+   * @see Command#withDeadline
    */
   public ParallelDeadlineGroup deadlineFor(Command... parallel) {
     return new ParallelDeadlineGroup(this, parallel);

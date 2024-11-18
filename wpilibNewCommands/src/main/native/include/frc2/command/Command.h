@@ -311,11 +311,12 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
 
   /**
    * Creates a new command that runs this command
-   * and the deadline in parallel, finishing when
-   * the deadline finishes.
+   * and the deadline in parallel, finishing
+   * (and interrupting this command) when the deadline finishes.
    *
    * @param deadline the deadline of the command group
    * @return the decorated command
+   * @see DeadlineFor
    */
   CommandPtr WithDeadline(CommandPtr&& deadline) &&;
 
@@ -328,6 +329,7 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param parallel the commands to run in parallel. Note the parallel commands
    * will be interupted when the deadline command ends
    * @return the decorated command
+   * @see WithDeadline
    */
   [[nodiscard]]
   CommandPtr DeadlineFor(CommandPtr&& parallel) &&;
