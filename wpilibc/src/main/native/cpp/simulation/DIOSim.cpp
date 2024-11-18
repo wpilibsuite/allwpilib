@@ -5,7 +5,6 @@
 #include "frc/simulation/DIOSim.h"
 
 #include <memory>
-#include <utility>
 
 #include <hal/simulation/DIOData.h>
 

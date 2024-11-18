@@ -8,10 +8,13 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/geometry/Pose3d.h"
+#include "wpimath/protobuf/geometry3d.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Pose3d> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Pose3d Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg, const frc::Pose3d& value);
+  using MessageStruct = wpi_proto_ProtobufPose3d;
+  using InputStream = wpi::ProtoInputStream<frc::Pose3d>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Pose3d>;
+  static std::optional<frc::Pose3d> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::Pose3d& value);
 };

@@ -118,7 +118,7 @@ struct WPI_DataLog;
  * @param period time between automatic flushes to disk, in seconds;
  *               this is a time/storage tradeoff
  */
-void DLM_Start(const char* dir, const char* filename, double period);
+void DLM_Start(const struct WPI_String* dir, const struct WPI_String* filename, double period);
 
 /**
  * Stop data log manager.
@@ -131,7 +131,7 @@ void DLM_Stop(void);
  *
  * @param message message
  */
-void DLM_Log(const char* message);
+void DLM_Log(const struct WPI_String* message);
 
 /**
  * Get the managed data log (for custom logging). Starts the data log manager
@@ -144,9 +144,9 @@ WPI_DataLog* DLM_GetLog(void);
 /**
  * Get the log directory.
  *
- * @return log directory
+ * @param value returned value (output)
  */
-const char* DLM_GetLogDir(void);
+void DLM_GetLogDir(struct WPI_String* value);
 
 /**
  * Enable or disable logging of NetworkTables data. Note that unlike the

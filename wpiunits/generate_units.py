@@ -4,8 +4,9 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 
-# This script generates unit-specific interfaces and mutable and immutable implementations of
-# those interfaces.
+# This script generates unit-specific interfaces and mutable and immutable
+# implementations of those interfaces.
+#
 # Generated files will be located in wpiunits/src/generated/main/
 
 import argparse

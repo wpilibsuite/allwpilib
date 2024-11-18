@@ -93,6 +93,17 @@ public class Translation3d
   }
 
   /**
+   * Constructs a 3D translation from a 2D translation in the X-Y plane.
+   *
+   * @param translation The 2D translation.
+   * @see Pose3d#Pose3d(Pose2d)
+   * @see Transform3d#Transform3d(Transform2d)
+   */
+  public Translation3d(Translation2d translation) {
+    this(translation.getX(), translation.getY(), 0.0);
+  }
+
+  /**
    * Constructs a Translation3d from the provided translation vector's X, Y, and Z components. The
    * values are assumed to be in meters.
    *

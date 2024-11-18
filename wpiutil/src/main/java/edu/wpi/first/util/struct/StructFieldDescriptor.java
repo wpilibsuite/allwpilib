@@ -224,7 +224,7 @@ public class StructFieldDescriptor {
    * @return true if bitfield
    */
   public boolean isBitField() {
-    return m_bitShift != 0 || m_bitWidth != (m_size * 8);
+    return (m_bitShift != 0 || m_bitWidth != (m_size * 8)) && m_struct == null;
   }
 
   private final StructDescriptor m_parent;

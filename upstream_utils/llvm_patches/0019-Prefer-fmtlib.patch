@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:46:20 -0400
-Subject: [PATCH 19/38] Prefer fmtlib
+Subject: [PATCH 19/36] Prefer fmtlib
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 20 ++++++--------------

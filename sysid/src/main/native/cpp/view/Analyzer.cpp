@@ -53,8 +53,9 @@ void Analyzer::UpdateFeedforwardGains() {
     m_accelRMSE = feedforwardGains.olsResult.rmse;
     m_settings.preset.measurementDelay =
         m_settings.type == FeedbackControllerLoopType::kPosition
-            ? m_manager->GetPositionDelay()
-            : m_manager->GetVelocityDelay();
+            // Clamp feedback measurement delay to ≥ 0
+            ? units::math::max(0_s, m_manager->GetPositionDelay())
+            : units::math::max(0_s, m_manager->GetVelocityDelay());
     PrepareGraphs();
   } catch (const sysid::InvalidDataError& e) {
     m_state = AnalyzerState::kGeneralDataError;

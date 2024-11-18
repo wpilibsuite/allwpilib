@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include "units/math.h"
 #include "units/time.h"
 #include "wpimath/MathShared.h"
@@ -65,9 +67,11 @@ class TrapezoidProfile {
     /**
      * Default constructor.
      */
-    Constraints() {
-      wpi::math::MathSharedStore::ReportUsage(
-          wpi::math::MathUsageId::kTrajectory_TrapezoidProfile, 1);
+    constexpr Constraints() {
+      if (!std::is_constant_evaluated()) {
+        wpi::math::MathSharedStore::ReportUsage(
+            wpi::math::MathUsageId::kTrajectory_TrapezoidProfile, 1);
+      }
     }
 
     /**
@@ -76,10 +80,13 @@ class TrapezoidProfile {
      * @param maxVelocity Maximum velocity.
      * @param maxAcceleration Maximum acceleration.
      */
-    Constraints(Velocity_t maxVelocity, Acceleration_t maxAcceleration)
+    constexpr Constraints(Velocity_t maxVelocity,
+                          Acceleration_t maxAcceleration)
         : maxVelocity{maxVelocity}, maxAcceleration{maxAcceleration} {
-      wpi::math::MathSharedStore::ReportUsage(
-          wpi::math::MathUsageId::kTrajectory_TrapezoidProfile, 1);
+      if (!std::is_constant_evaluated()) {
+        wpi::math::MathSharedStore::ReportUsage(
+            wpi::math::MathUsageId::kTrajectory_TrapezoidProfile, 1);
+      }
     }
   };
 
@@ -94,7 +101,7 @@ class TrapezoidProfile {
     /// The velocity at this state.
     Velocity_t velocity{0};
 
-    bool operator==(const State&) const = default;
+    constexpr bool operator==(const State&) const = default;
   };
 
   /**
@@ -102,13 +109,13 @@ class TrapezoidProfile {
    *
    * @param constraints The constraints on the profile, like maximum velocity.
    */
-  TrapezoidProfile(Constraints constraints)  // NOLINT
+  constexpr TrapezoidProfile(Constraints constraints)  // NOLINT
       : m_constraints(constraints) {}
 
-  TrapezoidProfile(const TrapezoidProfile&) = default;
-  TrapezoidProfile& operator=(const TrapezoidProfile&) = default;
-  TrapezoidProfile(TrapezoidProfile&&) = default;
-  TrapezoidProfile& operator=(TrapezoidProfile&&) = default;
+  constexpr TrapezoidProfile(const TrapezoidProfile&) = default;
+  constexpr TrapezoidProfile& operator=(const TrapezoidProfile&) = default;
+  constexpr TrapezoidProfile(TrapezoidProfile&&) = default;
+  constexpr TrapezoidProfile& operator=(TrapezoidProfile&&) = default;
 
   /**
    * Calculates the position and velocity for the profile at a time t where the
@@ -120,7 +127,7 @@ class TrapezoidProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
-  State Calculate(units::second_t t, State current, State goal) {
+  constexpr State Calculate(units::second_t t, State current, State goal) {
     m_direction = ShouldFlipAcceleration(current, goal) ? -1 : 1;
     m_current = Direct(current);
     goal = Direct(goal);
@@ -195,7 +202,7 @@ class TrapezoidProfile {
    * @param target The target distance.
    * @return The time left until a target distance in the profile is reached.
    */
-  units::second_t TimeLeftUntil(Distance_t target) const {
+  constexpr units::second_t TimeLeftUntil(Distance_t target) const {
     Distance_t position = m_current.position * m_direction;
     Velocity_t velocity = m_current.velocity * m_direction;
 
@@ -266,7 +273,7 @@ class TrapezoidProfile {
    *
    * @return The total time the profile takes to reach the goal.
    */
-  units::second_t TotalTime() const { return m_endDecel; }
+  constexpr units::second_t TotalTime() const { return m_endDecel; }
 
   /**
    * Returns true if the profile has reached the goal.
@@ -277,7 +284,9 @@ class TrapezoidProfile {
    * @param t The time since the beginning of the profile.
    * @return True if the profile has reached the goal.
    */
-  bool IsFinished(units::second_t t) const { return t >= TotalTime(); }
+  constexpr bool IsFinished(units::second_t t) const {
+    return t >= TotalTime();
+  }
 
  private:
   /**
@@ -288,12 +297,13 @@ class TrapezoidProfile {
    * @param initial The initial state (usually the current state).
    * @param goal The desired state when the profile is complete.
    */
-  static bool ShouldFlipAcceleration(const State& initial, const State& goal) {
+  static constexpr bool ShouldFlipAcceleration(const State& initial,
+                                               const State& goal) {
     return initial.position > goal.position;
   }
 
   // Flip the sign of the velocity and position if the profile is inverted
-  State Direct(const State& in) const {
+  constexpr State Direct(const State& in) const {
     State result = in;
     result.position *= m_direction;
     result.velocity *= m_direction;

@@ -77,7 +77,8 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
       Translation2d{1_m, 1_m}, Translation2d{1_m, -1_m},
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
 
-  SwerveDriveOdometry<4> odometry{kinematics, 0_rad, {zero, zero, zero, zero}};
+  SwerveDriveOdometry<4> odometry{
+      kinematics, frc::Rotation2d{}, {zero, zero, zero, zero}};
 
   SwerveModulePosition fl;
   SwerveModulePosition fr;
@@ -141,7 +142,8 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
       Translation2d{1_m, 1_m}, Translation2d{1_m, -1_m},
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
 
-  SwerveDriveOdometry<4> odometry{kinematics, 0_rad, {zero, zero, zero, zero}};
+  SwerveDriveOdometry<4> odometry{
+      kinematics, frc::Rotation2d{}, {zero, zero, zero, zero}};
 
   SwerveModulePosition fl;
   SwerveModulePosition fr;

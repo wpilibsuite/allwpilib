@@ -15,7 +15,7 @@ class SendableBuilder;
  */
 class WPILIB_DLLEXPORT Sendable {
  public:
-  virtual ~Sendable() = default;
+  constexpr virtual ~Sendable() = default;
 
   /**
    * Initializes this Sendable object.

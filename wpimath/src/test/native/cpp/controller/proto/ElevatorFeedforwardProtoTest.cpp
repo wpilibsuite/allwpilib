@@ -2,16 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
+#include <wpi/SmallVector.h>
 
 #include "frc/controller/ElevatorFeedforward.h"
 
 using namespace frc;
 
 namespace {
-
-using ProtoType = wpi::Protobuf<frc::ElevatorFeedforward>;
 
 static constexpr auto Ks = 1.91_V;
 static constexpr auto Kg = 2.29_V;
@@ -22,13 +20,15 @@ constexpr ElevatorFeedforward kExpectedData{Ks, Kg, Kv, Ka};
 }  // namespace
 
 TEST(ElevatorFeedforwardProtoTest, Roundtrip) {
-  google::protobuf::Arena arena;
-  google::protobuf::Message* proto = ProtoType::New(&arena);
-  ProtoType::Pack(proto, kExpectedData);
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::SmallVector<uint8_t, 64> buf;
 
-  ElevatorFeedforward unpacked_data = ProtoType::Unpack(*proto);
-  EXPECT_EQ(kExpectedData.GetKs().value(), unpacked_data.GetKs().value());
-  EXPECT_EQ(kExpectedData.GetKg().value(), unpacked_data.GetKg().value());
-  EXPECT_EQ(kExpectedData.GetKv().value(), unpacked_data.GetKv().value());
-  EXPECT_EQ(kExpectedData.GetKa().value(), unpacked_data.GetKa().value());
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  auto unpacked_data = message.Unpack(buf);
+  ASSERT_TRUE(unpacked_data.has_value());
+
+  EXPECT_EQ(kExpectedData.GetKs().value(), unpacked_data->GetKs().value());
+  EXPECT_EQ(kExpectedData.GetKg().value(), unpacked_data->GetKg().value());
+  EXPECT_EQ(kExpectedData.GetKv().value(), unpacked_data->GetKv().value());
+  EXPECT_EQ(kExpectedData.GetKa().value(), unpacked_data->GetKa().value());
 }
