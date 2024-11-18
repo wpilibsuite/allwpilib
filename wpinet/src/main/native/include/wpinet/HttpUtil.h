@@ -320,10 +320,10 @@ class HttpRequest {
       : host{loc.host}, port{loc.port} {
     SmallVector<std::pair<std::string_view, std::string_view>, 4> params;
     for (const auto& p : loc.params) {
-      params.emplace_back(std::make_pair(GetFirst(p), GetSecond(p)));
+      params.emplace_back(std::pair{GetFirst(p), GetSecond(p)});
     }
     for (const auto& p : extraParams) {
-      params.emplace_back(std::make_pair(GetFirst(p), GetSecond(p)));
+      params.emplace_back(std::pair{GetFirst(p), GetSecond(p)});
     }
     SetPath(loc.path, params);
     SetAuth(loc);

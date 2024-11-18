@@ -83,7 +83,7 @@ class WPILibCameraServerShared : public frc::CameraServerShared {
     ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format, args);
   }
   std::pair<std::thread::id, bool> GetRobotMainThreadId() const override {
-    return std::make_pair(RobotBase::GetThreadId(), true);
+    return std::pair{RobotBase::GetThreadId(), true};
   }
 };
 class WPILibMathShared : public wpi::math::MathShared {
