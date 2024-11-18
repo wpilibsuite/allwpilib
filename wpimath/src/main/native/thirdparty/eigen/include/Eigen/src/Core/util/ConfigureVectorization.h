@@ -174,6 +174,13 @@
 
 //----------------------------------------------------------------------
 
+// Disable vectorization in intellisense
+#ifdef __INTELLISENSE__
+#ifndef EIGEN_DONT_VECTORIZE
+#define EIGEN_DONT_VECTORIZE
+#endif
+#endif
+
 // if alignment is disabled, then disable vectorization. Note: EIGEN_MAX_ALIGN_BYTES is the proper check, it takes into
 // account both the user's will (EIGEN_MAX_ALIGN_BYTES,EIGEN_DONT_ALIGN) and our own platform checks
 #if EIGEN_MAX_ALIGN_BYTES == 0
