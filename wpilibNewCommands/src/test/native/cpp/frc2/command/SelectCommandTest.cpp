@@ -68,7 +68,7 @@ class TestableSelectCommand : public SelectCommand<int> {
     std::vector<std::pair<int, std::unique_ptr<Command>>> vec;
     int index = 0;
     for (auto&& command : commands) {
-      vec.emplace_back(std::make_pair(index, std::move(command)));
+      vec.emplace_back(std::pair{index, std::move(command)});
       index++;
     }
     return vec;
