@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Fri, 15 Sep 2023 18:26:50 -0700
-Subject: [PATCH 31/38] Replace deprecated std::aligned_storage_t
+Subject: [PATCH 30/36] Replace deprecated std::aligned_storage_t
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 4 ++--

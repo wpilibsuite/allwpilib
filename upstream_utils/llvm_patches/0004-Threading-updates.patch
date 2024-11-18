@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:17:19 -0400
-Subject: [PATCH 04/38] Threading updates
+Subject: [PATCH 04/36] Threading updates
 
 - Remove guards for threads and exception
 - Prefer scope gaurd over lock gaurd

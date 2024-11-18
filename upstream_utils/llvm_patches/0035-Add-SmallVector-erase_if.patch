@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 18 Jun 2024 09:07:33 -0700
-Subject: [PATCH 36/38] Add SmallVector erase_if()
+Subject: [PATCH 35/36] Add SmallVector erase_if()
 
 ---
  llvm/include/llvm/ADT/SmallVector.h | 8 ++++++++

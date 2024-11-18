@@ -81,12 +81,12 @@ public record ImmutableMeasure<U extends Unit>(double magnitude, double baseUnit
   }
 
   @Override
-  public Measure<U> divide(double divisor) {
+  public Measure<U> div(double divisor) {
     return ofBaseUnits(baseUnitMagnitude / divisor, unit);
   }
 
   @Override
-  public Measure<U> divide(Dimensionless divisor) {
+  public Measure<U> div(Dimensionless divisor) {
     return ofBaseUnits(baseUnitMagnitude / divisor.baseUnitMagnitude(), unit);
   }
 }

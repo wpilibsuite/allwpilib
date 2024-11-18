@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Fri, 1 Mar 2024 11:56:17 -0800
-Subject: [PATCH 25/38] constexpr endian byte swap
+Subject: [PATCH 25/36] constexpr endian byte swap
 
 ---
  llvm/include/llvm/Support/Endian.h | 4 +++-

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 23:18:34 -0400
-Subject: [PATCH 10/38] Detemplatize SmallVectorBase
+Subject: [PATCH 10/36] Detemplatize SmallVectorBase
 
 ---
  llvm/include/llvm/ADT/SmallVector.h | 35 ++++++++++-----------------

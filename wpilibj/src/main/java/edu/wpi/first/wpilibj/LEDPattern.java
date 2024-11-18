@@ -191,7 +191,7 @@ public interface LEDPattern {
 
     return (reader, writer) -> {
       int bufLen = reader.getLength();
-      long now = WPIUtilJNI.now();
+      long now = RobotController.getTime();
 
       // index should move by (buf.length) / (period)
       double t = (now % (long) periodMicros) / periodMicros;
@@ -242,7 +242,7 @@ public interface LEDPattern {
 
     return (reader, writer) -> {
       int bufLen = reader.getLength();
-      long now = WPIUtilJNI.now();
+      long now = RobotController.getTime();
 
       // every step in time that's a multiple of microsPerLED will increment the offset by 1
       var offset = now / microsPerLED;
@@ -271,7 +271,7 @@ public interface LEDPattern {
     final long onTimeMicros = (long) onTime.in(Microseconds);
 
     return (reader, writer) -> {
-      if (WPIUtilJNI.now() % totalTimeMicros < onTimeMicros) {
+      if (RobotController.getTime() % totalTimeMicros < onTimeMicros) {
         applyTo(reader, writer);
       } else {
         kOff.applyTo(reader, writer);
@@ -323,7 +323,7 @@ public interface LEDPattern {
           reader,
           (i, r, g, b) -> {
             // How far we are in the cycle, in the range [0, 1)
-            double t = (WPIUtilJNI.now() % periodMicros) / (double) periodMicros;
+            double t = (RobotController.getTime() % periodMicros) / (double) periodMicros;
             double phase = t * 2 * Math.PI;
 
             // Apply the cosine function and shift its output from [-1, 1] to [0, 1]

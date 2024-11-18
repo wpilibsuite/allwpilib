@@ -113,7 +113,7 @@ public class Alert implements AutoCloseable {
     }
 
     if (active) {
-      m_activeStartTime = RobotController.getFPGATime();
+      m_activeStartTime = RobotController.getTime();
       m_activeAlerts.add(new PublishedAlert(m_activeStartTime, m_text));
     } else {
       m_activeAlerts.remove(new PublishedAlert(m_activeStartTime, m_text));

@@ -167,6 +167,6 @@ public class Drivetrain {
     m_poseEstimator.addVisionMeasurement(
         ExampleGlobalMeasurementSensor.getEstimatedGlobalPose(
             m_poseEstimator.getEstimatedPosition()),
-        Timer.getFPGATimestamp() - 0.3);
+        Timer.getTimestamp() - 0.3);
   }
 }

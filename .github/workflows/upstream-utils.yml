@@ -35,101 +35,121 @@ jobs:
           cd upstream_utils
           ./apriltag.py clone
           ./apriltag.py copy-src
+          ./apriltag.py format-patch
       - name: Run argparse_lib.py
         run: |
           cd upstream_utils
           ./argparse_lib.py clone
           ./argparse_lib.py copy-src
+          ./argparse_lib.py format-patch
       - name: Run eigen.py
         run: |
           cd upstream_utils
           ./eigen.py clone
           ./eigen.py copy-src
+          ./eigen.py format-patch
       - name: Run expected.py
         run: |
           cd upstream_utils
           ./expected.py clone
           ./expected.py copy-src
+          ./expected.py format-patch
       - name: Run fmt.py
         run: |
           cd upstream_utils
           ./fmt.py clone
           ./fmt.py copy-src
+          ./fmt.py format-patch
       - name: Run gcem.py
         run: |
           cd upstream_utils
           ./gcem.py clone
           ./gcem.py copy-src
+          ./gcem.py format-patch
       - name: Run gl3w.py
         run: |
           cd upstream_utils
           ./gl3w.py clone
           ./gl3w.py copy-src
+          ./gl3w.py format-patch
       - name: Run glfw.py
         run: |
           cd upstream_utils
           ./glfw.py clone
           ./glfw.py copy-src
+          ./glfw.py format-patch
       - name: Run googletest.py
         run: |
           cd upstream_utils
           ./googletest.py clone
           ./googletest.py copy-src
+          ./googletest.py format-patch
       - name: Run imgui.py
         run: |
           cd upstream_utils
           ./imgui.py clone
           ./imgui.py copy-src
+          ./imgui.py format-patch
       - name: Run implot.py
         run: |
           cd upstream_utils
           ./implot.py clone
           ./implot.py copy-src
+          ./implot.py format-patch
       - name: Run json.py
         run: |
           cd upstream_utils
           ./json.py clone
           ./json.py copy-src
+          ./json.py format-patch
       - name: Run libuv.py
         run: |
           cd upstream_utils
           ./libuv.py clone
           ./libuv.py copy-src
+          ./libuv.py format-patch
       - name: Run llvm.py
         run: |
           cd upstream_utils
           ./llvm.py clone
           ./llvm.py copy-src
+          ./llvm.py format-patch
       - name: Run mpack.py
         run: |
           cd upstream_utils
           ./mpack.py clone
           ./mpack.py copy-src
+          ./mpack.py format-patch
       - name: Run stack_walker.py
         run: |
           cd upstream_utils
           ./stack_walker.py clone
           ./stack_walker.py copy-src
+          ./stack_walker.py format-patch
       - name: Run memory.py
         run: |
           cd upstream_utils
           ./memory.py clone
           ./memory.py copy-src
+          ./memory.py format-patch
       - name: Run protobuf.py
         run: |
           cd upstream_utils
           ./protobuf.py clone
           ./protobuf.py copy-src
+          ./protobuf.py format-patch
       - name: Run sleipnir.py
         run: |
           cd upstream_utils
           ./sleipnir.py clone
           ./sleipnir.py copy-src
+          ./sleipnir.py format-patch
       - name: Run stb.py
         run: |
           cd upstream_utils
           ./stb.py clone
           ./stb.py copy-src
+          ./stb.py format-patch
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output

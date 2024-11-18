@@ -678,7 +678,7 @@ void DriverStation::StartDataLog(wpi::log::DataLog& log, bool logJoysticks) {
 void ReportJoystickUnpluggedErrorV(fmt::string_view format,
                                    fmt::format_args args) {
   auto& inst = GetInstance();
-  auto currentTime = Timer::GetFPGATimestamp();
+  auto currentTime = Timer::GetTimestamp();
   if (currentTime > inst.nextMessageTime) {
     ReportErrorV(err::Error, "", 0, "", format, args);
     inst.nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
@@ -689,7 +689,7 @@ void ReportJoystickUnpluggedWarningV(fmt::string_view format,
                                      fmt::format_args args) {
   auto& inst = GetInstance();
   if (DriverStation::IsFMSAttached() || !inst.silenceJoystickWarning) {
-    auto currentTime = Timer::GetFPGATimestamp();
+    auto currentTime = Timer::GetTimestamp();
     if (currentTime > inst.nextMessageTime) {
       ReportErrorV(warn::Warning, "", 0, "", format, args);
       inst.nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;

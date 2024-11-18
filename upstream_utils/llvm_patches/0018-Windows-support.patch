@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
-Subject: [PATCH 18/38] Windows support
+Subject: [PATCH 18/36] Windows support
 
 ---
  .../llvm/Support/Windows/WindowsSupport.h     | 45 +++++----

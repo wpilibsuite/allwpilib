@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Fri, 1 Mar 2024 11:37:36 -0800
-Subject: [PATCH 34/38] Add back removed raw_string_ostream::write_impl()
+Subject: [PATCH 33/36] Add back removed raw_string_ostream::write_impl()
 
 ---
  llvm/lib/Support/raw_ostream.cpp | 8 ++++++++
