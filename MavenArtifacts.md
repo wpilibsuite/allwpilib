@@ -28,7 +28,7 @@ When we publish C++ only libraries, they are published with the base artifact na
 
 Example:
 ```
-edu.wpi.first.wpilibc:wpilibc-cpp:version:classifier@zip
+org.wpilib.wpilibc:wpilibc-cpp:version:classifier@zip
 ```
 
 #### Java Only Libraries
@@ -36,7 +36,7 @@ When we publish Java only libraries, they are published with the base artifact n
 
 Example:
 ```
-edu.wpi.first.wpilibj:wpilibj-java:version
+org.wpilib.wpilibj:wpilibj-java:version
 ```
 
 #### C++/Java Libraries without JNI
@@ -44,8 +44,8 @@ For libraries that are both C++ and Java, but without a JNI component, the C++ c
 
 Example:
 ```
-edu.wpi.first.wpiutil:wpiutil-cpp:version:classifier@zip (C++)
-edu.wpi.first.wpiutil:wpiutil-java:version (Java)
+org.wpilib.wpiutil:wpiutil-cpp:version:classifier@zip (C++)
+org.wpilib.wpiutil:wpiutil-java:version (Java)
 ```
 
 #### C++/Java Libraries with JNI
@@ -55,9 +55,9 @@ The `-jni` artifact should only be used in cases where you want to create a self
 
 Example:
 ```
-edu.wpi.first.ntcore:ntcore-cpp:version:classifier@zip (C++)
-edu.wpi.first.ntcore:ntcore-jni:version:classifier (JNI jar library)
-edu.wpi.first.ntcore:ntcore-java:version (Java)
+org.wpilib.ntcore:ntcore-cpp:version:classifier@zip (C++)
+org.wpilib.ntcore:ntcore-jni:version:classifier (JNI jar library)
+org.wpilib.ntcore:ntcore-java:version (Java)
 ```
 
 ## Provided Artifacts
@@ -65,7 +65,7 @@ This repository provides the following artifacts. Below each artifact is its dep
 
 For C++, if building with static dependencies, the listed order should be the link order in your linker.
 
-All artifacts are based at `edu.wpi.first.artifactname` in the repository.
+All artifacts are based at `org.wpilib.artifactname` in the repository.
 
 * wpiutil
 
@@ -155,7 +155,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
 
 This repository provides the builds of the following third party software.
 
-All artifacts are based at `edu.wpi.first.thirdparty.frcYEAR` in the repository.
+All artifacts are based at `org.wpilib.thirdparty.frcYEAR` in the repository.
 
 * apriltaglib
 * googletest

@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.shuffleboard;
+package org.wpilib.wpilibj.shuffleboard;
 
-import edu.wpi.first.cscore.VideoSource;
-import edu.wpi.first.networktables.NetworkTableType;
-import edu.wpi.first.util.function.FloatSupplier;
-import edu.wpi.first.util.sendable.Sendable;
+import org.wpilib.cscore.VideoSource;
+import org.wpilib.networktables.NetworkTableType;
+import org.wpilib.util.function.FloatSupplier;
+import org.wpilib.util.sendable.Sendable;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.BooleanSupplier;

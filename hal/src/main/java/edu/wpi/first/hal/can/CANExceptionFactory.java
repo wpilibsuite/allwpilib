@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.hal.can;
+package org.wpilib.hal.can;
 
-import edu.wpi.first.hal.communication.NIRioStatus;
-import edu.wpi.first.hal.util.UncleanStatusException;
+import org.wpilib.hal.communication.NIRioStatus;
+import org.wpilib.hal.util.UncleanStatusException;
 
 /**
  * Checks the status of a CAN message and throws an exception of the appropriate type if necessary.

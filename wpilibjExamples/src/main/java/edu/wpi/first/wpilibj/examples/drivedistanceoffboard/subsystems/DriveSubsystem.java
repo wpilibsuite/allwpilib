@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.drivedistanceoffboard.subsystems;
+package org.wpilib.wpilibj.examples.drivedistanceoffboard.subsystems;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.MetersPerSecond;
+import static org.wpilib.units.Units.Volts;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
-import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.ExampleSmartMotorController;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.math.trajectory.TrapezoidProfile.State;
+import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.wpilibj.RobotController;
+import org.wpilib.wpilibj.Timer;
+import org.wpilib.wpilibj.drive.DifferentialDrive;
+import org.wpilib.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
+import org.wpilib.wpilibj.examples.drivedistanceoffboard.ExampleSmartMotorController;
+import org.wpilib.wpilibj2.command.Command;
+import org.wpilib.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.

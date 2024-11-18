@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
-import static edu.wpi.first.units.Units.Seconds;
+import static org.wpilib.units.Units.Seconds;
 
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.NotifierJNI;
-import edu.wpi.first.units.measure.Time;
+import org.wpilib.hal.DriverStationJNI;
+import org.wpilib.hal.FRCNetComm.tInstances;
+import org.wpilib.hal.FRCNetComm.tResourceType;
+import org.wpilib.hal.HAL;
+import org.wpilib.hal.NotifierJNI;
+import org.wpilib.units.measure.Time;
 import java.util.PriorityQueue;
 
 /**

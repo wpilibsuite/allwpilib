@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.mechanism2d;
+package org.wpilib.wpilibj.examples.mechanism2d;
 
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
+import org.wpilib.wpilibj.AnalogPotentiometer;
+import org.wpilib.wpilibj.Encoder;
+import org.wpilib.wpilibj.Joystick;
+import org.wpilib.wpilibj.TimedRobot;
+import org.wpilib.wpilibj.motorcontrol.PWMSparkMax;
+import org.wpilib.wpilibj.smartdashboard.Mechanism2d;
+import org.wpilib.wpilibj.smartdashboard.MechanismLigament2d;
+import org.wpilib.wpilibj.smartdashboard.MechanismRoot2d;
+import org.wpilib.wpilibj.smartdashboard.SmartDashboard;
+import org.wpilib.wpilibj.util.Color;
+import org.wpilib.wpilibj.util.Color8Bit;
 
 /**
  * This sample program shows how to use Mechanism2d - a visual representation of arms, elevators,

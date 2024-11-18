@@ -2,25 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
-import edu.wpi.first.hal.AllianceStationID;
-import edu.wpi.first.hal.ControlWord;
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.MatchInfoData;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.IntegerPublisher;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.networktables.StringTopic;
-import edu.wpi.first.util.EventVector;
-import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.util.datalog.BooleanArrayLogEntry;
-import edu.wpi.first.util.datalog.BooleanLogEntry;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.FloatArrayLogEntry;
-import edu.wpi.first.util.datalog.IntegerArrayLogEntry;
+import org.wpilib.hal.AllianceStationID;
+import org.wpilib.hal.ControlWord;
+import org.wpilib.hal.DriverStationJNI;
+import org.wpilib.hal.HAL;
+import org.wpilib.hal.MatchInfoData;
+import org.wpilib.networktables.BooleanPublisher;
+import org.wpilib.networktables.IntegerPublisher;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.StringPublisher;
+import org.wpilib.networktables.StringTopic;
+import org.wpilib.util.EventVector;
+import org.wpilib.util.WPIUtilJNI;
+import org.wpilib.util.datalog.BooleanArrayLogEntry;
+import org.wpilib.util.datalog.BooleanLogEntry;
+import org.wpilib.util.datalog.DataLog;
+import org.wpilib.util.datalog.FloatArrayLogEntry;
+import org.wpilib.util.datalog.IntegerArrayLogEntry;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Optional;

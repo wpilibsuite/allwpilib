@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.motorcontrol;
+package org.wpilib.wpilibj.motorcontrol;
 
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.MotorSafety;
-import edu.wpi.first.wpilibj.PWM;
-import edu.wpi.first.wpilibj.RobotController;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.wpilibj.MotorSafety;
+import org.wpilib.wpilibj.PWM;
+import org.wpilib.wpilibj.RobotController;
 import java.util.ArrayList;
 
 /** Common base class for all PWM Motor Controllers. */
@@ -67,7 +67,7 @@ public abstract class PWMMotorController extends MotorSafety
   /**
    * Get the recently set value of the PWM. This value is affected by the inversion property. If you
    * want the value that is sent directly to the MotorController, use {@link
-   * edu.wpi.first.wpilibj.PWM#getSpeed()} instead.
+   * org.wpilib.wpilibj.PWM#getSpeed()} instead.
    *
    * @return The most recently set value for the PWM between -1.0 and 1.0.
    */

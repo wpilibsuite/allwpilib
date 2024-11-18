@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.test;
+package org.wpilib.wpilibj.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 
-import edu.wpi.first.wpilibj.test.AbstractTestSuite.ClassMethodPair;
+import org.wpilib.wpilibj.test.AbstractTestSuite.ClassMethodPair;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Ignore;

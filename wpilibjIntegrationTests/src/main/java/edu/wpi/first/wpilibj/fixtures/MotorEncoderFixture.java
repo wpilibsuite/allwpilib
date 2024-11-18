@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.fixtures;
+package org.wpilib.wpilibj.fixtures;
 
-import edu.wpi.first.wpilibj.Counter;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWM;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.test.TestBench;
+import org.wpilib.wpilibj.Counter;
+import org.wpilib.wpilibj.DigitalInput;
+import org.wpilib.wpilibj.Encoder;
+import org.wpilib.wpilibj.PWM;
+import org.wpilib.wpilibj.Timer;
+import org.wpilib.wpilibj.motorcontrol.MotorController;
+import org.wpilib.wpilibj.test.TestBench;
 import java.lang.reflect.ParameterizedType;
 import java.util.logging.Logger;
 

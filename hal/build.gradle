@@ -9,7 +9,7 @@ ext {
 
     nativeName = 'hal'
     setBaseName = 'wpiHal'
-    devMain = 'edu.wpi.first.hal.DevMain'
+    devMain = 'org.wpilib.hal.DevMain'
     niLibraries = true
     generatedHeaders = "src/generated/main/native/include"
     splitSetup = {

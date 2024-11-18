@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.kinematics;
+package org.wpilib.math.kinematics;
 
-import static edu.wpi.first.units.Units.Meters;
+import static org.wpilib.units.Units.Meters;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.kinematics.proto.DifferentialDriveWheelPositionsProto;
-import edu.wpi.first.math.kinematics.struct.DifferentialDriveWheelPositionsStruct;
-import edu.wpi.first.units.measure.Distance;
+import org.wpilib.math.MathUtil;
+import org.wpilib.math.interpolation.Interpolatable;
+import org.wpilib.math.kinematics.proto.DifferentialDriveWheelPositionsProto;
+import org.wpilib.math.kinematics.struct.DifferentialDriveWheelPositionsStruct;
+import org.wpilib.units.measure.Distance;
 import java.util.Objects;
 
 /** Represents the wheel positions for a differential drive drivetrain. */

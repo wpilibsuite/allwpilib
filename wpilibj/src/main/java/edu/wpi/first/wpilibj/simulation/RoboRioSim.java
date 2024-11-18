@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.wpilibj.simulation;
 
-import edu.wpi.first.hal.simulation.NotifyCallback;
-import edu.wpi.first.hal.simulation.RoboRioDataJNI;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.RobotController.RadioLEDState;
+import org.wpilib.hal.simulation.NotifyCallback;
+import org.wpilib.hal.simulation.RoboRioDataJNI;
+import org.wpilib.wpilibj.RobotController;
+import org.wpilib.wpilibj.RobotController.RadioLEDState;
 
 /** A utility class to control a simulated RoboRIO. */
 public final class RoboRioSim {

@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import edu.wpi.first.units.measure.ImmutablePer;
-import edu.wpi.first.units.measure.MutPer;
-import edu.wpi.first.units.measure.Per;
+import org.wpilib.units.measure.ImmutablePer;
+import org.wpilib.units.measure.MutPer;
+import org.wpilib.units.measure.Per;
 import java.util.Objects;
 
 /**
@@ -159,7 +159,7 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
    * {@inheritDoc}
    *
    * <p>Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
-   * method will always return a {@link edu.wpi.first.units.measure.Per} instance. If you want to
+   * method will always return a {@link org.wpilib.units.measure.Per} instance. If you want to
    * avoid casting, use {@link #ofNative(double)} that returns a {@code Per} instance directly.
    *
    * @param magnitude the magnitude of the measure
@@ -174,7 +174,7 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
    * {@inheritDoc}
    *
    * <p>Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
-   * method will always return a {@link edu.wpi.first.units.measure.Per} instance. If you want to
+   * method will always return a {@link org.wpilib.units.measure.Per} instance. If you want to
    * avoid casting, use {@link #ofNativeBaseUnits(double)} that returns a {@code Per} instance
    * directly.
    *
@@ -226,7 +226,7 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
    * {@inheritDoc}
    *
    * <p>Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
-   * method will always return a {@link edu.wpi.first.units.measure.MutPer} instance.
+   * method will always return a {@link org.wpilib.units.measure.MutPer} instance.
    *
    * @param initialMagnitude the starting magnitude of the measure
    * @return the ratio measure

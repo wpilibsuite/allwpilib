@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.hal;
+package org.wpilib.wpilibj.hal;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.MatchInfoData;
-import edu.wpi.first.hal.simulation.DriverStationDataJNI;
-import edu.wpi.first.wpilibj.DriverStation.MatchType;
+import org.wpilib.hal.DriverStationJNI;
+import org.wpilib.hal.MatchInfoData;
+import org.wpilib.hal.simulation.DriverStationDataJNI;
+import org.wpilib.wpilibj.DriverStation.MatchType;
 import org.junit.jupiter.api.Test;
 
 class MatchInfoDataTest {

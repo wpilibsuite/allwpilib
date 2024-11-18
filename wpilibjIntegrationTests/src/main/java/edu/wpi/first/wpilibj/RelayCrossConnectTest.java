@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Relay.Direction;
-import edu.wpi.first.wpilibj.Relay.InvalidValueException;
-import edu.wpi.first.wpilibj.Relay.Value;
-import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFixture;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-import edu.wpi.first.wpilibj.test.TestBench;
+import org.wpilib.networktables.NetworkTable;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.wpilibj.Relay.Direction;
+import org.wpilib.wpilibj.Relay.InvalidValueException;
+import org.wpilib.wpilibj.Relay.Value;
+import org.wpilib.wpilibj.fixtures.RelayCrossConnectFixture;
+import org.wpilib.wpilibj.smartdashboard.SendableBuilderImpl;
+import org.wpilib.wpilibj.test.AbstractComsSetup;
+import org.wpilib.wpilibj.test.TestBench;
 import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.Before;

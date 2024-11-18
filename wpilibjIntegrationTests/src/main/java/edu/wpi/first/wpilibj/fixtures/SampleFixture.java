@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.fixtures;
+package org.wpilib.wpilibj.fixtures;
 
 /**
  * This is an example of how to use the {@link ITestFixture} interface to create test fixtures for a

@@ -1,6 +1,6 @@
 ext {
     nativeName = 'wpilibNewCommands'
-    devMain = 'edu.wpi.first.wpilibj2.commands.DevMain'
+    devMain = 'org.wpilib.wpilibj2.commands.DevMain'
 }
 
 evaluationDependsOn(':ntcore')

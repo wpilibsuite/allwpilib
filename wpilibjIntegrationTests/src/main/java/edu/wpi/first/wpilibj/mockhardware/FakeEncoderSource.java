@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.mockhardware;
+package org.wpilib.wpilibj.mockhardware;
 
-import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.Timer;
+import org.wpilib.wpilibj.DigitalOutput;
+import org.wpilib.wpilibj.Timer;
 
 /** Emulates a quadrature encoder. */
 public class FakeEncoderSource implements AutoCloseable {

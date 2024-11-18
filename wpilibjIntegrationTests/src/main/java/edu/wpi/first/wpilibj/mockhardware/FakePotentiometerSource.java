@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.mockhardware;
+package org.wpilib.wpilibj.mockhardware;
 
-import edu.wpi.first.wpilibj.AnalogOutput;
+import org.wpilib.wpilibj.AnalogOutput;
 
-/** A fake source to provide output to a {@link edu.wpi.first.wpilibj.interfaces.Potentiometer}. */
+/** A fake source to provide output to a {@link org.wpilib.wpilibj.interfaces.Potentiometer}. */
 public class FakePotentiometerSource implements AutoCloseable {
   private AnalogOutput m_output;
   private boolean m_initOutput;

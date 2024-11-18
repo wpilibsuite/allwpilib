@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.shuffleboard;
+package org.wpilib.wpilibj.shuffleboard;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.PubSubOption;
-import edu.wpi.first.networktables.StringPublisher;
+import org.wpilib.hal.FRCNetComm.tResourceType;
+import org.wpilib.hal.HAL;
+import org.wpilib.networktables.NetworkTable;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.PubSubOption;
+import org.wpilib.networktables.StringPublisher;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;

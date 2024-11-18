@@ -2,28 +2,28 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.swervecontrollercommand;
+package org.wpilib.wpilibj.examples.swervecontrollercommand;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants;
-import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.DriveConstants;
-import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants;
-import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.OIConstants;
-import edu.wpi.first.wpilibj.examples.swervecontrollercommand.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.trajectory.Trajectory;
+import org.wpilib.math.trajectory.TrajectoryConfig;
+import org.wpilib.math.trajectory.TrajectoryGenerator;
+import org.wpilib.wpilibj.XboxController;
+import org.wpilib.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants;
+import org.wpilib.wpilibj.examples.swervecontrollercommand.Constants.DriveConstants;
+import org.wpilib.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants;
+import org.wpilib.wpilibj.examples.swervecontrollercommand.Constants.OIConstants;
+import org.wpilib.wpilibj.examples.swervecontrollercommand.subsystems.DriveSubsystem;
+import org.wpilib.wpilibj2.command.Command;
+import org.wpilib.wpilibj2.command.Commands;
+import org.wpilib.wpilibj2.command.InstantCommand;
+import org.wpilib.wpilibj2.command.RunCommand;
+import org.wpilib.wpilibj2.command.SwerveControllerCommand;
+import org.wpilib.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 
 /*
@@ -64,8 +64,8 @@ public class RobotContainer {
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
+   * instantiating a {@link org.wpilib.wpilibj.GenericHID} or one of its subclasses ({@link
+   * org.wpilib.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {}

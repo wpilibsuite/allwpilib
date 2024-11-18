@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
-import edu.wpi.first.hal.AccumulatorResult;
-import edu.wpi.first.hal.AnalogJNI;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.hal.util.AllocationException;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import org.wpilib.hal.AccumulatorResult;
+import org.wpilib.hal.AnalogJNI;
+import org.wpilib.hal.FRCNetComm.tResourceType;
+import org.wpilib.hal.HAL;
+import org.wpilib.hal.SimDevice;
+import org.wpilib.hal.util.AllocationException;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * Analog channel class.

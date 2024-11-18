@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.trajectory;
+package org.wpilib.math.trajectory;
 
-import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.PerUnit;
-import edu.wpi.first.units.TimeUnit;
-import edu.wpi.first.units.Unit;
+import org.wpilib.math.MathSharedStore;
+import org.wpilib.math.MathUsageId;
+import org.wpilib.units.Measure;
+import org.wpilib.units.PerUnit;
+import org.wpilib.units.TimeUnit;
+import org.wpilib.units.Unit;
 import java.util.Objects;
 
 /**

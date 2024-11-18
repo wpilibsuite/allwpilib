@@ -1,7 +1,7 @@
 apply plugin: 'cpp'
 apply plugin: 'google-test-test-suite'
 apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 apply plugin: SingleNativeBuild
 apply plugin: ExtraTasks
 
@@ -9,7 +9,7 @@ apply from: "${rootDir}/shared/config.gradle"
 
 ext {
     baseId = nativeName
-    groupId = "edu.wpi.first.${nativeName}"
+    groupId = "org.wpilib.${nativeName}"
 }
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"

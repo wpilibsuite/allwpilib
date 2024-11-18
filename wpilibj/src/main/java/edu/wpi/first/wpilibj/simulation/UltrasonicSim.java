@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.wpilibj.simulation;
 
-import edu.wpi.first.hal.SimBoolean;
-import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Ultrasonic;
+import org.wpilib.hal.SimBoolean;
+import org.wpilib.hal.SimDouble;
+import org.wpilib.math.util.Units;
+import org.wpilib.wpilibj.Ultrasonic;
 
-/** Class to control a simulated {@link edu.wpi.first.wpilibj.Ultrasonic}. */
+/** Class to control a simulated {@link org.wpilib.wpilibj.Ultrasonic}. */
 public class UltrasonicSim {
   private final SimBoolean m_simRangeValid;
   private final SimDouble m_simRange;

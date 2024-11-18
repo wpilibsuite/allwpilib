@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import edu.wpi.first.units.measure.ImmutableMomentOfInertia;
-import edu.wpi.first.units.measure.MomentOfInertia;
-import edu.wpi.first.units.measure.MutMomentOfInertia;
+import org.wpilib.units.measure.ImmutableMomentOfInertia;
+import org.wpilib.units.measure.MomentOfInertia;
+import org.wpilib.units.measure.MutMomentOfInertia;
 
 /**
- * A unit of moment of inertia, like {@link edu.wpi.first.units.Units#KilogramSquareMeters}. Moments
+ * A unit of moment of inertia, like {@link org.wpilib.units.Units#KilogramSquareMeters}. Moments
  * of inertia describe how much an object resists being rotated, analogous to mass's resistance to
  * being accelerated along a line.
  */

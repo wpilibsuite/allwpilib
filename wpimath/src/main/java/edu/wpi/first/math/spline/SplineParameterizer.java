@@ -26,7 +26,7 @@
  * SOFTWARE.
  */
 
-package edu.wpi.first.math.spline;
+package org.wpilib.math.spline;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

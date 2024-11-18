@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.digitalcommunication;
+package org.wpilib.wpilibj.examples.digitalcommunication;
 
-import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.wpilibj.DigitalOutput;
+import org.wpilib.wpilibj.DriverStation;
+import org.wpilib.wpilibj.TimedRobot;
 import java.util.Optional;
 
 /**

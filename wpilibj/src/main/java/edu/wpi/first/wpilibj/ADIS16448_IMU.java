@@ -11,16 +11,16 @@
 /* Modified by Juan Chong - frcsupport@analog.com                             */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.SimBoolean;
-import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
+import org.wpilib.hal.FRCNetComm.tResourceType;
+import org.wpilib.hal.HAL;
+import org.wpilib.hal.SimBoolean;
+import org.wpilib.hal.SimDevice;
+import org.wpilib.hal.SimDouble;
+import org.wpilib.math.MathUtil;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
 
 // CHECKSTYLE.OFF: TypeName
 // CHECKSTYLE.OFF: MemberName

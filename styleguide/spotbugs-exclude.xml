@@ -5,11 +5,11 @@
   </Match>
   <Match>
     <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
-    <Class name="edu.wpi.first.wpilibj.test.TestSuite" />
+    <Class name="org.wpilib.wpilibj.test.TestSuite" />
   </Match>
   <Match>
     <Bug pattern="DE_MIGHT_IGNORE" />
-    <Class name="edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl$Property" />
+    <Class name="org.wpilib.wpilibj.smartdashboard.SendableBuilderImpl$Property" />
   </Match>
   <Match>
     <Bug pattern="DM_DEFAULT_ENCODING" />
@@ -22,7 +22,7 @@
   </Match>
   <Match>
     <Bug pattern="EC_BAD_ARRAY_COMPARE" />
-    <Class name="edu.wpi.first.math.estimator.SwerveDrivePoseEstimator$InterpolationRecord" />
+    <Class name="org.wpilib.math.estimator.SwerveDrivePoseEstimator$InterpolationRecord" />
   </Match>
   <Match>
     <Bug pattern="EI_EXPOSE_REP" />
@@ -39,7 +39,7 @@
   </Match>
   <Match>
     <Bug pattern="MS_CANNOT_BE_FINAL" />
-    <Class name="edu.wpi.first.wpilibj.examples.pacgoat.Robot" />
+    <Class name="org.wpilib.wpilibj.examples.pacgoat.Robot" />
   </Match>
   <Match>
     <Bug pattern="MS_EXPOSE_REP" />
@@ -108,35 +108,35 @@
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.romitimed.Robot" />
+    <Class name="org.wpilib.wpilibj.templates.romitimed.Robot" />
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.xrptimed.Robot" />
+    <Class name="org.wpilib.wpilibj.templates.xrptimed.Robot" />
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timed.Robot" />
+    <Class name="org.wpilib.wpilibj.templates.timed.Robot" />
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timeslice.Robot" />
+    <Class name="org.wpilib.wpilibj.templates.timeslice.Robot" />
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timesliceskeleton.Robot" />
+    <Class name="org.wpilib.wpilibj.templates.timesliceskeleton.Robot" />
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_FIELD" />
-    <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
+    <Class name="org.wpilib.wpilibj.ADIS16448_IMU" />
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_FIELD" />
-    <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
+    <Class name="org.wpilib.wpilibj.ADIS16470_IMU" />
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_FIELD" />
-    <Class name="edu.wpi.first.wpilibj.AnalogTrigger" />
+    <Class name="org.wpilib.wpilibj.AnalogTrigger" />
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
@@ -149,7 +149,7 @@
   </Match>
   <Match>
     <Bug pattern="RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED" />
-    <Class name="edu.wpi.first.networktables.NetworkTableInstance" />
+    <Class name="org.wpilib.networktables.NetworkTableInstance" />
   </Match>
   <!--
   Strict reading of Object.equals() contract means that whenever equals() behaviour is defined, all implementations
@@ -162,6 +162,6 @@
   </Match>
   <Match>
     <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
-    <Class name="edu.wpi.first.epilogue.EpilogueConfiguration" />
+    <Class name="org.wpilib.epilogue.EpilogueConfiguration" />
   </Match>
 </FindBugsFilter>

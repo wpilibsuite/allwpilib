@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import edu.wpi.first.units.measure.Force;
-import edu.wpi.first.units.measure.ImmutableForce;
-import edu.wpi.first.units.measure.MutForce;
+import org.wpilib.units.measure.Force;
+import org.wpilib.units.measure.ImmutableForce;
+import org.wpilib.units.measure.MutForce;
 
 /** A unit of force like {@link Units#Newtons}. */
 public final class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> {

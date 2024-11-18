@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.templates.commandbased;
+package org.wpilib.wpilibj.templates.commandbased;
 
-import edu.wpi.first.wpilibj.templates.commandbased.Constants.OperatorConstants;
-import edu.wpi.first.wpilibj.templates.commandbased.commands.Autos;
-import edu.wpi.first.wpilibj.templates.commandbased.commands.ExampleCommand;
-import edu.wpi.first.wpilibj.templates.commandbased.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import org.wpilib.wpilibj.templates.commandbased.Constants.OperatorConstants;
+import org.wpilib.wpilibj.templates.commandbased.commands.Autos;
+import org.wpilib.wpilibj.templates.commandbased.commands.ExampleCommand;
+import org.wpilib.wpilibj.templates.commandbased.subsystems.ExampleSubsystem;
+import org.wpilib.wpilibj2.command.Command;
+import org.wpilib.wpilibj2.command.button.CommandXboxController;
+import org.wpilib.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,9 +36,9 @@ public class RobotContainer {
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
    * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+   * org.wpilib.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
+   * CommandXboxController Xbox}/{@link org.wpilib.wpilibj2.command.button.CommandPS4Controller
+   * PS4} controllers or {@link org.wpilib.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
   private void configureBindings() {

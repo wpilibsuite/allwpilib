@@ -9,7 +9,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>OutlineViewer</string>
 	<key>CFBundleIdentifier</key>
-	<string>edu.wpi.first.tools.OutlineViewer</string>
+	<string>org.wpilib.tools.OutlineViewer</string>
 	<key>CFBundleIconFile</key>
 	<string>ov.icns</string>
 	<key>CFBundlePackageType</key>

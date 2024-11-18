@@ -2,23 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
-import edu.wpi.first.cameraserver.CameraServerShared;
-import edu.wpi.first.cameraserver.CameraServerSharedStore;
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.HALUtil;
-import edu.wpi.first.math.MathShared;
-import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
-import edu.wpi.first.networktables.MultiSubscriber;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.util.WPILibVersion;
+import org.wpilib.cameraserver.CameraServerShared;
+import org.wpilib.cameraserver.CameraServerSharedStore;
+import org.wpilib.hal.FRCNetComm.tInstances;
+import org.wpilib.hal.FRCNetComm.tResourceType;
+import org.wpilib.hal.HAL;
+import org.wpilib.hal.HALUtil;
+import org.wpilib.math.MathShared;
+import org.wpilib.math.MathSharedStore;
+import org.wpilib.math.MathUsageId;
+import org.wpilib.networktables.MultiSubscriber;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.util.WPIUtilJNI;
+import org.wpilib.wpilibj.livewindow.LiveWindow;
+import org.wpilib.wpilibj.shuffleboard.Shuffleboard;
+import org.wpilib.wpilibj.util.WPILibVersion;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;

@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.wpilibj.simulation;
 
-import edu.wpi.first.hal.simulation.AccelerometerDataJNI;
-import edu.wpi.first.hal.simulation.NotifyCallback;
-import edu.wpi.first.wpilibj.BuiltInAccelerometer;
+import org.wpilib.hal.simulation.AccelerometerDataJNI;
+import org.wpilib.hal.simulation.NotifyCallback;
+import org.wpilib.wpilibj.BuiltInAccelerometer;
 
 /** Class to control a simulated built-in accelerometer. */
 public class BuiltInAccelerometerSim {

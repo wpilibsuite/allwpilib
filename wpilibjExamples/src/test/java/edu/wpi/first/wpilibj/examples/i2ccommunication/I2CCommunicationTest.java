@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.i2ccommunication;
+package org.wpilib.wpilibj.examples.i2ccommunication;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.hal.AllianceStationID;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.simulation.CallbackStore;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-import edu.wpi.first.wpilibj.simulation.I2CSim;
-import edu.wpi.first.wpilibj.simulation.SimHooks;
+import org.wpilib.hal.AllianceStationID;
+import org.wpilib.hal.HAL;
+import org.wpilib.wpilibj.DriverStation;
+import org.wpilib.wpilibj.simulation.CallbackStore;
+import org.wpilib.wpilibj.simulation.DriverStationSim;
+import org.wpilib.wpilibj.simulation.I2CSim;
+import org.wpilib.wpilibj.simulation.SimHooks;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.AfterEach;

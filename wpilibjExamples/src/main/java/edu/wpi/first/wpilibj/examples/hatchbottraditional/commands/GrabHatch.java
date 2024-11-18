@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.hatchbottraditional.commands;
+package org.wpilib.wpilibj.examples.hatchbottraditional.commands;
 
-import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.HatchSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
+import org.wpilib.wpilibj.examples.hatchbottraditional.subsystems.HatchSubsystem;
+import org.wpilib.wpilibj2.command.Command;
 
 /**
  * A simple command that grabs a hatch with the {@link HatchSubsystem}. Written explicitly for
  * pedagogical purposes. Actual code should inline a command this simple with {@link
- * edu.wpi.first.wpilibj2.command.InstantCommand}.
+ * org.wpilib.wpilibj2.command.InstantCommand}.
  */
 public class GrabHatch extends Command {
   // The subsystem the command runs on

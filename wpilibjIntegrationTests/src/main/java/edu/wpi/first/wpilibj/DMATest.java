@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
-import edu.wpi.first.wpilibj.motorcontrol.Jaguar;
-import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-import edu.wpi.first.wpilibj.test.TestBench;
+import org.wpilib.math.util.Units;
+import org.wpilib.wpilibj.fixtures.AnalogCrossConnectFixture;
+import org.wpilib.wpilibj.motorcontrol.Jaguar;
+import org.wpilib.wpilibj.motorcontrol.PWMMotorController;
+import org.wpilib.wpilibj.test.AbstractComsSetup;
+import org.wpilib.wpilibj.test.TestBench;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;

@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.spline;
+package org.wpilib.math.spline;
 
-import edu.wpi.first.math.spline.proto.CubicHermiteSplineProto;
-import edu.wpi.first.math.spline.struct.CubicHermiteSplineStruct;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import edu.wpi.first.util.struct.StructSerializable;
+import org.wpilib.math.spline.proto.CubicHermiteSplineProto;
+import org.wpilib.math.spline.struct.CubicHermiteSplineStruct;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.StructSerializable;
 import org.ejml.simple.SimpleMatrix;
 
 /** Represents a hermite spline of degree 3. */

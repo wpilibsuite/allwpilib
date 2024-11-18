@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.fixtures;
+package org.wpilib.wpilibj.fixtures;
 
-import edu.wpi.first.wpilibj.Counter;
-import edu.wpi.first.wpilibj.mockhardware.FakeCounterSource;
+import org.wpilib.wpilibj.Counter;
+import org.wpilib.wpilibj.mockhardware.FakeCounterSource;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,7 +64,7 @@ public class FakeCounterFixture implements ITestFixture {
   /*
    * (non-Javadoc)
    *
-   * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#setup()
+   * @see org.wpilib.wpilibj.fixtures.ITestFixture#setup()
    */
   @Override
   public void setup() {}
@@ -72,7 +72,7 @@ public class FakeCounterFixture implements ITestFixture {
   /*
    * (non-Javadoc)
    *
-   * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#reset()
+   * @see org.wpilib.wpilibj.fixtures.ITestFixture#reset()
    */
   @Override
   public void reset() {
@@ -82,7 +82,7 @@ public class FakeCounterFixture implements ITestFixture {
   /*
    * (non-Javadoc)
    *
-   * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#teardown()
+   * @see org.wpilib.wpilibj.fixtures.ITestFixture#teardown()
    */
   @Override
   public void teardown() {

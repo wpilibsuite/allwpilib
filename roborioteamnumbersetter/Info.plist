@@ -9,7 +9,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>roboRIOTeamNumberSetter</string>
 	<key>CFBundleIdentifier</key>
-	<string>edu.wpi.first.tools.roboRIOTeamNumberSetter</string>
+	<string>org.wpilib.tools.roboRIOTeamNumberSetter</string>
 	<key>CFBundleIconFile</key>
 	<string>rtns.icns</string>
 	<key>CFBundlePackageType</key>

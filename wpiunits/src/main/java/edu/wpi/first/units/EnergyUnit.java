@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import edu.wpi.first.units.measure.Energy;
-import edu.wpi.first.units.measure.ImmutableEnergy;
-import edu.wpi.first.units.measure.MutEnergy;
+import org.wpilib.units.measure.Energy;
+import org.wpilib.units.measure.ImmutableEnergy;
+import org.wpilib.units.measure.MutEnergy;
 
 /**
  * Unit of energy dimension.

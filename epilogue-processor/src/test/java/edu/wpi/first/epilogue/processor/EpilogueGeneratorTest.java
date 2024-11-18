@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.epilogue.processor;
+package org.wpilib.epilogue.processor;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
-import static edu.wpi.first.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
+import static org.wpilib.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.testing.compile.Compilation;
@@ -20,7 +20,7 @@ class EpilogueGeneratorTest {
   void noFields() {
     String source =
         """
-          package edu.wpi.first.epilogue;
+          package org.wpilib.epilogue;
 
           @Logged
           class Example {
@@ -29,11 +29,11 @@ class EpilogueGeneratorTest {
 
     String expected =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import static edu.wpi.first.units.Units.Seconds;
+        import static org.wpilib.units.Units.Seconds;
 
-        import edu.wpi.first.epilogue.ExampleLogger;
+        import org.wpilib.epilogue.ExampleLogger;
 
         public final class Epilogue {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -65,10 +65,10 @@ class EpilogueGeneratorTest {
   void robotBase() {
     String source =
         """
-          package edu.wpi.first.epilogue;
+          package org.wpilib.epilogue;
 
           @Logged
-          class Example extends edu.wpi.first.wpilibj.RobotBase {
+          class Example extends org.wpilib.wpilibj.RobotBase {
             @Override
             public void startCompetition() {}
             @Override
@@ -78,11 +78,11 @@ class EpilogueGeneratorTest {
 
     String expected =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import static edu.wpi.first.units.Units.Seconds;
+        import static org.wpilib.units.Units.Seconds;
 
-        import edu.wpi.first.epilogue.ExampleLogger;
+        import org.wpilib.epilogue.ExampleLogger;
 
         public final class Epilogue {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -113,20 +113,20 @@ class EpilogueGeneratorTest {
   void timedRobot() {
     String source =
         """
-          package edu.wpi.first.epilogue;
+          package org.wpilib.epilogue;
 
           @Logged
-          class Example extends edu.wpi.first.wpilibj.TimedRobot {
+          class Example extends org.wpilib.wpilibj.TimedRobot {
           }
           """;
 
     String expected =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import static edu.wpi.first.units.Units.Seconds;
+        import static org.wpilib.units.Units.Seconds;
 
-        import edu.wpi.first.epilogue.ExampleLogger;
+        import org.wpilib.epilogue.ExampleLogger;
 
         public final class Epilogue {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -153,7 +153,7 @@ class EpilogueGeneratorTest {
            * new values. Alternatively, {@code bind()} can be used to update at an offset from
            * the main robot loop.
            */
-          public static void update(edu.wpi.first.epilogue.Example robot) {
+          public static void update(org.wpilib.epilogue.Example robot) {
             long start = System.nanoTime();
             exampleLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
             config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
@@ -167,7 +167,7 @@ class EpilogueGeneratorTest {
            * directly from sensors will be slightly different from data used in the main robot
            * loop.
            */
-          public static void bind(edu.wpi.first.epilogue.Example robot) {
+          public static void bind(org.wpilib.epilogue.Example robot) {
             if (config.loggingPeriod == null) {
               config.loggingPeriod = Seconds.of(robot.getPeriod());
             }
@@ -189,23 +189,23 @@ class EpilogueGeneratorTest {
   void multipleRobots() {
     String source =
         """
-          package edu.wpi.first.epilogue;
+          package org.wpilib.epilogue;
 
           @Logged
-          class AlphaBot extends edu.wpi.first.wpilibj.TimedRobot { }
+          class AlphaBot extends org.wpilib.wpilibj.TimedRobot { }
 
           @Logged
-          class BetaBot extends edu.wpi.first.wpilibj.TimedRobot { }
+          class BetaBot extends org.wpilib.wpilibj.TimedRobot { }
           """;
 
     String expected =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import static edu.wpi.first.units.Units.Seconds;
+        import static org.wpilib.units.Units.Seconds;
 
-        import edu.wpi.first.epilogue.AlphaBotLogger;
-        import edu.wpi.first.epilogue.BetaBotLogger;
+        import org.wpilib.epilogue.AlphaBotLogger;
+        import org.wpilib.epilogue.BetaBotLogger;
 
         public final class Epilogue {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -233,7 +233,7 @@ class EpilogueGeneratorTest {
            * new values. Alternatively, {@code bind()} can be used to update at an offset from
            * the main robot loop.
            */
-          public static void update(edu.wpi.first.epilogue.AlphaBot robot) {
+          public static void update(org.wpilib.epilogue.AlphaBot robot) {
             long start = System.nanoTime();
             alphaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
             config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
@@ -247,7 +247,7 @@ class EpilogueGeneratorTest {
            * directly from sensors will be slightly different from data used in the main robot
            * loop.
            */
-          public static void bind(edu.wpi.first.epilogue.AlphaBot robot) {
+          public static void bind(org.wpilib.epilogue.AlphaBot robot) {
             if (config.loggingPeriod == null) {
               config.loggingPeriod = Seconds.of(robot.getPeriod());
             }
@@ -265,7 +265,7 @@ class EpilogueGeneratorTest {
            * new values. Alternatively, {@code bind()} can be used to update at an offset from
            * the main robot loop.
            */
-          public static void update(edu.wpi.first.epilogue.BetaBot robot) {
+          public static void update(org.wpilib.epilogue.BetaBot robot) {
             long start = System.nanoTime();
             betaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
             config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
@@ -279,7 +279,7 @@ class EpilogueGeneratorTest {
            * directly from sensors will be slightly different from data used in the main robot
            * loop.
            */
-          public static void bind(edu.wpi.first.epilogue.BetaBot robot) {
+          public static void bind(org.wpilib.epilogue.BetaBot robot) {
             if (config.loggingPeriod == null) {
               config.loggingPeriod = Seconds.of(robot.getPeriod());
             }
@@ -301,9 +301,9 @@ class EpilogueGeneratorTest {
   void genericCustomLogger() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.logging.*;
+        import org.wpilib.epilogue.logging.*;
 
         class A {}
         class B extends A {}
@@ -327,12 +327,12 @@ class EpilogueGeneratorTest {
 
     String expected =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import static edu.wpi.first.units.Units.Seconds;
+        import static org.wpilib.units.Units.Seconds;
 
-        import edu.wpi.first.epilogue.ExampleLogger;
-        import edu.wpi.first.epilogue.CustomLogger;
+        import org.wpilib.epilogue.ExampleLogger;
+        import org.wpilib.epilogue.CustomLogger;
 
         public final class Epilogue {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();

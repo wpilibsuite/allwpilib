@@ -2,25 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.wpilibj.simulation;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static org.wpilib.units.Units.Radians;
+import static org.wpilib.units.Units.RadiansPerSecond;
+import static org.wpilib.units.Units.RadiansPerSecondPerSecond;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.RobotController;
-
-/** Represents a simulated DC motor mechanism. */
-public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
+import org.wpilib.math.VecBuilder;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N2;
+import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.math.util.Units;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularAcceleration;
+import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.wpilibj.RobotController;
+org.wpilib.
+/** Reporg.wpilib.lated DC motor mechanism. */
+public org.wpilib.im extends LinearSystemSim<N2, N1, N2> {
   // Gearbox for the DC motor.
   private final DCMotor m_gearbox;
 
@@ -47,10 +47,10 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   public DCMotorSim(LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
-
+org.wpilib.
     // By theorem 6.10.1 of https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
-    // the DC motor state-space model is:
-    //
+    // thorg.wpilib.te-space model is:
+    //org.wpilib.
     //   dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
     //   A = -G²Kₜ/(KᵥRJ)
     //   B = GKₜ/(RJ)

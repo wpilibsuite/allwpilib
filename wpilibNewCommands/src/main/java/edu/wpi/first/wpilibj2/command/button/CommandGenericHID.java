@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj2.command.button;
+package org.wpilib.wpilibj2.command.button;
 
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.event.EventLoop;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.wpilib.math.Pair;
+import org.wpilib.wpilibj.GenericHID;
+import org.wpilib.wpilibj.event.EventLoop;
+import org.wpilib.wpilibj2.command.CommandScheduler;
 import java.util.HashMap;
 import java.util.Map;
 

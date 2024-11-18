@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.internal;
+package org.wpilib.wpilibj.internal;
 
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.DriverStation;
+import org.wpilib.hal.DriverStationJNI;
+import org.wpilib.util.WPIUtilJNI;
+import org.wpilib.wpilibj.DriverStation;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /** For internal use only. */

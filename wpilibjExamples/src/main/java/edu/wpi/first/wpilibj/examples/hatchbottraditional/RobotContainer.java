@@ -2,27 +2,27 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.hatchbottraditional;
+package org.wpilib.wpilibj.examples.hatchbottraditional;
 
-import static edu.wpi.first.wpilibj.XboxController.Button;
+import static org.wpilib.wpilibj.XboxController.Button;
 
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.AutoConstants;
-import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.OIConstants;
-import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.ComplexAuto;
-import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.DefaultDrive;
-import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.DriveDistance;
-import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.GrabHatch;
-import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.HalveDriveSpeed;
-import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.ReleaseHatch;
-import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.HatchSubsystem;
-import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import org.wpilib.wpilibj.XboxController;
+import org.wpilib.wpilibj.examples.hatchbottraditional.Constants.AutoConstants;
+import org.wpilib.wpilibj.examples.hatchbottraditional.Constants.OIConstants;
+import org.wpilib.wpilibj.examples.hatchbottraditional.commands.ComplexAuto;
+import org.wpilib.wpilibj.examples.hatchbottraditional.commands.DefaultDrive;
+import org.wpilib.wpilibj.examples.hatchbottraditional.commands.DriveDistance;
+import org.wpilib.wpilibj.examples.hatchbottraditional.commands.GrabHatch;
+import org.wpilib.wpilibj.examples.hatchbottraditional.commands.HalveDriveSpeed;
+import org.wpilib.wpilibj.examples.hatchbottraditional.commands.ReleaseHatch;
+import org.wpilib.wpilibj.examples.hatchbottraditional.subsystems.DriveSubsystem;
+import org.wpilib.wpilibj.examples.hatchbottraditional.subsystems.HatchSubsystem;
+import org.wpilib.wpilibj.shuffleboard.EventImportance;
+import org.wpilib.wpilibj.shuffleboard.Shuffleboard;
+import org.wpilib.wpilibj.smartdashboard.SendableChooser;
+import org.wpilib.wpilibj2.command.Command;
+import org.wpilib.wpilibj2.command.CommandScheduler;
+import org.wpilib.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -101,9 +101,9 @@ public class RobotContainer {
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * instantiating a {@link org.wpilib.wpilibj.GenericHID} or one of its subclasses ({@link
+   * org.wpilib.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * org.wpilib.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
     // Grab the hatch when the 'A' button is pressed.

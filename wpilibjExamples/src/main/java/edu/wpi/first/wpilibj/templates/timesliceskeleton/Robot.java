@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.templates.timesliceskeleton;
+package org.wpilib.wpilibj.templates.timesliceskeleton;
 
-import edu.wpi.first.wpilibj.TimesliceRobot;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import org.wpilib.wpilibj.TimesliceRobot;
+import org.wpilib.wpilibj.livewindow.LiveWindow;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

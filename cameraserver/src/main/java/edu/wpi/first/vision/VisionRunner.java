@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.vision;
+package org.wpilib.vision;
 
-import edu.wpi.first.cameraserver.CameraServerSharedStore;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.VideoSource;
+import org.wpilib.cameraserver.CameraServerSharedStore;
+import org.wpilib.cscore.CvSink;
+import org.wpilib.cscore.VideoSource;
 import org.opencv.core.Mat;
 
 /**

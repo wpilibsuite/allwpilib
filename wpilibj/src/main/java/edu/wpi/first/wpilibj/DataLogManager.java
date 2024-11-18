@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.util.FileLogger;
-import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.util.concurrent.Event;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DataLogBackgroundWriter;
-import edu.wpi.first.util.datalog.IntegerLogEntry;
-import edu.wpi.first.util.datalog.StringLogEntry;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.util.FileLogger;
+import org.wpilib.util.WPIUtilJNI;
+import org.wpilib.util.concurrent.Event;
+import org.wpilib.util.datalog.DataLog;
+import org.wpilib.util.datalog.DataLogBackgroundWriter;
+import org.wpilib.util.datalog.IntegerLogEntry;
+import org.wpilib.util.datalog.StringLogEntry;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

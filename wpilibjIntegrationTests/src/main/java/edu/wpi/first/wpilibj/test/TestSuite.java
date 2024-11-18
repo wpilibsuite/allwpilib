@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.test;
+package org.wpilib.wpilibj.test;
 
-import edu.wpi.first.wpilibj.WpiLibJTestSuite;
+import org.wpilib.wpilibj.WpiLibJTestSuite;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -51,11 +51,11 @@ public class TestSuite extends AbstractTestSuite {
   }
 
   @SuppressWarnings("unused")
-  private static final Logger WPILIBJ_ROOT_LOGGER = Logger.getLogger("edu.wpi.first.wpilibj");
+  private static final Logger WPILIBJ_ROOT_LOGGER = Logger.getLogger("org.wpilib.wpilibj");
 
   @SuppressWarnings("unused")
   private static final Logger WPILIBJ_COMMAND_ROOT_LOGGER =
-      Logger.getLogger("edu.wpi.first.wpilibj.command");
+      Logger.getLogger("org.wpilib.wpilibj.command");
 
   private static final Class<?> QUICK_TEST = QuickTest.class;
   private static final String QUICK_TEST_FLAG = "--quick";

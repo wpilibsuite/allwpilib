@@ -2,26 +2,26 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj2.command;
+package org.wpilib.wpilibj2.command;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
-import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
-import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
-import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.simulation.SimHooks;
+import org.wpilib.hal.HAL;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.MecanumDriveKinematics;
+import org.wpilib.math.kinematics.MecanumDriveOdometry;
+import org.wpilib.math.kinematics.MecanumDriveWheelPositions;
+import org.wpilib.math.kinematics.MecanumDriveWheelSpeeds;
+import org.wpilib.math.trajectory.TrajectoryConfig;
+import org.wpilib.math.trajectory.TrajectoryGenerator;
+import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.wpilibj.Timer;
+import org.wpilib.wpilibj.simulation.SimHooks;
 import java.util.ArrayList;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

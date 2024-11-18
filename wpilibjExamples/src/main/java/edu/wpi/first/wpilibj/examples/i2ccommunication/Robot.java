@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.i2ccommunication;
+package org.wpilib.wpilibj.examples.i2ccommunication;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.I2C.Port;
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.wpilibj.DriverStation;
+import org.wpilib.wpilibj.I2C;
+import org.wpilib.wpilibj.I2C.Port;
+import org.wpilib.wpilibj.TimedRobot;
 import java.util.Optional;
 
 /**

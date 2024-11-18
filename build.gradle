@@ -1,4 +1,4 @@
-import edu.wpi.first.toolchain.*
+import org.wpilib.toolchain.*
 
 buildscript {
     repositories {
@@ -10,11 +10,11 @@ buildscript {
 
 plugins {
     id 'base'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2023.0.1'
-    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
-    id 'edu.wpi.first.NativeUtils' apply false
-    id 'edu.wpi.first.GradleJni' version '1.1.0'
-    id 'edu.wpi.first.GradleVsCode'
+    id 'org.wpilib.wpilib.versioning.WPILibVersioningPlugin' version '2023.0.1'
+    id 'org.wpilib.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
+    id 'org.wpilib.NativeUtils' apply false
+    id 'org.wpilib.GradleJni' version '1.1.0'
+    id 'org.wpilib.GradleVsCode'
     id 'idea'
     id 'visual-studio'
     id 'net.ltgt.errorprone' version '3.1.0' apply false

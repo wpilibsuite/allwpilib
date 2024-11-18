@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.wpilibj.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.hal.HALUtil;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.RobotController.RadioLEDState;
-import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
-import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
-import edu.wpi.first.wpilibj.simulation.testutils.EnumCallback;
-import edu.wpi.first.wpilibj.simulation.testutils.IntCallback;
+import org.wpilib.hal.HALUtil;
+import org.wpilib.wpilibj.RobotController;
+import org.wpilib.wpilibj.RobotController.RadioLEDState;
+import org.wpilib.wpilibj.simulation.testutils.BooleanCallback;
+import org.wpilib.wpilibj.simulation.testutils.DoubleCallback;
+import org.wpilib.wpilibj.simulation.testutils.EnumCallback;
+import org.wpilib.wpilibj.simulation.testutils.IntCallback;
 import org.junit.jupiter.api.Test;
 
 class RoboRioSimTest {

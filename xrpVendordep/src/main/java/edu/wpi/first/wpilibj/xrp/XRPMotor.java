@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.xrp;
+package org.wpilib.wpilibj.xrp;
 
-import edu.wpi.first.hal.SimBoolean;
-import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.hal.SimDevice.Direction;
-import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import org.wpilib.hal.SimBoolean;
+import org.wpilib.hal.SimDevice;
+import org.wpilib.hal.SimDevice.Direction;
+import org.wpilib.hal.SimDouble;
+import org.wpilib.wpilibj.motorcontrol.MotorController;
 import java.util.HashMap;
 import java.util.HashSet;
 

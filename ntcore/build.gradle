@@ -8,7 +8,7 @@ ext {
     }
 
     nativeName = 'ntcore'
-    devMain = 'edu.wpi.first.ntcore.DevMain'
+    devMain = 'org.wpilib.ntcore.DevMain'
     generatedSources = "$projectDir/src/generated/main/native/cpp"
     generatedHeaders = "$projectDir/src/generated/main/native/include"
     jniSplitSetup = {

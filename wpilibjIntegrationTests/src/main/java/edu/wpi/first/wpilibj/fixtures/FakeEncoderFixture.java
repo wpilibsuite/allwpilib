@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.fixtures;
+package org.wpilib.wpilibj.fixtures;
 
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.mockhardware.FakeEncoderSource;
+import org.wpilib.wpilibj.Encoder;
+import org.wpilib.wpilibj.mockhardware.FakeEncoderSource;
 import java.util.logging.Logger;
 
 /**
@@ -65,7 +65,7 @@ public class FakeEncoderFixture implements ITestFixture {
   /*
    * (non-Javadoc)
    *
-   * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#setup()
+   * @see org.wpilib.wpilibj.fixtures.ITestFixture#setup()
    */
   @Override
   public void setup() {}
@@ -73,7 +73,7 @@ public class FakeEncoderFixture implements ITestFixture {
   /*
    * (non-Javadoc)
    *
-   * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#reset()
+   * @see org.wpilib.wpilibj.fixtures.ITestFixture#reset()
    */
   @Override
   public void reset() {
@@ -85,7 +85,7 @@ public class FakeEncoderFixture implements ITestFixture {
   /*
    * (non-Javadoc)
    *
-   * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#teardown()
+   * @see org.wpilib.wpilibj.fixtures.ITestFixture#teardown()
    */
   @Override
   public void teardown() {

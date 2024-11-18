@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.wpilibj.simulation;
 
-import edu.wpi.first.hal.simulation.NotifyCallback;
-import edu.wpi.first.hal.simulation.SPIAccelerometerDataJNI;
+import org.wpilib.hal.simulation.NotifyCallback;
+import org.wpilib.hal.simulation.SPIAccelerometerDataJNI;
 
 /** A class to control a simulated accelerometer over SPI. */
 public class SPIAccelerometerSim {

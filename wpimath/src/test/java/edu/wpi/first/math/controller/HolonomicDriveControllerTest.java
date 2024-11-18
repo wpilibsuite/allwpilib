@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.controller;
+package org.wpilib.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import org.wpilib.math.MathUtil;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Twist2d;
+import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.trajectory.Trajectory;
+import org.wpilib.math.trajectory.TrajectoryConfig;
+import org.wpilib.math.trajectory.TrajectoryGenerator;
+import org.wpilib.math.trajectory.TrapezoidProfile;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;

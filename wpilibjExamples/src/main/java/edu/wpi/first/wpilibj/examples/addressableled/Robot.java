@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.addressableled;
+package org.wpilib.wpilibj.examples.addressableled;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import static org.wpilib.units.Units.Meters;
+import static org.wpilib.units.Units.MetersPerSecond;
 
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.wpilibj.AddressableLED;
+import org.wpilib.wpilibj.AddressableLEDBuffer;
+import org.wpilib.wpilibj.LEDPattern;
+import org.wpilib.wpilibj.TimedRobot;
 
 public class Robot extends TimedRobot {
   private final AddressableLED m_led;

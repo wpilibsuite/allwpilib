@@ -1,6 +1,6 @@
 ext {
     nativeName = 'cameraserver'
-    devMain = 'edu.wpi.first.cameraserver.DevMain'
+    devMain = 'org.wpilib.cameraserver.DevMain'
 }
 
 evaluationDependsOn(':ntcore')

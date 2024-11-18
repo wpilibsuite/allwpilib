@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.intermediatevision;
+package org.wpilib.wpilibj.examples.intermediatevision;
 
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.CvSource;
-import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.cameraserver.CameraServer;
+import org.wpilib.cscore.CvSink;
+import org.wpilib.cscore.CvSource;
+import org.wpilib.cscore.UsbCamera;
+import org.wpilib.wpilibj.TimedRobot;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;

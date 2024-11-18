@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.util.cleanup;
+package org.wpilib.util.cleanup;
 
-import edu.wpi.first.util.ErrorMessages;
+import org.wpilib.util.ErrorMessages;
 import java.util.ArrayDeque;
 import java.util.Deque;
 

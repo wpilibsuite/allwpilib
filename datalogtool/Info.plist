@@ -9,7 +9,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>datalogTool</string>
 	<key>CFBundleIdentifier</key>
-	<string>edu.wpi.first.tools.datalogTool</string>
+	<string>org.wpilib.tools.datalogTool</string>
 	<key>CFBundleIconFile</key>
 	<string>datalogtool.icns</string>
 	<key>CFBundlePackageType</key>

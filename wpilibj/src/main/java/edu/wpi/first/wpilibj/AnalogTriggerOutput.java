@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.AnalogJNI;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
+import org.wpilib.hal.AnalogJNI;
+import org.wpilib.hal.FRCNetComm.tResourceType;
+import org.wpilib.hal.HAL;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
 
 /**
  * Class to represent a specific output from an analog trigger. This class is used to get the

@@ -11,7 +11,7 @@ if (OperatingSystem.current().isWindows()) {
     def outputsFolder = file("$buildDir/outputs")
 
     def baseArtifactId = 'runtime'
-    def artifactGroupId = "edu.wpi.first.msvc"
+    def artifactGroupId = "org.wpilib.msvc"
     def zipBaseName = "_GROUP_edu_wpi_first_msvc_ID_runtime_CLS"
 
     def vsLocator = gradle.services.get(VisualStudioLocator)

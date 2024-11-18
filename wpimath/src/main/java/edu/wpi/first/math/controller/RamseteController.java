@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.controller;
+package org.wpilib.math.controller;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.Trajectory;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.trajectory.Trajectory;
 
 /**
  * Ramsete is a nonlinear time-varying feedback controller for unicycle models that drives the model

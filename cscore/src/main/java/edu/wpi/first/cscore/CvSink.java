@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.cscore;
+package org.wpilib.cscore;
 
-import edu.wpi.first.util.PixelFormat;
-import edu.wpi.first.util.RawFrame;
+import org.wpilib.util.PixelFormat;
+import org.wpilib.util.RawFrame;
 import java.nio.ByteBuffer;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;

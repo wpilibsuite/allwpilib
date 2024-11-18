@@ -2,27 +2,27 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Celsius;
-import static edu.wpi.first.units.Units.Microseconds;
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.Amps;
+import static org.wpilib.units.Units.Celsius;
+import static org.wpilib.units.Units.Microseconds;
+import static org.wpilib.units.Units.Volts;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.HALUtil;
-import edu.wpi.first.hal.LEDJNI;
-import edu.wpi.first.hal.PowerJNI;
-import edu.wpi.first.hal.can.CANJNI;
-import edu.wpi.first.hal.can.CANStatus;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.units.measure.Voltage;
-
-/** Contains functions for roboRIO functionality. */
-public final class RobotController {
-  private RobotController() {
+import org.wpilib.hal.HAL;
+import org.wpilib.hal.HALUtil;
+import org.wpilib.hal.LEDJNI;
+import org.wpilib.hal.PowerJNI;
+import org.wpilib.hal.can.CANJNI;
+import org.wpilib.hal.can.CANStatus;
+import org.wpilib.units.measure.Current;
+import org.wpilib.units.measure.Temperature;
+import org.wpilib.units.measure.Time;
+import org.wpilib.units.measure.Voltage;
+org.wpilib.
+/** Conorg.wpilib.s for roboRIO functionality. */
+public org.wpilib.botController {
+  privaorg.wpilib.ller() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 

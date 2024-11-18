@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.geometry.proto;
+package org.wpilib.math.geometry.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Quaternion;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.proto.Geometry3D.ProtobufPose3d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Quaternion;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.proto.Geometry3D.ProtobufPose3d;
 import org.junit.jupiter.api.Test;
 
 class Pose3dProtoTest {

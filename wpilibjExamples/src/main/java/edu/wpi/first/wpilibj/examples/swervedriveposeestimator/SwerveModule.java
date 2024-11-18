@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.swervedriveposeestimator;
+package org.wpilib.wpilibj.examples.swervedriveposeestimator;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.MetersPerSecond;
+import static org.wpilib.units.Units.RadiansPerSecond;
+import static org.wpilib.units.Units.Volts;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.kinematics.SwerveModuleState;
+import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.wpilibj.Encoder;
+import org.wpilib.wpilibj.motorcontrol.PWMSparkMax;
 
 public class SwerveModule {
   private static final double kWheelRadius = 0.0508;

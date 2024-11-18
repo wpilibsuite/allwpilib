@@ -6,14 +6,14 @@
 {% macro capitalize_first(string) -%}
 {{ string[0]|capitalize + string[1:] }}
 {%- endmacro %}
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
-{{ "// " if SkipReporting }}import edu.wpi.first.hal.FRCNetComm.tResourceType;
-{{ "// " if SkipReporting }}import edu.wpi.first.hal.HAL;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.event.BooleanEvent;
-import edu.wpi.first.wpilibj.event.EventLoop;
+{{ "// " if SkipReporting }}import org.wpilib.hal.FRCNetComm.tResourceType;
+{{ "// " if SkipReporting }}import org.wpilib.hal.HAL;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.wpilibj.event.BooleanEvent;
+import org.wpilib.wpilibj.event.EventLoop;
 
 /**
  * Handle input from {{ ConsoleName }} controllers connected to the Driver Station.

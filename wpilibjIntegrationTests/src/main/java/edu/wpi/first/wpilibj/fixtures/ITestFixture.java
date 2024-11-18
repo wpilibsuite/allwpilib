@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.fixtures;
+package org.wpilib.wpilibj.fixtures;
 
-import edu.wpi.first.wpilibj.test.TestBench;
+import org.wpilib.wpilibj.test.TestBench;
 
 /**
  * Common interface for all test fixtures. This ensures that all test fixtures have setup and

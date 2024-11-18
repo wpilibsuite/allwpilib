@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
-import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.hal.SimDevice.Direction;
-import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import org.wpilib.hal.SimDevice;
+import org.wpilib.hal.SimDevice.Direction;
+import org.wpilib.hal.SimDouble;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * SharpIR analog distance sensor class. These distance measuring sensors output an analog voltage

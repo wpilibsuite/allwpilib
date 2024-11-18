@@ -1,4 +1,4 @@
-import edu.wpi.first.toolchain.NativePlatforms
+import org.wpilib.toolchain.NativePlatforms
 
 apply plugin: 'java'
 apply plugin: 'jacoco'
@@ -75,7 +75,7 @@ ext {
 }
 
 apply plugin: 'cpp'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 apply from: '../shared/config.gradle'
 
@@ -161,7 +161,7 @@ model {
                             new groovy.json.JsonSlurper().parseText(exampleFile.text).each { entry ->
                                 project.tasks.create("run${entry.foldername}", JavaExec) { run ->
                                     run.group "run examples"
-                                    run.mainClass = "edu.wpi.first.wpilibj.examples." + entry.foldername + "." + entry.mainclass
+                                    run.mainClass = "org.wpilib.wpilibj.examples." + entry.foldername + "." + entry.mainclass
                                     run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath
@@ -175,15 +175,15 @@ model {
                                     testTask.group "verification"
                                     testTask.useJUnitPlatform()
                                     testTask.filter {
-                                        includeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
+                                        includeTestsMatching("org.wpilib.wpilibj.examples.${entry.foldername}.*")
                                         // armsimulation regularly fails on CI Win64Debug
                                         if (project.hasProperty('ciDebugOnly')) {
-                                            excludeTestsMatching("edu.wpi.first.wpilibj.examples.armsimulation.*")
+                                            excludeTestsMatching("org.wpilib.wpilibj.examples.armsimulation.*")
                                         }
                                         setFailOnNoMatchingTests(false)
                                     }
                                     test.filter {
-                                        excludeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
+                                        excludeTestsMatching("org.wpilib.wpilibj.examples.${entry.foldername}.*")
                                         setFailOnNoMatchingTests(false)
                                     }
                                     testTask.testClassesDirs = sourceSets.test.output.classesDirs

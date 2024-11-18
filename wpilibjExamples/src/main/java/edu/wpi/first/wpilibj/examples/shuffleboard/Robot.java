@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.shuffleboard;
+package org.wpilib.wpilibj.examples.shuffleboard;
 
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import org.wpilib.networktables.GenericEntry;
+import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.wpilibj.AnalogPotentiometer;
+import org.wpilib.wpilibj.Encoder;
+import org.wpilib.wpilibj.TimedRobot;
+import org.wpilib.wpilibj.drive.DifferentialDrive;
+import org.wpilib.wpilibj.motorcontrol.PWMSparkMax;
+import org.wpilib.wpilibj.shuffleboard.BuiltInLayouts;
+import org.wpilib.wpilibj.shuffleboard.Shuffleboard;
+import org.wpilib.wpilibj.shuffleboard.ShuffleboardLayout;
+import org.wpilib.wpilibj.shuffleboard.ShuffleboardTab;
 
 public class Robot extends TimedRobot {
   private final PWMSparkMax m_leftDriveMotor = new PWMSparkMax(0);

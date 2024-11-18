@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.kinematics.struct;
+package org.wpilib.math.kinematics.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;

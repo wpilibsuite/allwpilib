@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import static edu.wpi.first.units.Units.Feet;
-import static edu.wpi.first.units.Units.FeetPerSecond;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Millisecond;
-import static edu.wpi.first.units.Units.Minute;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Seconds;
+import static org.wpilib.units.Units.Feet;
+import static org.wpilib.units.Units.FeetPerSecond;
+import static org.wpilib.units.Units.Meters;
+import static org.wpilib.units.Units.MetersPerSecond;
+import static org.wpilib.units.Units.MetersPerSecondPerSecond;
+import static org.wpilib.units.Units.Millisecond;
+import static org.wpilib.units.Units.Minute;
+import static org.wpilib.units.Units.Radians;
+import static org.wpilib.units.Units.Second;
+import static org.wpilib.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;

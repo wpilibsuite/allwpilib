@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.controller;
+package org.wpilib.math.controller;
 
-import edu.wpi.first.math.DARE;
-import edu.wpi.first.math.InterpolatingMatrixTreeMap;
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.StateSpaceUtil;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.system.Discretization;
-import edu.wpi.first.math.trajectory.Trajectory;
+import org.wpilib.math.DARE;
+import org.wpilib.math.InterpolatingMatrixTreeMap;
+import org.wpilib.math.MatBuilder;
+import org.wpilib.math.Matrix;
+import org.wpilib.math.Nat;
+import org.wpilib.math.StateSpaceUtil;
+import org.wpilib.math.VecBuilder;
+import org.wpilib.math.Vector;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.numbers.N2;
+import org.wpilib.math.numbers.N3;
+import org.wpilib.math.system.Discretization;
+import org.wpilib.math.trajectory.Trajectory;
 
 /**
  * The linear time-varying unicycle controller has a similar form to the LQR, but the model used to

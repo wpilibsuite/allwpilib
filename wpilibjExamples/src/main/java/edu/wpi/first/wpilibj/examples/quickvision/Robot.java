@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.quickvision;
+package org.wpilib.wpilibj.examples.quickvision;
 
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.cameraserver.CameraServer;
+import org.wpilib.wpilibj.TimedRobot;
 
 /**
  * Uses the CameraServer class to automatically capture video from a USB webcam and send it to the

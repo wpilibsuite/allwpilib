@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.shuffleboard;
+package org.wpilib.wpilibj.shuffleboard;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.cscore.VideoSource;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringArrayPublisher;
-import edu.wpi.first.networktables.StringArrayTopic;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import org.wpilib.cscore.VideoSource;
+import org.wpilib.networktables.NetworkTable;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.StringArrayPublisher;
+import org.wpilib.networktables.StringArrayTopic;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;

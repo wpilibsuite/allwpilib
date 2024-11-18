@@ -7,10 +7,10 @@ ext {
     ]
     baseId = 'wpiutil'
     groupId = 'edu.wpi.first.wpiutil'
-
+org.wpilib.
     nativeName = 'wpiutil'
     devMain = 'edu.wpi.first.util.DevMain'
-    def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
+    def generatorg.wpilib.GenerateResourcesTask('main', 'WPI', 'wpi', project)
 
     splitSetup = {
         it.tasks.withType(CppCompile) {

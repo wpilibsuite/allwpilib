@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.shuffleboard;
+package org.wpilib.wpilibj.shuffleboard;
 
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.wpilibj.DriverStation;
+import org.wpilib.networktables.BooleanPublisher;
+import org.wpilib.networktables.NetworkTable;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.StringPublisher;
+import org.wpilib.wpilibj.DriverStation;
 
 /** Controls Shuffleboard recordings via NetworkTables. */
 final class RecordingController {

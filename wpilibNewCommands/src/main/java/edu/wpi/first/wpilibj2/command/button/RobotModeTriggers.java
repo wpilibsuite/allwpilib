@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj2.command.button;
+package org.wpilib.wpilibj2.command.button;
 
-import edu.wpi.first.wpilibj.DriverStation;
+import org.wpilib.wpilibj.DriverStation;
 
 /**
  * A class containing static {@link Trigger} factories for running callbacks when the robot mode

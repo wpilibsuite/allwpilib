@@ -28,7 +28,7 @@ Java
 ```groovy
 plugins {
   id "java"
-  id "edu.wpi.first.GradleRIO" version "2025.1.1-beta-1"
+  id "org.wpilib.GradleRIO" version "2025.1.1-beta-1"
 }
 
 wpi.maven.useLocal = false
@@ -42,7 +42,7 @@ C++
 plugins {
   id "cpp"
   id "google-test-test-suite"
-  id "edu.wpi.first.GradleRIO" version "2025.1.1-beta-1"
+  id "org.wpilib.GradleRIO" version "2025.1.1-beta-1"
 }
 
 wpi.maven.useLocal = false
@@ -64,7 +64,7 @@ Java
 ```groovy
 plugins {
   id "java"
-  id "edu.wpi.first.GradleRIO" version "2025.1.1-beta-1"
+  id "org.wpilib.GradleRIO" version "2025.1.1-beta-1"
 }
 
 wpi.maven.useLocal = false
@@ -78,7 +78,7 @@ C++
 plugins {
   id "cpp"
   id "google-test-test-suite"
-  id "edu.wpi.first.GradleRIO" version "2025.1.1-beta-1"
+  id "org.wpilib.GradleRIO" version "2025.1.1-beta-1"
 }
 
 wpi.maven.useLocal = false

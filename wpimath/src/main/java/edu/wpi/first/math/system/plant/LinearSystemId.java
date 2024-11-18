@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.system.plant;
+package org.wpilib.math.system.plant;
 
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.LinearSystem;
+import org.wpilib.math.MatBuilder;
+import org.wpilib.math.Matrix;
+import org.wpilib.math.Nat;
+import org.wpilib.math.VecBuilder;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N2;
+import org.wpilib.math.system.LinearSystem;
 
 /** Linear system ID utility functions. */
 public final class LinearSystemId {
@@ -128,7 +128,7 @@ public final class LinearSystemId {
    * [position, velocity], inputs are [voltage], and outputs are [position].
    *
    * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
-   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
+   * {@link org.wpilib.math.util.Units} class for converting between unit types.
    *
    * <p>The parameters provided by the user are from this feedforward model:
    *
@@ -249,7 +249,7 @@ public final class LinearSystemId {
    * [velocity], inputs are [voltage], and outputs are [velocity].
    *
    * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
-   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
+   * {@link org.wpilib.math.util.Units} class for converting between unit types.
    *
    * <p>The parameters provided by the user are from this feedforward model:
    *
@@ -282,7 +282,7 @@ public final class LinearSystemId {
    * [position, velocity]ᵀ, inputs are [voltage], and outputs are [position].
    *
    * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
-   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
+   * {@link org.wpilib.math.util.Units} class for converting between unit types.
    *
    * <p>The parameters provided by the user are from this feedforward model:
    *

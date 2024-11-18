@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.potentiometerpid;
+package org.wpilib.wpilibj.examples.potentiometerpid;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.HAL.SimPeriodicBeforeCallback;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.simulation.JoystickSim;
-import edu.wpi.first.wpilibj.simulation.PWMSim;
-import edu.wpi.first.wpilibj.simulation.SimHooks;
+import org.wpilib.hal.HAL;
+import org.wpilib.hal.HAL.SimPeriodicBeforeCallback;
+import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.math.util.Units;
+import org.wpilib.wpilibj.RobotController;
+import org.wpilib.wpilibj.simulation.AnalogInputSim;
+import org.wpilib.wpilibj.simulation.DriverStationSim;
+import org.wpilib.wpilibj.simulation.ElevatorSim;
+import org.wpilib.wpilibj.simulation.JoystickSim;
+import org.wpilib.wpilibj.simulation.PWMSim;
+import org.wpilib.wpilibj.simulation.SimHooks;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

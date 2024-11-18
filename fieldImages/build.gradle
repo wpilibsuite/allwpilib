@@ -7,7 +7,7 @@ if (project.hasProperty('onlylinuxathena')) {
 apply plugin: 'cpp'
 apply plugin: 'java'
 apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 if (OperatingSystem.current().isWindows()) {
     apply plugin: 'windows-resources'
@@ -22,8 +22,8 @@ dependencies {
 ext {
     nativeName = 'fieldImages'
     baseId = nativeName
-    groupId = 'edu.wpi.first.fieldImages'
-    devMain = "edu.wpi.first.fieldImages.DevMain"
+    groupId = 'org.wpilib.fieldImages'
+    devMain = "org.wpilib.fieldImages.DevMain"
 }
 
 apply from: "${rootDir}/shared/resources.gradle"

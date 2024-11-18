@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.system.plant.proto;
+package org.wpilib.math.system.plant.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.proto.Plant.ProtobufDCMotor;
-import edu.wpi.first.math.system.plant.DCMotor;
+import org.wpilib.math.proto.Plant.ProtobufDCMotor;
+import org.wpilib.math.system.plant.DCMotor;
 import org.junit.jupiter.api.Test;
 
 class DCMotorProtoTest {

@@ -26,7 +26,7 @@ cc_binary(
 java_binary(
     name = "DevMain-Java",
     srcs = ["src/dev/java/edu/wpi/first/cameraserver/DevMain.java"],
-    main_class = "edu.wpi.first.cameraserver.DevMain",
+    main_class = "org.wpilib.cameraserver.DevMain",
     deps = [
     ],
 )

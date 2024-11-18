@@ -20,11 +20,11 @@ evaluationDependsOn(':romiVendordep')
 evaluationDependsOn(':xrpVendordep')
 
 def baseArtifactIdCpp = 'documentation'
-def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
+def artifactGroupIdCpp = 'org.wpilib.wpilibc'
 def zipBaseNameCpp = '_GROUP_edu_wpi_first_wpilibc_ID_documentation_CLS'
 
 def baseArtifactIdJava = 'documentation'
-def artifactGroupIdJava = 'edu.wpi.first.wpilibj'
+def artifactGroupIdJava = 'org.wpilib.wpilibj'
 def zipBaseNameJava = '_GROUP_edu_wpi_first_wpilibj_ID_documentation_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
@@ -191,27 +191,27 @@ task generateJavaDocs(type: Javadoc) {
     options.addStringOption("tag", "pre:a:Pre-Condition")
     options.addBooleanOption("Xdoclint/package:" +
             // TODO: v Document these, then remove them from the list
-            "-edu.wpi.first.hal," +
-            "-edu.wpi.first.hal.simulation," +
+            "-org.wpilib.hal," +
+            "-org.wpilib.hal.simulation," +
             // TODO: ^ Document these, then remove them from the list
-            "-edu.wpi.first.math.proto," +
-            "-edu.wpi.first.math.struct," +
-            "-edu.wpi.first.math.controller.proto," +
-            "-edu.wpi.first.math.controller.struct," +
-            "-edu.wpi.first.math.geometry.proto," +
-            "-edu.wpi.first.math.geometry.struct," +
-            "-edu.wpi.first.math.kinematics.proto," +
-            "-edu.wpi.first.math.kinematics.struct," +
-            "-edu.wpi.first.math.spline.proto," +
-            "-edu.wpi.first.math.spline.struct," +
-            "-edu.wpi.first.math.system.proto," +
-            "-edu.wpi.first.math.system.struct," +
-            "-edu.wpi.first.math.system.plant.proto," +
-            "-edu.wpi.first.math.system.plant.struct," +
-            "-edu.wpi.first.math.trajectory.proto," +
+            "-org.wpilib.math.proto," +
+            "-org.wpilib.math.struct," +
+            "-org.wpilib.math.controller.proto," +
+            "-org.wpilib.math.controller.struct," +
+            "-org.wpilib.math.geometry.proto," +
+            "-org.wpilib.math.geometry.struct," +
+            "-org.wpilib.math.kinematics.proto," +
+            "-org.wpilib.math.kinematics.struct," +
+            "-org.wpilib.math.spline.proto," +
+            "-org.wpilib.math.spline.struct," +
+            "-org.wpilib.math.system.proto," +
+            "-org.wpilib.math.system.struct," +
+            "-org.wpilib.math.system.plant.proto," +
+            "-org.wpilib.math.system.plant.struct," +
+            "-org.wpilib.math.trajectory.proto," +
             // The .measure package contains generated source files for which automatic javadoc
             // generation is very difficult to do meaningfully.
-            "-edu.wpi.first.units.measure", true)
+            "-org.wpilib.units.measure", true)
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     options.linkSource(true)

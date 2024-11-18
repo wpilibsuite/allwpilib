@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.path;
+package org.wpilib.math.path;
 
-import edu.wpi.first.math.Num;
-import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.optimization.SimulatedAnnealing;
+import org.wpilib.math.Num;
+import org.wpilib.math.Vector;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.optimization.SimulatedAnnealing;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.function.ToDoubleBiFunction;

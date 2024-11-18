@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
-import edu.wpi.first.hal.PortsJNI;
-import edu.wpi.first.hal.REVPHFaults;
-import edu.wpi.first.hal.REVPHJNI;
-import edu.wpi.first.hal.REVPHStickyFaults;
-import edu.wpi.first.hal.REVPHVersion;
+import org.wpilib.hal.PortsJNI;
+import org.wpilib.hal.REVPHFaults;
+import org.wpilib.hal.REVPHJNI;
+import org.wpilib.hal.REVPHStickyFaults;
+import org.wpilib.hal.REVPHVersion;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;

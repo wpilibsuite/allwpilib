@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import edu.wpi.first.units.measure.Dimensionless;
-import edu.wpi.first.units.measure.ImmutableDimensionless;
-import edu.wpi.first.units.measure.MutDimensionless;
+import org.wpilib.units.measure.Dimensionless;
+import org.wpilib.units.measure.ImmutableDimensionless;
+import org.wpilib.units.measure.MutDimensionless;
 
 /**
  * A type of unit that corresponds to raw values and not any physical dimension, such as percentage.

@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
-import edu.wpi.first.wpilibj.test.TestBench;
+import org.wpilib.wpilibj.fixtures.DIOCrossConnectFixture;
+import org.wpilib.wpilibj.test.TestBench;
 import java.util.Collection;
 import java.util.logging.Logger;
 import org.junit.After;
@@ -141,7 +141,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
    * (non-Javadoc)
    *
    * @see
-   * edu.wpi.first.wpilibj.AbstractInterruptTest#giveSource()
+   * org.wpilib.wpilibj.AbstractInterruptTest#giveSource()
    */
   @Override
   DigitalSource giveSource() {
@@ -152,7 +152,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
    * (non-Javadoc)
    *
    * @see
-   * edu.wpi.first.wpilibj.AbstractInterruptTest#freeSource()
+   * org.wpilib.wpilibj.AbstractInterruptTest#freeSource()
    */
   @Override
   void freeSource() {
@@ -162,7 +162,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
   /*
    * (non-Javadoc)
    *
-   * @see edu.wpi.first.wpilibj.AbstractInterruptTest#setInterruptHigh()
+   * @see org.wpilib.wpilibj.AbstractInterruptTest#setInterruptHigh()
    */
   @Override
   void setInterruptHigh() {
@@ -172,7 +172,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
   /*
    * (non-Javadoc)
    *
-   * @see edu.wpi.first.wpilibj.AbstractInterruptTest#setInterruptLow()
+   * @see org.wpilib.wpilibj.AbstractInterruptTest#setInterruptLow()
    */
   @Override
   void setInterruptLow() {

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.shuffleboard;
+package org.wpilib.wpilibj.shuffleboard;
 
 /**
  * The types of the widgets bundled with Shuffleboard.
@@ -167,7 +167,7 @@ public enum BuiltInWidgets implements WidgetType {
    *
    * <ul>
    *   <li>Number
-   *   <li>{@link edu.wpi.first.wpilibj.AnalogInput}
+   *   <li>{@link org.wpilib.wpilibj.AnalogInput}
    * </ul>
    *
    * <br>
@@ -186,11 +186,11 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kVoltageView("Voltage View"),
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.PowerDistribution PowerDistribution}. <br>
+   * Displays a {@link org.wpilib.wpilibj.PowerDistribution PowerDistribution}. <br>
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.PowerDistribution}
+   *   <li>{@link org.wpilib.wpilibj.PowerDistribution}
    * </ul>
    *
    * <br>
@@ -204,12 +204,12 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kPowerDistribution("PDP"),
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser SendableChooser} with a
+   * Displays a {@link org.wpilib.wpilibj.smartdashboard.SendableChooser SendableChooser} with a
    * dropdown combo box with a list of options. <br>
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser}
+   *   <li>{@link org.wpilib.wpilibj.smartdashboard.SendableChooser}
    * </ul>
    *
    * <br>
@@ -217,12 +217,12 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kComboBoxChooser("ComboBox Chooser"),
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser SendableChooser} with a
+   * Displays a {@link org.wpilib.wpilibj.smartdashboard.SendableChooser SendableChooser} with a
    * toggle button for each available option. <br>
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser}
+   *   <li>{@link org.wpilib.wpilibj.smartdashboard.SendableChooser}
    * </ul>
    *
    * <br>
@@ -230,12 +230,12 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kSplitButtonChooser("Split Button Chooser"),
   /**
-   * Displays an {@link edu.wpi.first.wpilibj.Encoder} displaying its speed, total traveled
+   * Displays an {@link org.wpilib.wpilibj.Encoder} displaying its speed, total traveled
    * distance, and its distance per tick. <br>
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.Encoder}
+   *   <li>{@link org.wpilib.wpilibj.Encoder}
    * </ul>
    *
    * <br>
@@ -243,26 +243,26 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kEncoder("Encoder"),
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.motorcontrol.MotorController MotorController}. The
+   * Displays a {@link org.wpilib.wpilibj.motorcontrol.MotorController MotorController}. The
    * motor controller will be controllable from the dashboard when test mode is enabled, but will
    * otherwise be view-only. <br>
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMMotorController}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.DMC60}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Jaguar}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMTalonSRX}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMVenom}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.SD540}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Spark}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Talon}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Victor}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.VictorSP}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup}
+   *   <li>{@link org.wpilib.wpilibj.motorcontrol.PWMMotorController}
+   *   <li>{@link org.wpilib.wpilibj.motorcontrol.DMC60}
+   *   <li>{@link org.wpilib.wpilibj.motorcontrol.Jaguar}
+   *   <li>{@link org.wpilib.wpilibj.motorcontrol.PWMSparkMax}
+   *   <li>{@link org.wpilib.wpilibj.motorcontrol.PWMTalonFX}
+   *   <li>{@link org.wpilib.wpilibj.motorcontrol.PWMTalonSRX}
+   *   <li>{@link org.wpilib.wpilibj.motorcontrol.PWMVenom}
+   *   <li>{@link org.wpilib.wpilibj.motorcontrol.PWMVictorSPX}
+   *   <li>{@link org.wpilib.wpilibj.motorcontrol.SD540}
+   *   <li>{@link org.wpilib.wpilibj.motorcontrol.Spark}
+   *   <li>{@link org.wpilib.wpilibj.motorcontrol.Talon}
+   *   <li>{@link org.wpilib.wpilibj.motorcontrol.Victor}
+   *   <li>{@link org.wpilib.wpilibj.motorcontrol.VictorSP}
+   *   <li>{@link org.wpilib.wpilibj.motorcontrol.MotorControllerGroup}
    *   <li>Any custom subclass of {@code MotorController}
    * </ul>
    *
@@ -282,7 +282,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj2.command.Command}
+   *   <li>{@link org.wpilib.wpilibj2.command.Command}
    *   <li>Any custom subclass of {@code Command}
    * </ul>
    *
@@ -297,7 +297,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj2.command.PIDCommand}
+   *   <li>{@link org.wpilib.wpilibj2.command.PIDCommand}
    *   <li>Any custom subclass of {@code PIDCommand}
    * </ul>
    *
@@ -311,7 +311,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.math.controller.PIDController}
+   *   <li>{@link org.wpilib.math.controller.PIDController}
    * </ul>
    *
    * <br>
@@ -324,7 +324,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.AnalogAccelerometer}
+   *   <li>{@link org.wpilib.wpilibj.AnalogAccelerometer}
    * </ul>
    *
    * <br>
@@ -350,9 +350,9 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.ADXL345_I2C}
-   *   <li>{@link edu.wpi.first.wpilibj.ADXL345_SPI}
-   *   <li>{@link edu.wpi.first.wpilibj.ADXL362}
+   *   <li>{@link org.wpilib.wpilibj.ADXL345_I2C}
+   *   <li>{@link org.wpilib.wpilibj.ADXL345_SPI}
+   *   <li>{@link org.wpilib.wpilibj.ADXL362}
    * </ul>
    *
    * <br>
@@ -374,8 +374,8 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.ADXRS450_Gyro}
-   *   <li>{@link edu.wpi.first.wpilibj.AnalogGyro}
+   *   <li>{@link org.wpilib.wpilibj.ADXRS450_Gyro}
+   *   <li>{@link org.wpilib.wpilibj.AnalogGyro}
    *   <li>Any custom subclass of {@code GyroBase} (such as a MXP gyro)
    * </ul>
    *
@@ -396,7 +396,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.Relay}
+   *   <li>{@link org.wpilib.wpilibj.Relay}
    * </ul>
    *
    * <br>
@@ -410,7 +410,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.drive.DifferentialDrive}
+   *   <li>{@link org.wpilib.wpilibj.drive.DifferentialDrive}
    * </ul>
    *
    * <br>
@@ -432,7 +432,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.drive.MecanumDrive}
+   *   <li>{@link org.wpilib.wpilibj.drive.MecanumDrive}
    * </ul>
    *
    * <br>
@@ -449,7 +449,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.cscore.VideoSource} (as long as it is streaming on an MJPEG server)
+   *   <li>{@link org.wpilib.cscore.VideoSource} (as long as it is streaming on an MJPEG server)
    * </ul>
    *
    * <br>
@@ -474,7 +474,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.smartdashboard.Field2d}
+   *   <li>{@link org.wpilib.wpilibj.smartdashboard.Field2d}
    * </ul>
    */
   kField("Field"),

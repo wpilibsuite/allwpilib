@@ -1,15 +1,15 @@
 import org.gradle.language.base.internal.ProjectLayout
-import edu.wpi.first.deployutils.deploy.target.RemoteTarget
-import edu.wpi.first.deployutils.deploy.target.location.SshDeployLocation
-import edu.wpi.first.deployutils.deploy.artifact.*
+import org.wpilib.deployutils.deploy.target.RemoteTarget
+import org.wpilib.deployutils.deploy.target.location.SshDeployLocation
+import org.wpilib.deployutils.deploy.artifact.*
 import org.gradle.internal.os.OperatingSystem
 
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 apply plugin: ExtraTasks
 
-apply plugin: 'edu.wpi.first.DeployUtils'
+apply plugin: 'org.wpilib.DeployUtils'
 
 apply from: '../shared/config.gradle'
 

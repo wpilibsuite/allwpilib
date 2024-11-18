@@ -13,7 +13,7 @@ java_library(
 java_binary(
     name = "DevMain-Java",
     srcs = ["src/dev/java/edu/wpi/first/cscore/DevMain.java"],
-    main_class = "edu.wpi.first.cscore.DevMain",
+    main_class = "org.wpilib.cscore.DevMain",
     deps = [
         ":cscore-java",
         "//wpiutil:wpiutil-java",

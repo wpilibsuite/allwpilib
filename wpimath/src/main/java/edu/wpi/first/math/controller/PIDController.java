@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.controller;
+package org.wpilib.math.controller;
 
-import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import org.wpilib.math.MathSharedStore;
+import org.wpilib.math.MathUsageId;
+import org.wpilib.math.MathUtil;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
 
 /** Implements a PID control loop. */
 public class PIDController implements Sendable, AutoCloseable {

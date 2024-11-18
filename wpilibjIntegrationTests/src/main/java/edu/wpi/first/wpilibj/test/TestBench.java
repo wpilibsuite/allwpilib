@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.test;
+package org.wpilib.wpilibj.test;
 
-import edu.wpi.first.wpilibj.AnalogGyro;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.AnalogOutput;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Relay;
-import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
-import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
-import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
-import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFixture;
-import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
-import edu.wpi.first.wpilibj.motorcontrol.Jaguar;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
-import edu.wpi.first.wpilibj.motorcontrol.Victor;
+import org.wpilib.wpilibj.AnalogGyro;
+import org.wpilib.wpilibj.AnalogInput;
+import org.wpilib.wpilibj.AnalogOutput;
+import org.wpilib.wpilibj.DigitalInput;
+import org.wpilib.wpilibj.Relay;
+import org.wpilib.wpilibj.Servo;
+import org.wpilib.wpilibj.fixtures.AnalogCrossConnectFixture;
+import org.wpilib.wpilibj.fixtures.DIOCrossConnectFixture;
+import org.wpilib.wpilibj.fixtures.MotorEncoderFixture;
+import org.wpilib.wpilibj.fixtures.RelayCrossConnectFixture;
+import org.wpilib.wpilibj.fixtures.TiltPanCameraFixture;
+import org.wpilib.wpilibj.motorcontrol.Jaguar;
+import org.wpilib.wpilibj.motorcontrol.Talon;
+import org.wpilib.wpilibj.motorcontrol.Victor;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;

@@ -10,7 +10,7 @@ java_library(
 java_binary(
     name = "DevMain-Java",
     srcs = ["src/dev/java/edu/wpi/first/units/DevMain.java"],
-    main_class = "edu.wpi.first.units.DevMain",
+    main_class = "org.wpilib.units.DevMain",
     deps = [
         ":wpiunits",
     ],

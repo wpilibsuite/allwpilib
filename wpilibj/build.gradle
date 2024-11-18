@@ -5,8 +5,8 @@ evaluationDependsOn(':cameraserver')
 
 ext {
     baseId = 'wpilibj'
-    groupId = 'edu.wpi.first.wpilibj'
-    devMain = 'edu.wpi.first.wpilibj.DevMain'
+    groupId = 'org.wpilib.wpilibj'
+    devMain = 'org.wpilib.wpilibj.DevMain'
 }
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"
@@ -75,7 +75,7 @@ dependencies {
 }
 
 apply plugin: 'cpp'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 apply plugin: ExtraTasks
 apply from: "${rootDir}/shared/config.gradle"
 

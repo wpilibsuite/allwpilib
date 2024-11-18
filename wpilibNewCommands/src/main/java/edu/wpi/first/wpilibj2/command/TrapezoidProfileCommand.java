@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj2.command;
+package org.wpilib.wpilibj2.command;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.math.trajectory.TrapezoidProfile.State;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 

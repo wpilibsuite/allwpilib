@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.system;
+package org.wpilib.math.system;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Num;
-import edu.wpi.first.math.numbers.N1;
+import org.wpilib.math.Matrix;
+import org.wpilib.math.Num;
+import org.wpilib.math.numbers.N1;
 import java.util.function.BiFunction;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;

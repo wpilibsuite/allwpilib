@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.util.protobuf;
+package org.wpilib.util.protobuf;
 
-import edu.wpi.first.util.WPISerializable;
+import org.wpilib.util.WPISerializable;
 
 /**
  * Marker interface to indicate a class is serializable using Protobuf serialization.

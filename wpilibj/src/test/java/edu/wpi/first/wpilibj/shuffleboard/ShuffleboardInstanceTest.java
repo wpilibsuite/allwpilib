@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.shuffleboard;
+package org.wpilib.wpilibj.shuffleboard;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableEvent.Kind;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.PubSubOption;
-import edu.wpi.first.networktables.StringSubscriber;
+import org.wpilib.networktables.GenericEntry;
+import org.wpilib.networktables.NetworkTableEntry;
+import org.wpilib.networktables.NetworkTableEvent.Kind;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.PubSubOption;
+import org.wpilib.networktables.StringSubscriber;
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;

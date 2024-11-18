@@ -10,7 +10,7 @@ import org.gradle.language.base.plugins.ComponentModelBasePlugin;
 import org.gradle.language.nativeplatform.tasks.AbstractNativeSourceCompileTask;
 import org.gradle.model.ModelMap;
 import org.gradle.internal.os.OperatingSystem
-import edu.wpi.first.toolchain.ToolchainExtension
+import org.wpilib.toolchain.ToolchainExtension
 import org.gradle.model.Mutate;
 import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.nativeplatform.test.googletest.GoogleTestTestSuiteBinarySpec;

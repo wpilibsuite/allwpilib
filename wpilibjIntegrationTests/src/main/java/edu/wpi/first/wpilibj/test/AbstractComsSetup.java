@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.test;
+package org.wpilib.wpilibj.test;
 
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.MockDS;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import org.wpilib.hal.DriverStationJNI;
+import org.wpilib.hal.HAL;
+import org.wpilib.wpilibj.DriverStation;
+import org.wpilib.wpilibj.MockDS;
+import org.wpilib.wpilibj.Timer;
+import org.wpilib.wpilibj.livewindow.LiveWindow;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.BeforeClass;

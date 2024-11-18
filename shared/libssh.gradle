@@ -1,7 +1,7 @@
 nativeUtils {
     nativeDependencyContainer {
         libssh(getNativeDependencyTypeClass('WPIStaticMavenDependency')) {
-            groupId = "edu.wpi.first.thirdparty.frc2024"
+            groupId = "org.wpilib.thirdparty.frc2024"
             artifactId = "libssh"
             headerClassifier = "headers"
             sourceClassifier = "sources"

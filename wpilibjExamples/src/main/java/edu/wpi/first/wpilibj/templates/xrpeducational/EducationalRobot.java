@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.templates.xrpeducational;
+package org.wpilib.wpilibj.templates.xrpeducational;
 
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.internal.DriverStationModeThread;
+import org.wpilib.hal.DriverStationJNI;
+import org.wpilib.util.WPIUtilJNI;
+import org.wpilib.wpilibj.DriverStation;
+import org.wpilib.wpilibj.RobotBase;
+import org.wpilib.wpilibj.internal.DriverStationModeThread;
 
 /** Educational robot base class. */
 public class EducationalRobot extends RobotBase {

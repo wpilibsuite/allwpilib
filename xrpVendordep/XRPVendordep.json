@@ -8,7 +8,7 @@
   "jsonUrl": "",
   "javaDependencies": [
     {
-      "groupId": "edu.wpi.first.xrpVendordep",
+      "groupId": "org.wpilib.xrpVendordep",
       "artifactId": "xrpVendordep-java",
       "version": "wpilib"
     }
@@ -16,7 +16,7 @@
   "jniDependencies": [],
   "cppDependencies": [
     {
-      "groupId": "edu.wpi.first.xrpVendordep",
+      "groupId": "org.wpilib.xrpVendordep",
       "artifactId": "xrpVendordep-cpp",
       "version": "wpilib",
       "libName": "xrpVendordep",

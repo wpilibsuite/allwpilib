@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import edu.wpi.first.units.measure.ImmutableTemperature;
-import edu.wpi.first.units.measure.MutTemperature;
-import edu.wpi.first.units.measure.Temperature;
+import org.wpilib.units.measure.ImmutableTemperature;
+import org.wpilib.units.measure.MutTemperature;
+import org.wpilib.units.measure.Temperature;
 
 /**
  * Unit of temperature dimension.

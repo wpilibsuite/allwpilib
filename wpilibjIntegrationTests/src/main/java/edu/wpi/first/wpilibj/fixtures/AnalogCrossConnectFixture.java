@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.fixtures;
+package org.wpilib.wpilibj.fixtures;
 
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.AnalogOutput;
+import org.wpilib.wpilibj.AnalogInput;
+import org.wpilib.wpilibj.AnalogOutput;
 
 /** A fixture that connects an {@link AnalogInput} and an {@link AnalogOutput}. */
 public abstract class AnalogCrossConnectFixture implements ITestFixture {
@@ -31,7 +31,7 @@ public abstract class AnalogCrossConnectFixture implements ITestFixture {
   /*
    * (non-Javadoc)
    *
-   * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#setup()
+   * @see org.wpilib.wpilibj.fixtures.ITestFixture#setup()
    */
   @Override
   public void setup() {
@@ -42,7 +42,7 @@ public abstract class AnalogCrossConnectFixture implements ITestFixture {
   /*
    * (non-Javadoc)
    *
-   * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#reset()
+   * @see org.wpilib.wpilibj.fixtures.ITestFixture#reset()
    */
   @Override
   public void reset() {
@@ -52,7 +52,7 @@ public abstract class AnalogCrossConnectFixture implements ITestFixture {
   /*
    * (non-Javadoc)
    *
-   * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#teardown()
+   * @see org.wpilib.wpilibj.fixtures.ITestFixture#teardown()
    */
   @Override
   public void teardown() {

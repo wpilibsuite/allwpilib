@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units.mutable;
+package org.wpilib.units.mutable;
 
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Unit;
+import org.wpilib.units.Measure;
+import org.wpilib.units.MutableMeasure;
+import org.wpilib.units.Unit;
 import java.util.Objects;
 
 /**

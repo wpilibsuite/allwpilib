@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj2.command.button;
+package org.wpilib.wpilibj2.command.button;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -10,14 +10,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import edu.wpi.first.wpilibj.simulation.SimHooks;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.CommandTestBase;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import org.wpilib.wpilibj.simulation.SimHooks;
+import org.wpilib.wpilibj2.command.Command;
+import org.wpilib.wpilibj2.command.CommandScheduler;
+import org.wpilib.wpilibj2.command.CommandTestBase;
+import org.wpilib.wpilibj2.command.FunctionalCommand;
+import org.wpilib.wpilibj2.command.RunCommand;
+import org.wpilib.wpilibj2.command.StartEndCommand;
+import org.wpilib.wpilibj2.command.WaitUntilCommand;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;

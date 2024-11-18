@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.system.plant;
+package org.wpilib.math.system.plant;
 
-import edu.wpi.first.math.system.plant.proto.DCMotorProto;
-import edu.wpi.first.math.system.plant.struct.DCMotorStruct;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import edu.wpi.first.util.struct.StructSerializable;
+import org.wpilib.math.system.plant.proto.DCMotorProto;
+import org.wpilib.math.system.plant.struct.DCMotorStruct;
+import org.wpilib.math.util.Units;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.StructSerializable;
 
 /** Holds the constants for a DC motor. */
 public class DCMotor implements ProtobufSerializable, StructSerializable {

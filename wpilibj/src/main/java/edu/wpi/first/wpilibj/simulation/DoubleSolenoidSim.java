@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.wpilibj.simulation;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsBase;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import org.wpilib.wpilibj.DoubleSolenoid;
+import org.wpilib.wpilibj.PneumaticsBase;
+import org.wpilib.wpilibj.PneumaticsModuleType;
 
-/** Class to control a simulated {@link edu.wpi.first.wpilibj.DoubleSolenoid}. */
+/** Class to control a simulated {@link org.wpilib.wpilibj.DoubleSolenoid}. */
 public class DoubleSolenoidSim {
   private final PneumaticsBaseSim m_module;
   private final int m_fwd;

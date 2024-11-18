@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.estimator;
+package org.wpilib.math.estimator;
 
-import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
-import edu.wpi.first.math.kinematics.Kinematics;
-import edu.wpi.first.math.kinematics.Odometry;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
+import org.wpilib.math.MathSharedStore;
+import org.wpilib.math.MathUtil;
+import org.wpilib.math.Matrix;
+import org.wpilib.math.Nat;
+import org.wpilib.math.VecBuilder;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Twist2d;
+import org.wpilib.math.interpolation.TimeInterpolatableBuffer;
+import org.wpilib.math.kinematics.Kinematics;
+import org.wpilib.math.kinematics.Odometry;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N3;
 import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -244,8 +244,8 @@ public class PoseEstimator<T> {
    *     don't use your own time source by calling {@link
    *     PoseEstimator#updateWithTime(double,Rotation2d,Object)} then you must use a timestamp with
    *     an epoch since FPGA startup (i.e., the epoch of this timestamp is the same epoch as {@link
-   *     edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that you should use {@link
-   *     edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source or sync the epochs.
+   *     org.wpilib.wpilibj.Timer#getFPGATimestamp()}.) This means that you should use {@link
+   *     org.wpilib.wpilibj.Timer#getFPGATimestamp()} as your time source or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
@@ -315,8 +315,8 @@ public class PoseEstimator<T> {
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link #updateWithTime}, then you must use a
    *     timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the same
-   *     epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}). This means that you
-   *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source in
+   *     epoch as {@link org.wpilib.wpilibj.Timer#getFPGATimestamp()}). This means that you
+   *     should use {@link org.wpilib.wpilibj.Timer#getFPGATimestamp()} as your time source in
    *     this case.
    * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
    *     in meters, y position in meters, and heading in radians). Increase these numbers to trust

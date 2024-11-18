@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-import edu.wpi.first.wpilibj.networktables.*;
-import edu.wpi.first.wpilibj.tables.*;
+import org.wpilib.wpilibj.networktables.*;
+import org.wpilib.wpilibj.tables.*;
 
 public class Client {
   private static class MyLogger implements NetworkTablesJNI.LoggerFunction {

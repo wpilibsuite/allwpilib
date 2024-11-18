@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.relay;
+package org.wpilib.wpilibj.examples.relay;
 
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Relay;
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.wpilibj.Joystick;
+import org.wpilib.wpilibj.Relay;
+import org.wpilib.wpilibj.TimedRobot;
 
 /**
  * This is a sample program which uses joystick buttons to control a relay. A Relay (generally a

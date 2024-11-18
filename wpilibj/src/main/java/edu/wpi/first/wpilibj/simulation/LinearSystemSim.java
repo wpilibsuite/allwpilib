@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.wpilibj.simulation;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Num;
-import edu.wpi.first.math.StateSpaceUtil;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.system.LinearSystem;
+import org.wpilib.math.Matrix;
+import org.wpilib.math.Num;
+import org.wpilib.math.StateSpaceUtil;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.system.LinearSystem;
 import org.ejml.MatrixDimensionException;
 import org.ejml.simple.SimpleMatrix;
 
 /**
  * This class helps simulate linear systems. To use this class, do the following in the {@link
- * edu.wpi.first.wpilibj.IterativeRobotBase#simulationPeriodic} method.
+ * org.wpilib.wpilibj.IterativeRobotBase#simulationPeriodic} method.
  *
  * <p>Call {@link #setInput(double...)} with the inputs to the system (usually voltage).
  *

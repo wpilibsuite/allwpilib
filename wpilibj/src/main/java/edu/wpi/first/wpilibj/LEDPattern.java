@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Microsecond;
-import static edu.wpi.first.units.Units.Microseconds;
-import static edu.wpi.first.units.Units.Value;
+import static org.wpilib.units.Units.Meters;
+import static org.wpilib.units.Units.Microsecond;
+import static org.wpilib.units.Units.Microseconds;
+import static org.wpilib.units.Units.Value;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.collections.LongToObjectHashMap;
-import edu.wpi.first.units.measure.Dimensionless;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Frequency;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.util.Color;
+import org.wpilib.math.MathUtil;
+import org.wpilib.units.collections.LongToObjectHashMap;
+import org.wpilib.units.measure.Dimensionless;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.Frequency;
+import org.wpilib.units.measure.LinearVelocity;
+import org.wpilib.units.measure.Time;
+import org.wpilib.util.WPIUtilJNI;
+import org.wpilib.wpilibj.util.Color;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;

@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.spline.struct;
+package org.wpilib.math.spline.struct;
 
-import edu.wpi.first.math.spline.QuinticHermiteSpline;
-import edu.wpi.first.util.struct.Struct;
+import org.wpilib.math.spline.QuinticHermiteSpline;
+import org.wpilib.util.struct.Struct;
 import java.nio.ByteBuffer;
 
 public final class QuinticHermiteSplineStruct implements Struct<QuinticHermiteSpline> {

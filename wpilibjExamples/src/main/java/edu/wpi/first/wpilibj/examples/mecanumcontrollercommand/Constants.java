@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.mecanumcontrollercommand;
+package org.wpilib.wpilibj.examples.mecanumcontrollercommand;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.MecanumDriveKinematics;
+import org.wpilib.math.trajectory.TrapezoidProfile;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean

@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.swervecontrollercommand;
+package org.wpilib.wpilibj.examples.swervecontrollercommand;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.wpilibj.TimedRobot;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean

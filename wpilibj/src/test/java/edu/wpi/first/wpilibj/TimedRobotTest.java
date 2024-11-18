@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-import edu.wpi.first.wpilibj.simulation.SimHooks;
+import org.wpilib.wpilibj.livewindow.LiveWindow;
+import org.wpilib.wpilibj.simulation.DriverStationSim;
+import org.wpilib.wpilibj.simulation.SimHooks;
 import java.util.ConcurrentModificationException;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;

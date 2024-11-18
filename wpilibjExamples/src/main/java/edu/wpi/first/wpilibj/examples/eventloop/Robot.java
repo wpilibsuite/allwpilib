@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.eventloop;
+package org.wpilib.wpilibj.examples.eventloop;
 
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.RPM;
+import static org.wpilib.units.Units.Volts;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Ultrasonic;
-import edu.wpi.first.wpilibj.event.BooleanEvent;
-import edu.wpi.first.wpilibj.event.EventLoop;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.wpilibj.Encoder;
+import org.wpilib.wpilibj.Joystick;
+import org.wpilib.wpilibj.TimedRobot;
+import org.wpilib.wpilibj.Ultrasonic;
+import org.wpilib.wpilibj.event.BooleanEvent;
+import org.wpilib.wpilibj.event.EventLoop;
+import org.wpilib.wpilibj.motorcontrol.PWMSparkMax;
 
 public class Robot extends TimedRobot {
   public static final int SHOT_VELOCITY = 200; // rpm

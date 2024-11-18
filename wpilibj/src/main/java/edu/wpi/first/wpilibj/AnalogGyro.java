@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.wpilibj;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.AnalogGyroJNI;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import org.wpilib.hal.AnalogGyroJNI;
+import org.wpilib.hal.FRCNetComm.tResourceType;
+import org.wpilib.hal.HAL;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position. The Gyro class
@@ -55,7 +55,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
   }
 
   /**
-   * Return the heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
+   * Return the heading of the robot as a {@link org.wpilib.math.geometry.Rotation2d}.
    *
    * <p>The angle is continuous, that is it will continue from 360 to 361 degrees. This allows
    * algorithms that wouldn't want to see a discontinuity in the gyro output as it sweeps past from
@@ -66,7 +66,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    *
    * <p>This heading is based on integration of the returned rate from the gyro.
    *
-   * @return the current heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
+   * @return the current heading of the robot as a {@link org.wpilib.math.geometry.Rotation2d}.
    */
   public Rotation2d getRotation2d() {
     return Rotation2d.fromDegrees(-getAngle());

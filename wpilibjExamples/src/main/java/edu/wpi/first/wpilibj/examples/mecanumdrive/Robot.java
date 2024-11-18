@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.mecanumdrive;
+package org.wpilib.wpilibj.examples.mecanumdrive;
 
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.drive.MecanumDrive;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.wpilibj.Joystick;
+import org.wpilib.wpilibj.TimedRobot;
+import org.wpilib.wpilibj.drive.MecanumDrive;
+import org.wpilib.wpilibj.motorcontrol.PWMSparkMax;
 
 /** This is a demo program showing how to use Mecanum control with the MecanumDrive class. */
 public class Robot extends TimedRobot {

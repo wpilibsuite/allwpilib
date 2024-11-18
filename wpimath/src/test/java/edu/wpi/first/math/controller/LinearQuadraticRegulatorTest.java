@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.controller;
+package org.wpilib.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Num;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.system.Discretization;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
+import org.wpilib.math.MatBuilder;
+import org.wpilib.math.Matrix;
+import org.wpilib.math.Nat;
+import org.wpilib.math.Num;
+import org.wpilib.math.VecBuilder;
+import org.wpilib.math.system.Discretization;
+import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
 
 class LinearQuadraticRegulatorTest {
