@@ -270,17 +270,13 @@ class CommandDecoratorTest extends CommandTestBase {
       assertAll(() -> assertTrue(dictatorHasRun.get()), () -> assertTrue(dictatorWasPolled.get()));
     }
   }
-  
+
   @Test
   void withDeadlineTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean finish = new AtomicBoolean(false);
-      Command endsBeforeGroup = Commands.none().withDeadline(
-          Commands.waitUntil(finish::get)
-      );
-      Command endsAfterGroup = Commands.idle().withDeadline(
-          Commands.waitUntil(finish::get)
-      );
+      Command endsBeforeGroup = Commands.none().withDeadline(Commands.waitUntil(finish::get));
+      Command endsAfterGroup = Commands.idle().withDeadline(Commands.waitUntil(finish::get));
       scheduler.schedule(endsBeforeGroup);
       scheduler.run();
       assertTrue(scheduler.isScheduled(endsBeforeGroup));
@@ -296,6 +292,7 @@ class CommandDecoratorTest extends CommandTestBase {
       assertFalse(scheduler.isScheduled(endsAfterGroup));
     }
   }
+
   @Test
   void withDeadlineOrderTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
