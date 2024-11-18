@@ -6,7 +6,6 @@
 
 #include <string>
 #include <utility>
-#include <vector>
 
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>

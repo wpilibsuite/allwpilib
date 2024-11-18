@@ -5,7 +5,6 @@
 #include "frc2/command/ParallelDeadlineGroup.h"
 
 #include <memory>
-#include <string>
 #include <utility>
 #include <vector>
 
