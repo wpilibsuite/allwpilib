@@ -12,7 +12,6 @@ import edu.wpi.first.hal.MatchInfoData;
 import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-
 import org.junit.jupiter.api.Test;
 
 class MatchInfoDataTest {
