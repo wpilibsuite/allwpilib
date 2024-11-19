@@ -183,12 +183,12 @@ class CommandPtr final {
   CommandPtr OnlyIf(std::function<bool()> condition) &&;
 
   /**
-   * Creates a new command that runs this command
-   * and the deadline in parallel, finishing when
-   * the deadline finishes.
+   * Creates a new command that runs this command and the deadline in parallel,
+   * finishing (and interrupting this command) when the deadline finishes.
    *
    * @param deadline the deadline of the command group
    * @return the decorated command
+   * @see DeadlineFor
    */
   CommandPtr WithDeadline(CommandPtr&& deadline) &&;
 
