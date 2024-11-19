@@ -293,6 +293,8 @@ public final class FRCNetComm {
     public static final int kFramework_RobotBuilder = 6;
     /** kFramework_AdvantageKit = 7. */
     public static final int kFramework_AdvantageKit = 7;
+    /** kFramework_MagicBot = 8. */
+    public static final int kFramework_MagicBot = 8;
     /** kRobotDrive_ArcadeStandard = 1. */
     public static final int kRobotDrive_ArcadeStandard = 1;
     /** kRobotDrive_ArcadeButtonSpin = 2. */
