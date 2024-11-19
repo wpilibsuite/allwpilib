@@ -321,6 +321,16 @@ public final class FRCNetComm {
     public static final int kRobotDrive2_KilloughCartesian = 12;
     /** kRobotDrive2_KilloughPolar = 13. */
     public static final int kRobotDrive2_KilloughPolar = 13;
+    /** kRobotDriveSwerve_Other = 14. */
+    public static final int kRobotDriveSwerve_Other = 14;
+    /** kRobotDriveSwerve_YAGSL = 15. */
+    public static final int kRobotDriveSwerve_YAGSL = 15;
+    /** kRobotDriveSwerve_CTRE = 16. */
+    public static final int kRobotDriveSwerve_CTRE = 16;
+    /** kRobotDriveSwerve_MaxSwerve = 17. */
+    public static final int kRobotDriveSwerve_MaxSwerve = 17;
+    /** kRobotDriveSwerve_AdvantageKit = 18. */
+    public static final int kRobotDriveSwerve_AdvantageKit = 18;
     /** kDriverStationCIO_Analog = 1. */
     public static final int kDriverStationCIO_Analog = 1;
     /** kDriverStationCIO_DigitalIn = 2. */
