@@ -139,6 +139,9 @@ class WPILibMathShared : public wpi::math::MathShared {
         HAL_Report(HALUsageReporting::kResourceType_ProfiledPIDController,
                    count);
         break;
+      case wpi::math::MathUsageId::kController_BangBangController:
+        HAL_Report(HALUsageReporting::kResourceType_BangBangController, count);
+        break;
     }
   }
 

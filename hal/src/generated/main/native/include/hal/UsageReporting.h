@@ -136,6 +136,7 @@ typedef enum
     kResourceType_Redux_future5 = 113,
     kResourceType_RevSparkFlexCAN = 114,
     kResourceType_RevSparkFlexPWM = 115,
+    kResourceType_BangBangController = 116,
 
 //    kResourceType_MaximumID = 255,
 } tResourceType;
