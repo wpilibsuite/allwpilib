@@ -1,6 +1,6 @@
 /*
  * Copyright (C) Photon Vision.
- * 
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
  *
@@ -43,10 +43,10 @@ bool lensmodel_one_validate_args(mrcal_lensmodel_t *mrcal_lensmodel,
                                  bool do_check_layout);
 
 // Empty vector just to pass in so it's not NULL?
-mrcal_point3_t observations_point[1];
+mrcal_point3_t observations_point[0];
 mrcal_pose_t
-    extrinsics_rt_fromref[1]; // Always zero for single camera, it seems?
-mrcal_point3_t points[1];     // Seems to always to be None for single camera?
+    extrinsics_rt_fromref[0]; // Always zero for single camera, it seems?
+mrcal_point3_t points[0];     // Seems to always to be None for single camera?
 
 static std::unique_ptr<mrcal_result> mrcal_calibrate(
     // List, depth is ordered array observation[N frames, object_height,
@@ -103,7 +103,8 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
 
   // Copy from board/point pool above, using some code borrowed from
   // mrcal-pywrap
-  mrcal_observation_board_t c_observations_board[Nobservations_board];
+  std::vector<mrcal_observation_board_t> observations_board_data(Nobservations_board);
+  auto c_observations_board = observations_board_data.data();
   // Try to make sure we don't accidentally make a zero-length array or
   // something stupid
   mrcal_observation_point_t
@@ -164,8 +165,11 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
   // call optimize
 
   // Residuals
-  double c_b_packed_final[Nstate];
-  double c_x_final[Nmeasurements];
+  std::vector<double> b_packed_final(Nstate);
+  auto c_b_packed_final = b_packed_final.data();
+
+  std::vector<double> x_final(Nmeasurements);
+  auto c_x_final = x_final.data();
 
   // Seeds
   double *c_intrinsics = intrinsics.data();
@@ -269,7 +273,7 @@ bool lensmodel_one_validate_args(mrcal_lensmodel_t *mrcal_lensmodel,
   int NlensParams = mrcal_lensmodel_num_params(mrcal_lensmodel);
   int NlensParams_have = intrinsics.size();
   if (NlensParams != NlensParams_have) {
-    std::fprintf(stderr, "intrinsics.shape[-1] MUST be %d. Instead got %d", NlensParams,
+    BARF("intrinsics.shape[-1] MUST be %d. Instead got %d", NlensParams,
          NlensParams_have);
     return false;
   }
