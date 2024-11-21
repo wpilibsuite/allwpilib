@@ -55,9 +55,4 @@ macro(wpilib_target_warnings target)
     )
         target_compile_options(${target} PRIVATE -gz=zlib)
     endif()
-
-    # Disable std::mutex constexpr constructor on MSVC
-    if(MSVC)
-        target_compile_options(${target} PRIVATE /D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR)
-    endif()
 endmacro()

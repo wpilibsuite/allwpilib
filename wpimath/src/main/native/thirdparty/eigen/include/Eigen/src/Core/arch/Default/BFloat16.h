@@ -613,6 +613,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 abs(const bfloat16& a) {
   return numext::bit_cast<bfloat16>(x);
 }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 exp(const bfloat16& a) { return bfloat16(::expf(float(a))); }
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 exp2(const bfloat16& a) { return bfloat16(::exp2f(float(a))); }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 expm1(const bfloat16& a) { return bfloat16(numext::expm1(float(a))); }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 log(const bfloat16& a) { return bfloat16(::logf(float(a))); }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 log1p(const bfloat16& a) { return bfloat16(numext::log1p(float(a))); }
@@ -760,6 +761,31 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Eigen::bfloat16 bit_cast<Eigen::bfloat16, 
 template <>
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC uint16_t bit_cast<uint16_t, Eigen::bfloat16>(const Eigen::bfloat16& src) {
   return Eigen::bfloat16_impl::raw_bfloat16_as_uint16(src);
+}
+
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 nextafter(const bfloat16& from, const bfloat16& to) {
+  if (numext::isnan EIGEN_NOT_A_MACRO(from)) {
+    return from;
+  }
+  if (numext::isnan EIGEN_NOT_A_MACRO(to)) {
+    return to;
+  }
+  if (from == to) {
+    return to;
+  }
+  uint16_t from_bits = numext::bit_cast<uint16_t>(from);
+  bool from_sign = from_bits >> 15;
+  // Whether we are adjusting toward the infinity with the same sign as from.
+  bool toward_inf = (to > from) == !from_sign;
+  if (toward_inf) {
+    ++from_bits;
+  } else if ((from_bits & 0x7fff) == 0) {
+    // Adjusting away from inf, but from is zero, so just toggle the sign.
+    from_bits ^= 0x8000;
+  } else {
+    --from_bits;
+  }
+  return numext::bit_cast<bfloat16>(from_bits);
 }
 
 }  // namespace numext

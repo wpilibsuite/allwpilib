@@ -228,8 +228,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     that if you don't use your own time source by calling UpdateWithTime(),
    *     then you must use a timestamp with an epoch since FPGA startup (i.e.,
    *     the epoch of this timestamp is the same epoch as
-   *     frc::Timer::GetFPGATimestamp(). This means that you should use
-   *     frc::Timer::GetFPGATimestamp() as your time source in this case.
+   *     frc::Timer::GetTimestamp(). This means that you should use
+   *     frc::Timer::GetTimestamp() as your time source in this case.
    */
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp) {
@@ -311,8 +311,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     that if you don't use your own time source by calling UpdateWithTime(),
    *     then you must use a timestamp with an epoch since FPGA startup (i.e.,
    *     the epoch of this timestamp is the same epoch as
-   *     frc::Timer::GetFPGATimestamp(). This means that you should use
-   *     frc::Timer::GetFPGATimestamp() as your time source in this case.
+   *     frc::Timer::GetTimestamp(). This means that you should use
+   *     frc::Timer::GetTimestamp() as your time source in this case.
    * @param visionMeasurementStdDevs Standard deviations of the vision pose
    *     measurement (x position in meters, y position in meters, and heading in
    *     radians). Increase these numbers to trust the vision pose measurement

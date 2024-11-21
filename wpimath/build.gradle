@@ -91,6 +91,7 @@ dependencies {
 }
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
+sourceSets.main.resources.srcDir "${projectDir}/src/main/proto"
 
 task unitsHeaders(type: Zip) {
     destinationDirectory = file("$buildDir/outputs")

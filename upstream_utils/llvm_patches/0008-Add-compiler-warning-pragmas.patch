@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:34:07 -0400
-Subject: [PATCH 08/38] Add compiler warning pragmas
+Subject: [PATCH 08/36] Add compiler warning pragmas
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 11 +++++++++++

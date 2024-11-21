@@ -270,10 +270,10 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
   }
 
   /** \returns a const pointer to the data array of this matrix */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Scalar* data() const { return m_storage.data(); }
+  EIGEN_DEVICE_FUNC constexpr const Scalar* data() const { return m_storage.data(); }
 
   /** \returns a pointer to the data array of this matrix */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar* data() { return m_storage.data(); }
+  EIGEN_DEVICE_FUNC constexpr Scalar* data() { return m_storage.data(); }
 
   /** Resizes \c *this to a \a rows x \a cols matrix.
    *
@@ -472,34 +472,17 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
   // Prevent user from trying to instantiate PlainObjectBase objects
   // by making all its constructor protected. See bug 1074.
  protected:
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr PlainObjectBase() : m_storage() {
-    //       EIGEN_INITIALIZE_COEFFS_IF_THAT_OPTION_IS_ENABLED
-  }
-
-#ifndef EIGEN_PARSED_BY_DOXYGEN
-  // FIXME is it still needed ?
-  /** \internal */
-  EIGEN_DEVICE_FUNC constexpr explicit PlainObjectBase(internal::constructor_without_unaligned_array_assert)
-      : m_storage(internal::constructor_without_unaligned_array_assert()) {
-    // EIGEN_INITIALIZE_COEFFS_IF_THAT_OPTION_IS_ENABLED
-  }
-#endif
-
-  EIGEN_DEVICE_FUNC constexpr PlainObjectBase(PlainObjectBase&& other) EIGEN_NOEXCEPT
-      : m_storage(std::move(other.m_storage)) {}
-
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr PlainObjectBase() = default;
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr PlainObjectBase(PlainObjectBase&&) = default;
   EIGEN_DEVICE_FUNC constexpr PlainObjectBase& operator=(PlainObjectBase&& other) EIGEN_NOEXCEPT {
     m_storage = std::move(other.m_storage);
     return *this;
   }
 
   /** Copy constructor */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr PlainObjectBase(const PlainObjectBase& other)
-      : Base(), m_storage(other.m_storage) {}
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr PlainObjectBase(const PlainObjectBase&) = default;
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE PlainObjectBase(Index size, Index rows, Index cols)
-      : m_storage(size, rows, cols) {
-    //       EIGEN_INITIALIZE_COEFFS_IF_THAT_OPTION_IS_ENABLED
-  }
+      : m_storage(size, rows, cols) {}
 
   /** \brief Construct a row of column vector with fixed size from an arbitrary number of coefficients.
    *
