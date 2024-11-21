@@ -502,5 +502,5 @@ struct ${container}_node_size
 endfunction()
 
 if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/container_node_sizes_impl.hpp)
-    get_container_node_sizes(${CMAKE_CURRENT_BINARY_DIR}/container_node_sizes_impl.hpp)
+    get_container_node_sizes(${CMAKE_CURRENT_BINARY_DIR}/src/generated/container_node_sizes_impl.hpp)
 endif()
