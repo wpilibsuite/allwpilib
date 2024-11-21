@@ -189,7 +189,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * swerve drivetrain.
    *
    * @param dtSeconds The duration of the timestep the speeds should be applied for.
-   * @return Itself, after it has been discretized, for inlining.
+   * @return Itself, after it has been discretized, for chaining.
    */
   public ChassisSpeeds discretize(double dtSeconds) {
     var desiredDeltaPose =
@@ -287,7 +287,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
-   * @return Itself, after it has been transformed, for inlining.
+   * @return Itself, after it has been transformed, for chaining.
    */
   public ChassisSpeeds toRobotRelativeSpeeds(Rotation2d robotAngle) {
     // CW rotation into chassis frame
@@ -375,7 +375,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
-   * @return Itself, after it has been transformed, for inlining.
+   * @return Itself, after it has been transformed, for chaining.
    */
   public ChassisSpeeds toFieldRelativeSpeeds(Rotation2d robotAngle) {
     // CCW rotation out of chassis frame
