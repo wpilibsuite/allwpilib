@@ -41,6 +41,18 @@ nativeUtils.platformConfigs.each {
 
 nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")
 
+// On windows x86, for ntcoreffi, use static runtime
+def windowsx86Platform = nativeUtils.platformConfigs.windowsx86
+windowsx86Platform.cCompiler.releaseArgs.remove('/MD')
+windowsx86Platform.cppCompiler.releaseArgs.remove('/MD')
+windowsx86Platform.cCompiler.debugArgs.remove('/MDd')
+windowsx86Platform.cppCompiler.debugArgs.remove('/MDd')
+
+windowsx86Platform.cCompiler.releaseArgs.add('/MT')
+windowsx86Platform.cppCompiler.releaseArgs.add('/MT')
+windowsx86Platform.cCompiler.debugArgs.add('/MTd')
+windowsx86Platform.cppCompiler.debugArgs.add('/MTd')
+
 model {
     components {
         all {
