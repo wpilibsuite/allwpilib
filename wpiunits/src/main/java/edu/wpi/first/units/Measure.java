@@ -99,6 +99,27 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   }
 
   /**
+   * Absolute value of measure.
+   *
+   * @param unit unit to use
+   * @return the absolute value of this measure in the given unit
+   */
+  default double abs(U unit) {
+    return Math.abs(this.in(unit));
+  }
+
+  /**
+   * Take the sign of another measure.
+   *
+   * @param other measure from which to take sign
+   * @param unit unit to use
+   * @return the value of the measure in the given unit with the sign of the provided measure
+   */
+  default double copySign(Measure<U> other, U unit) {
+    return Math.copySign(this.in(unit), other.in(unit));
+  }
+
+  /**
    * Returns an immutable copy of this measure. The copy can be used freely and is guaranteed never
    * to change.
    *

@@ -11,6 +11,8 @@
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
+#include "wpimath/MathShared.h"
+
 namespace frc {
 
 /**
@@ -40,7 +42,13 @@ class WPILIB_DLLEXPORT BangBangController
    */
   constexpr explicit BangBangController(
       double tolerance = std::numeric_limits<double>::infinity())
-      : m_tolerance(tolerance) {}
+      : m_tolerance(tolerance) {
+    if (!std::is_constant_evaluated()) {
+      ++instances;
+      wpi::math::MathSharedStore::ReportUsage(
+          wpi::math::MathUsageId::kController_BangBangController, instances);
+    }
+  }
 
   /**
    * Sets the setpoint for the bang-bang controller.
@@ -127,6 +135,9 @@ class WPILIB_DLLEXPORT BangBangController
 
   double m_setpoint = 0;
   double m_measurement = 0;
+
+  // Usage reporting instances
+  inline static int instances = 0;
 };
 
 }  // namespace frc

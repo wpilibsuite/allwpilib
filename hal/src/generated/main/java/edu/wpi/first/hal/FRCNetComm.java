@@ -251,6 +251,8 @@ public final class FRCNetComm {
     public static final int kResourceType_RevSparkFlexCAN = 114;
     /** kResourceType_RevSparkFlexPWM = 115. */
     public static final int kResourceType_RevSparkFlexPWM = 115;
+    /** kResourceType_BangBangController = 116. */
+    public static final int kResourceType_BangBangController = 116;
   }
 
   /**
@@ -273,6 +275,8 @@ public final class FRCNetComm {
     public static final int kLanguage_DotNet = 5;
     /** kLanguage_Kotlin = 6. */
     public static final int kLanguage_Kotlin = 6;
+    /** kLanguage_Rust = 7. */
+    public static final int kLanguage_Rust = 7;
     /** kCANPlugin_BlackJagBridge = 1. */
     public static final int kCANPlugin_BlackJagBridge = 1;
     /** kCANPlugin_2CAN = 2. */
@@ -291,6 +295,8 @@ public final class FRCNetComm {
     public static final int kFramework_RobotBuilder = 6;
     /** kFramework_AdvantageKit = 7. */
     public static final int kFramework_AdvantageKit = 7;
+    /** kFramework_MagicBot = 8. */
+    public static final int kFramework_MagicBot = 8;
     /** kRobotDrive_ArcadeStandard = 1. */
     public static final int kRobotDrive_ArcadeStandard = 1;
     /** kRobotDrive_ArcadeButtonSpin = 2. */
@@ -317,6 +323,16 @@ public final class FRCNetComm {
     public static final int kRobotDrive2_KilloughCartesian = 12;
     /** kRobotDrive2_KilloughPolar = 13. */
     public static final int kRobotDrive2_KilloughPolar = 13;
+    /** kRobotDriveSwerve_Other = 14. */
+    public static final int kRobotDriveSwerve_Other = 14;
+    /** kRobotDriveSwerve_YAGSL = 15. */
+    public static final int kRobotDriveSwerve_YAGSL = 15;
+    /** kRobotDriveSwerve_CTRE = 16. */
+    public static final int kRobotDriveSwerve_CTRE = 16;
+    /** kRobotDriveSwerve_MaxSwerve = 17. */
+    public static final int kRobotDriveSwerve_MaxSwerve = 17;
+    /** kRobotDriveSwerve_AdvantageKit = 18. */
+    public static final int kRobotDriveSwerve_AdvantageKit = 18;
     /** kDriverStationCIO_Analog = 1. */
     public static final int kDriverStationCIO_Analog = 1;
     /** kDriverStationCIO_DigitalIn = 2. */
@@ -369,6 +385,24 @@ public final class FRCNetComm {
     public static final int kOdometry_MecanumDrive = 2;
     /** kOdometry_SwerveDrive = 3. */
     public static final int kOdometry_SwerveDrive = 3;
+    /** kDashboard_Unknown = 1. */
+    public static final int kDashboard_Unknown = 1;
+    /** kDashboard_Glass = 2. */
+    public static final int kDashboard_Glass = 2;
+    /** kDashboard_SmartDashboard = 3. */
+    public static final int kDashboard_SmartDashboard = 3;
+    /** kDashboard_Shuffleboard = 4. */
+    public static final int kDashboard_Shuffleboard = 4;
+    /** kDashboard_Elastic = 5. */
+    public static final int kDashboard_Elastic = 5;
+    /** kDashboard_LabVIEW = 6. */
+    public static final int kDashboard_LabVIEW = 6;
+    /** kDashboard_AdvantageScope = 7. */
+    public static final int kDashboard_AdvantageScope = 7;
+    /** kDashboard_QFRCDashboard = 8. */
+    public static final int kDashboard_QFRCDashboard = 8;
+    /** kDashboard_FRCWebComponents = 9. */
+    public static final int kDashboard_FRCWebComponents = 9;
   }
 
   /** Utility class. */
