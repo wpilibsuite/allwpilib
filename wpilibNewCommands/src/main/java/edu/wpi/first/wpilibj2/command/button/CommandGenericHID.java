@@ -325,7 +325,7 @@ public class CommandGenericHID {
   }
 
   /**
-   * Constructs a Trigger instance that is true when the HID is connected, attached to the given 
+   * Constructs a Trigger instance that is true when the HID is connected, attached to the given
    * loop.
    *
    * @param loop the event loop instance to attach the Trigger to.
