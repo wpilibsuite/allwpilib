@@ -331,7 +331,7 @@ public class CommandGenericHID {
    * @return a Trigger instance that is true when the HID is connected.
    */
   public Trigger connected(EventLoop loop) {
-    return m_isConnectedCache.computeIfAbsent(k -> new Trigger(loop, this::isConnected));
+    return m_isConnectedCache.computeIfAbsent(loop, k -> new Trigger(loop, this::isConnected));
   }
 
   /**
