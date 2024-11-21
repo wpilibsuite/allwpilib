@@ -26,6 +26,7 @@ public class CommandGenericHID {
   private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>>
       m_axisMagnitudeGreaterThanCache = new HashMap<>();
   private final Map<EventLoop, Map<Integer, Trigger>> m_povCache = new HashMap<>();
+  private final Map<EventLoop, Trigger> m_isConnectedCache = new HashMap<>();
 
   /**
    * Construct an instance of a device.
