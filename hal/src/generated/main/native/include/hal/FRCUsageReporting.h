@@ -167,6 +167,7 @@ namespace HALUsageReporting {
     kResourceType_Redux_future5 = 113,
     kResourceType_RevSparkFlexCAN = 114,
     kResourceType_RevSparkFlexPWM = 115,
+    kResourceType_BangBangController = 116,
   };
   enum tInstances : int32_t {
     kLanguage_LabVIEW = 1,
