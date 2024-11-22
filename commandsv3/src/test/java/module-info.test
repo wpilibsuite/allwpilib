@@ -1,0 +1,5 @@
+--add-modules
+  wpilib.epilogue
+
+--add-reads
+  wpilib.command3=wpilib.epilogue

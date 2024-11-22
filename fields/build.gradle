@@ -15,7 +15,9 @@ if (OperatingSystem.current().isWindows()) {
 
 dependencies {
     annotationProcessor libs.avaje.jsonb.generator
+    annotationProcessor libs.avaje.inject
     implementation libs.avaje.jsonb
+    implementation libs.avaje.inject
 }
 
 ext {

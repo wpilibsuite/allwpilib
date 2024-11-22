@@ -1,0 +1,5 @@
+--add-modules
+  compile.testing
+
+--add-reads
+  wpilib.javac=compile.testing

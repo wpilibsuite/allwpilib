@@ -91,12 +91,14 @@ dependencies {
     annotationProcessor libs.avaje.jsonb.generator
     api project(":wpiunits")
     api libs.avaje.jsonb
-    api libs.bundles.ejml
+    implementation libs.avaje.inject
+    api "org.ejml:ejml-java9module:0.45.2-SNAPSHOT"
     api libs.quickbuf.runtime
     implementation project(":wpiannotations")
     annotationProcessor project(':javacPlugin')
     testAnnotationProcessor project(':javacPlugin')
 }
+
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 sourceSets.main.resources.srcDir "${projectDir}/src/main/proto"

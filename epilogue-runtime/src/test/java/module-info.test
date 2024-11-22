@@ -1,0 +1,5 @@
+--add-modules
+  wpilib.math
+
+--add-reads
+  wpilib.epilogue=wpilib.math

@@ -15,3 +15,15 @@ dependencies {
     testImplementation libs.compile.testing
     testImplementation project(':commandsv2')
 }
+
+test {
+    moduleOptions {
+        runOnClasspath = true
+    }
+}
+
+afterEvaluate {
+    tasks.withType(JavaCompile).matching { it.name.contains("Test") }.configureEach {
+        options.compilerArgs << "--add-modules" << "com.google.common" << "--add-reads" << "wpilib.javac=com.google.common"
+    }
+}
