@@ -121,7 +121,9 @@ tasks.withType(JavaCompile).configureEach {
         "-Xlint:-requires-transitive-automatic",
         "-Xlint:-exports",
         // Java modules warn about exposing classes without an explicitly declared constructor
-        "-Xlint:-missing-explicit-ctor"
+        "-Xlint:-missing-explicit-ctor",
+        // Java modules warn about module names with trailing digits
+        "-Xlint:-module"
     ]
 }
 
