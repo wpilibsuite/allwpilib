@@ -21,6 +21,9 @@ namespace units {
  */
 UNIT_ADD(angular_jerk, radians_per_second_cubed, radians_per_second_cubed,
          rad_per_s_cu, unit<std::ratio<1>, units::category::angular_jerk_unit>)
+UNIT_ADD(angular_jerk, pi_radians_per_second_cubed, pi_radians_per_second_cubed,
+         pi_rad_per_s_cu,
+         compound_unit<angle::pi_radians, inverse<cubed<time::seconds>>>)
 UNIT_ADD(angular_jerk, degrees_per_second_cubed, degrees_per_second_cubed,
          deg_per_s_cu,
          compound_unit<angle::degrees, inverse<cubed<time::seconds>>>)

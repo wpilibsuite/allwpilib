@@ -22,6 +22,9 @@ namespace units {
 UNIT_ADD(angular_acceleration, radians_per_second_squared,
          radians_per_second_squared, rad_per_s_sq,
          unit<std::ratio<1>, units::category::angular_acceleration_unit>)
+UNIT_ADD(angular_acceleration, pi_radians_per_second_squared,
+         pi_radians_per_second_squared, pi_rad_per_s_sq,
+         compound_unit<angle::pi_radians, inverse<squared<time::seconds>>>)
 UNIT_ADD(angular_acceleration, degrees_per_second_squared,
          degrees_per_second_squared, deg_per_s_sq,
          compound_unit<angle::degrees, inverse<squared<time::seconds>>>)

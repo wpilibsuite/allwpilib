@@ -44,6 +44,8 @@ namespace units {
     defined(ENABLE_PREDEFINED_ANGULAR_VELOCITY_UNITS)
 UNIT_ADD(angular_velocity, radians_per_second, radians_per_second, rad_per_s,
          unit<std::ratio<1>, units::category::angular_velocity_unit>)
+UNIT_ADD(angular_velocity, pi_radians_per_second, pi_radians_per_second,
+         pi_rad_per_s, compound_unit<angle::pi_radians, inverse<time::seconds>>)
 UNIT_ADD(angular_velocity, degrees_per_second, degrees_per_second, deg_per_s,
          compound_unit<angle::degrees, inverse<time::seconds>>)
 UNIT_ADD(angular_velocity, turns_per_second, turns_per_second, tps,

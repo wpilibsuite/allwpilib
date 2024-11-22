@@ -98,6 +98,13 @@ public final class Units {
    */
   public static final AngleUnit Radian = Radians; // alias
 
+  /** 1/2 of a turn around a circle. */
+  public static final AngleUnit PIRadians =
+      derive(Radians).aggregate(Math.PI).named("PI Radian").symbol("π rad").make();
+
+  /** 1/2 of a turn around a circle. */
+  public static final AngleUnit PIRadian = PIRadians; // alias
+
   /**
    * A single turn of an object around an external axis. Numerically equivalent to {@link
    * #Rotations}, but may be semantically more expressive in certain scenarios.
@@ -175,6 +182,12 @@ public final class Units {
   public static final AngularVelocityUnit RadiansPerSecond = Radians.per(Second);
 
   /**
+   * A unit of angular velocity, equivalent to spinning at a rate of one {@link #PIRadians π Radian}
+   * per {@link #Second}.
+   */
+  public static final AngularVelocityUnit PIRadiansPerSecond = PIRadians.per(Second);
+
+  /**
    * A unit of angular velocity equivalent to spinning at a rate of one {@link #Degrees Degree} per
    * {@link #Second}.
    */
@@ -216,6 +229,13 @@ public final class Units {
    */
   public static final AngularAccelerationUnit RadiansPerSecondPerSecond =
       RadiansPerSecond.per(Second);
+
+  /**
+   * A unit of angular acceleration, equivalent to accelerating at a rate of one {@link #PIRadians π
+   * Radian} per {@link #Second} every second.
+   */
+  public static final AngularAccelerationUnit PIRadiansPerSecondPerSecond =
+      PIRadiansPerSecond.per(Second);
 
   /**
    * A unit of angular acceleration equivalent to accelerating at a rate of one {@link #Degrees

@@ -166,8 +166,8 @@ constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
 WPILIB_DLLEXPORT
 constexpr units::radian_t AngleModulus(units::radian_t angle) {
   return InputModulus<units::radian_t>(angle,
-                                       units::radian_t{-std::numbers::pi},
-                                       units::radian_t{std::numbers::pi});
+                                       -1_pi_rad,
+                                       1_pi_rad);
 }
 
 // floorDiv and floorMod algorithms taken from Java
