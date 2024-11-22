@@ -30,7 +30,7 @@ def copy_upstream_src(wpilib_root):
             file.write(content)
 
     files = walk_cwd_and_copy_if(
-        lambda dp, f: f.endswith("dogleg.c"),
+        lambda dp, f: f.endswith("dogleg.cpp"),
         os.path.join(wpical, "src/main/native/thirdparty/libdogleg/src"),
     )
     for f in files:

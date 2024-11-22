@@ -20,7 +20,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////// Lens models
 ////////////////////////////////////////////////////////////////////////////////
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 // Return an array of strings listing all the available lens models
 //
 // These are all "unconfigured" strings that use "..." placeholders for any
@@ -846,6 +848,9 @@ void                 mrcal_free_cameramodel(mrcal_cameramodel_t** cameramodel);
 bool mrcal_write_cameramodel_file(const char* filename,
                                   const mrcal_cameramodel_t* cameramodel);
 
+#ifdef __cplusplus
+} // extern "C"
+#endif
 #define DECLARE_mrcal_apply_color_map(T,Tname)                          \
     bool mrcal_apply_color_map_##Tname(                                 \
         mrcal_image_bgr_t*    out,                                      \

@@ -126,7 +126,9 @@ typedef struct
 
 } dogleg_solverContext_t;
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 // Fills in the given structure with the default parameter set
 void dogleg_getDefaultParameters(dogleg_parameters2_t* parameters);
 
@@ -293,3 +295,7 @@ double dogleg_getOutliernessTrace_newFeature_sparse(const double*            Jqu
                                                     int                      NoutlierFeatures,
                                                     dogleg_operatingPoint_t* point,
                                                     dogleg_solverContext_t*  ctx);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
