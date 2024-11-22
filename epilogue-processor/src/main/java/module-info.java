@@ -6,6 +6,7 @@ import javax.annotation.processing.Processor;
 
 module wpilib.epilogue.processor {
   requires java.compiler;
+  requires jdk.compiler;
   requires wpilib.epilogue;
 
   provides Processor with
