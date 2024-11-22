@@ -10,4 +10,5 @@ repositories {
 }
 dependencies {
     implementation "edu.wpi.first:native-utils:2025.12.1"
+    implementation("org.gradlex:extra-java-module-info:1.9")
 }

@@ -8,6 +8,7 @@ evaluationDependsOn(':cscore')
 evaluationDependsOn(':hal')
 
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
+apply from: "${rootDir}/shared/java/opencv-module-patches.gradle"
 
 dependencies {
     implementation project(':wpiutil')

@@ -1,0 +1,34 @@
+// Patch legacy non-modularized dependencies to have module info
+extraJavaModuleInfo {
+    module('org.ejml:ejml-core', 'ejml.core') {
+        exportAllPackages()
+    }
+    module('org.ejml:ejml-simple', 'ejml.simple') {
+        exportAllPackages()
+        requiresTransitive('ejml.core')
+    }
+    module('org.ejml:ejml-fsparse', 'ejml.fsparse') {
+        exportAllPackages()
+        requiresTransitive('ejml.core')
+    }
+    module('org.ejml:ejml-dsparse', 'ejml.dsparse') {
+        exportAllPackages()
+        requiresTransitive('ejml.core')
+    }
+    module('org.ejml:ejml-fdense', 'ejml.fdense') {
+        exportAllPackages()
+        requiresTransitive('ejml.core')
+    }
+    module('org.ejml:ejml-ddense', 'ejml.ddense') {
+        exportAllPackages()
+        requiresTransitive('ejml.core')
+    }
+    module('org.ejml:ejml-cdense', 'ejml.cdense') {
+        exportAllPackages()
+        requiresTransitive('ejml.core')
+    }
+    module('org.ejml:ejml-zdense', 'ejml.zdense') {
+        exportAllPackages()
+        requiresTransitive('ejml.core')
+    }
+}

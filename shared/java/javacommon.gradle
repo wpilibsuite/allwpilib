@@ -1,6 +1,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
+apply plugin: 'org.gradlex.extra-java-module-info'
 
 def baseArtifactId = project.baseId
 def artifactGroupId = project.groupId
@@ -114,6 +115,13 @@ tasks.withType(JavaCompile).configureEach {
         "-Xlint:-serial",
         // ignore unclaimed annotation warning from annotation processing
         "-Xlint:-processing",
+        "-Xlint:-preview",
+        // ignore modules requiring automatic library modules
+        "-Xlint:-requires-automatic",
+        "-Xlint:-requires-transitive-automatic",
+        "-Xlint:-exports",
+        // Java modules warn about exposing classes without an explicitly declared constructor
+        "-Xlint:-missing-explicit-ctor"
     ]
 }
 
