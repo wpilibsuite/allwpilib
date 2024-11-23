@@ -13,9 +13,9 @@ import static org.mockito.Mockito.verify;
 
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.CommandTestBase;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -28,8 +28,8 @@ import java.util.function.BooleanSupplier;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class TriggerTest extends CommandTestBase {
   @Test
@@ -53,11 +53,12 @@ class TriggerTest extends CommandTestBase {
 
   @ParameterizedTest
   @MethodSource("initialStates")
-  void onTrueInitialStateTest(InitialState initialState, boolean pressed, Map<String, Boolean> results) {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
-    Command command1 = Commands.idle();
-    InternalButton button = new InternalButton();
-    boolean shouldBeScheduled = results.get("onTrue");
+  void onTrueInitialStateTest(
+      InitialState initialState, boolean pressed, Map<String, Boolean> results) {
+    final CommandScheduler scheduler = CommandScheduler.getInstance();
+    final Command command1 = Commands.idle();
+    final InternalButton button = new InternalButton();
+    final boolean shouldBeScheduled = results.get("onTrue");
 
     button.setPressed(pressed);
     button.onTrue(command1, initialState);
@@ -89,11 +90,12 @@ class TriggerTest extends CommandTestBase {
 
   @ParameterizedTest
   @MethodSource("initialStates")
-  void onFalseInitialStateTest(InitialState initialState, boolean pressed, Map<String, Boolean> results) {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
-    Command command1 = Commands.idle();
-    InternalButton button = new InternalButton();
-    boolean shouldBeScheduled = results.get("onFalse");
+  void onFalseInitialStateTest(
+      InitialState initialState, boolean pressed, Map<String, Boolean> results) {
+    final CommandScheduler scheduler = CommandScheduler.getInstance();
+    final Command command1 = Commands.idle();
+    final InternalButton button = new InternalButton();
+    final boolean shouldBeScheduled = results.get("onFalse");
 
     button.setPressed(pressed);
     button.onFalse(command1, initialState);
@@ -132,11 +134,12 @@ class TriggerTest extends CommandTestBase {
 
   @ParameterizedTest
   @MethodSource("initialStates")
-  void onChangeInitialStateTest(InitialState initialState, boolean pressed, Map<String, Boolean> results) {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
-    Command command1 = Commands.idle();
-    InternalButton button = new InternalButton();
-    boolean shouldBeScheduled = results.get("onTrue") || results.get("onFalse");
+  void onChangeInitialStateTest(
+      InitialState initialState, boolean pressed, Map<String, Boolean> results) {
+    final CommandScheduler scheduler = CommandScheduler.getInstance();
+    final Command command1 = Commands.idle();
+    final InternalButton button = new InternalButton();
+    final boolean shouldBeScheduled = results.get("onTrue") || results.get("onFalse");
 
     button.setPressed(pressed);
     button.onChange(command1, initialState);
@@ -256,11 +259,12 @@ class TriggerTest extends CommandTestBase {
 
   @ParameterizedTest
   @MethodSource("initialStates")
-  void toggleOnTrueInitialStateTest(InitialState initialState, boolean pressed, Map<String, Boolean> results) {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
-    Command command1 = Commands.idle();
-    InternalButton button = new InternalButton();
-    boolean shouldBeScheduled = results.get("onTrue");
+  void toggleOnTrueInitialStateTest(
+      InitialState initialState, boolean pressed, Map<String, Boolean> results) {
+    final CommandScheduler scheduler = CommandScheduler.getInstance();
+    final Command command1 = Commands.idle();
+    final InternalButton button = new InternalButton();
+    final boolean shouldBeScheduled = results.get("onTrue");
 
     button.setPressed(pressed);
     button.onTrue(command1, initialState);
@@ -354,13 +358,13 @@ class TriggerTest extends CommandTestBase {
 
   static Stream<Arguments> initialStates() {
     return Stream.of(
-      arguments(InitialState.FALSE, true, Map.of("onTrue", true, "onFalse", false)),
-      arguments(InitialState.FALSE, false, Map.of("onTrue", false, "onFalse", false)),
-      arguments(InitialState.TRUE, true, Map.of("onTrue", false, "onFalse", false)),
-      arguments(InitialState.TRUE, false, Map.of("onTrue", false, "onFalse", true)),
-      arguments(InitialState.CONDITION, true, Map.of("onTrue", false, "onFalse", false)),
-      arguments(InitialState.CONDITION, false, Map.of("onTrue", false, "onFalse", false)),
-      arguments(InitialState.NEG_CONDITION, true, Map.of("onTrue", true, "onFalse", false)),
-      arguments(InitialState.NEG_CONDITION, false, Map.of("onTrue", false, "onFalse", true)));
+        arguments(InitialState.FALSE, true, Map.of("onTrue", true, "onFalse", false)),
+        arguments(InitialState.FALSE, false, Map.of("onTrue", false, "onFalse", false)),
+        arguments(InitialState.TRUE, true, Map.of("onTrue", false, "onFalse", false)),
+        arguments(InitialState.TRUE, false, Map.of("onTrue", false, "onFalse", true)),
+        arguments(InitialState.CONDITION, true, Map.of("onTrue", false, "onFalse", false)),
+        arguments(InitialState.CONDITION, false, Map.of("onTrue", false, "onFalse", false)),
+        arguments(InitialState.NEG_CONDITION, true, Map.of("onTrue", true, "onFalse", false)),
+        arguments(InitialState.NEG_CONDITION, false, Map.of("onTrue", false, "onFalse", true)));
   }
 }

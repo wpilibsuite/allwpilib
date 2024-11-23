@@ -25,7 +25,8 @@ import java.util.function.BooleanSupplier;
  */
 public class Trigger implements BooleanSupplier {
   /**
-   * Enum specifying the initial state to use for a binding. This impacts whether or not the binding will be triggered immediately.
+   * Enum specifying the initial state to use for a binding. This impacts whether or not the binding
+   * will be triggered immediately.
    */
   public enum InitialState {
     /** Indicates the binding should assume the condition starts as false. */
@@ -116,7 +117,8 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Starts the given command whenever the condition changes from `false` to `true`. The command is never started immediately.
+   * Starts the given command whenever the condition changes from `false` to `true`. The command is
+   * never started immediately.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
@@ -153,7 +155,8 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Starts the given command whenever the condition changes from `true` to `false`. The command is never started immediately.
+   * Starts the given command whenever the condition changes from `true` to `false`. The command is
+   * never started immediately.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
@@ -284,7 +287,8 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Toggles a command when the condition changes from `false` to `true`. The command is never toggled immediately.
+   * Toggles a command when the condition changes from `false` to `true`. The command is never
+   * toggled immediately.
    *
    * @param command the command to toggle
    * @return this trigger, so calls can be chained
@@ -325,7 +329,8 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Toggles a command when the condition changes from `true` to `false`. The command is never toggled immediately.
+   * Toggles a command when the condition changes from `true` to `false`. The command is never
+   * toggled immediately.
    *
    * @param command the command to toggle
    * @return this trigger, so calls can be chained
