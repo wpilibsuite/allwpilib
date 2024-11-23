@@ -166,39 +166,39 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
-      import java.lang.invoke.MethodHandles;
-      import java.lang.invoke.VarHandle;
+    import edu.wpi.first.epilogue.Logged;
+    import edu.wpi.first.epilogue.Epilogue;
+    import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+    import edu.wpi.first.epilogue.logging.DataLogger;
+    import java.lang.invoke.MethodHandles;
+    import java.lang.invoke.VarHandle;
 
-      public class ExampleLogger extends ClassSpecificLogger<Example> {
-        private static final VarHandle $x;
+    public class ExampleLogger extends ClassSpecificLogger<Example> {
+      private static final VarHandle $x;
 
-        static {
-          try {
-            var lookup = MethodHandles.privateLookupIn(Example.class, MethodHandles.lookup());
-            $x = lookup.findVarHandle(Example.class, "x", java.util.function.DoubleSupplier.class);
-          } catch (ReflectiveOperationException e) {
-            throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
-          }
-        }
-
-        public ExampleLogger() {
-          super(Example.class);
-        }
-
-        @Override
-        public void update(DataLogger dataLogger, Example object) {
-          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", ((java.util.function.DoubleSupplier) $sup.get(object)).getAsDouble());
-          }
+      static {
+        try {
+          var lookup = MethodHandles.privateLookupIn(Example.class, MethodHandles.lookup());
+          $x = lookup.findVarHandle(Example.class, "x", java.util.function.DoubleSupplier.class);
+        } catch (ReflectiveOperationException e) {
+          throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
         }
       }
-      """;
+
+      public ExampleLogger() {
+        super(Example.class);
+      }
+
+      @Override
+      public void update(DataLogger dataLogger, Example object) {
+        if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+          dataLogger.log("x", ((java.util.function.DoubleSupplier) $x.get(object)).getAsDouble());
+        }
+      }
+    }
+    """;
 
     assertLoggerGenerates(source, expectedGeneratedSource);
   }
