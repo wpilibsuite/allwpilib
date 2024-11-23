@@ -325,11 +325,11 @@ INSTANTIATE_TEST_SUITE_P(
     InitialStateTests, TriggerInitialStateTest,
     testing::Values(
         // Initial state, pressed, rising, falling
-        std::tuple{Trigger::InitialState::FALSE, false, false, false},
-        std::tuple{Trigger::InitialState::FALSE, true, true, false},
-        std::tuple{Trigger::InitialState::TRUE, false, false, true},
-        std::tuple{Trigger::InitialState::TRUE, true, false, false},
-        std::tuple{Trigger::InitialState::CONDITION, false, false, false},
-        std::tuple{Trigger::InitialState::CONDITION, true, false, false},
-        std::tuple{Trigger::InitialState::NEG_CONDITION, false, false, true},
-        std::tuple{Trigger::InitialState::NEG_CONDITION, true, true, false}));
+        std::tuple{Trigger::InitialState::kFalse, false, false, false},
+        std::tuple{Trigger::InitialState::kFalse, true, true, false},
+        std::tuple{Trigger::InitialState::kTrue, false, false, true},
+        std::tuple{Trigger::InitialState::kTrue, true, false, false},
+        std::tuple{Trigger::InitialState::kCondition, false, false, false},
+        std::tuple{Trigger::InitialState::kCondition, true, false, false},
+        std::tuple{Trigger::InitialState::kNegCondition, false, false, true},
+        std::tuple{Trigger::InitialState::kNegCondition, true, true, false}));

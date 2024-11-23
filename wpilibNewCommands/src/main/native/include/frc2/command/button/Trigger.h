@@ -39,23 +39,23 @@ class Trigger {
      * Indicates the binding should use false as the initial value. This causes
      * a rising edge at the start if and only if the condition starts true.
      */
-    FALSE,
+    kFalse,
     /**
      * Indicates the binding should use true as the initial value. This causes a
      * falling edge at the start if and only if the condition starts false.
      */
-    TRUE,
+    kTrue,
     /**
      * Indicates the binding should use the trigger's condition as the initial
      * value. This never causes an edge at the start.
      */
-    CONDITION,
+    kCondition,
     /**
      * Indicates the binding should use the negated trigger's condition as the
      * initial value. This always causes an edge at the start. Rising or falling
      * depends on if the condition starts true or false, respectively.
      */
-    NEG_CONDITION
+    kNegCondition
   };
 
   /**
@@ -93,7 +93,7 @@ class Trigger {
    * @return this trigger, so calls can be chained
    */
   Trigger OnChange(Command* command,
-                   InitialState initialState = InitialState::CONDITION);
+                   InitialState initialState = InitialState::kCondition);
 
   /**
    * Starts the command when the condition changes. Moves command ownership to
@@ -104,7 +104,7 @@ class Trigger {
    * @return this trigger, so calls can be chained
    */
   Trigger OnChange(CommandPtr&& command,
-                   InitialState initialState = InitialState::CONDITION);
+                   InitialState initialState = InitialState::kCondition);
 
   /**
    * Starts the given command whenever the condition changes from `false` to
@@ -118,7 +118,7 @@ class Trigger {
    * @return this trigger, so calls can be chained
    */
   Trigger OnTrue(Command* command,
-                 InitialState initialState = InitialState::CONDITION);
+                 InitialState initialState = InitialState::kCondition);
 
   /**
    * Starts the given command whenever the condition changes from `false` to
@@ -129,7 +129,7 @@ class Trigger {
    * @return The trigger, for chained calls.
    */
   Trigger OnTrue(CommandPtr&& command,
-                 InitialState initialState = InitialState::CONDITION);
+                 InitialState initialState = InitialState::kCondition);
 
   /**
    * Starts the given command whenever the condition changes from `true` to
@@ -143,7 +143,7 @@ class Trigger {
    * @return this trigger, so calls can be chained
    */
   Trigger OnFalse(Command* command,
-                  InitialState initialState = InitialState::CONDITION);
+                  InitialState initialState = InitialState::kCondition);
 
   /**
    * Starts the given command whenever the condition changes from `true` to
@@ -154,7 +154,7 @@ class Trigger {
    * @return The trigger, for chained calls.
    */
   Trigger OnFalse(CommandPtr&& command,
-                  InitialState initialState = InitialState::CONDITION);
+                  InitialState initialState = InitialState::kCondition);
 
   /**
    * Starts the given command when the condition changes to `true` and cancels
@@ -171,7 +171,7 @@ class Trigger {
    * @return this trigger, so calls can be chained
    */
   Trigger WhileTrue(Command* command,
-                    InitialState initialState = InitialState::CONDITION);
+                    InitialState initialState = InitialState::kCondition);
 
   /**
    * Starts the given command when the condition changes to `true` and cancels
@@ -186,7 +186,7 @@ class Trigger {
    * @return The trigger, for chained calls.
    */
   Trigger WhileTrue(CommandPtr&& command,
-                    InitialState initialState = InitialState::CONDITION);
+                    InitialState initialState = InitialState::kCondition);
 
   /**
    * Starts the given command when the condition changes to `false` and cancels
@@ -203,7 +203,7 @@ class Trigger {
    * @return this trigger, so calls can be chained
    */
   Trigger WhileFalse(Command* command,
-                     InitialState initialState = InitialState::CONDITION);
+                     InitialState initialState = InitialState::kCondition);
 
   /**
    * Starts the given command when the condition changes to `false` and cancels
@@ -218,7 +218,7 @@ class Trigger {
    * @return The trigger, for chained calls.
    */
   Trigger WhileFalse(CommandPtr&& command,
-                     InitialState initialState = InitialState::CONDITION);
+                     InitialState initialState = InitialState::kCondition);
 
   /**
    * Toggles a command when the condition changes from `false` to `true`.
@@ -231,7 +231,7 @@ class Trigger {
    * @return this trigger, so calls can be chained
    */
   Trigger ToggleOnTrue(Command* command,
-                       InitialState initialState = InitialState::CONDITION);
+                       InitialState initialState = InitialState::kCondition);
 
   /**
    * Toggles a command when the condition changes from `false` to `true`.
@@ -244,7 +244,7 @@ class Trigger {
    * @return this trigger, so calls can be chained
    */
   Trigger ToggleOnTrue(CommandPtr&& command,
-                       InitialState initialState = InitialState::CONDITION);
+                       InitialState initialState = InitialState::kCondition);
 
   /**
    * Toggles a command when the condition changes from `true` to the low
@@ -258,7 +258,7 @@ class Trigger {
    * @return this trigger, so calls can be chained
    */
   Trigger ToggleOnFalse(Command* command,
-                        InitialState initialState = InitialState::CONDITION);
+                        InitialState initialState = InitialState::kCondition);
 
   /**
    * Toggles a command when the condition changes from `true` to `false`.
@@ -271,7 +271,7 @@ class Trigger {
    * @return this trigger, so calls can be chained
    */
   Trigger ToggleOnFalse(CommandPtr&& command,
-                        InitialState initialState = InitialState::CONDITION);
+                        InitialState initialState = InitialState::kCondition);
 
   /**
    * Composes two triggers with logical AND.
@@ -349,13 +349,13 @@ class Trigger {
  private:
   bool GetInitialState(InitialState initialState) const {
     switch (initialState) {
-      case InitialState::FALSE:
+      case InitialState::kFalse:
         return false;
-      case InitialState::TRUE:
+      case InitialState::kTrue:
         return true;
-      case InitialState::CONDITION:
+      case InitialState::kCondition:
         return m_condition();
-      case InitialState::NEG_CONDITION:
+      case InitialState::kNegCondition:
         return !m_condition();
     }
     return false;

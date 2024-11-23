@@ -33,23 +33,23 @@ public class Trigger implements BooleanSupplier {
      * Indicates the binding should use false as the initial value. This causes a rising edge at the
      * start if and only if the condition starts true.
      */
-    FALSE,
+    kFalse,
     /**
      * Indicates the binding should use true as the initial value. This causes a falling edge at the
      * start if and only if the condition starts false.
      */
-    TRUE,
+    kTrue,
     /**
      * Indicates the binding should use the trigger's condition as the initial value. This never
      * causes an edge at the start.
      */
-    CONDITION,
+    kCondition,
     /**
      * Indicates the binding should use the negated trigger's condition as the initial value. This
      * always causes an edge at the start. Rising or falling depends on if the condition starts true
      * or false, respectively.
      */
-    NEG_CONDITION;
+    kNegCondition;
   }
 
   private final BooleanSupplier m_condition;
@@ -85,10 +85,10 @@ public class Trigger implements BooleanSupplier {
    */
   private boolean getInitialState(InitialState initialState) {
     return switch (initialState) {
-      case FALSE -> false;
-      case TRUE -> true;
-      case CONDITION -> m_condition.getAsBoolean();
-      case NEG_CONDITION -> !m_condition.getAsBoolean();
+      case kFalse -> false;
+      case kTrue -> true;
+      case kCondition -> m_condition.getAsBoolean();
+      case kNegCondition -> !m_condition.getAsBoolean();
     };
   }
 
@@ -99,7 +99,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger onChange(Command command) {
-    return onChange(command, InitialState.CONDITION);
+    return onChange(command, InitialState.kCondition);
   }
 
   /**
@@ -137,7 +137,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger onTrue(Command command) {
-    return onTrue(command, InitialState.CONDITION);
+    return onTrue(command, InitialState.kCondition);
   }
 
   /**
@@ -175,7 +175,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger onFalse(Command command) {
-    return onFalse(command, InitialState.CONDITION);
+    return onFalse(command, InitialState.kCondition);
   }
 
   /**
@@ -216,7 +216,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger whileTrue(Command command) {
-    return whileTrue(command, InitialState.CONDITION);
+    return whileTrue(command, InitialState.kCondition);
   }
 
   /**
@@ -263,7 +263,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger whileFalse(Command command) {
-    return whileFalse(command, InitialState.CONDITION);
+    return whileFalse(command, InitialState.kCondition);
   }
 
   /**
@@ -307,7 +307,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger toggleOnTrue(Command command) {
-    return toggleOnTrue(command, InitialState.CONDITION);
+    return toggleOnTrue(command, InitialState.kCondition);
   }
 
   /**
@@ -349,7 +349,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger toggleOnFalse(Command command) {
-    return toggleOnFalse(command, InitialState.CONDITION);
+    return toggleOnFalse(command, InitialState.kCondition);
   }
 
   /**

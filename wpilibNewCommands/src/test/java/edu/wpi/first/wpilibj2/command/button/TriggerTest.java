@@ -358,13 +358,13 @@ class TriggerTest extends CommandTestBase {
 
   static Stream<Arguments> initialStates() {
     return Stream.of(
-        arguments(InitialState.FALSE, true, Map.of("onTrue", true, "onFalse", false)),
-        arguments(InitialState.FALSE, false, Map.of("onTrue", false, "onFalse", false)),
-        arguments(InitialState.TRUE, true, Map.of("onTrue", false, "onFalse", false)),
-        arguments(InitialState.TRUE, false, Map.of("onTrue", false, "onFalse", true)),
-        arguments(InitialState.CONDITION, true, Map.of("onTrue", false, "onFalse", false)),
-        arguments(InitialState.CONDITION, false, Map.of("onTrue", false, "onFalse", false)),
-        arguments(InitialState.NEG_CONDITION, true, Map.of("onTrue", true, "onFalse", false)),
-        arguments(InitialState.NEG_CONDITION, false, Map.of("onTrue", false, "onFalse", true)));
+        arguments(InitialState.kFalse, true, Map.of("onTrue", true, "onFalse", false)),
+        arguments(InitialState.kFalse, false, Map.of("onTrue", false, "onFalse", false)),
+        arguments(InitialState.kTrue, true, Map.of("onTrue", false, "onFalse", false)),
+        arguments(InitialState.kTrue, false, Map.of("onTrue", false, "onFalse", true)),
+        arguments(InitialState.kCondition, true, Map.of("onTrue", false, "onFalse", false)),
+        arguments(InitialState.kCondition, false, Map.of("onTrue", false, "onFalse", false)),
+        arguments(InitialState.kNegCondition, true, Map.of("onTrue", true, "onFalse", false)),
+        arguments(InitialState.kNegCondition, false, Map.of("onTrue", false, "onFalse", true)));
   }
 }
