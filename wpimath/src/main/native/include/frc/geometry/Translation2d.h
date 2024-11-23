@@ -54,13 +54,13 @@ class WPILIB_DLLEXPORT Translation2d {
       : m_x{distance * angle.Cos()}, m_y{distance * angle.Sin()} {}
 
   /**
-   * Constructs a Translation2d from the provided translation vector's X and Y
-   * components. The values are assumed to be in meters.
+   * Constructs a Translation2d from a 2D translation vector. The values are
+   * assumed to be in meters.
    *
-   * @param vector The translation vector to represent.
+   * @param vector The translation vector.
    */
   constexpr explicit Translation2d(const Eigen::Vector2d& vector)
-      : m_x{units::meter_t{vector(0)}}, m_y{units::meter_t{vector(1)}} {}
+      : m_x{units::meter_t{vector.x()}}, m_y{units::meter_t{vector.y()}} {}
 
   /**
    * Calculates the distance between two translations in 2D space.
@@ -90,9 +90,9 @@ class WPILIB_DLLEXPORT Translation2d {
   constexpr units::meter_t Y() const { return m_y; }
 
   /**
-   * Returns a vector representation of this translation.
+   * Returns a 2D translation vector representation of this translation.
    *
-   * @return A Vector representation of this translation.
+   * @return A 2D translation vector representation of this translation.
    */
   constexpr Eigen::Vector2d ToVector() const {
     return Eigen::Vector2d{{m_x.value(), m_y.value()}};

@@ -404,6 +404,24 @@ class WPILIB_DLLEXPORT Rotation3d {
   }
 
   /**
+   * Returns rotation matrix representation of this rotation.
+   */
+  constexpr Eigen::Matrix3d ToMatrix() const {
+    double w = m_q.W();
+    double x = m_q.X();
+    double y = m_q.Y();
+    double z = m_q.Z();
+
+    // https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Quaternion-derived_rotation_matrix
+    return Eigen::Matrix3d{{1.0 - 2.0 * (y * y + z * z), 2.0 * (x * y - w * z),
+                            2.0 * (x * z + w * y)},
+                           {2.0 * (x * y + w * z), 1.0 - 2.0 * (x * x + z * z),
+                            2.0 * (y * z - w * x)},
+                           {2.0 * (x * z - w * y), 2.0 * (y * z + w * x),
+                            1.0 - 2.0 * (x * x + y * y)}};
+  }
+
+  /**
    * Returns a Rotation2d representing this Rotation3d projected into the X-Y
    * plane.
    */

@@ -5,12 +5,16 @@
 #pragma once
 
 #include <type_traits>
+#include <utility>
 
+#include <Eigen/Core>
+#include <Eigen/LU>
 #include <gcem.hpp>
 #include <wpi/StackTrace.h>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
+#include "frc/ct_matrix.h"
 #include "units/angle.h"
 #include "wpimath/MathShared.h"
 
@@ -56,6 +60,41 @@ class WPILIB_DLLEXPORT Rotation2d {
             "x and y components of Rotation2d are zero\n{}",
             wpi::GetStackTrace(1));
       }
+    }
+  }
+
+  /**
+   * Constructs a Rotation2d from a rotation matrix.
+   *
+   * @param rotationMatrix The rotation matrix.
+   * @throws std::domain_error if the rotation matrix isn't special orthogonal.
+   */
+  constexpr explicit Rotation2d(const Eigen::Matrix2d& rotationMatrix) {
+    auto impl =
+        []<typename Matrix2d>(const Matrix2d& R) -> std::pair<double, double> {
+      // Require that the rotation matrix is special orthogonal. This is true if
+      // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
+      if ((R * R.transpose() - Matrix2d::Identity()).norm() > 1e-9) {
+        throw std::domain_error("Rotation matrix isn't orthogonal");
+      }
+      if (gcem::abs(R.determinant() - 1.0) > 1e-9) {
+        throw std::domain_error(
+            "Rotation matrix is orthogonal but not special orthogonal");
+      }
+
+      // R = [cosθ  −sinθ]
+      //     [sinθ   cosθ]
+      return {R(0, 0), R(1, 0)};
+    };
+
+    if (std::is_constant_evaluated()) {
+      auto cossin = impl(ct_matrix2d{rotationMatrix});
+      m_cos = std::get<0>(cossin);
+      m_sin = std::get<1>(cossin);
+    } else {
+      auto cossin = impl(rotationMatrix);
+      m_cos = std::get<0>(cossin);
+      m_sin = std::get<1>(cossin);
     }
   }
 
@@ -145,6 +184,15 @@ class WPILIB_DLLEXPORT Rotation2d {
   constexpr Rotation2d RotateBy(const Rotation2d& other) const {
     return {Cos() * other.Cos() - Sin() * other.Sin(),
             Cos() * other.Sin() + Sin() * other.Cos()};
+  }
+
+  /**
+   * Returns matrix representation of this rotation.
+   */
+  constexpr Eigen::Matrix2d ToMatrix() const {
+    // R = [cosθ  −sinθ]
+    //     [sinθ   cosθ]
+    return Eigen::Matrix2d{{m_cos, -m_sin}, {m_sin, m_cos}};
   }
 
   /**

@@ -309,6 +309,23 @@ class ct_matrix {
   }
 
   /**
+   * Constexpr version of Eigen's 2x2 matrix determinant member function.
+   *
+   * @return Determinant of matrix.
+   */
+  constexpr Scalar determinant() const
+    requires(Rows == 2 && Cols == 2)
+  {
+    // |a  b|
+    // |c  d| = ad - bc
+    Scalar a = (*this)(0, 0);
+    Scalar b = (*this)(0, 1);
+    Scalar c = (*this)(1, 0);
+    Scalar d = (*this)(1, 1);
+    return a * d - b * c;
+  }
+
+  /**
    * Constexpr version of Eigen's 3x3 matrix determinant member function.
    *
    * @return Determinant of matrix.
@@ -364,7 +381,9 @@ using ct_vector = ct_matrix<Scalar, Rows, 1>;
 template <typename Scalar, int Cols>
 using ct_row_vector = ct_matrix<Scalar, 1, Cols>;
 
+using ct_matrix2d = ct_matrix<double, 2, 2>;
 using ct_matrix3d = ct_matrix<double, 3, 3>;
+using ct_vector2d = ct_vector<double, 2>;
 using ct_vector3d = ct_vector<double, 3>;
 
 }  // namespace frc
