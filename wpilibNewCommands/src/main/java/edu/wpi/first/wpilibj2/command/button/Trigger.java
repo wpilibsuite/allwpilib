@@ -41,7 +41,7 @@ public class Trigger implements BooleanSupplier {
     kTrue,
     /**
      * Indicates the binding should use the trigger's condition as the initial value. This never
-     * causes an edge at the start.
+     * causes an edge at the start. This is the default behavior.
      */
     kCondition,
     /**
@@ -106,7 +106,7 @@ public class Trigger implements BooleanSupplier {
    * Starts the command when the condition changes.
    *
    * @param command the command to start
-   * @param initialState the initial state to use
+   * @param initialState the initial state to use, kCondition (no initial edge) by default
    * @return this trigger, so calls can be chained
    */
   public Trigger onChange(Command command, InitialState initialState) {
@@ -144,7 +144,7 @@ public class Trigger implements BooleanSupplier {
    * Starts the given command whenever the condition changes from `false` to `true`.
    *
    * @param command the command to start
-   * @param initialState the initial state to use
+   * @param initialState the initial state to use, kCondition (no initial edge) by default
    * @return this trigger, so calls can be chained
    */
   public Trigger onTrue(Command command, InitialState initialState) {
@@ -182,7 +182,7 @@ public class Trigger implements BooleanSupplier {
    * Starts the given command whenever the condition changes from `true` to `false`.
    *
    * @param command the command to start
-   * @param initialState the initial state to use
+   * @param initialState the initial state to use, kCondition (no initial edge) by default
    * @return this trigger, so calls can be chained
    */
   public Trigger onFalse(Command command, InitialState initialState) {
@@ -227,7 +227,7 @@ public class Trigger implements BooleanSupplier {
    * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
    *
    * @param command the command to start
-   * @param initialState the initial state to use
+   * @param initialState the initial state to use, kCondition (no initial edge) by default
    * @return this trigger, so calls can be chained
    */
   public Trigger whileTrue(Command command, InitialState initialState) {
@@ -274,7 +274,7 @@ public class Trigger implements BooleanSupplier {
    * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
    *
    * @param command the command to start
-   * @param initialState the initial state to use
+   * @param initialState the initial state to use, kCondition (no initial edge) by default
    * @return this trigger, so calls can be chained
    */
   public Trigger whileFalse(Command command, InitialState initialState) {
@@ -314,7 +314,7 @@ public class Trigger implements BooleanSupplier {
    * Toggles a command when the condition changes from `false` to `true`.
    *
    * @param command the command to toggle
-   * @param initialState the initial state to use
+   * @param initialState the initial state to use, kCondition (no initial edge) by default
    * @return this trigger, so calls can be chained
    */
   public Trigger toggleOnTrue(Command command, InitialState initialState) {
@@ -356,7 +356,7 @@ public class Trigger implements BooleanSupplier {
    * Toggles a command when the condition changes from `true` to `false`.
    *
    * @param command the command to toggle
-   * @param initialState the initial state to use
+   * @param initialState the initial state to use, kCondition (no initial edge) by default
    * @return this trigger, so calls can be chained
    */
   public Trigger toggleOnFalse(Command command, InitialState initialState) {
