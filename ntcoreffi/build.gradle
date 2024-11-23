@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
     id 'c'
     id 'cpp'
@@ -117,6 +119,10 @@ task cppHeadersZip(type: Zip) {
         dependsOn it
         from zipTree(it.archiveFile)
     }
+}
+
+if (OperatingSystem.current().isWindows() && !project.hasProperty('ntcoreffibuild')) {
+    return
 }
 
 build.dependsOn cppHeadersZip

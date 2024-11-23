@@ -41,6 +41,23 @@ nativeUtils.platformConfigs.each {
 
 nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")
 
+if (project.hasProperty('ntcoreffibuild')) {
+  // On windows, for ntcoreffi, use static runtime
+  nativeUtils.platformConfigs.each {
+    if (it.name.contains('windows')) {
+      it.cCompiler.releaseArgs.remove('/MD')
+      it.cppCompiler.releaseArgs.remove('/MD')
+      it.cCompiler.debugArgs.remove('/MDd')
+      it.cppCompiler.debugArgs.remove('/MDd')
+
+      it.cCompiler.releaseArgs.add('/MT')
+      it.cppCompiler.releaseArgs.add('/MT')
+      it.cCompiler.debugArgs.add('/MTd')
+      it.cppCompiler.debugArgs.add('/MTd')
+    }
+  }
+}
+
 model {
     components {
         all {
