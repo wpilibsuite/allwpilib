@@ -345,6 +345,7 @@ class Trigger {
       case InitialState::NEG_CONDITION:
         return !m_condition();
     }
+    return false;
   }
 
   frc::EventLoop* m_loop;
