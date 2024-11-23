@@ -35,13 +35,26 @@ class Trigger {
    * whether or not the binding will be triggered immediately.
    */
   enum struct InitialState {
-    /** Indicates the binding should assume the condition starts as false. */
+    /**
+     * Indicates the binding should use false as the initial value. This causes
+     * a rising edge at the start if and only if the condition starts true.
+     */
     FALSE,
-    /** Indicates the binding should assume the condition starts as true. */
+    /**
+     * Indicates the binding should use true as the initial value. This causes a
+     * falling edge at the start if and only if the condition starts false.
+     */
     TRUE,
-    /** Indicates the binding should use the trigger's condition. */
+    /**
+     * Indicates the binding should use the trigger's condition as the initial
+     * value. This never causes an edge at the start.
+     */
     CONDITION,
-    /** Indicates the binding should use the negated trigger's condition. */
+    /**
+     * Indicates the binding should use the negated trigger's condition as the
+     * initial value. This always causes an edge at the start. Rising or falling
+     * depends on if the condition starts true or false, respectively.
+     */
     NEG_CONDITION
   };
 
