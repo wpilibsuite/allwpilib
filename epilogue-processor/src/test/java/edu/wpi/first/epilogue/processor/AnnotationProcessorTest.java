@@ -141,7 +141,60 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", (double) $x.get(object));
+            dataLogger.log("x", ((double) $x.get(object)));
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void privateSuppliers() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      import java.util.function.DoubleSupplier;
+
+      @Logged
+      class Example {
+        private DoubleSupplier x;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.DataLogger;
+      import java.lang.invoke.MethodHandles;
+      import java.lang.invoke.VarHandle;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        private static final VarHandle $x;
+
+        static {
+          try {
+            var lookup = MethodHandles.privateLookupIn(Example.class, MethodHandles.lookup());
+            $x = lookup.findVarHandle(Example.class, "x", java.util.function.DoubleSupplier.class);
+          } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+          }
+        }
+
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(DataLogger dataLogger, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            dataLogger.log("x", ((java.util.function.DoubleSupplier) $sup.get(object)).getAsDouble());
           }
         }
       }
@@ -192,7 +245,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            logSendable(dataLogger.getSubLogger("chooser"), (edu.wpi.first.wpilibj.smartdashboard.SendableChooser<java.lang.String>) $chooser.get(object));
+            logSendable(dataLogger.getSubLogger("chooser"), ((edu.wpi.first.wpilibj.smartdashboard.SendableChooser<java.lang.String>) $chooser.get(object)));
           }
         }
       }
@@ -1275,7 +1328,7 @@ class AnnotationProcessorTest {
           @Override
           public void update(DataLogger dataLogger, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              var $$theField = (edu.wpi.first.epilogue.I) $theField.get(object);
+              var $$theField = ((edu.wpi.first.epilogue.I) $theField.get(object));
               if ($$theField instanceof edu.wpi.first.epilogue.Base edu_wpi_first_epilogue_Base) {
                 Epilogue.baseLogger.tryUpdate(dataLogger.getSubLogger("theField"), edu_wpi_first_epilogue_Base, Epilogue.getConfig().errorHandler);
               } else {
@@ -1343,6 +1396,8 @@ class AnnotationProcessorTest {
 
     assertLoggerGenerates(source, expectedGeneratedSource);
   }
+
+  
 
   @Test
   void warnsAboutNonLoggableFields() {
