@@ -18,6 +18,14 @@
 using namespace frc2;
 class TriggerTest : public CommandTestBase {};
 
+// Initial state, pressed, rising, falling
+using InitialStateTestData =
+    std::tuple<Trigger::InitialState, bool, bool, bool>;
+
+class TriggerInitialStateTest
+    : public TriggerTest,
+      public testing::WithParamInterface<InitialStateTestData> {};
+
 TEST_F(TriggerTest, OnTrue) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool finished = false;
@@ -36,6 +44,22 @@ TEST_F(TriggerTest, OnTrue) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
+TEST_P(TriggerInitialStateTest, OnTrue) {
+  auto [initialState, pressed, rising, falling] = GetParam();
+  auto& scheduler = CommandScheduler::GetInstance();
+  RunCommand command([] {});
+  bool shouldBeScheduled = rising;
+
+  Trigger([pressed = pressed] {
+    return pressed;
+  }).OnTrue(&command, initialState);
+
+  EXPECT_FALSE(scheduler.IsScheduled(&command));
+
+  scheduler.Run();
+  EXPECT_EQ(shouldBeScheduled, scheduler.IsScheduled(&command));
+}
+
 TEST_F(TriggerTest, OnFalse) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool finished = false;
@@ -52,6 +76,22 @@ TEST_F(TriggerTest, OnFalse) {
   finished = true;
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
+}
+
+TEST_P(TriggerInitialStateTest, OnFalse) {
+  auto [initialState, pressed, rising, falling] = GetParam();
+  auto& scheduler = CommandScheduler::GetInstance();
+  RunCommand command([] {});
+  bool shouldBeScheduled = falling;
+
+  Trigger([pressed = pressed] {
+    return pressed;
+  }).OnFalse(&command, initialState);
+
+  EXPECT_FALSE(scheduler.IsScheduled(&command));
+
+  scheduler.Run();
+  EXPECT_EQ(shouldBeScheduled, scheduler.IsScheduled(&command));
 }
 
 TEST_F(TriggerTest, OnChange) {
@@ -76,6 +116,22 @@ TEST_F(TriggerTest, OnChange) {
   finished = true;
   scheduler.Run();
   EXPECT_FALSE(command.IsScheduled());
+}
+
+TEST_P(TriggerInitialStateTest, OnChange) {
+  auto [initialState, pressed, rising, falling] = GetParam();
+  auto& scheduler = CommandScheduler::GetInstance();
+  RunCommand command([] {});
+  bool shouldBeScheduled = rising || falling;
+
+  Trigger([pressed = pressed] {
+    return pressed;
+  }).OnChange(&command, initialState);
+
+  EXPECT_FALSE(scheduler.IsScheduled(&command));
+
+  scheduler.Run();
+  EXPECT_EQ(shouldBeScheduled, scheduler.IsScheduled(&command));
 }
 
 TEST_F(TriggerTest, WhileTrueRepeatedly) {
@@ -175,6 +231,22 @@ TEST_F(TriggerTest, ToggleOnTrue) {
   EXPECT_EQ(1, endCounter);
 }
 
+TEST_P(TriggerInitialStateTest, ToggleOnTrue) {
+  auto [initialState, pressed, rising, falling] = GetParam();
+  auto& scheduler = CommandScheduler::GetInstance();
+  RunCommand command([] {});
+  bool shouldBeScheduled = rising;
+
+  Trigger([pressed = pressed] {
+    return pressed;
+  }).ToggleOnTrue(&command, initialState);
+
+  EXPECT_FALSE(scheduler.IsScheduled(&command));
+
+  scheduler.Run();
+  EXPECT_EQ(shouldBeScheduled, scheduler.IsScheduled(&command));
+}
+
 TEST_F(TriggerTest, And) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool finished = false;
@@ -247,3 +319,16 @@ TEST_F(TriggerTest, Debounce) {
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(&command));
 }
+
+INSTANTIATE_TEST_SUITE_P(
+    InitialState, TriggerInitialStateTest,
+    testing::Values(
+        // Initial state, pressed, rising, falling
+        std::tuple{Trigger::InitialState::FALSE, false, false, false},
+        std::tuple{Trigger::InitialState::FALSE, true, true, false},
+        std::tuple{Trigger::InitialState::TRUE, false, false, true},
+        std::tuple{Trigger::InitialState::TRUE, true, false, false},
+        std::tuple{Trigger::InitialState::CONDITION, false, false, false},
+        std::tuple{Trigger::InitialState::CONDITION, true, false, false},
+        std::tuple{Trigger::InitialState::NEG_CONDITION, false, false, true},
+        std::tuple{Trigger::InitialState::NEG_CONDITION, true, true, false}));

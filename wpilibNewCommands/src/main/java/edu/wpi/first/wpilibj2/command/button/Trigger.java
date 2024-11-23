@@ -24,6 +24,20 @@ import java.util.function.BooleanSupplier;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class Trigger implements BooleanSupplier {
+  /**
+   * Enum specifying the initial state to use for a binding. This impacts whether or not the binding will be triggered immediately.
+   */
+  public enum InitialState {
+    /** Indicates the binding should assume the condition starts as false. */
+    FALSE,
+    /** Indicates the binding should assume the condition starts as true. */
+    TRUE,
+    /** Indicates the binding should use the trigger's condition. */
+    CONDITION,
+    /** Indicates the binding should use the negated trigger's condition. */
+    NEG_CONDITION;
+  }
+
   private final BooleanSupplier m_condition;
   private final EventLoop m_loop;
 
@@ -50,16 +64,42 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Starts the command when the condition changes.
+   * Gets the initial state for a binding based on an initial state policy.
+   *
+   * @param initialState Initial state policy.
+   * @return The initial state to use.
+   */
+  private boolean getInitialState(InitialState initialState) {
+    return switch (initialState) {
+      case FALSE -> false;
+      case TRUE -> true;
+      case CONDITION -> m_condition.getAsBoolean();
+      case NEG_CONDITION -> !m_condition.getAsBoolean();
+    };
+  }
+
+  /**
+   * Starts the command when the condition changes. The command is never started immediately.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
    */
   public Trigger onChange(Command command) {
+    return onChange(command, InitialState.CONDITION);
+  }
+
+  /**
+   * Starts the command when the condition changes.
+   *
+   * @param command the command to start
+   * @param initialState the initial state to use
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger onChange(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "onChange");
     m_loop.bind(
         new Runnable() {
-          private boolean m_pressedLast = m_condition.getAsBoolean();
+          private boolean m_pressedLast = getInitialState(initialState);
 
           @Override
           public void run() {
@@ -76,16 +116,27 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Starts the given command whenever the condition changes from `false` to `true`.
+   * Starts the given command whenever the condition changes from `false` to `true`. The command is never started immediately.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
    */
   public Trigger onTrue(Command command) {
+    return onTrue(command, InitialState.CONDITION);
+  }
+
+  /**
+   * Starts the given command whenever the condition changes from `false` to `true`.
+   *
+   * @param command the command to start
+   * @param initialState the initial state to use
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger onTrue(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "onTrue");
     m_loop.bind(
         new Runnable() {
-          private boolean m_pressedLast = m_condition.getAsBoolean();
+          private boolean m_pressedLast = getInitialState(initialState);
 
           @Override
           public void run() {
@@ -102,16 +153,27 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Starts the given command whenever the condition changes from `true` to `false`.
+   * Starts the given command whenever the condition changes from `true` to `false`. The command is never started immediately.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
    */
   public Trigger onFalse(Command command) {
+    return onFalse(command, InitialState.CONDITION);
+  }
+
+  /**
+   * Starts the given command whenever the condition changes from `true` to `false`.
+   *
+   * @param command the command to start
+   * @param initialState the initial state to use
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger onFalse(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "onFalse");
     m_loop.bind(
         new Runnable() {
-          private boolean m_pressedLast = m_condition.getAsBoolean();
+          private boolean m_pressedLast = getInitialState(initialState);
 
           @Override
           public void run() {
@@ -129,7 +191,7 @@ public class Trigger implements BooleanSupplier {
 
   /**
    * Starts the given command when the condition changes to `true` and cancels it when the condition
-   * changes to `false`.
+   * changes to `false`. The command is never started immediately.
    *
    * <p>Doesn't re-start the command if it ends while the condition is still `true`. If the command
    * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
@@ -138,10 +200,25 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger whileTrue(Command command) {
+    return whileTrue(command, InitialState.CONDITION);
+  }
+
+  /**
+   * Starts the given command when the condition changes to `true` and cancels it when the condition
+   * changes to `false`.
+   *
+   * <p>Doesn't re-start the command if it ends while the condition is still `true`. If the command
+   * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
+   *
+   * @param command the command to start
+   * @param initialState the initial state to use
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger whileTrue(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "whileTrue");
     m_loop.bind(
         new Runnable() {
-          private boolean m_pressedLast = m_condition.getAsBoolean();
+          private boolean m_pressedLast = getInitialState(initialState);
 
           @Override
           public void run() {
@@ -161,7 +238,7 @@ public class Trigger implements BooleanSupplier {
 
   /**
    * Starts the given command when the condition changes to `false` and cancels it when the
-   * condition changes to `true`.
+   * condition changes to `true`. The command is never started immediately.
    *
    * <p>Doesn't re-start the command if it ends while the condition is still `false`. If the command
    * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
@@ -170,10 +247,25 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger whileFalse(Command command) {
+    return whileFalse(command, InitialState.CONDITION);
+  }
+
+  /**
+   * Starts the given command when the condition changes to `false` and cancels it when the
+   * condition changes to `true`.
+   *
+   * <p>Doesn't re-start the command if it ends while the condition is still `false`. If the command
+   * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
+   *
+   * @param command the command to start
+   * @param initialState the initial state to use
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger whileFalse(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "whileFalse");
     m_loop.bind(
         new Runnable() {
-          private boolean m_pressedLast = m_condition.getAsBoolean();
+          private boolean m_pressedLast = getInitialState(initialState);
 
           @Override
           public void run() {
@@ -192,16 +284,27 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Toggles a command when the condition changes from `false` to `true`.
+   * Toggles a command when the condition changes from `false` to `true`. The command is never toggled immediately.
    *
    * @param command the command to toggle
    * @return this trigger, so calls can be chained
    */
   public Trigger toggleOnTrue(Command command) {
+    return toggleOnTrue(command, InitialState.CONDITION);
+  }
+
+  /**
+   * Toggles a command when the condition changes from `false` to `true`.
+   *
+   * @param command the command to toggle
+   * @param initialState the initial state to use
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger toggleOnTrue(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "toggleOnTrue");
     m_loop.bind(
         new Runnable() {
-          private boolean m_pressedLast = m_condition.getAsBoolean();
+          private boolean m_pressedLast = getInitialState(initialState);
 
           @Override
           public void run() {
@@ -222,16 +325,27 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Toggles a command when the condition changes from `true` to `false`.
+   * Toggles a command when the condition changes from `true` to `false`. The command is never toggled immediately.
    *
    * @param command the command to toggle
    * @return this trigger, so calls can be chained
    */
   public Trigger toggleOnFalse(Command command) {
+    return toggleOnFalse(command, InitialState.CONDITION);
+  }
+
+  /**
+   * Toggles a command when the condition changes from `true` to `false`.
+   *
+   * @param command the command to toggle
+   * @param initialState the initial state to use
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger toggleOnFalse(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "toggleOnFalse");
     m_loop.bind(
         new Runnable() {
-          private boolean m_pressedLast = m_condition.getAsBoolean();
+          private boolean m_pressedLast = getInitialState(initialState);
 
           @Override
           public void run() {

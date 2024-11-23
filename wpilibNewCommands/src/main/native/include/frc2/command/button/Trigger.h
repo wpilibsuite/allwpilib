@@ -31,6 +31,21 @@ class Command;
 class Trigger {
  public:
   /**
+   * Enum specifying the initial state to use for a binding. This impacts
+   * whether or not the binding will be triggered immediately.
+   */
+  enum struct InitialState {
+    /** Indicates the binding should assume the condition starts as false. */
+    FALSE,
+    /** Indicates the binding should assume the condition starts as true. */
+    TRUE,
+    /** Indicates the binding should use the trigger's condition. */
+    CONDITION,
+    /** Indicates the binding should use the negated trigger's condition. */
+    NEG_CONDITION
+  };
+
+  /**
    * Creates a new trigger based on the given condition.
    *
    * <p>Polled by the default scheduler button loop.
@@ -61,18 +76,22 @@ class Trigger {
    * Starts the command when the condition changes.
    *
    * @param command the command to start
+   * @param initialState the initial state to use
    * @return this trigger, so calls can be chained
    */
-  Trigger OnChange(Command* command);
+  Trigger OnChange(Command* command,
+                   InitialState initialState = InitialState::CONDITION);
 
   /**
    * Starts the command when the condition changes. Moves command ownership to
    * the button scheduler.
    *
    * @param command the command to start
+   * @param initialState the initial state to use
    * @return this trigger, so calls can be chained
    */
-  Trigger OnChange(CommandPtr&& command);
+  Trigger OnChange(CommandPtr&& command,
+                   InitialState initialState = InitialState::CONDITION);
 
   /**
    * Starts the given command whenever the condition changes from `false` to
@@ -82,18 +101,22 @@ class Trigger {
    * lifespan of the command.
    *
    * @param command the command to start
+   * @param initialState the initial state to use
    * @return this trigger, so calls can be chained
    */
-  Trigger OnTrue(Command* command);
+  Trigger OnTrue(Command* command,
+                 InitialState initialState = InitialState::CONDITION);
 
   /**
    * Starts the given command whenever the condition changes from `false` to
    * `true`. Moves command ownership to the button scheduler.
    *
    * @param command The command to bind.
+   * @param initialState the initial state to use
    * @return The trigger, for chained calls.
    */
-  Trigger OnTrue(CommandPtr&& command);
+  Trigger OnTrue(CommandPtr&& command,
+                 InitialState initialState = InitialState::CONDITION);
 
   /**
    * Starts the given command whenever the condition changes from `true` to
@@ -103,18 +126,22 @@ class Trigger {
    * lifespan of the command.
    *
    * @param command the command to start
+   * @param initialState the initial state to use
    * @return this trigger, so calls can be chained
    */
-  Trigger OnFalse(Command* command);
+  Trigger OnFalse(Command* command,
+                  InitialState initialState = InitialState::CONDITION);
 
   /**
    * Starts the given command whenever the condition changes from `true` to
    * `false`.
    *
    * @param command The command to bind.
+   * @param initialState the initial state to use
    * @return The trigger, for chained calls.
    */
-  Trigger OnFalse(CommandPtr&& command);
+  Trigger OnFalse(CommandPtr&& command,
+                  InitialState initialState = InitialState::CONDITION);
 
   /**
    * Starts the given command when the condition changes to `true` and cancels
@@ -127,9 +154,11 @@ class Trigger {
    * lifespan of the command.
    *
    * @param command the command to start
+   * @param initialState the initial state to use
    * @return this trigger, so calls can be chained
    */
-  Trigger WhileTrue(Command* command);
+  Trigger WhileTrue(Command* command,
+                    InitialState initialState = InitialState::CONDITION);
 
   /**
    * Starts the given command when the condition changes to `true` and cancels
@@ -140,9 +169,11 @@ class Trigger {
    * `true`. If the command should restart, see RepeatCommand.
    *
    * @param command The command to bind.
+   * @param initialState the initial state to use
    * @return The trigger, for chained calls.
    */
-  Trigger WhileTrue(CommandPtr&& command);
+  Trigger WhileTrue(CommandPtr&& command,
+                    InitialState initialState = InitialState::CONDITION);
 
   /**
    * Starts the given command when the condition changes to `false` and cancels
@@ -155,9 +186,11 @@ class Trigger {
    * lifespan of the command.
    *
    * @param command the command to start
+   * @param initialState the initial state to use
    * @return this trigger, so calls can be chained
    */
-  Trigger WhileFalse(Command* command);
+  Trigger WhileFalse(Command* command,
+                     InitialState initialState = InitialState::CONDITION);
 
   /**
    * Starts the given command when the condition changes to `false` and cancels
@@ -168,9 +201,11 @@ class Trigger {
    * `false`. If the command should restart, see RepeatCommand.
    *
    * @param command The command to bind.
+   * @param initialState the initial state to use
    * @return The trigger, for chained calls.
    */
-  Trigger WhileFalse(CommandPtr&& command);
+  Trigger WhileFalse(CommandPtr&& command,
+                     InitialState initialState = InitialState::CONDITION);
 
   /**
    * Toggles a command when the condition changes from `false` to `true`.
@@ -179,9 +214,11 @@ class Trigger {
    * lifespan of the command.
    *
    * @param command the command to toggle
+   * @param initialState the initial state to use
    * @return this trigger, so calls can be chained
    */
-  Trigger ToggleOnTrue(Command* command);
+  Trigger ToggleOnTrue(Command* command,
+                       InitialState initialState = InitialState::CONDITION);
 
   /**
    * Toggles a command when the condition changes from `false` to `true`.
@@ -190,9 +227,11 @@ class Trigger {
    * lifespan of the command.
    *
    * @param command the command to toggle
+   * @param initialState the initial state to use
    * @return this trigger, so calls can be chained
    */
-  Trigger ToggleOnTrue(CommandPtr&& command);
+  Trigger ToggleOnTrue(CommandPtr&& command,
+                       InitialState initialState = InitialState::CONDITION);
 
   /**
    * Toggles a command when the condition changes from `true` to the low
@@ -202,9 +241,11 @@ class Trigger {
    * lifespan of the command.
    *
    * @param command the command to toggle
+   * @param initialState the initial state to use
    * @return this trigger, so calls can be chained
    */
-  Trigger ToggleOnFalse(Command* command);
+  Trigger ToggleOnFalse(Command* command,
+                        InitialState initialState = InitialState::CONDITION);
 
   /**
    * Toggles a command when the condition changes from `true` to `false`.
@@ -213,9 +254,11 @@ class Trigger {
    * lifespan of the command.
    *
    * @param command the command to toggle
+   * @param initialState the initial state to use
    * @return this trigger, so calls can be chained
    */
-  Trigger ToggleOnFalse(CommandPtr&& command);
+  Trigger ToggleOnFalse(CommandPtr&& command,
+                        InitialState initialState = InitialState::CONDITION);
 
   /**
    * Composes two triggers with logical AND.
@@ -291,6 +334,19 @@ class Trigger {
   bool Get() const;
 
  private:
+  bool GetInitialState(InitialState initialState) const {
+    switch (initialState) {
+      case InitialState::FALSE:
+        return false;
+      case InitialState::TRUE:
+        return true;
+      case InitialState::CONDITION:
+        return m_condition();
+      case InitialState::NEG_CONDITION:
+        return !m_condition();
+    }
+  }
+
   frc::EventLoop* m_loop;
   std::function<bool()> m_condition;
 };
