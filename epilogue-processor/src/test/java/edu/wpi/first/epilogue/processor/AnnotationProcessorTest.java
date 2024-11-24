@@ -166,7 +166,7 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-package edu.wpi.first.epilogue;
+    package edu.wpi.first.epilogue;
 
     import edu.wpi.first.epilogue.Logged;
     import edu.wpi.first.epilogue.Epilogue;
