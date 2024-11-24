@@ -1397,8 +1397,6 @@ package edu.wpi.first.epilogue;
     assertLoggerGenerates(source, expectedGeneratedSource);
   }
 
-  
-
   @Test
   void warnsAboutNonLoggableFields() {
     String source =
