@@ -122,7 +122,7 @@ public final class StringUtils {
 
     // Use the name on the class config to set the generated logger names
     // This helps to avoid naming conflicts
-    if (config.name().isBlank()) {
+    if (config == null || config.name().isBlank()) {
       loggerClassName = className + "Logger";
     } else {
       String cleaned = config.name().replaceAll(" ", "");

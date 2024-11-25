@@ -97,8 +97,7 @@ public class AnnotationProcessor extends AbstractProcessor {
         List.of(
             new LoggableHandler(
                 processingEnv,
-                roundEnv.getElementsAnnotatedWith(
-                    Logged.class)), // prioritize epilogue logging over Sendable
+                roundEnv.getRootElements()), // prioritize epilogue logging over Sendable
             new ConfiguredLoggerHandler(
                 processingEnv, customLoggers), // then customized logging configs
             new ArrayHandler(processingEnv),
@@ -381,7 +380,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
   private void warnOfNonLoggableElements(TypeElement clazz) {
     var config = clazz.getAnnotation(Logged.class);
-    if (config.strategy() == Logged.Strategy.OPT_IN) {
+    if (config == null || config.strategy() == Logged.Strategy.OPT_IN) {
       // field and method validations will have already checked everything
       return;
     }
