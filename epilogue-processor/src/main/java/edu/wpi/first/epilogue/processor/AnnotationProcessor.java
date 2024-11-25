@@ -380,7 +380,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
   private void warnOfNonLoggableElements(TypeElement clazz) {
     var config = clazz.getAnnotation(Logged.class);
-    if (config == null || config.strategy() == Logged.Strategy.OPT_IN) {
+    if (config != null && config.strategy() == Logged.Strategy.OPT_IN) {
       // field and method validations will have already checked everything
       return;
     }
