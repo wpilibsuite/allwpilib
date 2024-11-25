@@ -189,8 +189,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * swerve drivetrain.
    *
    * @param dtSeconds The duration of the timestep the speeds should be applied for.
+   * @return Reference to itself
    */
-  public void discretize(double dtSeconds) {
+  public ChassisSpeeds discretize(double dtSeconds) {
     var desiredDeltaPose =
         new Pose2d(
             vxMetersPerSecond * dtSeconds,
@@ -205,6 +206,8 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
     vxMetersPerSecond = twist.dx / dtSeconds;
     vyMetersPerSecond = twist.dy / dtSeconds;
     omegaRadiansPerSecond = twist.dtheta / dtSeconds;
+
+    return this;
   }
 
   /**
@@ -285,13 +288,16 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
+   * @return Reference to itself
    */
-  public void toRobotRelativeSpeeds(Rotation2d robotAngle) {
+  public ChassisSpeeds toRobotRelativeSpeeds(Rotation2d robotAngle) {
     // CW rotation into chassis frame
     var rotated =
         new Translation2d(vxMetersPerSecond, vyMetersPerSecond).rotateBy(robotAngle.unaryMinus());
     vxMetersPerSecond = rotated.getX();
     vyMetersPerSecond = rotated.getY();
+
+    return this;
   }
 
   /**
@@ -371,12 +377,15 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
+   * @return Reference to itself
    */
-  public void toFieldRelativeSpeeds(Rotation2d robotAngle) {
+  public ChassisSpeeds toFieldRelativeSpeeds(Rotation2d robotAngle) {
     // CCW rotation out of chassis frame
     var rotated = new Translation2d(vxMetersPerSecond, vyMetersPerSecond).rotateBy(robotAngle);
     vxMetersPerSecond = rotated.getX();
     vyMetersPerSecond = rotated.getY();
+
+    return this;
   }
 
   /**
