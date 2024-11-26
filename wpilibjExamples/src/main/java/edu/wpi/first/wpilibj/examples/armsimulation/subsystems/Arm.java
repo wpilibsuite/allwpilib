@@ -30,7 +30,8 @@ public class Arm implements AutoCloseable {
   private double m_armSetpointDegrees = Constants.kDefaultArmSetpointDegrees;
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
-  private final Gearbox m_armGearbox = new Gearbox(KnownDCMotor.Vex775Pro.dcMotor, 2, Constants.kArmReduction);
+  private final Gearbox m_armGearbox =
+      new Gearbox(KnownDCMotor.Vex775Pro.dcMotor, 2, Constants.kArmReduction);
 
   // Standard classes for controlling our arm
   private final PIDController m_controller = new PIDController(m_armKp, 0, 0);

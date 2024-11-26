@@ -37,8 +37,13 @@ class ExtendedKalmanFilterTest {
     final var m = 63.503; // Robot mass
     final var J = 5.6; // Robot moment of inertia
 
-    final var C1 = -n * Math.pow(gr, 2) * motor.kt.baseUnitMagnitude() / (motor.kv.baseUnitMagnitude() * motor.internalResistance.baseUnitMagnitude() * r * r);
-    final var C2 = n * gr * motor.kt.baseUnitMagnitude() / (motor.internalResistance.baseUnitMagnitude() * r);
+    final var C1 =
+        -n
+            * Math.pow(gr, 2)
+            * motor.kt.baseUnitMagnitude()
+            / (motor.kv.baseUnitMagnitude() * motor.internalResistance.baseUnitMagnitude() * r * r);
+    final var C2 =
+        n * gr * motor.kt.baseUnitMagnitude() / (motor.internalResistance.baseUnitMagnitude() * r);
     final var k1 = 1.0 / m + rb * rb / J;
     final var k2 = 1.0 / m - rb * rb / J;
 
@@ -73,15 +78,16 @@ class ExtendedKalmanFilterTest {
 
     assertDoesNotThrow(
         () -> {
-          ExtendedKalmanFilter<N5, N2, N3> observer = new ExtendedKalmanFilter<>(
-              Nat.N5(),
-              Nat.N2(),
-              Nat.N3(),
-              ExtendedKalmanFilterTest::getDynamics,
-              ExtendedKalmanFilterTest::getLocalMeasurementModel,
-              VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
-              VecBuilder.fill(0.0001, 0.01, 0.01),
-              dtSeconds);
+          ExtendedKalmanFilter<N5, N2, N3> observer =
+              new ExtendedKalmanFilter<>(
+                  Nat.N5(),
+                  Nat.N2(),
+                  Nat.N3(),
+                  ExtendedKalmanFilterTest::getDynamics,
+                  ExtendedKalmanFilterTest::getLocalMeasurementModel,
+                  VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
+                  VecBuilder.fill(0.0001, 0.01, 0.01),
+                  dtSeconds);
 
           Matrix<N2, N1> u = VecBuilder.fill(12.0, 12.0);
           observer.predict(u, dtSeconds);
@@ -101,32 +107,36 @@ class ExtendedKalmanFilterTest {
     double dtSeconds = 0.00505;
     double rbMeters = 0.8382 / 2.0; // Robot radius
 
-    ExtendedKalmanFilter<N5, N2, N3> observer = new ExtendedKalmanFilter<>(
-        Nat.N5(),
-        Nat.N2(),
-        Nat.N3(),
-        ExtendedKalmanFilterTest::getDynamics,
-        ExtendedKalmanFilterTest::getLocalMeasurementModel,
-        VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
-        VecBuilder.fill(0.001, 0.01, 0.01),
-        dtSeconds);
+    ExtendedKalmanFilter<N5, N2, N3> observer =
+        new ExtendedKalmanFilter<>(
+            Nat.N5(),
+            Nat.N2(),
+            Nat.N3(),
+            ExtendedKalmanFilterTest::getDynamics,
+            ExtendedKalmanFilterTest::getLocalMeasurementModel,
+            VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
+            VecBuilder.fill(0.001, 0.01, 0.01),
+            dtSeconds);
 
-    List<Pose2d> waypoints = List.of(
-        new Pose2d(2.75, 22.521, Rotation2d.kZero),
-        new Pose2d(24.73, 19.68, Rotation2d.fromDegrees(5.846)));
-    var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, new TrajectoryConfig(8.8, 0.1));
+    List<Pose2d> waypoints =
+        List.of(
+            new Pose2d(2.75, 22.521, Rotation2d.kZero),
+            new Pose2d(24.73, 19.68, Rotation2d.fromDegrees(5.846)));
+    var trajectory =
+        TrajectoryGenerator.generateTrajectory(waypoints, new TrajectoryConfig(8.8, 0.1));
 
     Matrix<N5, N1> r = new Matrix<>(Nat.N5(), Nat.N1());
 
     Matrix<N5, N1> nextR = new Matrix<>(Nat.N5(), Nat.N1());
     Matrix<N2, N1> u = new Matrix<>(Nat.N2(), Nat.N1());
 
-    var B = NumericalJacobian.numericalJacobianU(
-        Nat.N5(),
-        Nat.N2(),
-        ExtendedKalmanFilterTest::getDynamics,
-        new Matrix<>(Nat.N5(), Nat.N1()),
-        u);
+    var B =
+        NumericalJacobian.numericalJacobianU(
+            Nat.N5(),
+            Nat.N2(),
+            ExtendedKalmanFilterTest::getDynamics,
+            new Matrix<>(Nat.N5(), Nat.N1()),
+            u);
 
     observer.setXhat(
         VecBuilder.fill(
@@ -159,8 +169,9 @@ class ExtendedKalmanFilterTest {
 
       observer.predict(u, dtSeconds);
 
-      groundTruthX = NumericalIntegration.rk4(
-          ExtendedKalmanFilterTest::getDynamics, groundTruthX, u, dtSeconds);
+      groundTruthX =
+          NumericalIntegration.rk4(
+              ExtendedKalmanFilterTest::getDynamics, groundTruthX, u, dtSeconds);
 
       r = nextR;
     }

@@ -102,7 +102,11 @@ public class Drivetrain {
       LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
   private final DifferentialDrivetrainSim m_drivetrainSimulator =
       new DifferentialDrivetrainSim(
-          m_drivetrainSystem, new Gearbox(KnownDCMotor.CIM.dcMotor, 2, 8), kTrackWidth, kWheelRadius, null);
+          m_drivetrainSystem,
+          new Gearbox(KnownDCMotor.CIM.dcMotor, 2, 8),
+          kTrackWidth,
+          kWheelRadius,
+          null);
 
   /**
    * Constructs a differential drive object. Sets the encoder distance per pulse and resets the

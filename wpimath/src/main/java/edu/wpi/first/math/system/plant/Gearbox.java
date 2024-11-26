@@ -26,61 +26,55 @@ public class Gearbox {
 
   /** The returned measure of angular velocity. Exists to minimize calls to GC. */
   private final MutAngularVelocity angularVelocity = RadiansPerSecond.mutable(0.0);
+
   /** The returned measure of input voltage. Exists to minimize calls to GC. */
   private final MutVoltage voltageInput = Volts.mutable(0.0);
+
   /** The returned measure of torque. Exists to minimize calls to GC. */
   private final MutTorque torque = NewtonMeters.mutable(0.0);
+
   /** The returned measure of current. Exists to minimize calls to GC. */
   private final MutCurrent current = Amps.mutable(0.0);
 
   /**
    * Constructs a Gearbox.
    *
-   * @param dcMotor   The DC motor used in this gearbox.
-   * @param numMotors Number of identical motors in the gearbox.
+   * @param dcMotor The DC motor used in this gearbox.
    */
-  public Gearbox(
-      DCMotor dcMotor) {
+  public Gearbox(DCMotor dcMotor) {
     this(dcMotor, 1, 1.0);
   }
 
   /**
    * Constructs a Gearbox.
    *
-   * @param dcMotor   The DC motor used in this gearbox.
+   * @param dcMotor The DC motor used in this gearbox.
    * @param numMotors Number of identical motors in the gearbox.
    */
-  public Gearbox(
-      DCMotor dcMotor,
-      int numMotors) {
+  public Gearbox(DCMotor dcMotor, int numMotors) {
     this(dcMotor, numMotors, 1.0);
   }
 
   /**
    * Constructs a Gearbox.
    *
-   * @param dcMotor          The DC motor used in this gearbox.
+   * @param dcMotor The DC motor used in this gearbox.
    * @param gearboxReduction The gearbox reduction.
    */
-  public Gearbox(
-      DCMotor dcMotor,
-      double gearboxReduction) {
+  public Gearbox(DCMotor dcMotor, double gearboxReduction) {
     this(dcMotor, 1, gearboxReduction);
   }
 
   /**
    * Constructs a Gearbox.
    *
-   * @param dcMotor          The DC motor used in this gearbox.
-   * @param numMotors        Number of identical motors in the gearbox.
+   * @param dcMotor The DC motor used in this gearbox.
+   * @param numMotors Number of identical motors in the gearbox.
    * @param gearboxReduction The gearbox reduction.
    * @throws IllegalArgumentException if numMotors &lt; 1, gearboxReduction &le; 0.
    */
-  public Gearbox(
-      DCMotor dcMotor,
-      int numMotors,
-      double gearboxReduction) {
-    if(numMotors < 1){
+  public Gearbox(DCMotor dcMotor, int numMotors, double gearboxReduction) {
+    if (numMotors < 1) {
       throw new IllegalArgumentException("numMotors must be greater than or equal to 1.");
     }
     if (gearboxReduction <= 0) {
@@ -93,9 +87,10 @@ public class Gearbox {
 
   /**
    * Returns the gearbox reduction as a ratio of output rotations to input rotations.
+   *
    * @return The gearbox reduction.
    */
-  public double getGearboxReduction(){
+  public double getGearboxReduction() {
     return gearboxReduction;
   }
 
@@ -111,93 +106,86 @@ public class Gearbox {
   }
 
   /**
-   * Calculate the input voltage in Volts of each motor for a given torque and
-   * angular velocity.
+   * Calculate the input voltage in Volts of each motor for a given torque and angular velocity.
    *
-   * @param torqueNewtonMeters           The torque produced by the gearbox.
-   * @param angularVelocityRadiansPerSec The current angular velocity of the
-   *                                     gearbox's output.
+   * @param torqueNewtonMeters The torque produced by the gearbox.
+   * @param angularVelocityRadiansPerSec The current angular velocity of the gearbox's output.
    * @return The voltage of each motor.
    */
-  public double getVoltageInputVolts(double torqueNewtonMeters, double angularVelocityRadiansPerSec) {
+  public double getVoltageInputVolts(
+      double torqueNewtonMeters, double angularVelocityRadiansPerSec) {
     return dcMotor.getAngularVelocityRadiansPerSecond(
         torqueNewtonMeters / gearboxReduction / numMotors,
         angularVelocityRadiansPerSec * gearboxReduction);
   }
 
   /**
-   * Calculate the input voltage of each motor for a given torque and
-   * angular velocity.
+   * Calculate the input voltage of each motor for a given torque and angular velocity.
    *
-   * @param torque          The torque produced by the gearbox.
+   * @param torque The torque produced by the gearbox.
    * @param angularVelocity The current angular velocity of the gearbox's output.
    * @return The voltage of each motor.
    */
   public Voltage getVoltageInput(Torque torque, AngularVelocity angularVelocity) {
-    return voltageInput
-        .mut_setMagnitude(getVoltageInputVolts(torque.baseUnitMagnitude(), angularVelocity.baseUnitMagnitude()));
+    return voltageInput.mut_setMagnitude(
+        getVoltageInputVolts(torque.baseUnitMagnitude(), angularVelocity.baseUnitMagnitude()));
   }
 
   /**
-   * Calculates the angular velocity in Radians per Second produced by the gearbox
-   * at a given torque and input voltage.
+   * Calculates the angular velocity in Radians per Second produced by the gearbox at a given torque
+   * and input voltage.
    *
    * @param torqueNewtonMeters The torque produced by the gearbox.
-   * @param voltageInputVolts  The voltage applied to each motor.
+   * @param voltageInputVolts The voltage applied to each motor.
    * @return The angular velocity of the gearbox's output.
    */
-  public double getAngularVelocityRadiansPerSecond(double torqueNewtonMeters, double voltageInputVolts) {
+  public double getAngularVelocityRadiansPerSecond(
+      double torqueNewtonMeters, double voltageInputVolts) {
     return dcMotor.getAngularVelocityRadiansPerSecond(
-        torqueNewtonMeters / gearboxReduction / numMotors,
-        voltageInputVolts)
+            torqueNewtonMeters / gearboxReduction / numMotors, voltageInputVolts)
         / gearboxReduction;
   }
 
   /**
-   * Calculates the angular velocity produced by the gearbox
-   * at a given torque and input voltage.
+   * Calculates the angular velocity produced by the gearbox at a given torque and input voltage.
    *
-   * @param torque       The torque produced by the gearbox.
+   * @param torque The torque produced by the gearbox.
    * @param voltageInput The voltage applied to each motor.
    * @return The angular velocity of the gearbox's output.
    */
   public AngularVelocity getAngularVelocity(Torque torque, Voltage voltageInput) {
     return angularVelocity.mut_setMagnitude(
         getAngularVelocityRadiansPerSecond(
-            torque.baseUnitMagnitude(),
-            voltageInput.baseUnitMagnitude()));
+            torque.baseUnitMagnitude(), voltageInput.baseUnitMagnitude()));
   }
 
   /**
-   * Calculate torque in Newton-Meters produced by the gearbox at a given angular
-   * velocity and input voltage.
+   * Calculate torque in Newton-Meters produced by the gearbox at a given angular velocity and input
+   * voltage.
    *
-   * @param angularVelocityRadiansPerSec The current angular velocity of the
-   *                                     gearbox's output.
-   * @param voltageInputVolts            The voltage applied to each motor.
+   * @param angularVelocityRadiansPerSec The current angular velocity of the gearbox's output.
+   * @param voltageInputVolts The voltage applied to each motor.
    * @return The torque output of the gearbox.
    */
-  public double getTorqueNewtonMeters(double angularVelocityRadiansPerSec, double voltageInputVolts) {
-    return numMotors * gearboxReduction * dcMotor.getTorqueNewtonMeters(
-        angularVelocityRadiansPerSec * gearboxReduction,
-        voltageInputVolts);
+  public double getTorqueNewtonMeters(
+      double angularVelocityRadiansPerSec, double voltageInputVolts) {
+    return numMotors
+        * gearboxReduction
+        * dcMotor.getTorqueNewtonMeters(
+            angularVelocityRadiansPerSec * gearboxReduction, voltageInputVolts);
   }
 
   /**
-   * Calculate torque in produced by the gearbox at a given angular
-   * velocity and input voltage.
+   * Calculate torque in produced by the gearbox at a given angular velocity and input voltage.
    *
-   * @param angularVelocity The current angular velocity of the
-   *                        gearbox's output.
-   * @param voltageInput    The voltage applied to each motor.
+   * @param angularVelocity The current angular velocity of the gearbox's output.
+   * @param voltageInput The voltage applied to each motor.
    * @return The torque output of the gearbox.
    */
   public Torque getTorque(AngularVelocity angularVelocity, Voltage voltageInput) {
-    return torque
-        .mut_setMagnitude(
-            getTorqueNewtonMeters(
-                angularVelocity.baseUnitMagnitude(),
-                voltageInput.baseUnitMagnitude()));
+    return torque.mut_setMagnitude(
+        getTorqueNewtonMeters(
+            angularVelocity.baseUnitMagnitude(), voltageInput.baseUnitMagnitude()));
   }
 
   /**
@@ -213,7 +201,7 @@ public class Gearbox {
   /**
    * Calculate net current drawn by all of the motors for a given torque.
    *
-   * @param torqueNewtonMeters The torque produced by the gearbox.
+   * @param torque The torque produced by the gearbox.
    * @return The net current drawn by the all of the motors.
    */
   public Current getCurrent(Torque torque) {

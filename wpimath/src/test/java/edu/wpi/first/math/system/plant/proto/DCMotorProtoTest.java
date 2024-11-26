@@ -24,7 +24,8 @@ class DCMotorProtoTest {
     assertEquals(DATA.stallCurrent.baseUnitMagnitude(), data.stallCurrent.baseUnitMagnitude());
     assertEquals(DATA.freeCurrent.baseUnitMagnitude(), data.freeCurrent.baseUnitMagnitude());
     assertEquals(DATA.freeSpeed.baseUnitMagnitude(), data.freeSpeed.baseUnitMagnitude());
-    assertEquals(DATA.internalResistance.baseUnitMagnitude(), data.internalResistance.baseUnitMagnitude());
+    assertEquals(
+        DATA.internalResistance.baseUnitMagnitude(), data.internalResistance.baseUnitMagnitude());
     assertEquals(DATA.kv.baseUnitMagnitude(), data.kv.baseUnitMagnitude());
     assertEquals(DATA.kt.baseUnitMagnitude(), data.kt.baseUnitMagnitude());
   }

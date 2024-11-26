@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.KnownDCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -29,7 +28,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator implements AutoCloseable {
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
-  private final Gearbox m_elevatorGearbox = new Gearbox(KnownDCMotor.Vex775Pro.dcMotor, 4, Constants.kElevatorGearing);
+  private final Gearbox m_elevatorGearbox =
+      new Gearbox(KnownDCMotor.Vex775Pro.dcMotor, 4, Constants.kElevatorGearing);
 
   // Standard classes for controlling our elevator
   private final ProfiledPIDController m_controller =

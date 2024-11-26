@@ -35,24 +35,27 @@ class LinearSystemLoopTest {
   LinearSystem<N2, N1, N2> m_plant = LinearSystemId.createElevatorSystem(gearbox, 5, 0.0181864);
 
   @SuppressWarnings("unchecked")
-  KalmanFilter<N2, N1, N1> m_observer = new KalmanFilter<>(
-      Nat.N2(),
-      Nat.N1(),
-      (LinearSystem<N2, N1, N1>) m_plant.slice(0),
-      VecBuilder.fill(0.05, 1.0),
-      VecBuilder.fill(0.0001),
-      kDt);
+  KalmanFilter<N2, N1, N1> m_observer =
+      new KalmanFilter<>(
+          Nat.N2(),
+          Nat.N1(),
+          (LinearSystem<N2, N1, N1>) m_plant.slice(0),
+          VecBuilder.fill(0.05, 1.0),
+          VecBuilder.fill(0.0001),
+          kDt);
 
   @SuppressWarnings("unchecked")
-  LinearQuadraticRegulator<N2, N1, N1> m_controller = new LinearQuadraticRegulator<>(
-      (LinearSystem<N2, N1, N1>) m_plant.slice(0),
-      VecBuilder.fill(0.02, 0.4),
-      VecBuilder.fill(12.0),
-      0.00505);
+  LinearQuadraticRegulator<N2, N1, N1> m_controller =
+      new LinearQuadraticRegulator<>(
+          (LinearSystem<N2, N1, N1>) m_plant.slice(0),
+          VecBuilder.fill(0.02, 0.4),
+          VecBuilder.fill(12.0),
+          0.00505);
 
   @SuppressWarnings("unchecked")
-  private final LinearSystemLoop<N2, N1, N1> m_loop = new LinearSystemLoop<>(
-      (LinearSystem<N2, N1, N1>) m_plant.slice(0), m_controller, m_observer, 12, 0.00505);
+  private final LinearSystemLoop<N2, N1, N1> m_loop =
+      new LinearSystemLoop<>(
+          (LinearSystem<N2, N1, N1>) m_plant.slice(0), m_controller, m_observer, 12, 0.00505);
 
   private static void updateTwoState(
       LinearSystem<N2, N1, N1> plant, LinearSystemLoop<N2, N1, N1> loop, double noise) {
@@ -74,10 +77,11 @@ class LinearSystemLoopTest {
     TrapezoidProfile.State state;
     for (int i = 0; i < 1000; i++) {
       profile = new TrapezoidProfile(constraints);
-      state = profile.calculate(
-          kDt,
-          new TrapezoidProfile.State(m_loop.getXHat(0), m_loop.getXHat(1)),
-          new TrapezoidProfile.State(references.get(0, 0), references.get(1, 0)));
+      state =
+          profile.calculate(
+              kDt,
+              new TrapezoidProfile.State(m_loop.getXHat(0), m_loop.getXHat(1)),
+              new TrapezoidProfile.State(references.get(0, 0), references.get(1, 0)));
       m_loop.setNextR(VecBuilder.fill(state.position, state.velocity));
 
       updateTwoState(
@@ -99,8 +103,9 @@ class LinearSystemLoopTest {
     int numMotors = 2;
     Gearbox gearbox = new Gearbox(motor, numMotors);
     LinearSystem<N1, N1, N1> plant = LinearSystemId.createFlywheelSystem(gearbox, 0.00289);
-    KalmanFilter<N1, N1, N1> observer = new KalmanFilter<>(
-        Nat.N1(), Nat.N1(), plant, VecBuilder.fill(1.0), VecBuilder.fill(kPositionStddev), kDt);
+    KalmanFilter<N1, N1, N1> observer =
+        new KalmanFilter<>(
+            Nat.N1(), Nat.N1(), plant, VecBuilder.fill(1.0), VecBuilder.fill(kPositionStddev), kDt);
 
     var qElms = VecBuilder.fill(9.0);
     var rElms = VecBuilder.fill(12.0);
@@ -124,9 +129,10 @@ class LinearSystemLoopTest {
 
       loop.setNextR(references);
 
-      Matrix<N1, N1> y = plant
-          .calculateY(loop.getXHat(), loop.getU())
-          .plus(VecBuilder.fill(random.nextGaussian() * kPositionStddev));
+      Matrix<N1, N1> y =
+          plant
+              .calculateY(loop.getXHat(), loop.getU())
+              .plus(VecBuilder.fill(random.nextGaussian() * kPositionStddev));
 
       loop.correct(y);
       loop.predict(kDt);

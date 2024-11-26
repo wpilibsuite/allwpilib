@@ -29,7 +29,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator implements AutoCloseable {
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
-  private final Gearbox m_elevatorGearbox = new Gearbox(KnownDCMotor.NEO.dcMotor, 2, Constants.kElevatorGearing);
+  private final Gearbox m_elevatorGearbox =
+      new Gearbox(KnownDCMotor.NEO.dcMotor, 2, Constants.kElevatorGearing);
 
   private final ExponentialProfile m_profile =
       new ExponentialProfile(

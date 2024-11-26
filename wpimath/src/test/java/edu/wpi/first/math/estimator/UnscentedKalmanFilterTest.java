@@ -22,7 +22,6 @@ import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.NumericalJacobian;
-import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.KnownDCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -36,17 +35,22 @@ class UnscentedKalmanFilterTest {
     var n = 2;
     // var gLow = 15.32;    // Low gear ratio
     var gHigh = 7.08; // High gear ratio
-    
+
     var rb = 0.8382 / 2.0; // Robot radius
     var r = 0.0746125; // Wheel radius
     var m = 63.503; // Robot mass
     var J = 5.6; // Robot moment of inertia
 
     var C1 =
-        -n * Math.pow(gHigh, 2)
+        -n
+            * Math.pow(gHigh, 2)
             * motor.kt.baseUnitMagnitude()
             / (motor.kv.baseUnitMagnitude() * motor.internalResistance.baseUnitMagnitude() * r * r);
-    var C2 = n * gHigh * motor.kt.baseUnitMagnitude() / (motor.internalResistance.baseUnitMagnitude() * r);
+    var C2 =
+        n
+            * gHigh
+            * motor.kt.baseUnitMagnitude()
+            / (motor.internalResistance.baseUnitMagnitude() * r);
     var k1 = 1.0 / m + Math.pow(rb, 2) / J;
     var k2 = 1.0 / m - Math.pow(rb, 2) / J;
 

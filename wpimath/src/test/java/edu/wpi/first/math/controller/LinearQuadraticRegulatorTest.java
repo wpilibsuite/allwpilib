@@ -48,11 +48,11 @@ class LinearQuadraticRegulatorTest {
     var G = 14.67;
     var gearbox = new Gearbox(motor, n, G);
 
-    var plant = LinearSystemId.createElevatorSystem(
-        gearbox, 8.0, 0.75 * 25.4 / 1000.0);
+    var plant = LinearSystemId.createElevatorSystem(gearbox, 8.0, 0.75 * 25.4 / 1000.0);
 
-    var K = new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt)
-        .getK();
+    var K =
+        new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt)
+            .getK();
 
     assertEquals(10.381, K.get(0, 0), 1e-2);
     assertEquals(0.6929, K.get(0, 1), 1e-2);
@@ -83,16 +83,15 @@ class LinearQuadraticRegulatorTest {
   /**
    * Returns feedback control gain for implicit model following.
    *
-   * <p>
-   * This is used to test the QRN overload of LQR.
+   * <p>This is used to test the QRN overload of LQR.
    *
-   * @param <States>  Number of states.
-   * @param <Inputs>  Number of inputs.
-   * @param A         State matrix.
-   * @param B         Input matrix.
-   * @param Q         State cost matrix.
-   * @param R         Input cost matrix.
-   * @param Aref      Desired state matrix.
+   * @param <States> Number of states.
+   * @param <Inputs> Number of inputs.
+   * @param A State matrix.
+   * @param B Input matrix.
+   * @param Q State cost matrix.
+   * @param R Input cost matrix.
+   * @param Aref Desired state matrix.
    * @param dtSeconds Discretization timestep in seconds.
    */
   <States extends Num, Inputs extends Num> Matrix<Inputs, States> getImplicitModelFollowingK(
@@ -110,7 +109,8 @@ class LinearQuadraticRegulatorTest {
     // Discretize desired dynamics
     var discAref = Discretization.discretizeA(Aref, dtSeconds);
 
-    Matrix<States, States> Qimf = (discA.minus(discAref)).transpose().times(Q).times(discA.minus(discAref));
+    Matrix<States, States> Qimf =
+        (discA.minus(discAref)).transpose().times(Q).times(discA.minus(discAref));
     Matrix<Inputs, Inputs> Rimf = discB.transpose().times(Q).times(discB).plus(R);
     Matrix<States, Inputs> Nimf = (discA.minus(discAref)).transpose().times(Q).times(discB);
 
@@ -171,10 +171,10 @@ class LinearQuadraticRegulatorTest {
     var G = 14.67;
     var gearbox = new Gearbox(motor, n, G);
 
-    var plant = LinearSystemId.createElevatorSystem(
-        gearbox, 8.0, 0.75 * 25.4 / 1000.0);
+    var plant = LinearSystemId.createElevatorSystem(gearbox, 8.0, 0.75 * 25.4 / 1000.0);
 
-    var regulator = new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt);
+    var regulator =
+        new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt);
 
     regulator.latencyCompensate(plant, dt, 0.01);
 

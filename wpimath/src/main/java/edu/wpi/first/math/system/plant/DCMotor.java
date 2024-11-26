@@ -28,18 +28,25 @@ import edu.wpi.first.util.struct.StructSerializable;
 public class DCMotor implements ProtobufSerializable, StructSerializable {
   /** Voltage at which the motor constants were measured. */
   public final Voltage nominalVoltage;
+
   /** Torque when stalled. */
   public final Torque stallTorque;
+
   /** Current draw when stalled. */
   public final Current stallCurrent;
+
   /** Current draw under no load. */
   public final Current freeCurrent;
+
   /** Angular velocity under no load. */
   public final AngularVelocity freeSpeed;
+
   /** Motor internal resistance. */
   public final Resistance internalResistance;
+
   /** Motor velocity constant. */
   public final Per<AngularVelocityUnit, VoltageUnit> kv;
+
   /** Motor torque constant. */
   public final Per<TorqueUnit, CurrentUnit> kt;
 
@@ -52,13 +59,11 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   /**
    * Constructs a DC motor.
    *
-   * @param nominalVoltageVolts     Voltage at which the motor constants were
-   *                                measured in Volts.
+   * @param nominalVoltageVolts Voltage at which the motor constants were measured in Volts.
    * @param stallTorqueNewtonMeters Torque when stalled in Newton-Meters.
-   * @param stallCurrentAmps        Current draw when stalled in Amps.
-   * @param freeCurrentAmps         Current draw under no load in Amps.
-   * @param freeSpeedRadPerSec      Angular velocity under no load in Radians per
-   *                                Second.
+   * @param stallCurrentAmps Current draw when stalled in Amps.
+   * @param freeCurrentAmps Current draw under no load in Amps.
+   * @param freeSpeedRadPerSec Angular velocity under no load in Radians per Second.
    */
   public DCMotor(
       double nominalVoltageVolts,
@@ -77,12 +82,11 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   /**
    * Constructs a DC motor.
    *
-   * @param nominalVoltage Voltage at which the motor constants were
-   *                       measured.
-   * @param stallTorque    Torque when stalled.
-   * @param stallCurrent   Current draw when stalled.
-   * @param freeCurrent    Current draw under no load.
-   * @param freeSpeed      Angular velocity under no load.
+   * @param nominalVoltage Voltage at which the motor constants were measured.
+   * @param stallTorque Torque when stalled.
+   * @param stallCurrent Current draw when stalled.
+   * @param freeCurrent Current draw under no load.
+   * @param freeSpeed Angular velocity under no load.
    */
   public DCMotor(
       Voltage nominalVoltage,
@@ -101,44 +105,51 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Calculate the input voltage of the motor for a given torque and
-   * angular velocity.
+   * Calculate the input voltage of the motor for a given torque and angular velocity.
    *
-   * @param torqueNewtonMeters           The torque produced by the motor.
-   * @param angularVelocityRadiansPerSec The current angular velocity of the
-   *                                     motor.
+   * @param torqueNewtonMeters The torque produced by the motor.
+   * @param angularVelocityRadiansPerSec The current angular velocity of the motor.
    * @return The voltage of the motor.
    */
-  public double getVoltageInputVolts(double torqueNewtonMeters, double angularVelocityRadiansPerSec) {
+  public double getVoltageInputVolts(
+      double torqueNewtonMeters, double angularVelocityRadiansPerSec) {
     return 1.0 / kv.baseUnitMagnitude() * angularVelocityRadiansPerSec
-        + 1.0 / kt.baseUnitMagnitude() * internalResistance.baseUnitMagnitude() * torqueNewtonMeters;
+        + 1.0
+            / kt.baseUnitMagnitude()
+            * internalResistance.baseUnitMagnitude()
+            * torqueNewtonMeters;
   }
 
   /**
-   * Calculates the angular velocity in Radians per Second produced by the motor
-   * at a given torque and input voltage.
+   * Calculates the angular velocity in Radians per Second produced by the motor at a given torque
+   * and input voltage.
    *
    * @param torqueNewtonMeters The torque produced by the motor.
-   * @param voltageInputVolts  The voltage applied to the motor.
+   * @param voltageInputVolts The voltage applied to the motor.
    * @return The angular velocity of the motor.
    */
-  public double getAngularVelocityRadiansPerSecond(double torqueNewtonMeters, double voltageInputVolts) {
+  public double getAngularVelocityRadiansPerSecond(
+      double torqueNewtonMeters, double voltageInputVolts) {
     return voltageInputVolts * kv.baseUnitMagnitude()
-        - 1.0 / kt.baseUnitMagnitude() * torqueNewtonMeters * internalResistance.baseUnitMagnitude()
+        - 1.0
+            / kt.baseUnitMagnitude()
+            * torqueNewtonMeters
+            * internalResistance.baseUnitMagnitude()
             * kv.baseUnitMagnitude();
   }
 
   /**
-   * Calculate torque in Newton-Meters produced by the motor at a given angular
-   * velocity and input voltage.
+   * Calculate torque in Newton-Meters produced by the motor at a given angular velocity and input
+   * voltage.
    *
-   * @param angularVelocityRadiansPerSec The current angular velocity of the
-   *                                     motor.
-   * @param voltageInputVolts            The voltage applied to the motor.
+   * @param angularVelocityRadiansPerSec The current angular velocity of the motor.
+   * @param voltageInputVolts The voltage applied to the motor.
    * @return The torque output.
    */
-  public double getTorqueNewtonMeters(double angularVelocityRadiansPerSec, double voltageInputVolts) {
-    return kt.baseUnitMagnitude() * (voltageInputVolts - (angularVelocityRadiansPerSec / kv.baseUnitMagnitude()));
+  public double getTorqueNewtonMeters(
+      double angularVelocityRadiansPerSec, double voltageInputVolts) {
+    return kt.baseUnitMagnitude()
+        * (voltageInputVolts - (angularVelocityRadiansPerSec / kv.baseUnitMagnitude()));
   }
 
   /**

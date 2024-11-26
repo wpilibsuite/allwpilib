@@ -26,7 +26,8 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 
 @ResourceLock("timing")
 class PotentiometerPIDTest {
-  private final Gearbox m_elevatorGearbox = new Gearbox(KnownDCMotor.Vex775Pro.dcMotor, 4, kElevatorGearing);
+  private final Gearbox m_elevatorGearbox =
+      new Gearbox(KnownDCMotor.Vex775Pro.dcMotor, 4, kElevatorGearing);
   private static final double kElevatorGearing = 10.0;
   private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
   private static final double kCarriageMassKg = 4.0; // kg

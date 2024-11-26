@@ -189,7 +189,7 @@ public class GearboxSim extends LinearSystemSim<N2, N1, N2> {
    * @return The Gearbox's torque in Newton-Meters.
    */
   public double getTorqueNewtonMeters() {
-    return getAngularAccelerationRadPerSecSq() * m_jKgMetersSquared;
+    return m_gearbox.getTorqueNewtonMeters(m_x.get(1, 0), m_u.get(0, 0));
   }
 
   /**

@@ -54,7 +54,8 @@ public class Robot extends TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in radians.
   private final LinearSystem<N2, N1, N2> m_armPlant =
-      LinearSystemId.createSingleJointedArmSystem(new Gearbox(KnownDCMotor.NEO.dcMotor, 2, kArmGearing), kArmMOI);
+      LinearSystemId.createSingleJointedArmSystem(
+          new Gearbox(KnownDCMotor.NEO.dcMotor, 2, kArmGearing), kArmMOI);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   @SuppressWarnings("unchecked")

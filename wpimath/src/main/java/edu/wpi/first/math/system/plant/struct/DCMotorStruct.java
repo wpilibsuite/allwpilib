@@ -4,14 +4,13 @@
 
 package edu.wpi.first.math.system.plant.struct;
 
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.util.struct.Struct;
-
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
 
 public class DCMotorStruct implements Struct<DCMotor> {
