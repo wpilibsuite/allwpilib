@@ -35,7 +35,10 @@ public class LoggableHandler extends ElementHandler {
 
   @Override
   public boolean isLoggable(Element element) {
-    return dataType(element) instanceof DeclaredType;
+    var dataType = dataType(element);
+    return dataType.getAnnotation(Logged.class) != null
+        || dataType instanceof DeclaredType decl
+            && decl.asElement().getAnnotation(Logged.class) != null;
   }
 
   @Override
