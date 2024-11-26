@@ -146,7 +146,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @return The flywheel's net current draw.
    */
   public double getCurrentDrawAmps() {
-    return m_gearbox.getCurrentAmps(getTorqueNewtonMeters()) * Math.signum(m_u.get(0, 0));
+    return m_gearbox.getNetCurrentAmps(getTorqueNewtonMeters()) * Math.signum(m_u.get(0, 0));
   }
 
   /**

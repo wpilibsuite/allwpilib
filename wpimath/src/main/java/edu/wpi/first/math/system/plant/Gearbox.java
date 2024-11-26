@@ -194,7 +194,7 @@ public class Gearbox {
    * @param torqueNewtonMeters The torque produced by the gearbox.
    * @return The net current drawn by the all of the motors.
    */
-  public double getCurrentAmps(double torqueNewtonMeters) {
+  public double getNetCurrentAmps(double torqueNewtonMeters) {
     return numMotors * dcMotor.getCurrentAmps(torqueNewtonMeters / numMotors / gearboxReduction);
   }
 
@@ -204,7 +204,7 @@ public class Gearbox {
    * @param torque The torque produced by the gearbox.
    * @return The net current drawn by the all of the motors.
    */
-  public Current getCurrent(Torque torque) {
-    return current.mut_setBaseUnitMagnitude(getCurrentAmps(torque.baseUnitMagnitude()));
+  public Current getNetCurrent(Torque torque) {
+    return current.mut_setBaseUnitMagnitude(getNetCurrentAmps(torque.baseUnitMagnitude()));
   }
 }

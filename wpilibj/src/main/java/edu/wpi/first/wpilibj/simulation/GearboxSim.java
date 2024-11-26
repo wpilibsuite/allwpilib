@@ -198,7 +198,7 @@ public class GearboxSim extends LinearSystemSim<N2, N1, N2> {
    * @return The Gearbox's net current draw.
    */
   public double getCurrentDrawAmps() {
-    return m_gearbox.getCurrentAmps(getTorqueNewtonMeters()) * Math.signum(m_u.get(0, 0));
+    return m_gearbox.getNetCurrentAmps(getTorqueNewtonMeters()) * Math.signum(m_u.get(0, 0));
   }
 
   /**
