@@ -117,7 +117,7 @@ public class AnnotationProcessor extends AbstractProcessor {
         .findAny()
         .ifPresent(
             epilogue -> {
-              processEpilogue(roundEnv, epilogue);
+              processEpilogue(roundEnv);
             });
 
     return false;
@@ -329,7 +329,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     return customLoggers;
   }
 
-  private void processEpilogue(RoundEnvironment roundEnv, TypeElement epilogueAnnotation) {
+  private void processEpilogue(RoundEnvironment roundEnv) {
     var annotatedElements = roundEnv.getRootElements();
 
     List<String> loggerClassNames = new ArrayList<>();
@@ -380,7 +380,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
   private void warnOfNonLoggableElements(TypeElement clazz) {
     var config = clazz.getAnnotation(Logged.class);
-    if (config != null && config.strategy() == Logged.Strategy.OPT_IN) {
+    if (config == null || config.strategy() == Logged.Strategy.OPT_IN) {
       // field and method validations will have already checked everything
       return;
     }

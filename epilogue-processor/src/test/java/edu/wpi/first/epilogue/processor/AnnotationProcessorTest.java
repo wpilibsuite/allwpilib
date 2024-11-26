@@ -67,6 +67,7 @@ class AnnotationProcessorTest {
 
       class Example {
         @Logged double x;
+        @Logged double y;
       }
     """;
     
@@ -88,6 +89,7 @@ class AnnotationProcessorTest {
         public void update(DataLogger dataLogger, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
+            dataLogger.log("y", object.y);
           }
         }
       }
