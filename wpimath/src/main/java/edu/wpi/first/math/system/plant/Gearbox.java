@@ -20,7 +20,6 @@ import edu.wpi.first.units.measure.Voltage;
 
 /** Models the behavior of a gearbox. */
 public class Gearbox {
-  
   /** The DCMotor for this gearbox. */
   public final DCMotor dcMotor;
 
