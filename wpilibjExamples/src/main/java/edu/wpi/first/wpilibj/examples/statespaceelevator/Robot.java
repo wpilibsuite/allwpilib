@@ -12,7 +12,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.LinearSystemLoop;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
+import edu.wpi.first.math.system.plant.KnownDCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -59,7 +60,7 @@ public class Robot extends TimedRobot {
    */
   private final LinearSystem<N2, N1, N2> m_elevatorPlant =
       LinearSystemId.createElevatorSystem(
-          DCMotor.getNEO(2), kCarriageMass, kDrumRadius, kElevatorGearing);
+          new Gearbox(KnownDCMotor.NEO.dcMotor, 2, kElevatorGearing), kCarriageMass, kDrumRadius);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   @SuppressWarnings("unchecked")

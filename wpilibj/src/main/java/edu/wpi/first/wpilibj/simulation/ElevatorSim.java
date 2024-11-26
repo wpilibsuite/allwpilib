@@ -11,14 +11,14 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated elevator mechanism. */
 public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   // Gearbox for the elevator.
-  private final DCMotor m_gearbox;
+  private final Gearbox m_gearbox;
 
   // The min allowable height for the elevator.
   private final double m_minHeight;
@@ -33,8 +33,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * Creates a simulated elevator mechanism.
    *
    * @param plant The linear system that represents the elevator. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *     double, double)}.
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(Gearbox, double,
+   *     double)}.
    * @param gearbox The type of and number of motors in the elevator gearbox.
    * @param minHeightMeters The min allowable height of the elevator.
    * @param maxHeightMeters The max allowable height of the elevator.
@@ -46,7 +46,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   @SuppressWarnings("this-escape")
   public ElevatorSim(
       LinearSystem<N2, N1, N2> plant,
-      DCMotor gearbox,
+      Gearbox gearbox,
       double minHeightMeters,
       double maxHeightMeters,
       boolean simulateGravity,
@@ -77,7 +77,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   public ElevatorSim(
       double kV,
       double kA,
-      DCMotor gearbox,
+      Gearbox gearbox,
       double minHeightMeters,
       double maxHeightMeters,
       boolean simulateGravity,
@@ -97,7 +97,6 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * Creates a simulated elevator mechanism.
    *
    * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
    * @param carriageMassKg The mass of the elevator carriage.
    * @param drumRadiusMeters The radius of the drum that the elevator spool is wrapped around.
    * @param minHeightMeters The min allowable height of the elevator.
@@ -108,8 +107,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    *     noise is desired. If present must have 1 element for position.
    */
   public ElevatorSim(
-      DCMotor gearbox,
-      double gearing,
+      Gearbox gearbox,
       double carriageMassKg,
       double drumRadiusMeters,
       double minHeightMeters,
@@ -118,7 +116,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
       double startingHeightMeters,
       double... measurementStdDevs) {
     this(
-        LinearSystemId.createElevatorSystem(gearbox, carriageMassKg, drumRadiusMeters, gearing),
+        LinearSystemId.createElevatorSystem(gearbox, carriageMassKg, drumRadiusMeters),
         gearbox,
         minHeightMeters,
         maxHeightMeters,
@@ -202,15 +200,12 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * @return The elevator current draw.
    */
   public double getCurrentDrawAmps() {
-    // I = V / R - omega / (Kv * R)
-    // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
-    // spinning 10x faster than the output
-    // v = r w, so w = v/r
     double kA = 1 / m_plant.getB().get(1, 0);
     double kV = -m_plant.getA().get(1, 1) * kA;
-    double motorVelocityRadPerSec = m_x.get(1, 0) * kV * m_gearbox.KvRadPerSecPerVolt;
+    double motorVelocityRadPerSec = m_x.get(1, 0) * kV * m_gearbox.dcMotor.kv.baseUnitMagnitude();
     var appliedVoltage = m_u.get(0, 0);
-    return m_gearbox.getCurrent(motorVelocityRadPerSec, appliedVoltage)
+    return m_gearbox.getCurrentAmps(
+            m_gearbox.getTorqueNewtonMeters(motorVelocityRadPerSec, appliedVoltage))
         * Math.signum(appliedVoltage);
   }
 

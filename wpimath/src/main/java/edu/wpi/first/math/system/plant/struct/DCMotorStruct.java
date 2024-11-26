@@ -6,6 +6,12 @@ package edu.wpi.first.math.system.plant.struct;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.struct.Struct;
+
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.NewtonMeters;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import java.nio.ByteBuffer;
 
 public class DCMotorStruct implements Struct<DCMotor> {
@@ -37,15 +43,15 @@ public class DCMotorStruct implements Struct<DCMotor> {
     double stallCurrent = bb.getDouble();
     double freeCurrent = bb.getDouble();
     double freeSpeed = bb.getDouble();
-    return new DCMotor(nominalVoltage, stallTorque, stallCurrent, freeCurrent, freeSpeed, 1);
+    return new DCMotor(nominalVoltage, stallTorque, stallCurrent, freeCurrent, freeSpeed);
   }
 
   @Override
   public void pack(ByteBuffer bb, DCMotor value) {
-    bb.putDouble(value.nominalVoltageVolts);
-    bb.putDouble(value.stallTorqueNewtonMeters);
-    bb.putDouble(value.stallCurrentAmps);
-    bb.putDouble(value.freeCurrentAmps);
-    bb.putDouble(value.freeSpeedRadPerSec);
+    bb.putDouble(value.nominalVoltage.in(Volts));
+    bb.putDouble(value.stallTorque.in(NewtonMeters));
+    bb.putDouble(value.stallCurrent.in(Amps));
+    bb.putDouble(value.freeCurrent.in(Amps));
+    bb.putDouble(value.freeSpeed.in(RadiansPerSecond));
   }
 }

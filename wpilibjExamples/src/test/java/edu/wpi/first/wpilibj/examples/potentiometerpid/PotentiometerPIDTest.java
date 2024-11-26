@@ -9,7 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HAL.SimPeriodicBeforeCallback;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
+import edu.wpi.first.math.system.plant.KnownDCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
@@ -25,7 +26,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 
 @ResourceLock("timing")
 class PotentiometerPIDTest {
-  private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
+  private final Gearbox m_elevatorGearbox = new Gearbox(KnownDCMotor.Vex775Pro.dcMotor, 4, kElevatorGearing);
   private static final double kElevatorGearing = 10.0;
   private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
   private static final double kCarriageMassKg = 4.0; // kg
@@ -49,7 +50,6 @@ class PotentiometerPIDTest {
     m_elevatorSim =
         new ElevatorSim(
             m_elevatorGearbox,
-            kElevatorGearing,
             kCarriageMassKg,
             kElevatorDrumRadius,
             0.0,

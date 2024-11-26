@@ -9,7 +9,8 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
+import edu.wpi.first.math.system.plant.KnownDCMotor;
 import edu.wpi.first.math.trajectory.ExponentialProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
@@ -28,7 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator implements AutoCloseable {
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
-  private final DCMotor m_elevatorGearbox = DCMotor.getNEO(2);
+  private final Gearbox m_elevatorGearbox = new Gearbox(KnownDCMotor.NEO.dcMotor, 2, Constants.kElevatorGearing);
 
   private final ExponentialProfile m_profile =
       new ExponentialProfile(
@@ -55,7 +56,6 @@ public class Elevator implements AutoCloseable {
   private final ElevatorSim m_elevatorSim =
       new ElevatorSim(
           m_elevatorGearbox,
-          Constants.kElevatorGearing,
           Constants.kCarriageMass,
           Constants.kElevatorDrumRadius,
           Constants.kMinElevatorHeightMeters,

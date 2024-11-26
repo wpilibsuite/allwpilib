@@ -9,7 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HAL.SimPeriodicBeforeCallback;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
+import edu.wpi.first.math.system.plant.KnownDCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
@@ -25,7 +26,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 @ResourceLock("timing")
 class UltrasonicPIDTest {
-  private final DCMotor m_gearbox = DCMotor.getFalcon500(2);
+  private final Gearbox m_gearbox = new Gearbox(KnownDCMotor.Falcon500.dcMotor, 2, kGearing);
   private static final double kGearing = KitbotGearing.k10p71.value;
   public static final double kvVoltSecondsPerMeter = 1.98;
   public static final double kaVoltSecondsSquaredPerMeter = 0.2;
@@ -63,7 +64,6 @@ class UltrasonicPIDTest {
                 kvVoltSecondsPerRadian,
                 kaVoltSecondsSquaredPerRadian),
             m_gearbox,
-            kGearing,
             kTrackwidthMeters,
             kWheelDiameterMeters / 2.0,
             null);

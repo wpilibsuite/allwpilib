@@ -9,7 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
+import edu.wpi.first.math.system.plant.KnownDCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
@@ -27,8 +28,7 @@ class ElevatorSimTest {
 
     var sim =
         new ElevatorSim(
-            DCMotor.getVex775Pro(4),
-            14.67,
+            new Gearbox(KnownDCMotor.Vex775Pro.dcMotor, 4, 14.67),
             8,
             0.75 * 25.4 / 1000.0,
             0.0,
@@ -67,8 +67,7 @@ class ElevatorSimTest {
   void testMinMax() {
     var sim =
         new ElevatorSim(
-            DCMotor.getVex775Pro(4),
-            14.67,
+            new Gearbox(KnownDCMotor.Vex775Pro.dcMotor, 4, 14.67),
             8.0,
             0.75 * 25.4 / 1000.0,
             0.0,
@@ -97,7 +96,13 @@ class ElevatorSimTest {
   void testStability() {
     var sim =
         new ElevatorSim(
-            DCMotor.getVex775Pro(4), 100, 4, Units.inchesToMeters(0.5), 0, 10, false, 0.0);
+            new Gearbox(KnownDCMotor.Vex775Pro.dcMotor, 4, 100),
+            4,
+            Units.inchesToMeters(0.5),
+            0,
+            10,
+            false,
+            0.0);
 
     sim.setState(VecBuilder.fill(0, 0));
     sim.setInput(12);
@@ -107,7 +112,7 @@ class ElevatorSimTest {
 
     var system =
         LinearSystemId.createElevatorSystem(
-            DCMotor.getVex775Pro(4), 4, Units.inchesToMeters(0.5), 100);
+            new Gearbox(KnownDCMotor.Vex775Pro.dcMotor, 4, 100), 4, Units.inchesToMeters(0.5));
     assertEquals(
         system.calculateX(VecBuilder.fill(0, 0), VecBuilder.fill(12), 0.02 * 50.0).get(0, 0),
         sim.getPositionMeters(),

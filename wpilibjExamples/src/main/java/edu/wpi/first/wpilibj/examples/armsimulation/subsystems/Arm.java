@@ -5,7 +5,8 @@
 package edu.wpi.first.wpilibj.examples.armsimulation.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
+import edu.wpi.first.math.system.plant.KnownDCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Preferences;
@@ -29,7 +30,7 @@ public class Arm implements AutoCloseable {
   private double m_armSetpointDegrees = Constants.kDefaultArmSetpointDegrees;
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
-  private final DCMotor m_armGearbox = DCMotor.getVex775Pro(2);
+  private final Gearbox m_armGearbox = new Gearbox(KnownDCMotor.Vex775Pro.dcMotor, 2, Constants.kArmReduction);
 
   // Standard classes for controlling our arm
   private final PIDController m_controller = new PIDController(m_armKp, 0, 0);
@@ -43,7 +44,6 @@ public class Arm implements AutoCloseable {
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
           m_armGearbox,
-          Constants.kArmReduction,
           SingleJointedArmSim.estimateMOI(Constants.kArmLength, Constants.kArmMass),
           Constants.kArmLength,
           Constants.kMinAngleRads,

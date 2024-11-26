@@ -12,20 +12,22 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.system.Discretization;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
+import edu.wpi.first.math.system.plant.KnownDCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
 
 class LinearQuadraticRegulatorTest {
   @Test
   void testLQROnElevator() {
-    var motors = DCMotor.getVex775Pro(2);
+    var motor = KnownDCMotor.Vex775Pro.dcMotor;
+    var n = 2;
+    var gearbox = new Gearbox(motor, n);
 
     var m = 5.0;
     var r = 0.0181864;
-    var G = 1.0;
 
-    var plant = LinearSystemId.createElevatorSystem(motors, m, r, G);
+    var plant = LinearSystemId.createElevatorSystem(gearbox, m, r);
 
     var qElms = VecBuilder.fill(0.02, 0.4);
     var rElms = VecBuilder.fill(12.0);
@@ -41,13 +43,16 @@ class LinearQuadraticRegulatorTest {
   void testFourMotorElevator() {
     var dt = 0.020;
 
-    var plant =
-        LinearSystemId.createElevatorSystem(
-            DCMotor.getVex775Pro(4), 8.0, 0.75 * 25.4 / 1000.0, 14.67);
+    var motor = KnownDCMotor.Vex775Pro.dcMotor;
+    var n = 4;
+    var G = 14.67;
+    var gearbox = new Gearbox(motor, n, G);
 
-    var K =
-        new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt)
-            .getK();
+    var plant = LinearSystemId.createElevatorSystem(
+        gearbox, 8.0, 0.75 * 25.4 / 1000.0);
+
+    var K = new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt)
+        .getK();
 
     assertEquals(10.381, K.get(0, 0), 1e-2);
     assertEquals(0.6929, K.get(0, 1), 1e-2);
@@ -55,13 +60,15 @@ class LinearQuadraticRegulatorTest {
 
   @Test
   void testLQROnArm() {
-    var motors = DCMotor.getVex775Pro(2);
+    var motor = KnownDCMotor.Vex775Pro.dcMotor;
+    var n = 2;
+    var G = 100.0;
+    var gearbox = new Gearbox(motor, n, G);
 
     var m = 4.0;
     var r = 0.4;
-    var G = 100.0;
 
-    var plant = LinearSystemId.createSingleJointedArmSystem(motors, 1d / 3d * m * r * r, G);
+    var plant = LinearSystemId.createSingleJointedArmSystem(gearbox, 1d / 3d * m * r * r);
 
     var qElms = VecBuilder.fill(0.01745, 0.08726);
     var rElms = VecBuilder.fill(12.0);
@@ -76,15 +83,16 @@ class LinearQuadraticRegulatorTest {
   /**
    * Returns feedback control gain for implicit model following.
    *
-   * <p>This is used to test the QRN overload of LQR.
+   * <p>
+   * This is used to test the QRN overload of LQR.
    *
-   * @param <States> Number of states.
-   * @param <Inputs> Number of inputs.
-   * @param A State matrix.
-   * @param B Input matrix.
-   * @param Q State cost matrix.
-   * @param R Input cost matrix.
-   * @param Aref Desired state matrix.
+   * @param <States>  Number of states.
+   * @param <Inputs>  Number of inputs.
+   * @param A         State matrix.
+   * @param B         Input matrix.
+   * @param Q         State cost matrix.
+   * @param R         Input cost matrix.
+   * @param Aref      Desired state matrix.
    * @param dtSeconds Discretization timestep in seconds.
    */
   <States extends Num, Inputs extends Num> Matrix<Inputs, States> getImplicitModelFollowingK(
@@ -102,8 +110,7 @@ class LinearQuadraticRegulatorTest {
     // Discretize desired dynamics
     var discAref = Discretization.discretizeA(Aref, dtSeconds);
 
-    Matrix<States, States> Qimf =
-        (discA.minus(discAref)).transpose().times(Q).times(discA.minus(discAref));
+    Matrix<States, States> Qimf = (discA.minus(discAref)).transpose().times(Q).times(discA.minus(discAref));
     Matrix<Inputs, Inputs> Rimf = discB.transpose().times(Q).times(discB).plus(R);
     Matrix<States, Inputs> Nimf = (discA.minus(discAref)).transpose().times(Q).times(discB);
 
@@ -159,12 +166,15 @@ class LinearQuadraticRegulatorTest {
   void testLatencyCompensate() {
     var dt = 0.02;
 
-    var plant =
-        LinearSystemId.createElevatorSystem(
-            DCMotor.getVex775Pro(4), 8.0, 0.75 * 25.4 / 1000.0, 14.67);
+    var motor = KnownDCMotor.Vex775Pro.dcMotor;
+    var n = 4;
+    var G = 14.67;
+    var gearbox = new Gearbox(motor, n, G);
 
-    var regulator =
-        new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt);
+    var plant = LinearSystemId.createElevatorSystem(
+        gearbox, 8.0, 0.75 * 25.4 / 1000.0);
+
+    var regulator = new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt);
 
     regulator.latencyCompensate(plant, dt, 0.01);
 

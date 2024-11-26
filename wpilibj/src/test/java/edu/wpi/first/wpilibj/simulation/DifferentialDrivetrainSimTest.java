@@ -19,7 +19,8 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.system.NumericalIntegration;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
+import edu.wpi.first.math.system.plant.KnownDCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -31,17 +32,16 @@ import org.junit.jupiter.api.Test;
 class DifferentialDrivetrainSimTest {
   @Test
   void testConvergence() {
-    var motor = DCMotor.getNEO(2);
+    var gearbox = new Gearbox(KnownDCMotor.NEO.dcMotor, 2);
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(
-            motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5, 1.0);
+            gearbox, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5);
 
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
     var sim =
         new DifferentialDrivetrainSim(
             plant,
-            motor,
-            1,
+            gearbox,
             kinematics.trackWidthMeters,
             Units.inchesToMeters(2),
             VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
@@ -97,14 +97,14 @@ class DifferentialDrivetrainSimTest {
 
   @Test
   void testCurrent() {
-    var motor = DCMotor.getNEO(2);
+    var gearbox = new Gearbox(KnownDCMotor.NEO.dcMotor, 2);
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(
-            motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5, 1.0);
+            gearbox, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5);
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
     var sim =
         new DifferentialDrivetrainSim(
-            plant, motor, 1, kinematics.trackWidthMeters, Units.inchesToMeters(2), null);
+            plant, gearbox, kinematics.trackWidthMeters, Units.inchesToMeters(2), null);
 
     sim.setInputs(-12, -12);
     for (int i = 0; i < 10; i++) {
@@ -127,17 +127,16 @@ class DifferentialDrivetrainSimTest {
 
   @Test
   void testModelStability() {
-    var motor = DCMotor.getNEO(2);
+    var gearbox = new Gearbox(KnownDCMotor.NEO.dcMotor, 2, 5.0);
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(
-            motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 2.0, 5.0);
+            gearbox, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 2.0);
 
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
     var sim =
         new DifferentialDrivetrainSim(
             plant,
-            motor,
-            5,
+            gearbox,
             kinematics.trackWidthMeters,
             Units.inchesToMeters(2),
             VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));

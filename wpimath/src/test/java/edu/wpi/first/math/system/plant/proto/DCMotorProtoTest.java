@@ -11,7 +11,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import org.junit.jupiter.api.Test;
 
 class DCMotorProtoTest {
-  private static final DCMotor DATA = new DCMotor(1.91, 19.1, 1.74, 1.74, 22.9, 3);
+  private static final DCMotor DATA = new DCMotor(1.91, 19.1, 1.74, 1.74, 22.9);
 
   @Test
   void testRoundtrip() {
@@ -19,13 +19,13 @@ class DCMotorProtoTest {
     DCMotor.proto.pack(proto, DATA);
 
     DCMotor data = DCMotor.proto.unpack(proto);
-    assertEquals(DATA.nominalVoltageVolts, data.nominalVoltageVolts);
-    assertEquals(DATA.stallTorqueNewtonMeters, data.stallTorqueNewtonMeters);
-    assertEquals(DATA.stallCurrentAmps, data.stallCurrentAmps);
-    assertEquals(DATA.freeCurrentAmps, data.freeCurrentAmps);
-    assertEquals(DATA.freeSpeedRadPerSec, data.freeSpeedRadPerSec);
-    assertEquals(DATA.rOhms, data.rOhms);
-    assertEquals(DATA.KvRadPerSecPerVolt, data.KvRadPerSecPerVolt);
-    assertEquals(DATA.KtNMPerAmp, data.KtNMPerAmp);
+    assertEquals(DATA.nominalVoltage.baseUnitMagnitude(), data.nominalVoltage.baseUnitMagnitude());
+    assertEquals(DATA.stallTorque.baseUnitMagnitude(), data.stallTorque.baseUnitMagnitude());
+    assertEquals(DATA.stallCurrent.baseUnitMagnitude(), data.stallCurrent.baseUnitMagnitude());
+    assertEquals(DATA.freeCurrent.baseUnitMagnitude(), data.freeCurrent.baseUnitMagnitude());
+    assertEquals(DATA.freeSpeed.baseUnitMagnitude(), data.freeSpeed.baseUnitMagnitude());
+    assertEquals(DATA.internalResistance.baseUnitMagnitude(), data.internalResistance.baseUnitMagnitude());
+    assertEquals(DATA.kv.baseUnitMagnitude(), data.kv.baseUnitMagnitude());
+    assertEquals(DATA.kt.baseUnitMagnitude(), data.kt.baseUnitMagnitude());
   }
 }

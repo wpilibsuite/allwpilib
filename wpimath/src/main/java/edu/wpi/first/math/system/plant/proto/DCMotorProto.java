@@ -4,6 +4,11 @@
 
 package edu.wpi.first.math.system.plant.proto;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.NewtonMeters;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.proto.Plant.ProtobufDCMotor;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.protobuf.Protobuf;
@@ -32,16 +37,15 @@ public class DCMotorProto implements Protobuf<DCMotor, ProtobufDCMotor> {
         msg.getStallTorque(),
         msg.getStallCurrent(),
         msg.getFreeCurrent(),
-        msg.getFreeSpeed(),
-        1);
+        msg.getFreeSpeed());
   }
 
   @Override
   public void pack(ProtobufDCMotor msg, DCMotor value) {
-    msg.setNominalVoltage(value.nominalVoltageVolts);
-    msg.setStallTorque(value.stallTorqueNewtonMeters);
-    msg.setStallCurrent(value.stallCurrentAmps);
-    msg.setFreeCurrent(value.freeCurrentAmps);
-    msg.setFreeSpeed(value.freeSpeedRadPerSec);
+    msg.setNominalVoltage(value.nominalVoltage.in(Volts));
+    msg.setStallTorque(value.stallTorque.in(NewtonMeters));
+    msg.setStallCurrent(value.stallCurrent.in(Amps));
+    msg.setFreeCurrent(value.freeCurrent.in(Amps));
+    msg.setFreeSpeed(value.freeSpeed.in(RadiansPerSecond));
   }
 }
