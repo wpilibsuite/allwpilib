@@ -20,8 +20,11 @@ import edu.wpi.first.units.measure.Voltage;
 
 /** Models the behavior of a gearbox. */
 public class Gearbox {
+  /** The DCMotor for this gearbox. */
   public final DCMotor dcMotor;
+  /** The number of motors for this gearbox. */
   public final int numMotors;
+  /** The reduction of this gear box as a ratio of output rotations to input rotations. */
   private double gearboxReduction;
 
   /** The returned measure of angular velocity. Exists to minimize calls to GC. */
