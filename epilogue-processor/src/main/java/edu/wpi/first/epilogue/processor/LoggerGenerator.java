@@ -40,13 +40,33 @@ public class LoggerGenerator {
       LoggerGenerator::isBuiltInJavaMethod;
   private final ProcessingEnvironment m_processingEnv;
   private final List<ElementHandler> m_handlers;
-  private final Logged kDefaultConfig = new Logged() {
-    @Override public Class<? extends Annotation> annotationType() { return Logged.class; }
-    @Override public String name() { return ""; }
-    @Override public Strategy strategy() { return Strategy.OPT_IN; }
-    @Override public Importance importance() { return Importance.DEBUG; }
-    @Override public Naming defaultNaming() { return Naming.USE_CODE_NAME; }
-  };
+  private final Logged kDefaultConfig =
+      new Logged() {
+        @Override
+        public Class<? extends Annotation> annotationType() {
+          return Logged.class;
+        }
+
+        @Override
+        public String name() {
+          return "";
+        }
+
+        @Override
+        public Strategy strategy() {
+          return Strategy.OPT_IN;
+        }
+
+        @Override
+        public Importance importance() {
+          return Importance.DEBUG;
+        }
+
+        @Override
+        public Naming defaultNaming() {
+          return Naming.USE_CODE_NAME;
+        }
+      };
 
   public LoggerGenerator(ProcessingEnvironment processingEnv, List<ElementHandler> handlers) {
     this.m_processingEnv = processingEnv;
@@ -81,7 +101,9 @@ public class LoggerGenerator {
    */
   public boolean writeLoggerFile(TypeElement clazz) throws IOException {
     var config = clazz.getAnnotation(Logged.class);
-    if (config == null) { config = kDefaultConfig; }
+    if (config == null) {
+      config = kDefaultConfig;
+    }
     boolean requireExplicitOptIn = config.strategy() == Logged.Strategy.OPT_IN;
 
     Predicate<Element> notSkipped = LoggerGenerator::isNotSkipped;
@@ -118,10 +140,12 @@ public class LoggerGenerator {
             .filter(this::isLoggable)
             .filter(e -> !isSimpleGetterMethodForLoggedField(e, fieldsToLog))
             .toList();
-    
+
     // If there is no log annotation and no fields to log, don't generate a logger
     // logger is still generated for @Logged classes for compatibility reasons
-    if (fieldsToLog.isEmpty() && methodsToLog.isEmpty() && clazz.getAnnotation(Logged.class) == null) {
+    if (fieldsToLog.isEmpty()
+        && methodsToLog.isEmpty()
+        && clazz.getAnnotation(Logged.class) == null) {
       return false;
     }
 

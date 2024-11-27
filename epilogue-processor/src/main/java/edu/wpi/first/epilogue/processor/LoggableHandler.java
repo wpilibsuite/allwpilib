@@ -56,7 +56,11 @@ public class LoggableHandler extends ElementHandler {
     var loggableSubtypes =
         m_loggedTypes.stream()
             .filter(
-                l -> l.getAnnotation(Logged.class) != null && m_processingEnv.getTypeUtils().isAssignable(l.asType(), declaredType.asType()))
+                l ->
+                    l.getAnnotation(Logged.class) != null
+                        && m_processingEnv
+                            .getTypeUtils()
+                            .isAssignable(l.asType(), declaredType.asType()))
             .sorted(inheritanceComparatorFor(declaredType))
             .toList();
 

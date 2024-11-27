@@ -37,7 +37,7 @@ class EpilogueGeneratorTest {
 
         public final class Epilogue {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
-      
+
           public static final ExampleLogger exampleLogger = new ExampleLogger();
 
           public static void configure(java.util.function.Consumer<EpilogueConfiguration> configurator) {
