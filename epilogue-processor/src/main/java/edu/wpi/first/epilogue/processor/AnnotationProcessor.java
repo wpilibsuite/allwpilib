@@ -355,14 +355,12 @@ public class AnnotationProcessor extends AbstractProcessor {
     for (TypeElement clazz : classes) {
       try {
         warnOfNonLoggableElements(clazz);
-        boolean isMainRobotClass = false;
-        if (processingEnv.getTypeUtils().isAssignable(clazz.getSuperclass(), robotBaseClass)) {
-          mainRobotClasses.add(clazz);
-          isMainRobotClass = true;
-        }
-        boolean canBeLogged = m_loggerGenerator.writeLoggerFile(clazz, isMainRobotClass);
+        boolean canBeLogged = m_loggerGenerator.writeLoggerFile(clazz);
         if (canBeLogged) {
           loggerClassNames.add(StringUtils.loggerClassName(clazz));
+        }
+        if (processingEnv.getTypeUtils().isAssignable(clazz.getSuperclass(), robotBaseClass)) {
+          mainRobotClasses.add(clazz);
         }
       } catch (IOException e) {
         processingEnv
