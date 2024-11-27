@@ -43,6 +43,11 @@ public interface Force extends Measure<ForceUnit> {
     return (Force) unit().ofBaseUnits(0 - baseUnitMagnitude());
   }
 
+  /**
+  * {@InheritDoc}
+  *
+  * @deprecated use unaryMinus() instead. This was renamed for consistancy with other WPILib classes like Rotation2d
+  */
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
