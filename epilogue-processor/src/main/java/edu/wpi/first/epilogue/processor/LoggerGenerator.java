@@ -79,7 +79,7 @@ public class LoggerGenerator {
    * @param clazz the data type that the logger should support.
    * @throws IOException if the file could not be written
    */
-  public void writeLoggerFile(TypeElement clazz) throws IOException {
+  public boolean writeLoggerFile(TypeElement clazz, boolean isMainRobotClass) throws IOException {
     var config = clazz.getAnnotation(Logged.class);
     if (config == null) { config = kDefaultConfig; }
     boolean requireExplicitOptIn = config.strategy() == Logged.Strategy.OPT_IN;
@@ -118,6 +118,12 @@ public class LoggerGenerator {
             .filter(this::isLoggable)
             .filter(e -> !isSimpleGetterMethodForLoggedField(e, fieldsToLog))
             .toList();
+    
+    // Nothing to log; continue
+    // Robot classes must have a generated logger
+    if (fieldsToLog.isEmpty() && methodsToLog.isEmpty() && !isMainRobotClass) {
+      return false;
+    }
 
     // Validate no name collisions
     Map<String, List<Element>> usedNames =
@@ -160,6 +166,7 @@ public class LoggerGenerator {
         });
 
     writeLoggerFile(clazz.getQualifiedName().toString(), config, fieldsToLog, methodsToLog);
+    return true;
   }
 
   private void writeLoggerFile(

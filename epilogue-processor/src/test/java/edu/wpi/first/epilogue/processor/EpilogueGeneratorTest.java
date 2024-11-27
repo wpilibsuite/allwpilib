@@ -38,8 +38,6 @@ class EpilogueGeneratorTest {
         public final class Epilogue {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
-          public static final ExampleLogger exampleLogger = new ExampleLogger();
-
           public static void configure(java.util.function.Consumer<EpilogueConfiguration> configurator) {
             configurator.accept(config);
           }
@@ -73,6 +71,7 @@ class EpilogueGeneratorTest {
             public void startCompetition() {}
             @Override
             public void endCompetition() {}
+            private double x = 0.0;
           }
           """;
 
@@ -116,8 +115,7 @@ class EpilogueGeneratorTest {
           package edu.wpi.first.epilogue;
 
           @Logged
-          class Example extends edu.wpi.first.wpilibj.TimedRobot {
-          }
+          class Example extends edu.wpi.first.wpilibj.TimedRobot { }
           """;
 
     String expected =
@@ -192,10 +190,14 @@ class EpilogueGeneratorTest {
           package edu.wpi.first.epilogue;
 
           @Logged
-          class AlphaBot extends edu.wpi.first.wpilibj.TimedRobot { }
+          class AlphaBot extends edu.wpi.first.wpilibj.TimedRobot {
+            double x = 0.0;
+          }
 
           @Logged
-          class BetaBot extends edu.wpi.first.wpilibj.TimedRobot { }
+          class BetaBot extends edu.wpi.first.wpilibj.TimedRobot {
+            double x = 0.0;
+          }
           """;
 
     String expected =
