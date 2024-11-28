@@ -1259,7 +1259,7 @@ class AnnotationProcessorTest {
         package edu.wpi.first.epilogue;
 
         class Outer {
-          @Logged(name = "CustomExample") // For the sake of testing, needs "Example" somewhere in the name
+          @Logged(name = "Custom Example") // For the sake of testing, needs "Example" somewhere in the name
           class Example {
             double x;
           }

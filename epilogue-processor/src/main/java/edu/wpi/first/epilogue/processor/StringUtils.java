@@ -126,7 +126,7 @@ public final class StringUtils {
     if (config.name().isEmpty()) {
       className = String.join("$", nesting);
     } else {
-      className = config.name();
+      className = capitalize(config.name()).replaceAll(" ", "");
     }
 
     return packageName + "." + className + "Logger";
