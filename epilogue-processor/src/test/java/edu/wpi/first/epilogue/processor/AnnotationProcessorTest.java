@@ -1330,6 +1330,47 @@ class AnnotationProcessorTest {
   }
 
   @Test
+  void nestedImplicit() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+        
+        class Implicit {
+          @Logged double x;
+        }
+        
+        class Example {
+          @Logged Implicit i;
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              Epilogue.implicitLogger.tryUpdate(dataLogger.getSubLogger("i"), object.i, Epilogue.getConfig().errorHandler);
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
   void customLogger() {
     String source =
         """

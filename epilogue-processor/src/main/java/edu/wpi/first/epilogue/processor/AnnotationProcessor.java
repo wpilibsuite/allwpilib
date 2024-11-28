@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -97,7 +99,7 @@ public class AnnotationProcessor extends AbstractProcessor {
         List.of(
             new LoggableHandler(
                 processingEnv,
-                roundEnv.getRootElements()), // prioritize epilogue logging over Sendable
+                getLoggedTypes(roundEnv)), // prioritize epilogue logging over Sendable
             new ConfiguredLoggerHandler(
                 processingEnv, customLoggers), // then customized logging configs
             new ArrayHandler(processingEnv),
@@ -117,10 +119,37 @@ public class AnnotationProcessor extends AbstractProcessor {
         .findAny()
         .ifPresent(
             epilogue -> {
-              processEpilogue(roundEnv);
+              processEpilogue(roundEnv, epilogue);
             });
 
     return false;
+  }
+
+  /**
+   * Gets the set of all loggable types in the compilation unit. A type is considered loggable if
+   * it is directly annotated with {@code @Logged} or contains a field or method with a
+   * {@code @Logged} annotation.
+   *
+   * @param roundEnv the compilation round environment
+   *
+   * @return the set of all loggable types
+   */
+  private Set<TypeElement> getLoggedTypes(RoundEnvironment roundEnv) {
+    return Stream.concat(
+        // 1. All type elements (classes, interfaces, or enums) with the @Logged annotation
+        roundEnv.getRootElements()
+            .stream()
+            .filter(e -> e instanceof TypeElement)
+            .map(e -> (TypeElement) e)
+            .filter(t -> t.getAnnotation(Logged.class) != null),
+        // 2. All type elements containing a field or method with the @Logged annotation
+        roundEnv.getElementsAnnotatedWith(Logged.class)
+            .stream()
+            .filter(e -> e instanceof VariableElement || e instanceof ExecutableElement)
+            .map(e -> e.getEnclosingElement())
+            .filter(e -> e instanceof TypeElement)
+            .map(e -> (TypeElement) e)
+    ).collect(Collectors.toSet()); // Collect to a set to avoid duplicates
   }
   
   private boolean validateFields(Set<? extends Element> annotatedElements) {
@@ -329,8 +358,8 @@ public class AnnotationProcessor extends AbstractProcessor {
     return customLoggers;
   }
 
-  private void processEpilogue(RoundEnvironment roundEnv) {
-    var annotatedElements = roundEnv.getRootElements();
+  private void processEpilogue(RoundEnvironment roundEnv, TypeElement epilogueAnnotation) {
+    var annotatedElements = roundEnv.getElementsAnnotatedWith(epilogueAnnotation);
 
     List<String> loggerClassNames = new ArrayList<>();
     var mainRobotClasses = new ArrayList<TypeElement>();
@@ -347,11 +376,8 @@ public class AnnotationProcessor extends AbstractProcessor {
       return;
     }
 
-    var classes =
-        annotatedElements.stream()
-            .filter(e -> e instanceof TypeElement)
-            .map(e -> (TypeElement) e)
-            .toList();
+    var classes = getLoggedTypes(roundEnv);
+
     for (TypeElement clazz : classes) {
       try {
         warnOfNonLoggableElements(clazz);
