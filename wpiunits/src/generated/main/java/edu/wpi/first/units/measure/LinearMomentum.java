@@ -70,6 +70,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
     return (LinearMomentum) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default LinearMomentum divide(double divisor) {
+    return (LinearMomentum) div(divisor);
+  }
+
   @Override
   default Force per(TimeUnit period) {
     return div(period.of(1));
@@ -86,6 +98,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
     return (Per<LinearMomentumUnit, AccelerationUnit<?>>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Mult<LinearMomentumUnit, AngleUnit> times(Angle multiplier) {
@@ -95,6 +119,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   @Override
   default Per<LinearMomentumUnit, AngleUnit> div(Angle divisor) {
     return (Per<LinearMomentumUnit, AngleUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, AngleUnit> divide(Angle divisor) {
+    return div(divisor);
   }
 
 
@@ -108,6 +144,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
     return (Per<LinearMomentumUnit, AngularAccelerationUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Mult<LinearMomentumUnit, AngularMomentumUnit> times(AngularMomentum multiplier) {
@@ -117,6 +165,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   @Override
   default Per<LinearMomentumUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
     return (Per<LinearMomentumUnit, AngularMomentumUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
+    return div(divisor);
   }
 
 
@@ -130,6 +190,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
     return (Per<LinearMomentumUnit, AngularVelocityUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Mult<LinearMomentumUnit, CurrentUnit> times(Current multiplier) {
@@ -141,9 +213,33 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
     return (Per<LinearMomentumUnit, CurrentUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, CurrentUnit> divide(Current divisor) {
+    return div(divisor);
+  }
+
   @Override
   default LinearMomentum div(Dimensionless divisor) {
     return (LinearMomentum) KilogramMetersPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default LinearMomentum divide(Dimensionless divisor) {
+    return (LinearMomentum) div(divisor);
   }
 
   @Override
@@ -162,6 +258,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
     return (Per<LinearMomentumUnit, DistanceUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, DistanceUnit> divide(Distance divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Mult<LinearMomentumUnit, EnergyUnit> times(Energy multiplier) {
@@ -171,6 +279,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   @Override
   default Per<LinearMomentumUnit, EnergyUnit> div(Energy divisor) {
     return (Per<LinearMomentumUnit, EnergyUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, EnergyUnit> divide(Energy divisor) {
+    return div(divisor);
   }
 
 
@@ -184,6 +304,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
     return (Per<LinearMomentumUnit, ForceUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, ForceUnit> divide(Force divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Force times(Frequency multiplier) {
@@ -193,6 +325,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   @Override
   default Per<LinearMomentumUnit, FrequencyUnit> div(Frequency divisor) {
     return (Per<LinearMomentumUnit, FrequencyUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, FrequencyUnit> divide(Frequency divisor) {
+    return div(divisor);
   }
 
 
@@ -206,6 +350,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
     return (Per<LinearMomentumUnit, LinearAccelerationUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Mult<LinearMomentumUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
@@ -215,6 +371,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   @Override
   default Dimensionless div(LinearMomentum divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Dimensionless divide(LinearMomentum divisor) {
+    return div(divisor);
   }
 
 
@@ -228,6 +396,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
     return Kilograms.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Mass divide(LinearVelocity divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Mult<LinearMomentumUnit, MassUnit> times(Mass multiplier) {
@@ -237,6 +417,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   @Override
   default LinearVelocity div(Mass divisor) {
     return MetersPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default LinearVelocity divide(Mass divisor) {
+    return div(divisor);
   }
 
 
@@ -250,6 +442,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
     return (Per<LinearMomentumUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Mult<LinearMomentumUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
@@ -259,6 +463,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   @Override
   default Per<LinearMomentumUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
     return (Per<LinearMomentumUnit, MultUnit<?, ?>>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
+    return div(divisor);
   }
 
 
@@ -272,6 +488,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
     return (Per<LinearMomentumUnit, PerUnit<?, ?>>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Mult<LinearMomentumUnit, PowerUnit> times(Power multiplier) {
@@ -281,6 +509,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   @Override
   default Per<LinearMomentumUnit, PowerUnit> div(Power divisor) {
     return (Per<LinearMomentumUnit, PowerUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, PowerUnit> divide(Power divisor) {
+    return div(divisor);
   }
 
 
@@ -294,6 +534,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
     return (Per<LinearMomentumUnit, ResistanceUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, ResistanceUnit> divide(Resistance divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Mult<LinearMomentumUnit, TemperatureUnit> times(Temperature multiplier) {
@@ -303,6 +555,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   @Override
   default Per<LinearMomentumUnit, TemperatureUnit> div(Temperature divisor) {
     return (Per<LinearMomentumUnit, TemperatureUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, TemperatureUnit> divide(Temperature divisor) {
+    return div(divisor);
   }
 
 
@@ -316,6 +580,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
     return Newtons.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Force divide(Time divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Mult<LinearMomentumUnit, TorqueUnit> times(Torque multiplier) {
@@ -325,6 +601,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   @Override
   default Per<LinearMomentumUnit, TorqueUnit> div(Torque divisor) {
     return (Per<LinearMomentumUnit, TorqueUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, TorqueUnit> divide(Torque divisor) {
+    return div(divisor);
   }
 
 
@@ -338,6 +626,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
     return (Per<LinearMomentumUnit, VelocityUnit<?>>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Mult<LinearMomentumUnit, VoltageUnit> times(Voltage multiplier) {
@@ -347,6 +647,18 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   @Override
   default Per<LinearMomentumUnit, VoltageUnit> div(Voltage divisor) {
     return (Per<LinearMomentumUnit, VoltageUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<LinearMomentumUnit, VoltageUnit> divide(Voltage divisor) {
+    return div(divisor);
   }
 
 }

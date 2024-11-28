@@ -70,6 +70,18 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
     return ({{ helpers['type_usage'](name) }}) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default {{ helpers['type_usage'](name) }} divide(double divisor) {
+    return ({{ helpers['type_usage'](name) }}) div(divisor);
+  }
+
   @Override
   default {{ config[name]['divide']['Time'] or "Velocity<{}>".format(helpers['mtou'](name)) }} per(TimeUnit period) {
     return div(period.of(1));
@@ -79,6 +91,18 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   @Override
   default {{ helpers['type_usage'](name) }} div({{ unit }} divisor) {
     return ({{ helpers['type_usage'](name) }}) {{ config[name]['base_unit'] }}.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default {{ helpers['type_usage'](name) }} divide({{ unit }} divisor) {
+    return ({{ helpers['type_usage'](name) }}) div(divisor);
   }
 
   @Override
@@ -106,20 +130,68 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   default {{ config[name]['divide'][unit] }} div({{ unit }} divisor) {
     return {{ config[config[name]['divide'][unit]]['base_unit'] }}.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default {{ config[name]['divide'][unit] }} divide({{ unit }} divisor) {
+    return div(divisor);
+  }
 {% elif unit == "Time" %}
   @Override
   default Velocity<{{ helpers['mtou'](name) }}> div({{ unit }} divisor) {
     return VelocityUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Velocity<{{ helpers['mtou'](name) }}> divide({{ unit }} divisor) {
+    return div(divisor);
   }
 {% elif unit == name %}
   @Override
   default Dimensionless div({{ unit }} divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Dimensionless divide({{ unit }} divisor) {
+    return div(divisor);
+  }
 {% else %}
   @Override
   default Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> div({{ unit }} divisor) {
     return (Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> divide({{ unit }} divisor) {
+    return div(divisor);
   }
 {% endif -%}
 {% endif -%}
