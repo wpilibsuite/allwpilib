@@ -15,7 +15,9 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +31,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
@@ -150,36 +153,28 @@ public class LoggerGenerator {
           }
         });
 
-    writeLoggerFile(clazz.getQualifiedName().toString(), config, fieldsToLog, methodsToLog);
+    writeLoggerFile(clazz, config, fieldsToLog, methodsToLog);
   }
 
   private void writeLoggerFile(
-      String className,
+      TypeElement clazz,
       Logged classConfig,
       List<VariableElement> loggableFields,
       List<ExecutableElement> loggableMethods)
       throws IOException {
-    String packageName = null;
-    int lastDot = className.lastIndexOf('.');
-    if (lastDot > 0) {
-      packageName = className.substring(0, lastDot);
+    // Walk nesting levels, to support inner classes
+    Deque<String> nesting = new ArrayDeque<>();
+    Element enclosing = clazz.getEnclosingElement();
+    while (!(enclosing instanceof PackageElement p)) {
+      nesting.addFirst(enclosing.getSimpleName().toString());
+      enclosing = enclosing.getEnclosingElement();
     }
+    String packageName = p.getQualifiedName().toString();
+    nesting.addLast(clazz.getSimpleName().toString());
+    String simpleClassName = String.join(".", nesting);
 
-    String simpleClassName = StringUtils.simpleName(className);
-    String loggerClassName = className + "Logger";
-    String loggerSimpleClassName = loggerClassName.substring(lastDot + 1);
-
-    // Use the name on the class config to set the generated logger names
-    // This helps to avoid naming conflicts
-    if (!classConfig.name().isBlank()) {
-      loggerSimpleClassName =
-          StringUtils.capitalize(classConfig.name().replaceAll(" ", "")) + "Logger";
-      if (lastDot > 0) {
-        loggerClassName = packageName + "." + loggerSimpleClassName;
-      } else {
-        loggerClassName = loggerSimpleClassName;
-      }
-    }
+    String loggerClassName = StringUtils.loggerClassName(clazz);
+    String loggerSimpleClassName = StringUtils.simpleName(loggerClassName);
 
     var loggerFile = m_processingEnv.getFiler().createSourceFile(loggerClassName);
 
@@ -220,13 +215,13 @@ public class LoggerGenerator {
         }
         out.println();
 
-        var clazz = simpleClassName + ".class";
+        var classReference = simpleClassName + ".class";
 
         out.println("  static {");
         out.println("    try {");
         out.println(
             "      var lookup = MethodHandles.privateLookupIn("
-                + clazz
+                + classReference
                 + ", MethodHandles.lookup());");
 
         for (var privateField : privateFields) {
@@ -235,7 +230,7 @@ public class LoggerGenerator {
               "      $"
                   + fieldName
                   + " = lookup.findVarHandle("
-                  + clazz
+                  + classReference
                   + ", \""
                   + fieldName
                   + "\", "
