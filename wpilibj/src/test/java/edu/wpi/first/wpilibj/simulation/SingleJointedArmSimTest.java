@@ -7,15 +7,15 @@ package edu.wpi.first.wpilibj.simulation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.Gearbox;
+import edu.wpi.first.math.system.plant.KnownDCMotor;
 import edu.wpi.first.math.util.Units;
 import org.junit.jupiter.api.Test;
 
 class SingleJointedArmSimTest {
   SingleJointedArmSim m_sim =
       new SingleJointedArmSim(
-          DCMotor.getVex775Pro(2),
-          300,
+          new Gearbox(KnownDCMotor.Vex775Pro.dcMotor, 2, 300),
           3.0,
           Units.inchesToMeters(30.0),
           -Math.PI,
