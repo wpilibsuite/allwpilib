@@ -122,7 +122,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     return false;
   }
-
+  
   private boolean validateFields(Set<? extends Element> annotatedElements) {
     var fields =
         annotatedElements.stream()
