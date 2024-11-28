@@ -60,14 +60,17 @@ class AnnotationProcessorTest {
   }
 
   @Test
-  void basicOptInLogging() {
+  void implicitOptInLogging() {
     String source =
         """
       package edu.wpi.first.epilogue;
 
       class Example {
         @Logged double x;
-        @Logged double y;
+        @Logged int y;
+    
+        @Logged public double getValue() { return 2.0; }
+        @Logged public boolean isActive() { return false; }
       }
     """;
 
@@ -90,6 +93,8 @@ class AnnotationProcessorTest {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("y", object.y);
+            dataLogger.log("getValue", object.getValue());
+            dataLogger.log("isActive", object.isActive());
           }
         }
       }
