@@ -68,7 +68,7 @@ class AnnotationProcessorTest {
       class Example {
         @Logged double x;
         @Logged int y;
-    
+
         @Logged public double getValue() { return 2.0; }
         @Logged public boolean isActive() { return false; }
       }
