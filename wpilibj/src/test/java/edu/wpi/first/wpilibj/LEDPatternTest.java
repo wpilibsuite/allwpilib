@@ -870,7 +870,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(8);
 
     {
-      WPIUtilJNI.setMockTime(0); // start
+      m_mockTime = 0; // start
       pattern.applyTo(buffer);
       assertColorEquals(kRed, buffer.getLED(0));
       assertColorEquals(kRed, buffer.getLED(1));
@@ -883,7 +883,7 @@ class LEDPatternTest {
     }
 
     {
-      WPIUtilJNI.setMockTime(1);
+      m_mockTime = 1;
       pattern.applyTo(buffer);
       assertColorEquals(kBlack, buffer.getLED(0));
       assertColorEquals(kRed, buffer.getLED(1));
@@ -896,7 +896,7 @@ class LEDPatternTest {
     }
 
     {
-      WPIUtilJNI.setMockTime(2);
+      m_mockTime = 2;
       pattern.applyTo(buffer);
       assertColorEquals(kBlack, buffer.getLED(0));
       assertColorEquals(kBlack, buffer.getLED(1));
@@ -909,7 +909,7 @@ class LEDPatternTest {
     }
 
     {
-      WPIUtilJNI.setMockTime(3);
+      m_mockTime = 3;
       pattern.applyTo(buffer);
       assertColorEquals(kBlack, buffer.getLED(0));
       assertColorEquals(kBlack, buffer.getLED(1));
@@ -935,7 +935,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(8);
 
     {
-      WPIUtilJNI.setMockTime(0); // start
+      m_mockTime = 0; // start
       pattern.applyTo(buffer);
       assertColorEquals(kRed, buffer.getLED(0));
       assertColorEquals(kRed, buffer.getLED(1));
@@ -948,7 +948,7 @@ class LEDPatternTest {
     }
 
     {
-      WPIUtilJNI.setMockTime(1);
+      m_mockTime = 1;
       pattern.applyTo(buffer);
       assertColorEquals(kBlack, buffer.getLED(0));
       assertColorEquals(kRed, buffer.getLED(1));
@@ -961,7 +961,7 @@ class LEDPatternTest {
     }
 
     {
-      WPIUtilJNI.setMockTime(2);
+      m_mockTime = 2;
       pattern.applyTo(buffer);
       assertColorEquals(kBlack, buffer.getLED(0));
       assertColorEquals(kBlack, buffer.getLED(1));
@@ -974,7 +974,7 @@ class LEDPatternTest {
     }
 
     {
-      WPIUtilJNI.setMockTime(3);
+      m_mockTime = 3;
       pattern.applyTo(buffer);
       assertColorEquals(kBlack, buffer.getLED(0));
       assertColorEquals(kBlack, buffer.getLED(1));
