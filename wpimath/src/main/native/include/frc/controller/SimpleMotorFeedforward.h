@@ -20,8 +20,7 @@ namespace frc {
  * permanent-magnet DC motor.
  */
 template <class Distance>
-  requires std::same_as<units::meter, Distance> ||
-           std::same_as<units::radian, Distance>
+  requires units::length_unit<Distance> || units::angle_unit<Distance>
 class SimpleMotorFeedforward {
  public:
   using Velocity =

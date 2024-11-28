@@ -5,9 +5,13 @@
 package edu.wpi.first.epilogue.processor;
 
 import edu.wpi.first.epilogue.Logged;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 
 public final class StringUtils {
@@ -108,34 +112,24 @@ public final class StringUtils {
    */
   public static String loggerClassName(TypeElement clazz) {
     var config = clazz.getAnnotation(Logged.class);
-    var className = clazz.getQualifiedName().toString();
 
-    String packageName;
-    int lastDot = className.lastIndexOf('.');
-    if (lastDot <= 0) {
-      packageName = null;
+    Deque<String> nesting = new ArrayDeque<>();
+    Element enclosing = clazz.getEnclosingElement();
+    while (!(enclosing instanceof PackageElement p)) {
+      nesting.addFirst(enclosing.getSimpleName().toString());
+      enclosing = enclosing.getEnclosingElement();
+    }
+    nesting.addLast(clazz.getSimpleName().toString());
+    String packageName = p.getQualifiedName().toString();
+
+    String className;
+    if (config.name().isEmpty()) {
+      className = String.join("$", nesting);
     } else {
-      packageName = className.substring(0, lastDot);
+      className = capitalize(config.name()).replaceAll(" ", "");
     }
 
-    String loggerClassName;
-
-    // Use the name on the class config to set the generated logger names
-    // This helps to avoid naming conflicts
-    if (config.name().isBlank()) {
-      loggerClassName = className + "Logger";
-    } else {
-      String cleaned = config.name().replaceAll(" ", "");
-
-      var loggerSimpleClassName = StringUtils.capitalize(cleaned) + "Logger";
-      if (packageName != null) {
-        loggerClassName = packageName + "." + loggerSimpleClassName;
-      } else {
-        loggerClassName = loggerSimpleClassName;
-      }
-    }
-
-    return loggerClassName;
+    return packageName + "." + className + "Logger";
   }
 
   /**

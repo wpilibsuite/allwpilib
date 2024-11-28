@@ -43,6 +43,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Dimensionless) unit().ofBaseUnits(0 - baseUnitMagnitude());
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use unaryMinus() instead. This was renamed for consistency with other WPILib classes like Rotation2d
+  */
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -70,6 +75,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Dimensionless) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Dimensionless divide(double divisor) {
+    return (Dimensionless) div(divisor);
+  }
+
   @Override
   default Frequency per(TimeUnit period) {
     return div(period.of(1));
@@ -86,6 +103,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Per<DimensionlessUnit, AccelerationUnit<?>>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Angle times(Angle multiplier) {
@@ -95,6 +124,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, AngleUnit> div(Angle divisor) {
     return (Per<DimensionlessUnit, AngleUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, AngleUnit> divide(Angle divisor) {
+    return div(divisor);
   }
 
 
@@ -108,6 +149,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Per<DimensionlessUnit, AngularAccelerationUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default AngularMomentum times(AngularMomentum multiplier) {
@@ -117,6 +170,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
     return (Per<DimensionlessUnit, AngularMomentumUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
+    return div(divisor);
   }
 
 
@@ -130,6 +195,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Per<DimensionlessUnit, AngularVelocityUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Current times(Current multiplier) {
@@ -141,9 +218,33 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Per<DimensionlessUnit, CurrentUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, CurrentUnit> divide(Current divisor) {
+    return div(divisor);
+  }
+
   @Override
   default Dimensionless div(Dimensionless divisor) {
     return (Dimensionless) Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Dimensionless divide(Dimensionless divisor) {
+    return (Dimensionless) div(divisor);
   }
 
   @Override
@@ -162,6 +263,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Per<DimensionlessUnit, DistanceUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, DistanceUnit> divide(Distance divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Energy times(Energy multiplier) {
@@ -171,6 +284,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, EnergyUnit> div(Energy divisor) {
     return (Per<DimensionlessUnit, EnergyUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, EnergyUnit> divide(Energy divisor) {
+    return div(divisor);
   }
 
 
@@ -184,6 +309,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Per<DimensionlessUnit, ForceUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, ForceUnit> divide(Force divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Frequency times(Frequency multiplier) {
@@ -193,6 +330,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, FrequencyUnit> div(Frequency divisor) {
     return (Per<DimensionlessUnit, FrequencyUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, FrequencyUnit> divide(Frequency divisor) {
+    return div(divisor);
   }
 
 
@@ -206,6 +355,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Per<DimensionlessUnit, LinearAccelerationUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default LinearMomentum times(LinearMomentum multiplier) {
@@ -215,6 +376,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
     return (Per<DimensionlessUnit, LinearMomentumUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
+    return div(divisor);
   }
 
 
@@ -228,6 +401,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Per<DimensionlessUnit, LinearVelocityUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Mass times(Mass multiplier) {
@@ -237,6 +422,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, MassUnit> div(Mass divisor) {
     return (Per<DimensionlessUnit, MassUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, MassUnit> divide(Mass divisor) {
+    return div(divisor);
   }
 
 
@@ -250,6 +447,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Per<DimensionlessUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Mult<DimensionlessUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
@@ -259,6 +468,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
     return (Per<DimensionlessUnit, MultUnit<?, ?>>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
+    return div(divisor);
   }
 
 
@@ -272,6 +493,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Per<DimensionlessUnit, PerUnit<?, ?>>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Power times(Power multiplier) {
@@ -281,6 +514,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, PowerUnit> div(Power divisor) {
     return (Per<DimensionlessUnit, PowerUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, PowerUnit> divide(Power divisor) {
+    return div(divisor);
   }
 
 
@@ -294,6 +539,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Per<DimensionlessUnit, ResistanceUnit>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, ResistanceUnit> divide(Resistance divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Temperature times(Temperature multiplier) {
@@ -303,6 +560,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, TemperatureUnit> div(Temperature divisor) {
     return (Per<DimensionlessUnit, TemperatureUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, TemperatureUnit> divide(Temperature divisor) {
+    return div(divisor);
   }
 
 
@@ -316,6 +585,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return Hertz.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Frequency divide(Time divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Torque times(Torque multiplier) {
@@ -325,6 +606,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, TorqueUnit> div(Torque divisor) {
     return (Per<DimensionlessUnit, TorqueUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, TorqueUnit> divide(Torque divisor) {
+    return div(divisor);
   }
 
 
@@ -338,6 +631,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Per<DimensionlessUnit, VelocityUnit<?>>) Measure.super.div(divisor);
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
+    return div(divisor);
+  }
+
 
   @Override
   default Voltage times(Voltage multiplier) {
@@ -347,6 +652,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, VoltageUnit> div(Voltage divisor) {
     return (Per<DimensionlessUnit, VoltageUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<DimensionlessUnit, VoltageUnit> divide(Voltage divisor) {
+    return div(divisor);
   }
 
 }

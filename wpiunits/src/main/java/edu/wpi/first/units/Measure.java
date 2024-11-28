@@ -152,7 +152,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * equivalent to -10 Kelvin, and <i>not</i> -10° Celsius.
    *
    * @return a measure equal to zero minus this measure
-   * @deprecated use unaryMinus() instead. This was renamed for consistancy with other WPILib
+   * @deprecated use unaryMinus() instead. This was renamed for consistency with other WPILib
    *     classes like Rotation2d
    */
   @Deprecated(since = "2025", forRemoval = true)
@@ -1019,6 +1019,341 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   default Measure<?> div(Resistance divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a unitless scalar and returns the result.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<U> divide(double divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a dimensionless scalar and returns the result.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<U> divide(Dimensionless divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measurement by another measure and performs some dimensional analysis to reduce
+   * the units.
+   *
+   * @param divisor the unit to divide by
+   * @return the resulting measure
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Measure<?> divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a generic acceleration and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Acceleration<?> divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by an angle and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Angle divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by an angular acceleration and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(AngularAcceleration divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by an angular momentum and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(AngularMomentum divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by an angular velocity and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(AngularVelocity divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by an electric current and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Current divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a distance and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Distance divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by an energy and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Energy divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a force and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Force divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a frequency and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Frequency divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a linear acceleration and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(LinearAcceleration divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a linear momentum and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(LinearMomentum divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a linear velocity and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(LinearVelocity divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a mass and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Mass divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a moment of inertia and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(MomentOfInertia divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a generic multiplication and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Mult<?, ?> divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a power and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Power divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a generic ratio and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Per<?, ?> divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a temperature and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Temperature divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a time and returns the result in the most appropriate unit. This will
+   * often - but not always - result in a {@link Per} type like {@link LinearVelocity} or {@link
+   * Acceleration}.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Time divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a torque and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Torque divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a generic velocity and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Velocity<?> divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a voltage and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Voltage divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a resistance and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Resistance divisor) {
+    return div(divisor);
   }
 
   /**
