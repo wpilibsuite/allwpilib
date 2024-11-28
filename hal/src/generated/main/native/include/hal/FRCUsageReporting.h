@@ -167,6 +167,7 @@ namespace HALUsageReporting {
     kResourceType_Redux_future5 = 113,
     kResourceType_RevSparkFlexCAN = 114,
     kResourceType_RevSparkFlexPWM = 115,
+    kResourceType_BangBangController = 116,
   };
   enum tInstances : int32_t {
     kLanguage_LabVIEW = 1,
@@ -175,6 +176,7 @@ namespace HALUsageReporting {
     kLanguage_Python = 4,
     kLanguage_DotNet = 5,
     kLanguage_Kotlin = 6,
+    kLanguage_Rust = 7,
     kCANPlugin_BlackJagBridge = 1,
     kCANPlugin_2CAN = 2,
     kFramework_Iterative = 1,
@@ -184,6 +186,7 @@ namespace HALUsageReporting {
     kFramework_ROS = 5,
     kFramework_RobotBuilder = 6,
     kFramework_AdvantageKit = 7,
+    kFramework_MagicBot = 8,
     kRobotDrive_ArcadeStandard = 1,
     kRobotDrive_ArcadeButtonSpin = 2,
     kRobotDrive_ArcadeRatioCurve = 3,
@@ -197,6 +200,11 @@ namespace HALUsageReporting {
     kRobotDrive2_MecanumPolar = 11,
     kRobotDrive2_KilloughCartesian = 12,
     kRobotDrive2_KilloughPolar = 13,
+    kRobotDriveSwerve_Other = 14,
+    kRobotDriveSwerve_YAGSL = 15,
+    kRobotDriveSwerve_CTRE = 16,
+    kRobotDriveSwerve_MaxSwerve = 17,
+    kRobotDriveSwerve_AdvantageKit = 18,
     kDriverStationCIO_Analog = 1,
     kDriverStationCIO_DigitalIn = 2,
     kDriverStationCIO_DigitalOut = 3,
@@ -223,6 +231,15 @@ namespace HALUsageReporting {
     kOdometry_DifferentialDrive = 1,
     kOdometry_MecanumDrive = 2,
     kOdometry_SwerveDrive = 3,
+    kDashboard_Unknown = 1,
+    kDashboard_Glass = 2,
+    kDashboard_SmartDashboard = 3,
+    kDashboard_Shuffleboard = 4,
+    kDashboard_Elastic = 5,
+    kDashboard_LabVIEW = 6,
+    kDashboard_AdvantageScope = 7,
+    kDashboard_QFRCDashboard = 8,
+    kDashboard_FRCWebComponents = 9,
   };
 }
 #endif

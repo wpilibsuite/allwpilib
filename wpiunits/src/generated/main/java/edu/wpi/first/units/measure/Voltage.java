@@ -43,6 +43,18 @@ public interface Voltage extends Measure<VoltageUnit> {
     return (Voltage) unit().ofBaseUnits(0 - baseUnitMagnitude());
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use unaryMinus() instead. This was renamed for consistency with other WPILib classes like Rotation2d
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Voltage negate() {
+    return (Voltage) unaryMinus();
+  }
+
   @Override
   default Voltage plus(Measure<? extends VoltageUnit> other) {
     return (Voltage) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
@@ -59,13 +71,25 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
-  default Voltage divide(double divisor) {
+  default Voltage div(double divisor) {
     return (Voltage) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Voltage divide(double divisor) {
+    return (Voltage) div(divisor);
   }
 
   @Override
   default Velocity<VoltageUnit> per(TimeUnit period) {
-    return divide(period.of(1));
+    return div(period.of(1));
   }
 
 
@@ -75,8 +99,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
+    return (Per<VoltageUnit, AccelerationUnit<?>>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
-    return (Per<VoltageUnit, AccelerationUnit<?>>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -86,8 +122,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, AngleUnit> div(Angle divisor) {
+    return (Per<VoltageUnit, AngleUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, AngleUnit> divide(Angle divisor) {
-    return (Per<VoltageUnit, AngleUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -97,8 +145,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
+    return (Per<VoltageUnit, AngularAccelerationUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
-    return (Per<VoltageUnit, AngularAccelerationUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -108,8 +168,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
+    return (Per<VoltageUnit, AngularMomentumUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
-    return (Per<VoltageUnit, AngularMomentumUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -119,8 +191,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
+    return (Per<VoltageUnit, AngularVelocityUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
-    return (Per<VoltageUnit, AngularVelocityUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -130,13 +214,37 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
-  default Per<VoltageUnit, CurrentUnit> divide(Current divisor) {
-    return (Per<VoltageUnit, CurrentUnit>) Measure.super.divide(divisor);
+  default Resistance div(Current divisor) {
+    return Ohms.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Resistance divide(Current divisor) {
+    return div(divisor);
   }
 
   @Override
-  default Voltage divide(Dimensionless divisor) {
+  default Voltage div(Dimensionless divisor) {
     return (Voltage) Volts.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Voltage divide(Dimensionless divisor) {
+    return (Voltage) div(divisor);
   }
 
   @Override
@@ -151,8 +259,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, DistanceUnit> div(Distance divisor) {
+    return (Per<VoltageUnit, DistanceUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, DistanceUnit> divide(Distance divisor) {
-    return (Per<VoltageUnit, DistanceUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -162,8 +282,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, EnergyUnit> div(Energy divisor) {
+    return (Per<VoltageUnit, EnergyUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, EnergyUnit> divide(Energy divisor) {
-    return (Per<VoltageUnit, EnergyUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -173,8 +305,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, ForceUnit> div(Force divisor) {
+    return (Per<VoltageUnit, ForceUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, ForceUnit> divide(Force divisor) {
-    return (Per<VoltageUnit, ForceUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -184,8 +328,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, FrequencyUnit> div(Frequency divisor) {
+    return (Per<VoltageUnit, FrequencyUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, FrequencyUnit> divide(Frequency divisor) {
-    return (Per<VoltageUnit, FrequencyUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -195,8 +351,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
+    return (Per<VoltageUnit, LinearAccelerationUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
-    return (Per<VoltageUnit, LinearAccelerationUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -206,8 +374,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
+    return (Per<VoltageUnit, LinearMomentumUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
-    return (Per<VoltageUnit, LinearMomentumUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -217,8 +397,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
+    return (Per<VoltageUnit, LinearVelocityUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
-    return (Per<VoltageUnit, LinearVelocityUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -228,8 +420,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, MassUnit> div(Mass divisor) {
+    return (Per<VoltageUnit, MassUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, MassUnit> divide(Mass divisor) {
-    return (Per<VoltageUnit, MassUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -239,8 +443,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
+    return (Per<VoltageUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
-    return (Per<VoltageUnit, MomentOfInertiaUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -250,8 +466,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
+    return (Per<VoltageUnit, MultUnit<?, ?>>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
-    return (Per<VoltageUnit, MultUnit<?, ?>>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -261,8 +489,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, PerUnit<?, ?>> div(Per<?, ?> divisor) {
+    return (Per<VoltageUnit, PerUnit<?, ?>>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
-    return (Per<VoltageUnit, PerUnit<?, ?>>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -272,8 +512,43 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, PowerUnit> div(Power divisor) {
+    return (Per<VoltageUnit, PowerUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, PowerUnit> divide(Power divisor) {
-    return (Per<VoltageUnit, PowerUnit>) Measure.super.divide(divisor);
+    return div(divisor);
+  }
+
+
+  @Override
+  default Mult<VoltageUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<VoltageUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Current div(Resistance divisor) {
+    return Amps.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Current divide(Resistance divisor) {
+    return div(divisor);
   }
 
 
@@ -283,8 +558,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, TemperatureUnit> div(Temperature divisor) {
+    return (Per<VoltageUnit, TemperatureUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, TemperatureUnit> divide(Temperature divisor) {
-    return (Per<VoltageUnit, TemperatureUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -294,8 +581,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
-  default Velocity<VoltageUnit> divide(Time divisor) {
+  default Velocity<VoltageUnit> div(Time divisor) {
     return VelocityUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Velocity<VoltageUnit> divide(Time divisor) {
+    return div(divisor);
   }
 
 
@@ -305,8 +604,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, TorqueUnit> div(Torque divisor) {
+    return (Per<VoltageUnit, TorqueUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, TorqueUnit> divide(Torque divisor) {
-    return (Per<VoltageUnit, TorqueUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -316,8 +627,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
+  default Per<VoltageUnit, VelocityUnit<?>> div(Velocity<?> divisor) {
+    return (Per<VoltageUnit, VelocityUnit<?>>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<VoltageUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
-    return (Per<VoltageUnit, VelocityUnit<?>>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -327,8 +650,20 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
-  default Dimensionless divide(Voltage divisor) {
+  default Dimensionless div(Voltage divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Dimensionless divide(Voltage divisor) {
+    return div(divisor);
   }
 
 }

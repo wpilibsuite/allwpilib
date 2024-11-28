@@ -320,10 +320,10 @@ class HttpRequest {
       : host{loc.host}, port{loc.port} {
     SmallVector<std::pair<std::string_view, std::string_view>, 4> params;
     for (const auto& p : loc.params) {
-      params.emplace_back(std::make_pair(GetFirst(p), GetSecond(p)));
+      params.emplace_back(std::pair{GetFirst(p), GetSecond(p)});
     }
     for (const auto& p : extraParams) {
-      params.emplace_back(std::make_pair(GetFirst(p), GetSecond(p)));
+      params.emplace_back(std::pair{GetFirst(p), GetSecond(p)});
     }
     SetPath(loc.path, params);
     SetAuth(loc);
@@ -375,8 +375,8 @@ class HttpRequest {
     return elem.first;
   }
   template <typename T>
-  static std::string_view GetFirst(const StringMapEntry<T>& elem) {
-    return elem.getKey();
+  static std::string_view GetFirst(const std::pair<std::string, T>& elem) {
+    return elem.first;
   }
   template <typename T>
   static std::string_view GetSecond(const T& elem) {

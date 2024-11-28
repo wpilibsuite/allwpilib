@@ -229,7 +229,7 @@ struct gemv_static_vector_if;
 
 template <typename Scalar, int Size, int MaxSize>
 struct gemv_static_vector_if<Scalar, Size, MaxSize, false> {
-  EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Scalar* data() {
+  EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC constexpr Scalar* data() {
     eigen_internal_assert(false && "should never be called");
     return 0;
   }
@@ -237,19 +237,19 @@ struct gemv_static_vector_if<Scalar, Size, MaxSize, false> {
 
 template <typename Scalar, int Size>
 struct gemv_static_vector_if<Scalar, Size, Dynamic, true> {
-  EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Scalar* data() { return 0; }
+  EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC constexpr Scalar* data() { return 0; }
 };
 
 template <typename Scalar, int Size, int MaxSize>
 struct gemv_static_vector_if<Scalar, Size, MaxSize, true> {
 #if EIGEN_MAX_STATIC_ALIGN_BYTES != 0
   internal::plain_array<Scalar, internal::min_size_prefer_fixed(Size, MaxSize), 0, AlignedMax> m_data;
-  EIGEN_STRONG_INLINE Scalar* data() { return m_data.array; }
+  EIGEN_STRONG_INLINE constexpr Scalar* data() { return m_data.array; }
 #else
   // Some architectures cannot align on the stack,
   // => let's manually enforce alignment by allocating more data and return the address of the first aligned element.
   internal::plain_array<Scalar, internal::min_size_prefer_fixed(Size, MaxSize) + EIGEN_MAX_ALIGN_BYTES, 0> m_data;
-  EIGEN_STRONG_INLINE Scalar* data() {
+  EIGEN_STRONG_INLINE constexpr Scalar* data() {
     return reinterpret_cast<Scalar*>((std::uintptr_t(m_data.array) & ~(std::size_t(EIGEN_MAX_ALIGN_BYTES - 1))) +
                                      EIGEN_MAX_ALIGN_BYTES);
   }
@@ -327,6 +327,7 @@ struct gemv_dense_selector<OnTheRight, ColMajor, true> {
 
       if (!evalToDest) {
 #ifdef EIGEN_DENSE_STORAGE_CTOR_PLUGIN
+        constexpr int Size = Dest::SizeAtCompileTime;
         Index size = dest.size();
         EIGEN_DENSE_STORAGE_CTOR_PLUGIN
 #endif
@@ -391,6 +392,7 @@ struct gemv_dense_selector<OnTheRight, RowMajor, true> {
 
     if (!DirectlyUseRhs) {
 #ifdef EIGEN_DENSE_STORAGE_CTOR_PLUGIN
+      constexpr int Size = ActualRhsTypeCleaned::SizeAtCompileTime;
       Index size = actualRhs.size();
       EIGEN_DENSE_STORAGE_CTOR_PLUGIN
 #endif

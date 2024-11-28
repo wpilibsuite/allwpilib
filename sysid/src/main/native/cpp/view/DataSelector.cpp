@@ -56,7 +56,7 @@ void DataSelector::Display() {
       TestData data = m_testdataFuture.get();
       for (auto&& motordata : data.motorData) {
         m_testdataStats.emplace_back(
-            fmt::format("Test State: {}", motordata.first()));
+            fmt::format("Test State: {}", motordata.first));
         int i = 0;
         for (auto&& run : motordata.second.runs) {
           m_testdataStats.emplace_back(fmt::format(

@@ -4,31 +4,33 @@
 
 #include "frc/controller/proto/ElevatorFeedforwardProto.h"
 
-#include <wpi/ProtoHelper.h>
+#include <optional>
 
-#include "controller.pb.h"
+#include "wpimath/protobuf/controller.npb.h"
 
-google::protobuf::Message* wpi::Protobuf<frc::ElevatorFeedforward>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufElevatorFeedforward>(arena);
-}
+std::optional<frc::ElevatorFeedforward>
+wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(InputStream& stream) {
+  wpi_proto_ProtobufElevatorFeedforward msg;
+  if (!stream.Decode(msg)) {
+    return {};
+  }
 
-frc::ElevatorFeedforward wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufElevatorFeedforward*>(&msg);
   return frc::ElevatorFeedforward{
-      units::volt_t{m->ks()},
-      units::volt_t{m->kg()},
-      units::unit_t<frc::ElevatorFeedforward::kv_unit>{m->kv()},
-      units::unit_t<frc::ElevatorFeedforward::ka_unit>{m->ka()},
+      units::volt_t{msg.ks},
+      units::volt_t{msg.kg},
+      units::unit_t<frc::ElevatorFeedforward::kv_unit>{msg.kv},
+      units::unit_t<frc::ElevatorFeedforward::ka_unit>{msg.ka},
   };
 }
 
-void wpi::Protobuf<frc::ElevatorFeedforward>::Pack(
-    google::protobuf::Message* msg, const frc::ElevatorFeedforward& value) {
-  auto m = static_cast<wpi::proto::ProtobufElevatorFeedforward*>(msg);
-  m->set_ks(value.GetKs().value());
-  m->set_kg(value.GetKg().value());
-  m->set_kv(value.GetKv().value());
-  m->set_ka(value.GetKa().value());
+bool wpi::Protobuf<frc::ElevatorFeedforward>::Pack(
+    OutputStream& stream, const frc::ElevatorFeedforward& value) {
+  wpi_proto_ProtobufElevatorFeedforward msg{
+      .ks = value.GetKs().value(),
+      .kg = value.GetKg().value(),
+      .kv = value.GetKv().value(),
+      .ka = value.GetKa().value(),
+      .dt = 0,
+  };
+  return stream.Encode(msg);
 }

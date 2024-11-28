@@ -259,9 +259,7 @@ void from_json(const wpi::json& json, Pose2d& pose);
 
 }  // namespace frc
 
-#ifndef NO_PROTOBUF
 #include "frc/geometry/proto/Pose2dProto.h"
-#endif
 #include "frc/geometry/struct/Pose2dStruct.h"
 
 #include "frc/geometry/Transform2d.h"

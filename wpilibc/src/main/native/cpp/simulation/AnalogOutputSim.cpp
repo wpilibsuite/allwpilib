@@ -5,7 +5,6 @@
 #include "frc/simulation/AnalogOutputSim.h"
 
 #include <memory>
-#include <utility>
 
 #include <hal/simulation/AnalogOutData.h>
 

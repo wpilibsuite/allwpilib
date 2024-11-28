@@ -35,4 +35,7 @@ public enum MathUsageId {
 
   /** ProfiledPIDController. */
   kController_ProfiledPIDController,
+
+  /** BangBangController. */
+  kController_BangBangController,
 }

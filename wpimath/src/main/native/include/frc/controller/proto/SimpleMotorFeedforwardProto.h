@@ -4,47 +4,57 @@
 
 #pragma once
 
-#include <wpi/ProtoHelper.h>
 #include <wpi/protobuf/Protobuf.h>
 
-#include "controller.pb.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
+#include "pb.h"
 #include "units/length.h"
+#include "wpimath/protobuf/controller.npb.h"
 
 // Everything is converted into units for
-// frc::SimpleMotorFeedforward<units::meters>
+// frc::SimpleMotorFeedforward<units::meters> or
+// frc::SimpleMotorFeedforward<units::radians>
 
 template <class Distance>
+  requires units::length_unit<Distance> || units::angle_unit<Distance>
 struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena) {
-    return wpi::CreateMessage<wpi::proto::ProtobufSimpleMotorFeedforward>(
-        arena);
+  using MessageStruct = wpi_proto_ProtobufSimpleMotorFeedforward;
+  using InputStream =
+      wpi::ProtoInputStream<frc::SimpleMotorFeedforward<Distance>>;
+  using OutputStream =
+      wpi::ProtoOutputStream<frc::SimpleMotorFeedforward<Distance>>;
+
+  static std::optional<frc::SimpleMotorFeedforward<Distance>> Unpack(
+      InputStream& stream) {
+    using BaseUnit =
+        units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
+    using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit>;
+    wpi_proto_ProtobufSimpleMotorFeedforward msg;
+    if (!stream.Decode(msg)) {
+      return {};
+    }
+
+    return frc::SimpleMotorFeedforward<Distance>{
+        units::volt_t{msg.ks},
+        units::unit_t<typename BaseFeedforward::kv_unit>{msg.kv},
+        units::unit_t<typename BaseFeedforward::ka_unit>{msg.ka},
+        units::second_t{msg.dt},
+    };
   }
 
-  static frc::SimpleMotorFeedforward<Distance> Unpack(
-      const google::protobuf::Message& msg) {
-    auto m =
-        static_cast<const wpi::proto::ProtobufSimpleMotorFeedforward*>(&msg);
-    return {units::volt_t{m->ks()},
-            units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{
-                m->kv()},
-            units::unit_t<frc::SimpleMotorFeedforward<units::meters>::ka_unit>{
-                m->ka()},
-            units::second_t{m->dt()}};
-  }
-
-  static void Pack(google::protobuf::Message* msg,
+  static bool Pack(OutputStream& stream,
                    const frc::SimpleMotorFeedforward<Distance>& value) {
-    auto m = static_cast<wpi::proto::ProtobufSimpleMotorFeedforward*>(msg);
-    m->set_ks(value.GetKs().value());
-    m->set_kv(
-        units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{
-            value.GetKv()}
-            .value());
-    m->set_ka(
-        units::unit_t<frc::SimpleMotorFeedforward<units::meters>::ka_unit>{
-            value.GetKa()}
-            .value());
-    m->set_dt(units::second_t{value.GetDt()}.value());
+    using BaseUnit =
+        units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
+    using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit>;
+    wpi_proto_ProtobufSimpleMotorFeedforward msg{
+        .ks = value.GetKs().value(),
+        .kv = units::unit_t<typename BaseFeedforward::kv_unit>{value.GetKv()}
+                  .value(),
+        .ka = units::unit_t<typename BaseFeedforward::ka_unit>{value.GetKa()}
+                  .value(),
+        .dt = units::second_t{value.GetDt()}.value(),
+    };
+    return stream.Encode(msg);
   }
 };

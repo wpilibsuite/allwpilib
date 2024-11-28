@@ -68,12 +68,12 @@ public final class GenericMutableMeasureImpl<U extends Unit>
   }
 
   @Override
-  public Measure<U> divide(double divisor) {
+  public Measure<U> div(double divisor) {
     return ImmutableMeasure.ofBaseUnits(m_baseUnitMagnitude / divisor, m_unit);
   }
 
   @Override
-  public Measure<U> divide(Dimensionless divisor) {
+  public Measure<U> div(Dimensionless divisor) {
     return ImmutableMeasure.ofBaseUnits(m_baseUnitMagnitude / divisor.baseUnitMagnitude(), m_unit);
   }
 }

@@ -6,6 +6,7 @@ package edu.wpi.first.epilogue.processor;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
+import static edu.wpi.first.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.testing.compile.Compilation;
@@ -171,7 +172,7 @@ class EpilogueGeneratorTest {
               config.loggingPeriod = Seconds.of(robot.getPeriod());
             }
             if (config.loggingPeriodOffset == null) {
-              config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+              config.loggingPeriodOffset = config.loggingPeriod.div(2);
             }
 
             robot.addPeriodic(() -> {
@@ -251,7 +252,7 @@ class EpilogueGeneratorTest {
               config.loggingPeriod = Seconds.of(robot.getPeriod());
             }
             if (config.loggingPeriodOffset == null) {
-              config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+              config.loggingPeriodOffset = config.loggingPeriod.div(2);
             }
 
             robot.addPeriodic(() -> {
@@ -283,7 +284,7 @@ class EpilogueGeneratorTest {
               config.loggingPeriod = Seconds.of(robot.getPeriod());
             }
             if (config.loggingPeriodOffset == null) {
-              config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+              config.loggingPeriodOffset = config.loggingPeriod.div(2);
             }
 
             robot.addPeriodic(() -> {
@@ -363,6 +364,7 @@ class EpilogueGeneratorTest {
       String loggedClassContent, String loggerClassContent) {
     Compilation compilation =
         javac()
+            .withOptions(kJavaVersionOptions)
             .withProcessors(new AnnotationProcessor())
             .compile(JavaFileObjects.forSourceString("", loggedClassContent));
 

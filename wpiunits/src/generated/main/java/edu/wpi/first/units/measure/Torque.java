@@ -43,6 +43,18 @@ public interface Torque extends Measure<TorqueUnit> {
     return (Torque) unit().ofBaseUnits(0 - baseUnitMagnitude());
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use unaryMinus() instead. This was renamed for consistency with other WPILib classes like Rotation2d
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Torque negate() {
+    return (Torque) unaryMinus();
+  }
+
   @Override
   default Torque plus(Measure<? extends TorqueUnit> other) {
     return (Torque) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
@@ -59,13 +71,25 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
-  default Torque divide(double divisor) {
+  default Torque div(double divisor) {
     return (Torque) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Torque divide(double divisor) {
+    return (Torque) div(divisor);
   }
 
   @Override
   default Velocity<TorqueUnit> per(TimeUnit period) {
-    return divide(period.of(1));
+    return div(period.of(1));
   }
 
 
@@ -75,8 +99,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
+    return (Per<TorqueUnit, AccelerationUnit<?>>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
-    return (Per<TorqueUnit, AccelerationUnit<?>>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -86,8 +122,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, AngleUnit> div(Angle divisor) {
+    return (Per<TorqueUnit, AngleUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, AngleUnit> divide(Angle divisor) {
-    return (Per<TorqueUnit, AngleUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -97,8 +145,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
+    return (Per<TorqueUnit, AngularAccelerationUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
-    return (Per<TorqueUnit, AngularAccelerationUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -108,8 +168,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
+    return (Per<TorqueUnit, AngularMomentumUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
-    return (Per<TorqueUnit, AngularMomentumUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -119,8 +191,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
+    return (Per<TorqueUnit, AngularVelocityUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
-    return (Per<TorqueUnit, AngularVelocityUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -130,13 +214,37 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, CurrentUnit> div(Current divisor) {
+    return (Per<TorqueUnit, CurrentUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, CurrentUnit> divide(Current divisor) {
-    return (Per<TorqueUnit, CurrentUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
   @Override
-  default Torque divide(Dimensionless divisor) {
+  default Torque div(Dimensionless divisor) {
     return (Torque) NewtonMeters.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Torque divide(Dimensionless divisor) {
+    return (Torque) div(divisor);
   }
 
   @Override
@@ -151,8 +259,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
-  default Force divide(Distance divisor) {
+  default Force div(Distance divisor) {
     return Newtons.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Force divide(Distance divisor) {
+    return div(divisor);
   }
 
 
@@ -162,8 +282,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, EnergyUnit> div(Energy divisor) {
+    return (Per<TorqueUnit, EnergyUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, EnergyUnit> divide(Energy divisor) {
-    return (Per<TorqueUnit, EnergyUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -173,8 +305,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
-  default Distance divide(Force divisor) {
+  default Distance div(Force divisor) {
     return Meters.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default Distance divide(Force divisor) {
+    return div(divisor);
   }
 
 
@@ -184,8 +328,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, FrequencyUnit> div(Frequency divisor) {
+    return (Per<TorqueUnit, FrequencyUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, FrequencyUnit> divide(Frequency divisor) {
-    return (Per<TorqueUnit, FrequencyUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -195,8 +351,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
+    return (Per<TorqueUnit, LinearAccelerationUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
-    return (Per<TorqueUnit, LinearAccelerationUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -206,8 +374,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
+    return (Per<TorqueUnit, LinearMomentumUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
-    return (Per<TorqueUnit, LinearMomentumUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -217,8 +397,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
+    return (Per<TorqueUnit, LinearVelocityUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
-    return (Per<TorqueUnit, LinearVelocityUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -228,8 +420,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, MassUnit> div(Mass divisor) {
+    return (Per<TorqueUnit, MassUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, MassUnit> divide(Mass divisor) {
-    return (Per<TorqueUnit, MassUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -239,8 +443,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
+    return (Per<TorqueUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
-    return (Per<TorqueUnit, MomentOfInertiaUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -250,8 +466,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
+    return (Per<TorqueUnit, MultUnit<?, ?>>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
-    return (Per<TorqueUnit, MultUnit<?, ?>>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -261,8 +489,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, PerUnit<?, ?>> div(Per<?, ?> divisor) {
+    return (Per<TorqueUnit, PerUnit<?, ?>>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
-    return (Per<TorqueUnit, PerUnit<?, ?>>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -272,8 +512,43 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, PowerUnit> div(Power divisor) {
+    return (Per<TorqueUnit, PowerUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, PowerUnit> divide(Power divisor) {
-    return (Per<TorqueUnit, PowerUnit>) Measure.super.divide(divisor);
+    return div(divisor);
+  }
+
+
+  @Override
+  default Mult<TorqueUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<TorqueUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<TorqueUnit, ResistanceUnit> div(Resistance divisor) {
+    return (Per<TorqueUnit, ResistanceUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<TorqueUnit, ResistanceUnit> divide(Resistance divisor) {
+    return div(divisor);
   }
 
 
@@ -283,8 +558,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, TemperatureUnit> div(Temperature divisor) {
+    return (Per<TorqueUnit, TemperatureUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, TemperatureUnit> divide(Temperature divisor) {
-    return (Per<TorqueUnit, TemperatureUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -294,8 +581,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
-  default Velocity<TorqueUnit> divide(Time divisor) {
+  default Velocity<TorqueUnit> div(Time divisor) {
     return VelocityUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Velocity<TorqueUnit> divide(Time divisor) {
+    return div(divisor);
   }
 
 
@@ -305,8 +604,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
-  default Dimensionless divide(Torque divisor) {
+  default Dimensionless div(Torque divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Dimensionless divide(Torque divisor) {
+    return div(divisor);
   }
 
 
@@ -316,8 +627,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, VelocityUnit<?>> div(Velocity<?> divisor) {
+    return (Per<TorqueUnit, VelocityUnit<?>>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
-    return (Per<TorqueUnit, VelocityUnit<?>>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -327,8 +650,20 @@ public interface Torque extends Measure<TorqueUnit> {
   }
 
   @Override
+  default Per<TorqueUnit, VoltageUnit> div(Voltage divisor) {
+    return (Per<TorqueUnit, VoltageUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<TorqueUnit, VoltageUnit> divide(Voltage divisor) {
-    return (Per<TorqueUnit, VoltageUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 }

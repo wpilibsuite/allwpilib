@@ -119,10 +119,12 @@ class TransposeImpl<MatrixType, Dense> : public internal::TransposeImpl_base<Mat
 
   typedef std::conditional_t<internal::is_lvalue<MatrixType>::value, Scalar, const Scalar> ScalarWithConstIfNotLvalue;
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE ScalarWithConstIfNotLvalue* data() {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr ScalarWithConstIfNotLvalue* data() {
     return derived().nestedExpression().data();
   }
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Scalar* data() const { return derived().nestedExpression().data(); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const Scalar* data() const {
+    return derived().nestedExpression().data();
+  }
 
   // FIXME: shall we keep the const version of coeffRef?
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Scalar& coeffRef(Index rowId, Index colId) const {

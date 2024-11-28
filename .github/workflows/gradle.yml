@@ -96,9 +96,16 @@ jobs:
             task: "build"
             outputs: "build/allOutputs"
           - os: windows-2022
-            artifact-name: Win32
+            artifact-name: Win32FFI
             architecture: x86
             task: ":ntcoreffi:build"
+            build-options: "-Pntcoreffibuild \"-Dorg.gradle.jvmargs=-Xmx1096m\""
+            outputs: "ntcoreffi/build/outputs"
+          - os: windows-2022
+            artifact-name: Win64FFI
+            architecture: x64
+            task: ":ntcoreffi:build"
+            build-options: "-Pntcoreffibuild -Pbuildwinarm64"
             outputs: "ntcoreffi/build/outputs"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
@@ -121,7 +128,7 @@ jobs:
           matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
       - name: Set Keychain Lock Timeout
-        run: security set-keychain-settings -lut 3600
+        run: security set-keychain-settings -lut 21600
         if: |
           matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))

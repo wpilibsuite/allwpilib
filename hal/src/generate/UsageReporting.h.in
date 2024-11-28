@@ -1,0 +1,55 @@
+
+#ifndef __UsageReporting_h__
+#define __UsageReporting_h__
+
+#ifdef _WIN32
+#include <stdint.h>
+#define EXPORT_FUNC __declspec(dllexport) __cdecl
+#elif defined(__vxworks)
+#include <vxWorks.h>
+#define EXPORT_FUNC
+#else
+#include <stdint.h>
+#include <stdlib.h>
+#define EXPORT_FUNC
+#endif
+
+#define kUsageReporting_version 1
+
+namespace nUsageReporting
+{
+typedef enum
+{
+${usage_reporting_types_cpp}
+
+//    kResourceType_MaximumID = 255,
+} tResourceType;
+
+typedef enum
+{
+${usage_reporting_instances_cpp}
+} tInstances;
+
+/**
+ * Report the usage of a resource of interest.
+ *
+ * @param resource one of the values in the tResourceType above (max value 51).
+ * @param instanceNumber an index that identifies the resource instance.
+ * @param context an optional additional context number for some cases (such as module number).  Set to 0 to omit.
+ * @param feature a string to be included describing features in use on a specific resource.  Setting the same resource more than once allows you to change the feature string.
+ */
+uint32_t EXPORT_FUNC report(tResourceType resource, uint8_t instanceNumber, uint8_t context = 0, const char* feature = NULL);
+} // namespace nUsageReporting
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+    uint32_t EXPORT_FUNC FRC_NetworkCommunication_nUsageReporting_report(uint8_t resource, uint8_t instanceNumber, uint8_t context, const char* feature);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // __UsageReporting_h__

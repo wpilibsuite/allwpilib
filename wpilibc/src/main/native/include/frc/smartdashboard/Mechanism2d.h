@@ -84,7 +84,7 @@ class Mechanism2d : public nt::NTSendable,
   std::string m_color;
   mutable wpi::mutex m_mutex;
   std::shared_ptr<nt::NetworkTable> m_table;
-  wpi::StringMap<std::unique_ptr<MechanismRoot2d>> m_roots;
+  wpi::StringMap<MechanismRoot2d> m_roots;
   nt::DoubleArrayPublisher m_dimsPub;
   nt::StringPublisher m_colorPub;
 };

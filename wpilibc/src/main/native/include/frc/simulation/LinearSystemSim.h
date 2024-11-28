@@ -10,7 +10,6 @@
 #include <units/time.h>
 
 #include "frc/EigenCore.h"
-#include "frc/RobotController.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/LinearSystem.h"
 

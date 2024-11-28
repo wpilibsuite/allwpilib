@@ -103,22 +103,36 @@ class LinearQuadraticRegulator {
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
 
-    if (!IsStabilizable<States, Inputs>(discA, discB)) {
-      std::string msg = fmt::format(
-          "The system passed to the LQR is unstabilizable!\n\nA =\n{}\nB "
-          "=\n{}\n",
-          discA, discB);
+    if (auto S = DARE<States, Inputs>(discA, discB, Q, R)) {
+      // K = (BᵀSB + R)⁻¹BᵀSA
+      m_K = (discB.transpose() * S.value() * discB + R)
+                .llt()
+                .solve(discB.transpose() * S.value() * discA);
+    } else if (S.error() == DAREError::QNotSymmetric ||
+               S.error() == DAREError::QNotPositiveSemidefinite) {
+      std::string msg = fmt::format("{}\n\nQ =\n{}\n", to_string(S.error()), Q);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    } else if (S.error() == DAREError::RNotSymmetric ||
+               S.error() == DAREError::RNotPositiveDefinite) {
+      std::string msg = fmt::format("{}\n\nR =\n{}\n", to_string(S.error()), R);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    } else if (S.error() == DAREError::ABNotStabilizable) {
+      std::string msg = fmt::format("{}\n\nA =\n{}\nB =\n{}\n",
+                                    to_string(S.error()), discA, discB);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    } else if (S.error() == DAREError::ACNotDetectable) {
+      std::string msg = fmt::format("{}\n\nA =\n{}\nQ =\n{}\n",
+                                    to_string(S.error()), discA, Q);
 
       wpi::math::MathSharedStore::ReportError(msg);
       throw std::invalid_argument(msg);
     }
-
-    Matrixd<States, States> S = DARE<States, Inputs>(discA, discB, Q, R);
-
-    // K = (BᵀSB + R)⁻¹BᵀSA
-    m_K = (discB.transpose() * S * discB + R)
-              .llt()
-              .solve(discB.transpose() * S * discA);
 
     Reset();
   }
@@ -144,12 +158,40 @@ class LinearQuadraticRegulator {
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
 
-    Matrixd<States, States> S = DARE<States, Inputs>(discA, discB, Q, R, N);
+    if (auto S = DARE<States, Inputs>(discA, discB, Q, R, N)) {
+      // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
+      m_K = (discB.transpose() * S.value() * discB + R)
+                .llt()
+                .solve(discB.transpose() * S.value() * discA + N.transpose());
+    } else if (S.error() == DAREError::QNotSymmetric ||
+               S.error() == DAREError::QNotPositiveSemidefinite) {
+      std::string msg = fmt::format("{}\n\nQ =\n{}\n", to_string(S.error()), Q);
 
-    // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
-    m_K = (discB.transpose() * S * discB + R)
-              .llt()
-              .solve(discB.transpose() * S * discA + N.transpose());
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    } else if (S.error() == DAREError::RNotSymmetric ||
+               S.error() == DAREError::RNotPositiveDefinite) {
+      std::string msg = fmt::format("{}\n\nR =\n{}\n", to_string(S.error()), R);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    } else if (S.error() == DAREError::ABNotStabilizable) {
+      std::string msg =
+          fmt::format("{}\n\nA =\n{}\nB =\n{}\n", to_string(S.error()),
+                      discA - discB * R.llt().solve(N.transpose()), discB);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    } else if (S.error() == DAREError::ACNotDetectable) {
+      auto R_llt = R.llt();
+      std::string msg =
+          fmt::format("{}\n\nA =\n{}\nQ =\n{}\n", to_string(S.error()),
+                      discA - discB * R_llt.solve(N.transpose()),
+                      Q - N * R_llt.solve(N.transpose()));
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    }
 
     Reset();
   }

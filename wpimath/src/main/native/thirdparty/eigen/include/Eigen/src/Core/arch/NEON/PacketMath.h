@@ -209,6 +209,7 @@ struct packet_traits<float> : default_packet_traits {
     HasRsqrt = 1,
     HasTanh = EIGEN_FAST_MATH,
     HasErf = EIGEN_FAST_MATH,
+    HasErfc = EIGEN_FAST_MATH,
     HasBessel = 0,  // Issues with accuracy.
     HasNdtri = 0
   };
@@ -653,6 +654,16 @@ struct unpacket_traits<Packet2ul> {
     masked_store_available = false
   };
 };
+
+template <>
+EIGEN_STRONG_INLINE Packet2f pzero(const Packet2f& /*a*/) {
+  return vdup_n_f32(0.0f);
+}
+
+template <>
+EIGEN_STRONG_INLINE Packet4f pzero(const Packet4f& /*a*/) {
+  return vdupq_n_f32(0.0f);
+}
 
 template <>
 EIGEN_STRONG_INLINE Packet2f pset1<Packet2f>(const float& from) {
@@ -5123,13 +5134,15 @@ struct packet_traits<double> : default_packet_traits {
     HasExp = 1,
     HasLog = 1,
     HasATan = 1,
+    HasATanh = 1,
 #endif
     HasSin = EIGEN_FAST_MATH,
     HasCos = EIGEN_FAST_MATH,
     HasSqrt = 1,
     HasRsqrt = 1,
-    HasTanh = 0,
-    HasErf = 0
+    HasTanh = EIGEN_FAST_MATH,
+    HasErf = 0,
+    HasErfc = EIGEN_FAST_MATH
   };
 };
 
@@ -5146,6 +5159,11 @@ struct unpacket_traits<Packet2d> {
     masked_store_available = false
   };
 };
+
+template <>
+EIGEN_STRONG_INLINE Packet2d pzero<Packet2d>(const Packet2d& /*a*/) {
+  return vdupq_n_f64(0.0);
+}
 
 template <>
 EIGEN_STRONG_INLINE Packet2d pset1<Packet2d>(const double& from) {

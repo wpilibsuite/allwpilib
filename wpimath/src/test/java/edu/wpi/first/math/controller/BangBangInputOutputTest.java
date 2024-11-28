@@ -6,24 +6,20 @@ package edu.wpi.first.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class BangBangInputOutputTest {
-  private BangBangController m_controller;
-
-  @BeforeEach
-  void setUp() {
-    m_controller = new BangBangController();
-  }
-
   @Test
   void shouldOutput() {
-    assertEquals(m_controller.calculate(0, 1), 1);
+    var controller = new BangBangController();
+
+    assertEquals(controller.calculate(0, 1), 1);
   }
 
   @Test
   void shouldNotOutput() {
-    assertEquals(m_controller.calculate(1, 0), 0);
+    var controller = new BangBangController();
+
+    assertEquals(controller.calculate(1, 0), 0);
   }
 }

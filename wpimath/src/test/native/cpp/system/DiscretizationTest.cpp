@@ -10,7 +10,6 @@
 #include "frc/EigenCore.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/NumericalIntegration.h"
-#include "frc/system/RungeKuttaTimeVarying.h"
 
 // Check that for a simple second-order system that we can easily analyze
 // analytically,
@@ -62,15 +61,15 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
   //       T
   // Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
   //       0
-  frc::Matrixd<2, 2> discQIntegrated = frc::RungeKuttaTimeVarying<
-      std::function<frc::Matrixd<2, 2>(units::second_t,
-                                       const frc::Matrixd<2, 2>&)>,
-      frc::Matrixd<2, 2>>(
-      [&](units::second_t t, const frc::Matrixd<2, 2>&) {
-        return frc::Matrixd<2, 2>((contA * t.value()).exp() * contQ *
-                                  (contA.transpose() * t.value()).exp());
-      },
-      0_s, frc::Matrixd<2, 2>::Zero(), dt);
+  frc::Matrixd<2, 2> discQIntegrated =
+      frc::RKDP<std::function<frc::Matrixd<2, 2>(units::second_t,
+                                                 const frc::Matrixd<2, 2>&)>,
+                frc::Matrixd<2, 2>>(
+          [&](units::second_t t, const frc::Matrixd<2, 2>&) {
+            return frc::Matrixd<2, 2>((contA * t.value()).exp() * contQ *
+                                      (contA.transpose() * t.value()).exp());
+          },
+          0_s, frc::Matrixd<2, 2>::Zero(), dt);
 
   frc::Matrixd<2, 2> discA;
   frc::Matrixd<2, 2> discQ;
@@ -94,15 +93,15 @@ TEST(DiscretizationTest, DiscretizeFastModelAQ) {
   //       T
   // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
   //       0
-  frc::Matrixd<2, 2> discQIntegrated = frc::RungeKuttaTimeVarying<
-      std::function<frc::Matrixd<2, 2>(units::second_t,
-                                       const frc::Matrixd<2, 2>&)>,
-      frc::Matrixd<2, 2>>(
-      [&](units::second_t t, const frc::Matrixd<2, 2>&) {
-        return frc::Matrixd<2, 2>((contA * t.value()).exp() * contQ *
-                                  (contA.transpose() * t.value()).exp());
-      },
-      0_s, frc::Matrixd<2, 2>::Zero(), dt);
+  frc::Matrixd<2, 2> discQIntegrated =
+      frc::RKDP<std::function<frc::Matrixd<2, 2>(units::second_t,
+                                                 const frc::Matrixd<2, 2>&)>,
+                frc::Matrixd<2, 2>>(
+          [&](units::second_t t, const frc::Matrixd<2, 2>&) {
+            return frc::Matrixd<2, 2>((contA * t.value()).exp() * contQ *
+                                      (contA.transpose() * t.value()).exp());
+          },
+          0_s, frc::Matrixd<2, 2>::Zero(), dt);
 
   frc::Matrixd<2, 2> discA;
   frc::Matrixd<2, 2> discQ;
