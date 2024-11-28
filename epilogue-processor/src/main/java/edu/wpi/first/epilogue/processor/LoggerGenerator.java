@@ -79,7 +79,7 @@ public class LoggerGenerator {
    * @param clazz the data type that the logger should support.
    * @throws IOException if the file could not be written
    */
-  public boolean writeLoggerFile(TypeElement clazz) throws IOException {
+  public boolean writeLoggerFile(TypeElement clazz, boolean isMainRobotClass) throws IOException {
     var config = clazz.getAnnotation(Logged.class);
     if (config == null) { config = kDefaultConfig; }
     boolean requireExplicitOptIn = config.strategy() == Logged.Strategy.OPT_IN;
@@ -119,9 +119,9 @@ public class LoggerGenerator {
             .filter(e -> !isSimpleGetterMethodForLoggedField(e, fieldsToLog))
             .toList();
     
-    // If there is no log annotation and no fields to log, don't generate a logger
-    // logger is still generated for @Logged classes for compatibility reasons
-    if (fieldsToLog.isEmpty() && methodsToLog.isEmpty() && clazz.getAnnotation(Logged.class) == null) {
+    // Nothing to log; continue
+    // Robot classes must have a generated logger
+    if (fieldsToLog.isEmpty() && methodsToLog.isEmpty() && !isMainRobotClass) {
       return false;
     }
 
