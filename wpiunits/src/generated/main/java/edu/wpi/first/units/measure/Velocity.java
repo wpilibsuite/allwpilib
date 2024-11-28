@@ -44,9 +44,9 @@ public interface Velocity<D extends Unit> extends Measure<VelocityUnit<D>> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use unaryMinus() instead. This was renamed for consistancy with other WPILib classes like Rotation2d
+  * @deprecated use unaryMinus() instead. This was renamed for consistency with other WPILib classes like Rotation2d
   */
   @Override
   @Deprecated(since = "2025", forRemoval = true)

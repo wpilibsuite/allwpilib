@@ -44,9 +44,9 @@ public interface Mult<A extends Unit, B extends Unit> extends Measure<MultUnit<A
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use unaryMinus() instead. This was renamed for consistancy with other WPILib classes like Rotation2d
+  * @deprecated use unaryMinus() instead. This was renamed for consistency with other WPILib classes like Rotation2d
   */
   @Override
   @Deprecated(since = "2025", forRemoval = true)
