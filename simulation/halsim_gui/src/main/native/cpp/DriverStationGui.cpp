@@ -1043,11 +1043,11 @@ static void DriverStationExecute() {
 
   bool disableDS = IsDSDisabled();
   if (disableDS && !prevDisableDS) {
-    if (auto win = HALSimGui::manager->GetWindow("System Joysticks")) {
+    if (auto win = DriverStationGui::dsManager->GetWindow("System Joysticks")) {
       win->SetVisibility(glass::Window::kDisabled);
     }
   } else if (!disableDS && prevDisableDS) {
-    if (auto win = HALSimGui::manager->GetWindow("System Joysticks")) {
+    if (auto win = DriverStationGui::dsManager->GetWindow("System Joysticks")) {
       win->SetVisibility(glass::Window::kShow);
     }
   }
