@@ -12,12 +12,13 @@
 
 using namespace frc;
 
+template <typename T>
 struct SimpleMotorFeedforwardStructTestData {
-  using Type = SimpleMotorFeedforward<units::meters>;
+  using Type = SimpleMotorFeedforward<T>;
 
-  inline static const Type kTestData = {units::volt_t{0.4},
-                                        units::volt_t{4.0} / 1_mps,
-                                        units::volt_t{0.7} / 1_mps_sq, 25_ms};
+  inline static const Type kTestData = {
+      units::volt_t{0.4}, units::volt_t{4.0} / (units::unit_t<T>{1} / 1_s),
+      units::volt_t{0.7} / (units::unit_t<T>{1} / 1_s / 1_s), 25_ms};
 
   static void CheckEq(const Type& testData, const Type& data) {
     EXPECT_EQ(testData.GetKs().value(), data.GetKs().value());
@@ -27,5 +28,12 @@ struct SimpleMotorFeedforwardStructTestData {
   }
 };
 
-INSTANTIATE_TYPED_TEST_SUITE_P(SimpleMotorFeedforwardMeters, StructTest,
-                               SimpleMotorFeedforwardStructTestData);
+INSTANTIATE_TYPED_TEST_SUITE_P(
+    SimpleMotorFeedforwardMeters, StructTest,
+    SimpleMotorFeedforwardStructTestData<units::meters>);
+INSTANTIATE_TYPED_TEST_SUITE_P(
+    SimpleMotorFeedforwardFeet, StructTest,
+    SimpleMotorFeedforwardStructTestData<units::feet>);
+INSTANTIATE_TYPED_TEST_SUITE_P(
+    SimpleMotorFeedforwardRadians, StructTest,
+    SimpleMotorFeedforwardStructTestData<units::radians>);
