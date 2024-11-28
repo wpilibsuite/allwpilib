@@ -40,7 +40,7 @@ public class LoggerGenerator {
       LoggerGenerator::isBuiltInJavaMethod;
   private final ProcessingEnvironment m_processingEnv;
   private final List<ElementHandler> m_handlers;
-  private final Logged kDefaultConfig =
+  private final Logged m_defaultConfig =
       new Logged() {
         @Override
         public Class<? extends Annotation> annotationType() {
@@ -102,7 +102,7 @@ public class LoggerGenerator {
   public void writeLoggerFile(TypeElement clazz) throws IOException {
     var config = clazz.getAnnotation(Logged.class);
     if (config == null) {
-      config = kDefaultConfig;
+      config = m_defaultConfig;
     }
     boolean requireExplicitOptIn = config.strategy() == Logged.Strategy.OPT_IN;
 
