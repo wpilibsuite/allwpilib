@@ -267,7 +267,7 @@ class TriggerTest extends CommandTestBase {
     final boolean shouldBeScheduled = results.get("onTrue");
 
     button.setPressed(pressed);
-    button.onTrue(command1, initialState);
+    button.toggleOnTrue(command1, initialState);
 
     assertFalse(command1.isScheduled());
 
