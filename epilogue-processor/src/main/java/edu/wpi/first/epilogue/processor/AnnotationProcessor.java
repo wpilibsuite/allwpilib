@@ -126,32 +126,29 @@ public class AnnotationProcessor extends AbstractProcessor {
   }
 
   /**
-   * Gets the set of all loggable types in the compilation unit. A type is considered loggable if
-   * it is directly annotated with {@code @Logged} or contains a field or method with a
-   * {@code @Logged} annotation.
+   * Gets the set of all loggable types in the compilation unit. A type is considered loggable if it
+   * is directly annotated with {@code @Logged} or contains a field or method with a {@code @Logged}
+   * annotation.
    *
    * @param roundEnv the compilation round environment
-   *
    * @return the set of all loggable types
    */
   private Set<TypeElement> getLoggedTypes(RoundEnvironment roundEnv) {
     return Stream.concat(
-        // 1. All type elements (classes, interfaces, or enums) with the @Logged annotation
-        roundEnv.getRootElements()
-            .stream()
-            .filter(e -> e instanceof TypeElement)
-            .map(e -> (TypeElement) e)
-            .filter(t -> t.getAnnotation(Logged.class) != null),
-        // 2. All type elements containing a field or method with the @Logged annotation
-        roundEnv.getElementsAnnotatedWith(Logged.class)
-            .stream()
-            .filter(e -> e instanceof VariableElement || e instanceof ExecutableElement)
-            .map(e -> e.getEnclosingElement())
-            .filter(e -> e instanceof TypeElement)
-            .map(e -> (TypeElement) e)
-    ).collect(Collectors.toSet()); // Collect to a set to avoid duplicates
+            // 1. All type elements (classes, interfaces, or enums) with the @Logged annotation
+            roundEnv.getRootElements().stream()
+                .filter(e -> e instanceof TypeElement)
+                .map(e -> (TypeElement) e)
+                .filter(t -> t.getAnnotation(Logged.class) != null),
+            // 2. All type elements containing a field or method with the @Logged annotation
+            roundEnv.getElementsAnnotatedWith(Logged.class).stream()
+                .filter(e -> e instanceof VariableElement || e instanceof ExecutableElement)
+                .map(e -> e.getEnclosingElement())
+                .filter(e -> e instanceof TypeElement)
+                .map(e -> (TypeElement) e))
+        .collect(Collectors.toSet()); // Collect to a set to avoid duplicates
   }
-  
+
   private boolean validateFields(Set<? extends Element> annotatedElements) {
     var fields =
         annotatedElements.stream()

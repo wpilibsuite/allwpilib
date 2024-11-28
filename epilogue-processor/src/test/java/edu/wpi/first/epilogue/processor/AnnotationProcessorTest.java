@@ -58,7 +58,7 @@ class AnnotationProcessorTest {
 
     assertLoggerGenerates(source, expectedGeneratedSource);
   }
-  
+
   @Test
   void basicOptInLogging() {
     String source =
@@ -70,7 +70,7 @@ class AnnotationProcessorTest {
         @Logged double y;
       }
     """;
-    
+
     String expectedGeneratedSource =
         """
       package edu.wpi.first.epilogue;
@@ -94,7 +94,7 @@ class AnnotationProcessorTest {
         }
       }
       """;
-    
+
     assertLoggerGenerates(source, expectedGeneratedSource);
   }
 
@@ -1334,11 +1334,11 @@ class AnnotationProcessorTest {
     String source =
         """
         package edu.wpi.first.epilogue;
-        
+
         class Implicit {
           @Logged double x;
         }
-        
+
         class Example {
           @Logged Implicit i;
         }
