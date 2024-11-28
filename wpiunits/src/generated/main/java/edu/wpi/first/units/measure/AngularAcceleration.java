@@ -71,9 +71,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Override
   @Deprecated(since = "2025", forRemoval = true)
@@ -99,9 +99,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -122,9 +122,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -145,9 +145,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -168,9 +168,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -191,9 +191,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -214,9 +214,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -231,9 +231,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Override
   @Deprecated(since = "2025", forRemoval = true)
@@ -259,9 +259,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -282,9 +282,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -305,9 +305,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -328,9 +328,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Override
   @Deprecated(since = "2025", forRemoval = true)
@@ -351,9 +351,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -374,9 +374,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -397,9 +397,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -420,9 +420,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -443,9 +443,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -466,9 +466,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -489,9 +489,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -512,9 +512,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -535,9 +535,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -558,9 +558,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -581,9 +581,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -604,9 +604,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -627,9 +627,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
@@ -650,9 +650,9 @@ public interface AngularAcceleration extends Measure<AngularAccelerationUnit> {
   }
 
   /**
-  * {@InheritDoc}
+  * {@inheritDoc}
   *
-  * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
   */
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})

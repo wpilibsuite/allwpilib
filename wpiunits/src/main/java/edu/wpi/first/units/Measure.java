@@ -152,7 +152,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * equivalent to -10 Kelvin, and <i>not</i> -10° Celsius.
    *
    * @return a measure equal to zero minus this measure
-   * @deprecated use unaryMinus() instead. This was renamed for consistancy with other WPILib
+   * @deprecated use unaryMinus() instead. This was renamed for consistency with other WPILib
    *     classes like Rotation2d
    */
   @Deprecated(since = "2025", forRemoval = true)
@@ -1026,7 +1026,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<U> divide(double divisor) {
@@ -1038,7 +1038,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<U> divide(Dimensionless divisor) {
@@ -1051,7 +1051,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the unit to divide by
    * @return the resulting measure
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Measure<?> divisor) {
@@ -1064,7 +1064,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Acceleration<?> divisor) {
@@ -1076,7 +1076,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Angle divisor) {
@@ -1089,7 +1089,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(AngularAcceleration divisor) {
@@ -1102,7 +1102,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(AngularMomentum divisor) {
@@ -1115,7 +1115,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(AngularVelocity divisor) {
@@ -1128,7 +1128,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Current divisor) {
@@ -1140,7 +1140,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Distance divisor) {
@@ -1152,7 +1152,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Energy divisor) {
@@ -1164,7 +1164,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Force divisor) {
@@ -1176,7 +1176,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Frequency divisor) {
@@ -1189,7 +1189,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(LinearAcceleration divisor) {
@@ -1201,7 +1201,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(LinearMomentum divisor) {
@@ -1213,7 +1213,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(LinearVelocity divisor) {
@@ -1225,7 +1225,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Mass divisor) {
@@ -1238,7 +1238,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(MomentOfInertia divisor) {
@@ -1251,7 +1251,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Mult<?, ?> divisor) {
@@ -1263,7 +1263,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Power divisor) {
@@ -1275,7 +1275,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Per<?, ?> divisor) {
@@ -1287,7 +1287,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Temperature divisor) {
@@ -1301,7 +1301,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Time divisor) {
@@ -1313,7 +1313,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Torque divisor) {
@@ -1325,7 +1325,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Velocity<?> divisor) {
@@ -1337,7 +1337,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Voltage divisor) {
@@ -1349,7 +1349,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *
    * @param divisor the measurement to divide by.
    * @return the division result
-   * @deprecated use div instead. This was renamed for consistancy with other languages like Kotlin
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
    */
   @Deprecated(since = "2025", forRemoval = true)
   default Measure<?> divide(Resistance divisor) {
