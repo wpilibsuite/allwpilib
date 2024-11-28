@@ -1167,6 +1167,132 @@ class AnnotationProcessorTest {
   }
 
   @Test
+  void innerClasses() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        class Outer {
+          @Logged
+          class Example { // Deliberately nonstatic
+            double x;
+          }
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+
+        public class Outer$ExampleLogger extends ClassSpecificLogger<Outer.Example> {
+          public Outer$ExampleLogger() {
+            super(Outer.Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Outer.Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              dataLogger.log("x", object.x);
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void highlyNestedInnerClasses() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        class A {
+          class B {
+            class C {
+              class D {
+                @Logged
+                class Example {
+                  double x;
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+
+        public class A$B$C$D$ExampleLogger extends ClassSpecificLogger<A.B.C.D.Example> {
+          public A$B$C$D$ExampleLogger() {
+            super(A.B.C.D.Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, A.B.C.D.Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              dataLogger.log("x", object.x);
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void renamedInnerClass() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        class Outer {
+          @Logged(name = "Custom Example") // For the sake of testing, needs "Example" somewhere in the name
+          class Example {
+            double x;
+          }
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+
+        public class CustomExampleLogger extends ClassSpecificLogger<Outer.Example> {
+          public CustomExampleLogger() {
+            super(Outer.Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Outer.Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              dataLogger.log("x", object.x);
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
   void diamondInheritance() {
     String source =
         """
