@@ -67,8 +67,7 @@ class AnnotationProcessorTest {
 
       class Example {
         @Logged double x;
-        @Logged public double y;
-        public double z;
+        @Logged double y;
       }
     """;
     
