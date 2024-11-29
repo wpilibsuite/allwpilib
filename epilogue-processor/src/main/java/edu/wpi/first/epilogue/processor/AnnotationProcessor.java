@@ -86,7 +86,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                       "Custom logger classes should have a @CustomLoggerFor annotation",
                       e);
             });
-    
+
     var loggedTypes = getLoggedTypes(roundEnv);
 
     // Handlers are declared in order of priority. If an element could be logged in more than one
@@ -95,8 +95,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     m_handlers =
         List.of(
             new LoggableHandler(
-                processingEnv,
-                loggedTypes), // prioritize epilogue logging over Sendable
+                processingEnv, loggedTypes), // prioritize epilogue logging over Sendable
             new ConfiguredLoggerHandler(
                 processingEnv, customLoggers), // then customized logging configs
             new ArrayHandler(processingEnv),
@@ -145,7 +144,8 @@ public class AnnotationProcessor extends AbstractProcessor {
                 .filter(e -> e instanceof TypeElement)
                 .map(e -> (TypeElement) e))
         .sorted(Comparator.comparing(e -> e.getSimpleName().toString()))
-        .collect(Collectors.toCollection(LinkedHashSet::new)); // Collect to a set to avoid duplicates
+        .collect(
+            Collectors.toCollection(LinkedHashSet::new)); // Collect to a set to avoid duplicates
   }
 
   private boolean validateFields(Set<? extends Element> annotatedElements) {
@@ -355,10 +355,7 @@ public class AnnotationProcessor extends AbstractProcessor {
   }
 
   private void processEpilogue(
-      RoundEnvironment roundEnv,
-      TypeElement epilogueAnnotation,
-      Set<TypeElement> loggedTypes
-  ) {
+      RoundEnvironment roundEnv, TypeElement epilogueAnnotation, Set<TypeElement> loggedTypes) {
     var annotatedElements = roundEnv.getElementsAnnotatedWith(epilogueAnnotation);
 
     List<String> loggerClassNames = new ArrayList<>();
