@@ -509,11 +509,15 @@ bool DriverStation::IsFMSAttached() {
   return controlWord.fmsAttached;
 }
 
-std::string DriverStation::GetGameSpecificMessage() {
+std::optional<std::string> DriverStation::GetGameSpecificMessage() {
   HAL_MatchInfo info;
   HAL_GetMatchInfo(&info);
-  return std::string(reinterpret_cast<char*>(info.gameSpecificMessage),
-                     info.gameSpecificMessageSize);
+  if (info.gameSpecificMessageSize != 0) {
+    return std::string(reinterpret_cast<char*>(info.gameSpecificMessage),
+                       info.gameSpecificMessageSize);
+  } else {
+    return std::nullopt;
+  }
 }
 
 std::string DriverStation::GetEventName() {

@@ -1009,10 +1009,14 @@ public final class DriverStation {
    *
    * @return the game specific message
    */
-  public static String getGameSpecificMessage() {
+  public static Optional<String> getGameSpecificMessage() {
     m_cacheDataMutex.lock();
     try {
-      return m_matchInfo.gameSpecificMessage;
+      if (m_matchInfo.gameSpecificMessage != null) {
+        return m_matchInfo.gameSpecificMessage;
+      } else {
+        return Optional.empty();
+      }
     } finally {
       m_cacheDataMutex.unlock();
     }
