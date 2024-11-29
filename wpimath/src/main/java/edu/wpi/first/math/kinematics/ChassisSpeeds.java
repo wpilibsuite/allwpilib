@@ -98,33 +98,23 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * <p>This is useful for compensating for translational skew when translating and rotating a
    * swerve drivetrain.
    *
+   * <p>This will create a new ChassisSpeeds object. To modify an existing ChassisSpeeds object
+   * without creating a new one, use the instance method instead.
+   *
    * @param vxMetersPerSecond Forward velocity.
    * @param vyMetersPerSecond Sideways velocity.
    * @param omegaRadiansPerSecond Angular velocity.
    * @param dtSeconds The duration of the timestep the speeds should be applied for.
    * @return Discretized ChassisSpeeds.
-   * @deprecated Use instance method instead.
    */
-  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds discretize(
       double vxMetersPerSecond,
       double vyMetersPerSecond,
       double omegaRadiansPerSecond,
       double dtSeconds) {
-    // Construct the desired pose after a timestep, relative to the current pose. The desired pose
-    // has decoupled translation and rotation.
-    var desiredDeltaPose =
-        new Pose2d(
-            vxMetersPerSecond * dtSeconds,
-            vyMetersPerSecond * dtSeconds,
-            new Rotation2d(omegaRadiansPerSecond * dtSeconds));
-
-    // Find the chassis translation/rotation deltas in the robot frame that move the robot from its
-    // current pose to the desired pose
-    var twist = Pose2d.kZero.log(desiredDeltaPose);
-
-    // Turn the chassis translation/rotation deltas into average velocities
-    return new ChassisSpeeds(twist.dx / dtSeconds, twist.dy / dtSeconds, twist.dtheta / dtSeconds);
+    var speeds = new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
+    speeds.discretize(dtSeconds);
+    return speeds;
   }
 
   /**
@@ -138,14 +128,15 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * <p>This is useful for compensating for translational skew when translating and rotating a
    * swerve drivetrain.
    *
+   * <p>This will create a new ChassisSpeeds object. To modify an existing ChassisSpeeds object
+   * without creating a new one, use the instance method instead.
+   *
    * @param vx Forward velocity.
    * @param vy Sideways velocity.
    * @param omega Angular velocity.
    * @param dt The duration of the timestep the speeds should be applied for.
    * @return Discretized ChassisSpeeds.
-   * @deprecated Use instance method instead.
    */
-  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds discretize(
       LinearVelocity vx, LinearVelocity vy, AngularVelocity omega, Time dt) {
     return discretize(
@@ -163,12 +154,13 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * <p>This is useful for compensating for translational skew when translating and rotating a
    * swerve drivetrain.
    *
+   * <p>This will create a new ChassisSpeeds object. To modify an existing ChassisSpeeds object
+   * without creating a new one, use the instance method instead.
+   *
    * @param continuousSpeeds The continuous speeds.
    * @param dtSeconds The duration of the timestep the speeds should be applied for.
    * @return Discretized ChassisSpeeds.
-   * @deprecated Use instance method instead.
    */
-  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds discretize(ChassisSpeeds continuousSpeeds, double dtSeconds) {
     return discretize(
         continuousSpeeds.vxMetersPerSecond,
@@ -211,6 +203,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * Converts a user provided field-relative set of speeds into a robot-relative ChassisSpeeds
    * object.
    *
+   * <p>This will create a new ChassisSpeeds object. To modify an existing ChassisSpeeds object
+   * without creating a new one, use the instance method instead.
+   *
    * @param vxMetersPerSecond The component of speed in the x direction relative to the field.
    *     Positive x is away from your alliance wall.
    * @param vyMetersPerSecond The component of speed in the y direction relative to the field.
@@ -220,23 +215,23 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
    * @return ChassisSpeeds object representing the speeds in the robot's frame of reference.
-   * @deprecated Use toRobotRelativeSpeeds instead.
    */
-  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromFieldRelativeSpeeds(
       double vxMetersPerSecond,
       double vyMetersPerSecond,
       double omegaRadiansPerSecond,
       Rotation2d robotAngle) {
-    // CW rotation into chassis frame
-    var rotated =
-        new Translation2d(vxMetersPerSecond, vyMetersPerSecond).rotateBy(robotAngle.unaryMinus());
-    return new ChassisSpeeds(rotated.getX(), rotated.getY(), omegaRadiansPerSecond);
+    var speeds = new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
+    speeds.toRobotRelativeSpeeds(robotAngle);
+    return speeds;
   }
 
   /**
    * Converts a user provided field-relative set of speeds into a robot-relative ChassisSpeeds
    * object.
+   *
+   * <p>This will create a new ChassisSpeeds object. To modify an existing ChassisSpeeds object
+   * without creating a new one, use the instance method instead.
    *
    * @param vx The component of speed in the x direction relative to the field. Positive x is away
    *     from your alliance wall.
@@ -247,9 +242,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
    * @return ChassisSpeeds object representing the speeds in the robot's frame of reference.
-   * @deprecated Use toRobotRelativeSpeeds instead.
    */
-  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromFieldRelativeSpeeds(
       LinearVelocity vx, LinearVelocity vy, AngularVelocity omega, Rotation2d robotAngle) {
     return fromFieldRelativeSpeeds(
@@ -260,6 +253,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * Converts a user provided field-relative ChassisSpeeds object into a robot-relative
    * ChassisSpeeds object.
    *
+   * <p>This will create a new ChassisSpeeds object. To modify an existing ChassisSpeeds object
+   * without creating a new one, use the instance method instead.
+   *
    * @param fieldRelativeSpeeds The ChassisSpeeds object representing the speeds in the field frame
    *     of reference. Positive x is away from your alliance wall. Positive y is to your left when
    *     standing behind the alliance wall.
@@ -267,9 +263,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
    * @return ChassisSpeeds object representing the speeds in the robot's frame of reference.
-   * @deprecated Use toRobotRelativeSpeeds instead.
    */
-  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromFieldRelativeSpeeds(
       ChassisSpeeds fieldRelativeSpeeds, Rotation2d robotAngle) {
     return fromFieldRelativeSpeeds(
@@ -298,6 +292,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * Converts a user provided robot-relative set of speeds into a field-relative ChassisSpeeds
    * object.
    *
+   * <p>This will create a new ChassisSpeeds object. To modify an existing ChassisSpeeds object
+   * without creating a new one, use the instance method instead.
+   *
    * @param vxMetersPerSecond The component of speed in the x direction relative to the robot.
    *     Positive x is towards the robot's front.
    * @param vyMetersPerSecond The component of speed in the y direction relative to the robot.
@@ -307,22 +304,23 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
    * @return ChassisSpeeds object representing the speeds in the field's frame of reference.
-   * @deprecated Use toFieldRelativeSpeeds instead.
    */
-  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromRobotRelativeSpeeds(
       double vxMetersPerSecond,
       double vyMetersPerSecond,
       double omegaRadiansPerSecond,
       Rotation2d robotAngle) {
-    // CCW rotation out of chassis frame
-    var rotated = new Translation2d(vxMetersPerSecond, vyMetersPerSecond).rotateBy(robotAngle);
-    return new ChassisSpeeds(rotated.getX(), rotated.getY(), omegaRadiansPerSecond);
+    var speeds = new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
+    speeds.toFieldRelativeSpeeds(robotAngle);
+    return speeds;
   }
 
   /**
    * Converts a user provided robot-relative set of speeds into a field-relative ChassisSpeeds
    * object.
+   *
+   * <p>This will create a new ChassisSpeeds object. To modify an existing ChassisSpeeds object
+   * without creating a new one, use the instance method instead.
    *
    * @param vx The component of speed in the x direction relative to the robot. Positive x is
    *     towards the robot's front.
@@ -333,9 +331,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
    * @return ChassisSpeeds object representing the speeds in the field's frame of reference.
-   * @deprecated Use toFieldRelativeSpeeds instead.
    */
-  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromRobotRelativeSpeeds(
       LinearVelocity vx, LinearVelocity vy, AngularVelocity omega, Rotation2d robotAngle) {
     return fromRobotRelativeSpeeds(
@@ -346,6 +342,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * Converts a user provided robot-relative ChassisSpeeds object into a field-relative
    * ChassisSpeeds object.
    *
+   * <p>This will create a new ChassisSpeeds object. To modify an existing ChassisSpeeds object
+   * without creating a new one, use the instance method instead.
+   *
    * @param robotRelativeSpeeds The ChassisSpeeds object representing the speeds in the robot frame
    *     of reference. Positive x is towards the robot's front. Positive y is towards the robot's
    *     left.
@@ -353,9 +352,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
    * @return ChassisSpeeds object representing the speeds in the field's frame of reference.
-   * @deprecated Use toFieldRelativeSpeeds instead.
    */
-  @Deprecated(forRemoval = true, since = "2025")
   public static ChassisSpeeds fromRobotRelativeSpeeds(
       ChassisSpeeds robotRelativeSpeeds, Rotation2d robotAngle) {
     return fromRobotRelativeSpeeds(
