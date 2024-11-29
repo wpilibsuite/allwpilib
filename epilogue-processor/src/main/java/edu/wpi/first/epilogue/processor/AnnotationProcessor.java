@@ -134,14 +134,15 @@ public class AnnotationProcessor extends AbstractProcessor {
    * @return the set of all loggable types
    */
   private Set<TypeElement> getLoggedTypes(RoundEnvironment roundEnv) {
+    // Fetches everything annotated with @Logged; classes, methods, values, etc.
+    var annotatedElements = roundEnv.getElementsAnnotatedWith(Logged.class);
     return Stream.concat(
             // 1. All type elements (classes, interfaces, or enums) with the @Logged annotation
-            roundEnv.getRootElements().stream()
+            annotatedElements.stream()
                 .filter(e -> e instanceof TypeElement)
-                .map(e -> (TypeElement) e)
-                .filter(t -> t.getAnnotation(Logged.class) != null),
+                .map(e -> (TypeElement) e),
             // 2. All type elements containing a field or method with the @Logged annotation
-            roundEnv.getElementsAnnotatedWith(Logged.class).stream()
+            annotatedElements.stream()
                 .filter(e -> e instanceof VariableElement || e instanceof ExecutableElement)
                 .map(e -> e.getEnclosingElement())
                 .filter(e -> e instanceof TypeElement)
