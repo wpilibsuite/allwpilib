@@ -22,13 +22,22 @@ public class ConfiguredLoggerHandler extends ElementHandler {
 
   @Override
   public boolean isLoggable(Element element) {
-    return m_customLoggers.containsKey(dataType(element));
+    return m_customLoggers.keySet().stream()
+        .anyMatch(m -> m_processingEnv.getTypeUtils().isAssignable(dataType(element), m));
   }
 
   @Override
   public String logInvocation(Element element) {
     var dataType = dataType(element);
-    var loggerType = m_customLoggers.get(dataType);
+    var loggerType =
+        m_customLoggers.entrySet().stream()
+            .filter(
+                e -> {
+                  return m_processingEnv.getTypeUtils().isAssignable(dataType, e.getKey());
+                })
+            .findFirst()
+            .orElseThrow()
+            .getValue();
 
     return "Epilogue."
         + StringUtils.lowerCamelCase(loggerType.asElement().getSimpleName())

@@ -1471,6 +1471,61 @@ class AnnotationProcessorTest {
   }
 
   @Test
+  void customGenericLogger() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.logging.*;
+        import edu.wpi.first.math.numbers.*;
+        import edu.wpi.first.math.Num;
+        import edu.wpi.first.math.Vector;
+
+        @CustomLoggerFor(Vector.class)
+        class VectorLogger extends ClassSpecificLogger<Vector<?>> {
+          public VectorLogger() {
+            super((Class) Vector.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Vector<?> object) {
+            // Implementation is irrelevant
+          }
+        }
+
+        @Logged
+        class Example {
+          Vector<N3> vec;
+        }
+        """;
+
+    String expectedGeneratedSource =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              Epilogue.vectorLogger.tryUpdate(dataLogger.getSubLogger("vec"), object.vec, Epilogue.getConfig().errorHandler);
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
   void warnsAboutNonLoggableFields() {
     String source =
         """
