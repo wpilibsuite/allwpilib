@@ -8,12 +8,7 @@ import edu.wpi.first.epilogue.CustomLoggerFor;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.processing.AbstractProcessor;
@@ -91,6 +86,8 @@ public class AnnotationProcessor extends AbstractProcessor {
                       "Custom logger classes should have a @CustomLoggerFor annotation",
                       e);
             });
+    
+    var loggedTypes = getLoggedTypes(roundEnv);
 
     // Handlers are declared in order of priority. If an element could be logged in more than one
     // way (eg a class implements both Sendable and StructSerializable), the order of the handlers
@@ -99,7 +96,7 @@ public class AnnotationProcessor extends AbstractProcessor {
         List.of(
             new LoggableHandler(
                 processingEnv,
-                getLoggedTypes(roundEnv)), // prioritize epilogue logging over Sendable
+                loggedTypes), // prioritize epilogue logging over Sendable
             new ConfiguredLoggerHandler(
                 processingEnv, customLoggers), // then customized logging configs
             new ArrayHandler(processingEnv),
@@ -119,7 +116,7 @@ public class AnnotationProcessor extends AbstractProcessor {
         .findAny()
         .ifPresent(
             epilogue -> {
-              processEpilogue(roundEnv, epilogue);
+              processEpilogue(roundEnv, epilogue, loggedTypes);
             });
 
     return false;
@@ -147,7 +144,8 @@ public class AnnotationProcessor extends AbstractProcessor {
                 .map(e -> e.getEnclosingElement())
                 .filter(e -> e instanceof TypeElement)
                 .map(e -> (TypeElement) e))
-        .collect(Collectors.toSet()); // Collect to a set to avoid duplicates
+        .sorted(Comparator.comparing(e -> e.getSimpleName().toString()))
+        .collect(Collectors.toCollection(LinkedHashSet::new)); // Collect to a set to avoid duplicates
   }
 
   private boolean validateFields(Set<? extends Element> annotatedElements) {
@@ -356,7 +354,11 @@ public class AnnotationProcessor extends AbstractProcessor {
     return customLoggers;
   }
 
-  private void processEpilogue(RoundEnvironment roundEnv, TypeElement epilogueAnnotation) {
+  private void processEpilogue(
+      RoundEnvironment roundEnv,
+      TypeElement epilogueAnnotation,
+      Set<TypeElement> loggedTypes
+  ) {
     var annotatedElements = roundEnv.getElementsAnnotatedWith(epilogueAnnotation);
 
     List<String> loggerClassNames = new ArrayList<>();
@@ -374,9 +376,7 @@ public class AnnotationProcessor extends AbstractProcessor {
       return;
     }
 
-    var classes = getLoggedTypes(roundEnv);
-
-    for (TypeElement clazz : classes) {
+    for (TypeElement clazz : loggedTypes) {
       try {
         warnOfNonLoggableElements(clazz);
         m_loggerGenerator.writeLoggerFile(clazz);
