@@ -139,6 +139,9 @@ typedef enum
     kResourceType_BangBangController = 116,
     kResourceType_DataLogManager = 117,
     kResourceType_LoggingFramework = 118,
+    kResourceType_ChoreoTrajectory = 119,
+    kResourceType_ChoreoTrigger = 120,
+    kResourceType_PathWeaverTrajectory = 121,
 
 //    kResourceType_MaximumID = 255,
 } tResourceType;

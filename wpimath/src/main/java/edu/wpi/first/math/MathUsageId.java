@@ -38,4 +38,7 @@ public enum MathUsageId {
 
   /** BangBangController. */
   kController_BangBangController,
+
+  /** PathWeaver Trajectory. */
+  kTrajectory_PathWeaver,
 }

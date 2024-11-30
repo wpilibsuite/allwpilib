@@ -170,6 +170,9 @@ namespace HALUsageReporting {
     kResourceType_BangBangController = 116,
     kResourceType_DataLogManager = 117,
     kResourceType_LoggingFramework = 118,
+    kResourceType_ChoreoTrajectory = 119,
+    kResourceType_ChoreoTrigger = 120,
+    kResourceType_PathWeaverTrajectory = 121,
   };
   enum tInstances : int32_t {
     kLanguage_LabVIEW = 1,
