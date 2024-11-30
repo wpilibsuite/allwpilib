@@ -55,7 +55,10 @@ filegroup(
 cc_library(
     name = "wpiHal.static",
     srcs = [":platform-srcs"] + glob(
-        ["src/main/native/cpp/**", "src/generated/main/native/cpp/**"],
+        [
+            "src/main/native/cpp/**",
+            "src/generated/main/native/cpp/**",
+        ],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**/*"]),
