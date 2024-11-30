@@ -2,6 +2,9 @@
 
 #include "wpi/protobuf/ProtobufCallbacks.h"
 
+#include <string>
+#include <utility>
+
 std::optional<mrc::VersionInfo> wpi::Protobuf<mrc::VersionInfo>::Unpack(
     InputStream& Stream) {
     wpi::UnpackCallback<std::string> NameCb;

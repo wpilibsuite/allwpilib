@@ -2,6 +2,9 @@
 
 #include "wpi/protobuf/ProtobufCallbacks.h"
 
+#include <string>
+#include <utility>
+
 static_assert(sizeof(mrc::ControlFlags) == sizeof(uint32_t));
 
 namespace {

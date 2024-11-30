@@ -2,6 +2,9 @@
 
 #include "wpi/protobuf/ProtobufCallbacks.h"
 
+#include <string>
+#include <utility>
+
 std::optional<mrc::JoystickDescriptor>
 wpi::Protobuf<mrc::JoystickDescriptor>::Unpack(InputStream& Stream) {
     wpi::UnpackCallback<std::string> JoystickNameCb;
