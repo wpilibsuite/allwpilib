@@ -373,7 +373,7 @@ class EpilogueGeneratorTest {
 
         import edu.wpi.first.hal.FRCNetComm;
         import edu.wpi.first.hal.HAL;
- 
+
         import edu.wpi.first.epilogue.ExampleLogger;
         import edu.wpi.first.epilogue.CustomLogger;
 
