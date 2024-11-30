@@ -22,6 +22,7 @@ model {
 
             enableCheckTask true
             javaCompileTasks << compileJava
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.systemcore)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
@@ -177,7 +178,6 @@ model {
     components {
         examplesMap.each { key, value ->
             if (key == "usbviewer") {
-                if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxsystemcore')) {
                 if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxsystemcore')) {
                     "${key}"(NativeExecutableSpec) {
                         targetBuildTypes 'debug'
