@@ -123,10 +123,10 @@ static wpi::mutex msgMutex;
 static HAL_ControlWord newestControlWord;
 static JoystickDataCache caches[3];
 static JoystickDataCache* currentRead = &caches[0];
-//static JoystickDataCache* currentReadLocal = &caches[0];
+// static JoystickDataCache* currentReadLocal = &caches[0];
 static std::atomic<JoystickDataCache*> currentCache{nullptr};
-//static JoystickDataCache* lastGiven = &caches[1];
-//static JoystickDataCache* cacheToUpdate = &caches[2];
+// static JoystickDataCache* lastGiven = &caches[1];
+// static JoystickDataCache* cacheToUpdate = &caches[2];
 
 static wpi::mutex cacheMutex;
 

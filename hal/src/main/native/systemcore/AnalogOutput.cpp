@@ -29,7 +29,6 @@ HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(
 
   *status = HAL_HANDLE_ERROR;
   return HAL_kInvalidHandle;
-
 }
 
 HAL_Bool HAL_CheckAnalogOutputChannel(int32_t channel) {
