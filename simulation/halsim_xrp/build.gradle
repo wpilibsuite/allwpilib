@@ -28,6 +28,7 @@ model {
                 return
             }
 
+            project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ":simulation:halsim_ws_core", library: "halsim_ws_core", linkage: "static"
         }
