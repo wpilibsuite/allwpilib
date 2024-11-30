@@ -1488,7 +1488,7 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(DataLogger dataLogger, Vector<?> object) {
+          public void update(EpilogueBackend backend, Vector<?> object) {
             // Implementation is irrelevant
           }
         }
@@ -1506,7 +1506,7 @@ class AnnotationProcessorTest {
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.Epilogue;
         import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.DataLogger;
+        import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -1514,9 +1514,9 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(DataLogger dataLogger, Example object) {
+          public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              Epilogue.vectorLogger.tryUpdate(dataLogger.getSubLogger("vec"), object.vec, Epilogue.getConfig().errorHandler);
+              Epilogue.vectorLogger.tryUpdate(backend.getNested("vec"), object.vec, Epilogue.getConfig().errorHandler);
             }
           }
         }
@@ -1543,7 +1543,7 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(DataLogger dataLogger, Generic<T> object) {
+          public void update(EpilogueBackend backend, Generic<T> object) {
             // Implementation is irrelevant
           }
         }
