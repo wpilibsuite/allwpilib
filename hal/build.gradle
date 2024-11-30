@@ -40,7 +40,7 @@ ext {
                     }
                 }
             }
-        }  else {
+        } else {
             it.sources {
                 simCpp(CppSourceSet) {
                     source {
@@ -50,7 +50,19 @@ ext {
                     exportedHeaders {
                         srcDir 'src/main/native/include'
                         srcDir generatedHeaders
+                        srcDir 'src/mrc/include'
                     }
+                }
+            }
+        }
+        it.sources {
+            nanopbCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/generated/main/native/cpp'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/generated/main/native/cpp'
                 }
             }
         }
@@ -110,7 +122,16 @@ model {
 }
 
 model {
-    components {}
+    components {
+        all {
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/mrc/include',
+                            'src/generated/main/native/cpp/mrc/protobuf'
+                }
+            }
+        }
+    }
     binaries {
         all {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {

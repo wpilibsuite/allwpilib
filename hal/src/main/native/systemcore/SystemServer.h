@@ -7,6 +7,7 @@
 #include <networktables/NetworkTableInstance.h>
 
 namespace hal {
-void InitializeSystemServer(nt::NetworkTableInstance Inst);
+void InitializeSystemServer();
+void ShutdownSystemServer();
 nt::NetworkTableInstance GetSystemServer();
 }

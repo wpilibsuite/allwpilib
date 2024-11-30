@@ -63,8 +63,8 @@ struct JoystickPovs {
 struct JoystickButtons {
     uint32_t Buttons;
 
-    size_t SetCount(uint8_t NewCount) const {
-        return (std::min)(Count, static_cast<uint8_t>(MRC_MAX_NUM_BUTTONS));
+    void SetCount(uint8_t NewCount) {
+        Count = (std::min)(NewCount, static_cast<uint8_t>(MRC_MAX_NUM_BUTTONS));
     }
 
     size_t GetCount() const { return Count; }
@@ -242,6 +242,64 @@ struct JoystickDescriptor {
     uint8_t AxesCount{0};
     uint8_t ButtonCount{0};
     uint8_t PovCount{0};
+};
+
+struct VersionInfo {
+    uint32_t DeviceId{0};
+
+    void SetName(std::string_view NewName) {
+        if (NewName.size() > MRC_MAX_VERSION_SIZE) {
+            NewName = NewName.substr(0, MRC_MAX_VERSION_SIZE);
+        }
+        Name = NewName;
+    }
+
+    void MoveName(std::string&& NewName) {
+        Name = std::move(NewName);
+        if (Name.size() > MRC_MAX_VERSION_SIZE) {
+            Name.resize(MRC_MAX_VERSION_SIZE);
+        }
+    }
+
+    std::string_view GetName() const { return Name; }
+
+    std::span<uint8_t> WritableNameBuffer(size_t Len) {
+        if (Len > MRC_MAX_VERSION_SIZE) {
+            Len = MRC_MAX_VERSION_SIZE;
+        }
+        Name.resize(Len);
+        return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Name.data()),
+                                  Name.size()};
+    }
+
+    void SetVersion(std::string_view NewVersion) {
+        if (NewVersion.size() > MRC_MAX_VERSION_SIZE) {
+            NewVersion = NewVersion.substr(0, MRC_MAX_VERSION_SIZE);
+        }
+        Version = NewVersion;
+    }
+
+    void MoveVersion(std::string&& NewVersion) {
+        Version = std::move(NewVersion);
+        if (Version.size() > MRC_MAX_VERSION_SIZE) {
+            Version.resize(MRC_MAX_VERSION_SIZE);
+        }
+    }
+
+    std::string_view GetVersion() const { return Version; }
+
+    std::span<uint8_t> WritableVersionBuffer(size_t Len) {
+        if (Len > MRC_MAX_VERSION_SIZE) {
+            Len = MRC_MAX_VERSION_SIZE;
+        }
+        Version.resize(Len);
+        return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Version.data()),
+                                  Version.size()};
+    }
+
+   private:
+    std::string Name;
+    std::string Version;
 };
 
 }  // namespace mrc
