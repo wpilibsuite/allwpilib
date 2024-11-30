@@ -1526,6 +1526,51 @@ class AnnotationProcessorTest {
   }
 
   @Test
+  void genericLoggerForGenericType() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.logging.*;
+
+        class Generic<T> { }
+
+        @CustomLoggerFor(Generic.class)
+        // Invalid: loggers cannot take type arguments
+        class GenericLogger<T> extends ClassSpecificLogger<Generic<T>> {
+          public GenericLogger() {
+            super((Class) Generic.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Generic<T> object) {
+            // Implementation is irrelevant
+          }
+        }
+
+        @Logged
+        class Example {
+          Generic<String> genericField;
+        }
+        """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .withProcessors(new AnnotationProcessor())
+            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+
+    assertThat(compilation).failed();
+    assertThat(compilation).hadErrorCount(1);
+
+    assertCompilationError(
+        "[EPILOGUE] Custom logger classes cannot take generic type arguments",
+        9,
+        1,
+        compilation.errors().get(0));
+  }
+
+  @Test
   void warnsAboutNonLoggableFields() {
     String source =
         """

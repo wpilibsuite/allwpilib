@@ -311,6 +311,16 @@ public class AnnotationProcessor extends AbstractProcessor {
           continue;
         }
 
+        if (annotatedElement instanceof TypeElement t && !t.getTypeParameters().isEmpty()) {
+          processingEnv
+              .getMessager()
+              .printMessage(
+                  Diagnostic.Kind.ERROR,
+                  "[EPILOGUE] Custom logger classes cannot take generic type arguments",
+                  annotatedElement);
+          continue;
+        }
+
         if (!processingEnv
             .getTypeUtils()
             .isAssignable(annotatedElement.asType(), requiredSuperClass)) {
