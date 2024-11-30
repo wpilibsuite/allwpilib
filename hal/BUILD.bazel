@@ -57,7 +57,7 @@ cc_library(
     srcs = [":platform-srcs"] + glob(
         [
             "src/main/native/cpp/**",
-             "src/generated/main/native/cpp/**",
+            "src/generated/main/native/cpp/**",
         ],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
