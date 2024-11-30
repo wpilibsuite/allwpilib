@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package mrc.proto;
+
+option java_package = "com.mrc.proto";
+
+message ProtobufJoystickData {
+    uint32 ButtonCount = 1;
+    fixed32 Buttons = 2;
+    repeated float Axes = 3;
+    repeated sint32 POVs = 4;
+}
+
+message ProtobufControlData {
+    uint32 ControlWord = 1;
+    float MatchTime = 2;
+    repeated ProtobufJoystickData Joysticks = 3;
+    string OpMode = 4;
+}
+
+message ProtobufJoystickDescriptor {
+    string JoystickName = 1;
+    repeated int32 AxisTypes = 2;
+    bool IsXbox = 3;
+    int32 JoystickType = 4;
+    int32 ButtonCount = 5;
+    int32 PovCount = 6;
+}
+
+message ProtobufJoystickOutputData {
+    fixed32 HidOutputs = 1;
+    float LeftRumble = 2;
+    float RightRumble = 3;
+}
+
+message ProtobufVersionInfo {
+    fixed32 DeviceId = 1;
+    string Name = 2;
+    string Version = 3;
+}
+
+message ProtobufMatchInfo {
+    string EventName = 1;
+    int32 MatchNumber = 2;
+    int32 ReplayNumber = 3;
+    int32 MatchType = 4;
+}
