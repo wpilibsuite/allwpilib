@@ -17,7 +17,7 @@ filegroup(
 
 ATHENA_SRCS = glob([
     "src/main/native/athena/**",
-    "src/main/native/robotshared/**"
+    "src/main/native/robotshared/**",
 ])
 
 ATHENA_DEPS = ["@bzlmodrio-ni//libraries/cpp/ni:shared"]
