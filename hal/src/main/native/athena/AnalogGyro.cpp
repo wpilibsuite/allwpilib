@@ -11,8 +11,8 @@
 #include <wpi/print.h>
 
 #include "AnalogInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
+#include "../robotshared/HALInitializer.h"
+#include "../robotshared/HALInternal.h"
 #include "hal/AnalogAccumulator.h"
 #include "hal/AnalogInput.h"
 #include "hal/handles/IndexedHandleResource.h"

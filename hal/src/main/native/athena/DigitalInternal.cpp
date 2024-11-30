@@ -13,7 +13,7 @@
 #include <wpi/mutex.h>
 
 #include "ConstantsInternal.h"
-#include "HALInitializer.h"
+#include "../robotshared/HALInitializer.h"
 #include "PortsInternal.h"
 #include "hal/AnalogTrigger.h"
 #include "hal/ChipObject.h"

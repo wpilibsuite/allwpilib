@@ -2,8 +2,9 @@ apply plugin: 'cpp'
 apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: ExtraTasks
 
-if (!project.hasProperty('onlylinuxathena')) {
+if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxsystemcore')) {
     ext.skiplinuxathena = true
+    ext.skiplinuxsystemcore = true
     apply from: "${rootDir}/shared/config.gradle"
 
     model {
@@ -57,7 +58,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                     }
                 }
                 binaries.all {
-                    if (!project.hasProperty('onlylinuxathena')) {
+                    if (!project.hasProperty('onlylinuxathena')  && !project.hasProperty('onlylinuxsystemcore')) {
                         project(':hal').addHalDependency(it, 'shared')
                         lib library: pluginName
                         if (project.hasProperty('includeNtCore')) {
@@ -84,7 +85,7 @@ if (!project.hasProperty('onlylinuxathena')) {
 model {
     tasks {
         def c = $.components
-        if (!project.hasProperty('onlylinuxathena')) {
+        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxsystemcore')) {
             project.tasks.create('runCpp', Exec) {
                 group = 'WPILib'
                 description = "Run the ${pluginName}Dev executable"

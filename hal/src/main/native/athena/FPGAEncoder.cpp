@@ -10,8 +10,8 @@
 #include <fmt/format.h>
 
 #include "DigitalInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
+#include "../robotshared/HALInitializer.h"
+#include "../robotshared/HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
 

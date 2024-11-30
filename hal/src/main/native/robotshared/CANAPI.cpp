@@ -10,7 +10,7 @@
 #include <wpi/DenseMap.h>
 #include <wpi/mutex.h>
 
-#include "HALInitializer.h"
+#include "../robotshared/HALInitializer.h"
 #include "hal/CAN.h"
 #include "hal/Errors.h"
 #include "hal/handles/UnlimitedHandleResource.h"

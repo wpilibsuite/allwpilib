@@ -20,7 +20,7 @@
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
-#include "HALInitializer.h"
+#include "../robotshared/HALInitializer.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 

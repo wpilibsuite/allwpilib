@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include "HALInitializer.h"
+#include "../robotshared/HALInitializer.h"
 #include "hal/ChipObject.h"
 
 using namespace hal;

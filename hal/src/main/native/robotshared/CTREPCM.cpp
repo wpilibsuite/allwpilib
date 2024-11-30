@@ -8,9 +8,9 @@
 
 #include <fmt/format.h>
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
+#include "../robotshared/HALInitializer.h"
+#include "../robotshared/HALInternal.h"
+#include "SharedPortsInternal.h"
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"
 #include "hal/handles/IndexedHandleResource.h"

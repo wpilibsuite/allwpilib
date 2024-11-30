@@ -4,7 +4,7 @@
 
 #include "hal/simulation/PowerDistributionData.h"
 
-#include "../PortsInternal.h"
+#include "../SharedPortsInternal.h"
 #include "hal/simulation/SimDataValue.h"
 
 extern "C" {

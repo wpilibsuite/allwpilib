@@ -8,8 +8,8 @@
 #include <thread>
 
 #include "CTREPDP.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
+#include "../robotshared/HALInternal.h"
+#include "SharedPortsInternal.h"
 #include "REVPDH.h"
 #include "hal/Errors.h"
 #include "hal/HALBase.h"

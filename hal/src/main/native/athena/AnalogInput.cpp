@@ -8,8 +8,8 @@
 #include <wpi/mutex.h>
 
 #include "AnalogInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
+#include "../robotshared/HALInitializer.h"
+#include "../robotshared/HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/AnalogAccumulator.h"
 #include "hal/handles/HandlesInternal.h"
