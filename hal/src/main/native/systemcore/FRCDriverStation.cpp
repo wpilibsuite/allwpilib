@@ -24,6 +24,15 @@
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/ProtobufTopic.h>
+#include <networktables/BooleanTopic.h>
+#include <networktables/StringTopic.h>
+#include <networktables/StringArrayTopic.h>
+#include "mrc/NetComm.h"
+#include "hal/proto/ControlData.h"
+#include "hal/proto/JoystickOutputData.h"
+
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");
 
@@ -49,8 +58,94 @@ struct JoystickDataCache {
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
 
+static void HandleControlEvent(const nt::Event& event) {
+  auto valueEvent = event.GetValueEventData();
+  if (!valueEvent) {
+    return;
+  }
+
+
+}
+static void HandleServerDisconnected(const nt::Event& event);
+
 struct FRCDriverStation {
+  std::atomic_bool watchdogActive{false};
+
+  nt::NetworkTableInstance ntInst;
+  wpi::ProtobufMessage<mrc::ControlData> controlDataMsg;
+  nt::ProtobufSubscriber<mrc::ControlData> controlSubscriber;
+  nt::StringPublisher libVersionPublisher;
+  nt::StringPublisher consoleLineTopic;
+  nt::BooleanPublisher newRobotProgramTopic;
+  nt::BooleanPublisher userCodeStartedTopic;
+  nt::BooleanPublisher userCodeDisabledTopic;
+  nt::BooleanPublisher userCodeAutonomousTopic;
+  nt::BooleanPublisher userCodeTeleopTopic;
+  nt::BooleanPublisher userCodeTestTopic;
+  nt::StringArrayPublisher availableOpModesPublisher;
+  std::array<nt::ProtobufPublisher<mrc::JoystickOutputData>,
+             MRC_MAX_NUM_JOYSTICKS>
+      joystickOutputsTopics;
+  NT_Listener controlListener{0};
+  NT_Listener disconnectedListener{0};
+
   wpi::EventVector newDataEvents;
+
+  explicit FRCDriverStation(nt::NetworkTableInstance inst) {
+    NT_EventFlags flags;
+    nt::PubSubOptions options;
+    options.sendAll = true;
+    options.keepDuplicates = true;
+    options.periodic = 0.005;
+    options.disableLocal = true;
+    flags = NT_EVENT_VALUE_REMOTE;
+
+    ntInst = inst;
+    controlSubscriber =
+        ntInst.GetProtobufTopic<mrc::ControlData>(ROBOT_CONTROL_DATA_PATH)
+            .Subscribe({}, options);
+    controlListener = ntInst.AddListener(
+        controlSubscriber, flags | NT_EVENT_UNPUBLISH,
+        [](const nt::Event& event) { HandleControlEvent(event); });
+
+    disconnectedListener = nt::AddListener(
+        ntInst.GetHandle(), NT_EVENT_DISCONNECTED,
+        [this](const nt::Event& event) { HandleServerDisconnected(event); });
+
+    libVersionPublisher =
+        ntInst.GetStringTopic(ROBOT_LIB_VERSION_PATH).Publish();
+
+    availableOpModesPublisher =
+        ntInst.GetStringArrayTopic(ROBOT_AVAILABLE_OP_MODES_PATH).Publish();
+
+    userCodeStartedTopic =
+        ntInst.GetBooleanTopic(ROBOT_CODE_STARTED_PATH).Publish(options);
+    userCodeDisabledTopic =
+        ntInst.GetBooleanTopic(ROBOT_DISABLED_TRACE_PATH).Publish(options);
+    userCodeAutonomousTopic =
+        ntInst.GetBooleanTopic(ROBOT_AUTON_TRACE_PATH).Publish(options);
+    userCodeTeleopTopic =
+        ntInst.GetBooleanTopic(ROBOT_TELEOP_TRACE_PATH).Publish(options);
+    userCodeTestTopic =
+        ntInst.GetBooleanTopic(ROBOT_TEST_TRACE_PATH).Publish(options);
+
+    for (size_t Count = 0; Count < joystickOutputsTopics.size(); Count++) {
+      std::string name = ROBOT_JOYSTICK_OUTPUTS_PATH;
+      name += std::to_string(Count);
+      joystickOutputsTopics[Count] =
+          ntInst.GetProtobufTopic<mrc::JoystickOutputData>(name).Publish(
+              options);
+    }
+
+    newRobotProgramTopic =
+        ntInst.GetBooleanTopic(ROBOT_NEW_ROBOT_PROGRAM_PATH).Publish(options);
+    newRobotProgramTopic.Set(true);
+  }
+
+  ~FRCDriverStation() {
+    ntInst.RemoveListener(controlListener);
+    ntInst.RemoveListener(disconnectedListener);
+  }
 };
 }  // namespace
 
@@ -235,8 +330,6 @@ void TcpCache::Update(uint32_t mask) {
 namespace hal::init {
 void InitializeFRCDriverStation() {
   std::memset(&newestControlWord, 0, sizeof(newestControlWord));
-  static FRCDriverStation ds;
-  driverStation = &ds;
 }
 }  // namespace hal::init
 
