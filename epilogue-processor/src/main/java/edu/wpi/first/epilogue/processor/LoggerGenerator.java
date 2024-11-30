@@ -253,7 +253,7 @@ public class LoggerGenerator {
       out.println();
 
       // @Override
-      // public void update(DataLogger dataLogger, Foo object) {
+      // public void update(EpilogueBackend backend, Foo object) {
       out.println("  @Override");
       out.println(
           "  public void update(EpilogueBackend backend, " + simpleClassName + " object) {");
