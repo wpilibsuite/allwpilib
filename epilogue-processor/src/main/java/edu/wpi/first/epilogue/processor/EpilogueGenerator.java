@@ -55,6 +55,10 @@ public class EpilogueGenerator {
         out.println("import static edu.wpi.first.units.Units.Seconds;");
         out.println();
 
+        out.println("import edu.wpi.first.hal.FRCNetComm;");
+        out.println("import edu.wpi.first.hal.HAL;");
+        out.println();
+
         loggerClassNames.stream()
             .sorted()
             .forEach(
@@ -80,6 +84,18 @@ public class EpilogueGenerator {
         out.println();
 
         out.println("public final class Epilogue {");
+
+        // Usage reporting
+        out.println(
+            """
+              static {
+                HAL.report(
+                  FRCNetComm.tResourceType.kResourceType_LoggingFramework,
+                  FRCNetComm.tInstances.kLoggingFramework_Epilogue
+                );
+              }
+            """);
+
         out.println(
             "  private static final EpilogueConfiguration config = new EpilogueConfiguration();");
         out.println();
