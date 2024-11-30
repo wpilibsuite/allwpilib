@@ -155,8 +155,8 @@ class EpilogueGeneratorTest {
            */
           public static void update(edu.wpi.first.epilogue.Example robot) {
             long start = System.nanoTime();
-            exampleLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
-            config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
+            exampleLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
+            config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -235,8 +235,8 @@ class EpilogueGeneratorTest {
            */
           public static void update(edu.wpi.first.epilogue.AlphaBot robot) {
             long start = System.nanoTime();
-            alphaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
-            config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
+            alphaBotLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
+            config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -267,8 +267,8 @@ class EpilogueGeneratorTest {
            */
           public static void update(edu.wpi.first.epilogue.BetaBot robot) {
             long start = System.nanoTime();
-            betaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
-            config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
+            betaBotLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
+            config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -314,7 +314,7 @@ class EpilogueGeneratorTest {
           public CustomLogger() { super(A.class); }
 
           @Override
-          public void update(DataLogger logger, A object) {} // implementation is irrelevant
+          public void update(EpilogueBackend backend, A object) {} // implementation is irrelevant
         }
 
         @Logged
