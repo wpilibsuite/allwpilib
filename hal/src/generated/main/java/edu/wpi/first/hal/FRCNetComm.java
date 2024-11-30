@@ -253,6 +253,10 @@ public final class FRCNetComm {
     public static final int kResourceType_RevSparkFlexPWM = 115;
     /** kResourceType_BangBangController = 116. */
     public static final int kResourceType_BangBangController = 116;
+    /** kResourceType_DataLogManager = 117. */
+    public static final int kResourceType_DataLogManager = 117;
+    /** kResourceType_LoggingFramework = 118. */
+    public static final int kResourceType_LoggingFramework = 118;
   }
 
   /**
@@ -403,6 +407,20 @@ public final class FRCNetComm {
     public static final int kDashboard_QFRCDashboard = 8;
     /** kDashboard_FRCWebComponents = 9. */
     public static final int kDashboard_FRCWebComponents = 9;
+    /** kDataLogLocation_Onboard = 1. */
+    public static final int kDataLogLocation_Onboard = 1;
+    /** kDataLogLocation_USB = 2. */
+    public static final int kDataLogLocation_USB = 2;
+    /** kLoggingFramework_Other = 1. */
+    public static final int kLoggingFramework_Other = 1;
+    /** kLoggingFramework_Epilogue = 2. */
+    public static final int kLoggingFramework_Epilogue = 2;
+    /** kLoggingFramework_Monologue = 3. */
+    public static final int kLoggingFramework_Monologue = 3;
+    /** kLoggingFramework_AdvantageKit = 4. */
+    public static final int kLoggingFramework_AdvantageKit = 4;
+    /** kLoggingFramework_DogLog = 5. */
+    public static final int kLoggingFramework_DogLog = 5;
   }
 
   /** Utility class. */
