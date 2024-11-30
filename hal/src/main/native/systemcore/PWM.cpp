@@ -15,10 +15,9 @@
 #include "../robotshared/HALInitializer.h"
 #include "../robotshared/HALInternal.h"
 #include "PortsInternal.h"
+#include "hal/Errors.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/HandlesInternal.h"
-
-#include "hal/Errors.h"
 
 using namespace hal;
 

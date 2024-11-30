@@ -12,8 +12,8 @@
 #include <FRC_NetworkCommunication/LoadOut.h>
 #include <wpi/mutex.h>
 
-#include "ConstantsInternal.h"
 #include "../robotshared/HALInitializer.h"
+#include "ConstantsInternal.h"
 #include "PortsInternal.h"
 #include "hal/AnalogTrigger.h"
 #include "hal/ChipObject.h"

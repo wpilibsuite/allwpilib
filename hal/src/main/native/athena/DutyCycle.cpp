@@ -6,10 +6,10 @@
 
 #include <memory>
 
+#include "../robotshared/HALInitializer.h"
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "DutyCycleInternal.h"
-#include "../robotshared/HALInitializer.h"
 #include "PortsInternal.h"
 #include "hal/ChipObject.h"
 #include "hal/Errors.h"

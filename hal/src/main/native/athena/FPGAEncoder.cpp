@@ -9,9 +9,9 @@
 
 #include <fmt/format.h>
 
-#include "DigitalInternal.h"
 #include "../robotshared/HALInitializer.h"
 #include "../robotshared/HALInternal.h"
+#include "DigitalInternal.h"
 #include "PortsInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
 

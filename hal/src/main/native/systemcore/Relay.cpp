@@ -13,10 +13,8 @@
 
 using namespace hal;
 
-
 namespace hal::init {
-void InitializeRelay() {
-}
+void InitializeRelay() {}
 }  // namespace hal::init
 
 extern "C" {
@@ -25,12 +23,11 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
                                         const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
-    *status = HAL_HANDLE_ERROR;
+  *status = HAL_HANDLE_ERROR;
   return HAL_kInvalidHandle;
 }
 
-void HAL_FreeRelayPort(HAL_RelayHandle relayPortHandle) {
-}
+void HAL_FreeRelayPort(HAL_RelayHandle relayPortHandle) {}
 
 HAL_Bool HAL_CheckRelayChannel(int32_t channel) {
   return false;

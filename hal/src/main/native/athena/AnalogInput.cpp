@@ -7,9 +7,9 @@
 #include <FRC_NetworkCommunication/AICalibration.h>
 #include <wpi/mutex.h>
 
-#include "AnalogInternal.h"
 #include "../robotshared/HALInitializer.h"
 #include "../robotshared/HALInternal.h"
+#include "AnalogInternal.h"
 #include "PortsInternal.h"
 #include "hal/AnalogAccumulator.h"
 #include "hal/handles/HandlesInternal.h"

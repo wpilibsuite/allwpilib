@@ -6,8 +6,8 @@
 
 #include <fmt/format.h>
 
-#include "FPGACalls.h"
 #include "../robotshared/HALInternal.h"
+#include "FPGACalls.h"
 #include "dlfcn.h"
 #include "hal/Errors.h"
 

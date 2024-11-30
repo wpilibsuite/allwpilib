@@ -12,11 +12,11 @@
 
 #include <wpi/print.h>
 
+#include "../robotshared/HALInternal.h"
 #include "AnalogInternal.h"
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "EncoderInternal.h"
-#include "../robotshared/HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/AnalogAccumulator.h"
 #include "hal/AnalogGyro.h"

@@ -9,10 +9,10 @@
 
 #include <fmt/format.h>
 
-#include "ConstantsInternal.h"
-#include "DigitalInternal.h"
 #include "../robotshared/HALInitializer.h"
 #include "../robotshared/HALInternal.h"
+#include "ConstantsInternal.h"
+#include "DigitalInternal.h"
 #include "PortsInternal.h"
 #include "hal/HAL.h"
 #include "hal/handles/LimitedHandleResource.h"

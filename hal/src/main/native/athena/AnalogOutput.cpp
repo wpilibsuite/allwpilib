@@ -6,9 +6,9 @@
 
 #include <string>
 
-#include "AnalogInternal.h"
 #include "../robotshared/HALInitializer.h"
 #include "../robotshared/HALInternal.h"
+#include "AnalogInternal.h"
 #include "PortsInternal.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"

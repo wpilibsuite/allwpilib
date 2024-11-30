@@ -7,10 +7,10 @@
 #include <cstring>
 #include <thread>
 
-#include "CTREPDP.h"
 #include "../robotshared/HALInternal.h"
-#include "SharedPortsInternal.h"
+#include "CTREPDP.h"
 #include "REVPDH.h"
+#include "SharedPortsInternal.h"
 #include "hal/Errors.h"
 #include "hal/HALBase.h"
 #include "hal/handles/HandlesInternal.h"

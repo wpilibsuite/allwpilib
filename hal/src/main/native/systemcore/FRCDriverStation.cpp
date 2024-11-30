@@ -70,7 +70,8 @@ static wpi::mutex msgMutex;
 
 //   // // copy integer values to double values
 //   // axes->count = netcommAxes.count;
-//   // // current scaling is -128 to 127, can easily be patched in the future by
+//   // // current scaling is -128 to 127, can easily be patched in the future
+//   by
 //   // // changing this function.
 //   // for (int32_t i = 0; i < netcommAxes.count; i++) {
 //   //   int8_t value = netcommAxes.axes[i];
@@ -142,7 +143,8 @@ static wpi::mutex cacheMutex;
  *         nonzero is bad.
  */
 // static int32_t HAL_GetJoystickDescriptorInternal(int32_t joystickNum,
-//                                                  HAL_JoystickDescriptor* desc) {
+//                                                  HAL_JoystickDescriptor*
+//                                                  desc) {
 //                                                   return 0;
 //   // desc->isXbox = 0;
 //   // desc->type = (std::numeric_limits<uint8_t>::max)();
@@ -156,10 +158,12 @@ static wpi::mutex cacheMutex;
 //   //     reinterpret_cast<char*>(&desc->name), &desc->axisCount,
 //   //     reinterpret_cast<uint8_t*>(&desc->axisTypes), &desc->buttonCount,
 //   //     &desc->povCount);
-//   // /* check the return, if there is an error and the RIOimage predates FRC2017,
+//   // /* check the return, if there is an error and the RIOimage predates
+//   FRC2017,
 //   //  * then axisCount needs to be cleared */
 //   // if (retval != 0) {
-//   //   /* set count to zero so downstream code doesn't decode invalid axisTypes. */
+//   //   /* set count to zero so downstream code doesn't decode invalid
+//   axisTypes. */
 //   //   desc->axisCount = 0;
 //   // }
 //   // return retval;
@@ -170,7 +174,8 @@ static wpi::mutex cacheMutex;
 //   // MatchType_t matchType = MatchType_t::kMatchType_none;
 //   // info->gameSpecificMessageSize = sizeof(info->gameSpecificMessage);
 //   // int status = FRC_NetworkCommunication_getMatchInfo(
-//   //     info->eventName, &matchType, &info->matchNumber, &info->replayNumber,
+//   //     info->eventName, &matchType, &info->matchNumber,
+//   &info->replayNumber,
 //   //     info->gameSpecificMessage, &info->gameSpecificMessageSize);
 
 //   // if (info->gameSpecificMessageSize > sizeof(info->gameSpecificMessage)) {
@@ -249,7 +254,7 @@ extern "C" {
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg) {
-                        return 0;
+  return 0;
   // // Avoid flooding console by keeping track of previous 5 error
   // // messages and only printing again if they're longer than 1 second old.
   // static constexpr int KEEP_MSGS = 5;
@@ -274,7 +279,8 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   //   }
   // }
   // int retval = 0;
-  // if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
+  // if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >=
+  // std::chrono::seconds(1)) {
   //   std::string_view detailsRef{details};
   //   std::string_view locationRef{location};
   //   std::string_view callStackRef{callStack};
@@ -288,8 +294,10 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   //           callStackRef.size() <=
   //       65535) {
   //     // Pass through
-  //     retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
-  //                                                 details, location, callStack);
+  //     retval = FRC_NetworkCommunication_sendError(isError, errorCode,
+  //     isLVCode,
+  //                                                 details, location,
+  //                                                 callStack);
   //   } else if (baseLength + detailsRef.size() > 65535) {
   //     // Details too long, cut both location and stack
   //     auto newLen = 65535 - baseLength;
@@ -303,12 +311,13 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   //     std::string newLocation{location, newLen};
   //     char empty = '\0';
   //     retval = FRC_NetworkCommunication_sendError(
-  //         isError, errorCode, isLVCode, details, newLocation.c_str(), &empty);
+  //         isError, errorCode, isLVCode, details, newLocation.c_str(),
+  //         &empty);
   //   } else {
   //     // Stack too long
-  //     auto newLen = 65535 - baseLength - detailsRef.size() - locationRef.size();
-  //     std::string newCallStack{callStack, newLen};
-  //     retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
+  //     auto newLen = 65535 - baseLength - detailsRef.size() -
+  //     locationRef.size(); std::string newCallStack{callStack, newLen}; retval
+  //     = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
   //                                                 details, location,
   //                                                 newCallStack.c_str());
   //   }
@@ -316,7 +325,8 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   //     fmt::memory_buffer buf;
   //     if (location && location[0] != '\0') {
   //       fmt::format_to(fmt::appender{buf},
-  //                      "{} at {}: ", isError ? "Error" : "Warning", location);
+  //                      "{} at {}: ", isError ? "Error" : "Warning",
+  //                      location);
   //     }
   //     fmt::format_to(fmt::appender{buf}, "{}\n", details);
   //     if (callStack && callStack[0] != '\0') {
@@ -457,7 +467,8 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
   CHECK_JOYSTICK_NUMBER(joystickNum);
   return 0;
   // return FRC_NetworkCommunication_setJoystickOutputs(joystickNum, outputs,
-  //                                                    leftRumble, rightRumble);
+  //                                                    leftRumble,
+  //                                                    rightRumble);
 }
 
 double HAL_GetMatchTime(int32_t* status) {
@@ -466,23 +477,23 @@ double HAL_GetMatchTime(int32_t* status) {
 }
 
 void HAL_ObserveUserProgramStarting(void) {
- // FRC_NetworkCommunication_observeUserProgramStarting();
+  // FRC_NetworkCommunication_observeUserProgramStarting();
 }
 
 void HAL_ObserveUserProgramDisabled(void) {
- // FRC_NetworkCommunication_observeUserProgramDisabled();
+  // FRC_NetworkCommunication_observeUserProgramDisabled();
 }
 
 void HAL_ObserveUserProgramAutonomous(void) {
- // FRC_NetworkCommunication_observeUserProgramAutonomous();
+  // FRC_NetworkCommunication_observeUserProgramAutonomous();
 }
 
 void HAL_ObserveUserProgramTeleop(void) {
- // FRC_NetworkCommunication_observeUserProgramTeleop();
+  // FRC_NetworkCommunication_observeUserProgramTeleop();
 }
 
 void HAL_ObserveUserProgramTest(void) {
- // FRC_NetworkCommunication_observeUserProgramTest();
+  // FRC_NetworkCommunication_observeUserProgramTest();
 }
 
 // // Constant number to be used for our occur handle
@@ -588,8 +599,7 @@ HAL_Bool HAL_GetOutputsEnabled(void) {
 }  // extern "C"
 
 namespace hal {
-void InitializeDriverStation() {
-}
+void InitializeDriverStation() {}
 
 void WaitForInitialPacket() {
   wpi::Event waitForInitEvent;

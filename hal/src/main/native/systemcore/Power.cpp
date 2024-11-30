@@ -27,31 +27,31 @@ extern "C" {
 
 double HAL_GetVinVoltage(int32_t* status) {
   initializePower(status);
-    *status = HAL_HANDLE_ERROR;
+  *status = HAL_HANDLE_ERROR;
   return 0;
 }
 
 double HAL_GetVinCurrent(int32_t* status) {
   initializePower(status);
-    *status = HAL_HANDLE_ERROR;
+  *status = HAL_HANDLE_ERROR;
   return 0;
 }
 
 double HAL_GetUserVoltage6V(int32_t* status) {
   initializePower(status);
-    *status = HAL_HANDLE_ERROR;
+  *status = HAL_HANDLE_ERROR;
   return 0;
 }
 
 double HAL_GetUserCurrent6V(int32_t* status) {
   initializePower(status);
-   *status = HAL_HANDLE_ERROR;
+  *status = HAL_HANDLE_ERROR;
   return 0;
 }
 
 HAL_Bool HAL_GetUserActive6V(int32_t* status) {
   initializePower(status);
-    *status = HAL_HANDLE_ERROR;
+  *status = HAL_HANDLE_ERROR;
   return 0;
 }
 

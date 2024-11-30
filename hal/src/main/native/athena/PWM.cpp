@@ -12,10 +12,10 @@
 #include <fmt/format.h>
 #include <wpi/print.h>
 
-#include "ConstantsInternal.h"
-#include "DigitalInternal.h"
 #include "../robotshared/HALInitializer.h"
 #include "../robotshared/HALInternal.h"
+#include "ConstantsInternal.h"
+#include "DigitalInternal.h"
 #include "PortsInternal.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/HandlesInternal.h"

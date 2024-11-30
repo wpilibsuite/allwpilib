@@ -10,8 +10,8 @@
 #include "../robotshared/HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/AnalogAccumulator.h"
-#include "hal/handles/HandlesInternal.h"
 #include "hal/Errors.h"
+#include "hal/handles/HandlesInternal.h"
 
 namespace hal::init {
 void InitializeAnalogInput() {}
@@ -29,8 +29,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   return HAL_kInvalidHandle;
 }
 
-void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle) {
-}
+void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle) {}
 
 HAL_Bool HAL_CheckAnalogModule(int32_t module) {
   return module == 1;
@@ -61,7 +60,7 @@ void HAL_SetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
 
 int32_t HAL_GetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
                                  int32_t* status) {
- *status = HAL_HANDLE_ERROR;
+  *status = HAL_HANDLE_ERROR;
   return 0;
 }
 

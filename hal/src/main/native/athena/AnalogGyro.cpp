@@ -10,9 +10,9 @@
 
 #include <wpi/print.h>
 
-#include "AnalogInternal.h"
 #include "../robotshared/HALInitializer.h"
 #include "../robotshared/HALInternal.h"
+#include "AnalogInternal.h"
 #include "hal/AnalogAccumulator.h"
 #include "hal/AnalogInput.h"
 #include "hal/handles/IndexedHandleResource.h"

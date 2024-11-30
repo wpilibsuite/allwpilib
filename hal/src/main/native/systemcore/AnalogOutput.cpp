@@ -16,8 +16,7 @@
 using namespace hal;
 
 namespace hal::init {
-void InitializeAnalogOutput() {
-}
+void InitializeAnalogOutput() {}
 }  // namespace hal::init
 
 extern "C" {
@@ -35,8 +34,7 @@ HAL_Bool HAL_CheckAnalogOutputChannel(int32_t channel) {
   return channel < kNumAnalogOutputs && channel >= 0;
 }
 
-void HAL_FreeAnalogOutputPort(HAL_AnalogOutputHandle analogOutputHandle) {
-}
+void HAL_FreeAnalogOutputPort(HAL_AnalogOutputHandle analogOutputHandle) {}
 
 void HAL_SetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
                          double voltage, int32_t* status) {
@@ -46,7 +44,7 @@ void HAL_SetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
 
 double HAL_GetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
                            int32_t* status) {
-*status = HAL_HANDLE_ERROR;
+  *status = HAL_HANDLE_ERROR;
   return 0;
 }
 

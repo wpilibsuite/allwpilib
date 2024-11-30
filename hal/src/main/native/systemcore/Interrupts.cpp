@@ -19,20 +19,18 @@
 using namespace hal;
 
 namespace hal::init {
-void InitializeInterrupts() {
-}
+void InitializeInterrupts() {}
 }  // namespace hal::init
 
 extern "C" {
 
 HAL_InterruptHandle HAL_InitializeInterrupts(int32_t* status) {
   hal::init::CheckInit();
-    *status = HAL_HANDLE_ERROR;
+  *status = HAL_HANDLE_ERROR;
   return HAL_kInvalidHandle;
 }
 
-void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle) {
-}
+void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle) {}
 
 int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
                              double timeout, HAL_Bool ignorePrevious,

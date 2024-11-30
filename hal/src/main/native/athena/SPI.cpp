@@ -19,9 +19,9 @@
 #include <wpi/mutex.h>
 #include <wpi/print.h>
 
-#include "DigitalInternal.h"
 #include "../robotshared/HALInitializer.h"
 #include "../robotshared/HALInternal.h"
+#include "DigitalInternal.h"
 #include "hal/DIO.h"
 #include "hal/HAL.h"
 #include "hal/handles/HandlesInternal.h"

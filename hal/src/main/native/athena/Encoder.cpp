@@ -8,10 +8,10 @@
 
 #include <fmt/format.h>
 
-#include "EncoderInternal.h"
-#include "FPGAEncoder.h"
 #include "../robotshared/HALInitializer.h"
 #include "../robotshared/HALInternal.h"
+#include "EncoderInternal.h"
+#include "FPGAEncoder.h"
 #include "PortsInternal.h"
 #include "hal/ChipObject.h"
 #include "hal/Counter.h"

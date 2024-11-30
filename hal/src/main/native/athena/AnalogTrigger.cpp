@@ -6,11 +6,11 @@
 
 #include <memory>
 
+#include "../robotshared/HALInitializer.h"
+#include "../robotshared/HALInternal.h"
 #include "AnalogInternal.h"
 #include "ConstantsInternal.h"
 #include "DutyCycleInternal.h"
-#include "../robotshared/HALInitializer.h"
-#include "../robotshared/HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/AnalogInput.h"
 #include "hal/DutyCycle.h"

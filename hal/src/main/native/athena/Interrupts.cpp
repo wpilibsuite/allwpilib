@@ -8,9 +8,9 @@
 
 #include <wpi/SafeThread.h>
 
-#include "DigitalInternal.h"
 #include "../robotshared/HALInitializer.h"
 #include "../robotshared/HALInternal.h"
+#include "DigitalInternal.h"
 #include "PortsInternal.h"
 #include "hal/ChipObject.h"
 #include "hal/Errors.h"
