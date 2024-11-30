@@ -26,7 +26,20 @@ ext {
                     }
                 }
             }
-        } else {
+        } else if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+            it.sources {
+                systemCoreCpp(CppSourceSet) {
+                    source {
+                        srcDirs = ['src/main/native/systemcore']
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        srcDir generatedHeaders
+                    }
+                }
+            }
+        }  else {
             it.sources {
                 simCpp(CppSourceSet) {
                     source {
@@ -55,6 +68,10 @@ sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 cppSourcesZip {
     from('src/main/native/athena') {
         into '/athena'
+    }
+
+    from('src/main/native/systemcore') {
+        into '/systemcore'
     }
 
     from('src/main/native/sim') {

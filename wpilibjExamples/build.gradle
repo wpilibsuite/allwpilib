@@ -197,7 +197,7 @@ model {
                                     }
                                     testTask.systemProperty 'java.library.path', filePath
 
-                                    if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
+                                    if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
                                         testTask.enabled = false
                                     }
                                     test.dependsOn(testTask)

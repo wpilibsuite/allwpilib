@@ -12,9 +12,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/roborio-cross-ubuntu:2024-22.04
-            artifact-name: Athena
-            build-options: "-Ponlylinuxathena"
+          # - container: wpilib/roborio-cross-ubuntu:2025-22.04
+          #   artifact-name: Athena
+          #   build-options: "-Ponlylinuxathena"
+          - container: wpilib/systemcore-cross-ubuntu:2025-22.04
+            artifact-name: SystemCore
+            build-options: "-Ponlylinuxsystemcore"
           - container: wpilib/raspbian-cross-ubuntu:bullseye-22.04
             artifact-name: Arm32
             build-options: "-Ponlylinuxarm32"

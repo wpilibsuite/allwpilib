@@ -14,6 +14,8 @@ generatedFileExclude {
   hal/src/main/native/athena/frccansae/
   hal/src/main/native/athena/visa/
   hal/src/main/native/include/ctre/
+  hal/src/main/native/systemcore/ctre/
+  hal/src/main/native/systemcore/rev/
   UsageReporting\.h$
 }
 
