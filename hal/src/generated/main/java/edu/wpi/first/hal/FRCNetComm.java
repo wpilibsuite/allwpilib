@@ -421,6 +421,12 @@ public final class FRCNetComm {
     public static final int kLoggingFramework_AdvantageKit = 4;
     /** kLoggingFramework_DogLog = 5. */
     public static final int kLoggingFramework_DogLog = 5;
+    /** kPDP_CTRE = 1. */
+    public static final int kPDP_CTRE = 1;
+    /** kPDP_REV = 2. */
+    public static final int kPDP_REV = 2;
+    /** kPDP_Unknown = 3. */
+    public static final int kPDP_Unknown = 3;
   }
 
   /** Utility class. */
