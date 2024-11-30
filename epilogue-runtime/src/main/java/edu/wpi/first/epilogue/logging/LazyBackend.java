@@ -11,36 +11,36 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * A data logger implementation that only logs data when it changes. Useful for keeping bandwidth
- * and file sizes down. However, because it still needs to check that data has changed, it cannot
- * avoid expensive sensor reads.
+ * A backend implementation that only logs data when it changes. Useful for keeping bandwidth and
+ * file sizes down. However, because it still needs to check that data has changed, it cannot avoid
+ * expensive sensor reads.
  */
-public class LazyLogger implements DataLogger {
-  private final DataLogger m_logger;
+public class LazyBackend implements EpilogueBackend {
+  private final EpilogueBackend m_backend;
 
   // Keep a record of the most recent value written to each entry
   // Note that this may duplicate a lot of data, and will box primitives.
   private final Map<String, Object> m_previousValues = new HashMap<>();
-  private final Map<String, SubLogger> m_subLoggers = new HashMap<>();
+  private final Map<String, NestedBackend> m_subLoggers = new HashMap<>();
 
   /**
-   * Creates a new lazy logger wrapper around another logger.
+   * Creates a new lazy backend wrapper around another backend.
    *
-   * @param logger the logger to delegate to
+   * @param backend the backend to delegate to
    */
-  public LazyLogger(DataLogger logger) {
-    this.m_logger = logger;
+  public LazyBackend(EpilogueBackend backend) {
+    this.m_backend = backend;
   }
 
   @Override
-  public DataLogger lazy() {
+  public EpilogueBackend lazy() {
     // Already lazy, don't need to wrap it again
     return this;
   }
 
   @Override
-  public DataLogger getSubLogger(String path) {
-    return m_subLoggers.computeIfAbsent(path, k -> new SubLogger(k, this));
+  public EpilogueBackend getNested(String path) {
+    return m_subLoggers.computeIfAbsent(path, k -> new NestedBackend(k, this));
   }
 
   @Override
@@ -53,7 +53,7 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value);
+    m_backend.log(identifier, value);
   }
 
   @Override
@@ -66,7 +66,7 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value);
+    m_backend.log(identifier, value);
   }
 
   @Override
@@ -79,7 +79,7 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value);
+    m_backend.log(identifier, value);
   }
 
   @Override
@@ -92,7 +92,7 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value);
+    m_backend.log(identifier, value);
   }
 
   @Override
@@ -105,7 +105,7 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value);
+    m_backend.log(identifier, value);
   }
 
   @Override
@@ -118,7 +118,7 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value);
+    m_backend.log(identifier, value);
   }
 
   @Override
@@ -131,7 +131,7 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value);
+    m_backend.log(identifier, value);
   }
 
   @Override
@@ -144,7 +144,7 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value);
+    m_backend.log(identifier, value);
   }
 
   @Override
@@ -157,7 +157,7 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value);
+    m_backend.log(identifier, value);
   }
 
   @Override
@@ -170,7 +170,7 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value);
+    m_backend.log(identifier, value);
   }
 
   @Override
@@ -183,7 +183,7 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value);
+    m_backend.log(identifier, value);
   }
 
   @Override
@@ -196,7 +196,7 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value);
+    m_backend.log(identifier, value);
   }
 
   @Override
@@ -209,7 +209,7 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value);
+    m_backend.log(identifier, value);
   }
 
   @Override
@@ -222,7 +222,7 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value, struct);
+    m_backend.log(identifier, value, struct);
   }
 
   @Override
@@ -235,6 +235,6 @@ public class LazyLogger implements DataLogger {
     }
 
     m_previousValues.put(identifier, value);
-    m_logger.log(identifier, value, struct);
+    m_backend.log(identifier, value, struct);
   }
 }

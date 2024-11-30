@@ -32,7 +32,7 @@ public class ConfiguredLoggerHandler extends ElementHandler {
 
     return "Epilogue."
         + StringUtils.lowerCamelCase(loggerType.asElement().getSimpleName())
-        + ".tryUpdate(dataLogger.getSubLogger(\""
+        + ".tryUpdate(backend.getNested(\""
         + loggedName(element)
         + "\"), "
         + elementAccess(element)

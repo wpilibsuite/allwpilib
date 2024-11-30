@@ -192,7 +192,7 @@ public class LoggerGenerator {
       out.println("import edu.wpi.first.epilogue.Logged;");
       out.println("import edu.wpi.first.epilogue.Epilogue;");
       out.println("import edu.wpi.first.epilogue.logging.ClassSpecificLogger;");
-      out.println("import edu.wpi.first.epilogue.logging.DataLogger;");
+      out.println("import edu.wpi.first.epilogue.logging.EpilogueBackend;");
       if (requiresVarHandles) {
         out.println("import java.lang.invoke.MethodHandles;");
         out.println("import java.lang.invoke.VarHandle;");
@@ -255,7 +255,8 @@ public class LoggerGenerator {
       // @Override
       // public void update(DataLogger dataLogger, Foo object) {
       out.println("  @Override");
-      out.println("  public void update(DataLogger dataLogger, " + simpleClassName + " object) {");
+      out.println(
+          "  public void update(EpilogueBackend backend, " + simpleClassName + " object) {");
 
       // Build a map of importance levels to the fields logged at those levels
       // e.g. { DEBUG: [fieldA, fieldB], INFO: [fieldC], CRITICAL: [fieldD, fieldE, fieldF] }
