@@ -82,7 +82,7 @@ deploy {
                 all {
                     postdeploy << { ctx ->
                         ctx.execute("sync")
-                        ctx.execute("sudo ldconfig")
+                        ctx.execute("sudo ldconfig /home/systemcore/frc/third-party/lib")
                     }
                 }
 
