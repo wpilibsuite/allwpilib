@@ -31,7 +31,7 @@
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
-#include "hal/roborio/HMB.h"
+#include "SystemServer.h"
 
 using namespace hal;
 
