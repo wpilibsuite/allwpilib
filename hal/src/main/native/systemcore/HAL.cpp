@@ -27,11 +27,11 @@
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
-#include "SystemServer.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/roborio/HMB.h"
 
 using namespace hal;
 
@@ -60,6 +60,7 @@ void InitializeHAL() {
   InitializeConstants();
   InitializeCounter();
   InitializeDIO();
+  InitializeDMA();
   InitializeDutyCycle();
   InitializeEncoder();
   InitializeFRCDriverStation();
@@ -73,10 +74,10 @@ void InitializeHAL() {
   InitializePorts();
   InitializePower();
   InitializePWM();
+  InitializeRelay();
   InitializeSerialPort();
-  InitializeSmartIo();
+  InitializeSPI();
   InitializeThreads();
-  InitializeUsageReporting();
 }
 }  // namespace init
 
@@ -336,8 +337,6 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   prctl(PR_SET_PDEATHSIG, SIGTERM);
 
-  hal::InitializeSystemServer();
-
   // // Return false if program failed to kill an existing program
   // if (!killExistingProgram(timeout, mode)) {
   //   return false;
@@ -365,5 +364,17 @@ void HAL_Shutdown(void) {}
 void HAL_SimPeriodicBefore(void) {}
 
 void HAL_SimPeriodicAfter(void) {}
+
+int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
+                   const char* feature) {
+  if (feature == nullptr) {
+    feature = "";
+  }
+
+  return 0;
+
+  // return FRC_NetworkCommunication_nUsageReporting_report(
+  //     resource, instanceNumber, context, feature);
+}
 
 }  // extern "C"
