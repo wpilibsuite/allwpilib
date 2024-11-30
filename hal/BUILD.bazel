@@ -15,7 +15,10 @@ filegroup(
     visibility = ["//hal:__subpackages__"],
 )
 
-ATHENA_SRCS = glob(["src/main/native/athena/**", "src/main/native/robotshared/**"])
+ATHENA_SRCS = glob([
+    "src/main/native/athena/**",
+    "src/main/native/robotshared/**"
+])
 
 ATHENA_DEPS = ["@bzlmodrio-ni//libraries/cpp/ni:shared"]
 
