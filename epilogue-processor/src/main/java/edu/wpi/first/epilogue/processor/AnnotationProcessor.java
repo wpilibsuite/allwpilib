@@ -86,7 +86,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                   .getMessager()
                   .printMessage(
                       Diagnostic.Kind.ERROR,
-                      "Custom logger classes should have a @CustomLoggerFor annotation",
+                      "[EPILOGUE] Custom logger classes should have a @CustomLoggerFor annotation",
                       e);
             });
 
@@ -284,7 +284,7 @@ public class AnnotationProcessor extends AbstractProcessor {
             .getMessager()
             .printMessage(
                 Diagnostic.Kind.ERROR,
-                "Logger classes must have a public no-argument constructor",
+                "[EPILOGUE] Logger classes must have a public no-argument constructor",
                 annotatedElement);
         continue;
       }
@@ -306,7 +306,17 @@ public class AnnotationProcessor extends AbstractProcessor {
               .getMessager()
               .printMessage(
                   Diagnostic.Kind.ERROR,
-                  "Multiple custom loggers detected for type " + targetType,
+                  "[EPILOGUE] Multiple custom loggers detected for type " + targetType,
+                  annotatedElement);
+          continue;
+        }
+
+        if (annotatedElement instanceof TypeElement t && !t.getTypeParameters().isEmpty()) {
+          processingEnv
+              .getMessager()
+              .printMessage(
+                  Diagnostic.Kind.ERROR,
+                  "[EPILOGUE] Custom logger classes cannot take generic type arguments",
                   annotatedElement);
           continue;
         }
@@ -318,7 +328,7 @@ public class AnnotationProcessor extends AbstractProcessor {
               .getMessager()
               .printMessage(
                   Diagnostic.Kind.ERROR,
-                  "Not a subclass of ClassSpecificLogger<" + targetType + ">",
+                  "[EPILOGUE] Not a subclass of ClassSpecificLogger<" + targetType + ">",
                   annotatedElement);
           continue;
         }
@@ -368,7 +378,7 @@ public class AnnotationProcessor extends AbstractProcessor {
             .getMessager()
             .printMessage(
                 Diagnostic.Kind.ERROR,
-                "Could not write logger file for " + clazz.getQualifiedName(),
+                "[EPILOGUE] Could not write logger file for " + clazz.getQualifiedName(),
                 clazz);
         e.printStackTrace(System.err);
       }

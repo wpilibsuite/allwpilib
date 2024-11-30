@@ -1471,6 +1471,106 @@ class AnnotationProcessorTest {
   }
 
   @Test
+  void customGenericLogger() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.logging.*;
+        import edu.wpi.first.math.numbers.*;
+        import edu.wpi.first.math.Num;
+        import edu.wpi.first.math.Vector;
+
+        @CustomLoggerFor(Vector.class)
+        class VectorLogger extends ClassSpecificLogger<Vector<?>> {
+          public VectorLogger() {
+            super((Class) Vector.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Vector<?> object) {
+            // Implementation is irrelevant
+          }
+        }
+
+        @Logged
+        class Example {
+          Vector<N3> vec;
+        }
+        """;
+
+    String expectedGeneratedSource =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.DataLogger;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              Epilogue.vectorLogger.tryUpdate(dataLogger.getSubLogger("vec"), object.vec, Epilogue.getConfig().errorHandler);
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void genericLoggerForGenericType() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.logging.*;
+
+        class Generic<T> { }
+
+        @CustomLoggerFor(Generic.class)
+        // Invalid: loggers cannot take type arguments
+        class GenericLogger<T> extends ClassSpecificLogger<Generic<T>> {
+          public GenericLogger() {
+            super((Class) Generic.class);
+          }
+
+          @Override
+          public void update(DataLogger dataLogger, Generic<T> object) {
+            // Implementation is irrelevant
+          }
+        }
+
+        @Logged
+        class Example {
+          Generic<String> genericField;
+        }
+        """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .withProcessors(new AnnotationProcessor())
+            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+
+    assertThat(compilation).failed();
+    assertThat(compilation).hadErrorCount(1);
+
+    assertCompilationError(
+        "[EPILOGUE] Custom logger classes cannot take generic type arguments",
+        9,
+        1,
+        compilation.errors().get(0));
+  }
+
+  @Test
   void warnsAboutNonLoggableFields() {
     String source =
         """
