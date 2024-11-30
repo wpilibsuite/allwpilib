@@ -27,7 +27,20 @@ ext {
                     }
                 }
             }
-        } else {
+        } else if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+            it.sources {
+                systemCoreCpp(CppSourceSet) {
+                    source {
+                        srcDirs = ['src/main/native/systemcore']
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        srcDir generatedHeaders
+                    }
+                }
+            }
+        }  else {
             it.sources {
                 simCpp(CppSourceSet) {
                     source {

@@ -18,20 +18,20 @@
 #include <utility>
 
 #include <wpi/MemoryBuffer.h>
+#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/mutex.h>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
 
-#include "CANInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
-#include "SystemServerInternal.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/roborio/HMB.h"
 
 using namespace hal;
 
@@ -49,16 +49,24 @@ void InitializeHAL() {
   InitializeCTREPCM();
   InitializeREVPH();
   InitializeAddressableLED();
+  InitializeAccelerometer();
+  InitializeAnalogAccumulator();
+  InitializeAnalogGyro();
   InitializeAnalogInput();
+  InitializeAnalogOutput();
+  InitializeAnalogTrigger();
   InitializeCAN();
   InitializeCANAPI();
   InitializeConstants();
   InitializeCounter();
   InitializeDIO();
+  InitializeDMA();
   InitializeDutyCycle();
   InitializeEncoder();
   InitializeFRCDriverStation();
   InitializeI2C();
+  InitializeInterrupts();
+  InitializeLEDs();
   InitializeMain();
   InitializeNotifier();
   InitializeCTREPDP();
@@ -66,10 +74,10 @@ void InitializeHAL() {
   InitializePorts();
   InitializePower();
   InitializePWM();
+  InitializeRelay();
   InitializeSerialPort();
-  InitializeSmartIo();
+  InitializeSPI();
   InitializeThreads();
-  InitializeUsageReporting();
 }
 }  // namespace init
 
@@ -80,6 +88,25 @@ uint64_t GetDSInitializeTime() {
 }  // namespace hal
 
 extern "C" {
+
+HAL_PortHandle HAL_GetPort(int32_t channel) {
+  // Dont allow a number that wouldn't fit in a uint8_t
+  if (channel < 0 || channel >= 255) {
+    return HAL_kInvalidHandle;
+  }
+  return createPortHandle(channel, 1);
+}
+
+HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel) {
+  // Dont allow a number that wouldn't fit in a uint8_t
+  if (channel < 0 || channel >= 255) {
+    return HAL_kInvalidHandle;
+  }
+  if (module < 0 || module >= 255) {
+    return HAL_kInvalidHandle;
+  }
+  return createPortHandle(channel, module);
+}
 
 const char* HAL_GetErrorMessage(int32_t code) {
   switch (code) {
@@ -204,15 +231,16 @@ void InitializeTeamNumber(void) {
   std::string_view hostname{hostnameBuf, sizeof(hostnameBuf)};
 
   // hostname is frc-{TEAM}-roborio
-  // Split string around '-' (max of 2 splits), take the second element
-  teamNumber = 0;
-  int i = 0;
-  wpi::split(hostname, '-', 2, false, [&](auto part) {
-    if (i == 1) {
-      teamNumber = wpi::parse_integer<int32_t>(part, 10).value_or(0);
-    }
-    ++i;
-  });
+  // Split string around '-' (max of 2 splits), take the second element of the
+  // resulting array.
+  wpi::SmallVector<std::string_view> elements;
+  wpi::split(hostname, elements, "-", 2);
+  if (elements.size() < 3) {
+    teamNumber = 0;
+    return;
+  }
+
+  teamNumber = wpi::parse_integer<int32_t>(elements[1], 10).value_or(0);
 }
 
 int32_t HAL_GetTeamNumber(void) {
@@ -251,6 +279,12 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
   return (upper << 32) + static_cast<uint64_t>(unexpandedLower);
 }
 
+HAL_Bool HAL_GetFPGAButton(int32_t* status) {
+  hal::init::CheckInit();
+  *status = HAL_HANDLE_ERROR;
+  return false;
+}
+
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
   hal::init::CheckInit();
   *status = HAL_HANDLE_ERROR;
@@ -276,6 +310,7 @@ HAL_Bool HAL_GetRSLState(int32_t* status) {
 }
 
 HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
+  *status = HAL_HANDLE_ERROR;
   return false;
 }
 
@@ -301,13 +336,6 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   setlinebuf(stdout);
 
   prctl(PR_SET_PDEATHSIG, SIGTERM);
-
-  if (!hal::InitializeCanBuses()) {
-    std::printf("Failed to initialize can buses\n");
-    return false;
-  }
-
-  hal::InitializeSystemServer();
 
   // // Return false if program failed to kill an existing program
   // if (!killExistingProgram(timeout, mode)) {
@@ -336,5 +364,17 @@ void HAL_Shutdown(void) {}
 void HAL_SimPeriodicBefore(void) {}
 
 void HAL_SimPeriodicAfter(void) {}
+
+int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
+                   const char* feature) {
+  if (feature == nullptr) {
+    feature = "";
+  }
+
+  return 0;
+
+  // return FRC_NetworkCommunication_nUsageReporting_report(
+  //     resource, instanceNumber, context, feature);
+}
 
 }  // extern "C"

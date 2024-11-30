@@ -84,33 +84,37 @@ void InitializeREVPH() {
 }  // namespace hal::init
 
 static PH_status_0_t HAL_ReadREVPHStatus0(HAL_CANHandle hcan, int32_t* status) {
-  HAL_CANReceiveMessage message;
+  uint8_t packedData[8] = {0};
+  int32_t length = 0;
+  uint64_t timestamp = 0;
   PH_status_0_t result = {};
 
-  HAL_ReadCANPacketTimeout(hcan, PH_STATUS_0_FRAME_API, &message,
-                           kPHFrameStatus0Timeout * 2, status);
+  HAL_ReadCANPacketTimeout(hcan, PH_STATUS_0_FRAME_API, packedData, &length,
+                           &timestamp, kPHFrameStatus0Timeout * 2, status);
 
   if (*status != 0) {
     return result;
   }
 
-  PH_status_0_unpack(&result, message.message.data, PH_STATUS_0_LENGTH);
+  PH_status_0_unpack(&result, packedData, PH_STATUS_0_LENGTH);
 
   return result;
 }
 
 static PH_status_1_t HAL_ReadREVPHStatus1(HAL_CANHandle hcan, int32_t* status) {
-  HAL_CANReceiveMessage message;
+  uint8_t packedData[8] = {0};
+  int32_t length = 0;
+  uint64_t timestamp = 0;
   PH_status_1_t result = {};
 
-  HAL_ReadCANPacketTimeout(hcan, PH_STATUS_1_FRAME_API, &message,
-                           kPHFrameStatus1Timeout * 2, status);
+  HAL_ReadCANPacketTimeout(hcan, PH_STATUS_1_FRAME_API, packedData, &length,
+                           &timestamp, kPHFrameStatus1Timeout * 2, status);
 
   if (*status != 0) {
     return result;
   }
 
-  PH_status_1_unpack(&result, message.message.data, PH_STATUS_1_LENGTH);
+  PH_status_1_unpack(&result, packedData, PH_STATUS_1_LENGTH);
 
   return result;
 }
@@ -177,21 +181,17 @@ static void HAL_UpdateDesiredREVPHSolenoidState(REV_PHObj* hph,
 }
 
 static void HAL_SendREVPHSolenoidsState(REV_PHObj* hph, int32_t* status) {
-  HAL_CANMessage message;
-  std::memset(&message, 0, sizeof(message));
-  message.dataSize = PH_SET_ALL_LENGTH;
-  PH_set_all_pack(message.data, &(hph->desiredSolenoidsState),
-                  PH_SET_ALL_LENGTH);
-
-  HAL_WriteCANPacketRepeating(hph->hcan, PH_SET_ALL_FRAME_API, &message,
-                              hph->controlPeriod, status);
+  uint8_t packedData[PH_SET_ALL_LENGTH] = {0};
+  PH_set_all_pack(packedData, &(hph->desiredSolenoidsState), PH_SET_ALL_LENGTH);
+  HAL_WriteCANPacketRepeating(hph->hcan, packedData, PH_SET_ALL_LENGTH,
+                              PH_SET_ALL_FRAME_API, hph->controlPeriod, status);
 }
 
 static HAL_Bool HAL_CheckREVPHPulseTime(int32_t time) {
   return ((time > 0) && (time <= HAL_REVPH_MAX_PULSE_TIME)) ? 1 : 0;
 }
 
-HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
+HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
                                     const char* allocationLocation,
                                     int32_t* status) {
   hal::init::CheckInit();
@@ -217,7 +217,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
   }
 
   HAL_CANHandle hcan =
-      HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
+      HAL_InitializeCAN(manufacturer, module, deviceType, status);
 
   if (*status != 0) {
     REVPHHandles->Free(handle);
@@ -291,13 +291,11 @@ void HAL_SetREVPHCompressorConfig(HAL_REVPHHandle handle,
   frameData.force_disable = config->forceDisable;
   frameData.use_digital = config->useDigital;
 
-  HAL_CANMessage message;
-  std::memset(&message, 0, sizeof(message));
-  message.dataSize = PH_COMPRESSOR_CONFIG_LENGTH;
-  PH_compressor_config_pack(message.data, &frameData,
+  uint8_t packedData[PH_COMPRESSOR_CONFIG_LENGTH] = {0};
+  PH_compressor_config_pack(packedData, &frameData,
                             PH_COMPRESSOR_CONFIG_LENGTH);
-
-  HAL_WriteCANPacket(ph->hcan, PH_COMPRESSOR_CONFIG_API, &message, status);
+  HAL_WriteCANPacket(ph->hcan, packedData, PH_COMPRESSOR_CONFIG_LENGTH,
+                     PH_COMPRESSOR_CONFIG_API, status);
 }
 
 void HAL_SetREVPHClosedLoopControlDisabled(HAL_REVPHHandle handle,
@@ -482,6 +480,9 @@ double HAL_GetREVPHSolenoidVoltage(HAL_REVPHHandle handle, int32_t* status) {
 void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
                          int32_t* status) {
   std::memset(version, 0, sizeof(*version));
+  uint8_t packedData[8] = {0};
+  int32_t length = 0;
+  uint64_t timestamp = 0;
   PH_version_t result = {};
   auto ph = REVPHHandles->Get(handle);
   if (ph == nullptr) {
@@ -501,20 +502,17 @@ void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
     return;
   }
 
-  HAL_CANMessage rtrmessage;
-  std::memset(&rtrmessage, 0, sizeof(rtrmessage));
-  rtrmessage.dataSize = PH_VERSION_LENGTH;
-
-  HAL_WriteCANRTRFrame(ph->hcan, PH_VERSION_FRAME_API, &rtrmessage, status);
+  HAL_WriteCANRTRFrame(ph->hcan, PH_VERSION_LENGTH, PH_VERSION_FRAME_API,
+                       status);
 
   if (*status != 0) {
     return;
   }
 
   uint32_t timeoutMs = 100;
-  HAL_CANReceiveMessage message;
   for (uint32_t i = 0; i <= timeoutMs; i++) {
-    HAL_ReadCANPacketNew(ph->hcan, PH_VERSION_FRAME_API, &message, status);
+    HAL_ReadCANPacketNew(ph->hcan, PH_VERSION_FRAME_API, packedData, &length,
+                         &timestamp, status);
     if (*status == 0) {
       break;
     }
@@ -525,7 +523,7 @@ void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
     return;
   }
 
-  PH_version_unpack(&result, message.message.data, PH_VERSION_LENGTH);
+  PH_version_unpack(&result, packedData, PH_VERSION_LENGTH);
 
   version->firmwareMajor = result.firmware_year;
   version->firmwareMinor = result.firmware_minor;
@@ -685,11 +683,10 @@ void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
   }
 
   // Send pulse command
-  HAL_CANMessage message;
-  std::memset(&message, 0, sizeof(message));
-  message.dataSize = PH_PULSE_ONCE_LENGTH;
-  PH_pulse_once_pack(message.data, &pulse, PH_PULSE_ONCE_LENGTH);
-  HAL_WriteCANPacket(ph->hcan, PH_PULSE_ONCE_FRAME_API, &message, status);
+  uint8_t packedData[PH_PULSE_ONCE_LENGTH] = {0};
+  PH_pulse_once_pack(packedData, &pulse, PH_PULSE_ONCE_LENGTH);
+  HAL_WriteCANPacket(ph->hcan, packedData, PH_PULSE_ONCE_LENGTH,
+                     PH_PULSE_ONCE_FRAME_API, status);
 }
 
 void HAL_GetREVPHFaults(HAL_REVPHHandle handle, HAL_REVPHFaults* faults,
@@ -755,11 +752,9 @@ void HAL_ClearREVPHStickyFaults(HAL_REVPHHandle handle, int32_t* status) {
     return;
   }
 
-  HAL_CANMessage message;
-  std::memset(&message, 0, sizeof(message));
-  message.dataSize = PH_CLEAR_FAULTS_LENGTH;
-
-  HAL_WriteCANPacket(ph->hcan, PH_CLEAR_FAULTS_FRAME_API, &message, status);
+  uint8_t packedData[8] = {0};
+  HAL_WriteCANPacket(ph->hcan, packedData, PH_CLEAR_FAULTS_LENGTH,
+                     PH_CLEAR_FAULTS_FRAME_API, status);
 }
 
 int32_t HAL_GetREVPHSolenoidDisabledList(HAL_REVPHHandle handle,

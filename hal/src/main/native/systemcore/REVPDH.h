@@ -25,7 +25,7 @@ extern "C" {
  * @param module       the device CAN ID (1 .. 63)
  * @return the created PDH handle
  */
-HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t busId, int32_t module,
+HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t module,
                                       const char* allocationLocation,
                                       int32_t* status);
 

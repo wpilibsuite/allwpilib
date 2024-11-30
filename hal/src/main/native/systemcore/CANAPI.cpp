@@ -9,10 +9,8 @@
 
 #include <wpi/DenseMap.h>
 #include <wpi/mutex.h>
-#include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
-#include "PortsInternal.h"
 #include "hal/CAN.h"
 #include "hal/Errors.h"
 #include "hal/handles/UnlimitedHandleResource.h"
@@ -20,15 +18,20 @@
 using namespace hal;
 
 namespace {
+struct Receives {
+  uint32_t lastTimeStamp;
+  uint8_t data[8];
+  uint8_t length;
+};
+
 struct CANStorage {
   HAL_CANManufacturer manufacturer;
   HAL_CANDeviceType deviceType;
-  int32_t busId;
   uint8_t deviceId;
   wpi::mutex periodicSendsMutex;
   wpi::SmallDenseMap<int32_t, int32_t> periodicSends;
   wpi::mutex receivesMutex;
-  wpi::SmallDenseMap<int32_t, HAL_CANReceiveMessage> receives;
+  wpi::SmallDenseMap<int32_t, Receives> receives;
 };
 }  // namespace
 
@@ -54,16 +57,19 @@ static int32_t CreateCANId(CANStorage* storage, int32_t apiId) {
 
 extern "C" {
 
-HAL_CANHandle HAL_InitializeCAN(int32_t busId, HAL_CANManufacturer manufacturer,
+uint32_t HAL_GetCANPacketBaseTime(void) {
+  timespec t;
+  clock_gettime(CLOCK_MONOTONIC, &t);
+
+  // Convert t to milliseconds
+  uint64_t ms = t.tv_sec * 1000ull + t.tv_nsec / 1000000ull;
+  return ms & 0xFFFFFFFF;
+}
+
+HAL_CANHandle HAL_InitializeCAN(HAL_CANManufacturer manufacturer,
                                 int32_t deviceId, HAL_CANDeviceType deviceType,
                                 int32_t* status) {
   hal::init::CheckInit();
-
-  if (busId < 0 || busId > hal::kNumCanBuses) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return HAL_kInvalidHandle;
-  }
-
   auto can = std::make_shared<CANStorage>();
 
   auto handle = canHandles->Allocate(can);
@@ -73,7 +79,6 @@ HAL_CANHandle HAL_InitializeCAN(int32_t busId, HAL_CANManufacturer manufacturer,
     return HAL_kInvalidHandle;
   }
 
-  can->busId = busId;
   can->deviceId = deviceId;
   can->deviceType = deviceType;
   can->manufacturer = manufacturer;
@@ -92,16 +97,13 @@ void HAL_CleanCAN(HAL_CANHandle handle) {
   for (auto&& i : data->periodicSends) {
     int32_t s = 0;
     auto id = CreateCANId(data.get(), i.first);
-    HAL_CANMessage message;
-    std::memset(&message, 0, sizeof(message));
-    HAL_CAN_SendMessage(data->busId, id, &message,
-                        HAL_CAN_SEND_PERIOD_STOP_REPEATING, &s);
+    HAL_CAN_SendMessage(id, nullptr, 0, HAL_CAN_SEND_PERIOD_STOP_REPEATING, &s);
     i.second = -1;
   }
 }
 
-void HAL_WriteCANPacket(HAL_CANHandle handle, int32_t apiId,
-                        const struct HAL_CANMessage* message, int32_t* status) {
+void HAL_WriteCANPacket(HAL_CANHandle handle, const uint8_t* data,
+                        int32_t length, int32_t apiId, int32_t* status) {
   auto can = canHandles->Get(handle);
   if (!can) {
     *status = HAL_HANDLE_ERROR;
@@ -110,13 +112,12 @@ void HAL_WriteCANPacket(HAL_CANHandle handle, int32_t apiId,
   auto id = CreateCANId(can.get(), apiId);
 
   std::scoped_lock lock(can->periodicSendsMutex);
-  HAL_CAN_SendMessage(can->busId, id, message, HAL_CAN_SEND_PERIOD_NO_REPEAT,
-                      status);
+  HAL_CAN_SendMessage(id, data, length, HAL_CAN_SEND_PERIOD_NO_REPEAT, status);
   can->periodicSends[apiId] = -1;
 }
 
-void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
-                                 const struct HAL_CANMessage* message,
+void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, const uint8_t* data,
+                                 int32_t length, int32_t apiId,
                                  int32_t repeatMs, int32_t* status) {
   auto can = canHandles->Get(handle);
   if (!can) {
@@ -126,12 +127,11 @@ void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
   auto id = CreateCANId(can.get(), apiId);
 
   std::scoped_lock lock(can->periodicSendsMutex);
-  HAL_CAN_SendMessage(can->busId, id, message, repeatMs, status);
+  HAL_CAN_SendMessage(id, data, length, repeatMs, status);
   can->periodicSends[apiId] = repeatMs;
 }
 
-void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t apiId,
-                          const struct HAL_CANMessage* message,
+void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t length, int32_t apiId,
                           int32_t* status) {
   auto can = canHandles->Get(handle);
   if (!can) {
@@ -140,10 +140,11 @@ void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t apiId,
   }
   auto id = CreateCANId(can.get(), apiId);
   id |= HAL_CAN_IS_FRAME_REMOTE;
+  uint8_t data[8];
+  std::memset(data, 0, sizeof(data));
 
   std::scoped_lock lock(can->periodicSendsMutex);
-  HAL_CAN_SendMessage(can->busId, id, message, HAL_CAN_SEND_PERIOD_NO_REPEAT,
-                      status);
+  HAL_CAN_SendMessage(id, data, length, HAL_CAN_SEND_PERIOD_NO_REPEAT, status);
   can->periodicSends[apiId] = -1;
 }
 
@@ -156,17 +157,14 @@ void HAL_StopCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
   }
   auto id = CreateCANId(can.get(), apiId);
 
-  HAL_CANMessage message;
-  std::memset(&message, 0, sizeof(message));
-
   std::scoped_lock lock(can->periodicSendsMutex);
-  HAL_CAN_SendMessage(can->busId, id, &message,
-                      HAL_CAN_SEND_PERIOD_STOP_REPEATING, status);
+  HAL_CAN_SendMessage(id, nullptr, 0, HAL_CAN_SEND_PERIOD_STOP_REPEATING,
+                      status);
   can->periodicSends[apiId] = -1;
 }
 
-void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId,
-                          struct HAL_CANReceiveMessage* message,
+void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
+                          int32_t* length, uint64_t* receivedTimestamp,
                           int32_t* status) {
   auto can = canHandles->Get(handle);
   if (!can) {
@@ -175,17 +173,24 @@ void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId,
   }
 
   uint32_t messageId = CreateCANId(can.get(), apiId);
-
-  HAL_CAN_ReceiveMessage(can->busId, messageId, message, status);
+  uint8_t dataSize = 0;
+  uint32_t ts = 0;
+  HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
   if (*status == 0) {
     std::scoped_lock lock(can->receivesMutex);
-    can->receives[messageId] = *message;
+    auto& msg = can->receives[messageId];
+    msg.length = dataSize;
+    msg.lastTimeStamp = ts;
+    // The NetComm call placed in data, copy into the msg
+    std::memcpy(msg.data, data, dataSize);
   }
+  *length = dataSize;
+  *receivedTimestamp = ts;
 }
 
-void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId,
-                             struct HAL_CANReceiveMessage* message,
+void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
+                             int32_t* length, uint64_t* receivedTimestamp,
                              int32_t* status) {
   auto can = canHandles->Get(handle);
   if (!can) {
@@ -194,26 +199,36 @@ void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId,
   }
 
   uint32_t messageId = CreateCANId(can.get(), apiId);
-
-  HAL_CAN_ReceiveMessage(can->busId, messageId, message, status);
+  uint8_t dataSize = 0;
+  uint32_t ts = 0;
+  HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
   std::scoped_lock lock(can->receivesMutex);
   if (*status == 0) {
     // fresh update
-    can->receives[messageId] = *message;
+    auto& msg = can->receives[messageId];
+    msg.length = dataSize;
+    *length = dataSize;
+    msg.lastTimeStamp = ts;
+    *receivedTimestamp = ts;
+    // The NetComm call placed in data, copy into the msg
+    std::memcpy(msg.data, data, dataSize);
   } else {
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Read the data from the stored message into the output
-      *message = i->second;
+      std::memcpy(data, i->second.data, i->second.length);
+      *length = i->second.length;
+      *receivedTimestamp = i->second.lastTimeStamp;
       *status = 0;
     }
   }
 }
 
 void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
-                              struct HAL_CANReceiveMessage* message,
-                              int32_t timeoutMs, int32_t* status) {
+                              uint8_t* data, int32_t* length,
+                              uint64_t* receivedTimestamp, int32_t timeoutMs,
+                              int32_t* status) {
   auto can = canHandles->Get(handle);
   if (!can) {
     *status = HAL_HANDLE_ERROR;
@@ -221,26 +236,34 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
   }
 
   uint32_t messageId = CreateCANId(can.get(), apiId);
-
-  HAL_CAN_ReceiveMessage(can->busId, messageId, message, status);
+  uint8_t dataSize = 0;
+  uint32_t ts = 0;
+  HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
   std::scoped_lock lock(can->receivesMutex);
   if (*status == 0) {
     // fresh update
-    can->receives[messageId] = *message;
+    auto& msg = can->receives[messageId];
+    msg.length = dataSize;
+    *length = dataSize;
+    msg.lastTimeStamp = ts;
+    *receivedTimestamp = ts;
+    // The NetComm call placed in data, copy into the msg
+    std::memcpy(msg.data, data, dataSize);
   } else {
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
-      uint64_t now = wpi::Now();
-      if (now - i->second.timeStamp >
-          (static_cast<uint64_t>(timeoutMs) * 1000)) {
+      uint32_t now = HAL_GetCANPacketBaseTime();
+      if (now - i->second.lastTimeStamp > static_cast<uint32_t>(timeoutMs)) {
         // Timeout, return bad status
         *status = HAL_CAN_TIMEOUT;
         return;
       }
       // Read the data from the stored message into the output
-      *message = i->second;
+      std::memcpy(data, i->second.data, i->second.length);
+      *length = i->second.length;
+      *receivedTimestamp = i->second.lastTimeStamp;
       *status = 0;
     }
   }
@@ -256,8 +279,8 @@ uint32_t HAL_StartCANStream(HAL_CANHandle handle, int32_t apiId, int32_t depth,
 
   uint32_t messageId = CreateCANId(can.get(), apiId);
 
-  uint32_t session = HAL_CAN_OpenStreamSession(can->busId, messageId,
-                                               0x1FFFFFFF, depth, status);
+  uint32_t session = 0;
+  HAL_CAN_OpenStreamSession(&session, messageId, 0x1FFFFFFF, depth, status);
   return session;
 }
 }  // extern "C"

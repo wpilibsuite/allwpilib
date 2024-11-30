@@ -129,8 +129,7 @@ void InitializeCTREPDP() {
 
 extern "C" {
 
-HAL_PDPHandle HAL_InitializePDP(int32_t busId, int32_t module,
-                                const char* allocationLocation,
+HAL_PDPHandle HAL_InitializePDP(int32_t module, const char* allocationLocation,
                                 int32_t* status) {
   hal::init::CheckInit();
   if (!HAL_CheckPDPModule(module)) {
@@ -154,8 +153,7 @@ HAL_PDPHandle HAL_InitializePDP(int32_t busId, int32_t module,
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
 
-  pdp->canHandle =
-      HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
+  pdp->canHandle = HAL_InitializeCAN(manufacturer, module, deviceType, status);
   if (*status != 0) {
     pdpHandles->Free(handle);
     return HAL_kInvalidHandle;
@@ -193,16 +191,16 @@ double HAL_GetPDPTemperature(HAL_PDPHandle handle, int32_t* status) {
     return 0;
   }
 
-  HAL_CANReceiveMessage message;
   PdpStatus3 pdpStatus;
+  int32_t length = 0;
+  uint64_t receivedTimestamp = 0;
 
-  HAL_ReadCANPacketTimeout(pdp->canHandle, Status3, &message, TimeoutMs,
-                           status);
+  HAL_ReadCANPacketTimeout(pdp->canHandle, Status3, pdpStatus.data, &length,
+                           &receivedTimestamp, TimeoutMs, status);
 
   if (*status != 0) {
     return 0;
   } else {
-    std::memcpy(pdpStatus.data, message.message.data, sizeof(pdpStatus.data));
     return pdpStatus.bits.temp * 1.03250836957542 - 67.8564500484966;
   }
 }
@@ -214,16 +212,16 @@ double HAL_GetPDPVoltage(HAL_PDPHandle handle, int32_t* status) {
     return 0;
   }
 
-  HAL_CANReceiveMessage message;
   PdpStatus3 pdpStatus;
+  int32_t length = 0;
+  uint64_t receivedTimestamp = 0;
 
-  HAL_ReadCANPacketTimeout(pdp->canHandle, Status3, &message, TimeoutMs,
-                           status);
+  HAL_ReadCANPacketTimeout(pdp->canHandle, Status3, pdpStatus.data, &length,
+                           &receivedTimestamp, TimeoutMs, status);
 
   if (*status != 0) {
     return 0;
   } else {
-    std::memcpy(pdpStatus.data, message.message.data, sizeof(pdpStatus.data));
     return pdpStatus.bits.busVoltage * 0.05 + 4.0; /* 50mV per unit plus 4V. */
   }
 }
@@ -242,18 +240,18 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
     return 0;
   }
 
-  HAL_CANReceiveMessage message;
+  int32_t length = 0;
+  uint64_t receivedTimestamp = 0;
 
   double raw = 0;
 
   if (channel <= 5) {
     PdpStatus1 pdpStatus;
-    HAL_ReadCANPacketTimeout(pdp->canHandle, Status1, &message, TimeoutMs,
-                             status);
+    HAL_ReadCANPacketTimeout(pdp->canHandle, Status1, pdpStatus.data, &length,
+                             &receivedTimestamp, TimeoutMs, status);
     if (*status != 0) {
       return 0;
     }
-    std::memcpy(pdpStatus.data, message.message.data, sizeof(pdpStatus.data));
     switch (channel) {
       case 0:
         raw = (static_cast<uint32_t>(pdpStatus.bits.chan1_h8) << 2) |
@@ -282,12 +280,11 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
     }
   } else if (channel <= 11) {
     PdpStatus2 pdpStatus;
-    HAL_ReadCANPacketTimeout(pdp->canHandle, Status2, &message, TimeoutMs,
-                             status);
+    HAL_ReadCANPacketTimeout(pdp->canHandle, Status2, pdpStatus.data, &length,
+                             &receivedTimestamp, TimeoutMs, status);
     if (*status != 0) {
       return 0;
     }
-    std::memcpy(pdpStatus.data, message.message.data, sizeof(pdpStatus.data));
     switch (channel) {
       case 6:
         raw = (static_cast<uint32_t>(pdpStatus.bits.chan7_h8) << 2) |
@@ -316,12 +313,11 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
     }
   } else {
     PdpStatus3 pdpStatus;
-    HAL_ReadCANPacketTimeout(pdp->canHandle, Status3, &message, TimeoutMs,
-                             status);
+    HAL_ReadCANPacketTimeout(pdp->canHandle, Status3, pdpStatus.data, &length,
+                             &receivedTimestamp, TimeoutMs, status);
     if (*status != 0) {
       return 0;
     }
-    std::memcpy(pdpStatus.data, message.message.data, sizeof(pdpStatus.data));
     switch (channel) {
       case 12:
         raw = (static_cast<uint32_t>(pdpStatus.bits.chan13_h8) << 2) |
@@ -354,28 +350,26 @@ void HAL_GetPDPAllChannelCurrents(HAL_PDPHandle handle, double* currents,
     return;
   }
 
-  HAL_CANReceiveMessage message;
+  int32_t length = 0;
+  uint64_t receivedTimestamp = 0;
   PdpStatus1 pdpStatus;
-  HAL_ReadCANPacketTimeout(pdp->canHandle, Status1, &message, TimeoutMs,
-                           status);
+  HAL_ReadCANPacketTimeout(pdp->canHandle, Status1, pdpStatus.data, &length,
+                           &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return;
   }
-  std::memcpy(pdpStatus.data, message.message.data, sizeof(pdpStatus.data));
   PdpStatus2 pdpStatus2;
-  HAL_ReadCANPacketTimeout(pdp->canHandle, Status2, &message, TimeoutMs,
-                           status);
+  HAL_ReadCANPacketTimeout(pdp->canHandle, Status2, pdpStatus2.data, &length,
+                           &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return;
   }
-  std::memcpy(pdpStatus2.data, message.message.data, sizeof(pdpStatus2.data));
   PdpStatus3 pdpStatus3;
-  HAL_ReadCANPacketTimeout(pdp->canHandle, Status3, &message, TimeoutMs,
-                           status);
+  HAL_ReadCANPacketTimeout(pdp->canHandle, Status3, pdpStatus3.data, &length,
+                           &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return;
   }
-  std::memcpy(pdpStatus3.data, message.message.data, sizeof(pdpStatus3.data));
 
   currents[0] = ((static_cast<uint32_t>(pdpStatus.bits.chan1_h8) << 2) |
                  pdpStatus.bits.chan1_l2) *
@@ -436,15 +430,15 @@ double HAL_GetPDPTotalCurrent(HAL_PDPHandle handle, int32_t* status) {
     return 0;
   }
 
-  HAL_CANReceiveMessage message;
   PdpStatusEnergy pdpStatus;
+  int32_t length = 0;
+  uint64_t receivedTimestamp = 0;
 
-  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, &message, TimeoutMs,
-                           status);
+  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, pdpStatus.data,
+                           &length, &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return 0;
   }
-  std::memcpy(pdpStatus.data, message.message.data, sizeof(pdpStatus.data));
 
   uint32_t raw;
   raw = pdpStatus.bits.TotalCurrent_125mAperunit_h8;
@@ -460,15 +454,15 @@ double HAL_GetPDPTotalPower(HAL_PDPHandle handle, int32_t* status) {
     return 0;
   }
 
-  HAL_CANReceiveMessage message;
   PdpStatusEnergy pdpStatus;
+  int32_t length = 0;
+  uint64_t receivedTimestamp = 0;
 
-  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, &message, TimeoutMs,
-                           status);
+  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, pdpStatus.data,
+                           &length, &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return 0;
   }
-  std::memcpy(pdpStatus.data, message.message.data, sizeof(pdpStatus.data));
 
   uint32_t raw;
   raw = pdpStatus.bits.Power_125mWperunit_h4;
@@ -486,15 +480,15 @@ double HAL_GetPDPTotalEnergy(HAL_PDPHandle handle, int32_t* status) {
     return 0;
   }
 
-  HAL_CANReceiveMessage message;
   PdpStatusEnergy pdpStatus;
+  int32_t length = 0;
+  uint64_t receivedTimestamp = 0;
 
-  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, &message, TimeoutMs,
-                           status);
+  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, pdpStatus.data,
+                           &length, &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return 0;
   }
-  std::memcpy(pdpStatus.data, message.message.data, sizeof(pdpStatus.data));
 
   uint32_t raw;
   raw = pdpStatus.bits.Energy_125mWPerUnitXTmeas_h4;
@@ -520,12 +514,8 @@ void HAL_ResetPDPTotalEnergy(HAL_PDPHandle handle, int32_t* status) {
     return;
   }
 
-  HAL_CANMessage message;
-  std::memset(&message, 0, sizeof(message));
-  message.dataSize = 1;
-  message.data[0] = 0x40; /* only bit set is ResetEnergy */
-
-  HAL_WriteCANPacket(pdp->canHandle, Control1, &message, status);
+  uint8_t pdpControl[] = {0x40}; /* only bit set is ResetEnergy */
+  HAL_WriteCANPacket(pdp->canHandle, pdpControl, 1, Control1, status);
 }
 
 void HAL_ClearPDPStickyFaults(HAL_PDPHandle handle, int32_t* status) {
@@ -535,12 +525,8 @@ void HAL_ClearPDPStickyFaults(HAL_PDPHandle handle, int32_t* status) {
     return;
   }
 
-  HAL_CANMessage message;
-  std::memset(&message, 0, sizeof(message));
-  message.dataSize = 1;
-  message.data[0] = 0x80; /* only bit set is ClearStickyFaults */
-
-  HAL_WriteCANPacket(pdp->canHandle, Control1, &message, status);
+  uint8_t pdpControl[] = {0x80}; /* only bit set is ClearStickyFaults */
+  HAL_WriteCANPacket(pdp->canHandle, pdpControl, 1, Control1, status);
 }
 
 uint32_t HAL_StartCANStream(HAL_CANHandle handle, int32_t apiId, int32_t depth,
@@ -608,9 +594,8 @@ HAL_PowerDistributionChannelData* HAL_GetPDPStreamData(HAL_PDPHandle handle,
 
   for (uint32_t i = 0; i < messagesRead; i++) {
     PdpStatus1 pdpStatus;
-    std::memcpy(pdpStatus.data, messages[i].message.message.data,
-                sizeof(pdpStatus));
-    uint64_t timestamp = messages[i].message.timeStamp;
+    std::memcpy(pdpStatus.data, messages[i].data, sizeof(messages[i].data));
+    uint32_t timestamp = messages[i].timeStamp;
 
     retData[*count].current =
         ((static_cast<uint32_t>(pdpStatus.bits.chan1_h8) << 2) |
@@ -665,9 +650,8 @@ HAL_PowerDistributionChannelData* HAL_GetPDPStreamData(HAL_PDPHandle handle,
 
   for (uint32_t i = 0; i < messagesRead; i++) {
     PdpStatus2 pdpStatus;
-    std::memcpy(pdpStatus.data, messages[i].message.message.data,
-                sizeof(pdpStatus));
-    uint64_t timestamp = messages[i].message.timeStamp;
+    std::memcpy(pdpStatus.data, messages[i].data, sizeof(messages[i].data));
+    uint32_t timestamp = messages[i].timeStamp;
 
     retData[*count].current =
         ((static_cast<uint32_t>(pdpStatus.bits.chan7_h8) << 2) |
@@ -722,9 +706,8 @@ HAL_PowerDistributionChannelData* HAL_GetPDPStreamData(HAL_PDPHandle handle,
 
   for (uint32_t i = 0; i < messagesRead; i++) {
     PdpStatus3 pdpStatus;
-    std::memcpy(pdpStatus.data, messages[i].message.message.data,
-                sizeof(pdpStatus));
-    uint64_t timestamp = messages[i].message.timeStamp;
+    std::memcpy(pdpStatus.data, messages[i].data, sizeof(messages[i].data));
+    uint32_t timestamp = messages[i].timeStamp;
 
     retData[*count].current =
         ((static_cast<uint32_t>(pdpStatus.bits.chan13_h8) << 2) |

@@ -91,85 +91,95 @@ extern "C" {
 
 static PDH_status_0_t HAL_ReadREVPDHStatus0(HAL_CANHandle hcan,
                                             int32_t* status) {
-  HAL_CANReceiveMessage message;
+  uint8_t packedData[8] = {0};
+  int32_t length = 0;
+  uint64_t timestamp = 0;
   PDH_status_0_t result = {};
 
-  HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_0_FRAME_API, &message,
-                           kPDHFrameStatus0Timeout * 2, status);
+  HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_0_FRAME_API, packedData, &length,
+                           &timestamp, kPDHFrameStatus0Timeout * 2, status);
 
   if (*status != 0) {
     return result;
   }
 
-  PDH_status_0_unpack(&result, message.message.data, PDH_STATUS_0_LENGTH);
+  PDH_status_0_unpack(&result, packedData, PDH_STATUS_0_LENGTH);
 
   return result;
 }
 
 static PDH_status_1_t HAL_ReadREVPDHStatus1(HAL_CANHandle hcan,
                                             int32_t* status) {
-  HAL_CANReceiveMessage message;
+  uint8_t packedData[8] = {0};
+  int32_t length = 0;
+  uint64_t timestamp = 0;
   PDH_status_1_t result = {};
 
-  HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_1_FRAME_API, &message,
-                           kPDHFrameStatus1Timeout * 2, status);
+  HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_1_FRAME_API, packedData, &length,
+                           &timestamp, kPDHFrameStatus1Timeout * 2, status);
 
   if (*status != 0) {
     return result;
   }
 
-  PDH_status_1_unpack(&result, message.message.data, PDH_STATUS_1_LENGTH);
+  PDH_status_1_unpack(&result, packedData, PDH_STATUS_1_LENGTH);
 
   return result;
 }
 
 static PDH_status_2_t HAL_ReadREVPDHStatus2(HAL_CANHandle hcan,
                                             int32_t* status) {
-  HAL_CANReceiveMessage message;
+  uint8_t packedData[8] = {0};
+  int32_t length = 0;
+  uint64_t timestamp = 0;
   PDH_status_2_t result = {};
 
-  HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_2_FRAME_API, &message,
-                           kPDHFrameStatus2Timeout * 2, status);
+  HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_2_FRAME_API, packedData, &length,
+                           &timestamp, kPDHFrameStatus2Timeout * 2, status);
 
   if (*status != 0) {
     return result;
   }
 
-  PDH_status_2_unpack(&result, message.message.data, PDH_STATUS_2_LENGTH);
+  PDH_status_2_unpack(&result, packedData, PDH_STATUS_2_LENGTH);
 
   return result;
 }
 
 static PDH_status_3_t HAL_ReadREVPDHStatus3(HAL_CANHandle hcan,
                                             int32_t* status) {
-  HAL_CANReceiveMessage message;
+  uint8_t packedData[8] = {0};
+  int32_t length = 0;
+  uint64_t timestamp = 0;
   PDH_status_3_t result = {};
 
-  HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_3_FRAME_API, &message,
-                           kPDHFrameStatus3Timeout * 2, status);
+  HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_3_FRAME_API, packedData, &length,
+                           &timestamp, kPDHFrameStatus3Timeout * 2, status);
 
   if (*status != 0) {
     return result;
   }
 
-  PDH_status_3_unpack(&result, message.message.data, PDH_STATUS_3_LENGTH);
+  PDH_status_3_unpack(&result, packedData, PDH_STATUS_3_LENGTH);
 
   return result;
 }
 
 static PDH_status_4_t HAL_ReadREVPDHStatus4(HAL_CANHandle hcan,
                                             int32_t* status) {
-  HAL_CANReceiveMessage message;
+  uint8_t packedData[8] = {0};
+  int32_t length = 0;
+  uint64_t timestamp = 0;
   PDH_status_4_t result = {};
 
-  HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_4_FRAME_API, &message,
-                           kPDHFrameStatus4Timeout * 2, status);
+  HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_4_FRAME_API, packedData, &length,
+                           &timestamp, kPDHFrameStatus4Timeout * 2, status);
 
   if (*status != 0) {
     return result;
   }
 
-  PDH_status_4_unpack(&result, message.message.data, PDH_STATUS_4_LENGTH);
+  PDH_status_4_unpack(&result, packedData, PDH_STATUS_4_LENGTH);
 
   return result;
 }
@@ -189,7 +199,7 @@ PDH_status_4_t HAL_GetREVPDHStatus4(HAL_REVPDHHandle handle, int32_t* status) {
   return statusFrame;
 }
 
-HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t busId, int32_t module,
+HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t module,
                                       const char* allocationLocation,
                                       int32_t* status) {
   hal::init::CheckInit();
@@ -215,7 +225,7 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t busId, int32_t module,
   }
 
   HAL_CANHandle hcan =
-      HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
+      HAL_InitializeCAN(manufacturer, module, deviceType, status);
 
   if (*status != 0) {
     REVPDHHandles->Free(handle);
@@ -444,16 +454,14 @@ void HAL_SetREVPDHSwitchableChannel(HAL_REVPDHHandle handle, HAL_Bool enabled,
     return;
   }
 
-  HAL_CANMessage message;
-  std::memset(&message, 0, sizeof(message));
+  uint8_t packedData[8] = {0};
   PDH_set_switch_channel_t frame;
   frame.output_set_value = enabled;
-  PDH_set_switch_channel_pack(message.data, &frame,
+  PDH_set_switch_channel_pack(packedData, &frame,
                               PDH_SET_SWITCH_CHANNEL_LENGTH);
-  message.dataSize = PDH_SET_SWITCH_CHANNEL_LENGTH;
 
-  HAL_WriteCANPacket(hpdh->hcan, PDH_SET_SWITCH_CHANNEL_FRAME_API, &message,
-                     status);
+  HAL_WriteCANPacket(hpdh->hcan, packedData, PDH_SET_SWITCH_CHANNEL_LENGTH,
+                     PDH_SET_SWITCH_CHANNEL_FRAME_API, status);
 }
 
 HAL_Bool HAL_GetREVPDHSwitchableChannelState(HAL_REVPDHHandle handle,
@@ -482,6 +490,9 @@ void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
                           HAL_PowerDistributionVersion* version,
                           int32_t* status) {
   std::memset(version, 0, sizeof(*version));
+  uint8_t packedData[8] = {0};
+  int32_t length = 0;
+  uint64_t timestamp = 0;
   PDH_version_t result = {};
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
@@ -501,20 +512,17 @@ void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
     return;
   }
 
-  HAL_CANMessage rtrmessage;
-  std::memset(&rtrmessage, 0, sizeof(rtrmessage));
-  rtrmessage.dataSize = PDH_VERSION_LENGTH;
-
-  HAL_WriteCANRTRFrame(hpdh->hcan, PDH_VERSION_FRAME_API, &rtrmessage, status);
+  HAL_WriteCANRTRFrame(hpdh->hcan, PDH_VERSION_LENGTH, PDH_VERSION_FRAME_API,
+                       status);
 
   if (*status != 0) {
     return;
   }
 
   uint32_t timeoutMs = 100;
-  HAL_CANReceiveMessage message;
   for (uint32_t i = 0; i <= timeoutMs; i++) {
-    HAL_ReadCANPacketNew(hpdh->hcan, PDH_VERSION_FRAME_API, &message, status);
+    HAL_ReadCANPacketNew(hpdh->hcan, PDH_VERSION_FRAME_API, packedData, &length,
+                         &timestamp, status);
     if (*status == 0) {
       break;
     }
@@ -525,7 +533,7 @@ void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
     return;
   }
 
-  PDH_version_unpack(&result, message.message.data, PDH_VERSION_LENGTH);
+  PDH_version_unpack(&result, packedData, PDH_VERSION_LENGTH);
 
   version->firmwareMajor = result.firmware_year;
   version->firmwareMinor = result.firmware_minor;
@@ -632,11 +640,9 @@ void HAL_ClearREVPDHStickyFaults(HAL_REVPDHHandle handle, int32_t* status) {
     return;
   }
 
-  HAL_CANMessage message;
-  std::memset(&message, 0, sizeof(message));
-  message.dataSize = PDH_CLEAR_FAULTS_LENGTH;
-
-  HAL_WriteCANPacket(hpdh->hcan, PDH_CLEAR_FAULTS_FRAME_API, &message, status);
+  uint8_t packedData[8] = {0};
+  HAL_WriteCANPacket(hpdh->hcan, packedData, PDH_CLEAR_FAULTS_LENGTH,
+                     PDH_CLEAR_FAULTS_FRAME_API, status);
 }
 
 uint32_t HAL_StartCANStream(HAL_CANHandle handle, int32_t apiId, int32_t depth,
@@ -711,9 +717,8 @@ HAL_PowerDistributionChannelData* HAL_GetREVPDHStreamData(
 
   for (uint32_t i = 0; i < messagesRead; i++) {
     PDH_status_0_t statusFrame0;
-    PDH_status_0_unpack(&statusFrame0, messages[i].message.message.data,
-                        PDH_STATUS_0_LENGTH);
-    uint32_t timestamp = messages[i].message.timeStamp;
+    PDH_status_0_unpack(&statusFrame0, messages[i].data, PDH_STATUS_0_LENGTH);
+    uint32_t timestamp = messages[i].timeStamp;
 
     retData[*count].current =
         PDH_status_0_channel_0_current_decode(statusFrame0.channel_0_current);
@@ -756,9 +761,8 @@ HAL_PowerDistributionChannelData* HAL_GetREVPDHStreamData(
 
   for (uint32_t i = 0; i < messagesRead; i++) {
     PDH_status_1_t statusFrame1;
-    PDH_status_1_unpack(&statusFrame1, messages[i].message.message.data,
-                        PDH_STATUS_1_LENGTH);
-    uint32_t timestamp = messages[i].message.timeStamp;
+    PDH_status_1_unpack(&statusFrame1, messages[i].data, PDH_STATUS_1_LENGTH);
+    uint32_t timestamp = messages[i].timeStamp;
 
     retData[*count].current =
         PDH_status_1_channel_6_current_decode(statusFrame1.channel_6_current);
@@ -801,9 +805,8 @@ HAL_PowerDistributionChannelData* HAL_GetREVPDHStreamData(
 
   for (uint32_t i = 0; i < messagesRead; i++) {
     PDH_status_2_t statusFrame2;
-    PDH_status_2_unpack(&statusFrame2, messages[i].message.message.data,
-                        PDH_STATUS_2_LENGTH);
-    uint32_t timestamp = messages[i].message.timeStamp;
+    PDH_status_2_unpack(&statusFrame2, messages[i].data, PDH_STATUS_2_LENGTH);
+    uint32_t timestamp = messages[i].timeStamp;
 
     retData[*count].current =
         PDH_status_2_channel_12_current_decode(statusFrame2.channel_12_current);
@@ -846,9 +849,8 @@ HAL_PowerDistributionChannelData* HAL_GetREVPDHStreamData(
 
   for (uint32_t i = 0; i < messagesRead; i++) {
     PDH_status_3_t statusFrame3;
-    PDH_status_3_unpack(&statusFrame3, messages[i].message.message.data,
-                        PDH_STATUS_3_LENGTH);
-    uint32_t timestamp = messages[i].message.timeStamp;
+    PDH_status_3_unpack(&statusFrame3, messages[i].data, PDH_STATUS_3_LENGTH);
+    uint32_t timestamp = messages[i].timeStamp;
 
     retData[*count].current =
         PDH_status_3_channel_18_current_decode(statusFrame3.channel_18_current);

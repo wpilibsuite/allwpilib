@@ -23,12 +23,10 @@ extern "C" {
 /**
  * Initializes a Power Distribution Panel.
  *
- * @param  busID  the can bus id
  * @param  module the module number to initialize
  * @return the created PDP
  */
-HAL_PDPHandle HAL_InitializePDP(int32_t busId, int32_t module,
-                                const char* allocationLocation,
+HAL_PDPHandle HAL_InitializePDP(int32_t module, const char* allocationLocation,
                                 int32_t* status);
 
 /**
