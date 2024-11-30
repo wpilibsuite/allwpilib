@@ -27,11 +27,11 @@
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
+#include "SystemServer.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
-#include "SystemServer.h"
 
 using namespace hal;
 
