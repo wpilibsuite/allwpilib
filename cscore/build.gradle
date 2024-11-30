@@ -179,6 +179,7 @@ model {
         examplesMap.each { key, value ->
             if (key == "usbviewer") {
                 if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxsystemcore')) {
+                if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxsystemcore')) {
                     "${key}"(NativeExecutableSpec) {
                         targetBuildTypes 'debug'
                         binaries.all {
