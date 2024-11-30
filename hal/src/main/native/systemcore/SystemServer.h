@@ -10,4 +10,4 @@ namespace hal {
 void InitializeSystemServer();
 void ShutdownSystemServer();
 nt::NetworkTableInstance GetSystemServer();
-}
+}  // namespace hal

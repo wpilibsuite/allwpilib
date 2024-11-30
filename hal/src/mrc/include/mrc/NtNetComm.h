@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #pragma once
 
 #define ROBOT_SYSTEM_SERVER_NT_PORT 6810
@@ -7,15 +11,15 @@
 #define ROBOT_WATCHDOG_ACTIVE_PATH (ROBOT_CONTROL_DATA_PREFIX "WatchdogActive")
 #define ROBOT_CONTROL_DATA_PATH (ROBOT_CONTROL_DATA_PREFIX "ControlData")
 #define ROBOT_GAME_SPECIFIC_MESSAGE_PATH \
-    (ROBOT_CONTROL_DATA_PREFIX "GameSpecificMessage")
+  (ROBOT_CONTROL_DATA_PREFIX "GameSpecificMessage")
 #define ROBOT_MATCH_INFO_PATH (ROBOT_CONTROL_DATA_PREFIX "MatchInfo")
 #define ROBOT_JOYSTICK_DESCRIPTORS_PATH \
-    (ROBOT_CONTROL_DATA_PREFIX "JoystickDescriptors/")
+  (ROBOT_CONTROL_DATA_PREFIX "JoystickDescriptors/")
 
 #define ROBOT_STATUS_DATA_PREFIX "/Netcomm/Status/"
 
 #define ROBOT_NEW_ROBOT_PROGRAM_PATH \
-    (ROBOT_STATUS_DATA_PREFIX "NewRobotProgram")
+  (ROBOT_STATUS_DATA_PREFIX "NewRobotProgram")
 #define ROBOT_CODE_STARTED_PATH (ROBOT_STATUS_DATA_PREFIX "UserCodeStarted")
 #define ROBOT_DISABLED_TRACE_PATH (ROBOT_STATUS_DATA_PREFIX "UserCodeDisabled")
 #define ROBOT_AUTON_TRACE_PATH (ROBOT_STATUS_DATA_PREFIX "UserCodeAutonomous")
