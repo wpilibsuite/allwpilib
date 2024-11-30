@@ -96,16 +96,16 @@ void UnknownFieldSet::MergeFromAndDestroy(UnknownFieldSet* other) {
   if (fields_.empty()) {
     fields_ = std::move(other->fields_);
   } else {
-#if __GNUC__ >= 13
+#if __GNUC__ >= 12
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow="
-#endif  // __GNUC__ >= 13
+#endif  // __GNUC__ >= 12
     fields_.insert(fields_.end(),
                    std::make_move_iterator(other->fields_.begin()),
                    std::make_move_iterator(other->fields_.end()));
-#if __GNUC__ >= 13
+#if __GNUC__ >= 12
 #pragma GCC diagnostic pop
-#endif  // __GNUC__ >= 13
+#endif  // __GNUC__ >= 12
   }
   other->fields_.clear();
 }

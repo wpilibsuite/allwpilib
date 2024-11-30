@@ -40,7 +40,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -48,9 +48,9 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
+            backend.log("x", object.x);
           }
         }
       }
@@ -123,7 +123,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -131,10 +131,10 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("y", object.y);
+            backend.log("x", object.x);
+            backend.log("y", object.y);
           }
         }
       }
@@ -162,7 +162,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
       import java.lang.invoke.VarHandle;
 
@@ -183,9 +183,9 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", (double) $x.get(object));
+            backend.log("x", (double) $x.get(object));
           }
         }
       }
@@ -213,7 +213,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
       import java.lang.invoke.VarHandle;
 
@@ -234,9 +234,9 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            logSendable(dataLogger.getSubLogger("chooser"), (edu.wpi.first.wpilibj.smartdashboard.SendableChooser<java.lang.String>) $chooser.get(object));
+            logSendable(backend.getNested("chooser"), (edu.wpi.first.wpilibj.smartdashboard.SendableChooser<java.lang.String>) $chooser.get(object));
           }
         }
       }
@@ -266,7 +266,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -274,15 +274,15 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("low", object.low);
+            backend.log("low", object.low);
           }
           if (Epilogue.shouldLog(Logged.Importance.INFO)) {
-            dataLogger.log("medium", object.medium);
+            backend.log("medium", object.medium);
           }
           if (Epilogue.shouldLog(Logged.Importance.CRITICAL)) {
-            dataLogger.log("high", object.high);
+            backend.log("high", object.high);
           }
         }
       }
@@ -314,7 +314,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -322,9 +322,9 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("enumValue", object.enumValue);
+            backend.log("enumValue", object.enumValue);
           }
         }
       }
@@ -358,7 +358,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -366,12 +366,12 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("arr1", object.arr1);
-            dataLogger.log("getX", object.getX());
-            dataLogger.log("getArr1", object.getArr1());
+            backend.log("x", object.x);
+            backend.log("arr1", object.arr1);
+            backend.log("getX", object.getX());
+            backend.log("getArr1", object.getArr1());
           }
         }
       }
@@ -405,7 +405,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -413,10 +413,10 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("getX", object.getX());
+            backend.log("x", object.x);
+            backend.log("getX", object.getX());
           }
         }
       }
@@ -450,7 +450,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -458,10 +458,10 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("getX", object.getX());
+            backend.log("x", object.x);
+            backend.log("getX", object.getX());
           }
         }
       }
@@ -495,7 +495,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -503,12 +503,12 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("arr1", object.arr1);
-            dataLogger.log("getX", object.getX());
-            dataLogger.log("getArr1", object.getArr1());
+            backend.log("x", object.x);
+            backend.log("arr1", object.arr1);
+            backend.log("getX", object.getX());
+            backend.log("getArr1", object.getArr1());
           }
         }
       }
@@ -542,7 +542,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -550,12 +550,12 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("arr1", object.arr1);
-            dataLogger.log("getX", object.getX());
-            dataLogger.log("getArr1", object.getArr1());
+            backend.log("x", object.x);
+            backend.log("arr1", object.arr1);
+            backend.log("getX", object.getX());
+            backend.log("getArr1", object.getArr1());
           }
         }
       }
@@ -589,7 +589,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -597,12 +597,12 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("arr1", object.arr1);
-            dataLogger.log("getX", object.getX());
-            dataLogger.log("getArr1", object.getArr1());
+            backend.log("x", object.x);
+            backend.log("arr1", object.arr1);
+            backend.log("getX", object.getX());
+            backend.log("getArr1", object.getArr1());
           }
         }
       }
@@ -639,7 +639,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -647,12 +647,12 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("arr1", object.arr1);
-            dataLogger.log("getX", object.getX());
-            dataLogger.log("getArr1", object.getArr1());
+            backend.log("x", object.x);
+            backend.log("arr1", object.arr1);
+            backend.log("getX", object.getX());
+            backend.log("getArr1", object.getArr1());
           }
         }
       }
@@ -688,7 +688,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -696,12 +696,12 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("arr1", object.arr1);
-            dataLogger.log("getX", object.getX());
-            dataLogger.log("getArr1", object.getArr1());
+            backend.log("x", object.x);
+            backend.log("arr1", object.arr1);
+            backend.log("getX", object.getX());
+            backend.log("getArr1", object.getArr1());
           }
         }
       }
@@ -738,7 +738,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -746,13 +746,13 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("arr1", object.arr1);
-            dataLogger.log("list", object.list);
-            dataLogger.log("getX", object.getX());
-            dataLogger.log("getArr1", object.getArr1());
+            backend.log("x", object.x);
+            backend.log("arr1", object.arr1);
+            backend.log("list", object.list);
+            backend.log("getX", object.getX());
+            backend.log("getArr1", object.getArr1());
           }
         }
       }
@@ -797,7 +797,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -805,13 +805,13 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x, edu.wpi.first.epilogue.Example.Structable.struct);
-            dataLogger.log("arr1", object.arr1, edu.wpi.first.epilogue.Example.Structable.struct);
-            dataLogger.log("list", object.list, edu.wpi.first.epilogue.Example.Structable.struct);
-            dataLogger.log("getX", object.getX(), edu.wpi.first.epilogue.Example.Structable.struct);
-            dataLogger.log("getArr1", object.getArr1(), edu.wpi.first.epilogue.Example.Structable.struct);
+            backend.log("x", object.x, edu.wpi.first.epilogue.Example.Structable.struct);
+            backend.log("arr1", object.arr1, edu.wpi.first.epilogue.Example.Structable.struct);
+            backend.log("list", object.list, edu.wpi.first.epilogue.Example.Structable.struct);
+            backend.log("getX", object.getX(), edu.wpi.first.epilogue.Example.Structable.struct);
+            backend.log("getArr1", object.getArr1(), edu.wpi.first.epilogue.Example.Structable.struct);
           }
         }
       }
@@ -848,7 +848,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -856,12 +856,12 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("list", object.list);
-            dataLogger.log("set", object.set);
-            dataLogger.log("queue", object.queue);
-            dataLogger.log("stack", object.stack);
+            backend.log("list", object.list);
+            backend.log("set", object.set);
+            backend.log("queue", object.queue);
+            backend.log("stack", object.stack);
           }
         }
       }
@@ -898,7 +898,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -906,7 +906,7 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
         }
       }
       """;
@@ -1029,7 +1029,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1037,10 +1037,10 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("value", object.value);
-            dataLogger.log("upcast", object.upcast());
+            backend.log("value", object.value);
+            backend.log("upcast", object.upcast());
           }
         }
       }
@@ -1081,7 +1081,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1089,10 +1089,10 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            Epilogue.childLogger.tryUpdate(dataLogger.getSubLogger("child"), object.child, Epilogue.getConfig().errorHandler);
-            Epilogue.ioLogger.tryUpdate(dataLogger.getSubLogger("io"), object.io, Epilogue.getConfig().errorHandler);
+            Epilogue.childLogger.tryUpdate(backend.getNested("child"), object.child, Epilogue.getConfig().errorHandler);
+            Epilogue.ioLogger.tryUpdate(backend.getNested("io"), object.io, Epilogue.getConfig().errorHandler);
           }
         }
       }
@@ -1168,7 +1168,7 @@ class AnnotationProcessorTest {
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.Epilogue;
         import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.DataLogger;
+        import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -1176,31 +1176,31 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(DataLogger dataLogger, Example object) {
+          public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
               var $$asInterface = object.asInterface;
               if ($$asInterface instanceof edu.wpi.first.epilogue.Impl1 edu_wpi_first_epilogue_Impl1) {
-                Epilogue.impl1Logger.tryUpdate(dataLogger.getSubLogger("asInterface"), edu_wpi_first_epilogue_Impl1, Epilogue.getConfig().errorHandler);
+                Epilogue.impl1Logger.tryUpdate(backend.getNested("asInterface"), edu_wpi_first_epilogue_Impl1, Epilogue.getConfig().errorHandler);
               } else if ($$asInterface instanceof edu.wpi.first.epilogue.Impl2 edu_wpi_first_epilogue_Impl2) {
-                Epilogue.impl2Logger.tryUpdate(dataLogger.getSubLogger("asInterface"), edu_wpi_first_epilogue_Impl2, Epilogue.getConfig().errorHandler);
+                Epilogue.impl2Logger.tryUpdate(backend.getNested("asInterface"), edu_wpi_first_epilogue_Impl2, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type edu.wpi.first.epilogue.IFace
-                Epilogue.iFaceLogger.tryUpdate(dataLogger.getSubLogger("asInterface"), $$asInterface, Epilogue.getConfig().errorHandler);
+                Epilogue.iFaceLogger.tryUpdate(backend.getNested("asInterface"), $$asInterface, Epilogue.getConfig().errorHandler);
               };
-              Epilogue.impl1Logger.tryUpdate(dataLogger.getSubLogger("firstImpl"), object.firstImpl, Epilogue.getConfig().errorHandler);
-              Epilogue.impl2Logger.tryUpdate(dataLogger.getSubLogger("secondImpl"), object.secondImpl, Epilogue.getConfig().errorHandler);
+              Epilogue.impl1Logger.tryUpdate(backend.getNested("firstImpl"), object.firstImpl, Epilogue.getConfig().errorHandler);
+              Epilogue.impl2Logger.tryUpdate(backend.getNested("secondImpl"), object.secondImpl, Epilogue.getConfig().errorHandler);
               var $$complex = object.complex;
               if ($$complex instanceof edu.wpi.first.epilogue.ConcreteLogged edu_wpi_first_epilogue_ConcreteLogged) {
-                Epilogue.concreteLoggedLogger.tryUpdate(dataLogger.getSubLogger("complex"), edu_wpi_first_epilogue_ConcreteLogged, Epilogue.getConfig().errorHandler);
+                Epilogue.concreteLoggedLogger.tryUpdate(backend.getNested("complex"), edu_wpi_first_epilogue_ConcreteLogged, Epilogue.getConfig().errorHandler);
               } else if ($$complex instanceof edu.wpi.first.epilogue.I4 edu_wpi_first_epilogue_I4) {
-                Epilogue.i4Logger.tryUpdate(dataLogger.getSubLogger("complex"), edu_wpi_first_epilogue_I4, Epilogue.getConfig().errorHandler);
+                Epilogue.i4Logger.tryUpdate(backend.getNested("complex"), edu_wpi_first_epilogue_I4, Epilogue.getConfig().errorHandler);
               } else if ($$complex instanceof edu.wpi.first.epilogue.I2 edu_wpi_first_epilogue_I2) {
-                Epilogue.i2Logger.tryUpdate(dataLogger.getSubLogger("complex"), edu_wpi_first_epilogue_I2, Epilogue.getConfig().errorHandler);
+                Epilogue.i2Logger.tryUpdate(backend.getNested("complex"), edu_wpi_first_epilogue_I2, Epilogue.getConfig().errorHandler);
               } else if ($$complex instanceof edu.wpi.first.epilogue.I3 edu_wpi_first_epilogue_I3) {
-                Epilogue.i3Logger.tryUpdate(dataLogger.getSubLogger("complex"), edu_wpi_first_epilogue_I3, Epilogue.getConfig().errorHandler);
+                Epilogue.i3Logger.tryUpdate(backend.getNested("complex"), edu_wpi_first_epilogue_I3, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type edu.wpi.first.epilogue.I
-                Epilogue.iLogger.tryUpdate(dataLogger.getSubLogger("complex"), $$complex, Epilogue.getConfig().errorHandler);
+                Epilogue.iLogger.tryUpdate(backend.getNested("complex"), $$complex, Epilogue.getConfig().errorHandler);
               };
             }
           }
@@ -1231,7 +1231,7 @@ class AnnotationProcessorTest {
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.Epilogue;
         import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.DataLogger;
+        import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
         public class Outer$ExampleLogger extends ClassSpecificLogger<Outer.Example> {
           public Outer$ExampleLogger() {
@@ -1239,9 +1239,9 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(DataLogger dataLogger, Outer.Example object) {
+          public void update(EpilogueBackend backend, Outer.Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              dataLogger.log("x", object.x);
+              backend.log("x", object.x);
             }
           }
         }
@@ -1277,7 +1277,7 @@ class AnnotationProcessorTest {
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.Epilogue;
         import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.DataLogger;
+        import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
         public class A$B$C$D$ExampleLogger extends ClassSpecificLogger<A.B.C.D.Example> {
           public A$B$C$D$ExampleLogger() {
@@ -1285,9 +1285,9 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(DataLogger dataLogger, A.B.C.D.Example object) {
+          public void update(EpilogueBackend backend, A.B.C.D.Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              dataLogger.log("x", object.x);
+              backend.log("x", object.x);
             }
           }
         }
@@ -1317,7 +1317,7 @@ class AnnotationProcessorTest {
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.Epilogue;
         import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.DataLogger;
+        import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
         public class CustomExampleLogger extends ClassSpecificLogger<Outer.Example> {
           public CustomExampleLogger() {
@@ -1325,9 +1325,9 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(DataLogger dataLogger, Outer.Example object) {
+          public void update(EpilogueBackend backend, Outer.Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              dataLogger.log("x", object.x);
+              backend.log("x", object.x);
             }
           }
         }
@@ -1370,7 +1370,7 @@ class AnnotationProcessorTest {
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.Epilogue;
         import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.DataLogger;
+        import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -1378,16 +1378,16 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(DataLogger dataLogger, Example object) {
+          public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
               var $$theField = object.theField;
               if ($$theField instanceof edu.wpi.first.epilogue.Base edu_wpi_first_epilogue_Base) {
-                Epilogue.baseLogger.tryUpdate(dataLogger.getSubLogger("theField"), edu_wpi_first_epilogue_Base, Epilogue.getConfig().errorHandler);
+                Epilogue.baseLogger.tryUpdate(backend.getNested("theField"), edu_wpi_first_epilogue_Base, Epilogue.getConfig().errorHandler);
               } else if ($$theField instanceof edu.wpi.first.epilogue.ExtendingInterface edu_wpi_first_epilogue_ExtendingInterface) {
-                Epilogue.extendingInterfaceLogger.tryUpdate(dataLogger.getSubLogger("theField"), edu_wpi_first_epilogue_ExtendingInterface, Epilogue.getConfig().errorHandler);
+                Epilogue.extendingInterfaceLogger.tryUpdate(backend.getNested("theField"), edu_wpi_first_epilogue_ExtendingInterface, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type edu.wpi.first.epilogue.I
-                Epilogue.iLogger.tryUpdate(dataLogger.getSubLogger("theField"), $$theField, Epilogue.getConfig().errorHandler);
+                Epilogue.iLogger.tryUpdate(backend.getNested("theField"), $$theField, Epilogue.getConfig().errorHandler);
               };
             }
           }
@@ -1422,7 +1422,7 @@ class AnnotationProcessorTest {
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.Epilogue;
         import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.DataLogger;
+        import edu.wpi.first.epilogue.logging.EpilogueBackend;
         import java.lang.invoke.MethodHandles;
         import java.lang.invoke.VarHandle;
 
@@ -1443,14 +1443,14 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(DataLogger dataLogger, Example object) {
+          public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
               var $$theField = (edu.wpi.first.epilogue.I) $theField.get(object);
               if ($$theField instanceof edu.wpi.first.epilogue.Base edu_wpi_first_epilogue_Base) {
-                Epilogue.baseLogger.tryUpdate(dataLogger.getSubLogger("theField"), edu_wpi_first_epilogue_Base, Epilogue.getConfig().errorHandler);
+                Epilogue.baseLogger.tryUpdate(backend.getNested("theField"), edu_wpi_first_epilogue_Base, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type edu.wpi.first.epilogue.I
-                Epilogue.iLogger.tryUpdate(dataLogger.getSubLogger("theField"), $$theField, Epilogue.getConfig().errorHandler);
+                Epilogue.iLogger.tryUpdate(backend.getNested("theField"), $$theField, Epilogue.getConfig().errorHandler);
               };
             }
           }
@@ -1518,7 +1518,7 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(DataLogger dataLogger, Point point) {
+          public void update(EpilogueBackend backend, Point point) {
             // Implementation is irrelevant
           }
         }
@@ -1536,7 +1536,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1544,15 +1544,115 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            Epilogue.customPointLogger.tryUpdate(dataLogger.getSubLogger("point"), object.point, Epilogue.getConfig().errorHandler);
+            Epilogue.customPointLogger.tryUpdate(backend.getNested("point"), object.point, Epilogue.getConfig().errorHandler);
           }
         }
       }
       """;
 
     assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void customGenericLogger() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.logging.*;
+        import edu.wpi.first.math.numbers.*;
+        import edu.wpi.first.math.Num;
+        import edu.wpi.first.math.Vector;
+
+        @CustomLoggerFor(Vector.class)
+        class VectorLogger extends ClassSpecificLogger<Vector<?>> {
+          public VectorLogger() {
+            super((Class) Vector.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Vector<?> object) {
+            // Implementation is irrelevant
+          }
+        }
+
+        @Logged
+        class Example {
+          Vector<N3> vec;
+        }
+        """;
+
+    String expectedGeneratedSource =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.EpilogueBackend;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              Epilogue.vectorLogger.tryUpdate(backend.getNested("vec"), object.vec, Epilogue.getConfig().errorHandler);
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void genericLoggerForGenericType() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.logging.*;
+
+        class Generic<T> { }
+
+        @CustomLoggerFor(Generic.class)
+        // Invalid: loggers cannot take type arguments
+        class GenericLogger<T> extends ClassSpecificLogger<Generic<T>> {
+          public GenericLogger() {
+            super((Class) Generic.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Generic<T> object) {
+            // Implementation is irrelevant
+          }
+        }
+
+        @Logged
+        class Example {
+          Generic<String> genericField;
+        }
+        """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .withProcessors(new AnnotationProcessor())
+            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+
+    assertThat(compilation).failed();
+    assertThat(compilation).hadErrorCount(1);
+
+    assertCompilationError(
+        "[EPILOGUE] Custom logger classes cannot take generic type arguments",
+        9,
+        1,
+        compilation.errors().get(0));
   }
 
   @Test
@@ -1599,7 +1699,7 @@ class AnnotationProcessorTest {
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.Epilogue;
         import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.DataLogger;
+        import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -1607,10 +1707,10 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(DataLogger dataLogger, Example object) {
+          public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              dataLogger.log("x", object.x());
-              dataLogger.log("y", object.y());
+              backend.log("x", object.x());
+              backend.log("y", object.y());
             }
           }
         }
@@ -1687,7 +1787,7 @@ class AnnotationProcessorTest {
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.Epilogue;
         import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.DataLogger;
+        import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -1695,11 +1795,11 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(DataLogger dataLogger, Example object) {
+          public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              dataLogger.log("x", object.x);
-              dataLogger.log("withANoOpTransform", object.withANoOpTransform());
-              dataLogger.log("withTemp", object.withTemp());
+              backend.log("x", object.x);
+              backend.log("withANoOpTransform", object.withANoOpTransform());
+              backend.log("withTemp", object.withTemp());
             }
           }
         }
@@ -1739,7 +1839,7 @@ class AnnotationProcessorTest {
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.Epilogue;
         import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.DataLogger;
+        import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -1747,14 +1847,14 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(DataLogger dataLogger, Example object) {
+          public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              dataLogger.log("Member Prefix", object.m_memberPrefix);
-              dataLogger.log("Constant Prefix", object.kConstantPrefix);
-              dataLogger.log("Other Constant Prefix", object.k_otherConstantPrefix);
-              dataLogger.log("Other Prefix", object.s_otherPrefix);
-              dataLogger.log("The Getter Method", object.getTheGetterMethod());
-              dataLogger.log("optedOut", object.optedOut());
+              backend.log("Member Prefix", object.m_memberPrefix);
+              backend.log("Constant Prefix", object.kConstantPrefix);
+              backend.log("Other Constant Prefix", object.k_otherConstantPrefix);
+              backend.log("Other Prefix", object.s_otherPrefix);
+              backend.log("The Getter Method", object.getTheGetterMethod());
+              backend.log("optedOut", object.optedOut());
             }
           }
         }

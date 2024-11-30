@@ -10,36 +10,36 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-class LazyLoggerTest {
+class LazyBackendTest {
   @Test
   void lazyOfLazyReturnsSelf() {
-    var lazy = new LazyLogger(new NullLogger());
+    var lazy = new LazyBackend(new NullBackend());
     assertSame(lazy, lazy.lazy());
   }
 
   @Test
   void lazyInt() {
-    var logger = new TestLogger();
-    var lazy = new LazyLogger(logger);
+    var backend = new TestBackend();
+    var lazy = new LazyBackend(backend);
 
     {
       // First time logging to "int" should go through
       lazy.log("int", 0);
-      assertEquals(List.of(new TestLogger.LogEntry<>("int", 0)), logger.getEntries());
+      assertEquals(List.of(new TestBackend.LogEntry<>("int", 0)), backend.getEntries());
     }
 
     {
       // Logging the current value shouldn't go through
       lazy.log("int", 0);
-      assertEquals(List.of(new TestLogger.LogEntry<>("int", 0)), logger.getEntries());
+      assertEquals(List.of(new TestBackend.LogEntry<>("int", 0)), backend.getEntries());
     }
 
     {
       // Logging a new value should go through
       lazy.log("int", 1);
       assertEquals(
-          List.of(new TestLogger.LogEntry<>("int", 0), new TestLogger.LogEntry<>("int", 1)),
-          logger.getEntries());
+          List.of(new TestBackend.LogEntry<>("int", 0), new TestBackend.LogEntry<>("int", 1)),
+          backend.getEntries());
     }
 
     {
@@ -47,10 +47,10 @@ class LazyLoggerTest {
       lazy.log("int", 0);
       assertEquals(
           List.of(
-              new TestLogger.LogEntry<>("int", 0),
-              new TestLogger.LogEntry<>("int", 1),
-              new TestLogger.LogEntry<>("int", 0)),
-          logger.getEntries());
+              new TestBackend.LogEntry<>("int", 0),
+              new TestBackend.LogEntry<>("int", 1),
+              new TestBackend.LogEntry<>("int", 0)),
+          backend.getEntries());
     }
   }
 }
