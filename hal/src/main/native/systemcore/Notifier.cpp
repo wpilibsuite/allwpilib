@@ -62,14 +62,12 @@ class NotifierHandleContainer
 static NotifierHandleContainer* notifierHandles;
 static std::atomic<bool> notifiersPaused{false};
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeNotifier() {
   static NotifierHandleContainer nH;
   notifierHandles = &nH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 
