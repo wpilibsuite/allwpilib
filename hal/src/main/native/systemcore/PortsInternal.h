@@ -19,13 +19,21 @@ constexpr int32_t kNumDigitalSPIPortChannels = 5;
 constexpr int32_t kNumPWMHeaders = 0;
 constexpr int32_t kNumDigitalChannels =
     kNumDigitalHeaders + kNumDigitalMXPChannels + kNumDigitalSPIPortChannels;
-constexpr int32_t kNumPWMChannels = 0;
+constexpr int32_t kNumPWMChannels = 0 + kNumPWMHeaders;
 constexpr int32_t kNumDigitalPWMOutputs = 0;
 constexpr int32_t kNumEncoders = 0;
 constexpr int32_t kNumInterrupts = 0;
 constexpr int32_t kNumRelayChannels = 8;
 constexpr int32_t kNumRelayHeaders = kNumRelayChannels / 2;
+constexpr int32_t kNumCTREPCMModules = 63;
+constexpr int32_t kNumCTRESolenoidChannels = 8;
+constexpr int32_t kNumCTREPDPModules = 63;
+constexpr int32_t kNumCTREPDPChannels = 16;
+constexpr int32_t kNumREVPDHModules = 63;
+constexpr int32_t kNumREVPDHChannels = 24;
 constexpr int32_t kNumDutyCycles = 0;
 constexpr int32_t kNumAddressableLEDs = 0;
+constexpr int32_t kNumREVPHModules = 63;
+constexpr int32_t kNumREVPHChannels = 16;
 
 }  // namespace hal

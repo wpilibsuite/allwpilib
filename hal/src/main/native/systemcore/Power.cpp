@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include "../robotshared/HALInitializer.h"
+#include "HALInitializer.h"
 #include "hal/Errors.h"
 
 using namespace hal;

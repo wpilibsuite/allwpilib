@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include "../robotshared/HALInitializer.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"

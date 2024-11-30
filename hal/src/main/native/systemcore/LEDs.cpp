@@ -13,7 +13,7 @@
 #include <fmt/std.h>
 #include <wpi/fs.h>
 
-#include "../robotshared/HALInternal.h"
+#include "HALInternal.h"
 #include "hal/Errors.h"
 
 namespace hal::init {

@@ -9,7 +9,7 @@
 
 #include <fmt/format.h>
 
-#include "../robotshared/HALInitializer.h"
+#include "HALInitializer.h"
 #include "hal/Errors.h"
 
 using namespace hal;

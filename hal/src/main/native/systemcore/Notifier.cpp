@@ -17,7 +17,7 @@
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
-#include "../robotshared/HALInitializer.h"
+#include "HALInitializer.h"
 #include "hal/Errors.h"
 #include "hal/HALBase.h"
 #include "hal/cpp/fpga_clock.h"

@@ -8,8 +8,8 @@
 #include <cstdio>
 #include <thread>
 
-#include "../robotshared/HALInitializer.h"
-#include "../robotshared/HALInternal.h"
+#include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/Errors.h"
 #include "hal/cpp/fpga_clock.h"

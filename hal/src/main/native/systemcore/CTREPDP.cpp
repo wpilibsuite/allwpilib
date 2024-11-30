@@ -9,9 +9,9 @@
 #include <fmt/format.h>
 #include <wpi/mutex.h>
 
-#include "../robotshared/HALInitializer.h"
-#include "../robotshared/HALInternal.h"
-#include "SharedPortsInternal.h"
+#include "HALInitializer.h"
+#include "HALInternal.h"
+#include "PortsInternal.h"
 #include "hal/CAN.h"
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"

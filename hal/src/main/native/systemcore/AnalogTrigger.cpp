@@ -6,8 +6,8 @@
 
 #include <memory>
 
-#include "../robotshared/HALInitializer.h"
-#include "../robotshared/HALInternal.h"
+#include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/AnalogInput.h"
 #include "hal/DutyCycle.h"

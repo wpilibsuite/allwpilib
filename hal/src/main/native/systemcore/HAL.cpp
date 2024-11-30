@@ -25,8 +25,8 @@
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
 
-#include "../robotshared/HALInitializer.h"
-#include "../robotshared/HALInternal.h"
+#include "HALInitializer.h"
+#include "HALInternal.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
