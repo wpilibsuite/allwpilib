@@ -24,6 +24,11 @@
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/BooleanTopic.h>
+#include "mrc/NtNetComm.h"
+#include "SystemServer.h"
+
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");
 
@@ -49,11 +54,29 @@ struct JoystickDataCache {
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
 
+struct SystemServerDriverStation {
+  nt::NetworkTableInstance ntInst;
+  nt::BooleanPublisher robotProgramPublisher;
+  nt::BooleanPublisher codeStartedPublisher;
+
+  SystemServerDriverStation(nt::NetworkTableInstance inst) {
+    ntInst = inst;
+
+    codeStartedPublisher =
+        ntInst.GetBooleanTopic(ROBOT_CODE_STARTED_PATH).Publish();
+
+    robotProgramPublisher =
+        ntInst.GetBooleanTopic(ROBOT_NEW_ROBOT_PROGRAM_PATH).Publish();
+    robotProgramPublisher.Set(true);
+  }
+};
+
 struct FRCDriverStation {
   wpi::EventVector newDataEvents;
 };
 }  // namespace
 
+static ::SystemServerDriverStation* systemServerDs;
 static ::FRCDriverStation* driverStation;
 
 // Message and Data variables
@@ -477,6 +500,7 @@ double HAL_GetMatchTime(int32_t* status) {
 }
 
 void HAL_ObserveUserProgramStarting(void) {
+  systemServerDs->codeStartedPublisher.Set(true);
   // FRC_NetworkCommunication_observeUserProgramStarting();
 }
 
@@ -599,7 +623,9 @@ HAL_Bool HAL_GetOutputsEnabled(void) {
 }  // extern "C"
 
 namespace hal {
-void InitializeDriverStation() {}
+void InitializeDriverStation() {
+  systemServerDs = new ::SystemServerDriverStation{hal::GetSystemServer()};
+}
 
 void WaitForInitialPacket() {
   wpi::Event waitForInitEvent;
