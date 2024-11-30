@@ -70,7 +70,7 @@ public final class TrajectoryUtil {
     return elements;
   }
 
-  private static int pathWeaverTrajectoryInstances = 0;
+  private static int pathWeaverTrajectoryInstances;
 
   /**
    * Imports a Trajectory from a JSON file exported from PathWeaver.
