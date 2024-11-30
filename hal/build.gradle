@@ -13,21 +13,6 @@ ext {
     niLibraries = true
     generatedHeaders = "src/generated/main/native/include"
     splitSetup = {
-        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
-            it.sources {
-                robotSharedCpp(CppSourceSet) {
-                    source {
-                        srcDirs = ['src/main/native/robotshared']
-                        include '**/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDir 'src/main/native/include'
-                        srcDir generatedHeaders
-                    }
-                }
-            }
-        }
-
         if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
             it.sources {
                 athenaCpp(CppSourceSet) {
@@ -87,10 +72,6 @@ cppSourcesZip {
 
     from('src/main/native/systemcore') {
         into '/systemcore'
-    }
-
-    from('src/main/native/robotshared') {
-        into '/robotshared'
     }
 
     from('src/main/native/sim') {

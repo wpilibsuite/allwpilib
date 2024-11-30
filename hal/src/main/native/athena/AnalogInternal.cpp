@@ -9,7 +9,7 @@
 
 #include <wpi/mutex.h>
 
-#include "../robotshared/HALInitializer.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 #include "hal/AnalogInput.h"
 #include "hal/ChipObject.h"

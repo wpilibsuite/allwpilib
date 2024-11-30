@@ -8,9 +8,9 @@
 #include <cstdio>
 #include <thread>
 
-#include "../robotshared/HALInitializer.h"
-#include "../robotshared/HALInternal.h"
 #include "DigitalInternal.h"
+#include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/HandlesInternal.h"

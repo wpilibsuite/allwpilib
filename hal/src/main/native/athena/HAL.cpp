@@ -28,9 +28,9 @@
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
 
-#include "../robotshared/HALInitializer.h"
-#include "../robotshared/HALInternal.h"
 #include "FPGACalls.h"
+#include "HALInitializer.h"
+#include "HALInternal.h"
 #include "hal/ChipObject.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"

@@ -10,7 +10,7 @@
 #include <cstdio>
 #include <memory>
 
-#include "../robotshared/HALInitializer.h"
+#include "HALInitializer.h"
 #include "hal/ChipObject.h"
 #include "hal/HAL.h"
 

@@ -9,11 +9,11 @@
 
 #include <fmt/format.h>
 
-#include "../robotshared/HALInitializer.h"
-#include "../robotshared/HALInternal.h"
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "FPGACalls.h"
+#include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/AddressableLEDTypes.h"
 #include "hal/ChipObject.h"
