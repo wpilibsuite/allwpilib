@@ -36,7 +36,6 @@ ext {
                     exportedHeaders {
                         srcDir 'src/main/native/include'
                         srcDir generatedHeaders
-                        srcDir 'src/mrc/include'
                     }
                 }
             }

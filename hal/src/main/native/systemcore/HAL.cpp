@@ -31,8 +31,7 @@
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
-
-#include "SystemServer.h"
+#include "hal/roborio/HMB.h"
 
 using namespace hal;
 
@@ -338,8 +337,11 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   prctl(PR_SET_PDEATHSIG, SIGTERM);
 
+<<<<<<< HEAD
   hal::InitializeSystemServer();
 
+=======
+>>>>>>> wpilibsuite/2027
   // // Return false if program failed to kill an existing program
   // if (!killExistingProgram(timeout, mode)) {
   //   return false;
