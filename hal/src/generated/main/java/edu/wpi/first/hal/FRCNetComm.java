@@ -257,6 +257,12 @@ public final class FRCNetComm {
     public static final int kResourceType_DataLogManager = 117;
     /** kResourceType_LoggingFramework = 118. */
     public static final int kResourceType_LoggingFramework = 118;
+    /** kResourceType_ChoreoTrajectory = 119. */
+    public static final int kResourceType_ChoreoTrajectory = 119;
+    /** kResourceType_ChoreoTrigger = 120. */
+    public static final int kResourceType_ChoreoTrigger = 120;
+    /** kResourceType_PathWeaverTrajectory = 121. */
+    public static final int kResourceType_PathWeaverTrajectory = 121;
   }
 
   /**

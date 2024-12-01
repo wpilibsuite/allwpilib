@@ -142,6 +142,10 @@ class WPILibMathShared : public wpi::math::MathShared {
       case wpi::math::MathUsageId::kController_BangBangController:
         HAL_Report(HALUsageReporting::kResourceType_BangBangController, count);
         break;
+      case wpi::math::MathUsageId::kTrajectory_PathWeaver:
+        HAL_Report(HALUsageReporting::kResourceType_PathWeaverTrajectory,
+                   count);
+        break;
     }
   }
 
