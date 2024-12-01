@@ -87,7 +87,7 @@ public final class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
    * current. For example, {@code Watts.per(Amps)} will return a unit of power equivalent to one
    * Volt.
    *
-   * @param voltage the voltage unit to multiply by
+   * @param current the current unit to multiply by
    * @return the power unit
    */  
   public VoltageUnit per(CurrentUnit current) {
