@@ -89,7 +89,7 @@ public final class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
    *
    * @param current the current unit to multiply by
    * @return the power unit
-   */  
+   */
   public VoltageUnit per(CurrentUnit current) {
     return VoltageUnit.combine(this, current);
   }
