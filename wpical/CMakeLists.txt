@@ -24,7 +24,7 @@ wpilib_target_warnings(wpical)
 target_include_directories(wpical PRIVATE src/main/native/include)
 
 find_package(OpenCV REQUIRED)
-target_link_libraries(wpical apriltaglib ${OpenCV_LIBS})
+target_link_libraries(wpical apriltaglib ${OpenCV_LIBS} wpiutil wpimath)
 
 if(WIN32)
     set_target_properties(wpical PROPERTIES WIN32_EXECUTABLE YES)

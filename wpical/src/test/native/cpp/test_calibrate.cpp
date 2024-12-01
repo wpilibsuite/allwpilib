@@ -72,8 +72,3 @@ TEST(Field_CalibrationTest, Atypical_Bad_Input_Directory) {
       projectRootPath + "/assets/2024-crescendo.json", 3, 15, false);
   EXPECT_EQ(ret, 1);
 }
-
-int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
