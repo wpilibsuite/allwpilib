@@ -263,6 +263,10 @@ public final class FRCNetComm {
     public static final int kResourceType_ChoreoTrigger = 120;
     /** kResourceType_PathWeaverTrajectory = 121. */
     public static final int kResourceType_PathWeaverTrajectory = 121;
+    /** kResourceType_Koors40 = 122. */
+    public static final int kResourceType_Koors40 = 122;
+    /** kResourceType_ThriftyNova = 123. */
+    public static final int kResourceType_ThriftyNova = 123;
   }
 
   /**
