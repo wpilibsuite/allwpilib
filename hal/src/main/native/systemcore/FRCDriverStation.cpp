@@ -10,9 +10,8 @@
 #include <limits>
 #include <string>
 #include <string_view>
+#include <utility>
 
-// #include <FRC_NetworkCommunication/FRCComm.h>
-// #include <FRC_NetworkCommunication/NetCommRPCProxy_Occur.h>
 #include <fmt/format.h>
 #include <wpi/EventVector.h>
 #include <wpi/SafeThread.h>
@@ -84,7 +83,7 @@ struct SystemServerDriverStation {
              MRC_MAX_NUM_JOYSTICKS>
       joystickOutputsTopics;
 
-  SystemServerDriverStation(nt::NetworkTableInstance inst) {
+  explicit SystemServerDriverStation(nt::NetworkTableInstance inst) {
     ntInst = inst;
 
     nt::PubSubOptions options;
