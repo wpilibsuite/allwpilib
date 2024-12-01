@@ -31,8 +31,8 @@ model {
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':fieldImages', library: 'fieldImages', linkage: 'static'
-            lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
-            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+            lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                 it.buildable = false
                 return
             }
