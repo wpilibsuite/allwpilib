@@ -81,7 +81,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.DataLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -89,12 +89,12 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(DataLogger dataLogger, Example object) {
+        public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x);
-            dataLogger.log("y", object.y);
-            dataLogger.log("getValue", object.getValue());
-            dataLogger.log("isActive", object.isActive());
+            backend.log("x", object.x);
+            backend.log("y", object.y);
+            backend.log("getValue", object.getValue());
+            backend.log("isActive", object.isActive());
           }
         }
       }
@@ -1482,7 +1482,7 @@ class AnnotationProcessorTest {
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.Epilogue;
         import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.DataLogger;
+        import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -1490,9 +1490,9 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(DataLogger dataLogger, Example object) {
+          public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              Epilogue.implicitLogger.tryUpdate(dataLogger.getSubLogger("i"), object.i, Epilogue.getConfig().errorHandler);
+              Epilogue.implicitLogger.tryUpdate(backend.getNested("i"), object.i, Epilogue.getConfig().errorHandler);
             }
           }
         }
