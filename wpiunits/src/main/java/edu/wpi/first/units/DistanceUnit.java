@@ -98,5 +98,13 @@ public final class DistanceUnit extends Unit {
     return TorqueUnit.combine(this, force);
   }
 
-  // TODO: Add a multAsEnergy equivalent
+  /**
+   * Multiplies this distance unit by a unit of force to create a unit of energy.
+   *
+   * @param force the unit of force
+   * @return the combined energy unit
+   */
+  public EnergyUnit multAsEnergy(ForceUnit force) {
+    return EnergyUnit.combine(force, this);
+  }
 }

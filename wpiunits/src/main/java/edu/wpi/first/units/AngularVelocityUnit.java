@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import static edu.wpi.first.units.Units.Watts;
+
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.ImmutableAngularVelocity;
 import edu.wpi.first.units.measure.MutAngularVelocity;
@@ -70,6 +72,24 @@ public final class AngularVelocityUnit extends PerUnit<AngleUnit, TimeUnit> {
   @Override
   public MutAngularVelocity mutable(double initialMagnitude) {
     return new MutAngularVelocity(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  }
+
+  /**
+   * Constructs a unit of power equivalent to this unit of angular velocity multiplied by another
+   * unit of torque. For example, {@code NewtonMeters.times(RadiansPerSecond)} will return a unit of
+   * power equivalent to one Watt.
+   *
+   * @param torque the unit of torque
+   * @param name the name of the resulting unit of power
+   * @param symbol the symbol used to represent the unit of power
+   * @return the power unit
+   */
+  public PowerUnit mult(TorqueUnit torque, String name, String symbol) {
+    double baseUnitEquivalent = torque.toBaseUnits(1) / this.toBaseUnits(1);
+    UnaryFunction toBaseConverter = x -> x * baseUnitEquivalent;
+    UnaryFunction fromBaseConverter = x -> x / baseUnitEquivalent;
+    PowerUnit powerUnit = new PowerUnit(Watts, toBaseConverter, fromBaseConverter, name, symbol);
+    return Units.derive(powerUnit).named(name).symbol(symbol).make();
   }
 
   @Override

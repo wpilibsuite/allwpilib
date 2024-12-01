@@ -25,14 +25,8 @@ public final class BaseUnits {
   /** The standard "unitless" unit. */
   public static final DimensionlessUnit Value = new DimensionlessUnit(null, 1, "<?>", "<?>");
 
-  /** The standard unit of voltage, volts. */
-  public static final VoltageUnit VoltageUnit = new VoltageUnit(null, 1, "Volt", "V");
-
   /** The standard unit of electric current, amperes. */
   public static final CurrentUnit CurrentUnit = new CurrentUnit(null, 1, "Amp", "A");
-
-  /** The standard unit of energy, joules. */
-  public static final EnergyUnit EnergyUnit = new EnergyUnit(null, 1, "Joule", "J");
 
   /** The standard unit of temperature, kelvin. */
   public static final TemperatureUnit TemperatureUnit =

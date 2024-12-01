@@ -4,8 +4,7 @@
 
 package edu.wpi.first.units;
 
-import static edu.wpi.first.units.Units.Joules;
-import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Amps;
 
 import edu.wpi.first.units.measure.ImmutablePower;
 import edu.wpi.first.units.measure.MutPower;
@@ -53,58 +52,6 @@ public final class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
     return cache.combine(energy, period);
   }
 
-  /**
-   * Combines voltage and current into power.
-   *
-   * @param voltage the unit of voltage
-   * @param current the unit of current
-   * @return the combined unit of power
-   */
-  public static PowerUnit combine(VoltageUnit voltage, CurrentUnit current) {
-    return combine(
-        new EnergyUnit(
-            Joules,
-            voltage.toBaseUnits(1) * current.toBaseUnits(1),
-            voltage.name() + "-" + current.name(),
-            voltage.symbol() + "*" + current.symbol()),
-        Seconds);
-  }
-
-  /**
-   * Combines voltage and current into power.
-   *
-   * @param current the unit of current
-   * @param voltage the unit of voltage
-   * @return the combined unit of power
-   */
-  public static PowerUnit combine(CurrentUnit current, VoltageUnit voltage) {
-    return combine(voltage, current);
-  }
-
-  /**
-   * Combines angular velocity and torque into power. Useful when dealing with motors and flywheels.
-   *
-   * @param angularVelocity the unit of angular velocity
-   * @param torque the unit of torque
-   * @return the combined unit of power
-   */
-  public static PowerUnit combine(AngularVelocityUnit angularVelocity, TorqueUnit torque) {
-    return combine(
-        new EnergyUnit(Joules, angularVelocity.toBaseUnits(1) * torque.toBaseUnits(1), "", ""),
-        Seconds);
-  }
-
-  /**
-   * Combines angular velocity and torque into power. Useful when dealing with motors and flywheels.
-   *
-   * @param torque the unit of torque
-   * @param angularVelocity the unit of angular velocity
-   * @return the combined unit of power
-   */
-  public static PowerUnit combine(TorqueUnit torque, AngularVelocityUnit angularVelocity) {
-    return combine(angularVelocity, torque);
-  }
-
   @Override
   public PowerUnit getBaseUnit() {
     return (PowerUnit) super.getBaseUnit();
@@ -133,6 +80,32 @@ public final class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
   @Override
   public MutPower mutable(double initialMagnitude) {
     return new MutPower(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  }
+
+  public VoltageUnit per(CurrentUnit current) {
+    return VoltageUnit.combine(this, current);
+  }
+
+  /**
+   * Constructs a unit of current equivalent to this unit of power divided by another unit of
+   * voltage. For example, {@code Watts.per(Volts)} will return a unit of power equivalent to one
+   * Amp.
+   *
+   * @param voltage the voltage unit to multiply by
+   * @return the power unit
+   */
+  public CurrentUnit per(VoltageUnit voltage) {
+    double baseUnitEquivalent = this.toBaseUnits(1) / voltage.toBaseUnits(1);
+    UnaryFunction toBaseConverter = x -> x * baseUnitEquivalent;
+    UnaryFunction fromBaseConverter = x -> x / baseUnitEquivalent;
+    CurrentUnit currentUnit =
+        new CurrentUnit(
+            Amps,
+            toBaseConverter,
+            fromBaseConverter,
+            this.name() + " per " + voltage.name(),
+            this.symbol() + "/" + voltage.symbol());
+    return Units.derive(currentUnit).make();
   }
 
   @Override
