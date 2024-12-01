@@ -82,6 +82,12 @@ struct SystemServerDriverStation {
              MRC_MAX_NUM_JOYSTICKS>
       joystickOutputsTopics;
 
+  NT_Listener controlDataListener;
+
+  wpi::mutex controlDataMutex;
+  wpi::ProtobufMessage<mrc::ControlData> controlDataMsg;
+  nt::Value lastValue;
+
   explicit SystemServerDriverStation(nt::NetworkTableInstance inst) {
     ntInst = inst;
 
@@ -135,7 +141,27 @@ struct SystemServerDriverStation {
       joystickDescriptorTopics[count] =
           ntInst.GetProtobufTopic<mrc::JoystickDescriptor>(name).Subscribe({});
     }
+
+    ntInst.AddListener(
+        controlDataSubscriber, NT_EVENT_VALUE_REMOTE | NT_EVENT_UNPUBLISH,
+        [this](const nt::Event& event) { HandleListener(event); });
   }
+
+  void HandleListener(const nt::Event& event);
+
+  bool GetLastControlData(mrc::ControlData* data, int64_t* time) {
+    std::scoped_lock lock{controlDataMutex};
+    if (!lastValue.IsRaw()) {
+      return false;
+    }
+    if (controlDataMsg.UnpackInto(data, lastValue.GetRaw())) {
+      *time = lastValue.time();
+      return true;
+    }
+    return false;
+  }
+
+  ~SystemServerDriverStation() { ntInst.RemoveListener(controlDataListener); }
 };
 
 struct FRCDriverStation {
@@ -145,6 +171,26 @@ struct FRCDriverStation {
 
 static ::SystemServerDriverStation* systemServerDs;
 static ::FRCDriverStation* driverStation;
+
+void SystemServerDriverStation::HandleListener(const nt::Event& event) {
+  auto valueEvent = event.GetValueEventData();
+
+  bool isValid = valueEvent && valueEvent->value.IsRaw();
+
+  {
+    std::scoped_lock lock{controlDataMutex};
+    if (isValid) {
+      lastValue = valueEvent->value;
+    } else {
+      // We've either been unpublished, or type changed.
+      // Treat either as a disconnect.
+      lastValue = nt::Value{};
+    }
+  }
+  if (isValid) {
+    driverStation->newDataEvents.Wakeup();
+  }
+}
 
 // Message and Data variables
 static wpi::mutex msgMutex;
@@ -539,17 +585,19 @@ void HAL_ObserveUserProgramTest(void) {
 }
 
 HAL_Bool HAL_RefreshDSData(void) {
-  auto newestData = systemServerDs->controlDataSubscriber.GetAtomic({});
+  mrc::ControlData newestData;
+  int64_t dataTime{0};
+  bool dataValid = systemServerDs->GetLastControlData(&newestData, &dataTime);
 
   auto now = wpi::Now();
-  auto delta = now - newestData.time;
+  auto delta = now - dataTime;
 
   bool updatedData = false;
 
   // Data newer then 125ms, and we have a DS connected
-  if (delta < 125000 && newestData.value.ControlWord.DsConnected) {
+  if (dataValid && delta < 125000 && newestData.ControlWord.DsConnected) {
     // Update the cache.
-    cacheToUpdate->Update(newestData.value);
+    cacheToUpdate->Update(newestData);
     updatedData = true;
   } else {
     // DS disconnected. Clear the control word
