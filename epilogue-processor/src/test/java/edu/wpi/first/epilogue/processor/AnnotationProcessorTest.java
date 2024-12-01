@@ -60,7 +60,7 @@ class AnnotationProcessorTest {
   }
 
   @Test
-  void implicitOptInLogging() {
+  void optInFields() {
     String source =
         """
       package edu.wpi.first.epilogue;
@@ -68,9 +68,6 @@ class AnnotationProcessorTest {
       class Example {
         @Logged double x;
         @Logged int y;
-
-        @Logged public double getValue() { return 2.0; }
-        @Logged public boolean isActive() { return false; }
       }
     """;
 
@@ -93,13 +90,50 @@ class AnnotationProcessorTest {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             backend.log("x", object.x);
             backend.log("y", object.y);
-            backend.log("getValue", object.getValue());
-            backend.log("isActive", object.isActive());
           }
         }
       }
       """;
 
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+  
+  @Test
+  void optInMethods() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      class Example {
+        @Logged public double getValue() { return 2.0; }
+        @Logged public String getName() { return "Example"; }
+      }
+    """;
+    
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("getValue", object.getValue());
+            backend.log("getName", object.getName());
+          }
+        }
+      }
+      """;
+    
     assertLoggerGenerates(source, expectedGeneratedSource);
   }
 
@@ -1461,7 +1495,7 @@ class AnnotationProcessorTest {
   }
 
   @Test
-  void nestedImplicit() {
+  void nestedOptIn() {
     String source =
         """
         package edu.wpi.first.epilogue;
