@@ -257,6 +257,16 @@ public final class FRCNetComm {
     public static final int kResourceType_DataLogManager = 117;
     /** kResourceType_LoggingFramework = 118. */
     public static final int kResourceType_LoggingFramework = 118;
+    /** kResourceType_ChoreoTrajectory = 119. */
+    public static final int kResourceType_ChoreoTrajectory = 119;
+    /** kResourceType_ChoreoTrigger = 120. */
+    public static final int kResourceType_ChoreoTrigger = 120;
+    /** kResourceType_PathWeaverTrajectory = 121. */
+    public static final int kResourceType_PathWeaverTrajectory = 121;
+    /** kResourceType_Koors40 = 122. */
+    public static final int kResourceType_Koors40 = 122;
+    /** kResourceType_ThriftyNova = 123. */
+    public static final int kResourceType_ThriftyNova = 123;
   }
 
   /**
@@ -421,6 +431,12 @@ public final class FRCNetComm {
     public static final int kLoggingFramework_AdvantageKit = 4;
     /** kLoggingFramework_DogLog = 5. */
     public static final int kLoggingFramework_DogLog = 5;
+    /** kPDP_CTRE = 1. */
+    public static final int kPDP_CTRE = 1;
+    /** kPDP_REV = 2. */
+    public static final int kPDP_REV = 2;
+    /** kPDP_Unknown = 3. */
+    public static final int kPDP_Unknown = 3;
   }
 
   /** Utility class. */

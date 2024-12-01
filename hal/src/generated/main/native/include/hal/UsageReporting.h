@@ -139,6 +139,11 @@ typedef enum
     kResourceType_BangBangController = 116,
     kResourceType_DataLogManager = 117,
     kResourceType_LoggingFramework = 118,
+    kResourceType_ChoreoTrajectory = 119,
+    kResourceType_ChoreoTrigger = 120,
+    kResourceType_PathWeaverTrajectory = 121,
+    kResourceType_Koors40 = 122,
+    kResourceType_ThriftyNova = 123,
 
 //    kResourceType_MaximumID = 255,
 } tResourceType;
@@ -222,6 +227,9 @@ typedef enum
     kLoggingFramework_Monologue = 3,
     kLoggingFramework_AdvantageKit = 4,
     kLoggingFramework_DogLog = 5,
+    kPDP_CTRE = 1,
+    kPDP_REV = 2,
+    kPDP_Unknown = 3,
 } tInstances;
 
 /**
