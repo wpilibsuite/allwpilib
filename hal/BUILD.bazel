@@ -1,7 +1,13 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("@rules_java//java:defs.bzl", "java_binary")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
-load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+
+cc_library(
+    name = "generated_cc_headers",
+    hdrs = glob(["src/generated/main/native/include/**"]),
+    includes = ["src/generated/main/native/include"],
+    strip_include_prefix = "src/generated/main/native/include",
+    visibility = ["//hal:__subpackages__"],
+)
 
 cc_library(
     name = "mrc_cc_headers",
@@ -19,7 +25,17 @@ cc_library(
     visibility = ["//hal:__subpackages__"],
 )
 
-SYSTEMCORE_SRCS = glob(["src/main/native/systemcore/**"])
+cc_library(
+    name = "generated_mrc_cc_headers",
+    hdrs = glob(["src/generated/main/native/cpp/mrc/protobuf/**"]),
+    includes = ["src/generated/main/native/cpp/mrc/protobuf"],
+    strip_include_prefix = "src/generated/main/native/cpp/mrc/protobuf",
+    visibility = ["//hal:__subpackages__"],
+)
+
+ATHENA_SRCS = glob(["src/main/native/athena/**"])
+
+ATHENA_DEPS = ["@bzlmodrio-ni//libraries/cpp/ni:shared"]
 
 SIM_SRCS = glob(["src/main/native/sim/**"])
 
@@ -38,6 +54,10 @@ cc_library(
             "src/main/native/cpp/**",
             "src/generated/main/native/cpp/**",
         ],
+        [
+            "src/main/native/cpp/**",
+            "src/generated/main/native/cpp/**",
+        ],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**/*"]),
@@ -45,10 +65,9 @@ cc_library(
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
-        ":generated_mrc_cc_headers",
+        ":generated_cc_headers",
         ":mrc_cc_headers",
-        "//ntcore:ntcore.static",
-        "//wpinet:wpinet.static",
+        ":generated_mrc_cc_headers",
         "//wpiutil:wpiutil.static",
     ],
 )

@@ -81,18 +81,6 @@ typedef struct _mrc_proto_ProtobufMatchInfo {
     int32_t MatchType;
 } mrc_proto_ProtobufMatchInfo;
 
-typedef struct _mrc_proto_ProtobufErrorInfo {
-    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
-    static std::string_view msg_name(void) noexcept;
-    static pb_filedesc_t file_descriptor(void) noexcept;
-
-    bool IsError;
-    int32_t ErrorCode;
-    pb_callback_t Details;
-    pb_callback_t Location;
-    pb_callback_t CallStack;
-} mrc_proto_ProtobufErrorInfo;
-
 
 /* Initializer values for message structs */
 #define mrc_proto_ProtobufJoystickData_init_default {0, 0, {{NULL}, NULL}, {{NULL}, NULL}}
@@ -101,14 +89,12 @@ typedef struct _mrc_proto_ProtobufErrorInfo {
 #define mrc_proto_ProtobufJoystickOutputData_init_default {0, 0, 0}
 #define mrc_proto_ProtobufVersionInfo_init_default {0, {{NULL}, NULL}, {{NULL}, NULL}}
 #define mrc_proto_ProtobufMatchInfo_init_default {{{NULL}, NULL}, 0, 0, 0}
-#define mrc_proto_ProtobufErrorInfo_init_default {0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickData_init_zero {0, 0, {{NULL}, NULL}, {{NULL}, NULL}}
 #define mrc_proto_ProtobufControlData_init_zero  {0, 0, {{NULL}, NULL}, {{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickDescriptor_init_zero {{{NULL}, NULL}, {{NULL}, NULL}, 0, 0, 0, 0}
 #define mrc_proto_ProtobufJoystickOutputData_init_zero {0, 0, 0}
 #define mrc_proto_ProtobufVersionInfo_init_zero  {0, {{NULL}, NULL}, {{NULL}, NULL}}
 #define mrc_proto_ProtobufMatchInfo_init_zero    {{{NULL}, NULL}, 0, 0, 0}
-#define mrc_proto_ProtobufErrorInfo_init_zero    {0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define mrc_proto_ProtobufJoystickData_ButtonCount_tag 1
@@ -135,11 +121,6 @@ typedef struct _mrc_proto_ProtobufErrorInfo {
 #define mrc_proto_ProtobufMatchInfo_MatchNumber_tag 2
 #define mrc_proto_ProtobufMatchInfo_ReplayNumber_tag 3
 #define mrc_proto_ProtobufMatchInfo_MatchType_tag 4
-#define mrc_proto_ProtobufErrorInfo_IsError_tag  1
-#define mrc_proto_ProtobufErrorInfo_ErrorCode_tag 2
-#define mrc_proto_ProtobufErrorInfo_Details_tag  3
-#define mrc_proto_ProtobufErrorInfo_Location_tag 4
-#define mrc_proto_ProtobufErrorInfo_CallStack_tag 5
 
 /* Struct field encoding specification for nanopb */
 #define mrc_proto_ProtobufJoystickData_FIELDLIST(X, a) \
@@ -191,22 +172,12 @@ X(a, STATIC,   SINGULAR, INT32,    MatchType,         4)
 #define mrc_proto_ProtobufMatchInfo_CALLBACK pb_default_field_callback
 #define mrc_proto_ProtobufMatchInfo_DEFAULT NULL
 
-#define mrc_proto_ProtobufErrorInfo_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, BOOL,     IsError,           1) \
-X(a, STATIC,   SINGULAR, SINT32,   ErrorCode,         2) \
-X(a, CALLBACK, SINGULAR, STRING,   Details,           3) \
-X(a, CALLBACK, SINGULAR, STRING,   Location,          4) \
-X(a, CALLBACK, SINGULAR, STRING,   CallStack,         5)
-#define mrc_proto_ProtobufErrorInfo_CALLBACK pb_default_field_callback
-#define mrc_proto_ProtobufErrorInfo_DEFAULT NULL
-
 /* Maximum encoded size of messages (where known) */
 /* mrc_proto_ProtobufJoystickData_size depends on runtime parameters */
 /* mrc_proto_ProtobufControlData_size depends on runtime parameters */
 /* mrc_proto_ProtobufJoystickDescriptor_size depends on runtime parameters */
 /* mrc_proto_ProtobufVersionInfo_size depends on runtime parameters */
 /* mrc_proto_ProtobufMatchInfo_size depends on runtime parameters */
-/* mrc_proto_ProtobufErrorInfo_size depends on runtime parameters */
 #define MRC_PROTO_MRCCOMM_NPB_H_MAX_SIZE         mrc_proto_ProtobufJoystickOutputData_size
 #define mrc_proto_ProtobufJoystickOutputData_size 15
 

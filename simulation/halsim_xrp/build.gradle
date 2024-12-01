@@ -23,11 +23,12 @@ apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
 model {
     binaries {
         all {
-            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                 it.buildable = false
                 return
             }
 
+            project(':ntcore').addNtcoreDependency(it, 'shared')
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ":simulation:halsim_ws_core", library: "halsim_ws_core", linkage: "static"

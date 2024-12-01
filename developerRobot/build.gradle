@@ -69,18 +69,14 @@ deploy {
     targets {
         systemcore(RemoteTarget) {
             directory = '/home/systemcore'
+        systemcore(RemoteTarget) {
+            directory = '/home/systemcore'
             maxChannels = 4
             locations {
-                mdns(SshDeployLocation) {
-                    address = "limelight.local"
+                ssh(SshDeployLocation) {
+                    address = "robot.local"
                     user = 'systemcore'
-                    password = 'systemcore'
-                    ipv6 = false
-                }
-                usb(SshDeployLocation) {
-                    address = "172.28.0.1"
-                    user = 'systemcore'
-                    password = 'systemcore'
+                    password = 'systemcorerules2027'
                     ipv6 = false
                 }
             }
@@ -99,11 +95,12 @@ deploy {
 
                 developerRobotCpp(NativeExecutableArtifact) {
                     libraryDirectory = '/home/systemcore/frc/third-party/lib'
+                    libraryDirectory = '/home/systemcore/frc/third-party/lib'
                     def excludes = getLibraryFilter().getExcludes()
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
                     postdeploy << { ctx ->
-                        ctx.execute("echo 'LD_LIBRARY_PATH=/home/systemcore/frc/third-party/lib /home/systemcore/developerRobotCpp' > /home/systemcore/robotCommand")
+                        ctx.execute("echo '/home/systemcore/developerRobotCpp' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                         ctx.execute("setcap cap_sys_nice+eip \"/home/systemcore/developerRobotCpp\"")
                         ctx.execute('chmod +x developerRobotCpp')
@@ -112,15 +109,17 @@ deploy {
 
                 developerRobotCppStatic(NativeExecutableArtifact) {
                     libraryDirectory = '/home/systemcore/frc/third-party/lib'
+                    libraryDirectory = '/home/systemcore/frc/third-party/lib'
                     postdeploy << { ctx ->
-                        ctx.execute("echo ''LD_LIBRARY_PATH=/home/systemcore/frc/third-party/lib /home/systemcore/developerRobotCppStatic' > /home/systemcore/robotCommand")
+                        ctx.execute("echo '/home/systemcore/developerRobotCppStatic' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
-                        ctx.execute("sudo setcap cap_sys_nice+eip \"/home/systemcore/developerRobotCppStatic\"")
+                        ctx.execute("setcap cap_sys_nice+eip \"/home/systemcore/developerRobotCppStatic\"")
                         ctx.execute('chmod +x developerRobotCppStatic')
                     }
                 }
 
                 developerRobotCppJava(NativeExecutableArtifact) {
+                    libraryDirectory = '/home/systemcore/frc/third-party/lib'
                     libraryDirectory = '/home/systemcore/frc/third-party/lib'
                     def excludes = getLibraryFilter().getExcludes()
                     excludes.add('**/*.so.debug')
@@ -130,6 +129,8 @@ deploy {
                 developerRobotJava(JavaArtifact) {
                     jarTask = shadowJar
                     postdeploy << { ctx ->
+                        ctx.execute("echo '/usr/bin/java -XX:+UseG1GC -Djava.library.path=/home/systemcore/frc/third-party/lib -jar /home/systemcore/developerRobot-all.jar' > /home/systemcore/robotCommand")
+                        ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                         ctx.execute("echo '/usr/bin/java -XX:+UseG1GC -Djava.library.path=/home/systemcore/frc/third-party/lib -jar /home/systemcore/developerRobot-all.jar' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                     }
@@ -154,6 +155,7 @@ eclipse {
 
 tasks.register('deployJava') {
     try {
+        dependsOn tasks.named('deployjresystemcore')
         dependsOn tasks.named('deploydeveloperRobotJavasystemcore')
         dependsOn tasks.named('deploydeveloperRobotCppJavasystemcore') // Deploying shared C++ is how to get the Java shared libraries.
     } catch (ignored) {
@@ -163,12 +165,14 @@ tasks.register('deployJava') {
 tasks.register('deployShared') {
     try {
         dependsOn tasks.named('deploydeveloperRobotCppsystemcore')
+        dependsOn tasks.named('deploydeveloperRobotCppsystemcore')
     } catch (ignored) {
     }
 }
 
 tasks.register('deployStatic') {
     try {
+        dependsOn tasks.named('deploydeveloperRobotCppStaticsystemcore')
         dependsOn tasks.named('deploydeveloperRobotCppStaticsystemcore')
     } catch (ignored) {
     }
@@ -192,7 +196,10 @@ model {
             }
             binaries.all { binary ->
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     if (binary.buildType.name == 'debug') {
+                        deploy.targets.systemcore.artifacts.developerRobotCpp.binary = binary
+                        deploy.targets.systemcore.artifacts.developerRobotCppJava.binary = binary
                         deploy.targets.systemcore.artifacts.developerRobotCpp.binary = binary
                         deploy.targets.systemcore.artifacts.developerRobotCppJava.binary = binary
                     }
@@ -213,6 +220,10 @@ model {
                 project(':ntcore').addNtcoreJniDependency(binary)
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                def systemArch = getCurrentArch()
+                if (binary.targetPlatform.name == systemArch) {
+                    simProjects.each {
+                        lib project: ":simulation:$it", library: it, linkage: 'shared'
                 def systemArch = getCurrentArch()
                 if (binary.targetPlatform.name == systemArch) {
                     simProjects.each {
@@ -238,7 +249,9 @@ model {
             }
             binaries.all { binary ->
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     if (binary.buildType.name == 'debug') {
+                        deploy.targets.systemcore.artifacts.developerRobotCppStatic.binary = binary
                         deploy.targets.systemcore.artifacts.developerRobotCppStatic.binary = binary
                     }
                 }
@@ -316,21 +329,6 @@ model {
             }
         }
 
-        installSystemCoreStatic(Task) {
-            $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore && it.component.name == 'developerRobotCppStatic') {
-                    dependsOn it.tasks.install
-                }
-            }
-        }
-
-        installSystemCore(Task) {
-            $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore && it.component.name == 'developerRobotCpp') {
-                    dependsOn it.tasks.install
-                }
-            }
-        }
         installSystemCoreStatic(Task) {
             $.binaries.each {
                 if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore && it.component.name == 'developerRobotCppStatic') {

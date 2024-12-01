@@ -2,9 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/SystemServer.h"
+#include "SystemServer.h"
 
-#include "SystemServerInternal.h"
 #include "mrc/NtNetComm.h"
 
 namespace hal {
@@ -17,7 +16,7 @@ void InitializeSystemServer() {
   }
   ServerInstance = nt::NetworkTableInstance::Create();
   ServerInstance.SetServer("localhost", ROBOT_SYSTEM_SERVER_NT_PORT);
-  ServerInstance.StartClient("RobotProgram");
+  ServerInstance.StartClient4("RobotProgram");
 }
 
 void ShutdownSystemServer() {
@@ -34,10 +33,3 @@ nt::NetworkTableInstance GetSystemServer() {
 }
 
 }  // namespace hal
-
-extern "C" {
-
-NT_Inst HAL_GetSystemServerHandle(void) {
-  return hal::ServerInstance.GetHandle();
-}
-}  // extern "C"
