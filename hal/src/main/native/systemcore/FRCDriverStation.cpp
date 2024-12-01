@@ -2,6 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <networktables/BooleanTopic.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/ProtobufTopic.h>
+#include <networktables/StringArrayTopic.h>
+#include <networktables/StringTopic.h>
+
 #include <atomic>
 #include <chrono>
 #include <cstdio>
@@ -18,24 +24,17 @@
 #include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
+#include "SystemServer.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
-
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/BooleanTopic.h>
-#include <networktables/ProtobufTopic.h>
-#include <networktables/StringArrayTopic.h>
-#include <networktables/StringTopic.h>
-#include "mrc/NtNetComm.h"
-#include "SystemServer.h"
 #include "hal/proto/ControlData.h"
-#include "hal/proto/MatchInfo.h"
 #include "hal/proto/JoystickDescriptor.h"
 #include "hal/proto/JoystickOutputData.h"
-
-#include <wpi/timestamp.h>
+#include "hal/proto/MatchInfo.h"
+#include "mrc/NtNetComm.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");
