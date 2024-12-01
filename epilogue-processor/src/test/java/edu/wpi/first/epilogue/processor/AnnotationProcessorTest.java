@@ -97,7 +97,7 @@ class AnnotationProcessorTest {
 
     assertLoggerGenerates(source, expectedGeneratedSource);
   }
-  
+
   @Test
   void optInMethods() {
     String source =
@@ -109,7 +109,7 @@ class AnnotationProcessorTest {
         @Logged public String getName() { return "Example"; }
       }
     """;
-    
+
     String expectedGeneratedSource =
         """
       package edu.wpi.first.epilogue;
@@ -133,7 +133,7 @@ class AnnotationProcessorTest {
         }
       }
       """;
-    
+
     assertLoggerGenerates(source, expectedGeneratedSource);
   }
 
