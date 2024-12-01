@@ -77,7 +77,11 @@ UNIT_CONFIGURATIONS = {
     },
     "AngularVelocity": {
         "base_unit": "RadiansPerSecond",
-        "multiply": {"Time": "Angle", "Frequency": "AngularAcceleration", "Torque" : "Power"},
+        "multiply": {
+            "Time": "Angle",
+            "Frequency": "AngularAcceleration",
+            "Torque": "Power",
+        },
         "divide": {"Time": "AngularAcceleration"},
         "extra": inspect.cleandoc(
             """
@@ -222,7 +226,13 @@ UNIT_CONFIGURATIONS = {
         "multiply": {
             "Time": "Energy",
         },
-        "divide": {"Voltage": "Current", "Current": "Voltage", "Energy": "Frequency", "Torque" : "AngularVelocity", "AngularVelocity" : "Torque"},
+        "divide": {
+            "Voltage": "Current",
+            "Current": "Voltage",
+            "Energy": "Frequency",
+            "Torque": "AngularVelocity",
+            "AngularVelocity": "Torque",
+        },
     },
     "Resistance": {
         "base_unit": "Ohms",
