@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Gold856 <117957790+Gold856@users.noreply.github.com>
 Date: Mon, 11 Nov 2024 00:15:05 -0500
-Subject: [PATCH 1/4] Fix MSVC build errors
+Subject: [PATCH 1/7] Fix MSVC build errors
 
 ---
  autodiff.hh      |  4 ++--
@@ -73,7 +73,7 @@ index 4ec6acadb5fc92ec264fb460e1fcc882dd3face3..8fc2857758ef7763cc1ef5b79a495aec
      };
  } mrcal_projection_precomputed_t;
 diff --git a/mrcal-types.h b/mrcal-types.h
-index 87d05d8503cace252cb126a745cdcf2e45c2e5f0..04627a76d90c279b94dc2614e4a6ff270ae8be24 100644
+index e5cf6c637f8f2bf9e4bbe4ad443661159c511887..7e43319b882c3e29eb3429f95c77fc8bd664ce1a 100644
 --- a/mrcal-types.h
 +++ b/mrcal-types.h
 @@ -45,24 +45,18 @@
@@ -120,10 +120,10 @@ index 87d05d8503cace252cb126a745cdcf2e45c2e5f0..04627a76d90c279b94dc2614e4a6ff27
      };
  } mrcal_lensmodel_t;
 diff --git a/mrcal.c b/mrcal.c
-index 7fb77075fbc7f7a6a7d17ea51c717cc274499629..d67ea34708a24ebc5d696c21e0478c87461fc0cc 100644
+index d1195a36050e5cbde393ed033e4d5699ce52225a..85ab4e26a5ab487fc13e66ebd486bd7c00480c05 100644
 --- a/mrcal.c
 +++ b/mrcal.c
-@@ -2662,8 +2662,6 @@ void project( // out
+@@ -2674,8 +2674,6 @@ void project( // out
      if(!camera_at_identity)
      {
          // make sure I can pass mrcal_pose_t.r as an rt[] transformation
@@ -132,7 +132,7 @@ index 7fb77075fbc7f7a6a7d17ea51c717cc274499629..d67ea34708a24ebc5d696c21e0478c87
          mrcal_compose_rt( _joint_rt,
                            gg._d_rj_rc, gg._d_rj_rf,
                            gg._d_tj_rc, gg._d_tj_tf,
-@@ -3453,8 +3451,6 @@ void mrcal_pack_solver_state_vector( // out, in
+@@ -3465,8 +3463,6 @@ void mrcal_pack_solver_state_vector( // out, in
                                               lensmodel, problem_selections,
                                               Ncameras_intrinsics );
  
@@ -141,7 +141,7 @@ index 7fb77075fbc7f7a6a7d17ea51c717cc274499629..d67ea34708a24ebc5d696c21e0478c87
      if( problem_selections.do_optimize_extrinsics )
          for(int icam_extrinsics=0; icam_extrinsics < Ncameras_extrinsics; icam_extrinsics++)
          {
-@@ -3703,11 +3699,6 @@ void mrcal_unpack_solver_state_vector( // out, in
+@@ -3715,11 +3711,6 @@ void mrcal_unpack_solver_state_vector( // out, in
  
      if( problem_selections.do_optimize_extrinsics )
      {

@@ -772,7 +772,9 @@ angle_error__assume_small(const vec_withgrad_t<6,3>& v0,
     val_withgrad_t<6> th_sq = costh*(-2.) + 2.;
 
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: temporary hack to avoid dividing by 0"
+#endif
     if(th_sq.x < 1e-21)
     {
         return val_withgrad_t<6>();
@@ -784,11 +786,15 @@ angle_error__assume_small(const vec_withgrad_t<6,3>& v0,
         th_sq.x = 0;
 
     return th_sq.sqrt();
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: look at numerical issues that will results in sqrt(<0)"
 // #warning "triangulated-solve: look at behavior near 0 where dsqrt/dx -> inf"
+#endif
 }
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: maybe exposing the triangulated-error C function is OK? I'm already exposing the Python function"
+#endif
 
 
 static
@@ -898,7 +904,9 @@ _mrcal_triangulated_error(// outputs
     // case a cos() error is the least of our issues
     val_withgrad_t<6> err = angle_error__assume_small( v0, m ) * 2.;
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: what happens when the rays are exactly parallel? Make sure the numerics remain happy. They don't: I divide by cross(v0,v1) ~ 0"
+#endif
 
 #if 0
     // original method
@@ -947,7 +955,9 @@ _mrcal_triangulated_error(// outputs
         // - err_to_vanishing_point between THRESHOLD_DIVERGENT_LOWER and _UPPER
         //   I linearly the scale on this divergence term from 0 to 1
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: set reasonable thresholds"
+#endif
 #define THRESHOLD_DIVERGENT_LOWER 3.0e-4
 #define THRESHOLD_DIVERGENT_UPPER 6.0e-4
 
@@ -959,7 +969,9 @@ _mrcal_triangulated_error(// outputs
         {
             // we're VERY divergent. Add another cost term:
             // the distance to the vanishing point
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: temporary testing logic"
+#endif
 #if defined DIVERGENT_COST_ONLY && DIVERGENT_COST_ONLY
             err = err_to_vanishing_point;
 #else
@@ -976,7 +988,9 @@ _mrcal_triangulated_error(// outputs
                 (err_to_vanishing_point    - THRESHOLD_DIVERGENT_LOWER) /
                 (THRESHOLD_DIVERGENT_UPPER - THRESHOLD_DIVERGENT_LOWER);
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: temporary testing logic"
+#endif
 #if defined DIVERGENT_COST_ONLY && DIVERGENT_COST_ONLY
             err = k*err_to_vanishing_point + (val_withgrad_t<6>(1.0)-k)*err;
 #else

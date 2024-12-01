@@ -551,3 +551,36 @@ void mrcal_compose_r_tinyr1_gradientr1_full( // output
                            const double* r_0,   // (3,) array
                            int r_0_stride0      // in bytes. <= 0 means "contiguous"
                            );
+
+// Procrustes fit functions. Align two corresponding sets of normalized
+// direction vectors or points. Return true on success
+bool mrcal_align_procrustes_vectors_R01(// out
+                                        double* R01,
+                                        // in
+                                        const int N,
+                                        // (N,3) arrays
+                                        // normalized direction vectors
+                                        const double* v0,
+                                        const double* v1,
+
+                                        // (N,) array; may be NULL to use an even
+                                        // weighting
+                                        const double* weights);
+
+bool mrcal_align_procrustes_points_Rt01(// out
+                                        double* Rt01,
+                                        // in
+                                        const int N,
+                                        // (N,3) arrays
+                                        const double* p0,
+                                        const double* p1,
+
+                                        // (N,) array; may be NULL to use an even
+                                        // weighting
+                                        const double* weights);
+
+// Compute a non-unique rotation to map a given vector to [0,0,1]
+void mrcal_R_aligned_to_vector(// out
+                               double* R,
+                               // in
+                               const double* v);

@@ -18,6 +18,7 @@ def copy_upstream_src(wpilib_root):
 
     files = walk_cwd_and_copy_if(
         lambda dp, f: (f.endswith(".h") or f.endswith(".hh"))
+        and not f.endswith("heap.h")
         and not f.endswith("stereo-matching-libelas.h")
         and not dp.startswith(os.path.join(".", "test")),
         os.path.join(wpical, "src/main/native/thirdparty/mrcal/include"),
@@ -29,11 +30,13 @@ def copy_upstream_src(wpilib_root):
             or f.endswith(".cpp")
             or f.endswith(".pl")
         )
+        and not f.endswith("heap.cc")
         and not f.endswith("mrcal-pywrap.c")
         and not f.endswith("image.c")
         and not f.endswith("stereo.c")
         and not f.endswith("stereo-matching-libelas.cc")
         and not f.endswith("uncertainty.c")
+        and not f.endswith("traverse-sensor-links.c")
         and not dp.startswith(os.path.join(".", "doc"))
         and not dp.startswith(os.path.join(".", "test")),
         os.path.join(wpical, "src/main/native/thirdparty/mrcal/src"),
@@ -52,7 +55,7 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "mrcal"
     url = "https://github.com/dkogan/mrcal"
-    tag = "71c89c4e9f268a0f4fb950325e7d551986a281ec"
+    tag = "662a539d3cbba4948c31d06a780569173b3fb6e6"
 
     mrcal = Lib(name, url, tag, copy_upstream_src)
     mrcal.main()

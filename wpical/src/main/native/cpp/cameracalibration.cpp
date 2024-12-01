@@ -203,7 +203,7 @@ int cameracalibration::calibrate(const std::string &input_video, float square_wi
         std::vector<cv::Point3f> obj_points;
         std::vector<cv::Point2f> img_points;
 
-        mrcal_point3_t points[(board_width - 1) * (board_height - 1)];
+        std::vector<mrcal_point3_t> points((board_width - 1) * (board_height - 1));
 
         charuco_detector.detectBoard(frame_gray, charuco_corners, charuco_ids, marker_corners, marker_ids);
 
@@ -222,7 +222,7 @@ int cameracalibration::calibrate(const std::string &input_video, float square_wi
             points[id].z = 1.0f;
         }
 
-        for (int i = 0; i < (sizeof(points) / sizeof(points[0])); i++)
+        for (int i = 0; i < points.size(); i++)
         {
             if (points[i].z != 1.0f)
             {
@@ -232,10 +232,8 @@ int cameracalibration::calibrate(const std::string &input_video, float square_wi
             }
         }
 
-        std::vector<mrcal_point3_t> points_vector(points, points + (sizeof(points) / sizeof(points[0])));
-
-        frames_rt_toref.push_back(getSeedPose(points_vector.data(), boardSize, imagerSize, square_width, 1000));
-        observation_boards.insert(observation_boards.end(), points_vector.begin(), points_vector.end());
+        frames_rt_toref.push_back(getSeedPose(points.data(), boardSize, imagerSize, square_width, 1000));
+        observation_boards.insert(observation_boards.end(), points.begin(), points.end());
 
         if (show_debug_window)
         {

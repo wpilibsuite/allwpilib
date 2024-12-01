@@ -1078,3 +1078,52 @@ void mrcal_r_from_R_full( // output
             }
     }
 }
+
+// Compute a non-unique rotation to map a given vector to [0,0,1]
+// See docstring for mrcal.R_aligned_to_vector() for details
+void mrcal_R_aligned_to_vector(// out
+                               double* R,
+                               // in
+                               const double* v)
+{
+    double magv = sqrt(v[0]*v[0] +
+                       v[1]*v[1] +
+                       v[2]*v[2]);
+
+    double* x = &R[0*3];
+    double* y = &R[1*3];
+    double* z = &R[2*3];
+
+    for(int i=0; i<3; i++)
+    {
+        x[i] = 0.0;
+        z[i] = v[i]/magv;
+    }
+
+    double inner_x_z = 0.;
+    if(fabs(z[0]) < .9)
+    {
+        x[0] = 1.;
+        inner_x_z = z[0];
+    }
+    else
+    {
+        x[1] = 1.;
+        inner_x_z = z[1];
+    }
+
+    for(int i=0; i<3; i++)
+        x[i] -= inner_x_z*z[i];
+
+    double magx = sqrt(x[0]*x[0] +
+                       x[1]*x[1] +
+                       x[2]*x[2]);
+
+    for(int i=0; i<3; i++)
+        x[i] /= magx;
+
+    // y = cross(z,x);
+    y[0] = z[1]*x[2] - z[2]*x[1];
+    y[1] = z[2]*x[0] - z[0]*x[2];
+    y[2] = z[0]*x[1] - z[1]*x[0];
+}

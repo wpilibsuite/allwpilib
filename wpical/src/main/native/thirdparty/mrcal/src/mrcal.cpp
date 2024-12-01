@@ -14,19 +14,22 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
+extern "C" {
 #include <dogleg.h>
+}
 #include <assert.h>
 #include <stdbool.h>
 #include <math.h>
 #include <string.h>
 
+extern "C" {
 #include "mrcal.h"
 #include "minimath/minimath.h"
 #include "cahvore.h"
 #include "minimath/minimath-extra.h"
 #include "util.h"
 #include "scales.h"
-
+}
 #define MSG_IF_VERBOSE(...) do { if(verbose) MSG( __VA_ARGS__ ); } while(0)
 
 #define restrict __restrict
@@ -447,7 +450,9 @@ int mrcal_measurement_index_points(int i_observation_point,
         i_observation_point * 2;
 }
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: need known-range points, at-infinity points"
+#endif
 
 int mrcal_num_measurements_points(int Nobservations_point)
 {
@@ -455,7 +460,9 @@ int mrcal_num_measurements_points(int Nobservations_point)
     return Nobservations_point * 2;
 }
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: Add a test for mrcal_measurement_index_points_triangulated()"
+#endif
 int mrcal_measurement_index_points_triangulated(int i_point_triangulated,
                                                 int Nobservations_board,
                                                 int Nobservations_point,
@@ -481,7 +488,9 @@ int mrcal_measurement_index_points_triangulated(int i_point_triangulated,
                                                                    i_point_triangulated);
 }
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: python-wrap this function"
+#endif
 int mrcal_num_measurements_points_triangulated_initial_Npoints(// May be NULL if we don't have any of these
                                                                const mrcal_observation_point_triangulated_t* observations_point_triangulated,
                                                                int Nobservations_point_triangulated,
@@ -527,7 +536,9 @@ int mrcal_num_measurements_points_triangulated(// May be NULL if we don't have a
                                                                     -1 );
 }
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: python-wrap this function"
+#endif
 bool mrcal_decode_observation_indices_points_triangulated(
     // output
     int* iobservation0,
@@ -651,7 +662,9 @@ bool mrcal_decode_observation_indices_points_triangulated(
 
 
 int mrcal_measurement_index_regularization(
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: this argument order is weird. Put then triangulated stuff at the end?"
+#endif
                                            // May be NULL if we don't have any of these
                                            const mrcal_observation_point_triangulated_t* observations_point_triangulated,
                                            int Nobservations_point_triangulated,
@@ -863,7 +876,9 @@ int _mrcal_num_j_nonzero(int Nobservations_board,
        problem_selections.do_optimize_extrinsics &&
        Ncameras_extrinsics > 0)
     {
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: I assume that camera0 is at the reference"
+#endif
         N += 3; // translation only
     }
 
@@ -2730,11 +2745,10 @@ void project( // out
             const mrcal_LENSMODEL_SPLINED_STEREOGRAPHIC__config_t* config =
                 &lensmodel->LENSMODEL_SPLINED_STEREOGRAPHIC__config;
             *gradient_sparse_meta =
-                (gradient_sparse_meta_t)
                 {
-                    .run_side_length = config->order+1,
-                    .ivar_stridey    = 2*config->Nx,
-                    .pool            = &dq_dintrinsics_pool_double[ivar_pool]
+                    &dq_dintrinsics_pool_double[ivar_pool],
+                    static_cast<uint16_t>(config->order+1),
+                    static_cast<uint16_t>(2*config->Nx),
                 };
             ivar_pool += Npoints*2 * runlen;
         }
@@ -2753,10 +2767,11 @@ void project( // out
 
     if( calibration_object_width_n == 0 )
     { // projecting discrete points
+        mrcal_point3_t pt_ref = {}; // Unused
         mrcal_point3_t p =
             _propagate_extrinsics( _dp_drc,_dp_dtc,_dp_drf,_dp_dtf,
                                    &dp_drc,&dp_dtc,&dp_drf,&dp_dtf,
-                                   &(mrcal_point3_t){},
+                                   &pt_ref,
                                    camera_at_identity ? NULL : &gg,
                                    Rj, d_Rj_rj, &joint_rt[3]);
         _project_point(  q,
@@ -3215,10 +3230,11 @@ bool _mrcal_unproject_internal( // out
         // MSG("init. q=(%g,%g)", q[i].x, q[i].y);
 
         // initial estimate: pinhole projection
+        const mrcal_point3_t v = {.x = (q[i].x-cx)/fx,
+                                  .y = (q[i].y-cy)/fy,
+                                  .z = 1.};
         mrcal_project_stereographic( (mrcal_point2_t*)out->xyz, NULL,
-                                     &(mrcal_point3_t){.x = (q[i].x-cx)/fx,
-                                                       .y = (q[i].y-cy)/fy,
-                                                       .z = 1.},
+                                     &v,
                                      1,
                                      intrinsics );
         // MSG("init. out->xyz[]=(%g,%g)", out->x, out->y);
@@ -3981,7 +3997,9 @@ bool markOutliers(// output, input
                   int Nobservations_board,
                   int Nobservations_point,
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: not const because this is where the outlier bit lives currently"
+#endif
                   mrcal_observation_point_triangulated_t* observations_point_triangulated,
                   int Nobservations_point_triangulated,
 
@@ -4209,7 +4227,9 @@ bool markOutliers(// output, input
                     pt0->outlier = true;
                     pt1->outlier = true;
                     foundNewOutliers = true;
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: outliers should not be marked in this first loop. This should happen in the following loop. Putting it here breaks the logic"
+#endif
 
 
                     // There are a lot of these, so I'm disabling this print for
@@ -4357,7 +4377,9 @@ bool markOutliers(// output, input
 
                     (*Noutliers_triangulated_point)++;
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: outliers not returned to the caller yet, so I simply print them out here"
+#endif
                     MSG("New outliers found: measurement %d observation (%d,%d)",
                         imeasurement_point_triangulated0 + imeasurement_point_triangulated,
                         i0, i1);
@@ -4539,7 +4561,7 @@ void optimizer_callback(// input state
     // cameras. With many cameras (this will be slow)
 
     // WARNING: sparsify this. This is potentially a BIG thing on the stack
-    std::vector<std::vector<double>> intrinsics_all(ctx->Ncameras_intrinsics, std::vector(ctx->Nintrinsics));
+    std::vector<std::vector<double>> intrinsics_all(ctx->Ncameras_intrinsics, std::vector<double>(ctx->Nintrinsics));
     std::vector<mrcal_pose_t> camera_rt(ctx->Ncameras_extrinsics);
 
     mrcal_calobject_warp_t calobject_warp_local = {};
@@ -4652,10 +4674,10 @@ void optimizer_callback(// input state
 
         // these are computed in respect to the real-unit parameters,
         // NOT the unit-scale parameters used by the optimizer
-        std::vector<mrcal_point3_t> dq_drcamera_vec       (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
-        std::vector<mrcal_point3_t> dq_dtcamera_vec       (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
-        std::vector<mrcal_point3_t> dq_drframe_vec        (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
-        std::vector<mrcal_point3_t> dq_dtframe_vec        (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
+        std::vector<mrcal_point3_t> dq_drcamera       (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
+        std::vector<mrcal_point3_t> dq_dtcamera       (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
+        std::vector<mrcal_point3_t> dq_drframe        (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
+        std::vector<mrcal_point3_t> dq_dtframe        (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
         std::vector<mrcal_calobject_warp_t> dq_dcalobject_warp(ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
         std::vector<mrcal_point2_t> q_hypothesis      (ctx->calibration_object_width_n*ctx->calibration_object_height_n);
         // I get the intrinsics gradients in separate arrays, possibly sparsely.
@@ -4686,13 +4708,13 @@ void optimizer_callback(// input state
                 &dq_dfxy, &dq_dintrinsics_nocore, &gradient_sparse_meta,
 
                 ctx->problem_selections.do_optimize_extrinsics ?
-                dq_drcamera_vec.data() : NULL,
+                dq_drcamera.data() : NULL,
                 ctx->problem_selections.do_optimize_extrinsics ?
-                dq_dtcamera_vec.data() : NULL,
+                dq_dtcamera.data() : NULL,
                 ctx->problem_selections.do_optimize_frames ?
-                dq_drframe_vec.data() : NULL,
+                dq_drframe.data() : NULL,
                 ctx->problem_selections.do_optimize_frames ?
-                dq_dtframe_vec.data() : NULL,
+                dq_dtframe.data() : NULL,
                 has_calobject_warp(ctx->problem_selections,ctx->Nobservations_board) ?
                 dq_dcalobject_warp.data() : NULL,
 
@@ -4819,7 +4841,7 @@ void optimizer_callback(// input state
                     if( has_calobject_warp(ctx->problem_selections,ctx->Nobservations_board) )
                     {
                         STORE_JACOBIAN_N( i_var_calobject_warp,
-                                          dq_dcalobject_warp[i_pt][i_xy].values,
+                                          dq_dcalobject_warp[i_pt * 2 + i_xy].values,
                                           weight * SCALE_CALOBJECT_WARP,
                                           MRCAL_NSTATE_CALOBJECT_WARP);
                     }
@@ -5044,7 +5066,7 @@ void optimizer_callback(// input state
         int Ngradients = get_Ngradients(&ctx->lensmodel, ctx->Nintrinsics);
 
         // WARNING: "compute size(dq_dintrinsics_pool_double) correctly and maybe bounds-check"
-        double dq_dintrinsics_pool_double[Ngradients];
+        std::vector<double> dq_dintrinsics_pool_double(Ngradients);
         // used for LENSMODEL_SPLINED_STEREOGRAPHIC only, but getting rid of
         // this in other cases isn't worth the trouble
         int    dq_dintrinsics_pool_int   [1];
@@ -5064,7 +5086,7 @@ void optimizer_callback(// input state
         project(&q_hypothesis,
 
                 ctx->problem_selections.do_optimize_intrinsics_core || ctx->problem_selections.do_optimize_intrinsics_distortions ?
-                dq_dintrinsics_pool_double : NULL,
+                dq_dintrinsics_pool_double.data() : NULL,
                 ctx->problem_selections.do_optimize_intrinsics_core || ctx->problem_selections.do_optimize_intrinsics_distortions ?
                 dq_dintrinsics_pool_int : NULL,
                 &dq_dfxy, &dq_dintrinsics_nocore, &gradient_sparse_meta,
@@ -5315,8 +5337,10 @@ void optimizer_callback(// input state
             assert(0);
         }
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: mrcal_observation_point_t.px is the observation vector in camera coords. No outliers. No intrinsics"
 // #warning "triangulated-solve: make weights work somehow. This is tied to outliers"
+#endif
 
         for(int i0 = 0;
             i0 < ctx->Nobservations_point_triangulated;
@@ -6075,7 +6099,9 @@ void optimizer_callback(// input state
 
             // compute scales
             {
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: better unity_cam01 scale"
+#endif
                 double normal_unity_cam01_value = 1.0;
 
                 double expected_regularization_unity_cam01_error_sq_noscale =
@@ -6220,7 +6246,7 @@ bool mrcal_optimizer_callback(// out
            problem_selections.do_optimize_extrinsics ) )
     {
         MSG("ERROR: We have triangulated points. At this time this is only allowed if we're NOT optimizing intrinsics AND if we ARE optimizing extrinsics.");
-        goto done;
+        return result;
     }
 
     if( Nobservations_board > 0 )
@@ -6228,7 +6254,7 @@ bool mrcal_optimizer_callback(// out
         if( problem_selections.do_optimize_calobject_warp && calobject_warp == NULL )
         {
             MSG("ERROR: We're optimizing the calibration object warp, so a buffer with a seed MUST be passed in.");
-            goto done;
+            return result;
         }
     }
     else
@@ -6244,7 +6270,7 @@ bool mrcal_optimizer_callback(// out
        !problem_selections.do_optimize_calobject_warp)
     {
         MSG("Not optimizing any of our variables!");
-        goto done;
+        return result;
     }
 
 
@@ -6257,7 +6283,7 @@ bool mrcal_optimizer_callback(// out
     {
         MSG("The buffer passed to fill-in b_packed has the wrong size. Needed exactly %d bytes, but got %d bytes",
             Nstate*(int)sizeof(double),buffer_size_b_packed);
-        goto done;
+        return result;
     }
 
     int Nmeasurements = mrcal_num_measurements(Nobservations_board,
@@ -6290,7 +6316,7 @@ bool mrcal_optimizer_callback(// out
     {
         MSG("The buffer passed to fill-in x has the wrong size. Needed exactly %d bytes, but got %d bytes",
             Nmeasurements*(int)sizeof(double),buffer_size_x);
-        goto done;
+        return result;
     }
 
     const int Npoints_fromBoards =
@@ -6310,9 +6336,9 @@ bool mrcal_optimizer_callback(// out
         .Npoints_fixed              = Npoints_fixed,
         .observations_board         = observations_board,
         .observations_board_pool    = observations_board_pool,
-        .observations_point_pool    = observations_point_pool,
         .Nobservations_board        = Nobservations_board,
         .observations_point         = observations_point,
+        .observations_point_pool    = observations_point_pool,
         .Nobservations_point        = Nobservations_point,
         .observations_point_triangulated  = observations_point_triangulated,
         .Nobservations_point_triangulated = Nobservations_point_triangulated,
@@ -6345,7 +6371,6 @@ bool mrcal_optimizer_callback(// out
 
     result = true;
 
-done:
     return result;
 }
 
@@ -6444,7 +6469,9 @@ mrcal_optimize( // out
         // callback. And because I must optimize SOMETHING, so if I have fixed
         // intrinsics then the extrinsics cannot be fixed
         return (mrcal_stats_t){.rms_reproj_error__pixels = -1.0};
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: can I loosen this? Optimizing intrinsics and triangulated points together should work"
+#endif
     }
 
     if(!modelHasCore_fxfycxcy(lensmodel))
@@ -6492,9 +6519,9 @@ mrcal_optimize( // out
         .Npoints_fixed              = Npoints_fixed,
         .observations_board         = observations_board,
         .observations_board_pool    = observations_board_pool,
-        .observations_point_pool    = observations_point_pool,
         .Nobservations_board        = Nobservations_board,
         .observations_point         = observations_point,
+        .observations_point_pool    = observations_point_pool,
         .Nobservations_point        = Nobservations_point,
         .observations_point_triangulated  = observations_point_triangulated,
         .Nobservations_point_triangulated = Nobservations_point_triangulated,
@@ -6595,7 +6622,9 @@ mrcal_optimize( // out
         for(int i=0; i<Nmeasurements_board/2; i++)
             if(observations_board_pool[i].z < 0.0)
                 stats.Noutliers_board++;
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: check for point outliers here as well. Pull the triangulated-point outlier code out of markOutliers, and call it here (divergent-ray finder and looking at marked outliers)"
+#endif
 
         double outliernessScale = -1.0;
         do
@@ -6609,10 +6638,13 @@ mrcal_optimize( // out
                                            &dogleg_parameters,
                                            &solver_context);
 
-            if(norm2_error < 0)
+            if(norm2_error < 0) {
                 // libdogleg barfed. I quit out
-                goto done;
+                if(solver_context != NULL)
+                    dogleg_freeContext(&solver_context);
 
+                return stats;
+            }
 #if 0
             // Not using dogleg_markOutliers() (yet...)
 
@@ -6632,7 +6664,9 @@ mrcal_optimize( // out
                               observations_board,
                               Nobservations_board,
                               Nobservations_point,
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: not const for now. this will become const once the outlier bit moves to the point_triangulated pool"
+#endif
                               (mrcal_observation_point_triangulated_t*)observations_point_triangulated,
                               Nobservations_point_triangulated,
                               calibration_object_width_n,
@@ -6640,12 +6674,14 @@ mrcal_optimize( // out
                               solver_context->beforeStep->x,
                               extrinsics_fromref,
                               verbose) &&
-                 ([]{MSG("Threw out some outliers. New count = %d/%d (%.1f%%). Going again",
+                 ([=]{MSG("Threw out some outliers. New count = %d/%d (%.1f%%). Going again",
                        stats.Noutliers_board,
                        Nmeasurements_board,
                        (double)(stats.Noutliers_board * 100) / (double)Nmeasurements_board);
                    return true;}()));
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: the above print should deal with triangulated points too"
+#endif
 
 
         // Done. I have the final state. I spit it back out
@@ -6654,7 +6690,7 @@ mrcal_optimize( // out
                              frames_toref,       // Nframes of these
                              points,             // Npoints of these
                              calobject_warp,
-                             packed_state,
+                             packed_state.data(),
                              lensmodel,
                              problem_selections,
                              Ncameras_intrinsics, Ncameras_extrinsics,
@@ -6769,7 +6805,9 @@ mrcal_optimize( // out
                                 (dogleg_callback_t*)&optimizer_callback, &ctx);
 
     stats.rms_reproj_error__pixels =
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: not correct for triangulated points either: 1 measurement, not 2"
+#endif
         // THIS IS NOT CORRECT FOR POINTS. I have 3 measurements for points currently
         sqrt(norm2_error / (double)ctx.Nmeasurements);
 
@@ -6778,7 +6816,6 @@ mrcal_optimize( // out
     if(x_final)
         memcpy(x_final, solver_context->beforeStep->x, ctx.Nmeasurements*sizeof(double));
 
- done:
     if(solver_context != NULL)
         dogleg_freeContext(&solver_context);
 
@@ -6802,7 +6839,9 @@ bool mrcal_write_cameramodel_file(const char* filename,
     {
         MSG("Couldn't construct lensmodel string. Unconfigured string: '%s'",
             mrcal_lensmodel_name_unconfigured(&cameramodel->lensmodel));
-        goto done;
+        if(fp != NULL)
+            fclose(fp);
+        return result;
     }
 
     int Nparams = mrcal_lensmodel_num_params(&cameramodel->lensmodel);
@@ -6810,7 +6849,9 @@ bool mrcal_write_cameramodel_file(const char* filename,
     {
         MSG("Couldn't get valid Nparams from lensmodel string '%s'",
             lensmodel_string);
-        goto done;
+        if(fp != NULL)
+            fclose(fp);
+        return result;;
     }
 
     fprintf(fp, "{\n");
@@ -6833,11 +6874,12 @@ bool mrcal_write_cameramodel_file(const char* filename,
     fprintf(fp,"}\n");
     result = true;
 
- done:
     if(fp != NULL)
         fclose(fp);
     return result;
 }
 
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: fixed points should live in a separate array, instead of at the end of the 'points' array"
+#endif

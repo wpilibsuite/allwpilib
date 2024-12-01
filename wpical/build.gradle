@@ -77,6 +77,7 @@ nativeUtils.platformConfigs.each {
         it.cCompiler.args.add("/wd4047")
         it.cCompiler.args.add("/wd4098")
         it.cCompiler.args.add("/wd4267")
+        it.cppCompiler.args.add("/wd4068")
         it.cppCompiler.args.add("/wd4101")
         it.cppCompiler.args.add("/wd4200")
         it.cppCompiler.args.add("/wd4576")
@@ -131,20 +132,20 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp', 'src/main/native/thirdparty/mrcal/src', 'src/main/native/thirdparty/mrcal_java/src', "$buildDir/generated/main/cpp"
+                        srcDirs 'src/main/native/cpp', 'src/main/native/thirdparty/libdogleg/src', 'src/main/native/thirdparty/mrcal/src', 'src/main/native/thirdparty/mrcal_java/src', "$buildDir/generated/main/cpp"
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/mrcal/include', 'src/main/native/thirdparty/mrcal_java/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libdogleg/include', 'src/main/native/thirdparty/mrcal/generated', 'src/main/native/thirdparty/mrcal/include', 'src/main/native/thirdparty/mrcal/include/minimath', 'src/main/native/thirdparty/mrcal_java/include'
                     }
                 }
                 c {
                     source {
-                        srcDirs 'src/main/native/thirdparty/libdogleg/src', 'src/main/native/thirdparty/mrcal/src'
+                        srcDirs 'src/main/native/thirdparty/mrcal/src'
                         include '**/*.c'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/mrcal/generated', 'src/main/native/thirdparty/mrcal/include', 'src/main/native/thirdparty/mrcal/include/minimath', 'src/main/native/thirdparty/libdogleg/include', 'src/main/native/thirdparty/suitesparse_cholmod/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libdogleg/include', 'src/main/native/thirdparty/mrcal/generated', 'src/main/native/thirdparty/mrcal/include', 'src/main/native/thirdparty/mrcal/include/minimath'
                     }
                 }
                 if (OperatingSystem.current().isWindows()) {
@@ -172,7 +173,7 @@ model {
                     it.cppCompiler.define('GLOG_DEPRECATED', '[[deprecated]]')
                 }
                 if (it.targetPlatform.operatingSystem.isWindows()) {
-                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib' << 'Comdlg32.lib'
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
                     it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
                 } else {

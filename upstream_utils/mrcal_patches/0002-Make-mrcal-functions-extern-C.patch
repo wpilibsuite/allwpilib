@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Gold856 <117957790+Gold856@users.noreply.github.com>
 Date: Fri, 22 Nov 2024 09:54:00 -0500
-Subject: [PATCH 2/4] Make mrcal functions extern "C"
+Subject: [PATCH 2/7] Make mrcal functions extern "C"
 
 ---
  mrcal.h | 7 ++++++-
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/mrcal.h b/mrcal.h
-index ebb751eca308afcf5c5236575734eb876a1a1d24..4a0f5620f91cbf5f42c3abd3b9e0b81b99ce3c7b 100644
+index 1eef334a79597cfae61f8111ab97ca04f02b83b2..488ddfe72b3407b3fcb7c3d9de43d1a07433744d 100644
 --- a/mrcal.h
 +++ b/mrcal.h
 @@ -20,7 +20,9 @@

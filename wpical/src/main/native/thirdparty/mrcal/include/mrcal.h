@@ -891,6 +891,34 @@ DECLARE_mrcal_apply_color_map(double,   double);
 
 #undef DECLARE_mrcal_apply_color_map
 
+
+
+// returns false on error
+typedef bool (*mrcal_callback_sensor_link_t)(const uint16_t idx_to,
+                                             const uint16_t idx_from,
+                                             void* cookie);
+
+// Traverses a connectivity graph of sensors to find the best connection from
+// the root sensor (idx==0) to every other sensor. This is useful to seed a
+// problem with sparse connections, where every sensor doesn't have overlapping
+// observations with every other sensor. See the docstring for
+// mrcal.traverse_sensor_links() for details (that Python function wraps
+// this one). Note: this C function takes a packed connectivity matrix (just the
+// upper triangle stored), while the Python function takes a full (N,N) array,
+// while assuming it is symmetric and has a 0 diagonal
+//
+// returns false on error
+bool mrcal_traverse_sensor_links( const uint16_t Nsensors,
+
+                                        // (N,N) symmetric matrix with a 0 diagonal.
+                                        // I store the upper triangle only,
+                                        // row-first: a 1D array of (N*(N-1)/2)
+                                        // values. use pairwise_index() to index
+                                        const uint16_t* connectivity_matrix,
+                                        const mrcal_callback_sensor_link_t cb,
+                                        void* cookie);
+
+
 // Public ABI stuff, that's not for end-user consumption
 #include "mrcal-internal.h"
 
