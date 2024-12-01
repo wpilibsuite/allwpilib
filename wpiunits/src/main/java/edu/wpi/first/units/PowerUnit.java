@@ -82,6 +82,14 @@ public final class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
     return new MutPower(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
+  /**
+   * Constructs a unit of voltage equivalent to this unit of power divided by another unit of
+   * current. For example, {@code Watts.per(Amps)} will return a unit of power equivalent to one
+   * Volt.
+   *
+   * @param voltage the voltage unit to multiply by
+   * @return the power unit
+   */  
   public VoltageUnit per(CurrentUnit current) {
     return VoltageUnit.combine(this, current);
   }
