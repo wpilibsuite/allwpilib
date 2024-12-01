@@ -20,6 +20,13 @@ def main():
         [sys.executable, f"{REPO_ROOT}/hal/generate_usage_reporting.py"], check=True
     )
     subprocess.run(
+        [
+            sys.executable,
+            f"{REPO_ROOT}/hal/generate_nanopb.py",
+        ],
+        check=True,
+    )
+    subprocess.run(
         [sys.executable, f"{REPO_ROOT}/ntcore/generate_topics.py"], check=True
     )
     subprocess.run(

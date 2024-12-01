@@ -42,11 +42,13 @@ model {
     }
     binaries {
         all {
+            project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
         }
         withType(GoogleTestTestSuiteBinarySpec) {
             project(':hal').addHalDependency(it, 'shared')
+            project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib library: pluginName, linkage: 'shared'

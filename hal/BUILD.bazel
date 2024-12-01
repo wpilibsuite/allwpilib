@@ -9,6 +9,22 @@ cc_library(
     visibility = ["//hal:__subpackages__"],
 )
 
+cc_library(
+    name = "mrc_cc_headers",
+    hdrs = glob(["src/mrc/include/**"]),
+    includes = ["src/mrc/include"],
+    strip_include_prefix = "src/mrc/include",
+    visibility = ["//hal:__subpackages__"],
+)
+
+cc_library(
+    name = "generated_mrc_cc_headers",
+    hdrs = glob(["src/generated/main/native/cpp/mrc/protobuf/**"]),
+    includes = ["src/generated/main/native/cpp/mrc/protobuf"],
+    strip_include_prefix = "src/generated/main/native/cpp/mrc/protobuf",
+    visibility = ["//hal:__subpackages__"],
+)
+
 filegroup(
     name = "generated_java",
     srcs = glob(["src/generated/main/java/**/*.java"]),
@@ -39,7 +55,10 @@ filegroup(
 cc_library(
     name = "wpiHal.static",
     srcs = [":platform-srcs"] + glob(
-        ["src/main/native/cpp/**"],
+        [
+            "src/main/native/cpp/**",
+            "src/generated/main/native/cpp/**",
+        ],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**/*"]),
@@ -48,6 +67,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":generated_cc_headers",
+        ":mrc_cc_headers",
+        ":generated_mrc_cc_headers",
         "//wpiutil:wpiutil.static",
     ] + HAL_DEPS,
 )
