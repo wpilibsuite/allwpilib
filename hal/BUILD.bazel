@@ -10,10 +10,24 @@ cc_library(
 )
 
 cc_library(
+    name = "mrc_cc_headers",
+    hdrs = glob(["src/mrc/include/**"]),
+    includes = ["src/mrc/include"],
+    strip_include_prefix = "src/mrc/include",
+    visibility = ["//hal:__subpackages__"],
+)
+
+cc_library(
     name = "generated_mrc_cc_headers",
     hdrs = glob(["src/generated/main/native/cpp/mrc/protobuf/**"]),
     includes = ["src/generated/main/native/cpp/mrc/protobuf"],
     strip_include_prefix = "src/generated/main/native/cpp/mrc/protobuf",
+    visibility = ["//hal:__subpackages__"],
+)
+
+filegroup(
+    name = "generated_java",
+    srcs = glob(["src/generated/main/java/**/*.java"]),
     visibility = ["//hal:__subpackages__"],
 )
 
@@ -43,7 +57,7 @@ cc_library(
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
-        ":generated_mrc_cc_headers",
+        ":generated_cc_headers",
         ":mrc_cc_headers",
         ":generated_mrc_cc_headers",
         "//wpiutil:wpiutil.static",
