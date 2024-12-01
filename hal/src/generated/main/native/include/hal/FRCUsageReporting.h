@@ -249,6 +249,9 @@ namespace HALUsageReporting {
     kLoggingFramework_Monologue = 3,
     kLoggingFramework_AdvantageKit = 4,
     kLoggingFramework_DogLog = 5,
+    kPDP_CTRE = 1,
+    kPDP_REV = 2,
+    kPDP_Unknown = 3,
   };
 }
 #endif
