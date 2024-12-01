@@ -36,10 +36,11 @@ ext {
                     exportedHeaders {
                         srcDir 'src/main/native/include'
                         srcDir generatedHeaders
+                        srcDir 'src/mrc/include'
                     }
                 }
             }
-        }  else {
+        } else {
             it.sources {
                 simCpp(CppSourceSet) {
                     source {
@@ -49,7 +50,19 @@ ext {
                     exportedHeaders {
                         srcDir 'src/main/native/include'
                         srcDir generatedHeaders
+                        srcDir 'src/mrc/include'
                     }
+                }
+            }
+        }
+        it.sources {
+            nanopbCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/generated/main/native/cpp'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/generated/main/native/cpp'
                 }
             }
         }
@@ -104,6 +117,35 @@ model {
                 if (it.component.name != 'hal' && it.component.name != 'halBase') return
                 if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) return
                 nativeUtils.useRequiredLibrary(it, 'ni_link_libraries')
+        }
+    }
+}
+
+model {
+    components {
+        all {
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/mrc/include',
+                            'src/generated/main/native/cpp/mrc/protobuf'
+                }
+            }
+        }
+    }
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            if (it.component.name == "${nativeName}JNI") {
+                project(':ntcore').addNtcoreDependency(it, 'static')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+            } else {
+                project(':ntcore').addNtcoreDependency(it, 'shared')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            }
         }
     }
 }
