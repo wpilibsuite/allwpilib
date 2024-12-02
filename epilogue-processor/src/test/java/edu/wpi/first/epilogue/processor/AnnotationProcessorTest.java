@@ -9,6 +9,7 @@ import static com.google.testing.compile.Compiler.javac;
 import static edu.wpi.first.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
@@ -135,6 +136,29 @@ class AnnotationProcessorTest {
       """;
 
     assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void shouldNotLog() {
+    String source =
+        """
+      class Example {
+        public double getValue() { return 2.0; }
+        public String getName() { return "Example"; }
+      }
+    """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .withProcessors(new AnnotationProcessor())
+            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+
+    assertThat(compilation).succeeded();
+    // nothing is annotated with @Logged; so, no logger file should be generated
+    assertTrue(
+        compilation.generatedSourceFiles().stream()
+            .noneMatch(jfo -> jfo.getName().contains("Example")));
   }
 
   @Test
