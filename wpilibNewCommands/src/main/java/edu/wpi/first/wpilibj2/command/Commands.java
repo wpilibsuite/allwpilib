@@ -52,6 +52,17 @@ public final class Commands {
   }
 
   /**
+   * Constructs a command that runs an action once and finishes.
+   *
+   * @param action the action to run
+   * @return the command
+   * @see InstantCommand
+   */
+  public static Command runOnce(Runnable action) {
+    return new InstantCommand(action);
+  }
+
+  /**
    * Constructs a command that runs an action every iteration until interrupted.
    *
    * @param action the action to run
@@ -61,6 +72,17 @@ public final class Commands {
    */
   public static Command run(Runnable action, Subsystem... requirements) {
     return new RunCommand(action, requirements);
+  }
+
+  /**
+   * Constructs a command that runs an action every iteration until interrupted.
+   *
+   * @param action the action to run
+   * @return the command
+   * @see RunCommand
+   */
+  public static Command run(Runnable action) {
+    return new RunCommand(action);
   }
 
   /**
