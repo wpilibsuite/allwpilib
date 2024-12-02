@@ -102,11 +102,6 @@ jobs:
             architecture: aarch64
             task: "build"
             outputs: "build/allOutputs"
-          - os: windows-2022
-            artifact-name: Win32
-            architecture: x86
-            task: ":ntcoreffi:build"
-            outputs: "ntcoreffi/build/outputs"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
     needs: [validation]
@@ -131,9 +126,6 @@ jobs:
         run: security set-keychain-settings -lut 21600
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main')
-      - name: Set Java Heap Size
-        run: sed -i 's/-Xmx2g/-Xmx1g/g' gradle.properties
-        if: matrix.artifact-name == 'Win32'
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
         if: matrix.os == 'windows-2022'
