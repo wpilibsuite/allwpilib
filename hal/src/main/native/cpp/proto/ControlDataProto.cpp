@@ -112,7 +112,7 @@ bool wpi::Protobuf<mrc::ControlData>::Pack(OutputStream& Stream,
 std::optional<mrc::Joystick> wpi::Protobuf<mrc::Joystick>::Unpack(
     InputStream& Stream) {
   wpi::UnpackCallback<float, MRC_MAX_NUM_AXES> AxesCb;
-  wpi::UnpackCallback<uint16_t, MRC_MAX_NUM_POVS> PovsCb;
+  wpi::UnpackCallback<int16_t, MRC_MAX_NUM_POVS> PovsCb;
 
   mrc_proto_ProtobufJoystickData Msg{
       .ButtonCount = 0,

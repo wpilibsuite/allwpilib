@@ -85,7 +85,7 @@ deploy {
                 all {
                     postdeploy << { ctx ->
                         ctx.execute("sync")
-                        ctx.execute("ldconfig")
+                        ctx.execute("sudo ldconfig /home/systemcore/frc/third-party/lib")
                     }
                 }
 
@@ -107,7 +107,7 @@ deploy {
                     postdeploy << { ctx ->
                         ctx.execute("echo '/home/systemcore/developerRobotCppStatic' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
-                        ctx.execute("setcap cap_sys_nice+eip \"/home/systemcore/developerRobotCppStatic\"")
+                        ctx.execute("sudo setcap cap_sys_nice+eip \"/home/systemcore/developerRobotCppStatic\"")
                         ctx.execute('chmod +x developerRobotCppStatic')
                     }
                 }
@@ -146,7 +146,6 @@ eclipse {
 
 tasks.register('deployJava') {
     try {
-        dependsOn tasks.named('deployjresystemcore')
         dependsOn tasks.named('deploydeveloperRobotJavasystemcore')
         dependsOn tasks.named('deploydeveloperRobotCppJavasystemcore') // Deploying shared C++ is how to get the Java shared libraries.
     } catch (ignored) {

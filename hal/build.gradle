@@ -37,6 +37,7 @@ ext {
                         srcDir 'src/main/native/include'
                         srcDir generatedHeaders
                         srcDir 'src/mrc/include'
+                        srcDir 'src/generated/main/native/cpp/mrc/protobuf'
                     }
                 }
             }
