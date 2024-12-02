@@ -1,0 +1,87 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+
+cc_library(
+    name = "generated_cc_headers",
+    hdrs = glob(["src/generated/main/native/include/**"]),
+    includes = ["src/generated/main/native/include"],
+    strip_include_prefix = "src/generated/main/native/include",
+    visibility = ["//wpilibNewCommands:__subpackages__"],
+)
+
+filegroup(
+    name = "generated_cc_source",
+    srcs = glob(["src/generated/main/native/cpp/**"]),
+    visibility = ["//wpilibNewCommands:__subpackages__"],
+)
+
+filegroup(
+    name = "generated_java",
+    srcs = glob(["src/generated/main/java/**/*.java"]),
+    visibility = ["//wpilibNewCommands:__subpackages__"],
+)
+
+cc_library(
+    name = "wpilibNewCommands.static",
+    srcs = glob(["src/main/native/cpp/**"]) + [":generated_cc_source"],
+    hdrs = glob(["src/main/native/include/**"]),
+    includes = ["src/main/native/include"],
+    strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":generated_cc_headers",
+        "//wpilibc:wpilibc.static",
+    ],
+)
+
+java_library(
+    name = "wpilibNewCommands-java",
+    srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cscore:cscore-java",
+        "//hal:hal-java",
+        "//ntcore:networktables-java",
+        "//wpilibj",
+        "//wpimath:wpimath-java",
+        "//wpinet:wpinet-java",
+        "//wpiunits",
+        "//wpiutil:wpiutil-java",
+    ],
+)
+
+cc_test(
+    name = "wpilibNewCommands-cpp-test",
+    size = "small",
+    srcs = glob([
+        "src/test/native/**/*.cpp",
+        "src/test/native/**/*.h",
+    ]),
+    tags = [
+        "no-tsan",
+        "no-ubsan",
+    ],
+    deps = [
+        ":wpilibNewCommands.static",
+        "//thirdparty/googletest:googletest.static",
+    ],
+)
+
+cc_binary(
+    name = "DevMain-Cpp",
+    srcs = ["src/dev/native/cpp/main.cpp"],
+    deps = [
+    ],
+)
+
+java_binary(
+    name = "DevMain-Java",
+    srcs = ["src/dev/java/edu/wpi/first/wpilibj2/commands/DevMain.java"],
+    main_class = "edu.wpi.first.wpilibj2.commands.DevMain",
+    deps = [
+        "//hal:hal-java",
+        "//ntcore:networktables-java",
+        "//wpimath:wpimath-java",
+        "//wpiutil:wpiutil-java",
+    ],
+)
