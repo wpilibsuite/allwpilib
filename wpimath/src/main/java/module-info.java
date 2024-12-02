@@ -2,13 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+/**
+ * The WPILib math module. This defines APIs for geometry, kinematics, odometry, path planning,
+ * control algorithms, and physics simulators for simple mechanisms.
+ */
 module wpilib.math {
   requires com.fasterxml.jackson.annotation;
   requires ejml.core;
   requires ejml.ddense;
   requires ejml.simple;
   requires us.hebi.quickbuf.runtime;
-  requires wpilib.units;
+  requires transitive wpilib.units;
   requires wpilib.util;
 
   exports edu.wpi.first.math;

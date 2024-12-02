@@ -21,6 +21,7 @@ plugins {
     id 'com.gradleup.shadow' version '8.3.4' apply false
     id 'com.diffplug.spotless' version '6.20.0' apply false
     id 'com.github.spotbugs' version '6.0.2' apply false
+    id 'org.javamodularity.moduleplugin' version '1.8.15' apply false
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')

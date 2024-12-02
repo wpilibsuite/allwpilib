@@ -2,6 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+/**
+ * The WPILib utility module. This defines miscellaneous APIs for concurrency, data logging,
+ * lambda functions, binary serialization and deserialization, native library interactions, and
+ * error reporting.
+ */
 @SuppressWarnings("requires-transitive-automatic")
 module wpilib.util {
   requires com.fasterxml.jackson.databind;

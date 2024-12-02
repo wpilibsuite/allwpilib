@@ -3,6 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 module wpilib.xrp {
-  requires transitive wpilib.wpilibj;
+  requires transitive wpilib;
   requires wpilib.hal;
 }

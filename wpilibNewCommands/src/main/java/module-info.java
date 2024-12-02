@@ -4,7 +4,7 @@
 
 module wpilib.commands2 {
   requires wpilib.units;
-  requires wpilib.wpilibj;
+  requires wpilib;
   requires wpilib.hal;
   requires wpilib.ntcore;
 

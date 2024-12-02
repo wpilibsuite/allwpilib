@@ -2,7 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-module wpilib.wpilibj {
+/**
+ * The core WPILib module. This defines APIs for interacting with robot sensors and actuators,
+ * dashboard applications, and high-level program control frameworks.
+ */
+module wpilib {
   requires ejml.core;
   requires ejml.simple;
   requires transitive wpilib.math;

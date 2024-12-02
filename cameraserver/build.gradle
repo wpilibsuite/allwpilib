@@ -29,6 +29,13 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += [
+        "--add-reads",
+        "wpilib.cameraserver=ALL-UNNAMED"
+    ]
+}
+
 nativeUtils.exportsConfigs {
     cameraserver {
     }
