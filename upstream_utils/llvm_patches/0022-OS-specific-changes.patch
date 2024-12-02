@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:30:43 -0400
-Subject: [PATCH 22/38] OS-specific changes
+Subject: [PATCH 22/36] OS-specific changes
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 16 +++++++---------

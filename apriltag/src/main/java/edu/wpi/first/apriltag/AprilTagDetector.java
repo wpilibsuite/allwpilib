@@ -297,7 +297,7 @@ public class AprilTagDetector implements AutoCloseable {
    * @return Results (array of AprilTagDetection)
    */
   public AprilTagDetection[] detect(Mat img) {
-    return AprilTagJNI.detect(m_native, img.cols(), img.rows(), img.cols(), img.dataAddr());
+    return AprilTagJNI.detect(m_native, img.cols(), img.rows(), (int) img.step1(), img.dataAddr());
   }
 
   private long m_native;

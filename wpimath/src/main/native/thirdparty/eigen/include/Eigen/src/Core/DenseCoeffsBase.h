@@ -298,7 +298,7 @@ class DenseCoeffsBase<Derived, WriteAccessors> : public DenseCoeffsBase<Derived,
    *
    * \sa operator()(Index,Index), coeff(Index, Index) const, coeffRef(Index)
    */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar& coeffRef(Index row, Index col) {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Scalar& coeffRef(Index row, Index col) {
     eigen_internal_assert(row >= 0 && row < rows() && col >= 0 && col < cols());
     return internal::evaluator<Derived>(derived()).coeffRef(row, col);
   }
@@ -312,7 +312,7 @@ class DenseCoeffsBase<Derived, WriteAccessors> : public DenseCoeffsBase<Derived,
    * \sa operator[](Index)
    */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar& operator()(Index row, Index col) {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Scalar& operator()(Index row, Index col) {
     eigen_assert(row >= 0 && row < rows() && col >= 0 && col < cols());
     return coeffRef(row, col);
   }
@@ -332,7 +332,7 @@ class DenseCoeffsBase<Derived, WriteAccessors> : public DenseCoeffsBase<Derived,
    * \sa operator[](Index), coeff(Index) const, coeffRef(Index,Index)
    */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar& coeffRef(Index index) {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Scalar& coeffRef(Index index) {
     EIGEN_STATIC_ASSERT(internal::evaluator<Derived>::Flags & LinearAccessBit,
                         THIS_COEFFICIENT_ACCESSOR_TAKING_ONE_ACCESS_IS_ONLY_FOR_EXPRESSIONS_ALLOWING_LINEAR_ACCESS)
     eigen_internal_assert(index >= 0 && index < size());
@@ -346,7 +346,7 @@ class DenseCoeffsBase<Derived, WriteAccessors> : public DenseCoeffsBase<Derived,
    * \sa operator[](Index) const, operator()(Index,Index), x(), y(), z(), w()
    */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar& operator[](Index index) {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Scalar& operator[](Index index) {
     EIGEN_STATIC_ASSERT(Derived::IsVectorAtCompileTime,
                         THE_BRACKET_OPERATOR_IS_ONLY_FOR_VECTORS__USE_THE_PARENTHESIS_OPERATOR_INSTEAD)
     eigen_assert(index >= 0 && index < size());

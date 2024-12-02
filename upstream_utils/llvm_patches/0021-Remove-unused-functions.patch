@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:16:51 -0400
-Subject: [PATCH 21/38] Remove unused functions
+Subject: [PATCH 21/36] Remove unused functions
 
 ---
  llvm/include/llvm/Support/raw_ostream.h |  5 +-

@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Thu, 21 Nov 2024 18:09:37 -0800
+Subject: [PATCH 3/4] Fix exception mask type typo on macOS
+
+---
+ src/macos.cxx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/macos.cxx b/src/macos.cxx
+index 85dbb5f45d89680e39b4847a9aa2d5472c824f2a..2c68064742bc7883a08551b88cd5dbb9a1f38100 100644
+--- a/src/macos.cxx
++++ b/src/macos.cxx
+@@ -20,7 +20,7 @@ bool is_debugger_present() noexcept
+ 		auto ports = exc<mach_port_t>;
+ 		auto behaviors = exc<exception_behavior_t>;
+ 		auto flavors = exc<thread_state_flavor_t>;
+-		exception_mast_t mask
++		exception_mask_t mask
+ 			= EXC_MASK_ALL & ~(EXC_MASK_RESOURCE | EXC_MASK_GUARD);
+ 		kern_return_t result = task_get_exception_ports(mach_task_self(), mask,
+ 			masks.data(), &count, ports.data(), behaviors.data(), flavors.data());

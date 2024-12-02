@@ -40,9 +40,6 @@ build:windows --config=windows_common
 
 build:windows --linkopt=/DEPENDENTLOADFLAG:0x1100
 
-# TODO
-build:windows --copt=/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
-
 ################################
 # ARM Windows Flags
 ################################

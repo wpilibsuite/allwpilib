@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:09:18 -0400
-Subject: [PATCH 01/38] Remove StringRef, ArrayRef, and Optional
+Subject: [PATCH 01/36] Remove StringRef, ArrayRef, and Optional
 
 ---
  llvm/include/llvm/ADT/PointerUnion.h          |   1 -
@@ -30,7 +30,7 @@ Subject: [PATCH 01/38] Remove StringRef, ArrayRef, and Optional
  llvm/unittests/ADT/SmallVectorTest.cpp        |  30 +----
  llvm/unittests/Support/ConvertUTFTest.cpp     |  41 ++++---
  llvm/unittests/Support/xxhashTest.cpp         |   4 +-
- 30 files changed, 282 insertions(+), 323 deletions(-)
+ 26 files changed, 232 insertions(+), 271 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
 index 7d4ed02b622626bb8043acb57b8ce7ed97a5f949..8ac68dbc0a791b8ac0e0ca865e69024cb642aa70 100644
