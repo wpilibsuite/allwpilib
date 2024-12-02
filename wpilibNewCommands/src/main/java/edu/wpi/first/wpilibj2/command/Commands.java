@@ -57,6 +57,7 @@ public final class Commands {
    * @param action the action to run
    * @return the command
    * @see InstantCommand
+   * @see Commands#runOnce(Runnable, Subsystem...)
    */
   public static Command runOnce(Runnable action) {
     return new InstantCommand(action);
@@ -80,6 +81,7 @@ public final class Commands {
    * @param action the action to run
    * @return the command
    * @see RunCommand
+   * @see Commands#run(Runnable, Subsystem...)
    */
   public static Command run(Runnable action) {
     return new RunCommand(action);
