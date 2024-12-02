@@ -51,7 +51,7 @@ jobs:
   tidy:
     name: "clang-tidy"
     runs-on: ubuntu-22.04
-    container: wpilib/roborio-cross-ubuntu:2025-22.04
+    container: wpilib/ubuntu-base:22.04
     steps:
       - uses: actions/checkout@v4
         with:
