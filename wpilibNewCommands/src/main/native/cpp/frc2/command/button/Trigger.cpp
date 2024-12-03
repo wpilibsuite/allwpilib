@@ -21,7 +21,7 @@ Trigger Trigger::OnChange(Command* command) {
         bool current = condition();
 
         if (previous != current) {
-          command->Schedule();
+          frc2::CommandScheduler::GetInstance().Schedule(command);
         }
 
         previous = current;
@@ -35,7 +35,7 @@ Trigger Trigger::OnChange(CommandPtr&& command) {
     bool current = condition();
 
     if (previous != current) {
-      command.Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     }
 
     previous = current;
@@ -49,7 +49,7 @@ Trigger Trigger::OnTrue(Command* command) {
         bool current = condition();
 
         if (!previous && current) {
-          command->Schedule();
+          frc2::CommandScheduler::GetInstance().Schedule(command);
         }
 
         previous = current;
@@ -63,7 +63,7 @@ Trigger Trigger::OnTrue(CommandPtr&& command) {
     bool current = condition();
 
     if (!previous && current) {
-      command.Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     }
 
     previous = current;
@@ -77,7 +77,7 @@ Trigger Trigger::OnFalse(Command* command) {
         bool current = condition();
 
         if (previous && !current) {
-          command->Schedule();
+          frc2::CommandScheduler::GetInstance().Schedule(command);
         }
 
         previous = current;
@@ -91,7 +91,7 @@ Trigger Trigger::OnFalse(CommandPtr&& command) {
     bool current = condition();
 
     if (previous && !current) {
-      command.Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     }
 
     previous = current;
@@ -105,7 +105,7 @@ Trigger Trigger::WhileTrue(Command* command) {
         bool current = condition();
 
         if (!previous && current) {
-          command->Schedule();
+          frc2::CommandScheduler::GetInstance().Schedule(command);
         } else if (previous && !current) {
           command->Cancel();
         }
@@ -121,7 +121,7 @@ Trigger Trigger::WhileTrue(CommandPtr&& command) {
     bool current = condition();
 
     if (!previous && current) {
-      command.Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     } else if (previous && !current) {
       command.Cancel();
     }
@@ -137,7 +137,7 @@ Trigger Trigger::WhileFalse(Command* command) {
         bool current = condition();
 
         if (previous && !current) {
-          command->Schedule();
+          frc2::CommandScheduler::GetInstance().Schedule(command);
         } else if (!previous && current) {
           command->Cancel();
         }
@@ -153,7 +153,7 @@ Trigger Trigger::WhileFalse(CommandPtr&& command) {
     bool current = condition();
 
     if (!previous && current) {
-      command.Schedule();
+      frc2::CommandScheduler::GetInstance().Schedule(command);
     } else if (previous && !current) {
       command.Cancel();
     }
@@ -172,7 +172,7 @@ Trigger Trigger::ToggleOnTrue(Command* command) {
       if (command->IsScheduled()) {
         command->Cancel();
       } else {
-        command->Schedule();
+        frc2::CommandScheduler::GetInstance().Schedule(command);
       }
     }
 
@@ -190,7 +190,7 @@ Trigger Trigger::ToggleOnTrue(CommandPtr&& command) {
       if (command.IsScheduled()) {
         command.Cancel();
       } else {
-        command.Schedule();
+        frc2::CommandScheduler::GetInstance().Schedule(command);
       }
     }
 
@@ -208,7 +208,7 @@ Trigger Trigger::ToggleOnFalse(Command* command) {
       if (command->IsScheduled()) {
         command->Cancel();
       } else {
-        command->Schedule();
+        frc2::CommandScheduler::GetInstance().Schedule(command);
       }
     }
 
@@ -226,7 +226,7 @@ Trigger Trigger::ToggleOnFalse(CommandPtr&& command) {
       if (command.IsScheduled()) {
         command.Cancel();
       } else {
-        command.Schedule();
+        frc2::CommandScheduler::GetInstance().Schedule(command);
       }
     }
 
