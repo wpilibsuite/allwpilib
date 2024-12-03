@@ -3,4 +3,7 @@ extraJavaModuleInfo {
     module('edu.wpi.first.thirdparty.frc2024.opencv:opencv-java', 'wpilib.opencv') {
         exportAllPackages()
     }
+    module('edu.wpi.first.thirdparty.frc2025.opencv:opencv-java', 'wpilib.opencv') {
+        exportAllPackages()
+    }
 }
