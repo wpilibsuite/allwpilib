@@ -19,16 +19,4 @@ HAL_ENUM(HAL_I2CPort) {
   HAL_I2C_kOnboard,
   HAL_I2C_kMXP
 };
-
-#ifdef __cplusplus
-namespace hal {
-
-/**
- * A move-only C++ wrapper around HAL_I2CPort.
- * Does not ensure destruction.
- */
-using I2CPort = Handle<HAL_I2CPort, nullptr, HAL_I2C_kInvalid>;
-
-}  // namespace hal
-#endif
 /** @} */

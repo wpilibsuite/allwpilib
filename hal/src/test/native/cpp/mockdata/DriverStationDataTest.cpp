@@ -131,6 +131,8 @@ TEST(DriverStationTest, EventInfo) {
   info.replayNumber = 42;
   HALSIM_SetMatchInfo(&info);
 
+  HAL_RefreshDSData();
+
   HAL_MatchInfo dataBack;
   HAL_GetMatchInfo(&dataBack);
 

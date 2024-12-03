@@ -152,7 +152,7 @@ class Loop final : public std::enable_shared_from_this<Loop> {
    */
   std::pair<bool, Time> GetTimeout() const noexcept {
     auto to = uv_backend_timeout(m_loop);
-    return std::make_pair(to == -1, Time{to});
+    return std::pair{to == -1, Time{to}};
   }
 
   /**

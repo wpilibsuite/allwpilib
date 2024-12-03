@@ -1,0 +1,27 @@
+name: 'Setup BuildBuddy acache'
+description: 'Sets up the build buddy cache to be readonly / writing based on the presence of environment variables'
+
+inputs:
+  token:
+    description: 'Build Buddy API token'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup without key
+      env:
+        API_KEY: ${{ inputs.token }}
+      if: ${{ env.API_KEY == '' }}
+      shell: bash
+      run: |
+          echo "No API key secret detected, will setup readonly cache"
+          echo "build:ci --config=build_buddy_readonly" > bazel_auth.rc
+
+    - name: Set with key
+      env:
+        API_KEY: ${{ inputs.token }}
+      if: ${{ env.API_KEY != '' }}
+      shell: bash
+      run: |
+          echo "API Key detected!"
+          echo "build:build_buddy --remote_header=x-buildbuddy-api-key=${{ env.API_KEY }}" > bazel_auth.rc

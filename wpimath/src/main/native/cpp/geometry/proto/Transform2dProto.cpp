@@ -4,27 +4,42 @@
 
 #include "frc/geometry/proto/Transform2dProto.h"
 
-#include <wpi/ProtoHelper.h>
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "geometry2d.pb.h"
+#include "wpimath/protobuf/geometry2d.npb.h"
 
-google::protobuf::Message* wpi::Protobuf<frc::Transform2d>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufTransform2d>(arena);
-}
+std::optional<frc::Transform2d> wpi::Protobuf<frc::Transform2d>::Unpack(
+    InputStream& stream) {
+  wpi::UnpackCallback<frc::Translation2d> tsln;
+  wpi::UnpackCallback<frc::Rotation2d> rot;
+  wpi_proto_ProtobufTransform2d msg{
+      .translation = tsln.Callback(),
+      .rotation = rot.Callback(),
+  };
+  if (!stream.Decode(msg)) {
+    return {};
+  }
 
-frc::Transform2d wpi::Protobuf<frc::Transform2d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufTransform2d*>(&msg);
+  auto itsln = tsln.Items();
+  auto irot = rot.Items();
+
+  if (itsln.empty() || irot.empty()) {
+    return {};
+  }
+
   return frc::Transform2d{
-      wpi::UnpackProtobuf<frc::Translation2d>(m->wpi_translation()),
-      wpi::UnpackProtobuf<frc::Rotation2d>(m->wpi_rotation()),
+      itsln[0],
+      irot[0],
   };
 }
 
-void wpi::Protobuf<frc::Transform2d>::Pack(google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::Transform2d>::Pack(OutputStream& stream,
                                            const frc::Transform2d& value) {
-  auto m = static_cast<wpi::proto::ProtobufTransform2d*>(msg);
-  wpi::PackProtobuf(m->mutable_translation(), value.Translation());
-  wpi::PackProtobuf(m->mutable_rotation(), value.Rotation());
+  wpi::PackCallback tsln{&value.Translation()};
+  wpi::PackCallback rot{&value.Rotation()};
+  wpi_proto_ProtobufTransform2d msg{
+      .translation = tsln.Callback(),
+      .rotation = rot.Callback(),
+  };
+  return stream.Encode(msg);
 }

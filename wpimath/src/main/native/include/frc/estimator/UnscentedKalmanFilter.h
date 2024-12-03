@@ -5,12 +5,19 @@
 #pragma once
 
 #include <functional>
+#include <utility>
 
+#include <Eigen/Cholesky>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "frc/EigenCore.h"
+#include "frc/StateSpaceUtil.h"
 #include "frc/estimator/MerweScaledSigmaPoints.h"
+#include "frc/estimator/UnscentedTransform.h"
+#include "frc/system/Discretization.h"
+#include "frc/system/NumericalIntegration.h"
+#include "frc/system/NumericalJacobian.h"
 #include "units/time.h"
 
 namespace frc {
@@ -74,7 +81,31 @@ class UnscentedKalmanFilter {
       std::function<StateVector(const StateVector&, const InputVector&)> f,
       std::function<OutputVector(const StateVector&, const InputVector&)> h,
       const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
-      units::second_t dt);
+      units::second_t dt)
+      : m_f(std::move(f)), m_h(std::move(h)) {
+    m_contQ = MakeCovMatrix(stateStdDevs);
+    m_contR = MakeCovMatrix(measurementStdDevs);
+    m_meanFuncX = [](const Matrixd<States, 2 * States + 1>& sigmas,
+                     const Vectord<2 * States + 1>& Wm) -> StateVector {
+      return sigmas * Wm;
+    };
+    m_meanFuncY = [](const Matrixd<Outputs, 2 * States + 1>& sigmas,
+                     const Vectord<2 * States + 1>& Wc) -> OutputVector {
+      return sigmas * Wc;
+    };
+    m_residualFuncX = [](const StateVector& a,
+                         const StateVector& b) -> StateVector { return a - b; };
+    m_residualFuncY = [](const OutputVector& a,
+                         const OutputVector& b) -> OutputVector {
+      return a - b;
+    };
+    m_addFuncX = [](const StateVector& a, const StateVector& b) -> StateVector {
+      return a + b;
+    };
+    m_dt = dt;
+
+    Reset();
+  }
 
   /**
    * Constructs an unscented Kalman filter with custom mean, residual, and
@@ -120,7 +151,20 @@ class UnscentedKalmanFilter {
           residualFuncY,
       std::function<StateVector(const StateVector&, const StateVector&)>
           addFuncX,
-      units::second_t dt);
+      units::second_t dt)
+      : m_f(std::move(f)),
+        m_h(std::move(h)),
+        m_meanFuncX(std::move(meanFuncX)),
+        m_meanFuncY(std::move(meanFuncY)),
+        m_residualFuncX(std::move(residualFuncX)),
+        m_residualFuncY(std::move(residualFuncY)),
+        m_addFuncX(std::move(addFuncX)) {
+    m_contQ = MakeCovMatrix(stateStdDevs);
+    m_contR = MakeCovMatrix(measurementStdDevs);
+    m_dt = dt;
+
+    Reset();
+  }
 
   /**
    * Returns the square-root error covariance matrix S.
@@ -197,7 +241,31 @@ class UnscentedKalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const InputVector& u, units::second_t dt);
+  void Predict(const InputVector& u, units::second_t dt) {
+    m_dt = dt;
+
+    // Discretize Q before projecting mean and covariance forward
+    StateMatrix contA =
+        NumericalJacobianX<States, States, Inputs>(m_f, m_xHat, u);
+    StateMatrix discA;
+    StateMatrix discQ;
+    DiscretizeAQ<States>(contA, m_contQ, m_dt, &discA, &discQ);
+    Eigen::internal::llt_inplace<double, Eigen::Lower>::blocked(discQ);
+
+    Matrixd<States, 2 * States + 1> sigmas =
+        m_pts.SquareRootSigmaPoints(m_xHat, m_S);
+
+    for (int i = 0; i < m_pts.NumSigmas(); ++i) {
+      StateVector x = sigmas.template block<States, 1>(0, i);
+      m_sigmasF.template block<States, 1>(0, i) = RK4(m_f, x, u, dt);
+    }
+
+    auto [xHat, S] = SquareRootUnscentedTransform<States, States>(
+        m_sigmasF, m_pts.Wm(), m_pts.Wc(), m_meanFuncX, m_residualFuncX,
+        discQ.template triangularView<Eigen::Lower>());
+    m_xHat = xHat;
+    m_S = S;
+  }
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
@@ -242,7 +310,25 @@ class UnscentedKalmanFilter {
   void Correct(
       const InputVector& u, const Vectord<Rows>& y,
       std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
-      const Matrixd<Rows, Rows>& R);
+      const Matrixd<Rows, Rows>& R) {
+    auto meanFuncY = [](const Matrixd<Outputs, 2 * States + 1>& sigmas,
+                        const Vectord<2 * States + 1>& Wc) -> Vectord<Rows> {
+      return sigmas * Wc;
+    };
+    auto residualFuncX = [](const StateVector& a,
+                            const StateVector& b) -> StateVector {
+      return a - b;
+    };
+    auto residualFuncY = [](const Vectord<Rows>& a,
+                            const Vectord<Rows>& b) -> Vectord<Rows> {
+      return a - b;
+    };
+    auto addFuncX = [](const StateVector& a,
+                       const StateVector& b) -> StateVector { return a + b; };
+    Correct<Rows>(u, y, std::move(h), R, std::move(meanFuncY),
+                  std::move(residualFuncY), std::move(residualFuncX),
+                  std::move(addFuncX));
+  }
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
@@ -277,7 +363,54 @@ class UnscentedKalmanFilter {
       std::function<StateVector(const StateVector&, const StateVector&)>
           residualFuncX,
       std::function<StateVector(const StateVector&, const StateVector&)>
-          addFuncX);
+          addFuncX) {
+    Matrixd<Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
+    Eigen::internal::llt_inplace<double, Eigen::Lower>::blocked(discR);
+
+    // Transform sigma points into measurement space
+    Matrixd<Rows, 2 * States + 1> sigmasH;
+    Matrixd<States, 2 * States + 1> sigmas =
+        m_pts.SquareRootSigmaPoints(m_xHat, m_S);
+    for (int i = 0; i < m_pts.NumSigmas(); ++i) {
+      sigmasH.template block<Rows, 1>(0, i) =
+          h(sigmas.template block<States, 1>(0, i), u);
+    }
+
+    // Mean and covariance of prediction passed through UT
+    auto [yHat, Sy] = SquareRootUnscentedTransform<Rows, States>(
+        sigmasH, m_pts.Wm(), m_pts.Wc(), meanFuncY, residualFuncY,
+        discR.template triangularView<Eigen::Lower>());
+
+    // Compute cross covariance of the state and the measurements
+    Matrixd<States, Rows> Pxy;
+    Pxy.setZero();
+    for (int i = 0; i < m_pts.NumSigmas(); ++i) {
+      // Pxy += (sigmas_f[:, i] - x̂)(sigmas_h[:, i] - ŷ)ᵀ W_c[i]
+      Pxy +=
+          m_pts.Wc(i) *
+          (residualFuncX(m_sigmasF.template block<States, 1>(0, i), m_xHat)) *
+          (residualFuncY(sigmasH.template block<Rows, 1>(0, i), yHat))
+              .transpose();
+    }
+
+    // K = (P_{xy} / S_yᵀ) / S_y
+    // K = (S_y \ P_{xy}ᵀ)ᵀ / S_y
+    // K = (S_yᵀ \ (S_y \ P_{xy}ᵀ))ᵀ
+    Matrixd<States, Rows> K =
+        Sy.transpose()
+            .fullPivHouseholderQr()
+            .solve(Sy.fullPivHouseholderQr().solve(Pxy.transpose()))
+            .transpose();
+
+    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − ŷ)
+    m_xHat = addFuncX(m_xHat, K * residualFuncY(y, yHat));
+
+    Matrixd<States, Rows> U = K * Sy;
+    for (int i = 0; i < Rows; i++) {
+      Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(
+          m_S, U.template block<States, 1>(0, i), -1);
+    }
+  }
 
  private:
   std::function<StateVector(const StateVector&, const InputVector&)> m_f;
@@ -309,5 +442,3 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     UnscentedKalmanFilter<5, 3, 3>;
 
 }  // namespace frc
-
-#include "UnscentedKalmanFilter.inc"

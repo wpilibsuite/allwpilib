@@ -3,12 +3,12 @@
 # Copyright (c) FIRST and other WPILib contributors.
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
+
 import argparse
 import json
-import sys
 import os
-from typing import Dict, Any
 from pathlib import Path
+from typing import Any, Dict
 
 from jinja2 import Environment, FileSystemLoader
 from jinja2.environment import Template
@@ -20,7 +20,7 @@ def render_template(
     output_dir.mkdir(parents=True, exist_ok=True)
 
     output_file = output_dir / filename
-    output_file.write_text(template.render(controller), encoding="utf-8")
+    output_file.write_text(template.render(controller), encoding="utf-8", newline="\n")
 
 
 def generate_cpp_headers(
@@ -67,7 +67,7 @@ def generate_pwm_motor_controllers(
     generate_cpp_sources(output_root, template_root, controllers)
 
 
-def main(argv):
+def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
@@ -90,7 +90,7 @@ def main(argv):
         default=dirname / "src/generate",
         type=Path,
     )
-    args = parser.parse_args(argv)
+    args = parser.parse_args()
 
     generate_pwm_motor_controllers(
         args.output_directory, args.template_root, args.schema_root
@@ -98,4 +98,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

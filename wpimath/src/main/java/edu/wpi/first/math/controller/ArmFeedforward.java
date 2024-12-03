@@ -13,7 +13,6 @@ import edu.wpi.first.math.controller.struct.ArmFeedforwardStruct;
 import edu.wpi.first.math.jni.ArmFeedforwardJNI;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
@@ -37,9 +36,6 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
 
   /** The period, in seconds. */
   private final double m_dt;
-
-  /** The calculated output voltage measure. */
-  private final MutVoltage output = Volts.mutable(0.0);
 
   /**
    * Creates a new ArmFeedforward with the specified gains and period.
@@ -207,12 +203,10 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    * @return The computed feedforward in volts.
    */
   public Voltage calculate(Angle currentAngle, AngularVelocity currentVelocity) {
-    output.mut_replace(
+    return Volts.of(
         kg * Math.cos(currentAngle.in(Radians))
             + ks * Math.signum(currentVelocity.in(RadiansPerSecond))
-            + kv * currentVelocity.in(RadiansPerSecond),
-        Volts);
-    return output;
+            + kv * currentVelocity.in(RadiansPerSecond));
   }
 
   /**
@@ -227,7 +221,7 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    */
   public Voltage calculate(
       Angle currentAngle, AngularVelocity currentVelocity, AngularVelocity nextVelocity) {
-    output.mut_replace(
+    return Volts.of(
         ArmFeedforwardJNI.calculate(
             ks,
             kv,
@@ -236,9 +230,7 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
             currentAngle.in(Radians),
             currentVelocity.in(RadiansPerSecond),
             nextVelocity.in(RadiansPerSecond),
-            m_dt),
-        Volts);
-    return output;
+            m_dt));
   }
 
   // Rearranging the main equation from the calculate() method yields the

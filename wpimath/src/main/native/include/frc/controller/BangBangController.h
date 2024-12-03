@@ -6,9 +6,12 @@
 
 #include <limits>
 
+#include <gcem.hpp>
 #include <wpi/SymbolExports.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
+
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
@@ -37,57 +40,66 @@ class WPILIB_DLLEXPORT BangBangController
    *
    * @param tolerance Tolerance for atSetpoint.
    */
-  explicit BangBangController(
-      double tolerance = std::numeric_limits<double>::infinity());
+  constexpr explicit BangBangController(
+      double tolerance = std::numeric_limits<double>::infinity())
+      : m_tolerance(tolerance) {
+    if (!std::is_constant_evaluated()) {
+      ++instances;
+      wpi::math::MathSharedStore::ReportUsage(
+          wpi::math::MathUsageId::kController_BangBangController, instances);
+    }
+  }
 
   /**
    * Sets the setpoint for the bang-bang controller.
    *
    * @param setpoint The desired setpoint.
    */
-  void SetSetpoint(double setpoint);
+  constexpr void SetSetpoint(double setpoint) { m_setpoint = setpoint; }
 
   /**
    * Returns the current setpoint of the bang-bang controller.
    *
    * @return The current setpoint.
    */
-  double GetSetpoint() const;
+  constexpr double GetSetpoint() const { return m_setpoint; }
 
   /**
    * Returns true if the error is within the tolerance of the setpoint.
    *
    * @return Whether the error is within the acceptable bounds.
    */
-  bool AtSetpoint() const;
+  constexpr bool AtSetpoint() const {
+    return gcem::abs(m_setpoint - m_measurement) < m_tolerance;
+  }
 
   /**
    * Sets the error within which AtSetpoint will return true.
    *
    * @param tolerance Position error which is tolerable.
    */
-  void SetTolerance(double tolerance);
+  constexpr void SetTolerance(double tolerance) { m_tolerance = tolerance; }
 
   /**
    * Returns the current tolerance of the controller.
    *
    * @return The current tolerance.
    */
-  double GetTolerance() const;
+  constexpr double GetTolerance() const { return m_tolerance; }
 
   /**
    * Returns the current measurement of the process variable.
    *
    * @return The current measurement of the process variable.
    */
-  double GetMeasurement() const;
+  constexpr double GetMeasurement() const { return m_measurement; }
 
   /**
    * Returns the current error.
    *
    * @return The current error.
    */
-  double GetError() const;
+  constexpr double GetError() const { return m_setpoint - m_measurement; }
 
   /**
    * Returns the calculated control output.
@@ -99,7 +111,12 @@ class WPILIB_DLLEXPORT BangBangController
    * @param setpoint The setpoint for the process variable.
    * @return The calculated motor output (0 or 1).
    */
-  double Calculate(double measurement, double setpoint);
+  constexpr double Calculate(double measurement, double setpoint) {
+    m_measurement = measurement;
+    m_setpoint = setpoint;
+
+    return measurement < setpoint ? 1 : 0;
+  }
 
   /**
    * Returns the calculated control output.
@@ -107,7 +124,9 @@ class WPILIB_DLLEXPORT BangBangController
    * @param measurement The most recent measurement of the process variable.
    * @return The calculated motor output (0 or 1).
    */
-  double Calculate(double measurement);
+  constexpr double Calculate(double measurement) {
+    return Calculate(measurement, m_setpoint);
+  }
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
@@ -116,6 +135,9 @@ class WPILIB_DLLEXPORT BangBangController
 
   double m_setpoint = 0;
   double m_measurement = 0;
+
+  // Usage reporting instances
+  inline static int instances = 0;
 };
 
 }  // namespace frc

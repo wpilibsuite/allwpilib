@@ -41,7 +41,7 @@ class MeasureTest {
   void testTimesConversionFactor() {
     Distance m = Units.Feet.of(10);
 
-    Per<AngleUnit, DistanceUnit> conversion = Units.Degrees.of(10).divide(Units.Feet.of(1));
+    Per<AngleUnit, DistanceUnit> conversion = Units.Degrees.of(10).div(Units.Feet.of(1));
     Angle result = m.timesConversionFactor(conversion);
     assertEquals(Units.Degrees.of(100), result);
   }
@@ -53,7 +53,7 @@ class MeasureTest {
     // Using a complex compound unit here
     // (Per<Mult<Mult<Mass, Per<Distance, Time>>, Distance>, Distance>)
     Per<AngularMomentumUnit, DistanceUnit> conversion =
-        Units.KilogramMetersSquaredPerSecond.of(1).divide(Units.Foot.one());
+        Units.KilogramMetersSquaredPerSecond.of(1).div(Units.Foot.one());
 
     AngularMomentum result = m.timesConversionFactor(conversion);
     assertEquals(Units.KilogramMetersSquaredPerSecond.of(1), result);
@@ -71,7 +71,7 @@ class MeasureTest {
   @Test
   void testDivide() {
     Distance m = Units.Meters.of(1);
-    Distance m2 = m.divide(10);
+    Distance m2 = m.div(10);
     assertEquals(0.1, m2.magnitude(), 0);
     assertNotSame(m2, m);
   }
@@ -121,7 +121,7 @@ class MeasureTest {
 
     // 144 Kg / (53 ms) = (1000 / 53) * 144 Kg/s = (144,000 / 53) Kg/s
 
-    var result = measure.divide(dt);
+    var result = measure.div(dt);
     assertEquals(144_000.0 / 53, result.baseUnitMagnitude(), 1e-5);
     assertEquals(Units.Kilograms.per(Units.Milliseconds), result.unit());
   }
@@ -141,13 +141,13 @@ class MeasureTest {
     // Dimensionless divide
     var m1 = Units.Meters.of(6);
     var m2 = Units.Value.of(3);
-    var result = m1.divide(m2);
-    assertEquals(2, m1.divide(m2).magnitude());
+    var result = m1.div(m2);
+    assertEquals(2, m1.div(m2).magnitude());
     assertEquals(Units.Meters, result.unit());
     // Velocity divide
     var m3 = Units.Meters.of(8);
     var m4 = Units.Meters.per(Units.Second).of(4);
-    var time = m3.divide(m4);
+    var time = m3.div(m4);
     assertEquals(2, time.magnitude());
     assertEquals(Units.Second, time.unit());
     // PerUnit divide
@@ -155,7 +155,7 @@ class MeasureTest {
     var m6 = Units.Volts.per(Units.Meter).of(2);
 
     // Voltage/(Voltage/Distance) -> Voltage * Distance/Voltage -> Distance
-    var dist = m5.divide(m6);
+    var dist = m5.div(m6);
     assertEquals(3, dist.magnitude());
     assertEquals(Units.Meter, dist.unit());
   }

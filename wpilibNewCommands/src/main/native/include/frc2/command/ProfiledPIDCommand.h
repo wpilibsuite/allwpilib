@@ -44,7 +44,9 @@ class ProfiledPIDCommand
    * @param goalSource   the controller's goal
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
+   * @deprecated Use a ProfiledPIDController instead
    */
+  [[deprecated("Use a ProfiledPIDController instead")]]
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
                      std::function<Distance_t()> measurementSource,
                      std::function<State()> goalSource,
@@ -66,7 +68,9 @@ class ProfiledPIDCommand
    * @param goalSource   the controller's goal
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
+   * @deprecated Use a ProfiledPIDController instead
    */
+  [[deprecated("Use a ProfiledPIDController instead")]]
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
                      std::function<Distance_t()> measurementSource,
                      std::function<Distance_t()> goalSource,
@@ -88,7 +92,10 @@ class ProfiledPIDCommand
    * @param goal         the controller's goal
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
+   * @deprecated Use a ProfiledPIDController instead
    */
+
+  [[deprecated("Use a ProfiledPIDController instead")]]
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
                      std::function<Distance_t()> measurementSource, State goal,
                      std::function<void(double, State)> useOutput,
@@ -106,7 +113,9 @@ class ProfiledPIDCommand
    * @param goal         the controller's goal
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
+   * @deprecated Use a ProfiledPIDController instead
    */
+  [[deprecated("Use a ProfiledPIDController instead")]]
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
                      std::function<Distance_t()> measurementSource,
                      Distance_t goal,

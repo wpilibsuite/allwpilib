@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.PowerDistributionFaults;
@@ -51,7 +52,11 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     m_handle = PowerDistributionJNI.initialize(module, moduleType.value);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
-    HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
+    if (moduleType == ModuleType.kCTRE) {
+      HAL.report(tResourceType.kResourceType_PDP, tInstances.kPDP_CTRE);
+    } else {
+      HAL.report(tResourceType.kResourceType_PDP, tInstances.kPDP_REV);
+    }
     SendableRegistry.addLW(this, "PowerDistribution", m_module);
   }
 
@@ -65,7 +70,12 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     m_handle = PowerDistributionJNI.initialize(kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
-    HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
+    if (PowerDistributionJNI.getType(m_handle) == PowerDistributionJNI.CTRE_TYPE) {
+      HAL.report(tResourceType.kResourceType_PDP, tInstances.kPDP_CTRE);
+    } else {
+      HAL.report(tResourceType.kResourceType_PDP, tInstances.kPDP_REV);
+    }
+
     SendableRegistry.addLW(this, "PowerDistribution", m_module);
   }
 

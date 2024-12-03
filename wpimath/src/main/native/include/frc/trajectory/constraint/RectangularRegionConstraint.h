@@ -31,9 +31,9 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
    * @deprecated Use constructor taking Rectangle2d instead.
    */
   [[deprecated("Use constructor taking Rectangle2d instead.")]]
-  RectangularRegionConstraint(const Translation2d& bottomLeftPoint,
-                              const Translation2d& topRightPoint,
-                              const Constraint& constraint)
+  constexpr RectangularRegionConstraint(const Translation2d& bottomLeftPoint,
+                                        const Translation2d& topRightPoint,
+                                        const Constraint& constraint)
       : m_rectangle{bottomLeftPoint, topRightPoint}, m_constraint(constraint) {}
 
   /**
@@ -43,11 +43,11 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
    * @param constraint The constraint to enforce when the robot is within the
    *     region.
    */
-  RectangularRegionConstraint(const Rectangle2d& rectangle,
-                              const Constraint& constraint)
+  constexpr RectangularRegionConstraint(const Rectangle2d& rectangle,
+                                        const Constraint& constraint)
       : m_rectangle{rectangle}, m_constraint{constraint} {}
 
-  units::meters_per_second_t MaxVelocity(
+  constexpr units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
       units::meters_per_second_t velocity) const override {
     if (m_rectangle.Contains(pose.Translation())) {
@@ -58,8 +58,9 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
     }
   }
 
-  MinMax MinMaxAcceleration(const Pose2d& pose, units::curvature_t curvature,
-                            units::meters_per_second_t speed) const override {
+  constexpr MinMax MinMaxAcceleration(
+      const Pose2d& pose, units::curvature_t curvature,
+      units::meters_per_second_t speed) const override {
     if (m_rectangle.Contains(pose.Translation())) {
       return m_constraint.MinMaxAcceleration(pose, curvature, speed);
     } else {

@@ -10,8 +10,11 @@
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
 #include <hal/Main.h>
+#include <networktables/NetworkTable.h>
+#include <wpi/RuntimeCheck.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/string.h>
 
 #include "frc/Errors.h"
 #include "frc/RuntimeType.h"
@@ -53,6 +56,21 @@ void RunRobot(wpi::mutex& m, Robot** robot) {
 
 template <class Robot>
 int StartRobot() {
+  uint32_t foundMajor;
+  uint32_t foundMinor;
+  uint32_t expectedMajor;
+  uint32_t expectedMinor;
+  WPI_String runtimePath;
+  if (!WPI_IsRuntimeValid(&foundMajor, &foundMinor, &expectedMajor,
+                          &expectedMinor, &runtimePath)) {
+    // We could make this error better, however unlike Java, there is only a
+    // single scenario that could be occuring. The entirety of VS is too out
+    // of date. In most cases the linker should detect this, but not always.
+    fmt::println(
+        "Your copy of Visual Studio is out of date. Please update it.\n");
+    return 1;
+  }
+
   int halInit = RunHALInitialization();
   if (halInit != 0) {
     return halInit;
@@ -257,6 +275,8 @@ class RobotBase {
   RobotBase& operator=(RobotBase&&) = default;
 
   static std::thread::id m_threadId;
+  NT_Listener connListenerHandle;
+  bool m_dashboardDetected = false;
 };
 
 }  // namespace frc

@@ -22,6 +22,7 @@
 
 #include "IConnectionList.h"
 #include "Log.h"
+#include "net/NetworkInterface.h"
 
 using namespace nt;
 namespace uv = wpi::uv;
@@ -42,8 +43,6 @@ NetworkClientBase::NetworkClientBase(int inst, std::string_view id,
       m_id{id},
       m_localQueue{logger},
       m_loop{*m_loopRunner.GetLoop()} {
-  m_localMsgs.reserve(net::NetworkLoopQueue::kInitialQueueSize);
-
   INFO("starting network client");
 }
 
@@ -150,7 +149,7 @@ NetworkClient3::NetworkClient3(int inst, std::string_view id,
   m_loopRunner.ExecAsync([this](uv::Loop& loop) {
     m_parallelConnect = wpi::ParallelTcpConnector::Create(
         loop, kReconnectRate, m_logger,
-        [this](uv::Tcp& tcp) { TcpConnected(tcp); });
+        [this](uv::Tcp& tcp) { TcpConnected(tcp); }, true);
 
     m_sendOutgoingTimer = uv::Timer::Create(loop);
     if (m_sendOutgoingTimer) {
@@ -193,9 +192,14 @@ NetworkClient3::~NetworkClient3() {
 }
 
 void NetworkClient3::HandleLocal() {
-  m_localQueue.ReadQueue(&m_localMsgs);
-  if (m_clientImpl) {
-    m_clientImpl->HandleLocal(m_localMsgs);
+  for (;;) {
+    auto msgs = m_localQueue.ReadQueue(m_localMsgs);
+    if (msgs.empty()) {
+      return;
+    }
+    if (m_clientImpl) {
+      m_clientImpl->HandleLocal(msgs);
+    }
   }
 }
 
@@ -303,7 +307,7 @@ NetworkClient::NetworkClient(
   m_loopRunner.ExecAsync([this](uv::Loop& loop) {
     m_parallelConnect = wpi::ParallelTcpConnector::Create(
         loop, kReconnectRate, m_logger,
-        [this](uv::Tcp& tcp) { TcpConnected(tcp); });
+        [this](uv::Tcp& tcp) { TcpConnected(tcp); }, true);
 
     m_readLocalTimer = uv::Timer::Create(loop);
     if (m_readLocalTimer) {
@@ -357,9 +361,14 @@ NetworkClient::~NetworkClient() {
 }
 
 void NetworkClient::HandleLocal() {
-  m_localQueue.ReadQueue(&m_localMsgs);
-  if (m_clientImpl) {
-    m_clientImpl->HandleLocal(std::move(m_localMsgs));
+  for (;;) {
+    auto msgs = m_localQueue.ReadQueue(m_localMsgs);
+    if (msgs.empty()) {
+      return;
+    }
+    if (m_clientImpl) {
+      m_clientImpl->HandleLocal(msgs);
+    }
   }
 }
 
@@ -407,7 +416,7 @@ void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp,
   m_wire = std::make_shared<net::WebSocketConnection>(
       ws, connInfo.protocol_version, m_logger);
   m_clientImpl = std::make_unique<net::ClientImpl>(
-      m_loop.Now().count(), m_inst, *m_wire, m_logger, m_timeSyncUpdated,
+      m_loop.Now().count(), *m_wire, m_logger, m_timeSyncUpdated,
       [this](uint32_t repeatMs) {
         DEBUG4("Setting periodic timer to {}", repeatMs);
         if (m_sendOutgoingTimer &&

@@ -8,10 +8,10 @@ Subject: [PATCH 7/9] Remove static from array indices
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/src/unix/linux.c b/src/unix/linux.c
-index be72054ab6513dce8099caeb4dca5083dfbef9df..322873f6f0e8954d2c5b572ef87fcbc74d7b12c1 100644
+index 25b93ba43b98874d658d58e3faab12049f6e4edf..df8e9ee5564227e700d0fb83390997ea85a5a869 100644
 --- a/src/unix/linux.c
 +++ b/src/unix/linux.c
-@@ -2098,7 +2098,7 @@ static uint64_t uv__read_uint64(const char* filename) {
+@@ -2113,7 +2113,7 @@ static uint64_t uv__read_uint64(const char* filename) {
   * finds the location and length of the memory controller mount path.
   * This disregards the leading / for easy concatenation of paths.
   * Returns NULL if the memory controller wasn't found. */
@@ -20,7 +20,7 @@ index be72054ab6513dce8099caeb4dca5083dfbef9df..322873f6f0e8954d2c5b572ef87fcbc7
                                                  int* n) {
    char* p;
  
-@@ -2119,7 +2119,7 @@ static char* uv__cgroup1_find_memory_controller(char buf[static 1024],
+@@ -2134,7 +2134,7 @@ static char* uv__cgroup1_find_memory_controller(char buf[static 1024],
    return p;
  }
  
@@ -29,7 +29,7 @@ index be72054ab6513dce8099caeb4dca5083dfbef9df..322873f6f0e8954d2c5b572ef87fcbc7
                                            uint64_t* max) {
    char filename[4097];
    char* p;
-@@ -2159,7 +2159,7 @@ update_limits:
+@@ -2174,7 +2174,7 @@ update_limits:
      *max = UINT64_MAX;
  }
  
@@ -38,7 +38,7 @@ index be72054ab6513dce8099caeb4dca5083dfbef9df..322873f6f0e8954d2c5b572ef87fcbc7
                                            uint64_t* max) {
    char filename[4097];
    char* p;
-@@ -2176,7 +2176,7 @@ static void uv__get_cgroup2_memory_limits(char buf[static 1024], uint64_t* high,
+@@ -2191,7 +2191,7 @@ static void uv__get_cgroup2_memory_limits(char buf[static 1024], uint64_t* high,
    *high = uv__read_uint64(filename);
  }
  
@@ -47,7 +47,7 @@ index be72054ab6513dce8099caeb4dca5083dfbef9df..322873f6f0e8954d2c5b572ef87fcbc7
    uint64_t high;
    uint64_t max;
  
-@@ -2202,7 +2202,7 @@ uint64_t uv_get_constrained_memory(void) {
+@@ -2217,7 +2217,7 @@ uint64_t uv_get_constrained_memory(void) {
  }
  
  
@@ -56,7 +56,7 @@ index be72054ab6513dce8099caeb4dca5083dfbef9df..322873f6f0e8954d2c5b572ef87fcbc7
    char filename[4097];
    uint64_t current;
    char* p;
-@@ -2226,7 +2226,7 @@ static uint64_t uv__get_cgroup1_current_memory(char buf[static 1024]) {
+@@ -2241,7 +2241,7 @@ static uint64_t uv__get_cgroup1_current_memory(char buf[static 1024]) {
    return uv__read_uint64("/sys/fs/cgroup/memory/memory.usage_in_bytes");
  }
  

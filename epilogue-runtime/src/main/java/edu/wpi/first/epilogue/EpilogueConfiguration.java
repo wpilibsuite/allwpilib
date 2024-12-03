@@ -4,8 +4,8 @@
 
 package edu.wpi.first.epilogue;
 
-import edu.wpi.first.epilogue.logging.DataLogger;
-import edu.wpi.first.epilogue.logging.NTDataLogger;
+import edu.wpi.first.epilogue.logging.EpilogueBackend;
+import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
 import edu.wpi.first.epilogue.logging.errors.ErrorPrinter;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -18,11 +18,11 @@ import edu.wpi.first.units.measure.Time;
 @SuppressWarnings("checkstyle:MemberName")
 public class EpilogueConfiguration {
   /**
-   * The data logger implementation for Epilogue to use. By default, this will log data directly to
+   * The backend implementation for Epilogue to use. By default, this will log data directly to
    * NetworkTables. NetworkTable data can be mirrored to a log file on disk by calling {@code
    * DataLogManager.start()} in your {@code robotInit} method.
    */
-  public DataLogger dataLogger = new NTDataLogger(NetworkTableInstance.getDefault());
+  public EpilogueBackend backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
 
   /**
    * The period Epilogue will log at. By default this is the period that the robot runs at. This is

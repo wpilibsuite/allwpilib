@@ -8,12 +8,17 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/controller/DifferentialDriveFeedforward.h"
+#include "pb.h"
+#include "wpimath/protobuf/controller.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DifferentialDriveFeedforward> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::DifferentialDriveFeedforward Unpack(
-      const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
+  using MessageStruct = wpi_proto_ProtobufDifferentialDriveFeedforward;
+  using InputStream = wpi::ProtoInputStream<frc::DifferentialDriveFeedforward>;
+  using OutputStream =
+      wpi::ProtoOutputStream<frc::DifferentialDriveFeedforward>;
+  static std::optional<frc::DifferentialDriveFeedforward> Unpack(
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
                    const frc::DifferentialDriveFeedforward& value);
 };
