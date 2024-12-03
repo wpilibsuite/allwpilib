@@ -24,6 +24,7 @@ namespace frc2 {
 class Command;
 class CommandPtr;
 class Subsystem;
+
 /**
  * The scheduler responsible for running Commands.  A Command-based robot should
  * call Run() on the singleton instance in its periodic block in order to run
