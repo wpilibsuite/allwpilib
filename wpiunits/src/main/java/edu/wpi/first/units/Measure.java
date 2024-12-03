@@ -25,6 +25,7 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Mult;
 import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Power;
+import edu.wpi.first.units.measure.Resistance;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Torque;
@@ -98,6 +99,27 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   }
 
   /**
+   * Absolute value of measure.
+   *
+   * @param unit unit to use
+   * @return the absolute value of this measure in the given unit
+   */
+  default double abs(U unit) {
+    return Math.abs(this.in(unit));
+  }
+
+  /**
+   * Take the sign of another measure.
+   *
+   * @param other measure from which to take sign
+   * @param unit unit to use
+   * @return the value of the measure in the given unit with the sign of the provided measure
+   */
+  default double copySign(Measure<U> other, U unit) {
+    return Math.copySign(this.in(unit), other.in(unit));
+  }
+
+  /**
    * Returns an immutable copy of this measure. The copy can be used freely and is guaranteed never
    * to change.
    *
@@ -122,6 +144,21 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @return a measure equal to zero minus this measure
    */
   Measure<U> unaryMinus();
+
+  /**
+   * Returns a measure equivalent to this one equal to zero minus its current value. For non-linear
+   * unit types like temperature, the zero point is treated as the zero value of the base unit (eg
+   * Kelvin). In effect, this means code like {@code Celsius.of(10).negate()} returns a value
+   * equivalent to -10 Kelvin, and <i>not</i> -10° Celsius.
+   *
+   * @return a measure equal to zero minus this measure
+   * @deprecated use unaryMinus() instead. This was renamed for consistency with other WPILib
+   *     classes like Rotation2d
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<U> negate() {
+    return unaryMinus();
+  }
 
   /**
    * Adds another measure of the same unit type to this one.
@@ -246,6 +283,8 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
       return times(velocity);
     } else if (multiplier instanceof Voltage voltage) {
       return times(voltage);
+    } else if (multiplier instanceof Resistance resistance) {
+      return times(resistance);
     } else {
       // Dimensional analysis fallthrough or a generic input measure type
       // Do a basic unit multiplication
@@ -531,6 +570,18 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   }
 
   /**
+   * Multiplies this measure by a resistance and returns the resulting measure in the most
+   * appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Resistance multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
    * Multiplies this measure by a conversion factor, returning the converted measurement. Unlike
    * {@link #times(Per)}, this allows for basic unit cancellation to return measurements of a known
    * dimension.
@@ -584,7 +635,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  Measure<U> divide(double divisor);
+  Measure<U> div(double divisor);
 
   /**
    * Divides this measure by a dimensionless scalar and returns the result.
@@ -592,7 +643,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  Measure<U> divide(Dimensionless divisor);
+  Measure<U> div(Dimensionless divisor);
 
   /**
    * Divides this measurement by another measure and performs some dimensional analysis to reduce
@@ -601,7 +652,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the unit to divide by
    * @return the resulting measure
    */
-  default Measure<?> divide(Measure<?> divisor) {
+  default Measure<?> div(Measure<?> divisor) {
     final double baseUnitResult = baseUnitMagnitude() / divisor.baseUnitMagnitude();
 
     if (unit().getBaseUnit().equals(divisor.unit().getBaseUnit())) {
@@ -641,52 +692,54 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
     }
 
     if (divisor instanceof Acceleration<?> acceleration) {
-      return divide(acceleration);
+      return div(acceleration);
     } else if (divisor instanceof Angle angle) {
-      return divide(angle);
+      return div(angle);
     } else if (divisor instanceof AngularAcceleration angularAcceleration) {
-      return divide(angularAcceleration);
+      return div(angularAcceleration);
     } else if (divisor instanceof AngularMomentum angularMomentum) {
-      return divide(angularMomentum);
+      return div(angularMomentum);
     } else if (divisor instanceof AngularVelocity angularVelocity) {
-      return divide(angularVelocity);
+      return div(angularVelocity);
     } else if (divisor instanceof Current current) {
-      return divide(current);
+      return div(current);
     } else if (divisor instanceof Dimensionless dimensionless) {
       // n.b. this case should already be covered
-      return divide(dimensionless);
+      return div(dimensionless);
     } else if (divisor instanceof Distance distance) {
-      return divide(distance);
+      return div(distance);
     } else if (divisor instanceof Energy energy) {
-      return divide(energy);
+      return div(energy);
     } else if (divisor instanceof Force force) {
-      return divide(force);
+      return div(force);
     } else if (divisor instanceof Frequency frequency) {
-      return divide(frequency);
+      return div(frequency);
     } else if (divisor instanceof LinearAcceleration linearAcceleration) {
-      return divide(linearAcceleration);
+      return div(linearAcceleration);
     } else if (divisor instanceof LinearVelocity linearVelocity) {
-      return divide(linearVelocity);
+      return div(linearVelocity);
     } else if (divisor instanceof Mass mass) {
-      return divide(mass);
+      return div(mass);
     } else if (divisor instanceof MomentOfInertia momentOfInertia) {
-      return divide(momentOfInertia);
+      return div(momentOfInertia);
     } else if (divisor instanceof Mult<?, ?> mult) {
-      return divide(mult);
+      return div(mult);
     } else if (divisor instanceof Per<?, ?> per) {
-      return divide(per);
+      return div(per);
     } else if (divisor instanceof Power power) {
-      return divide(power);
+      return div(power);
     } else if (divisor instanceof Temperature temperature) {
-      return divide(temperature);
+      return div(temperature);
     } else if (divisor instanceof Time time) {
-      return divide(time);
+      return div(time);
     } else if (divisor instanceof Torque torque) {
-      return divide(torque);
+      return div(torque);
     } else if (divisor instanceof Velocity<?> velocity) {
-      return divide(velocity);
+      return div(velocity);
     } else if (divisor instanceof Voltage voltage) {
-      return divide(voltage);
+      return div(voltage);
+    } else if (divisor instanceof Resistance resistance) {
+      return div(resistance);
     } else {
       // Dimensional analysis fallthrough or a generic input measure type
       // Do a basic unit multiplication
@@ -701,7 +754,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Acceleration<?> divisor) {
+  default Measure<?> div(Acceleration<?> divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -712,7 +765,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Angle divisor) {
+  default Measure<?> div(Angle divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -724,7 +777,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(AngularAcceleration divisor) {
+  default Measure<?> div(AngularAcceleration divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -736,7 +789,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(AngularMomentum divisor) {
+  default Measure<?> div(AngularMomentum divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -748,7 +801,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(AngularVelocity divisor) {
+  default Measure<?> div(AngularVelocity divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -760,7 +813,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Current divisor) {
+  default Measure<?> div(Current divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -771,7 +824,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Distance divisor) {
+  default Measure<?> div(Distance divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -782,7 +835,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Energy divisor) {
+  default Measure<?> div(Energy divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -793,7 +846,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Force divisor) {
+  default Measure<?> div(Force divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -804,7 +857,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Frequency divisor) {
+  default Measure<?> div(Frequency divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -816,7 +869,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(LinearAcceleration divisor) {
+  default Measure<?> div(LinearAcceleration divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -827,7 +880,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(LinearMomentum divisor) {
+  default Measure<?> div(LinearMomentum divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -838,7 +891,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(LinearVelocity divisor) {
+  default Measure<?> div(LinearVelocity divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -849,7 +902,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Mass divisor) {
+  default Measure<?> div(Mass divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -861,7 +914,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(MomentOfInertia divisor) {
+  default Measure<?> div(MomentOfInertia divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -873,7 +926,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Mult<?, ?> divisor) {
+  default Measure<?> div(Mult<?, ?> divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -884,7 +937,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Power divisor) {
+  default Measure<?> div(Power divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -895,7 +948,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Per<?, ?> divisor) {
+  default Measure<?> div(Per<?, ?> divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -906,7 +959,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Temperature divisor) {
+  default Measure<?> div(Temperature divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -919,7 +972,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Time divisor) {
+  default Measure<?> div(Time divisor) {
     return VelocityUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -930,7 +983,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Torque divisor) {
+  default Measure<?> div(Torque divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -941,7 +994,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Velocity<?> divisor) {
+  default Measure<?> div(Velocity<?> divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -952,9 +1005,355 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @param divisor the measurement to divide by.
    * @return the division result
    */
-  default Measure<?> divide(Voltage divisor) {
+  default Measure<?> div(Voltage divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a resistance and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> div(Resistance divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a unitless scalar and returns the result.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<U> divide(double divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a dimensionless scalar and returns the result.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<U> divide(Dimensionless divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measurement by another measure and performs some dimensional analysis to reduce
+   * the units.
+   *
+   * @param divisor the unit to divide by
+   * @return the resulting measure
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Measure<?> divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a generic acceleration and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Acceleration<?> divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by an angle and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Angle divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by an angular acceleration and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(AngularAcceleration divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by an angular momentum and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(AngularMomentum divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by an angular velocity and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(AngularVelocity divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by an electric current and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Current divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a distance and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Distance divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by an energy and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Energy divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a force and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Force divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a frequency and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Frequency divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a linear acceleration and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(LinearAcceleration divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a linear momentum and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(LinearMomentum divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a linear velocity and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(LinearVelocity divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a mass and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Mass divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a moment of inertia and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(MomentOfInertia divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a generic multiplication and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Mult<?, ?> divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a power and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Power divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a generic ratio and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Per<?, ?> divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a temperature and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Temperature divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a time and returns the result in the most appropriate unit. This will
+   * often - but not always - result in a {@link Per} type like {@link LinearVelocity} or {@link
+   * Acceleration}.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Time divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a torque and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Torque divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a generic velocity and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Velocity<?> divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a voltage and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Voltage divisor) {
+    return div(divisor);
+  }
+
+  /**
+   * Divides this measure by a resistance and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  default Measure<?> divide(Resistance divisor) {
+    return div(divisor);
   }
 
   /**
@@ -974,13 +1373,13 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
 
   /**
    * Divides this measure by a time period and returns the result in the most appropriate unit. This
-   * is equivalent to {@code divide(period.of(1))}.
+   * is equivalent to {@code div(period.of(1))}.
    *
    * @param period the time period measurement to divide by.
    * @return the division result
    */
   default Measure<?> per(TimeUnit period) {
-    return divide(period.of(1));
+    return div(period.of(1));
   }
 
   /**

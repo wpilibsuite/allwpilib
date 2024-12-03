@@ -9,10 +9,10 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <wpi/deprecated.h>
 
-#include "cscore.h"
 #include "cscore_cv.h"
 
 namespace frc {
@@ -130,7 +130,9 @@ class CameraServer {
    */
   template <typename T>
   [[deprecated("Call StartAutomaticCapture with a HttpCamera instead.")]]
-  static cs::AxisCamera AddAxisCamera(std::initializer_list<T> hosts);
+  static cs::AxisCamera AddAxisCamera(std::initializer_list<T> hosts) {
+    return AddAxisCamera("Axis Camera", hosts);
+  }
 
   /**
    * Adds an Axis IP camera.
@@ -185,7 +187,14 @@ class CameraServer {
   template <typename T>
   [[deprecated("Call StartAutomaticCapture with a HttpCamera instead.")]]
   static cs::AxisCamera AddAxisCamera(std::string_view name,
-                                      std::initializer_list<T> hosts);
+                                      std::initializer_list<T> hosts) {
+    std::vector<std::string> vec;
+    vec.reserve(hosts.size());
+    for (const auto& host : hosts) {
+      vec.emplace_back(host);
+    }
+    return AddAxisCamera(name, vec);
+  }
   WPI_UNIGNORE_DEPRECATED
 
   /**
@@ -316,5 +325,3 @@ class CameraServer {
 };
 
 }  // namespace frc
-
-#include "cameraserver/CameraServer.inc"

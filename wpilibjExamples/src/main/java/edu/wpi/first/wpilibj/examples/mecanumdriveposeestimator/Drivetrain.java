@@ -148,14 +148,12 @@ public class Drivetrain {
    */
   public void drive(
       double xSpeed, double ySpeed, double rot, boolean fieldRelative, double periodSeconds) {
-    var mecanumDriveWheelSpeeds =
-        m_kinematics.toWheelSpeeds(
-            ChassisSpeeds.discretize(
-                fieldRelative
-                    ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                        xSpeed, ySpeed, rot, m_poseEstimator.getEstimatedPosition().getRotation())
-                    : new ChassisSpeeds(xSpeed, ySpeed, rot),
-                periodSeconds));
+    var chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
+    if (fieldRelative) {
+      chassisSpeeds.toRobotRelativeSpeeds(m_poseEstimator.getEstimatedPosition().getRotation());
+    }
+    chassisSpeeds.discretize(periodSeconds);
+    var mecanumDriveWheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
     mecanumDriveWheelSpeeds.desaturate(kMaxSpeed);
     setSpeeds(mecanumDriveWheelSpeeds);
   }
@@ -169,6 +167,6 @@ public class Drivetrain {
     m_poseEstimator.addVisionMeasurement(
         ExampleGlobalMeasurementSensor.getEstimatedGlobalPose(
             m_poseEstimator.getEstimatedPosition()),
-        Timer.getFPGATimestamp() - 0.3);
+        Timer.getTimestamp() - 0.3);
   }
 }

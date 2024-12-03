@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Fri, 14 Jul 2023 16:40:18 -0700
+Subject: [PATCH 8/9] Add pragmas for missing libraries and set _WIN32_WINNT to
+ Windows 10
+
+This makes GetSystemTimePreciseAsFileTime() available.
+
+The #define value is from
+https://learn.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt.
+---
+ include/uv/win.h | 2 +-
+ src/win/util.c   | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/include/uv/win.h b/include/uv/win.h
+index 48e1402d155ceb80e35a904815cb5739cab2fbe8..576f0fa52b60524711e04e94c740ae9b85fb36a9 100644
+--- a/include/uv/win.h
++++ b/include/uv/win.h
+@@ -20,7 +20,7 @@
+  */
+ 
+ #ifndef _WIN32_WINNT
+-# define _WIN32_WINNT   0x0600
++# define _WIN32_WINNT   0x0A00
+ #endif
+ 
+ #if !defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED)
+diff --git a/src/win/util.c b/src/win/util.c
+index 1239831dcc0c5fdb8e267d4dd8e73cb73fdc88c9..907a09840931b37ec74b8011aedaee3100b5c643 100644
+--- a/src/win/util.c
++++ b/src/win/util.c
+@@ -73,7 +73,9 @@ static char *process_title;
+ static CRITICAL_SECTION process_title_lock;
+ 
+ #pragma comment(lib, "Advapi32.lib")
++#pragma comment(lib, "Dbghelp.lib")
+ #pragma comment(lib, "IPHLPAPI.lib")
++#pragma comment(lib, "Ole32.lib")
+ #pragma comment(lib, "Psapi.lib")
+ #pragma comment(lib, "Userenv.lib")
+ #pragma comment(lib, "kernel32.lib")

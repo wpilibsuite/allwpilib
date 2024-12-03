@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thad House <thadhouse1@gmail.com>
+Date: Tue, 29 Oct 2024 20:23:48 -0700
+Subject: [PATCH 3/4] Generate messages or anything non static as callback
+
+---
+ generator/nanopb_generator.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/generator/nanopb_generator.py b/generator/nanopb_generator.py
+index 239aed4f379b5d454e3b65c48ca11e9f92b6bc4d..3b59ba59e6fc997350b1368a2faebc051cd6176a 100755
+--- a/generator/nanopb_generator.py
++++ b/generator/nanopb_generator.py
+@@ -683,10 +683,12 @@ class Field(ProtoElement):
+ 
+         # Decide how the field data will be allocated
+         if field_options.type == nanopb_pb2.FT_DEFAULT:
+-            if can_be_static:
++            if desc.type == FieldD.TYPE_MESSAGE:
++                field_options.type = nanopb_pb2.FT_CALLBACK
++            elif can_be_static:
+                 field_options.type = nanopb_pb2.FT_STATIC
+             else:
+-                field_options.type = field_options.fallback_type
++                field_options.type = nanopb_pb2.FT_CALLBACK
+ 
+         if field_options.type == nanopb_pb2.FT_STATIC and not can_be_static:
+             raise Exception("Field '%s' is defined as static, but max_size or "

@@ -3,10 +3,7 @@
 import os
 import shutil
 
-from upstream_utils import (
-    walk_cwd_and_copy_if,
-    Lib,
-)
+from upstream_utils import Lib, walk_cwd_and_copy_if
 
 
 def copy_upstream_src(wpilib_root):
@@ -56,7 +53,7 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "libuv"
     url = "https://github.com/libuv/libuv"
-    tag = "v1.48.0"
+    tag = "v1.49.2"
 
     libuv = Lib(name, url, tag, copy_upstream_src)
     libuv.main()

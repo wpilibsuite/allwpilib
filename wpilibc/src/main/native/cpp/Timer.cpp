@@ -36,7 +36,7 @@ Timer::Timer() {
 
 units::second_t Timer::Get() const {
   if (m_running) {
-    return (GetFPGATimestamp() - m_startTime) + m_accumulatedTime;
+    return (GetTimestamp() - m_startTime) + m_accumulatedTime;
   } else {
     return m_accumulatedTime;
   }
@@ -44,12 +44,12 @@ units::second_t Timer::Get() const {
 
 void Timer::Reset() {
   m_accumulatedTime = 0_s;
-  m_startTime = GetFPGATimestamp();
+  m_startTime = GetTimestamp();
 }
 
 void Timer::Start() {
   if (!m_running) {
-    m_startTime = GetFPGATimestamp();
+    m_startTime = GetTimestamp();
     m_running = true;
   }
 }
@@ -82,6 +82,14 @@ bool Timer::AdvanceIfElapsed(units::second_t period) {
   } else {
     return false;
   }
+}
+
+bool Timer::IsRunning() const {
+  return m_running;
+}
+
+units::second_t Timer::GetTimestamp() {
+  return units::second_t{frc::RobotController::GetTime() * 1.0e-6};
 }
 
 units::second_t Timer::GetFPGATimestamp() {

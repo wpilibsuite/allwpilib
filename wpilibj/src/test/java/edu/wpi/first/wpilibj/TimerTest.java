@@ -35,18 +35,22 @@ class TimerTest {
 
     // Verify timer is initialized as stopped
     assertEquals(timer.get(), 0.0);
+    assertFalse(timer.isRunning());
     SimHooks.stepTiming(0.5);
     assertEquals(timer.get(), 0.0);
+    assertFalse(timer.isRunning());
 
     // Verify timer increments after it's started
     timer.start();
     SimHooks.stepTiming(0.5);
     assertEquals(timer.get(), 0.5, 1e-9);
+    assertTrue(timer.isRunning());
 
     // Verify timer stops incrementing after it's stopped
     timer.stop();
     SimHooks.stepTiming(0.5);
     assertEquals(timer.get(), 0.5, 1e-9);
+    assertFalse(timer.isRunning());
   }
 
   @Test

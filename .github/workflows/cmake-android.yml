@@ -1,0 +1,51 @@
+name: CMake Android
+
+on: [pull_request, push]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  SCCACHE_WEBDAV_ENDPOINT: "https://frcmaven.wpi.edu/artifactory/wpilib-generic-cache-cmake-local"
+  SCCACHE_WEBDAV_KEY_PREFIX: "sccache"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            name: Android Arm64
+            abi: arm64-v8a
+          - os: ubuntu-22.04
+            name: Android X64
+            abi: "x86_64"
+
+    name: "Build - ${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r27c
+          add-to-path: false
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Install sccache
+        uses: mozilla-actions/sccache-action@v0.0.5
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: configure
+        run: cmake --preset with-sccache -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_WPILIB=OFF -DWITH_GUI=OFF -DWITH_CSCORE=OFF -DWITH_TESTS=OFF -DWITH_SIMULATION_MODULES=OFF -DWITH_PROTOBUF=OFF -DWITH_JAVA=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_TOOLCHAIN_FILE=${{ steps.setup-ndk.outputs.ndk-path }}/build/cmake/android.toolchain.cmake -DANDROID_ABI="${{ matrix.abi }}" -DANDROID_PLATFORM=android-24
+
+      - name: build
+        run: cmake --build build-cmake --parallel $(nproc)

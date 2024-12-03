@@ -112,6 +112,23 @@ class Timer {
   bool AdvanceIfElapsed(units::second_t period);
 
   /**
+   * Whether the timer is currently running.
+   *
+   * @return true if running.
+   */
+  bool IsRunning() const;
+
+  /**
+   * Return the clock time in seconds. By default, the time is based on the FPGA
+   * hardware clock in seconds since the FPGA started. However, the return value
+   * of this method may be modified to use any time base, including
+   * non-monotonic time bases.
+   *
+   * @returns Robot running time in seconds.
+   */
+  static units::second_t GetTimestamp();
+
+  /**
    * Return the FPGA system clock time in seconds.
    *
    * Return the time from the FPGA hardware clock in seconds since the FPGA

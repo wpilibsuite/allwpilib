@@ -122,6 +122,9 @@ class {{ ConsoleName }}Controller : public GenericHID,
    * Read the value of the left bumper (LB) button on the controller.
    *
    * @return the state of the button
+   * @deprecated Use GetLeftBumperButton instead. This function is deprecated
+   * for removal to make function names consistent to allow the HID classes to
+   * be automatically generated.
    */
   [[deprecated("Use GetLeftBumperButton instead")]]
   bool GetLeftBumper() const;
@@ -130,6 +133,9 @@ class {{ ConsoleName }}Controller : public GenericHID,
    * Read the value of the right bumper (RB) button on the controller.
    *
    * @return the state of the button
+   * @deprecated Use GetRightBumperButton instead. This function is deprecated
+   * for removal to make function names consistent to allow the HID classes to
+   * be automatically generated.
    */
   [[deprecated("Use GetRightBumperButton instead")]]
   bool GetRightBumper() const;
@@ -138,6 +144,9 @@ class {{ ConsoleName }}Controller : public GenericHID,
    * Whether the left bumper (LB) was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check
+   * @deprecated Use GetLeftBumperButtonPressed instead. This function is
+   * deprecated for removal to make function names consistent to allow the HID
+   * classes to be automatically generated.
    */
   [[deprecated("Use GetLeftBumperButtonPressed instead")]]
   bool GetLeftBumperPressed();
@@ -146,6 +155,9 @@ class {{ ConsoleName }}Controller : public GenericHID,
    * Whether the right bumper (RB) was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check
+   * @deprecated Use GetRightBumperButtonPressed instead. This function is
+   * deprecated for removal to make function names consistent to allow the HID
+   * classes to be automatically generated.
    */
   [[deprecated("Use GetRightBumperButtonPressed instead")]]
   bool GetRightBumperPressed();
@@ -154,6 +166,9 @@ class {{ ConsoleName }}Controller : public GenericHID,
    * Whether the left bumper (LB) was released since the last check.
    *
    * @return Whether the button was released since the last check.
+   * @deprecated Use GetLeftBumperButtonReleased instead. This function is
+   * deprecated for removal to make function names consistent to allow the HID
+   * classes to be automatically generated.
    */
   [[deprecated("Use GetLeftBumperButtonReleased instead")]]
   bool GetLeftBumperReleased();
@@ -162,6 +177,9 @@ class {{ ConsoleName }}Controller : public GenericHID,
    * Whether the right bumper (RB) was released since the last check.
    *
    * @return Whether the button was released since the last check.
+   * @deprecated Use GetRightBumperButtonReleased instead. This function is
+   * deprecated for removal to make function names consistent to allow the HID
+   * classes to be automatically generated.
    */
   [[deprecated("Use GetRightBumperButtonReleased instead")]]
   bool GetRightBumperReleased();
@@ -170,6 +188,9 @@ class {{ ConsoleName }}Controller : public GenericHID,
    * Read the value of the touchpad button on the controller.
    *
    * @return The state of the button.
+   * @deprecated Use GetTouchpadButton instead. This function is deprecated for
+   * removal to make function names consistent to allow the HID classes to be
+   * automatically generated.
    */
   [[deprecated("Use GetTouchpadButton instead")]]
   bool GetTouchpad() const;
@@ -177,6 +198,9 @@ class {{ ConsoleName }}Controller : public GenericHID,
    * Whether the touchpad was pressed since the last check.
    *
    * @return Whether the touchpad was pressed since the last check.
+   * @deprecated Use GetTouchpadButtonPressed instead. This function is
+   * deprecated for removal to make function names consistent to allow the HID
+   * classes to be automatically generated.
    */
   [[deprecated("Use GetTouchpadButtonPressed instead")]]
   bool GetTouchpadPressed();
@@ -185,6 +209,9 @@ class {{ ConsoleName }}Controller : public GenericHID,
    * Whether the touchpad was released since the last check.
    *
    * @return Whether the touchpad was released since the last check.
+   * @deprecated Use GetLeftBumperButton instead. This function is deprecated
+   * for removal to make function names consistent to allow the HID classes to
+   * be automatically generated.
    */
   [[deprecated("Use GetTouchpadButtonReleased instead")]]
   bool GetTouchpadReleased();

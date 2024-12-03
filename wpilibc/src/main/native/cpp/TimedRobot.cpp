@@ -46,6 +46,8 @@ void TimedRobot::StartCompetition() {
       break;
     }
 
+    m_loopStartTimeUs = RobotController::GetFPGATime();
+
     callback.func();
 
     // Increment the expiration time by the number of full periods it's behind
@@ -90,10 +92,15 @@ TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
 }
 
 TimedRobot::~TimedRobot() {
-  int32_t status = 0;
+  if (m_notifier != HAL_kInvalidHandle) {
+    int32_t status = 0;
+    HAL_StopNotifier(m_notifier, &status);
+    FRC_ReportError(status, "StopNotifier");
+  }
+}
 
-  HAL_StopNotifier(m_notifier, &status);
-  FRC_ReportError(status, "StopNotifier");
+uint64_t TimedRobot::GetLoopStartTime() {
+  return m_loopStartTimeUs;
 }
 
 void TimedRobot::AddPeriodic(std::function<void()> callback,

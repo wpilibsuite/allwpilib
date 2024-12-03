@@ -809,7 +809,7 @@
       "Command-based",
       "DataLog"
     ],
-    "foldername": "SysId",
+    "foldername": "SysIdRoutine",
     "gradlebase": "cpp",
     "commandversion": 2
   }

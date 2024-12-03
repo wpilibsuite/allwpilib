@@ -97,6 +97,11 @@
 // for std::is_nothrow_move_assignable
 #include <type_traits>
 
+// for std::this_thread::yield().
+#if !defined(EIGEN_USE_BLAS) && (defined(EIGEN_HAS_OPENMP) || defined(EIGEN_GEMM_THREADPOOL))
+#include <thread>
+#endif
+
 // for outputting debug info
 #ifdef EIGEN_DEBUG_ASSIGN
 #include <iostream>
@@ -117,8 +122,8 @@
 #include <CL/sycl.hpp>
 #include <map>
 #include <memory>
-#include <utility>
 #include <thread>
+#include <utility>
 #ifndef EIGEN_SYCL_LOCAL_THREAD_DIM0
 #define EIGEN_SYCL_LOCAL_THREAD_DIM0 16
 #endif
@@ -319,6 +324,7 @@ using std::ptrdiff_t;
 #include "src/Core/CwiseNullaryOp.h"
 #include "src/Core/CwiseUnaryView.h"
 #include "src/Core/SelfCwiseBinaryOp.h"
+#include "src/Core/InnerProduct.h"
 #include "src/Core/Dot.h"
 #include "src/Core/StableNorm.h"
 #include "src/Core/Stride.h"

@@ -98,6 +98,9 @@ void Instance::DestroySource(CS_Source handle) {
 
 void Instance::DestroySink(CS_Sink handle) {
   if (auto data = m_sinks.Free(handle)) {
+    if (auto source = data->sink->GetSource()) {
+      source->Wakeup();
+    }
     notifier.NotifySink(data->sink->GetName(), handle, CS_SINK_DESTROYED);
   }
 }

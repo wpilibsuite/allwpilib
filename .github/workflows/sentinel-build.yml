@@ -119,7 +119,7 @@ jobs:
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main')
       - name: Set Keychain Lock Timeout
-        run: security set-keychain-settings -lut 3600
+        run: security set-keychain-settings -lut 21600
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main')
       - name: Set Java Heap Size

@@ -6,7 +6,7 @@ package edu.wpi.first.epilogue.processor;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-import edu.wpi.first.epilogue.logging.DataLogger;
+import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -61,15 +61,46 @@ public abstract class ElementHandler {
    * @return the name specified in the {@link Logged @Logged} annotation on the element, if present;
    *     otherwise, the field or method's name with no modifications
    */
-  public String loggedName(Element element) {
-    var elementName = element.getSimpleName().toString();
-    var config = element.getAnnotation(Logged.class);
+  public static String loggedName(Element element) {
+    var elementConfig = element.getAnnotation(Logged.class);
 
-    if (config != null && !config.name().isBlank()) {
-      return config.name();
-    } else {
-      return elementName;
+    // Use the name provided on the logged element, if one is present
+    if (elementConfig != null && !elementConfig.name().isBlank()) {
+      return elementConfig.name();
     }
+
+    var config = elementConfig;
+
+    if (config == null) {
+      // Look up the parent class configuration
+      // We assume one is present, since logged elements should only be found if the enclosing class
+      // is @Logged itself
+      Logged parentConfig = null;
+      for (var parent = element.getEnclosingElement();
+          parent != null;
+          parent = parent.getEnclosingElement()) {
+        parentConfig = parent.getAnnotation(Logged.class);
+        if (parentConfig != null) {
+          break;
+        }
+      }
+
+      config = parentConfig;
+    }
+
+    if (config == null) {
+      // Uh oh
+      throw new IllegalStateException(
+          "Could not generate a name for element "
+              + element
+              + " without a @Logged annotation AND without being contained within a class with a @Logged annotation!\n\nOpen an issue at https://github.com/wpilibsuite/allwpilib/issues and include a copy of the file that caused this error.");
+    }
+
+    var elementName = element.getSimpleName().toString();
+    return switch (config.defaultNaming()) {
+      case USE_CODE_NAME -> elementName;
+      case USE_HUMAN_NAME -> StringUtils.toHumanName(elementName);
+    };
   }
 
   /**
@@ -126,7 +157,7 @@ public abstract class ElementHandler {
   /**
    * Generates a code snippet to place in a generated logger file to log the value of a field or
    * method. Log invocations are placed in a generated implementation of {@link
-   * ClassSpecificLogger#update(DataLogger, Object)}, with access to the data logger and logged
+   * ClassSpecificLogger#update(EpilogueBackend, Object)}, with access to the backend and logged
    * object passed to the method call.
    *
    * @param element the field or method element to generate the logger call for

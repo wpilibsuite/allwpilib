@@ -9,6 +9,7 @@
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "units/acceleration.h"
 #include "units/curvature.h"
+#include "units/math.h"
 #include "units/velocity.h"
 
 namespace frc {
@@ -25,15 +26,34 @@ namespace frc {
 class WPILIB_DLLEXPORT CentripetalAccelerationConstraint
     : public TrajectoryConstraint {
  public:
-  explicit CentripetalAccelerationConstraint(
-      units::meters_per_second_squared_t maxCentripetalAcceleration);
+  constexpr explicit CentripetalAccelerationConstraint(
+      units::meters_per_second_squared_t maxCentripetalAcceleration)
+      : m_maxCentripetalAcceleration(maxCentripetalAcceleration) {}
 
-  units::meters_per_second_t MaxVelocity(
+  constexpr units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override;
+      units::meters_per_second_t velocity) const override {
+    // ac = v²/r
+    // k (curvature) = 1/r
 
-  MinMax MinMaxAcceleration(const Pose2d& pose, units::curvature_t curvature,
-                            units::meters_per_second_t speed) const override;
+    // therefore, ac = v²k
+    // ac/k = v²
+    // v = √(ac/k)
+
+    // We have to multiply by 1_rad here to get the units to cancel out nicely.
+    // The units library defines a unit for radians although it is technically
+    // unitless.
+    return units::math::sqrt(m_maxCentripetalAcceleration /
+                             units::math::abs(curvature) * 1_rad);
+  }
+
+  constexpr MinMax MinMaxAcceleration(
+      const Pose2d& pose, units::curvature_t curvature,
+      units::meters_per_second_t speed) const override {
+    // The acceleration of the robot has no impact on the centripetal
+    // acceleration of the robot.
+    return {};
+  }
 
  private:
   units::meters_per_second_squared_t m_maxCentripetalAcceleration;

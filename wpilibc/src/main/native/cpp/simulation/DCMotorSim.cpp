@@ -6,7 +6,7 @@
 
 #include <wpi/MathExtras.h>
 
-#include "frc/system/plant/LinearSystemId.h"
+#include "frc/RobotController.h"
 
 using namespace frc;
 using namespace frc::sim;
@@ -52,7 +52,7 @@ units::radians_per_second_t DCMotorSim::GetAngularVelocity() const {
 
 units::radians_per_second_squared_t DCMotorSim::GetAngularAcceleration() const {
   return units::radians_per_second_squared_t{
-      (m_plant.A() * m_x + m_plant.B() * m_u)(0, 0)};
+      (m_plant.A() * m_x + m_plant.B() * m_u)(1, 0)};
 }
 
 units::newton_meter_t DCMotorSim::GetTorque() const {

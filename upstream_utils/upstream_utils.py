@@ -55,9 +55,10 @@ def copy_to(files, root, rename_c_to_cpp=False):
     for f in files:
         dest_file = os.path.join(root, f)
 
-        # Rename .cc file to .cpp
-        if dest_file.endswith(".cc"):
+        # Rename .cc or .cxx file to .cpp
+        if dest_file.endswith(".cc") or dest_file.endswith(".cxx"):
             dest_file = os.path.splitext(dest_file)[0] + ".cpp"
+
         if rename_c_to_cpp and dest_file.endswith(".c"):
             dest_file = os.path.splitext(dest_file)[0] + ".cpp"
 
@@ -475,13 +476,8 @@ class Lib:
 
         self.copy_upstream_src(self.wpilib_root)
 
-    def main(self, argv=sys.argv[1:]):
-        """Processes the given arguments.
-
-        Keyword argument:
-        argv -- The arguments to process. Defaults to the arguments passed to
-        the program.
-        """
+    def main(self):
+        """Process arguments of upstream_utils script"""
         parser = argparse.ArgumentParser(
             description=f"CLI manager of the {self.name} upstream library"
         )
@@ -515,7 +511,7 @@ class Lib:
             help="Copies files from the upstream repository into the thirdparty directory in allwpilib",
         )
 
-        args = parser.parse_args(argv)
+        args = parser.parse_args()
 
         self.wpilib_root = get_repo_root()
         if args.subcommand == "info":

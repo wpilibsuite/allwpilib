@@ -60,7 +60,7 @@ public class ArrayHandler extends ElementHandler {
 
     if (m_structHandler.isLoggableType(componentType)) {
       // Struct arrays need to pass in the struct serializer
-      return "dataLogger.log(\""
+      return "backend.log(\""
           + loggedName(element)
           + "\", "
           + elementAccess(element)
@@ -69,7 +69,7 @@ public class ArrayHandler extends ElementHandler {
           + ")";
     } else {
       // Primitive or string array
-      return "dataLogger.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
+      return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
     }
   }
 }

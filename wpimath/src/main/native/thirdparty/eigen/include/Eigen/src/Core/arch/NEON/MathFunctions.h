@@ -37,6 +37,7 @@ BF16_PACKET_FUNCTION(Packet4f, Packet4bf, psin)
 BF16_PACKET_FUNCTION(Packet4f, Packet4bf, pcos)
 BF16_PACKET_FUNCTION(Packet4f, Packet4bf, plog)
 BF16_PACKET_FUNCTION(Packet4f, Packet4bf, pexp)
+BF16_PACKET_FUNCTION(Packet4f, Packet4bf, pexp2)
 BF16_PACKET_FUNCTION(Packet4f, Packet4bf, ptanh)
 
 template <>

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 18:09:45 -0400
-Subject: [PATCH 14/38] Delete numbers from MathExtras
+Subject: [PATCH 14/36] Delete numbers from MathExtras
 
 ---
  llvm/include/llvm/Support/MathExtras.h | 36 --------------------------

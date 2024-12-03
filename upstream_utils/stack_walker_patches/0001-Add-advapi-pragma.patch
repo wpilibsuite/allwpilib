@@ -13,9 +13,9 @@ index 89545f8612d0d099d48fcf4184a2f2a30cf8577f..b2bcbaa447c5db1a3bcc155fb317ebc8
 +++ b/Main/StackWalker/StackWalker.cpp
 @@ -91,6 +91,7 @@
  #include <new>
-
+ 
  #pragma comment(lib, "version.lib") // for "VerQueryValue"
 +#pragma comment(lib, "Advapi32.lib") // for "GetUserName"
-
+ 
  #pragma warning(disable : 4826)
  #if _MSC_VER >= 1900

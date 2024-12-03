@@ -1,4 +1,4 @@
-def opencvVersion = '4.8.0-4'
+def opencvVersion = '4.8.0-1'
 
 if (project.hasProperty('useCpp') && project.useCpp) {
     model {
@@ -22,12 +22,12 @@ if (project.hasProperty('useCpp') && project.useCpp) {
 
 if (project.hasProperty('useJava') && project.useJava) {
     dependencies {
-        implementation "edu.wpi.first.thirdparty.frc2024.opencv:opencv-java:${opencvVersion}"
+        implementation "edu.wpi.first.thirdparty.frc2025.opencv:opencv-java:${opencvVersion}"
         if (!project.hasProperty('skipDev') || !project.skipDev) {
-            devImplementation "edu.wpi.first.thirdparty.frc2024.opencv:opencv-java:${opencvVersion}"
+            devImplementation "edu.wpi.first.thirdparty.frc2025.opencv:opencv-java:${opencvVersion}"
         }
         if (project.hasProperty('useDocumentation') && project.useDocumentation) {
-            javaSource "edu.wpi.first.thirdparty.frc2024.opencv:opencv-java:${opencvVersion}:sources"
+            javaSource "edu.wpi.first.thirdparty.frc2025.opencv:opencv-java:${opencvVersion}:sources"
         }
     }
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
+
 import argparse
 import json
-import sys
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
@@ -10,7 +10,7 @@ from jinja2 import Environment, FileSystemLoader
 def Output(output_dir: Path, controller_name: str, contents: str):
     output_dir.mkdir(parents=True, exist_ok=True)
     output_file = output_dir / controller_name
-    output_file.write_text(contents, encoding="utf-8")
+    output_file.write_text(contents, encoding="utf-8", newline="\n")
 
 
 def generate_topics(
@@ -122,7 +122,7 @@ def generate_topics(
     Output(output_directory / jni_subdirectory, "types_jni.cpp", output)
 
 
-def main(argv):
+def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
@@ -145,10 +145,10 @@ def main(argv):
         default=dirname / "src/generate",
         type=Path,
     )
-    args = parser.parse_args(argv)
+    args = parser.parse_args()
 
     generate_topics(args.output_directory, args.template_root, args.types_schema_file)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

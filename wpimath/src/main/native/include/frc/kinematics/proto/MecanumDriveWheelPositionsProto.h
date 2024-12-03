@@ -8,12 +8,15 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/kinematics/MecanumDriveWheelPositions.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::MecanumDriveWheelPositions> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::MecanumDriveWheelPositions Unpack(
-      const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
+  using MessageStruct = wpi_proto_ProtobufMecanumDriveWheelPositions;
+  using InputStream = wpi::ProtoInputStream<frc::MecanumDriveWheelPositions>;
+  using OutputStream = wpi::ProtoOutputStream<frc::MecanumDriveWheelPositions>;
+  static std::optional<frc::MecanumDriveWheelPositions> Unpack(
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
                    const frc::MecanumDriveWheelPositions& value);
 };

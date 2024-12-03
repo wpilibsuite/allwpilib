@@ -15,7 +15,9 @@
 
 #include <wpi/json_fwd.h>
 
+#include "networktables/NetworkTableType.h"
 #include "networktables/Topic.h"
+#include "ntcore_cpp.h"
 
 namespace wpi {
 template <typename T>
@@ -46,7 +48,9 @@ class StringArraySubscriber : public Subscriber {
    * @param handle Native handle
    * @param defaultValue Default value
    */
-  StringArraySubscriber(NT_Subscriber handle, ParamType defaultValue);
+  StringArraySubscriber(NT_Subscriber handle, ParamType defaultValue)
+      : Subscriber{handle},
+        m_defaultValue{defaultValue.begin(), defaultValue.end()} {}
 
   /**
    * Get the last published value.
@@ -54,7 +58,9 @@ class StringArraySubscriber : public Subscriber {
    *
    * @return value
    */
-  ValueType Get() const;
+  ValueType Get() const {
+    return Get(m_defaultValue);
+  }
 
   /**
    * Get the last published value.
@@ -63,7 +69,9 @@ class StringArraySubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return value
    */
-  ValueType Get(ParamType defaultValue) const;
+  ValueType Get(ParamType defaultValue) const {
+    return ::nt::GetStringArray(m_subHandle, defaultValue);
+  }
 
   /**
    * Get the last published value along with its timestamp
@@ -72,7 +80,9 @@ class StringArraySubscriber : public Subscriber {
    *
    * @return timestamped value
    */
-  TimestampedValueType GetAtomic() const;
+  TimestampedValueType GetAtomic() const {
+    return GetAtomic(m_defaultValue);
+  }
 
   /**
    * Get the last published value along with its timestamp.
@@ -82,7 +92,9 @@ class StringArraySubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return timestamped value
    */
-  TimestampedValueType GetAtomic(ParamType defaultValue) const;
+  TimestampedValueType GetAtomic(ParamType defaultValue) const {
+    return ::nt::GetAtomicStringArray(m_subHandle, defaultValue);
+  }
 
   /**
    * Get an array of all value changes since the last call to ReadQueue.
@@ -94,7 +106,9 @@ class StringArraySubscriber : public Subscriber {
    * @return Array of timestamped values; empty array if no new changes have
    *     been published since the previous call.
    */
-  std::vector<TimestampedValueType> ReadQueue();
+  std::vector<TimestampedValueType> ReadQueue() {
+    return ::nt::ReadQueueStringArray(m_subHandle);
+  }
 
   /**
    * Get the corresponding topic.
@@ -126,7 +140,7 @@ class StringArrayPublisher : public Publisher {
    *
    * @param handle Native handle
    */
-  explicit StringArrayPublisher(NT_Publisher handle);
+  explicit StringArrayPublisher(NT_Publisher handle) : Publisher{handle} {}
 
   /**
    * Publish a new value.
@@ -134,7 +148,9 @@ class StringArrayPublisher : public Publisher {
    * @param value value to publish
    * @param time timestamp; 0 indicates current NT time should be used
    */
-  void Set(ParamType value, int64_t time = 0);
+  void Set(ParamType value, int64_t time = 0) {
+    ::nt::SetStringArray(m_pubHandle, value, time);
+  }
 
   /**
    * Publish a default value.
@@ -143,7 +159,9 @@ class StringArrayPublisher : public Publisher {
    *
    * @param value value
    */
-  void SetDefault(ParamType value);
+  void SetDefault(ParamType value) {
+    ::nt::SetDefaultStringArray(m_pubHandle, value);
+  }
 
   /**
    * Get the corresponding topic.
@@ -178,7 +196,9 @@ class StringArrayEntry final : public StringArraySubscriber,
    * @param handle Native handle
    * @param defaultValue Default value
    */
-  StringArrayEntry(NT_Entry handle, ParamType defaultValue);
+  StringArrayEntry(NT_Entry handle, ParamType defaultValue)
+      : StringArraySubscriber{handle, defaultValue},
+        StringArrayPublisher{handle} {}
 
   /**
    * Determines if the native handle is valid.
@@ -204,7 +224,9 @@ class StringArrayEntry final : public StringArraySubscriber,
   /**
    * Stops publishing the entry if it's published.
    */
-  void Unpublish();
+  void Unpublish() {
+    ::nt::Unpublish(m_pubHandle);
+  }
 };
 
 /**
@@ -256,7 +278,11 @@ class StringArrayTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions);
+      const PubSubOptions& options = kDefaultPubSubOptions) {
+    return StringArraySubscriber{
+        ::nt::Subscribe(m_handle, NT_STRING_ARRAY, "string[]", options),
+        defaultValue};
+  }
   /**
    * Create a new subscriber to the topic, with specific type string.
    *
@@ -276,7 +302,11 @@ class StringArrayTopic final : public Topic {
   [[nodiscard]]
   SubscriberType SubscribeEx(
       std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions);
+      const PubSubOptions& options = kDefaultPubSubOptions) {
+    return StringArraySubscriber{
+        ::nt::Subscribe(m_handle, NT_STRING_ARRAY, typeString, options),
+        defaultValue};
+  }
 
   /**
    * Create a new publisher to the topic.
@@ -294,7 +324,10 @@ class StringArrayTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions);
+  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
+    return StringArrayPublisher{
+        ::nt::Publish(m_handle, NT_STRING_ARRAY, "string[]", options)};
+  }
 
   /**
    * Create a new publisher to the topic, with type string and initial
@@ -316,7 +349,10 @@ class StringArrayTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions);
+    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    return StringArrayPublisher{
+        ::nt::PublishEx(m_handle, NT_STRING_ARRAY, typeString, properties, options)};
+  }
 
   /**
    * Create a new entry for the topic.
@@ -340,7 +376,11 @@ class StringArrayTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(ParamType defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions);
+                     const PubSubOptions& options = kDefaultPubSubOptions) {
+    return StringArrayEntry{
+        ::nt::GetEntry(m_handle, NT_STRING_ARRAY, "string[]", options),
+        defaultValue};
+  }
   /**
    * Create a new entry for the topic, with specific type string.
    *
@@ -364,10 +404,24 @@ class StringArrayTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
-                       const PubSubOptions& options = kDefaultPubSubOptions);
+                       const PubSubOptions& options = kDefaultPubSubOptions) {
+    return StringArrayEntry{
+        ::nt::GetEntry(m_handle, NT_STRING_ARRAY, typeString, options),
+        defaultValue};
+  }
 
 };
 
-}  // namespace nt
+inline StringArrayTopic StringArraySubscriber::GetTopic() const {
+  return StringArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
 
-#include "networktables/StringArrayTopic.inc"
+inline StringArrayTopic StringArrayPublisher::GetTopic() const {
+  return StringArrayTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+}
+
+inline StringArrayTopic StringArrayEntry::GetTopic() const {
+  return StringArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+}
+
+}  // namespace nt

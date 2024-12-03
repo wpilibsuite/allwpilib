@@ -8,10 +8,13 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/geometry/Ellipse2d.h"
+#include "wpimath/protobuf/geometry2d.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Ellipse2d> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Ellipse2d Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg, const frc::Ellipse2d& value);
+  using MessageStruct = wpi_proto_ProtobufEllipse2d;
+  using InputStream = wpi::ProtoInputStream<frc::Ellipse2d>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Ellipse2d>;
+  static std::optional<frc::Ellipse2d> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::Ellipse2d& value);
 };

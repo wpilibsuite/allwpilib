@@ -4,17 +4,43 @@
 
 #pragma once
 
+#include <stdexcept>
+
+#include <fmt/format.h>
 #include <wpi/protobuf/Protobuf.h>
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "frc/kinematics/SwerveDriveKinematics.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
 template <size_t NumModules>
 struct wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::SwerveDriveKinematics<NumModules> Unpack(
-      const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
-                   const frc::SwerveDriveKinematics<NumModules>& value);
-};
+  using MessageStruct = wpi_proto_ProtobufSwerveDriveKinematics;
+  using InputStream =
+      wpi::ProtoInputStream<frc::SwerveDriveKinematics<NumModules>>;
+  using OutputStream =
+      wpi::ProtoOutputStream<frc::SwerveDriveKinematics<NumModules>>;
 
-#include "frc/kinematics/proto/SwerveDriveKinematicsProto.inc"
+  static std::optional<frc::SwerveDriveKinematics<NumModules>> Unpack(
+      InputStream& stream) {
+    wpi::WpiArrayUnpackCallback<frc::Translation2d, NumModules> modules;
+    wpi_proto_ProtobufSwerveDriveKinematics msg{
+        .modules = modules.Callback(),
+    };
+    modules.SetLimits(wpi::DecodeLimits::Fail);
+    if (!stream.Decode(msg)) {
+      return {};
+    }
+
+    return frc::SwerveDriveKinematics<NumModules>{modules.Array()};
+  }
+
+  static bool Pack(OutputStream& stream,
+                   const frc::SwerveDriveKinematics<NumModules>& value) {
+    wpi::PackCallback<frc::Translation2d> modules{value.GetModules()};
+    wpi_proto_ProtobufSwerveDriveKinematics msg{
+        .modules = modules.Callback(),
+    };
+    return stream.Encode(msg);
+  }
+};

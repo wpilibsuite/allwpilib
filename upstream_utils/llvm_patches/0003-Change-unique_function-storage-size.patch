@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:13:55 -0400
-Subject: [PATCH 03/38] Change unique_function storage size
+Subject: [PATCH 03/36] Change unique_function storage size
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 4 ++--

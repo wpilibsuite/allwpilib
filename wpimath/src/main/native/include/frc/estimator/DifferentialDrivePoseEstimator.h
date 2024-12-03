@@ -89,9 +89,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
    */
   void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                      units::meter_t rightDistance, const Pose2d& pose) {
-    PoseEstimator<DifferentialDriveWheelSpeeds,
-                  DifferentialDriveWheelPositions>::
-        ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
+    PoseEstimator::ResetPosition(gyroAngle, {leftDistance, rightDistance},
+                                 pose);
   }
 
   /**
@@ -106,10 +105,7 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
    */
   Pose2d Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                 units::meter_t rightDistance) {
-    return PoseEstimator<
-        DifferentialDriveWheelSpeeds,
-        DifferentialDriveWheelPositions>::Update(gyroAngle,
-                                                 {leftDistance, rightDistance});
+    return PoseEstimator::Update(gyroAngle, {leftDistance, rightDistance});
   }
 
   /**
@@ -127,11 +123,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
                         const Rotation2d& gyroAngle,
                         units::meter_t leftDistance,
                         units::meter_t rightDistance) {
-    return PoseEstimator<
-        DifferentialDriveWheelSpeeds,
-        DifferentialDriveWheelPositions>::UpdateWithTime(currentTime, gyroAngle,
-                                                         {leftDistance,
-                                                          rightDistance});
+    return PoseEstimator::UpdateWithTime(currentTime, gyroAngle,
+                                         {leftDistance, rightDistance});
   }
 
  private:

@@ -115,6 +115,7 @@ struct random_float_impl<Scalar, false> {
   }
 };
 
+#if !EIGEN_COMP_NVCC
 // random implementation for long double
 // this specialization is not compatible with double-double scalars
 template <bool Specialize = (sizeof(long double) == 2 * sizeof(uint64_t)) &&
@@ -146,6 +147,7 @@ struct random_longdouble_impl<false> {
 };
 template <>
 struct random_float_impl<long double> : random_longdouble_impl<> {};
+#endif
 
 template <typename Scalar>
 struct random_default_impl<Scalar, false, false> {

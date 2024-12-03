@@ -4,10 +4,14 @@
 
 #include "frc/DARE.h"
 
-template Eigen::Matrix<double, 2, 2> frc::DARE<2, 3>(
-    const Eigen::Matrix<double, 2, 2>& A, const Eigen::Matrix<double, 2, 3>& B,
-    const Eigen::Matrix<double, 2, 2>& Q, const Eigen::Matrix<double, 3, 3>& R);
-template Eigen::Matrix<double, 2, 2> frc::DARE<2, 3>(
-    const Eigen::Matrix<double, 2, 2>& A, const Eigen::Matrix<double, 2, 3>& B,
-    const Eigen::Matrix<double, 2, 2>& Q, const Eigen::Matrix<double, 3, 3>& R,
-    const Eigen::Matrix<double, 2, 3>& N);
+template wpi::expected<Eigen::Matrix<double, 2, 2>, frc::DAREError>
+frc::DARE<2, 3>(const Eigen::Matrix<double, 2, 2>& A,
+                const Eigen::Matrix<double, 2, 3>& B,
+                const Eigen::Matrix<double, 2, 2>& Q,
+                const Eigen::Matrix<double, 3, 3>& R, bool checkPreconditions);
+template wpi::expected<Eigen::Matrix<double, 2, 2>, frc::DAREError>
+frc::DARE<2, 3>(const Eigen::Matrix<double, 2, 2>& A,
+                const Eigen::Matrix<double, 2, 3>& B,
+                const Eigen::Matrix<double, 2, 2>& Q,
+                const Eigen::Matrix<double, 3, 3>& R,
+                const Eigen::Matrix<double, 2, 3>& N, bool checkPreconditions);

@@ -230,6 +230,7 @@ struct trmv_selector<Mode, ColMajor> {
 
     if (!evalToDest) {
 #ifdef EIGEN_DENSE_STORAGE_CTOR_PLUGIN
+      constexpr int Size = Dest::SizeAtCompileTime;
       Index size = dest.size();
       EIGEN_DENSE_STORAGE_CTOR_PLUGIN
 #endif
@@ -310,6 +311,7 @@ struct trmv_selector<Mode, RowMajor> {
 #endif
       }
 #ifdef EIGEN_DENSE_STORAGE_CTOR_PLUGIN
+      constexpr int Size = ActualRhsTypeCleaned::SizeAtCompileTime;
       Index size = actualRhs.size();
       EIGEN_DENSE_STORAGE_CTOR_PLUGIN
 #endif
