@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.proto.SimpleMotorFeedforwardProto;
 import edu.wpi.first.math.controller.struct.SimpleMotorFeedforwardStruct;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.PerUnit;
 import edu.wpi.first.units.TimeUnit;
@@ -29,6 +31,21 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
 
   /** The period, in seconds. */
   private final double m_dt;
+
+  /**
+   * Creates a new SimpleMotorFeedforward with the specified plant and period. Units used to create
+   * the plant will dictate units of the computed feedforward. The static gain (ks) is assumed to be
+   * 0.0.
+   *
+   * <p>The constructor is useful for simulating the FlywheelSim and DCMotorSim classes.
+   *
+   * @param plant The system plant
+   * @param dtSeconds The period in seconds.
+   * @throws IllegalArgumentException for period &le; zero.
+   */
+  public SimpleMotorFeedforward(LinearSystem<N1, N1, N1> plant, double dtSeconds) {
+    this(0.0, -plant.getA(0, 0) / plant.getB(0, 0), 1.0 / plant.getB(0, 0), dtSeconds);
+  }
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains and period.
