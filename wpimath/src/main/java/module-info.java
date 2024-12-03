@@ -8,9 +8,7 @@
  */
 module wpilib.math {
   requires com.fasterxml.jackson.annotation;
-  requires ejml.core;
-  requires ejml.ddense;
-  requires ejml.simple;
+  requires transitive ejml.all;
   requires us.hebi.quickbuf.runtime;
   requires transitive wpilib.units;
   requires wpilib.util;

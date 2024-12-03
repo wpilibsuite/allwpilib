@@ -7,8 +7,6 @@
  * dashboard applications, and high-level program control frameworks.
  */
 module wpilib {
-  requires ejml.core;
-  requires ejml.simple;
   requires transitive wpilib.math;
   requires transitive wpilib.units;
   requires transitive wpilib.util;

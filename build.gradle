@@ -30,8 +30,10 @@ wpilibVersioning.releaseMode = project.hasProperty('releaseMode')
 allprojects {
     repositories {
         maven {
-        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
-    }
+            url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+        }
+        // For testing local EJML uberjar builds
+        mavenLocal()
     }
     wpilibRepositories.use2027Repos()
     if (project.hasProperty('releaseMode')) {
