@@ -9,6 +9,7 @@ import static com.google.testing.compile.Compiler.javac;
 import static edu.wpi.first.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
@@ -57,6 +58,107 @@ class AnnotationProcessorTest {
       """;
 
     assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void optInFields() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      class Example {
+        @Logged double x;
+        @Logged int y;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x);
+            backend.log("y", object.y);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void optInMethods() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      class Example {
+        @Logged public double getValue() { return 2.0; }
+        @Logged public String getName() { return "Example"; }
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("getValue", object.getValue());
+            backend.log("getName", object.getName());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void shouldNotLog() {
+    String source =
+        """
+      class Example {
+        public double getValue() { return 2.0; }
+        public String getName() { return "Example"; }
+      }
+    """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .withProcessors(new AnnotationProcessor())
+            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+
+    assertThat(compilation).succeeded();
+    // nothing is annotated with @Logged; so, no logger file should be generated
+    assertTrue(
+        compilation.generatedSourceFiles().stream()
+            .noneMatch(jfo -> jfo.getName().contains("Example")));
   }
 
   @Test
@@ -1408,6 +1510,47 @@ class AnnotationProcessorTest {
                 // Base type edu.wpi.first.epilogue.I
                 Epilogue.iLogger.tryUpdate(backend.getNested("theField"), $$theField, Epilogue.getConfig().errorHandler);
               };
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void nestedOptIn() {
+    String source =
+        """
+        package edu.wpi.first.epilogue;
+
+        class Implicit {
+          @Logged double x;
+        }
+
+        class Example {
+          @Logged Implicit i;
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.Logged;
+        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+        import edu.wpi.first.epilogue.logging.EpilogueBackend;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              Epilogue.implicitLogger.tryUpdate(backend.getNested("i"), object.i, Epilogue.getConfig().errorHandler);
             }
           }
         }
