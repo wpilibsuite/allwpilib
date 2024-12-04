@@ -10,6 +10,7 @@
 module wpilib.cameraserver {
   requires transitive wpilib.cscore;
   requires transitive wpilib.ntcore;
+  requires wpilib.opencv;
   requires wpilib.util;
 
   exports edu.wpi.first.cameraserver;

@@ -26,6 +26,7 @@ dependencies {
 }
 
 apply from: "${rootDir}/shared/java/wpimath-module-patches.gradle"
+apply from: "${rootDir}/shared/java/opencv-module-patches.gradle"
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 
