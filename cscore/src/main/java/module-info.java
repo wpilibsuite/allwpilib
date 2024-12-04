@@ -6,7 +6,7 @@
  * The WPILib cscore module. This defines APIs for connecting to and reading images from cameras
  * connected to the robot and for configuring those cameras.
  */
-module wpilib.cscore {
+open module wpilib.cscore {
   requires transitive wpilib.opencv;
   requires wpilib.util;
 

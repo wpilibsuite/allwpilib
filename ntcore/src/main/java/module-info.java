@@ -6,7 +6,7 @@
  * The WPILib networking module. This defines APIs for sending and receiving data over the robot
  * network for communication with coprocessors and the driver station.
  */
-module wpilib.ntcore {
+open module wpilib.ntcore {
   requires wpilib.util;
 
   exports edu.wpi.first.networktables;

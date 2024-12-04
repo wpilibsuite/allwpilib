@@ -1,4 +1,4 @@
-module wpilib.examples {
+open module wpilib.examples {
   requires wpilib.apriltag;
   requires wpilib.cameraserver;
   requires wpilib.commands2;

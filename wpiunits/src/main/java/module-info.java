@@ -5,7 +5,7 @@
 /**
  * The WPILib units module. This defines APIs for type-safe unit definitions and math operations.
  */
-module wpilib.units {
+open module wpilib.units {
   exports edu.wpi.first.units;
   exports edu.wpi.first.units.collections;
   exports edu.wpi.first.units.measure;

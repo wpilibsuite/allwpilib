@@ -7,7 +7,7 @@
  * by dashboards and coprocessors, and for running OpenCV pipelines (though note that the roboRIO
  * is too slow to run any but the most simple pipelines at a reasonable speed).
  */
-module wpilib.cameraserver {
+open module wpilib.cameraserver {
   requires transitive wpilib.cscore;
   requires transitive wpilib.ntcore;
   requires wpilib.opencv;

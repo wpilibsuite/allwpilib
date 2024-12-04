@@ -7,7 +7,7 @@
  * layer and JNI bindings. Most robot programs don't need to use this directly and should use the
  * {@code wpilib} module instead.
  */
-module wpilib.hal {
+open module wpilib.hal {
   requires wpilib.util;
 
   exports edu.wpi.first.hal;

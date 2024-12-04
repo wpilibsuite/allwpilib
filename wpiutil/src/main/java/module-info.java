@@ -8,7 +8,7 @@
  * error reporting.
  */
 @SuppressWarnings("requires-transitive-automatic")
-module wpilib.util {
+open module wpilib.util {
   requires com.fasterxml.jackson.databind;
   requires transitive us.hebi.quickbuf.runtime;
 
