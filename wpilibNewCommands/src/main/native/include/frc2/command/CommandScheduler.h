@@ -95,9 +95,22 @@ class CommandScheduler final : public wpi::Sendable,
   /**
    * Schedules a command for execution. Does nothing if the command is already
    * scheduled. If a command's requirements are not available, it will only be
+   * started if all the commands currently using those requirements are
+   * interruptible. If this is the case, they will be interrupted and the
+   * command will be scheduled.
+   *
+   * @param command the command to schedule
+   */
+  void Schedule(CommandPtr&& command);
+
+  /**
+   * Schedules a command for execution. Does nothing if the command is already
+   * scheduled. If a command's requirements are not available, it will only be
    * started if all the commands currently using those requirements have been
    * scheduled as interruptible. If this is the case, they will be interrupted
    * and the command will be scheduled.
+   *
+   * The pointer must remain valid through the entire lifecycle of the command.
    *
    * @param command the command to schedule
    */

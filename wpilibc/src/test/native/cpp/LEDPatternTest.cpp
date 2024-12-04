@@ -48,7 +48,8 @@ TEST(LEDPatternTest, SolidColor) {
 
 TEST(LEDPatternTest, EmptyGradientSetsToBlack) {
   std::array<Color, 0> colors;
-  LEDPattern pattern = LEDPattern::Gradient(colors);
+  LEDPattern pattern =
+      LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
   std::array<AddressableLED::LEDData, 5> buffer;
   pattern.ApplyTo(buffer);
   for (int i = 0; i < 5; i++) {
@@ -58,7 +59,8 @@ TEST(LEDPatternTest, EmptyGradientSetsToBlack) {
 
 TEST(LEDPatternTest, SingleColorGradientSetsSolid) {
   std::array<Color, 1> colors{Color::kYellow};
-  LEDPattern pattern = LEDPattern::Gradient(colors);
+  LEDPattern pattern =
+      LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
   std::array<AddressableLED::LEDData, 5> buffer;
   pattern.ApplyTo(buffer);
   for (int i = 0; i < 5; i++) {
@@ -68,7 +70,8 @@ TEST(LEDPatternTest, SingleColorGradientSetsSolid) {
 
 TEST(LEDPatternTest, Gradient2Colors) {
   std::array<Color, 2> colors{Color::kYellow, Color::kPurple};
-  LEDPattern pattern = LEDPattern::Gradient(colors);
+  LEDPattern pattern =
+      LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
   std::array<AddressableLED::LEDData, 99> buffer;
   pattern.ApplyTo(buffer);
   AssertIndexColor(buffer, 0, Color::kYellow);
@@ -80,9 +83,21 @@ TEST(LEDPatternTest, Gradient2Colors) {
   AssertIndexColor(buffer, 98, Color::kYellow);
 }
 
+TEST(LEDPatternTest, DiscontinuousGradient2Colors) {
+  std::array<Color, 2> colors{Color::kYellow, Color::kPurple};
+  LEDPattern pattern =
+      LEDPattern::Gradient(LEDPattern::GradientType::kDiscontinuous, colors);
+  std::array<AddressableLED::LEDData, 99> buffer;
+  pattern.ApplyTo(buffer);
+  AssertIndexColor(buffer, 0, Color::kYellow);
+  AssertIndexColor(buffer, 49, LerpColors(Color::kYellow, Color::kPurple, 0.5));
+  AssertIndexColor(buffer, 98, Color::kPurple);
+}
+
 TEST(LEDPatternTest, Gradient3Colors) {
   std::array<Color, 3> colors{Color::kYellow, Color::kPurple, Color::kWhite};
-  LEDPattern pattern = LEDPattern::Gradient(colors);
+  LEDPattern pattern =
+      LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
   std::array<AddressableLED::LEDData, 99> buffer;
   pattern.ApplyTo(buffer);
 
@@ -97,6 +112,20 @@ TEST(LEDPatternTest, Gradient3Colors) {
                    LerpColors(Color::kWhite, Color::kYellow, 25 / 33.0));
   AssertIndexColor(buffer, 98,
                    LerpColors(Color::kWhite, Color::kYellow, 32 / 33.0));
+}
+
+TEST(LEDPatternTest, DiscontinuousGradient3Colors) {
+  std::array<Color, 3> colors{Color::kYellow, Color::kPurple, Color::kWhite};
+  LEDPattern pattern =
+      LEDPattern::Gradient(LEDPattern::GradientType::kDiscontinuous, colors);
+  std::array<AddressableLED::LEDData, 101> buffer;
+  pattern.ApplyTo(buffer);
+
+  AssertIndexColor(buffer, 0, Color::kYellow);
+  AssertIndexColor(buffer, 25, LerpColors(Color::kYellow, Color::kPurple, 0.5));
+  AssertIndexColor(buffer, 50, Color::kPurple);
+  AssertIndexColor(buffer, 75, LerpColors(Color::kPurple, Color::kWhite, 0.5));
+  AssertIndexColor(buffer, 100, Color::kWhite);
 }
 
 TEST(LEDPatternTest, EmptyStepsSetsToBlack) {
@@ -782,6 +811,220 @@ TEST(LEDPatternTest, ClippingBrightness) {
   auto pattern = base.AtBrightness(100);
   pattern.ApplyTo(buffer);
   AssertIndexColor(buffer, 0, Color::kWhite);
+}
+
+TEST(LEDPatternTest, ReverseMask) {
+  std::array<AddressableLED::LEDData, 8> buffer;
+
+  std::array<std::pair<double, Color>, 4> colorSteps{
+      std::pair{0.0, Color::kRed}, std::pair{0.25, Color::kBlue},
+      std::pair{0.5, Color::kYellow}, std::pair{0.75, Color::kGreen}};
+  std::array<std::pair<double, Color>, 2> maskSteps{
+      std::pair{0, Color::kWhite}, std::pair{0.5, Color::kBlack}};
+
+  auto pattern = LEDPattern::Steps(colorSteps)
+                     .Mask(LEDPattern::Steps(maskSteps))
+                     .Reversed();
+
+  pattern.ApplyTo(buffer);
+
+  AssertIndexColor(buffer, 7, Color::kRed);
+  AssertIndexColor(buffer, 6, Color::kRed);
+  AssertIndexColor(buffer, 5, Color::kBlue);
+  AssertIndexColor(buffer, 4, Color::kBlue);
+  AssertIndexColor(buffer, 3, Color::kBlack);
+  AssertIndexColor(buffer, 2, Color::kBlack);
+  AssertIndexColor(buffer, 1, Color::kBlack);
+  AssertIndexColor(buffer, 0, Color::kBlack);
+}
+
+TEST(LEDPatternTest, OffsetMask) {
+  std::array<AddressableLED::LEDData, 8> buffer;
+
+  std::array<std::pair<double, Color>, 4> colorSteps{
+      std::pair{0.0, Color::kRed}, std::pair{0.25, Color::kBlue},
+      std::pair{0.5, Color::kYellow}, std::pair{0.75, Color::kGreen}};
+  std::array<std::pair<double, Color>, 2> maskSteps{
+      std::pair{0, Color::kWhite}, std::pair{0.5, Color::kBlack}};
+
+  auto pattern = LEDPattern::Steps(colorSteps)
+                     .Mask(LEDPattern::Steps(maskSteps))
+                     .OffsetBy(4);
+
+  pattern.ApplyTo(buffer);
+
+  AssertIndexColor(buffer, 0, Color::kBlack);
+  AssertIndexColor(buffer, 1, Color::kBlack);
+  AssertIndexColor(buffer, 2, Color::kBlack);
+  AssertIndexColor(buffer, 3, Color::kBlack);
+  AssertIndexColor(buffer, 4, Color::kRed);
+  AssertIndexColor(buffer, 5, Color::kRed);
+  AssertIndexColor(buffer, 6, Color::kBlue);
+  AssertIndexColor(buffer, 7, Color::kBlue);
+}
+
+TEST(LEDPatternTest, RelativeScrollingMask) {
+  std::array<AddressableLED::LEDData, 8> buffer;
+
+  std::array<std::pair<double, Color>, 4> colorSteps{
+      std::pair{0.0, Color::kRed}, std::pair{0.25, Color::kBlue},
+      std::pair{0.5, Color::kYellow}, std::pair{0.75, Color::kGreen}};
+  std::array<std::pair<double, Color>, 2> maskSteps{
+      std::pair{0, Color::kWhite}, std::pair{0.5, Color::kBlack}};
+
+  auto pattern = LEDPattern::Steps(colorSteps)
+                     .Mask(LEDPattern::Steps(maskSteps))
+                     .ScrollAtRelativeSpeed(units::hertz_t{1e6 / 8.0});
+
+  pattern.ApplyTo(buffer);
+
+  static uint64_t now = 0ull;
+  WPI_SetNowImpl([] { return now; });
+
+  {
+    now = 0ull;  // start
+    SCOPED_TRACE(fmt::format("Time {}", now));
+
+    pattern.ApplyTo(buffer);
+
+    AssertIndexColor(buffer, 0, Color::kRed);
+    AssertIndexColor(buffer, 1, Color::kRed);
+    AssertIndexColor(buffer, 2, Color::kBlue);
+    AssertIndexColor(buffer, 3, Color::kBlue);
+    AssertIndexColor(buffer, 4, Color::kBlack);
+    AssertIndexColor(buffer, 5, Color::kBlack);
+    AssertIndexColor(buffer, 6, Color::kBlack);
+    AssertIndexColor(buffer, 7, Color::kBlack);
+  }
+  {
+    now = 1ull;
+    SCOPED_TRACE(fmt::format("Time {}", now));
+
+    pattern.ApplyTo(buffer);
+
+    AssertIndexColor(buffer, 0, Color::kBlack);
+    AssertIndexColor(buffer, 1, Color::kRed);
+    AssertIndexColor(buffer, 2, Color::kRed);
+    AssertIndexColor(buffer, 3, Color::kBlue);
+    AssertIndexColor(buffer, 4, Color::kBlue);
+    AssertIndexColor(buffer, 5, Color::kBlack);
+    AssertIndexColor(buffer, 6, Color::kBlack);
+    AssertIndexColor(buffer, 7, Color::kBlack);
+  }
+  {
+    now = 2ull;
+    SCOPED_TRACE(fmt::format("Time {}", now));
+
+    pattern.ApplyTo(buffer);
+
+    AssertIndexColor(buffer, 0, Color::kBlack);
+    AssertIndexColor(buffer, 1, Color::kBlack);
+    AssertIndexColor(buffer, 2, Color::kRed);
+    AssertIndexColor(buffer, 3, Color::kRed);
+    AssertIndexColor(buffer, 4, Color::kBlue);
+    AssertIndexColor(buffer, 5, Color::kBlue);
+    AssertIndexColor(buffer, 6, Color::kBlack);
+    AssertIndexColor(buffer, 7, Color::kBlack);
+  }
+  {
+    now = 3ull;
+    SCOPED_TRACE(fmt::format("Time {}", now));
+
+    pattern.ApplyTo(buffer);
+
+    AssertIndexColor(buffer, 0, Color::kBlack);
+    AssertIndexColor(buffer, 1, Color::kBlack);
+    AssertIndexColor(buffer, 2, Color::kBlack);
+    AssertIndexColor(buffer, 3, Color::kRed);
+    AssertIndexColor(buffer, 4, Color::kRed);
+    AssertIndexColor(buffer, 5, Color::kBlue);
+    AssertIndexColor(buffer, 6, Color::kBlue);
+    AssertIndexColor(buffer, 7, Color::kBlack);
+  }
+
+  WPI_SetNowImpl(nullptr);  // cleanup
+}
+
+TEST(LEDPatternTest, AbsoluteScrollingMask) {
+  std::array<AddressableLED::LEDData, 8> buffer;
+
+  std::array<std::pair<double, Color>, 4> colorSteps{
+      std::pair{0.0, Color::kRed}, std::pair{0.25, Color::kBlue},
+      std::pair{0.5, Color::kYellow}, std::pair{0.75, Color::kGreen}};
+  std::array<std::pair<double, Color>, 2> maskSteps{
+      std::pair{0, Color::kWhite}, std::pair{0.5, Color::kBlack}};
+
+  auto pattern = LEDPattern::Steps(colorSteps)
+                     .Mask(LEDPattern::Steps(maskSteps))
+                     .ScrollAtAbsoluteSpeed(1_mps, 1_m);
+
+  pattern.ApplyTo(buffer);
+
+  static uint64_t now = 0ull;
+  WPI_SetNowImpl([] { return now; });
+
+  {
+    now = 0ull;  // start
+    SCOPED_TRACE(fmt::format("Time {}", now));
+
+    pattern.ApplyTo(buffer);
+
+    AssertIndexColor(buffer, 0, Color::kRed);
+    AssertIndexColor(buffer, 1, Color::kRed);
+    AssertIndexColor(buffer, 2, Color::kBlue);
+    AssertIndexColor(buffer, 3, Color::kBlue);
+    AssertIndexColor(buffer, 4, Color::kBlack);
+    AssertIndexColor(buffer, 5, Color::kBlack);
+    AssertIndexColor(buffer, 6, Color::kBlack);
+    AssertIndexColor(buffer, 7, Color::kBlack);
+  }
+  {
+    now = 1000000ull;
+    SCOPED_TRACE(fmt::format("Time {}", now));
+
+    pattern.ApplyTo(buffer);
+
+    AssertIndexColor(buffer, 0, Color::kBlack);
+    AssertIndexColor(buffer, 1, Color::kRed);
+    AssertIndexColor(buffer, 2, Color::kRed);
+    AssertIndexColor(buffer, 3, Color::kBlue);
+    AssertIndexColor(buffer, 4, Color::kBlue);
+    AssertIndexColor(buffer, 5, Color::kBlack);
+    AssertIndexColor(buffer, 6, Color::kBlack);
+    AssertIndexColor(buffer, 7, Color::kBlack);
+  }
+  {
+    now = 2000000ull;
+    SCOPED_TRACE(fmt::format("Time {}", now));
+
+    pattern.ApplyTo(buffer);
+
+    AssertIndexColor(buffer, 0, Color::kBlack);
+    AssertIndexColor(buffer, 1, Color::kBlack);
+    AssertIndexColor(buffer, 2, Color::kRed);
+    AssertIndexColor(buffer, 3, Color::kRed);
+    AssertIndexColor(buffer, 4, Color::kBlue);
+    AssertIndexColor(buffer, 5, Color::kBlue);
+    AssertIndexColor(buffer, 6, Color::kBlack);
+    AssertIndexColor(buffer, 7, Color::kBlack);
+  }
+  {
+    now = 3000000ull;
+    SCOPED_TRACE(fmt::format("Time {}", now));
+
+    pattern.ApplyTo(buffer);
+
+    AssertIndexColor(buffer, 0, Color::kBlack);
+    AssertIndexColor(buffer, 1, Color::kBlack);
+    AssertIndexColor(buffer, 2, Color::kBlack);
+    AssertIndexColor(buffer, 3, Color::kRed);
+    AssertIndexColor(buffer, 4, Color::kRed);
+    AssertIndexColor(buffer, 5, Color::kBlue);
+    AssertIndexColor(buffer, 6, Color::kBlue);
+    AssertIndexColor(buffer, 7, Color::kBlack);
+  }
+
+  WPI_SetNowImpl(nullptr);  // cleanup
 }
 
 void AssertIndexColor(std::span<AddressableLED::LEDData> data, int index,

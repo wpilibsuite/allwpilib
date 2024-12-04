@@ -15,15 +15,14 @@ namespace frc {
  * @{
  */
 
-/**
- * This class represents the reflectance sensor pair
- * on the XRP robot.
- */
+/** This class represents the ultrasonic rangefinder on an XRP robot. */
 class XRPRangefinder {
  public:
   /**
-   * Return the measured distance in meters. Distances further than 4 meters
-   * will be reported as 4 meters.
+   * Get the measured distance in meters. Distance further than 4m will be
+   * reported as 4m.
+   *
+   * @return distance in meters
    */
   units::meter_t GetDistance() const;
 

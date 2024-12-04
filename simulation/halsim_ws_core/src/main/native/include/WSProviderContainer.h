@@ -40,7 +40,7 @@ class ProviderContainer {
   void ForEach(IterFn fn) {
     std::shared_lock lock(m_mutex);
     for (auto& kv : m_providers) {
-      fn(kv.getValue());
+      fn(kv.second);
     }
   }
 

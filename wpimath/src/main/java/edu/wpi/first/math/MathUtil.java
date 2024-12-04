@@ -126,7 +126,7 @@ public final class MathUtil {
   }
 
   /**
-   * Wraps an angle to the range -pi to pi radians.
+   * Wraps an angle to the range -π to π radians.
    *
    * @param angleRadians Angle to wrap in radians.
    * @return The wrapped angle.

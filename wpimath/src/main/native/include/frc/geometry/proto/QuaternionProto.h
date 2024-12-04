@@ -8,11 +8,13 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/geometry/Quaternion.h"
+#include "wpimath/protobuf/geometry3d.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Quaternion> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Quaternion Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
-                   const frc::Quaternion& value);
+  using MessageStruct = wpi_proto_ProtobufQuaternion;
+  using InputStream = wpi::ProtoInputStream<frc::Quaternion>;
+  using OutputStream = wpi::ProtoOutputStream<frc::Quaternion>;
+  static std::optional<frc::Quaternion> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::Quaternion& value);
 };

@@ -3,9 +3,9 @@
 # Copyright (c) FIRST and other WPILib contributors.
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
-import json
-import sys
+
 import argparse
+import json
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
@@ -14,7 +14,7 @@ from jinja2 import Environment, FileSystemLoader
 def write_controller_file(output_dir: Path, controller_name: str, contents: str):
     output_dir.mkdir(parents=True, exist_ok=True)
     output_file = output_dir / controller_name
-    output_file.write_text(contents, encoding="utf-8")
+    output_file.write_text(contents, encoding="utf-8", newline="\n")
 
 
 def generate_hids(output_directory: Path, template_directory: Path, schema_file: Path):
@@ -24,7 +24,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
     # Java files
     java_subdirectory = "main/java/edu/wpi/first/wpilibj2/command/button"
     env = Environment(
-        loader=FileSystemLoader(template_directory / java_subdirectory),
+        loader=FileSystemLoader(template_directory / "main/java"),
         autoescape=False,
         keep_trailing_newline=True,
     )
@@ -63,7 +63,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         write_controller_file(root_path, controllerName, output)
 
 
-def main(argv):
+def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
@@ -86,10 +86,10 @@ def main(argv):
         default="wpilibj/src/generate/hids.json",
         type=Path,
     )
-    args = parser.parse_args(argv)
+    args = parser.parse_args()
 
     generate_hids(args.output_directory, args.template_root, args.schema_file)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

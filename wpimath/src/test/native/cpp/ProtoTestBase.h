@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
+#include <wpi/SmallVector.h>
 #include <wpi/protobuf/Protobuf.h>
 
 template <typename T>
@@ -14,41 +14,14 @@ class ProtoTest : public testing::Test {};
 TYPED_TEST_SUITE_P(ProtoTest);
 
 TYPED_TEST_P(ProtoTest, RoundTrip) {
-  using Type = typename TypeParam::Type;
-  google::protobuf::Arena arena;
-  google::protobuf::Message* proto = wpi::Protobuf<Type>::New(&arena);
-  wpi::PackProtobuf(proto, TypeParam::kTestData);
+  wpi::ProtobufMessage<decltype(TypeParam::kTestData)> message;
+  wpi::SmallVector<uint8_t, 64> buf;
 
-  Type unpacked_data = wpi::UnpackProtobuf<Type>(*proto);
-  TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
+  ASSERT_TRUE(message.Pack(buf, TypeParam::kTestData));
+  auto unpacked_data = message.Unpack(buf);
+  ASSERT_TRUE(unpacked_data.has_value());
+
+  TypeParam::CheckEq(TypeParam::kTestData, *unpacked_data);
 }
 
-TYPED_TEST_P(ProtoTest, DoublePack) {
-  using Type = typename TypeParam::Type;
-  google::protobuf::Arena arena;
-  google::protobuf::Message* proto = wpi::Protobuf<Type>::New(&arena);
-  wpi::PackProtobuf(proto, TypeParam::kTestData);
-  wpi::PackProtobuf(proto, TypeParam::kTestData);
-
-  Type unpacked_data = wpi::UnpackProtobuf<Type>(*proto);
-  TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
-}
-
-TYPED_TEST_P(ProtoTest, DoubleUnpack) {
-  using Type = typename TypeParam::Type;
-  google::protobuf::Arena arena;
-  google::protobuf::Message* proto = wpi::Protobuf<Type>::New(&arena);
-  wpi::PackProtobuf(proto, TypeParam::kTestData);
-
-  {
-    Type unpacked_data = wpi::UnpackProtobuf<Type>(*proto);
-    TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
-  }
-
-  {
-    Type unpacked_data = wpi::UnpackProtobuf<Type>(*proto);
-    TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
-  }
-}
-
-REGISTER_TYPED_TEST_SUITE_P(ProtoTest, RoundTrip, DoublePack, DoubleUnpack);
+REGISTER_TYPED_TEST_SUITE_P(ProtoTest, RoundTrip);

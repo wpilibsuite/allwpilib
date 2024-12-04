@@ -16,7 +16,10 @@ import java.util.function.DoubleSupplier;
  * are performed synchronously in the command's execute() method.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @deprecated Use a PIDController instead
  */
+@Deprecated(forRemoval = true, since = "2025")
 public class PIDCommand extends Command {
   /** PID controller. */
   protected final PIDController m_controller;

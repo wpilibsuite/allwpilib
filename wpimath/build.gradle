@@ -21,6 +21,15 @@ ext {
                             'src/main/native/thirdparty/sleipnir/src'
                 }
             }
+            nanopbCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/generated/main/native/cpp'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/generated/main/native/cpp'
+                }
+            }
         }
     }
 }
@@ -34,16 +43,14 @@ cppHeadersZip {
     from('src/main/native/thirdparty/gcem/include') {
         into '/'
     }
-    from("$buildDir/generated/source/proto/main/cpp") {
+    from("src/generated/main/native/cpp/wpimath/protobuf") {
         into '/wpimath/protobuf'
-        include '*.h'
+        include '**/*.h'
     }
     from('src/main/native/thirdparty/sleipnir/include') {
         into '/'
     }
 }
-
-cppHeadersZip.dependsOn generateProto
 
 model {
     components {
@@ -53,7 +60,8 @@ model {
                     srcDirs 'src/main/native/include',
                             'src/main/native/thirdparty/eigen/include',
                             'src/main/native/thirdparty/gcem/include',
-                            'src/main/native/thirdparty/sleipnir/include'
+                            'src/main/native/thirdparty/sleipnir/include',
+                            'src/generated/main/native/cpp'
                 }
             }
         }
@@ -67,21 +75,8 @@ model {
 
 nativeUtils.exportsConfigs {
     wpimath {
-        x64ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
         objectFilterClosure = { file ->
-            return file.name.endsWith('.pb.obj')
+            return file.name.endsWith('.pb.obj') || file.name.endsWith('.npb.obj')
         }
     }
 }
@@ -96,6 +91,7 @@ dependencies {
 }
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
+sourceSets.main.resources.srcDir "${projectDir}/src/main/proto"
 
 task unitsHeaders(type: Zip) {
     destinationDirectory = file("$buildDir/outputs")

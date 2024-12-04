@@ -4,34 +4,9 @@
 
 #include "frc/controller/DifferentialDriveAccelerationLimiter.h"
 
-#include <utility>
-
 #include <Eigen/QR>
 
 using namespace frc;
-
-DifferentialDriveAccelerationLimiter::DifferentialDriveAccelerationLimiter(
-    LinearSystem<2, 2, 2> system, units::meter_t trackwidth,
-    units::meters_per_second_squared_t maxLinearAccel,
-    units::radians_per_second_squared_t maxAngularAccel)
-    : DifferentialDriveAccelerationLimiter(system, trackwidth, -maxLinearAccel,
-                                           maxLinearAccel, maxAngularAccel) {}
-
-DifferentialDriveAccelerationLimiter::DifferentialDriveAccelerationLimiter(
-    LinearSystem<2, 2, 2> system, units::meter_t trackwidth,
-    units::meters_per_second_squared_t minLinearAccel,
-    units::meters_per_second_squared_t maxLinearAccel,
-    units::radians_per_second_squared_t maxAngularAccel)
-    : m_system{std::move(system)},
-      m_trackwidth{trackwidth},
-      m_minLinearAccel{minLinearAccel},
-      m_maxLinearAccel{maxLinearAccel},
-      m_maxAngularAccel{maxAngularAccel} {
-  if (minLinearAccel > maxLinearAccel) {
-    throw std::invalid_argument(
-        "maxLinearAccel must be greater than minLinearAccel");
-  }
-}
 
 DifferentialDriveWheelVoltages DifferentialDriveAccelerationLimiter::Calculate(
     units::meters_per_second_t leftVelocity,

@@ -66,6 +66,14 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
 option(WITH_JAVA "Include Java and JNI in the build" OFF)
 option(WITH_JAVA_SOURCE "Build Java source jars" ${WITH_JAVA})
+option(WITH_DOCS "Build Doxygen docs (needs Git for versioning)" OFF)
+cmake_dependent_option(
+    DOCS_WARNINGS_AS_ERRORS
+    "Make docs warnings into errors"
+    OFF
+    WITH_DOCS
+    OFF
+)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
@@ -123,12 +131,17 @@ set(java_lib_dest java)
 if(WITH_JAVA OR WITH_JAVA_SOURCE)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
     find_package(Java REQUIRED COMPONENTS Development)
-    find_package(JNI REQUIRED COMPONENTS JVM)
-else()
-    # Protoc requires the java runtime
-    find_package(Java REQUIRED COMPONENTS Runtime)
+    if(NOT ANDROID)
+        find_package(JNI REQUIRED COMPONENTS JVM)
+    endif()
 endif()
 
+if(WITH_DOCS)
+    find_package(Doxygen REQUIRED)
+    find_package(Git REQUIRED)
+    include(AddDoxygenDocs)
+    add_doxygen_docs()
+endif()
 find_package(LIBSSH CONFIG 0.7.1)
 
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
@@ -278,8 +291,6 @@ if(WITH_NTCORE)
     add_subdirectory(wpinet)
     add_subdirectory(ntcore)
 endif()
-
-add_subdirectory(protoplugin)
 
 if(WITH_WPIMATH)
     if(WITH_JAVA)

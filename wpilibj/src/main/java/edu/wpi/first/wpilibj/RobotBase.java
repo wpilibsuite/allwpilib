@@ -14,6 +14,7 @@ import edu.wpi.first.math.MathShared;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.networktables.MultiSubscriber;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -42,6 +43,10 @@ public abstract class RobotBase implements AutoCloseable {
   private static long m_threadId = -1;
 
   private final MultiSubscriber m_suball;
+
+  private final int m_connListenerHandle;
+
+  private boolean m_dashboardDetected;
 
   private static void setupCameraServerShared() {
     CameraServerShared shared =
@@ -110,6 +115,10 @@ public abstract class RobotBase implements AutoCloseable {
                   tResourceType.kResourceType_PIDController2, count);
               case kController_ProfiledPIDController -> HAL.report(
                   tResourceType.kResourceType_ProfiledPIDController, count);
+              case kController_BangBangController -> HAL.report(
+                  tResourceType.kResourceType_BangBangController, count);
+              case kTrajectory_PathWeaver -> HAL.report(
+                  tResourceType.kResourceType_PathWeaverTrajectory, count);
               default -> {
                 // NOP
               }
@@ -118,7 +127,7 @@ public abstract class RobotBase implements AutoCloseable {
 
           @Override
           public double getTimestamp() {
-            return WPIUtilJNI.now() * 1.0e-6;
+            return Timer.getTimestamp();
           }
         });
   }
@@ -158,6 +167,65 @@ public abstract class RobotBase implements AutoCloseable {
       System.err.println("timed out while waiting for NT server to start");
     }
 
+    m_connListenerHandle =
+        inst.addConnectionListener(
+            false,
+            event -> {
+              if (event.is(NetworkTableEvent.Kind.kConnected)) {
+                if (event.connInfo.remote_id.startsWith("glass")) {
+                  HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Glass);
+                  m_dashboardDetected = true;
+                } else if (event.connInfo.remote_id.startsWith("SmartDashboard")) {
+                  HAL.report(
+                      tResourceType.kResourceType_Dashboard, tInstances.kDashboard_SmartDashboard);
+                  m_dashboardDetected = true;
+                } else if (event.connInfo.remote_id.startsWith("shuffleboard")) {
+                  HAL.report(
+                      tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Shuffleboard);
+                  m_dashboardDetected = true;
+                } else if (event.connInfo.remote_id.startsWith("elastic")
+                    || event.connInfo.remote_id.startsWith("Elastic")) {
+                  HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Elastic);
+                  m_dashboardDetected = true;
+                } else if (event.connInfo.remote_id.startsWith("Dashboard")) {
+                  HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_LabVIEW);
+                  m_dashboardDetected = true;
+                } else if (event.connInfo.remote_id.startsWith("AdvantageScope")) {
+                  HAL.report(
+                      tResourceType.kResourceType_Dashboard, tInstances.kDashboard_AdvantageScope);
+                  m_dashboardDetected = true;
+                } else if (event.connInfo.remote_id.startsWith("QFRCDashboard")) {
+                  HAL.report(
+                      tResourceType.kResourceType_Dashboard, tInstances.kDashboard_QFRCDashboard);
+                  m_dashboardDetected = true;
+                } else if (event.connInfo.remote_id.startsWith("FRC Web Components")) {
+                  HAL.report(
+                      tResourceType.kResourceType_Dashboard,
+                      tInstances.kDashboard_FRCWebComponents);
+                  m_dashboardDetected = true;
+                } else {
+                  // Only report unknown if there wasn't another dashboard already reported
+                  // (unknown could also be another device)
+                  if (!m_dashboardDetected) {
+                    int delim = event.connInfo.remote_id.indexOf('@');
+                    if (delim != -1) {
+                      HAL.report(
+                          tResourceType.kResourceType_Dashboard,
+                          tInstances.kDashboard_Unknown,
+                          0,
+                          event.connInfo.remote_id.substring(0, delim));
+                    } else {
+                      HAL.report(
+                          tResourceType.kResourceType_Dashboard,
+                          tInstances.kDashboard_Unknown,
+                          0,
+                          event.connInfo.remote_id);
+                    }
+                  }
+                }
+              }
+            });
+
     LiveWindow.setEnabled(false);
     Shuffleboard.disableActuatorWidgets();
   }
@@ -174,6 +242,7 @@ public abstract class RobotBase implements AutoCloseable {
   @Override
   public void close() {
     m_suball.close();
+    NetworkTableInstance.getDefault().removeListener(m_connListenerHandle);
   }
 
   /**
@@ -397,6 +466,9 @@ public abstract class RobotBase implements AutoCloseable {
    * @param robotSupplier Function that returns an instance of the robot subclass.
    */
   public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
+    // Check that the MSVC runtime is valid.
+    WPIUtilJNI.checkMsvcRuntime();
+
     if (!HAL.initialize(500, 0)) {
       throw new IllegalStateException("Failed to initialize. Terminating");
     }

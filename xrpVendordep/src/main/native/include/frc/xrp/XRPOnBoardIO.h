@@ -35,13 +35,24 @@ class XRPOnBoardIO {
 
   /**
    * Gets if the USER button is pressed.
+   *
+   * @return True if the USER button is currently pressed.
    */
   bool GetUserButtonPressed();
 
   /**
    * Sets the yellow LED.
+   *
+   * @param value True to activate LED, false otherwise.
    */
   void SetLed(bool value);
+
+  /**
+   * Gets the state of the yellow LED.
+   *
+   * @return True if LED is active, false otherwise.
+   */
+  bool GetLed() const;
 
  private:
   frc::DigitalInput m_userButton{0};

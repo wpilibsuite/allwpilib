@@ -43,6 +43,18 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
     return (AngularVelocity) unit().ofBaseUnits(0 - baseUnitMagnitude());
   }
 
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use unaryMinus() instead. This was renamed for consistency with other WPILib classes like Rotation2d
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default AngularVelocity negate() {
+    return (AngularVelocity) unaryMinus();
+  }
+
   @Override
   default AngularVelocity plus(Measure<? extends AngularVelocityUnit> other) {
     return (AngularVelocity) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
@@ -59,13 +71,25 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
-  default AngularVelocity divide(double divisor) {
+  default AngularVelocity div(double divisor) {
     return (AngularVelocity) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default AngularVelocity divide(double divisor) {
+    return (AngularVelocity) div(divisor);
   }
 
   @Override
   default AngularAcceleration per(TimeUnit period) {
-    return divide(period.of(1));
+    return div(period.of(1));
   }
 
 
@@ -75,8 +99,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
+    return (Per<AngularVelocityUnit, AccelerationUnit<?>>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
-    return (Per<AngularVelocityUnit, AccelerationUnit<?>>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -86,8 +122,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, AngleUnit> div(Angle divisor) {
+    return (Per<AngularVelocityUnit, AngleUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, AngleUnit> divide(Angle divisor) {
-    return (Per<AngularVelocityUnit, AngleUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -97,8 +145,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
+    return (Per<AngularVelocityUnit, AngularAccelerationUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
-    return (Per<AngularVelocityUnit, AngularAccelerationUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -108,8 +168,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
+    return (Per<AngularVelocityUnit, AngularMomentumUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
-    return (Per<AngularVelocityUnit, AngularMomentumUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -119,8 +191,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
-  default Dimensionless divide(AngularVelocity divisor) {
+  default Dimensionless div(AngularVelocity divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Dimensionless divide(AngularVelocity divisor) {
+    return div(divisor);
   }
 
 
@@ -130,13 +214,37 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, CurrentUnit> div(Current divisor) {
+    return (Per<AngularVelocityUnit, CurrentUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, CurrentUnit> divide(Current divisor) {
-    return (Per<AngularVelocityUnit, CurrentUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
   @Override
-  default AngularVelocity divide(Dimensionless divisor) {
+  default AngularVelocity div(Dimensionless divisor) {
     return (AngularVelocity) RadiansPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default AngularVelocity divide(Dimensionless divisor) {
+    return (AngularVelocity) div(divisor);
   }
 
   @Override
@@ -151,8 +259,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, DistanceUnit> div(Distance divisor) {
+    return (Per<AngularVelocityUnit, DistanceUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, DistanceUnit> divide(Distance divisor) {
-    return (Per<AngularVelocityUnit, DistanceUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -162,8 +282,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, EnergyUnit> div(Energy divisor) {
+    return (Per<AngularVelocityUnit, EnergyUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, EnergyUnit> divide(Energy divisor) {
-    return (Per<AngularVelocityUnit, EnergyUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -173,8 +305,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, ForceUnit> div(Force divisor) {
+    return (Per<AngularVelocityUnit, ForceUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, ForceUnit> divide(Force divisor) {
-    return (Per<AngularVelocityUnit, ForceUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -184,8 +328,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, FrequencyUnit> div(Frequency divisor) {
+    return (Per<AngularVelocityUnit, FrequencyUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, FrequencyUnit> divide(Frequency divisor) {
-    return (Per<AngularVelocityUnit, FrequencyUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -195,8 +351,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
+    return (Per<AngularVelocityUnit, LinearAccelerationUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
-    return (Per<AngularVelocityUnit, LinearAccelerationUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -206,8 +374,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
+    return (Per<AngularVelocityUnit, LinearMomentumUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
-    return (Per<AngularVelocityUnit, LinearMomentumUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -217,8 +397,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
+    return (Per<AngularVelocityUnit, LinearVelocityUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
-    return (Per<AngularVelocityUnit, LinearVelocityUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -228,8 +420,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, MassUnit> div(Mass divisor) {
+    return (Per<AngularVelocityUnit, MassUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, MassUnit> divide(Mass divisor) {
-    return (Per<AngularVelocityUnit, MassUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -239,8 +443,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
+    return (Per<AngularVelocityUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
-    return (Per<AngularVelocityUnit, MomentOfInertiaUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -250,8 +466,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
+    return (Per<AngularVelocityUnit, MultUnit<?, ?>>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
-    return (Per<AngularVelocityUnit, MultUnit<?, ?>>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -261,8 +489,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, PerUnit<?, ?>> div(Per<?, ?> divisor) {
+    return (Per<AngularVelocityUnit, PerUnit<?, ?>>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
-    return (Per<AngularVelocityUnit, PerUnit<?, ?>>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -272,8 +512,43 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, PowerUnit> div(Power divisor) {
+    return (Per<AngularVelocityUnit, PowerUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, PowerUnit> divide(Power divisor) {
-    return (Per<AngularVelocityUnit, PowerUnit>) Measure.super.divide(divisor);
+    return div(divisor);
+  }
+
+
+  @Override
+  default Mult<AngularVelocityUnit, ResistanceUnit> times(Resistance multiplier) {
+    return (Mult<AngularVelocityUnit, ResistanceUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, ResistanceUnit> div(Resistance divisor) {
+    return (Per<AngularVelocityUnit, ResistanceUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
+  default Per<AngularVelocityUnit, ResistanceUnit> divide(Resistance divisor) {
+    return div(divisor);
   }
 
 
@@ -283,8 +558,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, TemperatureUnit> div(Temperature divisor) {
+    return (Per<AngularVelocityUnit, TemperatureUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, TemperatureUnit> divide(Temperature divisor) {
-    return (Per<AngularVelocityUnit, TemperatureUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -294,8 +581,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
-  default AngularAcceleration divide(Time divisor) {
+  default AngularAcceleration div(Time divisor) {
     return RadiansPerSecondPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Override
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  default AngularAcceleration divide(Time divisor) {
+    return div(divisor);
   }
 
 
@@ -305,8 +604,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, TorqueUnit> div(Torque divisor) {
+    return (Per<AngularVelocityUnit, TorqueUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, TorqueUnit> divide(Torque divisor) {
-    return (Per<AngularVelocityUnit, TorqueUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -316,8 +627,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, VelocityUnit<?>> div(Velocity<?> divisor) {
+    return (Per<AngularVelocityUnit, VelocityUnit<?>>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
-    return (Per<AngularVelocityUnit, VelocityUnit<?>>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 
 
@@ -327,8 +650,20 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   }
 
   @Override
+  default Per<AngularVelocityUnit, VoltageUnit> div(Voltage divisor) {
+    return (Per<AngularVelocityUnit, VoltageUnit>) Measure.super.div(divisor);
+  }
+
+  /**
+  * {@inheritDoc}
+  *
+  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
+  */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings({"deprecation", "removal"})
+  @Override
   default Per<AngularVelocityUnit, VoltageUnit> divide(Voltage divisor) {
-    return (Per<AngularVelocityUnit, VoltageUnit>) Measure.super.divide(divisor);
+    return div(divisor);
   }
 default Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
 }

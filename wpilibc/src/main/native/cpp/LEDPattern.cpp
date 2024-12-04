@@ -18,33 +18,46 @@
 
 using namespace frc;
 
-LEDPattern::LEDPattern(LEDPatternFn impl) : m_impl(std::move(impl)) {}
+LEDPattern::LEDPattern(std::function<void(frc::LEDPattern::LEDReader,
+                                          std::function<void(int, frc::Color)>)>
+                           impl)
+    : m_impl(std::move(impl)) {}
+
+void LEDPattern::ApplyTo(LEDPattern::LEDReader reader,
+                         std::function<void(int, frc::Color)> writer) const {
+  m_impl(reader, writer);
+}
 
 void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data,
-                         LEDWriterFn writer) const {
-  m_impl(data, writer);
+                         std::function<void(int, frc::Color)> writer) const {
+  ApplyTo(LEDPattern::LEDReader{[=](size_t i) { return data[i]; }, data.size()},
+          writer);
 }
 
 void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data) const {
   ApplyTo(data, [&](int index, Color color) { data[index].SetLED(color); });
 }
 
-LEDPattern LEDPattern::Reversed() {
-  return LEDPattern{[self = *this](auto data, auto writer) {
-    self.ApplyTo(data, [&](int i, Color color) {
-      writer((data.size() - 1) - i, color);
-    });
+LEDPattern LEDPattern::MapIndex(
+    std::function<size_t(size_t, size_t)> indexMapper) {
+  return LEDPattern{[self = *this, indexMapper](auto data, auto writer) {
+    size_t bufLen = data.size();
+    self.ApplyTo(
+        LEDPattern::LEDReader{
+            [=](auto i) { return data[indexMapper(bufLen, i)]; }, bufLen},
+        [&](int i, Color color) { writer(indexMapper(bufLen, i), color); });
   }};
 }
 
+LEDPattern LEDPattern::Reversed() {
+  return MapIndex([](size_t bufLen, size_t i) { return bufLen - 1 - i; });
+}
+
 LEDPattern LEDPattern::OffsetBy(int offset) {
-  return LEDPattern{[=, self = *this](auto data, auto writer) {
-    self.ApplyTo(data, [&data, &writer, offset](int i, Color color) {
-      int shiftedIndex =
-          frc::FloorMod(i + offset, static_cast<int>(data.size()));
-      writer(shiftedIndex, color);
-    });
-  }};
+  return MapIndex([offset](size_t bufLen, size_t i) {
+    return frc::FloorMod(static_cast<int>(i) + offset,
+                         static_cast<int>(bufLen));
+  });
 }
 
 LEDPattern LEDPattern::ScrollAtRelativeSpeed(units::hertz_t velocity) {
@@ -53,8 +66,7 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(units::hertz_t velocity) {
   // Invert and multiply by 1,000,000 to get microseconds
   double periodMicros = 1e6 / velocity.value();
 
-  return LEDPattern{[=, self = *this](auto data, auto writer) {
-    auto bufLen = data.size();
+  return MapIndex([=](size_t bufLen, size_t i) {
     auto now = wpi::Now();
 
     // index should move by (bufLen) / (period)
@@ -62,12 +74,9 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(units::hertz_t velocity) {
         (now % static_cast<int64_t>(std::floor(periodMicros))) / periodMicros;
     int offset = static_cast<int>(std::floor(t * bufLen));
 
-    self.ApplyTo(data, [=](int i, Color color) {
-      // floorMod so if the offset is negative, we still get positive outputs
-      int shiftedIndex = frc::FloorMod(i + offset, static_cast<int>(bufLen));
-      writer(shiftedIndex, color);
-    });
-  }};
+    return frc::FloorMod(static_cast<int>(i) + offset,
+                         static_cast<int>(bufLen));
+  });
 }
 
 LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
@@ -77,8 +86,7 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
   auto microsPerLed =
       static_cast<int64_t>(std::floor((ledSpacing / velocity).value() * 1e6));
 
-  return LEDPattern{[=, self = *this](auto data, auto writer) {
-    auto bufLen = data.size();
+  return MapIndex([=](size_t bufLen, size_t i) {
     auto now = wpi::Now();
 
     // every step in time that's a multiple of microsPerLED will increment
@@ -87,13 +95,9 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
     // offset values for negative velocities
     auto offset = static_cast<int64_t>(now) / microsPerLed;
 
-    self.ApplyTo(data, [=, &writer](int i, Color color) {
-      // FloorMod so if the offset is negative, we still get positive outputs
-      int shiftedIndex = frc::FloorMod(i + offset, static_cast<int>(bufLen));
-
-      writer(shiftedIndex, color);
-    });
-  }};
+    return frc::FloorMod(static_cast<int>(i) + offset,
+                         static_cast<int>(bufLen));
+  });
 }
 
 LEDPattern LEDPattern::Blink(units::second_t onTime, units::second_t offTime) {
@@ -104,7 +108,7 @@ LEDPattern LEDPattern::Blink(units::second_t onTime, units::second_t offTime) {
     if (wpi::Now() % totalMicros < onMicros) {
       self.ApplyTo(data, writer);
     } else {
-      LEDPattern::kOff.ApplyTo(data, writer);
+      LEDPattern::Off().ApplyTo(data, writer);
     }
   }};
 }
@@ -118,7 +122,7 @@ LEDPattern LEDPattern::SynchronizedBlink(std::function<bool()> signal) {
     if (signal()) {
       self.ApplyTo(data, writer);
     } else {
-      LEDPattern::kOff.ApplyTo(data, writer);
+      LEDPattern::Off().ApplyTo(data, writer);
     }
   }};
 }
@@ -198,7 +202,9 @@ LEDPattern LEDPattern::AtBrightness(double relativeBrightness) {
 
 // Static constants and functions
 
-LEDPattern LEDPattern::kOff = LEDPattern::Solid(Color::kBlack);
+LEDPattern LEDPattern::Off() {
+  return LEDPattern::Solid(Color::kBlack);
+}
 
 LEDPattern LEDPattern::Solid(const Color color) {
   return LEDPattern{[=](auto data, auto writer) {
@@ -228,7 +234,7 @@ LEDPattern LEDPattern::ProgressMaskLayer(
 LEDPattern LEDPattern::Steps(std::span<const std::pair<double, Color>> steps) {
   if (steps.size() == 0) {
     // no colors specified
-    return LEDPattern::kOff;
+    return LEDPattern::Off();
   }
   if (steps.size() == 1 && steps[0].first == 0) {
     // only one color specified, just show a static color
@@ -261,21 +267,30 @@ LEDPattern LEDPattern::Steps(
   return Steps(std::span{steps.begin(), steps.end()});
 }
 
-LEDPattern LEDPattern::Gradient(std::span<const Color> colors) {
+LEDPattern LEDPattern::Gradient(GradientType type,
+                                std::span<const Color> colors) {
   if (colors.size() == 0) {
     // no colors specified
-    return LEDPattern::kOff;
+    return LEDPattern::Off();
   }
   if (colors.size() == 1) {
     // only one color specified, just show a static color
     return LEDPattern::Solid(colors[0]);
   }
 
-  return LEDPattern{[colors = std::vector(colors.begin(), colors.end())](
+  return LEDPattern{[type, colors = std::vector(colors.begin(), colors.end())](
                         auto data, auto writer) {
     size_t numSegments = colors.size();
     auto bufLen = data.size();
-    int ledsPerSegment = bufLen / numSegments;
+    int ledsPerSegment = 0;
+    switch (type) {
+      case kContinuous:
+        ledsPerSegment = bufLen / numSegments;
+        break;
+      case kDiscontinuous:
+        ledsPerSegment = (bufLen - 1) / (numSegments - 1);
+        break;
+    }
 
     for (size_t led = 0; led < bufLen; led++) {
       int colorIndex = (led / ledsPerSegment) % numSegments;
@@ -293,8 +308,9 @@ LEDPattern LEDPattern::Gradient(std::span<const Color> colors) {
   }};
 }
 
-LEDPattern LEDPattern::Gradient(std::initializer_list<Color> colors) {
-  return Gradient(std::span{colors.begin(), colors.end()});
+LEDPattern LEDPattern::Gradient(GradientType type,
+                                std::initializer_list<Color> colors) {
+  return Gradient(type, std::span{colors.begin(), colors.end()});
 }
 
 LEDPattern LEDPattern::Rainbow(int saturation, int value) {

@@ -4,65 +4,27 @@
 
 #pragma once
 
-#include <string>
-
 #include <wpi/json.h>
 
-#include "PubSubOptions.h"
 #include "gmock/gmock.h"
 #include "net/NetworkInterface.h"
 
 namespace nt::net {
 
-class MockLocalInterface : public LocalInterface {
- public:
-  MOCK_METHOD(NT_Topic, NetworkAnnounce,
-              (std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, NT_Publisher pubHandle),
-              (override));
-  MOCK_METHOD(void, NetworkUnannounce, (std::string_view name), (override));
-  MOCK_METHOD(void, NetworkPropertiesUpdate,
-              (std::string_view name, const wpi::json& update, bool ack),
-              (override));
-  MOCK_METHOD(void, NetworkSetValue, (NT_Topic topicHandle, const Value& value),
-              (override));
-};
-
-class MockNetworkInterface : public NetworkInterface {
- public:
-  MOCK_METHOD(void, Publish,
-              (NT_Publisher pubHandle, NT_Topic topicHandle,
-               std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptionsImpl& options),
-              (override));
-  MOCK_METHOD(void, Unpublish, (NT_Publisher pubHandle, NT_Topic topicHandle),
-              (override));
-  MOCK_METHOD(void, SetProperties,
-              (NT_Topic topicHandle, std::string_view name,
-               const wpi::json& update),
-              (override));
-  MOCK_METHOD(void, Subscribe,
-              (NT_Subscriber subHandle, std::span<const std::string> prefixes,
-               const PubSubOptionsImpl& options),
-              (override));
-  MOCK_METHOD(void, Unsubscribe, (NT_Subscriber subHandle), (override));
-  MOCK_METHOD(void, SetValue, (NT_Publisher pubHandle, const Value& value),
-              (override));
-};
-
 class MockLocalStorage : public ILocalStorage {
  public:
-  MOCK_METHOD(NT_Topic, NetworkAnnounce,
-              (std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, NT_Publisher pubHandle),
+  MOCK_METHOD(int, ServerAnnounce,
+              (std::string_view name, int id, std::string_view typeStr,
+               const wpi::json& properties, std::optional<int> pubuid),
               (override));
-  MOCK_METHOD(void, NetworkUnannounce, (std::string_view name), (override));
-  MOCK_METHOD(void, NetworkPropertiesUpdate,
+  MOCK_METHOD(void, ServerUnannounce, (std::string_view name, int id),
+              (override));
+  MOCK_METHOD(void, ServerPropertiesUpdate,
               (std::string_view name, const wpi::json& update, bool ack),
               (override));
-  MOCK_METHOD(void, NetworkSetValue, (NT_Topic topicHandle, const Value& value),
+  MOCK_METHOD(void, ServerSetValue, (int topicId, const Value& value),
               (override));
-  MOCK_METHOD(void, StartNetwork, (NetworkInterface * network), (override));
+  MOCK_METHOD(void, StartNetwork, (ClientMessageHandler * network), (override));
   MOCK_METHOD(void, ClearNetwork, (), (override));
 };
 

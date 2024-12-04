@@ -4,29 +4,42 @@
 
 #include "frc/geometry/proto/Ellipse2dProto.h"
 
-#include <wpi/ProtoHelper.h>
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "geometry2d.pb.h"
+#include "wpimath/protobuf/geometry2d.npb.h"
 
-google::protobuf::Message* wpi::Protobuf<frc::Ellipse2d>::New(
-    google::protobuf::Arena* arena) {
-  return wpi::CreateMessage<wpi::proto::ProtobufEllipse2d>(arena);
-}
+std::optional<frc::Ellipse2d> wpi::Protobuf<frc::Ellipse2d>::Unpack(
+    InputStream& stream) {
+  wpi::UnpackCallback<frc::Pose2d> pose;
+  wpi_proto_ProtobufEllipse2d msg{
+      .center = pose.Callback(),
+      .xSemiAxis = 0,
+      .ySemiAxis = 0,
+  };
+  if (!stream.Decode(msg)) {
+    return {};
+  }
 
-frc::Ellipse2d wpi::Protobuf<frc::Ellipse2d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufEllipse2d*>(&msg);
+  auto ipose = pose.Items();
+
+  if (ipose.empty()) {
+    return {};
+  }
+
   return frc::Ellipse2d{
-      wpi::UnpackProtobuf<frc::Pose2d>(m->wpi_center()),
-      units::meter_t{m->xsemiaxis()},
-      units::meter_t{m->ysemiaxis()},
+      ipose[0],
+      units::meter_t{msg.xSemiAxis},
+      units::meter_t{msg.ySemiAxis},
   };
 }
 
-void wpi::Protobuf<frc::Ellipse2d>::Pack(google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::Ellipse2d>::Pack(OutputStream& stream,
                                          const frc::Ellipse2d& value) {
-  auto m = static_cast<wpi::proto::ProtobufEllipse2d*>(msg);
-  wpi::PackProtobuf(m->mutable_center(), value.Center());
-  m->set_xsemiaxis(value.XSemiAxis().value());
-  m->set_ysemiaxis(value.YSemiAxis().value());
+  wpi::PackCallback pose{&value.Center()};
+  wpi_proto_ProtobufEllipse2d msg{
+      .center = pose.Callback(),
+      .xSemiAxis = value.XSemiAxis().value(),
+      .ySemiAxis = value.YSemiAxis().value(),
+  };
+  return stream.Encode(msg);
 }

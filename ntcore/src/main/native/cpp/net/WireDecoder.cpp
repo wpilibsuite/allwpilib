@@ -17,6 +17,7 @@
 #include <wpi/mpack.h>
 
 #include "Message.h"
+#include "MessageHandler.h"
 
 using namespace nt;
 using namespace nt::net;
@@ -190,7 +191,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           }
 
           // complete
-          out.ClientPublish(pubuid, *name, *typeStr, *properties);
+          out.ClientPublish(pubuid, *name, *typeStr, *properties, {});
           rv = true;
         } else if (*method == UnpublishMsg::kMethodStr) {
           // pubuid
@@ -430,14 +431,14 @@ void nt::net::WireDecodeText(std::string_view in, ServerMessageHandler& out,
   ::WireDecodeTextImpl(in, out, logger);
 }
 
-bool nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int64_t* outId,
+bool nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
                                Value* outValue, std::string* error,
                                int64_t localTimeOffset) {
   mpack_reader_t reader;
   mpack_reader_init_data(&reader, reinterpret_cast<const char*>(in->data()),
                          in->size());
   mpack_expect_array_match(&reader, 4);
-  *outId = mpack_expect_i64(&reader);
+  *outId = mpack_expect_int(&reader);
   auto time = mpack_expect_i64(&reader);
   int type = mpack_expect_int(&reader);
   switch (type) {

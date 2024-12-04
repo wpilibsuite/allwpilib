@@ -68,6 +68,10 @@ struct general_matrix_matrix_triangular_product<Index, LhsScalar, LhsStorageOrde
                                       const RhsScalar* rhs_, Index rhsStride, ResScalar* res_, Index resIncr,
                                       Index resStride, const ResScalar& alpha,
                                       level3_blocking<LhsScalar, RhsScalar>& blocking) {
+    if (size == 0) {
+      return;
+    }
+
     typedef gebp_traits<LhsScalar, RhsScalar> Traits;
 
     typedef const_blas_data_mapper<LhsScalar, Index, LhsStorageOrder> LhsMapper;
@@ -157,7 +161,7 @@ struct tribb_kernel {
     gebp_kernel<LhsScalar, RhsScalar, Index, ResMapper, mr, nr, ConjLhs, ConjRhs> gebp_kernel1;
     gebp_kernel<LhsScalar, RhsScalar, Index, BufferMapper, mr, nr, ConjLhs, ConjRhs> gebp_kernel2;
 
-    Matrix<ResScalar, BlockSize, BlockSize, ColMajor> buffer((internal::constructor_without_unaligned_array_assert()));
+    Matrix<ResScalar, BlockSize, BlockSize, ColMajor> buffer;
 
     // let's process the block per panel of actual_mc x BlockSize,
     // again, each is split into three parts, etc.

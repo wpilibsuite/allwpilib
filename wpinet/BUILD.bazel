@@ -1,0 +1,218 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
+
+WIN_UV_SRCS = glob([
+    "src/main/native/thirdparty/libuv/src/win/*.cpp",
+    "src/main/native/thirdparty/libuv/src/win/*.h",
+])
+
+UNIX_UV_SRCS = [
+    "src/main/native/thirdparty/libuv/src/unix/async.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/core.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/dl.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/fs.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/getaddrinfo.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/getnameinfo.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/loop-watcher.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/loop.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/pipe.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/poll.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/process.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/random-devurandom.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/random-getentropy.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/random-getrandom.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/signal.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/stream.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/tcp.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/thread.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/tty.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/udp.cpp",
+] + glob(["src/main/native/thirdparty/libuv/src/unix/*.h"])
+
+MAC_UV_SRCS = [
+    "src/main/native/thirdparty/libuv/src/unix/bsd-ifaddrs.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/darwin.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/darwin-proctitle.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/fsevents.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/kqueue.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/proctitle.cpp",
+]
+
+LINUX_UV_SRCS = [
+    "src/main/native/thirdparty/libuv/src/unix/linux.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/procfs-exepath.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/proctitle.cpp",
+    "src/main/native/thirdparty/libuv/src/unix/random-sysctl-linux.cpp",
+]
+
+cc_library(
+    name = "libuv-headers",
+    hdrs = glob([
+        "src/main/native/thirdparty/libuv/include/**/*.h",
+    ]),
+    includes = ["src/main/native/thirdparty/libuv/src"],
+    strip_include_prefix = "src/main/native/thirdparty/libuv/include",
+    visibility = ["//wpinet:__subpackages__"],
+)
+
+filegroup(
+    name = "libuv-srcs",
+    srcs = select({
+               "@rules_bzlmodrio_toolchains//constraints/combined:is_unix": UNIX_UV_SRCS,
+               "//conditions:default": [],
+           }) +
+           select({
+               "@bazel_tools//src/conditions:darwin": MAC_UV_SRCS,
+               "@bazel_tools//src/conditions:windows": WIN_UV_SRCS,
+               "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_UV_SRCS,
+           }) + glob(["src/main/native/thirdparty/libuv/src/*"]),
+    visibility = ["//wpinet:__subpackages__"],
+)
+
+cc_library(
+    name = "tcpsockets-headers",
+    hdrs = glob([
+        "src/main/native/thirdparty/tcpsockets/include/**/*.h",
+    ]),
+    includes = ["src/main/native/thirdparty/tcpsockets/include"],
+    strip_include_prefix = "src/main/native/thirdparty/tcpsockets/include",
+    visibility = ["//wpinet:__subpackages__"],
+)
+
+filegroup(
+    name = "tcpsockets-srcs",
+    srcs = glob(["src/main/native/thirdparty/tcpsockets/cpp/**"]),
+    visibility = ["//wpinet:__subpackages__"],
+)
+
+generate_resources(
+    name = "generate-resources",
+    namespace = "wpi",
+    prefix = "WPI",
+    resource_files = glob(["src/main/native/resources/*"]),
+)
+
+filegroup(
+    name = "native-srcs",
+    srcs = ["generate-resources"] + select({
+        "@bazel_tools//src/conditions:darwin": glob(["src/main/native/macOS/*"]),
+        "@bazel_tools//src/conditions:windows": glob(["src/main/native/windows/*"]),
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": glob(["src/main/native/linux/*"]),
+    }),
+)
+
+cc_library(
+    name = "private_includes",
+    hdrs = glob([
+        "src/main/native/cpp/*.h",
+    ]),
+    strip_include_prefix = "src/main/native/cpp",
+)
+
+cc_library(
+    name = "wpinet.static",
+    srcs = glob(
+        ["src/main/native/cpp/**"],
+        exclude = ["src/main/native/cpp/jni/**"],
+    ) + [
+        ":libuv-srcs",
+        ":tcpsockets-srcs",
+    ] + ["native-srcs"],
+    hdrs = glob(["src/main/native/include/**/*"]),
+    includes = ["src/main/native/include"],
+    strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":libuv-headers",
+        ":private_includes",
+        ":tcpsockets-headers",
+        "//wpiutil:wpiutil.static",
+    ],
+)
+
+java_library(
+    name = "wpinet-java",
+    srcs = glob(["src/main/java/**/*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil:wpiutil-java",
+    ],
+)
+
+cc_test(
+    name = "wpinet-cpp-test",
+    size = "small",
+    srcs = glob([
+        "src/test/native/**/*.cpp",
+        "src/test/native/**/*.h",
+    ]),
+    tags = ["no-asan"],
+    deps = [
+        ":wpinet.static",
+        "//thirdparty/googletest:googletest.static",
+        "//wpiutil:wpiutil-testlib",
+    ],
+)
+
+cc_binary(
+    name = "DevMain-Cpp",
+    srcs = ["src/dev/native/cpp/main.cpp"],
+    deps = [
+        ":wpinet.static",
+    ],
+)
+
+java_binary(
+    name = "DevMain-java",
+    srcs = ["src/dev/java/edu/wpi/first/net/DevMain.java"],
+    main_class = "edu.wpi.first.net.DevMain",
+    deps = [
+        ":wpinet-java",
+        "//wpiutil:wpiutil-java",
+    ],
+)
+
+cc_binary(
+    name = "netconsoleServer",
+    srcs = ["src/netconsoleServer/native/cpp/main.cpp"],
+    linkopts = select({
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": ["-lutil"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        ":wpinet.static",
+    ],
+)
+
+cc_binary(
+    name = "netconsoleTee",
+    srcs = ["src/netconsoleTee/native/cpp/main.cpp"],
+    deps = [
+        ":wpinet.static",
+    ],
+)
+
+cc_binary(
+    name = "dsclient",
+    srcs = ["examples/dsclient/dsclient.cpp"],
+    deps = [
+        ":wpinet.static",
+    ],
+)
+
+cc_binary(
+    name = "parallelconnect",
+    srcs = ["examples/parallelconnect/parallelconnect.cpp"],
+    deps = [
+        ":wpinet.static",
+    ],
+)
+
+cc_binary(
+    name = "webserver",
+    srcs = ["examples/webserver/webserver.cpp"],
+    deps = [
+        ":wpinet.static",
+    ],
+)
