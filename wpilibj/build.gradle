@@ -169,6 +169,9 @@ test {
         outputs.upToDateWhen {false}
         showStandardStreams = true
     }
+    moduleOptions {
+        runOnClasspath = true
+    }
 }
 
 apply from: "${rootDir}/shared/javaDesktopTestTask.gradle"
