@@ -5,4 +5,6 @@
 module wpilib.xrp {
   requires transitive wpilib;
   requires wpilib.hal;
+
+  exports edu.wpi.first.wpilibj.xrp;
 }
