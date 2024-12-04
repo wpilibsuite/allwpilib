@@ -189,8 +189,6 @@ model {
                         it.linker.args << '-lGL'
                     }
                 }
-
-                nativeUtils.useRequiredLibrary(it, 'opencv_shared');
             }
         }
     }
