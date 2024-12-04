@@ -217,7 +217,7 @@ class EpilogueGeneratorTest {
     String source =
         """
           package edu.wpi.first.epilogue.generated;
-          
+
           import edu.wpi.first.epilogue.Logged;
 
           @Logged
@@ -356,7 +356,7 @@ class EpilogueGeneratorTest {
           @CustomLoggerFor({A.class, B.class, C.class})
           public static class CustomLogger extends ClassSpecificLogger<A> {
             public CustomLogger() { super(A.class); }
-  
+
             @Override
             public void update(EpilogueBackend backend, A object) {} // implementation is irrelevant
           }
@@ -413,7 +413,9 @@ class EpilogueGeneratorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", loggedClassContent));
+            .compile(
+                JavaFileObjects.forSourceString(
+                    "edu.wpi.first.epilogue.Example", loggedClassContent));
 
     assertThat(compilation).succeededWithoutWarnings();
     var generatedFiles = compilation.generatedSourceFiles();
