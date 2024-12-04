@@ -148,7 +148,7 @@ __declspec(dllexport)
       gPlotProvider->DisplayMenu();
       ImGui::EndMenu();
     }
-    if (ImGui::BeginMenu("Window")) {
+    if (HALSimGui::manager->GetNumWindows() > 0 && ImGui::BeginMenu("Window")) {
       HALSimGui::manager->DisplayMenu();
       ImGui::EndMenu();
     }

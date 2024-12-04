@@ -47,7 +47,7 @@ public class SendableHandler extends ElementHandler {
       return null;
     }
 
-    return "logSendable(dataLogger.getSubLogger(\""
+    return "logSendable(backend.getNested(\""
         + loggedName(element)
         + "\"), "
         + elementAccess(element)

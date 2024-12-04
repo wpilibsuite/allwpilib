@@ -6,7 +6,7 @@ package edu.wpi.first.epilogue.processor;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-import edu.wpi.first.epilogue.logging.DataLogger;
+import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -157,7 +157,7 @@ public abstract class ElementHandler {
   /**
    * Generates a code snippet to place in a generated logger file to log the value of a field or
    * method. Log invocations are placed in a generated implementation of {@link
-   * ClassSpecificLogger#update(DataLogger, Object)}, with access to the data logger and logged
+   * ClassSpecificLogger#update(EpilogueBackend, Object)}, with access to the backend and logged
    * object passed to the method call.
    *
    * @param element the field or method element to generate the logger call for

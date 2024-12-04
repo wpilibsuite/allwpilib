@@ -9,40 +9,40 @@ import edu.wpi.first.units.Unit;
 import edu.wpi.first.util.struct.Struct;
 import java.util.Collection;
 
-/** A data logger is a generic interface for logging discrete data points. */
-public interface DataLogger {
+/** A backend is a generic interface for Epilogue to log discrete data points. */
+public interface EpilogueBackend {
   /**
-   * Creates a data logger that logs to multiple backends at once. Data reads will still only occur
-   * once; data is passed to all composed loggers at once.
+   * Creates a backend that logs to multiple backends at once. Data reads will still only occur
+   * once; data is passed to all composed backends at once.
    *
-   * @param loggers the loggers to compose together
-   * @return the multi logger
+   * @param backends the backends to compose together
+   * @return the multi backend
    */
-  static DataLogger multi(DataLogger... loggers) {
-    return new MultiLogger(loggers);
+  static EpilogueBackend multi(EpilogueBackend... backends) {
+    return new MultiBackend(backends);
   }
 
   /**
-   * Creates a lazy version of this logger. A lazy logger will only log data to a field when its
+   * Creates a lazy version of this backend. A lazy backend will only log data to a field when its
    * value changes, which can help keep file size and bandwidth usage in check. However, there is an
    * additional CPU and memory overhead associated with tracking the current value of every logged
    * entry. The most surefire way to reduce CPU and memory usage associated with logging is to log
    * fewer things - which can be done by opting out of logging unnecessary data or increasing the
    * minimum logged importance level in the Epilogue configuration.
    *
-   * @return the lazy logger
+   * @return the lazy backend
    */
-  default DataLogger lazy() {
-    return new LazyLogger(this);
+  default EpilogueBackend lazy() {
+    return new LazyBackend(this);
   }
 
   /**
-   * Gets a logger that can be used to log nested data underneath a specific path.
+   * Gets a backend that can be used to log nested data underneath a specific path.
    *
    * @param path the path to use for logging nested data under
-   * @return the sub logger
+   * @return the nested backend
    */
-  DataLogger getSubLogger(String path);
+  EpilogueBackend getNested(String path);
 
   /**
    * Logs a 32-bit integer data point.

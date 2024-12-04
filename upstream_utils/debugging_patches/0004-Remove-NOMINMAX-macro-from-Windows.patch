@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Thu, 21 Nov 2024 18:49:53 -0800
+Subject: [PATCH 4/4] Remove NOMINMAX macro from Windows
+
+---
+ src/windows.cxx | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/windows.cxx b/src/windows.cxx
+index 45d98eb27c5182de7ad11291925275fb4fdb54fb..d20ae438ef9b2de8830c6df099f0476aba395de5 100644
+--- a/src/windows.cxx
++++ b/src/windows.cxx
+@@ -4,7 +4,6 @@
+ #	include <debugging.hpp>
+ 
+ #	define WIN32_LEAN_AND_MEAN
+-#	define NOMINMAX
+ #	include <Windows.h>
+ 
+ namespace stdx {

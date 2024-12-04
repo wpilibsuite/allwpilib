@@ -6,14 +6,14 @@ package edu.wpi.first.epilogue.logging;
 
 import edu.wpi.first.util.struct.Struct;
 
-/** Null data logger implementation that logs nothing. */
-public class NullLogger implements DataLogger {
+/** Null backend implementation that logs nothing. */
+public class NullBackend implements EpilogueBackend {
   /** Default constructor. */
-  public NullLogger() {}
+  public NullBackend() {}
 
   @Override
-  public DataLogger getSubLogger(String path) {
-    // Since a sublogger would still log nothing and has no state, we can just return the same
+  public EpilogueBackend getNested(String path) {
+    // Since a nested backend would still log nothing and has no state, we can just return the same
     // null-logging implementation
     return this;
   }
