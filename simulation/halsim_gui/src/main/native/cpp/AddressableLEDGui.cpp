@@ -12,8 +12,6 @@
 #include <hal/simulation/AddressableLEDData.h>
 #include <imgui.h>
 
-#include "HALSimGui.h"
-
 using namespace halsimgui;
 
 namespace {
@@ -75,7 +73,7 @@ void AddressableLEDsModel::Update() {
 
 bool AddressableLEDsModel::Exists() {
   for (auto&& model : m_models) {
-    if (model && model->Exists()) {
+    if (model) {
       return true;
     }
   }
@@ -91,25 +89,6 @@ void AddressableLEDsModel::ForEachLEDDisplay(
   }
 }
 
-static bool AddressableLEDsExists() {
-  static const int numLED = HAL_GetNumAddressableLEDs();
-  for (int i = 0; i < numLED; ++i) {
-    if (HALSIM_GetAddressableLEDInitialized(i)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-void AddressableLEDGui::Initialize() {
-  HALSimGui::halProvider->Register(
-      "Addressable LEDs", [] { return AddressableLEDsExists(); },
-      [] { return std::make_unique<AddressableLEDsModel>(); },
-      [](glass::Window* win, glass::Model* model) {
-        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-        win->SetDefaultPos(290, 100);
-        return glass::MakeFunctionView([=] {
-          glass::DisplayLEDDisplays(static_cast<AddressableLEDsModel*>(model));
-        });
-      });
+glass::LEDDisplaysModel* halsimgui::CreateAddressableLEDsModel() {
+  return glass::CreateModel<AddressableLEDsModel>();
 }

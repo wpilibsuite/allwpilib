@@ -3,18 +3,16 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
-#include <memory>
 
-#include <glass/hardware/Pneumatic.h>
+namespace glass {
+class DeviceTreeModel;
+class PneumaticControlsModel;
+}  // namespace glass
 
 namespace halsimgui {
 
-class PCMSimGui {
- public:
-  static void Initialize();
-  static bool PCMsAnyInitialized();
-  static bool PCMsAnySolenoids(glass::PneumaticControlsModel* model);
-  static std::unique_ptr<glass::PneumaticControlsModel> GetPCMsModel();
-};
+glass::PneumaticControlsModel* CreatePCMsModel();
+void InitializePCMs(glass::DeviceTreeModel& deviceTree,
+                    glass::PneumaticControlsModel* model);
 
 }  // namespace halsimgui

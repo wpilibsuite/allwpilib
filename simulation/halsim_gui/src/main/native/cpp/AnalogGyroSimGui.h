@@ -4,11 +4,12 @@
 
 #pragma once
 
+namespace glass {
+class DeviceTreeModel;
+}  // namespace glass
+
 namespace halsimgui {
 
-class AnalogGyroSimGui {
- public:
-  static void Initialize();
-};
+void InitializeAnalogGyros(glass::DeviceTreeModel& deviceTree);
 
 }  // namespace halsimgui

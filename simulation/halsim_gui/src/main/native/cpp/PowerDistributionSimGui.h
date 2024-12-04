@@ -4,11 +4,12 @@
 
 #pragma once
 
+namespace glass {
+class PowerDistributionsModel;
+}  // namespace glass
+
 namespace halsimgui {
 
-class PowerDistributionSimGui {
- public:
-  static void Initialize();
-};
+glass::PowerDistributionsModel* CreatePowerDistributionsModel();
 
 }  // namespace halsimgui

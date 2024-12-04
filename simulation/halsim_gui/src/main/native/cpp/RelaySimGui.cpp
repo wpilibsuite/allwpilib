@@ -55,7 +55,7 @@ class RelaysSimModel : public glass::RelaysModel {
 
   void Update() override;
 
-  bool Exists() override { return true; }
+  bool Exists() override;
 
   void ForEachRelay(wpi::function_ref<void(glass::RelayModel& model, int index)>
                         func) override;
@@ -81,6 +81,15 @@ void RelaysSimModel::Update() {
   }
 }
 
+bool RelaysSimModel::Exists() {
+  for (auto&& model : m_models) {
+    if (model) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void RelaysSimModel::ForEachRelay(
     wpi::function_ref<void(glass::RelayModel& model, int index)> func) {
   for (int32_t i = 0, iend = static_cast<int32_t>(m_models.size()); i < iend;
@@ -91,27 +100,6 @@ void RelaysSimModel::ForEachRelay(
   }
 }
 
-static bool RelayAnyInitialized() {
-  static const int32_t num = HAL_GetNumRelayHeaders();
-  for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetRelayInitializedForward(i) ||
-        HALSIM_GetRelayInitializedReverse(i)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-void RelaySimGui::Initialize() {
-  HALSimGui::halProvider->Register(
-      "Relays", RelayAnyInitialized,
-      [] { return std::make_unique<RelaysSimModel>(); },
-      [](glass::Window* win, glass::Model* model) {
-        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-        win->SetDefaultPos(180, 20);
-        return glass::MakeFunctionView([=] {
-          glass::DisplayRelays(static_cast<RelaysSimModel*>(model),
-                               HALSimGui::halProvider->AreOutputsEnabled());
-        });
-      });
+glass::RelaysModel* halsimgui::CreateRelaysModel() {
+  return glass::CreateModel<RelaysSimModel>();
 }
