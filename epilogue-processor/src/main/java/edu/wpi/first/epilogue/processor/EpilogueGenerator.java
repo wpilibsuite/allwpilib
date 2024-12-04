@@ -46,15 +46,18 @@ public class EpilogueGenerator {
       List<String> loggerClassNames, Collection<TypeElement> mainRobotClasses) {
     try {
       var centralStore =
-          m_processingEnv.getFiler().createSourceFile("edu.wpi.first.epilogue.Epilogue");
+          m_processingEnv.getFiler().createSourceFile("edu.wpi.first.epilogue.generated.Epilogue");
 
       try (var out = new PrintWriter(centralStore.openOutputStream())) {
-        out.println("package edu.wpi.first.epilogue;");
+        out.println("package edu.wpi.first.epilogue.generated;");
         out.println();
 
         out.println("import static edu.wpi.first.units.Units.Seconds;");
         out.println();
 
+        out.println("import edu.wpi.first.epilogue.Logged;");
+        out.println("import edu.wpi.first.epilogue.EpilogueConfiguration;");
+        out.println("import edu.wpi.first.hal.FRCNetComm;");
         out.println("import edu.wpi.first.hal.HAL;");
         out.println();
 

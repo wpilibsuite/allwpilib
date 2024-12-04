@@ -196,7 +196,7 @@ public class LoggerGenerator {
       }
 
       out.println("import edu.wpi.first.epilogue.Logged;");
-      out.println("import edu.wpi.first.epilogue.Epilogue;");
+      out.println("import edu.wpi.first.epilogue.generated.Epilogue;");
       out.println("import edu.wpi.first.epilogue.logging.ClassSpecificLogger;");
       out.println("import edu.wpi.first.epilogue.logging.EpilogueBackend;");
       if (requiresVarHandles) {
