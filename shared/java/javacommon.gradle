@@ -1,7 +1,10 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
-apply plugin: 'org.gradlex.extra-java-module-info'
+if (project.name != 'epilogue-processor') {
+    println("Applying extra-java-module-info to project ${project.name}")
+    apply plugin: 'org.gradlex.extra-java-module-info'
+}
 apply plugin: 'org.javamodularity.moduleplugin'
 
 def baseArtifactId = project.baseId

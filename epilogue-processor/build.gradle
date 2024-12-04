@@ -8,7 +8,7 @@ ext {
 }
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"
-apply from: "${rootDir}/shared/java/opencv-module-patches.gradle"
+//apply from: "${rootDir}/shared/java/opencv-module-patches.gradle"
 
 dependencies {
     implementation(project(':epilogue-runtime'))
@@ -17,35 +17,8 @@ dependencies {
     testImplementation 'com.google.testing.compile:compile-testing:+'
 }
 
-extraJavaModuleInfo {
-    module('com.google.testing.compile:compile-testing', 'google.compile_testing') {
-        exportAllPackages()
-    }
-    module('com.google.truth:truth', 'google.truth') { // Somebody wants just `truth` as the module name...
-        exportAllPackages()
-    }
-    module('com.google.auto:auto-common', 'google.auto.common') {
-        exportAllPackages()
-    }
-    module('com.google.auto.value:auto-value', 'google.auto.value') {
-        exportAllPackages()
-    }
-    module('com.google.auto.value:auto-value-annotations', 'google.auto.value.annotations') {
-        exportAllPackages()
-    }
-    module('org.hamcrest:hamcrest-core', 'hamcrest.core') {
-        exportAllPackages()
-    }
-    module('com.google.guava:failureaccess', 'google.guava.failureaccess') {
-        exportAllPackages()
-    }
-    module('com.google.guava:listenablefuture', 'google.guava.listenablefuture') {
-        exportAllPackages()
-    }
-    module('com.google.code.findbugs:jsr305', 'findbugs.jsr305') {
-        exportAllPackages()
-    }
-    module('com.google.j2objc:j2objc-annotations', 'google.j2objc.annotations') {
-        exportAllPackages()
+test {
+    moduleOptions {
+        runOnClasspath = true
     }
 }
