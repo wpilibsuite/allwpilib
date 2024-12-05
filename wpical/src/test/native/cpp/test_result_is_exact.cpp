@@ -2,20 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <stdint.h>
-#include <gtest/gtest.h>
-
-#include <istream>
 #include <chrono>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
-#include <istream>
-#include <map>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
+#include <gtest/gtest.h>
 #include <mrcal_wrapper.h>
 
 using namespace cv;
@@ -149,12 +143,11 @@ std::vector<double> calibrate(const std::string& fname, cv::Size boardSize,
   return stats.intrinsics;
 }
 
-const std::string projectRootPath = "C:\\Users\\matth\\Documents\\GitHub\\allwpilib\\wpical\\src\\main\\native\\resources";
+const std::string projectRootPath = PROJECT_ROOT_PATH;
 
-TEST(MrcalResultExactlyMatches, lifecam_1280) {
-  auto calculated_intrinsics{
-      calibrate(projectRootPath + "/lifecam_1280p_10x10.vnl", {10, 10},
-                {1280, 720})};
+TEST(MrcalResultExactlyMatchesTest, lifecam_1280) {
+  auto calculated_intrinsics{calibrate(
+      projectRootPath + "/lifecam_1280p_10x10.vnl", {10, 10}, {1280, 720})};
 
   // ## generated with mrgingham --jobs 4 --gridn 10
   // /home/mmorley/photonvision/test-resources/calibrationSquaresImg/lifecam/2024-01-02_lifecam_1280/*.png

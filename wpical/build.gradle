@@ -127,7 +127,7 @@ nativeUtils.platformConfigs.each {
         it.cppCompiler.args.add("-Wno-maybe-uninitialized")
     }
 }
-
+def testResources = "\"$rootDir/wpical/src/main/native/resources\"".replace("\\", "/")
 model {
     components {
         "${nativeName}"(NativeExecutableSpec) {
@@ -220,6 +220,7 @@ model {
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
+                it.cppCompiler.define('PROJECT_ROOT_PATH', testResources)
                 it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.cppCompiler.define('GLOG_DEPRECATED', '__declspec(deprecated)')

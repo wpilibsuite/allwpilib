@@ -5,39 +5,36 @@
 #include <cameracalibration.h>
 #include <fieldcalibration.h>
 
-#include <iostream>
 #include <string>
 
 #include <gtest/gtest.h>
 #include <wpi/json.h>
 
-const std::string projectRootPath = "C:\\Users\\matth\\Documents\\GitHub\\allwpilib\\wpical\\src\\main\\native\\resources";
+const std::string projectRootPath = PROJECT_ROOT_PATH;
 
 TEST(Camera_CalibrationTest, OpenCV_Typical) {
   int ret = cameracalibration::calibrate(
-      projectRootPath + "/testcalibration.mp4", 0.709f, 0.551f, 12, 8,
-      true);
+      projectRootPath + "/testcalibration.mp4", 0.709f, 0.551f, 12, 8, true);
   EXPECT_EQ(ret, 0);
 }
 
 TEST(Camera_CalibrationTest, OpenCV_Atypical) {
   int ret = cameracalibration::calibrate(
-      projectRootPath + "/fieldvideo/long.mp4", 0.709f, 0.551f, 12, 8,
-      false);
+      projectRootPath + "/fieldvideo/long.mp4", 0.709f, 0.551f, 12, 8, false);
   EXPECT_EQ(ret, 1);
 }
 
 TEST(Camera_CalibrationTest, MRcal_Typical) {
-  int ret = cameracalibration::calibrate(
-      projectRootPath + "/testcalibration.mp4", 0.709f, 12, 8, 1080, 1920,
-      false);
+  int ret =
+      cameracalibration::calibrate(projectRootPath + "/testcalibration.mp4",
+                                   0.709f, 12, 8, 1080, 1920, false);
   EXPECT_EQ(ret, 0);
 }
 
 TEST(Camera_CalibrationTest, MRcal_Atypical) {
-  int ret = cameracalibration::calibrate(
-      projectRootPath + "/fieldvideo/short.mp4", 0.709f, 12, 8, 1080,
-      1920, false);
+  int ret =
+      cameracalibration::calibrate(projectRootPath + "/fieldvideo/short.mp4",
+                                   0.709f, 12, 8, 1080, 1920, false);
   EXPECT_EQ(ret, 1);
 }
 
