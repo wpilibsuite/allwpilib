@@ -227,6 +227,19 @@ model {
                     it.cppCompiler.define('GLOG_DEPRECATED', '[[deprecated]]')
                 }
                 lib project: ':thirdparty:googletest', library: 'googletest', linkage: 'static'
+
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    // Comdlg32.lib is needed for GetSaveFileNameA
+                    // dbghelp.lib is needed for glog functions
+                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib' << 'Comdlg32.lib' << 'dbghelp.lib'
+                } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
+                } else {
+                    it.linker.args << '-lX11' << '-lgfortran'
+                    if (it.targetPlatform.name.startsWith('linuxarm')) {
+                        it.linker.args << '-lGL'
+                    }
+                }
             }
         }
     }
