@@ -12,6 +12,7 @@
 
 #include <cstring>
 
+#include <fmt/format.h>
 #include <wpi/mutex.h>
 #include <wpi/print.h>
 
@@ -49,13 +50,16 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   }
   int handle = open("/dev/i2c-1", O_RDWR);
   if (handle < 0) {
-    wpi::print("Failed to open onboard i2c bus: {}\n", std::strerror(errno));
+    int err = errno;
+    *status = NO_AVAILABLE_RESOURCES;
+    hal::SetLastError(status, fmt::format("Failed to open onboard i2c bus: {}",
+                                          std::strerror(err)));
+    wpi::print("Failed to open onboard i2c bus: {}\n", std::strerror(err));
+    handle = -1;
+    i2COnboardObjCount--;
     return;
   }
   i2COnBoardHandle = handle;
-
-  *status = HAL_HANDLE_ERROR;
-  return;
 }
 
 int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
