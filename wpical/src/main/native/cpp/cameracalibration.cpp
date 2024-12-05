@@ -122,7 +122,7 @@ int cameracalibration::calibrate(const std::string &input_video, float square_wi
 
     try
     {
-        int flags = cv::CALIB_RATIONAL_MODEL;
+        int flags = cv::CALIB_RATIONAL_MODEL | cv::CALIB_USE_LU;
         repError = cv::calibrateCamera(all_obj_points, all_img_points, frame_shape, camera_matrix, dist_coeffs, r_vecs, t_vecs, cv::noArray(), cv::noArray(), cv::noArray(), flags);
     }
     catch (...)
