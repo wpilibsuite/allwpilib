@@ -534,6 +534,7 @@ static void DisplayGui() {
   ImGui::End();
 }
 
+#ifndef RUNNING_WPICAL_TESTS
 #ifdef _WIN32
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                       LPSTR pCmdLine, int nCmdShow) {
@@ -571,3 +572,4 @@ int main(int argc, char** argv) {
 
   return 0;
 }
+#endif

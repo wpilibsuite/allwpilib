@@ -228,7 +228,7 @@ model {
                     it.cppCompiler.define('GLOG_DEPRECATED', '[[deprecated]]')
                 }
                 lib project: ':thirdparty:googletest', library: 'googletest', linkage: 'static'
-
+                it.cppCompiler.define("RUNNING_WPICAL_TESTS")
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     // Comdlg32.lib is needed for GetSaveFileNameA
                     // dbghelp.lib is needed for glog functions
