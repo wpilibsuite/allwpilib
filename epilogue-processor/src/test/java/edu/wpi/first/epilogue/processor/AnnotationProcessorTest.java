@@ -19,9 +19,32 @@ import java.util.Locale;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.notification.RunListener;
 
 @SuppressWarnings("checkstyle:LineLength") // Source code templates exceed the line length limit
 class AnnotationProcessorTest {
+  @Test
+  void pls() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+ 
+      class Example {
+        @Logged double x;
+      }
+  
+      class SubLoggable {
+        @Logged double y;
+      }
+    """;
+    
+    String expectedGeneratedSource = "";
+    
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+  
+  
   @Test
   void simple() {
     String source =

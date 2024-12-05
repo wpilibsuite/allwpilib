@@ -34,8 +34,12 @@ public class LoggableHandler extends ElementHandler {
 
   @Override
   public boolean isLoggable(Element element) {
-    return m_processingEnv.getTypeUtils().asElement(dataType(element)) instanceof TypeElement t
-        && m_loggedTypes.contains(t);
+    return isLoggableType(dataType(element));
+  }
+  
+  public boolean isLoggableType(TypeMirror typeMirror) {
+    return m_processingEnv.getTypeUtils().asElement(typeMirror) instanceof TypeElement t
+               && m_loggedTypes.contains(t);
   }
 
   @Override

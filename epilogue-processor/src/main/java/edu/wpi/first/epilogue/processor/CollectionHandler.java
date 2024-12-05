@@ -8,6 +8,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import java.util.Collection;
 
 /**
  * Collections of strings and structs are loggable. Collections of boxed primitive types are not.
@@ -17,9 +18,9 @@ public class CollectionHandler extends ElementHandler {
   private final TypeMirror m_collectionType;
   private final StructHandler m_structHandler;
 
-  protected CollectionHandler(ProcessingEnvironment processingEnv) {
+  protected CollectionHandler(ProcessingEnvironment processingEnv, Collection<? extends Element> loggedTypes) {
     super(processingEnv);
-    m_arrayHandler = new ArrayHandler(processingEnv);
+    m_arrayHandler = new ArrayHandler(processingEnv, loggedTypes);
     m_collectionType =
         processingEnv.getElementUtils().getTypeElement("java.util.Collection").asType();
     m_structHandler = new StructHandler(processingEnv);

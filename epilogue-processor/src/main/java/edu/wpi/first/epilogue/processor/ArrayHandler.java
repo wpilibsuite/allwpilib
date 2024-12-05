@@ -9,6 +9,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
+import java.util.Collection;
 
 /**
  * Arrays of bytes, ints, flats, doubles, booleans, Strings, and struct-serializable objects can be
@@ -16,14 +17,15 @@ import javax.lang.model.type.TypeMirror;
  */
 public class ArrayHandler extends ElementHandler {
   private final StructHandler m_structHandler;
+  private final LoggableHandler m_loggableHandler;
   private final TypeMirror m_javaLangString;
 
-  protected ArrayHandler(ProcessingEnvironment processingEnv) {
+  protected ArrayHandler(ProcessingEnvironment processingEnv, Collection<? extends Element> loggedTypes) {
     super(processingEnv);
 
     // use a struct handler for managing struct arrays
     m_structHandler = new StructHandler(processingEnv);
-
+    m_loggableHandler = new LoggableHandler(processingEnv, loggedTypes);
     m_javaLangString = lookupTypeElement(processingEnv, "java.lang.String").asType();
   }
 
@@ -48,7 +50,8 @@ public class ArrayHandler extends ElementHandler {
     }
 
     return m_structHandler.isLoggableType(type)
-        || m_processingEnv.getTypeUtils().isAssignable(type, m_javaLangString);
+        || m_processingEnv.getTypeUtils().isAssignable(type, m_javaLangString)
+        || m_loggableHandler.isLoggableType(type);
   }
 
   @Override
@@ -67,6 +70,16 @@ public class ArrayHandler extends ElementHandler {
           + ", "
           + m_structHandler.structAccess(componentType)
           + ")";
+    } else if (m_loggableHandler.isLoggableType(componentType)) {
+      var loggedName = loggedName(element);
+      var elementAccess = elementAccess(element);
+      return """
+          int listCounterOf%s = 0;
+          for (var value: %s) {
+ 
+            listCounterOf%s++;
+          }
+        """.formatted(loggedName, elementAccess, loggedName, loggedName, loggedName);
     } else {
       // Primitive or string array
       return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
