@@ -151,9 +151,9 @@ std::vector<double> calibrate(const std::string& fname, cv::Size boardSize,
 
 const std::string projectRootPath = "C:\\Users\\matth\\Documents\\GitHub\\allwpilib\\wpical\\src\\main\\native\\resources";
 
-void test_lifecam_1280() {
+TEST(MrcalResultExactlyMatches, lifecam_1280) {
   auto calculated_intrinsics{
-      calibrate(projectRootPath + "/assets/lifecam_1280p_10x10.vnl", {10, 10},
+      calibrate(projectRootPath + "/lifecam_1280p_10x10.vnl", {10, 10},
                 {1280, 720})};
 
   // ## generated with mrgingham --jobs 4 --gridn 10
