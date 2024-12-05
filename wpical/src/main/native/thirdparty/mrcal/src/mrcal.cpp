@@ -6644,7 +6644,6 @@ mrcal_optimize( // out
                                            &dogleg_parameters,
                                            &solver_context);
 
-            // TODO: is this scope {} correct? intent is unclear.
             if(norm2_error < 0) {
                 // libdogleg barfed. I quit out
                 if(solver_context != NULL)
