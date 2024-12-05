@@ -29,7 +29,7 @@ struct Notifier {
   std::string name;
   uint64_t waitTime = UINT64_MAX;
   bool active = true;
-  bool waitTimeValid = false;    // True if waitTime is set and in the future
+  bool waitTimeValid = false;  // True if waitTime is set and in the future
   wpi::mutex mutex;
   wpi::condition_variable cond;
 };
