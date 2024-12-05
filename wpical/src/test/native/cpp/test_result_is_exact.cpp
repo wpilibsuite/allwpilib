@@ -2,25 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-/*
- * Copyright (C) Photon Vision.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 #include <stdint.h>
+#include <gtest/gtest.h>
 
+#include <istream>
 #include <chrono>
 #include <cstdio>
 #include <fstream>
@@ -33,8 +18,6 @@
 
 #include <mrcal_wrapper.h>
 
-#include "mrcal_jni.h"
-
 using namespace cv;
 
 struct cmpByFilename {
@@ -46,7 +29,7 @@ struct cmpByFilename {
   }
 };
 
-std::vector<double> calibrate(std::string_view fname, cv::Size boardSize,
+std::vector<double> calibrate(const std::string& fname, cv::Size boardSize,
                               cv::Size imagerSize) {
   std::ifstream file(fname);
   if (!file.is_open()) {
@@ -151,13 +134,13 @@ std::vector<double> calibrate(std::string_view fname, cv::Size boardSize,
     std::printf("\n===============================\n\n");
     std::printf("RMS Reprojection Error: %.2f pixels\n", stats.rms_error);
     std::printf("Worst residual (by measurement): %.1f pixels\n", max_error);
-    std::printf("Noutliers: %i of %lu (%.1f percent of the data)\n",
+    std::printf("Noutliers: %i of %zu (%.1f percent of the data)\n",
                 stats.Noutliers_board, total_points,
                 100.0 * stats.Noutliers_board / total_points);
     std::printf("calobject_warp: [%f, %f]\n", stats.calobject_warp.x2,
                 stats.calobject_warp.y2);
     std::printf("dt, seeding + solve: %f ms\n", dt_ms / 1e6);
-    std::printf("Intrinsics [%lu]: ", stats.intrinsics.size());
+    std::printf("Intrinsics [%zu]: ", stats.intrinsics.size());
     for (auto i : stats.intrinsics)
       std::printf("%f ", i);
     std::printf("\n");
@@ -166,9 +149,9 @@ std::vector<double> calibrate(std::string_view fname, cv::Size boardSize,
   return stats.intrinsics;
 }
 
-const std::string projectRootPath = PROJECT_ROOT_PATH;
+const std::string projectRootPath = "C:\\Users\\matth\\Documents\\GitHub\\allwpilib\\wpical\\src\\main\\native\\resources";
 
-int test_lifecam_1280() {
+void test_lifecam_1280() {
   auto calculated_intrinsics{
       calibrate(projectRootPath + "/assets/lifecam_1280p_10x10.vnl", {10, 10},
                 {1280, 720})};
