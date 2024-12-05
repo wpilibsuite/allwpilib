@@ -28,20 +28,6 @@ macro(wpilib_target_warnings target)
         )
     endif()
 
-    # Suppress C++-specific OpenCV warning; C compiler rejects it with an error
-    # https://github.com/opencv/opencv/issues/20269
-    if(UNIX AND NOT APPLE)
-        target_compile_options(
-            ${target}
-            PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-enum-enum-conversion>
-        )
-    elseif(UNIX AND APPLE)
-        target_compile_options(
-            ${target}
-            PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-anon-enum-enum-conversion>
-        )
-    endif()
-
     # Suppress warning "enumeration types with a fixed underlying type are a
     # Clang extension"
     if(APPLE)
