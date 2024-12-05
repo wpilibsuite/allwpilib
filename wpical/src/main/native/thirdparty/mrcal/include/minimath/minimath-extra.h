@@ -5,6 +5,7 @@
 // replacement, and I'm not going to be thorough and I'm not going to add tests
 // until I do that.
 
+#define restrict __restrict
 
 // Upper triangle is stored, in the usual row-major order.
 

@@ -353,6 +353,8 @@ endif()
 if(WITH_SIMULATION_MODULES)
     add_subdirectory(simulation)
 endif()
+    
+add_subdirectory(wpical)
 
 configure_file(wpilib-config.cmake.in ${WPILIB_BINARY_DIR}/wpilib-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/wpilib-config.cmake DESTINATION share/wpilib)

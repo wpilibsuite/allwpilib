@@ -181,7 +181,9 @@ typedef struct
 // is used to identify a specific camera, while the "extrinsics" index is used
 // to locate a camera in space. If I have a camera that is moving over time, the
 // intrinsics index will remain the same, while the extrinsics index will change
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: there should be a pool of these, and I should be indexing that pool"
+#endif
 typedef struct
 {
     // indexes the intrinsics array
@@ -215,26 +217,36 @@ typedef struct
     int                  i_point;
 } mrcal_observation_point_t;
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: triangulated points into a pool. maybe allowing the intrinsics to move in the process"
+#endif
 
 // An observation of a discrete point where the point itself is NOT a part of
 // the optimization, but computed implicitly via triangulation. This structure
 // is very similar to mrcal_observation_point_t, except instead of i_point
 // identifying the point being observed we have
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: FINISH DOC"
+#endif
 typedef struct
 {
     // which camera is making this observation
     mrcal_camera_index_t icam;
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: DOCUMENT. CAN THIS BIT FIELD BE PACKED NICELY?"
+#endif
     // Set if this is the last camera observing this point. Any set of N>=2
     // cameras can observe any point. All observations of a given point are
     // stored consecutively, the last one being noted by this bit
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: do I really need this? I cannot look at the next observation to determine when this one is done?"
+#endif
     bool                 last_in_set : 1;
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: this is temporary. Should be a weight in observations_point_pool like all the other observations"
+#endif
     bool                 outlier     : 1;
 
     // Observed pixel coordinates. This works just like elements of
@@ -243,7 +255,9 @@ typedef struct
 } mrcal_observation_point_triangulated_t;
 
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: need a function to identify a vanilla calibration problem. It needs to not include any triangulated points. The noise propagation is different"
+#endif
 
 
 // Bits indicating which parts of the optimization problem being solved. We can
@@ -269,8 +283,10 @@ typedef struct
     // If true, optimize the shape of the calibration object
     bool do_optimize_calobject_warp         : 1;
 
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: Need finer-grained regularization flags"
 // #warning "triangulated-solve: Regularization flags should reflect do_optimize stuff and Ncameras stuff"
+#endif
     // If true, apply the regularization terms in the solver
     bool do_apply_regularization            : 1;
 
@@ -319,7 +335,9 @@ typedef struct
     /* observation produces two measurements. Note that this INCLUDES any */ \
     /* outliers that were passed-in at the start */                     \
     _(int,            Noutliers_triangulated_point,     PyLong_FromLong)
+#if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: implement stats.Noutliers_triangulated_point; add to c-api.org"
+#endif
 #define MRCAL_STATS_ITEM_DEFINE(type, name, pyconverter) type name;
 typedef struct
 {

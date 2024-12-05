@@ -47,6 +47,7 @@ def copy_upstream_src(wpilib_root):
     for f in files:
         with open(f) as file:
             content = file.read()
+            content = content.replace("#include <malloc.h>", "")
             content = content.replace("// mrcal_point3_t *c_observations_point_pool = observations_point;", "mrcal_point3_t *c_observations_point_pool = observations_point;")
             content = content.replace("// mrcal_observation_point_triangulated_t *observations_point_triangulated =", "mrcal_observation_point_triangulated_t *observations_point_triangulated = NULL;")
             content = content.replace("// observations_point_triangulated,", "observations_point_triangulated,")
@@ -61,7 +62,7 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "mrcal_java"
     url = "https://github.com/PhotonVision/mrcal-java"
-    tag = "41d7868df2dad98f396c109a40bbe09c22cacbbb"
+    tag = "5f9d3168ccf1ecdfca48da13ea07fffa47f95d00"
 
     mrcal_java = Lib(name, url, tag, copy_upstream_src)
     mrcal_java.main()
