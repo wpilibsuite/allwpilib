@@ -171,6 +171,10 @@ model {
                 } else {
                     it.cppCompiler.define('GLOG_DEPRECATED', '[[deprecated]]')
                 }
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.windowsarm64) {
+                    it.linker.args << '/alternatename:__imp___std_init_once_complete=__imp_InitOnceComplete'
+                    it.linker.args << '/alternatename:__imp___std_init_once_begin_initialize=__imp_InitOnceBeginInitialize'
+                }
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     // Comdlg32.lib is needed for GetSaveFileNameA
                     // dbghelp.lib is needed for glog functions
