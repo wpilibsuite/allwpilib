@@ -14,7 +14,7 @@ const std::string projectRootPath = PROJECT_ROOT_PATH;
 
 TEST(Camera_CalibrationTest, OpenCV_Typical) {
   int ret = cameracalibration::calibrate(
-      projectRootPath + "/testcalibration.mp4", 0.709f, 0.551f, 12, 8, true);
+      projectRootPath + "/testcalibration.mp4", 0.709f, 0.551f, 12, 8, false);
   EXPECT_EQ(ret, 0);
 }
 

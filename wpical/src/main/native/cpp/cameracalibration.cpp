@@ -249,7 +249,8 @@ int cameracalibration::calibrate(const std::string &input_video, float square_wi
     }
 
     video_capture.release();
-    cv::destroyAllWindows();
+    if (show_debug_window){
+    cv::destroyAllWindows();}
 
     if (observation_boards.empty())
     {
@@ -360,9 +361,9 @@ int cameracalibration::calibrate(const std::string &input_video, float square_wi
             frames_rt_toref.push_back(getSeedPose(current_points.data(), boardSize, imagerSize, square_width * 0.0254, 1000));
             observation_boards.insert(observation_boards.end(), current_points.begin(), current_points.end());
         }
-
+        if (show_debug_window){
         cv::imshow("Checkerboard Detection", frame);
-
+        }
         if (cv::waitKey(30) == 'q')
         {
             break;
@@ -370,7 +371,9 @@ int cameracalibration::calibrate(const std::string &input_video, float square_wi
     }
 
     video_capture.release();
+    if (show_debug_window){
     cv::destroyAllWindows();
+    }
 
     if (observation_boards.empty())
     {

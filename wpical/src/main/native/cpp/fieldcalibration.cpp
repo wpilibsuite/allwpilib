@@ -333,7 +333,8 @@ bool fieldcalibration::process_video_file(
         constraints,
     bool show_debug_window)
 {
-  cv::namedWindow("Processing Frame", cv::WINDOW_NORMAL);
+  if (show_debug_window){
+  cv::namedWindow("Processing Frame", cv::WINDOW_NORMAL);}
   cv::VideoCapture video_input(path);
 
   if (!video_input.isOpened())
@@ -458,7 +459,9 @@ bool fieldcalibration::process_video_file(
   }
 
   video_input.release();
+  if (show_debug_window){
   cv::destroyAllWindows();
+  }
 
   return true;
 }
