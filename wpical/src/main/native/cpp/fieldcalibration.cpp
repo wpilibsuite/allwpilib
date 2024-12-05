@@ -15,7 +15,7 @@
 
 class PoseGraphError {
 public:
-  PoseGraphError(Pose t_ab_observed)
+  explicit PoseGraphError(Pose t_ab_observed)
       : m_t_ab_observed(std::move(t_ab_observed)) {}
 
   template <typename T>

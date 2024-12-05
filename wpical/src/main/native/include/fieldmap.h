@@ -11,7 +11,7 @@
 class fieldmap {
 public:
     fieldmap();
-    fieldmap(wpi::json map);
+    explicit fieldmap(wpi::json map);
     tag::pose getTag(int tag);
     int getNumTags();
     double minimizeAngle(double angle);
