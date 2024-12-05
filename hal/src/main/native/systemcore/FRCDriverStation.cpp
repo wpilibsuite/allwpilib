@@ -124,7 +124,9 @@ struct SystemServerDriverStation {
     consoleLinePublisher =
         ntInst.GetStringTopic(ROBOT_CONSOLE_LINE_PATH).Publish(options);
 
-    errorInfoPublisher = ntInst.GetProtobufTopic<mrc::ErrorInfo>(ROBOT_ERROR_INFO_PATH).Publish(options);
+    errorInfoPublisher =
+        ntInst.GetProtobufTopic<mrc::ErrorInfo>(ROBOT_ERROR_INFO_PATH)
+            .Publish(options);
 
     versionPublisher =
         ntInst.GetStringTopic(ROBOT_LIB_VERSION_PATH).Publish(options);
@@ -370,8 +372,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     }
   }
   int retval = 0;
-  if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >=
-  std::chrono::seconds(1)) {
+  if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
     std::string_view detailsRef{details};
     std::string_view locationRef{location};
     std::string_view callStackRef{callStack};
@@ -391,8 +392,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
       fmt::memory_buffer buf;
       if (location && location[0] != '\0') {
         fmt::format_to(fmt::appender{buf},
-                       "{} at {}: ", isError ? "Error" : "Warning",
-                       location);
+                       "{} at {}: ", isError ? "Error" : "Warning", location);
       }
       fmt::format_to(fmt::appender{buf}, "{}\n", details);
       if (callStack && callStack[0] != '\0') {
