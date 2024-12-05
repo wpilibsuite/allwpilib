@@ -167,10 +167,7 @@ TEST(MrcalResultExactlyMatches, lifecam_1280) {
       2.560627057,  -0.03170208336, 0.0695788644,   -0.09547554864};
 
   for (int i = 0; i < 12; i++) {
-    std::cout << calculated_intrinsics[i] << std::endl;
     EXPECT_NEAR(mrcal_cli_groundtruth_intrinsics[i], calculated_intrinsics[i],
                 1e-6);
   }
-
-  EXPECT_TRUE(false);
 }
