@@ -48,7 +48,7 @@ jobs:
         with:
           image: ${{ matrix.container }}
           options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME -e ARTIFACTORY_PUBLISH_PASSWORD -e GITHUB_REF -e CI
-          run: sudo apt-get update && sudo apt-get install -y gfortran && ls /usr/lib/gcc/x86_64-linux-gnu/11/ && df . && rm -f semicolon_delimited_script && echo $GITHUB_REF && ls /usr/lib/gcc/x86_64-linux-gnu/11/ && ./gradlew build --build-cache -i -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+          run: sudo apt-get update && sudo apt-get install -y gfortran && df . && rm -f semicolon_delimited_script && echo $GITHUB_REF && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         env:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
