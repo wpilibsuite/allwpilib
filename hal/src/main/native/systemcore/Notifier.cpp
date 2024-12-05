@@ -29,9 +29,7 @@ struct Notifier {
   std::string name;
   uint64_t waitTime = UINT64_MAX;
   bool active = true;
-  bool waitTimeValid = false;    // True if waitTime is set and in the future
-  bool waitingForAlarm = false;  // True if in HAL_WaitForNotifierAlarm()
-  uint64_t waitCount = 0;        // Counts calls to HAL_WaitForNotifierAlarm()
+  bool waitTimeValid = false;  // True if waitTime is set and in the future
   wpi::mutex mutex;
   wpi::condition_variable cond;
 };
@@ -60,7 +58,6 @@ class NotifierHandleContainer
 };
 
 static NotifierHandleContainer* notifierHandles;
-static std::atomic<bool> notifiersPaused{false};
 
 namespace hal::init {
 void InitializeNotifier() {
@@ -84,7 +81,7 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
 
 HAL_Bool HAL_SetNotifierThreadPriority(HAL_Bool realTime, int32_t priority,
                                        int32_t* status) {
-  // TODO fix this
+  // There is no thread, so this can be removed.
   return true;
 }
 
@@ -166,20 +163,17 @@ uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
 
   std::unique_lock ulock(notifiersWaiterMutex);
   std::unique_lock lock(notifier->mutex);
-  notifier->waitingForAlarm = true;
-  ++notifier->waitCount;
   ulock.unlock();
   notifiersWaiterCond.notify_all();
   while (notifier->active) {
     uint64_t curTime = HAL_GetFPGATime(status);
     if (notifier->waitTimeValid && curTime >= notifier->waitTime) {
       notifier->waitTimeValid = false;
-      notifier->waitingForAlarm = false;
       return curTime;
     }
 
     double waitDuration;
-    if (!notifier->waitTimeValid || notifiersPaused) {
+    if (!notifier->waitTimeValid) {
       // If not running, wait 1000 seconds
       waitDuration = 1000.0;
     } else {
@@ -188,7 +182,6 @@ uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
 
     notifier->cond.wait_for(lock, std::chrono::duration<double>(waitDuration));
   }
-  notifier->waitingForAlarm = false;
   return 0;
 }
 
