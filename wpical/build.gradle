@@ -20,8 +20,7 @@ ext {
     nativeName = 'wpical'
     useCpp = true
     sharedCvConfigs = [
-        apriltagDev : [],
-        apriltagTest: []]
+        wpicalTest: []]
     staticCvConfigs = []
 }
 
@@ -33,7 +32,6 @@ def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.c
 
 apply from: "${rootDir}/shared/ceres.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
-apply from: "${rootDir}/shared/googletest.gradle"
 
 task generateCppVersion() {
     description = 'Generates the wpilib version class'
@@ -210,6 +208,25 @@ model {
                         srcDirs 'src/test/native/include', 'src/main/native/cpp'
                     }
                 }
+            }
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name.startsWith("linuxarm")) {
+                    it.buildable = false
+                    return
+                }
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
+                lib project: ':apriltag', library: 'apriltag', linkage: 'static'
+                nativeUtils.useRequiredLibrary(it, 'ceres')
+                nativeUtils.useRequiredLibrary(it, 'opencv_static')
+                it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    it.cppCompiler.define('GLOG_DEPRECATED', '__declspec(deprecated)')
+                } else {
+                    it.cppCompiler.define('GLOG_DEPRECATED', '[[deprecated]]')
+                }
+                lib project: ':thirdparty:googletest', library: 'googletest', linkage: 'static'
             }
         }
     }
