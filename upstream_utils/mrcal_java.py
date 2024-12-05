@@ -47,6 +47,7 @@ def copy_upstream_src(wpilib_root):
     for f in files:
         with open(f) as file:
             content = file.read()
+            content = content.replace("#include <malloc.h>", "")
             content = content.replace("// mrcal_point3_t *c_observations_point_pool = observations_point;", "mrcal_point3_t *c_observations_point_pool = observations_point;")
             content = content.replace("// mrcal_observation_point_triangulated_t *observations_point_triangulated =", "mrcal_observation_point_triangulated_t *observations_point_triangulated = NULL;")
             content = content.replace("// observations_point_triangulated,", "observations_point_triangulated,")

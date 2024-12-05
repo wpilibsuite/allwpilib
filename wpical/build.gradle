@@ -104,6 +104,7 @@ nativeUtils.platformConfigs.each {
         it.cppCompiler.args.add("-Wno-uninitialized")
         it.cppCompiler.args.add("-Wno-missing-braces")
         it.cppCompiler.args.add("-Wno-null-conversion")
+        it.cppCompiler.args.add("-Wno-unused-but-set-variable")
     } else {
         it.cCompiler.args.add("-Wno-format-nonliteral")
         it.cCompiler.args.remove("-pedantic")

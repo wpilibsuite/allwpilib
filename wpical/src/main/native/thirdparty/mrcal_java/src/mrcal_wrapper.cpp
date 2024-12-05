@@ -15,7 +15,7 @@
 
 #include "mrcal_wrapper.h"
 
-#include <malloc.h>
+
 #include <stdint.h>
 
 #include <algorithm>
