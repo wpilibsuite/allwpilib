@@ -20,7 +20,6 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import org.junit.jupiter.api.Test;
 
-
 @SuppressWarnings("checkstyle:LineLength") // Source code templates exceed the line length limit
 class AnnotationProcessorTest {
   @Test
@@ -972,37 +971,41 @@ class AnnotationProcessorTest {
 
     assertLoggerGenerates(source, expectedGeneratedSource);
   }
-  
+
   @Test
-  void logAnnotationArrays() {
+  void customLoggableArrays() {
     String source =
         """
       package edu.wpi.first.epilogue;
       import java.util.List;
- 
+
+      @Logged
       class Example {
-        @Logged SubLoggable[] x;
+        final SubLoggable[] x = new SubLoggable[] {}; // logged
+        SubLoggable[] y; // not logged; not marked final
+        final List<SubLoggable> z = List.of(); // not logged; lists cannot be logged
       }
-  
+
+      @Logged
       class SubLoggable {
-        @Logged double y;
+        double y;
       }
     """;
-    
+
     String expectedGeneratedSource =
         """
       package edu.wpi.first.epilogue;
-      
+
       import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.EpilogueBackend;
-      
+
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
           super(Example.class);
         }
-      
+
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
@@ -1013,7 +1016,7 @@ class AnnotationProcessorTest {
         }
       }
       """;
-    
+
     assertLoggerGenerates(source, expectedGeneratedSource);
   }
 

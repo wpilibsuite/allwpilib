@@ -4,12 +4,14 @@
 
 package edu.wpi.first.epilogue.processor;
 
+import java.util.Collection;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
-import java.util.Collection;
+import javax.tools.Diagnostic;
 
 /**
  * Arrays of bytes, ints, flats, doubles, booleans, Strings, and struct-serializable objects can be
@@ -20,7 +22,8 @@ public class ArrayHandler extends ElementHandler {
   private final LoggableHandler m_loggableHandler;
   private final TypeMirror m_javaLangString;
 
-  protected ArrayHandler(ProcessingEnvironment processingEnv, Collection<? extends Element> loggedTypes) {
+  protected ArrayHandler(
+      ProcessingEnvironment processingEnv, Collection<? extends Element> loggedTypes) {
     super(processingEnv);
 
     // use a struct handler for managing struct arrays
@@ -32,7 +35,8 @@ public class ArrayHandler extends ElementHandler {
   @Override
   public boolean isLoggable(Element element) {
     return dataType(element) instanceof ArrayType arr
-        && isLoggableComponentType(arr.getComponentType(), false);
+        && (isLoggableComponentType(arr.getComponentType())
+            || isCustomLoggableArray(arr.getComponentType(), element));
   }
 
   /**
@@ -41,7 +45,7 @@ public class ArrayHandler extends ElementHandler {
    * @param type the data type to check
    * @return true if an array like {@code type[]} can be logged, false otherwise
    */
-  public boolean isLoggableComponentType(TypeMirror type, boolean excludeCustomLogged) {
+  public boolean isLoggableComponentType(TypeMirror type) {
     if (type instanceof PrimitiveType primitive) {
       return switch (primitive.getKind()) {
         case BYTE, INT, LONG, FLOAT, DOUBLE, BOOLEAN -> true;
@@ -50,8 +54,31 @@ public class ArrayHandler extends ElementHandler {
     }
 
     return m_structHandler.isLoggableType(type)
-        || m_processingEnv.getTypeUtils().isAssignable(type, m_javaLangString)
-        || (!excludeCustomLogged && m_loggableHandler.isLoggableType(type));
+        || m_processingEnv.getTypeUtils().isAssignable(type, m_javaLangString);
+  }
+
+  /**
+   * Checks to see if an array has a type that either contains a @Logged annotation or has a custom
+   * logger. Will fail if the array is not final.
+   *
+   * @param componentType The component type of the array
+   * @param arrayElement The element of the array
+   * @return Whether the array
+   */
+  private boolean isCustomLoggableArray(TypeMirror componentType, Element arrayElement) {
+    if (arrayElement.getModifiers().contains(Modifier.FINAL)) {
+      return m_loggableHandler.isLoggableType(componentType);
+    } else {
+      m_processingEnv
+          .getMessager()
+          .printMessage(
+              Diagnostic.Kind.NOTE,
+              "[EPILOGUE] Excluded from logs because array "
+                  + arrayElement
+                  + " isn't marked as final(or is returned from a method).",
+              arrayElement);
+      return false;
+    }
   }
 
   @Override
@@ -72,15 +99,16 @@ public class ArrayHandler extends ElementHandler {
           + ")";
     } else if (m_loggableHandler.isLoggableType(componentType)) {
       var elementAccess = elementAccess(element);
-      var logInvocation = m_loggableHandler.addLogPathSuffix(
-          m_loggableHandler.logInvocation(element, componentType, elementAccess + "[i]"),
-          "\"/\" + i"
-      );
+      var logInvocation =
+          m_loggableHandler.addLogPathSuffix(
+              m_loggableHandler.logInvocation(element, componentType, elementAccess + "[i]"),
+              "\"/\" + i");
       return """
           for (int i = 0; i < %s.length; i++) {
             %s;
           }
-        """.formatted(elementAccess, logInvocation);
+        """
+          .formatted(elementAccess, logInvocation);
     } else {
       // Primitive or string array
       return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";

@@ -4,11 +4,11 @@
 
 package edu.wpi.first.epilogue.processor;
 
+import java.util.Collection;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import java.util.Collection;
 
 /**
  * Collections of strings and structs are loggable. Collections of boxed primitive types are not.
@@ -18,7 +18,8 @@ public class CollectionHandler extends ElementHandler {
   private final TypeMirror m_collectionType;
   private final StructHandler m_structHandler;
 
-  protected CollectionHandler(ProcessingEnvironment processingEnv, Collection<? extends Element> loggedTypes) {
+  protected CollectionHandler(
+      ProcessingEnvironment processingEnv, Collection<? extends Element> loggedTypes) {
     super(processingEnv);
     m_arrayHandler = new ArrayHandler(processingEnv, loggedTypes);
     m_collectionType =
@@ -35,7 +36,7 @@ public class CollectionHandler extends ElementHandler {
             .isAssignable(dataType, m_processingEnv.getTypeUtils().erasure(m_collectionType))
         && dataType instanceof DeclaredType decl
         && decl.getTypeArguments().size() == 1
-        && m_arrayHandler.isLoggableComponentType(decl.getTypeArguments().get(0), true);
+        && m_arrayHandler.isLoggableComponentType(decl.getTypeArguments().get(0));
   }
 
   @Override
