@@ -15,7 +15,7 @@ nativeUtils {
         configureDependencies {
             opencvYear = "frc2025"
             niLibVersion = "2025.0.0"
-            opencvVersion = "4.8.0-2"
+            opencvVersion = "4.10.0-2"
         }
     }
 }
