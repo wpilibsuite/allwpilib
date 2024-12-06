@@ -19,32 +19,10 @@ import java.util.Locale;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.notification.RunListener;
+
 
 @SuppressWarnings("checkstyle:LineLength") // Source code templates exceed the line length limit
 class AnnotationProcessorTest {
-  @Test
-  void pls() {
-    String source =
-        """
-      package edu.wpi.first.epilogue;
-
- 
-      class Example {
-        @Logged double x;
-      }
-  
-      class SubLoggable {
-        @Logged double y;
-      }
-    """;
-    
-    String expectedGeneratedSource = "";
-    
-    assertLoggerGenerates(source, expectedGeneratedSource);
-  }
-  
-  
   @Test
   void simple() {
     String source =
@@ -992,6 +970,50 @@ class AnnotationProcessorTest {
       }
       """;
 
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+  
+  @Test
+  void logAnnotationArrays() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+      import java.util.List;
+ 
+      class Example {
+        @Logged SubLoggable[] x;
+      }
+  
+      class SubLoggable {
+        @Logged double y;
+      }
+    """;
+    
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+      
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+      
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              for (int i = 0; i < object.x.length; i++) {
+                Epilogue.subLoggableLogger.tryUpdate(backend.getNested("x" + "/" + i), object.x[i], Epilogue.getConfig().errorHandler);
+              };
+          }
+        }
+      }
+      """;
+    
     assertLoggerGenerates(source, expectedGeneratedSource);
   }
 

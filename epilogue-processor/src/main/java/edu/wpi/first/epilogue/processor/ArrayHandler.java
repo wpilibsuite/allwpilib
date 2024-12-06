@@ -32,7 +32,7 @@ public class ArrayHandler extends ElementHandler {
   @Override
   public boolean isLoggable(Element element) {
     return dataType(element) instanceof ArrayType arr
-        && isLoggableComponentType(arr.getComponentType());
+        && isLoggableComponentType(arr.getComponentType(), false);
   }
 
   /**
@@ -41,7 +41,7 @@ public class ArrayHandler extends ElementHandler {
    * @param type the data type to check
    * @return true if an array like {@code type[]} can be logged, false otherwise
    */
-  public boolean isLoggableComponentType(TypeMirror type) {
+  public boolean isLoggableComponentType(TypeMirror type, boolean excludeCustomLogged) {
     if (type instanceof PrimitiveType primitive) {
       return switch (primitive.getKind()) {
         case BYTE, INT, LONG, FLOAT, DOUBLE, BOOLEAN -> true;
@@ -51,7 +51,7 @@ public class ArrayHandler extends ElementHandler {
 
     return m_structHandler.isLoggableType(type)
         || m_processingEnv.getTypeUtils().isAssignable(type, m_javaLangString)
-        || m_loggableHandler.isLoggableType(type);
+        || (!excludeCustomLogged && m_loggableHandler.isLoggableType(type));
   }
 
   @Override
@@ -71,15 +71,16 @@ public class ArrayHandler extends ElementHandler {
           + m_structHandler.structAccess(componentType)
           + ")";
     } else if (m_loggableHandler.isLoggableType(componentType)) {
-      var loggedName = loggedName(element);
       var elementAccess = elementAccess(element);
+      var logInvocation = m_loggableHandler.addLogPathSuffix(
+          m_loggableHandler.logInvocation(element, componentType, elementAccess + "[i]"),
+          "\"/\" + i"
+      );
       return """
-          int listCounterOf%s = 0;
-          for (var value: %s) {
- 
-            listCounterOf%s++;
+          for (int i = 0; i < %s.length; i++) {
+            %s;
           }
-        """.formatted(loggedName, elementAccess, loggedName, loggedName, loggedName);
+        """.formatted(elementAccess, logInvocation);
     } else {
       // Primitive or string array
       return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";

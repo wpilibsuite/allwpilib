@@ -35,7 +35,7 @@ public class CollectionHandler extends ElementHandler {
             .isAssignable(dataType, m_processingEnv.getTypeUtils().erasure(m_collectionType))
         && dataType instanceof DeclaredType decl
         && decl.getTypeArguments().size() == 1
-        && m_arrayHandler.isLoggableComponentType(decl.getTypeArguments().get(0));
+        && m_arrayHandler.isLoggableComponentType(decl.getTypeArguments().get(0), true);
   }
 
   @Override
