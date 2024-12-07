@@ -63,17 +63,6 @@ typedef struct _wpi_proto_ProtobufMecanumDriveKinematics {
     pb_callback_t rear_right;
 } wpi_proto_ProtobufMecanumDriveKinematics;
 
-typedef struct _wpi_proto_ProtobufMecanumDriveMotorVoltages {
-    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
-    static std::string_view msg_name(void) noexcept;
-    static pb_filedesc_t file_descriptor(void) noexcept;
-
-    double front_left;
-    double front_right;
-    double rear_left;
-    double rear_right;
-} wpi_proto_ProtobufMecanumDriveMotorVoltages;
-
 typedef struct _wpi_proto_ProtobufMecanumDriveWheelPositions {
     static const pb_msgdesc_t* msg_descriptor(void) noexcept;
     static std::string_view msg_name(void) noexcept;
@@ -129,7 +118,6 @@ typedef struct _wpi_proto_ProtobufSwerveModuleState {
 #define wpi_proto_ProtobufDifferentialDriveWheelSpeeds_init_default {0, 0}
 #define wpi_proto_ProtobufDifferentialDriveWheelPositions_init_default {0, 0}
 #define wpi_proto_ProtobufMecanumDriveKinematics_init_default {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
-#define wpi_proto_ProtobufMecanumDriveMotorVoltages_init_default {0, 0, 0, 0}
 #define wpi_proto_ProtobufMecanumDriveWheelPositions_init_default {0, 0, 0, 0}
 #define wpi_proto_ProtobufMecanumDriveWheelSpeeds_init_default {0, 0, 0, 0}
 #define wpi_proto_ProtobufSwerveDriveKinematics_init_default {{{NULL}, NULL}}
@@ -140,7 +128,6 @@ typedef struct _wpi_proto_ProtobufSwerveModuleState {
 #define wpi_proto_ProtobufDifferentialDriveWheelSpeeds_init_zero {0, 0}
 #define wpi_proto_ProtobufDifferentialDriveWheelPositions_init_zero {0, 0}
 #define wpi_proto_ProtobufMecanumDriveKinematics_init_zero {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
-#define wpi_proto_ProtobufMecanumDriveMotorVoltages_init_zero {0, 0, 0, 0}
 #define wpi_proto_ProtobufMecanumDriveWheelPositions_init_zero {0, 0, 0, 0}
 #define wpi_proto_ProtobufMecanumDriveWheelSpeeds_init_zero {0, 0, 0, 0}
 #define wpi_proto_ProtobufSwerveDriveKinematics_init_zero {{{NULL}, NULL}}
@@ -160,10 +147,6 @@ typedef struct _wpi_proto_ProtobufSwerveModuleState {
 #define wpi_proto_ProtobufMecanumDriveKinematics_front_right_tag 2
 #define wpi_proto_ProtobufMecanumDriveKinematics_rear_left_tag 3
 #define wpi_proto_ProtobufMecanumDriveKinematics_rear_right_tag 4
-#define wpi_proto_ProtobufMecanumDriveMotorVoltages_front_left_tag 1
-#define wpi_proto_ProtobufMecanumDriveMotorVoltages_front_right_tag 2
-#define wpi_proto_ProtobufMecanumDriveMotorVoltages_rear_left_tag 3
-#define wpi_proto_ProtobufMecanumDriveMotorVoltages_rear_right_tag 4
 #define wpi_proto_ProtobufMecanumDriveWheelPositions_front_left_tag 1
 #define wpi_proto_ProtobufMecanumDriveWheelPositions_front_right_tag 2
 #define wpi_proto_ProtobufMecanumDriveWheelPositions_rear_left_tag 3
@@ -215,14 +198,6 @@ X(a, CALLBACK, OPTIONAL, MESSAGE,  rear_right,        4)
 #define wpi_proto_ProtobufMecanumDriveKinematics_rear_left_MSGTYPE wpi_proto_ProtobufTranslation2d
 #define wpi_proto_ProtobufMecanumDriveKinematics_rear_right_MSGTYPE wpi_proto_ProtobufTranslation2d
 
-#define wpi_proto_ProtobufMecanumDriveMotorVoltages_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, DOUBLE,   front_left,        1) \
-X(a, STATIC,   SINGULAR, DOUBLE,   front_right,       2) \
-X(a, STATIC,   SINGULAR, DOUBLE,   rear_left,         3) \
-X(a, STATIC,   SINGULAR, DOUBLE,   rear_right,        4)
-#define wpi_proto_ProtobufMecanumDriveMotorVoltages_CALLBACK NULL
-#define wpi_proto_ProtobufMecanumDriveMotorVoltages_DEFAULT NULL
-
 #define wpi_proto_ProtobufMecanumDriveWheelPositions_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, DOUBLE,   front_left,        1) \
 X(a, STATIC,   SINGULAR, DOUBLE,   front_right,       2) \
@@ -264,12 +239,11 @@ X(a, CALLBACK, OPTIONAL, MESSAGE,  angle,             2)
 /* wpi_proto_ProtobufSwerveDriveKinematics_size depends on runtime parameters */
 /* wpi_proto_ProtobufSwerveModulePosition_size depends on runtime parameters */
 /* wpi_proto_ProtobufSwerveModuleState_size depends on runtime parameters */
-#define WPI_PROTO_KINEMATICS_NPB_H_MAX_SIZE      wpi_proto_ProtobufMecanumDriveMotorVoltages_size
+#define WPI_PROTO_KINEMATICS_NPB_H_MAX_SIZE      wpi_proto_ProtobufMecanumDriveWheelPositions_size
 #define wpi_proto_ProtobufChassisSpeeds_size     27
 #define wpi_proto_ProtobufDifferentialDriveKinematics_size 9
 #define wpi_proto_ProtobufDifferentialDriveWheelPositions_size 18
 #define wpi_proto_ProtobufDifferentialDriveWheelSpeeds_size 18
-#define wpi_proto_ProtobufMecanumDriveMotorVoltages_size 36
 #define wpi_proto_ProtobufMecanumDriveWheelPositions_size 36
 #define wpi_proto_ProtobufMecanumDriveWheelSpeeds_size 36
 
