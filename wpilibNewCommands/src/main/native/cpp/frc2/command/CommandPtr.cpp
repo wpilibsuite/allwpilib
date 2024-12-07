@@ -168,6 +168,16 @@ CommandPtr CommandPtr::OnlyIf(std::function<bool()> condition) && {
   return std::move(*this).Unless(std::not_fn(std::move(condition)));
 }
 
+CommandPtr CommandPtr::After(std::function<bool()> condition) && {
+  AssertValid();
+  return std::move(*this).BeforeStarting(cmd::WaitUntil(condition));
+}
+
+CommandPtr CommandPtr::AfterTime(units::second_t duration) && {
+  AssertValid();
+  return std::move(*this).BeforeStarting(cmd::Wait(duration));
+}
+
 CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {
   AssertValid();
   std::vector<std::unique_ptr<Command>> vec;
