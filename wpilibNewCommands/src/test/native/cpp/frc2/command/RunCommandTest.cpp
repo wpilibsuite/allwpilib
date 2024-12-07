@@ -4,6 +4,7 @@
 
 #include "CommandTestBase.h"
 #include "frc2/command/RunCommand.h"
+#include <frc2/command/Commands.h>
 
 using namespace frc2;
 class RunCommandTest : public CommandTestBase {};
@@ -13,9 +14,9 @@ TEST_F(RunCommandTest, RunCommandSchedule) {
 
   int counter = 0;
 
-  RunCommand command([&counter] { counter++; }, {});
+  auto command = frc2::cmd::Run([&counter] {counter++;});
 
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
   scheduler.Run();
   scheduler.Run();
   scheduler.Run();
