@@ -45,3 +45,11 @@ message ProtobufMatchInfo {
     int32 ReplayNumber = 3;
     int32 MatchType = 4;
 }
+
+message ProtobufErrorInfo {
+    bool IsError = 1;
+    sint32 ErrorCode = 2;
+    string Details = 3;
+    string Location = 4;
+    string CallStack = 5;
+}

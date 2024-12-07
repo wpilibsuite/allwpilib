@@ -178,6 +178,12 @@ struct MatchInfo {
                               EventName.size()};
   }
 
+  bool operator==(const MatchInfo& Other) const {
+    return MatchNumber == Other.MatchNumber &&
+           ReplayNumber == Other.ReplayNumber && Type == Other.Type &&
+           EventName == Other.EventName;
+  }
+
  private:
   std::string EventName;
 };
@@ -303,6 +309,91 @@ struct VersionInfo {
  private:
   std::string Name;
   std::string Version;
+};
+
+struct ErrorInfo {
+  bool IsError{false};
+  int32_t ErrorCode{0};
+
+  void SetDetails(std::string_view NewDetails) {
+    if (NewDetails.size() > MRC_MAX_ERROR_INFO_STR_LEN) {
+      NewDetails = NewDetails.substr(0, MRC_MAX_ERROR_INFO_STR_LEN);
+    }
+    Details = NewDetails;
+  }
+
+  void MoveDetails(std::string&& NewDetails) {
+    Details = std::move(NewDetails);
+    if (Details.size() > MRC_MAX_ERROR_INFO_STR_LEN) {
+      Details.resize(MRC_MAX_ERROR_INFO_STR_LEN);
+    }
+  }
+
+  std::string_view GetDetails() const { return Details; }
+
+  std::span<uint8_t> WritableDetailsBuffer(size_t Len) {
+    if (Len > MRC_MAX_ERROR_INFO_STR_LEN) {
+      Len = MRC_MAX_ERROR_INFO_STR_LEN;
+    }
+    Details.resize(Len);
+    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Details.data()),
+                              Details.size()};
+  }
+
+  void SetLocation(std::string_view NewLocation) {
+    if (NewLocation.size() > MRC_MAX_ERROR_INFO_STR_LEN) {
+      NewLocation = NewLocation.substr(0, MRC_MAX_ERROR_INFO_STR_LEN);
+    }
+    Location = NewLocation;
+  }
+
+  void MoveLocation(std::string&& NewLocation) {
+    Location = std::move(NewLocation);
+    if (Location.size() > MRC_MAX_ERROR_INFO_STR_LEN) {
+      Location.resize(MRC_MAX_ERROR_INFO_STR_LEN);
+    }
+  }
+
+  std::string_view GetLocation() const { return Location; }
+
+  std::span<uint8_t> WritableLocationBuffer(size_t Len) {
+    if (Len > MRC_MAX_ERROR_INFO_STR_LEN) {
+      Len = MRC_MAX_ERROR_INFO_STR_LEN;
+    }
+    Location.resize(Len);
+    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Location.data()),
+                              Location.size()};
+  }
+
+  void SetCallStack(std::string_view NewCallStack) {
+    if (NewCallStack.size() > MRC_MAX_ERROR_INFO_STR_LEN) {
+      NewCallStack = NewCallStack.substr(0, MRC_MAX_ERROR_INFO_STR_LEN);
+    }
+    CallStack = NewCallStack;
+  }
+
+  void MoveCallStack(std::string&& NewCallStack) {
+    CallStack = std::move(NewCallStack);
+    if (CallStack.size() > MRC_MAX_ERROR_INFO_STR_LEN) {
+      CallStack.resize(MRC_MAX_ERROR_INFO_STR_LEN);
+    }
+  }
+
+  std::string_view GetCallStack() const { return CallStack; }
+
+  std::span<uint8_t> WritableCallStackBuffer(size_t Len) {
+    if (Len > MRC_MAX_ERROR_INFO_STR_LEN) {
+      Len = MRC_MAX_ERROR_INFO_STR_LEN;
+    }
+    CallStack.resize(Len);
+    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(CallStack.data()),
+                              CallStack.size()};
+  }
+
+ private:
+  std::string Details;
+  std::string Location;
+  std::string CallStack;
 };
 
 }  // namespace mrc
