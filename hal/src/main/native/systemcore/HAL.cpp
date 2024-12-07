@@ -28,6 +28,7 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "SystemServer.h"
+#include "SocketCan.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
@@ -78,6 +79,7 @@ void InitializeHAL() {
   InitializeSerialPort();
   InitializeSPI();
   InitializeThreads();
+  InitializeSocketCan();
 }
 }  // namespace init
 
@@ -336,6 +338,11 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   setlinebuf(stdout);
 
   prctl(PR_SET_PDEATHSIG, SIGTERM);
+
+  if (!hal::InitializeCanBuses()) {
+    printf("Failed to initialize can buses\n");
+    return false;
+  }
 
   hal::InitializeSystemServer();
 

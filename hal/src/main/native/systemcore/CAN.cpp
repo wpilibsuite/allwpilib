@@ -6,6 +6,9 @@
 
 #include "hal/Errors.h"
 
+#include <linux/can.h>
+#include <linux/can/raw.h>
+
 namespace hal::init {
 void InitializeCAN() {}
 }  // namespace hal::init

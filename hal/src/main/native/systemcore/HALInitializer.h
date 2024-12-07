@@ -52,4 +52,5 @@ extern void InitializeRelay();
 extern void InitializeSerialPort();
 extern void InitializeSPI();
 extern void InitializeThreads();
+extern void InitializeSocketCan();
 }  // namespace hal::init
