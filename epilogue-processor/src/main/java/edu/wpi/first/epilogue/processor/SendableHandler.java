@@ -35,7 +35,9 @@ public class SendableHandler extends ElementHandler {
 
     // Accept any sendable type. However, the log invocation will return null
     // for sendable types that should not be logged (commands, subsystems)
-    return m_sendableType.map(t -> m_processingEnv.getTypeUtils().isAssignable(dataType, t)).orElse(false);
+    return m_sendableType
+        .map(t -> m_processingEnv.getTypeUtils().isAssignable(dataType, t))
+        .orElse(false);
   }
 
   @Override
@@ -47,10 +49,14 @@ public class SendableHandler extends ElementHandler {
     // but their sendable implementations do not include helpful information.
     // Users are free to provide custom logging implementations for commands, and tag their
     // subsystems with @Logged to log their contents automatically
-    if (m_commandType.map(t -> m_processingEnv.getTypeUtils().isAssignable(dataType, t)).orElse(false)) {
+    if (m_commandType
+        .map(t -> m_processingEnv.getTypeUtils().isAssignable(dataType, t))
+        .orElse(false)) {
       return null;
     }
-    if (m_subsystemType.map(t -> m_processingEnv.getTypeUtils().isAssignable(dataType, t)).orElse(false)) {
+    if (m_subsystemType
+        .map(t -> m_processingEnv.getTypeUtils().isAssignable(dataType, t))
+        .orElse(false)) {
       return null;
     }
 
