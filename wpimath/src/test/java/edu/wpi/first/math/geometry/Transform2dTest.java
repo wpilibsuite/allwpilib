@@ -23,6 +23,14 @@ class Transform2dTest {
   }
 
   @Test
+  void testToMatrix() {
+    var before = new Transform2d(1.0, 2.0, Rotation2d.fromDegrees(20.0));
+    var after = new Transform2d(before.toMatrix());
+
+    assertEquals(before, after);
+  }
+
+  @Test
   void testInverse() {
     var initial = new Pose2d(new Translation2d(1.0, 2.0), Rotation2d.fromDegrees(45.0));
     var transform = new Transform2d(new Translation2d(5.0, 0.0), Rotation2d.fromDegrees(5.0));
