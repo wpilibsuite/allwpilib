@@ -256,11 +256,10 @@ class CommandDecoratorTest extends CommandTestBase {
                 return true;
               });
       Command other =
-          new RunCommand(
-              () ->
-                  assertAll(
-                      () -> assertTrue(dictatorHasRun.get()),
-                      () -> assertTrue(dictatorWasPolled.get())));
+          Commands.run(() ->
+          assertAll(
+              () -> assertTrue(dictatorHasRun.get()),
+              () -> assertTrue(dictatorWasPolled.get())));
 
       Command group = dictator.deadlineFor(other);
 
@@ -309,10 +308,9 @@ class CommandDecoratorTest extends CommandTestBase {
                 return true;
               });
       Command command2 =
-          new RunCommand(
-              () ->
-                  assertAll(
-                      () -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get())));
+          Commands.run(() ->
+          assertAll(
+              () -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get())));
 
       Command group = command1.alongWith(command2);
 
@@ -354,11 +352,10 @@ class CommandDecoratorTest extends CommandTestBase {
                 return true;
               });
       Command command2 =
-          new RunCommand(
-              () -> {
-                assertTrue(firstHasRun.get());
-                assertTrue(firstWasPolled.get());
-              });
+          Commands.run(() -> {
+            assertTrue(firstHasRun.get());
+            assertTrue(firstWasPolled.get());
+          });
 
       Command group = command1.raceWith(command2);
 
