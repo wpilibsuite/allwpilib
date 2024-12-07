@@ -143,7 +143,7 @@ TEST_F(SwerveDriveKinematicsTest, ResetWheelAngle) {
   EXPECT_NEAR(flMod.angle.Degrees().value(), 0.0, kEpsilon);
   EXPECT_NEAR(frMod.angle.Degrees().value(), 90.0, kEpsilon);
   EXPECT_NEAR(blMod.angle.Degrees().value(), 180.0, kEpsilon);
-  EXPECT_NEAR(brMod.angle.Degrees().value(), 270.0, kEpsilon);
+  EXPECT_NEAR(brMod.angle.Degrees().value(), -90.0, kEpsilon);
 }
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardKinematics) {

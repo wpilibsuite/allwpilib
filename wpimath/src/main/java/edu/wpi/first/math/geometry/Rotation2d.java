@@ -27,10 +27,6 @@ import java.util.Objects;
 
 /**
  * A rotation in a 2D coordinate frame represented by a point on the unit circle (cosine and sine).
- *
- * <p>The angle is continuous, that is if a Rotation2d is constructed with 361 degrees, it will
- * return 361 degrees. This allows algorithms that wouldn't want to see a discontinuity in the
- * rotations as it sweeps past from 360 to 0 on the second time around.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
@@ -85,13 +81,11 @@ public class Rotation2d
    */
   public static final Rotation2d k180deg = kPi;
 
-  private final double m_value;
   private final double m_cos;
   private final double m_sin;
 
   /** Constructs a Rotation2d with a default angle of 0 degrees. */
   public Rotation2d() {
-    m_value = 0.0;
     m_cos = 1.0;
     m_sin = 0.0;
   }
@@ -103,7 +97,6 @@ public class Rotation2d
    */
   @JsonCreator
   public Rotation2d(@JsonProperty(required = true, value = "radians") double value) {
-    m_value = value;
     m_cos = Math.cos(value);
     m_sin = Math.sin(value);
   }
@@ -125,7 +118,6 @@ public class Rotation2d
       MathSharedStore.reportError(
           "x and y components of Rotation2d are zero\n", Thread.currentThread().getStackTrace());
     }
-    m_value = Math.atan2(m_sin, m_cos);
   }
 
   /**
@@ -233,7 +225,7 @@ public class Rotation2d
    * @return The inverse of the current rotation.
    */
   public Rotation2d unaryMinus() {
-    return new Rotation2d(-m_value);
+    return new Rotation2d(m_cos, -m_sin);
   }
 
   /**
@@ -243,7 +235,7 @@ public class Rotation2d
    * @return The new scaled Rotation2d.
    */
   public Rotation2d times(double scalar) {
-    return new Rotation2d(m_value * scalar);
+    return new Rotation2d(getRadians() * scalar);
   }
 
   /**
@@ -296,25 +288,22 @@ public class Rotation2d
   }
 
   /**
-   * Returns the radian value of the Rotation2d.
+   * Returns the radian value of the Rotation2d constrained within [-π, π].
    *
-   * @return The radian value of the Rotation2d.
-   * @see edu.wpi.first.math.MathUtil#angleModulus(double) to constrain the angle within (-π, π]
+   * @return The radian value of the Rotation2d constrained within [-π, π].
    */
   @JsonProperty
   public double getRadians() {
-    return m_value;
+    return Math.atan2(m_sin, m_cos);
   }
 
   /**
-   * Returns the degree value of the Rotation2d.
+   * Returns the degree value of the Rotation2d constrained within [-180, 180].
    *
-   * @return The degree value of the Rotation2d.
-   * @see edu.wpi.first.math.MathUtil#inputModulus(double, double, double) to constrain the angle
-   *     within (-180, 180]
+   * @return The degree value of the Rotation2d constrained within [-180, 180].
    */
   public double getDegrees() {
-    return Math.toDegrees(m_value);
+    return Math.toDegrees(getRadians());
   }
 
   /**
@@ -323,7 +312,7 @@ public class Rotation2d
    * @return The number of rotations of the Rotation2d.
    */
   public double getRotations() {
-    return Units.radiansToRotations(m_value);
+    return Units.radiansToRotations(getRadians());
   }
 
   /**
@@ -355,7 +344,7 @@ public class Rotation2d
 
   @Override
   public String toString() {
-    return String.format("Rotation2d(Rads: %.2f, Deg: %.2f)", m_value, Math.toDegrees(m_value));
+    return String.format("Rotation2d(Rads: %.2f, Deg: %.2f)", getRadians(), getDegrees());
   }
 
   /**
@@ -372,7 +361,7 @@ public class Rotation2d
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_value);
+    return Objects.hash(getRadians());
   }
 
   @Override
