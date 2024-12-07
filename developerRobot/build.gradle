@@ -72,9 +72,9 @@ deploy {
             maxChannels = 4
             locations {
                 ssh(SshDeployLocation) {
-                    address = "robot.local"
+                    address = "limelight.local"
                     user = 'systemcore'
-                    password = 'systemcorerules2027'
+                    password = 'systemcore'
                     ipv6 = false
                 }
             }
