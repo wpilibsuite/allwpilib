@@ -4,9 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.mecanumbot;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -98,14 +95,10 @@ public class Drivetrain {
    * @param speeds The desired wheel speeds.
    */
   public void setSpeeds(MecanumDriveWheelSpeeds speeds) {
-    final double frontLeftFeedforward =
-        m_feedforward.calculate(MetersPerSecond.of(speeds.frontLeftMetersPerSecond)).in(Volts);
-    final double frontRightFeedforward =
-        m_feedforward.calculate(MetersPerSecond.of(speeds.frontRightMetersPerSecond)).in(Volts);
-    final double backLeftFeedforward =
-        m_feedforward.calculate(MetersPerSecond.of(speeds.rearLeftMetersPerSecond)).in(Volts);
-    final double backRightFeedforward =
-        m_feedforward.calculate(MetersPerSecond.of(speeds.rearRightMetersPerSecond)).in(Volts);
+    final double frontLeftFeedforward = m_feedforward.calculate(speeds.frontLeftMetersPerSecond);
+    final double frontRightFeedforward = m_feedforward.calculate(speeds.frontRightMetersPerSecond);
+    final double backLeftFeedforward = m_feedforward.calculate(speeds.rearLeftMetersPerSecond);
+    final double backRightFeedforward = m_feedforward.calculate(speeds.rearRightMetersPerSecond);
 
     final double frontLeftOutput =
         m_frontLeftPIDController.calculate(

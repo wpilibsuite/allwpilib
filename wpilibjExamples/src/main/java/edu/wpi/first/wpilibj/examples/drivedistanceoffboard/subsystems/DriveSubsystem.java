@@ -4,9 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.drivedistanceoffboard.subsystems;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -99,18 +96,12 @@ public class DriveSubsystem extends SubsystemBase {
     m_leftLeader.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition,
         currentLeft.position,
-        m_feedforward
-                .calculate(
-                    MetersPerSecond.of(currentLeft.velocity), MetersPerSecond.of(nextLeft.velocity))
-                .in(Volts)
+        m_feedforward.calculateWithVelocities(currentLeft.velocity, nextLeft.velocity)
             / RobotController.getBatteryVoltage());
     m_rightLeader.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition,
         currentRight.position,
-        m_feedforward
-                .calculate(
-                    MetersPerSecond.of(currentLeft.velocity), MetersPerSecond.of(nextLeft.velocity))
-                .in(Volts)
+        m_feedforward.calculateWithVelocities(currentLeft.velocity, nextLeft.velocity)
             / RobotController.getBatteryVoltage());
   }
 

@@ -163,7 +163,7 @@ public class LTVDifferentialDriveController {
       var discA = discABPair.getFirst();
       var discB = discABPair.getSecond();
 
-      var S = DARE.dareDetail(discA, discB, Q, R);
+      var S = DARE.dareNoPrecond(discA, discB, Q, R);
 
       // K = (BᵀSB + R)⁻¹BᵀSA
       m_table.put(

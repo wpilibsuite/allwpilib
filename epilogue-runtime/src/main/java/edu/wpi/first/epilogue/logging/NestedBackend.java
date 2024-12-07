@@ -9,21 +9,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A data logger that logs to an underlying logger, prepending all logged data with a specific
- * prefix. Useful for logging nested data structures.
+ * A backend that logs to an underlying backend, prepending all logged data with a specific prefix.
+ * Useful for logging nested data structures.
  */
-public class SubLogger implements DataLogger {
+public class NestedBackend implements EpilogueBackend {
   private final String m_prefix;
-  private final DataLogger m_impl;
-  private final Map<String, SubLogger> m_subLoggers = new HashMap<>();
+  private final EpilogueBackend m_impl;
+  private final Map<String, NestedBackend> m_nestedBackends = new HashMap<>();
 
   /**
-   * Creates a new sublogger underneath another logger.
+   * Creates a new nested backed underneath another backend.
    *
-   * @param prefix the prefix to append to all data logged in the sublogger
-   * @param impl the data logger to log to
+   * @param prefix the prefix to append to all data logged in the nested backend
+   * @param impl the backend to log to
    */
-  public SubLogger(String prefix, DataLogger impl) {
+  public NestedBackend(String prefix, EpilogueBackend impl) {
     // Add a trailing slash if not already present
     if (prefix.endsWith("/")) {
       this.m_prefix = prefix;
@@ -34,8 +34,8 @@ public class SubLogger implements DataLogger {
   }
 
   @Override
-  public DataLogger getSubLogger(String path) {
-    return m_subLoggers.computeIfAbsent(path, k -> new SubLogger(k, this));
+  public EpilogueBackend getNested(String path) {
+    return m_nestedBackends.computeIfAbsent(path, k -> new NestedBackend(k, this));
   }
 
   @Override

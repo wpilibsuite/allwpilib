@@ -168,6 +168,15 @@ namespace HALUsageReporting {
     kResourceType_RevSparkFlexCAN = 114,
     kResourceType_RevSparkFlexPWM = 115,
     kResourceType_BangBangController = 116,
+    kResourceType_DataLogManager = 117,
+    kResourceType_LoggingFramework = 118,
+    kResourceType_ChoreoTrajectory = 119,
+    kResourceType_ChoreoTrigger = 120,
+    kResourceType_PathWeaverTrajectory = 121,
+    kResourceType_Koors40 = 122,
+    kResourceType_ThriftyNova = 123,
+    kResourceType_PWFSEN36005 = 124,
+    kResourceType_LaserShark = 125,
   };
   enum tInstances : int32_t {
     kLanguage_LabVIEW = 1,
@@ -240,6 +249,16 @@ namespace HALUsageReporting {
     kDashboard_AdvantageScope = 7,
     kDashboard_QFRCDashboard = 8,
     kDashboard_FRCWebComponents = 9,
+    kDataLogLocation_Onboard = 1,
+    kDataLogLocation_USB = 2,
+    kLoggingFramework_Other = 1,
+    kLoggingFramework_Epilogue = 2,
+    kLoggingFramework_Monologue = 3,
+    kLoggingFramework_AdvantageKit = 4,
+    kLoggingFramework_DogLog = 5,
+    kPDP_CTRE = 1,
+    kPDP_REV = 2,
+    kPDP_Unknown = 3,
   };
 }
 #endif

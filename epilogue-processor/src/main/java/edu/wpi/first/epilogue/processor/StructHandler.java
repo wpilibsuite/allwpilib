@@ -39,7 +39,7 @@ public class StructHandler extends ElementHandler {
 
   @Override
   public String logInvocation(Element element) {
-    return "dataLogger.log(\""
+    return "backend.log(\""
         + loggedName(element)
         + "\", "
         + elementAccess(element)
