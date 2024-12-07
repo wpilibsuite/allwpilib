@@ -6,6 +6,7 @@
 
 #include "CommandTestBase.h"
 #include "frc2/command/PrintCommand.h"
+#include <frc2/command/Commands.h>
 
 using namespace frc2;
 class PrintCommandTest : public CommandTestBase {};
@@ -13,15 +14,15 @@ class PrintCommandTest : public CommandTestBase {};
 TEST_F(PrintCommandTest, PrintCommandSchedule) {
   CommandScheduler scheduler = GetScheduler();
 
-  PrintCommand command("Test!");
+  auto command = frc2::cmd::Print("Test!");
 
   testing::internal::CaptureStdout();
 
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
   scheduler.Run();
 
   EXPECT_TRUE(std::regex_search(testing::internal::GetCapturedStdout(),
                                 std::regex("Test!")));
 
-  EXPECT_FALSE(scheduler.IsScheduled(&command));
+  EXPECT_FALSE(scheduler.IsScheduled(command));
 }
