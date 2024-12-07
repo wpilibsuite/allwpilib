@@ -90,7 +90,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceInterrupt) {
 TEST_F(ParallelRaceGroupTest, ParallelRaceNotScheduledCancel) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto group = frc2::cmd::Race(frc2::cmd::None(), frc2::cmd::None());
+  auto group = cmd::Race(cmd::None(), cmd::None());
 
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(group));
 }
@@ -119,11 +119,11 @@ TEST_F(ParallelRaceGroupTest, RaceGroupRequirement) {
   TestSubsystem requirement3;
   TestSubsystem requirement4;
 
-  auto command1 = frc2::cmd::RunOnce([] {}, {&requirement1, &requirement2});
-  auto command2 = frc2::cmd::RunOnce([] {}, {&requirement3});
-  auto command3 = frc2::cmd::RunOnce([] {}, {&requirement3, &requirement4});
+  auto command1 = cmd::RunOnce([] {}, {&requirement1, &requirement2});
+  auto command2 = cmd::RunOnce([] {}, {&requirement3});
+  auto command3 = cmd::RunOnce([] {}, {&requirement3, &requirement4});
 
-  auto group = frc2::cmd::Race(std::move(command1), std::move(command2));
+  auto group = cmd::Race(std::move(command1), std::move(command2));
 
   scheduler.Schedule(group);
   scheduler.Schedule(command3);
@@ -139,12 +139,12 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnce) {
   bool finished2 = false;
   bool finished3 = false;
 
-  auto command1 = frc2::cmd::WaitUntil([&finished1] {return finished1;});
-  auto command2 = frc2::cmd::WaitUntil([&finished2] {return finished2;});
-  auto command3 = frc2::cmd::WaitUntil([&finished3] {return finished3;});
+  auto command1 = cmd::WaitUntil([&finished1] {return finished1;});
+  auto command2 = cmd::WaitUntil([&finished2] {return finished2;});
+  auto command3 = cmd::WaitUntil([&finished3] {return finished3;});
 
-  auto group1 = frc2::cmd::Sequence(std::move(command1), std::move(command2));
-  auto group2 = frc2::cmd::Race(std::move(group1), std::move(command3));
+  auto group1 = cmd::Sequence(std::move(command1), std::move(command2));
+  auto group2 = cmd::Race(std::move(group1), std::move(command3));
 
   scheduler.Schedule(group2);
   scheduler.Run();

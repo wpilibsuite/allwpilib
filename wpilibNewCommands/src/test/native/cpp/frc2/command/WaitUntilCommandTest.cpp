@@ -14,7 +14,7 @@ TEST_F(WaitUntilCommandTest, WaitUntilCommandSchedule) {
 
   bool finished = false;
 
-  auto command = frc2::cmd::WaitUntil([&finished] {return finished;});
+  auto command = cmd::WaitUntil([&finished] {return finished;});
 
   scheduler.Schedule(command);
   scheduler.Run();

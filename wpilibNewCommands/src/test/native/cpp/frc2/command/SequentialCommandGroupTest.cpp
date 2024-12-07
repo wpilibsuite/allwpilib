@@ -105,9 +105,9 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupCopy) {
 
   bool finished = false;
 
-  auto command = frc2::cmd::WaitUntil([&finished] { return finished; });
+  auto command = cmd::WaitUntil([&finished] { return finished; });
 
-  auto group = frc2::cmd::Sequence(std::move(command));
+  auto group = cmd::Sequence(std::move(command));
   scheduler.Schedule(group);
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(group));
@@ -124,13 +124,13 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupRequirement) {
   TestSubsystem requirement3;
   TestSubsystem requirement4;
 
-  auto command1 = frc2::cmd::RunOnce([] {}, {&requirement1, &requirement2});
+  auto command1 = cmd::RunOnce([] {}, {&requirement1, &requirement2});
   // InstantCommand command1([] {}, {&requirement1, &requirement2});
-  auto command2 = frc2::cmd::RunOnce([] {}, {&requirement3});
-  auto command3 = frc2::cmd::RunOnce([] {}, {&requirement3, &requirement4});
+  auto command2 = cmd::RunOnce([] {}, {&requirement3});
+  auto command3 = cmd::RunOnce([] {}, {&requirement3, &requirement4});
 
   // SequentialCommandGroup group(std::move(command1), std::move(command2));
-  auto group = frc2::cmd::Sequence(
+  auto group = cmd::Sequence(
       make_vector<CommandPtr>(std::move(command1), std::move(command2)));
 
   scheduler.Schedule(group);

@@ -14,7 +14,7 @@ TEST_F(StartEndCommandTest, StartEndCommandSchedule) {
 
   int counter = 0;
 
-  auto command = frc2::cmd::StartEnd([&counter] {counter++;}, [&counter] {counter++;});
+  auto command = cmd::StartEnd([&counter] {counter++;}, [&counter] {counter++;});
 
   scheduler.Schedule(command);
   scheduler.Run();

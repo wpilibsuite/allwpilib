@@ -56,7 +56,7 @@ TEST_P(SchedulingRecursionTest, CancelFromInitialize) {
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
                                     GetParam()};
-  auto other = frc2::cmd::Run([&hasOtherRun] {hasOtherRun = true;}, {&requirement});
+  auto other = cmd::Run([&hasOtherRun] {hasOtherRun = true;}, {&requirement});
 
   scheduler.Schedule(&selfCancels);
   scheduler.Run();
@@ -79,7 +79,7 @@ TEST_F(SchedulingRecursionTest, CancelFromInitializeAction) {
                                 [&counter](bool) { counter++; },
                                 [] { return false; },
                                 {&requirement}};
-  auto other = frc2::cmd::Run([&hasOtherRun] {hasOtherRun = true;}, {&requirement});
+  auto other = cmd::Run([&hasOtherRun] {hasOtherRun = true;}, {&requirement});
   scheduler.OnCommandInitialize([&scheduler, &selfCancels](const Command&) {
     scheduler.Cancel(&selfCancels);
   });
@@ -102,7 +102,7 @@ TEST_P(SchedulingRecursionTest,
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
                                     GetParam()};
-  auto other = frc2::cmd::Run([&hasOtherRun] {hasOtherRun = true;}, {&requirement});
+  auto other = cmd::Run([&hasOtherRun] {hasOtherRun = true;}, {&requirement});
   scheduler.SetDefaultCommand(&requirement, std::move(other));
 
   scheduler.Schedule(&selfCancels);

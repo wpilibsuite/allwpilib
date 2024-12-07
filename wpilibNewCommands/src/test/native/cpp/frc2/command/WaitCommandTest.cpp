@@ -17,7 +17,7 @@ TEST_F(WaitCommandTest, WaitCommandSchedule) {
 
   CommandScheduler scheduler = GetScheduler();
 
-  auto command = frc2::cmd::Wait(100_ms);
+  auto command = cmd::Wait(100_ms);
 
   scheduler.Schedule(command);
   scheduler.Run();

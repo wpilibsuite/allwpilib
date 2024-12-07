@@ -14,7 +14,7 @@ class PrintCommandTest : public CommandTestBase {};
 TEST_F(PrintCommandTest, PrintCommandSchedule) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto command = frc2::cmd::Print("Test!");
+  auto command = cmd::Print("Test!");
 
   testing::internal::CaptureStdout();
 

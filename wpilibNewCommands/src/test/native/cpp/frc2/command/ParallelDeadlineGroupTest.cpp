@@ -95,7 +95,7 @@ TEST_F(ParallelDeadlineGroupTest, SequentialGroupInterrupt) {
 TEST_F(ParallelDeadlineGroupTest, DeadlineGroupNotScheduledCancel) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto group = frc2::cmd::Deadline(frc2::cmd::None(), frc2::cmd::None());
+  auto group = cmd::Deadline(cmd::None(), cmd::None());
 
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(group));
 }
@@ -105,9 +105,9 @@ TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineCopy) {
 
   bool finished = false;
 
-  auto command = frc2::cmd::WaitUntil([&finished] {return finished;});
+  auto command = cmd::WaitUntil([&finished] {return finished;});
 
-  auto group = frc2::cmd::Deadline(std::move(command));
+  auto group = cmd::Deadline(std::move(command));
   scheduler.Schedule(group);
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(group));
@@ -124,11 +124,11 @@ TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineRequirement) {
   TestSubsystem requirement3;
   TestSubsystem requirement4;
 
-  auto command1 = frc2::cmd::RunOnce([] {}, {&requirement1, &requirement2});
-  auto command2 = frc2::cmd::RunOnce([] {}, {&requirement3});
-  auto command3 = frc2::cmd::RunOnce([] {}, {&requirement3, &requirement4});
+  auto command1 = cmd::RunOnce([] {}, {&requirement1, &requirement2});
+  auto command2 = cmd::RunOnce([] {}, {&requirement3});
+  auto command3 = cmd::RunOnce([] {}, {&requirement3, &requirement4});
 
-  auto group = frc2::cmd::Deadline(std::move(command1), std::move(command2));
+  auto group = cmd::Deadline(std::move(command1), std::move(command2));
 
   scheduler.Schedule(group);
   scheduler.Schedule(command3);

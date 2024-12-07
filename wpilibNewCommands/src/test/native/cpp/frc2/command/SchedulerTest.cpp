@@ -16,7 +16,7 @@ class SchedulerTest : public CommandTestBase {};
 TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto command = frc2::cmd::None();
+  auto command = cmd::None();
 
   int counter = 0;
 
@@ -33,7 +33,7 @@ TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
 TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto command = frc2::cmd::Idle();
+  auto command = cmd::Idle();
 
   int counter = 0;
 
@@ -57,7 +57,7 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptNoCause) {
         counter++;
       });
 
-  auto command = frc2::cmd::Idle();
+  auto command = cmd::Idle();
 
   scheduler.Schedule(command);
   scheduler.Cancel(command);
@@ -143,8 +143,8 @@ TEST_F(SchedulerTest, UnregisterSubsystem) {
 TEST_F(SchedulerTest, SchedulerCancelAll) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto command1 = frc2::cmd::Idle();
-  auto command2 = frc2::cmd::Idle();
+  auto command1 = cmd::Idle();
+  auto command2 = cmd::Idle();
 
   int counter = 0;
 
@@ -167,7 +167,7 @@ TEST_F(SchedulerTest, ScheduleScheduledNoOp) {
 
   int counter = 0;
 
-  auto command = frc2::cmd::StartEnd([&counter] {counter++;}, [] {});
+  auto command = cmd::StartEnd([&counter] {counter++;}, [] {});
 
   scheduler.Schedule(command);
   scheduler.Schedule(command);

@@ -436,7 +436,7 @@ TEST_F(CommandDecoratorTest, HandleInterrupt) {
 }
 
 TEST_F(CommandDecoratorTest, WithName) {
-  auto command = frc2::cmd::None();
+  auto command = cmd::None();
   std::string name{"Named"};
   auto named = std::move(command).WithName(name);
   EXPECT_EQ(name, named.get()->GetName());
