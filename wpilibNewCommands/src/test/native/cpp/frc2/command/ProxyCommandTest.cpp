@@ -9,6 +9,7 @@
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ProxyCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
+#include <frc2/command/Commands.h>
 
 using namespace frc2;
 class ProxyCommandTest : public CommandTestBase {};
@@ -52,8 +53,8 @@ TEST_F(ProxyCommandTest, OwningCommandSchedule) {
 
   bool scheduled = false;
 
-  CommandPtr command =
-      InstantCommand([&scheduled] { scheduled = true; }).AsProxy();
+  auto command =
+      frc2::cmd::RunOnce([&scheduled] { scheduled = true; }).AsProxy();
 
   scheduler.Schedule(command);
   scheduler.Run();
@@ -66,8 +67,8 @@ TEST_F(ProxyCommandTest, OwningCommandEnd) {
 
   bool finished = false;
 
-  CommandPtr command =
-      WaitUntilCommand([&finished] { return finished; }).AsProxy();
+  auto command =
+      frc2::cmd::WaitUntil([&finished] { return finished; }).AsProxy();
 
   scheduler.Schedule(command);
   scheduler.Run();
