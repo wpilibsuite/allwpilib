@@ -8,6 +8,7 @@
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/StartEndCommand.h"
+#include <frc2/command/Commands.h>
 
 using namespace frc2;
 class SchedulerTest : public CommandTestBase {};
@@ -15,7 +16,7 @@ class SchedulerTest : public CommandTestBase {};
 TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
-  InstantCommand command;
+  auto command = frc2::cmd::None();
 
   int counter = 0;
 
@@ -23,7 +24,7 @@ TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
   scheduler.OnCommandExecute([&counter](const Command&) { counter++; });
   scheduler.OnCommandFinish([&counter](const Command&) { counter++; });
 
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
   scheduler.Run();
 
   EXPECT_EQ(counter, 3);
@@ -32,15 +33,15 @@ TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
 TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
-  RunCommand command([] {}, {});
+  auto command = frc2::cmd::Idle();
 
   int counter = 0;
 
   scheduler.OnCommandInterrupt([&counter](const Command&) { counter++; });
 
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
   scheduler.Run();
-  scheduler.Cancel(&command);
+  scheduler.Cancel(command);
 
   EXPECT_EQ(counter, 1);
 }
@@ -56,10 +57,10 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptNoCause) {
         counter++;
       });
 
-  RunCommand command([] {});
+  auto command = frc2::cmd::Idle();
 
-  scheduler.Schedule(&command);
-  scheduler.Cancel(&command);
+  scheduler.Schedule(command);
+  scheduler.Cancel(command);
 
   EXPECT_EQ(1, counter);
 }
@@ -142,8 +143,8 @@ TEST_F(SchedulerTest, UnregisterSubsystem) {
 TEST_F(SchedulerTest, SchedulerCancelAll) {
   CommandScheduler scheduler = GetScheduler();
 
-  RunCommand command([] {}, {});
-  RunCommand command2([] {}, {});
+  auto command1 = frc2::cmd::Idle();
+  auto command2 = frc2::cmd::Idle();
 
   int counter = 0;
 
@@ -153,8 +154,8 @@ TEST_F(SchedulerTest, SchedulerCancelAll) {
         EXPECT_FALSE(interruptor);
       });
 
-  scheduler.Schedule(&command);
-  scheduler.Schedule(&command2);
+  scheduler.Schedule(command1);
+  scheduler.Schedule(command2);
   scheduler.Run();
   scheduler.CancelAll();
 
@@ -166,10 +167,10 @@ TEST_F(SchedulerTest, ScheduleScheduledNoOp) {
 
   int counter = 0;
 
-  StartEndCommand command([&counter] { counter++; }, [] {});
+  auto command = frc2::cmd::StartEnd([&counter] {counter++;}, [] {});
 
-  scheduler.Schedule(&command);
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
+  scheduler.Schedule(command);
 
   EXPECT_EQ(counter, 1);
 }
