@@ -33,6 +33,22 @@ void SolenoidSim::SetOutput(bool output) {
   m_module->SetSolenoidOutput(m_channel, output);
 }
 
+bool SolenoidSim::IsOn() {
+  return m_module->GetSolenoidOutput(m_channel);
+}
+
+bool SolenoidSim::IsOff() {
+  return !m_module->GetSolenoidOutput(m_channel);
+}
+
+void SolenoidSim::SetOn() {
+  m_module->SetSolenoidOutput(m_channel, true);
+}
+
+void SolenoidSim::SetOff() {
+  m_module->SetSolenoidOutput(m_channel, false);
+}
+
 std::unique_ptr<CallbackStore> SolenoidSim::RegisterOutputCallback(
     NotifyCallback callback, bool initialNotify) {
   return m_module->RegisterSolenoidOutputCallback(m_channel, callback,
