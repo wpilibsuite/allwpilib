@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.geometry.AllianceSymmetry.Flippable;
+import edu.wpi.first.math.geometry.AllianceSymmetry.SymmetryStrategy;
 import edu.wpi.first.math.geometry.proto.Pose3dProto;
 import edu.wpi.first.math.geometry.struct.Pose3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
@@ -22,7 +24,8 @@ import java.util.Objects;
 /** Represents a 3D pose containing translational and rotational elements. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, StructSerializable {
+public class Pose3d
+    implements Interpolatable<Pose3d>, ProtobufSerializable, StructSerializable, Flippable<Pose3d> {
   /**
    * A preallocated Pose3d representing the origin.
    *
@@ -371,6 +374,11 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
               twist.dx * t, twist.dy * t, twist.dz * t, twist.rx * t, twist.ry * t, twist.rz * t);
       return this.exp(scaledTwist);
     }
+  }
+
+  @Override
+  public Pose3d flip(SymmetryStrategy strategy) {
+    return new Pose3d(m_translation.flip(strategy), m_rotation.flip(strategy));
   }
 
   /** Pose3d protobuf for serialization. */

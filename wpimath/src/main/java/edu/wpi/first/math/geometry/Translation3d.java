@@ -13,6 +13,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.AllianceSymmetry.Flippable;
+import edu.wpi.first.math.geometry.AllianceSymmetry.SymmetryStrategy;
 import edu.wpi.first.math.geometry.proto.Translation3dProto;
 import edu.wpi.first.math.geometry.struct.Translation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
@@ -32,7 +34,10 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Translation3d
-    implements Interpolatable<Translation3d>, ProtobufSerializable, StructSerializable {
+    implements Interpolatable<Translation3d>,
+        ProtobufSerializable,
+        StructSerializable,
+        Flippable<Translation3d> {
   /**
    * A preallocated Translation3d representing the origin.
    *
@@ -315,6 +320,11 @@ public class Translation3d
         MathUtil.interpolate(this.getX(), endValue.getX(), t),
         MathUtil.interpolate(this.getY(), endValue.getY(), t),
         MathUtil.interpolate(this.getZ(), endValue.getZ(), t));
+  }
+
+  @Override
+  public Translation3d flip(SymmetryStrategy strategy) {
+    return new Translation3d(strategy.flipX(m_x), strategy.flipY(m_y), m_z);
   }
 
   /** Translation3d protobuf for serialization. */
