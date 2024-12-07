@@ -4,6 +4,7 @@
 
 #include "CommandTestBase.h"
 #include "frc2/command/StartEndCommand.h"
+#include <frc2/command/Commands.h>
 
 using namespace frc2;
 class StartEndCommandTest : public CommandTestBase {};
@@ -13,13 +14,12 @@ TEST_F(StartEndCommandTest, StartEndCommandSchedule) {
 
   int counter = 0;
 
-  StartEndCommand command([&counter] { counter++; }, [&counter] { counter++; },
-                          {});
+  auto command = frc2::cmd::StartEnd([&counter] {counter++;}, [&counter] {counter++;});
 
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
   scheduler.Run();
   scheduler.Run();
-  scheduler.Cancel(&command);
+  scheduler.Cancel(command);
 
   EXPECT_EQ(2, counter);
 }
