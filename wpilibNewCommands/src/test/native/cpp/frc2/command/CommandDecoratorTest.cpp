@@ -436,8 +436,8 @@ TEST_F(CommandDecoratorTest, HandleInterrupt) {
 }
 
 TEST_F(CommandDecoratorTest, WithName) {
-  InstantCommand command;
+  auto command = frc2::cmd::None();
   std::string name{"Named"};
-  CommandPtr named = std::move(command).WithName(name);
+  auto named = std::move(command).WithName(name);
   EXPECT_EQ(name, named.get()->GetName());
 }
