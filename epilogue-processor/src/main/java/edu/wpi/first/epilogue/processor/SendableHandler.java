@@ -7,6 +7,7 @@ package edu.wpi.first.epilogue.processor;
 import java.util.Optional;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
 public class SendableHandler extends ElementHandler {
@@ -19,14 +20,16 @@ public class SendableHandler extends ElementHandler {
 
     m_sendableType =
         Optional.ofNullable(
-            lookupTypeElement(processingEnv, "edu.wpi.first.util.sendable.Sendable").asType());
+                lookupTypeElement(processingEnv, "edu.wpi.first.util.sendable.Sendable"))
+            .map(TypeElement::asType);
     m_commandType =
         Optional.ofNullable(
-            lookupTypeElement(processingEnv, "edu.wpi.first.wpilibj2.command.Command").asType());
+                lookupTypeElement(processingEnv, "edu.wpi.first.wpilibj2.command.Command"))
+            .map(TypeElement::asType);
     m_subsystemType =
         Optional.ofNullable(
-            lookupTypeElement(processingEnv, "edu.wpi.first.wpilibj2.command.SubsystemBase")
-                .asType());
+                lookupTypeElement(processingEnv, "edu.wpi.first.wpilibj2.command.SubsystemBase"))
+            .map(TypeElement::asType);
   }
 
   @Override
