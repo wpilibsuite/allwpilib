@@ -7,6 +7,7 @@
 #include "CommandTestBase.h"
 #include "frc2/command/WaitCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
+#include <frc2/command/Commands.h>
 
 using namespace frc2;
 class WaitCommandTest : public CommandTestBase {};
@@ -16,14 +17,14 @@ TEST_F(WaitCommandTest, WaitCommandSchedule) {
 
   CommandScheduler scheduler = GetScheduler();
 
-  WaitCommand command(100_ms);
+  auto command = frc2::cmd::Wait(100_ms);
 
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&command));
+  EXPECT_TRUE(scheduler.IsScheduled(command));
   frc::sim::StepTiming(110_ms);
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&command));
+  EXPECT_FALSE(scheduler.IsScheduled(command));
 
   frc::sim::ResumeTiming();
 }
