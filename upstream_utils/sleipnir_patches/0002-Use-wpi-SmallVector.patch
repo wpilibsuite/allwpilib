@@ -1,11 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sun, 16 Jun 2024 12:08:49 -0700
-Subject: [PATCH 4/5] Use wpi::SmallVector
+Subject: [PATCH 2/3] Use wpi::SmallVector
 
 ---
  include/.styleguide                               |  1 +
- include/sleipnir/autodiff/Expression.hpp          |  5 +++--
+ include/sleipnir/autodiff/Expression.hpp          | 13 +++++++------
  include/sleipnir/autodiff/ExpressionGraph.hpp     | 15 ++++++++-------
  include/sleipnir/autodiff/Hessian.hpp             |  4 ++--
  include/sleipnir/autodiff/Jacobian.hpp            | 10 +++++-----
@@ -19,7 +19,7 @@ Subject: [PATCH 4/5] Use wpi::SmallVector
  src/optimization/solver/InteriorPoint.cpp         |  4 ++--
  .../solver/util/FeasibilityRestoration.hpp        | 10 +++++-----
  src/optimization/solver/util/Filter.hpp           |  4 ++--
- 15 files changed, 50 insertions(+), 44 deletions(-)
+ 15 files changed, 54 insertions(+), 48 deletions(-)
 
 diff --git a/include/.styleguide b/include/.styleguide
 index 6a7f8ed28f9cb037c9746a7e0ef5e110481d9825..efa36cee1fb593ae810032340c64f1854fbbc523 100644
@@ -32,7 +32,7 @@ index 6a7f8ed28f9cb037c9746a7e0ef5e110481d9825..efa36cee1fb593ae810032340c64f185
 +  ^wpi/
  }
 diff --git a/include/sleipnir/autodiff/Expression.hpp b/include/sleipnir/autodiff/Expression.hpp
-index dff8e2a6ef24413e3e6356bf0ec57286e50654cf..bdbeb4730223f88cfdc0c424a8f7b852b34742f7 100644
+index dd53755ccae88e3975d1b5e6b13ac464bd4efcce..ef9a15bf69d8cae6b2196513b72ec4b359cc8752 100644
 --- a/include/sleipnir/autodiff/Expression.hpp
 +++ b/include/sleipnir/autodiff/Expression.hpp
 @@ -11,11 +11,12 @@
@@ -49,7 +49,33 @@ index dff8e2a6ef24413e3e6356bf0ec57286e50654cf..bdbeb4730223f88cfdc0c424a8f7b852
  
  namespace sleipnir::detail {
  
-@@ -427,7 +428,7 @@ inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
+@@ -29,8 +30,8 @@ inline constexpr bool kUsePoolAllocator = true;
+ 
+ struct SLEIPNIR_DLLEXPORT Expression;
+ 
+-inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr);
+-inline constexpr void IntrusiveSharedPtrDecRefCount(Expression* expr);
++inline void IntrusiveSharedPtrIncRefCount(Expression* expr);
++inline void IntrusiveSharedPtrDecRefCount(Expression* expr);
+ 
+ /**
+  * Typedef for intrusive shared pointer to Expression.
+@@ -418,7 +419,7 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sqrt(const ExpressionPtr& x);
+  *
+  * @param expr The shared pointer's managed object.
+  */
+-inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr) {
++inline void IntrusiveSharedPtrIncRefCount(Expression* expr) {
+   ++expr->refCount;
+ }
+ 
+@@ -427,12 +428,12 @@ inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr) {
+  *
+  * @param expr The shared pointer's managed object.
+  */
+-inline constexpr void IntrusiveSharedPtrDecRefCount(Expression* expr) {
++inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
+   // If a deeply nested tree is being deallocated all at once, calling the
    // Expression destructor when expr's refcount reaches zero can cause a stack
    // overflow. Instead, we iterate over its children to decrement their
    // refcounts and deallocate them.
