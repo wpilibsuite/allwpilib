@@ -124,17 +124,17 @@ TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineRequirement) {
   TestSubsystem requirement3;
   TestSubsystem requirement4;
 
-  InstantCommand command1([] {}, {&requirement1, &requirement2});
-  InstantCommand command2([] {}, {&requirement3});
-  InstantCommand command3([] {}, {&requirement3, &requirement4});
+  auto command1 = frc2::cmd::RunOnce([] {}, {&requirement1, &requirement2});
+  auto command2 = frc2::cmd::RunOnce([] {}, {&requirement3});
+  auto command3 = frc2::cmd::RunOnce([] {}, {&requirement3, &requirement4});
 
-  ParallelDeadlineGroup group(std::move(command1), std::move(command2));
+  auto group = frc2::cmd::Deadline(std::move(command1), std::move(command2));
 
-  scheduler.Schedule(&group);
-  scheduler.Schedule(&command3);
+  scheduler.Schedule(group);
+  scheduler.Schedule(command3);
 
-  EXPECT_TRUE(scheduler.IsScheduled(&command3));
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  EXPECT_TRUE(scheduler.IsScheduled(command3));
+  EXPECT_FALSE(scheduler.IsScheduled(group));
 }
 
 class TestableDeadlineCommand : public ParallelDeadlineGroup {
