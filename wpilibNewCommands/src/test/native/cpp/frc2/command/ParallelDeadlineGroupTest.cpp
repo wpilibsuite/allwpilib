@@ -95,9 +95,9 @@ TEST_F(ParallelDeadlineGroupTest, SequentialGroupInterrupt) {
 TEST_F(ParallelDeadlineGroupTest, DeadlineGroupNotScheduledCancel) {
   CommandScheduler scheduler = GetScheduler();
 
-  ParallelDeadlineGroup group{InstantCommand(), InstantCommand()};
+  auto group = frc2::cmd::Deadline(frc2::cmd::None(), frc2::cmd::None());
 
-  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
+  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(group));
 }
 
 TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineCopy) {
@@ -105,15 +105,15 @@ TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineCopy) {
 
   bool finished = false;
 
-  WaitUntilCommand command([&finished] { return finished; });
+  auto command = frc2::cmd::WaitUntil([&finished] {return finished;});
 
-  ParallelDeadlineGroup group(command);
-  scheduler.Schedule(&group);
+  auto group = frc2::cmd::Deadline(std::move(command));
+  scheduler.Schedule(group);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&group));
+  EXPECT_TRUE(scheduler.IsScheduled(group));
   finished = true;
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  EXPECT_FALSE(scheduler.IsScheduled(group));
 }
 
 TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineRequirement) {
