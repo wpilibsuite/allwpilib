@@ -79,7 +79,7 @@ class Rotation2dTest {
     var rot = Rotation2d.fromDegrees(10.0);
 
     assertEquals(30.0, rot.times(3.0).getDegrees(), kEpsilon);
-    assertEquals(410.0, rot.times(41.0).getDegrees(), kEpsilon);
+    assertEquals(50.0, rot.times(41.0).getDegrees(), kEpsilon);
   }
 
   @Test
