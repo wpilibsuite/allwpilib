@@ -18,9 +18,6 @@
 'component: examples':
 - changed-files:
   - any-glob-to-any-file: wpilib*Examples/**
-'component: examples':
-- changed-files:
-  - any-glob-to-any-file: wpilib*Examples/**
 'component: glass':
 - changed-files:
   - any-glob-to-any-file: glass/**
