@@ -4,10 +4,13 @@
 
 package edu.wpi.first.epilogue.logging;
 
+import edu.wpi.first.networktables.NTSendableBuilder;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.Topic;
 import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.function.FloatConsumer;
 import edu.wpi.first.util.function.FloatSupplier;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.BooleanSupplier;
@@ -20,9 +23,12 @@ import java.util.function.Supplier;
 
 /** A sendable builder implementation that sends data to a {@link EpilogueBackend}. */
 @SuppressWarnings("PMD.CouplingBetweenObjects") // most methods simply delegate to the backend
-public class LogBackedSendableBuilder implements SendableBuilder {
+public class LogBackedSendableBuilder implements NTSendableBuilder {
+  private static final NetworkTable rootTable =
+      NetworkTableInstance.getDefault().getTable("Robot");
   private final EpilogueBackend m_backend;
   private final Collection<Runnable> m_updates = new ArrayList<>();
+  private final NetworkTable networkTable;
 
   /**
    * Creates a new sendable builder that delegates writes to an underlying backend.
@@ -31,6 +37,11 @@ public class LogBackedSendableBuilder implements SendableBuilder {
    */
   public LogBackedSendableBuilder(EpilogueBackend backend) {
     this.m_backend = backend;
+    if (backend instanceof NestedBackend nb) {
+      networkTable = rootTable.getSubTable(nb.getPrefix());
+    } else {
+      networkTable = rootTable;
+    }
   }
 
   @Override
@@ -177,7 +188,22 @@ public class LogBackedSendableBuilder implements SendableBuilder {
   public void publishConstRaw(String key, String typeString, byte[] value) {
     m_backend.log(key, value);
   }
-
+  
+  @Override
+  public void setUpdateTable(Runnable func) {
+    m_updates.add(func);
+  }
+  
+  @Override
+  public Topic getTopic(String key) {
+    return getTable().getTopic(key);
+  }
+  
+  @Override
+  public NetworkTable getTable() {
+    return networkTable;
+  }
+  
   @Override
   public BackendKind getBackendKind() {
     return BackendKind.kUnknown;
