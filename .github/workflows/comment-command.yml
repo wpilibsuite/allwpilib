@@ -1,0 +1,103 @@
+name: Comment Commands
+on:
+  issue_comment:
+    types: [ created ]
+
+jobs:
+  format:
+    if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/format')
+    runs-on: ubuntu-24.04
+    steps:
+      - name: React Rocket
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {owner, repo} = context.issue
+            github.rest.reactions.createForIssueComment({
+              owner,
+              repo,
+              comment_id: context.payload.comment.id,
+              content: "rocket",
+            });
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}
+      - name: Fetch all history and metadata
+        run: |
+          git checkout -b pr
+          git branch -f main origin/main
+      - name: Checkout PR
+        run: |
+          gh pr checkout $NUMBER
+        env:
+          GITHUB_TOKEN: "${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}"
+          NUMBER: ${{ github.event.issue.number }}
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Install wpiformat
+        run: |
+          python -m venv ${{ runner.temp }}/wpiformat
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2024.50
+      - name: Run wpiformat
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat
+      - name: Run spotlessApply
+        run: ./gradlew spotlessApply
+      - name: Commit
+        run: |
+          # Set credentials
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Commit
+          git commit -am "Formatting fixes"
+          git push
+
+  pregen:
+    if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/pregen')
+    runs-on: ubuntu-24.04
+    steps:
+      - name: React Rocket
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {owner, repo} = context.issue
+            github.rest.reactions.createForIssueComment({
+              owner,
+              repo,
+              comment_id: context.payload.comment.id,
+              content: "rocket",
+            });
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}
+      - name: Checkout PR
+        run: |
+          gh pr checkout $NUMBER
+        env:
+          GITHUB_TOKEN: "${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}"
+          NUMBER: ${{ github.event.issue.number }}
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install jinja
+        run: python -m pip install jinja2
+      - name: Install protobuf dependencies
+        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler && wget https://github.com/HebiRobotics/QuickBuffers/releases/download/1.3.3/protoc-gen-quickbuf-1.3.3-linux-x86_64.exe && chmod +x protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
+      - name: Regenerate all
+        run: ./.github/workflows/pregen_all.py --quickbuf_plugin=protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
+      - name: Commit
+        run: |
+          # Set credentials
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Commit
+          git commit -am "Regenerate pregenerated files"
+          git push

@@ -20,7 +20,7 @@ jobs:
 
   wpiformat:
     name: "wpiformat"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -36,8 +36,9 @@ jobs:
       - name: Install wpiformat
         run: |
           python -m venv ${{ runner.temp }}/wpiformat
-          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2025.33
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2024.50
       - name: Run
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat
         run: ${{ runner.temp }}/wpiformat/bin/wpiformat
       - name: Check output
         run: git --no-pager diff --exit-code HEAD
@@ -59,9 +60,8 @@ jobs:
 
   tidy:
     name: "clang-tidy"
-    runs-on: ubuntu-22.04
-    needs: [validation]
-    container: wpilib/ubuntu-base:22.04
+    runs-on: ubuntu-24.04
+    container: wpilib/ubuntu-base:24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -78,7 +78,7 @@ jobs:
       - name: Install wpiformat
         run: |
           python -m venv ${{ runner.temp }}/wpiformat
-          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2025.33
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2024.50
       - name: Create compile_commands.json
         run: |
           ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
@@ -92,9 +92,8 @@ jobs:
         run: ${{ runner.temp }}/wpiformat/bin/wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64debug -vv
   javaformat:
     name: "Java format"
-    runs-on: ubuntu-22.04
-    needs: [validation]
-    container: wpilib/ubuntu-base:22.04
+    runs-on: ubuntu-24.04
+    container: wpilib/ubuntu-base:24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -126,8 +125,7 @@ jobs:
 
   documentation:
     name: "Documentation"
-    runs-on: ubuntu-22.04
-    needs: [validation]
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
