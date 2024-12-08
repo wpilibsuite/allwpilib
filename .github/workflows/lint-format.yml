@@ -39,6 +39,7 @@ jobs:
           ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2024.50
       - name: Run
         run: ${{ runner.temp }}/wpiformat/bin/wpiformat
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat
       - name: Check output
         run: git --no-pager diff --exit-code HEAD
       - name: Generate diff
