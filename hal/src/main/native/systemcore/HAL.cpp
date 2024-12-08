@@ -312,7 +312,6 @@ HAL_Bool HAL_GetRSLState(int32_t* status) {
 }
 
 HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
   return false;
 }
 
