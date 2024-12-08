@@ -42,22 +42,17 @@ class HolonomicDriveControllerTest {
     Trajectory trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
 
     final double kDt = 0.02;
-    final double kTotalTime = trajectory.getTotalTimeSeconds();
+    final double kTotalTime = trajectory.getTotalTime();
 
     for (int i = 0; i < (kTotalTime / kDt); i++) {
       Trajectory.State state = trajectory.sample(kDt * i);
       ChassisSpeeds output = controller.calculate(robotPose, state, Rotation2d.kZero);
 
-      robotPose =
-          robotPose.exp(
-              new Twist2d(
-                  output.vxMetersPerSecond * kDt,
-                  output.vyMetersPerSecond * kDt,
-                  output.omegaRadiansPerSecond * kDt));
+      robotPose = robotPose.exp(new Twist2d(output.vx * kDt, output.vy * kDt, output.omega * kDt));
     }
 
     final List<Trajectory.State> states = trajectory.getStates();
-    final Pose2d endPose = states.get(states.size() - 1).poseMeters;
+    final Pose2d endPose = states.get(states.size() - 1).pose;
 
     // Java lambdas require local variables referenced from a lambda expression
     // must be final or effectively final.
@@ -85,6 +80,6 @@ class HolonomicDriveControllerTest {
         controller.calculate(
             new Pose2d(0, 0, new Rotation2d(1.57)), Pose2d.kZero, 0, new Rotation2d(1.57));
 
-    assertEquals(0.0, speeds.omegaRadiansPerSecond);
+    assertEquals(0.0, speeds.omega);
   }
 }

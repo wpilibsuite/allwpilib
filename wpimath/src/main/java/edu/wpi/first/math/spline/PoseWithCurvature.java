@@ -9,24 +9,24 @@ import edu.wpi.first.math.geometry.Pose2d;
 /** Represents a pair of a pose and a curvature. */
 public class PoseWithCurvature {
   /** Represents the pose. */
-  public Pose2d poseMeters;
+  public Pose2d pose;
 
-  /** Represents the curvature. */
-  public double curvatureRadPerMeter;
+  /** Represents the curvature in radians per meter. */
+  public double curvature;
 
   /**
    * Constructs a PoseWithCurvature.
    *
-   * @param poseMeters The pose.
-   * @param curvatureRadPerMeter The curvature.
+   * @param pose The pose.
+   * @param curvature The curvature in radians per meter.
    */
-  public PoseWithCurvature(Pose2d poseMeters, double curvatureRadPerMeter) {
-    this.poseMeters = poseMeters;
-    this.curvatureRadPerMeter = curvatureRadPerMeter;
+  public PoseWithCurvature(Pose2d pose, double curvature) {
+    this.pose = pose;
+    this.curvature = curvature;
   }
 
   /** Constructs a PoseWithCurvature with default values. */
   public PoseWithCurvature() {
-    poseMeters = Pose2d.kZero;
+    pose = Pose2d.kZero;
   }
 }

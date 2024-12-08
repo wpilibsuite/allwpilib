@@ -123,8 +123,7 @@ public class SwerveControllerCommand extends Command {
         xController,
         yController,
         thetaController,
-        () ->
-            trajectory.getStates().get(trajectory.getStates().size() - 1).poseMeters.getRotation(),
+        () -> trajectory.getStates().get(trajectory.getStates().size() - 1).pose.getRotation(),
         outputModuleStates,
         requirements);
   }
@@ -162,8 +161,7 @@ public class SwerveControllerCommand extends Command {
         pose,
         kinematics,
         controller,
-        () ->
-            trajectory.getStates().get(trajectory.getStates().size() - 1).poseMeters.getRotation(),
+        () -> trajectory.getStates().get(trajectory.getStates().size() - 1).pose.getRotation(),
         outputModuleStates,
         requirements);
   }
@@ -233,6 +231,6 @@ public class SwerveControllerCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
+    return m_timer.hasElapsed(m_trajectory.getTotalTime());
   }
 }

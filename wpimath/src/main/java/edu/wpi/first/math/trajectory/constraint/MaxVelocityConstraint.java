@@ -17,21 +17,20 @@ public class MaxVelocityConstraint implements TrajectoryConstraint {
   /**
    * Constructs a new MaxVelocityConstraint.
    *
-   * @param maxVelocityMetersPerSecond The max velocity.
+   * @param maxVelocity The max velocity in m/s.
    */
-  public MaxVelocityConstraint(double maxVelocityMetersPerSecond) {
-    m_maxVelocity = maxVelocityMetersPerSecond;
+  public MaxVelocityConstraint(double maxVelocity) {
+    m_maxVelocity = maxVelocity;
   }
 
   @Override
-  public double getMaxVelocityMetersPerSecond(
-      Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
+  public double getMaxVelocity(Pose2d pose, double curvature, double velocity) {
     return m_maxVelocity;
   }
 
   @Override
-  public TrajectoryConstraint.MinMax getMinMaxAccelerationMetersPerSecondSq(
-      Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
+  public TrajectoryConstraint.MinMax getMinMaxAcceleration(
+      Pose2d pose, double curvature, double velocity) {
     return new MinMax();
   }
 }

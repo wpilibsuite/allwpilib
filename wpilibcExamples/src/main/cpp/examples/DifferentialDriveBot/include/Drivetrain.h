@@ -56,7 +56,7 @@ class Drivetrain {
   void UpdateOdometry();
 
  private:
-  static constexpr units::meter_t kTrackWidth = 0.381_m * 2;
+  static constexpr units::meter_t kTrackwidth = 0.381_m * 2;
   static constexpr double kWheelRadius = 0.0508;  // meters
   static constexpr int kEncoderResolution = 4096;
 
@@ -73,7 +73,7 @@ class Drivetrain {
 
   frc::AnalogGyro m_gyro{0};
 
-  frc::DifferentialDriveKinematics m_kinematics{kTrackWidth};
+  frc::DifferentialDriveKinematics m_kinematics{kTrackwidth};
   frc::DifferentialDriveOdometry m_odometry{
       m_gyro.GetRotation2d(), units::meter_t{m_leftEncoder.GetDistance()},
       units::meter_t{m_rightEncoder.GetDistance()}};

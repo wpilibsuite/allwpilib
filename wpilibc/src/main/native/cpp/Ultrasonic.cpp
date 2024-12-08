@@ -137,7 +137,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
 units::meter_t Ultrasonic::GetRange() const {
   if (IsRangeValid()) {
     if (m_simRange) {
-      return units::inch_t{m_simRange.Get()};
+      return units::meter_t{m_simRange.Get()};
     }
     return m_counter.GetPeriod() * kSpeedOfSound / 2.0;
   } else {
@@ -164,7 +164,7 @@ void Ultrasonic::Initialize() {
   m_simDevice = hal::SimDevice("Ultrasonic", m_echoChannel->GetChannel());
   if (m_simDevice) {
     m_simRangeValid = m_simDevice.CreateBoolean("Range Valid", false, true);
-    m_simRange = m_simDevice.CreateDouble("Range (in)", false, 0.0);
+    m_simRange = m_simDevice.CreateDouble("Range (m)", false, 0.0);
     m_pingChannel->SetSimDevice(m_simDevice);
     m_echoChannel->SetSimDevice(m_simDevice);
   }

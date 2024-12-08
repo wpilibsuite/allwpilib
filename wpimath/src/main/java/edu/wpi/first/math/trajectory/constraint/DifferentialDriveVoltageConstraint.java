@@ -43,23 +43,17 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
   }
 
   @Override
-  public double getMaxVelocityMetersPerSecond(
-      Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
+  public double getMaxVelocity(Pose2d pose, double curvature, double velocity) {
     return Double.POSITIVE_INFINITY;
   }
 
   @Override
-  public MinMax getMinMaxAccelerationMetersPerSecondSq(
-      Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
+  public MinMax getMinMaxAcceleration(Pose2d pose, double curvature, double velocity) {
     var wheelSpeeds =
-        m_kinematics.toWheelSpeeds(
-            new ChassisSpeeds(
-                velocityMetersPerSecond, 0, velocityMetersPerSecond * curvatureRadPerMeter));
+        m_kinematics.toWheelSpeeds(new ChassisSpeeds(velocity, 0, velocity * curvature));
 
-    double maxWheelSpeed =
-        Math.max(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
-    double minWheelSpeed =
-        Math.min(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
+    double maxWheelSpeed = Math.max(wheelSpeeds.left, wheelSpeeds.right);
+    double minWheelSpeed = Math.min(wheelSpeeds.left, wheelSpeeds.right);
 
     // Calculate maximum/minimum possible accelerations from motor dynamics
     // and max/min wheel speeds
@@ -87,28 +81,18 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
     double maxChassisAcceleration;
     double minChassisAcceleration;
 
-    if (velocityMetersPerSecond == 0) {
+    if (velocity == 0) {
       maxChassisAcceleration =
-          maxWheelAcceleration
-              / (1 + m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter) / 2);
+          maxWheelAcceleration / (1 + m_kinematics.trackwidth * Math.abs(curvature) / 2);
       minChassisAcceleration =
-          minWheelAcceleration
-              / (1 + m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter) / 2);
+          minWheelAcceleration / (1 + m_kinematics.trackwidth * Math.abs(curvature) / 2);
     } else {
       maxChassisAcceleration =
           maxWheelAcceleration
-              / (1
-                  + m_kinematics.trackWidthMeters
-                      * Math.abs(curvatureRadPerMeter)
-                      * Math.signum(velocityMetersPerSecond)
-                      / 2);
+              / (1 + m_kinematics.trackwidth * Math.abs(curvature) * Math.signum(velocity) / 2);
       minChassisAcceleration =
           minWheelAcceleration
-              / (1
-                  - m_kinematics.trackWidthMeters
-                      * Math.abs(curvatureRadPerMeter)
-                      * Math.signum(velocityMetersPerSecond)
-                      / 2);
+              / (1 - m_kinematics.trackwidth * Math.abs(curvature) * Math.signum(velocity) / 2);
     }
 
     // When turning about a point inside the wheelbase (i.e. radius less than half
@@ -116,10 +100,10 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
     // the same.  The formula above changes sign for the inner wheel when this happens.
     // We can accurately account for this by simply negating the inner wheel.
 
-    if ((m_kinematics.trackWidthMeters / 2) > (1 / Math.abs(curvatureRadPerMeter))) {
-      if (velocityMetersPerSecond > 0) {
+    if ((m_kinematics.trackwidth / 2) > (1 / Math.abs(curvature))) {
+      if (velocity > 0) {
         minChassisAcceleration = -minChassisAcceleration;
-      } else if (velocityMetersPerSecond < 0) {
+      } else if (velocity < 0) {
         maxChassisAcceleration = -maxChassisAcceleration;
       }
     }

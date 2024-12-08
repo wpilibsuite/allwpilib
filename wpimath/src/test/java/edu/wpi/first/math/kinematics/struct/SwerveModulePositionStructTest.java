@@ -24,7 +24,7 @@ class SwerveModulePositionStructTest {
     buffer.rewind();
 
     SwerveModulePosition data = SwerveModulePosition.struct.unpack(buffer);
-    assertEquals(DATA.distanceMeters, data.distanceMeters);
+    assertEquals(DATA.distance, data.distance);
     assertEquals(DATA.angle, data.angle);
   }
 }

@@ -20,9 +20,9 @@ class MecanumDriveWheelPositionsProtoTest {
     MecanumDriveWheelPositions.proto.pack(proto, DATA);
 
     MecanumDriveWheelPositions data = MecanumDriveWheelPositions.proto.unpack(proto);
-    assertEquals(DATA.frontLeftMeters, data.frontLeftMeters);
-    assertEquals(DATA.frontRightMeters, data.frontRightMeters);
-    assertEquals(DATA.rearLeftMeters, data.rearLeftMeters);
-    assertEquals(DATA.rearRightMeters, data.rearRightMeters);
+    assertEquals(DATA.frontLeft, data.frontLeft);
+    assertEquals(DATA.frontRight, data.frontRight);
+    assertEquals(DATA.rearLeft, data.rearLeft);
+    assertEquals(DATA.rearRight, data.rearRight);
   }
 }
