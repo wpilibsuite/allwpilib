@@ -24,10 +24,10 @@ import java.util.function.Supplier;
 /** A sendable builder implementation that sends data to a {@link EpilogueBackend}. */
 @SuppressWarnings("PMD.CouplingBetweenObjects") // most methods simply delegate to the backend
 public class LogBackedSendableBuilder implements NTSendableBuilder {
-  private static final NetworkTable rootTable = NetworkTableInstance.getDefault().getTable("Robot");
+  private static final NetworkTable m_rootTable = NetworkTableInstance.getDefault().getTable("Robot");
   private final EpilogueBackend m_backend;
   private final Collection<Runnable> m_updates = new ArrayList<>();
-  private final NetworkTable networkTable;
+  private final NetworkTable m_networkTable;
 
   /**
    * Creates a new sendable builder that delegates writes to an underlying backend.
@@ -37,9 +37,9 @@ public class LogBackedSendableBuilder implements NTSendableBuilder {
   public LogBackedSendableBuilder(EpilogueBackend backend) {
     this.m_backend = backend;
     if (backend instanceof NestedBackend nb) {
-      networkTable = rootTable.getSubTable(nb.getPrefix());
+      m_networkTable = m_rootTable.getSubTable(nb.getPrefix());
     } else {
-      networkTable = rootTable;
+      m_networkTable = m_rootTable;
     }
   }
 
@@ -200,7 +200,7 @@ public class LogBackedSendableBuilder implements NTSendableBuilder {
 
   @Override
   public NetworkTable getTable() {
-    return networkTable;
+    return m_networkTable;
   }
 
   @Override
