@@ -5,10 +5,8 @@
 #include <bit>
 #include <utility>
 
-#include <wpi/Endian.h>
-
-#include "wpi/datalog/DataLog.h"
-#include "wpi/datalog/DataLogReader.h"
+#include "wpi/DataLog.h"
+#include "wpi/Endian.h"
 
 using namespace wpi::log;
 
