@@ -43,7 +43,7 @@ int32_t SmartIo::InitializeMode(SmartIoMode mode) {
           inst.GetDoubleTopic("/io/valset" + channelString).Publish(options);
       setPublisher.Set(0);
       pwmMinPublisher =
-          inst.GetDoubleTopic("/io/pwmmim" + channelString).Publish();
+          inst.GetDoubleTopic("/io/pwmmin" + channelString).Publish();
       pwmMinPublisher.Set(0);
       pwmMaxPublisher =
           inst.GetDoubleTopic("/io/pwmmax" + channelString).Publish();
@@ -63,8 +63,8 @@ int32_t SmartIo::SetPwmMicroseconds(uint16_t microseconds) {
 
   // TODO(thad) add support for always on signal
 
-  if (microseconds > 4096) {
-    microseconds = 4096;
+  if (microseconds > 4095) {
+    microseconds = 4095;
   }
 
   // Scale from 0-4096 to 0.0-2.0, then to -1.0-1.0

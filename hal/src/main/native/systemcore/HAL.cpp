@@ -77,6 +77,7 @@ void InitializeHAL() {
   InitializePWM();
   InitializeRelay();
   InitializeSerialPort();
+  InitializeSmartIo();
   InitializeSPI();
   InitializeThreads();
 }
