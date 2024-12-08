@@ -72,7 +72,7 @@ class Drivetrain {
   void Periodic();
 
  private:
-  static constexpr units::meter_t kTrackWidth = 0.381_m * 2;
+  static constexpr units::meter_t kTrackwidth = 0.381_m * 2;
   static constexpr double kWheelRadius = 0.0508;  // meters
   static constexpr int kEncoderResolution = 4096;
 
@@ -89,7 +89,7 @@ class Drivetrain {
 
   frc::AnalogGyro m_gyro{0};
 
-  frc::DifferentialDriveKinematics m_kinematics{kTrackWidth};
+  frc::DifferentialDriveKinematics m_kinematics{kTrackwidth};
   frc::DifferentialDriveOdometry m_odometry{
       m_gyro.GetRotation2d(), units::meter_t{m_leftEncoder.GetDistance()},
       units::meter_t{m_rightEncoder.GetDistance()}};
@@ -106,5 +106,5 @@ class Drivetrain {
       frc::LinearSystemId::IdentifyDrivetrainSystem(
           1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
   frc::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
-      m_drivetrainSystem, kTrackWidth, frc::DCMotor::CIM(2), 8, 2_in};
+      m_drivetrainSystem, kTrackwidth, frc::DCMotor::CIM(2), 8, 2_in};
 };

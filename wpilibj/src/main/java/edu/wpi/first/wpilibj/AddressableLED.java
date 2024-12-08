@@ -73,22 +73,13 @@ public class AddressableLED implements AutoCloseable {
    * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing needs to be set for
    * those.
    *
-   * @param highTime0NanoSeconds high time for 0 bit (default 400ns)
-   * @param lowTime0NanoSeconds low time for 0 bit (default 900ns)
-   * @param highTime1NanoSeconds high time for 1 bit (default 900ns)
-   * @param lowTime1NanoSeconds low time for 1 bit (default 600ns)
+   * @param highTime0 high time for 0 bit in nanoseconds (default 400 ns)
+   * @param lowTime0 low time for 0 bit in nanoseconds (default 900 ns)
+   * @param highTime1 high time for 1 bit in nanoseconds (default 900 ns)
+   * @param lowTime1 low time for 1 bit in nanoseconds (default 600 ns)
    */
-  public void setBitTiming(
-      int highTime0NanoSeconds,
-      int lowTime0NanoSeconds,
-      int highTime1NanoSeconds,
-      int lowTime1NanoSeconds) {
-    AddressableLEDJNI.setBitTiming(
-        m_handle,
-        highTime0NanoSeconds,
-        lowTime0NanoSeconds,
-        highTime1NanoSeconds,
-        lowTime1NanoSeconds);
+  public void setBitTiming(int highTime0, int lowTime0, int highTime1, int lowTime1) {
+    AddressableLEDJNI.setBitTiming(m_handle, highTime0, lowTime0, highTime1, lowTime1);
   }
 
   /**
@@ -96,10 +87,10 @@ public class AddressableLED implements AutoCloseable {
    *
    * <p>The sync time is the time to hold output so LEDs enable. Default set for WS2812B and WS2815.
    *
-   * @param syncTimeMicroSeconds the sync time (default 280us)
+   * @param syncTime the sync time in microseconds (default 280 μs)
    */
-  public void setSyncTime(int syncTimeMicroSeconds) {
-    AddressableLEDJNI.setSyncTime(m_handle, syncTimeMicroSeconds);
+  public void setSyncTime(int syncTime) {
+    AddressableLEDJNI.setSyncTime(m_handle, syncTime);
   }
 
   /**

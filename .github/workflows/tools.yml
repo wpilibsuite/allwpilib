@@ -43,31 +43,31 @@ jobs:
             development
           retention-days: 1
 
-  PathWeaver:
-    name: "Build - PathWeaver"
-    needs: [build-artifacts]
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: wpilibsuite/PathWeaver
-          fetch-depth: 0
-      - name: Patch PathWeaver to use local development
-        run: sed -i "s/wpilibTools.deps.wpilibVersion.*/wpilibTools.deps.wpilibVersion = \'$YEAR\.424242\.+\'/" dependencies.gradle
-      - uses: actions/download-artifact@v4
-        with:
-          name: MavenArtifacts
-      - uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
-      - name: Move artifacts
-        run: mkdir -p ~/releases/maven/development && cp -r edu ~/releases/maven/development
-      - name: Build with Gradle
-        run: ./gradlew build
-      - uses: actions/upload-artifact@v4
-        with:
-          name: PathWeaver Build
-          path: |
-            build/allOutputs/
-          retention-days: 7
+  # PathWeaver:
+  #   name: "Build - PathWeaver"
+  #   needs: [build-artifacts]
+  #   runs-on: ubuntu-24.04
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         repository: wpilibsuite/PathWeaver
+  #         fetch-depth: 0
+  #     - name: Patch PathWeaver to use local development
+  #       run: sed -i "s/wpilibTools.deps.wpilibVersion.*/wpilibTools.deps.wpilibVersion = \'$YEAR\.424242\.+\'/" dependencies.gradle
+  #     - uses: actions/download-artifact@v4
+  #       with:
+  #         name: MavenArtifacts
+  #     - uses: actions/setup-java@v4
+  #       with:
+  #         java-version: 17
+  #         distribution: 'temurin'
+  #     - name: Move artifacts
+  #       run: mkdir -p ~/releases/maven/development && cp -r edu ~/releases/maven/development
+  #     - name: Build with Gradle
+  #       run: ./gradlew build
+  #     - uses: actions/upload-artifact@v4
+  #       with:
+  #         name: PathWeaver Build
+  #         path: |
+  #           build/allOutputs/
+  #         retention-days: 7

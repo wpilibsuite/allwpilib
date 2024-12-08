@@ -54,10 +54,9 @@ public class RobotContainer {
                     // Multiply by max speed to map the joystick unitless inputs to actual units.
                     // This will map the [-1, 1] to [max speed backwards, max speed forwards],
                     // converting them to actual units.
-                    m_driverController.getLeftY() * DriveConstants.kMaxSpeedMetersPerSecond,
-                    m_driverController.getLeftX() * DriveConstants.kMaxSpeedMetersPerSecond,
-                    m_driverController.getRightX()
-                        * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
+                    m_driverController.getLeftY() * DriveConstants.kMaxSpeed,
+                    m_driverController.getLeftX() * DriveConstants.kMaxSpeed,
+                    m_driverController.getRightX() * ModuleConstants.kMaxModuleAngularSpeed,
                     false),
             m_robotDrive));
   }
@@ -78,9 +77,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Create config for trajectory
     TrajectoryConfig config =
-        new TrajectoryConfig(
-                AutoConstants.kMaxSpeedMetersPerSecond,
-                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+        new TrajectoryConfig(AutoConstants.kMaxSpeed, AutoConstants.kMaxAcceleration)
             // Add kinematics to ensure max speed is actually obeyed
             .setKinematics(DriveConstants.kDriveKinematics);
 

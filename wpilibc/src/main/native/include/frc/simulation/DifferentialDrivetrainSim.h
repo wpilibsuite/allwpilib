@@ -25,7 +25,7 @@ class DifferentialDrivetrainSim {
    *              system can be created with
    *              LinearSystemId::DrivetrainVelocitySystem() or
    *              LinearSystemId::IdentifyDrivetrainSystem().
-   * @param trackWidth   The robot's track width.
+   * @param trackwidth   The robot's trackwidth.
    * @param driveMotor   A DCMotor representing the left side of the drivetrain.
    * @param gearingRatio The gearingRatio ratio of the left side, as output over
    *                     input. This must be the same ratio as the ratio used to
@@ -41,7 +41,7 @@ class DifferentialDrivetrainSim {
    *                           starting point.
    */
   DifferentialDrivetrainSim(
-      LinearSystem<2, 2, 2> plant, units::meter_t trackWidth,
+      LinearSystem<2, 2, 2> plant, units::meter_t trackwidth,
       DCMotor driveMotor, double gearingRatio, units::meter_t wheelRadius,
       const std::array<double, 7>& measurementStdDevs = {});
 
@@ -56,7 +56,7 @@ class DifferentialDrivetrainSim {
    *                    center.
    * @param mass        The mass of the drivebase.
    * @param wheelRadius The radius of the wheels on the drivetrain.
-   * @param trackWidth  The robot's track width, or distance between left and
+   * @param trackwidth  The robot's trackwidth, or distance between left and
    *                    right wheels.
    * @param measurementStdDevs Standard deviations for measurements, in the form
    *                           [x, y, heading, left velocity, right velocity,
@@ -70,7 +70,7 @@ class DifferentialDrivetrainSim {
   DifferentialDrivetrainSim(
       frc::DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
       units::kilogram_t mass, units::meter_t wheelRadius,
-      units::meter_t trackWidth,
+      units::meter_t trackwidth,
       const std::array<double, 7>& measurementStdDevs = {});
 
   /**

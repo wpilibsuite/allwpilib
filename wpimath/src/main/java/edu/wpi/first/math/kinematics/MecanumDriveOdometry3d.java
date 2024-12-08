@@ -31,14 +31,14 @@ public class MecanumDriveOdometry3d extends Odometry3d<MecanumDriveWheelPosition
    * @param kinematics The mecanum drive kinematics for your drivetrain.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The distances driven by each wheel.
-   * @param initialPoseMeters The starting position of the robot on the field.
+   * @param initialPose The starting position of the robot on the field.
    */
   public MecanumDriveOdometry3d(
       MecanumDriveKinematics kinematics,
       Rotation3d gyroAngle,
       MecanumDriveWheelPositions wheelPositions,
-      Pose3d initialPoseMeters) {
-    super(kinematics, gyroAngle, wheelPositions, initialPoseMeters);
+      Pose3d initialPose) {
+    super(kinematics, gyroAngle, wheelPositions, initialPose);
     MathSharedStore.reportUsage("MecanumDriveOdometry3d", "");
   }
 

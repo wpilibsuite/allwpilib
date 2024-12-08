@@ -34,9 +34,9 @@ public class MecanumDriveWheelPositionsProto
 
   @Override
   public void pack(ProtobufMecanumDriveWheelPositions msg, MecanumDriveWheelPositions value) {
-    msg.setFrontLeft(value.frontLeftMeters);
-    msg.setFrontRight(value.frontRightMeters);
-    msg.setRearLeft(value.rearLeftMeters);
-    msg.setRearRight(value.rearRightMeters);
+    msg.setFrontLeft(value.frontLeft);
+    msg.setFrontRight(value.frontRight);
+    msg.setRearLeft(value.rearLeft);
+    msg.setRearRight(value.rearRight);
   }
 }

@@ -107,9 +107,8 @@ int32_t HAL_GetDutyCycleHighTime(HAL_DutyCycleHandle dutyCycleHandle,
     return 0;
   }
 
-  double periodSeconds = 1.0 / SimDutyCycleData[dutyCycle->index].frequency;
-  double periodNanoSeconds = periodSeconds * 1e9;
-  return periodNanoSeconds * SimDutyCycleData[dutyCycle->index].output;
+  double period = 1e9 / SimDutyCycleData[dutyCycle->index].frequency;  // ns
+  return period * SimDutyCycleData[dutyCycle->index].output;
 }
 
 int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,

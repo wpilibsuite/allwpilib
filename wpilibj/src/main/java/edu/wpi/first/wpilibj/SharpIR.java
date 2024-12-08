@@ -8,6 +8,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -28,47 +29,47 @@ public class SharpIR implements Sendable, AutoCloseable {
 
   private final double m_A;
   private final double m_B;
-  private final double m_minCM;
-  private final double m_maxCM;
+  private final double m_min; // m
+  private final double m_max; // m
 
   /**
-   * Sharp GP2Y0A02YK0F is an analog IR sensor capable of measuring distances from 20cm to 150cm.
+   * Sharp GP2Y0A02YK0F is an analog IR sensor capable of measuring distances from 20 cm to 150 cm.
    *
    * @param channel Analog input channel the sensor is connected to
    * @return sensor object
    */
   public static SharpIR GP2Y0A02YK0F(int channel) {
-    return new SharpIR(channel, 62.28, -1.092, 20, 150.0);
+    return new SharpIR(channel, 62.28, -1.092, 0.2, 1.5);
   }
 
   /**
-   * Sharp GP2Y0A21YK0F is an analog IR sensor capable of measuring distances from 10cm to 80cm.
+   * Sharp GP2Y0A21YK0F is an analog IR sensor capable of measuring distances from 10 cm to 80 cm.
    *
    * @param channel Analog input channel the sensor is connected to
    * @return sensor object
    */
   public static SharpIR GP2Y0A21YK0F(int channel) {
-    return new SharpIR(channel, 26.449, -1.226, 10.0, 80.0);
+    return new SharpIR(channel, 26.449, -1.226, 0.1, 0.8);
   }
 
   /**
-   * Sharp GP2Y0A41SK0F is an analog IR sensor capable of measuring distances from 4cm to 30cm.
+   * Sharp GP2Y0A41SK0F is an analog IR sensor capable of measuring distances from 4 cm to 30 cm.
    *
    * @param channel Analog input channel the sensor is connected to
    * @return sensor object
    */
   public static SharpIR GP2Y0A41SK0F(int channel) {
-    return new SharpIR(channel, 12.354, -1.07, 4.0, 30.0);
+    return new SharpIR(channel, 12.354, -1.07, 0.04, 0.3);
   }
 
   /**
-   * Sharp GP2Y0A51SK0F is an analog IR sensor capable of measuring distances from 2cm to 15cm.
+   * Sharp GP2Y0A51SK0F is an analog IR sensor capable of measuring distances from 2 cm to 15 cm.
    *
    * @param channel Analog input channel the sensor is connected to
    * @return sensor object
    */
   public static SharpIR GP2Y0A51SK0F(int channel) {
-    return new SharpIR(channel, 5.2819, -1.161, 2.0, 15.0);
+    return new SharpIR(channel, 5.2819, -1.161, 0.02, 0.15);
   }
 
   /**
@@ -78,24 +79,24 @@ public class SharpIR implements Sendable, AutoCloseable {
    * @param channel AnalogInput channel
    * @param a Constant A
    * @param b Constant B
-   * @param minCM Minimum distance to report in centimeters
-   * @param maxCM Maximum distance to report in centimeters
+   * @param min Minimum distance to report in meters
+   * @param max Maximum distance to report in meters
    */
   @SuppressWarnings("this-escape")
-  public SharpIR(int channel, double a, double b, double minCM, double maxCM) {
+  public SharpIR(int channel, double a, double b, double min, double max) {
     m_sensor = new AnalogInput(channel);
 
     m_A = a;
     m_B = b;
-    m_minCM = minCM;
-    m_maxCM = maxCM;
+    m_min = min;
+    m_max = max;
 
     HAL.reportUsage("IO", channel, "SharpIR");
     SendableRegistry.add(this, "SharpIR", channel);
 
     m_simDevice = SimDevice.create("SharpIR", m_sensor.getChannel());
     if (m_simDevice != null) {
-      m_simRange = m_simDevice.createDouble("Range (cm)", Direction.kInput, 0.0);
+      m_simRange = m_simDevice.createDouble("Range (m)", Direction.kInput, 0.0);
       m_sensor.setSimDevice(m_simDevice);
     }
   }
@@ -123,37 +124,24 @@ public class SharpIR implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get the range in inches from the distance sensor.
+   * Get the range in meters from the distance sensor.
    *
-   * @return range in inches of the target returned by the sensor
+   * @return range in meters of the target returned by the sensor
    */
-  public double getRangeInches() {
-    return getRangeCM() / 2.54;
-  }
-
-  /**
-   * Get the range in centimeters from the distance sensor.
-   *
-   * @return range in centimeters of the target returned by the sensor
-   */
-  public double getRangeCM() {
-    double distance;
-
+  public double getRange() {
     if (m_simRange != null) {
-      distance = m_simRange.get();
+      return MathUtil.clamp(m_simRange.get(), m_min, m_max);
     } else {
       // Don't allow zero/negative values
       var v = Math.max(m_sensor.getVoltage(), 0.00001);
-      distance = m_A * Math.pow(v, m_B);
-    }
 
-    // Always constrain output
-    return Math.max(Math.min(distance, m_maxCM), m_minCM);
+      return MathUtil.clamp(m_A * Math.pow(v, m_B) * 1e-2, m_min, m_max);
+    }
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Ultrasonic");
-    builder.addDoubleProperty("Value", this::getRangeInches, null);
+    builder.addDoubleProperty("Value", this::getRange, null);
   }
 }

@@ -52,16 +52,16 @@ public final class Constants {
     // If you call DriveSubsystem.drive() with a different period make sure to update this.
     public static final double kDrivePeriod = TimedRobot.kDefaultPeriod;
 
-    public static final double kTrackWidth = 0.5;
+    public static final double kTrackwidth = 0.5;
     // Distance between centers of right and left wheels on robot
     public static final double kWheelBase = 0.7;
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics =
         new SwerveDriveKinematics(
-            new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+            new Translation2d(kWheelBase / 2, kTrackwidth / 2),
+            new Translation2d(kWheelBase / 2, -kTrackwidth / 2),
+            new Translation2d(-kWheelBase / 2, kTrackwidth / 2),
+            new Translation2d(-kWheelBase / 2, -kTrackwidth / 2));
 
     public static final boolean kGyroReversed = false;
 
@@ -69,22 +69,22 @@ public final class Constants {
     // These characterization values MUST be determined either experimentally or theoretically
     // for *your* robot's drive.
     // The SysId tool provides a convenient method for obtaining these values for your robot.
-    public static final double ksVolts = 1;
-    public static final double kvVoltSecondsPerMeter = 0.8;
-    public static final double kaVoltSecondsSquaredPerMeter = 0.15;
+    public static final double ks = 1; // V
+    public static final double kv = 0.8; // V/(m/s)
+    public static final double ka = 0.15; // V/(m/s²)
 
-    public static final double kMaxSpeedMetersPerSecond = 3;
+    public static final double kMaxSpeed = 3; // m/s
   }
 
   public static final class ModuleConstants {
-    public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
-    public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
+    public static final double kMaxModuleAngularSpeed = 2 * Math.PI; // rad/s
+    public static final double kMaxModuleAngularAcceleration = 2 * Math.PI; // rad/s²
 
     public static final int kEncoderCPR = 1024;
-    public static final double kWheelDiameterMeters = 0.15;
+    public static final double kWheelDiameter = 0.15; // m
     public static final double kDriveEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelDiameterMeters * Math.PI) / kEncoderCPR;
+        (kWheelDiameter * Math.PI) / kEncoderCPR;
 
     public static final double kTurningEncoderDistancePerPulse =
         // Assumes the encoders are on a 1:1 reduction with the module shaft.
@@ -100,10 +100,10 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+    public static final double kMaxSpeed = 3; // m/s
+    public static final double kMaxAcceleration = 3; // m/s²
+    public static final double kMaxAngularSpeed = Math.PI; // rad/s
+    public static final double kMaxAngularAcceleration = Math.PI; // rad/s²
 
     public static final double kPXController = 1;
     public static final double kPYController = 1;
@@ -111,7 +111,6 @@ public final class Constants {
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-        new TrapezoidProfile.Constraints(
-            kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+        new TrapezoidProfile.Constraints(kMaxAngularSpeed, kMaxAngularAcceleration);
   }
 }

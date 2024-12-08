@@ -25,10 +25,10 @@ public class Constants {
   public static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
   public static final double kCarriageMass = 4.0; // kg
 
-  public static final double kSetpointMeters = 0.75;
+  public static final double kSetpoint = 0.75; // m
   // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
-  public static final double kMinElevatorHeightMeters = 0.0;
-  public static final double kMaxElevatorHeightMeters = 1.25;
+  public static final double kMinElevatorHeight = 0.0; // m
+  public static final double kMaxElevatorHeight = 1.25; // m
 
   // distance per pulse = (distance per revolution) / (pulses per revolution)
   //  = (Pi * D) / ppr

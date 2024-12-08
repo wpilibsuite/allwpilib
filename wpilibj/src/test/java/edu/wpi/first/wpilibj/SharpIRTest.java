@@ -15,13 +15,13 @@ class SharpIRTest {
     try (SharpIR s = SharpIR.GP2Y0A02YK0F(1)) {
       SharpIRSim sim = new SharpIRSim(s);
 
-      assertEquals(20, s.getRangeCM());
+      assertEquals(0.2, s.getRange());
 
-      sim.setRangeCm(30);
-      assertEquals(30, s.getRangeCM());
+      sim.setRange(0.3);
+      assertEquals(0.3, s.getRange());
 
-      sim.setRangeCm(300);
-      assertEquals(150, s.getRangeCM());
+      sim.setRange(3);
+      assertEquals(1.5, s.getRange());
     }
   }
 }

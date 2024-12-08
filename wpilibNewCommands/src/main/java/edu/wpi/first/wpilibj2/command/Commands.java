@@ -121,12 +121,12 @@ public final class Commands {
   /**
    * Constructs a command that does nothing, finishing after a specified duration.
    *
-   * @param seconds after how long the command finishes
+   * @param time after how long the command finishes in seconds
    * @return the command
    * @see WaitCommand
    */
-  public static Command waitSeconds(double seconds) {
-    return new WaitCommand(seconds);
+  public static Command wait(double time) {
+    return new WaitCommand(time);
   }
 
   /**

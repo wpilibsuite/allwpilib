@@ -20,7 +20,7 @@ class SwerveModuleStateTest {
     refA.optimize(angleA);
 
     assertAll(
-        () -> assertEquals(2.0, refA.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(2.0, refA.speed, kEpsilon),
         () -> assertEquals(0.0, refA.angle.getDegrees(), kEpsilon));
 
     var angleB = Rotation2d.fromDegrees(-50);
@@ -28,7 +28,7 @@ class SwerveModuleStateTest {
     refB.optimize(angleB);
 
     assertAll(
-        () -> assertEquals(-4.7, refB.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(-4.7, refB.speed, kEpsilon),
         () -> assertEquals(-139.0, refB.angle.getDegrees(), kEpsilon));
   }
 
@@ -39,7 +39,7 @@ class SwerveModuleStateTest {
     refA.optimize(angleA);
 
     assertAll(
-        () -> assertEquals(2.0, refA.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(2.0, refA.speed, kEpsilon),
         () -> assertEquals(89.0, refA.angle.getDegrees(), kEpsilon));
 
     var angleB = Rotation2d.kZero;
@@ -47,7 +47,7 @@ class SwerveModuleStateTest {
     refB.optimize(angleB);
 
     assertAll(
-        () -> assertEquals(-2.0, refB.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(-2.0, refB.speed, kEpsilon),
         () -> assertEquals(-2.0, refB.angle.getDegrees(), kEpsilon));
   }
 
@@ -58,7 +58,7 @@ class SwerveModuleStateTest {
     refA.cosineScale(angleA);
 
     assertAll(
-        () -> assertEquals(Math.sqrt(2.0), refA.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(Math.sqrt(2.0), refA.speed, kEpsilon),
         () -> assertEquals(45.0, refA.angle.getDegrees(), kEpsilon));
 
     var angleB = Rotation2d.fromDegrees(45.0);
@@ -66,7 +66,7 @@ class SwerveModuleStateTest {
     refB.cosineScale(angleB);
 
     assertAll(
-        () -> assertEquals(2.0, refB.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(2.0, refB.speed, kEpsilon),
         () -> assertEquals(45.0, refB.angle.getDegrees(), kEpsilon));
 
     var angleC = Rotation2d.fromDegrees(-45.0);
@@ -74,7 +74,7 @@ class SwerveModuleStateTest {
     refC.cosineScale(angleC);
 
     assertAll(
-        () -> assertEquals(0.0, refC.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, refC.speed, kEpsilon),
         () -> assertEquals(45.0, refC.angle.getDegrees(), kEpsilon));
 
     var angleD = Rotation2d.fromDegrees(135.0);
@@ -82,7 +82,7 @@ class SwerveModuleStateTest {
     refD.cosineScale(angleD);
 
     assertAll(
-        () -> assertEquals(0.0, refD.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, refD.speed, kEpsilon),
         () -> assertEquals(45.0, refD.angle.getDegrees(), kEpsilon));
 
     var angleE = Rotation2d.fromDegrees(-135.0);
@@ -90,7 +90,7 @@ class SwerveModuleStateTest {
     refE.cosineScale(angleE);
 
     assertAll(
-        () -> assertEquals(-2.0, refE.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(-2.0, refE.speed, kEpsilon),
         () -> assertEquals(45.0, refE.angle.getDegrees(), kEpsilon));
 
     var angleF = Rotation2d.fromDegrees(180.0);
@@ -98,7 +98,7 @@ class SwerveModuleStateTest {
     refF.cosineScale(angleF);
 
     assertAll(
-        () -> assertEquals(-Math.sqrt(2.0), refF.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(-Math.sqrt(2.0), refF.speed, kEpsilon),
         () -> assertEquals(45.0, refF.angle.getDegrees(), kEpsilon));
 
     var angleG = Rotation2d.fromDegrees(0.0);
@@ -106,7 +106,7 @@ class SwerveModuleStateTest {
     refG.cosineScale(angleG);
 
     assertAll(
-        () -> assertEquals(-Math.sqrt(2.0), refG.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(-Math.sqrt(2.0), refG.speed, kEpsilon),
         () -> assertEquals(45.0, refG.angle.getDegrees(), kEpsilon));
 
     var angleH = Rotation2d.fromDegrees(45.0);
@@ -114,7 +114,7 @@ class SwerveModuleStateTest {
     refH.cosineScale(angleH);
 
     assertAll(
-        () -> assertEquals(-2.0, refH.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(-2.0, refH.speed, kEpsilon),
         () -> assertEquals(45.0, refH.angle.getDegrees(), kEpsilon));
 
     var angleI = Rotation2d.fromDegrees(-45.0);
@@ -122,7 +122,7 @@ class SwerveModuleStateTest {
     refI.cosineScale(angleI);
 
     assertAll(
-        () -> assertEquals(0.0, refI.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, refI.speed, kEpsilon),
         () -> assertEquals(45.0, refI.angle.getDegrees(), kEpsilon));
 
     var angleJ = Rotation2d.fromDegrees(135.0);
@@ -130,7 +130,7 @@ class SwerveModuleStateTest {
     refJ.cosineScale(angleJ);
 
     assertAll(
-        () -> assertEquals(0.0, refJ.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, refJ.speed, kEpsilon),
         () -> assertEquals(45.0, refJ.angle.getDegrees(), kEpsilon));
 
     var angleK = Rotation2d.fromDegrees(-135.0);
@@ -138,7 +138,7 @@ class SwerveModuleStateTest {
     refK.cosineScale(angleK);
 
     assertAll(
-        () -> assertEquals(2.0, refK.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(2.0, refK.speed, kEpsilon),
         () -> assertEquals(45.0, refK.angle.getDegrees(), kEpsilon));
 
     var angleL = Rotation2d.fromDegrees(180.0);
@@ -146,7 +146,7 @@ class SwerveModuleStateTest {
     refL.cosineScale(angleL);
 
     assertAll(
-        () -> assertEquals(Math.sqrt(2.0), refL.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(Math.sqrt(2.0), refL.speed, kEpsilon),
         () -> assertEquals(45.0, refL.angle.getDegrees(), kEpsilon));
   }
 }

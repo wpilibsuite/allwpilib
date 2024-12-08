@@ -54,14 +54,14 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
    * @param inputs A {@link Nat} representing the number of inputs.
    * @param f A vector-valued function of x, the state, and u, the input, that returns the
    *     derivative of the state vector. HAS to be control-affine (of the form f(x) + Bu).
-   * @param dtSeconds The timestep between calls of calculate().
+   * @param dt The timestep between calls of calculate() in seconds.
    */
   public ControlAffinePlantInversionFeedforward(
       Nat<States> states,
       Nat<Inputs> inputs,
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
-      double dtSeconds) {
-    this.m_dt = dtSeconds;
+      double dt) {
+    this.m_dt = dt;
     this.m_f = f;
     this.m_inputs = inputs;
 
@@ -84,15 +84,15 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
    * @param f A vector-valued function of x, the state, that returns the derivative of the state
    *     vector.
    * @param B Continuous input matrix of the plant being controlled.
-   * @param dtSeconds The timestep between calls of calculate().
+   * @param dt The timestep between calls of calculate() in seconds.
    */
   public ControlAffinePlantInversionFeedforward(
       Nat<States> states,
       Nat<Inputs> inputs,
       Function<Matrix<States, N1>, Matrix<States, N1>> f,
       Matrix<States, Inputs> B,
-      double dtSeconds) {
-    this.m_dt = dtSeconds;
+      double dt) {
+    this.m_dt = dt;
     this.m_inputs = inputs;
 
     this.m_f = (x, u) -> f.apply(x);

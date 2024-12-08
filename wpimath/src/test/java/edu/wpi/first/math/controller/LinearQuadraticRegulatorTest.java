@@ -85,7 +85,7 @@ class LinearQuadraticRegulatorTest {
    * @param Q State cost matrix.
    * @param R Input cost matrix.
    * @param Aref Desired state matrix.
-   * @param dtSeconds Discretization timestep in seconds.
+   * @param dt Discretization timestep in seconds.
    */
   <States extends Num, Inputs extends Num> Matrix<Inputs, States> getImplicitModelFollowingK(
       Matrix<States, States> A,
@@ -93,21 +93,21 @@ class LinearQuadraticRegulatorTest {
       Matrix<States, States> Q,
       Matrix<Inputs, Inputs> R,
       Matrix<States, States> Aref,
-      double dtSeconds) {
+      double dt) {
     // Discretize real dynamics
-    var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
+    var discABPair = Discretization.discretizeAB(A, B, dt);
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
 
     // Discretize desired dynamics
-    var discAref = Discretization.discretizeA(Aref, dtSeconds);
+    var discAref = Discretization.discretizeA(Aref, dt);
 
     Matrix<States, States> Qimf =
         (discA.minus(discAref)).transpose().times(Q).times(discA.minus(discAref));
     Matrix<Inputs, Inputs> Rimf = discB.transpose().times(Q).times(discB).plus(R);
     Matrix<States, Inputs> Nimf = (discA.minus(discAref)).transpose().times(Q).times(discB);
 
-    return new LinearQuadraticRegulator<>(A, B, Qimf, Rimf, Nimf, dtSeconds).getK();
+    return new LinearQuadraticRegulator<>(A, B, Qimf, Rimf, Nimf, dt).getK();
   }
 
   @Test

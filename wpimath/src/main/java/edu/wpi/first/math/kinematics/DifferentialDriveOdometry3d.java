@@ -35,20 +35,17 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    * Constructs a DifferentialDriveOdometry3d object.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistanceMeters The distance traveled by the left encoder.
-   * @param rightDistanceMeters The distance traveled by the right encoder.
-   * @param initialPoseMeters The starting position of the robot on the field.
+   * @param leftDistance The distance traveled by the left encoder in meters.
+   * @param rightDistance The distance traveled by the right encoder in meters.
+   * @param initialPose The starting position of the robot on the field.
    */
   public DifferentialDriveOdometry3d(
-      Rotation3d gyroAngle,
-      double leftDistanceMeters,
-      double rightDistanceMeters,
-      Pose3d initialPoseMeters) {
+      Rotation3d gyroAngle, double leftDistance, double rightDistance, Pose3d initialPose) {
     super(
         new DifferentialDriveKinematics(1),
         gyroAngle,
-        new DifferentialDriveWheelPositions(leftDistanceMeters, rightDistanceMeters),
-        initialPoseMeters);
+        new DifferentialDriveWheelPositions(leftDistance, rightDistance),
+        initialPose);
     MathSharedStore.reportUsage("DifferentialDriveOdometry3d", "");
   }
 
@@ -58,26 +55,23 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    * @param gyroAngle The angle reported by the gyroscope.
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
-   * @param initialPoseMeters The starting position of the robot on the field.
+   * @param initialPose The starting position of the robot on the field.
    */
   public DifferentialDriveOdometry3d(
-      Rotation3d gyroAngle,
-      Distance leftDistance,
-      Distance rightDistance,
-      Pose3d initialPoseMeters) {
-    this(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), initialPoseMeters);
+      Rotation3d gyroAngle, Distance leftDistance, Distance rightDistance, Pose3d initialPose) {
+    this(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), initialPose);
   }
 
   /**
    * Constructs a DifferentialDriveOdometry3d object.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistanceMeters The distance traveled by the left encoder.
-   * @param rightDistanceMeters The distance traveled by the right encoder.
+   * @param leftDistance The distance traveled by the left encoder in meters.
+   * @param rightDistance The distance traveled by the right encoder in meters.
    */
   public DifferentialDriveOdometry3d(
-      Rotation3d gyroAngle, double leftDistanceMeters, double rightDistanceMeters) {
-    this(gyroAngle, leftDistanceMeters, rightDistanceMeters, Pose3d.kZero);
+      Rotation3d gyroAngle, double leftDistance, double rightDistance) {
+    this(gyroAngle, leftDistance, rightDistance, Pose3d.kZero);
   }
 
   /**
@@ -99,19 +93,14 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    * automatically takes care of offsetting the gyro angle.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistanceMeters The distance traveled by the left encoder.
-   * @param rightDistanceMeters The distance traveled by the right encoder.
-   * @param poseMeters The position on the field that your robot is at.
+   * @param leftDistance The distance traveled by the left encoder in meters.
+   * @param rightDistance The distance traveled by the right encoder in meters.
+   * @param pose The position on the field that your robot is at.
    */
   public void resetPosition(
-      Rotation3d gyroAngle,
-      double leftDistanceMeters,
-      double rightDistanceMeters,
-      Pose3d poseMeters) {
+      Rotation3d gyroAngle, double leftDistance, double rightDistance, Pose3d pose) {
     super.resetPosition(
-        gyroAngle,
-        new DifferentialDriveWheelPositions(leftDistanceMeters, rightDistanceMeters),
-        poseMeters);
+        gyroAngle, new DifferentialDriveWheelPositions(leftDistance, rightDistance), pose);
   }
 
   /**
@@ -123,11 +112,11 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    * @param gyroAngle The angle reported by the gyroscope.
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
-   * @param poseMeters The position on the field that your robot is at.
+   * @param pose The position on the field that your robot is at.
    */
   public void resetPosition(
-      Rotation3d gyroAngle, Distance leftDistance, Distance rightDistance, Pose3d poseMeters) {
-    resetPosition(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), poseMeters);
+      Rotation3d gyroAngle, Distance leftDistance, Distance rightDistance, Pose3d pose) {
+    resetPosition(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), pose);
   }
 
   /**
@@ -136,13 +125,12 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    * advantageous for teams that are using lower CPR encoders.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistanceMeters The distance traveled by the left encoder.
-   * @param rightDistanceMeters The distance traveled by the right encoder.
+   * @param leftDistance The distance traveled by the left encoder in meters.
+   * @param rightDistance The distance traveled by the right encoder in meters.
    * @return The new pose of the robot.
    */
-  public Pose3d update(
-      Rotation3d gyroAngle, double leftDistanceMeters, double rightDistanceMeters) {
+  public Pose3d update(Rotation3d gyroAngle, double leftDistance, double rightDistance) {
     return super.update(
-        gyroAngle, new DifferentialDriveWheelPositions(leftDistanceMeters, rightDistanceMeters));
+        gyroAngle, new DifferentialDriveWheelPositions(leftDistance, rightDistance));
   }
 }

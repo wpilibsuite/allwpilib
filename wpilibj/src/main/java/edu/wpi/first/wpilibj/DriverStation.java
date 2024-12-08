@@ -1148,19 +1148,19 @@ public final class DriverStation {
   /**
    * Wait for a DS connection.
    *
-   * @param timeoutSeconds timeout in seconds. 0 for infinite.
+   * @param timeout timeout in seconds. 0 for infinite.
    * @return true if connected, false if timeout
    */
-  public static boolean waitForDsConnection(double timeoutSeconds) {
+  public static boolean waitForDsConnection(double timeout) {
     int event = WPIUtilJNI.createEvent(true, false);
     DriverStationJNI.provideNewDataEventHandle(event);
     boolean result;
     try {
-      if (timeoutSeconds == 0) {
+      if (timeout == 0) {
         WPIUtilJNI.waitForObject(event);
         result = true;
       } else {
-        result = !WPIUtilJNI.waitForObjectTimeout(event, timeoutSeconds);
+        result = !WPIUtilJNI.waitForObjectTimeout(event, timeout);
       }
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();

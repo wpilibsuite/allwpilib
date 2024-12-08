@@ -4,19 +4,11 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated DC motor mechanism. */
@@ -27,8 +19,8 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   // The gearing from the motors to the output.
   private final double m_gearing;
 
-  // The moment of inertia for the DC motor mechanism.
-  private final double m_jKgMetersSquared;
+  // The moment of inertia for the DC motor mechanism in kg-m².
+  private final double m_j;
 
   /**
    * Creates a simulated DC motor mechanism.
@@ -64,36 +56,36 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
     //
     //   B = GKₜ/(RJ)
     //   J = GKₜ/(RB)
-    m_gearing = -gearbox.KvRadPerSecPerVolt * plant.getA(1, 1) / plant.getB(1, 0);
-    m_jKgMetersSquared = m_gearing * gearbox.KtNMPerAmp / (gearbox.rOhms * plant.getB(1, 0));
+    m_gearing = -gearbox.Kv * plant.getA(1, 1) / plant.getB(1, 0);
+    m_j = m_gearing * gearbox.Kt / (gearbox.R * plant.getB(1, 0));
   }
 
   /**
    * Sets the state of the DC motor.
    *
-   * @param angularPositionRad The new position in radians.
-   * @param angularVelocityRadPerSec The new velocity in radians per second.
+   * @param angularPosition The new position in radians.
+   * @param angularVelocity The new velocity in radians per second.
    */
-  public void setState(double angularPositionRad, double angularVelocityRadPerSec) {
-    setState(VecBuilder.fill(angularPositionRad, angularVelocityRadPerSec));
+  public void setState(double angularPosition, double angularVelocity) {
+    setState(VecBuilder.fill(angularPosition, angularVelocity));
   }
 
   /**
    * Sets the DC motor's angular position.
    *
-   * @param angularPositionRad The new position in radians.
+   * @param angularPosition The new position in radians.
    */
-  public void setAngle(double angularPositionRad) {
-    setState(angularPositionRad, getAngularVelocityRadPerSec());
+  public void setAngle(double angularPosition) {
+    setState(angularPosition, getAngularVelocity());
   }
 
   /**
    * Sets the DC motor's angular velocity.
    *
-   * @param angularVelocityRadPerSec The new velocity in radians per second.
+   * @param angularVelocity The new velocity in radians per second.
    */
-  public void setAngularVelocity(double angularVelocityRadPerSec) {
-    setState(getAngularPositionRad(), angularVelocityRadPerSec);
+  public void setAngularVelocity(double angularVelocity) {
+    setState(getAngularPosition(), angularVelocity);
   }
 
   /**
@@ -108,10 +100,10 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Returns the moment of inertia of the DC motor.
    *
-   * @return The DC motor's moment of inertia.
+   * @return The DC motor's moment of inertia in kg-m².
    */
-  public double getJKgMetersSquared() {
-    return m_jKgMetersSquared;
+  public double getJ() {
+    return m_j;
   }
 
   /**
@@ -126,28 +118,10 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Returns the DC motor's position.
    *
-   * @return The DC motor's position.
+   * @return The DC motor's position in meters.
    */
-  public double getAngularPositionRad() {
+  public double getAngularPosition() {
     return getOutput(0);
-  }
-
-  /**
-   * Returns the DC motor's position in rotations.
-   *
-   * @return The DC motor's position in rotations.
-   */
-  public double getAngularPositionRotations() {
-    return Units.radiansToRotations(getAngularPositionRad());
-  }
-
-  /**
-   * Returns the DC motor's position.
-   *
-   * @return The DC motor's position
-   */
-  public Angle getAngularPosition() {
-    return Radians.of(getAngularPositionRad());
   }
 
   /**
@@ -155,62 +129,35 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @return The DC motor's velocity.
    */
-  public double getAngularVelocityRadPerSec() {
+  public double getAngularVelocity() {
     return getOutput(1);
-  }
-
-  /**
-   * Returns the DC motor's velocity in RPM.
-   *
-   * @return The DC motor's velocity in RPM.
-   */
-  public double getAngularVelocityRPM() {
-    return Units.radiansPerSecondToRotationsPerMinute(getAngularVelocityRadPerSec());
-  }
-
-  /**
-   * Returns the DC motor's velocity.
-   *
-   * @return The DC motor's velocity
-   */
-  public AngularVelocity getAngularVelocity() {
-    return RadiansPerSecond.of(getAngularVelocityRadPerSec());
-  }
-
-  /**
-   * Returns the DC motor's acceleration in Radians Per Second Squared.
-   *
-   * @return The DC motor's acceleration in Radians Per Second Squared.
-   */
-  public double getAngularAccelerationRadPerSecSq() {
-    var acceleration = (m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u));
-    return acceleration.get(1, 0);
   }
 
   /**
    * Returns the DC motor's acceleration.
    *
-   * @return The DC motor's acceleration.
+   * @return The DC motor's acceleration in rad/s².
    */
-  public AngularAcceleration getAngularAcceleration() {
-    return RadiansPerSecondPerSecond.of(getAngularAccelerationRadPerSecSq());
+  public double getAngularAcceleration() {
+    var acceleration = (m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u));
+    return acceleration.get(1, 0);
   }
 
   /**
-   * Returns the DC motor's torque in Newton-Meters.
+   * Returns the DC motor's torque in.
    *
-   * @return The DC motor's torque in Newton-Meters.
+   * @return The DC motor's torque in Newton-meters.
    */
-  public double getTorqueNewtonMeters() {
-    return getAngularAccelerationRadPerSecSq() * m_jKgMetersSquared;
+  public double getTorque() {
+    return getAngularAcceleration() * m_j;
   }
 
   /**
    * Returns the DC motor's current draw.
    *
-   * @return The DC motor's current draw.
+   * @return The DC motor's current draw in amps.
    */
-  public double getCurrentDrawAmps() {
+  public double getCurrentDraw() {
     // I = V / R - omega / (Kv * R)
     // Reductions are output over input, so a reduction of 2:1 means the motor is spinning
     // 2x faster than the output

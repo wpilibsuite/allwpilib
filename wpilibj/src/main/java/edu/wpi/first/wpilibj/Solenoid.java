@@ -125,11 +125,11 @@ public class Solenoid implements Sendable, AutoCloseable {
    * <p>On the PH, the timing can be controlled in 0.001 second increments, with a maximum of 65.534
    * seconds.
    *
-   * @param durationSeconds The duration of the pulse in seconds.
+   * @param duration The duration of the pulse in seconds.
    * @see #startPulse()
    */
-  public void setPulseDuration(double durationSeconds) {
-    long durationMS = (long) (durationSeconds * 1000);
+  public void setPulseDuration(double duration) {
+    long durationMS = (long) (duration * 1000);
     m_module.setOneShotDuration(m_channel, (int) durationMS);
   }
 
