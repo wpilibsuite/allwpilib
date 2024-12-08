@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -158,8 +159,6 @@ public class Rotation2d
     //     [sinθ   cosθ]
     m_cos = R.get(0, 0);
     m_sin = R.get(1, 0);
-
-    m_value = Math.atan2(m_sin, m_cos);
   }
 
   /**

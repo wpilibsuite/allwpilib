@@ -6,8 +6,10 @@
 
 #include <type_traits>
 #include <utility>
+#include <utility>
 
 #include <Eigen/Core>
+#include <Eigen/LU>
 #include <gcem.hpp>
 #include <wpi/StackTrace.h>
 #include <wpi/SymbolExports.h>
@@ -76,11 +78,7 @@ class WPILIB_DLLEXPORT Rotation2d {
       if ((R * R.transpose() - Matrix2d::Identity()).norm() > 1e-9) {
         throw std::domain_error("Rotation matrix isn't orthogonal");
       }
-      // HACK: Uses ct_matrix instead of <Eigen/LU> for determinant because
-      //       including <Eigen/LU> doubles compilation times on MSVC, even if
-      //       this constructor is unused. MSVC's frontend inefficiently parses
-      //       large headers; GCC and Clang are largely unaffected.
-      if (gcem::abs(ct_matrix{R}.determinant() - 1.0) > 1e-9) {
+      if (gcem::abs(R.determinant() - 1.0) > 1e-9) {
         throw std::domain_error(
             "Rotation matrix is orthogonal but not special orthogonal");
       }
@@ -99,8 +97,6 @@ class WPILIB_DLLEXPORT Rotation2d {
       m_cos = std::get<0>(cossin);
       m_sin = std::get<1>(cossin);
     }
-
-    m_value = units::radian_t{gcem::atan2(m_sin, m_cos)};
   }
 
   /**
