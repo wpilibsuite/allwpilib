@@ -51,25 +51,25 @@ class DifferentialDriveVoltageConstraintTest {
       assertAll(
           () ->
               assertTrue(
-                  feedforward.calculateWithVelocities(
+                  feedforward.calculate(
                           wheelSpeeds.leftMetersPerSecond,
                           wheelSpeeds.leftMetersPerSecond + dt * acceleration)
                       <= maxVoltage + 0.05),
           () ->
               assertTrue(
-                  feedforward.calculateWithVelocities(
+                  feedforward.calculate(
                           wheelSpeeds.leftMetersPerSecond,
                           wheelSpeeds.leftMetersPerSecond + dt * acceleration)
                       >= -maxVoltage - 0.05),
           () ->
               assertTrue(
-                  feedforward.calculateWithVelocities(
+                  feedforward.calculate(
                           wheelSpeeds.rightMetersPerSecond,
                           wheelSpeeds.rightMetersPerSecond + dt * acceleration)
                       <= maxVoltage + 0.05),
           () ->
               assertTrue(
-                  feedforward.calculateWithVelocities(
+                  feedforward.calculate(
                           wheelSpeeds.rightMetersPerSecond,
                           wheelSpeeds.rightMetersPerSecond + dt * acceleration)
                       >= -maxVoltage - 0.05));

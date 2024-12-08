@@ -56,10 +56,10 @@ class WPILIB_DLLEXPORT Translation3d {
   }
 
   /**
-   * Constructs a Translation3d from the provided translation vector's X, Y, and
-   * Z components. The values are assumed to be in meters.
+   * Constructs a Translation3d from a 3D translation vector. The values are
+   * assumed to be in meters.
    *
-   * @param vector The translation vector to represent.
+   * @param vector The translation vector.
    */
   constexpr explicit Translation3d(const Eigen::Vector3d& vector)
       : m_x{units::meter_t{vector.x()}},
@@ -114,9 +114,9 @@ class WPILIB_DLLEXPORT Translation3d {
   constexpr units::meter_t Z() const { return m_z; }
 
   /**
-   * Returns a vector representation of this translation.
+   * Returns a 3D translation vector representation of this translation.
    *
-   * @return A Vector representation of this translation.
+   * @return A 3D translation vector representation of this translation.
    */
   constexpr Eigen::Vector3d ToVector() const {
     return Eigen::Vector3d{{m_x.value(), m_y.value(), m_z.value()}};
