@@ -34,19 +34,17 @@ class SimpleMotorFeedforwardTest {
     double nextVelocity = 3.0; // rad/s
 
     assertEquals(
-        37.52499583432516 + 0.5,
-        simpleMotor.calculateWithVelocities(currentVelocity, nextVelocity),
-        0.002);
+        37.52499583432516 + 0.5, simpleMotor.calculate(currentVelocity, nextVelocity), 0.002);
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + Ks,
-        simpleMotor.calculateWithVelocities(currentVelocity, nextVelocity),
+        simpleMotor.calculate(currentVelocity, nextVelocity),
         0.002);
 
     // These won't match exactly. It's just an approximation to make sure they're
     // in the same ballpark.
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + Ks,
-        simpleMotor.calculateWithVelocities(currentVelocity, nextVelocity),
+        simpleMotor.calculate(currentVelocity, nextVelocity),
         2.0);
   }
 
