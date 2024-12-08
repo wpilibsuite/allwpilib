@@ -57,6 +57,7 @@ jobs:
       matrix:
         include:
           - { name: "Linux (native)",  os: ubuntu-24.04,   action: "test",  config: "--config=linux",    }
+          - { name: "Linux (roborio)", os: ubuntu-24.04,   action: "build", config: "--config=roborio",  }
     name: "${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
     steps:
@@ -74,7 +75,6 @@ jobs:
 
   buildifier:
     name: "buildifier"
-    runs-on: ubuntu-24.04
     runs-on: ubuntu-24.04
     steps:
       - name: Set up Go 1.15.x
