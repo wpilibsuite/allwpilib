@@ -37,7 +37,7 @@ public class NestedBackend implements EpilogueBackend {
   public EpilogueBackend getNested(String path) {
     return m_nestedBackends.computeIfAbsent(path, k -> new NestedBackend(k, this));
   }
-  
+
   public String getPrefix() {
     return m_prefix;
   }

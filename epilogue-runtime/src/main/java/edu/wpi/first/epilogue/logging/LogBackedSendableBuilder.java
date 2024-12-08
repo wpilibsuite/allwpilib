@@ -24,8 +24,7 @@ import java.util.function.Supplier;
 /** A sendable builder implementation that sends data to a {@link EpilogueBackend}. */
 @SuppressWarnings("PMD.CouplingBetweenObjects") // most methods simply delegate to the backend
 public class LogBackedSendableBuilder implements NTSendableBuilder {
-  private static final NetworkTable rootTable =
-      NetworkTableInstance.getDefault().getTable("Robot");
+  private static final NetworkTable rootTable = NetworkTableInstance.getDefault().getTable("Robot");
   private final EpilogueBackend m_backend;
   private final Collection<Runnable> m_updates = new ArrayList<>();
   private final NetworkTable networkTable;
@@ -188,22 +187,22 @@ public class LogBackedSendableBuilder implements NTSendableBuilder {
   public void publishConstRaw(String key, String typeString, byte[] value) {
     m_backend.log(key, value);
   }
-  
+
   @Override
   public void setUpdateTable(Runnable func) {
     m_updates.add(func);
   }
-  
+
   @Override
   public Topic getTopic(String key) {
     return getTable().getTopic(key);
   }
-  
+
   @Override
   public NetworkTable getTable() {
     return networkTable;
   }
-  
+
   @Override
   public BackendKind getBackendKind() {
     return BackendKind.kUnknown;
