@@ -4,11 +4,13 @@
 
 #pragma once
 
+#include <cmath>
+
+#include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
-#include <wpi/interpolating_map.h>
 
-#include "frc/EigenCore.h"
+#include "frc/StateSpaceUtil.h"
 #include "frc/controller/DifferentialDriveWheelVoltages.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/system/LinearSystem.h"
@@ -52,14 +54,18 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    * @param Qelems     The maximum desired error tolerance for each state.
    * @param Relems     The maximum desired control effort for each input.
    * @param dt         Discretization timestep.
-   * @throws std::domain_error if max velocity of plant with 12 V input <= 0 m/s
-   *     or >= 15 m/s.
    */
   LTVDifferentialDriveController(const frc::LinearSystem<2, 2, 2>& plant,
                                  units::meter_t trackwidth,
                                  const wpi::array<double, 5>& Qelems,
                                  const wpi::array<double, 2>& Relems,
-                                 units::second_t dt);
+                                 units::second_t dt)
+      : m_trackwidth{trackwidth},
+        m_A{plant.A()},
+        m_B{plant.B()},
+        m_Q{frc::MakeCostMatrix(Qelems)},
+        m_R{frc::MakeCostMatrix(Relems)},
+        m_dt{dt} {}
 
   /**
    * Move constructor.
@@ -75,7 +81,13 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
   /**
    * Returns true if the pose error is within tolerance of the reference.
    */
-  bool AtReference() const;
+  bool AtReference() const {
+    return std::abs(m_error(0)) < m_tolerance(0) &&
+           std::abs(m_error(1)) < m_tolerance(1) &&
+           std::abs(m_error(2)) < m_tolerance(2) &&
+           std::abs(m_error(3)) < m_tolerance(3) &&
+           std::abs(m_error(4)) < m_tolerance(4);
+  }
 
   /**
    * Sets the pose error which is considered tolerable for use with
@@ -87,7 +99,12 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    */
   void SetTolerance(const Pose2d& poseTolerance,
                     units::meters_per_second_t leftVelocityTolerance,
-                    units::meters_per_second_t rightVelocityTolerance);
+                    units::meters_per_second_t rightVelocityTolerance) {
+    m_tolerance = Eigen::Vector<double, 5>{
+        poseTolerance.X().value(), poseTolerance.Y().value(),
+        poseTolerance.Rotation().Radians().value(),
+        leftVelocityTolerance.value(), rightVelocityTolerance.value()};
+  }
 
   /**
    * Returns the left and right output voltages of the LTV controller.
@@ -123,16 +140,41 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
   DifferentialDriveWheelVoltages Calculate(
       const Pose2d& currentPose, units::meters_per_second_t leftVelocity,
       units::meters_per_second_t rightVelocity,
-      const Trajectory::State& desiredState);
+      const Trajectory::State& desiredState) {
+    // v = (v_r + v_l) / 2     (1)
+    // w = (v_r - v_l) / (2r)  (2)
+    // k = w / v               (3)
+    //
+    // v_l = v - wr
+    // v_l = v - (vk)r
+    // v_l = v(1 - kr)
+    //
+    // v_r = v + wr
+    // v_r = v + (vk)r
+    // v_r = v(1 + kr)
+    return Calculate(
+        currentPose, leftVelocity, rightVelocity, desiredState.pose,
+        desiredState.velocity *
+            (1 - (desiredState.curvature / 1_rad * m_trackwidth / 2.0)),
+        desiredState.velocity *
+            (1 + (desiredState.curvature / 1_rad * m_trackwidth / 2.0)));
+  }
 
  private:
   units::meter_t m_trackwidth;
 
-  // LUT from drivetrain linear velocity to LQR gain
-  wpi::interpolating_map<units::meters_per_second_t, Matrixd<2, 5>> m_table;
+  // Continuous velocity dynamics
+  Eigen::Matrix<double, 2, 2> m_A;
+  Eigen::Matrix<double, 2, 2> m_B;
 
-  Vectord<5> m_error;
-  Vectord<5> m_tolerance;
+  // LQR cost matrices
+  Eigen::Matrix<double, 5, 5> m_Q;
+  Eigen::Matrix<double, 2, 2> m_R;
+
+  units::second_t m_dt;
+
+  Eigen::Vector<double, 5> m_error;
+  Eigen::Vector<double, 5> m_tolerance;
 };
 
 }  // namespace frc
