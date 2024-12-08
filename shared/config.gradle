@@ -7,7 +7,6 @@ if (project.hasProperty('ciDebugOnly')) {
 }
 
 nativeUtils.addWpiNativeUtils()
-nativeUtils.withCrossRoboRIO()
 nativeUtils.withCrossLinuxArm32()
 nativeUtils.withCrossLinuxArm64()
 nativeUtils.withCrossSystemCore()
