@@ -99,6 +99,43 @@ class WPILIB_DLLEXPORT Rotation2d {
   }
 
   /**
+   * Constructs a Rotation2d from a rotation matrix.
+   *
+   * @param rotationMatrix The rotation matrix.
+   * @throws std::domain_error if the rotation matrix isn't special orthogonal.
+   */
+  constexpr explicit Rotation2d(const Eigen::Matrix2d& rotationMatrix) {
+    auto impl =
+        []<typename Matrix2d>(const Matrix2d& R) -> std::pair<double, double> {
+      // Require that the rotation matrix is special orthogonal. This is true if
+      // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
+      if ((R * R.transpose() - Matrix2d::Identity()).norm() > 1e-9) {
+        throw std::domain_error("Rotation matrix isn't orthogonal");
+      }
+      if (gcem::abs(R.determinant() - 1.0) > 1e-9) {
+        throw std::domain_error(
+            "Rotation matrix is orthogonal but not special orthogonal");
+      }
+
+      // R = [cosθ  −sinθ]
+      //     [sinθ   cosθ]
+      return {R(0, 0), R(1, 0)};
+    };
+
+    if (std::is_constant_evaluated()) {
+      auto cossin = impl(ct_matrix2d{rotationMatrix});
+      m_cos = std::get<0>(cossin);
+      m_sin = std::get<1>(cossin);
+    } else {
+      auto cossin = impl(rotationMatrix);
+      m_cos = std::get<0>(cossin);
+      m_sin = std::get<1>(cossin);
+    }
+
+    m_value = units::radian_t{gcem::atan2(m_sin, m_cos)};
+  }
+
+  /**
    * Adds two rotations together, with the result being bounded between -π and
    * π.
    *
