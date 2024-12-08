@@ -123,7 +123,7 @@ public final class StringUtils {
     String packageName = p.getQualifiedName().toString();
 
     String className;
-    if (config.name().isEmpty()) {
+    if (config == null || config.name().isEmpty()) {
       className = String.join("$", nesting);
     } else {
       className = capitalize(config.name()).replaceAll(" ", "");

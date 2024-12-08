@@ -204,6 +204,8 @@ struct SLEIPNIR_DLLEXPORT Expression {
    */
   friend SLEIPNIR_DLLEXPORT ExpressionPtr operator*(const ExpressionPtr& lhs,
                                                     const ExpressionPtr& rhs) {
+    using enum ExpressionType;
+
     // Prune expression
     if (lhs->IsConstant(0.0)) {
       // Return zero
@@ -218,22 +220,20 @@ struct SLEIPNIR_DLLEXPORT Expression {
     }
 
     // Evaluate constant
-    if (lhs->type == ExpressionType::kConstant &&
-        rhs->type == ExpressionType::kConstant) {
+    if (lhs->type == kConstant && rhs->type == kConstant) {
       return MakeExpressionPtr(lhs->value * rhs->value);
     }
 
     // Evaluate expression type
     ExpressionType type;
-    if (lhs->type == ExpressionType::kConstant) {
+    if (lhs->type == kConstant) {
       type = rhs->type;
-    } else if (rhs->type == ExpressionType::kConstant) {
+    } else if (rhs->type == kConstant) {
       type = lhs->type;
-    } else if (lhs->type == ExpressionType::kLinear &&
-               rhs->type == ExpressionType::kLinear) {
-      type = ExpressionType::kQuadratic;
+    } else if (lhs->type == kLinear && rhs->type == kLinear) {
+      type = kQuadratic;
     } else {
-      type = ExpressionType::kNonlinear;
+      type = kNonlinear;
     }
 
     return MakeExpressionPtr(
@@ -259,6 +259,8 @@ struct SLEIPNIR_DLLEXPORT Expression {
    */
   friend SLEIPNIR_DLLEXPORT ExpressionPtr operator/(const ExpressionPtr& lhs,
                                                     const ExpressionPtr& rhs) {
+    using enum ExpressionType;
+
     // Prune expression
     if (lhs->IsConstant(0.0)) {
       // Return zero
@@ -268,17 +270,16 @@ struct SLEIPNIR_DLLEXPORT Expression {
     }
 
     // Evaluate constant
-    if (lhs->type == ExpressionType::kConstant &&
-        rhs->type == ExpressionType::kConstant) {
+    if (lhs->type == kConstant && rhs->type == kConstant) {
       return MakeExpressionPtr(lhs->value / rhs->value);
     }
 
     // Evaluate expression type
     ExpressionType type;
-    if (rhs->type == ExpressionType::kConstant) {
+    if (rhs->type == kConstant) {
       type = lhs->type;
     } else {
-      type = ExpressionType::kNonlinear;
+      type = kNonlinear;
     }
 
     return MakeExpressionPtr(
@@ -306,6 +307,8 @@ struct SLEIPNIR_DLLEXPORT Expression {
    */
   friend SLEIPNIR_DLLEXPORT ExpressionPtr operator+(const ExpressionPtr& lhs,
                                                     const ExpressionPtr& rhs) {
+    using enum ExpressionType;
+
     // Prune expression
     if (lhs == nullptr || lhs->IsConstant(0.0)) {
       return rhs;
@@ -314,8 +317,7 @@ struct SLEIPNIR_DLLEXPORT Expression {
     }
 
     // Evaluate constant
-    if (lhs->type == ExpressionType::kConstant &&
-        rhs->type == ExpressionType::kConstant) {
+    if (lhs->type == kConstant && rhs->type == kConstant) {
       return MakeExpressionPtr(lhs->value + rhs->value);
     }
 
@@ -339,6 +341,8 @@ struct SLEIPNIR_DLLEXPORT Expression {
    */
   friend SLEIPNIR_DLLEXPORT ExpressionPtr operator-(const ExpressionPtr& lhs,
                                                     const ExpressionPtr& rhs) {
+    using enum ExpressionType;
+
     // Prune expression
     if (lhs->IsConstant(0.0)) {
       if (rhs->IsConstant(0.0)) {
@@ -352,8 +356,7 @@ struct SLEIPNIR_DLLEXPORT Expression {
     }
 
     // Evaluate constant
-    if (lhs->type == ExpressionType::kConstant &&
-        rhs->type == ExpressionType::kConstant) {
+    if (lhs->type == kConstant && rhs->type == kConstant) {
       return MakeExpressionPtr(lhs->value - rhs->value);
     }
 
@@ -375,6 +378,8 @@ struct SLEIPNIR_DLLEXPORT Expression {
    * @param lhs Operand of unary minus.
    */
   friend SLEIPNIR_DLLEXPORT ExpressionPtr operator-(const ExpressionPtr& lhs) {
+    using enum ExpressionType;
+
     // Prune expression
     if (lhs->IsConstant(0.0)) {
       // Return zero
@@ -382,7 +387,7 @@ struct SLEIPNIR_DLLEXPORT Expression {
     }
 
     // Evaluate constant
-    if (lhs->type == ExpressionType::kConstant) {
+    if (lhs->type == kConstant) {
       return MakeExpressionPtr(-lhs->value);
     }
 
@@ -465,6 +470,8 @@ inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr abs(  // NOLINT
     const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     // Return zero
@@ -472,12 +479,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr abs(  // NOLINT
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     return MakeExpressionPtr(std::abs(x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear, [](double x, double) { return std::abs(x); },
+      kNonlinear, [](double x, double) { return std::abs(x); },
       [](double x, double, double parentAdjoint) {
         if (x < 0.0) {
           return -parentAdjoint;
@@ -508,18 +515,20 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr abs(  // NOLINT
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr acos(  // NOLINT
     const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     return MakeExpressionPtr(std::numbers::pi / 2.0);
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     return MakeExpressionPtr(std::acos(x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear, [](double x, double) { return std::acos(x); },
+      kNonlinear, [](double x, double) { return std::acos(x); },
       [](double x, double, double parentAdjoint) {
         return -parentAdjoint / std::sqrt(1.0 - x * x);
       },
@@ -538,6 +547,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr acos(  // NOLINT
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr asin(  // NOLINT
     const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     // Return zero
@@ -545,12 +556,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr asin(  // NOLINT
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     return MakeExpressionPtr(std::asin(x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear, [](double x, double) { return std::asin(x); },
+      kNonlinear, [](double x, double) { return std::asin(x); },
       [](double x, double, double parentAdjoint) {
         return parentAdjoint / std::sqrt(1.0 - x * x);
       },
@@ -569,6 +580,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr asin(  // NOLINT
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr atan(  // NOLINT
     const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     // Return zero
@@ -576,12 +589,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr atan(  // NOLINT
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     return MakeExpressionPtr(std::atan(x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear, [](double x, double) { return std::atan(x); },
+      kNonlinear, [](double x, double) { return std::atan(x); },
       [](double x, double, double parentAdjoint) {
         return parentAdjoint / (1.0 + x * x);
       },
@@ -600,6 +613,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr atan(  // NOLINT
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr atan2(  // NOLINT
     const ExpressionPtr& y, const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (y->IsConstant(0.0)) {
     // Return zero
@@ -609,14 +624,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr atan2(  // NOLINT
   }
 
   // Evaluate constant
-  if (y->type == ExpressionType::kConstant &&
-      x->type == ExpressionType::kConstant) {
+  if (y->type == kConstant && x->type == kConstant) {
     return MakeExpressionPtr(std::atan2(y->value, x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear,
-      [](double y, double x) { return std::atan2(y, x); },
+      kNonlinear, [](double y, double x) { return std::atan2(y, x); },
       [](double y, double x, double parentAdjoint) {
         return parentAdjoint * x / (y * y + x * x);
       },
@@ -641,18 +654,20 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr atan2(  // NOLINT
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr cos(  // NOLINT
     const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     return MakeExpressionPtr(1.0);
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     return MakeExpressionPtr(std::cos(x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear, [](double x, double) { return std::cos(x); },
+      kNonlinear, [](double x, double) { return std::cos(x); },
       [](double x, double, double parentAdjoint) {
         return -parentAdjoint * std::sin(x);
       },
@@ -670,18 +685,20 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr cos(  // NOLINT
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr cosh(  // NOLINT
     const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     return MakeExpressionPtr(1.0);
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     return MakeExpressionPtr(std::cosh(x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear, [](double x, double) { return std::cosh(x); },
+      kNonlinear, [](double x, double) { return std::cosh(x); },
       [](double x, double, double parentAdjoint) {
         return parentAdjoint * std::sinh(x);
       },
@@ -699,6 +716,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr cosh(  // NOLINT
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr erf(  // NOLINT
     const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     // Return zero
@@ -706,12 +725,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr erf(  // NOLINT
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     return MakeExpressionPtr(std::erf(x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear, [](double x, double) { return std::erf(x); },
+      kNonlinear, [](double x, double) { return std::erf(x); },
       [](double x, double, double parentAdjoint) {
         return parentAdjoint * 2.0 * std::numbers::inv_sqrtpi *
                std::exp(-x * x);
@@ -732,18 +751,20 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr erf(  // NOLINT
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr exp(  // NOLINT
     const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     return MakeExpressionPtr(1.0);
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     return MakeExpressionPtr(std::exp(x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear, [](double x, double) { return std::exp(x); },
+      kNonlinear, [](double x, double) { return std::exp(x); },
       [](double x, double, double parentAdjoint) {
         return parentAdjoint * std::exp(x);
       },
@@ -762,6 +783,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr exp(  // NOLINT
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr hypot(  // NOLINT
     const ExpressionPtr& x, const ExpressionPtr& y) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     return y;
@@ -770,14 +793,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr hypot(  // NOLINT
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant &&
-      y->type == ExpressionType::kConstant) {
+  if (x->type == kConstant && y->type == kConstant) {
     return MakeExpressionPtr(std::hypot(x->value, y->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear,
-      [](double x, double y) { return std::hypot(x, y); },
+      kNonlinear, [](double x, double y) { return std::hypot(x, y); },
       [](double x, double y, double parentAdjoint) {
         return parentAdjoint * x / std::hypot(x, y);
       },
@@ -802,6 +823,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr hypot(  // NOLINT
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr log(  // NOLINT
     const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     // Return zero
@@ -809,12 +832,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr log(  // NOLINT
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     return MakeExpressionPtr(std::log(x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear, [](double x, double) { return std::log(x); },
+      kNonlinear, [](double x, double) { return std::log(x); },
       [](double x, double, double parentAdjoint) { return parentAdjoint / x; },
       [](const ExpressionPtr& x, const ExpressionPtr&,
          const ExpressionPtr& parentAdjoint) { return parentAdjoint / x; },
@@ -828,6 +851,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr log(  // NOLINT
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr log10(  // NOLINT
     const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     // Return zero
@@ -835,13 +860,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr log10(  // NOLINT
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     return MakeExpressionPtr(std::log10(x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear,
-      [](double x, double) { return std::log10(x); },
+      kNonlinear, [](double x, double) { return std::log10(x); },
       [](double x, double, double parentAdjoint) {
         return parentAdjoint / (std::numbers::ln10 * x);
       },
@@ -860,6 +884,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr log10(  // NOLINT
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr pow(  // NOLINT
     const ExpressionPtr& base, const ExpressionPtr& power) {
+  using enum ExpressionType;
+
   // Prune expression
   if (base->IsConstant(0.0)) {
     // Return zero
@@ -874,15 +900,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr pow(  // NOLINT
   }
 
   // Evaluate constant
-  if (base->type == ExpressionType::kConstant &&
-      power->type == ExpressionType::kConstant) {
+  if (base->type == kConstant && power->type == kConstant) {
     return MakeExpressionPtr(std::pow(base->value, power->value));
   }
 
   return MakeExpressionPtr(
-      base->type == ExpressionType::kLinear && power->IsConstant(2.0)
-          ? ExpressionType::kQuadratic
-          : ExpressionType::kNonlinear,
+      base->type == kLinear && power->IsConstant(2.0) ? kQuadratic : kNonlinear,
       [](double base, double power) { return std::pow(base, power); },
       [](double base, double power, double parentAdjoint) {
         return parentAdjoint * std::pow(base, power - 1) * power;
@@ -923,8 +946,10 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr pow(  // NOLINT
  * @param x The argument.
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr sign(const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     if (x->value < 0.0) {
       return MakeExpressionPtr(-1.0);
     } else if (x->value == 0.0) {
@@ -936,7 +961,7 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sign(const ExpressionPtr& x) {
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear,
+      kNonlinear,
       [](double x, double) {
         if (x < 0.0) {
           return -1.0;
@@ -961,6 +986,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sign(const ExpressionPtr& x) {
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr sin(  // NOLINT
     const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     // Return zero
@@ -968,12 +995,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sin(  // NOLINT
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     return MakeExpressionPtr(std::sin(x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear, [](double x, double) { return std::sin(x); },
+      kNonlinear, [](double x, double) { return std::sin(x); },
       [](double x, double, double parentAdjoint) {
         return parentAdjoint * std::cos(x);
       },
@@ -990,6 +1017,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sin(  // NOLINT
  * @param x The argument.
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr sinh(const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     // Return zero
@@ -997,12 +1026,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sinh(const ExpressionPtr& x) {
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     return MakeExpressionPtr(std::sinh(x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear, [](double x, double) { return std::sinh(x); },
+      kNonlinear, [](double x, double) { return std::sinh(x); },
       [](double x, double, double parentAdjoint) {
         return parentAdjoint * std::cosh(x);
       },
@@ -1020,8 +1049,10 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sinh(const ExpressionPtr& x) {
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr sqrt(  // NOLINT
     const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     if (x->value == 0.0) {
       // Return zero
       return x;
@@ -1033,7 +1064,7 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sqrt(  // NOLINT
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear, [](double x, double) { return std::sqrt(x); },
+      kNonlinear, [](double x, double) { return std::sqrt(x); },
       [](double x, double, double parentAdjoint) {
         return parentAdjoint / (2.0 * std::sqrt(x));
       },
@@ -1052,6 +1083,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sqrt(  // NOLINT
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr tan(  // NOLINT
     const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     // Return zero
@@ -1059,12 +1092,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr tan(  // NOLINT
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     return MakeExpressionPtr(std::tan(x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear, [](double x, double) { return std::tan(x); },
+      kNonlinear, [](double x, double) { return std::tan(x); },
       [](double x, double, double parentAdjoint) {
         return parentAdjoint / (std::cos(x) * std::cos(x));
       },
@@ -1082,6 +1115,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr tan(  // NOLINT
  * @param x The argument.
  */
 SLEIPNIR_DLLEXPORT inline ExpressionPtr tanh(const ExpressionPtr& x) {
+  using enum ExpressionType;
+
   // Prune expression
   if (x->IsConstant(0.0)) {
     // Return zero
@@ -1089,12 +1124,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr tanh(const ExpressionPtr& x) {
   }
 
   // Evaluate constant
-  if (x->type == ExpressionType::kConstant) {
+  if (x->type == kConstant) {
     return MakeExpressionPtr(std::tanh(x->value));
   }
 
   return MakeExpressionPtr(
-      ExpressionType::kNonlinear, [](double x, double) { return std::tanh(x); },
+      kNonlinear, [](double x, double) { return std::tanh(x); },
       [](double x, double, double parentAdjoint) {
         return parentAdjoint / (std::cosh(x) * std::cosh(x));
       },

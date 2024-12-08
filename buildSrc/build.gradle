@@ -9,5 +9,5 @@ repositories {
     }
 }
 dependencies {
-    implementation "edu.wpi.first:native-utils:2025.7.1"
+    implementation "edu.wpi.first:native-utils:2025.9.0"
 }

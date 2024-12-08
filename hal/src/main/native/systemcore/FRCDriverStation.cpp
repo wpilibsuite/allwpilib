@@ -31,6 +31,7 @@
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/proto/ControlData.h"
+#include "hal/proto/ErrorInfo.h"
 #include "hal/proto/JoystickDescriptor.h"
 #include "hal/proto/JoystickOutputData.h"
 #include "hal/proto/MatchInfo.h"
@@ -77,6 +78,7 @@ struct SystemServerDriverStation {
 
   nt::StringPublisher versionPublisher;
   nt::StringPublisher consoleLinePublisher;
+  nt::ProtobufPublisher<mrc::ErrorInfo> errorInfoPublisher;
 
   std::array<nt::ProtobufPublisher<mrc::JoystickOutputData>,
              MRC_MAX_NUM_JOYSTICKS>
@@ -121,6 +123,10 @@ struct SystemServerDriverStation {
 
     consoleLinePublisher =
         ntInst.GetStringTopic(ROBOT_CONSOLE_LINE_PATH).Publish(options);
+
+    errorInfoPublisher =
+        ntInst.GetProtobufTopic<mrc::ErrorInfo>(ROBOT_ERROR_INFO_PATH)
+            .Publish(options);
 
     versionPublisher =
         ntInst.GetStringTopic(ROBOT_LIB_VERSION_PATH).Publish(options);
@@ -342,102 +348,74 @@ extern "C" {
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg) {
-  return 0;
-  // // Avoid flooding console by keeping track of previous 5 error
-  // // messages and only printing again if they're longer than 1 second old.
-  // static constexpr int KEEP_MSGS = 5;
-  // std::scoped_lock lock(msgMutex);
-  // static std::string prevMsg[KEEP_MSGS];
-  // static std::chrono::time_point<std::chrono::steady_clock>
-  //     prevMsgTime[KEEP_MSGS];
-  // static bool initialized = false;
-  // if (!initialized) {
-  //   for (int i = 0; i < KEEP_MSGS; i++) {
-  //     prevMsgTime[i] =
-  //         std::chrono::steady_clock::now() - std::chrono::seconds(2);
-  //   }
-  //   initialized = true;
-  // }
+  // Avoid flooding console by keeping track of previous 5 error
+  // messages and only printing again if they're longer than 1 second old.
+  static constexpr int KEEP_MSGS = 5;
+  std::scoped_lock lock(msgMutex);
+  static std::string prevMsg[KEEP_MSGS];
+  static std::chrono::time_point<std::chrono::steady_clock>
+      prevMsgTime[KEEP_MSGS];
+  static bool initialized = false;
+  if (!initialized) {
+    for (int i = 0; i < KEEP_MSGS; i++) {
+      prevMsgTime[i] =
+          std::chrono::steady_clock::now() - std::chrono::seconds(2);
+    }
+    initialized = true;
+  }
 
-  // auto curTime = std::chrono::steady_clock::now();
-  // int i;
-  // for (i = 0; i < KEEP_MSGS; ++i) {
-  //   if (prevMsg[i] == details) {
-  //     break;
-  //   }
-  // }
-  // int retval = 0;
-  // if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >=
-  // std::chrono::seconds(1)) {
-  //   std::string_view detailsRef{details};
-  //   std::string_view locationRef{location};
-  //   std::string_view callStackRef{callStack};
+  auto curTime = std::chrono::steady_clock::now();
+  int i;
+  for (i = 0; i < KEEP_MSGS; ++i) {
+    if (prevMsg[i] == details) {
+      break;
+    }
+  }
+  int retval = 0;
+  if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
+    std::string_view detailsRef{details};
+    std::string_view locationRef{location};
+    std::string_view callStackRef{callStack};
 
-  //   // 2 size, 1 tag, 4 timestamp, 2 seqnum
-  //   // 2 numOccur, 4 error code, 1 flags, 6 strlen
-  //   // 1 extra needed for padding on Netcomm end.
-  //   size_t baseLength = 23;
+    mrc::ErrorInfo errorInfo;
+    errorInfo.IsError = isError ? 1 : 0;
+    errorInfo.ErrorCode = errorCode;
+    errorInfo.SetDetails(details);
+    errorInfo.SetLocation(location);
+    errorInfo.SetCallStack(callStack);
 
-  //   if (baseLength + detailsRef.size() + locationRef.size() +
-  //           callStackRef.size() <=
-  //       65535) {
-  //     // Pass through
-  //     retval = FRC_NetworkCommunication_sendError(isError, errorCode,
-  //     isLVCode,
-  //                                                 details, location,
-  //                                                 callStack);
-  //   } else if (baseLength + detailsRef.size() > 65535) {
-  //     // Details too long, cut both location and stack
-  //     auto newLen = 65535 - baseLength;
-  //     std::string newDetails{details, newLen};
-  //     char empty = '\0';
-  //     retval = FRC_NetworkCommunication_sendError(
-  //         isError, errorCode, isLVCode, newDetails.c_str(), &empty, &empty);
-  //   } else if (baseLength + detailsRef.size() + locationRef.size() > 65535) {
-  //     // Location too long, cut stack
-  //     auto newLen = 65535 - baseLength - detailsRef.size();
-  //     std::string newLocation{location, newLen};
-  //     char empty = '\0';
-  //     retval = FRC_NetworkCommunication_sendError(
-  //         isError, errorCode, isLVCode, details, newLocation.c_str(),
-  //         &empty);
-  //   } else {
-  //     // Stack too long
-  //     auto newLen = 65535 - baseLength - detailsRef.size() -
-  //     locationRef.size(); std::string newCallStack{callStack, newLen}; retval
-  //     = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
-  //                                                 details, location,
-  //                                                 newCallStack.c_str());
-  //   }
-  //   if (printMsg) {
-  //     fmt::memory_buffer buf;
-  //     if (location && location[0] != '\0') {
-  //       fmt::format_to(fmt::appender{buf},
-  //                      "{} at {}: ", isError ? "Error" : "Warning",
-  //                      location);
-  //     }
-  //     fmt::format_to(fmt::appender{buf}, "{}\n", details);
-  //     if (callStack && callStack[0] != '\0') {
-  //       fmt::format_to(fmt::appender{buf}, "{}\n", callStack);
-  //     }
-  //     auto printError = gPrintErrorImpl.load();
-  //     printError(buf.data(), buf.size());
-  //   }
-  //   if (i == KEEP_MSGS) {
-  //     // replace the oldest one
-  //     i = 0;
-  //     auto first = prevMsgTime[0];
-  //     for (int j = 1; j < KEEP_MSGS; ++j) {
-  //       if (prevMsgTime[j] < first) {
-  //         first = prevMsgTime[j];
-  //         i = j;
-  //       }
-  //     }
-  //     prevMsg[i] = details;
-  //   }
-  //   prevMsgTime[i] = curTime;
-  // }
-  // return retval;
+    fmt::print("{}\n", errorInfo.GetCallStack());
+
+    systemServerDs->errorInfoPublisher.Set(errorInfo);
+
+    if (printMsg) {
+      fmt::memory_buffer buf;
+      if (location && location[0] != '\0') {
+        fmt::format_to(fmt::appender{buf},
+                       "{} at {}: ", isError ? "Error" : "Warning", location);
+      }
+      fmt::format_to(fmt::appender{buf}, "{}\n", details);
+      if (callStack && callStack[0] != '\0') {
+        fmt::format_to(fmt::appender{buf}, "{}\n", callStack);
+      }
+      auto printError = gPrintErrorImpl.load();
+      printError(buf.data(), buf.size());
+    }
+    if (i == KEEP_MSGS) {
+      // replace the oldest one
+      i = 0;
+      auto first = prevMsgTime[0];
+      for (int j = 1; j < KEEP_MSGS; ++j) {
+        if (prevMsgTime[j] < first) {
+          first = prevMsgTime[j];
+          i = j;
+        }
+      }
+      prevMsg[i] = details;
+    }
+    prevMsgTime[i] = curTime;
+  }
+  return retval;
 }
 
 void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size)) {
