@@ -502,19 +502,16 @@ public class MecanumControllerCommand extends Command {
 
     if (m_usePID) {
       final double frontLeftFeedforward =
-          m_feedforward.calculateWithVelocities(
-              m_prevFrontLeftSpeedSetpoint, frontLeftSpeedSetpoint);
+          m_feedforward.calculate(m_prevFrontLeftSpeedSetpoint, frontLeftSpeedSetpoint);
 
       final double rearLeftFeedforward =
-          m_feedforward.calculateWithVelocities(m_prevRearLeftSpeedSetpoint, rearLeftSpeedSetpoint);
+          m_feedforward.calculate(m_prevRearLeftSpeedSetpoint, rearLeftSpeedSetpoint);
 
       final double frontRightFeedforward =
-          m_feedforward.calculateWithVelocities(
-              m_prevFrontRightSpeedSetpoint, frontRightSpeedSetpoint);
+          m_feedforward.calculate(m_prevFrontRightSpeedSetpoint, frontRightSpeedSetpoint);
 
       final double rearRightFeedforward =
-          m_feedforward.calculateWithVelocities(
-              m_prevRearRightSpeedSetpoint, rearRightSpeedSetpoint);
+          m_feedforward.calculate(m_prevRearRightSpeedSetpoint, rearRightSpeedSetpoint);
 
       frontLeftOutput =
           frontLeftFeedforward

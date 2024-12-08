@@ -96,12 +96,12 @@ public class DriveSubsystem extends SubsystemBase {
     m_leftLeader.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition,
         currentLeft.position,
-        m_feedforward.calculateWithVelocities(currentLeft.velocity, nextLeft.velocity)
+        m_feedforward.calculate(currentLeft.velocity, nextLeft.velocity)
             / RobotController.getBatteryVoltage());
     m_rightLeader.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition,
         currentRight.position,
-        m_feedforward.calculateWithVelocities(currentLeft.velocity, nextLeft.velocity)
+        m_feedforward.calculate(currentLeft.velocity, nextLeft.velocity)
             / RobotController.getBatteryVoltage());
   }
 
