@@ -54,6 +54,8 @@ dependencies {
     implementation project(':cameraserver')
     implementation project(':wpilibNewCommands')
     implementation project(':apriltag')
+    implementation project(':epilogue-runtime')
+    annotationProcessor project(':epilogue-processor')
 }
 
 tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
