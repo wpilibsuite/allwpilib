@@ -34,7 +34,7 @@ public class SwerveModulePositionProto
 
   @Override
   public void pack(ProtobufSwerveModulePosition msg, SwerveModulePosition value) {
-    msg.setDistance(value.distanceMeters);
+    msg.setDistance(value.distance);
     Rotation2d.proto.pack(msg.getMutableAngle(), value.angle);
   }
 }

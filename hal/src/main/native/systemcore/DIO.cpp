@@ -94,13 +94,13 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
   return false;
 }
 
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
+void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
                int32_t* status) {
   *status = HAL_HANDLE_ERROR;
   return;
 }
 
-void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
+void HAL_PulseMultiple(uint32_t channelMask, double pulseLength,
                        int32_t* status) {
   *status = HAL_HANDLE_ERROR;
   return;

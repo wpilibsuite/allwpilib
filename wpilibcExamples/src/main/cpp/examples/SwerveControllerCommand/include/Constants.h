@@ -80,10 +80,10 @@ inline constexpr double kPRearRightVel = 0.5;
 
 namespace ModuleConstants {
 inline constexpr int kEncoderCPR = 1024;
-inline constexpr double kWheelDiameterMeters = 0.15;
+inline constexpr auto kWheelDiameter = 0.15_m;
 inline constexpr double kDriveEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterMeters * std::numbers::pi) /
+    (kWheelDiameter.value() * std::numbers::pi) /
     static_cast<double>(kEncoderCPR);
 
 inline constexpr double kTurningEncoderDistancePerPulse =

@@ -20,13 +20,13 @@ public final class Discretization {
    *
    * @param <States> Num representing the number of states.
    * @param contA Continuous system matrix.
-   * @param dtSeconds Discretization timestep.
+   * @param dt Discretization timestep in seconds.
    * @return the discrete matrix system.
    */
   public static <States extends Num> Matrix<States, States> discretizeA(
-      Matrix<States, States> contA, double dtSeconds) {
+      Matrix<States, States> contA, double dt) {
     // A_d = eᴬᵀ
-    return contA.times(dtSeconds).exp();
+    return contA.times(dt).exp();
   }
 
   /**
@@ -36,12 +36,12 @@ public final class Discretization {
    * @param <Inputs> Nat representing the inputs to the system.
    * @param contA Continuous system matrix.
    * @param contB Continuous input matrix.
-   * @param dtSeconds Discretization timestep.
+   * @param dt Discretization timestep in seconds.
    * @return a Pair representing discA and diskB.
    */
   public static <States extends Num, Inputs extends Num>
       Pair<Matrix<States, States>, Matrix<States, Inputs>> discretizeAB(
-          Matrix<States, States> contA, Matrix<States, Inputs> contB, double dtSeconds) {
+          Matrix<States, States> contA, Matrix<States, Inputs> contB, double dt) {
     int states = contA.getNumRows();
     int inputs = contB.getNumCols();
 
@@ -53,7 +53,7 @@ public final class Discretization {
 
     //  ϕ = eᴹᵀ = [A_d  B_d]
     //            [ 0    I ]
-    var phi = M.times(dtSeconds).exp();
+    var phi = M.times(dt).exp();
 
     var discA = new Matrix<States, States>(new SimpleMatrix(states, states));
     discA.extractFrom(0, 0, phi);
@@ -70,12 +70,12 @@ public final class Discretization {
    * @param <States> Nat representing the number of states.
    * @param contA Continuous system matrix.
    * @param contQ Continuous process noise covariance matrix.
-   * @param dtSeconds Discretization timestep.
+   * @param dt Discretization timestep in seconds.
    * @return a pair representing the discrete system matrix and process noise covariance matrix.
    */
   public static <States extends Num>
       Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQ(
-          Matrix<States, States> contA, Matrix<States, States> contQ, double dtSeconds) {
+          Matrix<States, States> contA, Matrix<States, States> contQ, double dt) {
     int states = contA.getNumRows();
 
     // Make continuous Q symmetric if it isn't already
@@ -91,7 +91,7 @@ public final class Discretization {
 
     // ϕ = eᴹᵀ = [−A_d  A_d⁻¹Q_d]
     //           [ 0      A_dᵀ  ]
-    final var phi = M.times(dtSeconds).exp();
+    final var phi = M.times(dt).exp();
 
     // ϕ₁₂ = A_d⁻¹Q_d
     final Matrix<States, States> phi12 = phi.block(states, states, 0, states);
@@ -115,11 +115,11 @@ public final class Discretization {
    *
    * @param <O> Nat representing the number of outputs.
    * @param contR Continuous measurement noise covariance matrix.
-   * @param dtSeconds Discretization timestep.
+   * @param dt Discretization timestep in seconds.
    * @return Discretized version of the provided continuous measurement noise covariance matrix.
    */
-  public static <O extends Num> Matrix<O, O> discretizeR(Matrix<O, O> contR, double dtSeconds) {
+  public static <O extends Num> Matrix<O, O> discretizeR(Matrix<O, O> contR, double dt) {
     // R_d = 1/T R
-    return contR.div(dtSeconds);
+    return contR.div(dt);
   }
 }

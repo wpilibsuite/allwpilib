@@ -156,7 +156,7 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
    *
    * @param nanoseconds The number of nanoseconds.
    */
-  public void setPeriodNanoSeconds(long nanoseconds) {
+  public void setPeriod(long nanoseconds) {
     int fpgaCycles = (int) (nanoseconds * SensorUtil.kSystemClockTicksPerMicrosecond / 4 / 1000);
     setPeriodCycles(fpgaCycles);
   }
@@ -177,7 +177,7 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
    *
    * @return The number of nanoseconds.
    */
-  public long getPeriodNanoSeconds() {
+  public long getPeriod() {
     int fpgaCycles = getPeriodCycles();
 
     return fpgaCycles * 1000L / (SensorUtil.kSystemClockTicksPerMicrosecond / 4);

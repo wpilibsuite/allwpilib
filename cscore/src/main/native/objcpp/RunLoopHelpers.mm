@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 
 namespace cs {
+
 void RunMainRunLoop() {
   if (CFRunLoopGetMain() != CFRunLoopGetCurrent()) {
     NSLog(@"This method can only be called from the main thread");
@@ -16,15 +17,16 @@ void RunMainRunLoop() {
   CFRunLoopRun();
 }
 
-int RunMainRunLoopTimeout(double timeoutSeconds) {
+int RunMainRunLoopTimeout(double timeout) {
   if (CFRunLoopGetMain() != CFRunLoopGetCurrent()) {
     NSLog(@"This method can only be called from the main thread");
     return -1;
   }
-  return CFRunLoopRunInMode(kCFRunLoopDefaultMode, timeoutSeconds, false);
+  return CFRunLoopRunInMode(kCFRunLoopDefaultMode, timeout, false);
 }
 
 void StopMainRunLoop() {
   CFRunLoopStop(CFRunLoopGetMain());
 }
+
 }

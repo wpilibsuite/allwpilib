@@ -58,12 +58,12 @@ public class Field2d implements NTSendable, AutoCloseable {
   /**
    * Set the robot pose from x, y, and rotation.
    *
-   * @param xMeters X location, in meters
-   * @param yMeters Y location, in meters
+   * @param x X location, in meters
+   * @param y Y location, in meters
    * @param rotation rotation
    */
-  public synchronized void setRobotPose(double xMeters, double yMeters, Rotation2d rotation) {
-    m_objects.get(0).setPose(xMeters, yMeters, rotation);
+  public synchronized void setRobotPose(double x, double y, Rotation2d rotation) {
+    m_objects.get(0).setPose(x, y, rotation);
   }
 
   /**

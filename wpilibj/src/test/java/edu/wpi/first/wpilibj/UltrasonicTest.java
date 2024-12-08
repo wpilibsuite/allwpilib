@@ -20,15 +20,15 @@ class UltrasonicTest {
     try (Ultrasonic ultrasonic = new Ultrasonic(0, 1)) {
       UltrasonicSim sim = new UltrasonicSim(ultrasonic);
 
-      assertEquals(0, ultrasonic.getRangeInches());
+      assertEquals(0, ultrasonic.getRange());
       assertTrue(ultrasonic.isRangeValid());
 
-      sim.setRangeInches(35.04);
-      assertEquals(35.04, ultrasonic.getRangeInches());
+      sim.setRange(35.04);
+      assertEquals(35.04, ultrasonic.getRange());
 
       sim.setRangeValid(false);
       assertFalse(ultrasonic.isRangeValid());
-      assertEquals(0, ultrasonic.getRangeInches());
+      assertEquals(0, ultrasonic.getRange());
     }
   }
 

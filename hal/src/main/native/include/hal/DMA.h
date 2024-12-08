@@ -72,11 +72,11 @@ void HAL_SetDMAPause(HAL_DMAHandle handle, HAL_Bool pause, int32_t* status);
  *
  * This can only be called if DMA is not started.
  *
- * @param[in] handle        the dma handle
- * @param[in] periodSeconds the period to trigger in seconds
- * @param[out] status       Error status variable. 0 on success.
+ * @param[in] handle  the dma handle
+ * @param[in] period  the period to trigger in seconds
+ * @param[out] status Error status variable. 0 on success.
  */
-void HAL_SetDMATimedTrigger(HAL_DMAHandle handle, double periodSeconds,
+void HAL_SetDMATimedTrigger(HAL_DMAHandle handle, double period,
                             int32_t* status);
 
 /**
@@ -287,35 +287,33 @@ void* HAL_GetDMADirectPointer(HAL_DMAHandle handle);
  *
  * See HAL_ReadDMA for full documentation.
  *
- * @param[in] dmaPointer     direct DMA pointer
- * @param[in] dmaSample      the sample object to place data into
- * @param[in] timeoutSeconds the time to wait for data to be queued before
- *                           timing out
- * @param[in] remainingOut   the number of samples remaining in the queue
- * @param[out] status        Error status variable. 0 on success.
+ * @param[in] dmaPointer   direct DMA pointer
+ * @param[in] dmaSample    the sample object to place data into
+ * @param[in] timeout      the time to wait for data to be queued before timing
+ *                         out in seconds
+ * @param[in] remainingOut the number of samples remaining in the queue
+ * @param[out] status      Error status variable. 0 on success.
  */
 enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
                                          HAL_DMASample* dmaSample,
-                                         double timeoutSeconds,
-                                         int32_t* remainingOut,
+                                         double timeout, int32_t* remainingOut,
                                          int32_t* status);
 
 /**
  * Reads a DMA sample from the queue.
  *
  *
- * @param[in] handle         the dma handle
- * @param[in] dmaSample      the sample object to place data into
- * @param[in] timeoutSeconds the time to wait for data to be queued before
- *                           timing out
- * @param[in] remainingOut   the number of samples remaining in the queue
- * @param[out] status        Error status variable. 0 on success.
+ * @param[in] handle       the dma handle
+ * @param[in] dmaSample    the sample object to place data into
+ * @param[in] timeout      the time to wait for data to be queued before timing
+ *                         out in seconds
+ * @param[in] remainingOut the number of samples remaining in the queue
+ * @param[out] status      Error status variable. 0 on success.
  * @return the success result of the sample read
  */
 enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
-                                   HAL_DMASample* dmaSample,
-                                   double timeoutSeconds, int32_t* remainingOut,
-                                   int32_t* status);
+                                   HAL_DMASample* dmaSample, double timeout,
+                                   int32_t* remainingOut, int32_t* status);
 
 // The following are helper functions for reading data from samples
 

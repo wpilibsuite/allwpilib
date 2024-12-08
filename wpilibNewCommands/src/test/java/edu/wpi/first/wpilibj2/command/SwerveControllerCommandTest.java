@@ -67,14 +67,14 @@ class SwerveControllerCommandTest {
   private static final double kAngularTolerance = 1 / 12.0;
 
   private static final double kWheelBase = 0.5;
-  private static final double kTrackWidth = 0.5;
+  private static final double kTrackwidth = 0.5;
 
   private final SwerveDriveKinematics m_kinematics =
       new SwerveDriveKinematics(
-          new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-          new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-          new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-          new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+          new Translation2d(kWheelBase / 2, kTrackwidth / 2),
+          new Translation2d(kWheelBase / 2, -kTrackwidth / 2),
+          new Translation2d(-kWheelBase / 2, kTrackwidth / 2),
+          new Translation2d(-kWheelBase / 2, -kTrackwidth / 2));
 
   private final SwerveDriveOdometry m_odometry =
       new SwerveDriveOdometry(m_kinematics, Rotation2d.kZero, m_modulePositions, Pose2d.kZero);
@@ -86,7 +86,7 @@ class SwerveControllerCommandTest {
 
   public Pose2d getRobotPose() {
     m_odometry.update(m_angle, m_modulePositions);
-    return m_odometry.getPoseMeters();
+    return m_odometry.getPose();
   }
 
   @Test
@@ -100,7 +100,7 @@ class SwerveControllerCommandTest {
     var config = new TrajectoryConfig(8.8, 0.1);
     final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
 
-    final var endState = trajectory.sample(trajectory.getTotalTimeSeconds());
+    final var endState = trajectory.sample(trajectory.getTotalTime());
 
     final var command =
         new SwerveControllerCommand(
@@ -118,10 +118,10 @@ class SwerveControllerCommandTest {
     command.initialize();
     while (!command.isFinished()) {
       command.execute();
-      m_angle = trajectory.sample(m_timer.get()).poseMeters.getRotation();
+      m_angle = trajectory.sample(m_timer.get()).pose.getRotation();
 
       for (int i = 0; i < m_modulePositions.length; i++) {
-        m_modulePositions[i].distanceMeters += m_moduleStates[i].speedMetersPerSecond * 0.005;
+        m_modulePositions[i].distance += m_moduleStates[i].speed * 0.005;
         m_modulePositions[i].angle = m_moduleStates[i].angle;
       }
 
@@ -131,11 +131,11 @@ class SwerveControllerCommandTest {
     command.end(true);
 
     assertAll(
-        () -> assertEquals(endState.poseMeters.getX(), getRobotPose().getX(), kxTolerance),
-        () -> assertEquals(endState.poseMeters.getY(), getRobotPose().getY(), kyTolerance),
+        () -> assertEquals(endState.pose.getX(), getRobotPose().getX(), kxTolerance),
+        () -> assertEquals(endState.pose.getY(), getRobotPose().getY(), kyTolerance),
         () ->
             assertEquals(
-                endState.poseMeters.getRotation().getRadians(),
+                endState.pose.getRotation().getRadians(),
                 getRobotPose().getRotation().getRadians(),
                 kAngularTolerance));
   }

@@ -23,11 +23,11 @@ public final class NumericalIntegration {
    *
    * @param f The function to integrate, which takes one argument x.
    * @param x The initial value of x.
-   * @param dtSeconds The time over which to integrate.
+   * @param dt The time over which to integrate in seconds.
    * @return the integration of dx/dt = f(x) for dt.
    */
-  public static double rk4(DoubleUnaryOperator f, double x, double dtSeconds) {
-    final var h = dtSeconds;
+  public static double rk4(DoubleUnaryOperator f, double x, double dt) {
+    final var h = dt;
     final var k1 = f.applyAsDouble(x);
     final var k2 = f.applyAsDouble(x + h * k1 * 0.5);
     final var k3 = f.applyAsDouble(x + h * k2 * 0.5);
@@ -42,11 +42,11 @@ public final class NumericalIntegration {
    * @param f The function to integrate. It must take two arguments x and u.
    * @param x The initial value of x.
    * @param u The value u held constant over the integration period.
-   * @param dtSeconds The time over which to integrate.
+   * @param dt The time over which to integrate in seconds.
    * @return The result of Runge Kutta integration (4th order).
    */
-  public static double rk4(DoubleBinaryOperator f, double x, double u, double dtSeconds) {
-    final var h = dtSeconds;
+  public static double rk4(DoubleBinaryOperator f, double x, double u, double dt) {
+    final var h = dt;
 
     final var k1 = f.applyAsDouble(x, u);
     final var k2 = f.applyAsDouble(x + h * k1 * 0.5, u);
@@ -64,15 +64,15 @@ public final class NumericalIntegration {
    * @param f The function to integrate. It must take two arguments x and u.
    * @param x The initial value of x.
    * @param u The value u held constant over the integration period.
-   * @param dtSeconds The time over which to integrate.
+   * @param dt The time over which to integrate in seconds.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
   public static <States extends Num, Inputs extends Num> Matrix<States, N1> rk4(
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
       Matrix<States, N1> x,
       Matrix<Inputs, N1> u,
-      double dtSeconds) {
-    final var h = dtSeconds;
+      double dt) {
+    final var h = dt;
 
     Matrix<States, N1> k1 = f.apply(x, u);
     Matrix<States, N1> k2 = f.apply(x.plus(k1.times(h * 0.5)), u);
@@ -88,12 +88,12 @@ public final class NumericalIntegration {
    * @param <States> A Num representing the states of the system.
    * @param f The function to integrate. It must take one argument x.
    * @param x The initial value of x.
-   * @param dtSeconds The time over which to integrate.
+   * @param dt The time over which to integrate in seconds.
    * @return 4th order Runge-Kutta integration of dx/dt = f(x) for dt.
    */
   public static <States extends Num> Matrix<States, N1> rk4(
-      UnaryOperator<Matrix<States, N1>> f, Matrix<States, N1> x, double dtSeconds) {
-    final var h = dtSeconds;
+      UnaryOperator<Matrix<States, N1>> f, Matrix<States, N1> x, double dt) {
+    final var h = dt;
 
     Matrix<States, N1> k1 = f.apply(x);
     Matrix<States, N1> k2 = f.apply(x.plus(k1.times(h * 0.5)));
@@ -111,20 +111,20 @@ public final class NumericalIntegration {
    * @param f The function to integrate. It must take two arguments t and y.
    * @param t The initial value of t.
    * @param y The initial value of y.
-   * @param dtSeconds The time over which to integrate.
+   * @param dt The time over which to integrate in seconds.
    * @return the integration of dx/dt = f(x) for dt.
    */
   public static <Rows extends Num, Cols extends Num> Matrix<Rows, Cols> rk4(
       BiFunction<Double, Matrix<Rows, Cols>, Matrix<Rows, Cols>> f,
       double t,
       Matrix<Rows, Cols> y,
-      double dtSeconds) {
-    final var h = dtSeconds;
+      double dt) {
+    final var h = dt;
 
     Matrix<Rows, Cols> k1 = f.apply(t, y);
-    Matrix<Rows, Cols> k2 = f.apply(t + dtSeconds * 0.5, y.plus(k1.times(h * 0.5)));
-    Matrix<Rows, Cols> k3 = f.apply(t + dtSeconds * 0.5, y.plus(k2.times(h * 0.5)));
-    Matrix<Rows, Cols> k4 = f.apply(t + dtSeconds, y.plus(k3.times(h)));
+    Matrix<Rows, Cols> k2 = f.apply(t + dt * 0.5, y.plus(k1.times(h * 0.5)));
+    Matrix<Rows, Cols> k3 = f.apply(t + dt * 0.5, y.plus(k2.times(h * 0.5)));
+    Matrix<Rows, Cols> k4 = f.apply(t + dt, y.plus(k3.times(h)));
 
     return y.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(h / 6.0));
   }
@@ -138,15 +138,15 @@ public final class NumericalIntegration {
    * @param f The function to integrate. It must take two arguments x and u.
    * @param x The initial value of x.
    * @param u The value u held constant over the integration period.
-   * @param dtSeconds The time over which to integrate.
+   * @param dt The time over which to integrate in seconds.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
   public static <States extends Num, Inputs extends Num> Matrix<States, N1> rkdp(
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
       Matrix<States, N1> x,
       Matrix<Inputs, N1> u,
-      double dtSeconds) {
-    return rkdp(f, x, u, dtSeconds, 1e-6);
+      double dt) {
+    return rkdp(f, x, u, dt, 1e-6);
   }
 
   /**
@@ -157,7 +157,7 @@ public final class NumericalIntegration {
    * @param f The function to integrate. It must take two arguments x and u.
    * @param x The initial value of x.
    * @param u The value u held constant over the integration period.
-   * @param dtSeconds The time over which to integrate.
+   * @param dt The time over which to integrate in seconds.
    * @param maxError The maximum acceptable truncation error. Usually a small number like 1e-6.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
@@ -165,7 +165,7 @@ public final class NumericalIntegration {
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
       Matrix<States, N1> x,
       Matrix<Inputs, N1> u,
-      double dtSeconds,
+      double dt,
       double maxError) {
     // See https://en.wikipedia.org/wiki/Dormand%E2%80%93Prince_method for the
     // Butcher tableau the following arrays came from.
@@ -200,13 +200,13 @@ public final class NumericalIntegration {
     double truncationError;
 
     double dtElapsed = 0.0;
-    double h = dtSeconds;
+    double h = dt;
 
     // Loop until we've gotten to our desired dt
-    while (dtElapsed < dtSeconds) {
+    while (dtElapsed < dt) {
       do {
         // Only allow us to advance up to the dt remaining
-        h = Math.min(h, dtSeconds - dtElapsed);
+        h = Math.min(h, dt - dtElapsed);
 
         var k1 = f.apply(x, u);
         var k2 = f.apply(x.plus(k1.times(A[0][0]).times(h)), u);
@@ -260,7 +260,7 @@ public final class NumericalIntegration {
                 .normF();
 
         if (truncationError == 0.0) {
-          h = dtSeconds - dtElapsed;
+          h = dt - dtElapsed;
         } else {
           h *= 0.9 * Math.pow(maxError / truncationError, 1.0 / 5.0);
         }
@@ -281,7 +281,7 @@ public final class NumericalIntegration {
    * @param f The function to integrate. It must take two arguments t and y.
    * @param t The initial value of t.
    * @param y The initial value of y.
-   * @param dtSeconds The time over which to integrate.
+   * @param dt The time over which to integrate in seconds.
    * @param maxError The maximum acceptable truncation error. Usually a small number like 1e-6.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
@@ -289,7 +289,7 @@ public final class NumericalIntegration {
       BiFunction<Double, Matrix<Rows, Cols>, Matrix<Rows, Cols>> f,
       double t,
       Matrix<Rows, Cols> y,
-      double dtSeconds,
+      double dt,
       double maxError) {
     // See https://en.wikipedia.org/wiki/Dormand%E2%80%93Prince_method for the
     // Butcher tableau the following arrays came from.
@@ -327,13 +327,13 @@ public final class NumericalIntegration {
     double truncationError;
 
     double dtElapsed = 0.0;
-    double h = dtSeconds;
+    double h = dt;
 
     // Loop until we've gotten to our desired dt
-    while (dtElapsed < dtSeconds) {
+    while (dtElapsed < dt) {
       do {
         // Only allow us to advance up to the dt remaining
-        h = Math.min(h, dtSeconds - dtElapsed);
+        h = Math.min(h, dt - dtElapsed);
 
         var k1 = f.apply(t, y);
         var k2 = f.apply(t + h * c[0], y.plus(k1.times(A[0][0]).times(h)));
@@ -387,7 +387,7 @@ public final class NumericalIntegration {
                 .normF();
 
         if (truncationError == 0.0) {
-          h = dtSeconds - dtElapsed;
+          h = dt - dtElapsed;
         } else {
           h *= 0.9 * Math.pow(maxError / truncationError, 1.0 / 5.0);
         }

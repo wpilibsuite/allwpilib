@@ -433,7 +433,7 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
   }
 }
 
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
+void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
                int32_t* status) {
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
@@ -441,10 +441,9 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
     return;
   }
 
-  uint32_t pulseLengthMicroseconds =
-      static_cast<uint32_t>(pulseLengthSeconds * 1e6);
+  uint32_t pulseLengthUs = static_cast<uint32_t>(pulseLength * 1e6);  // μs
 
-  if (pulseLengthMicroseconds <= 0 || pulseLengthMicroseconds > 0xFFFF) {
+  if (pulseLengthUs <= 0 || pulseLengthUs > 0xFFFF) {
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(status,
                       "Length must be between 1 and 65535 microseconds");
@@ -461,17 +460,15 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
     pulse.MXP = 1u << remapMXPChannel(port->channel);
   }
 
-  digitalSystem->writePulseLength(
-      static_cast<uint16_t>(pulseLengthMicroseconds), status);
+  digitalSystem->writePulseLength(static_cast<uint16_t>(pulseLengthUs), status);
   digitalSystem->writePulse(pulse, status);
 }
 
-void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
+void HAL_PulseMultiple(uint32_t channelMask, double pulseLength,
                        int32_t* status) {
-  uint32_t pulseLengthMicroseconds =
-      static_cast<uint32_t>(pulseLengthSeconds * 1e6);
+  uint32_t pulseLengthUs = static_cast<uint32_t>(pulseLength * 1e6);  // μs
 
-  if (pulseLengthMicroseconds <= 0 || pulseLengthMicroseconds > 0xFFFF) {
+  if (pulseLengthUs <= 0 || pulseLengthUs > 0xFFFF) {
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(status,
                       "Length must be between 1 and 65535 microseconds");
@@ -483,8 +480,7 @@ void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
   pulse.MXP = (channelMask & 0xFFFF) >> 10;
   pulse.SPIPort = (channelMask & 0x1F) >> 26;
 
-  digitalSystem->writePulseLength(
-      static_cast<uint16_t>(pulseLengthMicroseconds), status);
+  digitalSystem->writePulseLength(static_cast<uint16_t>(pulseLengthUs), status);
   digitalSystem->writePulse(pulse, status);
 }
 

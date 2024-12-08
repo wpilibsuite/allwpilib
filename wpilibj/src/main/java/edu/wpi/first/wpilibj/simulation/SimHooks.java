@@ -65,18 +65,18 @@ public final class SimHooks {
   /**
    * Advance the simulator time and wait for all notifiers to run.
    *
-   * @param deltaSeconds the amount to advance (in seconds)
+   * @param delta the amount to advance in seconds
    */
-  public static void stepTiming(double deltaSeconds) {
-    SimulatorJNI.stepTiming((long) (deltaSeconds * 1e6));
+  public static void stepTiming(double delta) {
+    SimulatorJNI.stepTiming((long) (delta * 1e6));
   }
 
   /**
    * Advance the simulator time and return immediately.
    *
-   * @param deltaSeconds the amount to advance (in seconds)
+   * @param delta the amount to advance in seconds
    */
-  public static void stepTimingAsync(double deltaSeconds) {
-    SimulatorJNI.stepTimingAsync((long) (deltaSeconds * 1e6));
+  public static void stepTimingAsync(double delta) {
+    SimulatorJNI.stepTimingAsync((long) (delta * 1e6));
   }
 }
