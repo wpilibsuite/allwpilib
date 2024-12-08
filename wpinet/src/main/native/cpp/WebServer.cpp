@@ -239,7 +239,7 @@ void WebServer::Start(unsigned int port, std::string_view path) {
   m_impl->runner.ExecSync([&](uv::Loop& loop) {
     auto server = uv::Tcp::Create(loop);
     if (!server) {
-      wpi::print(stderr, "PortForwarder: Creating server failed\n");
+      wpi::print(stderr, "WebServer: Creating server failed\n");
       return;
     }
 
