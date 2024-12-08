@@ -244,7 +244,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
     //   f(x, u) = Ax + Bu + [0  3/2⋅g⋅cos(θ)/L]ᵀ
 
     Matrix<N2, N1> updatedXhat =
-        NumericalIntegration.rkdp(
+        NumericalIntegration.tsit5(
             (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
               Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
               if (m_simulateGravity) {

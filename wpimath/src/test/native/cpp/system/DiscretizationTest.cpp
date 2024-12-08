@@ -62,9 +62,9 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
   // Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
   //       0
   frc::Matrixd<2, 2> discQIntegrated =
-      frc::RKDP<std::function<frc::Matrixd<2, 2>(units::second_t,
-                                                 const frc::Matrixd<2, 2>&)>,
-                frc::Matrixd<2, 2>>(
+      frc::Tsit5<std::function<frc::Matrixd<2, 2>(units::second_t,
+                                                  const frc::Matrixd<2, 2>&)>,
+                 frc::Matrixd<2, 2>>(
           [&](units::second_t t, const frc::Matrixd<2, 2>&) {
             return frc::Matrixd<2, 2>((contA * t.value()).exp() * contQ *
                                       (contA.transpose() * t.value()).exp());
@@ -94,9 +94,9 @@ TEST(DiscretizationTest, DiscretizeFastModelAQ) {
   // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
   //       0
   frc::Matrixd<2, 2> discQIntegrated =
-      frc::RKDP<std::function<frc::Matrixd<2, 2>(units::second_t,
-                                                 const frc::Matrixd<2, 2>&)>,
-                frc::Matrixd<2, 2>>(
+      frc::Tsit5<std::function<frc::Matrixd<2, 2>(units::second_t,
+                                                  const frc::Matrixd<2, 2>&)>,
+                 frc::Matrixd<2, 2>>(
           [&](units::second_t t, const frc::Matrixd<2, 2>&) {
             return frc::Matrixd<2, 2>((contA * t.value()).exp() * contQ *
                                       (contA.transpose() * t.value()).exp());
