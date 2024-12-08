@@ -226,7 +226,10 @@ cc_library(
 
 java_library(
     name = "wpiutil-java",
-    srcs = glob(["src/main/java/**/*.java"]),
+    srcs = glob([
+        "src/main/java/**/*.java",
+        "src/generated/java/**/*.java",
+    ]),
     visibility = ["//visibility:public"],
     deps = [
         "@maven//:com_fasterxml_jackson_core_jackson_annotations",

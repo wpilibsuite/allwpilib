@@ -1,0 +1,64 @@
+{
+    "types": [
+        {
+          "name": "Double",
+          "DataType": "double",
+          "AppendType": "double",
+          "IsArray": false
+        },
+        {
+          "name": "DoubleArray",
+          "DataType": "double[]",
+          "AppendType": "double[]",
+          "IsArray": true
+        },
+        {
+          "name": "Float",
+          "DataType": "float",
+          "AppendType": "float",
+          "IsArray": false
+        },
+        {
+          "name": "FloatArray",
+          "DataType": "float[]",
+          "AppendType": "float[]",
+          "IsArray": true
+        },
+        {
+          "name": "Integer",
+          "DataType": "int64",
+          "AppendType": "long",
+          "IsArray": false
+        },
+        {
+          "name": "IntegerArray",
+          "DataType": "int64[]",
+          "AppendType": "long[]",
+          "IsArray": true
+        },
+        {
+          "name": "Boolean",
+          "DataType": "boolean",
+          "AppendType": "boolean",
+          "IsArray": false
+        },
+        {
+          "name": "BooleanArray",
+          "DataType": "boolean[]",
+          "AppendType": "boolean[]",
+          "IsArray": true
+        },
+        {
+          "name": "String",
+          "DataType": "String",
+          "AppendType": "String",
+          "IsArray": false
+        },
+        {
+          "name": "StringArray",
+          "DataType": "string[]",
+          "AppendType": "String[]",
+          "IsArray": true
+        }
+    ]
+}

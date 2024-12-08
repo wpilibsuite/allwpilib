@@ -57,7 +57,7 @@ if(WITH_JAVA)
 
     set(CMAKE_JNI_TARGET true)
 
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+    file(GLOB_RECURSE JAVA_SOURCES src/main/*.java)
 
     add_jar(
         wpiutil_jar

@@ -71,6 +71,10 @@ def main():
         [sys.executable, f"{REPO_ROOT}/thirdparty/imgui_suite/generate_gl3w.py"],
         check=True,
     )
+    subprocess.run(
+        [sys.executable, f"{REPO_ROOT}/wpiutil/generate_datalog_entries.py"],
+        check=True,
+    )
     subprocess.run(f"{REPO_ROOT}/thirdparty/imgui_suite/generate_fonts.sh", check=True)
 
 
