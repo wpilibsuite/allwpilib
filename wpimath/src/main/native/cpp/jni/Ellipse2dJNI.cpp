@@ -16,11 +16,11 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_math_jni_Ellipse2dJNI
- * Method:    findNearestPoint
+ * Method:    nearest
  * Signature: (DDDDDDD[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_jni_Ellipse2dJNI_findNearestPoint
+Java_edu_wpi_first_math_jni_Ellipse2dJNI_nearest
   (JNIEnv* env, jclass, jdouble centerX, jdouble centerY, jdouble centerHeading,
    jdouble xSemiAxis, jdouble ySemiAxis, jdouble pointX, jdouble pointY,
    jdoubleArray nearestPoint)
@@ -30,7 +30,7 @@ Java_edu_wpi_first_math_jni_Ellipse2dJNI_findNearestPoint
           frc::Pose2d{units::meter_t{centerX}, units::meter_t{centerY},
                       units::radian_t{centerHeading}},
           units::meter_t{xSemiAxis}, units::meter_t{ySemiAxis}}
-          .FindNearestPoint({units::meter_t{pointX}, units::meter_t{pointY}});
+          .Nearest({units::meter_t{pointX}, units::meter_t{pointY}});
 
   wpi::array buf{point.X().value(), point.Y().value()};
   env->SetDoubleArrayRegion(nearestPoint, 0, 2, buf.data());
