@@ -154,6 +154,10 @@ bool SocketCanState::InitializeBuses() {
 
               uint32_t messageId = MapSocketCanToMessageId(frame.can_id);
               uint64_t timestamp = wpi::Now();
+              // Ensure FDF flag is set for the read later.
+              if (rVal == CANFD_MTU) {
+                frame.flags = CANFD_FDF;
+              }
 
               std::scoped_lock lock{readMutex[canIndex]};
               auto& msg = readFrames[canIndex][messageId];
@@ -239,24 +243,28 @@ void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
   // Mask doesn't include RTR flag
   // Mask is full
   if (messageIDMask == CAN_EFF_MASK) {
+    //printf("Fast lookup of %x\n", *messageID);
     // We're doing a fast lookup
     auto& msg = canState->readFrames[busId][*messageID];
     if (msg.timestamp == 0) {
       *status = HAL_ERR_CANSessionMux_MessageNotFound;
       return;
     }
-    if (*dataSize < msg.frame.len) {
+    if ((msg.frame.flags & CANFD_FDF) || msg.frame.len > 8) {
+      printf("FD frames not supported for read right now\n");
       *status = HAL_ERR_CANSessionMux_InvalidBuffer;
       return;
     }
     // TODO this time needs to be fixed up.
-    *timeStamp = msg.timestamp;
+    *timeStamp = msg.timestamp / 1000;
     memcpy(data, msg.frame.data, msg.frame.len);
     *dataSize = msg.frame.len;
     *status = 0;
     msg.timestamp = 0;
     return;
   }
+
+  printf("Slow lookup not supported\n");
 
   // Add support for slow lookup later
   *status = HAL_ERR_CANSessionMux_NotAllowed;
