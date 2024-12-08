@@ -24,6 +24,11 @@
 #include "hal/Threads.h"
 #include "wpi/timestamp.h"
 
+#include <utility>
+#include <memory>
+#include <vector>
+#include <cstdio>
+
 #define NUM_CAN_BUSES 1
 
 namespace {
@@ -77,7 +82,7 @@ struct SocketCanState {
   wpi::DenseMap<uint32_t, uint16_t> packetToTime;
 
   wpi::mutex readMutex[NUM_CAN_BUSES];
-  // TODO, we need a MUCH better way of doing this masking
+  // TODO(thadhouse) we need a MUCH better way of doing this masking
   wpi::DenseMap<uint32_t, FrameStore> readFrames[NUM_CAN_BUSES];
 
   bool InitializeBuses();
@@ -111,8 +116,7 @@ bool SocketCanState::InitializeBuses() {
       }
 
       ifreq ifr;
-      strcpy(ifr.ifr_name, "canX");
-      ifr.ifr_name[3] = ('0' + i);
+      snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can%d", i);
 
       if (ioctl(socketHandle[i], SIOCGIFINDEX, &ifr) == -1) {
         success = false;
@@ -144,7 +148,7 @@ bool SocketCanState::InitializeBuses() {
               canfd_frame frame;
               int rVal = read(fd, &frame, sizeof(frame));
               if (rVal <= 0) {
-                // TODO error handling
+                // TODO(thadhouse) error handling
                 return;
               }
               if (frame.can_id & CAN_ERR_FLAG) {
@@ -184,7 +188,7 @@ extern "C" {
 
 void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
                          uint8_t dataSize, int32_t periodMs, int32_t* status) {
-  // TODO this will become a parameter
+  // TODO(thadhouse) this will become a parameter
   // isFd will also be a part of this parameter
   uint8_t busId = 0;
 
@@ -194,7 +198,7 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
   }
 
   if (periodMs == HAL_CAN_SEND_PERIOD_STOP_REPEATING) {
-    // TODO
+    // TODO(thadhouse) actually stop
     *status = 0;
     return;
   }
@@ -216,13 +220,13 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
   std::scoped_lock lock{canState->writeMutex[busId]};
   int result = send(canState->socketHandle[busId], &frame, mtu, 0);
   if (result != mtu) {
-    // TODO better error
+    // TODO(thadhouse) better error
     *status = HAL_ERR_CANSessionMux_InvalidBuffer;
     return;
   }
 
   if (periodMs > 0) {
-    // TODO set repeating
+    // TODO(thadhouse) set repeating
   }
 }
 void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
@@ -257,7 +261,7 @@ void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
       *status = HAL_ERR_CANSessionMux_InvalidBuffer;
       return;
     }
-    // TODO this time needs to be fixed up.
+    // TODO(thadhouse) this time needs to be fixed up.
     *timeStamp = msg.timestamp / 1000;
     memcpy(data, msg.frame.data, msg.frame.len);
     *dataSize = msg.frame.len;
