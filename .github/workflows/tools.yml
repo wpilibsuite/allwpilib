@@ -46,7 +46,7 @@ jobs:
   # Robotbuilder:
   #   name: "Build - RobotBuilder"
   #   needs: [build-artifacts]
-  #   runs-on: ubuntu-22.04
+  #   runs-on: ubuntu-24.04
   #   env:
   #     DISPLAY: ':10'
   #   steps:
@@ -93,7 +93,7 @@ jobs:
   Shuffleboard:
     name: "Build - Shuffleboard"
     needs: [build-artifacts]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -124,7 +124,7 @@ jobs:
   PathWeaver:
     name: "Build - PathWeaver"
     needs: [build-artifacts]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
