@@ -15,10 +15,10 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
+#include "SmartIo.h"
 #include "hal/Errors.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/HandlesInternal.h"
-#include "SmartIo.h"
 
 using namespace hal;
 
