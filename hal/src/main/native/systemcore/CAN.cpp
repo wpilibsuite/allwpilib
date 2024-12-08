@@ -241,7 +241,7 @@ void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
 
   std::scoped_lock lock{canState->readMutex[busId]};
 
-  // TODO, this is going to be wrong, but we're going to assume that
+  // TODO(thadhouse) this is going to be wrong, but we're going to assume that
   // any lookup without the 11 bit mask set wants to look for a 29 bit frame.
   // Also, only do fast lookups for 29 bit frames
 
