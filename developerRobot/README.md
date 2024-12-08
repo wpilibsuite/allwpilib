@@ -9,7 +9,12 @@ This command builds everything.
 
 ## Simulation
 
-This command runs the C++ subproject on desktop.
+This command runs the Java project on desktop.
+```bash
+./gradlew developerRobot:run
+```
+
+This command runs the C++ project on desktop.
 ```bash
 ./gradlew developerRobot:runCpp
 ```

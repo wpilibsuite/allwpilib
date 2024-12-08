@@ -84,14 +84,15 @@ class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoint assuming discrete
-   * control. Use this method when the setpoint does not change.
+   * Calculates the feedforward from the gains and velocity setpoint assuming
+   * discrete control. Use this method when the velocity setpoint does not
+   * change.
    *
-   * @param setpoint The velocity setpoint.
+   * @param velocity The velocity setpoint.
    * @return The computed feedforward, in volts.
    */
-  constexpr units::volt_t Calculate(units::unit_t<Velocity> setpoint) const {
-    return Calculate(setpoint, setpoint);
+  constexpr units::volt_t Calculate(units::unit_t<Velocity> velocity) const {
+    return Calculate(velocity, velocity);
   }
 
   /**

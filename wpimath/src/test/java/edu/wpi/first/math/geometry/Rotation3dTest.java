@@ -345,6 +345,18 @@ class Rotation3dTest {
   }
 
   @Test
+  void testToMatrix() {
+    var before =
+        new Rotation3d(
+            Units.degreesToRadians(10.0),
+            Units.degreesToRadians(20.0),
+            Units.degreesToRadians(30.0));
+    var after = new Rotation3d(before.toMatrix());
+
+    assertEquals(before, after);
+  }
+
+  @Test
   void testInterpolate() {
     final var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
     final var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);

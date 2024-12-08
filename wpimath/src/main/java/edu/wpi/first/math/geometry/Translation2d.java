@@ -88,10 +88,10 @@ public class Translation2d
   }
 
   /**
-   * Constructs a Translation2d from the provided translation vector's X and Y components. The
-   * values are assumed to be in meters.
+   * Constructs a Translation2d from a 2D translation vector. The values are assumed to be in
+   * meters.
    *
-   * @param vector The translation vector to represent.
+   * @param vector The translation vector.
    */
   public Translation2d(Vector<N2> vector) {
     this(vector.get(0), vector.get(1));
@@ -148,9 +148,9 @@ public class Translation2d
   }
 
   /**
-   * Returns a vector representation of this translation.
+   * Returns a 2D translation vector representation of this translation.
    *
-   * @return A Vector representation of this translation.
+   * @return A 2D translation vector representation of this translation.
    */
   public Vector<N2> toVector() {
     return VecBuilder.fill(m_x, m_y);
