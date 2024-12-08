@@ -4,22 +4,23 @@ Date: Sun, 16 Jun 2024 12:08:49 -0700
 Subject: [PATCH 2/3] Use wpi::SmallVector
 
 ---
- include/.styleguide                               |  1 +
- include/sleipnir/autodiff/Expression.hpp          | 13 +++++++------
- include/sleipnir/autodiff/ExpressionGraph.hpp     | 15 ++++++++-------
- include/sleipnir/autodiff/Hessian.hpp             |  4 ++--
- include/sleipnir/autodiff/Jacobian.hpp            | 10 +++++-----
- include/sleipnir/autodiff/Variable.hpp            | 10 +++++-----
- include/sleipnir/autodiff/VariableMatrix.hpp      |  4 ++--
- include/sleipnir/optimization/Multistart.hpp      |  7 ++++---
- .../sleipnir/optimization/OptimizationProblem.hpp |  8 ++++----
- include/sleipnir/util/Pool.hpp                    |  7 ++++---
- include/sleipnir/util/Spy.hpp                     |  4 ++--
- src/.styleguide                                   |  1 +
- src/optimization/solver/InteriorPoint.cpp         |  4 ++--
- .../solver/util/FeasibilityRestoration.hpp        | 10 +++++-----
- src/optimization/solver/util/Filter.hpp           |  4 ++--
- 15 files changed, 54 insertions(+), 48 deletions(-)
+ include/.styleguide                            |  1 +
+ include/sleipnir/autodiff/Expression.hpp       | 13 +++++++------
+ include/sleipnir/autodiff/ExpressionGraph.hpp  | 15 ++++++++-------
+ include/sleipnir/autodiff/Hessian.hpp          |  4 ++--
+ include/sleipnir/autodiff/Jacobian.hpp         | 10 +++++-----
+ include/sleipnir/autodiff/Variable.hpp         | 10 +++++-----
+ include/sleipnir/autodiff/VariableMatrix.hpp   |  4 ++--
+ include/sleipnir/optimization/Multistart.hpp   |  7 ++++---
+ .../optimization/OptimizationProblem.hpp       |  8 ++++----
+ include/sleipnir/util/Pool.hpp                 |  7 ++++---
+ include/sleipnir/util/Spy.hpp                  |  4 ++--
+ src/.styleguide                                |  1 +
+ src/optimization/solver/InteriorPoint.cpp      |  4 ++--
+ src/optimization/solver/SQP.cpp                |  4 ++--
+ .../solver/util/FeasibilityRestoration.hpp     | 18 +++++++++---------
+ src/optimization/solver/util/Filter.hpp        |  4 ++--
+ 16 files changed, 60 insertions(+), 54 deletions(-)
 
 diff --git a/include/.styleguide b/include/.styleguide
 index 6a7f8ed28f9cb037c9746a7e0ef5e110481d9825..efa36cee1fb593ae810032340c64f1854fbbc523 100644
@@ -334,7 +335,7 @@ index 8055713a2492a9c8473f047a2fb9fe7ca57753c3..09b1b2f3bf33c35ae0aeddb9b5d47c0d
  
    for (auto& future : futures) {
 diff --git a/include/sleipnir/optimization/OptimizationProblem.hpp b/include/sleipnir/optimization/OptimizationProblem.hpp
-index 28b2943f5842229335e79eae14abbda6ff5b7000..e812fa5e3454903d4dfb8572539ebf1b506bdf11 100644
+index 569dcdee507881ceb412585ca811927072552c15..66883fed98ad087010fb153bd91effce6e047928 100644
 --- a/include/sleipnir/optimization/OptimizationProblem.hpp
 +++ b/include/sleipnir/optimization/OptimizationProblem.hpp
 @@ -11,6 +11,7 @@
@@ -345,15 +346,15 @@ index 28b2943f5842229335e79eae14abbda6ff5b7000..e812fa5e3454903d4dfb8572539ebf1b
  
  #include "sleipnir/autodiff/Variable.hpp"
  #include "sleipnir/autodiff/VariableMatrix.hpp"
-@@ -21,7 +22,6 @@
- #include "sleipnir/optimization/solver/InteriorPoint.hpp"
+@@ -22,7 +23,6 @@
+ #include "sleipnir/optimization/solver/SQP.hpp"
  #include "sleipnir/util/Print.hpp"
  #include "sleipnir/util/SymbolExports.hpp"
 -#include "sleipnir/util/small_vector.hpp"
  
  namespace sleipnir {
  
-@@ -358,16 +358,16 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
+@@ -364,16 +364,16 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
   private:
    // The list of decision variables, which are the root of the problem's
    // expression tree
@@ -434,7 +435,7 @@ index f3b2f0cf9e60b3a86b9654ff2b381f9c48734ff6..ad739cea6dce6f6cb586f538d1d30b92
 +  ^wpi/
  }
 diff --git a/src/optimization/solver/InteriorPoint.cpp b/src/optimization/solver/InteriorPoint.cpp
-index dcd8b56dc08516b80f89550c43cb7002745b93d8..892d2dd20f7fe92c2c91518a4ecb487425643585 100644
+index a09d9866d05731c8ce53122b3d1a850803883df4..d3981c59d163927e3e5ba602c3323f6e1429c475 100644
 --- a/src/optimization/solver/InteriorPoint.cpp
 +++ b/src/optimization/solver/InteriorPoint.cpp
 @@ -9,6 +9,7 @@
@@ -462,8 +463,37 @@ index dcd8b56dc08516b80f89550c43cb7002745b93d8..892d2dd20f7fe92c2c91518a4ecb4874
  
    RegularizedLDLT solver;
  
+diff --git a/src/optimization/solver/SQP.cpp b/src/optimization/solver/SQP.cpp
+index 77b9632e1da37361c995a8579d1d83a2756d6d88..662abc2fb6e311767b0fbb3a61121ce78549a3f6 100644
+--- a/src/optimization/solver/SQP.cpp
++++ b/src/optimization/solver/SQP.cpp
+@@ -9,6 +9,7 @@
+ #include <limits>
+ 
+ #include <Eigen/SparseCholesky>
++#include <wpi/SmallVector.h>
+ 
+ #include "optimization/RegularizedLDLT.hpp"
+ #include "optimization/solver/util/ErrorEstimate.hpp"
+@@ -22,7 +23,6 @@
+ #include "sleipnir/optimization/SolverExitCondition.hpp"
+ #include "sleipnir/util/Print.hpp"
+ #include "sleipnir/util/Spy.hpp"
+-#include "sleipnir/util/small_vector.hpp"
+ #include "util/ScopeExit.hpp"
+ #include "util/ToMilliseconds.hpp"
+ 
+@@ -155,7 +155,7 @@ void SQP(std::span<Variable> decisionVariables,
+   Filter filter{f};
+ 
+   // Kept outside the loop so its storage can be reused
+-  small_vector<Eigen::Triplet<double>> triplets;
++  wpi::SmallVector<Eigen::Triplet<double>> triplets;
+ 
+   RegularizedLDLT solver;
+ 
 diff --git a/src/optimization/solver/util/FeasibilityRestoration.hpp b/src/optimization/solver/util/FeasibilityRestoration.hpp
-index c324ef093cc7dc8ce93af2cba337042a65b28475..0f13676aea0e80549ef1ef43e4972d5498acaa18 100644
+index feefe137adf0832b094a36d61201b15962138ded..79b5d99ae27de6049ba098888a965291e6b677fa 100644
 --- a/src/optimization/solver/util/FeasibilityRestoration.hpp
 +++ b/src/optimization/solver/util/FeasibilityRestoration.hpp
 @@ -8,6 +8,7 @@
@@ -482,16 +512,16 @@ index c324ef093cc7dc8ce93af2cba337042a65b28475..0f13676aea0e80549ef1ef43e4972d54
  
  namespace sleipnir {
  
-@@ -65,7 +65,7 @@ inline void FeasibilityRestoration(
- 
+@@ -57,7 +57,7 @@ inline void FeasibilityRestoration(
    constexpr double ρ = 1000.0;
+   double μ = config.tolerance / 10.0;
  
 -  small_vector<Variable> fr_decisionVariables;
 +  wpi::SmallVector<Variable> fr_decisionVariables;
    fr_decisionVariables.reserve(decisionVariables.size() +
-                                2 * equalityConstraints.size() +
-                                2 * inequalityConstraints.size());
-@@ -81,7 +81,7 @@ inline void FeasibilityRestoration(
+                                2 * equalityConstraints.size());
+ 
+@@ -70,7 +70,7 @@ inline void FeasibilityRestoration(
      fr_decisionVariables.emplace_back();
    }
  
@@ -500,7 +530,7 @@ index c324ef093cc7dc8ce93af2cba337042a65b28475..0f13676aea0e80549ef1ef43e4972d54
  
    VariableMatrix xAD{std::span{it, it + decisionVariables.size()}};
    it += decisionVariables.size();
-@@ -157,7 +157,7 @@ inline void FeasibilityRestoration(
+@@ -128,7 +128,7 @@ inline void FeasibilityRestoration(
    }
  
    // cₑ(x) - pₑ + nₑ = 0
@@ -509,7 +539,43 @@ index c324ef093cc7dc8ce93af2cba337042a65b28475..0f13676aea0e80549ef1ef43e4972d54
    fr_equalityConstraints.assign(equalityConstraints.begin(),
                                  equalityConstraints.end());
    for (size_t row = 0; row < fr_equalityConstraints.size(); ++row) {
-@@ -166,7 +166,7 @@ inline void FeasibilityRestoration(
+@@ -137,7 +137,7 @@ inline void FeasibilityRestoration(
+   }
+ 
+   // cᵢ(x) - s - pᵢ + nᵢ = 0
+-  small_vector<Variable> fr_inequalityConstraints;
++  wpi::SmallVector<Variable> fr_inequalityConstraints;
+ 
+   // pₑ ≥ 0
+   std::copy(p_e.begin(), p_e.end(),
+@@ -227,7 +227,7 @@ inline void FeasibilityRestoration(
+ 
+   constexpr double ρ = 1000.0;
+ 
+-  small_vector<Variable> fr_decisionVariables;
++  wpi::SmallVector<Variable> fr_decisionVariables;
+   fr_decisionVariables.reserve(decisionVariables.size() +
+                                2 * equalityConstraints.size() +
+                                2 * inequalityConstraints.size());
+@@ -243,7 +243,7 @@ inline void FeasibilityRestoration(
+     fr_decisionVariables.emplace_back();
+   }
+ 
+-  auto it = fr_decisionVariables.cbegin();
++  auto it = fr_decisionVariables.begin();
+ 
+   VariableMatrix xAD{std::span{it, it + decisionVariables.size()}};
+   it += decisionVariables.size();
+@@ -319,7 +319,7 @@ inline void FeasibilityRestoration(
+   }
+ 
+   // cₑ(x) - pₑ + nₑ = 0
+-  small_vector<Variable> fr_equalityConstraints;
++  wpi::SmallVector<Variable> fr_equalityConstraints;
+   fr_equalityConstraints.assign(equalityConstraints.begin(),
+                                 equalityConstraints.end());
+   for (size_t row = 0; row < fr_equalityConstraints.size(); ++row) {
+@@ -328,7 +328,7 @@ inline void FeasibilityRestoration(
    }
  
    // cᵢ(x) - s - pᵢ + nᵢ = 0
@@ -519,7 +585,7 @@ index c324ef093cc7dc8ce93af2cba337042a65b28475..0f13676aea0e80549ef1ef43e4972d54
                                    inequalityConstraints.end());
    for (size_t row = 0; row < fr_inequalityConstraints.size(); ++row) {
 diff --git a/src/optimization/solver/util/Filter.hpp b/src/optimization/solver/util/Filter.hpp
-index 3fbb849edc4a6b3336f94b5af9e018a37b07b123..02bdb5a8db5c80dd86d17ea4421ec564d7e0a2c7 100644
+index f19236928c59623bc0a3ce87b659f0756997f821..0c14efd7b8afa6cef398f5a7d383c54dbf64ec68 100644
 --- a/src/optimization/solver/util/Filter.hpp
 +++ b/src/optimization/solver/util/Filter.hpp
 @@ -8,9 +8,9 @@
@@ -531,12 +597,12 @@ index 3fbb849edc4a6b3336f94b5af9e018a37b07b123..02bdb5a8db5c80dd86d17ea4421ec564
  #include "sleipnir/autodiff/Variable.hpp"
 -#include "sleipnir/util/small_vector.hpp"
  
- namespace sleipnir {
+ // See docs/algorithms.md#Works_cited for citation definitions.
  
-@@ -182,7 +182,7 @@ class Filter {
+@@ -177,7 +177,7 @@ class Filter {
+ 
   private:
    Variable* m_f = nullptr;
-   double m_μ = 0.0;
 -  small_vector<FilterEntry> m_filter;
 +  wpi::SmallVector<FilterEntry> m_filter;
  };
