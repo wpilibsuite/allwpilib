@@ -54,6 +54,7 @@ dependencies {
     implementation project(':cameraserver')
     implementation project(':wpilibNewCommands')
     implementation project(':apriltag')
+    implementation project(':wpiunits')
     implementation project(':epilogue-runtime')
     annotationProcessor project(':epilogue-processor')
 }
