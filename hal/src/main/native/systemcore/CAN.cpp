@@ -22,10 +22,40 @@
 #include <linux/can/raw.h>
 
 #include "hal/Threads.h"
+#include "wpi/timestamp.h"
 
 #define NUM_CAN_BUSES 1
 
 namespace {
+
+static constexpr uint32_t MatchingBitMask = CAN_EFF_MASK | CAN_RTR_FLAG;
+
+static_assert(CAN_RTR_FLAG == HAL_CAN_IS_FRAME_REMOTE);
+static_assert(CAN_EFF_FLAG == HAL_CAN_IS_FRAME_11BIT);
+
+uint32_t MapMessageIdToSocketCan(uint32_t id) {
+  // Message and RTR map directly
+  uint32_t toRet = id & MatchingBitMask;
+
+  // Reverse the 11 bit flag
+  if ((id & HAL_CAN_IS_FRAME_11BIT) == 0) {
+    toRet |= CAN_EFF_FLAG;
+  }
+
+  return toRet;
+}
+
+uint32_t MapSocketCanToMessageId(uint32_t id) {
+  // Message and RTR map directly
+  uint32_t toRet = id & MatchingBitMask;
+
+  // Reverse the 11 bit flag
+  if ((id & CAN_EFF_FLAG) == 0) {
+    toRet |= HAL_CAN_IS_FRAME_11BIT;
+  }
+
+  return toRet;
+}
 
 struct FrameStore {
   canfd_frame frame;
@@ -108,20 +138,29 @@ bool SocketCanState::InitializeBuses() {
         return;
       }
 
-      poll->pollEvent.connect([fd = socketHandle[i]](int mask) {
-        if (mask & UV_READABLE) {
-          canfd_frame frame;
-          int rVal = read(fd, &frame, sizeof(frame));
-          if (rVal <= 0) {
-            // TODO error handling
-            return;
-          }
-          if (frame.can_id & CAN_ERR_FLAG) {
-            // Do nothing if this is an error frame
-            return;
-          }
-        }
-      });
+      poll->pollEvent.connect(
+          [this, fd = socketHandle[i], canIndex = i](int mask) {
+            if (mask & UV_READABLE) {
+              canfd_frame frame;
+              int rVal = read(fd, &frame, sizeof(frame));
+              if (rVal <= 0) {
+                // TODO error handling
+                return;
+              }
+              if (frame.can_id & CAN_ERR_FLAG) {
+                // Do nothing if this is an error frame
+                return;
+              }
+
+              uint32_t messageId = MapSocketCanToMessageId(frame.can_id);
+              uint64_t timestamp = wpi::Now();
+
+              std::scoped_lock lock{readMutex[canIndex]};
+              auto& msg = readFrames[canIndex][messageId];
+              msg.frame = frame;
+              msg.timestamp = timestamp;
+            }
+          });
 
       poll->Start(UV_READABLE);
     }
@@ -135,23 +174,7 @@ bool InitializeCanBuses() {
 }
 }  // namespace hal
 
-namespace {
-
-static constexpr uint32_t MatchingBitMask = CAN_EFF_MASK | CAN_RTR_FLAG;
-
-static_assert(CAN_RTR_FLAG == HAL_CAN_IS_FRAME_REMOTE);
-static_assert(CAN_EFF_FLAG == HAL_CAN_IS_FRAME_11BIT);
-
-uint32_t MapMessageIdToSocketCan(uint32_t id) {
-  // Message and RTR map directly
-  uint32_t toRet = id & MatchingBitMask;
-
-  // Reverse the 11 bit flag
-  if ((id & HAL_CAN_IS_FRAME_11BIT) == 0) {
-    toRet |= CAN_EFF_FLAG;
-  }
-}
-}  // namespace
+namespace {}  // namespace
 
 extern "C" {
 
@@ -180,7 +203,7 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
   }
 
   if (periodMs == HAL_CAN_SEND_PERIOD_NO_REPEAT) {
-    auto mtu = isFd ? CANFD_MTU : CAN_MTU;
+    int mtu = isFd ? CANFD_MTU : CAN_MTU;
     std::scoped_lock lock{canState->writeMutex[busId]};
     int result = send(canState->socketHandle[busId], &frame, mtu, 0);
     if (result == mtu) {
