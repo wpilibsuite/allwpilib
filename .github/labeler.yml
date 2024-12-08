@@ -57,4 +57,3 @@
 'component: wpiutil':
 - changed-files:
   - any-glob-to-any-file: wpiutil/**
-
