@@ -41,12 +41,11 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
    * confusing and opens potential footguns for users who do not fully
    * understand the semantics and implications of proxying, but who simply want
    * runtime construction. Users who do know what they are doing and need a
-   * supplier-constructed proxied command should instead proxy a DeferredCommand
-   *     using the <code>AsProxy</code> decorator.
+   * supplier-constructed proxied command should instead defer a proxy command.
    * @see DeferredCommand
    */
   WPI_IGNORE_DEPRECATED
-  [[deprecated("Proxy a DeferredCommand instead")]]
+  [[deprecated("Defer a proxy command instead.")]]
   explicit ProxyCommand(wpi::unique_function<Command*()> supplier);
 
   /**
@@ -62,11 +61,10 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
    * confusing and opens potential footguns for users who do not fully
    * understand the semantics and implications of proxying, but who simply want
    * runtime construction. Users who do know what they are doing and need a
-   * supplier-constructed proxied command should instead proxy a DeferredCommand
-   *     using the <code>AsProxy</code> decorator.
+   * supplier-constructed proxied command should instead defer a proxy command.
    * @see DeferredCommand
    */
-  [[deprecated("Proxy a DeferredCommand instead")]]
+  [[deprecated("Defer a proxy command instead.")]]
   explicit ProxyCommand(wpi::unique_function<CommandPtr()> supplier);
   WPI_UNIGNORE_DEPRECATED
 
