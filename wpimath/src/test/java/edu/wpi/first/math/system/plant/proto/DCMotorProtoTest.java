@@ -19,13 +19,13 @@ class DCMotorProtoTest {
     DCMotor.proto.pack(proto, DATA);
 
     DCMotor data = DCMotor.proto.unpack(proto);
-    assertEquals(DATA.nominalVoltageVolts, data.nominalVoltageVolts);
-    assertEquals(DATA.stallTorqueNewtonMeters, data.stallTorqueNewtonMeters);
-    assertEquals(DATA.stallCurrentAmps, data.stallCurrentAmps);
-    assertEquals(DATA.freeCurrentAmps, data.freeCurrentAmps);
-    assertEquals(DATA.freeSpeedRadPerSec, data.freeSpeedRadPerSec);
-    assertEquals(DATA.rOhms, data.rOhms);
-    assertEquals(DATA.KvRadPerSecPerVolt, data.KvRadPerSecPerVolt);
-    assertEquals(DATA.KtNMPerAmp, data.KtNMPerAmp);
+    assertEquals(DATA.nominalVoltage, data.nominalVoltage);
+    assertEquals(DATA.stallTorque, data.stallTorque);
+    assertEquals(DATA.stallCurrent, data.stallCurrent);
+    assertEquals(DATA.freeCurrent, data.freeCurrent);
+    assertEquals(DATA.freeSpeed, data.freeSpeed);
+    assertEquals(DATA.R, data.R);
+    assertEquals(DATA.Kv, data.Kv);
+    assertEquals(DATA.Kt, data.Kt);
   }
 }

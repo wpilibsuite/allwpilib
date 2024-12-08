@@ -42,10 +42,10 @@ public class DCMotorStruct implements Struct<DCMotor> {
 
   @Override
   public void pack(ByteBuffer bb, DCMotor value) {
-    bb.putDouble(value.nominalVoltageVolts);
-    bb.putDouble(value.stallTorqueNewtonMeters);
-    bb.putDouble(value.stallCurrentAmps);
-    bb.putDouble(value.freeCurrentAmps);
-    bb.putDouble(value.freeSpeedRadPerSec);
+    bb.putDouble(value.nominalVoltage);
+    bb.putDouble(value.stallTorque);
+    bb.putDouble(value.stallCurrent);
+    bb.putDouble(value.freeCurrent);
+    bb.putDouble(value.freeSpeed);
   }
 }

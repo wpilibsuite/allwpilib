@@ -41,7 +41,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   private Matrix<States, States> m_P;
   private final Matrix<States, States> m_contQ;
   private final Matrix<Outputs, Outputs> m_contR;
-  private double m_dtSeconds;
+  private double m_dt;
 
   private final Matrix<States, States> m_initP;
 
@@ -57,7 +57,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * @param plant The plant used for the prediction step.
    * @param stateStdDevs Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
-   * @param dtSeconds Nominal discretization timestep.
+   * @param dt Nominal discretization timestep in seconds.
    * @throws IllegalArgumentException If the system is undetectable.
    */
   public KalmanFilter(
@@ -66,21 +66,21 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
       LinearSystem<States, Inputs, Outputs> plant,
       Matrix<States, N1> stateStdDevs,
       Matrix<Outputs, N1> measurementStdDevs,
-      double dtSeconds) {
+      double dt) {
     this.m_states = states;
 
     this.m_plant = plant;
 
     m_contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
     m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
-    m_dtSeconds = dtSeconds;
+    m_dt = dt;
 
     // Find discrete A and Q
-    var pair = Discretization.discretizeAQ(plant.getA(), m_contQ, dtSeconds);
+    var pair = Discretization.discretizeAQ(plant.getA(), m_contQ, dt);
     var discA = pair.getFirst();
     var discQ = pair.getSecond();
 
-    var discR = Discretization.discretizeR(m_contR, dtSeconds);
+    var discR = Discretization.discretizeR(m_contR, dt);
 
     var C = plant.getC();
 
@@ -173,21 +173,21 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * Project the model into the future with a new control input u.
    *
    * @param u New control input from controller.
-   * @param dtSeconds Timestep for prediction.
+   * @param dt Timestep for prediction in seconds.
    */
   @Override
-  public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
+  public void predict(Matrix<Inputs, N1> u, double dt) {
     // Find discrete A and Q
-    final var discPair = Discretization.discretizeAQ(m_plant.getA(), m_contQ, dtSeconds);
+    final var discPair = Discretization.discretizeAQ(m_plant.getA(), m_contQ, dt);
     final var discA = discPair.getFirst();
     final var discQ = discPair.getSecond();
 
-    m_xHat = m_plant.calculateX(m_xHat, u, dtSeconds);
+    m_xHat = m_plant.calculateX(m_xHat, u, dt);
 
     // Pₖ₊₁⁻ = APₖ⁻Aᵀ + Q
     m_P = discA.times(m_P).times(discA.transpose()).plus(discQ);
 
-    m_dtSeconds = dtSeconds;
+    m_dt = dt;
   }
 
   /**
@@ -214,7 +214,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     final var C = m_plant.getC();
     final var D = m_plant.getD();
 
-    final var discR = Discretization.discretizeR(R, m_dtSeconds);
+    final var discR = Discretization.discretizeR(R, m_dt);
 
     final var S = C.times(m_P).times(C.transpose()).plus(discR);
 

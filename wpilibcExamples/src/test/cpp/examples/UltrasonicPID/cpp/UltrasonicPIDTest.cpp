@@ -2,7 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <string>
 #include <thread>
 
 #include <frc/RobotController.h>
@@ -47,7 +46,7 @@ class UltrasonicPIDTest : public testing::TestWithParam<double> {
                                           Robot::kUltrasonicEchoPort};
   int32_t m_callback;
 
-  units::millimeter_t m_distance;
+  units::meter_t m_distance;
 
  public:
   void SimPeriodicBefore() {
@@ -101,7 +100,7 @@ TEST_P(UltrasonicPIDTest, Auto) {
   {
     frc::sim::StepTiming(5_s);
 
-    EXPECT_NEAR(Robot::kHoldDistance.value(), m_distance.value(), 10.0);
+    EXPECT_NEAR(Robot::kHoldDistance.value(), m_distance.value(), 0.01);
   }
 }
 

@@ -23,7 +23,7 @@ class Robot : public frc::TimedRobot {
   void AutonomousPeriodic() override;
 
   // distance the robot wants to stay from an object
-  static constexpr units::millimeter_t kHoldDistance = 1_m;
+  static constexpr units::meter_t kHoldDistance = 1_m;
 
   static constexpr int kLeftMotorPort = 0;
   static constexpr int kRightMotorPort = 1;
@@ -32,7 +32,7 @@ class Robot : public frc::TimedRobot {
 
  private:
   // proportional speed constant
-  static constexpr double kP = 0.001;
+  static constexpr double kP = 1.0;
   // integral speed constant
   static constexpr double kI = 0.0;
   // derivative speed constant

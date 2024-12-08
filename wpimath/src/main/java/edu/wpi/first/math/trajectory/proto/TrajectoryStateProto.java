@@ -38,10 +38,10 @@ public class TrajectoryStateProto implements Protobuf<Trajectory.State, Protobuf
 
   @Override
   public void pack(ProtobufTrajectoryState msg, Trajectory.State value) {
-    msg.setTime(value.timeSeconds);
-    msg.setVelocity(value.velocityMetersPerSecond);
-    msg.setAcceleration(value.accelerationMetersPerSecondSq);
-    Pose2d.proto.pack(msg.getMutablePose(), value.poseMeters);
-    msg.setCurvature(value.curvatureRadPerMeter);
+    msg.setTime(value.time);
+    msg.setVelocity(value.velocity);
+    msg.setAcceleration(value.acceleration);
+    Pose2d.proto.pack(msg.getMutablePose(), value.pose);
+    msg.setCurvature(value.curvature);
   }
 }

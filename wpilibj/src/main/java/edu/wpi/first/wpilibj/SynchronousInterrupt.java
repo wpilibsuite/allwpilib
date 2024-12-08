@@ -87,14 +87,14 @@ public class SynchronousInterrupt implements AutoCloseable {
   /**
    * Wait for an interrupt.
    *
-   * @param timeoutSeconds The timeout in seconds. 0 or less will return immediately.
+   * @param timeout The timeout in seconds. 0 or less will return immediately.
    * @param ignorePrevious True to ignore if a previous interrupt has occurred, and only wait for a
    *     new trigger. False will consider if an interrupt has occurred since the last time the
    *     interrupt was read.
    * @return Result of which edges were triggered, or if a timeout occurred.
    */
-  public WaitResult waitForInterrupt(double timeoutSeconds, boolean ignorePrevious) {
-    long result = InterruptJNI.waitForInterrupt(m_handle, timeoutSeconds, ignorePrevious);
+  public WaitResult waitForInterrupt(double timeout, boolean ignorePrevious) {
+    long result = InterruptJNI.waitForInterrupt(m_handle, timeout, ignorePrevious);
 
     // Rising edge result is the interrupt bit set in the byte 0xFF
     // Falling edge result is the interrupt bit set in the byte 0xFF00
@@ -108,11 +108,11 @@ public class SynchronousInterrupt implements AutoCloseable {
   /**
    * Wait for an interrupt, ignoring any previously occurring interrupts.
    *
-   * @param timeoutSeconds The timeout in seconds. 0 or less will return immediately.
+   * @param timeout The timeout in seconds. 0 or less will return immediately.
    * @return Result of which edges were triggered, or if a timeout occurred.
    */
-  public WaitResult waitForInterrupt(double timeoutSeconds) {
-    return waitForInterrupt(timeoutSeconds, true);
+  public WaitResult waitForInterrupt(double timeout) {
+    return waitForInterrupt(timeout, true);
   }
 
   /**

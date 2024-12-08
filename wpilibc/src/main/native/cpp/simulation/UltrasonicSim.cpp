@@ -15,13 +15,13 @@ UltrasonicSim::UltrasonicSim(const frc::Ultrasonic& ultrasonic)
 UltrasonicSim::UltrasonicSim(int ping, int echo) {
   frc::sim::SimDeviceSim deviceSim{"Ultrasonic", echo};
   m_simRangeValid = deviceSim.GetBoolean("Range Valid");
-  m_simRange = deviceSim.GetDouble("Range (in)");
+  m_simRange = deviceSim.GetDouble("Range (m)");
 }
 
 void UltrasonicSim::SetRangeValid(bool valid) {
   m_simRangeValid.Set(valid);
 }
 
-void UltrasonicSim::SetRange(units::inch_t range) {
+void UltrasonicSim::SetRange(units::meter_t range) {
   m_simRange.Set(range.value());
 }

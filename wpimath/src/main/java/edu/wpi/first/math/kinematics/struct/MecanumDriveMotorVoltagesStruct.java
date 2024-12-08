@@ -40,9 +40,9 @@ public final class MecanumDriveMotorVoltagesStruct implements Struct<MecanumDriv
 
   @Override
   public void pack(ByteBuffer bb, MecanumDriveMotorVoltages value) {
-    bb.putDouble(value.frontLeftVoltage);
-    bb.putDouble(value.frontRightVoltage);
-    bb.putDouble(value.rearLeftVoltage);
-    bb.putDouble(value.rearRightVoltage);
+    bb.putDouble(value.frontLeft);
+    bb.putDouble(value.frontRight);
+    bb.putDouble(value.rearLeft);
+    bb.putDouble(value.rearRight);
   }
 }

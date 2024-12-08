@@ -48,17 +48,17 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
    * @param controller State-space controller.
    * @param observer State-space observer.
    * @param maxVoltageVolts The maximum voltage that can be applied. Commonly 12.
-   * @param dtSeconds The nominal timestep.
+   * @param dt The nominal timestep in seconds.
    */
   public LinearSystemLoop(
       LinearSystem<States, Inputs, Outputs> plant,
       LinearQuadraticRegulator<States, Inputs, Outputs> controller,
       KalmanFilter<States, Inputs, Outputs> observer,
       double maxVoltageVolts,
-      double dtSeconds) {
+      double dt) {
     this(
         controller,
-        new LinearPlantInversionFeedforward<>(plant, dtSeconds),
+        new LinearPlantInversionFeedforward<>(plant, dt),
         observer,
         u -> StateSpaceUtil.desaturateInputVector(u, maxVoltageVolts));
   }
@@ -72,19 +72,15 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
    * @param controller State-space controller.
    * @param observer State-space observer.
    * @param clampFunction The function used to clamp the input U.
-   * @param dtSeconds The nominal timestep.
+   * @param dt The nominal timestep in seconds.
    */
   public LinearSystemLoop(
       LinearSystem<States, Inputs, Outputs> plant,
       LinearQuadraticRegulator<States, Inputs, Outputs> controller,
       KalmanFilter<States, Inputs, Outputs> observer,
       Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> clampFunction,
-      double dtSeconds) {
-    this(
-        controller,
-        new LinearPlantInversionFeedforward<>(plant, dtSeconds),
-        observer,
-        clampFunction);
+      double dt) {
+    this(controller, new LinearPlantInversionFeedforward<>(plant, dt), observer, clampFunction);
   }
 
   /**
@@ -327,15 +323,15 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
    *
    * <p>After calling this, the user should send the elements of u to the actuators.
    *
-   * @param dtSeconds Timestep for model update.
+   * @param dt Timestep for model update in seconds.
    */
-  public void predict(double dtSeconds) {
+  public void predict(double dt) {
     var u =
         clampInput(
             m_controller
                 .calculate(getObserver().getXhat(), m_nextR)
                 .plus(m_feedforward.calculate(m_nextR)));
-    getObserver().predict(u, dtSeconds);
+    getObserver().predict(u, dt);
   }
 
   /**

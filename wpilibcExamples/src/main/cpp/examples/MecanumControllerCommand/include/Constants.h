@@ -43,17 +43,17 @@ inline constexpr bool kRearLeftEncoderReversed = true;
 inline constexpr bool kFrontRightEncoderReversed = false;
 inline constexpr bool kRearRightEncoderReversed = true;
 
-inline constexpr auto kTrackWidth =
+inline constexpr auto kTrackwidth =
     0.5_m;  // Distance between centers of right and left wheels on robot
 inline constexpr auto kWheelBase =
     0.7_m;  // Distance between centers of front and back wheels on robot
 extern const frc::MecanumDriveKinematics kDriveKinematics;
 
 inline constexpr int kEncoderCPR = 1024;
-inline constexpr double kWheelDiameterMeters = 0.15;
+inline constexpr auto kWheelDiameter = 0.15_m;
 inline constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterMeters * std::numbers::pi) /
+    (kWheelDiameter.value() * std::numbers::pi) /
     static_cast<double>(kEncoderCPR);
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!

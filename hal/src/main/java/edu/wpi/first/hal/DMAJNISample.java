@@ -29,8 +29,8 @@ public class DMAJNISample {
   /** Default constructor. */
   public DMAJNISample() {}
 
-  public int update(int dmaHandle, double timeoutSeconds) {
-    m_timeStamp = DMAJNI.readDMA(dmaHandle, timeoutSeconds, m_dataBuffer, m_storage);
+  public int update(int dmaHandle, double timeout) {
+    m_timeStamp = DMAJNI.readDMA(dmaHandle, timeout, m_dataBuffer, m_storage);
     return m_storage[25];
   }
 
