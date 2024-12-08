@@ -4,6 +4,8 @@
 
 #include "glass/DataSource.h"
 
+#include <string>
+
 #include <fmt/format.h>
 
 #include "glass/ContextInternal.h"
@@ -13,7 +15,7 @@ using namespace glass;
 wpi::sig::Signal<const char*, DataSource*> DataSource::sourceCreated;
 
 DataSource::DataSource(std::string_view id)
-    : m_id{id}, m_name{gContext->sourceNameStorage.GetString(m_id)} {
+    : m_id{id}, m_name{gContext->sourceNameStorage.Get<std::string>(m_id)} {
   gContext->sources.try_emplace(m_id, this);
   sourceCreated(m_id.c_str(), this);
 }
