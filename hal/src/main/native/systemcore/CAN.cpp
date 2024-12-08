@@ -193,6 +193,12 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
     return;
   }
 
+  if (periodMs == HAL_CAN_SEND_PERIOD_STOP_REPEATING) {
+    // TODO
+    *status = 0;
+    return;
+  }
+
   bool isFd = false;
   messageID = MapMessageIdToSocketCan(messageID);
 
@@ -206,20 +212,17 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
     frame.len = size;
   }
 
-  if (periodMs == HAL_CAN_SEND_PERIOD_NO_REPEAT) {
-    int mtu = isFd ? CANFD_MTU : CAN_MTU;
-    std::scoped_lock lock{canState->writeMutex[busId]};
-    int result = send(canState->socketHandle[busId], &frame, mtu, 0);
-    if (result == mtu) {
-      *status = 0;
-    } else {
-      // TODO better error
-      *status = HAL_ERR_CANSessionMux_InvalidBuffer;
-    }
-  } else {
-    // TODO add periodic support
-    *status = HAL_ERR_CANSessionMux_NotAllowed;
+  int mtu = isFd ? CANFD_MTU : CAN_MTU;
+  std::scoped_lock lock{canState->writeMutex[busId]};
+  int result = send(canState->socketHandle[busId], &frame, mtu, 0);
+  if (result != mtu) {
+    // TODO better error
+    *status = HAL_ERR_CANSessionMux_InvalidBuffer;
     return;
+  }
+
+  if (periodMs > 0) {
+    // TODO set repeating
   }
 }
 void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
@@ -243,8 +246,7 @@ void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
   // Mask doesn't include RTR flag
   // Mask is full
   if (messageIDMask == CAN_EFF_MASK) {
-    //printf("Fast lookup of %x\n", *messageID);
-    // We're doing a fast lookup
+    //  We're doing a fast lookup
     auto& msg = canState->readFrames[busId][*messageID];
     if (msg.timestamp == 0) {
       *status = HAL_ERR_CANSessionMux_MessageNotFound;
@@ -264,7 +266,7 @@ void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
     return;
   }
 
-  printf("Slow lookup not supported\n");
+  printf("Slow lookup not supported yet\n");
 
   // Add support for slow lookup later
   *status = HAL_ERR_CANSessionMux_NotAllowed;
