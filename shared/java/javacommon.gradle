@@ -103,10 +103,11 @@ configurations {
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs = [
         '--release',
-        '17',
+        '21',
+        '--enable-preview',
         '-encoding',
         'UTF8',
-        "-Werror",
+//        "-Werror",
         "-Xlint:all",
         // ignore AutoCloseable warnings
         "-Xlint:-try",

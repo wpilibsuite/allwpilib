@@ -142,7 +142,7 @@ public abstract class RobotBase implements AutoCloseable {
    */
   protected RobotBase() {
     final NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    m_threadId = Thread.currentThread().getId();
+    m_threadId = Thread.currentThread().threadId();
     setupCameraServerShared();
     setupMathShared();
     // subscribe to "" to force persistent values to propagate to local
@@ -420,9 +420,13 @@ public abstract class RobotBase implements AutoCloseable {
     } catch (Throwable throwable) {
       Throwable cause = throwable.getCause();
       if (cause != null) {
-        throwable = cause;
+//        throwable = cause;
       }
       DriverStation.reportError("Unhandled exception: " + throwable, throwable.getStackTrace());
+      while (cause != null) {
+        DriverStation.reportError("  Caused by: " + cause, cause.getStackTrace());
+        cause = cause.getCause();
+      }
       errorOnExit = true;
     } finally {
       m_runMutex.lock();

@@ -19,7 +19,7 @@ plugins {
     id 'visual-studio'
     id 'net.ltgt.errorprone' version '3.1.0' apply false
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
-    id 'com.diffplug.spotless' version '6.20.0' apply false
+    id 'com.diffplug.spotless' version '6.25.0' apply false
     id 'com.github.spotbugs' version '6.0.2' apply false
 }
 
@@ -110,8 +110,8 @@ subprojects {
 
     plugins.withType(JavaPlugin) {
         java {
-            sourceCompatibility = 17
-            targetCompatibility = 17
+            sourceCompatibility = 21
+            targetCompatibility = 21
         }
     }
 
