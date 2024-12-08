@@ -221,6 +221,27 @@ TEST_F(CommandDecoratorTest, DeadlineFor) {
   EXPECT_FALSE(scheduler.IsScheduled(group));
 }
 
+TEST_F(CommandDecoratorTest, WithDeadline) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool finish = false;
+
+  auto dictator = WaitUntilCommand([&finish] { return finish; });
+  auto endsAfter = WaitUntilCommand([] { return false; });
+
+  auto group = std::move(endsAfter).WithDeadline(std::move(dictator).ToPtr());
+
+  scheduler.Schedule(group);
+  scheduler.Run();
+
+  EXPECT_TRUE(scheduler.IsScheduled(group));
+
+  finish = true;
+  scheduler.Run();
+
+  EXPECT_FALSE(scheduler.IsScheduled(group));
+}
+
 TEST_F(CommandDecoratorTest, AlongWith) {
   CommandScheduler scheduler = GetScheduler();
 
@@ -275,6 +296,33 @@ TEST_F(CommandDecoratorTest, DeadlineForOrder) {
   });
 
   auto group = std::move(dictator).DeadlineFor(std::move(other).ToPtr());
+
+  scheduler.Schedule(group);
+  scheduler.Run();
+
+  EXPECT_TRUE(dictatorHasRun);
+  EXPECT_TRUE(dictatorWasPolled);
+}
+
+TEST_F(CommandDecoratorTest, WithDeadlineOrder) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool dictatorHasRun = false;
+  bool dictatorWasPolled = false;
+
+  auto dictator =
+      FunctionalCommand([] {}, [&dictatorHasRun] { dictatorHasRun = true; },
+                        [](bool interrupted) {},
+                        [&dictatorWasPolled] {
+                          dictatorWasPolled = true;
+                          return true;
+                        });
+  auto other = RunCommand([&dictatorHasRun, &dictatorWasPolled] {
+    EXPECT_TRUE(dictatorHasRun);
+    EXPECT_TRUE(dictatorWasPolled);
+  });
+
+  auto group = std::move(other).WithDeadline(std::move(dictator).ToPtr());
 
   scheduler.Schedule(group);
   scheduler.Run();
