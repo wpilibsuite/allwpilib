@@ -68,22 +68,6 @@ class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming continuous
-   * control.
-   *
-   * @param velocity     The velocity setpoint.
-   * @param acceleration The acceleration setpoint.
-   * @return The computed feedforward, in volts.
-   * @deprecated Use the current/next velocity overload instead.
-   */
-  [[deprecated("Use the current/next velocity overload instead.")]]
-  constexpr units::volt_t Calculate(
-      units::unit_t<Velocity> velocity,
-      units::unit_t<Acceleration> acceleration) const {
-    return kS * wpi::sgn(velocity) + kV * velocity + kA * acceleration;
-  }
-
-  /**
    * Calculates the feedforward from the gains and velocity setpoint assuming
    * discrete control. Use this method when the velocity setpoint does not
    * change.
