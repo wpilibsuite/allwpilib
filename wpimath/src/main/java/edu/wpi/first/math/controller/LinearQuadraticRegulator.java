@@ -45,20 +45,20 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param plant The plant being controlled.
    * @param qelms The maximum desired error tolerance for each state.
    * @param relms The maximum desired control effort for each input.
-   * @param dtSeconds Discretization timestep.
+   * @param dt Discretization timestep in seconds.
    * @throws IllegalArgumentException If the system is unstabilizable.
    */
   public LinearQuadraticRegulator(
       LinearSystem<States, Inputs, Outputs> plant,
       Vector<States> qelms,
       Vector<Inputs> relms,
-      double dtSeconds) {
+      double dt) {
     this(
         plant.getA(),
         plant.getB(),
         StateSpaceUtil.makeCostMatrix(qelms),
         StateSpaceUtil.makeCostMatrix(relms),
-        dtSeconds);
+        dt);
   }
 
   /**
@@ -72,7 +72,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param B Continuous input matrix of the plant being controlled.
    * @param qelms The maximum desired error tolerance for each state.
    * @param relms The maximum desired control effort for each input.
-   * @param dtSeconds Discretization timestep.
+   * @param dt Discretization timestep in seconds.
    * @throws IllegalArgumentException If the system is unstabilizable.
    */
   public LinearQuadraticRegulator(
@@ -80,13 +80,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
       Matrix<States, Inputs> B,
       Vector<States> qelms,
       Vector<Inputs> relms,
-      double dtSeconds) {
-    this(
-        A,
-        B,
-        StateSpaceUtil.makeCostMatrix(qelms),
-        StateSpaceUtil.makeCostMatrix(relms),
-        dtSeconds);
+      double dt) {
+    this(A, B, StateSpaceUtil.makeCostMatrix(qelms), StateSpaceUtil.makeCostMatrix(relms), dt);
   }
 
   /**
@@ -96,7 +91,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param B Continuous input matrix of the plant being controlled.
    * @param Q The state cost matrix.
    * @param R The input cost matrix.
-   * @param dtSeconds Discretization timestep.
+   * @param dt Discretization timestep in seconds.
    * @throws IllegalArgumentException If the system is unstabilizable.
    */
   public LinearQuadraticRegulator(
@@ -104,8 +99,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
       Matrix<States, Inputs> B,
       Matrix<States, States> Q,
       Matrix<Inputs, Inputs> R,
-      double dtSeconds) {
-    var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
+      double dt) {
+    var discABPair = Discretization.discretizeAB(A, B, dt);
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
 
@@ -134,7 +129,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param Q The state cost matrix.
    * @param R The input cost matrix.
    * @param N The state-input cross-term cost matrix.
-   * @param dtSeconds Discretization timestep.
+   * @param dt Discretization timestep in seconds.
    * @throws IllegalArgumentException If the system is unstabilizable.
    */
   public LinearQuadraticRegulator(
@@ -143,8 +138,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
       Matrix<States, States> Q,
       Matrix<Inputs, Inputs> R,
       Matrix<States, Inputs> N,
-      double dtSeconds) {
-    var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
+      double dt) {
+    var discABPair = Discretization.discretizeAB(A, B, dt);
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
 
@@ -253,15 +248,15 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * appendix C.4 for a derivation.
    *
    * @param plant The plant being controlled.
-   * @param dtSeconds Discretization timestep in seconds.
-   * @param inputDelaySeconds Input time delay in seconds.
+   * @param dt Discretization timestep in seconds.
+   * @param inputDelay Input time delay in seconds.
    */
   public void latencyCompensate(
-      LinearSystem<States, Inputs, Outputs> plant, double dtSeconds, double inputDelaySeconds) {
-    var discABPair = Discretization.discretizeAB(plant.getA(), plant.getB(), dtSeconds);
+      LinearSystem<States, Inputs, Outputs> plant, double dt, double inputDelay) {
+    var discABPair = Discretization.discretizeAB(plant.getA(), plant.getB(), dt);
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
 
-    m_K = m_K.times((discA.minus(discB.times(m_K))).pow(inputDelaySeconds / dtSeconds));
+    m_K = m_K.times((discA.minus(discB.times(m_K))).pow(inputDelay / dt));
   }
 }

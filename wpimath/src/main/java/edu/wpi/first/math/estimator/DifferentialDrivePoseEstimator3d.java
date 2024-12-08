@@ -48,22 +48,22 @@ public class DifferentialDrivePoseEstimator3d
    *
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The current gyro angle.
-   * @param leftDistanceMeters The distance traveled by the left encoder.
-   * @param rightDistanceMeters The distance traveled by the right encoder.
-   * @param initialPoseMeters The starting pose estimate.
+   * @param leftDistance The distance traveled by the left encoder in meters.
+   * @param rightDistance The distance traveled by the right encoder in meters.
+   * @param initialPose The starting pose estimate.
    */
   public DifferentialDrivePoseEstimator3d(
       DifferentialDriveKinematics kinematics,
       Rotation3d gyroAngle,
-      double leftDistanceMeters,
-      double rightDistanceMeters,
-      Pose3d initialPoseMeters) {
+      double leftDistance,
+      double rightDistance,
+      Pose3d initialPose) {
     this(
         kinematics,
         gyroAngle,
-        leftDistanceMeters,
-        rightDistanceMeters,
-        initialPoseMeters,
+        leftDistance,
+        rightDistance,
+        initialPose,
         VecBuilder.fill(0.02, 0.02, 0.02, 0.01),
         VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
   }
@@ -73,9 +73,9 @@ public class DifferentialDrivePoseEstimator3d
    *
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The gyro angle of the robot.
-   * @param leftDistanceMeters The distance traveled by the left encoder.
-   * @param rightDistanceMeters The distance traveled by the right encoder.
-   * @param initialPoseMeters The estimated initial pose.
+   * @param leftDistance The distance traveled by the left encoder in meters.
+   * @param rightDistance The distance traveled by the right encoder in meters.
+   * @param initialPose The estimated initial pose.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
    *     in meters, and heading in radians). Increase these numbers to trust your state estimate
    *     less.
@@ -86,15 +86,14 @@ public class DifferentialDrivePoseEstimator3d
   public DifferentialDrivePoseEstimator3d(
       DifferentialDriveKinematics kinematics,
       Rotation3d gyroAngle,
-      double leftDistanceMeters,
-      double rightDistanceMeters,
-      Pose3d initialPoseMeters,
+      double leftDistance,
+      double rightDistance,
+      Pose3d initialPose,
       Matrix<N4, N1> stateStdDevs,
       Matrix<N4, N1> visionMeasurementStdDevs) {
     super(
         kinematics,
-        new DifferentialDriveOdometry3d(
-            gyroAngle, leftDistanceMeters, rightDistanceMeters, initialPoseMeters),
+        new DifferentialDriveOdometry3d(gyroAngle, leftDistance, rightDistance, initialPose),
         stateStdDevs,
         visionMeasurementStdDevs);
   }
@@ -106,19 +105,14 @@ public class DifferentialDrivePoseEstimator3d
    * automatically takes care of offsetting the gyro angle.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftPositionMeters The distance traveled by the left encoder.
-   * @param rightPositionMeters The distance traveled by the right encoder.
-   * @param poseMeters The position on the field that your robot is at.
+   * @param leftPosition The distance traveled by the left encoder in meters.
+   * @param rightPosition The distance traveled by the right encoder in meters.
+   * @param pose The position on the field that your robot is at.
    */
   public void resetPosition(
-      Rotation3d gyroAngle,
-      double leftPositionMeters,
-      double rightPositionMeters,
-      Pose3d poseMeters) {
+      Rotation3d gyroAngle, double leftPosition, double rightPosition, Pose3d pose) {
     resetPosition(
-        gyroAngle,
-        new DifferentialDriveWheelPositions(leftPositionMeters, rightPositionMeters),
-        poseMeters);
+        gyroAngle, new DifferentialDriveWheelPositions(leftPosition, rightPosition), pose);
   }
 
   /**
@@ -126,34 +120,27 @@ public class DifferentialDrivePoseEstimator3d
    * loop.
    *
    * @param gyroAngle The current gyro angle.
-   * @param distanceLeftMeters The total distance travelled by the left wheel in meters.
-   * @param distanceRightMeters The total distance travelled by the right wheel in meters.
+   * @param distanceLeft The total distance travelled by the left wheel in meters.
+   * @param distanceRight The total distance travelled by the right wheel in meters.
    * @return The estimated pose of the robot in meters.
    */
-  public Pose3d update(
-      Rotation3d gyroAngle, double distanceLeftMeters, double distanceRightMeters) {
-    return update(
-        gyroAngle, new DifferentialDriveWheelPositions(distanceLeftMeters, distanceRightMeters));
+  public Pose3d update(Rotation3d gyroAngle, double distanceLeft, double distanceRight) {
+    return update(gyroAngle, new DifferentialDriveWheelPositions(distanceLeft, distanceRight));
   }
 
   /**
    * Updates the pose estimator with wheel encoder and gyro information. This should be called every
    * loop.
    *
-   * @param currentTimeSeconds Time at which this method was called, in seconds.
+   * @param currentTime Time at which this method was called, in seconds.
    * @param gyroAngle The current gyro angle.
-   * @param distanceLeftMeters The total distance travelled by the left wheel in meters.
-   * @param distanceRightMeters The total distance travelled by the right wheel in meters.
+   * @param distanceLeft The total distance travelled by the left wheel in meters.
+   * @param distanceRight The total distance travelled by the right wheel in meters.
    * @return The estimated pose of the robot in meters.
    */
   public Pose3d updateWithTime(
-      double currentTimeSeconds,
-      Rotation3d gyroAngle,
-      double distanceLeftMeters,
-      double distanceRightMeters) {
+      double currentTime, Rotation3d gyroAngle, double distanceLeft, double distanceRight) {
     return updateWithTime(
-        currentTimeSeconds,
-        gyroAngle,
-        new DifferentialDriveWheelPositions(distanceLeftMeters, distanceRightMeters));
+        currentTime, gyroAngle, new DifferentialDriveWheelPositions(distanceLeft, distanceRight));
   }
 }

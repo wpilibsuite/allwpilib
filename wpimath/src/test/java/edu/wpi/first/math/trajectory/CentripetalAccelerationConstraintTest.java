@@ -20,14 +20,13 @@ class CentripetalAccelerationConstraintTest {
     Trajectory trajectory =
         TrajectoryGeneratorTest.getTrajectory(Collections.singletonList(constraint));
 
-    var duration = trajectory.getTotalTimeSeconds();
+    var duration = trajectory.getTotalTime();
     var t = 0.0;
     var dt = 0.02;
 
     while (t < duration) {
       var point = trajectory.sample(t);
-      var centripetalAcceleration =
-          Math.pow(point.velocityMetersPerSecond, 2) * point.curvatureRadPerMeter;
+      var centripetalAcceleration = Math.pow(point.velocity, 2) * point.curvature;
 
       t += dt;
       assertTrue(centripetalAcceleration <= maxCentripetalAcceleration + 0.05);

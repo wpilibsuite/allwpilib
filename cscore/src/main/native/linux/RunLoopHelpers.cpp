@@ -12,16 +12,16 @@ static wpi::Event& GetInstance() {
 }
 
 namespace cs {
+
 void RunMainRunLoop() {
   wpi::Event& event = GetInstance();
   wpi::WaitForObject(event.GetHandle());
 }
 
-int RunMainRunLoopTimeout(double timeoutSeconds) {
+int RunMainRunLoopTimeout(double timeout) {
   wpi::Event& event = GetInstance();
   bool timedOut = false;
-  bool signaled =
-      wpi::WaitForObject(event.GetHandle(), timeoutSeconds, &timedOut);
+  bool signaled = wpi::WaitForObject(event.GetHandle(), timeout, &timedOut);
   if (timedOut) {
     return 3;
   }
@@ -35,4 +35,5 @@ void StopMainRunLoop() {
   wpi::Event& event = GetInstance();
   event.Set();
 }
+
 }  // namespace cs

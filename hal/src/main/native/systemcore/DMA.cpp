@@ -148,17 +148,15 @@ void* HAL_GetDMADirectPointer(HAL_DMAHandle handle) {
 
 enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
                                          HAL_DMASample* dmaSample,
-                                         double timeoutSeconds,
-                                         int32_t* remainingOut,
+                                         double timeout, int32_t* remainingOut,
                                          int32_t* status) {
   *status = HAL_HANDLE_ERROR;
   return HAL_DMAReadStatus::HAL_DMA_ERROR;
 }
 
 enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
-                                   HAL_DMASample* dmaSample,
-                                   double timeoutSeconds, int32_t* remainingOut,
-                                   int32_t* status) {
+                                   HAL_DMASample* dmaSample, double timeout,
+                                   int32_t* remainingOut, int32_t* status) {
   *status = HAL_HANDLE_ERROR;
   return HAL_DMAReadStatus::HAL_DMA_ERROR;
 }

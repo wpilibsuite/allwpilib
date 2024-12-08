@@ -74,10 +74,7 @@ public class Shooter extends SubsystemBase {
   // Feedforward controller to run the shooter wheel in closed-loop, set the constants equal to
   // those calculated by SysId
   private final SimpleMotorFeedforward m_shooterFeedforward =
-      new SimpleMotorFeedforward(
-          ShooterConstants.kSVolts,
-          ShooterConstants.kVVoltSecondsPerRotation,
-          ShooterConstants.kAVoltSecondsSquaredPerRotation);
+      new SimpleMotorFeedforward(ShooterConstants.kS, ShooterConstants.kV, ShooterConstants.kA);
 
   /** Creates a new Shooter subsystem. */
   public Shooter() {

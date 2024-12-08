@@ -38,10 +38,10 @@ public class DCMotorProto implements Protobuf<DCMotor, ProtobufDCMotor> {
 
   @Override
   public void pack(ProtobufDCMotor msg, DCMotor value) {
-    msg.setNominalVoltage(value.nominalVoltageVolts);
-    msg.setStallTorque(value.stallTorqueNewtonMeters);
-    msg.setStallCurrent(value.stallCurrentAmps);
-    msg.setFreeCurrent(value.freeCurrentAmps);
-    msg.setFreeSpeed(value.freeSpeedRadPerSec);
+    msg.setNominalVoltage(value.nominalVoltage);
+    msg.setStallTorque(value.stallTorque);
+    msg.setStallCurrent(value.stallCurrent);
+    msg.setFreeCurrent(value.freeCurrent);
+    msg.setFreeSpeed(value.freeSpeed);
   }
 }

@@ -95,27 +95,27 @@ public class ADIS16448_IMUSim {
   /**
    * Sets the X axis acceleration in meters per second squared.
    *
-   * @param accelMetersPerSecondSquared The acceleration.
+   * @param accel The acceleration in m/s².
    */
-  public void setAccelX(double accelMetersPerSecondSquared) {
-    m_simAccelX.set(accelMetersPerSecondSquared);
+  public void setAccelX(double accel) {
+    m_simAccelX.set(accel);
   }
 
   /**
    * Sets the Y axis acceleration in meters per second squared.
    *
-   * @param accelMetersPerSecondSquared The acceleration.
+   * @param accel The acceleration in m/s².
    */
-  public void setAccelY(double accelMetersPerSecondSquared) {
-    m_simAccelY.set(accelMetersPerSecondSquared);
+  public void setAccelY(double accel) {
+    m_simAccelY.set(accel);
   }
 
   /**
    * Sets the Z axis acceleration in meters per second squared.
    *
-   * @param accelMetersPerSecondSquared The acceleration.
+   * @param accel The acceleration in m/s².
    */
-  public void setAccelZ(double accelMetersPerSecondSquared) {
-    m_simAccelZ.set(accelMetersPerSecondSquared);
+  public void setAccelZ(double accel) {
+    m_simAccelZ.set(accel);
   }
 }
