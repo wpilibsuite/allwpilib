@@ -1010,7 +1010,7 @@ class AnnotationProcessorTest {
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
               for (int i = 0; i < object.x.length; i++) {
-                Epilogue.subLoggableLogger.tryUpdate(backend.getNested("x" + "/" + i), object.x[i], Epilogue.getConfig().errorHandler);
+                  Epilogue.subLoggableLogger.tryUpdate(backend.getNested("x/" + i), object.x[i], Epilogue.getConfig().errorHandler);
               };
           }
         }

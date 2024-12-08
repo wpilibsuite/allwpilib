@@ -8,6 +8,7 @@ import java.util.Collection;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
@@ -66,19 +67,24 @@ public class ArrayHandler extends ElementHandler {
    * @return Whether the array
    */
   private boolean isCustomLoggableArray(TypeMirror componentType, Element arrayElement) {
-    if (arrayElement.getModifiers().contains(Modifier.FINAL)) {
-      return m_loggableHandler.isLoggableType(componentType);
-    } else {
-      m_processingEnv
-          .getMessager()
-          .printMessage(
-              Diagnostic.Kind.NOTE,
-              "[EPILOGUE] Excluded from logs because array "
-                  + arrayElement
-                  + " isn't marked as final(or is returned from a method).",
-              arrayElement);
-      return false;
+    if (m_loggableHandler.isLoggableType(componentType)) {
+      if (!arrayElement.getModifiers().contains(Modifier.FINAL)) {
+        String cause =
+            arrayElement instanceof VariableElement
+                ? " isn't marked as final."
+                : " is returned from a method.";
+        cause += " Arrays with @Logged classes cannot be non-final or be returned from methods.";
+        m_processingEnv
+            .getMessager()
+            .printMessage(
+                Diagnostic.Kind.NOTE,
+                "[EPILOGUE] Excluded from logs because array " + arrayElement + cause,
+                arrayElement);
+        return false;
+      }
+      return true;
     }
+    return false;
   }
 
   @Override
@@ -100,12 +106,14 @@ public class ArrayHandler extends ElementHandler {
     } else if (m_loggableHandler.isLoggableType(componentType)) {
       var elementAccess = elementAccess(element);
       var logInvocation =
-          m_loggableHandler.addLogPathSuffix(
-              m_loggableHandler.logInvocation(element, componentType, elementAccess + "[i]"),
-              "\"/\" + i");
+          m_loggableHandler.logInvocation(element, componentType, elementAccess + "[i]");
+      logInvocation =
+          logInvocation.replaceAll(
+              "backend\\.getNested\\(\".*\"\\)",
+              "backend.getNested(\"%s/\" + i)".formatted(loggedName(element)));
       return """
           for (int i = 0; i < %s.length; i++) {
-            %s;
+              %s;
           }
         """
           .formatted(elementAccess, logInvocation);
