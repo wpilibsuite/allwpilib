@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.HolonomicDriveController;
@@ -19,7 +17,6 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -58,14 +55,10 @@ public class MecanumControllerCommand extends Command {
   private final Supplier<MecanumDriveWheelSpeeds> m_currentWheelSpeeds;
   private final Consumer<MecanumDriveMotorVoltages> m_outputDriveVoltages;
   private final Consumer<MecanumDriveWheelSpeeds> m_outputWheelSpeeds;
-  private final MutLinearVelocity m_prevFrontLeftSpeedSetpoint = MetersPerSecond.mutable(0);
-  private final MutLinearVelocity m_prevRearLeftSpeedSetpoint = MetersPerSecond.mutable(0);
-  private final MutLinearVelocity m_prevFrontRightSpeedSetpoint = MetersPerSecond.mutable(0);
-  private final MutLinearVelocity m_prevRearRightSpeedSetpoint = MetersPerSecond.mutable(0);
-  private final MutLinearVelocity m_frontLeftSpeedSetpoint = MetersPerSecond.mutable(0);
-  private final MutLinearVelocity m_rearLeftSpeedSetpoint = MetersPerSecond.mutable(0);
-  private final MutLinearVelocity m_frontRightSpeedSetpoint = MetersPerSecond.mutable(0);
-  private final MutLinearVelocity m_rearRightSpeedSetpoint = MetersPerSecond.mutable(0);
+  private double m_prevFrontLeftSpeedSetpoint; // m/s
+  private double m_prevRearLeftSpeedSetpoint; // m/s
+  private double m_prevFrontRightSpeedSetpoint; // m/s
+  private double m_prevRearRightSpeedSetpoint; // m/s
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow the provided
@@ -343,10 +336,10 @@ public class MecanumControllerCommand extends Command {
     MecanumDriveWheelSpeeds prevSpeeds =
         m_kinematics.toWheelSpeeds(new ChassisSpeeds(initialXVelocity, initialYVelocity, 0.0));
 
-    m_prevFrontLeftSpeedSetpoint.mut_setMagnitude(prevSpeeds.frontLeftMetersPerSecond);
-    m_prevRearLeftSpeedSetpoint.mut_setMagnitude(prevSpeeds.rearLeftMetersPerSecond);
-    m_prevFrontRightSpeedSetpoint.mut_setMagnitude(prevSpeeds.frontRightMetersPerSecond);
-    m_prevRearRightSpeedSetpoint.mut_setMagnitude(prevSpeeds.rearRightMetersPerSecond);
+    m_prevFrontLeftSpeedSetpoint = prevSpeeds.frontLeftMetersPerSecond;
+    m_prevRearLeftSpeedSetpoint = prevSpeeds.rearLeftMetersPerSecond;
+    m_prevFrontRightSpeedSetpoint = prevSpeeds.frontRightMetersPerSecond;
+    m_prevRearRightSpeedSetpoint = prevSpeeds.rearRightMetersPerSecond;
 
     m_timer.restart();
   }
@@ -363,10 +356,10 @@ public class MecanumControllerCommand extends Command {
 
     targetWheelSpeeds.desaturate(m_maxWheelVelocityMetersPerSecond);
 
-    m_frontLeftSpeedSetpoint.mut_setMagnitude(targetWheelSpeeds.frontLeftMetersPerSecond);
-    m_rearLeftSpeedSetpoint.mut_setMagnitude(targetWheelSpeeds.rearLeftMetersPerSecond);
-    m_frontRightSpeedSetpoint.mut_setMagnitude(targetWheelSpeeds.frontRightMetersPerSecond);
-    m_rearRightSpeedSetpoint.mut_setMagnitude(targetWheelSpeeds.rearRightMetersPerSecond);
+    double frontLeftSpeedSetpoint = targetWheelSpeeds.frontLeftMetersPerSecond;
+    double rearLeftSpeedSetpoint = targetWheelSpeeds.rearLeftMetersPerSecond;
+    double frontRightSpeedSetpoint = targetWheelSpeeds.frontRightMetersPerSecond;
+    double rearRightSpeedSetpoint = targetWheelSpeeds.rearRightMetersPerSecond;
 
     double frontLeftOutput;
     double rearLeftOutput;
@@ -375,42 +368,39 @@ public class MecanumControllerCommand extends Command {
 
     if (m_usePID) {
       final double frontLeftFeedforward =
-          m_feedforward.calculate(m_prevFrontLeftSpeedSetpoint, m_frontLeftSpeedSetpoint).in(Volts);
+          m_feedforward.calculateWithVelocities(
+              m_prevFrontLeftSpeedSetpoint, frontLeftSpeedSetpoint);
 
       final double rearLeftFeedforward =
-          m_feedforward.calculate(m_prevRearLeftSpeedSetpoint, m_rearLeftSpeedSetpoint).in(Volts);
+          m_feedforward.calculateWithVelocities(m_prevRearLeftSpeedSetpoint, rearLeftSpeedSetpoint);
 
       final double frontRightFeedforward =
-          m_feedforward
-              .calculate(m_prevFrontRightSpeedSetpoint, m_frontRightSpeedSetpoint)
-              .in(Volts);
+          m_feedforward.calculateWithVelocities(
+              m_prevFrontRightSpeedSetpoint, frontRightSpeedSetpoint);
 
       final double rearRightFeedforward =
-          m_feedforward.calculate(m_prevRearRightSpeedSetpoint, m_rearRightSpeedSetpoint).in(Volts);
+          m_feedforward.calculateWithVelocities(
+              m_prevRearRightSpeedSetpoint, rearRightSpeedSetpoint);
 
       frontLeftOutput =
           frontLeftFeedforward
               + m_frontLeftController.calculate(
-                  m_currentWheelSpeeds.get().frontLeftMetersPerSecond,
-                  m_frontLeftSpeedSetpoint.in(MetersPerSecond));
+                  m_currentWheelSpeeds.get().frontLeftMetersPerSecond, frontLeftSpeedSetpoint);
 
       rearLeftOutput =
           rearLeftFeedforward
               + m_rearLeftController.calculate(
-                  m_currentWheelSpeeds.get().rearLeftMetersPerSecond,
-                  m_rearLeftSpeedSetpoint.in(MetersPerSecond));
+                  m_currentWheelSpeeds.get().rearLeftMetersPerSecond, rearLeftSpeedSetpoint);
 
       frontRightOutput =
           frontRightFeedforward
               + m_frontRightController.calculate(
-                  m_currentWheelSpeeds.get().frontRightMetersPerSecond,
-                  m_frontRightSpeedSetpoint.in(MetersPerSecond));
+                  m_currentWheelSpeeds.get().frontRightMetersPerSecond, frontRightSpeedSetpoint);
 
       rearRightOutput =
           rearRightFeedforward
               + m_rearRightController.calculate(
-                  m_currentWheelSpeeds.get().rearRightMetersPerSecond,
-                  m_rearRightSpeedSetpoint.in(MetersPerSecond));
+                  m_currentWheelSpeeds.get().rearRightMetersPerSecond, rearRightSpeedSetpoint);
 
       m_outputDriveVoltages.accept(
           new MecanumDriveMotorVoltages(
@@ -419,10 +409,10 @@ public class MecanumControllerCommand extends Command {
     } else {
       m_outputWheelSpeeds.accept(
           new MecanumDriveWheelSpeeds(
-              m_frontLeftSpeedSetpoint.in(MetersPerSecond),
-              m_frontRightSpeedSetpoint.in(MetersPerSecond),
-              m_rearLeftSpeedSetpoint.in(MetersPerSecond),
-              m_rearRightSpeedSetpoint.in(MetersPerSecond)));
+              frontLeftSpeedSetpoint,
+              frontRightSpeedSetpoint,
+              rearLeftSpeedSetpoint,
+              rearRightSpeedSetpoint));
     }
   }
 

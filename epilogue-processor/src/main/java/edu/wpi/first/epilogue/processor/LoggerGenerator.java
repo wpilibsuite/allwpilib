@@ -15,6 +15,7 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.annotation.Annotation;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -42,6 +43,33 @@ public class LoggerGenerator {
       LoggerGenerator::isBuiltInJavaMethod;
   private final ProcessingEnvironment m_processingEnv;
   private final List<ElementHandler> m_handlers;
+  private final Logged m_defaultConfig =
+      new Logged() {
+        @Override
+        public Class<? extends Annotation> annotationType() {
+          return Logged.class;
+        }
+
+        @Override
+        public String name() {
+          return "";
+        }
+
+        @Override
+        public Strategy strategy() {
+          return Strategy.OPT_IN;
+        }
+
+        @Override
+        public Importance importance() {
+          return Importance.DEBUG;
+        }
+
+        @Override
+        public Naming defaultNaming() {
+          return Naming.USE_CODE_NAME;
+        }
+      };
 
   public LoggerGenerator(ProcessingEnvironment processingEnv, List<ElementHandler> handlers) {
     this.m_processingEnv = processingEnv;
@@ -76,6 +104,9 @@ public class LoggerGenerator {
    */
   public void writeLoggerFile(TypeElement clazz) throws IOException {
     var config = clazz.getAnnotation(Logged.class);
+    if (config == null) {
+      config = m_defaultConfig;
+    }
     boolean requireExplicitOptIn = config.strategy() == Logged.Strategy.OPT_IN;
 
     Predicate<Element> notSkipped = LoggerGenerator::isNotSkipped;

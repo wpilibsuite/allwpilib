@@ -4,10 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.swervebot;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -127,10 +123,7 @@ public class SwerveModule {
     final double driveOutput =
         m_drivePIDController.calculate(m_driveEncoder.getRate(), desiredState.speedMetersPerSecond);
 
-    final double driveFeedforward =
-        m_driveFeedforward
-            .calculate(MetersPerSecond.of(desiredState.speedMetersPerSecond))
-            .in(Volts);
+    final double driveFeedforward = m_driveFeedforward.calculate(desiredState.speedMetersPerSecond);
 
     // Calculate the turning motor output from the turning PID controller.
     final double turnOutput =
@@ -138,9 +131,7 @@ public class SwerveModule {
             m_turningEncoder.getDistance(), desiredState.angle.getRadians());
 
     final double turnFeedforward =
-        m_turnFeedforward
-            .calculate(RadiansPerSecond.of(m_turningPIDController.getSetpoint().velocity))
-            .in(Volts);
+        m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
 
     m_driveMotor.setVoltage(driveOutput + driveFeedforward);
     m_turningMotor.setVoltage(turnOutput + turnFeedforward);
