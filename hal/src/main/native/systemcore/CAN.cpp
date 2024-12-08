@@ -4,30 +4,27 @@
 
 #include "hal/CAN.h"
 
-#include "hal/Errors.h"
-
-#include "wpinet/EventLoopRunner.h"
-#include "wpi/mutex.h"
-#include "wpi/DenseMap.h"
-
-#include "wpinet/uv/Poll.h"
-#include "wpinet/uv/Timer.h"
-
-#include <net/if.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-
 #include <linux/can.h>
 #include <linux/can/raw.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 
-#include "hal/Threads.h"
-#include "wpi/timestamp.h"
-
-#include <utility>
-#include <memory>
-#include <vector>
 #include <cstdio>
+#include <memory>
+#include <utility>
+#include <vector>
+
+#include <wpi/DenseMap.h>
+#include <wpi/mutex.h>
+#include <wpi/timestamp.h>
+
+#include "hal/Errors.h"
+#include "hal/Threads.h"
+#include "wpinet/EventLoopRunner.h"
+#include "wpinet/uv/Poll.h"
+#include "wpinet/uv/Timer.h"
 
 #define NUM_CAN_BUSES 1
 
@@ -104,7 +101,7 @@ bool SocketCanState::InitializeBuses() {
     int32_t status = 0;
     HAL_SetCurrentThreadPriority(true, 50, &status);
     if (status != 0) {
-      printf("Failed to set CAN thread priority\n");
+      std::printf("Failed to set CAN thread priority\n");
     }
 
     for (int i = 0; i < NUM_CAN_BUSES; i++) {
@@ -116,7 +113,7 @@ bool SocketCanState::InitializeBuses() {
       }
 
       ifreq ifr;
-      snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can%d", i);
+      std::snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can%d", i);
 
       if (ioctl(socketHandle[i], SIOCGIFINDEX, &ifr) == -1) {
         success = false;
@@ -124,7 +121,7 @@ bool SocketCanState::InitializeBuses() {
       }
 
       sockaddr_can addr;
-      memset(&addr, 0, sizeof(addr));
+      std::memset(&addr, 0, sizeof(addr));
       addr.can_family = AF_CAN;
       addr.can_ifindex = ifr.ifr_ifindex;
 
@@ -134,7 +131,7 @@ bool SocketCanState::InitializeBuses() {
         return;
       }
 
-      printf("Successfully bound to can interface %d\n", i);
+      std::printf("Successfully bound to can interface %d\n", i);
 
       auto poll = wpi::uv::Poll::Create(loop, socketHandle[i]);
       if (!poll) {
@@ -207,12 +204,12 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
   messageID = MapMessageIdToSocketCan(messageID);
 
   canfd_frame frame;
-  memset(&frame, 0, sizeof(frame));
+  std::memset(&frame, 0, sizeof(frame));
   frame.can_id = messageID;
   frame.flags = isFd ? CANFD_FDF | CANFD_BRS : 0;
   if (dataSize) {
     auto size = (std::min)(dataSize, static_cast<uint8_t>(sizeof(frame.data)));
-    memcpy(frame.data, data, size);
+    std::memcpy(frame.data, data, size);
     frame.len = size;
   }
 
@@ -257,20 +254,20 @@ void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
       return;
     }
     if ((msg.frame.flags & CANFD_FDF) || msg.frame.len > 8) {
-      printf("FD frames not supported for read right now\n");
+      std::printf("FD frames not supported for read right now\n");
       *status = HAL_ERR_CANSessionMux_InvalidBuffer;
       return;
     }
     // TODO(thadhouse) this time needs to be fixed up.
     *timeStamp = msg.timestamp / 1000;
-    memcpy(data, msg.frame.data, msg.frame.len);
+    std::memcpy(data, msg.frame.data, msg.frame.len);
     *dataSize = msg.frame.len;
     *status = 0;
     msg.timestamp = 0;
     return;
   }
 
-  printf("Slow lookup not supported yet\n");
+  std::printf("Slow lookup not supported yet\n");
 
   // Add support for slow lookup later
   *status = HAL_ERR_CANSessionMux_NotAllowed;

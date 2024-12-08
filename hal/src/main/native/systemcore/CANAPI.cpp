@@ -9,12 +9,12 @@
 
 #include <wpi/DenseMap.h>
 #include <wpi/mutex.h>
+#include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
 #include "hal/CAN.h"
 #include "hal/Errors.h"
 #include "hal/handles/UnlimitedHandleResource.h"
-#include <wpi/timestamp.h>
 
 using namespace hal;
 
