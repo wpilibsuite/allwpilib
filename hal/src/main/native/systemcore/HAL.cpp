@@ -25,6 +25,7 @@
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
 
+#include "CANInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "SystemServer.h"
@@ -336,6 +337,11 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   setlinebuf(stdout);
 
   prctl(PR_SET_PDEATHSIG, SIGTERM);
+
+  if (!hal::InitializeCanBuses()) {
+    std::printf("Failed to initialize can buses\n");
+    return false;
+  }
 
   hal::InitializeSystemServer();
 

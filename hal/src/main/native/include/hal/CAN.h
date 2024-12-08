@@ -26,12 +26,12 @@
 /**
  * Mask for "is frame remote" in message ID.
  */
-#define HAL_CAN_IS_FRAME_REMOTE 0x80000000
+#define HAL_CAN_IS_FRAME_REMOTE 0x40000000
 
 /**
  * Mask for "is frame 11 bits" in message ID.
  */
-#define HAL_CAN_IS_FRAME_11BIT 0x40000000
+#define HAL_CAN_IS_FRAME_11BIT 0x80000000
 
 #define HAL_ERR_CANSessionMux_InvalidBuffer -44086
 #define HAL_ERR_CANSessionMux_MessageNotFound -44087

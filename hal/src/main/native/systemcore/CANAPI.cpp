@@ -9,6 +9,7 @@
 
 #include <wpi/DenseMap.h>
 #include <wpi/mutex.h>
+#include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
 #include "hal/CAN.h"
@@ -58,12 +59,7 @@ static int32_t CreateCANId(CANStorage* storage, int32_t apiId) {
 extern "C" {
 
 uint32_t HAL_GetCANPacketBaseTime(void) {
-  timespec t;
-  clock_gettime(CLOCK_MONOTONIC, &t);
-
-  // Convert t to milliseconds
-  uint64_t ms = t.tv_sec * 1000ull + t.tv_nsec / 1000000ull;
-  return ms & 0xFFFFFFFF;
+  return wpi::Now() / 1000;
 }
 
 HAL_CANHandle HAL_InitializeCAN(HAL_CANManufacturer manufacturer,
