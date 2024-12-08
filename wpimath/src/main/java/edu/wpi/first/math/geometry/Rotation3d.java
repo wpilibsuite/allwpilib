@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -456,6 +457,32 @@ public class Rotation3d
    */
   public Angle getMeasureZ() {
     return Radians.of(getZ());
+  }
+
+  /**
+   * Returns rotation matrix representation of this rotation.
+   *
+   * @return Rotation matrix representation of this rotation.
+   */
+  public Matrix<N3, N3> toMatrix() {
+    double w = m_q.getW();
+    double x = m_q.getX();
+    double y = m_q.getY();
+    double z = m_q.getZ();
+
+    // https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Quaternion-derived_rotation_matrix
+    return MatBuilder.fill(
+        Nat.N3(),
+        Nat.N3(),
+        1.0 - 2.0 * (y * y + z * z),
+        2.0 * (x * y - w * z),
+        2.0 * (x * z + w * y),
+        2.0 * (x * y + w * z),
+        1.0 - 2.0 * (x * x + z * z),
+        2.0 * (y * z - w * x),
+        2.0 * (x * z - w * y),
+        2.0 * (y * z + w * x),
+        1.0 - 2.0 * (x * x + y * y));
   }
 
   /**
