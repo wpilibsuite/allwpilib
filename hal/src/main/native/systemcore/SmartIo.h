@@ -4,6 +4,7 @@
 #include "hal/handles/DigitalHandleResource.h"
 #include "hal/handles/HandlesInternal.h"
 #include "networktables/DoubleTopic.h"
+#include <string>
 
 namespace hal {
 
