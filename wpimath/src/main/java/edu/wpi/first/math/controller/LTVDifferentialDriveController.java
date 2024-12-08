@@ -27,11 +27,10 @@ import edu.wpi.first.math.trajectory.Trajectory;
  * state-space, then interpolate between them with a lookup table to save computational resources.
  *
  * <p>This controller has a flat hierarchy with pose and wheel velocity references and voltage
- * outputs. This is different from a Ramsete controller's nested hierarchy where the top-level
+ * outputs. This is different from a unicycle controller's nested hierarchy where the top-level
  * controller has a pose reference and chassis velocity command outputs, and the low-level
  * controller has wheel velocity references and voltage outputs. Flat hierarchies are easier to tune
- * in one shot. Furthermore, this controller is more optimal in the "least-squares error" sense than
- * a controller based on Ramsete.
+ * in one shot.
  *
  * <p>See section 8.7 in Controls Engineering in FRC for a derivation of the control law we used
  * shown in theorem 8.7.4.
