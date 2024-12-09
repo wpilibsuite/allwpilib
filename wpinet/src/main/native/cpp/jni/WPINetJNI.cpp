@@ -84,14 +84,14 @@ Java_edu_wpi_first_net_WPINetJNI_removePortForwarder
 /*
  * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    startWebserver
- * Signature: (ILjava/lang/String;I)V
+ * Signature: (ILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_net_WPINetJNI_startWebServer
   (JNIEnv* env, jclass, jint port, jstring path)
 {
-  wpi::WebServer::GetInstance().Add(static_cast<unsigned int>(port),
-                                    JStringRef{env, path}.str());
+  wpi::WebServer::GetInstance().Start(static_cast<unsigned int>(port),
+                                      JStringRef{env, path}.str());
 }
 
 /*
@@ -103,7 +103,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_net_WPINetJNI_stopWebServer
   (JNIEnv* env, jclass, jint port)
 {
-  wpi::WebServer::GetInstance().Remove(port);
+  wpi::WebServer::GetInstance().Stop(port);
 }
 
 /*
