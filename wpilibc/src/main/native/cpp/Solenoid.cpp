@@ -54,6 +54,24 @@ bool Solenoid::Get() const {
   return (currentAll & m_mask) != 0;
 }
 
+bool Solenoid::IsOn() const {
+  int currentAll = m_module->GetSolenoids();
+  return (currentAll & m_mask) != 0;
+}
+
+bool Solenoid::IsOff() const {
+  int currentAll = m_module->GetSolenoids();
+  return (currentAll & m_mask) == 0;
+}
+
+void Solenoid::SetOn() {
+  Set(true);
+}
+
+void Solenoid::SetOff() {
+  Set(false);
+}
+
 void Solenoid::Toggle() {
   Set(!Get());
 }
