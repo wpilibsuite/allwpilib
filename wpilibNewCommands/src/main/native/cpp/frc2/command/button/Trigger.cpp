@@ -15,22 +15,23 @@ using namespace frc2;
 
 Trigger::Trigger(const Trigger& other) = default;
 
-Trigger Trigger::OnChange(Command* command) {
-  m_loop->Bind(
-      [condition = m_condition, previous = m_condition(), command]() mutable {
-        bool current = condition();
+Trigger Trigger::OnChange(Command* command, InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState), command]() mutable {
+    bool current = condition();
 
-        if (previous != current) {
-          command->Schedule();
-        }
+    if (previous != current) {
+      command->Schedule();
+    }
 
-        previous = current;
-      });
+    previous = current;
+  });
   return *this;
 }
 
-Trigger Trigger::OnChange(CommandPtr&& command) {
-  m_loop->Bind([condition = m_condition, previous = m_condition(),
+Trigger Trigger::OnChange(CommandPtr&& command, InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState),
                 command = std::move(command)]() mutable {
     bool current = condition();
 
@@ -43,22 +44,23 @@ Trigger Trigger::OnChange(CommandPtr&& command) {
   return *this;
 }
 
-Trigger Trigger::OnTrue(Command* command) {
-  m_loop->Bind(
-      [condition = m_condition, previous = m_condition(), command]() mutable {
-        bool current = condition();
+Trigger Trigger::OnTrue(Command* command, InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState), command]() mutable {
+    bool current = condition();
 
-        if (!previous && current) {
-          command->Schedule();
-        }
+    if (!previous && current) {
+      command->Schedule();
+    }
 
-        previous = current;
-      });
+    previous = current;
+  });
   return *this;
 }
 
-Trigger Trigger::OnTrue(CommandPtr&& command) {
-  m_loop->Bind([condition = m_condition, previous = m_condition(),
+Trigger Trigger::OnTrue(CommandPtr&& command, InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState),
                 command = std::move(command)]() mutable {
     bool current = condition();
 
@@ -71,22 +73,23 @@ Trigger Trigger::OnTrue(CommandPtr&& command) {
   return *this;
 }
 
-Trigger Trigger::OnFalse(Command* command) {
-  m_loop->Bind(
-      [condition = m_condition, previous = m_condition(), command]() mutable {
-        bool current = condition();
+Trigger Trigger::OnFalse(Command* command, InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState), command]() mutable {
+    bool current = condition();
 
-        if (previous && !current) {
-          command->Schedule();
-        }
+    if (previous && !current) {
+      command->Schedule();
+    }
 
-        previous = current;
-      });
+    previous = current;
+  });
   return *this;
 }
 
-Trigger Trigger::OnFalse(CommandPtr&& command) {
-  m_loop->Bind([condition = m_condition, previous = m_condition(),
+Trigger Trigger::OnFalse(CommandPtr&& command, InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState),
                 command = std::move(command)]() mutable {
     bool current = condition();
 
@@ -99,24 +102,25 @@ Trigger Trigger::OnFalse(CommandPtr&& command) {
   return *this;
 }
 
-Trigger Trigger::WhileTrue(Command* command) {
-  m_loop->Bind(
-      [condition = m_condition, previous = m_condition(), command]() mutable {
-        bool current = condition();
+Trigger Trigger::WhileTrue(Command* command, InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState), command]() mutable {
+    bool current = condition();
 
-        if (!previous && current) {
-          command->Schedule();
-        } else if (previous && !current) {
-          command->Cancel();
-        }
+    if (!previous && current) {
+      command->Schedule();
+    } else if (previous && !current) {
+      command->Cancel();
+    }
 
-        previous = current;
-      });
+    previous = current;
+  });
   return *this;
 }
 
-Trigger Trigger::WhileTrue(CommandPtr&& command) {
-  m_loop->Bind([condition = m_condition, previous = m_condition(),
+Trigger Trigger::WhileTrue(CommandPtr&& command, InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState),
                 command = std::move(command)]() mutable {
     bool current = condition();
 
@@ -131,24 +135,25 @@ Trigger Trigger::WhileTrue(CommandPtr&& command) {
   return *this;
 }
 
-Trigger Trigger::WhileFalse(Command* command) {
-  m_loop->Bind(
-      [condition = m_condition, previous = m_condition(), command]() mutable {
-        bool current = condition();
+Trigger Trigger::WhileFalse(Command* command, InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState), command]() mutable {
+    bool current = condition();
 
-        if (previous && !current) {
-          command->Schedule();
-        } else if (!previous && current) {
-          command->Cancel();
-        }
+    if (previous && !current) {
+      command->Schedule();
+    } else if (!previous && current) {
+      command->Cancel();
+    }
 
-        previous = current;
-      });
+    previous = current;
+  });
   return *this;
 }
 
-Trigger Trigger::WhileFalse(CommandPtr&& command) {
-  m_loop->Bind([condition = m_condition, previous = m_condition(),
+Trigger Trigger::WhileFalse(CommandPtr&& command, InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState),
                 command = std::move(command)]() mutable {
     bool current = condition();
 
@@ -163,8 +168,9 @@ Trigger Trigger::WhileFalse(CommandPtr&& command) {
   return *this;
 }
 
-Trigger Trigger::ToggleOnTrue(Command* command) {
-  m_loop->Bind([condition = m_condition, previous = m_condition(),
+Trigger Trigger::ToggleOnTrue(Command* command, InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState),
                 command = command]() mutable {
     bool current = condition();
 
@@ -181,8 +187,9 @@ Trigger Trigger::ToggleOnTrue(Command* command) {
   return *this;
 }
 
-Trigger Trigger::ToggleOnTrue(CommandPtr&& command) {
-  m_loop->Bind([condition = m_condition, previous = m_condition(),
+Trigger Trigger::ToggleOnTrue(CommandPtr&& command, InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState),
                 command = std::move(command)]() mutable {
     bool current = condition();
 
@@ -199,8 +206,9 @@ Trigger Trigger::ToggleOnTrue(CommandPtr&& command) {
   return *this;
 }
 
-Trigger Trigger::ToggleOnFalse(Command* command) {
-  m_loop->Bind([condition = m_condition, previous = m_condition(),
+Trigger Trigger::ToggleOnFalse(Command* command, InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState),
                 command = command]() mutable {
     bool current = condition();
 
@@ -217,8 +225,10 @@ Trigger Trigger::ToggleOnFalse(Command* command) {
   return *this;
 }
 
-Trigger Trigger::ToggleOnFalse(CommandPtr&& command) {
-  m_loop->Bind([condition = m_condition, previous = m_condition(),
+Trigger Trigger::ToggleOnFalse(CommandPtr&& command,
+                               InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState),
                 command = std::move(command)]() mutable {
     bool current = condition();
 

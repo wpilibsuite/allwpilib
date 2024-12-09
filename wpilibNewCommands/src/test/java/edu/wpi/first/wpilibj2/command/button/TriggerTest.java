@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj2.command.button;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -14,14 +15,21 @@ import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.CommandTestBase;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger.InitialState;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class TriggerTest extends CommandTestBase {
   @Test
@@ -43,6 +51,24 @@ class TriggerTest extends CommandTestBase {
     assertFalse(command1.isScheduled());
   }
 
+  @ParameterizedTest
+  @MethodSource("initialStates")
+  void onTrueInitialStateTest(
+      InitialState initialState, boolean pressed, Map<String, Boolean> results) {
+    final CommandScheduler scheduler = CommandScheduler.getInstance();
+    final Command command1 = Commands.idle();
+    final InternalButton button = new InternalButton();
+    final boolean shouldBeScheduled = results.get("onTrue");
+
+    button.setPressed(pressed);
+    button.onTrue(command1, initialState);
+
+    assertFalse(command1.isScheduled());
+
+    scheduler.run();
+    assertEquals(shouldBeScheduled, command1.isScheduled());
+  }
+
   @Test
   void onFalseTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
@@ -60,6 +86,24 @@ class TriggerTest extends CommandTestBase {
     finished.set(true);
     scheduler.run();
     assertFalse(command1.isScheduled());
+  }
+
+  @ParameterizedTest
+  @MethodSource("initialStates")
+  void onFalseInitialStateTest(
+      InitialState initialState, boolean pressed, Map<String, Boolean> results) {
+    final CommandScheduler scheduler = CommandScheduler.getInstance();
+    final Command command1 = Commands.idle();
+    final InternalButton button = new InternalButton();
+    final boolean shouldBeScheduled = results.get("onFalse");
+
+    button.setPressed(pressed);
+    button.onFalse(command1, initialState);
+
+    assertFalse(command1.isScheduled());
+
+    scheduler.run();
+    assertEquals(shouldBeScheduled, command1.isScheduled());
   }
 
   @Test
@@ -86,6 +130,24 @@ class TriggerTest extends CommandTestBase {
     finished.set(true);
     scheduler.run();
     assertFalse(command1.isScheduled());
+  }
+
+  @ParameterizedTest
+  @MethodSource("initialStates")
+  void onChangeInitialStateTest(
+      InitialState initialState, boolean pressed, Map<String, Boolean> results) {
+    final CommandScheduler scheduler = CommandScheduler.getInstance();
+    final Command command1 = Commands.idle();
+    final InternalButton button = new InternalButton();
+    final boolean shouldBeScheduled = results.get("onTrue") || results.get("onFalse");
+
+    button.setPressed(pressed);
+    button.onChange(command1, initialState);
+
+    assertFalse(command1.isScheduled());
+
+    scheduler.run();
+    assertEquals(shouldBeScheduled, command1.isScheduled());
   }
 
   @Test
@@ -195,6 +257,24 @@ class TriggerTest extends CommandTestBase {
     assertEquals(1, endCounter.get());
   }
 
+  @ParameterizedTest
+  @MethodSource("initialStates")
+  void toggleOnTrueInitialStateTest(
+      InitialState initialState, boolean pressed, Map<String, Boolean> results) {
+    final CommandScheduler scheduler = CommandScheduler.getInstance();
+    final Command command1 = Commands.idle();
+    final InternalButton button = new InternalButton();
+    final boolean shouldBeScheduled = results.get("onTrue");
+
+    button.setPressed(pressed);
+    button.toggleOnTrue(command1, initialState);
+
+    assertFalse(command1.isScheduled());
+
+    scheduler.run();
+    assertEquals(shouldBeScheduled, command1.isScheduled());
+  }
+
   @Test
   void cancelWhenActiveTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
@@ -274,5 +354,17 @@ class TriggerTest extends CommandTestBase {
     assertFalse(button.getAsBoolean());
     button.setPressed(true);
     assertTrue(button.getAsBoolean());
+  }
+
+  static Stream<Arguments> initialStates() {
+    return Stream.of(
+        arguments(InitialState.kFalse, true, Map.of("onTrue", true, "onFalse", false)),
+        arguments(InitialState.kFalse, false, Map.of("onTrue", false, "onFalse", false)),
+        arguments(InitialState.kTrue, true, Map.of("onTrue", false, "onFalse", false)),
+        arguments(InitialState.kTrue, false, Map.of("onTrue", false, "onFalse", true)),
+        arguments(InitialState.kCondition, true, Map.of("onTrue", false, "onFalse", false)),
+        arguments(InitialState.kCondition, false, Map.of("onTrue", false, "onFalse", false)),
+        arguments(InitialState.kNegCondition, true, Map.of("onTrue", true, "onFalse", false)),
+        arguments(InitialState.kNegCondition, false, Map.of("onTrue", false, "onFalse", true)));
   }
 }
