@@ -452,6 +452,24 @@ public abstract class Command implements Sendable {
   }
 
   /**
+   * Decorates this command to run when disabled.
+   *
+   * @return the decorated command
+   */
+  public WrapperCommand ignoreDisable() {
+    return this.ignoringDisable(true);
+  }
+
+  /**
+   * Decorates this command to stop when disabled.
+   *
+   * @return the decorated command
+   */
+  public WrapperCommand respectDisable() {
+    return this.ignoringDisable(false);
+  }
+
+  /**
    * Decorates this command to have a different {@link InterruptionBehavior interruption behavior}.
    *
    * @param interruptBehavior the desired interrupt behavior
