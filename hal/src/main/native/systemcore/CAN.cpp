@@ -13,6 +13,7 @@
 
 #include <cstdio>
 #include <memory>
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -65,7 +66,8 @@ struct FrameStore {
 };
 
 struct SocketCanState {
-  wpi::EventLoopRunner loopRunner;
+  wpi::EventLoopRunner readLoopRunner;
+  wpi::EventLoopRunner writeLoopRunner;
   wpi::mutex writeMutex[NUM_CAN_BUSES];
   int socketHandle[NUM_CAN_BUSES];
   // ms to count/timer map
@@ -102,7 +104,7 @@ void InitializeCAN() {
 
 bool SocketCanState::InitializeBuses() {
   bool success = true;
-  loopRunner.ExecSync([this, &success](wpi::uv::Loop& loop) {
+  readLoopRunner.ExecSync([this, &success](wpi::uv::Loop& loop) {
     int32_t status = 0;
     HAL_SetCurrentThreadPriority(true, 50, &status);
     if (status != 0) {
@@ -179,16 +181,15 @@ bool SocketCanState::InitializeBuses() {
 }
 
 void SocketCanState::TimerCallback(uint16_t time) {
-  for (const auto& busFrames : timedFrames[time]) {
-    for (size_t i = 0; i < busFrames.size(); i++) {
-      const auto& frame = busFrames[i];
-      if (!frame.has_value()) {
-        continue;
-      }
-      std::scoped_lock lock{writeMutex[i]};
-      int mtu = (frame->flags & CANFD_FDF) ? CANFD_MTU : CAN_MTU;
-      send(canState->socketHandle[i], &*frame, mtu, 0);
+  auto& busFrames = timedFrames[time];
+  for (size_t i = 0; i < busFrames.size(); i++) {
+    const auto& frame = busFrames[i];
+    if (!frame.has_value()) {
+      continue;
     }
+    std::scoped_lock lock{writeMutex[i]};
+    int mtu = (frame->flags & CANFD_FDF) ? CANFD_MTU : CAN_MTU;
+    send(canState->socketHandle[i], &*frame, mtu, 0);
   }
 }
 
@@ -254,7 +255,7 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
   messageID = MapMessageIdToSocketCan(messageID);
 
   if (periodMs == HAL_CAN_SEND_PERIOD_STOP_REPEATING) {
-    canState->loopRunner.ExecSync([messageID, busId](wpi::uv::Loop&) {
+    canState->writeLoopRunner.ExecSync([messageID, busId](wpi::uv::Loop&) {
       canState->RemovePeriodic(busId, messageID);
     });
 
@@ -284,9 +285,10 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
   }
 
   if (periodMs > 0) {
-    canState->loopRunner.ExecAsync([busId, periodMs, frame](wpi::uv::Loop&) {
-      canState->AddPeriodic(busId, periodMs, frame);
-    });
+    canState->writeLoopRunner.ExecAsync(
+        [busId, periodMs, frame](wpi::uv::Loop& loop) {
+          canState->AddPeriodic(loop, busId, periodMs, frame);
+        });
   }
 }
 void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
