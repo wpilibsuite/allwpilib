@@ -79,6 +79,8 @@ deploy {
                 }
             }
 
+            timeout = 7
+
             def remote = it
 
             artifacts {
@@ -95,7 +97,7 @@ deploy {
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/home/systemcore/developerRobotCpp' > /home/systemcore/robotCommand")
+                        ctx.execute("echo 'LD_LIBRARY_PATH=/home/systemcore/frc/third-party/lib /home/systemcore/developerRobotCpp' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                         ctx.execute("setcap cap_sys_nice+eip \"/home/systemcore/developerRobotCpp\"")
                         ctx.execute('chmod +x developerRobotCpp')
@@ -105,7 +107,7 @@ deploy {
                 developerRobotCppStatic(NativeExecutableArtifact) {
                     libraryDirectory = '/home/systemcore/frc/third-party/lib'
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/home/systemcore/developerRobotCppStatic' > /home/systemcore/robotCommand")
+                        ctx.execute("echo ''LD_LIBRARY_PATH=/home/systemcore/frc/third-party/lib /home/systemcore/developerRobotCppStatic' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                         ctx.execute("sudo setcap cap_sys_nice+eip \"/home/systemcore/developerRobotCppStatic\"")
                         ctx.execute('chmod +x developerRobotCppStatic')
