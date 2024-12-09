@@ -26,7 +26,7 @@ public class DriverStationTest extends AbstractComsSetup {
   public void waitForDataTest() {
     long startTime = RobotController.getFPGATime();
 
-    int handle = WPIUtilJNI.createEvent(false, false);
+    int handle = WPIUtilJNI.makeEvent(false, false);
     DriverStationJNI.provideNewDataEventHandle(handle);
 
     // Wait for data 50 times
