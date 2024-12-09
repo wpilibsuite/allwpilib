@@ -58,11 +58,11 @@ public class DMASample {
    * Retrieves a new DMA sample.
    *
    * @param dma DMA object.
-   * @param timeoutSeconds Timeout in seconds for retrieval.
+   * @param timeout Timeout for retrieval in seconds.
    * @return DMA read status.
    */
-  public DMAReadStatus update(DMA dma, double timeoutSeconds) {
-    return DMAReadStatus.getValue(m_dmaSample.update(dma.m_dmaHandle, timeoutSeconds));
+  public DMAReadStatus update(DMA dma, double timeout) {
+    return DMAReadStatus.getValue(m_dmaSample.update(dma.m_dmaHandle, timeout));
   }
 
   /**

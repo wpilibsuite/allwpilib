@@ -69,12 +69,8 @@ class SwerveDrivePoseEstimator3dTest {
         kinematics,
         estimator,
         trajectory,
-        state ->
-            new ChassisSpeeds(
-                state.velocityMetersPerSecond,
-                0,
-                state.velocityMetersPerSecond * state.curvatureRadPerMeter),
-        state -> state.poseMeters,
+        state -> new ChassisSpeeds(state.velocity, 0, state.velocity * state.curvature),
+        state -> state.pose,
         trajectory.getInitialPose(),
         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
         0.02,
@@ -132,12 +128,8 @@ class SwerveDrivePoseEstimator3dTest {
             kinematics,
             estimator,
             trajectory,
-            state ->
-                new ChassisSpeeds(
-                    state.velocityMetersPerSecond,
-                    0,
-                    state.velocityMetersPerSecond * state.curvatureRadPerMeter),
-            state -> state.poseMeters,
+            state -> new ChassisSpeeds(state.velocity, 0, state.velocity * state.curvature),
+            state -> state.pose,
             initial_pose,
             new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
             0.02,
@@ -177,7 +169,7 @@ class SwerveDrivePoseEstimator3dTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.getTotalTimeSeconds()) {
+    while (t <= trajectory.getTotalTime()) {
       var groundTruthState = trajectory.sample(t);
 
       // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
@@ -206,8 +198,7 @@ class SwerveDrivePoseEstimator3dTest {
       var moduleStates = kinematics.toSwerveModuleStates(chassisSpeeds);
 
       for (int i = 0; i < moduleStates.length; i++) {
-        positions[i].distanceMeters +=
-            moduleStates[i].speedMetersPerSecond * (1 - rand.nextGaussian() * 0.05) * dt;
+        positions[i].distance += moduleStates[i].speed * (1 - rand.nextGaussian() * 0.05) * dt;
         positions[i].angle =
             moduleStates[i].angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
       }
@@ -217,7 +208,7 @@ class SwerveDrivePoseEstimator3dTest {
               t,
               new Rotation3d(
                   groundTruthState
-                      .poseMeters
+                      .pose
                       .getRotation()
                       .plus(new Rotation2d(rand.nextGaussian() * 0.05))
                       .minus(trajectory.getInitialPose().getRotation())),
@@ -225,7 +216,7 @@ class SwerveDrivePoseEstimator3dTest {
 
       double error =
           groundTruthState
-              .poseMeters
+              .pose
               .getTranslation()
               .getDistance(xHat.getTranslation().toTranslation2d());
       if (error > maxError) {
@@ -247,8 +238,7 @@ class SwerveDrivePoseEstimator3dTest {
         "Incorrect Final Theta");
 
     if (checkError) {
-      assertEquals(
-          0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.07, "Incorrect mean error");
+      assertEquals(0.0, errorSum / (trajectory.getTotalTime() / dt), 0.07, "Incorrect mean error");
       assertEquals(0.0, maxError, 0.2, "Incorrect max error");
     }
   }

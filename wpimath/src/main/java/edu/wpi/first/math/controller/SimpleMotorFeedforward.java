@@ -31,12 +31,12 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    * @param ks The static gain in volts.
    * @param kv The velocity gain in V/(units/s).
    * @param ka The acceleration gain in V/(units/s²).
-   * @param dtSeconds The period in seconds.
+   * @param dt The period in seconds.
    * @throws IllegalArgumentException for kv &lt; zero.
    * @throws IllegalArgumentException for ka &lt; zero.
    * @throws IllegalArgumentException for period &le; zero.
    */
-  public SimpleMotorFeedforward(double ks, double kv, double ka, double dtSeconds) {
+  public SimpleMotorFeedforward(double ks, double kv, double ka, double dt) {
     this.ks = ks;
     this.kv = kv;
     this.ka = ka;
@@ -46,11 +46,10 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
     if (ka < 0.0) {
       throw new IllegalArgumentException("ka must be a non-negative number, got " + ka + "!");
     }
-    if (dtSeconds <= 0.0) {
-      throw new IllegalArgumentException(
-          "period must be a positive number, got " + dtSeconds + "!");
+    if (dt <= 0.0) {
+      throw new IllegalArgumentException("period must be a positive number, got " + dt + "!");
     }
-    m_dt = dtSeconds;
+    m_dt = dt;
   }
 
   /**

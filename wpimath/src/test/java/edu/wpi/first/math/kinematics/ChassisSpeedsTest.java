@@ -25,11 +25,7 @@ class ChassisSpeedsTest {
     final var dt = 0.01;
 
     speeds.discretize(duration);
-    final var twist =
-        new Twist2d(
-            speeds.vxMetersPerSecond * dt,
-            speeds.vyMetersPerSecond * dt,
-            speeds.omegaRadiansPerSecond * dt);
+    final var twist = new Twist2d(speeds.vx * dt, speeds.vy * dt, speeds.omega * dt);
 
     var pose = Pose2d.kZero;
     for (double time = 0; time < duration; time += dt) {
@@ -38,13 +34,9 @@ class ChassisSpeedsTest {
 
     final var result = pose; // For lambda capture
     assertAll(
-        () -> assertEquals(target.vxMetersPerSecond * duration, result.getX(), kEpsilon),
-        () -> assertEquals(target.vyMetersPerSecond * duration, result.getY(), kEpsilon),
-        () ->
-            assertEquals(
-                target.omegaRadiansPerSecond * duration,
-                result.getRotation().getRadians(),
-                kEpsilon));
+        () -> assertEquals(target.vx * duration, result.getX(), kEpsilon),
+        () -> assertEquals(target.vy * duration, result.getY(), kEpsilon),
+        () -> assertEquals(target.omega * duration, result.getRotation().getRadians(), kEpsilon));
   }
 
   @Test
@@ -55,9 +47,9 @@ class ChassisSpeedsTest {
     var speeds = new ChassisSpeeds(vx, vy, omega);
 
     assertAll(
-        () -> assertEquals(0.368808, speeds.vxMetersPerSecond, kEpsilon),
-        () -> assertEquals(0, speeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.002094395102, speeds.omegaRadiansPerSecond, kEpsilon));
+        () -> assertEquals(0.368808, speeds.vx, kEpsilon),
+        () -> assertEquals(0, speeds.vy, kEpsilon),
+        () -> assertEquals(0.002094395102, speeds.omega, kEpsilon));
   }
 
   @Test
@@ -66,9 +58,9 @@ class ChassisSpeedsTest {
     chassisSpeeds.toRobotRelativeSpeeds(Rotation2d.kCW_Pi_2);
 
     assertAll(
-        () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
-        () -> assertEquals(1.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.5, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
+        () -> assertEquals(0.0, chassisSpeeds.vx, kEpsilon),
+        () -> assertEquals(1.0, chassisSpeeds.vy, kEpsilon),
+        () -> assertEquals(0.5, chassisSpeeds.omega, kEpsilon));
   }
 
   @Test
@@ -77,9 +69,9 @@ class ChassisSpeedsTest {
     chassisSpeeds.toFieldRelativeSpeeds(Rotation2d.fromDegrees(45.0));
 
     assertAll(
-        () -> assertEquals(1.0 / Math.sqrt(2.0), chassisSpeeds.vxMetersPerSecond, kEpsilon),
-        () -> assertEquals(1.0 / Math.sqrt(2.0), chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.5, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
+        () -> assertEquals(1.0 / Math.sqrt(2.0), chassisSpeeds.vx, kEpsilon),
+        () -> assertEquals(1.0 / Math.sqrt(2.0), chassisSpeeds.vy, kEpsilon),
+        () -> assertEquals(0.5, chassisSpeeds.omega, kEpsilon));
   }
 
   @Test
@@ -90,9 +82,9 @@ class ChassisSpeedsTest {
     final var chassisSpeeds = left.plus(right);
 
     assertAll(
-        () -> assertEquals(3.0, chassisSpeeds.vxMetersPerSecond),
-        () -> assertEquals(2.0, chassisSpeeds.vyMetersPerSecond),
-        () -> assertEquals(1.0, chassisSpeeds.omegaRadiansPerSecond));
+        () -> assertEquals(3.0, chassisSpeeds.vx),
+        () -> assertEquals(2.0, chassisSpeeds.vy),
+        () -> assertEquals(1.0, chassisSpeeds.omega));
   }
 
   @Test
@@ -103,9 +95,9 @@ class ChassisSpeedsTest {
     final var chassisSpeeds = left.minus(right);
 
     assertAll(
-        () -> assertEquals(-1.0, chassisSpeeds.vxMetersPerSecond),
-        () -> assertEquals(0.0, chassisSpeeds.vyMetersPerSecond),
-        () -> assertEquals(0.5, chassisSpeeds.omegaRadiansPerSecond));
+        () -> assertEquals(-1.0, chassisSpeeds.vx),
+        () -> assertEquals(0.0, chassisSpeeds.vy),
+        () -> assertEquals(0.5, chassisSpeeds.omega));
   }
 
   @Test
@@ -113,9 +105,9 @@ class ChassisSpeedsTest {
     final var chassisSpeeds = (new ChassisSpeeds(1.0, 0.5, 0.75)).unaryMinus();
 
     assertAll(
-        () -> assertEquals(-1.0, chassisSpeeds.vxMetersPerSecond),
-        () -> assertEquals(-0.5, chassisSpeeds.vyMetersPerSecond),
-        () -> assertEquals(-0.75, chassisSpeeds.omegaRadiansPerSecond));
+        () -> assertEquals(-1.0, chassisSpeeds.vx),
+        () -> assertEquals(-0.5, chassisSpeeds.vy),
+        () -> assertEquals(-0.75, chassisSpeeds.omega));
   }
 
   @Test
@@ -123,9 +115,9 @@ class ChassisSpeedsTest {
     final var chassisSpeeds = (new ChassisSpeeds(1.0, 0.5, 0.75)).times(2.0);
 
     assertAll(
-        () -> assertEquals(2.0, chassisSpeeds.vxMetersPerSecond),
-        () -> assertEquals(1.0, chassisSpeeds.vyMetersPerSecond),
-        () -> assertEquals(1.5, chassisSpeeds.omegaRadiansPerSecond));
+        () -> assertEquals(2.0, chassisSpeeds.vx),
+        () -> assertEquals(1.0, chassisSpeeds.vy),
+        () -> assertEquals(1.5, chassisSpeeds.omega));
   }
 
   @Test
@@ -133,8 +125,8 @@ class ChassisSpeedsTest {
     final var chassisSpeeds = (new ChassisSpeeds(1.0, 0.5, 0.75)).div(2.0);
 
     assertAll(
-        () -> assertEquals(0.5, chassisSpeeds.vxMetersPerSecond),
-        () -> assertEquals(0.25, chassisSpeeds.vyMetersPerSecond),
-        () -> assertEquals(0.375, chassisSpeeds.omegaRadiansPerSecond));
+        () -> assertEquals(0.5, chassisSpeeds.vx),
+        () -> assertEquals(0.25, chassisSpeeds.vy),
+        () -> assertEquals(0.375, chassisSpeeds.omega));
   }
 }

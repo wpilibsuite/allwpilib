@@ -95,7 +95,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return m_odometry.getPose();
   }
 
   /**
@@ -126,10 +126,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Sets the front left drive MotorController to a voltage. */
   public void setDriveMotorControllersVolts(MecanumDriveMotorVoltages volts) {
-    m_frontLeft.setVoltage(volts.frontLeftVoltage);
-    m_rearLeft.setVoltage(volts.rearLeftVoltage);
-    m_frontRight.setVoltage(volts.frontRightVoltage);
-    m_rearRight.setVoltage(volts.rearRightVoltage);
+    m_frontLeft.setVoltage(volts.frontLeft);
+    m_rearLeft.setVoltage(volts.rearLeft);
+    m_frontRight.setVoltage(volts.frontRight);
+    m_rearRight.setVoltage(volts.rearRight);
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
