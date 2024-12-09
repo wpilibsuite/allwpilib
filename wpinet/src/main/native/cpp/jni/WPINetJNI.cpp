@@ -83,7 +83,7 @@ Java_edu_wpi_first_net_WPINetJNI_removePortForwarder
 
 /*
  * Class:     edu_wpi_first_net_WPINetJNI
- * Method:    startWebserver
+ * Method:    startWebServer
  * Signature: (ILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
