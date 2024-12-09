@@ -26,10 +26,11 @@ public interface InferLogPath {
     return Parser.logPathMap.getOrDefault(this, Parser.DEFAULT_NAMESPACE) + "/" + logUnder;
   }
 
-  class Parser {
+  @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
+  final class Parser {
     private static final Map<Object, String> logPathMap = new WeakHashMap<>();
     private static final String DEFAULT_NAMESPACE = "UNKNOWN";
-    private static boolean enabled = false;
+    private static boolean enabled;
 
     /**
      * Enables log path parsing. This must be called in your robot class to use this interface.
@@ -37,7 +38,9 @@ public interface InferLogPath {
      * @param robotInstance The TimedRobot instance
      */
     public static void enable(Object robotInstance) {
-      if (enabled) return;
+      if (enabled) {
+        return;
+      }
       enabled = true;
       recurseLogPaths(robotInstance, "");
     }
@@ -54,8 +57,9 @@ public interface InferLogPath {
             recurseLogPaths(field.get(obj), currentPath + "/" + computeLogName(field));
           } else {
             var arraySubtype = field.getType().getComponentType();
-            if (arraySubtype == null || !InferLogPath.class.isAssignableFrom(arraySubtype))
+            if (arraySubtype == null || !InferLogPath.class.isAssignableFrom(arraySubtype)) {
               continue;
+            }
             field.setAccessible(true);
             int index = 0;
             var name = computeLogName(field);
