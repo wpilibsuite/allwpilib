@@ -23,9 +23,9 @@ public interface InferLogPath {
   }
 
   class Parser {
-    static final Map<Object, String> logPathMap = new WeakHashMap<>();
-    static final String DEFAULT_NAMESPACE = "UNKNOWN";
-    static boolean enabled = false;
+    private static final Map<Object, String> logPathMap = new WeakHashMap<>();
+    private static final String DEFAULT_NAMESPACE = "UNKNOWN";
+    private static boolean enabled = false;
     
     /**
      * Enables log path parsing. This must be called in your robot class to use this interface.
@@ -40,7 +40,7 @@ public interface InferLogPath {
 
     private Parser() {}
 
-    static void recurseLogPaths(Object obj, String currentPath) {
+    private static void recurseLogPaths(Object obj, String currentPath) {
       logPathMap.put(obj, currentPath);
       var clazz = obj.getClass();
       for (var field : clazz.getDeclaredFields()) {
