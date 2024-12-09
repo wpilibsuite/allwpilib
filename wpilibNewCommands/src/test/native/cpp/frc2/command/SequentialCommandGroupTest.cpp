@@ -125,13 +125,10 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupRequirement) {
   TestSubsystem requirement4;
 
   auto command1 = cmd::RunOnce([] {}, {&requirement1, &requirement2});
-  // InstantCommand command1([] {}, {&requirement1, &requirement2});
   auto command2 = cmd::RunOnce([] {}, {&requirement3});
   auto command3 = cmd::RunOnce([] {}, {&requirement3, &requirement4});
 
-  // SequentialCommandGroup group(std::move(command1), std::move(command2));
-  auto group = cmd::Sequence(
-      make_vector<CommandPtr>(std::move(command1), std::move(command2)));
+  auto group = cmd::Sequence(std::move(command1), std::move(command2));
 
   scheduler.Schedule(group);
   scheduler.Schedule(command3);

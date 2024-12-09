@@ -16,7 +16,7 @@ TEST_F(DefaultCommandTest, DefaultCommandSchedule) {
 
   TestSubsystem subsystem;
 
-  auto command = cmd::Run([] {}, {&subsystem});
+  auto command = cmd::Idle({&subsystem});
 
   scheduler.SetDefaultCommand(&subsystem, std::move(command));
   auto handle = scheduler.GetDefaultCommand(&subsystem);
@@ -30,8 +30,8 @@ TEST_F(DefaultCommandTest, DefaultCommandInterruptResume) {
 
   TestSubsystem subsystem;
 
-  auto command1 = cmd::Run([] {}, {&subsystem});
-  auto command2 = cmd::Run([] {}, {&subsystem});
+  auto command1 = cmd::Idle({&subsystem});
+  auto command2 = cmd::Idle({&subsystem});
 
   scheduler.SetDefaultCommand(&subsystem, std::move(command1));
   auto handle = scheduler.GetDefaultCommand(&subsystem);

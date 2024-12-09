@@ -56,35 +56,35 @@ TEST_F(ConditionalCommandTest, ConditionalCommandRequirement) {
 }
 
 TEST_F(ConditionalCommandTest, AllTrue) {
-  CommandPtr command = cmd::Either(cmd::Run([] {}, {}).IgnoringDisable(true),
-                                   cmd::Run([] {}, {}).IgnoringDisable(true),
+  auto command = cmd::Either(cmd::Idle().IgnoringDisable(true),
+                                   cmd::Idle().IgnoringDisable(true),
                                    [] { return true; });
   EXPECT_EQ(true, command.get()->RunsWhenDisabled());
 }
 
 TEST_F(ConditionalCommandTest, AllFalse) {
-  CommandPtr command = cmd::Either(cmd::Run([] {}, {}).IgnoringDisable(false),
-                                   cmd::Run([] {}, {}).IgnoringDisable(false),
+  auto command = cmd::Either(cmd::Idle().IgnoringDisable(false),
+                                   cmd::Idle().IgnoringDisable(false),
                                    [] { return true; });
   EXPECT_EQ(false, command.get()->RunsWhenDisabled());
 }
 
 TEST_F(ConditionalCommandTest, OneTrueOneFalse) {
-  CommandPtr command = cmd::Either(cmd::Run([] {}, {}).IgnoringDisable(true),
-                                   cmd::Run([] {}, {}).IgnoringDisable(false),
+  auto command = cmd::Either(cmd::Idle().IgnoringDisable(true),
+                                   cmd::Idle().IgnoringDisable(false),
                                    [] { return true; });
   EXPECT_EQ(false, command.get()->RunsWhenDisabled());
 }
 
 TEST_F(ConditionalCommandTest, TwoFalseOneTrue) {
-  CommandPtr command = cmd::Either(cmd::Run([] {}, {}).IgnoringDisable(false),
-                                   cmd::Run([] {}, {}).IgnoringDisable(true),
+  auto command = cmd::Either(cmd::Idle().IgnoringDisable(false),
+                                   cmd::Idle().IgnoringDisable(true),
                                    [] { return true; });
   EXPECT_EQ(false, command.get()->RunsWhenDisabled());
 }
 
 TEST_F(ConditionalCommandTest, AllCancelSelf) {
-  CommandPtr command = cmd::Either(
+  auto command = cmd::Either(
       cmd::WaitUntil([] {
         return false;
       }).WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
@@ -97,10 +97,10 @@ TEST_F(ConditionalCommandTest, AllCancelSelf) {
 }
 
 TEST_F(ConditionalCommandTest, AllCancelIncoming) {
-  CommandPtr command =
-      cmd::Either(cmd::Run([] {}, {}).WithInterruptBehavior(
+  auto command =
+      cmd::Either(cmd::Idle().WithInterruptBehavior(
                       Command::InterruptionBehavior::kCancelIncoming),
-                  cmd::Run([] {}, {}).WithInterruptBehavior(
+                  cmd::Idle().WithInterruptBehavior(
                       Command::InterruptionBehavior::kCancelIncoming),
                   [] { return false; });
   EXPECT_EQ(Command::InterruptionBehavior::kCancelIncoming,
@@ -108,10 +108,10 @@ TEST_F(ConditionalCommandTest, AllCancelIncoming) {
 }
 
 TEST_F(ConditionalCommandTest, OneCancelSelfOneIncoming) {
-  CommandPtr command =
-      cmd::Either(cmd::Run([] {}, {}).WithInterruptBehavior(
+  auto command =
+      cmd::Either(cmd::Idle().WithInterruptBehavior(
                       Command::InterruptionBehavior::kCancelSelf),
-                  cmd::Run([] {}, {}).WithInterruptBehavior(
+                  cmd::Idle().WithInterruptBehavior(
                       Command::InterruptionBehavior::kCancelIncoming),
                   [] { return false; });
   EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
@@ -119,10 +119,10 @@ TEST_F(ConditionalCommandTest, OneCancelSelfOneIncoming) {
 }
 
 TEST_F(ConditionalCommandTest, OneCancelIncomingOneSelf) {
-  CommandPtr command =
-      cmd::Either(cmd::Run([] {}, {}).WithInterruptBehavior(
+  auto command =
+      cmd::Either(cmd::Idle().WithInterruptBehavior(
                       Command::InterruptionBehavior::kCancelIncoming),
-                  cmd::Run([] {}, {}).WithInterruptBehavior(
+                  cmd::Idle().WithInterruptBehavior(
                       Command::InterruptionBehavior::kCancelSelf),
                   [] { return false; });
   EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
