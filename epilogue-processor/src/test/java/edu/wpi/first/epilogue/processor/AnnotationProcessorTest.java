@@ -1026,6 +1026,54 @@ class AnnotationProcessorTest {
   }
 
   @Test
+  void customLoggableArrays() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+      import java.util.List;
+
+      @Logged
+      class Example {
+        final SubLoggable[] x = new SubLoggable[] {}; // logged
+        SubLoggable[] y; // not logged; not marked final
+        final List<SubLoggable> z = List.of(); // not logged; lists cannot be logged
+      }
+
+      @Logged
+      class SubLoggable {
+        double y;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              for (int i = 0; i < object.x.length; i++) {
+                  Epilogue.subLoggableLogger.tryUpdate(backend.getNested("x/" + i), object.x[i], Epilogue.getConfig().errorHandler);
+              };
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
   void badLogSetup() {
     String source =
         """
