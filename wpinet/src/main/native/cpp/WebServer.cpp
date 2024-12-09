@@ -4,6 +4,8 @@
 
 #include "wpinet/WebServer.h"
 
+#include <unistd.h>
+
 #include <memory>
 #include <string>
 #include <utility>
