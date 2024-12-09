@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.epilogue.util;
 
 import edu.wpi.first.epilogue.Logged;
@@ -26,7 +30,7 @@ public interface InferLogPath {
     private static final Map<Object, String> logPathMap = new WeakHashMap<>();
     private static final String DEFAULT_NAMESPACE = "UNKNOWN";
     private static boolean enabled = false;
-    
+
     /**
      * Enables log path parsing. This must be called in your robot class to use this interface.
      *
