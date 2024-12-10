@@ -100,8 +100,8 @@ public class DifferentialDriveKinematics
    * distance deltas. This method is often used for odometry -- determining the robot's position on
    * the field using changes in the distance driven by each wheel on the robot.
    *
-   * @param leftDistance The distance measured by the left side encoder.
-   * @param rightDistance The distance measured by the right side encoder.
+   * @param leftDistance The distance measured by the left side encoder in meters.
+   * @param rightDistance The distance measured by the right side encoder in meters.
    * @return The resulting Twist2d.
    */
   public Twist2d toTwist2d(double leftDistance, double rightDistance) {

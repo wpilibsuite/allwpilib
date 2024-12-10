@@ -65,9 +65,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   /**
    * Constructs a ChassisSpeeds object.
    *
-   * @param vx Forward velocity in meters per second.
-   * @param vy Sideways velocity in meters per second.
-   * @param omega Angular velocity in radians per second.
+   * @param vx Forward velocity.
+   * @param vy Sideways velocity.
+   * @param omega Angular velocity.
    */
   public ChassisSpeeds(LinearVelocity vx, LinearVelocity vy, AngularVelocity omega) {
     this(vx.in(MetersPerSecond), vy.in(MetersPerSecond), omega.in(RadiansPerSecond));
@@ -126,10 +126,10 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * <p>This is useful for compensating for translational skew when translating and rotating a
    * swerve drivetrain.
    *
-   * @param vx Forward velocity in meters per second.
-   * @param vy Sideways velocity in meters per second.
-   * @param omega Angular velocity in radians per second.
-   * @param dt The duration of the timestep in seconds the speeds should be applied for.
+   * @param vx Forward velocity.
+   * @param vy Sideways velocity.
+   * @param omega Angular velocity.
+   * @param dt The duration of the timestep the speeds should be applied for.
    * @return Discretized ChassisSpeeds.
    * @deprecated Use instance method instead.
    */

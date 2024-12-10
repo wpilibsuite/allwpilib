@@ -171,7 +171,7 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    *
    * @param currentXhat The current state estimate.
    * @param u The system inputs (usually voltage).
-   * @param dt The time difference between controller updates.
+   * @param dt The time difference between controller updates in seconds.
    * @return The new state.
    */
   protected Matrix<States, N1> updateX(

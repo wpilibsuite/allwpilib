@@ -164,7 +164,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @return The current arm angle in radians.
    */
-  public double getAngleRads() {
+  public double getAngle() {
     return getOutput(0);
   }
 
@@ -180,7 +180,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Returns the arm current draw.
    *
-   * @return The arm current draw.
+   * @return The arm current draw in amps.
    */
   public double getCurrentDraw() {
     // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is

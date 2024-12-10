@@ -84,7 +84,7 @@ public class Trajectory implements ProtobufSerializable {
   /**
    * Returns the overall duration of the trajectory.
    *
-   * @return The duration of the trajectory.
+   * @return The duration of the trajectory in seconds.
    */
   public double getTotalTime() {
     return m_totalTime;

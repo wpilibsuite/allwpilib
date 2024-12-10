@@ -36,10 +36,10 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
    *     double, double)}.
    * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param minHeight The min allowable height of the elevator.
-   * @param maxHeight The max allowable height of the elevator.
+   * @param minHeight The min allowable height of the elevator in meters.
+   * @param maxHeight The max allowable height of the elevator in meters.
    * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingHeight The starting height of the elevator.
+   * @param startingHeight The starting height of the elevator in meters.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
    */
@@ -98,8 +98,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @param gearbox The type of and number of motors in the elevator gearbox.
    * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
-   * @param carriageMass The mass of the elevator carriage.
-   * @param drumRadius The radius of the drum that the elevator spool is wrapped around.
+   * @param carriageMass The mass of the elevator carriage in kg.
+   * @param drumRadius The radius of the drum that the elevator spool is wrapped around in meters.
    * @param minHeight The min allowable height of the elevator.
    * @param maxHeight The max allowable height of the elevator.
    * @param simulateGravity Whether gravity should be simulated or not.
@@ -141,7 +141,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Returns whether the elevator would hit the lower limit.
    *
-   * @param elevatorHeight The elevator height.
+   * @param elevatorHeight The elevator height in meters.
    * @return Whether the elevator would hit the lower limit.
    */
   public boolean wouldHitLowerLimit(double elevatorHeight) {
@@ -151,7 +151,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Returns whether the elevator would hit the upper limit.
    *
-   * @param elevatorHeight The elevator height.
+   * @param elevatorHeight The elevator height in meters.
    * @return Whether the elevator would hit the upper limit.
    */
   public boolean wouldHitUpperLimit(double elevatorHeight) {
@@ -226,7 +226,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @param currentXhat The current state estimate.
    * @param u The system inputs (voltage).
-   * @param dt The time difference between controller updates.
+   * @param dt The time difference between controller updates in seconds.
    */
   @Override
   protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dt) {

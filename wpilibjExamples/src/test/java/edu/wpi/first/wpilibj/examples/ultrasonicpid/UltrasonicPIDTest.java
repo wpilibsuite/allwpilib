@@ -28,7 +28,7 @@ class UltrasonicPIDTest {
   private final DCMotor m_gearbox = DCMotor.getFalcon500(2);
   private static final double kGearing = KitbotGearing.k10p71.value;
   public static final double kvLinear = 1.98; // V/(m/s)
-  public static final double kaLinear = 0.2; // V/m/s²)
+  public static final double kaLinear = 0.2; // V/(m/s²)
   private static final double kvAngular = 1.5; // V/(rad/s)
   private static final double kaAngular = 0.3; // V/(rad/s²)
   private static final double kWheelDiameter = 0.15; // m
