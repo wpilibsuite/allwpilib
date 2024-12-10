@@ -13,6 +13,7 @@
 
 #include <cstdio>
 #include <memory>
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -65,24 +66,30 @@ struct FrameStore {
 };
 
 struct SocketCanState {
-  wpi::EventLoopRunner loopRunner;
+  wpi::EventLoopRunner readLoopRunner;
+  wpi::EventLoopRunner writeLoopRunner;
   wpi::mutex writeMutex[NUM_CAN_BUSES];
   int socketHandle[NUM_CAN_BUSES];
-  wpi::mutex timerMutex;
   // ms to count/timer map
   wpi::DenseMap<uint16_t, std::pair<size_t, std::weak_ptr<wpi::uv::Timer>>>
       timers;
   // ms to bus mask/packet
-  wpi::DenseMap<uint16_t, std::vector<std::pair<uint8_t, canfd_frame>>>
+  wpi::DenseMap<uint16_t, std::array<std::optional<canfd_frame>, NUM_CAN_BUSES>>
       timedFrames;
   // packet to time
-  wpi::DenseMap<uint32_t, uint16_t> packetToTime;
+  wpi::DenseMap<uint32_t, std::array<uint16_t, NUM_CAN_BUSES>> packetToTime;
 
   wpi::mutex readMutex[NUM_CAN_BUSES];
   // TODO(thadhouse) we need a MUCH better way of doing this masking
   wpi::DenseMap<uint32_t, FrameStore> readFrames[NUM_CAN_BUSES];
 
   bool InitializeBuses();
+
+  void TimerCallback(uint16_t time);
+
+  void RemovePeriodic(uint8_t busMask, uint32_t messageId);
+  void AddPeriodic(wpi::uv::Loop& loop, uint8_t busMask, uint16_t time,
+                   const canfd_frame& frame);
 };
 
 }  // namespace
@@ -97,7 +104,7 @@ void InitializeCAN() {
 
 bool SocketCanState::InitializeBuses() {
   bool success = true;
-  loopRunner.ExecSync([this, &success](wpi::uv::Loop& loop) {
+  readLoopRunner.ExecSync([this, &success](wpi::uv::Loop& loop) {
     int32_t status = 0;
     HAL_SetCurrentThreadPriority(true, 50, &status);
     if (status != 0) {
@@ -173,6 +180,56 @@ bool SocketCanState::InitializeBuses() {
   return success;
 }
 
+void SocketCanState::TimerCallback(uint16_t time) {
+  auto& busFrames = timedFrames[time];
+  for (size_t i = 0; i < busFrames.size(); i++) {
+    const auto& frame = busFrames[i];
+    if (!frame.has_value()) {
+      continue;
+    }
+    std::scoped_lock lock{writeMutex[i]};
+    int mtu = (frame->flags & CANFD_FDF) ? CANFD_MTU : CAN_MTU;
+    send(canState->socketHandle[i], &*frame, mtu, 0);
+  }
+}
+
+void SocketCanState::RemovePeriodic(uint8_t busId, uint32_t messageId) {
+  // Find time, and remove from map
+  auto& time = packetToTime[messageId][busId];
+  auto storedTime = time;
+  time = 0;
+
+  // Its already been removed
+  if (storedTime == 0) {
+    return;
+  }
+
+  // Reset frame
+  timedFrames[storedTime][busId].reset();
+
+  auto& timer = timers[storedTime];
+  // Stop the timer
+  timer.first--;
+  if (timer.first == 0) {
+    if (auto l = timer.second.lock()) {
+      l->Stop();
+    }
+  }
+}
+
+void SocketCanState::AddPeriodic(wpi::uv::Loop& loop, uint8_t busId,
+                                 uint16_t time, const canfd_frame& frame) {
+  packetToTime[frame.can_id][busId] = time;
+  timedFrames[time][busId] = frame;
+  auto& timer = timers[time];
+  timer.first++;
+  if (timer.first == 1) {
+    auto newTimer = wpi::uv::Timer::Create(loop);
+    newTimer->timeout.connect([this, time] { TimerCallback(time); });
+    newTimer->Start(wpi::uv::Timer::Time{time}, wpi::uv::Timer::Time{time});
+  }
+}
+
 namespace hal {
 bool InitializeCanBuses() {
   return canState->InitializeBuses();
@@ -194,14 +251,17 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
     return;
   }
 
+  bool isFd = false;
+  messageID = MapMessageIdToSocketCan(messageID);
+
   if (periodMs == HAL_CAN_SEND_PERIOD_STOP_REPEATING) {
-    // TODO(thadhouse) actually stop
+    canState->writeLoopRunner.ExecSync([messageID, busId](wpi::uv::Loop&) {
+      canState->RemovePeriodic(busId, messageID);
+    });
+
     *status = 0;
     return;
   }
-
-  bool isFd = false;
-  messageID = MapMessageIdToSocketCan(messageID);
 
   canfd_frame frame;
   std::memset(&frame, 0, sizeof(frame));
@@ -214,16 +274,21 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
   }
 
   int mtu = isFd ? CANFD_MTU : CAN_MTU;
-  std::scoped_lock lock{canState->writeMutex[busId]};
-  int result = send(canState->socketHandle[busId], &frame, mtu, 0);
-  if (result != mtu) {
-    // TODO(thadhouse) better error
-    *status = HAL_ERR_CANSessionMux_InvalidBuffer;
-    return;
+  {
+    std::scoped_lock lock{canState->writeMutex[busId]};
+    int result = send(canState->socketHandle[busId], &frame, mtu, 0);
+    if (result != mtu) {
+      // TODO(thadhouse) better error
+      *status = HAL_ERR_CANSessionMux_InvalidBuffer;
+      return;
+    }
   }
 
   if (periodMs > 0) {
-    // TODO(thadhouse) set repeating
+    canState->writeLoopRunner.ExecAsync(
+        [busId, periodMs, frame](wpi::uv::Loop& loop) {
+          canState->AddPeriodic(loop, busId, periodMs, frame);
+        });
   }
 }
 void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
