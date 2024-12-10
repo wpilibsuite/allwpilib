@@ -14,11 +14,13 @@
 #include <wpi/DenseMap.h>
 #include <wpi/Signal.h>
 #include <wpi/StringMap.h>
+#include <wpi/json.h>
 #include <wpi/fs.h>
 #include <wpi/print.h>
 
 #include "wpinet/EventLoopRunner.h"
 #include "wpinet/HttpServerConnection.h"
+#include "wpinet/HttpUtil.h"
 #include "wpinet/UrlParser.h"
 #include "wpinet/raw_uv_ostream.h"
 #include "wpinet/uv/GetAddrInfo.h"
@@ -39,7 +41,7 @@ class MyHttpConnection : public wpi::HttpServerConnection,
  protected:
   void ProcessRequest() override;
   void SendFileResponse(int code, std::string_view codeText,
-                        std::string_view contentType, std::string_view filename,
+                        std::string_view contentType, fs::path filename,
                         std::string_view extraHeader = {});
 
   std::string m_path;
@@ -141,7 +143,7 @@ static std::string_view GetMimeType(std::string_view ext) {
 
 void MyHttpConnection::SendFileResponse(int code, std::string_view codeText,
                                         std::string_view contentType,
-                                        std::string_view filename,
+                                        fs::path filename,
                                         std::string_view extraHeader) {
   // open file
   std::error_code ec;
@@ -214,11 +216,51 @@ void MyHttpConnection::ProcessRequest() {
     query = url.GetQuery();
   }
   // fmt::print(stderr, "query: \"{}\"\n", query);
+  HttpQueryMap qmap{query};
 
   const bool isGET = m_request.GetMethod() == wpi::HTTP_GET;
-  if (isGET && wpi::starts_with(path, "/") && !wpi::contains(path, "..")) {
-    SendFileResponse(200, "OK", GetMimeType(wpi::rsplit(path, '.').second),
-                     fmt::format("{}{}", m_path, path));
+  if (isGET && wpi::starts_with(path, '/') && !wpi::contains(path, "..")) {
+    fs::path fullpath = fmt::format("{}{}", m_path, path);
+    std::error_code ec;
+    bool isdir = fs::is_directory(fullpath, ec);
+    if (isdir) {
+      if (!wpi::ends_with(path, '/')) {
+        // redirect to trailing / location
+        SendResponse(301, "Moved Permanently", "text/plain", "",
+                     fmt::format("Location: {}/\r\n\r\n", path));
+        return;
+      }
+      // generate directory listing
+      wpi::SmallString<64> formatBuf;
+      if (qmap.Get("format", formatBuf).value_or("") == "json") {
+        wpi::json j = wpi::json::array();
+        for (auto&& entry : fs::directory_iterator{fullpath}) {
+          bool subdir = entry.is_directory(ec);
+          j.emplace_back(
+              wpi::json{{"filename", entry.path().filename().string()},
+                        {"size", subdir ? 0 : entry.file_size(ec)},
+                        {"directory", subdir}});
+        }
+        SendResponse(200, "OK", "text/json", j.dump());
+      } else {
+        std::string html = fmt::format(
+            "<html><head><title>{}</title></head><body>"
+            "<table><tr><th>Name</th><th>Size</th></tr>\n",
+            path);
+        for (auto&& entry : fs::directory_iterator{fullpath}) {
+          bool subdir = entry.is_directory(ec);
+          html += fmt::format(
+              "<tr><td><a href=\"{0}{1}\">{0}{1}</a></td><td>{2}</td></tr>",
+              entry.path().filename().string(), subdir ? "/" : "",
+              subdir ? "" : fmt::to_string(entry.file_size(ec)));
+        }
+        html += "</table></body></html>";
+        SendResponse(200, "OK", "text/html", html);
+      }
+    } else {
+      SendFileResponse(200, "OK", GetMimeType(wpi::rsplit(path, '.').second),
+                       fullpath);
+    }
   } else {
     SendError(404, "Resource not found");
   }
