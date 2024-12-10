@@ -27,12 +27,12 @@ import org.junit.jupiter.params.provider.ValueSource;
 class UltrasonicPIDTest {
   private final DCMotor m_gearbox = DCMotor.getFalcon500(2);
   private static final double kGearing = KitbotGearing.k10p71.value;
-  public static final double kvVoltSecondsPerMeter = 1.98;
-  public static final double kaVoltSecondsSquaredPerMeter = 0.2;
-  private static final double kvVoltSecondsPerRadian = 1.5;
-  private static final double kaVoltSecondsSquaredPerRadian = 0.3;
-  private static final double kWheelDiameterMeters = 0.15;
-  private static final double kTrackwidthMeters = 0.7;
+  public static final double kvLinear = 1.98; // V/(m/s)
+  public static final double kaLinear = 0.2; // V/(m/s²)
+  private static final double kvAngular = 1.5; // V/(rad/s)
+  private static final double kaAngular = 0.3; // V/(rad/s²)
+  private static final double kWheelDiameter = 0.15; // m
+  private static final double kTrackwidth = 0.7; // m
 
   private Robot m_robot;
   private Thread m_thread;
@@ -46,7 +46,7 @@ class UltrasonicPIDTest {
   // distance between the robot's starting position and the object
   // we will update this in a moment
   private double m_startToObject = Double.POSITIVE_INFINITY;
-  private double m_distanceMM;
+  private double m_distance; // m
 
   // We're not using @BeforeEach so m_startToObject gets initialized properly
   private void startThread() {
@@ -57,15 +57,11 @@ class UltrasonicPIDTest {
     m_thread = new Thread(m_robot::startCompetition);
     m_driveSim =
         new DifferentialDrivetrainSim(
-            LinearSystemId.identifyDrivetrainSystem(
-                kvVoltSecondsPerMeter,
-                kaVoltSecondsSquaredPerMeter,
-                kvVoltSecondsPerRadian,
-                kaVoltSecondsSquaredPerRadian),
+            LinearSystemId.identifyDrivetrainSystem(kvLinear, kaLinear, kvAngular, kaAngular),
             m_gearbox,
             kGearing,
-            kTrackwidthMeters,
-            kWheelDiameterMeters / 2.0,
+            kTrackwidth,
+            kWheelDiameter / 2.0,
             null);
     m_ultrasonicSim = new UltrasonicSim(Robot.kUltrasonicPingPort, Robot.kUltrasonicEchoPort);
     m_leftMotorSim = new PWMSim(Robot.kLeftMotorPort);
@@ -80,10 +76,10 @@ class UltrasonicPIDTest {
               m_driveSim.update(0.02);
 
               double startingDistance = m_startToObject;
-              double range = m_driveSim.getLeftPositionMeters() - startingDistance;
+              double range = m_driveSim.getLeftPosition() - startingDistance;
 
-              m_ultrasonicSim.setRangeMeters(range);
-              m_distanceMM = range * 1.0e3;
+              m_ultrasonicSim.setRange(range);
+              m_distance = range;
             });
 
     m_thread.start();
@@ -128,7 +124,7 @@ class UltrasonicPIDTest {
     {
       SimHooks.stepTiming(5.0);
 
-      assertEquals(Robot.kHoldDistanceMillimeters, m_distanceMM, 10.0);
+      assertEquals(Robot.kHoldDistance, m_distance, 0.01);
     }
   }
 }

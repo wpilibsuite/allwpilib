@@ -27,7 +27,7 @@ class TrajectoryTransformTest {
 
     // Test initial pose.
     assertEquals(
-        new Pose2d(1, 2, Rotation2d.fromDegrees(30)), transformedTrajectory.sample(0).poseMeters);
+        new Pose2d(1, 2, Rotation2d.fromDegrees(30)), transformedTrajectory.sample(0).pose);
 
     testSameShapedTrajectory(trajectory.getStates(), transformedTrajectory.getStates());
   }
@@ -45,18 +45,18 @@ class TrajectoryTransformTest {
     var transformedTrajectory = trajectory.relativeTo(new Pose2d(1, 2, Rotation2d.fromDegrees(30)));
 
     // Test initial pose.
-    assertEquals(Pose2d.kZero, transformedTrajectory.sample(0).poseMeters);
+    assertEquals(Pose2d.kZero, transformedTrajectory.sample(0).pose);
 
     testSameShapedTrajectory(trajectory.getStates(), transformedTrajectory.getStates());
   }
 
   void testSameShapedTrajectory(List<Trajectory.State> statesA, List<Trajectory.State> statesB) {
     for (int i = 0; i < statesA.size() - 1; i++) {
-      var a1 = statesA.get(i).poseMeters;
-      var a2 = statesA.get(i + 1).poseMeters;
+      var a1 = statesA.get(i).pose;
+      var a2 = statesA.get(i + 1).pose;
 
-      var b1 = statesB.get(i).poseMeters;
-      var b2 = statesB.get(i + 1).poseMeters;
+      var b1 = statesB.get(i).pose;
+      var b2 = statesB.get(i + 1).pose;
 
       assertEquals(a2.relativeTo(a1), b2.relativeTo(b1));
     }

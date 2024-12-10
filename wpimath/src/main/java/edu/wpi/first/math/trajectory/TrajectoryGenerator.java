@@ -91,8 +91,8 @@ public final class TrajectoryGenerator {
     // Change the points back to their original orientation.
     if (config.isReversed()) {
       for (var point : points) {
-        point.poseMeters = point.poseMeters.plus(kFlip);
-        point.curvatureRadPerMeter *= -1;
+        point.pose = point.pose.plus(kFlip);
+        point.curvature *= -1;
       }
     }
 
@@ -167,8 +167,8 @@ public final class TrajectoryGenerator {
     // Change the points back to their original orientation.
     if (config.isReversed()) {
       for (var point : points) {
-        point.poseMeters = point.poseMeters.plus(kFlip);
-        point.curvatureRadPerMeter *= -1;
+        point.pose = point.pose.plus(kFlip);
+        point.curvature *= -1;
       }
     }
 
@@ -217,8 +217,8 @@ public final class TrajectoryGenerator {
     // Change the points back to their original orientation.
     if (config.isReversed()) {
       for (var point : points) {
-        point.poseMeters = point.poseMeters.plus(kFlip);
-        point.curvatureRadPerMeter *= -1;
+        point.pose = point.pose.plus(kFlip);
+        point.curvature *= -1;
       }
     }
 

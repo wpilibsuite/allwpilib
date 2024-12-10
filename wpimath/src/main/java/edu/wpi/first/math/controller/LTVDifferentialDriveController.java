@@ -242,10 +242,8 @@ public class LTVDifferentialDriveController {
         currentPose,
         leftVelocity,
         rightVelocity,
-        desiredState.poseMeters,
-        desiredState.velocityMetersPerSecond
-            * (1 - (desiredState.curvatureRadPerMeter * m_trackwidth / 2.0)),
-        desiredState.velocityMetersPerSecond
-            * (1 + (desiredState.curvatureRadPerMeter * m_trackwidth / 2.0)));
+        desiredState.pose,
+        desiredState.velocity * (1 - (desiredState.curvature * m_trackwidth / 2.0)),
+        desiredState.velocity * (1 + (desiredState.curvature * m_trackwidth / 2.0)));
   }
 }

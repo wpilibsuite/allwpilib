@@ -19,9 +19,9 @@ class MecanumDriveMotorVoltagesProtoTest
 
   @Override
   public void checkEquals(MecanumDriveMotorVoltages testData, MecanumDriveMotorVoltages data) {
-    assertEquals(testData.frontLeftVoltage, data.frontLeftVoltage);
-    assertEquals(testData.frontRightVoltage, data.frontRightVoltage);
-    assertEquals(testData.rearLeftVoltage, data.rearLeftVoltage);
-    assertEquals(testData.rearRightVoltage, data.rearRightVoltage);
+    assertEquals(testData.frontLeft, data.frontLeft);
+    assertEquals(testData.frontRight, data.frontRight);
+    assertEquals(testData.rearLeft, data.rearLeft);
+    assertEquals(testData.rearRight, data.rearRight);
   }
 }

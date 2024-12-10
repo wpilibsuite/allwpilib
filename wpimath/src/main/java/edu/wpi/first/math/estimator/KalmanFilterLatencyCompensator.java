@@ -41,15 +41,11 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
    * @param observer The observer.
    * @param u The input at the timestamp.
    * @param localY The local output at the timestamp
-   * @param timestampSeconds The timestamp of the state.
+   * @param timestamp The timestamp of the state in seconds.
    */
   public void addObserverState(
-      KalmanTypeFilter<S, I, O> observer,
-      Matrix<I, N1> u,
-      Matrix<O, N1> localY,
-      double timestampSeconds) {
-    m_pastObserverSnapshots.add(
-        Map.entry(timestampSeconds, new ObserverSnapshot(observer, u, localY)));
+      KalmanTypeFilter<S, I, O> observer, Matrix<I, N1> u, Matrix<O, N1> localY, double timestamp) {
+    m_pastObserverSnapshots.add(Map.entry(timestamp, new ObserverSnapshot(observer, u, localY)));
 
     if (m_pastObserverSnapshots.size() > kMaxPastObserverStates) {
       m_pastObserverSnapshots.remove(0);
@@ -65,7 +61,7 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
    * @param nominalDtSeconds The nominal timestep.
    * @param y The measurement.
    * @param globalMeasurementCorrect The function take calls correct() on the observer.
-   * @param timestampSeconds The timestamp of the measurement.
+   * @param timestamp The timestamp of the measurement in seconds.
    */
   public <R extends Num> void applyPastGlobalMeasurement(
       Nat<R> rows,
@@ -73,15 +69,12 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
       double nominalDtSeconds,
       Matrix<R, N1> y,
       BiConsumer<Matrix<I, N1>, Matrix<R, N1>> globalMeasurementCorrect,
-      double timestampSeconds) {
+      double timestamp) {
     if (m_pastObserverSnapshots.isEmpty()) {
       // State map was empty, which means that we got a past measurement right at startup. The only
       // thing we can really do is ignore the measurement.
       return;
     }
-
-    // Use a less verbose name for timestamp
-    double timestamp = timestampSeconds;
 
     int maxIdx = m_pastObserverSnapshots.size() - 1;
     int low = 0;

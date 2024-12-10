@@ -12,16 +12,16 @@ import edu.wpi.first.util.struct.StructSerializable;
 /** Represents the motor voltages for a mecanum drive drivetrain. */
 public class MecanumDriveMotorVoltages implements ProtobufSerializable, StructSerializable {
   /** Voltage of the front left motor. */
-  public double frontLeftVoltage;
+  public double frontLeft;
 
   /** Voltage of the front right motor. */
-  public double frontRightVoltage;
+  public double frontRight;
 
   /** Voltage of the rear left motor. */
-  public double rearLeftVoltage;
+  public double rearLeft;
 
   /** Voltage of the rear right motor. */
-  public double rearRightVoltage;
+  public double rearRight;
 
   /** Constructs a MecanumDriveMotorVoltages with zeros for all member fields. */
   public MecanumDriveMotorVoltages() {}
@@ -29,20 +29,17 @@ public class MecanumDriveMotorVoltages implements ProtobufSerializable, StructSe
   /**
    * Constructs a MecanumDriveMotorVoltages.
    *
-   * @param frontLeftVoltage Voltage of the front left motor.
-   * @param frontRightVoltage Voltage of the front right motor.
-   * @param rearLeftVoltage Voltage of the rear left motor.
-   * @param rearRightVoltage Voltage of the rear right motor.
+   * @param frontLeft Voltage of the front left motor.
+   * @param frontRight Voltage of the front right motor.
+   * @param rearLeft Voltage of the rear left motor.
+   * @param rearRight Voltage of the rear right motor.
    */
   public MecanumDriveMotorVoltages(
-      double frontLeftVoltage,
-      double frontRightVoltage,
-      double rearLeftVoltage,
-      double rearRightVoltage) {
-    this.frontLeftVoltage = frontLeftVoltage;
-    this.frontRightVoltage = frontRightVoltage;
-    this.rearLeftVoltage = rearLeftVoltage;
-    this.rearRightVoltage = rearRightVoltage;
+      double frontLeft, double frontRight, double rearLeft, double rearRight) {
+    this.frontLeft = frontLeft;
+    this.frontRight = frontRight;
+    this.rearLeft = rearLeft;
+    this.rearRight = rearRight;
   }
 
   @Override
@@ -50,7 +47,7 @@ public class MecanumDriveMotorVoltages implements ProtobufSerializable, StructSe
     return String.format(
         "MecanumDriveMotorVoltages(Front Left: %.2f V, Front Right: %.2f V, "
             + "Rear Left: %.2f V, Rear Right: %.2f V)",
-        frontLeftVoltage, frontRightVoltage, rearLeftVoltage, rearRightVoltage);
+        frontLeft, frontRight, rearLeft, rearRight);
   }
 
   /** MecanumDriveMotorVoltages struct for serialization. */

@@ -38,7 +38,7 @@ public class DifferentialDriveWheelSpeedsStruct implements Struct<DifferentialDr
 
   @Override
   public void pack(ByteBuffer bb, DifferentialDriveWheelSpeeds value) {
-    bb.putDouble(value.leftMetersPerSecond);
-    bb.putDouble(value.rightMetersPerSecond);
+    bb.putDouble(value.left);
+    bb.putDouble(value.right);
   }
 }

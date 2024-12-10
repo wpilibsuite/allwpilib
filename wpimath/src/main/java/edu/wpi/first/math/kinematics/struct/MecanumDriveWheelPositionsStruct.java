@@ -40,9 +40,9 @@ public class MecanumDriveWheelPositionsStruct implements Struct<MecanumDriveWhee
 
   @Override
   public void pack(ByteBuffer bb, MecanumDriveWheelPositions value) {
-    bb.putDouble(value.frontLeftMeters);
-    bb.putDouble(value.frontRightMeters);
-    bb.putDouble(value.rearLeftMeters);
-    bb.putDouble(value.rearRightMeters);
+    bb.putDouble(value.frontLeft);
+    bb.putDouble(value.frontRight);
+    bb.putDouble(value.rearLeft);
+    bb.putDouble(value.rearRight);
   }
 }

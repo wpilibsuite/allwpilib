@@ -45,7 +45,7 @@ class UltrasonicSim {
    *
    * @param range The range.
    */
-  void SetRange(units::inch_t range);
+  void SetRange(units::meter_t range);
 
  private:
   hal::SimBoolean m_simRangeValid;

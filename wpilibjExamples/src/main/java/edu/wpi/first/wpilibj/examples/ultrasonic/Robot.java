@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.ultrasonic;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -26,14 +27,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    // We can read the distance in millimeters
-    double distanceMillimeters = m_rangeFinder.getRangeMM();
-    // ... or in inches
-    double distanceInches = m_rangeFinder.getRangeInches();
+    // Read distance in meters
+    double distance = m_rangeFinder.getRange();
 
     // We can also publish the data itself periodically
-    SmartDashboard.putNumber("Distance[mm]", distanceMillimeters);
-    SmartDashboard.putNumber("Distance[inch]", distanceInches);
+    SmartDashboard.putNumber("Distance[m]", distance);
+    SmartDashboard.putNumber("Distance[inch]", Units.metersToInches(distance));
   }
 
   @Override
@@ -48,8 +47,8 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     if (m_rangeFinder.isRangeValid()) {
       // Data is valid, publish it
-      SmartDashboard.putNumber("Distance[mm]", m_rangeFinder.getRangeMM());
-      SmartDashboard.putNumber("Distance[inch]", m_rangeFinder.getRangeInches());
+      SmartDashboard.putNumber("Distance[m]", m_rangeFinder.getRange());
+      SmartDashboard.putNumber("Distance[inch]", Units.metersToInches(m_rangeFinder.getRange()));
 
       // Ping for next measurement
       m_rangeFinder.ping();

@@ -96,7 +96,7 @@ class LTVDifferentialDriveControllerTest {
             0.0,
             0.0);
 
-    final var totalTime = trajectory.getTotalTimeSeconds();
+    final var totalTime = trajectory.getTotalTime();
     for (int i = 0; i < (totalTime / kDt); ++i) {
       var state = trajectory.sample(kDt * i);
       robotPose =
@@ -115,7 +115,7 @@ class LTVDifferentialDriveControllerTest {
     }
 
     final var states = trajectory.getStates();
-    final var endPose = states.get(states.size() - 1).poseMeters;
+    final var endPose = states.get(states.size() - 1).pose;
 
     // Java lambdas require local variables referenced from a lambda expression
     // must be final or effectively final.

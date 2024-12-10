@@ -33,10 +33,10 @@ public class DMA implements AutoCloseable {
   /**
    * Sets DMA to trigger at an interval.
    *
-   * @param periodSeconds Period at which to trigger DMA in seconds.
+   * @param period Period at which to trigger DMA in seconds.
    */
-  public void setTimedTrigger(double periodSeconds) {
-    DMAJNI.setTimedTrigger(m_dmaHandle, periodSeconds);
+  public void setTimedTrigger(double period) {
+    DMAJNI.setTimedTrigger(m_dmaHandle, period);
   }
 
   /**

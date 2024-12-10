@@ -22,6 +22,6 @@ class DifferentialDriveKinematicsStructTest {
     buffer.rewind();
 
     DifferentialDriveKinematics data = DifferentialDriveKinematics.struct.unpack(buffer);
-    assertEquals(DATA.trackWidthMeters, data.trackWidthMeters);
+    assertEquals(DATA.trackwidth, data.trackwidth);
   }
 }

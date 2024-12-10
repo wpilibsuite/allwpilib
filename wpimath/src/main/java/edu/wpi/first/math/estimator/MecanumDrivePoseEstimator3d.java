@@ -46,18 +46,18 @@ public class MecanumDrivePoseEstimator3d extends PoseEstimator3d<MecanumDriveWhe
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The current gyro angle.
    * @param wheelPositions The distances driven by each wheel.
-   * @param initialPoseMeters The starting pose estimate.
+   * @param initialPose The starting pose estimate.
    */
   public MecanumDrivePoseEstimator3d(
       MecanumDriveKinematics kinematics,
       Rotation3d gyroAngle,
       MecanumDriveWheelPositions wheelPositions,
-      Pose3d initialPoseMeters) {
+      Pose3d initialPose) {
     this(
         kinematics,
         gyroAngle,
         wheelPositions,
-        initialPoseMeters,
+        initialPose,
         VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
         VecBuilder.fill(0.45, 0.45, 0.45, 0.45));
   }
@@ -68,7 +68,7 @@ public class MecanumDrivePoseEstimator3d extends PoseEstimator3d<MecanumDriveWhe
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The current gyro angle.
    * @param wheelPositions The distance measured by each wheel.
-   * @param initialPoseMeters The starting pose estimate.
+   * @param initialPose The starting pose estimate.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
    *     in meters, and heading in radians). Increase these numbers to trust your state estimate
    *     less.
@@ -80,12 +80,12 @@ public class MecanumDrivePoseEstimator3d extends PoseEstimator3d<MecanumDriveWhe
       MecanumDriveKinematics kinematics,
       Rotation3d gyroAngle,
       MecanumDriveWheelPositions wheelPositions,
-      Pose3d initialPoseMeters,
+      Pose3d initialPose,
       Matrix<N4, N1> stateStdDevs,
       Matrix<N4, N1> visionMeasurementStdDevs) {
     super(
         kinematics,
-        new MecanumDriveOdometry3d(kinematics, gyroAngle, wheelPositions, initialPoseMeters),
+        new MecanumDriveOdometry3d(kinematics, gyroAngle, wheelPositions, initialPose),
         stateStdDevs,
         visionMeasurementStdDevs);
   }

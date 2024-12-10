@@ -31,8 +31,8 @@ public class SwerveModule {
           0,
           0,
           new TrapezoidProfile.Constraints(
-              ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-              ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
+              ModuleConstants.kMaxModuleAngularSpeed,
+              ModuleConstants.kMaxModuleAngularAcceleration));
 
   /**
    * Constructs a SwerveModule.
@@ -117,7 +117,7 @@ public class SwerveModule {
 
     // Calculate the drive output from the drive PID controller.
     final double driveOutput =
-        m_drivePIDController.calculate(m_driveEncoder.getRate(), desiredState.speedMetersPerSecond);
+        m_drivePIDController.calculate(m_driveEncoder.getRate(), desiredState.speed);
 
     // Calculate the turning motor output from the turning PID controller.
     final double turnOutput =

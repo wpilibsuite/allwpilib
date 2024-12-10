@@ -24,10 +24,10 @@ class TrajectoryStateProtoTest {
     Trajectory.State.proto.pack(proto, DATA);
 
     Trajectory.State data = Trajectory.State.proto.unpack(proto);
-    assertEquals(DATA.timeSeconds, data.timeSeconds);
-    assertEquals(DATA.velocityMetersPerSecond, data.velocityMetersPerSecond);
-    assertEquals(DATA.accelerationMetersPerSecondSq, data.accelerationMetersPerSecondSq);
-    assertEquals(DATA.poseMeters, data.poseMeters);
-    assertEquals(DATA.curvatureRadPerMeter, data.curvatureRadPerMeter);
+    assertEquals(DATA.time, data.time);
+    assertEquals(DATA.velocity, data.velocity);
+    assertEquals(DATA.acceleration, data.acceleration);
+    assertEquals(DATA.pose, data.pose);
+    assertEquals(DATA.curvature, data.curvature);
   }
 }

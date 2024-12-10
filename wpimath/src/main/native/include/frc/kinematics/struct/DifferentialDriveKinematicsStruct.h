@@ -15,7 +15,7 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveKinematics> {
     return "DifferentialDriveKinematics";
   }
   static constexpr size_t GetSize() { return 8; }
-  static constexpr std::string_view GetSchema() { return "double track_width"; }
+  static constexpr std::string_view GetSchema() { return "double trackwidth"; }
 
   static frc::DifferentialDriveKinematics Unpack(std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
