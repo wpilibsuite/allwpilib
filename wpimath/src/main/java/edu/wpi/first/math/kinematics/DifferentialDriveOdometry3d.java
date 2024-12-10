@@ -54,8 +54,8 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    * Constructs a DifferentialDriveOdometry3d object.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistance The distance traveled by the left encoder in meters.
-   * @param rightDistance The distance traveled by the right encoder in meters.
+   * @param leftDistance The distance traveled by the left encoder.
+   * @param rightDistance The distance traveled by the right encoder.
    * @param initialPose The starting position of the robot on the field.
    */
   public DifferentialDriveOdometry3d(
@@ -79,8 +79,8 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    * Constructs a DifferentialDriveOdometry3d object.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistance The distance traveled by the left encoder in meters.
-   * @param rightDistance The distance traveled by the right encoder in meters.
+   * @param leftDistance The distance traveled by the left encoder.
+   * @param rightDistance The distance traveled by the right encoder.
    */
   public DifferentialDriveOdometry3d(
       Rotation3d gyroAngle, Distance leftDistance, Distance rightDistance) {
@@ -111,8 +111,8 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    * automatically takes care of offsetting the gyro angle.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistance The distance traveled by the left encoder in meters.
-   * @param rightDistance The distance traveled by the right encoder in meters.
+   * @param leftDistance The distance traveled by the left encoder.
+   * @param rightDistance The distance traveled by the right encoder.
    * @param pose The position on the field that your robot is at.
    */
   public void resetPosition(
