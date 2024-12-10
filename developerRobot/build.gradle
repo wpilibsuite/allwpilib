@@ -37,6 +37,8 @@ application {
 
 apply plugin: 'com.github.johnrengelman.shadow'
 
+sourceSets.main.java.srcDir "${buildDir}/generated/sources/annotationProcessor/java/main"
+
 repositories {
     maven {
         url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
