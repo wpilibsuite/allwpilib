@@ -28,8 +28,8 @@ public final class RuntimeLoader {
     if (System.getProperty("os.name").startsWith("Windows")) {
       msg.append(
           "A common cause of this error is using a JVM with an incorrect MSVC runtime.\n"
-            + "Ensure you are using the WPILib JVM (The current running JVM is listed above)\n"
-            + "See https://wpilib.org/jvmruntime for more information\n");
+              + "Ensure you are using the WPILib JVM (The current running JVM is listed above)\n"
+              + "See https://wpilib.org/jvmruntime for more information\n");
     }
     return msg.toString();
   }
