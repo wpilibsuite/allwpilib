@@ -27,9 +27,9 @@ public final class RuntimeLoader {
         .append(String.format("JVM Location: %s\n", jvmLocation));
     if (System.getProperty("os.name").startsWith("Windows")) {
       msg.append(
-          "A common cause of this error is using a JVM with an incorrect MSVC runtime.\n")
-          .append("Ensure you are using the WPILib JVM (The current running JVM is listed above\n")
-          .append("See https://wpilib.org/jvmruntime for more information\n");
+          "A common cause of this error is using a JVM with an incorrect MSVC runtime.\n"
+            + "Ensure you are using the WPILib JVM (The current running JVM is listed above\n"
+            + "See https://wpilib.org/jvmruntime for more information\n");
     }
     return msg.toString();
   }
