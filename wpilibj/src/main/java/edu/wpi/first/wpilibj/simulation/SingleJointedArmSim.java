@@ -147,7 +147,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @return Whether the arm has hit the lower limit.
    */
   public boolean hasHitLowerLimit() {
-    return wouldHitLowerLimit(getAngleRads());
+    return wouldHitLowerLimit(getAngle());
   }
 
   /**
@@ -156,7 +156,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @return Whether the arm has hit the upper limit.
    */
   public boolean hasHitUpperLimit() {
-    return wouldHitUpperLimit(getAngleRads());
+    return wouldHitUpperLimit(getAngle());
   }
 
   /**
