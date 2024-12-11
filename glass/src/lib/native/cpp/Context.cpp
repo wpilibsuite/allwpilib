@@ -483,7 +483,7 @@ void glass::EndChild() {
 }
 
 bool glass::CollapsingHeader(const char* label, ImGuiTreeNodeFlags flags) {
-  bool& open = GetStorage().GetChild(label).GetBool(
+  bool& open = GetStorage().GetChild(label).Get<bool>(
       "open", (flags & ImGuiTreeNodeFlags_DefaultOpen) != 0);
   ImGui::SetNextItemOpen(open);
   open = ImGui::CollapsingHeader(label, flags);
@@ -492,7 +492,7 @@ bool glass::CollapsingHeader(const char* label, ImGuiTreeNodeFlags flags) {
 
 bool glass::TreeNodeEx(const char* label, ImGuiTreeNodeFlags flags) {
   PushStorageStack(label);
-  bool& open = GetStorage().GetBool(
+  bool& open = GetStorage().Get<bool>(
       "open", (flags & ImGuiTreeNodeFlags_DefaultOpen) != 0);
   ImGui::SetNextItemOpen(open);
   open = ImGui::TreeNodeEx(label, flags);

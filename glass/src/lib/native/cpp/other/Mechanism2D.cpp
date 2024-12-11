@@ -90,7 +90,7 @@ class BackgroundInfo {
 }  // namespace
 
 BackgroundInfo::BackgroundInfo(Storage& storage)
-    : m_filename{storage.GetString("image")} {}
+    : m_filename{storage.Get<std::string>("image")} {}
 
 void BackgroundInfo::DisplaySettings() {
   if (ImGui::Button("Choose image...")) {
