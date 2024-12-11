@@ -14,8 +14,8 @@
 #include <wpi/DenseMap.h>
 #include <wpi/Signal.h>
 #include <wpi/StringMap.h>
-#include <wpi/json.h>
 #include <wpi/fs.h>
+#include <wpi/json.h>
 #include <wpi/print.h>
 
 #include "wpinet/EventLoopRunner.h"
