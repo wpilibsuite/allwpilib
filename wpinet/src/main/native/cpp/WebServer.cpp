@@ -233,26 +233,54 @@ void MyHttpConnection::ProcessRequest() {
       // generate directory listing
       wpi::SmallString<64> formatBuf;
       if (qmap.Get("format", formatBuf).value_or("") == "json") {
-        wpi::json j = wpi::json::array();
+        wpi::json dirs = wpi::json::array();
+        wpi::json files = wpi::json::array();
         for (auto&& entry : fs::directory_iterator{fullpath}) {
           bool subdir = entry.is_directory(ec);
-          j.emplace_back(
-              wpi::json{{"filename", entry.path().filename().string()},
-                        {"size", subdir ? 0 : entry.file_size(ec)},
-                        {"directory", subdir}});
+          std::string name = entry.path().filename().string();
+          if (subdir) {
+            dirs.emplace_back(wpi::json{{"name", std::move(name)}});
+          } else {
+            files.emplace_back(
+                wpi::json{{"name", std::move(name)},
+                          {"size", subdir ? 0 : entry.file_size(ec)}});
+          }
         }
-        SendResponse(200, "OK", "text/json", j.dump());
+        SendResponse(
+            200, "OK", "text/json",
+            wpi::json{{"dirs", std::move(dirs)}, {"files", std::move(files)}}
+                .dump());
       } else {
+        wpi::StringMap<std::string> dirs;
+        wpi::StringMap<std::string> files;
+        for (auto&& entry : fs::directory_iterator{fullpath}) {
+          bool subdir = entry.is_directory(ec);
+          std::string name = entry.path().filename().string();
+          wpi::SmallString<128> nameUriBuf, nameHtmlBuf;
+          if (subdir) {
+            dirs.emplace(
+                name, fmt::format(
+                          "<tr><td><a href=\"{}/\">{}/</a></td><td></td></tr>",
+                          EscapeURI(name, nameUriBuf),
+                          EscapeHTML(name, nameHtmlBuf)));
+          } else {
+            files.emplace(
+                name, fmt::format(
+                          "<tr><td><a href=\"{}\">{}</a></td><td>{}</td></tr>",
+                          EscapeURI(name, nameUriBuf),
+                          EscapeHTML(name, nameHtmlBuf), entry.file_size(ec)));
+          }
+        }
+
         std::string html = fmt::format(
             "<html><head><title>{}</title></head><body>"
             "<table><tr><th>Name</th><th>Size</th></tr>\n",
             path);
-        for (auto&& entry : fs::directory_iterator{fullpath}) {
-          bool subdir = entry.is_directory(ec);
-          html += fmt::format(
-              "<tr><td><a href=\"{0}{1}\">{0}{1}</a></td><td>{2}</td></tr>",
-              entry.path().filename().string(), subdir ? "/" : "",
-              subdir ? "" : fmt::to_string(entry.file_size(ec)));
+        for (auto&& str : dirs) {
+          html += str.second;
+        }
+        for (auto&& str : files) {
+          html += str.second;
         }
         html += "</table></body></html>";
         SendResponse(200, "OK", "text/html", html);
