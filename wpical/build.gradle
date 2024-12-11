@@ -168,10 +168,6 @@ model {
                 } else {
                     it.cppCompiler.define('GLOG_DEPRECATED', '[[deprecated]]')
                 }
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.windowsarm64) {
-                    it.linker.args << '/alternatename:__imp___std_init_once_complete=__imp_InitOnceComplete'
-                    it.linker.args << '/alternatename:__imp___std_init_once_begin_initialize=__imp_InitOnceBeginInitialize'
-                }
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     // Comdlg32.lib is needed for GetSaveFileNameA
                     // dbghelp.lib is needed for glog functions
@@ -219,6 +215,11 @@ model {
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 it.cppCompiler.define('PROJECT_ROOT_PATH', testResources)
                 it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.windowsarm64) {
+                    // https://developercommunity.visualstudio.com/t/-imp-std-init-once-complete-unresolved-external-sy/1684365#T-N10041864
+                    it.linker.args << '/alternatename:__imp___std_init_once_complete=__imp_InitOnceComplete'
+                    it.linker.args << '/alternatename:__imp___std_init_once_begin_initialize=__imp_InitOnceBeginInitialize'
+                }
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.cppCompiler.define('GLOG_DEPRECATED', '__declspec(deprecated)')
                 } else {
@@ -230,6 +231,7 @@ model {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                     // Comdlg32.lib is needed for GetSaveFileNameA
                     // dbghelp.lib is needed for glog functions
+                    // advapi32.lib is needed for __imp_RegDeleteKeyA and other __imp_Reg functions for icvLoadWindowPos and the save variant
                     it.linker.args << 'advapi32.lib' << 'Comdlg32.lib' << 'dbghelp.lib'
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
                     it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore' << '-framework' << 'Accelerate'
