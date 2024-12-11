@@ -95,8 +95,7 @@ class StructGeneratorTest {
 
   @SuppressWarnings("unchecked")
   private <S extends StructSerializable> void testStructRoundTrip(S value) {
-    Struct<S> struct =
-        StructFetcher.fetchStruct((Class<S>) value.getClass()).get();
+    Struct<S> struct = StructFetcher.fetchStruct((Class<S>) value.getClass()).get();
     ByteBuffer buffer = ByteBuffer.allocate(struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     struct.pack(buffer, value);
@@ -108,8 +107,7 @@ class StructGeneratorTest {
 
   @SuppressWarnings("unchecked")
   private <S extends StructSerializable> void testStructDoublePack(S value) {
-    Struct<S> struct =
-        StructFetcher.fetchStruct((Class<S>) value.getClass()).get();
+    Struct<S> struct = StructFetcher.fetchStruct((Class<S>) value.getClass()).get();
     ByteBuffer buffer = ByteBuffer.allocate(struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     struct.pack(buffer, value);
@@ -123,8 +121,7 @@ class StructGeneratorTest {
 
   @SuppressWarnings("unchecked")
   private <S extends StructSerializable> void testStructDoubleUnpack(S value) {
-    Struct<S> struct =
-        StructFetcher.fetchStruct((Class<S>) value.getClass()).get();
+    Struct<S> struct = StructFetcher.fetchStruct((Class<S>) value.getClass()).get();
     ByteBuffer buffer = ByteBuffer.allocate(struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     struct.pack(buffer, value);
