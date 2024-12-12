@@ -88,7 +88,7 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupCopy) {
 
   bool finished = false;
 
-  auto command = cmd::WaitUntil([&finished] {return finished;});
+  auto command = cmd::WaitUntil([&finished] { return finished; });
 
   auto group = cmd::Parallel(std::move(command));
   scheduler.Schedule(group);

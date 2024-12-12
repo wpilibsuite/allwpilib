@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
-#include "frc2/command/InstantCommand.h"
 #include "frc2/command/Commands.h"
+#include "frc2/command/InstantCommand.h"
 
 using namespace frc2;
 class InstantCommandTest : public CommandTestBase {};
@@ -14,7 +14,7 @@ TEST_F(InstantCommandTest, InstantCommandSchedule) {
 
   int counter = 0;
 
-  auto command = cmd::RunOnce([&counter] {counter++;});
+  auto command = cmd::RunOnce([&counter] { counter++; });
 
   scheduler.Schedule(command);
   scheduler.Run();

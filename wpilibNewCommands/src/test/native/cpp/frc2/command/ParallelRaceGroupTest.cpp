@@ -139,9 +139,9 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnce) {
   bool finished2 = false;
   bool finished3 = false;
 
-  auto command1 = cmd::WaitUntil([&finished1] {return finished1;});
-  auto command2 = cmd::WaitUntil([&finished2] {return finished2;});
-  auto command3 = cmd::WaitUntil([&finished3] {return finished3;});
+  auto command1 = cmd::WaitUntil([&finished1] { return finished1; });
+  auto command2 = cmd::WaitUntil([&finished2] { return finished2; });
+  auto command3 = cmd::WaitUntil([&finished3] { return finished3; });
 
   auto group1 = cmd::Sequence(std::move(command1), std::move(command2));
   auto group2 = cmd::Race(std::move(group1), std::move(command3));

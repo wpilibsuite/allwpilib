@@ -5,8 +5,8 @@
 #include <utility>
 
 #include "CommandTestBase.h"
-#include "frc2/command/RunCommand.h"
 #include "frc2/command/Commands.h"
+#include "frc2/command/RunCommand.h"
 
 using namespace frc2;
 class DefaultCommandTest : public CommandTestBase {};

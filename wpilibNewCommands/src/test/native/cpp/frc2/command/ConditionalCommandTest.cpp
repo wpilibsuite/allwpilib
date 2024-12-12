@@ -56,30 +56,30 @@ TEST_F(ConditionalCommandTest, ConditionalCommandRequirement) {
 }
 
 TEST_F(ConditionalCommandTest, AllTrue) {
-  auto command = cmd::Either(cmd::Idle().IgnoringDisable(true),
-                                   cmd::Idle().IgnoringDisable(true),
-                                   [] { return true; });
+  auto command =
+      cmd::Either(cmd::Idle().IgnoringDisable(true),
+                  cmd::Idle().IgnoringDisable(true), [] { return true; });
   EXPECT_EQ(true, command.get()->RunsWhenDisabled());
 }
 
 TEST_F(ConditionalCommandTest, AllFalse) {
-  auto command = cmd::Either(cmd::Idle().IgnoringDisable(false),
-                                   cmd::Idle().IgnoringDisable(false),
-                                   [] { return true; });
+  auto command =
+      cmd::Either(cmd::Idle().IgnoringDisable(false),
+                  cmd::Idle().IgnoringDisable(false), [] { return true; });
   EXPECT_EQ(false, command.get()->RunsWhenDisabled());
 }
 
 TEST_F(ConditionalCommandTest, OneTrueOneFalse) {
-  auto command = cmd::Either(cmd::Idle().IgnoringDisable(true),
-                                   cmd::Idle().IgnoringDisable(false),
-                                   [] { return true; });
+  auto command =
+      cmd::Either(cmd::Idle().IgnoringDisable(true),
+                  cmd::Idle().IgnoringDisable(false), [] { return true; });
   EXPECT_EQ(false, command.get()->RunsWhenDisabled());
 }
 
 TEST_F(ConditionalCommandTest, TwoFalseOneTrue) {
-  auto command = cmd::Either(cmd::Idle().IgnoringDisable(false),
-                                   cmd::Idle().IgnoringDisable(true),
-                                   [] { return true; });
+  auto command =
+      cmd::Either(cmd::Idle().IgnoringDisable(false),
+                  cmd::Idle().IgnoringDisable(true), [] { return true; });
   EXPECT_EQ(false, command.get()->RunsWhenDisabled());
 }
 

@@ -105,7 +105,7 @@ TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineCopy) {
 
   bool finished = false;
 
-  auto command = cmd::WaitUntil([&finished] {return finished;});
+  auto command = cmd::WaitUntil([&finished] { return finished; });
 
   auto group = cmd::Deadline(std::move(command));
   scheduler.Schedule(group);

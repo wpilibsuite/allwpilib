@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <frc2/command/Commands.h>
+
 #include <utility>
 
 #include <gtest/gtest.h>
@@ -11,7 +13,6 @@
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/RunCommand.h"
-#include <frc2/command/Commands.h>
 
 using namespace frc2;
 
@@ -56,7 +57,7 @@ TEST_P(SchedulingRecursionTest, CancelFromInitialize) {
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
                                     GetParam()};
-  auto other = cmd::Run([&hasOtherRun] {hasOtherRun = true;}, {&requirement});
+  auto other = cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
 
   scheduler.Schedule(&selfCancels);
   scheduler.Run();
@@ -79,7 +80,7 @@ TEST_F(SchedulingRecursionTest, CancelFromInitializeAction) {
                                 [&counter](bool) { counter++; },
                                 [] { return false; },
                                 {&requirement}};
-  auto other = cmd::Run([&hasOtherRun] {hasOtherRun = true;}, {&requirement});
+  auto other = cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
   scheduler.OnCommandInitialize([&scheduler, &selfCancels](const Command&) {
     scheduler.Cancel(&selfCancels);
   });
@@ -102,7 +103,7 @@ TEST_P(SchedulingRecursionTest,
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
                                     GetParam()};
-  auto other = cmd::Run([&hasOtherRun] {hasOtherRun = true;}, {&requirement});
+  auto other = cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
   scheduler.SetDefaultCommand(&requirement, std::move(other));
 
   scheduler.Schedule(&selfCancels);
@@ -203,7 +204,7 @@ TEST_F(SchedulingRecursionTest, CancelFromEndLoop) {
 TEST_F(SchedulingRecursionTest, CancelFromEndLoopWhileInRunLoop) {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
-  
+
   EndCommand dCancelsAll([&](bool) {
     counter++;
     scheduler.CancelAll();
