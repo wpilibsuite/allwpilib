@@ -64,7 +64,7 @@ public class BoundVector2d implements StructSerializable {
    *
    * @return The Y component of the vector's position
    */
-  public double getXPos() {
+  public double getPositionX() {
     return m_position.getX();
   }
 
@@ -73,7 +73,7 @@ public class BoundVector2d implements StructSerializable {
    *
    * @return The Y component of the vector's position
    */
-  public double getYPos() {
+  public double getPositionY() {
     return m_position.getY();
   }
 
