@@ -13,7 +13,7 @@ public class BoundVector2dStruct implements Struct<BoundVector2d> {
 
   @Override
   public String getTypeName() {
-    return "Vector2d";
+    return "BoundVector2d";
   }
 
   @Override
