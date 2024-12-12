@@ -3,21 +3,14 @@ package edu.wpi.first.math.geometry;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.wpi.first.math.geometry.struct.Pose2dStruct;
+import edu.wpi.first.math.geometry.struct.BoundVector2dStruct;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
-/**
- * Represents a vector in a vector field. Has an origin, and x/y component vectors.
- *
- * <p>The name is not semantically correct (Vector2d would mean a vector in 2d space which would
- * only have components without an origin) but naming things is hard.
- *
- * <p>TODO: Change the name to something that is semantically correct
- */
+/** Represents a bound vector in a vector field. Has an origin, and x/y component vectors. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Vector2d implements StructSerializable {
+public class BoundVector2d implements StructSerializable {
   private final Translation2d position;
   private final Translation2d components;
 
@@ -27,7 +20,7 @@ public class Vector2d implements StructSerializable {
    * @param position The position of the vector.
    * @param components The X/Y component vectors.
    */
-  public Vector2d(
+  public BoundVector2d(
       @JsonProperty(required = true, value = "position") Translation2d position,
       @JsonProperty(required = true, value = "components") Translation2d components) {
     this.position = position;
@@ -35,13 +28,13 @@ public class Vector2d implements StructSerializable {
   }
 
   /**
-   * Constructs a vector with the specified position, direction, and magnitude.
+   * Constructs a bound vector with the specified position, direction, and magnitude.
    *
    * @param position The position of the vector.
    * @param direction The direction of the vector.
    * @param magnitude The magnitude of the vector.
    */
-  public Vector2d(Translation2d position, Rotation2d direction, double magnitude) {
+  public BoundVector2d(Translation2d position, Rotation2d direction, double magnitude) {
     this(position, new Translation2d(magnitude, direction));
   }
 
@@ -52,8 +45,8 @@ public class Vector2d implements StructSerializable {
    * @param end The end point.
    * @return A new Vector2d with the correct position and components.
    */
-  public static Vector2d fromStartEndPoints(Translation2d start, Translation2d end) {
-    return new Vector2d(start, end.minus(start));
+  public static BoundVector2d fromStartEndPoints(Translation2d start, Translation2d end) {
+    return new BoundVector2d(start, end.minus(start));
   }
 
   /**
@@ -136,8 +129,8 @@ public class Vector2d implements StructSerializable {
    * @param scalar The scalar.
    * @return The new scaled Vector2d.
    */
-  public Vector2d times(double scalar) {
-    return new Vector2d(position, components.times(scalar));
+  public BoundVector2d times(double scalar) {
+    return new BoundVector2d(position, components.times(scalar));
   }
 
   /**
@@ -146,8 +139,8 @@ public class Vector2d implements StructSerializable {
    * @param scalar The scalar.
    * @return The new scaled Vector2d.
    */
-  public Vector2d div(double scalar) {
-    return new Vector2d(position, components.div(scalar));
+  public BoundVector2d div(double scalar) {
+    return new BoundVector2d(position, components.div(scalar));
   }
 
   /**
@@ -156,8 +149,8 @@ public class Vector2d implements StructSerializable {
    * @param offset The offset.
    * @return The new moved Vector2d.
    */
-  public Vector2d move(Translation2d offset) {
-    return new Vector2d(position.plus(offset), components);
+  public BoundVector2d move(Translation2d offset) {
+    return new BoundVector2d(position.plus(offset), components);
   }
 
   /**
@@ -166,8 +159,8 @@ public class Vector2d implements StructSerializable {
    * @param rotation The rotation to transform the vector by.
    * @return The new rotated vector.
    */
-  public Vector2d rotateBy(Rotation2d rotation) {
-    return new Vector2d(position, components.rotateBy(rotation));
+  public BoundVector2d rotateBy(Rotation2d rotation) {
+    return new BoundVector2d(position, components.rotateBy(rotation));
   }
 
   /**
@@ -182,7 +175,8 @@ public class Vector2d implements StructSerializable {
   @Override
   public String toString() {
     return String.format(
-        "Vector2d(Position: %.2s, Components: %.2s)", position.toString(), components.toString());
+        "BoundVector2d(Position: %.2s, Components: %.2s)",
+        position.toString(), components.toString());
   }
 
   @Override
@@ -193,5 +187,5 @@ public class Vector2d implements StructSerializable {
   // TODO: Add Protobuf serialization
 
   /** vector2d struct for serialization. */
-  public static final Pose2dStruct struct = new Pose2dStruct();
+  public static final BoundVector2dStruct struct = new BoundVector2dStruct();
 }

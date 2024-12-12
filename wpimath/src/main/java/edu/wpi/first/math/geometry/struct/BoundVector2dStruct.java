@@ -1,14 +1,14 @@
 package edu.wpi.first.math.geometry.struct;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Vector2d;
+import edu.wpi.first.math.geometry.BoundVector2d;
 import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
 
-public class Vector2dStruct implements Struct<Vector2d> {
+public class BoundVector2dStruct implements Struct<BoundVector2d> {
   @Override
-  public Class<Vector2d> getTypeClass() {
-    return Vector2d.class;
+  public Class<BoundVector2d> getTypeClass() {
+    return BoundVector2d.class;
   }
 
   @Override
@@ -27,14 +27,14 @@ public class Vector2dStruct implements Struct<Vector2d> {
   }
 
   @Override
-  public Vector2d unpack(ByteBuffer bb) {
+  public BoundVector2d unpack(ByteBuffer bb) {
     var origin = Translation2d.struct.unpack(bb);
     var components = Translation2d.struct.unpack(bb);
-    return new Vector2d(origin, components);
+    return new BoundVector2d(origin, components);
   }
 
   @Override
-  public void pack(ByteBuffer bb, Vector2d value) {
+  public void pack(ByteBuffer bb, BoundVector2d value) {
     Translation2d.struct.pack(bb, value.getPosition());
     Translation2d.struct.pack(bb, value.getComponents());
   }
