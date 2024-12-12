@@ -11,8 +11,8 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class BoundVector2d implements StructSerializable {
-  private final Translation2d position;
-  private final Translation2d components;
+  private final Translation2d m_position;
+  private final Translation2d m_components;
 
   /**
    * Constructs a vector with the specified position and component vectors.
@@ -23,8 +23,8 @@ public class BoundVector2d implements StructSerializable {
   public BoundVector2d(
       @JsonProperty(required = true, value = "position") Translation2d position,
       @JsonProperty(required = true, value = "components") Translation2d components) {
-    this.position = position;
-    this.components = components;
+    this.m_position = position;
+    this.m_components = components;
   }
 
   /**
@@ -56,7 +56,7 @@ public class BoundVector2d implements StructSerializable {
    */
   @JsonProperty
   public Translation2d getPosition() {
-    return position;
+    return m_position;
   }
 
   /**
@@ -65,7 +65,7 @@ public class BoundVector2d implements StructSerializable {
    * @return The Y component of the vector's position
    */
   public double getXPos() {
-    return position.getX();
+    return m_position.getX();
   }
 
   /**
@@ -74,7 +74,7 @@ public class BoundVector2d implements StructSerializable {
    * @return The Y component of the vector's position
    */
   public double getYPos() {
-    return position.getY();
+    return m_position.getY();
   }
 
   /**
@@ -84,7 +84,7 @@ public class BoundVector2d implements StructSerializable {
    */
   @JsonProperty
   public Translation2d getComponents() {
-    return components;
+    return m_components;
   }
 
   /**
@@ -93,7 +93,7 @@ public class BoundVector2d implements StructSerializable {
    * @return The X component of the vector.
    */
   public double getXComponent() {
-    return components.getX();
+    return m_components.getX();
   }
 
   /**
@@ -102,7 +102,7 @@ public class BoundVector2d implements StructSerializable {
    * @return The Y component of the vector.
    */
   public double getYComponent() {
-    return components.getY();
+    return m_components.getY();
   }
 
   /**
@@ -111,7 +111,7 @@ public class BoundVector2d implements StructSerializable {
    * @return The magnitude of the vector.
    */
   public double getMagnitude() {
-    return components.getNorm();
+    return m_components.getNorm();
   }
 
   /**
@@ -120,7 +120,7 @@ public class BoundVector2d implements StructSerializable {
    * @return The angle of the vector.
    */
   public Rotation2d getAngle() {
-    return components.getAngle();
+    return m_components.getAngle();
   }
 
   /**
@@ -130,7 +130,7 @@ public class BoundVector2d implements StructSerializable {
    * @return The new scaled Vector2d.
    */
   public BoundVector2d times(double scalar) {
-    return new BoundVector2d(position, components.times(scalar));
+    return new BoundVector2d(m_position, m_components.times(scalar));
   }
 
   /**
@@ -140,7 +140,7 @@ public class BoundVector2d implements StructSerializable {
    * @return The new scaled Vector2d.
    */
   public BoundVector2d div(double scalar) {
-    return new BoundVector2d(position, components.div(scalar));
+    return new BoundVector2d(m_position, m_components.div(scalar));
   }
 
   /**
@@ -150,7 +150,7 @@ public class BoundVector2d implements StructSerializable {
    * @return The new moved Vector2d.
    */
   public BoundVector2d move(Translation2d offset) {
-    return new BoundVector2d(position.plus(offset), components);
+    return new BoundVector2d(m_position.plus(offset), m_components);
   }
 
   /**
@@ -160,7 +160,7 @@ public class BoundVector2d implements StructSerializable {
    * @return The new rotated vector.
    */
   public BoundVector2d rotateBy(Rotation2d rotation) {
-    return new BoundVector2d(position, components.rotateBy(rotation));
+    return new BoundVector2d(m_position, m_components.rotateBy(rotation));
   }
 
   /**
@@ -169,19 +169,19 @@ public class BoundVector2d implements StructSerializable {
    * @return The new Pose2d.
    */
   public Pose2d toPose2d() {
-    return new Pose2d(position, getAngle());
+    return new Pose2d(m_position, getAngle());
   }
 
   @Override
   public String toString() {
     return String.format(
         "BoundVector2d(Position: %.2s, Components: %.2s)",
-        position.toString(), components.toString());
+        m_position.toString(), m_components.toString());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(position, components);
+    return Objects.hash(m_position, m_components);
   }
 
   // TODO: Add Protobuf serialization
