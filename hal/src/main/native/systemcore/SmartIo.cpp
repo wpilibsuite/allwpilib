@@ -34,14 +34,14 @@ int32_t SmartIo::InitializeMode(SmartIoMode mode) {
   modePublisher = inst.GetDoubleTopic("/io/type" + channelString).Publish();
   getSubscriber = inst.GetDoubleTopic("/io/valread" + channelString)
                       .Subscribe(0.0, options);
+  setPublisher =
+      inst.GetDoubleTopic("/io/valset" + channelString).Publish(options);
+  setPublisher.Set(0);
 
   currentMode = mode;
   switch (mode) {
     case SmartIoMode::PWMOutput:
       modePublisher.Set(3);
-      setPublisher =
-          inst.GetDoubleTopic("/io/valset" + channelString).Publish(options);
-      setPublisher.Set(0);
       pwmMinPublisher =
           inst.GetDoubleTopic("/io/pwmmin" + channelString).Publish();
       pwmMinPublisher.Set(0);
@@ -50,10 +50,51 @@ int32_t SmartIo::InitializeMode(SmartIoMode mode) {
       pwmMaxPublisher.Set(4096);
       return 0;
 
+    case SmartIoMode::DigitalInput:
+      modePublisher.Set(0);
+      return 0;
+
+    case SmartIoMode::DigitalOutput:
+      modePublisher.Set(1);
+      return 0;
+
+    case SmartIoMode::Disabled:
+      modePublisher.Set(0);
+      return 0;
+
     default:
 
       return INCOMPATIBLE_STATE;
   }
+}
+
+int32_t SmartIo::SwitchDioDirection(bool input) {
+  if (currentMode != SmartIoMode::DigitalInput &&
+      currentMode != SmartIoMode::DigitalOutput) {
+    return INCOMPATIBLE_STATE;
+  }
+
+  modePublisher.Set(input ? 0 : 1);
+  currentMode = input ? SmartIoMode::DigitalInput : SmartIoMode::DigitalOutput;
+  return 0;
+}
+
+int32_t SmartIo::SetDigitalOutput(bool value) {
+  if (currentMode != SmartIoMode::DigitalInput &&
+      currentMode != SmartIoMode::DigitalOutput) {
+    return INCOMPATIBLE_STATE;
+  }
+  setPublisher.Set(value ? 255.0 : 0.0);
+  return 0;
+}
+
+int32_t SmartIo::GetDigitalInput(bool* value) {
+  if (currentMode != SmartIoMode::DigitalInput &&
+      currentMode != SmartIoMode::DigitalOutput) {
+    return INCOMPATIBLE_STATE;
+  }
+  *value = getSubscriber.Get() != 0;
+  return 0;
 }
 
 int32_t SmartIo::SetPwmMicroseconds(uint16_t microseconds) {

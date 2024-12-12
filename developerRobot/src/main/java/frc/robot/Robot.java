@@ -4,9 +4,15 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
+  DigitalInput di = new DigitalInput(0);
+  DigitalOutput dio = new DigitalOutput(1);
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -33,7 +39,19 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {}
 
+  int count = 0;
+  boolean val = false;
+
   /** This function is called periodically during all modes. */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    SmartDashboard.putBoolean("Input", di.get());
+
+    count++;
+    if (count >= 20) {
+      count = 0;
+      val = !val;
+      dio.set(val);
+    }
+  }
 }

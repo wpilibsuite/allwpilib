@@ -17,7 +17,9 @@ constexpr int32_t kPwmDisabled = 0;
 constexpr int32_t kPwmAlwaysHigh = 0xFFFF;
 
 enum class SmartIoMode {
+  Disabled,
   DigitalInput,
+  DigitalOutput,
   PWMOutput,
 };
 
@@ -31,7 +33,7 @@ struct SmartIo {
   int32_t deadbandMinPwm = 0;
   int32_t minPwm = 0;
   std::string previousAllocation;
-  SmartIoMode currentMode{SmartIoMode::DigitalInput};
+  SmartIoMode currentMode{SmartIoMode::Disabled};
   nt::DoublePublisher modePublisher;
 
   nt::DoublePublisher setPublisher;
@@ -41,6 +43,11 @@ struct SmartIo {
   nt::DoublePublisher pwmMaxPublisher;
 
   int32_t InitializeMode(SmartIoMode mode);
+  int32_t SwitchDioDirection(bool input);
+
+  int32_t SetDigitalOutput(bool value);
+  int32_t GetDigitalInput(bool* value);
+
   int32_t SetPwmMicroseconds(uint16_t microseconds);
   int32_t GetPwmMicroseconds(uint16_t* microseconds);
 };
