@@ -272,7 +272,6 @@ TEST_P(SchedulingRecursionTest, ScheduleFromEndCancel) {
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
                                     GetParam()};
-  RunCommand other{[] {}, {&requirement}};
 
   scheduler.Schedule(&selfCancels);
   EXPECT_NO_THROW({ scheduler.Cancel(&selfCancels); });
@@ -286,30 +285,30 @@ TEST_P(SchedulingRecursionTest, ScheduleFromEndInterrupt) {
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
                                     GetParam()};
-  RunCommand other{[] {}, {&requirement}};
+  auto other = cmd::Idle({&requirement});
 
   scheduler.Schedule(&selfCancels);
-  EXPECT_NO_THROW({ scheduler.Schedule(&other); });
+  EXPECT_NO_THROW({ scheduler.Schedule(other); });
   EXPECT_EQ(1, counter);
   EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
-  EXPECT_TRUE(scheduler.IsScheduled(&other));
+  EXPECT_TRUE(scheduler.IsScheduled(other));
 }
 
 TEST_F(SchedulingRecursionTest, ScheduleFromEndInterruptAction) {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   TestSubsystem requirement;
-  RunCommand selfCancels{[] {}, {&requirement}};
-  RunCommand other{[] {}, {&requirement}};
+  auto selfCancels = cmd::Idle({&requirement});
+  auto other = cmd::Idle({&requirement});
   scheduler.OnCommandInterrupt([&](const Command&) {
     counter++;
-    scheduler.Schedule(&other);
+    scheduler.Schedule(other);
   });
-  scheduler.Schedule(&selfCancels);
-  EXPECT_NO_THROW({ scheduler.Schedule(&other); });
+  scheduler.Schedule(selfCancels);
+  EXPECT_NO_THROW({ scheduler.Schedule(other); });
   EXPECT_EQ(1, counter);
-  EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
-  EXPECT_TRUE(scheduler.IsScheduled(&other));
+  EXPECT_FALSE(scheduler.IsScheduled(selfCancels));
+  EXPECT_TRUE(scheduler.IsScheduled(other));
 }
 
 TEST_F(SchedulingRecursionTest, CancelDefaultCommandFromEnd) {
@@ -321,11 +320,11 @@ TEST_F(SchedulingRecursionTest, CancelDefaultCommandFromEnd) {
                                    [&counter](bool) { counter++; },
                                    [] { return false; },
                                    {&requirement}};
-  RunCommand other{[] {}, {&requirement}};
+  auto other = cmd::Idle({&requirement});
   FunctionalCommand cancelDefaultCommand{[] {}, [] {},
                                          [&](bool) {
                                            counter++;
-                                           scheduler.Schedule(&other);
+                                           scheduler.Schedule(other);
                                          },
                                          [] { return false; }};
 
@@ -338,7 +337,7 @@ TEST_F(SchedulingRecursionTest, CancelDefaultCommandFromEnd) {
   });
   EXPECT_EQ(2, counter);
   EXPECT_FALSE(scheduler.IsScheduled(&defaultCommand));
-  EXPECT_TRUE(scheduler.IsScheduled(&other));
+  EXPECT_TRUE(scheduler.IsScheduled(other));
 }
 
 INSTANTIATE_TEST_SUITE_P(
