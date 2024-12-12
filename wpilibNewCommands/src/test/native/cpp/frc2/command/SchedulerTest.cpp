@@ -71,7 +71,7 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCause) {
   int counter = 0;
 
   TestSubsystem subsystem{};
-  RunCommand command([] {}, {&subsystem});
+  auto command = frc2::cmd::Idle({&subsystem});
   InstantCommand interruptor([] {}, {&subsystem});
 
   scheduler.OnCommandInterrupt(
@@ -81,7 +81,7 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCause) {
         counter++;
       });
 
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
   scheduler.Schedule(&interruptor);
 
   EXPECT_EQ(1, counter);
@@ -93,11 +93,10 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCauseInRunLoop) {
   int counter = 0;
 
   TestSubsystem subsystem{};
-  RunCommand command([] {}, {&subsystem});
+  auto command = frc2::cmd::Idle({&subsystem});
   InstantCommand interruptor([] {}, {&subsystem});
   // This command will schedule interruptor in execute() inside the run loop
-  InstantCommand interruptorScheduler(
-      [&] { scheduler.Schedule(&interruptor); });
+  auto interruptorScheduler = frc2::cmd::RunOnce([&] { scheduler.Schedule(&interruptor);});
 
   scheduler.OnCommandInterrupt(
       [&](const Command&, const std::optional<Command*>& cause) {
@@ -106,8 +105,8 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCauseInRunLoop) {
         counter++;
       });
 
-  scheduler.Schedule(&command);
-  scheduler.Schedule(&interruptorScheduler);
+  scheduler.Schedule(command);
+  scheduler.Schedule(interruptorScheduler);
 
   scheduler.Run();
 
