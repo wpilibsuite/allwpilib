@@ -61,17 +61,10 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * This is useful for compensating for translational skew when translating and
    * rotating a swerve drivetrain.
    *
-   * @param vx Forward velocity.
-   * @param vy Sideways velocity.
-   * @param omega Angular velocity.
    * @param dt The duration of the timestep the speeds should be applied for.
-   *
    * @return Discretized ChassisSpeeds.
    */
-  static constexpr ChassisSpeeds Discretize(units::meters_per_second_t vx,
-                                            units::meters_per_second_t vy,
-                                            units::radians_per_second_t omega,
-                                            units::second_t dt) {
+  constexpr ChassisSpeeds Discretize(units::second_t dt) const {
     // Construct the desired pose after a timestep, relative to the current
     // pose. The desired pose has decoupled translation and rotation.
     Pose2d desiredDeltaPose{vx * dt, vy * dt, omega * dt};
@@ -85,47 +78,17 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   }
 
   /**
-   * Discretizes a continuous-time chassis speed.
-   *
-   * This function converts a continuous-time chassis speed into a discrete-time
-   * one such that when the discrete-time chassis speed is applied for one
-   * timestep, the robot moves as if the velocity components are independent
-   * (i.e., the robot moves v_x * dt along the x-axis, v_y * dt along the
-   * y-axis, and omega * dt around the z-axis).
-   *
-   * This is useful for compensating for translational skew when translating and
-   * rotating a swerve drivetrain.
-   *
-   * @param continuousSpeeds The continuous speeds.
-   * @param dt The duration of the timestep the speeds should be applied for.
-   *
-   * @return Discretized ChassisSpeeds.
-   */
-  static constexpr ChassisSpeeds Discretize(
-      const ChassisSpeeds& continuousSpeeds, units::second_t dt) {
-    return Discretize(continuousSpeeds.vx, continuousSpeeds.vy,
-                      continuousSpeeds.omega, dt);
-  }
-
-  /**
-   * Converts a user provided field-relative set of speeds into a robot-relative
+   * Converts this field-relative set of speeds into a robot-relative
    * ChassisSpeeds object.
    *
-   * @param vx The component of speed in the x direction relative to the field.
-   * Positive x is away from your alliance wall.
-   * @param vy The component of speed in the y direction relative to the field.
-   * Positive y is to your left when standing behind the alliance wall.
-   * @param omega The angular rate of the robot.
    * @param robotAngle The angle of the robot as measured by a gyroscope. The
-   * robot's angle is considered to be zero when it is facing directly away from
-   * your alliance station wall. Remember that this should be CCW positive.
-   *
+   *     robot's angle is considered to be zero when it is facing directly away
+   *     from your alliance station wall. Remember that this should be CCW
+   *     positive.
    * @return ChassisSpeeds object representing the speeds in the robot's frame
-   * of reference.
+   *     of reference.
    */
-  static constexpr ChassisSpeeds FromFieldRelativeSpeeds(
-      units::meters_per_second_t vx, units::meters_per_second_t vy,
-      units::radians_per_second_t omega, const Rotation2d& robotAngle) {
+  constexpr ChassisSpeeds ToRobotRelative(const Rotation2d& robotAngle) const {
     // CW rotation into chassis frame
     auto rotated =
         Translation2d{units::meter_t{vx.value()}, units::meter_t{vy.value()}}
@@ -135,72 +98,23 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   }
 
   /**
-   * Converts a user provided field-relative ChassisSpeeds object into a
-   * robot-relative ChassisSpeeds object.
-   *
-   * @param fieldRelativeSpeeds The ChassisSpeeds object representing the speeds
-   *    in the field frame of reference. Positive x is away from your alliance
-   *    wall. Positive y is to your left when standing behind the alliance wall.
-   * @param robotAngle The angle of the robot as measured by a gyroscope. The
-   *    robot's angle is considered to be zero when it is facing directly away
-   *    from your alliance station wall. Remember that this should be CCW
-   *    positive.
-   * @return ChassisSpeeds object representing the speeds in the robot's frame
-   *    of reference.
-   */
-  static constexpr ChassisSpeeds FromFieldRelativeSpeeds(
-      const ChassisSpeeds& fieldRelativeSpeeds, const Rotation2d& robotAngle) {
-    return FromFieldRelativeSpeeds(fieldRelativeSpeeds.vx,
-                                   fieldRelativeSpeeds.vy,
-                                   fieldRelativeSpeeds.omega, robotAngle);
-  }
-
-  /**
-   * Converts a user provided robot-relative set of speeds into a field-relative
+   * Converts this robot-relative set of speeds into a field-relative
    * ChassisSpeeds object.
    *
-   * @param vx The component of speed in the x direction relative to the robot.
-   * Positive x is towards the robot's front.
-   * @param vy The component of speed in the y direction relative to the robot.
-   * Positive y is towards the robot's left.
-   * @param omega The angular rate of the robot.
    * @param robotAngle The angle of the robot as measured by a gyroscope. The
-   * robot's angle is considered to be zero when it is facing directly away from
-   * your alliance station wall. Remember that this should be CCW positive.
-   *
+   *     robot's angle is considered to be zero when it is facing directly away
+   *     from your alliance station wall. Remember that this should be CCW
+   *     positive.
    * @return ChassisSpeeds object representing the speeds in the field's frame
-   * of reference.
+   *     of reference.
    */
-  static constexpr ChassisSpeeds FromRobotRelativeSpeeds(
-      units::meters_per_second_t vx, units::meters_per_second_t vy,
-      units::radians_per_second_t omega, const Rotation2d& robotAngle) {
+  constexpr ChassisSpeeds ToFieldRelative(const Rotation2d& robotAngle) const {
     // CCW rotation out of chassis frame
     auto rotated =
         Translation2d{units::meter_t{vx.value()}, units::meter_t{vy.value()}}
             .RotateBy(robotAngle);
     return {units::meters_per_second_t{rotated.X().value()},
             units::meters_per_second_t{rotated.Y().value()}, omega};
-  }
-
-  /**
-   * Converts a user provided robot-relative ChassisSpeeds object into a
-   * field-relative ChassisSpeeds object.
-   *
-   * @param robotRelativeSpeeds The ChassisSpeeds object representing the speeds
-   *    in the robot frame of reference. Positive x is the towards robot's
-   * front. Positive y is towards the robot's left.
-   * @param robotAngle The angle of the robot as measured by a gyroscope. The
-   *    robot's angle is considered to be zero when it is facing directly away
-   *    from your alliance station wall. Remember that this should be CCW
-   *    positive.
-   * @return ChassisSpeeds object representing the speeds in the field's frame
-   *    of reference.
-   */
-  static constexpr ChassisSpeeds FromRobotRelativeSpeeds(
-      const ChassisSpeeds& robotRelativeSpeeds, const Rotation2d& robotAngle) {
-    return FromRobotRelativeSpeeds(robotRelativeSpeeds.vx,
-                                   robotRelativeSpeeds.vy,
-                                   robotRelativeSpeeds.omega, robotAngle);
   }
 
   /**
