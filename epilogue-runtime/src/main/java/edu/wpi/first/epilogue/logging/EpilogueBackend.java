@@ -200,7 +200,7 @@ public interface EpilogueBackend {
    * @param value the new value of the data field
    */
   default void log(String identifier, Measure<?> value) {
-    log(identifier + " (" + value.unit().symbol() + ")", value.baseUnitMagnitude());
+    log(identifier + " (" + value.baseUnit().symbol() + ")", value.baseUnitMagnitude());
   }
 
   /**
