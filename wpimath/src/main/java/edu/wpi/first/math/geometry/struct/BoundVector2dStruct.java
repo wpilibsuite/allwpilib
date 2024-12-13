@@ -1,7 +1,7 @@
 package edu.wpi.first.math.geometry.struct;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.BoundVector2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
 

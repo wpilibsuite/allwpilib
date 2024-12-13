@@ -7,7 +7,15 @@ import edu.wpi.first.math.geometry.struct.BoundVector2dStruct;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
-/** Represents a bound vector in a vector field. Has an origin, and x/y component vectors. */
+/**
+ * Represents a bound vector, or a vector with a start and end point, instead of just a direction
+ * and magnitude. Instead of having a defined end point, this object has a start point, and a vector
+ * relative to that start point. The vector is represented by 2 component vectors in the X and Y
+ * axes respectively, which when summed, gives the vector.
+ *
+ * <p>This object can be used to represent a force being applied from a certain location, or can be
+ * used to represent a certain vector in a vector field visualization.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class BoundVector2d implements StructSerializable {
@@ -115,9 +123,9 @@ public class BoundVector2d implements StructSerializable {
   }
 
   /**
-   * Returns the angle of the vector.
+   * Returns the angle this vector forms with the positive X axis.
    *
-   * @return The angle of the vector.
+   * @return The angle this vector forms with the positive X axis.
    */
   public Rotation2d getAngle() {
     return m_components.getAngle();
