@@ -104,9 +104,9 @@ int cameracalibration::calibrate(const std::string& input_video,
       cv::aruco::drawDetectedCornersCharuco(debug_image, charuco_corners,
                                             charuco_ids);
       cv::imshow("Frame", debug_image);
-    }
-    if (cv::waitKey(1) == 'q') {
-      break;
+      if (cv::waitKey(1) == 'q') {
+        break;
+      }
     }
   }
 
@@ -243,9 +243,9 @@ int cameracalibration::calibrate(const std::string& input_video,
       cv::aruco::drawDetectedCornersCharuco(debug_image, charuco_corners,
                                             charuco_ids);
       cv::imshow("Frame", debug_image);
-    }
-    if (cv::waitKey(1) == 'q') {
-      break;
+      if (cv::waitKey(1) == 'q') {
+        break;
+      }
     }
   }
 
@@ -358,9 +358,9 @@ int cameracalibration::calibrate(const std::string& input_video,
     if (show_debug_window) {
       cv::drawChessboardCorners(frame, boardSize, corners, found);
       cv::imshow("Checkerboard Detection", frame);
-    }
-    if (cv::waitKey(30) == 'q') {
-      break;
+      if (cv::waitKey(30) == 'q') {
+        break;
+      }
     }
   }
 
