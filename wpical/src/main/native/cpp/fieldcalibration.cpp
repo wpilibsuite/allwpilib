@@ -133,15 +133,7 @@ fieldcalibration::load_camera_model(std::string path)
         }
         catch (...)
         {
-          try
-          {
-            camera_distortion(i, j) = json_data["distortion_coefficients"]
-                                               [(i * camera_distortion.cols()) + j];
-          }
-          catch (...)
-          {
-            camera_distortion(i, j) = 0.0;
-          }
+          camera_distortion(i, j) = 0.0;
         }
       }
     }
