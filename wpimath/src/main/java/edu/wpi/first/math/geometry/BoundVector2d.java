@@ -19,20 +19,19 @@ import java.util.Objects;
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class BoundVector2d implements StructSerializable {
   private final Translation2d m_startPoint;
-  private final Translation2d m_offsetVector;
+  private final Translation2d m_vector;
 
   /**
-   * Constructs a vector with the specified position and end point offset.
+   * Constructs a vector with the specified start point.
    *
    * @param startPoint The position of the vector.
-   * @param offsetVector The vector that represents the offset of the end point relative to the
-   *     start point.
+   * @param vector The vector originating from the start point.
    */
   public BoundVector2d(
       @JsonProperty(required = true, value = "startPoint") Translation2d startPoint,
-      @JsonProperty(required = true, value = "offsetVector") Translation2d offsetVector) {
+      @JsonProperty(required = true, value = "vector") Translation2d vector) {
     this.m_startPoint = startPoint;
-    this.m_offsetVector = offsetVector;
+    this.m_vector = vector;
   }
 
   /**
@@ -58,12 +57,12 @@ public class BoundVector2d implements StructSerializable {
   }
 
   /**
-   * Returns the start position of the vector.
+   * Returns the start point of the vector.
    *
-   * @return The start position of the vector.
+   * @return The start point of the vector.
    */
   @JsonProperty
-  public Translation2d getStartPosition() {
+  public Translation2d getStartPoint() {
     return m_startPoint;
   }
 
@@ -91,35 +90,35 @@ public class BoundVector2d implements StructSerializable {
    * @return The vector that represents the offset between the start and end points.
    */
   @JsonProperty
-  public Translation2d getOffsetVector() {
-    return m_offsetVector;
+  public Translation2d getVector() {
+    return m_vector;
   }
 
   /**
-   * Returns the X component of the offset vector.
+   * Returns the X component of the vector.
    *
-   * @return The X component of the offset vector.
+   * @return The X component of the vector.
    */
-  public double getOffsetX() {
-    return m_offsetVector.getX();
+  public double getVectorX() {
+    return m_vector.getX();
   }
 
   /**
-   * Returns the Y component of the offset vector.
+   * Returns the Y component of the vector.
    *
-   * @return The Y component of the offset vector.
+   * @return The Y component of the vector.
    */
-  public double getOffsetY() {
-    return m_offsetVector.getY();
+  public double getVectorY() {
+    return m_vector.getY();
   }
 
   /**
-   * Returns the magnitude of the offset vector.
+   * Returns the magnitude of the vector.
    *
-   * @return The magnitude of the offset vector.
+   * @return The magnitude of the vector.
    */
   public double getMagnitude() {
-    return m_offsetVector.getNorm();
+    return m_vector.getNorm();
   }
 
   /**
@@ -128,7 +127,7 @@ public class BoundVector2d implements StructSerializable {
    * @return The angle the vector forms with the positive X axis.
    */
   public Rotation2d getAngle() {
-    return m_offsetVector.getAngle();
+    return m_vector.getAngle();
   }
 
   /**
@@ -137,27 +136,27 @@ public class BoundVector2d implements StructSerializable {
    * @return The end point of the bounded vector.
    */
   public Translation2d getEndPoint() {
-    return m_startPoint.plus(m_offsetVector);
+    return m_startPoint.plus(m_vector);
   }
 
   /**
-   * Multiplies the magnitude of the offset vector by a scalar.
+   * Multiplies the magnitude of the vector by a scalar.
    *
    * @param scalar The scalar.
-   * @return The new scaled Vector2d.
+   * @return The new scaled BoundVector2d.
    */
   public BoundVector2d times(double scalar) {
-    return new BoundVector2d(m_startPoint, m_offsetVector.times(scalar));
+    return new BoundVector2d(m_startPoint, m_vector.times(scalar));
   }
 
   /**
-   * Divides the magnitude of the offset vector by a scalar.
+   * Divides the magnitude of the vector by a scalar.
    *
    * @param scalar The scalar.
-   * @return The new scaled Vector2d.
+   * @return The new scaled BoundVector2d.
    */
   public BoundVector2d div(double scalar) {
-    return new BoundVector2d(m_startPoint, m_offsetVector.div(scalar));
+    return new BoundVector2d(m_startPoint, m_vector.div(scalar));
   }
 
   /**
@@ -167,17 +166,17 @@ public class BoundVector2d implements StructSerializable {
    * @return The new moved Vector2d.
    */
   public BoundVector2d move(Translation2d offset) {
-    return new BoundVector2d(m_startPoint.plus(offset), m_offsetVector);
+    return new BoundVector2d(m_startPoint.plus(offset), m_vector);
   }
 
   /**
-   * Rotates the offset vector around its start position and returns the new vector.
+   * Rotates the vector around its start position and returns the new vector.
    *
    * @param rotation The rotation to transform the vector by.
    * @return The new rotated vector.
    */
   public BoundVector2d rotateBy(Rotation2d rotation) {
-    return new BoundVector2d(m_startPoint, m_offsetVector.rotateBy(rotation));
+    return new BoundVector2d(m_startPoint, m_vector.rotateBy(rotation));
   }
 
   /**
@@ -192,13 +191,13 @@ public class BoundVector2d implements StructSerializable {
   @Override
   public String toString() {
     return String.format(
-        "BoundVector2d(Start point: %.2s, Offset vector: %.2s)",
-        m_startPoint.toString(), m_offsetVector.toString());
+        "BoundVector2d(Start point: %.2s, Vector: %.2s)",
+        m_startPoint.toString(), m_vector.toString());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_startPoint, m_offsetVector);
+    return Objects.hash(m_startPoint, m_vector);
   }
 
   // TODO: Add Protobuf serialization
