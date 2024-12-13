@@ -36,7 +36,7 @@ public class BoundVector2dStruct implements Struct<BoundVector2d> {
   @Override
   public void pack(ByteBuffer bb, BoundVector2d value) {
     Translation2d.struct.pack(bb, value.getPosition());
-    Translation2d.struct.pack(bb, value.getComponents());
+    Translation2d.struct.pack(bb, value.getOffsetVector());
   }
 
   @Override
