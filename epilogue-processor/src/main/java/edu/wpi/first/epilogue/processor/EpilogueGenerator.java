@@ -188,6 +188,7 @@ public class EpilogueGenerator {
                    */
                 """);
             out.println("  public static void bind(" + robotClassName + " robot) {");
+            out.println("    ManualLogProcessor.enable(robot, config);");
             out.println("    if (config.loggingPeriod == null) {");
             out.println("      config.loggingPeriod = Seconds.of(robot.getPeriod());");
             out.println("    }");

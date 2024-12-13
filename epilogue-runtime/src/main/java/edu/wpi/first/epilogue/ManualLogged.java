@@ -1,4 +1,4 @@
-package edu.wpi.first.epilogue.logging.manual;
+package edu.wpi.first.epilogue;
 
 import edu.wpi.first.epilogue.logging.EpilogueBackend;
 

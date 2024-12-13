@@ -1,9 +1,7 @@
-package edu.wpi.first.epilogue.logging.manual;
+package edu.wpi.first.epilogue;
 
 import static edu.wpi.first.wpilibj.Alert.AlertType.kError;
 
-import edu.wpi.first.epilogue.EpilogueConfiguration;
-import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.epilogue.logging.NullBackend;
 import edu.wpi.first.wpilibj.Alert;
