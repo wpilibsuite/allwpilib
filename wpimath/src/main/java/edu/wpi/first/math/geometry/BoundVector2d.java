@@ -123,12 +123,21 @@ public class BoundVector2d implements StructSerializable {
   }
 
   /**
-   * Returns the angle this vector forms with the positive X axis.
+   * Returns the angle the vector forms with the positive X axis.
    *
-   * @return The angle this vector forms with the positive X axis.
+   * @return The angle the vector forms with the positive X axis.
    */
   public Rotation2d getAngle() {
     return m_components.getAngle();
+  }
+
+  /**
+   * Gets the end point of the bounded vector.
+   *
+   * @return The end point of the bounded vector.
+   */
+  public Translation2d getEndPoint() {
+    return m_position.plus(m_components);
   }
 
   /**
