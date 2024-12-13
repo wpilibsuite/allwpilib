@@ -35,7 +35,7 @@ application {
     mainClass = 'frc.robot.Main'
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.gradleup.shadow'
 
 repositories {
     maven {
