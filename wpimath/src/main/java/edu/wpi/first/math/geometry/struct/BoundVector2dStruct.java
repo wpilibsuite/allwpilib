@@ -23,14 +23,14 @@ public class BoundVector2dStruct implements Struct<BoundVector2d> {
 
   @Override
   public String getSchema() {
-    return "Translation2d startPosition;Translation2d vector";
+    return "Translation2d startPoint;Translation2d vector";
   }
 
   @Override
   public BoundVector2d unpack(ByteBuffer bb) {
-    var startPosition = Translation2d.struct.unpack(bb);
+    var startPoint = Translation2d.struct.unpack(bb);
     var vector = Translation2d.struct.unpack(bb);
-    return new BoundVector2d(startPosition, vector);
+    return new BoundVector2d(startPoint, vector);
   }
 
   @Override
