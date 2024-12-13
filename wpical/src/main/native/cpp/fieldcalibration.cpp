@@ -474,7 +474,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
         path, poses, constraints, show_debug_window);
 
     if (!success) {
-      std::cout << "Unable to process video" << std::endl;
+      std::cout << "Unable to process video " << path << std::endl;
       return 1;
     }
   }
