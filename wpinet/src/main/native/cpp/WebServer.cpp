@@ -4,6 +4,10 @@
 
 #include "wpinet/WebServer.h"
 
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
 #include <memory>
 #include <string>
 #include <utility>
