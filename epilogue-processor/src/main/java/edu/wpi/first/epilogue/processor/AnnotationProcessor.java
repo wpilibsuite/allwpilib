@@ -143,12 +143,19 @@ public class AnnotationProcessor extends AbstractProcessor {
             annotatedElements.stream()
                 .filter(e -> e instanceof TypeElement)
                 .map(e -> (TypeElement) e),
-            // 2. All type elements containing a field or method with the @Logged annotation
+            // 2. All type elements containing a field or method with the @Logged annotation,
+            // or interfaces which have an implementing class with an @Logged annotation
             annotatedElements.stream()
                 .filter(e -> e instanceof VariableElement || e instanceof ExecutableElement)
                 .map(Element::getEnclosingElement)
                 .filter(e -> e instanceof TypeElement)
                 .map(e -> (TypeElement) e))
+        .flatMap(
+            e ->
+                Stream.concat(
+                    Stream.of(e),
+                    e.getInterfaces().stream()
+                        .map(i -> (TypeElement) ((DeclaredType) i).asElement())))
         .sorted(Comparator.comparing(e -> e.getSimpleName().toString()))
         .collect(
             Collectors.toCollection(LinkedHashSet::new)); // Collect to a set to avoid duplicates

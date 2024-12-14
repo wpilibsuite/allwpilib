@@ -22,13 +22,15 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.util.struct.Struct;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 /**
  * A backend implementation that sends data over network tables. Be careful when using this, since
  * sending too much data may cause bandwidth or CPU starvation.
  */
-public class NTEpilogueBackend implements EpilogueBackend {
+public class NTBackend implements EpilogueBackend {
   private final NetworkTableInstance m_nt;
+  private BooleanSupplier m_enabledSupplier;
 
   private final Map<String, Publisher> m_publishers = new HashMap<>();
   private final Map<String, NestedBackend> m_nestedBackends = new HashMap<>();
@@ -38,8 +40,23 @@ public class NTEpilogueBackend implements EpilogueBackend {
    *
    * @param nt the NetworkTable instance to use to send data to
    */
-  public NTEpilogueBackend(NetworkTableInstance nt) {
+  public NTBackend(NetworkTableInstance nt) {
     this.m_nt = nt;
+  }
+
+  /** Creates a logging backend that sends information to NetworkTables. */
+  public NTBackend() {
+    this.m_nt = NetworkTableInstance.getDefault();
+  }
+
+  /**
+   * Creates a logging backend that sends information to NetworkTables.
+   *
+   * @param enabledSupplier whether to enable networktables logging
+   */
+  public NTBackend(BooleanSupplier enabledSupplier) {
+    this.m_nt = NetworkTableInstance.getDefault();
+    this.m_enabledSupplier = enabledSupplier;
   }
 
   @Override
@@ -49,6 +66,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, int value) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     ((IntegerPublisher)
             m_publishers.computeIfAbsent(identifier, k -> m_nt.getIntegerTopic(k).publish()))
         .set(value);
@@ -56,6 +76,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, long value) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     ((IntegerPublisher)
             m_publishers.computeIfAbsent(identifier, k -> m_nt.getIntegerTopic(k).publish()))
         .set(value);
@@ -63,6 +86,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, float value) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     ((FloatPublisher)
             m_publishers.computeIfAbsent(identifier, k -> m_nt.getFloatTopic(k).publish()))
         .set(value);
@@ -70,6 +96,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, double value) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     ((DoublePublisher)
             m_publishers.computeIfAbsent(identifier, k -> m_nt.getDoubleTopic(k).publish()))
         .set(value);
@@ -77,6 +106,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, boolean value) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     ((BooleanPublisher)
             m_publishers.computeIfAbsent(identifier, k -> m_nt.getBooleanTopic(k).publish()))
         .set(value);
@@ -84,6 +116,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, byte[] value) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     ((RawPublisher)
             m_publishers.computeIfAbsent(identifier, k -> m_nt.getRawTopic(k).publish("raw")))
         .set(value);
@@ -92,6 +127,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
   @Override
   @SuppressWarnings("PMD.UnnecessaryCastRule")
   public void log(String identifier, int[] value) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     // NT backend only supports int64[], so we have to manually widen to 64 bits before sending
     long[] widened = new long[value.length];
 
@@ -106,6 +144,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, long[] value) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     ((IntegerArrayPublisher)
             m_publishers.computeIfAbsent(identifier, k -> m_nt.getIntegerArrayTopic(k).publish()))
         .set(value);
@@ -113,6 +154,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, float[] value) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     ((FloatArrayPublisher)
             m_publishers.computeIfAbsent(identifier, k -> m_nt.getFloatArrayTopic(k).publish()))
         .set(value);
@@ -120,6 +164,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, double[] value) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     ((DoubleArrayPublisher)
             m_publishers.computeIfAbsent(identifier, k -> m_nt.getDoubleArrayTopic(k).publish()))
         .set(value);
@@ -127,6 +174,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, boolean[] value) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     ((BooleanArrayPublisher)
             m_publishers.computeIfAbsent(identifier, k -> m_nt.getBooleanArrayTopic(k).publish()))
         .set(value);
@@ -134,6 +184,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, String value) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     ((StringPublisher)
             m_publishers.computeIfAbsent(identifier, k -> m_nt.getStringTopic(k).publish()))
         .set(value);
@@ -141,6 +194,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, String[] value) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     ((StringArrayPublisher)
             m_publishers.computeIfAbsent(identifier, k -> m_nt.getStringArrayTopic(k).publish()))
         .set(value);
@@ -149,6 +205,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
   @Override
   @SuppressWarnings("unchecked")
   public <S> void log(String identifier, S value, Struct<S> struct) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     m_nt.addSchema(struct);
     ((StructPublisher<S>)
             m_publishers.computeIfAbsent(identifier, k -> m_nt.getStructTopic(k, struct).publish()))
@@ -158,6 +217,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
   @Override
   @SuppressWarnings("unchecked")
   public <S> void log(String identifier, S[] value, Struct<S> struct) {
+    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+      return;
+    }
     m_nt.addSchema(struct);
     ((StructArrayPublisher<S>)
             m_publishers.computeIfAbsent(
