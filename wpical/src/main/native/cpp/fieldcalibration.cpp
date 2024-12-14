@@ -309,7 +309,8 @@ bool fieldcalibration::process_video_file(
   int frame_num = 0;
 
   while (video_input.read(frame)) {
-    std::cout << "Processing " << path << " - Frame " << frame_num << std::endl;
+    std::cout << "Processing " << path << " - Frame " << frame_num++
+              << std::endl;
 
     // Convert color frame to grayscale frame
     cv::cvtColor(frame, frame_gray, cv::COLOR_BGR2GRAY);

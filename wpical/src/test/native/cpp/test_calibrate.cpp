@@ -12,7 +12,7 @@
 
 const std::string projectRootPath = PROJECT_ROOT_PATH;
 #ifdef __linux__
-const std::string fileSuffix = ".mjpg";
+const std::string fileSuffix = ".avi";
 const std::string videoLocation = "/altfieldvideo";
 #else
 const std::string fileSuffix = ".mp4";
