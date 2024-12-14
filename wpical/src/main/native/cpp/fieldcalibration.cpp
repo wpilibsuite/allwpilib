@@ -362,8 +362,10 @@ bool fieldcalibration::process_video_file(
           tag_detection_i, camera_matrix, camera_distortion, tag_size);
 
       // Draw debug cube
-      draw_tag_cube(frame_debug, caamera_to_tag, camera_matrix,
-                    camera_distortion, tag_size);
+      if (show_debug_window) {
+        draw_tag_cube(frame_debug, caamera_to_tag, camera_matrix,
+                      camera_distortion, tag_size);
+      }
 
       // Skip finding transformation from smallest tag ID to itself
       if (tag_detection_i->id == tag_detection_min->id) {

@@ -24,6 +24,12 @@ namespace gui = wpi::gui;
 
 const char* GetWPILibVersion();
 
+#ifdef __linux__
+const bool showDebug = false;
+#else
+const bool showDebug = true;
+#endif
+
 namespace wpical {
 std::string_view GetResource_wpical_16_png();
 std::string_view GetResource_wpical_32_png();
@@ -202,7 +208,7 @@ static void DisplayGui() {
       int calibrationOutput = fieldcalibration::calibrate(
           selected_field_calibration_directory.c_str(), calibration_json_path,
           selected_camera_intrinsics, selected_field_map.c_str(), pinnedTag,
-          true);
+          showDebug);
 
       if (calibrationOutput == 1) {
         ImGui::OpenPopup("Field Calibration Error");
@@ -328,7 +334,7 @@ static void DisplayGui() {
         std::cout << "calibration button pressed" << std::endl;
         int ret = cameracalibration::calibrate(
             selected_camera_intrinsics.c_str(), squareWidth, markerWidth,
-            boardWidth, boardHeight, imagerWidth, imagerHeight, true);
+            boardWidth, boardHeight, imagerWidth, imagerHeight, showDebug);
         if (ret == 0) {
           size_t lastSeparatorPos =
               selected_camera_intrinsics.find_last_of("/\\");
@@ -381,7 +387,7 @@ static void DisplayGui() {
         std::cout << "calibration button pressed" << std::endl;
         int ret = cameracalibration::calibrate(
             selected_camera_intrinsics.c_str(), squareWidth, markerWidth,
-            boardWidth, boardHeight, true);
+            boardWidth, boardHeight, showDebug);
         if (ret == 0) {
           size_t lastSeparatorPos =
               selected_camera_intrinsics.find_last_of("/\\");
