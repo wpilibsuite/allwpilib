@@ -12,6 +12,7 @@
 
 #include <fmt/format.h>
 #include <wpi/DenseMap.h>
+#include <wpi/MemoryBuffer.h>
 #include <wpi/Signal.h>
 #include <wpi/StringMap.h>
 #include <wpi/fs.h>
@@ -46,7 +47,11 @@ class MyHttpConnection : public wpi::HttpServerConnection,
 
   std::string m_path;
 };
+}  // namespace
 
+#if 1 //def _WIN32
+#else
+namespace {
 class SendfileReq : public uv::RequestImpl<SendfileReq, uv_fs_t> {
  public:
   SendfileReq(uv_file out, uv_file in, int64_t inOffset, size_t len)
@@ -109,6 +114,7 @@ static void Sendfile(uv::Loop& loop, uv_file out, uv_file in, int64_t inOffset,
     req->Keep();
   }
 }
+#endif
 
 static std::string_view GetMimeType(std::string_view ext) {
   static const wpi::StringMap<std::string> map{
@@ -145,6 +151,26 @@ void MyHttpConnection::SendFileResponse(int code, std::string_view codeText,
                                         std::string_view contentType,
                                         fs::path filename,
                                         std::string_view extraHeader) {
+#if 1  // def _WIN32
+  auto membuf = wpi::MemoryBuffer::GetFile(filename.string());
+  if (!membuf) {
+    SendError(404);
+    return;
+  }
+
+  wpi::SmallVector<uv::Buffer, 4> toSend;
+  wpi::raw_uv_ostream os{toSend, 4096};
+  BuildHeader(os, code, codeText, contentType, (*membuf)->size(), extraHeader);
+  SendData(os.bufs(), false);
+  m_stream.Write(
+      {{(*membuf)->GetBuffer()}},
+      [closeAfter = !m_keepAlive, stream = &m_stream,
+       membuf = std::shared_ptr{std::move(*membuf)}](auto, uv::Error) {
+        if (closeAfter) {
+          stream->Close();
+        }
+      });
+#else
   // open file
   std::error_code ec;
   auto infile = fs::OpenFileForRead(filename, ec);
@@ -193,6 +219,7 @@ void MyHttpConnection::SendFileResponse(int code, std::string_view codeText,
                stream->SetBlocking(false);
              }
            });
+#endif
 }
 
 void MyHttpConnection::ProcessRequest() {
