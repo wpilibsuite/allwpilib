@@ -219,6 +219,56 @@ public abstract class Command implements Sendable {
   }
 
   /**
+   * Decorates this command to run once a condition becomes true.
+   *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
+   * @param condition the condition to wait for
+   * @return the decorated command
+   */
+  public SequentialCommandGroup after(BooleanSupplier condition) {
+    // if we want this to bypass the `WaitUntilCommand` if the condition is already true,
+    // we can use a conditional command but it proposes some compositional issues
+    return beforeStarting(new WaitUntilCommand(condition));
+  }
+
+  /**
+   * Decorates this command to run after a time delay.
+   *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
+   * @param seconds the seconds to wait
+   * @return the decorated command
+   */
+  public SequentialCommandGroup afterSeconds(double seconds) {
+    return beforeStarting(new WaitCommand(seconds));
+  }
+
+  /**
+   * Decorates this command to run after a time delay.
+   *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
+   * @param time the time to wait
+   * @return the decorated command
+   */
+  public SequentialCommandGroup afterTime(Time time) {
+    return afterSeconds(time.in(Seconds));
+  }
+
+  /**
    * Decorates this command with a runnable to run before this command starts.
    *
    * <p>Note: This decorator works by adding this command to a composition. The command the
