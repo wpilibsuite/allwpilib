@@ -30,7 +30,9 @@ class WebServer {
 
   /**
    * Create a web server at the given port.
-   * Note that local ports less than 1024 won't work as a normal user.
+   * Note that local ports less than 1024 won't work as a normal user. Also,
+   * many ports are blocked by the FRC robot radio; check the game manual for
+   * what is allowed through the radio firewall.
    *
    * @param port local port number
    * @param path local path to document root
