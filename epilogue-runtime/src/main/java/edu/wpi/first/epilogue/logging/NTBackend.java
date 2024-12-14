@@ -30,7 +30,7 @@ import java.util.function.BooleanSupplier;
  */
 public class NTBackend implements EpilogueBackend {
   private final NetworkTableInstance m_nt;
-  private BooleanSupplier m_enabledSupplier;
+  private BooleanSupplier m_disabledSupplier;
 
   private final Map<String, Publisher> m_publishers = new HashMap<>();
   private final Map<String, NestedBackend> m_nestedBackends = new HashMap<>();
@@ -49,14 +49,16 @@ public class NTBackend implements EpilogueBackend {
     this.m_nt = NetworkTableInstance.getDefault();
   }
 
-  /**
-   * Creates a logging backend that sends information to NetworkTables.
-   *
-   * @param enabledSupplier whether to enable networktables logging
-   */
-  public NTBackend(BooleanSupplier enabledSupplier) {
-    this.m_nt = NetworkTableInstance.getDefault();
-    this.m_enabledSupplier = enabledSupplier;
+  /** Creates a new NTBackend that is disabled whenever the disabledSupplier returns true. */
+  public NTBackend disableWhen(BooleanSupplier disabledSupplier) {
+    var newBackend = new NTBackend(this.m_nt);
+    if (m_disabledSupplier == null) {
+      newBackend.m_disabledSupplier = disabledSupplier;
+    } else {
+      newBackend.m_disabledSupplier =
+          () -> m_disabledSupplier.getAsBoolean() || disabledSupplier.getAsBoolean();
+    }
+    return newBackend;
   }
 
   @Override
@@ -66,7 +68,7 @@ public class NTBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, int value) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     ((IntegerPublisher)
@@ -76,7 +78,7 @@ public class NTBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, long value) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     ((IntegerPublisher)
@@ -86,7 +88,7 @@ public class NTBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, float value) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     ((FloatPublisher)
@@ -96,7 +98,7 @@ public class NTBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, double value) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     ((DoublePublisher)
@@ -106,7 +108,7 @@ public class NTBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, boolean value) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     ((BooleanPublisher)
@@ -116,7 +118,7 @@ public class NTBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, byte[] value) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     ((RawPublisher)
@@ -127,7 +129,7 @@ public class NTBackend implements EpilogueBackend {
   @Override
   @SuppressWarnings("PMD.UnnecessaryCastRule")
   public void log(String identifier, int[] value) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     // NT backend only supports int64[], so we have to manually widen to 64 bits before sending
@@ -144,7 +146,7 @@ public class NTBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, long[] value) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     ((IntegerArrayPublisher)
@@ -154,7 +156,7 @@ public class NTBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, float[] value) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     ((FloatArrayPublisher)
@@ -164,7 +166,7 @@ public class NTBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, double[] value) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     ((DoubleArrayPublisher)
@@ -174,7 +176,7 @@ public class NTBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, boolean[] value) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     ((BooleanArrayPublisher)
@@ -184,7 +186,7 @@ public class NTBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, String value) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     ((StringPublisher)
@@ -194,7 +196,7 @@ public class NTBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, String[] value) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     ((StringArrayPublisher)
@@ -205,7 +207,7 @@ public class NTBackend implements EpilogueBackend {
   @Override
   @SuppressWarnings("unchecked")
   public <S> void log(String identifier, S value, Struct<S> struct) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     m_nt.addSchema(struct);
@@ -217,7 +219,7 @@ public class NTBackend implements EpilogueBackend {
   @Override
   @SuppressWarnings("unchecked")
   public <S> void log(String identifier, S[] value, Struct<S> struct) {
-    if (m_enabledSupplier != null && !m_enabledSupplier.getAsBoolean()) {
+    if (m_disabledSupplier != null && m_disabledSupplier.getAsBoolean()) {
       return;
     }
     m_nt.addSchema(struct);
