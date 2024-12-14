@@ -39,6 +39,11 @@ std::string_view UnescapeURI(std::string_view str, SmallVectorImpl<char>& buf,
 std::string_view EscapeURI(std::string_view str, SmallVectorImpl<char>& buf,
                            bool spacePlus = true);
 
+// Escape a string for HTML output.
+// @param buf Buffer for output
+// @return Escaped string
+std::string_view EscapeHTML(std::string_view str, SmallVectorImpl<char>& buf);
+
 // Parse a set of HTTP headers.  Saves just the Content-Type and Content-Length
 // fields.
 // @param is Input stream
