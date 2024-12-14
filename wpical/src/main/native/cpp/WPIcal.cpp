@@ -95,11 +95,10 @@ static void DisplayGui() {
   static double markerWidth = 0.551;
   static int boardWidth = 12;
   static int boardHeight = 8;
-  static double imagerWidth = 0;
-  static double imagerHeight = 0;
+  static double imagerWidth = 1080;
+  static double imagerHeight = 1920;
 
   static int pinnedTag = 1;
-  static int fps = 15;
 
   static int focusedTag = 1;
   static int referenceTag = 1;
@@ -183,10 +182,6 @@ static void DisplayGui() {
     pinnedTag = 16;
   }
 
-  // calibration fps text field
-  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-  ImGui::InputInt("Calibration FPS", &fps);
-
   // calibrate button
   if (ImGui::Button("Calibrate!!!")) {
     if (!selected_field_calibration_directory.empty() &&
@@ -206,8 +201,7 @@ static void DisplayGui() {
 
       int calibrationOutput = fieldcalibration::calibrate(
           selected_field_calibration_directory.c_str(), calibration_json_path,
-          selected_camera_intrinsics, selected_field_map.c_str(), pinnedTag,
-          fps, true);
+          selected_camera_intrinsics, selected_field_map.c_str(), pinnedTag, true);
 
       if (calibrationOutput == 1) {
         ImGui::OpenPopup("Field Calibration Error");
@@ -233,8 +227,6 @@ static void DisplayGui() {
         "field map, and field calibration directory");
   } else if (!(pinnedTag > 0 && pinnedTag <= 16)) {
     ImGui::TextWrapped("Make sure the pinned tag is a valid april tag (1-16)");
-  } else if (fps < 0) {
-    ImGui::TextWrapped("Make sure FPS is at least 1");
   } else {
     ImGui::TextWrapped("Calibration Ready");
   }
@@ -254,8 +246,6 @@ static void DisplayGui() {
         "- Your field calibration video directory contains only field "
         "calibration videos and no other files");
     ImGui::TextWrapped("- Your pinned tag is a valid FRC Apriltag");
-    ImGui::TextWrapped(
-        "- Your detection FPS is smaller than the field video FPS.");
     ImGui::Separator();
     if (ImGui::Button("OK", ImVec2(120, 0))) {
       ImGui::CloseCurrentPopup();
@@ -306,7 +296,7 @@ static void DisplayGui() {
       if (ImGui::Button("Select Camera Calibration Video")) {
         camera_intrinsics_selector = std::make_unique<pfd::open_file>(
             "Select Camera Calibration Video", "",
-            std::vector<std::string>{"Video Files", "*.mp4 *.mov *.m4v *.mkv"},
+            std::vector<std::string>{"Video Files", "*.mp4 *.mov *.m4v *.mkv *.mjpg"},
             pfd::opt::none);
       }
 
@@ -321,6 +311,8 @@ static void DisplayGui() {
       ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
       ImGui::InputDouble("Square Width (in)", &squareWidth);
       ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+      ImGui::InputDouble("Marker Width (in)", &markerWidth);
+      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
       ImGui::InputInt("Board Width (squares)", &boardWidth);
       ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
       ImGui::InputInt("Board Height (squares)", &boardHeight);
@@ -333,8 +325,8 @@ static void DisplayGui() {
       if (ImGui::Button("Calibrate") && !selected_camera_intrinsics.empty()) {
         std::cout << "calibration button pressed" << std::endl;
         int ret = cameracalibration::calibrate(
-            selected_camera_intrinsics.c_str(), squareWidth, boardWidth,
-            boardHeight, imagerWidth, imagerHeight, true);
+            selected_camera_intrinsics.c_str(), squareWidth, markerWidth,
+            boardWidth, boardHeight, imagerWidth, imagerHeight, true);
         if (ret == 0) {
           size_t lastSeparatorPos =
               selected_camera_intrinsics.find_last_of("/\\");
@@ -360,7 +352,7 @@ static void DisplayGui() {
       if (ImGui::Button("Select Camera Calibration Video")) {
         camera_intrinsics_selector = std::make_unique<pfd::open_file>(
             "Select Camera Calibration Video", "",
-            std::vector<std::string>{"Video Files", "*.mp4 *.mov *.m4v *.mkv"},
+            std::vector<std::string>{"Video Files", "*.mp4 *.mov *.m4v *.mkv *.mjpg"},
             pfd::opt::none);
       }
 
@@ -414,6 +406,7 @@ static void DisplayGui() {
     if (ImGui::Button("Close")) {
       ImGui::CloseCurrentPopup();
     }
+
     ImGui::EndPopup();
   }
 

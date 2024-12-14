@@ -54,7 +54,7 @@ void draw_tag_cube(cv::Mat& frame, Eigen::Matrix<double, 4, 4> camera_to_tag,
                    const Eigen::Matrix<double, 8, 1>& camera_distortion,
                    double tag_size);
 bool process_video_file(
-    apriltag_detector_t* tag_detector, int detection_fps,
+    apriltag_detector_t* tag_detector,
     const Eigen::Matrix<double, 3, 3>& camera_matrix,
     const Eigen::Matrix<double, 8, 1>& camera_distortion, double tag_size,
     const std::string& path,
@@ -64,5 +64,5 @@ bool process_video_file(
     bool show_debug_window);
 int calibrate(std::string input_dir_path, std::string output_file_path,
               std::string camera_model_path, std::string ideal_map_path,
-              int pinned_tag_id, int detection_fps, bool show_debug_window);
+              int pinned_tag_id, bool show_debug_window);
 }  // namespace fieldcalibration

@@ -284,7 +284,7 @@ void fieldcalibration::draw_tag_cube(
 }
 
 bool fieldcalibration::process_video_file(
-    apriltag_detector_t* tag_detector, int detection_fps,
+    apriltag_detector_t* tag_detector,
     const Eigen::Matrix<double, 3, 3>& camera_matrix,
     const Eigen::Matrix<double, 8, 1>& camera_distortion, double tag_size,
     const std::string& path,
@@ -302,16 +302,6 @@ bool fieldcalibration::process_video_file(
     return false;
   }
 
-  int video_fps = video_input.get(cv::CAP_PROP_FPS);
-
-  if (video_fps <= detection_fps) {
-    video_input.release();
-    if (show_debug_window) {
-      cv::destroyAllWindows();
-    }
-    return false;
-  }
-
   cv::Mat frame;
   cv::Mat frame_gray;
   cv::Mat frame_debug;
@@ -319,10 +309,6 @@ bool fieldcalibration::process_video_file(
   int frame_num = 0;
 
   while (video_input.read(frame)) {
-    if (frame_num++ % (video_fps / detection_fps) != 0) {
-      continue;
-    }
-
     std::cout << "Processing " << path << " - Frame " << frame_num << std::endl;
 
     // Convert color frame to grayscale frame
@@ -417,8 +403,7 @@ bool fieldcalibration::process_video_file(
 int fieldcalibration::calibrate(std::string input_dir_path,
                                 std::string output_file_path,
                                 std::string camera_model_path,
-                                std::string ideal_map_path, int pinned_tag_id,
-                                int detection_fps, bool show_debug_window) {
+                                std::string ideal_map_path, int pinned_tag_id, bool show_debug_window) {
   // Silence OpenCV logging
   cv::utils::logging::setLogLevel(
       cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
@@ -470,7 +455,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
     const std::string path = entry.path().string();
 
     bool success = process_video_file(
-        tag_detector, detection_fps, camera_matrix, camera_distortion, 0.1651,
+        tag_detector, camera_matrix, camera_distortion, 0.1651,
         path, poses, constraints, show_debug_window);
 
     if (!success) {
