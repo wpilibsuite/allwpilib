@@ -298,7 +298,7 @@ static void DisplayGui() {
         camera_intrinsics_selector = std::make_unique<pfd::open_file>(
             "Select Camera Calibration Video", "",
             std::vector<std::string>{"Video Files",
-                                     "*.mp4 *.mov *.m4v *.mkv *.mjpg"},
+                                     "*.mp4 *.mov *.m4v *.mkv *.avi"},
             pfd::opt::none);
       }
 
@@ -355,7 +355,7 @@ static void DisplayGui() {
         camera_intrinsics_selector = std::make_unique<pfd::open_file>(
             "Select Camera Calibration Video", "",
             std::vector<std::string>{"Video Files",
-                                     "*.mp4 *.mov *.m4v *.mkv *.mjpg"},
+                                     "*.mp4 *.mov *.m4v *.mkv *.avi"},
             pfd::opt::none);
       }
 
