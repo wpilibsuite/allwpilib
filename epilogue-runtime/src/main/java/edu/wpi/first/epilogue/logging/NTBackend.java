@@ -49,7 +49,11 @@ public class NTBackend implements EpilogueBackend {
     this.m_nt = NetworkTableInstance.getDefault();
   }
 
-  /** Creates a new NTBackend that is disabled whenever the disabledSupplier returns true. */
+  /**
+   * Creates a new NTBackend that is disabled whenever the disabledSupplier returns true.
+   *
+   * @param disabledSupplier the disable condition for NT logging
+   */
   public NTBackend disableWhen(BooleanSupplier disabledSupplier) {
     var newBackend = new NTBackend(this.m_nt);
     if (m_disabledSupplier == null) {
