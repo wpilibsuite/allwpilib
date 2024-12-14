@@ -4,8 +4,6 @@
 
 #include "wpinet/WebServer.h"
 
-#include <unistd.h>
-
 #include <memory>
 #include <string>
 #include <utility>
@@ -49,8 +47,7 @@ class MyHttpConnection : public wpi::HttpServerConnection,
 };
 }  // namespace
 
-#if 1 //def _WIN32
-#else
+#ifndef _WIN32
 namespace {
 class SendfileReq : public uv::RequestImpl<SendfileReq, uv_fs_t> {
  public:
@@ -151,7 +148,7 @@ void MyHttpConnection::SendFileResponse(int code, std::string_view codeText,
                                         std::string_view contentType,
                                         fs::path filename,
                                         std::string_view extraHeader) {
-#if 1  // def _WIN32
+#ifdef _WIN32
   auto membuf = wpi::MemoryBuffer::GetFile(filename.string());
   if (!membuf) {
     SendError(404);
