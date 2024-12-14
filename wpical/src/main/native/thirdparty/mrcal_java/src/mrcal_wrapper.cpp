@@ -28,6 +28,18 @@
 
 using namespace cv;
 
+class CholmodCtx {
+public:
+  cholmod_common Common, *cc;
+  CholmodCtx() {
+    cc = &Common;
+    cholmod_l_start(cc);
+  }
+
+  ~CholmodCtx() { cholmod_l_finish(cc); }
+};
+static CholmodCtx cctx;
+
 #define BARF(...) std::fprintf(stderr, __VA_ARGS__)
 
 // forward declarations for functions borrowed from mrcal-pywrap
