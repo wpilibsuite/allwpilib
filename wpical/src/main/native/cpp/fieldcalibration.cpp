@@ -403,7 +403,8 @@ bool fieldcalibration::process_video_file(
 int fieldcalibration::calibrate(std::string input_dir_path,
                                 std::string output_file_path,
                                 std::string camera_model_path,
-                                std::string ideal_map_path, int pinned_tag_id, bool show_debug_window) {
+                                std::string ideal_map_path, int pinned_tag_id,
+                                bool show_debug_window) {
   // Silence OpenCV logging
   cv::utils::logging::setLogLevel(
       cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
@@ -454,9 +455,9 @@ int fieldcalibration::calibrate(std::string input_dir_path,
 
     const std::string path = entry.path().string();
 
-    bool success = process_video_file(
-        tag_detector, camera_matrix, camera_distortion, 0.1651,
-        path, poses, constraints, show_debug_window);
+    bool success =
+        process_video_file(tag_detector, camera_matrix, camera_distortion,
+                           0.1651, path, poses, constraints, show_debug_window);
 
     if (!success) {
       std::cout << "Unable to process video " << path << std::endl;

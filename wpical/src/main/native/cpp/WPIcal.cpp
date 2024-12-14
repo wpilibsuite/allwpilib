@@ -201,7 +201,8 @@ static void DisplayGui() {
 
       int calibrationOutput = fieldcalibration::calibrate(
           selected_field_calibration_directory.c_str(), calibration_json_path,
-          selected_camera_intrinsics, selected_field_map.c_str(), pinnedTag, true);
+          selected_camera_intrinsics, selected_field_map.c_str(), pinnedTag,
+          true);
 
       if (calibrationOutput == 1) {
         ImGui::OpenPopup("Field Calibration Error");
@@ -296,7 +297,8 @@ static void DisplayGui() {
       if (ImGui::Button("Select Camera Calibration Video")) {
         camera_intrinsics_selector = std::make_unique<pfd::open_file>(
             "Select Camera Calibration Video", "",
-            std::vector<std::string>{"Video Files", "*.mp4 *.mov *.m4v *.mkv *.mjpg"},
+            std::vector<std::string>{"Video Files",
+                                     "*.mp4 *.mov *.m4v *.mkv *.mjpg"},
             pfd::opt::none);
       }
 
@@ -352,7 +354,8 @@ static void DisplayGui() {
       if (ImGui::Button("Select Camera Calibration Video")) {
         camera_intrinsics_selector = std::make_unique<pfd::open_file>(
             "Select Camera Calibration Video", "",
-            std::vector<std::string>{"Video Files", "*.mp4 *.mov *.m4v *.mkv *.mjpg"},
+            std::vector<std::string>{"Video Files",
+                                     "*.mp4 *.mov *.m4v *.mkv *.mjpg"},
             pfd::opt::none);
       }
 
