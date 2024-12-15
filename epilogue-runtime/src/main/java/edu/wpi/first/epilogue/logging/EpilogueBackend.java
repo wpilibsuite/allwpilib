@@ -198,9 +198,10 @@ public interface EpilogueBackend {
    *
    * @param identifier the identifier of the data field
    * @param value the new value of the data field
+   * @param <U> the dimension of the unit
    */
-  default void log(String identifier, Measure<?> value) {
-    log(identifier + " (" + value.baseUnit().symbol() + ")", value.baseUnitMagnitude());
+  default <U extends Unit> void log(String identifier, Measure<U> value) {
+    log(identifier, value, value.baseUnit());
   }
 
   /**
