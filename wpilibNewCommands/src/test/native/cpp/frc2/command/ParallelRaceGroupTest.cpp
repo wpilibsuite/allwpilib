@@ -100,15 +100,15 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceCopy) {
 
   bool finished = false;
 
-  WaitUntilCommand command([&finished] { return finished; });
+  auto command = cmd::WaitUntil([&finished] { return finished; });
 
-  ParallelRaceGroup group(command);
-  scheduler.Schedule(&group);
+  auto group = cmd::Race(std::move(command));
+  scheduler.Schedule(group);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&group));
+  EXPECT_TRUE(scheduler.IsScheduled(group));
   finished = true;
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  EXPECT_FALSE(scheduler.IsScheduled(group));
 }
 
 TEST_F(ParallelRaceGroupTest, RaceGroupRequirement) {
