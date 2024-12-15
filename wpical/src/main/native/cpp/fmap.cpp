@@ -6,7 +6,7 @@
 
 #include <string>
 
-std::string fmap::singleTag(int tag, tag::pose tagpose, bool endTag) {
+wpi::json fmap::singleTag(int tag, const tag::pose& tagpose) {
   std::string transform = "";
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
@@ -22,13 +22,10 @@ std::string fmap::singleTag(int tag, tag::pose tagpose, bool endTag) {
       "{\"family\":\"apriltag3_36h11_classic\",\"id\":" + std::to_string(tag) +
       ",\"size\":165.1,\"transform\":[" + transform + "],\"unique\":true}";
 
-  if (!endTag) {
-    fmapTag += ",";
-  }
-  return fmapTag;
+  return wpi::json::parse(fmapTag);
 }
 
-std::string fmap::convertfmap(wpi::json json) {
+wpi::json fmap::convertfmap(const wpi::json& json) {
   std::string fmapstart = "{\"fiducials\":[";
 
   std::string fmapend = "],\"type\":\"frc\"}";
@@ -36,9 +33,11 @@ std::string fmap::convertfmap(wpi::json json) {
   fieldmap fieldmap(json);
 
   for (int i = 0; i < fieldmap.getNumTags(); i++) {
-    fmapstart += singleTag(i + 1, fieldmap.getTag(i + 1),
-                           i == fieldmap.getNumTags() - 1 ? true : false);
+    fmapstart += singleTag(i + 1, fieldmap.getTag(i + 1)).dump();
+    if (i != fieldmap.getNumTags() - 1) {
+      fmapstart += ",";
+    }
   }
 
-  return fmapstart.append(fmapend);
+  return wpi::json::parse(fmapstart.append(fmapend));
 }
