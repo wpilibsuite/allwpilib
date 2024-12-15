@@ -428,6 +428,35 @@ Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameData
 
 /*
  * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    setRawFrameDataArray
+ * Signature: (J[BIIIII)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameDataArray
+  (JNIEnv* env, jclass, jlong frame, jbyteArray data, jint size, jint width,
+   jint height, jint stride, jint pixelFormat)
+{
+  auto* f = reinterpret_cast<wpi::RawFrame*>(frame);
+  if (!f) {
+    wpi::ThrowNullPointerException(env, "frame is null");
+    return;
+  }
+  auto buf = reinterpret_cast<jbyte*>(env->GetByteArrayElements(data, NULL));
+  if (!buf) {
+    wpi::ThrowNullPointerException(env, "data is null");
+    return;
+  }
+  // there's no way to free a passed-in direct byte buffer
+  f->SetData(buf, size, env->GetDirectBufferCapacity(data), nullptr,
+             [](void*, void*, size_t) {});
+  f->width = width;
+  f->height = height;
+  f->stride = stride;
+  f->pixelFormat = pixelFormat;
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
  * Method:    setRawFrameInfo
  * Signature: (JIIIII)V
  */
