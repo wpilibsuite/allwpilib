@@ -239,6 +239,14 @@ void MyHttpConnection::ProcessRequest() {
   }
   // fmt::print(stderr, "path: \"{}\"\n", path);
 
+  wpi::SmallString<128> pathBuf;
+  bool error;
+  path = UnescapeURI(path, pathBuf, &error);
+  if (error) {
+    SendError(400);
+    return;
+  }
+
   std::string_view query;
   if (url.HasQuery()) {
     query = url.GetQuery();
