@@ -15,11 +15,13 @@
 #include <fmt/format.h>
 #include <wpi/DenseMap.h>
 #include <wpi/MemoryBuffer.h>
+#include <wpi/SmallString.h>
 #include <wpi/Signal.h>
 #include <wpi/StringMap.h>
 #include <wpi/fs.h>
 #include <wpi/json.h>
 #include <wpi/print.h>
+#include <wpi/raw_ostream.h>
 
 #include "wpinet/EventLoopRunner.h"
 #include "wpinet/HttpServerConnection.h"
@@ -322,8 +324,13 @@ void MyHttpConnection::ProcessRequest() {
         SendResponse(200, "OK", "text/html", html);
       }
     } else {
+      wpi::SmallString<128> extraHeadersBuf;
+      wpi::raw_svector_ostream os{extraHeadersBuf};
+      os << "Content-Disposition: filename=\"";
+      os.write_escaped(fullpath.filename().string());
+      os << "\"\r\n";
       SendFileResponse(200, "OK", GetMimeType(wpi::rsplit(path, '.').second),
-                       fullpath);
+                       fullpath, os.str());
     }
   } else {
     SendError(404, "Resource not found");
