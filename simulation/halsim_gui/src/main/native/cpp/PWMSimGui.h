@@ -4,11 +4,12 @@
 
 #pragma once
 
+namespace glass {
+class PWMsModel;
+}  // namespace glass
+
 namespace halsimgui {
 
-class PWMSimGui {
- public:
-  static void Initialize();
-};
+glass::PWMsModel* CreatePWMsModel();
 
 }  // namespace halsimgui

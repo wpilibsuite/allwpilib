@@ -4,11 +4,12 @@
 
 #pragma once
 
+namespace glass {
+class LEDDisplaysModel;
+}  // namespace glass
+
 namespace halsimgui {
 
-class AddressableLEDGui {
- public:
-  static void Initialize();
-};
+glass::LEDDisplaysModel* CreateAddressableLEDsModel();
 
 }  // namespace halsimgui

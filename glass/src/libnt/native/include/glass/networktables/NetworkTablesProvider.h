@@ -17,31 +17,21 @@
 #include <wpi/StringMap.h>
 
 #include "glass/Model.h"
-#include "glass/Provider.h"
+#include "glass/Storage.h"
 
 namespace glass {
 
 class Window;
 
-namespace detail {
-struct NTProviderFunctions {
-  using Exists =
-      std::function<bool(nt::NetworkTableInstance inst, const char* path)>;
-  using CreateModel = std::function<std::unique_ptr<Model>(
-      nt::NetworkTableInstance inst, const char* path)>;
-  using ViewExists = std::function<bool(Model*, const char* path)>;
-  using CreateView =
-      std::function<std::unique_ptr<View>(Window*, Model*, const char* path)>;
-};
-}  // namespace detail
-
 /**
- * A provider for NetworkTables (SmartDashboard style) models and views.
+ * NetworkTables (SmartDashboard style) windows.
  */
-class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
+class NetworkTablesProvider {
  public:
-  using Provider::CreateModelFunc;
-  using Provider::CreateViewFunc;
+  using CreateModelFunc = std::function<std::unique_ptr<Model>(
+      nt::NetworkTableInstance inst, const char* path)>;
+  using SetupWindowFunc = std::function<void(Window*)>;
+  using DisplayFunc = std::function<void(Model*)>;
 
   explicit NetworkTablesProvider(Storage& storage);
   NetworkTablesProvider(Storage& storage, nt::NetworkTableInstance inst);
@@ -54,28 +44,30 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   nt::NetworkTableInstance GetInstance() const { return m_inst; }
 
   /**
-   * Perform global initialization.  This should be called prior to
-   * wpi::gui::Initialize().
+   * Displays all windows.
    */
-  void GlobalInit() override { Provider::GlobalInit(); }
+  void Display();
 
   /**
    * Displays menu contents as a tree of available NetworkTables views.
    */
-  void DisplayMenu() override;
+  void DisplayMenu();
 
   /**
-   * Registers a NetworkTables model and view.
+   * Registers a NetworkTables model and display.
    *
    * @param typeName SmartDashboard .type value to match
    * @param createModel functor to create model
-   * @param createView functor to create view
+   * @param setupWindow functor to set up window
+   * @param display functor to display window content
    */
   void Register(std::string_view typeName, CreateModelFunc createModel,
-                CreateViewFunc createView);
+                SetupWindowFunc setupWindow, DisplayFunc display);
+
+  void Update();
 
  private:
-  void Update() override;
+  Storage& m_windows;
 
   nt::NetworkTableInstance m_inst;
   nt::NetworkTableListenerPoller m_poller;
@@ -86,10 +78,11 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
 
   struct Builder {
     CreateModelFunc createModel;
-    CreateViewFunc createView;
+    SetupWindowFunc setupWindow;
+    DisplayFunc display;
   };
 
-  // mapping from .type string to model/view creators
+  // mapping from .type string to builders
   wpi::StringMap<Builder> m_typeMap;
 
   struct SubListener {
@@ -100,18 +93,18 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   // mapping from .type topic to subscriber/listener
   wpi::DenseMap<NT_Topic, SubListener> m_topicMap;
 
-  struct Entry : public ModelEntry {
-    Entry(nt::Topic typeTopic, std::string_view name, const Builder& builder)
-        : ModelEntry{name, [](auto, const char*) { return true; },
-                     builder.createModel},
-          typeTopic{typeTopic} {}
-    nt::Topic typeTopic;
+  struct Entry {
+    explicit Entry(Storage& storage) : typeString{storage.GetString("type")} {}
+
+    std::string& typeString;
+    std::unique_ptr<Model> model;
+    std::unique_ptr<Window> window;
   };
-
-  void Show(ViewEntry* entry, Window* window) override;
-
+  // active windows
+#if 0
   ViewEntry* GetOrCreateView(const Builder& builder, nt::Topic typeTopic,
                              std::string_view name);
+#endif
 };
 
 /**

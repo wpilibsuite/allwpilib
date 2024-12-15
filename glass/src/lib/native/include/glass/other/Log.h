@@ -30,13 +30,13 @@ class LogData {
 
 void DisplayLog(LogData* data, bool autoScroll);
 
-class LogView : public View {
+class LogSettings {
  public:
-  explicit LogView(LogData* data) : m_data{data} {}
+  explicit LogSettings(LogData* data) : m_data{data} {}
 
-  void Display() override;
-  void Settings() override;
-  bool HasSettings() override;
+  void DisplayMenu();
+
+  bool IsAutoScroll() const { return m_autoScroll; }
 
  private:
   LogData* m_data;
