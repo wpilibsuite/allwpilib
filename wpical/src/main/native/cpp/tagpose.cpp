@@ -5,6 +5,8 @@
 #include <tagpose.h>
 
 namespace tag {
+const double fieldLength = 16.541;
+const double fieldWidth = 8.211;
 pose::pose(double xpos, double ypos, double zpos, double w, double x, double y,
            double z) {
   xPos = xpos;
@@ -14,8 +16,8 @@ pose::pose(double xpos, double ypos, double zpos, double w, double x, double y,
   rotationMatrix = quaternion.toRotationMatrix();
   transformMatrixFmap.setZero();
   transformMatrixFmap.block<3, 3>(0, 0) = rotationMatrix;
-  transformMatrixFmap(0, 3) = xpos - (16.541 / 2.0);
-  transformMatrixFmap(1, 3) = ypos - (8.211 / 2.0);
+  transformMatrixFmap(0, 3) = xpos - (fieldLength / 2.0);
+  transformMatrixFmap(1, 3) = ypos - (fieldWidth / 2.0);
   transformMatrixFmap(2, 3) = zpos;
   transformMatrixFmap(3, 3) = 1;
   transformMatrixFmap(3, 0) = 0;

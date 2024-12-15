@@ -101,8 +101,8 @@ static void DisplayGui() {
   static double markerWidth = 0.551;
   static int boardWidth = 12;
   static int boardHeight = 8;
-  static double imagerWidth = 1080;
-  static double imagerHeight = 1920;
+  static double imagerWidth = 1920;
+  static double imagerHeight = 1080;
 
   static int pinnedTag = 1;
 
@@ -211,15 +211,19 @@ static void DisplayGui() {
           showDebug);
 
       if (calibrationOutput == 1) {
-        ImGui::OpenPopup("Field Calibration Error");
+        ImGui::OpenPopup("Fmap Conversion failed");
       } else if (calibrationOutput == 0) {
         std::ifstream caljsonpath(calibration_json_path);
-        std::string fmap = fmap::convertfmap(wpi::json::parse(caljsonpath));
-        std::ofstream out(selected_download_directory + "/output.fmap");
-        out << fmap;
-        out.close();
-        ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
-        ImGui::OpenPopup("Visualize Calibration");
+        try {
+          wpi::json fmap = fmap::convertfmap(wpi::json::parse(caljsonpath));
+          std::ofstream out(selected_download_directory + "/output.fmap");
+          out << fmap.dump(4);
+          out.close();
+          ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
+          ImGui::OpenPopup("Visualize Calibration");
+        } catch (...) {
+          ImGui::OpenPopup("Field Calibration Error");
+        }
       }
     }
   }
@@ -253,6 +257,20 @@ static void DisplayGui() {
         "- Your field calibration video directory contains only field "
         "calibration videos and no other files");
     ImGui::TextWrapped("- Your pinned tag is a valid FRC Apriltag");
+    ImGui::Separator();
+    if (ImGui::Button("OK", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+
+  if (ImGui::BeginPopupModal("Fmap Conversion failed", NULL,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::TextWrapped(
+        "Fmap conversion failed - you can still use the calibration output on "
+        "Limelight platforms by converting the .json output to .fmap using the "
+        "Limelight map builder tool");
+    ImGui::TextWrapped("https://tools.limelightvision.io/map-builder");
     ImGui::Separator();
     if (ImGui::Button("OK", ImVec2(120, 0))) {
       ImGui::CloseCurrentPopup();
@@ -496,28 +514,20 @@ static void DisplayGui() {
       ImGui::TextWrapped("Y Difference: %s (m)", std::to_string(yDiff).c_str());
       ImGui::TextWrapped("Z Difference: %s (m)", std::to_string(zDiff).c_str());
 
-      // ImGui::TextWrapped("Yaw %s°",
-      // std::to_string(currentCalibrationMap.minimizeAngle(currentCalibrationMap.getTag(focusedTag).yawRot
-      // * (180.0 / std::numbers::pi)))); ImGui::TextWrapped("Pitch %s°",
-      // std::to_string(currentCalibrationMap.minimizeAngle(currentCalibrationMap.getTag(focusedTag).pitchRot
-      // * (180.0 / std::numbers::pi)))); ImGui::TextWrapped("Roll %s°",
-      // std::to_string(currentCalibrationMap.minimizeAngle(currentCalibrationMap.getTag(focusedTag).rollRot
-      // * (180.0 / std::numbers::pi))));
-
       ImGui::TextWrapped(
           "Yaw Difference %s°",
-          std::to_string(currentCalibrationMap.minimizeAngle(
-                             yawDiff * (180.0 / std::numbers::pi)))
+          std::to_string(
+              fieldmap::minimizeAngle(yawDiff * (180.0 / std::numbers::pi)))
               .c_str());
       ImGui::TextWrapped(
           "Pitch Difference %s°",
-          std::to_string(currentCalibrationMap.minimizeAngle(
-                             pitchDiff * (180.0 / std::numbers::pi)))
+          std::to_string(
+              fieldmap::minimizeAngle(pitchDiff * (180.0 / std::numbers::pi)))
               .c_str());
       ImGui::TextWrapped(
           "Roll Difference %s°",
-          std::to_string(currentCalibrationMap.minimizeAngle(
-                             rollDiff * (180.0 / std::numbers::pi)))
+          std::to_string(
+              fieldmap::minimizeAngle(rollDiff * (180.0 / std::numbers::pi)))
               .c_str());
 
       ImGui::NewLine();

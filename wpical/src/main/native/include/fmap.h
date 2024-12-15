@@ -6,13 +6,11 @@
 
 #include <fieldmap.h>
 
-#include <string>
-
 #include <opencv2/opencv.hpp>
 #include <tagpose.h>
 #include <wpi/json.h>
 
 namespace fmap {
-std::string singleTag(int tag, tag::pose tagpose, bool endTag);
-std::string convertfmap(wpi::json json);
+wpi::json singleTag(int tag, const tag::pose& tagpose);
+wpi::json convertfmap(const wpi::json& json);
 }  // namespace fmap
