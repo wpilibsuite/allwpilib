@@ -163,10 +163,10 @@ void MyHttpConnection::SendFileResponse(int code, std::string_view codeText,
   wpi::raw_uv_ostream os{toSend, 4096};
   BuildHeader(os, code, codeText, contentType, (*membuf)->size(), extraHeader);
   SendData(os.bufs(), false);
+  auto buf = (*membuf)->GetBuffer();
   m_stream.Write(
-      {{(*membuf)->GetBuffer()}},
-      [closeAfter = !m_keepAlive, stream = &m_stream,
-       membuf = std::shared_ptr{std::move(*membuf)}](auto, uv::Error) {
+      {{buf}}, [closeAfter = !m_keepAlive, stream = &m_stream,
+                membuf = std::shared_ptr{std::move(*membuf)}](auto, uv::Error) {
         if (closeAfter) {
           stream->Close();
         }
