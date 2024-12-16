@@ -5,24 +5,21 @@
 #include "fmap.h"
 
 #include <string>
+#include <vector>
 
 wpi::json fmap::singleTag(int tag, const tag::pose& tagpose) {
-  std::string transform = "";
+  std::vector<double> transform = {};
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
-      transform += std::to_string(tagpose.transformMatrixFmap(i, j));
-      transform += ",";
+      transform.push_back(tagpose.transformMatrixFmap(i, j));
     }
   }
 
-  // remove end comma
-  transform = transform.substr(0, transform.length() - 2);
-
-  std::string fmapTag =
-      "{\"family\":\"apriltag3_36h11_classic\",\"id\":" + std::to_string(tag) +
-      ",\"size\":165.1,\"transform\":[" + transform + "],\"unique\":true}";
-
-  return wpi::json::parse(fmapTag);
+  return {{"family", "apriltag3_36h11_classic"},
+          {"id", tag},
+          {"size", 165.1},
+          {"transform", transform},
+          {"unique", true}};
 }
 
 wpi::json fmap::convertfmap(const wpi::json& json) {
