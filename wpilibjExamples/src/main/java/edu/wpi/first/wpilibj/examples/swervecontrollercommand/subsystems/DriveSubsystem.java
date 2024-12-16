@@ -125,7 +125,7 @@ public class DriveSubsystem extends SubsystemBase {
     chassisSpeeds = chassisSpeeds.discretize(DriveConstants.kDrivePeriod);
 
     var states = DriveConstants.kDriveKinematics.toWheelSpeeds(chassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.kMaxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.kMaxSpeedMetersPerSecond);
 
     m_frontLeft.setDesiredState(states[0]);
     m_frontRight.setDesiredState(states[1]);

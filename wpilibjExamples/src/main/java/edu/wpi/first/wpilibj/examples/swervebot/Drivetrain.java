@@ -56,12 +56,12 @@ public class Drivetrain {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(
-      double xSpeed, double ySpeed, double rot, boolean fieldRelative, double period) {
+      double xSpeed, double ySpeed, double rot, boolean fieldRelative, double periodSeconds) {
     var chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
     if (fieldRelative) {
       chassisSpeeds = chassisSpeeds.toRobotRelative(m_gyro.getRotation2d());
     }
-    chassisSpeeds = chassisSpeeds.discretize(period);
+    chassisSpeeds = chassisSpeeds.discretize(periodSeconds);
 
     var states = m_kinematics.toWheelSpeeds(chassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(states, kMaxSpeed);
