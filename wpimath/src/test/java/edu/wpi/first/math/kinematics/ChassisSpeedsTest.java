@@ -23,7 +23,7 @@ class ChassisSpeedsTest {
     final var duration = 1.0;
     final var dt = 0.01;
 
-    final var speeds = ChassisSpeeds.discretize(target, duration);
+    final var speeds = target.discretize(duration);
     final var twist =
         new Twist2d(
             speeds.vxMetersPerSecond * dt,
@@ -60,9 +60,8 @@ class ChassisSpeedsTest {
   }
 
   @Test
-  void testFromFieldRelativeSpeeds() {
-    final var chassisSpeeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(1.0, 0.0, 0.5, Rotation2d.kCW_Pi_2);
+  void testToRobotRelative() {
+    final var chassisSpeeds = new ChassisSpeeds(1.0, 0.0, 0.5).toRobotRelative(Rotation2d.kCW_Pi_2);
 
     assertAll(
         () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
@@ -71,9 +70,9 @@ class ChassisSpeedsTest {
   }
 
   @Test
-  void testFromRobotRelativeSpeeds() {
+  void testToFieldRelative() {
     final var chassisSpeeds =
-        ChassisSpeeds.fromRobotRelativeSpeeds(1.0, 0.0, 0.5, Rotation2d.fromDegrees(45.0));
+        new ChassisSpeeds(1.0, 0.0, 0.5).toFieldRelative(Rotation2d.fromDegrees(45.0));
 
     assertAll(
         () -> assertEquals(1.0 / Math.sqrt(2.0), chassisSpeeds.vxMetersPerSecond, kEpsilon),

@@ -115,8 +115,8 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
     m_rotationError = desiredHeading - currentPose.Rotation();
 
     if (!m_enabled) {
-      return ChassisSpeeds::FromFieldRelativeSpeeds(xFF, yFF, thetaFF,
-                                                    currentPose.Rotation());
+      return ChassisSpeeds{xFF, yFF, thetaFF}.ToRobotRelative(
+          currentPose.Rotation());
     }
 
     // Calculate feedback velocities (based on position error).
@@ -126,8 +126,8 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
         currentPose.Y().value(), trajectoryPose.Y().value())};
 
     // Return next output.
-    return ChassisSpeeds::FromFieldRelativeSpeeds(
-        xFF + xFeedback, yFF + yFeedback, thetaFF, currentPose.Rotation());
+    return ChassisSpeeds{xFF + xFeedback, yFF + yFeedback, thetaFF}
+        .ToRobotRelative(currentPose.Rotation());
   }
 
   /**

@@ -488,7 +488,7 @@ public class MecanumControllerCommand extends Command {
         m_controller.calculate(m_pose.get(), desiredState, m_desiredRotation.get());
     var targetWheelSpeeds = m_kinematics.toWheelSpeeds(targetChassisSpeeds);
 
-    targetWheelSpeeds.desaturate(m_maxWheelVelocityMetersPerSecond);
+    targetWheelSpeeds = targetWheelSpeeds.desaturate(m_maxWheelVelocityMetersPerSecond);
 
     double frontLeftSpeedSetpoint = targetWheelSpeeds.frontLeftMetersPerSecond;
     double rearLeftSpeedSetpoint = targetWheelSpeeds.rearLeftMetersPerSecond;
