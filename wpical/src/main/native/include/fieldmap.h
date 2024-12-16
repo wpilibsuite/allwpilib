@@ -16,6 +16,10 @@ class fieldmap {
  public:
   fieldmap() = default;
   explicit fieldmap(const wpi::json& json) {
+    double field_length_meters =
+        static_cast<double>(json.at("field").at("length"));
+    double field_width_meters =
+        static_cast<double>(json.at("field").at("width"));
     for (const auto& tag : json.at("tags").items()) {
       double tagXPos =
           static_cast<double>(tag.value().at("pose").at("translation").at("x"));
@@ -33,7 +37,8 @@ class fieldmap {
           tag.value().at("pose").at("rotation").at("quaternion").at("Z"));
 
       tagVec.emplace_back(tagXPos, tagYPos, tagZPos, tagWQuat, tagXQuat,
-                          tagYQuat, tagZQuat);
+                          tagYQuat, tagZQuat, field_length_meters,
+                          field_width_meters);
     }
   }
 

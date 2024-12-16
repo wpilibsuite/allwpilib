@@ -559,7 +559,9 @@ int fieldcalibration::calibrate(std::string input_dir_path,
     observed_map_json["tags"].push_back(tag_json);
   }
 
-  observed_map_json["field"] = {{"length", 16.541}, {"width", 8.211}};
+  observed_map_json["field"] = {
+      {"length", static_cast<double>(json.at("field").at("length"))},
+      {"width", static_cast<double>(json.at("field").at("width"))}};
 
   std::ofstream output_file(output_file_path);
   output_file << observed_map_json.dump(4) << std::endl;
