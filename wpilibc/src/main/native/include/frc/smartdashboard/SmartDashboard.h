@@ -122,9 +122,9 @@ class SmartDashboard {
   static bool PutBoolean(std::string_view keyName, bool value);
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist
    * @param key the key
-   * @param defaultValue the default value to set if key doesn't exist.
+   * @param defaultValue the value to set if key doesn't exist.
    * @returns True if the table key did not already exist, otherwise False
    */
   static bool SetDefaultBoolean(std::string_view key, bool defaultValue);
@@ -135,7 +135,7 @@ class SmartDashboard {
    * If the key is not found, returns the default value.
    *
    * @param keyName the key
-   * @param defaultValue the default value to set if key doesn't exist
+   * @param defaultValue the default value to return if key doesn't exist
    * @return the value
    */
   static bool GetBoolean(std::string_view keyName, bool defaultValue);
@@ -153,10 +153,10 @@ class SmartDashboard {
   static bool PutNumber(std::string_view keyName, double value);
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key          The key.
-   * @param defaultValue The default value to set if key doesn't exist.
+   * @param defaultValue The value to set if key doesn't exist.
    * @returns True if the table key did not already exist, otherwise False
    */
   static bool SetDefaultNumber(std::string_view key, double defaultValue);
@@ -167,7 +167,7 @@ class SmartDashboard {
    * If the key is not found, returns the default value.
    *
    * @param keyName the key
-   * @param defaultValue the default value to set if the key doesn't exist
+   * @param defaultValue the default value to return if the key doesn't exist
    * @return the value
    */
   static double GetNumber(std::string_view keyName, double defaultValue);
@@ -185,10 +185,10 @@ class SmartDashboard {
   static bool PutString(std::string_view keyName, std::string_view value);
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
-   * @param defaultValue the default value to set if key doesn't exist.
+   * @param defaultValue the value to set if key doesn't exist.
    * @returns True if the table key did not already exist, otherwise False
    */
   static bool SetDefaultString(std::string_view key,
@@ -200,7 +200,7 @@ class SmartDashboard {
    * If the key is not found, returns the default value.
    *
    * @param keyName the key
-   * @param defaultValue the default value to set if the key doesn't exist
+   * @param defaultValue the default value to return if the key doesn't exist
    * @return the value
    */
   static std::string GetString(std::string_view keyName,
@@ -220,10 +220,10 @@ class SmartDashboard {
   static bool PutBooleanArray(std::string_view key, std::span<const int> value);
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
-   * @param defaultValue the default value to set if key doesn't exist.
+   * @param defaultValue the value to set if key doesn't exist.
    * @returns True if the table key did not already exist, otherwise False
    */
   static bool SetDefaultBooleanArray(std::string_view key,
@@ -261,10 +261,10 @@ class SmartDashboard {
                              std::span<const double> value);
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key          The key.
-   * @param defaultValue The default value to set if key doesn't exist.
+   * @param defaultValue The value to set if key doesn't exist.
    * @returns True if the table key did not already exist, otherwise False
    */
   static bool SetDefaultNumberArray(std::string_view key,
@@ -298,10 +298,10 @@ class SmartDashboard {
                              std::span<const std::string> value);
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key          The key.
-   * @param defaultValue The default value to set if key doesn't exist.
+   * @param defaultValue The value to set if key doesn't exist.
    * @returns True if the table key did not already exist, otherwise False
    */
   static bool SetDefaultStringArray(std::string_view key,
@@ -334,10 +334,10 @@ class SmartDashboard {
   static bool PutRaw(std::string_view key, std::span<const uint8_t> value);
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key          The key.
-   * @param defaultValue The default value to set if key doesn't exist.
+   * @param defaultValue The value to set if key doesn't exist.
    * @returns True if the table key did not already exist, otherwise False
    */
   static bool SetDefaultRaw(std::string_view key,
@@ -374,10 +374,10 @@ class SmartDashboard {
   static bool PutValue(std::string_view keyName, const nt::Value& value);
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
-   * @param defaultValue The default value to set if key doesn't exist.
+   * @param defaultValue The value to set if key doesn't exist.
    * @returns True if the table key did not already exist, otherwise False
    */
   static bool SetDefaultValue(std::string_view key,
