@@ -418,7 +418,7 @@ public abstract class Command implements Sendable {
     // use an array so that it stays in the heap instead of stack.
     // We use an array with a size of 1 instead of `AtomicInteger` because of the performance
     // overhead
-    int[] counter = new int[1];
+    int[] counter = {0};
     return this.finallyDo(() -> counter[0]++).repeatedly().until(() -> counter[0] >= repetitions);
   }
 
