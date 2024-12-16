@@ -24,7 +24,11 @@ class ChassisSpeedsTest {
     final var dt = 0.01;
 
     final var speeds = target.discretize(duration);
-    final var twist = new Twist2d(speeds.vx * dt, speeds.vy * dt, speeds.omega * dt);
+    final var twist =
+        new Twist2d(
+            speeds.vxMetersPerSecond * dt,
+            speeds.vyMetersPerSecond * dt,
+            speeds.omegaRadiansPerSecond * dt);
 
     var pose = Pose2d.kZero;
     for (double time = 0; time < duration; time += dt) {
