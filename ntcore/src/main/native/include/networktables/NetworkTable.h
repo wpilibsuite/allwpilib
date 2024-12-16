@@ -365,7 +365,7 @@ class NetworkTable final {
    *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists
+   * @returns True if the table key did not already exist, otherwise False
    */
   bool SetDefaultNumber(std::string_view key, double defaultValue);
 
@@ -393,7 +393,7 @@ class NetworkTable final {
    *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists
+   * @returns True if the table key did not already exist, otherwise False
    */
   bool SetDefaultString(std::string_view key, std::string_view defaultValue);
 
@@ -423,7 +423,7 @@ class NetworkTable final {
    *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists
+   * @returns True if the table key did not already exist, otherwise False
    */
   bool SetDefaultBoolean(std::string_view key, bool defaultValue);
 
@@ -456,7 +456,7 @@ class NetworkTable final {
    *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
-   * @return False if the table key exists
+   * @return True if the table key did not already exist, otherwise False
    */
   bool SetDefaultBooleanArray(std::string_view key,
                               std::span<const int> defaultValue);
@@ -494,7 +494,7 @@ class NetworkTable final {
    *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists
+   * @returns True if the table key did not already exist, otherwise False
    */
   bool SetDefaultNumberArray(std::string_view key,
                              std::span<const double> defaultValue);
@@ -528,7 +528,7 @@ class NetworkTable final {
    *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists
+   * @returns True if the table key did not already exist, otherwise False
    */
   bool SetDefaultStringArray(std::string_view key,
                              std::span<const std::string> defaultValue);
@@ -562,7 +562,7 @@ class NetworkTable final {
    *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
-   * @return False if the table key exists
+   * @return True if the table key did not already exist, otherwise False
    */
   bool SetDefaultRaw(std::string_view key,
                      std::span<const uint8_t> defaultValue);
@@ -596,7 +596,7 @@ class NetworkTable final {
    *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
-   * @return False if the table key exists
+   * @return True if the table key did not already exist, otherwise False
    */
   bool SetDefaultValue(std::string_view key, const Value& defaultValue);
 

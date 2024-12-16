@@ -200,7 +200,7 @@ public final class SmartDashboard {
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
-   * @return True: success; False the key already existed
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultBoolean(String key, boolean defaultValue) {
     return getEntry(key).setDefaultBoolean(defaultValue);
@@ -235,7 +235,7 @@ public final class SmartDashboard {
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
-   * @return True: success; False the key already existed
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultNumber(String key, double defaultValue) {
     return getEntry(key).setDefaultDouble(defaultValue);
@@ -270,7 +270,7 @@ public final class SmartDashboard {
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
-   * @return True: success; False the key already existed
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultString(String key, String defaultValue) {
     return getEntry(key).setDefaultString(defaultValue);
@@ -316,7 +316,7 @@ public final class SmartDashboard {
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
-   * @return True: success; False the key already existed
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultBooleanArray(String key, boolean[] defaultValue) {
     return getEntry(key).setDefaultBooleanArray(defaultValue);
@@ -327,7 +327,7 @@ public final class SmartDashboard {
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
-   * @return True: success; False the key already existed
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultBooleanArray(String key, Boolean[] defaultValue) {
     return getEntry(key).setDefaultBooleanArray(defaultValue);
@@ -386,7 +386,7 @@ public final class SmartDashboard {
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
-   * @return True: success; False the key already existed
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultNumberArray(String key, double[] defaultValue) {
     return getEntry(key).setDefaultDoubleArray(defaultValue);
@@ -397,7 +397,7 @@ public final class SmartDashboard {
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
-   * @return True: success; False the key already existed
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultNumberArray(String key, Double[] defaultValue) {
     return getEntry(key).setDefaultNumberArray(defaultValue);
@@ -445,7 +445,7 @@ public final class SmartDashboard {
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
-   * @return True: success; False the key already existed
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultStringArray(String key, String[] defaultValue) {
     return getEntry(key).setDefaultStringArray(defaultValue);
@@ -480,7 +480,7 @@ public final class SmartDashboard {
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
-   * @return True: success; False the key already existed
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultRaw(String key, byte[] defaultValue) {
     return getEntry(key).setDefaultRaw(defaultValue);
