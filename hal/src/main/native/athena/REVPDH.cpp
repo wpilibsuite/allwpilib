@@ -89,6 +89,22 @@ void InitializeREVPDH() {
 
 extern "C" {
 
+/**
+ * REV PDH firmware v25.0.0 updates the scaling factor for channels 20-23.
+ */
+static double getLowCurrentChannelConversionFactor(HAL_REVPDHHandle* handle) {
+  HAL_PowerDistributionVersion version;
+  uint32_t status;
+  HAL_GetREVPDHVersion(handle, &version, &status);
+
+  if (version.year >= 25) {
+    return 1.0;
+  } else {
+    // We doubled the scaling factor over the wire.
+    return 0.5;
+  }
+}
+
 static PDH_status_0_t HAL_ReadREVPDHStatus0(HAL_CANHandle hcan,
                                             int32_t* status) {
   uint8_t packedData[8] = {0};
@@ -349,6 +365,9 @@ double HAL_GetREVPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
   } else if (channel < 24) {
     // Periodic status 3
     PDH_status_3_t statusFrame = HAL_ReadREVPDHStatus3(hpdh->hcan, status);
+
+    double lowCurrentChannelConversion =
+        getLowCurrentChannelConversionFactor(hpdh);
     switch (channel) {
       case 18:
         return PDH_status_3_channel_18_current_decode(
@@ -358,16 +377,20 @@ double HAL_GetREVPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
             statusFrame.channel_19_current);
       case 20:
         return PDH_status_3_channel_20_current_decode(
-            statusFrame.channel_20_current);
+                   statusFrame.channel_20_current) *
+               lowCurrentChannelConversion;
       case 21:
         return PDH_status_3_channel_21_current_decode(
-            statusFrame.channel_21_current);
+                   statusFrame.channel_21_current) *
+               lowCurrentChannelConversion;
       case 22:
         return PDH_status_3_channel_22_current_decode(
-            statusFrame.channel_22_current);
+                   statusFrame.channel_22_current) *
+               lowCurrentChannelConversion;
       case 23:
         return PDH_status_3_channel_23_current_decode(
-            statusFrame.channel_23_current);
+                   statusFrame.channel_23_current) *
+               lowCurrentChannelConversion;
     }
   }
   return 0;
@@ -385,6 +408,9 @@ void HAL_GetREVPDHAllChannelCurrents(HAL_REVPDHHandle handle, double* currents,
   PDH_status_1_t statusFrame1 = HAL_ReadREVPDHStatus1(hpdh->hcan, status);
   PDH_status_2_t statusFrame2 = HAL_ReadREVPDHStatus2(hpdh->hcan, status);
   PDH_status_3_t statusFrame3 = HAL_ReadREVPDHStatus3(hpdh->hcan, status);
+
+  double lowCurrentChannelConversion =
+      getLowCurrentChannelConversionFactor(hpdh);
 
   currents[0] =
       PDH_status_0_channel_0_current_decode(statusFrame0.channel_0_current);
@@ -427,13 +453,17 @@ void HAL_GetREVPDHAllChannelCurrents(HAL_REVPDHHandle handle, double* currents,
   currents[19] =
       PDH_status_3_channel_19_current_decode(statusFrame3.channel_19_current);
   currents[20] =
-      PDH_status_3_channel_20_current_decode(statusFrame3.channel_20_current);
+      PDH_status_3_channel_20_current_decode(statusFrame3.channel_20_current) *
+      lowCurrentChannelConversion;
   currents[21] =
-      PDH_status_3_channel_21_current_decode(statusFrame3.channel_21_current);
+      PDH_status_3_channel_21_current_decode(statusFrame3.channel_21_current) *
+      lowCurrentChannelConversion;
   currents[22] =
-      PDH_status_3_channel_22_current_decode(statusFrame3.channel_22_current);
+      PDH_status_3_channel_22_current_decode(statusFrame3.channel_22_current) *
+      lowCurrentChannelConversion;
   currents[23] =
-      PDH_status_3_channel_23_current_decode(statusFrame3.channel_23_current);
+      PDH_status_3_channel_23_current_decode(statusFrame3.channel_23_current) *
+      lowCurrentChannelConversion;
 }
 
 uint16_t HAL_GetREVPDHTotalCurrent(HAL_REVPDHHandle handle, int32_t* status) {
@@ -847,6 +877,9 @@ HAL_PowerDistributionChannelData* HAL_GetREVPDHStreamData(
     goto Exit;
   }
 
+  double lowCurrentChannelConversion =
+      getLowCurrentChannelConversionFactor(hpdh);
+
   for (uint32_t i = 0; i < messagesRead; i++) {
     PDH_status_3_t statusFrame3;
     PDH_status_3_unpack(&statusFrame3, messages[i].data, PDH_STATUS_3_LENGTH);
@@ -862,23 +895,27 @@ HAL_PowerDistributionChannelData* HAL_GetREVPDHStreamData(
     retData[*count].channel = 20;
     retData[*count].timestamp = timestamp;
     (*count)++;
-    retData[*count].current =
-        PDH_status_3_channel_20_current_decode(statusFrame3.channel_20_current);
+    retData[*count].current = PDH_status_3_channel_20_current_decode(
+                                  statusFrame3.channel_20_current) *
+                              lowCurrentChannelConversion;
     retData[*count].channel = 21;
     retData[*count].timestamp = timestamp;
     (*count)++;
-    retData[*count].current =
-        PDH_status_3_channel_21_current_decode(statusFrame3.channel_21_current);
+    retData[*count].current = PDH_status_3_channel_21_current_decode(
+                                  statusFrame3.channel_21_current) *
+                              lowCurrentChannelConversion;
     retData[*count].channel = 22;
     retData[*count].timestamp = timestamp;
     (*count)++;
-    retData[*count].current =
-        PDH_status_3_channel_22_current_decode(statusFrame3.channel_22_current);
+    retData[*count].current = PDH_status_3_channel_22_current_decode(
+                                  statusFrame3.channel_22_current) *
+                              lowCurrentChannelConversion;
     retData[*count].channel = 23;
     retData[*count].timestamp = timestamp;
     (*count)++;
-    retData[*count].current =
-        PDH_status_3_channel_23_current_decode(statusFrame3.channel_23_current);
+    retData[*count].current = PDH_status_3_channel_23_current_decode(
+                                  statusFrame3.channel_23_current) *
+                              lowCurrentChannelConversion;
     retData[*count].channel = 24;
     retData[*count].timestamp = timestamp;
     (*count)++;
