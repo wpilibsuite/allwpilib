@@ -32,9 +32,9 @@ class WPILIB_DLLEXPORT MecanumDriveKinematicsConstraint
       units::meters_per_second_t velocity) const override {
     auto xVelocity = velocity * pose.Rotation().Cos();
     auto yVelocity = velocity * pose.Rotation().Sin();
-    auto wheelSpeeds = m_kinematics.ToWheelSpeeds(
-        {xVelocity, yVelocity, velocity * curvature});
-    wheelSpeeds.Desaturate(m_maxSpeed);
+    auto wheelSpeeds =
+        m_kinematics.ToWheelSpeeds({xVelocity, yVelocity, velocity * curvature})
+            .Desaturate(m_maxSpeed);
 
     auto normSpeeds = m_kinematics.ToChassisSpeeds(wheelSpeeds);
 
