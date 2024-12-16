@@ -34,9 +34,9 @@ public class MecanumDriveWheelSpeedsProto
 
   @Override
   public void pack(ProtobufMecanumDriveWheelSpeeds msg, MecanumDriveWheelSpeeds value) {
-    msg.setFrontLeft(value.frontLeftMetersPerSecond);
-    msg.setFrontRight(value.frontRightMetersPerSecond);
-    msg.setRearLeft(value.rearLeftMetersPerSecond);
-    msg.setRearRight(value.rearRightMetersPerSecond);
+    msg.setFrontLeft(value.frontLeft);
+    msg.setFrontRight(value.frontRight);
+    msg.setRearLeft(value.rearLeft);
+    msg.setRearRight(value.rearRight);
   }
 }

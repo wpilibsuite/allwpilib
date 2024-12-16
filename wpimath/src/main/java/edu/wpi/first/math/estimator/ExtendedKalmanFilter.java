@@ -58,7 +58,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
   private Matrix<States, States> m_P;
 
-  private double m_dtSeconds;
+  private double m_dt;
 
   /**
    * Constructs an extended Kalman filter.
@@ -74,7 +74,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * @param h A vector-valued function of x and u that returns the measurement vector.
    * @param stateStdDevs Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
-   * @param dtSeconds Nominal discretization timestep.
+   * @param dt Nominal discretization timestep in seconds.
    */
   public ExtendedKalmanFilter(
       Nat<States> states,
@@ -84,7 +84,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> h,
       Matrix<States, N1> stateStdDevs,
       Matrix<Outputs, N1> measurementStdDevs,
-      double dtSeconds) {
+      double dt) {
     this(
         states,
         inputs,
@@ -95,7 +95,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
         measurementStdDevs,
         Matrix::minus,
         Matrix::plus,
-        dtSeconds);
+        dt);
   }
 
   /**
@@ -115,7 +115,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * @param residualFuncY A function that computes the residual of two measurement vectors (i.e. it
    *     subtracts them.)
    * @param addFuncX A function that adds two state vectors.
-   * @param dtSeconds Nominal discretization timestep.
+   * @param dt Nominal discretization timestep in seconds.
    */
   public ExtendedKalmanFilter(
       Nat<States> states,
@@ -127,7 +127,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
       Matrix<Outputs, N1> measurementStdDevs,
       BiFunction<Matrix<Outputs, N1>, Matrix<Outputs, N1>, Matrix<Outputs, N1>> residualFuncY,
       BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> addFuncX,
-      double dtSeconds) {
+      double dt) {
     m_states = states;
     m_outputs = outputs;
 
@@ -139,7 +139,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     m_contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
     m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
-    m_dtSeconds = dtSeconds;
+    m_dt = dt;
 
     reset();
 
@@ -150,11 +150,11 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
         NumericalJacobian.numericalJacobianX(
             outputs, states, h, m_xHat, new Matrix<>(inputs, Nat.N1()));
 
-    final var discPair = Discretization.discretizeAQ(contA, m_contQ, dtSeconds);
+    final var discPair = Discretization.discretizeAQ(contA, m_contQ, dt);
     final var discA = discPair.getFirst();
     final var discQ = discPair.getSecond();
 
-    final var discR = Discretization.discretizeR(m_contR, dtSeconds);
+    final var discR = Discretization.discretizeR(m_contR, dt);
 
     if (StateSpaceUtil.isDetectable(discA, C) && outputs.getNum() <= states.getNum()) {
       m_initP = DARE.dare(discA.transpose(), C.transpose(), discQ, discR);
@@ -249,11 +249,11 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * Project the model into the future with a new control input u.
    *
    * @param u New control input from controller.
-   * @param dtSeconds Timestep for prediction.
+   * @param dt Timestep for prediction in seconds.
    */
   @Override
-  public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
-    predict(u, m_f, dtSeconds);
+  public void predict(Matrix<Inputs, N1> u, double dt) {
+    predict(u, m_f, dt);
   }
 
   /**
@@ -261,26 +261,26 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    *
    * @param u New control input from controller.
    * @param f The function used to linearize the model.
-   * @param dtSeconds Timestep for prediction.
+   * @param dt Timestep for prediction in seconds.
    */
   public void predict(
       Matrix<Inputs, N1> u,
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
-      double dtSeconds) {
+      double dt) {
     // Find continuous A
     final var contA = NumericalJacobian.numericalJacobianX(m_states, m_states, f, m_xHat, u);
 
     // Find discrete A and Q
-    final var discPair = Discretization.discretizeAQ(contA, m_contQ, dtSeconds);
+    final var discPair = Discretization.discretizeAQ(contA, m_contQ, dt);
     final var discA = discPair.getFirst();
     final var discQ = discPair.getSecond();
 
-    m_xHat = NumericalIntegration.rk4(f, m_xHat, u, dtSeconds);
+    m_xHat = NumericalIntegration.rk4(f, m_xHat, u, dt);
 
     // Pₖ₊₁⁻ = APₖ⁻Aᵀ + Q
     m_P = discA.times(m_P).times(discA.transpose()).plus(discQ);
 
-    m_dtSeconds = dtSeconds;
+    m_dt = dt;
   }
 
   /**
@@ -356,7 +356,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
       BiFunction<Matrix<Rows, N1>, Matrix<Rows, N1>, Matrix<Rows, N1>> residualFuncY,
       BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> addFuncX) {
     final var C = NumericalJacobian.numericalJacobianX(rows, m_states, h, m_xHat, u);
-    final var discR = Discretization.discretizeR(R, m_dtSeconds);
+    final var discR = Discretization.discretizeR(R, m_dt);
 
     final var S = C.times(m_P).times(C.transpose()).plus(discR);
 

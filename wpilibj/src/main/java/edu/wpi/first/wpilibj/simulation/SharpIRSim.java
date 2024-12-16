@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SharpIR;
 
 /** Simulation class for Sharp IR sensors. */
@@ -28,24 +27,15 @@ public class SharpIRSim {
    */
   public SharpIRSim(int channel) {
     SimDeviceSim simDevice = new SimDeviceSim("SharpIR", channel);
-    m_simRange = simDevice.getDouble("Range (cm)");
+    m_simRange = simDevice.getDouble("Range (m)");
   }
 
   /**
-   * Set the range in inches returned by the distance sensor.
+   * Set the range in meters returned by the distance sensor.
    *
-   * @param inches range in inches of the target returned by the sensor
+   * @param range range in meters of the target returned by the sensor
    */
-  public void setRangeInches(double inches) {
-    m_simRange.set(Units.inchesToMeters(inches) * 100.0);
-  }
-
-  /**
-   * Set the range in centimeters returned by the distance sensor.
-   *
-   * @param cm range in centimeters of the target returned by the sensor
-   */
-  public void setRangeCm(double cm) {
-    m_simRange.set(cm);
+  public void setRange(double range) {
+    m_simRange.set(range);
   }
 }

@@ -105,10 +105,10 @@ public class Drive extends SubsystemBase {
   /**
    * Returns a command that drives the robot forward a specified distance at a specified speed.
    *
-   * @param distanceMeters The distance to drive forward in meters
+   * @param distance The distance to drive forward in meters
    * @param speed The fraction of max speed at which to drive
    */
-  public Command driveDistanceCommand(double distanceMeters, double speed) {
+  public Command driveDistanceCommand(double distance, double speed) {
     return runOnce(
             () -> {
               // Reset encoders at the start of the command
@@ -119,9 +119,7 @@ public class Drive extends SubsystemBase {
         .andThen(run(() -> m_drive.arcadeDrive(speed, 0)))
         // End command when we've traveled the specified distance
         .until(
-            () ->
-                Math.max(m_leftEncoder.getDistance(), m_rightEncoder.getDistance())
-                    >= distanceMeters)
+            () -> Math.max(m_leftEncoder.getDistance(), m_rightEncoder.getDistance()) >= distance)
         // Stop the drive when the command ends
         .finallyDo(interrupted -> m_drive.stopMotor());
   }

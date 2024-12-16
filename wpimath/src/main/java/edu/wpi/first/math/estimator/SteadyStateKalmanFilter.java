@@ -58,7 +58,7 @@ public class SteadyStateKalmanFilter<States extends Num, Inputs extends Num, Out
    * @param plant The plant used for the prediction step.
    * @param stateStdDevs Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
-   * @param dtSeconds Nominal discretization timestep.
+   * @param dt Nominal discretization timestep in seconds.
    * @throws IllegalArgumentException If the system is undetectable.
    */
   public SteadyStateKalmanFilter(
@@ -67,7 +67,7 @@ public class SteadyStateKalmanFilter<States extends Num, Inputs extends Num, Out
       LinearSystem<States, Inputs, Outputs> plant,
       Matrix<States, N1> stateStdDevs,
       Matrix<Outputs, N1> measurementStdDevs,
-      double dtSeconds) {
+      double dt) {
     this.m_states = states;
 
     this.m_plant = plant;
@@ -75,11 +75,11 @@ public class SteadyStateKalmanFilter<States extends Num, Inputs extends Num, Out
     var contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
     var contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
 
-    var pair = Discretization.discretizeAQ(plant.getA(), contQ, dtSeconds);
+    var pair = Discretization.discretizeAQ(plant.getA(), contQ, dt);
     var discA = pair.getFirst();
     var discQ = pair.getSecond();
 
-    var discR = Discretization.discretizeR(contR, dtSeconds);
+    var discR = Discretization.discretizeR(contR, dt);
 
     var C = plant.getC();
 
@@ -174,10 +174,10 @@ public class SteadyStateKalmanFilter<States extends Num, Inputs extends Num, Out
    * Project the model into the future with a new control input u.
    *
    * @param u New control input from controller.
-   * @param dtSeconds Timestep for prediction.
+   * @param dt Timestep for prediction in seconds.
    */
-  public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
-    this.m_xHat = m_plant.calculateX(m_xHat, u, dtSeconds);
+  public void predict(Matrix<Inputs, N1> u, double dt) {
+    this.m_xHat = m_plant.calculateX(m_xHat, u, dt);
   }
 
   /**

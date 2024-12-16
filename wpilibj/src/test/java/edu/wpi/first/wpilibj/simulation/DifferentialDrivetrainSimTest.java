@@ -42,7 +42,7 @@ class DifferentialDrivetrainSimTest {
             plant,
             motor,
             1,
-            kinematics.trackWidthMeters,
+            kinematics.trackwidth,
             Units.inchesToMeters(2),
             VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
@@ -61,15 +61,13 @@ class DifferentialDrivetrainSimTest {
             new TrajectoryConfig(1, 1)
                 .addConstraint(new DifferentialDriveKinematicsConstraint(kinematics, 1)));
 
-    for (double t = 0; t < traj.getTotalTimeSeconds(); t += 0.020) {
+    for (double t = 0; t < traj.getTotalTime(); t += 0.020) {
       var state = traj.sample(t);
       var feedbackOut = feedback.calculate(sim.getPose(), state);
 
       var wheelSpeeds = kinematics.toWheelSpeeds(feedbackOut);
 
-      var voltages =
-          feedforward.calculate(
-              VecBuilder.fill(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond));
+      var voltages = feedforward.calculate(VecBuilder.fill(wheelSpeeds.left, wheelSpeeds.right));
 
       // Sim periodic code
       sim.setInputs(voltages.get(0, 0), voltages.get(1, 0));
@@ -104,25 +102,25 @@ class DifferentialDrivetrainSimTest {
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
     var sim =
         new DifferentialDrivetrainSim(
-            plant, motor, 1, kinematics.trackWidthMeters, Units.inchesToMeters(2), null);
+            plant, motor, 1, kinematics.trackwidth, Units.inchesToMeters(2), null);
 
     sim.setInputs(-12, -12);
     for (int i = 0; i < 10; i++) {
       sim.update(0.020);
     }
-    assertTrue(sim.getCurrentDrawAmps() > 0);
+    assertTrue(sim.getCurrentDraw() > 0);
 
     sim.setInputs(12, 12);
     for (int i = 0; i < 20; i++) {
       sim.update(0.020);
     }
-    assertTrue(sim.getCurrentDrawAmps() > 0);
+    assertTrue(sim.getCurrentDraw() > 0);
 
     sim.setInputs(-12, 12);
     for (int i = 0; i < 30; i++) {
       sim.update(0.020);
     }
-    assertTrue(sim.getCurrentDrawAmps() > 0);
+    assertTrue(sim.getCurrentDraw() > 0);
   }
 
   @Test
@@ -138,7 +136,7 @@ class DifferentialDrivetrainSimTest {
             plant,
             motor,
             5,
-            kinematics.trackWidthMeters,
+            kinematics.trackwidth,
             Units.inchesToMeters(2),
             VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
 

@@ -20,10 +20,10 @@ public class Robot extends TimedRobot {
   static final int kJoystickChannel = 3;
 
   // The elevator can move 1.5 meters from top to bottom
-  static final double kFullHeightMeters = 1.5;
+  static final double kFullHeight = 1.5;
 
-  // Bottom, middle, and top elevator setpoints
-  static final double[] kSetpointsMeters = {0.2, 0.8, 1.4};
+  // Bottom, middle, and top elevator setpoints in meters
+  static final double[] kSetpoints = {0.2, 0.8, 1.4};
 
   // proportional, integral, and derivative speed constants
   // DANGER: when tuning PID constants, high/inappropriate values for kP, kI,
@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
   private final PIDController m_pidController = new PIDController(kP, kI, kD);
   // Scaling is handled internally
   private final AnalogPotentiometer m_potentiometer =
-      new AnalogPotentiometer(kPotChannel, kFullHeightMeters);
+      new AnalogPotentiometer(kPotChannel, kFullHeight);
   private final PWMSparkMax m_elevatorMotor = new PWMSparkMax(kMotorChannel);
   private final Joystick m_joystick = new Joystick(kJoystickChannel);
 
@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     // Move to the bottom setpoint when teleop starts
     m_index = 0;
-    m_pidController.setSetpoint(kSetpointsMeters[m_index]);
+    m_pidController.setSetpoint(kSetpoints[m_index]);
   }
 
   @Override
@@ -62,9 +62,9 @@ public class Robot extends TimedRobot {
     // when the button is pressed once, the selected elevator setpoint is incremented
     if (m_joystick.getTriggerPressed()) {
       // index of the elevator setpoint wraps around.
-      m_index = (m_index + 1) % kSetpointsMeters.length;
+      m_index = (m_index + 1) % kSetpoints.length;
       System.out.println("m_index = " + m_index);
-      m_pidController.setSetpoint(kSetpointsMeters[m_index]);
+      m_pidController.setSetpoint(kSetpoints[m_index]);
     }
   }
 

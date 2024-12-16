@@ -22,8 +22,8 @@ public class SwerveModulePosition
         Interpolatable<SwerveModulePosition>,
         ProtobufSerializable,
         StructSerializable {
-  /** Distance measured by the wheel of the module. */
-  public double distanceMeters;
+  /** Distance measured by the wheel of the module in meters. */
+  public double distance;
 
   /** Angle of the module. */
   public Rotation2d angle = Rotation2d.kZero;
@@ -40,11 +40,11 @@ public class SwerveModulePosition
   /**
    * Constructs a SwerveModulePosition.
    *
-   * @param distanceMeters The distance measured by the wheel of the module.
+   * @param distance The distance measured by the wheel of the module in meters.
    * @param angle The angle of the module.
    */
-  public SwerveModulePosition(double distanceMeters, Rotation2d angle) {
-    this.distanceMeters = distanceMeters;
+  public SwerveModulePosition(double distance, Rotation2d angle) {
+    this.distance = distance;
     this.angle = angle;
   }
 
@@ -61,13 +61,13 @@ public class SwerveModulePosition
   @Override
   public boolean equals(Object obj) {
     return obj instanceof SwerveModulePosition other
-        && Math.abs(other.distanceMeters - distanceMeters) < 1E-9
+        && Math.abs(other.distance - distance) < 1E-9
         && angle.equals(other.angle);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(distanceMeters, angle);
+    return Objects.hash(distance, angle);
   }
 
   /**
@@ -79,13 +79,12 @@ public class SwerveModulePosition
    */
   @Override
   public int compareTo(SwerveModulePosition other) {
-    return Double.compare(this.distanceMeters, other.distanceMeters);
+    return Double.compare(this.distance, other.distance);
   }
 
   @Override
   public String toString() {
-    return String.format(
-        "SwerveModulePosition(Distance: %.2f m, Angle: %s)", distanceMeters, angle);
+    return String.format("SwerveModulePosition(Distance: %.2f m, Angle: %s)", distance, angle);
   }
 
   /**
@@ -94,13 +93,13 @@ public class SwerveModulePosition
    * @return A copy.
    */
   public SwerveModulePosition copy() {
-    return new SwerveModulePosition(distanceMeters, angle);
+    return new SwerveModulePosition(distance, angle);
   }
 
   @Override
   public SwerveModulePosition interpolate(SwerveModulePosition endValue, double t) {
     return new SwerveModulePosition(
-        MathUtil.interpolate(this.distanceMeters, endValue.distanceMeters, t),
+        MathUtil.interpolate(this.distance, endValue.distance, t),
         this.angle.interpolate(endValue.angle, t));
   }
 }
