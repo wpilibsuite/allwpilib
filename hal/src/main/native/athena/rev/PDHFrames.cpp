@@ -947,12 +947,12 @@ bool PDH_status_3_channel_15_breaker_fault_is_in_range(uint8_t value)
 
 uint8_t PDH_status_3_channel_20_current_encode(double value)
 {
-    return (uint8_t)(value / 0.0625);
+    return (uint8_t)(value / 0.125);
 }
 
 double PDH_status_3_channel_20_current_decode(uint8_t value)
 {
-    return ((double)value * 0.0625);
+    return ((double)value * 0.125);
 }
 
 bool PDH_status_3_channel_20_current_is_in_range(uint8_t value)
@@ -964,12 +964,12 @@ bool PDH_status_3_channel_20_current_is_in_range(uint8_t value)
 
 uint8_t PDH_status_3_channel_21_current_encode(double value)
 {
-    return (uint8_t)(value / 0.0625);
+    return (uint8_t)(value / 0.125);
 }
 
 double PDH_status_3_channel_21_current_decode(uint8_t value)
 {
-    return ((double)value * 0.0625);
+    return ((double)value * 0.125);
 }
 
 bool PDH_status_3_channel_21_current_is_in_range(uint8_t value)
@@ -981,12 +981,12 @@ bool PDH_status_3_channel_21_current_is_in_range(uint8_t value)
 
 uint8_t PDH_status_3_channel_22_current_encode(double value)
 {
-    return (uint8_t)(value / 0.0625);
+    return (uint8_t)(value / 0.125);
 }
 
 double PDH_status_3_channel_22_current_decode(uint8_t value)
 {
-    return ((double)value * 0.0625);
+    return ((double)value * 0.125);
 }
 
 bool PDH_status_3_channel_22_current_is_in_range(uint8_t value)
@@ -998,12 +998,12 @@ bool PDH_status_3_channel_22_current_is_in_range(uint8_t value)
 
 uint8_t PDH_status_3_channel_23_current_encode(double value)
 {
-    return (uint8_t)(value / 0.0625);
+    return (uint8_t)(value / 0.125);
 }
 
 double PDH_status_3_channel_23_current_decode(uint8_t value)
 {
-    return ((double)value * 0.0625);
+    return ((double)value * 0.125);
 }
 
 bool PDH_status_3_channel_23_current_is_in_range(uint8_t value)
