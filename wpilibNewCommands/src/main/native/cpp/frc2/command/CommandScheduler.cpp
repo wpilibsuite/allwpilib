@@ -225,7 +225,6 @@ void CommandScheduler::Run() {
       }
 
       m_watchdog.AddEpoch(command->GetName() + ".End(false)");
-
       // remove owned commands after everything else is done
       m_impl->ownedCommands.erase(command);
     }
