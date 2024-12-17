@@ -89,6 +89,22 @@ public class RawFrame implements AutoCloseable {
   }
 
   /**
+   * Set frame data.
+   *
+   * @param data A byte array containing the frame data.
+   * @param width The width of the frame, in pixels
+   * @param height The height of the frame, in pixels
+   * @param stride The number of bytes in each row of image data
+   * @param pixelFormat The PixelFormat of the frame
+   */
+  public void setData(byte[] data, int width, int height, int stride, PixelFormat pixelFormat) {
+    var dataByteBuffer = ByteBuffer.allocateDirect(width * height * stride);
+    dataByteBuffer.put(data);
+
+    setData(dataByteBuffer, width, height, stride, pixelFormat);
+  }
+
+  /**
    * Call to set frame information.
    *
    * @param width The width of the frame, in pixels
