@@ -38,6 +38,25 @@ void PowerDistributionSim::SetInitialized(bool initialized) {
 }
 
 std::unique_ptr<CallbackStore>
+PowerDistributionSim::RegisterChannelCountCallback(NotifyCallback callback,
+                                                   bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      m_index, -1, callback,
+      &HALSIM_CancelPowerDistributionChannelCountCallback);
+  store->SetUid(HALSIM_RegisterPowerDistributionChannelCountCallback(
+      m_index, &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+int PowerDistributionSim::GetChannelCount() const {
+  return HALSIM_GetPowerDistributionChannelCount(m_index);
+}
+
+void PowerDistributionSim::SetChannelCount(int channelCount) {
+  HALSIM_SetPowerDistributionChannelCount(m_index, channelCount);
+}
+
+std::unique_ptr<CallbackStore>
 PowerDistributionSim::RegisterTemperatureCallback(NotifyCallback callback,
                                                   bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
