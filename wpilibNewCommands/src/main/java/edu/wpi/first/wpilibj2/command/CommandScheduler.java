@@ -269,7 +269,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     m_scheduledCommandsCopy = m_scheduledCommands.toArray(m_scheduledCommandsCopy);
     for (Command command : m_scheduledCommandsCopy) {
       if (command == null) {
-        // at least 1 Command was removed before `run` was called (diff between copy and original).
         // No more elements to iterate over (see toArray documentation)
         break;
       }

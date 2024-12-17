@@ -2,16 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc2/command/FunctionalCommand.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/RunCommand.h>
-
-#include <memory>
-
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <networktables/NetworkTableInstance.h>
 
 #include "CommandTestBase.h"
+#include "frc2/command/FunctionalCommand.h"
+#include "frc2/command/InstantCommand.h"
+#include "frc2/command/RunCommand.h"
 
 using namespace frc2;
 class CommandScheduleTest : public CommandTestBase {};
