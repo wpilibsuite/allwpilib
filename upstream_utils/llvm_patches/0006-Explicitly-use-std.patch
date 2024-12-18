@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:37:34 -0400
-Subject: [PATCH 06/38] Explicitly use std::
+Subject: [PATCH 06/36] Explicitly use std::
 
 ---
  llvm/include/llvm/ADT/SmallSet.h       |  2 +-
  llvm/lib/Support/ErrorHandling.cpp     |  2 +-
  llvm/unittests/ADT/SmallPtrSetTest.cpp |  2 +-
  llvm/unittests/ADT/SmallSetTest.cpp    | 10 +++++-----
- 5 files changed, 9 insertions(+), 9 deletions(-)
+ 4 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallSet.h b/llvm/include/llvm/ADT/SmallSet.h
 index aeee5f97799aea7e7588d7afba1e47b4fa3d8c7b..4969dfb0d61c2fad805c9cb7bc0184ea6d47bf23 100644

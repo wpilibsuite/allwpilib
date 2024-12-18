@@ -41,7 +41,7 @@ constexpr Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(
   for (int row = 0; row < result.rows(); ++row) {
     for (int col = 0; col < result.cols(); ++col) {
       if (row != col) {
-        result.coeffRef(row, col) = 0.0;
+        result(row, col) = 0.0;
       }
     }
   }
@@ -49,9 +49,9 @@ constexpr Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(
   wpi::for_each(
       [&](int i, double tolerance) {
         if (tolerance == std::numeric_limits<double>::infinity()) {
-          result.coeffRef(i, i) = 0.0;
+          result(i, i) = 0.0;
         } else {
-          result.coeffRef(i, i) = 1.0 / (tolerance * tolerance);
+          result(i, i) = 1.0 / (tolerance * tolerance);
         }
       },
       tolerances...);
@@ -78,14 +78,13 @@ constexpr Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
   for (int row = 0; row < result.rows(); ++row) {
     for (int col = 0; col < result.cols(); ++col) {
       if (row != col) {
-        result.coeffRef(row, col) = 0.0;
+        result(row, col) = 0.0;
       }
     }
   }
 
-  wpi::for_each(
-      [&](int i, double stdDev) { result.coeffRef(i, i) = stdDev * stdDev; },
-      stdDevs...);
+  wpi::for_each([&](int i, double stdDev) { result(i, i) = stdDev * stdDev; },
+                stdDevs...);
 
   return result;
 }
@@ -111,12 +110,12 @@ constexpr Matrixd<N, N> MakeCostMatrix(const std::array<double, N>& costs) {
     for (int col = 0; col < result.cols(); ++col) {
       if (row == col) {
         if (costs[row] == std::numeric_limits<double>::infinity()) {
-          result.coeffRef(row, col) = 0.0;
+          result(row, col) = 0.0;
         } else {
-          result.coeffRef(row, col) = 1.0 / (costs[row] * costs[row]);
+          result(row, col) = 1.0 / (costs[row] * costs[row]);
         }
       } else {
-        result.coeffRef(row, col) = 0.0;
+        result(row, col) = 0.0;
       }
     }
   }
@@ -143,9 +142,9 @@ constexpr Matrixd<N, N> MakeCovMatrix(const std::array<double, N>& stdDevs) {
   for (int row = 0; row < result.rows(); ++row) {
     for (int col = 0; col < result.cols(); ++col) {
       if (row == col) {
-        result.coeffRef(row, col) = stdDevs[row] * stdDevs[row];
+        result(row, col) = stdDevs[row] * stdDevs[row];
       } else {
-        result.coeffRef(row, col) = 0.0;
+        result(row, col) = 0.0;
       }
     }
   }
@@ -207,9 +206,12 @@ Vectord<N> MakeWhiteNoiseVector(const std::array<double, N>& stdDevs) {
  * @param pose The pose that is being represented.
  *
  * @return The vector.
+ * @deprecated Create the vector manually instead. If you were using this as an
+ *     intermediate step for constructing affine transformations, use
+ *     Pose2d.ToMatrix() instead.
  */
-WPILIB_DLLEXPORT
-constexpr Eigen::Vector3d PoseTo3dVector(const Pose2d& pose) {
+[[deprecated("Use Pose2d.ToMatrix() instead.")]]
+WPILIB_DLLEXPORT constexpr Eigen::Vector3d PoseTo3dVector(const Pose2d& pose) {
   return Eigen::Vector3d{{pose.Translation().X().value(),
                           pose.Translation().Y().value(),
                           pose.Rotation().Radians().value()}};
@@ -221,9 +223,12 @@ constexpr Eigen::Vector3d PoseTo3dVector(const Pose2d& pose) {
  * @param pose The pose that is being represented.
  *
  * @return The vector.
+ * @deprecated Create the vector manually instead. If you were using this as an
+ *     intermediate step for constructing affine transformations, use
+ *     Pose2d.ToMatrix() instead.
  */
-WPILIB_DLLEXPORT
-constexpr Eigen::Vector4d PoseTo4dVector(const Pose2d& pose) {
+[[deprecated("Use Pose2d.ToMatrix() instead.")]]
+WPILIB_DLLEXPORT constexpr Eigen::Vector4d PoseTo4dVector(const Pose2d& pose) {
   return Eigen::Vector4d{{pose.Translation().X().value(),
                           pose.Translation().Y().value(), pose.Rotation().Cos(),
                           pose.Rotation().Sin()}};
@@ -312,9 +317,12 @@ bool IsDetectable(const Matrixd<States, States>& A,
  * @param pose The pose that is being represented.
  *
  * @return The vector.
+ * @deprecated Create the vector manually instead. If you were using this as an
+ *     intermediate step for constructing affine transformations, use
+ *     Pose2d.ToMatrix() instead.
  */
-WPILIB_DLLEXPORT
-constexpr Eigen::Vector3d PoseToVector(const Pose2d& pose) {
+[[deprecated("Use Pose2d.ToMatrix() instead.")]]
+WPILIB_DLLEXPORT constexpr Eigen::Vector3d PoseToVector(const Pose2d& pose) {
   return Eigen::Vector3d{
       {pose.X().value(), pose.Y().value(), pose.Rotation().Radians().value()}};
 }
@@ -334,7 +342,7 @@ constexpr Vectord<Inputs> ClampInputMaxMagnitude(const Vectord<Inputs>& u,
                                                  const Vectord<Inputs>& umax) {
   Vectord<Inputs> result;
   for (int i = 0; i < Inputs; ++i) {
-    result.coeffRef(i) = std::clamp(u.coeff(i), umin.coeff(i), umax.coeff(i));
+    result(i) = std::clamp(u(i), umin(i), umax(i));
   }
   return result;
 }

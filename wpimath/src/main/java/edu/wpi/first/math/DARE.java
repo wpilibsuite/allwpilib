@@ -38,13 +38,13 @@ public final class DARE {
    * @param R Input cost matrix.
    * @return Solution of DARE.
    */
-  public static <States extends Num, Inputs extends Num> Matrix<States, States> dareDetail(
+  public static <States extends Num, Inputs extends Num> Matrix<States, States> dareNoPrecond(
       Matrix<States, States> A,
       Matrix<States, Inputs> B,
       Matrix<States, States> Q,
       Matrix<Inputs, Inputs> R) {
     var S = new Matrix<States, States>(new SimpleMatrix(A.getNumRows(), A.getNumCols()));
-    DAREJNI.dareDetailABQR(
+    DAREJNI.dareNoPrecondABQR(
         A.getStorage().getDDRM().getData(),
         B.getStorage().getDDRM().getData(),
         Q.getStorage().getDDRM().getData(),
@@ -115,14 +115,14 @@ public final class DARE {
    * @param N State-input cross-term cost matrix.
    * @return Solution of DARE.
    */
-  public static <States extends Num, Inputs extends Num> Matrix<States, States> dareDetail(
+  public static <States extends Num, Inputs extends Num> Matrix<States, States> dareNoPrecond(
       Matrix<States, States> A,
       Matrix<States, Inputs> B,
       Matrix<States, States> Q,
       Matrix<Inputs, Inputs> R,
       Matrix<States, Inputs> N) {
     var S = new Matrix<States, States>(new SimpleMatrix(A.getNumRows(), A.getNumCols()));
-    DAREJNI.dareDetailABQRN(
+    DAREJNI.dareNoPrecondABQRN(
         A.getStorage().getDDRM().getData(),
         B.getStorage().getDDRM().getData(),
         Q.getStorage().getDDRM().getData(),

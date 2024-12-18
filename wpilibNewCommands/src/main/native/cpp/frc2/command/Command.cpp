@@ -121,6 +121,10 @@ CommandPtr Command::OnlyIf(std::function<bool()> condition) && {
   return std::move(*this).ToPtr().OnlyIf(std::move(condition));
 }
 
+CommandPtr Command::WithDeadline(CommandPtr&& deadline) && {
+  return std::move(*this).ToPtr().WithDeadline(std::move(deadline));
+}
+
 CommandPtr Command::DeadlineFor(CommandPtr&& parallel) && {
   return std::move(*this).ToPtr().DeadlineFor(std::move(parallel));
 }

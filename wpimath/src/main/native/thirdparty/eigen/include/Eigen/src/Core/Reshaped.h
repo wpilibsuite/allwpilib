@@ -173,7 +173,7 @@ class ReshapedImpl_dense<XprType, Rows, Cols, Order, false>
 
 #ifdef EIGEN_PARSED_BY_DOXYGEN
   /** \sa MapBase::data() */
-  EIGEN_DEVICE_FUNC inline const Scalar* data() const;
+  EIGEN_DEVICE_FUNC constexpr const Scalar* data() const;
   EIGEN_DEVICE_FUNC inline Index innerStride() const;
   EIGEN_DEVICE_FUNC inline Index outerStride() const;
 #endif

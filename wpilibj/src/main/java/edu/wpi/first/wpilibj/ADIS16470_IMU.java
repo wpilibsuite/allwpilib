@@ -426,6 +426,10 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     return m_connected;
   }
 
+  private static int toUShort(int upper, int lower) {
+    return ((upper & 0xFF) << 8) + (lower & 0xFF);
+  }
+
   private static int toShort(int upper, int lower) {
     return (short) (((upper & 0xFF) << 8) + (lower & 0xFF));
   }
@@ -609,7 +613,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     m_spi.write(buf, 2);
     m_spi.read(false, buf, 2);
 
-    return (buf[0] << 8) & buf[1];
+    return toUShort(buf[0], buf[1]);
   }
 
   private void writeRegister(int reg, int val) {

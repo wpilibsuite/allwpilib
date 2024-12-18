@@ -35,7 +35,7 @@ application {
     mainClass = 'frc.robot.Main'
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.gradleup.shadow'
 
 repositories {
     maven {
@@ -54,6 +54,9 @@ dependencies {
     implementation project(':cameraserver')
     implementation project(':wpilibNewCommands')
     implementation project(':apriltag')
+    implementation project(':wpiunits')
+    implementation project(':epilogue-runtime')
+    annotationProcessor project(':epilogue-processor')
 }
 
 tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {

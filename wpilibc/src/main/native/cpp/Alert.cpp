@@ -149,7 +149,7 @@ void Alert::Set(bool active) {
   }
 
   if (active) {
-    m_activeStartTime = frc::RobotController::GetFPGATime();
+    m_activeStartTime = frc::RobotController::GetTime();
     m_activeAlerts->emplace(m_activeStartTime, m_text);
   } else {
     m_activeAlerts->erase({m_activeStartTime, m_text});

@@ -43,6 +43,9 @@ bool WriteFromSmallVector(pb_ostream_t* stream, const pb_byte_t* buf,
 
 bool WriteFromStdVector(pb_ostream_t* stream, const pb_byte_t* buf,
                         size_t count);
+
+bool WriteSubmessage(pb_ostream_t* stream, const pb_msgdesc_t* desc,
+                     const void* msg);
 }  // namespace detail
 
 /**
@@ -208,7 +211,8 @@ class ProtoOutputStream {
   bool Encode(
       const typename Protobuf<std::remove_cvref_t<T>>::MessageStruct& msg) {
     if (m_streamMsg) {
-      return pb_encode_submessage(m_streamMsg, m_msgDesc, &msg);
+      return detail::WriteSubmessage(m_streamMsg, m_msgDesc, &msg);
+      // return pb_encode_submessage(m_streamMsg, m_msgDesc, &msg);
     }
     return pb_encode(&m_streamLocal, m_msgDesc, &msg);
   }

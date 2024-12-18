@@ -170,6 +170,22 @@ class Pose3dTest {
   }
 
   @Test
+  void testToMatrix() {
+    var before =
+        new Pose3d(
+            1.0,
+            2.0,
+            3.0,
+            new Rotation3d(
+                Units.degreesToRadians(20.0),
+                Units.degreesToRadians(30.0),
+                Units.degreesToRadians(40.0)));
+    var after = new Pose3d(before.toMatrix());
+
+    assertEquals(before, after);
+  }
+
+  @Test
   void testToPose2d() {
     var pose =
         new Pose3d(

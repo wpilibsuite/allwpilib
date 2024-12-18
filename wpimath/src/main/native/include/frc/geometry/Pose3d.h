@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 
@@ -53,6 +54,25 @@ class WPILIB_DLLEXPORT Pose3d {
   constexpr Pose3d(units::meter_t x, units::meter_t y, units::meter_t z,
                    Rotation3d rotation)
       : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
+
+  /**
+   * Constructs a pose with the specified affine transformation matrix.
+   *
+   * @param matrix The affine transformation matrix.
+   * @throws std::domain_error if the affine transformation matrix is invalid.
+   */
+  constexpr explicit Pose3d(const Eigen::Matrix4d& matrix)
+      : m_translation{Eigen::Vector3d{
+            {matrix(0, 3)}, {matrix(1, 3)}, {matrix(2, 3)}}},
+        m_rotation{
+            Eigen::Matrix3d{{matrix(0, 0), matrix(0, 1), matrix(0, 2)},
+                            {matrix(1, 0), matrix(1, 1), matrix(1, 2)},
+                            {matrix(2, 0), matrix(2, 1), matrix(2, 2)}}} {
+    if (matrix(3, 0) != 0.0 || matrix(3, 1) != 0.0 || matrix(3, 2) != 0.0 ||
+        matrix(3, 3) != 1.0) {
+      throw std::domain_error("Affine transformation matrix is invalid");
+    }
+  }
 
   /**
    * Constructs a 3D pose from a 2D pose in the X-Y plane.
@@ -219,6 +239,18 @@ class WPILIB_DLLEXPORT Pose3d {
   constexpr Twist3d Log(const Pose3d& end) const;
 
   /**
+   * Returns an affine transformation matrix representation of this pose.
+   */
+  constexpr Eigen::Matrix4d ToMatrix() const {
+    auto vec = m_translation.ToVector();
+    auto mat = m_rotation.ToMatrix();
+    return Eigen::Matrix4d{{mat(0, 0), mat(0, 1), mat(0, 2), vec(0)},
+                           {mat(1, 0), mat(1, 1), mat(1, 2), vec(1)},
+                           {mat(2, 0), mat(2, 1), mat(2, 2), vec(2)},
+                           {0.0, 0.0, 0.0, 1.0}};
+  }
+
+  /**
    * Returns a Pose2d representing this Pose3d projected into the X-Y plane.
    */
   constexpr Pose2d ToPose2d() const {
@@ -281,9 +313,9 @@ constexpr Eigen::Matrix3d RotationVectorToMatrix(
   //         [ 0 -c  b]
   // Omega = [ c  0 -a]
   //         [-b  a  0]
-  return Eigen::Matrix3d{{0.0, -rotation.coeff(2), rotation.coeff(1)},
-                         {rotation.coeff(2), 0.0, -rotation.coeff(0)},
-                         {-rotation.coeff(1), rotation.coeff(0), 0.0}};
+  return Eigen::Matrix3d{{0.0, -rotation(2), rotation(1)},
+                         {rotation(2), 0.0, -rotation(0)},
+                         {-rotation(1), rotation(0), 0.0}};
 }
 
 }  // namespace detail

@@ -87,6 +87,14 @@ class Pose2dTest {
   }
 
   @Test
+  void testToMatrix() {
+    var before = new Pose2d(1.0, 2.0, Rotation2d.fromDegrees(20.0));
+    var after = new Pose2d(before.toMatrix());
+
+    assertEquals(before, after);
+  }
+
+  @Test
   void testMinus() {
     var initial = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(45.0));
     var last = new Pose2d(5.0, 5.0, Rotation2d.fromDegrees(45.0));
