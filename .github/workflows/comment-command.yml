@@ -42,12 +42,24 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
+      - name: Set up Go 1.15.x
+        uses: actions/setup-go@v5
+        with:
+          cache: false
+          go-version: 1.15.x
+        id: go
+      - name: Install Buildifier
+        run: |
+          cd $(mktemp -d)
+          GO111MODULE=on go get github.com/bazelbuild/buildtools/buildifier@6.0.0
       - name: Install wpiformat
         run: pip3 install wpiformat==2024.50
       - name: Run wpiformat
         run: wpiformat
       - name: Run spotlessApply
         run: ./gradlew spotlessApply
+      - name: Run buildifier
+        run: buildifier -warnings all --lint=fix -r .
       - name: Commit
         run: |
           # Set credentials
