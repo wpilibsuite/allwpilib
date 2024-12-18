@@ -66,7 +66,7 @@ public class Tracer {
     private final ArrayList<String> m_traceStack = new ArrayList<>();
 
     /**
-     * ideally we only need `traceStack` but in the interest of memory optimization and string
+     * Ideally we only need `traceStack` but in the interest of memory optimization and string
      * concatenation speed we store the history of the stack to reuse the stack names.
      */
     private final ArrayList<String> m_traceStackHistory = new ArrayList<>();
