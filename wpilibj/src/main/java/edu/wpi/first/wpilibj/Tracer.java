@@ -171,8 +171,8 @@ public class Tracer {
       if (m_disabled != m_disableNextCycle || m_cyclePoisoned) {
         // Gives publishers empty times,
         // reporting no data is better than bad data
-        for (var publisher : m_publishers.entrySet()) {
-          publisher.getValue().set(0.0);
+        for (var publisher : m_publishers.values()) {
+          publisher.set(0.0);
         }
         return;
       } else if (!m_disabled) {
