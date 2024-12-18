@@ -32,7 +32,7 @@ import java.util.function.Supplier;
  * <p>Example inside a {@code Drive Subsystem}
  *
  * <pre><code>
- * // Subsystem periodics are automaticall traced
+ * // Subsystem periodics are automatically traced
  * public void periodic() {
  *   for (var module : modules) {
  *     Tracer.traceFunc("Module" + module.getName(), module::update);
