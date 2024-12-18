@@ -59,8 +59,7 @@ class Tracer {
     // A collection of all publishers that have been created,
     // this makes updating the times of publishers much easier and faster
     std::vector<std::pair<std::string_view, nt::DoublePublisher>> m_publishers;
-    // If the cycle is poisoned, it will warn the user
-    // and not publish any data
+    // If the cycle is poisoned, it will warn the user and not publish any data
     bool m_cyclePoisoned = false;
     // If the tracer is disabled, it will not publish any data
     // or do any string manipulation
