@@ -83,10 +83,7 @@ public class Tracer {
     /** the publishers for each trace, the key is the trace name, modified every endCycle. */
     private final HashMap<String, DoublePublisher> m_publishers = new HashMap<>();
 
-    /*
-     * If the cycle is poisoned, it will warn the user
-     * and not publish any data.
-     */
+    /** If the cycle is poisoned, it will warn the user and not publish any data. */
     boolean m_cyclePoisoned = false;
 
     /** If the tracer is disabled, it will not publish any data or do any string manipulation. */
