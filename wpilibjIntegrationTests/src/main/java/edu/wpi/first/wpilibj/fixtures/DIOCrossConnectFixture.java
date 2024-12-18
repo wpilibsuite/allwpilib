@@ -37,10 +37,8 @@ public class DIOCrossConnectFixture implements ITestFixture {
    * @param input The port of the {@link DigitalInput}
    * @param output The port of the {@link DigitalOutput}
    */
-  public DIOCrossConnectFixture(Integer input, Integer output) {
-    assert input != null;
-    assert output != null;
-    assert !input.equals(output);
+  public DIOCrossConnectFixture(int input, int output) {
+    assert input != output;
     m_input = new DigitalInput(input);
     m_output = new DigitalOutput(output);
     m_allocated = true;

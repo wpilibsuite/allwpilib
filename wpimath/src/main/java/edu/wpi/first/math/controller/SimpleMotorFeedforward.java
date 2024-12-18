@@ -4,15 +4,8 @@
 
 package edu.wpi.first.math.controller;
 
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.math.controller.proto.SimpleMotorFeedforwardProto;
 import edu.wpi.first.math.controller.struct.SimpleMotorFeedforwardStruct;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.PerUnit;
-import edu.wpi.first.units.TimeUnit;
-import edu.wpi.first.units.Unit;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
@@ -136,7 +129,7 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    * @param velocity The velocity setpoint.
    * @param acceleration The acceleration setpoint.
    * @return The computed feedforward.
-   * @deprecated Use the current/next velocity overload instead.
+   * @deprecated Use {@link #calculateWithVelocities(double, double)} instead.
    */
   @SuppressWarnings("removal")
   @Deprecated(forRemoval = true, since = "2025")
@@ -150,24 +143,9 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    *
    * @param velocity The velocity setpoint.
    * @return The computed feedforward.
-   * @deprecated Use the current/next velocity overload instead.
    */
-  @SuppressWarnings("removal")
-  @Deprecated(forRemoval = true, since = "2025")
   public double calculate(double velocity) {
     return calculate(velocity, 0);
-  }
-
-  /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete control when the
-   * setpoint does not change.
-   *
-   * @param <U> The velocity parameter either as distance or angle.
-   * @param setpoint The velocity setpoint.
-   * @return The computed feedforward.
-   */
-  public <U extends Unit> Voltage calculate(Measure<? extends PerUnit<U, TimeUnit>> setpoint) {
-    return calculate(setpoint, setpoint);
   }
 
   /**
@@ -175,25 +153,20 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    *
    * <p>Note this method is inaccurate when the velocity crosses 0.
    *
-   * @param <U> The velocity parameter either as distance or angle.
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity The next velocity setpoint.
    * @return The computed feedforward.
    */
-  public <U extends Unit> Voltage calculate(
-      Measure<? extends PerUnit<U, TimeUnit>> currentVelocity,
-      Measure<? extends PerUnit<U, TimeUnit>> nextVelocity) {
+  public double calculateWithVelocities(double currentVelocity, double nextVelocity) {
     // See wpimath/algorithms.md#Simple_motor_feedforward for derivation
     if (ka == 0.0) {
-      return Volts.of(ks * Math.signum(nextVelocity.magnitude()) + kv * nextVelocity.magnitude());
+      return ks * Math.signum(nextVelocity) + kv * nextVelocity;
     } else {
       double A = -kv / ka;
       double B = 1.0 / ka;
       double A_d = Math.exp(A * m_dt);
       double B_d = 1.0 / A * (A_d - 1.0) * B;
-      return Volts.of(
-          ks * Math.signum(currentVelocity.magnitude())
-              + 1.0 / B_d * (nextVelocity.magnitude() - A_d * currentVelocity.magnitude()));
+      return ks * Math.signum(currentVelocity) + 1.0 / B_d * (nextVelocity - A_d * currentVelocity);
     }
   }
 

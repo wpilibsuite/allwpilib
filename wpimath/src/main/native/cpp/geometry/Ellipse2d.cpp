@@ -8,7 +8,7 @@
 
 using namespace frc;
 
-Translation2d Ellipse2d::FindNearestPoint(const Translation2d& point) const {
+Translation2d Ellipse2d::Nearest(const Translation2d& point) const {
   // Check if already in ellipse
   if (Contains(point)) {
     return point;

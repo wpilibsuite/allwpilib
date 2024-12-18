@@ -46,29 +46,31 @@ enum class SolverExitCondition : int8_t {
  */
 SLEIPNIR_DLLEXPORT constexpr std::string_view ToMessage(
     const SolverExitCondition& exitCondition) {
+  using enum SolverExitCondition;
+
   switch (exitCondition) {
-    case SolverExitCondition::kSuccess:
+    case kSuccess:
       return "solved to desired tolerance";
-    case SolverExitCondition::kSolvedToAcceptableTolerance:
+    case kSolvedToAcceptableTolerance:
       return "solved to acceptable tolerance";
-    case SolverExitCondition::kCallbackRequestedStop:
+    case kCallbackRequestedStop:
       return "callback requested stop";
-    case SolverExitCondition::kTooFewDOFs:
+    case kTooFewDOFs:
       return "problem has too few degrees of freedom";
-    case SolverExitCondition::kLocallyInfeasible:
+    case kLocallyInfeasible:
       return "problem is locally infeasible";
-    case SolverExitCondition::kFeasibilityRestorationFailed:
+    case kFeasibilityRestorationFailed:
       return "solver failed to reach the desired tolerance, and feasibility "
              "restoration failed to converge";
-    case SolverExitCondition::kNonfiniteInitialCostOrConstraints:
+    case kNonfiniteInitialCostOrConstraints:
       return "solver encountered nonfinite initial cost or constraints and "
              "gave up";
-    case SolverExitCondition::kDivergingIterates:
+    case kDivergingIterates:
       return "solver encountered diverging primal iterates xₖ and/or sₖ and "
              "gave up";
-    case SolverExitCondition::kMaxIterationsExceeded:
+    case kMaxIterationsExceeded:
       return "solution returned after maximum iterations exceeded";
-    case SolverExitCondition::kTimeout:
+    case kTimeout:
       return "solution returned after maximum wall clock time exceeded";
     default:
       return "unknown";

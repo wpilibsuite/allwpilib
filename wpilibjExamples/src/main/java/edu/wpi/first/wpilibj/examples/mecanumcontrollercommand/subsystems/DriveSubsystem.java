@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
@@ -125,11 +124,15 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /** Sets the front left drive MotorController to a voltage. */
-  public void setDriveMotorControllersVolts(MecanumDriveMotorVoltages volts) {
-    m_frontLeft.setVoltage(volts.frontLeftVoltage);
-    m_rearLeft.setVoltage(volts.rearLeftVoltage);
-    m_frontRight.setVoltage(volts.frontRightVoltage);
-    m_rearRight.setVoltage(volts.rearRightVoltage);
+  public void setDriveMotorControllersVolts(
+      double frontLeftVoltage,
+      double frontRightVoltage,
+      double rearLeftVoltage,
+      double rearRightVoltage) {
+    m_frontLeft.setVoltage(frontLeftVoltage);
+    m_rearLeft.setVoltage(rearLeftVoltage);
+    m_frontRight.setVoltage(frontRightVoltage);
+    m_rearRight.setVoltage(rearRightVoltage);
   }
 
   /** Resets the drive encoders to currently read a position of 0. */

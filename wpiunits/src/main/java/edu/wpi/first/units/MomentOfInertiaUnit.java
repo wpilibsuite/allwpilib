@@ -28,7 +28,7 @@ public final class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, Angu
   }
 
   MomentOfInertiaUnit(
-      PerUnit<AngularMomentumUnit, AngularVelocityUnit> baseUnit,
+      MomentOfInertiaUnit baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,

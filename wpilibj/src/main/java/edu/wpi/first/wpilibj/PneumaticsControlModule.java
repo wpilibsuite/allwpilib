@@ -47,8 +47,7 @@ public class PneumaticsControlModule implements PneumaticsBase {
 
   private static DataStore getForModule(int module) {
     synchronized (m_handleLock) {
-      Integer moduleBoxed = module;
-      DataStore pcm = m_handleMap.get(moduleBoxed);
+      DataStore pcm = m_handleMap.get(module);
       if (pcm == null) {
         pcm = new DataStore(module);
       }

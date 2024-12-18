@@ -68,19 +68,19 @@ public class SysIdRoutineBot {
     m_driverController
         .a()
         .and(m_driverController.leftBumper())
-        .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     m_driverController
         .b()
         .and(m_driverController.leftBumper())
-        .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     m_driverController
         .x()
         .and(m_driverController.leftBumper())
-        .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
     m_driverController
         .y()
         .and(m_driverController.leftBumper())
-        .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**
