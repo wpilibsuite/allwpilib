@@ -7,9 +7,13 @@ package edu.wpi.first.wpilibj2.command;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
@@ -17,16 +21,45 @@ class SchedulerTest extends CommandTestBase {
   @Test
   void schedulerLambdaTestNoInterrupt() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
+      List<String> testEvents = Collections.synchronizedList(new ArrayList<>());
 
-      scheduler.onCommandInitialize(command -> counter.incrementAndGet());
-      scheduler.onCommandExecute(command -> counter.incrementAndGet());
-      scheduler.onCommandFinish(command -> counter.incrementAndGet());
+      scheduler.onCommandInitialize(command -> testEvents.add("OnInitialize " + command.getName()));
+      scheduler.onCommandBeforeExecute(
+          command -> testEvents.add("OnBeforeExecute " + command.getName()));
+      scheduler.onCommandExecute(command -> testEvents.add("OnAfterExecute " + command.getName()));
+      scheduler.onCommandFinish(command -> testEvents.add("OnFinish " + command.getName()));
 
-      scheduler.schedule(new InstantCommand());
+      scheduler.schedule(
+          new FunctionalCommand(
+                  () -> testEvents.add("Initializing OnceCommand"),
+                  () -> testEvents.add("Executing OnceCommand"),
+                  (Boolean interrupted) -> testEvents.add("Ending OnceCommand"),
+                  () -> true)
+              .withName("OnceCommand"));
+      scheduler.schedule(
+          new FunctionalCommand(
+                  () -> testEvents.add("Initializing ContinuingCommand"),
+                  () -> testEvents.add("Executing ContinuingCommand"),
+                  (Boolean interrupted) -> testEvents.add("Ending ContinuingCommand"),
+                  () -> false)
+              .withName("ContinuingCommand"));
       scheduler.run();
 
-      assertEquals(counter.get(), 3);
+      assertIterableEquals(
+          List.of(
+              "Initializing OnceCommand",
+              "OnInitialize OnceCommand",
+              "Initializing ContinuingCommand",
+              "OnInitialize ContinuingCommand",
+              "OnBeforeExecute OnceCommand",
+              "Executing OnceCommand",
+              "OnAfterExecute OnceCommand",
+              "Ending OnceCommand",
+              "OnFinish OnceCommand",
+              "OnBeforeExecute ContinuingCommand",
+              "Executing ContinuingCommand",
+              "OnAfterExecute ContinuingCommand"),
+          testEvents);
     }
   }
 
