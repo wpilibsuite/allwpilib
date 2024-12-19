@@ -305,7 +305,7 @@ model {
 }
 
 tasks.withType(CppCompile) {
-    dependsOn generateCatchUserConfig
+    dependsOn "generateCatchUserConfig"
 }
 
 sourceSets {
