@@ -1,0 +1,7 @@
+model {
+    binaries {
+        withType(GoogleTestTestSuiteBinarySpec).all {
+            lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
+        }
+    }
+}
