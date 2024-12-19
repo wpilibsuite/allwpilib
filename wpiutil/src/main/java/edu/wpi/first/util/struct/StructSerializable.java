@@ -10,6 +10,7 @@ import edu.wpi.first.util.WPISerializable;
  * Marker interface to indicate a class is serializable using Struct serialization.
  *
  * <p>While this cannot be enforced by the interface, any class implementing this interface should
- * provide a public final static `struct` member variable.
+ * provide a public final static `struct` member variable, or a static final `getStruct()` method if
+ * the class is generic.
  */
 public interface StructSerializable extends WPISerializable {}
