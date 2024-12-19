@@ -43,8 +43,8 @@ model {
                     include '**/*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/include'
-                            // "$buildDir/generated-includes/"
+                    srcDirs 'src/main/native/include',
+                            "$buildDir/generated-includes/"
                 }
             }
         }
