@@ -119,6 +119,14 @@ void SmartDashboard::PutData(wpi::Sendable* value) {
   }
 }
 
+void SmartDashboard::PutData(std::string_view key, wpi::Sendable& data) {
+  PutData(key, &data);
+}
+
+void SmartDashboard::PutData(wpi::Sendable& value) {
+  PutData(&value);
+}
+
 wpi::Sendable* SmartDashboard::GetData(std::string_view key) {
   auto& inst = GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
