@@ -422,6 +422,13 @@ class WPILIB_DLLEXPORT Rotation3d {
   }
 
   /**
+   * Returns rotation vector representation of this rotation.
+   *
+   * @return Rotation vector representation of this rotation.
+   */
+  constexpr Eigen::Vector3d ToVector() const { return m_q.ToRotationVector(); }
+
+  /**
    * Returns a Rotation2d representing this Rotation3d projected into the X-Y
    * plane.
    */
