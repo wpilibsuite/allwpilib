@@ -22,6 +22,7 @@ import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.util.datalog.StructArrayLogEntry;
 import edu.wpi.first.util.datalog.StructLogEntry;
 import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.wpilibj.DataLogManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -39,6 +40,11 @@ public class FileBackend implements EpilogueBackend {
    */
   public FileBackend(DataLog dataLog) {
     this.m_dataLog = requireNonNullParam(dataLog, "dataLog", "FileBackend");
+  }
+
+  /** Creates a new file-based backend. */
+  public FileBackend() {
+    this(DataLogManager.getLog());
   }
 
   @Override
