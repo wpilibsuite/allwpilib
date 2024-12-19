@@ -55,4 +55,8 @@ tasks.withType(CppCompile) {
     dependsOn generateCatchUserConfig
 }
 
+tasks.withType(TestCpp) {
+    dependsOn generateCatchUserConfig
+}
+
 apply from: 'publish.gradle'
