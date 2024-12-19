@@ -26,8 +26,8 @@ task generateCatchUserConfig() {
         }
 
         def read = catch2UserConfigInput.text
-        read = read.replace('${CATCH_CONFIG_DEFAULT_REPORTER}', "console")
-        read = read.replace('${CATCH_CONFIG_CONSOLE_WIDTH}', "80")
+        read = read.replace('@CATCH_CONFIG_DEFAULT_REPORTER@', "console")
+        read = read.replace('@CATCH_CONFIG_CONSOLE_WIDTH@', "80")
         read = read.replaceAll("#cmakedefine", "//")
 
         catch2UserConfigOutput.write(read)
