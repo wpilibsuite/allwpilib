@@ -365,6 +365,8 @@ public abstract class RobotBase implements AutoCloseable {
   private static <T extends RobotBase> void runRobot(Supplier<T> robotSupplier) {
     System.out.println("********** Robot program starting **********");
 
+    Thread.currentThread().setName("RobotMain");
+
     T robot;
     try {
       robot = robotSupplier.get();

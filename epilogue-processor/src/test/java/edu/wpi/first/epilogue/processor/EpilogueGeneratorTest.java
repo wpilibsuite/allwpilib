@@ -207,7 +207,9 @@ class EpilogueGeneratorTest {
 
             robot.addPeriodic(() -> {
               update(robot);
-            }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
+            },
+            "EpiloguePeriodic",
+            config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
           }
         }
         """;
@@ -297,7 +299,9 @@ class EpilogueGeneratorTest {
 
             robot.addPeriodic(() -> {
               update(robot);
-            }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
+            },
+            "EpiloguePeriodic",
+            config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
           }
 
           /**
@@ -329,7 +333,9 @@ class EpilogueGeneratorTest {
 
             robot.addPeriodic(() -> {
               update(robot);
-            }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
+            },
+            "EpiloguePeriodic",
+            config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
           }
         }
         """;

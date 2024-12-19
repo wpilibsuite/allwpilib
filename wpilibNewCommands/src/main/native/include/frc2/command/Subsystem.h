@@ -49,6 +49,8 @@ class Subsystem {
    * Command.  Teams should try to be consistent within their own codebases
    * about which responsibilities will be handled by Commands, and which will be
    * handled here.
+   *
+   * <p>This method is implicitly timed using the `Tracer` class.
    */
   virtual void Periodic();
 
@@ -57,6 +59,8 @@ class Subsystem {
    * updating subsystem-specific state that needs to be maintained for
    * simulations, such as for updating simulation classes and setting simulated
    * sensor readings.
+   *
+   * <p>This method is implicitly timed using the `Tracer` class.
    */
   virtual void SimulationPeriodic();
 
