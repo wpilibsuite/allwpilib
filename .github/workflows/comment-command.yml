@@ -93,16 +93,8 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}"
           NUMBER: ${{ github.event.issue.number }}
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install jinja
-        run: python -m pip install jinja2
-      - name: Install protobuf dependencies
-        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler && wget https://github.com/HebiRobotics/QuickBuffers/releases/download/1.3.3/protoc-gen-quickbuf-1.3.3-linux-x86_64.exe && chmod +x protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
-      - name: Regenerate all
-        run: ./.github/workflows/pregen_all.py --quickbuf_plugin=protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
+      - name: Run pregen
+        uses: ./.github/actions/pregen
       - name: Commit
         run: |
           # Set credentials
