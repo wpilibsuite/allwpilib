@@ -304,6 +304,8 @@ model {
     }
 }
 
+sourceSets.main.java.srcDir "${projectDir}/src/main/generated/java"
+
 sourceSets {
     printlog
 }
