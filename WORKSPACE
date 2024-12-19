@@ -35,8 +35,8 @@ maven_install(
 # Download toolchains
 http_archive(
     name = "rules_bzlmodrio_toolchains",
-    sha256 = "2ef1cafce7f4fd4e909bb5de8b0dc771a934646afd55d5f100ff31f6b500df98",
-    url = "https://github.com/wpilibsuite/rules_bzlmodRio_toolchains/releases/download/2024-1.bcr1/rules_bzlmodRio_toolchains-2024-1.bcr1.tar.gz",
+    sha256 = "fe267e2af53c1def1e962700a9aeda9e8fdfa9fb46b72167c615ec0e25447dd6",
+    url = "https://github.com/wpilibsuite/rules_bzlmodRio_toolchains/releases/download/2025-1/rules_bzlmodRio_toolchains-2025-1.tar.gz",
 )
 
 load("@rules_bzlmodrio_toolchains//:maven_deps.bzl", "setup_legacy_setup_toolchains_dependencies")
@@ -71,6 +71,12 @@ register_toolchains(
     "@local_bullseye_64//:macos",
     "@local_bullseye_64//:linux",
     "@local_bullseye_64//:windows",
+    "@local_bookworm_32//:macos",
+    "@local_bookworm_32//:linux",
+    "@local_bookworm_32//:windows",
+    "@local_bookworm_64//:macos",
+    "@local_bookworm_64//:linux",
+    "@local_bookworm_64//:windows",
 )
 
 setup_legacy_setup_jdk_dependencies()
@@ -87,8 +93,8 @@ setup_legacy_bzlmodrio_ni_cpp_dependencies()
 
 http_archive(
     name = "bzlmodrio-opencv",
-    sha256 = "5314cce05b49451a46bf3e3140fc401342e53d5f3357612ed4473e59bb616cba",
-    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2024.4.8.0-4.bcr1/bzlmodRio-opencv-2024.4.8.0-4.bcr1.tar.gz",
+    sha256 = "4f4a607956ca8555618736c3058dd96e09d02df19e95088c1e352d2319fd70c7",
+    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-2/bzlmodRio-opencv-2025.4.10.0-2.tar.gz",
 )
 
 load("@bzlmodrio-opencv//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_opencv_cpp_dependencies")
@@ -98,3 +104,16 @@ setup_legacy_bzlmodrio_opencv_cpp_dependencies()
 load("@bzlmodrio-opencv//:maven_java_deps.bzl", "setup_legacy_bzlmodrio_opencv_java_dependencies")
 
 setup_legacy_bzlmodrio_opencv_java_dependencies()
+
+http_archive(
+    name = "build_bazel_apple_support",
+    sha256 = "c4bb2b7367c484382300aee75be598b92f847896fb31bbd22f3a2346adf66a80",
+    url = "https://github.com/bazelbuild/apple_support/releases/download/1.15.1/apple_support.1.15.1.tar.gz",
+)
+
+load(
+    "@build_bazel_apple_support//lib:repositories.bzl",
+    "apple_support_dependencies",
+)
+
+apple_support_dependencies()
