@@ -17,7 +17,19 @@ import edu.wpi.first.units.measure.MutEnergy;
  * <p>Actual units (such as {@link Units#Joules} and {@link Units#Kilojoules}) can be found in the
  * {@link Units} class.
  */
-public final class EnergyUnit extends Unit {
+public final class EnergyUnit extends MultUnit<ForceUnit, DistanceUnit> {
+  private static final CombinatoryUnitCache<ForceUnit, DistanceUnit, EnergyUnit> cache =
+      new CombinatoryUnitCache<>(EnergyUnit::new);
+
+  EnergyUnit(ForceUnit force, DistanceUnit distance) {
+    super(
+        force.isBaseUnit() && distance.isBaseUnit()
+            ? null
+            : combine(force.getBaseUnit(), distance.getBaseUnit()),
+        force,
+        distance);
+  }
+
   EnergyUnit(
       EnergyUnit baseUnit,
       UnaryFunction toBaseConverter,
@@ -27,46 +39,20 @@ public final class EnergyUnit extends Unit {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
-  EnergyUnit(EnergyUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
-    super(baseUnit, baseUnitEquivalent, name, symbol);
+  /**
+   * Combines a force and distance to form a unit of energy.
+   *
+   * @param force the unit of force
+   * @param distance the unit of distance
+   * @return the combined unit of energy
+   */
+  public static EnergyUnit combine(ForceUnit force, DistanceUnit distance) {
+    return cache.combine(force, distance);
   }
 
   @Override
   public EnergyUnit getBaseUnit() {
     return (EnergyUnit) super.getBaseUnit();
-  }
-
-  /**
-   * Combines this unit of energy with a unit of time to create a unit of power.
-   *
-   * @param period the period of the change in energy
-   * @return the combined unit of power
-   */
-  @Override
-  public PowerUnit per(TimeUnit period) {
-    return PowerUnit.combine(this, period);
-  }
-
-  /**
-   * Creates a ratio unit between this unit and an arbitrary other unit.
-   *
-   * @param other the other unit
-   * @param <U> the type of the other unit
-   * @return the ratio unit
-   */
-  public <U extends Unit> PerUnit<EnergyUnit, U> per(U other) {
-    return PerUnit.combine(this, other);
-  }
-
-  /**
-   * Converts a measurement value in terms of another unit to this unit.
-   *
-   * @param magnitude the magnitude of the measurement in terms of the other unit
-   * @param otherUnit the other unit
-   * @return the value of the measurement in terms of this unit
-   */
-  public double convertFrom(double magnitude, EnergyUnit otherUnit) {
-    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
   @Override
@@ -89,8 +75,41 @@ public final class EnergyUnit extends Unit {
     return (Energy) super.one();
   }
 
+  /**
+   * Converts a measurement value in terms of another unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other unit
+   * @param otherUnit the other unit
+   * @return the value of the measurement in terms of this unit
+   */
+  public double convertFrom(double magnitude, EnergyUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
+  }
+
   @Override
   public MutEnergy mutable(double initialMagnitude) {
     return new MutEnergy(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  }
+
+  /**
+   * Combines this unit of energy with a unit of time to create a unit of power.
+   *
+   * @param period the period of the change in energy
+   * @return the combined unit of power
+   */
+  @Override
+  public PowerUnit per(TimeUnit period) {
+    return PowerUnit.combine(this, period);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<EnergyUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
   }
 }

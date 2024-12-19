@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import static edu.wpi.first.units.Units.Watts;
+
 import edu.wpi.first.units.measure.ImmutableVoltage;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
@@ -17,9 +19,17 @@ import edu.wpi.first.units.measure.Voltage;
  * <p>Actual units (such as {@link Units#Volts} and {@link Units#Millivolts}) can be found in the
  * {@link Units} class.
  */
-public final class VoltageUnit extends Unit {
-  VoltageUnit(VoltageUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
-    super(baseUnit, baseUnitEquivalent, name, symbol);
+public final class VoltageUnit extends PerUnit<PowerUnit, CurrentUnit> {
+  private static final CombinatoryUnitCache<PowerUnit, CurrentUnit, VoltageUnit> cache =
+      new CombinatoryUnitCache<>(VoltageUnit::new);
+
+  VoltageUnit(PowerUnit power, CurrentUnit current) {
+    super(
+        power.isBaseUnit() && current.isBaseUnit()
+            ? null
+            : combine(power.getBaseUnit(), current.getBaseUnit()),
+        power,
+        current);
   }
 
   VoltageUnit(
@@ -31,24 +41,20 @@ public final class VoltageUnit extends Unit {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  /**
+   * Combines a power and a current unit to form a unit of voltage.
+   *
+   * @param power the unit of energy
+   * @param current the unit of time
+   * @return the combined unit of power
+   */
+  public static VoltageUnit combine(PowerUnit power, CurrentUnit current) {
+    return cache.combine(power, current);
+  }
+
   @Override
   public VoltageUnit getBaseUnit() {
     return (VoltageUnit) super.getBaseUnit();
-  }
-
-  /**
-   * Constructs a unit of power equivalent to this unit of voltage multiplied by another unit of
-   * electrical current. For example, {@code Volts.times(Amps)} will return a unit of power
-   * equivalent to one Watt; {@code Volts.times(Milliamps)} will return a unit of power equivalent
-   * to a milliwatt, and so on.
-   *
-   * @param current the current unit to multiply by
-   * @param name the name of the resulting unit of power
-   * @param symbol the symbol used to represent the unit of power
-   * @return the power unit
-   */
-  public PowerUnit mult(CurrentUnit current, String name, String symbol) {
-    return Units.derive(PowerUnit.combine(this, current)).named(name).symbol(symbol).make();
   }
 
   @Override
@@ -74,6 +80,30 @@ public final class VoltageUnit extends Unit {
   @Override
   public MutVoltage mutable(double magnitude) {
     return new MutVoltage(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  /**
+   * Constructs a unit of power equivalent to this unit of voltage multiplied by another unit of
+   * electrical current. For example, {@code Volts.times(Amps)} will return a unit of power
+   * equivalent to one Watt; {@code Volts.times(Milliamps)} will return a unit of power equivalent
+   * to a milliwatt, and so on.
+   *
+   * @param current the current unit to multiply by
+   * @return the power unit
+   */
+  @Override
+  public PowerUnit mult(CurrentUnit current) {
+    double baseUnitEquivalent = this.toBaseUnits(1) * current.toBaseUnits(1);
+    UnaryFunction toBaseConverter = x -> x * baseUnitEquivalent;
+    UnaryFunction fromBaseConverter = x -> x / baseUnitEquivalent;
+    PowerUnit powerUnit =
+        new PowerUnit(
+            Watts,
+            toBaseConverter,
+            fromBaseConverter,
+            this.name() + "-" + current.name(),
+            this.symbol() + "*" + current.symbol());
+    return powerUnit;
   }
 
   @Override

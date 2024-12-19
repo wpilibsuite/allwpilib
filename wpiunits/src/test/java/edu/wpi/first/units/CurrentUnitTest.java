@@ -12,15 +12,13 @@ import org.junit.jupiter.api.Test;
 class CurrentUnitTest {
   @Test
   void testAmpsTimesVolts() {
-    PowerUnit combined = Units.Amps.mult(Units.Volts, "Watt", "w");
-
-    assertTrue(combined.equivalent(Units.Watts));
+    assertTrue(Units.Amps.mult(Units.Volts).equivalent(Units.Watts));
   }
 
   @Test
   void testMilliAmpsTimesMilliVolts() {
     // results in microwatts
-    PowerUnit times = Units.Milliamps.mult(Units.Millivolts, "Microwatt", "uW");
+    PowerUnit times = Units.Milliamps.mult(Units.Millivolts);
     PowerUnit millimilli = Units.Milli(Units.Milliwatts);
 
     assertEquals(1, times.convertFrom(1e-6, Units.Watts));
