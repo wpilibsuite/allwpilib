@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 TEST(EventTest, AutoReset) {
-  auto event = wpi::CreateEvent(false, false);
+  auto event = wpi::MakeEvent(false, false);
   std::thread thr([&] { wpi::SetEvent(event); });
   wpi::WaitForObject(event);
   thr.join();
@@ -19,7 +19,7 @@ TEST(EventTest, AutoReset) {
 }
 
 TEST(EventTest, ManualReset) {
-  auto event = wpi::CreateEvent(true, false);
+  auto event = wpi::MakeEvent(true, false);
   int done = 0;
   std::thread thr([&] {
     wpi::SetEvent(event);
@@ -34,15 +34,15 @@ TEST(EventTest, ManualReset) {
 }
 
 TEST(EventTest, InitialSet) {
-  auto event = wpi::CreateEvent(false, true);
+  auto event = wpi::MakeEvent(false, true);
   bool timedOut;
   wpi::WaitForObject(event, 0, &timedOut);
   ASSERT_EQ(timedOut, false);
 }
 
 TEST(EventTest, WaitMultiple) {
-  auto event1 = wpi::CreateEvent(false, false);
-  auto event2 = wpi::CreateEvent(false, false);
+  auto event1 = wpi::MakeEvent(false, false);
+  auto event2 = wpi::MakeEvent(false, false);
   std::thread thr([&] { wpi::SetEvent(event2); });
   WPI_Handle signaled[2];
   auto result1 = wpi::WaitForObjects({event1, event2}, signaled);
