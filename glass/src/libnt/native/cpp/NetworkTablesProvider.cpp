@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <string>
 #include <utility>
 
 #include <fmt/format.h>
@@ -33,12 +34,16 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
     for (auto&& childIt : m_storage.GetChildren()) {
       auto id = childIt.key();
       auto typePtr = m_typeCache.FindValue(id);
-      if (!typePtr || typePtr->type != Storage::Value::kString) {
+      if (!typePtr) {
+        continue;
+      }
+      auto strPtr = std::get_if<std::string>(&typePtr->data);
+      if (!strPtr) {
         continue;
       }
 
       // only handle ones where we have a builder
-      auto builderIt = m_typeMap.find(typePtr->stringVal);
+      auto builderIt = m_typeMap.find(*strPtr);
       if (builderIt == m_typeMap.end()) {
         continue;
       }
@@ -89,10 +94,13 @@ void NetworkTablesProvider::DisplayMenu() {
       // Add type label to smartdashboard sendables
       if (wpi::starts_with(entry->name, "/SmartDashboard/")) {
         auto typeEntry = m_typeCache.FindValue(entry->name);
-        if (typeEntry) {
+        if (!typeEntry) {
+          continue;
+        }
+        if (auto typeStr = std::get_if<std::string>(&typeEntry->data)) {
           ImGui::SameLine();
           ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
-          ImGui::Text("%s", typeEntry->stringVal.c_str());
+          ImGui::Text("%s", typeStr->c_str());
           ImGui::PopStyleColor();
           ImGui::SameLine();
           ImGui::Dummy(ImVec2(10.0f, 0.0f));
@@ -166,7 +174,7 @@ void NetworkTablesProvider::Update() {
       GetOrCreateView(builderIt->second, nt::Topic{valueData->topic},
                       tableName);
       // cache the type
-      m_typeCache.SetString(tableName, valueData->value.GetString());
+      m_typeCache.Set(tableName, valueData->value.GetString());
     }
   }
 }
