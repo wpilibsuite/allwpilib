@@ -304,10 +304,6 @@ model {
     }
 }
 
-tasks.withType(CppCompile) {
-    dependsOn "generateCatchUserConfig"
-}
-
 sourceSets {
     printlog
 }
