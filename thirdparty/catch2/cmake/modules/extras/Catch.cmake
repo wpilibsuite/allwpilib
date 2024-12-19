@@ -38,6 +38,7 @@ same as the Catch name; see also ``TEST_PREFIX`` and ``TEST_SUFFIX``.
                          [OUTPUT_PREFIX prefix]
                          [OUTPUT_SUFFIX suffix]
                          [DISCOVERY_MODE <POST_BUILD|PRE_TEST>]
+                         [SKIP_IS_FAILURE]
     )
 
   ``catch_discover_tests`` sets up a post-build command on the test executable
@@ -131,7 +132,7 @@ same as the Catch name; see also ``TEST_PREFIX`` and ``TEST_SUFFIX``.
     of test cases from the test executable and when the tests are executed themselves.
     This requires cmake/ctest >= 3.22.
 
-  `DISCOVERY_MODE mode``
+  ``DISCOVERY_MODE mode``
     Provides control over when ``catch_discover_tests`` performs test discovery.
     By default, ``POST_BUILD`` sets up a post-build command to perform test discovery
     at build time. In certain scenarios, like cross-compiling, this ``POST_BUILD``
@@ -144,6 +145,9 @@ same as the Catch name; see also ``TEST_PREFIX`` and ``TEST_SUFFIX``.
     calling ``catch_discover_tests``. This provides a mechanism for globally selecting
     a preferred test discovery behavior without having to modify each call site.
 
+  ``SKIP_IS_FAILURE``
+    Disables skipped test detection.
+
 #]=======================================================================]
 
 #------------------------------------------------------------------------------
@@ -151,7 +155,7 @@ function(catch_discover_tests TARGET)
 
   cmake_parse_arguments(
     ""
-    ""
+    "SKIP_IS_FAILURE"
     "TEST_PREFIX;TEST_SUFFIX;WORKING_DIRECTORY;TEST_LIST;REPORTER;OUTPUT_DIR;OUTPUT_PREFIX;OUTPUT_SUFFIX;DISCOVERY_MODE"
     "TEST_SPEC;EXTRA_ARGS;PROPERTIES;DL_PATHS;DL_FRAMEWORK_PATHS"
     ${ARGN}
@@ -192,6 +196,9 @@ function(catch_discover_tests TARGET)
     TARGET ${TARGET}
     PROPERTY CROSSCOMPILING_EMULATOR
   )
+  if (NOT _SKIP_IS_FAILURE)
+    set(_PROPERTIES ${_PROPERTIES} SKIP_RETURN_CODE 4)
+  endif()
 
   if(_DISCOVERY_MODE STREQUAL "POST_BUILD")
     add_custom_command(
@@ -260,7 +267,6 @@ function(catch_discover_tests TARGET)
       "      CTEST_FILE"             " [==[" "${ctest_tests_file}"        "]==]"   "\n"
       "      TEST_DL_PATHS"          " [==[" "${_DL_PATHS}"               "]==]"   "\n"
       "      TEST_DL_FRAMEWORK_PATHS" " [==[" "${_DL_FRAMEWORK_PATHS}"     "]==]"   "\n"
-      "      CTEST_FILE"             " [==[" "${CTEST_FILE}"              "]==]"   "\n"
       "    )"                                                                      "\n"
       "  endif()"                                                                  "\n"
       "  include(\"${ctest_tests_file}\")"                                         "\n"
