@@ -51,6 +51,8 @@ model {
     }
 }
 
+project(':').libraryBuild.dependsOn build
+
 tasks.withType(CppCompile) {
     dependsOn generateCatchUserConfig
 }
