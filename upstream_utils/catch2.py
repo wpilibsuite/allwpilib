@@ -3,11 +3,7 @@
 import os
 import shutil
 
-from upstream_utils import (
-    comment_out_invalid_includes,
-    walk_cwd_and_copy_if,
-    Lib,
-)
+from upstream_utils import Lib, comment_out_invalid_includes, walk_cwd_and_copy_if
 
 
 def copy_upstream_src(wpilib_root):
