@@ -16,7 +16,7 @@ that want even more control over what code runs on their robot.
 #include <stdio.h>
 
 #include <hal/HAL.h>
-#include "wpi/Synchronization.h"
+#include <wpi/Synchronization.h>
 
 enum DriverStationMode {
   DisabledMode,

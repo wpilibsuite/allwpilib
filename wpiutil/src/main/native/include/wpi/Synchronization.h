@@ -58,8 +58,7 @@ constexpr int kHandleTypeUserBase = 80;
  * @param initialState true to make the event initially in signaled state
  * @return Event handle
  */
-WPI_EventHandle MakeEvent(bool manualReset = false,
-                            bool initialState = false);
+WPI_EventHandle MakeEvent(bool manualReset = false, bool initialState = false);
 
 /**
  * Destroys an event.  Destruction wakes up any waiters.
@@ -94,7 +93,7 @@ void ResetEvent(WPI_EventHandle handle);
  * @return Semaphore handle
  */
 WPI_SemaphoreHandle MakeSemaphore(int initialCount = 0,
-                                    int maximumCount = INT_MAX);
+                                  int maximumCount = INT_MAX);
 
 /**
  * Destroys a semaphore.  Destruction wakes up any waiters.
