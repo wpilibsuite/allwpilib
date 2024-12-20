@@ -21,9 +21,7 @@ NTCommandSelectorModel::NTCommandSelectorModel(nt::NetworkTableInstance inst,
                     .GetEntry(false)},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_runningData{fmt::format("NTCmd:{}", path)},
-      m_nameValue{wpi::rsplit(path, '/').second} {
-  m_runningData.SetDigital(true);
-}
+      m_nameValue{wpi::rsplit(path, '/').second} {}
 
 void NTCommandSelectorModel::SetRunning(bool run) {
   m_running.Set(run);
