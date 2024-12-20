@@ -22,7 +22,7 @@ using namespace frc2;
 
 using SendableChooserTestPublisherFunc = std::function<void(wpi::Sendable*)>;
 using SendableChooserTestArgs =
-    std::pair<std::function<frc2::CommandPtr(SendablePublisherFunc)>,
+    std::pair<std::function<frc2::CommandPtr(SendableChooserTestPublisherFunc)>,
               std::vector<std::string_view>>;
 
 class SendableChooserCommandTest
@@ -54,27 +54,27 @@ static const frc2::CommandPtr CommandNamed(std::string_view name) {
   return frc2::cmd::Print(name).WithName(name);
 }
 
-static const auto OptionsAreCorrectParams() {
+static const std::vector<SendableChooserTestArgs> OptionsAreCorrectParams() {
   SendableChooserTestArgs empty{[](SendableChooserTestPublisherFunc func) {
                                   return frc2::cmd::Choose(func);
                                 },
                                 std::vector<std::string_view>()};
 
   SendableChooserTestArgs duplicateName{
-      [](SendableChooserTestPublisherFunc(func) {
-        return frc2::cmd::Choose(func, CommandNamed("a"), CommandNamed("b"), CommandNamed("a")),
+      [](SendableChooserTestPublisherFunc func) {
+        return frc2::cmd::Choose(func, CommandNamed("a"), CommandNamed("b"), CommandNamed("a"));
       }, make_vector<std::string_view>("a", "b")};
 
   SendableChooserTestArgs happyPath{
-      [](SendableChooserTestPublisherFunc(func) {
-        return frc2::cmd::Choose(func, CommandNamed("a"), CommandNamed("b"), CommandNamed("c")),
+      [](SendableChooserTestPublisherFunc func) {
+        return frc2::cmd::Choose(func, CommandNamed("a"), CommandNamed("b"), CommandNamed("c"));
       }, make_vector<std::string_view>("a", "b", "c")};
 
-  return testing::Values(empty, duplicateName, happyPath);
+  return make_vector<SendableChooserTestArgs>(empty, duplicateName, happyPath);
 }
 
 }  // namespace utils
 
 INSTANTIATE_TEST_SUITE_P(SendableChooserCommandTests,
                          SendableChooserCommandTest,
-                         utils::OptionsAreCorrectParams());
+                         testing::ValuesIn(utils::OptionsAreCorrectParams()));
