@@ -18,7 +18,6 @@ kControlStart = 0
 kControlFinish = 1
 kControlSetMetadata = 2
 
-
 class StartRecordData:
     """Data contained in a start control record as created by DataLog.start() when
     writing the log. This can be read by calling DataLogRecord.getStartData().
