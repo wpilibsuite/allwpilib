@@ -203,7 +203,7 @@ public class SwerveDriveKinematics
    * @return The resulting chassis speed.
    */
   @Override
-  public ChassisSpeeds toChassisSpeeds(SwerveModuleState... moduleStates) {
+  public ChassisSpeeds toChassisSpeeds(SwerveModuleState[] moduleStates) {
     if (moduleStates.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of module locations provided in "
