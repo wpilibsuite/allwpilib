@@ -1,7 +1,5 @@
 name: Comment Commands
 on:
-  issue_comment:
-    types: [ created ]
 
 jobs:
   format:
