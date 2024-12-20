@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <functional>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -19,8 +20,10 @@
 
 using namespace frc2;
 
+using SendableChooserTestPublisherFunc = std::function<void(wpi::Sendable*)>;
 using SendableChooserTestArgs =
-    std::pair<std::vector<frc2::CommandPtr>, std::vector<std::string_view>>;
+    std::pair<std::function<frc2::CommandPtr(SendablePublisherFunc)>,
+              std::vector<std::string_view>>;
 
 class SendableChooserCommandTest
     : public CommandTestBaseWithParam<SendableChooserTestArgs> {
@@ -35,14 +38,13 @@ class SendableChooserCommandTest
 };
 
 TEST_P(SendableChooserCommandTest, OptionsAreCorrect) {
-  auto&& [commands, names] = GetParam();
+  auto&& [commandFactory, names] = GetParam();
   nt::StringArraySubscriber optionsSubscriber =
       nt::NetworkTableInstance::GetDefault()
           .GetStringArrayTopic("/SmartDashboard/chooser/options")
           .Subscribe({});
-  auto cmd = frc2::cmd::Choose(
-      [&](wpi::Sendable* c) { frc::SmartDashboard::PutData("chooser", c); },
-      std::move(commands));
+  auto cmd = commandFactory(
+      [&](wpi::Sendable* c) { frc::SmartDashboard::PutData("chooser", c); });
   frc::SmartDashboard::UpdateValues();
   EXPECT_EQ(names, optionsSubscriber.Get());
 }
@@ -53,18 +55,20 @@ static const frc2::CommandPtr CommandNamed(std::string_view name) {
 }
 
 static const auto OptionsAreCorrectParams() {
-  SendableChooserTestArgs empty{make_vector<frc2::CommandPtr>(),
-                                make_vector<std::string_view>()};
+  SendableChooserTestArgs empty{[](SendableChooserTestPublisherFunc func) {
+                                  return frc2::cmd::Choose(func);
+                                },
+                                std::vector<std::string_view>()};
 
   SendableChooserTestArgs duplicateName{
-      make_vector<frc2::CommandPtr>(CommandNamed("a"), CommandNamed("b"),
-                                    CommandNamed("a")),
-      make_vector<std::string_view>("a", "b")};
+      [](SendableChooserTestPublisherFunc(func) {
+        return frc2::cmd::Choose(func, CommandNamed("a"), CommandNamed("b"), CommandNamed("a")),
+      }, make_vector<std::string_view>("a", "b")};
 
   SendableChooserTestArgs happyPath{
-      make_vector<frc2::CommandPtr>(CommandNamed("a"), CommandNamed("b"),
-                                    CommandNamed("c")),
-      make_vector<std::string_view>("a", "b", "c")};
+      [](SendableChooserTestPublisherFunc(func) {
+        return frc2::cmd::Choose(func, CommandNamed("a"), CommandNamed("b"), CommandNamed("c")),
+      }, make_vector<std::string_view>("a", "b", "c")};
 
   return testing::Values(empty, duplicateName, happyPath);
 }
