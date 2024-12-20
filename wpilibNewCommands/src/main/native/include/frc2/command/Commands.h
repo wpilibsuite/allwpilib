@@ -8,11 +8,14 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
+#include <frc/smartdashboard/SendableChooser.h>
 #include <wpi/deprecated.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Requirements.h"
@@ -154,6 +157,40 @@ CommandPtr Select(std::function<Key()> selector,
    ...);
 
   return SelectCommand(std::move(selector), std::move(vec)).ToPtr();
+}
+
+/**
+ * Runs a command chosen from the dashboard.
+ *
+ *
+ * Example usage:
+ *
+ * ```cpp
+ * frc2::CommandPtr autonomousCommand = frc2::cmd::Choose(
+ *    [](wpi::Sendable* chooser) {
+ *      frc::SmartDashboard::PutData("Auto Chooser", chooser);
+ *    },
+ *    std::move(myFirstAuto).WithName("First Auto"),
+ *    std::move(mySecondAuto).WithName("Second Auto"));
+ * ```
+ *
+ *
+ * @param publish lambda used for publishing the chooser to the dashboard
+ * @param commands commands to choose from
+ * @return the command
+ */
+template <std::convertible_to<CommandPtr>... CommandPtrs>
+[[nodiscard]]
+CommandPtr Choose(std::function<void(wpi::Sendable*)> publish,
+                  CommandPtrs&&... commands) {
+  frc::SendableChooser<std::string_view> chooser;
+  ((void)chooser.AddOption(commands.GetName(), commands.GetName()), ...);
+  publish(&chooser);
+  return Select(
+      [sendableChooser = std::move(chooser)]() mutable {
+        return sendableChooser.GetSelected();
+      },
+      (std::pair{commands.GetName(), std::move(commands)}, ...));
 }
 
 /**
