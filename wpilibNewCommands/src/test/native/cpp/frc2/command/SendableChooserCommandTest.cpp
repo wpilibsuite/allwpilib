@@ -19,7 +19,7 @@
 
 using namespace frc2;
 
-typedef SendableChooserTestArgs =
+using SendableChooserTestArgs =
     std::pair<std::vector<frc2::CommandPtr>, std::vector<std::string_view>>;
 
 class SendableChooserCommandTest
@@ -39,12 +39,12 @@ TEST_P(SendableChooserCommandTest, OptionsAreCorrect) {
   nt::StringArraySubscriber optionsSubscriber =
       nt::NetworkTableInstance::GetDefault()
           .GetStringArrayTopic("/SmartDashboard/chooser/options")
-          .Subscribe();
+          .Subscribe({});
   auto cmd = frc2::cmd::Choose(
       [&](wpi::Sendable* c) { frc::SmartDashboard::PutData("chooser", c); },
       std::move(commands));
   frc::SmartDashboard::UpdateValues();
-  //  EXPECT_THAT(optionsSubscriber.Get(), ::testing::ElementsAre)
+  EXPECT_EQ(names, optionsSubscriber.Get());
 }
 
 namespace utils {
