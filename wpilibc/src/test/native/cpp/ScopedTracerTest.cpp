@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
+#include <wpi/deprecated.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/ScopedTracer.h"
@@ -18,7 +19,9 @@ TEST(ScopedTracerTest, Timing) {
 
   frc::sim::PauseTiming();
   {
+    WPI_IGNORE_DEPRECATED
     frc::ScopedTracer tracer("timing_test", os);
+    WPI_UNIGNORE_DEPRECATED
     frc::sim::StepTiming(1.5_s);
   }
   frc::sim::ResumeTiming();

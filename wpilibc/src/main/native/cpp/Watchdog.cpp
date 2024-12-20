@@ -11,6 +11,7 @@
 
 #include <fmt/format.h>
 #include <hal/Notifier.h>
+#include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 #include <wpi/priority_queue.h>
 
@@ -131,6 +132,7 @@ void Watchdog::Impl::Main() {
     UpdateAlarm();
   }
 }
+WPI_IGNORE_DEPRECATED
 
 Watchdog::Watchdog(units::second_t timeout, std::function<void()> callback)
     : m_timeout(timeout), m_callback(std::move(callback)), m_impl(GetImpl()) {}
@@ -182,6 +184,7 @@ void Watchdog::SetTimeout(units::second_t timeout) {
   m_impl->m_watchdogs.emplace(this);
   m_impl->UpdateAlarm();
 }
+WPI_UNIGNORE_DEPRECATED
 
 units::second_t Watchdog::GetTimeout() const {
   std::scoped_lock lock(m_impl->m_mutex);
@@ -193,6 +196,7 @@ bool Watchdog::IsExpired() const {
   return m_isExpired;
 }
 
+WPI_IGNORE_DEPRECATED
 void Watchdog::AddEpoch(std::string_view epochName) {
   m_tracer.AddEpoch(epochName);
 }
@@ -217,6 +221,7 @@ void Watchdog::Enable() {
   m_impl->m_watchdogs.emplace(this);
   m_impl->UpdateAlarm();
 }
+WPI_UNIGNORE_DEPRECATED
 
 void Watchdog::Disable() {
   std::scoped_lock lock(m_impl->m_mutex);

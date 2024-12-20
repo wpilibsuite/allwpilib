@@ -147,6 +147,8 @@ class CommandScheduler final : public wpi::Sendable,
    *
    * <p>Any subsystems not being used as requirements have their default methods
    * started.
+   *
+   * <p>This method is implicitly timed using the `Tracer` class.
    */
   void Run();
 
@@ -345,11 +347,6 @@ class CommandScheduler final : public wpi::Sendable,
    * Enables the command scheduler.
    */
   void Enable();
-
-  /**
-   * Prints list of epochs added so far and their times.
-   */
-  void PrintWatchdogEpochs();
 
   /**
    * Adds an action to perform on the initialization of any command by the

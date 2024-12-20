@@ -408,13 +408,25 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
-   * Decorates this Command with a name.
+   * Decorates this Command with a name. Is an inline function for
+   * Command::SetName(std::string_view);
    *
    * @param name name
    * @return the decorated Command
    */
   [[nodiscard]]
   CommandPtr WithName(std::string_view name) &&;
+
+  /**
+   * Decorates this Command so that it's `Execute` method is implicitly timed
+   * using the `Tracer` class. This decorator also names the command similarly
+   * to the `WithName(string)` method.
+   *
+   * @param name name
+   * @return the decorated Command
+   */
+  [[nodiscard]]
+  CommandPtr Traced(std::string_view name) &&;
 
   /**
    * Schedules this command.

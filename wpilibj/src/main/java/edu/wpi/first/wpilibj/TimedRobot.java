@@ -12,6 +12,8 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.Tracer.SubstitutiveTracer;
+import java.util.Optional;
 import java.util.PriorityQueue;
 
 /**
@@ -22,46 +24,64 @@ import java.util.PriorityQueue;
  * <p>periodic() functions from the base class are called on an interval by a Notifier instance.
  */
 public class TimedRobot extends IterativeRobotBase {
-  @SuppressWarnings("MemberName")
+  /** A container for a callback to run at a specific period. */
   static class Callback implements Comparable<Callback> {
-    public Runnable func;
-    public long period;
-    public long expirationTime;
+    /** The callback to run. */
+    public Runnable m_func;
+
+    /**
+     * The tracer to use for this callback. This allows callbacks to appear in their own tracer
+     * table separate from the main RobotLoop tracer table.
+     */
+    public Optional<SubstitutiveTracer> m_tracerSub;
+
+    /** The period at which to run the callback in microseconds. */
+    public long m_period;
+
+    /** The time at which the callback should be run. */
+    public long m_expirationTime;
 
     /**
      * Construct a callback container.
      *
      * @param func The callback to run.
-     * @param startTimeSeconds The common starting point for all callback scheduling in
-     *     microseconds.
-     * @param periodSeconds The period at which to run the callback in microseconds.
-     * @param offsetSeconds The offset from the common starting time in microseconds.
+     * @param name The name of the callback. This is used to create a separate tracer table for the
+     *     callback. If empty, separate tracer tables are not used.
+     * @param startTimeUs The common starting time in microseconds.
+     * @param periodUs The period at which to run the callback in microseconds.
+     * @param offsetUs The offset from the common starting time in microseconds. This is useful for
+     *     scheduling a callback in a different timeslot relative to TimedRobot.
      */
-    Callback(Runnable func, long startTimeUs, long periodUs, long offsetUs) {
-      this.func = func;
-      this.period = periodUs;
-      this.expirationTime =
+    Callback(Runnable func, String name, long startTimeUs, long periodUs, long offsetUs) {
+      this.m_func = func;
+      this.m_tracerSub = Optional.ofNullable(name).map(SubstitutiveTracer::new);
+      this.m_period = periodUs;
+      this.m_expirationTime =
           startTimeUs
               + offsetUs
-              + this.period
-              + (RobotController.getFPGATime() - startTimeUs) / this.period * this.period;
+              + this.m_period
+              + (RobotController.getFPGATime() - startTimeUs) / this.m_period * this.m_period;
+    }
+
+    void call() {
+      m_tracerSub.ifPresentOrElse(tracer -> tracer.subWith(m_func), m_func);
     }
 
     @Override
     public boolean equals(Object rhs) {
-      return rhs instanceof Callback callback && expirationTime == callback.expirationTime;
+      return rhs instanceof Callback callback && m_expirationTime == callback.m_expirationTime;
     }
 
     @Override
     public int hashCode() {
-      return Double.hashCode(expirationTime);
+      return Double.hashCode(m_expirationTime);
     }
 
     @Override
     public int compareTo(Callback rhs) {
       // Elements with sooner expiration times are sorted as lesser. The head of
       // Java's PriorityQueue is the least element.
-      return Long.compare(expirationTime, rhs.expirationTime);
+      return Long.compare(m_expirationTime, rhs.m_expirationTime);
     }
   }
 
@@ -90,7 +110,7 @@ public class TimedRobot extends IterativeRobotBase {
   protected TimedRobot(double period) {
     super(period);
     m_startTimeUs = RobotController.getFPGATime();
-    addPeriodic(this::loopFunc, period);
+    addPeriodic(this::loopFunc, null, period);
     NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
@@ -122,7 +142,7 @@ public class TimedRobot extends IterativeRobotBase {
       // at the end of the loop.
       var callback = m_callbacks.poll();
 
-      NotifierJNI.updateNotifierAlarm(m_notifier, callback.expirationTime);
+      NotifierJNI.updateNotifierAlarm(m_notifier, callback.m_expirationTime);
 
       long currentTime = NotifierJNI.waitForNotifierAlarm(m_notifier);
       if (currentTime == 0) {
@@ -131,26 +151,26 @@ public class TimedRobot extends IterativeRobotBase {
 
       m_loopStartTimeUs = RobotController.getFPGATime();
 
-      callback.func.run();
+      callback.call();
 
       // Increment the expiration time by the number of full periods it's behind
       // plus one to avoid rapid repeat fires from a large loop overrun. We
       // assume currentTime ≥ expirationTime rather than checking for it since
       // the callback wouldn't be running otherwise.
-      callback.expirationTime +=
-          callback.period
-              + (currentTime - callback.expirationTime) / callback.period * callback.period;
+      callback.m_expirationTime +=
+          callback.m_period
+              + (currentTime - callback.m_expirationTime) / callback.m_period * callback.m_period;
       m_callbacks.add(callback);
 
       // Process all other callbacks that are ready to run
-      while (m_callbacks.peek().expirationTime <= currentTime) {
+      while (m_callbacks.peek().m_expirationTime <= currentTime) {
         callback = m_callbacks.poll();
 
-        callback.func.run();
+        callback.call();
 
-        callback.expirationTime +=
-            callback.period
-                + (currentTime - callback.expirationTime) / callback.period * callback.period;
+        callback.m_expirationTime +=
+            callback.m_period
+                + (currentTime - callback.m_expirationTime) / callback.m_period * callback.m_period;
         m_callbacks.add(callback);
       }
     }
@@ -161,6 +181,8 @@ public class TimedRobot extends IterativeRobotBase {
   public void endCompetition() {
     NotifierJNI.stopNotifier(m_notifier);
   }
+
+  private static int m_periodicCount;
 
   /**
    * Return the system clock time in micrseconds for the start of the current periodic loop. This is
@@ -181,9 +203,15 @@ public class TimedRobot extends IterativeRobotBase {
    *
    * @param callback The callback to run.
    * @param periodSeconds The period at which to run the callback in seconds.
+   * @deprecated Use {@link #addPeriodic(Runnable, String, double)} instead.
    */
+  @Deprecated(since = "2025", forRemoval = true)
   public final void addPeriodic(Runnable callback, double periodSeconds) {
-    m_callbacks.add(new Callback(callback, m_startTimeUs, (long) (periodSeconds * 1e6), 0));
+    addPeriodic(
+        callback,
+        "Periodic" + m_periodicCount++,
+        Time.ofBaseUnits(periodSeconds, Seconds),
+        Time.ofBaseUnits(0.0, Seconds));
   }
 
   /**
@@ -196,11 +224,15 @@ public class TimedRobot extends IterativeRobotBase {
    * @param periodSeconds The period at which to run the callback in seconds.
    * @param offsetSeconds The offset from the common starting time in seconds. This is useful for
    *     scheduling a callback in a different timeslot relative to TimedRobot.
+   * @deprecated Use {@link #addPeriodic(Runnable, String, double, double)} instead.
    */
+  @Deprecated(since = "2025", forRemoval = true)
   public final void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
-    m_callbacks.add(
-        new Callback(
-            callback, m_startTimeUs, (long) (periodSeconds * 1e6), (long) (offsetSeconds * 1e6)));
+    addPeriodic(
+        callback,
+        "Periodic" + m_periodicCount++,
+        Time.ofBaseUnits(periodSeconds, Seconds),
+        Time.ofBaseUnits(offsetSeconds, Seconds));
   }
 
   /**
@@ -211,9 +243,11 @@ public class TimedRobot extends IterativeRobotBase {
    *
    * @param callback The callback to run.
    * @param period The period at which to run the callback.
+   * @deprecated Use {@link #addPeriodic(Runnable, String, Time)} instead.
    */
+  @Deprecated(since = "2025", forRemoval = true)
   public final void addPeriodic(Runnable callback, Time period) {
-    addPeriodic(callback, period.in(Seconds));
+    addPeriodic(callback, "Periodic" + m_periodicCount++, period, Time.ofBaseUnits(0.0, Seconds));
   }
 
   /**
@@ -226,8 +260,80 @@ public class TimedRobot extends IterativeRobotBase {
    * @param period The period at which to run the callback.
    * @param offset The offset from the common starting time. This is useful for scheduling a
    *     callback in a different timeslot relative to TimedRobot.
+   * @deprecated Use {@link #addPeriodic(Runnable, String, Time, Time)} instead.
    */
+  @Deprecated(since = "2025", forRemoval = true)
   public final void addPeriodic(Runnable callback, Time period, Time offset) {
-    addPeriodic(callback, period.in(Seconds), offset.in(Seconds));
+    addPeriodic(callback, "Periodic" + m_periodicCount++, period, offset);
+  }
+
+  /**
+   * Add a callback to run at a specific period.
+   *
+   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+   * synchronously. Interactions between them are thread-safe.
+   *
+   * @param callback The callback to run.
+   * @param name The name of the callback. This is used to create a separate tracer table for the
+   *     callback.
+   * @param period The period at which to run the callback in seconds.
+   * @param offset The offset from the common starting time in seconds. This is useful for
+   *     scheduling a callback in a different timeslot relative to TimedRobot.
+   */
+  public final void addPeriodic(Runnable callback, String name, double period, double offset) {
+    m_callbacks.add(
+        new Callback(
+            callback,
+            name,
+            m_startTimeUs,
+            (long) (period * 1_000_000),
+            (long) (offset * 1_000_000)));
+  }
+
+  /**
+   * Add a callback to run at a specific period.
+   *
+   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+   * synchronously. Interactions between them are thread-safe.
+   *
+   * @param callback The callback to run.
+   * @param name The name of the callback. This is used to create a separate tracer table for the
+   *     callback.
+   * @param period The period at which to run the callback in seconds.
+   */
+  public final void addPeriodic(Runnable callback, String name, double period) {
+    addPeriodic(callback, name, period, 0.0);
+  }
+
+  /**
+   * Add a callback to run at a specific period.
+   *
+   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+   * synchronously. Interactions between them are thread-safe.
+   *
+   * @param callback The callback to run.
+   * @param name The name of the callback. This is used to create a separate tracer table for the
+   *     callback.
+   * @param period The period at which to run the callback.
+   * @param offset The offset from the common starting time. This is useful for scheduling a
+   *     callback in a different timeslot relative to TimedRobot.
+   */
+  public final void addPeriodic(Runnable callback, String name, Time period, Time offset) {
+    addPeriodic(callback, name, period.in(Seconds), offset.in(Seconds));
+  }
+
+  /**
+   * Add a callback to run at a specific period.
+   *
+   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+   * synchronously. Interactions between them are thread-safe.
+   *
+   * @param callback The callback to run.
+   * @param name The name of the callback. This is used to create a separate tracer table for the
+   *     callback.
+   * @param period The period at which to run the callback.
+   */
+  public final void addPeriodic(Runnable callback, String name, Time period) {
+    addPeriodic(callback, name, period, Seconds.zero());
   }
 }

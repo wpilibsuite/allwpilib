@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <cstdio>
+#include <string>
 #include <utility>
 
 #include <hal/DriverStation.h>
@@ -63,7 +64,7 @@ void TimedRobot::StartCompetition() {
     while (m_callbacks.top().expirationTime <= currentTime) {
       callback = m_callbacks.pop();
 
-      callback.func();
+      callback();
 
       callback.expirationTime +=
           callback.period + (currentTime - callback.expirationTime) /
@@ -80,7 +81,7 @@ void TimedRobot::EndCompetition() {
 
 TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   m_startTime = std::chrono::microseconds{RobotController::GetFPGATime()};
-  AddPeriodic([=, this] { LoopFunc(); }, period);
+  AddPeriodic([=, this] { LoopFunc(); }, "", period);
 
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
@@ -103,10 +104,20 @@ uint64_t TimedRobot::GetLoopStartTime() {
   return m_loopStartTimeUs;
 }
 
+int periodics = 0;
+
 void TimedRobot::AddPeriodic(std::function<void()> callback,
                              units::second_t period, units::second_t offset) {
   m_callbacks.emplace(
-      callback, m_startTime,
+      callback, fmt::format("Periodic{}", periodics++), m_startTime,
+      std::chrono::microseconds{static_cast<int64_t>(period.value() * 1e6)},
+      std::chrono::microseconds{static_cast<int64_t>(offset.value() * 1e6)});
+}
+
+void TimedRobot::AddPeriodic(std::function<void()> callback, std::string name,
+                             units::second_t period, units::second_t offset) {
+  m_callbacks.emplace(
+      callback, name, m_startTime,
       std::chrono::microseconds{static_cast<int64_t>(period.value() * 1e6)},
       std::chrono::microseconds{static_cast<int64_t>(offset.value() * 1e6)});
 }

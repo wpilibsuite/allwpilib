@@ -20,6 +20,8 @@ namespace frc {
  * need to create an instance at the top of the block you are timing. After the
  * block finishes execution (i.e. when the ScopedTracer instance gets
  * destroyed), the epoch is printed to the provided raw_ostream.
+ *
+ * @deprecated Use frc::Tracer::StartScopedTrace(string) instead.
  */
 class ScopedTracer {
  public:
@@ -28,7 +30,10 @@ class ScopedTracer {
    *
    * @param name The name of the epoch.
    * @param os A reference to the raw_ostream to print data to.
+   *
+   * @deprecated Use frc::Tracer::StartScopedTrace(string) instead.
    */
+  [[deprecated("Use frc::Tracer::StartScopedTrace(string) instead.")]]
   ScopedTracer(std::string_view name, wpi::raw_ostream& os);
   ~ScopedTracer();
 

@@ -5,10 +5,12 @@
 #include "frc2/command/CommandPtr.h"
 
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
 #include <frc/Errors.h>
+#include <frc/Tracer.h>
 
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/ConditionalCommand.h"
@@ -257,6 +259,30 @@ CommandPtr CommandPtr::WithName(std::string_view name) && {
   WrapperCommand wrapper{std::move(m_ptr)};
   wrapper.SetName(name);
   return std::move(wrapper).ToPtr();
+}
+
+namespace {
+class TracedCommand : public WrapperCommand {
+ public:
+  TracedCommand(std::unique_ptr<Command>&& command, std::string_view name)
+      : WrapperCommand(std::move(command)), m_name(name) {}
+
+  void Execute() override {
+    frc::Tracer::StartTrace(m_name);
+    WrapperCommand::Execute();
+    frc::Tracer::EndTrace();
+  }
+
+ private:
+  std::string m_name;
+};
+}  // namespace
+
+CommandPtr CommandPtr::Traced(std::string_view name) && {
+  AssertValid();
+  m_ptr = std::make_unique<TracedCommand>(std::move(m_ptr), name);
+  m_ptr->SetName(name);
+  return std::move(*this);
 }
 
 Command* CommandPtr::get() const& {

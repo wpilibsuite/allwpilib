@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <gtest/gtest.h>
+#include <wpi/deprecated.h>
 
 #include "frc/simulation/SimHooks.h"
 
@@ -100,34 +101,6 @@ TEST_F(WatchdogTest, IsExpired) {
 
   watchdog.Reset();
   EXPECT_FALSE(watchdog.IsExpired());
-}
-
-TEST_F(WatchdogTest, Epochs) {
-  uint32_t watchdogCounter = 0;
-
-  Watchdog watchdog(0.4_s, [&] { watchdogCounter++; });
-
-  // Run 1
-  watchdog.Enable();
-  watchdog.AddEpoch("Epoch 1");
-  frc::sim::StepTiming(0.1_s);
-  watchdog.AddEpoch("Epoch 2");
-  frc::sim::StepTiming(0.1_s);
-  watchdog.AddEpoch("Epoch 3");
-  watchdog.Disable();
-
-  EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
-
-  // Run 2
-  watchdog.Enable();
-  watchdog.AddEpoch("Epoch 1");
-  frc::sim::StepTiming(0.2_s);
-  watchdog.Reset();
-  frc::sim::StepTiming(0.2_s);
-  watchdog.AddEpoch("Epoch 2");
-  watchdog.Disable();
-
-  EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 }
 
 TEST_F(WatchdogTest, MultiWatchdog) {
