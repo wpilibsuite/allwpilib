@@ -1,0 +1,36 @@
+cppHeaderFileInclude {
+  \.h$
+  \.inc$
+  \.inl$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  src/main/native/resources/
+  src/main/native/thirdparty/
+  src/main/native/win/wpical.ico
+  src/main/native/mac/wpical.icns
+}
+
+repoRootNameOverride {
+  wpical
+}
+
+includeOtherLibs {
+  ^GLFW
+  ^ceres/
+  ^fmt/
+  ^frc/
+  ^gtest/
+  ^imgui
+  ^implot\.h$
+  ^mrcal_wrapper\.h$
+  ^opencv2\.h$
+  ^portable-file-dialogs\.h$
+  ^tagpose\.h$
+  ^wpi/
+  ^wpigui
+}
