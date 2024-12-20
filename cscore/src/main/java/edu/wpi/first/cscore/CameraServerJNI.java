@@ -1025,10 +1025,10 @@ public class CameraServerJNI {
   /**
    * Runs main run loop with timeout.
    *
-   * @param timeoutSeconds Timeout in seconds.
+   * @param timeout Timeout in seconds.
    * @return 3 on timeout, 2 on signal, 1 on other.
    */
-  public static native int runMainRunLoopTimeout(double timeoutSeconds);
+  public static native int runMainRunLoopTimeout(double timeout);
 
   /** Stops main run loop. */
   public static native void stopMainRunLoop();

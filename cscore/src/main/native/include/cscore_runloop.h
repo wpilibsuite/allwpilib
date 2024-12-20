@@ -5,7 +5,16 @@
 #pragma once
 
 namespace cs {
+
 void RunMainRunLoop();
-int RunMainRunLoopTimeout(double timeoutSeconds);
+
+/**
+ * Runs main run loop with timeout.
+ *
+ * @param timeout Timeout in seconds.
+ */
+int RunMainRunLoopTimeout(double timeout);
+
 void StopMainRunLoop();
+
 }  // namespace cs

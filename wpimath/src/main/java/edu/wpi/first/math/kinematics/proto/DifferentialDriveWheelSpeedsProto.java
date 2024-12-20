@@ -33,7 +33,7 @@ public class DifferentialDriveWheelSpeedsProto
 
   @Override
   public void pack(ProtobufDifferentialDriveWheelSpeeds msg, DifferentialDriveWheelSpeeds value) {
-    msg.setLeft(value.leftMetersPerSecond);
-    msg.setRight(value.rightMetersPerSecond);
+    msg.setLeft(value.left);
+    msg.setRight(value.right);
   }
 }

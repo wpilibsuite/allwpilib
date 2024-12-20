@@ -98,7 +98,7 @@ class DigitalGlitchFilter : public wpi::Sendable,
    *
    * @param nanoseconds The number of nanoseconds.
    */
-  void SetPeriodNanoSeconds(uint64_t nanoseconds);
+  void SetPeriod(uint64_t nanoseconds);
 
   /**
    * Gets the number of cycles that the input must not change state for.
@@ -112,7 +112,7 @@ class DigitalGlitchFilter : public wpi::Sendable,
    *
    * @return The number of nanoseconds.
    */
-  uint64_t GetPeriodNanoSeconds();
+  uint64_t GetPeriod();
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 

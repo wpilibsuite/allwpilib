@@ -19,10 +19,10 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 public class Robot extends TimedRobot {
   // distance the robot wants to stay from an object
   // (one meter)
-  static final double kHoldDistanceMillimeters = 1.0e3;
+  static final double kHoldDistance = 1.0; // m
 
   // proportional speed constant
-  private static final double kP = 0.001;
+  private static final double kP = 1.0;
   // integral speed constant
   private static final double kI = 0.0;
   // derivative speed constant
@@ -53,12 +53,12 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // Set setpoint of the pid controller
-    m_pidController.setSetpoint(kHoldDistanceMillimeters);
+    m_pidController.setSetpoint(kHoldDistance);
   }
 
   @Override
   public void autonomousPeriodic() {
-    double measurement = m_ultrasonic.getRangeMM();
+    double measurement = m_ultrasonic.getRange();
     double filteredMeasurement = m_filter.calculate(measurement);
     double pidOutput = m_pidController.calculate(filteredMeasurement);
 

@@ -720,8 +720,7 @@ void* HAL_GetDMADirectPointer(HAL_DMAHandle handle) {
 
 enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
                                          HAL_DMASample* dmaSample,
-                                         double timeoutSeconds,
-                                         int32_t* remainingOut,
+                                         double timeout, int32_t* remainingOut,
                                          int32_t* status) {
   DMA* dma = static_cast<DMA*>(dmaPointer);
   *remainingOut = 0;
@@ -733,8 +732,8 @@ enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
   }
 
   dma->manager->read(dmaSample->readBuffer, dma->captureStore.captureSize,
-                     static_cast<uint32_t>(timeoutSeconds * 1000),
-                     &remainingBytes, status);
+                     static_cast<uint32_t>(timeout * 1000), &remainingBytes,
+                     status);
 
   if ((remainingBytes % dma->captureStore.captureSize) != 0) {
     wpi::print(
@@ -769,17 +768,15 @@ enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
 }
 
 enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
-                                   HAL_DMASample* dmaSample,
-                                   double timeoutSeconds, int32_t* remainingOut,
-                                   int32_t* status) {
+                                   HAL_DMASample* dmaSample, double timeout,
+                                   int32_t* remainingOut, int32_t* status) {
   auto dma = dmaHandles->Get(handle);
   if (!dma) {
     *status = HAL_HANDLE_ERROR;
     return HAL_DMA_ERROR;
   }
 
-  return HAL_ReadDMADirect(dma.get(), dmaSample, timeoutSeconds, remainingOut,
-                           status);
+  return HAL_ReadDMADirect(dma.get(), dmaSample, timeout, remainingOut, status);
 }
 
 static uint32_t ReadDMAValue(const HAL_DMASample& dma, int valueType, int index,

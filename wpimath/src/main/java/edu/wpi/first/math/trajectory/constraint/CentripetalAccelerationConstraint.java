@@ -15,29 +15,28 @@ import edu.wpi.first.math.geometry.Pose2d;
  * around tight turns, making it easier to track trajectories with sharp turns.
  */
 public class CentripetalAccelerationConstraint implements TrajectoryConstraint {
-  private final double m_maxCentripetalAccelerationMetersPerSecondSq;
+  private final double m_maxCentripetalAcceleration;
 
   /**
    * Constructs a centripetal acceleration constraint.
    *
-   * @param maxCentripetalAccelerationMetersPerSecondSq The max centripetal acceleration.
+   * @param maxCentripetalAcceleration The max centripetal acceleration in m/s².
    */
-  public CentripetalAccelerationConstraint(double maxCentripetalAccelerationMetersPerSecondSq) {
-    m_maxCentripetalAccelerationMetersPerSecondSq = maxCentripetalAccelerationMetersPerSecondSq;
+  public CentripetalAccelerationConstraint(double maxCentripetalAcceleration) {
+    m_maxCentripetalAcceleration = maxCentripetalAcceleration;
   }
 
   /**
    * Returns the max velocity given the current pose and curvature.
    *
-   * @param poseMeters The pose at the current point in the trajectory.
-   * @param curvatureRadPerMeter The curvature at the current point in the trajectory.
-   * @param velocityMetersPerSecond The velocity at the current point in the trajectory before
-   *     constraints are applied.
+   * @param pose The pose at the current point in the trajectory.
+   * @param curvature The curvature at the current point in the trajectory in rad/m.
+   * @param velocity The velocity at the current point in the trajectory before constraints are
+   *     applied in m/s.
    * @return The absolute maximum velocity.
    */
   @Override
-  public double getMaxVelocityMetersPerSecond(
-      Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
+  public double getMaxVelocity(Pose2d pose, double curvature, double velocity) {
     // ac = v²/r
     // k (curvature) = 1/r
 
@@ -45,22 +44,20 @@ public class CentripetalAccelerationConstraint implements TrajectoryConstraint {
     // ac/k = v²
     // v = √(ac/k)
 
-    return Math.sqrt(
-        m_maxCentripetalAccelerationMetersPerSecondSq / Math.abs(curvatureRadPerMeter));
+    return Math.sqrt(m_maxCentripetalAcceleration / Math.abs(curvature));
   }
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory given pose,
    * curvature, and speed.
    *
-   * @param poseMeters The pose at the current point in the trajectory.
-   * @param curvatureRadPerMeter The curvature at the current point in the trajectory.
-   * @param velocityMetersPerSecond The speed at the current point in the trajectory.
+   * @param pose The pose at the current point in the trajectory.
+   * @param curvature The curvature at the current point in the trajectory in rad/m.
+   * @param velocity The speed at the current point in the trajectory in m/s.
    * @return The min and max acceleration bounds.
    */
   @Override
-  public MinMax getMinMaxAccelerationMetersPerSecondSq(
-      Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
+  public MinMax getMinMaxAcceleration(Pose2d pose, double curvature, double velocity) {
     // The acceleration of the robot has no impact on the centripetal acceleration
     // of the robot.
     return new MinMax();

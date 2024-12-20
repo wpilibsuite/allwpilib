@@ -24,7 +24,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
   private final double m_gearing;
 
   // The length of the arm.
-  private final double m_armLenMeters;
+  private final double m_armLength;
 
   // The minimum angle that the arm is capable of.
   private final double m_minAngle;
@@ -43,7 +43,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    *     double, double)}.
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
-   * @param armLengthMeters The length of the arm.
+   * @param armLength The length of the arm in meters.
    * @param minAngleRads The minimum angle that the arm is capable of.
    * @param maxAngleRads The maximum angle that the arm is capable of.
    * @param simulateGravity Whether gravity should be simulated or not.
@@ -56,7 +56,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
       LinearSystem<N2, N1, N2> plant,
       DCMotor gearbox,
       double gearing,
-      double armLengthMeters,
+      double armLength,
       double minAngleRads,
       double maxAngleRads,
       boolean simulateGravity,
@@ -65,7 +65,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
-    m_armLenMeters = armLengthMeters;
+    m_armLength = armLength;
     m_minAngle = minAngleRads;
     m_maxAngle = maxAngleRads;
     m_simulateGravity = simulateGravity;
@@ -78,8 +78,8 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
-   * @param jKgMetersSquared The moment of inertia of the arm; can be calculated from CAD software.
-   * @param armLengthMeters The length of the arm.
+   * @param j The moment of inertia of the arm in kg-m²; can be calculated from CAD software.
+   * @param armLength The length of the arm in meters.
    * @param minAngleRads The minimum angle that the arm is capable of.
    * @param maxAngleRads The maximum angle that the arm is capable of.
    * @param simulateGravity Whether gravity should be simulated or not.
@@ -90,18 +90,18 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
   public SingleJointedArmSim(
       DCMotor gearbox,
       double gearing,
-      double jKgMetersSquared,
-      double armLengthMeters,
+      double j,
+      double armLength,
       double minAngleRads,
       double maxAngleRads,
       boolean simulateGravity,
       double startingAngleRads,
       double... measurementStdDevs) {
     this(
-        LinearSystemId.createSingleJointedArmSystem(gearbox, jKgMetersSquared, gearing),
+        LinearSystemId.createSingleJointedArmSystem(gearbox, j, gearing),
         gearbox,
         gearing,
-        armLengthMeters,
+        armLength,
         minAngleRads,
         maxAngleRads,
         simulateGravity,
@@ -147,7 +147,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @return Whether the arm has hit the lower limit.
    */
   public boolean hasHitLowerLimit() {
-    return wouldHitLowerLimit(getAngleRads());
+    return wouldHitLowerLimit(getAngle());
   }
 
   /**
@@ -156,33 +156,33 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @return Whether the arm has hit the upper limit.
    */
   public boolean hasHitUpperLimit() {
-    return wouldHitUpperLimit(getAngleRads());
+    return wouldHitUpperLimit(getAngle());
   }
 
   /**
    * Returns the current arm angle.
    *
-   * @return The current arm angle.
+   * @return The current arm angle in radians.
    */
-  public double getAngleRads() {
+  public double getAngle() {
     return getOutput(0);
   }
 
   /**
    * Returns the current arm velocity.
    *
-   * @return The current arm velocity.
+   * @return The current arm velocity in radians per second.
    */
-  public double getVelocityRadPerSec() {
+  public double getVelocity() {
     return getOutput(1);
   }
 
   /**
    * Returns the arm current draw.
    *
-   * @return The arm current draw.
+   * @return The arm current draw in amps.
    */
-  public double getCurrentDrawAmps() {
+  public double getCurrentDraw() {
     // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
     // spinning 10x faster than the output
     var motorVelocity = m_x.get(1, 0) * m_gearing;
@@ -202,12 +202,12 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Calculates a rough estimate of the moment of inertia of an arm given its length and mass.
    *
-   * @param lengthMeters The length of the arm.
-   * @param massKg The mass of the arm.
-   * @return The calculated moment of inertia.
+   * @param length The length of the arm in m.
+   * @param mass The mass of the arm in kg.
+   * @return The calculated moment of inertia in kg-m².
    */
-  public static double estimateMOI(double lengthMeters, double massKg) {
-    return 1.0 / 3.0 * massKg * lengthMeters * lengthMeters;
+  public static double estimateMOI(double length, double mass) {
+    return 1.0 / 3.0 * mass * length * length;
   }
 
   /**
@@ -215,10 +215,10 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @param currentXhat The current state estimate.
    * @param u The system inputs (voltage).
-   * @param dtSeconds The time difference between controller updates.
+   * @param dt The time difference between controller updates in seconds.
    */
   @Override
-  protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
+  protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dt) {
     // The torque on the arm is given by τ = F⋅r, where F is the force applied by
     // gravity and r the distance from pivot to center of mass. Recall from
     // dynamics that the sum of torques for a rigid body is τ = J⋅α, were τ is
@@ -248,14 +248,14 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
             (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
               Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
               if (m_simulateGravity) {
-                double alphaGrav = 3.0 / 2.0 * -9.8 * Math.cos(x.get(0, 0)) / m_armLenMeters;
+                double alphaGrav = 3.0 / 2.0 * -9.8 * Math.cos(x.get(0, 0)) / m_armLength;
                 xdot = xdot.plus(VecBuilder.fill(0, alphaGrav));
               }
               return xdot;
             },
             currentXhat,
             u,
-            dtSeconds);
+            dt);
 
     // We check for collision after updating xhat
     if (wouldHitLowerLimit(updatedXhat.get(0, 0))) {

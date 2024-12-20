@@ -47,10 +47,10 @@ public class DMAJNI extends JNIWrapper {
    * <p>This can only be called if DMA is not started.
    *
    * @param handle the dma handle
-   * @param periodSeconds the period to trigger in seconds
+   * @param period the period to trigger in seconds
    * @see "HAL_SetDMATimedTrigger"
    */
-  public static native void setTimedTrigger(int handle, double periodSeconds);
+  public static native void setTimedTrigger(int handle, double period);
 
   /**
    * Sets DMA transfers to occur at a specific timed interval in FPGA cycles.
@@ -229,14 +229,13 @@ public class DMAJNI extends JNIWrapper {
    * Reads a DMA sample from the queue.
    *
    * @param handle the dma handle
-   * @param timeoutSeconds the time to wait for data to be queued before timing out
+   * @param timeout the time in seconds to wait for data to be queued before timing out
    * @param buffer the sample object to place data into
    * @param sampleStore index 0-21 channelOffsets, index 22: capture size, index 23: triggerChannels
    *     (bitflags), index 24: remaining, index 25: read status
    * @return timestamp of the DMA Sample
    */
-  public static native long readDMA(
-      int handle, double timeoutSeconds, int[] buffer, int[] sampleStore);
+  public static native long readDMA(int handle, double timeout, int[] buffer, int[] sampleStore);
 
   /**
    * Get the sensor DMA sample.

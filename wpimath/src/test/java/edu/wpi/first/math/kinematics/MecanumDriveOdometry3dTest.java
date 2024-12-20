@@ -42,7 +42,7 @@ class MecanumDriveOdometry3dTest {
             Rotation3d.kZero,
             zero,
             new Pose3d(1, 2, 0, new Rotation3d(0, 0, Units.degreesToRadians(45))));
-    var pose = odometry.getPoseMeters();
+    var pose = odometry.getPose();
     assertAll(
         () -> assertEquals(pose.getX(), 1.0, 1e-9),
         () -> assertEquals(pose.getY(), 2.0, 1e-9),
@@ -148,38 +148,36 @@ class MecanumDriveOdometry3dTest {
     double errorSum = 0;
     double odometryDistanceTravelled = 0;
     double trajectoryDistanceTravelled = 0;
-    while (t <= trajectory.getTotalTimeSeconds()) {
+    while (t <= trajectory.getTotalTime()) {
       var groundTruthState = trajectory.sample(t);
 
       trajectoryDistanceTravelled +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+          groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
 
       var wheelSpeeds =
           kinematics.toWheelSpeeds(
               new ChassisSpeeds(
-                  groundTruthState.velocityMetersPerSecond,
+                  groundTruthState.velocity,
                   0,
-                  groundTruthState.velocityMetersPerSecond
-                      * groundTruthState.curvatureRadPerMeter));
+                  groundTruthState.velocity * groundTruthState.curvature));
 
-      wheelSpeeds.frontLeftMetersPerSecond += rand.nextGaussian() * 0.1;
-      wheelSpeeds.frontRightMetersPerSecond += rand.nextGaussian() * 0.1;
-      wheelSpeeds.rearLeftMetersPerSecond += rand.nextGaussian() * 0.1;
-      wheelSpeeds.rearRightMetersPerSecond += rand.nextGaussian() * 0.1;
+      wheelSpeeds.frontLeft += rand.nextGaussian() * 0.1;
+      wheelSpeeds.frontRight += rand.nextGaussian() * 0.1;
+      wheelSpeeds.rearLeft += rand.nextGaussian() * 0.1;
+      wheelSpeeds.rearRight += rand.nextGaussian() * 0.1;
 
-      wheelPositions.frontLeftMeters += wheelSpeeds.frontLeftMetersPerSecond * dt;
-      wheelPositions.frontRightMeters += wheelSpeeds.frontRightMetersPerSecond * dt;
-      wheelPositions.rearLeftMeters += wheelSpeeds.rearLeftMetersPerSecond * dt;
-      wheelPositions.rearRightMeters += wheelSpeeds.rearRightMetersPerSecond * dt;
+      wheelPositions.frontLeft += wheelSpeeds.frontLeft * dt;
+      wheelPositions.frontRight += wheelSpeeds.frontRight * dt;
+      wheelPositions.rearLeft += wheelSpeeds.rearLeft * dt;
+      wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
 
-      var lastPose = odometry.getPoseMeters();
+      var lastPose = odometry.getPose();
 
       var xHat =
           odometry.update(
               new Rotation3d(
                   groundTruthState
-                      .poseMeters
+                      .pose
                       .getRotation()
                       .plus(new Rotation2d(rand.nextGaussian() * 0.05))),
               wheelPositions);
@@ -188,7 +186,7 @@ class MecanumDriveOdometry3dTest {
 
       double error =
           groundTruthState
-              .poseMeters
+              .pose
               .getTranslation()
               .getDistance(xHat.getTranslation().toTranslation2d());
       if (error > maxError) {
@@ -199,8 +197,7 @@ class MecanumDriveOdometry3dTest {
       t += dt;
     }
 
-    assertEquals(
-        0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.35, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.getTotalTime() / dt), 0.35, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.35, "Incorrect max error");
     assertEquals(
         1.0,
@@ -241,33 +238,30 @@ class MecanumDriveOdometry3dTest {
     double errorSum = 0;
     double odometryDistanceTravelled = 0;
     double trajectoryDistanceTravelled = 0;
-    while (t <= trajectory.getTotalTimeSeconds()) {
+    while (t <= trajectory.getTotalTime()) {
       var groundTruthState = trajectory.sample(t);
 
       trajectoryDistanceTravelled +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+          groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
 
       var wheelSpeeds =
           kinematics.toWheelSpeeds(
               new ChassisSpeeds(
-                  groundTruthState.velocityMetersPerSecond
-                      * groundTruthState.poseMeters.getRotation().getCos(),
-                  groundTruthState.velocityMetersPerSecond
-                      * groundTruthState.poseMeters.getRotation().getSin(),
+                  groundTruthState.velocity * groundTruthState.pose.getRotation().getCos(),
+                  groundTruthState.velocity * groundTruthState.pose.getRotation().getSin(),
                   0));
 
-      wheelSpeeds.frontLeftMetersPerSecond += rand.nextGaussian() * 0.1;
-      wheelSpeeds.frontRightMetersPerSecond += rand.nextGaussian() * 0.1;
-      wheelSpeeds.rearLeftMetersPerSecond += rand.nextGaussian() * 0.1;
-      wheelSpeeds.rearRightMetersPerSecond += rand.nextGaussian() * 0.1;
+      wheelSpeeds.frontLeft += rand.nextGaussian() * 0.1;
+      wheelSpeeds.frontRight += rand.nextGaussian() * 0.1;
+      wheelSpeeds.rearLeft += rand.nextGaussian() * 0.1;
+      wheelSpeeds.rearRight += rand.nextGaussian() * 0.1;
 
-      wheelPositions.frontLeftMeters += wheelSpeeds.frontLeftMetersPerSecond * dt;
-      wheelPositions.frontRightMeters += wheelSpeeds.frontRightMetersPerSecond * dt;
-      wheelPositions.rearLeftMeters += wheelSpeeds.rearLeftMetersPerSecond * dt;
-      wheelPositions.rearRightMeters += wheelSpeeds.rearRightMetersPerSecond * dt;
+      wheelPositions.frontLeft += wheelSpeeds.frontLeft * dt;
+      wheelPositions.frontRight += wheelSpeeds.frontRight * dt;
+      wheelPositions.rearLeft += wheelSpeeds.rearLeft * dt;
+      wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
 
-      var lastPose = odometry.getPoseMeters();
+      var lastPose = odometry.getPose();
 
       var xHat = odometry.update(new Rotation3d(0, 0, rand.nextGaussian() * 0.05), wheelPositions);
 
@@ -275,7 +269,7 @@ class MecanumDriveOdometry3dTest {
 
       double error =
           groundTruthState
-              .poseMeters
+              .pose
               .getTranslation()
               .getDistance(xHat.getTranslation().toTranslation2d());
       if (error > maxError) {
@@ -286,8 +280,7 @@ class MecanumDriveOdometry3dTest {
       t += dt;
     }
 
-    assertEquals(
-        0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.15, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.getTotalTime() / dt), 0.15, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.3, "Incorrect max error");
     assertEquals(
         1.0,
