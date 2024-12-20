@@ -8,12 +8,15 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
 #include <utility>
+#include <variant>
 #include <vector>
 
+#include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 #include <wpi/iterator_range.h>
 #include <wpi/json_fwd.h>
@@ -39,117 +42,150 @@ class ChildIterator;
  */
 class Storage {
  public:
-  struct Value {
-    enum Type {
-      kNone,
-      kInt,
-      kInt64,
-      kBool,
-      kFloat,
-      kDouble,
-      kString,
-      kChild,
-      kIntArray,
-      kInt64Array,
-      kBoolArray,
-      kFloatArray,
-      kDoubleArray,
-      kStringArray,
-      kChildArray
-    };
+  using Child = std::shared_ptr<Storage>;
+
+  class Value {
+   public:
+    using ValueData =
+        std::variant<std::monostate, int, bool, float, double, std::string,
+                     Child, std::vector<int>, std::vector<float>,
+                     std::vector<double>, std::vector<std::string>,
+                     std::vector<Child>>;
 
     Value() = default;
-    explicit Value(Type type) : type{type} {}
-    Value(const Value&) = delete;
-    Value& operator=(const Value&) = delete;
-    ~Value() { Reset(kNone); }
+    explicit Value(ValueData&& data) : data{std::move(data)} {}
 
-    Type type = kNone;
-    union {
-      int intVal;
-      int64_t int64Val;
-      bool boolVal;
-      float floatVal;
-      double doubleVal;
-      Storage* child;
-      std::vector<int>* intArray;
-      std::vector<int64_t>* int64Array;
-      std::vector<int>* boolArray;
-      std::vector<float>* floatArray;
-      std::vector<double>* doubleArray;
-      std::vector<std::string>* stringArray;
-      std::vector<std::unique_ptr<Storage>>* childArray;
-    };
-    std::string stringVal;
+    template <typename T, typename R = T>
+    R Read(T&& defaultVal)
+      requires(std::convertible_to<T, R> && std::assignable_from<ValueData&, R>)
+    {
+      if (auto d = std::get_if<R>(&data)) {
+        return *d;
+      }
+      if (auto d = Convert<R>(&data)) {
+        Convert<R>(&dataDefault);
+        return *d;
+      }
+      return Set<R>(std::forward<T>(defaultVal));
+    }
 
-    union {
-      int intDefault;
-      int64_t int64Default;
-      bool boolDefault;
-      float floatDefault;
-      double doubleDefault;
-      // pointers may be nullptr to indicate empty
-      std::vector<int>* intArrayDefault;
-      std::vector<int64_t>* int64ArrayDefault;
-      std::vector<int>* boolArrayDefault;
-      std::vector<float>* floatArrayDefault;
-      std::vector<double>* doubleArrayDefault;
-      std::vector<std::string>* stringArrayDefault;
-    };
-    std::string stringDefault;
+    template <typename T, typename... Args>
+    T& Set(Args&&... args)
+      requires(std::assignable_from<ValueData&, T>)
+    {
+      dataDefault.emplace<T>(args...);
+      return data.emplace<T>(std::forward<Args>(args)...);
+    }
 
-    bool hasDefault = false;
-
-    void Reset(Type newType);
+    ValueData data;
+    ValueData dataDefault;
   };
 
-  using ValueMap = wpi::StringMap<std::unique_ptr<Value>>;
+  using ValueMap = wpi::StringMap<Value>;
   template <typename Iterator>
   using ChildIterator = detail::ChildIterator<Iterator>;
 
   // The "Read" functions don't create or overwrite the value
-  int ReadInt(std::string_view key, int defaultVal = 0) const;
-  int64_t ReadInt64(std::string_view key, int64_t defaultVal = 0) const;
-  bool ReadBool(std::string_view key, bool defaultVal = false) const;
-  float ReadFloat(std::string_view key, float defaultVal = 0.0f) const;
-  double ReadDouble(std::string_view key, double defaultVal = 0.0) const;
-  std::string ReadString(std::string_view key,
-                         std::string_view defaultVal = {}) const;
+  template <typename T, typename R = T>
+  R Read(std::string_view key, T&& defaultVal = {}) const
+    requires(std::convertible_to<T, R> &&
+             std::assignable_from<Value::ValueData&, R>)
+  {
+    if (auto value = FindValue(key)) {
+      return value->Read<R>(std::forward<T>(defaultVal));
+    } else {
+      return defaultVal;
+    }
+  }
 
-  void SetInt(std::string_view key, int val);
-  void SetInt64(std::string_view key, int64_t val);
-  void SetBool(std::string_view key, bool val);
-  void SetFloat(std::string_view key, float val);
-  void SetDouble(std::string_view key, double val);
-  void SetString(std::string_view key, std::string_view val);
+  template <typename T>
+  void Set(std::string_view key, T&& val)
+    requires(std::assignable_from<Value::ValueData&, T>)
+  {
+    GetValue(key).Set<T>(std::forward<T>(val));
+  }
+
+  template <typename T>
+  void Set(std::string_view key, const T& val)
+    requires(std::assignable_from<Value::ValueData&, T>)
+  {
+    GetValue(key).Set<T>(val);
+  }
+
+  template <typename T>
+  void Set(std::string_view key, std::span<const typename T::value_type> val)
+    requires(std::assignable_from<Value::ValueData&, T>)
+  {
+    GetValue(key).Set<T>(val.begin(), val.end());
+  }
+
+  void Set(std::string_view key, std::string_view val) {
+    GetValue(key).Set<std::string>(std::string{val});
+  }
 
   // The "Get" functions create or override the current value type.
   // If the value is not set, it is set to the provided default.
-  int& GetInt(std::string_view key, int defaultVal = 0);
-  int64_t& GetInt64(std::string_view key, int64_t defaultVal = 0);
-  bool& GetBool(std::string_view key, bool defaultVal = false);
-  float& GetFloat(std::string_view key, float defaultVal = 0.0f);
-  double& GetDouble(std::string_view key, double defaultVal = 0.0);
-  std::string& GetString(std::string_view key,
-                         std::string_view defaultVal = {});
+  template <typename T>
+  T& Get(std::string_view key, T&& defaultVal = {})
+    requires(!std::same_as<T, Child> &&
+             std::assignable_from<Value::ValueData&, T>)
+  {
+    Value& value = GetValue(key);
+    if (auto data = std::get_if<T>(&value.data)) {
+      return *data;
+    }
+    return value.Set<T>(defaultVal);
+  }
 
-  std::vector<int>& GetIntArray(std::string_view key,
-                                std::span<const int> defaultVal = {});
-  std::vector<int64_t>& GetInt64Array(std::string_view key,
-                                      std::span<const int64_t> defaultVal = {});
-  std::vector<int>& GetBoolArray(std::string_view key,
-                                 std::span<const int> defaultVal = {});
-  std::vector<float>& GetFloatArray(std::string_view key,
-                                    std::span<const float> defaultVal = {});
-  std::vector<double>& GetDoubleArray(std::string_view key,
-                                      std::span<const double> defaultVal = {});
-  std::vector<std::string>& GetStringArray(
-      std::string_view key, std::span<const std::string> defaultVal = {});
-  std::vector<std::unique_ptr<Storage>>& GetChildArray(std::string_view key);
+  template <typename T>
+  T& Get(std::string_view key, const T& defaultVal)
+    requires(!std::same_as<T, Child> &&
+             std::assignable_from<Value::ValueData&, T>)
+  {
+    Value& value = GetValue(key);
+    if (auto data = std::get_if<T>(&value.data)) {
+      return *data;
+    }
+    return value.Set<T>(defaultVal);
+  }
 
-  Value* FindValue(std::string_view key);
-  Value& GetValue(std::string_view key);
+  template <typename T>
+  T& Get(std::string_view key,
+         std::span<const typename T::value_type> defaultVal)
+    requires(!std::same_as<T, Child> &&
+             std::assignable_from<Value::ValueData&, T>)
+  {
+    Value& value = GetValue(key);
+    if (auto data = std::get_if<T>(&value.data)) {
+      return *data;
+    }
+    return value.Set<T>(defaultVal.begin(), defaultVal.end());
+  }
+
+  std::string& Get(std::string_view key, std::string_view defaultVal) {
+    Value& value = GetValue(key);
+    if (auto data = std::get_if<std::string>(&value.data)) {
+      return *data;
+    }
+    return value.Set<std::string>(defaultVal);
+  }
+
+  Value* FindValue(std::string_view key) const {
+    auto it = m_values.find(key);
+    if (it == m_values.end()) {
+      return nullptr;
+    }
+    return &it->second;
+  }
+
+  Value& GetValue(std::string_view key) {
+    return m_values.try_emplace(key).first->second;
+  }
   Storage& GetChild(std::string_view label_id);
+
+  std::vector<Child>& GetChildArray(std::string_view key) {
+    return Get<std::vector<Child>>(key);
+  }
 
   void SetData(std::shared_ptr<void>&& data) { m_data = std::move(data); }
 
@@ -158,15 +194,23 @@ class Storage {
     return static_cast<T*>(m_data.get());
   }
 
+  template <typename T, typename... Args>
+  T& GetOrNewData(Args&&... args) {
+    if (!m_data) {
+      m_data = std::make_shared<T>(std::forward<Args>(args)...);
+    }
+    return *static_cast<T*>(m_data.get());
+  }
+
   Storage() = default;
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
 
-  void Insert(std::string_view key, std::unique_ptr<Value> value) {
-    m_values[key] = std::move(value);
+  void Insert(std::string_view key, Value&& value) {
+    m_values.try_emplace(std::string{key}, std::move(value));
   }
 
-  std::unique_ptr<Value> Erase(std::string_view key);
+  void Erase(std::string_view key) { m_values.erase(key); }
 
   void EraseAll() { m_values.clear(); }
 
@@ -187,7 +231,13 @@ class Storage {
    * Clear settings (set to default).  Calls custom clear function (if set),
    * otherwise calls ClearValues().
    */
-  void Clear();
+  void Clear() {
+    if (m_clear) {
+      m_clear();
+    } else {
+      ClearValues();
+    }
+  }
 
   /**
    * Clear values (and values of children) only (set to default).  Does not
@@ -199,7 +249,13 @@ class Storage {
    * Apply settings (called after all settings have been loaded).  Calls
    * custom apply function (if set), otherwise calls ApplyChildren().
    */
-  void Apply();
+  void Apply() {
+    if (m_apply) {
+      m_apply();
+    } else {
+      ApplyChildren();
+    }
+  }
 
   /**
    * Apply settings to children.  Does not call custom apply function.
@@ -234,6 +290,61 @@ class Storage {
   std::function<wpi::json()> m_toJson;
   std::function<void()> m_clear;
   std::function<void()> m_apply;
+
+  template <typename T>
+  static std::optional<T> ParseString(std::string_view str) {
+    if constexpr (std::same_as<T, bool>) {
+      if (str == "true") {
+        return true;
+      } else if (str == "false") {
+        return false;
+      } else if (auto val = wpi::parse_integer<int>(str, 10)) {
+        return val.value() != 0;
+      } else {
+        return std::nullopt;
+      }
+    } else if constexpr (std::floating_point<T>) {
+      return wpi::parse_float<T>(str);
+    } else {
+      return wpi::parse_integer<T>(str, 10);
+    }
+    return std::nullopt;
+  }
+
+  template <typename T>
+  static T* Convert(Value::ValueData* data) {
+    if constexpr (std::same_as<T, bool>) {
+      if (auto d = std::get_if<std::string>(data)) {
+        if (auto val = ParseString<T>(*d)) {
+          return &data->emplace<T>(*val);
+        }
+      }
+    } else if constexpr (std::same_as<T, int> || std::same_as<T, float> ||
+                         std::same_as<T, double>) {
+      if (auto d = std::get_if<int>(data)) {
+        return &data->emplace<T>(*d);
+      } else if (auto d = std::get_if<float>(data)) {
+        return &data->emplace<T>(*d);
+      } else if (auto d = std::get_if<double>(data)) {
+        return &data->emplace<T>(*d);
+      } else if (auto d = std::get_if<std::string>(data)) {
+        if (auto val = ParseString<T>(*d)) {
+          return &data->emplace<T>(*val);
+        }
+      }
+    } else if constexpr (std::same_as<T, std::vector<int>> ||
+                         std::same_as<T, std::vector<float>> ||
+                         std::same_as<T, std::vector<double>>) {
+      if (auto d = std::get_if<std::vector<int>>(data)) {
+        return &data->emplace(T{d->begin(), d->end()});
+      } else if (auto d = std::get_if<std::vector<float>>(data)) {
+        return &data->emplace(T{d->begin(), d->end()});
+      } else if (auto d = std::get_if<std::vector<double>>(data)) {
+        return &data->emplace(T{d->begin(), d->end()});
+      }
+    }
+    return nullptr;
+  }
 };
 
 namespace detail {
@@ -249,7 +360,8 @@ class ChildIterator {
  public:
   ChildIterator(IteratorType it, IteratorType end) noexcept
       : anchor(it), end(end) {
-    while (anchor != end && anchor->second->type != Storage::Value::kChild) {
+    while (anchor != end &&
+           !std::holds_alternative<Storage::Child>(anchor->second.data)) {
       ++anchor;
     }
   }
@@ -260,7 +372,8 @@ class ChildIterator {
   /// increment operator (needed for range-based for)
   ChildIterator& operator++() {
     ++anchor;
-    while (anchor != end && anchor->second->type != Storage::Value::kChild) {
+    while (anchor != end &&
+           !std::holds_alternative<Storage::Child>(anchor->second.data)) {
       ++anchor;
     }
     return *this;
@@ -275,7 +388,9 @@ class ChildIterator {
   std::string_view key() const { return anchor->first; }
 
   /// return value of the iterator
-  Storage& value() const { return *anchor->second->child; }
+  Storage& value() const {
+    return *std::get<Storage::Child>(anchor->second.data);
+  }
 };
 
 }  // namespace detail
