@@ -12,12 +12,12 @@
 
 namespace glass {
 
-class DataSource;
+class BooleanSource;
 
 class RelayModel : public Model {
  public:
-  virtual DataSource* GetForwardData() = 0;
-  virtual DataSource* GetReverseData() = 0;
+  virtual BooleanSource* GetForwardData() = 0;
+  virtual BooleanSource* GetReverseData() = 0;
 
   virtual void SetForward(bool val) = 0;
   virtual void SetReverse(bool val) = 0;

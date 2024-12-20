@@ -39,12 +39,12 @@ class CompressorSimModel : public glass::CompressorModel {
 
   bool Exists() override { return HALSIM_GetREVPHInitialized(m_index); }
 
-  glass::DataSource* GetRunningData() override { return &m_running; }
-  glass::DataSource* GetEnabledData() override { return nullptr; }
-  glass::DataSource* GetPressureSwitchData() override {
+  glass::BooleanSource* GetRunningData() override { return &m_running; }
+  glass::BooleanSource* GetEnabledData() override { return nullptr; }
+  glass::BooleanSource* GetPressureSwitchData() override {
     return &m_pressureSwitch;
   }
-  glass::DataSource* GetCurrentData() override { return &m_current; }
+  glass::DoubleSource* GetCurrentData() override { return &m_current; }
 
   void SetRunning(bool val) override {
     HALSIM_SetREVPHCompressorOn(m_index, val);
@@ -73,7 +73,7 @@ class SolenoidSimModel : public glass::SolenoidModel {
 
   bool Exists() override { return HALSIM_GetREVPHInitialized(m_index); }
 
-  glass::DataSource* GetOutputData() override { return &m_output; }
+  glass::BooleanSource* GetOutputData() override { return &m_output; }
 
   void SetOutput(bool val) override {
     HALSIM_SetREVPHSolenoidOutput(m_index, m_channel, val);

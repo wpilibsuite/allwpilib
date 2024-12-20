@@ -15,20 +15,22 @@ class SmallVectorImpl;
 
 namespace glass {
 
-class DataSource;
+class BooleanSource;
+class DoubleSource;
+class IntegerSource;
+class StringSource;
 
 class FMSModel : public Model {
  public:
-  virtual DataSource* GetFmsAttachedData() = 0;
-  virtual DataSource* GetDsAttachedData() = 0;
-  virtual DataSource* GetAllianceStationIdData() = 0;
-  virtual DataSource* GetMatchTimeData() = 0;
-  virtual DataSource* GetEStopData() = 0;
-  virtual DataSource* GetEnabledData() = 0;
-  virtual DataSource* GetTestData() = 0;
-  virtual DataSource* GetAutonomousData() = 0;
-  virtual std::string_view GetGameSpecificMessage(
-      wpi::SmallVectorImpl<char>& buf) = 0;
+  virtual BooleanSource* GetFmsAttachedData() = 0;
+  virtual BooleanSource* GetDsAttachedData() = 0;
+  virtual IntegerSource* GetAllianceStationIdData() = 0;
+  virtual DoubleSource* GetMatchTimeData() = 0;
+  virtual BooleanSource* GetEStopData() = 0;
+  virtual BooleanSource* GetEnabledData() = 0;
+  virtual BooleanSource* GetTestData() = 0;
+  virtual BooleanSource* GetAutonomousData() = 0;
+  virtual StringSource* GetGameSpecificMessageData() = 0;
 
   virtual void SetFmsAttached(bool val) = 0;
   virtual void SetDsAttached(bool val) = 0;

@@ -10,6 +10,7 @@
 #include <string_view>
 
 #include <imgui.h>
+#include <wpi/SmallVector.h>
 #include <wpi/Signal.h>
 #include <wpi/spinlock.h>
 
@@ -20,13 +21,19 @@ namespace glass {
  */
 class DataSource {
  public:
-  explicit DataSource(std::string_view id);
-  DataSource(std::string_view id, int index);
-  DataSource(std::string_view id, int index, int index2);
+  enum Kind {
+    kBoolean,
+    kDouble,
+    kFloat,
+    kInteger,
+    kString,
+  };
   virtual ~DataSource();
 
   DataSource(const DataSource&) = delete;
   DataSource& operator=(const DataSource&) = delete;
+  DataSource(DataSource&&) = delete;
+  DataSource& operator=(DataSource&&) = delete;
 
   const char* GetId() const { return m_id.c_str(); }
 
@@ -34,20 +41,7 @@ class DataSource {
   std::string& GetName() { return m_name; }
   const std::string& GetName() const { return m_name; }
 
-  void SetDigital(bool digital) { m_digital = digital; }
-  bool IsDigital() const { return m_digital; }
-
-  void SetValue(double value, int64_t time = 0) {
-    std::scoped_lock lock{m_valueMutex};
-    m_value = value;
-    m_valueTime = time;
-    valueChanged(value, time);
-  }
-
-  double GetValue() const {
-    std::scoped_lock lock{m_valueMutex};
-    return m_value;
-  }
+  Kind GetKind() const { return m_kind; }
 
   int64_t GetValueTime() const {
     std::scoped_lock lock{m_valueMutex};
@@ -69,8 +63,6 @@ class DataSource {
                 ImGuiInputTextFlags flags = 0) const;
   void EmitDrag(ImGuiDragDropFlags flags = 0) const;
 
-  wpi::sig::SignalBase<wpi::spinlock, double, int64_t> valueChanged;
-
   static DataSource* Find(std::string_view id);
 
   static wpi::sig::Signal<const char*, DataSource*> sourceCreated;
@@ -78,10 +70,133 @@ class DataSource {
  private:
   std::string m_id;
   std::string& m_name;
-  bool m_digital = false;
+  Kind m_kind;
+
+ protected:
+  DataSource(Kind kind, std::string_view id);
+
+  void Register();
+
+  virtual void SetDragDropPayload() const = 0;
+
   mutable wpi::spinlock m_valueMutex;
-  double m_value = 0;
   int64_t m_valueTime = 0;
+};
+
+std::string MakeSourceId(std::string_view id, int index);
+std::string MakeSourceId(std::string_view id, int index, int index2);
+
+template <typename T, DataSource::Kind kind>
+class ValueSource : public DataSource {
+ public:
+  void SetValue(T value, int64_t time = 0) {
+    std::scoped_lock lock{m_valueMutex};
+    m_value = value;
+    m_valueTime = time;
+    valueChanged(value, time);
+  }
+
+  T GetValue() const {
+    std::scoped_lock lock{m_valueMutex};
+    return m_value;
+  }
+
+  wpi::sig::SignalBase<wpi::spinlock, T, int64_t> valueChanged;
+
+ private:
+  T m_value = 0;
+
+ protected:
+  explicit ValueSource(std::string_view id) : DataSource{kind, id} {}
+};
+
+class BooleanSource : public ValueSource<bool, DataSource::kBoolean> {
+ public:
+  explicit BooleanSource(std::string_view id) : ValueSource{id} { Register(); }
+
+  static BooleanSource* AcceptDragDropPayload(ImGuiDragDropFlags flags = 0);
+
+ protected:
+  void SetDragDropPayload() const override;
+};
+
+class DoubleSource : public ValueSource<double, DataSource::kDouble> {
+ public:
+  explicit DoubleSource(std::string_view id) : ValueSource{id} { Register(); }
+
+  static DoubleSource* AcceptDragDropPayload(ImGuiDragDropFlags flags = 0);
+
+ protected:
+  void SetDragDropPayload() const override;
+};
+
+class FloatSource : public ValueSource<float, DataSource::kFloat> {
+ public:
+  explicit FloatSource(std::string_view id) : ValueSource{id} { Register(); }
+
+  static FloatSource* AcceptDragDropPayload(ImGuiDragDropFlags flags = 0);
+
+ protected:
+  void SetDragDropPayload() const override;
+};
+
+class IntegerSource : public ValueSource<int64_t, DataSource::kInteger> {
+ public:
+  explicit IntegerSource(std::string_view id) : ValueSource{id} { Register(); }
+
+  static IntegerSource* AcceptDragDropPayload(ImGuiDragDropFlags flags = 0);
+
+ protected:
+  void SetDragDropPayload() const override;
+};
+
+class StringSource : public DataSource {
+ public:
+  explicit StringSource(std::string_view id) : DataSource{kString, id} {
+    Register();
+  }
+
+  void SetValue(std::string_view value, int64_t time = 0) {
+    std::scoped_lock lock{m_valueMutex};
+    m_value = value;
+    m_valueTime = time;
+    valueChanged(m_value, time);
+  }
+
+  void SetValue(std::string&& value, int64_t time = 0) {
+    std::scoped_lock lock{m_valueMutex};
+    m_value = std::move(value);
+    m_valueTime = time;
+    valueChanged(m_value, time);
+  }
+
+  void SetValue(const char* value, int64_t time = 0) {
+    std::scoped_lock lock{m_valueMutex};
+    m_value = value;
+    m_valueTime = time;
+    valueChanged(m_value, time);
+  }
+
+  std::string GetValue() const {
+    std::scoped_lock lock{m_valueMutex};
+    return m_value;
+  }
+
+  std::string_view GetValue(wpi::SmallVectorImpl<char>& buf) const {
+    std::scoped_lock lock{m_valueMutex};
+    buf.assign(m_value.begin(), m_value.end());
+    return {buf.begin(), buf.end()};
+  }
+
+  wpi::sig::SignalBase<wpi::spinlock, std::string_view, int64_t> valueChanged;
+
+  static StringSource* AcceptDragDropPayload(ImGuiDragDropFlags flags = 0);
+
+ private:
+  std::string m_value;
+
+ protected:
+  void SetDragDropPayload() const override;
 };
 
 }  // namespace glass

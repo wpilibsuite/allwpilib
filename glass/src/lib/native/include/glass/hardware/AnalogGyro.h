@@ -10,12 +10,12 @@
 
 namespace glass {
 
-class DataSource;
+class DoubleSource;
 
 class AnalogGyroModel : public Model {
  public:
-  virtual DataSource* GetAngleData() = 0;
-  virtual DataSource* GetRateData() = 0;
+  virtual DoubleSource* GetAngleData() = 0;
+  virtual DoubleSource* GetRateData() = 0;
 
   virtual void SetAngle(double val) = 0;
   virtual void SetRate(double val) = 0;

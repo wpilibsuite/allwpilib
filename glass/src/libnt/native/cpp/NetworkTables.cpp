@@ -631,20 +631,39 @@ static void UpdateJsonValueSource(NetworkTablesModel& model,
   }
 }
 
+template <typename T>
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
-    std::string_view name, double value, int64_t time, bool digital) {
+    std::string_view name, T value, int64_t time) {
   valueChildren.clear();
-  if (!source) {
-    source = std::make_unique<DataSource>(fmt::format("NT:{}", name));
+  if constexpr (std::same_as<T, bool>) {
+    if (!source || source->GetKind() != DataSource::kBoolean) {
+      source = std::make_unique<BooleanSource>(fmt::format("NT:{}", name));
+    }
+    static_cast<BooleanSource*>(source.get())->SetValue(value, time);
+  } else if constexpr (std::same_as<T, double>) {
+    if (!source || source->GetKind() != DataSource::kDouble) {
+      source = std::make_unique<DoubleSource>(fmt::format("NT:{}", name));
+    }
+    static_cast<DoubleSource*>(source.get())->SetValue(value, time);
+  } else if constexpr (std::same_as<T, float>) {
+    if (!source || source->GetKind() != DataSource::kFloat) {
+      source = std::make_unique<FloatSource>(fmt::format("NT:{}", name));
+    }
+    static_cast<FloatSource*>(source.get())->SetValue(value, time);
+  } else if constexpr (std::same_as<T, int64_t>) {
+    if (!source || source->GetKind() != DataSource::kInteger) {
+      source = std::make_unique<IntegerSource>(fmt::format("NT:{}", name));
+    }
+    static_cast<IntegerSource*>(source.get())->SetValue(value, time);
+  } else {
+    static_assert(false, "Unknown type");
   }
-  source->SetValue(value, time);
-  source->SetDigital(digital);
 }
 
-template <typename T, typename MakeValue>
+template <bool IsBoolean, typename T, typename MakeValue>
 void NetworkTablesModel::ValueSource::UpdateDiscreteArray(
     std::string_view name, std::span<const T> arr, int64_t time,
-    MakeValue makeValue, bool digital) {
+    MakeValue makeValue) {
   if (valueChildrenMap) {
     valueChildren.clear();
     valueChildrenMap = false;
@@ -657,7 +676,11 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteArray(
       child.path = fmt::format("{}{}", name, child.name);
     }
     child.value = makeValue(arr[i], time);
-    child.UpdateDiscreteSource(child.path, arr[i], time, digital);
+    if constexpr (IsBoolean) {
+      child.UpdateDiscreteSource(child.path, static_cast<bool>(arr[i]), time);
+    } else {
+      child.UpdateDiscreteSource(child.path, arr[i], time);
+    }
     ++i;
   }
 }
@@ -667,8 +690,7 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
     std::string_view typeStr) {
   switch (value.type()) {
     case NT_BOOLEAN:
-      UpdateDiscreteSource(name, value.GetBoolean() ? 1 : 0, value.time(),
-                           true);
+      UpdateDiscreteSource(name, value.GetBoolean(), value.time());
       break;
     case NT_INTEGER:
       UpdateDiscreteSource(name, value.GetInteger(), value.time());
@@ -680,20 +702,20 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
       UpdateDiscreteSource(name, value.GetDouble(), value.time());
       break;
     case NT_BOOLEAN_ARRAY:
-      UpdateDiscreteArray(name, value.GetBooleanArray(), value.time(),
-                          nt::Value::MakeBoolean, true);
+      UpdateDiscreteArray<true>(name, value.GetBooleanArray(), value.time(),
+                                nt::Value::MakeBoolean);
       break;
     case NT_INTEGER_ARRAY:
-      UpdateDiscreteArray(name, value.GetIntegerArray(), value.time(),
-                          nt::Value::MakeInteger);
+      UpdateDiscreteArray<false>(name, value.GetIntegerArray(), value.time(),
+                                 nt::Value::MakeInteger);
       break;
     case NT_FLOAT_ARRAY:
-      UpdateDiscreteArray(name, value.GetFloatArray(), value.time(),
-                          nt::Value::MakeFloat);
+      UpdateDiscreteArray<false>(name, value.GetFloatArray(), value.time(),
+                                 nt::Value::MakeFloat);
       break;
     case NT_DOUBLE_ARRAY:
-      UpdateDiscreteArray(name, value.GetDoubleArray(), value.time(),
-                          nt::Value::MakeDouble);
+      UpdateDiscreteArray<false>(name, value.GetDoubleArray(), value.time(),
+                                 nt::Value::MakeDouble);
       break;
     case NT_STRING_ARRAY: {
       auto arr = value.GetStringArray();
@@ -729,6 +751,11 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
         os << '"';
         os.write_escaped(value.GetString());
         os << '"';
+        if (!source || source->GetKind() != DataSource::kString) {
+          source = std::make_unique<StringSource>(fmt::format("NT:{}", name));
+        }
+        static_cast<StringSource*>(source.get())
+            ->SetValue(value.GetString(), value.time());
       }
       break;
     case NT_RAW:

@@ -21,9 +21,7 @@ NTDigitalInputModel::NTDigitalInputModel(nt::NetworkTableInstance inst,
           inst.GetBooleanTopic(fmt::format("{}/Value", path)).Subscribe(false)},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_valueData{fmt::format("NT_DIn:{}", path)},
-      m_nameValue{wpi::rsplit(path, '/').second} {
-  m_valueData.SetDigital(true);
-}
+      m_nameValue{wpi::rsplit(path, '/').second} {}
 
 void NTDigitalInputModel::Update() {
   for (auto&& v : m_value.ReadQueue()) {

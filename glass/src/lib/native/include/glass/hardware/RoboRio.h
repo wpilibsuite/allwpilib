@@ -8,14 +8,16 @@
 
 namespace glass {
 
-class DataSource;
+class BooleanSource;
+class DoubleSource;
+class IntegerSource;
 
 class RoboRioRailModel : public Model {
  public:
-  virtual DataSource* GetVoltageData() = 0;
-  virtual DataSource* GetCurrentData() = 0;
-  virtual DataSource* GetActiveData() = 0;
-  virtual DataSource* GetFaultsData() = 0;
+  virtual DoubleSource* GetVoltageData() = 0;
+  virtual DoubleSource* GetCurrentData() = 0;
+  virtual BooleanSource* GetActiveData() = 0;
+  virtual IntegerSource* GetFaultsData() = 0;
 
   virtual void SetVoltage(double val) = 0;
   virtual void SetCurrent(double val) = 0;
@@ -29,10 +31,10 @@ class RoboRioModel : public Model {
   virtual RoboRioRailModel* GetUser5VRail() = 0;
   virtual RoboRioRailModel* GetUser3V3Rail() = 0;
 
-  virtual DataSource* GetUserButton() = 0;
-  virtual DataSource* GetVInVoltageData() = 0;
-  virtual DataSource* GetVInCurrentData() = 0;
-  virtual DataSource* GetBrownoutVoltage() = 0;
+  virtual BooleanSource* GetUserButton() = 0;
+  virtual DoubleSource* GetVInVoltageData() = 0;
+  virtual DoubleSource* GetVInCurrentData() = 0;
+  virtual DoubleSource* GetBrownoutVoltage() = 0;
 
   virtual void SetUserButton(bool val) = 0;
   virtual void SetVInVoltage(double val) = 0;

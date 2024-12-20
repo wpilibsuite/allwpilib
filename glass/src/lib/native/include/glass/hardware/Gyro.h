@@ -7,13 +7,13 @@
 #include "glass/Model.h"
 
 namespace glass {
-class DataSource;
+class DoubleSource;
 class GyroModel : public Model {
  public:
   virtual const char* GetName() const = 0;
   virtual const char* GetSimDevice() const = 0;
 
-  virtual DataSource* GetAngleData() = 0;
+  virtual DoubleSource* GetAngleData() = 0;
   virtual void SetAngle(double angle) = 0;
 };
 void DisplayGyro(GyroModel* m);

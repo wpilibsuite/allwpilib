@@ -6,15 +6,13 @@
 
 #include <glass/DataSource.h>
 
-#define HALSIMGUI_DATASOURCE(cbname, id, TYPE, vtype)                         \
-  class cbname##Source : public ::glass::DataSource {                         \
+#define HALSIMGUI_DATASOURCE(cbname, id, TYPE, Type, vtype)                   \
+  class cbname##Source : public ::glass::Type##Source {                       \
    public:                                                                    \
     cbname##Source()                                                          \
-        : DataSource(id),                                                     \
+        : Type##Source{id},                                                   \
           m_callback{                                                         \
-              HALSIM_Register##cbname##Callback(CallbackFunc, this, true)} {  \
-      SetDigital(HAL_##TYPE == HAL_BOOLEAN);                                  \
-    }                                                                         \
+              HALSIM_Register##cbname##Callback(CallbackFunc, this, true)} {} \
                                                                               \
     ~cbname##Source() {                                                       \
       if (m_callback != 0)                                                    \
@@ -32,25 +30,24 @@
   }
 
 #define HALSIMGUI_DATASOURCE_BOOLEAN(cbname, id) \
-  HALSIMGUI_DATASOURCE(cbname, id, BOOLEAN, boolean)
+  HALSIMGUI_DATASOURCE(cbname, id, BOOLEAN, Boolean, boolean)
 
 #define HALSIMGUI_DATASOURCE_DOUBLE(cbname, id) \
-  HALSIMGUI_DATASOURCE(cbname, id, DOUBLE, double)
+  HALSIMGUI_DATASOURCE(cbname, id, DOUBLE, Double, double)
 
 #define HALSIMGUI_DATASOURCE_INT(cbname, id) \
-  HALSIMGUI_DATASOURCE(cbname, id, INT, int)
+  HALSIMGUI_DATASOURCE(cbname, id, INT, Integer, int)
 
-#define HALSIMGUI_DATASOURCE_INDEXED(cbname, id, TYPE, vtype)                 \
-  class cbname##Source : public ::glass::DataSource {                         \
+#define HALSIMGUI_DATASOURCE_INDEXED(cbname, id, TYPE, Type, vtype)           \
+  class cbname##Source : public ::glass::Type##Source {                       \
    public:                                                                    \
     explicit cbname##Source(int32_t index, int channel = -1)                  \
-        : DataSource(id, channel < 0 ? index : channel),                      \
+        : Type##Source{::glass::MakeSourceId(id,                              \
+                                             channel < 0 ? index : channel)}, \
           m_index{index},                                                     \
           m_channel{channel < 0 ? index : channel},                           \
           m_callback{HALSIM_Register##cbname##Callback(index, CallbackFunc,   \
-                                                       this, true)} {         \
-      SetDigital(HAL_##TYPE == HAL_BOOLEAN);                                  \
-    }                                                                         \
+                                                       this, true)} {}        \
                                                                               \
     ~cbname##Source() {                                                       \
       if (m_callback != 0)                                                    \
@@ -78,22 +75,20 @@
   }
 
 #define HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(cbname, id) \
-  HALSIMGUI_DATASOURCE_INDEXED(cbname, id, BOOLEAN, boolean)
+  HALSIMGUI_DATASOURCE_INDEXED(cbname, id, BOOLEAN, Boolean, boolean)
 
 #define HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(cbname, id) \
-  HALSIMGUI_DATASOURCE_INDEXED(cbname, id, DOUBLE, double)
+  HALSIMGUI_DATASOURCE_INDEXED(cbname, id, DOUBLE, Double, double)
 
-#define HALSIMGUI_DATASOURCE_INDEXED2(cbname, id, TYPE, vtype)                \
-  class cbname##Source : public ::glass::DataSource {                         \
+#define HALSIMGUI_DATASOURCE_INDEXED2(cbname, id, TYPE, Type, vtype)          \
+  class cbname##Source : public ::glass::Type##Source {                       \
    public:                                                                    \
     explicit cbname##Source(int32_t index, int32_t channel)                   \
-        : DataSource(id, index, channel),                                     \
+        : Type##Source{::glass::MakeSourceId(id, index, channel)},            \
           m_index{index},                                                     \
           m_channel{channel},                                                 \
           m_callback{HALSIM_Register##cbname##Callback(                       \
-              index, channel, CallbackFunc, this, true)} {                    \
-      SetDigital(HAL_##TYPE == HAL_BOOLEAN);                                  \
-    }                                                                         \
+              index, channel, CallbackFunc, this, true)} {}                   \
                                                                               \
     ~cbname##Source() {                                                       \
       if (m_callback != 0)                                                    \
@@ -121,7 +116,7 @@
   }
 
 #define HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED2(cbname, id) \
-  HALSIMGUI_DATASOURCE_INDEXED2(cbname, id, BOOLEAN, boolean)
+  HALSIMGUI_DATASOURCE_INDEXED2(cbname, id, BOOLEAN, Boolean, boolean)
 
 #define HALSIMGUI_DATASOURCE_DOUBLE_INDEXED2(cbname, id) \
-  HALSIMGUI_DATASOURCE_INDEXED2(cbname, id, DOUBLE, double)
+  HALSIMGUI_DATASOURCE_INDEXED2(cbname, id, DOUBLE, Double, double)
