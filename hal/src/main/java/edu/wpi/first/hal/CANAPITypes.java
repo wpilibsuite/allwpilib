@@ -47,6 +47,8 @@ public final class CANAPITypes {
     kMiscellaneous(10),
     /** IO breakout. */
     kIOBreakout(11),
+    /** Servo Controller. */
+    kServoController(12),
     /** Firmware update. */
     kFirmwareUpdate(31);
 

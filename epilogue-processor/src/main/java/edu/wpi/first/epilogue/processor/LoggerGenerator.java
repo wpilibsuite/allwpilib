@@ -43,6 +43,8 @@ public class LoggerGenerator {
       LoggerGenerator::isBuiltInJavaMethod;
   private final ProcessingEnvironment m_processingEnv;
   private final List<ElementHandler> m_handlers;
+
+  @SuppressWarnings("BadAnnotationImplementation")
   private final Logged m_defaultConfig =
       new Logged() {
         @Override
