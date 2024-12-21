@@ -29,7 +29,6 @@ class SolenoidSim {
    * Sets the solenoid output.
    * @param output The new solenoid output.
    */
-  [[deprecated("Use SetOn or SetOff methods instead.")]]
   void SetOutput(bool output);
 
   /**
