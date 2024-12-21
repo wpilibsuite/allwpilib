@@ -196,14 +196,7 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   public double calculateWithVelocities(
       double currentAngle, double currentVelocity, double nextVelocity) {
     return ArmFeedforwardJNI.calculate(
-            ks,
-            kv,
-            ka,
-            kg,
-            currentAngle,
-            currentVelocity,
-            nextVelocity,
-            m_dt);
+        ks, kv, ka, kg, currentAngle, currentVelocity, nextVelocity, m_dt);
   }
 
   // Rearranging the main equation from the calculate() method yields the
