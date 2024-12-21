@@ -88,9 +88,7 @@ public class SolenoidSim {
    * Change the solenoid output.
    *
    * @param output the new solenoid output
-   * @deprecated Use setOn or setOff instead.
    */
-  @Deprecated
   public void setOutput(boolean output) {
     m_module.setSolenoidOutput(m_channel, output);
   }
