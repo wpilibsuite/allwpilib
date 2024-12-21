@@ -72,7 +72,7 @@ void Solenoid::SetOff() {
 }
 
 void Solenoid::Toggle() {
-  Set(!Get());
+  Set(!IsOn());
 }
 
 int Solenoid::GetChannel() const {
@@ -96,6 +96,6 @@ void Solenoid::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetActuator(true);
   builder.SetSafeState([=, this] { Set(false); });
   builder.AddBooleanProperty(
-      "Value", [=, this] { return Get(); },
+      "Value", [=, this] { return IsOn(); },
       [=, this](bool value) { Set(value); });
 }
