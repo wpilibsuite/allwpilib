@@ -9,7 +9,7 @@
 #include "PortsInternal.h"
 #include "hal/handles/DigitalHandleResource.h"
 #include "hal/handles/HandlesInternal.h"
-#include "networktables/DoubleTopic.h"
+#include "networktables/IntegerTopic.h"
 
 namespace hal {
 
@@ -32,13 +32,10 @@ struct SmartIo {
   int32_t minPwm = 0;
   std::string previousAllocation;
   SmartIoMode currentMode{SmartIoMode::DigitalInput};
-  nt::DoublePublisher modePublisher;
+  nt::IntegerPublisher modePublisher;
 
-  nt::DoublePublisher setPublisher;
-  nt::DoubleSubscriber getSubscriber;
-
-  nt::DoublePublisher pwmMinPublisher;
-  nt::DoublePublisher pwmMaxPublisher;
+  nt::IntegerPublisher setPublisher;
+  nt::IntegerSubscriber getSubscriber;
 
   int32_t InitializeMode(SmartIoMode mode);
   int32_t SetPwmMicroseconds(uint16_t microseconds);
