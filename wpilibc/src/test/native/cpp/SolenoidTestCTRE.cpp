@@ -15,10 +15,10 @@ TEST(SolenoidCTRETest, ValidInitialization) {
   EXPECT_EQ(2, solenoid.GetChannel());
 
   solenoid.Set(true);
-  EXPECT_TRUE(solenoid.Get());
+  EXPECT_TRUE(solenoid.IsOn());
 
   solenoid.Set(false);
-  EXPECT_FALSE(solenoid.Get());
+  EXPECT_FALSE(solenoid.IsOn());
 }
 
 TEST(SolenoidCTRETest, DoubleInitialization) {
@@ -41,12 +41,12 @@ TEST(SolenoidCTRETest, InvalidChannel) {
 TEST(SolenoidCTRETest, Toggle) {
   Solenoid solenoid{3, frc::PneumaticsModuleType::CTREPCM, 2};
   solenoid.Set(true);
-  EXPECT_TRUE(solenoid.Get());
+  EXPECT_TRUE(solenoid.IsOn());
 
   solenoid.Toggle();
-  EXPECT_FALSE(solenoid.Get());
+  EXPECT_FALSE(solenoid.IsOn());
 
   solenoid.Toggle();
-  EXPECT_TRUE(solenoid.Get());
+  EXPECT_TRUE(solenoid.IsOn());
 }
 }  // namespace frc
