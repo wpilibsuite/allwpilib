@@ -52,6 +52,25 @@ class WPILIB_DLLEXPORT Transform3d {
       : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
 
   /**
+   * Constructs a transform with the specified affine transformation matrix.
+   *
+   * @param matrix The affine transformation matrix.
+   * @throws std::domain_error if the affine transformation matrix is invalid.
+   */
+  constexpr explicit Transform3d(const Eigen::Matrix4d& matrix)
+      : m_translation{Eigen::Vector3d{
+            {matrix(0, 3)}, {matrix(1, 3)}, {matrix(2, 3)}}},
+        m_rotation{
+            Eigen::Matrix3d{{matrix(0, 0), matrix(0, 1), matrix(0, 2)},
+                            {matrix(1, 0), matrix(1, 1), matrix(1, 2)},
+                            {matrix(2, 0), matrix(2, 1), matrix(2, 2)}}} {
+    if (matrix(3, 0) != 0.0 || matrix(3, 1) != 0.0 || matrix(3, 2) != 0.0 ||
+        matrix(3, 3) != 1.0) {
+      throw std::domain_error("Affine transformation matrix is invalid");
+    }
+  }
+
+  /**
    * Constructs the identity transform -- maps an initial pose to itself.
    */
   constexpr Transform3d() = default;
@@ -94,6 +113,19 @@ class WPILIB_DLLEXPORT Transform3d {
    * @return The z component of the transformation's translation.
    */
   constexpr units::meter_t Z() const { return m_translation.Z(); }
+
+  /**
+   * Returns an affine transformation matrix representation of this
+   * transformation.
+   */
+  constexpr Eigen::Matrix4d ToMatrix() const {
+    auto vec = m_translation.ToVector();
+    auto mat = m_rotation.ToMatrix();
+    return Eigen::Matrix4d{{mat(0, 0), mat(0, 1), mat(0, 2), vec(0)},
+                           {mat(1, 0), mat(1, 1), mat(1, 2), vec(1)},
+                           {mat(2, 0), mat(2, 1), mat(2, 2), vec(2)},
+                           {0.0, 0.0, 0.0, 1.0}};
+  }
 
   /**
    * Returns the rotational component of the transformation.

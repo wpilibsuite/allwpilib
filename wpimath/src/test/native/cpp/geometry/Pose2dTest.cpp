@@ -141,6 +141,13 @@ TEST(Pose2dTest, Nearest) {
                        .value());
 }
 
+TEST(Pose2dTest, ToMatrix) {
+  Pose2d before{1_m, 2_m, 20_deg};
+  Pose2d after{before.ToMatrix()};
+
+  EXPECT_EQ(before, after);
+}
+
 TEST(Pose2dTest, Constexpr) {
   constexpr Pose2d defaultConstructed;
   constexpr Pose2d translationRotation{Translation2d{0_m, 1_m},

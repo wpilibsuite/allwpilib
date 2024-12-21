@@ -10,9 +10,13 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.proto.Pose2dProto;
 import edu.wpi.first.math.geometry.struct.Pose2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
@@ -77,6 +81,20 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
    */
   public Pose2d(Distance x, Distance y, Rotation2d rotation) {
     this(x.in(Meters), y.in(Meters), rotation);
+  }
+
+  /**
+   * Constructs a pose with the specified affine transformation matrix.
+   *
+   * @param matrix The affine transformation matrix.
+   * @throws IllegalArgumentException if the affine transformation matrix is invalid.
+   */
+  public Pose2d(Matrix<N3, N3> matrix) {
+    m_translation = new Translation2d(matrix.get(0, 2), matrix.get(1, 2));
+    m_rotation = new Rotation2d(matrix.block(2, 2, 0, 0));
+    if (matrix.get(2, 0) != 0.0 || matrix.get(2, 1) != 0.0 || matrix.get(2, 2) != 1.0) {
+      throw new IllegalArgumentException("Affine transformation matrix is invalid");
+    }
   }
 
   /**
@@ -293,6 +311,28 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
             .times(Math.hypot(halfThetaByTanOfHalfDtheta, halfDtheta));
 
     return new Twist2d(translationPart.getX(), translationPart.getY(), dtheta);
+  }
+
+  /**
+   * Returns an affine transformation matrix representation of this pose.
+   *
+   * @return An affine transformation matrix representation of this pose.
+   */
+  public Matrix<N3, N3> toMatrix() {
+    var vec = m_translation.toVector();
+    var mat = m_rotation.toMatrix();
+    return MatBuilder.fill(
+        Nat.N3(),
+        Nat.N3(),
+        mat.get(0, 0),
+        mat.get(0, 1),
+        vec.get(0),
+        mat.get(1, 0),
+        mat.get(1, 1),
+        vec.get(1),
+        0.0,
+        0.0,
+        1.0);
   }
 
   /**

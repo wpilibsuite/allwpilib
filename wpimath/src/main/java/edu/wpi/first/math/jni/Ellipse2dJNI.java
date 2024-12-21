@@ -9,7 +9,7 @@ public final class Ellipse2dJNI extends WPIMathJNI {
   /**
    * Returns the nearest point that is contained within the ellipse.
    *
-   * <p>Constructs an Ellipse2d object and runs its FindNearestPoint() method.
+   * <p>Constructs an Ellipse2d object and runs its nearest() method.
    *
    * @param centerX The x coordinate of the center of the ellipse in meters.
    * @param centerY The y coordinate of the center of the ellipse in meters.
@@ -20,7 +20,7 @@ public final class Ellipse2dJNI extends WPIMathJNI {
    * @param pointY The y coordinate of the point that this will find the nearest point to.
    * @param nearestPoint Array to store nearest point into.
    */
-  public static native void findNearestPoint(
+  public static native void nearest(
       double centerX,
       double centerY,
       double centerHeading,

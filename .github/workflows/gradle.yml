@@ -15,10 +15,10 @@ jobs:
           - container: wpilib/roborio-cross-ubuntu:2025-22.04
             artifact-name: Athena
             build-options: "-Ponlylinuxathena"
-          - container: wpilib/raspbian-cross-ubuntu:bullseye-22.04
+          - container: wpilib/raspbian-cross-ubuntu:bookworm-22.04
             artifact-name: Arm32
             build-options: "-Ponlylinuxarm32"
-          - container: wpilib/aarch64-cross-ubuntu:bullseye-22.04
+          - container: wpilib/aarch64-cross-ubuntu:bookworm-22.04
             artifact-name: Arm64
             build-options: "-Ponlylinuxarm64"
           - container: wpilib/ubuntu-base:22.04
