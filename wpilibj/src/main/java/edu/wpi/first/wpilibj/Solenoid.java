@@ -104,8 +104,7 @@ public class Solenoid implements Sendable, AutoCloseable {
    * @return true if the solenoid off.
    */
   public boolean isOff() {
-    int currentAll = m_module.getSolenoids();
-    return (currentAll & m_mask) == 0;
+    return !isOn();
   }
 
   /** Turns the solenoid on. */

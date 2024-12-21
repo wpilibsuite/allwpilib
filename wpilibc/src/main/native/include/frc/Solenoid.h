@@ -59,6 +59,7 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
    *
    * @return The current value of the solenoid.
    */
+  [[deprecated("Use isOn or isOff methods instead.")]]
   bool Get() const;
 
   /**

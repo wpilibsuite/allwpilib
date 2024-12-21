@@ -60,8 +60,7 @@ bool Solenoid::IsOn() const {
 }
 
 bool Solenoid::IsOff() const {
-  int currentAll = m_module->GetSolenoids();
-  return (currentAll & m_mask) == 0;
+  return !IsOn();
 }
 
 void Solenoid::SetOn() {
