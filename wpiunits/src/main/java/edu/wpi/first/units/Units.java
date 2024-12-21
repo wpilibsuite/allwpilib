@@ -374,66 +374,9 @@ public final class Units {
   public static final MomentOfInertiaUnit KilogramSquareMeters =
       KilogramMetersSquaredPerSecond.mult(RadiansPerSecond);
 
-  // VoltageUnit
-  /** The base unit of electric potential. */
-  public static final VoltageUnit Volts = BaseUnits.VoltageUnit;
-
-  /** The base unit of electric potential. */
-  public static final VoltageUnit Volt = Volts; // alias
-
-  /**
-   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
-   * or low-power circuits.
-   */
-  public static final VoltageUnit Millivolts = Milli(Volts);
-
-  /**
-   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
-   * or low-power circuits.
-   */
-  public static final VoltageUnit Millivolt = Millivolts; // alias
-
-  // CurrentUnit
-  /** The base unit of electrical current. */
-  public static final CurrentUnit Amps = BaseUnits.CurrentUnit;
-
-  /** The base unit of electrical current. */
-  public static final CurrentUnit Amp = Amps; // alias
-
-  /**
-   * A unit equal to 1/1000 of an {@link #Amp}. Useful when dealing with low-current applications
-   * like LED drivers or low-power circuits.
-   */
-  public static final CurrentUnit Milliamps = Milli(Amps);
-
-  /**
-   * A unit equal to 1/1000 of an {@link #Amp}. Useful when dealing with low-current applications
-   * like LED drivers or low-power circuits.
-   */
-  public static final CurrentUnit Milliamp = Milliamps; // alias
-
-  // ResistanceUnit
-  /** The base unit of resistance. Equivalent to one {@link #Volt} per {@link #Amp}. */
-  public static final ResistanceUnit Ohms = derive(Volts.per(Amp)).named("Ohm").symbol("Ω").make();
-
-  /** The base unit of resistance. Equivalent to one {@link #Volt} per {@link #Amp}. */
-  public static final ResistanceUnit Ohm = Ohms; // alias
-
-  /** A unit equal to 1,000 {@link #Ohms}. */
-  public static final ResistanceUnit KiloOhms = Kilo(Ohms);
-
-  /** A unit equal to 1,000 {@link #Ohms}. */
-  public static final ResistanceUnit KiloOhm = KiloOhms; // alias
-
-  /** A unit equal to 1/1000 of a {@link #Ohm}. */
-  public static final ResistanceUnit MilliOhms = Milli(Ohms);
-
-  /** A unit equal to 1/1000 of a {@link #Ohm}. */
-  public static final ResistanceUnit MilliOhm = MilliOhms; // alias
-
   // EnergyUnit
   /** The base unit of energy. */
-  public static final EnergyUnit Joules = BaseUnits.EnergyUnit;
+  public static final EnergyUnit Joules = Newton.multAsEnergy(Meters);
 
   /** The base unit of energy. */
   public static final EnergyUnit Joule = Joules; // alias
@@ -483,6 +426,63 @@ public final class Units {
    */
   public static final PowerUnit Horsepower =
       derive(Watts).aggregate(745.7).named("Horsepower").symbol("HP").make();
+
+  // CurrentUnit
+  /** The base unit of electrical current. */
+  public static final CurrentUnit Amps = BaseUnits.CurrentUnit;
+
+  /** The base unit of electrical current. */
+  public static final CurrentUnit Amp = Amps; // alias
+
+  /**
+   * A unit equal to 1/1000 of an {@link #Amp}. Useful when dealing with low-current applications
+   * like LED drivers or low-power circuits.
+   */
+  public static final CurrentUnit Milliamps = Milli(Amps);
+
+  /**
+   * A unit equal to 1/1000 of an {@link #Amp}. Useful when dealing with low-current applications
+   * like LED drivers or low-power circuits.
+   */
+  public static final CurrentUnit Milliamp = Milliamps; // alias
+
+  // VoltageUnit
+  /** The base unit of electric potential. */
+  public static final VoltageUnit Volts = derive(Watts.per(Amp)).named("Volt").symbol("V").make();
+
+  /** The base unit of electric potential. */
+  public static final VoltageUnit Volt = Volts; // alias
+
+  /**
+   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
+   * or low-power circuits.
+   */
+  public static final VoltageUnit Millivolts = Milli(Volts);
+
+  /**
+   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
+   * or low-power circuits.
+   */
+  public static final VoltageUnit Millivolt = Millivolts; // alias
+
+  // ResistanceUnit
+  /** The base unit of resistance. Equivalent to one {@link #Volt} per {@link #Amp}. */
+  public static final ResistanceUnit Ohms = derive(Volts.per(Amp)).named("Ohm").symbol("Ω").make();
+
+  /** The base unit of resistance. Equivalent to one {@link #Volt} per {@link #Amp}. */
+  public static final ResistanceUnit Ohm = Ohms; // alias
+
+  /** A unit equal to 1,000 {@link #Ohms}. */
+  public static final ResistanceUnit KiloOhms = Kilo(Ohms);
+
+  /** A unit equal to 1,000 {@link #Ohms}. */
+  public static final ResistanceUnit KiloOhm = KiloOhms; // alias
+
+  /** A unit equal to 1/1000 of a {@link #Ohm}. */
+  public static final ResistanceUnit MilliOhms = Milli(Ohms);
+
+  /** A unit equal to 1/1000 of a {@link #Ohm}. */
+  public static final ResistanceUnit MilliOhm = MilliOhms; // alias
 
   // TemperatureUnit
   /**
