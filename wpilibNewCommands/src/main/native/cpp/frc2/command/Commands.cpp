@@ -6,7 +6,7 @@
 
 #include <utility>
 #include <vector>
-
+#include <memory>
 #include <wpi/deprecated.h>
 
 #include "frc2/command/ConditionalCommand.h"
@@ -82,6 +82,21 @@ CommandPtr cmd::DeferredProxy(wpi::unique_function<CommandPtr()> supplier) {
   return ProxyCommand(std::move(supplier)).ToPtr();
 }
 WPI_UNIGNORE_DEPRECATED
+
+CommandPtr cmd::Fork(CommandPtr&& other) {
+  std::vector<Command*> vec{other.get()};
+  auto m_ptr = make_unique<ScheduleCommand>(std::span<Command*>(vec));
+  return ScheduleCommand(std::move(*m_ptr)).ToPtr();
+}
+
+CommandPtr cmd::Fork(std::vector<CommandPtr>&& commands) {
+  std::vector<Command*> vec{};
+  for (auto&& ptr : commands) {
+    vec.emplace_back(std::move(ptr).Unwrap().get());
+  }
+  auto m_ptr = make_unique<ScheduleCommand>(std::span<Command*>(vec));
+  return ScheduleCommand(std::move(*m_ptr)).ToPtr();
+}
 
 CommandPtr cmd::Wait(units::second_t duration) {
   return WaitCommand(duration).ToPtr();
