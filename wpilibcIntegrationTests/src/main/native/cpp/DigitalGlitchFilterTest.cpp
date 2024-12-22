@@ -28,13 +28,13 @@ TEST(DigitalGlitchFilterTest, Basic) {
   // Check that we can make a single filter and set the period.
   frc::DigitalGlitchFilter filter1;
   filter1.Add(&input1);
-  filter1.SetPeriodNanoSeconds(4200);
+  filter1.SetPeriod(4200);
 
   // Check that we can make a second filter with 2 inputs.
   frc::DigitalGlitchFilter filter2;
   filter2.Add(&input2);
   filter2.Add(&input3);
-  filter2.SetPeriodNanoSeconds(97100);
+  filter2.SetPeriod(97100);
 
   // Check that we can make a third filter with an input, an encoder, and a
   // counter.
@@ -42,12 +42,12 @@ TEST(DigitalGlitchFilterTest, Basic) {
   filter3.Add(&input4);
   filter3.Add(&encoder5);
   filter3.Add(&counter7);
-  filter3.SetPeriodNanoSeconds(167800);
+  filter3.SetPeriod(167800);
 
   // Verify that the period was properly set for all 3 filters.
-  EXPECT_EQ(4200u, filter1.GetPeriodNanoSeconds());
-  EXPECT_EQ(97100u, filter2.GetPeriodNanoSeconds());
-  EXPECT_EQ(167800u, filter3.GetPeriodNanoSeconds());
+  EXPECT_EQ(4200u, filter1.GetPeriod());
+  EXPECT_EQ(97100u, filter2.GetPeriod());
+  EXPECT_EQ(167800u, filter3.GetPeriod());
 
   // Clean up.
   filter1.Remove(&input1);

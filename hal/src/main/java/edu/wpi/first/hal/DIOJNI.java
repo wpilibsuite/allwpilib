@@ -89,10 +89,10 @@ public class DIOJNI extends JNIWrapper {
    * going at any time.
    *
    * @param dioPortHandle the digital port handle
-   * @param pulseLengthSeconds the active length of the pulse (in seconds)
+   * @param pulseLength the active length of the pulse in seconds
    * @see "HAL_Pulse"
    */
-  public static native void pulse(int dioPortHandle, double pulseLengthSeconds);
+  public static native void pulse(int dioPortHandle, double pulseLength);
 
   /**
    * Generates a single digital pulse on multiple channels.
@@ -101,10 +101,10 @@ public class DIOJNI extends JNIWrapper {
    * any time.
    *
    * @param channelMask the channel mask
-   * @param pulseLengthSeconds the active length of the pulse (in seconds)
+   * @param pulseLength the active length of the pulse in seconds
    * @see "HAL_PulseMultiple"
    */
-  public static native void pulseMultiple(long channelMask, double pulseLengthSeconds);
+  public static native void pulseMultiple(long channelMask, double pulseLength);
 
   /**
    * Checks a DIO line to see if it is currently generating a pulse.

@@ -30,7 +30,7 @@ import java.util.List;
 public class Ultrasonic implements Sendable, AutoCloseable {
   // Time (sec) for the ping trigger pulse.
   private static final double kPingTime = 10 * 1e-6;
-  private static final double kSpeedOfSoundInchesPerSec = 1130.0 * 12.0;
+  private static final double kSpeedOfSound = 344.4; // m/s
   // ultrasonic sensor list
   private static final List<Ultrasonic> m_sensors = new ArrayList<>();
   // automatic round robin mode
@@ -88,7 +88,7 @@ public class Ultrasonic implements Sendable, AutoCloseable {
     m_simDevice = SimDevice.create("Ultrasonic", m_echoChannel.getChannel());
     if (m_simDevice != null) {
       m_simRangeValid = m_simDevice.createBoolean("Range Valid", Direction.kInput, true);
-      m_simRange = m_simDevice.createDouble("Range (in)", Direction.kInput, 0.0);
+      m_simRange = m_simDevice.createDouble("Range (m)", Direction.kInput, 0.0);
       m_pingChannel.setSimDevice(m_simDevice);
       m_echoChannel.setSimDevice(m_simDevice);
     }
@@ -276,30 +276,20 @@ public class Ultrasonic implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get the range in inches from the ultrasonic sensor. If there is no valid value yet, i.e. at
+   * Get the range in meters from the ultrasonic sensor. If there is no valid value yet, i.e. at
    * least one measurement hasn't completed, then return 0.
    *
-   * @return double Range in inches of the target returned from the ultrasonic sensor.
+   * @return double Range in meters of the target returned by the ultrasonic sensor.
    */
-  public double getRangeInches() {
+  public double getRange() {
     if (isRangeValid()) {
       if (m_simRange != null) {
         return m_simRange.get();
       }
-      return m_counter.getPeriod() * kSpeedOfSoundInchesPerSec / 2.0;
+      return m_counter.getPeriod() * kSpeedOfSound / 2.0;
     } else {
       return 0;
     }
-  }
-
-  /**
-   * Get the range in millimeters from the ultrasonic sensor. If there is no valid value yet, i.e.
-   * at least one measurement hasn't completed, then return 0.
-   *
-   * @return double Range in millimeters of the target returned by the ultrasonic sensor.
-   */
-  public double getRangeMM() {
-    return getRangeInches() * 25.4;
   }
 
   /**
@@ -323,6 +313,6 @@ public class Ultrasonic implements Sendable, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Ultrasonic");
-    builder.addDoubleProperty("Value", this::getRangeInches, null);
+    builder.addDoubleProperty("Value", this::getRange, null);
   }
 }

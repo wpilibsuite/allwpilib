@@ -20,7 +20,7 @@ class DifferentialDriveWheelSpeedsProtoTest {
     DifferentialDriveWheelSpeeds.proto.pack(proto, DATA);
 
     DifferentialDriveWheelSpeeds data = DifferentialDriveWheelSpeeds.proto.unpack(proto);
-    assertEquals(DATA.leftMetersPerSecond, data.leftMetersPerSecond);
-    assertEquals(DATA.rightMetersPerSecond, data.rightMetersPerSecond);
+    assertEquals(DATA.left, data.left);
+    assertEquals(DATA.right, data.right);
   }
 }

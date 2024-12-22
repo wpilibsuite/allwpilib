@@ -301,7 +301,7 @@ Java_edu_wpi_first_hal_DMAJNI_stopDMA
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_hal_DMAJNI_readDMA
-  (JNIEnv* env, jclass, jint handle, jdouble timeoutSeconds, jintArray buf,
+  (JNIEnv* env, jclass, jint handle, jdouble timeout, jintArray buf,
    jintArray store)
 {
   int32_t status = 0;
@@ -309,7 +309,7 @@ Java_edu_wpi_first_hal_DMAJNI_readDMA
   std::memset(&dmaSample, 0, sizeof(dmaSample));
   int32_t remaining = 0;
   HAL_DMAReadStatus readStatus =
-      HAL_ReadDMA(handle, &dmaSample, timeoutSeconds, &remaining, &status);
+      HAL_ReadDMA(handle, &dmaSample, timeout, &remaining, &status);
   CheckStatus(env, status);
 
   static_assert(sizeof(uint32_t) == sizeof(jint), "Java ints must be 32 bits");

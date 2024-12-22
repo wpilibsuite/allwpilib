@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Ultrasonic;
 
 /** Class to control a simulated {@link edu.wpi.first.wpilibj.Ultrasonic}. */
@@ -33,7 +32,7 @@ public class UltrasonicSim {
   public UltrasonicSim(@SuppressWarnings("unused") int ping, int echo) {
     SimDeviceSim simDevice = new SimDeviceSim("Ultrasonic", echo);
     m_simRangeValid = simDevice.getBoolean("Range Valid");
-    m_simRange = simDevice.getDouble("Range (in)");
+    m_simRange = simDevice.getDouble("Range (m)");
   }
 
   /**
@@ -48,18 +47,9 @@ public class UltrasonicSim {
   /**
    * Sets the range measurement.
    *
-   * @param inches The range in inches.
+   * @param range The range in meters.
    */
-  public void setRangeInches(double inches) {
-    m_simRange.set(inches);
-  }
-
-  /**
-   * Sets the range measurement.
-   *
-   * @param meters The range in meters.
-   */
-  public void setRangeMeters(double meters) {
-    m_simRange.set(Units.metersToInches(meters));
+  public void setRange(double range) {
+    m_simRange.set(range);
   }
 }

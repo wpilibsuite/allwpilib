@@ -107,23 +107,19 @@ public class Drivetrain {
    * @param speeds The desired wheel speeds.
    */
   public void setSpeeds(MecanumDriveWheelSpeeds speeds) {
-    final double frontLeftFeedforward = m_feedforward.calculate(speeds.frontLeftMetersPerSecond);
-    final double frontRightFeedforward = m_feedforward.calculate(speeds.frontRightMetersPerSecond);
-    final double backLeftFeedforward = m_feedforward.calculate(speeds.rearLeftMetersPerSecond);
-    final double backRightFeedforward = m_feedforward.calculate(speeds.rearRightMetersPerSecond);
+    final double frontLeftFeedforward = m_feedforward.calculate(speeds.frontLeft);
+    final double frontRightFeedforward = m_feedforward.calculate(speeds.frontRight);
+    final double backLeftFeedforward = m_feedforward.calculate(speeds.rearLeft);
+    final double backRightFeedforward = m_feedforward.calculate(speeds.rearRight);
 
     final double frontLeftOutput =
-        m_frontLeftPIDController.calculate(
-            m_frontLeftEncoder.getRate(), speeds.frontLeftMetersPerSecond);
+        m_frontLeftPIDController.calculate(m_frontLeftEncoder.getRate(), speeds.frontLeft);
     final double frontRightOutput =
-        m_frontRightPIDController.calculate(
-            m_frontRightEncoder.getRate(), speeds.frontRightMetersPerSecond);
+        m_frontRightPIDController.calculate(m_frontRightEncoder.getRate(), speeds.frontRight);
     final double backLeftOutput =
-        m_backLeftPIDController.calculate(
-            m_backLeftEncoder.getRate(), speeds.rearLeftMetersPerSecond);
+        m_backLeftPIDController.calculate(m_backLeftEncoder.getRate(), speeds.rearLeft);
     final double backRightOutput =
-        m_backRightPIDController.calculate(
-            m_backRightEncoder.getRate(), speeds.rearRightMetersPerSecond);
+        m_backRightPIDController.calculate(m_backRightEncoder.getRate(), speeds.rearRight);
 
     m_frontLeftMotor.setVoltage(frontLeftOutput + frontLeftFeedforward);
     m_frontRightMotor.setVoltage(frontRightOutput + frontRightFeedforward);
@@ -140,14 +136,13 @@ public class Drivetrain {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(
-      double xSpeed, double ySpeed, double rot, boolean fieldRelative, double periodSeconds) {
+      double xSpeed, double ySpeed, double rot, boolean fieldRelative, double period) {
     var chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
     if (fieldRelative) {
       chassisSpeeds =
           chassisSpeeds.toRobotRelative(m_poseEstimator.getEstimatedPosition().getRotation());
     }
-    setSpeeds(
-        m_kinematics.toWheelSpeeds(chassisSpeeds.discretize(periodSeconds)).desaturate(kMaxSpeed));
+    setSpeeds(m_kinematics.toWheelSpeeds(chassisSpeeds.discretize(period)).desaturate(kMaxSpeed));
   }
 
   /** Updates the field relative position of the robot. */

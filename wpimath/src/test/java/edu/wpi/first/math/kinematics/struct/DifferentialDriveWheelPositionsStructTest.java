@@ -23,7 +23,7 @@ class DifferentialDriveWheelPositionsStructTest {
     buffer.rewind();
 
     DifferentialDriveWheelPositions data = DifferentialDriveWheelPositions.struct.unpack(buffer);
-    assertEquals(DATA.leftMeters, data.leftMeters);
-    assertEquals(DATA.rightMeters, data.rightMeters);
+    assertEquals(DATA.left, data.left);
+    assertEquals(DATA.right, data.right);
   }
 }

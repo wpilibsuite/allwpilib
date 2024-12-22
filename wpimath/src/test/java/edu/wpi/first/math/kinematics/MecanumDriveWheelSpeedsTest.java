@@ -18,10 +18,10 @@ class MecanumDriveWheelSpeedsTest {
     final var wheelSpeeds = left.plus(right);
 
     assertAll(
-        () -> assertEquals(3.0, wheelSpeeds.frontLeftMetersPerSecond),
-        () -> assertEquals(2.0, wheelSpeeds.frontRightMetersPerSecond),
-        () -> assertEquals(2.5, wheelSpeeds.rearLeftMetersPerSecond),
-        () -> assertEquals(2.5, wheelSpeeds.rearRightMetersPerSecond));
+        () -> assertEquals(3.0, wheelSpeeds.frontLeft),
+        () -> assertEquals(2.0, wheelSpeeds.frontRight),
+        () -> assertEquals(2.5, wheelSpeeds.rearLeft),
+        () -> assertEquals(2.5, wheelSpeeds.rearRight));
   }
 
   @Test
@@ -32,10 +32,10 @@ class MecanumDriveWheelSpeedsTest {
     final var wheelSpeeds = left.minus(right);
 
     assertAll(
-        () -> assertEquals(-1.0, wheelSpeeds.frontLeftMetersPerSecond),
-        () -> assertEquals(0.0, wheelSpeeds.frontRightMetersPerSecond),
-        () -> assertEquals(1.5, wheelSpeeds.rearLeftMetersPerSecond),
-        () -> assertEquals(0.5, wheelSpeeds.rearRightMetersPerSecond));
+        () -> assertEquals(-1.0, wheelSpeeds.frontLeft),
+        () -> assertEquals(0.0, wheelSpeeds.frontRight),
+        () -> assertEquals(1.5, wheelSpeeds.rearLeft),
+        () -> assertEquals(0.5, wheelSpeeds.rearRight));
   }
 
   @Test
@@ -43,10 +43,10 @@ class MecanumDriveWheelSpeedsTest {
     final var wheelSpeeds = new MecanumDriveWheelSpeeds(1.0, 0.5, 2.0, 1.5).unaryMinus();
 
     assertAll(
-        () -> assertEquals(-1.0, wheelSpeeds.frontLeftMetersPerSecond),
-        () -> assertEquals(-0.5, wheelSpeeds.frontRightMetersPerSecond),
-        () -> assertEquals(-2.0, wheelSpeeds.rearLeftMetersPerSecond),
-        () -> assertEquals(-1.5, wheelSpeeds.rearRightMetersPerSecond));
+        () -> assertEquals(-1.0, wheelSpeeds.frontLeft),
+        () -> assertEquals(-0.5, wheelSpeeds.frontRight),
+        () -> assertEquals(-2.0, wheelSpeeds.rearLeft),
+        () -> assertEquals(-1.5, wheelSpeeds.rearRight));
   }
 
   @Test
@@ -54,10 +54,10 @@ class MecanumDriveWheelSpeedsTest {
     final var wheelSpeeds = new MecanumDriveWheelSpeeds(1.0, 0.5, 2.0, 1.5).times(2.0);
 
     assertAll(
-        () -> assertEquals(2.0, wheelSpeeds.frontLeftMetersPerSecond),
-        () -> assertEquals(1.0, wheelSpeeds.frontRightMetersPerSecond),
-        () -> assertEquals(4.0, wheelSpeeds.rearLeftMetersPerSecond),
-        () -> assertEquals(3.0, wheelSpeeds.rearRightMetersPerSecond));
+        () -> assertEquals(2.0, wheelSpeeds.frontLeft),
+        () -> assertEquals(1.0, wheelSpeeds.frontRight),
+        () -> assertEquals(4.0, wheelSpeeds.rearLeft),
+        () -> assertEquals(3.0, wheelSpeeds.rearRight));
   }
 
   @Test
@@ -65,9 +65,9 @@ class MecanumDriveWheelSpeedsTest {
     final var wheelSpeeds = new MecanumDriveWheelSpeeds(1.0, 0.5, 2.0, 1.5).div(2.0);
 
     assertAll(
-        () -> assertEquals(0.5, wheelSpeeds.frontLeftMetersPerSecond),
-        () -> assertEquals(0.25, wheelSpeeds.frontRightMetersPerSecond),
-        () -> assertEquals(1.0, wheelSpeeds.rearLeftMetersPerSecond),
-        () -> assertEquals(0.75, wheelSpeeds.rearRightMetersPerSecond));
+        () -> assertEquals(0.5, wheelSpeeds.frontLeft),
+        () -> assertEquals(0.25, wheelSpeeds.frontRight),
+        () -> assertEquals(1.0, wheelSpeeds.rearLeft),
+        () -> assertEquals(0.75, wheelSpeeds.rearRight));
   }
 }

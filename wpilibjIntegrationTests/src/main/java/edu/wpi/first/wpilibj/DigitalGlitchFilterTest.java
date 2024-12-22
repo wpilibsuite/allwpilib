@@ -36,22 +36,22 @@ public class DigitalGlitchFilterTest extends AbstractComsSetup {
 
     final DigitalGlitchFilter filter1 = new DigitalGlitchFilter();
     filter1.add(input1);
-    filter1.setPeriodNanoSeconds(4200);
+    filter1.setPeriod(4200);
 
     final DigitalGlitchFilter filter2 = new DigitalGlitchFilter();
     filter2.add(input2);
     filter2.add(input3);
-    filter2.setPeriodNanoSeconds(97100);
+    filter2.setPeriod(97100);
 
     final DigitalGlitchFilter filter3 = new DigitalGlitchFilter();
     filter3.add(input4);
     filter3.add(encoder5);
     filter3.add(counter7);
-    filter3.setPeriodNanoSeconds(167800);
+    filter3.setPeriod(167800);
 
-    assertEquals(4200, filter1.getPeriodNanoSeconds());
-    assertEquals(97100, filter2.getPeriodNanoSeconds());
-    assertEquals(167800, filter3.getPeriodNanoSeconds());
+    assertEquals(4200, filter1.getPeriod());
+    assertEquals(97100, filter2.getPeriod());
+    assertEquals(167800, filter3.getPeriod());
 
     filter1.remove(input1);
 

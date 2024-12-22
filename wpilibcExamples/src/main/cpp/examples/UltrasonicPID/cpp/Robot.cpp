@@ -15,8 +15,8 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousPeriodic() {
-  units::millimeter_t measurement = m_ultrasonic.GetRange();
-  units::millimeter_t filteredMeasurement = m_filter.Calculate(measurement);
+  units::meter_t measurement = m_ultrasonic.GetRange();
+  units::meter_t filteredMeasurement = m_filter.Calculate(measurement);
   double pidOutput = m_pidController.Calculate(filteredMeasurement.value());
 
   // disable input squaring -- PID output is linear

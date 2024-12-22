@@ -211,10 +211,8 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
 }
 
 void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
-                                    int32_t highTime0NanoSeconds,
-                                    int32_t lowTime0NanoSeconds,
-                                    int32_t highTime1NanoSeconds,
-                                    int32_t lowTime1NanoSeconds,
+                                    int32_t highTime0, int32_t lowTime0,
+                                    int32_t highTime1, int32_t lowTime1,
                                     int32_t* status) {
   auto led = addressableLEDHandles->Get(handle);
   if (!led) {
@@ -222,22 +220,21 @@ void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
     return;
   }
 
-  led->led->writeLowBitTickTiming(0, highTime0NanoSeconds / 25, status);
-  led->led->writeLowBitTickTiming(1, lowTime0NanoSeconds / 25, status);
-  led->led->writeHighBitTickTiming(0, highTime1NanoSeconds / 25, status);
-  led->led->writeHighBitTickTiming(1, lowTime1NanoSeconds / 25, status);
+  led->led->writeLowBitTickTiming(0, highTime0 / 25, status);
+  led->led->writeLowBitTickTiming(1, lowTime0 / 25, status);
+  led->led->writeHighBitTickTiming(0, highTime1 / 25, status);
+  led->led->writeHighBitTickTiming(1, lowTime1 / 25, status);
 }
 
 void HAL_SetAddressableLEDSyncTime(HAL_AddressableLEDHandle handle,
-                                   int32_t syncTimeMicroSeconds,
-                                   int32_t* status) {
+                                   int32_t syncTime, int32_t* status) {
   auto led = addressableLEDHandles->Get(handle);
   if (!led) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
 
-  led->led->writeSyncTiming(syncTimeMicroSeconds, status);
+  led->led->writeSyncTiming(syncTime, status);
 }
 
 void HAL_StartAddressableLEDOutput(HAL_AddressableLEDHandle handle,
