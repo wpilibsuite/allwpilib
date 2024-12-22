@@ -34,7 +34,7 @@ int32_t SmartIo::InitializeMode(SmartIoMode mode) {
 
   modePublisher = inst.GetIntegerTopic(subTableString + "type").Publish();
   getSubscriber = 
-    inst.GetIntegerTopic(subTableString + "valget").Subscribe(0.0, options);
+      inst.GetIntegerTopic(subTableString + "valget").Subscribe(0.0, options);
 
   currentMode = mode;
   switch (mode) {
