@@ -109,8 +109,8 @@ static void DisplayGui() {
   static int focusedTag = 1;
   static int referenceTag = 1;
 
-  static fieldmap currentCalibrationMap;
-  static fieldmap currentReferenceMap;
+  static Fieldmap currentCalibrationMap;
+  static Fieldmap currentReferenceMap;
 
   // camera matrix selector button
   if (ImGui::Button("Upload Camera Intrinsics")) {
@@ -487,8 +487,8 @@ static void DisplayGui() {
       std::ifstream calJson(calibration_json_path);
       std::ifstream refJson(selected_field_map);
 
-      currentCalibrationMap = fieldmap(wpi::json::parse(calJson));
-      currentReferenceMap = fieldmap(wpi::json::parse(refJson));
+      currentCalibrationMap = Fieldmap(wpi::json::parse(calJson));
+      currentReferenceMap = Fieldmap(wpi::json::parse(refJson));
 
       double xDiff = currentReferenceMap.getTag(focusedTag).xPos -
                      currentCalibrationMap.getTag(focusedTag).xPos;
@@ -517,17 +517,17 @@ static void DisplayGui() {
       ImGui::TextWrapped(
           "Yaw Difference %s°",
           std::to_string(
-              fieldmap::minimizeAngle(yawDiff * (180.0 / std::numbers::pi)))
+              Fieldmap::minimizeAngle(yawDiff * (180.0 / std::numbers::pi)))
               .c_str());
       ImGui::TextWrapped(
           "Pitch Difference %s°",
           std::to_string(
-              fieldmap::minimizeAngle(pitchDiff * (180.0 / std::numbers::pi)))
+              Fieldmap::minimizeAngle(pitchDiff * (180.0 / std::numbers::pi)))
               .c_str());
       ImGui::TextWrapped(
           "Roll Difference %s°",
           std::to_string(
-              fieldmap::minimizeAngle(rollDiff * (180.0 / std::numbers::pi)))
+              Fieldmap::minimizeAngle(rollDiff * (180.0 / std::numbers::pi)))
               .c_str());
 
       ImGui::NewLine();

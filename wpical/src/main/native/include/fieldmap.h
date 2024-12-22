@@ -12,10 +12,10 @@
 #include <tagpose.h>
 #include <wpi/json.h>
 
-class fieldmap {
+class Fieldmap {
  public:
-  fieldmap() = default;
-  explicit fieldmap(const wpi::json& json) {
+  Fieldmap() = default;
+  explicit Fieldmap(const wpi::json& json) {
     double field_length_meters =
         static_cast<double>(json.at("field").at("length"));
     double field_width_meters =
@@ -47,6 +47,7 @@ class fieldmap {
   int getNumTags() const { return tagVec.size(); }
 
   static double minimizeAngle(double angle) {
+    angle = std::fmod(angle, 360);
     if (angle > 180) {
       return angle - 360;
     } else if (angle < -180) {

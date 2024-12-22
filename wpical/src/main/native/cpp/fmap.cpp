@@ -27,7 +27,7 @@ wpi::json fmap::convertfmap(const wpi::json& json) {
 
   std::string fmapend = "],\"type\":\"frc\"}";
 
-  fieldmap fieldmap(json);
+  Fieldmap fieldmap(json);
 
   for (int i = 0; i < fieldmap.getNumTags(); i++) {
     fmapstart += singleTag(i + 1, fieldmap.getTag(i + 1)).dump();
