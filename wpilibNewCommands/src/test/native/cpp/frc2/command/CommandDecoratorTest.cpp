@@ -412,12 +412,14 @@ TEST_F(CommandDecoratorTest, RepeatedlyCount) {
   for (int i = 1; i < 3; i++) {
     scheduler.Run();
     EXPECT_EQ(i, counter);
-    EXPECT_TRUE(scheduler.IsScheduled(command));
+    EXPECT_TRUE(scheduler.IsScheduled(command))
+        << "Expected group to be scheduled with i = " << i;
   }
 
   scheduler.Run();
-  EXPECT_EQ(3, counter);
-  EXPECT_FALSE(scheduler.IsScheduled(command));
+  EXPECT_EQ(3, counter) << "Loop should have run 3 times something went wrong";
+  EXPECT_FALSE(scheduler.IsScheduled(command))
+      << "This command should have gotten unscheduled";
 }
 
 TEST_F(CommandDecoratorTest, Unless) {
