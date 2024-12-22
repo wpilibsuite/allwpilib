@@ -172,6 +172,9 @@ public class WPIUtilJNI {
   static native void setRawFrameData(
       long frame, ByteBuffer data, int size, int width, int height, int stride, int pixelFormat);
 
+  static native void setRawFrameDataArray(
+      long frame, byte[] data, int size, int width, int height, int stride, int pixelFormat);
+
   static native void setRawFrameInfo(
       long frame, int size, int width, int height, int stride, int pixelFormat);
 
