@@ -42,7 +42,7 @@ class fieldmap {
     }
   }
 
-  const tag::pose& getTag(size_t tag) const { return tagVec[tag - 1]; }
+  const tag::Pose& getTag(size_t tag) const { return tagVec[tag - 1]; }
 
   int getNumTags() const { return tagVec.size(); }
 
@@ -56,5 +56,5 @@ class fieldmap {
   }
 
  private:
-  std::vector<tag::pose> tagVec;
+  std::vector<tag::Pose> tagVec;
 };

@@ -11,6 +11,6 @@
 #include <wpi/json.h>
 
 namespace fmap {
-wpi::json singleTag(int tag, const tag::pose& tagpose);
+wpi::json singleTag(int tag, const tag::Pose& tagpose);
 wpi::json convertfmap(const wpi::json& json);
 }  // namespace fmap

@@ -5,7 +5,7 @@
 #include <tagpose.h>
 
 namespace tag {
-pose::pose(double xpos, double ypos, double zpos, double w, double x, double y,
+Pose::Pose(double xpos, double ypos, double zpos, double w, double x, double y,
            double z, double field_length_meters, double field_width_meters) {
   xPos = xpos;
   yPos = ypos;

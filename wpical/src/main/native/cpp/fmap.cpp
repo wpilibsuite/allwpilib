@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-wpi::json fmap::singleTag(int tag, const tag::pose& tagpose) {
+wpi::json fmap::singleTag(int tag, const tag::Pose& tagpose) {
   std::vector<double> transform = {};
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
