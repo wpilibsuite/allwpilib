@@ -30,11 +30,11 @@ int32_t SmartIo::InitializeMode(SmartIoMode mode) {
   options.periodic = 0.005;
 
   auto channelString = std::to_string(channel);
-  auto subTableString = "/io/"+channelString+"/";
+  auto subTableString = "/io/" + channelString + "/";
 
   modePublisher = inst.GetIntegerTopic(subTableString + "type").Publish();
-  getSubscriber = inst.GetIntegerTopic(subTableString + "valget")
-                      .Subscribe(0.0, options);
+  getSubscriber = 
+    inst.GetIntegerTopic(subTableString + "valget").Subscribe(0.0, options);
 
   currentMode = mode;
   switch (mode) {
