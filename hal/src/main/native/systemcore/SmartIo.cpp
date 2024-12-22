@@ -30,24 +30,19 @@ int32_t SmartIo::InitializeMode(SmartIoMode mode) {
   options.periodic = 0.005;
 
   auto channelString = std::to_string(channel);
+  auto subTableString = "/io/" + channelString + "/";
 
-  modePublisher = inst.GetDoubleTopic("/io/type" + channelString).Publish();
-  getSubscriber = inst.GetDoubleTopic("/io/valread" + channelString)
-                      .Subscribe(0.0, options);
+  modePublisher = inst.GetIntegerTopic(subTableString + "type").Publish();
+  getSubscriber =
+      inst.GetIntegerTopic(subTableString + "valget").Subscribe(0.0, options);
 
   currentMode = mode;
   switch (mode) {
     case SmartIoMode::PWMOutput:
-      modePublisher.Set(3);
+      modePublisher.Set(4);
       setPublisher =
-          inst.GetDoubleTopic("/io/valset" + channelString).Publish(options);
+          inst.GetIntegerTopic(subTableString + "valset").Publish(options);
       setPublisher.Set(0);
-      pwmMinPublisher =
-          inst.GetDoubleTopic("/io/pwmmin" + channelString).Publish();
-      pwmMinPublisher.Set(0);
-      pwmMaxPublisher =
-          inst.GetDoubleTopic("/io/pwmmax" + channelString).Publish();
-      pwmMaxPublisher.Set(4096);
       return 0;
 
     default:
@@ -67,8 +62,7 @@ int32_t SmartIo::SetPwmMicroseconds(uint16_t microseconds) {
     microseconds = 4095;
   }
 
-  // Scale from 0-4096 to 0.0-2.0, then to -1.0-1.0
-  setPublisher.Set((microseconds / 2048.0) - 1);
+  setPublisher.Set(microseconds);
 
   return 0;
 }
@@ -78,10 +72,10 @@ int32_t SmartIo::GetPwmMicroseconds(uint16_t* microseconds) {
     return INCOMPATIBLE_STATE;
   }
 
-  double val = getSubscriber.Get();
+  int val = getSubscriber.Get();
 
   // Get to 0-2, then scale to 0-4096;
-  *microseconds = (val + 1) * 2048;
+  *microseconds = val;
 
   return 0;
 }
