@@ -104,22 +104,25 @@ class CvSink : public ImageSink {
    * Times out (returning 0) after timeout seconds.
    * The provided image will have the pixelFormat this class was constructed
    * with.
-   * 
-   * @param lastFrameTime Timestamp of the last frame - used to compare new frames against, or 0 to use the current time
+   *
+   * @param lastFrameTime Timestamp of the last frame - used to compare new
+   * frames against, or 0 to use the current time
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225, uint64_t lastFrameTime = 0);
+  uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225,
+                     uint64_t lastFrameTime = 0);
 
   /**
    * Wait for the next frame and get the image.  May block forever.
    * The provided image will have the pixelFormat this class was constructed
    * with.
-   * 
-   * @param lastFrameTime Timestamp of the last frame - used to compare new frames against, or 0 to use the current time
+   *
+   * @param lastFrameTime Timestamp of the last frame - used to compare new
+   * frames against, or 0 to use the current time
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as wpi::Now(),
@@ -135,14 +138,16 @@ class CvSink : public ImageSink {
    * with. The data is backed by data in the CvSink. It will be invalidated by
    * any grabFrame*() call on the sink.
    *
-   * @param lastFrameTime Timestamp of the last frame - used to compare new frames against, or 0 to use the current time
+   * @param lastFrameTime Timestamp of the last frame - used to compare new
+   * frames against, or 0 to use the current time
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrameDirect(cv::Mat& image, double timeout = 0.225, uint64_t lastFrameTime = 0);
+  uint64_t GrabFrameDirect(cv::Mat& image, double timeout = 0.225,
+                           uint64_t lastFrameTime = 0);
 
   /**
    * Wait for the next frame and get the image.  May block forever.
@@ -150,7 +155,8 @@ class CvSink : public ImageSink {
    * with. The data is backed by data in the CvSink. It will be invalidated by
    * any grabFrame*() call on the sink.
    *
-   * @param lastFrameTime Timestamp of the last frame - used to compare new frames against, or 0 to use the current time
+   * @param lastFrameTime Timestamp of the last frame - used to compare new
+   * frames against, or 0 to use the current time
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as wpi::Now(),
@@ -297,7 +303,8 @@ inline CvSink::CvSink(std::string_view name,
 inline CvSink::CvSink(const CvSink& sink)
     : ImageSink{sink}, pixelFormat{sink.pixelFormat} {}
 
-inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout, uint64_t lastFrameTime) {
+inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout,
+                                  uint64_t lastFrameTime) {
   cv::Mat tmpnam;
   auto retVal = GrabFrameDirect(tmpnam, lastFrameTime);
   if (retVal <= 0) {
@@ -307,7 +314,8 @@ inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout, uint64_t lastF
   return retVal;
 }
 
-inline uint64_t CvSink::GrabFrameNoTimeout(cv::Mat& image, uint64_t lastFrameTime) {
+inline uint64_t CvSink::GrabFrameNoTimeout(cv::Mat& image,
+                                           uint64_t lastFrameTime) {
   cv::Mat tmpnam;
   auto retVal = GrabFrameNoTimeoutDirect(tmpnam, lastFrameTime);
   if (retVal <= 0) {
@@ -341,12 +349,14 @@ inline constexpr int CvSink::GetCvFormat(WPI_PixelFormat pixelFormat) {
   return type;
 }
 
-inline uint64_t CvSink::GrabFrameDirect(cv::Mat& image, double timeout, uint64_t lastFrameTime) {
+inline uint64_t CvSink::GrabFrameDirect(cv::Mat& image, double timeout,
+                                        uint64_t lastFrameTime) {
   rawFrame.height = 0;
   rawFrame.width = 0;
   rawFrame.stride = 0;
   rawFrame.pixelFormat = pixelFormat;
-  auto timestamp = GrabSinkFrameTimeout(m_handle, rawFrame, timeout, &m_status, lastFrameTime);
+  auto timestamp = GrabSinkFrameTimeout(m_handle, rawFrame, timeout, &m_status,
+                                        lastFrameTime);
   if (m_status != CS_OK) {
     return 0;
   }
@@ -357,7 +367,8 @@ inline uint64_t CvSink::GrabFrameDirect(cv::Mat& image, double timeout, uint64_t
   return timestamp;
 }
 
-inline uint64_t CvSink::GrabFrameNoTimeoutDirect(cv::Mat& image, uint64_t lastFrameTime) {
+inline uint64_t CvSink::GrabFrameNoTimeoutDirect(cv::Mat& image,
+                                                 uint64_t lastFrameTime) {
   rawFrame.height = 0;
   rawFrame.width = 0;
   rawFrame.stride = 0;
