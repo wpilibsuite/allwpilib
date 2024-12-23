@@ -23,7 +23,7 @@ using namespace frc2;
 using SendableChooserTestPublisherFunc = std::function<void(wpi::Sendable*)>;
 using SendableChooserTestArgs =
     std::pair<std::function<frc2::CommandPtr(SendableChooserTestPublisherFunc)>,
-              std::vector<std::string_view>>;
+              std::vector<std::string>>;
 
 class SendableChooserCommandTest
     : public CommandTestBaseWithParam<SendableChooserTestArgs> {
@@ -50,7 +50,7 @@ TEST_P(SendableChooserCommandTest, OptionsAreCorrect) {
 }
 
 namespace utils {
-static const frc2::CommandPtr CommandNamed(std::string_view name) {
+static frc2::CommandPtr CommandNamed(std::string_view name) {
   return frc2::cmd::Print(name).WithName(name);
 }
 
@@ -58,17 +58,17 @@ static const std::vector<SendableChooserTestArgs> OptionsAreCorrectParams() {
   SendableChooserTestArgs empty{[](SendableChooserTestPublisherFunc func) {
                                   return frc2::cmd::Choose(func);
                                 },
-                                std::vector<std::string_view>()};
+                                std::vector<std::string>()};
 
   SendableChooserTestArgs duplicateName{
       [](SendableChooserTestPublisherFunc func) {
         return frc2::cmd::Choose(func, CommandNamed("a"), CommandNamed("b"), CommandNamed("a"));
-      }, make_vector<std::string_view>("a", "b")};
+      }, make_vector<std::string>("a", "b")};
 
   SendableChooserTestArgs happyPath{
       [](SendableChooserTestPublisherFunc func) {
         return frc2::cmd::Choose(func, CommandNamed("a"), CommandNamed("b"), CommandNamed("c"));
-      }, make_vector<std::string_view>("a", "b", "c")};
+      }, make_vector<std::string>("a", "b", "c")};
 
   return make_vector<SendableChooserTestArgs>(empty, duplicateName, happyPath);
 }
