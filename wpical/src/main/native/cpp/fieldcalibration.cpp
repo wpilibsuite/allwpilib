@@ -16,6 +16,24 @@
 
 #include "tag36h11.h"
 
+struct Pose {
+  Eigen::Vector3d p;
+  Eigen::Quaterniond q;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
+
+struct Constraint {
+  int id_begin;
+  int id_end;
+  Pose t_begin_end;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
+
+struct CameraModel {
+  Eigen::Matrix<double, 3, 3> intrinsic_matrix;
+  Eigen::Matrix<double, 8, 1> distortion_coefficients;
+};
+
 class PoseGraphError {
  public:
   explicit PoseGraphError(Pose t_ab_observed)
@@ -64,7 +82,7 @@ class PoseGraphError {
   const Pose m_t_ab_observed;
 };
 
-static CameraModel fieldcalibration::load_camera_model(std::string path) {
+static CameraModel load_camera_model(std::string path) {
   Eigen::Matrix<double, 3, 3> camera_matrix;
   Eigen::Matrix<double, 8, 1> camera_distortion;
 
@@ -123,7 +141,7 @@ static CameraModel fieldcalibration::load_camera_model(std::string path) {
   return camera_model;
 }
 
-static CameraModel fieldcalibration::load_camera_model(wpi::json json_data) {
+static CameraModel load_camera_model(wpi::json json_data) {
   // Camera matrix
   Eigen::Matrix<double, 3, 3> camera_matrix;
 
@@ -148,8 +166,7 @@ static CameraModel fieldcalibration::load_camera_model(wpi::json json_data) {
   return camera_model;
 }
 
-static std::map<int, wpi::json> fieldcalibration::load_ideal_map(
-    std::string path) {
+static std::map<int, wpi::json> load_ideal_map(std::string path) {
   std::ifstream file(path);
   wpi::json json_data = wpi::json::parse(file);
   std::map<int, wpi::json> ideal_map;
@@ -161,7 +178,7 @@ static std::map<int, wpi::json> fieldcalibration::load_ideal_map(
   return ideal_map;
 }
 
-Eigen::Matrix<double, 4, 4> fieldcalibration::get_tag_transform(
+Eigen::Matrix<double, 4, 4> get_tag_transform(
     std::map<int, wpi::json>& ideal_map, int tag_id) {
   Eigen::Matrix<double, 4, 4> transform =
       Eigen::Matrix<double, 4, 4>::Identity();
@@ -181,7 +198,7 @@ Eigen::Matrix<double, 4, 4> fieldcalibration::get_tag_transform(
   return transform;
 }
 
-static Eigen::Matrix<double, 4, 4> fieldcalibration::estimate_tag_pose(
+static Eigen::Matrix<double, 4, 4> estimate_tag_pose(
     apriltag_detection_t* tag_detection,
     const Eigen::Matrix<double, 3, 3>& camera_matrix,
     const Eigen::Matrix<double, 8, 1>& camera_distortion, double tag_size) {
@@ -224,10 +241,11 @@ static Eigen::Matrix<double, 4, 4> fieldcalibration::estimate_tag_pose(
   return camera_to_tag;
 }
 
-static void fieldcalibration::draw_tag_cube(
-    cv::Mat& frame, Eigen::Matrix<double, 4, 4> camera_to_tag,
-    const Eigen::Matrix<double, 3, 3>& camera_matrix,
-    const Eigen::Matrix<double, 8, 1>& camera_distortion, double tag_size) {
+static void draw_tag_cube(cv::Mat& frame,
+                          Eigen::Matrix<double, 4, 4> camera_to_tag,
+                          const Eigen::Matrix<double, 3, 3>& camera_matrix,
+                          const Eigen::Matrix<double, 8, 1>& camera_distortion,
+                          double tag_size) {
   cv::Mat camera_matrix_cv;
   cv::Mat camera_distortion_cv;
 
@@ -283,7 +301,7 @@ static void fieldcalibration::draw_tag_cube(
   }
 }
 
-static bool fieldcalibration::process_video_file(
+static bool process_video_file(
     apriltag_detector_t* tag_detector,
     const Eigen::Matrix<double, 3, 3>& camera_matrix,
     const Eigen::Matrix<double, 8, 1>& camera_distortion, double tag_size,
