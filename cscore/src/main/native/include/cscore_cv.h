@@ -103,10 +103,8 @@ class CvSink : public ImageSink {
    * Wait for the next frame and get the image.
    * Times out (returning 0) after timeout seconds.
    * The provided image will have the pixelFormat this class was constructed
-   * with.
-   *
-   * @param lastFrameTime Timestamp of the last frame - used to compare new
-   * frames against, or 0 to use the current time
+   * with. If lastFrameTime is provided, this will return the first frame with a
+   * timestamp other than lastFrameTime - set to 0 to use the current time.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as wpi::Now(),
@@ -119,10 +117,8 @@ class CvSink : public ImageSink {
   /**
    * Wait for the next frame and get the image.  May block forever.
    * The provided image will have the pixelFormat this class was constructed
-   * with.
-   *
-   * @param lastFrameTime Timestamp of the last frame - used to compare new
-   * frames against, or 0 to use the current time
+   * with. If lastFrameTime is provided, this will return the first frame with
+   * a timestamp other than lastFrameTime - set to 0 to use the current time.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as wpi::Now(),
@@ -136,10 +132,9 @@ class CvSink : public ImageSink {
    * Times out (returning 0) after timeout seconds.
    * The provided image will have the pixelFormat this class was constructed
    * with. The data is backed by data in the CvSink. It will be invalidated by
-   * any grabFrame*() call on the sink.
-   *
-   * @param lastFrameTime Timestamp of the last frame - used to compare new
-   * frames against, or 0 to use the current time
+   * any grabFrame*() call on the sink. If lastFrameTime is provided, this will
+   * return the first frame with a timestamp other than lastFrameTime - set to 0
+   * to use the current time
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as wpi::Now(),
@@ -153,10 +148,9 @@ class CvSink : public ImageSink {
    * Wait for the next frame and get the image.  May block forever.
    * The provided image will have the pixelFormat this class was constructed
    * with. The data is backed by data in the CvSink. It will be invalidated by
-   * any grabFrame*() call on the sink.
-   *
-   * @param lastFrameTime Timestamp of the last frame - used to compare new
-   * frames against, or 0 to use the current time
+   * any grabFrame*() call on the sink. If lastFrameTime is provided, this will
+   * return the first frame with a timestamp other than lastFrameTime - set to 0
+   * to use the current time.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as wpi::Now(),
