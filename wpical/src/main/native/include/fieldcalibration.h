@@ -36,24 +36,28 @@ struct Constraint {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
+struct CameraModel {
+  Eigen::Matrix<double, 3, 3> intrinsic_matrix;
+  Eigen::Matrix<double, 8, 1> distortion_coefficients;
+};
+
 namespace fieldcalibration {
-std::tuple<Eigen::Matrix<double, 3, 3>, Eigen::Matrix<double, 8, 1>>
-load_camera_model(std::string path);
-std::tuple<Eigen::Matrix<double, 3, 3>, Eigen::Matrix<double, 8, 1>>
-load_camera_model(wpi::json json_data);
-std::map<int, wpi::json> load_ideal_map(std::string path);
+static CameraModel load_camera_model(std::string path);
+static CameraModel load_camera_model(wpi::json json_data);
+static std::map<int, wpi::json> load_ideal_map(std::string path);
 std::vector<Eigen::Vector3d> get_model_corners(double tag_size);
-Eigen::Matrix<double, 4, 4> get_tag_transform(
+static Eigen::Matrix<double, 4, 4> get_tag_transform(
     std::map<int, wpi::json>& ideal_map, int tag_id);
-Eigen::Matrix<double, 4, 4> estimate_tag_pose(
+static Eigen::Matrix<double, 4, 4> estimate_tag_pose(
     apriltag_detection_t* tag_detection,
     const Eigen::Matrix<double, 3, 3>& camera_matrix,
     const Eigen::Matrix<double, 8, 1>& camera_distortion, double tag_size);
-void draw_tag_cube(cv::Mat& frame, Eigen::Matrix<double, 4, 4> camera_to_tag,
-                   const Eigen::Matrix<double, 3, 3>& camera_matrix,
-                   const Eigen::Matrix<double, 8, 1>& camera_distortion,
-                   double tag_size);
-bool process_video_file(
+static void draw_tag_cube(cv::Mat& frame,
+                          Eigen::Matrix<double, 4, 4> camera_to_tag,
+                          const Eigen::Matrix<double, 3, 3>& camera_matrix,
+                          const Eigen::Matrix<double, 8, 1>& camera_distortion,
+                          double tag_size);
+static bool process_video_file(
     apriltag_detector_t* tag_detector,
     const Eigen::Matrix<double, 3, 3>& camera_matrix,
     const Eigen::Matrix<double, 8, 1>& camera_distortion, double tag_size,
