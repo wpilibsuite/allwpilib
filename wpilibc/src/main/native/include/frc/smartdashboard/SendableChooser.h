@@ -114,19 +114,19 @@ class SendableChooser : public SendableChooserBase {
   }
 
   /**
-   * Returns the name of the selected option. 
-   * 
-   * If there is none selected, it will return the default option's name. If there is none selected
-   * and no default, it will return an empty string.
-   *  
+   * Returns the name of the selected option.
+   *
+   * If there is none selected, it will return the default option's name. If
+   * there is none selected and no default, it will return an empty string.
+   *
    * @return The name of the option selected
    */
   std::string_view GetSelectedName() const {
     std::scoped_lock lock(m_mutex);
     if (m_haveSelected) {
-        return m_selected;
+      return m_selected;
     } else {
-        return m_defaultChoice;
+      return m_defaultChoice;
     }
   }
 
@@ -134,7 +134,8 @@ class SendableChooser : public SendableChooserBase {
    * Bind a listener that's called when the selected value changes.
    * Only one listener can be bound. Calling this function will replace the
    * previous listener.
-   * @param listener The function to call that accepts the new name and new value
+   * @param listener The function to call that accepts the new name and new
+   * value
    */
   void OnChange(std::function<void(std::string_view, T)> listener) {
     std::scoped_lock lock(m_mutex);
@@ -148,9 +149,7 @@ class SendableChooser : public SendableChooserBase {
    * @param listener The function to call that accepts the new value
    */
   void OnChange(std::function<void(T)> listener) {
-    OnChange<T>([listener](std::string_view, T choice) {
-      listener(choice);
-    });
+    OnChange<T>([listener](std::string_view, T choice) { listener(choice); });
   }
 
   void InitSendable(wpi::SendableBuilder& builder) override {
@@ -184,24 +183,24 @@ class SendableChooser : public SendableChooserBase {
           }
         },
         nullptr);
-    builder.AddStringProperty(kSelected, nullptr,
-                              [=, this](std::string_view val) {
-                                T choice{};
-                                std::function<void(std::string_view, T)> listener;
-                                {
-                                  std::scoped_lock lock(m_mutex);
-                                  m_haveSelected = true;
-                                  m_selected = val;
-                                  if (m_previousVal != val && m_listener) {
-                                    choice = m_choices[val];
-                                    listener = m_listener;
-                                  }
-                                  m_previousVal = val;
-                                }
-                                if (listener) {
-                                  listener(val, choice);
-                                }
-                              });
+    builder.AddStringProperty(
+        kSelected, nullptr, [=, this](std::string_view val) {
+          T choice{};
+          std::function<void(std::string_view, T)> listener;
+          {
+            std::scoped_lock lock(m_mutex);
+            m_haveSelected = true;
+            m_selected = val;
+            if (m_previousVal != val && m_listener) {
+              choice = m_choices[val];
+              listener = m_listener;
+            }
+            m_previousVal = val;
+          }
+          if (listener) {
+            listener(val, choice);
+          }
+        });
   }
 };
 

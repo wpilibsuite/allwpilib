@@ -71,7 +71,10 @@ TEST(SendableChooserTest, ChangeListener) {
 
   std::string currentName = "";
   int currentVal = 0;
-  chooser.OnChange([&](std::string_view name, int val) { currentName = std::string(name); currentVal = val; });
+  chooser.OnChange([&](std::string_view name, int val) {
+    currentName = std::string(name);
+    currentVal = val;
+  });
 
   frc::SmartDashboard::PutData("ChangeListenerChooser", &chooser);
   frc::SmartDashboard::UpdateValues();
