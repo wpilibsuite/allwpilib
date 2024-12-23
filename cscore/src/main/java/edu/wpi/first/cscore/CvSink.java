@@ -68,6 +68,17 @@ public class CvSink extends ImageSink {
    * provided image will have the pixelFormat this class was constructed with.
    *
    * @param image Where to store the image.
+   * @return Frame time, or 0 on error (call GetError() to obtain the error message)
+   */
+  public long grabFrame(Mat image) {
+    return grabFrame(image, 0.225, 0);
+  }
+
+  /**
+   * Wait for the next frame and get the image. Times out (returning 0) after 0.225 seconds. The
+   * provided image will have the pixelFormat this class was constructed with.
+   *
+   * @param image Where to store the image.
    * @param lastFrameTime Timestamp of the last frame - used to compare new frames against, or 0 to
    *     use the current time
    * @return Frame time, or 0 on error (call GetError() to obtain the error message)
@@ -75,6 +86,21 @@ public class CvSink extends ImageSink {
   public long grabFrame(Mat image, long lastFrameTime) {
     return grabFrame(image, 0.225, lastFrameTime);
   }
+
+
+  /**
+   * Wait for the next frame and get the image. Times out (returning 0) after timeout seconds. The
+   * provided image will have the pixelFormat this class was constructed with.
+   *
+   * @param image Where to store the image.
+   * @param timeout Retrieval timeout in seconds.
+   * @return Frame time, or 0 on error (call GetError() to obtain the error message); the frame time
+   *     is in 1 us increments.
+   */
+  public long grabFrame(Mat image, double timeout) {
+    return grabFrame(image, timeout, 0);
+  }
+
 
   /**
    * Wait for the next frame and get the image. Times out (returning 0) after timeout seconds. The
@@ -136,6 +162,31 @@ public class CvSink extends ImageSink {
    */
   public long grabFrameDirect(long lastFrameTime) {
     return grabFrameDirect(0.225, lastFrameTime);
+  }
+
+  /**
+   * Wait for the next frame and store the image. Times out (returning 0) after 0.225 seconds. The
+   * provided image will have the pixelFormat this class was constructed with. Use getDirectMat() to
+   * grab the image.
+   *
+   * @return Frame time, or 0 on error (call GetError() to obtain the error message)
+   */
+  public long grabFrameDirect() {
+    return grabFrameDirect(0.225, 0);
+  }
+
+  /**
+   * Wait for the next frame and store the image. Times out (returning 0) after timeout seconds. The
+   * provided image will have the pixelFormat this class was constructed with. Use getDirectMat() to
+   * grab the image.
+   *
+   * @param timeout Retrieval timeout in seconds.
+   * @return Frame time, or 0 on error (call GetError() to obtain the error message); the frame time
+   *     is in 1 us increments.
+   */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  public long grabFrameDirect(double timeout) {
+    return grabFrameDirect(timeout, 0);
   }
 
   /**
