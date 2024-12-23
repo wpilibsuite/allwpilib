@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstdio>
-#include <iostream>
 #include <span>
 #include <string>
 #include <thread>
@@ -12,13 +11,10 @@
 #include <cameraserver/CameraServer.h>
 #include <fmt/format.h>
 #include <frc/TimedRobot.h>
-#include <frc/Timer.h>
-#include <frc/Tracer.h>
 #include <frc/apriltag/AprilTagDetection.h>
 #include <frc/apriltag/AprilTagDetector.h>
 #include <frc/apriltag/AprilTagPoseEstimator.h>
 #include <frc/geometry/Transform3d.h>
-#include <networktables/DoubleTopic.h>
 #include <networktables/IntegerArrayTopic.h>
 #include <networktables/NetworkTableInstance.h>
 #include <opencv2/core/core.hpp>
@@ -71,19 +67,15 @@ class Robot : public frc::TimedRobot {
     frc::AprilTagPoseEstimator estimator(poseEstConfig);
 
     // Get the USB camera from CameraServer
-    cs::UsbCamera camera = frc::CameraServer::StartAutomaticCapture(
-        "foobar",
-        "/dev/v4l/by-id/"
-        "usb-Arducam_Technology_Co.__Ltd._Arducam_OV2311_USB_Camera_UC621-"
-        "video-index0");
+    cs::UsbCamera camera = frc::CameraServer::StartAutomaticCapture();
     // Set the resolution
-    camera.SetVideoMode(cs::VideoMode::PixelFormat::kMJPEG, 1600, 1200, 50);
+    camera.SetResolution(640, 480);
 
     // Get a CvSink. This will capture Mats from the Camera
     cs::CvSink cvSink = frc::CameraServer::GetVideo();
     // Setup a CvSource. This will send images back to the Dashboard
     cs::CvSource outputStream =
-        frc::CameraServer::PutVideo("Detected", 1600, 1200);
+        frc::CameraServer::PutVideo("Detected", 640, 480);
 
     // Mats are very memory expensive. Lets reuse this Mat.
     cv::Mat mat;
@@ -98,36 +90,31 @@ class Robot : public frc::TimedRobot {
     auto tagsTable =
         nt::NetworkTableInstance::GetDefault().GetTable("apriltags");
     auto pubTags = tagsTable->GetIntegerArrayTopic("tags").Publish();
-    auto latency = tagsTable->GetDoubleTopic("latency").Publish();
-    auto fps = tagsTable->GetDoubleTopic("fps").Publish();
 
-    frc::Tracer tracer{};
+    // Keep track of the timestamp of the last frame we processed. This lets us
+    // ask CSCore for the next image we haven't yet seen
+    uint64_t lastFrameTime{0};
 
     while (true) {
-      tracer.ClearEpochs();
-      auto start = frc::Timer::GetFPGATimestamp();
-
       // Tell the CvSink to grab a frame from the camera and
       // put it in the source mat.  If there is an error notify the
       // output.
-      if (cvSink.GrabFrame(mat) == 0) {
+      auto frameTime = cvSink.GrabFrame(mat, lastFrameTime = lastFrameTime);
+      if (frameTime == 0) {
         // Send the output the error.
         outputStream.NotifyError(cvSink.GetError());
         // skip the rest of the current iteration
         continue;
       }
 
-      tracer.AddEpoch("1_grabbed frame");
+      // Write the frame time down for next loop
+      lastFrameTime = frameTime;
 
       cv::cvtColor(mat, grayMat, cv::COLOR_BGR2GRAY);
-
-      tracer.AddEpoch("2_bgr2grey");
 
       cv::Size g_size = grayMat.size();
       frc::AprilTagDetector::Results detections =
           detector.Detect(g_size.width, g_size.height, grayMat.data);
-
-      tracer.AddEpoch("3_detect tags");
 
       // have not seen any tags yet
       tags.clear();
@@ -173,23 +160,11 @@ class Robot : public frc::TimedRobot {
                    rotation.Z().value() }});
       }
 
-      tracer.AddEpoch("4_process tags");
-
       // put list of tags onto NT
       pubTags.Set(tags);
 
-      tracer.AddEpoch("5_output tags");
-
       // Give the output stream a new image to display
       outputStream.PutFrame(mat);
-
-      tracer.AddEpoch("6_publish output stream");
-
-      auto end = frc::Timer::GetFPGATimestamp();
-      latency.Set((end - start).to<double>());
-      fps.Set(1.0 / (end - start).to<double>());
-
-      tracer.PrintEpochs();
     }
   }
 #endif

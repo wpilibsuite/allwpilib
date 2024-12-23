@@ -91,7 +91,7 @@ public class VisionRunner<P extends VisionPipeline> {
       // No errors, process the image
       m_pipeline.process(m_image);
       m_listener.copyPipelineOutputs(m_pipeline);
-      
+
       m_lastFrameTime = frameTime;
     }
   }

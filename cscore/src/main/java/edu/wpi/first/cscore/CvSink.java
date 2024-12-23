@@ -76,9 +76,12 @@ public class CvSink extends ImageSink {
 
   /**
    * Wait for the next frame and get the image. Times out (returning 0) after 0.225 seconds. The
-   * provided image will have the pixelFormat this class was constructed with. 
-   * 
-   * If lastFrameTime is provided and non-zero, the sink will fill image with the first frame from the source that is not equal to lastFrameTime. If lastFrameTime is zero, the time of the current frame owned by the CvSource is used, and this function will block until the connected CvSource provides a new frame.
+   * provided image will have the pixelFormat this class was constructed with.
+   *
+   * <p>If lastFrameTime is provided and non-zero, the sink will fill image with the first frame
+   * from the source that is not equal to lastFrameTime. If lastFrameTime is zero, the time of the
+   * current frame owned by the CvSource is used, and this function will block until the connected
+   * CvSource provides a new frame.
    *
    * @param image Where to store the image.
    * @param lastFrameTime Timestamp of the last frame - used to compare new frames against, or 0 to
@@ -88,7 +91,6 @@ public class CvSink extends ImageSink {
   public long grabFrame(Mat image, long lastFrameTime) {
     return grabFrame(image, 0.225, lastFrameTime);
   }
-
 
   /**
    * Wait for the next frame and get the image. Times out (returning 0) after timeout seconds. The
@@ -102,7 +104,6 @@ public class CvSink extends ImageSink {
   public long grabFrame(Mat image, double timeout) {
     return grabFrame(image, timeout, 0);
   }
-
 
   /**
    * Wait for the next frame and get the image. Times out (returning 0) after timeout seconds. The
