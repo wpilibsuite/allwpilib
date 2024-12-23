@@ -67,7 +67,7 @@ class SendableChooserTest {
       }
 
       assertNull(chooser.getSelected());
-      assertNull(chooser.getSelectedName());
+      assertEquals("", chooser.getSelectedName());
     }
   }
 

@@ -45,7 +45,7 @@ TEST(SendableChooserTest, DefaultIsReturnedOnNoSelect) {
   chooser.SetDefaultOption("4", 4);
 
   EXPECT_EQ(4, chooser.GetSelected());
-  EXPECT_EQ("4",, chooser.GetSelectedName());
+  EXPECT_EQ("4", chooser.GetSelectedName());
 }
 
 TEST(SendableChooserTest,
@@ -71,7 +71,7 @@ TEST(SendableChooserTest, ChangeListener) {
 
   std::string currentName = "";
   int currentVal = 0;
-  chooser.OnChange([&](std::string name, int val) { currentName = name; currentVal = val; });
+  chooser.OnChange([&](std::string_view name, int val) { currentName = std::string(name); currentVal = val; });
 
   frc::SmartDashboard::PutData("ChangeListenerChooser", &chooser);
   frc::SmartDashboard::UpdateValues();

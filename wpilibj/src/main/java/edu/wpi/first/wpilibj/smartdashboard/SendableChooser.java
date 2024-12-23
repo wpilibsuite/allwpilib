@@ -98,22 +98,13 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
    * @return the option selected
    */
   public V getSelected() {
-    m_mutex.lock();
-    try {
-      if (m_selected != null) {
-        return m_map.get(m_selected);
-      } else {
-        return m_map.get(m_defaultChoice);
-      }
-    } finally {
-      m_mutex.unlock();
-    }
+    return m_map.get(getSelectedName());
   }
 
   /**
    * Returns the name of the selected option. If there is none selected, it will return the default.
-   * If there is none selected and no default, it will return {@code null}.
-   * 
+   * If there is none selected and no default, it will return an empty String.
+   *
    * @return the name of the option selected
    */
   public String getSelectedName() {

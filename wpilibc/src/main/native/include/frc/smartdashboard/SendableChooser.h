@@ -37,7 +37,7 @@ template <class T>
   requires std::copy_constructible<T> && std::default_initializable<T>
 class SendableChooser : public SendableChooserBase {
   wpi::StringMap<T> m_choices;
-  std::function<void(std::string, T)> m_listener;
+  std::function<void(std::string_view, T)> m_listener;
   template <class U>
   static U _unwrap_smart_ptr(const U& value) {
     return value;
@@ -121,7 +121,7 @@ class SendableChooser : public SendableChooserBase {
    *  
    * @return The name of the option selected
    */
-  std::string GetSelectedName() const {
+  std::string_view GetSelectedName() const {
     std::scoped_lock lock(m_mutex);
     if (m_haveSelected) {
         return m_selected;
@@ -136,7 +136,7 @@ class SendableChooser : public SendableChooserBase {
    * previous listener.
    * @param listener The function to call that accepts the new name and new value
    */
-  void OnChange(std::function<void(std::string, T)> listener) {
+  void OnChange(std::function<void(std::string_view, T)> listener) {
     std::scoped_lock lock(m_mutex);
     m_listener = listener;
   }
@@ -148,7 +148,7 @@ class SendableChooser : public SendableChooserBase {
    * @param listener The function to call that accepts the new value
    */
   void OnChange(std::function<void(T)> listener) {
-    OnChange<T>([listener](std::string, T choice) {
+    OnChange<T>([listener](std::string_view, T choice) {
       listener(choice);
     });
   }
@@ -187,7 +187,7 @@ class SendableChooser : public SendableChooserBase {
     builder.AddStringProperty(kSelected, nullptr,
                               [=, this](std::string_view val) {
                                 T choice{};
-                                std::function<void(std::string, T)> listener;
+                                std::function<void(std::string_view, T)> listener;
                                 {
                                   std::scoped_lock lock(m_mutex);
                                   m_haveSelected = true;
