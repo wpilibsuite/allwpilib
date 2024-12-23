@@ -26,24 +26,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-/** A data logger implementation that saves information to a WPILib {@link DataLog} file on disk. */
-public class FileLogger implements DataLogger {
+/** A backend implementation that saves information to a WPILib {@link DataLog} file on disk. */
+public class FileBackend implements EpilogueBackend {
   private final DataLog m_dataLog;
   private final Map<String, DataLogEntry> m_entries = new HashMap<>();
-  private final Map<String, SubLogger> m_subLoggers = new HashMap<>();
+  private final Map<String, NestedBackend> m_subLoggers = new HashMap<>();
 
   /**
-   * Creates a new file logger.
+   * Creates a new file-based backend.
    *
    * @param dataLog the data log to save data to
    */
-  public FileLogger(DataLog dataLog) {
-    this.m_dataLog = requireNonNullParam(dataLog, "dataLog", "FileLogger");
+  public FileBackend(DataLog dataLog) {
+    this.m_dataLog = requireNonNullParam(dataLog, "dataLog", "FileBackend");
   }
 
   @Override
-  public DataLogger getSubLogger(String path) {
-    return m_subLoggers.computeIfAbsent(path, k -> new SubLogger(k, this));
+  public EpilogueBackend getNested(String path) {
+    return m_subLoggers.computeIfAbsent(path, k -> new NestedBackend(k, this));
   }
 
   @SuppressWarnings("unchecked")

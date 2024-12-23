@@ -104,10 +104,10 @@ public class Translation3d
   }
 
   /**
-   * Constructs a Translation3d from the provided translation vector's X, Y, and Z components. The
-   * values are assumed to be in meters.
+   * Constructs a Translation3d from a 3D translation vector. The values are assumed to be in
+   * meters.
    *
-   * @param vector The translation vector to represent.
+   * @param vector The translation vector.
    */
   public Translation3d(Vector<N3> vector) {
     this(vector.get(0), vector.get(1), vector.get(2));
@@ -184,9 +184,9 @@ public class Translation3d
   }
 
   /**
-   * Returns a vector representation of this translation.
+   * Returns a 2D translation vector representation of this translation.
    *
-   * @return A Vector representation of this translation.
+   * @return A 2D translation vector representation of this translation.
    */
   public Vector<N3> toVector() {
     return VecBuilder.fill(m_x, m_y, m_z);

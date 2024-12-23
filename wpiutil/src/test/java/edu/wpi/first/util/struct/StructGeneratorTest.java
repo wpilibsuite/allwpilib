@@ -4,15 +4,15 @@
 
 package edu.wpi.first.util.struct;
 
-import static edu.wpi.first.util.struct.ProceduralStructGenerator.genEnum;
-import static edu.wpi.first.util.struct.ProceduralStructGenerator.genRecord;
+import static edu.wpi.first.util.struct.StructGenerator.genEnum;
+import static edu.wpi.first.util.struct.StructGenerator.genRecord;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
-class ProceduralStructGeneratorTest {
+class StructGeneratorTest {
   public record CustomRecord(int int32, boolean bool, double float64, char character, short int16)
       implements StructSerializable {
     public static CustomRecord create() {
@@ -95,8 +95,7 @@ class ProceduralStructGeneratorTest {
 
   @SuppressWarnings("unchecked")
   private <S extends StructSerializable> void testStructRoundTrip(S value) {
-    Struct<S> struct =
-        ProceduralStructGenerator.extractClassStruct((Class<S>) value.getClass()).get();
+    Struct<S> struct = StructFetcher.fetchStruct((Class<S>) value.getClass()).get();
     ByteBuffer buffer = ByteBuffer.allocate(struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     struct.pack(buffer, value);
@@ -108,8 +107,7 @@ class ProceduralStructGeneratorTest {
 
   @SuppressWarnings("unchecked")
   private <S extends StructSerializable> void testStructDoublePack(S value) {
-    Struct<S> struct =
-        ProceduralStructGenerator.extractClassStruct((Class<S>) value.getClass()).get();
+    Struct<S> struct = StructFetcher.fetchStruct((Class<S>) value.getClass()).get();
     ByteBuffer buffer = ByteBuffer.allocate(struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     struct.pack(buffer, value);
@@ -123,8 +121,7 @@ class ProceduralStructGeneratorTest {
 
   @SuppressWarnings("unchecked")
   private <S extends StructSerializable> void testStructDoubleUnpack(S value) {
-    Struct<S> struct =
-        ProceduralStructGenerator.extractClassStruct((Class<S>) value.getClass()).get();
+    Struct<S> struct = StructFetcher.fetchStruct((Class<S>) value.getClass()).get();
     ByteBuffer buffer = ByteBuffer.allocate(struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     struct.pack(buffer, value);

@@ -42,3 +42,6 @@ build:macos --linkopt=-Wl,-rpath,'@loader_path'"
 
 # Things not in nativetools
 build:macos --copt=-Wno-shorten-64-to-32
+
+build:macos --host_per_file_copt=external/zlib/.*\.c@-Wno-deprecated-non-prototype
+build:macos --host_per_file_copt=external/com_google_protobuf/.*\.cc@-Wno-unused-function

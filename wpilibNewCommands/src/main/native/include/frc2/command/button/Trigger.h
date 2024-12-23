@@ -11,6 +11,7 @@
 #include <frc/event/EventLoop.h>
 #include <frc/filter/Debouncer.h>
 #include <units/time.h>
+#include <wpi/FunctionExtras.h>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandScheduler.h"
@@ -375,6 +376,14 @@ class Trigger {
     }
     return false;
   }
+
+  /**
+   * Adds a binding to the EventLoop.
+   *
+   * @param body The body of the binding to add.
+   */
+  void AddBinding(wpi::unique_function<void(bool, bool)>&& body,
+                  InitialState initialState);
 
   frc::EventLoop* m_loop;
   std::function<bool()> m_condition;

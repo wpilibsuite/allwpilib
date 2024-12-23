@@ -52,6 +52,18 @@ public class Trigger implements BooleanSupplier {
     kNegCondition;
   }
 
+  /** Functional interface for the body of a trigger binding. */
+  @FunctionalInterface
+  private interface BindingBody {
+    /**
+     * Executes the body of the binding.
+     *
+     * @param previous The previous state of the condition.
+     * @param current The current state of the condition.
+     */
+    void run(boolean previous, boolean current);
+  }
+
   private final BooleanSupplier m_condition;
   private final EventLoop m_loop;
 
@@ -93,6 +105,27 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
+   * Adds a binding to the EventLoop.
+   *
+   * @param body The body of the binding to add.
+   */
+  private void addBinding(BindingBody body, InitialState initialState) {
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_previous = getInitialState(initialState);
+
+          @Override
+          public void run() {
+            boolean current = m_condition.getAsBoolean();
+
+            body.run(m_previous, current);
+
+            m_previous = current;
+          }
+        });
+  }
+
+  /**
    * Starts the command when the condition changes. The command is never started immediately.
    *
    * @param command the command to start
@@ -111,21 +144,13 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger onChange(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "onChange");
-    m_loop.bind(
-        new Runnable() {
-          private boolean m_pressedLast = getInitialState(initialState);
-
-          @Override
-          public void run() {
-            boolean pressed = m_condition.getAsBoolean();
-
-            if (m_pressedLast != pressed) {
-              command.schedule();
-            }
-
-            m_pressedLast = pressed;
+    addBinding(
+        (previous, current) -> {
+          if (previous != current) {
+            command.schedule();
           }
-        });
+        },
+        initialState);
     return this;
   }
 
@@ -149,21 +174,13 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger onTrue(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "onTrue");
-    m_loop.bind(
-        new Runnable() {
-          private boolean m_pressedLast = getInitialState(initialState);
-
-          @Override
-          public void run() {
-            boolean pressed = m_condition.getAsBoolean();
-
-            if (!m_pressedLast && pressed) {
-              command.schedule();
-            }
-
-            m_pressedLast = pressed;
+    addBinding(
+        (previous, current) -> {
+          if (!previous && current) {
+            command.schedule();
           }
-        });
+        },
+        initialState);
     return this;
   }
 
@@ -187,21 +204,13 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger onFalse(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "onFalse");
-    m_loop.bind(
-        new Runnable() {
-          private boolean m_pressedLast = getInitialState(initialState);
-
-          @Override
-          public void run() {
-            boolean pressed = m_condition.getAsBoolean();
-
-            if (m_pressedLast && !pressed) {
-              command.schedule();
-            }
-
-            m_pressedLast = pressed;
+    addBinding(
+        (previous, current) -> {
+          if (previous && !current) {
+            command.schedule();
           }
-        });
+        },
+        initialState);
     return this;
   }
 
@@ -232,23 +241,15 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger whileTrue(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "whileTrue");
-    m_loop.bind(
-        new Runnable() {
-          private boolean m_pressedLast = getInitialState(initialState);
-
-          @Override
-          public void run() {
-            boolean pressed = m_condition.getAsBoolean();
-
-            if (!m_pressedLast && pressed) {
-              command.schedule();
-            } else if (m_pressedLast && !pressed) {
-              command.cancel();
-            }
-
-            m_pressedLast = pressed;
+    addBinding(
+        (previous, current) -> {
+          if (!previous && current) {
+            command.schedule();
+          } else if (previous && !current) {
+            command.cancel();
           }
-        });
+        },
+        initialState);
     return this;
   }
 
@@ -279,23 +280,15 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger whileFalse(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "whileFalse");
-    m_loop.bind(
-        new Runnable() {
-          private boolean m_pressedLast = getInitialState(initialState);
-
-          @Override
-          public void run() {
-            boolean pressed = m_condition.getAsBoolean();
-
-            if (m_pressedLast && !pressed) {
-              command.schedule();
-            } else if (!m_pressedLast && pressed) {
-              command.cancel();
-            }
-
-            m_pressedLast = pressed;
+    addBinding(
+        (previous, current) -> {
+          if (previous && !current) {
+            command.schedule();
+          } else if (!previous && current) {
+            command.cancel();
           }
-        });
+        },
+        initialState);
     return this;
   }
 
@@ -319,25 +312,17 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger toggleOnTrue(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "toggleOnTrue");
-    m_loop.bind(
-        new Runnable() {
-          private boolean m_pressedLast = getInitialState(initialState);
-
-          @Override
-          public void run() {
-            boolean pressed = m_condition.getAsBoolean();
-
-            if (!m_pressedLast && pressed) {
-              if (command.isScheduled()) {
-                command.cancel();
-              } else {
-                command.schedule();
-              }
+    addBinding(
+        (previous, current) -> {
+          if (!previous && current) {
+            if (command.isScheduled()) {
+              command.cancel();
+            } else {
+              command.schedule();
             }
-
-            m_pressedLast = pressed;
           }
-        });
+        },
+        initialState);
     return this;
   }
 
@@ -361,25 +346,17 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger toggleOnFalse(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "toggleOnFalse");
-    m_loop.bind(
-        new Runnable() {
-          private boolean m_pressedLast = getInitialState(initialState);
-
-          @Override
-          public void run() {
-            boolean pressed = m_condition.getAsBoolean();
-
-            if (m_pressedLast && !pressed) {
-              if (command.isScheduled()) {
-                command.cancel();
-              } else {
-                command.schedule();
-              }
+    addBinding(
+        (previous, current) -> {
+          if (previous && !current) {
+            if (command.isScheduled()) {
+              command.cancel();
+            } else {
+              command.schedule();
             }
-
-            m_pressedLast = pressed;
           }
-        });
+        },
+        initialState);
     return this;
   }
 

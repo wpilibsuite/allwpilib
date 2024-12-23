@@ -24,27 +24,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A data logger implementation that sends data over network tables. Be careful when using this,
- * since sending too much data may cause bandwidth or CPU starvation.
+ * A backend implementation that sends data over network tables. Be careful when using this, since
+ * sending too much data may cause bandwidth or CPU starvation.
  */
-public class NTDataLogger implements DataLogger {
+public class NTEpilogueBackend implements EpilogueBackend {
   private final NetworkTableInstance m_nt;
 
   private final Map<String, Publisher> m_publishers = new HashMap<>();
-  private final Map<String, SubLogger> m_subLoggers = new HashMap<>();
+  private final Map<String, NestedBackend> m_nestedBackends = new HashMap<>();
 
   /**
-   * Creates a data logger that sends information to NetworkTables.
+   * Creates a logging backend that sends information to NetworkTables.
    *
    * @param nt the NetworkTable instance to use to send data to
    */
-  public NTDataLogger(NetworkTableInstance nt) {
+  public NTEpilogueBackend(NetworkTableInstance nt) {
     this.m_nt = nt;
   }
 
   @Override
-  public DataLogger getSubLogger(String path) {
-    return m_subLoggers.computeIfAbsent(path, k -> new SubLogger(k, this));
+  public EpilogueBackend getNested(String path) {
+    return m_nestedBackends.computeIfAbsent(path, k -> new NestedBackend(k, this));
   }
 
   @Override

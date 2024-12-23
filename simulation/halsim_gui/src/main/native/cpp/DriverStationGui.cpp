@@ -1053,6 +1053,7 @@ static void DriverStationExecute() {
   }
   prevDisableDS = disableDS;
   if (disableDS) {
+    gFMSModel->Update();
     return;
   }
 

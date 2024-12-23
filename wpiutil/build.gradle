@@ -184,6 +184,12 @@ nativeUtils.exportsConfigs {
     }
 }
 
+nativeUtils.platformConfigs.each {
+    if (it.name.contains('windows')) {
+        it.cppCompiler.args.add("/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR")
+    }
+}
+
 cppHeadersZip {
     def thirdpartyIncDirs = [
         'src/main/native/thirdparty/argparse/include',

@@ -206,9 +206,12 @@ Vectord<N> MakeWhiteNoiseVector(const std::array<double, N>& stdDevs) {
  * @param pose The pose that is being represented.
  *
  * @return The vector.
+ * @deprecated Create the vector manually instead. If you were using this as an
+ *     intermediate step for constructing affine transformations, use
+ *     Pose2d.ToMatrix() instead.
  */
-WPILIB_DLLEXPORT
-constexpr Eigen::Vector3d PoseTo3dVector(const Pose2d& pose) {
+[[deprecated("Use Pose2d.ToMatrix() instead.")]]
+WPILIB_DLLEXPORT constexpr Eigen::Vector3d PoseTo3dVector(const Pose2d& pose) {
   return Eigen::Vector3d{{pose.Translation().X().value(),
                           pose.Translation().Y().value(),
                           pose.Rotation().Radians().value()}};
@@ -220,9 +223,12 @@ constexpr Eigen::Vector3d PoseTo3dVector(const Pose2d& pose) {
  * @param pose The pose that is being represented.
  *
  * @return The vector.
+ * @deprecated Create the vector manually instead. If you were using this as an
+ *     intermediate step for constructing affine transformations, use
+ *     Pose2d.ToMatrix() instead.
  */
-WPILIB_DLLEXPORT
-constexpr Eigen::Vector4d PoseTo4dVector(const Pose2d& pose) {
+[[deprecated("Use Pose2d.ToMatrix() instead.")]]
+WPILIB_DLLEXPORT constexpr Eigen::Vector4d PoseTo4dVector(const Pose2d& pose) {
   return Eigen::Vector4d{{pose.Translation().X().value(),
                           pose.Translation().Y().value(), pose.Rotation().Cos(),
                           pose.Rotation().Sin()}};
@@ -311,9 +317,12 @@ bool IsDetectable(const Matrixd<States, States>& A,
  * @param pose The pose that is being represented.
  *
  * @return The vector.
+ * @deprecated Create the vector manually instead. If you were using this as an
+ *     intermediate step for constructing affine transformations, use
+ *     Pose2d.ToMatrix() instead.
  */
-WPILIB_DLLEXPORT
-constexpr Eigen::Vector3d PoseToVector(const Pose2d& pose) {
+[[deprecated("Use Pose2d.ToMatrix() instead.")]]
+WPILIB_DLLEXPORT constexpr Eigen::Vector3d PoseToVector(const Pose2d& pose) {
   return Eigen::Vector3d{
       {pose.X().value(), pose.Y().value(), pose.Rotation().Radians().value()}};
 }

@@ -113,7 +113,7 @@ concept MutableStructSerializable =
  * In addition to meeting StructSerializable, implementations must define a
  * wpi::Struct<T> static member
  * `void ForEachNested(std::invocable<std::string_view, std::string_view) auto
- * fn)` (or equivalent) and call ForEachNestedStruct<Type> on each nested struct
+ * fn)` (or equivalent) and call ForEachStructSchema<Type> on each nested struct
  * type.
  */
 template <typename T, typename... I>

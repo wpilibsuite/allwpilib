@@ -155,7 +155,7 @@ class WPILIB_DLLEXPORT Rectangle2d {
    * @return The distance (0, if the point is contained by the rectangle)
    */
   constexpr units::meter_t Distance(const Translation2d& point) const {
-    return FindNearestPoint(point).Distance(point);
+    return Nearest(point).Distance(point);
   }
 
   /**
@@ -165,7 +165,7 @@ class WPILIB_DLLEXPORT Rectangle2d {
    * @return A new point that is nearest to {@code point} and contained in the
    * rectangle.
    */
-  constexpr Translation2d FindNearestPoint(const Translation2d& point) const {
+  constexpr Translation2d Nearest(const Translation2d& point) const {
     // Check if already in rectangle
     if (Contains(point)) {
       return point;

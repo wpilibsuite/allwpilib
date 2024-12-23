@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Microsecond;
 import static edu.wpi.first.units.Units.Microseconds;
@@ -15,6 +16,7 @@ import static edu.wpi.first.wpilibj.LEDPattern.GradientType.kContinuous;
 import static edu.wpi.first.wpilibj.LEDPattern.GradientType.kDiscontinuous;
 import static edu.wpi.first.wpilibj.util.Color.kBlack;
 import static edu.wpi.first.wpilibj.util.Color.kBlue;
+import static edu.wpi.first.wpilibj.util.Color.kGreen;
 import static edu.wpi.first.wpilibj.util.Color.kLime;
 import static edu.wpi.first.wpilibj.util.Color.kMagenta;
 import static edu.wpi.first.wpilibj.util.Color.kMidnightBlue;
@@ -813,6 +815,176 @@ class LEDPatternTest {
     pattern.applyTo(buffer);
 
     assertColorEquals(kWhite, buffer.getLED(0));
+  }
+
+  @Test
+  void reverseMask() {
+    var pattern =
+        LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
+            .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
+            .reversed();
+    var buffer = new AddressableLEDBuffer(8);
+
+    pattern.applyTo(buffer);
+
+    assertColorEquals(kRed, buffer.getLED(7));
+    assertColorEquals(kRed, buffer.getLED(6));
+    assertColorEquals(kBlue, buffer.getLED(5));
+    assertColorEquals(kBlue, buffer.getLED(4));
+    assertColorEquals(kBlack, buffer.getLED(3));
+    assertColorEquals(kBlack, buffer.getLED(2));
+    assertColorEquals(kBlack, buffer.getLED(1));
+    assertColorEquals(kBlack, buffer.getLED(0));
+  }
+
+  @Test
+  void offsetMask() {
+    var pattern =
+        LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
+            .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
+            .offsetBy(4);
+    var buffer = new AddressableLEDBuffer(8);
+
+    pattern.applyTo(buffer);
+
+    assertColorEquals(kBlack, buffer.getLED(0));
+    assertColorEquals(kBlack, buffer.getLED(1));
+    assertColorEquals(kBlack, buffer.getLED(2));
+    assertColorEquals(kBlack, buffer.getLED(3));
+    assertColorEquals(kRed, buffer.getLED(4));
+    assertColorEquals(kRed, buffer.getLED(5));
+    assertColorEquals(kBlue, buffer.getLED(6));
+    assertColorEquals(kBlue, buffer.getLED(7));
+  }
+
+  @Test
+  void relativeScrollingMask() {
+    // [red, red, blue, blue, yellow, yellow, green, green]
+    // under a mask of first 50% on, last 50% off
+    // [red, red, blue, blue, black, black, black, black]
+    // all scrolling at 1 LED per microsecond
+    var pattern =
+        LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
+            .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
+            .scrollAtRelativeSpeed(Percent.per(Microsecond).of(12.5));
+    var buffer = new AddressableLEDBuffer(8);
+
+    {
+      m_mockTime = 0; // start
+      pattern.applyTo(buffer);
+      assertColorEquals(kRed, buffer.getLED(0));
+      assertColorEquals(kRed, buffer.getLED(1));
+      assertColorEquals(kBlue, buffer.getLED(2));
+      assertColorEquals(kBlue, buffer.getLED(3));
+      assertColorEquals(kBlack, buffer.getLED(4));
+      assertColorEquals(kBlack, buffer.getLED(5));
+      assertColorEquals(kBlack, buffer.getLED(6));
+      assertColorEquals(kBlack, buffer.getLED(7));
+    }
+
+    {
+      m_mockTime = 1;
+      pattern.applyTo(buffer);
+      assertColorEquals(kBlack, buffer.getLED(0));
+      assertColorEquals(kRed, buffer.getLED(1));
+      assertColorEquals(kRed, buffer.getLED(2));
+      assertColorEquals(kBlue, buffer.getLED(3));
+      assertColorEquals(kBlue, buffer.getLED(4));
+      assertColorEquals(kBlack, buffer.getLED(5));
+      assertColorEquals(kBlack, buffer.getLED(6));
+      assertColorEquals(kBlack, buffer.getLED(7));
+    }
+
+    {
+      m_mockTime = 2;
+      pattern.applyTo(buffer);
+      assertColorEquals(kBlack, buffer.getLED(0));
+      assertColorEquals(kBlack, buffer.getLED(1));
+      assertColorEquals(kRed, buffer.getLED(2));
+      assertColorEquals(kRed, buffer.getLED(3));
+      assertColorEquals(kBlue, buffer.getLED(4));
+      assertColorEquals(kBlue, buffer.getLED(5));
+      assertColorEquals(kBlack, buffer.getLED(6));
+      assertColorEquals(kBlack, buffer.getLED(7));
+    }
+
+    {
+      m_mockTime = 3;
+      pattern.applyTo(buffer);
+      assertColorEquals(kBlack, buffer.getLED(0));
+      assertColorEquals(kBlack, buffer.getLED(1));
+      assertColorEquals(kBlack, buffer.getLED(2));
+      assertColorEquals(kRed, buffer.getLED(3));
+      assertColorEquals(kRed, buffer.getLED(4));
+      assertColorEquals(kBlue, buffer.getLED(5));
+      assertColorEquals(kBlue, buffer.getLED(6));
+      assertColorEquals(kBlack, buffer.getLED(7));
+    }
+  }
+
+  @Test
+  void absoluteScrollingMask() {
+    // [red, red, blue, blue, yellow, yellow, green, green]
+    // under a mask of first 50% on, last 50% off
+    // [red, red, blue, blue, black, black, black, black]
+    // all scrolling at 1 LED per microsecond
+    var pattern =
+        LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
+            .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
+            .scrollAtAbsoluteSpeed(Meters.per(Microsecond).of(1), Meters.one());
+    var buffer = new AddressableLEDBuffer(8);
+
+    {
+      m_mockTime = 0; // start
+      pattern.applyTo(buffer);
+      assertColorEquals(kRed, buffer.getLED(0));
+      assertColorEquals(kRed, buffer.getLED(1));
+      assertColorEquals(kBlue, buffer.getLED(2));
+      assertColorEquals(kBlue, buffer.getLED(3));
+      assertColorEquals(kBlack, buffer.getLED(4));
+      assertColorEquals(kBlack, buffer.getLED(5));
+      assertColorEquals(kBlack, buffer.getLED(6));
+      assertColorEquals(kBlack, buffer.getLED(7));
+    }
+
+    {
+      m_mockTime = 1;
+      pattern.applyTo(buffer);
+      assertColorEquals(kBlack, buffer.getLED(0));
+      assertColorEquals(kRed, buffer.getLED(1));
+      assertColorEquals(kRed, buffer.getLED(2));
+      assertColorEquals(kBlue, buffer.getLED(3));
+      assertColorEquals(kBlue, buffer.getLED(4));
+      assertColorEquals(kBlack, buffer.getLED(5));
+      assertColorEquals(kBlack, buffer.getLED(6));
+      assertColorEquals(kBlack, buffer.getLED(7));
+    }
+
+    {
+      m_mockTime = 2;
+      pattern.applyTo(buffer);
+      assertColorEquals(kBlack, buffer.getLED(0));
+      assertColorEquals(kBlack, buffer.getLED(1));
+      assertColorEquals(kRed, buffer.getLED(2));
+      assertColorEquals(kRed, buffer.getLED(3));
+      assertColorEquals(kBlue, buffer.getLED(4));
+      assertColorEquals(kBlue, buffer.getLED(5));
+      assertColorEquals(kBlack, buffer.getLED(6));
+      assertColorEquals(kBlack, buffer.getLED(7));
+    }
+
+    {
+      m_mockTime = 3;
+      pattern.applyTo(buffer);
+      assertColorEquals(kBlack, buffer.getLED(0));
+      assertColorEquals(kBlack, buffer.getLED(1));
+      assertColorEquals(kBlack, buffer.getLED(2));
+      assertColorEquals(kRed, buffer.getLED(3));
+      assertColorEquals(kRed, buffer.getLED(4));
+      assertColorEquals(kBlue, buffer.getLED(5));
+      assertColorEquals(kBlue, buffer.getLED(6));
+      assertColorEquals(kBlack, buffer.getLED(7));
+    }
   }
 
   void assertColorEquals(Color expected, Color actual) {

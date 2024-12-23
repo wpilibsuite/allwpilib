@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases") // This is not a test class!
-public class TestLogger implements DataLogger {
+public class TestBackend implements EpilogueBackend {
   public record LogEntry<T>(String identifier, T value) {}
 
-  private final Map<String, SubLogger> m_subLoggers = new HashMap<>();
+  private final Map<String, NestedBackend> m_nestedBackends = new HashMap<>();
 
   private final List<LogEntry<?>> m_entries = new ArrayList<>();
 
@@ -24,8 +24,8 @@ public class TestLogger implements DataLogger {
   }
 
   @Override
-  public DataLogger getSubLogger(String path) {
-    return m_subLoggers.computeIfAbsent(path, k -> new SubLogger(k, this));
+  public EpilogueBackend getNested(String path) {
+    return m_nestedBackends.computeIfAbsent(path, k -> new NestedBackend(k, this));
   }
 
   @Override
