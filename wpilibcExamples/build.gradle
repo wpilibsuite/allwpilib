@@ -88,7 +88,7 @@ model {
 
         examplesMap.each { key, value ->
             "${key}"(NativeExecutableSpec) {
-                targetBuildTypes 'debug'
+                targetBuildTypes 'release'
                 binaries.all { binary ->
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
@@ -139,7 +139,7 @@ model {
         }
         templatesMap.each { key, value ->
             "${key}"(NativeExecutableSpec) {
-                targetBuildTypes 'debug'
+                targetBuildTypes 'release'
                 binaries.all { binary ->
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
@@ -243,7 +243,7 @@ model {
                 if (it in NativeExecutableSpec && it.name) {
                     it.binaries.each {
                         def arch = it.targetPlatform.name
-                        if (arch == systemArch && it.buildType.name == 'debug') {
+                        if (arch == systemArch && it.buildType.name == 'release') {
                             compileTask.dependsOn it.tasks.link
                         }
                     }
@@ -270,7 +270,7 @@ model {
             if (examplesMap.containsKey(component.name)) {
                 // Get the appropriate binary and create the run task.
                 component.binaries.each { binary ->
-                    if (binary.targetPlatform.name == getCurrentArch() && binary.buildType.name == "debug") {
+                    if (binary.targetPlatform.name == getCurrentArch() && binary.buildType.name == "release") {
                         project.tasks.create("run${component.name}", Exec) {
                             // Add simulation modules to HALSIM_EXTENSIONS environment variable.
                             def setupEnv = {
