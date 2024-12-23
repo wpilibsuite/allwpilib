@@ -143,7 +143,7 @@ class SendableChooser : public SendableChooserBase {
    * @param listener The function to call that accepts the new value
    */
   void OnChange(std::function<void(T)> listener) {
-    OnChange([listener](std::string_view val, T choice) { listener(choice); });
+    OnChange([listener = std::move(listener)](std::string_view val, T choice) { listener(choice); });
   }
 
   void InitSendable(wpi::SendableBuilder& builder) override {
