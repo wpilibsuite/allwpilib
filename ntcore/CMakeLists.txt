@@ -25,7 +25,11 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/ntcore>
 )
 wpilib_target_warnings(ntcore)
-target_compile_features(ntcore PUBLIC cxx_std_20)
+if(MSVC)
+    target_compile_features(ntcore PUBLIC cxx_std_23)
+else()
+    target_compile_features(ntcore PUBLIC cxx_std_20)
+endif()
 target_link_libraries(ntcore PUBLIC wpinet wpiutil)
 
 set_property(TARGET ntcore PROPERTY FOLDER "libraries")
