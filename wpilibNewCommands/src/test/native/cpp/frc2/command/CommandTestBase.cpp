@@ -7,11 +7,7 @@
 using namespace frc2;
 
 CommandTestBase::CommandTestBase() {
-  auto& scheduler = CommandScheduler::GetInstance();
-  scheduler.CancelAll();
-  scheduler.Enable();
-  scheduler.GetActiveButtonLoop()->Clear();
-  scheduler.UnregisterAllSubsystems();
+  CommandScheduler::ResetInstance();
 
   SetDSEnabled(true);
 }
@@ -19,10 +15,6 @@ CommandTestBase::CommandTestBase() {
 CommandTestBase::~CommandTestBase() {
   CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
   CommandScheduler::GetInstance().UnregisterAllSubsystems();
-}
-
-CommandScheduler CommandTestBase::GetScheduler() {
-  return CommandScheduler();
 }
 
 void CommandTestBase::SetDSEnabled(bool enabled) {

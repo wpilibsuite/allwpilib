@@ -11,8 +11,6 @@ using namespace frc2;
 class PrintCommandTest : public CommandTestBase {};
 
 TEST_F(PrintCommandTest, PrintCommandSchedule) {
-  CommandScheduler scheduler = GetScheduler();
-
   PrintCommand command("Test!");
 
   testing::internal::CaptureStdout();

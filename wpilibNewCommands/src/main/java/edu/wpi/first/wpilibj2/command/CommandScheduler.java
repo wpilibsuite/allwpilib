@@ -62,6 +62,17 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     return instance;
   }
 
+  /**
+   * Resets the Scheduler instance, which is useful for testing purposes. This should not be called
+   * from user code.
+   */
+  public static synchronized void resetInstance() {
+    if (instance != null) {
+      instance.close();
+    }
+    instance = null;
+  }
+
   private static final Optional<Command> kNoInterruptor = Optional.empty();
 
   private final Map<Command, Exception> m_composedCommands = new WeakHashMap<>();
@@ -99,7 +110,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
   private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> {});
 
-  CommandScheduler() {
+  private CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
     LiveWindow.setEnabledListener(

@@ -9,8 +9,6 @@ using namespace frc2;
 class FunctionalCommandTest : public CommandTestBase {};
 
 TEST_F(FunctionalCommandTest, FunctionalCommandSchedule) {
-  CommandScheduler scheduler = GetScheduler();
-
   int counter = 0;
   bool finished = false;
 

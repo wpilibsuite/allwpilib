@@ -8,7 +8,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.CommandTestBase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +29,6 @@ class NetworkButtonTest extends CommandTestBase {
 
   @Test
   void setNetworkButtonTest() {
-    var scheduler = CommandScheduler.getInstance();
     var commandHolder = new MockCommandHolder(true);
     var command = commandHolder.getMock();
     var pub = m_inst.getTable("TestTable").getBooleanTopic("Test").publish();

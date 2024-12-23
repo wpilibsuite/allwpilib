@@ -14,8 +14,6 @@ using namespace frc2;
 class ConditionalCommandTest : public CommandTestBase {};
 
 TEST_F(ConditionalCommandTest, ConditionalCommandSchedule) {
-  CommandScheduler scheduler = GetScheduler();
-
   std::unique_ptr<MockCommand> mock = std::make_unique<MockCommand>();
   MockCommand* mockptr = mock.get();
 
@@ -35,8 +33,6 @@ TEST_F(ConditionalCommandTest, ConditionalCommandSchedule) {
 }
 
 TEST_F(ConditionalCommandTest, ConditionalCommandRequirement) {
-  CommandScheduler scheduler = GetScheduler();
-
   TestSubsystem requirement1;
   TestSubsystem requirement2;
   TestSubsystem requirement3;

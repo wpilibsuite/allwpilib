@@ -33,7 +33,7 @@ class CommandSendableButtonTest : public CommandTestBase {
 
 TEST_F(CommandSendableButtonTest, trueAndNotScheduledSchedules) {
   // Not scheduled and true -> scheduled
-  GetScheduler().Run();
+  scheduler.Run();
   frc::SmartDashboard::UpdateValues();
   EXPECT_FALSE(m_command->IsScheduled());
   EXPECT_EQ(0, m_schedule);
@@ -41,7 +41,7 @@ TEST_F(CommandSendableButtonTest, trueAndNotScheduledSchedules) {
 
   m_publish.Set(true);
   frc::SmartDashboard::UpdateValues();
-  GetScheduler().Run();
+  scheduler.Run();
   EXPECT_TRUE(m_command->IsScheduled());
   EXPECT_EQ(1, m_schedule);
   EXPECT_EQ(0, m_cancel);
@@ -50,7 +50,7 @@ TEST_F(CommandSendableButtonTest, trueAndNotScheduledSchedules) {
 TEST_F(CommandSendableButtonTest, trueAndScheduledNoOp) {
   // Scheduled and true -> no-op
   m_command->Schedule();
-  GetScheduler().Run();
+  scheduler.Run();
   frc::SmartDashboard::UpdateValues();
   EXPECT_TRUE(m_command->IsScheduled());
   EXPECT_EQ(1, m_schedule);
@@ -58,7 +58,7 @@ TEST_F(CommandSendableButtonTest, trueAndScheduledNoOp) {
 
   m_publish.Set(true);
   frc::SmartDashboard::UpdateValues();
-  GetScheduler().Run();
+  scheduler.Run();
   EXPECT_TRUE(m_command->IsScheduled());
   EXPECT_EQ(1, m_schedule);
   EXPECT_EQ(0, m_cancel);
@@ -66,7 +66,7 @@ TEST_F(CommandSendableButtonTest, trueAndScheduledNoOp) {
 
 TEST_F(CommandSendableButtonTest, falseAndNotScheduledNoOp) {
   // Not scheduled and false -> no-op
-  GetScheduler().Run();
+  scheduler.Run();
   frc::SmartDashboard::UpdateValues();
   EXPECT_FALSE(m_command->IsScheduled());
   EXPECT_EQ(0, m_schedule);
@@ -74,7 +74,7 @@ TEST_F(CommandSendableButtonTest, falseAndNotScheduledNoOp) {
 
   m_publish.Set(false);
   frc::SmartDashboard::UpdateValues();
-  GetScheduler().Run();
+  scheduler.Run();
   EXPECT_FALSE(m_command->IsScheduled());
   EXPECT_EQ(0, m_schedule);
   EXPECT_EQ(0, m_cancel);
@@ -83,7 +83,7 @@ TEST_F(CommandSendableButtonTest, falseAndNotScheduledNoOp) {
 TEST_F(CommandSendableButtonTest, falseAndScheduledCancel) {
   // Scheduled and false -> cancel
   m_command->Schedule();
-  GetScheduler().Run();
+  scheduler.Run();
   frc::SmartDashboard::UpdateValues();
   EXPECT_TRUE(m_command->IsScheduled());
   EXPECT_EQ(1, m_schedule);
@@ -91,7 +91,7 @@ TEST_F(CommandSendableButtonTest, falseAndScheduledCancel) {
 
   m_publish.Set(false);
   frc::SmartDashboard::UpdateValues();
-  GetScheduler().Run();
+  scheduler.Run();
   EXPECT_FALSE(m_command->IsScheduled());
   EXPECT_EQ(1, m_schedule);
   EXPECT_EQ(1, m_cancel);
