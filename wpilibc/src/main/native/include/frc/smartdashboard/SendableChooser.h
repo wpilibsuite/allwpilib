@@ -37,7 +37,7 @@ template <class T>
   requires std::copy_constructible<T> && std::default_initializable<T>
 class SendableChooser : public SendableChooserBase {
   wpi::StringMap<T> m_choices;
-  std::function<void(T)> m_listener;
+  std::function<void(std::string, T)> m_listener;
   template <class U>
   static U _unwrap_smart_ptr(const U& value) {
     return value;
@@ -114,14 +114,43 @@ class SendableChooser : public SendableChooserBase {
   }
 
   /**
+   * Returns the name of the selected option. 
+   * 
+   * If there is none selected, it will return the default option's name. If there is none selected
+   * and no default, it will return an empty string.
+   *  
+   * @return The name of the option selected
+   */
+  std::string GetSelectedName() const {
+    std::scoped_lock lock(m_mutex);
+    if (m_haveSelected) {
+        return m_selected;
+    } else {
+        return m_defaultChoice;
+    }
+  }
+
+  /**
+   * Bind a listener that's called when the selected value changes.
+   * Only one listener can be bound. Calling this function will replace the
+   * previous listener.
+   * @param listener The function to call that accepts the new name and new value
+   */
+  void OnChange(std::function<void(std::string, T)> listener) {
+    std::scoped_lock lock(m_mutex);
+    m_listener = listener;
+  }
+
+  /**
    * Bind a listener that's called when the selected value changes.
    * Only one listener can be bound. Calling this function will replace the
    * previous listener.
    * @param listener The function to call that accepts the new value
    */
   void OnChange(std::function<void(T)> listener) {
-    std::scoped_lock lock(m_mutex);
-    m_listener = listener;
+    OnChange<T>([listener](std::string, T choice) {
+      listener(choice);
+    });
   }
 
   void InitSendable(wpi::SendableBuilder& builder) override {
@@ -158,7 +187,7 @@ class SendableChooser : public SendableChooserBase {
     builder.AddStringProperty(kSelected, nullptr,
                               [=, this](std::string_view val) {
                                 T choice{};
-                                std::function<void(T)> listener;
+                                std::function<void(std::string, T)> listener;
                                 {
                                   std::scoped_lock lock(m_mutex);
                                   m_haveSelected = true;
@@ -170,7 +199,7 @@ class SendableChooser : public SendableChooserBase {
                                   m_previousVal = val;
                                 }
                                 if (listener) {
-                                  listener(choice);
+                                  listener(val, choice);
                                 }
                               });
   }

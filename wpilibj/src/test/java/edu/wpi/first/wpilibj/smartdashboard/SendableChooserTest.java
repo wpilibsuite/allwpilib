@@ -42,6 +42,7 @@ class SendableChooserTest {
       chooserSim.setSelected(String.valueOf(toSelect));
       SmartDashboard.updateValues();
       assertEquals(toSelect, chooser.getSelected());
+      assertEquals(String.valueOf(toSelect), chooser.getSelectedName());
     }
   }
 
@@ -54,6 +55,7 @@ class SendableChooserTest {
       chooser.setDefaultOption(String.valueOf(0), 0);
 
       assertEquals(0, chooser.getSelected());
+      assertEquals(String.valueOf(0), chooser.getSelectedName());
     }
   }
 
@@ -65,6 +67,7 @@ class SendableChooserTest {
       }
 
       assertNull(chooser.getSelected());
+      assertNull(chooser.getSelectedName());
     }
   }
 

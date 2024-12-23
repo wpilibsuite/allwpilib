@@ -31,6 +31,7 @@ TEST_P(SendableChooserTest, ReturnsSelected) {
   chooserSim.SetSelected(std::to_string(GetParam()));
   frc::SmartDashboard::UpdateValues();
   EXPECT_EQ(GetParam(), chooser.GetSelected());
+  EXPECT_EQ(std::to_string(GetParam()), chooser.GetSelectedName());
 }
 
 TEST(SendableChooserTest, DefaultIsReturnedOnNoSelect) {
@@ -44,6 +45,7 @@ TEST(SendableChooserTest, DefaultIsReturnedOnNoSelect) {
   chooser.SetDefaultOption("4", 4);
 
   EXPECT_EQ(4, chooser.GetSelected());
+  EXPECT_EQ("4",, chooser.GetSelectedName());
 }
 
 TEST(SendableChooserTest,
@@ -55,6 +57,7 @@ TEST(SendableChooserTest,
   }
 
   EXPECT_EQ(0, chooser.GetSelected());
+  EXPECT_EQ("", chooser.GetSelectedName());
 }
 
 TEST(SendableChooserTest, ChangeListener) {
@@ -65,8 +68,10 @@ TEST(SendableChooserTest, ChangeListener) {
   for (int i = 1; i <= 3; i++) {
     chooser.AddOption(std::to_string(i), i);
   }
+
+  std::string currentName = "";
   int currentVal = 0;
-  chooser.OnChange([&](int val) { currentVal = val; });
+  chooser.OnChange([&](std::string name, int val) { currentName = name; currentVal = val; });
 
   frc::SmartDashboard::PutData("ChangeListenerChooser", &chooser);
   frc::SmartDashboard::UpdateValues();
@@ -74,6 +79,7 @@ TEST(SendableChooserTest, ChangeListener) {
   frc::SmartDashboard::UpdateValues();
 
   EXPECT_EQ(3, currentVal);
+  EXPECT_EQ("3", currentName);
 }
 
 INSTANTIATE_TEST_SUITE_P(SendableChooserTests, SendableChooserTest,

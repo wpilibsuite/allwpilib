@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -49,7 +50,7 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
   private String m_defaultChoice = "";
   private final int m_instance;
   private String m_previousVal;
-  private Consumer<V> m_listener;
+  private BiConsumer<String, V> m_listener;
   private static final AtomicInteger s_instances = new AtomicInteger();
 
   /** Instantiates a {@link SendableChooser}. */
@@ -110,16 +111,45 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
   }
 
   /**
+   * Returns the name of the selected option. If there is none selected, it will return the default.
+   * If there is none selected and no default, it will return {@code null}.
+   * 
+   * @return the name of the option selected
+   */
+  public String getSelectedName() {
+    m_mutex.lock();
+    try {
+      if (m_selected != null) {
+        return m_selected;
+      } else {
+        return m_defaultChoice;
+      }
+    } finally {
+      m_mutex.unlock();
+    }
+  }
+
+  /**
+   * Bind a listener that's called when the selected value changes. Only one listener can be bound.
+   * Calling this function will replace the previous listener.
+   *
+   * @param listener The function to call that accepts the new name and new value
+   */
+  public void onChange(BiConsumer<String, V> listener) {
+    requireNonNullParam(listener, "listener", "onChange");
+    m_mutex.lock();
+    m_listener = listener;
+    m_mutex.unlock();
+  }
+
+  /**
    * Bind a listener that's called when the selected value changes. Only one listener can be bound.
    * Calling this function will replace the previous listener.
    *
    * @param listener The function to call that accepts the new value
    */
   public void onChange(Consumer<V> listener) {
-    requireNonNullParam(listener, "listener", "onChange");
-    m_mutex.lock();
-    m_listener = listener;
-    m_mutex.unlock();
+    onChange((String value, V choice) -> listener.accept(choice));
   }
 
   private String m_selected;
@@ -151,7 +181,7 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
         null,
         val -> {
           V choice;
-          Consumer<V> listener;
+          BiConsumer<String, V> listener;
           m_mutex.lock();
           try {
             m_selected = val;
@@ -167,7 +197,7 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
             m_mutex.unlock();
           }
           if (listener != null) {
-            listener.accept(choice);
+            listener.accept(val, choice);
           }
         });
   }
