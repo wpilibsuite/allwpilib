@@ -363,6 +363,12 @@ class Trigger {
   bool Get() const;
 
  private:
+  /**
+   * Gets the initial state for a binding based on an initial state policy.
+   *
+   * @param initialState Initial state policy.
+   * @return The initial state to use.
+   */
   bool GetInitialState(InitialState initialState) const {
     switch (initialState) {
       case InitialState::kFalse:
