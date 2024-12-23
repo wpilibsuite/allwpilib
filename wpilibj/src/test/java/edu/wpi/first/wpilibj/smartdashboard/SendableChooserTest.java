@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.simulation.SendableChooserSim;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,14 +79,21 @@ class SendableChooserTest {
       for (int i = 1; i <= 3; i++) {
         chooser.addOption(String.valueOf(i), i);
       }
+
+      AtomicReference<String> currentName = new AtomicReference<>("");
       AtomicInteger currentVal = new AtomicInteger();
-      chooser.onChange(currentVal::set);
+      chooser.onChange(
+          (String name, Integer value) -> {
+            currentName.set(name);
+            currentVal.set(value);
+          });
 
       SmartDashboard.putData("changeListenerChooser", chooser);
       SmartDashboard.updateValues();
       chooserSim.setSelected("3");
       SmartDashboard.updateValues();
       assertEquals(3, currentVal.get());
+      assertEquals("3", currentName.get());
     }
   }
 

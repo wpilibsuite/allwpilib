@@ -95,13 +95,7 @@ class SendableChooser : public SendableChooserBase {
    * @return The option selected
    */
   CopyType GetSelected() const {
-    std::string selected = m_defaultChoice;
-    {
-      std::scoped_lock lock(m_mutex);
-      if (m_haveSelected) {
-        selected = m_selected;
-      }
-    }
+    std::string_view selected = GetSelectedName();
     if (selected.empty()) {
       return CopyType{};
     } else {
