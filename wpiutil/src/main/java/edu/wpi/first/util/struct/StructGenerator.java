@@ -12,11 +12,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 /** A utility class for procedurally generating {@link Struct}s from records and enums. */
-public final class ProceduralStructGenerator {
-  private ProceduralStructGenerator() {
+public final class StructGenerator {
+  private StructGenerator() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
@@ -120,54 +119,6 @@ public final class ProceduralStructGenerator {
       customStructTypeMap.put(clazz, struct);
     } else if (!StructSerializable.class.isAssignableFrom(clazz)) {
       customStructTypeMap.putIfAbsent(clazz, struct);
-    }
-  }
-
-  /**
-   * Returns a {@link Struct} for the given {@link StructSerializable} marked class. Due to the
-   * non-contractual nature of the marker this can fail. If the {@code struct} field could not be
-   * accessed for any reason, an empty {@link Optional} is returned.
-   *
-   * @param <T> The type of the class.
-   * @param clazz The class object to extract the struct from.
-   * @return An optional containing the struct if it could be extracted.
-   */
-  @SuppressWarnings("unchecked")
-  public static <T extends StructSerializable> Optional<Struct<T>> extractClassStruct(
-      Class<? extends T> clazz) {
-    try {
-      var possibleField = Optional.ofNullable(clazz.getDeclaredField("struct"));
-      return possibleField.flatMap(
-          field -> {
-            if (Struct.class.isAssignableFrom(field.getType())) {
-              try {
-                return Optional.ofNullable((Struct<T>) field.get(null));
-              } catch (IllegalAccessException e) {
-                return Optional.empty();
-              }
-            } else {
-              return Optional.empty();
-            }
-          });
-    } catch (NoSuchFieldException e) {
-      return Optional.empty();
-    }
-  }
-
-  /**
-   * Returns a {@link Struct} for the given class. This does not do compile time checking that the
-   * class is a {@link StructSerializable}. Whenever possible it is reccomended to use {@link
-   * #extractClassStruct(Class)}.
-   *
-   * @param clazz The class object to extract the struct from.
-   * @return An optional containing the struct if it could be extracted.
-   */
-  @SuppressWarnings("unchecked")
-  public static Optional<Struct<?>> extractClassStructDynamic(Class<?> clazz) {
-    if (StructSerializable.class.isAssignableFrom(clazz)) {
-      return extractClassStruct((Class<? extends StructSerializable>) clazz).map(struct -> struct);
-    } else {
-      return Optional.empty();
     }
   }
 
@@ -303,7 +254,7 @@ public final class ProceduralStructGenerator {
    * @return The generated struct.
    */
   @SuppressWarnings({"unchecked", "PMD.AvoidAccessibilityAlteration"})
-  static <R extends Record> Struct<R> genRecord(final Class<R> recordClass) {
+  public static <R extends Record> Struct<R> genRecord(final Class<R> recordClass) {
     final RecordComponent[] components = recordClass.getRecordComponents();
     final SchemaBuilder schemaBuilder = new SchemaBuilder();
     final ArrayList<Struct<?>> nestedStructs = new ArrayList<>();
@@ -329,7 +280,7 @@ public final class ProceduralStructGenerator {
         if (customStructTypeMap.containsKey(type)) {
           struct = customStructTypeMap.get(type);
         } else if (StructSerializable.class.isAssignableFrom(type)) {
-          var optStruct = extractClassStructDynamic(type);
+          var optStruct = StructFetcher.fetchStructDynamic(type);
           if (optStruct.isPresent()) {
             struct = optStruct.get();
           } else {
@@ -465,7 +416,7 @@ public final class ProceduralStructGenerator {
    * @return The generated struct.
    */
   @SuppressWarnings({"unchecked", "PMD.AvoidAccessibilityAlteration"})
-  static <E extends Enum<E>> Struct<E> genEnum(Class<E> enumClass) {
+  public static <E extends Enum<E>> Struct<E> genEnum(Class<E> enumClass) {
     final E[] enumVariants = enumClass.getEnumConstants();
     final Field[] allEnumFields = enumClass.getDeclaredFields();
     final SchemaBuilder schemaBuilder = new SchemaBuilder();
@@ -516,7 +467,7 @@ public final class ProceduralStructGenerator {
         if (customStructTypeMap.containsKey(type)) {
           struct = customStructTypeMap.get(type);
         } else if (StructSerializable.class.isAssignableFrom(type)) {
-          var optStruct = extractClassStructDynamic(type);
+          var optStruct = StructFetcher.fetchStructDynamic(type);
           if (optStruct.isPresent()) {
             struct = optStruct.get();
           } else {

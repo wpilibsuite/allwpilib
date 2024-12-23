@@ -404,7 +404,7 @@ constexpr Twist3d Pose3d::Log(const Pose3d& end) const {
 
     Vector3d u{
         {transform.X().value(), transform.Y().value(), transform.Z().value()}};
-    Vector3d rvec = transform.Rotation().GetQuaternion().ToRotationVector();
+    Vector3d rvec = transform.Rotation().ToVector();
     Matrix3d omega = detail::RotationVectorToMatrix(rvec);
     Matrix3d omegaSq = omega * omega;
     double theta = rvec.norm();

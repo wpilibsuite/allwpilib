@@ -81,6 +81,22 @@ std::string_view EscapeURI(std::string_view str, SmallVectorImpl<char>& buf,
   return {buf.data(), buf.size()};
 }
 
+std::string_view EscapeHTML(std::string_view str, SmallVectorImpl<char>& buf) {
+  buf.clear();
+  for (auto i = str.begin(), end = str.end(); i != end; ++i) {
+    if (*i == '&') {
+      buf.append({'&', 'a', 'm', 'p', ';'});
+    } else if (*i == '<') {
+      buf.append({'&', 'l', 't', ';'});
+    } else if (*i == '>') {
+      buf.append({'&', 'g', 't', ';'});
+    } else {
+      buf.push_back(*i);
+    }
+  }
+  return {buf.data(), buf.size()};
+}
+
 HttpQueryMap::HttpQueryMap(std::string_view query) {
   SmallVector<std::string_view, 16> queryElems;
   split(query, queryElems, '&', 100, false);

@@ -125,7 +125,7 @@ public class Odometry3d<T> {
    */
   public Pose3d update(Rotation3d gyroAngle, T wheelPositions) {
     var angle = gyroAngle.plus(m_gyroOffset);
-    var angle_difference = angle.minus(m_previousAngle).getQuaternion().toRotationVector();
+    var angle_difference = angle.minus(m_previousAngle).toVector();
 
     var twist2d = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);
     var twist =
