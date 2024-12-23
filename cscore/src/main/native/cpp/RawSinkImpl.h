@@ -32,8 +32,9 @@ class RawSinkImpl : public SinkImpl {
 
   void Stop();
 
-  uint64_t GrabFrame(WPI_RawFrame& frame);
-  uint64_t GrabFrame(WPI_RawFrame& frame, double timeout);
+  uint64_t GrabFrame(WPI_RawFrame& frame, uint64_t lastFrameTime = 0);
+  uint64_t GrabFrame(WPI_RawFrame& frame, double timeout,
+                     uint64_t lastFrameTime = 0);
 
  private:
   void ThreadMain();

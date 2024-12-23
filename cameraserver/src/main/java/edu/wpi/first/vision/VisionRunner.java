@@ -81,7 +81,7 @@ public class VisionRunner<P extends VisionPipeline> {
   }
 
   private void runOnceInternal() {
-    long frameTime = m_cvSink.grabFrame(m_image);
+    long frameTime = m_cvSink.grabFrame(m_image, 0);
     if (frameTime == 0) {
       // There was an error, report it
       String error = m_cvSink.getError();

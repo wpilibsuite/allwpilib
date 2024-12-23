@@ -779,10 +779,11 @@ public class CameraServerJNI {
    * @param frame Raw frame.
    * @param nativeObj Native object.
    * @param timeout Timeout in seconds.
+   * @param lastFrameTime Timestamp of the last frame - used to compare new frames against.
    * @return Raw sink frame timeout.
    */
   public static native long grabRawSinkFrameTimeout(
-      int sink, RawFrame frame, long nativeObj, double timeout);
+      int sink, RawFrame frame, long nativeObj, double timeout, long lastFrameTime);
 
   /**
    * Returns sink error message.
