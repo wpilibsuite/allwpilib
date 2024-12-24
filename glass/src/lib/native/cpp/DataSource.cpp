@@ -4,7 +4,10 @@
 
 #include "glass/DataSource.h"
 
+#include <string>
+
 #include <fmt/format.h>
+#include <imgui.h>
 
 #include "glass/ContextInternal.h"
 
@@ -12,17 +15,18 @@ using namespace glass;
 
 wpi::sig::Signal<const char*, DataSource*> DataSource::sourceCreated;
 
-DataSource::DataSource(std::string_view id)
-    : m_id{id}, m_name{gContext->sourceNameStorage.GetString(m_id)} {
-  gContext->sources.try_emplace(m_id, this);
-  sourceCreated(m_id.c_str(), this);
+std::string glass::MakeSourceId(std::string_view id, int index) {
+  return fmt::format("{}[{}]", id, index);
 }
 
-DataSource::DataSource(std::string_view id, int index)
-    : DataSource{fmt::format("{}[{}]", id, index)} {}
+std::string glass::MakeSourceId(std::string_view id, int index, int index2) {
+  return fmt::format("{}[{},{}]", id, index, index2);
+}
 
-DataSource::DataSource(std::string_view id, int index, int index2)
-    : DataSource{fmt::format("{}[{},{}]", id, index, index2)} {}
+DataSource::DataSource(Kind kind, std::string_view id)
+    : m_id{id},
+      m_name{gContext->sourceNameStorage.GetString(m_id)},
+      m_kind{kind} {}
 
 DataSource::~DataSource() {
   if (!gContext) {
@@ -99,8 +103,7 @@ bool DataSource::InputInt(const char* label, int* v, int step, int step_fast,
 
 void DataSource::EmitDrag(ImGuiDragDropFlags flags) const {
   if (ImGui::BeginDragDropSource(flags)) {
-    auto self = this;
-    ImGui::SetDragDropPayload("DataSource", &self, sizeof(self));  // NOLINT
+    SetDragDropPayload();
     const char* name = GetName().c_str();
     ImGui::TextUnformatted(name[0] == '\0' ? m_id.c_str() : name);
     ImGui::EndDragDropSource();
@@ -113,4 +116,69 @@ DataSource* DataSource::Find(std::string_view id) {
     return nullptr;
   }
   return it->second;
+}
+
+void DataSource::Register() {
+  gContext->sources.insert_or_assign(m_id, this);
+  sourceCreated(m_id.c_str(), this);
+}
+
+BooleanSource* BooleanSource::AcceptDragDropPayload(ImGuiDragDropFlags flags) {
+  if (auto payload = ImGui::AcceptDragDropPayload("BooleanSource", flags)) {
+    return *static_cast<BooleanSource**>(payload->Data);
+  }
+  return nullptr;
+}
+
+void BooleanSource::SetDragDropPayload() const {
+  auto self = this;
+  ImGui::SetDragDropPayload("BooleanSource", &self, sizeof(self));  // NOLINT
+}
+
+DoubleSource* DoubleSource::AcceptDragDropPayload(ImGuiDragDropFlags flags) {
+  if (auto payload = ImGui::AcceptDragDropPayload("DoubleSource", flags)) {
+    return *static_cast<DoubleSource**>(payload->Data);
+  }
+  return nullptr;
+}
+
+void DoubleSource::SetDragDropPayload() const {
+  auto self = this;
+  ImGui::SetDragDropPayload("DoubleSource", &self, sizeof(self));  // NOLINT
+}
+
+FloatSource* FloatSource::AcceptDragDropPayload(ImGuiDragDropFlags flags) {
+  if (auto payload = ImGui::AcceptDragDropPayload("FloatSource", flags)) {
+    return *static_cast<FloatSource**>(payload->Data);
+  }
+  return nullptr;
+}
+
+void FloatSource::SetDragDropPayload() const {
+  auto self = this;
+  ImGui::SetDragDropPayload("FloatSource", &self, sizeof(self));  // NOLINT
+}
+
+IntegerSource* IntegerSource::AcceptDragDropPayload(ImGuiDragDropFlags flags) {
+  if (auto payload = ImGui::AcceptDragDropPayload("IntegerSource", flags)) {
+    return *static_cast<IntegerSource**>(payload->Data);
+  }
+  return nullptr;
+}
+
+void IntegerSource::SetDragDropPayload() const {
+  auto self = this;
+  ImGui::SetDragDropPayload("IntegerSource", &self, sizeof(self));  // NOLINT
+}
+
+StringSource* StringSource::AcceptDragDropPayload(ImGuiDragDropFlags flags) {
+  if (auto payload = ImGui::AcceptDragDropPayload("StringSource", flags)) {
+    return *static_cast<StringSource**>(payload->Data);
+  }
+  return nullptr;
+}
+
+void StringSource::SetDragDropPayload() const {
+  auto self = this;
+  ImGui::SetDragDropPayload("StringSource", &self, sizeof(self));  // NOLINT
 }

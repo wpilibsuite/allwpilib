@@ -21,9 +21,7 @@ NTDigitalOutputModel::NTDigitalOutputModel(nt::NetworkTableInstance inst,
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
                          .Subscribe(false)},
-      m_valueData{fmt::format("NT_DOut:{}", path)} {
-  m_valueData.SetDigital(true);
-}
+      m_valueData{fmt::format("NT_DOut:{}", path)} {}
 
 void NTDigitalOutputModel::SetValue(bool val) {
   m_value.Set(val);

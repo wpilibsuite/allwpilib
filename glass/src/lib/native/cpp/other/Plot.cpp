@@ -82,7 +82,8 @@ class PlotSeries {
  private:
   bool IsDigital() const {
     return m_digital.GetValue() == kDigital ||
-           (m_digital.GetValue() == kAuto && m_source && m_source->IsDigital());
+           (m_digital.GetValue() == kAuto && m_source &&
+            m_source->GetKind() == DataSource::kBoolean);
   }
   void AppendValue(double value, int64_t time);
 
@@ -255,11 +256,46 @@ void PlotSeries::CheckSource() {
 void PlotSeries::SetSource(DataSource* source) {
   m_source = source;
 
-  // add initial value
-  AppendValue(source->GetValue(), 0);
+  switch (source->GetKind()) {
+    case DataSource::kBoolean: {
+      auto s = static_cast<BooleanSource*>(source);
+      // add initial value
+      AppendValue(s->GetValue(), 0);
 
-  m_newValueConn = source->valueChanged.connect_connection(
-      [this](double value, int64_t time) { AppendValue(value, time); });
+      m_newValueConn = s->valueChanged.connect_connection(
+          [this](bool value, int64_t time) { AppendValue(value, time); });
+      break;
+    }
+    case DataSource::kDouble: {
+      auto s = static_cast<DoubleSource*>(source);
+      // add initial value
+      AppendValue(s->GetValue(), 0);
+
+      m_newValueConn = s->valueChanged.connect_connection(
+          [this](double value, int64_t time) { AppendValue(value, time); });
+      break;
+    }
+    case DataSource::kFloat: {
+      auto s = static_cast<FloatSource*>(source);
+      // add initial value
+      AppendValue(s->GetValue(), 0);
+
+      m_newValueConn = s->valueChanged.connect_connection(
+          [this](double value, int64_t time) { AppendValue(value, time); });
+      break;
+    }
+    case DataSource::kInteger: {
+      auto s = static_cast<IntegerSource*>(source);
+      // add initial value
+      AppendValue(s->GetValue(), 0);
+
+      m_newValueConn = s->valueChanged.connect_connection(
+          [this](int64_t value, int64_t time) { AppendValue(value, time); });
+      break;
+    }
+    default:
+      break;
+  }
 }
 
 void PlotSeries::AppendValue(double value, int64_t timeUs) {
@@ -522,9 +558,18 @@ Plot::Plot(Storage& storage)
 }
 
 void Plot::DragDropAccept(PlotView& view, size_t i, int yAxis) {
-  if (const ImGuiPayload* payload =
-          ImGui::AcceptDragDropPayload("DataSource")) {
-    auto source = *static_cast<DataSource**>(payload->Data);
+  // accept any of double/float/boolean/integer sources
+  DataSource* source = DoubleSource::AcceptDragDropPayload();
+  if (!source) {
+    source = FloatSource::AcceptDragDropPayload();
+  }
+  if (!source) {
+    source = BooleanSource::AcceptDragDropPayload();
+  }
+  if (!source) {
+    source = IntegerSource::AcceptDragDropPayload();
+  }
+  if (source) {
     // don't add duplicates unless it's onto a different Y axis
     auto it =
         std::find_if(m_series.begin(), m_series.end(), [=](const auto& elem) {

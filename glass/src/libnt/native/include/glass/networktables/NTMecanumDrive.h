@@ -47,10 +47,10 @@ class NTMecanumDriveModel : public DriveModel {
 
   std::string m_nameValue;
   bool m_controllableValue = false;
-  DataSource m_flPercentData;
-  DataSource m_frPercentData;
-  DataSource m_rlPercentData;
-  DataSource m_rrPercentData;
+  DoubleSource m_flPercentData;
+  DoubleSource m_frPercentData;
+  DoubleSource m_rlPercentData;
+  DoubleSource m_rrPercentData;
 
   std::vector<DriveModel::WheelInfo> m_wheels;
   ImVec2 m_speedVector;

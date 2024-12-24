@@ -15,15 +15,15 @@
 struct ImVec2;
 
 namespace glass {
-class DataSource;
+class DoubleSource;
 class DriveModel : public Model {
  public:
   struct WheelInfo {
     std::string name;
-    DataSource* percent;
+    DoubleSource* percent;
     std::function<void(double)> setter;
 
-    WheelInfo(std::string_view name, DataSource* percent,
+    WheelInfo(std::string_view name, DoubleSource* percent,
               std::function<void(double)> setter)
         : name(name), percent(percent), setter(std::move(setter)) {}
   };

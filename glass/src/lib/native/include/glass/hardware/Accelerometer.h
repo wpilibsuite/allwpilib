@@ -8,13 +8,13 @@
 
 namespace glass {
 
-class DataSource;
+class DoubleSource;
 
 class AccelerometerModel : public Model {
  public:
-  virtual DataSource* GetXData() = 0;
-  virtual DataSource* GetYData() = 0;
-  virtual DataSource* GetZData() = 0;
+  virtual DoubleSource* GetXData() = 0;
+  virtual DoubleSource* GetYData() = 0;
+  virtual DoubleSource* GetZData() = 0;
 
   virtual int GetRange() = 0;
 

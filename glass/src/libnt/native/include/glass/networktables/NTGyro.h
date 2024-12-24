@@ -25,7 +25,7 @@ class NTGyroModel : public GyroModel {
   const char* GetName() const override { return m_nameValue.c_str(); }
   const char* GetSimDevice() const override { return nullptr; }
 
-  DataSource* GetAngleData() override { return &m_angleData; }
+  DoubleSource* GetAngleData() override { return &m_angleData; }
   void SetAngle(double value) override {}
 
   void Update() override;
@@ -37,7 +37,7 @@ class NTGyroModel : public GyroModel {
   nt::DoubleSubscriber m_angle;
   nt::StringSubscriber m_name;
 
-  DataSource m_angleData;
+  DoubleSource m_angleData;
   std::string m_nameValue;
 };
 }  // namespace glass

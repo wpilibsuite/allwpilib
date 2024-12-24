@@ -12,14 +12,14 @@
 
 namespace glass {
 
-class DataSource;
+class DoubleSource;
 
 class PWMModel : public Model {
  public:
   // returns -1 if not an addressable LED
   virtual int GetAddressableLED() const = 0;
 
-  virtual DataSource* GetSpeedData() = 0;
+  virtual DoubleSource* GetSpeedData() = 0;
 
   virtual void SetSpeed(double val) = 0;
 };
