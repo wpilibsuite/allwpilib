@@ -1637,18 +1637,18 @@ Java_edu_wpi_first_cscore_CameraServerJNI_grabRawSinkFrame
 /*
  * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    grabRawSinkFrameTimeout
- * Signature: (ILjava/lang/Object;JD)J
+ * Signature: (ILjava/lang/Object;JDJ)J
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_cscore_CameraServerJNI_grabRawSinkFrameTimeout
   (JNIEnv* env, jclass, jint sink, jobject frameObj, jlong framePtr,
-   jdouble timeout)
+   jdouble timeout, jlong lastFrameTimeout)
 {
   auto* frame = reinterpret_cast<wpi::RawFrame*>(framePtr);
   auto origData = frame->data;
   CS_Status status = 0;
   auto rv = cs::GrabSinkFrameTimeout(static_cast<CS_Sink>(sink), *frame,
-                                     timeout, &status);
+                                     timeout, &status, lastFrameTimeout);
   if (!CheckStatus(env, status)) {
     return 0;
   }

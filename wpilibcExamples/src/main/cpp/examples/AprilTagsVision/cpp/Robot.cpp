@@ -95,7 +95,8 @@ class Robot : public frc::TimedRobot {
       // Tell the CvSink to grab a frame from the camera and
       // put it in the source mat.  If there is an error notify the
       // output.
-      if (cvSink.GrabFrame(mat) == 0) {
+      auto frameTime = cvSink.GrabFrame(mat);
+      if (frameTime == 0) {
         // Send the output the error.
         outputStream.NotifyError(cvSink.GetError());
         // skip the rest of the current iteration

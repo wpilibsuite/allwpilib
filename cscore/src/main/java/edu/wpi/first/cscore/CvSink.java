@@ -71,7 +71,25 @@ public class CvSink extends ImageSink {
    * @return Frame time, or 0 on error (call GetError() to obtain the error message)
    */
   public long grabFrame(Mat image) {
-    return grabFrame(image, 0.225);
+    return grabFrame(image, 0.225, 0);
+  }
+
+  /**
+   * Wait for the next frame and get the image. Times out (returning 0) after 0.225 seconds. The
+   * provided image will have the pixelFormat this class was constructed with.
+   *
+   * <p>If lastFrameTime is provided and non-zero, the sink will fill image with the first frame
+   * from the source that is not equal to lastFrameTime. If lastFrameTime is zero, the time of the
+   * current frame owned by the CvSource is used, and this function will block until the connected
+   * CvSource provides a new frame.
+   *
+   * @param image Where to store the image.
+   * @param lastFrameTime Timestamp of the last frame - used to compare new frames against, or 0 to
+   *     use the current time
+   * @return Frame time, or 0 on error (call GetError() to obtain the error message)
+   */
+  public long grabFrame(Mat image, long lastFrameTime) {
+    return grabFrame(image, 0.225, lastFrameTime);
   }
 
   /**
@@ -84,7 +102,22 @@ public class CvSink extends ImageSink {
    *     is in 1 us increments.
    */
   public long grabFrame(Mat image, double timeout) {
-    long rv = grabFrameDirect(timeout);
+    return grabFrame(image, timeout, 0);
+  }
+
+  /**
+   * Wait for the next frame and get the image. Times out (returning 0) after timeout seconds. The
+   * provided image will have the pixelFormat this class was constructed with.
+   *
+   * @param image Where to store the image.
+   * @param timeout Retrieval timeout in seconds.
+   * @param lastFrameTime Timestamp of the last frame - used to compare new frames against, or 0 to
+   *     use the current time
+   * @return Frame time, or 0 on error (call GetError() to obtain the error message); the frame time
+   *     is in 1 us increments.
+   */
+  public long grabFrame(Mat image, double timeout, long lastFrameTime) {
+    long rv = grabFrameDirect(timeout, lastFrameTime);
     if (rv <= 0) {
       return rv;
     }
@@ -126,10 +159,23 @@ public class CvSink extends ImageSink {
    * provided image will have the pixelFormat this class was constructed with. Use getDirectMat() to
    * grab the image.
    *
+   * @param lastFrameTime Timestamp of the last frame - used to compare new frames against, or 0 to
+   *     use the current time
+   * @return Frame time, or 0 on error (call GetError() to obtain the error message)
+   */
+  public long grabFrameDirect(long lastFrameTime) {
+    return grabFrameDirect(0.225, lastFrameTime);
+  }
+
+  /**
+   * Wait for the next frame and store the image. Times out (returning 0) after 0.225 seconds. The
+   * provided image will have the pixelFormat this class was constructed with. Use getDirectMat() to
+   * grab the image.
+   *
    * @return Frame time, or 0 on error (call GetError() to obtain the error message)
    */
   public long grabFrameDirect() {
-    return grabFrameDirect(0.225);
+    return grabFrameDirect(0.225, 0);
   }
 
   /**
@@ -143,9 +189,26 @@ public class CvSink extends ImageSink {
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public long grabFrameDirect(double timeout) {
+    return grabFrameDirect(timeout, 0);
+  }
+
+  /**
+   * Wait for the next frame and store the image. Times out (returning 0) after timeout seconds. The
+   * provided image will have the pixelFormat this class was constructed with. Use getDirectMat() to
+   * grab the image.
+   *
+   * @param timeout Retrieval timeout in seconds.
+   * @param lastFrameTime Timestamp of the last frame - used to compare new frames against, or 0 to
+   *     use the current time
+   * @return Frame time, or 0 on error (call GetError() to obtain the error message); the frame time
+   *     is in 1 us increments.
+   */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  public long grabFrameDirect(double timeout, long lastFrameTime) {
     m_frame.setInfo(0, 0, 0, m_pixelFormat);
     long rv =
-        CameraServerJNI.grabRawSinkFrameTimeout(m_handle, m_frame, m_frame.getNativeObj(), timeout);
+        CameraServerJNI.grabRawSinkFrameTimeout(
+            m_handle, m_frame, m_frame.getNativeObj(), timeout, lastFrameTime);
     if (rv <= 0) {
       return rv;
     }

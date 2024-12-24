@@ -42,7 +42,7 @@ void RawSinkImpl::Stop() {
   }
 }
 
-uint64_t RawSinkImpl::GrabFrame(WPI_RawFrame& image) {
+uint64_t RawSinkImpl::GrabFrame(WPI_RawFrame& image, uint64_t lastFrameTime) {
   SetEnabled(true);
 
   auto source = GetSource();
@@ -52,7 +52,7 @@ uint64_t RawSinkImpl::GrabFrame(WPI_RawFrame& image) {
     return 0;
   }
 
-  auto frame = source->GetNextFrame();  // blocks
+  auto frame = source->GetNextFrame(lastFrameTime);  // blocks
   if (!frame) {
     // Bad frame; sleep for 20 ms so we don't consume all processor time.
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -62,7 +62,8 @@ uint64_t RawSinkImpl::GrabFrame(WPI_RawFrame& image) {
   return GrabFrameImpl(image, frame);
 }
 
-uint64_t RawSinkImpl::GrabFrame(WPI_RawFrame& image, double timeout) {
+uint64_t RawSinkImpl::GrabFrame(WPI_RawFrame& image, double timeout,
+                                uint64_t lastFrameTime) {
   SetEnabled(true);
 
   auto source = GetSource();
@@ -72,7 +73,7 @@ uint64_t RawSinkImpl::GrabFrame(WPI_RawFrame& image, double timeout) {
     return 0;
   }
 
-  auto frame = source->GetNextFrame(timeout);  // blocks
+  auto frame = source->GetNextFrame(timeout, lastFrameTime);  // blocks
   if (!frame) {
     // Bad frame; sleep for 20 ms so we don't consume all processor time.
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -164,23 +165,25 @@ CS_Sink CreateRawSinkCallback(std::string_view name, bool isCv,
                                     inst.telemetry, processFrame));
 }
 
-uint64_t GrabSinkFrame(CS_Sink sink, WPI_RawFrame& image, CS_Status* status) {
+uint64_t GrabSinkFrame(CS_Sink sink, WPI_RawFrame& image, CS_Status* status,
+                       uint64_t lastFrameTime) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data || (data->kind & SinkMask) == 0) {
     *status = CS_INVALID_HANDLE;
     return 0;
   }
-  return static_cast<RawSinkImpl&>(*data->sink).GrabFrame(image);
+  return static_cast<RawSinkImpl&>(*data->sink).GrabFrame(image, lastFrameTime);
 }
 
 uint64_t GrabSinkFrameTimeout(CS_Sink sink, WPI_RawFrame& image, double timeout,
-                              CS_Status* status) {
+                              CS_Status* status, uint64_t lastFrameTime) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data || (data->kind & SinkMask) == 0) {
     *status = CS_INVALID_HANDLE;
     return 0;
   }
-  return static_cast<RawSinkImpl&>(*data->sink).GrabFrame(image, timeout);
+  return static_cast<RawSinkImpl&>(*data->sink)
+      .GrabFrame(image, timeout, lastFrameTime);
 }
 
 }  // namespace cs
@@ -197,6 +200,21 @@ CS_Sink CS_CreateRawSinkCallback(
   return cs::CreateRawSinkCallback(
       wpi::to_string_view(name), isCv,
       [=](uint64_t time) { processFrame(data, time); }, status);
+}
+
+uint64_t CS_GrabRawSinkFrameWithFrameTime(CS_Sink sink,
+                                          struct WPI_RawFrame* image,
+                                          uint64_t lastFrameTime,
+                                          CS_Status* status) {
+  return cs::GrabSinkFrame(sink, *image, status, lastFrameTime);
+}
+
+uint64_t CS_GrabRawSinkFrameTimeoutWithFrameTime(CS_Sink sink,
+                                                 struct WPI_RawFrame* image,
+                                                 double timeout,
+                                                 uint64_t lastFrameTime,
+                                                 CS_Status* status) {
+  return cs::GrabSinkFrameTimeout(sink, *image, timeout, status, lastFrameTime);
 }
 
 uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct WPI_RawFrame* image,

@@ -27,6 +27,15 @@ uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct WPI_RawFrame* rawImage,
                              CS_Status* status);
 uint64_t CS_GrabRawSinkFrameTimeout(CS_Sink sink, struct WPI_RawFrame* rawImage,
                                     double timeout, CS_Status* status);
+uint64_t CS_GrabRawSinkFrameWithFrameTime(CS_Sink sink,
+                                          struct WPI_RawFrame* rawImage,
+                                          uint64_t lastFrameTime,
+                                          CS_Status* status);
+uint64_t CS_GrabRawSinkFrameTimeoutWithFrameTime(CS_Sink sink,
+                                                 struct WPI_RawFrame* rawImage,
+                                                 double timeout,
+                                                 uint64_t lastFrameTime,
+                                                 CS_Status* status);
 
 CS_Sink CS_CreateRawSink(const struct WPI_String* name, CS_Bool isCv,
                          CS_Status* status);
@@ -64,9 +73,12 @@ CS_Sink CreateRawSinkCallback(std::string_view name, bool isCv,
 
 void PutSourceFrame(CS_Source source, const WPI_RawFrame& image,
                     CS_Status* status);
-uint64_t GrabSinkFrame(CS_Sink sink, WPI_RawFrame& image, CS_Status* status);
+
+// TODO - default parameters need to go last, is this OK?
+uint64_t GrabSinkFrame(CS_Sink sink, WPI_RawFrame& image, CS_Status* status,
+                       uint64_t lastFrameTime = 0);
 uint64_t GrabSinkFrameTimeout(CS_Sink sink, WPI_RawFrame& image, double timeout,
-                              CS_Status* status);
+                              CS_Status* status, uint64_t lastFrameTime = 0);
 
 /**
  * A source for user code to provide video frames as raw bytes.
