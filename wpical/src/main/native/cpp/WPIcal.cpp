@@ -7,6 +7,7 @@
 #include <fieldmap.h>
 #include <fmap.h>
 
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <numbers>

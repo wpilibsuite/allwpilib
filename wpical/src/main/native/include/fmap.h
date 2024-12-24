@@ -6,7 +6,6 @@
 
 #include <fieldmap.h>
 
-#include <opencv2/opencv.hpp>
 #include <tagpose.h>
 #include <wpi/json.h>
 

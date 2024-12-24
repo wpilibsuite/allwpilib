@@ -14,6 +14,18 @@
 #include <utility>
 #include <vector>
 
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+#include <ceres/ceres.h>
+#include <opencv2/calib3d.hpp>
+#include <opencv2/core/eigen.hpp>
+#include <opencv2/core/utils/logger.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/videoio.hpp>
+#include <wpi/json.h>
+
+#include "apriltag.h"
 #include "tag36h11.h"
 
 struct Pose {

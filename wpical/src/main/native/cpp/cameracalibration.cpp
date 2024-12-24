@@ -4,10 +4,17 @@
 
 #include "cameracalibration.h"
 
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <mrcal_wrapper.h>
+#include <opencv2/objdetect/aruco_board.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/videoio.hpp>
+#include <wpi/json.h>
 
 static bool filter(std::vector<cv::Point2f> charuco_corners,
                    std::vector<int> charuco_ids,

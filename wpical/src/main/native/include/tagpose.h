@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <Eigen/Geometry>
 
 namespace tag {

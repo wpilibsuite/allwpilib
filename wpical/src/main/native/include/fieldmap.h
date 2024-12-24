@@ -4,11 +4,9 @@
 
 #pragma once
 
-#include <numbers>
+#include <cmath>
 #include <vector>
 
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
 #include <tagpose.h>
 #include <wpi/json.h>
 

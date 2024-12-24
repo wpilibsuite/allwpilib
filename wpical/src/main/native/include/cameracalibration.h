@@ -4,16 +4,7 @@
 
 #pragma once
 
-#include <fstream>
 #include <string>
-
-#include <mrcal_wrapper.h>
-#include <opencv2/aruco.hpp>
-#include <opencv2/aruco/charuco.hpp>
-#include <opencv2/objdetect/aruco_board.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/videoio.hpp>
-#include <wpi/json.h>
 
 namespace cameracalibration {
 int calibrate(const std::string& input_video, float square_width,
