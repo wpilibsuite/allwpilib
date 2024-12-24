@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <frc2/command/Commands.h>
+
 #include <utility>
 
 #include "CommandTestBase.h"
@@ -15,7 +17,7 @@ class SchedulerTest : public CommandTestBase {};
 TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
-  InstantCommand command;
+  auto command = cmd::None();
 
   int counter = 0;
 
@@ -23,7 +25,7 @@ TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
   scheduler.OnCommandExecute([&counter](const Command&) { counter++; });
   scheduler.OnCommandFinish([&counter](const Command&) { counter++; });
 
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
   scheduler.Run();
 
   EXPECT_EQ(counter, 3);
@@ -32,15 +34,15 @@ TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
 TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
-  RunCommand command([] {}, {});
+  auto command = cmd::Idle();
 
   int counter = 0;
 
   scheduler.OnCommandInterrupt([&counter](const Command&) { counter++; });
 
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
   scheduler.Run();
-  scheduler.Cancel(&command);
+  scheduler.Cancel(command);
 
   EXPECT_EQ(counter, 1);
 }
@@ -56,10 +58,10 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptNoCause) {
         counter++;
       });
 
-  RunCommand command([] {});
+  auto command = cmd::Idle();
 
-  scheduler.Schedule(&command);
-  scheduler.Cancel(&command);
+  scheduler.Schedule(command);
+  scheduler.Cancel(command);
 
   EXPECT_EQ(1, counter);
 }
@@ -70,7 +72,7 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCause) {
   int counter = 0;
 
   TestSubsystem subsystem{};
-  RunCommand command([] {}, {&subsystem});
+  auto command = cmd::Idle({&subsystem});
   InstantCommand interruptor([] {}, {&subsystem});
 
   scheduler.OnCommandInterrupt(
@@ -80,7 +82,7 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCause) {
         counter++;
       });
 
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
   scheduler.Schedule(&interruptor);
 
   EXPECT_EQ(1, counter);
@@ -92,11 +94,11 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCauseInRunLoop) {
   int counter = 0;
 
   TestSubsystem subsystem{};
-  RunCommand command([] {}, {&subsystem});
+  auto command = cmd::Idle({&subsystem});
   InstantCommand interruptor([] {}, {&subsystem});
   // This command will schedule interruptor in execute() inside the run loop
-  InstantCommand interruptorScheduler(
-      [&] { scheduler.Schedule(&interruptor); });
+  auto interruptorScheduler =
+      cmd::RunOnce([&] { scheduler.Schedule(&interruptor); });
 
   scheduler.OnCommandInterrupt(
       [&](const Command&, const std::optional<Command*>& cause) {
@@ -105,8 +107,8 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCauseInRunLoop) {
         counter++;
       });
 
-  scheduler.Schedule(&command);
-  scheduler.Schedule(&interruptorScheduler);
+  scheduler.Schedule(command);
+  scheduler.Schedule(interruptorScheduler);
 
   scheduler.Run();
 
@@ -142,8 +144,8 @@ TEST_F(SchedulerTest, UnregisterSubsystem) {
 TEST_F(SchedulerTest, SchedulerCancelAll) {
   CommandScheduler scheduler = GetScheduler();
 
-  RunCommand command([] {}, {});
-  RunCommand command2([] {}, {});
+  auto command1 = cmd::Idle();
+  auto command2 = cmd::Idle();
 
   int counter = 0;
 
@@ -153,8 +155,8 @@ TEST_F(SchedulerTest, SchedulerCancelAll) {
         EXPECT_FALSE(interruptor);
       });
 
-  scheduler.Schedule(&command);
-  scheduler.Schedule(&command2);
+  scheduler.Schedule(command1);
+  scheduler.Schedule(command2);
   scheduler.Run();
   scheduler.CancelAll();
 
@@ -166,10 +168,10 @@ TEST_F(SchedulerTest, ScheduleScheduledNoOp) {
 
   int counter = 0;
 
-  StartEndCommand command([&counter] { counter++; }, [] {});
+  auto command = cmd::StartEnd([&counter] { counter++; }, [] {});
 
-  scheduler.Schedule(&command);
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
+  scheduler.Schedule(command);
 
   EXPECT_EQ(counter, 1);
 }
