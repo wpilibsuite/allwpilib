@@ -300,7 +300,7 @@ inline CvSink::CvSink(const CvSink& sink)
 inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout,
                                   uint64_t lastFrameTime) {
   cv::Mat tmpnam;
-  auto retVal = GrabFrameDirect(tmpnam, lastFrameTime);
+  auto retVal = GrabFrameDirect(tmpnam, timeout, lastFrameTime);
   if (retVal <= 0) {
     return retVal;
   }
