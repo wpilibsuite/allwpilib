@@ -186,9 +186,9 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   /**
    * Calculates the feedforward from the gains and setpoints assuming discrete control.
    *
-   * @param currentAngle The current angle in radians. This angle should be measured from the 
-   *     horizontal (i.e. if the provided angle is 0, the arm should be parallel to the floor). 
-   *     If your encoder does not follow this convention, an offset should be added.
+   * @param currentAngle The current angle in radians. This angle should be measured from the
+   *     horizontal (i.e. if the provided angle is 0, the arm should be parallel to the floor). If
+   *     your encoder does not follow this convention, an offset should be added.
    * @param currentVelocity The current velocity setpoint in radians per second.
    * @param nextVelocity The next velocity setpoint in radians per second.
    * @return The computed feedforward in volts.
