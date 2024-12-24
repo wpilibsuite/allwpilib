@@ -49,9 +49,39 @@ public class SolenoidSim {
    * Check the solenoid output.
    *
    * @return the solenoid output
+   * @deprecated Use isOn or isOff instead
    */
+  @Deprecated
   public boolean getOutput() {
     return m_module.getSolenoidOutput(m_channel);
+  }
+
+  /**
+   * Returns true if the solenoid is on.
+   *
+   * @return true if the solenoid is on.
+   */
+  public boolean isOn() {
+    return m_module.getSolenoidOutput(m_channel);
+  }
+
+  /**
+   * Returns true if the solenoid is off.
+   *
+   * @return true if the solenoid off.
+   */
+  public boolean isOff() {
+    return !m_module.getSolenoidOutput(m_channel);
+  }
+
+  /** Turns the solenoid on. */
+  public void setOn() {
+    m_module.setSolenoidOutput(m_channel, true);
+  }
+
+  /** Turns the solenoid off. */
+  public void setOff() {
+    m_module.setSolenoidOutput(m_channel, false);
   }
 
   /**

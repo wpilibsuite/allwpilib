@@ -54,8 +54,25 @@ bool Solenoid::Get() const {
   return (currentAll & m_mask) != 0;
 }
 
+bool Solenoid::IsOn() const {
+  int currentAll = m_module->GetSolenoids();
+  return (currentAll & m_mask) != 0;
+}
+
+bool Solenoid::IsOff() const {
+  return !IsOn();
+}
+
+void Solenoid::SetOn() {
+  Set(true);
+}
+
+void Solenoid::SetOff() {
+  Set(false);
+}
+
 void Solenoid::Toggle() {
-  Set(!Get());
+  Set(!IsOn());
 }
 
 int Solenoid::GetChannel() const {
@@ -79,6 +96,6 @@ void Solenoid::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetActuator(true);
   builder.SetSafeState([=, this] { Set(false); });
   builder.AddBooleanProperty(
-      "Value", [=, this] { return Get(); },
+      "Value", [=, this] { return IsOn(); },
       [=, this](bool value) { Set(value); });
 }

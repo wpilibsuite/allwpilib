@@ -18,8 +18,44 @@ class SolenoidSim {
   SolenoidSim(PneumaticsModuleType type, int channel);
   ~SolenoidSim() = default;
 
+  /**
+   * Returns the solenoid output.
+   * @return the solenoid output.
+   */
+  [[deprecated("Use IsOn or IsOff methods instead.")]]
   bool GetOutput() const;
+
+  /**
+   * Sets the solenoid output.
+   * @param output The new solenoid output.
+   */
   void SetOutput(bool output);
+
+  /**
+   * Returns true if the solenoid is on.
+   *
+   * @return true if the solenoid is on.
+   *
+   */
+  bool IsOn();
+
+  /**
+   * Returns true if the solenoid is off.
+   *
+   * @return true if the solenoid is off.
+   *
+   */
+  bool IsOff();
+
+  /**
+   * Turns the solenoid on.
+   */
+  void SetOn();
+
+  /**
+   * Turns the solenoid off.
+   */
+  void SetOff();
 
   /**
    * Register a callback to be run when the output of this solenoid has changed.
