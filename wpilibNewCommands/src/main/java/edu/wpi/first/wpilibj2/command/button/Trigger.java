@@ -24,6 +24,34 @@ import java.util.function.BooleanSupplier;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class Trigger implements BooleanSupplier {
+  /**
+   * Enum specifying the initial state to use for a binding. This impacts whether or not the binding
+   * will be triggered immediately.
+   */
+  public enum InitialState {
+    /**
+     * Indicates the binding should use false as the initial value. This causes a rising edge at the
+     * start if and only if the condition starts true.
+     */
+    kFalse,
+    /**
+     * Indicates the binding should use true as the initial value. This causes a falling edge at the
+     * start if and only if the condition starts false.
+     */
+    kTrue,
+    /**
+     * Indicates the binding should use the trigger's condition as the initial value. This never
+     * causes an edge at the start. This is the default behavior.
+     */
+    kCondition,
+    /**
+     * Indicates the binding should use the negated trigger's condition as the initial value. This
+     * always causes an edge at the start. Rising or falling depends on if the condition starts true
+     * or false, respectively.
+     */
+    kNegCondition;
+  }
+
   /** Functional interface for the body of a trigger binding. */
   @FunctionalInterface
   private interface BindingBody {
@@ -62,14 +90,29 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
+   * Gets the initial state for a binding based on an initial state policy.
+   *
+   * @param initialState Initial state policy.
+   * @return The initial state to use.
+   */
+  private boolean getInitialState(InitialState initialState) {
+    return switch (initialState) {
+      case kFalse -> false;
+      case kTrue -> true;
+      case kCondition -> m_condition.getAsBoolean();
+      case kNegCondition -> !m_condition.getAsBoolean();
+    };
+  }
+
+  /**
    * Adds a binding to the EventLoop.
    *
    * @param body The body of the binding to add.
    */
-  private void addBinding(BindingBody body) {
+  private void addBinding(BindingBody body, InitialState initialState) {
     m_loop.bind(
         new Runnable() {
-          private boolean m_previous = m_condition.getAsBoolean();
+          private boolean m_previous = getInitialState(initialState);
 
           @Override
           public void run() {
@@ -83,54 +126,106 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Starts the command when the condition changes.
+   * Starts the command when the condition changes. The command is never started immediately.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
    */
   public Trigger onChange(Command command) {
+    return onChange(command, InitialState.kCondition);
+  }
+
+  /**
+   * Starts the command when the condition changes.
+   *
+   * @param command the command to start
+   * @param initialState the initial state to use, kCondition (no initial edge) by default
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger onChange(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "onChange");
     addBinding(
         (previous, current) -> {
           if (previous != current) {
             command.schedule();
           }
-        });
+        },
+        initialState);
     return this;
+  }
+
+  /**
+   * Starts the given command whenever the condition changes from `false` to `true`. The command is
+   * never started immediately.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger onTrue(Command command) {
+    return onTrue(command, InitialState.kCondition);
   }
 
   /**
    * Starts the given command whenever the condition changes from `false` to `true`.
    *
    * @param command the command to start
+   * @param initialState the initial state to use, kCondition (no initial edge) by default
    * @return this trigger, so calls can be chained
    */
-  public Trigger onTrue(Command command) {
+  public Trigger onTrue(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "onTrue");
     addBinding(
         (previous, current) -> {
           if (!previous && current) {
             command.schedule();
           }
-        });
+        },
+        initialState);
     return this;
+  }
+
+  /**
+   * Starts the given command whenever the condition changes from `true` to `false`. The command is
+   * never started immediately.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger onFalse(Command command) {
+    return onFalse(command, InitialState.kCondition);
   }
 
   /**
    * Starts the given command whenever the condition changes from `true` to `false`.
    *
    * @param command the command to start
+   * @param initialState the initial state to use, kCondition (no initial edge) by default
    * @return this trigger, so calls can be chained
    */
-  public Trigger onFalse(Command command) {
+  public Trigger onFalse(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "onFalse");
     addBinding(
         (previous, current) -> {
           if (previous && !current) {
             command.schedule();
           }
-        });
+        },
+        initialState);
     return this;
+  }
+
+  /**
+   * Starts the given command when the condition changes to `true` and cancels it when the condition
+   * changes to `false`. The command is never started immediately.
+   *
+   * <p>Doesn't re-start the command if it ends while the condition is still `true`. If the command
+   * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger whileTrue(Command command) {
+    return whileTrue(command, InitialState.kCondition);
   }
 
   /**
@@ -141,9 +236,10 @@ public class Trigger implements BooleanSupplier {
    * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
    *
    * @param command the command to start
+   * @param initialState the initial state to use, kCondition (no initial edge) by default
    * @return this trigger, so calls can be chained
    */
-  public Trigger whileTrue(Command command) {
+  public Trigger whileTrue(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "whileTrue");
     addBinding(
         (previous, current) -> {
@@ -152,8 +248,23 @@ public class Trigger implements BooleanSupplier {
           } else if (previous && !current) {
             command.cancel();
           }
-        });
+        },
+        initialState);
     return this;
+  }
+
+  /**
+   * Starts the given command when the condition changes to `false` and cancels it when the
+   * condition changes to `true`. The command is never started immediately.
+   *
+   * <p>Doesn't re-start the command if it ends while the condition is still `false`. If the command
+   * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger whileFalse(Command command) {
+    return whileFalse(command, InitialState.kCondition);
   }
 
   /**
@@ -164,9 +275,10 @@ public class Trigger implements BooleanSupplier {
    * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
    *
    * @param command the command to start
+   * @param initialState the initial state to use, kCondition (no initial edge) by default
    * @return this trigger, so calls can be chained
    */
-  public Trigger whileFalse(Command command) {
+  public Trigger whileFalse(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "whileFalse");
     addBinding(
         (previous, current) -> {
@@ -175,17 +287,30 @@ public class Trigger implements BooleanSupplier {
           } else if (!previous && current) {
             command.cancel();
           }
-        });
+        },
+        initialState);
     return this;
+  }
+
+  /**
+   * Toggles a command when the condition changes from `false` to `true`. The command is never
+   * toggled immediately.
+   *
+   * @param command the command to toggle
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger toggleOnTrue(Command command) {
+    return toggleOnTrue(command, InitialState.kCondition);
   }
 
   /**
    * Toggles a command when the condition changes from `false` to `true`.
    *
    * @param command the command to toggle
+   * @param initialState the initial state to use, kCondition (no initial edge) by default
    * @return this trigger, so calls can be chained
    */
-  public Trigger toggleOnTrue(Command command) {
+  public Trigger toggleOnTrue(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "toggleOnTrue");
     addBinding(
         (previous, current) -> {
@@ -196,17 +321,30 @@ public class Trigger implements BooleanSupplier {
               command.schedule();
             }
           }
-        });
+        },
+        initialState);
     return this;
+  }
+
+  /**
+   * Toggles a command when the condition changes from `true` to `false`. The command is never
+   * toggled immediately.
+   *
+   * @param command the command to toggle
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger toggleOnFalse(Command command) {
+    return toggleOnFalse(command, InitialState.kCondition);
   }
 
   /**
    * Toggles a command when the condition changes from `true` to `false`.
    *
    * @param command the command to toggle
+   * @param initialState the initial state to use, kCondition (no initial edge) by default
    * @return this trigger, so calls can be chained
    */
-  public Trigger toggleOnFalse(Command command) {
+  public Trigger toggleOnFalse(Command command, InitialState initialState) {
     requireNonNullParam(command, "command", "toggleOnFalse");
     addBinding(
         (previous, current) -> {
@@ -217,7 +355,8 @@ public class Trigger implements BooleanSupplier {
               command.schedule();
             }
           }
-        });
+        },
+        initialState);
     return this;
   }
 
