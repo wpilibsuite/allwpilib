@@ -360,7 +360,16 @@ class CommandScheduler final : public wpi::Sendable,
   void OnCommandInitialize(Action action);
 
   /**
-   * Adds an action to perform on the execution of any command by the scheduler.
+   * Adds an action to perform before the execution of any command by the
+   * scheduler.
+   *
+   * @param action the action to perform
+   */
+  void OnCommandBeforeExecute(Action action);
+
+  /**
+   * Adds an action to perform after the execution of any command by the
+   * scheduler.
    *
    * @param action the action to perform
    */
