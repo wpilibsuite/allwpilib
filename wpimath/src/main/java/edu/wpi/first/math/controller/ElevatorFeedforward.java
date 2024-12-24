@@ -160,9 +160,9 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    *
    * <p>Note this method is inaccurate when the velocity crosses 0.
    *
-   * @param currentVelocity The current velocity setpoint.
-   * @param nextVelocity The next velocity setpoint.
-   * @return The computed feedforward.
+   * @param currentVelocity The current velocity setpoint in meters per second.
+   * @param nextVelocity The next velocity setpoint in meters per second.
+   * @return The computed feedforward in volts.
    */
   public double calculateWithVelocities(double currentVelocity, double nextVelocity) {
     // See wpimath/algorithms.md#Elevator_feedforward for derivation
