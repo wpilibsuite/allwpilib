@@ -11,8 +11,8 @@
 #include <utility>
 
 #include <imgui.h>
-#include <wpi/SmallVector.h>
 #include <wpi/Signal.h>
+#include <wpi/SmallVector.h>
 #include <wpi/spinlock.h>
 
 namespace glass {
