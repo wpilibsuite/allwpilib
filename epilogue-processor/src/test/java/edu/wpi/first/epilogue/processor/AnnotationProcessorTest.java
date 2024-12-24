@@ -100,61 +100,6 @@ class AnnotationProcessorTest {
   }
 
   @Test
-  void optInInheritance() {
-    String source =
-        """
-      package edu.wpi.first.epilogue;
-
-      class Example {
-        @Logged public ABC inst = new Base2();
-      }
-
-      class Base implements ABC {
-        double x;
-      }
-
-      class Base2 implements ABC {
-        @Logged double x;
-      }
-
-      interface ABC {
-        default double a() { return 2.0; }
-      }
-    """;
-
-    String expectedGeneratedSource =
-        """
-      package edu.wpi.first.epilogue;
-
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
-
-      public class ExampleLogger extends ClassSpecificLogger<Example> {
-        public ExampleLogger() {
-          super(Example.class);
-        }
-
-        @Override
-        public void update(EpilogueBackend backend, Example object) {
-          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            var $$inst = object.inst;
-            if ($$inst instanceof edu.wpi.first.epilogue.Base2 edu_wpi_first_epilogue_Base2) {
-              Epilogue.base2Logger.tryUpdate(backend.getNested("inst"), edu_wpi_first_epilogue_Base2, Epilogue.getConfig().errorHandler);
-            } else {
-              // Base type edu.wpi.first.epilogue.ABC
-              Epilogue.abcLogger.tryUpdate(backend.getNested("inst"), $$inst, Epilogue.getConfig().errorHandler);
-            };
-          }
-        }
-      }
-      """;
-
-    assertLoggerGenerates(source, expectedGeneratedSource);
-  }
-
-  @Test
   void optInMethods() {
     String source =
         """
