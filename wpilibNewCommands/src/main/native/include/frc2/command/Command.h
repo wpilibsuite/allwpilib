@@ -496,6 +496,16 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
  protected:
   Command();
 
+  /**
+   * Throws an error if a parallel group already shares
+   * one or more requirements with a command
+   * that will be added to it.
+   *
+   * @param parallelGroup The parallel group command.
+   * @param toAdd The command that will be added to the parallel group.
+   */
+  void EnsureDisjointRequirements(Command* toAdd);
+
  private:
   /// Requirements set.
   wpi::SmallSet<Subsystem*, 4> m_requirements;
@@ -503,12 +513,4 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   std::optional<std::string> m_previousComposition;
 };
 
-/**
- * Checks if two commands have disjoint requirement sets.
- *
- * @param first The first command to check.
- * @param second The second command to check.
- * @return False if first and second share a requirement.
- */
-bool RequirementsDisjoint(Command* first, Command* second);
-}  // namespace frc2
+} // namespace frc2
