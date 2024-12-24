@@ -11,6 +11,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validation:
+    name: "Validation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v4
+
   wpiformat:
     name: "wpiformat"
     runs-on: ubuntu-22.04
@@ -51,6 +58,7 @@ jobs:
   tidy:
     name: "clang-tidy"
     runs-on: ubuntu-22.04
+    needs: [validation]
     container: wpilib/ubuntu-base:22.04
     steps:
       - uses: actions/checkout@v4
@@ -81,6 +89,7 @@ jobs:
   javaformat:
     name: "Java format"
     runs-on: ubuntu-22.04
+    needs: [validation]
     container: wpilib/ubuntu-base:22.04
     steps:
       - uses: actions/checkout@v4
@@ -114,6 +123,7 @@ jobs:
   documentation:
     name: "Documentation"
     runs-on: ubuntu-22.04
+    needs: [validation]
     steps:
       - uses: actions/checkout@v4
         with:
