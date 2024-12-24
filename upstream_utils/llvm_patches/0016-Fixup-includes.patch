@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:38:11 -0400
-Subject: [PATCH 16/36] Fixup includes
+Subject: [PATCH 16/37] Fixup includes
 
 ---
  llvm/include/llvm/Support/PointerLikeTypeTraits.h |  1 +
@@ -38,7 +38,7 @@ index d53462e742e61d3476915d5b2c5aa63772e78a8a..34054140489e4d536ace4650207c783d
  #include "llvm/Support/SwapByteOrder.h"
  #include <span>
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index c205eab6f5467e3f461a168a596e574e3876f77e..8c22a46cd0f1faa2becb0a686bf1b6fd5b1e46c9 100644
+index ea8d60426ead7163550b73e0fdc32cb11bb089cb..5f53ec03a1c1e91659143f12abec145b95627826 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -28,12 +28,11 @@
@@ -57,7 +57,7 @@ index c205eab6f5467e3f461a168a596e574e3876f77e..8c22a46cd0f1faa2becb0a686bf1b6fd
  #endif
  
  using namespace llvm;
-@@ -212,7 +211,7 @@ void LLVMResetFatalErrorHandler() {
+@@ -210,7 +209,7 @@ void LLVMResetFatalErrorHandler() {
  #ifdef _WIN32
  
  #define WIN32_NO_STATUS

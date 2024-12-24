@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:30:43 -0400
-Subject: [PATCH 23/36] OS-specific changes
+Subject: [PATCH 23/37] OS-specific changes
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 16 +++++++---------
  1 file changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index c699e64f2b5e3aab5465388c2b8a197c57273365..8fdbe1a0ceb5c9f270124f9fe78fb78e0fdb7a33 100644
+index 51cc3edaa7b128725912e51757cd0b443fe064ae..fcfb90a614a99e333f56f8380e63ff89dd1d684f 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -96,15 +96,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
@@ -28,7 +28,7 @@ index c699e64f2b5e3aab5465388c2b8a197c57273365..8fdbe1a0ceb5c9f270124f9fe78fb78e
  }
  
  void llvm::install_bad_alloc_error_handler(fatal_error_handler_t handler,
-@@ -144,9 +136,15 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+@@ -142,9 +134,15 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
    // an OOM to stderr and abort.
    const char *OOMMessage = "LLVM ERROR: out of memory\n";
    const char *Newline = "\n";

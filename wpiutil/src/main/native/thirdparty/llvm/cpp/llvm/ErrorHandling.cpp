@@ -94,9 +94,7 @@ void wpi::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
 
 void wpi::install_bad_alloc_error_handler(fatal_error_handler_t handler,
                                            void *user_data) {
-#if LLVM_ENABLE_THREADS == 1
   std::scoped_lock Lock(BadAllocErrorHandlerMutex);
-#endif
   assert(!BadAllocErrorHandler &&
          "Bad alloc error handler already registered!\n");
   BadAllocErrorHandler = handler;

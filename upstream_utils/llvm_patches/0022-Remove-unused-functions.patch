@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:16:51 -0400
-Subject: [PATCH 22/36] Remove unused functions
+Subject: [PATCH 22/37] Remove unused functions
 
 ---
  llvm/include/llvm/Support/raw_ostream.h |  5 +-
@@ -35,10 +35,10 @@ index 39a600c2ed7cd1cfecb46ff17929ffcb389207d7..9bb9260eecf35b0f71d144256fc956a8
    //===--------------------------------------------------------------------===//
    // Subclass Interface
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index f9f2c0047e0193f86ada6b4d9ae5b68445c6a593..c699e64f2b5e3aab5465388c2b8a197c57273365 100644
+index 9b292a51dbd59ad700da22d008a5bcac1c334b26..51cc3edaa7b128725912e51757cd0b443fe064ae 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -184,22 +184,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
+@@ -182,22 +182,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
  #endif
  }
  

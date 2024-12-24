@@ -203,7 +203,7 @@ inline uint64_t maxUIntN(uint64_t N) {
 
 /// Gets the minimum value for a N-bit signed integer.
 inline int64_t minIntN(int64_t N) {
-  assert(N <= 64 && "integer width out of range");
+  assert(N >= 0 && N <= 64 && "integer width out of range");
 
   if (N == 0)
     return 0;
@@ -216,7 +216,7 @@ inline int64_t minIntN(int64_t N) {
 
 /// Gets the maximum value for a N-bit signed integer.
 inline int64_t maxIntN(int64_t N) {
-  assert(N <= 64 && "integer width out of range");
+  assert(N >= 0 && N <= 64 && "integer width out of range");
 
   // This relies on two's complement wraparound when N == 64, so we convert to
   // int64_t only at the very end to avoid UB.
