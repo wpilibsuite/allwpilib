@@ -23,7 +23,6 @@ public class VisionRunner<P extends VisionPipeline> {
   private final CvSink m_cvSink = new CvSink("VisionRunner CvSink");
   private final P m_pipeline;
   private final Mat m_image = new Mat();
-  private long m_lastFrameTime = 0;
   private final Listener<? super P> m_listener;
   private volatile boolean m_enabled = true;
 
@@ -82,7 +81,7 @@ public class VisionRunner<P extends VisionPipeline> {
   }
 
   private void runOnceInternal() {
-    long frameTime = m_cvSink.grabFrame(m_image, m_lastFrameTime);
+    long frameTime = m_cvSink.grabFrame(m_image);
     if (frameTime == 0) {
       // There was an error, report it
       String error = m_cvSink.getError();
@@ -91,8 +90,6 @@ public class VisionRunner<P extends VisionPipeline> {
       // No errors, process the image
       m_pipeline.process(m_image);
       m_listener.copyPipelineOutputs(m_pipeline);
-
-      m_lastFrameTime = frameTime;
     }
   }
 

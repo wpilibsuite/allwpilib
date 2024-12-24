@@ -91,24 +91,17 @@ class Robot : public frc::TimedRobot {
         nt::NetworkTableInstance::GetDefault().GetTable("apriltags");
     auto pubTags = tagsTable->GetIntegerArrayTopic("tags").Publish();
 
-    // Keep track of the timestamp of the last frame we processed. This lets us
-    // ask CSCore for the next image we haven't yet seen
-    uint64_t lastFrameTime{0};
-
     while (true) {
       // Tell the CvSink to grab a frame from the camera and
       // put it in the source mat.  If there is an error notify the
       // output.
-      auto frameTime = cvSink.GrabFrame(mat, lastFrameTime = lastFrameTime);
+      auto frameTime = cvSink.GrabFrame(mat);
       if (frameTime == 0) {
         // Send the output the error.
         outputStream.NotifyError(cvSink.GetError());
         // skip the rest of the current iteration
         continue;
       }
-
-      // Write the frame time down for next loop
-      lastFrameTime = frameTime;
 
       cv::cvtColor(mat, grayMat, cv::COLOR_BGR2GRAY);
 
