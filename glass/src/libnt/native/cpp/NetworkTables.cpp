@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <cinttypes>
-#include <concepts>
 #include <cstring>
 #include <functional>
 #include <initializer_list>
@@ -631,33 +630,40 @@ static void UpdateJsonValueSource(NetworkTablesModel& model,
   }
 }
 
-template <typename T>
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
-    std::string_view name, T value, int64_t time) {
+    std::string_view name, bool value, int64_t time) {
   valueChildren.clear();
-  if constexpr (std::same_as<T, bool>) {
-    if (!source || source->GetKind() != DataSource::kBoolean) {
-      source = std::make_unique<BooleanSource>(fmt::format("NT:{}", name));
-    }
-    static_cast<BooleanSource*>(source.get())->SetValue(value, time);
-  } else if constexpr (std::same_as<T, double>) {
-    if (!source || source->GetKind() != DataSource::kDouble) {
-      source = std::make_unique<DoubleSource>(fmt::format("NT:{}", name));
-    }
-    static_cast<DoubleSource*>(source.get())->SetValue(value, time);
-  } else if constexpr (std::same_as<T, float>) {
-    if (!source || source->GetKind() != DataSource::kFloat) {
-      source = std::make_unique<FloatSource>(fmt::format("NT:{}", name));
-    }
-    static_cast<FloatSource*>(source.get())->SetValue(value, time);
-  } else if constexpr (std::same_as<T, int64_t>) {
-    if (!source || source->GetKind() != DataSource::kInteger) {
-      source = std::make_unique<IntegerSource>(fmt::format("NT:{}", name));
-    }
-    static_cast<IntegerSource*>(source.get())->SetValue(value, time);
-  } else {
-    static_assert(false, "Unknown type");
+  if (!source || source->GetKind() != DataSource::kBoolean) {
+    source = std::make_unique<BooleanSource>(fmt::format("NT:{}", name));
   }
+  static_cast<BooleanSource*>(source.get())->SetValue(value, time);
+}
+
+void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
+    std::string_view name, float value, int64_t time) {
+  valueChildren.clear();
+  if (!source || source->GetKind() != DataSource::kFloat) {
+    source = std::make_unique<FloatSource>(fmt::format("NT:{}", name));
+  }
+  static_cast<FloatSource*>(source.get())->SetValue(value, time);
+}
+
+void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
+    std::string_view name, double value, int64_t time) {
+  valueChildren.clear();
+  if (!source || source->GetKind() != DataSource::kDouble) {
+    source = std::make_unique<DoubleSource>(fmt::format("NT:{}", name));
+  }
+  static_cast<DoubleSource*>(source.get())->SetValue(value, time);
+}
+
+void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
+    std::string_view name, int64_t value, int64_t time) {
+  valueChildren.clear();
+  if (!source || source->GetKind() != DataSource::kInteger) {
+    source = std::make_unique<IntegerSource>(fmt::format("NT:{}", name));
+  }
+  static_cast<IntegerSource*>(source.get())->SetValue(value, time);
 }
 
 template <bool IsBoolean, typename T, typename MakeValue>

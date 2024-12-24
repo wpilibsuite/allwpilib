@@ -4,6 +4,8 @@
 
 #include "glass/DataSource.h"
 
+#include <string>
+
 #include <fmt/format.h>
 
 #include "glass/ContextInternal.h"

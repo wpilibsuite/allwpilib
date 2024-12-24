@@ -58,8 +58,12 @@ class NetworkTablesModel : public Model {
     bool valueChildrenMap = false;
 
    private:
-    template <typename T>
-    void UpdateDiscreteSource(std::string_view name, T value, int64_t time);
+    void UpdateDiscreteSource(std::string_view name, bool value, int64_t time);
+    void UpdateDiscreteSource(std::string_view name, float value, int64_t time);
+    void UpdateDiscreteSource(std::string_view name, double value,
+                              int64_t time);
+    void UpdateDiscreteSource(std::string_view name, int64_t value,
+                              int64_t time);
 
     template <bool IsBoolean, typename T, typename MakeValue>
     void UpdateDiscreteArray(std::string_view name, std::span<const T> arr,
