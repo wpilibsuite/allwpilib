@@ -29,18 +29,16 @@ class NotifierCommandTest extends CommandTestBase {
   @Test
   @ResourceLock("timing")
   void notifierCommandScheduleTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger(0);
+    AtomicInteger counter = new AtomicInteger(0);
 
-      NotifierCommand command = new NotifierCommand(counter::incrementAndGet, 0.01);
+    NotifierCommand command = new NotifierCommand(counter::incrementAndGet, 0.01);
 
-      scheduler.schedule(command);
-      for (int i = 0; i < 5; ++i) {
-        SimHooks.stepTiming(0.005);
-      }
-      scheduler.cancel(command);
-
-      assertEquals(2, counter.get());
+    scheduler.schedule(command);
+    for (int i = 0; i < 5; ++i) {
+      SimHooks.stepTiming(0.005);
     }
+    scheduler.cancel(command);
+
+    assertEquals(2, counter.get());
   }
 }

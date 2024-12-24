@@ -14,8 +14,6 @@ class WaitCommandTest : public CommandTestBase {};
 TEST_F(WaitCommandTest, WaitCommandSchedule) {
   frc::sim::PauseTiming();
 
-  CommandScheduler scheduler = GetScheduler();
-
   WaitCommand command(100_ms);
 
   scheduler.Schedule(&command);

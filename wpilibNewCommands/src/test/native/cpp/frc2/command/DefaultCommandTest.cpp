@@ -11,8 +11,6 @@ using namespace frc2;
 class DefaultCommandTest : public CommandTestBase {};
 
 TEST_F(DefaultCommandTest, DefaultCommandSchedule) {
-  CommandScheduler scheduler = GetScheduler();
-
   TestSubsystem subsystem;
 
   RunCommand command1([] {}, {&subsystem});
@@ -25,8 +23,6 @@ TEST_F(DefaultCommandTest, DefaultCommandSchedule) {
 }
 
 TEST_F(DefaultCommandTest, DefaultCommandInterruptResume) {
-  CommandScheduler scheduler = GetScheduler();
-
   TestSubsystem subsystem;
 
   RunCommand command1([] {}, {&subsystem});

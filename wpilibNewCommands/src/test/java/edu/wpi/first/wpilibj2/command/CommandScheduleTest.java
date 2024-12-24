@@ -18,111 +18,100 @@ import org.junit.jupiter.api.Test;
 class CommandScheduleTest extends CommandTestBase {
   @Test
   void instantScheduleTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder holder = new MockCommandHolder(true);
-      holder.setFinished(true);
-      Command mockCommand = holder.getMock();
+    MockCommandHolder holder = new MockCommandHolder(true);
+    holder.setFinished(true);
+    Command mockCommand = holder.getMock();
 
-      scheduler.schedule(mockCommand);
-      assertTrue(scheduler.isScheduled(mockCommand));
-      verify(mockCommand).initialize();
+    scheduler.schedule(mockCommand);
+    assertTrue(scheduler.isScheduled(mockCommand));
+    verify(mockCommand).initialize();
 
-      scheduler.run();
+    scheduler.run();
 
-      verify(mockCommand).execute();
-      verify(mockCommand).end(false);
+    verify(mockCommand).execute();
+    verify(mockCommand).end(false);
 
-      assertFalse(scheduler.isScheduled(mockCommand));
-    }
+    assertFalse(scheduler.isScheduled(mockCommand));
   }
 
   @Test
   void singleIterationScheduleTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder holder = new MockCommandHolder(true);
-      Command mockCommand = holder.getMock();
+    MockCommandHolder holder = new MockCommandHolder(true);
+    Command mockCommand = holder.getMock();
 
-      scheduler.schedule(mockCommand);
+    scheduler.schedule(mockCommand);
 
-      assertTrue(scheduler.isScheduled(mockCommand));
+    assertTrue(scheduler.isScheduled(mockCommand));
 
-      scheduler.run();
-      holder.setFinished(true);
-      scheduler.run();
+    scheduler.run();
+    holder.setFinished(true);
+    scheduler.run();
 
-      verify(mockCommand).initialize();
-      verify(mockCommand, times(2)).execute();
-      verify(mockCommand).end(false);
+    verify(mockCommand).initialize();
+    verify(mockCommand, times(2)).execute();
+    verify(mockCommand).end(false);
 
-      assertFalse(scheduler.isScheduled(mockCommand));
-    }
+    assertFalse(scheduler.isScheduled(mockCommand));
   }
 
   @Test
   void multiScheduleTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder command1Holder = new MockCommandHolder(true);
-      Command command1 = command1Holder.getMock();
-      MockCommandHolder command2Holder = new MockCommandHolder(true);
-      Command command2 = command2Holder.getMock();
-      MockCommandHolder command3Holder = new MockCommandHolder(true);
-      Command command3 = command3Holder.getMock();
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
+    Command command2 = command2Holder.getMock();
+    MockCommandHolder command3Holder = new MockCommandHolder(true);
+    Command command3 = command3Holder.getMock();
 
-      scheduler.schedule(command1, command2, command3);
-      assertTrue(scheduler.isScheduled(command1, command2, command3));
-      scheduler.run();
-      assertTrue(scheduler.isScheduled(command1, command2, command3));
+    scheduler.schedule(command1, command2, command3);
+    assertTrue(scheduler.isScheduled(command1, command2, command3));
+    scheduler.run();
+    assertTrue(scheduler.isScheduled(command1, command2, command3));
 
-      command1Holder.setFinished(true);
-      scheduler.run();
-      assertTrue(scheduler.isScheduled(command2, command3));
-      assertFalse(scheduler.isScheduled(command1));
+    command1Holder.setFinished(true);
+    scheduler.run();
+    assertTrue(scheduler.isScheduled(command2, command3));
+    assertFalse(scheduler.isScheduled(command1));
 
-      command2Holder.setFinished(true);
-      scheduler.run();
-      assertTrue(scheduler.isScheduled(command3));
-      assertFalse(scheduler.isScheduled(command1, command2));
+    command2Holder.setFinished(true);
+    scheduler.run();
+    assertTrue(scheduler.isScheduled(command3));
+    assertFalse(scheduler.isScheduled(command1, command2));
 
-      command3Holder.setFinished(true);
-      scheduler.run();
-      assertFalse(scheduler.isScheduled(command1, command2, command3));
-    }
+    command3Holder.setFinished(true);
+    scheduler.run();
+    assertFalse(scheduler.isScheduled(command1, command2, command3));
   }
 
   @Test
   void schedulerCancelTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder holder = new MockCommandHolder(true);
-      Command mockCommand = holder.getMock();
+    MockCommandHolder holder = new MockCommandHolder(true);
+    Command mockCommand = holder.getMock();
 
-      scheduler.schedule(mockCommand);
+    scheduler.schedule(mockCommand);
 
-      scheduler.run();
-      scheduler.cancel(mockCommand);
-      scheduler.run();
+    scheduler.run();
+    scheduler.cancel(mockCommand);
+    scheduler.run();
 
-      verify(mockCommand).execute();
-      verify(mockCommand).end(true);
-      verify(mockCommand, never()).end(false);
+    verify(mockCommand).execute();
+    verify(mockCommand).end(true);
+    verify(mockCommand, never()).end(false);
 
-      assertFalse(scheduler.isScheduled(mockCommand));
-    }
+    assertFalse(scheduler.isScheduled(mockCommand));
   }
 
   @Test
   void notScheduledCancelTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder holder = new MockCommandHolder(true);
-      Command mockCommand = holder.getMock();
+    MockCommandHolder holder = new MockCommandHolder(true);
+    Command mockCommand = holder.getMock();
 
-      assertDoesNotThrow(() -> scheduler.cancel(mockCommand));
-    }
+    assertDoesNotThrow(() -> scheduler.cancel(mockCommand));
   }
 
   @Test
   void smartDashboardCancelTest() {
-    try (CommandScheduler scheduler = new CommandScheduler();
-        var inst = NetworkTableInstance.create()) {
+    try (var inst = NetworkTableInstance.create()) {
       SmartDashboard.setNetworkTableInstance(inst);
       SmartDashboard.putData("Scheduler", scheduler);
       SmartDashboard.updateValues();
