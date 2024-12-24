@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:37:34 -0400
-Subject: [PATCH 06/36] Explicitly use std::
+Subject: [PATCH 06/37] Explicitly use std::
 
 ---
  llvm/include/llvm/ADT/SmallSet.h       |  2 +-
@@ -24,10 +24,10 @@ index aeee5f97799aea7e7588d7afba1e47b4fa3d8c7b..4969dfb0d61c2fad805c9cb7bc0184ea
  
  /// Inequality comparison for SmallSet.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 637b669a7d0dae69ef4b34955f21a9fb8ba1276e..0b87b375de67dc18647e3ebe646bf323dd05e8c5 100644
+index 89829dc4faff0b2667ded462444e0eaeec53fd01..ea8d60426ead7163550b73e0fdc32cb11bb089cb 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -213,7 +213,7 @@ void LLVMResetFatalErrorHandler() {
+@@ -249,7 +249,7 @@ std::error_code llvm::mapLastWindowsError() {
  // I'd rather not double the line count of the following.
  #define MAP_ERR_TO_COND(x, y)                                                  \
    case x:                                                                      \
@@ -37,10 +37,10 @@ index 637b669a7d0dae69ef4b34955f21a9fb8ba1276e..0b87b375de67dc18647e3ebe646bf323
  std::error_code llvm::mapWindowsError(unsigned EV) {
    switch (EV) {
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index 7ed8670fd31ea2a14e6ba7f59a8ac8e35046890c..531f81ab5b3fc1dcff731230f3cb7649cb90aedf 100644
+index a39b11b9f82156a78b9ad7ce7b8c28855829e611..a6c2b329f072639706aa221feb8c08e33533f813 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-@@ -298,7 +298,7 @@ TEST(SmallPtrSetTest, dereferenceAndIterate) {
+@@ -259,7 +259,7 @@ TEST(SmallPtrSetTest, dereferenceAndIterate) {
  
    // Sort.  We should hit the first element just once and the final element N
    // times.

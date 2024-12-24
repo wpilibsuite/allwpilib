@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:16:51 -0400
-Subject: [PATCH 21/36] Remove unused functions
+Subject: [PATCH 22/37] Remove unused functions
 
 ---
  llvm/include/llvm/Support/raw_ostream.h |  5 +-
@@ -11,18 +11,18 @@ Subject: [PATCH 21/36] Remove unused functions
  4 files changed, 23 insertions(+), 126 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index d56999186f719f8d91f3a047a19960caf62a066c..9a9a1f688313a5784a58a70f2cb4cc0d6ec70e79 100644
+index 39a600c2ed7cd1cfecb46ff17929ffcb389207d7..9bb9260eecf35b0f71d144256fc956a80b2da8a3 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -70,7 +70,6 @@ private:
+@@ -71,7 +71,6 @@ private:
    /// for a \see write_impl() call to handle the data which has been put into
    /// this buffer.
    char *OutBufStart, *OutBufEnd, *OutBufCur;
 -  bool ColorEnabled = false;
  
-   /// Optional stream this stream is tied to. If this stream is written to, the
-   /// tied-to stream will be flushed first.
-@@ -317,9 +316,9 @@ public:
+   enum class BufferKind {
+     Unbuffered = 0,
+@@ -330,9 +329,9 @@ public:
  
    // Enable or disable colors. Once enable_colors(false) is called,
    // changeColor() has no effect until enable_colors(true) is called.
@@ -32,13 +32,13 @@ index d56999186f719f8d91f3a047a19960caf62a066c..9a9a1f688313a5784a58a70f2cb4cc0d
 -  bool colors_enabled() const { return ColorEnabled; }
 +  bool colors_enabled() const { return false; }
  
-   /// Tie this stream to the specified stream. Replaces any existing tied-to
-   /// stream. Specifying a nullptr unties the stream.
+   //===--------------------------------------------------------------------===//
+   // Subclass Interface
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 4d992442d153d088f6a7a1fc13e3c84012c45a06..e19a38256ce714359b85076cf49056f379764d8d 100644
+index 9b292a51dbd59ad700da22d008a5bcac1c334b26..51cc3edaa7b128725912e51757cd0b443fe064ae 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -181,22 +181,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
+@@ -182,22 +182,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
  #endif
  }
  
@@ -60,9 +60,9 @@ index 4d992442d153d088f6a7a1fc13e3c84012c45a06..e19a38256ce714359b85076cf49056f3
 -
  #ifdef _WIN32
  
- #include <winerror.h>
+ #define WIN32_NO_STATUS
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 9ea41cad8fed864b53e2e463450c066fb4e00131..44149e85876f089756dcce151670a6060eadfee1 100644
+index 6ed93793a64c523102626d581656d2f9509f7d5d..7e9a58db056e315cdcec22af0439017dee737c8f 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -176,16 +176,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
@@ -82,7 +82,7 @@ index 9ea41cad8fed864b53e2e463450c066fb4e00131..44149e85876f089756dcce151670a606
  void raw_ostream::flush_nonempty() {
    assert(OutBufCur > OutBufStart && "Invalid call to flush_nonempty.");
    size_t Length = OutBufCur - OutBufStart;
-@@ -328,15 +318,22 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+@@ -322,15 +312,22 @@ static int getFD(std::string_view Filename, std::error_code &EC,
    if (Filename == "-") {
      EC = std::error_code();
      // Change stdout's text/binary mode based on the Flags.
@@ -110,7 +110,7 @@ index 9ea41cad8fed864b53e2e463450c066fb4e00131..44149e85876f089756dcce151670a606
    if (EC)
      return -1;
  
-@@ -396,12 +393,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+@@ -390,12 +387,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
  
    // Get the starting position.
    off_t loc = ::lseek(FD, 0, SEEK_CUR);
@@ -124,7 +124,7 @@ index 9ea41cad8fed864b53e2e463450c066fb4e00131..44149e85876f089756dcce151670a606
  #else
    SupportsSeeking = !EC && loc != (off_t)-1;
  #endif
-@@ -414,10 +407,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+@@ -408,10 +401,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
  raw_fd_ostream::~raw_fd_ostream() {
    if (FD >= 0) {
      flush();
@@ -137,7 +137,7 @@ index 9ea41cad8fed864b53e2e463450c066fb4e00131..44149e85876f089756dcce151670a606
    }
  
  #ifdef __MINGW32__
-@@ -512,7 +503,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+@@ -509,7 +500,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
  
    do {
      size_t ChunkSize = std::min(Size, MaxWriteSize);
@@ -149,7 +149,7 @@ index 9ea41cad8fed864b53e2e463450c066fb4e00131..44149e85876f089756dcce151670a606
  
      if (ret < 0) {
        // If it's a recoverable error, swallow it and retry the write.
-@@ -555,8 +550,8 @@ void raw_fd_ostream::close() {
+@@ -552,8 +547,8 @@ void raw_fd_ostream::close() {
    assert(ShouldClose);
    ShouldClose = false;
    flush();

@@ -1,36 +1,35 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:09:18 -0400
-Subject: [PATCH 01/36] Remove StringRef, ArrayRef, and Optional
+Subject: [PATCH 01/37] Remove StringRef, ArrayRef, and Optional
 
 ---
  llvm/include/llvm/ADT/PointerUnion.h          |   1 -
  llvm/include/llvm/ADT/SmallSet.h              |   2 +-
- llvm/include/llvm/ADT/SmallString.h           | 103 ++++++++++--------
+ llvm/include/llvm/ADT/SmallString.h           | 101 ++++++++++--------
  llvm/include/llvm/ADT/SmallVector.h           |   7 +-
  llvm/include/llvm/Support/Chrono.h            |  10 +-
  llvm/include/llvm/Support/Compiler.h          |   2 +-
  llvm/include/llvm/Support/ConvertUTF.h        |  31 +++---
  llvm/include/llvm/Support/ErrorHandling.h     |   9 +-
  .../llvm/Support/SmallVectorMemoryBuffer.h    |   6 +-
- llvm/include/llvm/Support/VersionTuple.h      |   6 -
+ llvm/include/llvm/Support/VersionTuple.h      |   6 --
  .../llvm/Support/Windows/WindowsSupport.h     |   4 +-
- llvm/include/llvm/Support/raw_ostream.h       |  46 +++++---
- llvm/include/llvm/Support/xxhash.h            |  16 +--
+ llvm/include/llvm/Support/raw_ostream.h       |  46 ++++----
+ llvm/include/llvm/Support/xxhash.h            |  18 ++--
  llvm/lib/Support/ConvertUTFWrapper.cpp        |  38 +++----
- llvm/lib/Support/ErrorHandling.cpp            |  13 +--
+ llvm/lib/Support/ErrorHandling.cpp            |  13 ++-
  llvm/lib/Support/SmallVector.cpp              |   5 +-
- llvm/lib/Support/raw_ostream.cpp              |  25 ++---
- llvm/lib/Support/xxhash.cpp                   |  10 +-
+ llvm/lib/Support/raw_ostream.cpp              |  25 +++--
+ llvm/lib/Support/xxhash.cpp                   |  12 +--
  llvm/unittests/ADT/DenseMapTest.cpp           |  29 +----
- llvm/unittests/ADT/FunctionExtrasTest.cpp     |  12 +-
- llvm/unittests/ADT/HashingTest.cpp            |   2 +-
+ llvm/unittests/ADT/FunctionExtrasTest.cpp     |  12 +--
  llvm/unittests/ADT/SmallPtrSetTest.cpp        |   1 -
  llvm/unittests/ADT/SmallStringTest.cpp        |  50 ++++-----
- llvm/unittests/ADT/SmallVectorTest.cpp        |  30 +----
+ llvm/unittests/ADT/SmallVectorTest.cpp        |  30 ++----
  llvm/unittests/Support/ConvertUTFTest.cpp     |  41 ++++---
- llvm/unittests/Support/xxhashTest.cpp         |   4 +-
- 26 files changed, 232 insertions(+), 271 deletions(-)
+ llvm/unittests/Support/xxhashTest.cpp         |   6 +-
+ 25 files changed, 232 insertions(+), 273 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
 index 7d4ed02b622626bb8043acb57b8ce7ed97a5f949..8ac68dbc0a791b8ac0e0ca865e69024cb642aa70 100644
@@ -63,7 +62,7 @@ index a16e8ac6f07552d98250e808190b00ee270f12b3..aeee5f97799aea7e7588d7afba1e47b4
  #include <type_traits>
  #include <utility>
 diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
-index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413b0e36e0f 100644
+index be3193c6ef9beba622f39e3e76cd0f0c6dd422b0..9fab1a7726bc6745296f5ebb24aee4055408e5f5 100644
 --- a/llvm/include/llvm/ADT/SmallString.h
 +++ b/llvm/include/llvm/ADT/SmallString.h
 @@ -15,8 +15,9 @@
@@ -137,14 +136,12 @@ index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413
        std::copy(Ref.begin(), Ref.end(), this->begin() + CurrentSize);
        CurrentSize += Ref.size();
      }
-@@ -89,26 +90,30 @@ public:
+@@ -89,26 +90,28 @@ public:
  
    /// Check for string equality.  This is more efficient than compare() when
    /// the relative ordering of inequal strings isn't needed.
--  [[nodiscard]] bool equals(StringRef RHS) const { return str().equals(RHS); }
-+  [[nodiscard]] bool equals(std::string_view RHS) const {
-+    return str().equals(RHS);
-+  }
+-  [[nodiscard]] bool equals(StringRef RHS) const { return str() == RHS; }
++  [[nodiscard]] bool equals(std::string_view RHS) const { return str() == RHS; }
  
    /// Check for string equality, ignoring case.
 -  [[nodiscard]] bool equals_insensitive(StringRef RHS) const {
@@ -173,7 +170,7 @@ index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413
      return str().compare_numeric(RHS);
    }
  
-@@ -116,14 +121,14 @@ public:
+@@ -116,14 +119,14 @@ public:
    /// @name String Predicates
    /// @{
  
@@ -194,7 +191,7 @@ index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413
    }
  
    /// @}
-@@ -142,7 +147,7 @@ public:
+@@ -142,7 +145,7 @@ public:
    ///
    /// \returns The index of the first occurrence of \p Str, or npos if not
    /// found.
@@ -203,7 +200,7 @@ index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413
      return str().find(Str, From);
    }
  
-@@ -150,7 +155,8 @@ public:
+@@ -150,7 +153,8 @@ public:
    ///
    /// \returns The index of the last occurrence of \p C, or npos if not
    /// found.
@@ -213,7 +210,7 @@ index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413
      return str().rfind(C, From);
    }
  
-@@ -158,7 +164,9 @@ public:
+@@ -158,7 +162,9 @@ public:
    ///
    /// \returns The index of the last occurrence of \p Str, or npos if not
    /// found.
@@ -224,7 +221,7 @@ index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413
  
    /// Find the first character in the string that is \p C, or npos if not
    /// found. Same as find.
-@@ -170,7 +178,8 @@ public:
+@@ -170,7 +176,8 @@ public:
    /// not found.
    ///
    /// Complexity: O(size() + Chars.size())
@@ -234,7 +231,7 @@ index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413
      return str().find_first_of(Chars, From);
    }
  
-@@ -184,15 +193,15 @@ public:
+@@ -184,15 +191,15 @@ public:
    /// \p Chars, or npos if not found.
    ///
    /// Complexity: O(size() + Chars.size())
@@ -253,7 +250,7 @@ index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413
      return str().find_last_of(C, From);
    }
  
-@@ -200,8 +209,8 @@ public:
+@@ -200,8 +207,8 @@ public:
    /// found.
    ///
    /// Complexity: O(size() + Chars.size())
@@ -264,7 +261,7 @@ index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413
      return str().find_last_of(Chars, From);
    }
  
-@@ -214,7 +223,9 @@ public:
+@@ -214,7 +221,9 @@ public:
  
    /// Return the number of non-overlapped occurrences of \p Str in the
    /// string.
@@ -275,7 +272,7 @@ index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413
  
    /// @}
    /// @name Substring Operations
-@@ -229,8 +240,8 @@ public:
+@@ -229,8 +238,8 @@ public:
    /// \param N The number of characters to included in the substring. If \p N
    /// exceeds the number of characters remaining in the string, the string
    /// suffix (starting with \p Start) will be returned.
@@ -286,7 +283,7 @@ index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413
      return str().substr(Start, N);
    }
  
-@@ -244,15 +255,15 @@ public:
+@@ -244,15 +253,15 @@ public:
    /// substring. If this is npos, or less than \p Start, or exceeds the
    /// number of characters remaining in the string, the string suffix
    /// (starting with \p Start) will be returned.
@@ -306,7 +303,7 @@ index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413
    }
  
    // TODO: Make this const, if it's safe...
-@@ -262,20 +273,20 @@ public:
+@@ -262,20 +271,20 @@ public:
      return this->data();
    }
  
@@ -332,10 +329,10 @@ index a5b9eec50c8257348743f1e32ebd9a9dabd53b25..45fbf13a43a081731186b0f41c553413
      return *this;
    }
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 09676d792dfebd88e5c8eace666b3ab0044a962e..c96fd0e4956ee6d586f85dc79623de137e781ce0 100644
+index 17444147b102a9636fe4f0f48cfb647aaaf3ed6b..94d8da059f4f8bad50039b0d0b7993396707829c 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -27,13 +27,12 @@
+@@ -28,13 +28,12 @@
  #include <limits>
  #include <memory>
  #include <new>
@@ -350,7 +347,7 @@ index 09676d792dfebd88e5c8eace666b3ab0044a962e..c96fd0e4956ee6d586f85dc79623de13
  template <typename IteratorT> class iterator_range;
  
  template <class Iterator>
-@@ -127,7 +126,7 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
+@@ -128,7 +127,7 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
  };
  
  /// This is the part of SmallVectorTemplateBase which does not depend on whether
@@ -359,7 +356,7 @@ index 09676d792dfebd88e5c8eace666b3ab0044a962e..c96fd0e4956ee6d586f85dc79623de13
  /// to avoid unnecessarily requiring T to be complete.
  template <typename T, typename = void>
  class SmallVectorTemplateCommon
-@@ -1242,7 +1241,7 @@ public:
+@@ -1243,7 +1242,7 @@ public:
  
    template <typename U,
              typename = std::enable_if_t<std::is_convertible<U, T>::value>>
@@ -412,10 +409,10 @@ index 71859af7c7e4a595140475daf356744f52d14d24..9c9ba7002310eba5113c14957f769702
      bool show_unit = consumeShowUnit(Style);
  
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index 8c315d255bb772d9e3c100adbd2c07b61283219b..6789f0413d8dc94cb465b6e66506b036449ee186 100644
+index d8e3794babc7449b436fa1d0bd858dab5198664b..7710bd9a08148289b5ba3b1f2dae5cccc4f26d4d 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
-@@ -319,7 +319,7 @@
+@@ -327,7 +327,7 @@
  #endif
  
  /// LLVM_GSL_POINTER - Apply this to non-owning classes like
@@ -639,7 +636,7 @@ index d3aacd14b2097b1e7e13c1003987c1fd52e0cf76..aabdb2f14668a990329b57f5454a0d7d
  
  template <typename HandleTraits>
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 42663a9adf2e51ae36209faf7d465094adbf0943..9345348d9ba555022b31f94299684316ffa15939 100644
+index df9ee2e5a78586d2a2e0eb6e0698953169f7bc58..18bdf4b7d3b96d42d93ca1e4800233b34be42a78 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -14,13 +14,12 @@
@@ -657,7 +654,7 @@ index 42663a9adf2e51ae36209faf7d465094adbf0943..9345348d9ba555022b31f94299684316
  #include <string>
  #include <string_view>
  #include <system_error>
-@@ -208,7 +207,22 @@ public:
+@@ -221,7 +220,22 @@ public:
      return *this;
    }
  
@@ -681,7 +678,7 @@ index 42663a9adf2e51ae36209faf7d465094adbf0943..9345348d9ba555022b31f94299684316
      // Inline fast path, particularly for strings with a known length.
      size_t Size = Str.size();
  
-@@ -241,7 +255,7 @@ public:
+@@ -254,7 +268,7 @@ public:
      // Inline fast path, particularly for constant strings where a sufficiently
      // smart compiler will simplify strlen.
  
@@ -690,7 +687,7 @@ index 42663a9adf2e51ae36209faf7d465094adbf0943..9345348d9ba555022b31f94299684316
    }
  
    raw_ostream &operator<<(const std::string &Str) {
-@@ -249,10 +263,6 @@ public:
+@@ -262,10 +276,6 @@ public:
      return write(Str.data(), Str.length());
    }
  
@@ -701,7 +698,7 @@ index 42663a9adf2e51ae36209faf7d465094adbf0943..9345348d9ba555022b31f94299684316
    raw_ostream &operator<<(const SmallVectorImpl<char> &Str) {
      return write(Str.data(), Str.size());
    }
-@@ -285,7 +295,7 @@ public:
+@@ -298,7 +308,7 @@ public:
  
    /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
    /// satisfy llvm::isPrint into an escape sequence.
@@ -710,7 +707,7 @@ index 42663a9adf2e51ae36209faf7d465094adbf0943..9345348d9ba555022b31f94299684316
  
    raw_ostream &write(unsigned char C);
    raw_ostream &write(const char *Ptr, size_t Size);
-@@ -501,14 +511,14 @@ public:
+@@ -511,14 +521,14 @@ public:
    /// As a special case, if Filename is "-", then the stream will use
    /// STDOUT_FILENO instead of opening a file. This will not close the stdout
    /// descriptor.
@@ -730,7 +727,7 @@ index 42663a9adf2e51ae36209faf7d465094adbf0943..9345348d9ba555022b31f94299684316
                   sys::fs::CreationDisposition Disp, sys::fs::FileAccess Access,
                   sys::fs::OpenFlags Flags);
  
-@@ -613,7 +623,7 @@ public:
+@@ -630,7 +640,7 @@ public:
    /// Open the specified file for reading/writing/seeking. If an error occurs,
    /// information about the error is put into EC, and the stream should be
    /// immediately destroyed.
@@ -739,7 +736,7 @@ index 42663a9adf2e51ae36209faf7d465094adbf0943..9345348d9ba555022b31f94299684316
  
    raw_fd_stream(int fd, bool shouldClose);
  
-@@ -695,8 +705,8 @@ public:
+@@ -716,8 +726,8 @@ public:
  
    void flush() = delete;
  
@@ -747,10 +744,10 @@ index 42663a9adf2e51ae36209faf7d465094adbf0943..9345348d9ba555022b31f94299684316
 -  StringRef str() const { return StringRef(OS.data(), OS.size()); }
 +  /// Return a std::string_view for the vector contents.
 +  std::string_view str() const { return std::string_view(OS.data(), OS.size()); }
+   SmallVectorImpl<char> &buffer() { return OS; }
  
    void reserveExtraSpace(uint64_t ExtraSize) override {
-     OS.reserve(tell() + ExtraSize);
-@@ -753,7 +763,7 @@ class Error;
+@@ -777,7 +787,7 @@ class Error;
  /// for other names. For raw_fd_ostream instances, the stream writes to
  /// a temporary file. The final output file is atomically replaced with the
  /// temporary file after the \p Write function is finished.
@@ -760,10 +757,10 @@ index 42663a9adf2e51ae36209faf7d465094adbf0943..9345348d9ba555022b31f94299684316
  
  raw_ostream &operator<<(raw_ostream &OS, std::nullopt_t);
 diff --git a/llvm/include/llvm/Support/xxhash.h b/llvm/include/llvm/Support/xxhash.h
-index 0cef3a54e50d70177a7401324f7a4daca83c6599..3e19ebabb7ad0ff437220d9fdfe59a313386762a 100644
+index 5f8a7ab360abe24e86286b2bd6b83df7ca5fa7d3..5267e22a45f6c0c6e3bc9ca1966ed9842772918e 100644
 --- a/llvm/include/llvm/Support/xxhash.h
 +++ b/llvm/include/llvm/Support/xxhash.h
-@@ -38,16 +38,18 @@
+@@ -38,17 +38,19 @@
  #ifndef LLVM_SUPPORT_XXHASH_H
  #define LLVM_SUPPORT_XXHASH_H
  
@@ -775,6 +772,7 @@ index 0cef3a54e50d70177a7401324f7a4daca83c6599..3e19ebabb7ad0ff437220d9fdfe59a31
 +#include <string_view>
  
  namespace llvm {
+ 
 -uint64_t xxHash64(llvm::StringRef Data);
 -uint64_t xxHash64(llvm::ArrayRef<uint8_t> Data);
 +uint64_t xxHash64(std::string_view Data);
@@ -787,7 +785,16 @@ index 0cef3a54e50d70177a7401324f7a4daca83c6599..3e19ebabb7ad0ff437220d9fdfe59a31
 +inline uint64_t xxh3_64bits(std::string_view data) {
 +  return xxh3_64bits(span(reinterpret_cast<const uint8_t*>(data.data()), data.size()));
  }
- }
+ 
+ /*-**********************************************************************
+@@ -72,7 +74,7 @@ struct XXH128_hash_t {
+ };
+ 
+ /// XXH3's 128-bit variant.
+-XXH128_hash_t xxh3_128bits(ArrayRef<uint8_t> data);
++XXH128_hash_t xxh3_128bits(span<const uint8_t> data);
+ 
+ } // namespace llvm
  
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
 index 3fa7365e72d34a5db941d1cbe2b1beebad5c10e6..d53462e742e61d3476915d5b2c5aa63772e78a8a 100644
@@ -922,7 +929,7 @@ index 3fa7365e72d34a5db941d1cbe2b1beebad5c10e6..d53462e742e61d3476915d5b2c5aa637
          Result);
    } else if (sizeof(wchar_t) == 4) {
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index b8b3b7424ac6b1de782e739782f9671194ce77a1..0aa13a0f78eb370b2a673ca4a773f26820575052 100644
+index cb42e28c04a86dd60deae6fdb0b87850c1bf3727..561509e0efdf15f6e534f0621a5964d92511114c 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -14,7 +14,6 @@
@@ -1001,7 +1008,7 @@ index b6ce37842040b36fc79770ca0296255f2bb42a1a..4f6fee18b659adcbfd79822832f91417
  }
  
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 3d3a564af51d120786b358b96a3c90e2b7fbf9f3..220d850b9bc69f8fc2fba7cd23629eca487cde23 100644
+index 2ce54faa9857e68d9c7de4ad28f6cfa5bae86908..2dbb0674406e1860fdd0c266df64003e45b12fa3 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -167,7 +167,7 @@ raw_ostream &raw_ostream::write_uuid(const uuid_t UUID) {
@@ -1013,7 +1020,7 @@ index 3d3a564af51d120786b358b96a3c90e2b7fbf9f3..220d850b9bc69f8fc2fba7cd23629eca
                                          bool UseHexEscapes) {
    for (unsigned char c : Str) {
      switch (c) {
-@@ -570,7 +570,7 @@ void format_object_base::home() {
+@@ -564,7 +564,7 @@ void format_object_base::home() {
  //  raw_fd_ostream
  //===----------------------------------------------------------------------===//
  
@@ -1022,7 +1029,7 @@ index 3d3a564af51d120786b358b96a3c90e2b7fbf9f3..220d850b9bc69f8fc2fba7cd23629eca
                   sys::fs::CreationDisposition Disp, sys::fs::FileAccess Access,
                   sys::fs::OpenFlags Flags) {
    assert((Access & sys::fs::FA_Write) &&
-@@ -596,25 +596,25 @@ static int getFD(StringRef Filename, std::error_code &EC,
+@@ -590,25 +590,25 @@ static int getFD(StringRef Filename, std::error_code &EC,
    return FD;
  }
  
@@ -1053,7 +1060,7 @@ index 3d3a564af51d120786b358b96a3c90e2b7fbf9f3..220d850b9bc69f8fc2fba7cd23629eca
                                 sys::fs::CreationDisposition Disp,
                                 sys::fs::FileAccess Access,
                                 sys::fs::OpenFlags Flags)
-@@ -686,8 +686,7 @@ raw_fd_ostream::~raw_fd_ostream() {
+@@ -680,8 +680,7 @@ raw_fd_ostream::~raw_fd_ostream() {
    // has_error() and clear the error flag with clear_error() before
    // destructing raw_ostream objects which may have errors.
    if (has_error())
@@ -1063,7 +1070,7 @@ index 3d3a564af51d120786b358b96a3c90e2b7fbf9f3..220d850b9bc69f8fc2fba7cd23629eca
                         /*gen_crash_diag=*/false);
  }
  
-@@ -706,7 +705,7 @@ raw_fd_ostream::~raw_fd_ostream() {
+@@ -700,7 +699,7 @@ raw_fd_ostream::~raw_fd_ostream() {
  // the input is UTF-8 or transcode from the local codepage to UTF-8 before
  // quoting it. If they don't, this may mess up the encoding, but this is still
  // probably the best compromise we can make.
@@ -1072,7 +1079,7 @@ index 3d3a564af51d120786b358b96a3c90e2b7fbf9f3..220d850b9bc69f8fc2fba7cd23629eca
    SmallVector<wchar_t, 256> WideText;
  
    // Fall back to ::write if it wasn't valid UTF-8.
-@@ -749,7 +748,7 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+@@ -746,7 +745,7 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
    // If this is a Windows console device, try re-encoding from UTF-8 to UTF-16
    // and using WriteConsoleW. If that fails, fall back to plain write().
    if (IsWindowsConsole)
@@ -1081,7 +1088,7 @@ index 3d3a564af51d120786b358b96a3c90e2b7fbf9f3..220d850b9bc69f8fc2fba7cd23629eca
        return;
  #endif
  
-@@ -925,7 +924,7 @@ raw_ostream &llvm::nulls() {
+@@ -922,7 +921,7 @@ raw_ostream &llvm::nulls() {
  // File Streams
  //===----------------------------------------------------------------------===//
  
@@ -1090,7 +1097,7 @@ index 3d3a564af51d120786b358b96a3c90e2b7fbf9f3..220d850b9bc69f8fc2fba7cd23629eca
      : raw_fd_ostream(getFD(Filename, EC, sys::fs::CD_CreateAlways,
                             sys::fs::FA_Write | sys::fs::FA_Read,
                             sys::fs::OF_None),
-@@ -998,7 +997,7 @@ void buffer_ostream::anchor() {}
+@@ -1007,7 +1006,7 @@ void buffer_ostream::anchor() {}
  
  void buffer_unique_ostream::anchor() {}
  
@@ -1100,10 +1107,10 @@ index 3d3a564af51d120786b358b96a3c90e2b7fbf9f3..220d850b9bc69f8fc2fba7cd23629eca
    if (OutputFileName == "-")
      return Write(outs());
 diff --git a/llvm/lib/Support/xxhash.cpp b/llvm/lib/Support/xxhash.cpp
-index 577f14189caff7d74377f7b28d8332deef4c62c4..b9c15e885a1751eaca43317323bd7a85fa201073 100644
+index cdb76d57e2c1df67e07c39f5e59284ab0ce07984..2496050eef7349ad82b54ffa6fb6bff8278c8364 100644
 --- a/llvm/lib/Support/xxhash.cpp
 +++ b/llvm/lib/Support/xxhash.cpp
-@@ -84,11 +84,11 @@ static uint64_t XXH64_avalanche(uint64_t hash) {
+@@ -100,11 +100,11 @@ static uint64_t XXH64_avalanche(uint64_t hash) {
    return hash;
  }
  
@@ -1118,7 +1125,7 @@ index 577f14189caff7d74377f7b28d8332deef4c62c4..b9c15e885a1751eaca43317323bd7a85
    uint64_t H64;
  
    if (Len >= 32) {
-@@ -144,7 +144,7 @@ uint64_t llvm::xxHash64(StringRef Data) {
+@@ -160,7 +160,7 @@ uint64_t llvm::xxHash64(StringRef Data) {
    return XXH64_avalanche(H64);
  }
  
@@ -1127,7 +1134,7 @@ index 577f14189caff7d74377f7b28d8332deef4c62c4..b9c15e885a1751eaca43317323bd7a85
    return xxHash64({(const char *)Data.data(), Data.size()});
  }
  
-@@ -394,7 +394,7 @@ static uint64_t XXH3_hashLong_64b(const uint8_t *input, size_t len,
+@@ -550,7 +550,7 @@ static uint64_t XXH3_hashLong_64b(const uint8_t *input, size_t len,
                          (uint64_t)len * PRIME64_1);
  }
  
@@ -1136,12 +1143,21 @@ index 577f14189caff7d74377f7b28d8332deef4c62c4..b9c15e885a1751eaca43317323bd7a85
    auto *in = data.data();
    size_t len = data.size();
    if (len <= 16)
+@@ -1020,7 +1020,7 @@ XXH3_hashLong_128b(const uint8_t *input, size_t len, const uint8_t *secret,
+   return h128;
+ }
+ 
+-llvm::XXH128_hash_t llvm::xxh3_128bits(ArrayRef<uint8_t> data) {
++llvm::XXH128_hash_t llvm::xxh3_128bits(span<const uint8_t> data) {
+   size_t len = data.size();
+   const uint8_t *input = data.data();
+ 
 diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
-index cc3244528f27e2bd7eaa385d8b7f49b2fbb7a3e6..b710ac07461ba58faa99cedeae7f209dc0f5902b 100644
+index d1bbdde8dfc267770b9d98808de54381571f2785..e93e18423507655ce8275a0718d8e5d01915985f 100644
 --- a/llvm/unittests/ADT/DenseMapTest.cpp
 +++ b/llvm/unittests/ADT/DenseMapTest.cpp
-@@ -9,11 +9,11 @@
- #include "llvm/ADT/DenseMap.h"
+@@ -10,11 +10,11 @@
+ #include "CountCopyAndMove.h"
  #include "llvm/ADT/DenseMapInfo.h"
  #include "llvm/ADT/DenseMapInfoVariant.h"
 -#include "llvm/ADT/StringRef.h"
@@ -1153,8 +1169,8 @@ index cc3244528f27e2bd7eaa385d8b7f49b2fbb7a3e6..b710ac07461ba58faa99cedeae7f209d
  #include <utility>
  #include <variant>
  
-@@ -499,31 +499,6 @@ TEST(DenseMapCustomTest, ReserveTest) {
-   }
+@@ -523,31 +523,6 @@ TEST(DenseMapCustomTest, InsertOrAssignTest) {
+   EXPECT_EQ(1, CountCopyAndMove::MoveAssignments);
  }
  
 -// Make sure DenseMap works with StringRef keys.
@@ -1185,7 +1201,7 @@ index cc3244528f27e2bd7eaa385d8b7f49b2fbb7a3e6..b710ac07461ba58faa99cedeae7f209d
  // Key traits that allows lookup with either an unsigned or char* key;
  // In the latter case, "a" == 0, "b" == 1 and so on.
  struct TestDenseMapInfo {
-@@ -761,7 +736,7 @@ TEST(DenseMapCustomTest, VariantSupport) {
+@@ -785,7 +760,7 @@ TEST(DenseMapCustomTest, VariantSupport) {
  // Test that gTest prints map entries as pairs instead of opaque objects.
  // See third-party/unittest/googletest/internal/custom/gtest-printers.h
  TEST(DenseMapCustomTest, PairPrinting) {
@@ -1228,21 +1244,8 @@ index fc856a976946bf6decda9b6724cac66afc7bdcd6..aff9d61c7f0d48834123b04b74a2e4f7
  
  TEST(UniqueFunctionTest, SFINAE) {
    EXPECT_EQ("not a function", returns("boo!"));
-diff --git a/llvm/unittests/ADT/HashingTest.cpp b/llvm/unittests/ADT/HashingTest.cpp
-index ab13ee833ce556945fb9526fd13d8bd5f3e5c95a..3e80467ebd0efddcf2cbbe003bb91f1475ca9cb3 100644
---- a/llvm/unittests/ADT/HashingTest.cpp
-+++ b/llvm/unittests/ADT/HashingTest.cpp
-@@ -295,7 +295,7 @@ TEST(HashingTest, HashCombineRangeGoldenTest) {
- #endif
-   };
-   for (unsigned i = 0; i < sizeof(golden_data)/sizeof(*golden_data); ++i) {
--    StringRef str = golden_data[i].s;
-+    std::string_view str = golden_data[i].s;
-     hash_code hash = hash_combine_range(str.begin(), str.end());
- #if 0 // Enable this to generate paste-able text for the above structure.
-     std::string member_str = "\"" + str.str() + "\",";
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index a97f2617cbf70783f3569709f7ee1bff03baebd2..7ed8670fd31ea2a14e6ba7f59a8ac8e35046890c 100644
+index b45318d076a3d846b7810ce8cdaed7d2d97eca87..a39b11b9f82156a78b9ad7ce7b8c28855829e611 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
 @@ -12,7 +12,6 @@
@@ -1621,11 +1624,11 @@ index 6e75fbae0969ba1bf0a76c4d79a123e405a8dae7..3b07d344f15a555f11ad5f8177a0a65b
    // Overlong sequences of the above.
    EXPECT_TRUE(CheckConvertUTF8ToUnicodeScalars(
 diff --git a/llvm/unittests/Support/xxhashTest.cpp b/llvm/unittests/Support/xxhashTest.cpp
-index 7d78de6772b5159459572fe11633c76d04b86907..d61a5acd21f4d685ca631d3adb20c2649e050bc3 100644
+index 84308ce130e72818b553ea4185e8542d13182b3c..ef9a43690974ba586acc681e9f8ac49d4661031e 100644
 --- a/llvm/unittests/Support/xxhashTest.cpp
 +++ b/llvm/unittests/Support/xxhashTest.cpp
-@@ -12,7 +12,7 @@
- using namespace llvm;
+@@ -32,7 +32,7 @@ static void fillTestBuffer(uint8_t *buffer, size_t len) {
+ }
  
  TEST(xxhashTest, Basic) {
 -  EXPECT_EQ(0xef46db3751d8e999U, xxHash64(StringRef()));
@@ -1633,7 +1636,7 @@ index 7d78de6772b5159459572fe11633c76d04b86907..d61a5acd21f4d685ca631d3adb20c264
    EXPECT_EQ(0x33bf00a859c4ba3fU, xxHash64("foo"));
    EXPECT_EQ(0x48a37c90ad27a659U, xxHash64("bar"));
    EXPECT_EQ(0x69196c1b3af0bff9U,
-@@ -31,7 +31,7 @@ TEST(xxhashTest, xxh3) {
+@@ -51,7 +51,7 @@ TEST(xxhashTest, xxh3) {
    }
  
  #define F(len, expected)                                                       \
@@ -1642,3 +1645,12 @@ index 7d78de6772b5159459572fe11633c76d04b86907..d61a5acd21f4d685ca631d3adb20c264
    F(0, 0x2d06800538d394c2);
    F(1, 0xd0d496e05c553485);
    F(2, 0x84d625edb7055eac);
+@@ -90,7 +90,7 @@ TEST(xxhashTest, xxh3_128bits) {
+ 
+ #define F(len, expected)                                                       \
+   EXPECT_EQ(XXH128_hash_t(expected),                                           \
+-            xxh3_128bits(ArrayRef(sanityBuffer, size_t(len))))
++            xxh3_128bits(span(sanityBuffer, size_t(len))))
+ 
+   F(0, (XXH128_hash_t{0x6001C324468D497FULL,
+                       0x99AA06D3014798D8ULL})); /* empty string */

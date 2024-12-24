@@ -801,6 +801,52 @@ template <class X, class Y>
   return unique_dyn_cast_or_null<X, Y>(Val);
 }
 
+//===----------------------------------------------------------------------===//
+// Isa Predicates
+//===----------------------------------------------------------------------===//
+
+/// These are wrappers over isa* function that allow them to be used in generic
+/// algorithms such as `wpi:all_of`, `wpi::none_of`, etc. This is accomplished
+/// by exposing the isa* functions through function objects with a generic
+/// function call operator.
+
+namespace detail {
+template <typename... Types> struct IsaCheckPredicate {
+  template <typename T> [[nodiscard]] bool operator()(const T &Val) const {
+    return isa<Types...>(Val);
+  }
+};
+
+template <typename... Types> struct IsaAndPresentCheckPredicate {
+  template <typename T> [[nodiscard]] bool operator()(const T &Val) const {
+    return isa_and_present<Types...>(Val);
+  }
+};
+} // namespace detail
+
+/// Function object wrapper for the `wpi::isa` type check. The function call
+/// operator returns true when the value can be cast to any type in `Types`.
+/// Example:
+/// ```
+/// SmallVector<Type> myTypes = ...;
+/// if (wpi::all_of(myTypes, wpi::IsaPred<VectorType>))
+///   ...
+/// ```
+template <typename... Types>
+inline constexpr detail::IsaCheckPredicate<Types...> IsaPred{};
+
+/// Function object wrapper for the `wpi::isa_and_present` type check. The
+/// function call operator returns true when the value can be cast to any type
+/// in `Types`, or if the value is not present (e.g., nullptr). Example:
+/// ```
+/// SmallVector<Type> myTypes = ...;
+/// if (wpi::all_of(myTypes, wpi::IsaAndPresentPred<VectorType>))
+///   ...
+/// ```
+template <typename... Types>
+inline constexpr detail::IsaAndPresentCheckPredicate<Types...>
+    IsaAndPresentPred{};
+
 } // end namespace wpi
 
 #endif // WPIUTIL_WPI_CASTING_H

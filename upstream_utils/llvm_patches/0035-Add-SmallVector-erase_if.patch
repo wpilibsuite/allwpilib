@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 18 Jun 2024 09:07:33 -0700
-Subject: [PATCH 35/36] Add SmallVector erase_if()
+Subject: [PATCH 35/37] Add SmallVector erase_if()
 
 ---
  llvm/include/llvm/ADT/SmallVector.h | 8 ++++++++
  1 file changed, 8 insertions(+)
 
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index b953ae45a34772eb7fd04c3af0275a7d093e1242..f4ec2d673e0edac516dd605e7aebbf7dd9d99cc5 100644
+index 6b12ea17aaa894dc9a719ade4c41a3f7df4304e9..2d53728f3ce621beb578a0ad9e8d6176b5d0eb66 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -1328,6 +1328,14 @@ template <typename Out, typename R> SmallVector<Out> to_vector_of(R &&Range) {
+@@ -1329,6 +1329,14 @@ template <typename Out, typename R> SmallVector<Out> to_vector_of(R &&Range) {
    return {std::begin(Range), std::end(Range)};
  }
  
