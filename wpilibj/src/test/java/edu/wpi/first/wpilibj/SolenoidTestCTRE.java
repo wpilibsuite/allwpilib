@@ -19,10 +19,10 @@ class SolenoidTestCTRE {
       assertEquals(2, solenoid.getChannel());
 
       solenoid.set(true);
-      assertTrue(solenoid.get());
+      assertTrue(solenoid.isOn());
 
       solenoid.set(false);
-      assertFalse(solenoid.get());
+      assertFalse(solenoid.isOn());
     }
   }
 
@@ -52,13 +52,13 @@ class SolenoidTestCTRE {
   void testToggle() {
     try (Solenoid solenoid = new Solenoid(3, PneumaticsModuleType.CTREPCM, 2)) {
       solenoid.set(true);
-      assertTrue(solenoid.get());
+      assertTrue(solenoid.isOn());
 
       solenoid.toggle();
-      assertFalse(solenoid.get());
+      assertFalse(solenoid.isOn());
 
       solenoid.toggle();
-      assertTrue(solenoid.get());
+      assertTrue(solenoid.isOn());
     }
   }
 }
