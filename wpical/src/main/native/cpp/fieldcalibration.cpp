@@ -490,9 +490,9 @@ int fieldcalibration::calibrate(std::string input_dir_path,
 
     const std::string path = entry.path().string();
 
-    bool success =
-        process_video_file(tag_detector, camera_matrix, camera_distortion,
-                           tagSizeMeters, path, poses, constraints, show_debug_window);
+    bool success = process_video_file(tag_detector, camera_matrix,
+                                      camera_distortion, tagSizeMeters, path,
+                                      poses, constraints, show_debug_window);
 
     if (!success) {
       std::cout << "Unable to process video " << path << std::endl;
