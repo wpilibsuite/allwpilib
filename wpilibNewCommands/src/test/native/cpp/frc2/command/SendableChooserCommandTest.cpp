@@ -62,13 +62,17 @@ static const std::vector<SendableChooserTestArgs> OptionsAreCorrectParams() {
 
   SendableChooserTestArgs duplicateName{
       [](SendableChooserTestPublisherFunc func) {
-        return frc2::cmd::Choose(func, CommandNamed("a"), CommandNamed("b"), CommandNamed("a"));
-      }, make_vector<std::string>("a", "b")};
+        return frc2::cmd::Choose(func, CommandNamed("a"), CommandNamed("b"),
+                                 CommandNamed("a"));
+      },
+      make_vector<std::string>("a", "b")};
 
-  SendableChooserTestArgs happyPath{
-      [](SendableChooserTestPublisherFunc func) {
-        return frc2::cmd::Choose(func, CommandNamed("a"), CommandNamed("b"), CommandNamed("c"));
-      }, make_vector<std::string>("a", "b", "c")};
+  SendableChooserTestArgs happyPath{[](SendableChooserTestPublisherFunc func) {
+                                      return frc2::cmd::Choose(
+                                          func, CommandNamed("a"),
+                                          CommandNamed("b"), CommandNamed("c"));
+                                    },
+                                    make_vector<std::string>("a", "b", "c")};
 
   return make_vector<SendableChooserTestArgs>(empty, duplicateName, happyPath);
 }

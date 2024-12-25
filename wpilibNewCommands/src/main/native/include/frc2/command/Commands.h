@@ -184,16 +184,16 @@ template <std::convertible_to<CommandPtr>... CommandPtrs>
 CommandPtr Choose(std::function<void(wpi::Sendable*)> publish,
                   CommandPtrs&&... commands) {
   auto chooser = std::make_shared<frc::SendableChooser<std::string_view>>();
-  ((void)chooser->AddOption(commands.get()->GetName(), 
-                          commands.get()->GetName()), 
-  ...);
+  ((void)chooser->AddOption(commands.get()->GetName(),
+                            commands.get()->GetName()),
+   ...);
   publish(chooser.get());
   return Select<std::string_view>(
       [sendableChooser = chooser]() mutable {
         return sendableChooser->GetSelected();
       },
-      std::pair{std::string_view{commands.get()->GetName()}, 
-          std::move(commands)}...);
+      std::pair{std::string_view{commands.get()->GetName()},
+                std::move(commands)}...);
 }
 
 /**
