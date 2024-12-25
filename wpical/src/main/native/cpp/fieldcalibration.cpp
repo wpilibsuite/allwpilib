@@ -94,6 +94,8 @@ class PoseGraphError {
   const Pose m_t_ab_observed;
 };
 
+const double tagSizeMeters = 0.1651;
+
 inline CameraModel load_camera_model(std::string path) {
   Eigen::Matrix<double, 3, 3> camera_matrix;
   Eigen::Matrix<double, 8, 1> camera_distortion;
@@ -490,7 +492,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
 
     bool success =
         process_video_file(tag_detector, camera_matrix, camera_distortion,
-                           0.1651, path, poses, constraints, show_debug_window);
+                           tagSizeMeters, path, poses, constraints, show_debug_window);
 
     if (!success) {
       std::cout << "Unable to process video " << path << std::endl;
