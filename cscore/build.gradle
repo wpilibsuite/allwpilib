@@ -185,7 +185,7 @@ model {
                             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                             lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                             lib library: 'cscore', linkage: 'shared'
-                            lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
+                            lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                             if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                                 it.buildable = false
                                 return

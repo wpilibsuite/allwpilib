@@ -25,7 +25,7 @@ nativeUtils.platformConfigs.named('osxuniversal') {
 
 model {
     components {
-        imgui(NativeLibrarySpec) {
+        imguiSuite(NativeLibrarySpec) {
             sources {
                 cpp {
                     source {
