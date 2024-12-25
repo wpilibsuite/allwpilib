@@ -10,6 +10,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validation:
+    name: "Validation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v4
+
   build-docker:
     if: (github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main') || github.event_name != 'schedule'
     strategy:
@@ -30,6 +37,7 @@ jobs:
             build-options: "-Ponlylinuxx86-64"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ubuntu-22.04
+    needs: [validation]
     steps:
       - name: Free Disk Space
         uses: jlumbroso/free-disk-space@main
@@ -101,6 +109,7 @@ jobs:
             outputs: "ntcoreffi/build/outputs"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
+    needs: [validation]
     steps:
       - uses: actions/checkout@v4
         with:
