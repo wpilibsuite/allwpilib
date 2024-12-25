@@ -549,13 +549,8 @@ static void DisplayGui() {
 
 #ifndef RUNNING_WPICAL_TESTS
 #ifdef _WIN32
-int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                      LPSTR pCmdLine, int nCmdShow) {
-  // AllocConsole();
-  // std::FILE *f;
-  // freopen_s(&f, "CONOUT$", "w", stdout);
-  // freopen_s(&f, "CONOUT$", "w", stderr);
-  // freopen_s(&f, "CONIN$", "r", stdin);
+int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
+                      int nCmdShow) {
   int argc = __argc;
   char** argv = __argv;
 #else
