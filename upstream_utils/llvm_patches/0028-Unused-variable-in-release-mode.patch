@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Leander Schulten <Leander.Schulten@rwth-aachen.de>
 Date: Mon, 10 Jul 2023 00:53:43 +0200
-Subject: [PATCH 27/36] Unused variable in release mode
+Subject: [PATCH 28/37] Unused variable in release mode
 
 ---
  llvm/include/llvm/ADT/DenseMap.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index 108193f04486425f3b7f039cd9d2004be6facafb..e9bd3bfa4a6fe0fa26ff20069bbadc816c8baa65 100644
+index c4764fffa845a7f9eb69f262aa0ee728d08b1655..e77fa3bade8133ae73fd271a582d8500269bfe7e 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
 @@ -124,7 +124,7 @@ public:
