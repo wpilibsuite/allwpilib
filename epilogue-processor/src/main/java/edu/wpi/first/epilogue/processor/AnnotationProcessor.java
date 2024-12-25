@@ -37,8 +37,8 @@ import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
 @SupportedAnnotationTypes({
-    "edu.wpi.first.epilogue.CustomLoggerFor",
-    "edu.wpi.first.epilogue.Logged"
+  "edu.wpi.first.epilogue.CustomLoggerFor",
+  "edu.wpi.first.epilogue.Logged"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class AnnotationProcessor extends AbstractProcessor {
@@ -46,20 +46,20 @@ public class AnnotationProcessor extends AbstractProcessor {
   private static final String kClassSpecificLoggerFqn =
       "edu.wpi.first.epilogue.logging.ClassSpecificLogger";
   private static final String kLoggedFqn = "edu.wpi.first.epilogue.Logged";
-  
+
   private EpilogueGenerator m_epiloguerGenerator;
   private LoggerGenerator m_loggerGenerator;
   private List<ElementHandler> m_handlers;
-  
+
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     if (annotations.isEmpty()) {
       // Nothing to do, don't claim
       return false;
     }
-    
+
     Map<TypeMirror, DeclaredType> customLoggers = new HashMap<>();
-    
+
     annotations.stream()
         .filter(ann -> kCustomLoggerFqn.contentEquals(ann.getQualifiedName()))
         .findAny()
@@ -67,7 +67,7 @@ public class AnnotationProcessor extends AbstractProcessor {
             customLogger -> {
               customLoggers.putAll(processCustomLoggers(roundEnv, customLogger));
             });
-    
+
     roundEnv.getRootElements().stream()
         .filter(
             e ->
@@ -92,9 +92,9 @@ public class AnnotationProcessor extends AbstractProcessor {
                       "[EPILOGUE] Custom logger classes should have a @CustomLoggerFor annotation",
                       e);
             });
-    
+
     var loggedTypes = getLoggedTypes(roundEnv);
-    
+
     // Handlers are declared in order of priority. If an element could be logged in more than one
     // way (eg a class implements both Sendable and StructSerializable), the order of the handlers
     // in this list will determine how it gets logged.
@@ -112,10 +112,10 @@ public class AnnotationProcessor extends AbstractProcessor {
             new SupplierHandler(processingEnv),
             new StructHandler(processingEnv), // prioritize struct over sendable
             new SendableHandler(processingEnv));
-    
+
     m_epiloguerGenerator = new EpilogueGenerator(processingEnv, customLoggers);
     m_loggerGenerator = new LoggerGenerator(processingEnv, m_handlers);
-    
+
     annotations.stream()
         .filter(ann -> kLoggedFqn.contentEquals(ann.getQualifiedName()))
         .findAny()
@@ -123,10 +123,10 @@ public class AnnotationProcessor extends AbstractProcessor {
             epilogue -> {
               processEpilogue(roundEnv, epilogue, loggedTypes);
             });
-    
+
     return false;
   }
-  
+
   /**
    * Gets the set of all loggable types in the compilation unit. A type is considered loggable if it
    * is directly annotated with {@code @Logged} or contains a field or method with a {@code @Logged}
@@ -149,20 +149,20 @@ public class AnnotationProcessor extends AbstractProcessor {
                 .map(Element::getEnclosingElement)
                 .filter(e -> e instanceof TypeElement)
                 .map(e -> (TypeElement) e))
-               .sorted(Comparator.comparing(e -> e.getSimpleName().toString()))
-               .collect(
-                   Collectors.toCollection(LinkedHashSet::new)); // Collect to a set to avoid duplicates
+        .sorted(Comparator.comparing(e -> e.getSimpleName().toString()))
+        .collect(
+            Collectors.toCollection(LinkedHashSet::new)); // Collect to a set to avoid duplicates
   }
-  
+
   private boolean validateFields(Set<? extends Element> annotatedElements) {
     var fields =
         annotatedElements.stream()
             .filter(e -> e instanceof VariableElement)
             .map(e -> (VariableElement) e)
             .toList();
-    
+
     boolean valid = true;
-    
+
     for (VariableElement field : fields) {
       // Field is explicitly tagged
       // And is not opted out of
@@ -180,16 +180,16 @@ public class AnnotationProcessor extends AbstractProcessor {
     }
     return valid;
   }
-  
+
   private boolean validateMethods(Set<? extends Element> annotatedElements) {
     var methods =
         annotatedElements.stream()
             .filter(e -> e instanceof ExecutableElement)
             .map(e -> (ExecutableElement) e)
             .toList();
-    
+
     boolean valid = true;
-    
+
     for (ExecutableElement method : methods) {
       // Field is explicitly tagged
       if (method.getAnnotation(NotLogged.class) == null) {
@@ -205,36 +205,36 @@ public class AnnotationProcessor extends AbstractProcessor {
                   method);
           valid = false;
         }
-        
+
         if (!method.getModifiers().contains(Modifier.PUBLIC)) {
           // Only public methods can be logged
-          
+
           processingEnv
               .getMessager()
               .printMessage(
                   Diagnostic.Kind.ERROR, "[EPILOGUE] Logged methods must be public", method);
-          
+
           valid = false;
         }
-        
+
         if (method.getModifiers().contains(Modifier.STATIC)) {
           processingEnv
               .getMessager()
               .printMessage(
                   Diagnostic.Kind.ERROR, "[EPILOGUE] Logged methods cannot be static", method);
-          
+
           valid = false;
         }
-        
+
         if (method.getReturnType().getKind() == TypeKind.NONE) {
           processingEnv
               .getMessager()
               .printMessage(
                   Diagnostic.Kind.ERROR, "[EPILOGUE] Logged methods cannot be void", method);
-          
+
           valid = false;
         }
-        
+
         if (!method.getParameters().isEmpty()) {
           processingEnv
               .getMessager()
@@ -242,14 +242,14 @@ public class AnnotationProcessor extends AbstractProcessor {
                   Diagnostic.Kind.ERROR,
                   "[EPILOGUE] Logged methods cannot accept arguments",
                   method);
-          
+
           valid = false;
         }
       }
     }
     return valid;
   }
-  
+
   /**
    * Checks if a type is not loggable.
    *
@@ -260,13 +260,13 @@ public class AnnotationProcessor extends AbstractProcessor {
       // e.g. void, cannot log
       return true;
     }
-    
+
     boolean loggable = m_handlers.stream().anyMatch(h -> h.isLoggable(element));
-    
+
     if (loggable) {
       return false;
     }
-    
+
     processingEnv
         .getMessager()
         .printMessage(
@@ -275,21 +275,21 @@ public class AnnotationProcessor extends AbstractProcessor {
             element);
     return true;
   }
-  
+
   @SuppressWarnings("unchecked")
   private Map<DeclaredType, DeclaredType> processCustomLoggers(
       RoundEnvironment roundEnv, TypeElement customLoggerAnnotation) {
     // map logged type to its custom logger, eg
     // { Point.class => CustomPointLogger.class }
     var customLoggers = new HashMap<DeclaredType, DeclaredType>();
-    
+
     var annotatedElements = roundEnv.getElementsAnnotatedWith(customLoggerAnnotation);
-    
+
     var loggerSuperClass =
         processingEnv
             .getElementUtils()
             .getTypeElement("edu.wpi.first.epilogue.logging.ClassSpecificLogger");
-    
+
     for (Element annotatedElement : annotatedElements) {
       List<AnnotationValue> targetTypes = List.of();
       for (AnnotationMirror annotationMirror : annotatedElement.getAnnotationMirrors()) {
@@ -299,7 +299,7 @@ public class AnnotationProcessor extends AbstractProcessor {
           }
         }
       }
-      
+
       boolean hasPublicNoArgConstructor =
           annotatedElement.getEnclosedElements().stream()
               .anyMatch(
@@ -308,7 +308,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                           && exe.getKind() == ElementKind.CONSTRUCTOR
                           && exe.getModifiers().contains(Modifier.PUBLIC)
                           && exe.getParameters().isEmpty());
-      
+
       if (!hasPublicNoArgConstructor) {
         processingEnv
             .getMessager()
@@ -318,11 +318,11 @@ public class AnnotationProcessor extends AbstractProcessor {
                 annotatedElement);
         continue;
       }
-      
+
       for (AnnotationValue value : targetTypes) {
         var targetType = (DeclaredType) value.getValue();
         var reflectedTarget = targetType.asElement();
-        
+
         // eg ClassSpecificLogger<MyDataType>
         var requiredSuperClass =
             processingEnv
@@ -330,7 +330,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                 .getDeclaredType(
                     loggerSuperClass,
                     processingEnv.getTypeUtils().getWildcardType(null, reflectedTarget.asType()));
-        
+
         if (customLoggers.containsKey(targetType)) {
           processingEnv
               .getMessager()
@@ -340,7 +340,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                   annotatedElement);
           continue;
         }
-        
+
         if (annotatedElement instanceof TypeElement t && !t.getTypeParameters().isEmpty()) {
           processingEnv
               .getMessager()
@@ -350,10 +350,10 @@ public class AnnotationProcessor extends AbstractProcessor {
                   annotatedElement);
           continue;
         }
-        
+
         if (!processingEnv
-                 .getTypeUtils()
-                 .isAssignable(annotatedElement.asType(), requiredSuperClass)) {
+            .getTypeUtils()
+            .isAssignable(annotatedElement.asType(), requiredSuperClass)) {
           processingEnv
               .getMessager()
               .printMessage(
@@ -362,42 +362,42 @@ public class AnnotationProcessor extends AbstractProcessor {
                   annotatedElement);
           continue;
         }
-        
+
         customLoggers.put(targetType, (DeclaredType) annotatedElement.asType());
       }
     }
-    
+
     return customLoggers;
   }
-  
+
   private void processEpilogue(
       RoundEnvironment roundEnv, TypeElement epilogueAnnotation, Set<TypeElement> loggedTypes) {
     var annotatedElements = roundEnv.getElementsAnnotatedWith(epilogueAnnotation);
-    
+
     List<String> loggerClassNames = new ArrayList<>();
     var mainRobotClasses = new ArrayList<TypeElement>();
-    
+
     // Used to check for a main robot class
     var robotBaseClass =
         processingEnv.getElementUtils().getTypeElement("edu.wpi.first.wpilibj.TimedRobot").asType();
-    
+
     boolean validFields = validateFields(annotatedElements);
     boolean validMethods = validateMethods(annotatedElements);
-    
+
     if (!(validFields && validMethods)) {
       // Generate nothing and bail
       return;
     }
-    
+
     for (TypeElement clazz : loggedTypes) {
       try {
         warnOfNonLoggableElements(clazz);
         m_loggerGenerator.writeLoggerFile(clazz);
-        
+
         if (processingEnv.getTypeUtils().isAssignable(clazz.getSuperclass(), robotBaseClass)) {
           mainRobotClasses.add(clazz);
         }
-        
+
         loggerClassNames.add(StringUtils.loggerClassName(clazz));
       } catch (IOException e) {
         processingEnv
@@ -409,38 +409,38 @@ public class AnnotationProcessor extends AbstractProcessor {
         e.printStackTrace(System.err);
       }
     }
-    
+
     // Sort alphabetically
     mainRobotClasses.sort(Comparator.comparing(c -> c.getSimpleName().toString()));
     m_epiloguerGenerator.writeEpilogueFile(loggerClassNames, mainRobotClasses);
   }
-  
+
   private void warnOfNonLoggableElements(TypeElement clazz) {
     var config = clazz.getAnnotation(Logged.class);
     if (config == null || config.strategy() == Logged.Strategy.OPT_IN) {
       // field and method validations will have already checked everything
       return;
     }
-    
+
     for (Element element : clazz.getEnclosedElements()) {
       if (element.getAnnotation(NotLogged.class) != null) {
         // Explicitly opted out from, don't need to check
         continue;
       }
-      
+
       if (element.getModifiers().contains(Modifier.STATIC)) {
         // static elements are never logged
         continue;
       }
-      
+
       if (element instanceof VariableElement v) {
         // isNotLoggable will internally print a warning message
         isNotLoggable(v, v.asType());
       }
-      
+
       if (element instanceof ExecutableElement exe
-              && exe.getModifiers().contains(Modifier.PUBLIC)
-              && exe.getParameters().isEmpty()) {
+          && exe.getModifiers().contains(Modifier.PUBLIC)
+          && exe.getParameters().isEmpty()) {
         // isNotLoggable will internally print a warning message
         isNotLoggable(exe, exe.getReturnType());
       }
