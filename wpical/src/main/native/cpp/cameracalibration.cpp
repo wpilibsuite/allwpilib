@@ -154,7 +154,7 @@ int cameracalibration::calibrate(const std::string& input_video,
 
   if (lastSeparatorPos != std::string::npos) {
     output_file_path = input_video.substr(0, lastSeparatorPos)
-                           .append("/camera calibration.json");
+                           .append("/cameracalibration.json");
   }
 
   std::ofstream output_file(output_file_path);
@@ -309,7 +309,7 @@ int cameracalibration::calibrate(const std::string& input_video,
 
   if (lastSeparatorPos != std::string::npos) {
     output_file_path = input_video.substr(0, lastSeparatorPos)
-                           .append("/camera calibration.json");
+                           .append("/cameracalibration.json");
   }
 
   std::ofstream output_file(output_file_path);
@@ -424,7 +424,7 @@ int cameracalibration::calibrate(const std::string& input_video,
 
   if (lastSeparatorPos != std::string::npos) {
     output_file_path = input_video.substr(0, lastSeparatorPos)
-                           .append("/camera calibration.json");
+                           .append("/cameracalibration.json");
   }
 
   std::ofstream output_file(output_file_path);

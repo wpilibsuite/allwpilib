@@ -362,7 +362,7 @@ static void DisplayGui() {
           if (lastSeparatorPos != std::string::npos) {
             output_file_path =
                 selected_camera_intrinsics.substr(0, lastSeparatorPos)
-                    .append("/camera calibration.json");
+                    .append("/cameracalibration.json");
           }
 
           selected_camera_intrinsics = output_file_path;
@@ -415,7 +415,7 @@ static void DisplayGui() {
           if (lastSeparatorPos != std::string::npos) {
             output_file_path =
                 selected_camera_intrinsics.substr(0, lastSeparatorPos)
-                    .append("/camera calibration.json");
+                    .append("/cameracalibration.json");
           }
 
           selected_camera_intrinsics = output_file_path;

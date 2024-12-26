@@ -49,7 +49,7 @@ TEST(Camera_CalibrationTest, MRcal_Atypical) {
 TEST(Field_CalibrationTest, Typical) {
   int ret = fieldcalibration::calibrate(
       projectRootPath + videoLocation, projectRootPath + "",
-      projectRootPath + "/camera calibration.json",
+      projectRootPath + "/cameracalibration.json",
       projectRootPath + "/2024-crescendo.json", 3, false);
   EXPECT_EQ(ret, 0);
 }
@@ -65,15 +65,15 @@ TEST(Field_CalibrationTest, Atypical_Bad_Camera_Model_Directory) {
 TEST(Field_CalibrationTest, Atypical_Bad_Ideal_JSON) {
   int ret = fieldcalibration::calibrate(
       projectRootPath + videoLocation, projectRootPath + "",
-      projectRootPath + "/camera calibration.json",
-      projectRootPath + "/camera calibration.json", 3, false);
+      projectRootPath + "/cameracalibration.json",
+      projectRootPath + "/cameracalibration.json", 3, false);
   EXPECT_EQ(ret, 1);
 }
 
 TEST(Field_CalibrationTest, Atypical_Bad_Input_Directory) {
   int ret = fieldcalibration::calibrate(
       projectRootPath + "", projectRootPath + "",
-      projectRootPath + "/camera calibration.json",
+      projectRootPath + "/cameracalibration.json",
       projectRootPath + "/2024-crescendo.json", 3, false);
   EXPECT_EQ(ret, 1);
 }
