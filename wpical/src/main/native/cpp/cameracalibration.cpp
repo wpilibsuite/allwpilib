@@ -14,7 +14,6 @@
 #include <opencv2/objdetect/aruco_board.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio.hpp>
-#include <wpi/json.h>
 
 static bool filter(std::vector<cv::Point2f> charuco_corners,
                    std::vector<int> charuco_ids,
@@ -45,9 +44,9 @@ static bool filter(std::vector<cv::Point2f> charuco_corners,
 }
 
 int cameracalibration::calibrate(const std::string& input_video,
-                                 float square_width, float marker_width,
-                                 int board_width, int board_height,
-                                 bool show_debug_window) {
+                                 CameraModel& camera_model, float square_width,
+                                 float marker_width, int board_width,
+                                 int board_height, bool show_debug_window) {
   // ChArUco Board
   cv::aruco::Dictionary aruco_dict =
       cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_1000);
@@ -140,34 +139,23 @@ int cameracalibration::calibrate(const std::string& input_video,
     return 1;
   }
 
-  // Save calibration output
-  wpi::json camera_model = {
-      {"camera_matrix", std::vector<double>(camera_matrix.begin<double>(),
-                                            camera_matrix.end<double>())},
-      {"distortion_coefficients",
-       std::vector<double>(dist_coeffs.begin<double>(),
-                           dist_coeffs.end<double>())},
-      {"avg_reprojection_error", repError}};
+  std::vector<double> matrix = {camera_matrix.begin<double>(),
+                                camera_matrix.end<double>()};
 
-  size_t lastSeparatorPos = input_video.find_last_of("/\\");
-  std::string output_file_path;
+  std::vector<double> distortion = {dist_coeffs.begin<double>(),
+                                    dist_coeffs.end<double>()};
 
-  if (lastSeparatorPos != std::string::npos) {
-    output_file_path = input_video.substr(0, lastSeparatorPos)
-                           .append("/cameracalibration.json");
-  }
-
-  std::ofstream output_file(output_file_path);
-  output_file << camera_model.dump(4) << std::endl;
-
-  std::cout << "calibration succeeded" << std::endl;
+  camera_model.intrinsic_matrix = Eigen::Matrix<double, 3, 3>(matrix.data());
+  camera_model.distortion_coefficients =
+      Eigen::Matrix<double, 8, 1>(distortion.data());
+  camera_model.avg_reprojection_error = repError;
   return 0;
 }
 
 int cameracalibration::calibrate(const std::string& input_video,
-                                 float square_width, float marker_width,
-                                 int board_width, int board_height,
-                                 double imagerWidthPixels,
+                                 CameraModel& camera_model, float square_width,
+                                 float marker_width, int board_width,
+                                 int board_height, double imagerWidthPixels,
                                  double imagerHeightPixels,
                                  bool show_debug_window) {
   // ChArUco Board
@@ -299,28 +287,19 @@ int cameracalibration::calibrate(const std::string& input_video,
                                                  0.0,
                                                  0.0};
 
-  // Save calibration output
-  wpi::json result = {{"camera_matrix", camera_matrix},
-                      {"distortion_coefficients", distortion_coefficients},
-                      {"avg_reprojection_error", stats.rms_error}};
-
-  size_t lastSeparatorPos = input_video.find_last_of("/\\");
-  std::string output_file_path;
-
-  if (lastSeparatorPos != std::string::npos) {
-    output_file_path = input_video.substr(0, lastSeparatorPos)
-                           .append("/cameracalibration.json");
-  }
-
-  std::ofstream output_file(output_file_path);
-  output_file << result.dump(4) << std::endl;
+  camera_model.intrinsic_matrix =
+      Eigen::Matrix<double, 3, 3>(camera_matrix.data());
+  camera_model.distortion_coefficients =
+      Eigen::Matrix<double, 8, 1>(distortion_coefficients.data());
+  camera_model.avg_reprojection_error = stats.rms_error;
 
   return 0;
 }
 
 int cameracalibration::calibrate(const std::string& input_video,
-                                 float square_width, int board_width,
-                                 int board_height, double imagerWidthPixels,
+                                 CameraModel& camera_model, float square_width,
+                                 int board_width, int board_height,
+                                 double imagerWidthPixels,
                                  double imagerHeightPixels,
                                  bool show_debug_window) {
   // Video capture
@@ -415,20 +394,11 @@ int cameracalibration::calibrate(const std::string& input_video,
                                                  0.0};
 
   // Save calibration output
-  wpi::json result = {{"camera_matrix", camera_matrix},
-                      {"distortion_coefficients", distortion_coefficients},
-                      {"avg_reprojection_error", stats.rms_error}};
-
-  size_t lastSeparatorPos = input_video.find_last_of("/\\");
-  std::string output_file_path;
-
-  if (lastSeparatorPos != std::string::npos) {
-    output_file_path = input_video.substr(0, lastSeparatorPos)
-                           .append("/cameracalibration.json");
-  }
-
-  std::ofstream output_file(output_file_path);
-  output_file << result.dump(4) << std::endl;
+  camera_model.intrinsic_matrix =
+      Eigen::Matrix<double, 3, 3>(camera_matrix.data());
+  camera_model.distortion_coefficients =
+      Eigen::Matrix<double, 8, 1>(distortion_coefficients.data());
+  camera_model.avg_reprojection_error = stats.rms_error;
 
   return 0;
 }

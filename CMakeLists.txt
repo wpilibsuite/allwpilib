@@ -144,7 +144,7 @@ if(WITH_DOCS)
     add_doxygen_docs()
 endif()
 
-if (WITH_WPICAL)
+if(WITH_WPICAL)
     find_package(Ceres CONFIG REQUIRED)
 endif()
 

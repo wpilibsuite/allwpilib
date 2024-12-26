@@ -6,6 +6,8 @@
 
 #include <string>
 
+#include "cameracalibration.h"
+
 namespace fieldcalibration {
 int calibrate(std::string input_dir_path, std::string output_file_path,
               std::string camera_model_path, std::string ideal_map_path,

@@ -41,11 +41,6 @@ struct Constraint {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-struct CameraModel {
-  Eigen::Matrix<double, 3, 3> intrinsic_matrix;
-  Eigen::Matrix<double, 8, 1> distortion_coefficients;
-};
-
 class PoseGraphError {
  public:
   explicit PoseGraphError(Pose t_ab_observed)
@@ -96,7 +91,7 @@ class PoseGraphError {
 
 const double tagSizeMeters = 0.1651;
 
-inline CameraModel load_camera_model(std::string path) {
+inline cameracalibration::CameraModel load_camera_model(std::string path) {
   Eigen::Matrix<double, 3, 3> camera_matrix;
   Eigen::Matrix<double, 8, 1> camera_distortion;
 
@@ -151,11 +146,12 @@ inline CameraModel load_camera_model(std::string path) {
     }
   }
 
-  CameraModel camera_model{camera_matrix, camera_distortion};
+  cameracalibration::CameraModel camera_model{
+      camera_matrix, camera_distortion, json_data["avg_reprojection_error"]};
   return camera_model;
 }
 
-inline CameraModel load_camera_model(wpi::json json_data) {
+inline cameracalibration::CameraModel load_camera_model(wpi::json json_data) {
   // Camera matrix
   Eigen::Matrix<double, 3, 3> camera_matrix;
 
@@ -176,7 +172,8 @@ inline CameraModel load_camera_model(wpi::json json_data) {
     }
   }
 
-  CameraModel camera_model{camera_matrix, camera_distortion};
+  cameracalibration::CameraModel camera_model{
+      camera_matrix, camera_distortion, json_data["avg_reprojection_error"]};
   return camera_model;
 }
 

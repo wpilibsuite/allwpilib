@@ -96,6 +96,10 @@ static void DisplayGui() {
 
   static std::string calibration_json_path;
 
+  cameracalibration::CameraModel cameraModel = {
+      .intrinsic_matrix = Eigen::Matrix<double, 3, 3>::Identity(),
+      .distortion_coefficients = Eigen::Matrix<double, 8, 1>::Zero(),
+      .avg_reprojection_error = 0.0};
   static bool mrcal = true;
 
   static double squareWidth = 0.709;
@@ -352,7 +356,7 @@ static void DisplayGui() {
       if (ImGui::Button("Calibrate") && !selected_camera_intrinsics.empty()) {
         std::cout << "calibration button pressed" << std::endl;
         int ret = cameracalibration::calibrate(
-            selected_camera_intrinsics.c_str(), squareWidth, markerWidth,
+            selected_camera_intrinsics.c_str(), cameraModel, markerWidth,
             boardWidth, boardHeight, imagerWidth, imagerHeight, showDebug);
         if (ret == 0) {
           size_t lastSeparatorPos =
@@ -366,6 +370,8 @@ static void DisplayGui() {
           }
 
           selected_camera_intrinsics = output_file_path;
+
+          cameracalibration::dumpJson(cameraModel, output_file_path);
           ImGui::CloseCurrentPopup();
         } else if (ret == 1) {
           std::cout << "calibration failed and popup ready" << std::endl;
@@ -405,8 +411,8 @@ static void DisplayGui() {
       if (ImGui::Button("Calibrate") && !selected_camera_intrinsics.empty()) {
         std::cout << "calibration button pressed" << std::endl;
         int ret = cameracalibration::calibrate(
-            selected_camera_intrinsics.c_str(), squareWidth, markerWidth,
-            boardWidth, boardHeight, showDebug);
+            selected_camera_intrinsics.c_str(), cameraModel, squareWidth,
+            markerWidth, boardWidth, boardHeight, showDebug);
         if (ret == 0) {
           size_t lastSeparatorPos =
               selected_camera_intrinsics.find_last_of("/\\");
@@ -419,6 +425,8 @@ static void DisplayGui() {
           }
 
           selected_camera_intrinsics = output_file_path;
+
+          cameracalibration::dumpJson(cameraModel, output_file_path);
           ImGui::CloseCurrentPopup();
         } else if (ret == 1) {
           std::cout << "calibration failed and popup ready" << std::endl;
