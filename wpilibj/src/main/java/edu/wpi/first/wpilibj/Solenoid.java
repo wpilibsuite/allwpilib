@@ -79,9 +79,8 @@ public class Solenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Read the current value of the solenoid.
-   * This is an alias for the isOn method.
-   * 
+   * Read the current value of the solenoid. This is an alias for the isOn method.
+   *
    * @return True if the solenoid output is on or false if the solenoid output is off.
    */
   public boolean get() {
@@ -90,8 +89,7 @@ public class Solenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Returns true if the solenoid is on.
-   * This is an alias for the get method.
+   * Returns true if the solenoid is on. This is an alias for the get method.
    *
    * @return true if the solenoid is on.
    */

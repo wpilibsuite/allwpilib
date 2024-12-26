@@ -64,7 +64,7 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
 
   /**
    * Returns true if the solenoid is on.
-   * This is an alias for the Get method.  
+   * This is an alias for the Get method.
    *
    * @return true if the solenoid is on.
    *
