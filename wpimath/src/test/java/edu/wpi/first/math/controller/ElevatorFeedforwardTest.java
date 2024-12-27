@@ -36,7 +36,7 @@ class ElevatorFeedforwardTest {
     var nextR = VecBuilder.fill(3.0);
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + ks + kg,
-        m_elevatorFF.calculateWithVelocities(2.0, 3.0),
+        m_elevatorFF.calculate(2.0, 3.0),
         0.002);
   }
 
