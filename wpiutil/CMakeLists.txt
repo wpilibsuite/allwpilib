@@ -232,6 +232,10 @@ configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake
 install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION share/wpiutil)
 install(EXPORT wpiutil DESTINATION share/wpiutil)
 
+add_executable(wpiutildev src/dev/native/cpp/main.cpp)
+wpilib_target_warnings(wpiutildev)
+target_link_libraries(wpiutildev wpiutil)
+
 subdir_list(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${wpiutil_examples})
     file(GLOB wpiutil_example_src examples/${example}/*.cpp)

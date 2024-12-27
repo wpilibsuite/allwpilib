@@ -120,8 +120,7 @@ class WPILIB_DLLEXPORT Odometry3d {
   const Pose3d& Update(const Rotation3d& gyroAngle,
                        const WheelPositions& wheelPositions) {
     auto angle = gyroAngle + m_gyroOffset;
-    auto angle_difference =
-        (angle - m_previousAngle).GetQuaternion().ToRotationVector();
+    auto angle_difference = (angle - m_previousAngle).ToVector();
 
     auto twist2d =
         m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);

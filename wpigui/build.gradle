@@ -35,7 +35,7 @@ model {
                 }
             }
             binaries.all {
-                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     it.buildable = false
                     return
@@ -99,7 +99,7 @@ model {
             }
             binaries.all {
                 lib library: 'wpigui'
-                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             }
         }
     }

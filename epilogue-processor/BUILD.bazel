@@ -1,0 +1,22 @@
+load("@rules_java//java:defs.bzl", "java_library", "java_plugin")
+
+java_library(
+    name = "processor",
+    srcs = glob(["src/main/java/**/*.java"]),
+    visibility = ["//visibility:public"],
+    runtime_deps = [
+        "//wpilibNewCommands:wpilibNewCommands-java",
+    ],
+    deps = [
+        "//epilogue-runtime:epilogue",
+    ],
+)
+
+java_plugin(
+    name = "plugin",
+    processor_class = "edu.wpi.first.epilogue.processor.AnnotationProcessor",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":processor",
+    ],
+)

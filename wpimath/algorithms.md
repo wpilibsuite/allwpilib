@@ -674,7 +674,7 @@ r̂ = 𝑣⃗ / ||𝑣⃗||
 
 ## Closed form solution for an Exponential Motion Profile
 
-### [Derivation of continuous-time model](wpimath/algorithms/docs/ExponentialProfileModel.py)
+### [Derivation of continuous-time model](wpimath/algorithms/ExponentialProfileModel.py)
 
 
 ### Heuristic for input direction in Exponential Profile
