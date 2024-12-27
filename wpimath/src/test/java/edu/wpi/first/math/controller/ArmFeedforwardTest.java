@@ -77,20 +77,9 @@ class ArmFeedforwardTest {
    * @param dt The simulation time in seconds.
    */
   private void calculateAndSimulate(
-      ArmFeedforward armFF,
-      double ks,
-      double kv,
-      double ka,
-      double kg,
-      double currentAngle,
-      double currentVelocity,
-      double nextVelocity,
-      double dt) {
-    final double input = armFF.calculateWithVelocities(currentAngle, currentVelocity, nextVelocity);
-    assertEquals(
-        nextVelocity,
-        simulate(ks, kv, ka, kg, currentAngle, currentVelocity, input, dt).get(1, 0),
-        1e-4);
+      double currentAngle, double currentVelocity, double nextVelocity, double dt) {
+    final double input = m_armFF.calculate(currentAngle, currentVelocity, nextVelocity);
+    assertEquals(nextVelocity, simulate(currentAngle, currentVelocity, input, dt).get(1, 0), 1e-12);
   }
 
   @Test
