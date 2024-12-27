@@ -38,13 +38,18 @@ public class FileBackend implements EpilogueBackend {
    *
    * @param dataLog the data log to save data to
    */
-  public FileBackend(DataLog dataLog) {
+  FileBackend(DataLog dataLog) {
     this.m_dataLog = requireNonNullParam(dataLog, "dataLog", "FileBackend");
   }
 
-  /** Creates a new file-based backend. */
-  public FileBackend() {
-    this(DataLogManager.getLog());
+  /**
+   * Creates a new file-based backend.
+   *
+   * @param enableNtCapture enables capture of networktables data to datalog if true
+   */
+  public FileBackend(boolean enableNtCapture) {
+    this.m_dataLog = DataLogManager.getLog();
+    DataLogManager.logNetworkTables(enableNtCapture);
   }
 
   @Override
