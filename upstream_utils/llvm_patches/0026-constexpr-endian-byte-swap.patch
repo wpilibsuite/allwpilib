@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Fri, 1 Mar 2024 11:56:17 -0800
-Subject: [PATCH 25/36] constexpr endian byte swap
+Subject: [PATCH 26/37] constexpr endian byte swap
 
 ---
  llvm/include/llvm/Support/Endian.h | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/llvm/include/llvm/Support/Endian.h b/llvm/include/llvm/Support/Endian.h
-index 4c0405cf1e2f69c6268d708badc2aef6dd968b51..f31fbf70fb723d19634e61ea4f21549fc767e58c 100644
+index 5831fe66a1f7b71f26aac179c4e2c904d0ad4255..62e19c04e5dc565dd94c5c38f7c6b141fbcb56a3 100644
 --- a/llvm/include/llvm/Support/Endian.h
 +++ b/llvm/include/llvm/Support/Endian.h
 @@ -50,7 +50,9 @@ template <typename value_type>

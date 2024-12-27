@@ -460,6 +460,32 @@ public class Rotation3d
   }
 
   /**
+   * Returns the axis in the axis-angle representation of this rotation.
+   *
+   * @return The axis in the axis-angle representation.
+   */
+  public Vector<N3> getAxis() {
+    double norm =
+        Math.sqrt(m_q.getX() * m_q.getX() + m_q.getY() * m_q.getY() + m_q.getZ() * m_q.getZ());
+    if (norm == 0.0) {
+      return VecBuilder.fill(0.0, 0.0, 0.0);
+    } else {
+      return VecBuilder.fill(m_q.getX() / norm, m_q.getY() / norm, m_q.getZ() / norm);
+    }
+  }
+
+  /**
+   * Returns the angle in radians in the axis-angle representation of this rotation.
+   *
+   * @return The angle in radians in the axis-angle representation of this rotation.
+   */
+  public double getAngle() {
+    double norm =
+        Math.sqrt(m_q.getX() * m_q.getX() + m_q.getY() * m_q.getY() + m_q.getZ() * m_q.getZ());
+    return 2.0 * Math.atan2(norm, m_q.getW());
+  }
+
+  /**
    * Returns rotation matrix representation of this rotation.
    *
    * @return Rotation matrix representation of this rotation.
@@ -486,29 +512,12 @@ public class Rotation3d
   }
 
   /**
-   * Returns the axis in the axis-angle representation of this rotation.
+   * Returns rotation vector representation of this rotation.
    *
-   * @return The axis in the axis-angle representation.
+   * @return Rotation vector representation of this rotation.
    */
-  public Vector<N3> getAxis() {
-    double norm =
-        Math.sqrt(m_q.getX() * m_q.getX() + m_q.getY() * m_q.getY() + m_q.getZ() * m_q.getZ());
-    if (norm == 0.0) {
-      return VecBuilder.fill(0.0, 0.0, 0.0);
-    } else {
-      return VecBuilder.fill(m_q.getX() / norm, m_q.getY() / norm, m_q.getZ() / norm);
-    }
-  }
-
-  /**
-   * Returns the angle in radians in the axis-angle representation of this rotation.
-   *
-   * @return The angle in radians in the axis-angle representation of this rotation.
-   */
-  public double getAngle() {
-    double norm =
-        Math.sqrt(m_q.getX() * m_q.getX() + m_q.getY() * m_q.getY() + m_q.getZ() * m_q.getZ());
-    return 2.0 * Math.atan2(norm, m_q.getW());
+  public Vector<N3> toVector() {
+    return m_q.toRotationVector();
   }
 
   /**

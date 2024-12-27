@@ -1,19 +1,19 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 18:09:45 -0400
-Subject: [PATCH 14/36] Delete numbers from MathExtras
+Subject: [PATCH 14/37] Delete numbers from MathExtras
 
 ---
  llvm/include/llvm/Support/MathExtras.h | 36 --------------------------
  1 file changed, 36 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 7541447fa2db5e1634d952b1f39957eb725611f4..60b3b9012a32dda5e7c3ba1dc5923ffa68df8215 100644
+index 6028ba8ead7627b4821aa8642f5069b305605c5e..b9084182158757647cc9896320a353a373b0f9ec 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -24,42 +24,6 @@
- 
- namespace llvm {
+@@ -40,42 +40,6 @@ template <typename T, typename U, typename = enableif_int<T, U>>
+ using common_sint =
+     std::common_type_t<std::make_signed_t<T>, std::make_signed_t<U>>;
  
 -/// Mathematical constants.
 -namespace numbers {

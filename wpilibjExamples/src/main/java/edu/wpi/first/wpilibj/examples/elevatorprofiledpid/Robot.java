@@ -4,9 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.elevatorprofiledpid;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -54,8 +51,6 @@ public class Robot extends TimedRobot {
     // Run controller and update motor output
     m_motor.setVoltage(
         m_controller.calculate(m_encoder.getDistance())
-            + m_feedforward
-                .calculate(MetersPerSecond.of(m_controller.getSetpoint().velocity))
-                .in(Volts));
+            + m_feedforward.calculate(m_controller.getSetpoint().velocity));
   }
 }

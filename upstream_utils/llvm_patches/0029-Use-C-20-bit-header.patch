@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 11 Jul 2023 22:56:09 -0700
-Subject: [PATCH 28/36] Use C++20 <bit> header
+Subject: [PATCH 29/37] Use C++20 <bit> header
 
 ---
  llvm/include/llvm/ADT/DenseMap.h       |   3 +-
@@ -11,7 +11,7 @@ Subject: [PATCH 28/36] Use C++20 <bit> header
  4 files changed, 31 insertions(+), 341 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index e9bd3bfa4a6fe0fa26ff20069bbadc816c8baa65..93b50c9e53af4ea3af5fd0329a8a03bdce659e9d 100644
+index e77fa3bade8133ae73fd271a582d8500269bfe7e..bf39eaf5ac230221defcdd1b7711b77089d05642 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
 @@ -23,6 +23,7 @@
@@ -22,7 +22,7 @@ index e9bd3bfa4a6fe0fa26ff20069bbadc816c8baa65..93b50c9e53af4ea3af5fd0329a8a03bd
  #include <cassert>
  #include <cstddef>
  #include <cstring>
-@@ -933,7 +934,7 @@ class SmallDenseMap
+@@ -949,7 +950,7 @@ class SmallDenseMap
  public:
    explicit SmallDenseMap(unsigned NumInitBuckets = 0) {
      if (NumInitBuckets > InlineBuckets)
@@ -32,10 +32,10 @@ index e9bd3bfa4a6fe0fa26ff20069bbadc816c8baa65..93b50c9e53af4ea3af5fd0329a8a03bd
    }
  
 diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index 08d6edb14eb3cd51405329aae61b9782266a2590..e84d53e6bf2f741be562b9d66bf0bdfe4a79f936 100644
+index a33c6eec308c8722f88b09f73f954d39558c3d62..36b4d4b58b414bd6f61437fb597cd596cb16e66f 100644
 --- a/llvm/include/llvm/ADT/Hashing.h
 +++ b/llvm/include/llvm/ADT/Hashing.h
-@@ -49,6 +49,7 @@
+@@ -50,6 +50,7 @@
  #include "llvm/Support/SwapByteOrder.h"
  #include "llvm/Support/type_traits.h"
  #include <algorithm>
@@ -43,7 +43,7 @@ index 08d6edb14eb3cd51405329aae61b9782266a2590..e84d53e6bf2f741be562b9d66bf0bdfe
  #include <cassert>
  #include <cstring>
  #include <optional>
-@@ -224,30 +225,30 @@ inline uint64_t hash_17to32_bytes(const char *s, size_t len, uint64_t seed) {
+@@ -208,30 +209,30 @@ inline uint64_t hash_17to32_bytes(const char *s, size_t len, uint64_t seed) {
    uint64_t b = fetch64(s + 8);
    uint64_t c = fetch64(s + len - 8) * k2;
    uint64_t d = fetch64(s + len - 16) * k0;
@@ -85,7 +85,7 @@ index 08d6edb14eb3cd51405329aae61b9782266a2590..e84d53e6bf2f741be562b9d66bf0bdfe
    uint64_t r = shift_mix((vf + ws) * k2 + (wf + vs) * k0);
    return shift_mix((seed ^ (r * k0)) + vs) * k2;
  }
-@@ -280,7 +281,7 @@ struct hash_state {
+@@ -264,7 +265,7 @@ struct hash_state {
      hash_state state = {0,
                          seed,
                          hash_16_bytes(seed, k1),
@@ -94,7 +94,7 @@ index 08d6edb14eb3cd51405329aae61b9782266a2590..e84d53e6bf2f741be562b9d66bf0bdfe
                          seed * k1,
                          shift_mix(seed),
                          0};
-@@ -294,10 +295,10 @@ struct hash_state {
+@@ -278,10 +279,10 @@ struct hash_state {
    static void mix_32_bytes(const char *s, uint64_t &a, uint64_t &b) {
      a += fetch64(s);
      uint64_t c = fetch64(s + 24);
@@ -107,7 +107,7 @@ index 08d6edb14eb3cd51405329aae61b9782266a2590..e84d53e6bf2f741be562b9d66bf0bdfe
      a += c;
    }
  
-@@ -305,11 +306,11 @@ struct hash_state {
+@@ -289,11 +290,11 @@ struct hash_state {
    /// We mix all 64 bytes even when the chunk length is smaller, but we
    /// record the actual length.
    void mix(const char *s) {
@@ -454,7 +454,7 @@ index c42b5e686bdc9cf3da71d8edaddc08216fe5fb2a..a19b6a9b80da2965f1308d3e7b0ade59
  
  #endif
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index daa79d99578e934ca001d1de5d2772ff961b8fc3..f66e64b601d01f17dc6c7a4e568cc4eb1d9bb985 100644
+index 4033e032b5979a4f25b4c16f3988fb11087ed6bb..219f8894849e80ee70a4b4cf40194682740ec865 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -15,6 +15,7 @@
@@ -465,22 +465,22 @@ index daa79d99578e934ca001d1de5d2772ff961b8fc3..f66e64b601d01f17dc6c7a4e568cc4eb
  #include <cassert>
  #include <climits>
  #include <cstdint>
-@@ -235,12 +236,12 @@ constexpr inline bool isShiftedMask_64(uint64_t Value) {
+@@ -262,12 +263,12 @@ constexpr bool isShiftedMask_64(uint64_t Value) {
  /// Return true if the argument is a power of two > 0.
  /// Ex. isPowerOf2_32(0x00100000U) == true (32 bit edition.)
- constexpr inline bool isPowerOf2_32(uint32_t Value) {
+ constexpr bool isPowerOf2_32(uint32_t Value) {
 -  return llvm::has_single_bit(Value);
 +  return std::has_single_bit(Value);
  }
  
  /// Return true if the argument is a power of two > 0 (64 bit edition.)
- constexpr inline bool isPowerOf2_64(uint64_t Value) {
+ constexpr bool isPowerOf2_64(uint64_t Value) {
 -  return llvm::has_single_bit(Value);
 +  return std::has_single_bit(Value);
  }
  
  /// Return true if the argument contains a non-empty sequence of ones with the
-@@ -252,8 +253,8 @@ inline bool isShiftedMask_32(uint32_t Value, unsigned &MaskIdx,
+@@ -279,8 +280,8 @@ inline bool isShiftedMask_32(uint32_t Value, unsigned &MaskIdx,
                               unsigned &MaskLen) {
    if (!isShiftedMask_32(Value))
      return false;
@@ -491,7 +491,7 @@ index daa79d99578e934ca001d1de5d2772ff961b8fc3..f66e64b601d01f17dc6c7a4e568cc4eb
    return true;
  }
  
-@@ -265,8 +266,8 @@ inline bool isShiftedMask_64(uint64_t Value, unsigned &MaskIdx,
+@@ -292,8 +293,8 @@ inline bool isShiftedMask_64(uint64_t Value, unsigned &MaskIdx,
                               unsigned &MaskLen) {
    if (!isShiftedMask_64(Value))
      return false;
@@ -502,7 +502,7 @@ index daa79d99578e934ca001d1de5d2772ff961b8fc3..f66e64b601d01f17dc6c7a4e568cc4eb
    return true;
  }
  
-@@ -284,26 +285,26 @@ template <> constexpr inline size_t CTLog2<1>() { return 0; }
+@@ -311,26 +312,26 @@ template <> constexpr size_t CTLog2<1>() { return 0; }
  /// (32 bit edition.)
  /// Ex. Log2_32(32) == 5, Log2_32(1) == 0, Log2_32(0) == -1, Log2_32(6) == 2
  inline unsigned Log2_32(uint32_t Value) {

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sun, 30 Jul 2023 14:17:37 -0700
-Subject: [PATCH 29/36] Remove DenseMap GTest printer test
+Subject: [PATCH 30/37] Remove DenseMap GTest printer test
 
 LLVM modifies internal GTest headers to support it, which we can't do.
 ---
@@ -9,10 +9,10 @@ LLVM modifies internal GTest headers to support it, which we can't do.
  1 file changed, 7 deletions(-)
 
 diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
-index 1f232d3046292c0da940ba4bef7d50604556e4c2..8d90d5afea79c619590cc32539e5124d02b1349c 100644
+index b930a21f8b43b64835436fcd27f4802a7987827f..b49100899c658fa952d37e526880913d57d07c5c 100644
 --- a/llvm/unittests/ADT/DenseMapTest.cpp
 +++ b/llvm/unittests/ADT/DenseMapTest.cpp
-@@ -737,11 +737,4 @@ TEST(DenseMapCustomTest, VariantSupport) {
+@@ -761,11 +761,4 @@ TEST(DenseMapCustomTest, VariantSupport) {
    EXPECT_FALSE(DenseMapInfo<variant>::isEqual(Keys[2], Keys[2]));
  }
  

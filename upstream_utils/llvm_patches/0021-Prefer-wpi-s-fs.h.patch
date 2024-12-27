@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:49:36 -0400
-Subject: [PATCH 20/36] Prefer wpi's fs.h
+Subject: [PATCH 21/37] Prefer wpi's fs.h
 
 ---
  llvm/include/llvm/Support/raw_ostream.h | 7 ++-----
  1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index e7526e016a858ad728feb7cf1c5014b9691759d4..d56999186f719f8d91f3a047a19960caf62a066c 100644
+index a6799603a0106262520ba1c9fda14a7967b12a63..39a600c2ed7cd1cfecb46ff17929ffcb389207d7 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -26,18 +26,15 @@

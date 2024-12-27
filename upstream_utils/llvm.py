@@ -13,7 +13,7 @@ def run_global_replacements(wpiutil_llvm_files):
 
         # Rename namespace from llvm to wpi
         content = content.replace("namespace llvm", "namespace wpi")
-        content = content.replace("llvm::", "wpi::")
+        content = content.replace("llvm:", "wpi:")
 
         # Fix #includes
         content = content.replace('include "llvm/ADT', 'include "wpi')
@@ -175,7 +175,7 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "llvm"
     url = "https://github.com/llvm/llvm-project"
-    tag = "llvmorg-18.1.8"
+    tag = "llvmorg-19.1.6"
 
     patch_options = {
         "use_threeway": True,
