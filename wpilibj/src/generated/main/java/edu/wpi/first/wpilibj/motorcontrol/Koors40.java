@@ -39,7 +39,7 @@ public class Koors40 extends PWMMotorController {
     super("Koors40", channel);
 
     m_pwm.setBoundsMicroseconds(2004, 1520, 1500, 1480, 997);
-    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
+    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k4X);
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();
 

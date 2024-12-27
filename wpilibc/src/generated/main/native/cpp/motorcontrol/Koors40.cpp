@@ -12,7 +12,7 @@ using namespace frc;
 
 Koors40::Koors40(int channel) : PWMMotorController("Koors40", channel) {
   m_pwm.SetBounds(2.004_ms, 1.52_ms, 1.5_ms, 1.48_ms, 0.997_ms);
-  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
+  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_4X);
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
