@@ -40,7 +40,7 @@ public class NTBackend implements EpilogueBackend {
    *
    * @param nt the NetworkTable instance to use to send data to
    */
-  public NTBackend(NetworkTableInstance nt) {
+  NTBackend(NetworkTableInstance nt) {
     this.m_nt = nt;
   }
 
