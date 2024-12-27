@@ -1,4 +1,4 @@
-project(wpical)
+project(wpical LANGUAGES C CXX Fortran)
 
 include(CompileWarnings)
 include(GenResources)
