@@ -34,9 +34,11 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install wpiformat
-        run: pip3 install wpiformat==2024.51
+        run: |
+          python -m venv ${{ runner.temp }}/wpiformat
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2024.51
       - name: Run
-        run: wpiformat
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat
       - name: Check output
         run: git --no-pager diff --exit-code HEAD
       - name: Generate diff
@@ -74,18 +76,20 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install wpiformat
-        run: pip3 install wpiformat==2024.51
+        run: |
+          python -m venv ${{ runner.temp }}/wpiformat
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2024.51
       - name: Create compile_commands.json
         run: |
           ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64release/compile_commands.json
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64debug/compile_commands.json
       - name: List changed files
-        run: wpiformat -list-changed-files
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -list-changed-files
       - name: Run clang-tidy release
-        run: wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64release -vv
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64release -vv
       - name: Run clang-tidy debug
-        run: wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64debug -vv
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64debug -vv
   javaformat:
     name: "Java format"
     runs-on: ubuntu-22.04
