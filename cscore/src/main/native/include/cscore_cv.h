@@ -394,7 +394,7 @@ inline uint64_t CvSink::GrabFrameDirectLastTime(cv::Mat& image,
   rawFrame.stride = 0;
   rawFrame.pixelFormat = pixelFormat;
   auto timestamp = GrabSinkFrameTimeoutLastTime(m_handle, rawFrame, timeout,
-                                                lastFrameTime & m_status);
+                                                lastFrameTime, &m_status);
   if (m_status != CS_OK) {
     return 0;
   }

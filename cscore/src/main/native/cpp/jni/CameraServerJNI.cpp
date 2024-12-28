@@ -1659,30 +1659,6 @@ Java_edu_wpi_first_cscore_CameraServerJNI_grabRawSinkFrameTimeout
 
 /*
  * Class:     edu_wpi_first_cscore_CameraServerJNI
- * Method:    grabRawSinkFrameTimeoutLastTime
- * Signature: (IJDJ)J
- */
-JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_cscore_CameraServerJNI_grabRawSinkFrameTimeoutLastTime
-  (JNIEnv* env, jclass, jint sink, jlong framePtr, jdouble timeout,
-   jlong lastFrameTimeout)
-{
-  auto* frame = reinterpret_cast<wpi::RawFrame*>(framePtr);
-  auto origData = frame->data;
-  CS_Status status = 0;
-
-  // fill frame with a copy of the latest frame from the Source
-  auto rv = cs::GrabSinkFrameTimeoutLastTime(
-      static_cast<CS_Sink>(sink), *frame, timeout, lastFrameTimeout, &status);
-  if (!CheckStatus(env, status)) {
-    return 0;
-  }
-
-  return rv;
-}
-
-/*
- * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSinkError
  * Signature: (I)Ljava/lang/String;
  */

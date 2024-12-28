@@ -63,7 +63,8 @@ uint64_t RawSinkImpl::GrabFrame(WPI_RawFrame& image) {
 }
 
 uint64_t RawSinkImpl::GrabFrame(WPI_RawFrame& image, double timeout){
-    return GrabFrameLastTime(image, timeout, 0)}
+    return GrabFrame(image, timeout, 0);
+}
 
 uint64_t RawSinkImpl::GrabFrame(WPI_RawFrame& image, double timeout,
                                 uint64_t lastFrameTime) {
@@ -230,7 +231,7 @@ uint64_t CS_GrabRawSinkFrameTimeoutWithFrameTime(CS_Sink sink,
                                                  double timeout,
                                                  uint64_t lastFrameTime,
                                                  CS_Status* status) {
-  return cs::GrabSinkFrameTimeoutLastTime(sink, *image, timeout, status,
+  return cs::GrabSinkFrameTimeoutLastTime(sink, *image, timeout,
                                           lastFrameTime, status);
 }
 

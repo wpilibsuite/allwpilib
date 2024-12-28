@@ -785,23 +785,6 @@ public class CameraServerJNI {
       int sink, RawFrame frame, long nativeObj, double timeout);
 
   /**
-   * Fill {@param framePtr} with the latest image from the source this sink is connected to.
-   *
-   * <p>If lastFrameTime is provided and non-zero, the sink will fill image with the first frame
-   * from the source that is not equal to lastFrameTime. If lastFrameTime is zero, the time of the
-   * current frame owned by the CvSource is used, and this function will block until the connected
-   * CvSource provides a new frame.
-   *
-   * @param sink Sink handle.
-   * @param nativeObj Pointer to a wpi::RawFrame.
-   * @param timeout Timeout in seconds.
-   * @param lastFrameTime Timestamp of the last frame - used to compare new frames against.
-   * @return Frame time, in uS, of the incoming frame.
-   */
-  public static native long grabRawSinkFrameTimeoutLastTime(
-      int sink, long framePtr, double timeout, long lastFrameTime);
-
-  /**
    * Returns sink error message.
    *
    * @param sink Sink handle.
