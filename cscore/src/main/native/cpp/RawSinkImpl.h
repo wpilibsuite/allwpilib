@@ -41,6 +41,8 @@ class RawSinkImpl : public SinkImpl {
  private:
   void ThreadMain();
 
+  // Copies the image from incomingFrame into rawFrame, converting where
+  // necessary to the resolution of rawFrame
   uint64_t GrabFrameImpl(WPI_RawFrame& rawFrame, Frame& incomingFrame);
 
   std::atomic_bool m_active;  // set to false to terminate threads
