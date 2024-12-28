@@ -64,9 +64,16 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
   /**
    * Resets the Scheduler instance, which is useful for testing purposes. This should not be called
-   * from user code.
+   * from user code and will only work when simulating code.
    */
   public static synchronized void resetInstance() {
+    if (!RobotBase.isSimulation()) {
+      DriverStation.reportWarning(
+          "Ignored call to CommandScheduler.resetInstance() outside of simulation! "
+              + "CommandScheduler.resetInstance() should only be used for unit test setup.",
+          true);
+      return;
+    }
     if (instance != null) {
       instance.close();
     }

@@ -10,6 +10,7 @@
 #include <utility>
 #include <vector>
 
+#include <frc/Errors.h>
 #include <frc/RobotBase.h>
 #include <frc/RobotState.h>
 #include <frc/TimedRobot.h>
@@ -94,6 +95,12 @@ CommandScheduler& CommandScheduler::GetInstance() {
 }
 
 void CommandScheduler::ResetInstance() {
+  if (!frc::RobotBase::IsSimulation()) {
+    FRC_ReportWarning(
+        "Ignoring call to frc2::CommandScheduler::ResetInstance() outside of "
+        "simulation! frc2::CommandScheduler::ResetInstance() should only be "
+        "used for unit test setup.");
+  }
   std::make_unique<Impl>().swap(GetInstance().m_impl);
 }
 

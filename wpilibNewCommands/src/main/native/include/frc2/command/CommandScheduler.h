@@ -45,7 +45,8 @@ class CommandScheduler final : public wpi::Sendable,
   static CommandScheduler& GetInstance();
 
   /** Resets the Scheduler instance, which is useful for testing purposes. This
-   * should not be called from user code. */
+   * should not be called from user code and will only work when simulating
+   * code. */
   static void ResetInstance();
 
   ~CommandScheduler() override;
