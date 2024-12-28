@@ -147,10 +147,10 @@ namespace warn {
  *
  * @param[in]  format error message format
  */
-#define FRC_ReportWarning(format, ...)                                  \
-  do {                                                                  \
-    ::frc::ReportError(warn::Warning, __FILE__, __LINE__, __FUNCTION__, \
-                       format __VA_OPT__(, ) __VA_ARGS__);              \
+#define FRC_ReportWarning(format, ...)                                         \
+  do {                                                                         \
+    ::frc::ReportError(::frc::warn::Warning, __FILE__, __LINE__, __FUNCTION__, \
+                       format __VA_OPT__(, ) __VA_ARGS__);                     \
   } while (0)
 
 /**
@@ -186,7 +186,7 @@ namespace warn {
 #define FRC_AssertMessage(condition, format, ...)                              \
   do {                                                                         \
     if (!(condition)) {                                                        \
-      throw ::frc::MakeError(err::AssertionFailure, __FILE__, __LINE__,        \
+      throw ::frc::MakeError(::frc::err::AssertionFailure, __FILE__, __LINE__, \
                              __FUNCTION__, format __VA_OPT__(, ) __VA_ARGS__); \
     }                                                                          \
   } while (0)
