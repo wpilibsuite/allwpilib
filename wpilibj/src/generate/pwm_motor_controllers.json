@@ -168,5 +168,19 @@
       "deadbandMin": 1.480,
       "min": 0.997
     }
+  },
+  {
+    "name": "Koors40",
+    "Manufacturer": "AndyMark",
+    "DisplayName": "Koors40",
+    "ResourceName": "Koors40",
+    "PeriodMultiplier": 4,
+    "pulse_width_ms": {
+      "max": 2.004,
+      "deadbandMax": 1.520,
+      "center": 1.500,
+      "deadbandMin": 1.480,
+      "min": 0.997
+    }
   }
 ]

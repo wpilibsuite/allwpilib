@@ -297,6 +297,14 @@
 #endif
 #endif
 
+/// LLVM_ATTRIBUTE_RESTRICT - Annotates a pointer to tell the compiler that
+/// it is not aliased in the current scope.
+#if defined(__clang__) || defined(__GNUC__) || defined(_MSC_VER)
+#define LLVM_ATTRIBUTE_RESTRICT __restrict
+#else
+#define LLVM_ATTRIBUTE_RESTRICT
+#endif
+
 /// \macro LLVM_ATTRIBUTE_RETURNS_NOALIAS Used to mark a function as returning a
 /// pointer that does not alias any other valid pointer.
 #ifndef LLVM_ATTRIBUTE_RETURNS_NOALIAS

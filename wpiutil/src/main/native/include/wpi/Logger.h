@@ -66,11 +66,10 @@ class Logger {
 #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #endif
 
-#define WPI_LOG(logger_inst, level, format, ...)                         \
-  if ((logger_inst).HasLogger() && level >= (logger_inst).min_level()) { \
-    (logger_inst)                                                        \
-        .Log(level, __FILE__, __LINE__,                                  \
-             FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__);             \
+#define WPI_LOG(logger_inst, level, format, ...)                            \
+  if ((logger_inst).HasLogger() && level >= (logger_inst).min_level()) {    \
+    (logger_inst)                                                           \
+        .Log(level, __FILE__, __LINE__, format __VA_OPT__(, ) __VA_ARGS__); \
   }
 
 #define WPI_ERROR(inst, format, ...) \

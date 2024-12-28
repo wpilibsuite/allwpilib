@@ -8,8 +8,9 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.numbers.N1;
 import java.util.function.BiFunction;
-import java.util.function.DoubleFunction;
-import java.util.function.Function;
+import java.util.function.DoubleBinaryOperator;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.UnaryOperator;
 
 /** Numerical integration utilities. */
 public final class NumericalIntegration {
@@ -25,13 +26,12 @@ public final class NumericalIntegration {
    * @param dtSeconds The time over which to integrate.
    * @return the integration of dx/dt = f(x) for dt.
    */
-  @SuppressWarnings("overloads")
-  public static double rk4(DoubleFunction<Double> f, double x, double dtSeconds) {
+  public static double rk4(DoubleUnaryOperator f, double x, double dtSeconds) {
     final var h = dtSeconds;
-    final var k1 = f.apply(x);
-    final var k2 = f.apply(x + h * k1 * 0.5);
-    final var k3 = f.apply(x + h * k2 * 0.5);
-    final var k4 = f.apply(x + h * k3);
+    final var k1 = f.applyAsDouble(x);
+    final var k2 = f.applyAsDouble(x + h * k1 * 0.5);
+    final var k3 = f.applyAsDouble(x + h * k2 * 0.5);
+    final var k4 = f.applyAsDouble(x + h * k3);
 
     return x + h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
   }
@@ -45,15 +45,13 @@ public final class NumericalIntegration {
    * @param dtSeconds The time over which to integrate.
    * @return The result of Runge Kutta integration (4th order).
    */
-  @SuppressWarnings("overloads")
-  public static double rk4(
-      BiFunction<Double, Double, Double> f, double x, Double u, double dtSeconds) {
+  public static double rk4(DoubleBinaryOperator f, double x, double u, double dtSeconds) {
     final var h = dtSeconds;
 
-    final var k1 = f.apply(x, u);
-    final var k2 = f.apply(x + h * k1 * 0.5, u);
-    final var k3 = f.apply(x + h * k2 * 0.5, u);
-    final var k4 = f.apply(x + h * k3, u);
+    final var k1 = f.applyAsDouble(x, u);
+    final var k2 = f.applyAsDouble(x + h * k1 * 0.5, u);
+    final var k3 = f.applyAsDouble(x + h * k2 * 0.5, u);
+    final var k4 = f.applyAsDouble(x + h * k3, u);
 
     return x + h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
   }
@@ -69,7 +67,6 @@ public final class NumericalIntegration {
    * @param dtSeconds The time over which to integrate.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
-  @SuppressWarnings("overloads")
   public static <States extends Num, Inputs extends Num> Matrix<States, N1> rk4(
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
       Matrix<States, N1> x,
@@ -94,9 +91,8 @@ public final class NumericalIntegration {
    * @param dtSeconds The time over which to integrate.
    * @return 4th order Runge-Kutta integration of dx/dt = f(x) for dt.
    */
-  @SuppressWarnings("overloads")
   public static <States extends Num> Matrix<States, N1> rk4(
-      Function<Matrix<States, N1>, Matrix<States, N1>> f, Matrix<States, N1> x, double dtSeconds) {
+      UnaryOperator<Matrix<States, N1>> f, Matrix<States, N1> x, double dtSeconds) {
     final var h = dtSeconds;
 
     Matrix<States, N1> k1 = f.apply(x);
@@ -145,7 +141,6 @@ public final class NumericalIntegration {
    * @param dtSeconds The time over which to integrate.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
-  @SuppressWarnings("overloads")
   public static <States extends Num, Inputs extends Num> Matrix<States, N1> rkdp(
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
       Matrix<States, N1> x,
@@ -166,7 +161,6 @@ public final class NumericalIntegration {
    * @param maxError The maximum acceptable truncation error. Usually a small number like 1e-6.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
-  @SuppressWarnings("overloads")
   public static <States extends Num, Inputs extends Num> Matrix<States, N1> rkdp(
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
       Matrix<States, N1> x,
@@ -291,7 +285,6 @@ public final class NumericalIntegration {
    * @param maxError The maximum acceptable truncation error. Usually a small number like 1e-6.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
-  @SuppressWarnings("overloads")
   public static <Rows extends Num, Cols extends Num> Matrix<Rows, Cols> rkdp(
       BiFunction<Double, Matrix<Rows, Cols>, Matrix<Rows, Cols>> f,
       double t,

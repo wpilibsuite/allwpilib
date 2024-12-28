@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sun, 8 May 2022 16:46:20 -0400
+Subject: [PATCH 20/37] Prefer fmtlib
+
+---
+ llvm/lib/Support/ErrorHandling.cpp | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
+
+diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+index c795f13065c820de772b56be7f59aab63f6ee084..9b292a51dbd59ad700da22d008a5bcac1c334b26 100644
+--- a/llvm/lib/Support/ErrorHandling.cpp
++++ b/llvm/lib/Support/ErrorHandling.cpp
+@@ -22,7 +22,7 @@
+ #include "llvm/Support/Signals.h"
+ #include "llvm/Support/Threading.h"
+ #include "llvm/Support/WindowsError.h"
+-#include "llvm/Support/raw_ostream.h"
++#include "wpi/print.h"
+ #include <cassert>
+ #include <cstdlib>
+ #include <mutex>
+@@ -93,15 +93,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+   if (handler) {
+     handler(handlerData, std::string{Reason}.c_str(), GenCrashDiag);
+   } else {
+-    // Blast the result out to stderr.  We don't try hard to make sure this
+-    // succeeds (e.g. handling EINTR) and we can't use errs() here because
+-    // raw ostreams can call report_fatal_error.
+-    SmallVector<char, 64> Buffer;
+-    raw_svector_ostream OS(Buffer);
+-    OS << "LLVM ERROR: " << Reason << "\n";
+-    std::string_view MessageStr = OS.str();
+-    ssize_t written = ::write(2, MessageStr.data(), MessageStr.size());
+-    (void)written; // If something went wrong, we deliberately just give up.
++    wpi::print(stderr, "LLVM ERROR: {}\n", Reason);
+   }
+ 
+   // If we reached here, we are failing ungracefully. Run the interrupt handlers
+@@ -177,11 +169,11 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
+   // llvm_unreachable is intended to be used to indicate "impossible"
+   // situations, and not legitimate runtime errors.
+   if (msg)
+-    dbgs() << msg << "\n";
+-  dbgs() << "UNREACHABLE executed";
++    wpi::print(stderr, "{}\n", msg);
++  std::fputs("UNREACHABLE executed", stderr);
+   if (file)
+-    dbgs() << " at " << file << ":" << line;
+-  dbgs() << "!\n";
++    wpi::print(stderr, " at {}:{}", file, line);
++  wpi::print(stderr, "!\n");
+   abort();
+ #ifdef LLVM_BUILTIN_UNREACHABLE
+   // Windows systems and possibly others don't declare abort() to be noreturn,
