@@ -84,14 +84,11 @@ TEST_F(ConditionalCommandTest, TwoFalseOneTrue) {
 }
 
 TEST_F(ConditionalCommandTest, AllCancelSelf) {
-  auto command = cmd::Either(
-      cmd::WaitUntil([] {
-        return false;
-      }).WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
-      cmd::WaitUntil([] {
-        return false;
-      }).WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
-      [] { return true; });
+  auto command = cmd::Either(cmd::Idle().WithInterruptBehavior(
+                                 Command::InterruptionBehavior::kCancelSelf),
+                             cmd::Idle().WithInterruptBehavior(
+                                 Command::InterruptionBehavior::kCancelSelf),
+                             [] { return true; });
   EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
             command.get()->GetInterruptionBehavior());
 }
