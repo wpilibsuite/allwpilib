@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Fri, 10 Nov 2023 14:17:53 -0800
-Subject: [PATCH 12/13] Suppress stringop-overflow warning false positives
+Subject: [PATCH 12/14] Suppress stringop-overflow warning false positives
 
 ---
  src/google/protobuf/io/coded_stream.h    | 7 +++++++
