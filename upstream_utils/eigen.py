@@ -88,7 +88,7 @@ def unsupported_inclusions(dp, f):
         return False
 
     # Include the MatrixFunctions module
-    return "MatrixFunctions" in abspath
+    return "MatrixFunctions" in abspath or "SpecialFunctions" in abspath or "Tensor" in abspath or abspath.endswith("SpecialFunctionsFunctors.h")
 
 
 def copy_upstream_src(wpilib_root):
