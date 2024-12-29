@@ -31,6 +31,7 @@ def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
 def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
 
 apply from: "${rootDir}/shared/ceres.gradle"
+apply from: "${rootDir}/shared/gtsam.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
 
 task generateCppVersion() {
@@ -164,6 +165,7 @@ model {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
+                nativeUtils.useRequiredLibrary(it, 'gtsam')
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
                 it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
@@ -178,6 +180,8 @@ model {
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
                     it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore' << '-framework' << 'Accelerate'
                 } else {
+                    it.cppCompiler.args.add("-Wno-deprecated-copy")
+                    it.cppCompiler.args.add("-Wno-redundant-move")
                     it.linker.args << '-lX11'
                     if (it.targetPlatform.name.startsWith('linuxarm')) {
                         it.linker.args << '-lGL'
@@ -218,6 +222,7 @@ model {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
+                nativeUtils.useRequiredLibrary(it, 'gtsam')
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
                 it.cppCompiler.define('PROJECT_ROOT_PATH', testResources)
                 it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
@@ -246,6 +251,9 @@ model {
                     if (it.targetPlatform.name.startsWith('linuxarm')) {
                         it.linker.args << '-lGL'
                     }
+
+                    it.cppCompiler.args.add("-Wno-deprecated-copy")
+                    it.cppCompiler.args.add("-Wno-redundant-move")
                 }
             }
         }
