@@ -140,7 +140,7 @@ class ParallelRaceGroupTest extends MultiCompositionTestBase<ParallelRaceGroup> 
     MockCommandHolder command3Holder = new MockCommandHolder(true);
     Command command3 = command3Holder.getMock();
 
-    Command group1 = new SequentialCommandGroup(command1, command2);
+    Command group1 = Commands.sequence(command1, command2);
     assertNotNull(group1);
     assertNotNull(command3);
     Command group2 = new ParallelRaceGroup(group1, command3);

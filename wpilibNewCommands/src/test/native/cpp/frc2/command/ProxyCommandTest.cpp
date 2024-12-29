@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <frc2/command/Commands.h>
+
 #include <memory>
 
 #include "CommandTestBase.h"
@@ -52,8 +54,7 @@ TEST_F(ProxyCommandTest, OwningCommandSchedule) {
 
   bool scheduled = false;
 
-  CommandPtr command =
-      InstantCommand([&scheduled] { scheduled = true; }).AsProxy();
+  auto command = cmd::RunOnce([&scheduled] { scheduled = true; }).AsProxy();
 
   scheduler.Schedule(command);
   scheduler.Run();
@@ -66,8 +67,7 @@ TEST_F(ProxyCommandTest, OwningCommandEnd) {
 
   bool finished = false;
 
-  CommandPtr command =
-      WaitUntilCommand([&finished] { return finished; }).AsProxy();
+  auto command = cmd::WaitUntil([&finished] { return finished; }).AsProxy();
 
   scheduler.Schedule(command);
   scheduler.Run();

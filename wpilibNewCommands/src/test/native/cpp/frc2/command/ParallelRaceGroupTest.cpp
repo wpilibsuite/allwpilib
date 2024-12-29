@@ -90,9 +90,9 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceInterrupt) {
 TEST_F(ParallelRaceGroupTest, ParallelRaceNotScheduledCancel) {
   CommandScheduler scheduler = GetScheduler();
 
-  ParallelRaceGroup group{InstantCommand(), InstantCommand()};
+  auto group = cmd::Race(cmd::None(), cmd::None());
 
-  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
+  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(group));
 }
 
 TEST_F(ParallelRaceGroupTest, ParallelRaceCopy) {
@@ -100,15 +100,15 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceCopy) {
 
   bool finished = false;
 
-  WaitUntilCommand command([&finished] { return finished; });
+  auto command = cmd::WaitUntil([&finished] { return finished; });
 
-  ParallelRaceGroup group(command);
-  scheduler.Schedule(&group);
+  auto group = cmd::Race(std::move(command));
+  scheduler.Schedule(group);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&group));
+  EXPECT_TRUE(scheduler.IsScheduled(group));
   finished = true;
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  EXPECT_FALSE(scheduler.IsScheduled(group));
 }
 
 TEST_F(ParallelRaceGroupTest, RaceGroupRequirement) {
@@ -119,17 +119,17 @@ TEST_F(ParallelRaceGroupTest, RaceGroupRequirement) {
   TestSubsystem requirement3;
   TestSubsystem requirement4;
 
-  InstantCommand command1([] {}, {&requirement1, &requirement2});
-  InstantCommand command2([] {}, {&requirement3});
-  InstantCommand command3([] {}, {&requirement3, &requirement4});
+  auto command1 = cmd::RunOnce([] {}, {&requirement1, &requirement2});
+  auto command2 = cmd::RunOnce([] {}, {&requirement3});
+  auto command3 = cmd::RunOnce([] {}, {&requirement3, &requirement4});
 
-  ParallelRaceGroup group(std::move(command1), std::move(command2));
+  auto group = cmd::Race(std::move(command1), std::move(command2));
 
-  scheduler.Schedule(&group);
-  scheduler.Schedule(&command3);
+  scheduler.Schedule(group);
+  scheduler.Schedule(command3);
 
-  EXPECT_TRUE(scheduler.IsScheduled(&command3));
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  EXPECT_TRUE(scheduler.IsScheduled(command3));
+  EXPECT_FALSE(scheduler.IsScheduled(group));
 }
 
 TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnce) {
@@ -139,21 +139,21 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnce) {
   bool finished2 = false;
   bool finished3 = false;
 
-  WaitUntilCommand command1([&finished1] { return finished1; });
-  WaitUntilCommand command2([&finished2] { return finished2; });
-  WaitUntilCommand command3([&finished3] { return finished3; });
+  auto command1 = cmd::WaitUntil([&finished1] { return finished1; });
+  auto command2 = cmd::WaitUntil([&finished2] { return finished2; });
+  auto command3 = cmd::WaitUntil([&finished3] { return finished3; });
 
-  SequentialCommandGroup group1(command1, command2);
-  ParallelRaceGroup group2(std::move(group1), command3);
+  auto group1 = cmd::Sequence(std::move(command1), std::move(command2));
+  auto group2 = cmd::Race(std::move(group1), std::move(command3));
 
-  scheduler.Schedule(&group2);
+  scheduler.Schedule(group2);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&group2));
+  EXPECT_TRUE(scheduler.IsScheduled(group2));
   finished1 = true;
   scheduler.Run();
   finished2 = true;
   EXPECT_NO_FATAL_FAILURE(scheduler.Run());
-  EXPECT_FALSE(scheduler.IsScheduled(&group2));
+  EXPECT_FALSE(scheduler.IsScheduled(group2));
 }
 
 TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTwice) {
