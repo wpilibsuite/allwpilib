@@ -57,13 +57,22 @@ void Window::Display() {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_padding);
   }
 
-  std::string label;
+  std::string name = m_name;
   if (m_name.empty()) {
-    label = fmt::format("{}###{}", m_defaultName, m_id);
-  } else {
-    label = fmt::format("{}###{}", m_name, m_id);
+    name = m_defaultName;
   }
-
+  std::string label = fmt::format("{}###{}", name, m_id);
+  // Accounts for size of title, collapse button, settings button, and
+  // close button
+  ImGui::ShowStyleEditor();
+  float minWidth =
+      ImGui::CalcTextSize(name.c_str()).x + ImGui::GetFontSize() * 2 +
+      ImGui::GetStyle().ItemInnerSpacing.x * 3 +
+      ImGui::GetStyle().FramePadding.x * 2 + ImGui::GetStyle().WindowBorderSize;
+  if (m_view->HasSettings()) {  // TODO doesn't quite work
+    minWidth += ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.x * 3;
+  }
+  ImGui::SetNextWindowSizeConstraints({minWidth, 0}, ImVec2{FLT_MAX, FLT_MAX});
   if (Begin(label.c_str(), &m_visible, m_flags)) {
     if (m_renamePopupEnabled || m_view->HasSettings()) {
       bool isClicked = (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
