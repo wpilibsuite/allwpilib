@@ -62,17 +62,19 @@ void Window::Display() {
     name = m_defaultName;
   }
   std::string label = fmt::format("{}###{}", name, m_id);
-  // Accounts for size of title, collapse button, settings button, and
-  // close button
+
+  // Accounts for size of title, collapse button, and close button
   ImGui::ShowStyleEditor();
   float minWidth =
       ImGui::CalcTextSize(name.c_str()).x + ImGui::GetFontSize() * 2 +
       ImGui::GetStyle().ItemInnerSpacing.x * 3 +
       ImGui::GetStyle().FramePadding.x * 2 + ImGui::GetStyle().WindowBorderSize;
-  if (m_view->HasSettings()) {  // TODO doesn't quite work
-    minWidth += ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.x * 3;
+  // Accounts for size of hamburger button
+  if (m_renamePopupEnabled || m_view->HasSettings()) {
+    minWidth += ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.x;
   }
   ImGui::SetNextWindowSizeConstraints({minWidth, 0}, ImVec2{FLT_MAX, FLT_MAX});
+
   if (Begin(label.c_str(), &m_visible, m_flags)) {
     if (m_renamePopupEnabled || m_view->HasSettings()) {
       bool isClicked = (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
