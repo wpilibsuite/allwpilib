@@ -32,10 +32,9 @@ public class TimedRobot extends IterativeRobotBase {
      * Construct a callback container.
      *
      * @param func The callback to run.
-     * @param startTimeSeconds The common starting point for all callback scheduling in
-     *     microseconds.
-     * @param periodSeconds The period at which to run the callback in microseconds.
-     * @param offsetSeconds The offset from the common starting time in microseconds.
+     * @param startTimeUs The common starting point for all callback scheduling in microseconds.
+     * @param periodUs The period at which to run the callback in microseconds.
+     * @param offsetUs The offset from the common starting time in microseconds.
      */
     Callback(Runnable func, long startTimeUs, long periodUs, long offsetUs) {
       this.func = func;
@@ -54,7 +53,7 @@ public class TimedRobot extends IterativeRobotBase {
 
     @Override
     public int hashCode() {
-      return Double.hashCode(expirationTime);
+      return Long.hashCode(expirationTime);
     }
 
     @Override
