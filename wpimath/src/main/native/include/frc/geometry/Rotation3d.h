@@ -8,7 +8,6 @@
 #include <type_traits>
 
 #include <Eigen/Core>
-#include <Eigen/LU>
 #include <fmt/format.h>
 #include <gcem.hpp>
 #include <wpi/SymbolExports.h>
@@ -114,7 +113,11 @@ class WPILIB_DLLEXPORT Rotation3d {
       if ((R * R.transpose() - Matrix3d::Identity()).norm() > 1e-9) {
         throw std::domain_error("Rotation matrix isn't orthogonal");
       }
-      if (gcem::abs(R.determinant() - 1.0) > 1e-9) {
+      // HACK: Uses ct_matrix instead of <Eigen/LU> for determinant because
+      //       including <Eigen/LU> doubles compilation times on MSVC, even if
+      //       this constructor is unused. MSVC's frontend inefficiently parses
+      //       large headers; GCC and Clang are largely unaffected.
+      if (gcem::abs(ct_matrix{R}.determinant() - 1.0) > 1e-9) {
         throw std::domain_error(
             "Rotation matrix is orthogonal but not special orthogonal");
       }
