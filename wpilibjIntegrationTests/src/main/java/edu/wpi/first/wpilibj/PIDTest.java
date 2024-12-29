@@ -41,9 +41,9 @@ public class PIDTest extends AbstractComsSetup {
   private PIDController m_controller = null;
   private static MotorEncoderFixture<?> me = null;
 
-  private final Double m_p;
-  private final Double m_i;
-  private final Double m_d;
+  private final double m_p;
+  private final double m_i;
+  private final double m_d;
 
   @Override
   protected Logger getClassLogger() {
@@ -58,7 +58,7 @@ public class PIDTest extends AbstractComsSetup {
    * @param d D gain.
    * @param mef Motor encoder fixture.
    */
-  public PIDTest(Double p, Double i, Double d, MotorEncoderFixture<?> mef) {
+  public PIDTest(double p, double i, double d, MotorEncoderFixture<?> mef) {
     logger.fine("Constructor with: " + mef.getType());
     if (PIDTest.me != null && !PIDTest.me.equals(mef)) {
       PIDTest.me.teardown();
@@ -133,7 +133,7 @@ public class PIDTest extends AbstractComsSetup {
     assertEquals(
         "PID.getPositionError() did not start at " + reference,
         reference,
-        m_controller.getPositionError(),
+        m_controller.getError(),
         0);
     m_builder.update();
     assertEquals(m_p, m_table.getEntry("Kp").getDouble(9999999), 0);
@@ -160,10 +160,7 @@ public class PIDTest extends AbstractComsSetup {
     assertEquals(pidData() + "did not start at 0", 0, me.getMotor().get(), 0);
     m_controller.setSetpoint(reference);
     assertEquals(
-        pidData() + "did not have an error of " + reference,
-        reference,
-        m_controller.getPositionError(),
-        0);
+        pidData() + "did not have an error of " + reference, reference, m_controller.getError(), 0);
     Notifier pidRunner =
         new Notifier(
             () -> me.getMotor().set(m_controller.calculate(me.getEncoder().getDistance())));
@@ -171,7 +168,7 @@ public class PIDTest extends AbstractComsSetup {
     Timer.delay(5);
     pidRunner.stop();
     assertTrue(
-        pidData() + "Was not on Target. Controller Error: " + m_controller.getPositionError(),
+        pidData() + "Was not on Target. Controller Error: " + m_controller.getError(),
         m_controller.atSetpoint());
 
     pidRunner.close();

@@ -6,6 +6,8 @@
 
 #include <execinfo.h>
 
+#include <string>
+
 #include "wpi/Demangle.h"
 #include "wpi/SmallString.h"
 #include "wpi/StringExtras.h"
@@ -14,6 +16,7 @@
 namespace wpi {
 
 std::string GetStackTraceDefault(int offset) {
+#ifndef __ANDROID__
   void* stackTrace[128];
   int stackSize = backtrace(stackTrace, 128);
   char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
@@ -36,6 +39,10 @@ std::string GetStackTraceDefault(int offset) {
   std::free(mangledSymbols);
 
   return std::string{trace.str()};
+#else
+  // backtrace_symbols not supported on android
+  return "";
+#endif
 }
 
 }  // namespace wpi

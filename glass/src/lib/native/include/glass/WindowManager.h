@@ -121,6 +121,11 @@ class WindowManager {
    */
   void EraseWindows() { m_windows.clear(); }
 
+  /**
+   * Get window count.
+   */
+  size_t GetNumWindows() const { return m_windows.size(); }
+
  protected:
   /**
    * Removes existing window (by index)

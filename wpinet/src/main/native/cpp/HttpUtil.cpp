@@ -5,13 +5,13 @@
 #include "wpinet/HttpUtil.h"
 
 #include <cctype>
+#include <string>
+#include <utility>
 
 #include <fmt/format.h>
 #include <wpi/Base64.h>
 #include <wpi/StringExtras.h>
 #include <wpi/raw_ostream.h>
-
-#include "wpinet/TCPConnector.h"
 
 namespace wpi {
 
@@ -78,6 +78,22 @@ std::string_view EscapeURI(std::string_view str, SmallVectorImpl<char>& buf,
     buf.push_back(hexLut[(*i) & 0x0f]);
   }
 
+  return {buf.data(), buf.size()};
+}
+
+std::string_view EscapeHTML(std::string_view str, SmallVectorImpl<char>& buf) {
+  buf.clear();
+  for (auto i = str.begin(), end = str.end(); i != end; ++i) {
+    if (*i == '&') {
+      buf.append({'&', 'a', 'm', 'p', ';'});
+    } else if (*i == '<') {
+      buf.append({'&', 'l', 't', ';'});
+    } else if (*i == '>') {
+      buf.append({'&', 'g', 't', ';'});
+    } else {
+      buf.push_back(*i);
+    }
+  }
   return {buf.data(), buf.size()};
 }
 
@@ -354,7 +370,7 @@ HttpLocation::HttpLocation(std::string_view url_, bool* error,
       return;
     }
 
-    params.emplace_back(std::make_pair(param, value));
+    params.emplace_back(std::pair{param, value});
   }
 
   *error = false;

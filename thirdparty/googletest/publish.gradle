@@ -1,0 +1,62 @@
+apply plugin: 'maven-publish'
+
+def baseArtifactId = 'googletest-cpp'
+def artifactGroupId = 'edu.wpi.first.thirdparty.googletest'
+def zipBaseName = '_GROUP_edu_wpi_first_thirdparty_googletest_ID_googletest-cpp_CLS'
+
+def outputsFolder = file("$project.buildDir/outputs")
+
+task cppSourcesZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
+    archiveClassifier = "sources"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src') {
+        into '/'
+    }
+}
+
+task cppHeadersZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
+    archiveClassifier = "headers"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('include') {
+        into '/'
+    }
+}
+
+build.dependsOn cppHeadersZip
+build.dependsOn cppSourcesZip
+
+addTaskToCopyAllOutputs(cppHeadersZip)
+addTaskToCopyAllOutputs(cppSourcesZip)
+
+model {
+    publishing {
+        def googletestTaskList = createComponentZipTasks($.components, ['googletest'], zipBaseName, Zip, project, includeStandardZipFormat)
+
+        publications {
+            cpp(MavenPublication) {
+                googletestTaskList.each {
+                    artifact it
+                }
+
+                artifact cppHeadersZip
+                artifact cppSourcesZip
+
+                artifactId = baseArtifactId
+                groupId artifactGroupId
+                version wpilibVersioning.version.get()
+            }
+        }
+    }
+}

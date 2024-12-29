@@ -4,7 +4,9 @@
 
 #include "frc/Preferences.h"
 
-#include <algorithm>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
@@ -13,19 +15,21 @@
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTableListener.h>
 #include <networktables/StringTopic.h>
+#include <wpi/json.h>
 
 using namespace frc;
 
 // The Preferences table name
 static constexpr std::string_view kTableName{"Preferences"};
-
+static constexpr std::string_view kSmartDashboardType = "RobotPreferences";
 namespace {
 struct Instance {
   Instance();
 
   std::shared_ptr<nt::NetworkTable> table{
       nt::NetworkTableInstance::GetDefault().GetTable(kTableName)};
-  nt::StringPublisher typePublisher{table->GetStringTopic(".type").Publish()};
+  nt::StringPublisher typePublisher{table->GetStringTopic(".type").PublishEx(
+      nt::StringTopic::kTypeString, {{"SmartDashboard", kSmartDashboardType}})};
   nt::MultiSubscriber tableSubscriber{nt::NetworkTableInstance::GetDefault(),
                                       {{fmt::format("{}/", table->GetPath())}}};
   nt::NetworkTableListener listener;
@@ -165,7 +169,7 @@ void Preferences::RemoveAll() {
 }
 
 Instance::Instance() {
-  typePublisher.Set("RobotPreferences");
+  typePublisher.Set(kSmartDashboardType);
   listener = nt::NetworkTableListener::CreateListener(
       tableSubscriber, NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
       [typeTopic = typePublisher.GetTopic().GetHandle()](auto& event) {

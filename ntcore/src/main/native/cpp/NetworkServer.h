@@ -13,12 +13,13 @@
 
 #include <wpinet/EventLoopRunner.h>
 #include <wpinet/uv/Async.h>
+#include <wpinet/uv/Idle.h>
 #include <wpinet/uv/Timer.h>
 
+#include "net/ClientMessageQueue.h"
 #include "net/Message.h"
-#include "net/NetworkLoopQueue.h"
-#include "net/ServerImpl.h"
 #include "ntcore_cpp.h"
+#include "server/ServerImpl.h"
 
 namespace wpi {
 class Logger;
@@ -49,7 +50,7 @@ class NetworkServer {
   class ServerConnection3;
   class ServerConnection4;
 
-  void HandleLocal();
+  void ProcessAllLocal();
   void LoadPersistent();
   void SavePersistent(std::string_view filename, std::string_view data);
   void Init();
@@ -71,11 +72,13 @@ class NetworkServer {
   std::shared_ptr<wpi::uv::Timer> m_savePersistentTimer;
   std::shared_ptr<wpi::uv::Async<>> m_flushLocal;
   std::shared_ptr<wpi::uv::Async<>> m_flush;
+  std::shared_ptr<wpi::uv::Idle> m_idle;
   bool m_shutdown = false;
 
-  std::vector<net::ClientMessage> m_localMsgs;
+  using Queue = net::LocalClientMessageQueue;
+  net::ClientMessage m_localMsgs[Queue::kBlockSize];
 
-  net::ServerImpl m_serverImpl;
+  server::ServerImpl m_serverImpl;
 
   // shared with user (must be atomic or mutex-protected)
   std::atomic<wpi::uv::Async<>*> m_flushLocalAtomic{nullptr};
@@ -87,7 +90,7 @@ class NetworkServer {
   };
   std::vector<Connection> m_connections;
 
-  net::NetworkLoopQueue m_localQueue;
+  Queue m_localQueue;
 
   wpi::EventLoopRunner m_loopRunner;
   wpi::uv::Loop& m_loop;

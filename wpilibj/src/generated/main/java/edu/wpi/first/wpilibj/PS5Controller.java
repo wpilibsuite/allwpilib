@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj;
 
 // import edu.wpi.first.hal.FRCNetComm.tResourceType;
 // import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 
@@ -22,7 +24,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * only through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any
  * 3rd party controllers.
  */
-public class PS5Controller extends GenericHID {
+public class PS5Controller extends GenericHID implements Sendable {
   /** Represents a digital button on a PS5Controller. */
   public enum Button {
     /** Square button. */
@@ -217,7 +219,7 @@ public class PS5Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent square(EventLoop loop) {
-    return new BooleanEvent(loop, this::getSquareButton);
+    return button(Button.kSquare.value, loop);
   }
 
   /**
@@ -255,7 +257,7 @@ public class PS5Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent cross(EventLoop loop) {
-    return new BooleanEvent(loop, this::getCrossButton);
+    return button(Button.kCross.value, loop);
   }
 
   /**
@@ -293,7 +295,7 @@ public class PS5Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent circle(EventLoop loop) {
-    return new BooleanEvent(loop, this::getCircleButton);
+    return button(Button.kCircle.value, loop);
   }
 
   /**
@@ -331,7 +333,7 @@ public class PS5Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent triangle(EventLoop loop) {
-    return new BooleanEvent(loop, this::getTriangleButton);
+    return button(Button.kTriangle.value, loop);
   }
 
   /**
@@ -369,7 +371,7 @@ public class PS5Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent L1(EventLoop loop) {
-    return new BooleanEvent(loop, this::getL1Button);
+    return button(Button.kL1.value, loop);
   }
 
   /**
@@ -407,7 +409,7 @@ public class PS5Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent R1(EventLoop loop) {
-    return new BooleanEvent(loop, this::getR1Button);
+    return button(Button.kR1.value, loop);
   }
 
   /**
@@ -445,7 +447,7 @@ public class PS5Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent L2(EventLoop loop) {
-    return new BooleanEvent(loop, this::getL2Button);
+    return button(Button.kL2.value, loop);
   }
 
   /**
@@ -483,7 +485,7 @@ public class PS5Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent R2(EventLoop loop) {
-    return new BooleanEvent(loop, this::getR2Button);
+    return button(Button.kR2.value, loop);
   }
 
   /**
@@ -521,7 +523,7 @@ public class PS5Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent create(EventLoop loop) {
-    return new BooleanEvent(loop, this::getCreateButton);
+    return button(Button.kCreate.value, loop);
   }
 
   /**
@@ -559,7 +561,7 @@ public class PS5Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent options(EventLoop loop) {
-    return new BooleanEvent(loop, this::getOptionsButton);
+    return button(Button.kOptions.value, loop);
   }
 
   /**
@@ -597,7 +599,7 @@ public class PS5Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent L3(EventLoop loop) {
-    return new BooleanEvent(loop, this::getL3Button);
+    return button(Button.kL3.value, loop);
   }
 
   /**
@@ -635,7 +637,7 @@ public class PS5Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent R3(EventLoop loop) {
-    return new BooleanEvent(loop, this::getR3Button);
+    return button(Button.kR3.value, loop);
   }
 
   /**
@@ -673,7 +675,7 @@ public class PS5Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent PS(EventLoop loop) {
-    return new BooleanEvent(loop, this::getPSButton);
+    return button(Button.kPS.value, loop);
   }
 
   /**
@@ -711,14 +713,15 @@ public class PS5Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent touchpad(EventLoop loop) {
-    return new BooleanEvent(loop, this::getTouchpadButton);
+    return button(Button.kTouchpad.value, loop);
   }
 
   /**
    * Read the value of the touchpad on the controller.
    *
    * @return The state of the touchpad.
-   * @deprecated Use {@link getTouchpadButton} instead
+   * @deprecated Use {@link getTouchpadButton} instead. This function is deprecated for removal to
+   *     make function names consistent to allow the HID classes to be automatically generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getTouchpad() {
@@ -729,7 +732,9 @@ public class PS5Controller extends GenericHID {
    * Whether the touchpad was pressed since the last check.
    *
    * @return Whether the touchpad was pressed since the last check.
-   * @deprecated Use {@link getTouchpadButtonPressed} instead
+   * @deprecated Use {@link getTouchpadButtonPressed} instead. This function is deprecated for
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getTouchpadPressed() {
@@ -740,10 +745,38 @@ public class PS5Controller extends GenericHID {
    * Whether the touchpad was released since the last check.
    *
    * @return Whether the touchpad was released since the last check.
-   * @deprecated Use {@link getTouchpadButtonReleased} instead
+   * @deprecated Use {@link getTouchpadButtonReleased} instead. This function is deprecated for
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getTouchpadReleased() {
     return getRawButtonReleased(Button.kTouchpad.value);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("HID");
+    builder.publishConstString("ControllerType", "PS5");
+    builder.addDoubleProperty("L2", this::getL2Axis, null);
+    builder.addDoubleProperty("R2", this::getR2Axis, null);
+    builder.addDoubleProperty("LeftX", this::getLeftX, null);
+    builder.addDoubleProperty("LeftY", this::getLeftY, null);
+    builder.addDoubleProperty("RightX", this::getRightX, null);
+    builder.addDoubleProperty("RightY", this::getRightY, null);
+    builder.addBooleanProperty("Square", this::getSquareButton, null);
+    builder.addBooleanProperty("Cross", this::getCrossButton, null);
+    builder.addBooleanProperty("Circle", this::getCircleButton, null);
+    builder.addBooleanProperty("Triangle", this::getTriangleButton, null);
+    builder.addBooleanProperty("L1", this::getL1Button, null);
+    builder.addBooleanProperty("R1", this::getR1Button, null);
+    builder.addBooleanProperty("L2", this::getL2Button, null);
+    builder.addBooleanProperty("R2", this::getR2Button, null);
+    builder.addBooleanProperty("Create", this::getCreateButton, null);
+    builder.addBooleanProperty("Options", this::getOptionsButton, null);
+    builder.addBooleanProperty("L3", this::getL3Button, null);
+    builder.addBooleanProperty("R3", this::getR3Button, null);
+    builder.addBooleanProperty("PS", this::getPSButton, null);
+    builder.addBooleanProperty("Touchpad", this::getTouchpadButton, null);
   }
 }

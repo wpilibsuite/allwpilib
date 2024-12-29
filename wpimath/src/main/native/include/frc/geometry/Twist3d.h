@@ -6,12 +6,12 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "frc/geometry/Rotation3d.h"
 #include "units/angle.h"
 #include "units/length.h"
 #include "units/math.h"
 
 namespace frc {
+
 /**
  * A change in distance along a 3D arc since the last pose update. We can use
  * ideas from differential calculus to create new Pose3ds from a Twist3d and
@@ -56,7 +56,7 @@ struct WPILIB_DLLEXPORT Twist3d {
    * @param other The other object.
    * @return Whether the two objects are equal.
    */
-  bool operator==(const Twist3d& other) const {
+  constexpr bool operator==(const Twist3d& other) const {
     return units::math::abs(dx - other.dx) < 1E-9_m &&
            units::math::abs(dy - other.dy) < 1E-9_m &&
            units::math::abs(dz - other.dz) < 1E-9_m &&
@@ -76,6 +76,7 @@ struct WPILIB_DLLEXPORT Twist3d {
                    rx * factor, ry * factor, rz * factor};
   }
 };
+
 }  // namespace frc
 
 #include "frc/geometry/proto/Twist3dProto.h"

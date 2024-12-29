@@ -6,6 +6,7 @@
 
 #include <wpi/MathExtras.h>
 
+#include "frc/RobotController.h"
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/LinearSystemId.h"
 

@@ -4,8 +4,15 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.proto.Transform3dProto;
 import edu.wpi.first.math.geometry.struct.Transform3dStruct;
+import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -64,10 +71,52 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
     m_rotation = rotation;
   }
 
+  /**
+   * Constructs a transform with x, y, and z translations instead of a separate Translation3d. The
+   * X, Y, and Z translations will be converted to and tracked as meters.
+   *
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param z The z component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  public Transform3d(Distance x, Distance y, Distance z, Rotation3d rotation) {
+    this(x.in(Meters), y.in(Meters), z.in(Meters), rotation);
+  }
+
+  /**
+   * Constructs a transform with the specified affine transformation matrix.
+   *
+   * @param matrix The affine transformation matrix.
+   * @throws IllegalArgumentException if the affine transformation matrix is invalid.
+   */
+  public Transform3d(Matrix<N4, N4> matrix) {
+    m_translation = new Translation3d(matrix.get(0, 3), matrix.get(1, 3), matrix.get(2, 3));
+    m_rotation = new Rotation3d(matrix.block(3, 3, 0, 0));
+    if (matrix.get(3, 0) != 0.0
+        || matrix.get(3, 1) != 0.0
+        || matrix.get(3, 2) != 0.0
+        || matrix.get(3, 3) != 1.0) {
+      throw new IllegalArgumentException("Affine transformation matrix is invalid");
+    }
+  }
+
   /** Constructs the identity transform -- maps an initial pose to itself. */
   public Transform3d() {
     m_translation = Translation3d.kZero;
     m_rotation = Rotation3d.kZero;
+  }
+
+  /**
+   * Constructs a 3D transform from a 2D transform in the X-Y plane.
+   *
+   * @param transform The 2D transform.
+   * @see Rotation3d#Rotation3d(Rotation2d)
+   * @see Translation3d#Translation3d(Translation2d)
+   */
+  public Transform3d(Transform2d transform) {
+    m_translation = new Translation3d(transform.getTranslation());
+    m_rotation = new Rotation3d(transform.getRotation());
   }
 
   /**
@@ -135,6 +184,62 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
    */
   public double getZ() {
     return m_translation.getZ();
+  }
+
+  /**
+   * Returns the X component of the transformation's translation in a measure.
+   *
+   * @return The x component of the transformation's translation in a measure.
+   */
+  public Distance getMeasureX() {
+    return m_translation.getMeasureX();
+  }
+
+  /**
+   * Returns the Y component of the transformation's translation in a measure.
+   *
+   * @return The y component of the transformation's translation in a measure.
+   */
+  public Distance getMeasureY() {
+    return m_translation.getMeasureY();
+  }
+
+  /**
+   * Returns the Z component of the transformation's translation in a measure.
+   *
+   * @return The z component of the transformation's translation in a measure.
+   */
+  public Distance getMeasureZ() {
+    return m_translation.getMeasureZ();
+  }
+
+  /**
+   * Returns an affine transformation matrix representation of this transformation.
+   *
+   * @return An affine transformation matrix representation of this transformation.
+   */
+  public Matrix<N4, N4> toMatrix() {
+    var vec = m_translation.toVector();
+    var mat = m_rotation.toMatrix();
+    return MatBuilder.fill(
+        Nat.N4(),
+        Nat.N4(),
+        mat.get(0, 0),
+        mat.get(0, 1),
+        mat.get(0, 2),
+        vec.get(0),
+        mat.get(1, 0),
+        mat.get(1, 1),
+        mat.get(1, 2),
+        vec.get(1),
+        mat.get(2, 0),
+        mat.get(2, 1),
+        mat.get(2, 2),
+        vec.get(2),
+        0.0,
+        0.0,
+        0.0,
+        1.0);
   }
 
   /**

@@ -4,6 +4,8 @@
 
 #include "frc/estimator/DifferentialDrivePoseEstimator.h"
 
+#include <vector>
+
 using namespace frc;
 
 DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
@@ -19,7 +21,8 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     units::meter_t leftDistance, units::meter_t rightDistance,
     const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
     const wpi::array<double, 3>& visionMeasurementStdDevs)
-    : PoseEstimator<DifferentialDriveWheelSpeeds,
-                    DifferentialDriveWheelPositions>(
-          kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
-      m_odometryImpl{gyroAngle, leftDistance, rightDistance, initialPose} {}
+    : PoseEstimator(kinematics, m_odometryImpl, stateStdDevs,
+                    visionMeasurementStdDevs),
+      m_odometryImpl{gyroAngle, leftDistance, rightDistance, initialPose} {
+  ResetPose(initialPose);
+}

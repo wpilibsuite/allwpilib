@@ -7,31 +7,30 @@ package edu.wpi.first.wpilibj.examples.addressableled;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 public class Robot extends TimedRobot {
-  private AddressableLED m_led;
-  private AddressableLEDBuffer m_ledBuffer;
+  private final AddressableLED m_led;
+  private final AddressableLEDBuffer m_ledBuffer;
 
   // Create an LED pattern that will display a rainbow across
   // all hues at maximum saturation and half brightness
   private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
 
   // Our LED strip has a density of 120 LEDs per meter
-  private static final Measure<Distance> kLedSpacing = Meters.of(1 / 120.0);
+  private static final Distance kLedSpacing = Meters.of(1 / 120.0);
 
   // Create a new pattern that scrolls the rainbow pattern across the LED strip, moving at a speed
   // of 1 meter per second.
   private final LEDPattern m_scrollingRainbow =
       m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     // PWM port 9
     // Must be a PWM header, not MXP or DIO
     m_led = new AddressableLED(9);

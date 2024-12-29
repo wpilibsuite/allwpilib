@@ -4,13 +4,12 @@
 
 #include "PCMSimGui.h"
 
-#include <glass/hardware/PCM.h>
-#include <glass/other/DeviceTree.h>
-
 #include <cstdio>
 #include <memory>
 #include <vector>
 
+#include <glass/hardware/Pneumatic.h>
+#include <glass/other/DeviceTree.h>
 #include <hal/Ports.h>
 #include <hal/Value.h>
 #include <hal/simulation/CTREPCMData.h>
@@ -25,7 +24,8 @@ namespace {
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(CTREPCMCompressorOn, "Compressor On");
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(CTREPCMClosedLoopEnabled, "Closed Loop");
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(CTREPCMPressureSwitch, "Pressure Switch");
-HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(CTREPCMCompressorCurrent, "Comp Current");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(CTREPCMCompressorCurrent,
+                                    "Compressor Current");
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED2(CTREPCMSolenoidOutput, "Solenoid");
 
 class CompressorSimModel : public glass::CompressorModel {
@@ -90,7 +90,7 @@ class SolenoidSimModel : public glass::SolenoidModel {
   CTREPCMSolenoidOutputSource m_output;
 };
 
-class PCMSimModel : public glass::PCMModel {
+class PCMSimModel : public glass::PneumaticControlModel {
  public:
   explicit PCMSimModel(int32_t index)
       : m_index{index},
@@ -107,6 +107,8 @@ class PCMSimModel : public glass::PCMModel {
       wpi::function_ref<void(glass::SolenoidModel& model, int index)> func)
       override;
 
+  std::string_view GetName() override { return "PCM"; }
+
   int GetNumSolenoids() const { return m_solenoidInitCount; }
 
  private:
@@ -116,7 +118,7 @@ class PCMSimModel : public glass::PCMModel {
   int m_solenoidInitCount = 0;
 };
 
-class PCMsSimModel : public glass::PCMsModel {
+class PCMsSimModel : public glass::PneumaticControlsModel {
  public:
   PCMsSimModel() : m_models(HAL_GetNumCTREPCMModules()) {}
 
@@ -124,8 +126,9 @@ class PCMsSimModel : public glass::PCMsModel {
 
   bool Exists() override { return true; }
 
-  void ForEachPCM(
-      wpi::function_ref<void(glass::PCMModel& model, int index)> func) override;
+  void ForEachPneumaticControl(
+      wpi::function_ref<void(glass::PneumaticControlModel& model, int index)>
+          func) override;
 
  private:
   std::vector<std::unique_ptr<PCMSimModel>> m_models;
@@ -176,8 +179,9 @@ void PCMsSimModel::Update() {
   }
 }
 
-void PCMsSimModel::ForEachPCM(
-    wpi::function_ref<void(glass::PCMModel& model, int index)> func) {
+void PCMsSimModel::ForEachPneumaticControl(
+    wpi::function_ref<void(glass::PneumaticControlModel& model, int index)>
+        func) {
   int32_t numCTREPCMs = m_models.size();
   for (int32_t i = 0; i < numCTREPCMs; ++i) {
     if (auto model = m_models[i].get()) {
@@ -186,7 +190,7 @@ void PCMsSimModel::ForEachPCM(
   }
 }
 
-static bool PCMsAnyInitialized() {
+bool PCMSimGui::PCMsAnyInitialized() {
   static const int32_t num = HAL_GetNumCTREPCMModules();
   for (int32_t i = 0; i < num; ++i) {
     if (HALSIM_GetCTREPCMInitialized(i)) {
@@ -196,31 +200,25 @@ static bool PCMsAnyInitialized() {
   return false;
 }
 
-void PCMSimGui::Initialize() {
-  HALSimGui::halProvider->RegisterModel("CTREPCMs", PCMsAnyInitialized, [] {
-    return std::make_unique<PCMsSimModel>();
-  });
-  HALSimGui::halProvider->RegisterView(
-      "Solenoids", "CTREPCMs",
-      [](glass::Model* model) {
-        bool any = false;
-        static_cast<PCMsSimModel*>(model)->ForEachPCM(
-            [&](glass::PCMModel& CTREPCM, int) {
-              if (static_cast<PCMSimModel*>(&CTREPCM)->GetNumSolenoids() > 0) {
-                any = true;
-              }
-            });
-        return any;
-      },
-      [](glass::Window* win, glass::Model* model) {
-        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-        win->SetDefaultPos(290, 20);
-        return glass::MakeFunctionView([=] {
-          glass::DisplayPCMsSolenoids(
-              static_cast<PCMsSimModel*>(model),
-              HALSimGui::halProvider->AreOutputsEnabled());
-        });
+bool PCMSimGui::PCMsAnySolenoids(glass::PneumaticControlsModel* model) {
+  bool any = false;
+  static_cast<PCMsSimModel*>(model)->ForEachPneumaticControl(
+      [&](glass::PneumaticControlModel& CTREPCM, int) {
+        if (static_cast<PCMSimModel*>(&CTREPCM)->GetNumSolenoids() > 0) {
+          any = true;
+        }
       });
+  return any;
+}
+
+std::unique_ptr<glass::PneumaticControlsModel> PCMSimGui::GetPCMsModel() {
+  return std::make_unique<PCMsSimModel>();
+}
+
+void PCMSimGui::Initialize() {
+  HALSimGui::halProvider->RegisterModel(
+      "CTREPCMs", PCMSimGui::PCMsAnyInitialized,
+      [] { return std::make_unique<PCMsSimModel>(); });
 
   SimDeviceGui::GetDeviceTree().Add(
       HALSimGui::halProvider->GetModel("CTREPCMs"), [](glass::Model* model) {

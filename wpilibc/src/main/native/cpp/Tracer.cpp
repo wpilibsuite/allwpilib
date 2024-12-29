@@ -36,7 +36,7 @@ void Tracer::PrintEpochs() {
   wpi::raw_svector_ostream os(buf);
   PrintEpochs(os);
   if (!buf.empty()) {
-    FRC_ReportError(warn::Warning, "{}", buf.c_str());
+    FRC_ReportWarning("{}", buf.c_str());
   }
 }
 
@@ -49,8 +49,8 @@ void Tracer::PrintEpochs(wpi::raw_ostream& os) {
     m_lastEpochsPrintTime = now;
     for (const auto& epoch : m_epochs) {
       os << fmt::format(
-          "\t{}: {:.6f}s\n", epoch.getKey(),
-          duration_cast<microseconds>(epoch.getValue()).count() / 1.0e6);
+          "\t{}: {:.6f}s\n", epoch.first,
+          duration_cast<microseconds>(epoch.second).count() / 1.0e6);
     }
   }
 }

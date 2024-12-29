@@ -7,11 +7,12 @@
 #include <concepts>
 #include <limits>
 
-#include "frc/geometry/Rotation2d.h"
+#include "frc/geometry/Rectangle2d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 
 namespace frc {
+
 /**
  * Enforces a particular constraint only within a rectangular region.
  */
@@ -22,23 +23,34 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
    * Constructs a new RectangularRegionConstraint.
    *
    * @param bottomLeftPoint The bottom left point of the rectangular region in
-   * which to enforce the constraint.
+   *     which to enforce the constraint.
    * @param topRightPoint The top right point of the rectangular region in which
-   * to enforce the constraint.
+   *     to enforce the constraint.
    * @param constraint The constraint to enforce when the robot is within the
-   * region.
+   *     region.
+   * @deprecated Use constructor taking Rectangle2d instead.
    */
-  RectangularRegionConstraint(const Translation2d& bottomLeftPoint,
-                              const Translation2d& topRightPoint,
-                              const Constraint& constraint)
-      : m_bottomLeftPoint(bottomLeftPoint),
-        m_topRightPoint(topRightPoint),
-        m_constraint(constraint) {}
+  [[deprecated("Use constructor taking Rectangle2d instead.")]]
+  constexpr RectangularRegionConstraint(const Translation2d& bottomLeftPoint,
+                                        const Translation2d& topRightPoint,
+                                        const Constraint& constraint)
+      : m_rectangle{bottomLeftPoint, topRightPoint}, m_constraint(constraint) {}
 
-  units::meters_per_second_t MaxVelocity(
+  /**
+   * Constructs a new RectangularRegionConstraint.
+   *
+   * @param rectangle The rectangular region in which to enforce the constraint.
+   * @param constraint The constraint to enforce when the robot is within the
+   *     region.
+   */
+  constexpr RectangularRegionConstraint(const Rectangle2d& rectangle,
+                                        const Constraint& constraint)
+      : m_rectangle{rectangle}, m_constraint{constraint} {}
+
+  constexpr units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
       units::meters_per_second_t velocity) const override {
-    if (IsPoseInRegion(pose)) {
+    if (m_rectangle.Contains(pose.Translation())) {
       return m_constraint.MaxVelocity(pose, curvature, velocity);
     } else {
       return units::meters_per_second_t{
@@ -46,31 +58,19 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
     }
   }
 
-  MinMax MinMaxAcceleration(const Pose2d& pose, units::curvature_t curvature,
-                            units::meters_per_second_t speed) const override {
-    if (IsPoseInRegion(pose)) {
+  constexpr MinMax MinMaxAcceleration(
+      const Pose2d& pose, units::curvature_t curvature,
+      units::meters_per_second_t speed) const override {
+    if (m_rectangle.Contains(pose.Translation())) {
       return m_constraint.MinMaxAcceleration(pose, curvature, speed);
     } else {
       return {};
     }
   }
 
-  /**
-   * Returns whether the specified robot pose is within the region that the
-   * constraint is enforced in.
-   *
-   * @param pose The robot pose.
-   * @return Whether the robot pose is within the constraint region.
-   */
-  bool IsPoseInRegion(const Pose2d& pose) const {
-    return pose.X() >= m_bottomLeftPoint.X() &&
-           pose.X() <= m_topRightPoint.X() &&
-           pose.Y() >= m_bottomLeftPoint.Y() && pose.Y() <= m_topRightPoint.Y();
-  }
-
  private:
-  Translation2d m_bottomLeftPoint;
-  Translation2d m_topRightPoint;
+  Rectangle2d m_rectangle;
   Constraint m_constraint;
 };
+
 }  // namespace frc

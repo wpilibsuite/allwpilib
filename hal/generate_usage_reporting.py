@@ -3,9 +3,9 @@
 # Copyright (c) FIRST and other WPILib contributors.
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
-from pathlib import Path
-import sys
+
 import argparse
+from pathlib import Path
 
 
 def generate_usage_reporting(output_directory: Path, template_directory: Path):
@@ -49,7 +49,7 @@ def generate_usage_reporting(output_directory: Path, template_directory: Path):
         )
 
         frc_net_comm = output_directory / f"main/java/{java_package}/FRCNetComm.java"
-        frc_net_comm.write_text(contents, encoding="utf-8")
+        frc_net_comm.write_text(contents, encoding="utf-8", newline="\n")
 
     with (template_directory / "FRCUsageReporting.h.in").open(
         encoding="utf-8"
@@ -65,11 +65,26 @@ def generate_usage_reporting(output_directory: Path, template_directory: Path):
         usage_reporting_hdr = (
             output_directory / "main/native/include/hal/FRCUsageReporting.h"
         )
-        usage_reporting_hdr.write_text(contents, encoding="utf-8")
+        usage_reporting_hdr.write_text(contents, encoding="utf-8", newline="\n")
+
+    with (template_directory / "UsageReporting.h.in").open(
+        encoding="utf-8"
+    ) as cpp_usage_reporting:
+        contents = (
+            # fmt: off
+            cpp_usage_reporting.read()
+            .replace(r"${usage_reporting_types_cpp}", "\n".join(usage_reporting_types_cpp))
+            .replace(r"${usage_reporting_instances_cpp}", "\n".join(usage_reporting_instances_cpp))
+            # fmt: on
+        )
+
+        usage_reporting_hdr = (
+            output_directory / "main/native/include/hal/UsageReporting.h"
+        )
+        usage_reporting_hdr.write_text(contents, encoding="utf-8", newline="\n")
 
 
-def main(argv):
-
+def main():
     dirname = Path(__file__).parent
 
     parser = argparse.ArgumentParser()
@@ -85,10 +100,10 @@ def main(argv):
         default=dirname / "src/generate",
         type=Path,
     )
-    args = parser.parse_args(argv)
+    args = parser.parse_args()
 
     generate_usage_reporting(args.output_directory, args.template_root)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

@@ -41,33 +41,37 @@ class DifferentialDriveVoltageConstraintTest {
               point.velocityMetersPerSecond,
               0,
               point.velocityMetersPerSecond * point.curvatureRadPerMeter);
-
       var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
 
       t += dt;
+      var acceleration = point.accelerationMetersPerSecondSq;
 
       // Not really a strictly-correct test as we're using the chassis accel instead of the
       // wheel accel, but much easier than doing it "properly" and a reasonable check anyway
       assertAll(
           () ->
               assertTrue(
-                  feedforward.calculate(
-                          wheelSpeeds.leftMetersPerSecond, point.accelerationMetersPerSecondSq)
+                  feedforward.calculateWithVelocities(
+                          wheelSpeeds.leftMetersPerSecond,
+                          wheelSpeeds.leftMetersPerSecond + dt * acceleration)
                       <= maxVoltage + 0.05),
           () ->
               assertTrue(
-                  feedforward.calculate(
-                          wheelSpeeds.leftMetersPerSecond, point.accelerationMetersPerSecondSq)
+                  feedforward.calculateWithVelocities(
+                          wheelSpeeds.leftMetersPerSecond,
+                          wheelSpeeds.leftMetersPerSecond + dt * acceleration)
                       >= -maxVoltage - 0.05),
           () ->
               assertTrue(
-                  feedforward.calculate(
-                          wheelSpeeds.rightMetersPerSecond, point.accelerationMetersPerSecondSq)
+                  feedforward.calculateWithVelocities(
+                          wheelSpeeds.rightMetersPerSecond,
+                          wheelSpeeds.rightMetersPerSecond + dt * acceleration)
                       <= maxVoltage + 0.05),
           () ->
               assertTrue(
-                  feedforward.calculate(
-                          wheelSpeeds.rightMetersPerSecond, point.accelerationMetersPerSecondSq)
+                  feedforward.calculateWithVelocities(
+                          wheelSpeeds.rightMetersPerSecond,
+                          wheelSpeeds.rightMetersPerSecond + dt * acceleration)
                       >= -maxVoltage - 0.05));
     }
   }

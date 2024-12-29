@@ -10,12 +10,12 @@ import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Value;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.Dimensionless;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.collections.LongToObjectHashMap;
+import edu.wpi.first.units.measure.Dimensionless;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Frequency;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.util.Color;
 import java.util.Map;
@@ -93,15 +93,28 @@ import java.util.function.DoubleSupplier;
  */
 @FunctionalInterface
 public interface LEDPattern {
+  /** A functional interface for index mapping functions. */
+  @FunctionalInterface
+  interface IndexMapper {
+    /**
+     * Maps the index.
+     *
+     * @param bufLen Length of the buffer
+     * @param index The index to map
+     * @return The mapped index
+     */
+    int apply(int bufLen, int index);
+  }
+
   /**
    * Writes the pattern to an LED buffer. Dynamic animations should be called periodically (such as
    * with a command or with a periodic method) to refresh the buffer over time.
    *
    * <p>This method is intentionally designed to use separate objects for reading and writing data.
    * By splitting them up, we can easily modify the behavior of some base pattern to make it {@link
-   * #scrollAtRelativeSpeed(Measure) scroll}, {@link #blink(Measure, Measure) blink}, or {@link
-   * #breathe(Measure) breathe} by intercepting the data writes to transform their behavior to
-   * whatever we like.
+   * #scrollAtRelativeSpeed(Frequency) scroll}, {@link #blink(Time, Time) blink}, or {@link
+   * #breathe(Time) breathe} by intercepting the data writes to transform their behavior to whatever
+   * we like.
    *
    * @param reader data reader for accessing buffer length and current colors
    * @param writer data writer for setting new LED colors on the buffer
@@ -130,6 +143,41 @@ public interface LEDPattern {
   }
 
   /**
+   * Creates a pattern with remapped indices.
+   *
+   * @param indexMapper the index mapper
+   * @return the mapped pattern
+   */
+  default LEDPattern mapIndex(IndexMapper indexMapper) {
+    return (reader, writer) -> {
+      int bufLen = reader.getLength();
+      applyTo(
+          new LEDReader() {
+            @Override
+            public int getLength() {
+              return reader.getLength();
+            }
+
+            @Override
+            public int getRed(int index) {
+              return reader.getRed(indexMapper.apply(bufLen, index));
+            }
+
+            @Override
+            public int getGreen(int index) {
+              return reader.getGreen(indexMapper.apply(bufLen, index));
+            }
+
+            @Override
+            public int getBlue(int index) {
+              return reader.getBlue(indexMapper.apply(bufLen, index));
+            }
+          },
+          (i, r, g, b) -> writer.setRGB(indexMapper.apply(bufLen, i), r, g, b));
+    };
+  }
+
+  /**
    * Creates a pattern that displays this one in reverse. Scrolling patterns will scroll in the
    * opposite direction (but at the same speed). It will treat the end of an LED strip as the start,
    * and the start of the strip as the end. This can be useful for making ping-pong patterns that
@@ -143,10 +191,7 @@ public interface LEDPattern {
    * @see AddressableLEDBufferView#reversed()
    */
   default LEDPattern reversed() {
-    return (reader, writer) -> {
-      int bufLen = reader.getLength();
-      applyTo(reader, (i, r, g, b) -> writer.setRGB((bufLen - 1) - i, r, g, b));
-    };
+    return mapIndex((length, index) -> length - 1 - index);
   }
 
   /**
@@ -157,15 +202,7 @@ public interface LEDPattern {
    * @return the offset pattern
    */
   default LEDPattern offsetBy(int offset) {
-    return (reader, writer) -> {
-      int bufLen = reader.getLength();
-      applyTo(
-          reader,
-          (i, r, g, b) -> {
-            int shiftedIndex = Math.floorMod(i + offset, bufLen);
-            writer.setRGB(shiftedIndex, r, g, b);
-          });
-    };
+    return mapIndex((length, index) -> Math.floorMod(index + offset, length));
   }
 
   /**
@@ -186,26 +223,19 @@ public interface LEDPattern {
    *     scroll along the length of LEDs and return back to the starting position
    * @return the scrolling pattern
    */
-  default LEDPattern scrollAtRelativeSpeed(Measure<Velocity<Dimensionless>> velocity) {
-    final double periodMicros = 1 / velocity.in(Value.per(Microsecond));
+  default LEDPattern scrollAtRelativeSpeed(Frequency velocity) {
+    final double periodMicros = velocity.asPeriod().in(Microseconds);
 
-    return (reader, writer) -> {
-      int bufLen = reader.getLength();
-      long now = WPIUtilJNI.now();
+    return mapIndex(
+        (bufLen, index) -> {
+          long now = RobotController.getTime();
 
-      // index should move by (buf.length) / (period)
-      double t = (now % (long) periodMicros) / periodMicros;
-      int offset = (int) (t * bufLen);
+          // index should move by (buf.length) / (period)
+          double t = (now % (long) periodMicros) / periodMicros;
+          int offset = (int) (t * bufLen);
 
-      applyTo(
-          reader,
-          (i, r, g, b) -> {
-            // floorMod so if the offset is negative, we still get positive outputs
-            int shiftedIndex = Math.floorMod(i + offset, bufLen);
-
-            writer.setRGB(shiftedIndex, r, g, b);
-          });
-    };
+          return Math.floorMod(index + offset, bufLen);
+        });
   }
 
   /**
@@ -217,7 +247,7 @@ public interface LEDPattern {
    *
    * <pre>
    *   // LEDs per meter, a known value taken from the spec sheet of our particular LED strip
-   *   Measure&lt;Distance&gt; LED_SPACING = Meters.of(1.0 / 60);
+   *   Distance LED_SPACING = Meters.of(1.0 / 60);
    *
    *   LEDPattern rainbow = LEDPattern.rainbow();
    *   LEDPattern scrollingRainbow =
@@ -232,8 +262,7 @@ public interface LEDPattern {
    * @param ledSpacing the distance between adjacent LEDs on the physical LED strip
    * @return the scrolling pattern
    */
-  default LEDPattern scrollAtAbsoluteSpeed(
-      Measure<Velocity<Distance>> velocity, Measure<Distance> ledSpacing) {
+  default LEDPattern scrollAtAbsoluteSpeed(LinearVelocity velocity, Distance ledSpacing) {
     // eg velocity = 10 m/s, spacing = 0.01m
     // meters per micro = 1e-5 m/us
     // micros per LED = 1e-2 m / (1e-5 m/us) = 1e-3 us
@@ -241,22 +270,16 @@ public interface LEDPattern {
     var metersPerMicro = velocity.in(Meters.per(Microsecond));
     var microsPerLED = (int) (ledSpacing.in(Meters) / metersPerMicro);
 
-    return (reader, writer) -> {
-      int bufLen = reader.getLength();
-      long now = WPIUtilJNI.now();
+    return mapIndex(
+        (bufLen, index) -> {
+          long now = RobotController.getTime();
 
-      // every step in time that's a multiple of microsPerLED will increment the offset by 1
-      var offset = now / microsPerLED;
+          // every step in time that's a multiple of microsPerLED will increment the offset by 1
+          var offset = (int) (now / microsPerLED);
 
-      applyTo(
-          reader,
-          (i, r, g, b) -> {
-            // floorMod so if the offset is negative, we still get positive outputs
-            int shiftedIndex = Math.floorMod(i + offset, bufLen);
-
-            writer.setRGB(shiftedIndex, r, g, b);
-          });
-    };
+          // floorMod so if the offset is negative, we still get positive outputs
+          return Math.floorMod(index + offset, bufLen);
+        });
   }
 
   /**
@@ -267,12 +290,12 @@ public interface LEDPattern {
    * @param offTime how long the pattern should be turned off for, per cycle
    * @return the blinking pattern
    */
-  default LEDPattern blink(Measure<Time> onTime, Measure<Time> offTime) {
+  default LEDPattern blink(Time onTime, Time offTime) {
     final long totalTimeMicros = (long) (onTime.in(Microseconds) + offTime.in(Microseconds));
     final long onTimeMicros = (long) onTime.in(Microseconds);
 
     return (reader, writer) -> {
-      if (WPIUtilJNI.now() % totalTimeMicros < onTimeMicros) {
+      if (RobotController.getTime() % totalTimeMicros < onTimeMicros) {
         applyTo(reader, writer);
       } else {
         kOff.applyTo(reader, writer);
@@ -281,13 +304,13 @@ public interface LEDPattern {
   }
 
   /**
-   * Like {@link #blink(Measure, Measure) blink(onTime, offTime)}, but where the "off" time is
-   * exactly equal to the "on" time.
+   * Like {@link #blink(Time, Time) blink(onTime, offTime)}, but where the "off" time is exactly
+   * equal to the "on" time.
    *
    * @param onTime how long the pattern should play for (and be turned off for), per cycle
    * @return the blinking pattern
    */
-  default LEDPattern blink(Measure<Time> onTime) {
+  default LEDPattern blink(Time onTime) {
     return blink(onTime, onTime);
   }
 
@@ -316,7 +339,7 @@ public interface LEDPattern {
    * @param period how fast the breathing pattern should complete a single cycle
    * @return the breathing pattern
    */
-  default LEDPattern breathe(Measure<Time> period) {
+  default LEDPattern breathe(Time period) {
     final long periodMicros = (long) period.in(Microseconds);
 
     return (reader, writer) -> {
@@ -324,7 +347,7 @@ public interface LEDPattern {
           reader,
           (i, r, g, b) -> {
             // How far we are in the cycle, in the range [0, 1)
-            double t = (WPIUtilJNI.now() % periodMicros) / (double) periodMicros;
+            double t = (RobotController.getTime() % periodMicros) / (double) periodMicros;
             double phase = t * 2 * Math.PI;
 
             // Apply the cosine function and shift its output from [-1, 1] to [0, 1]
@@ -444,7 +467,7 @@ public interface LEDPattern {
    * @param relativeBrightness the multiplier to apply to all channels to modify brightness
    * @return the input pattern, displayed at
    */
-  default LEDPattern atBrightness(Measure<Dimensionless> relativeBrightness) {
+  default LEDPattern atBrightness(Dimensionless relativeBrightness) {
     double multiplier = relativeBrightness.in(Value);
 
     return (reader, writer) -> {
@@ -570,16 +593,35 @@ public interface LEDPattern {
     };
   }
 
+  /** Types of gradients. */
+  enum GradientType {
+    /**
+     * A continuous gradient, where the gradient wraps around to allow for seamless scrolling
+     * effects.
+     */
+    kContinuous,
+
+    /**
+     * A discontinuous gradient, where the first pixel is set to the first color of the gradient and
+     * the final pixel is set to the last color of the gradient. There is no wrapping effect, so
+     * scrolling effects will display an obvious seam.
+     */
+    kDiscontinuous
+  }
+
   /**
    * Creates a pattern that displays a non-animated gradient of colors across the entire length of
-   * the LED strip. The gradient wraps around so the start and end of the strip are the same color,
-   * which allows the gradient to be modified with a scrolling effect with no discontinuities.
-   * Colors are evenly distributed along the full length of the LED strip.
+   * the LED strip. Colors are evenly distributed along the full length of the LED strip. The
+   * gradient type is configured with the {@code type} parameter, allowing the gradient to be either
+   * continuous (no seams, good for scrolling effects) or discontinuous (a clear seam is visible,
+   * but the gradient applies to the full length of the LED strip without needing to use some space
+   * for wrapping).
    *
+   * @param type the type of gradient (continuous or discontinuous)
    * @param colors the colors to display in the gradient
    * @return a motionless gradient pattern
    */
-  static LEDPattern gradient(Color... colors) {
+  static LEDPattern gradient(GradientType type, Color... colors) {
     if (colors.length == 0) {
       // Nothing to display
       DriverStation.reportWarning("Creating a gradient with no colors!", false);
@@ -596,7 +638,11 @@ public interface LEDPattern {
 
     return (reader, writer) -> {
       int bufLen = reader.getLength();
-      int ledsPerSegment = bufLen / numSegments;
+      int ledsPerSegment =
+          switch (type) {
+            case kContinuous -> bufLen / numSegments;
+            case kDiscontinuous -> (bufLen - 1) / (numSegments - 1);
+          };
 
       for (int led = 0; led < bufLen; led++) {
         int colorIndex = (led / ledsPerSegment) % numSegments;

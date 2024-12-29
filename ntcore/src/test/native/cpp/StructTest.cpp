@@ -46,7 +46,7 @@ struct Info1 {
 
 template <>
 struct wpi::Struct<Inner> {
-  static constexpr std::string_view GetTypeString() { return "struct:Inner"; }
+  static constexpr std::string_view GetTypeName() { return "Inner"; }
   static constexpr size_t GetSize() { return 8; }
   static constexpr std::string_view GetSchema() { return "int32 a; int32 b"; }
 
@@ -62,7 +62,7 @@ struct wpi::Struct<Inner> {
 
 template <>
 struct wpi::Struct<Outer> {
-  static constexpr std::string_view GetTypeString() { return "struct:Outer"; }
+  static constexpr std::string_view GetTypeName() { return "Outer"; }
   static constexpr size_t GetSize() { return wpi::GetStructSize<Inner>() + 4; }
   static constexpr std::string_view GetSchema() {
     return "Inner inner; int32 c";
@@ -86,7 +86,7 @@ struct wpi::Struct<Outer> {
 
 template <>
 struct wpi::Struct<Inner2> {
-  static std::string_view GetTypeString() { return "struct:Inner2"; }
+  static std::string_view GetTypeName() { return "Inner2"; }
   static size_t GetSize() { return 8; }
   static std::string_view GetSchema() { return "int32 a; int32 b"; }
 
@@ -102,7 +102,7 @@ struct wpi::Struct<Inner2> {
 
 template <>
 struct wpi::Struct<Outer2> {
-  static std::string_view GetTypeString() { return "struct:Outer2"; }
+  static std::string_view GetTypeName() { return "Outer2"; }
   static size_t GetSize() { return wpi::GetStructSize<Inner>() + 4; }
   static std::string_view GetSchema() { return "Inner2 inner; int32 c"; }
 
@@ -124,7 +124,7 @@ struct wpi::Struct<Outer2> {
 
 template <>
 struct wpi::Struct<ThingA> {
-  static constexpr std::string_view GetTypeString() { return "struct:ThingA"; }
+  static constexpr std::string_view GetTypeName() { return "ThingA"; }
   static constexpr size_t GetSize() { return 1; }
   static constexpr std::string_view GetSchema() { return "uint8 value"; }
   static ThingA Unpack(std::span<const uint8_t> data) {
@@ -137,8 +137,8 @@ struct wpi::Struct<ThingA> {
 
 template <>
 struct wpi::Struct<ThingB, Info1> {
-  static constexpr std::string_view GetTypeString(const Info1&) {
-    return "struct:ThingB";
+  static constexpr std::string_view GetTypeName(const Info1&) {
+    return "ThingB";
   }
   static constexpr size_t GetSize(const Info1&) { return 1; }
   static constexpr std::string_view GetSchema(const Info1&) {

@@ -41,12 +41,19 @@ struct HAL_ControlWord {
 typedef struct HAL_ControlWord HAL_ControlWord;
 
 HAL_ENUM(HAL_AllianceStationID) {
+  /** Unknown Alliance Station */
   HAL_AllianceStationID_kUnknown = 0,
+  /** Red Alliance Station 1 */
   HAL_AllianceStationID_kRed1,
+  /** Red Alliance Station 2 */
   HAL_AllianceStationID_kRed2,
+  /** Red Alliance Station 3 */
   HAL_AllianceStationID_kRed3,
+  /** Blue Alliance Station 1 */
   HAL_AllianceStationID_kBlue1,
+  /** Blue Alliance Station 2 */
   HAL_AllianceStationID_kBlue2,
+  /** Blue Alliance Station 3 */
   HAL_AllianceStationID_kBlue3,
 };
 
@@ -57,12 +64,21 @@ HAL_ENUM(HAL_MatchType) {
   HAL_kMatchType_elimination,
 };
 
-/* The maximum number of axes that will be stored in a single HALJoystickAxes
- * struct. This is used for allocating buffers, not bounds checking, since
- * there are usually less axes in practice.
+/**
+ * The maximum number of axes that will be stored in a single HAL_JoystickAxes
+ * struct. This is used for allocating buffers, not bounds checking, since there
+ * are usually less axes in practice.
  */
 #define HAL_kMaxJoystickAxes 12
+/**
+ * The maximum number of POVs that will be stored in a single HAL_JoystickPOVs
+ * struct. This is used for allocating buffers, not bounds checking, since there
+ * are usually less POVs in practice.
+ */
 #define HAL_kMaxJoystickPOVs 12
+/**
+ * The maximum number of joysticks.
+ */
 #define HAL_kMaxJoysticks 6
 
 struct HAL_JoystickAxes {

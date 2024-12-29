@@ -207,7 +207,7 @@ struct type_casting_traits {
   };
 };
 
-// provides a succint template to define vectorized casting traits with respect to the largest accessible packet types
+// provides a succinct template to define vectorized casting traits with respect to the largest accessible packet types
 template <typename Src, typename Tgt>
 struct vectorized_type_casting_traits {
   enum : int {
@@ -577,12 +577,6 @@ EIGEN_DEVICE_FUNC inline Packet pnot(const Packet& a) {
 template <typename Packet>
 EIGEN_DEVICE_FUNC inline Packet pandnot(const Packet& a, const Packet& b) {
   return pand(a, pnot(b));
-}
-
-/** \internal \returns isnan(a) */
-template <typename Packet>
-EIGEN_DEVICE_FUNC inline Packet pisnan(const Packet& a) {
-  return pandnot(ptrue(a), pcmp_eq(a, a));
 }
 
 // In the general case, use bitwise select.
@@ -1002,6 +996,20 @@ EIGEN_DEVICE_FUNC inline Packet pcplxflip(const Packet& a) {
  * Special math functions
  ***************************/
 
+/** \internal \returns isnan(a) */
+template <typename Packet>
+EIGEN_DEVICE_FUNC inline Packet pisnan(const Packet& a) {
+  return pandnot(ptrue(a), pcmp_eq(a, a));
+}
+
+/** \internal \returns isinf(a) */
+template <typename Packet>
+EIGEN_DEVICE_FUNC inline Packet pisinf(const Packet& a) {
+  using Scalar = typename unpacket_traits<Packet>::type;
+  constexpr Scalar inf = NumTraits<Scalar>::infinity();
+  return pcmp_eq(pabs(a), pset1<Packet>(inf));
+}
+
 /** \internal \returns the sine of \a a (coeff-wise) */
 template <typename Packet>
 EIGEN_DECLARE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet psin(const Packet& a) {
@@ -1075,8 +1083,13 @@ EIGEN_DECLARE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet patanh(const Packet&
 /** \internal \returns the exp of \a a (coeff-wise) */
 template <typename Packet>
 EIGEN_DECLARE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet pexp(const Packet& a) {
-  EIGEN_USING_STD(exp);
-  return exp(a);
+  return numext::exp(a);
+}
+
+/** \internal \returns the exp2 of \a a (coeff-wise) */
+template <typename Packet>
+EIGEN_DECLARE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet pexp2(const Packet& a) {
+  return numext::exp2(a);
 }
 
 /** \internal \returns the expm1 of \a a (coeff-wise) */
@@ -1105,7 +1118,7 @@ EIGEN_DECLARE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet plog10(const Packet&
   return log10(a);
 }
 
-/** \internal \returns the log10 of \a a (coeff-wise) */
+/** \internal \returns the log2 of \a a (coeff-wise) */
 template <typename Packet>
 EIGEN_DECLARE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet plog2(const Packet& a) {
   using Scalar = typename internal::unpacket_traits<Packet>::type;

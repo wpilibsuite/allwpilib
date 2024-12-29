@@ -6,11 +6,12 @@
 
 #include <algorithm>
 #include <exception>
-#include <filesystem>
+#include <memory>
 #include <numbers>
+#include <string>
 #include <thread>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <glass/Context.h>
 #include <glass/Storage.h>
 #include <imgui.h>
@@ -32,7 +33,6 @@ Analyzer::Analyzer(glass::Storage& storage, wpi::Logger& logger)
   // Fill the StringMap with preset values.
   m_presets["Default"] = presets::kDefault;
   m_presets["WPILib"] = presets::kWPILib;
-  m_presets["CTRE Phoenix 5 CANcoder"] = presets::kCTREv5CANCoder;
   m_presets["CTRE Phoenix 5"] = presets::kCTREv5;
   m_presets["CTRE Phoenix 6"] = presets::kCTREv6;
   m_presets["REV Brushless Encoder Port"] = presets::kREVNEOBuiltIn;
@@ -53,8 +53,9 @@ void Analyzer::UpdateFeedforwardGains() {
     m_accelRMSE = feedforwardGains.olsResult.rmse;
     m_settings.preset.measurementDelay =
         m_settings.type == FeedbackControllerLoopType::kPosition
-            ? m_manager->GetPositionDelay()
-            : m_manager->GetVelocityDelay();
+            // Clamp feedback measurement delay to ≥ 0
+            ? units::math::max(0_s, m_manager->GetPositionDelay())
+            : units::math::max(0_s, m_manager->GetVelocityDelay());
     PrepareGraphs();
   } catch (const sysid::InvalidDataError& e) {
     m_state = AnalyzerState::kGeneralDataError;

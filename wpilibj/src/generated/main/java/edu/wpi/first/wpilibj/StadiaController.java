@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj;
 
 // import edu.wpi.first.hal.FRCNetComm.tResourceType;
 // import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 
@@ -22,7 +24,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * only through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any
  * 3rd party controllers.
  */
-public class StadiaController extends GenericHID {
+public class StadiaController extends GenericHID implements Sendable {
   /** Represents a digital button on a StadiaController. */
   public enum Button {
     /** A button. */
@@ -195,7 +197,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent a(EventLoop loop) {
-    return new BooleanEvent(loop, this::getAButton);
+    return button(Button.kA.value, loop);
   }
 
   /**
@@ -233,7 +235,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent b(EventLoop loop) {
-    return new BooleanEvent(loop, this::getBButton);
+    return button(Button.kB.value, loop);
   }
 
   /**
@@ -271,7 +273,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent x(EventLoop loop) {
-    return new BooleanEvent(loop, this::getXButton);
+    return button(Button.kX.value, loop);
   }
 
   /**
@@ -309,7 +311,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent y(EventLoop loop) {
-    return new BooleanEvent(loop, this::getYButton);
+    return button(Button.kY.value, loop);
   }
 
   /**
@@ -347,7 +349,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent leftBumper(EventLoop loop) {
-    return new BooleanEvent(loop, this::getLeftBumperButton);
+    return button(Button.kLeftBumper.value, loop);
   }
 
   /**
@@ -385,7 +387,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent rightBumper(EventLoop loop) {
-    return new BooleanEvent(loop, this::getRightBumperButton);
+    return button(Button.kRightBumper.value, loop);
   }
 
   /**
@@ -423,7 +425,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent leftStick(EventLoop loop) {
-    return new BooleanEvent(loop, this::getLeftStickButton);
+    return button(Button.kLeftStick.value, loop);
   }
 
   /**
@@ -461,7 +463,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent rightStick(EventLoop loop) {
-    return new BooleanEvent(loop, this::getRightStickButton);
+    return button(Button.kRightStick.value, loop);
   }
 
   /**
@@ -499,7 +501,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent ellipses(EventLoop loop) {
-    return new BooleanEvent(loop, this::getEllipsesButton);
+    return button(Button.kEllipses.value, loop);
   }
 
   /**
@@ -537,7 +539,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent hamburger(EventLoop loop) {
-    return new BooleanEvent(loop, this::getHamburgerButton);
+    return button(Button.kHamburger.value, loop);
   }
 
   /**
@@ -575,7 +577,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent stadia(EventLoop loop) {
-    return new BooleanEvent(loop, this::getStadiaButton);
+    return button(Button.kStadia.value, loop);
   }
 
   /**
@@ -613,7 +615,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent rightTrigger(EventLoop loop) {
-    return new BooleanEvent(loop, this::getRightTriggerButton);
+    return button(Button.kRightTrigger.value, loop);
   }
 
   /**
@@ -651,7 +653,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent leftTrigger(EventLoop loop) {
-    return new BooleanEvent(loop, this::getLeftTriggerButton);
+    return button(Button.kLeftTrigger.value, loop);
   }
 
   /**
@@ -689,7 +691,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent google(EventLoop loop) {
-    return new BooleanEvent(loop, this::getGoogleButton);
+    return button(Button.kGoogle.value, loop);
   }
 
   /**
@@ -727,14 +729,15 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent frame(EventLoop loop) {
-    return new BooleanEvent(loop, this::getFrameButton);
+    return button(Button.kFrame.value, loop);
   }
 
   /**
    * Read the value of the left bumper (LB) button on the controller.
    *
    * @return The state of the button.
-   * @deprecated Use {@link getLeftBumperButton} instead
+   * @deprecated Use {@link getLeftBumperButton} instead. This function is deprecated for removal
+   *     to make function names consistent to allow the HID classes to be automatically generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumper() {
@@ -745,7 +748,8 @@ public class StadiaController extends GenericHID {
    * Read the value of the right bumper (RB) button on the controller.
    *
    * @return The state of the button.
-   * @deprecated Use {@link getRightBumperButton} instead
+   * @deprecated Use {@link getRightBumperButton} instead. This function is deprecated for removal
+   *     to make function names consistent to allow the HID classes to be automatically generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumper() {
@@ -756,7 +760,9 @@ public class StadiaController extends GenericHID {
    * Whether the left bumper (LB) was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
-   * @deprecated Use {@link getLeftBumperButtonPressed} instead
+   * @deprecated Use {@link getLeftBumperButtonPressed} instead. This function is deprecated for
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumperPressed() {
@@ -767,7 +773,9 @@ public class StadiaController extends GenericHID {
    * Whether the right bumper (RB) was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
-   * @deprecated Use {@link getRightBumperButtonPressed} instead
+   * @deprecated Use {@link getRightBumperButtonPressed} instead. This function is deprecated for
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumperPressed() {
@@ -778,7 +786,9 @@ public class StadiaController extends GenericHID {
    * Whether the left bumper (LB) was released since the last check.
    *
    * @return Whether the button was released since the last check.
-   * @deprecated Use {@link getLeftBumperButtonReleased} instead
+   * @deprecated Use {@link getLeftBumperButtonReleased} instead. This function is deprecated for
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumperReleased() {
@@ -789,10 +799,37 @@ public class StadiaController extends GenericHID {
    * Whether the right bumper (RB) was released since the last check.
    *
    * @return Whether the button was released since the last check.
-   * @deprecated Use {@link getRightBumperButtonReleased} instead
+   * @deprecated Use {@link getRightBumperButtonReleased} instead. This function is deprecated for
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumperReleased() {
     return getRawButtonReleased(Button.kRightBumper.value);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("HID");
+    builder.publishConstString("ControllerType", "Stadia");
+    builder.addDoubleProperty("LeftX", this::getLeftX, null);
+    builder.addDoubleProperty("RightX", this::getRightX, null);
+    builder.addDoubleProperty("LeftY", this::getLeftY, null);
+    builder.addDoubleProperty("RightY", this::getRightY, null);
+    builder.addBooleanProperty("A", this::getAButton, null);
+    builder.addBooleanProperty("B", this::getBButton, null);
+    builder.addBooleanProperty("X", this::getXButton, null);
+    builder.addBooleanProperty("Y", this::getYButton, null);
+    builder.addBooleanProperty("LeftBumper", this::getLeftBumperButton, null);
+    builder.addBooleanProperty("RightBumper", this::getRightBumperButton, null);
+    builder.addBooleanProperty("LeftStick", this::getLeftStickButton, null);
+    builder.addBooleanProperty("RightStick", this::getRightStickButton, null);
+    builder.addBooleanProperty("Ellipses", this::getEllipsesButton, null);
+    builder.addBooleanProperty("Hamburger", this::getHamburgerButton, null);
+    builder.addBooleanProperty("Stadia", this::getStadiaButton, null);
+    builder.addBooleanProperty("RightTrigger", this::getRightTriggerButton, null);
+    builder.addBooleanProperty("LeftTrigger", this::getLeftTriggerButton, null);
+    builder.addBooleanProperty("Google", this::getGoogleButton, null);
+    builder.addBooleanProperty("Frame", this::getFrameButton, null);
   }
 }

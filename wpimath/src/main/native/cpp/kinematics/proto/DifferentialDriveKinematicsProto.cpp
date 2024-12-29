@@ -4,27 +4,24 @@
 
 #include "frc/kinematics/proto/DifferentialDriveKinematicsProto.h"
 
-#include "kinematics.pb.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
-google::protobuf::Message* wpi::Protobuf<frc::DifferentialDriveKinematics>::New(
-    google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufDifferentialDriveKinematics>(arena);
-}
+std::optional<frc::DifferentialDriveKinematics>
+wpi::Protobuf<frc::DifferentialDriveKinematics>::Unpack(InputStream& stream) {
+  wpi_proto_ProtobufDifferentialDriveKinematics msg;
+  if (!stream.Decode(msg)) {
+    return {};
+  }
 
-frc::DifferentialDriveKinematics
-wpi::Protobuf<frc::DifferentialDriveKinematics>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m =
-      static_cast<const wpi::proto::ProtobufDifferentialDriveKinematics*>(&msg);
   return frc::DifferentialDriveKinematics{
-      units::meter_t{m->track_width()},
+      units::meter_t{msg.track_width},
   };
 }
 
-void wpi::Protobuf<frc::DifferentialDriveKinematics>::Pack(
-    google::protobuf::Message* msg,
-    const frc::DifferentialDriveKinematics& value) {
-  auto m = static_cast<wpi::proto::ProtobufDifferentialDriveKinematics*>(msg);
-  m->set_track_width(value.trackWidth.value());
+bool wpi::Protobuf<frc::DifferentialDriveKinematics>::Pack(
+    OutputStream& stream, const frc::DifferentialDriveKinematics& value) {
+  wpi_proto_ProtobufDifferentialDriveKinematics msg{
+      .track_width = value.trackWidth.value(),
+  };
+  return stream.Encode(msg);
 }

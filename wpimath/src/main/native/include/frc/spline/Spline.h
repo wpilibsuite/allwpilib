@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include <optional>
 #include <utility>
-#include <vector>
 
+#include <gcem.hpp>
 #include <wpi/array.h>
 
 #include "frc/EigenCore.h"
@@ -15,6 +16,7 @@
 #include "units/length.h"
 
 namespace frc {
+
 /**
  * Represents a two-dimensional parametric spline that interpolates between two
  * points.
@@ -26,15 +28,15 @@ class Spline {
  public:
   using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
 
-  Spline() = default;
+  constexpr Spline() = default;
 
-  Spline(const Spline&) = default;
-  Spline& operator=(const Spline&) = default;
+  constexpr Spline(const Spline&) = default;
+  constexpr Spline& operator=(const Spline&) = default;
 
-  Spline(Spline&&) = default;
-  Spline& operator=(Spline&&) = default;
+  constexpr Spline(Spline&&) = default;
+  constexpr Spline& operator=(Spline&&) = default;
 
-  virtual ~Spline() = default;
+  constexpr virtual ~Spline() = default;
 
   /**
    * Represents a control vector for a spline.
@@ -57,12 +59,12 @@ class Spline {
    * @param t The point t
    * @return The pose and curvature at that point.
    */
-  PoseWithCurvature GetPoint(double t) const {
+  std::optional<PoseWithCurvature> GetPoint(double t) const {
     Vectord<Degree + 1> polynomialBases;
 
     // Populate the polynomial bases
     for (int i = 0; i <= Degree; i++) {
-      polynomialBases(i) = std::pow(t, Degree - i);
+      polynomialBases(i) = gcem::pow(t, Degree - i);
     }
 
     // This simply multiplies by the coefficients. We need to divide out t some
@@ -88,11 +90,15 @@ class Spline {
       ddy = combined(5) / t / t;
     }
 
+    if (gcem::hypot(dx, dy) < 1e-6) {
+      return std::nullopt;
+    }
+
     // Find the curvature.
     const auto curvature =
-        (dx * ddy - ddx * dy) / ((dx * dx + dy * dy) * std::hypot(dx, dy));
+        (dx * ddy - ddx * dy) / ((dx * dx + dy * dy) * gcem::hypot(dx, dy));
 
-    return {
+    return PoseWithCurvature{
         {FromVector(combined.template block<2, 1>(0, 0)), Rotation2d{dx, dy}},
         units::curvature_t{curvature}};
   }
@@ -102,21 +108,21 @@ class Spline {
    *
    * @return The coefficients of the spline.
    */
-  virtual Matrixd<6, Degree + 1> Coefficients() const = 0;
+  constexpr virtual Matrixd<6, Degree + 1> Coefficients() const = 0;
 
   /**
    * Returns the initial control vector that created this spline.
    *
    * @return The initial control vector that created this spline.
    */
-  virtual const ControlVector& GetInitialControlVector() const = 0;
+  constexpr virtual const ControlVector& GetInitialControlVector() const = 0;
 
   /**
    * Returns the final control vector that created this spline.
    *
    * @return The final control vector that created this spline.
    */
-  virtual const ControlVector& GetFinalControlVector() const = 0;
+  constexpr virtual const ControlVector& GetFinalControlVector() const = 0;
 
  protected:
   /**
@@ -125,8 +131,9 @@ class Spline {
    * @param translation The Translation2d to convert.
    * @return The vector.
    */
-  static Eigen::Vector2d ToVector(const Translation2d& translation) {
-    return Eigen::Vector2d{translation.X().value(), translation.Y().value()};
+  static constexpr Eigen::Vector2d ToVector(const Translation2d& translation) {
+    return Eigen::Vector2d{{translation.X().value()},
+                           {translation.Y().value()}};
   }
 
   /**
@@ -135,8 +142,9 @@ class Spline {
    * @param vector The vector to convert.
    * @return The Translation2d.
    */
-  static Translation2d FromVector(const Eigen::Vector2d& vector) {
+  static constexpr Translation2d FromVector(const Eigen::Vector2d& vector) {
     return Translation2d{units::meter_t{vector(0)}, units::meter_t{vector(1)}};
   }
 };
+
 }  // namespace frc

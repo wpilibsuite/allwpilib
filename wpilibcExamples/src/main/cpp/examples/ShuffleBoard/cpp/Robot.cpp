@@ -29,7 +29,7 @@
  */
 class Robot : public frc::TimedRobot {
  public:
-  void RobotInit() override {
+  Robot() {
     wpi::SendableRegistry::AddChild(&m_robotDrive, &m_left);
     wpi::SendableRegistry::AddChild(&m_robotDrive, &m_right);
 

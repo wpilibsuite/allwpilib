@@ -33,7 +33,38 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
   QuinticHermiteSpline(wpi::array<double, 3> xInitialControlVector,
                        wpi::array<double, 3> xFinalControlVector,
                        wpi::array<double, 3> yInitialControlVector,
-                       wpi::array<double, 3> yFinalControlVector);
+                       wpi::array<double, 3> yFinalControlVector)
+      : m_initialControlVector{xInitialControlVector, yInitialControlVector},
+        m_finalControlVector{xFinalControlVector, yFinalControlVector} {
+    const auto hermite = MakeHermiteBasis();
+    const auto x =
+        ControlVectorFromArrays(xInitialControlVector, xFinalControlVector);
+    const auto y =
+        ControlVectorFromArrays(yInitialControlVector, yFinalControlVector);
+
+    // Populate first two rows with coefficients.
+    m_coefficients.template block<1, 6>(0, 0) = (hermite * x).transpose();
+    m_coefficients.template block<1, 6>(1, 0) = (hermite * y).transpose();
+
+    // Populate Row 2 and Row 3 with the derivatives of the equations above.
+    // Then populate row 4 and 5 with the second derivatives.
+    for (int i = 0; i < 6; i++) {
+      // Here, we are multiplying by (5 - i) to manually take the derivative.
+      // The power of the term in index 0 is 5, index 1 is 4 and so on. To find
+      // the coefficient of the derivative, we can use the power rule and
+      // multiply the existing coefficient by its power.
+      m_coefficients.template block<2, 1>(2, i) =
+          m_coefficients.template block<2, 1>(0, i) * (5 - i);
+    }
+    for (int i = 0; i < 5; i++) {
+      // Here, we are multiplying by (4 - i) to manually take the derivative.
+      // The power of the term in index 0 is 4, index 1 is 3 and so on. To find
+      // the coefficient of the derivative, we can use the power rule and
+      // multiply the existing coefficient by its power.
+      m_coefficients.template block<2, 1>(4, i) =
+          m_coefficients.template block<2, 1>(2, i) * (4 - i);
+    }
+  }
 
   /**
    * Returns the coefficients matrix.
@@ -69,7 +100,7 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
    * Returns the hermite basis matrix for quintic hermite spline interpolation.
    * @return The hermite basis matrix for quintic hermite spline interpolation.
    */
-  static Matrixd<6, 6> MakeHermiteBasis() {
+  static constexpr Matrixd<6, 6> MakeHermiteBasis() {
     // Given P(i), P'(i), P"(i), P(i+1), P'(i+1), P"(i+1), the control vectors,
     // we want to find the coefficients of the spline
     // P(t) = a₅t⁵ + a₄t⁴ + a₃t³ + a₂t² + a₁t + a₀.
@@ -97,15 +128,12 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
     // [a₂] = [  0.0   0.0   0.5   0.0   0.0   0.0][P(i+1) ]
     // [a₁] = [  0.0   1.0   0.0   0.0   0.0   0.0][P'(i+1)]
     // [a₀] = [  1.0   0.0   0.0   0.0   0.0   0.0][P"(i+1)]
-
-    static const Matrixd<6, 6> basis{
-        {-06.0, -03.0, -00.5, +06.0, -03.0, +00.5},
-        {+15.0, +08.0, +01.5, -15.0, +07.0, -01.0},
-        {-10.0, -06.0, -01.5, +10.0, -04.0, +00.5},
-        {+00.0, +00.0, +00.5, +00.0, +00.0, +00.0},
-        {+00.0, +01.0, +00.0, +00.0, +00.0, +00.0},
-        {+01.0, +00.0, +00.0, +00.0, +00.0, +00.0}};
-    return basis;
+    return Matrixd<6, 6>{{-06.0, -03.0, -00.5, +06.0, -03.0, +00.5},
+                         {+15.0, +08.0, +01.5, -15.0, +07.0, -01.0},
+                         {-10.0, -06.0, -01.5, +10.0, -04.0, +00.5},
+                         {+00.0, +00.0, +00.5, +00.0, +00.0, +00.0},
+                         {+00.0, +01.0, +00.0, +00.0, +00.0, +00.0},
+                         {+01.0, +00.0, +00.0, +00.0, +00.0, +00.0}};
   }
 
   /**
@@ -117,10 +145,14 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
    *
    * @return The control vector matrix for a dimension.
    */
-  static Vectord<6> ControlVectorFromArrays(wpi::array<double, 3> initialVector,
-                                            wpi::array<double, 3> finalVector) {
-    return Vectord<6>{initialVector[0], initialVector[1], initialVector[2],
-                      finalVector[0],   finalVector[1],   finalVector[2]};
+  static constexpr Vectord<6> ControlVectorFromArrays(
+      wpi::array<double, 3> initialVector, wpi::array<double, 3> finalVector) {
+    return Vectord<6>{{initialVector[0]}, {initialVector[1]},
+                      {initialVector[2]}, {finalVector[0]},
+                      {finalVector[1]},   {finalVector[2]}};
   }
 };
 }  // namespace frc
+
+#include "frc/spline/proto/QuinticHermiteSplineProto.h"
+#include "frc/spline/struct/QuinticHermiteSplineStruct.h"

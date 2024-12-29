@@ -3,13 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstdio>
+#include <memory>
 
 #include <wpi/Logger.h>
 #include <wpi/print.h>
 
 #include "wpinet/DsClient.h"
 #include "wpinet/EventLoopRunner.h"
-#include "wpinet/uv/Error.h"
 
 namespace uv = wpi::uv;
 
@@ -32,5 +32,5 @@ int main() {
   });
 
   // wait for a keypress to terminate
-  std::getchar();
+  static_cast<void>(std::getchar());
 }

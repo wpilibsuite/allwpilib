@@ -13,8 +13,7 @@ public class Robot extends TimedRobot {
   private final Joystick m_joystick = new Joystick(Constants.kJoystickPort);
   private final Elevator m_elevator = new Elevator();
 
-  @Override
-  public void robotInit() {}
+  public Robot() {}
 
   @Override
   public void robotPeriodic() {

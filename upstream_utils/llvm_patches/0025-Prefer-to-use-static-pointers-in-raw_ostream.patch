@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Thu, 19 May 2022 00:58:36 -0400
+Subject: [PATCH 25/37] Prefer to use static pointers in raw_ostream
+
+See #1401
+---
+ llvm/lib/Support/raw_ostream.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index 7e9a58db056e315cdcec22af0439017dee737c8f..b417bebdef3a2f2e12e46e65ad7885d243b477a7 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -612,9 +612,9 @@ raw_fd_ostream &llvm::outs() {
+   EC = enableAutoConversion(STDOUT_FILENO);
+   assert(!EC);
+ #endif
+-  static raw_fd_ostream S("-", EC, sys::fs::OF_None);
++  static raw_fd_ostream* S = new raw_fd_ostream("-", EC, sys::fs::OF_None);
+   assert(!EC);
+-  return S;
++  return *S;
+ }
+ 
+ raw_fd_ostream &llvm::errs() {
+@@ -623,8 +623,8 @@ raw_fd_ostream &llvm::errs() {
+   std::error_code EC = enableAutoConversion(STDERR_FILENO);
+   assert(!EC);
+ #endif
+-  static raw_fd_ostream S(STDERR_FILENO, false, true);
+-  return S;
++  static raw_fd_ostream* S = new raw_fd_ostream(STDERR_FILENO, false, true);
++  return *S;
+ }
+ 
+ /// nulls() - This returns a reference to a raw_ostream which discards output.

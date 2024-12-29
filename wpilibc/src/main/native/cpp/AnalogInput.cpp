@@ -4,6 +4,8 @@
 
 #include "frc/AnalogInput.h"
 
+#include <string>
+
 #include <hal/AnalogAccumulator.h>
 #include <hal/AnalogInput.h>
 #include <hal/FRCUsageReporting.h>
@@ -35,10 +37,6 @@ AnalogInput::AnalogInput(int channel) {
   HAL_Report(HALUsageReporting::kResourceType_AnalogChannel, channel + 1);
 
   wpi::SendableRegistry::AddLW(this, "AnalogInput", channel);
-}
-
-AnalogInput::~AnalogInput() {
-  HAL_FreeAnalogInputPort(m_port);
 }
 
 int AnalogInput::GetValue() const {

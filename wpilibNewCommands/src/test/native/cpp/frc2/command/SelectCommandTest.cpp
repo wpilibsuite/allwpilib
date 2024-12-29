@@ -2,9 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include "CommandTestBase.h"
 #include "CompositionTestBase.h"
-#include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/SelectCommand.h"
 
@@ -65,7 +68,7 @@ class TestableSelectCommand : public SelectCommand<int> {
     std::vector<std::pair<int, std::unique_ptr<Command>>> vec;
     int index = 0;
     for (auto&& command : commands) {
-      vec.emplace_back(std::make_pair(index, std::move(command)));
+      vec.emplace_back(std::pair{index, std::move(command)});
       index++;
     }
     return vec;

@@ -4,31 +4,30 @@
 
 #include "frc/geometry/proto/Twist3dProto.h"
 
-#include "geometry3d.pb.h"
+#include "wpimath/protobuf/geometry3d.npb.h"
 
-google::protobuf::Message* wpi::Protobuf<frc::Twist3d>::New(
-    google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufTwist3d>(
-      arena);
-}
+std::optional<frc::Twist3d> wpi::Protobuf<frc::Twist3d>::Unpack(
+    InputStream& stream) {
+  wpi_proto_ProtobufTwist3d msg;
+  if (!stream.Decode(msg)) {
+    return {};
+  }
 
-frc::Twist3d wpi::Protobuf<frc::Twist3d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufTwist3d*>(&msg);
   return frc::Twist3d{
-      units::meter_t{m->dx()},  units::meter_t{m->dy()},
-      units::meter_t{m->dz()},  units::radian_t{m->rx()},
-      units::radian_t{m->ry()}, units::radian_t{m->rz()},
+      units::meter_t{msg.dx},  units::meter_t{msg.dy},  units::meter_t{msg.dz},
+      units::radian_t{msg.rx}, units::radian_t{msg.ry}, units::radian_t{msg.rz},
   };
 }
 
-void wpi::Protobuf<frc::Twist3d>::Pack(google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::Twist3d>::Pack(OutputStream& stream,
                                        const frc::Twist3d& value) {
-  auto m = static_cast<wpi::proto::ProtobufTwist3d*>(msg);
-  m->set_dx(value.dx.value());
-  m->set_dy(value.dy.value());
-  m->set_dz(value.dz.value());
-  m->set_rx(value.rx.value());
-  m->set_ry(value.ry.value());
-  m->set_rz(value.rz.value());
+  wpi_proto_ProtobufTwist3d msg{
+      .dx = value.dx.value(),
+      .dy = value.dy.value(),
+      .dz = value.dz.value(),
+      .rx = value.rx.value(),
+      .ry = value.ry.value(),
+      .rz = value.rz.value(),
+  };
+  return stream.Encode(msg);
 }

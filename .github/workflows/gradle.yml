@@ -7,18 +7,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validation:
+    name: "Validation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v4
+
   build-docker:
     strategy:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/roborio-cross-ubuntu:2024-22.04
+          - container: wpilib/roborio-cross-ubuntu:2025-22.04
             artifact-name: Athena
             build-options: "-Ponlylinuxathena"
-          - container: wpilib/raspbian-cross-ubuntu:bullseye-22.04
+          - container: wpilib/raspbian-cross-ubuntu:bookworm-22.04
             artifact-name: Arm32
             build-options: "-Ponlylinuxarm32"
-          - container: wpilib/aarch64-cross-ubuntu:bullseye-22.04
+          - container: wpilib/aarch64-cross-ubuntu:bookworm-22.04
             artifact-name: Arm64
             build-options: "-Ponlylinuxarm64"
           - container: wpilib/ubuntu-base:22.04
@@ -26,6 +33,7 @@ jobs:
             build-options: "-Ponlylinuxx86-64"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ubuntu-22.04
+    needs: [validation]
     steps:
       - name: Free Disk Space
         uses: jlumbroso/free-disk-space@main
@@ -42,7 +50,7 @@ jobs:
           fetch-depth: 0
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')
       - name: Build with Gradle
         uses: addnab/docker-run-action@v3
         with:
@@ -61,7 +69,7 @@ jobs:
 
   build-host:
     env:
-      MACOSX_DEPLOYMENT_TARGET: 13
+      MACOSX_DEPLOYMENT_TARGET: 13.3
     strategy:
       fail-fast: false
       matrix:
@@ -96,12 +104,20 @@ jobs:
             task: "build"
             outputs: "build/allOutputs"
           - os: windows-2022
-            artifact-name: Win32
+            artifact-name: Win32FFI
             architecture: x86
             task: ":ntcoreffi:build"
+            build-options: "-Pntcoreffibuild \"-Dorg.gradle.jvmargs=-Xmx1096m\""
+            outputs: "ntcoreffi/build/outputs"
+          - os: windows-2022
+            artifact-name: Win64FFI
+            architecture: x64
+            task: ":ntcoreffi:build"
+            build-options: "-Pntcoreffibuild -Pbuildwinarm64"
             outputs: "ntcoreffi/build/outputs"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
+    needs: [validation]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -112,29 +128,44 @@ jobs:
           java-version: 17
           architecture: ${{ matrix.architecture }}
       - name: Import Developer ID Certificate
-        uses: wpilibsuite/import-signing-certificate@v1
+        uses: wpilibsuite/import-signing-certificate@v2
         with:
           certificate-data: ${{ secrets.APPLE_CERTIFICATE_DATA }}
           certificate-passphrase: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           keychain-password: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
         if: |
-          matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
+          matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027'))))
       - name: Set Keychain Lock Timeout
-        run: security set-keychain-settings -lut 3600
+        run: security set-keychain-settings -lut 21600
         if: |
-          matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
+          matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027'))))
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         shell: bash
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')
       - name: Set Java Heap Size
         run: sed -i 's/-Xmx2g/-Xmx1g/g' gradle.properties
         if: matrix.artifact-name == 'Win32'
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
         if: matrix.os == 'windows-2022'
+      - name: Check disk free space pre-cleanup (macOS)
+        run: df -h .
+        if: matrix.os == 'macOS-14'
+      - name: Cleanup disk space
+        # CodeQL: 5G
+        # go: 748M
+        # Android: 12G
+        run: |
+          rm -rf /Users/runner/hostedtoolcache/CodeQL
+          rm -rf /Users/runner/hostedtoolcache/go
+          rm -rf /Users/runner/Library/Android
+        if: matrix.os == 'macOS-14'
+      - name: Check disk free space post-cleanup (macOS)
+        run: df -h .
+        if: matrix.os == 'macOS-14'
       - name: Build with Gradle
         run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         env:
@@ -143,11 +174,14 @@ jobs:
       - name: Sign Libraries with Developer ID
         run: ./gradlew copyAllOutputs --build-cache -PbuildServer -PskipJavaFormat -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         if: |
-          matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
+          matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027'))))
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
         if: matrix.os == 'windows-2022'
+      - name: Check disk free space (macOS)
+        run: df -h .
+        if: matrix.os == 'macOS-14'
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
@@ -156,6 +190,7 @@ jobs:
   build-documentation:
     name: "Build - Documentation"
     runs-on: ubuntu-22.04
+    needs: [validation]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -166,7 +201,7 @@ jobs:
           java-version: 17
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')
       - name: Build with Gradle
         run: ./gradlew docs:zipDocs --build-cache -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
         env:
@@ -184,8 +219,8 @@ jobs:
     steps:
       - name: Free Disk Space
         if: |
-          github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+          github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
         uses: jlumbroso/free-disk-space@main
         with:
           tool-cache: false
@@ -197,38 +232,38 @@ jobs:
           swap-storage: false
       - uses: actions/checkout@v4
         if: |
-          github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+          github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
         with:
           repository: wpilibsuite/build-tools
       - uses: actions/download-artifact@v4
         if: |
-          github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+          github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
         with:
           path: combiner/products/build/allOutputs
       - name: Flatten Artifacts
         if: |
-          github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+          github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
         run: rsync -a --delete combiner/products/build/allOutputs/*/* combiner/products/build/allOutputs/
       - name: Check version number exists
         if: |
-          github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+          github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
         run: |
           cat combiner/products/build/allOutputs/version.txt
           test -s combiner/products/build/allOutputs/version.txt
       - uses: actions/setup-java@v4
         if: |
-          github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+          github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
         with:
           distribution: 'temurin'
           java-version: 17
       - name: Combine (Main)
         if: |
-          github.repository_owner == 'wpilibsuite' &&
+          github.repository == 'wpilibsuite/allwpilib' &&
           github.ref == 'refs/heads/main'
         run: cd combiner && ./gradlew publish -Pallwpilib
         env:
@@ -237,8 +272,8 @@ jobs:
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: Combine (Release)
         if: |
-          github.repository_owner == 'wpilibsuite' &&
-          startsWith(github.ref, 'refs/tags/v')
+          github.repository == 'wpilibsuite/allwpilib' &&
+          startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')
         run: cd combiner && ./gradlew publish -Pallwpilib -PreleaseRepoPublish
         env:
           RUN_AZURE_ARTIFACTORY_RELEASE: "TRUE"
@@ -246,8 +281,26 @@ jobs:
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - uses: actions/upload-artifact@v4
         if: |
-          github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+          github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
         with:
           name: Maven
           path: ~/releases
+
+  dispatch:
+    name: dispatch
+    needs: [combine]
+    strategy:
+      matrix:
+        repo: ['SmartDashboard', 'PathWeaver', 'Shuffleboard', 'RobotBuilder']
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: peter-evans/repository-dispatch@v3
+        if: |
+          github.repository == 'wpilibsuite/allwpilib' &&
+          startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')
+        with:
+          token: ${{ secrets.TOOL_REPO_ACCESS_TOKEN }}
+          repository: wpilibsuite/${{ matrix.repo }}
+          event-type: tag
+          client-payload: '{"package_name": "allwpilib", "package_version": "${{ github.ref_name }}"}'

@@ -7,7 +7,10 @@
 #include <jni.h>
 
 #include "edu_wpi_first_util_WPIUtilJNI.h"
+#include "wpi/DataLog.h"
+#include "wpi/FileLogger.h"
 #include "wpi/RawFrame.h"
+#include "wpi/RuntimeCheck.h"
 #include "wpi/Synchronization.h"
 #include "wpi/jni_util.h"
 #include "wpi/print.h"
@@ -23,13 +26,15 @@ static JException indexOobEx;
 static JException interruptedEx;
 static JException ioEx;
 static JException nullPointerEx;
+static JException msvcRuntimeEx;
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgEx},
     {"java/lang/IndexOutOfBoundsException", &indexOobEx},
     {"java/lang/InterruptedException", &interruptedEx},
     {"java/io/IOException", &ioEx},
-    {"java/lang/NullPointerException", &nullPointerEx}};
+    {"java/lang/NullPointerException", &nullPointerEx},
+    {"edu/wpi/first/util/MsvcRuntimeException", &msvcRuntimeEx}};
 
 void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
   illegalArgEx.Throw(env, msg);
@@ -73,6 +78,34 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 
   for (auto& c : exceptions) {
     c.cls->free(env);
+  }
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    checkMsvcRuntime
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_checkMsvcRuntime
+  (JNIEnv* env, jclass)
+{
+  uint32_t foundMajor;
+  uint32_t foundMinor;
+  uint32_t expectedMajor;
+  uint32_t expectedMinor;
+  WPI_String runtimePath;
+
+  if (!WPI_IsRuntimeValid(&foundMajor, &foundMinor, &expectedMajor,
+                          &expectedMinor, &runtimePath)) {
+    static jmethodID ctor =
+        env->GetMethodID(msvcRuntimeEx, "<init>", "(IIIILjava/lang/String;)V");
+    jstring jmsvcruntime = MakeJString(env, wpi::to_string_view(&runtimePath));
+    jobject exception =
+        env->NewObject(msvcRuntimeEx, ctor, foundMajor, foundMinor,
+                       expectedMajor, expectedMinor, jmsvcruntime);
+    WPI_FreeString(&runtimePath);
+    env->Throw(static_cast<jthrowable>(exception));
   }
 }
 
@@ -414,4 +447,41 @@ Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameInfo
   f->pixelFormat = pixelFormat;
 }
 
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    createFileLogger
+ * Signature: (Ljava/lang/String;JLjava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_createFileLogger
+  (JNIEnv* env, jclass, jstring file, jlong log, jstring key)
+{
+  if (!file) {
+    wpi::ThrowNullPointerException(env, "file is null");
+    return 0;
+  }
+  auto* f = reinterpret_cast<wpi::log::DataLog*>(log);
+  if (!f) {
+    wpi::ThrowNullPointerException(env, "log is null");
+    return 0;
+  }
+  if (!key) {
+    wpi::ThrowNullPointerException(env, "key is null");
+    return 0;
+  }
+  return reinterpret_cast<jlong>(
+      new wpi::FileLogger{JStringRef{env, file}, *f, JStringRef{env, key}});
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    freeFileLogger
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_freeFileLogger
+  (JNIEnv* env, jclass, jlong fileTail)
+{
+  delete reinterpret_cast<wpi::FileLogger*>(fileTail);
+}
 }  // extern "C"

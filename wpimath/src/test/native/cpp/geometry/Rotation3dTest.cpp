@@ -23,7 +23,7 @@ TEST(Rotation3dTest, GimbalLockAccuracy) {
                  units::radian_t{std::numbers::pi / 2}};
   EXPECT_EQ(expected1, result1);
   EXPECT_DOUBLE_EQ(std::numbers::pi / 2, (result1.X() + result1.Z()).value());
-  EXPECT_DOUBLE_EQ(-std::numbers::pi / 2, result1.Y().value());
+  EXPECT_NEAR(-std::numbers::pi / 2, result1.Y().value(), 1e-7);
 
   rot1 = Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}};
   rot2 = Rotation3d{units::radian_t{-std::numbers::pi}, 0_rad, 0_rad};
@@ -34,7 +34,7 @@ TEST(Rotation3dTest, GimbalLockAccuracy) {
                  units::radian_t{std::numbers::pi / 2}};
   EXPECT_EQ(expected2, result2);
   EXPECT_DOUBLE_EQ(std::numbers::pi / 2, (result2.Z() - result2.X()).value());
-  EXPECT_DOUBLE_EQ(std::numbers::pi / 2, result2.Y().value());
+  EXPECT_NEAR(std::numbers::pi / 2, result2.Y().value(), 1e-7);
 
   rot1 = Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}};
   rot2 = Rotation3d{0_rad, units::radian_t{std::numbers::pi / 3}, 0_rad};
@@ -305,6 +305,13 @@ TEST(Rotation3dTest, Inequality) {
   const auto rot1 = Rotation3d{zAxis, 43_deg};
   const auto rot2 = Rotation3d{zAxis, 43.5_deg};
   EXPECT_NE(rot1, rot2);
+}
+
+TEST(Rotation3dTest, ToMatrix) {
+  Rotation3d before{10_deg, 20_deg, 30_deg};
+  Rotation3d after{before.ToMatrix()};
+
+  EXPECT_EQ(before, after);
 }
 
 TEST(Rotation3dTest, Interpolate) {

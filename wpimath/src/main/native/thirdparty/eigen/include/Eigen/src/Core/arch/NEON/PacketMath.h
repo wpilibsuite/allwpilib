@@ -103,7 +103,7 @@ EIGEN_STRONG_INLINE Packet4f shuffle1(const Packet4f& m, int mask) {
   return res;
 }
 
-// fuctionally equivalent to _mm_shuffle_ps in SSE when interleave
+// functionally equivalent to _mm_shuffle_ps in SSE when interleave
 // == false (i.e. shuffle<false>(m, n, mask) equals _mm_shuffle_ps(m, n, mask)),
 // interleave m and n when interleave == true. Currently used in LU/arch/InverseSize4.h
 // to enable a shared implementation for fast inversion of matrices of size 4.
@@ -209,6 +209,7 @@ struct packet_traits<float> : default_packet_traits {
     HasRsqrt = 1,
     HasTanh = EIGEN_FAST_MATH,
     HasErf = EIGEN_FAST_MATH,
+    HasErfc = EIGEN_FAST_MATH,
     HasBessel = 0,  // Issues with accuracy.
     HasNdtri = 0
   };
@@ -653,6 +654,16 @@ struct unpacket_traits<Packet2ul> {
     masked_store_available = false
   };
 };
+
+template <>
+EIGEN_STRONG_INLINE Packet2f pzero(const Packet2f& /*a*/) {
+  return vdup_n_f32(0.0f);
+}
+
+template <>
+EIGEN_STRONG_INLINE Packet4f pzero(const Packet4f& /*a*/) {
+  return vdupq_n_f32(0.0f);
+}
 
 template <>
 EIGEN_STRONG_INLINE Packet2f pset1<Packet2f>(const float& from) {
@@ -5029,7 +5040,7 @@ EIGEN_STRONG_INLINE Packet4bf pnegate<Packet4bf>(const Packet4bf& a) {
 
 //---------- double ----------
 
-// Clang 3.5 in the iOS toolchain has an ICE triggered by NEON intrisics for double.
+// Clang 3.5 in the iOS toolchain has an ICE triggered by NEON intrinsics for double.
 // Confirmed at least with __apple_build_version__ = 6000054.
 #if EIGEN_COMP_CLANGAPPLE
 // Let's hope that by the time __apple_build_version__ hits the 601* range, the bug will be fixed.
@@ -5075,7 +5086,7 @@ typedef float64x1_t Packet1d;
 EIGEN_ALWAYS_INLINE Packet2d make_packet2d(double a, double b) { return Packet2d{a, b}; }
 #endif
 
-// fuctionally equivalent to _mm_shuffle_pd in SSE (i.e. shuffle(m, n, mask) equals _mm_shuffle_pd(m,n,mask))
+// functionally equivalent to _mm_shuffle_pd in SSE (i.e. shuffle(m, n, mask) equals _mm_shuffle_pd(m,n,mask))
 // Currently used in LU/arch/InverseSize4.h to enable a shared implementation
 // for fast inversion of matrices of size 4.
 EIGEN_STRONG_INLINE Packet2d shuffle(const Packet2d& m, const Packet2d& n, int mask) {
@@ -5123,13 +5134,15 @@ struct packet_traits<double> : default_packet_traits {
     HasExp = 1,
     HasLog = 1,
     HasATan = 1,
+    HasATanh = 1,
 #endif
     HasSin = EIGEN_FAST_MATH,
     HasCos = EIGEN_FAST_MATH,
     HasSqrt = 1,
     HasRsqrt = 1,
-    HasTanh = 0,
-    HasErf = 0
+    HasTanh = EIGEN_FAST_MATH,
+    HasErf = 0,
+    HasErfc = EIGEN_FAST_MATH
   };
 };
 
@@ -5146,6 +5159,11 @@ struct unpacket_traits<Packet2d> {
     masked_store_available = false
   };
 };
+
+template <>
+EIGEN_STRONG_INLINE Packet2d pzero<Packet2d>(const Packet2d& /*a*/) {
+  return vdupq_n_f64(0.0);
+}
 
 template <>
 EIGEN_STRONG_INLINE Packet2d pset1<Packet2d>(const double& from) {

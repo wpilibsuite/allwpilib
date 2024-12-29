@@ -4,6 +4,9 @@
 
 #include "cameraserver/CameraServerShared.h"
 
+#include <memory>
+#include <utility>
+
 #include <wpi/mutex.h>
 
 namespace {
@@ -19,7 +22,7 @@ class DefaultCameraServerShared : public frc::CameraServerShared {
   void ReportDriverStationErrorV(fmt::string_view format,
                                  fmt::format_args args) override {}
   std::pair<std::thread::id, bool> GetRobotMainThreadId() const override {
-    return std::make_pair(std::thread::id(), false);
+    return std::pair{std::thread::id(), false};
   }
 };
 }  // namespace

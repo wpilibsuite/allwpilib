@@ -4,12 +4,12 @@
 
 #include "DeploySession.h"
 
-#include <memory>
-#include <mutex>
+#include <string>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpinet/uv/Error.h>
@@ -19,7 +19,7 @@
 
 #include "SshSession.h"
 
-using namespace sysid;
+using namespace rtns;
 
 #ifdef ERROR
 #undef ERROR

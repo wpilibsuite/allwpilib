@@ -6,6 +6,13 @@
 
 #include <frc/Errors.h>
 
+#include <map>
+#include <numbers>
+#include <set>
+#include <string>
+
+#include <units/angle.h>
+
 using namespace frc;
 
 std::map<int, std::string> XRPServo::s_simDeviceMap = {{4, "servo1"},
@@ -40,28 +47,21 @@ XRPServo::XRPServo(int deviceNum) {
   }
 }
 
-void XRPServo::SetAngle(double angleDegrees) {
-  if (angleDegrees < 0.0) {
-    angleDegrees = 0.0;
-  }
-
-  if (angleDegrees > 180.0) {
-    angleDegrees = 180.0;
-  }
-
-  double pos = (angleDegrees / 180.0);
+void XRPServo::SetAngle(units::radian_t angle) {
+  angle = std::clamp<units::radian_t>(angle, 0_deg, 180_deg);
+  double pos = angle.value() / std::numbers::pi;
 
   if (m_simPosition) {
     m_simPosition.Set(pos);
   }
 }
 
-double XRPServo::GetAngle() const {
+units::radian_t XRPServo::GetAngle() const {
   if (m_simPosition) {
-    return m_simPosition.Get() * 180.0;
+    return units::radian_t{m_simPosition.Get() * std::numbers::pi};
   }
 
-  return 90.0;
+  return 90_deg;
 }
 
 void XRPServo::SetPosition(double pos) {

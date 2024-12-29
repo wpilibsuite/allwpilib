@@ -48,7 +48,7 @@ SLEIPNIR_DLLEXPORT void InteriorPoint(
     std::span<Variable> decisionVariables,
     std::span<Variable> equalityConstraints,
     std::span<Variable> inequalityConstraints, Variable& f,
-    function_ref<bool(const SolverIterationInfo&)> callback,
+    function_ref<bool(const SolverIterationInfo& info)> callback,
     const SolverConfig& config, bool feasibilityRestoration, Eigen::VectorXd& x,
     Eigen::VectorXd& s, SolverStatus* status);
 

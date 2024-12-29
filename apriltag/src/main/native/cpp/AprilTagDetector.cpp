@@ -5,7 +5,7 @@
 #include "frc/apriltag/AprilTagDetector.h"
 
 #include <cmath>
-#include <numbers>
+#include <utility>
 
 #ifdef _WIN32
 #pragma warning(disable : 4200)
@@ -17,13 +17,7 @@
 
 #include "apriltag.h"
 #include "tag16h5.h"
-#include "tag25h9.h"
 #include "tag36h11.h"
-#include "tagCircle21h7.h"
-#include "tagCircle49h12.h"
-#include "tagCustom48h12.h"
-#include "tagStandard41h12.h"
-#include "tagStandard52h13.h"
 
 using namespace frc;
 
@@ -46,7 +40,9 @@ void AprilTagDetector::Results::Destroy() {
   }
 }
 
-AprilTagDetector::AprilTagDetector() : m_impl{apriltag_detector_create()} {}
+AprilTagDetector::AprilTagDetector() : m_impl{apriltag_detector_create()} {
+  SetQuadThresholdParameters({});
+}
 
 AprilTagDetector& AprilTagDetector::operator=(AprilTagDetector&& rhs) {
   Destroy();
@@ -115,20 +111,8 @@ bool AprilTagDetector::AddFamily(std::string_view fam, int bitsCorrected) {
   // create the family
   if (fam == "tag16h5") {
     data = tag16h5_create();
-  } else if (fam == "tag25h9") {
-    data = tag25h9_create();
   } else if (fam == "tag36h11") {
     data = tag36h11_create();
-  } else if (fam == "tagCircle21h7") {
-    data = tagCircle21h7_create();
-  } else if (fam == "tagCircle49h12") {
-    data = tagCircle49h12_create();
-  } else if (fam == "tagStandard41h12") {
-    data = tagStandard41h12_create();
-  } else if (fam == "tagStandard52h13") {
-    data = tagStandard52h13_create();
-  } else if (fam == "tagCustom48h12") {
-    data = tagCustom48h12_create();
   }
   if (!data) {
     m_families.erase(fam);  // don't keep null value
@@ -146,7 +130,7 @@ void AprilTagDetector::RemoveFamily(std::string_view fam) {
     apriltag_detector_remove_family(
         static_cast<apriltag_detector_t*>(m_impl),
         static_cast<apriltag_family_t*>(it->second));
-    DestroyFamily(it->getKey(), it->second);
+    DestroyFamily(it->first, it->second);
     m_families.erase(it);
   }
 }
@@ -174,7 +158,7 @@ void AprilTagDetector::Destroy() {
 
 void AprilTagDetector::DestroyFamilies() {
   for (auto&& entry : m_families) {
-    DestroyFamily(entry.getKey(), entry.second);
+    DestroyFamily(entry.first, entry.second);
   }
 }
 
@@ -182,19 +166,7 @@ void AprilTagDetector::DestroyFamily(std::string_view name, void* data) {
   auto fam = static_cast<apriltag_family_t*>(data);
   if (name == "tag16h5") {
     tag16h5_destroy(fam);
-  } else if (name == "tag25h9") {
-    tag25h9_destroy(fam);
   } else if (name == "tag36h11") {
     tag36h11_destroy(fam);
-  } else if (name == "tagCircle21h7") {
-    tagCircle21h7_destroy(fam);
-  } else if (name == "tagCircle49h12") {
-    tagCircle49h12_destroy(fam);
-  } else if (name == "tagStandard41h12") {
-    tagStandard41h12_destroy(fam);
-  } else if (name == "tagStandard52h13") {
-    tagStandard52h13_destroy(fam);
-  } else if (name == "tagCustom48h12") {
-    tagCustom48h12_destroy(fam);
   }
 }

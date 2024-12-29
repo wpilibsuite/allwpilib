@@ -4,24 +4,36 @@
 
 #include "frc/geometry/proto/Rotation3dProto.h"
 
-#include "geometry3d.pb.h"
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
-google::protobuf::Message* wpi::Protobuf<frc::Rotation3d>::New(
-    google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufRotation3d>(
-      arena);
-}
+#include "wpimath/protobuf/geometry3d.npb.h"
 
-frc::Rotation3d wpi::Protobuf<frc::Rotation3d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufRotation3d*>(&msg);
+std::optional<frc::Rotation3d> wpi::Protobuf<frc::Rotation3d>::Unpack(
+    InputStream& stream) {
+  wpi::UnpackCallback<frc::Quaternion> quat;
+  wpi_proto_ProtobufRotation3d msg{
+      .q = quat.Callback(),
+  };
+  if (!stream.Decode(msg)) {
+    return {};
+  }
+
+  auto iquat = quat.Items();
+
+  if (iquat.empty()) {
+    return {};
+  }
+
   return frc::Rotation3d{
-      wpi::UnpackProtobuf<frc::Quaternion>(m->q()),
+      iquat[0],
   };
 }
 
-void wpi::Protobuf<frc::Rotation3d>::Pack(google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::Rotation3d>::Pack(OutputStream& stream,
                                           const frc::Rotation3d& value) {
-  auto m = static_cast<wpi::proto::ProtobufRotation3d*>(msg);
-  wpi::PackProtobuf(m->mutable_q(), value.GetQuaternion());
+  wpi::PackCallback quat{&value.GetQuaternion()};
+  wpi_proto_ProtobufRotation3d msg{
+      .q = quat.Callback(),
+  };
+  return stream.Encode(msg);
 }

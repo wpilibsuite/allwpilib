@@ -16,8 +16,8 @@ public class SwerveModulePositionStruct implements Struct<SwerveModulePosition> 
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:SwerveModulePosition";
+  public String getTypeName() {
+    return "SwerveModulePosition";
   }
 
   @Override

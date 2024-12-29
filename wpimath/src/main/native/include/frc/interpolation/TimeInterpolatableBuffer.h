@@ -5,9 +5,7 @@
 #pragma once
 
 #include <algorithm>
-#include <array>
 #include <functional>
-#include <map>
 #include <optional>
 #include <utility>
 #include <vector>
@@ -144,6 +142,13 @@ class TimeInterpolatableBuffer {
     return m_pastSnapshots;
   }
 
+  /**
+   * Grant access to the internal sample buffer.
+   */
+  const std::vector<std::pair<units::second_t, T>>& GetInternalBuffer() const {
+    return m_pastSnapshots;
+  }
+
  private:
   units::second_t m_historySize;
   std::vector<std::pair<units::second_t, T>> m_pastSnapshots;
@@ -152,7 +157,19 @@ class TimeInterpolatableBuffer {
 
 // Template specialization to ensure that Pose2d uses pose exponential
 template <>
-WPILIB_DLLEXPORT TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
-    units::second_t historySize);
+inline TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
+    units::second_t historySize)
+    : m_historySize(historySize),
+      m_interpolatingFunc([](const Pose2d& start, const Pose2d& end, double t) {
+        if (t < 0) {
+          return start;
+        } else if (t >= 1) {
+          return end;
+        } else {
+          Twist2d twist = start.Log(end);
+          Twist2d scaledTwist = twist * t;
+          return start.Exp(scaledTwist);
+        }
+      }) {}
 
 }  // namespace frc

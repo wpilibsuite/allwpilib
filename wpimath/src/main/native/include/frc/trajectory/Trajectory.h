@@ -4,8 +4,11 @@
 
 #pragma once
 
+#include <algorithm>
+#include <stdexcept>
 #include <vector>
 
+#include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
@@ -13,6 +16,7 @@
 #include "frc/geometry/Transform2d.h"
 #include "units/acceleration.h"
 #include "units/curvature.h"
+#include "units/math.h"
 #include "units/time.h"
 #include "units/velocity.h"
 
@@ -46,7 +50,7 @@ class WPILIB_DLLEXPORT Trajectory {
     /**
      * Checks equality between this State and another object.
      */
-    bool operator==(const State&) const = default;
+    constexpr bool operator==(const State&) const = default;
 
     /**
      * Interpolates between two States.
@@ -56,7 +60,46 @@ class WPILIB_DLLEXPORT Trajectory {
      *
      * @return The interpolated state.
      */
-    State Interpolate(State endValue, double i) const;
+    constexpr State Interpolate(State endValue, double i) const {
+      // Find the new [t] value.
+      const auto newT = wpi::Lerp(t, endValue.t, i);
+
+      // Find the delta time between the current state and the interpolated
+      // state.
+      const auto deltaT = newT - t;
+
+      // If delta time is negative, flip the order of interpolation.
+      if (deltaT < 0_s) {
+        return endValue.Interpolate(*this, 1.0 - i);
+      }
+
+      // Check whether the robot is reversing at this stage.
+      const auto reversing =
+          velocity < 0_mps ||
+          (units::math::abs(velocity) < 1E-9_mps && acceleration < 0_mps_sq);
+
+      // Calculate the new velocity.
+      // v = v_0 + at
+      const units::meters_per_second_t newV =
+          velocity + (acceleration * deltaT);
+
+      // Calculate the change in position.
+      // delta_s = v_0 t + 0.5at²
+      const units::meter_t newS =
+          (velocity * deltaT + 0.5 * acceleration * deltaT * deltaT) *
+          (reversing ? -1.0 : 1.0);
+
+      // Return the new state. To find the new position for the new state, we
+      // need to interpolate between the two endpoint poses. The fraction for
+      // interpolation is the change in position (delta s) divided by the total
+      // distance between the two endpoints.
+      const double interpolationFrac =
+          newS / endValue.pose.Translation().Distance(pose.Translation());
+
+      return {newT, newV, acceleration,
+              wpi::Lerp(pose, endValue.pose, interpolationFrac),
+              wpi::Lerp(curvature, endValue.curvature, interpolationFrac)};
+    }
   };
 
   Trajectory() = default;
@@ -66,7 +109,14 @@ class WPILIB_DLLEXPORT Trajectory {
    *
    * @throws std::invalid_argument if the vector of states is empty.
    */
-  explicit Trajectory(const std::vector<State>& states);
+  explicit Trajectory(const std::vector<State>& states) : m_states(states) {
+    if (m_states.empty()) {
+      throw std::invalid_argument(
+          "Trajectory manually initialized with no states.");
+    }
+
+    m_totalTime = states.back().t;
+  }
 
   /**
    * Returns the overall duration of the trajectory.
@@ -88,7 +138,41 @@ class WPILIB_DLLEXPORT Trajectory {
    * @return The state at that point in time.
    * @throws std::runtime_error if the trajectory has no states.
    */
-  State Sample(units::second_t t) const;
+  State Sample(units::second_t t) const {
+    if (m_states.empty()) {
+      throw std::runtime_error(
+          "Trajectory cannot be sampled if it has no states.");
+    }
+
+    if (t <= m_states.front().t) {
+      return m_states.front();
+    }
+    if (t >= m_totalTime) {
+      return m_states.back();
+    }
+
+    // Use binary search to get the element with a timestamp no less than the
+    // requested timestamp. This starts at 1 because we use the previous state
+    // later on for interpolation.
+    auto sample =
+        std::lower_bound(m_states.cbegin() + 1, m_states.cend(), t,
+                         [](const auto& a, const auto& b) { return a.t < b; });
+
+    auto prevSample = sample - 1;
+
+    // The sample's timestamp is now greater than or equal to the requested
+    // timestamp. If it is greater, we need to interpolate between the
+    // previous state and the current state to get the exact state that we
+    // want.
+
+    // If the difference in states is negligible, then we are spot on!
+    if (units::math::abs(sample->t - prevSample->t) < 1E-9_s) {
+      return *sample;
+    }
+    // Interpolate between the two states for the state that we want.
+    return prevSample->Interpolate(
+        *sample, (t - prevSample->t) / (sample->t - prevSample->t));
+  }
 
   /**
    * Transforms all poses in the trajectory by the given transform. This is
@@ -98,7 +182,24 @@ class WPILIB_DLLEXPORT Trajectory {
    * @param transform The transform to transform the trajectory by.
    * @return The transformed trajectory.
    */
-  Trajectory TransformBy(const Transform2d& transform);
+  Trajectory TransformBy(const Transform2d& transform) {
+    auto& firstState = m_states[0];
+    auto& firstPose = firstState.pose;
+
+    // Calculate the transformed first pose.
+    auto newFirstPose = firstPose + transform;
+    auto newStates = m_states;
+    newStates[0].pose = newFirstPose;
+
+    for (unsigned int i = 1; i < newStates.size(); i++) {
+      auto& state = newStates[i];
+      // We are transforming relative to the coordinate frame of the new initial
+      // pose.
+      state.pose = newFirstPose + (state.pose - firstPose);
+    }
+
+    return Trajectory(newStates);
+  }
 
   /**
    * Transforms all poses in the trajectory so that they are relative to the
@@ -109,7 +210,13 @@ class WPILIB_DLLEXPORT Trajectory {
    *             the current trajectory will be transformed into.
    * @return The transformed trajectory.
    */
-  Trajectory RelativeTo(const Pose2d& pose);
+  Trajectory RelativeTo(const Pose2d& pose) {
+    auto newStates = m_states;
+    for (auto& state : newStates) {
+      state.pose = state.pose.RelativeTo(pose);
+    }
+    return Trajectory(newStates);
+  }
 
   /**
    * Concatenates another trajectory to the current trajectory. The user is
@@ -119,7 +226,26 @@ class WPILIB_DLLEXPORT Trajectory {
    * @param other The trajectory to concatenate.
    * @return The concatenated trajectory.
    */
-  Trajectory operator+(const Trajectory& other) const;
+  Trajectory operator+(const Trajectory& other) const {
+    // If this is a default constructed trajectory with no states, then we can
+    // simply return the rhs trajectory.
+    if (m_states.empty()) {
+      return other;
+    }
+
+    auto states = m_states;
+    auto otherStates = other.States();
+    for (auto& otherState : otherStates) {
+      otherState.t += m_totalTime;
+    }
+
+    // Here we omit the first state of the other trajectory because we don't
+    // want two time points with different states. Sample() will automatically
+    // interpolate between the end of this trajectory and the second state of
+    // the other trajectory.
+    states.insert(states.end(), otherStates.begin() + 1, otherStates.end());
+    return Trajectory(states);
+  }
 
   /**
    * Returns the initial pose of the trajectory.

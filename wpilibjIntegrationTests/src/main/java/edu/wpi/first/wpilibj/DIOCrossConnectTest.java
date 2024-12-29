@@ -39,7 +39,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
    * @param input The port for the input wire
    * @param output The port for the output wire
    */
-  public DIOCrossConnectTest(Integer input, Integer output) {
+  public DIOCrossConnectTest(int input, int output) {
     if (dio != null) {
       dio.teardown();
     }

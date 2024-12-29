@@ -4,17 +4,18 @@ Date: Tue, 26 Apr 2022 15:19:14 -0400
 Subject: [PATCH 4/9] Preprocessor cleanup
 
 ---
- include/uv.h        | 12 ------------
- include/uv/unix.h   |  8 --------
- src/unix/internal.h |  2 ++
- src/win/fs.c        |  1 +
- src/win/tty.c       |  2 ++
- src/win/util.c      |  8 ++++++++
- src/win/winsock.c   |  1 +
- 7 files changed, 14 insertions(+), 20 deletions(-)
+ include/uv.h               | 12 ------------
+ include/uv/unix.h          |  8 --------
+ src/unix/darwin-syscalls.h |  2 ++
+ src/unix/internal.h        |  2 ++
+ src/win/fs.c               |  1 +
+ src/win/tty.c              |  2 ++
+ src/win/util.c             |  8 ++++++++
+ src/win/winsock.c          |  1 +
+ 8 files changed, 16 insertions(+), 20 deletions(-)
 
 diff --git a/include/uv.h b/include/uv.h
-index 5642101c10c351a602a195d3b74027b53bf641d2..aff06cb7f4352eb4fcf93c938f09a789318bddc3 100644
+index 9e450c5110fe57117b686bf683cc6631f37efaeb..d8d59a03512eff879d9688c09fb4a9a57a82ffb7 100644
 --- a/include/uv.h
 +++ b/include/uv.h
 @@ -23,9 +23,6 @@
@@ -27,7 +28,7 @@ index 5642101c10c351a602a195d3b74027b53bf641d2..aff06cb7f4352eb4fcf93c938f09a789
  
  #if defined(BUILDING_UV_SHARED) && defined(USING_UV_SHARED)
  #error "Define either BUILDING_UV_SHARED or USING_UV_SHARED, not both."
-@@ -796,16 +793,10 @@ UV_EXTERN int uv_tty_get_winsize(uv_tty_t*, int* width, int* height);
+@@ -824,16 +821,10 @@ UV_EXTERN int uv_tty_get_winsize(uv_tty_t*, int* width, int* height);
  UV_EXTERN void uv_tty_set_vterm_state(uv_tty_vtermstate_t state);
  UV_EXTERN int uv_tty_get_vterm_state(uv_tty_vtermstate_t* state);
  
@@ -44,7 +45,7 @@ index 5642101c10c351a602a195d3b74027b53bf641d2..aff06cb7f4352eb4fcf93c938f09a789
  UV_EXTERN uv_handle_type uv_guess_handle(uv_file file);
  
  enum {
-@@ -1918,7 +1909,4 @@ void uv_wtf8_to_utf16(const char* wtf8,
+@@ -1964,7 +1955,4 @@ UV_EXTERN void uv_wtf8_to_utf16(const char* wtf8,
  #undef UV_LOOP_PRIVATE_PLATFORM_FIELDS
  #undef UV__ERR
  
@@ -53,7 +54,7 @@ index 5642101c10c351a602a195d3b74027b53bf641d2..aff06cb7f4352eb4fcf93c938f09a789
 -#endif
  #endif /* UV_H */
 diff --git a/include/uv/unix.h b/include/uv/unix.h
-index 09f88a5674280d762c094d956e5dec6971c6a33e..e334cabe0280ef94bacbb1171049c71f17bf56ff 100644
+index 538f98b6c5d657169e2750a549dd82bf0b948542..2073fe61a569386cc850d733a6c94cbb77a0a369 100644
 --- a/include/uv/unix.h
 +++ b/include/uv/unix.h
 @@ -47,14 +47,6 @@
@@ -71,11 +72,25 @@ index 09f88a5674280d762c094d956e5dec6971c6a33e..e334cabe0280ef94bacbb1171049c71f
  #elif defined(__APPLE__)
  # include "uv/darwin.h"
  #elif defined(__DragonFly__)       || \
+diff --git a/src/unix/darwin-syscalls.h b/src/unix/darwin-syscalls.h
+index dc2d1bd234b1f12e39b7e76d6e290c15b19a3735..851af81c74e5b5d62f5f7e72da84703c15eace90 100644
+--- a/src/unix/darwin-syscalls.h
++++ b/src/unix/darwin-syscalls.h
+@@ -11,7 +11,9 @@ struct mmsghdr {
+     size_t msg_len;
+ };
+ 
++extern "C" {
+ ssize_t recvmsg_x(int s, const struct mmsghdr* msgp, u_int cnt, int flags);
+ ssize_t sendmsg_x(int s, const struct mmsghdr* msgp, u_int cnt, int flags);
++}
+ 
+ #endif /* UV_DARWIN_SYSCALLS_H_ */
 diff --git a/src/unix/internal.h b/src/unix/internal.h
-index 98c437dcadec5b5106d697e82d5394d459f55e47..854d98a16a74c45e0b6cb92b17782de6803f6e28 100644
+index 1daf4d81da3a5bf931c4a5db8fd9116c4c303012..9377e970c4a7adafb8195974f6dc5ba40437ef1a 100644
 --- a/src/unix/internal.h
 +++ b/src/unix/internal.h
-@@ -233,6 +233,8 @@ struct uv__statx {
+@@ -237,6 +237,8 @@ struct uv__statx {
  #if defined(__linux__) && O_NDELAY != O_NONBLOCK
  #undef uv__nonblock
  #define uv__nonblock uv__nonblock_fcntl
@@ -85,7 +100,7 @@ index 98c437dcadec5b5106d697e82d5394d459f55e47..854d98a16a74c45e0b6cb92b17782de6
  
  /* core */
 diff --git a/src/win/fs.c b/src/win/fs.c
-index 7df1df2b9ba23c0ecb96e82a6cfcaae824826b69..26ba539936786902af5830c2811594292815d2d7 100644
+index f1966ab5c0245af0f56ca407a1697a5c8609ebb4..572a82dca3cbcdb7829241dd520e8f34591d81e9 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
 @@ -43,6 +43,7 @@
@@ -97,7 +112,7 @@ index 7df1df2b9ba23c0ecb96e82a6cfcaae824826b69..26ba539936786902af5830c281159429
  #define UV_FS_FREE_PATHS         0x0002
  #define UV_FS_FREE_PTR           0x0008
 diff --git a/src/win/tty.c b/src/win/tty.c
-index c90995afb6166a7cab0a267f5eb513705ce05148..7adf3cd3ba81a9c41064f4ef2af01667092f27d1 100644
+index 62ddf32f0fbd29664dd05c6ba426532a2faf4668..9a4252d9d89d82fdd316312cc4550dd3c0fe798d 100644
 --- a/src/win/tty.c
 +++ b/src/win/tty.c
 @@ -37,6 +37,8 @@
@@ -110,7 +125,7 @@ index c90995afb6166a7cab0a267f5eb513705ce05148..7adf3cd3ba81a9c41064f4ef2af01667
  # define InterlockedOr _InterlockedOr
  #endif
 diff --git a/src/win/util.c b/src/win/util.c
-index 5fbc70f52952f90b36fb22ee03ec7f70e6ed5954..f505cfad4987768fa6470ca27612312c2ba0729d 100644
+index 1aca4e9a081cd7e4481503d59f39872acbbc6a9c..1239831dcc0c5fdb8e267d4dd8e73cb73fdc88c9 100644
 --- a/src/win/util.c
 +++ b/src/win/util.c
 @@ -64,12 +64,20 @@

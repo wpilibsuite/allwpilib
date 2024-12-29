@@ -60,46 +60,6 @@
     "commandversion": 2
   },
   {
-    "name": "PIDCommand",
-    "description": "A command that runs a PIDController.",
-    "tags": [
-      "pidcommand"
-    ],
-    "foldername": "pidcommand",
-    "replacename": "ReplaceMePIDCommand",
-    "commandversion": 2
-  },
-  {
-    "name": "PIDSubsystem",
-    "description": "A subsystem that runs a PIDController.",
-    "tags": [
-      "pidsubsystem"
-    ],
-    "foldername": "pidsubsystem2",
-    "replacename": "ReplaceMePIDSubsystem",
-    "commandversion": 2
-  },
-  {
-    "name": "ProfiledPIDCommand",
-    "description": "A command that runs a ProfiledPIDController.",
-    "tags": [
-      "profiledpidcommand"
-    ],
-    "foldername": "profiledpidcommand",
-    "replacename": "ReplaceMeProfiledPIDCommand",
-    "commandversion": 2
-  },
-  {
-    "name": "ProfiledPIDSubsystem",
-    "description": "A subsystem that runs a ProfiledPIDController.",
-    "tags": [
-      "profiledpidsubsystem"
-    ],
-    "foldername": "profiledpidsubsystem",
-    "replacename": "ReplaceMeProfiledPIDSubsystem",
-    "commandversion": 2
-  },
-  {
     "name": "SequentialCommandGroup",
     "description": "A command group that runs commands in sequence.",
     "tags": [
@@ -117,26 +77,6 @@
     ],
     "foldername": "subsystem2",
     "replacename": "ReplaceMeSubsystem",
-    "commandversion": 2
-  },
-  {
-    "name": "TrapezoidProfileCommand",
-    "description": "A command that executes a trapezoidal motion profile.",
-    "tags": [
-      "trapezoidprofilecommand"
-    ],
-    "foldername": "trapezoidprofilecommand",
-    "replacename": "ReplaceMeTrapezoidProfileCommand",
-    "commandversion": 2
-  },
-  {
-    "name": "TrapezoidProfileSubsystem",
-    "description": "A subsystem that executes a trapezoidal motion profile.",
-    "tags": [
-      "trapezoidprofilesubsystem"
-    ],
-    "foldername": "trapezoidprofilesubsystem",
-    "replacename": "ReplaceMeTrapezoidProfileSubsystem",
     "commandversion": 2
   }
 ]

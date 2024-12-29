@@ -4,32 +4,30 @@
 
 #include "frc/kinematics/proto/MecanumDriveWheelSpeedsProto.h"
 
-#include "kinematics.pb.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
-google::protobuf::Message* wpi::Protobuf<frc::MecanumDriveWheelSpeeds>::New(
-    google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufMecanumDriveWheelSpeeds>(arena);
-}
+std::optional<frc::MecanumDriveWheelSpeeds>
+wpi::Protobuf<frc::MecanumDriveWheelSpeeds>::Unpack(InputStream& stream) {
+  wpi_proto_ProtobufMecanumDriveWheelSpeeds msg;
+  if (!stream.Decode(msg)) {
+    return {};
+  }
 
-frc::MecanumDriveWheelSpeeds
-wpi::Protobuf<frc::MecanumDriveWheelSpeeds>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m =
-      static_cast<const wpi::proto::ProtobufMecanumDriveWheelSpeeds*>(&msg);
   return frc::MecanumDriveWheelSpeeds{
-      units::meters_per_second_t{m->front_left()},
-      units::meters_per_second_t{m->front_right()},
-      units::meters_per_second_t{m->rear_left()},
-      units::meters_per_second_t{m->rear_right()},
+      units::meters_per_second_t{msg.front_left},
+      units::meters_per_second_t{msg.front_right},
+      units::meters_per_second_t{msg.rear_left},
+      units::meters_per_second_t{msg.rear_right},
   };
 }
 
-void wpi::Protobuf<frc::MecanumDriveWheelSpeeds>::Pack(
-    google::protobuf::Message* msg, const frc::MecanumDriveWheelSpeeds& value) {
-  auto m = static_cast<wpi::proto::ProtobufMecanumDriveWheelSpeeds*>(msg);
-  m->set_front_left(value.frontLeft.value());
-  m->set_front_right(value.frontRight.value());
-  m->set_rear_left(value.rearLeft.value());
-  m->set_rear_right(value.rearRight.value());
+bool wpi::Protobuf<frc::MecanumDriveWheelSpeeds>::Pack(
+    OutputStream& stream, const frc::MecanumDriveWheelSpeeds& value) {
+  wpi_proto_ProtobufMecanumDriveWheelSpeeds msg{
+      .front_left = value.frontLeft.value(),
+      .front_right = value.frontRight.value(),
+      .rear_left = value.rearLeft.value(),
+      .rear_right = value.rearRight.value(),
+  };
+  return stream.Encode(msg);
 }

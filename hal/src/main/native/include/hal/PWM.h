@@ -35,9 +35,8 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
  * Frees a PWM port.
  *
  * @param[in] pwmPortHandle the pwm handle
- * @param[out] status       Error status variable. 0 on success.
  */
-void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status);
+void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle);
 
 /**
  * Checks if a pwm channel is valid.
@@ -216,7 +215,7 @@ void HAL_SetPWMAlwaysHighMode(HAL_DigitalHandle pwmPortHandle, int32_t* status);
  * Gets the loop timing of the PWM system.
  *
  * @param[out] status Error status variable. 0 on success.
- * @return the loop time
+ * @return the loop time in clock ticks
  */
 int32_t HAL_GetPWMLoopTiming(int32_t* status);
 

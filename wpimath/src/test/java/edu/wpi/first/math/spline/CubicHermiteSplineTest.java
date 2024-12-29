@@ -36,7 +36,7 @@ class CubicHermiteSplineTest {
 
     var poses = new ArrayList<PoseWithCurvature>();
 
-    poses.add(splines[0].getPoint(0.0));
+    poses.add(splines[0].getPoint(0.0).get());
 
     for (var spline : splines) {
       poses.addAll(SplineParameterizer.parameterize(spline));

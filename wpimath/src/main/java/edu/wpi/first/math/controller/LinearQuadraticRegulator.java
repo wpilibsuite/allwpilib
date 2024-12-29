@@ -5,7 +5,6 @@
 package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.DARE;
-import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.StateSpaceUtil;
@@ -47,7 +46,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param qelms The maximum desired error tolerance for each state.
    * @param relms The maximum desired control effort for each input.
    * @param dtSeconds Discretization timestep.
-   * @throws IllegalArgumentException If the system is uncontrollable.
+   * @throws IllegalArgumentException If the system is unstabilizable.
    */
   public LinearQuadraticRegulator(
       LinearSystem<States, Inputs, Outputs> plant,
@@ -74,7 +73,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param qelms The maximum desired error tolerance for each state.
    * @param relms The maximum desired control effort for each input.
    * @param dtSeconds Discretization timestep.
-   * @throws IllegalArgumentException If the system is uncontrollable.
+   * @throws IllegalArgumentException If the system is unstabilizable.
    */
   public LinearQuadraticRegulator(
       Matrix<States, States> A,
@@ -98,7 +97,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param Q The state cost matrix.
    * @param R The input cost matrix.
    * @param dtSeconds Discretization timestep.
-   * @throws IllegalArgumentException If the system is uncontrollable.
+   * @throws IllegalArgumentException If the system is unstabilizable.
    */
   public LinearQuadraticRegulator(
       Matrix<States, States> A,
@@ -109,17 +108,6 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
-
-    if (!StateSpaceUtil.isStabilizable(discA, discB)) {
-      var msg =
-          "The system passed to the LQR is uncontrollable!\n\nA =\n"
-              + discA.getStorage().toString()
-              + "\nB =\n"
-              + discB.getStorage().toString()
-              + '\n';
-      MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
-      throw new IllegalArgumentException(msg);
-    }
 
     var S = DARE.dare(discA, discB, Q, R);
 
@@ -147,7 +135,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param R The input cost matrix.
    * @param N The state-input cross-term cost matrix.
    * @param dtSeconds Discretization timestep.
-   * @throws IllegalArgumentException If the system is uncontrollable.
+   * @throws IllegalArgumentException If the system is unstabilizable.
    */
   public LinearQuadraticRegulator(
       Matrix<States, States> A,

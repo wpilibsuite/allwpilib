@@ -15,8 +15,8 @@ public class Twist2dStruct implements Struct<Twist2d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Twist2d";
+  public String getTypeName() {
+    return "Twist2d";
   }
 
   @Override

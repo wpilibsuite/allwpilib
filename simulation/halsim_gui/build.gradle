@@ -20,8 +20,6 @@ apply from: "${rootDir}/shared/googletest.gradle"
 apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
 
 
-apply from: "${rootDir}/shared/imgui.gradle"
-
 model {
     binaries {
         all {
@@ -33,7 +31,7 @@ model {
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':fieldImages', library: 'fieldImages', linkage: 'static'
-            nativeUtils.useRequiredLibrary(it, 'imgui')
+            lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                 it.buildable = false
                 return

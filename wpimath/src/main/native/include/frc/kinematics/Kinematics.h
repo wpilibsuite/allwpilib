@@ -20,9 +20,12 @@ namespace frc {
  * forward kinematics converts wheel speeds into chassis speed.
  */
 template <typename WheelSpeeds, typename WheelPositions>
-  requires std::copy_constructible<WheelPositions>
+  requires std::copy_constructible<WheelPositions> &&
+           std::assignable_from<WheelPositions&, const WheelPositions&>
 class WPILIB_DLLEXPORT Kinematics {
  public:
+  virtual ~Kinematics() noexcept = default;
+
   /**
    * Performs forward kinematics to return the resulting chassis speed from the
    * wheel speeds. This method is often used for odometry -- determining the

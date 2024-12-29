@@ -5,6 +5,10 @@
 #include "glass/Storage.h"
 
 #include <concepts>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <imgui.h>
 #include <wpi/StringExtras.h>
@@ -327,7 +331,7 @@ std::vector<std::unique_ptr<Storage>>& Storage::GetChildArray(
 std::unique_ptr<Storage::Value> Storage::Erase(std::string_view key) {
   auto it = m_values.find(key);
   if (it != m_values.end()) {
-    auto rv = std::move(it->getValue());
+    auto rv = std::move(it->second);
     m_values.erase(it);
     return rv;
   }
@@ -335,11 +339,9 @@ std::unique_ptr<Storage::Value> Storage::Erase(std::string_view key) {
 }
 
 void Storage::EraseChildren() {
-  for (auto&& kv : m_values) {
-    if (kv.getValue()->type == Value::kChild) {
-      m_values.remove(&kv);
-    }
-  }
+  std::erase_if(m_values, [](const auto& kv) {
+    return kv.second->type == Value::kChild;
+  });
 }
 
 static bool JsonArrayToStorage(Storage::Value* valuePtr, const wpi::json& jarr,
@@ -555,7 +557,7 @@ wpi::json Storage::ToJson() const {
   wpi::json j = wpi::json::object();
   for (auto&& kv : m_values) {
     wpi::json jelem;
-    auto& value = *kv.getValue();
+    auto& value = *kv.second;
     switch (value.type) {
 #define CASE(CapsName, LowerName)                                        \
   case Value::k##CapsName:                                               \
@@ -598,7 +600,7 @@ wpi::json Storage::ToJson() const {
       default:
         continue;
     }
-    j.emplace(kv.getKey(), std::move(jelem));
+    j.emplace(kv.first, std::move(jelem));
   }
   return j;
 }
@@ -613,7 +615,7 @@ void Storage::Clear() {
 
 void Storage::ClearValues() {
   for (auto&& kv : m_values) {
-    auto& value = *kv.getValue();
+    auto& value = *kv.second;
     switch (value.type) {
       case Value::kInt:
         value.intVal = value.intDefault;
@@ -699,7 +701,7 @@ void Storage::Apply() {
 
 void Storage::ApplyChildren() {
   for (auto&& kv : m_values) {
-    auto& value = *kv.getValue();
+    auto& value = *kv.second;
     switch (value.type) {
       case Value::kChild:
         value.child->Apply();

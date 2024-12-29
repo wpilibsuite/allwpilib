@@ -9,20 +9,24 @@
 namespace frc {
 
 /**
- * This class represents the reflectance sensor pair
- * on the XRP robot.
+ * @ingroup xrp_api
+ * @{
  */
+
+/** This class represents the reflectance sensor pair on an XRP robot. */
 class XRPReflectanceSensor {
  public:
   /**
-   * Return the reflectance value of the left sensor.
-   * Value ranges from 0.0 (white) to 1.0 (black)
+   * Returns the reflectance value of the left sensor.
+   *
+   * @return value between 0.0 (white) and 1.0 (black).
    */
   double GetLeftReflectanceValue() const;
 
   /**
-   * Return the reflectance value of the right sensor.
-   * Value ranges from 0.0 (white) to 1.0 (black)
+   * Returns the reflectance value of the right sensor.
+   *
+   * @return value between 0.0 (white) and 1.0 (black).
    */
   double GetRightReflectanceValue() const;
 
@@ -30,5 +34,7 @@ class XRPReflectanceSensor {
   frc::AnalogInput m_leftSensor{0};
   frc::AnalogInput m_rightSensor{1};
 };
+
+/** @} */
 
 }  // namespace frc

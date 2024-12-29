@@ -57,8 +57,7 @@ public class DutyCycleSim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DutyCycleDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
@@ -88,8 +87,7 @@ public class DutyCycleSim {
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerFrequencyCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DutyCycleDataJNI.registerFrequencyCallback(m_index, callback, initialNotify);
@@ -119,8 +117,7 @@ public class DutyCycleSim {
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerOutputCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DutyCycleDataJNI.registerOutputCallback(m_index, callback, initialNotify);

@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Sat, 10 Jun 2023 15:13:45 -0700
-Subject: [PATCH 05/12] Suppress enum-enum conversion warning
+Subject: [PATCH 05/14] Suppress enum-enum conversion warning
 
 ---
  src/google/protobuf/generated_message_tctable_impl.h | 9 +++++++++
  1 file changed, 9 insertions(+)
 
 diff --git a/src/google/protobuf/generated_message_tctable_impl.h b/src/google/protobuf/generated_message_tctable_impl.h
-index 21fa5332d39b24e0bdb6432f27183df743d512c6..ce3d9110e28706ca18dcf0f2c94feba75f447dc7 100644
+index 21fa5332d39b24e0bdb6432f27183df743d512c6..5aceeb39ae24866e7258d62cf5b025df0ba20fc5 100644
 --- a/src/google/protobuf/generated_message_tctable_impl.h
 +++ b/src/google/protobuf/generated_message_tctable_impl.h
 @@ -180,6 +180,12 @@ static_assert(kFmtShift + kFmtBits == 12, "number of bits changed");
@@ -17,7 +17,7 @@ index 21fa5332d39b24e0bdb6432f27183df743d512c6..ce3d9110e28706ca18dcf0f2c94feba7
  
 +#ifdef __GNUC__
 +#pragma GCC diagnostic push
-+#if __GNUC__ >= 12 || (__GNUC__ == 11 && __GNUC_MINOR >= 1)
++#if __GNUC__ >= 12 || (__GNUC__ == 11 && __GNUC_MINOR__ >= 1)
 +#pragma GCC diagnostic ignored "-Wdeprecated-enum-enum-conversion"
 +#endif
 +#endif

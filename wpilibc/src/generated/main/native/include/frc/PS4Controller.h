@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/GenericHID.h"
 
 namespace frc {
@@ -22,7 +25,9 @@ namespace frc {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class PS4Controller : public GenericHID {
+class PS4Controller : public GenericHID,
+                                    public wpi::Sendable,
+                                    public wpi::SendableHelper<PS4Controller> {
  public:
   /**
    * Construct an instance of a controller.
@@ -521,6 +526,9 @@ class PS4Controller : public GenericHID {
    * Read the value of the touchpad button on the controller.
    *
    * @return The state of the button.
+   * @deprecated Use GetTouchpadButton instead. This function is deprecated for
+   * removal to make function names consistent to allow the HID classes to be
+   * automatically generated.
    */
   [[deprecated("Use GetTouchpadButton instead")]]
   bool GetTouchpad() const;
@@ -528,6 +536,9 @@ class PS4Controller : public GenericHID {
    * Whether the touchpad was pressed since the last check.
    *
    * @return Whether the touchpad was pressed since the last check.
+   * @deprecated Use GetTouchpadButtonPressed instead. This function is
+   * deprecated for removal to make function names consistent to allow the HID
+   * classes to be automatically generated.
    */
   [[deprecated("Use GetTouchpadButtonPressed instead")]]
   bool GetTouchpadPressed();
@@ -536,6 +547,9 @@ class PS4Controller : public GenericHID {
    * Whether the touchpad was released since the last check.
    *
    * @return Whether the touchpad was released since the last check.
+   * @deprecated Use GetLeftBumperButton instead. This function is deprecated
+   * for removal to make function names consistent to allow the HID classes to
+   * be automatically generated.
    */
   [[deprecated("Use GetTouchpadButtonReleased instead")]]
   bool GetTouchpadReleased();
@@ -587,6 +601,8 @@ class PS4Controller : public GenericHID {
     /// Right trigger 2.
     static constexpr int kR2 = 4;
   };
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };
 
 }  // namespace frc

@@ -174,7 +174,7 @@ public class ProfiledPIDController implements Sendable {
    * @return the position tolerance of the controller.
    */
   public double getPositionTolerance() {
-    return m_controller.getPositionTolerance();
+    return m_controller.getErrorTolerance();
   }
 
   /**
@@ -183,7 +183,16 @@ public class ProfiledPIDController implements Sendable {
    * @return the velocity tolerance of the controller.
    */
   public double getVelocityTolerance() {
-    return m_controller.getVelocityTolerance();
+    return m_controller.getErrorDerivativeTolerance();
+  }
+
+  /**
+   * Returns the accumulated error used in the integral calculation of this controller.
+   *
+   * @return The accumulated error of this controller.
+   */
+  public double getAccumulatedError() {
+    return m_controller.getAccumulatedError();
   }
 
   /**
@@ -321,7 +330,7 @@ public class ProfiledPIDController implements Sendable {
    * @return The error.
    */
   public double getPositionError() {
-    return m_controller.getPositionError();
+    return m_controller.getError();
   }
 
   /**
@@ -330,7 +339,7 @@ public class ProfiledPIDController implements Sendable {
    * @return The change in error per second.
    */
   public double getVelocityError() {
-    return m_controller.getVelocityError();
+    return m_controller.getErrorDerivative();
   }
 
   /**

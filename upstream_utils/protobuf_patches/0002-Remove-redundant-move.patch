@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Sat, 10 Jun 2023 14:41:39 -0700
-Subject: [PATCH 02/12] Remove redundant move
+Subject: [PATCH 02/14] Remove redundant move
 
 ---
  src/google/protobuf/extension_set.h | 2 +-

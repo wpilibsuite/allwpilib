@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstdio>
+#include <memory>
 
 #include <wpi/Logger.h>
 
@@ -47,5 +48,5 @@ int main() {
   });
 
   // wait for a keypress to terminate
-  std::getchar();
+  static_cast<void>(std::getchar());
 }

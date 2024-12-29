@@ -1,0 +1,18 @@
+
+###############################
+# Roborio
+###############################
+build:roborio --config=base_linux
+
+build:roborio --platforms=@rules_bzlmodrio_toolchains//platforms/roborio
+build:roborio --build_tag_filters=-no-roborio
+build:roborio --features=compiler_param_file
+build:roborio --platform_suffix=roborio
+build:roborio --incompatible_enable_cc_toolchain_resolution
+
+build:roborio --cxxopt=-Wno-error=deprecated-declarations
+
+# Extra 11
+build:roborio --cxxopt=-Wno-error=deprecated-enum-enum-conversion
+
+build:roborio --host_per_file_copt=external/zlib/.*\.c@-Wno-deprecated-non-prototype

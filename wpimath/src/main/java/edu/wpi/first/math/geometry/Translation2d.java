@@ -17,8 +17,7 @@ import edu.wpi.first.math.geometry.proto.Translation2dProto;
 import edu.wpi.first.math.geometry.struct.Translation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Collections;
@@ -84,15 +83,15 @@ public class Translation2d
    * @param x The x component of the translation.
    * @param y The y component of the translation.
    */
-  public Translation2d(Measure<Distance> x, Measure<Distance> y) {
+  public Translation2d(Distance x, Distance y) {
     this(x.in(Meters), y.in(Meters));
   }
 
   /**
-   * Constructs a Translation2d from the provided translation vector's X and Y components. The
-   * values are assumed to be in meters.
+   * Constructs a Translation2d from a 2D translation vector. The values are assumed to be in
+   * meters.
    *
-   * @param vector The translation vector to represent.
+   * @param vector The translation vector.
    */
   public Translation2d(Vector<N2> vector) {
     this(vector.get(0), vector.get(1));
@@ -131,9 +130,27 @@ public class Translation2d
   }
 
   /**
-   * Returns a vector representation of this translation.
+   * Returns the X component of the translation in a measure.
    *
-   * @return A Vector representation of this translation.
+   * @return The x component of the translation in a measure.
+   */
+  public Distance getMeasureX() {
+    return Meters.of(m_x);
+  }
+
+  /**
+   * Returns the Y component of the translation in a measure.
+   *
+   * @return The y component of the translation in a measure.
+   */
+  public Distance getMeasureY() {
+    return Meters.of(m_y);
+  }
+
+  /**
+   * Returns a 2D translation vector representation of this translation.
+   *
+   * @return A 2D translation vector representation of this translation.
    */
   public Vector<N2> toVector() {
     return VecBuilder.fill(m_x, m_y);

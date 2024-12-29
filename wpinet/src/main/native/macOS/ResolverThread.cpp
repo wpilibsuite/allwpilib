@@ -7,6 +7,9 @@
 #include "ResolverThread.h"
 
 #include <algorithm>
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include <wpi/mutex.h>
 
@@ -32,7 +35,7 @@ void ResolverThread::AddServiceRef(DNSServiceRef serviceRef,
       thread.join();
     }
     running = true;
-    thread = std::thread([=] { ThreadMain(); });
+    thread = std::thread([this] { ThreadMain(); });
   }
 }
 

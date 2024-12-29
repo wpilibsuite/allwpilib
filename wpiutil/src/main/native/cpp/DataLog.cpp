@@ -4,10 +4,13 @@
 
 #include "wpi/DataLog.h"
 
+#include <algorithm>
 #include <bit>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "wpi/Endian.h"
@@ -80,7 +83,7 @@ void DataLog::StartFile() {
 
   // Existing start and schema data records
   for (auto&& entryInfo : m_entries) {
-    AppendStartRecord(entryInfo.second.id, entryInfo.first(),
+    AppendStartRecord(entryInfo.second.id, entryInfo.first,
                       entryInfo.second.type,
                       m_entryIds[entryInfo.second.id].metadata, 0);
     if (!entryInfo.second.schemaData.empty()) {
@@ -374,7 +377,7 @@ void DataLog::AppendFloat(int entry, float value, int64_t timestamp) {
   if constexpr (std::endian::native == std::endian::little) {
     std::memcpy(buf, &value, 4);
   } else {
-    wpi::support::endian::write32le(buf, wpi::bit_cast<uint32_t>(value));
+    wpi::support::endian::write32le(buf, std::bit_cast<uint32_t>(value));
   }
 }
 
@@ -390,7 +393,7 @@ void DataLog::AppendDouble(int entry, double value, int64_t timestamp) {
   if constexpr (std::endian::native == std::endian::little) {
     std::memcpy(buf, &value, 8);
   } else {
-    wpi::support::endian::write64le(buf, wpi::bit_cast<uint64_t>(value));
+    wpi::support::endian::write64le(buf, std::bit_cast<uint64_t>(value));
   }
 }
 
@@ -505,14 +508,14 @@ void DataLog::AppendFloatArray(int entry, std::span<const float> arr,
     while ((arr.size() * 4) > kBlockSize) {
       buf = Reserve(kBlockSize);
       for (auto val : arr.subspan(0, kBlockSize / 4)) {
-        wpi::support::endian::write32le(buf, wpi::bit_cast<uint32_t>(val));
+        wpi::support::endian::write32le(buf, std::bit_cast<uint32_t>(val));
         buf += 4;
       }
       arr = arr.subspan(kBlockSize / 4);
     }
     buf = Reserve(arr.size() * 4);
     for (auto val : arr) {
-      wpi::support::endian::write32le(buf, wpi::bit_cast<uint32_t>(val));
+      wpi::support::endian::write32le(buf, std::bit_cast<uint32_t>(val));
       buf += 4;
     }
   }
@@ -537,14 +540,14 @@ void DataLog::AppendDoubleArray(int entry, std::span<const double> arr,
     while ((arr.size() * 8) > kBlockSize) {
       buf = Reserve(kBlockSize);
       for (auto val : arr.subspan(0, kBlockSize / 8)) {
-        wpi::support::endian::write64le(buf, wpi::bit_cast<uint64_t>(val));
+        wpi::support::endian::write64le(buf, std::bit_cast<uint64_t>(val));
         buf += 8;
       }
       arr = arr.subspan(kBlockSize / 8);
     }
     buf = Reserve(arr.size() * 8);
     for (auto val : arr) {
-      wpi::support::endian::write64le(buf, wpi::bit_cast<uint64_t>(val));
+      wpi::support::endian::write64le(buf, std::bit_cast<uint64_t>(val));
       buf += 8;
     }
   }
@@ -615,6 +618,107 @@ void DataLog::AppendStringArray(int entry,
   wpi::support::endian::write32le(buf, arr.size());
   for (auto&& sv : arr) {
     AppendStringImpl(sv.str);
+  }
+}
+
+template <typename V1, typename V2>
+inline bool UpdateImpl(std::optional<std::vector<V1>>& lastValue,
+                       std::span<const V2> data) {
+  if (!lastValue || !std::equal(data.begin(), data.end(), lastValue->begin(),
+                                lastValue->end())) {
+    if (lastValue) {
+      lastValue->assign(data.begin(), data.end());
+    } else {
+      lastValue = std::vector<V1>{data.begin(), data.end()};
+    }
+    return true;
+  }
+  return false;
+}
+
+template <typename V1>
+inline bool UpdateImpl(std::optional<std::vector<V1>>& lastValue,
+                       std::span<const bool> data) {
+  if (!lastValue || !std::equal(data.begin(), data.end(), lastValue->begin(),
+                                lastValue->end(), [](auto a, auto b) {
+                                  return a == static_cast<bool>(b);
+                                })) {
+    if (lastValue) {
+      lastValue->assign(data.begin(), data.end());
+    } else {
+      lastValue = std::vector<V1>{data.begin(), data.end()};
+    }
+    return true;
+  }
+  return false;
+}
+
+void RawLogEntry::Update(std::span<const uint8_t> data, int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, data)) {
+    Append(data, timestamp);
+  }
+}
+
+void BooleanArrayLogEntry::Update(std::span<const bool> arr,
+                                  int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
+  }
+}
+
+void BooleanArrayLogEntry::Update(std::span<const int> arr, int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
+  }
+}
+
+void BooleanArrayLogEntry::Update(std::span<const uint8_t> arr,
+                                  int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
+  }
+}
+
+void IntegerArrayLogEntry::Update(std::span<const int64_t> arr,
+                                  int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
+  }
+}
+
+void FloatArrayLogEntry::Update(std::span<const float> arr, int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
+  }
+}
+
+void DoubleArrayLogEntry::Update(std::span<const double> arr,
+                                 int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
+  }
+}
+
+void StringArrayLogEntry::Update(std::span<const std::string> arr,
+                                 int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
+  }
+}
+
+void StringArrayLogEntry::Update(std::span<const std::string_view> arr,
+                                 int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
   }
 }
 

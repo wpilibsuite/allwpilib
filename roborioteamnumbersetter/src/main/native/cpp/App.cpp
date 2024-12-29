@@ -3,8 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <memory>
+#include <string>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 
 #ifndef _WIN32
 #include <arpa/inet.h>
@@ -57,10 +59,10 @@ struct TeamNumberRefHolder {
 static std::unique_ptr<TeamNumberRefHolder> teamNumberRef;
 static std::unordered_map<std::string, std::pair<unsigned int, std::string>>
     foundDevices;
-static std::unordered_map<std::string, std::optional<sysid::DeviceStatus>>
+static std::unordered_map<std::string, std::optional<rtns::DeviceStatus>>
     deviceStatuses;
 static wpi::Logger logger;
-static sysid::DeploySession deploySession{logger};
+static rtns::DeploySession deploySession{logger};
 static std::unique_ptr<wpi::MulticastServiceResolver> multicastResolver;
 static glass::MainMenuBar gMainMenu;
 
@@ -79,7 +81,7 @@ static void FindDevices() {
       if (macKey != data.txt.end()) {
         auto& mac = macKey->second;
         auto& foundDevice = foundDevices[mac];
-        foundDevice = std::make_pair(data.ipv4Address, data.hostName);
+        foundDevice = std::pair{data.ipv4Address, data.hostName};
         auto& deviceStatus = deviceStatuses[mac];
         if (!deviceStatus) {
           deploySession.GetStatus(mac, foundDevice.first);
@@ -182,7 +184,7 @@ static void DisplayGui() {
 
     for (auto&& i : foundDevices) {
       std::future<int>* future = deploySession.GetFuture(i.first);
-      std::future<sysid::DeviceStatus>* futureStatus =
+      std::future<rtns::DeviceStatus>* futureStatus =
           deploySession.GetStatusFuture(i.first);
       if (ImGui::BeginTable("Table", 4)) {
         ImGui::TableSetupColumn(
@@ -235,7 +237,14 @@ static void DisplayGui() {
         ImGui::Text("Refreshing Status");
         const auto fs = futureStatus->wait_for(std::chrono::seconds(0));
         if (fs == std::future_status::ready) {
-          deviceStatuses[i.first] = futureStatus->get();
+          // DeploySession may throw exceptions. They've already been logged, so
+          // we can ignore them.
+          try {
+            deviceStatuses[i.first] = futureStatus->get();
+          } catch (const std::exception&) {
+            // pass, already been logged
+          }
+          // Always destroy the future so the UI updates
           deploySession.DestroyStatusFuture(i.first);
         }
       } else {

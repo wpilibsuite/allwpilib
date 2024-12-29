@@ -1,0 +1,249 @@
+import org.gradle.internal.os.OperatingSystem
+
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64')) {
+    return;
+}
+
+description = "Field Calibration Tool"
+
+apply plugin: 'c'
+apply plugin: 'cpp'
+apply plugin: 'visual-studio'
+apply plugin: 'google-test-test-suite'
+apply plugin: 'edu.wpi.first.NativeUtils'
+
+if (OperatingSystem.current().isWindows()) {
+    apply plugin: 'windows-resources'
+}
+
+ext {
+    nativeName = 'wpical'
+    useCpp = true
+    sharedCvConfigs = [
+        wpicalTest: []]
+    staticCvConfigs = []
+}
+
+apply from: "${rootDir}/shared/resources.gradle"
+apply from: "${rootDir}/shared/config.gradle"
+
+def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
+def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
+
+apply from: "${rootDir}/shared/ceres.gradle"
+apply from: "${rootDir}/shared/opencv.gradle"
+
+task generateCppVersion() {
+    description = 'Generates the wpilib version class'
+    group = 'WPILib'
+
+    outputs.file wpilibVersionFileOutput
+    inputs.file wpilibVersionFileInput
+
+    if (wpilibVersioning.releaseMode) {
+        outputs.upToDateWhen { false }
+    }
+
+    // We follow a simple set of checks to determine whether we should generate a new version file:
+    // 1. If the release type is not development, we generate a new version file
+    // 2. If there is no generated version number, we generate a new version file
+    // 3. If there is a generated build number, and the release type is development, then we will
+    //    only generate if the publish task is run.
+    doLast {
+        def version = wpilibVersioning.version.get()
+        println "Writing version ${version} to $wpilibVersionFileOutput"
+
+        if (wpilibVersionFileOutput.exists()) {
+            wpilibVersionFileOutput.delete()
+        }
+        def read = wpilibVersionFileInput.text.replace('${wpilib_version}', version)
+        wpilibVersionFileOutput.write(read)
+    }
+}
+
+gradle.taskGraph.addTaskExecutionGraphListener { graph ->
+    def willPublish = graph.hasTask(publish)
+    if (willPublish) {
+        generateCppVersion.outputs.upToDateWhen { false }
+    }
+}
+
+def generateTask = createGenerateResourcesTask('main', 'WPIcal', 'wpical', project)
+
+project(':').libraryBuild.dependsOn build
+tasks.withType(CppCompile) {
+    dependsOn generateTask
+    dependsOn generateCppVersion
+}
+
+// Suppress warnings
+nativeUtils.platformConfigs.each {
+    if (it.name.contains('windows')) {
+        it.cCompiler.args.add("/wd4047")
+        it.cCompiler.args.add("/wd4098")
+        it.cCompiler.args.add("/wd4267")
+        it.cppCompiler.args.add("/wd4068")
+        it.cppCompiler.args.add("/wd4101")
+        it.cppCompiler.args.add("/wd4200")
+        it.cppCompiler.args.add("/wd4576")
+        it.cppCompiler.args.add("/wd4715")
+    } else if (it.name.contains('osx')) {
+        it.cCompiler.args.add("-Wno-format-nonliteral")
+        it.cCompiler.args.remove("-pedantic")
+        it.cCompiler.args.add("-Wno-unused-variable")
+        it.cCompiler.args.add("-Wno-unused-function")
+        it.cCompiler.args.add("-Wno-sign-compare")
+        it.cppCompiler.args.add("-Wno-missing-field-initializers")
+        it.cppCompiler.args.remove("-pedantic")
+        it.cppCompiler.args.add("-Wno-unused-variable")
+        it.cppCompiler.args.add("-Wno-unused-function")
+        it.cppCompiler.args.add("-Wno-sign-compare")
+        it.cppCompiler.args.remove("-permissive")
+        it.cppCompiler.args.add("-fpermissive")
+        it.cppCompiler.args.add("-Wno-missing-braces")
+        it.cppCompiler.args.add("-Wno-null-conversion")
+        it.cppCompiler.args.add("-Wno-unused-but-set-variable")
+    } else {
+        it.cCompiler.args.add("-Wno-format-nonliteral")
+        it.cCompiler.args.remove("-pedantic")
+        it.cCompiler.args.add("-Wno-unused-variable")
+        it.cCompiler.args.add("-Wno-unused-function")
+        it.cCompiler.args.add("-Wno-sign-compare")
+        it.cppCompiler.args.add("-Wno-missing-field-initializers")
+        it.cppCompiler.args.remove("-pedantic")
+        it.cppCompiler.args.add("-Wno-unused-variable")
+        it.cppCompiler.args.add("-Wno-unused-function")
+        it.cppCompiler.args.add("-Wno-sign-compare")
+        it.cppCompiler.args.add("-Wno-deprecated-declarations")
+        it.cppCompiler.args.add("-Wno-deprecated-enum-enum-conversion")
+        it.cppCompiler.args.remove("-permissive")
+        it.cppCompiler.args.add("-fpermissive")
+    }
+}
+def testResources = "\"$rootDir/wpical/src/main/native/resources\"".replace("\\", "/")
+model {
+    components {
+        "${nativeName}"(NativeExecutableSpec) {
+            baseName = 'wpical'
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp', 'src/main/native/thirdparty/libdogleg/src', 'src/main/native/thirdparty/mrcal/src', 'src/main/native/thirdparty/mrcal_java/src', "$buildDir/generated/main/cpp"
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libdogleg/include', 'src/main/native/thirdparty/mrcal/generated', 'src/main/native/thirdparty/mrcal/include', 'src/main/native/thirdparty/mrcal/include/minimath', 'src/main/native/thirdparty/mrcal_java/include'
+                    }
+                }
+                c {
+                    source {
+                        srcDirs 'src/main/native/thirdparty/mrcal/src'
+                        include '**/*.c'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libdogleg/include', 'src/main/native/thirdparty/mrcal/generated', 'src/main/native/thirdparty/mrcal/include', 'src/main/native/thirdparty/mrcal/include/minimath'
+                    }
+                }
+                if (OperatingSystem.current().isWindows()) {
+                    rc.source {
+                        srcDirs 'src/main/native/win'
+                        include '*.rc'
+                    }
+                }
+            }
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name.startsWith("linuxarm")) {
+                    it.buildable = false
+                    return
+                }
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':apriltag', library: 'apriltag', linkage: 'static'
+                nativeUtils.useRequiredLibrary(it, 'ceres')
+                nativeUtils.useRequiredLibrary(it, 'opencv_static')
+                it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    it.cppCompiler.define('GLOG_DEPRECATED', '__declspec(deprecated)')
+                } else {
+                    it.cppCompiler.define('GLOG_DEPRECATED', '[[deprecated]]')
+                }
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    // Comdlg32.lib is needed for GetSaveFileNameA
+                    // dbghelp.lib is needed for glog functions
+                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib' << 'Comdlg32.lib' << 'dbghelp.lib'
+                } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore' << '-framework' << 'Accelerate'
+                } else {
+                    it.linker.args << '-lX11' << "-lgfortran"
+                    if (it.targetPlatform.name.startsWith('linuxarm')) {
+                        it.linker.args << '-lGL'
+                    }
+                }
+            }
+        }
+    }
+    testSuites {
+        "${nativeName}Test"(GoogleTestTestSuiteSpec) {
+            for(NativeComponentSpec c : $.components) {
+                if (c.name == nativeName) {
+                    testing c
+                    break
+                }
+            }
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/test/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/test/native/include', 'src/main/native/cpp'
+                    }
+                }
+            }
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name.startsWith("linuxarm")) {
+                    it.buildable = false
+                    return
+                }
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':apriltag', library: 'apriltag', linkage: 'static'
+                nativeUtils.useRequiredLibrary(it, 'ceres')
+                nativeUtils.useRequiredLibrary(it, 'opencv_static')
+                it.cppCompiler.define('PROJECT_ROOT_PATH', testResources)
+                it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.windowsarm64) {
+                    // https://developercommunity.visualstudio.com/t/-imp-std-init-once-complete-unresolved-external-sy/1684365#T-N10041864
+                    it.linker.args << '/alternatename:__imp___std_init_once_complete=__imp_InitOnceComplete'
+                    it.linker.args << '/alternatename:__imp___std_init_once_begin_initialize=__imp_InitOnceBeginInitialize'
+                }
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    it.cppCompiler.define('GLOG_DEPRECATED', '__declspec(deprecated)')
+                } else {
+                    it.cppCompiler.define('GLOG_DEPRECATED', '[[deprecated]]')
+                }
+                lib project: ':thirdparty:googletest', library: 'googletest', linkage: 'static'
+                it.cppCompiler.define("RUNNING_WPICAL_TESTS")
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+                    // Comdlg32.lib is needed for GetSaveFileNameA
+                    // dbghelp.lib is needed for glog functions
+                    // advapi32.lib is needed for __imp_RegDeleteKeyA and other __imp_Reg functions for icvLoadWindowPos and the save variant
+                    it.linker.args << 'advapi32.lib' << 'Comdlg32.lib' << 'dbghelp.lib'
+                } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore' << '-framework' << 'Accelerate'
+                } else {
+                    it.linker.args << '-lX11' << '-lgfortran'
+                    if (it.targetPlatform.name.startsWith('linuxarm')) {
+                        it.linker.args << '-lGL'
+                    }
+                }
+            }
+        }
+    }
+}
+
+apply from: 'publish.gradle'

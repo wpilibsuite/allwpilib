@@ -4,7 +4,7 @@
 
 #include "Robot.h"
 
-void Robot::RobotInit() {}
+Robot::Robot() {}
 void Robot::RobotPeriodic() {}
 
 void Robot::AutonomousInit() {}

@@ -1,0 +1,169 @@
+import org.gradle.internal.os.OperatingSystem
+
+if (project.hasProperty('onlylinuxathena')) {
+    return;
+}
+
+apply plugin: 'c'
+apply plugin: 'cpp'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+
+if (OperatingSystem.current().isMacOsX()) {
+    apply plugin: 'objective-c'
+    apply plugin: 'objective-cpp'
+}
+
+apply from: "${rootDir}/shared/config.gradle"
+
+nativeUtils.platformConfigs.named('osxuniversal') {
+    it.objcCompiler.args.remove('-fobjc-weak')
+    it.objcCompiler.args.remove('-fobjc-arc')
+    it.objcppCompiler.args.remove('-fobjc-weak')
+    it.objcppCompiler.args.remove('-fobjc-arc')
+}
+
+model {
+    components {
+        imguiSuite(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'imgui/cpp', 'generated/fonts/src', 'stb/cpp', 'implot/cpp', 'imgui/cpp/misc/cpp'
+                        include '*.cpp', 'backends/imgui_impl_glfw.cpp', 'backends/imgui_impl_opengl3.cpp', 'backends/imgui_impl_opengl2.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'imgui/include', 'generated/fonts/include', 'stb/include', 'implot/include', 'generated/gl3w/include', 'glfw/include', 'imgui/include/misc/cpp', 'imgui/include/backends'
+                        include '*.h', 'backends/imgui_impl_glfw.h', 'backends/imgui_impl_opengl3.h', 'backends/imgui_impl_opengl2.h'
+                    }
+                }
+                c {
+                    source {
+                        srcDirs 'generated/gl3w/src', 'glfw/src'
+                        include 'gl3w.c', 'context.c', 'init.c', 'input.c', 'monitor.c', 'platform.c', 'vulkan.c', 'window.c', 'egl_context.c', 'osmesa_context.c', 'null_init.c', 'null_monitor.c', 'null_window.c', 'null_joystick.c'
+                    }
+                    exportedHeaders {
+                        srcDirs 'generated/gl3w/include', 'glfw/include'
+                        include '*.h'
+                    }
+                }
+            }
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    it.buildable = false
+                    return
+                }
+                if (toolChain in VisualCpp) {
+                    cppCompiler.args '-D_UNICODE', '-DUNICODE', '-DWIN32', '-D_WIN32', '-DSTRICT', '-DWIN32_LEAN_AND_MEAN', '-D_HAS_EXCEPTIONS=1'
+                } else {
+                    cppCompiler.args '-Wshadow', '-fexceptions', '-Wno-missing-field-initializers'
+                }
+                if (it in SharedLibraryBinarySpec) {
+                    it.cCompiler.define '_GLFW_BUILD_DLL'
+                    if (!it.targetPlatform.operatingSystem.isWindows()) {
+                        it.linker.args << '-fvisibility=hidden'
+                    }
+                }
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    it.cCompiler.define '_GLFW_WIN32'
+                    linker.args << 'kernel32.lib' << 'Gdi32.lib' << 'User32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+                    it.sources {
+                        imguiWindowsCpp(CppSourceSet) {
+                            source {
+                                srcDirs 'imgui'
+                                include 'cpp/backends/imgui_impl_dx11.cpp'
+                            }
+                            exportedHeaders {
+                                srcDirs 'imgui/include', 'imgui/include/backends'
+                                include '*.h', 'backends/imgui_impl_dx11.h'
+                            }
+                        }
+                        glfw3WindowsC(CSourceSet) {
+                            source {
+                                srcDirs 'glfw/src'
+                                includes = [
+                                    'win32_init.c',
+                                    'win32_joystick.c',
+                                    'win32_module.c',
+                                    'win32_monitor.c',
+                                    'win32_time.c',
+                                    'win32_thread.c',
+                                    'win32_window.c',
+                                    'wgl_context.c',
+                                ]
+                            }
+                        }
+                    }
+                } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.cCompiler.args << '-fno-common'
+                    it.cCompiler.define '_GLFW_COCOA'
+                    it.objcCompiler.define '_GLFW_COCOA'
+                    it.objcppCompiler.args << '-fobjc-arc'
+                    it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
+                    it.sources {
+                        imguiMacObjectiveCpp(ObjectiveCppSourceSet) {
+                            source {
+                                srcDirs 'imgui'
+                                include 'cpp/backends/imgui_impl_metal.mm'
+                            }
+                            exportedHeaders {
+                                srcDirs 'imgui/include', 'imgui/include/backends'
+                                include '*.h', 'backends/imgui_impl_metal.h'
+                            }
+                        }
+                        glfw3MacC(CSourceSet) {
+                            source {
+                                srcDirs 'glfw/src'
+                                includes = [
+                                    'cocoa_time.c',
+                                    'posix_module.c',
+                                    'posix_thread.c',
+                                ]
+                            }
+                        }
+                        glfw3MacObjC(ObjectiveCSourceSet) {
+                            source {
+                                srcDirs 'glfw/src'
+                                includes = [
+                                    'cocoa_init.m',
+                                    'cocoa_joystick.m',
+                                    'cocoa_monitor.m',
+                                    'cocoa_window.m',
+                                    'nsgl_context.m',
+                                ]
+                            }
+                        }
+                    }
+                } else {
+                    it.cCompiler.define '_GLFW_X11'
+                    it.linker.args << '-lrt'
+                    it.sources {
+                        glfw3LinuxC(CSourceSet) {
+                            source {
+                                srcDirs 'glfw/src'
+                                includes = [
+                                    'x11_init.c',
+                                    'x11_monitor.c',
+                                    'x11_window.c',
+                                    'xkb_unicode.c',
+                                    'posix_module.c',
+                                    'posix_poll.c',
+                                    'posix_time.c',
+                                    'posix_thread.c',
+                                    'glx_context.c',
+                                    'linux_joystick.c',
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+            binaries.withType(SharedLibraryBinarySpec) {
+                buildable = false
+            }
+            appendDebugPathToBinaries(binaries)
+        }
+    }
+}
+
+apply from: 'publish.gradle'

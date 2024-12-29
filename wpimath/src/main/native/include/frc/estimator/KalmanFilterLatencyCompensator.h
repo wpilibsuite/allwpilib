@@ -59,7 +59,7 @@ class KalmanFilterLatencyCompensator {
    * @param observer  The observer.
    * @param u         The input at the timestamp.
    * @param localY    The local output at the timestamp
-   * @param timestamp The timesnap of the state.
+   * @param timestamp The timestamp of the state.
    */
   void AddObserverState(const KalmanFilterType& observer, Vectord<Inputs> u,
                         Vectord<Outputs> localY, units::second_t timestamp) {

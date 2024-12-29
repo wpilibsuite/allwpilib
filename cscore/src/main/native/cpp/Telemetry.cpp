@@ -5,7 +5,7 @@
 #include "Telemetry.h"
 
 #include <chrono>
-#include <limits>
+#include <utility>
 
 #include <wpi/DenseMap.h>
 #include <wpi/timestamp.h>
@@ -14,7 +14,6 @@
 #include "Instance.h"
 #include "Notifier.h"
 #include "SourceImpl.h"
-#include "cscore_cpp.h"
 
 using namespace cs;
 
@@ -35,7 +34,7 @@ class Telemetry::Thread : public wpi::SafeThread {
 
 int64_t Telemetry::Thread::GetValue(CS_Handle handle, CS_TelemetryKind kind,
                                     CS_Status* status) {
-  auto it = m_user.find(std::make_pair(handle, static_cast<int>(kind)));
+  auto it = m_user.find(std::pair{handle, static_cast<int>(kind)});
   if (it == m_user.end()) {
     *status = CS_EMPTY_VALUE;
     return 0;
@@ -137,8 +136,8 @@ void Telemetry::RecordSourceBytes(const SourceImpl& source, int quantity) {
     return;
   }
   auto handleData = Instance::GetInstance().FindSource(source);
-  thr->m_current[std::make_pair(Handle{handleData.first, Handle::kSource},
-                                static_cast<int>(CS_SOURCE_BYTES_RECEIVED))] +=
+  thr->m_current[std::pair{Handle{handleData.first, Handle::kSource},
+                           static_cast<int>(CS_SOURCE_BYTES_RECEIVED)}] +=
       quantity;
 }
 
@@ -148,7 +147,7 @@ void Telemetry::RecordSourceFrames(const SourceImpl& source, int quantity) {
     return;
   }
   auto handleData = Instance::GetInstance().FindSource(source);
-  thr->m_current[std::make_pair(Handle{handleData.first, Handle::kSource},
-                                static_cast<int>(CS_SOURCE_FRAMES_RECEIVED))] +=
+  thr->m_current[std::pair{Handle{handleData.first, Handle::kSource},
+                           static_cast<int>(CS_SOURCE_FRAMES_RECEIVED)}] +=
       quantity;
 }

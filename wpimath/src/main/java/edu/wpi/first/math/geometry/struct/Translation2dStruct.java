@@ -15,8 +15,8 @@ public class Translation2dStruct implements Struct<Translation2d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Translation2d";
+  public String getTypeName() {
+    return "Translation2d";
   }
 
   @Override

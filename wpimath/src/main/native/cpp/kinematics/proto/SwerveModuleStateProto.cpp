@@ -4,26 +4,39 @@
 
 #include "frc/kinematics/proto/SwerveModuleStateProto.h"
 
-#include "kinematics.pb.h"
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
-google::protobuf::Message* wpi::Protobuf<frc::SwerveModuleState>::New(
-    google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufSwerveModuleState>(arena);
-}
+#include "wpimath/protobuf/kinematics.npb.h"
 
-frc::SwerveModuleState wpi::Protobuf<frc::SwerveModuleState>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufSwerveModuleState*>(&msg);
+std::optional<frc::SwerveModuleState>
+wpi::Protobuf<frc::SwerveModuleState>::Unpack(InputStream& stream) {
+  wpi::UnpackCallback<frc::Rotation2d> angle;
+  wpi_proto_ProtobufSwerveModuleState msg{
+      .speed = 0,
+      .angle = angle.Callback(),
+  };
+  if (!stream.Decode(msg)) {
+    return {};
+  }
+
+  auto iangle = angle.Items();
+
+  if (iangle.empty()) {
+    return {};
+  }
+
   return frc::SwerveModuleState{
-      units::meters_per_second_t{m->speed()},
-      wpi::UnpackProtobuf<frc::Rotation2d>(m->angle()),
+      units::meters_per_second_t{msg.speed},
+      iangle[0],
   };
 }
 
-void wpi::Protobuf<frc::SwerveModuleState>::Pack(
-    google::protobuf::Message* msg, const frc::SwerveModuleState& value) {
-  auto m = static_cast<wpi::proto::ProtobufSwerveModuleState*>(msg);
-  m->set_speed(value.speed.value());
-  wpi::PackProtobuf(m->mutable_angle(), value.angle);
+bool wpi::Protobuf<frc::SwerveModuleState>::Pack(
+    OutputStream& stream, const frc::SwerveModuleState& value) {
+  wpi::PackCallback angle{&value.angle};
+  wpi_proto_ProtobufSwerveModuleState msg{
+      .speed = value.speed.value(),
+      .angle = angle.Callback(),
+  };
+  return stream.Encode(msg);
 }

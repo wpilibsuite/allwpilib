@@ -4,6 +4,7 @@
 
 #include "frc/trajectory/TrajectoryUtil.h"
 
+#include <string>
 #include <system_error>
 
 #include <fmt/format.h>
@@ -28,14 +29,16 @@ void TrajectoryUtil::ToPathweaverJson(const Trajectory& trajectory,
 }
 
 Trajectory TrajectoryUtil::FromPathweaverJson(std::string_view path) {
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(path, ec);
-  if (fileBuffer == nullptr || ec) {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(path);
+  if (!fileBuffer) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
-  wpi::json json = wpi::json::parse(fileBuffer->GetCharBuffer());
+  wpi::json json = wpi::json::parse(fileBuffer.value()->GetCharBuffer());
+
+  wpi::math::MathSharedStore::ReportUsage(
+      wpi::math::MathUsageId::kTrajectory_PathWeaver,
+      ++pathWeaverTrajectoryInstances);
 
   return Trajectory{json.get<std::vector<Trajectory::State>>()};
 }

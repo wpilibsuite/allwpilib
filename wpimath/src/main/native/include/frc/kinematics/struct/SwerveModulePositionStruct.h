@@ -11,8 +11,8 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::SwerveModulePosition> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:SwerveModulePosition";
+  static constexpr std::string_view GetTypeName() {
+    return "SwerveModulePosition";
   }
   static constexpr size_t GetSize() {
     return 8 + wpi::GetStructSize<frc::Rotation2d>();

@@ -5,10 +5,11 @@
 #include "WireDecoder3.h"
 
 #include <algorithm>
+#include <bit>
 #include <string>
+#include <utility>
 
 #include <fmt/format.h>
-#include <wpi/MathExtras.h>
 #include <wpi/SpanExtras.h>
 
 #include "Message3.h"
@@ -73,7 +74,7 @@ std::optional<uint64_t> WireDecoder3::SimpleValueReader::Read64(
 std::optional<double> WireDecoder3::SimpleValueReader::ReadDouble(
     std::span<const uint8_t>* in) {
   if (auto val = Read64(in)) {
-    return wpi::bit_cast<double>(val.value());
+    return std::bit_cast<double>(val.value());
   } else {
     return std::nullopt;
   }

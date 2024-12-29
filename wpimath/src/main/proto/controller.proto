@@ -9,6 +9,7 @@ message ProtobufArmFeedforward {
   double kg = 2;
   double kv = 3;
   double ka = 4;
+  double dt = 5;
 }
 
 message ProtobufDifferentialDriveFeedforward {
@@ -23,12 +24,14 @@ message ProtobufElevatorFeedforward {
   double kg = 2;
   double kv = 3;
   double ka = 4;
+  double dt = 5;
 }
 
 message ProtobufSimpleMotorFeedforward {
   double ks = 1;
   double kv = 2;
   double ka = 3;
+  double dt = 4;
 }
 
 message ProtobufDifferentialDriveWheelVoltages {

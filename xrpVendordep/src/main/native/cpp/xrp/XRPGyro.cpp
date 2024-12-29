@@ -4,6 +4,9 @@
 
 #include "frc/xrp/XRPGyro.h"
 
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+
 using namespace frc;
 
 XRPGyro::XRPGyro() : m_simDevice("Gyro:XRPGyro") {
@@ -24,66 +27,70 @@ XRPGyro::XRPGyro() : m_simDevice("Gyro:XRPGyro") {
   }
 }
 
-double XRPGyro::GetAngle() const {
+units::radian_t XRPGyro::GetAngle() const {
   return GetAngleZ();
 }
 
-double XRPGyro::GetRate() const {
+frc::Rotation2d XRPGyro::GetRotation2d() const {
+  return frc::Rotation2d{GetAngle()};
+}
+
+units::radians_per_second_t XRPGyro::GetRate() const {
   return GetRateZ();
 }
 
-double XRPGyro::GetRateX() const {
+units::radians_per_second_t XRPGyro::GetRateX() const {
   if (m_simRateX) {
-    return m_simRateX.Get();
+    return units::degrees_per_second_t{m_simRateX.Get()};
   }
 
-  return 0.0;
+  return 0_rad_per_s;
 }
 
-double XRPGyro::GetRateY() const {
+units::radians_per_second_t XRPGyro::GetRateY() const {
   if (m_simRateY) {
-    return m_simRateY.Get();
+    return units::degrees_per_second_t{m_simRateY.Get()};
   }
 
-  return 0.0;
+  return 0_rad_per_s;
 }
 
-double XRPGyro::GetRateZ() const {
+units::radians_per_second_t XRPGyro::GetRateZ() const {
   if (m_simRateZ) {
-    return m_simRateZ.Get();
+    return units::degrees_per_second_t{m_simRateZ.Get()};
   }
 
-  return 0.0;
+  return 0_rad_per_s;
 }
 
-double XRPGyro::GetAngleX() const {
+units::radian_t XRPGyro::GetAngleX() const {
   if (m_simAngleX) {
-    return m_simAngleX.Get() - m_angleXOffset;
+    return units::degree_t{m_simAngleX.Get()} - m_angleXOffset;
   }
 
-  return 0.0;
+  return 0_rad;
 }
 
-double XRPGyro::GetAngleY() const {
+units::radian_t XRPGyro::GetAngleY() const {
   if (m_simAngleY) {
-    return m_simAngleY.Get() - m_angleYOffset;
+    return units::degree_t{m_simAngleY.Get()} - m_angleYOffset;
   }
 
-  return 0.0;
+  return 0_rad;
 }
 
-double XRPGyro::GetAngleZ() const {
+units::radian_t XRPGyro::GetAngleZ() const {
   if (m_simAngleZ) {
-    return m_simAngleZ.Get() - m_angleZOffset;
+    return units::degree_t{m_simAngleZ.Get()} - m_angleZOffset;
   }
 
-  return 0.0;
+  return 0_rad;
 }
 
 void XRPGyro::Reset() {
   if (m_simAngleX) {
-    m_angleXOffset = m_simAngleX.Get();
-    m_angleYOffset = m_simAngleY.Get();
-    m_angleZOffset = m_simAngleZ.Get();
+    m_angleXOffset = units::degree_t{m_simAngleX.Get()};
+    m_angleYOffset = units::degree_t{m_simAngleY.Get()};
+    m_angleZOffset = units::degree_t{m_simAngleZ.Get()};
   }
 }

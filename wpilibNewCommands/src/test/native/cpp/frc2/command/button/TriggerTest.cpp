@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <utility>
+
 #include <frc/simulation/SimHooks.h>
 #include <gtest/gtest.h>
 
@@ -50,6 +52,30 @@ TEST_F(TriggerTest, OnFalse) {
   finished = true;
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
+}
+
+TEST_F(TriggerTest, OnChange) {
+  auto& scheduler = CommandScheduler::GetInstance();
+  bool finished = false;
+  bool pressed = true;
+  WaitUntilCommand command([&finished] { return finished; });
+
+  Trigger([&pressed] { return pressed; }).OnChange(&command);
+  scheduler.Run();
+  EXPECT_FALSE(command.IsScheduled());
+  pressed = false;
+  scheduler.Run();
+  EXPECT_TRUE(command.IsScheduled());
+  finished = true;
+  scheduler.Run();
+  EXPECT_FALSE(command.IsScheduled());
+  finished = false;
+  pressed = true;
+  scheduler.Run();
+  EXPECT_TRUE(command.IsScheduled());
+  finished = true;
+  scheduler.Run();
+  EXPECT_FALSE(command.IsScheduled());
 }
 
 TEST_F(TriggerTest, WhileTrueRepeatedly) {

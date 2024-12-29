@@ -2,12 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <frc/simulation/SendableChooserSim.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 #include <string>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringTopic.h>
@@ -16,22 +17,18 @@ class SendableChooserTest : public ::testing::TestWithParam<int> {};
 
 TEST_P(SendableChooserTest, ReturnsSelected) {
   frc::SendableChooser<int> chooser;
+  frc::sim::SendableChooserSim chooserSim{
+      fmt::format("/SmartDashboard/ReturnsSelectedChooser{}/", GetParam())};
 
   for (int i = 1; i <= 3; i++) {
     chooser.AddOption(std::to_string(i), i);
   }
   chooser.SetDefaultOption("0", 0);
 
-  auto pub =
-      nt::NetworkTableInstance::GetDefault()
-          .GetStringTopic(fmt::format(
-              "/SmartDashboard/ReturnsSelectedChooser{}/selected", GetParam()))
-          .Publish();
-
   frc::SmartDashboard::PutData(
       fmt::format("ReturnsSelectedChooser{}", GetParam()), &chooser);
   frc::SmartDashboard::UpdateValues();
-  pub.Set(std::to_string(GetParam()));
+  chooserSim.SetSelected(std::to_string(GetParam()));
   frc::SmartDashboard::UpdateValues();
   EXPECT_EQ(GetParam(), chooser.GetSelected());
 }
@@ -62,6 +59,8 @@ TEST(SendableChooserTest,
 
 TEST(SendableChooserTest, ChangeListener) {
   frc::SendableChooser<int> chooser;
+  frc::sim::SendableChooserSim chooserSim{
+      "/SmartDashboard/ChangeListenerChooser/"};
 
   for (int i = 1; i <= 3; i++) {
     chooser.AddOption(std::to_string(i), i);
@@ -71,7 +70,7 @@ TEST(SendableChooserTest, ChangeListener) {
 
   frc::SmartDashboard::PutData("ChangeListenerChooser", &chooser);
   frc::SmartDashboard::UpdateValues();
-  frc::SmartDashboard::PutString("ChangeListenerChooser/selected", "3");
+  chooserSim.SetSelected("3");
   frc::SmartDashboard::UpdateValues();
 
   EXPECT_EQ(3, currentVal);

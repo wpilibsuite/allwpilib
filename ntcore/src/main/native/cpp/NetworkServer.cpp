@@ -7,8 +7,11 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <memory>
 #include <span>
+#include <string>
 #include <system_error>
+#include <utility>
 #include <vector>
 
 #include <wpi/MemoryBuffer.h>
@@ -38,6 +41,8 @@ namespace uv = wpi::uv;
 
 // use a larger max message size for websockets
 static constexpr size_t kMaxMessageSize = 2 * 1024 * 1024;
+
+static constexpr size_t kClientProcessMessageCountMax = 16;
 
 class NetworkServer::ServerConnection {
  public:
@@ -102,7 +107,6 @@ class NetworkServer::ServerConnection4 final
 void NetworkServer::ServerConnection::SetupOutgoingTimer() {
   m_outgoingTimer = uv::Timer::Create(m_server.m_loop);
   m_outgoingTimer->timeout.connect([this] {
-    m_server.HandleLocal();
     m_server.m_serverImpl.SendOutgoing(m_clientId,
                                        m_server.m_loop.Now().count());
   });
@@ -122,7 +126,9 @@ void NetworkServer::ServerConnection::UpdateOutgoingTimer(uint32_t repeatMs) {
 void NetworkServer::ServerConnection::ConnectionClosed() {
   // don't call back into m_server if it's being destroyed
   if (!m_outgoingTimer->IsLoopClosing()) {
-    m_server.m_serverImpl.RemoveClient(m_clientId);
+    uv::Timer::SingleShot(m_outgoingTimer->GetLoopRef(), uv::Timer::Time{0},
+                          [client = m_server.m_serverImpl.RemoveClient(
+                               m_clientId)]() mutable { client.reset(); });
     m_server.RemoveConnection(this);
   }
   m_outgoingTimer->Close();
@@ -167,8 +173,10 @@ NetworkServer::ServerConnection3::ServerConnection3(
     ConnectionClosed();
   });
   stream->data.connect([this](uv::Buffer& buf, size_t size) {
-    m_server.m_serverImpl.ProcessIncomingBinary(
-        m_clientId, {reinterpret_cast<const uint8_t*>(buf.base), size});
+    if (m_server.m_serverImpl.ProcessIncomingBinary(
+            m_clientId, {reinterpret_cast<const uint8_t*>(buf.base), size})) {
+      m_server.m_idle->Start();
+    }
   });
   stream->StartRead();
 
@@ -249,7 +257,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
       m_websocket->binary.connect([this](std::span<const uint8_t> data, bool) {
         while (!data.empty()) {
           // decode message
-          int64_t pubuid;
+          int pubuid;
           Value value;
           std::string error;
           if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0)) {
@@ -288,10 +296,14 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
       ConnectionClosed();
     });
     m_websocket->text.connect([this](std::string_view data, bool) {
-      m_server.m_serverImpl.ProcessIncomingText(m_clientId, data);
+      if (m_server.m_serverImpl.ProcessIncomingText(m_clientId, data)) {
+        m_server.m_idle->Start();
+      }
     });
     m_websocket->binary.connect([this](std::span<const uint8_t> data, bool) {
-      m_server.m_serverImpl.ProcessIncomingBinary(m_clientId, data);
+      if (m_server.m_serverImpl.ProcessIncomingBinary(m_clientId, data)) {
+        m_server.m_idle->Start();
+      }
     });
 
     SetupOutgoingTimer();
@@ -315,12 +327,11 @@ NetworkServer::NetworkServer(std::string_view persistentFilename,
       m_serverImpl{logger},
       m_localQueue{logger},
       m_loop(*m_loopRunner.GetLoop()) {
-  m_localMsgs.reserve(net::NetworkLoopQueue::kInitialQueueSize);
   m_loopRunner.ExecAsync([=, this](uv::Loop& loop) {
     // connect local storage to server
-    m_serverImpl.SetLocal(&m_localStorage);
+    m_serverImpl.SetLocal(&m_localStorage, &m_localQueue);
     m_localStorage.StartNetwork(&m_localQueue);
-    HandleLocal();
+    ProcessAllLocal();
 
     // load persistent file first, then initialize
     uv::QueueWork(m_loop, [this] { LoadPersistent(); }, [this] { Init(); });
@@ -345,21 +356,20 @@ void NetworkServer::Flush() {
   }
 }
 
-void NetworkServer::HandleLocal() {
-  m_localQueue.ReadQueue(&m_localMsgs);
-  m_serverImpl.HandleLocal(m_localMsgs);
+void NetworkServer::ProcessAllLocal() {
+  while (m_serverImpl.ProcessLocalMessages(128)) {
+  }
 }
 
 void NetworkServer::LoadPersistent() {
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(m_persistentFilename, ec);
-  if (fileBuffer == nullptr || ec.value() != 0) {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(m_persistentFilename);
+  if (!fileBuffer) {
     INFO(
         "could not open persistent file '{}': {} "
         "(this can be ignored if you aren't expecting persistent values)",
-        m_persistentFilename, ec.message());
+        m_persistentFilename, fileBuffer.error().message());
     // backup file
+    std::error_code ec;
     fs::copy_file(m_persistentFilename, m_persistentFilename + ".bak",
                   std::filesystem::copy_options::overwrite_existing, ec);
     // try to write an empty file so it doesn't happen again
@@ -370,7 +380,8 @@ void NetworkServer::LoadPersistent() {
     }
     return;
   }
-  m_persistentData = std::string{fileBuffer->begin(), fileBuffer->end()};
+  m_persistentData =
+      std::string{fileBuffer.value()->begin(), fileBuffer.value()->end()};
   DEBUG4("read data: {}", m_persistentData);
 }
 
@@ -416,8 +427,10 @@ void NetworkServer::Init() {
   m_readLocalTimer = uv::Timer::Create(m_loop);
   if (m_readLocalTimer) {
     m_readLocalTimer->timeout.connect([this] {
-      HandleLocal();
-      m_serverImpl.SendAllOutgoing(m_loop.Now().count(), false);
+      if (m_serverImpl.ProcessLocalMessages(kClientProcessMessageCountMax)) {
+        DEBUG4("Starting idle processing");
+        m_idle->Start();  // more to process
+      }
     });
     m_readLocalTimer->Start(uv::Timer::Time{100}, uv::Timer::Time{100});
   }
@@ -442,7 +455,7 @@ void NetworkServer::Init() {
   m_flush = uv::Async<>::Create(m_loop);
   if (m_flush) {
     m_flush->wakeup.connect([this] {
-      HandleLocal();
+      ProcessAllLocal();
       m_serverImpl.SendAllOutgoing(m_loop.Now().count(), true);
     });
   }
@@ -450,9 +463,27 @@ void NetworkServer::Init() {
 
   m_flushLocal = uv::Async<>::Create(m_loop);
   if (m_flushLocal) {
-    m_flushLocal->wakeup.connect([this] { HandleLocal(); });
+    m_flushLocal->wakeup.connect([this] {
+      if (m_serverImpl.ProcessLocalMessages(kClientProcessMessageCountMax)) {
+        DEBUG4("Starting idle processing");
+        m_idle->Start();  // more to process
+      }
+    });
   }
   m_flushLocalAtomic = m_flushLocal.get();
+
+  m_idle = uv::Idle::Create(m_loop);
+  if (m_idle) {
+    m_idle->idle.connect([this] {
+      if (m_serverImpl.ProcessIncomingMessages(kClientProcessMessageCountMax)) {
+        DEBUG4("Starting idle processing");
+        m_idle->Start();  // more to process
+      } else {
+        DEBUG4("Stopping idle processing");
+        m_idle->Stop();  // go back to sleep
+      }
+    });
+  }
 
   INFO("Listening on NT3 port {}, NT4 port {}", m_port3, m_port4);
 

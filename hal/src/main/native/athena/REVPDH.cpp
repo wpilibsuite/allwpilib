@@ -12,6 +12,7 @@
 #include <hal/handles/IndexedHandleResource.h>
 
 #include <cstring>
+#include <string>
 #include <thread>
 
 #include <fmt/format.h>
@@ -204,17 +205,20 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t module,
   hal::init::CheckInit();
   if (!HAL_CheckREVPDHModuleNumber(module)) {
     *status = RESOURCE_OUT_OF_RANGE;
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH", 1,
+                                     kNumREVPDHModules, module);
     return HAL_kInvalidHandle;
   }
 
   HAL_REVPDHHandle handle;
-  auto hpdh = REVPDHHandles->Allocate(module, &handle, status);
+  // Module starts at 1
+  auto hpdh = REVPDHHandles->Allocate(module - 1, &handle, status);
   if (*status != 0) {
     if (hpdh) {
       hal::SetLastErrorPreviouslyAllocated(status, "REV PDH", module,
                                            hpdh->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH", 0,
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH", 1,
                                        kNumREVPDHModules, module);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
@@ -252,7 +256,7 @@ int32_t HAL_GetREVPDHModuleNumber(HAL_REVPDHHandle handle, int32_t* status) {
 }
 
 HAL_Bool HAL_CheckREVPDHModuleNumber(int32_t module) {
-  return ((module >= 1) && (module < kNumREVPDHModules)) ? 1 : 0;
+  return ((module >= 1) && (module <= kNumREVPDHModules)) ? 1 : 0;
 }
 
 HAL_Bool HAL_CheckREVPDHChannelNumber(int32_t channel) {
@@ -624,6 +628,8 @@ void HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle,
   stickyFaults->brownout = status4.sticky_brownout_fault;
   stickyFaults->canWarning = status4.sticky_can_warning_fault;
   stickyFaults->canBusOff = status4.sticky_can_bus_off_fault;
+  stickyFaults->hardwareFault = status4.sticky_hardware_fault;
+  stickyFaults->firmwareFault = status4.sticky_firmware_fault;
   stickyFaults->hasReset = status4.sticky_has_reset_fault;
 }
 

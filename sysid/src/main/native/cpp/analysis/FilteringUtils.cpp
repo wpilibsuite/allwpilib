@@ -4,10 +4,13 @@
 
 #include "sysid/analysis/FilteringUtils.h"
 
+#include <algorithm>
+#include <functional>
 #include <limits>
 #include <numbers>
 #include <numeric>
-#include <stdexcept>
+#include <string>
+#include <tuple>
 #include <vector>
 
 #include <fmt/format.h>
@@ -319,13 +322,15 @@ static units::second_t GetMaxStepTime(
     wpi::StringMap<std::vector<PreparedData>>& data) {
   auto maxStepTime = 0_s;
   for (auto& it : data) {
-    auto key = it.first();
-    auto& dataset = it.getValue();
+    auto& key = it.first;
+    auto& dataset = it.second;
 
     if (IsRaw(key) && wpi::contains(key, "dynamic")) {
-      auto duration = dataset.back().timestamp - dataset.front().timestamp;
-      if (duration > maxStepTime) {
-        maxStepTime = duration;
+      if (!dataset.empty()) {
+        auto duration = dataset.back().timestamp - dataset.front().timestamp;
+        if (duration > maxStepTime) {
+          maxStepTime = duration;
+        }
       }
     }
   }
@@ -346,8 +351,8 @@ void sysid::InitialTrimAndFilter(
   // Calculate Velocity Threshold if it hasn't been set yet
   if (settings->velocityThreshold == std::numeric_limits<double>::infinity()) {
     for (auto& it : preparedData) {
-      auto key = it.first();
-      auto& dataset = it.getValue();
+      auto& key = it.first;
+      auto& dataset = it.second;
       if (wpi::contains(key, "quasistatic")) {
         settings->velocityThreshold =
             std::min(settings->velocityThreshold,
@@ -358,8 +363,8 @@ void sysid::InitialTrimAndFilter(
   }
 
   for (auto& it : preparedData) {
-    auto key = it.first();
-    auto& dataset = it.getValue();
+    auto& key = it.first;
+    auto& dataset = it.second;
 
     // Trim quasistatic test data to remove all points where voltage is zero or
     // velocity < velocity threshold.
@@ -419,7 +424,7 @@ void sysid::AccelFilter(wpi::StringMap<std::vector<PreparedData>>* data) {
 
   // Remove points with acceleration = 0
   for (auto& it : preparedData) {
-    auto& dataset = it.getValue();
+    auto& dataset = it.second;
 
     for (size_t i = 0; i < dataset.size(); i++) {
       if (dataset.at(i).acceleration == 0.0) {
@@ -431,7 +436,7 @@ void sysid::AccelFilter(wpi::StringMap<std::vector<PreparedData>>* data) {
 
   // Confirm there's still data
   if (std::any_of(preparedData.begin(), preparedData.end(),
-                  [](const auto& it) { return it.getValue().empty(); })) {
+                  [](const auto& it) { return it.second.empty(); })) {
     throw sysid::InvalidDataError(
         "Acceleration filtering has removed all data.");
   }

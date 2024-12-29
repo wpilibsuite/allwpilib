@@ -25,8 +25,6 @@ apply from: "${rootDir}/shared/config.gradle"
 def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
 def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
 
-apply from: "${rootDir}/shared/imgui.gradle"
-
 task generateCppVersion() {
     description = 'Generates the wpilib version class'
     group = 'WPILib'
@@ -98,14 +96,11 @@ model {
                     it.buildable = false
                     return
                 }
-                lib project: ':glass', library: 'glassnt', linkage: 'static'
                 lib project: ':glass', library: 'glass', linkage: 'static'
-                project(':ntcore').addNtcoreDependency(it, 'static')
-                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                nativeUtils.useRequiredLibrary(it, 'imgui')
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                     it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'
@@ -140,14 +135,11 @@ model {
                     it.buildable = false
                     return
                 }
-                lib project: ':glass', library: 'glassnt', linkage: 'static'
                 lib project: ':glass', library: 'glass', linkage: 'static'
-                project(':ntcore').addNtcoreDependency(it, 'static')
-                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                nativeUtils.useRequiredLibrary(it, 'imgui')
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                     it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'
@@ -162,7 +154,8 @@ model {
                         it.linker.args << '-lGL'
                     }
                 }
-                nativeUtils.useRequiredLibrary(it, "googletest_static")
+
+                lib project: ':thirdparty:googletest', library: 'googletest', linkage: 'static'
                 it.cppCompiler.define("RUNNING_SYSID_TESTS")
             }
         }

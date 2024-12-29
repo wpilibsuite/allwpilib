@@ -13,11 +13,9 @@ nativeUtils.withCrossLinuxArm64()
 nativeUtils {
     wpi {
         configureDependencies {
-            opencvYear = "frc2024"
-            googleTestYear = "frc2024"
-            niLibVersion = "2024.2.1"
-            opencvVersion = "4.8.0-4"
-            googleTestVersion = "1.14.0-1"
+            opencvYear = "frc2025"
+            niLibVersion = "2025.0.0"
+            opencvVersion = "4.10.0-3"
         }
     }
 }
@@ -42,6 +40,23 @@ nativeUtils.platformConfigs.each {
 }
 
 nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")
+
+if (project.hasProperty('ntcoreffibuild')) {
+  // On windows, for ntcoreffi, use static runtime
+  nativeUtils.platformConfigs.each {
+    if (it.name.contains('windows')) {
+      it.cCompiler.releaseArgs.remove('/MD')
+      it.cppCompiler.releaseArgs.remove('/MD')
+      it.cCompiler.debugArgs.remove('/MDd')
+      it.cppCompiler.debugArgs.remove('/MDd')
+
+      it.cCompiler.releaseArgs.add('/MT')
+      it.cppCompiler.releaseArgs.add('/MT')
+      it.cCompiler.debugArgs.add('/MTd')
+      it.cppCompiler.debugArgs.add('/MTd')
+    }
+  }
+}
 
 model {
     components {
@@ -127,7 +142,7 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
             description = 'Creates component archive for platform ' + key
             destinationDirectory = outputsFolder
             archiveClassifier = key
-            archiveBaseName = '_M_' + base
+            archiveBaseName = base
             duplicatesStrategy = 'exclude'
 
             from(licenseFile) {

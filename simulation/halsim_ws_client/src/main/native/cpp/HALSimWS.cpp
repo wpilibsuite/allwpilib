@@ -5,6 +5,8 @@
 #include "HALSimWS.h"
 
 #include <cstdio>
+#include <memory>
+#include <string>
 
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
@@ -110,8 +112,8 @@ void HALSimWS::Start() {
   // Print any filters we are using
   if (m_useMsgFiltering) {
     wpi::print("WS Message Filters:");
-    for (auto filter : m_msgFilters.keys()) {
-      wpi::print("* \"{}\"\n", filter);
+    for (auto&& filter : m_msgFilters) {
+      wpi::print("* \"{}\"\n", filter.first);
     }
   } else {
     wpi::print("No WS Message Filters specified");

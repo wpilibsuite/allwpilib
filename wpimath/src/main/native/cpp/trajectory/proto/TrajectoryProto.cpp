@@ -4,30 +4,30 @@
 
 #include "frc/trajectory/proto/TrajectoryProto.h"
 
-#include "trajectory.pb.h"
+#include <vector>
 
-google::protobuf::Message* wpi::Protobuf<frc::Trajectory>::New(
-    google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufTrajectory>(
-      arena);
-}
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
-frc::Trajectory wpi::Protobuf<frc::Trajectory>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufTrajectory*>(&msg);
-  std::vector<frc::Trajectory::State> states;
-  states.reserve(m->states().size());
-  for (const auto& protoState : m->states()) {
-    states.push_back(wpi::UnpackProtobuf<frc::Trajectory::State>(protoState));
+#include "wpimath/protobuf/trajectory.npb.h"
+
+std::optional<frc::Trajectory> wpi::Protobuf<frc::Trajectory>::Unpack(
+    InputStream& stream) {
+  wpi::StdVectorUnpackCallback<frc::Trajectory::State, SIZE_MAX> states;
+  wpi_proto_ProtobufTrajectory msg{
+      .states = states.Callback(),
+  };
+  if (!stream.Decode(msg)) {
+    return {};
   }
-  return frc::Trajectory{states};
+
+  return frc::Trajectory{states.Vec()};
 }
 
-void wpi::Protobuf<frc::Trajectory>::Pack(google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::Trajectory>::Pack(OutputStream& stream,
                                           const frc::Trajectory& value) {
-  auto m = static_cast<wpi::proto::ProtobufTrajectory*>(msg);
-  m->mutable_states()->Reserve(value.States().size());
-  for (const auto& state : value.States()) {
-    wpi::PackProtobuf(m->add_states(), state);
-  }
+  wpi::PackCallback<frc::Trajectory::State> states{value.States()};
+  wpi_proto_ProtobufTrajectory msg{
+      .states = states.Callback(),
+  };
+  return stream.Encode(msg);
 }

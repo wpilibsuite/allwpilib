@@ -24,8 +24,6 @@ apply from: "${rootDir}/shared/config.gradle"
 def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
 def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
 
-apply from: "${rootDir}/shared/imgui.gradle"
-
 task generateCppVersion() {
     description = 'Generates the wpilib version class'
     group = 'WPILib'
@@ -104,7 +102,7 @@ model {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':fieldImages', library: 'fieldImages', linkage: 'static'
-                nativeUtils.useRequiredLibrary(it, 'imgui')
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {

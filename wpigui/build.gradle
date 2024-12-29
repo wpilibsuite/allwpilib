@@ -16,23 +16,9 @@ ext {
 }
 
 apply from: "${rootDir}/shared/config.gradle"
-apply from: "${rootDir}/shared/imgui.gradle"
 
 nativeUtils.exportsConfigs {
     wpigui {
-        x64ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
     }
 }
 
@@ -49,7 +35,7 @@ model {
                 }
             }
             binaries.all {
-                nativeUtils.useRequiredLibrary(it, 'imgui')
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     it.buildable = false
                     return
@@ -113,7 +99,7 @@ model {
             }
             binaries.all {
                 lib library: 'wpigui'
-                nativeUtils.useRequiredLibrary(it, 'imgui')
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             }
         }
     }

@@ -39,6 +39,11 @@ std::string_view UnescapeURI(std::string_view str, SmallVectorImpl<char>& buf,
 std::string_view EscapeURI(std::string_view str, SmallVectorImpl<char>& buf,
                            bool spacePlus = true);
 
+// Escape a string for HTML output.
+// @param buf Buffer for output
+// @return Escaped string
+std::string_view EscapeHTML(std::string_view str, SmallVectorImpl<char>& buf);
+
 // Parse a set of HTTP headers.  Saves just the Content-Type and Content-Length
 // fields.
 // @param is Input stream
@@ -316,7 +321,18 @@ class HttpRequest {
   }
 
   template <typename T>
-  HttpRequest(const HttpLocation& loc, const T& extraParams);
+  HttpRequest(const HttpLocation& loc, const T& extraParams)
+      : host{loc.host}, port{loc.port} {
+    SmallVector<std::pair<std::string_view, std::string_view>, 4> params;
+    for (const auto& p : loc.params) {
+      params.emplace_back(std::pair{GetFirst(p), GetSecond(p)});
+    }
+    for (const auto& p : extraParams) {
+      params.emplace_back(std::pair{GetFirst(p), GetSecond(p)});
+    }
+    SetPath(loc.path, params);
+    SetAuth(loc);
+  }
 
   HttpRequest(const HttpLocation& loc, std::string_view path_)
       : host{loc.host}, port{loc.port}, path{path_} {
@@ -337,16 +353,35 @@ class HttpRequest {
 
  private:
   void SetAuth(const HttpLocation& loc);
+
   template <typename T>
-  void SetPath(std::string_view path_, const T& params);
+  void SetPath(std::string_view path_, const T& params) {
+    // Build location including query string
+    raw_svector_ostream pathOs{path};
+    pathOs << path_;
+    bool first = true;
+    for (const auto& param : params) {
+      if (first) {
+        pathOs << '?';
+        first = false;
+      } else {
+        pathOs << '&';
+      }
+      SmallString<64> escapeBuf;
+      pathOs << EscapeURI(GetFirst(param), escapeBuf, false);
+      if (!GetSecond(param).empty()) {
+        pathOs << '=' << EscapeURI(GetSecond(param), escapeBuf, false);
+      }
+    }
+  }
 
   template <typename T>
   static std::string_view GetFirst(const T& elem) {
     return elem.first;
   }
   template <typename T>
-  static std::string_view GetFirst(const StringMapEntry<T>& elem) {
-    return elem.getKey();
+  static std::string_view GetFirst(const std::pair<std::string, T>& elem) {
+    return elem.first;
   }
   template <typename T>
   static std::string_view GetSecond(const T& elem) {
@@ -416,8 +451,10 @@ class HttpMultipartScanner {
   std::string m_buf;
 };
 
-}  // namespace wpi
+inline HttpPathRef HttpPath::drop_front(size_t n) const {
+  return HttpPathRef(*this, n);
+}
 
-#include "HttpUtil.inc"
+}  // namespace wpi
 
 #endif  // WPINET_HTTPUTIL_H_

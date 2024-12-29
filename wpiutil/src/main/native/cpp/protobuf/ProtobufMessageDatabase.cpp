@@ -4,7 +4,12 @@
 
 #include "wpi/protobuf/ProtobufMessageDatabase.h"
 
+#include <memory>
+#include <string>
+
 #include <google/protobuf/descriptor.h>
+
+#include "wpi/ProtoHelper.h"
 
 using namespace wpi;
 
@@ -34,7 +39,7 @@ bool ProtobufMessageDatabase::Add(std::string_view filename,
 
   if (!file.proto) {
     file.proto = std::unique_ptr<FileDescriptorProto>{
-        Arena::CreateMessage<FileDescriptorProto>(nullptr)};
+        wpi::CreateMessage<FileDescriptorProto>(nullptr)};
   } else {
     // replacing an existing one; remove any previously existing refs
     for (auto&& dep : file.proto->dependency()) {

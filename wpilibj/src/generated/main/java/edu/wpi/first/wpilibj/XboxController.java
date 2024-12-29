@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 
@@ -22,7 +24,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * only through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any
  * 3rd party controllers.
  */
-public class XboxController extends GenericHID {
+public class XboxController extends GenericHID implements Sendable {
   /** Represents a digital button on a XboxController. */
   public enum Button {
     /** A button. */
@@ -175,7 +177,7 @@ public class XboxController extends GenericHID {
    *     threshold, attached to the given event loop
    */
   public BooleanEvent leftTrigger(double threshold, EventLoop loop) {
-    return new BooleanEvent(loop, () -> getLeftTriggerAxis() > threshold);
+    return axisGreaterThan(Axis.kLeftTrigger.value, threshold, loop);
   }
 
   /**
@@ -211,7 +213,7 @@ public class XboxController extends GenericHID {
    *     threshold, attached to the given event loop
    */
   public BooleanEvent rightTrigger(double threshold, EventLoop loop) {
-    return new BooleanEvent(loop, () -> getRightTriggerAxis() > threshold);
+    return axisGreaterThan(Axis.kRightTrigger.value, threshold, loop);
   }
 
   /**
@@ -261,7 +263,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent a(EventLoop loop) {
-    return new BooleanEvent(loop, this::getAButton);
+    return button(Button.kA.value, loop);
   }
 
   /**
@@ -299,7 +301,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent b(EventLoop loop) {
-    return new BooleanEvent(loop, this::getBButton);
+    return button(Button.kB.value, loop);
   }
 
   /**
@@ -337,7 +339,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent x(EventLoop loop) {
-    return new BooleanEvent(loop, this::getXButton);
+    return button(Button.kX.value, loop);
   }
 
   /**
@@ -375,7 +377,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent y(EventLoop loop) {
-    return new BooleanEvent(loop, this::getYButton);
+    return button(Button.kY.value, loop);
   }
 
   /**
@@ -413,7 +415,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent leftBumper(EventLoop loop) {
-    return new BooleanEvent(loop, this::getLeftBumperButton);
+    return button(Button.kLeftBumper.value, loop);
   }
 
   /**
@@ -451,7 +453,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent rightBumper(EventLoop loop) {
-    return new BooleanEvent(loop, this::getRightBumperButton);
+    return button(Button.kRightBumper.value, loop);
   }
 
   /**
@@ -489,7 +491,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent back(EventLoop loop) {
-    return new BooleanEvent(loop, this::getBackButton);
+    return button(Button.kBack.value, loop);
   }
 
   /**
@@ -527,7 +529,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent start(EventLoop loop) {
-    return new BooleanEvent(loop, this::getStartButton);
+    return button(Button.kStart.value, loop);
   }
 
   /**
@@ -565,7 +567,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent leftStick(EventLoop loop) {
-    return new BooleanEvent(loop, this::getLeftStickButton);
+    return button(Button.kLeftStick.value, loop);
   }
 
   /**
@@ -603,14 +605,15 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent rightStick(EventLoop loop) {
-    return new BooleanEvent(loop, this::getRightStickButton);
+    return button(Button.kRightStick.value, loop);
   }
 
   /**
    * Read the value of the left bumper (LB) button on the controller.
    *
    * @return The state of the button.
-   * @deprecated Use {@link getLeftBumperButton} instead
+   * @deprecated Use {@link getLeftBumperButton} instead. This function is deprecated for removal
+   *     to make function names consistent to allow the HID classes to be automatically generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumper() {
@@ -621,7 +624,8 @@ public class XboxController extends GenericHID {
    * Read the value of the right bumper (RB) button on the controller.
    *
    * @return The state of the button.
-   * @deprecated Use {@link getRightBumperButton} instead
+   * @deprecated Use {@link getRightBumperButton} instead. This function is deprecated for removal
+   *     to make function names consistent to allow the HID classes to be automatically generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumper() {
@@ -632,7 +636,9 @@ public class XboxController extends GenericHID {
    * Whether the left bumper (LB) was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
-   * @deprecated Use {@link getLeftBumperButtonPressed} instead
+   * @deprecated Use {@link getLeftBumperButtonPressed} instead. This function is deprecated for
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumperPressed() {
@@ -643,7 +649,9 @@ public class XboxController extends GenericHID {
    * Whether the right bumper (RB) was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
-   * @deprecated Use {@link getRightBumperButtonPressed} instead
+   * @deprecated Use {@link getRightBumperButtonPressed} instead. This function is deprecated for
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumperPressed() {
@@ -654,7 +662,9 @@ public class XboxController extends GenericHID {
    * Whether the left bumper (LB) was released since the last check.
    *
    * @return Whether the button was released since the last check.
-   * @deprecated Use {@link getLeftBumperButtonReleased} instead
+   * @deprecated Use {@link getLeftBumperButtonReleased} instead. This function is deprecated for
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumperReleased() {
@@ -665,10 +675,34 @@ public class XboxController extends GenericHID {
    * Whether the right bumper (RB) was released since the last check.
    *
    * @return Whether the button was released since the last check.
-   * @deprecated Use {@link getRightBumperButtonReleased} instead
+   * @deprecated Use {@link getRightBumperButtonReleased} instead. This function is deprecated for
+   *     removal to make function names consistent to allow the HID classes to be automatically
+   *     generated.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumperReleased() {
     return getRawButtonReleased(Button.kRightBumper.value);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("HID");
+    builder.publishConstString("ControllerType", "Xbox");
+    builder.addDoubleProperty("LeftTrigger", this::getLeftTriggerAxis, null);
+    builder.addDoubleProperty("RightTrigger", this::getRightTriggerAxis, null);
+    builder.addDoubleProperty("LeftX", this::getLeftX, null);
+    builder.addDoubleProperty("RightX", this::getRightX, null);
+    builder.addDoubleProperty("LeftY", this::getLeftY, null);
+    builder.addDoubleProperty("RightY", this::getRightY, null);
+    builder.addBooleanProperty("A", this::getAButton, null);
+    builder.addBooleanProperty("B", this::getBButton, null);
+    builder.addBooleanProperty("X", this::getXButton, null);
+    builder.addBooleanProperty("Y", this::getYButton, null);
+    builder.addBooleanProperty("LeftBumper", this::getLeftBumperButton, null);
+    builder.addBooleanProperty("RightBumper", this::getRightBumperButton, null);
+    builder.addBooleanProperty("Back", this::getBackButton, null);
+    builder.addBooleanProperty("Start", this::getStartButton, null);
+    builder.addBooleanProperty("LeftStick", this::getLeftStickButton, null);
+    builder.addBooleanProperty("RightStick", this::getRightStickButton, null);
   }
 }

@@ -4,7 +4,7 @@
 
 #include "frc/DigitalInput.h"
 
-#include <limits>
+#include <string>
 
 #include <hal/DIO.h>
 #include <hal/FRCUsageReporting.h>
@@ -33,10 +33,6 @@ DigitalInput::DigitalInput(int channel) {
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalInput, channel + 1);
   wpi::SendableRegistry::AddLW(this, "DigitalInput", channel);
-}
-
-DigitalInput::~DigitalInput() {
-  HAL_FreeDIOPort(m_handle);
 }
 
 bool DigitalInput::Get() const {

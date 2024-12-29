@@ -14,12 +14,11 @@
 #include <utility>
 #include <vector>
 
+#include "pb.h"
+#include "pb_decode.h"
+#include "pb_encode.h"
+#include "wpi/array.h"
 #include "wpi/function_ref.h"
-
-namespace google::protobuf {
-class Arena;
-class Message;
-}  // namespace google::protobuf
 
 namespace wpi {
 
@@ -36,43 +35,239 @@ class SmallVectorImpl;
 template <typename T>
 struct Protobuf {};
 
+namespace detail {
+using SmallVectorType = wpi::SmallVectorImpl<uint8_t>;
+using StdVectorType = std::vector<uint8_t>;
+bool WriteFromSmallVector(pb_ostream_t* stream, const pb_byte_t* buf,
+                          size_t count);
+
+bool WriteFromStdVector(pb_ostream_t* stream, const pb_byte_t* buf,
+                        size_t count);
+
+bool WriteSubmessage(pb_ostream_t* stream, const pb_msgdesc_t* desc,
+                     const void* msg);
+}  // namespace detail
+
+/**
+ * Class for wrapping a nanopb istream.
+ */
+template <typename T>
+class ProtoInputStream {
+ public:
+  /**
+   * Constructs a nanopb istream from an existing istream object.
+   * Generally used internally for decoding submessages
+   *
+   * @param[in] stream the nanopb istream
+   */
+  explicit ProtoInputStream(pb_istream_t* stream)
+      : m_streamMsg{stream},
+        m_msgDesc{
+            Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
+  }
+
+  /**
+   * Constructs a nanopb istream from a buffer.
+   *
+   * @param[in] stream the stream buffer
+   */
+  explicit ProtoInputStream(std::span<const uint8_t> stream)
+      : m_streamLocal{pb_istream_from_buffer(
+            reinterpret_cast<const pb_byte_t*>(stream.data()), stream.size())},
+        m_msgDesc{
+            Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
+  }
+
+  /**
+   * Gets the backing nanopb stream object.
+   *
+   * @return nanopb stream
+   */
+  pb_istream_t* Stream() noexcept {
+    return m_streamMsg ? m_streamMsg : &m_streamLocal;
+  }
+
+  /**
+   * Gets the nanopb message descriptor
+   *
+   * @return the nanopb message descriptor
+   */
+  const pb_msgdesc_t* MsgDesc() const noexcept { return m_msgDesc; }
+
+  /**
+   * Decodes a protobuf. Flags are the same flags passed to pb_decode_ex.
+   *
+   * @param[in] msg The message to decode into
+   * @param[in] flags Flags to pass
+   * @return true if decoding was successful, false otherwise
+   */
+  bool Decode(typename Protobuf<std::remove_cvref_t<T>>::MessageStruct& msg,
+              unsigned int flags = 0) {
+    return pb_decode_ex(Stream(), m_msgDesc, &msg, flags);
+  }
+
+ private:
+  pb_istream_t m_streamLocal;
+  pb_istream_t* m_streamMsg{nullptr};
+  const pb_msgdesc_t* m_msgDesc;
+};
+
+/**
+ * Class for wrapping a nanopb ostream
+ */
+template <typename T>
+class ProtoOutputStream {
+ public:
+  /**
+   * Constructs a nanopb ostream from an existing ostream object
+   * Generally used internally for encoding messages.
+   *
+   * This constructor will cause `Encode` to call pb_encode_submessage
+   * instead of `pb_encode_ex`
+   *
+   * @param[in] stream the nanopb ostream
+   */
+  explicit ProtoOutputStream(pb_ostream_t* stream)
+      : m_streamMsg{stream},
+        m_msgDesc{
+            Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
+  }
+
+  /**
+   * Constructs a nanopb ostream from a buffer.
+   *
+   * This constructor will cause `Encode` to call pb_encode_ex`
+   *
+   * @param[in] out the stream buffer
+   */
+  explicit ProtoOutputStream(detail::SmallVectorType& out)
+      : m_msgDesc{
+            Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
+    m_streamLocal.callback = detail::WriteFromSmallVector;
+    m_streamLocal.state = &out;
+    m_streamLocal.max_size = SIZE_MAX;
+    m_streamLocal.bytes_written = 0;
+    m_streamLocal.errmsg = nullptr;
+  }
+
+  /**
+   * Constructs a nanopb ostream from a buffer.
+   *
+   * This constructor will cause `Encode` to call pb_encode_ex`
+   *
+   * @param[in] out the stream buffer
+   */
+  explicit ProtoOutputStream(detail::StdVectorType& out)
+      : m_msgDesc{
+            Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
+    m_streamLocal.callback = detail::WriteFromStdVector;
+    m_streamLocal.state = &out;
+    m_streamLocal.max_size = SIZE_MAX;
+    m_streamLocal.bytes_written = 0;
+    m_streamLocal.errmsg = nullptr;
+  }
+
+  /**
+   * Constructs a empty nanopb stream. You must fill out the stream
+   * returned from `Stream` before calling Encode.
+   *
+   * This constructor exists to cause `Encode` to call pb_encode_ex`,
+   * but allow manipulating the stream manually.
+   */
+  ProtoOutputStream()
+      : m_msgDesc{Protobuf<
+            std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {}
+
+  /**
+   * Gets the backing nanopb stream object.
+   *
+   * @return nanopb stream
+   */
+  pb_ostream_t* Stream() noexcept {
+    return m_streamMsg ? m_streamMsg : &m_streamLocal;
+  }
+
+  /**
+   * Gets if this stream points to a submessage, and will call
+   * pb_encode_submessage instead of pb_encode
+   *
+   * @return true if submessage, false otherwise
+   */
+  bool IsSubmessage() const noexcept { return m_streamMsg; }
+
+  /**
+   * Gets the nanopb message descriptor
+   *
+   * @return the nanopb message descriptor
+   */
+  const pb_msgdesc_t* MsgDesc() const noexcept { return m_msgDesc; }
+
+  /**
+   * Decodes a protobuf. Flags are the same flags passed to pb_decode_ex.
+   *
+   * @param[in] msg The message to encode from
+   * @return true if encoding was successful, false otherwise
+   */
+  bool Encode(
+      const typename Protobuf<std::remove_cvref_t<T>>::MessageStruct& msg) {
+    if (m_streamMsg) {
+      return detail::WriteSubmessage(m_streamMsg, m_msgDesc, &msg);
+      // return pb_encode_submessage(m_streamMsg, m_msgDesc, &msg);
+    }
+    return pb_encode(&m_streamLocal, m_msgDesc, &msg);
+  }
+
+ private:
+  pb_ostream_t m_streamLocal;
+  pb_ostream_t* m_streamMsg{nullptr};
+  const pb_msgdesc_t* m_msgDesc;
+};
+
 /**
  * Specifies that a type is capable of protobuf serialization and
  * deserialization.
  *
  * This is designed for serializing complex flexible data structures using
  * code generated from a .proto file. Serialization consists of writing
- * values into a mutable protobuf Message and deserialization consists of
- * reading values from an immutable protobuf Message.
+ * values into a nanopb Stream and deserialization consists of
+ * reading values from nanopb Stream.
  *
  * Implementations must define a template specialization for wpi::Protobuf with
  * T being the type that is being serialized/deserialized, with the following
  * static members (as enforced by this concept):
- * - google::protobuf::Message* New(google::protobuf::Arena*): create a protobuf
- *   message
- * - T Unpack(const google::protobuf::Message&): function for deserialization
- * - void Pack(google::protobuf::Message*, T&& value): function for
- *   serialization
+ * - using MessageStruct = nanopb_message_struct_here: typedef to the wpilib
+ *   modified nanopb message struct
+ * - std::optional<T> Unpack(wpi::ProtoInputStream<T>&): function
+ *   for deserialization
+ * - bool Pack(wpi::ProtoOutputStream<T>&, T&& value): function
+ *   for serialization
  *
- * To avoid pulling in the protobuf headers, these functions use
- * google::protobuf::Message instead of a more specific type; implementations
- * will need to static_cast to the correct type as created by New().
- *
- * Additionally: In a static block, call StructRegistry.registerClass() to
- * register the class
+ * As a suggestion, 2 extra type usings can be added to simplify the stream
+ * definitions, however these are not required.
+ * - using InputStream = wpi::ProtoInputStream<T>;
+ * - using OutputStream = wpi::ProtoOutputStream<T>;
  */
 template <typename T>
 concept ProtobufSerializable = requires(
-    google::protobuf::Arena* arena, const google::protobuf::Message& inmsg,
-    google::protobuf::Message* outmsg, const T& value) {
+    wpi::ProtoOutputStream<std::remove_cvref_t<T>>& ostream,
+    wpi::ProtoInputStream<std::remove_cvref_t<T>>& istream, const T& value) {
   typename Protobuf<typename std::remove_cvref_t<T>>;
   {
-    Protobuf<typename std::remove_cvref_t<T>>::New(arena)
-  } -> std::same_as<google::protobuf::Message*>;
+    Protobuf<typename std::remove_cvref_t<T>>::Unpack(istream)
+  } -> std::same_as<std::optional<typename std::remove_cvref_t<T>>>;
   {
-    Protobuf<typename std::remove_cvref_t<T>>::Unpack(inmsg)
-  } -> std::same_as<typename std::remove_cvref_t<T>>;
-  Protobuf<typename std::remove_cvref_t<T>>::Pack(outmsg, value);
+    Protobuf<typename std::remove_cvref_t<T>>::Pack(ostream, value)
+  } -> std::same_as<bool>;
+  typename Protobuf<typename std::remove_cvref_t<T>>::MessageStruct;
+  {
+    Protobuf<typename std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()
+  } -> std::same_as<const pb_msgdesc_t*>;
+  {
+    Protobuf<typename std::remove_cvref_t<T>>::MessageStruct::msg_name()
+  } -> std::same_as<std::string_view>;
+  {
+    Protobuf<typename std::remove_cvref_t<T>>::MessageStruct::file_descriptor()
+  } -> std::same_as<pb_filedesc_t>;
 };
 
 /**
@@ -80,66 +275,22 @@ concept ProtobufSerializable = requires(
  *
  * In addition to meeting ProtobufSerializable, implementations must define a
  * wpi::Protobuf<T> static member
- * `void UnpackInto(T*, const google::protobuf::Message&)` to update the
- * pointed-to T with the contents of the message.
+ * - bool UnpackInto(T*, wpi::ProtoInputStream<T>&)` to update the
+ *   pointed-to T with the contents of the message.
  */
 template <typename T>
 concept MutableProtobufSerializable =
     ProtobufSerializable<T> &&
-    requires(T* out, const google::protobuf::Message& msg) {
-      Protobuf<typename std::remove_cvref_t<T>>::UnpackInto(out, msg);
+    requires(T* out, wpi::ProtoInputStream<T>& istream) {
+      {
+        Protobuf<typename std::remove_cvref_t<T>>::UnpackInto(out, istream)
+      } -> std::same_as<bool>;
     };
 
-/**
- * Unpack a serialized protobuf message.
- *
- * @tparam T object type
- * @param msg protobuf message
- * @return Deserialized object
- */
-template <ProtobufSerializable T>
-inline T UnpackProtobuf(const google::protobuf::Message& msg) {
-  return Protobuf<T>::Unpack(msg);
-}
-
-/**
- * Pack a serialized protobuf message.
- *
- * @param msg protobuf message (mutable, output)
- * @param value object
- */
-template <ProtobufSerializable T>
-inline void PackProtobuf(google::protobuf::Message* msg, const T& value) {
-  Protobuf<typename std::remove_cvref_t<T>>::Pack(msg, value);
-}
-
-/**
- * Unpack a serialized struct into an existing object, overwriting its contents.
- *
- * @param out object (output)
- * @param msg protobuf message
- */
-template <ProtobufSerializable T>
-inline void UnpackProtobufInto(T* out, const google::protobuf::Message& msg) {
-  if constexpr (MutableProtobufSerializable<T>) {
-    Protobuf<T>::UnpackInto(out, msg);
-  } else {
-    *out = UnpackProtobuf<T>(msg);
-  }
-}
-
-// these detail functions avoid the need to include protobuf headers
 namespace detail {
-void DeleteProtobuf(google::protobuf::Message* msg);
-bool ParseProtobuf(google::protobuf::Message* msg,
-                   std::span<const uint8_t> data);
-bool SerializeProtobuf(wpi::SmallVectorImpl<uint8_t>& out,
-                       const google::protobuf::Message& msg);
-bool SerializeProtobuf(std::vector<uint8_t>& out,
-                       const google::protobuf::Message& msg);
-std::string GetTypeString(const google::protobuf::Message& msg);
+std::string GetTypeString(const pb_msgdesc_t* msg);
 void ForEachProtobufDescriptor(
-    const google::protobuf::Message& msg,
+    const pb_msgdesc_t* msg,
     function_ref<bool(std::string_view filename)> wants,
     function_ref<void(std::string_view filename,
                       std::span<const uint8_t> descriptor)>
@@ -147,48 +298,23 @@ void ForEachProtobufDescriptor(
 }  // namespace detail
 
 /**
- * Owning wrapper (ala std::unique_ptr) for google::protobuf::Message* that does
- * not require the protobuf headers be included. Note this object is not thread
- * safe; users of this object are required to provide any necessary thread
- * safety.
+ * Ease of use wrapper to make nanopb streams more opaque to the user.
+ * This class is stateless and thread safe.
  *
  * @tparam T serialized object type
  */
 template <ProtobufSerializable T>
 class ProtobufMessage {
  public:
-  explicit ProtobufMessage(google::protobuf::Arena* arena = nullptr)
-      : m_msg{Protobuf<T>::New(arena)} {}
-  ~ProtobufMessage() { detail::DeleteProtobuf(m_msg); }
-  ProtobufMessage(const ProtobufMessage&) = delete;
-  ProtobufMessage& operator=(const ProtobufMessage&) = delete;
-  ProtobufMessage(ProtobufMessage&& rhs) : m_msg{rhs.m_msg} {
-    rhs.m_msg = nullptr;
-  }
-  ProtobufMessage& operator=(ProtobufMessage&& rhs) {
-    std::swap(m_msg, rhs.m_msg);
-    return *this;
-  }
-
-  /**
-   * Gets the stored message object.
-   *
-   * @return google::protobuf::Message*
-   */
-  google::protobuf::Message* GetMessage() { return m_msg; }
-  const google::protobuf::Message* GetMessage() const { return m_msg; }
-
   /**
    * Unpacks from a byte array.
    *
    * @param data byte array
    * @return Optional; empty if parsing failed
    */
-  std::optional<T> Unpack(std::span<const uint8_t> data) {
-    if (!detail::ParseProtobuf(m_msg, data)) {
-      return std::nullopt;
-    }
-    return Protobuf<T>::Unpack(*m_msg);
+  std::optional<std::remove_cvref_t<T>> Unpack(std::span<const uint8_t> data) {
+    ProtoInputStream<std::remove_cvref_t<T>> stream{data};
+    return Protobuf<std::remove_cvref_t<T>>::Unpack(stream);
   }
 
   /**
@@ -199,11 +325,17 @@ class ProtobufMessage {
    * @return true if successful
    */
   bool UnpackInto(T* out, std::span<const uint8_t> data) {
-    if (!detail::ParseProtobuf(m_msg, data)) {
-      return false;
+    if constexpr (MutableProtobufSerializable<T>) {
+      ProtoInputStream<std::remove_cvref_t<T>> stream{data};
+      return Protobuf<std::remove_cvref_t<T>>::UnpackInto(out, stream);
+    } else {
+      auto unpacked = Unpack(data);
+      if (!unpacked) {
+        return false;
+      }
+      *out = std::move(unpacked.value());
+      return true;
     }
-    UnpackProtobufInto(out, *m_msg);
-    return true;
   }
 
   /**
@@ -214,8 +346,8 @@ class ProtobufMessage {
    * @return true if successful
    */
   bool Pack(wpi::SmallVectorImpl<uint8_t>& out, const T& value) {
-    Protobuf<T>::Pack(m_msg, value);
-    return detail::SerializeProtobuf(out, *m_msg);
+    ProtoOutputStream<std::remove_cvref_t<T>> stream{out};
+    return Protobuf<std::remove_cvref_t<T>>::Pack(stream, value);
   }
 
   /**
@@ -226,8 +358,8 @@ class ProtobufMessage {
    * @return true if successful
    */
   bool Pack(std::vector<uint8_t>& out, const T& value) {
-    Protobuf<T>::Pack(m_msg, value);
-    return detail::SerializeProtobuf(out, *m_msg);
+    ProtoOutputStream<std::remove_cvref_t<T>> stream{out};
+    return Protobuf<std::remove_cvref_t<T>>::Pack(stream, value);
   }
 
   /**
@@ -235,7 +367,10 @@ class ProtobufMessage {
    *
    * @return type string
    */
-  std::string GetTypeString() const { return detail::GetTypeString(*m_msg); }
+  std::string GetTypeString() const {
+    return detail::GetTypeString(
+        Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor());
+  }
 
   /**
    * Loops over all protobuf descriptors including nested/referenced
@@ -250,11 +385,10 @@ class ProtobufMessage {
       function_ref<void(std::string_view filename,
                         std::span<const uint8_t> descriptor)>
           fn) {
-    detail::ForEachProtobufDescriptor(*m_msg, exists, fn);
+    detail::ForEachProtobufDescriptor(
+        Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor(),
+        exists, fn);
   }
-
- private:
-  google::protobuf::Message* m_msg = nullptr;
 };
 
 }  // namespace wpi

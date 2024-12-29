@@ -3,9 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <limits>
+#include <numbers>
 #include <random>
 #include <tuple>
 #include <utility>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <wpi/print.h>
@@ -167,8 +169,8 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
                                   state.velocity * state.curvature};
       },
       [&](frc::Trajectory::State& state) { return state.pose; },
-      trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s,
-      0.1_s, 0.25_s, true, false);
+      trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms,
+      100_ms, 250_ms, true, false);
 }
 
 TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
@@ -205,14 +207,14 @@ TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
                                       state.velocity * state.curvature};
           },
           [&](frc::Trajectory::State& state) { return state.pose; },
-          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s, 0.1_s,
-          0.25_s, false, false);
+          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms, 100_ms,
+          250_ms, false, false);
     }
   }
 }
 
 TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
-  // This tests for multiple vision measurements appled at the same time.
+  // This tests for multiple vision measurements applied at the same time.
   // The expected behavior is that all measurements affect the estimated pose.
   // The alternative result is that only one vision measurement affects the
   // outcome. If that were the case, after 1000 measurements, the estimated
@@ -275,7 +277,7 @@ TEST(DifferentialDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
       {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}};
 
   // Add enough measurements to fill up the buffer
-  for (auto time = 0.0_s; time < 4_s; time += 0.02_s) {
+  for (auto time = 0_s; time < 4_s; time += 20_ms) {
     estimator.UpdateWithTime(time, frc::Rotation2d{}, 0_m, 0_m);
   }
 
@@ -352,4 +354,74 @@ TEST(DifferentialDrivePoseEstimatorTest, TestSampleAt) {
             estimator.SampleAt(0.5_s));
   EXPECT_EQ(std::optional(frc::Pose2d{2_m, 0.1_m, frc::Rotation2d{}}),
             estimator.SampleAt(2.5_s));
+}
+
+TEST(DifferentialDrivePoseEstimatorTest, TestReset) {
+  frc::DifferentialDriveKinematics kinematics{1_m};
+  frc::DifferentialDrivePoseEstimator estimator{
+      kinematics,
+      frc::Rotation2d{},
+      0_m,
+      0_m,
+      frc::Pose2d{-1_m, -1_m, frc::Rotation2d{1_rad}},
+      {1.0, 1.0, 1.0},
+      {1.0, 1.0, 1.0}};
+
+  // Test initial pose
+  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      1, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset position
+  estimator.ResetPosition(frc::Rotation2d{}, 1_m, 1_m,
+                          frc::Pose2d{1_m, 0_m, frc::Rotation2d{}});
+
+  EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test orientation and wheel positions
+  estimator.Update(frc::Rotation2d{}, 2_m, 2_m);
+
+  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset rotation
+  estimator.ResetRotation(frc::Rotation2d{90_deg});
+
+  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      std::numbers::pi / 2,
+      estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test orientation
+  estimator.Update(frc::Rotation2d{}, 3_m, 3_m);
+
+  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      std::numbers::pi / 2,
+      estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset translation
+  estimator.ResetTranslation(frc::Translation2d{-1_m, -1_m});
+
+  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      std::numbers::pi / 2,
+      estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset pose
+  estimator.ResetPose(frc::Pose2d{});
+
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      0, estimator.GetEstimatedPosition().Rotation().Radians().value());
 }

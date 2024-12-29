@@ -4,9 +4,22 @@
 
 #include "wpi/DataLogWriter.h"
 
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include "wpi/raw_ostream.h"
 
 using namespace wpi::log;
+
+static std::unique_ptr<wpi::raw_ostream> CheckOpen(std::string_view filename,
+                                                   std::error_code& ec) {
+  auto rv = std::make_unique<wpi::raw_fd_ostream>(filename, ec);
+  if (ec) {
+    return nullptr;
+  }
+  return rv;
+}
 
 DataLogWriter::DataLogWriter(std::string_view filename, std::error_code& ec,
                              std::string_view extraHeader)
@@ -14,8 +27,7 @@ DataLogWriter::DataLogWriter(std::string_view filename, std::error_code& ec,
 
 DataLogWriter::DataLogWriter(wpi::Logger& msglog, std::string_view filename,
                              std::error_code& ec, std::string_view extraHeader)
-    : DataLogWriter{msglog, std::make_unique<raw_fd_ostream>(filename, ec),
-                    extraHeader} {
+    : DataLogWriter{msglog, CheckOpen(filename, ec), extraHeader} {
   if (ec) {
     Stop();
   }

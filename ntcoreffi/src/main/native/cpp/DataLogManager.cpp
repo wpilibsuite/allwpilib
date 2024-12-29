@@ -8,17 +8,17 @@
 #include <ctime>
 #include <random>
 #include <string>
-#include <string_view>
+#include <vector>
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/DataLogBackgroundWriter.h>
+#include <wpi/FileLogger.h>
 #include <wpi/SafeThread.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/print.h>
-#include <wpi/timestamp.h>
 
 #ifdef __FRC_ROBORIO__
 #include <FRC_NetworkCommunication/FRCComm.h>
@@ -60,12 +60,12 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
 }
 }  // namespace frc
 
-#define FRC_ReportError(status, format, ...)                             \
-  do {                                                                   \
-    if ((status) != 0) {                                                 \
-      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__,       \
-                         FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__); \
-    }                                                                    \
+#define FRC_ReportError(status, format, ...)                       \
+  do {                                                             \
+    if ((status) != 0) {                                           \
+      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
+                         format __VA_OPT__(, ) __VA_ARGS__);       \
+    }                                                              \
   } while (0)
 
 namespace RobotController {
@@ -192,6 +192,8 @@ struct Thread final : public wpi::SafeThread {
 
   void StartNTLog();
   void StopNTLog();
+  void StartConsoleLog();
+  void StopConsoleLog();
 
   std::string m_logDir;
   bool m_filenameOverride;
@@ -199,6 +201,8 @@ struct Thread final : public wpi::SafeThread {
   bool m_ntLoggerEnabled = false;
   NT_DataLogger m_ntEntryLogger = 0;
   NT_ConnectionDataLogger m_ntConnLogger = 0;
+  bool m_consoleLoggerEnabled = false;
+  wpi::FileLogger m_consoleLogger;
   wpi::log::StringLogEntry m_messageLog;
 };
 
@@ -453,6 +457,20 @@ void Thread::StopNTLog() {
   }
 }
 
+void Thread::StartConsoleLog() {
+  if (!m_consoleLoggerEnabled) {
+    m_consoleLoggerEnabled = true;
+    m_consoleLogger = {"/home/lvuser/FRC_UserProgram.log", m_log, "output"};
+  }
+}
+
+void Thread::StopConsoleLog() {
+  if (m_consoleLoggerEnabled) {
+    m_consoleLoggerEnabled = false;
+    m_consoleLogger = {};
+  }
+}
+
 Instance::Instance(std::string_view dir, std::string_view filename,
                    double period) {
   // Delete all previously existing FRC_TBD_*.wpilog files. These only exist
@@ -517,34 +535,52 @@ void DataLogManager::LogNetworkTables(bool enabled) {
   }
 }
 
+void DataLogManager::LogConsoleOutput(bool enabled) {
+  if (auto thr = GetInstance().owner.GetThread()) {
+    if (enabled) {
+      thr->StartConsoleLog();
+    } else if (!enabled) {
+      thr->StopConsoleLog();
+    }
+  }
+}
+
 void DataLogManager::SignalNewDSDataOccur() {
   wpi::SetSignalObject(DriverStation::gNewDataEvent);
 }
 
 extern "C" {
 
-void DLM_Start(const char* dir, const char* filename, double period) {
-  DataLogManager::Start(dir, filename, period);
+void DLM_Start(const struct WPI_String* dir, const struct WPI_String* filename,
+               double period) {
+  DataLogManager::Start(wpi::to_string_view(dir), wpi::to_string_view(filename),
+                        period);
 }
 
 void DLM_Stop(void) {
   DataLogManager::Stop();
 }
 
-void DLM_Log(const char* message) {
-  DataLogManager::Log(message);
+void DLM_Log(const struct WPI_String* message) {
+  DataLogManager::Log(wpi::to_string_view(message));
 }
 
 WPI_DataLog* DLM_GetLog(void) {
   return reinterpret_cast<WPI_DataLog*>(&DataLogManager::GetLog());
 }
 
-const char* DLM_GetLogDir(void) {
-  return DataLogManager::GetLogDir().data();
+void DLM_GetLogDir(struct WPI_String* value) {
+  auto logDir = DataLogManager::GetLogDir();
+  char* write = WPI_AllocateString(value, logDir.size());
+  std::memcpy(write, logDir.data(), logDir.size());
 }
 
 void DLM_LogNetworkTables(int enabled) {
   DataLogManager::LogNetworkTables(enabled);
+}
+
+void DLM_LogConsoleOutput(int enabled) {
+  DataLogManager::LogConsoleOutput(enabled);
 }
 
 void DLM_SignalNewDSDataOccur(void) {

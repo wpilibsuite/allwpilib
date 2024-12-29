@@ -33,8 +33,13 @@ class AprilTagDetectorTest {
   static void beforeAll() {
     try {
       RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-    } catch (IOException ex) {
-      fail(ex);
+    } catch (IOException e) {
+      try {
+        // Try adding a debug postfix
+        RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME + "d");
+      } catch (IOException ex) {
+        fail(ex);
+      }
     }
   }
 
@@ -86,11 +91,6 @@ class AprilTagDetectorTest {
   }
 
   @Test
-  void testAdd25h9() {
-    assertDoesNotThrow(() -> detector.addFamily("tag25h9"));
-  }
-
-  @Test
   void testAdd36h11() {
     assertDoesNotThrow(() -> detector.addFamily("tag36h11"));
   }
@@ -129,6 +129,34 @@ class AprilTagDetectorTest {
     encoded.release();
     Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2GRAY);
     return image;
+  }
+
+  @Test
+  void testDecodeCropped() {
+    detector.addFamily("tag16h5");
+    detector.addFamily("tag36h11");
+
+    Mat image;
+    try {
+      image = loadImage("tag1_640_480.jpg");
+    } catch (IOException ex) {
+      fail(ex);
+      return;
+    }
+
+    // Pre-knowledge -- the tag is within this ROI of this particular test image
+    var cropped = image.submat(100, 400, 220, 570);
+
+    try {
+      AprilTagDetection[] results = detector.detect(cropped);
+      assertEquals(1, results.length);
+      assertEquals("tag36h11", results[0].getFamily());
+      assertEquals(1, results[0].getId());
+      assertEquals(0, results[0].getHamming());
+    } finally {
+      cropped.release();
+      image.release();
+    }
   }
 
   @Test

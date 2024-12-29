@@ -4,6 +4,11 @@
 
 #include "frc/shuffleboard/ShuffleboardContainer.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <ntcore_cpp.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -45,7 +50,7 @@ ShuffleboardLayout& ShuffleboardContainer::GetLayout(std::string_view title,
     auto layout = std::make_unique<ShuffleboardLayout>(*this, title, type);
     auto ptr = layout.get();
     m_components.emplace_back(std::move(layout));
-    m_layouts.insert(std::make_pair(title, ptr));
+    m_layouts.insert(std::pair{title, ptr});
   }
   return *m_layouts[title];
 }

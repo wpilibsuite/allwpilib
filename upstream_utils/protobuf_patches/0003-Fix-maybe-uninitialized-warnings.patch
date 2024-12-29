@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Sat, 10 Jun 2023 15:00:20 -0700
-Subject: [PATCH 03/12] Fix maybe-uninitialized warnings
+Subject: [PATCH 03/14] Fix maybe-uninitialized warnings
 
 ---
  src/google/protobuf/arena.cc                     |  6 +++---

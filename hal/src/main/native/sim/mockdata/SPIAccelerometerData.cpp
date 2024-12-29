@@ -42,7 +42,7 @@ DEFINE_CAPI(double, Z, z)
   SimSPIAccelerometerData[index].NAME.RegisterCallback(callback, param, \
                                                        initialNotify)
 
-void HALSIM_RegisterSPIAccelerometerAllCallbcaks(int32_t index,
+void HALSIM_RegisterSPIAccelerometerAllCallbacks(int32_t index,
                                                  HAL_NotifyCallback callback,
                                                  void* param,
                                                  HAL_Bool initialNotify) {

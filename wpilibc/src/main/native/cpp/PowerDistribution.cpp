@@ -4,6 +4,8 @@
 
 #include "frc/PowerDistribution.h"
 
+#include <vector>
+
 #include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/Ports.h>
@@ -13,7 +15,6 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
-#include "frc/SensorUtil.h"
 
 static_assert(static_cast<HAL_PowerDistributionType>(
                   frc::PowerDistribution::ModuleType::kCTRE) ==
@@ -38,7 +39,14 @@ PowerDistribution::PowerDistribution() {
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
 
-  HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
+  if (HAL_GetPowerDistributionType(m_handle, &status) ==
+      HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
+    HAL_Report(HALUsageReporting::kResourceType_PDP,
+               HALUsageReporting::kPDP_CTRE);
+  } else {
+    HAL_Report(HALUsageReporting::kResourceType_PDP,
+               HALUsageReporting::kPDP_REV);
+  }
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
 }
 
@@ -53,15 +61,14 @@ PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   FRC_ReportError(status, "Module {}", module);
 
-  HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
-  wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
-}
-
-PowerDistribution::~PowerDistribution() {
-  if (m_handle != HAL_kInvalidHandle) {
-    HAL_CleanPowerDistribution(m_handle);
-    m_handle = HAL_kInvalidHandle;
+  if (moduleType == ModuleType::kCTRE) {
+    HAL_Report(HALUsageReporting::kResourceType_PDP,
+               HALUsageReporting::kPDP_CTRE);
+  } else {
+    HAL_Report(HALUsageReporting::kResourceType_PDP,
+               HALUsageReporting::kPDP_REV);
   }
+  wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
 }
 
 int PowerDistribution::GetNumChannels() const {

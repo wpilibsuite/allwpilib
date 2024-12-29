@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Fri, 10 Nov 2023 14:17:53 -0800
-Subject: [PATCH 12/12] Suppress stringop-overflow warning false positives
+Subject: [PATCH 12/14] Suppress stringop-overflow warning false positives
 
 ---
  src/google/protobuf/io/coded_stream.h    | 7 +++++++
@@ -9,42 +9,42 @@ Subject: [PATCH 12/12] Suppress stringop-overflow warning false positives
  2 files changed, 14 insertions(+)
 
 diff --git a/src/google/protobuf/io/coded_stream.h b/src/google/protobuf/io/coded_stream.h
-index 6c0dd4ab4099d1d748957af8bfc5f8c59c2aa3d6..a102cec8ea0b56926f63cf9ece205c634cb6d528 100644
+index 6c0dd4ab4099d1d748957af8bfc5f8c59c2aa3d6..f43b7ee044673b33410a3ebec6a501ff434d061d 100644
 --- a/src/google/protobuf/io/coded_stream.h
 +++ b/src/google/protobuf/io/coded_stream.h
 @@ -681,7 +681,14 @@ class PROTOBUF_EXPORT EpsCopyOutputStream {
      if (PROTOBUF_PREDICT_FALSE(end_ - ptr < static_cast<int>(size))) {
        return WriteRawFallback(data, size, ptr);
      }
-+#if __GNUC__ >= 13
++#if __GNUC__ >= 12
 +#pragma GCC diagnostic push
 +#pragma GCC diagnostic ignored "-Wstringop-overflow="
-+#endif  // __GNUC__ >= 13
++#endif  // __GNUC__ >= 12
      std::memcpy(ptr, data, size);
-+#if __GNUC__ >= 13
++#if __GNUC__ >= 12
 +#pragma GCC diagnostic pop
-+#endif  // __GNUC__ >= 13
++#endif  // __GNUC__ >= 12
      return ptr + size;
    }
    // Writes the buffer specified by data, size to the stream. Possibly by
 diff --git a/src/google/protobuf/unknown_field_set.cc b/src/google/protobuf/unknown_field_set.cc
-index 74c358e9a22c5475bfaef6c5ac63b05fc61b7074..c0587350b309839f3b8b99506d0417a9fd91b06d 100644
+index 74c358e9a22c5475bfaef6c5ac63b05fc61b7074..5f6f7a1a298321e562112fed576a7086bd57643c 100644
 --- a/src/google/protobuf/unknown_field_set.cc
 +++ b/src/google/protobuf/unknown_field_set.cc
 @@ -96,9 +96,16 @@ void UnknownFieldSet::MergeFromAndDestroy(UnknownFieldSet* other) {
    if (fields_.empty()) {
      fields_ = std::move(other->fields_);
    } else {
-+#if __GNUC__ >= 13
++#if __GNUC__ >= 12
 +#pragma GCC diagnostic push
 +#pragma GCC diagnostic ignored "-Wstringop-overflow="
-+#endif  // __GNUC__ >= 13
++#endif  // __GNUC__ >= 12
      fields_.insert(fields_.end(),
                     std::make_move_iterator(other->fields_.begin()),
                     std::make_move_iterator(other->fields_.end()));
-+#if __GNUC__ >= 13
++#if __GNUC__ >= 12
 +#pragma GCC diagnostic pop
-+#endif  // __GNUC__ >= 13
++#endif  // __GNUC__ >= 12
    }
    other->fields_.clear();
  }

@@ -4,6 +4,9 @@
 
 #include "HALSimWeb.h"
 
+#include <memory>
+#include <string>
+
 #include <wpi/SmallString.h>
 #include <wpi/fs.h>
 #include <wpi/print.h>
@@ -120,8 +123,8 @@ void HALSimWeb::Start() {
   // Print any filters we are using
   if (m_useMsgFiltering) {
     wpi::print("WS Message Filters:");
-    for (auto filter : m_msgFilters.keys()) {
-      wpi::print("* \"{}\"\n", filter);
+    for (auto&& filter : m_msgFilters) {
+      wpi::print("* \"{}\"\n", filter.first);
     }
   } else {
     wpi::print("No WS Message Filters specified");

@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstring>
+#include <string>
 
 #include <gtest/gtest.h>
 #include <wpi/StringExtras.h>
@@ -129,6 +130,8 @@ TEST(DriverStationTest, EventInfo) {
   info.matchType = HAL_MatchType::HAL_kMatchType_qualification;
   info.replayNumber = 42;
   HALSIM_SetMatchInfo(&info);
+
+  HAL_RefreshDSData();
 
   HAL_MatchInfo dataBack;
   HAL_GetMatchInfo(&dataBack);

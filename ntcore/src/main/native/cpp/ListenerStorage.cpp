@@ -5,6 +5,8 @@
 #include "ListenerStorage.h"
 
 #include <algorithm>
+#include <utility>
+#include <vector>
 
 #include <wpi/SmallVector.h>
 
@@ -352,6 +354,7 @@ void ListenerStorage::Reset() {
   m_topicListeners.clear();
   m_valueListeners.clear();
   m_logListeners.clear();
+  m_timeSyncListeners.clear();
   if (m_thread) {
     m_thread.Stop();
   }
@@ -381,6 +384,9 @@ ListenerStorage::DoRemoveListeners(std::span<const NT_Listener> handles) {
       if ((listener->eventMask & NT_EVENT_LOGMESSAGE) != 0 ||
           (listener->eventMask & 0x1ff0000) != 0) {
         m_logListeners.Remove(listener.get());
+      }
+      if ((listener->eventMask & NT_EVENT_TIMESYNC) != 0) {
+        m_timeSyncListeners.Remove(listener.get());
       }
     }
   }

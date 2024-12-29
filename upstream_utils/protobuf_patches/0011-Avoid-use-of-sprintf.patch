@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Mon, 9 Oct 2023 19:28:08 -0700
-Subject: [PATCH 11/12] Avoid use of sprintf
+Subject: [PATCH 11/14] Avoid use of sprintf
 
 ---
  src/google/protobuf/stubs/strutil.cc | 14 +++++++++++---

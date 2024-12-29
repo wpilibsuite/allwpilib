@@ -2,13 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <glass/Context.h>
-#include <glass/Storage.h>
-#include <glass/other/Plot.h>
-
 #include <cstdio>
+#include <memory>
 #include <string_view>
 
+#include <glass/Context.h>
+#include <glass/Storage.h>
+#include <glass/hardware/Pneumatic.h>
+#include <glass/other/Plot.h>
 #include <hal/Extensions.h>
 #include <hal/Main.h>
 #include <imgui.h>
@@ -26,6 +27,7 @@
 #include "HALSimGuiExt.h"
 #include "NetworkTablesSimGui.h"
 #include "PCMSimGui.h"
+#include "PHSimGui.h"
 #include "PWMSimGui.h"
 #include "PowerDistributionSimGui.h"
 #include "RelaySimGui.h"
@@ -85,8 +87,42 @@ __declspec(dllexport)
   PowerDistributionSimGui::Initialize();
   PWMSimGui::Initialize();
   RelaySimGui::Initialize();
+  PHSimGui::Initialize();
   RoboRioSimGui::Initialize();
   TimingGui::Initialize();
+
+  HALSimGui::halProvider->RegisterModel(
+      "AllPneumaticControls",
+      [] {
+        return PCMSimGui::PCMsAnyInitialized() || PHSimGui::PHsAnyInitialized();
+      },
+      [] {
+        return std::make_unique<glass::AllPneumaticControlsModel>(
+            PCMSimGui::GetPCMsModel(), PHSimGui::GetPHsModel());
+      });
+
+  HALSimGui::halProvider->RegisterView(
+      "Solenoids", "AllPneumaticControls",
+      [](glass::Model* model) {
+        auto pneumaticModel =
+            static_cast<glass::AllPneumaticControlsModel*>(model);
+        return PCMSimGui::PCMsAnySolenoids(pneumaticModel->pcms.get()) ||
+               PHSimGui::PHsAnySolenoids(pneumaticModel->phs.get());
+      },
+      [](glass::Window* win, glass::Model* model) {
+        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+        win->SetDefaultPos(290, 20);
+        return glass::MakeFunctionView([=] {
+          auto pneumaticModel =
+              static_cast<glass::AllPneumaticControlsModel*>(model);
+          glass::DisplayPneumaticControlsSolenoids(
+              pneumaticModel->pcms.get(),
+              HALSimGui::halProvider->AreOutputsEnabled());
+          glass::DisplayPneumaticControlsSolenoids(
+              pneumaticModel->phs.get(),
+              HALSimGui::halProvider->AreOutputsEnabled());
+        });
+      });
 
   HALSimGui::mainMenu.AddMainMenu([] {
     if (ImGui::BeginMenu("Hardware")) {
@@ -112,7 +148,7 @@ __declspec(dllexport)
       gPlotProvider->DisplayMenu();
       ImGui::EndMenu();
     }
-    if (ImGui::BeginMenu("Window")) {
+    if (HALSimGui::manager->GetNumWindows() > 0 && ImGui::BeginMenu("Window")) {
       HALSimGui::manager->DisplayMenu();
       ImGui::EndMenu();
     }

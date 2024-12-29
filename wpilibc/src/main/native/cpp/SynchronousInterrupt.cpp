@@ -4,7 +4,9 @@
 
 #include "frc/SynchronousInterrupt.h"
 
+#include <memory>
 #include <type_traits>
+#include <utility>
 
 #include <hal/Interrupts.h>
 #include <wpi/NullDeleter.h>
@@ -47,10 +49,6 @@ void SynchronousInterrupt::InitSynchronousInterrupt() {
   FRC_CheckErrorStatus(status, "Interrupt request failed");
   HAL_SetInterruptUpSourceEdge(m_handle, true, false, &status);
   FRC_CheckErrorStatus(status, "Interrupt setting up source edge failed");
-}
-
-SynchronousInterrupt::~SynchronousInterrupt() {
-  HAL_CleanInterrupts(m_handle);
 }
 
 inline SynchronousInterrupt::WaitResult operator|(

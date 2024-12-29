@@ -19,9 +19,9 @@ class ArmFeedforwardProtoTest {
     ArmFeedforward.proto.pack(proto, DATA);
 
     ArmFeedforward data = ArmFeedforward.proto.unpack(proto);
-    assertEquals(DATA.ks, data.ks);
-    assertEquals(DATA.kg, data.kg);
-    assertEquals(DATA.kv, data.kv);
-    assertEquals(DATA.ka, data.ka);
+    assertEquals(DATA.getKs(), data.getKs());
+    assertEquals(DATA.getKg(), data.getKg());
+    assertEquals(DATA.getKv(), data.getKv());
+    assertEquals(DATA.getKa(), data.getKa());
   }
 }

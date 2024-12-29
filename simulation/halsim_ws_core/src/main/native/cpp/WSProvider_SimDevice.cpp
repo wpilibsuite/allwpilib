@@ -6,6 +6,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include <fmt/format.h>
 #include <hal/Ports.h>
@@ -51,7 +54,7 @@ void HALSimWSProviderSimDevice::CancelCallbacks() {
   m_simValueCreatedCbKey = 0;
 
   for (auto& kv : m_simValueChangedCbKeys) {
-    HALSIM_CancelSimValueChangedCallback(kv.getValue());
+    HALSIM_CancelSimValueChangedCallback(kv.second);
   }
 
   m_simValueChangedCbKeys.clear();
@@ -66,18 +69,18 @@ void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
     auto vd = m_valueHandles.find(it.key());
     if (vd != m_valueHandles.end()) {
       HAL_Value value;
-      value.type = vd->second->valueType;
+      value.type = vd->second.valueType;
       switch (value.type) {
         case HAL_BOOLEAN:
           value.data.v_boolean = static_cast<bool>(it.value()) ? 1 : 0;
           break;
         case HAL_DOUBLE:
           value.data.v_double = it.value();
-          value.data.v_double -= vd->second->doubleOffset;
+          value.data.v_double -= vd->second.doubleOffset;
           break;
         case HAL_ENUM: {
           if (it->is_string()) {
-            auto& options = vd->second->options;
+            auto& options = vd->second.options;
             auto& str = it.value().get_ref<const std::string&>();
             auto optionIt =
                 std::find_if(options.begin(), options.end(),
@@ -86,7 +89,7 @@ void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
               value.data.v_enum = optionIt - options.begin();
             }
           } else if (it->is_number()) {
-            auto& values = vd->second->optionValues;
+            auto& values = vd->second.optionValues;
             double num = it.value();
             auto valueIt = std::find_if(
                 values.begin(), values.end(),
@@ -100,17 +103,17 @@ void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
         }
         case HAL_INT:
           value.data.v_int = it.value();
-          value.data.v_int -= vd->second->intOffset;
+          value.data.v_int -= vd->second.intOffset;
           break;
         case HAL_LONG:
           value.data.v_long = it.value();
-          value.data.v_long -= vd->second->intOffset;
+          value.data.v_long -= vd->second.intOffset;
           break;
         default:
           break;
       }
 
-      HAL_SetSimValue(vd->second->handle, &value);
+      HAL_SetSimValue(vd->second.handle, &value);
     }
   }
 }
@@ -143,30 +146,31 @@ void HALSimWSProviderSimDevice::OnValueCreated(const char* name,
     }
   }
   std::string key = fmt::format("{}{}", prefix, name);
-  auto data = std::make_unique<SimDeviceValueData>();
-  data->device = this;
-  data->handle = handle;
-  data->key = key;
+  SimDeviceValueData data;
+  data.device = this;
+  data.handle = handle;
+  data.key = key;
   if (value->type == HAL_ENUM) {
     int32_t numOptions = 0;
 
     const char** options = HALSIM_GetSimValueEnumOptions(handle, &numOptions);
-    data->options.reserve(numOptions);
+    data.options.reserve(numOptions);
     for (int32_t i = 0; i < numOptions; ++i) {
-      data->options.emplace_back(options[i]);
+      data.options.emplace_back(options[i]);
     }
 
     const double* values =
         HALSIM_GetSimValueEnumDoubleValues(handle, &numOptions);
-    data->optionValues.assign(values, values + numOptions);
+    data.optionValues.assign(values, values + numOptions);
   }
-  data->valueType = value->type;
+  data.valueType = value->type;
 
-  auto param = data.get();
+  SimDeviceValueData* param;
 
   {
     std::unique_lock lock(m_vhLock);
-    m_valueHandles[data->key] = std::move(data);
+    param = &m_valueHandles.insert_or_assign(data.key, std::move(data))
+                 .first->second;
   }
 
   int32_t cbKey = HALSIM_RegisterSimValueChangedCallback(
@@ -188,7 +192,8 @@ void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,
   if (ws) {
     switch (value->type) {
       case HAL_BOOLEAN:
-        ProcessHalCallback({{valueData->key, value->data.v_boolean}});
+        ProcessHalCallback(
+            {{valueData->key, static_cast<bool>(value->data.v_boolean)}});
         break;
       case HAL_DOUBLE:
         ProcessHalCallback(

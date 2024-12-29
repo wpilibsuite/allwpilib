@@ -4,7 +4,8 @@
 
 package edu.wpi.first.units;
 
-import java.util.Objects;
+import edu.wpi.first.units.measure.Dimensionless;
+import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
 
 /**
  * A measure holds the magnitude and unit of some dimension, such as distance, time, or speed. An
@@ -12,28 +13,13 @@ import java.util.Objects;
  * situations and gives compile-time safety. Two measures with the same <i>unit</i> and
  * <i>magnitude</i> are effectively equivalent objects.
  *
+ * @param magnitude the magnitude of the measure in terms of its unit
+ * @param baseUnitMagnitude the magnitude of the measure in terms of its base unit
+ * @param unit the unit of the measurement
  * @param <U> the unit type of the measure
  */
-public class ImmutableMeasure<U extends Unit<U>> implements Measure<U> {
-  private final double m_magnitude;
-  private final double m_baseUnitMagnitude;
-  private final U m_unit;
-
-  /**
-   * Creates a new immutable measure instance. This shouldn't be used directly; prefer one of the
-   * factory methods instead.
-   *
-   * @param magnitude the magnitude of this measure
-   * @param unit the unit of this measure.
-   */
-  @SuppressWarnings("unchecked")
-  ImmutableMeasure(double magnitude, double baseUnitMagnitude, Unit<U> unit) {
-    Objects.requireNonNull(unit, "Unit cannot be null");
-    m_magnitude = magnitude;
-    m_baseUnitMagnitude = baseUnitMagnitude;
-    m_unit = (U) unit;
-  }
-
+public record ImmutableMeasure<U extends Unit>(double magnitude, double baseUnitMagnitude, U unit)
+    implements Measure<U> {
   /**
    * Creates a new measure in the given unit with a magnitude equal to the given one in base units.
    *
@@ -42,8 +28,7 @@ public class ImmutableMeasure<U extends Unit<U>> implements Measure<U> {
    * @param unit the unit of measure
    * @return a new measure
    */
-  public static <U extends Unit<U>> ImmutableMeasure<U> ofBaseUnits(
-      double baseUnitMagnitude, Unit<U> unit) {
+  public static <U extends Unit> ImmutableMeasure<U> ofBaseUnits(double baseUnitMagnitude, U unit) {
     return new ImmutableMeasure<>(unit.fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, unit);
   }
 
@@ -55,42 +40,9 @@ public class ImmutableMeasure<U extends Unit<U>> implements Measure<U> {
    * @param unit the unit of measure
    * @return a new measure
    */
-  public static <U extends Unit<U>> ImmutableMeasure<U> ofRelativeUnits(
-      double relativeMagnitude, Unit<U> unit) {
+  public static <U extends Unit> ImmutableMeasure<U> ofRelativeUnits(
+      double relativeMagnitude, U unit) {
     return new ImmutableMeasure<>(relativeMagnitude, unit.toBaseUnits(relativeMagnitude), unit);
-  }
-
-  /** Gets the unitless magnitude of this measure. */
-  @Override
-  public double magnitude() {
-    return m_magnitude;
-  }
-
-  @Override
-  public double baseUnitMagnitude() {
-    return m_baseUnitMagnitude;
-  }
-
-  /** Gets the units of this measure. */
-  @Override
-  public U unit() {
-    return m_unit;
-  }
-
-  /**
-   * Checks for <i>object equality</i>. To check if two measures are <i>equivalent</i>, use {@link
-   * #isEquivalent(Measure) isEquivalent}.
-   */
-  @Override
-  public boolean equals(Object o) {
-    return o instanceof Measure<?> that
-        && Objects.equals(m_unit, that.unit())
-        && m_baseUnitMagnitude == that.baseUnitMagnitude();
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(m_magnitude, m_unit);
   }
 
   @Override
@@ -99,7 +51,42 @@ public class ImmutableMeasure<U extends Unit<U>> implements Measure<U> {
   }
 
   @Override
-  public String toString() {
-    return toShortString();
+  public MutableMeasure<U, ?, ?> mutableCopy() {
+    return new GenericMutableMeasureImpl<>(magnitude, baseUnitMagnitude, unit);
+  }
+
+  @Override
+  public Measure<U> unaryMinus() {
+    return ofBaseUnits(0 - baseUnitMagnitude, unit);
+  }
+
+  @Override
+  public Measure<U> plus(Measure<? extends U> other) {
+    return ofBaseUnits(baseUnitMagnitude + other.baseUnitMagnitude(), unit);
+  }
+
+  @Override
+  public Measure<U> minus(Measure<? extends U> other) {
+    return ofBaseUnits(baseUnitMagnitude - other.baseUnitMagnitude(), unit);
+  }
+
+  @Override
+  public Measure<U> times(double multiplier) {
+    return ofBaseUnits(baseUnitMagnitude * multiplier, unit);
+  }
+
+  @Override
+  public Measure<U> times(Dimensionless multiplier) {
+    return ofBaseUnits(baseUnitMagnitude * multiplier.baseUnitMagnitude(), unit);
+  }
+
+  @Override
+  public Measure<U> div(double divisor) {
+    return ofBaseUnits(baseUnitMagnitude / divisor, unit);
+  }
+
+  @Override
+  public Measure<U> div(Dimensionless divisor) {
+    return ofBaseUnits(baseUnitMagnitude / divisor.baseUnitMagnitude(), unit);
   }
 }

@@ -5,7 +5,6 @@
 #include "frc/simulation/DriverStationSim.h"
 
 #include <memory>
-#include <utility>
 
 #include <hal/DriverStation.h>
 #include <hal/simulation/DriverStationData.h>

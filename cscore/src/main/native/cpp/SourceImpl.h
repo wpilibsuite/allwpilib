@@ -98,7 +98,8 @@ class SourceImpl : public PropertyContainer {
 
   // Blocking function that waits for the next frame and returns it (with
   // timeout in seconds).  If timeout expires, returns empty frame.
-  Frame GetNextFrame(double timeout);
+  // If lastFrameTime==0, uses m_frame.GetTime() for lastFrameTime
+  Frame GetNextFrame(double timeout, Frame::Time lastFrameTime = 0);
 
   // Force a wakeup of all GetNextFrame() callers by sending an empty frame.
   void Wakeup();

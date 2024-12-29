@@ -4,26 +4,42 @@
 
 #include "frc/geometry/proto/Transform3dProto.h"
 
-#include "geometry3d.pb.h"
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
-google::protobuf::Message* wpi::Protobuf<frc::Transform3d>::New(
-    google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufTransform3d>(arena);
-}
+#include "wpimath/protobuf/geometry3d.npb.h"
 
-frc::Transform3d wpi::Protobuf<frc::Transform3d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufTransform3d*>(&msg);
+std::optional<frc::Transform3d> wpi::Protobuf<frc::Transform3d>::Unpack(
+    InputStream& stream) {
+  wpi::UnpackCallback<frc::Translation3d> tsln;
+  wpi::UnpackCallback<frc::Rotation3d> rot;
+  wpi_proto_ProtobufTransform3d msg{
+      .translation = tsln.Callback(),
+      .rotation = rot.Callback(),
+  };
+  if (!stream.Decode(msg)) {
+    return {};
+  }
+
+  auto itsln = tsln.Items();
+  auto irot = rot.Items();
+
+  if (itsln.empty() || irot.empty()) {
+    return {};
+  }
+
   return frc::Transform3d{
-      wpi::UnpackProtobuf<frc::Translation3d>(m->translation()),
-      wpi::UnpackProtobuf<frc::Rotation3d>(m->rotation()),
+      itsln[0],
+      irot[0],
   };
 }
 
-void wpi::Protobuf<frc::Transform3d>::Pack(google::protobuf::Message* msg,
+bool wpi::Protobuf<frc::Transform3d>::Pack(OutputStream& stream,
                                            const frc::Transform3d& value) {
-  auto m = static_cast<wpi::proto::ProtobufTransform3d*>(msg);
-  wpi::PackProtobuf(m->mutable_translation(), value.Translation());
-  wpi::PackProtobuf(m->mutable_rotation(), value.Rotation());
+  wpi::PackCallback tsln{&value.Translation()};
+  wpi::PackCallback rot{&value.Rotation()};
+  wpi_proto_ProtobufTransform3d msg{
+      .translation = tsln.Callback(),
+      .rotation = rot.Callback(),
+  };
+  return stream.Encode(msg);
 }

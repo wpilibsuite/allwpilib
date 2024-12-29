@@ -153,7 +153,9 @@ class WPILIB_DLLEXPORT Ellipse2d {
    * @param point The point to check.
    * @return The distance (0, if the point is contained by the ellipse)
    */
-  units::meter_t Distance(const Translation2d& point) const;
+  units::meter_t Distance(const Translation2d& point) const {
+    return Nearest(point).Distance(point);
+  }
 
   /**
    * Returns the nearest point that is contained within the ellipse.
@@ -162,7 +164,7 @@ class WPILIB_DLLEXPORT Ellipse2d {
    * @return A new point that is nearest to {@code point} and contained in the
    *   ellipse.
    */
-  Translation2d FindNearestPoint(const Translation2d& point) const;
+  Translation2d Nearest(const Translation2d& point) const;
 
   /**
    * Checks equality between this Ellipse2d and another object.

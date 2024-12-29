@@ -5,6 +5,9 @@
 #include <jni.h>
 
 #include <cassert>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <wpi/ConvertUTF.h>
@@ -1302,7 +1305,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_Strin
     }
     names.emplace_back(JStringRef{env, elem}.str());
     servers.emplace_back(
-        std::make_pair(std::string_view{names.back()}, portInts[i]));
+        std::pair{std::string_view{names.back()}, portInts[i]});
   }
   nt::SetServer(inst, servers);
 }

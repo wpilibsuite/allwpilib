@@ -14,7 +14,6 @@
 #include <hal/Notifier.h>
 
 #include "frc/Errors.h"
-#include "frc/Timer.h"
 
 using namespace frc;
 
@@ -37,29 +36,38 @@ void TimedRobot::StartCompetition() {
     auto callback = m_callbacks.pop();
 
     int32_t status = 0;
-    HAL_UpdateNotifierAlarm(
-        m_notifier, static_cast<uint64_t>(callback.expirationTime * 1e6),
-        &status);
+    HAL_UpdateNotifierAlarm(m_notifier, callback.expirationTime.count(),
+                            &status);
     FRC_CheckErrorStatus(status, "UpdateNotifierAlarm");
 
-    uint64_t curTime = HAL_WaitForNotifierAlarm(m_notifier, &status);
-    if (curTime == 0 || status != 0) {
+    std::chrono::microseconds currentTime{
+        HAL_WaitForNotifierAlarm(m_notifier, &status)};
+    if (currentTime.count() == 0 || status != 0) {
       break;
     }
 
+    m_loopStartTimeUs = RobotController::GetFPGATime();
+
     callback.func();
 
-    callback.expirationTime += callback.period;
+    // Increment the expiration time by the number of full periods it's behind
+    // plus one to avoid rapid repeat fires from a large loop overrun. We assume
+    // currentTime ≥ expirationTime rather than checking for it since the
+    // callback wouldn't be running otherwise.
+    callback.expirationTime +=
+        callback.period + (currentTime - callback.expirationTime) /
+                              callback.period * callback.period;
     m_callbacks.push(std::move(callback));
 
     // Process all other callbacks that are ready to run
-    while (static_cast<uint64_t>(m_callbacks.top().expirationTime * 1e6) <=
-           curTime) {
+    while (m_callbacks.top().expirationTime <= currentTime) {
       callback = m_callbacks.pop();
 
       callback.func();
 
-      callback.expirationTime += callback.period;
+      callback.expirationTime +=
+          callback.period + (currentTime - callback.expirationTime) /
+                                callback.period * callback.period;
       m_callbacks.push(std::move(callback));
     }
   }
@@ -71,7 +79,7 @@ void TimedRobot::EndCompetition() {
 }
 
 TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
-  m_startTime = Timer::GetFPGATimestamp();
+  m_startTime = std::chrono::microseconds{RobotController::GetFPGATime()};
   AddPeriodic([=, this] { LoopFunc(); }, period);
 
   int32_t status = 0;
@@ -84,15 +92,21 @@ TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
 }
 
 TimedRobot::~TimedRobot() {
-  int32_t status = 0;
+  if (m_notifier != HAL_kInvalidHandle) {
+    int32_t status = 0;
+    HAL_StopNotifier(m_notifier, &status);
+    FRC_ReportError(status, "StopNotifier");
+  }
+}
 
-  HAL_StopNotifier(m_notifier, &status);
-  FRC_ReportError(status, "StopNotifier");
-
-  HAL_CleanNotifier(m_notifier, &status);
+uint64_t TimedRobot::GetLoopStartTime() {
+  return m_loopStartTimeUs;
 }
 
 void TimedRobot::AddPeriodic(std::function<void()> callback,
                              units::second_t period, units::second_t offset) {
-  m_callbacks.emplace(callback, m_startTime, period, offset);
+  m_callbacks.emplace(
+      callback, m_startTime,
+      std::chrono::microseconds{static_cast<int64_t>(period.value() * 1e6)},
+      std::chrono::microseconds{static_cast<int64_t>(offset.value() * 1e6)});
 }

@@ -11,7 +11,7 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::Twist3d> {
-  static constexpr std::string_view GetTypeString() { return "struct:Twist3d"; }
+  static constexpr std::string_view GetTypeName() { return "Twist3d"; }
   static constexpr size_t GetSize() { return 48; }
   static constexpr std::string_view GetSchema() {
     return "double dx;double dy;double dz;double rx;double ry;double rz";

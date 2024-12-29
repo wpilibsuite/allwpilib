@@ -4,10 +4,13 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.proto.Ellipse2dProto;
 import edu.wpi.first.math.geometry.struct.Ellipse2dStruct;
 import edu.wpi.first.math.jni.Ellipse2dJNI;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -36,12 +39,35 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
+   * Constructs an ellipse around a center point and two semi-axes, a horizontal and vertical one.
+   * The X and Y semi-axis will be converted to and tracked as meters.
+   *
+   * @param center The center of the ellipse.
+   * @param xSemiAxis The x semi-axis.
+   * @param ySemiAxis The y semi-axis.
+   */
+  public Ellipse2d(Pose2d center, Distance xSemiAxis, Distance ySemiAxis) {
+    this(center, xSemiAxis.in(Meters), ySemiAxis.in(Meters));
+  }
+
+  /**
    * Constructs a perfectly circular ellipse with the specified radius.
    *
    * @param center The center of the circle.
    * @param radius The radius of the circle.
    */
   public Ellipse2d(Translation2d center, double radius) {
+    this(new Pose2d(center, Rotation2d.kZero), radius, radius);
+  }
+
+  /**
+   * Constructs a perfectly circular ellipse with the specified radius. The radius will be converted
+   * to and tracked as meters.
+   *
+   * @param center The center of the circle.
+   * @param radius The radius of the circle.
+   */
+  public Ellipse2d(Translation2d center, Distance radius) {
     this(new Pose2d(center, Rotation2d.kZero), radius, radius);
   }
 
@@ -79,6 +105,24 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    */
   public double getYSemiAxis() {
     return m_ySemiAxis;
+  }
+
+  /**
+   * Returns the x semi-axis in a measure.
+   *
+   * @return The x semi-axis in a measure.
+   */
+  public Distance getMeasureXSemiAxis() {
+    return Meters.of(m_xSemiAxis);
+  }
+
+  /**
+   * Returns the y semi-axis in a measure.
+   *
+   * @return The y semi-axis in a measure.
+   */
+  public Distance getMeasureYSemiAxis() {
+    return Meters.of(m_ySemiAxis);
   }
 
   /**
@@ -155,7 +199,17 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @return The distance (0, if the point is contained by the ellipse)
    */
   public double getDistance(Translation2d point) {
-    return findNearestPoint(point).getDistance(point);
+    return nearest(point).getDistance(point);
+  }
+
+  /**
+   * Returns the distance between the perimeter of the ellipse and the point in a measure.
+   *
+   * @param point The point to check.
+   * @return The distance (0, if the point is contained by the ellipse) in a measure.
+   */
+  public Distance getMeasureDistance(Translation2d point) {
+    return Meters.of(getDistance(point));
   }
 
   /**
@@ -164,7 +218,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @param point The point that this will find the nearest point to.
    * @return A new point that is nearest to {@code point} and contained in the ellipse.
    */
-  public Translation2d findNearestPoint(Translation2d point) {
+  public Translation2d nearest(Translation2d point) {
     // Check if already in ellipse
     if (contains(point)) {
       return point;
@@ -172,7 +226,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
 
     // Find nearest point
     var nearestPoint = new double[2];
-    Ellipse2dJNI.findNearestPoint(
+    Ellipse2dJNI.nearest(
         m_center.getX(),
         m_center.getY(),
         m_center.getRotation().getRadians(),

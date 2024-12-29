@@ -4,29 +4,26 @@
 
 #include "frc/kinematics/proto/DifferentialDriveWheelSpeedsProto.h"
 
-#include "kinematics.pb.h"
+#include "wpimath/protobuf/kinematics.npb.h"
 
-google::protobuf::Message* wpi::Protobuf<
-    frc::DifferentialDriveWheelSpeeds>::New(google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufDifferentialDriveWheelSpeeds>(arena);
-}
+std::optional<frc::DifferentialDriveWheelSpeeds>
+wpi::Protobuf<frc::DifferentialDriveWheelSpeeds>::Unpack(InputStream& stream) {
+  wpi_proto_ProtobufDifferentialDriveWheelSpeeds msg;
+  if (!stream.Decode(msg)) {
+    return {};
+  }
 
-frc::DifferentialDriveWheelSpeeds
-wpi::Protobuf<frc::DifferentialDriveWheelSpeeds>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufDifferentialDriveWheelSpeeds*>(
-      &msg);
   return frc::DifferentialDriveWheelSpeeds{
-      units::meters_per_second_t{m->left()},
-      units::meters_per_second_t{m->right()},
+      units::meters_per_second_t{msg.left},
+      units::meters_per_second_t{msg.right},
   };
 }
 
-void wpi::Protobuf<frc::DifferentialDriveWheelSpeeds>::Pack(
-    google::protobuf::Message* msg,
-    const frc::DifferentialDriveWheelSpeeds& value) {
-  auto m = static_cast<wpi::proto::ProtobufDifferentialDriveWheelSpeeds*>(msg);
-  m->set_left(value.left.value());
-  m->set_right(value.right.value());
+bool wpi::Protobuf<frc::DifferentialDriveWheelSpeeds>::Pack(
+    OutputStream& stream, const frc::DifferentialDriveWheelSpeeds& value) {
+  wpi_proto_ProtobufDifferentialDriveWheelSpeeds msg{
+      .left = value.left.value(),
+      .right = value.right.value(),
+  };
+  return stream.Encode(msg);
 }

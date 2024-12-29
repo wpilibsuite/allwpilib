@@ -6,6 +6,8 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <memory>
+#include <utility>
 
 #include <fmt/format.h>
 #include <wpi/print.h>

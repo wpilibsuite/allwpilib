@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 
@@ -38,7 +40,10 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
   DifferentialDriveAccelerationLimiter(
       LinearSystem<2, 2, 2> system, units::meter_t trackwidth,
       units::meters_per_second_squared_t maxLinearAccel,
-      units::radians_per_second_squared_t maxAngularAccel);
+      units::radians_per_second_squared_t maxAngularAccel)
+      : DifferentialDriveAccelerationLimiter(system, trackwidth,
+                                             -maxLinearAccel, maxLinearAccel,
+                                             maxAngularAccel) {}
 
   /**
    * Constructs a DifferentialDriveAccelerationLimiter.
@@ -56,10 +61,20 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
       LinearSystem<2, 2, 2> system, units::meter_t trackwidth,
       units::meters_per_second_squared_t minLinearAccel,
       units::meters_per_second_squared_t maxLinearAccel,
-      units::radians_per_second_squared_t maxAngularAccel);
+      units::radians_per_second_squared_t maxAngularAccel)
+      : m_system{std::move(system)},
+        m_trackwidth{trackwidth},
+        m_minLinearAccel{minLinearAccel},
+        m_maxLinearAccel{maxLinearAccel},
+        m_maxAngularAccel{maxAngularAccel} {
+    if (minLinearAccel > maxLinearAccel) {
+      throw std::invalid_argument(
+          "maxLinearAccel must be greater than minLinearAccel");
+    }
+  }
 
   /**
-   * Returns the next voltage pair subject to acceleraiton constraints.
+   * Returns the next voltage pair subject to acceleration constraints.
    *
    * @param leftVelocity The left wheel velocity.
    * @param rightVelocity The right wheel velocity.

@@ -4,6 +4,8 @@
 
 #include <jni.h>
 
+#include <algorithm>
+#include <string>
 #include <vector>
 
 #include <fmt/format.h>
@@ -17,6 +19,18 @@
 
 using namespace wpi::java;
 using namespace wpi::log;
+
+namespace {
+class buf_ostream : public wpi::raw_uvector_ostream {
+ private:
+  std::vector<uint8_t> data;
+
+ public:
+  buf_ostream() : raw_uvector_ostream{data} {}
+
+  void clear() { data.clear(); }
+};
+}  // namespace
 
 extern "C" {
 
@@ -98,6 +112,24 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_fgCreate
 
 /*
  * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Method:    fgCreateMemory
+ * Signature: (Ljava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_util_datalog_DataLogJNI_fgCreateMemory
+  (JNIEnv* env, jclass, jstring extraHeader)
+{
+  if (!extraHeader) {
+    wpi::ThrowNullPointerException(env, "extraHeader is null");
+    return 0;
+  }
+  auto writer = new DataLogWriter{std::make_unique<buf_ostream>(),
+                                  JStringRef{env, extraHeader}};
+  return reinterpret_cast<jlong>(writer);
+}
+
+/*
+ * Class:     edu_wpi_first_util_datalog_DataLogJNI
  * Method:    flush
  * Signature: (J)V
  */
@@ -109,7 +141,34 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_flush
     wpi::ThrowNullPointerException(env, "impl is null");
     return;
   }
-  reinterpret_cast<DataLogBackgroundWriter*>(impl)->Flush();
+  reinterpret_cast<DataLog*>(impl)->Flush();
+}
+
+/*
+ * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Method:    copyWriteBuffer
+ * Signature: (J[BI)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_util_datalog_DataLogJNI_copyWriteBuffer
+  (JNIEnv* env, jclass, jlong impl, jbyteArray buf, jint start)
+{
+  if (impl == 0) {
+    wpi::ThrowNullPointerException(env, "impl is null");
+    return 0;
+  }
+  auto writer = reinterpret_cast<DataLogWriter*>(impl);
+  writer->Flush();
+  auto& stream = static_cast<buf_ostream&>(writer->GetStream());
+  JSpan<jbyte> jbuf{env, buf};
+  auto arr = stream.array();
+  if (start < 0 || static_cast<size_t>(start) >= arr.size()) {
+    stream.clear();
+    return 0;
+  }
+  size_t qty = (std::min)(jbuf.size(), arr.size() - start);
+  std::copy(arr.begin(), arr.begin() + qty, jbuf.begin());
+  return qty;
 }
 
 /*
@@ -125,7 +184,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_pause
     wpi::ThrowNullPointerException(env, "impl is null");
     return;
   }
-  reinterpret_cast<DataLogBackgroundWriter*>(impl)->Pause();
+  reinterpret_cast<DataLog*>(impl)->Pause();
 }
 
 /*
@@ -141,7 +200,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_resume
     wpi::ThrowNullPointerException(env, "impl is null");
     return;
   }
-  reinterpret_cast<DataLogBackgroundWriter*>(impl)->Resume();
+  reinterpret_cast<DataLog*>(impl)->Resume();
 }
 
 /*
@@ -157,7 +216,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_stop
     wpi::ThrowNullPointerException(env, "impl is null");
     return;
   }
-  reinterpret_cast<DataLogBackgroundWriter*>(impl)->Stop();
+  reinterpret_cast<DataLog*>(impl)->Stop();
 }
 
 /*

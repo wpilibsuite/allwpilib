@@ -4,11 +4,10 @@
 
 #include "PWMSimGui.h"
 
-#include <glass/hardware/PWM.h>
-
 #include <memory>
 #include <vector>
 
+#include <glass/hardware/PWM.h>
 #include <hal/Ports.h>
 #include <hal/simulation/AddressableLEDData.h>
 #include <hal/simulation/PWMData.h>

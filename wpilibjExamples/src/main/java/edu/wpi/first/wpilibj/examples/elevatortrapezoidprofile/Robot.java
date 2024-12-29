@@ -24,8 +24,7 @@ public class Robot extends TimedRobot {
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
-  @Override
-  public void robotInit() {
+  public Robot() {
     // Note: These gains are fake, and will have to be tuned for your robot.
     m_motor.setPID(1.3, 0.0, 0.7);
   }

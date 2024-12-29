@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
+#include <wpi/SmallVector.h>
 
 #include "frc/trajectory/Trajectory.h"
-#include "trajectory.pb.h"
 
 using namespace frc;
 
@@ -20,15 +20,17 @@ const Trajectory::State kExpectedData = Trajectory::State{
 }  // namespace
 
 TEST(TrajectoryStateProtoTest, Roundtrip) {
-  google::protobuf::Arena arena;
-  google::protobuf::Message* proto = ProtoType::New(&arena);
-  ProtoType::Pack(proto, kExpectedData);
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::SmallVector<uint8_t, 64> buf;
 
-  Trajectory::State unpacked_data = ProtoType::Unpack(*proto);
-  EXPECT_EQ(kExpectedData.t.value(), unpacked_data.t.value());
-  EXPECT_EQ(kExpectedData.velocity.value(), unpacked_data.velocity.value());
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  auto unpacked_data = message.Unpack(buf);
+  ASSERT_TRUE(unpacked_data.has_value());
+
+  EXPECT_EQ(kExpectedData.t.value(), unpacked_data->t.value());
+  EXPECT_EQ(kExpectedData.velocity.value(), unpacked_data->velocity.value());
   EXPECT_EQ(kExpectedData.acceleration.value(),
-            unpacked_data.acceleration.value());
-  EXPECT_EQ(kExpectedData.pose, unpacked_data.pose);
-  EXPECT_EQ(kExpectedData.curvature.value(), unpacked_data.curvature.value());
+            unpacked_data->acceleration.value());
+  EXPECT_EQ(kExpectedData.pose, unpacked_data->pose);
+  EXPECT_EQ(kExpectedData.curvature.value(), unpacked_data->curvature.value());
 }

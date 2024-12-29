@@ -18,21 +18,36 @@
 
 namespace frc {
 
-/**
- * Sets the LED at the given index to the given color.
- */
-using LEDWriterFn = std::function<void(int, frc::Color)>;
-
-/**
- * Accepts a data buffer (1st argument) and a callback (2nd argument) for
- * writing data.
- */
-using LEDPatternFn =
-    std::function<void(std::span<frc::AddressableLED::LEDData>, LEDWriterFn)>;
-
 class LEDPattern {
  public:
-  explicit LEDPattern(LEDPatternFn impl);
+  /**
+   * A wrapper around a length and an arbitrary reader function that accepts an
+   * LED index and returns data for the LED at that index. This configuration
+   * allows us to abstract over different container types without templating.
+   */
+  class LEDReader {
+   public:
+    LEDReader(std::function<frc::AddressableLED::LEDData(int)> impl,
+              size_t size)
+        : m_impl{std::move(impl)}, m_size{size} {}
+
+    frc::AddressableLED::LEDData operator[](size_t index) const {
+      return m_impl(index);
+    }
+
+    size_t size() const { return m_size; }
+
+   private:
+    std::function<frc::AddressableLED::LEDData(int)> m_impl;
+    size_t m_size;
+  };
+
+  explicit LEDPattern(std::function<void(frc::LEDPattern::LEDReader,
+                                         std::function<void(int, frc::Color)>)>
+                          impl);
+
+  void ApplyTo(LEDReader reader,
+               std::function<void(int, frc::Color)> writer) const;
 
   /**
    * Writes the pattern to an LED buffer. Dynamic animations should be called
@@ -48,7 +63,7 @@ class LEDPattern {
    * @param writer data writer for setting new LED colors on the LED strip
    */
   void ApplyTo(std::span<frc::AddressableLED::LEDData> data,
-               LEDWriterFn writer) const;
+               std::function<void(int, frc::Color)> writer) const;
 
   /**
    * Writes the pattern to an LED buffer. Dynamic animations should be called
@@ -63,6 +78,15 @@ class LEDPattern {
    * @param data the current data of the LED strip
    */
   void ApplyTo(std::span<frc::AddressableLED::LEDData> data) const;
+
+  /**
+   * Creates a pattern with remapped indices.
+   *
+   * @param indexMapper the index mapper
+   * @return the mapped pattern
+   */
+  [[nodiscard]]
+  LEDPattern MapIndex(std::function<size_t(size_t, size_t)> indexMapper);
 
   /**
    * Creates a pattern that displays this one in reverse. Scrolling patterns
@@ -112,7 +136,7 @@ class LEDPattern {
    *
    *   frc::LEDPattern rainbow = frc::LEDPattern::Rainbow();
    *   frc::LEDPattern scrollingRainbow =
-   *     rainbow.ScrollAtAbsoluteSpeed(units::inches_per_second_t{4},
+   *     rainbow.ScrollAtAbsoluteSpeed(units::feet_per_second_t{1 / 3.0},
    * LED_SPACING);
    * </pre>
    *
@@ -246,7 +270,7 @@ class LEDPattern {
   LEDPattern AtBrightness(double relativeBrightness);
 
   /** A pattern that turns off all LEDs. */
-  static LEDPattern kOff;
+  static LEDPattern Off();
 
   /**
    * Creates a pattern that displays a single static color along the entire
@@ -315,29 +339,52 @@ class LEDPattern {
   static LEDPattern Steps(
       std::initializer_list<std::pair<double, Color>> steps);
 
-  /**
-   * Creates a pattern that displays a non-animated gradient of colors across
-   * the entire length of the LED strip. The gradient wraps around so the start
-   * and end of the strip are the same color, which allows the gradient to be
-   * modified with a scrolling effect with no discontinuities. Colors are evenly
-   * distributed along the full length of the LED strip.
-   *
-   * @param colors the colors to display in the gradient
-   * @return a motionless gradient pattern
-   */
-  static LEDPattern Gradient(std::span<const Color> colors);
+  /** Types of gradients. */
+  enum GradientType {
+    /**
+     * A continuous gradient, where the gradient wraps around to allow for
+     * seamless scrolling effects.
+     */
+    kContinuous,
+    /**
+     * A discontinuous gradient, where the first pixel is set to the first color
+     * of the gradient and the final pixel is set to the last color of the
+     * gradient. There is no wrapping effect, so scrolling effects will display
+     * an obvious seam.
+     */
+    kDiscontinuous
+  };
 
   /**
    * Creates a pattern that displays a non-animated gradient of colors across
-   * the entire length of the LED strip. The gradient wraps around so the start
-   * and end of the strip are the same color, which allows the gradient to be
-   * modified with a scrolling effect with no discontinuities. Colors are evenly
-   * distributed along the full length of the LED strip.
+   * the entire length of the LED strip. Colors are evenly distributed along the
+   * full length of the LED strip. The gradient type is configured with the
+   * {@code type} parameter, allowing the gradient to be either continuous (no
+   * seams, good for scrolling effects) or discontinuous (a clear seam is
+   * visible, but the gradient applies to the full length of the LED strip
+   * without needing to use some space for wrapping).
    *
+   * @param type the type of gradient (continuous or discontinuous)
    * @param colors the colors to display in the gradient
    * @return a motionless gradient pattern
    */
-  static LEDPattern Gradient(std::initializer_list<Color> colors);
+  static LEDPattern Gradient(GradientType type, std::span<const Color> colors);
+
+  /**
+   * Creates a pattern that displays a non-animated gradient of colors across
+   * the entire length of the LED strip. Colors are evenly distributed along the
+   * full length of the LED strip. The gradient type is configured with the
+   * {@code type} parameter, allowing the gradient to be either continuous (no
+   * seams, good for scrolling effects) or discontinuous (a clear seam is
+   * visible, but the gradient applies to the full length of the LED strip
+   * without needing to use some space for wrapping).
+   *
+   * @param type the type of gradient (continuous or discontinuous)
+   * @param colors the colors to display in the gradient
+   * @return a motionless gradient pattern
+   */
+  static LEDPattern Gradient(GradientType type,
+                             std::initializer_list<Color> colors);
 
   /**
    * Creates an LED pattern that displays a rainbow across the color wheel. The
@@ -350,6 +397,8 @@ class LEDPattern {
   static LEDPattern Rainbow(int saturation, int value);
 
  private:
-  LEDPatternFn m_impl;
+  std::function<void(frc::LEDPattern::LEDReader,
+                     std::function<void(int, frc::Color)>)>
+      m_impl;
 };
 }  // namespace frc

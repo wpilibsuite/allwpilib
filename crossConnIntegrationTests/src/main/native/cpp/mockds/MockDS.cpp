@@ -8,7 +8,6 @@
 
 #include <string_view>
 
-#include <fmt/core.h>
 #include <hal/cpp/fpga_clock.h>
 #include <wpi/Logger.h>
 #include <wpi/SmallVector.h>

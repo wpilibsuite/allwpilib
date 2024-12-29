@@ -4,6 +4,8 @@
 
 #include "wpi/UidVector.h"  // NOLINT(build/include_order)
 
+#include <vector>
+
 #include <gtest/gtest.h>
 
 namespace wpi {

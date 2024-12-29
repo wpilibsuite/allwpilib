@@ -1,0 +1,47 @@
+
+# Warning level
+build:macos --copt=-Wall
+build:macos --copt=-Wextra
+build:macos --copt=-Werror
+
+
+# C++ only
+build:macos --cxxopt=-std=c++20
+build:macos --cxxopt=-pedantic
+build:macos --cxxopt=-fPIC
+build:macos --cxxopt=-Wno-unused-parameter
+build:macos --cxxopt=-Wno-error=deprecated-enum-enum-conversion
+build:macos --cxxopt=-Wno-missing-field-initializers
+build:macos --cxxopt=-Wno-unused-private-field
+build:macos --cxxopt=-Wno-unused-const-variable
+build:macos --cxxopt=-Wno-error=c11-extensions
+build:macos --cxxopt=-pthread
+build:macos --cxxopt=-Wno-deprecated-anon-enum-enum-conversion
+
+# C only
+build:macos --conlyopt=-pedantic
+build:macos --conlyopt=-fPIC
+build:macos --conlyopt=-Wno-unused-parameter
+build:macos --conlyopt=-Wno-missing-field-initializers
+build:macos --conlyopt=-Wno-unused-private-field
+build:macos --conlyopt=-Wno-fixed-enum-extension"
+
+
+build:macos --linkopt=-framework
+build:macos --linkopt=CoreFoundation
+build:macos --linkopt=-framework
+build:macos --linkopt=AVFoundation
+build:macos --linkopt=-framework
+build:macos --linkopt=Foundation
+build:macos --linkopt=-framework
+build:macos --linkopt=CoreMedia
+build:macos --linkopt=-framework
+build:macos --linkopt=CoreVideo
+build:macos --linkopt=-headerpad_max_install_names
+build:macos --linkopt=-Wl,-rpath,'@loader_path'"
+
+# Things not in nativetools
+build:macos --copt=-Wno-shorten-64-to-32
+
+build:macos --host_per_file_copt=external/zlib/.*\.c@-Wno-deprecated-non-prototype
+build:macos --host_per_file_copt=external/com_google_protobuf/.*\.cc@-Wno-unused-function

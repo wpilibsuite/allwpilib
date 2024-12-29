@@ -4,6 +4,10 @@
 
 #include "frc2/command/CommandPtr.h"
 
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include <frc/Errors.h>
 
 #include "frc2/command/CommandScheduler.h"
@@ -12,7 +16,6 @@
 #include "frc2/command/ParallelCommandGroup.h"
 #include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/PrintCommand.h"
 #include "frc2/command/ProxyCommand.h"
 #include "frc2/command/RepeatCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
@@ -163,6 +166,15 @@ CommandPtr CommandPtr::Unless(std::function<bool()> condition) && {
 CommandPtr CommandPtr::OnlyIf(std::function<bool()> condition) && {
   AssertValid();
   return std::move(*this).Unless(std::not_fn(std::move(condition)));
+}
+
+CommandPtr CommandPtr::WithDeadline(CommandPtr&& deadline) && {
+  AssertValid();
+  std::vector<std::unique_ptr<Command>> vec;
+  vec.emplace_back(std::move(m_ptr));
+  m_ptr = std::make_unique<ParallelDeadlineGroup>(std::move(deadline).Unwrap(),
+                                                  std::move(vec));
+  return std::move(*this);
 }
 
 CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {

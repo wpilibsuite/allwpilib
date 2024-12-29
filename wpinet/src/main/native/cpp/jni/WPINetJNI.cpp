@@ -4,6 +4,11 @@
 
 #include <jni.h>
 
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <wpi/jni_util.h>
 
 #include "../MulticastHandleManager.h"
@@ -11,6 +16,7 @@
 #include "wpinet/MulticastServiceAnnouncer.h"
 #include "wpinet/MulticastServiceResolver.h"
 #include "wpinet/PortForwarder.h"
+#include "wpinet/WebServer.h"
 
 using namespace wpi::java;
 
@@ -73,6 +79,31 @@ Java_edu_wpi_first_net_WPINetJNI_removePortForwarder
   (JNIEnv* env, jclass, jint port)
 {
   wpi::PortForwarder::GetInstance().Remove(port);
+}
+
+/*
+ * Class:     edu_wpi_first_net_WPINetJNI
+ * Method:    startWebServer
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_net_WPINetJNI_startWebServer
+  (JNIEnv* env, jclass, jint port, jstring path)
+{
+  wpi::WebServer::GetInstance().Start(static_cast<unsigned int>(port),
+                                      JStringRef{env, path}.str());
+}
+
+/*
+ * Class:     edu_wpi_first_net_WPINetJNI
+ * Method:    stopWebServer
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_net_WPINetJNI_stopWebServer
+  (JNIEnv* env, jclass, jint port)
+{
+  wpi::WebServer::GetInstance().Stop(port);
 }
 
 /*

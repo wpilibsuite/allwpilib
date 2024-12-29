@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <memory>
 #include <utility>
 
@@ -13,8 +14,13 @@
 
 namespace nt {
 
+template <typename T>
+concept HandleType = requires {
+  { T::kType } -> std::convertible_to<NT_Handle>;
+};
+
 // Utility wrapper class for our UidVectors
-template <typename T, size_t Size>
+template <HandleType T, size_t Size>
 class HandleMap : public wpi::UidVector<std::unique_ptr<T>, Size> {
  public:
   template <typename... Args>

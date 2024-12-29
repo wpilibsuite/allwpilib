@@ -18,48 +18,51 @@ import us.hebi.quickbuf.ProtoUtil;
 import us.hebi.quickbuf.RepeatedByte;
 
 public final class Controller {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(1684,
-    "ChBjb250cm9sbGVyLnByb3RvEgl3cGkucHJvdG8iWAoWUHJvdG9idWZBcm1GZWVkZm9yd2FyZBIOCgJr" + 
-    "cxgBIAEoAVICa3MSDgoCa2cYAiABKAFSAmtnEg4KAmt2GAMgASgBUgJrdhIOCgJrYRgEIAEoAVICa2Ei" + 
-    "ngEKJFByb3RvYnVmRGlmZmVyZW50aWFsRHJpdmVGZWVkZm9yd2FyZBIbCglrdl9saW5lYXIYASABKAFS" + 
-    "CGt2TGluZWFyEhsKCWthX2xpbmVhchgCIAEoAVIIa2FMaW5lYXISHQoKa3ZfYW5ndWxhchgDIAEoAVIJ" + 
-    "a3ZBbmd1bGFyEh0KCmthX2FuZ3VsYXIYBCABKAFSCWthQW5ndWxhciJdChtQcm90b2J1ZkVsZXZhdG9y" + 
-    "RmVlZGZvcndhcmQSDgoCa3MYASABKAFSAmtzEg4KAmtnGAIgASgBUgJrZxIOCgJrdhgDIAEoAVICa3YS" + 
-    "DgoCa2EYBCABKAFSAmthIlAKHlByb3RvYnVmU2ltcGxlTW90b3JGZWVkZm9yd2FyZBIOCgJrcxgBIAEo" + 
-    "AVICa3MSDgoCa3YYAiABKAFSAmt2Eg4KAmthGAMgASgBUgJrYSJSCiZQcm90b2J1ZkRpZmZlcmVudGlh" + 
-    "bERyaXZlV2hlZWxWb2x0YWdlcxISCgRsZWZ0GAEgASgBUgRsZWZ0EhQKBXJpZ2h0GAIgASgBUgVyaWdo" + 
-    "dEIaChhlZHUud3BpLmZpcnN0Lm1hdGgucHJvdG9K0AgKBhIEAAAkAQoICgEMEgMAABIKCAoBAhIDAgAS" + 
-    "CggKAQgSAwQAMQoJCgIIARIDBAAxCgoKAgQAEgQGAAsBCgoKAwQAARIDBggeCgsKBAQAAgASAwcCEAoM" + 
-    "CgUEAAIABRIDBwIICgwKBQQAAgABEgMHCQsKDAoFBAACAAMSAwcODwoLCgQEAAIBEgMIAhAKDAoFBAAC" + 
-    "AQUSAwgCCAoMCgUEAAIBARIDCAkLCgwKBQQAAgEDEgMIDg8KCwoEBAACAhIDCQIQCgwKBQQAAgIFEgMJ" + 
-    "AggKDAoFBAACAgESAwkJCwoMCgUEAAICAxIDCQ4PCgsKBAQAAgMSAwoCEAoMCgUEAAIDBRIDCgIICgwK" + 
-    "BQQAAgMBEgMKCQsKDAoFBAACAwMSAwoODwoKCgIEARIEDQASAQoKCgMEAQESAw0ILAoLCgQEAQIAEgMO" + 
-    "AhcKDAoFBAECAAUSAw4CCAoMCgUEAQIAARIDDgkSCgwKBQQBAgADEgMOFRYKCwoEBAECARIDDwIXCgwK" + 
-    "BQQBAgEFEgMPAggKDAoFBAECAQESAw8JEgoMCgUEAQIBAxIDDxUWCgsKBAQBAgISAxACGAoMCgUEAQIC" + 
-    "BRIDEAIICgwKBQQBAgIBEgMQCRMKDAoFBAECAgMSAxAWFwoLCgQEAQIDEgMRAhgKDAoFBAECAwUSAxEC" + 
-    "CAoMCgUEAQIDARIDEQkTCgwKBQQBAgMDEgMRFhcKCgoCBAISBBQAGQEKCgoDBAIBEgMUCCMKCwoEBAIC" + 
-    "ABIDFQIQCgwKBQQCAgAFEgMVAggKDAoFBAICAAESAxUJCwoMCgUEAgIAAxIDFQ4PCgsKBAQCAgESAxYC",
-    "EAoMCgUEAgIBBRIDFgIICgwKBQQCAgEBEgMWCQsKDAoFBAICAQMSAxYODwoLCgQEAgICEgMXAhAKDAoF" + 
-    "BAICAgUSAxcCCAoMCgUEAgICARIDFwkLCgwKBQQCAgIDEgMXDg8KCwoEBAICAxIDGAIQCgwKBQQCAgMF" + 
-    "EgMYAggKDAoFBAICAwESAxgJCwoMCgUEAgIDAxIDGA4PCgoKAgQDEgQbAB8BCgoKAwQDARIDGwgmCgsK" + 
-    "BAQDAgASAxwCEAoMCgUEAwIABRIDHAIICgwKBQQDAgABEgMcCQsKDAoFBAMCAAMSAxwODwoLCgQEAwIB" + 
-    "EgMdAhAKDAoFBAMCAQUSAx0CCAoMCgUEAwIBARIDHQkLCgwKBQQDAgEDEgMdDg8KCwoEBAMCAhIDHgIQ" + 
-    "CgwKBQQDAgIFEgMeAggKDAoFBAMCAgESAx4JCwoMCgUEAwICAxIDHg4PCgoKAgQEEgQhACQBCgoKAwQE" + 
-    "ARIDIQguCgsKBAQEAgASAyICEgoMCgUEBAIABRIDIgIICgwKBQQEAgABEgMiCQ0KDAoFBAQCAAMSAyIQ" + 
-    "EQoLCgQEBAIBEgMjAhMKDAoFBAQCAQUSAyMCCAoMCgUEBAIBARIDIwkOCgwKBQQEAgEDEgMjERJiBnBy" + 
-    "b3RvMw==");
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(1897,
+    "ChBjb250cm9sbGVyLnByb3RvEgl3cGkucHJvdG8iaAoWUHJvdG9idWZBcm1GZWVkZm9yd2FyZBIOCgJr" + 
+    "cxgBIAEoAVICa3MSDgoCa2cYAiABKAFSAmtnEg4KAmt2GAMgASgBUgJrdhIOCgJrYRgEIAEoAVICa2ES" + 
+    "DgoCZHQYBSABKAFSAmR0Ip4BCiRQcm90b2J1ZkRpZmZlcmVudGlhbERyaXZlRmVlZGZvcndhcmQSGwoJ" + 
+    "a3ZfbGluZWFyGAEgASgBUghrdkxpbmVhchIbCglrYV9saW5lYXIYAiABKAFSCGthTGluZWFyEh0KCmt2" + 
+    "X2FuZ3VsYXIYAyABKAFSCWt2QW5ndWxhchIdCgprYV9hbmd1bGFyGAQgASgBUglrYUFuZ3VsYXIibQob" + 
+    "UHJvdG9idWZFbGV2YXRvckZlZWRmb3J3YXJkEg4KAmtzGAEgASgBUgJrcxIOCgJrZxgCIAEoAVICa2cS" + 
+    "DgoCa3YYAyABKAFSAmt2Eg4KAmthGAQgASgBUgJrYRIOCgJkdBgFIAEoAVICZHQiYAoeUHJvdG9idWZT" + 
+    "aW1wbGVNb3RvckZlZWRmb3J3YXJkEg4KAmtzGAEgASgBUgJrcxIOCgJrdhgCIAEoAVICa3YSDgoCa2EY" + 
+    "AyABKAFSAmthEg4KAmR0GAQgASgBUgJkdCJSCiZQcm90b2J1ZkRpZmZlcmVudGlhbERyaXZlV2hlZWxW" + 
+    "b2x0YWdlcxISCgRsZWZ0GAEgASgBUgRsZWZ0EhQKBXJpZ2h0GAIgASgBUgVyaWdodEIaChhlZHUud3Bp" + 
+    "LmZpcnN0Lm1hdGgucHJvdG9K9QkKBhIEAAAnAQoICgEMEgMAABIKCAoBAhIDAgASCggKAQgSAwQAMQoJ" + 
+    "CgIIARIDBAAxCgoKAgQAEgQGAAwBCgoKAwQAARIDBggeCgsKBAQAAgASAwcCEAoMCgUEAAIABRIDBwII" + 
+    "CgwKBQQAAgABEgMHCQsKDAoFBAACAAMSAwcODwoLCgQEAAIBEgMIAhAKDAoFBAACAQUSAwgCCAoMCgUE" + 
+    "AAIBARIDCAkLCgwKBQQAAgEDEgMIDg8KCwoEBAACAhIDCQIQCgwKBQQAAgIFEgMJAggKDAoFBAACAgES" + 
+    "AwkJCwoMCgUEAAICAxIDCQ4PCgsKBAQAAgMSAwoCEAoMCgUEAAIDBRIDCgIICgwKBQQAAgMBEgMKCQsK" + 
+    "DAoFBAACAwMSAwoODwoLCgQEAAIEEgMLAhAKDAoFBAACBAUSAwsCCAoMCgUEAAIEARIDCwkLCgwKBQQA" + 
+    "AgQDEgMLDg8KCgoCBAESBA4AEwEKCgoDBAEBEgMOCCwKCwoEBAECABIDDwIXCgwKBQQBAgAFEgMPAggK" + 
+    "DAoFBAECAAESAw8JEgoMCgUEAQIAAxIDDxUWCgsKBAQBAgESAxACFwoMCgUEAQIBBRIDEAIICgwKBQQB" + 
+    "AgEBEgMQCRIKDAoFBAECAQMSAxAVFgoLCgQEAQICEgMRAhgKDAoFBAECAgUSAxECCAoMCgUEAQICARID" + 
+    "EQkTCgwKBQQBAgIDEgMRFhcKCwoEBAECAxIDEgIYCgwKBQQBAgMFEgMSAggKDAoFBAECAwESAxIJEwoM",
+    "CgUEAQIDAxIDEhYXCgoKAgQCEgQVABsBCgoKAwQCARIDFQgjCgsKBAQCAgASAxYCEAoMCgUEAgIABRID" + 
+    "FgIICgwKBQQCAgABEgMWCQsKDAoFBAICAAMSAxYODwoLCgQEAgIBEgMXAhAKDAoFBAICAQUSAxcCCAoM" + 
+    "CgUEAgIBARIDFwkLCgwKBQQCAgEDEgMXDg8KCwoEBAICAhIDGAIQCgwKBQQCAgIFEgMYAggKDAoFBAIC" + 
+    "AgESAxgJCwoMCgUEAgICAxIDGA4PCgsKBAQCAgMSAxkCEAoMCgUEAgIDBRIDGQIICgwKBQQCAgMBEgMZ" + 
+    "CQsKDAoFBAICAwMSAxkODwoLCgQEAgIEEgMaAhAKDAoFBAICBAUSAxoCCAoMCgUEAgIEARIDGgkLCgwK" + 
+    "BQQCAgQDEgMaDg8KCgoCBAMSBB0AIgEKCgoDBAMBEgMdCCYKCwoEBAMCABIDHgIQCgwKBQQDAgAFEgMe" + 
+    "AggKDAoFBAMCAAESAx4JCwoMCgUEAwIAAxIDHg4PCgsKBAQDAgESAx8CEAoMCgUEAwIBBRIDHwIICgwK" + 
+    "BQQDAgEBEgMfCQsKDAoFBAMCAQMSAx8ODwoLCgQEAwICEgMgAhAKDAoFBAMCAgUSAyACCAoMCgUEAwIC" + 
+    "ARIDIAkLCgwKBQQDAgIDEgMgDg8KCwoEBAMCAxIDIQIQCgwKBQQDAgMFEgMhAggKDAoFBAMCAwESAyEJ" + 
+    "CwoMCgUEAwIDAxIDIQ4PCgoKAgQEEgQkACcBCgoKAwQEARIDJAguCgsKBAQEAgASAyUCEgoMCgUEBAIA" + 
+    "BRIDJQIICgwKBQQEAgABEgMlCQ0KDAoFBAQCAAMSAyUQEQoLCgQEBAIBEgMmAhMKDAoFBAQCAQUSAyYC" + 
+    "CAoMCgUEBAIBARIDJgkOCgwKBQQEAgEDEgMmERJiBnByb3RvMw==");
 
   static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("controller.proto", "wpi.proto", descriptorData);
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufArmFeedforward_descriptor = descriptor.internalContainedType(31, 88, "ProtobufArmFeedforward", "wpi.proto.ProtobufArmFeedforward");
+  static final Descriptors.Descriptor wpi_proto_ProtobufArmFeedforward_descriptor = descriptor.internalContainedType(31, 104, "ProtobufArmFeedforward", "wpi.proto.ProtobufArmFeedforward");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialDriveFeedforward_descriptor = descriptor.internalContainedType(122, 158, "ProtobufDifferentialDriveFeedforward", "wpi.proto.ProtobufDifferentialDriveFeedforward");
+  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialDriveFeedforward_descriptor = descriptor.internalContainedType(138, 158, "ProtobufDifferentialDriveFeedforward", "wpi.proto.ProtobufDifferentialDriveFeedforward");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufElevatorFeedforward_descriptor = descriptor.internalContainedType(282, 93, "ProtobufElevatorFeedforward", "wpi.proto.ProtobufElevatorFeedforward");
+  static final Descriptors.Descriptor wpi_proto_ProtobufElevatorFeedforward_descriptor = descriptor.internalContainedType(298, 109, "ProtobufElevatorFeedforward", "wpi.proto.ProtobufElevatorFeedforward");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufSimpleMotorFeedforward_descriptor = descriptor.internalContainedType(377, 80, "ProtobufSimpleMotorFeedforward", "wpi.proto.ProtobufSimpleMotorFeedforward");
+  static final Descriptors.Descriptor wpi_proto_ProtobufSimpleMotorFeedforward_descriptor = descriptor.internalContainedType(409, 96, "ProtobufSimpleMotorFeedforward", "wpi.proto.ProtobufSimpleMotorFeedforward");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialDriveWheelVoltages_descriptor = descriptor.internalContainedType(459, 82, "ProtobufDifferentialDriveWheelVoltages", "wpi.proto.ProtobufDifferentialDriveWheelVoltages");
+  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialDriveWheelVoltages_descriptor = descriptor.internalContainedType(507, 82, "ProtobufDifferentialDriveWheelVoltages", "wpi.proto.ProtobufDifferentialDriveWheelVoltages");
 
   /**
    * @return this proto file's descriptor.
@@ -93,6 +96,11 @@ public final class Controller {
      * <code>optional double ka = 4;</code>
      */
     private double ka;
+
+    /**
+     * <code>optional double dt = 5;</code>
+     */
+    private double dt;
 
     private ProtobufArmFeedforward() {
     }
@@ -252,6 +260,43 @@ public final class Controller {
       return this;
     }
 
+    /**
+     * <code>optional double dt = 5;</code>
+     * @return whether the dt field is set
+     */
+    public boolean hasDt() {
+      return (bitField0_ & 0x00000010) != 0;
+    }
+
+    /**
+     * <code>optional double dt = 5;</code>
+     * @return this
+     */
+    public ProtobufArmFeedforward clearDt() {
+      bitField0_ &= ~0x00000010;
+      dt = 0D;
+      return this;
+    }
+
+    /**
+     * <code>optional double dt = 5;</code>
+     * @return the dt
+     */
+    public double getDt() {
+      return dt;
+    }
+
+    /**
+     * <code>optional double dt = 5;</code>
+     * @param value the dt to set
+     * @return this
+     */
+    public ProtobufArmFeedforward setDt(final double value) {
+      bitField0_ |= 0x00000010;
+      dt = value;
+      return this;
+    }
+
     @Override
     public ProtobufArmFeedforward copyFrom(final ProtobufArmFeedforward other) {
       cachedSize = other.cachedSize;
@@ -261,6 +306,7 @@ public final class Controller {
         kg = other.kg;
         kv = other.kv;
         ka = other.ka;
+        dt = other.dt;
       }
       return this;
     }
@@ -283,6 +329,9 @@ public final class Controller {
       if (other.hasKa()) {
         setKa(other.ka);
       }
+      if (other.hasDt()) {
+        setDt(other.dt);
+      }
       return this;
     }
 
@@ -297,6 +346,7 @@ public final class Controller {
       kg = 0D;
       kv = 0D;
       ka = 0D;
+      dt = 0D;
       return this;
     }
 
@@ -323,7 +373,8 @@ public final class Controller {
         && (!hasKs() || ProtoUtil.isEqual(ks, other.ks))
         && (!hasKg() || ProtoUtil.isEqual(kg, other.kg))
         && (!hasKv() || ProtoUtil.isEqual(kv, other.kv))
-        && (!hasKa() || ProtoUtil.isEqual(ka, other.ka));
+        && (!hasKa() || ProtoUtil.isEqual(ka, other.ka))
+        && (!hasDt() || ProtoUtil.isEqual(dt, other.dt));
     }
 
     @Override
@@ -344,6 +395,10 @@ public final class Controller {
         output.writeRawByte((byte) 33);
         output.writeDoubleNoTag(ka);
       }
+      if ((bitField0_ & 0x00000010) != 0) {
+        output.writeRawByte((byte) 41);
+        output.writeDoubleNoTag(dt);
+      }
     }
 
     @Override
@@ -359,6 +414,9 @@ public final class Controller {
         size += 9;
       }
       if ((bitField0_ & 0x00000008) != 0) {
+        size += 9;
+      }
+      if ((bitField0_ & 0x00000010) != 0) {
         size += 9;
       }
       return size;
@@ -403,6 +461,15 @@ public final class Controller {
             ka = input.readDouble();
             bitField0_ |= 0x00000008;
             tag = input.readTag();
+            if (tag != 41) {
+              break;
+            }
+          }
+          case 41: {
+            // dt
+            dt = input.readDouble();
+            bitField0_ |= 0x00000010;
+            tag = input.readTag();
             if (tag != 0) {
               break;
             }
@@ -435,6 +502,9 @@ public final class Controller {
       }
       if ((bitField0_ & 0x00000008) != 0) {
         output.writeDouble(FieldNames.ka, ka);
+      }
+      if ((bitField0_ & 0x00000010) != 0) {
+        output.writeDouble(FieldNames.dt, dt);
       }
       output.endObject();
     }
@@ -484,6 +554,17 @@ public final class Controller {
               if (!input.trySkipNullValue()) {
                 ka = input.readDouble();
                 bitField0_ |= 0x00000008;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case 3216: {
+            if (input.isAtField(FieldNames.dt)) {
+              if (!input.trySkipNullValue()) {
+                dt = input.readDouble();
+                bitField0_ |= 0x00000010;
               }
             } else {
               input.skipUnknownField();
@@ -557,6 +638,8 @@ public final class Controller {
       static final FieldName kv = FieldName.forField("kv");
 
       static final FieldName ka = FieldName.forField("ka");
+
+      static final FieldName dt = FieldName.forField("dt");
     }
   }
 
@@ -1088,6 +1171,11 @@ public final class Controller {
      */
     private double ka;
 
+    /**
+     * <code>optional double dt = 5;</code>
+     */
+    private double dt;
+
     private ProtobufElevatorFeedforward() {
     }
 
@@ -1246,6 +1334,43 @@ public final class Controller {
       return this;
     }
 
+    /**
+     * <code>optional double dt = 5;</code>
+     * @return whether the dt field is set
+     */
+    public boolean hasDt() {
+      return (bitField0_ & 0x00000010) != 0;
+    }
+
+    /**
+     * <code>optional double dt = 5;</code>
+     * @return this
+     */
+    public ProtobufElevatorFeedforward clearDt() {
+      bitField0_ &= ~0x00000010;
+      dt = 0D;
+      return this;
+    }
+
+    /**
+     * <code>optional double dt = 5;</code>
+     * @return the dt
+     */
+    public double getDt() {
+      return dt;
+    }
+
+    /**
+     * <code>optional double dt = 5;</code>
+     * @param value the dt to set
+     * @return this
+     */
+    public ProtobufElevatorFeedforward setDt(final double value) {
+      bitField0_ |= 0x00000010;
+      dt = value;
+      return this;
+    }
+
     @Override
     public ProtobufElevatorFeedforward copyFrom(final ProtobufElevatorFeedforward other) {
       cachedSize = other.cachedSize;
@@ -1255,6 +1380,7 @@ public final class Controller {
         kg = other.kg;
         kv = other.kv;
         ka = other.ka;
+        dt = other.dt;
       }
       return this;
     }
@@ -1277,6 +1403,9 @@ public final class Controller {
       if (other.hasKa()) {
         setKa(other.ka);
       }
+      if (other.hasDt()) {
+        setDt(other.dt);
+      }
       return this;
     }
 
@@ -1291,6 +1420,7 @@ public final class Controller {
       kg = 0D;
       kv = 0D;
       ka = 0D;
+      dt = 0D;
       return this;
     }
 
@@ -1317,7 +1447,8 @@ public final class Controller {
         && (!hasKs() || ProtoUtil.isEqual(ks, other.ks))
         && (!hasKg() || ProtoUtil.isEqual(kg, other.kg))
         && (!hasKv() || ProtoUtil.isEqual(kv, other.kv))
-        && (!hasKa() || ProtoUtil.isEqual(ka, other.ka));
+        && (!hasKa() || ProtoUtil.isEqual(ka, other.ka))
+        && (!hasDt() || ProtoUtil.isEqual(dt, other.dt));
     }
 
     @Override
@@ -1338,6 +1469,10 @@ public final class Controller {
         output.writeRawByte((byte) 33);
         output.writeDoubleNoTag(ka);
       }
+      if ((bitField0_ & 0x00000010) != 0) {
+        output.writeRawByte((byte) 41);
+        output.writeDoubleNoTag(dt);
+      }
     }
 
     @Override
@@ -1353,6 +1488,9 @@ public final class Controller {
         size += 9;
       }
       if ((bitField0_ & 0x00000008) != 0) {
+        size += 9;
+      }
+      if ((bitField0_ & 0x00000010) != 0) {
         size += 9;
       }
       return size;
@@ -1397,6 +1535,15 @@ public final class Controller {
             ka = input.readDouble();
             bitField0_ |= 0x00000008;
             tag = input.readTag();
+            if (tag != 41) {
+              break;
+            }
+          }
+          case 41: {
+            // dt
+            dt = input.readDouble();
+            bitField0_ |= 0x00000010;
+            tag = input.readTag();
             if (tag != 0) {
               break;
             }
@@ -1429,6 +1576,9 @@ public final class Controller {
       }
       if ((bitField0_ & 0x00000008) != 0) {
         output.writeDouble(FieldNames.ka, ka);
+      }
+      if ((bitField0_ & 0x00000010) != 0) {
+        output.writeDouble(FieldNames.dt, dt);
       }
       output.endObject();
     }
@@ -1478,6 +1628,17 @@ public final class Controller {
               if (!input.trySkipNullValue()) {
                 ka = input.readDouble();
                 bitField0_ |= 0x00000008;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case 3216: {
+            if (input.isAtField(FieldNames.dt)) {
+              if (!input.trySkipNullValue()) {
+                dt = input.readDouble();
+                bitField0_ |= 0x00000010;
               }
             } else {
               input.skipUnknownField();
@@ -1552,6 +1713,8 @@ public final class Controller {
       static final FieldName kv = FieldName.forField("kv");
 
       static final FieldName ka = FieldName.forField("ka");
+
+      static final FieldName dt = FieldName.forField("dt");
     }
   }
 
@@ -1575,6 +1738,11 @@ public final class Controller {
      * <code>optional double ka = 3;</code>
      */
     private double ka;
+
+    /**
+     * <code>optional double dt = 4;</code>
+     */
+    private double dt;
 
     private ProtobufSimpleMotorFeedforward() {
     }
@@ -1697,6 +1865,43 @@ public final class Controller {
       return this;
     }
 
+    /**
+     * <code>optional double dt = 4;</code>
+     * @return whether the dt field is set
+     */
+    public boolean hasDt() {
+      return (bitField0_ & 0x00000008) != 0;
+    }
+
+    /**
+     * <code>optional double dt = 4;</code>
+     * @return this
+     */
+    public ProtobufSimpleMotorFeedforward clearDt() {
+      bitField0_ &= ~0x00000008;
+      dt = 0D;
+      return this;
+    }
+
+    /**
+     * <code>optional double dt = 4;</code>
+     * @return the dt
+     */
+    public double getDt() {
+      return dt;
+    }
+
+    /**
+     * <code>optional double dt = 4;</code>
+     * @param value the dt to set
+     * @return this
+     */
+    public ProtobufSimpleMotorFeedforward setDt(final double value) {
+      bitField0_ |= 0x00000008;
+      dt = value;
+      return this;
+    }
+
     @Override
     public ProtobufSimpleMotorFeedforward copyFrom(final ProtobufSimpleMotorFeedforward other) {
       cachedSize = other.cachedSize;
@@ -1705,6 +1910,7 @@ public final class Controller {
         ks = other.ks;
         kv = other.kv;
         ka = other.ka;
+        dt = other.dt;
       }
       return this;
     }
@@ -1724,6 +1930,9 @@ public final class Controller {
       if (other.hasKa()) {
         setKa(other.ka);
       }
+      if (other.hasDt()) {
+        setDt(other.dt);
+      }
       return this;
     }
 
@@ -1737,6 +1946,7 @@ public final class Controller {
       ks = 0D;
       kv = 0D;
       ka = 0D;
+      dt = 0D;
       return this;
     }
 
@@ -1762,7 +1972,8 @@ public final class Controller {
       return bitField0_ == other.bitField0_
         && (!hasKs() || ProtoUtil.isEqual(ks, other.ks))
         && (!hasKv() || ProtoUtil.isEqual(kv, other.kv))
-        && (!hasKa() || ProtoUtil.isEqual(ka, other.ka));
+        && (!hasKa() || ProtoUtil.isEqual(ka, other.ka))
+        && (!hasDt() || ProtoUtil.isEqual(dt, other.dt));
     }
 
     @Override
@@ -1779,6 +1990,10 @@ public final class Controller {
         output.writeRawByte((byte) 25);
         output.writeDoubleNoTag(ka);
       }
+      if ((bitField0_ & 0x00000008) != 0) {
+        output.writeRawByte((byte) 33);
+        output.writeDoubleNoTag(dt);
+      }
     }
 
     @Override
@@ -1791,6 +2006,9 @@ public final class Controller {
         size += 9;
       }
       if ((bitField0_ & 0x00000004) != 0) {
+        size += 9;
+      }
+      if ((bitField0_ & 0x00000008) != 0) {
         size += 9;
       }
       return size;
@@ -1826,6 +2044,15 @@ public final class Controller {
             ka = input.readDouble();
             bitField0_ |= 0x00000004;
             tag = input.readTag();
+            if (tag != 33) {
+              break;
+            }
+          }
+          case 33: {
+            // dt
+            dt = input.readDouble();
+            bitField0_ |= 0x00000008;
+            tag = input.readTag();
             if (tag != 0) {
               break;
             }
@@ -1855,6 +2082,9 @@ public final class Controller {
       }
       if ((bitField0_ & 0x00000004) != 0) {
         output.writeDouble(FieldNames.ka, ka);
+      }
+      if ((bitField0_ & 0x00000008) != 0) {
+        output.writeDouble(FieldNames.dt, dt);
       }
       output.endObject();
     }
@@ -1893,6 +2123,17 @@ public final class Controller {
               if (!input.trySkipNullValue()) {
                 ka = input.readDouble();
                 bitField0_ |= 0x00000004;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case 3216: {
+            if (input.isAtField(FieldNames.dt)) {
+              if (!input.trySkipNullValue()) {
+                dt = input.readDouble();
+                bitField0_ |= 0x00000008;
               }
             } else {
               input.skipUnknownField();
@@ -1966,6 +2207,8 @@ public final class Controller {
       static final FieldName kv = FieldName.forField("kv");
 
       static final FieldName ka = FieldName.forField("ka");
+
+      static final FieldName dt = FieldName.forField("dt");
     }
   }
 

@@ -5,15 +5,17 @@
 #include "sysid/analysis/AnalysisManager.h"
 
 #include <cmath>
-#include <functional>
+#include <limits>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <units/angle.h>
 #include <wpi/MathExtras.h>
-#include <wpi/MemoryBuffer.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 
+#include "sysid/analysis/FeedforwardAnalysis.h"
 #include "sysid/analysis/FilteringUtils.h"
 
 using namespace sysid;
@@ -88,8 +90,8 @@ static void CopyRawData(wpi::StringMap<MotorData>* dataset) {
   auto& data = *dataset;
   // Loads the Raw Data
   for (auto& it : data) {
-    auto key = it.first();
-    auto& motorData = it.getValue();
+    auto& key = it.first;
+    auto& motorData = it.second;
 
     if (!wpi::contains(key, "raw")) {
       data[fmt::format("raw-{}", key)] = motorData;
@@ -124,7 +126,7 @@ void AnalysisManager::PrepareGeneralData() {
   WPI_INFO(m_logger, "{}", "Converting raw data to PreparedData struct.");
   // Convert data to PreparedData structs
   for (auto& it : m_data.motorData) {
-    auto key = it.first();
+    auto key = it.first;
     preparedData[key] = ConvertToPrepared(m_data.motorData[key]);
     WPI_INFO(m_logger, "SAMPLES {}", preparedData[key].size());
   }
@@ -172,7 +174,7 @@ AnalysisManager::AnalysisManager(TestData data, Settings& settings,
                                  wpi::Logger& logger)
     : m_data{std::move(data)}, m_logger{logger}, m_settings{settings} {
   // Reset settings for Dynamic Test Limits
-  m_settings.stepTestDuration = units::second_t{0.0};
+  m_settings.stepTestDuration = 0_s;
   m_settings.velocityThreshold = std::numeric_limits<double>::infinity();
 }
 

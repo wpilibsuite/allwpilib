@@ -4,7 +4,8 @@
 
 #include "frc/RobotController.h"
 
-#include <cstddef>
+#include <functional>
+#include <string>
 
 #include <hal/CAN.h>
 #include <hal/HALBase.h>
@@ -14,6 +15,10 @@
 #include "frc/Errors.h"
 
 using namespace frc;
+
+std::function<uint64_t()> RobotController::m_timeSource = [] {
+  return RobotController::GetFPGATime();
+};
 
 int RobotController::GetFPGAVersion() {
   int32_t status = 0;
@@ -49,6 +54,14 @@ int32_t RobotController::GetTeamNumber() {
   return HAL_GetTeamNumber();
 }
 
+void RobotController::SetTimeSource(std::function<uint64_t()> supplier) {
+  m_timeSource = supplier;
+}
+
+uint64_t RobotController::GetTime() {
+  return m_timeSource();
+}
+
 uint64_t RobotController::GetFPGATime() {
   int32_t status = 0;
   uint64_t time = HAL_GetFPGATime(&status);
@@ -81,6 +94,13 @@ bool RobotController::IsBrownedOut() {
   int32_t status = 0;
   bool retVal = HAL_GetBrownedOut(&status);
   FRC_CheckErrorStatus(status, "IsBrownedOut");
+  return retVal;
+}
+
+int RobotController::GetCommsDisableCount() {
+  int32_t status = 0;
+  int retVal = HAL_GetCommsDisableCount(&status);
+  FRC_CheckErrorStatus(status, "GetCommsDisableCount");
   return retVal;
 }
 
@@ -212,6 +232,12 @@ int RobotController::GetFaultCount6V() {
   int retVal = HAL_GetUserCurrentFaults6V(&status);
   FRC_CheckErrorStatus(status, "GetFaultCount6V");
   return retVal;
+}
+
+void RobotController::ResetRailFaultCounts() {
+  int32_t status = 0;
+  HAL_ResetUserCurrentFaults(&status);
+  FRC_CheckErrorStatus(status, "ResetRailFaultCounts");
 }
 
 units::volt_t RobotController::GetBrownoutVoltage() {

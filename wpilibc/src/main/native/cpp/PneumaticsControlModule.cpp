@@ -4,6 +4,9 @@
 
 #include "frc/PneumaticsControlModule.h"
 
+#include <memory>
+#include <string>
+
 #include <hal/CTREPCM.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>
@@ -264,7 +267,7 @@ void PneumaticsControlModule::UnreserveCompressor() {
 }
 
 units::volt_t PneumaticsControlModule::GetAnalogVoltage(int channel) const {
-  return units::volt_t{0};
+  return 0_V;
 }
 
 units::pounds_per_square_inch_t PneumaticsControlModule::GetPressure(

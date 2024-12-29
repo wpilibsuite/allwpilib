@@ -235,19 +235,20 @@ EIGEN_CATCH_ASSIGN_XPR_OP_PRODUCT(sub_assign_op, scalar_difference_op, add_assig
 
 template <typename Lhs, typename Rhs>
 struct generic_product_impl<Lhs, Rhs, DenseShape, DenseShape, InnerProduct> {
+  using impl = default_inner_product_impl<Lhs, Rhs, false>;
   template <typename Dst>
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void evalTo(Dst& dst, const Lhs& lhs, const Rhs& rhs) {
-    dst.coeffRef(0, 0) = (lhs.transpose().cwiseProduct(rhs)).sum();
+    dst.coeffRef(0, 0) = impl::run(lhs, rhs);
   }
 
   template <typename Dst>
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void addTo(Dst& dst, const Lhs& lhs, const Rhs& rhs) {
-    dst.coeffRef(0, 0) += (lhs.transpose().cwiseProduct(rhs)).sum();
+    dst.coeffRef(0, 0) += impl::run(lhs, rhs);
   }
 
   template <typename Dst>
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void subTo(Dst& dst, const Lhs& lhs, const Rhs& rhs) {
-    dst.coeffRef(0, 0) -= (lhs.transpose().cwiseProduct(rhs)).sum();
+    dst.coeffRef(0, 0) -= impl::run(lhs, rhs);
   }
 };
 
@@ -810,7 +811,7 @@ struct diagonal_product_evaluator_base : evaluator_base<Derived> {
                     : (Derived::MaxColsAtCompileTime == 1 && Derived::MaxRowsAtCompileTime != 1) ? ColMajor
                     : MatrixFlags & RowMajorBit                                                  ? RowMajor
                                                                                                  : ColMajor,
-    SameStorageOrder_ = StorageOrder_ == (MatrixFlags & RowMajorBit ? RowMajor : ColMajor),
+    SameStorageOrder_ = int(StorageOrder_) == ((MatrixFlags & RowMajorBit) ? RowMajor : ColMajor),
 
     ScalarAccessOnDiag_ = !((int(StorageOrder_) == ColMajor && int(ProductOrder) == OnTheLeft) ||
                             (int(StorageOrder_) == RowMajor && int(ProductOrder) == OnTheRight)),

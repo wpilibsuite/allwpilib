@@ -29,7 +29,7 @@ class interpolating_map {
    * @param value The value.
    */
   void insert(const Key& key, const Value& value) {
-    m_container.insert(std::make_pair(key, value));
+    m_container.insert(std::pair{key, value});
   }
 
   /**
@@ -39,7 +39,7 @@ class interpolating_map {
    * @param value The value.
    */
   void insert(Key&& key, Value&& value) {
-    m_container.insert(std::make_pair(key, value));
+    m_container.insert(std::pair{key, value});
   }
 
   /**

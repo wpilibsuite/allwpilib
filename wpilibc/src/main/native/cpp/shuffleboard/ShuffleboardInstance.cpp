@@ -4,6 +4,9 @@
 
 #include "frc/shuffleboard/ShuffleboardInstance.h"
 
+#include <memory>
+#include <string>
+
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
@@ -15,7 +18,7 @@
 using namespace frc::detail;
 
 struct ShuffleboardInstance::Impl {
-  wpi::StringMap<std::unique_ptr<ShuffleboardTab>> tabs;
+  wpi::StringMap<ShuffleboardTab> tabs;
 
   bool tabsChanged = false;
   std::shared_ptr<nt::NetworkTable> rootTable;
@@ -41,25 +44,24 @@ frc::ShuffleboardTab& ShuffleboardInstance::GetTab(std::string_view title) {
     HAL_Report(HALUsageReporting::kResourceType_Shuffleboard, 0);
     gReported = true;
   }
-  if (m_impl->tabs.find(title) == m_impl->tabs.end()) {
-    m_impl->tabs.try_emplace(title,
-                             std::make_unique<ShuffleboardTab>(*this, title));
+  auto [it, added] = m_impl->tabs.try_emplace(title, *this, title);
+  if (added) {
     m_impl->tabsChanged = true;
   }
-  return *m_impl->tabs.find(title)->second;
+  return it->second;
 }
 
 void ShuffleboardInstance::Update() {
   if (m_impl->tabsChanged) {
     wpi::SmallVector<std::string, 16> tabTitles;
     for (auto& entry : m_impl->tabs) {
-      tabTitles.emplace_back(entry.second->GetTitle());
+      tabTitles.emplace_back(entry.second.GetTitle());
     }
     m_impl->rootMetaTable->GetEntry("Tabs").SetStringArray(tabTitles);
     m_impl->tabsChanged = false;
   }
   for (auto& entry : m_impl->tabs) {
-    auto& tab = *entry.second;
+    auto& tab = entry.second;
     tab.BuildInto(m_impl->rootTable,
                   m_impl->rootMetaTable->GetSubTable(tab.GetTitle()));
   }
@@ -67,7 +69,7 @@ void ShuffleboardInstance::Update() {
 
 void ShuffleboardInstance::EnableActuatorWidgets() {
   for (auto& entry : m_impl->tabs) {
-    auto& tab = *entry.second;
+    auto& tab = entry.second;
     for (auto& component : tab.GetComponents()) {
       component->EnableIfActuator();
     }
@@ -76,7 +78,7 @@ void ShuffleboardInstance::EnableActuatorWidgets() {
 
 void ShuffleboardInstance::DisableActuatorWidgets() {
   for (auto& entry : m_impl->tabs) {
-    auto& tab = *entry.second;
+    auto& tab = entry.second;
     for (auto& component : tab.GetComponents()) {
       component->DisableIfActuator();
     }

@@ -10,7 +10,10 @@
 #include <poll.h>
 
 #include <atomic>
+#include <memory>
+#include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include <wpi/SmallVector.h>

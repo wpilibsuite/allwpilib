@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Tue, 13 Jun 2023 23:58:50 -0700
-Subject: [PATCH 09/12] Disable unused function warning
+Subject: [PATCH 09/14] Disable unused function warning
 
 ---
  src/google/protobuf/generated_message_tctable_lite.cc | 4 ++++

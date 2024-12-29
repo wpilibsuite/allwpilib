@@ -4,10 +4,13 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -18,10 +21,10 @@ import edu.wpi.first.math.geometry.proto.Rotation3dProto;
 import edu.wpi.first.math.geometry.struct.Rotation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
-import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 
 /** A rotation in a 3D coordinate frame represented by a quaternion. */
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -86,6 +89,24 @@ public class Rotation3d
   }
 
   /**
+   * Constructs a Rotation3d from extrinsic roll, pitch, and yaw.
+   *
+   * <p>Extrinsic rotations occur in that order around the axes in the fixed global frame rather
+   * than the body frame.
+   *
+   * <p>Angles are measured counterclockwise with the rotation axis pointing "out of the page". If
+   * you point your right thumb along the positive axis direction, your fingers curl in the
+   * direction of positive rotation.
+   *
+   * @param roll The counterclockwise rotation angle around the X axis (roll).
+   * @param pitch The counterclockwise rotation angle around the Y axis (pitch).
+   * @param yaw The counterclockwise rotation angle around the Z axis (yaw).
+   */
+  public Rotation3d(Angle roll, Angle pitch, Angle yaw) {
+    this(roll.in(Radians), pitch.in(Radians), yaw.in(Radians));
+  }
+
+  /**
    * Constructs a Rotation3d with the given rotation vector representation. This representation is
    * equivalent to axis-angle, where the normalized axis is multiplied by the rotation around the
    * axis in radians.
@@ -113,6 +134,17 @@ public class Rotation3d
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Definition
     var v = axis.times(1.0 / norm).times(Math.sin(angleRadians / 2.0));
     m_q = new Quaternion(Math.cos(angleRadians / 2.0), v.get(0, 0), v.get(1, 0), v.get(2, 0));
+  }
+
+  /**
+   * Constructs a Rotation3d with the given axis-angle representation. The axis doesn't have to be
+   * normalized.
+   *
+   * @param axis The rotation axis.
+   * @param angle The rotation around the axis.
+   */
+  public Rotation3d(Vector<N3> axis, Angle angle) {
+    this(axis, angle.in(Radians));
   }
 
   /**
@@ -198,33 +230,59 @@ public class Rotation3d
       // there's no rotation. The default initialization of m_q will work.
       m_q = new Quaternion();
     } else if (dotNorm < -1.0 + 1E-9) {
-      // If the dot product is -1, the two vectors point in opposite directions
-      // so a 180 degree rotation is required. Any orthogonal vector can be used
-      // for it. Q in the QR decomposition is an orthonormal basis, so it
-      // contains orthogonal unit vectors.
-      var X = VecBuilder.fill(initial.get(0, 0), initial.get(1, 0), initial.get(2, 0));
-      final var qr = DecompositionFactory_DDRM.qr(3, 1);
-      qr.decompose(X.getStorage().getMatrix());
-      final var Q = qr.getQ(null, false);
+      // If the dot product is -1, the two vectors are antiparallel, so a 180°
+      // rotation is required. Any other vector can be used to generate an
+      // orthogonal one.
 
-      // w = cos(θ/2) = cos(90°) = 0
-      //
-      // For x, y, and z, we use the second column of Q because the first is
-      // parallel instead of orthogonal. The third column would also work.
-      m_q = new Quaternion(0.0, Q.get(0, 1), Q.get(1, 1), Q.get(2, 1));
+      double x = Math.abs(initial.get(0, 0));
+      double y = Math.abs(initial.get(1, 0));
+      double z = Math.abs(initial.get(2, 0));
+
+      // Find vector that is most orthogonal to initial vector
+      Vector<N3> other;
+      if (x < y) {
+        if (x < z) {
+          // Use x-axis
+          other = VecBuilder.fill(1, 0, 0);
+        } else {
+          // Use z-axis
+          other = VecBuilder.fill(0, 0, 1);
+        }
+      } else {
+        if (y < z) {
+          // Use y-axis
+          other = VecBuilder.fill(0, 1, 0);
+        } else {
+          // Use z-axis
+          other = VecBuilder.fill(0, 0, 1);
+        }
+      }
+
+      var axis = Vector.cross(initial, other);
+
+      double axisNorm = axis.norm();
+      m_q =
+          new Quaternion(
+              0.0, axis.get(0, 0) / axisNorm, axis.get(1, 0) / axisNorm, axis.get(2, 0) / axisNorm);
     } else {
-      // initial x last
-      var axis =
-          VecBuilder.fill(
-              initial.get(1, 0) * last.get(2, 0) - last.get(1, 0) * initial.get(2, 0),
-              last.get(0, 0) * initial.get(2, 0) - initial.get(0, 0) * last.get(2, 0),
-              initial.get(0, 0) * last.get(1, 0) - last.get(0, 0) * initial.get(1, 0));
+      var axis = Vector.cross(initial, last);
 
       // https://stackoverflow.com/a/11741520
       m_q =
           new Quaternion(normProduct + dot, axis.get(0, 0), axis.get(1, 0), axis.get(2, 0))
               .normalize();
     }
+  }
+
+  /**
+   * Constructs a 3D rotation from a 2D rotation in the X-Y plane.
+   *
+   * @param rotation The 2D rotation.
+   * @see Pose3d#Pose3d(Pose2d)
+   * @see Transform3d#Transform3d(Transform2d)
+   */
+  public Rotation3d(Rotation2d rotation) {
+    this(0.0, 0.0, rotation.getRadians());
   }
 
   /**
@@ -375,6 +433,33 @@ public class Rotation3d
   }
 
   /**
+   * Returns the counterclockwise rotation angle around the X axis (roll) in a measure.
+   *
+   * @return The counterclockwise rotation angle around the x axis (roll) in a measure.
+   */
+  public Angle getMeasureX() {
+    return Radians.of(getX());
+  }
+
+  /**
+   * Returns the counterclockwise rotation angle around the Y axis (pitch) in a measure.
+   *
+   * @return The counterclockwise rotation angle around the y axis (pitch) in a measure.
+   */
+  public Angle getMeasureY() {
+    return Radians.of(getY());
+  }
+
+  /**
+   * Returns the counterclockwise rotation angle around the Z axis (yaw) in a measure.
+   *
+   * @return The counterclockwise rotation angle around the z axis (yaw) in a measure.
+   */
+  public Angle getMeasureZ() {
+    return Radians.of(getZ());
+  }
+
+  /**
    * Returns the axis in the axis-angle representation of this rotation.
    *
    * @return The axis in the axis-angle representation.
@@ -398,6 +483,50 @@ public class Rotation3d
     double norm =
         Math.sqrt(m_q.getX() * m_q.getX() + m_q.getY() * m_q.getY() + m_q.getZ() * m_q.getZ());
     return 2.0 * Math.atan2(norm, m_q.getW());
+  }
+
+  /**
+   * Returns rotation matrix representation of this rotation.
+   *
+   * @return Rotation matrix representation of this rotation.
+   */
+  public Matrix<N3, N3> toMatrix() {
+    double w = m_q.getW();
+    double x = m_q.getX();
+    double y = m_q.getY();
+    double z = m_q.getZ();
+
+    // https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Quaternion-derived_rotation_matrix
+    return MatBuilder.fill(
+        Nat.N3(),
+        Nat.N3(),
+        1.0 - 2.0 * (y * y + z * z),
+        2.0 * (x * y - w * z),
+        2.0 * (x * z + w * y),
+        2.0 * (x * y + w * z),
+        1.0 - 2.0 * (x * x + z * z),
+        2.0 * (y * z - w * x),
+        2.0 * (x * z - w * y),
+        2.0 * (y * z + w * x),
+        1.0 - 2.0 * (x * x + y * y));
+  }
+
+  /**
+   * Returns rotation vector representation of this rotation.
+   *
+   * @return Rotation vector representation of this rotation.
+   */
+  public Vector<N3> toVector() {
+    return m_q.toRotationVector();
+  }
+
+  /**
+   * Returns the angle in a measure in the axis-angle representation of this rotation.
+   *
+   * @return The angle in a measure in the axis-angle representation of this rotation.
+   */
+  public Angle getMeasureAngle() {
+    return Radians.of(getAngle());
   }
 
   /**

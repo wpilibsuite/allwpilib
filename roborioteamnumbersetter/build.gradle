@@ -25,7 +25,6 @@ def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
 def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
 
 apply from: "${rootDir}/shared/libssh.gradle"
-apply from: "${rootDir}/shared/imgui.gradle"
 
 task generateCppVersion() {
     description = 'Generates the wpilib version class'
@@ -103,7 +102,8 @@ model {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                nativeUtils.useRequiredLibrary(it, 'imgui', 'libssh')
+                nativeUtils.useRequiredLibrary(it, 'libssh')
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                     it.linker.args << 'ws2_32.lib' << 'advapi32.lib' << 'crypt32.lib' << 'user32.lib'

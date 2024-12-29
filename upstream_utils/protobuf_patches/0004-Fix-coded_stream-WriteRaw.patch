@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Sat, 10 Jun 2023 15:03:38 -0700
-Subject: [PATCH 04/12] Fix coded_stream WriteRaw
+Subject: [PATCH 04/14] Fix coded_stream WriteRaw
 
 ---
  src/google/protobuf/implicit_weak_message.h | 2 +-

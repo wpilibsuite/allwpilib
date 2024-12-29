@@ -5,8 +5,11 @@
 #include "networktables/NetworkTable.h"
 
 #include <algorithm>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include <fmt/core.h>
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
@@ -422,7 +425,7 @@ NT_Listener NetworkTable::AddSubTableListener(SubTableListener listener) {
         if (notified_tables->find(sub_table_key) != notified_tables->end()) {
           return;
         }
-        notified_tables->insert(std::make_pair(sub_table_key, '\0'));
+        notified_tables->insert(std::pair{sub_table_key, '\0'});
         cb(this, sub_table_key, this->GetSubTable(sub_table_key));
       });
 }

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Sat, 10 Jun 2023 14:13:07 -0700
-Subject: [PATCH 01/12] Fix sign-compare warnings
+Subject: [PATCH 01/14] Fix sign-compare warnings
 
 ---
  src/google/protobuf/compiler/importer.cc                  | 2 +-

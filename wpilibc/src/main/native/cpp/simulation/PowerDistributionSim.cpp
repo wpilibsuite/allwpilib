@@ -5,7 +5,6 @@
 #include "frc/simulation/PowerDistributionSim.h"
 
 #include <memory>
-#include <utility>
 
 #include <hal/simulation/PowerDistributionData.h>
 

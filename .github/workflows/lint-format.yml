@@ -11,6 +11,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validation:
+    name: "Validation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v4
+
   wpiformat:
     name: "wpiformat"
     runs-on: ubuntu-22.04
@@ -22,14 +29,16 @@ jobs:
         run: |
           git checkout -b pr
           git branch -f main origin/main
-      - name: Set up Python 3.10
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: Install wpiformat
-        run: pip3 install wpiformat==2024.34
+        run: |
+          python -m venv ${{ runner.temp }}/wpiformat
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2024.51
       - name: Run
-        run: wpiformat
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat
       - name: Check output
         run: git --no-pager diff --exit-code HEAD
       - name: Generate diff
@@ -51,7 +60,8 @@ jobs:
   tidy:
     name: "clang-tidy"
     runs-on: ubuntu-22.04
-    container: wpilib/roborio-cross-ubuntu:2024-22.04
+    needs: [validation]
+    container: wpilib/ubuntu-base:22.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,26 +71,29 @@ jobs:
           git config --global --add safe.directory /__w/allwpilib/allwpilib
           git checkout -b pr
           git branch -f main origin/main
-      - name: Set up Python 3.10
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: Install wpiformat
-        run: pip3 install wpiformat==2024.34
+        run: |
+          python -m venv ${{ runner.temp }}/wpiformat
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2024.51
       - name: Create compile_commands.json
         run: |
           ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64release/compile_commands.json
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64debug/compile_commands.json
       - name: List changed files
-        run: wpiformat -list-changed-files
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -list-changed-files
       - name: Run clang-tidy release
-        run: wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64release -vv
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64release -vv
       - name: Run clang-tidy debug
-        run: wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64debug -vv
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64debug -vv
   javaformat:
     name: "Java format"
     runs-on: ubuntu-22.04
+    needs: [validation]
     container: wpilib/ubuntu-base:22.04
     steps:
       - uses: actions/checkout@v4
@@ -98,9 +111,23 @@ jobs:
       - name: Generate diff
         run: git diff HEAD > javaformat-fixes.patch
         if: ${{ failure() }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: javaformat fixes
+          path: javaformat-fixes.patch
+        if: ${{ failure() }}
+      - name: Write to job summary
+        run: |
+          echo '```diff' >> $GITHUB_STEP_SUMMARY
+          cat javaformat-fixes.patch >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        if: ${{ failure() }}
+
   documentation:
     name: "Documentation"
     runs-on: ubuntu-22.04
+    needs: [validation]
     steps:
       - uses: actions/checkout@v4
         with:

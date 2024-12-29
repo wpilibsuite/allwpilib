@@ -9,7 +9,7 @@ ext {
     groupId = 'edu.wpi.first.wpiutil'
 
     nativeName = 'wpiutil'
-    devMain = 'edu.wpi.first.wpiutil.DevMain'
+    devMain = 'edu.wpi.first.util.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
 
     splitSetup = {
@@ -17,6 +17,15 @@ ext {
             dependsOn generateTask
         }
         it.sources {
+            debuggingCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/debugging/src'
+                    include '*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/debugging/include'
+                }
+            }
             fmtlibCpp(CppSourceSet) {
                 source {
                     srcDirs 'src/main/native/thirdparty/fmtlib/src'
@@ -32,7 +41,7 @@ ext {
                     include '*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/fmtlib/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/llvm/include'
                 }
             }
             llvmCpp(CppSourceSet) {
@@ -41,7 +50,7 @@ ext {
                     include '**/*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include'
                 }
             }
             mpackCpp(CppSourceSet) {
@@ -51,6 +60,15 @@ ext {
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/thirdparty/mpack/include'
+                }
+            }
+            nanopbCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/nanopb/src'
+                    include '*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/nanopb/include'
                 }
             }
             sigslotCpp(CppSourceSet) {
@@ -100,7 +118,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/mpack/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include'
                         include '**/*.h'
                     }
                 }
@@ -114,7 +132,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include'
                         include '**/*.h'
                     }
                 }
@@ -127,7 +145,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include'
                         include '**/*.h'
                     }
                 }
@@ -140,7 +158,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include'
                         include '**/*.h'
                     }
                 }
@@ -163,46 +181,35 @@ apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 nativeUtils.exportsConfigs {
     wpiutil {
-        x64ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
+    }
+}
+
+nativeUtils.platformConfigs.each {
+    if (it.name.contains('windows')) {
+        it.cppCompiler.args.add("/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR")
     }
 }
 
 cppHeadersZip {
-    from('src/main/native/thirdparty/expected/include') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/fmtlib/include') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/json/include') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/llvm/include') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/mpack/include') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/sigslot/include') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/memory/include') {
-        into '/'
-    }
-    from('src/main/native/thirdparty/protobuf/include') {
-        into '/'
+    def thirdpartyIncDirs = [
+        'src/main/native/thirdparty/argparse/include',
+        'src/main/native/thirdparty/debugging/include',
+        'src/main/native/thirdparty/expected/include',
+        'src/main/native/thirdparty/fmtlib/include',
+        'src/main/native/thirdparty/json/include',
+        'src/main/native/thirdparty/llvm/include',
+        'src/main/native/thirdparty/mpack/include',
+        'src/main/native/thirdparty/nanopb/include',
+        'src/main/native/thirdparty/sigslot/include',
+        'src/main/native/thirdparty/memory/include',
+        'src/main/native/thirdparty/protobuf/include'
+    ]
+
+    thirdpartyIncDirs.each {
+        ext.includeDirs << project.file(it)
+        from(it) {
+            into '/'
+        }
     }
 }
 
@@ -222,6 +229,9 @@ cppSourcesZip {
     from('src/main/native/thirdparty/mpack/src') {
         into '/'
     }
+    from('src/main/native/thirdparty/nanopb/src') {
+        into '/'
+    }
     from('src/main/native/thirdparty/protobuf/src') {
         into '/'
     }
@@ -235,7 +245,27 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include', 'src/main/native/thirdparty/nanopb/include'
+                }
+            }
+        }
+    }
+    testSuites {
+        withType(GoogleTestTestSuiteSpec) {
+            sources {
+                protobufGenCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/generated/test/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/generated/test/native/cpp'
+                    }
+                }
+            }
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/test/native/include', 'src/generated/test/native/cpp'
                 }
             }
         }

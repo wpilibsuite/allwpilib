@@ -9,10 +9,8 @@
 #include <exception>
 #include <limits>
 #include <numeric>
-#include <optional>
 #include <string>
 #include <string_view>
-#include <tuple>
 #include <vector>
 
 #include <units/time.h>
@@ -23,7 +21,7 @@
 #include "sysid/analysis/AnalysisType.h"
 #include "sysid/analysis/FeedbackAnalysis.h"
 #include "sysid/analysis/FeedbackControllerPreset.h"
-#include "sysid/analysis/FeedforwardAnalysis.h"
+#include "sysid/analysis/OLS.h"
 #include "sysid/analysis/Storage.h"
 
 namespace sysid {
@@ -254,7 +252,7 @@ class AnalysisManager {
   std::string_view GetUnit() const { return m_data.distanceUnit; }
 
   /**
-   * Returns a reference to the iterator of the currently selected raw datset.
+   * Returns a reference to the iterator of the currently selected raw dataset.
    * Unfortunately, due to ImPlot internals, the reference cannot be const so
    * the user should be careful not to change any data.
    *
@@ -264,7 +262,7 @@ class AnalysisManager {
 
   /**
    * Returns a reference to the iterator of the currently selected filtered
-   * datset. Unfortunately, due to ImPlot internals, the reference cannot be
+   * dataset. Unfortunately, due to ImPlot internals, the reference cannot be
    * const so the user should be careful not to change any data.
    *
    * @return A reference to the filtered internal data.

@@ -5,18 +5,6 @@ include(CompileWarnings)
 include(AddTest)
 include(DownloadAndCheck)
 
-# workaround for makefiles - for some reason parent directories aren't created.
-file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
-file(GLOB wpimath_proto_src src/main/proto/*.proto)
-protobuf_generate_cpp(
-    WPIMATH_PROTO_SRCS
-    WPIMATH_PROTO_HDRS
-    PROTOC_OUT_DIR
-    "${CMAKE_CURRENT_BINARY_DIR}/protobuf"
-    PROTOS
-    ${wpimath_proto_src}
-)
-
 file(
     GLOB wpimath_jni_src
     src/main/native/cpp/jni/ArmFeedforwardJNI.cpp
@@ -31,8 +19,6 @@ file(
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
 
     if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.43.1.jar")
@@ -77,8 +63,6 @@ if(WITH_JAVA)
     file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
     file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
 
-    set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${EJML_JARS} ${JACKSON_JARS} ${QUICKBUF_JAR})
-
     set(CMAKE_JNI_TARGET true)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
@@ -86,8 +70,9 @@ if(WITH_JAVA)
     add_jar(
         wpimath_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS ${EJML_JARS} wpiutil_jar wpiunits_jar
+        INCLUDE_JARS wpiutil_jar wpiunits_jar ${EJML_JARS} ${JACKSON_JARS} ${QUICKBUF_JAR}
         OUTPUT_NAME wpimath
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS wpimath_jni_headers
     )
     set_property(TARGET wpimath_jar PROPERTY FOLDER "java")
@@ -109,53 +94,19 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
-    file(
-        GLOB WPIMATH_SOURCES
-        src/main/java/edu/wpi/first/math/*.java
-        src/generated/main/java/edu/wpi/first/math/Nat.java
-    )
-    file(GLOB WPIMATH_CONTROLLER_SOURCES src/main/java/edu/wpi/first/math/controller/*.java)
-    file(GLOB WPIMATH_ESTIMATOR_SOURCES src/main/java/edu/wpi/first/math/estimator/*.java)
-    file(GLOB WPIMATH_FILTER_SOURCES src/main/java/edu/wpi/first/math/filter/*.java)
-    file(GLOB WPIMATH_GEOMETRY_SOURCES src/main/java/edu/wpi/first/math/geometry/*.java)
-    file(GLOB WPIMATH_INTERPOLATION_SOURCES src/main/java/edu/wpi/first/math/interpolation/*.java)
-    file(GLOB WPIMATH_KINEMATICS_SOURCES src/main/java/edu/wpi/first/math/kinematics/*.java)
-    file(GLOB WPIMATH_NUMBERS_SOURCES src/generated/main/java/edu/wpi/first/math/numbers/*.java)
-    file(GLOB WPIMATH_SPLINE_SOURCES src/main/java/edu/wpi/first/math/spline/*.java)
-    file(GLOB WPIMATH_SYSTEM_SOURCES src/main/java/edu/wpi/first/math/system/*.java)
-    file(GLOB WPIMATH_SYSTEM_PLANT_SOURCES src/main/java/edu/wpi/first/math/system/plant/*.java)
-    file(GLOB WPIMATH_TRAJECTORY_SOURCES src/main/java/edu/wpi/first/math/trajectory/*.java)
-    file(
-        GLOB WPIMATH_TRAJECTORY_CONSTRAINT_SOURCES
-        src/main/java/edu/wpi/first/math/trajectory/constraint/*.java
-    )
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         wpimath_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/math" ${WPIMATH_SOURCES}
-        NAMESPACE "edu/wpi/first/math/controller" ${WPIMATH_CONTROLLER_SOURCES}
-        NAMESPACE "edu/wpi/first/math/estimator" ${WPIMATH_ESTIMATOR_SOURCES}
-        NAMESPACE "edu/wpi/first/math/filter" ${WPIMATH_FILTER_SOURCES}
-        NAMESPACE "edu/wpi/first/math/geometry" ${WPIMATH_GEOMETRY_SOURCES}
-        NAMESPACE "edu/wpi/first/math/interpolation" ${WPIMATH_INTERPOLATION_SOURCES}
-        NAMESPACE "edu/wpi/first/math/kinematics" ${WPIMATH_KINEMATICS_SOURCES}
-        NAMESPACE "edu/wpi/first/math/spline" ${WPIMATH_SPLINE_SOURCES}
-        NAMESPACE "edu/wpi/first/math/system" ${WPIMATH_SYSTEM_SOURCES}
-        NAMESPACE "edu/wpi/first/math/system/plant" ${WPIMATH_SYSTEM_PLANT_SOURCES}
-        NAMESPACE "edu/wpi/first/math/trajectory" ${WPIMATH_TRAJECTORY_SOURCES}
-        NAMESPACE
-            "edu/wpi/first/math/trajectory/constraint"
-            ${WPIMATH_TRAJECTORY_CONSTRAINT_SOURCES}
-        NAMESPACE "edu/wpi/first/math/util" src/main/java/edu/wpi/first/math/util/Units.java
+        BASE_DIRECTORIES
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/java
         OUTPUT_NAME wpimath-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(WPIMATH_SRC_JAR_FILE TARGET wpimath_src_jar PROPERTY JAR_FILE)
-    install(FILES ${WPIMATH_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET wpimath_src_jar PROPERTY FOLDER "java")
+
+    install_jar(wpimath_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 file(
@@ -166,7 +117,36 @@ file(
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
-add_library(wpimath ${wpimath_native_src} ${WPIMATH_PROTO_SRCS})
+
+file(GLOB_RECURSE wpimath_protobuf_native_src src/generated/main/native/cpp/wpimath/protobuf/*.cpp)
+
+add_library(protobuf OBJECT ${wpimath_protobuf_native_src})
+target_link_libraries(protobuf wpiutil)
+
+add_library(wpimath ${wpimath_native_src} $<TARGET_OBJECTS:protobuf>)
+
+if(MSVC)
+    get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+    set(CONFIG_SUFFIX "$<$<BOOL:${IS_MULTI_CONFIG}>:_$<CONFIG>>")
+    file(
+        GENERATE OUTPUT
+        ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects${CONFIG_SUFFIX}.txt
+        CONTENT $<LIST:JOIN,$<TARGET_OBJECTS:protobuf>,\n>
+    )
+    add_custom_command(
+        TARGET wpimath
+        PRE_LINK
+        COMMAND
+            cmake -E __create_def ${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports${CONFIG_SUFFIX}.def
+            ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects${CONFIG_SUFFIX}.txt
+    )
+    target_link_options(
+        wpimath
+        PRIVATE
+            /DEF:$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports${CONFIG_SUFFIX}.def>
+    )
+endif()
+
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 
@@ -190,7 +170,6 @@ if(NOT USE_SYSTEM_EIGEN)
         SYSTEM
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/eigen/include>
-            $<INSTALL_INTERFACE:${include_dest}/wpimath>
     )
 else()
     find_package(Eigen3 CONFIG REQUIRED)
@@ -198,22 +177,16 @@ else()
 endif()
 
 install(
-    DIRECTORY src/main/native/thirdparty/sleipnir/include/
+    DIRECTORY src/main/native/thirdparty/gcem/include/ src/main/native/thirdparty/sleipnir/include/
     DESTINATION "${include_dest}/wpimath"
 )
 target_include_directories(
     wpimath
     SYSTEM
     PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/src>
-)
-
-install(DIRECTORY src/main/native/thirdparty/gcem/include/ DESTINATION "${include_dest}/wpimath")
-target_include_directories(
-    wpimath
-    SYSTEM
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>
 )
 
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
@@ -221,7 +194,7 @@ target_include_directories(
     wpimath
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/protobuf>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/cpp>
         $<INSTALL_INTERFACE:${include_dest}/wpimath>
 )
 
@@ -235,5 +208,5 @@ install(EXPORT wpimath DESTINATION share/wpimath)
 if(WITH_TESTS)
     wpilib_add_test(wpimath src/test/native/cpp)
     target_include_directories(wpimath_test PRIVATE src/test/native/include)
-    target_link_libraries(wpimath_test wpimath gmock_main)
+    target_link_libraries(wpimath_test wpimath googletest)
 endif()

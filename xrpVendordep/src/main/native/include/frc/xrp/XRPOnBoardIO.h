@@ -14,6 +14,11 @@
 namespace frc {
 
 /**
+ * @ingroup xrp_api
+ * @{
+ */
+
+/**
  * This class represents the onboard IO of the XRP
  * reference robot. This the USER push button and
  * LED.
@@ -30,17 +35,30 @@ class XRPOnBoardIO {
 
   /**
    * Gets if the USER button is pressed.
+   *
+   * @return True if the USER button is currently pressed.
    */
   bool GetUserButtonPressed();
 
   /**
    * Sets the yellow LED.
+   *
+   * @param value True to activate LED, false otherwise.
    */
   void SetLed(bool value);
+
+  /**
+   * Gets the state of the yellow LED.
+   *
+   * @return True if LED is active, false otherwise.
+   */
+  bool GetLed() const;
 
  private:
   frc::DigitalInput m_userButton{0};
   frc::DigitalOutput m_led{1};
 };
+
+/** @} */
 
 }  // namespace frc

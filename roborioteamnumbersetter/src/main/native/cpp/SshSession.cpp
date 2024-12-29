@@ -9,14 +9,14 @@
 #include <sys/stat.h>
 
 #include <algorithm>
-#include <stdexcept>
+#include <string>
 
 #include <fmt/format.h>
 #include <libssh/libssh.h>
 #include <libssh/sftp.h>
 #include <wpi/Logger.h>
 
-using namespace sysid;
+using namespace rtns;
 
 #define INFO(fmt, ...) WPI_INFO(m_logger, fmt __VA_OPT__(, ) __VA_ARGS__)
 
@@ -86,7 +86,13 @@ void SshSession::Execute(std::string_view cmd) {
     ssh_channel_free(channel);
     throw SshException(ssh_get_error(m_session));
   }
-  INFO("{} {}", ssh_channel_get_exit_status(channel), cmd);
+  uint32_t exitCode = 0;
+#if LIBSSH_VERSION_MAJOR == 0 && LIBSSH_VERSION_MINOR >= 11
+  ssh_channel_get_exit_state(channel, &exitCode, nullptr, nullptr);
+#else
+  exitCode = ssh_channel_get_exit_status(channel);
+#endif
+  INFO("{} {}", exitCode, cmd);
 
   // Log output.
   char buf[512];
@@ -136,11 +142,17 @@ std::string SshSession::ExecuteResult(std::string_view cmd, int* exitStatus) {
     ssh_channel_free(channel);
     throw SshException(ssh_get_error(m_session));
   }
-  INFO("{} {}", ssh_channel_get_exit_status(channel), cmd);
+  uint32_t exitCode = 0;
+#if LIBSSH_VERSION_MAJOR == 0 && LIBSSH_VERSION_MINOR >= 11
+  ssh_channel_get_exit_state(channel, &exitCode, nullptr, nullptr);
+#else
+  exitCode = ssh_channel_get_exit_status(channel);
+#endif
+  INFO("{} {}", exitCode, cmd);
 
   std::string result;
   if (exitStatus) {
-    *exitStatus = ssh_channel_get_exit_status(channel);
+    *exitStatus = exitCode;
   }
 
   // Log output.

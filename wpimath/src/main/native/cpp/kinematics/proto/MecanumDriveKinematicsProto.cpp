@@ -4,30 +4,55 @@
 
 #include "frc/kinematics/proto/MecanumDriveKinematicsProto.h"
 
-#include "kinematics.pb.h"
+#include <wpi/protobuf/ProtobufCallbacks.h>
 
-google::protobuf::Message* wpi::Protobuf<frc::MecanumDriveKinematics>::New(
-    google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufMecanumDriveKinematics>(arena);
-}
+#include "wpimath/protobuf/kinematics.npb.h"
 
-frc::MecanumDriveKinematics wpi::Protobuf<frc::MecanumDriveKinematics>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufMecanumDriveKinematics*>(&msg);
+std::optional<frc::MecanumDriveKinematics>
+wpi::Protobuf<frc::MecanumDriveKinematics>::Unpack(InputStream& stream) {
+  wpi::UnpackCallback<frc::Translation2d> frontLeft;
+  wpi::UnpackCallback<frc::Translation2d> frontRight;
+  wpi::UnpackCallback<frc::Translation2d> rearLeft;
+  wpi::UnpackCallback<frc::Translation2d> rearRight;
+  wpi_proto_ProtobufMecanumDriveKinematics msg{
+      .front_left = frontLeft.Callback(),
+      .front_right = frontRight.Callback(),
+      .rear_left = rearLeft.Callback(),
+      .rear_right = rearRight.Callback(),
+  };
+  if (!stream.Decode(msg)) {
+    return {};
+  }
+
+  auto ifrontLeft = frontLeft.Items();
+  auto ifrontRight = frontRight.Items();
+  auto irearLeft = rearLeft.Items();
+  auto irearRight = rearRight.Items();
+
+  if (ifrontLeft.empty() || ifrontRight.empty() || irearLeft.empty() ||
+      irearRight.empty()) {
+    return {};
+  }
+
   return frc::MecanumDriveKinematics{
-      wpi::UnpackProtobuf<frc::Translation2d>(m->front_left()),
-      wpi::UnpackProtobuf<frc::Translation2d>(m->front_right()),
-      wpi::UnpackProtobuf<frc::Translation2d>(m->rear_left()),
-      wpi::UnpackProtobuf<frc::Translation2d>(m->rear_right()),
+      ifrontLeft[0],
+      ifrontRight[0],
+      irearLeft[0],
+      irearRight[0],
   };
 }
 
-void wpi::Protobuf<frc::MecanumDriveKinematics>::Pack(
-    google::protobuf::Message* msg, const frc::MecanumDriveKinematics& value) {
-  auto m = static_cast<wpi::proto::ProtobufMecanumDriveKinematics*>(msg);
-  wpi::PackProtobuf(m->mutable_front_left(), value.GetFrontLeft());
-  wpi::PackProtobuf(m->mutable_front_right(), value.GetFrontRight());
-  wpi::PackProtobuf(m->mutable_rear_left(), value.GetRearLeft());
-  wpi::PackProtobuf(m->mutable_rear_right(), value.GetRearRight());
+bool wpi::Protobuf<frc::MecanumDriveKinematics>::Pack(
+    OutputStream& stream, const frc::MecanumDriveKinematics& value) {
+  wpi::PackCallback frontLeft{&value.GetFrontLeft()};
+  wpi::PackCallback frontRight{&value.GetFrontRight()};
+  wpi::PackCallback rearLeft{&value.GetRearLeft()};
+  wpi::PackCallback rearRight{&value.GetRearRight()};
+  wpi_proto_ProtobufMecanumDriveKinematics msg{
+      .front_left = frontLeft.Callback(),
+      .front_right = frontRight.Callback(),
+      .rear_left = rearLeft.Callback(),
+      .rear_right = rearRight.Callback(),
+  };
+  return stream.Encode(msg);
 }

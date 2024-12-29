@@ -3,7 +3,7 @@
   "name": "XRP-Vendordep",
   "version": "1.0.0",
   "uuid": "1571a1a5-ed3f-4f07-b7eb-b2beb17394e0",
-  "frcYear": "2024",
+  "frcYear": "2025",
   "mavenUrls": [],
   "jsonUrl": "",
   "javaDependencies": [

@@ -7,12 +7,16 @@
 #include <algorithm>
 #include <memory>
 #include <span>
+#include <string>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include <glass/support/DataLogReaderThread.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <portable-file-dialogs.h>
+#include <wpi/SmallVector.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
@@ -35,15 +39,15 @@ void LogLoader::Display() {
     if (!m_opener->result().empty()) {
       m_filename = m_opener->result()[0];
 
-      std::error_code ec;
-      auto buf = wpi::MemoryBuffer::GetFile(m_filename, ec);
-      if (ec) {
+      auto fileBuffer = wpi::MemoryBuffer::GetFile(m_filename);
+      if (!fileBuffer) {
         ImGui::OpenPopup("Error");
-        m_error = fmt::format("Could not open file: {}", ec.message());
+        m_error = fmt::format("Could not open file: {}",
+                              fileBuffer.error().message());
         return;
       }
 
-      wpi::log::DataLogReader reader{std::move(buf)};
+      wpi::log::DataLogReader reader{std::move(*fileBuffer)};
       if (!reader.IsValid()) {
         ImGui::OpenPopup("Error");
         m_error = "Not a valid datalog file";

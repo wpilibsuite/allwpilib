@@ -13,7 +13,7 @@ frc::GenericHID& CommandGenericHID::GetHID() {
 }
 
 Trigger CommandGenericHID::Button(int button, frc::EventLoop* loop) const {
-  return m_hid.Button(button, loop).CastTo<Trigger>();
+  return Trigger(loop, [this, button] { return m_hid.GetRawButton(button); });
 }
 
 Trigger CommandGenericHID::POV(int angle, frc::EventLoop* loop) const {
@@ -73,4 +73,20 @@ Trigger CommandGenericHID::AxisGreaterThan(int axis, double threshold,
   return Trigger(loop, [this, axis, threshold]() {
     return m_hid.GetRawAxis(axis) > threshold;
   });
+}
+
+Trigger CommandGenericHID::AxisMagnitudeGreaterThan(
+    int axis, double threshold, frc::EventLoop* loop) const {
+  return Trigger(loop, [this, axis, threshold]() {
+    return std::abs(m_hid.GetRawAxis(axis)) > threshold;
+  });
+}
+
+void CommandGenericHID::SetRumble(frc::GenericHID::RumbleType type,
+                                  double value) {
+  m_hid.SetRumble(type, value);
+}
+
+bool CommandGenericHID::IsConnected() const {
+  return m_hid.IsConnected();
 }

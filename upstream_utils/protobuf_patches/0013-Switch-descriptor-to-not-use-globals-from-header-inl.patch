@@ -1,0 +1,167 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thad House <thadhouse1@gmail.com>
+Date: Sun, 18 Aug 2024 22:43:37 -0700
+Subject: [PATCH 13/14] Switch descriptor to not use globals from header inline
+ functions
+
+---
+ src/google/protobuf/descriptor.cc | 66 +++++++++++++++++++------------
+ src/google/protobuf/descriptor.h  | 20 +++++-----
+ 2 files changed, 51 insertions(+), 35 deletions(-)
+
+diff --git a/src/google/protobuf/descriptor.cc b/src/google/protobuf/descriptor.cc
+index 5f3427dc72497b618c4dea3ec6985eeb39139349..5be05da4fb1c21fb1068ae7341cabef9dcf598a5 100644
+--- a/src/google/protobuf/descriptor.cc
++++ b/src/google/protobuf/descriptor.cc
+@@ -791,31 +791,31 @@ class Symbol {
+   const internal::SymbolBase* ptr_;
+ };
+ 
+-const FieldDescriptor::CppType
+-    FieldDescriptor::kTypeToCppTypeMap[MAX_TYPE + 1] = {
+-        static_cast<CppType>(0),  // 0 is reserved for errors
+-
+-        CPPTYPE_DOUBLE,   // TYPE_DOUBLE
+-        CPPTYPE_FLOAT,    // TYPE_FLOAT
+-        CPPTYPE_INT64,    // TYPE_INT64
+-        CPPTYPE_UINT64,   // TYPE_UINT64
+-        CPPTYPE_INT32,    // TYPE_INT32
+-        CPPTYPE_UINT64,   // TYPE_FIXED64
+-        CPPTYPE_UINT32,   // TYPE_FIXED32
+-        CPPTYPE_BOOL,     // TYPE_BOOL
+-        CPPTYPE_STRING,   // TYPE_STRING
+-        CPPTYPE_MESSAGE,  // TYPE_GROUP
+-        CPPTYPE_MESSAGE,  // TYPE_MESSAGE
+-        CPPTYPE_STRING,   // TYPE_BYTES
+-        CPPTYPE_UINT32,   // TYPE_UINT32
+-        CPPTYPE_ENUM,     // TYPE_ENUM
+-        CPPTYPE_INT32,    // TYPE_SFIXED32
+-        CPPTYPE_INT64,    // TYPE_SFIXED64
+-        CPPTYPE_INT32,    // TYPE_SINT32
+-        CPPTYPE_INT64,    // TYPE_SINT64
++static const FieldDescriptor::CppType
++    kTypeToCppTypeMap[FieldDescriptor::MAX_TYPE + 1] = {
++        static_cast<FieldDescriptor::CppType>(0),  // 0 is reserved for errors
++
++        FieldDescriptor::CPPTYPE_DOUBLE,   // TYPE_DOUBLE
++        FieldDescriptor::CPPTYPE_FLOAT,    // TYPE_FLOAT
++        FieldDescriptor::CPPTYPE_INT64,    // TYPE_INT64
++        FieldDescriptor::CPPTYPE_UINT64,   // TYPE_UINT64
++        FieldDescriptor::CPPTYPE_INT32,    // TYPE_INT32
++        FieldDescriptor::CPPTYPE_UINT64,   // TYPE_FIXED64
++        FieldDescriptor::CPPTYPE_UINT32,   // TYPE_FIXED32
++        FieldDescriptor::CPPTYPE_BOOL,     // TYPE_BOOL
++        FieldDescriptor::CPPTYPE_STRING,   // TYPE_STRING
++        FieldDescriptor::CPPTYPE_MESSAGE,  // TYPE_GROUP
++        FieldDescriptor::CPPTYPE_MESSAGE,  // TYPE_MESSAGE
++        FieldDescriptor::CPPTYPE_STRING,   // TYPE_BYTES
++        FieldDescriptor::CPPTYPE_UINT32,   // TYPE_UINT32
++        FieldDescriptor::CPPTYPE_ENUM,     // TYPE_ENUM
++        FieldDescriptor::CPPTYPE_INT32,    // TYPE_SFIXED32
++        FieldDescriptor::CPPTYPE_INT64,    // TYPE_SFIXED64
++        FieldDescriptor::CPPTYPE_INT32,    // TYPE_SINT32
++        FieldDescriptor::CPPTYPE_INT64,    // TYPE_SINT64
+ };
+ 
+-const char* const FieldDescriptor::kTypeToName[MAX_TYPE + 1] = {
++static const char* const kTypeToName[FieldDescriptor::MAX_TYPE + 1] = {
+     "ERROR",  // 0 is reserved for errors
+ 
+     "double",    // TYPE_DOUBLE
+@@ -838,7 +838,7 @@ const char* const FieldDescriptor::kTypeToName[MAX_TYPE + 1] = {
+     "sint64",    // TYPE_SINT64
+ };
+ 
+-const char* const FieldDescriptor::kCppTypeToName[MAX_CPPTYPE + 1] = {
++static const char* const kCppTypeToName[FieldDescriptor::MAX_CPPTYPE + 1] = {
+     "ERROR",  // 0 is reserved for errors
+ 
+     "int32",    // CPPTYPE_INT32
+@@ -853,7 +853,7 @@ const char* const FieldDescriptor::kCppTypeToName[MAX_CPPTYPE + 1] = {
+     "message",  // CPPTYPE_MESSAGE
+ };
+ 
+-const char* const FieldDescriptor::kLabelToName[MAX_LABEL + 1] = {
++static const char* const kLabelToName[FieldDescriptor::MAX_LABEL + 1] = {
+     "ERROR",  // 0 is reserved for errors
+ 
+     "optional",  // LABEL_OPTIONAL
+@@ -861,6 +861,22 @@ const char* const FieldDescriptor::kLabelToName[MAX_LABEL + 1] = {
+     "repeated",  // LABEL_REPEATED
+ };
+ 
++const FieldDescriptor::CppType *FieldDescriptor::GetTypeToCppTypeMap() {
++  return kTypeToCppTypeMap;
++}
++
++const char* const *FieldDescriptor::GetTypeToName() {
++  return kTypeToName;
++}
++
++const char* const *FieldDescriptor::GetCppTypeToName() {
++  return kCppTypeToName;
++}
++
++const char* const *FieldDescriptor::GetLabelToName() {
++  return kLabelToName;
++}
++
+ const char* FileDescriptor::SyntaxName(FileDescriptor::Syntax syntax) {
+   switch (syntax) {
+     case SYNTAX_PROTO2:
+diff --git a/src/google/protobuf/descriptor.h b/src/google/protobuf/descriptor.h
+index bee3e32b9f1d5ba47b83d1e388716a3c3b6e82c6..1cb2421b5362a757abe3735e15321e630b1cab3e 100644
+--- a/src/google/protobuf/descriptor.h
++++ b/src/google/protobuf/descriptor.h
+@@ -976,13 +976,13 @@ class PROTOBUF_EXPORT FieldDescriptor : private internal::SymbolBase {
+     mutable std::atomic<const Message*> default_generated_instance_;
+   };
+ 
+-  static const CppType kTypeToCppTypeMap[MAX_TYPE + 1];
++  static const CppType *GetTypeToCppTypeMap();
+ 
+-  static const char* const kTypeToName[MAX_TYPE + 1];
++  static const char* const *GetTypeToName();
+ 
+-  static const char* const kCppTypeToName[MAX_CPPTYPE + 1];
++  static const char* const *GetCppTypeToName();
+ 
+-  static const char* const kLabelToName[MAX_LABEL + 1];
++  static const char* const *GetLabelToName();
+ 
+   // Must be constructed using DescriptorPool.
+   FieldDescriptor() {}
+@@ -2392,27 +2392,27 @@ inline int MethodDescriptor::index() const {
+ }
+ 
+ inline const char* FieldDescriptor::type_name() const {
+-  return kTypeToName[type()];
++  return GetTypeToName()[type()];
+ }
+ 
+ inline FieldDescriptor::CppType FieldDescriptor::cpp_type() const {
+-  return kTypeToCppTypeMap[type()];
++  return GetTypeToCppTypeMap()[type()];
+ }
+ 
+ inline const char* FieldDescriptor::cpp_type_name() const {
+-  return kCppTypeToName[kTypeToCppTypeMap[type()]];
++  return GetCppTypeToName()[GetTypeToCppTypeMap()[type()]];
+ }
+ 
+ inline FieldDescriptor::CppType FieldDescriptor::TypeToCppType(Type type) {
+-  return kTypeToCppTypeMap[type];
++  return GetTypeToCppTypeMap()[type];
+ }
+ 
+ inline const char* FieldDescriptor::TypeName(Type type) {
+-  return kTypeToName[type];
++  return GetTypeToName()[type];
+ }
+ 
+ inline const char* FieldDescriptor::CppTypeName(CppType cpp_type) {
+-  return kCppTypeToName[cpp_type];
++  return GetCppTypeToName()[cpp_type];
+ }
+ 
+ inline bool FieldDescriptor::IsTypePackable(Type field_type) {

@@ -24,8 +24,6 @@ apply from: "${rootDir}/shared/config.gradle"
 def wpilibVersionFileInput = file("src/app/generate/WPILibVersion.cpp.in")
 def wpilibVersionFileOutput = file("$buildDir/generated/app/cpp/WPILibVersion.cpp")
 
-apply from: "${rootDir}/shared/imgui.gradle"
-
 task generateCppVersion() {
     description = 'Generates the wpilib version class'
     group = 'WPILib'
@@ -71,19 +69,6 @@ tasks.withType(CppCompile) {
 
 nativeUtils.exportsConfigs {
     glass {
-        x64ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
     }
 }
 
@@ -112,7 +97,7 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':fieldImages', library: 'fieldImages', linkage: 'shared'
-                nativeUtils.useRequiredLibrary(it, 'imgui')
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -142,7 +127,7 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':fieldImages', library: 'fieldImages', linkage: 'shared'
-                nativeUtils.useRequiredLibrary(it, 'imgui')
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -163,6 +148,7 @@ model {
                 if (OperatingSystem.current().isWindows()) {
                     rc.source {
                         srcDirs 'src/app/native/win'
+                        include '*.rc'
                     }
                 }
             }
@@ -181,7 +167,7 @@ model {
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':fieldImages', library: 'fieldImages', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
-                nativeUtils.useRequiredLibrary(it, 'imgui')
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                     it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'

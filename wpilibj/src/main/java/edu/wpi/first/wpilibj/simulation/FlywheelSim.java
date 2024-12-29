@@ -13,10 +13,8 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated flywheel mechanism. */
@@ -29,14 +27,6 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
 
   // The moment of inertia for the flywheel mechanism.
   private final double m_jKgMetersSquared;
-
-  // The angular velocity of the system.
-  private final MutableMeasure<Velocity<Angle>> m_angularVelocity =
-      MutableMeasure.zero(RadiansPerSecond);
-
-  // The angular acceleration of the system.
-  private final MutableMeasure<Velocity<Velocity<Angle>>> m_angularAcceleration =
-      MutableMeasure.zero(RadiansPerSecondPerSecond);
 
   /**
    * Creates a simulated flywheel mechanism.
@@ -106,7 +96,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel's gearbox.
    */
-  public DCMotor getGearBox() {
+  public DCMotor getGearbox() {
     return m_gearbox;
   }
 
@@ -133,9 +123,8 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel's velocity
    */
-  public Measure<Velocity<Angle>> getAngularVelocity() {
-    m_angularVelocity.mut_setMagnitude(getAngularVelocityRadPerSec());
-    return m_angularVelocity;
+  public AngularVelocity getAngularVelocity() {
+    return RadiansPerSecond.of(getAngularVelocityRadPerSec());
   }
 
   /**
@@ -153,9 +142,8 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel's acceleration.
    */
-  public Measure<Velocity<Velocity<Angle>>> getAngularAcceleration() {
-    m_angularAcceleration.mut_setMagnitude(getAngularAccelerationRadPerSecSq());
-    return m_angularAcceleration;
+  public AngularAcceleration getAngularAcceleration() {
+    return RadiansPerSecondPerSecond.of(getAngularAccelerationRadPerSecSq());
   }
 
   /**
@@ -183,7 +171,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   /**
    * Gets the input voltage for the flywheel.
    *
-   * @return The flywheel input voltage.
+   * @return The flywheel's input voltage.
    */
   public double getInputVoltage() {
     return getInput(0);

@@ -7,9 +7,9 @@
 #include <cmath>
 #include <fstream>
 #include <limits>
-#include <vector>
 
 #include <Eigen/SparseCholesky>
+#include <wpi/SmallVector.h>
 
 #include "optimization/RegularizedLDLT.hpp"
 #include "optimization/solver/util/ErrorEstimate.hpp"
@@ -37,7 +37,7 @@ namespace sleipnir {
 void InteriorPoint(std::span<Variable> decisionVariables,
                    std::span<Variable> equalityConstraints,
                    std::span<Variable> inequalityConstraints, Variable& f,
-                   function_ref<bool(const SolverIterationInfo&)> callback,
+                   function_ref<bool(const SolverIterationInfo& info)> callback,
                    const SolverConfig& config, bool feasibilityRestoration,
                    Eigen::VectorXd& x, Eigen::VectorXd& s,
                    SolverStatus* status) {
@@ -195,7 +195,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
   // Fraction-to-the-boundary rule scale factor τ
   double τ = τ_min;
 
-  Filter filter{f, μ};
+  Filter filter{f};
 
   // This should be run when the error estimate is below a desired threshold for
   // the current barrier parameter
@@ -222,11 +222,11 @@ void InteriorPoint(std::span<Variable> decisionVariables,
     τ = std::max(τ_min, 1.0 - μ);
 
     // Reset the filter when the barrier parameter is updated
-    filter.Reset(μ);
+    filter.Reset();
   };
 
   // Kept outside the loop so its storage can be reused
-  std::vector<Eigen::Triplet<double>> triplets;
+  wpi::SmallVector<Eigen::Triplet<double>> triplets;
 
   RegularizedLDLT solver;
 
@@ -240,11 +240,16 @@ void InteriorPoint(std::span<Variable> decisionVariables,
   // Error estimate
   double E_0 = std::numeric_limits<double>::infinity();
 
-  iterationsStartTime = std::chrono::system_clock::now();
+  if (config.diagnostics) {
+    iterationsStartTime = std::chrono::system_clock::now();
+  }
 
   while (E_0 > config.tolerance &&
          acceptableIterCounter < config.maxAcceptableIterations) {
-    auto innerIterStartTime = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point innerIterStartTime;
+    if (config.diagnostics) {
+      innerIterStartTime = std::chrono::system_clock::now();
+    }
 
     // Check for local equality constraint infeasibility
     if (IsEqualityLocallyInfeasible(A_e, c_e)) {
@@ -354,7 +359,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
         decisionVariables.size() + equalityConstraints.size(),
         decisionVariables.size() + equalityConstraints.size());
     lhs.setFromSortedTriplets(triplets.begin(), triplets.end(),
-                              [](const auto& a, const auto& b) { return b; });
+                              [](const auto&, const auto& b) { return b; });
 
     const Eigen::VectorXd e = Eigen::VectorXd::Ones(s.rows());
 
@@ -367,6 +372,9 @@ void InteriorPoint(std::span<Variable> decisionVariables,
     rhs.segment(x.rows(), y.rows()) = -c_e;
 
     // Solve the Newton-KKT system
+    //
+    // [H + AᵢᵀΣAᵢ  Aₑᵀ][ pₖˣ] = −[∇f − Aₑᵀy + Aᵢᵀ(S⁻¹(Zcᵢ − μe) − z)]
+    // [    Aₑ       0 ][−pₖʸ]    [                cₑ                ]
     solver.Compute(lhs, equalityConstraints.size(), μ);
     Eigen::VectorXd step{x.rows() + y.rows()};
     if (solver.Info() == Eigen::Success) {
@@ -406,16 +414,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
 
       xAD.SetValue(trial_x);
 
-      f.Update();
-
-      for (int row = 0; row < c_e.rows(); ++row) {
-        c_eAD(row).Update();
-      }
       Eigen::VectorXd trial_c_e = c_eAD.Value();
-
-      for (int row = 0; row < c_i.rows(); ++row) {
-        c_iAD(row).Update();
-      }
       Eigen::VectorXd trial_c_i = c_iAD.Value();
 
       // If f(xₖ + αpₖˣ), cₑ(xₖ + αpₖˣ), or cᵢ(xₖ + αpₖˣ) aren't finite, reduce
@@ -439,7 +438,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
       }
 
       // Check whether filter accepts trial iterate
-      auto entry = filter.MakeEntry(trial_s, trial_c_e, trial_c_i);
+      auto entry = filter.MakeEntry(trial_s, trial_c_e, trial_c_i, μ);
       if (filter.TryAdd(entry)) {
         // Accept step
         break;
@@ -499,20 +498,11 @@ void InteriorPoint(std::span<Variable> decisionVariables,
 
           xAD.SetValue(trial_x);
 
-          f.Update();
-
-          for (int row = 0; row < c_e.rows(); ++row) {
-            c_eAD(row).Update();
-          }
           trial_c_e = c_eAD.Value();
-
-          for (int row = 0; row < c_i.rows(); ++row) {
-            c_iAD(row).Update();
-          }
           trial_c_i = c_iAD.Value();
 
           // Check whether filter accepts trial iterate
-          entry = filter.MakeEntry(trial_s, trial_c_e, trial_c_i);
+          entry = filter.MakeEntry(trial_s, trial_c_e, trial_c_i, μ);
           if (filter.TryAdd(entry)) {
             p_x = p_x_cor;
             p_y = p_y_soc;
@@ -544,7 +534,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
       if (fullStepRejectedCounter >= 4 &&
           filter.maxConstraintViolation > entry.constraintViolation / 10.0) {
         filter.maxConstraintViolation *= 0.1;
-        filter.Reset(μ);
+        filter.Reset();
         continue;
       }
 
@@ -571,14 +561,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
         yAD.SetValue(trial_y);
         zAD.SetValue(trial_z);
 
-        for (int row = 0; row < c_e.rows(); ++row) {
-          c_eAD(row).Update();
-        }
         Eigen::VectorXd trial_c_e = c_eAD.Value();
-
-        for (int row = 0; row < c_i.rows(); ++row) {
-          c_iAD(row).Update();
-        }
         Eigen::VectorXd trial_c_i = c_iAD.Value();
 
         double nextKKTError = KKTError(gradientF.Value(), jacobianCe.Value(),
@@ -600,14 +583,14 @@ void InteriorPoint(std::span<Variable> decisionVariables,
           return;
         }
 
-        auto initialEntry = filter.MakeEntry(s, c_e, c_i);
+        auto initialEntry = filter.MakeEntry(s, c_e, c_i, μ);
 
         // Feasibility restoration phase
         Eigen::VectorXd fr_x = x;
         Eigen::VectorXd fr_s = s;
         SolverStatus fr_status;
         FeasibilityRestoration(
-            decisionVariables, equalityConstraints, inequalityConstraints, f, μ,
+            decisionVariables, equalityConstraints, inequalityConstraints, μ,
             [&](const SolverIterationInfo& info) {
               Eigen::VectorXd trial_x =
                   info.x.segment(0, decisionVariables.size());
@@ -617,26 +600,13 @@ void InteriorPoint(std::span<Variable> decisionVariables,
                   info.s.segment(0, inequalityConstraints.size());
               sAD.SetValue(trial_s);
 
-              for (int row = 0; row < c_e.rows(); ++row) {
-                c_eAD(row).Update();
-              }
               Eigen::VectorXd trial_c_e = c_eAD.Value();
-
-              for (int row = 0; row < c_i.rows(); ++row) {
-                c_iAD(row).Update();
-              }
               Eigen::VectorXd trial_c_i = c_iAD.Value();
-
-              for (int row = 0; row < c_i.rows(); ++row) {
-                c_iAD(row).Update();
-              }
-
-              f.Update();
 
               // If current iterate is acceptable to normal filter and
               // constraint violation has sufficiently reduced, stop
               // feasibility restoration
-              auto entry = filter.MakeEntry(trial_s, trial_c_e, trial_c_i);
+              auto entry = filter.MakeEntry(trial_s, trial_c_e, trial_c_i, μ);
               if (filter.IsAcceptable(entry) &&
                   entry.constraintViolation <
                       0.9 * initialEntry.constraintViolation) {
@@ -694,7 +664,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
                                              A_e.cols() + s.rows()};
             Ahat.setFromSortedTriplets(
                 triplets.begin(), triplets.end(),
-                [](const auto& a, const auto& b) { return b; });
+                [](const auto&, const auto& b) { return b; });
 
             // lhs = ÂÂᵀ
             Eigen::SparseMatrix<double> lhs = Ahat * Ahat.transpose();
@@ -789,16 +759,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
     g = gradientF.Value();
     H = hessianL.Value();
 
-    // Update cₑ
-    for (int row = 0; row < c_e.rows(); ++row) {
-      c_eAD(row).Update();
-    }
     c_e = c_eAD.Value();
-
-    // Update cᵢ
-    for (int row = 0; row < c_i.rows(); ++row) {
-      c_iAD(row).Update();
-    }
     c_i = c_iAD.Value();
 
     // Update the error estimate

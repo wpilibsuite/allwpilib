@@ -161,7 +161,7 @@ class GeneralizedEigenSolver {
     compute(A, B, computeEigenvectors);
   }
 
-  /* \brief Returns the computed generalized eigenvectors.
+  /** \brief Returns the computed generalized eigenvectors.
    *
    * \returns  %Matrix whose columns are the (possibly complex) right eigenvectors.
    * i.e. the eigenvectors that solve (A - l*B)x = 0. The ordering matches the eigenvalues.
@@ -361,7 +361,7 @@ GeneralizedEigenSolver<MatrixType>& GeneralizedEigenSolver<MatrixType>::compute(
           // Compute eigenvector in position (i+1) and then position (i) is just the conjugate
           cv.setZero();
           cv.coeffRef(i + 1) = Scalar(1.0);
-          // here, the "static_cast" workaound expression template issues.
+          // here, the "static_cast" workaround expression template issues.
           cv.coeffRef(i) = -(static_cast<Scalar>(beta * mS.coeffRef(i, i + 1)) - alpha * mT.coeffRef(i, i + 1)) /
                            (static_cast<Scalar>(beta * mS.coeffRef(i, i)) - alpha * mT.coeffRef(i, i));
           for (Index j = i - 1; j >= 0; j--) {

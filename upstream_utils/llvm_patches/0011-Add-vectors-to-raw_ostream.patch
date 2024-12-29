@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:48:59 -0400
-Subject: [PATCH 11/36] Add vectors to raw_ostream
+Subject: [PATCH 11/37] Add vectors to raw_ostream
 
 ---
  llvm/include/llvm/Support/raw_ostream.h | 115 ++++++++++++++++++++++++
@@ -9,7 +9,7 @@ Subject: [PATCH 11/36] Add vectors to raw_ostream
  2 files changed, 162 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 95019180a9deb406ed4f2991c664a4cc4e956dac..e7526e016a858ad728feb7cf1c5014b9691759d4 100644
+index cbeb712e2a69426d83457cb1065fff4ca80a669d..a6799603a0106262520ba1c9fda14a7967b12a63 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -24,6 +24,7 @@
@@ -20,7 +20,7 @@ index 95019180a9deb406ed4f2991c664a4cc4e956dac..e7526e016a858ad728feb7cf1c5014b9
  
  namespace llvm {
  
-@@ -261,12 +262,24 @@ public:
+@@ -274,12 +275,24 @@ public:
      return write(Str.data(), Str.size());
    }
  
@@ -45,8 +45,8 @@ index 95019180a9deb406ed4f2991c664a4cc4e956dac..e7526e016a858ad728feb7cf1c5014b9
  
    /// indent - Insert 'NumSpaces' spaces.
    raw_ostream &indent(unsigned NumSpaces);
-@@ -617,6 +630,108 @@ public:
-   }
+@@ -641,6 +654,108 @@ public:
+   static bool classof(const raw_ostream *OS);
  };
  
 +/// A raw_ostream that writes to a vector.  This is a
@@ -155,11 +155,11 @@ index 95019180a9deb406ed4f2991c664a4cc4e956dac..e7526e016a858ad728feb7cf1c5014b9
  class raw_null_ostream : public raw_pwrite_stream {
    /// See raw_ostream::write_impl.
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index c65fb70a4d22db51f4140b910c308333289b6248..57d3091fd5cc5b416e814f9f33811f0fa7afe9cf 100644
+index ee9d2b0cda0a4f338e4b089304203f220a5ed1c4..6c330c92e7dbeb27310b053d1a82de73b42ee6f8 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -668,6 +668,53 @@ void raw_svector_ostream::pwrite_impl(const char *Ptr, size_t Size,
-   memcpy(OS.data() + Offset, Ptr, Size);
+@@ -677,6 +677,53 @@ bool raw_svector_ostream::classof(const raw_ostream *OS) {
+   return OS->get_kind() == OStreamKind::OK_SVecStream;
  }
  
 +//===----------------------------------------------------------------------===//

@@ -7,9 +7,11 @@ file(
     GLOB ntcore_native_src
     src/main/native/cpp/*.cpp
     src/generated/main/native/cpp/*.cpp
+    src/main/native/cpp/local/*.cpp
     src/main/native/cpp/net/*.cpp
     src/main/native/cpp/net3/*.cpp
     src/main/native/cpp/networktables/*.cpp
+    src/main/native/cpp/server/*.cpp
     src/main/native/cpp/tables/*.cpp
 )
 add_library(ntcore ${ntcore_native_src})
@@ -39,13 +41,9 @@ install(EXPORT ntcore DESTINATION share/ntcore)
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
 
     file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
-
-    set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${QUICKBUF_JAR})
 
     file(GLOB ntcore_jni_src src/main/native/cpp/jni/*.cpp src/generated/main/native/cpp/jni/*.cpp)
 
@@ -55,8 +53,9 @@ if(WITH_JAVA)
     add_jar(
         ntcore_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS wpiutil_jar
+        INCLUDE_JARS wpiutil_jar ${QUICKBUF_JAR}
         OUTPUT_NAME ntcore
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS ntcore_jni_headers
     )
     set_property(TARGET ntcore_jar PROPERTY FOLDER "java")
@@ -70,10 +69,6 @@ if(WITH_JAVA)
 
     set_property(TARGET ntcorejni PROPERTY FOLDER "libraries")
 
-    if(MSVC)
-        install(TARGETS ntcorejni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-    endif()
-
     target_link_libraries(ntcorejni PRIVATE ntcore_jni_headers)
     add_dependencies(ntcorejni ntcore_jar)
 
@@ -82,24 +77,19 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
-    file(
-        GLOB NTCORE_SOURCES
-        src/main/java/edu/wpi/first/networktables/*.java
-        src/generated/main/java/*.java
-    )
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         ntcore_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/networktables" ${NTCORE_SOURCES}
+        BASE_DIRECTORIES
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/java
         OUTPUT_NAME ntcore-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(NTCORE_SRC_JAR_FILE TARGET ntcore_src_jar PROPERTY JAR_FILE)
-    install(FILES ${NTCORE_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET ntcore_src_jar PROPERTY FOLDER "java")
+
+    install_jar(ntcore_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 add_executable(ntcoredev src/dev/native/cpp/main.cpp)
@@ -109,5 +99,5 @@ target_link_libraries(ntcoredev ntcore)
 if(WITH_TESTS)
     wpilib_add_test(ntcore src/test/native/cpp)
     target_include_directories(ntcore_test PRIVATE src/main/native/cpp)
-    target_link_libraries(ntcore_test ntcore gmock_main wpiutil_testlib)
+    target_link_libraries(ntcore_test ntcore googletest wpiutil_testlib)
 endif()

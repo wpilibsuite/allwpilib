@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <functional>
 #include <string>
 
 #include <units/temperature.h>
@@ -21,7 +22,13 @@ struct CANStatus {
   int transmitErrorCount;
 };
 
-enum RadioLEDState { kOff = 0, kGreen = 1, kRed = 2, kOrange = 3 };
+/** State for the radio led. */
+enum RadioLEDState {
+  kOff = 0,    ///< Off.
+  kGreen = 1,  ///< Green.
+  kRed = 2,    ///< Red.
+  kOrange = 3  ///< Orange.
+};
 
 class RobotController {
  public:
@@ -73,6 +80,24 @@ class RobotController {
   static int32_t GetTeamNumber();
 
   /**
+   * Sets a new source to provide the clock time in microseconds. Changing this
+   * affects the return value of {@code GetTime}.
+   *
+   * @param supplier Function to return the time in microseconds.
+   */
+  static void SetTimeSource(std::function<uint64_t()> supplier);
+
+  /**
+   * Read the microsecond timestamp. By default, the time is based on the FPGA
+   * hardware clock in microseconds since the FPGA started. However, the return
+   * value of this method may be modified to use any time base, including
+   * non-monotonic and non-continuous time bases.
+   *
+   * @return The current time in microseconds.
+   */
+  static uint64_t GetTime();
+
+  /**
    * Read the microsecond-resolution timer on the FPGA.
    *
    * @return The current time in microseconds according to the FPGA (since FPGA
@@ -114,6 +139,14 @@ class RobotController {
    * @return True if the system is browned out
    */
   static bool IsBrownedOut();
+
+  /**
+   * Gets the number of times the system has been disabled due to communication
+   * errors with the Driver Station.
+   *
+   * @return number of disables due to communication errors.
+   */
+  static int GetCommsDisableCount();
 
   /**
    * Gets the current state of the Robot Signal Light (RSL)
@@ -174,7 +207,7 @@ class RobotController {
 
   /**
    * Get the count of the total current faults on the 3.3V rail since the
-   * controller has booted.
+   * code started.
    *
    * @return The number of faults
    */
@@ -212,7 +245,7 @@ class RobotController {
 
   /**
    * Get the count of the total current faults on the 5V rail since the
-   * controller has booted.
+   * code started.
    *
    * @return The number of faults
    */
@@ -250,11 +283,14 @@ class RobotController {
 
   /**
    * Get the count of the total current faults on the 6V rail since the
-   * controller has booted.
+   * code started.
    *
    * @return The number of faults.
    */
   static int GetFaultCount6V();
+
+  /** Reset the overcurrent fault counters for all user rails to 0. */
+  static void ResetRailFaultCounts();
 
   /**
    * Get the current brownout voltage setting.
@@ -303,6 +339,9 @@ class RobotController {
    * @return The status of the CAN bus
    */
   static CANStatus GetCANStatus();
+
+ private:
+  static std::function<uint64_t()> m_timeSource;
 };
 
 }  // namespace frc

@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include <hal/CANAPITypes.h>
+#include <hal/CANAPI.h>
 
 namespace frc {
 struct CANData {
@@ -49,11 +49,6 @@ class CAN {
    * @param deviceType         The device type
    */
   CAN(int deviceId, int deviceManufacturer, int deviceType);
-
-  /**
-   * Closes the CAN communication.
-   */
-  ~CAN();
 
   CAN(CAN&&) = default;
   CAN& operator=(CAN&&) = default;
@@ -178,6 +173,6 @@ class CAN {
       HAL_CAN_Dev_kMiscellaneous;
 
  private:
-  hal::Handle<HAL_CANHandle> m_handle;
+  hal::Handle<HAL_CANHandle, HAL_CleanCAN> m_handle;
 };
 }  // namespace frc

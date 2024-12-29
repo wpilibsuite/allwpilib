@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sun, 4 Dec 2022 11:01:56 -0800
+Subject: [PATCH 1/8] apriltag_pose.c: Set NULL when second solution could not
+ be determined
+
+---
+ apriltag_pose.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/apriltag_pose.c b/apriltag_pose.c
+index 6043cb857fbb28304b7e28419f62462f7f0bd05d..f0003a2d187df13236992026ee6ff7f9d6f7aff9 100644
+--- a/apriltag_pose.c
++++ b/apriltag_pose.c
+@@ -513,6 +513,7 @@ void estimate_tag_pose_orthogonal_iteration(
+         solution2->t = matd_create(3, 1);
+         *err2 = orthogonal_iteration(v, p, &solution2->t, &solution2->R, 4, nIters);
+     } else {
++        solution2->t = NULL;
+         *err2 = HUGE_VAL;
+     }
+ 

@@ -38,6 +38,7 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@SuppressWarnings("removal")
 public class MecanumControllerCommand extends Command {
   private final Timer m_timer = new Timer();
   private final boolean m_usePID;
@@ -53,10 +54,12 @@ public class MecanumControllerCommand extends Command {
   private final PIDController m_frontRightController;
   private final PIDController m_rearRightController;
   private final Supplier<MecanumDriveWheelSpeeds> m_currentWheelSpeeds;
-  private final Consumer<MecanumDriveMotorVoltages> m_outputDriveVoltages;
+  private final MecanumVoltagesConsumer m_outputDriveVoltages;
   private final Consumer<MecanumDriveWheelSpeeds> m_outputWheelSpeeds;
-  private MecanumDriveWheelSpeeds m_prevSpeeds;
-  private double m_prevTime;
+  private double m_prevFrontLeftSpeedSetpoint; // m/s
+  private double m_prevRearLeftSpeedSetpoint; // m/s
+  private double m_prevFrontRightSpeedSetpoint; // m/s
+  private double m_prevRearRightSpeedSetpoint; // m/s
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow the provided
@@ -82,8 +85,7 @@ public class MecanumControllerCommand extends Command {
    * @param frontRightController The front right wheel velocity PID.
    * @param rearRightController The rear right wheel velocity PID.
    * @param currentWheelSpeeds A MecanumDriveWheelSpeeds object containing the current wheel speeds.
-   * @param outputDriveVoltages A MecanumDriveMotorVoltages object containing the output motor
-   *     voltages.
+   * @param outputDriveVoltages A MecanumVoltagesConsumer that consumes voltages of mecanum motors.
    * @param requirements The subsystems to require.
    */
   @SuppressWarnings("this-escape")
@@ -102,7 +104,7 @@ public class MecanumControllerCommand extends Command {
       PIDController frontRightController,
       PIDController rearRightController,
       Supplier<MecanumDriveWheelSpeeds> currentWheelSpeeds,
-      Consumer<MecanumDriveMotorVoltages> outputDriveVoltages,
+      MecanumVoltagesConsumer outputDriveVoltages,
       Subsystem... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumControllerCommand");
     m_pose = requireNonNullParam(pose, "pose", "MecanumControllerCommand");
@@ -151,6 +153,139 @@ public class MecanumControllerCommand extends Command {
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path
    * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
    *
+   * @param trajectory The trajectory to follow.
+   * @param pose A function that supplies the robot pose - use one of the odometry classes to
+   *     provide this.
+   * @param feedforward The feedforward to use for the drivetrain.
+   * @param kinematics The kinematics for the robot drivetrain.
+   * @param xController The Trajectory Tracker PID controller for the robot's x position.
+   * @param yController The Trajectory Tracker PID controller for the robot's y position.
+   * @param thetaController The Trajectory Tracker PID controller for angle for the robot.
+   * @param desiredRotation The angle that the robot should be facing. This is sampled at each time
+   *     step.
+   * @param maxWheelVelocityMetersPerSecond The maximum velocity of a drivetrain wheel.
+   * @param frontLeftController The front left wheel velocity PID.
+   * @param rearLeftController The rear left wheel velocity PID.
+   * @param frontRightController The front right wheel velocity PID.
+   * @param rearRightController The rear right wheel velocity PID.
+   * @param currentWheelSpeeds A MecanumDriveWheelSpeeds object containing the current wheel speeds.
+   * @param outputDriveVoltages A MecanumDriveMotorVoltages object containing the output motor
+   *     voltages.
+   * @param requirements The subsystems to require.
+   */
+  @Deprecated(since = "2025", forRemoval = true)
+  public MecanumControllerCommand(
+      Trajectory trajectory,
+      Supplier<Pose2d> pose,
+      SimpleMotorFeedforward feedforward,
+      MecanumDriveKinematics kinematics,
+      PIDController xController,
+      PIDController yController,
+      ProfiledPIDController thetaController,
+      Supplier<Rotation2d> desiredRotation,
+      double maxWheelVelocityMetersPerSecond,
+      PIDController frontLeftController,
+      PIDController rearLeftController,
+      PIDController frontRightController,
+      PIDController rearRightController,
+      Supplier<MecanumDriveWheelSpeeds> currentWheelSpeeds,
+      Consumer<MecanumDriveMotorVoltages> outputDriveVoltages,
+      Subsystem... requirements) {
+    this(
+        trajectory,
+        pose,
+        feedforward,
+        kinematics,
+        xController,
+        yController,
+        thetaController,
+        desiredRotation,
+        maxWheelVelocityMetersPerSecond,
+        frontLeftController,
+        rearLeftController,
+        frontRightController,
+        rearRightController,
+        currentWheelSpeeds,
+        (frontLeft, frontRight, rearLeft, rearRight) ->
+            outputDriveVoltages.accept(
+                new MecanumDriveMotorVoltages(frontLeft, frontRight, rearLeft, rearRight)),
+        requirements);
+  }
+
+  /**
+   * Constructs a new MecanumControllerCommand that when executed will follow the provided
+   * trajectory. PID control and feedforward are handled internally. Outputs are scaled from -12 to
+   * 12 as a voltage output to the motor.
+   *
+   * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path
+   * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
+   *
+   * <p>Note 2: The final rotation of the robot will be set to the rotation of the final pose in the
+   * trajectory. The robot will not follow the rotations from the poses at each timestep. If
+   * alternate rotation behavior is desired, the other constructor with a supplier for rotation
+   * should be used.
+   *
+   * @param trajectory The trajectory to follow.
+   * @param pose A function that supplies the robot pose - use one of the odometry classes to
+   *     provide this.
+   * @param feedforward The feedforward to use for the drivetrain.
+   * @param kinematics The kinematics for the robot drivetrain.
+   * @param xController The Trajectory Tracker PID controller for the robot's x position.
+   * @param yController The Trajectory Tracker PID controller for the robot's y position.
+   * @param thetaController The Trajectory Tracker PID controller for angle for the robot.
+   * @param maxWheelVelocityMetersPerSecond The maximum velocity of a drivetrain wheel.
+   * @param frontLeftController The front left wheel velocity PID.
+   * @param rearLeftController The rear left wheel velocity PID.
+   * @param frontRightController The front right wheel velocity PID.
+   * @param rearRightController The rear right wheel velocity PID.
+   * @param currentWheelSpeeds A MecanumDriveWheelSpeeds object containing the current wheel speeds.
+   * @param outputDriveVoltages A MecanumVoltagesConsumer that consumes voltages of mecanum motors.
+   * @param requirements The subsystems to require.
+   */
+  public MecanumControllerCommand(
+      Trajectory trajectory,
+      Supplier<Pose2d> pose,
+      SimpleMotorFeedforward feedforward,
+      MecanumDriveKinematics kinematics,
+      PIDController xController,
+      PIDController yController,
+      ProfiledPIDController thetaController,
+      double maxWheelVelocityMetersPerSecond,
+      PIDController frontLeftController,
+      PIDController rearLeftController,
+      PIDController frontRightController,
+      PIDController rearRightController,
+      Supplier<MecanumDriveWheelSpeeds> currentWheelSpeeds,
+      MecanumVoltagesConsumer outputDriveVoltages,
+      Subsystem... requirements) {
+    this(
+        trajectory,
+        pose,
+        feedforward,
+        kinematics,
+        xController,
+        yController,
+        thetaController,
+        () ->
+            trajectory.getStates().get(trajectory.getStates().size() - 1).poseMeters.getRotation(),
+        maxWheelVelocityMetersPerSecond,
+        frontLeftController,
+        rearLeftController,
+        frontRightController,
+        rearRightController,
+        currentWheelSpeeds,
+        outputDriveVoltages,
+        requirements);
+  }
+
+  /**
+   * Constructs a new MecanumControllerCommand that when executed will follow the provided
+   * trajectory. PID control and feedforward are handled internally. Outputs are scaled from -12 to
+   * 12 as a voltage output to the motor.
+   *
+   * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path
+   * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
+   *
    * <p>Note 2: The final rotation of the robot will be set to the rotation of the final pose in the
    * trajectory. The robot will not follow the rotations from the poses at each timestep. If
    * alternate rotation behavior is desired, the other constructor with a supplier for rotation
@@ -174,6 +309,7 @@ public class MecanumControllerCommand extends Command {
    *     voltages.
    * @param requirements The subsystems to require.
    */
+  @Deprecated(since = "2025", forRemoval = true)
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -198,15 +334,15 @@ public class MecanumControllerCommand extends Command {
         xController,
         yController,
         thetaController,
-        () ->
-            trajectory.getStates().get(trajectory.getStates().size() - 1).poseMeters.getRotation(),
         maxWheelVelocityMetersPerSecond,
         frontLeftController,
         rearLeftController,
         frontRightController,
         rearRightController,
         currentWheelSpeeds,
-        outputDriveVoltages,
+        (frontLeft, frontRight, rearLeft, rearRight) ->
+            outputDriveVoltages.accept(
+                new MecanumDriveMotorVoltages(frontLeft, frontRight, rearLeft, rearRight)),
         requirements);
   }
 
@@ -331,8 +467,13 @@ public class MecanumControllerCommand extends Command {
     var initialYVelocity =
         initialState.velocityMetersPerSecond * initialState.poseMeters.getRotation().getSin();
 
-    m_prevSpeeds =
+    MecanumDriveWheelSpeeds prevSpeeds =
         m_kinematics.toWheelSpeeds(new ChassisSpeeds(initialXVelocity, initialYVelocity, 0.0));
+
+    m_prevFrontLeftSpeedSetpoint = prevSpeeds.frontLeftMetersPerSecond;
+    m_prevRearLeftSpeedSetpoint = prevSpeeds.rearLeftMetersPerSecond;
+    m_prevFrontRightSpeedSetpoint = prevSpeeds.frontRightMetersPerSecond;
+    m_prevRearRightSpeedSetpoint = prevSpeeds.rearRightMetersPerSecond;
 
     m_timer.restart();
   }
@@ -340,7 +481,6 @@ public class MecanumControllerCommand extends Command {
   @Override
   public void execute() {
     double curTime = m_timer.get();
-    double dt = curTime - m_prevTime;
 
     var desiredState = m_trajectory.sample(curTime);
 
@@ -350,10 +490,10 @@ public class MecanumControllerCommand extends Command {
 
     targetWheelSpeeds.desaturate(m_maxWheelVelocityMetersPerSecond);
 
-    var frontLeftSpeedSetpoint = targetWheelSpeeds.frontLeftMetersPerSecond;
-    var rearLeftSpeedSetpoint = targetWheelSpeeds.rearLeftMetersPerSecond;
-    var frontRightSpeedSetpoint = targetWheelSpeeds.frontRightMetersPerSecond;
-    var rearRightSpeedSetpoint = targetWheelSpeeds.rearRightMetersPerSecond;
+    double frontLeftSpeedSetpoint = targetWheelSpeeds.frontLeftMetersPerSecond;
+    double rearLeftSpeedSetpoint = targetWheelSpeeds.rearLeftMetersPerSecond;
+    double frontRightSpeedSetpoint = targetWheelSpeeds.frontRightMetersPerSecond;
+    double rearRightSpeedSetpoint = targetWheelSpeeds.rearRightMetersPerSecond;
 
     double frontLeftOutput;
     double rearLeftOutput;
@@ -362,24 +502,19 @@ public class MecanumControllerCommand extends Command {
 
     if (m_usePID) {
       final double frontLeftFeedforward =
-          m_feedforward.calculate(
-              frontLeftSpeedSetpoint,
-              (frontLeftSpeedSetpoint - m_prevSpeeds.frontLeftMetersPerSecond) / dt);
+          m_feedforward.calculateWithVelocities(
+              m_prevFrontLeftSpeedSetpoint, frontLeftSpeedSetpoint);
 
       final double rearLeftFeedforward =
-          m_feedforward.calculate(
-              rearLeftSpeedSetpoint,
-              (rearLeftSpeedSetpoint - m_prevSpeeds.rearLeftMetersPerSecond) / dt);
+          m_feedforward.calculateWithVelocities(m_prevRearLeftSpeedSetpoint, rearLeftSpeedSetpoint);
 
       final double frontRightFeedforward =
-          m_feedforward.calculate(
-              frontRightSpeedSetpoint,
-              (frontRightSpeedSetpoint - m_prevSpeeds.frontRightMetersPerSecond) / dt);
+          m_feedforward.calculateWithVelocities(
+              m_prevFrontRightSpeedSetpoint, frontRightSpeedSetpoint);
 
       final double rearRightFeedforward =
-          m_feedforward.calculate(
-              rearRightSpeedSetpoint,
-              (rearRightSpeedSetpoint - m_prevSpeeds.rearRightMetersPerSecond) / dt);
+          m_feedforward.calculateWithVelocities(
+              m_prevRearRightSpeedSetpoint, rearRightSpeedSetpoint);
 
       frontLeftOutput =
           frontLeftFeedforward
@@ -402,8 +537,7 @@ public class MecanumControllerCommand extends Command {
                   m_currentWheelSpeeds.get().rearRightMetersPerSecond, rearRightSpeedSetpoint);
 
       m_outputDriveVoltages.accept(
-          new MecanumDriveMotorVoltages(
-              frontLeftOutput, frontRightOutput, rearLeftOutput, rearRightOutput));
+          frontLeftOutput, frontRightOutput, rearLeftOutput, rearRightOutput);
 
     } else {
       m_outputWheelSpeeds.accept(
@@ -413,9 +547,6 @@ public class MecanumControllerCommand extends Command {
               rearLeftSpeedSetpoint,
               rearRightSpeedSetpoint));
     }
-
-    m_prevTime = curTime;
-    m_prevSpeeds = targetWheelSpeeds;
   }
 
   @Override
@@ -426,5 +557,23 @@ public class MecanumControllerCommand extends Command {
   @Override
   public boolean isFinished() {
     return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
+  }
+
+  /** A consumer to represent an operation on the voltages of a mecanum drive. */
+  @FunctionalInterface
+  public interface MecanumVoltagesConsumer {
+    /**
+     * Accepts the voltages to perform some operation with them.
+     *
+     * @param frontLeftVoltage The voltage of the front left motor.
+     * @param frontRightVoltage The voltage of the front right motor.
+     * @param rearLeftVoltage The voltage of the rear left motor.
+     * @param rearRightVoltage The voltage of the rear left motor.
+     */
+    void accept(
+        double frontLeftVoltage,
+        double frontRightVoltage,
+        double rearLeftVoltage,
+        double rearRightVoltage);
   }
 }

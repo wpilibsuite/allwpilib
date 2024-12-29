@@ -4,6 +4,7 @@
 
 #include "frc/smartdashboard/Mechanism2d.h"
 
+#include <memory>
 #include <string_view>
 
 #include <networktables/NTSendableBuilder.h>
@@ -21,16 +22,12 @@ Mechanism2d::Mechanism2d(double width, double height,
 
 MechanismRoot2d* Mechanism2d::GetRoot(std::string_view name, double x,
                                       double y) {
-  auto& obj = m_roots[name];
-  if (obj) {
-    return obj.get();
+  auto [it, isNew] =
+      m_roots.try_emplace(name, name, x, y, MechanismRoot2d::private_init{});
+  if (isNew && m_table) {
+    it->second.Update(m_table->GetSubTable(name));
   }
-  obj = std::make_unique<MechanismRoot2d>(name, x, y,
-                                          MechanismRoot2d::private_init{});
-  if (m_table) {
-    obj->Update(m_table->GetSubTable(name));
-  }
-  return obj.get();
+  return &it->second;
 }
 
 void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
@@ -49,8 +46,7 @@ void Mechanism2d::InitSendable(nt::NTSendableBuilder& builder) {
   m_dimsPub.Set({{m_width, m_height}});
   m_colorPub = m_table->GetStringTopic(kBackgroundColor).Publish();
   m_colorPub.Set(m_color);
-  for (const auto& entry : m_roots) {
-    const auto& root = entry.getValue().get();
-    root->Update(m_table->GetSubTable(entry.getKey()));
+  for (auto& entry : m_roots) {
+    entry.second.Update(m_table->GetSubTable(entry.first));
   }
 }

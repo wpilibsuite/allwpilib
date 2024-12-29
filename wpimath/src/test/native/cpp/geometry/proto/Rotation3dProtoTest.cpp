@@ -3,25 +3,25 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
+#include <wpi/SmallVector.h>
 
 #include "frc/geometry/Rotation3d.h"
-#include "geometry3d.pb.h"
 
 using namespace frc;
 
 namespace {
-
-using ProtoType = wpi::Protobuf<frc::Rotation3d>;
 
 const Rotation3d kExpectedData =
     Rotation3d{Quaternion{2.29, 0.191, 0.191, 17.4}};
 }  // namespace
 
 TEST(Rotation3dProtoTest, Roundtrip) {
-  google::protobuf::Arena arena;
-  google::protobuf::Message* proto = ProtoType::New(&arena);
-  ProtoType::Pack(proto, kExpectedData);
+  wpi::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::SmallVector<uint8_t, 64> buf;
 
-  Rotation3d unpacked_data = ProtoType::Unpack(*proto);
-  EXPECT_EQ(kExpectedData.GetQuaternion(), unpacked_data.GetQuaternion());
+  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  auto unpacked_data = message.Unpack(buf);
+  ASSERT_TRUE(unpacked_data.has_value());
+
+  EXPECT_EQ(kExpectedData.GetQuaternion(), unpacked_data->GetQuaternion());
 }

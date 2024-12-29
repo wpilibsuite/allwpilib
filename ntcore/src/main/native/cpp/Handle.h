@@ -33,12 +33,12 @@ class Handle {
   static_assert(kTypeMax <= wpi::kHandleTypeHALBase);
   enum { kIndexMax = 0xfffff };
 
-  explicit Handle(NT_Handle handle) : m_handle(handle) {}
-  operator NT_Handle() const { return m_handle; }
+  constexpr explicit Handle(NT_Handle handle) : m_handle(handle) {}
+  constexpr operator NT_Handle() const { return m_handle; }
 
-  NT_Handle handle() const { return m_handle; }
+  constexpr NT_Handle handle() const { return m_handle; }
 
-  Handle(int inst, int index, Type type) {
+  constexpr Handle(int inst, int index, Type type) {
     if (inst < 0 || index < 0) {
       m_handle = 0;
       return;
@@ -47,16 +47,22 @@ class Handle {
                (index & 0xfffff);
   }
 
-  unsigned int GetIndex() const {
+  constexpr unsigned int GetIndex() const {
     return static_cast<unsigned int>(m_handle) & 0xfffff;
   }
-  Type GetType() const {
+  constexpr Type GetType() const {
     return static_cast<Type>((static_cast<int>(m_handle) >> 24) & 0x7f);
   }
-  int GetInst() const { return (static_cast<int>(m_handle) >> 20) & 0xf; }
-  bool IsType(Type type) const { return type == GetType(); }
-  int GetTypedIndex(Type type) const { return IsType(type) ? GetIndex() : -1; }
-  int GetTypedInst(Type type) const { return IsType(type) ? GetInst() : -1; }
+  constexpr int GetInst() const {
+    return (static_cast<int>(m_handle) >> 20) & 0xf;
+  }
+  constexpr bool IsType(Type type) const { return type == GetType(); }
+  constexpr int GetTypedIndex(Type type) const {
+    return IsType(type) ? GetIndex() : -1;
+  }
+  constexpr int GetTypedInst(Type type) const {
+    return IsType(type) ? GetInst() : -1;
+  }
 
  private:
   NT_Handle m_handle;

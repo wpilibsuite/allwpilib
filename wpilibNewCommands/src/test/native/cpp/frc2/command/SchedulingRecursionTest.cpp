@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <utility>
+
 #include <gtest/gtest.h>
 
 #include "CommandTestBase.h"
@@ -335,6 +337,45 @@ TEST_F(SchedulingRecursionTest, CancelDefaultCommandFromEnd) {
   EXPECT_EQ(2, counter);
   EXPECT_FALSE(scheduler.IsScheduled(&defaultCommand));
   EXPECT_TRUE(scheduler.IsScheduled(&other));
+}
+
+TEST_F(SchedulingRecursionTest, CancelNextCommandFromCommand) {
+  CommandScheduler scheduler = GetScheduler();
+
+  frc2::RunCommand* command1Ptr = nullptr;
+  frc2::RunCommand* command2Ptr = nullptr;
+  int counter = 0;
+
+  auto command1 = frc2::RunCommand([&counter, &command2Ptr, &scheduler] {
+    scheduler.Cancel(command2Ptr);
+    counter++;
+  });
+  auto command2 = frc2::RunCommand([&counter, &command1Ptr, &scheduler] {
+    scheduler.Cancel(command1Ptr);
+    counter++;
+  });
+
+  command1Ptr = &command1;
+  command2Ptr = &command2;
+
+  scheduler.Schedule(&command1);
+  scheduler.Schedule(&command2);
+  scheduler.Run();
+
+  EXPECT_EQ(counter, 1) << "Second command was run when it shouldn't have been";
+
+  // only one of the commands should be canceled.
+  EXPECT_FALSE(scheduler.IsScheduled(&command1) &&
+               scheduler.IsScheduled(&command2))
+      << "Both commands are running when only one should be";
+  // one of the commands shouldn't be canceled because the other one is canceled
+  // first
+  EXPECT_TRUE(scheduler.IsScheduled(&command1) ||
+              scheduler.IsScheduled(&command2))
+      << "Both commands are canceled when only one should be";
+
+  scheduler.Run();
+  EXPECT_EQ(counter, 2);
 }
 
 INSTANTIATE_TEST_SUITE_P(

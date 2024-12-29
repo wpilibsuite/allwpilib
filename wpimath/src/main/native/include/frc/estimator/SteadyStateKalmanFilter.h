@@ -4,12 +4,22 @@
 
 #pragma once
 
+#include <cmath>
+#include <stdexcept>
+#include <string>
+
+#include <Eigen/Cholesky>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
+#include "frc/DARE.h"
 #include "frc/EigenCore.h"
+#include "frc/StateSpaceUtil.h"
+#include "frc/fmt/Eigen.h"
+#include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"
 #include "units/time.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
@@ -48,7 +58,7 @@ class SteadyStateKalmanFilter {
   using OutputArray = wpi::array<double, Outputs>;
 
   /**
-   * Constructs a staeady-state Kalman filter with the given plant.
+   * Constructs a steady-state Kalman filter with the given plant.
    *
    * See
    * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
@@ -58,12 +68,84 @@ class SteadyStateKalmanFilter {
    * @param stateStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dt                 Nominal discretization timestep.
-   * @throws std::invalid_argument If the system is unobservable.
+   * @throws std::invalid_argument If the system is undetectable.
    */
   SteadyStateKalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
                           const StateArray& stateStdDevs,
                           const OutputArray& measurementStdDevs,
-                          units::second_t dt);
+                          units::second_t dt) {
+    m_plant = &plant;
+
+    auto contQ = MakeCovMatrix(stateStdDevs);
+    auto contR = MakeCovMatrix(measurementStdDevs);
+
+    Matrixd<States, States> discA;
+    Matrixd<States, States> discQ;
+    DiscretizeAQ<States>(plant.A(), contQ, dt, &discA, &discQ);
+
+    auto discR = DiscretizeR<Outputs>(contR, dt);
+
+    const auto& C = plant.C();
+
+    if (!IsDetectable<States, Outputs>(discA, C)) {
+      std::string msg = fmt::format(
+          "The system passed to the Kalman filter is undetectable!\n\n"
+          "A =\n{}\nC =\n{}\n",
+          discA, C);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    }
+
+    if (auto P = DARE<States, Outputs>(discA.transpose(), C.transpose(), discQ,
+                                       discR)) {
+      // S = CPCᵀ + R
+      Matrixd<Outputs, Outputs> S = C * P.value() * C.transpose() + discR;
+
+      // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
+      // efficiently.
+      //
+      // K = PCᵀS⁻¹
+      // KS = PCᵀ
+      // (KS)ᵀ = (PCᵀ)ᵀ
+      // SᵀKᵀ = CPᵀ
+      //
+      // The solution of Ax = b can be found via x = A.solve(b).
+      //
+      // Kᵀ = Sᵀ.solve(CPᵀ)
+      // K = (Sᵀ.solve(CPᵀ))ᵀ
+      m_K = S.transpose().ldlt().solve(C * P.value().transpose()).transpose();
+    } else if (P.error() == DAREError::QNotSymmetric ||
+               P.error() == DAREError::QNotPositiveSemidefinite) {
+      std::string msg =
+          fmt::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    } else if (P.error() == DAREError::RNotSymmetric ||
+               P.error() == DAREError::RNotPositiveDefinite) {
+      std::string msg =
+          fmt::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    } else if (P.error() == DAREError::ABNotStabilizable) {
+      std::string msg = fmt::format(
+          "The (A, C) pair is not detectable.\n\nA =\n{}\nC =\n{}\n",
+          to_string(P.error()), discA, C);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    } else if (P.error() == DAREError::ACNotDetectable) {
+      std::string msg = fmt::format("{}\n\nA =\n{}\nQ =\n{}\n",
+                                    to_string(P.error()), discA, discQ);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    }
+
+    Reset();
+  }
 
   SteadyStateKalmanFilter(SteadyStateKalmanFilter&&) = default;
   SteadyStateKalmanFilter& operator=(SteadyStateKalmanFilter&&) = default;
@@ -119,7 +201,9 @@ class SteadyStateKalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const InputVector& u, units::second_t dt);
+  void Predict(const InputVector& u, units::second_t dt) {
+    m_xHat = m_plant->CalculateX(m_xHat, u, dt);
+  }
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
@@ -127,7 +211,13 @@ class SteadyStateKalmanFilter {
    * @param u Same control input used in the last predict step.
    * @param y Measurement vector.
    */
-  void Correct(const InputVector& u, const OutputVector& y);
+  void Correct(const InputVector& u, const OutputVector& y) {
+    const auto& C = m_plant->C();
+    const auto& D = m_plant->D();
+
+    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
+    m_xHat += m_K * (y - (C * m_xHat + D * u));
+  }
 
  private:
   LinearSystem<States, Inputs, Outputs>* m_plant;
@@ -149,5 +239,3 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     SteadyStateKalmanFilter<2, 1, 1>;
 
 }  // namespace frc
-
-#include "SteadyStateKalmanFilter.inc"

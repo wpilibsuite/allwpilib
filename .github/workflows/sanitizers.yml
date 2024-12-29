@@ -6,6 +6,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
+env:
+  SCCACHE_WEBDAV_ENDPOINT: "https://frcmaven.wpi.edu/artifactory/wpilib-generic-cache-cmake-local"
+  SCCACHE_WEBDAV_KEY_PREFIX: "sccache"
+
 jobs:
   build:
     strategy:
@@ -26,33 +30,28 @@ jobs:
             ctest-flags: ""
     name: "${{ matrix.name }}"
     runs-on: ubuntu-22.04
-    container: wpilib/roborio-cross-ubuntu:2024-22.04
+    container: wpilib/roborio-cross-ubuntu:2025-22.04
     steps:
       - name: Install Dependencies
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3 clang-14 libprotobuf-dev protobuf-compiler ninja-build
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java clang-14 libprotobuf-dev protobuf-compiler ninja-build
 
-      - name: Install QuickBuffers
-        if: runner.os == 'Linux'
-        run: wget https://github.com/HebiRobotics/QuickBuffers/releases/download/1.3.3/protoc-gen-quickbuf_1.3.3_amd64.deb && sudo apt install ./protoc-gen-quickbuf_1.3.3_amd64.deb
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@v0.0.3
-
-      - name: Install jinja
-        run: python -m pip install jinja2
+      - name: Install sccache
+        uses: mozilla-actions/sccache-action@v0.0.5
 
       - uses: actions/checkout@v4
 
       - name: configure
         run: mkdir build && cd build && cmake -G Ninja -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_C_COMPILER:FILEPATH=/usr/bin/clang-14 -DCMAKE_CXX_COMPILER:FILEPATH=/usr/bin/clang++-14 -DWITH_JAVA=OFF ${{ matrix.cmake-flags }} ..
         env:
-          SCCACHE_GHA_ENABLED: "true"
+          SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
       - name: build
         working-directory: build
         run: cmake --build . --parallel $(nproc)
         env:
-          SCCACHE_GHA_ENABLED: "true"
+          SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
       - name: test
         working-directory: build

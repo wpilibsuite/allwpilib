@@ -2,10 +2,15 @@
 
 #pragma once
 
+#include <cstdio>
 #include <system_error>
 #include <utility>
 
+#if __has_include(<fmt/base.h>)
+#include <fmt/base.h>
+#else
 #include <fmt/core.h>
+#endif
 
 namespace sleipnir {
 

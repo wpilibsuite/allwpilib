@@ -4,22 +4,15 @@
 
 #include "frc2/command/Command.h"
 
+#include <string>
+#include <utility>
+
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
-#include "frc2/command/CommandHelper.h"
+#include "frc2/command/CommandPtr.h"
 #include "frc2/command/CommandScheduler.h"
-#include "frc2/command/ConditionalCommand.h"
-#include "frc2/command/InstantCommand.h"
-#include "frc2/command/ParallelCommandGroup.h"
-#include "frc2/command/ParallelDeadlineGroup.h"
-#include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/RepeatCommand.h"
-#include "frc2/command/SequentialCommandGroup.h"
-#include "frc2/command/WaitCommand.h"
-#include "frc2/command/WaitUntilCommand.h"
-#include "frc2/command/WrapperCommand.h"
 
 using namespace frc2;
 
@@ -126,6 +119,10 @@ CommandPtr Command::Unless(std::function<bool()> condition) && {
 
 CommandPtr Command::OnlyIf(std::function<bool()> condition) && {
   return std::move(*this).ToPtr().OnlyIf(std::move(condition));
+}
+
+CommandPtr Command::WithDeadline(CommandPtr&& deadline) && {
+  return std::move(*this).ToPtr().WithDeadline(std::move(deadline));
 }
 
 CommandPtr Command::DeadlineFor(CommandPtr&& parallel) && {

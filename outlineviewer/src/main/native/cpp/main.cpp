@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <memory>
+#include <string>
 
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>

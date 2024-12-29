@@ -29,7 +29,7 @@ inline void NamedLog(UsbCameraImplObjc* objc, unsigned int level,
 
 #define OBJCLOG(level, format, ...)         \
   NamedLog(self, level, __FILE__, __LINE__, \
-           FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__)
+           format __VA_OPT__(, ) __VA_ARGS__)
 
 #define OBJCERROR(format, ...) \
   OBJCLOG(::wpi::WPI_LOG_ERROR, format __VA_OPT__(, ) __VA_ARGS__)

@@ -27,7 +27,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Packet4hf ptanh<Packet4hf>(const Packet4hf
 
 template <>
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Packet8hf ptanh<Packet8hf>(const Packet8hf& x) {
-  // Convert each 4 halfs to float, call the float ptanh, and then convert back.
+  // Convert each 4 half types to float, call the float ptanh, and then convert back.
   return vcombine_f16(vcvt_f16_f32(ptanh<Packet4f>(vcvt_f32_f16(vget_low_f16(x)))),
                       vcvt_f16_f32(ptanh<Packet4f>(vcvt_high_f32_f16(x))));
 }
@@ -37,6 +37,7 @@ BF16_PACKET_FUNCTION(Packet4f, Packet4bf, psin)
 BF16_PACKET_FUNCTION(Packet4f, Packet4bf, pcos)
 BF16_PACKET_FUNCTION(Packet4f, Packet4bf, plog)
 BF16_PACKET_FUNCTION(Packet4f, Packet4bf, pexp)
+BF16_PACKET_FUNCTION(Packet4f, Packet4bf, pexp2)
 BF16_PACKET_FUNCTION(Packet4f, Packet4bf, ptanh)
 
 template <>

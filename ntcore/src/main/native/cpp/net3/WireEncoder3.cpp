@@ -4,7 +4,9 @@
 
 #include "WireEncoder3.h"
 
-#include <wpi/MathExtras.h>
+#include <bit>
+
+#include <wpi/Endian.h>
 #include <wpi/SmallVector.h>
 #include <wpi/leb128.h>
 #include <wpi/raw_ostream.h>
@@ -19,28 +21,21 @@ static void Write8(wpi::raw_ostream& os, uint8_t val) {
 }
 
 static void Write16(wpi::raw_ostream& os, uint16_t val) {
-  os << std::span<const uint8_t>{{static_cast<uint8_t>((val >> 8) & 0xff),
-                                  static_cast<uint8_t>(val & 0xff)}};
+  uint8_t buf[2];
+  wpi::support::endian::write16be(buf, val);
+  os << buf;
 }
 
 static void Write32(wpi::raw_ostream& os, uint32_t val) {
-  os << std::span<const uint8_t>{{static_cast<uint8_t>((val >> 24) & 0xff),
-                                  static_cast<uint8_t>((val >> 16) & 0xff),
-                                  static_cast<uint8_t>((val >> 8) & 0xff),
-                                  static_cast<uint8_t>(val & 0xff)}};
+  uint8_t buf[4];
+  wpi::support::endian::write32be(buf, val);
+  os << buf;
 }
 
 static void WriteDouble(wpi::raw_ostream& os, double val) {
-  // The highest performance way to do this, albeit non-portable.
-  uint64_t v = wpi::bit_cast<uint64_t>(val);
-  os << std::span<const uint8_t>{{static_cast<uint8_t>((v >> 56) & 0xff),
-                                  static_cast<uint8_t>((v >> 48) & 0xff),
-                                  static_cast<uint8_t>((v >> 40) & 0xff),
-                                  static_cast<uint8_t>((v >> 32) & 0xff),
-                                  static_cast<uint8_t>((v >> 24) & 0xff),
-                                  static_cast<uint8_t>((v >> 16) & 0xff),
-                                  static_cast<uint8_t>((v >> 8) & 0xff),
-                                  static_cast<uint8_t>(v & 0xff)}};
+  uint8_t buf[8];
+  wpi::support::endian::write64be(buf, std::bit_cast<uint64_t>(val));
+  os << buf;
 }
 
 static void WriteString(wpi::raw_ostream& os, std::string_view str) {

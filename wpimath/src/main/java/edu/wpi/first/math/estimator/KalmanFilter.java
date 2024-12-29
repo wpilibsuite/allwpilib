@@ -5,7 +5,6 @@
 package edu.wpi.first.math.estimator;
 
 import edu.wpi.first.math.DARE;
-import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
@@ -59,7 +58,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * @param stateStdDevs Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dtSeconds Nominal discretization timestep.
-   * @throws IllegalArgumentException If the system is unobservable.
+   * @throws IllegalArgumentException If the system is undetectable.
    */
   public KalmanFilter(
       Nat<States> states,
@@ -84,17 +83,6 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     var discR = Discretization.discretizeR(m_contR, dtSeconds);
 
     var C = plant.getC();
-
-    if (!StateSpaceUtil.isDetectable(discA, C)) {
-      var msg =
-          "The system passed to the Kalman filter is unobservable!\n\nA =\n"
-              + discA.getStorage().toString()
-              + "\nC =\n"
-              + C.getStorage().toString()
-              + '\n';
-      MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
-      throw new IllegalArgumentException(msg);
-    }
 
     m_initP = new Matrix<>(DARE.dare(discA.transpose(), C.transpose(), discQ, discR));
 

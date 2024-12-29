@@ -202,9 +202,9 @@ class SparseMatrix : public SparseCompressedBase<SparseMatrix<Scalar_, Options_,
   inline StorageIndex* innerNonZeroPtr() { return m_innerNonZeros; }
 
   /** \internal */
-  inline Storage& data() { return m_data; }
+  constexpr Storage& data() { return m_data; }
   /** \internal */
-  inline const Storage& data() const { return m_data; }
+  constexpr const Storage& data() const { return m_data; }
 
   /** \returns the value of the matrix at position \a i, \a j
    * This function returns Scalar(0) if the element is an explicit \em zero */
@@ -250,7 +250,7 @@ class SparseMatrix : public SparseCompressedBase<SparseMatrix<Scalar_, Options_,
       }
     }
     if ((dst < end) && (m_data.index(dst) == inner)) {
-      // this coefficient exists, return a refernece to it
+      // this coefficient exists, return a reference to it
       if (inserted != nullptr) {
         *inserted = false;
       }
@@ -829,6 +829,8 @@ class SparseMatrix : public SparseCompressedBase<SparseMatrix<Scalar_, Options_,
     std::swap(m_innerNonZeros, other.m_innerNonZeros);
     m_data.swap(other.m_data);
   }
+  /** Free-function swap. */
+  friend EIGEN_DEVICE_FUNC void swap(SparseMatrix& a, SparseMatrix& b) { a.swap(b); }
 
   /** Sets *this to the identity matrix.
    * This function also turns the matrix into compressed mode, and drop any reserved memory. */
@@ -1226,8 +1228,8 @@ void set_from_triplets_sorted(const InputIterator& begin, const InputIterator& e
   // matrix is finalized
 }
 
-// thin wrapper around a generic binary functor to use the sparse disjunction evaulator instead of the default
-// "arithmetic" evaulator
+// thin wrapper around a generic binary functor to use the sparse disjunction evaluator instead of the default
+// "arithmetic" evaluator
 template <typename DupFunctor, typename LhsScalar, typename RhsScalar = LhsScalar>
 struct scalar_disjunction_op {
   using result_type = typename result_of<DupFunctor(LhsScalar, RhsScalar)>::type;
@@ -1633,7 +1635,7 @@ SparseMatrix<Scalar_, Options_, StorageIndex_>::insertCompressedAtByOuterInner(I
   // first, check if there is adequate allocated memory
   if (m_data.allocatedSize() <= m_data.size()) {
     // if there is no capacity for a single insertion, double the capacity
-    // increase capacity by a mininum of 32
+    // increase capacity by a minimum of 32
     Index minReserve = 32;
     Index reserveSize = numext::maxi(minReserve, m_data.allocatedSize());
     m_data.reserve(reserveSize);

@@ -17,8 +17,7 @@ import edu.wpi.first.math.geometry.proto.Translation3dProto;
 import edu.wpi.first.math.geometry.struct.Translation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -89,15 +88,26 @@ public class Translation3d
    * @param y The y component of the translation.
    * @param z The z component of the translation.
    */
-  public Translation3d(Measure<Distance> x, Measure<Distance> y, Measure<Distance> z) {
+  public Translation3d(Distance x, Distance y, Distance z) {
     this(x.in(Meters), y.in(Meters), z.in(Meters));
   }
 
   /**
-   * Constructs a Translation3d from the provided translation vector's X, Y, and Z components. The
-   * values are assumed to be in meters.
+   * Constructs a 3D translation from a 2D translation in the X-Y plane.
    *
-   * @param vector The translation vector to represent.
+   * @param translation The 2D translation.
+   * @see Pose3d#Pose3d(Pose2d)
+   * @see Transform3d#Transform3d(Transform2d)
+   */
+  public Translation3d(Translation2d translation) {
+    this(translation.getX(), translation.getY(), 0.0);
+  }
+
+  /**
+   * Constructs a Translation3d from a 3D translation vector. The values are assumed to be in
+   * meters.
+   *
+   * @param vector The translation vector.
    */
   public Translation3d(Vector<N3> vector) {
     this(vector.get(0), vector.get(1), vector.get(2));
@@ -147,9 +157,36 @@ public class Translation3d
   }
 
   /**
-   * Returns a vector representation of this translation.
+   * Returns the X component of the translation in a measure.
    *
-   * @return A Vector representation of this translation.
+   * @return The x component of the translation in a measure.
+   */
+  public Distance getMeasureX() {
+    return Meters.of(m_x);
+  }
+
+  /**
+   * Returns the Y component of the translation in a measure.
+   *
+   * @return The y component of the translation in a measure.
+   */
+  public Distance getMeasureY() {
+    return Meters.of(m_y);
+  }
+
+  /**
+   * Returns the Z component of the translation in a measure.
+   *
+   * @return The z component of the translation in a measure.
+   */
+  public Distance getMeasureZ() {
+    return Meters.of(m_z);
+  }
+
+  /**
+   * Returns a 2D translation vector representation of this translation.
+   *
+   * @return A 2D translation vector representation of this translation.
    */
   public Vector<N3> toVector() {
     return VecBuilder.fill(m_x, m_y, m_z);

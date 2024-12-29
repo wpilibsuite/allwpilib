@@ -5,6 +5,9 @@
 #include "frc/PneumaticHub.h"
 
 #include <array>
+#include <cstdio>
+#include <memory>
+#include <string>
 
 #include <fmt/format.h>
 #include <hal/REVPH.h>
@@ -148,7 +151,7 @@ void PneumaticHub::EnableCompressorAnalog(
     units::pounds_per_square_inch_t maxPressure) {
   if (minPressure >= maxPressure) {
     throw FRC_MakeError(err::InvalidParameter,
-                        "maxPressure must be greater than minPresure");
+                        "maxPressure must be greater than minPressure");
   }
   if (minPressure < 0_psi || minPressure > 120_psi) {
     throw FRC_MakeError(err::ParameterOutOfRange,
@@ -178,7 +181,7 @@ void PneumaticHub::EnableCompressorHybrid(
     units::pounds_per_square_inch_t maxPressure) {
   if (minPressure >= maxPressure) {
     throw FRC_MakeError(err::InvalidParameter,
-                        "maxPressure must be greater than minPresure");
+                        "maxPressure must be greater than minPressure");
   }
   if (minPressure < 0_psi || minPressure > 120_psi) {
     throw FRC_MakeError(err::ParameterOutOfRange,
@@ -243,14 +246,9 @@ int PneumaticHub::GetModuleNumber() const {
 
 int PneumaticHub::GetSolenoidDisabledList() const {
   int32_t status = 0;
-  HAL_REVPHStickyFaults faults;
-  std::memset(&faults, 0, sizeof(faults));
-  HAL_GetREVPHStickyFaults(m_handle, &faults, &status);
+  auto result = HAL_GetREVPHSolenoidDisabledList(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  uint32_t intFaults = 0;
-  static_assert(sizeof(faults) == sizeof(intFaults));
-  std::memcpy(&intFaults, &faults, sizeof(faults));
-  return intFaults & 0xFFFF;
+  return result;
 }
 
 void PneumaticHub::FireOneShot(int index) {

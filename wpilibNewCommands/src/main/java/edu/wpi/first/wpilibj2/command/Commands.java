@@ -6,8 +6,7 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
+import edu.wpi.first.units.measure.Time;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -137,7 +136,7 @@ public final class Commands {
    * @return the command
    * @see WaitCommand
    */
-  public static Command waitTime(Measure<Time> time) {
+  public static Command waitTime(Time time) {
     return new WaitCommand(time);
   }
 
@@ -200,7 +199,7 @@ public final class Commands {
    * @param supplier the command supplier
    * @return the command
    * @deprecated The ProxyCommand supplier constructor has been deprecated in favor of directly
-   *     proxying a {@link DeferredCommand}, see ProxyCommand documentaion for more details. As a
+   *     proxying a {@link DeferredCommand}, see ProxyCommand documentation for more details. As a
    *     replacement, consider using `defer(supplier).asProxy()`.
    * @see ProxyCommand
    */

@@ -7,12 +7,14 @@
 #include <concepts>
 #include <limits>
 
+#include "frc/geometry/Ellipse2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "units/length.h"
 
 namespace frc {
+
 /**
  * Enforces a particular constraint only within an elliptical region.
  */
@@ -27,21 +29,33 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
    * @param yWidth The height of the ellipse in which to enforce the constraint.
    * @param rotation The rotation to apply to all radii around the origin.
    * @param constraint The constraint to enforce when the robot is within the
-   * region.
+   *     region.
+   * @deprecated Use constructor taking Ellipse2d instead.
    */
-  EllipticalRegionConstraint(const Translation2d& center, units::meter_t xWidth,
-                             units::meter_t yWidth, const Rotation2d& rotation,
-                             const Constraint& constraint)
-      : m_center(center),
-        m_radii(xWidth / 2.0, yWidth / 2.0),
-        m_constraint(constraint) {
-    m_radii = m_radii.RotateBy(rotation);
-  }
+  [[deprecated("Use constructor taking Ellipse2d instead.")]]
+  constexpr EllipticalRegionConstraint(const Translation2d& center,
+                                       units::meter_t xWidth,
+                                       units::meter_t yWidth,
+                                       const Rotation2d& rotation,
+                                       const Constraint& constraint)
+      : m_ellipse{Pose2d{center, rotation}, xWidth / 2.0, yWidth / 2.0},
+        m_constraint(constraint) {}
 
-  units::meters_per_second_t MaxVelocity(
+  /**
+   * Constructs a new EllipticalRegionConstraint.
+   *
+   * @param ellipse The ellipse in which to enforce the constraint.
+   * @param constraint The constraint to enforce when the robot is within the
+   *     region.
+   */
+  constexpr EllipticalRegionConstraint(const Ellipse2d& ellipse,
+                                       const Constraint& constraint)
+      : m_ellipse{ellipse}, m_constraint{constraint} {}
+
+  constexpr units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
       units::meters_per_second_t velocity) const override {
-    if (IsPoseInRegion(pose)) {
+    if (m_ellipse.Contains(pose.Translation())) {
       return m_constraint.MaxVelocity(pose, curvature, velocity);
     } else {
       return units::meters_per_second_t{
@@ -49,43 +63,19 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
     }
   }
 
-  MinMax MinMaxAcceleration(const Pose2d& pose, units::curvature_t curvature,
-                            units::meters_per_second_t speed) const override {
-    if (IsPoseInRegion(pose)) {
+  constexpr MinMax MinMaxAcceleration(
+      const Pose2d& pose, units::curvature_t curvature,
+      units::meters_per_second_t speed) const override {
+    if (m_ellipse.Contains(pose.Translation())) {
       return m_constraint.MinMaxAcceleration(pose, curvature, speed);
     } else {
       return {};
     }
   }
 
-  /**
-   * Returns whether the specified robot pose is within the region that the
-   * constraint is enforced in.
-   *
-   * @param pose The robot pose.
-   * @return Whether the robot pose is within the constraint region.
-   */
-  bool IsPoseInRegion(const Pose2d& pose) const {
-    // The region bounded by the ellipse is given by the equation:
-    //
-    // (x−h)²/Rx² + (y−k)²/Ry² ≤ 1
-    //
-    // Multiply by Rx²Ry² for efficiency reasons:
-    //
-    // (x−h)²Ry² + (y−k)²Rx² ≤ Rx²Ry²
-    //
-    // If the inequality is satisfied, then it is inside the ellipse; otherwise
-    // it is outside the ellipse.
-    return units::math::pow<2>(pose.X() - m_center.X()) *
-                   units::math::pow<2>(m_radii.Y()) +
-               units::math::pow<2>(pose.Y() - m_center.Y()) *
-                   units::math::pow<2>(m_radii.X()) <=
-           units::math::pow<2>(m_radii.X()) * units::math::pow<2>(m_radii.Y());
-  }
-
  private:
-  Translation2d m_center;
-  Translation2d m_radii;
+  Ellipse2d m_ellipse;
   Constraint m_constraint;
 };
+
 }  // namespace frc

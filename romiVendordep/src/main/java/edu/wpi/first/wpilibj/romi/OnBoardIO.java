@@ -31,8 +31,11 @@ public class OnBoardIO {
   private static final double MESSAGE_INTERVAL = 1.0;
   private double m_nextMessageTime;
 
+  /** Mode for Romi onboard IO channel. */
   public enum ChannelMode {
+    /** Input. */
     INPUT,
+    /** Output. */
     OUTPUT
   }
 
@@ -79,7 +82,7 @@ public class OnBoardIO {
       return m_buttonB.get();
     }
 
-    double currentTime = Timer.getFPGATimestamp();
+    double currentTime = Timer.getTimestamp();
     if (currentTime > m_nextMessageTime) {
       DriverStation.reportError("Button B was not configured", true);
       m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
@@ -97,7 +100,7 @@ public class OnBoardIO {
       return m_buttonC.get();
     }
 
-    double currentTime = Timer.getFPGATimestamp();
+    double currentTime = Timer.getTimestamp();
     if (currentTime > m_nextMessageTime) {
       DriverStation.reportError("Button C was not configured", true);
       m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
@@ -114,7 +117,7 @@ public class OnBoardIO {
     if (m_greenLed != null) {
       m_greenLed.set(value);
     } else {
-      double currentTime = Timer.getFPGATimestamp();
+      double currentTime = Timer.getTimestamp();
       if (currentTime > m_nextMessageTime) {
         DriverStation.reportError("Green LED was not configured", true);
         m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
@@ -131,7 +134,7 @@ public class OnBoardIO {
     if (m_redLed != null) {
       m_redLed.set(value);
     } else {
-      double currentTime = Timer.getFPGATimestamp();
+      double currentTime = Timer.getTimestamp();
       if (currentTime > m_nextMessageTime) {
         DriverStation.reportError("Red LED was not configured", true);
         m_nextMessageTime = currentTime + MESSAGE_INTERVAL;

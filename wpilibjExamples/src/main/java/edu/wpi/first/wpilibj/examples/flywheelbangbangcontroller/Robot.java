@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
   private final PWMSparkMax m_flywheelMotor = new PWMSparkMax(kMotorPort);
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
 
-  private final BangBangController m_bangBangControler = new BangBangController();
+  private final BangBangController m_bangBangController = new BangBangController();
 
   // Gains are for example purposes only - must be determined for your own robot!
   public static final double kFlywheelKs = 0.0001; // V
@@ -65,10 +65,9 @@ public class Robot extends TimedRobot {
   private final FlywheelSim m_flywheelSim = new FlywheelSim(m_plant, m_gearbox);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
-  @Override
-  public void robotInit() {
-    // Add bang-bang controler to SmartDashboard and networktables.
-    SmartDashboard.putData(m_bangBangControler);
+  public Robot() {
+    // Add bang-bang controller to SmartDashboard and networktables.
+    SmartDashboard.putData(m_bangBangController);
   }
 
   /** Controls flywheel to a set speed (RPM) controlled by a joystick. */
@@ -82,7 +81,7 @@ public class Robot extends TimedRobot {
                 * Units.rotationsPerMinuteToRadiansPerSecond(kMaxSetpointValue));
 
     // Set setpoint and measurement of the bang-bang controller
-    double bangOutput = m_bangBangControler.calculate(m_encoder.getRate(), setpoint) * 12.0;
+    double bangOutput = m_bangBangController.calculate(m_encoder.getRate(), setpoint) * 12.0;
 
     // Controls a motor with the output of the BangBang controller and a
     // feedforward. The feedforward is reduced slightly to avoid overspeeding

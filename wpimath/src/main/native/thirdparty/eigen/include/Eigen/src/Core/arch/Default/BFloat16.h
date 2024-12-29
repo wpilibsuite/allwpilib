@@ -139,15 +139,11 @@ struct numeric_limits_bfloat16_impl {
   static EIGEN_CONSTEXPR const bool has_infinity = true;
   static EIGEN_CONSTEXPR const bool has_quiet_NaN = true;
   static EIGEN_CONSTEXPR const bool has_signaling_NaN = true;
-#if __cplusplus >= 202302L
   EIGEN_DIAGNOSTICS(push)
   EIGEN_DISABLE_DEPRECATED_WARNING
-#endif
   static EIGEN_CONSTEXPR const std::float_denorm_style has_denorm = std::denorm_present;
   static EIGEN_CONSTEXPR const bool has_denorm_loss = false;
-#if __cplusplus >= 202302L
   EIGEN_DIAGNOSTICS(pop)
-#endif
   static EIGEN_CONSTEXPR const std::float_round_style round_style = std::numeric_limits<float>::round_style;
   static EIGEN_CONSTEXPR const bool is_iec559 = true;
   // The C++ standard defines this as "true if the set of values representable
@@ -194,17 +190,13 @@ template <typename T>
 EIGEN_CONSTEXPR const bool numeric_limits_bfloat16_impl<T>::has_quiet_NaN;
 template <typename T>
 EIGEN_CONSTEXPR const bool numeric_limits_bfloat16_impl<T>::has_signaling_NaN;
-#if __cplusplus >= 202302L
 EIGEN_DIAGNOSTICS(push)
 EIGEN_DISABLE_DEPRECATED_WARNING
-#endif
 template <typename T>
 EIGEN_CONSTEXPR const std::float_denorm_style numeric_limits_bfloat16_impl<T>::has_denorm;
 template <typename T>
 EIGEN_CONSTEXPR const bool numeric_limits_bfloat16_impl<T>::has_denorm_loss;
-#if __cplusplus >= 202302L
 EIGEN_DIAGNOSTICS(pop)
-#endif
 template <typename T>
 EIGEN_CONSTEXPR const std::float_round_style numeric_limits_bfloat16_impl<T>::round_style;
 template <typename T>
@@ -621,6 +613,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 abs(const bfloat16& a) {
   return numext::bit_cast<bfloat16>(x);
 }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 exp(const bfloat16& a) { return bfloat16(::expf(float(a))); }
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 exp2(const bfloat16& a) { return bfloat16(::exp2f(float(a))); }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 expm1(const bfloat16& a) { return bfloat16(numext::expm1(float(a))); }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 log(const bfloat16& a) { return bfloat16(::logf(float(a))); }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 log1p(const bfloat16& a) { return bfloat16(numext::log1p(float(a))); }
@@ -768,6 +761,31 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Eigen::bfloat16 bit_cast<Eigen::bfloat16, 
 template <>
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC uint16_t bit_cast<uint16_t, Eigen::bfloat16>(const Eigen::bfloat16& src) {
   return Eigen::bfloat16_impl::raw_bfloat16_as_uint16(src);
+}
+
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 nextafter(const bfloat16& from, const bfloat16& to) {
+  if (numext::isnan EIGEN_NOT_A_MACRO(from)) {
+    return from;
+  }
+  if (numext::isnan EIGEN_NOT_A_MACRO(to)) {
+    return to;
+  }
+  if (from == to) {
+    return to;
+  }
+  uint16_t from_bits = numext::bit_cast<uint16_t>(from);
+  bool from_sign = from_bits >> 15;
+  // Whether we are adjusting toward the infinity with the same sign as from.
+  bool toward_inf = (to > from) == !from_sign;
+  if (toward_inf) {
+    ++from_bits;
+  } else if ((from_bits & 0x7fff) == 0) {
+    // Adjusting away from inf, but from is zero, so just toggle the sign.
+    from_bits ^= 0x8000;
+  } else {
+    --from_bits;
+  }
+  return numext::bit_cast<bfloat16>(from_bits);
 }
 
 }  // namespace numext

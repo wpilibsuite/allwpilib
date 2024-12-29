@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <memory>
+
 #include <frc/DigitalInput.h>
 #include <frc/DigitalOutput.h>
 #include <frc/Errors.h>
@@ -32,7 +34,7 @@ bool OnBoardIO::GetButtonBPressed() {
     return m_buttonB->Get();
   }
 
-  auto currentTime = frc::Timer::GetFPGATimestamp();
+  auto currentTime = frc::Timer::GetTimestamp();
   if (currentTime > m_nextMessageTime) {
     FRC_ReportError(frc::err::Error, "{}", "Button B was not configured");
     m_nextMessageTime = currentTime + kMessageInterval;
@@ -45,7 +47,7 @@ bool OnBoardIO::GetButtonCPressed() {
     return m_buttonC->Get();
   }
 
-  auto currentTime = frc::Timer::GetFPGATimestamp();
+  auto currentTime = frc::Timer::GetTimestamp();
   if (currentTime > m_nextMessageTime) {
     FRC_ReportError(frc::err::Error, "{}", "Button C was not configured");
     m_nextMessageTime = currentTime + kMessageInterval;
@@ -57,7 +59,7 @@ void OnBoardIO::SetGreenLed(bool value) {
   if (m_greenLed) {
     m_greenLed->Set(value);
   } else {
-    auto currentTime = frc::Timer::GetFPGATimestamp();
+    auto currentTime = frc::Timer::GetTimestamp();
     if (currentTime > m_nextMessageTime) {
       FRC_ReportError(frc::err::Error, "{}", "Green LED was not configured");
       m_nextMessageTime = currentTime + kMessageInterval;
@@ -69,7 +71,7 @@ void OnBoardIO::SetRedLed(bool value) {
   if (m_redLed) {
     m_redLed->Set(value);
   } else {
-    auto currentTime = frc::Timer::GetFPGATimestamp();
+    auto currentTime = frc::Timer::GetTimestamp();
     if (currentTime > m_nextMessageTime) {
       FRC_ReportError(frc::err::Error, "{}", "Red LED was not configured");
       m_nextMessageTime = currentTime + kMessageInterval;

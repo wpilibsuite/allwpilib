@@ -5,8 +5,15 @@
 #pragma once
 
 #include <hal/SimDevice.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
 
 namespace frc {
+
+/**
+ * @ingroup romi_api
+ * @{
+ */
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.
@@ -19,55 +26,67 @@ class RomiGyro {
   RomiGyro();
 
   /**
-   * Return the actual angle in degrees that the robot is currently facing.
+   * Return the actual angle in radians that the robot is currently facing.
    *
    * The angle is based on integration of the returned rate form the gyro.
-   * The angle is continuous, that is, it will continue from 360->361 degrees.
+   * The angle is continuous, that is, it will continue from 2π->3π radians.
    * This allows algorithms that wouldn't want to see a discontinuity in the
-   * gyro output as it sweeps from 360 to 0 on the second time around.
+   * gyro output as it sweeps from 2π to 0 on the second time around.
    *
-   * @return the current heading of the robot in degrees.
+   * @return The current heading of the robot.
    */
-  double GetAngle() const;
+  units::radian_t GetAngle() const;
 
   /**
    * Return the rate of rotation of the gyro
    *
    * The rate is based on the most recent reading of the gyro.
    *
-   * @return the current rate in degrees per second
+   * @return The current rate.
    */
-  double GetRate() const;
+  units::radians_per_second_t GetRate() const;
 
   /**
-   * Gets the rate of turn in degrees-per-second around the X-axis
+   * Get the rate of turn in around the X-axis.
+   *
+   * @return Rate of turn.
    */
-  double GetRateX() const;
+  units::radians_per_second_t GetRateX() const;
 
   /**
-   * Gets the rate of turn in degrees-per-second around the Y-axis
+   * Get the rate of turn in around the Y-axis.
+   *
+   * @return Rate of turn.
    */
-  double GetRateY() const;
+  units::radians_per_second_t GetRateY() const;
 
   /**
-   * Gets the rate of turn in degrees-per-second around the Z-axis
+   * Get the rate of turn around the Z-axis.
+   *
+   * @return Rate of turn.
    */
-  double GetRateZ() const;
+  units::radians_per_second_t GetRateZ() const;
 
   /**
-   * Gets the currently reported angle around the X-axis
+   * Get the currently reported angle around the X-axis.
+   *
+   * @return Current angle around X-axis.
    */
-  double GetAngleX() const;
+  units::radian_t GetAngleX() const;
 
   /**
-   * Gets the currently reported angle around the X-axis
+   * Get the currently reported angle around the Y-axis.
+   *
+   * @return Current angle around Y-axis.
    */
-  double GetAngleY() const;
+  units::radian_t GetAngleY() const;
 
   /**
-   * Gets the currently reported angle around the X-axis
+   * Get the currently reported angle around the Z-axis.
+   *
+   * @return Current angle around Z-axis.
    */
-  double GetAngleZ() const;
+  units::radian_t GetAngleZ() const;
 
   /**
    * Resets the gyro
@@ -87,5 +106,7 @@ class RomiGyro {
   double m_angleYOffset = 0;
   double m_angleZOffset = 0;
 };
+
+/** @} */
 
 }  // namespace frc
