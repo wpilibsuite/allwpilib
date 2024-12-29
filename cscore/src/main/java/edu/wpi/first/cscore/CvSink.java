@@ -44,7 +44,7 @@ public class CvSink extends ImageSink {
    * Create a sink for accepting OpenCV images. grabFrame() must be called on the created sink to
    * get each new image.
    *
-   * @param name Source name (arbitrary unique identifier)
+   * @param name Sink name (arbitrary unique identifier)
    * @param pixelFormat Source pixel format
    */
   public CvSink(String name, PixelFormat pixelFormat) {
