@@ -32,8 +32,7 @@ public class TimedRobot extends IterativeRobotBase {
      * Construct a callback container.
      *
      * @param func The callback to run.
-     * @param startTimeUs The common starting point for all callback scheduling in
-     *     microseconds.
+     * @param startTimeUs The common starting point for all callback scheduling in microseconds.
      * @param periodUs The period at which to run the callback in microseconds.
      * @param offsetUs The offset from the common starting time in microseconds.
      */
