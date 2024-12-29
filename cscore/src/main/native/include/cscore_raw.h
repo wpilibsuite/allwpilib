@@ -226,10 +226,12 @@ inline uint64_t RawSink::GrabFrameNoTimeout(wpi::RawFrame& image) const {
   return GrabSinkFrame(m_handle, image, &m_status);
 }
 
-inline uint64_t RawSink::GrabFrameLastTime(wpi::RawFrame& image, uint64_t lastFrameTime,
-                                  double timeout) const {
+inline uint64_t RawSink::GrabFrameLastTime(wpi::RawFrame& image,
+                                           uint64_t lastFrameTime,
+                                           double timeout) const {
   m_status = 0;
-  return GrabSinkFrameTimeoutLastTime(m_handle, image, timeout, lastFrameTime, &m_status);
+  return GrabSinkFrameTimeoutLastTime(m_handle, image, timeout, lastFrameTime,
+                                      &m_status);
 }
 /** @} */
 
