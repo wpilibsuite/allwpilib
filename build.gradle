@@ -29,8 +29,8 @@ wpilibVersioning.releaseMode = project.hasProperty('releaseMode')
 allprojects {
     repositories {
         maven {
-        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
-    }
+            url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+        }
     }
     if (project.hasProperty('releaseMode')) {
         wpilibRepositories.addAllReleaseRepositories(it)

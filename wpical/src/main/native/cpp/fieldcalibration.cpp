@@ -16,13 +16,8 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <ceres/ceres.h>
-#include <frc/apriltag/AprilTag.h>
-#include <frc/apriltag/AprilTagDetector.h>
-#include <frc/apriltag/AprilTagDetector_cv.h>
+#include <frc/apriltag/AprilTagDetection.h>
 #include <frc/apriltag/AprilTagFieldLayout.h>
-#include <frc/geometry/Rotation3d.h>
-#include <frc/geometry/Translation3d.h>
 #include <opencv2/calib3d.hpp>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/core/types.hpp>
@@ -31,70 +26,10 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/videoio.hpp>
 
+#include "apriltag.h"
+#include "gtsam_meme/wpical_gtsam.h"
+#include "tag36h11.h"
 #include "cameracalibration.h"
-
-struct Pose {
-  Eigen::Vector3d p;
-  Eigen::Quaterniond q;
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
-
-struct Constraint {
-  int idBegin;
-  int idEnd;
-  Pose tBeginEnd;
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
-
-class PoseGraphError {
- public:
-  explicit PoseGraphError(Pose t_ab_observed)
-      : m_t_ab_observed(std::move(t_ab_observed)) {}
-
-  template <typename T>
-  bool operator()(const T* const p_a_ptr, const T* const q_a_ptr,
-                  const T* const p_b_ptr, const T* const q_b_ptr,
-                  T* residuals_ptr) const {
-    // Tag A
-    Eigen::Map<const Eigen::Matrix<T, 3, 1>> p_a(p_a_ptr);
-    Eigen::Map<const Eigen::Quaternion<T>> q_a(q_a_ptr);
-
-    // Tag B
-    Eigen::Map<const Eigen::Matrix<T, 3, 1>> p_b(p_b_ptr);
-    Eigen::Map<const Eigen::Quaternion<T>> q_b(q_b_ptr);
-
-    // Rotation between tag A to tag B
-    Eigen::Quaternion<T> q_a_inverse = q_a.conjugate();
-    Eigen::Quaternion<T> q_ab_estimated = q_a_inverse * q_b;
-
-    // Displacement between tag A and tag B in tag A's frame
-    Eigen::Matrix<T, 3, 1> p_ab_estimated = q_a_inverse * (p_b - p_a);
-
-    // Error between the orientations
-    Eigen::Quaternion<T> delta_q =
-        m_t_ab_observed.q.template cast<T>() * q_ab_estimated.conjugate();
-
-    // Residuals
-    Eigen::Map<Eigen::Matrix<T, 6, 1>> residuals(residuals_ptr);
-    residuals.template block<3, 1>(0, 0) =
-        p_ab_estimated - m_t_ab_observed.p.template cast<T>();
-    residuals.template block<3, 1>(3, 0) = T(2.0) * delta_q.vec();
-
-    return true;
-  }
-
-  static ceres::CostFunction* Create(const Pose& t_ab_observed) {
-    return new ceres::AutoDiffCostFunction<PoseGraphError, 6, 3, 4, 3, 4>(
-        new PoseGraphError(t_ab_observed));
-  }
-
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
- private:
-  const Pose m_t_ab_observed;
-};
-
-const double tagSizeMeters = 0.1651;
 
 inline Eigen::Matrix4d EstimateTagPose(
     std::span<double, 8> tagCorners,
@@ -125,23 +60,42 @@ inline Eigen::Matrix4d EstimateTagPose(
   cv::Mat rMat;
   cv::Rodrigues(rVec, rMat);
 
-  Eigen::Matrix<double, 4, 4> cameraToTag{
-      {rMat.at<double>(0, 0), rMat.at<double>(0, 1), rMat.at<double>(0, 2),
-       tVec.at(0)},
-      {rMat.at<double>(1, 0), rMat.at<double>(1, 1), rMat.at<double>(1, 2),
-       tVec.at(1)},
-      {rMat.at<double>(2, 0), rMat.at<double>(2, 1), rMat.at<double>(2, 2),
-       tVec.at(2)},
-      {0.0, 0.0, 0.0, 1.0}};
-
-  return cameraToTag;
+  cameracalibration::CameraModel camera_model{camera_matrix, camera_distortion, -1};
+  return camera_model;
 }
 
-inline void DrawTagCube(cv::Mat& frame, Eigen::Matrix4d cameraToTag,
-                        const cameracalibration::CameraModel& cameraModel,
-                        double tagSize) {
-  cv::Mat cameraMatrix;
-  cv::Mat cameraDistortion;
+inline cameracalibration::CameraModel load_camera_model(wpi::json json_data) {
+  // Camera matrix
+  Eigen::Matrix<double, 3, 3> camera_matrix;
+
+  for (int i = 0; i < camera_matrix.rows(); i++) {
+    for (int j = 0; j < camera_matrix.cols(); j++) {
+      camera_matrix(i, j) =
+          json_data["camera_matrix"][(i * camera_matrix.cols()) + j];
+    }
+  }
+
+  // Distortion coefficients
+  Eigen::Matrix<double, 8, 1> camera_distortion;
+
+  for (int i = 0; i < camera_distortion.rows(); i++) {
+    for (int j = 0; j < camera_distortion.cols(); j++) {
+      camera_distortion(i, j) = json_data["distortion_coefficients"]
+                                         [(i * camera_distortion.cols()) + j];
+    }
+  }
+
+  cameracalibration::CameraModel camera_model{camera_matrix, camera_distortion};
+  return camera_model;
+}
+
+inline void draw_tag_cube(cv::Mat& frame,
+                          Eigen::Matrix<double, 4, 4> camera_to_tag,
+                          const Eigen::Matrix<double, 3, 3>& camera_matrix,
+                          const Eigen::Matrix<double, 8, 1>& camera_distortion,
+                          double tag_size) {
+  cv::Mat camera_matrix_cv;
+  cv::Mat camera_distortion_cv;
 
   cv::eigen2cv(cameraModel.intrinsicMatrix, cameraMatrix);
   cv::eigen2cv(cameraModel.distortionCoefficients, cameraDistortion);
@@ -195,15 +149,19 @@ inline void DrawTagCube(cv::Mat& frame, Eigen::Matrix4d cameraToTag,
   }
 }
 
-inline bool ProcessVideoFile(
-    frc::AprilTagDetector& detector,
-    const cameracalibration::CameraModel& cameraModel, double tagSize,
-    const std::string& path,
-    std::map<int, Pose, std::less<int>,
-             Eigen::aligned_allocator<std::pair<const int, Pose>>>& poses,
-    std::vector<Constraint, Eigen::aligned_allocator<Constraint>>& constraints,
-    bool showDebugWindow) {
-  if (showDebugWindow) {
+/**
+ * Convert a video file to a list of keyframes
+ */
+inline bool process_video_file(
+    apriltag_detector_t* tag_detector,
+    const Eigen::Matrix<double, 3, 3>& camera_matrix,
+    const Eigen::Matrix<double, 8, 1>& camera_distortion, double tag_size,
+    const std::string& path, gtsam::Key& keyframe,
+    wpical::KeyframeMap& outputMap, bool show_debug_window) {
+  // clear inputs
+  outputMap.clear();
+
+  if (show_debug_window) {
     cv::namedWindow("Processing Frame", cv::WINDOW_NORMAL);
   }
   cv::VideoCapture videoInput(path);
@@ -213,15 +171,13 @@ inline bool ProcessVideoFile(
     return false;
   }
 
+  // Reuse mats if we can - allocatiosn are expensive
   cv::Mat frame;
   cv::Mat frameGray;
   cv::Mat frameDebug;
 
-  int frameNum = 0;
-
-  while (videoInput.read(frame)) {
-    std::cout << "Processing " << path << " - Frame " << frameNum++
-              << std::endl;
+  while (video_input.read(frame)) {
+    std::cout << "Processing " << path << " - Frame " << keyframe << std::endl;
 
     // Convert color frame to grayscale frame
     cv::cvtColor(frame, frameGray, cv::COLOR_BGR2GRAY);
@@ -237,68 +193,50 @@ inline bool ProcessVideoFile(
       continue;
     }
 
-    // Find detection with the smallest tag ID
-    auto tagDetectionMin = results.front();
-    for (auto detection : results) {
-      if (detection->GetId() < tagDetectionMin->GetId()) {
-        tagDetectionMin = detection;
+    std::vector<TagDetection> tagsThisKeyframe;
+    for (int i = 0; i < zarray_size(tag_detections); i++) {
+      apriltag_detection_t* tag_detection_i;
+      zarray_get(tag_detections, i, &tag_detection_i);
+
+      // Convert to our data type. I don't love how complicated this is.
+      auto atag = reinterpret_cast<frc::AprilTagDetection*>(tag_detection_i);
+      auto tag_corners_cv = std::vector<cv::Point2d>{};
+      for (int corn = 0; corn < 4; corn++) {
+        tag_corners_cv.emplace_back(atag->GetCorner(corn).x,
+                                    atag->GetCorner(corn).y);
       }
+
+      // Undistort so gtsam doesn't have to deal with distortion
+      cv::Mat camCalCv(camera_matrix.rows(), camera_matrix.cols(), CV_64F);
+      cv::Mat camDistCv(camera_distortion.rows(), camera_distortion.cols(),
+                        CV_64F);
+
+      cv::eigen2cv(camera_matrix, camCalCv);
+      cv::eigen2cv(camera_distortion, camDistCv);
+
+      cv::undistortImagePoints(tag_corners_cv, tag_corners_cv, camCalCv,
+                               camDistCv);
+
+      TagDetection tag;
+      tag.id = atag->GetId();
+
+      tag.corners.resize(4);
+      std::transform(tag_corners_cv.begin(), tag_corners_cv.end(),
+                     tag.corners.begin(),
+                     [](const auto& it) { return TargetCorner{it.x, it.y}; });
+
+      tagsThisKeyframe.push_back(tag);
     }
-    std::array<double, 8> cornerBuf;
-    Eigen::Matrix4d cameraToTagMin;
-    try {
-      cameraToTagMin = EstimateTagPose(tagDetectionMin->GetCorners(cornerBuf),
-                                       cameraModel, tagSize);
-    } catch (...) {
-      // SQPNP failed, probably because the camera model is bad
-      return false;
-    }
-
-    // Find transformation from smallest tag ID
-    for (auto detection : results) {
-      // Add tag ID to poses
-      if (poses.find(detection->GetId()) == poses.end()) {
-        poses[detection->GetId()] = {Eigen::Vector3d(0.0, 0.0, 0.0),
-                                     Eigen::Quaterniond(1.0, 0.0, 0.0, 0.0)};
-      }
-      std::array<double, 8> corners;
-      // Estimate camera to tag pose
-      Eigen::Matrix4d cameraToTag;
-      try {
-        cameraToTag = EstimateTagPose(detection->GetCorners(corners),
-                                      cameraModel, tagSize);
-      } catch (...) {
-        // SQPNP failed, probably because the camera model is bad
-        return false;
-      }
-      // Draw debug cube
-      if (showDebugWindow) {
-        DrawTagCube(frameDebug, cameraToTag, cameraModel, tagSize);
-      }
-
-      // Skip finding transformation from smallest tag ID to itself
-      if (detection->GetId() == tagDetectionMin->GetId()) {
-        continue;
-      }
-
-      Eigen::Matrix4d tagMinToTag = cameraToTagMin.inverse() * cameraToTag;
-
-      // Constraint
-      Constraint constraint;
-      constraint.idBegin = tagDetectionMin->GetId();
-      constraint.idEnd = detection->GetId();
-      constraint.tBeginEnd.p = tagMinToTag.block<3, 1>(0, 3);
-      constraint.tBeginEnd.q =
-          Eigen::Quaterniond(tagMinToTag.block<3, 3>(0, 0));
-
-      constraints.push_back(constraint);
-    }
+    outputMap[keyframe] = tagsThisKeyframe;
 
     // Show debug
     if (showDebugWindow) {
       cv::imshow("Processing Frame", frameDebug);
       cv::waitKey(1);
     }
+
+    // Keep track of the frame number
+    keyframe++;
   }
 
   videoInput.release();
@@ -309,19 +247,51 @@ inline bool ProcessVideoFile(
   return true;
 }
 
-std::optional<frc::AprilTagFieldLayout> fieldcalibration::calibrate(
-    std::string inputDirPath, cameracalibration::CameraModel& cameraModel,
-    const frc::AprilTagFieldLayout& idealLayout, int pinnedTagId,
-    bool showDebugWindow) {
-  // Silence OpenCV logging
-  cv::utils::logging::setLogLevel(
-      cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
+int fieldcalibration::calibrate(std::string input_dir_path,
+                                wpi::json& output_json,
+                                std::string camera_model_path,
+                                std::string ideal_map_path, int pinned_tag_id,
+                                bool show_debug_window) {
+  // // Silence OpenCV logging
+  // cv::utils::logging::setLogLevel(
+  //     cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
 
-  bool pinnedTagFound = false;
-  // Check if pinned tag is in ideal layout
-  for (const auto& tag : idealLayout.GetTags()) {
-    if (tag.ID == pinnedTagId) {
-      pinnedTagFound = true;
+  // Load camera model
+  Eigen::Matrix3d camera_matrix;
+  Eigen::Matrix<double, 8, 1> camera_distortion;
+
+  try {
+    auto camera_model = load_camera_model(camera_model_path);
+    camera_matrix = camera_model.intrinsic_matrix;
+    camera_distortion = camera_model.distortion_coefficients;
+  } catch (...) {
+    return 1;
+  }
+
+  // Convert intrinsics to gtsam-land. Order fx fy s u0 v0
+  gtsam::Cal3_S2 gtsam_cal{
+      camera_matrix(0, 0), camera_matrix(1, 1), 0,
+      camera_matrix(0, 2), camera_matrix(1, 2),
+  };
+
+  // Load the seed field layout from disk
+  frc::AprilTagFieldLayout idealTagLayout;
+  try {
+    wpi::json json = wpi::json::parse(std::ifstream(ideal_map_path));
+    idealTagLayout = json.get<frc::AprilTagFieldLayout>();
+  } catch (...) {
+    std::cerr << "Could not deserialize" << ideal_map_path << std::endl;
+    return 1;
+  }
+
+  // Load ideal field map
+  std::map<int, wpi::json> ideal_map;
+
+  bool pinned_tag_found = false;
+  // Check if pinned tag is in ideal map
+  for (const auto& [tag_id, tag_json] : ideal_map) {
+    if (tag_id == pinned_tag_id) {
+      pinned_tag_found = true;
       break;
     }
   }
@@ -335,21 +305,25 @@ std::optional<frc::AprilTagFieldLayout> fieldcalibration::calibrate(
   detector.SetConfig({.numThreads = 8});
   detector.AddFamily("tag36h11");
 
-  // Find tag poses
-  std::map<int, Pose, std::less<int>,
-           Eigen::aligned_allocator<std::pair<const int, Pose>>>
-      poses;
-  std::vector<Constraint, Eigen::aligned_allocator<Constraint>> constraints;
+  // Write down keyframes from all our video files
+  wpical::KeyframeMap outputMap;
 
-  for (const auto& entry : std::filesystem::directory_iterator(inputDirPath)) {
+  gtsam::Key keyframe{gtsam::symbol_shorthand::X(0)};
+
+  constexpr units::meter_t TAG_SIZE = 0.1651_m;
+
+  for (const auto& entry :
+       std::filesystem::directory_iterator(input_dir_path)) {
+    // Ignore hidden files
     if (entry.path().filename().string()[0] == '.') {
       continue;
     }
 
     const std::string path = entry.path().string();
 
-    bool success = ProcessVideoFile(detector, cameraModel, tagSizeMeters, path,
-                                    poses, constraints, showDebugWindow);
+    bool success = process_video_file(
+        tag_detector, camera_matrix, camera_distortion, TAG_SIZE.to<double>(),
+        path, keyframe, outputMap, show_debug_window);
 
     if (!success) {
       std::cout << "Unable to process video " << path << std::endl;
@@ -357,69 +331,34 @@ std::optional<frc::AprilTagFieldLayout> fieldcalibration::calibrate(
     }
   }
 
-  // Build optimization problem
-  ceres::Problem problem;
-  ceres::Manifold* quaternionManifold = new ceres::EigenQuaternionManifold;
+  wpical::GtsamApriltagMap layoutGuess{idealTagLayout, TAG_SIZE};
 
-  for (const auto& constraint : constraints) {
-    auto poseBeginIter = poses.find(constraint.idBegin);
-    auto poseEndIter = poses.find(constraint.idEnd);
+  // TODO - handle constraints more generally (ie, multiple, tunable)
 
-    ceres::CostFunction* costFunction =
-        PoseGraphError::Create(constraint.tBeginEnd);
+  // Noise on our pose prior. order is rx, ry, rz, tx, ty, tz, and units are
+  // [rad] and [m].
+  // Guess ~1 degree and 5 mm for fun.
+  using gtsam::Vector3;
+  using gtsam::Vector6;
+  Vector6 sigmas;
+  sigmas << Vector3::Constant(0.015), Vector3::Constant(0.005);
+  gtsam::SharedNoiseModel posePriorNoise =
+      gtsam::noiseModel::Diagonal::Sigmas(sigmas);
+  std::map<int32_t, std::pair<gtsam::Pose3, gtsam::SharedNoiseModel>> fixedTags{
+      {pinned_tag_id,
+       {layoutGuess.WorldToTag(pinned_tag_id).value(), posePriorNoise}}};
 
-    problem.AddResidualBlock(
-        costFunction, nullptr, poseBeginIter->second.p.data(),
-        poseBeginIter->second.q.coeffs().data(), poseEndIter->second.p.data(),
-        poseEndIter->second.q.coeffs().data());
+  // one pixel in u and v - TODO don't hardcode this
+  gtsam::SharedNoiseModel cameraNoise{
+      gtsam::noiseModel::Isotropic::Sigma(2, 1.0)};
 
-    problem.SetManifold(poseBeginIter->second.q.coeffs().data(),
-                        quaternionManifold);
-    problem.SetManifold(poseEndIter->second.q.coeffs().data(),
-                        quaternionManifold);
-  }
+  auto calResult = wpical::OptimizeLayout(layoutGuess, outputMap, gtsam_cal,
+                                          fixedTags, cameraNoise);
 
-  // Pin tag
-  auto pinnedTagIter = poses.find(pinnedTagId);
-  if (pinnedTagIter != poses.end()) {
-    problem.SetParameterBlockConstant(pinnedTagIter->second.p.data());
-    problem.SetParameterBlockConstant(pinnedTagIter->second.q.coeffs().data());
-  }
+  // Convert the output AprilTagFieldLayout to a json
+  wpi::json observed_map_json = calResult.optimizedLayout;
 
-  // Solve
-  ceres::Solver::Options options;
-  options.max_num_iterations = 200;
-  options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
-  options.num_threads = 10;
+  output_json = observed_map_json;
 
-  ceres::Solver::Summary summary;
-  ceres::Solve(options, &problem, &summary);
-
-  std::cout << summary.BriefReport() << std::endl;
-
-  Eigen::Matrix4d correctionA;
-  correctionA << 0, 0, -1, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1;
-
-  Eigen::Matrix4d correctionB;
-  correctionB << 0, 1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 1;
-
-  Eigen::Matrix4d pinnedTagTransform =
-      idealLayout.GetTagPose(pinnedTagId)->ToMatrix();
-
-  std::vector<frc::AprilTag> tags;
-  for (const auto& [tagId, pose] : poses) {
-    // Transformation from pinned tag
-    Eigen::Matrix4d transform = Eigen::Matrix4d::Identity();
-
-    transform.block<3, 3>(0, 0) = pose.q.toRotationMatrix();
-    transform.block<3, 1>(0, 3) = pose.p;
-
-    // Transformation from world
-    Eigen::Matrix4d correctedTransform =
-        pinnedTagTransform * correctionA * transform * correctionB;
-    frc::AprilTag tag{tagId, frc::Pose3d{correctedTransform}};
-    tags.emplace_back(tag);
-  }
-  return frc::AprilTagFieldLayout{tags, idealLayout.GetFieldLength(),
-                                  idealLayout.GetFieldWidth()};
+  return 0;
 }
