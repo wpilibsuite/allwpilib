@@ -111,7 +111,7 @@ public class WPIUtilJNI {
    * @param initialState true to make the event initially in signaled state
    * @return Event handle
    */
-  public static native int createEvent(boolean manualReset, boolean initialState);
+  public static native int makeEvent(boolean manualReset, boolean initialState);
 
   /**
    * Destroys an event. Destruction wakes up any waiters.
@@ -144,7 +144,7 @@ public class WPIUtilJNI {
    * @param maximumCount maximum value for the semaphore's internal counter
    * @return Semaphore handle
    */
-  public static native int createSemaphore(int initialCount, int maximumCount);
+  public static native int makeSemaphore(int initialCount, int maximumCount);
 
   /**
    * Destroys a semaphore. Destruction wakes up any waiters.
