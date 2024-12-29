@@ -1,0 +1,14 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Fri, 22 Nov 2024 09:55:22 -0500
+Subject: [PATCH 3/8] Make mrcal C++
+
+---
+ mrcal.c => mrcal.cpp | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ rename mrcal.c => mrcal.cpp (100%)
+
+diff --git a/mrcal.c b/mrcal.cpp
+similarity index 100%
+rename from mrcal.c
+rename to mrcal.cpp

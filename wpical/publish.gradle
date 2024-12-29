@@ -1,0 +1,124 @@
+apply plugin: 'maven-publish'
+
+def baseArtifactId = 'wpical'
+def artifactGroupId = 'edu.wpi.first.tools'
+def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_wpical_CLS'
+
+def outputsFolder = file("$project.buildDir/outputs")
+
+model {
+    tasks {
+        // Create the run task.
+        $.components.wpical.binaries.each { bin ->
+            if (bin.buildable && bin.name.toLowerCase().contains("debug") && nativeUtils.isNativeDesktopPlatform(bin.targetPlatform)) {
+                Task run = project.tasks.create("run", Exec) {
+                    commandLine bin.tasks.install.runScriptFile.get().asFile.toString()
+                }
+                run.dependsOn bin.tasks.install
+            }
+        }
+    }
+    publishing {
+        def wpicalTaskList = []
+        $.components.each { component ->
+            component.binaries.each { binary ->
+                if (binary in NativeExecutableBinarySpec && binary.component.name.contains("wpical")) {
+                    if (binary.buildable && (binary.name.contains('Release') || binary.name.contains('release'))) {
+                        // We are now in the binary that we want.
+                        // This is the default application path for the ZIP task.
+                        def applicationPath = binary.executable.file
+                        def icon = file("$project.projectDir/src/main/native/mac/wpical.icns")
+
+                        // Create the ZIP.
+                        def task = project.tasks.create("copywpicalExecutable" + binary.targetPlatform.operatingSystem.name + binary.targetPlatform.architecture.name, Zip) {
+                            description("Copies the wpical executable to the outputs directory.")
+                            destinationDirectory = outputsFolder
+
+                            archiveBaseName = zipBaseName
+                            duplicatesStrategy = 'exclude'
+                            archiveClassifier = nativeUtils.getPublishClassifier(binary)
+
+                            from(licenseFile) {
+                                into '/'
+                            }
+
+                            if (binary.targetPlatform.operatingSystem.isWindows()) {
+                                def exePath = binary.executable.file.absolutePath
+                                exePath = exePath.substring(0, exePath.length() - 4)
+                                def pdbPath = new File(exePath + '.pdb')
+                                from(pdbPath)
+                            }
+
+                            into(nativeUtils.getPlatformPath(binary))
+                        }
+
+                        if (binary.targetPlatform.operatingSystem.isMacOsX()) {
+                            // Create the macOS bundle.
+                            def bundleTask = project.tasks.create("bundlewpicalOsxApp" + binary.targetPlatform.architecture.name, Copy) {
+                                description("Creates a macOS application bundle for wpical")
+                                from(file("$project.projectDir/Info.plist"))
+                                into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/wpical.app/Contents"))
+                                into("MacOS") {
+                                    with copySpec {
+                                        from binary.executable.file
+                                    }
+                                }
+                                into("Resources") {
+                                    with copySpec {
+                                        from icon
+                                    }
+                                }
+
+                                inputs.property "HasDeveloperId", project.hasProperty("developerID")
+
+                                doLast {
+                                    if (project.hasProperty("developerID")) {
+                                        // Get path to binary.
+                                        exec {
+                                            workingDir rootDir
+                                            def args = [
+                                                "sh",
+                                                "-c",
+                                                "codesign --force --strict --deep " +
+                                                "--timestamp --options=runtime " +
+                                                "--verbose -s ${project.findProperty("developerID")} " +
+                                                "$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/wpical.app/"
+                                            ]
+                                            commandLine args
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Reset the application path if we are creating a bundle.
+                            applicationPath = file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name")
+                            task.from(applicationPath)
+                            project.build.dependsOn bundleTask
+
+                            bundleTask.dependsOn binary.tasks.link
+                            task.dependsOn(bundleTask)
+                        } else {
+                            task.from(applicationPath)
+                        }
+
+                        task.dependsOn binary.tasks.link
+                        wpicalTaskList.add(task)
+                        project.build.dependsOn task
+                        project.artifacts { task }
+                        addTaskToCopyAllOutputs(task)
+                    }
+                }
+            }
+        }
+
+        publications {
+            wpical(MavenPublication) {
+                wpicalTaskList.each { artifact it }
+
+                artifactId = baseArtifactId
+                groupId = artifactGroupId
+                version wpilibVersioning.version.get()
+            }
+        }
+    }
+}
