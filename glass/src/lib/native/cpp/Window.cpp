@@ -64,7 +64,6 @@ void Window::Display() {
   std::string label = fmt::format("{}###{}", name, m_id);
 
   // Accounts for size of title, collapse button, and close button
-  ImGui::ShowStyleEditor();
   float minWidth =
       ImGui::CalcTextSize(name.c_str()).x + ImGui::GetFontSize() * 2 +
       ImGui::GetStyle().ItemInnerSpacing.x * 3 +
