@@ -57,15 +57,15 @@ void Window::Display() {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_padding);
   }
 
-  std::string name = m_name;
+  std::string* name = &m_name;
   if (m_name.empty()) {
-    name = m_defaultName;
+    name = &m_defaultName;
   }
   std::string label = fmt::format("{}###{}", name, m_id);
 
   // Accounts for size of title, collapse button, and close button
   float minWidth =
-      ImGui::CalcTextSize(name.c_str()).x + ImGui::GetFontSize() * 2 +
+      ImGui::CalcTextSize(name->c_str()).x + ImGui::GetFontSize() * 2 +
       ImGui::GetStyle().ItemInnerSpacing.x * 3 +
       ImGui::GetStyle().FramePadding.x * 2 + ImGui::GetStyle().WindowBorderSize;
   // Accounts for size of hamburger button
