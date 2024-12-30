@@ -6,7 +6,6 @@
 
 #include <string>
 
-#include <wpi/SmallString.h>
 #include <wpi/json.h>
 
 #include "Instance.h"
