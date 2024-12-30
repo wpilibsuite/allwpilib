@@ -272,14 +272,12 @@ CS_SinkKind CS_GetSinkKind(CS_Sink sink, CS_Status* status) {
 }
 
 void CS_GetSinkName(CS_Sink sink, WPI_String* name, CS_Status* status) {
-  wpi::SmallString<128> buf;
-  cs::ConvertToC(name, cs::GetSinkName(sink, buf, status));
+  cs::ConvertToC(name, cs::GetSinkName(sink, status));
 }
 
 void CS_GetSinkDescription(CS_Sink sink, WPI_String* description,
                            CS_Status* status) {
-  wpi::SmallString<128> buf;
-  cs::ConvertToC(description, cs::GetSinkDescription(sink, buf, status));
+  cs::ConvertToC(description, cs::GetSinkDescription(sink, status));
 }
 
 CS_Property CS_GetSinkProperty(CS_Sink sink, const struct WPI_String* name,
