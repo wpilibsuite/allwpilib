@@ -581,12 +581,14 @@ void UsbCameraImpl::CameraThreadMain() {
               SDEBUG4("Frame was {} uS old", offset);
               frameTime -= offset;
 
-              // TODO - do we wanna report this info to the user
-              auto tsSrcFlags = buf.flags & V4L2_BUF_FLAG_TSTAMP_SRC_MASK;
+              // TODO - do we wanna report this info to the user somehow in
+              // Frame?
               SDEBUG4(
                   "End Of Frame {} Start Of Exposure {}",
-                  static_cast<bool>(tsSrcFlags & V4L2_BUF_FLAG_TSTAMP_SRC_EOF),
-                  static_cast<bool>(tsSrcFlags & V4L2_BUF_FLAG_TSTAMP_SRC_SOE));
+                  static_cast<bool>(buf.flags & V4L2_BUF_FLAG_TSTAMP_SRC_MASK &
+                                    V4L2_BUF_FLAG_TSTAMP_SRC_EOF),
+                  static_cast<bool>(buf.flags & V4L2_BUF_FLAG_TSTAMP_SRC_MASK &
+                                    V4L2_BUF_FLAG_TSTAMP_SRC_SOE));
             } else {
               // Can't do anything if we can't access the clock, leave default
             }
