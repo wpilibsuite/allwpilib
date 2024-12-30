@@ -14,7 +14,6 @@
 #include <vector>
 
 #include <wpi/RawFrame.h>
-#include <wpi/SmallVector.h>
 #include <wpi/json_fwd.h>
 
 #include "cscore_c.h"
@@ -318,12 +317,7 @@ CS_Sink CreateCvSinkCallback(std::string_view name,
  */
 CS_SinkKind GetSinkKind(CS_Sink sink, CS_Status* status);
 std::string GetSinkName(CS_Sink sink, CS_Status* status);
-std::string_view GetSinkName(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
-                             CS_Status* status);
 std::string GetSinkDescription(CS_Sink sink, CS_Status* status);
-std::string_view GetSinkDescription(CS_Sink sink,
-                                    wpi::SmallVectorImpl<char>& buf,
-                                    CS_Status* status);
 CS_Property GetSinkProperty(CS_Sink sink, std::string_view name,
                             CS_Status* status);
 std::vector<CS_Property> EnumerateSinkProperties(CS_Sink sink,
@@ -357,8 +351,6 @@ int GetMjpegServerPort(CS_Sink sink, CS_Status* status);
 void SetSinkDescription(CS_Sink sink, std::string_view description,
                         CS_Status* status);
 std::string GetSinkError(CS_Sink sink, CS_Status* status);
-std::string_view GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
-                              CS_Status* status);
 void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status);
 /** @} */
 
