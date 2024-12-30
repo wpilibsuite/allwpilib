@@ -180,36 +180,13 @@ std::string GetSourceName(CS_Source source, CS_Status* status) {
   return std::string{data->source->GetName()};
 }
 
-std::string_view GetSourceName(CS_Source source,
-                               wpi::SmallVectorImpl<char>& buf,
-                               CS_Status* status) {
-  auto data = Instance::GetInstance().GetSource(source);
-  if (!data) {
-    *status = CS_INVALID_HANDLE;
-    return {};
-  }
-  return data->source->GetName();
-}
-
 std::string GetSourceDescription(CS_Source source, CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return {};
   }
-  wpi::SmallString<128> buf;
-  return std::string{data->source->GetDescription(buf)};
-}
-
-std::string_view GetSourceDescription(CS_Source source,
-                                      wpi::SmallVectorImpl<char>& buf,
-                                      CS_Status* status) {
-  auto data = Instance::GetInstance().GetSource(source);
-  if (!data) {
-    *status = CS_INVALID_HANDLE;
-    return {};
-  }
-  return data->source->GetDescription(buf);
+  return data->source->GetDescription();
 }
 
 uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status) {

@@ -363,8 +363,7 @@ SourcePublisher::SourcePublisher(Instance& inst,
   CS_Status status = 0;
   wpi::SmallString<64> buf;
   sourcePublisher.Set(MakeSourceValue(source, buf));
-  wpi::SmallString<64> descBuf;
-  descriptionPublisher.Set(cs::GetSourceDescription(source, descBuf, &status));
+  descriptionPublisher.Set(cs::GetSourceDescription(source, &status));
   connectedPublisher.Set(cs::IsSourceConnected(source, &status));
   streamsPublisher.Set(inst.GetSourceStreamValues(source));
   auto mode = cs::GetSourceVideoMode(source, &status);
@@ -404,9 +403,8 @@ Instance::Instance() {
           case cs::VideoEvent::kSourceConnected:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               // update the description too (as it may have changed)
-              wpi::SmallString<64> descBuf;
-              publisher->descriptionPublisher.Set(cs::GetSourceDescription(
-                  event.sourceHandle, descBuf, &status));
+              publisher->descriptionPublisher.Set(
+                  cs::GetSourceDescription(event.sourceHandle, &status));
               publisher->connectedPublisher.Set(true);
             }
             break;
