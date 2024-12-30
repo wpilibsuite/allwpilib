@@ -544,7 +544,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_createHttpCameraMulti
     return 0;
   }
   size_t len = env->GetArrayLength(urls);
-  wpi::SmallVector<std::string, 8> vec;
+  std::vector<std::string> vec;
   vec.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
@@ -1110,7 +1110,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_setHttpCameraUrls
     return;
   }
   size_t len = env->GetArrayLength(urls);
-  wpi::SmallVector<std::string, 8> vec;
+  std::vector<std::string> vec;
   vec.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
@@ -1300,7 +1300,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_setSourceEnumPropertyChoices
     return;
   }
   size_t len = env->GetArrayLength(choices);
-  wpi::SmallVector<std::string, 8> vec;
+  std::vector<std::string> vec;
   vec.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{

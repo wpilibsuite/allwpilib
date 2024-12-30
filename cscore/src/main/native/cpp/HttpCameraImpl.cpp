@@ -658,7 +658,7 @@ CS_Source CS_CreateHttpCamera(const struct WPI_String* name,
 CS_Source CS_CreateHttpCameraMulti(const struct WPI_String* name,
                                    const struct WPI_String* urls, int count,
                                    CS_HttpCameraKind kind, CS_Status* status) {
-  wpi::SmallVector<std::string, 4> vec;
+  std::vector<std::string> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) {
     vec.emplace_back(wpi::to_string_view(&urls[i]));
@@ -672,7 +672,7 @@ CS_HttpCameraKind CS_GetHttpCameraKind(CS_Source source, CS_Status* status) {
 
 void CS_SetHttpCameraUrls(CS_Source source, const struct WPI_String* urls,
                           int count, CS_Status* status) {
-  wpi::SmallVector<std::string, 4> vec;
+  std::vector<std::string> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) {
     vec.emplace_back(wpi::to_string_view(&urls[i]));
