@@ -13,6 +13,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include <wpi/StringMap.h>
@@ -99,8 +100,7 @@ class HttpCameraImpl : public SourceImpl {
   void StreamThreadMain();
 
   // Functions used by StreamThreadMain()
-  wpi::HttpConnection* DeviceStreamConnect(
-      wpi::SmallVectorImpl<char>& boundary);
+  std::pair<wpi::HttpConnection*, std::string> DeviceStreamConnect();
   void DeviceStream(wpi::raw_istream& is, std::string_view boundary);
   bool DeviceStreamFrame(wpi::raw_istream& is, std::string& imageBuf);
 
