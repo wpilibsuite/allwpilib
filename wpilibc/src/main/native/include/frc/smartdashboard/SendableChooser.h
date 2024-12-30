@@ -115,7 +115,7 @@ class SendableChooser : public SendableChooserBase {
    *
    * @return The name of the option selected
    */
-  std::string_view GetSelectedName() const {
+  std::string GetSelectedName() const {
     std::scoped_lock lock(m_mutex);
     if (m_haveSelected) {
       return m_selected;
