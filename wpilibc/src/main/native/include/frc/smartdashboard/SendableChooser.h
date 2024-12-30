@@ -95,7 +95,7 @@ class SendableChooser : public SendableChooserBase {
    * @return The option selected
    */
   CopyType GetSelected() const {
-    std::string_view selected = GetSelectedName();
+    std::string selected = GetSelectedName();
     if (selected.empty()) {
       return CopyType{};
     } else {
