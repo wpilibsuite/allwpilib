@@ -27,6 +27,11 @@ uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct WPI_RawFrame* rawImage,
                              CS_Status* status);
 uint64_t CS_GrabRawSinkFrameTimeout(CS_Sink sink, struct WPI_RawFrame* rawImage,
                                     double timeout, CS_Status* status);
+uint64_t CS_GrabRawSinkFrameTimeoutWithFrameTime(CS_Sink sink,
+                                                 struct WPI_RawFrame* rawImage,
+                                                 double timeout,
+                                                 uint64_t lastFrameTime,
+                                                 CS_Status* status);
 
 CS_Sink CS_CreateRawSink(const struct WPI_String* name, CS_Bool isCv,
                          CS_Status* status);
@@ -67,6 +72,9 @@ void PutSourceFrame(CS_Source source, const WPI_RawFrame& image,
 uint64_t GrabSinkFrame(CS_Sink sink, WPI_RawFrame& image, CS_Status* status);
 uint64_t GrabSinkFrameTimeout(CS_Sink sink, WPI_RawFrame& image, double timeout,
                               CS_Status* status);
+uint64_t GrabSinkFrameTimeoutLastTime(CS_Sink sink, WPI_RawFrame& image,
+                                      double timeout, uint64_t lastFrameTime,
+                                      CS_Status* status);
 
 /**
  * A source for user code to provide video frames as raw bytes.
@@ -163,6 +171,24 @@ class RawSink : public ImageSink {
    */
   [[nodiscard]]
   uint64_t GrabFrameNoTimeout(wpi::RawFrame& image) const;
+
+  /**
+   * Wait for the next frame and get the image.  May block forever.
+   * The provided image will have three 8-bit channels stored in BGR order.
+   *
+   * <p>If lastFrameTime is provided and non-zero, the sink will fill image with
+   * the first frame from the source that is not equal to lastFrameTime. If
+   * lastFrameTime is zero, the time of the current frame owned by the CvSource
+   * is used, and this function will block until the connected CvSource provides
+   * a new frame.
+   *
+   * @return Frame time, or 0 on error (call GetError() to obtain the error
+   *         message); the frame time is in the same time base as wpi::Now(),
+   *         and is in 1 us increments.
+   */
+  [[nodiscard]]
+  uint64_t GrabFrameLastTime(wpi::RawFrame& image, uint64_t lastFrameTime,
+                             double timeout = 0.225) const;
 };
 
 inline RawSource::RawSource(std::string_view name, const VideoMode& mode) {
@@ -198,6 +224,14 @@ inline uint64_t RawSink::GrabFrame(wpi::RawFrame& image, double timeout) const {
 inline uint64_t RawSink::GrabFrameNoTimeout(wpi::RawFrame& image) const {
   m_status = 0;
   return GrabSinkFrame(m_handle, image, &m_status);
+}
+
+inline uint64_t RawSink::GrabFrameLastTime(wpi::RawFrame& image,
+                                           uint64_t lastFrameTime,
+                                           double timeout) const {
+  m_status = 0;
+  return GrabSinkFrameTimeoutLastTime(m_handle, image, timeout, lastFrameTime,
+                                      &m_status);
 }
 /** @} */
 

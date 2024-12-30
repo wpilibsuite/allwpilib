@@ -23,15 +23,13 @@ TYPED_TEST_SUITE_P(SingleCompositionRunsWhenDisabledTest);
 
 TYPED_TEST_P(SingleCompositionRunsWhenDisabledTest, True) {
   auto param = true;
-  TypeParam command = TypeParam(
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(param).Unwrap());
+  TypeParam command = TypeParam(cmd::Idle().IgnoringDisable(param).Unwrap());
   EXPECT_EQ(param, command.RunsWhenDisabled());
 }
 
 TYPED_TEST_P(SingleCompositionRunsWhenDisabledTest, False) {
   auto param = false;
-  TypeParam command = TypeParam(
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(param).Unwrap());
+  TypeParam command = TypeParam(cmd::Idle().IgnoringDisable(param).Unwrap());
   EXPECT_EQ(param, command.RunsWhenDisabled());
 }
 
@@ -44,17 +42,15 @@ TYPED_TEST_SUITE_P(SingleCompositionInterruptibilityTest);
 
 TYPED_TEST_P(SingleCompositionInterruptibilityTest, CancelSelf) {
   auto param = Command::InterruptionBehavior::kCancelSelf;
-  TypeParam command = TypeParam(cmd::WaitUntil([] { return false; })
-                                    .WithInterruptBehavior(param)
-                                    .Unwrap());
+  TypeParam command =
+      TypeParam(cmd::Idle().WithInterruptBehavior(param).Unwrap());
   EXPECT_EQ(param, command.GetInterruptionBehavior());
 }
 
 TYPED_TEST_P(SingleCompositionInterruptibilityTest, CancelIncoming) {
   auto param = Command::InterruptionBehavior::kCancelIncoming;
-  TypeParam command = TypeParam(cmd::WaitUntil([] { return false; })
-                                    .WithInterruptBehavior(param)
-                                    .Unwrap());
+  TypeParam command =
+      TypeParam(cmd::Idle().WithInterruptBehavior(param).Unwrap());
   EXPECT_EQ(param, command.GetInterruptionBehavior());
 }
 
@@ -77,47 +73,43 @@ TYPED_TEST_SUITE_P(MultiCompositionRunsWhenDisabledTest);
 
 TYPED_TEST_P(MultiCompositionRunsWhenDisabledTest, OneTrue) {
   auto param = true;
-  TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(param))));
+  TypeParam command = TypeParam(CommandPtr::UnwrapVector(
+      cmd::impl::MakeVector(cmd::Idle().IgnoringDisable(param))));
   EXPECT_EQ(param, command.RunsWhenDisabled());
 }
 
 TYPED_TEST_P(MultiCompositionRunsWhenDisabledTest, OneFalse) {
   auto param = false;
-  TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(param))));
+  TypeParam command = TypeParam(CommandPtr::UnwrapVector(
+      cmd::impl::MakeVector(cmd::Idle().IgnoringDisable(param))));
   EXPECT_EQ(param, command.RunsWhenDisabled());
 }
 
 TYPED_TEST_P(MultiCompositionRunsWhenDisabledTest, AllTrue) {
   TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(true),
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(true),
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(true))));
+      cmd::Idle().IgnoringDisable(true), cmd::Idle().IgnoringDisable(true),
+      cmd::Idle().IgnoringDisable(true))));
   EXPECT_EQ(true, command.RunsWhenDisabled());
 }
 
 TYPED_TEST_P(MultiCompositionRunsWhenDisabledTest, AllFalse) {
   TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(false),
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(false),
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(false))));
+      cmd::Idle().IgnoringDisable(false), cmd::Idle().IgnoringDisable(false),
+      cmd::Idle().IgnoringDisable(false))));
   EXPECT_EQ(false, command.RunsWhenDisabled());
 }
 
 TYPED_TEST_P(MultiCompositionRunsWhenDisabledTest, TwoTrueOneFalse) {
   TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(true),
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(true),
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(false))));
+      cmd::Idle().IgnoringDisable(true), cmd::Idle().IgnoringDisable(true),
+      cmd::Idle().IgnoringDisable(false))));
   EXPECT_EQ(false, command.RunsWhenDisabled());
 }
 
 TYPED_TEST_P(MultiCompositionRunsWhenDisabledTest, TwoFalseOneTrue) {
   TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(false),
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(false),
-      cmd::WaitUntil([] { return false; }).IgnoringDisable(true))));
+      cmd::Idle().IgnoringDisable(false), cmd::Idle().IgnoringDisable(false),
+      cmd::Idle().IgnoringDisable(true))));
   EXPECT_EQ(false, command.RunsWhenDisabled());
 }
 
@@ -132,61 +124,49 @@ class MultiCompositionInterruptibilityTest
 TYPED_TEST_SUITE_P(MultiCompositionInterruptibilityTest);
 
 TYPED_TEST_P(MultiCompositionInterruptibilityTest, AllCancelSelf) {
-  TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
-      cmd::WaitUntil([] {
-        return false;
-      }).WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
-      cmd::WaitUntil([] {
-        return false;
-      }).WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
-      cmd::WaitUntil([] {
-        return false;
-      }).WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf))));
+  TypeParam command = TypeParam(CommandPtr::UnwrapVector(
+      cmd::impl::MakeVector(cmd::Idle().WithInterruptBehavior(
+                                Command::InterruptionBehavior::kCancelSelf),
+                            cmd::Idle().WithInterruptBehavior(
+                                Command::InterruptionBehavior::kCancelSelf),
+                            cmd::Idle().WithInterruptBehavior(
+                                Command::InterruptionBehavior::kCancelSelf))));
   EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
             command.GetInterruptionBehavior());
 }
 
 TYPED_TEST_P(MultiCompositionInterruptibilityTest, AllCancelIncoming) {
   TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
-      cmd::WaitUntil([] {
-        return false;
-      }).WithInterruptBehavior(Command::InterruptionBehavior::kCancelIncoming),
-      cmd::WaitUntil([] {
-        return false;
-      }).WithInterruptBehavior(Command::InterruptionBehavior::kCancelIncoming),
-      cmd::WaitUntil([] { return false; })
-          .WithInterruptBehavior(
-              Command::InterruptionBehavior::kCancelIncoming))));
+      cmd::Idle().WithInterruptBehavior(
+          Command::InterruptionBehavior::kCancelIncoming),
+      cmd::Idle().WithInterruptBehavior(
+          Command::InterruptionBehavior::kCancelIncoming),
+      cmd::Idle().WithInterruptBehavior(
+          Command::InterruptionBehavior::kCancelIncoming))));
   EXPECT_EQ(Command::InterruptionBehavior::kCancelIncoming,
             command.GetInterruptionBehavior());
 }
 
 TYPED_TEST_P(MultiCompositionInterruptibilityTest, TwoCancelSelfOneIncoming) {
   TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
-      cmd::WaitUntil([] {
-        return false;
-      }).WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
-      cmd::WaitUntil([] {
-        return false;
-      }).WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
-      cmd::WaitUntil([] { return false; })
-          .WithInterruptBehavior(
-              Command::InterruptionBehavior::kCancelIncoming))));
+      cmd::Idle().WithInterruptBehavior(
+          Command::InterruptionBehavior::kCancelSelf),
+      cmd::Idle().WithInterruptBehavior(
+          Command::InterruptionBehavior::kCancelSelf),
+      cmd::Idle().WithInterruptBehavior(
+          Command::InterruptionBehavior::kCancelIncoming))));
   EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
             command.GetInterruptionBehavior());
 }
 
 TYPED_TEST_P(MultiCompositionInterruptibilityTest, TwoCancelIncomingOneSelf) {
-  TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
-      cmd::WaitUntil([] {
-        return false;
-      }).WithInterruptBehavior(Command::InterruptionBehavior::kCancelIncoming),
-      cmd::WaitUntil([] {
-        return false;
-      }).WithInterruptBehavior(Command::InterruptionBehavior::kCancelIncoming),
-      cmd::WaitUntil([] {
-        return false;
-      }).WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf))));
+  TypeParam command = TypeParam(CommandPtr::UnwrapVector(
+      cmd::impl::MakeVector(cmd::Idle().WithInterruptBehavior(
+                                Command::InterruptionBehavior::kCancelIncoming),
+                            cmd::Idle().WithInterruptBehavior(
+                                Command::InterruptionBehavior::kCancelIncoming),
+                            cmd::Idle().WithInterruptBehavior(
+                                Command::InterruptionBehavior::kCancelSelf))));
   EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
             command.GetInterruptionBehavior());
 }

@@ -334,7 +334,7 @@ class ct_matrix {
     requires(Rows == 3 && Cols == 3)
   {
     // |a  b  c|
-    // |d  e  f| = aei + bfg + cgh - ceg - bdi - afh
+    // |d  e  f| = aei + bfg + cdh - ceg - bdi - afh
     // |g  h  i|
     Scalar a = (*this)(0, 0);
     Scalar b = (*this)(0, 1);
@@ -345,7 +345,7 @@ class ct_matrix {
     Scalar g = (*this)(2, 0);
     Scalar h = (*this)(2, 1);
     Scalar i = (*this)(2, 2);
-    return a * e * i + b * f * g + c * g * h - c * e * g - b * d * i -
+    return a * e * i + b * f * g + c * d * h - c * e * g - b * d * i -
            a * f * h;
   }
 

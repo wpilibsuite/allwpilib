@@ -39,8 +39,9 @@ public class LTVUnicycleController {
 
   /**
    * Constructs a linear time-varying unicycle controller with default maximum desired error
-   * tolerances of (0.0625 m, 0.125 m, 2 rad) and default maximum desired control effort of (1 m/s,
-   * 2 rad/s).
+   * tolerances of (x = 0.0625 m, y = 0.125 m, heading = 2 rad), default maximum desired control
+   * effort of (linear velocity = 1 m/s, angular velocity = 2 rad/s), and default maximum Velocity
+   * of 9 m/s.
    *
    * @param dt Discretization timestep in seconds.
    */
@@ -55,8 +56,11 @@ public class LTVUnicycleController {
    * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning">https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning</a>
    * for how to select the tolerances.
    *
-   * @param qelems The maximum desired error tolerance for each state.
-   * @param relems The maximum desired control effort for each input.
+   * <p>The default maximum Velocity is 9 m/s.
+   *
+   * @param qelems The maximum desired error tolerance for each state (x, y, heading).
+   * @param relems The maximum desired control effort for each input (linear velocity, angular
+   *     velocity).
    * @param dt Discretization timestep in seconds.
    */
   public LTVUnicycleController(Vector<N3> qelems, Vector<N2> relems, double dt) {
