@@ -572,20 +572,19 @@ void UsbCameraImpl::CameraThreadMain() {
             // grab current time in the same timebase as buf.timestamp
             struct timespec ts;
             if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0) {
-              Frame::Time nowTime = {buf.timestamp.tv_sec * 1'000'000 +
+              int64_t nowTime = {buf.timestamp.tv_sec * 1'000'000 +
                                      buf.timestamp.tv_usec};
-              Frame::Time bufTime = {buf.timestamp.tv_sec * 1'000'000 +
+              int64_t bufTime = {buf.timestamp.tv_sec * 1'000'000 +
                                      buf.timestamp.tv_usec};
               // And offset frameTime by the latency
-              Frame::Time offset{nowTime - bufTime};
+              int64_t offset{nowTime - bufTime};
               SDEBUG4("Frame was %lu uS old", offset);
               frameTime -= offset;
             } else {
               // Can't do anything if we can't access the clock, leave default
             }
           } else if (tsFlags & V4L2_BUF_FLAG_TIMESTAMP_COPY) {
-            buf.time SDEBUG4(
-                "Got valid copy time for frame - default to wpi::Now");
+            SDEBUG4("Got valid copy time for frame - default to wpi::Now");
           }
 
           PutFrame(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat),
