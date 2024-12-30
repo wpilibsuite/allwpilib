@@ -7,7 +7,6 @@
 #include <fmt/format.h>
 
 #include "wpi/system/Errors.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
 using namespace wpi;
@@ -32,8 +31,8 @@ void Tracer::AddEpoch(std::string_view epochName) {
 }
 
 void Tracer::PrintEpochs() {
-  wpi::util::SmallString<128> buf;
-  wpi::util::raw_svector_ostream os(buf);
+  std::string buf;
+  wpi::util::raw_string_ostream os(buf);
   PrintEpochs(os);
   if (!buf.empty()) {
     WPILIB_ReportWarning("{}", buf.c_str());

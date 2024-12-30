@@ -5,11 +5,9 @@
 #pragma once
 
 #include <memory>
-#include <span>
 #include <utility>
 #include <vector>
 
-#include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
 
 namespace wpi::cs {
@@ -49,7 +47,7 @@ class UnlimitedHandleResource {
   std::shared_ptr<TStruct> Free(THandle handle);
 
   template <typename T>
-  std::span<T> GetAll(wpi::util::SmallVectorImpl<T>& vec);
+  std::vector<T> GetAll();
 
   std::vector<std::shared_ptr<TStruct>> FreeAll();
 
@@ -146,10 +144,16 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Free(
 
 template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 template <typename T>
-inline std::span<T>
-UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::GetAll(
-    wpi::util::SmallVectorImpl<T>& vec) {
-  ForEach([&](THandle handle, const TStruct&) { vec.push_back(handle); });
+inline std::vector<T>
+UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::GetAll() {
+  std::scoped_lock sync(m_handleMutex);
+  std::vector<T> vec;
+  vec.reserve(m_structures.size());
+  for (size_t i = 0; i < m_structures.size(); i++) {
+    if (m_structures[i] != nullptr) {
+      vec.push_back(MakeHandle(i));
+    }
+  }
   return vec;
 }
 

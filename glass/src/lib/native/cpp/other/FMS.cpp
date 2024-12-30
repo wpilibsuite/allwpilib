@@ -10,7 +10,6 @@
 #include <imgui_stdlib.h>
 
 #include "wpi/glass/DataSource.hpp"
-#include "wpi/util/SmallString.hpp"
 
 using namespace wpi::glass;
 
@@ -147,8 +146,7 @@ void wpi::glass::DisplayFMSReadOnly(FMSModel* model) {
   }
   if (auto data = model->GetGameData()) {
     if (exists) {
-      wpi::util::SmallString<64> gsmBuf;
-      std::string_view gsm = data->GetValue(gsmBuf);
+      std::string gsm = data->GetValue();
       ImGui::Text("Game Data: %.*s", static_cast<int>(gsm.size()), gsm.data());
     } else {
       ImGui::TextUnformatted("Game Data: ?");

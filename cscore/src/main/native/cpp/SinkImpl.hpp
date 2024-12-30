@@ -29,7 +29,7 @@ class SinkImpl : public PropertyContainer {
   std::string_view GetName() const { return m_name; }
 
   void SetDescription(std::string_view description);
-  std::string_view GetDescription(wpi::util::SmallVectorImpl<char>& buf) const;
+  std::string GetDescription() const;
 
   void Enable();
   void Disable();
@@ -43,7 +43,6 @@ class SinkImpl : public PropertyContainer {
   }
 
   std::string GetError() const;
-  std::string_view GetError(wpi::util::SmallVectorImpl<char>& buf) const;
 
   bool SetConfigJson(std::string_view config, CS_Status* status);
   virtual bool SetConfigJson(const wpi::util::json& config, CS_Status* status);

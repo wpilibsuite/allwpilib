@@ -18,7 +18,6 @@
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/net/uv/Stream.hpp"
 #include "wpi/util/Base64.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/print.hpp"
@@ -122,7 +121,7 @@ class WebSocket::ClientHandshakeData {
     for (char& v : nonce) {
       v = static_cast<char>(dist(gen));
     }
-    wpi::util::raw_svector_ostream os(key);
+    wpi::util::raw_string_ostream os(key);
     wpi::util::Base64Encode(os, {nonce, 16});
   }
   ~ClientHandshakeData() {
@@ -132,9 +131,9 @@ class WebSocket::ClientHandshakeData {
     }
   }
 
-  wpi::util::SmallString<64> key;  // the key sent to the server
-  wpi::util::SmallVector<std::string, 2> protocols;  // valid protocols
-  HttpParser parser{HttpParser::kResponse};          // server response parser
+  std::string key;                           // the key sent to the server
+  std::vector<std::string> protocols;        // valid protocols
+  HttpParser parser{HttpParser::kResponse};  // server response parser
   bool hasUpgrade = false;
   bool hasConnection = false;
   bool hasAccept = false;
@@ -143,13 +142,11 @@ class WebSocket::ClientHandshakeData {
   std::weak_ptr<uv::Timer> timer;
 };
 
-static std::string_view AcceptHash(std::string_view key,
-                                   wpi::util::SmallVectorImpl<char>& buf) {
+static std::string AcceptHash(std::string_view key) {
   wpi::util::SHA1 hash;
   hash.Update(key);
   hash.Update("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
-  wpi::util::SmallString<64> hashBuf;
-  return wpi::util::Base64Encode(hash.RawFinal(hashBuf), buf);
+  return wpi::util::Base64Encode(hash.RawFinal());
 }
 
 WebSocket::WebSocket(uv::Stream& stream, bool server, const private_init&)
@@ -285,9 +282,8 @@ void WebSocket::StartClient(std::string_view uri, std::string_view host,
           m_clientHandshake->hasConnection = true;
         } else if (wpi::util::equals_lower(name, "sec-websocket-accept")) {
           // Check against expected response
-          wpi::util::SmallString<64> acceptBuf;
           if (!wpi::util::equals(
-                  value, AcceptHash(m_clientHandshake->key, acceptBuf))) {
+                  value, AcceptHash(m_clientHandshake->key))) {
             return Terminate(1002, "invalid accept key");
           }
           m_clientHandshake->hasAccept = true;
@@ -365,8 +361,7 @@ void WebSocket::StartServer(std::string_view key, std::string_view version,
   os << "Connection: Upgrade\r\n";
 
   // accept hash
-  wpi::util::SmallString<64> acceptBuf;
-  os << "Sec-WebSocket-Accept: " << AcceptHash(key, acceptBuf) << "\r\n";
+  os << "Sec-WebSocket-Accept: " << AcceptHash(key) << "\r\n";
 
   if (!protocol.empty()) {
     os << "Sec-WebSocket-Protocol: " << protocol << "\r\n";

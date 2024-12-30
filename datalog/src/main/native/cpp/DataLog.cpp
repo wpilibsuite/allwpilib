@@ -13,9 +13,10 @@
 #include <utility>
 #include <vector>
 
+#include <fmt/format.h>
+
 #include "wpi/util/Endian.hpp"
 #include "wpi/util/Logger.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/string.hpp"
 #include "wpi/util/timestamp.hpp"
@@ -146,9 +147,7 @@ void DataLog::AddSchema(std::string_view name, std::string_view type,
     return;  // don't add duplicates
   }
   schemaInfo.data.assign(schema.begin(), schema.end());
-  wpi::util::SmallString<128> fullName{"/.schema/"};
-  fullName += name;
-  int entry = StartImpl(fullName, type, {}, timestamp);
+  int entry = StartImpl(fmt::format("/.schema/{}", name), type, {}, timestamp);
 
   // inline AppendRaw() without releasing lock
   if (entry <= 0) {

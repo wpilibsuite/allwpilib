@@ -8,11 +8,6 @@
 
 #include "wpi/glass/Model.hpp"
 
-namespace wpi::util {
-template <typename T>
-class SmallVectorImpl;
-}  // namespace wpi::util
-
 namespace wpi::glass {
 
 class BooleanSource;

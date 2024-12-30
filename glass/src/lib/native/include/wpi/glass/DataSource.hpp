@@ -15,7 +15,6 @@
 #include <imgui.h>
 
 #include "wpi/util/Signal.h"
-#include "wpi/util/SmallVector.hpp"
 #include "wpi/util/spinlock.hpp"
 
 namespace wpi::glass {
@@ -200,12 +199,6 @@ class StringSource : public DataSource {
   std::string GetValue() const {
     std::scoped_lock lock{m_valueMutex};
     return m_value;
-  }
-
-  std::string_view GetValue(wpi::util::SmallVectorImpl<char>& buf) const {
-    std::scoped_lock lock{m_valueMutex};
-    buf.assign(m_value.begin(), m_value.end());
-    return {buf.begin(), buf.end()};
   }
 
   wpi::util::sig::SignalBase<wpi::util::spinlock, std::string_view, int64_t>

@@ -926,11 +926,9 @@ std::optional<long double> parse_float<long double>(
  * quote character is found.
  *
  * @param str input string
- * @param buf buffer for unescaped characters
  * @return pair of the unescaped string and any remaining input
  */
-std::pair<std::string_view, std::string_view> UnescapeCString(
-    std::string_view str, SmallVectorImpl<char>& buf);
+std::pair<std::string, std::string_view> UnescapeCString(std::string_view str);
 
 /**
  * Like std::format_to_n() in that it writes at most n bytes to the output

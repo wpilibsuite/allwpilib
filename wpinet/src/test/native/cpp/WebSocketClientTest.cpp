@@ -15,7 +15,6 @@
 #include "wpi/net/HttpParser.hpp"
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/util/Base64.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/sha1.hpp"
 
@@ -46,10 +45,7 @@ class WebSocketClientTest : public WebSocketTest {
       if (mockBadAccept) {
         hash.Update("1");
       }
-      wpi::util::SmallString<64> hashBuf;
-      wpi::util::SmallString<64> acceptBuf;
-      os << "Sec-WebSocket-Accept: "
-         << wpi::util::Base64Encode(hash.RawFinal(hashBuf), acceptBuf)
+      os << "Sec-WebSocket-Accept: " << wpi::util::Base64Encode(hash.RawFinal())
          << "\r\n";
 
       if (!mockProtocol.empty()) {
@@ -95,7 +91,7 @@ class WebSocketClientTest : public WebSocketTest {
   std::vector<uint8_t> wireData;
   std::shared_ptr<uv::Pipe> conn;
   HttpParser req{HttpParser::kRequest};
-  wpi::util::SmallString<64> clientKey;
+  std::string clientKey;
   std::string mockProtocol;
   bool serverHeadersDone = false;
   std::function<void()> connected;

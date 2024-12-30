@@ -1641,9 +1641,8 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
             entry.publisher =
                 wpi::nt::Publish(entry.info.topic, NT_STRING, "string");
           }
-          wpi::util::SmallString<128> buf;
           wpi::nt::SetString(entry.publisher,
-                             wpi::util::UnescapeCString(v + 1, buf).first);
+                             wpi::util::UnescapeCString(v + 1).first);
         }
       }
       break;

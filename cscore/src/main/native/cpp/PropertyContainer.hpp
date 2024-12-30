@@ -20,8 +20,6 @@
 
 namespace wpi::util {
 class Logger;
-template <typename T>
-class SmallVectorImpl;
 }  // namespace wpi::util
 
 namespace wpi::cs {
@@ -31,21 +29,16 @@ class PropertyContainer {
   virtual ~PropertyContainer() = default;
 
   int GetPropertyIndex(std::string_view name) const;
-  std::span<int> EnumerateProperties(wpi::util::SmallVectorImpl<int>& vec,
-                                     CS_Status* status) const;
+  std::vector<int> EnumerateProperties(CS_Status* status) const;
   CS_PropertyKind GetPropertyKind(int property) const;
-  std::string_view GetPropertyName(int property,
-                                   wpi::util::SmallVectorImpl<char>& buf,
-                                   CS_Status* status) const;
+  std::string GetPropertyName(int property, CS_Status* status) const;
   int GetProperty(int property, CS_Status* status) const;
   virtual void SetProperty(int property, int value, CS_Status* status);
   int GetPropertyMin(int property, CS_Status* status) const;
   int GetPropertyMax(int property, CS_Status* status) const;
   int GetPropertyStep(int property, CS_Status* status) const;
   int GetPropertyDefault(int property, CS_Status* status) const;
-  std::string_view GetStringProperty(int property,
-                                     wpi::util::SmallVectorImpl<char>& buf,
-                                     CS_Status* status) const;
+  std::string GetStringProperty(int property, CS_Status* status) const;
   virtual void SetStringProperty(int property, std::string_view value,
                                  CS_Status* status);
   std::vector<std::string> GetEnumPropertyChoices(int property,
