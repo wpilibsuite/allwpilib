@@ -311,8 +311,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getPropertyName
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
-  wpi::SmallString<128> buf;
-  auto str = cs::GetPropertyName(property, buf, &status);
+  auto str = cs::GetPropertyName(property, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -418,8 +417,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getStringProperty
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
-  wpi::SmallString<128> buf;
-  auto str = cs::GetStringProperty(property, buf, &status);
+  auto str = cs::GetStringProperty(property, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }

@@ -57,8 +57,7 @@ CS_PropertyKind CS_GetPropertyKind(CS_Property property, CS_Status* status) {
 
 void CS_GetPropertyName(CS_Property property, WPI_String* name,
                         CS_Status* status) {
-  wpi::SmallString<128> buf;
-  cs::ConvertToC(name, cs::GetPropertyName(property, buf, status));
+  cs::ConvertToC(name, cs::GetPropertyName(property, status));
 }
 
 int CS_GetProperty(CS_Property property, CS_Status* status) {
@@ -87,8 +86,7 @@ int CS_GetPropertyDefault(CS_Property property, CS_Status* status) {
 
 void CS_GetStringProperty(CS_Property property, WPI_String* value,
                           CS_Status* status) {
-  wpi::SmallString<128> buf;
-  cs::ConvertToC(value, cs::GetStringProperty(property, buf, status));
+  cs::ConvertToC(value, cs::GetStringProperty(property, status));
 }
 
 void CS_SetStringProperty(CS_Property property, const struct WPI_String* value,

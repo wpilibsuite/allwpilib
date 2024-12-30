@@ -67,24 +67,12 @@ CS_PropertyKind GetPropertyKind(CS_Property property, CS_Status* status) {
 }
 
 std::string GetPropertyName(CS_Property property, CS_Status* status) {
-  wpi::SmallString<128> buf;
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
   if (!container) {
     return {};
   }
-  return std::string{container->GetPropertyName(propertyIndex, buf, status)};
-}
-
-std::string_view GetPropertyName(CS_Property property,
-                                 wpi::SmallVectorImpl<char>& buf,
-                                 CS_Status* status) {
-  int propertyIndex;
-  auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) {
-    return {};
-  }
-  return container->GetPropertyName(propertyIndex, buf, status);
+  return container->GetPropertyName(propertyIndex, status);
 }
 
 int GetProperty(CS_Property property, CS_Status* status) {
@@ -142,24 +130,12 @@ int GetPropertyDefault(CS_Property property, CS_Status* status) {
 }
 
 std::string GetStringProperty(CS_Property property, CS_Status* status) {
-  wpi::SmallString<128> buf;
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
   if (!container) {
     return {};
   }
-  return std::string{container->GetStringProperty(propertyIndex, buf, status)};
-}
-
-std::string_view GetStringProperty(CS_Property property,
-                                   wpi::SmallVectorImpl<char>& buf,
-                                   CS_Status* status) {
-  int propertyIndex;
-  auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) {
-    return {};
-  }
-  return container->GetStringProperty(propertyIndex, buf, status);
+  return container->GetStringProperty(propertyIndex, status);
 }
 
 void SetStringProperty(CS_Property property, std::string_view value,
@@ -297,9 +273,7 @@ std::span<CS_Property> EnumerateSourceProperties(
     *status = CS_INVALID_HANDLE;
     return {};
   }
-  wpi::SmallVector<int, 32> properties_buf;
-  for (auto property :
-       data->source->EnumerateProperties(properties_buf, status)) {
+  for (auto property : data->source->EnumerateProperties(status)) {
     vec.push_back(Handle{source, property, Handle::kProperty});
   }
   return vec;
@@ -591,9 +565,7 @@ std::span<CS_Property> EnumerateSinkProperties(
     *status = CS_INVALID_HANDLE;
     return {};
   }
-  wpi::SmallVector<int, 32> properties_buf;
-  for (auto property :
-       data->sink->EnumerateProperties(properties_buf, status)) {
+  for (auto property : data->sink->EnumerateProperties(status)) {
     vec.push_back(Handle{sink, property, Handle::kSinkProperty});
   }
   return vec;
