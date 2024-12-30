@@ -8,6 +8,7 @@
 #include <functional>
 
 #include <opencv2/core/mat.hpp>
+#include <wpi/RawFrame.h>
 
 #include "cscore_oo.h"
 #include "cscore_raw.h"
