@@ -178,9 +178,6 @@ struct RawEvent {
  */
 CS_PropertyKind GetPropertyKind(CS_Property property, CS_Status* status);
 std::string GetPropertyName(CS_Property property, CS_Status* status);
-std::string_view GetPropertyName(CS_Property property,
-                                 wpi::SmallVectorImpl<char>& buf,
-                                 CS_Status* status);
 int GetProperty(CS_Property property, CS_Status* status);
 void SetProperty(CS_Property property, int value, CS_Status* status);
 int GetPropertyMin(CS_Property property, CS_Status* status);
@@ -188,9 +185,6 @@ int GetPropertyMax(CS_Property property, CS_Status* status);
 int GetPropertyStep(CS_Property property, CS_Status* status);
 int GetPropertyDefault(CS_Property property, CS_Status* status);
 std::string GetStringProperty(CS_Property property, CS_Status* status);
-std::string_view GetStringProperty(CS_Property property,
-                                   wpi::SmallVectorImpl<char>& buf,
-                                   CS_Status* status);
 void SetStringProperty(CS_Property property, std::string_view value,
                        CS_Status* status);
 std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
