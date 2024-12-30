@@ -561,9 +561,9 @@ void UsbCameraImpl::CameraThreadMain() {
           // check the timestamp time
           auto tsFlags = buf.flags & V4L2_BUF_FLAG_TIMESTAMP_MASK;
           SDEBUG4("Flags {}", tsFlags);
-          if (tsFlags & V4L2_BUF_FLAG_TIMESTAMP_UNKNOWN) {
+          if (tsFlags == V4L2_BUF_FLAG_TIMESTAMP_UNKNOWN) {
             SDEBUG4("Got unknown time for frame - default to wpi::Now");
-          } else if (tsFlags & V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC) {
+          } else if (tsFlags == V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC) {
             SDEBUG4("Got valid monotonic time for frame");
             // we can't go directly to frametime, since the rest of cscore
             // expects us to use wpi::Now, which is in an arbitrary timebase
@@ -578,22 +578,23 @@ void UsbCameraImpl::CameraThreadMain() {
                                  buf.timestamp.tv_usec};
               // And offset frameTime by the latency
               int64_t offset{nowTime - bufTime};
-              SDEBUG4("Frame was {} uS old", offset);
               frameTime -= offset;
 
               // Figure out the timestamp's source
               int tsrcFlags = buf.flags & V4L2_BUF_FLAG_TSTAMP_SRC_MASK;
-              if (tsrcFlags & V4L2_BUF_FLAG_TSTAMP_SRC_EOF) {
+              if (tsrcFlags == V4L2_BUF_FLAG_TSTAMP_SRC_EOF) {
                 timeSource = WPI_TIMESRC_V4L_EOF;
-              } else if (tsrcFlags & V4L2_BUF_FLAG_TSTAMP_SRC_SOE) {
+              } else if (tsrcFlags == V4L2_BUF_FLAG_TSTAMP_SRC_SOE) {
                 timeSource = WPI_TIMESRC_V4L_SOE;
               } else {
                 timeSource = WPI_TIMESRC_UNKNOWN;
               }
+              SDEBUG4("Frame was {} uS old, flags {}, source {}", offset,
+                      tsrcFlags, static_cast<int>(timeSource));
             } else {
               // Can't do anything if we can't access the clock, leave default
             }
-          } else if (tsFlags & V4L2_BUF_FLAG_TIMESTAMP_COPY) {
+          } else if (tsFlags == V4L2_BUF_FLAG_TIMESTAMP_COPY) {
             SDEBUG4("Got valid copy time for frame - default to wpi::Now");
           }
 

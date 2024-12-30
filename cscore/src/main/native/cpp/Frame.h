@@ -78,6 +78,9 @@ class Frame {
   }
 
   Time GetTime() const { return m_impl ? m_impl->time : 0; }
+  WPI_TimestampSource GetTimeSource() const {
+    return m_impl ? m_impl->timeSource : WPI_TIMESRC_UNKNOWN;
+  }
 
   std::string_view GetError() const {
     if (!m_impl) {
