@@ -559,6 +559,7 @@ void UsbCameraImpl::CameraThreadMain() {
 
           // check the timestamp time
           auto tsFlags = buf.flags & V4L2_BUF_FLAG_TIMESTAMP_MASK;
+          SDEBUG4("Flags {}", tsFlags);
           if (tsFlags & V4L2_BUF_FLAG_TIMESTAMP_UNKNOWN) {
             SDEBUG4(
                 "Got unknown monotonic time for frame - default to wpi::Now");
@@ -572,12 +573,12 @@ void UsbCameraImpl::CameraThreadMain() {
             // grab current time in the same timebase as buf.timestamp
             struct timespec ts;
             if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0) {
-              int64_t nowTime = {ts.tv_sec * 1'000'000 + ts.tv_usec};
+              int64_t nowTime = {ts.tv_sec * 1'000'000 + ts.tv_nsec / 1000};
               int64_t bufTime = {buf.timestamp.tv_sec * 1'000'000 +
                                  buf.timestamp.tv_usec};
               // And offset frameTime by the latency
               int64_t offset{nowTime - bufTime};
-              SDEBUG4("Frame was %lu uS old", offset);
+              SDEBUG4("Frame was {} uS old", offset);
               frameTime -= offset;
             } else {
               // Can't do anything if we can't access the clock, leave default
