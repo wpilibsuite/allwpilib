@@ -556,13 +556,13 @@ void UsbCameraImpl::CameraThreadMain() {
         }
         if (good) {
           Frame::Time frameTime{wpi::Now()};
+          WPI_TimestampSource timeSource{WPI_TIMESRC_FRAME_DEQUEUE};
 
           // check the timestamp time
           auto tsFlags = buf.flags & V4L2_BUF_FLAG_TIMESTAMP_MASK;
           SDEBUG4("Flags {}", tsFlags);
           if (tsFlags & V4L2_BUF_FLAG_TIMESTAMP_UNKNOWN) {
-            SDEBUG4(
-                "Got unknown monotonic time for frame - default to wpi::Now");
+            SDEBUG4("Got unknown time for frame - default to wpi::Now");
           } else if (tsFlags & V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC) {
             SDEBUG4("Got valid monotonic time for frame");
             // we can't go directly to frametime, since the rest of cscore
@@ -581,14 +581,15 @@ void UsbCameraImpl::CameraThreadMain() {
               SDEBUG4("Frame was {} uS old", offset);
               frameTime -= offset;
 
-              // TODO - do we wanna report this info to the user somehow in
-              // Frame?
-              SDEBUG4(
-                  "End Of Frame {} Start Of Exposure {}",
-                  static_cast<bool>(buf.flags & V4L2_BUF_FLAG_TSTAMP_SRC_MASK &
-                                    V4L2_BUF_FLAG_TSTAMP_SRC_EOF),
-                  static_cast<bool>(buf.flags & V4L2_BUF_FLAG_TSTAMP_SRC_MASK &
-                                    V4L2_BUF_FLAG_TSTAMP_SRC_SOE));
+              // Figure out the timestamp's source
+              int tsrcFlags = buf.flags & V4L2_BUF_FLAG_TSTAMP_SRC_MASK;
+              if (tsrcFlags & V4L2_BUF_FLAG_TSTAMP_SRC_EOF) {
+                timeSource = WPI_TIMESRC_V4L_EOF;
+              } else if (tsrcFlags & V4L2_BUF_FLAG_TSTAMP_SRC_SOE) {
+                timeSource = WPI_TIMESRC_V4L_SOE;
+              } else {
+                timeSource = WPI_TIMESRC_UNKNOWN;
+              }
             } else {
               // Can't do anything if we can't access the clock, leave default
             }
@@ -597,7 +598,7 @@ void UsbCameraImpl::CameraThreadMain() {
           }
 
           PutFrame(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat),
-                   width, height, image, frameTime);  // TODO: time
+                   width, height, image, frameTime, timeSource);
         }
       }
 
