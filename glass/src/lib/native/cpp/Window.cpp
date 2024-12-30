@@ -61,7 +61,7 @@ void Window::Display() {
   if (m_name.empty()) {
     name = &m_defaultName;
   }
-  std::string label = fmt::format("{}###{}", name, m_id);
+  std::string label = fmt::format("{}###{}", *name, m_id);
 
   // Accounts for size of title, collapse button, and close button
   float minWidth =
