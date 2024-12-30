@@ -349,11 +349,9 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
 
   SendHTMLHeadTitle(os);
   os << startRootPage;
-  wpi::SmallVector<int, 32> properties_vec;
   CS_Status status = 0;
-  for (auto prop : source.EnumerateProperties(properties_vec, &status)) {
-    wpi::SmallString<128> name_buf;
-    auto name = source.GetPropertyName(prop, name_buf, &status);
+  for (auto prop : source.EnumerateProperties(&status)) {
+    auto name = source.GetPropertyName(prop, &status);
     if (wpi::starts_with(name, "raw_")) {
       continue;
     }
@@ -411,18 +409,16 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
         }
         break;
       }
-      case CS_PROP_STRING: {
-        wpi::SmallString<128> strval_buf;
+      case CS_PROP_STRING:
         wpi::print(os,
                    "<input type=\"text\" id=\"{0}box\" name=\"{0}\" "
                    "value=\"{1}\" />\n",
-                   name, source.GetStringProperty(prop, strval_buf, &status));
+                   name, source.GetStringProperty(prop, &status));
         wpi::print(os,
                    "<input type=\"button\" value =\"Submit\" "
                    "onclick=\"update('{0}', {0}box.value)\" />\n",
                    name);
         break;
-      }
       default:
         break;
     }
@@ -489,18 +485,16 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
   }
 
   os << "{\n\"controls\": [\n";
-  wpi::SmallVector<int, 32> properties_vec;
   bool first = true;
   CS_Status status = 0;
-  for (auto prop : source.EnumerateProperties(properties_vec, &status)) {
+  for (auto prop : source.EnumerateProperties(&status)) {
     if (first) {
       first = false;
     } else {
       os << ",\n";
     }
     os << '{';
-    wpi::SmallString<128> name_buf;
-    auto name = source.GetPropertyName(prop, name_buf, &status);
+    auto name = source.GetPropertyName(prop, &status);
     auto kind = source.GetPropertyKind(prop);
     wpi::print(os, "\n\"name\": \"{}\"", name);
     wpi::print(os, ",\n\"id\": \"{}\"", prop);
@@ -518,11 +512,9 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
       case CS_PROP_ENUM:
         wpi::print(os, "{}", source.GetProperty(prop, &status));
         break;
-      case CS_PROP_STRING: {
-        wpi::SmallString<128> strval_buf;
-        os << source.GetStringProperty(prop, strval_buf, &status);
+      case CS_PROP_STRING:
+        os << source.GetStringProperty(prop, &status);
         break;
-      }
       default:
         break;
     }
@@ -773,8 +765,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
     lastFrameTime = thisFrameTime;
     double timestamp = lastFrameTime / 1000000.0;
     header.clear();
-    oss << "\r\n--" BOUNDARY "\r\n"
-        << "Content-Type: image/jpeg\r\n";
+    oss << "\r\n--" BOUNDARY "\r\n" << "Content-Type: image/jpeg\r\n";
     wpi::print(oss, "Content-Length: {}\r\n", size);
     wpi::print(oss, "X-Timestamp: {}\r\n", timestamp);
     oss << "\r\n";
