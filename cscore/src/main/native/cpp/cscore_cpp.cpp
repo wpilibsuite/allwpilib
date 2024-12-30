@@ -8,7 +8,6 @@
 #include <string>
 #include <vector>
 
-#include <wpi/SmallString.h>
 #include <wpi/json.h>
 #include <wpinet/hostname.h>
 
@@ -491,35 +490,13 @@ std::string GetSinkName(CS_Sink sink, CS_Status* status) {
   return std::string{data->sink->GetName()};
 }
 
-std::string_view GetSinkName(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
-                             CS_Status* status) {
-  auto data = Instance::GetInstance().GetSink(sink);
-  if (!data) {
-    *status = CS_INVALID_HANDLE;
-    return {};
-  }
-  return data->sink->GetName();
-}
-
 std::string GetSinkDescription(CS_Sink sink, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return {};
   }
-  wpi::SmallString<128> buf;
-  return std::string{data->sink->GetDescription(buf)};
-}
-
-std::string_view GetSinkDescription(CS_Sink sink,
-                                    wpi::SmallVectorImpl<char>& buf,
-                                    CS_Status* status) {
-  auto data = Instance::GetInstance().GetSink(sink);
-  if (!data) {
-    *status = CS_INVALID_HANDLE;
-    return {};
-  }
-  return data->sink->GetDescription(buf);
+  return data->sink->GetDescription();
 }
 
 CS_Property GetSinkProperty(CS_Sink sink, std::string_view name,

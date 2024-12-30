@@ -10,7 +10,6 @@
 
 #define WPI_RAWFRAME_JNI
 #include <wpi/RawFrame.h>
-#include <wpi/SmallString.h>
 #include <wpi/jni_util.h>
 
 #include "cscore_raw.h"
@@ -1386,8 +1385,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getSinkName
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
-  wpi::SmallString<128> buf;
-  auto str = cs::GetSinkName(sink, buf, &status);
+  auto str = cs::GetSinkName(sink, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1404,8 +1402,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getSinkDescription
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
-  wpi::SmallString<128> buf;
-  auto str = cs::GetSinkDescription(sink, buf, &status);
+  auto str = cs::GetSinkDescription(sink, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1660,8 +1657,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getSinkError
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
-  wpi::SmallString<128> buf;
-  auto str = cs::GetSinkError(sink, buf, &status);
+  auto str = cs::GetSinkError(sink, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
