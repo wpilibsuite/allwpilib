@@ -221,8 +221,7 @@ CS_VideoMode* CS_EnumerateSourceVideoModes(CS_Source source, int* count,
 
 CS_Sink* CS_EnumerateSourceSinks(CS_Source source, int* count,
                                  CS_Status* status) {
-  wpi::SmallVector<CS_Sink, 32> buf;
-  auto handles = cs::EnumerateSourceSinks(source, buf, status);
+  auto handles = cs::EnumerateSourceSinks(source, status);
   CS_Sink* sinks =
       static_cast<CS_Sink*>(wpi::safe_malloc(handles.size() * sizeof(CS_Sink)));
   *count = handles.size();
@@ -440,8 +439,7 @@ void CS_Shutdown(void) {
 }
 
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
-  wpi::SmallVector<CS_Source, 32> buf;
-  auto handles = cs::EnumerateSourceHandles(buf, status);
+  auto handles = cs::EnumerateSourceHandles(status);
   CS_Source* sources = static_cast<CS_Source*>(
       wpi::safe_malloc(handles.size() * sizeof(CS_Source)));
   *count = handles.size();
@@ -463,8 +461,7 @@ void CS_ReleaseEnumeratedSources(CS_Source* sources, int count) {
 }
 
 CS_Sink* CS_EnumerateSinks(int* count, CS_Status* status) {
-  wpi::SmallVector<CS_Sink, 32> buf;
-  auto handles = cs::EnumerateSinkHandles(buf, status);
+  auto handles = cs::EnumerateSinkHandles(status);
   CS_Sink* sinks =
       static_cast<CS_Sink*>(wpi::safe_malloc(handles.size() * sizeof(CS_Sink)));
   *count = handles.size();

@@ -253,9 +253,7 @@ std::string GetSourceConfigJson(CS_Source source, CS_Status* status);
 wpi::json GetSourceConfigJsonObject(CS_Source source, CS_Status* status);
 std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
                                                  CS_Status* status);
-std::span<CS_Sink> EnumerateSourceSinks(CS_Source source,
-                                        wpi::SmallVectorImpl<CS_Sink>& vec,
-                                        CS_Status* status);
+std::vector<CS_Sink> EnumerateSourceSinks(CS_Source source, CS_Status* status);
 CS_Source CopySource(CS_Source source, CS_Status* status);
 void ReleaseSource(CS_Source source, CS_Status* status);
 /** @} */
@@ -436,10 +434,8 @@ void Shutdown();
  */
 std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status);
 
-std::span<CS_Source> EnumerateSourceHandles(
-    wpi::SmallVectorImpl<CS_Source>& vec, CS_Status* status);
-std::span<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
-                                        CS_Status* status);
+std::vector<CS_Source> EnumerateSourceHandles(CS_Status* status);
+std::vector<CS_Sink> EnumerateSinkHandles(CS_Status* status);
 
 std::string GetHostname();
 
