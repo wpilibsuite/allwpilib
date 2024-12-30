@@ -728,8 +728,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSourceProperties
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::SmallVector<CS_Property, 32> buf;
-  auto arr = cs::EnumerateSourceProperties(source, buf, &status);
+  auto arr = cs::EnumerateSourceProperties(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1442,8 +1441,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSinkProperties
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::SmallVector<CS_Property, 32> buf;
-  auto arr = cs::EnumerateSinkProperties(source, buf, &status);
+  auto arr = cs::EnumerateSinkProperties(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }

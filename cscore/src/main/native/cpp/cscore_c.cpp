@@ -144,8 +144,7 @@ CS_Property CS_GetSourceProperty(CS_Source source,
 
 CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
                                           CS_Status* status) {
-  wpi::SmallVector<CS_Property, 32> buf;
-  auto vec = cs::EnumerateSourceProperties(source, buf, status);
+  auto vec = cs::EnumerateSourceProperties(source, status);
   CS_Property* out = static_cast<CS_Property*>(
       wpi::safe_malloc(vec.size() * sizeof(CS_Property)));
   *count = vec.size();
@@ -290,8 +289,7 @@ CS_Property CS_GetSinkProperty(CS_Sink sink, const struct WPI_String* name,
 
 CS_Property* CS_EnumerateSinkProperties(CS_Sink sink, int* count,
                                         CS_Status* status) {
-  wpi::SmallVector<CS_Property, 32> buf;
-  auto vec = cs::EnumerateSinkProperties(sink, buf, status);
+  auto vec = cs::EnumerateSinkProperties(sink, status);
   CS_Property* out = static_cast<CS_Property*>(
       wpi::safe_malloc(vec.size() * sizeof(CS_Property)));
   *count = vec.size();

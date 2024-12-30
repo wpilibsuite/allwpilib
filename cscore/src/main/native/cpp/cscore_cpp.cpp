@@ -242,15 +242,17 @@ CS_Property GetSourceProperty(CS_Source source, std::string_view name,
   return Handle{source, property, Handle::kProperty};
 }
 
-std::span<CS_Property> EnumerateSourceProperties(
-    CS_Source source, wpi::SmallVectorImpl<CS_Property>& vec,
-    CS_Status* status) {
+std::vector<CS_Property> EnumerateSourceProperties(CS_Source source,
+                                                   CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return {};
   }
-  for (auto property : data->source->EnumerateProperties(status)) {
+  std::vector<CS_Property> vec;
+  auto handles = data->source->EnumerateProperties(status);
+  vec.reserve(handles.size());
+  for (auto property : handles) {
     vec.push_back(Handle{source, property, Handle::kProperty});
   }
   return vec;
@@ -535,14 +537,17 @@ CS_Property GetSinkProperty(CS_Sink sink, std::string_view name,
   return Handle{sink, property, Handle::kSinkProperty};
 }
 
-std::span<CS_Property> EnumerateSinkProperties(
-    CS_Sink sink, wpi::SmallVectorImpl<CS_Property>& vec, CS_Status* status) {
+std::vector<CS_Property> EnumerateSinkProperties(
+    CS_Sink sink, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return {};
   }
-  for (auto property : data->sink->EnumerateProperties(status)) {
+  std::vector<CS_Property> vec;
+  auto handles = data->sink->EnumerateProperties(status);
+  vec.reserve(handles.size());
+  for (auto property : handles) {
     vec.push_back(Handle{sink, property, Handle::kSinkProperty});
   }
   return vec;
