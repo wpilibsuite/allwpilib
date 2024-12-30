@@ -572,10 +572,9 @@ void UsbCameraImpl::CameraThreadMain() {
             // grab current time in the same timebase as buf.timestamp
             struct timespec ts;
             if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0) {
-              int64_t nowTime = {buf.timestamp.tv_sec * 1'000'000 +
-                                     buf.timestamp.tv_usec};
+              int64_t nowTime = {ts.tv_sec * 1'000'000 + ts.tv_usec};
               int64_t bufTime = {buf.timestamp.tv_sec * 1'000'000 +
-                                     buf.timestamp.tv_usec};
+                                 buf.timestamp.tv_usec};
               // And offset frameTime by the latency
               int64_t offset{nowTime - bufTime};
               SDEBUG4("Frame was %lu uS old", offset);
