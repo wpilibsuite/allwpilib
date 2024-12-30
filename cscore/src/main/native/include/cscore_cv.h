@@ -151,6 +151,27 @@ class CvSink : public ImageSink {
   [[nodiscard]]
   uint64_t GrabFrameNoTimeoutDirect(cv::Mat& image);
 
+  /**
+   * Wait for the next frame and get the image.
+   * Times out (returning 0) after timeout seconds.
+   * The provided image will have the pixelFormat this class was constructed
+   * with. The data is backed by data in the CvSink. It will be invalidated by
+   * any grabFrame*() call on the sink.
+   *
+   * <p>If lastFrameTime is provided and non-zero, the sink will fill image with
+   * the first frame from the source that is not equal to lastFrameTime. If
+   * lastFrameTime is zero, the time of the current frame owned by the CvSource
+   * is used, and this function will block until the connected CvSource provides
+   * a new frame.
+   *
+   * @return Frame time, or 0 on error (call GetError() to obtain the error
+   *         message); the frame time is in the same time base as wpi::Now(),
+   *         and is in 1 us increments.
+   */
+  [[nodiscard]]
+  uint64_t GrabFrameDirectLastTime(cv::Mat& image, uint64_t lastFrameTime,
+                                   double timeout = 0.225);
+
  private:
   constexpr int GetCvFormat(WPI_PixelFormat pixelFormat);
 
@@ -355,6 +376,25 @@ inline uint64_t CvSink::GrabFrameNoTimeoutDirect(cv::Mat& image) {
   rawFrame.stride = 0;
   rawFrame.pixelFormat = pixelFormat;
   auto timestamp = GrabSinkFrame(m_handle, rawFrame, &m_status);
+  if (m_status != CS_OK) {
+    return 0;
+  }
+  image =
+      cv::Mat{rawFrame.height, rawFrame.width,
+              GetCvFormat(static_cast<WPI_PixelFormat>(rawFrame.pixelFormat)),
+              rawFrame.data, static_cast<size_t>(rawFrame.stride)};
+  return timestamp;
+}
+
+inline uint64_t CvSink::GrabFrameDirectLastTime(cv::Mat& image,
+                                                uint64_t lastFrameTime,
+                                                double timeout) {
+  rawFrame.height = 0;
+  rawFrame.width = 0;
+  rawFrame.stride = 0;
+  rawFrame.pixelFormat = pixelFormat;
+  auto timestamp = GrabSinkFrameTimeoutLastTime(m_handle, rawFrame, timeout,
+                                                lastFrameTime, &m_status);
   if (m_status != CS_OK) {
     return 0;
   }

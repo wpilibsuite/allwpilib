@@ -117,6 +117,8 @@ public abstract class RobotBase implements AutoCloseable {
                   tResourceType.kResourceType_ProfiledPIDController, count);
               case kController_BangBangController -> HAL.report(
                   tResourceType.kResourceType_BangBangController, count);
+              case kTrajectory_PathWeaver -> HAL.report(
+                  tResourceType.kResourceType_PathWeaverTrajectory, count);
               default -> {
                 // NOP
               }

@@ -10,19 +10,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validation:
+    name: "Validation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v4
+
   build-docker:
     if: (github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main') || github.event_name != 'schedule'
     strategy:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/roborio-cross-ubuntu:2024-22.04
+          - container: wpilib/roborio-cross-ubuntu:2025-22.04
             artifact-name: Athena
             build-options: "-Ponlylinuxathena"
-          - container: wpilib/raspbian-cross-ubuntu:bullseye-22.04
+          - container: wpilib/raspbian-cross-ubuntu:bookworm-22.04
             artifact-name: Arm32
             build-options: "-Ponlylinuxarm32"
-          - container: wpilib/aarch64-cross-ubuntu:bullseye-22.04
+          - container: wpilib/aarch64-cross-ubuntu:bookworm-22.04
             artifact-name: Arm64
             build-options: "-Ponlylinuxarm64"
           - container: wpilib/ubuntu-base:22.04
@@ -30,6 +37,7 @@ jobs:
             build-options: "-Ponlylinuxx86-64"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ubuntu-22.04
+    needs: [validation]
     steps:
       - name: Free Disk Space
         uses: jlumbroso/free-disk-space@main
@@ -101,6 +109,7 @@ jobs:
             outputs: "ntcoreffi/build/outputs"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
+    needs: [validation]
     steps:
       - uses: actions/checkout@v4
         with:

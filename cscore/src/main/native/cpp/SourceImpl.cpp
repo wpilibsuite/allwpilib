@@ -84,12 +84,17 @@ Frame SourceImpl::GetNextFrame() {
   return m_frame;
 }
 
-Frame SourceImpl::GetNextFrame(double timeout) {
+Frame SourceImpl::GetNextFrame(double timeout, Frame::Time lastFrameTime) {
   std::unique_lock lock{m_frameMutex};
-  auto oldTime = m_frame.GetTime();
+
+  if (lastFrameTime == 0) {
+    lastFrameTime = m_frame.GetTime();
+  }
+
+  // Wait unitl m_frame has a timestamp other than lastFrameTime
   if (!m_frameCv.wait_for(
           lock, std::chrono::milliseconds(static_cast<int>(timeout * 1000)),
-          [=, this] { return m_frame.GetTime() != oldTime; })) {
+          [=, this] { return m_frame.GetTime() != lastFrameTime; })) {
     m_frame = Frame{*this, "timed out getting frame", wpi::Now()};
   }
   return m_frame;

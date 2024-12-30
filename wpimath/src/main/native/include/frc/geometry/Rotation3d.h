@@ -8,7 +8,6 @@
 #include <type_traits>
 
 #include <Eigen/Core>
-#include <Eigen/LU>
 #include <fmt/format.h>
 #include <gcem.hpp>
 #include <wpi/SymbolExports.h>
@@ -114,7 +113,11 @@ class WPILIB_DLLEXPORT Rotation3d {
       if ((R * R.transpose() - Matrix3d::Identity()).norm() > 1e-9) {
         throw std::domain_error("Rotation matrix isn't orthogonal");
       }
-      if (gcem::abs(R.determinant() - 1.0) > 1e-9) {
+      // HACK: Uses ct_matrix instead of <Eigen/LU> for determinant because
+      //       including <Eigen/LU> doubles compilation times on MSVC, even if
+      //       this constructor is unused. MSVC's frontend inefficiently parses
+      //       large headers; GCC and Clang are largely unaffected.
+      if (gcem::abs(ct_matrix{R}.determinant() - 1.0) > 1e-9) {
         throw std::domain_error(
             "Rotation matrix is orthogonal but not special orthogonal");
       }
@@ -402,6 +405,31 @@ class WPILIB_DLLEXPORT Rotation3d {
     double norm = gcem::hypot(m_q.X(), m_q.Y(), m_q.Z());
     return units::radian_t{2.0 * gcem::atan2(norm, m_q.W())};
   }
+
+  /**
+   * Returns rotation matrix representation of this rotation.
+   */
+  constexpr Eigen::Matrix3d ToMatrix() const {
+    double w = m_q.W();
+    double x = m_q.X();
+    double y = m_q.Y();
+    double z = m_q.Z();
+
+    // https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Quaternion-derived_rotation_matrix
+    return Eigen::Matrix3d{{1.0 - 2.0 * (y * y + z * z), 2.0 * (x * y - w * z),
+                            2.0 * (x * z + w * y)},
+                           {2.0 * (x * y + w * z), 1.0 - 2.0 * (x * x + z * z),
+                            2.0 * (y * z - w * x)},
+                           {2.0 * (x * z - w * y), 2.0 * (y * z + w * x),
+                            1.0 - 2.0 * (x * x + y * y)}};
+  }
+
+  /**
+   * Returns rotation vector representation of this rotation.
+   *
+   * @return Rotation vector representation of this rotation.
+   */
+  constexpr Eigen::Vector3d ToVector() const { return m_q.ToRotationVector(); }
 
   /**
    * Returns a Rotation2d representing this Rotation3d projected into the X-Y

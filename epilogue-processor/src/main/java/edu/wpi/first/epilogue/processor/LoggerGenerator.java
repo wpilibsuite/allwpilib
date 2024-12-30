@@ -15,7 +15,10 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.annotation.Annotation;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +32,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
@@ -39,6 +43,35 @@ public class LoggerGenerator {
       LoggerGenerator::isBuiltInJavaMethod;
   private final ProcessingEnvironment m_processingEnv;
   private final List<ElementHandler> m_handlers;
+
+  @SuppressWarnings("BadAnnotationImplementation")
+  private final Logged m_defaultConfig =
+      new Logged() {
+        @Override
+        public Class<? extends Annotation> annotationType() {
+          return Logged.class;
+        }
+
+        @Override
+        public String name() {
+          return "";
+        }
+
+        @Override
+        public Strategy strategy() {
+          return Strategy.OPT_IN;
+        }
+
+        @Override
+        public Importance importance() {
+          return Importance.DEBUG;
+        }
+
+        @Override
+        public Naming defaultNaming() {
+          return Naming.USE_CODE_NAME;
+        }
+      };
 
   public LoggerGenerator(ProcessingEnvironment processingEnv, List<ElementHandler> handlers) {
     this.m_processingEnv = processingEnv;
@@ -73,6 +106,9 @@ public class LoggerGenerator {
    */
   public void writeLoggerFile(TypeElement clazz) throws IOException {
     var config = clazz.getAnnotation(Logged.class);
+    if (config == null) {
+      config = m_defaultConfig;
+    }
     boolean requireExplicitOptIn = config.strategy() == Logged.Strategy.OPT_IN;
 
     Predicate<Element> notSkipped = LoggerGenerator::isNotSkipped;
@@ -150,36 +186,28 @@ public class LoggerGenerator {
           }
         });
 
-    writeLoggerFile(clazz.getQualifiedName().toString(), config, fieldsToLog, methodsToLog);
+    writeLoggerFile(clazz, config, fieldsToLog, methodsToLog);
   }
 
   private void writeLoggerFile(
-      String className,
+      TypeElement clazz,
       Logged classConfig,
       List<VariableElement> loggableFields,
       List<ExecutableElement> loggableMethods)
       throws IOException {
-    String packageName = null;
-    int lastDot = className.lastIndexOf('.');
-    if (lastDot > 0) {
-      packageName = className.substring(0, lastDot);
+    // Walk nesting levels, to support inner classes
+    Deque<String> nesting = new ArrayDeque<>();
+    Element enclosing = clazz.getEnclosingElement();
+    while (!(enclosing instanceof PackageElement p)) {
+      nesting.addFirst(enclosing.getSimpleName().toString());
+      enclosing = enclosing.getEnclosingElement();
     }
+    String packageName = p.getQualifiedName().toString();
+    nesting.addLast(clazz.getSimpleName().toString());
+    String simpleClassName = String.join(".", nesting);
 
-    String simpleClassName = StringUtils.simpleName(className);
-    String loggerClassName = className + "Logger";
-    String loggerSimpleClassName = loggerClassName.substring(lastDot + 1);
-
-    // Use the name on the class config to set the generated logger names
-    // This helps to avoid naming conflicts
-    if (!classConfig.name().isBlank()) {
-      loggerSimpleClassName =
-          StringUtils.capitalize(classConfig.name().replaceAll(" ", "")) + "Logger";
-      if (lastDot > 0) {
-        loggerClassName = packageName + "." + loggerSimpleClassName;
-      } else {
-        loggerClassName = loggerSimpleClassName;
-      }
-    }
+    String loggerClassName = StringUtils.loggerClassName(clazz);
+    String loggerSimpleClassName = StringUtils.simpleName(loggerClassName);
 
     var loggerFile = m_processingEnv.getFiler().createSourceFile(loggerClassName);
 
@@ -197,7 +225,7 @@ public class LoggerGenerator {
       out.println("import edu.wpi.first.epilogue.Logged;");
       out.println("import edu.wpi.first.epilogue.Epilogue;");
       out.println("import edu.wpi.first.epilogue.logging.ClassSpecificLogger;");
-      out.println("import edu.wpi.first.epilogue.logging.DataLogger;");
+      out.println("import edu.wpi.first.epilogue.logging.EpilogueBackend;");
       if (requiresVarHandles) {
         out.println("import java.lang.invoke.MethodHandles;");
         out.println("import java.lang.invoke.VarHandle;");
@@ -220,13 +248,13 @@ public class LoggerGenerator {
         }
         out.println();
 
-        var clazz = simpleClassName + ".class";
+        var classReference = simpleClassName + ".class";
 
         out.println("  static {");
         out.println("    try {");
         out.println(
             "      var lookup = MethodHandles.privateLookupIn("
-                + clazz
+                + classReference
                 + ", MethodHandles.lookup());");
 
         for (var privateField : privateFields) {
@@ -235,7 +263,7 @@ public class LoggerGenerator {
               "      $"
                   + fieldName
                   + " = lookup.findVarHandle("
-                  + clazz
+                  + classReference
                   + ", \""
                   + fieldName
                   + "\", "
@@ -258,9 +286,10 @@ public class LoggerGenerator {
       out.println();
 
       // @Override
-      // public void update(DataLogger dataLogger, Foo object) {
+      // public void update(EpilogueBackend backend, Foo object) {
       out.println("  @Override");
-      out.println("  public void update(DataLogger dataLogger, " + simpleClassName + " object) {");
+      out.println(
+          "  public void update(EpilogueBackend backend, " + simpleClassName + " object) {");
 
       // Build a map of importance levels to the fields logged at those levels
       // e.g. { DEBUG: [fieldA, fieldB], INFO: [fieldC], CRITICAL: [fieldD, fieldE, fieldF] }

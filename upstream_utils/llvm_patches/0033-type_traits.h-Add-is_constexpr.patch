@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sat, 2 Dec 2023 15:21:32 -0800
+Subject: [PATCH 33/37] type_traits.h: Add is_constexpr()
+
+---
+ llvm/include/llvm/Support/type_traits.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/llvm/include/llvm/Support/type_traits.h b/llvm/include/llvm/Support/type_traits.h
+index 3171af93fa7ffe4707c03289270cf5951e3db7c5..e1b094640876649709abc199f83942dbfef09771 100644
+--- a/llvm/include/llvm/Support/type_traits.h
++++ b/llvm/include/llvm/Support/type_traits.h
+@@ -76,6 +76,11 @@ union trivial_helper {
+ 
+ } // end namespace detail
+ 
++// https://stackoverflow.com/questions/55288555/c-check-if-statement-can-be-evaluated-constexpr
++template<class Lambda, int=(Lambda{}(), 0)>
++constexpr bool is_constexpr(Lambda) { return true; }
++constexpr bool is_constexpr(...) { return false; }
++
+ } // end namespace llvm
+ 
+ #endif // LLVM_SUPPORT_TYPE_TRAITS_H

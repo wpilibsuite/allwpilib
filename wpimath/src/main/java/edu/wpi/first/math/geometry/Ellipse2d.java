@@ -199,7 +199,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @return The distance (0, if the point is contained by the ellipse)
    */
   public double getDistance(Translation2d point) {
-    return findNearestPoint(point).getDistance(point);
+    return nearest(point).getDistance(point);
   }
 
   /**
@@ -218,7 +218,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @param point The point that this will find the nearest point to.
    * @return A new point that is nearest to {@code point} and contained in the ellipse.
    */
-  public Translation2d findNearestPoint(Translation2d point) {
+  public Translation2d nearest(Translation2d point) {
     // Check if already in ellipse
     if (contains(point)) {
       return point;
@@ -226,7 +226,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
 
     // Find nearest point
     var nearestPoint = new double[2];
-    Ellipse2dJNI.findNearestPoint(
+    Ellipse2dJNI.nearest(
         m_center.getX(),
         m_center.getY(),
         m_center.getRotation().getRadians(),

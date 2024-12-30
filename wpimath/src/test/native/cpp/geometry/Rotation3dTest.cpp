@@ -307,6 +307,13 @@ TEST(Rotation3dTest, Inequality) {
   EXPECT_NE(rot1, rot2);
 }
 
+TEST(Rotation3dTest, ToMatrix) {
+  Rotation3d before{10_deg, 20_deg, 30_deg};
+  Rotation3d after{before.ToMatrix()};
+
+  EXPECT_EQ(before, after);
+}
+
 TEST(Rotation3dTest, Interpolate) {
   const Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
   const Eigen::Vector3d yAxis{0.0, 1.0, 0.0};

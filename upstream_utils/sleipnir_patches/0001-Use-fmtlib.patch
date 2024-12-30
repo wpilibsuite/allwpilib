@@ -1,0 +1,95 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Wed, 29 May 2024 16:29:55 -0700
+Subject: [PATCH 1/3] Use fmtlib
+
+---
+ include/.styleguide             |  1 +
+ include/sleipnir/util/Print.hpp | 31 ++++++++++++++++++-------------
+ 2 files changed, 19 insertions(+), 13 deletions(-)
+
+diff --git a/include/.styleguide b/include/.styleguide
+index 8fb61fdf9cc5ceff633d3126f0579eef25a1326f..6a7f8ed28f9cb037c9746a7e0ef5e110481d9825 100644
+--- a/include/.styleguide
++++ b/include/.styleguide
+@@ -12,4 +12,5 @@ licenseUpdateExclude {
+ 
+ includeOtherLibs {
+   ^Eigen/
++  ^fmt/
+ }
+diff --git a/include/sleipnir/util/Print.hpp b/include/sleipnir/util/Print.hpp
+index a746cb77b70f095bb15f4c493295cb925bc74cd3..c01fd4ac679df854b885293d681ea1e0984626fa 100644
+--- a/include/sleipnir/util/Print.hpp
++++ b/include/sleipnir/util/Print.hpp
+@@ -3,52 +3,57 @@
+ #pragma once
+ 
+ #include <cstdio>
+-#include <print>
+ #include <system_error>
+ #include <utility>
+ 
++#if __has_include(<fmt/base.h>)
++#include <fmt/base.h>
++#else
++#include <fmt/core.h>
++#endif
++
+ namespace sleipnir {
+ 
+ /**
+- * Wrapper around std::print() that squelches write failure exceptions.
++ * Wrapper around fmt::print() that squelches write failure exceptions.
+  */
+ template <typename... T>
+-inline void print(std::format_string<T...> fmt, T&&... args) {
++inline void print(fmt::format_string<T...> fmt, T&&... args) {
+   try {
+-    std::print(fmt, std::forward<T>(args)...);
++    fmt::print(fmt, std::forward<T>(args)...);
+   } catch (const std::system_error&) {
+   }
+ }
+ 
+ /**
+- * Wrapper around std::print() that squelches write failure exceptions.
++ * Wrapper around fmt::print() that squelches write failure exceptions.
+  */
+ template <typename... T>
+-inline void print(std::FILE* f, std::format_string<T...> fmt, T&&... args) {
++inline void print(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
+   try {
+-    std::print(f, fmt, std::forward<T>(args)...);
++    fmt::print(f, fmt, std::forward<T>(args)...);
+   } catch (const std::system_error&) {
+   }
+ }
+ 
+ /**
+- * Wrapper around std::println() that squelches write failure exceptions.
++ * Wrapper around fmt::println() that squelches write failure exceptions.
+  */
+ template <typename... T>
+-inline void println(std::format_string<T...> fmt, T&&... args) {
++inline void println(fmt::format_string<T...> fmt, T&&... args) {
+   try {
+-    std::println(fmt, std::forward<T>(args)...);
++    fmt::println(fmt, std::forward<T>(args)...);
+   } catch (const std::system_error&) {
+   }
+ }
+ 
+ /**
+- * Wrapper around std::println() that squelches write failure exceptions.
++ * Wrapper around fmt::println() that squelches write failure exceptions.
+  */
+ template <typename... T>
+-inline void println(std::FILE* f, std::format_string<T...> fmt, T&&... args) {
++inline void println(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
+   try {
+-    std::println(f, fmt, std::forward<T>(args)...);
++    fmt::println(f, fmt, std::forward<T>(args)...);
+   } catch (const std::system_error&) {
+   }
+ }

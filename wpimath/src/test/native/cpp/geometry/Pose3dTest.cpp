@@ -112,6 +112,13 @@ TEST(Pose3dTest, Minus) {
   EXPECT_NEAR(0.0, transform.Rotation().Z().value(), 1e-9);
 }
 
+TEST(Pose3dTest, ToMatrix) {
+  Pose3d before{1_m, 2_m, 3_m, Rotation3d{10_deg, 20_deg, 30_deg}};
+  Pose3d after{before.ToMatrix()};
+
+  EXPECT_EQ(before, after);
+}
+
 TEST(Pose3dTest, ToPose2d) {
   Pose3d pose{1_m, 2_m, 3_m, Rotation3d{20_deg, 30_deg, 40_deg}};
   Pose2d expected{1_m, 2_m, 40_deg};

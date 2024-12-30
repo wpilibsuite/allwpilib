@@ -196,11 +196,11 @@ public final class SmartDashboard {
   }
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
-   * @param defaultValue the default value to set if key does not exist.
-   * @return False if the table key exists with a different type
+   * @param defaultValue the value to set if key does not exist
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultBoolean(String key, boolean defaultValue) {
     return getEntry(key).setDefaultBoolean(defaultValue);
@@ -231,11 +231,11 @@ public final class SmartDashboard {
   }
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
-   * @param defaultValue the default value to set if key does not exist.
-   * @return False if the table key exists with a different type
+   * @param defaultValue the value to set if key does not exist
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultNumber(String key, double defaultValue) {
     return getEntry(key).setDefaultDouble(defaultValue);
@@ -266,11 +266,11 @@ public final class SmartDashboard {
   }
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
-   * @param defaultValue the default value to set if key does not exist.
-   * @return False if the table key exists with a different type
+   * @param defaultValue the value to set if key does not exist
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultString(String key, String defaultValue) {
     return getEntry(key).setDefaultString(defaultValue);
@@ -312,22 +312,22 @@ public final class SmartDashboard {
   }
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
-   * @param defaultValue the default value to set if key does not exist.
-   * @return False if the table key exists with a different type
+   * @param defaultValue the value to set if key does not exist
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultBooleanArray(String key, boolean[] defaultValue) {
     return getEntry(key).setDefaultBooleanArray(defaultValue);
   }
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
-   * @param defaultValue the default value to set if key does not exist.
-   * @return False if the table key exists with a different type
+   * @param defaultValue the value to set if key does not exist
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultBooleanArray(String key, Boolean[] defaultValue) {
     return getEntry(key).setDefaultBooleanArray(defaultValue);
@@ -382,22 +382,22 @@ public final class SmartDashboard {
   }
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
-   * @param defaultValue the default value to set if key does not exist.
-   * @return False if the table key exists with a different type
+   * @param defaultValue the value to set if key does not exist
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultNumberArray(String key, double[] defaultValue) {
     return getEntry(key).setDefaultDoubleArray(defaultValue);
   }
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
-   * @param defaultValue the default value to set if key does not exist.
-   * @return False if the table key exists with a different type
+   * @param defaultValue the value to set if key does not exist
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultNumberArray(String key, Double[] defaultValue) {
     return getEntry(key).setDefaultNumberArray(defaultValue);
@@ -441,11 +441,11 @@ public final class SmartDashboard {
   }
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
-   * @param defaultValue the default value to set if key does not exist.
-   * @return False if the table key exists with a different type
+   * @param defaultValue the value to set if key does not exist
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultStringArray(String key, String[] defaultValue) {
     return getEntry(key).setDefaultStringArray(defaultValue);
@@ -476,11 +476,11 @@ public final class SmartDashboard {
   }
 
   /**
-   * Gets the current value in the table, setting it if it does not exist.
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
-   * @param defaultValue the default value to set if key does not exist.
-   * @return False if the table key exists with a different type
+   * @param defaultValue the value to set if key does not exist
+   * @return True if the key did not already exist, otherwise False
    */
   public static boolean setDefaultRaw(String key, byte[] defaultValue) {
     return getEntry(key).setDefaultRaw(defaultValue);

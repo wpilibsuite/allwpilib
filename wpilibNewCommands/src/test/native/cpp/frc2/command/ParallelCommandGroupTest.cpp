@@ -78,9 +78,9 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupInterrupt) {
 TEST_F(ParallelCommandGroupTest, ParallelGroupNotScheduledCancel) {
   CommandScheduler scheduler = GetScheduler();
 
-  ParallelCommandGroup group((InstantCommand(), InstantCommand()));
+  auto group = cmd::Parallel(cmd::None(), cmd::None());
 
-  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
+  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(group));
 }
 
 TEST_F(ParallelCommandGroupTest, ParallelGroupCopy) {
@@ -88,15 +88,15 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupCopy) {
 
   bool finished = false;
 
-  WaitUntilCommand command([&finished] { return finished; });
+  auto command = cmd::WaitUntil([&finished] { return finished; });
 
-  ParallelCommandGroup group(command);
-  scheduler.Schedule(&group);
+  auto group = cmd::Parallel(std::move(command));
+  scheduler.Schedule(group);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&group));
+  EXPECT_TRUE(scheduler.IsScheduled(group));
   finished = true;
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  EXPECT_FALSE(scheduler.IsScheduled(group));
 }
 
 TEST_F(ParallelCommandGroupTest, ParallelGroupRequirement) {
@@ -107,17 +107,17 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupRequirement) {
   TestSubsystem requirement3;
   TestSubsystem requirement4;
 
-  InstantCommand command1([] {}, {&requirement1, &requirement2});
-  InstantCommand command2([] {}, {&requirement3});
-  InstantCommand command3([] {}, {&requirement3, &requirement4});
+  auto command1 = cmd::RunOnce([] {}, {&requirement1, &requirement2});
+  auto command2 = cmd::RunOnce([] {}, {&requirement3});
+  auto command3 = cmd::RunOnce([] {}, {&requirement3, &requirement4});
 
-  ParallelCommandGroup group(std::move(command1), std::move(command2));
+  auto group = cmd::Parallel(std::move(command1), std::move(command2));
 
-  scheduler.Schedule(&group);
-  scheduler.Schedule(&command3);
+  scheduler.Schedule(group);
+  scheduler.Schedule(command3);
 
-  EXPECT_TRUE(scheduler.IsScheduled(&command3));
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  EXPECT_TRUE(scheduler.IsScheduled(command3));
+  EXPECT_FALSE(scheduler.IsScheduled(group));
 }
 
 INSTANTIATE_MULTI_COMMAND_COMPOSITION_TEST_SUITE(ParallelCommandGroupTest,
