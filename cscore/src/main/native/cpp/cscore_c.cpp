@@ -11,7 +11,6 @@
 #include <vector>
 
 #include <wpi/MemAlloc.h>
-#include <wpi/SmallString.h>
 
 #include "c_util.h"
 #include "cscore_cpp.h"
