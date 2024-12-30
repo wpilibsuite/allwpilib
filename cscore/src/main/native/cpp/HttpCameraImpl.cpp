@@ -123,8 +123,7 @@ void HttpCameraImpl::StreamThreadMain() {
     }
 
     // connect
-    wpi::SmallString<64> boundary;
-    wpi::HttpConnection* conn = DeviceStreamConnect(boundary);
+    auto [conn, boundary] = DeviceStreamConnect();
 
     if (!m_active) {
       break;
@@ -139,7 +138,7 @@ void HttpCameraImpl::StreamThreadMain() {
     SetConnected(true);
 
     // stream
-    DeviceStream(conn->is, boundary.str());
+    DeviceStream(conn->is, boundary);
     {
       std::unique_lock lock(m_mutex);
       m_streamConn = nullptr;
@@ -150,8 +149,8 @@ void HttpCameraImpl::StreamThreadMain() {
   SetConnected(false);
 }
 
-wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
-    wpi::SmallVectorImpl<char>& boundary) {
+std::pair<wpi::HttpConnection*, std::string>
+HttpCameraImpl::DeviceStreamConnect() {
   // Build the request
   wpi::HttpRequest req;
   {
@@ -159,7 +158,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
     if (m_locations.empty()) {
       SERROR("locations array is empty!?");
       std::this_thread::sleep_for(std::chrono::seconds(1));
-      return nullptr;
+      return {};
     }
     if (m_nextLocation >= m_locations.size()) {
       m_nextLocation = 0;
@@ -173,7 +172,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
       wpi::TCPConnector::connect(req.host.c_str(), req.port, m_logger, 1);
 
   if (!m_active || !stream) {
-    return nullptr;
+    return {};
   }
 
   auto connPtr = std::make_unique<wpi::HttpConnection>(std::move(stream), 1);
@@ -191,7 +190,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
     SWARNING("{}", warn);
     std::scoped_lock lock(m_mutex);
     m_streamConn = nullptr;
-    return nullptr;
+    return {};
   }
 
   // Parse Content-Type header to get the boundary
@@ -202,11 +201,11 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
              mediaType);
     std::scoped_lock lock(m_mutex);
     m_streamConn = nullptr;
-    return nullptr;
+    return {};
   }
 
   // media parameters
-  boundary.clear();
+  std::string boundary;
   while (!contentType.empty()) {
     std::string_view keyvalue;
     std::tie(keyvalue, contentType) = wpi::split(contentType, ';');
@@ -226,10 +225,10 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
              req.host.str());
     std::scoped_lock lock(m_mutex);
     m_streamConn = nullptr;
-    return nullptr;
+    return {};
   }
 
-  return conn;
+  return {conn, boundary};
 }
 
 void HttpCameraImpl::DeviceStream(wpi::raw_istream& is,
