@@ -222,9 +222,8 @@ bool IsSourceConnected(CS_Source source, CS_Status* status);
 bool IsSourceEnabled(CS_Source source, CS_Status* status);
 CS_Property GetSourceProperty(CS_Source source, std::string_view name,
                               CS_Status* status);
-std::span<CS_Property> EnumerateSourceProperties(
-    CS_Source source, wpi::SmallVectorImpl<CS_Property>& vec,
-    CS_Status* status);
+std::vector<CS_Property> EnumerateSourceProperties(CS_Source source,
+                                                   CS_Status* status);
 VideoMode GetSourceVideoMode(CS_Source source, CS_Status* status);
 bool SetSourceVideoMode(CS_Source source, const VideoMode& mode,
                         CS_Status* status);
@@ -327,8 +326,8 @@ std::string_view GetSinkDescription(CS_Sink sink,
                                     CS_Status* status);
 CS_Property GetSinkProperty(CS_Sink sink, std::string_view name,
                             CS_Status* status);
-std::span<CS_Property> EnumerateSinkProperties(
-    CS_Sink sink, wpi::SmallVectorImpl<CS_Property>& vec, CS_Status* status);
+std::vector<CS_Property> EnumerateSinkProperties(CS_Sink sink,
+                                                 CS_Status* status);
 void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);
 CS_Property GetSinkSourceProperty(CS_Sink sink, std::string_view name,
                                   CS_Status* status);

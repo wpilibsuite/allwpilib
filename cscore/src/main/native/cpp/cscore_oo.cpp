@@ -23,9 +23,8 @@ wpi::json VideoSink::GetConfigJsonObject() const {
 }
 
 std::vector<VideoProperty> VideoSource::EnumerateProperties() const {
-  wpi::SmallVector<CS_Property, 32> handles_buf;
   CS_Status status = 0;
-  auto handles = EnumerateSourceProperties(m_handle, handles_buf, &status);
+  auto handles = EnumerateSourceProperties(m_handle, &status);
 
   std::vector<VideoProperty> properties;
   properties.reserve(handles.size());
@@ -60,9 +59,8 @@ std::vector<VideoSource> VideoSource::EnumerateSources() {
 }
 
 std::vector<VideoProperty> VideoSink::EnumerateProperties() const {
-  wpi::SmallVector<CS_Property, 32> handles_buf;
   CS_Status status = 0;
-  auto handles = EnumerateSinkProperties(m_handle, handles_buf, &status);
+  auto handles = EnumerateSinkProperties(m_handle, &status);
 
   std::vector<VideoProperty> properties;
   properties.reserve(handles.size());
