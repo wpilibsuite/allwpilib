@@ -1453,8 +1453,7 @@ bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
 }
 
 void UsbCameraImpl::SetQuirks() {
-  wpi::SmallString<128> descbuf;
-  std::string_view desc = GetDescription(descbuf);
+  auto desc = GetDescription();
   m_lifecam_exposure = wpi::ends_with(desc, "LifeCam HD-3000") ||
                        wpi::ends_with(desc, "LifeCam Cinema (TM)");
   m_ov9281_exposure = wpi::contains(desc, "OV9281");

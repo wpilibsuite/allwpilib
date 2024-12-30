@@ -213,13 +213,7 @@ CS_Source CreateCvSource(std::string_view name, const VideoMode& mode,
  */
 CS_SourceKind GetSourceKind(CS_Source source, CS_Status* status);
 std::string GetSourceName(CS_Source source, CS_Status* status);
-std::string_view GetSourceName(CS_Source source,
-                               wpi::SmallVectorImpl<char>& buf,
-                               CS_Status* status);
 std::string GetSourceDescription(CS_Source source, CS_Status* status);
-std::string_view GetSourceDescription(CS_Source source,
-                                      wpi::SmallVectorImpl<char>& buf,
-                                      CS_Status* status);
 uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status);
 void SetSourceConnectionStrategy(CS_Source source,
                                  CS_ConnectionStrategy strategy,

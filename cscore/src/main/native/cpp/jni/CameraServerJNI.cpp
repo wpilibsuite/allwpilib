@@ -614,8 +614,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getSourceName
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::SmallString<128> buf;
-  auto str = cs::GetSourceName(source, buf, &status);
+  auto str = cs::GetSourceName(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -632,8 +631,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getSourceDescription
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::SmallString<128> buf;
-  auto str = cs::GetSourceDescription(source, buf, &status);
+  auto str = cs::GetSourceDescription(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }

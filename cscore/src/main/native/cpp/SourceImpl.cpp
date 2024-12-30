@@ -50,11 +50,9 @@ void SourceImpl::SetDescription(std::string_view description) {
   m_description = description;
 }
 
-std::string_view SourceImpl::GetDescription(
-    wpi::SmallVectorImpl<char>& buf) const {
+std::string SourceImpl::GetDescription() const {
   std::scoped_lock lock(m_mutex);
-  buf.append(m_description.begin(), m_description.end());
-  return {buf.data(), buf.size()};
+  return m_description;
 }
 
 void SourceImpl::SetConnected(bool connected) {
