@@ -401,16 +401,14 @@ std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
   return data->source->EnumerateVideoModes(status);
 }
 
-std::span<CS_Sink> EnumerateSourceSinks(CS_Source source,
-                                        wpi::SmallVectorImpl<CS_Sink>& vec,
-                                        CS_Status* status) {
+std::vector<CS_Sink> EnumerateSourceSinks(CS_Source source, CS_Status* status) {
   auto& inst = Instance::GetInstance();
   auto data = inst.GetSource(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return {};
   }
-  return inst.EnumerateSourceSinks(source, vec);
+  return inst.EnumerateSourceSinks(source);
 }
 
 CS_Source CopySource(CS_Source source, CS_Status* status) {
@@ -868,14 +866,12 @@ void Shutdown() {
 // Utility Functions
 //
 
-std::span<CS_Source> EnumerateSourceHandles(
-    wpi::SmallVectorImpl<CS_Source>& vec, CS_Status* status) {
-  return Instance::GetInstance().EnumerateSourceHandles(vec);
+std::vector<CS_Source> EnumerateSourceHandles(CS_Status* status) {
+  return Instance::GetInstance().EnumerateSourceHandles();
 }
 
-std::span<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
-                                        CS_Status* status) {
-  return Instance::GetInstance().EnumerateSinkHandles(vec);
+std::vector<CS_Sink> EnumerateSinkHandles(CS_Status* status) {
+  return Instance::GetInstance().EnumerateSinkHandles();
 }
 
 std::string GetHostname() {

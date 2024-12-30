@@ -888,8 +888,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSourceSinks
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::SmallVector<CS_Sink, 16> buf;
-  auto arr = cs::EnumerateSourceSinks(source, buf, &status);
+  auto arr = cs::EnumerateSourceSinks(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1945,8 +1944,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSources
   (JNIEnv* env, jclass)
 {
   CS_Status status = 0;
-  wpi::SmallVector<CS_Source, 16> buf;
-  auto arr = cs::EnumerateSourceHandles(buf, &status);
+  auto arr = cs::EnumerateSourceHandles(&status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1963,8 +1961,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSinks
   (JNIEnv* env, jclass)
 {
   CS_Status status = 0;
-  wpi::SmallVector<CS_Sink, 16> buf;
-  auto arr = cs::EnumerateSinkHandles(buf, &status);
+  auto arr = cs::EnumerateSinkHandles(&status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
