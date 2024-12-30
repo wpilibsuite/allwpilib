@@ -110,14 +110,12 @@ CS_SourceKind CS_GetSourceKind(CS_Source source, CS_Status* status) {
 }
 
 void CS_GetSourceName(CS_Source source, WPI_String* name, CS_Status* status) {
-  wpi::SmallString<128> buf;
-  cs::ConvertToC(name, cs::GetSourceName(source, buf, status));
+  cs::ConvertToC(name, cs::GetSourceName(source, status));
 }
 
 void CS_GetSourceDescription(CS_Source source, WPI_String* description,
                              CS_Status* status) {
-  wpi::SmallString<128> buf;
-  cs::ConvertToC(description, cs::GetSourceDescription(source, buf, status));
+  cs::ConvertToC(description, cs::GetSourceDescription(source, status));
 }
 
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
