@@ -27,7 +27,7 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
     return {};
   }
 
-  wpi::SmallString<128> buf;
+  std::string buf;
   wpi::raw_fd_istream is{fd, true};
 
   // build vendor and product 4-char hex strings
@@ -59,13 +59,13 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
       // next vendor, but didn't match product?
       if (line[0] != '\t') {
         buf += "Unknown";
-        return std::string{buf};
+        return buf;
       }
 
       // look for product
       if (wpi::starts_with(wpi::substr(line, 1), productStr)) {
         buf += wpi::trim(wpi::substr(line, 6));
-        return std::string{buf};
+        return buf;
       }
     }
   }
