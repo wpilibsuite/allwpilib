@@ -14,9 +14,9 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringMap.h>
+#include <wpi/expected>
 #include <wpi/raw_istream.h>
 
 #include "wpinet/NetworkStream.h"
@@ -26,23 +26,20 @@
 namespace wpi {
 
 // Unescape a %xx-encoded URI.
-// @param buf Buffer for output
-// @param error Set to true if an error occurred
-// @return Escaped string
-std::string_view UnescapeURI(std::string_view str, SmallVectorImpl<char>& buf,
-                             bool* error);
+// @param str input string
+// @return Escaped string, or index of error location
+wpi::expected<std::string, size_t> UnescapeURI(std::string_view str);
 
 // Escape a string with %xx-encoding.
-// @param buf Buffer for output
+// @param str input string
 // @param spacePlus If true, encodes spaces to '+' rather than "%20"
 // @return Escaped string
-std::string_view EscapeURI(std::string_view str, SmallVectorImpl<char>& buf,
-                           bool spacePlus = true);
+std::string EscapeURI(std::string_view str, bool spacePlus = true);
 
 // Escape a string for HTML output.
-// @param buf Buffer for output
+// @param str input string
 // @return Escaped string
-std::string_view EscapeHTML(std::string_view str, SmallVectorImpl<char>& buf);
+std::string EscapeHTML(std::string_view str);
 
 // Parse a set of HTTP headers.  Saves just the Content-Type and Content-Length
 // fields.
@@ -50,8 +47,8 @@ std::string_view EscapeHTML(std::string_view str, SmallVectorImpl<char>& buf);
 // @param contentType If not null, Content-Type contents are saved here.
 // @param contentLength If not null, Content-Length contents are saved here.
 // @return False if error occurred in input stream
-bool ParseHttpHeaders(raw_istream& is, SmallVectorImpl<char>* contentType,
-                      SmallVectorImpl<char>* contentLength);
+bool ParseHttpHeaders(raw_istream& is, std::string* contentType,
+                      std::string* contentLength);
 
 // Look for a MIME multi-part boundary.  On return, the input stream will
 // be located at the character following the boundary (usually "\r\n").
@@ -89,12 +86,10 @@ class HttpQueryMap {
    * value are unescaped strings.
    *
    * @param name name (unescaped)
-   * @param buf result buffer for value
    * @return Optional unescaped value.  Returns an empty optional if the
    *         name is not present in the query map.
    */
-  std::optional<std::string_view> Get(std::string_view name,
-                                      SmallVectorImpl<char>& buf) const;
+  std::optional<std::string> Get(std::string_view name) const;
 
  private:
   StringMap<std::string_view> m_elems;
@@ -225,7 +220,7 @@ class HttpPath {
   HttpPathRef drop_front(size_t n) const;
 
  private:
-  SmallString<128> m_pathBuf;
+  std::string m_pathBuf;
   SmallVector<size_t, 16> m_pathEnds;
 };
 
@@ -346,10 +341,10 @@ class HttpRequest {
     SetAuth(loc);
   }
 
-  SmallString<128> host;
+  std::string host;
   int port;
   std::string auth;
-  SmallString<128> path;
+  std::string path;
 
  private:
   void SetAuth(const HttpLocation& loc);
@@ -357,7 +352,7 @@ class HttpRequest {
   template <typename T>
   void SetPath(std::string_view path_, const T& params) {
     // Build location including query string
-    raw_svector_ostream pathOs{path};
+    raw_string_ostream pathOs{path};
     pathOs << path_;
     bool first = true;
     for (const auto& param : params) {
@@ -367,10 +362,9 @@ class HttpRequest {
       } else {
         pathOs << '&';
       }
-      SmallString<64> escapeBuf;
-      pathOs << EscapeURI(GetFirst(param), escapeBuf, false);
+      pathOs << EscapeURI(GetFirst(param), false);
       if (!GetSecond(param).empty()) {
-        pathOs << '=' << EscapeURI(GetSecond(param), escapeBuf, false);
+        pathOs << '=' << EscapeURI(GetSecond(param), false);
       }
     }
   }
@@ -401,8 +395,8 @@ class HttpConnection {
   wpi::raw_socket_ostream os;
 
   // Valid after Handshake() is successful
-  SmallString<64> contentType;
-  SmallString<64> contentLength;
+  std::string contentType;
+  std::string contentLength;
 
   explicit operator bool() const { return stream && !is.has_error(); }
 };
@@ -437,7 +431,7 @@ class HttpMultipartScanner {
   }
 
  private:
-  SmallString<64> m_boundaryWith, m_boundaryWithout;
+  std::string m_boundaryWith, m_boundaryWithout;
 
   // Internal state
   enum State { kBoundary, kPadding, kDone };

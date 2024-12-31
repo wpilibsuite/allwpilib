@@ -229,9 +229,8 @@ void NetworkClient::TcpConnected(uv::Tcp& tcp) {
   }
   wpi::WebSocket::ClientOptions options;
   options.handshakeTimeout = kWebsocketHandshakeTimeout;
-  wpi::SmallString<128> idBuf;
   auto ws = wpi::WebSocket::CreateClient(
-      tcp, fmt::format("/nt/{}", wpi::EscapeURI(m_id, idBuf)), "",
+      tcp, fmt::format("/nt/{}", wpi::EscapeURI(m_id)), "",
       {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu"},
       options);
   ws->SetMaxMessageSize(kMaxMessageSize);
