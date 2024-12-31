@@ -199,8 +199,8 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::raw_ostream& os,
                                                  SourceImpl& source,
                                                  std::string_view parameters,
                                                  bool respond) {
-  wpi::SmallString<256> responseBuf;
-  wpi::raw_svector_ostream response{responseBuf};
+  std::string responseBuf;
+  wpi::raw_string_ostream response{responseBuf};
   // command format: param1=value1&param2=value2...
   while (!parameters.empty()) {
     // split out next param and value
@@ -393,19 +393,20 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
             continue;  // skip empty choices
           }
           // replace any non-printable characters in name with spaces
-          wpi::SmallString<128> ch_name;
+          std::string ch_name;
+          ch_name.reserve(choice->size());
           for (char ch : *choice) {
             ch_name.push_back(wpi::isPrint(ch) ? ch : ' ');
           }
           wpi::print(os,
                      "<input id=\"{0}{1}\" type=\"radio\" name=\"{0}\" "
                      "value=\"{2}\" onclick=\"update('{0}', {1})\"",
-                     name, j, ch_name.str());
+                     name, j, ch_name);
           if (j == valE) {
             os << " checked";
           }
           wpi::print(os, " /><label for=\"{}{}\">{}</label>\n", name, j,
-                     ch_name.str());
+                     ch_name);
         }
         break;
       }
@@ -534,11 +535,12 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
           os << ", ";
         }
         // replace any non-printable characters in name with spaces
-        wpi::SmallString<128> ch_name;
+        std::string ch_name;
+        ch_name.reserve(choice->size());
         for (char ch : *choice) {
           ch_name.push_back(std::isprint(ch) ? ch : ' ');
         }
-        wpi::print(os, "\"{}\": \"{}\"", j, ch_name.str());
+        wpi::print(os, "\"{}\": \"{}\"", j, ch_name);
       }
       os << "}\n";
     }
@@ -664,8 +666,8 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
 
   os.SetUnbuffered();
 
-  wpi::SmallString<256> header;
-  wpi::raw_svector_ostream oss{header};
+  std::string header;
+  wpi::raw_string_ostream oss{header};
 
   SendHeader(oss, 200, "OK", "multipart/x-mixed-replace;boundary=" BOUNDARY);
   os << oss.str();
