@@ -9,7 +9,6 @@
 #include <string>
 #include <utility>
 
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fmt/raw_ostream.h>
 #include <wpi/print.h>
@@ -789,8 +788,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   wpi::raw_socket_ostream os{*m_stream, true};
 
   // Read the request string from the stream
-  wpi::SmallString<128> reqBuf;
-  std::string_view req = is.getline(reqBuf, 4096);
+  auto req = is.getline(4096);
   if (is.has_error()) {
     SDEBUG("error getting request string");
     return;
@@ -847,9 +845,8 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
 
   // Read the rest of the HTTP request.
   // The end of the request is marked by a single, empty line
-  wpi::SmallString<128> lineBuf;
   for (;;) {
-    if (wpi::starts_with(is.getline(lineBuf, 4096), "\n")) {
+    if (wpi::starts_with(is.getline(4096), "\n")) {
       break;
     }
     if (is.has_error()) {
