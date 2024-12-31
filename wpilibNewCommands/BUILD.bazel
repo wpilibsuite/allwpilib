@@ -1,5 +1,38 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//wpilibNewCommands:generate.bzl", "generate_wpilib_new_commands")
+
+py_binary(
+    name = "generate_hids",
+    srcs = ["generate_hids.py"],
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+    deps = [requirement("jinja2")],
+)
+
+filegroup(
+    name = "templates",
+    srcs = glob(["src/generate/main/**"]) + [
+        "//wpilibj:hid_schema",
+    ],
+    visibility = ["//wpilibNewCommands:__subpackages__"],
+)
+
+generate_wpilib_new_commands(
+    name = "generate_wpilib_new_commands",
+)
+
+write_source_files(
+    name = "write_wpilib_new_commands",
+    files = {
+        "src/generated": ":generate_wpilib_new_commands",
+    },
+    suggested_update_target = "//:write_all",
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "generated_cc_headers",

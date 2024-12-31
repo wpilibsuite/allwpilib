@@ -1,5 +1,34 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//hal:generate.bzl", "generate_hal")
+
+filegroup(
+    name = "templates",
+    srcs = glob(["src/generate/*"]),
+)
+
+py_binary(
+    name = "generate_usage_reporting",
+    srcs = ["generate_usage_reporting.py"],
+    data = [":templates"],
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+)
+
+generate_hal(
+    name = "generate_hal",
+)
+
+write_source_files(
+    name = "write_hal",
+    files = {
+        "src/generated": ":generate_hal",
+    },
+    suggested_update_target = "//:write_all",
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "generated_cc_headers",
