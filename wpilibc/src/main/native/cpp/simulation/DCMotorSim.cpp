@@ -42,6 +42,15 @@ void DCMotorSim::SetState(units::radian_t angularPosition,
   SetState(Vectord<2>{angularPosition, angularVelocity});
 }
 
+void DCMotorSim::SetAngle(units::radian_t angularPosition) {
+  SetState(angularPosition, GetAngularVelocity());
+}
+
+void DCMotorSim::SetAngularVelocity(
+    units::radians_per_second_t angularVelocity) {
+  SetState(GetAngularPosition(), angularVelocity);
+}
+
 units::radian_t DCMotorSim::GetAngularPosition() const {
   return units::radian_t{GetOutput(0)};
 }
