@@ -216,25 +216,24 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::raw_ostream& os,
     SDEBUG4("HTTP parameter \"{}\" value \"{}\"", rawParam, rawValue);
 
     // unescape param
-    bool error = false;
-    wpi::SmallString<64> paramBuf;
-    std::string_view param = wpi::UnescapeURI(rawParam, paramBuf, &error);
-    if (error) {
+    auto exParam = wpi::UnescapeURI(rawParam);
+    if (!exParam) {
       auto estr = fmt::format("could not unescape parameter \"{}\"", rawParam);
       SendError(os, 500, estr);
       SDEBUG("{}", estr);
       return false;
     }
+    auto param = *std::move(exParam);
 
     // unescape value
-    wpi::SmallString<64> valueBuf;
-    std::string_view value = wpi::UnescapeURI(rawValue, valueBuf, &error);
-    if (error) {
+    auto exValue = wpi::UnescapeURI(rawValue);
+    if (!exValue) {
       auto estr = fmt::format("could not unescape value \"{}\"", rawValue);
       SendError(os, 500, estr);
       SDEBUG("{}", estr);
       return false;
     }
+    auto value = *std::move(exValue);
 
     // Handle resolution, compression, and FPS.  These are handled locally
     // rather than passed to the source.

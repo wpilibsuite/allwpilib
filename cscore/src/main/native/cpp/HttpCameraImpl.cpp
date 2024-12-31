@@ -194,11 +194,10 @@ HttpCameraImpl::DeviceStreamConnect() {
   }
 
   // Parse Content-Type header to get the boundary
-  auto [mediaType, contentType] = wpi::split(conn->contentType.str(), ';');
+  auto [mediaType, contentType] = wpi::split(conn->contentType, ';');
   mediaType = wpi::trim(mediaType);
   if (mediaType != "multipart/x-mixed-replace") {
-    SWARNING("\"{}\": unrecognized Content-Type \"{}\"", req.host.str(),
-             mediaType);
+    SWARNING("\"{}\": unrecognized Content-Type \"{}\"", req.host, mediaType);
     std::scoped_lock lock(m_mutex);
     m_streamConn = nullptr;
     return {};
@@ -221,8 +220,7 @@ HttpCameraImpl::DeviceStreamConnect() {
   }
 
   if (boundary.empty()) {
-    SWARNING("\"{}\": empty multi-part boundary or no Content-Type",
-             req.host.str());
+    SWARNING("\"{}\": empty multi-part boundary or no Content-Type", req.host);
     std::scoped_lock lock(m_mutex);
     m_streamConn = nullptr;
     return {};
@@ -276,26 +274,25 @@ void HttpCameraImpl::DeviceStream(wpi::raw_istream& is,
 bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
                                        std::string& imageBuf) {
   // Read the headers
-  wpi::SmallString<64> contentTypeBuf;
-  wpi::SmallString<64> contentLengthBuf;
-  if (!ParseHttpHeaders(is, &contentTypeBuf, &contentLengthBuf)) {
+  std::string contentType;
+  std::string contentLength;
+  if (!ParseHttpHeaders(is, &contentType, &contentLength)) {
     SWARNING("disconnected during headers");
     PutError("disconnected during headers", wpi::Now());
     return false;
   }
 
   // Check the content type (if present)
-  if (!contentTypeBuf.str().empty() &&
-      !wpi::starts_with(contentTypeBuf, "image/jpeg")) {
-    auto errMsg = fmt::format("received unknown Content-Type \"{}\"",
-                              contentTypeBuf.str());
+  if (!contentType.empty() && !wpi::starts_with(contentType, "image/jpeg")) {
+    auto errMsg =
+        fmt::format("received unknown Content-Type \"{}\"", contentType);
     SWARNING("{}", errMsg);
     PutError(errMsg, wpi::Now());
     return false;
   }
 
   int width, height;
-  if (auto v = wpi::parse_integer<unsigned int>(contentLengthBuf, 10)) {
+  if (auto v = wpi::parse_integer<unsigned int>(contentLength, 10)) {
     // We know how big it is!  Just get a frame of the right size and read
     // the data directly into it.
     unsigned int contentLength = v.value();

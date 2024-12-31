@@ -235,19 +235,18 @@ void MyHttpConnection::ProcessRequest() {
     return;
   }
 
-  std::string_view path;
+  std::string_view origpath;
   if (url.HasPath()) {
-    path = url.GetPath();
+    origpath = url.GetPath();
   }
   // fmt::print(stderr, "path: \"{}\"\n", path);
 
-  wpi::SmallString<128> pathBuf;
-  bool error;
-  path = UnescapeURI(path, pathBuf, &error);
-  if (error) {
+  auto exPath = UnescapeURI(origpath);
+  if (!exPath) {
     SendError(400);
     return;
   }
+  auto path = *std::move(exPath);
 
   std::string_view query;
   if (url.HasQuery()) {
@@ -269,8 +268,7 @@ void MyHttpConnection::ProcessRequest() {
         return;
       }
       // generate directory listing
-      wpi::SmallString<64> formatBuf;
-      if (qmap.Get("format", formatBuf).value_or("") == "json") {
+      if (qmap.Get("format").value_or("") == "json") {
         wpi::json dirs = wpi::json::array();
         wpi::json files = wpi::json::array();
         for (auto&& entry : fs::directory_iterator{fullpath}) {
@@ -294,19 +292,17 @@ void MyHttpConnection::ProcessRequest() {
         for (auto&& entry : fs::directory_iterator{fullpath}) {
           bool subdir = entry.is_directory(ec);
           std::string name = entry.path().filename().string();
-          wpi::SmallString<128> nameUriBuf, nameHtmlBuf;
           if (subdir) {
             dirs.emplace(
                 name, fmt::format(
                           "<tr><td><a href=\"{}/\">{}/</a></td><td></td></tr>",
-                          EscapeURI(name, nameUriBuf),
-                          EscapeHTML(name, nameHtmlBuf)));
+                          EscapeURI(name), EscapeHTML(name)));
           } else {
             files.emplace(
-                name, fmt::format(
-                          "<tr><td><a href=\"{}\">{}</a></td><td>{}</td></tr>",
-                          EscapeURI(name, nameUriBuf),
-                          EscapeHTML(name, nameHtmlBuf), entry.file_size(ec)));
+                name,
+                fmt::format(
+                    "<tr><td><a href=\"{}\">{}</a></td><td>{}</td></tr>",
+                    EscapeURI(name), EscapeHTML(name), entry.file_size(ec)));
           }
         }
 
