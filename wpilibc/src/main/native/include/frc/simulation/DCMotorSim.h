@@ -111,17 +111,17 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Returns the gearbox.
    */
-  const DCMotor& Gearbox() const { return m_gearbox; }
+  const DCMotor& GetGearbox() const;
 
   /**
    * Returns the gearing;
    */
-  double Gearing() const { return m_gearing; }
+  double GetGearing() const;
 
   /**
    * Returns the moment of inertia
    */
-  units::kilogram_square_meter_t J() const { return m_j; }
+  units::kilogram_square_meter_t GetJ() const;
 
  private:
   DCMotor m_gearbox;
