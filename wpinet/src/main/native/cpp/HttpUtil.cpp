@@ -10,7 +10,6 @@
 
 #include <fmt/format.h>
 #include <wpi/Base64.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/raw_ostream.h>
 
@@ -162,9 +161,8 @@ bool ParseHttpHeaders(raw_istream& is, std::string* contentType,
 
   bool inContentType = false;
   bool inContentLength = false;
-  SmallString<64> lineBuf;
   for (;;) {
-    std::string_view line = rtrim(is.getline(lineBuf, 1024));
+    auto line = rtrim(is.getline(1024));
     if (is.has_error()) {
       return false;
     }
@@ -376,8 +374,7 @@ bool HttpConnection::Handshake(const HttpRequest& request,
   os.flush();
 
   // read first line of response
-  SmallString<64> lineBuf;
-  std::string_view line = rtrim(is.getline(lineBuf, 1024));
+  auto line = rtrim(is.getline(1024));
   if (is.has_error()) {
     *warnMsg = "disconnected before response";
     return false;

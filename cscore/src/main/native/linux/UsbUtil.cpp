@@ -11,7 +11,6 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/raw_istream.h>
@@ -35,10 +34,9 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
   auto productStr = fmt::format("{:04x}", product);
 
   // scan file
-  wpi::SmallString<128> lineBuf;
   bool foundVendor = false;
   for (;;) {
-    auto line = is.getline(lineBuf, 4096);
+    auto line = is.getline(4096);
     if (is.has_error()) {
       break;
     }
