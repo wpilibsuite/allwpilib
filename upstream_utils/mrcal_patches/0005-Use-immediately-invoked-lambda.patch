@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Fri, 29 Nov 2024 22:56:22 -0500
+Subject: [PATCH 5/8] Use immediately invoked lambda
+
+---
+ mrcal.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mrcal.cpp b/mrcal.cpp
+index 5f28f3303da4b4669af896587427b2ad3ad4b7e6..e048bef1d1b5addfd137d3c492108c36e56eda7f 100644
+--- a/mrcal.cpp
++++ b/mrcal.cpp
+@@ -6668,11 +6668,11 @@ mrcal_optimize( // out
+                               solver_context->beforeStep->x,
+                               extrinsics_fromref,
+                               verbose) &&
+-                 ({MSG("Threw out some outliers. New count = %d/%d (%.1f%%). Going again",
++                 ([=]{MSG("Threw out some outliers. New count = %d/%d (%.1f%%). Going again",
+                        stats.Noutliers_board,
+                        Nmeasurements_board,
+                        (double)(stats.Noutliers_board * 100) / (double)Nmeasurements_board);
+-                   true;}));
++                   return true;}()));
+ #if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
+ #warning "triangulated-solve: the above print should deal with triangulated points too"
+ #endif

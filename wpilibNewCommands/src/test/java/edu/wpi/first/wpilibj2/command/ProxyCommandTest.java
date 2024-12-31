@@ -28,7 +28,7 @@ class ProxyCommandTest extends CommandTestBase {
   void proxyCommandEndTest() {
     AtomicBoolean cond = new AtomicBoolean();
 
-    WaitUntilCommand command = new WaitUntilCommand(cond::get);
+    Command command = Commands.waitUntil(cond::get);
 
     ProxyCommand scheduleCommand = new ProxyCommand(command);
 

@@ -23,7 +23,7 @@ class CommandDecoratorTest extends CommandTestBase {
     HAL.initialize(500, 0);
     SimHooks.pauseTiming();
     try {
-      Command timeout = new RunCommand(() -> {}).withTimeout(0.1);
+      Command timeout = Commands.idle().withTimeout(0.1);
 
       scheduler.schedule(timeout);
       scheduler.run();
@@ -43,7 +43,7 @@ class CommandDecoratorTest extends CommandTestBase {
   void untilTest() {
     AtomicBoolean finish = new AtomicBoolean();
 
-    Command command = new RunCommand(() -> {}).until(finish::get);
+    Command command = Commands.idle().until(finish::get);
 
     scheduler.schedule(command);
     scheduler.run();
@@ -88,7 +88,7 @@ class CommandDecoratorTest extends CommandTestBase {
   void onlyWhileTest() {
     AtomicBoolean run = new AtomicBoolean(true);
 
-    Command command = new RunCommand(() -> {}).onlyWhile(run::get);
+    Command command = Commands.idle().onlyWhile(run::get);
 
     scheduler.schedule(command);
     scheduler.run();
@@ -131,7 +131,7 @@ class CommandDecoratorTest extends CommandTestBase {
 
   @Test
   void ignoringDisableTest() {
-    var command = new RunCommand(() -> {}).ignoringDisable(true);
+    var command = Commands.idle().ignoringDisable(true);
 
     setDSEnabled(false);
 
@@ -146,7 +146,7 @@ class CommandDecoratorTest extends CommandTestBase {
     AtomicBoolean finished = new AtomicBoolean();
     finished.set(false);
 
-    Command command = new InstantCommand().beforeStarting(() -> finished.set(true));
+    Command command = Commands.none().beforeStarting(() -> finished.set(true));
 
     scheduler.schedule(command);
 
@@ -165,7 +165,7 @@ class CommandDecoratorTest extends CommandTestBase {
   void andThenLambdaTest() {
     AtomicBoolean finished = new AtomicBoolean(false);
 
-    Command command = new InstantCommand().andThen(() -> finished.set(true));
+    Command command = Commands.none().andThen(() -> finished.set(true));
 
     scheduler.schedule(command);
 
@@ -184,8 +184,8 @@ class CommandDecoratorTest extends CommandTestBase {
   void andThenTest() {
     AtomicBoolean condition = new AtomicBoolean(false);
 
-    Command command1 = new InstantCommand();
-    Command command2 = new InstantCommand(() -> condition.set(true));
+    Command command1 = Commands.none();
+    Command command2 = Commands.runOnce(() -> condition.set(true));
     Command group = command1.andThen(command2);
 
     scheduler.schedule(group);
@@ -205,9 +205,9 @@ class CommandDecoratorTest extends CommandTestBase {
   void deadlineForTest() {
     AtomicBoolean finish = new AtomicBoolean(false);
 
-    Command dictator = new WaitUntilCommand(finish::get);
-    Command endsBefore = new InstantCommand();
-    Command endsAfter = new WaitUntilCommand(() -> false);
+    Command dictator = Commands.waitUntil(finish::get);
+    Command endsBefore = Commands.none();
+    Command endsAfter = Commands.idle();
 
     Command group = dictator.deadlineFor(endsBefore, endsAfter);
 
@@ -237,7 +237,7 @@ class CommandDecoratorTest extends CommandTestBase {
               return true;
             });
     Command other =
-        new RunCommand(
+        Commands.run(
             () ->
                 assertAll(
                     () -> assertTrue(dictatorHasRun.get()),
@@ -302,8 +302,8 @@ class CommandDecoratorTest extends CommandTestBase {
   void alongWithTest() {
     AtomicBoolean finish = new AtomicBoolean(false);
 
-    Command command1 = new WaitUntilCommand(finish::get);
-    Command command2 = new InstantCommand();
+    Command command1 = Commands.waitUntil(finish::get);
+    Command command2 = Commands.none();
 
     Command group = command1.alongWith(command2);
 
@@ -348,8 +348,8 @@ class CommandDecoratorTest extends CommandTestBase {
 
   @Test
   void raceWithTest() {
-    Command command1 = new WaitUntilCommand(() -> false);
-    Command command2 = new InstantCommand();
+    Command command1 = Commands.idle();
+    Command command2 = Commands.none();
 
     Command group = command1.raceWith(command2);
 
@@ -374,7 +374,7 @@ class CommandDecoratorTest extends CommandTestBase {
               return true;
             });
     Command command2 =
-        new RunCommand(
+        Commands.run(
             () -> {
               assertTrue(firstHasRun.get());
               assertTrue(firstWasPolled.get());
@@ -393,7 +393,7 @@ class CommandDecoratorTest extends CommandTestBase {
     AtomicBoolean hasRun = new AtomicBoolean(false);
     AtomicBoolean unlessCondition = new AtomicBoolean(true);
 
-    Command command = new InstantCommand(() -> hasRun.set(true)).unless(unlessCondition::get);
+    Command command = Commands.runOnce(() -> hasRun.set(true)).unless(unlessCondition::get);
 
     scheduler.schedule(command);
     scheduler.run();
@@ -410,7 +410,7 @@ class CommandDecoratorTest extends CommandTestBase {
     AtomicBoolean hasRun = new AtomicBoolean(false);
     AtomicBoolean onlyIfCondition = new AtomicBoolean(false);
 
-    Command command = new InstantCommand(() -> hasRun.set(true)).onlyIf(onlyIfCondition::get);
+    Command command = Commands.runOnce(() -> hasRun.set(true)).onlyIf(onlyIfCondition::get);
 
     scheduler.schedule(command);
     scheduler.run();
@@ -491,7 +491,7 @@ class CommandDecoratorTest extends CommandTestBase {
 
   @Test
   void withNameTest() {
-    InstantCommand command = new InstantCommand();
+    Command command = Commands.none();
     String name = "Named";
     Command named = command.withName(name);
     assertEquals(name, named.getName());

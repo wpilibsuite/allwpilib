@@ -92,7 +92,7 @@ class SelectCommandTest extends MultiCompositionTestBase<SelectCommand<Integer>>
             () -> "one");
 
     scheduler.schedule(selectCommand);
-    scheduler.schedule(new InstantCommand(() -> {}, system3));
+    scheduler.schedule(system3.runOnce(() -> {}));
 
     assertFalse(scheduler.isScheduled(selectCommand));
 
