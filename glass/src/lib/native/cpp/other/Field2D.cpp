@@ -26,7 +26,6 @@
 #include <units/angle.h>
 #include <units/length.h>
 #include <wpi/MemoryBuffer.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 #include <wpi/fs.h>
@@ -964,7 +963,7 @@ void glass::DisplayField2DSettings(Field2DModel* model) {
     }
     PushID(name);
 
-    wpi::SmallString<64> nameBuf{name};
+    std::string nameBuf{name};
     if (ImGui::CollapsingHeader(nameBuf.c_str())) {
       auto& obj =
           field->m_objects.try_emplace(name, GetStorage()).first->second;

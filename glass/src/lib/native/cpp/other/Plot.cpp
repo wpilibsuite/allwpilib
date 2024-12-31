@@ -28,8 +28,6 @@
 #include <implot.h>
 #include <implot_internal.h>
 #include <wpi/Signal.h>
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
 #include <wpi/timestamp.h>
 
 #include "glass/Context.h"

@@ -299,43 +299,43 @@ std::optional<long double> wpi::parse_float<long double>(
   return val;
 }
 
-std::pair<std::string_view, std::string_view> wpi::UnescapeCString(
-    std::string_view str, wpi::SmallVectorImpl<char>& buf) {
-  buf.clear();
-  buf.reserve(str.size());
+std::pair<std::string, std::string_view> wpi::UnescapeCString(
+    std::string_view str) {
+  std::string out;
+  out.reserve(str.size());
   const char* s = str.data();
   const char* end = str.data() + str.size();
   for (; s != end && *s != '"'; ++s) {
     if (*s != '\\' || (s + 1) >= end) {
-      buf.push_back(*s);
+      out.push_back(*s);
       continue;
     }
     switch (*++s) {
       case 'a':
-        buf.push_back('\a');
+        out.push_back('\a');
         break;
       case 'b':
-        buf.push_back('\b');
+        out.push_back('\b');
         break;
       case 'f':
-        buf.push_back('\f');
+        out.push_back('\f');
         break;
       case 'n':
-        buf.push_back('\n');
+        out.push_back('\n');
         break;
       case 'r':
-        buf.push_back('\r');
+        out.push_back('\r');
         break;
       case 't':
-        buf.push_back('\t');
+        out.push_back('\t');
         break;
       case 'v':
-        buf.push_back('\v');
+        out.push_back('\v');
         break;
       case 'x': {
         // hex escape
         if ((s + 1) >= end || !isxdigit(*(s + 1))) {
-          buf.push_back('x');  // treat it like a unknown escape
+          out.push_back('x');  // treat it like a unknown escape
           break;
         }
         unsigned int ch = wpi::hexDigitValue(*++s);
@@ -343,7 +343,7 @@ std::pair<std::string_view, std::string_view> wpi::UnescapeCString(
           ch <<= 4;
           ch |= wpi::hexDigitValue(*++s);
         }
-        buf.push_back(static_cast<char>(ch));
+        out.push_back(static_cast<char>(ch));
         break;
       }
       case '0':
@@ -366,17 +366,17 @@ std::pair<std::string_view, std::string_view> wpi::UnescapeCString(
           ch <<= 3;
           ch |= *++s - '0';
         }
-        buf.push_back(static_cast<char>(ch));
+        out.push_back(static_cast<char>(ch));
         break;
       }
       default:
-        buf.push_back(*s);
+        out.push_back(*s);
         break;
     }
   }
   if (s == end) {
-    return {{buf.data(), buf.size()}, {}};
+    return {out, {}};
   } else {
-    return {{buf.data(), buf.size()}, {s, static_cast<size_t>(end - s)}};
+    return {out, {s, static_cast<size_t>(end - s)}};
   }
 }

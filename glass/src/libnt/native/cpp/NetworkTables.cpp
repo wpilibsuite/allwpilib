@@ -26,7 +26,6 @@
 #include <ntcore_cpp.h>
 #include <ntcore_cpp_types.h>
 #include <wpi/MessagePack.h>
-#include <wpi/SmallString.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/mpack.h>
@@ -1499,9 +1498,7 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
             entry.publisher =
                 nt::Publish(entry.info.topic, NT_STRING, "string");
           }
-          wpi::SmallString<128> buf;
-          nt::SetString(entry.publisher,
-                        wpi::UnescapeCString(v + 1, buf).first);
+          nt::SetString(entry.publisher, wpi::UnescapeCString(v + 1).first);
         }
       }
       break;
