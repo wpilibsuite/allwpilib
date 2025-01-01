@@ -8,6 +8,7 @@
 #include <string>
 #include <utility>
 
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fmt/raw_ostream.h>
 #include <wpi/print.h>
