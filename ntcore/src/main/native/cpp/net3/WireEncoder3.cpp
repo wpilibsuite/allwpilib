@@ -7,7 +7,6 @@
 #include <bit>
 
 #include <wpi/Endian.h>
-#include <wpi/SmallVector.h>
 #include <wpi/leb128.h>
 #include <wpi/raw_ostream.h>
 
