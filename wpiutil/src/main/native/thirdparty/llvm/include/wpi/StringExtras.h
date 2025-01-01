@@ -30,9 +30,6 @@
 
 namespace wpi {
 
-template <typename T>
-class SmallVectorImpl;
-
 /// hexdigit - Return the hexadecimal character for the
 /// given number \p X (which should be less than 16).
 constexpr char hexdigit(unsigned X, bool LowerCase = false) noexcept {
