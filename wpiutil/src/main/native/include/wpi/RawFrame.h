@@ -137,19 +137,23 @@ template <std::same_as<wpi::RawFrame> T>
 void SetFrameData(JNIEnv* env, jclass rawFrameCls, jobject jframe,
                   const T& frame, bool newData) {
   if (newData) {
-    static jmethodID setData = env->GetMethodID(rawFrameCls, "setDataJNI",
-                                                "(Ljava/nio/ByteBuffer;IIII)V");
+    static jmethodID setData = env->GetMethodID(
+        rawFrameCls, "setDataJNI", "(Ljava/nio/ByteBuffer;IIIIJI)V");
     env->CallVoidMethod(
         jframe, setData, env->NewDirectByteBuffer(frame.data, frame.size),
         static_cast<jint>(frame.width), static_cast<jint>(frame.height),
-        static_cast<jint>(frame.stride), static_cast<jint>(frame.pixelFormat));
+        static_cast<jint>(frame.stride), static_cast<jint>(frame.pixelFormat),
+        static_cast<jlong>(frame.timestamp),
+        static_cast<jint>(frame.timestampSrc));
   } else {
     static jmethodID setInfo =
-        env->GetMethodID(rawFrameCls, "setInfoJNI", "(IIII)V");
+        env->GetMethodID(rawFrameCls, "setInfoJNI", "(IIIIJI)V");
     env->CallVoidMethod(jframe, setInfo, static_cast<jint>(frame.width),
                         static_cast<jint>(frame.height),
                         static_cast<jint>(frame.stride),
-                        static_cast<jint>(frame.pixelFormat));
+                        static_cast<jint>(frame.pixelFormat),
+                        static_cast<jlong>(frame.timestamp),
+                        static_cast<jint>(frame.timestampSrc));
   }
 }
 #endif
