@@ -514,8 +514,8 @@ CS_Property GetSinkProperty(CS_Sink sink, std::string_view name,
   return Handle{sink, property, Handle::kSinkProperty};
 }
 
-std::vector<CS_Property> EnumerateSinkProperties(
-    CS_Sink sink, CS_Status* status) {
+std::vector<CS_Property> EnumerateSinkProperties(CS_Sink sink,
+                                                 CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
