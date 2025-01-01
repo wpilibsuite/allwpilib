@@ -46,7 +46,7 @@ wpi::expected<std::string, size_t> UnescapeURI(std::string_view str) {
     }
     out.push_back((val1 << 4) | val2);
   }
-  return std::move(out);
+  return out;
 }
 
 std::string EscapeURI(std::string_view str, bool spacePlus) {
