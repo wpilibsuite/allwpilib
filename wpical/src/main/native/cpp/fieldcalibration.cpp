@@ -466,6 +466,19 @@ int fieldcalibration::calibrate(std::string input_dir_path,
     return 1;
   }
 
+  bool pinned_tag_found = false;
+  // Check if pinned tag is in ideal map
+  for (const auto& [tag_id, tag_json] : ideal_map) {
+    if (tag_id == pinned_tag_id) {
+      pinned_tag_found = true;
+      break;
+    }
+  }
+
+  if (!pinned_tag_found) {
+    return 1;
+  }
+
   // Apriltag detector
   apriltag_detector_t* tag_detector = apriltag_detector_create();
   tag_detector->nthreads = 8;
