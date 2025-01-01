@@ -14,9 +14,9 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <string>
 #include <string_view>
 
-#include "wpi/SmallVector.h"
 #include "wpi/fs.h"
 
 #if defined(_MSC_VER)

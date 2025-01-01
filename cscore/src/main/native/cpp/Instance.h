@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <utility>
+#include <vector>
 
 #include <wpi/Logger.h>
 #include <wpinet/EventLoopRunner.h>
