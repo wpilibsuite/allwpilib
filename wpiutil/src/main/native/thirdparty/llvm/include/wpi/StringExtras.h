@@ -543,6 +543,52 @@ constexpr std::pair<std::string_view, std::string_view> rsplit(
 /**
  * Splits @p str into substrings around the occurrences of a separator string.
  *
+ * Each substring is passed to the callback @p func. If @p maxSplit is >= 0, at
+ * most @p maxSplit splits are done and consequently <= @p maxSplit + 1
+ * elements are added to arr.
+ * If @p keepEmpty is false, empty strings are not included. They
+ * still count when considering @p maxSplit
+ * An useful invariant is that
+ * separator.join(all callbacks) == str if maxSplit == -1 and keepEmpty == true
+ *
+ * @param separator The string to split on.
+ * @param maxSplit The maximum number of times the string is split.
+ * @param keepEmpty True if empty substring should be added.
+ * @param func Function to call for each substring.
+ */
+template <typename F>
+void split(std::string_view str, std::string_view separator, int maxSplit,
+           bool keepEmpty, F&& func) {
+  std::string_view s = str;
+
+  // Count down from maxSplit. When maxSplit is -1, this will just split
+  // "forever". This doesn't support splitting more than 2^31 times
+  // intentionally; if we ever want that we can make maxSplit a 64-bit integer
+  // but that seems unlikely to be useful.
+  while (maxSplit-- != 0) {
+    auto idx = s.find(separator);
+    if (idx == std::string_view::npos) {
+      break;
+    }
+
+    // Push this split.
+    if (keepEmpty || idx > 0) {
+      func(slice(s, 0, idx));
+    }
+
+    // Jump forward.
+    s = slice(s, idx + separator.size(), std::string_view::npos);
+  }
+
+  // Push the tail.
+  if (keepEmpty || !s.empty()) {
+    func(s);
+  }
+}
+
+/**
+ * Splits @p str into substrings around the occurrences of a separator string.
+ *
  * Each substring is stored in @p arr. If @p maxSplit is >= 0, at most
  * @p maxSplit splits are done and consequently <= @p maxSplit + 1
  * elements are added to arr.
