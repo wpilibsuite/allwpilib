@@ -114,6 +114,8 @@ static void DisplayGui() {
   static int focusedTag = 1;
   static int referenceTag = 1;
 
+  static int maxFRCTag = 22;
+
   static Fieldmap currentCalibrationMap;
   static Fieldmap currentReferenceMap;
 
@@ -189,15 +191,15 @@ static void DisplayGui() {
 
   if (pinnedTag < 1) {
     pinnedTag = 1;
-  } else if (pinnedTag > 16) {
-    pinnedTag = 16;
+  } else if (pinnedTag > maxFRCTag) {
+    pinnedTag = maxFRCTag;
   }
 
   // calibrate button
   if (ImGui::Button("Calibrate!!!")) {
     if (!selected_field_calibration_directory.empty() &&
         !selected_camera_intrinsics.empty() && !selected_field_map.empty() &&
-        pinnedTag > 0 && pinnedTag <= 16) {
+        pinnedTag > 0 && pinnedTag <= maxFRCTag) {
       download_directory_selector =
           std::make_unique<pfd::select_folder>("Select Download Folder", "");
       if (download_directory_selector) {
@@ -241,7 +243,7 @@ static void DisplayGui() {
     ImGui::TextWrapped(
         "Some inputs are empty! please enter your camera calibration video, "
         "field map, and field calibration directory");
-  } else if (!(pinnedTag > 0 && pinnedTag <= 16)) {
+  } else if (!(pinnedTag > 0 && pinnedTag <= maxFRCTag)) {
     ImGui::TextWrapped("Make sure the pinned tag is a valid april tag (1-16)");
   } else {
     ImGui::TextWrapped("Calibration Ready");
@@ -482,14 +484,14 @@ static void DisplayGui() {
 
     if (focusedTag < 1) {
       focusedTag = 1;
-    } else if (focusedTag > 16) {
-      focusedTag = 16;
+    } else if (focusedTag > maxFRCTag) {
+      focusedTag = maxFRCTag;
     }
 
     if (referenceTag < 1) {
       referenceTag = 1;
-    } else if (referenceTag > 16) {
-      referenceTag = 16;
+    } else if (referenceTag > maxFRCTag) {
+      referenceTag = maxFRCTag;
     }
 
     if (!calibration_json_path.empty() && !selected_field_map.empty()) {
