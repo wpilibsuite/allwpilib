@@ -144,9 +144,9 @@ typedef enum
     kResourceType_PathWeaverTrajectory = 121,
     kResourceType_Koors40 = 122,
     kResourceType_ThriftyNova = 123,
-    kResourceType_PWFSEN36005 = 124,
-    kResourceType_LaserShark = 125,
-    kResourceType_RevServoHub = 126,
+    kResourceType_RevServoHub = 124,
+    kResourceType_PWFSEN36005 = 125,
+    kResourceType_LaserShark = 126,
 
 //    kResourceType_MaximumID = 255,
 } tResourceType;
