@@ -51,7 +51,7 @@ std::pair<bool, std::string_view> WebSocketServerHelper::MatchProtocol(
   if (protocols.empty() && m_protocols.empty()) {
     return {true, {}};
   }
-  for (auto protocol : protocols) {
+  for (auto&& protocol : protocols) {
     for (auto&& clientProto : m_protocols) {
       if (protocol == clientProto) {
         return {true, protocol};
@@ -66,7 +66,7 @@ std::pair<bool, std::string_view> WebSocketServerHelper::MatchProtocol(
   if (protocols.empty() && m_protocols.empty()) {
     return {true, {}};
   }
-  for (auto protocol : protocols) {
+  for (auto&& protocol : protocols) {
     for (auto&& clientProto : m_protocols) {
       if (protocol == clientProto) {
         return {true, protocol};
