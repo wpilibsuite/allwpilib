@@ -20,6 +20,8 @@ enum class AprilTagField {
   k2023ChargedUp,
   /// 2024 Crescendo.
   k2024Crescendo,
+  /// Alias to the current game.
+  kDefaultField = k2024Crescendo,
 
   // This is a placeholder for denoting the last supported field. This should
   // always be the last entry in the enum and should not be used by users
