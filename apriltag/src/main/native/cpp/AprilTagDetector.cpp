@@ -62,8 +62,8 @@ void AprilTagDetector::SetConfig(const Config& config) {
   impl.refine_edges = config.refineEdges;
   impl.decode_sharpening = config.decodeSharpening;
   impl.debug = config.debug;
-  impl.roiXCoor = config.roiXCoor;
-  impl.roiYCoor = config.roiYCoor;
+  impl.roiX = config.roiX;
+  impl.roiY = config.roiY;
   impl.roiWidth = config.roiWidth;
   impl.roiHeight = config.roiHeight;
 }
@@ -78,6 +78,10 @@ AprilTagDetector::Config AprilTagDetector::GetConfig() const {
       .refineEdges = impl.refine_edges,
       .decodeSharpening = impl.decode_sharpening,
       .debug = impl.debug,
+      .roiX = impl.roiX, 
+      .roiY = impl.roiY,
+      .roiWidth = impl.roiWidth,
+      .roiHeight = impl.roiHeight
   };
 }
 

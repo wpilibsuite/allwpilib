@@ -78,10 +78,10 @@ class WPILIB_DLLEXPORT AprilTagDetector {
     bool debug = false;
 
     //ROI used for saving proccesing time
-    double roiXCoor = 0;
-    double roiYCoor = 0;
-    double roiWidth = 16;
-    double roiHeight = 16;
+    int roiX = 0;
+    int roiY = 0;
+    int roiWidth = 16;
+    int roiHeight = 16;
   };
 
   /** Quad threshold parameters. */

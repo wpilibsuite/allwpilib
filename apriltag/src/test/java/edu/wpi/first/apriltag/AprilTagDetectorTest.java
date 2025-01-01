@@ -147,8 +147,8 @@ class AprilTagDetectorTest {
     // Pre-knowledge -- the tag is within this ROI of this particular test image
     
     var configs = detector.getConfig();
-    configs.roiXCoor = 100;
-    configs.roiYCoor = 400;
+    configs.roiX = 100;
+    configs.roiY = 400;
     configs.roiWidth = 220;
     configs.roiHeight = 570;
     detector.setConfig(configs);

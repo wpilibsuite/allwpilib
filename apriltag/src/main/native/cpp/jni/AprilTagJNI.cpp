@@ -117,6 +117,10 @@ static AprilTagDetector::Config FromJavaDetectorConfig(JNIEnv* env,
   FIELD(refineEdges, "Z");
   FIELD(decodeSharpening, "D");
   FIELD(debug, "Z");
+  FIELD(roiX, "I");
+  FIELD(roiY, "I");
+  FIELD(roiWidth, "I");
+  FIELD(roiHeight, "I");
 
 #undef FIELD
 
@@ -130,6 +134,10 @@ static AprilTagDetector::Config FromJavaDetectorConfig(JNIEnv* env,
       FIELD(bool, Boolean, refineEdges),
       FIELD(double, Double, decodeSharpening),
       FIELD(bool, Boolean, debug),
+      FIELD(int, Int, roiX),
+      FIELD(int, Int, roiY),
+      FIELD(int, Int, roiWidth),
+      FIELD(int, Int, roiHeight)
   };
 
 #undef GET

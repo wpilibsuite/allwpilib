@@ -190,7 +190,7 @@ struct apriltag_detector
     pthread_mutex_t mutex;
 
     //ROI used for saving proccesing time
-    double roiXCoor, roiYCoor, roiWidth, roiHeight;
+    int roiX, roiY, roiWidth, roiHeight;
 };
 
 // Represents the detection of a tag. These are returned to the user
