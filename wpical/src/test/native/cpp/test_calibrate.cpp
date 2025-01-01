@@ -87,3 +87,19 @@ TEST(Field_CalibrationTest, Atypical_Bad_Input_Directory) {
       projectRootPath + "/2024-crescendo.json", 3, false);
   EXPECT_EQ(ret, 1);
 }
+
+TEST(Field_CalibrationTest, Atypical_Bad_Pinned_Tag) {
+  int ret = fieldcalibration::calibrate(
+      projectRootPath + videoLocation, calSavePath,
+      calSavePath + "/cameracalibration.json",
+      projectRootPath + "/2024-crescendo.json", 42, false);
+  EXPECT_EQ(ret, 1);
+}
+
+TEST(Field_CalibrationTest, Atypical_Bad_Pinned_Tag_Negative) {
+  int ret = fieldcalibration::calibrate(
+      projectRootPath + videoLocation, calSavePath,
+      calSavePath + "/cameracalibration.json",
+      projectRootPath + "/2024-crescendo.json", -1, false);
+  EXPECT_EQ(ret, 1);
+}
