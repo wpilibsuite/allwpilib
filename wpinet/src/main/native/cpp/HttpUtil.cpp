@@ -94,15 +94,13 @@ std::string EscapeHTML(std::string_view str) {
 }
 
 HttpQueryMap::HttpQueryMap(std::string_view query) {
-  SmallVector<std::string_view, 16> queryElems;
-  split(query, queryElems, '&', 100, false);
-  for (auto elem : queryElems) {
+  split(query, '&', 100, false, [&](auto elem) {
     auto [nameEsc, valueEsc] = split(elem, '=');
     // note: ignores duplicates
     if (auto name = wpi::UnescapeURI(nameEsc)) {
       m_elems.try_emplace(*name, valueEsc);
     }
-  }
+  });
 }
 
 std::optional<std::string> HttpQueryMap::Get(std::string_view name) const {
@@ -119,9 +117,7 @@ HttpPath::HttpPath(std::string_view path) {
     m_pathEnds.emplace_back(0);
     return;
   }
-  wpi::SmallVector<std::string_view, 16> pathElems;
-  split(path, pathElems, '/', 100, false);
-  for (auto elem : pathElems) {
+  split(path, '/', 100, false, [&](auto elem) {
     auto val = wpi::UnescapeURI(elem);
     if (!val) {
       m_pathEnds.clear();
@@ -129,7 +125,7 @@ HttpPath::HttpPath(std::string_view path) {
     }
     m_pathBuf += *val;
     m_pathEnds.emplace_back(m_pathBuf.size());
-  }
+  });
 }
 
 bool HttpPath::startswith(size_t start,
