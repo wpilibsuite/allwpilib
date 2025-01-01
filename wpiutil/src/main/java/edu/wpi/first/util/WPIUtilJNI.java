@@ -175,6 +175,9 @@ public class WPIUtilJNI {
   static native void setRawFrameInfo(
       long frame, int size, int width, int height, int stride, int pixelFormat);
 
+  static native void setRawFrameTime(
+      long frame, long timestamp, int timeSource);
+
   /**
    * Waits for a handle to be signaled.
    *

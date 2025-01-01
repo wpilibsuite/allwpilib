@@ -118,6 +118,18 @@ public class RawFrame implements AutoCloseable {
   }
 
   /**
+   * Update this frame's timestamp info
+   *
+   * @param frameTime the time this frame was grabbed at. This uses the same time base as wpi::Now(), in us.
+   * @param frameTimeSource the time source for the timestamp this frame was grabbed at.
+   */
+  public void setTimeInfo(long frameTime, TimestampSource frameTimeSource) {
+    m_time = frameTime;
+    m_timeSource = frameTimeSource;
+    WPIUtilJNI.setRawFrameTime(m_nativeObj, frameTime, frameTimeSource.getValue());
+  }
+
+  /**
    * Get the pointer to native representation of this frame.
    *
    * @return The pointer to native representation of this frame.
