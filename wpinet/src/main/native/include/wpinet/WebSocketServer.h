@@ -66,6 +66,18 @@ class WebSocketServerHelper {
    *         is empty.
    */
   std::pair<bool, std::string_view> MatchProtocol(
+      std::span<const std::string> protocols);
+
+  /**
+   * Try to find a match to the list of sub-protocols provided by the client.
+   * The list is priority ordered, so the first match wins.
+   * Only valid during and after the upgrade event.
+   * @param protocols Acceptable protocols
+   * @return Pair; first item is true if a match was made, false if not.
+   *         Second item is the matched protocol if a match was made, otherwise
+   *         is empty.
+   */
+  std::pair<bool, std::string_view> MatchProtocol(
       std::initializer_list<std::string_view> protocols) {
     return MatchProtocol({protocols.begin(), protocols.end()});
   }
