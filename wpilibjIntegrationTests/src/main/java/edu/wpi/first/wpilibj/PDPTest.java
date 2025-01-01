@@ -51,7 +51,7 @@ public class PDPTest extends AbstractComsSetup {
    * @param mef Motor encoder fixture.
    * @param expectedCurrentDraw Expected current draw in Amps.
    */
-  public PDPTest(MotorEncoderFixture<?> mef, Double expectedCurrentDraw) {
+  public PDPTest(MotorEncoderFixture<?> mef, double expectedCurrentDraw) {
     logger.fine("Constructor with: " + mef.getType());
     if (me != null && !me.equals(mef)) {
       me.teardown();

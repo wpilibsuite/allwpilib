@@ -143,12 +143,11 @@ public class Drivetrain {
       double xSpeed, double ySpeed, double rot, boolean fieldRelative, double periodSeconds) {
     var chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
     if (fieldRelative) {
-      chassisSpeeds.toRobotRelativeSpeeds(m_poseEstimator.getEstimatedPosition().getRotation());
+      chassisSpeeds =
+          chassisSpeeds.toRobotRelative(m_poseEstimator.getEstimatedPosition().getRotation());
     }
-    chassisSpeeds.discretize(periodSeconds);
-    var mecanumDriveWheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
-    mecanumDriveWheelSpeeds.desaturate(kMaxSpeed);
-    setSpeeds(mecanumDriveWheelSpeeds);
+    setSpeeds(
+        m_kinematics.toWheelSpeeds(chassisSpeeds.discretize(periodSeconds)).desaturate(kMaxSpeed));
   }
 
   /** Updates the field relative position of the robot. */

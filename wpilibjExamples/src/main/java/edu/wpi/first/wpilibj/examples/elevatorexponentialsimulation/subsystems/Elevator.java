@@ -4,9 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.elevatorexponentialsimulation.subsystems;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -113,10 +110,7 @@ public class Elevator implements AutoCloseable {
 
     // With the setpoint value we run PID control like normal
     double pidOutput = m_pidController.calculate(m_encoder.getDistance(), m_setpoint.position);
-    double feedforwardOutput =
-        m_feedforward
-            .calculate(MetersPerSecond.of(m_setpoint.velocity), MetersPerSecond.of(next.velocity))
-            .in(Volts);
+    double feedforwardOutput = m_feedforward.calculate(m_setpoint.velocity, next.velocity);
 
     m_motor.setVoltage(pidOutput + feedforwardOutput);
 

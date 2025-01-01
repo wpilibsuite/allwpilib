@@ -36,11 +36,8 @@ public class Drivetrain {
       new SwerveDriveKinematics(
           m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
-  /*
-   * Here we use SwerveDrivePoseEstimator so that we can fuse odometry readings.
-   * The numbers used
-   * below are robot specific, and should be tuned.
-   */
+  /* Here we use SwerveDrivePoseEstimator so that we can fuse odometry readings. The numbers used
+  below are robot specific, and should be tuned. */
   private final SwerveDrivePoseEstimator m_poseEstimator =
       new SwerveDrivePoseEstimator(
           m_kinematics,
@@ -71,15 +68,19 @@ public class Drivetrain {
       double xSpeed, double ySpeed, double rot, boolean fieldRelative, double periodSeconds) {
     var chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
     if (fieldRelative) {
-      chassisSpeeds.toRobotRelativeSpeeds(m_poseEstimator.getEstimatedPosition().getRotation());
+      chassisSpeeds =
+          chassisSpeeds.toRobotRelative(m_poseEstimator.getEstimatedPosition().getRotation());
     }
-    chassisSpeeds.discretize(periodSeconds);
-    var swerveModuleStates = m_kinematics.toWheelSpeeds(chassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_backLeft.setDesiredState(swerveModuleStates[2]);
-    m_backRight.setDesiredState(swerveModuleStates[3]);
+
+    chassisSpeeds = chassisSpeeds.discretize(periodSeconds);
+
+    var states = m_kinematics.toWheelSpeeds(chassisSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, kMaxSpeed);
+
+    m_frontLeft.setDesiredState(states[0]);
+    m_frontRight.setDesiredState(states[1]);
+    m_backLeft.setDesiredState(states[2]);
+    m_backRight.setDesiredState(states[3]);
   }
 
   /** Updates the field relative position of the robot. */
@@ -93,8 +94,7 @@ public class Drivetrain {
           m_backRight.getPosition()
         });
 
-    // Also apply vision measurements. We use 0.3 seconds in the past as an example
-    // -- on
+    // Also apply vision measurements. We use 0.3 seconds in the past as an example -- on
     // a real robot, this must be calculated based either on latency or timestamps.
     m_poseEstimator.addVisionMeasurement(
         ExampleGlobalMeasurementSensor.getEstimatedGlobalPose(

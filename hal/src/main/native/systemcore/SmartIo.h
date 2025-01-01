@@ -9,7 +9,7 @@
 #include "PortsInternal.h"
 #include "hal/handles/DigitalHandleResource.h"
 #include "hal/handles/HandlesInternal.h"
-#include "networktables/DoubleTopic.h"
+#include "networktables/IntegerTopic.h"
 
 namespace hal {
 
@@ -17,10 +17,13 @@ constexpr int32_t kPwmDisabled = 0;
 constexpr int32_t kPwmAlwaysHigh = 0xFFFF;
 
 enum class SmartIoMode {
-  Disabled,
-  DigitalInput,
+  DigitalInput = 0,
   DigitalOutput,
+  AnalogInput,
+  PWMInput,
   PWMOutput,
+  SingleCounterRising,
+  SingleCounterFalling,
 };
 
 struct SmartIo {
@@ -33,14 +36,11 @@ struct SmartIo {
   int32_t deadbandMinPwm = 0;
   int32_t minPwm = 0;
   std::string previousAllocation;
-  SmartIoMode currentMode{SmartIoMode::Disabled};
-  nt::DoublePublisher modePublisher;
+  SmartIoMode currentMode{SmartIoMode::DigitalInput};
+  nt::IntegerPublisher modePublisher;
 
-  nt::DoublePublisher setPublisher;
-  nt::DoubleSubscriber getSubscriber;
-
-  nt::DoublePublisher pwmMinPublisher;
-  nt::DoublePublisher pwmMaxPublisher;
+  nt::IntegerPublisher setPublisher;
+  nt::IntegerSubscriber getSubscriber;
 
   int32_t InitializeMode(SmartIoMode mode);
   int32_t SwitchDioDirection(bool input);

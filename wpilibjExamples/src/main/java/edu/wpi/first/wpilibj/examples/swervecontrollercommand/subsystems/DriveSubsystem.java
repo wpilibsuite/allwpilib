@@ -120,16 +120,17 @@ public class DriveSubsystem extends SubsystemBase {
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     var chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
     if (fieldRelative) {
-      chassisSpeeds.toRobotRelativeSpeeds(m_gyro.getRotation2d());
+      chassisSpeeds = chassisSpeeds.toRobotRelative(m_gyro.getRotation2d());
     }
-    chassisSpeeds.discretize(DriveConstants.kDrivePeriod);
-    var swerveModuleStates = DriveConstants.kDriveKinematics.toWheelSpeeds(chassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
+    chassisSpeeds = chassisSpeeds.discretize(DriveConstants.kDrivePeriod);
+
+    var states = DriveConstants.kDriveKinematics.toWheelSpeeds(chassisSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.kMaxSpeedMetersPerSecond);
+
+    m_frontLeft.setDesiredState(states[0]);
+    m_frontRight.setDesiredState(states[1]);
+    m_rearLeft.setDesiredState(states[2]);
+    m_rearRight.setDesiredState(states[3]);
   }
 
   /**

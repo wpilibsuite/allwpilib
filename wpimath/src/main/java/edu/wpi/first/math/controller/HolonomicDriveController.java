@@ -102,10 +102,9 @@ public class HolonomicDriveController {
 
     m_poseError = trajectoryPose.relativeTo(currentPose);
     m_rotationError = desiredHeading.minus(currentPose.getRotation());
-    ChassisSpeeds speeds = new ChassisSpeeds(xFF, yFF, thetaFF);
+
     if (!m_enabled) {
-      speeds.toRobotRelativeSpeeds(currentPose.getRotation());
-      return speeds;
+      return new ChassisSpeeds(xFF, yFF, thetaFF).toRobotRelative(currentPose.getRotation());
     }
 
     // Calculate feedback velocities (based on position error).
@@ -113,10 +112,8 @@ public class HolonomicDriveController {
     double yFeedback = m_yController.calculate(currentPose.getY(), trajectoryPose.getY());
 
     // Return next output.
-    speeds.vxMetersPerSecond += xFeedback;
-    speeds.vyMetersPerSecond += yFeedback;
-    speeds.toRobotRelativeSpeeds(currentPose.getRotation());
-    return speeds;
+    return new ChassisSpeeds(xFF + xFeedback, yFF + yFeedback, thetaFF)
+        .toRobotRelative(currentPose.getRotation());
   }
 
   /**

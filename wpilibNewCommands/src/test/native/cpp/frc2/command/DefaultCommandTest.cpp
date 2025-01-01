@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "CommandTestBase.h"
+#include "frc2/command/Commands.h"
 #include "frc2/command/RunCommand.h"
 
 using namespace frc2;
@@ -15,9 +16,9 @@ TEST_F(DefaultCommandTest, DefaultCommandSchedule) {
 
   TestSubsystem subsystem;
 
-  RunCommand command1([] {}, {&subsystem});
+  auto command = cmd::Idle({&subsystem});
 
-  scheduler.SetDefaultCommand(&subsystem, std::move(command1));
+  scheduler.SetDefaultCommand(&subsystem, std::move(command));
   auto handle = scheduler.GetDefaultCommand(&subsystem);
   scheduler.Run();
 
@@ -29,18 +30,18 @@ TEST_F(DefaultCommandTest, DefaultCommandInterruptResume) {
 
   TestSubsystem subsystem;
 
-  RunCommand command1([] {}, {&subsystem});
-  RunCommand command2([] {}, {&subsystem});
+  auto command1 = cmd::Idle({&subsystem});
+  auto command2 = cmd::Idle({&subsystem});
 
   scheduler.SetDefaultCommand(&subsystem, std::move(command1));
   auto handle = scheduler.GetDefaultCommand(&subsystem);
   scheduler.Run();
-  scheduler.Schedule(&command2);
+  scheduler.Schedule(command2);
 
-  EXPECT_TRUE(scheduler.IsScheduled(&command2));
+  EXPECT_TRUE(scheduler.IsScheduled(command2));
   EXPECT_FALSE(scheduler.IsScheduled(handle));
 
-  scheduler.Cancel(&command2);
+  scheduler.Cancel(command2);
   scheduler.Run();
 
   EXPECT_TRUE(scheduler.IsScheduled(handle));

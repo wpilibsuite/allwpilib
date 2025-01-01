@@ -27,39 +27,27 @@ abstract class MultiCompositionTestBase<T extends Command> extends SingleComposi
         arguments(
             "AllCancelSelf",
             InterruptionBehavior.kCancelSelf,
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf)),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf)),
         arguments(
             "AllCancelIncoming",
             InterruptionBehavior.kCancelIncoming,
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)),
         arguments(
             "TwoCancelSelfOneIncoming",
             InterruptionBehavior.kCancelSelf,
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)),
         arguments(
             "TwoCancelIncomingOneSelf",
             InterruptionBehavior.kCancelSelf,
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf)));
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf)));
   }
 
   @MethodSource
@@ -79,27 +67,27 @@ abstract class MultiCompositionTestBase<T extends Command> extends SingleComposi
         arguments(
             "AllFalse",
             false,
-            new WaitUntilCommand(() -> false).ignoringDisable(false),
-            new WaitUntilCommand(() -> false).ignoringDisable(false),
-            new WaitUntilCommand(() -> false).ignoringDisable(false)),
+            Commands.idle().ignoringDisable(false),
+            Commands.idle().ignoringDisable(false),
+            Commands.idle().ignoringDisable(false)),
         arguments(
             "AllTrue",
             true,
-            new WaitUntilCommand(() -> false).ignoringDisable(true),
-            new WaitUntilCommand(() -> false).ignoringDisable(true),
-            new WaitUntilCommand(() -> false).ignoringDisable(true)),
+            Commands.idle().ignoringDisable(true),
+            Commands.idle().ignoringDisable(true),
+            Commands.idle().ignoringDisable(true)),
         arguments(
             "TwoTrueOneFalse",
             false,
-            new WaitUntilCommand(() -> false).ignoringDisable(true),
-            new WaitUntilCommand(() -> false).ignoringDisable(true),
-            new WaitUntilCommand(() -> false).ignoringDisable(false)),
+            Commands.idle().ignoringDisable(true),
+            Commands.idle().ignoringDisable(true),
+            Commands.idle().ignoringDisable(false)),
         arguments(
             "TwoFalseOneTrue",
             false,
-            new WaitUntilCommand(() -> false).ignoringDisable(false),
-            new WaitUntilCommand(() -> false).ignoringDisable(false),
-            new WaitUntilCommand(() -> false).ignoringDisable(true)));
+            Commands.idle().ignoringDisable(false),
+            Commands.idle().ignoringDisable(false),
+            Commands.idle().ignoringDisable(true)));
   }
 
   @MethodSource
@@ -115,8 +103,8 @@ abstract class MultiCompositionTestBase<T extends Command> extends SingleComposi
   }
 
   static Stream<Arguments> composeDuplicates() {
-    Command a = new InstantCommand(() -> {});
-    Command b = new InstantCommand(() -> {});
+    Command a = Commands.none();
+    Command b = Commands.none();
     return Stream.of(
         arguments("AA", new Command[] {a, a}),
         arguments("ABA", new Command[] {a, b, a}),

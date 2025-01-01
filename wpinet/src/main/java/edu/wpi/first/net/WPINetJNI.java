@@ -81,6 +81,22 @@ public class WPINetJNI {
   public static native void removePortForwarder(int port);
 
   /**
+   * Create a web server at the given port. Note that local ports less than 1024 won't work as a
+   * normal user.
+   *
+   * @param port local port number
+   * @param path local path to document root
+   */
+  public static native void startWebServer(int port, String path);
+
+  /**
+   * Stop web server running at the given port.
+   *
+   * @param port local port number
+   */
+  public static native void stopWebServer(int port);
+
+  /**
    * Creates a MulticastServiceAnnouncer.
    *
    * @param serviceName service name

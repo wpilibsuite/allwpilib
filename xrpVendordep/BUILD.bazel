@@ -1,0 +1,54 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+
+cc_library(
+    name = "xrp-cpp",
+    srcs = glob([
+        "src/main/native/cpp/**",
+    ]),
+    hdrs = glob(["src/main/native/include/**"]),
+    strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpilibc:wpilibc.static",
+    ],
+)
+
+java_library(
+    name = "xrp-java",
+    srcs = glob(["src/main/java/**/*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//hal:hal-java",
+        "//wpilibj",
+        "//wpimath:wpimath-java",
+    ],
+)
+
+cc_test(
+    name = "xrp-cpp-test",
+    size = "small",
+    srcs = glob(["src/test/native/cpp/**"]),
+    deps = [
+        "//thirdparty/googletest:googletest.static",
+    ],
+)
+
+cc_binary(
+    name = "DevMain-Cpp",
+    srcs = ["src/dev/native/cpp/main.cpp"],
+    deps = [
+        "//wpiutil:wpiutil.static",
+    ],
+)
+
+java_binary(
+    name = "DevMain-Java",
+    srcs = ["src/dev/java/edu/wpi/first/wpilibj/xrp/DevMain.java"],
+    main_class = "edu.wpi.first.wpilibj.xrp.DevMain",
+    deps = [
+        "//hal:hal-java",
+        "//ntcore:networktables-java",
+        "//wpiutil:wpiutil-java",
+    ],
+)

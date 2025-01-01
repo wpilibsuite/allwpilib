@@ -488,8 +488,8 @@ Value GetEntryValue(NT_Handle subentry);
 /**
  * Set Default Entry Value
  *
- * Returns copy of current entry value if it exists.
- * Otherwise, sets passed in value, and returns set value.
+ * Returns False if name exists.
+ * Otherwise, sets passed in value, and returns True.
  * Note that one of the type options is "unassigned".
  *
  * @param entry     entry handle

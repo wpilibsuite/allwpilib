@@ -8,17 +8,16 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
                        units::meters_per_second_t ySpeed,
                        units::radians_per_second_t rot, bool fieldRelative,
                        units::second_t period) {
-  auto states =
-      m_kinematics.ToSwerveModuleStates(frc::ChassisSpeeds::Discretize(
-          fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                              xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
-                        : frc::ChassisSpeeds{xSpeed, ySpeed, rot},
-          period));
+  frc::ChassisSpeeds chassisSpeeds{xSpeed, ySpeed, rot};
+  if (fieldRelative) {
+    chassisSpeeds = chassisSpeeds.ToRobotRelative(m_gyro.GetRotation2d());
+  }
+  chassisSpeeds = chassisSpeeds.Discretize(period);
 
+  auto states = m_kinematics.ToSwerveModuleStates(chassisSpeeds);
   m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
 
   auto [fl, fr, bl, br] = states;
-
   m_frontLeft.SetDesiredState(fl);
   m_frontRight.SetDesiredState(fr);
   m_backLeft.SetDesiredState(bl);

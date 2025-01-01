@@ -46,6 +46,7 @@ public:
   enum class OStreamKind {
     OK_OStream,
     OK_FDStream,
+    OK_SVecStream,
   };
 
 private:
@@ -71,10 +72,6 @@ private:
   /// this buffer.
   char *OutBufStart, *OutBufEnd, *OutBufCur;
 
-  /// Optional stream this stream is tied to. If this stream is written to, the
-  /// tied-to stream will be flushed first.
-  raw_ostream *TiedStream = nullptr;
-
   enum class BufferKind {
     Unbuffered = 0,
     InternalBuffer,
@@ -92,6 +89,14 @@ public:
     MAGENTA,
     CYAN,
     WHITE,
+    BRIGHT_BLACK,
+    BRIGHT_RED,
+    BRIGHT_GREEN,
+    BRIGHT_YELLOW,
+    BRIGHT_BLUE,
+    BRIGHT_MAGENTA,
+    BRIGHT_CYAN,
+    BRIGHT_WHITE,
     SAVEDCOLOR,
     RESET,
   };
@@ -104,6 +109,14 @@ public:
   static constexpr Colors MAGENTA = Colors::MAGENTA;
   static constexpr Colors CYAN = Colors::CYAN;
   static constexpr Colors WHITE = Colors::WHITE;
+  static constexpr Colors BRIGHT_BLACK = Colors::BRIGHT_BLACK;
+  static constexpr Colors BRIGHT_RED = Colors::BRIGHT_RED;
+  static constexpr Colors BRIGHT_GREEN = Colors::BRIGHT_GREEN;
+  static constexpr Colors BRIGHT_YELLOW = Colors::BRIGHT_YELLOW;
+  static constexpr Colors BRIGHT_BLUE = Colors::BRIGHT_BLUE;
+  static constexpr Colors BRIGHT_MAGENTA = Colors::BRIGHT_MAGENTA;
+  static constexpr Colors BRIGHT_CYAN = Colors::BRIGHT_CYAN;
+  static constexpr Colors BRIGHT_WHITE = Colors::BRIGHT_WHITE;
   static constexpr Colors SAVEDCOLOR = Colors::SAVEDCOLOR;
   static constexpr Colors RESET = Colors::RESET;
 
@@ -320,10 +333,6 @@ public:
 
   bool colors_enabled() const { return false; }
 
-  /// Tie this stream to the specified stream. Replaces any existing tied-to
-  /// stream. Specifying a nullptr unties the stream.
-  void tie(raw_ostream *TieTo) { TiedStream = TieTo; }
-
   //===--------------------------------------------------------------------===//
   // Subclass Interface
   //===--------------------------------------------------------------------===//
@@ -383,9 +392,6 @@ private:
   /// unused bytes in the buffer.
   void copy_to_buffer(const char *Ptr, size_t Size);
 
-  /// Flush the tied-to stream (if present) and then write the required data.
-  void flush_tied_then_write(const char *Ptr, size_t Size);
-
   virtual void anchor();
 };
 
@@ -434,6 +440,10 @@ class raw_fd_ostream : public raw_pwrite_stream {
   bool ShouldClose;
   bool SupportsSeeking = false;
   bool IsRegularFile = false;
+
+  /// Optional stream this stream is tied to. If this stream is written to, the
+  /// tied-to stream will be flushed first.
+  raw_ostream *TiedStream = nullptr;
 
 #ifdef _WIN32
   /// True if this fd refers to a Windows console device. Mintty and other
@@ -508,6 +518,13 @@ public:
   /// Flushes the stream and repositions the underlying file descriptor position
   /// to the offset specified from the beginning of the file.
   uint64_t seek(uint64_t off);
+
+  /// Tie this stream to the specified stream. Replaces any existing tied-to
+  /// stream. Specifying a nullptr unties the stream. This is intended for to
+  /// tie errs() to outs(), so that outs() is flushed whenever something is
+  /// written to errs(), preventing weird and hard-to-test output when stderr
+  /// is redirected to stdout.
+  void tie(raw_ostream *TieTo) { TiedStream = TieTo; }
 
   std::error_code error() const { return EC; }
 
@@ -615,7 +632,11 @@ public:
   ///
   /// \param O The vector to write to; this should generally have at least 128
   /// bytes free to avoid any extraneous memory overhead.
-  explicit raw_svector_ostream(SmallVectorImpl<char> &O) : OS(O) {
+  explicit raw_svector_ostream(SmallVectorImpl<char> &O)
+      : raw_pwrite_stream(false, raw_ostream::OStreamKind::OK_SVecStream),
+        OS(O) {
+    // FIXME: here and in a few other places, set directly to unbuffered in the
+    // ctor.
     SetUnbuffered();
   }
 
@@ -625,10 +646,13 @@ public:
 
   /// Return a std::string_view for the vector contents.
   std::string_view str() const { return std::string_view(OS.data(), OS.size()); }
+  SmallVectorImpl<char> &buffer() { return OS; }
 
   void reserveExtraSpace(uint64_t ExtraSize) override {
     OS.reserve(tell() + ExtraSize);
   }
+
+  static bool classof(const raw_ostream *OS);
 };
 
 /// A raw_ostream that writes to a vector.  This is a

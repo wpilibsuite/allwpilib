@@ -31,8 +31,9 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
  public:
   /**
    * Constructs a linear time-varying unicycle controller with default maximum
-   * desired error tolerances of (0.0625 m, 0.125 m, 2 rad) and default maximum
-   * desired control effort of (1 m/s, 2 rad/s).
+   * desired error tolerances of (x = 0.0625 m, y = 0.125 m, heading = 2 rad)
+   * and default maximum desired control effort of (linear velocity = 1 m/s,
+   * angular velocity = 2 rad/s).
    *
    * @param dt Discretization timestep.
    */
@@ -46,8 +47,10 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning
    * for how to select the tolerances.
    *
-   * @param Qelems The maximum desired error tolerance for each state.
-   * @param Relems The maximum desired control effort for each input.
+   * @param Qelems The maximum desired error tolerance for each state (x, y,
+   *               heading).
+   * @param Relems The maximum desired control effort for each input (linear
+   *               velocity, angular velocity).
    * @param dt     Discretization timestep.
    */
   LTVUnicycleController(const wpi::array<double, 3>& Qelems,

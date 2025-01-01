@@ -74,34 +74,26 @@ class ConditionalCommandTest extends CommandTestBase {
         arguments(
             "AllCancelSelf",
             InterruptionBehavior.kCancelSelf,
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
             (BooleanSupplier) () -> true),
         arguments(
             "AllCancelIncoming",
             InterruptionBehavior.kCancelIncoming,
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
             (BooleanSupplier) () -> true),
         arguments(
             "OneCancelSelfOneIncoming",
             InterruptionBehavior.kCancelSelf,
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
             (BooleanSupplier) () -> true),
         arguments(
             "OneCancelIncomingOneSelf",
             InterruptionBehavior.kCancelSelf,
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
-            new WaitUntilCommand(() -> false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
             (BooleanSupplier) () -> true));
   }
 
@@ -122,26 +114,26 @@ class ConditionalCommandTest extends CommandTestBase {
         arguments(
             "AllFalse",
             false,
-            new WaitUntilCommand(() -> false).ignoringDisable(false),
-            new WaitUntilCommand(() -> false).ignoringDisable(false),
+            Commands.idle().ignoringDisable(false),
+            Commands.idle().ignoringDisable(false),
             (BooleanSupplier) () -> true),
         arguments(
             "AllTrue",
             true,
-            new WaitUntilCommand(() -> false).ignoringDisable(true),
-            new WaitUntilCommand(() -> false).ignoringDisable(true),
+            Commands.idle().ignoringDisable(true),
+            Commands.idle().ignoringDisable(true),
             (BooleanSupplier) () -> true),
         arguments(
             "OneTrueOneFalse",
             false,
-            new WaitUntilCommand(() -> false).ignoringDisable(true),
-            new WaitUntilCommand(() -> false).ignoringDisable(false),
+            Commands.idle().ignoringDisable(true),
+            Commands.idle().ignoringDisable(false),
             (BooleanSupplier) () -> true),
         arguments(
             "OneFalseOneTrue",
             false,
-            new WaitUntilCommand(() -> false).ignoringDisable(false),
-            new WaitUntilCommand(() -> false).ignoringDisable(true),
+            Commands.idle().ignoringDisable(false),
+            Commands.idle().ignoringDisable(true),
             (BooleanSupplier) () -> true));
   }
 
