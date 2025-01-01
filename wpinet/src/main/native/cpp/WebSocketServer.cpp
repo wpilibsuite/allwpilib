@@ -77,21 +77,6 @@ std::pair<bool, std::string_view> WebSocketServerHelper::MatchProtocol(
   return {false, {}};
 }
 
-std::pair<bool, std::string_view> WebSocketServerHelper::MatchProtocol(
-    std::span<const std::string> protocols) {
-  if (protocols.empty() && m_protocols.empty()) {
-    return {true, {}};
-  }
-  for (auto protocol : protocols) {
-    for (auto&& clientProto : m_protocols) {
-      if (protocol == clientProto) {
-        return {true, protocol};
-      }
-    }
-  }
-  return {false, {}};
-}
-
 WebSocketServer::WebSocketServer(uv::Stream& stream,
                                  std::span<const std::string_view> protocols,
                                  ServerOptions options, const private_init&)
