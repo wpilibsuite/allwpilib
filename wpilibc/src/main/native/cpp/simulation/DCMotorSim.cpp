@@ -85,3 +85,15 @@ void DCMotorSim::SetInputVoltage(units::volt_t voltage) {
   SetInput(Vectord<1>{voltage.value()});
   ClampInput(frc::RobotController::GetBatteryVoltage().value());
 }
+
+const DCMotor& DCMotorSim::GetGearbox() const {
+  return m_gearbox;
+}
+
+double DCMotorSim::GetGearing() const {
+  return m_gearing;
+}
+
+units::kilogram_square_meter_t DCMotorSim::GetJ() const {
+  return m_j;
+}
