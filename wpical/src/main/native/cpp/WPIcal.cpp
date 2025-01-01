@@ -244,7 +244,7 @@ static void DisplayGui() {
         "Some inputs are empty! please enter your camera calibration video, "
         "field map, and field calibration directory");
   } else if (!(pinnedTag > 0 && pinnedTag <= maxFRCTag)) {
-    ImGui::TextWrapped("Make sure the pinned tag is a valid april tag (1-16)");
+    ImGui::TextWrapped("Make sure the pinned tag is a valid april tag (1-22)");
   } else {
     ImGui::TextWrapped("Calibration Ready");
   }
