@@ -22,6 +22,7 @@ import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.util.datalog.StructArrayLogEntry;
 import edu.wpi.first.util.datalog.StructLogEntry;
 import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.wpilibj.DataLogManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -37,8 +38,18 @@ public class FileBackend implements EpilogueBackend {
    *
    * @param dataLog the data log to save data to
    */
-  public FileBackend(DataLog dataLog) {
+  FileBackend(DataLog dataLog) {
     this.m_dataLog = requireNonNullParam(dataLog, "dataLog", "FileBackend");
+  }
+
+  /**
+   * Creates a new file-based backend.
+   *
+   * @param enableNtCapture enables capture of networktables data to datalog if true
+   */
+  public FileBackend(boolean enableNtCapture) {
+    this.m_dataLog = DataLogManager.getLog();
+    DataLogManager.logNetworkTables(enableNtCapture);
   }
 
   @Override
