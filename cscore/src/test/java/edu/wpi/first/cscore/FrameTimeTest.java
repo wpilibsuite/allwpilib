@@ -35,7 +35,6 @@ public class FrameTimeTest {
         new Thread(
             () -> {
               long ret = sink.grabFrame(sinkFrame);
-              System.err.println(ret);
               assertTrue(ret > 0);
             });
     sinkGrabber.start();
