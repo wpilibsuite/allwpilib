@@ -62,7 +62,12 @@ void AprilTagDetector::SetConfig(const Config& config) {
   impl.refine_edges = config.refineEdges;
   impl.decode_sharpening = config.decodeSharpening;
   impl.debug = config.debug;
+  impl.roiXCoor = config.roiXCoor;
+  impl.roiYCoor = config.roiYCoor;
+  impl.roiWidth = config.roiWidth;
+  impl.roiHeight = config.roiHeight;
 }
+
 
 AprilTagDetector::Config AprilTagDetector::GetConfig() const {
   auto& impl = *static_cast<apriltag_detector_t*>(m_impl);

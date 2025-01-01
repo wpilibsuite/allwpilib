@@ -631,4 +631,5 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate36h11AprilTagImage
   wpi::SetFrameData(env, rawFrameCls, frameObj, *frame, newData);
 }
 
+
 }  // extern "C"

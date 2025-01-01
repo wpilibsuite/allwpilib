@@ -76,6 +76,12 @@ class WPILIB_DLLEXPORT AprilTagDetector {
      * such as the RoboRIO. Default is disabled (false).
      */
     bool debug = false;
+
+    //ROI used for saving proccesing time
+    double roiXCoor = 0;
+    double roiYCoor = 0;
+    double roiWidth = 16;
+    double roiHeight = 16;
   };
 
   /** Quad threshold parameters. */

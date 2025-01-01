@@ -145,16 +145,23 @@ class AprilTagDetectorTest {
     }
 
     // Pre-knowledge -- the tag is within this ROI of this particular test image
-    var cropped = image.submat(100, 400, 220, 570);
+    
+    var configs = detector.getConfig();
+    configs.roiXCoor = 100;
+    configs.roiYCoor = 400;
+    configs.roiWidth = 220;
+    configs.roiHeight = 570;
+    detector.setConfig(configs);
+
 
     try {
-      AprilTagDetection[] results = detector.detect(cropped);
+      AprilTagDetection[] results = detector.detect(image);
       assertEquals(1, results.length);
       assertEquals("tag36h11", results[0].getFamily());
       assertEquals(1, results[0].getId());
       assertEquals(0, results[0].getHamming());
     } finally {
-      cropped.release();
+    
       image.release();
     }
   }

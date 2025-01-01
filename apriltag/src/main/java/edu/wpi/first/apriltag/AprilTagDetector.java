@@ -57,6 +57,9 @@ public class AprilTagDetector implements AutoCloseable {
      */
     public boolean debug;
 
+    //ROI used for saving proccesing time
+    public double roiXCoor, roiYCoor, roiWidth, roiHeight;
+
     /** Default constructor. */
     public Config() {}
 
@@ -78,13 +81,22 @@ public class AprilTagDetector implements AutoCloseable {
         float quadSigma,
         boolean refineEdges,
         double decodeSharpening,
-        boolean debug) {
+        boolean debug,
+        double roiXCoor,
+        double roiYCoor,
+        double roiWidth,
+        double roiHeight
+        ) {
       this.numThreads = numThreads;
       this.quadDecimate = quadDecimate;
       this.quadSigma = quadSigma;
       this.refineEdges = refineEdges;
       this.decodeSharpening = decodeSharpening;
       this.debug = debug;
+      this.roiXCoor = roiXCoor;
+      this.roiYCoor = roiYCoor;
+      this.roiWidth = roiWidth;
+      this.roiHeight = roiHeight;
     }
 
     @Override
