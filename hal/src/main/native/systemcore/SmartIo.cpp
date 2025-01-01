@@ -32,54 +32,39 @@ int32_t SmartIo::InitializeMode(SmartIoMode mode) {
   auto channelString = std::to_string(channel);
   auto subTableString = "/io/" + channelString + "/";
 
-<<<<<<< HEAD
-  modePublisher = inst.GetDoubleTopic("/io/type" + channelString).Publish();
-  getSubscriber = inst.GetDoubleTopic("/io/valread" + channelString)
-                      .Subscribe(0.0, options);
-  setPublisher =
-      inst.GetDoubleTopic("/io/valset" + channelString).Publish(options);
-  setPublisher.Set(0);
-=======
   modePublisher = inst.GetIntegerTopic(subTableString + "type").Publish();
   getSubscriber =
-      inst.GetIntegerTopic(subTableString + "valget").Subscribe(0.0, options);
->>>>>>> 2027
+      inst.GetIntegerTopic(subTableString + "valget").Subscribe(0, options);
+  frequencySubscriber =
+      inst.GetIntegerTopic(subTableString + "freqget").Subscribe(0, options);
+  setPublisher =
+      inst.GetIntegerTopic(subTableString + "valset").Publish(options);
+  periodPublisher =
+      inst.GetIntegerTopic(subTableString + "periodset").Publish(options);
 
   currentMode = mode;
   switch (mode) {
-    case SmartIoMode::PWMOutput:
-<<<<<<< HEAD
-      modePublisher.Set(3);
-      pwmMinPublisher =
-          inst.GetDoubleTopic("/io/pwmmin" + channelString).Publish();
-      pwmMinPublisher.Set(0);
-      pwmMaxPublisher =
-          inst.GetDoubleTopic("/io/pwmmax" + channelString).Publish();
-      pwmMaxPublisher.Set(4096);
-=======
-      modePublisher.Set(4);
-      setPublisher =
-          inst.GetIntegerTopic(subTableString + "valset").Publish(options);
-      setPublisher.Set(0);
->>>>>>> 2027
-      return 0;
-
-    case SmartIoMode::DigitalInput:
-      modePublisher.Set(0);
-      return 0;
-
+    // These need to set a 0 output
     case SmartIoMode::DigitalOutput:
-      modePublisher.Set(1);
-      return 0;
+    case SmartIoMode::PWMOutput:
+      setPublisher.Set(0);
+      break;
 
-    case SmartIoMode::Disabled:
-      modePublisher.Set(0);
-      return 0;
+    // These don't need to set any value
+    case SmartIoMode::DigitalInput:
+    case SmartIoMode::AnalogInput:
+    case SmartIoMode::PWMInput:
+    case SmartIoMode::SingleCounterRising:
+    case SmartIoMode::SingleCounterFalling:
+      break;
 
     default:
 
       return INCOMPATIBLE_STATE;
   }
+
+  modePublisher.Set(static_cast<int>(mode));
+  return 0;
 }
 
 int32_t SmartIo::SwitchDioDirection(bool input) {

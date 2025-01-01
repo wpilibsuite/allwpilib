@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
-  DigitalInput di = new DigitalInput(0);
-  DigitalOutput dio = new DigitalOutput(1);
+  DigitalInput di = new DigitalInput(1);
+  DigitalOutput dio = new DigitalOutput(0);
 
   /**
    * This function is run when the robot is first started up and should be used for any

@@ -42,6 +42,9 @@ struct SmartIo {
   nt::IntegerPublisher setPublisher;
   nt::IntegerSubscriber getSubscriber;
 
+  nt::IntegerPublisher periodPublisher;
+  nt::IntegerSubscriber frequencySubscriber;
+
   int32_t InitializeMode(SmartIoMode mode);
   int32_t SwitchDioDirection(bool input);
 
