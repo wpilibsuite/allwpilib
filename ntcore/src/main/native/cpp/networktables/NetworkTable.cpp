@@ -42,27 +42,21 @@ std::string_view NetworkTable::BasenameKey(std::string_view key) {
 
 std::string NetworkTable::NormalizeKey(std::string_view key,
                                        bool withLeadingSlash) {
-  wpi::SmallString<128> buf;
-  return std::string{NormalizeKey(key, buf, withLeadingSlash)};
-}
-
-std::string_view NetworkTable::NormalizeKey(std::string_view key,
-                                            wpi::SmallVectorImpl<char>& buf,
-                                            bool withLeadingSlash) {
-  buf.clear();
+  std::string out;
+  out.reserve(key.size() + 1);
   if (withLeadingSlash) {
-    buf.push_back(PATH_SEPARATOR_CHAR);
+    out.push_back(PATH_SEPARATOR_CHAR);
   }
   // for each path element, add it with a slash following
   wpi::split(key, PATH_SEPARATOR_CHAR, -1, false, [&](auto part) {
-    buf.append(part.begin(), part.end());
-    buf.push_back(PATH_SEPARATOR_CHAR);
+    out.append(part.begin(), part.end());
+    out.push_back(PATH_SEPARATOR_CHAR);
   });
   // remove trailing slash if the input key didn't have one
   if (!key.empty() && key.back() != PATH_SEPARATOR_CHAR) {
-    buf.pop_back();
+    out.pop_back();
   }
-  return {buf.data(), buf.size()};
+  return out;
 }
 
 std::vector<std::string> NetworkTable::GetHierarchy(std::string_view key) {
