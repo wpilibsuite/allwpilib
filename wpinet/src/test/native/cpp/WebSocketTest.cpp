@@ -187,7 +187,7 @@ TEST_F(WebSocketTest, CreateClientExtraHeaders) {
   });
   clientPipe->Connect(pipeName, [&]() {
     WebSocket::ClientOptions options;
-    SmallVector<std::pair<std::string_view, std::string_view>, 4> extraHeaders;
+    std::vector<std::pair<std::string_view, std::string_view>> extraHeaders;
     extraHeaders.emplace_back("Extra1", "Data1");
     extraHeaders.emplace_back("Extra2", "Data2");
     options.extraHeaders = extraHeaders;
