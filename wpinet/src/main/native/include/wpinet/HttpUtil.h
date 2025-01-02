@@ -318,7 +318,7 @@ class HttpRequest {
   template <typename T>
   HttpRequest(const HttpLocation& loc, const T& extraParams)
       : host{loc.host}, port{loc.port} {
-    SmallVector<std::pair<std::string_view, std::string_view>, 4> params;
+    std::vector<std::pair<std::string_view, std::string_view>> params;
     for (const auto& p : loc.params) {
       params.emplace_back(std::pair{GetFirst(p), GetSecond(p)});
     }
