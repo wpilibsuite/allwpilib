@@ -15,9 +15,9 @@ import edu.wpi.first.util.RawFrame;
 import edu.wpi.first.util.TimestampSource;
 import org.junit.jupiter.api.Test;
 
-public class FrameTimeTest {
+class FrameTimeTest {
   @Test
-  public void testFrameTimeRoundTrip() {
+  void testFrameTimeRoundTrip() {
     // Given a Source
     RawSource source = new RawSource("foobar", PixelFormat.kBGR, 320, 240, 30);
 

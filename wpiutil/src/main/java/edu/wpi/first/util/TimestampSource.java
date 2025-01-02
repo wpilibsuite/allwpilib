@@ -4,14 +4,22 @@
 
 package edu.wpi.first.util;
 
+/**
+ * Options for where the timestamp an {@link RawFrame} was captured at can be measured relative to
+ */
 public enum TimestampSource {
+  /** unknown */
   kUnknown(0),
-  // wpi::Now when the new frame was dequeued by CSCore. Does not account for camera exposure time
-  // or V4L latency.
+  /**
+   * wpi::Now when the new frame was dequeued by CSCore. Does not account for camera exposure time
+   * or V4L latency.
+   */
   kFrameDequeue(1),
-  // End of Frame. Same as V4L2_BUF_FLAG_TSTAMP_SRC_EOF, translated into wpi::Now's timebase.
+  /** End of Frame. Same as V4L2_BUF_FLAG_TSTAMP_SRC_EOF, translated into wpi::Now's timebase. */
   kV4lEoF(2),
-  // Start of Exposure. Same as V4L2_BUF_FLAG_TSTAMP_SRC_SOE, translated into wpi::Now's timebase.
+  /**
+   * Start of Exposure. Same as V4L2_BUF_FLAG_TSTAMP_SRC_SOE, translated into wpi::Now's timebase.
+   */
   kV4lSoE(3);
 
   private final int value;
@@ -38,6 +46,6 @@ public enum TimestampSource {
    * @return Enum value
    */
   public static TimestampSource getFromInt(int timestampSource) {
-    return timestampSource >= 0 && timestampSource < s_values.length ? s_values[timestampSource] : kUnknown;
+    return s_values[timestampSource];
   }
 }
