@@ -15,7 +15,7 @@ import java.util.Objects;
 
 /** Represents the wheel positions for a differential drive drivetrain. */
 public class DifferentialDriveWheelPositions
-    implements Interpolatable<DifferentialDriveWheelPositions> {
+    implements StructSerializable, Interpolatable<DifferentialDriveWheelPositions> {
   /** Distance measured by the left side. */
   public double leftMeters;
 
