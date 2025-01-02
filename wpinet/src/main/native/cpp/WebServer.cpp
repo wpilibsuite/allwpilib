@@ -15,7 +15,6 @@
 #include <fmt/format.h>
 #include <wpi/DenseMap.h>
 #include <wpi/MemoryBuffer.h>
-#include <wpi/SmallString.h>
 #include <wpi/Signal.h>
 #include <wpi/StringMap.h>
 #include <wpi/fs.h>
@@ -320,8 +319,8 @@ void MyHttpConnection::ProcessRequest() {
         SendResponse(200, "OK", "text/html", html);
       }
     } else {
-      wpi::SmallString<128> extraHeadersBuf;
-      wpi::raw_svector_ostream os{extraHeadersBuf};
+      std::string extraHeaders;
+      wpi::raw_string_ostream os{extraHeaders};
       os << "Content-Disposition: filename=\"";
       os.write_escaped(fullpath.filename().string());
       os << "\"\r\n";

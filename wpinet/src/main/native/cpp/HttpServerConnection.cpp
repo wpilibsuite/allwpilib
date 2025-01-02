@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include <wpi/SmallString.h>
+#include <fmt/format.h>
 #include <wpi/SmallVector.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
@@ -174,8 +174,6 @@ void HttpServerConnection::SendError(int code, std::string_view message) {
       baseMessage = "501: Not Implemented!";
       break;
   }
-  SmallString<256> content{baseMessage};
-  content += "\r\n";
-  content += message;
-  SendResponse(code, codeText, "text/plain", content.str(), extra);
+  SendResponse(code, codeText, "text/plain",
+               fmt::format("{}\r\n{}", baseMessage, message), extra);
 }
