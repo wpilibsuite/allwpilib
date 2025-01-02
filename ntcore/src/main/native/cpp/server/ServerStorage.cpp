@@ -146,7 +146,8 @@ void ServerStorage::SetValue(ServerClient* client, ServerTopic* topic,
 
 void ServerStorage::RemoveClient(ServerClient* client) {
   // remove all publishers and subscribers for this client
-  wpi::SmallVector<ServerTopic*, 16> toDelete;
+  std::vector<ServerTopic*> toDelete;
+  toDelete.reserve(m_topics.size());
   for (auto&& topic : m_topics) {
     bool pubChanged = false;
     bool subChanged = false;
