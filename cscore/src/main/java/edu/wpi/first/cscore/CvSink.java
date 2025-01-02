@@ -227,7 +227,7 @@ public class CvSink extends ImageSink {
    *
    * @return Time in 1 us increments.
    */
-  long getLastFrameTime() {
+  public long getLastFrameTime() {
     return m_frame.getTimestamp();
   }
 
