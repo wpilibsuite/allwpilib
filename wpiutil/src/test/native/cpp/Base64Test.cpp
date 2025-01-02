@@ -35,13 +35,7 @@ class Base64Test : public ::testing::TestWithParam<Base64TestParam> {
 };
 
 TEST_P(Base64Test, EncodeStdString) {
-  std::string s;
-  Base64Encode(GetPlain(), &s);
-  ASSERT_EQ(GetParam().encoded, s);
-
-  // text already in s
-  Base64Encode(GetPlain(), &s);
-  ASSERT_EQ(GetParam().encoded, s);
+  ASSERT_EQ(GetParam().encoded, Base64Encode(GetPlain()));
 }
 
 TEST_P(Base64Test, EncodeSmallString) {
@@ -52,13 +46,10 @@ TEST_P(Base64Test, EncodeSmallString) {
 }
 
 TEST_P(Base64Test, DecodeStdString) {
-  std::string s;
   std::string_view encoded = GetParam().encoded;
-  EXPECT_EQ(encoded.size(), Base64Decode(encoded, &s));
-  ASSERT_EQ(GetPlain(), s);
-
-  // text already in s
-  Base64Decode(encoded, &s);
+  size_t len;
+  std::string s = Base64Decode(encoded, &len);
+  EXPECT_EQ(encoded.size(), len);
   ASSERT_EQ(GetPlain(), s);
 }
 

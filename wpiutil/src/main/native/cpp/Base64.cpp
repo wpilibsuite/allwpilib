@@ -119,12 +119,12 @@ size_t Base64Decode(raw_ostream& os, std::string_view encoded) {
   return (end - bytes_begin) + ((4 - nprbytes) & 3);
 }
 
-size_t Base64Decode(std::string_view encoded, std::string* plain) {
-  plain->resize(0);
-  raw_string_ostream os(*plain);
-  size_t rv = Base64Decode(os, encoded);
+std::string Base64Decode(std::string_view encoded, size_t* num_read) {
+  std::string plain;
+  raw_string_ostream os(plain);
+  *num_read = Base64Decode(os, encoded);
   os.flush();
-  return rv;
+  return plain;
 }
 
 std::string_view Base64Decode(std::string_view encoded, size_t* num_read,
@@ -181,11 +181,12 @@ void Base64Encode(raw_ostream& os, std::string_view plain) {
   }
 }
 
-void Base64Encode(std::string_view plain, std::string* encoded) {
-  encoded->resize(0);
-  raw_string_ostream os(*encoded);
+std::string Base64Encode(std::string_view plain) {
+  std::string encoded;
+  raw_string_ostream os(encoded);
   Base64Encode(os, plain);
   os.flush();
+  return encoded;
 }
 
 std::string_view Base64Encode(std::string_view plain,
@@ -201,11 +202,12 @@ void Base64Encode(raw_ostream& os, std::span<const uint8_t> plain) {
                                     plain.size()});
 }
 
-void Base64Encode(std::span<const uint8_t> plain, std::string* encoded) {
-  encoded->resize(0);
-  raw_string_ostream os(*encoded);
+std::string Base64Encode(std::span<const uint8_t> plain) {
+  std::string encoded;
+  raw_string_ostream os(encoded);
   Base64Encode(os, plain);
   os.flush();
+  return encoded;
 }
 
 std::string_view Base64Encode(std::span<const uint8_t> plain,
