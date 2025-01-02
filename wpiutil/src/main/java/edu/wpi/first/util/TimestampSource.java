@@ -5,10 +5,10 @@
 package edu.wpi.first.util;
 
 /**
- * Options for where the timestamp an {@link RawFrame} was captured at can be measured relative to
+ * Options for where the timestamp an {@link RawFrame} was captured at can be measured relative to.
  */
 public enum TimestampSource {
-  /** unknown */
+  /** unknown. */
   kUnknown(0),
   /**
    * wpi::Now when the new frame was dequeued by CSCore. Does not account for camera exposure time
