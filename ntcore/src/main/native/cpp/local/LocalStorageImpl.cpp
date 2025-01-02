@@ -12,6 +12,7 @@
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 #include <wpi/DataLog.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 
 #include "IListenerStorage.h"
@@ -588,9 +589,10 @@ void StorageImpl::AddListenerImpl(NT_Listener listenerHandle,
           .get();
 
   // if we're doing anything immediate, get the list of matching topics
-  wpi::SmallVector<LocalTopic*, 32> topics;
+  std::vector<LocalTopic*> topics;
   if ((eventMask & NT_EVENT_IMMEDIATE) != 0 &&
       (eventMask & (NT_EVENT_PUBLISH | NT_EVENT_VALUE_ALL)) != 0) {
+    topics.reserve(m_topics.size());
     for (auto&& topic : m_topics) {
       if (topic->Exists() && subscriber->Matches(topic->name, topic->special)) {
         topics.emplace_back(topic.get());
