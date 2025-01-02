@@ -86,10 +86,13 @@ void DataLog::StartFile() {
     AppendStartRecord(entryInfo.second.id, entryInfo.first,
                       entryInfo.second.type,
                       m_entryIds[entryInfo.second.id].metadata, 0);
-    if (!entryInfo.second.schemaData.empty()) {
-      StartRecord(entryInfo.second.id, 0, entryInfo.second.schemaData.size(),
-                  0);
-      AppendImpl(entryInfo.second.schemaData);
+  }
+
+  // Existing schema data records
+  for (auto&& schemaInfo : m_schemas) {
+    if (schemaInfo.second.id != 0) {
+      StartRecord(schemaInfo.second.id, 0, schemaInfo.second.data.size(), 0);
+      AppendImpl(schemaInfo.second.data);
     }
   }
 
@@ -131,28 +134,26 @@ void DataLog::BufferHalfFull() {}
 
 bool DataLog::HasSchema(std::string_view name) const {
   std::scoped_lock lock{m_mutex};
-  wpi::SmallString<128> fullName{"/.schema/"};
-  fullName += name;
-  auto it = m_entries.find(fullName);
-  return it != m_entries.end();
+  return m_schemas.contains(name);
 }
 
 void DataLog::AddSchema(std::string_view name, std::string_view type,
                         std::span<const uint8_t> schema, int64_t timestamp) {
   std::scoped_lock lock{m_mutex};
-  wpi::SmallString<128> fullName{"/.schema/"};
-  fullName += name;
-  auto& entryInfo = m_entries[fullName];
-  if (entryInfo.id != 0) {
+  auto& schemaInfo = m_schemas[name];
+  if (schemaInfo.id != 0) {
     return;  // don't add duplicates
   }
-  entryInfo.schemaData.assign(schema.begin(), schema.end());
+  schemaInfo.data.assign(schema.begin(), schema.end());
+  wpi::SmallString<128> fullName{"/.schema/"};
+  fullName += name;
   int entry = StartImpl(fullName, type, {}, timestamp);
 
   // inline AppendRaw() without releasing lock
   if (entry <= 0) {
     [[unlikely]] return;  // should never happen, but check anyway
   }
+  schemaInfo.id = entry;
   if (!m_active) {
     [[unlikely]] return;
   }
