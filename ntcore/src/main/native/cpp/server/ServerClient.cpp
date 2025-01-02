@@ -5,6 +5,7 @@
 #include "ServerClient.h"
 
 #include <utility>
+#include <vector>
 
 #include <wpi/MessagePack.h>
 
