@@ -94,10 +94,6 @@ class NetworkTable final {
   static std::string NormalizeKey(std::string_view key,
                                   bool withLeadingSlash = true);
 
-  static std::string_view NormalizeKey(std::string_view key,
-                                       wpi::SmallVectorImpl<char>& buf,
-                                       bool withLeadingSlash = true);
-
   /**
    * Gets a list of the names of all the super tables of a given key. For
    * example, the key "/foo/bar/baz" has a hierarchy of "/", "/foo",
