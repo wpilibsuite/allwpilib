@@ -12,7 +12,6 @@
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 #include <wpi/DataLog.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 
 #include "IListenerStorage.h"
@@ -726,22 +725,17 @@ void StorageImpl::StopDataLog(NT_DataLogger logger) {
 //
 
 bool StorageImpl::HasSchema(std::string_view name) {
-  wpi::SmallString<128> fullName{"/.schema/"};
-  fullName += name;
-  auto it = m_schemas.find(fullName);
-  return it != m_schemas.end();
+  return m_schemas.contains(name);
 }
 
 void StorageImpl::AddSchema(std::string_view name, std::string_view type,
                             std::span<const uint8_t> schema) {
-  wpi::SmallString<128> fullName{"/.schema/"};
-  fullName += name;
-  auto& pubHandle = m_schemas[fullName];
+  auto& pubHandle = m_schemas[name];
   if (pubHandle != 0) {
     return;
   }
 
-  auto topic = GetOrCreateTopic(fullName);
+  auto topic = GetOrCreateTopic(fmt::format("/.schema/{}", name));
 
   if (topic->localPublishers.size() >= kMaxPublishers) {
     ERR("reached maximum number of publishers to '{}', not publishing",
