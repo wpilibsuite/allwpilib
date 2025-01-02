@@ -7,7 +7,6 @@
 #include <gtest/gtest.h>
 
 #include "wpi/Base64.h"
-#include "wpi/SmallString.h"
 
 namespace wpi {
 
@@ -38,32 +37,12 @@ TEST_P(Base64Test, EncodeStdString) {
   ASSERT_EQ(GetParam().encoded, Base64Encode(GetPlain()));
 }
 
-TEST_P(Base64Test, EncodeSmallString) {
-  SmallString<128> buf;
-  ASSERT_EQ(GetParam().encoded, Base64Encode(GetPlain(), buf));
-  // reuse buf
-  ASSERT_EQ(GetParam().encoded, Base64Encode(GetPlain(), buf));
-}
-
 TEST_P(Base64Test, DecodeStdString) {
   std::string_view encoded = GetParam().encoded;
   size_t len;
   std::string s = Base64Decode(encoded, &len);
   EXPECT_EQ(encoded.size(), len);
   ASSERT_EQ(GetPlain(), s);
-}
-
-TEST_P(Base64Test, DecodeSmallString) {
-  SmallString<128> buf;
-  std::string_view encoded = GetParam().encoded;
-  size_t len;
-  std::string_view plain = Base64Decode(encoded, &len, buf);
-  EXPECT_EQ(encoded.size(), len);
-  ASSERT_EQ(GetPlain(), plain);
-
-  // reuse buf
-  plain = Base64Decode(encoded, &len, buf);
-  ASSERT_EQ(GetPlain(), plain);
 }
 
 static Base64TestParam sample[] = {
