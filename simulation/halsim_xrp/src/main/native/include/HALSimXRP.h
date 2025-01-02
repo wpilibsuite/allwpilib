@@ -63,7 +63,7 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   int m_port;
 
   void SendStateToXRP();
-  wpi::uv::SimpleBufferPool<4>& GetBufferPool();
+  wpi::uv::SimpleBufferPool& GetBufferPool();
   std::mutex m_buffer_mutex;
 
   struct sockaddr_in m_dest;
