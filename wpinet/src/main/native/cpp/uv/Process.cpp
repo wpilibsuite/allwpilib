@@ -5,6 +5,7 @@
 #include "wpinet/uv/Process.h"
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "wpinet/uv/Loop.h"
