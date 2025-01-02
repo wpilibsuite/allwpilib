@@ -10,6 +10,7 @@
 #include <vector>
 
 #include <wpi/Base64.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/sha1.h>
 
