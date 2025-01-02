@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj2.command;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -81,10 +80,7 @@ public class ParallelDeadlineGroup extends Command {
     CommandScheduler.getInstance().registerComposedCommands(commands);
 
     for (Command command : commands) {
-      if (!Collections.disjoint(command.getRequirements(), getRequirements())) {
-        throw new IllegalArgumentException(
-            "Multiple commands in a parallel group cannot require the same subsystems");
-      }
+      ensureDisjointRequirements(command);
       m_commands.put(command, false);
       addRequirements(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
