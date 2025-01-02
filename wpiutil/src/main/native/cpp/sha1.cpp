@@ -21,8 +21,6 @@
 
 #include <string>
 
-#include "wpi/SmallVector.h"
-#include "wpi/StringExtras.h"
 #include "wpi/raw_istream.h"
 #include "wpi/raw_ostream.h"
 
@@ -295,14 +293,6 @@ std::string SHA1::Final() {
   return out;
 }
 
-std::string_view SHA1::Final(SmallVectorImpl<char>& buf) {
-  raw_svector_ostream os(buf);
-
-  finalize(digest, buffer, buf_size, transforms, os, true);
-
-  return os.str();
-}
-
 std::string SHA1::RawFinal() {
   std::string out;
   raw_string_ostream os(out);
@@ -310,14 +300,6 @@ std::string SHA1::RawFinal() {
   finalize(digest, buffer, buf_size, transforms, os, false);
 
   return out;
-}
-
-std::string_view SHA1::RawFinal(SmallVectorImpl<char>& buf) {
-  raw_svector_ostream os(buf);
-
-  finalize(digest, buffer, buf_size, transforms, os, false);
-
-  return os.str();
 }
 
 std::string SHA1::FromFile(std::string_view filename) {
