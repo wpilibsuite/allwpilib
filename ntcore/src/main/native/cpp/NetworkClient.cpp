@@ -13,7 +13,6 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpinet/HttpUtil.h>
 #include <wpinet/uv/Loop.h>
