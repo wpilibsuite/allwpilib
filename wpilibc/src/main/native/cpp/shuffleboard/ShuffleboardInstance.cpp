@@ -10,7 +10,6 @@
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/SmallVector.h>
 #include <wpi/StringMap.h>
 
 #include "frc/shuffleboard/Shuffleboard.h"
@@ -53,7 +52,8 @@ frc::ShuffleboardTab& ShuffleboardInstance::GetTab(std::string_view title) {
 
 void ShuffleboardInstance::Update() {
   if (m_impl->tabsChanged) {
-    wpi::SmallVector<std::string, 16> tabTitles;
+    std::vector<std::string> tabTitles;
+    tabTitles.reserve(m_impl->tabs.size());
     for (auto& entry : m_impl->tabs) {
       tabTitles.emplace_back(entry.second.GetTitle());
     }

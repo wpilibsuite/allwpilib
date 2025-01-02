@@ -12,7 +12,6 @@
 
 #include <networktables/DoubleArrayTopic.h>
 #include <units/length.h>
-#include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
 
 #include "frc/geometry/Pose2d.h"
@@ -89,14 +88,6 @@ class FieldObject2d {
    */
   std::vector<Pose2d> GetPoses() const;
 
-  /**
-   * Get multiple poses.
-   *
-   * @param out output SmallVector to hold 2D poses
-   * @return span referring to output SmallVector
-   */
-  std::span<const Pose2d> GetPoses(wpi::SmallVectorImpl<Pose2d>& out) const;
-
  private:
   void UpdateEntry(bool setDefault = false);
   void UpdateFromEntry() const;
@@ -104,7 +95,7 @@ class FieldObject2d {
   mutable wpi::mutex m_mutex;
   std::string m_name;
   nt::DoubleArrayEntry m_entry;
-  mutable wpi::SmallVector<Pose2d, 1> m_poses;
+  mutable std::vector<Pose2d> m_poses;
 };
 
 }  // namespace frc
