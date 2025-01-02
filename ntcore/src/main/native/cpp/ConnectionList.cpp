@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 
-#include <wpi/SmallVector.h>
 #include <wpi/json.h>
 #include <wpi/raw_ostream.h>
 
@@ -100,7 +99,7 @@ void ConnectionList::AddListener(NT_Listener listener, unsigned int eventMask) {
   if ((eventMask & (NT_EVENT_CONNECTED | NT_EVENT_IMMEDIATE)) ==
           (NT_EVENT_CONNECTED | NT_EVENT_IMMEDIATE) &&
       !m_connections.empty()) {
-    wpi::SmallVector<const ConnectionInfo*, 16> infos;
+    std::vector<ConnectionInfo*> infos;
     infos.reserve(m_connections.size());
     for (auto&& conn : m_connections) {
       infos.emplace_back(&(*conn));
