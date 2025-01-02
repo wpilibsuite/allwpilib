@@ -10,7 +10,6 @@
 #include <vector>
 
 #include <wpi/Base64.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/sha1.h>
 
@@ -45,10 +44,7 @@ class WebSocketClientTest : public WebSocketTest {
       if (mockBadAccept) {
         hash.Update("1");
       }
-      SmallString<64> hashBuf;
-      SmallString<64> acceptBuf;
-      os << "Sec-WebSocket-Accept: "
-         << Base64Encode(hash.RawFinal(hashBuf), acceptBuf) << "\r\n";
+      os << "Sec-WebSocket-Accept: " << Base64Encode(hash.RawFinal()) << "\r\n";
 
       if (!mockProtocol.empty()) {
         os << "Sec-WebSocket-Protocol: " << mockProtocol << "\r\n";
@@ -93,7 +89,7 @@ class WebSocketClientTest : public WebSocketTest {
   std::vector<uint8_t> wireData;
   std::shared_ptr<uv::Pipe> conn;
   HttpParser req{HttpParser::kRequest};
-  SmallString<64> clientKey;
+  std::string clientKey;
   std::string mockProtocol;
   bool serverHeadersDone = false;
   std::function<void()> connected;
