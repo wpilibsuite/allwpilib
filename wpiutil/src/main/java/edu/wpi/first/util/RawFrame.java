@@ -18,7 +18,7 @@ public class RawFrame implements AutoCloseable {
   private int m_height;
   private int m_stride;
   private PixelFormat m_pixelFormat = PixelFormat.kUnknown;
-  private long m_time = 0;
+  private long m_time;
   private TimestampSource m_timeSource = TimestampSource.kUnknown;
 
   /** Construct a new empty RawFrame. */
