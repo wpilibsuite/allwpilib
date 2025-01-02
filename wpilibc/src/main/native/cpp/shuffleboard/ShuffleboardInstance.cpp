@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
