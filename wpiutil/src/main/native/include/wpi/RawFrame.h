@@ -99,6 +99,8 @@ struct RawFrame : public WPI_RawFrame {
     pixelFormat = WPI_PIXFMT_UNKNOWN;
     width = 0;
     height = 0;
+    timestamp = 0;
+    timestampSrc = WPI_TIMESRC_UNKNOWN;
   }
   RawFrame(const RawFrame&) = delete;
   RawFrame& operator=(const RawFrame&) = delete;
