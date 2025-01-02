@@ -10,12 +10,14 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.proto.DifferentialDriveWheelPositionsProto;
 import edu.wpi.first.math.kinematics.struct.DifferentialDriveWheelPositionsStruct;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.units.measure.Distance;
 import java.util.Objects;
 
 /** Represents the wheel positions for a differential drive drivetrain. */
 public class DifferentialDriveWheelPositions
-    implements StructSerializable, Interpolatable<DifferentialDriveWheelPositions> {
+    implements StructSerializable, ProtobufSerializable, Interpolatable<DifferentialDriveWheelPositions> {
   /** Distance measured by the left side. */
   public double leftMeters;
 
