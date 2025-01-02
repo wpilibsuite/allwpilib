@@ -79,13 +79,42 @@ public class Solenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Read the current value of the solenoid.
+   * Read the current value of the solenoid. This is an alias for the isOn method.
    *
    * @return True if the solenoid output is on or false if the solenoid output is off.
    */
   public boolean get() {
     int currentAll = m_module.getSolenoids();
     return (currentAll & m_mask) != 0;
+  }
+
+  /**
+   * Returns true if the solenoid is on. This is an alias for the get method.
+   *
+   * @return true if the solenoid is on.
+   */
+  public boolean isOn() {
+    int currentAll = m_module.getSolenoids();
+    return (currentAll & m_mask) != 0;
+  }
+
+  /**
+   * Returns true if the solenoid is off.
+   *
+   * @return true if the solenoid off.
+   */
+  public boolean isOff() {
+    return !isOn();
+  }
+
+  /** Turns the solenoid on. */
+  public void setOn() {
+    set(true);
+  }
+
+  /** Turns the solenoid off. */
+  public void setOff() {
+    set(false);
   }
 
   /**

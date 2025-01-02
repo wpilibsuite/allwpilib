@@ -110,6 +110,30 @@ void DoubleSolenoid::Toggle() {
   }
 }
 
+bool DoubleSolenoid::IsForward() {
+  return Get() == kForward;
+}
+
+bool DoubleSolenoid::IsReverse() {
+  return Get() == kReverse;
+}
+
+bool DoubleSolenoid::IsOff() {
+  return Get() == kOff;
+}
+
+void DoubleSolenoid::SetForward() {
+  Set(kForward);
+}
+
+void DoubleSolenoid::SetReverse() {
+  Set(kReverse);
+}
+
+void DoubleSolenoid::SetOff() {
+  Set(kOff);
+}
+
 int DoubleSolenoid::GetFwdChannel() const {
   return m_forwardChannel;
 }

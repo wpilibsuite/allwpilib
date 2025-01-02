@@ -19,10 +19,10 @@ class SolenoidTestREV {
       assertEquals(2, solenoid.getChannel());
 
       solenoid.set(true);
-      assertTrue(solenoid.get());
+      assertTrue(solenoid.isOn());
 
       solenoid.set(false);
-      assertFalse(solenoid.get());
+      assertFalse(solenoid.isOn());
     }
   }
 
@@ -50,13 +50,13 @@ class SolenoidTestREV {
   void testToggle() {
     try (Solenoid solenoid = new Solenoid(3, PneumaticsModuleType.REVPH, 2)) {
       solenoid.set(true);
-      assertTrue(solenoid.get());
+      assertTrue(solenoid.isOn());
 
       solenoid.toggle();
-      assertFalse(solenoid.get());
+      assertFalse(solenoid.isOn());
 
       solenoid.toggle();
-      assertTrue(solenoid.get());
+      assertTrue(solenoid.isOn());
     }
   }
 }
