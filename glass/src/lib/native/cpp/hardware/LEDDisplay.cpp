@@ -28,10 +28,10 @@ void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
   bool running = model->IsRunning();
   auto& storage = GetStorage();
 
-  int& numColumns = storage.GetInt("columns", 10);
-  bool& serpentine = storage.GetBool("serpentine", false);
-  int& order = storage.GetInt("order", LEDConfig::RowMajor);
-  int& start = storage.GetInt("start", LEDConfig::UpperLeft);
+  int& numColumns = storage.Get<int>("columns", 10);
+  bool& serpentine = storage.Get<bool>("serpentine", false);
+  int& order = storage.Get<int>("order", LEDConfig::RowMajor);
+  int& start = storage.Get<int>("start", LEDConfig::UpperLeft);
 
   ImGui::PushItemWidth(ImGui::GetFontSize() * 7);
   ImGui::LabelText("Length", "%d", length);
