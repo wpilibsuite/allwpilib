@@ -7,9 +7,13 @@ package edu.wpi.first.wpilibj2.command;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -177,6 +181,37 @@ public final class Commands {
    */
   public static <K> Command select(Map<K, Command> commands, Supplier<? extends K> selector) {
     return new SelectCommand<>(commands, selector);
+  }
+
+  /**
+   * Runs a command chosen from the dashboard.
+   *
+   * <p>Example usage:
+   *
+   * <pre>
+   * <code>
+   * Command autonomousCommand = Commands.choose(
+   *   chooser -> SmartDashboard.putData("Auto Chooser", chooser),
+   *   myFirstAuto.withName("First Auto"),
+   *   mySecondAuto.withName("Second Auto")
+   * );
+   * </code>
+   * </pre>
+   *
+   * @param publish lambda used for publishing the chooser to the dashboard
+   * @param commands commands to choose from
+   * @return the command
+   */
+  public static Command choose(Consumer<Sendable> publish, Command... commands) {
+    SendableChooser<String> chooser = new SendableChooser<>();
+    HashMap<String, Command> options = new HashMap<>(commands.length);
+    for (Command command : commands) {
+      var name = command.getName();
+      chooser.addOption(name, name);
+      options.put(name, command);
+    }
+    publish.accept(chooser);
+    return select(options, chooser::getSelected);
   }
 
   /**
