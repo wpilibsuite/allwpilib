@@ -21,7 +21,7 @@ namespace wpilibws {
 
 class WebServerClientTest {
  public:
-  using BufferPool = wpi::uv::SimpleBufferPool<4>;
+  using BufferPool = wpi::uv::SimpleBufferPool;
   using LoopFunc = std::function<void()>;
   using UvExecFunc = wpi::uv::AsyncFunction<void(LoopFunc)>;
 
