@@ -197,7 +197,8 @@ void MulticastServiceResolver::Stop() {
   if (!pImpl->serviceRef) {
     return;
   }
-  wpi::SmallVector<WPI_EventHandle, 8> cleanupEvents;
+  std::vector<WPI_EventHandle> cleanupEvents;
+  cleanupEvents.reserve(pImpl->ResolveStates.size() + 1);
   for (auto&& i : pImpl->ResolveStates) {
     cleanupEvents.push_back(
         pImpl->thread->RemoveServiceRefOutsideThread(i->ResolveRef));

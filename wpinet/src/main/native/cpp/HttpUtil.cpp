@@ -358,7 +358,7 @@ HttpLocation::HttpLocation(std::string_view url_, bool* error,
 
 void HttpRequest::SetAuth(const HttpLocation& loc) {
   if (!loc.user.empty()) {
-    Base64Encode(fmt::format("{}:{}", loc.user, loc.password), &auth);
+    auth = Base64Encode(fmt::format("{}:{}", loc.user, loc.password));
   }
 }
 
