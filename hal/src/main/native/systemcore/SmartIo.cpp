@@ -46,14 +46,14 @@ int32_t SmartIo::InitializeMode(SmartIoMode mode) {
   switch (mode) {
     // These need to set a 0 output
     case SmartIoMode::DigitalOutput:
-    case SmartIoMode::PWMOutput:
+    case SmartIoMode::PwmOutput:
       setPublisher.Set(0);
       break;
 
     // These don't need to set any value
     case SmartIoMode::DigitalInput:
     case SmartIoMode::AnalogInput:
-    case SmartIoMode::PWMInput:
+    case SmartIoMode::PwmInput:
     case SmartIoMode::SingleCounterRising:
     case SmartIoMode::SingleCounterFalling:
       break;
@@ -96,12 +96,28 @@ int32_t SmartIo::GetDigitalInput(bool* value) {
   return 0;
 }
 
-int32_t SmartIo::SetPwmMicroseconds(uint16_t microseconds) {
-  if (currentMode != SmartIoMode::PWMOutput) {
+int32_t SmartIo::SetPwmOutputPeriod(PwmOutputPeriod period) {
+  if (currentMode != SmartIoMode::PwmOutput) {
     return INCOMPATIBLE_STATE;
   }
 
-  // TODO(thad) add support for always on signal
+  switch (period) {
+    case PwmOutputPeriod::k20ms:
+    case PwmOutputPeriod::k10ms:
+    case PwmOutputPeriod::k5ms:
+    case PwmOutputPeriod::k2ms:
+      periodPublisher.Set(static_cast<int>(period));
+      return 0;
+
+    default:
+      return PARAMETER_OUT_OF_RANGE;
+  }
+}
+
+int32_t SmartIo::SetPwmMicroseconds(uint16_t microseconds) {
+  if (currentMode != SmartIoMode::PwmOutput) {
+    return INCOMPATIBLE_STATE;
+  }
 
   if (microseconds > 4095) {
     microseconds = 4095;
@@ -113,7 +129,7 @@ int32_t SmartIo::SetPwmMicroseconds(uint16_t microseconds) {
 }
 
 int32_t SmartIo::GetPwmMicroseconds(uint16_t* microseconds) {
-  if (currentMode != SmartIoMode::PWMOutput) {
+  if (currentMode != SmartIoMode::PwmOutput) {
     return INCOMPATIBLE_STATE;
   }
 

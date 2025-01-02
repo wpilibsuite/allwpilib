@@ -99,7 +99,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
 
   port->channel = channel;
 
-  *status = port->InitializeMode(SmartIoMode::PWMOutput);
+  *status = port->InitializeMode(SmartIoMode::PwmOutput);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::PWM);
     return HAL_kInvalidHandle;
@@ -372,18 +372,48 @@ double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
 }
 
 void HAL_LatchPWMZero(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
-  // TODO(thad) figure out what this actually means
-  return;
+  HAL_SetPWMPulseTimeMicroseconds(pwmPortHandle, 0, status);
 }
 
 void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
                            int32_t* status) {
-  // TODO(thad) not currently supported
-  return;
+  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  switch (squelchMask) {
+    case 0:
+      *status = port->SetPwmOutputPeriod(hal::PwmOutputPeriod::k5ms);
+      break;
+    case 1:
+    case 2:
+      *status = port->SetPwmOutputPeriod(hal::PwmOutputPeriod::k10ms);
+      break;
+    case 3:
+      *status = port->SetPwmOutputPeriod(hal::PwmOutputPeriod::k20ms);
+      break;
+    default:
+      *status = PARAMETER_OUT_OF_RANGE;
+      return;
+  }
 }
 
 void HAL_SetPWMAlwaysHighMode(HAL_DigitalHandle pwmPortHandle,
                               int32_t* status) {
+  // Always high is going to have to use a 2ms period
+  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  *status = port->SetPwmOutputPeriod(hal::PwmOutputPeriod::k2ms);
+  if (*status != 0) {
+    return;
+  }
+
   HAL_SetPWMPulseTimeMicroseconds(pwmPortHandle, kPwmAlwaysHigh, status);
 }
 
