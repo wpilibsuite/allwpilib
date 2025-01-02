@@ -10,7 +10,6 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpinet/uv/Error.h>
 #include <wpinet/uv/GetAddrInfo.h>
@@ -82,16 +81,16 @@ bool DeploySession::ChangeTeamNumber(const std::string& macAddress,
 
   std::future<int> future = std::async(
       std::launch::async, [this, ipAddress, teamNumber, mac = macAddress]() {
-        //  Convert to IP address.
-        wpi::SmallString<16> ip;
+        // Convert to IP address.
+        std::string ip;
         in_addr addr;
         addr.s_addr = ipAddress;
         wpi::uv::AddrToName(addr, &ip);
-        DEBUG("Trying to establish SSH connection to {}.", ip.str());
+        DEBUG("Trying to establish SSH connection to {}.", ip);
         try {
-          SshSession session{ip.str(), kPort, kUsername, kPassword, m_logger};
+          SshSession session{ip, kPort, kUsername, kPassword, m_logger};
           session.Open();
-          DEBUG("SSH connection to {} was successful.", ip.str());
+          DEBUG("SSH connection to {} was successful.", ip);
 
           SUCCESS("roboRIO Connected!");
 
@@ -107,7 +106,7 @@ bool DeploySession::ChangeTeamNumber(const std::string& macAddress,
             throw e;
           }
         } catch (const SshSession::SshException& e) {
-          DEBUG("SSH connection to {} failed with {}.", ip.str(), e.what());
+          DEBUG("SSH connection to {} failed with {}.", ip, e.what());
           throw e;
         }
         return 0;
@@ -126,16 +125,16 @@ bool DeploySession::Reboot(const std::string& macAddress,
 
   std::future<int> future =
       std::async(std::launch::async, [this, ipAddress, mac = macAddress]() {
-        //  Convert to IP address.
-        wpi::SmallString<16> ip;
+        // Convert to IP address.
+        std::string ip;
         in_addr addr;
         addr.s_addr = ipAddress;
         wpi::uv::AddrToName(addr, &ip);
-        DEBUG("Trying to establish SSH connection to {}.", ip.str());
+        DEBUG("Trying to establish SSH connection to {}.", ip);
         try {
-          SshSession session{ip.str(), kPort, kUsername, kPassword, m_logger};
+          SshSession session{ip, kPort, kUsername, kPassword, m_logger};
           session.Open();
-          DEBUG("SSH connection to {} was successful.", ip.str());
+          DEBUG("SSH connection to {} was successful.", ip);
 
           SUCCESS("roboRIO Connected!");
 
@@ -146,7 +145,7 @@ bool DeploySession::Reboot(const std::string& macAddress,
             throw e;
           }
         } catch (const SshSession::SshException& e) {
-          DEBUG("SSH connection to {} failed with {}.", ip.str(), e.what());
+          DEBUG("SSH connection to {} failed with {}.", ip, e.what());
           throw e;
         }
         return 0;
@@ -165,16 +164,16 @@ bool DeploySession::Blink(const std::string& macAddress,
 
   std::future<int> future =
       std::async(std::launch::async, [this, ipAddress, mac = macAddress]() {
-        //  Convert to IP address.
-        wpi::SmallString<16> ip;
+        // Convert to IP address.
+        std::string ip;
         in_addr addr;
         addr.s_addr = ipAddress;
         wpi::uv::AddrToName(addr, &ip);
-        DEBUG("Trying to establish SSH connection to {}.", ip.str());
+        DEBUG("Trying to establish SSH connection to {}.", ip);
         try {
-          SshSession session{ip.str(), kPort, kUsername, kPassword, m_logger};
+          SshSession session{ip, kPort, kUsername, kPassword, m_logger};
           session.Open();
-          DEBUG("SSH connection to {} was successful.", ip.str());
+          DEBUG("SSH connection to {} was successful.", ip);
 
           SUCCESS("roboRIO Connected!");
 
@@ -189,7 +188,7 @@ bool DeploySession::Blink(const std::string& macAddress,
             throw e;
           }
         } catch (const SshSession::SshException& e) {
-          DEBUG("SSH connection to {} failed with {}.", ip.str(), e.what());
+          DEBUG("SSH connection to {} failed with {}.", ip, e.what());
           throw e;
         }
         return 0;
@@ -208,16 +207,16 @@ bool DeploySession::DisableWebServer(const std::string& macAddress,
 
   std::future<int> future =
       std::async(std::launch::async, [this, ipAddress, mac = macAddress]() {
-        //  Convert to IP address.
-        wpi::SmallString<16> ip;
+        // Convert to IP address.
+        std::string ip;
         in_addr addr;
         addr.s_addr = ipAddress;
         wpi::uv::AddrToName(addr, &ip);
-        DEBUG("Trying to establish SSH connection to {}.", ip.str());
+        DEBUG("Trying to establish SSH connection to {}.", ip);
         try {
-          SshSession session{ip.str(), kPort, kUsername, kPassword, m_logger};
+          SshSession session{ip, kPort, kUsername, kPassword, m_logger};
           session.Open();
-          DEBUG("SSH connection to {} was successful.", ip.str());
+          DEBUG("SSH connection to {} was successful.", ip);
 
           SUCCESS("roboRIO Connected!");
 
@@ -232,7 +231,7 @@ bool DeploySession::DisableWebServer(const std::string& macAddress,
             throw e;
           }
         } catch (const SshSession::SshException& e) {
-          DEBUG("SSH connection to {} failed with {}.", ip.str(), e.what());
+          DEBUG("SSH connection to {} failed with {}.", ip, e.what());
           throw e;
         }
         return 0;
@@ -251,16 +250,16 @@ bool DeploySession::EnableWebServer(const std::string& macAddress,
 
   std::future<int> future =
       std::async(std::launch::async, [this, ipAddress, mac = macAddress]() {
-        //  Convert to IP address.
-        wpi::SmallString<16> ip;
+        // Convert to IP address.
+        std::string ip;
         in_addr addr;
         addr.s_addr = ipAddress;
         wpi::uv::AddrToName(addr, &ip);
-        DEBUG("Trying to establish SSH connection to {}.", ip.str());
+        DEBUG("Trying to establish SSH connection to {}.", ip);
         try {
-          SshSession session{ip.str(), kPort, kUsername, kPassword, m_logger};
+          SshSession session{ip, kPort, kUsername, kPassword, m_logger};
           session.Open();
-          DEBUG("SSH connection to {} was successful.", ip.str());
+          DEBUG("SSH connection to {} was successful.", ip);
 
           SUCCESS("roboRIO Connected!");
 
@@ -275,7 +274,7 @@ bool DeploySession::EnableWebServer(const std::string& macAddress,
             throw e;
           }
         } catch (const SshSession::SshException& e) {
-          DEBUG("SSH connection to {} failed with {}.", ip.str(), e.what());
+          DEBUG("SSH connection to {} failed with {}.", e.what());
           throw e;
         }
         return 0;
@@ -294,17 +293,17 @@ bool DeploySession::GetStatus(const std::string& macAddress,
 
   std::future<DeviceStatus> future =
       std::async(std::launch::async, [this, ipAddress, mac = macAddress]() {
-        //  Convert to IP address.
-        wpi::SmallString<16> ip;
+        // Convert to IP address.
+        std::string ip;
         in_addr addr;
         addr.s_addr = ipAddress;
         wpi::uv::AddrToName(addr, &ip);
-        DEBUG("Trying to establish SSH connection to {}.", ip.str());
+        DEBUG("Trying to establish SSH connection to {}.", ip);
         DeviceStatus status;
         try {
-          SshSession session{ip.str(), kPort, kUsername, kPassword, m_logger};
+          SshSession session{ip, kPort, kUsername, kPassword, m_logger};
           session.Open();
-          DEBUG("SSH connection to {} was successful.", ip.str());
+          DEBUG("SSH connection to {} was successful.", ip);
 
           SUCCESS("roboRIO Connected!");
 
@@ -333,7 +332,7 @@ bool DeploySession::GetStatus(const std::string& macAddress,
             throw e;
           }
         } catch (const SshSession::SshException& e) {
-          DEBUG("SSH connection to {} failed with {}.", ip.str(), e.what());
+          DEBUG("SSH connection to {} failed with {}.", ip, e.what());
           throw e;
         }
         return status;
