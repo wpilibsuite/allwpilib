@@ -13,69 +13,67 @@ import org.junit.jupiter.api.Test;
 class RepeatCommandTest extends SingleCompositionTestBase<RepeatCommand> {
   @Test
   void callsMethodsCorrectly() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      var initCounter = new AtomicInteger(0);
-      var exeCounter = new AtomicInteger(0);
-      var isFinishedCounter = new AtomicInteger(0);
-      var endCounter = new AtomicInteger(0);
-      var isFinishedHook = new AtomicBoolean(false);
+    var initCounter = new AtomicInteger(0);
+    var exeCounter = new AtomicInteger(0);
+    var isFinishedCounter = new AtomicInteger(0);
+    var endCounter = new AtomicInteger(0);
+    var isFinishedHook = new AtomicBoolean(false);
 
-      final var command =
-          new FunctionalCommand(
-                  initCounter::incrementAndGet,
-                  exeCounter::incrementAndGet,
-                  interrupted -> endCounter.incrementAndGet(),
-                  () -> {
-                    isFinishedCounter.incrementAndGet();
-                    return isFinishedHook.get();
-                  })
-              .repeatedly();
+    final var command =
+        new FunctionalCommand(
+                initCounter::incrementAndGet,
+                exeCounter::incrementAndGet,
+                interrupted -> endCounter.incrementAndGet(),
+                () -> {
+                  isFinishedCounter.incrementAndGet();
+                  return isFinishedHook.get();
+                })
+            .repeatedly();
 
-      assertEquals(0, initCounter.get());
-      assertEquals(0, exeCounter.get());
-      assertEquals(0, isFinishedCounter.get());
-      assertEquals(0, endCounter.get());
+    assertEquals(0, initCounter.get());
+    assertEquals(0, exeCounter.get());
+    assertEquals(0, isFinishedCounter.get());
+    assertEquals(0, endCounter.get());
 
-      scheduler.schedule(command);
-      assertEquals(1, initCounter.get());
-      assertEquals(0, exeCounter.get());
-      assertEquals(0, isFinishedCounter.get());
-      assertEquals(0, endCounter.get());
+    scheduler.schedule(command);
+    assertEquals(1, initCounter.get());
+    assertEquals(0, exeCounter.get());
+    assertEquals(0, isFinishedCounter.get());
+    assertEquals(0, endCounter.get());
 
-      isFinishedHook.set(false);
-      scheduler.run();
-      assertEquals(1, initCounter.get());
-      assertEquals(1, exeCounter.get());
-      assertEquals(1, isFinishedCounter.get());
-      assertEquals(0, endCounter.get());
+    isFinishedHook.set(false);
+    scheduler.run();
+    assertEquals(1, initCounter.get());
+    assertEquals(1, exeCounter.get());
+    assertEquals(1, isFinishedCounter.get());
+    assertEquals(0, endCounter.get());
 
-      isFinishedHook.set(true);
-      scheduler.run();
-      assertEquals(1, initCounter.get());
-      assertEquals(2, exeCounter.get());
-      assertEquals(2, isFinishedCounter.get());
-      assertEquals(1, endCounter.get());
+    isFinishedHook.set(true);
+    scheduler.run();
+    assertEquals(1, initCounter.get());
+    assertEquals(2, exeCounter.get());
+    assertEquals(2, isFinishedCounter.get());
+    assertEquals(1, endCounter.get());
 
-      isFinishedHook.set(false);
-      scheduler.run();
-      assertEquals(2, initCounter.get());
-      assertEquals(3, exeCounter.get());
-      assertEquals(3, isFinishedCounter.get());
-      assertEquals(1, endCounter.get());
+    isFinishedHook.set(false);
+    scheduler.run();
+    assertEquals(2, initCounter.get());
+    assertEquals(3, exeCounter.get());
+    assertEquals(3, isFinishedCounter.get());
+    assertEquals(1, endCounter.get());
 
-      isFinishedHook.set(true);
-      scheduler.run();
-      assertEquals(2, initCounter.get());
-      assertEquals(4, exeCounter.get());
-      assertEquals(4, isFinishedCounter.get());
-      assertEquals(2, endCounter.get());
+    isFinishedHook.set(true);
+    scheduler.run();
+    assertEquals(2, initCounter.get());
+    assertEquals(4, exeCounter.get());
+    assertEquals(4, isFinishedCounter.get());
+    assertEquals(2, endCounter.get());
 
-      scheduler.cancel(command);
-      assertEquals(2, initCounter.get());
-      assertEquals(4, exeCounter.get());
-      assertEquals(4, isFinishedCounter.get());
-      assertEquals(2, endCounter.get());
-    }
+    scheduler.cancel(command);
+    assertEquals(2, initCounter.get());
+    assertEquals(4, exeCounter.get());
+    assertEquals(4, isFinishedCounter.get());
+    assertEquals(2, endCounter.get());
   }
 
   @Override

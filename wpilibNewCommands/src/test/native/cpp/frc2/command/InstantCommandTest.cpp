@@ -10,8 +10,6 @@ using namespace frc2;
 class InstantCommandTest : public CommandTestBase {};
 
 TEST_F(InstantCommandTest, InstantCommandSchedule) {
-  CommandScheduler scheduler = GetScheduler();
-
   int counter = 0;
 
   auto command = cmd::RunOnce([&counter] { counter++; });

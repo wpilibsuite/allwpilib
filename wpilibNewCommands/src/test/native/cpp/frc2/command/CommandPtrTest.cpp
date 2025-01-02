@@ -15,8 +15,6 @@ using namespace frc2;
 class CommandPtrTest : public CommandTestBase {};
 
 TEST_F(CommandPtrTest, MovedFrom) {
-  CommandScheduler scheduler = GetScheduler();
-
   int counter = 0;
 
   CommandPtr movedFrom = cmd::Run([&counter] { counter++; });

@@ -11,8 +11,6 @@ using namespace frc2;
 class StartEndCommandTest : public CommandTestBase {};
 
 TEST_F(StartEndCommandTest, StartEndCommandSchedule) {
-  CommandScheduler scheduler = GetScheduler();
-
   int counter = 0;
 
   auto command =

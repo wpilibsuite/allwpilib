@@ -16,8 +16,6 @@ using namespace frc2;
 class ParallelRaceGroupTest : public CommandTestBase {};
 
 TEST_F(ParallelRaceGroupTest, ParallelRaceSchedule) {
-  CommandScheduler scheduler = GetScheduler();
-
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command3Holder = std::make_unique<MockCommand>();
@@ -52,8 +50,6 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceSchedule) {
 }
 
 TEST_F(ParallelRaceGroupTest, ParallelRaceInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
-
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command3Holder = std::make_unique<MockCommand>();
@@ -88,16 +84,12 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceInterrupt) {
 }
 
 TEST_F(ParallelRaceGroupTest, ParallelRaceNotScheduledCancel) {
-  CommandScheduler scheduler = GetScheduler();
-
   auto group = cmd::Race(cmd::None(), cmd::None());
 
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(group));
 }
 
 TEST_F(ParallelRaceGroupTest, ParallelRaceCopy) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool finished = false;
 
   auto command = cmd::WaitUntil([&finished] { return finished; });
@@ -112,8 +104,6 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceCopy) {
 }
 
 TEST_F(ParallelRaceGroupTest, RaceGroupRequirement) {
-  CommandScheduler scheduler = GetScheduler();
-
   TestSubsystem requirement1;
   TestSubsystem requirement2;
   TestSubsystem requirement3;
@@ -133,8 +123,6 @@ TEST_F(ParallelRaceGroupTest, RaceGroupRequirement) {
 }
 
 TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnce) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool finished1 = false;
   bool finished2 = false;
   bool finished3 = false;
@@ -157,8 +145,6 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnce) {
 }
 
 TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTwice) {
-  CommandScheduler scheduler = GetScheduler();
-
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command3Holder = std::make_unique<MockCommand>();

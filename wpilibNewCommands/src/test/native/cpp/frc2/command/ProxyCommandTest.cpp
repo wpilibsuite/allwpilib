@@ -16,8 +16,6 @@ using namespace frc2;
 class ProxyCommandTest : public CommandTestBase {};
 
 TEST_F(ProxyCommandTest, NonOwningCommandSchedule) {
-  CommandScheduler& scheduler = CommandScheduler::GetInstance();
-
   bool scheduled = false;
 
   InstantCommand toSchedule([&scheduled] { scheduled = true; }, {});
@@ -31,8 +29,6 @@ TEST_F(ProxyCommandTest, NonOwningCommandSchedule) {
 }
 
 TEST_F(ProxyCommandTest, NonOwningCommandEnd) {
-  CommandScheduler& scheduler = CommandScheduler::GetInstance();
-
   bool finished = false;
 
   WaitUntilCommand toSchedule([&finished] { return finished; });

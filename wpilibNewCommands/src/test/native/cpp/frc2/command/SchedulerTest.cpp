@@ -15,8 +15,6 @@ using namespace frc2;
 class SchedulerTest : public CommandTestBase {};
 
 TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
-
   auto command = cmd::None();
 
   int counter = 0;
@@ -32,8 +30,6 @@ TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
 }
 
 TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
-
   auto command = cmd::Idle();
 
   int counter = 0;
@@ -48,8 +44,6 @@ TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {
 }
 
 TEST_F(SchedulerTest, SchedulerLambdaInterruptNoCause) {
-  CommandScheduler scheduler = GetScheduler();
-
   int counter = 0;
 
   scheduler.OnCommandInterrupt(
@@ -67,8 +61,7 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptNoCause) {
 }
 
 TEST_F(SchedulerTest, SchedulerLambdaInterruptCause) {
-  CommandScheduler scheduler = GetScheduler();
-
+  bool inTest = true;
   int counter = 0;
 
   TestSubsystem subsystem{};
@@ -76,21 +69,22 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCause) {
   InstantCommand interruptor([] {}, {&subsystem});
 
   scheduler.OnCommandInterrupt(
-      [&](const Command&, const std::optional<Command*>& cause) {
-        ASSERT_TRUE(cause);
-        EXPECT_EQ(&interruptor, *cause);
-        counter++;
+      [&](const Command& interrupted, const std::optional<Command*>& cause) {
+        if (inTest) {
+          ASSERT_TRUE(cause);
+          EXPECT_EQ(&interruptor, *cause);
+          counter++;
+        }
       });
 
   scheduler.Schedule(command);
   scheduler.Schedule(&interruptor);
 
   EXPECT_EQ(1, counter);
+  inTest = false;
 }
 
 TEST_F(SchedulerTest, SchedulerLambdaInterruptCauseInRunLoop) {
-  CommandScheduler scheduler = GetScheduler();
-
   int counter = 0;
 
   TestSubsystem subsystem{};
@@ -115,11 +109,19 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCauseInRunLoop) {
   EXPECT_EQ(1, counter);
 }
 
-TEST_F(SchedulerTest, RegisterSubsystem) {
-  CommandScheduler scheduler = GetScheduler();
+class UnregisteredSubsystem : public Subsystem {
+ public:
+  explicit UnregisteredSubsystem(int& runCount) : m_runCount{runCount} {}
 
+  void Periodic() override { ++m_runCount; }
+
+ private:
+  int& m_runCount;
+};
+
+TEST_F(SchedulerTest, RegisterSubsystem) {
   int counter = 0;
-  TestSubsystem system{[&counter] { counter++; }};
+  UnregisteredSubsystem system{counter};
 
   EXPECT_NO_FATAL_FAILURE(scheduler.RegisterSubsystem(&system));
 
@@ -128,10 +130,8 @@ TEST_F(SchedulerTest, RegisterSubsystem) {
 }
 
 TEST_F(SchedulerTest, UnregisterSubsystem) {
-  CommandScheduler scheduler = GetScheduler();
-
   int counter = 0;
-  TestSubsystem system{[&counter] { counter++; }};
+  UnregisteredSubsystem system{counter};
 
   scheduler.RegisterSubsystem(&system);
 
@@ -142,8 +142,6 @@ TEST_F(SchedulerTest, UnregisterSubsystem) {
 }
 
 TEST_F(SchedulerTest, SchedulerCancelAll) {
-  CommandScheduler scheduler = GetScheduler();
-
   auto command1 = cmd::Idle();
   auto command2 = cmd::Idle();
 
@@ -164,8 +162,6 @@ TEST_F(SchedulerTest, SchedulerCancelAll) {
 }
 
 TEST_F(SchedulerTest, ScheduleScheduledNoOp) {
-  CommandScheduler scheduler = GetScheduler();
-
   int counter = 0;
 
   auto command = cmd::StartEnd([&counter] { counter++; }, [] {});
@@ -194,7 +190,6 @@ class TrackDestroyCommand
 };
 
 TEST_F(SchedulerTest, ScheduleCommandPtr) {
-  CommandScheduler scheduler = GetScheduler();
   int destructionCounter = 0;
   int runCounter = 0;
 
