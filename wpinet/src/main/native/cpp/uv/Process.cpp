@@ -5,8 +5,7 @@
 #include "wpinet/uv/Process.h"
 
 #include <memory>
-
-#include <wpi/SmallString.h>
+#include <vector>
 
 #include "wpinet/uv/Loop.h"
 #include "wpinet/uv/Pipe.h"
@@ -27,22 +26,22 @@ std::shared_ptr<Process> Process::SpawnArray(Loop& loop, std::string_view file,
     h.exited(status, signal);
   };
 
-  SmallString<128> fileBuf{file};
+  std::string fileBuf{file};
   coptions.file = fileBuf.c_str();
   coptions.cwd = nullptr;
   coptions.flags = 0;
   coptions.uid = 0;
   coptions.gid = 0;
 
-  SmallVector<char*, 4> argsBuf;
-  SmallVector<char*, 4> envBuf;
+  std::vector<char*> argsBuf;
+  std::vector<char*> envBuf;
   struct StdioContainer : public uv_stdio_container_t {
     StdioContainer() {
       flags = UV_IGNORE;
       data.fd = 0;
     }
   };
-  SmallVector<StdioContainer, 4> stdioBuf;
+  std::vector<StdioContainer> stdioBuf;
 
   for (auto&& o : options) {
     switch (o.m_type) {

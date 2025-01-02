@@ -14,7 +14,6 @@
 #include <string_view>
 
 #include <wpi/Signal.h>
-#include <wpi/SmallVector.h>
 
 #include "wpinet/uv/Handle.h"
 
@@ -68,11 +67,6 @@ class Process final : public HandleImpl<Process, uv_process_t> {
 
     /*implicit*/ Option(std::string_view arg)  // NOLINT
         : m_strData(arg) {
-      m_data.str = m_strData.c_str();
-    }
-
-    /*implicit*/ Option(const SmallVectorImpl<char>& arg)  // NOLINT
-        : m_strData(arg.data(), arg.size()) {
       m_data.str = m_strData.c_str();
     }
 
