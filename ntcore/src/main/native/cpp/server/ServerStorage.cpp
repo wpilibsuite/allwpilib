@@ -582,9 +582,8 @@ std::string ServerStorage::LoadPersistent(std::string_view in) {
       } else {
         // raw
         if (auto v = valueIt->second.get_ptr<std::string*>()) {
-          std::vector<uint8_t> data;
-          wpi::Base64Decode(*v, &data);
-          value = Value::MakeRaw(std::move(data), time);
+          size_t count;
+          value = Value::MakeRaw(wpi::Base64DecodeUnsigned(*v, &count), time);
         } else {
           error = "value type mismatch, expected string";
           goto err;

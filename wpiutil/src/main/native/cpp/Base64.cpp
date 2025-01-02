@@ -126,10 +126,12 @@ std::string Base64Decode(std::string_view encoded, size_t* num_read) {
   return plain;
 }
 
-size_t Base64Decode(std::string_view encoded, std::vector<uint8_t>* plain) {
-  plain->resize(0);
-  raw_uvector_ostream os(*plain);
-  return Base64Decode(os, encoded);
+std::vector<uint8_t> Base64DecodeUnsigned(std::string_view encoded,
+                                          size_t* num_read) {
+  std::vector<uint8_t> plain;
+  raw_uvector_ostream os(plain);
+  *num_read = Base64Decode(os, encoded);
+  return plain;
 }
 
 static const char basis_64[] =
