@@ -20,7 +20,8 @@ size_t Base64Decode(raw_ostream& os, std::string_view encoded);
 
 std::string Base64Decode(std::string_view encoded, size_t* num_read);
 
-size_t Base64Decode(std::string_view encoded, std::vector<uint8_t>* plain);
+std::vector<uint8_t> Base64DecodeUnsigned(std::string_view encoded,
+                                          size_t* num_read);
 
 void Base64Encode(raw_ostream& os, std::string_view plain);
 
