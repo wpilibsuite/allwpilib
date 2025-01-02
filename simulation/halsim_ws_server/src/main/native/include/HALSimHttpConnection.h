@@ -52,7 +52,7 @@ class HALSimHttpConnection
   bool m_isWsConnected = false;
 
   // these are only valid if the websocket is connected
-  wpi::uv::SimpleBufferPool<4> m_buffers;
+  wpi::uv::SimpleBufferPool m_buffers;
   std::mutex m_buffers_mutex;
 };
 
