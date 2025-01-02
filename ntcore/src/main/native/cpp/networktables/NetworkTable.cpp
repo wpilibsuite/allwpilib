@@ -11,7 +11,6 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 
@@ -63,18 +62,18 @@ std::vector<std::string> NetworkTable::GetHierarchy(std::string_view key) {
   std::vector<std::string> hierarchy;
   hierarchy.emplace_back(1, PATH_SEPARATOR_CHAR);
   // for each path element, add it to the end of what we built previously
-  wpi::SmallString<128> path;
+  std::string path;
   bool any = false;
   wpi::split(key, PATH_SEPARATOR_CHAR, -1, false, [&](auto part) {
     any = true;
     path += PATH_SEPARATOR_CHAR;
     path += part;
-    hierarchy.emplace_back(path.str());
+    hierarchy.emplace_back(path);  // copy, don't move; we need to keep building
   });
   // handle trailing slash
   if (any && key.back() == PATH_SEPARATOR_CHAR) {
     path += PATH_SEPARATOR_CHAR;
-    hierarchy.emplace_back(path.str());
+    hierarchy.emplace_back(std::move(path));
   }
   return hierarchy;
 }
