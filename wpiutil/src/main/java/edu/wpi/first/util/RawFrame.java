@@ -18,6 +18,8 @@ public class RawFrame implements AutoCloseable {
   private int m_height;
   private int m_stride;
   private PixelFormat m_pixelFormat = PixelFormat.kUnknown;
+  private long m_time;
+  private TimestampSource m_timeSource = TimestampSource.kUnknown;
 
   /** Construct a new empty RawFrame. */
   public RawFrame() {
@@ -43,12 +45,15 @@ public class RawFrame implements AutoCloseable {
    * @param stride The number of bytes in each row of image data
    * @param pixelFormat The PixelFormat of the frame
    */
-  void setDataJNI(ByteBuffer data, int width, int height, int stride, int pixelFormat) {
+  void setDataJNI(
+      ByteBuffer data, int width, int height, int stride, int pixelFormat, long time, int timeSrc) {
     m_data = data;
     m_width = width;
     m_height = height;
     m_stride = stride;
     m_pixelFormat = PixelFormat.getFromInt(pixelFormat);
+    m_time = time;
+    m_timeSource = TimestampSource.getFromInt(timeSrc);
   }
 
   /**
@@ -59,11 +64,13 @@ public class RawFrame implements AutoCloseable {
    * @param stride The number of bytes in each row of image data
    * @param pixelFormat The PixelFormat of the frame
    */
-  void setInfoJNI(int width, int height, int stride, int pixelFormat) {
+  void setInfoJNI(int width, int height, int stride, int pixelFormat, long time, int timeSrc) {
     m_width = width;
     m_height = height;
     m_stride = stride;
     m_pixelFormat = PixelFormat.getFromInt(pixelFormat);
+    m_time = time;
+    m_timeSource = TimestampSource.getFromInt(timeSrc);
   }
 
   /**
@@ -108,6 +115,19 @@ public class RawFrame implements AutoCloseable {
         height,
         stride,
         pixelFormat.getValue());
+  }
+
+  /**
+   * Update this frame's timestamp info.
+   *
+   * @param frameTime the time this frame was grabbed at. This uses the same time base as
+   *     wpi::Now(), in us.
+   * @param frameTimeSource the time source for the timestamp this frame was grabbed at.
+   */
+  public void setTimeInfo(long frameTime, TimestampSource frameTimeSource) {
+    m_time = frameTime;
+    m_timeSource = frameTimeSource;
+    WPIUtilJNI.setRawFrameTime(m_nativeObj, frameTime, frameTimeSource.getValue());
   }
 
   /**
@@ -184,5 +204,23 @@ public class RawFrame implements AutoCloseable {
    */
   public PixelFormat getPixelFormat() {
     return m_pixelFormat;
+  }
+
+  /**
+   * Get the time this frame was grabbed at. This uses the same time base as wpi::Now(), in us.
+   *
+   * @return Time in 1 us increments.
+   */
+  public long getTimestamp() {
+    return m_time;
+  }
+
+  /**
+   * Get the time source for the timestamp this frame was grabbed at.
+   *
+   * @return Time source
+   */
+  public TimestampSource getTimestampSource() {
+    return m_timeSource;
   }
 }
