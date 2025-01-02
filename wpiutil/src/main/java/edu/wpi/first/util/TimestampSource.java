@@ -34,10 +34,10 @@ public enum TimestampSource {
   /**
    * Gets a TimestampSource enum value from its integer value.
    *
-   * @param TimestampSource integer value
+   * @param timestampSource integer value
    * @return Enum value
    */
   public static TimestampSource getFromInt(int timestampSource) {
-    return s_values[timestampSource];
+    return timestampSource >= 0 && timestampSource < s_values.length ? s_values[timestampSource] : kUnknown;
   }
 }
