@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <utility>
+
 #include <fmt/format.h>
 #include <wpi/SmallVector.h>
 #include <wpi/timestamp.h>
@@ -32,19 +34,9 @@ NTFMSModel::NTFMSModel(nt::NetworkTableInstance inst, std::string_view path)
       m_estop{fmt::format("NT_FMS:EStop:{}", path)},
       m_enabled{fmt::format("NT_FMS:RobotEnabled:{}", path)},
       m_test{fmt::format("NT_FMS:TestMode:{}", path)},
-      m_autonomous{fmt::format("NT_FMS:AutonomousMode:{}", path)} {
-  m_fmsAttached.SetDigital(true);
-  m_dsAttached.SetDigital(true);
-  m_estop.SetDigital(true);
-  m_enabled.SetDigital(true);
-  m_test.SetDigital(true);
-  m_autonomous.SetDigital(true);
-}
-
-std::string_view NTFMSModel::GetGameSpecificMessage(
-    wpi::SmallVectorImpl<char>& buf) {
-  return m_gameSpecificMessage.Get(buf, "");
-}
+      m_autonomous{fmt::format("NT_FMS:AutonomousMode:{}", path)},
+      m_gameSpecificMessageData{
+          fmt::format("NT_FMS:GameSpecificMessage:{}", path)} {}
 
 void NTFMSModel::Update() {
   for (auto&& v : m_alliance.ReadQueue()) {
@@ -69,6 +61,9 @@ void NTFMSModel::Update() {
     m_estop.SetValue(((controlWord & 0x08) != 0) ? 1 : 0, v.time);
     m_fmsAttached.SetValue(((controlWord & 0x10) != 0) ? 1 : 0, v.time);
     m_dsAttached.SetValue(((controlWord & 0x20) != 0) ? 1 : 0, v.time);
+  }
+  for (auto&& v : m_gameSpecificMessage.ReadQueue()) {
+    m_gameSpecificMessageData.SetValue(std::move(v.value), v.time);
   }
 }
 

@@ -14,14 +14,15 @@
 
 namespace glass {
 
-class DataSource;
+class BooleanSource;
+class DoubleSource;
 
 class CompressorModel : public Model {
  public:
-  virtual DataSource* GetRunningData() = 0;
-  virtual DataSource* GetEnabledData() = 0;
-  virtual DataSource* GetPressureSwitchData() = 0;
-  virtual DataSource* GetCurrentData() = 0;
+  virtual BooleanSource* GetRunningData() = 0;
+  virtual BooleanSource* GetEnabledData() = 0;
+  virtual BooleanSource* GetPressureSwitchData() = 0;
+  virtual DoubleSource* GetCurrentData() = 0;
 
   virtual void SetRunning(bool val) = 0;
   virtual void SetEnabled(bool val) = 0;
@@ -31,7 +32,7 @@ class CompressorModel : public Model {
 
 class SolenoidModel : public Model {
  public:
-  virtual DataSource* GetOutputData() = 0;
+  virtual BooleanSource* GetOutputData() = 0;
 
   virtual void SetOutput(bool val) = 0;
 };

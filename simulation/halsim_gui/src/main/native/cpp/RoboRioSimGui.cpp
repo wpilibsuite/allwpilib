@@ -36,10 +36,10 @@ class RoboRioUser6VRailSimModel : public glass::RoboRioRailModel {
  public:
   void Update() override {}
   bool Exists() override { return true; }
-  glass::DataSource* GetVoltageData() override { return &m_voltage; }
-  glass::DataSource* GetCurrentData() override { return &m_current; }
-  glass::DataSource* GetActiveData() override { return &m_active; }
-  glass::DataSource* GetFaultsData() override { return &m_faults; }
+  glass::DoubleSource* GetVoltageData() override { return &m_voltage; }
+  glass::DoubleSource* GetCurrentData() override { return &m_current; }
+  glass::BooleanSource* GetActiveData() override { return &m_active; }
+  glass::IntegerSource* GetFaultsData() override { return &m_faults; }
 
   void SetVoltage(double val) override { HALSIM_SetRoboRioUserVoltage6V(val); }
   void SetCurrent(double val) override { HALSIM_SetRoboRioUserCurrent6V(val); }
@@ -57,10 +57,10 @@ class RoboRioUser5VRailSimModel : public glass::RoboRioRailModel {
  public:
   void Update() override {}
   bool Exists() override { return true; }
-  glass::DataSource* GetVoltageData() override { return &m_voltage; }
-  glass::DataSource* GetCurrentData() override { return &m_current; }
-  glass::DataSource* GetActiveData() override { return &m_active; }
-  glass::DataSource* GetFaultsData() override { return &m_faults; }
+  glass::DoubleSource* GetVoltageData() override { return &m_voltage; }
+  glass::DoubleSource* GetCurrentData() override { return &m_current; }
+  glass::BooleanSource* GetActiveData() override { return &m_active; }
+  glass::IntegerSource* GetFaultsData() override { return &m_faults; }
 
   void SetVoltage(double val) override { HALSIM_SetRoboRioUserVoltage5V(val); }
   void SetCurrent(double val) override { HALSIM_SetRoboRioUserCurrent5V(val); }
@@ -78,10 +78,10 @@ class RoboRioUser3V3RailSimModel : public glass::RoboRioRailModel {
  public:
   void Update() override {}
   bool Exists() override { return true; }
-  glass::DataSource* GetVoltageData() override { return &m_voltage; }
-  glass::DataSource* GetCurrentData() override { return &m_current; }
-  glass::DataSource* GetActiveData() override { return &m_active; }
-  glass::DataSource* GetFaultsData() override { return &m_faults; }
+  glass::DoubleSource* GetVoltageData() override { return &m_voltage; }
+  glass::DoubleSource* GetCurrentData() override { return &m_current; }
+  glass::BooleanSource* GetActiveData() override { return &m_active; }
+  glass::IntegerSource* GetFaultsData() override { return &m_faults; }
 
   void SetVoltage(double val) override { HALSIM_SetRoboRioUserVoltage3V3(val); }
   void SetCurrent(double val) override { HALSIM_SetRoboRioUserCurrent3V3(val); }
@@ -105,10 +105,10 @@ class RoboRioSimModel : public glass::RoboRioModel {
   glass::RoboRioRailModel* GetUser5VRail() override { return &m_user5VRail; }
   glass::RoboRioRailModel* GetUser3V3Rail() override { return &m_user3V3Rail; }
 
-  glass::DataSource* GetUserButton() override { return &m_userButton; }
-  glass::DataSource* GetVInVoltageData() override { return &m_vInVoltage; }
-  glass::DataSource* GetVInCurrentData() override { return &m_vInCurrent; }
-  glass::DataSource* GetBrownoutVoltage() override {
+  glass::BooleanSource* GetUserButton() override { return &m_userButton; }
+  glass::DoubleSource* GetVInVoltageData() override { return &m_vInVoltage; }
+  glass::DoubleSource* GetVInCurrentData() override { return &m_vInCurrent; }
+  glass::DoubleSource* GetBrownoutVoltage() override {
     return &m_brownoutVoltage;
   }
 

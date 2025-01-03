@@ -12,15 +12,15 @@
 
 namespace glass {
 
-class DataSource;
+class DoubleSource;
 
 class PowerDistributionModel : public Model {
  public:
   virtual int GetNumChannels() const = 0;
 
-  virtual DataSource* GetTemperatureData() = 0;
-  virtual DataSource* GetVoltageData() = 0;
-  virtual DataSource* GetCurrentData(int channel) = 0;
+  virtual DoubleSource* GetTemperatureData() = 0;
+  virtual DoubleSource* GetVoltageData() = 0;
+  virtual DoubleSource* GetCurrentData(int channel) = 0;
 
   virtual void SetTemperature(double val) = 0;
   virtual void SetVoltage(double val) = 0;

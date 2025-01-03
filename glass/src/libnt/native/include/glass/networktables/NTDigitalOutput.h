@@ -34,7 +34,7 @@ class NTDigitalOutputModel : public DIOModel {
 
   bool IsInput() const override { return true; }
 
-  DataSource* GetValueData() override { return &m_valueData; }
+  BooleanSource* GetValueData() override { return &m_valueData; }
 
   void SetValue(bool val) override;
 
@@ -48,7 +48,7 @@ class NTDigitalOutputModel : public DIOModel {
   nt::StringSubscriber m_name;
   nt::BooleanSubscriber m_controllable;
 
-  DataSource m_valueData;
+  BooleanSource m_valueData;
   std::string m_nameValue;
   bool m_controllableValue = false;
 };

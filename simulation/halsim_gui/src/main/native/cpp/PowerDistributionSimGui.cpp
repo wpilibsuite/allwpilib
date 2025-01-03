@@ -47,9 +47,9 @@ class PowerDistributionSimModel : public glass::PowerDistributionModel {
 
   int GetNumChannels() const override { return m_currents.size(); }
 
-  glass::DataSource* GetTemperatureData() override { return &m_temp; }
-  glass::DataSource* GetVoltageData() override { return &m_voltage; }
-  glass::DataSource* GetCurrentData(int channel) override {
+  glass::DoubleSource* GetTemperatureData() override { return &m_temp; }
+  glass::DoubleSource* GetVoltageData() override { return &m_voltage; }
+  glass::DoubleSource* GetCurrentData(int channel) override {
     return m_currents[channel].get();
   }
 

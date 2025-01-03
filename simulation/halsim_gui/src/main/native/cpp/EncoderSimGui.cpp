@@ -12,12 +12,12 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <glass/DataSource.h>
 #include <glass/hardware/Encoder.h>
 #include <hal/Ports.h>
 #include <hal/simulation/EncoderData.h>
 #include <hal/simulation/SimDeviceData.h>
 
-#include "HALDataSource.h"
 #include "HALSimGui.h"
 
 using namespace halsimgui;
@@ -45,9 +45,7 @@ class EncoderSimModel : public glass::EncoderModel {
         m_periodCallback{HALSIM_RegisterEncoderPeriodCallback(
             index, PeriodCallbackFunc, this, true)},
         m_directionCallback{HALSIM_RegisterEncoderDirectionCallback(
-            index, DirectionCallbackFunc, this, true)} {
-    m_direction.SetDigital(true);
-  }
+            index, DirectionCallbackFunc, this, true)} {}
 
   EncoderSimModel(int32_t index, int channelA, int channelB)
       : EncoderSimModel(fmt::format("Encoder[{},{}]", channelA, channelB),
@@ -90,14 +88,14 @@ class EncoderSimModel : public glass::EncoderModel {
   int GetChannelA() const override { return m_channelA; }
   int GetChannelB() const override { return m_channelB; }
 
-  glass::DataSource* GetDistancePerPulseData() override {
+  glass::DoubleSource* GetDistancePerPulseData() override {
     return &m_distancePerPulse;
   }
-  glass::DataSource* GetCountData() override { return &m_count; }
-  glass::DataSource* GetPeriodData() override { return &m_period; }
-  glass::DataSource* GetDirectionData() override { return &m_direction; }
-  glass::DataSource* GetDistanceData() override { return &m_distance; }
-  glass::DataSource* GetRateData() override { return &m_rate; }
+  glass::IntegerSource* GetCountData() override { return &m_count; }
+  glass::DoubleSource* GetPeriodData() override { return &m_period; }
+  glass::BooleanSource* GetDirectionData() override { return &m_direction; }
+  glass::DoubleSource* GetDistanceData() override { return &m_distance; }
+  glass::DoubleSource* GetRateData() override { return &m_rate; }
 
   double GetMaxPeriod() override { return HALSIM_GetEncoderMaxPeriod(m_index); }
   bool GetReverseDirection() override {
@@ -178,12 +176,12 @@ class EncoderSimModel : public glass::EncoderModel {
     }
   }
 
-  glass::DataSource m_distancePerPulse;
-  glass::DataSource m_count;
-  glass::DataSource m_period;
-  glass::DataSource m_direction;
-  glass::DataSource m_distance;
-  glass::DataSource m_rate;
+  glass::DoubleSource m_distancePerPulse;
+  glass::IntegerSource m_count;
+  glass::DoubleSource m_period;
+  glass::BooleanSource m_direction;
+  glass::DoubleSource m_distance;
+  glass::DoubleSource m_rate;
 
   int32_t m_index;
   int m_channelA;

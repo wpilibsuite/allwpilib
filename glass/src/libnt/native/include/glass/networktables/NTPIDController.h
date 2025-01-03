@@ -25,11 +25,11 @@ class NTPIDControllerModel : public PIDControllerModel {
 
   const char* GetName() const override { return m_nameValue.c_str(); }
 
-  DataSource* GetPData() override { return &m_pData; }
-  DataSource* GetIData() override { return &m_iData; }
-  DataSource* GetDData() override { return &m_dData; }
-  DataSource* GetSetpointData() override { return &m_setpointData; }
-  DataSource* GetIZoneData() override { return &m_iZoneData; }
+  DoubleSource* GetPData() override { return &m_pData; }
+  DoubleSource* GetIData() override { return &m_iData; }
+  DoubleSource* GetDData() override { return &m_dData; }
+  DoubleSource* GetSetpointData() override { return &m_setpointData; }
+  DoubleSource* GetIZoneData() override { return &m_iZoneData; }
 
   void SetP(double value) override;
   void SetI(double value) override;
@@ -51,11 +51,11 @@ class NTPIDControllerModel : public PIDControllerModel {
   nt::DoubleEntry m_setpoint;
   nt::DoubleEntry m_iZone;
 
-  DataSource m_pData;
-  DataSource m_iData;
-  DataSource m_dData;
-  DataSource m_setpointData;
-  DataSource m_iZoneData;
+  DoubleSource m_pData;
+  DoubleSource m_iData;
+  DoubleSource m_dData;
+  DoubleSource m_setpointData;
+  DoubleSource m_iZoneData;
 
   std::string m_nameValue;
   bool m_controllableValue = false;
