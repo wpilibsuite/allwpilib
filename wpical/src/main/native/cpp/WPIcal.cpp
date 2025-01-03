@@ -108,6 +108,12 @@ void openDirectoryButton(const char* text, std::string& selected_directory) {
   }
 }
 
+std::string getFileName(std::string path) {
+  size_t lastSlash = path.find_last_of("/\\");
+  size_t lastDot = path.find_last_of(".");
+  return path.substr(lastSlash + 1, lastDot - lastSlash - 1);
+}
+
 static void DisplayGui() {
   ImGui::GetStyle().WindowRounding = 0;
 
@@ -523,8 +529,20 @@ static void DisplayGui() {
     if (!selected_field_map.empty()) {
       drawCheck();
     }
-    openFilesButton("Add Field Calibration", selected_field_calibrations,
+    openFilesButton("Select Field Calibrations", selected_field_calibrations,
                     "JSON", "*.json");
+    ImGui::Separator();
+    if (!selected_field_map.empty() && !selected_field_calibrations.empty()) {
+      for (auto& file : selected_field_calibrations) {
+        ImGui::Selectable(getFileName(file).c_str());
+        if (ImGui::BeginDragDropSource()) {
+          ImGui::SetDragDropPayload("FieldCalibration", &selected_field_map,
+                                    sizeof(selected_field_map));
+          ImGui::TextUnformatted(selected_field_map.c_str());
+          ImGui::EndDragDropSource();
+        }
+      }
+    }
     ImGui::Separator();
     if (ImGui::Button("Close", ImVec2(120, 0))) {
       ImGui::CloseCurrentPopup();
