@@ -531,7 +531,7 @@ static void DisplayGui() {
     }
     openFilesButton("Select Field Calibrations", selected_field_calibrations,
                     "JSON", "*.json");
-    ImGui::Separator();
+
     if (!selected_field_map.empty() && !selected_field_calibrations.empty()) {
       for (auto& file : selected_field_calibrations) {
         ImGui::Selectable(getFileName(file).c_str());
