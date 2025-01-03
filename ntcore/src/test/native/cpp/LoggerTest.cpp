@@ -27,7 +27,7 @@ class LoggerTest : public ::testing::Test {
 
 void LoggerTest::Generate() {
   // generate info message
-  nt::StartClient4(m_inst, "");
+  nt::StartClient(m_inst, "");
 
   // generate error message
   nt::Publish(nt::Handle(nt::Handle{m_inst}.GetInst(), 5, nt::Handle::kTopic),
