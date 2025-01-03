@@ -43,7 +43,7 @@ typedef NT_Handle NT_Topic;
 typedef NT_Handle NT_Subscriber;
 typedef NT_Handle NT_Publisher;
 
-/** Default network tables port number (NT4) */
+/** Default network tables port number */
 #define NT_DEFAULT_PORT 5810
 
 /** NetworkTables data types. */

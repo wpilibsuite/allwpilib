@@ -50,7 +50,7 @@ TEST_F(TimeSyncTest, TestServer) {
   ASSERT_FALSE(data->valid);
 }
 
-TEST_F(TimeSyncTest, TestClient4) {
+TEST_F(TimeSyncTest, TestClient) {
   m_inst.StartClient("client");
   auto offset = m_inst.GetServerTimeOffset();
   ASSERT_FALSE(offset);
