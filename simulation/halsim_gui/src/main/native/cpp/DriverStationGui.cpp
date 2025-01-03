@@ -197,11 +197,11 @@ class JoystickModel {
   int axisCount;
   int buttonCount;
   int povCount;
-  std::unique_ptr<glass::DataSource> axes[HAL_kMaxJoystickAxes];
+  std::unique_ptr<glass::DoubleSource> axes[HAL_kMaxJoystickAxes];
   // use pointer instead of unique_ptr to allow it to be passed directly
   // to DrawLEDSources()
-  glass::DataSource* buttons[32];
-  std::unique_ptr<glass::DataSource> povs[HAL_kMaxJoystickPOVs];
+  glass::BooleanSource* buttons[32];
+  std::unique_ptr<glass::IntegerSource> povs[HAL_kMaxJoystickPOVs];
 
  private:
   static void CallbackFunc(const char*, void* param, const HAL_Value*);
@@ -214,19 +214,18 @@ class FMSSimModel : public glass::FMSModel {
  public:
   FMSSimModel();
 
-  glass::DataSource* GetFmsAttachedData() override { return &m_fmsAttached; }
-  glass::DataSource* GetDsAttachedData() override { return &m_dsAttached; }
-  glass::DataSource* GetAllianceStationIdData() override {
+  glass::BooleanSource* GetFmsAttachedData() override { return &m_fmsAttached; }
+  glass::BooleanSource* GetDsAttachedData() override { return &m_dsAttached; }
+  glass::IntegerSource* GetAllianceStationIdData() override {
     return &m_allianceStationId;
   }
-  glass::DataSource* GetMatchTimeData() override { return &m_matchTime; }
-  glass::DataSource* GetEStopData() override { return &m_estop; }
-  glass::DataSource* GetEnabledData() override { return &m_enabled; }
-  glass::DataSource* GetTestData() override { return &m_test; }
-  glass::DataSource* GetAutonomousData() override { return &m_autonomous; }
-  std::string_view GetGameSpecificMessage(
-      wpi::SmallVectorImpl<char>& buf) override {
-    return m_gameMessage;
+  glass::DoubleSource* GetMatchTimeData() override { return &m_matchTime; }
+  glass::BooleanSource* GetEStopData() override { return &m_estop; }
+  glass::BooleanSource* GetEnabledData() override { return &m_enabled; }
+  glass::BooleanSource* GetTestData() override { return &m_test; }
+  glass::BooleanSource* GetAutonomousData() override { return &m_autonomous; }
+  glass::StringSource* GetGameSpecificMessageData() override {
+    return &m_gameMessage;
   }
 
   void SetFmsAttached(bool val) override { m_fmsAttached.SetValue(val); }
@@ -240,7 +239,7 @@ class FMSSimModel : public glass::FMSModel {
   void SetTest(bool val) override { m_test.SetValue(val); }
   void SetAutonomous(bool val) override { m_autonomous.SetValue(val); }
   void SetGameSpecificMessage(std::string_view val) override {
-    m_gameMessage = val;
+    m_gameMessage.SetValue(val);
   }
 
   void UpdateHAL();
@@ -252,16 +251,16 @@ class FMSSimModel : public glass::FMSModel {
   bool IsReadOnly() override;
 
  private:
-  glass::DataSource m_fmsAttached{"FMS:FMSAttached"};
-  glass::DataSource m_dsAttached{"FMS:DSAttached"};
-  glass::DataSource m_allianceStationId{"FMS:AllianceStationID"};
-  glass::DataSource m_matchTime{"FMS:MatchTime"};
-  glass::DataSource m_estop{"FMS:EStop"};
-  glass::DataSource m_enabled{"FMS:RobotEnabled"};
-  glass::DataSource m_test{"FMS:TestMode"};
-  glass::DataSource m_autonomous{"FMS:AutonomousMode"};
+  glass::BooleanSource m_fmsAttached{"FMS:FMSAttached"};
+  glass::BooleanSource m_dsAttached{"FMS:DSAttached"};
+  glass::IntegerSource m_allianceStationId{"FMS:AllianceStationID"};
+  glass::DoubleSource m_matchTime{"FMS:MatchTime"};
+  glass::BooleanSource m_estop{"FMS:EStop"};
+  glass::BooleanSource m_enabled{"FMS:RobotEnabled"};
+  glass::BooleanSource m_test{"FMS:TestMode"};
+  glass::BooleanSource m_autonomous{"FMS:AutonomousMode"};
   double m_startMatchTime = -1.0;
-  std::string m_gameMessage;
+  glass::StringSource m_gameMessage{"FMS:GameSpecificMessage"};
 };
 
 }  // namespace
@@ -297,7 +296,7 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
   HALSIM_GetJoystickAxes(index, &halAxes);
   axisCount = halAxes.count;
   for (int i = 0; i < axisCount; ++i) {
-    axes[i] = std::make_unique<glass::DataSource>(
+    axes[i] = std::make_unique<glass::DoubleSource>(
         fmt::format("Joystick[{}] Axis[{}]", index, i));
   }
 
@@ -305,9 +304,8 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
   HALSIM_GetJoystickButtons(index, &halButtons);
   buttonCount = halButtons.count;
   for (int i = 0; i < buttonCount; ++i) {
-    buttons[i] = new glass::DataSource(
+    buttons[i] = new glass::BooleanSource(
         fmt::format("Joystick[{}] Button[{}]", index, i + 1));
-    buttons[i]->SetDigital(true);
   }
   for (int i = buttonCount; i < 32; ++i) {
     buttons[i] = nullptr;
@@ -317,7 +315,7 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
   HALSIM_GetJoystickPOVs(index, &halPOVs);
   povCount = halPOVs.count;
   for (int i = 0; i < povCount; ++i) {
-    povs[i] = std::make_unique<glass::DataSource>(
+    povs[i] = std::make_unique<glass::IntegerSource>(
         fmt::format("Joystick[{}] POV [{}]", index, i));
   }
 
@@ -1157,12 +1155,6 @@ static void DriverStationExecute() {
 }
 
 FMSSimModel::FMSSimModel() {
-  m_fmsAttached.SetDigital(true);
-  m_dsAttached.SetDigital(true);
-  m_estop.SetDigital(true);
-  m_enabled.SetDigital(true);
-  m_test.SetDigital(true);
-  m_autonomous.SetDigital(true);
   m_matchTime.SetValue(-1.0);
   m_allianceStationId.SetValue(HAL_AllianceStationID_kRed1);
 }
@@ -1176,7 +1168,7 @@ void FMSSimModel::UpdateHAL() {
   HALSIM_SetDriverStationTest(m_test.GetValue());
   HALSIM_SetDriverStationAutonomous(m_autonomous.GetValue());
   HALSIM_SetDriverStationMatchTime(m_matchTime.GetValue());
-  auto str = wpi::make_string(m_gameMessage);
+  auto str = wpi::make_string(m_gameMessage.GetValue());
   HALSIM_SetGameSpecificMessage(&str);
   HALSIM_SetDriverStationDsAttached(m_dsAttached.GetValue());
 }
@@ -1214,8 +1206,10 @@ void FMSSimModel::Update() {
 
   HAL_MatchInfo info;
   HALSIM_GetMatchInfo(&info);
-  m_gameMessage.assign(info.gameSpecificMessage,
-                       info.gameSpecificMessage + info.gameSpecificMessageSize);
+  m_gameMessage.SetValue(
+      std::string_view{reinterpret_cast<const char*>(info.gameSpecificMessage),
+                       reinterpret_cast<const char*>(info.gameSpecificMessage) +
+                           info.gameSpecificMessageSize});
 }
 
 bool FMSSimModel::IsReadOnly() {

@@ -10,11 +10,11 @@
 
 namespace glass {
 
-class DataSource;
+class DoubleSource;
 
 class AnalogOutputModel : public Model {
  public:
-  virtual DataSource* GetVoltageData() = 0;
+  virtual DoubleSource* GetVoltageData() = 0;
 
   virtual void SetVoltage(double val) = 0;
 };

@@ -33,10 +33,10 @@ class RelaySimModel : public glass::RelayModel {
            HALSIM_GetRelayInitializedReverse(m_index);
   }
 
-  glass::DataSource* GetForwardData() override {
+  glass::BooleanSource* GetForwardData() override {
     return HALSIM_GetRelayInitializedForward(m_index) ? &m_forward : nullptr;
   }
-  glass::DataSource* GetReverseData() override {
+  glass::BooleanSource* GetReverseData() override {
     return HALSIM_GetRelayInitializedReverse(m_index) ? &m_reverse : nullptr;
   }
 

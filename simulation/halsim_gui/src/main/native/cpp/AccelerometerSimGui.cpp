@@ -32,9 +32,9 @@ class AccelerometerSimModel : public glass::AccelerometerModel {
 
   bool Exists() override { return HALSIM_GetAccelerometerActive(m_index); }
 
-  glass::DataSource* GetXData() override { return &m_xData; }
-  glass::DataSource* GetYData() override { return &m_yData; }
-  glass::DataSource* GetZData() override { return &m_zData; }
+  glass::DoubleSource* GetXData() override { return &m_xData; }
+  glass::DoubleSource* GetYData() override { return &m_yData; }
+  glass::DoubleSource* GetZData() override { return &m_zData; }
 
   int GetRange() override { return HALSIM_GetAccelerometerRange(m_index); }
 

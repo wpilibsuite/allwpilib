@@ -12,14 +12,14 @@
 
 namespace glass {
 
-class DataSource;
+class DoubleSource;
 
 class AnalogInputModel : public Model {
  public:
   virtual bool IsGyro() const = 0;
   virtual const char* GetSimDevice() const = 0;
 
-  virtual DataSource* GetVoltageData() = 0;
+  virtual DoubleSource* GetVoltageData() = 0;
 
   virtual void SetVoltage(double val) = 0;
 };

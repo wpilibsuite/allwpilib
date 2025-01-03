@@ -7,12 +7,12 @@
 #include "glass/Model.h"
 
 namespace glass {
-class DataSource;
+class DoubleSource;
 class MotorControllerModel : public Model {
  public:
   virtual const char* GetName() const = 0;
   virtual const char* GetSimDevice() const = 0;
-  virtual DataSource* GetPercentData() = 0;
+  virtual DoubleSource* GetPercentData() = 0;
   virtual void SetPercent(double value) = 0;
 };
 void DisplayMotorController(MotorControllerModel* m);
