@@ -12,10 +12,9 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <wpi/Signal.h>
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
 
 #include "wpinet/HttpParser.h"
 #include "wpinet/WebSocket.h"
@@ -66,6 +65,18 @@ class WebSocketServerHelper {
    *         is empty.
    */
   std::pair<bool, std::string_view> MatchProtocol(
+      std::span<const std::string> protocols);
+
+  /**
+   * Try to find a match to the list of sub-protocols provided by the client.
+   * The list is priority ordered, so the first match wins.
+   * Only valid during and after the upgrade event.
+   * @param protocols Acceptable protocols
+   * @return Pair; first item is true if a match was made, false if not.
+   *         Second item is the matched protocol if a match was made, otherwise
+   *         is empty.
+   */
+  std::pair<bool, std::string_view> MatchProtocol(
       std::initializer_list<std::string_view> protocols) {
     return MatchProtocol({protocols.begin(), protocols.end()});
   }
@@ -91,9 +102,9 @@ class WebSocketServerHelper {
  private:
   bool m_gotHost = false;
   bool m_websocket = false;
-  SmallVector<std::string, 2> m_protocols;
-  SmallString<64> m_key;
-  SmallString<16> m_version;
+  std::vector<std::string> m_protocols;
+  std::string m_key;
+  std::string m_version;
 };
 
 /**
@@ -164,7 +175,7 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
   uv::Stream& m_stream;
   HttpParser m_req{HttpParser::kRequest};
   WebSocketServerHelper m_helper;
-  SmallVector<std::string, 2> m_protocols;
+  std::vector<std::string> m_protocols;
   ServerOptions m_options;
   bool m_aborted = false;
   sig::ScopedConnection m_dataConn;

@@ -2,8 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <string>
+
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
 
 #include "hal/Errors.h"
 #include "hal/HALBase.h"
@@ -11,7 +12,7 @@
 namespace {
 struct LastErrorStorage {
   int32_t status;
-  wpi::SmallString<512> message;
+  std::string message;
 };
 }  // namespace
 

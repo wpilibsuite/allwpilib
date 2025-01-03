@@ -514,10 +514,14 @@ class DataLog {
   std::vector<Buffer> m_outgoing;
   struct EntryInfo {
     std::string type;
-    std::vector<uint8_t> schemaData;  // only set for schema entries
     int id{0};
   };
   wpi::StringMap<EntryInfo> m_entries;
+  struct SchemaInfo {
+    std::vector<uint8_t> data;
+    int id{0};
+  };
+  wpi::StringMap<SchemaInfo> m_schemas;
   struct EntryInfo2 {
     std::string metadata;
     unsigned int count;

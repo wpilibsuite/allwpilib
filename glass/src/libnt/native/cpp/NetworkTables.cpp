@@ -27,7 +27,6 @@
 #include <ntcore_cpp.h>
 #include <ntcore_cpp_types.h>
 #include <wpi/MessagePack.h>
-#include <wpi/SmallString.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/mpack.h>
@@ -972,7 +971,8 @@ void NetworkTablesModel::RebuildTreeImpl(std::vector<TreeNode>* tree,
       continue;
     }
     parts.clear();
-    wpi::split(entry->info.name, parts, '/', -1, false);
+    wpi::split(entry->info.name, '/', -1, false,
+               [&](auto part) { parts.emplace_back(part); });
 
     // ignore a raw "/" key
     if (parts.empty()) {
@@ -1455,9 +1455,7 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
             entry.publisher =
                 nt::Publish(entry.info.topic, NT_STRING, "string");
           }
-          wpi::SmallString<128> buf;
-          nt::SetString(entry.publisher,
-                        wpi::UnescapeCString(v + 1, buf).first);
+          nt::SetString(entry.publisher, wpi::UnescapeCString(v + 1).first);
         }
       }
       break;

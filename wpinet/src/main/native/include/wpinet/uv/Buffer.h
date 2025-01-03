@@ -8,12 +8,10 @@
 #include <uv.h>
 
 #include <cstring>
-#include <initializer_list>
 #include <span>
 #include <string_view>
 #include <utility>
-
-#include <wpi/SmallVector.h>
+#include <vector>
 
 namespace wpi::uv {
 
@@ -108,7 +106,6 @@ class Buffer : public uv_buf_t {
  * to the heap.
  * @tparam DEPTH depth of pool
  */
-template <size_t DEPTH = 4>
 class SimpleBufferPool {
  public:
   /**
@@ -167,7 +164,7 @@ class SimpleBufferPool {
   size_t Remaining() const { return m_pool.size(); }
 
  private:
-  SmallVector<Buffer, DEPTH> m_pool;
+  std::vector<Buffer> m_pool;
   size_t m_size;  // NOLINT
 };
 

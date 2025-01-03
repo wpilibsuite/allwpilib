@@ -122,7 +122,7 @@ Java_edu_wpi_first_net_WPINetJNI_createMulticastServiceAnnouncer
   JStringRef serviceNameRef{env, serviceName};
   JStringRef serviceTypeRef{env, serviceType};
 
-  wpi::SmallVector<std::pair<std::string, std::string>, 8> txtVec;
+  std::vector<std::pair<std::string, std::string>> txtVec;
 
   if (keys != nullptr && values != nullptr) {
     size_t keysLen = env->GetArrayLength(keys);
@@ -338,9 +338,11 @@ Java_edu_wpi_first_net_WPINetJNI_getMulticastServiceResolverData
     JLocal<jstring> serviceName{env, MakeJString(env, data.serviceName)};
     JLocal<jstring> hostName{env, MakeJString(env, data.hostName)};
 
-    wpi::SmallVector<std::string_view, 8> keysRef;
-    wpi::SmallVector<std::string_view, 8> valuesRef;
+    std::vector<std::string_view> keysRef;
+    std::vector<std::string_view> valuesRef;
 
+    keysRef.reserve(data.txt.size());
+    valuesRef.reserve(data.txt.size());
     size_t index = 0;
     for (auto&& txt : data.txt) {
       keysRef.emplace_back(txt.first);

@@ -6,7 +6,6 @@
 
 #include <string>
 
-#include <wpi/SmallString.h>
 #include <wpi/json.h>
 
 #include "Instance.h"
@@ -37,11 +36,9 @@ void SinkImpl::SetDescription(std::string_view description) {
   m_description = description;
 }
 
-std::string_view SinkImpl::GetDescription(
-    wpi::SmallVectorImpl<char>& buf) const {
+std::string SinkImpl::GetDescription() const {
   std::scoped_lock lock(m_mutex);
-  buf.append(m_description.begin(), m_description.end());
-  return {buf.data(), buf.size()};
+  return m_description;
 }
 
 void SinkImpl::Enable() {
@@ -112,18 +109,6 @@ std::string SinkImpl::GetError() const {
     return "no source connected";
   }
   return std::string{m_source->GetCurFrame().GetError()};
-}
-
-std::string_view SinkImpl::GetError(wpi::SmallVectorImpl<char>& buf) const {
-  std::scoped_lock lock(m_mutex);
-  if (!m_source) {
-    return "no source connected";
-  }
-  // Make a copy as it's shared data
-  std::string_view error = m_source->GetCurFrame().GetError();
-  buf.clear();
-  buf.append(error.data(), error.data() + error.size());
-  return {buf.data(), buf.size()};
 }
 
 bool SinkImpl::SetConfigJson(std::string_view config, CS_Status* status) {
@@ -222,16 +207,6 @@ std::string GetSinkError(CS_Sink sink, CS_Status* status) {
   return data->sink->GetError();
 }
 
-std::string_view GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
-                              CS_Status* status) {
-  auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || (data->kind & SinkMask) == 0) {
-    *status = CS_INVALID_HANDLE;
-    return {};
-  }
-  return data->sink->GetError(buf);
-}
-
 void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data || (data->kind & SinkMask) == 0) {
@@ -251,8 +226,7 @@ void CS_SetSinkDescription(CS_Sink sink, const struct WPI_String* description,
 
 void CS_GetSinkError(CS_Sink sink, struct WPI_String* error,
                      CS_Status* status) {
-  wpi::SmallString<128> buf;
-  cs::ConvertToC(error, cs::GetSinkError(sink, buf, status));
+  cs::ConvertToC(error, cs::GetSinkError(sink, status));
 }
 
 void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status) {

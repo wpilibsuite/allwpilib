@@ -13,7 +13,6 @@
 #include <vector>
 
 #include <wpi/SafeThread.h>
-#include <wpi/SmallVector.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include <wpinet/NetworkAcceptor.h>

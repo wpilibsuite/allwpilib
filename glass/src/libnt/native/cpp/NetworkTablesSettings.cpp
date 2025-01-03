@@ -12,7 +12,6 @@
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <ntcore_cpp.h>
-#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 
 #include "glass/Context.h"
@@ -73,12 +72,10 @@ void NetworkTablesSettings::Thread::Main() {
           (team = wpi::parse_integer<unsigned int>(serverTeam, 10))) {
         nt::SetServerTeam(m_inst, team.value(), port);
       } else {
-        wpi::SmallVector<std::string_view, 4> serverNames;
         std::vector<std::pair<std::string_view, unsigned int>> servers;
-        wpi::split(serverTeam, serverNames, ',', -1, false);
-        for (auto&& serverName : serverNames) {
+        wpi::split(serverTeam, ',', -1, false, [&](auto serverName) {
           servers.emplace_back(serverName, port);
-        }
+        });
         nt::SetServer(m_inst, servers);
       }
 

@@ -1162,8 +1162,7 @@ UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status) {
   }
 
   info.path = static_cast<UsbCameraImpl&>(*data->source).GetPath();
-  wpi::SmallVector<char, 64> buf;
-  info.name = static_cast<UsbCameraImpl&>(*data->source).GetDescription(buf);
+  info.name = static_cast<UsbCameraImpl&>(*data->source).GetDescription();
   ParseVidAndPid(info.path, &info.productId, &info.vendorId);
   info.dev = -1;  // We have lost dev information by this point in time.
   return info;

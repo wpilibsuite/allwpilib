@@ -5,12 +5,12 @@
 #include <memory>
 #include <span>
 #include <string>
+#include <vector>
 
 #include <fmt/format.h>
 
 #define WPI_RAWFRAME_JNI
 #include <wpi/RawFrame.h>
-#include <wpi/SmallString.h>
 #include <wpi/jni_util.h>
 
 #include "cscore_raw.h"
@@ -311,8 +311,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getPropertyName
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
-  wpi::SmallString<128> buf;
-  auto str = cs::GetPropertyName(property, buf, &status);
+  auto str = cs::GetPropertyName(property, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -418,8 +417,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getStringProperty
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
-  wpi::SmallString<128> buf;
-  auto str = cs::GetStringProperty(property, buf, &status);
+  auto str = cs::GetStringProperty(property, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -547,7 +545,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_createHttpCameraMulti
     return 0;
   }
   size_t len = env->GetArrayLength(urls);
-  wpi::SmallVector<std::string, 8> vec;
+  std::vector<std::string> vec;
   vec.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
@@ -616,8 +614,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getSourceName
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::SmallString<128> buf;
-  auto str = cs::GetSourceName(source, buf, &status);
+  auto str = cs::GetSourceName(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -634,8 +631,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getSourceDescription
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::SmallString<128> buf;
-  auto str = cs::GetSourceDescription(source, buf, &status);
+  auto str = cs::GetSourceDescription(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -732,8 +728,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSourceProperties
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::SmallVector<CS_Property, 32> buf;
-  auto arr = cs::EnumerateSourceProperties(source, buf, &status);
+  auto arr = cs::EnumerateSourceProperties(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -888,8 +883,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSourceSinks
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::SmallVector<CS_Sink, 16> buf;
-  auto arr = cs::EnumerateSourceSinks(source, buf, &status);
+  auto arr = cs::EnumerateSourceSinks(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1117,7 +1111,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_setHttpCameraUrls
     return;
   }
   size_t len = env->GetArrayLength(urls);
-  wpi::SmallVector<std::string, 8> vec;
+  std::vector<std::string> vec;
   vec.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
@@ -1307,7 +1301,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_setSourceEnumPropertyChoices
     return;
   }
   size_t len = env->GetArrayLength(choices);
-  wpi::SmallVector<std::string, 8> vec;
+  std::vector<std::string> vec;
   vec.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
@@ -1392,8 +1386,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getSinkName
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
-  wpi::SmallString<128> buf;
-  auto str = cs::GetSinkName(sink, buf, &status);
+  auto str = cs::GetSinkName(sink, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1410,8 +1403,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getSinkDescription
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
-  wpi::SmallString<128> buf;
-  auto str = cs::GetSinkDescription(sink, buf, &status);
+  auto str = cs::GetSinkDescription(sink, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1447,8 +1439,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSinkProperties
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::SmallVector<CS_Property, 32> buf;
-  auto arr = cs::EnumerateSinkProperties(source, buf, &status);
+  auto arr = cs::EnumerateSinkProperties(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1667,8 +1658,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getSinkError
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
-  wpi::SmallString<128> buf;
-  auto str = cs::GetSinkError(sink, buf, &status);
+  auto str = cs::GetSinkError(sink, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1945,8 +1935,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSources
   (JNIEnv* env, jclass)
 {
   CS_Status status = 0;
-  wpi::SmallVector<CS_Source, 16> buf;
-  auto arr = cs::EnumerateSourceHandles(buf, &status);
+  auto arr = cs::EnumerateSourceHandles(&status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1963,8 +1952,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSinks
   (JNIEnv* env, jclass)
 {
   CS_Status status = 0;
-  wpi::SmallVector<CS_Sink, 16> buf;
-  auto arr = cs::EnumerateSinkHandles(buf, &status);
+  auto arr = cs::EnumerateSinkHandles(&status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
