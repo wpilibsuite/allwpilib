@@ -208,8 +208,7 @@ NT_SetTopicPersistent
 NT_SetTopicProperties
 NT_SetTopicProperty
 NT_SetTopicRetained
-NT_StartClient3
-NT_StartClient4
+NT_StartClient
 NT_StartConnectionDataLog
 NT_StartDSClient
 NT_StartEntryDataLog

@@ -633,10 +633,9 @@ void StopLocal(NT_Inst inst) {
 }
 
 void StartServer(NT_Inst inst, std::string_view persist_filename,
-                 std::string_view listen_address, unsigned int port3,
-                 unsigned int port4) {
+                 std::string_view listen_address, unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartServer(persist_filename, listen_address, port3, port4);
+    ii->StartServer(persist_filename, listen_address, port);
   }
 }
 
@@ -646,15 +645,9 @@ void StopServer(NT_Inst inst) {
   }
 }
 
-void StartClient3(NT_Inst inst, std::string_view identity) {
+void StartClient(NT_Inst inst, std::string_view identity) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartClient3(identity);
-  }
-}
-
-void StartClient4(NT_Inst inst, std::string_view identity) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartClient4(identity);
+    ii->StartClient(identity);
   }
 }
 

@@ -45,11 +45,9 @@ class InstanceImpl {
   void StartLocal();
   void StopLocal();
   void StartServer(std::string_view persistFilename,
-                   std::string_view listenAddress, unsigned int port3,
-                   unsigned int port4);
+                   std::string_view listenAddress, unsigned int port);
   void StopServer();
-  void StartClient3(std::string_view identity);
-  void StartClient4(std::string_view identity);
+  void StartClient(std::string_view identity);
   void StopClient();
   void SetServers(
       std::span<const std::pair<std::string, unsigned int>> servers);

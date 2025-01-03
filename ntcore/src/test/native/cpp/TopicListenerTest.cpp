@@ -50,8 +50,8 @@ class TopicListenerTest : public ::testing::Test {
 };
 
 void TopicListenerTest::Connect(unsigned int port) {
-  nt::StartServer(m_serverInst, "topiclistenertest.json", "127.0.0.1", 0, port);
-  nt::StartClient4(m_clientInst, "client");
+  nt::StartServer(m_serverInst, "topiclistenertest.json", "127.0.0.1", port);
+  nt::StartClient(m_clientInst, "client");
   nt::SetServer(m_clientInst, "127.0.0.1", port);
 
   // Use connection listener to ensure we've connected

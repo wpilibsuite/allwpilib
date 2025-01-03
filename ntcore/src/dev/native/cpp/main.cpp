@@ -81,8 +81,8 @@ void bench() {
   auto server = nt::CreateInstance();
 
   // connect client and server
-  nt::StartServer(server, "bench.json", "127.0.0.1", 0, 10000);
-  nt::StartClient4(client, "client");
+  nt::StartServer(server, "bench.json", "127.0.0.1", 10000);
+  nt::StartClient(client, "client");
   nt::SetServer(client, "127.0.0.1", 10000);
 
   using namespace std::chrono_literals;
@@ -142,11 +142,11 @@ void bench2() {
   auto server = nt::CreateInstance();
 
   // connect client and server
-  nt::StartServer(server, "bench2.json", "127.0.0.1", 10001, 10000);
-  nt::StartClient4(client1, "client1");
-  nt::StartClient3(client2, "client2");
+  nt::StartServer(server, "bench2.json", "127.0.0.1", 10000);
+  nt::StartClient(client1, "client1");
+  nt::StartClient(client2, "client2");
   nt::SetServer(client1, "127.0.0.1", 10000);
-  nt::SetServer(client2, "127.0.0.1", 10001);
+  nt::SetServer(client2, "127.0.0.1", 10000);
 
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(1s);
@@ -214,7 +214,7 @@ static std::uniform_real_distribution<double> dist;
 
 void stress() {
   auto server = nt::CreateInstance();
-  nt::StartServer(server, "stress.json", "127.0.0.1", 0, 10000);
+  nt::StartServer(server, "stress.json", "127.0.0.1", 10000);
   nt::SubscribeMultiple(server, {{std::string_view{}}});
 
   using namespace std::chrono_literals;
@@ -228,7 +228,7 @@ void stress() {
         std::this_thread::sleep_for(0.1s * dist(gen));
 
         // connect
-        nt::StartClient4(client, "client");
+        nt::StartClient(client, "client");
         nt::SetServer(client, "127.0.0.1", 10000);
 
         // sleep a random amount of time
@@ -308,7 +308,7 @@ void stress2() {
   auto client = nt::NetworkTableInstance::Create();
   client.SetServer("localhost");
   auto clientName = "test client";
-  client.StartClient4(clientName);
+  client.StartClient(clientName);
   std::this_thread::sleep_for(2s);  // Startup time.
   int sentCount = 0;
   while (sentCount < count) {
