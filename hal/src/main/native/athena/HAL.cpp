@@ -350,8 +350,7 @@ void InitializeTeamNumber(void) {
   std::string_view hostname{hostnameBuf, sizeof(hostnameBuf)};
 
   // hostname is frc-{TEAM}-roborio
-  // Split string around '-' (max of 2 splits), take the second element of the
-  // resulting array.
+  // Split string around '-' (max of 2 splits), take the second element
   teamNumber = 0;
   int i = 0;
   wpi::split(hostname, '-', 2, false, [&](auto part) {
