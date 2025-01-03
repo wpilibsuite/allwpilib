@@ -19,7 +19,7 @@ namespace wpi::uv {
 namespace detail {
 template <typename T>
 concept StringAssignable = requires(T a, const char* p) {
-  { a.assign(p, p) };
+  { a.assign(p, p) };  // NOLINT(readability/braces)
 };
 }  // namespace detail
 
