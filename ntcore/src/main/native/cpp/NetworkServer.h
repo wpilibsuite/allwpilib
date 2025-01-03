@@ -36,10 +36,9 @@ class IConnectionList;
 class NetworkServer {
  public:
   NetworkServer(std::string_view persistentFilename,
-                std::string_view listenAddress, unsigned int port3,
-                unsigned int port4, net::ILocalStorage& localStorage,
-                IConnectionList& connList, wpi::Logger& logger,
-                std::function<void()> initDone);
+                std::string_view listenAddress, unsigned int port,
+                net::ILocalStorage& localStorage, IConnectionList& connList,
+                wpi::Logger& logger, std::function<void()> initDone);
   ~NetworkServer();
 
   void FlushLocal();
@@ -47,7 +46,6 @@ class NetworkServer {
 
  private:
   class ServerConnection;
-  class ServerConnection3;
   class ServerConnection4;
 
   void ProcessAllLocal();
@@ -64,8 +62,7 @@ class NetworkServer {
   std::string m_persistentData;
   std::string m_persistentFilename;
   std::string m_listenAddress;
-  unsigned int m_port3;
-  unsigned int m_port4;
+  unsigned int m_port;
 
   // used only from loop
   std::shared_ptr<wpi::uv::Timer> m_readLocalTimer;

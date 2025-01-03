@@ -1997,7 +1997,7 @@ void glass::DisplayNetworkTablesInfo(NetworkTablesModel* model) {
   }
 
   auto netMode = inst.GetNetworkMode();
-  if (netMode == NT_NET_MODE_SERVER || netMode == NT_NET_MODE_CLIENT4) {
+  if (netMode == NT_NET_MODE_SERVER || netMode == NT_NET_MODE_CLIENT) {
     if (CollapsingHeader("Server")) {
       PushID("Server");
       ImGui::Indent();

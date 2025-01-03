@@ -83,7 +83,7 @@ static std::string MakeTitle(NT_Inst inst, nt::Event event) {
     auto numClients = nt::GetConnections(inst).size();
     return fmt::format("Glass - {} Client{} Connected", numClients,
                        (numClients == 1 ? "" : "s"));
-  } else if (mode & NT_NET_MODE_CLIENT3 || mode & NT_NET_MODE_CLIENT4) {
+  } else if (mode & NT_NET_MODE_CLIENT) {
     if (event.Is(NT_EVENT_CONNECTED)) {
       return fmt::format("Glass - Connected ({})",
                          event.GetConnectionInfo()->remote_ip);
