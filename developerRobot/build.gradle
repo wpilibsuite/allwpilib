@@ -71,8 +71,14 @@ deploy {
             directory = '/home/systemcore'
             maxChannels = 4
             locations {
-                ssh(SshDeployLocation) {
+                mdns(SshDeployLocation) {
                     address = "limelight.local"
+                    user = 'systemcore'
+                    password = 'systemcore'
+                    ipv6 = false
+                }
+                usb(SshDeployLocation) {
+                    address = "172.28.0.1"
                     user = 'systemcore'
                     password = 'systemcore'
                     ipv6 = false
