@@ -52,7 +52,7 @@ class PreferencesTest {
       fail(ex);
     }
 
-    m_inst.startServer(filepath.toString(), "", 0, 0);
+    m_inst.startServer(filepath.toString(), "", 0);
     try {
       int count = 0;
       while (m_inst.getNetworkMode().contains(NetworkTableInstance.NetworkMode.kStarting)) {
