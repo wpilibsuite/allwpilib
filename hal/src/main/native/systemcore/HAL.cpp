@@ -18,7 +18,6 @@
 #include <utility>
 
 #include <wpi/MemoryBuffer.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/mutex.h>
@@ -233,16 +232,15 @@ void InitializeTeamNumber(void) {
   std::string_view hostname{hostnameBuf, sizeof(hostnameBuf)};
 
   // hostname is frc-{TEAM}-roborio
-  // Split string around '-' (max of 2 splits), take the second element of the
-  // resulting array.
-  wpi::SmallVector<std::string_view> elements;
-  wpi::split(hostname, elements, "-", 2);
-  if (elements.size() < 3) {
-    teamNumber = 0;
-    return;
-  }
-
-  teamNumber = wpi::parse_integer<int32_t>(elements[1], 10).value_or(0);
+  // Split string around '-' (max of 2 splits), take the second element
+  teamNumber = 0;
+  int i = 0;
+  wpi::split(hostname, '-', 2, false, [&](auto part) {
+    if (i == 1) {
+      teamNumber = wpi::parse_integer<int32_t>(part, 10).value_or(0);
+    }
+    ++i;
+  });
 }
 
 int32_t HAL_GetTeamNumber(void) {

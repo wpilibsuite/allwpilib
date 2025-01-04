@@ -6,11 +6,12 @@
 
 #include <algorithm>
 #include <memory>
+#include <string>
 #include <utility>
 
 #include <fmt/format.h>
 #include <ntcore_cpp.h>
-#include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpigui.h>
 
@@ -65,10 +66,11 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
 
 void NetworkTablesProvider::DisplayMenu() {
   wpi::SmallVector<std::string_view, 6> path;
-  wpi::SmallString<64> name;
+  std::string name;
   for (auto&& entry : m_viewEntries) {
     path.clear();
-    wpi::split(entry->name, path, '/', -1, false);
+    wpi::split(entry->name, '/', -1, false,
+               [&](auto name) { path.emplace_back(name); });
 
     bool fullDepth = true;
     int depth = 0;

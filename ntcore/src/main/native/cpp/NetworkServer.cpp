@@ -15,7 +15,6 @@
 #include <vector>
 
 #include <wpi/MemoryBuffer.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/mutex.h>
@@ -169,13 +168,11 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
   }
   DEBUG4("path: '{}'", path);
 
-  wpi::SmallString<128> nameBuf;
-  std::string_view name;
-  bool err = false;
+  wpi::expected<std::string, size_t> name;
   if (auto uri = wpi::remove_prefix(path, "/nt/")) {
-    name = wpi::UnescapeURI(*uri, nameBuf, &err);
+    name = wpi::UnescapeURI(*uri);
   }
-  if (err || name.empty()) {
+  if (!name || name->empty()) {
     INFO("invalid path '{}' (from {}), must match /nt/[clientId], closing",
          path, m_connInfo);
     m_websocket->Fail(
@@ -185,7 +182,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
 
   m_websocket->SetMaxMessageSize(kMaxMessageSize);
 
-  m_websocket->open.connect([this, name = std::string{name}](
+  m_websocket->open.connect([this, name = std::move(*name)](
                                 std::string_view protocol) {
     m_info.protocol_version =
         protocol == "v4.1.networktables.first.wpi.edu" ? 0x0401 : 0x0400;

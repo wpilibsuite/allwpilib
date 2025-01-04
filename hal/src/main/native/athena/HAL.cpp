@@ -21,7 +21,6 @@
 #include <FRC_NetworkCommunication/LoadOut.h>
 #include <FRC_NetworkCommunication/UsageReporting.h>
 #include <wpi/MemoryBuffer.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/mutex.h>
@@ -319,8 +318,7 @@ void InitializeRoboRioComments(void) {
     start += searchString.size();
     std::string_view escapedComments =
         wpi::slice(fileContents, start, fileContents.size());
-    wpi::SmallString<64> buf;
-    auto [unescapedComments, rem] = wpi::UnescapeCString(escapedComments, buf);
+    auto [unescapedComments, rem] = wpi::UnescapeCString(escapedComments);
     unescapedComments.copy(roboRioCommentsString,
                            sizeof(roboRioCommentsString));
 
@@ -352,16 +350,15 @@ void InitializeTeamNumber(void) {
   std::string_view hostname{hostnameBuf, sizeof(hostnameBuf)};
 
   // hostname is frc-{TEAM}-roborio
-  // Split string around '-' (max of 2 splits), take the second element of the
-  // resulting array.
-  wpi::SmallVector<std::string_view> elements;
-  wpi::split(hostname, elements, "-", 2);
-  if (elements.size() < 3) {
-    teamNumber = 0;
-    return;
-  }
-
-  teamNumber = wpi::parse_integer<int32_t>(elements[1], 10).value_or(0);
+  // Split string around '-' (max of 2 splits), take the second element
+  teamNumber = 0;
+  int i = 0;
+  wpi::split(hostname, '-', 2, false, [&](auto part) {
+    if (i == 1) {
+      teamNumber = wpi::parse_integer<int32_t>(part, 10).value_or(0);
+    }
+    ++i;
+  });
 }
 
 int32_t HAL_GetTeamNumber(void) {

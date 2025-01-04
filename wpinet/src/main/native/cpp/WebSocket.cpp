@@ -11,9 +11,9 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <wpi/Base64.h>
-#include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/print.h>
@@ -123,8 +123,7 @@ class WebSocket::ClientHandshakeData {
     for (char& v : nonce) {
       v = static_cast<char>(dist(gen));
     }
-    raw_svector_ostream os(key);
-    Base64Encode(os, {nonce, 16});
+    key = Base64Encode({nonce, 16});
   }
   ~ClientHandshakeData() {
     if (auto t = timer.lock()) {
@@ -133,8 +132,8 @@ class WebSocket::ClientHandshakeData {
     }
   }
 
-  SmallString<64> key;                       // the key sent to the server
-  SmallVector<std::string, 2> protocols;     // valid protocols
+  std::string key;                           // the key sent to the server
+  std::vector<std::string> protocols;        // valid protocols
   HttpParser parser{HttpParser::kResponse};  // server response parser
   bool hasUpgrade = false;
   bool hasConnection = false;
@@ -144,13 +143,11 @@ class WebSocket::ClientHandshakeData {
   std::weak_ptr<uv::Timer> timer;
 };
 
-static std::string_view AcceptHash(std::string_view key,
-                                   SmallVectorImpl<char>& buf) {
+static std::string AcceptHash(std::string_view key) {
   SHA1 hash;
   hash.Update(key);
   hash.Update("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
-  SmallString<64> hashBuf;
-  return Base64Encode(hash.RawFinal(hashBuf), buf);
+  return Base64Encode(hash.RawFinal());
 }
 
 WebSocket::WebSocket(uv::Stream& stream, bool server, const private_init&)
@@ -286,8 +283,7 @@ void WebSocket::StartClient(std::string_view uri, std::string_view host,
           m_clientHandshake->hasConnection = true;
         } else if (equals_lower(name, "sec-websocket-accept")) {
           // Check against expected response
-          SmallString<64> acceptBuf;
-          if (!equals(value, AcceptHash(m_clientHandshake->key, acceptBuf))) {
+          if (!equals(value, AcceptHash(m_clientHandshake->key))) {
             return Terminate(1002, "invalid accept key");
           }
           m_clientHandshake->hasAccept = true;
@@ -365,8 +361,7 @@ void WebSocket::StartServer(std::string_view key, std::string_view version,
   os << "Connection: Upgrade\r\n";
 
   // accept hash
-  SmallString<64> acceptBuf;
-  os << "Sec-WebSocket-Accept: " << AcceptHash(key, acceptBuf) << "\r\n";
+  os << "Sec-WebSocket-Accept: " << AcceptHash(key) << "\r\n";
 
   if (!protocol.empty()) {
     os << "Sec-WebSocket-Protocol: " << protocol << "\r\n";
@@ -711,7 +706,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
 static void VerboseDebug(const WebSocket::Frame& frame) {
 #ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG
   if ((frame.opcode & 0x7f) == 0x01) {
-    SmallString<128> str;
+    std::string str;
 #ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG_CONTENT
     for (auto&& d : frame.data) {
       str.append(std::string_view(d.base, d.len));
@@ -719,9 +714,9 @@ static void VerboseDebug(const WebSocket::Frame& frame) {
 #endif
     wpi::print("WS SendText({})\n", str.str());
   } else if ((frame.opcode & 0x7f) == 0x02) {
-    SmallString<128> str;
+    std::string str;
 #ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG_CONTENT
-    raw_svector_ostream stros{str};
+    raw_string_ostream stros{str};
     for (auto&& d : frame.data) {
       for (auto ch : d.data()) {
         stros << fmt::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);
@@ -730,9 +725,9 @@ static void VerboseDebug(const WebSocket::Frame& frame) {
 #endif
     wpi::print("WS SendBinary({})\n", str.str());
   } else {
-    SmallString<128> str;
+    std::string str;
 #ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG_CONTENT
-    raw_svector_ostream stros{str};
+    raw_string_ostream stros{str};
     for (auto&& d : frame.data) {
       for (auto ch : d.data()) {
         stros << fmt::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);

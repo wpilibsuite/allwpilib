@@ -6,8 +6,7 @@
 
 #include <memory>
 #include <utility>
-
-#include <wpi/SmallVector.h>
+#include <vector>
 
 #include "MulticastHandleManager.h"
 
@@ -20,8 +19,8 @@ WPI_MulticastServiceAnnouncerHandle WPI_CreateMulticastServiceAnnouncer(
   auto& manager = wpi::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
 
-  wpi::SmallVector<std::pair<std::string_view, std::string_view>, 8> txts;
-
+  std::vector<std::pair<std::string_view, std::string_view>> txts;
+  txts.reserve(txtCount);
   for (int32_t i = 0; i < txtCount; i++) {
     txts.emplace_back(
         std::pair<std::string_view, std::string_view>{keys[i], values[i]});

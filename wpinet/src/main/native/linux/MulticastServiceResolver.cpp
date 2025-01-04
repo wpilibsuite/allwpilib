@@ -8,7 +8,6 @@
 #include <string>
 #include <utility>
 
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/mutex.h>
 
@@ -72,21 +71,19 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
             wpi::substr(value, splitIndex + 1, value.size() - splitIndex - 1);
         data.txt.emplace_back(std::pair<std::string, std::string>{key, value});
       }
-      wpi::SmallString<256> outputHostName;
       char label[256];
       do {
         impl->table.unescape_label(&host_name, label, sizeof(label));
         if (label[0] == '\0') {
           break;
         }
-        outputHostName.append(label);
-        outputHostName.append(".");
+        data.hostName.append(label);
+        data.hostName.append(".");
       } while (true);
 
       data.ipv4Address = address->data.ipv4.address;
       data.port = port;
       data.serviceName = name;
-      data.hostName = std::string{outputHostName};
 
       impl->onFound(std::move(data));
     }

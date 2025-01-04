@@ -12,6 +12,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <wpi/json_fwd.h>
 
@@ -22,8 +23,6 @@
 
 namespace wpi {
 class Logger;
-template <typename T>
-class SmallVectorImpl;
 }  // namespace wpi
 
 namespace nt::server {
@@ -67,9 +66,8 @@ class ServerClient {
   void UpdateMetaClientPub();
   void UpdateMetaClientSub();
 
-  std::span<ServerSubscriber*> GetSubscribers(
-      std::string_view name, bool special,
-      wpi::SmallVectorImpl<ServerSubscriber*>& buf);
+  std::vector<ServerSubscriber*> GetSubscribers(std::string_view name,
+                                                bool special);
 
   std::string_view GetName() const { return m_name; }
   int GetId() const { return m_id; }

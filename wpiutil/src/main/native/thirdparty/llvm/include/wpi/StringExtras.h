@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <iterator>
 #include <limits>
 #include <optional>
@@ -28,9 +29,6 @@
 #include <fmt/format.h>
 
 namespace wpi {
-
-template <typename T>
-class SmallVectorImpl;
 
 /// hexdigit - Return the hexadecimal character for the
 /// given number \p X (which should be less than 16).
@@ -362,7 +360,8 @@ inline bool contains_lower(std::string_view str, const char* other) noexcept {
  * starts with the prefix. If the string does not start with the prefix, return
  * an empty optional.
  */
-constexpr std::optional<std::string_view> remove_prefix(std::string_view str, std::string_view prefix) noexcept {
+constexpr std::optional<std::string_view> remove_prefix(
+    std::string_view str, std::string_view prefix) noexcept {
   if (str.starts_with(prefix)) {
     str.remove_prefix(prefix.size());
     return str;
@@ -375,7 +374,8 @@ constexpr std::optional<std::string_view> remove_prefix(std::string_view str, st
  * string ends with the suffix. If the string does not end with the suffix,
  * return an empty optional.
  */
-constexpr std::optional<std::string_view> remove_suffix(std::string_view str, std::string_view suffix) noexcept {
+constexpr std::optional<std::string_view> remove_suffix(
+    std::string_view str, std::string_view suffix) noexcept {
   if (str.ends_with(suffix)) {
     str.remove_suffix(suffix.size());
     return str;
@@ -541,42 +541,95 @@ constexpr std::pair<std::string_view, std::string_view> rsplit(
 /**
  * Splits @p str into substrings around the occurrences of a separator string.
  *
- * Each substring is stored in @p arr. If @p maxSplit is >= 0, at most
- * @p maxSplit splits are done and consequently <= @p maxSplit + 1
- * elements are added to arr.
- * If @p keepEmpty is false, empty strings are not added to @p arr. They
- * still count when considering @p maxSplit
+ * Each substring is passed to the callback @p func. If @p maxSplit is >= 0, at
+ * most @p maxSplit splits are done and consequently <= @p maxSplit + 1
+ * elements are provided to the callback.
+ * If @p keepEmpty is false, empty strings are not included. They
+ * still count when considering @p maxSplit.
  * An useful invariant is that
- * separator.join(arr) == str if maxSplit == -1 and keepEmpty == true
+ * separator.join(all callbacks) == str if keepEmpty == true.
  *
- * @param arr Where to put the substrings.
  * @param separator The string to split on.
  * @param maxSplit The maximum number of times the string is split.
  * @param keepEmpty True if empty substring should be added.
+ * @param func Function to call for each substring.
  */
-void split(std::string_view str, SmallVectorImpl<std::string_view>& arr,
-           std::string_view separator, int maxSplit = -1,
-           bool keepEmpty = true) noexcept;
+template <std::invocable<std::string_view> F>
+void split(std::string_view str, std::string_view separator, int maxSplit,
+           bool keepEmpty, F&& func) {
+  std::string_view s = str;
+
+  // Count down from maxSplit. When maxSplit is -1, this will just split
+  // "forever". This doesn't support splitting more than 2^31 times
+  // intentionally; if we ever want that we can make maxSplit a 64-bit integer
+  // but that seems unlikely to be useful.
+  while (maxSplit-- != 0) {
+    auto idx = s.find(separator);
+    if (idx == std::string_view::npos) {
+      break;
+    }
+
+    // Provide this split.
+    if (keepEmpty || idx > 0) {
+      func(slice(s, 0, idx));
+    }
+
+    // Jump forward.
+    s = slice(s, idx + separator.size(), std::string_view::npos);
+  }
+
+  // Provide the tail.
+  if (keepEmpty || !s.empty()) {
+    func(s);
+  }
+}
 
 /**
  * Splits @p str into substrings around the occurrences of a separator
  * character.
  *
- * Each substring is stored in @p arr. If @p maxSplit is >= 0, at most
- * @p maxSplit splits are done and consequently <= @p maxSplit + 1
- * elements are added to arr.
- * If @p keepEmpty is false, empty strings are not added to @p arr. They
- * still count when considering @p maxSplit
+ * Each substring is passed to the callback @p func. If @p maxSplit is >= 0, at
+ * most @p maxSplit splits are done and consequently <= @p maxSplit + 1
+ * elements are provided to the callback.
+ * If @p keepEmpty is false, empty strings are not included. They
+ * still count when considering @p maxSplit.
  * An useful invariant is that
- * separator.join(arr) == str if maxSplit == -1 and keepEmpty == true
+ * separator.join(all callbacks) == str if keepEmpty == true.
  *
- * @param arr Where to put the substrings.
  * @param separator The character to split on.
  * @param maxSplit The maximum number of times the string is split.
  * @param keepEmpty True if empty substring should be added.
+ * @param func Function to call for each substring.
  */
-void split(std::string_view str, SmallVectorImpl<std::string_view>& arr,
-           char separator, int maxSplit = -1, bool keepEmpty = true) noexcept;
+template <std::invocable<std::string_view> F>
+void split(std::string_view str, char separator, int maxSplit, bool keepEmpty,
+           F&& func) {
+  std::string_view s = str;
+
+  // Count down from maxSplit. When maxSplit is -1, this will just split
+  // "forever". This doesn't support splitting more than 2^31 times
+  // intentionally; if we ever want that we can make maxSplit a 64-bit integer
+  // but that seems unlikely to be useful.
+  while (maxSplit-- != 0) {
+    size_t idx = s.find(separator);
+    if (idx == std::string_view::npos) {
+      break;
+    }
+
+    // Provide this split.
+    if (keepEmpty || idx > 0) {
+      func(slice(s, 0, idx));
+    }
+
+    // Jump forward.
+    s = slice(s, idx + 1, std::string_view::npos);
+  }
+
+  // Provide the tail.
+  if (keepEmpty || !s.empty()) {
+    func(s);
+  }
+}
 
 /**
  * Returns @p str with consecutive @p ch characters starting from the
@@ -744,11 +797,9 @@ std::optional<long double> parse_float<long double>(
  * quote character is found.
  *
  * @param str input string
- * @param buf buffer for unescaped characters
  * @return pair of the unescaped string and any remaining input
  */
-std::pair<std::string_view, std::string_view> UnescapeCString(
-    std::string_view str, SmallVectorImpl<char>& buf);
+std::pair<std::string, std::string_view> UnescapeCString(std::string_view str);
 
 /**
  * Like std::format_to_n() in that it writes at most n bytes to the output

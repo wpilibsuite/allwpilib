@@ -26,8 +26,6 @@
 #include <string_view>
 
 namespace wpi {
-template <typename T>
-class SmallVectorImpl;
 class raw_istream;
 
 class SHA1 {
@@ -36,8 +34,7 @@ class SHA1 {
   void Update(std::string_view s);
   void Update(raw_istream& is);
   std::string Final();
-  std::string_view Final(SmallVectorImpl<char>& buf);
-  std::string_view RawFinal(SmallVectorImpl<char>& buf);
+  std::string RawFinal();
   static std::string FromFile(std::string_view filename);
 
  private:

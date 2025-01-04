@@ -47,8 +47,8 @@ struct DataStore {
 };
 }  // namespace
 
-static SimpleBufferPool<4>& GetBufferPool() {
-  static SimpleBufferPool<4> bufferPool;
+static SimpleBufferPool& GetBufferPool() {
+  static SimpleBufferPool bufferPool;
   return bufferPool;
 }
 

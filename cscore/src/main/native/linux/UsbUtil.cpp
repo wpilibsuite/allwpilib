@@ -11,7 +11,6 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/raw_istream.h>
@@ -27,7 +26,7 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
     return {};
   }
 
-  wpi::SmallString<128> buf;
+  std::string buf;
   wpi::raw_fd_istream is{fd, true};
 
   // build vendor and product 4-char hex strings
@@ -35,10 +34,9 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
   auto productStr = fmt::format("{:04x}", product);
 
   // scan file
-  wpi::SmallString<128> lineBuf;
   bool foundVendor = false;
   for (;;) {
-    auto line = is.getline(lineBuf, 4096);
+    auto line = is.getline(4096);
     if (is.has_error()) {
       break;
     }
@@ -59,13 +57,13 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
       // next vendor, but didn't match product?
       if (line[0] != '\t') {
         buf += "Unknown";
-        return std::string{buf};
+        return buf;
       }
 
       // look for product
       if (wpi::starts_with(wpi::substr(line, 1), productStr)) {
         buf += wpi::trim(wpi::substr(line, 6));
-        return std::string{buf};
+        return buf;
       }
     }
   }

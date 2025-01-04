@@ -12,6 +12,7 @@
 #include <cstdio>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <fmt/format.h>
 #include <wpi/SmallVector.h>
@@ -235,7 +236,7 @@ int main(int argc, char* argv[]) {
   }
 
   // build process options
-  wpi::SmallVector<uv::Process::Option, 8> options;
+  std::vector<uv::Process::Option> options;
 
   // hook up pipes to child
   options.emplace_back(
