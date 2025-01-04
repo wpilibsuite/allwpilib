@@ -1,0 +1,19 @@
+{
+  "game": "Reefscape",
+  "field-image": "2025-field.png",
+  "field-corners": {
+    "top-left": [
+      176,
+      38
+    ],
+    "bottom-right": [
+      1401,
+      601
+    ]
+  },
+  "field-size": [
+    57.573,
+    26.417
+  ],
+  "field-unit": "foot"
+}
