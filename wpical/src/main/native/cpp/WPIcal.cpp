@@ -9,12 +9,14 @@
 
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <numbers>
 #include <string>
 #include <vector>
 
 #include <GLFW/glfw3.h>
+#include <fmt/format.h>
 #include <imgui.h>
 #include <portable-file-dialogs.h>
 #include <tagpose.h>
@@ -114,6 +116,25 @@ std::string getFileName(std::string path) {
   return path.substr(lastSlash + 1, lastDot - lastSlash - 1);
 }
 
+static bool EmitEntryTarget(int tag_id, std::string& file) {
+  if (!file.empty()) {
+    auto text = fmt::format("{}: {}", tag_id, file);
+    ImGui::TextUnformatted(text.c_str());
+  } else {
+    ImGui::Text("%i: <none (DROP HERE)>", tag_id);
+  }
+  bool rv = false;
+  if (ImGui::BeginDragDropTarget()) {
+    if (const ImGuiPayload* payload =
+            ImGui::AcceptDragDropPayload("FieldCalibration")) {
+      file = *(std::string*)payload->Data;
+      rv = true;
+    }
+    ImGui::EndDragDropTarget();
+  }
+  return rv;
+}
+
 static void DisplayGui() {
   ImGui::GetStyle().WindowRounding = 0;
 
@@ -143,6 +164,8 @@ static void DisplayGui() {
   static std::string selected_download_directory;
   static std::string calibration_json_path;
   static std::vector<std::string> selected_field_calibrations;
+  static std::map<int, std::string> combiner_map;
+  static int current_combiner_tag_id = 0;
 
   cameracalibration::CameraModel cameraModel = {
       .intrinsic_matrix = Eigen::Matrix<double, 3, 3>::Identity(),
@@ -533,21 +556,27 @@ static void DisplayGui() {
                     "JSON", "*.json");
 
     if (!selected_field_map.empty() && !selected_field_calibrations.empty()) {
-      for (auto& file : selected_field_calibrations) {
+      for (std::string& file : selected_field_calibrations) {
         ImGui::Selectable(getFileName(file).c_str());
         if (ImGui::BeginDragDropSource()) {
-          ImGui::SetDragDropPayload("FieldCalibration", &selected_field_map,
-                                    sizeof(selected_field_map));
-          ImGui::TextUnformatted(selected_field_map.c_str());
+          ImGui::SetDragDropPayload("FieldCalibration", &file, sizeof(file));
+          ImGui::TextUnformatted(file.c_str());
           ImGui::EndDragDropSource();
         }
       }
+
+      combiner_map.emplace(3, "");
+
+      for (auto& [key, val] : combiner_map) {
+        EmitEntryTarget(key, val);
+      }
     }
     ImGui::Separator();
-    if (ImGui::Button("Close", ImVec2(120, 0))) {
+    if (ImGui::Button("Close", ImVec2(0, 0))) {
       ImGui::CloseCurrentPopup();
     }
-    if (ImGui::Button("Download", ImVec2(120, 0))) {
+    ImGui::SameLine();
+    if (ImGui::Button("Download", ImVec2(0, 0))) {
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
