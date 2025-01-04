@@ -5,7 +5,7 @@
 #pragma once
 
 #include <cmath>
-#include <vector>
+#include <map>
 
 #include <tagpose.h>
 #include <wpi/json.h>
@@ -19,6 +19,7 @@ class Fieldmap {
     double field_width_meters =
         static_cast<double>(json.at("field").at("width"));
     for (const auto& tag : json.at("tags").items()) {
+      double tag_id = static_cast<int>(tag.value().at("ID"));
       double tagXPos =
           static_cast<double>(tag.value().at("pose").at("translation").at("x"));
       double tagYPos =
@@ -34,15 +35,18 @@ class Fieldmap {
       double tagZQuat = static_cast<double>(
           tag.value().at("pose").at("rotation").at("quaternion").at("Z"));
 
-      tagVec.emplace_back(tagXPos, tagYPos, tagZPos, tagWQuat, tagXQuat,
-                          tagYQuat, tagZQuat, field_length_meters,
-                          field_width_meters);
+      tagVec.emplace(
+          tag_id,
+          tag::Pose(tagXPos, tagYPos, tagZPos, tagWQuat, tagXQuat, tagYQuat,
+                    tagZQuat, field_length_meters, field_width_meters));
     }
   }
 
-  const tag::Pose& getTag(size_t tag) const { return tagVec[tag - 1]; }
+  const tag::Pose& getTag(size_t tag) const { return tagVec.at(tag); }
 
   int getNumTags() const { return tagVec.size(); }
+
+  bool hasTag(int tag) { return tagVec.find(tag) != tagVec.end(); }
 
   static double minimizeAngle(double angle) {
     angle = std::fmod(angle, 360);
@@ -55,5 +59,5 @@ class Fieldmap {
   }
 
  private:
-  std::vector<tag::Pose> tagVec;
+  std::map<int, tag::Pose> tagVec;
 };

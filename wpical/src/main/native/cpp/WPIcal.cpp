@@ -121,7 +121,7 @@ static bool EmitEntryTarget(int tag_id, std::string& file) {
     auto text = fmt::format("{}: {}", tag_id, file);
     ImGui::TextUnformatted(text.c_str());
   } else {
-    ImGui::Text("%i: <none (DROP HERE)>", tag_id);
+    ImGui::Text("Tag ID %i: <none (DROP HERE)>", tag_id);
   }
   bool rv = false;
   if (ImGui::BeginDragDropTarget()) {
@@ -557,7 +557,8 @@ static void DisplayGui() {
 
     if (!selected_field_map.empty() && !selected_field_calibrations.empty()) {
       for (std::string& file : selected_field_calibrations) {
-        ImGui::Selectable(getFileName(file).c_str());
+        ImGui::Selectable(getFileName(file).c_str(), false,
+                          ImGuiSelectableFlags_DontClosePopups);
         if (ImGui::BeginDragDropSource()) {
           ImGui::SetDragDropPayload("FieldCalibration", &file, sizeof(file));
           ImGui::TextUnformatted(file.c_str());
@@ -565,10 +566,19 @@ static void DisplayGui() {
         }
       }
 
-      combiner_map.emplace(3, "");
-
       for (auto& [key, val] : combiner_map) {
         EmitEntryTarget(key, val);
+      }
+
+      ImGui::InputInt("Tag ID", &current_combiner_tag_id);
+      ImGui::SameLine();
+      if (ImGui::Button("Add", ImVec2(0, 0)) &&
+          currentReferenceMap.hasTag(current_combiner_tag_id)) {
+        combiner_map.emplace(current_combiner_tag_id, "");
+      }
+      ImGui::SameLine();
+      if (ImGui::Button("Remove", ImVec2(0, 0))) {
+        combiner_map.erase(current_combiner_tag_id);
       }
     }
     ImGui::Separator();
