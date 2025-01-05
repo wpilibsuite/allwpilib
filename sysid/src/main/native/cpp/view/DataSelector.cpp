@@ -10,9 +10,9 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/DataLogReaderThread.h>
 #include <imgui.h>
 #include <wpi/DataLogReader.h>
+#include <wpi/DataLogReaderThread.h>
 #include <wpi/Logger.h>
 #include <wpi/StringExtras.h>
 

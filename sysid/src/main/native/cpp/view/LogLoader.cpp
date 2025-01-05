@@ -12,10 +12,10 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/DataLogReaderThread.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <portable-file-dialogs.h>
+#include <wpi/DataLogReaderThread.h>
 #include <wpi/SmallVector.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
@@ -54,8 +54,7 @@ void LogLoader::Display() {
         return;
       }
       unload();
-      m_reader =
-          std::make_unique<wpi::DataLogReaderThread>(std::move(reader));
+      m_reader = std::make_unique<wpi::DataLogReaderThread>(std::move(reader));
       m_entryTree.clear();
     }
     m_opener.reset();

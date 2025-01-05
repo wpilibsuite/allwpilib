@@ -4,11 +4,11 @@
 
 #include "wpi/DataLogReaderThread.h"
 
-#include <string>
-#include <utility>
-
 #include <wpi/StringExtras.h>
 #include <wpi/print.h>
+
+#include <string>
+#include <utility>
 
 using namespace wpi;
 
