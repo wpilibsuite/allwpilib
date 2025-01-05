@@ -300,7 +300,7 @@ if(WITH_NTCORE)
     add_subdirectory(ntcore)
 endif()
 
-add_subdirectory(wpilogcli)
+add_subdirectory(datalogcli)
 
 add_subdirectory(protoplugin)
 

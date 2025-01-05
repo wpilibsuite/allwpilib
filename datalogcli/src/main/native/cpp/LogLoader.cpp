@@ -17,7 +17,7 @@
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 
-using namespace wpilogcli;
+using namespace datalogcli;
 
 LogLoader::LogLoader(glass::Storage& storage, wpi::Logger& logger) {}
 

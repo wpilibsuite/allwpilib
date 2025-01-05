@@ -22,7 +22,7 @@ namespace wpi {
 class Logger;
 }  // namespace wpi
 
-namespace wpilogcli {
+namespace datalogcli {
 /**
  * Helps with loading datalog files.
  */
@@ -71,4 +71,4 @@ class LogLoader {
   void RebuildEntryTree();
   int GetTargetEntryId(std::string_view name);
 };
-}  // namespace wpilogcli
+}  // namespace datalogcli
