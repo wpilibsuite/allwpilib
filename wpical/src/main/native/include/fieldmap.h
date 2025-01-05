@@ -35,18 +35,30 @@ class Fieldmap {
       double tagZQuat = static_cast<double>(
           tag.value().at("pose").at("rotation").at("quaternion").at("Z"));
 
-      tagVec.emplace(
-          tag_id,
-          tag::Pose(tagXPos, tagYPos, tagZPos, tagWQuat, tagXQuat, tagYQuat,
-                    tagZQuat, field_length_meters, field_width_meters));
+      tagMap.emplace(
+          tag_id, tag::Pose(tag_id, tagXPos, tagYPos, tagZPos, tagWQuat,
+                            tagXQuat, tagYQuat, tagZQuat, field_length_meters,
+                            field_width_meters));
     }
+    fieldLength = field_length_meters;
+    fieldWidth = field_width_meters;
   }
 
-  const tag::Pose& getTag(size_t tag) const { return tagVec.at(tag); }
+  const tag::Pose& getTag(size_t tag) const { return tagMap.at(tag); }
 
-  int getNumTags() const { return tagVec.size(); }
+  int getNumTags() const { return tagMap.size(); }
 
-  bool hasTag(int tag) { return tagVec.find(tag) != tagVec.end(); }
+  bool hasTag(int tag) { return tagMap.find(tag) != tagMap.end(); }
+
+  wpi::json toJson() {
+    wpi::json json;
+    for (auto& [key, val] : tagMap) {
+      json["tags"].push_back(val.toJson());
+    }
+    json["field"]["length"] = fieldLength;
+    json["field"]["width"] = fieldWidth;
+    return json;
+  }
 
   static double minimizeAngle(double angle) {
     angle = std::fmod(angle, 360);
@@ -58,6 +70,13 @@ class Fieldmap {
     return angle;
   }
 
+  void replaceTag(int tag_id, tag::Pose pose) {
+    tagMap.erase(tag_id);
+    tagMap.emplace(tag_id, pose);
+  }
+
  private:
-  std::map<int, tag::Pose> tagVec;
+  double fieldLength;
+  double fieldWidth;
+  std::map<int, tag::Pose> tagMap;
 };

@@ -189,6 +189,7 @@ static void DisplayGui() {
 
   static Fieldmap currentCalibrationMap;
   static Fieldmap currentReferenceMap;
+  static Fieldmap currentCombinerMap;
 
   // camera matrix selector button
   openFileButton("Select Camera Intrinsics JSON", selected_camera_intrinsics,
@@ -553,6 +554,7 @@ static void DisplayGui() {
       drawCheck();
       std::ifstream json(selected_field_map);
       currentReferenceMap = Fieldmap(wpi::json::parse(json));
+      currentCombinerMap = currentReferenceMap;
     }
     openFilesButton("Select Field Calibrations", selected_field_calibrations,
                     "JSON", "*.json");
@@ -575,7 +577,7 @@ static void DisplayGui() {
       ImGui::InputInt("Tag ID", &current_combiner_tag_id);
       ImGui::SameLine();
       if (ImGui::Button("Add", ImVec2(0, 0)) &&
-          currentReferenceMap.hasTag(current_combiner_tag_id)) {
+          currentCombinerMap.hasTag(current_combiner_tag_id)) {
         combiner_map.emplace(current_combiner_tag_id, "");
       }
       ImGui::SameLine();
@@ -589,7 +591,30 @@ static void DisplayGui() {
     }
     ImGui::SameLine();
     if (ImGui::Button("Download", ImVec2(0, 0))) {
-      ImGui::CloseCurrentPopup();
+      for (auto& [key, val] : combiner_map) {
+        std::ifstream json(val);
+        Fieldmap map(wpi::json::parse(json));
+        currentCombinerMap.replaceTag(key, map.getTag(key));
+      }
+
+      if (!selected_download_directory.empty()) {
+        std::ofstream out(selected_download_directory + "/combination.json");
+        out << currentCombinerMap.toJson().dump(4);
+        out.close();
+      } else {
+        auto download_directory_selector =
+            std::make_unique<pfd::select_folder>("Select Download Folder", "");
+        if (download_directory_selector) {
+          auto selectedFiles = download_directory_selector->result();
+          if (!selectedFiles.empty()) {
+            selected_download_directory = selectedFiles;
+          }
+          download_directory_selector.reset();
+        }
+        std::ofstream out(selected_download_directory + "/combination.json");
+        out << currentCombinerMap.toJson().dump(4);
+        out.close();
+      }
     }
     ImGui::EndPopup();
   }
