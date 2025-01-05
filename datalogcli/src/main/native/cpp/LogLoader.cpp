@@ -21,14 +21,6 @@ using namespace datalogcli;
 
 LogLoader::LogLoader() {}
 
-datalogcli::LogLoader::LogLoader(const LogLoader& original) {
-  m_reader = std::make_unique<wpi::DataLogReaderThread>(original.m_reader.get());
-  m_filename = original.m_filename;
-  m_error = original.m_error;
-  m_entryTree = original.m_entryTree;
-  m_filter = original.m_filter;
-}
-
 LogLoader::~LogLoader() = default;
 
 void LogLoader::Load(std::string_view log_path) {

@@ -5,12 +5,6 @@
 #include "wpi/argparse.h"
 #include "LogLoader.h"
 
-datalogcli::LogLoader open_log(fs::path log_path) {
-  datalogcli::LogLoader loader{};
-  loader.Load(log_path.string());
-  return loader;
-}
-
 void export_json(fs::path log_path, fs::path output_path) {
 
 }
@@ -30,7 +24,8 @@ void write_csv(std::vector<wpi::log::DataLogRecord> records, fs::path output_pat
 
 void extract_entry(std::string_view entry_name, fs::path log_path, fs::path output_path, bool use_json) {
   // represent entry as a list of records
-  datalogcli::LogLoader loader = open_log(log_path);
+  datalogcli::LogLoader loader{};
+  loader.Load(log_path.string());
   std::vector<wpi::log::DataLogRecord> records = loader.GetRecords(entry_name);
 }
 
