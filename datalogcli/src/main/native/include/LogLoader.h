@@ -29,11 +29,13 @@ namespace datalogcli {
 class LogLoader {
  public:
   /**
-   * Creates a log loader widget
+   * Creates a log loader
    *
    * @param logger The program logger
    */
   explicit LogLoader();
+
+  explicit LogLoader(const LogLoader&);
 
   ~LogLoader();
 

@@ -21,6 +21,14 @@ using namespace datalogcli;
 
 LogLoader::LogLoader() {}
 
+datalogcli::LogLoader::LogLoader(const LogLoader& original) {
+  m_reader = std::make_unique<wpi::DataLogReaderThread>(original.m_reader.get());
+  m_filename = original.m_filename;
+  m_error = original.m_error;
+  m_entryTree = original.m_entryTree;
+  m_filter = original.m_filter;
+}
+
 LogLoader::~LogLoader() = default;
 
 void LogLoader::Load(std::string_view log_path) {
@@ -72,9 +80,6 @@ std::vector<wpi::log::DataLogRecord> LogLoader::GetRecords(std::string_view fiel
       record_list.push_back(*rangeReader);
     }
   }
-  
-  
-  
 
   return record_list;
 }
