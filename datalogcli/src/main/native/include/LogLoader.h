@@ -13,12 +13,12 @@
 #include <wpi/Signal.h>
 
 namespace glass {
-class DataLogReaderEntry;
-class DataLogReaderThread;
 class Storage;
 }  // namespace glass
 
 namespace wpi {
+class DataLogReaderEntry;
+class DataLogReaderThread;
 class Logger;
 }  // namespace wpi
 
@@ -33,7 +33,7 @@ class LogLoader {
    *
    * @param logger The program logger
    */
-  explicit LogLoader(glass::Storage& storage, wpi::Logger& logger);
+  explicit LogLoader(wpi::Logger& logger);
 
   ~LogLoader();
 
@@ -51,7 +51,7 @@ class LogLoader {
   // wpi::Logger& m_logger;
 
   std::string m_filename;
-  std::unique_ptr<glass::DataLogReaderThread> m_reader;
+  std::unique_ptr<wpi::DataLogReaderThread> m_reader;
 
   std::string m_error;
 
@@ -63,12 +63,9 @@ class LogLoader {
     explicit EntryTreeNode(std::string_view name) : name{name} {}
     std::string name;  // name of just this node
     std::string path;  // full path if entry is nullptr
-    const glass::DataLogReaderEntry* entry = nullptr;
+    const wpi::DataLogReaderEntry* entry = nullptr;
     std::vector<EntryTreeNode> children;  // children, sorted by name
   };
   std::vector<EntryTreeNode> m_entryTree;
-
-  void RebuildEntryTree();
-  int GetTargetEntryId(std::string_view name);
 };
 }  // namespace datalogcli
