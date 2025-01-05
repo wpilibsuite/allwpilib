@@ -1,22 +1,38 @@
 #include <cstring>
 #include <string>
 #include <string_view>
+#include <wpi/fs.h>
 #include "wpi/argparse.h"
+#include "LogLoader.h"
 
-void export_json(std::string_view output_path) {
+namespace fs = std::filesystem;
 
-}
-
-void export_csv(std::string_view output_path) {
-
-}
-
-void extract_field(std::string_view field_name, std::string_view output_path, bool use_json) {
+void export_json(fs::path log_path, fs::path output_path) {
 
 }
 
-void open_log(std::string_view log_path) {
-  // TODO: Add Log reader (base it on SysId?)
+void export_csv(fs::path log_path, fs::path output_path) {
+
+}
+
+void write_json(std::vector<wpi::log::DataLogRecord> records, fs::path output_path) {
+
+}
+
+void write_csv(std::vector<wpi::log::DataLogRecord> records, fs::path output_path) {
+  std::string header{"timestamp,value"};
+
+}
+
+void extract_entry(std::string_view entry_name, fs::path log_path, fs::path output_path, bool use_json) {
+  // represent entry as a list of records
+  datalogcli::LogLoader loader = open_log(log_path);
+  std::vector<wpi::log::DataLogRecord> records = loader.GetRecords(entry_name);
+}
+
+datalogcli::LogLoader open_log(fs::path log_path) {
+  datalogcli::LogLoader loader{};
+  loader.Load(log_path.string());
 }
 
 int main(int argc, char* argv[]) {
@@ -24,9 +40,9 @@ int main(int argc, char* argv[]) {
 
   wpi::ArgumentParser export_json_command{"json"};
   export_json_command.add_description(
-      "Export a JSON representation of a WPILOG file");
+      "Export a JSON representation of a DataLog file");
   export_json_command.add_argument("log_file")
-      .help("Path to the WPILOG file to export");
+      .help("Path to the DataLog file to export");
   export_json_command.add_argument("json_file")
       .help(
           "Path of the JSON file to create with the exported data. If it "
@@ -34,27 +50,27 @@ int main(int argc, char* argv[]) {
 
   wpi::ArgumentParser export_csv_command{"csv"};
   export_csv_command.add_description(
-      "Export a CSV representation of a WPILOG file");
-  export_csv_command.add_argument("-l", "--log-file").help("The WPILOG file to export");
+      "Export a CSV representation of a DataLog file");
+  export_csv_command.add_argument("-l", "--log-file").help("The DataLog file to export");
   export_csv_command.add_argument("-o", "--output-file")
       .required()
       .help(
           "The CSV file to create with the exported data. If it "
           "exists, it will be overwritten.");
 
-  wpi::ArgumentParser extract_field_command{"extract"};
-  extract_field_command.add_description(
-      "Extract the histoy of one field from a WPILOG file and store it in a "
+  wpi::ArgumentParser extract_entry_command{"extract"};
+  extract_entry_command.add_description(
+      "Extract the history of one entry from a DataLog file and store it in a "
       "JSON or CSV file");
-  extract_field_command.add_argument("-f", "--field")
+  extract_entry_command.add_argument("-e", "--entry")
       .required()
-      .help("The field to extract from the WPILOG");
-  extract_field_command.add_argument("-l", "--log")
+      .help("The entry to extract from the Log");
+  extract_entry_command.add_argument("-l", "--log-file")
       .required()
-      .help("The WPILOG file to extract from");
-  extract_field_command.add_argument("--time-start")
+      .help("The DataLog file to extract from");
+  extract_entry_command.add_argument("--time-start")
     .help("The timestamp to start extracting at");
-  extract_field_command.add_argument("-o", "--output")
+  extract_entry_command.add_argument("-o", "--output")
       .required()
       .help(
           "The file to export the field and data to. It will be created or "
@@ -62,7 +78,7 @@ int main(int argc, char* argv[]) {
   
   cli.add_subparser(export_json_command);
   cli.add_subparser(export_csv_command);
-  cli.add_subparser(extract_field_command);
+  cli.add_subparser(extract_entry_command);
 
   try {
     cli.parse_args(argc, argv);
@@ -74,10 +90,57 @@ int main(int argc, char* argv[]) {
 
   // see which one was called
   if (export_json_command) {
-    //export_json();
+    // validate paths
+    fs::path logPath{export_json_command.get("--log-file")};
+    if (logPath.extension() != ".wpilog")
+    {
+      std::cerr << "Please use a valid DataLog (.wpilog) file." << std::endl;
+      return 1;
+    }
+
+    fs::path outputPath{export_json_command.get("--output")};
+    if (outputPath.extension() != ".csv" || outputPath.extension() != ".json")
+    {
+      std::cerr << "Only JSON and CSV are currently supported as output formats." << std::endl;
+      return 1;
+    }
+
+    export_json(logPath, outputPath);
   } else if (export_csv_command) {
-    export_csv(export_csv_command.get("--log-file"));
-  } else if (extract_field_command) {
-    //extract_field();
+    // validate paths
+    fs::path logPath{export_csv_command.get("--log-file")};
+    if (logPath.extension() != ".wpilog")
+    {
+      std::cerr << "Please use a valid DataLog (.wpilog) file." << std::endl;
+      return 1;
+    }
+
+    fs::path outputPath{export_csv_command.get("--output")};
+    if (outputPath.extension() != ".csv" || outputPath.extension() != ".json")
+    {
+      std::cerr << "Only JSON and CSV are currently supported as output formats." << std::endl;
+      return 1;
+    }
+
+    export_csv(logPath, outputPath);
+  } else if (extract_entry_command) {
+    // validate paths
+    fs::path logPath{extract_entry_command.get("--log-file")};
+    if (logPath.extension() != ".wpilog")
+    {
+      std::cerr << "Please use a valid DataLog (.wpilog) file." << std::endl;
+      return 1;
+    }
+
+    fs::path outputPath{extract_entry_command.get("--output")};
+    if (outputPath.extension() != ".csv" || outputPath.extension() != ".json")
+    {
+      std::cerr << "Only JSON and CSV are currently supported as output formats." << std::endl;
+      return 1;
+    }
+
+    bool json{outputPath.extension() == ".json" ? true : false};
+
+    extract_entry(extract_entry_command.get("--entry"), logPath, outputPath, json);
   }
 }

@@ -33,7 +33,7 @@ class LogLoader {
    *
    * @param logger The program logger
    */
-  explicit LogLoader(wpi::Logger& logger);
+  explicit LogLoader();
 
   ~LogLoader();
 
@@ -48,7 +48,6 @@ class LogLoader {
   std::vector<wpi::log::DataLogRecord> GetRecords(std::string_view field_name);
 
  private:
-  // wpi::Logger& m_logger;
 
   std::string m_filename;
   std::unique_ptr<wpi::DataLogReaderThread> m_reader;
