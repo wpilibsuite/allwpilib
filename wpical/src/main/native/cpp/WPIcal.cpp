@@ -551,6 +551,8 @@ static void DisplayGui() {
     openFileButton("Select Ideal Map", selected_field_map, "JSON", "*.json");
     if (!selected_field_map.empty()) {
       drawCheck();
+      std::ifstream json(selected_field_map);
+      currentReferenceMap = Fieldmap(wpi::json::parse(json));
     }
     openFilesButton("Select Field Calibrations", selected_field_calibrations,
                     "JSON", "*.json");
