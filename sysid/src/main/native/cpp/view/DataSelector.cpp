@@ -10,7 +10,7 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <glass/support/DataLogReaderThread.h>
+#include <wpi/DataLogReaderThread.h>
 #include <imgui.h>
 #include <wpi/DataLogReader.h>
 #include <wpi/Logger.h>
@@ -25,7 +25,7 @@ using namespace sysid;
 static constexpr const char* kAnalysisTypes[] = {"Elevator", "Arm", "Simple"};
 
 static bool EmitEntryTarget(const char* name, bool isString,
-                            const glass::DataLogReaderEntry** entry) {
+                            const wpi::DataLogReaderEntry** entry) {
   if (*entry) {
     auto text =
         fmt::format("{}: {} ({})", name, (*entry)->name, (*entry)->type);
@@ -38,8 +38,8 @@ static bool EmitEntryTarget(const char* name, bool isString,
   if (ImGui::BeginDragDropTarget()) {
     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(
             isString ? "DataLogEntryString" : "DataLogEntry")) {
-      assert(payload->DataSize == sizeof(const glass::DataLogReaderEntry*));
-      *entry = *static_cast<const glass::DataLogReaderEntry**>(payload->Data);
+      assert(payload->DataSize == sizeof(const wpi::DataLogReaderEntry*));
+      *entry = *static_cast<const wpi::DataLogReaderEntry**>(payload->Data);
       rv = true;
     }
     ImGui::EndDragDropTarget();
@@ -179,7 +179,7 @@ void DataSelector::Reset() {
 }
 
 DataSelector::Tests DataSelector::LoadTests(
-    const glass::DataLogReaderEntry& testStateEntry) {
+    const wpi::DataLogReaderEntry& testStateEntry) {
   Tests tests;
   for (auto&& range : testStateEntry.ranges) {
     std::string_view prevState;
@@ -245,7 +245,7 @@ static void AddSamples(std::vector<MotorData::Run::Sample<T>>& samples,
 }
 
 static std::vector<std::pair<int64_t, double>> GetData(
-    const glass::DataLogReaderEntry& entry, double scale) {
+    const wpi::DataLogReaderEntry& entry, double scale) {
   std::vector<std::pair<int64_t, double>> rv;
   bool isDouble = entry.type == "double";
   for (auto&& range : entry.ranges) {

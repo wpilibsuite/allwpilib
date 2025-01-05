@@ -12,7 +12,7 @@
 #include <utility>
 #include <vector>
 
-#include <glass/support/DataLogReaderThread.h>
+#include <wpi/DataLogReaderThread.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <portable-file-dialogs.h>
@@ -55,7 +55,7 @@ void LogLoader::Display() {
       }
       unload();
       m_reader =
-          std::make_unique<glass::DataLogReaderThread>(std::move(reader));
+          std::make_unique<wpi::DataLogReaderThread>(std::move(reader));
       m_entryTree.clear();
     }
     m_opener.reset();
@@ -108,7 +108,7 @@ void LogLoader::Display() {
 void LogLoader::RebuildEntryTree() {
   m_entryTree.clear();
   wpi::SmallVector<std::string_view, 16> parts;
-  m_reader->ForEachEntryName([&](const glass::DataLogReaderEntry& entry) {
+  m_reader->ForEachEntryName([&](const wpi::DataLogReaderEntry& entry) {
     // only show double/float/string entries (TODO: support struct/protobuf)
     if (entry.type != "double" && entry.type != "float" &&
         entry.type != "string") {
@@ -167,7 +167,7 @@ void LogLoader::RebuildEntryTree() {
 }
 
 static void EmitEntry(const std::string& name,
-                      const glass::DataLogReaderEntry& entry) {
+                      const wpi::DataLogReaderEntry& entry) {
   ImGui::TableNextColumn();
   ImGui::Selectable(name.c_str());
   if (ImGui::BeginDragDropSource()) {
