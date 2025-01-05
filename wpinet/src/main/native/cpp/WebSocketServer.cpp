@@ -5,6 +5,7 @@
 #include "wpinet/WebSocketServer.h"
 
 #include <memory>
+#include <string>
 #include <utility>
 
 #include <wpi/StringExtras.h>
