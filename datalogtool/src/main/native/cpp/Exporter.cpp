@@ -20,11 +20,11 @@
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 #include <glass/Storage.h>
-#include <wpi/DataLogReaderThread.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
 #include <portable-file-dialogs.h>
+#include <wpi/DataLogReaderThread.h>
 #include <wpi/DenseMap.h>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/SmallVector.h>
