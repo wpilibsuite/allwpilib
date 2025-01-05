@@ -19,7 +19,8 @@ void write_json(std::vector<wpi::log::DataLogRecord> records, fs::path output_pa
 }
 
 void write_csv(std::vector<wpi::log::DataLogRecord> records, fs::path output_path) {
-  ExportCsv(output_path.string(), 0);
+  datalogcli::DataLogCSVWriter writer{};
+  writer.ExportCsv(output_path.string(), 0);
 }
 
 void extract_entry(std::string_view entry_name, fs::path log_path, fs::path output_path, bool use_json) {

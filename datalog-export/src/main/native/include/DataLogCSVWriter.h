@@ -6,4 +6,12 @@
 
 #include <string>
 
-static void ExportCsv(std::string_view outputFolder, int style);
+namespace datalogcli {
+    class DataLogCSVWriter {
+        public:
+            explicit DataLogCSVWriter();
+            ~DataLogCSVWriter();
+
+            void ExportCsv(std::string_view outputFolder, int style);
+    };
+}
