@@ -611,9 +611,13 @@ static void DisplayGui() {
           }
           download_directory_selector.reset();
         }
-        std::ofstream out(selected_download_directory + "/combination.json");
-        out << currentCombinerMap.toJson().dump(4);
-        out.close();
+        std::ofstream json(selected_download_directory + "/combination.json");
+        json << currentCombinerMap.toJson().dump(4);
+        json.close();
+
+        std::ofstream fmap(selected_download_directory + "/combination.fmap");
+        fmap << fmap::convertfmap(currentCombinerMap.toJson()).dump(4);
+        fmap.close();
       }
     }
     ImGui::EndPopup();
