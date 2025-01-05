@@ -23,7 +23,7 @@
 #include <wpi/protobuf/ProtobufMessageDatabase.h>
 #endif
 
-namespace glass {
+namespace wpi {
 
 class DataLogReaderRange {
  public:
@@ -105,4 +105,4 @@ class DataLogReaderThread {
   std::thread m_thread;
 };
 
-}  // namespace glass
+}  // namespace wpi
