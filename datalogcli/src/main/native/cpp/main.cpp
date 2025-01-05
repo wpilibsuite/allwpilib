@@ -1,7 +1,7 @@
 #include <cstring>
 #include <string>
 #include <string_view>
-#include "argparse/argparse.hpp"
+#include "wpi/argparse.h"
 
 void export_json(std::string_view output_path) {
 
@@ -20,9 +20,9 @@ void open_log(std::string_view log_path) {
 }
 
 int main(int argc, char* argv[]) {
-  argparse::ArgumentParser cli{"wpilog-cli"};
+  wpi::ArgumentParser cli{"wpilog-cli"};
 
-  argparse::ArgumentParser export_json_command{"json"};
+  wpi::ArgumentParser export_json_command{"json"};
   export_json_command.add_description(
       "Export a JSON representation of a WPILOG file");
   export_json_command.add_argument("log_file")
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
           "Path of the JSON file to create with the exported data. If it "
           "exists, it will be overwritten.");
 
-  argparse::ArgumentParser export_csv_command{"csv"};
+  wpi::ArgumentParser export_csv_command{"csv"};
   export_csv_command.add_description(
       "Export a CSV representation of a WPILOG file");
   export_csv_command.add_argument("-l", "--log-file").help("The WPILOG file to export");
@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
           "The CSV file to create with the exported data. If it "
           "exists, it will be overwritten.");
 
-  argparse::ArgumentParser extract_field_command{"extract"};
+  wpi::ArgumentParser extract_field_command{"extract"};
   extract_field_command.add_description(
       "Extract the histoy of one field from a WPILOG file and store it in a "
       "JSON or CSV file");
