@@ -16,12 +16,13 @@ public enum Fields {
   k2021Slalom("2021-slalompath.json"),
   k2022RapidReact("2022-rapidreact.json"),
   k2023ChargedUp("2023-chargedup.json"),
-  k2024Crescendo("2024-crescendo.json");
+  k2024Crescendo("2024-crescendo.json"),
+  k2025Reefscape("2025-reefscape.json");
 
   public static final String kBaseResourceDir = "/edu/wpi/first/fields/";
 
   /** Alias to the current game. */
-  public static final Fields kDefaultField = k2024Crescendo;
+  public static final Fields kDefaultField = k2025Reefscape;
 
   public final String m_resourceFile;
 

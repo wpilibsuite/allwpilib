@@ -55,11 +55,11 @@ class WPILIB_DLLEXPORT Rotation2d {
   constexpr Rotation2d(double x, double y) {
     double magnitude = gcem::hypot(x, y);
     if (magnitude > 1e-6) {
-      m_sin = y / magnitude;
       m_cos = x / magnitude;
+      m_sin = y / magnitude;
     } else {
-      m_sin = 0.0;
       m_cos = 1.0;
+      m_sin = 0.0;
       if (!std::is_constant_evaluated()) {
         wpi::math::MathSharedStore::ReportError(
             "x and y components of Rotation2d are zero\n{}",
