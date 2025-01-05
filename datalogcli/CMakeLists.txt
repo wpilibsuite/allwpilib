@@ -23,7 +23,7 @@ add_executable(
     ${APP_ICON_MACOSX}
 )
 
-target_include_directories(datalogcli PUBLIC src/main/native/cpp)
+target_include_directories(datalogcli PUBLIC src/main/native/include)
 
 target_link_libraries(datalogcli PRIVATE wpiutil)
 
