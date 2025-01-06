@@ -244,7 +244,12 @@ static jobject MakeJObject(JNIEnv* env,
                         static_cast<jfloat>(config.quadSigma),
                         static_cast<jboolean>(config.refineEdges),
                         static_cast<jdouble>(config.decodeSharpening),
-                        static_cast<jboolean>(config.debug));
+                        static_cast<jboolean>(config.debug),
+                        static_cast<jint>(config.roiX),
+                        static_cast<jint>(config.roiY),
+                        static_cast<jint>(config.roiWidth),
+                        static_cast<jint>(config.roiHeight)
+                        );
 }
 
 static jobject MakeJObject(

@@ -95,6 +95,7 @@ void AprilTagDetector::SetQuadThresholdParameters(
   qtp.max_line_fit_mse = params.maxLineFitMSE;
   qtp.min_white_black_diff = params.minWhiteBlackDiff;
   qtp.deglitch = params.deglitch;
+  
 
   m_qtpCriticalAngle = params.criticalAngle;
 }
