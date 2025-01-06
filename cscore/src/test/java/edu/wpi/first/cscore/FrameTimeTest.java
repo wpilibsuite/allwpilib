@@ -29,12 +29,17 @@ class FrameTimeTest {
     RawFrame frame = new RawFrame();
     frame.setTimeInfo(12, TimestampSource.kV4lEoF);
 
+    // HACK (Matt): try putting a frame into the source to prime the tubes
+    assertDoesNotThrow(() -> Thread.sleep(10));
+    source.putFrame(frame);
+    assertDoesNotThrow(() -> Thread.sleep(10));
+
     // And a sink waiting for a new frame to arrive
     RawFrame sinkFrame = new RawFrame();
     Thread sinkGrabber =
         new Thread(
             () -> {
-              long ret = sink.grabFrame(sinkFrame);
+              long ret = sink.grabFrame(sinkFrame, 10);
               assertTrue(ret > 0);
             });
     sinkGrabber.start();
@@ -43,7 +48,7 @@ class FrameTimeTest {
     // (Note: the frame time and time source are overridden by RawSourceImpl, and changing this is
     // spooky)
     // (Matt: without this sleep, the test seemed flakey)
-    assertDoesNotThrow(() -> Thread.sleep(10));
+    assertDoesNotThrow(() -> Thread.sleep(20));
     source.putFrame(frame);
 
     // then the sink gets the image
