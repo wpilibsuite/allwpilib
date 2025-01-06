@@ -19,6 +19,9 @@ cameracalibration::CameraModel cameraModel = {
     .intrinsic_matrix = Eigen::Matrix<double, 3, 3>::Identity(),
     .distortion_coefficients = Eigen::Matrix<double, 8, 1>::Zero(),
     .avg_reprojection_error = 0.0};
+
+wpi::json output_json;
+
 #ifdef __linux__
 const std::string fileSuffix = ".avi";
 const std::string videoLocation = "/altfieldvideo";
@@ -58,7 +61,7 @@ TEST(Camera_CalibrationTest, MRcal_Atypical) {
 
 TEST(Field_CalibrationTest, Typical) {
   int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, calSavePath,
+      projectRootPath + videoLocation, output_json,
       calSavePath + "/cameracalibration.json",
       projectRootPath + "/2024-crescendo.json", 3, false);
   EXPECT_EQ(ret, 0);
@@ -66,7 +69,7 @@ TEST(Field_CalibrationTest, Typical) {
 
 TEST(Field_CalibrationTest, Atypical_Bad_Camera_Model_Directory) {
   int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, calSavePath,
+      projectRootPath + videoLocation, output_json,
       projectRootPath + videoLocation + "/long" + fileSuffix,
       projectRootPath + "/2024-crescendo.json", 3, false);
   EXPECT_EQ(ret, 1);
@@ -74,7 +77,7 @@ TEST(Field_CalibrationTest, Atypical_Bad_Camera_Model_Directory) {
 
 TEST(Field_CalibrationTest, Atypical_Bad_Ideal_JSON) {
   int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, calSavePath,
+      projectRootPath + videoLocation, output_json,
       calSavePath + "/cameracalibration.json",
       calSavePath + "/cameracalibration.json", 3, false);
   EXPECT_EQ(ret, 1);
@@ -82,7 +85,7 @@ TEST(Field_CalibrationTest, Atypical_Bad_Ideal_JSON) {
 
 TEST(Field_CalibrationTest, Atypical_Bad_Input_Directory) {
   int ret = fieldcalibration::calibrate(
-      projectRootPath + "", calSavePath,
+      projectRootPath + "", output_json,
       calSavePath + "/cameracalibration.json",
       projectRootPath + "/2024-crescendo.json", 3, false);
   EXPECT_EQ(ret, 1);
@@ -90,7 +93,7 @@ TEST(Field_CalibrationTest, Atypical_Bad_Input_Directory) {
 
 TEST(Field_CalibrationTest, Atypical_Bad_Pinned_Tag) {
   int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, calSavePath,
+      projectRootPath + videoLocation, output_json,
       calSavePath + "/cameracalibration.json",
       projectRootPath + "/2024-crescendo.json", 42, false);
   EXPECT_EQ(ret, 1);
@@ -98,7 +101,7 @@ TEST(Field_CalibrationTest, Atypical_Bad_Pinned_Tag) {
 
 TEST(Field_CalibrationTest, Atypical_Bad_Pinned_Tag_Negative) {
   int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, calSavePath,
+      projectRootPath + videoLocation, output_json,
       calSavePath + "/cameracalibration.json",
       projectRootPath + "/2024-crescendo.json", -1, false);
   EXPECT_EQ(ret, 1);

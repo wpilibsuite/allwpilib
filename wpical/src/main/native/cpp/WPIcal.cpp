@@ -62,7 +62,7 @@ void drawCheck() {
 
 void processFileSelector(std::unique_ptr<pfd::open_file>& selector,
                          std::string& selected_file) {
-  if (selector) {
+  if (selector && selector->ready(0)) {
     auto selectedFiles = selector->result();
     if (!selectedFiles.empty()) {
       selected_file = selectedFiles[0];
@@ -73,7 +73,7 @@ void processFileSelector(std::unique_ptr<pfd::open_file>& selector,
 
 void processFilesSelector(std::unique_ptr<pfd::open_file>& selector,
                           std::vector<std::string>& selected_files) {
-  if (selector) {
+  if (selector && selector->ready(0)) {
     auto selectedFiles = selector->result();
     if (!selectedFiles.empty()) {
       selected_files = selectedFiles;
@@ -84,7 +84,7 @@ void processFilesSelector(std::unique_ptr<pfd::open_file>& selector,
 
 void processDirectorySelector(std::unique_ptr<pfd::select_folder>& selector,
                               std::string& selected_directory) {
-  if (selector) {
+  if (selector && selector->ready(0)) {
     auto selectedFiles = selector->result();
     if (!selectedFiles.empty()) {
       selected_directory = selectedFiles;
@@ -148,6 +148,24 @@ static bool EmitEntryTarget(int tag_id, std::string& file) {
   return rv;
 }
 
+void saveCalibration(wpi::json& field, std::string& output_directory,
+                     std::string output_name, bool& isCalibrating) {
+  if (!field.empty() && !output_directory.empty()) {
+    std::cout << "Saving calibration to " << output_directory << std::endl;
+    std::ofstream out(output_directory + "/" + output_name + ".json");
+    out << field.dump(4);
+    out.close();
+
+    std::ofstream fmap(output_directory + "/" + output_name + ".fmap");
+    fmap << fmap::convertfmap(field).dump(4);
+    fmap.close();
+
+    field.clear();
+    output_directory.clear();
+    isCalibrating = false;
+  }
+}
+
 static void DisplayGui() {
   ImGui::GetStyle().WindowRounding = 0;
 
@@ -173,11 +191,15 @@ static void DisplayGui() {
 
   static std::unique_ptr<pfd::open_file> camera_intrinsics_selector;
   static std::unique_ptr<pfd::open_file> field_map_selector;
+  static std::unique_ptr<pfd::open_file> output_calibration_json_selector;
+  static std::unique_ptr<pfd::open_file> combination_calibrations_selector;
+
   static std::unique_ptr<pfd::select_folder>
       field_calibration_directory_selector;
   static std::unique_ptr<pfd::select_folder> download_directory_selector;
-  static std::unique_ptr<pfd::open_file> output_calibration_json_selector;
-  static std::unique_ptr<pfd::open_file> combination_calibrations_selector;
+
+  static wpi::json field_calibration_json;
+  static wpi::json field_combination_json;
 
   static std::string selected_camera_intrinsics;
   static std::string selected_field_map;
@@ -188,6 +210,9 @@ static void DisplayGui() {
 
   static std::map<int, std::string> combiner_map;
   static int current_combiner_tag_id = 0;
+
+  static bool isCalibrating = false;
+  static int calibrationOutput = -1;
 
   cameracalibration::CameraModel cameraModel = {
       .intrinsic_matrix = Eigen::Matrix<double, 3, 3>::Identity(),
@@ -258,43 +283,27 @@ static void DisplayGui() {
 
   // calibrate button
   if (ImGui::Button("Calibrate!!!")) {
-    if (!selected_field_calibration_directory.empty() &&
-        !selected_camera_intrinsics.empty() && !selected_field_map.empty()) {
-      auto download_directory_selector =
-          std::make_unique<pfd::select_folder>("Select Download Folder", "");
-      if (download_directory_selector) {
-        auto selectedFiles = download_directory_selector->result();
-        if (!selectedFiles.empty()) {
-          selected_download_directory = selectedFiles;
-        }
-        download_directory_selector.reset();
-      }
-
-      output_calibration_json_path =
-          selected_download_directory + "/output.json";
-
-      int calibrationOutput = fieldcalibration::calibrate(
-          selected_field_calibration_directory.c_str(),
-          output_calibration_json_path, selected_camera_intrinsics,
-          selected_field_map.c_str(), pinnedTag, showDebug);
-
-      if (calibrationOutput == 1) {
-        ImGui::OpenPopup("Field Calibration Error");
-      } else if (calibrationOutput == 0) {
-        std::ifstream caljsonpath(output_calibration_json_path);
-        try {
-          wpi::json fmap = fmap::convertfmap(wpi::json::parse(caljsonpath));
-          std::ofstream out(selected_download_directory + "/output.fmap");
-          out << fmap.dump(4);
-          out.close();
-          ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
-          ImGui::OpenPopup("Visualize Calibration");
-        } catch (...) {
-          ImGui::OpenPopup("Fmap Conversion Error");
-        }
-      }
-    }
+    calibrationOutput = fieldcalibration::calibrate(
+        selected_field_calibration_directory.c_str(), field_calibration_json,
+        selected_camera_intrinsics, selected_field_map.c_str(), pinnedTag,
+        showDebug);
   }
+
+  if (calibrationOutput == 1) {
+    ImGui::OpenPopup("Field Calibration Error");
+  }
+
+  if (selected_download_directory.empty() && !field_calibration_json.empty() &&
+      !download_directory_selector) {
+    download_directory_selector =
+        std::make_unique<pfd::select_folder>("Select Download Folder", "");
+  }
+
+  processDirectorySelector(download_directory_selector,
+                           selected_download_directory);
+  saveCalibration(field_calibration_json, selected_download_directory,
+                  "field_calibration", isCalibrating);
+
   if (ImGui::Button("Visualize")) {
     ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
     ImGui::OpenPopup("Visualize Calibration");
@@ -333,6 +342,7 @@ static void DisplayGui() {
     ImGui::TextWrapped("- Your pinned tag is a valid FRC Apriltag");
     ImGui::Separator();
     if (ImGui::Button("OK", ImVec2(120, 0))) {
+      calibrationOutput = -1;
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
@@ -655,25 +665,20 @@ static void DisplayGui() {
         Fieldmap map(wpi::json::parse(json));
         currentCombinerMap.replaceTag(key, map.getTag(key));
       }
-
-      if (!selected_download_directory.empty()) {
-        std::ofstream out(selected_download_directory + "/combination.json");
-        out << currentCombinerMap.toJson().dump(4);
-        out.close();
-      } else {
-        auto download_directory_selector =
-            std::make_unique<pfd::select_folder>("Select Download Folder", "");
-        processDirectorySelector(download_directory_selector,
-                                 selected_download_directory);
-        std::ofstream json(selected_download_directory + "/combination.json");
-        json << currentCombinerMap.toJson().dump(4);
-        json.close();
-
-        std::ofstream fmap(selected_download_directory + "/combination.fmap");
-        fmap << fmap::convertfmap(currentCombinerMap.toJson()).dump(4);
-        fmap.close();
-      }
+      field_combination_json = currentCombinerMap.toJson();
     }
+
+    if (selected_download_directory.empty() &&
+        !field_combination_json.empty() && !download_directory_selector) {
+      download_directory_selector =
+          std::make_unique<pfd::select_folder>("Select Download Folder", "");
+    }
+
+    processDirectorySelector(download_directory_selector,
+                             selected_download_directory);
+    saveCalibration(field_combination_json, selected_download_directory,
+                    "combined_calibration", isCalibrating);
+
     ImGui::EndPopup();
   }
 
