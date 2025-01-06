@@ -98,9 +98,7 @@ std::string_view EscapeHTML(std::string_view str, SmallVectorImpl<char>& buf) {
 }
 
 HttpQueryMap::HttpQueryMap(std::string_view query) {
-  SmallVector<std::string_view, 16> queryElems;
-  split(query, queryElems, '&', 100, false);
-  for (auto elem : queryElems) {
+  split(query, '&', 100, false, [&](auto elem) {
     auto [nameEsc, valueEsc] = split(elem, '=');
     SmallString<64> nameBuf;
     bool err = false;
@@ -109,7 +107,7 @@ HttpQueryMap::HttpQueryMap(std::string_view query) {
     if (!err) {
       m_elems.try_emplace(name, valueEsc);
     }
-  }
+  });
 }
 
 std::optional<std::string_view> HttpQueryMap::Get(
@@ -132,9 +130,7 @@ HttpPath::HttpPath(std::string_view path) {
     m_pathEnds.emplace_back(0);
     return;
   }
-  wpi::SmallVector<std::string_view, 16> pathElems;
-  split(path, pathElems, '/', 100, false);
-  for (auto elem : pathElems) {
+  split(path, '/', 100, false, [&](auto elem) {
     SmallString<64> buf;
     bool err = false;
     auto val = wpi::UnescapeURI(elem, buf, &err);
@@ -144,7 +140,7 @@ HttpPath::HttpPath(std::string_view path) {
     }
     m_pathBuf += val;
     m_pathEnds.emplace_back(m_pathBuf.size());
-  }
+  });
 }
 
 bool HttpPath::startswith(size_t start,

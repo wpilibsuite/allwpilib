@@ -245,7 +245,8 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
 
       wpi::SmallVector<std::string_view, 16> pathSplitVec;
       // Split path into individual directories
-      wpi::split(path, pathSplitVec, '/', -1, false);
+      wpi::split(path, '/', -1, false,
+                 [&](auto part) { pathSplitVec.emplace_back(part); });
 
       // Find each individual item index
       int findusb = -1;

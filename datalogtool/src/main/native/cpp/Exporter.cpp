@@ -102,7 +102,8 @@ static void RebuildEntryTree() {
     } else {
       parts.emplace_back(prefix);
     }
-    wpi::split(mainpart, parts, '/', -1, false);
+    wpi::split(mainpart, '/', -1, false,
+               [&](auto part) { parts.emplace_back(part); });
 
     // ignore a raw "/" key
     if (parts.empty()) {

@@ -1015,7 +1015,8 @@ void NetworkTablesModel::RebuildTreeImpl(std::vector<TreeNode>* tree,
       continue;
     }
     parts.clear();
-    wpi::split(entry->info.name, parts, '/', -1, false);
+    wpi::split(entry->info.name, '/', -1, false,
+               [&](auto part) { parts.emplace_back(part); });
 
     // ignore a raw "/" key
     if (parts.empty()) {
