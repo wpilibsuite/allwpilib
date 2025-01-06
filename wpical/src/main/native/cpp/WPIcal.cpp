@@ -212,7 +212,6 @@ static void DisplayGui() {
   static int current_combiner_tag_id = 0;
 
   static bool isCalibrating = false;
-  static int calibrationOutput = -1;
 
   cameracalibration::CameraModel cameraModel = {
       .intrinsic_matrix = Eigen::Matrix<double, 3, 3>::Identity(),
@@ -283,20 +282,20 @@ static void DisplayGui() {
 
   // calibrate button
   if (ImGui::Button("Calibrate!!!")) {
-    calibrationOutput = fieldcalibration::calibrate(
+    int calibrationOutput = fieldcalibration::calibrate(
         selected_field_calibration_directory.c_str(), field_calibration_json,
         selected_camera_intrinsics, selected_field_map.c_str(), pinnedTag,
         showDebug);
-  }
 
-  if (calibrationOutput == 1) {
-    ImGui::OpenPopup("Field Calibration Error");
-  }
+    if (calibrationOutput == 1) {
+      ImGui::OpenPopup("Field Calibration Error");
+    }
 
-  if (selected_download_directory.empty() && !field_calibration_json.empty() &&
-      !download_directory_selector) {
-    download_directory_selector =
-        std::make_unique<pfd::select_folder>("Select Download Folder", "");
+    if (selected_download_directory.empty() &&
+        !field_calibration_json.empty() && !download_directory_selector) {
+      download_directory_selector =
+          std::make_unique<pfd::select_folder>("Select Download Folder", "");
+    }
   }
 
   processDirectorySelector(download_directory_selector,
@@ -342,7 +341,6 @@ static void DisplayGui() {
     ImGui::TextWrapped("- Your pinned tag is a valid FRC Apriltag");
     ImGui::Separator();
     if (ImGui::Button("OK", ImVec2(120, 0))) {
-      calibrationOutput = -1;
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
