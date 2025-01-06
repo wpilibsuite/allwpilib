@@ -5,6 +5,7 @@
 #include "wpinet/WebSocketServer.h"
 
 #include <memory>
+#include <string>
 #include <utility>
 
 #include <wpi/StringExtras.h>
@@ -31,14 +32,12 @@ WebSocketServerHelper::WebSocketServerHelper(HttpParser& req) {
       m_version = value;
     } else if (equals_lower(name, "sec-websocket-protocol")) {
       // Protocols are comma delimited, repeated headers add to list
-      SmallVector<std::string_view, 2> protocols;
-      split(value, protocols, ",", -1, false);
-      for (auto protocol : protocols) {
+      split(value, ',', -1, false, [&](auto protocol) {
         protocol = trim(protocol);
         if (!protocol.empty()) {
           m_protocols.emplace_back(protocol);
         }
-      }
+      });
     }
   });
   req.headersComplete.connect([&req, this](bool) {
@@ -53,7 +52,22 @@ std::pair<bool, std::string_view> WebSocketServerHelper::MatchProtocol(
   if (protocols.empty() && m_protocols.empty()) {
     return {true, {}};
   }
-  for (auto protocol : protocols) {
+  for (auto&& protocol : protocols) {
+    for (auto&& clientProto : m_protocols) {
+      if (protocol == clientProto) {
+        return {true, protocol};
+      }
+    }
+  }
+  return {false, {}};
+}
+
+std::pair<bool, std::string_view> WebSocketServerHelper::MatchProtocol(
+    std::span<const std::string> protocols) {
+  if (protocols.empty() && m_protocols.empty()) {
+    return {true, {}};
+  }
+  for (auto&& protocol : protocols) {
     for (auto&& clientProto : m_protocols) {
       if (protocol == clientProto) {
         return {true, protocol};
@@ -101,9 +115,7 @@ WebSocketServer::WebSocketServer(uv::Stream& stream,
     }
 
     // Negotiate sub-protocol
-    SmallVector<std::string_view, 2> protocols{m_protocols.begin(),
-                                               m_protocols.end()};
-    std::string_view protocol = m_helper.MatchProtocol(protocols).second;
+    std::string_view protocol = m_helper.MatchProtocol(m_protocols).second;
 
     // Disconnect our header reader
     m_dataConn.disconnect();

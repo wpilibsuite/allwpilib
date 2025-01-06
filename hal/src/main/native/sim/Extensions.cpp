@@ -10,7 +10,6 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/print.h>
@@ -100,7 +99,6 @@ int HAL_LoadOneExtension(const char* library) {
 
 int HAL_LoadExtensions(void) {
   int rc = 1;
-  wpi::SmallVector<std::string_view, 2> libraries;
   const char* e = std::getenv("HALSIM_EXTENSIONS");
   if (!e) {
     if (GetShowNotFoundMessage()) {
@@ -109,13 +107,11 @@ int HAL_LoadExtensions(void) {
     }
     return rc;
   }
-  wpi::split(e, libraries, DELIM, -1, false);
-  for (auto& library : libraries) {
-    rc = HAL_LoadOneExtension(std::string(library).c_str());
-    if (rc < 0) {
-      break;
+  wpi::split(e, DELIM, -1, false, [&](auto library) {
+    if (rc >= 0) {
+      rc = HAL_LoadOneExtension(std::string(library).c_str());
     }
-  }
+  });
   return rc;
 }
 
