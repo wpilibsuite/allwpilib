@@ -22,7 +22,9 @@ class Storage;
 }  // namespace glass
 
 namespace wpi {
-class DataLogReaderEntry;
+namespace log{
+  class DataLogReaderEntry;
+}
 class Logger;
 }  // namespace wpi
 
@@ -64,10 +66,10 @@ class DataSelector : public glass::View {
   std::future<Tests> m_testsFuture;
   Tests m_tests;
   std::string m_selectedTest;
-  const wpi::DataLogReaderEntry* m_testStateEntry = nullptr;
-  const wpi::DataLogReaderEntry* m_velocityEntry = nullptr;
-  const wpi::DataLogReaderEntry* m_positionEntry = nullptr;
-  const wpi::DataLogReaderEntry* m_voltageEntry = nullptr;
+  const wpi::log::DataLogReaderEntry* m_testStateEntry = nullptr;
+  const wpi::log::DataLogReaderEntry* m_velocityEntry = nullptr;
+  const wpi::log::DataLogReaderEntry* m_positionEntry = nullptr;
+  const wpi::log::DataLogReaderEntry* m_voltageEntry = nullptr;
   double m_velocityScale = 1.0;
   double m_positionScale = 1.0;
   int m_selectedUnit = 0;
@@ -75,7 +77,7 @@ class DataSelector : public glass::View {
   std::future<TestData> m_testdataFuture;
   std::vector<std::string> m_testdataStats;
 
-  static Tests LoadTests(const wpi::DataLogReaderEntry& testStateEntry);
+  static Tests LoadTests(const wpi::log::DataLogReaderEntry& testStateEntry);
   TestData BuildTestData();
 };
 }  // namespace sysid

@@ -21,8 +21,10 @@ class open_file;
 }  // namespace pfd
 
 namespace wpi {
-class DataLogReaderEntry;
-class DataLogReaderThread;
+namespace log {
+  class DataLogReaderEntry;
+  class DataLogReaderThread;
+}
 class Logger;
 }  // namespace wpi
 
@@ -57,7 +59,7 @@ class LogLoader : public glass::View {
 
   std::string m_filename;
   std::unique_ptr<pfd::open_file> m_opener;
-  std::unique_ptr<wpi::DataLogReaderThread> m_reader;
+  std::unique_ptr<wpi::log::DataLogReaderThread> m_reader;
 
   std::string m_error;
 
@@ -67,7 +69,7 @@ class LogLoader : public glass::View {
     explicit EntryTreeNode(std::string_view name) : name{name} {}
     std::string name;  // name of just this node
     std::string path;  // full path if entry is nullptr
-    const wpi::DataLogReaderEntry* entry = nullptr;
+    const wpi::log::DataLogReaderEntry* entry = nullptr;
     std::vector<EntryTreeNode> children;  // children, sorted by name
   };
   std::vector<EntryTreeNode> m_entryTree;

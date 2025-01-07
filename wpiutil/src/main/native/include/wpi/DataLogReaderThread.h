@@ -23,7 +23,7 @@
 #include <wpi/protobuf/ProtobufMessageDatabase.h>
 #endif
 
-namespace wpi {
+namespace wpi::log {
 
 class DataLogReaderRange {
  public:

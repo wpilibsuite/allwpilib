@@ -40,7 +40,7 @@
 
 namespace {
 struct InputFile {
-  explicit InputFile(std::unique_ptr<wpi::DataLogReaderThread> datalog);
+  explicit InputFile(std::unique_ptr<wpi::log::DataLogReaderThread> datalog);
 
   InputFile(std::string_view filename, std::string_view status)
       : filename{filename},
@@ -51,7 +51,7 @@ struct InputFile {
 
   std::string filename;
   std::string stem;
-  std::unique_ptr<wpi::DataLogReaderThread> datalog;
+  std::unique_ptr<wpi::log::DataLogReaderThread> datalog;
   std::string status;
   bool highlight = false;
 };
@@ -140,7 +140,7 @@ static void RebuildEntryTree() {
   }
 }
 
-InputFile::InputFile(std::unique_ptr<wpi::DataLogReaderThread> datalog_)
+InputFile::InputFile(std::unique_ptr<wpi::log::DataLogReaderThread> datalog_)
     : filename{datalog_->GetBufferIdentifier()},
       stem{fs::path{filename}.stem().string()},
       datalog{std::move(datalog_)} {
@@ -196,7 +196,7 @@ static std::unique_ptr<InputFile> LoadDataLog(std::string_view filename) {
   }
 
   return std::make_unique<InputFile>(
-      std::make_unique<wpi::DataLogReaderThread>(std::move(reader)));
+      std::make_unique<wpi::log::DataLogReaderThread>(std::move(reader)));
 }
 
 void DisplayInputFiles() {

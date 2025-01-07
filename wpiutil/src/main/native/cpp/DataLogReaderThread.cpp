@@ -10,7 +10,7 @@
 #include <string>
 #include <utility>
 
-using namespace wpi;
+using namespace wpi::log;
 
 DataLogReaderThread::~DataLogReaderThread() {
   if (m_thread.joinable()) {
