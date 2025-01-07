@@ -5,13 +5,14 @@
 #include "LogLoader.h"
 
 #include <memory>
+#include <string>
 #include <string_view>
 #include <system_error>
 #include <utility>
 #include <vector>
-#include "fmt/base.h"
-#include "wpi/DataLogReader.h"
 
+#include <fmt/base.h>
+#include <wpi/DataLogReader.h>
 #include <wpi/DataLogReaderThread.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
@@ -24,7 +25,6 @@ LogLoader::LogLoader() {}
 LogLoader::~LogLoader() = default;
 
 void LogLoader::Load(std::string_view log_path) {
-
   // Handle opening the file
   std::error_code ec;
   auto buf = wpi::MemoryBuffer::GetFile(log_path);
@@ -38,7 +38,7 @@ void LogLoader::Load(std::string_view log_path) {
     m_error = "Not a valid datalog file";
     return;
   }
-  unload(); // release the actual file, we have the data in the reader now
+  unload();  // release the actual file, we have the data in the reader now
   m_reader = std::make_unique<wpi::DataLogReaderThread>(std::move(reader));
   m_entryTree.clear();
 
@@ -52,23 +52,22 @@ void LogLoader::Load(std::string_view log_path) {
   // Summary info
   fmt::println("{}", fs::path{m_filename}.stem().string().c_str());
   fmt::println("%u records, %u entries%s", m_reader->GetNumRecords(),
-              m_reader->GetNumEntries(),
-              m_reader->IsDone() ? "" : " (working)");
+               m_reader->GetNumEntries(),
+               m_reader->IsDone() ? "" : " (working)");
 
   if (!m_reader->IsDone()) {
     return;
   }
 }
 
-std::vector<wpi::log::DataLogRecord> LogLoader::GetRecords(std::string_view field_name) {
+std::vector<wpi::log::DataLogRecord> LogLoader::GetRecords(
+    std::string_view field_name) {
   std::vector<wpi::log::DataLogRecord> record_list{};
 
   const wpi::DataLogReaderEntry* entry = m_reader->GetEntry(field_name);
-  for (wpi::DataLogReaderRange range : entry->ranges)
-  {
+  for (wpi::DataLogReaderRange range : entry->ranges) {
     wpi::log::DataLogReader::iterator rangeReader = range.begin();
-    while (!rangeReader->IsFinish())
-    {
+    while (!rangeReader->IsFinish()) {
       record_list.push_back(*rangeReader);
     }
   }
@@ -76,5 +75,9 @@ std::vector<wpi::log::DataLogRecord> LogLoader::GetRecords(std::string_view fiel
   return record_list;
 }
 
+std::vector<wpi::log::DataLogRecord> datalogcli::LogLoader::GetAllRecords() {
+  std::vector<wpi::log::DataLogRecord> record_list{};
 
-
+  //auto iter = m_reader-
+  return record_list;
+}

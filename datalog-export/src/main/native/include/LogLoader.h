@@ -8,8 +8,8 @@
 #include <string>
 #include <string_view>
 #include <vector>
-#include "wpi/DataLogReader.h"
 
+#include <wpi/DataLogReader.h>
 #include <wpi/Signal.h>
 
 namespace glass {
@@ -45,8 +45,9 @@ class LogLoader {
 
   std::vector<wpi::log::DataLogRecord> GetRecords(std::string_view field_name);
 
- private:
+  std::vector<wpi::log::DataLogRecord> GetAllRecords();
 
+ private:
   std::string m_filename;
   std::unique_ptr<wpi::DataLogReaderThread> m_reader;
 

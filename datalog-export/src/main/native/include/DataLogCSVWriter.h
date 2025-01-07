@@ -7,11 +7,11 @@
 #include <string>
 
 namespace datalogcli {
-    class DataLogCSVWriter {
-        public:
-            explicit DataLogCSVWriter();
-            ~DataLogCSVWriter();
+class DataLogCSVWriter {
+ public:
+  explicit DataLogCSVWriter();
+  ~DataLogCSVWriter();
 
-            void ExportCsv(std::string_view outputFolder, int style);
-    };
-}
+  void ExportCsv(std::string_view outputFolder, int style);
+};
+}  // namespace datalogcli

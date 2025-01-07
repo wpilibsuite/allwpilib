@@ -4,9 +4,19 @@ include(CompileWarnings)
 include(GenResources)
 
 configure_file(src/main/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
-generate_resources(src/main/native/resources generated/main/cpp DLT dlt datalog-export_resources_src)
+generate_resources(
+    src/main/native/resources
+    generated/main/cpp
+    DLT
+    dlt
+    datalog-export_resources_src
+)
 
-file(GLOB datalog-export_src src/main/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
+file(
+    GLOB datalog-export_src
+    src/main/native/cpp/*.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp
+)
 
 if(WIN32)
     set(datalog-export_rc src/main/native/win/datalog-export.rc)
