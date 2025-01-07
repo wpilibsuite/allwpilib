@@ -120,12 +120,6 @@ jobs:
           ./mpack.py clone
           ./mpack.py copy-src
           ./mpack.py format-patch
-      - name: Run stack_walker.py
-        run: |
-          cd upstream_utils
-          ./stack_walker.py clone
-          ./stack_walker.py copy-src
-          ./stack_walker.py format-patch
       - name: Run memory.py
         run: |
           cd upstream_utils
