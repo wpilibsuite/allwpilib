@@ -504,7 +504,7 @@ public final class SmartDashboard {
 
   /**
    * Put a value with units in the table.
-   * 
+   *
    * @param key the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
@@ -515,7 +515,7 @@ public final class SmartDashboard {
       return false;
     }
     String publishedUnitSymbol = entry.getTopic().getProperty("unit");
-    if (publishedUnitSymbol == "null") {
+    if (publishedUnitSymbol.equals("null")) {
       entry.getTopic().setProperty("unit", unit.symbol());
     } else if (!publishedUnitSymbol.equals(unit.symbol())) {
       return false;
@@ -526,7 +526,7 @@ public final class SmartDashboard {
 
   /**
    * Put a value with units in the table.
-   * 
+   *
    * @param key the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
@@ -536,13 +536,13 @@ public final class SmartDashboard {
   }
 
   /**
-   * Returns the value with units the key maps to. If the key does not exist or is of different type,
-   * it will return the default value.
-   * 
+   * Returns the value with units the key maps to. If the key does not exist or is of different
+   * type, it will return the default value.
+   *
    * @param key the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value if there is no value
-   *    associated with the key
+   *     associated with the key
    */
   @SuppressWarnings("unchecked")
   public static <U extends Unit> Measure<U> getMeasure(String key, Measure<U> defaultValue) {
@@ -551,7 +551,7 @@ public final class SmartDashboard {
       return defaultValue;
     }
     String publishedUnitSymbol = entry.getTopic().getProperty("unit");
-    if (publishedUnitSymbol == "null") {
+    if (publishedUnitSymbol.equals("null")) {
       return defaultValue;
     }
     U unit = defaultValue.baseUnit();
