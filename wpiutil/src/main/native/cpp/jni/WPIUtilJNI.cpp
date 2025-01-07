@@ -428,6 +428,24 @@ Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameData
 
 /*
  * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    setRawFrameTime
+ * Signature: (JJI)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameTime
+  (JNIEnv* env, jclass, jlong frame, jlong time, jint timeSource)
+{
+  auto* f = reinterpret_cast<wpi::RawFrame*>(frame);
+  if (!f) {
+    wpi::ThrowNullPointerException(env, "frame is null");
+    return;
+  }
+  f->timestamp = time;
+  f->timestampSrc = timeSource;
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
  * Method:    setRawFrameInfo
  * Signature: (JIIIII)V
  */

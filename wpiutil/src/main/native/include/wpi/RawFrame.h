@@ -34,13 +34,15 @@ typedef struct WPI_RawFrame {  // NOLINT
   uint8_t* data;
   // function to free image data (may be NULL)
   void (*freeFunc)(void* cbdata, void* data, size_t capacity);
-  void* freeCbData;  // data passed to freeFunc
-  size_t capacity;   // data buffer capacity, in bytes
-  size_t size;       // actual size of data, in bytes
-  int pixelFormat;   // WPI_PixelFormat
-  int width;         // width of image, in pixels
-  int height;        // height of image, in pixels
-  int stride;        // size of each row of data, in bytes (may be 0)
+  void* freeCbData;    // data passed to freeFunc
+  size_t capacity;     // data buffer capacity, in bytes
+  size_t size;         // actual size of data, in bytes
+  int pixelFormat;     // WPI_PixelFormat
+  int width;           // width of image, in pixels
+  int height;          // height of image, in pixels
+  int stride;          // size of each row of data, in bytes (may be 0)
+  uint64_t timestamp;  // image capture timestamp
+  int timestampSrc;    // WPI_TimestampSource
 } WPI_RawFrame;
 
 /**
@@ -56,6 +58,21 @@ enum WPI_PixelFormat {
   WPI_PIXFMT_Y16,          // Grayscale, 16 bpp
   WPI_PIXFMT_UYVY,         // YUV 4:2:2, 16 bpp
   WPI_PIXFMT_BGRA,         // BGRA 8-8-8-8-, 32 bpp
+};
+
+/**
+ * Timestamp metadata. Timebase is the same as wpi::Now
+ */
+enum WPI_TimestampSource {
+  WPI_TIMESRC_UNKNOWN = 0,    // unknown
+  WPI_TIMESRC_FRAME_DEQUEUE,  // wpi::Now when the new frame was dequeued by
+                              // CSCore. Does not account for camera exposure
+                              // time or V4L latency.
+  WPI_TIMESRC_V4L_EOF,  // End of Frame. Same as V4L2_BUF_FLAG_TSTAMP_SRC_EOF,
+                        // translated into wpi::Now's timebase.
+  WPI_TIMESRC_V4L_SOE,  // Start of Exposure. Same as
+                        // V4L2_BUF_FLAG_TSTAMP_SRC_SOE, translated into
+                        // wpi::Now's timebase.
 };
 
 // Returns nonzero if the frame data was allocated/reallocated
@@ -82,6 +99,8 @@ struct RawFrame : public WPI_RawFrame {
     pixelFormat = WPI_PIXFMT_UNKNOWN;
     width = 0;
     height = 0;
+    timestamp = 0;
+    timestampSrc = WPI_TIMESRC_UNKNOWN;
   }
   RawFrame(const RawFrame&) = delete;
   RawFrame& operator=(const RawFrame&) = delete;
@@ -120,19 +139,23 @@ template <std::same_as<wpi::RawFrame> T>
 void SetFrameData(JNIEnv* env, jclass rawFrameCls, jobject jframe,
                   const T& frame, bool newData) {
   if (newData) {
-    static jmethodID setData = env->GetMethodID(rawFrameCls, "setDataJNI",
-                                                "(Ljava/nio/ByteBuffer;IIII)V");
+    static jmethodID setData = env->GetMethodID(
+        rawFrameCls, "setDataJNI", "(Ljava/nio/ByteBuffer;IIIIJI)V");
     env->CallVoidMethod(
         jframe, setData, env->NewDirectByteBuffer(frame.data, frame.size),
         static_cast<jint>(frame.width), static_cast<jint>(frame.height),
-        static_cast<jint>(frame.stride), static_cast<jint>(frame.pixelFormat));
+        static_cast<jint>(frame.stride), static_cast<jint>(frame.pixelFormat),
+        static_cast<jlong>(frame.timestamp),
+        static_cast<jint>(frame.timestampSrc));
   } else {
     static jmethodID setInfo =
-        env->GetMethodID(rawFrameCls, "setInfoJNI", "(IIII)V");
+        env->GetMethodID(rawFrameCls, "setInfoJNI", "(IIIIJI)V");
     env->CallVoidMethod(jframe, setInfo, static_cast<jint>(frame.width),
                         static_cast<jint>(frame.height),
                         static_cast<jint>(frame.stride),
-                        static_cast<jint>(frame.pixelFormat));
+                        static_cast<jint>(frame.pixelFormat),
+                        static_cast<jlong>(frame.timestamp),
+                        static_cast<jint>(frame.timestampSrc));
   }
 }
 #endif
