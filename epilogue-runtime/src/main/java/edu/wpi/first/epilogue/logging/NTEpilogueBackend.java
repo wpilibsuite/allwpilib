@@ -170,9 +170,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
 
   @Override
   public <U extends Unit> void log(String identifier, Measure<U> value, U unit) {
-    DoublePublisher pub = (DoublePublisher)
-    m_publishers.computeIfAbsent(
-      identifier, k -> m_nt.getDoubleTopic(k).publish());
+    DoublePublisher pub =
+        (DoublePublisher)
+            m_publishers.computeIfAbsent(identifier, k -> m_nt.getDoubleTopic(k).publish());
     pub.set(value.in(unit));
     Unit cachedUnit = m_units.get(identifier);
     if (cachedUnit == null || !cachedUnit.equivalent(unit)) {
