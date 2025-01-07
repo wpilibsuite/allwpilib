@@ -515,7 +515,7 @@ public final class SmartDashboard {
       return false;
     }
     String publishedUnitSymbol = entry.getTopic().getProperty("unit");
-    if (publishedUnitSymbol.equals("null")) {
+    if ("null".equals(publishedUnitSymbol)) {
       entry.getTopic().setProperty("unit", unit.symbol());
     } else if (!publishedUnitSymbol.equals(unit.symbol())) {
       return false;
@@ -551,7 +551,7 @@ public final class SmartDashboard {
       return defaultValue;
     }
     String publishedUnitSymbol = entry.getTopic().getProperty("unit");
-    if (publishedUnitSymbol.equals("null")) {
+    if ("null".equals(publishedUnitSymbol)) {
       return defaultValue;
     }
     U unit = defaultValue.baseUnit();
