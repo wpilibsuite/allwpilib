@@ -78,6 +78,6 @@ std::vector<wpi::log::DataLogRecord> LogLoader::GetRecords(
 std::vector<wpi::log::DataLogRecord> datalogcli::LogLoader::GetAllRecords() {
   std::vector<wpi::log::DataLogRecord> record_list{};
 
-  //auto iter = m_reader-
+  // auto iter = m_reader-
   return record_list;
 }
