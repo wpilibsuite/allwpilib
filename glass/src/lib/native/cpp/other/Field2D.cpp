@@ -585,17 +585,29 @@ FieldFrameData FieldInfo::GetFrameData(ImVec2 min, ImVec2 max) const {
     max.x -= (m_imageWidth - m_right) * scale;
     max.y -= (m_imageHeight - m_bottom) * scale;
   } else if ((max.x - min.x) > 40 && (max.y - min.y > 40)) {
+    // scale padding to be proportional to aspect ratio
+    float width = max.x - min.x;
+    float height = max.y - min.y;
+    float padX, padY;
+    if (width > height) {
+      padX = 20 * width / height;
+      padY = 20;
+    } else {
+      padX = 20;
+      padY = 20 * height / width;
+    }
+
     // ensure there's some padding
-    min.x += 20;
-    max.x -= 20;
-    min.y += 20;
-    max.y -= 20;
+    min.x += padX;
+    max.x -= padX;
+    min.y += padY;
+    max.y -= padY;
 
     // also pad the image so it's the same size as the box
-    ffd.imageMin.x += 20;
-    ffd.imageMax.x -= 20;
-    ffd.imageMin.y += 20;
-    ffd.imageMax.y -= 20;
+    ffd.imageMin.x += padX;
+    ffd.imageMax.x -= padX;
+    ffd.imageMin.y += padY;
+    ffd.imageMax.y -= padY;
   }
 
   ffd.min = min;
