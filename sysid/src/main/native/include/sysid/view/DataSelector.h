@@ -22,9 +22,9 @@ class Storage;
 }  // namespace glass
 
 namespace wpi {
-namespace log{
-  class DataLogReaderEntry;
-}
+namespace log {
+class DataLogReaderEntry;
+}  // namespace log
 class Logger;
 }  // namespace wpi
 

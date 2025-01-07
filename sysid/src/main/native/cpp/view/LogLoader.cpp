@@ -54,7 +54,8 @@ void LogLoader::Display() {
         return;
       }
       unload();
-      m_reader = std::make_unique<wpi::log::DataLogReaderThread>(std::move(reader));
+      m_reader =
+          std::make_unique<wpi::log::DataLogReaderThread>(std::move(reader));
       m_entryTree.clear();
     }
     m_opener.reset();

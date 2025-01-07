@@ -39,7 +39,8 @@ static bool EmitEntryTarget(const char* name, bool isString,
     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(
             isString ? "DataLogEntryString" : "DataLogEntry")) {
       assert(payload->DataSize == sizeof(const wpi::log::DataLogReaderEntry*));
-      *entry = *static_cast<const wpi::log::DataLogReaderEntry**>(payload->Data);
+      *entry =
+          *static_cast<const wpi::log::DataLogReaderEntry**>(payload->Data);
       rv = true;
     }
     ImGui::EndDragDropTarget();

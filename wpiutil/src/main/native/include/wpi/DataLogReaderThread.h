@@ -105,4 +105,4 @@ class DataLogReaderThread {
   std::thread m_thread;
 };
 
-}  // namespace wpi
+}  // namespace wpi::log

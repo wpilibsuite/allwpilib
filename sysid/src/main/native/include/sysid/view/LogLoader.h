@@ -22,9 +22,9 @@ class open_file;
 
 namespace wpi {
 namespace log {
-  class DataLogReaderEntry;
-  class DataLogReaderThread;
-}
+class DataLogReaderEntry;
+class DataLogReaderThread;
+}  // namespace log
 class Logger;
 }  // namespace wpi
 
