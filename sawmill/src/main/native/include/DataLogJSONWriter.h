@@ -6,6 +6,8 @@
 
 #include <string>
 #include <string_view>
+#include <vector>
+#include <wpi/DataLogReaderThread.h>
 
 #include <wpi/fs.h>
 
