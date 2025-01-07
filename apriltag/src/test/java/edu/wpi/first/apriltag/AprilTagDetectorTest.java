@@ -146,12 +146,10 @@ class AprilTagDetectorTest {
 
     // Pre-knowledge -- the tag is within this ROI of this particular test image
     
-    var configs = detector.getConfig();
-    configs.roiX = 100;
-    configs.roiY = 400;
-    configs.roiWidth = 220;
-    configs.roiHeight = 570;
-    detector.setConfig(configs);
+    var config = detector.getConfig();
+      config.roiHeight = image.rows();
+      config.roiWidth = image.cols();
+      detector.setConfig(config);
 
 
     try {
@@ -179,6 +177,11 @@ class AprilTagDetectorTest {
       return;
     }
     try {
+      var config = detector.getConfig();
+      config.roiHeight = image.rows();
+      config.roiWidth = image.cols();
+      detector.setConfig(config);
+
       AprilTagDetection[] results = detector.detect(image);
       assertEquals(1, results.length);
       assertEquals("tag36h11", results[0].getFamily());
@@ -212,6 +215,12 @@ class AprilTagDetectorTest {
       return;
     }
     try {
+
+      var config = detector.getConfig();
+      config.roiHeight = image.rows();
+      config.roiWidth = image.cols();
+      detector.setConfig(config);
+
       AprilTagDetection[] results = detector.detect(image);
       assertEquals(1, results.length);
 
@@ -245,6 +254,11 @@ class AprilTagDetectorTest {
       return;
     }
     try {
+      var config = detector.getConfig();
+      config.roiHeight = image.rows();
+      config.roiWidth = image.cols();
+      detector.setConfig(config);
+
       AprilTagDetection[] results = detector.detect(image);
       assertEquals(1, results.length);
 
@@ -275,6 +289,11 @@ class AprilTagDetectorTest {
       return;
     }
     try {
+      var config = detector.getConfig();
+      config.roiHeight = image.rows();
+      config.roiWidth = image.cols();
+      detector.setConfig(config);
+      
       AprilTagDetection[] results = detector.detect(image);
       assertEquals(1, results.length);
 

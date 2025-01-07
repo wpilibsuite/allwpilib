@@ -379,10 +379,7 @@ apriltag_detector_t *apriltag_detector_create(void)
 
     // NB: defer initialization of td->wp so that the user can
     // override td->nthreads.
-    td->roiX = 0;
-    td->roiY = 0;
-    td->roiWidth = 16;
-    td->roiHeight = 16;
+
     return td;
 }
 

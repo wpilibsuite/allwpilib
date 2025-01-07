@@ -233,7 +233,7 @@ static jobjectArray MakeJObject(JNIEnv* env,
 static jobject MakeJObject(JNIEnv* env,
                            const AprilTagDetector::Config& config) {
   static jmethodID constructor =
-      env->GetMethodID(detectorConfigCls, "<init>", "(IFFZDZ)V");
+      env->GetMethodID(detectorConfigCls, "<init>", "(IFFZDZIIII)V");
   if (!constructor) {
     return nullptr;
   }
