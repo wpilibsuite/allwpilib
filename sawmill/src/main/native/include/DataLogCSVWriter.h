@@ -6,7 +6,7 @@
 
 #include <string>
 
-namespace datalogcli {
+namespace sawmill {
 class DataLogCSVWriter {
  public:
   explicit DataLogCSVWriter();
@@ -14,4 +14,4 @@ class DataLogCSVWriter {
 
   void ExportCsv(std::string_view outputFolder, int style);
 };
-}  // namespace datalogcli
+}  // namespace sawmill

@@ -110,7 +110,7 @@ InputFile::~InputFile() {
   }
 }
 
-using namespace datalogcli;
+using namespace sawmill;
 
 static wpi::mutex gExportMutex;
 static std::vector<std::string> gExportErrors;

@@ -16,34 +16,36 @@
 #include "LogLoader.h"
 
 void export_json(fs::path log_path, fs::path output_path) {
-  datalogcli::LogLoader loader{};
+  sawmill::LogLoader loader{};
   loader.Load(log_path.string());
   std::vector<wpi::log::DataLogRecord> records = loader.GetAllRecords();
-  datalogcli::DataLogJSONWriter writer{};
+  sawmill::DataLogJSONWriter writer{};
   writer.ExportJSON(output_path, records);
 }
 
-void export_csv(fs::path log_path, fs::path output_path) {}
+void export_csv(fs::path log_path, fs::path output_path) {
+  
+}
 
 void write_json(std::vector<wpi::log::DataLogRecord> records,
                 fs::path output_path) {}
 
 void write_csv(std::vector<wpi::log::DataLogRecord> records,
                fs::path output_path) {
-  datalogcli::DataLogCSVWriter writer{};
+  sawmill::DataLogCSVWriter writer{};
   writer.ExportCsv(output_path.string(), 0);
 }
 
 void extract_entry(std::string_view entry_name, fs::path log_path,
                    fs::path output_path, bool use_json) {
   // represent entry as a list of records
-  datalogcli::LogLoader loader{};
+  sawmill::LogLoader loader{};
   loader.Load(log_path.string());
   std::vector<wpi::log::DataLogRecord> records = loader.GetRecords(entry_name);
 }
 
 int main(int argc, char* argv[]) {
-  wpi::ArgumentParser cli{"datalogcli"};
+  wpi::ArgumentParser cli{"sawmill"};
   std::string jsonMode{};
 
   wpi::ArgumentParser export_json_command{"json"};

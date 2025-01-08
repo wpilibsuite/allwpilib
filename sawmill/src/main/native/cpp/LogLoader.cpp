@@ -18,7 +18,7 @@
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 
-using namespace datalogcli;
+using namespace sawmill;
 
 LogLoader::LogLoader() {}
 
@@ -75,7 +75,7 @@ std::vector<wpi::log::DataLogRecord> LogLoader::GetRecords(
   return record_list;
 }
 
-std::vector<wpi::log::DataLogRecord> datalogcli::LogLoader::GetAllRecords() {
+std::vector<wpi::log::DataLogRecord> sawmill::LogLoader::GetAllRecords() {
   std::vector<wpi::log::DataLogRecord> record_list{};
 
   for (wpi::log::DataLogRecord record : m_reader->GetReader())

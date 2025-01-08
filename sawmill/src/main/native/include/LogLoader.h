@@ -22,7 +22,7 @@ class DataLogReaderThread;
 class Logger;
 }  // namespace wpi
 
-namespace datalogcli {
+namespace sawmill {
 /**
  * Helps with loading datalog files.
  */
@@ -66,4 +66,4 @@ class LogLoader {
   };
   std::vector<EntryTreeNode> m_entryTree;
 };
-}  // namespace datalogcli
+}  // namespace sawmill

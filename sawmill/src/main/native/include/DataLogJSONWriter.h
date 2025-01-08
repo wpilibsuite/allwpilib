@@ -11,7 +11,7 @@
 
 #include <wpi/fs.h>
 
-namespace datalogcli {
+namespace sawmill {
 /**
  * Helps with loading datalog files.
  */
@@ -22,4 +22,4 @@ class DataLogJSONWriter {
 
  private:
 };
-}  // namespace datalogcli
+}  // namespace sawmill
