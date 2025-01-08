@@ -85,9 +85,9 @@ cmake_dependent_option(
     WITH_JAVA
     OFF
 )
-option(WITH_WPILIB "Build hal, wpilibc/j, and developerRobot (needs OpenCV)" OFF)
+option(WITH_WPILIB "Build hal, wpilibc/j, and developerRobot (needs OpenCV)" ON)
 option(WITH_EXAMPLES "Build examples" OFF)
-option(WITH_TESTS "Build unit tests (requires internet connection)" OFF)
+option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
 option(WITH_GUI "Build GUI items" ON)
 option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
 option(WITH_PROTOBUF "Build protobuf support" ON)
