@@ -7,9 +7,26 @@
 #include <wpi/DataLogReaderThread.h>
 
 namespace sawmill {
-struct DataLogRecord {
-  const wpi::log::StartRecordData entryData;
-  wpi::log::DataLogRecord dataLogRecord;
-  int entryColumn = -1;
+struct Entry {
+  explicit Entry(const wpi::log::StartRecordData& srd)
+      : name{srd.name}, type{srd.type}, metadata{srd.metadata} {}
+
+  std::string name;
+  std::string type;
+  std::string metadata;
+  //std::set<InputFile*> inputFiles;
+  bool typeConflict = false;
+  bool metadataConflict = false;
+  bool selected = true;
+
+  // used only during export
+  int column = -1;
 };
+
+struct DataLogRecord {
+  const Entry entryData;
+  wpi::log::DataLogRecord dataLogRecord;
+};
+
+
 }  // namespace sawmill

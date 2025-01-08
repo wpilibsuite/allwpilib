@@ -8,7 +8,6 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <string_view>
 #include <system_error>
 #include <utility>
 #include <vector>
@@ -84,7 +83,7 @@ std::vector<sawmill::DataLogRecord> sawmill::LogLoader::GetAllRecords() {
         wpi::log::StartRecordData data;
         if (record.GetStartData(&data)) {
           // associate an entry id with a StartRecordData
-          dataMap[data.entry] = data;
+          dataMap[data.entry] = sawmill::Entry{data};
         }
       } else if (record.IsFinish()) {
         // remove the association
@@ -103,7 +102,7 @@ std::vector<sawmill::DataLogRecord> sawmill::LogLoader::GetAllRecords() {
   return records;
 }
 
-std::map<int, wpi::log::StartRecordData, std::less<>>
+std::map<int, sawmill::Entry, std::less<>>
 sawmill::LogLoader::GetEntryMap() {
   return dataMap;
 }

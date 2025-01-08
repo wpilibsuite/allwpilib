@@ -2,15 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "DataLogCSVWriter.h"
 
 #include <atomic>
 #include <ctime>
 #include <functional>
-#include <future>
 #include <map>
 #include <memory>
-#include <set>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -32,84 +29,68 @@
 #include <wpi/raw_ostream.h>
 #include <DataLogExport.h>
 
-namespace {
-struct InputFile {
-  explicit InputFile(std::unique_ptr<wpi::DataLogReaderThread> datalog);
+// namespace {
+// struct InputFile {
+//   explicit InputFile(std::unique_ptr<wpi::DataLogReaderThread> datalog);
 
-  InputFile(std::string_view filename, std::string_view status)
-      : filename{filename},
-        stem{fs::path{filename}.stem().string()},
-        status{status} {}
+//   InputFile(std::string_view filename, std::string_view status)
+//       : filename{filename},
+//         stem{fs::path{filename}.stem().string()},
+//         status{status} {}
 
-  ~InputFile();
+//   ~InputFile();
 
-  std::string filename;
-  std::string stem;
-  std::unique_ptr<wpi::DataLogReaderThread> datalog;
-  std::string status;
-  bool highlight = false;
-};
+//   std::string filename;
+//   std::string stem;
+//   std::unique_ptr<wpi::DataLogReaderThread> datalog;
+//   std::string status;
+//   bool highlight = false;
+// };
+// }  // namespace
 
-struct Entry {
-  explicit Entry(const wpi::log::StartRecordData& srd)
-      : name{srd.name}, type{srd.type}, metadata{srd.metadata} {}
-
-  std::string name;
-  std::string type;
-  std::string metadata;
-  std::set<InputFile*> inputFiles;
-  bool typeConflict = false;
-  bool metadataConflict = false;
-  bool selected = true;
-
-  // used only during export
-  int column = -1;
-};
-}  // namespace
-
-static std::map<std::string, std::unique_ptr<InputFile>, std::less<>>
-    gInputFiles;
+//static std::map<std::string, std::unique_ptr<InputFile>, std::less<>>
+//    gInputFiles;
 static wpi::mutex gEntriesMutex;
-static std::map<std::string, std::unique_ptr<Entry>, std::less<>> gEntries;
+static std::map<std::string, std::unique_ptr<sawmill::Entry>, std::less<>> gEntries;
 std::atomic_int gExportCount{0};
 
-InputFile::InputFile(std::unique_ptr<wpi::DataLogReaderThread> datalog_)
-    : filename{datalog_->GetBufferIdentifier()},
-      stem{fs::path{filename}.stem().string()},
-      datalog{std::move(datalog_)} {
-  datalog->sigEntryAdded.connect([this](const wpi::log::StartRecordData& srd) {
-    std::scoped_lock lock{gEntriesMutex};
-    auto it = gEntries.find(srd.name);
-    if (it == gEntries.end()) {
-      it = gEntries.emplace(srd.name, std::make_unique<Entry>(srd)).first;
-    } else {
-      if (it->second->type != srd.type) {
-        it->second->typeConflict = true;
-      }
-      if (it->second->metadata != srd.metadata) {
-        it->second->metadataConflict = true;
-      }
-    }
-    it->second->inputFiles.emplace(this);
-  });
-}
+// InputFile::InputFile(std::unique_ptr<wpi::DataLogReaderThread> datalog_)
+//     : filename{datalog_->GetBufferIdentifier()},
+//       stem{fs::path{filename}.stem().string()},
+//       datalog{std::move(datalog_)} {
+//   datalog->sigEntryAdded.connect([this](const wpi::log::StartRecordData& srd) {
+//     std::scoped_lock lock{gEntriesMutex};
+//     auto it = gEntries.find(srd.name);
+//     if (it == gEntries.end()) {
+//       it = gEntries.emplace(srd.name, std::make_unique<Entry>(srd)).first;
+//     } else {
+//       if (it->second->type != srd.type) {
+//         it->second->typeConflict = true;
+//       }
+//       if (it->second->metadata != srd.metadata) {
+//         it->second->metadataConflict = true;
+//       }
+//     }
+//     it->second->inputFiles.emplace(this);
+//   });
+// }
 
-InputFile::~InputFile() {
-  if (!datalog) {
-    return;
-  }
-  std::scoped_lock lock{gEntriesMutex};
-  bool changed = false;
-  for (auto it = gEntries.begin(); it != gEntries.end();) {
-    it->second->inputFiles.erase(this);
-    if (it->second->inputFiles.empty()) {
-      it = gEntries.erase(it);
-      changed = true;
-    } else {
-      ++it;
-    }
-  }
-}
+// InputFile::~InputFile() {
+//   if (!datalog) {
+//     return;
+//   }
+//   std::scoped_lock lock{gEntriesMutex};
+//   bool changed = false;
+//   for (auto it = gEntries.begin(); it != gEntries.end();) {
+//     it->second->inputFiles.erase(this);
+//     if (it->second->inputFiles.empty()) {
+//       it = gEntries.erase(it);
+//       changed = true;
+//     } else {
+//       ++it;
+//     }
+//   }
+// }
 
 using namespace sawmill;
 
@@ -290,7 +271,7 @@ static void ValueToCsv(wpi::raw_ostream& os, const sawmill::DataLogRecord& recor
 //   wpi::print(os, "<invalid>");
 // }
 
-void ExportCsvFile(wpi::raw_ostream& os, int style, bool printControlRecords, std::vector<sawmill::DataLogRecord> records, std::map<int, wpi::log::StartRecordData, std::less<>> entryMap) {
+void ExportCsvFile(wpi::raw_ostream& os, int style, bool printControlRecords, std::vector<sawmill::DataLogRecord> records, std::map<int, sawmill::Entry, std::less<>> entryMap) {
   // print header
   if (style == 0)
   {
@@ -299,14 +280,14 @@ void ExportCsvFile(wpi::raw_ostream& os, int style, bool printControlRecords, st
     // scan for exported fields for this file to print header and assign columns
     os << "Timestamp";
     int columnNum = 0;
-    // TODO: Find a way to tie the entry data to a column number without modifying startrecorddata or iterating through every record
-    for (std::pair<const int, wpi::log::StartRecordData> &entry : entryMap)
+    for (std::pair<const int, sawmill::Entry> &entry : entryMap)
     {
       os << ',' << '"';
       PrintEscapedCsvString(os, entry.second.name);
       os << '"';
-      
+      entry.second.column = columnNum++;
     }
+    os << '\n';
   }
   
   for (sawmill::DataLogRecord record : records)
@@ -326,7 +307,7 @@ void ExportCsvFile(wpi::raw_ostream& os, int style, bool printControlRecords, st
       os << '\n';
     } else if(style == 1) {
       wpi::print(os, "{},", record.dataLogRecord.GetTimestamp() / 1000000.0);
-      for (int i = 0; i < record.entryColumn; ++i) {
+      for (int i = 0; i < record.entryData.column; ++i) {
         os << ',';
       }
       ValueToCsv(os, record);

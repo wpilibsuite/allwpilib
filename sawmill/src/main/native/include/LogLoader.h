@@ -6,11 +6,11 @@
 
 #include <memory>
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include <wpi/DataLogReader.h>
 #include <wpi/Signal.h>
+#include <wpi/fs.h>
 
 #include "DataLogExport.h"
 
@@ -47,7 +47,7 @@ class LogLoader {
 
   std::vector<sawmill::DataLogRecord> GetAllRecords();
 
-  std::map<int, wpi::log::StartRecordData, std::less<>> GetEntryMap();
+  std::map<int, sawmill::Entry, std::less<>> GetEntryMap();
 
  private:
   std::string m_filename;
@@ -59,7 +59,7 @@ class LogLoader {
 
   wpi::log::StartRecordData* entryData;
 
-  std::map<int, wpi::log::StartRecordData, std::less<>> dataMap;
+  std::map<int, sawmill::Entry, std::less<>> dataMap;
 
   std::vector<sawmill::DataLogRecord> records;
 };
