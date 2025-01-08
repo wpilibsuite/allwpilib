@@ -24,10 +24,10 @@ LogLoader::LogLoader() {}
 
 LogLoader::~LogLoader() = default;
 
-void LogLoader::Load(std::string_view log_path) {
+void LogLoader::Load(fs::path logPath) {
   // Handle opening the file
   std::error_code ec;
-  auto buf = wpi::MemoryBuffer::GetFile(log_path);
+  auto buf = wpi::MemoryBuffer::GetFile(logPath.string());
   if (ec) {
     m_error = fmt::format("Could not open file: {}", ec.message());
     return;
@@ -40,7 +40,6 @@ void LogLoader::Load(std::string_view log_path) {
   }
   unload();  // release the actual file, we have the data in the reader now
   m_reader = std::make_unique<wpi::DataLogReaderThread>(std::move(reader));
-  m_entryTree.clear();
 
   // Handle Errors
   fmt::println("{}", m_error);
@@ -58,9 +57,11 @@ void LogLoader::Load(std::string_view log_path) {
   if (!m_reader->IsDone()) {
     return;
   }
+
+
 }
 
-std::vector<wpi::log::DataLogRecord> LogLoader::GetRecords(
+/*std::vector<wpi::log::DataLogRecord> LogLoader::GetRecords(
     std::string_view field_name) {
   std::vector<wpi::log::DataLogRecord> record_list{};
 
@@ -73,15 +74,35 @@ std::vector<wpi::log::DataLogRecord> LogLoader::GetRecords(
   }
 
   return record_list;
-}
+}*/
 
-std::vector<wpi::log::DataLogRecord> sawmill::LogLoader::GetAllRecords() {
-  std::vector<wpi::log::DataLogRecord> record_list{};
-
-  for (wpi::log::DataLogRecord record : m_reader->GetReader())
-  {
-    record_list.push_back(record);
+std::vector<sawmill::DataLogRecord> sawmill::LogLoader::GetAllRecords() {
+  if (records.size() == 0) {
+    std::map<int, wpi::log::StartRecordData, std::less<>> dataMap;
+    // get all records
+    for (wpi::log::DataLogRecord record : m_reader->GetReader())
+    {
+      if (record.IsStart()) {
+        wpi::log::StartRecordData data;
+        if (record.GetStartData(&data)) {
+          // associate an entry id with a StartRecordData
+          dataMap[data.entry] = data;
+        } 
+      } else if (record.IsFinish()) {
+        // remove the association
+        int entryId;
+        if (record.GetFinishEntry(&entryId))
+        {
+          dataMap.erase(entryId);
+        }
+      } 
+      int entryId = record.GetEntry();
+      if (dataMap.contains(entryId))
+      {
+        records.push_back(sawmill::DataLogRecord{dataMap[entryId], record});
+      }
+    }
   }
   
-  return record_list;
+  return records;
 }

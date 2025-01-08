@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "DataLogExport.h"
+
 #include <memory>
 #include <string>
 #include <string_view>
@@ -41,11 +43,9 @@ class LogLoader {
    */
   wpi::sig::Signal<> unload;
 
-  void Load(std::string_view log_path);
+  void Load(fs::path logPath);
 
-  std::vector<wpi::log::DataLogRecord> GetRecords(std::string_view field_name);
-
-  std::vector<wpi::log::DataLogRecord> GetAllRecords();
+  std::vector<sawmill::DataLogRecord> GetAllRecords();
 
  private:
   std::string m_filename;
@@ -57,13 +57,6 @@ class LogLoader {
 
   wpi::log::StartRecordData* entryData;
 
-  struct EntryTreeNode {
-    explicit EntryTreeNode(std::string_view name) : name{name} {}
-    std::string name;  // name of just this node
-    std::string path;  // full path if entry is nullptr
-    const wpi::DataLogReaderEntry* entry = nullptr;
-    std::vector<EntryTreeNode> children;  // children, sorted by name
-  };
-  std::vector<EntryTreeNode> m_entryTree;
+  std::vector<sawmill::DataLogRecord> records;
 };
 }  // namespace sawmill

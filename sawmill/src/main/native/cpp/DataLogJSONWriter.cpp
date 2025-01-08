@@ -11,7 +11,7 @@
 #include <wpi/json.h>
 
 void ExportJSON(fs::path outputPath,
-                std::vector<wpi::log::DataLogRecord> records) {
+                std::vector<sawmill::DataLogRecord> records) {
   // JSON structure
   // List of blocks
   // Each block is a direct transcription of a record

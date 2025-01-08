@@ -23,7 +23,10 @@ void export_json(fs::path log_path, fs::path output_path) {
   writer.ExportJSON(output_path, records);
 }
 
-void export_csv(fs::path log_path, fs::path output_path) {
+void export_csv(fs::path logPath, fs::path outputPaths) {
+  sawmill::LogLoader loader{};
+  loader.Load(logPath);
+  // 
   
 }
 
@@ -140,7 +143,7 @@ int main(int argc, char* argv[]) {
       return 1;
     }
 
-    export_csv(logPath, outputPath);
+    //export_csv(logPath, outputPath);
   } else if (extract_entry_command) {
     // validate paths
     fs::path logPath{extract_entry_command.get("--log-file")};

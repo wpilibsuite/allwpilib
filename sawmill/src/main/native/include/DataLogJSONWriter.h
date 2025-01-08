@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "DataLogExport.h"
+
 #include <string>
 #include <string_view>
 #include <vector>
@@ -18,7 +20,7 @@ namespace sawmill {
 class DataLogJSONWriter {
  public:
   void ExportJSON(fs::path exportPath,
-                  std::vector<wpi::log::DataLogRecord> records);
+                  std::vector<sawmill::DataLogRecord> records);
 
  private:
 };
