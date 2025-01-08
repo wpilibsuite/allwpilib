@@ -18,7 +18,7 @@
 void export_json(fs::path log_path, fs::path output_path) {
   sawmill::LogLoader loader{};
   loader.Load(log_path.string());
-  std::vector<wpi::log::DataLogRecord> records = loader.GetAllRecords();
+  std::vector<sawmill::DataLogRecord> records = loader.GetAllRecords();
   sawmill::DataLogJSONWriter writer{};
   writer.ExportJSON(output_path, records);
 }
@@ -26,8 +26,7 @@ void export_json(fs::path log_path, fs::path output_path) {
 void export_csv(fs::path logPath, fs::path outputPaths) {
   sawmill::LogLoader loader{};
   loader.Load(logPath);
-  // 
-  
+  //
 }
 
 void write_json(std::vector<wpi::log::DataLogRecord> records,
@@ -44,7 +43,7 @@ void extract_entry(std::string_view entry_name, fs::path log_path,
   // represent entry as a list of records
   sawmill::LogLoader loader{};
   loader.Load(log_path.string());
-  std::vector<wpi::log::DataLogRecord> records = loader.GetRecords(entry_name);
+  //std::vector<sawmill::DataLogRecord> records = loader.GetRecords(entry_name);
 }
 
 int main(int argc, char* argv[]) {
@@ -143,7 +142,7 @@ int main(int argc, char* argv[]) {
       return 1;
     }
 
-    //export_csv(logPath, outputPath);
+    // export_csv(logPath, outputPath);
   } else if (extract_entry_command) {
     // validate paths
     fs::path logPath{extract_entry_command.get("--log-file")};

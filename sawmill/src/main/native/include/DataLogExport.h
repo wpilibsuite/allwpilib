@@ -7,8 +7,9 @@
 #include <wpi/DataLogReaderThread.h>
 
 namespace sawmill {
-    struct DataLogRecord {
-        const wpi::log::StartRecordData entryData;
-        wpi::log::DataLogRecord record;
-    };
-}
+struct DataLogRecord {
+  const wpi::log::StartRecordData entryData;
+  wpi::log::DataLogRecord dataLogRecord;
+  int entryColumn = -1;
+};
+}  // namespace sawmill
