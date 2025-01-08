@@ -11,6 +11,7 @@
 #include <system_error>
 #include <utility>
 #include <vector>
+#include "DataLogExport.h"
 
 #include <fmt/base.h>
 #include <wpi/DataLogReader.h>
@@ -83,7 +84,7 @@ std::vector<sawmill::DataLogRecord> LogLoader::GetAllRecords() {
         wpi::log::StartRecordData data;
         if (record.GetStartData(&data)) {
           // associate an entry id with a StartRecordData
-          dataMap[data.entry] = sawmill::Entry{data};
+          dataMap.emplace(data.entry, sawmill::Entry{data});
         }
       } else if (record.IsFinish()) {
         // remove the association
@@ -94,11 +95,13 @@ std::vector<sawmill::DataLogRecord> LogLoader::GetAllRecords() {
       }
       int entryId = record.GetEntry();
       if (dataMap.contains(entryId)) {
-        records.push_back(sawmill::DataLogRecord{dataMap[entryId], record});
+        if (auto it = dataMap.find(entryId); it != dataMap.end()) {
+          records.emplace_back(it->second, record);
+        }
       }
     }
   }
-
+  
   return records;
 }
 
