@@ -4,19 +4,9 @@ include(CompileWarnings)
 include(GenResources)
 
 configure_file(src/main/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
-generate_resources(
-    src/main/native/resources
-    generated/main/cpp
-    DLT
-    dlt
-    sawmill_resources_src
-)
+generate_resources(src/main/native/resources generated/main/cpp DLT dlt sawmill_resources_src)
 
-file(
-    GLOB sawmill_src
-    src/main/native/cpp/*.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp
-)
+file(GLOB sawmill_src src/main/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 
 if(WIN32)
     set(sawmill_rc src/main/native/win/sawmill.rc)
@@ -25,13 +15,7 @@ elseif(APPLE)
     set_source_files_properties(${APP_ICON_MACOSX} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
 
-add_executable(
-    sawmill
-    ${sawmill_src}
-    ${sawmill_resources_src}
-    ${sawmill_rc}
-    ${APP_ICON_MACOSX}
-)
+add_executable(sawmill ${sawmill_src} ${sawmill_resources_src} ${sawmill_rc} ${APP_ICON_MACOSX})
 
 target_include_directories(sawmill PUBLIC src/main/native/include)
 
