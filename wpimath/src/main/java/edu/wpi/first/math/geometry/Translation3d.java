@@ -217,6 +217,17 @@ public class Translation3d
   }
 
   /**
+   * Rotates this translation around another translation in 3D space.
+   *
+   * @param other The other translation to rotate around.
+   * @param rot The rotation to rotate the translation by.
+   * @return The new rotated translation.
+   */
+  public Translation3d rotateAround(Translation3d other, Rotation3d rot) {
+    return this.minus(other).rotateBy(rot).plus(other);
+  }
+
+  /**
    * Returns a Translation2d representing this Translation3d projected into the X-Y plane.
    *
    * @return A Translation2d representing this Translation3d projected into the X-Y plane.

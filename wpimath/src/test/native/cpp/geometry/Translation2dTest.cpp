@@ -38,6 +38,15 @@ TEST(Translation2dTest, RotateBy) {
   EXPECT_DOUBLE_EQ(3.0, rotated.Y().value());
 }
 
+TEST(Translation2dTest, RotateAround) {
+  const Translation2d another{2_m, 1_m};
+  const Translation2d other{3_m, 2_m};
+  const auto rotated = another.RotateAround(other, 180_deg);
+
+  EXPECT_NEAR(4.0, rotated.X().value(), 1e-9);
+  EXPECT_DOUBLE_EQ(3.0, rotated.Y().value());
+}
+
 TEST(Translation2dTest, Multiplication) {
   const Translation2d original{3_m, 5_m};
   const auto mult = original * 3;
