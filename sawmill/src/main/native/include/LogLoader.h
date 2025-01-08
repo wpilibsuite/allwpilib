@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "DataLogExport.h"
-
 #include <memory>
 #include <string>
 #include <string_view>
@@ -13,6 +11,8 @@
 
 #include <wpi/DataLogReader.h>
 #include <wpi/Signal.h>
+
+#include "DataLogExport.h"
 
 namespace glass {
 class Storage;
@@ -47,6 +47,8 @@ class LogLoader {
 
   std::vector<sawmill::DataLogRecord> GetAllRecords();
 
+  std::map<int, wpi::log::StartRecordData, std::less<>> GetEntryMap();
+
  private:
   std::string m_filename;
   std::unique_ptr<wpi::DataLogReaderThread> m_reader;
@@ -56,6 +58,8 @@ class LogLoader {
   std::string m_filter;
 
   wpi::log::StartRecordData* entryData;
+
+  std::map<int, wpi::log::StartRecordData, std::less<>> dataMap;
 
   std::vector<sawmill::DataLogRecord> records;
 };

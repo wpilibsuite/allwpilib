@@ -4,6 +4,8 @@
 
 #include "LogLoader.h"
 
+#include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -57,8 +59,6 @@ void LogLoader::Load(fs::path logPath) {
   if (!m_reader->IsDone()) {
     return;
   }
-
-
 }
 
 /*std::vector<wpi::log::DataLogRecord> LogLoader::GetRecords(
@@ -78,31 +78,32 @@ void LogLoader::Load(fs::path logPath) {
 
 std::vector<sawmill::DataLogRecord> sawmill::LogLoader::GetAllRecords() {
   if (records.size() == 0) {
-    std::map<int, wpi::log::StartRecordData, std::less<>> dataMap;
     // get all records
-    for (wpi::log::DataLogRecord record : m_reader->GetReader())
-    {
+    for (wpi::log::DataLogRecord record : m_reader->GetReader()) {
       if (record.IsStart()) {
         wpi::log::StartRecordData data;
         if (record.GetStartData(&data)) {
           // associate an entry id with a StartRecordData
           dataMap[data.entry] = data;
-        } 
+        }
       } else if (record.IsFinish()) {
         // remove the association
         int entryId;
-        if (record.GetFinishEntry(&entryId))
-        {
+        if (record.GetFinishEntry(&entryId)) {
           dataMap.erase(entryId);
         }
-      } 
+      }
       int entryId = record.GetEntry();
-      if (dataMap.contains(entryId))
-      {
+      if (dataMap.contains(entryId)) {
         records.push_back(sawmill::DataLogRecord{dataMap[entryId], record});
       }
     }
   }
-  
+
   return records;
+}
+
+std::map<int, wpi::log::StartRecordData, std::less<>>
+sawmill::LogLoader::GetEntryMap() {
+  return dataMap;
 }
