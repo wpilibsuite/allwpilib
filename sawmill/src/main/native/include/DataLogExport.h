@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <string>
+
 #include <wpi/DataLogReaderThread.h>
 
 namespace sawmill {
@@ -14,7 +16,7 @@ struct Entry {
   std::string name;
   std::string type;
   std::string metadata;
-  //std::set<InputFile*> inputFiles;
+  // std::set<InputFile*> inputFiles;
   bool typeConflict = false;
   bool metadataConflict = false;
   bool selected = true;
@@ -27,6 +29,5 @@ struct DataLogRecord {
   const Entry entryData;
   wpi::log::DataLogRecord dataLogRecord;
 };
-
 
 }  // namespace sawmill

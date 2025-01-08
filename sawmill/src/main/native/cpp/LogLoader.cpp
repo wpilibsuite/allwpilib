@@ -11,7 +11,6 @@
 #include <system_error>
 #include <utility>
 #include <vector>
-#include "DataLogExport.h"
 
 #include <fmt/base.h>
 #include <wpi/DataLogReader.h>
@@ -19,6 +18,8 @@
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
+
+#include "DataLogExport.h"
 
 using namespace sawmill;
 
@@ -101,11 +102,10 @@ std::vector<sawmill::DataLogRecord> LogLoader::GetAllRecords() {
       }
     }
   }
-  
+
   return records;
 }
 
-std::map<int, sawmill::Entry, std::less<>>
-LogLoader::GetEntryMap() {
+std::map<int, sawmill::Entry, std::less<>> LogLoader::GetEntryMap() {
   return dataMap;
 }

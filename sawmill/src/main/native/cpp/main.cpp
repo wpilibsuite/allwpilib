@@ -50,55 +50,60 @@ int main(int argc, char* argv[]) {
   wpi::ArgumentParser cli{"sawmill"};
   std::string jsonMode{};
 
-  wpi::ArgumentParser export_json_command{"json"};
-  export_json_command.add_description(
-      "Export a JSON representation of a DataLog file");
-  export_json_command.add_argument("log_file")
-      .help("Path to the DataLog file to export");
-  export_json_command.add_argument("export_path")
+  wpi::ArgumentParser export_command{"export"};
+  export_command.add_description(
+      "Export a DataLog file in a text-based format");
+  export_command.add_argument("Type")
+    .help(
+        "The file type of the exported log, must be 'json' or 'csv'.");
+  export_command.add_argument("DataLog")
+      .help("A valid path to a .wpilog file to convert");
+  export_command.add_argument("Output")
       .help(
-          "Path of the JSON file to create with the exported data. If it "
-          "exists, it will be overwritten.");
-  export_json_command.add_argument("-m", "--mode")
-      .help(
-          "How to format the exported JSON. 'direct' means that each record "
-          "will be directly converted to a JSON dictionary and exported, "
-          "including control records. 'direct_data' is the same as direct, but "
-          "control records will be ommitted. The default is 'direct_data'.")
-      .default_value("direct_data")
-      .store_into(jsonMode);
+          "A valid path to the location of the exported log file."
+          "All directories must exist, but if the file does not, a new file "
+          "will be created with the name of the original DataLog.");
+  // wpi::ArgumentParser export_json_command{"json"};
+  // export_json_command.add_description(
+  //     "Export a JSON representation of a DataLog file");
+  // export_json_command.add_argument("log_file")
+  //     .help("Path to the DataLog file to export");
+  // export_json_command.add_argument("export_path")
+  //     .help(
+  //         "Path of the JSON file to create with the exported data. If it "
+  //         "exists, it will be overwritten.");
+  // export_json_command.add_argument("-m", "--mode")
+  //     .help(
+  //         "How to format the exported JSON. 'direct' means that each record "
+  //         "will be directly converted to a JSON dictionary and exported, "
+  //         "including control records. 'direct_data' is the same as direct, but "
+  //         "control records will be ommitted. The default is 'direct_data'.")
+  //     .default_value("direct_data")
+  //     .store_into(jsonMode);
 
-  wpi::ArgumentParser export_csv_command{"csv"};
-  export_csv_command.add_description(
-      "Export a CSV representation of a DataLog file");
-  export_csv_command.add_argument("log-file")
-      .help("The DataLog file to export");
-  export_csv_command.add_argument("output-file")
-      .help(
-          "The CSV file to create with the exported data. If it "
-          "exists, it will be overwritten.");
+  
 
-  wpi::ArgumentParser extract_entry_command{"extract"};
-  extract_entry_command.add_description(
-      "Extract the history of one entry from a DataLog file and store it in a "
-      "JSON or CSV file");
-  extract_entry_command.add_argument("-e", "--entry")
-      .required()
-      .help("The entry to extract from the Log");
-  extract_entry_command.add_argument("-l", "--log-file")
-      .required()
-      .help("The DataLog file to extract from");
-  extract_entry_command.add_argument("--time-start")
-      .help("The timestamp to start extracting at");
-  extract_entry_command.add_argument("-o", "--output")
-      .required()
-      .help(
-          "The file to export the field and data to. It will be created or "
-          "overwritten if it already exists");
+  // wpi::ArgumentParser extract_entry_command{"extract"};
+  // extract_entry_command.add_description(
+  //     "Extract the history of one entry from a DataLog file and store it in a "
+  //     "JSON or CSV file");
+  // extract_entry_command.add_argument("-e", "--entry")
+  //     .required()
+  //     .help("The entry to extract from the Log");
+  // extract_entry_command.add_argument("-l", "--log-file")
+  //     .required()
+  //     .help("The DataLog file to extract from");
+  // extract_entry_command.add_argument("--time-start")
+  //     .help("The timestamp to start extracting at");
+  // extract_entry_command.add_argument("-o", "--output")
+  //     .required()
+  //     .help(
+  //         "The file to export the field and data to. It will be created or "
+  //         "overwritten if it already exists");
 
-  cli.add_subparser(export_json_command);
-  cli.add_subparser(export_csv_command);
-  cli.add_subparser(extract_entry_command);
+  //cli.add_subparser(export_json_command);
+  cli.add_subparser(export_command);
+  //cli.add_subparser(extract_entry_command);
 
   try {
     cli.parse_args(argc, argv);
@@ -109,32 +114,32 @@ int main(int argc, char* argv[]) {
   }
 
   // see which one was called
-  if (export_json_command) {
-    // validate paths
-    fs::path logPath{export_json_command.get("--log-file")};
-    if (logPath.extension() != ".wpilog") {
-      std::cerr << "Please use a valid DataLog (.wpilog) file." << std::endl;
-      return 1;
-    }
+  // if (export_json_command) {
+  //   // validate paths
+  //   fs::path logPath{export_json_command.get("--log-file")};
+  //   if (logPath.extension() != ".wpilog") {
+  //     std::cerr << "Please use a valid DataLog (.wpilog) file." << std::endl;
+  //     return 1;
+  //   }
 
-    fs::path outputPath{export_json_command.get("--output")};
-    if (outputPath.extension() != ".csv" || outputPath.extension() != ".json") {
-      std::cerr
-          << "Only JSON and CSV are currently supported as output formats."
-          << std::endl;
-      return 1;
-    }
+  //   fs::path outputPath{export_json_command.get("--output")};
+  //   if (outputPath.extension() != ".csv" || outputPath.extension() != ".json") {
+  //     std::cerr
+  //         << "Only JSON and CSV are currently supported as output formats."
+  //         << std::endl;
+  //     return 1;
+  //   }
 
     //export_json(logPath, outputPath);
-  } else if (export_csv_command) {
+  /*} else*/ if (export_command) {
     // validate paths
-    fs::path logPath{export_csv_command.get("--log-file")};
+    fs::path logPath{export_command.get("--log-file")};
     if (logPath.extension() != ".wpilog") {
       std::cerr << "Please use a valid DataLog (.wpilog) file." << std::endl;
       return 1;
     }
 
-    fs::path outputPath{export_csv_command.get("--output")};
+    fs::path outputPath{export_command.get("--output")};
     if (outputPath.extension() != ".csv" || outputPath.extension() != ".json") {
       std::cerr
           << "Only JSON and CSV are currently supported as output formats."
@@ -143,25 +148,25 @@ int main(int argc, char* argv[]) {
     }
 
     // export_csv(logPath, outputPath);
-  } else if (extract_entry_command) {
+  } //else if (extract_entry_command) {
     // validate paths
-    fs::path logPath{extract_entry_command.get("--log-file")};
-    if (logPath.extension() != ".wpilog") {
-      std::cerr << "Please use a valid DataLog (.wpilog) file." << std::endl;
-      return 1;
-    }
+  //   fs::path logPath{extract_entry_command.get("--log-file")};
+  //   if (logPath.extension() != ".wpilog") {
+  //     std::cerr << "Please use a valid DataLog (.wpilog) file." << std::endl;
+  //     return 1;
+  //   }
 
-    fs::path outputPath{extract_entry_command.get("--output")};
-    if (outputPath.extension() != ".csv" || outputPath.extension() != ".json") {
-      std::cerr
-          << "Only JSON and CSV are currently supported as output formats."
-          << std::endl;
-      return 1;
-    }
+  //   fs::path outputPath{extract_entry_command.get("--output")};
+  //   if (outputPath.extension() != ".csv" || outputPath.extension() != ".json") {
+  //     std::cerr
+  //         << "Only JSON and CSV are currently supported as output formats."
+  //         << std::endl;
+  //     return 1;
+  //   }
 
-    bool json{outputPath.extension() == ".json" ? true : false};
+  //   bool json{outputPath.extension() == ".json" ? true : false};
 
-    extract_entry(extract_entry_command.get("--entry"), logPath, outputPath,
-                  json);
-  }
+  //   extract_entry(extract_entry_command.get("--entry"), logPath, outputPath,
+  //                 json);
+  // }
 }

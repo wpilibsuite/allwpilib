@@ -7,8 +7,8 @@ configure_file(src/main/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
 generate_resources(src/main/native/resources generated/main/cpp DLT dlt sawmill_resources_src)
 
 # Generate compile_commands.json by default
-if (NOT CMAKE_EXPORT_COMPILE_COMMANDS)
-  set(CMAKE_EXPORT_COMPILE_COMMANDS "YES" CACHE STRING "" FORCE)
+if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS "YES" CACHE STRING "" FORCE)
 endif()
 
 file(GLOB sawmill_src src/main/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)

@@ -9,7 +9,6 @@
 namespace sawmill {
 class DataLogCSVWriter {
  public:
-
   void ExportCsv(std::string_view outputFolder, int style);
 };
 }  // namespace sawmill

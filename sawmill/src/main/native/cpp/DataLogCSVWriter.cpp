@@ -2,7 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-
 #include <atomic>
 #include <ctime>
 #include <functional>
@@ -13,6 +12,7 @@
 #include <utility>
 #include <vector>
 
+#include <DataLogExport.h>
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
@@ -27,7 +27,6 @@
 #include <wpi/mutex.h>
 #include <wpi/print.h>
 #include <wpi/raw_ostream.h>
-#include <DataLogExport.h>
 
 // namespace {
 // struct InputFile {
@@ -48,17 +47,19 @@
 // };
 // }  // namespace
 
-//static std::map<std::string, std::unique_ptr<InputFile>, std::less<>>
-//    gInputFiles;
+// static std::map<std::string, std::unique_ptr<InputFile>, std::less<>>
+//     gInputFiles;
 static wpi::mutex gEntriesMutex;
-static std::map<std::string, std::unique_ptr<sawmill::Entry>, std::less<>> gEntries;
+static std::map<std::string, std::unique_ptr<sawmill::Entry>, std::less<>>
+    gEntries;
 std::atomic_int gExportCount{0};
 
 // InputFile::InputFile(std::unique_ptr<wpi::DataLogReaderThread> datalog_)
 //     : filename{datalog_->GetBufferIdentifier()},
 //       stem{fs::path{filename}.stem().string()},
 //       datalog{std::move(datalog_)} {
-//   datalog->sigEntryAdded.connect([this](const wpi::log::StartRecordData& srd) {
+//   datalog->sigEntryAdded.connect([this](const wpi::log::StartRecordData& srd)
+//   {
 //     std::scoped_lock lock{gEntriesMutex};
 //     auto it = gEntries.find(srd.name);
 //     if (it == gEntries.end()) {
@@ -112,9 +113,11 @@ static void PrintEscapedCsvString(wpi::raw_ostream& os, std::string_view str) {
   }
 }
 
-static void ValueToCsv(wpi::raw_ostream& os, const sawmill::DataLogRecord& record) {
+static void ValueToCsv(wpi::raw_ostream& os,
+                       const sawmill::DataLogRecord& record) {
   // systemTime needs special handling
-  if (record.entryData.name == "systemTime" && record.entryData.type == "int64") {
+  if (record.entryData.name == "systemTime" &&
+      record.entryData.type == "int64") {
     int64_t val;
     if (record.dataLogRecord.GetInteger(&val)) {
       std::time_t timeval = val / 1000000;
@@ -128,14 +131,16 @@ static void ValueToCsv(wpi::raw_ostream& os, const sawmill::DataLogRecord& recor
       wpi::print(os, "{}", val);
       return;
     }
-  } else if (record.entryData.type == "int64" || record.entryData.type == "int") {
+  } else if (record.entryData.type == "int64" ||
+             record.entryData.type == "int") {
     // support "int" for compatibility with old NT4 datalogs
     int64_t val;
     if (record.dataLogRecord.GetInteger(&val)) {
       wpi::print(os, "{}", val);
       return;
     }
-  } else if (record.entryData.type == "string" || record.entryData.type == "json") {
+  } else if (record.entryData.type == "string" ||
+             record.entryData.type == "json") {
     std::string_view val;
     record.dataLogRecord.GetString(&val);
     os << '"';
@@ -271,17 +276,17 @@ static void ValueToCsv(wpi::raw_ostream& os, const sawmill::DataLogRecord& recor
 //   wpi::print(os, "<invalid>");
 // }
 
-void ExportCsvFile(wpi::raw_ostream& os, int style, bool printControlRecords, std::vector<sawmill::DataLogRecord> records, std::map<int, sawmill::Entry, std::less<>> entryMap) {
+void ExportCsvFile(wpi::raw_ostream& os, int style, bool printControlRecords,
+                   std::vector<sawmill::DataLogRecord> records,
+                   std::map<int, sawmill::Entry, std::less<>> entryMap) {
   // print header
-  if (style == 0)
-  {
+  if (style == 0) {
     os << "Timestamp,Name,Value\n";
   } else if (style == 1) {
     // scan for exported fields for this file to print header and assign columns
     os << "Timestamp";
     int columnNum = 0;
-    for (std::pair<const int, sawmill::Entry> &entry : entryMap)
-    {
+    for (std::pair<const int, sawmill::Entry>& entry : entryMap) {
       os << ',' << '"';
       PrintEscapedCsvString(os, entry.second.name);
       os << '"';
@@ -289,23 +294,20 @@ void ExportCsvFile(wpi::raw_ostream& os, int style, bool printControlRecords, st
     }
     os << '\n';
   }
-  
-  for (sawmill::DataLogRecord record : records)
-  {
+
+  for (sawmill::DataLogRecord record : records) {
     // if this is a control record and we dont want to print those, skip
-    if (record.dataLogRecord.IsControl() && !printControlRecords)
-    {
+    if (record.dataLogRecord.IsControl() && !printControlRecords) {
       continue;
     }
 
-    if (style == 0)
-    {
+    if (style == 0) {
       wpi::print(os, "{},\"", record.dataLogRecord.GetTimestamp() / 1000000.0);
       PrintEscapedCsvString(os, record.entryData.name);
       os << '"' << ',';
       ValueToCsv(os, record);
       os << '\n';
-    } else if(style == 1) {
+    } else if (style == 1) {
       wpi::print(os, "{},", record.dataLogRecord.GetTimestamp() / 1000000.0);
       for (int i = 0; i < record.entryData.column; ++i) {
         os << ',';
@@ -313,11 +315,7 @@ void ExportCsvFile(wpi::raw_ostream& os, int style, bool printControlRecords, st
       ValueToCsv(os, record);
       os << '\n';
     }
-    
-    
   }
-  
-  
 }
 
 // static void ExportCsvFile(InputFile& f, wpi::raw_ostream& os, int style) {
@@ -325,12 +323,12 @@ void ExportCsvFile(wpi::raw_ostream& os, int style, bool printControlRecords, st
 //   if (style == 0) {
 //     os << "Timestamp,Name,Value\n";
 //   } else if (style == 1) {
-//     // scan for exported fields for this file to print header and assign columns
-//     os << "Timestamp";
-//     int columnNum = 0;
-//     for (auto&& entry : gEntries) {
+//     // scan for exported fields for this file to print header and assign
+//     columns os << "Timestamp"; int columnNum = 0; for (auto&& entry :
+//     gEntries) {
 //       if (entry.second->selected &&
-//           entry.second->inputFiles.find(&f) != entry.second->inputFiles.end()) {
+//           entry.second->inputFiles.find(&f) !=
+//           entry.second->inputFiles.end()) {
 //         os << ',' << '"';
 //         PrintEscapedCsvString(os, entry.first);
 //         os << '"';
