@@ -15,13 +15,13 @@
 #include "DataLogJSONWriter.h"
 #include "LogLoader.h"
 
-void export_json(fs::path log_path, fs::path output_path) {
-  sawmill::LogLoader loader{};
-  loader.Load(log_path.string());
-  std::vector<sawmill::DataLogRecord> records = loader.GetAllRecords();
-  sawmill::DataLogJSONWriter writer{};
-  writer.ExportJSON(output_path, records);
-}
+// void export_json(fs::path log_path, fs::path output_path) {
+//   sawmill::LogLoader loader{};
+//   loader.Load(log_path.string());
+//   std::vector<sawmill::DataLogRecord> records = loader.GetAllRecords();
+//   sawmill::DataLogJSONWriter writer{};
+//   writer.ExportJSON(output_path, records);
+// }
 
 void export_csv(fs::path logPath, fs::path outputPaths) {
   sawmill::LogLoader loader{};
@@ -32,11 +32,11 @@ void export_csv(fs::path logPath, fs::path outputPaths) {
 void write_json(std::vector<wpi::log::DataLogRecord> records,
                 fs::path output_path) {}
 
-void write_csv(std::vector<wpi::log::DataLogRecord> records,
-               fs::path output_path) {
-  sawmill::DataLogCSVWriter writer{};
-  writer.ExportCsv(output_path.string(), 0);
-}
+// void write_csv(std::vector<wpi::log::DataLogRecord> records,
+//                fs::path output_path) {
+//   sawmill::DataLogCSVWriter writer{};
+//   writer.ExportCsv(output_path.string(), 0);
+// }
 
 void extract_entry(std::string_view entry_name, fs::path log_path,
                    fs::path output_path, bool use_json) {
@@ -125,7 +125,7 @@ int main(int argc, char* argv[]) {
       return 1;
     }
 
-    export_json(logPath, outputPath);
+    //export_json(logPath, outputPath);
   } else if (export_csv_command) {
     // validate paths
     fs::path logPath{export_csv_command.get("--log-file")};

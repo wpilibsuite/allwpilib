@@ -21,7 +21,5 @@ class DataLogJSONWriter {
  public:
   void ExportJSON(fs::path exportPath,
                   std::vector<sawmill::DataLogRecord> records);
-
- private:
 };
 }  // namespace sawmill

@@ -4,13 +4,11 @@
 
 #pragma once
 
-#include <string>
+#include <string_view>
 
 namespace sawmill {
 class DataLogCSVWriter {
  public:
-  explicit DataLogCSVWriter();
-  ~DataLogCSVWriter();
 
   void ExportCsv(std::string_view outputFolder, int style);
 };
