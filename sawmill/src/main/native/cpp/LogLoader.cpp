@@ -75,7 +75,7 @@ void LogLoader::Load(fs::path logPath) {
   return record_list;
 }*/
 
-std::vector<sawmill::DataLogRecord> sawmill::LogLoader::GetAllRecords() {
+std::vector<sawmill::DataLogRecord> LogLoader::GetAllRecords() {
   if (records.size() == 0) {
     // get all records
     for (wpi::log::DataLogRecord record : m_reader->GetReader()) {
@@ -103,6 +103,6 @@ std::vector<sawmill::DataLogRecord> sawmill::LogLoader::GetAllRecords() {
 }
 
 std::map<int, sawmill::Entry, std::less<>>
-sawmill::LogLoader::GetEntryMap() {
+LogLoader::GetEntryMap() {
   return dataMap;
 }
