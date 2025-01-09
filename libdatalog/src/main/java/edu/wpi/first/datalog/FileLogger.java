@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.util;
+package edu.wpi.first.datalog;
 
-import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.datalog.DataLog;
 
 /**
  * A class version of `tail -f`, otherwise known as `tail -f` at home. Watches a file and puts the
