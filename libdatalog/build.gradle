@@ -18,10 +18,38 @@ model {
                     srcDirs 'src/main/native/include'
                 }
             }
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            if (it.component.name == "${nativeName}JNI") {
+                lib project ':wpiutil', library: 'wpiutil', linkage: 'static'
+            } else {
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            }
         }
     }
 }
 
-dependencies {
-    api project(":wpiutil")
-}
+// model {
+//     components {}
+//     binaries {
+//         all {
+//             if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+//                 return
+//             }
+//             if (it.component.name == "${nativeName}JNI") {
+//                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
+//                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+//                 lib project: ':libdatalog', library: 'libdatalog', linkage: 'static'
+//             } else {
+//                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+//                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+//                 lib project: ':libdatalog', library: 'libdatalog', linkage: 'shared'
+//             }
+//         }
+//     }
+// }
+
+// dependencies {
+//     api project(":wpiutil")
+// }
