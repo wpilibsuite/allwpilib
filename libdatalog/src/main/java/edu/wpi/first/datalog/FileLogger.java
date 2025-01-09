@@ -4,6 +4,8 @@
 
 package edu.wpi.first.datalog;
 
+import edu.wpi.first.util.WPIUtilJNI;
+
 /**
  * A class version of `tail -f`, otherwise known as `tail -f` at home. Watches a file and puts the
  * data into a data log. Only works on Linux-based platforms.
