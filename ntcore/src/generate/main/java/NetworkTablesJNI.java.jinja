@@ -7,7 +7,7 @@
 package edu.wpi.first.networktables;
 
 import edu.wpi.first.util.RuntimeLoader;
-import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.datalog.DataLog;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.EnumSet;
