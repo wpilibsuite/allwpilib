@@ -28,7 +28,6 @@ using fstream = std::fstream;
 #if defined(_WIN32)
 // A Win32 HANDLE is a typedef of void*
 using file_t = void*;
-const file_t kInvalidFile = INVALID_HANDLE_VALUE;
 #else
 using file_t = int;
 #endif
