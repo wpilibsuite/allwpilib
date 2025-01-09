@@ -40,7 +40,7 @@ foreach(example ${libdatalog_examples})
     if(libdatalog_example_src)
         add_executable(libdatalog_${example} ${libdatalog_example_src})
         wpilib_target_warnings(libdatalog_${example})
-        target_link_libraries(libdatalog_${example} libdatalog)
+        target_link_libraries(libdatalog_${example} libdatalog wpiutil)
         set_property(TARGET libdatalog_${example} PROPERTY FOLDER "examples")
     endif()
 endforeach()
@@ -91,11 +91,13 @@ if(WITH_JAVA)
     set(CMAKE_JNI_TARGET true)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+    file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
 
     add_jar(
         libdatalog_jar
         ${JAVA_SOURCES}
         # INCLUDE_JARS ${JACKSON_JARS} ${QUICKBUF_JAR}
+        INCLUDE_JARS wpiutil_jar ${QUICKBUF_JAR}
         OUTPUT_NAME libdatalog
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS libdatalog_jni_headers
@@ -146,9 +148,9 @@ if(WITH_TESTS)
 
     wpilib_add_test(libdatalog src/test/native/cpp)
     target_include_directories(libdatalog_test PRIVATE src/generated/test/native/cpp)
-    target_link_libraries(libdatalog_test libdatalog googletest libdatalog_testlib)
+    target_link_libraries(libdatalog_test libdatalog googletest libdatalog_testlib wpiutil)
     if(MSVC)
-        target_compile_options(lobdatalog_test PRIVATE /utf-8)
+        target_compile_options(libdatalog_test PRIVATE /utf-8)
     endif()
 endif()
 

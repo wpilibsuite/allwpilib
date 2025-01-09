@@ -14,7 +14,7 @@
 
 #include <fmt/format.h>
 
-#include "edu_wpi_first_util_datalog_DataLogJNI.h"
+//#include "edu_wpi_first_util_datalog_DataLogJNI.h"
 #include "wpi/DataLog.h"
 #include "wpi/DataLogBackgroundWriter.h"
 #include "wpi/DataLogWriter.h"
@@ -22,6 +22,9 @@
 
 using namespace wpi::java;
 using namespace wpi::log;
+
+static bool mockTimeEnabled = false;
+static uint64_t mockNow = 0;
 
 namespace {
 class buf_ostream : public wpi::raw_uvector_ostream {
@@ -111,6 +114,22 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_fgCreate
     return 0;
   }
   return reinterpret_cast<jlong>(writer);
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    now
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_now
+  (JNIEnv*, jclass)
+{
+  if (mockTimeEnabled) {
+    return mockNow;
+  } else {
+    return wpi::Now();
+  }
 }
 
 /*

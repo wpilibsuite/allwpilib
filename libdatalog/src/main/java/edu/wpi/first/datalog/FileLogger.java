@@ -4,8 +4,6 @@
 
 package edu.wpi.first.datalog;
 
-import edu.wpi.first.util.WPIUtilJNI;
-
 /**
  * A class version of `tail -f`, otherwise known as `tail -f` at home. Watches a file and puts the
  * data into a data log. Only works on Linux-based platforms.
@@ -22,11 +20,11 @@ public class FileLogger implements AutoCloseable {
    * @param key The log key to append data to.
    */
   public FileLogger(String file, DataLog log, String key) {
-    m_impl = WPIUtilJNI.createFileLogger(file, log.getImpl(), key);
+    m_impl = DataLogJNI.createFileLogger(file, log.getImpl(), key);
   }
 
   @Override
   public void close() {
-    WPIUtilJNI.freeFileLogger(m_impl);
+    DataLogJNI.freeFileLogger(m_impl);
   }
 }
