@@ -100,6 +100,7 @@ void CommandScheduler::ResetInstance() {
         "Ignoring call to frc2::CommandScheduler::ResetInstance() outside of "
         "simulation! frc2::CommandScheduler::ResetInstance() should only be "
         "used for unit test setup.");
+    return;
   }
   std::make_unique<Impl>().swap(GetInstance().m_impl);
 }
