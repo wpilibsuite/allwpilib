@@ -14,7 +14,7 @@
 
 #include <fmt/format.h>
 
-//#include "edu_wpi_first_util_datalog_DataLogJNI.h"
+#include "edu_wpi_first_datalog_DataLogJNI.h"
 #include "wpi/DataLog.h"
 #include "wpi/DataLogBackgroundWriter.h"
 #include "wpi/DataLogWriter.h"
@@ -46,7 +46,7 @@ extern "C" {
  * Signature: (Ljava/lang/String;Ljava/lang/String;DLjava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_bgCreate
+Java_edu_wpi_first_datalog_DataLogJNI_bgCreate
   (JNIEnv* env, jclass, jstring dir, jstring filename, jdouble period,
    jstring extraHeader)
 {
@@ -73,7 +73,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_bgCreate
  * Signature: (JLjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_bgSetFilename
+Java_edu_wpi_first_datalog_DataLogJNI_bgSetFilename
   (JNIEnv* env, jclass, jlong impl, jstring filename)
 {
   if (impl == 0) {
@@ -94,7 +94,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_bgSetFilename
  * Signature: (Ljava/lang/String;Ljava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_fgCreate
+Java_edu_wpi_first_datalog_DataLogJNI_fgCreate
   (JNIEnv* env, jclass, jstring filename, jstring extraHeader)
 {
   if (!filename) {
@@ -138,7 +138,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_now
  * Signature: (Ljava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_fgCreateMemory
+Java_edu_wpi_first_datalog_DataLogJNI_fgCreateMemory
   (JNIEnv* env, jclass, jstring extraHeader)
 {
   if (!extraHeader) {
@@ -156,7 +156,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_fgCreateMemory
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_flush
+Java_edu_wpi_first_datalog_DataLogJNI_flush
   (JNIEnv* env, jclass, jlong impl)
 {
   if (impl == 0) {
@@ -172,7 +172,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_flush
  * Signature: (J[BI)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_copyWriteBuffer
+Java_edu_wpi_first_datalog_DataLogJNI_copyWriteBuffer
   (JNIEnv* env, jclass, jlong impl, jbyteArray buf, jint start)
 {
   if (impl == 0) {
@@ -199,7 +199,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_copyWriteBuffer
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_pause
+Java_edu_wpi_first_datalog_DataLogJNI_pause
   (JNIEnv* env, jclass, jlong impl)
 {
   if (impl == 0) {
@@ -215,7 +215,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_pause
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_resume
+Java_edu_wpi_first_datalog_DataLogJNI_resume
   (JNIEnv* env, jclass, jlong impl)
 {
   if (impl == 0) {
@@ -231,7 +231,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_resume
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_stop
+Java_edu_wpi_first_datalog_DataLogJNI_stop
   (JNIEnv* env, jclass, jlong impl)
 {
   if (impl == 0) {
@@ -247,7 +247,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_stop
  * Signature: (JLjava/lang/String;Ljava/lang/String;[BJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_addSchema
+Java_edu_wpi_first_datalog_DataLogJNI_addSchema
   (JNIEnv* env, jclass, jlong impl, jstring name, jstring type,
    jbyteArray schema, jlong timestamp)
 {
@@ -266,7 +266,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_addSchema
  * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_addSchemaString
+Java_edu_wpi_first_datalog_DataLogJNI_addSchemaString
   (JNIEnv* env, jclass, jlong impl, jstring name, jstring type, jstring schema,
    jlong timestamp)
 {
@@ -288,7 +288,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_addSchemaString
  * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;J)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_start
+Java_edu_wpi_first_datalog_DataLogJNI_start
   (JNIEnv* env, jclass, jlong impl, jstring name, jstring type,
    jstring metadata, jlong timestamp)
 {
@@ -307,7 +307,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_start
  * Signature: (JIJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_finish
+Java_edu_wpi_first_datalog_DataLogJNI_finish
   (JNIEnv* env, jclass, jlong impl, jint entry, jlong timestamp)
 {
   if (impl == 0) {
@@ -323,7 +323,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_finish
  * Signature: (JILjava/lang/String;J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_setMetadata
+Java_edu_wpi_first_datalog_DataLogJNI_setMetadata
   (JNIEnv* env, jclass, jlong impl, jint entry, jstring metadata,
    jlong timestamp)
 {
@@ -341,7 +341,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_setMetadata
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_close
+Java_edu_wpi_first_datalog_DataLogJNI_close
   (JNIEnv*, jclass, jlong impl)
 {
   delete reinterpret_cast<DataLog*>(impl);
@@ -353,7 +353,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_close
  * Signature: (JI[BIIJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_appendRaw
+Java_edu_wpi_first_datalog_DataLogJNI_appendRaw
   (JNIEnv* env, jclass, jlong impl, jint entry, jbyteArray value, jint start,
    jint length, jlong timestamp)
 {
@@ -389,7 +389,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendRaw
  * Signature: (JILjava/lang/Object;IIJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_appendRawBuffer
+Java_edu_wpi_first_datalog_DataLogJNI_appendRawBuffer
   (JNIEnv* env, jclass, jlong impl, jint entry, jobject value, jint start,
    jint length, jlong timestamp)
 {
@@ -425,7 +425,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendRawBuffer
  * Signature: (JIZJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_appendBoolean
+Java_edu_wpi_first_datalog_DataLogJNI_appendBoolean
   (JNIEnv* env, jclass, jlong impl, jint entry, jboolean value, jlong timestamp)
 {
   if (impl == 0) {
@@ -441,7 +441,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendBoolean
  * Signature: (JIJJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_appendInteger
+Java_edu_wpi_first_datalog_DataLogJNI_appendInteger
   (JNIEnv* env, jclass, jlong impl, jint entry, jlong value, jlong timestamp)
 {
   if (impl == 0) {
@@ -457,7 +457,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendInteger
  * Signature: (JIFJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_appendFloat
+Java_edu_wpi_first_datalog_DataLogJNI_appendFloat
   (JNIEnv* env, jclass, jlong impl, jint entry, jfloat value, jlong timestamp)
 {
   if (impl == 0) {
@@ -473,7 +473,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendFloat
  * Signature: (JIDJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_appendDouble
+Java_edu_wpi_first_datalog_DataLogJNI_appendDouble
   (JNIEnv* env, jclass, jlong impl, jint entry, jdouble value, jlong timestamp)
 {
   if (impl == 0) {
@@ -489,7 +489,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendDouble
  * Signature: (JILjava/lang/String;J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_appendString
+Java_edu_wpi_first_datalog_DataLogJNI_appendString
   (JNIEnv* env, jclass, jlong impl, jint entry, jstring value, jlong timestamp)
 {
   if (impl == 0) {
@@ -506,7 +506,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendString
  * Signature: (JI[ZJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_appendBooleanArray
+Java_edu_wpi_first_datalog_DataLogJNI_appendBooleanArray
   (JNIEnv* env, jclass, jlong impl, jint entry, jbooleanArray value,
    jlong timestamp)
 {
@@ -528,7 +528,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendBooleanArray
  * Signature: (JI[JJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_appendIntegerArray
+Java_edu_wpi_first_datalog_DataLogJNI_appendIntegerArray
   (JNIEnv* env, jclass, jlong impl, jint entry, jlongArray value,
    jlong timestamp)
 {
@@ -561,7 +561,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendIntegerArray
  * Signature: (JI[FJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_appendFloatArray
+Java_edu_wpi_first_datalog_DataLogJNI_appendFloatArray
   (JNIEnv* env, jclass, jlong impl, jint entry, jfloatArray value,
    jlong timestamp)
 {
@@ -583,7 +583,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendFloatArray
  * Signature: (JI[DJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_appendDoubleArray
+Java_edu_wpi_first_datalog_DataLogJNI_appendDoubleArray
   (JNIEnv* env, jclass, jlong impl, jint entry, jdoubleArray value,
    jlong timestamp)
 {
@@ -605,7 +605,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendDoubleArray
  * Signature: (JI[Ljava/lang/Object;J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_appendStringArray
+Java_edu_wpi_first_datalog_DataLogJNI_appendStringArray
   (JNIEnv* env, jclass, jlong impl, jint entry, jobjectArray value,
    jlong timestamp)
 {
