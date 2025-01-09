@@ -18,14 +18,14 @@ model {
                     srcDirs 'src/main/native/include'
                 }
             }
-            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
-                return
-            }
-            if (it.component.name == "${nativeName}JNI") {
-                lib project ':wpiutil', library: 'wpiutil', linkage: 'static'
-            } else {
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-            }
+            // if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+            //     return
+            // }
+            // if (it.component.name == "${nativeName}JNI") {
+            //     lib project ':wpiutil', library: 'wpiutil', linkage: 'static'
+            // } else {
+            //     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            // }
         }
     }
 }
@@ -50,6 +50,6 @@ model {
 //     }
 // }
 
-// dependencies {
-//     api project(":wpiutil")
-// }
+dependencies {
+    api project(":wpiutil")
+}
