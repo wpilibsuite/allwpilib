@@ -7,7 +7,6 @@
 #include <jni.h>
 
 #include "edu_wpi_first_util_WPIUtilJNI.h"
-#include "wpi/DataLog.h"
 #include "wpi/FileLogger.h"
 #include "wpi/RawFrame.h"
 #include "wpi/RuntimeCheck.h"
