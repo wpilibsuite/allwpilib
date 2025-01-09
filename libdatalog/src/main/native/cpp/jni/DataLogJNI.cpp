@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
-#include "WPIUtilJNI.h"
 
+#include "wpi/DataLogJNI.h"
 #include "wpi/FileLogger.h"
 
 
