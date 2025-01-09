@@ -157,7 +157,7 @@ class WPILIB_DLLEXPORT Translation3d {
    */
   constexpr Translation3d RotateAround(const Translation3d& other,
                                        const Rotation3d& rot) const {
-    return operator-(other).RotateBy(rot).operator+(other);
+    return (*this - other).RotateBy(rot) + other;
   }
 
   /**

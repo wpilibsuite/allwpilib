@@ -92,7 +92,7 @@ class Translation3dTest {
 
     assertAll(
         () -> assertEquals(1.0, rotated1.getX(), kEpsilon),
-        () -> assertEquals(0, rotated1.getY(), kEpsilon),
+        () -> assertEquals(0.0, rotated1.getY(), kEpsilon),
         () -> assertEquals(1.0, rotated1.getZ(), kEpsilon));
 
     var rotated2 =
@@ -107,7 +107,7 @@ class Translation3dTest {
         translation.rotateAround(around, new Rotation3d(zAxis, Units.degreesToRadians(90.0)));
 
     assertAll(
-        () -> assertEquals(3, rotated3.getX(), kEpsilon),
+        () -> assertEquals(3.0, rotated3.getX(), kEpsilon),
         () -> assertEquals(0.0, rotated3.getY(), kEpsilon),
         () -> assertEquals(3.0, rotated3.getZ(), kEpsilon));
   }
