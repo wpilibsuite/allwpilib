@@ -114,6 +114,8 @@ static void DisplayGui() {
   static int focusedTag = 1;
   static int referenceTag = 1;
 
+  static int maxFRCTag = 22;
+
   static Fieldmap currentCalibrationMap;
   static Fieldmap currentReferenceMap;
 
@@ -187,17 +189,10 @@ static void DisplayGui() {
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
   ImGui::InputInt("Pinned Tag", &pinnedTag);
 
-  if (pinnedTag < 1) {
-    pinnedTag = 1;
-  } else if (pinnedTag > 16) {
-    pinnedTag = 16;
-  }
-
   // calibrate button
   if (ImGui::Button("Calibrate!!!")) {
     if (!selected_field_calibration_directory.empty() &&
-        !selected_camera_intrinsics.empty() && !selected_field_map.empty() &&
-        pinnedTag > 0 && pinnedTag <= 16) {
+        !selected_camera_intrinsics.empty() && !selected_field_map.empty()) {
       download_directory_selector =
           std::make_unique<pfd::select_folder>("Select Download Folder", "");
       if (download_directory_selector) {
@@ -216,7 +211,7 @@ static void DisplayGui() {
           showDebug);
 
       if (calibrationOutput == 1) {
-        ImGui::OpenPopup("Fmap Conversion failed");
+        ImGui::OpenPopup("Field Calibration Error");
       } else if (calibrationOutput == 0) {
         std::ifstream caljsonpath(calibration_json_path);
         try {
@@ -227,7 +222,7 @@ static void DisplayGui() {
           ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
           ImGui::OpenPopup("Visualize Calibration");
         } catch (...) {
-          ImGui::OpenPopup("Field Calibration Error");
+          ImGui::OpenPopup("Fmap Conversion Error");
         }
       }
     }
@@ -241,8 +236,10 @@ static void DisplayGui() {
     ImGui::TextWrapped(
         "Some inputs are empty! please enter your camera calibration video, "
         "field map, and field calibration directory");
-  } else if (!(pinnedTag > 0 && pinnedTag <= 16)) {
-    ImGui::TextWrapped("Make sure the pinned tag is a valid april tag (1-16)");
+  } else if (!(pinnedTag > 0 && pinnedTag <= maxFRCTag)) {
+    ImGui::TextWrapped(
+        "The pinned tag is not within the normal range for FRC fields (1-22), "
+        "If you proceed, You may experience a bad calibration.");
   } else {
     ImGui::TextWrapped("Calibration Ready");
   }
@@ -269,7 +266,7 @@ static void DisplayGui() {
     ImGui::EndPopup();
   }
 
-  if (ImGui::BeginPopupModal("Fmap Conversion failed", NULL,
+  if (ImGui::BeginPopupModal("Fmap Conversion Error", NULL,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::TextWrapped(
         "Fmap conversion failed - you can still use the calibration output on "
@@ -479,18 +476,6 @@ static void DisplayGui() {
     ImGui::InputInt("Focused Tag", &focusedTag);
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
     ImGui::InputInt("Reference Tag", &referenceTag);
-
-    if (focusedTag < 1) {
-      focusedTag = 1;
-    } else if (focusedTag > 16) {
-      focusedTag = 16;
-    }
-
-    if (referenceTag < 1) {
-      referenceTag = 1;
-    } else if (referenceTag > 16) {
-      referenceTag = 16;
-    }
 
     if (!calibration_json_path.empty() && !selected_field_map.empty()) {
       std::ifstream calJson(calibration_json_path);
