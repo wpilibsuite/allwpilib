@@ -4,7 +4,7 @@ ext {
     baseId = 'libdatalog'
     groupId = 'edu.wpi.first.datalog'
 
-    nativeName = 'libdatalog'
+    nativeName = 'datalog'
     devMain = 'edu.wpi.first.math.DevMain'
 }
 
