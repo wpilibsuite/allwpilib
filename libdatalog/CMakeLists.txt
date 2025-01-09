@@ -49,12 +49,15 @@ wpilib_target_warnings(libdatalogjni)
 target_link_libraries(libdatalogjni PUBLIC libdatalog)
 
 if(WITH_TESTS)
-    file(GLOB_RECURSE libdatalog_test_src src/test/native/cpp/*.cpp)
-    target_sources(libdatalog_test PRIVATE ${libdatalog_test_src})
+    file(GLOB_RECURSE libdatalog_testlib_src src/test/native/include/*.h)
+    add_library(libdatalog_testlib INTERFACE ${libdatalog_test_src})
+    target_include_directories(libdatalog_testlib INTERFACE src/test/native/include)
+
     wpilib_add_test(libdatalog src/test/native/cpp)
+    target_include_directories(libdatalog_test PRIVATE src/generated/test/native/cpp)
     target_link_libraries(libdatalog_test libdatalog googletest libdatalog_testlib)
     if(MSVC)
-        target_compile_options(libdatalog_test PRIVATE /utf-8)
+        target_compile_options(lobdatalog_test PRIVATE /utf-8)
     endif()
 endif()
 
