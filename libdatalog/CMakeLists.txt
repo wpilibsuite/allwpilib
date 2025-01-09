@@ -147,7 +147,6 @@ if(WITH_TESTS)
     target_include_directories(libdatalog_testlib INTERFACE src/test/native/include)
 
     wpilib_add_test(libdatalog src/test/native/cpp)
-    target_include_directories(libdatalog_test PRIVATE src/generated/test/native/cpp)
     target_link_libraries(libdatalog_test libdatalog googletest libdatalog_testlib wpiutil)
     if(MSVC)
         target_compile_options(libdatalog_test PRIVATE /utf-8)

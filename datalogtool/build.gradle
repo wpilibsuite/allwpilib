@@ -101,6 +101,7 @@ model {
                 lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                lib project: ':libdatalog', library: 'libdatalog', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'libssh')
                 if (it.targetPlatform.operatingSystem.isWindows()) {
