@@ -5,6 +5,7 @@
 #include "glass/networktables/NetworkTablesSettings.h"
 
 #include <optional>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -94,17 +95,17 @@ void NetworkTablesSettings::Thread::Main() {
 
 NetworkTablesSettings::NetworkTablesSettings(std::string_view clientName,
                                              Storage& storage, NT_Inst inst)
-    : m_mode{storage.GetString("mode"),
+    : m_mode{storage.Get<std::string>("mode"),
              0,
              {"Disabled", "Client (NT4)", "Client (NT3)", "Server"}},
       m_persistentFilename{
-          storage.GetString("persistentFilename", "networktables.json")},
-      m_serverTeam{storage.GetString("serverTeam")},
-      m_listenAddress{storage.GetString("listenAddress")},
-      m_clientName{storage.GetString("clientName", clientName)},
-      m_port3{storage.GetInt("port3", NT_DEFAULT_PORT3)},
-      m_port4{storage.GetInt("port4", NT_DEFAULT_PORT4)},
-      m_dsClient{storage.GetBool("dsClient", true)} {
+          storage.Get<std::string>("persistentFilename", "networktables.json")},
+      m_serverTeam{storage.Get<std::string>("serverTeam")},
+      m_listenAddress{storage.Get<std::string>("listenAddress")},
+      m_clientName{storage.Get<std::string>("clientName", clientName)},
+      m_port3{storage.Get<int>("port3", NT_DEFAULT_PORT3)},
+      m_port4{storage.Get<int>("port4", NT_DEFAULT_PORT4)},
+      m_dsClient{storage.Get<bool>("dsClient", true)} {
   m_thread.Start(inst);
 }
 

@@ -34,7 +34,7 @@ void glass::DisplayRelay(RelayModel* model, int index, bool outputsEnabled) {
     }
   }
 
-  std::string& name = GetStorage().GetString("name");
+  std::string& name = GetStorage().Get<std::string>("name");
   ImGui::PushID("name");
   if (!name.empty()) {
     ImGui::Text("%s [%d]", name.c_str(), index);

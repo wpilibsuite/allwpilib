@@ -124,7 +124,7 @@ class Plot {
   const std::string& GetName() const { return m_name; }
 
   std::vector<std::unique_ptr<PlotSeries>> m_series;
-  std::vector<std::unique_ptr<Storage>>& m_seriesStorage;
+  std::vector<std::shared_ptr<Storage>>& m_seriesStorage;
 
   // Returns base height; does not include actual plot height if auto-sized.
   int GetAutoBaseHeight(bool* isAuto, size_t i);
@@ -197,26 +197,27 @@ class PlotView : public View {
                       size_t toSeriesIndex, int yAxis = -1);
 
   PlotProvider* m_provider;
-  std::vector<std::unique_ptr<Storage>>& m_plotsStorage;
+  std::vector<Storage::Child>& m_plotsStorage;
   std::vector<std::unique_ptr<Plot>> m_plots;
 };
 
 }  // namespace
 
 PlotSeries::PlotSeries(Storage& storage)
-    : m_id{storage.GetString("id")},
-      m_name{storage.GetString("name")},
-      m_yAxis{storage.GetInt("yAxis", 0)},
-      m_color{storage.GetFloatArray("color", kDefaultColor)},
-      m_marker{storage.GetString("marker"),
+    : m_id{storage.Get<std::string>("id")},
+      m_name{storage.Get<std::string>("name")},
+      m_yAxis{storage.Get<int>("yAxis", 0)},
+      m_color{storage.Get<std::vector<float>>("color", kDefaultColor)},
+      m_marker{storage.Get<std::string>("marker"),
                0,
                {"None", "Circle", "Square", "Diamond", "Up", "Down", "Left",
                 "Right", "Cross", "Plus", "Asterisk"}},
-      m_weight{storage.GetFloat("weight", IMPLOT_AUTO)},
-      m_digital{
-          storage.GetString("digital"), kAuto, {"Auto", "Digital", "Analog"}},
-      m_digitalBitHeight{storage.GetInt("digitalBitHeight", 8)},
-      m_digitalBitGap{storage.GetInt("digitalBitGap", 4)} {}
+      m_weight{storage.Get<float>("weight", IMPLOT_AUTO)},
+      m_digital{storage.Get<std::string>("digital"),
+                kAuto,
+                {"Auto", "Digital", "Analog"}},
+      m_digitalBitHeight{storage.Get<int>("digitalBitHeight", 8)},
+      m_digitalBitGap{storage.Get<int>("digitalBitGap", 4)} {}
 
 PlotSeries::PlotSeries(Storage& storage, std::string_view id)
     : PlotSeries{storage} {
@@ -472,44 +473,44 @@ void PlotSeries::EmitSettings(size_t i) {
 }
 
 Plot::PlotAxis::PlotAxis(Storage& storage, int num)
-    : label{storage.GetString("label")},
-      min{storage.GetDouble("min", 0)},
-      max{storage.GetDouble("max", 1)},
-      lockMin{storage.GetBool("lockMin", false)},
-      lockMax{storage.GetBool("lockMax", false)},
-      autoFit{storage.GetBool("autoFit", false)},
-      logScale{storage.GetBool("logScale", false)},
-      invert{storage.GetBool("invert", false)},
-      opposite{storage.GetBool("opposite", num != 0)},
-      gridLines{storage.GetBool("gridLines", num == 0)},
-      tickMarks{storage.GetBool("tickMarks", true)},
-      tickLabels{storage.GetBool("tickLabels", true)} {}
+    : label{storage.Get<std::string>("label")},
+      min{storage.Get<double>("min", 0)},
+      max{storage.Get<double>("max", 1)},
+      lockMin{storage.Get<bool>("lockMin", false)},
+      lockMax{storage.Get<bool>("lockMax", false)},
+      autoFit{storage.Get<bool>("autoFit", false)},
+      logScale{storage.Get<bool>("logScale", false)},
+      invert{storage.Get<bool>("invert", false)},
+      opposite{storage.Get<bool>("opposite", num != 0)},
+      gridLines{storage.Get<bool>("gridLines", num == 0)},
+      tickMarks{storage.Get<bool>("tickMarks", true)},
+      tickLabels{storage.Get<bool>("tickLabels", true)} {}
 
 Plot::Plot(Storage& storage)
     : m_seriesStorage{storage.GetChildArray("series")},
-      m_name{storage.GetString("name")},
-      m_visible{storage.GetBool("visible", true)},
-      m_backgroundColor{
-          storage.GetFloatArray("backgroundColor", kDefaultBackgroundColor)},
-      m_showPause{storage.GetBool("showPause", true)},
-      m_lockPrevX{storage.GetBool("lockPrevX", false)},
-      m_legend{storage.GetBool("legend", true)},
-      m_legendOutside{storage.GetBool("legendOutside", false)},
-      m_legendHorizontal{storage.GetBool("legendHorizontal", false)},
+      m_name{storage.Get<std::string>("name")},
+      m_visible{storage.Get<bool>("visible", true)},
+      m_backgroundColor{storage.Get<std::vector<float>>(
+          "backgroundColor", kDefaultBackgroundColor)},
+      m_showPause{storage.Get<bool>("showPause", true)},
+      m_lockPrevX{storage.Get<bool>("lockPrevX", false)},
+      m_legend{storage.Get<bool>("legend", true)},
+      m_legendOutside{storage.Get<bool>("legendOutside", false)},
+      m_legendHorizontal{storage.Get<bool>("legendHorizontal", false)},
       m_legendLocation{
-          storage.GetInt("legendLocation", ImPlotLocation_NorthWest)},
-      m_crosshairs{storage.GetBool("crosshairs", false)},
-      m_mousePosition{storage.GetBool("mousePosition", true)},
-      m_yAxis2{storage.GetBool("yaxis2", false)},
-      m_yAxis3{storage.GetBool("yaxis3", false)},
-      m_viewTime{storage.GetFloat("viewTime", 10)},
-      m_autoHeight{storage.GetBool("autoHeight", true)},
-      m_height{storage.GetInt("height", 300)} {
+          storage.Get<int>("legendLocation", ImPlotLocation_NorthWest)},
+      m_crosshairs{storage.Get<bool>("crosshairs", false)},
+      m_mousePosition{storage.Get<bool>("mousePosition", true)},
+      m_yAxis2{storage.Get<bool>("yaxis2", false)},
+      m_yAxis3{storage.Get<bool>("yaxis3", false)},
+      m_viewTime{storage.Get<float>("viewTime", 10)},
+      m_autoHeight{storage.Get<bool>("autoHeight", true)},
+      m_height{storage.Get<int>("height", 300)} {
   auto& axesStorage = storage.GetChildArray("axis");
   axesStorage.resize(kAxisCount);
   for (int i = 0; i < kAxisCount; ++i) {
     if (!axesStorage[i]) {
-      axesStorage[i] = std::make_unique<Storage>();
+      axesStorage[i] = std::make_shared<Storage>();
     }
     m_axis.emplace_back(*axesStorage[i], i);
   }
@@ -517,7 +518,7 @@ Plot::Plot(Storage& storage)
   // loop over series
   for (auto&& v : m_seriesStorage) {
     m_series.emplace_back(
-        std::make_unique<PlotSeries>(*v, v->ReadString("id")));
+        std::make_unique<PlotSeries>(*v, v->Read<std::string>("id")));
   }
 }
 
@@ -532,7 +533,7 @@ void Plot::DragDropAccept(PlotView& view, size_t i, int yAxis) {
                  (yAxis == -1 || elem->GetYAxis() == yAxis);
         });
     if (it == m_series.end()) {
-      m_seriesStorage.emplace_back(std::make_unique<Storage>());
+      m_seriesStorage.emplace_back(std::make_shared<Storage>());
       m_series.emplace_back(std::make_unique<PlotSeries>(
           *m_seriesStorage.back(), source, yAxis == -1 ? 0 : yAxis));
     }
@@ -792,7 +793,7 @@ PlotView::PlotView(PlotProvider* provider, Storage& storage)
 void PlotView::Display() {
   if (m_plots.empty()) {
     if (ImGui::Button("Add plot")) {
-      m_plotsStorage.emplace_back(std::make_unique<Storage>());
+      m_plotsStorage.emplace_back(std::make_shared<Storage>());
       m_plots.emplace_back(std::make_unique<Plot>(*m_plotsStorage.back()));
     }
 
@@ -928,7 +929,7 @@ PlotProvider::PlotProvider(Storage& storage) : WindowManager{storage} {
 
 void PlotView::Settings() {
   if (ImGui::Button("Add plot")) {
-    m_plotsStorage.emplace_back(std::make_unique<Storage>());
+    m_plotsStorage.emplace_back(std::make_shared<Storage>());
     m_plots.emplace_back(std::make_unique<Plot>(*m_plotsStorage.back()));
   }
 

@@ -353,7 +353,7 @@ int main(int argc, char** argv) {
 
   gui::Initialize("Glass - DISCONNECTED", 1024, 768,
                   ImGuiConfigFlags_DockingEnable);
-  gEnterKey = &glass::GetStorageRoot().GetInt("enterKey", GLFW_KEY_ENTER);
+  gEnterKey = &glass::GetStorageRoot().Get<int>("enterKey", GLFW_KEY_ENTER);
   if (auto win = gui::GetSystemWindow()) {
     gPrevKeyCallback = glfwSetKeyCallback(win, RemapEnterKeyCallback);
   }

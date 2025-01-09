@@ -19,12 +19,13 @@ using namespace glass;
 Window::Window(Storage& storage, std::string_view id,
                Visibility defaultVisibility)
     : m_id{id},
-      m_name{storage.GetString("name")},
+      m_name{storage.Get<std::string>("name")},
       m_defaultName{id},
-      m_visible{storage.GetBool("visible", defaultVisibility != kHide)},
-      m_enabled{storage.GetBool("enabled", defaultVisibility != kDisabled)},
-      m_defaultVisible{storage.GetValue("visible").boolDefault},
-      m_defaultEnabled{storage.GetValue("enabled").boolDefault} {}
+      m_visible{storage.Get<bool>("visible", defaultVisibility != kHide)},
+      m_enabled{storage.Get<bool>("enabled", defaultVisibility != kDisabled)},
+      m_defaultVisible{std::get<bool>(storage.GetValue("visible").dataDefault)},
+      m_defaultEnabled{
+          std::get<bool>(storage.GetValue("enabled").dataDefault)} {}
 
 void Window::SetVisibility(Visibility visibility) {
   m_visible = visibility != kHide;
