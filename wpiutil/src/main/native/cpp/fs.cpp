@@ -59,6 +59,8 @@ namespace fs {
 #pragma warning(disable : 4244 4267 4146)
 #endif
 
+const file_t kInvalidFile = INVALID_HANDLE_VALUE;
+
 static DWORD nativeDisposition(CreationDisposition Disp, OpenFlags Flags) {
   switch (Disp) {
     case CD_CreateAlways:
