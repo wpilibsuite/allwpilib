@@ -38,7 +38,7 @@ model {
             } else {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                lib project: ':libdatalog', library: 'liblibdatalog', linkage: 'shared'
+                lib project: ':libdatalog', library: 'libdatalog', linkage: 'shared'
             }
         }
     }
@@ -62,4 +62,8 @@ nativeUtils.exportsConfigs {
     ntcoreJNI {
         x64SymbolFilter = symbolFilter
     }
+}
+
+dependencies {
+    api project(":libdatalog")
 }

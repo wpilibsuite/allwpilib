@@ -53,7 +53,7 @@ if(WITH_JAVA)
     add_jar(
         ntcore_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS wpiutil_jar ${QUICKBUF_JAR}
+        INCLUDE_JARS wpiutil_jar ${QUICKBUF_JAR} libdatalog_jar
         OUTPUT_NAME ntcore
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS ntcore_jni_headers
