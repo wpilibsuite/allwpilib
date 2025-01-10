@@ -216,7 +216,7 @@ class WPILIB_DLLEXPORT Pose3d {
    * @return The new rotated pose.
    */
   constexpr Pose3d RotateAround(const Translation3d& point,
-                                const Rotation3d& rot) {
+                                const Rotation3d& rot) const {
     return {m_translation.RotateAround(point, rot), m_rotation.RotateBy(rot)};
   }
 
