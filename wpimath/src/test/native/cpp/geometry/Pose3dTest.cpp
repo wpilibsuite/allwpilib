@@ -8,6 +8,7 @@
 #include <wpi/array.h>
 
 #include "frc/geometry/Pose3d.h"
+#include <corecrt_math_defines.h>
 
 using namespace frc;
 
@@ -81,6 +82,17 @@ TEST(Pose3dTest, RelativeTo) {
   EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), finalRelativeToInitial.X().value());
   EXPECT_DOUBLE_EQ(0.0, finalRelativeToInitial.Y().value());
   EXPECT_NEAR(0.0, finalRelativeToInitial.Rotation().Z().value(), 1e-9);
+}
+
+TEST(Pose3dTest, RotateAround) {
+  const Pose3d initial{5_m, 0_m, 0_m, Rotation3d{}};
+  const Translation3d point{0_m, 0_m, 0_m};
+
+  const auto rotated = initial.RotateAround(point, Rotation3d{0_deg, 0_deg, 180_deg});
+
+  EXPECT_NEAR(-5.0, rotated.X().value(), 1e-9);
+  EXPECT_NEAR(0.0, rotated.Y().value(), 1e-9);
+  EXPECT_NEAR(M_PI, rotated.Rotation().Z().value(), 1e-9);
 }
 
 TEST(Pose3dTest, Equality) {
