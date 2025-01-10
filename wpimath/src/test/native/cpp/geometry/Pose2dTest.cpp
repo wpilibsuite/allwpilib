@@ -56,7 +56,7 @@ TEST(Pose2dTest, RotateAround) {
   const Translation2d point{0_m, 0_m};
 
   const auto rotated = initial.RotateAround(point, Rotation2d{180_deg});
-  
+
   EXPECT_NEAR(-5.0, rotated.X().value(), 1e-9);
   EXPECT_NEAR(0.0, rotated.Y().value(), 1e-9);
   EXPECT_NEAR(180.0, rotated.Rotation().Degrees().value(), 1e-9);
