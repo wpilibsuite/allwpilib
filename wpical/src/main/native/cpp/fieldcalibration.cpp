@@ -23,7 +23,6 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/videoio.hpp>
-#include <wpi/json.h>
 
 #include "apriltag.h"
 #include "tag36h11.h"
@@ -433,7 +432,7 @@ inline bool process_video_file(
 }
 
 int fieldcalibration::calibrate(std::string input_dir_path,
-                                std::string output_file_path,
+                                wpi::json& output_json,
                                 std::string camera_model_path,
                                 std::string ideal_map_path, int pinned_tag_id,
                                 bool show_debug_window) {
@@ -605,8 +604,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
       {"length", static_cast<double>(json.at("field").at("length"))},
       {"width", static_cast<double>(json.at("field").at("width"))}};
 
-  std::ofstream output_file(output_file_path);
-  output_file << observed_map_json.dump(4) << std::endl;
+  output_json = observed_map_json;
 
   return 0;
 }
