@@ -193,7 +193,7 @@ class WPILIB_DLLEXPORT Pose2d {
    * @return The new rotated pose.
    */
   constexpr Pose2d RotateAround(const Translation2d& point,
-                                const Rotation2d& rot) {
+                                const Rotation2d& rot) const {
     return {m_translation.RotateAround(point, rot), m_rotation.RotateBy(rot)};
   }
 
