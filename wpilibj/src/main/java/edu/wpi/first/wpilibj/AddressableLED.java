@@ -71,8 +71,8 @@ public class AddressableLED implements AutoCloseable {
   /**
    * Sets the bit timing.
    *
-   * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing needs to be set
-   * for those.
+   * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing needs to be set for
+   * those.
    *
    * @param highTime0NanoSeconds high time for 0 bit (default 400ns)
    * @param lowTime0NanoSeconds low time for 0 bit (default 900ns)
