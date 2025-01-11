@@ -12,7 +12,8 @@ import edu.wpi.first.hal.PWMJNI;
 /**
  * A class for driving addressable LEDs, such as WS2812B, WS2815, and NeoPixels.
  *
- * <p>By default, the timing supports WS2812B and WS2815 LEDs, but is configurable using setBitTiming()
+ * <p>By default, the timing supports WS2812B and WS2815 LEDs, but is configurable using
+ * setBitTiming()
  *
  * <p>Only 1 LED driver is currently supported by the roboRIO. However, multiple LED strips can be
  * connected in series and controlled from the single driver.
@@ -70,7 +71,8 @@ public class AddressableLED implements AutoCloseable {
   /**
    * Sets the bit timing.
    *
-   * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing needs to be set for those.
+   * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing needs to be set
+   * for those.
    *
    * @param highTime0NanoSeconds high time for 0 bit (default 400ns)
    * @param lowTime0NanoSeconds low time for 0 bit (default 900ns)
