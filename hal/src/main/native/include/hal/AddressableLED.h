@@ -77,8 +77,8 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
 /**
  * Sets the bit timing.
  *
- * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing needs to
- * be set for those.
+ * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing
+ * needs to be set for those.
  *
  * @param[in] handle the Addressable LED handle
  * @param[in] highTime0NanoSeconds high time for 0 bit (default 400ns)
