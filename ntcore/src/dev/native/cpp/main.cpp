@@ -32,8 +32,6 @@ void stress();
 void stress2();
 
 int main(int argc, char* argv[]) {
-  wpi::impl::SetupNowDefaultOnRio();
-
   if (argc == 2 && std::string_view{argv[1]} == "bench") {
     bench();
     return EXIT_SUCCESS;
