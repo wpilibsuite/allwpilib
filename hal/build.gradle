@@ -10,23 +10,9 @@ ext {
     nativeName = 'hal'
     setBaseName = 'wpiHal'
     devMain = 'edu.wpi.first.hal.DevMain'
-    niLibraries = true
     generatedHeaders = "src/generated/main/native/include"
     splitSetup = {
-        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-            it.sources {
-                athenaCpp(CppSourceSet) {
-                    source {
-                        srcDirs = ['src/main/native/athena']
-                        include '**/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDir 'src/main/native/include'
-                        srcDir generatedHeaders
-                    }
-                }
-            }
-        } else if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+        if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
             it.sources {
                 systemCoreCpp(CppSourceSet) {
                     source {
@@ -69,9 +55,6 @@ ext {
         }
     }
     exeSplitSetup = {
-        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-            nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
-        }
     }
 }
 
@@ -108,17 +91,6 @@ nativeUtils.exportsConfigs {
     }
     halJNI {
         x64SymbolFilter = symbolFilter
-    }
-}
-
-model {
-    binaries {
-        all {
-            if (!(it instanceof NativeBinarySpec)) return
-                if (it.component.name != 'hal' && it.component.name != 'halBase') return
-                if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) return
-                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries')
-        }
     }
 }
 

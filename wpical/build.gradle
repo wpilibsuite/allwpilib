@@ -152,7 +152,7 @@ model {
                 }
             }
             binaries.all {
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore || it.targetPlatform.name.startsWith("linuxarm")) {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore || it.targetPlatform.name.startsWith("linuxarm")) {
                     it.buildable = false
                     return
                 }
@@ -203,7 +203,7 @@ model {
                 }
             }
             binaries.all {
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore || it.targetPlatform.name.startsWith("linuxarm")) {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore || it.targetPlatform.name.startsWith("linuxarm")) {
                     it.buildable = false
                     return
                 }
