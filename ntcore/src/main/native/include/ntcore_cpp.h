@@ -120,7 +120,7 @@ struct TopicInfo {
 struct ConnectionInfo {
   /**
    * The remote identifier (as set on the remote node by
-   * NetworkTableInstance::StartClient4() or nt::StartClient4()).
+   * NetworkTableInstance::StartClient() or nt::StartClient()).
    */
   std::string remote_id;
 
@@ -1057,12 +1057,10 @@ void StopLocal(NT_Inst inst);
  *                          null terminated)
  * @param listen_address    the address to listen on, or null to listen on any
  *                          address. (UTF-8 string)
- * @param port3             port to communicate over (NT3)
- * @param port4             port to communicate over (NT4)
+ * @param port              port to communicate over
  */
 void StartServer(NT_Inst inst, std::string_view persist_filename,
-                 std::string_view listen_address, unsigned int port3,
-                 unsigned int port4);
+                 std::string_view listen_address, unsigned int port);
 
 /**
  * Stops the server if it is running.
@@ -1072,22 +1070,13 @@ void StartServer(NT_Inst inst, std::string_view persist_filename,
 void StopServer(NT_Inst inst);
 
 /**
- * Starts a NT3 client.  Use SetServer or SetServerTeam to set the server name
+ * Starts a client.  Use SetServer or SetServerTeam to set the server name
  * and port.
  *
  * @param inst      instance handle
  * @param identity  network identity to advertise (cannot be empty string)
  */
-void StartClient3(NT_Inst inst, std::string_view identity);
-
-/**
- * Starts a NT4 client.  Use SetServer or SetServerTeam to set the server name
- * and port.
- *
- * @param inst      instance handle
- * @param identity  network identity to advertise (cannot be empty string)
- */
-void StartClient4(NT_Inst inst, std::string_view identity);
+void StartClient(NT_Inst inst, std::string_view identity);
 
 /**
  * Stops the client if it is running.

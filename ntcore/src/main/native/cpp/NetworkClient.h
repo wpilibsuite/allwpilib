@@ -25,8 +25,6 @@
 #include "net/ClientMessageQueue.h"
 #include "net/Message.h"
 #include "net/WebSocketConnection.h"
-#include "net3/ClientImpl3.h"
-#include "net3/UvStreamConnection3.h"
 
 namespace wpi {
 class Logger;
@@ -98,28 +96,6 @@ class NetworkClientBase : public INetworkClient {
   wpi::uv::Loop& m_loop;
 };
 
-class NetworkClient3 final : public NetworkClientBase {
- public:
-  NetworkClient3(int inst, std::string_view id,
-                 net::ILocalStorage& localStorage, IConnectionList& connList,
-                 wpi::Logger& logger);
-  ~NetworkClient3() final;
-
-  void SetServers(
-      std::span<const std::pair<std::string, unsigned int>> servers) final {
-    DoSetServers(servers, NT_DEFAULT_PORT3);
-  }
-
- private:
-  void HandleLocal();
-  void TcpConnected(wpi::uv::Tcp& tcp) final;
-  void ForceDisconnect(std::string_view reason) override;
-  void DoDisconnect(std::string_view reason) override;
-
-  std::shared_ptr<net3::UvStreamConnection3> m_wire;
-  std::shared_ptr<net3::ClientImpl3> m_clientImpl;
-};
-
 class NetworkClient final : public NetworkClientBase {
  public:
   NetworkClient(
@@ -131,7 +107,7 @@ class NetworkClient final : public NetworkClientBase {
 
   void SetServers(
       std::span<const std::pair<std::string, unsigned int>> servers) final {
-    DoSetServers(servers, NT_DEFAULT_PORT4);
+    DoSetServers(servers, NT_DEFAULT_PORT);
   }
 
  private:

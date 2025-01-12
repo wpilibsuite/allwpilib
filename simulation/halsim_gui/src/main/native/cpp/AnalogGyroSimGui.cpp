@@ -32,8 +32,8 @@ class AnalogGyroSimModel : public glass::AnalogGyroModel {
 
   bool Exists() override { return HALSIM_GetAnalogGyroInitialized(m_index); }
 
-  glass::DataSource* GetAngleData() override { return &m_angle; }
-  glass::DataSource* GetRateData() override { return &m_rate; }
+  glass::DoubleSource* GetAngleData() override { return &m_angle; }
+  glass::DoubleSource* GetRateData() override { return &m_rate; }
 
   void SetAngle(double val) override {
     HALSIM_SetAnalogGyroAngle(m_index, val);
