@@ -104,8 +104,8 @@ public class AnnotationProcessor extends AbstractProcessor {
                 processingEnv, loggedTypes), // prioritize epilogue logging over Sendable
             new ConfiguredLoggerHandler(
                 processingEnv, customLoggers), // then customized logging configs
-            new ArrayHandler(processingEnv),
-            new CollectionHandler(processingEnv),
+            new ArrayHandler(processingEnv, loggedTypes),
+            new CollectionHandler(processingEnv, loggedTypes),
             new EnumHandler(processingEnv),
             new MeasureHandler(processingEnv),
             new PrimitiveHandler(processingEnv),
