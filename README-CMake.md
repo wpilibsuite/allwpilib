@@ -24,7 +24,6 @@ WPILib is normally built with Gradle, however for some systems, such as Linux ba
 * datalogtool
 * glass
 * outlineviewer
-* roborioteamnumbersetter
 * sysid
 * halsim_gui (if simulation extensions are enabled)
 
