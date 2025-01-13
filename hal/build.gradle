@@ -23,21 +23,6 @@ ext {
                         srcDir 'src/main/native/include'
                         srcDir generatedHeaders
                         srcDir 'src/mrc/include'
-                        srcDir 'src/generated/main/native/cpp/mrc/protobuf'
-                    }
-                }
-            }
-        } else if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
-            it.sources {
-                systemCoreCpp(CppSourceSet) {
-                    source {
-                        srcDirs = ['src/main/native/systemcore']
-                        include '**/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDir 'src/main/native/include'
-                        srcDir generatedHeaders
-                        srcDir 'src/mrc/include'
                     }
                 }
             }
@@ -105,35 +90,6 @@ nativeUtils.exportsConfigs {
     }
     halJNI {
         x64SymbolFilter = symbolFilter
-    }
-}
-
-model {
-    components {
-        all {
-            it.sources.each {
-                it.exportedHeaders {
-                    srcDirs 'src/mrc/include',
-                            'src/generated/main/native/cpp/mrc/protobuf'
-                }
-            }
-        }
-    }
-    binaries {
-        all {
-            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
-                return
-            }
-            if (it.component.name == "${nativeName}JNI") {
-                project(':ntcore').addNtcoreDependency(it, 'static')
-                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-            } else {
-                project(':ntcore').addNtcoreDependency(it, 'shared')
-                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-            }
-        }
     }
 }
 
