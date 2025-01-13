@@ -74,9 +74,6 @@ model {
                 nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
             }
-            if ((it instanceof NativeExecutableBinarySpec || it instanceof GoogleTestTestSuiteBinarySpec) && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
-            }
         }
     }
     tasks {

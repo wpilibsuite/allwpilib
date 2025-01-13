@@ -218,9 +218,6 @@ model {
                 binaries.all {
                     lib library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                        nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
-                    }
                 }
                 sources {
                     cpp {
@@ -246,9 +243,6 @@ model {
             binaries.all { binary ->
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
-                }
                 if (binary.targetPlatform.operatingSystem.isLinux()) {
                     linker.args "-lutil"
                 }
@@ -268,9 +262,6 @@ model {
             binaries.all { binary ->
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
-                }
             }
         }
     }

@@ -44,7 +44,7 @@ model {
 
     binaries {
         all {
-            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                 it.buildable = false
                 return
             }
@@ -59,9 +59,6 @@ model {
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib library: pluginName, linkage: 'shared'
-            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
-            }
         }
     }
 }
