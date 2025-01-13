@@ -270,6 +270,16 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   CommandPtr Repeatedly() &&;
 
   /**
+   * Decorates this command to run repeatedly until the given count is reached
+   * or is interrupted. The decorated command can still be canceled.
+   *
+   * @param times the number/count of times to run the command
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr Repeatedly(int times) &&;
+
+  /**
    * Decorates this command to run "by proxy" by wrapping it in a ProxyCommand.
    * Use this for "forking off" from command compositions when the user does not
    * wish to extend the command's requirements to the entire command
