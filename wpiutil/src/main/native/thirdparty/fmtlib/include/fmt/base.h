@@ -21,7 +21,7 @@
 #endif
 
 // The fmt library version in the form major * 10000 + minor * 100 + patch.
-#define FMT_VERSION 110100
+#define FMT_VERSION 110102
 
 // Detect compiler versions.
 #if defined(__clang__) && !defined(__ibmxl__)
@@ -159,6 +159,20 @@
 #else
 #  define FMT_TRY if (true)
 #  define FMT_CATCH(x) if (false)
+#endif
+
+#ifdef FMT_NO_UNIQUE_ADDRESS
+// Use the provided definition.
+#elif FMT_CPLUSPLUS < 202002L
+// Not supported.
+#elif FMT_HAS_CPP_ATTRIBUTE(no_unique_address)
+#  define FMT_NO_UNIQUE_ADDRESS [[no_unique_address]]
+// VS2019 v16.10 and later except clang-cl (https://reviews.llvm.org/D110485).
+#elif FMT_MSC_VERSION >= 1929 && !FMT_CLANG_VERSION
+#  define FMT_NO_UNIQUE_ADDRESS [[msvc::no_unique_address]]
+#endif
+#ifndef FMT_NO_UNIQUE_ADDRESS
+#  define FMT_NO_UNIQUE_ADDRESS
 #endif
 
 #if FMT_HAS_CPP17_ATTRIBUTE(fallthrough)
@@ -827,6 +841,12 @@ class basic_specs {
     FMT_ASSERT(size <= max_fill_size, "invalid fill");
     for (size_t i = 0; i < size; ++i)
       fill_data_[i & 3] = static_cast<char>(s[i]);
+  }
+
+  FMT_CONSTEXPR void copy_fill_from(const basic_specs& specs) {
+    set_fill_size(specs.fill_size());
+    for (size_t i = 0; i < max_fill_size; ++i)
+      fill_data_[i] = specs.fill_data_[i];
   }
 };
 
@@ -2256,9 +2276,7 @@ struct locale_ref {
 
  public:
   constexpr locale_ref() : locale_(nullptr) {}
-
-  template <typename Locale, FMT_ENABLE_IF(sizeof(Locale::collate) != 0)>
-  locale_ref(const Locale& loc);
+  template <typename Locale> locale_ref(const Locale& loc);
 
   inline explicit operator bool() const noexcept { return locale_ != nullptr; }
 #endif  // FMT_USE_LOCALE
@@ -2604,10 +2622,11 @@ template <typename Context> class basic_format_args {
 };
 
 // A formatting context.
-class context : private detail::locale_ref {
+class context {
  private:
   appender out_;
   format_args args_;
+  FMT_NO_UNIQUE_ADDRESS detail::locale_ref loc_;
 
  public:
   /// The character type for the output.
@@ -2623,7 +2642,7 @@ class context : private detail::locale_ref {
   /// in the object so make sure they have appropriate lifetimes.
   FMT_CONSTEXPR context(iterator out, format_args args,
                         detail::locale_ref loc = {})
-      : locale_ref(loc), out_(out), args_(args) {}
+      : out_(out), args_(args), loc_(loc) {}
   context(context&&) = default;
   context(const context&) = delete;
   void operator=(const context&) = delete;
@@ -2642,7 +2661,7 @@ class context : private detail::locale_ref {
   // Advances the begin iterator to `it`.
   FMT_CONSTEXPR void advance_to(iterator) {}
 
-  FMT_CONSTEXPR auto locale() const -> detail::locale_ref { return *this; }
+  FMT_CONSTEXPR auto locale() const -> detail::locale_ref { return loc_; }
 };
 
 template <typename Char = char> struct runtime_format_string {
@@ -2659,7 +2678,8 @@ template <typename Char = char> struct runtime_format_string {
  */
 inline auto runtime(string_view s) -> runtime_format_string<> { return {{s}}; }
 
-/// A compile-time format string.
+/// A compile-time format string. Use `format_string` in the public API to
+/// prevent type deduction.
 template <typename... T> struct fstring {
  private:
   static constexpr int num_static_named_args =
