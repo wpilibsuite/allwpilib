@@ -37,7 +37,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
 
   /**
    * Create a state-space model of the elevator system. The states of the system
-   * are [position, velocity], inputs are [voltage], and outputs are [position].
+   * are [position, velocity]ᵀ, inputs are [voltage], and outputs are [position,
+   * velocity]ᵀ.
    *
    * @param motor The motor (or gearbox) attached to the carriage.
    * @param mass The mass of the elevator carriage, in kilograms.
@@ -74,8 +75,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
 
   /**
    * Create a state-space model of a single-jointed arm system.The states of the
-   * system are [angle, angular velocity], inputs are [voltage], and outputs are
-   * [angle].
+   * system are [angle, angular velocity]ᵀ, inputs are [voltage], and outputs
+   * are [angle, angular velocity]ᵀ.
    *
    * @param motor The motor (or gearbox) attached to the arm.
    * @param J The moment of inertia J of the arm.
@@ -147,8 +148,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
   /**
    * Create a state-space model for a 1 DOF position system from its kV
    * (volts/(unit/sec)) and kA (volts/(unit/sec²)). These constants can be
-   * found using SysId. the states of the system are [position, velocity],
-   * inputs are [voltage], and outputs are [position].
+   * found using SysId. the states of the system are [position, velocity]ᵀ,
+   * inputs are [voltage], and outputs are [position, velocity]ᵀ.
    *
    * You MUST use an SI unit (i.e. meters or radians) for the Distance template
    * argument. You may still use non-SI units (such as feet or inches) for the
@@ -169,7 +170,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
   template <typename Distance>
     requires std::same_as<units::meter, Distance> ||
              std::same_as<units::radian, Distance>
-  static constexpr LinearSystem<2, 1, 1> IdentifyPositionSystem(
+  static constexpr LinearSystem<2, 1, 2> IdentifyPositionSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
     if (kV < decltype(kV){0}) {
@@ -180,11 +181,11 @@ class WPILIB_DLLEXPORT LinearSystemId {
     }
 
     Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
-    Matrixd<2, 1> B{0.0, 1.0 / kA.value()};
-    Matrixd<1, 2> C{1.0, 0.0};
-    Matrixd<1, 1> D{0.0};
+    Matrixd<2, 1> B{{0.0}, {1.0 / kA.value()}};
+    Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+    Matrixd<2, 1> D{{0.0}, {0.0}};
 
-    return LinearSystem<2, 1, 1>(A, B, C, D);
+    return LinearSystem<2, 1, 2>(A, B, C, D);
   }
 
   /**
@@ -337,8 +338,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
 
   /**
    * Create a state-space model of a DC motor system. The states of the system
-   * are [angular position, angular velocity], inputs are [voltage], and outputs
-   * are [angular position, angular velocity].
+   * are [angular position, angular velocity]ᵀ, inputs are [voltage], and
+   * outputs are [angular position, angular velocity]ᵀ.
    *
    * @param motor The motor (or gearbox) attached to the system.
    * @param J the moment of inertia J of the DC motor.
@@ -370,8 +371,9 @@ class WPILIB_DLLEXPORT LinearSystemId {
   /**
    * Create a state-space model of a DC motor system from its kV
    * (volts/(unit/sec)) and kA (volts/(unit/sec²)). These constants can be
-   * found using SysId. the states of the system are [position, velocity],
-   * inputs are [voltage], and outputs are [position].
+   * found using SysId. the states of the system are [angular position, angular
+   * velocity]ᵀ, inputs are [voltage], and outputs are [angular position,
+   * angular velocity]ᵀ.
    *
    * You MUST use an SI unit (i.e. meters or radians) for the Distance template
    * argument. You may still use non-SI units (such as feet or inches) for the
@@ -410,9 +412,9 @@ class WPILIB_DLLEXPORT LinearSystemId {
 
   /**
    * Create a state-space model of differential drive drivetrain. In this model,
-   * the states are [left velocity, right velocity], the inputs are [left
+   * the states are [left velocity, right velocity]ᵀ, the inputs are [left
    * voltage, right voltage], and the outputs are [left velocity, right
-   * velocity]
+   * velocity]ᵀ.
    *
    * @param motor The motor (or gearbox) driving the drivetrain.
    * @param mass The mass of the robot in kilograms.
