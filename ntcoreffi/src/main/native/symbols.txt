@@ -261,9 +261,6 @@ WPI_DestroySignalObject
 WPI_FreeString
 WPI_FreeStringArray
 WPI_GetSystemTime
-WPI_Impl_SetupNowUseDefaultOnRio
-WPI_Impl_SetupNowRioWithSession
-WPI_Impl_ShutdownNowRio
 WPI_InitString
 WPI_InitStringWithLength
 WPI_Now
