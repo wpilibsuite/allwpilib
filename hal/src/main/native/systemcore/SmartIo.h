@@ -17,8 +17,20 @@ constexpr int32_t kPwmDisabled = 0;
 constexpr int32_t kPwmAlwaysHigh = 0xFFFF;
 
 enum class SmartIoMode {
-  DigitalInput,
-  PWMOutput,
+  DigitalInput = 0,
+  DigitalOutput,
+  AnalogInput,
+  PwmInput,
+  PwmOutput,
+  SingleCounterRising,
+  SingleCounterFalling,
+};
+
+enum class PwmOutputPeriod {
+  k20ms = 0,
+  k10ms,
+  k5ms,
+  k2ms,
 };
 
 struct SmartIo {
@@ -37,7 +49,17 @@ struct SmartIo {
   nt::IntegerPublisher setPublisher;
   nt::IntegerSubscriber getSubscriber;
 
+  nt::IntegerPublisher periodPublisher;
+  nt::IntegerSubscriber frequencySubscriber;
+
   int32_t InitializeMode(SmartIoMode mode);
+  int32_t SwitchDioDirection(bool input);
+
+  int32_t SetDigitalOutput(bool value);
+  int32_t GetDigitalInput(bool* value);
+
+  int32_t SetPwmOutputPeriod(PwmOutputPeriod period);
+
   int32_t SetPwmMicroseconds(uint16_t microseconds);
   int32_t GetPwmMicroseconds(uint16_t* microseconds);
 };

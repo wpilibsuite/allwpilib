@@ -8,7 +8,7 @@
 
 namespace hal {
 
-constexpr int32_t kNumSmartIo = 4;
+constexpr int32_t kNumSmartIo = 5;
 constexpr int32_t kNumAccumulators = 0;
 constexpr int32_t kNumAnalogTriggers = 0;
 constexpr int32_t kNumAnalogInputs = 8;
