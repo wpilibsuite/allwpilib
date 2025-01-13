@@ -348,7 +348,7 @@ public class CommandPS4Controller extends CommandGenericHID {
   }
 
   /**
-   * Get the X axis value of left side of the controller.
+   * Get the X axis value of left side of the controller. Right is positive.
    *
    * @return The axis value.
    */
@@ -357,7 +357,7 @@ public class CommandPS4Controller extends CommandGenericHID {
   }
 
   /**
-   * Get the Y axis value of left side of the controller.
+   * Get the Y axis value of left side of the controller. Back is positive.
    *
    * @return The axis value.
    */
@@ -366,7 +366,7 @@ public class CommandPS4Controller extends CommandGenericHID {
   }
 
   /**
-   * Get the X axis value of right side of the controller.
+   * Get the X axis value of right side of the controller. Right is positive.
    *
    * @return The axis value.
    */
@@ -375,7 +375,7 @@ public class CommandPS4Controller extends CommandGenericHID {
   }
 
   /**
-   * Get the Y axis value of right side of the controller.
+   * Get the Y axis value of right side of the controller. Back is positive.
    *
    * @return The axis value.
    */

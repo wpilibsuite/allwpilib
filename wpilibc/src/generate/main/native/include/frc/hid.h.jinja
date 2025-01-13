@@ -47,7 +47,7 @@ class {{ ConsoleName }}Controller : public GenericHID,
   {{ ConsoleName }}Controller& operator=({{ ConsoleName }}Controller&&) = default;
 {% for stick in sticks %}
   /**
-   * Get the {{ stick.NameParts[1] }} axis value of {{ stick.NameParts[0] }} side of the controller.
+   * Get the {{ stick.NameParts[1] }} axis value of {{ stick.NameParts[0] }} side of the controller. {{ stick.PositiveDirection }} is positive.
    *
    * @return the axis value.
    */

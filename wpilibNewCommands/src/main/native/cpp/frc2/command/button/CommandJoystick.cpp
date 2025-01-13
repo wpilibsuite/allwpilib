@@ -26,5 +26,8 @@ double CommandJoystick::GetMagnitude() const {
 }
 
 units::radian_t CommandJoystick::GetDirection() const {
+  // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#joystick-and-controller-coordinate-system
+  // +X is right and +Y is back, so 0 radians is right and CW is positive.
+  // Rotate by 90 degrees CCW to make 0 radians forward and CW positive.
   return m_hid.GetDirection();
 }

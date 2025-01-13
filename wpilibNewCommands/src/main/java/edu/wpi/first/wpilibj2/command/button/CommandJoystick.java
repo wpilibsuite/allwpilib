@@ -173,6 +173,9 @@ public class CommandJoystick extends CommandGenericHID {
   /**
    * Get the x position of the HID.
    *
+   * <p>This depends on the mapping of the joystick connected to the current port. On most
+   * joysticks, positive is to the right.
+   *
    * @return the x position
    */
   public double getX() {
@@ -181,6 +184,9 @@ public class CommandJoystick extends CommandGenericHID {
 
   /**
    * Get the y position of the HID.
+   *
+   * <p>This depends on the mapping of the joystick connected to the current port. On most
+   * joysticks, positive is to the back.
    *
    * @return the y position
    */
@@ -218,8 +224,8 @@ public class CommandJoystick extends CommandGenericHID {
   }
 
   /**
-   * Get the magnitude of the direction vector formed by the joystick's current position relative to
-   * its origin.
+   * Get the magnitude of the vector formed by the joystick's current position relative to its
+   * origin.
    *
    * @return The magnitude of the direction vector
    */
@@ -228,16 +234,21 @@ public class CommandJoystick extends CommandGenericHID {
   }
 
   /**
-   * Get the direction of the vector formed by the joystick and its origin in radians.
+   * Get the direction of the vector formed by the joystick and its origin in radians. 0 is forward
+   * and clockwise is positive. (Straight right is π/2.)
    *
    * @return The direction of the vector in radians
    */
   public double getDirectionRadians() {
+    // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#joystick-and-controller-coordinate-system
+    // +X is right and +Y is back, so 0 radians is right and CW is positive. Rotate by 90 degrees
+    // CCW to make 0 radians forward and CW positive.
     return m_hid.getDirectionRadians();
   }
 
   /**
-   * Get the direction of the vector formed by the joystick and its origin in degrees.
+   * Get the direction of the vector formed by the joystick and its origin in degrees. 0 is forward
+   * and clockwise is positive. (Straight right is 90.)
    *
    * @return The direction of the vector in degrees
    */

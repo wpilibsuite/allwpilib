@@ -60,28 +60,32 @@
           "left",
           "X"
         ],
-        "value": 0
+        "value": 0,
+        "PositiveDirection": "Right"
       },
       {
         "NameParts": [
           "right",
           "X"
         ],
-        "value": 4
+        "value": 4,
+        "PositiveDirection": "Right"
       },
       {
         "NameParts": [
           "left",
           "Y"
         ],
-        "value": 1
+        "value": 1,
+        "PositiveDirection": "Back"
       },
       {
         "NameParts": [
           "right",
           "Y"
         ],
-        "value": 5
+        "value": 5,
+        "PositiveDirection": "Back"
       }
     ],
     "triggers": [
@@ -175,28 +179,32 @@
           "left",
           "X"
         ],
-        "value": 0
+        "value": 0,
+        "PositiveDirection": "Right"
       },
       {
         "NameParts": [
           "left",
           "Y"
         ],
-        "value": 1
+        "value": 1,
+        "PositiveDirection": "Back"
       },
       {
         "NameParts": [
           "right",
           "X"
         ],
-        "value": 2
+        "value": 2,
+        "PositiveDirection": "Right"
       },
       {
         "NameParts": [
           "right",
           "Y"
         ],
-        "value": 5
+        "value": 5,
+        "PositiveDirection": "Back"
       }
     ],
     "triggers": [
@@ -290,28 +298,32 @@
           "left",
           "X"
         ],
-        "value": 0
+        "value": 0,
+        "PositiveDirection": "Right"
       },
       {
         "NameParts": [
           "left",
           "Y"
         ],
-        "value": 1
+        "value": 1,
+        "PositiveDirection": "Back"
       },
       {
         "NameParts": [
           "right",
           "X"
         ],
-        "value": 2
+        "value": 2,
+        "PositiveDirection": "Right"
       },
       {
         "NameParts": [
           "right",
           "Y"
         ],
-        "value": 5
+        "value": 5,
+        "PositiveDirection": "Back"
       }
     ],
     "triggers": [
@@ -412,28 +424,32 @@
           "left",
           "X"
         ],
-        "value": 0
+        "value": 0,
+        "PositiveDirection": "Right"
       },
       {
         "NameParts": [
           "right",
           "X"
         ],
-        "value": 3
+        "value": 3,
+        "PositiveDirection": "Right"
       },
       {
         "NameParts": [
           "left",
           "Y"
         ],
-        "value": 1
+        "value": 1,
+        "PositiveDirection": "Back"
       },
       {
         "NameParts": [
           "right",
           "Y"
         ],
-        "value": 4
+        "value": 4,
+        "PositiveDirection": "Back"
       }
     ]
   }

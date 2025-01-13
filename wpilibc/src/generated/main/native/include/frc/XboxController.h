@@ -45,28 +45,28 @@ class XboxController : public GenericHID,
   XboxController& operator=(XboxController&&) = default;
 
   /**
-   * Get the X axis value of left side of the controller.
+   * Get the X axis value of left side of the controller. Right is positive.
    *
    * @return the axis value.
    */
   double GetLeftX() const;
 
   /**
-   * Get the X axis value of right side of the controller.
+   * Get the X axis value of right side of the controller. Right is positive.
    *
    * @return the axis value.
    */
   double GetRightX() const;
 
   /**
-   * Get the Y axis value of left side of the controller.
+   * Get the Y axis value of left side of the controller. Back is positive.
    *
    * @return the axis value.
    */
   double GetLeftY() const;
 
   /**
-   * Get the Y axis value of right side of the controller.
+   * Get the Y axis value of right side of the controller. Back is positive.
    *
    * @return the axis value.
    */

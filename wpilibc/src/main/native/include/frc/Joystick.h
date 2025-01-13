@@ -148,6 +148,7 @@ class Joystick : public GenericHID {
    * Get the X value of the current joystick.
    *
    * This depends on the mapping of the joystick connected to the current port.
+   * On most joysticks, positive is to the right.
    */
   double GetX() const;
 
@@ -155,6 +156,7 @@ class Joystick : public GenericHID {
    * Get the Y value of the current joystick.
    *
    * This depends on the mapping of the joystick connected to the current port.
+   * On most joysticks, positive is to the back.
    */
   double GetY() const;
 
@@ -244,7 +246,7 @@ class Joystick : public GenericHID {
   BooleanEvent Top(EventLoop* loop) const;
 
   /**
-   * Get the magnitude of the direction vector formed by the joystick's
+   * Get the magnitude of the vector formed by the joystick's
    * current position relative to its origin.
    *
    * @return The magnitude of the direction vector
@@ -252,7 +254,9 @@ class Joystick : public GenericHID {
   double GetMagnitude() const;
 
   /**
-   * Get the direction of the vector formed by the joystick and its origin.
+   * Get the direction of the vector formed by the joystick and its origin. 0 is
+   * forward and clockwise is positive. (Straight right is π/2 radians or 90
+   * degrees.)
    *
    * @return The direction of the vector.
    */
