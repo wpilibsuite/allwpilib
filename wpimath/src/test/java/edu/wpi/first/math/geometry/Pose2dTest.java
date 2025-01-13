@@ -73,6 +73,19 @@ class Pose2dTest {
   }
 
   @Test
+  void testRotateAround() {
+    var initial = new Pose2d(5, 0, Rotation2d.kZero);
+    var point = Translation2d.kZero;
+
+    var rotated = initial.rotateAround(point, Rotation2d.kPi);
+
+    assertAll(
+        () -> assertEquals(-5.0, rotated.getX(), kEpsilon),
+        () -> assertEquals(0.0, rotated.getY(), kEpsilon),
+        () -> assertEquals(180.0, rotated.getRotation().getDegrees(), kEpsilon));
+  }
+
+  @Test
   void testEquality() {
     var one = new Pose2d(0.0, 5.0, Rotation2d.fromDegrees(43.0));
     var two = new Pose2d(0.0, 5.0, Rotation2d.fromDegrees(43.0));
