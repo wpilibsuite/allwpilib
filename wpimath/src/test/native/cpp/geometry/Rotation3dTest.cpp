@@ -308,8 +308,8 @@ TEST(Rotation3dTest, Inequality) {
 }
 
 TEST(Rotation3dTest, ToMatrix) {
-  Rotation3d before{10_deg, 20_deg, 30_deg};
-  Rotation3d after{before.ToMatrix()};
+  constexpr Rotation3d before{10_deg, 20_deg, 30_deg};
+  constexpr Rotation3d after{before.ToMatrix()};
 
   EXPECT_EQ(before, after);
 }

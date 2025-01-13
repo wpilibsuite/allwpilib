@@ -79,8 +79,8 @@ TEST(Rotation2dTest, Inequality) {
 }
 
 TEST(Rotation2dTest, ToMatrix) {
-  Rotation2d before{20_deg};
-  Rotation2d after{before.ToMatrix()};
+  constexpr Rotation2d before{20_deg};
+  constexpr Rotation2d after{before.ToMatrix()};
 
   EXPECT_EQ(before, after);
 }
