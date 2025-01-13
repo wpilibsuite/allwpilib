@@ -35,8 +35,8 @@ model {
                 }
             }
             binaries.all {
-                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     it.buildable = false
                     return
                 }
@@ -105,7 +105,7 @@ model {
     }
     binaries {
         all {
-            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                 it.buildable = false
                 return
             }
