@@ -293,17 +293,6 @@ model {
     }
 }
 
-model {
-    binaries {
-        all {
-            if (!(it instanceof NativeBinarySpec)) return
-                if (it.component.name != 'wpiutil' && it.component.name != 'wpiutilBase') return
-                if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) return
-                nativeUtils.useRequiredLibrary(it, 'chipobject_headers')
-        }
-    }
-}
-
 sourceSets {
     printlog
 }
