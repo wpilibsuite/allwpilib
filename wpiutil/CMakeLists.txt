@@ -9,7 +9,6 @@ include(DownloadAndCheck)
 file(
     GLOB wpiutil_jni_src
     src/main/native/cpp/jni/WPIUtilJNI.cpp
-    src/main/native/cpp/jni/DataLogJNI.cpp
 )
 
 # Java bindings

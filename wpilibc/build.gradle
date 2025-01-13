@@ -112,6 +112,7 @@ model {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':libdatalog', library: 'libdatalog', linkage: 'shared'
             }
         }
         "${nativeName}"(NativeLibrarySpec) {

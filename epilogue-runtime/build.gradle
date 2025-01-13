@@ -13,4 +13,5 @@ dependencies {
     api(project(':ntcore'))
     api(project(':wpiutil'))
     api(project(':wpiunits'))
+    api(project(':libdatalog'))
 }
