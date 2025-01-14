@@ -33,8 +33,8 @@ void InitializeDutyCycle() {
 }  // namespace hal::init
 
 extern "C" {
-HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_Handle digitalSourceHandle,
-                                            HAL_AnalogTriggerType triggerType,
+HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_PortHandle portHandle,
+                                            const char* allocationLocation,
                                             int32_t* status) {
   hal::init::CheckInit();
 
@@ -51,7 +51,7 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_Handle digitalSourceHandle,
   }
 
   int16_t index = getHandleIndex(handle);
-  SimDutyCycleData[index].digitalChannel = getHandleIndex(digitalSourceHandle);
+  SimDutyCycleData[index].digitalChannel = getPortHandleChannel(portHandle);
   SimDutyCycleData[index].initialized = true;
   SimDutyCycleData[index].simDevice = 0;
   dutyCycle->index = index;
