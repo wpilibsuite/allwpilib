@@ -9,4 +9,4 @@ extern "C" {
 NT_Inst HAL_GetSystemServerHandle(void) {
   return 0;
 }
-}
+}  // extern "C"

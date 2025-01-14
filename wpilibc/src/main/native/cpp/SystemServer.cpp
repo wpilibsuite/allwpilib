@@ -4,7 +4,7 @@
 
 #include "frc/SystemServer.h"
 
-#include "hal/SystemServer.h"
+#include <hal/SystemServer.h>
 
 namespace frc {
 

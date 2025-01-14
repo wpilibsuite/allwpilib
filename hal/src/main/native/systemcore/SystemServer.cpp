@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "hal/SystemServer.h"
-#include "SystemServerInternal.h"
 
+#include "SystemServerInternal.h"
 #include "mrc/NtNetComm.h"
 
 namespace hal {
@@ -40,4 +40,4 @@ extern "C" {
 NT_Inst HAL_GetSystemServerHandle(void) {
   return hal::ServerInstance.GetHandle();
 }
-}
+}  // extern "C"
