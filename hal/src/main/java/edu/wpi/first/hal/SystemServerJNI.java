@@ -5,7 +5,7 @@
 package edu.wpi.first.hal;
 
 /**
- * SystemServer JNI Functions
+ * SystemServer JNI Functions.
  *
  * @see "SystemServer.h"
  */
@@ -18,6 +18,6 @@ public class SystemServerJNI extends JNIWrapper {
    */
   public static native int getSystemServerHandle();
 
-    /** Utility class. */
+  /** Utility class. */
   private SystemServerJNI() {}
 }
