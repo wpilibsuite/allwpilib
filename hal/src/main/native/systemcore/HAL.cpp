@@ -77,7 +77,6 @@ void InitializeHAL() {
   InitializeRelay();
   InitializeSerialPort();
   InitializeSmartIo();
-  InitializeSPI();
   InitializeThreads();
 }
 }  // namespace init

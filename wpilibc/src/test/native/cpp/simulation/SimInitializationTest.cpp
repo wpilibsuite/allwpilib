@@ -23,7 +23,6 @@
 #include "frc/simulation/PowerDistributionSim.h"
 #include "frc/simulation/RelaySim.h"
 #include "frc/simulation/RoboRioSim.h"
-#include "frc/simulation/SPIAccelerometerSim.h"
 
 using namespace frc::sim;
 
@@ -46,7 +45,6 @@ TEST(SimInitializationTest, AllInitialize) {
   RelaySim rsim{0};
   RoboRioSim rrsim;
   (void)rrsim;
-  SPIAccelerometerSim sasim{0};
   DutyCycleSim dcsim = DutyCycleSim::CreateForIndex(0);
   (void)dcsim;
   AddressableLEDSim adLED;
