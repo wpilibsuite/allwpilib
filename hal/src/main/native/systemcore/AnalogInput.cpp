@@ -4,9 +4,10 @@
 
 #include "hal/AnalogInput.h"
 
-#include <wpi/mutex.h>
 #include <cstdio>
 #include <thread>
+
+#include <wpi/mutex.h>
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
@@ -30,7 +31,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
     int32_t* status) {
   hal::init::CheckInit();
 
-int16_t channel = getPortHandleChannel(portHandle);
+  int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex || channel >= kNumSmartIo) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog", 0,
@@ -40,8 +41,8 @@ int16_t channel = getPortHandleChannel(portHandle);
 
   HAL_DigitalHandle handle;
 
-  auto port =
-      smartIoHandles->Allocate(channel, HAL_HandleEnum::AnalogInput, &handle, status);
+  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::AnalogInput,
+                                       &handle, status);
 
   if (*status != 0) {
     if (port) {
@@ -68,7 +69,8 @@ int16_t channel = getPortHandleChannel(portHandle);
 }
 
 void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle) {
-  auto port = smartIoHandles->Get(analogPortHandle, HAL_HandleEnum::AnalogInput);
+  auto port =
+      smartIoHandles->Get(analogPortHandle, HAL_HandleEnum::AnalogInput);
   if (port == nullptr) {
     return;
   }
@@ -135,7 +137,8 @@ int32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
 
 int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
                            int32_t* status) {
-  auto port = smartIoHandles->Get(analogPortHandle, HAL_HandleEnum::AnalogInput);
+  auto port =
+      smartIoHandles->Get(analogPortHandle, HAL_HandleEnum::AnalogInput);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -160,7 +163,8 @@ int32_t HAL_GetAnalogVoltsToValue(HAL_AnalogInputHandle analogPortHandle,
 
 double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
                             int32_t* status) {
-  auto port = smartIoHandles->Get(analogPortHandle, HAL_HandleEnum::AnalogInput);
+  auto port =
+      smartIoHandles->Get(analogPortHandle, HAL_HandleEnum::AnalogInput);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
