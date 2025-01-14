@@ -5,6 +5,7 @@
 #include "hal/AnalogInput.h"
 
 #include <wpi/mutex.h>
+#include <cstdio>
 #include <thread>
 
 #include "HALInitializer.h"
