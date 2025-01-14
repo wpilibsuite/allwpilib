@@ -16,7 +16,6 @@
 #include <WSProvider_Joystick.h>
 #include <WSProvider_PCM.h>
 #include <WSProvider_PWM.h>
-#include <WSProvider_Relay.h>
 #include <WSProvider_RoboRIO.h>
 #include <WSProvider_SimDevice.h>
 #include <WSProvider_Solenoid.h>
@@ -50,7 +49,6 @@ bool HALSimWSClient::Initialize() {
     HALSimWSProviderJoystick::Initialize(registerFunc);
     HALSimWSProviderPCM::Initialize(registerFunc);
     HALSimWSProviderPWM::Initialize(registerFunc);
-    HALSimWSProviderRelay::Initialize(registerFunc);
     HALSimWSProviderRoboRIO::Initialize(registerFunc);
     HALSimWSProviderSolenoid::Initialize(registerFunc);
 

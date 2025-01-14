@@ -53,7 +53,6 @@ components:
             - $ref: "#/components/schemas/joystickData"
             - $ref: "#/components/schemas/pcmData"
             - $ref: "#/components/schemas/pwmData"
-            - $ref: "#/components/schemas/relayData"
             - $ref: "#/components/schemas/solenoidData"
             - $ref: "#/components/schemas/roborioData"
             - $ref: "#/components/schemas/canmotorData"
@@ -573,36 +572,6 @@ components:
             "<zero_latch":
               type: boolean
               description: "Whether the PWM should be latched to 0"
-
-    relayData:
-      type: object
-      required:
-      - type
-      - device
-      properties:
-        type:
-          type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
-          const: Relay
-        device:
-          type: string
-          description: Device Identifier (usually channel)
-        data:
-          type: object
-          description: "Relay Output Data (type: Relay, device: channel number)"
-          properties:
-            <init_fwd:
-              type: boolean
-              description: "If relay forward direction is initialized in the robot program"
-            <init_rev:
-              type: boolean
-              description: "If relay reverse direction is initialized in the robot program"
-            <fwd:
-              type: boolean
-              description: "True if forward direction is enabled"
-            <rev:
-              type: boolean
-              description: "True if reverse direction is enabled"
 
     solenoidData:
       type: object

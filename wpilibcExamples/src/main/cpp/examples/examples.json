@@ -13,18 +13,6 @@
     "commandversion": 2
   },
   {
-    "name": "Relay",
-    "description": "Control a relay from joystick buttons.",
-    "tags": [
-      "Hardware",
-      "Relay",
-      "Joystick"
-    ],
-    "foldername": "Relay",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
     "name": "PDP CAN Monitoring",
     "description": "Monitor Power Distribution data such as voltage, current, temperature, etc.",
     "tags": [

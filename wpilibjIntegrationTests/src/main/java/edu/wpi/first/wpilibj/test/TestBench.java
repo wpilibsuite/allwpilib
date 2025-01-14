@@ -8,12 +8,10 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
-import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
 import edu.wpi.first.wpilibj.motorcontrol.Jaguar;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
@@ -221,26 +219,6 @@ public final class TestBench {
       @Override
       protected AnalogInput giveAnalogInput() {
         return new AnalogInput(2);
-      }
-    };
-  }
-
-  /** Returns the relay cross-connect fixture. */
-  public static RelayCrossConnectFixture getRelayCrossConnectFixture() {
-    return new RelayCrossConnectFixture() {
-      @Override
-      protected Relay giveRelay() {
-        return new Relay(0);
-      }
-
-      @Override
-      protected DigitalInput giveInputTwo() {
-        return new DigitalInput(18);
-      }
-
-      @Override
-      protected DigitalInput giveInputOne() {
-        return new DigitalInput(19);
       }
     };
   }

@@ -171,32 +171,6 @@ Java_edu_wpi_first_hal_PortsJNI_getNumInterrupts
 
 /*
  * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumRelayChannels
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumRelayChannels
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumRelayChannels();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumRelayHeaders
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumRelayHeaders
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumRelayHeaders();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumCTREPCMModules
  * Signature: ()I
  */

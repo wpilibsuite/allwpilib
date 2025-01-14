@@ -31,7 +31,6 @@ import org.junit.runners.Suite.SuiteClasses;
   PCMTest.class,
   PDPTest.class,
   PIDTest.class,
-  RelayCrossConnectTest.class,
   SampleTest.class,
   TimerTest.class
 })

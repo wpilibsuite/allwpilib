@@ -30,7 +30,6 @@
 #include "PHSimGui.h"
 #include "PWMSimGui.h"
 #include "PowerDistributionSimGui.h"
-#include "RelaySimGui.h"
 #include "RoboRioSimGui.h"
 #include "SimDeviceGui.h"
 #include "TimingGui.h"
@@ -86,7 +85,6 @@ __declspec(dllexport)
   PCMSimGui::Initialize();
   PowerDistributionSimGui::Initialize();
   PWMSimGui::Initialize();
-  RelaySimGui::Initialize();
   PHSimGui::Initialize();
   RoboRioSimGui::Initialize();
   TimingGui::Initialize();

@@ -42,10 +42,4 @@ public class ConstantsPortsTest extends AbstractComsSetup {
   public void testPwmChannels() {
     assertEquals(20, SensorUtil.kPwmChannels);
   }
-
-  /** kRelayChannels. */
-  @Test
-  public void testRelayChannels() {
-    assertEquals(4, SensorUtil.kRelayChannels);
-  }
 }
