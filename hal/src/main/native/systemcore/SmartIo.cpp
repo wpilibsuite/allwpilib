@@ -141,4 +141,16 @@ int32_t SmartIo::GetPwmMicroseconds(uint16_t* microseconds) {
   return 0;
 }
 
+int32_t SmartIo::GetAnalogInput(uint16_t* value) {
+  if (currentMode != SmartIoMode::AnalogInput) {
+    return INCOMPATIBLE_STATE;
+  }
+
+  int val = getSubscriber.Get();
+
+  *value = val;
+
+  return 0;
+}
+
 }  // namespace hal
