@@ -32,9 +32,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
    */
   @SuppressWarnings("this-escape")
   public DutyCycle(int channel) {
-    m_handle =
-        DutyCycleJNI.initialize(
-            HAL.getPort((byte) channel));
+    m_handle = DutyCycleJNI.initialize(HAL.getPort((byte) channel));
 
     m_channel = channel;
     HAL.report(tResourceType.kResourceType_DutyCycle, channel + 1);
