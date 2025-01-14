@@ -27,7 +27,7 @@
 #include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
-#include "SystemServer.h"
+#include "SystemServerInternal.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/proto/ControlData.h"
