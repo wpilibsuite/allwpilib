@@ -4,6 +4,7 @@
 
 #include "frc/DutyCycle.h"
 
+#include <string>
 #include <utility>
 
 #include <hal/DutyCycle.h>

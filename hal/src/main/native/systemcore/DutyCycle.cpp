@@ -5,6 +5,7 @@
 #include "hal/DutyCycle.h"
 
 #include <memory>
+#include <cstdio>
 #include <thread>
 
 #include "HALInitializer.h"
