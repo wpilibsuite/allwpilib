@@ -18,9 +18,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-/**
- * ADXL345 I2C Accelerometer.
- */
+/** ADXL345 I2C Accelerometer. */
 @SuppressWarnings("TypeName")
 public class ADXL345_I2C implements NTSendable, AutoCloseable {
   /** Default I2C device address. */
