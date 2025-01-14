@@ -4,6 +4,12 @@
 
 #pragma once
 
+#include <wpi/DataLogReader.h>
+#include <wpi/DenseMap.h>
+#include <wpi/Signal.h>
+#include <wpi/mutex.h>
+#include <wpi/struct/DynamicStruct.h>
+
 #include <atomic>
 #include <functional>
 #include <map>
@@ -13,17 +19,11 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/DataLogReader.h>
-#include <wpi/DenseMap.h>
-#include <wpi/Signal.h>
-#include <wpi/mutex.h>
-#include <wpi/struct/DynamicStruct.h>
-
 #ifndef NO_PROTOBUF
 #include <wpi/protobuf/ProtobufMessageDatabase.h>
 #endif
 
-namespace glass {
+namespace wpi {
 
 class DataLogReaderRange {
  public:
@@ -105,4 +105,4 @@ class DataLogReaderThread {
   std::thread m_thread;
 };
 
-}  // namespace glass
+}  // namespace wpi
