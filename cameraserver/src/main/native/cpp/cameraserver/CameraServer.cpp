@@ -80,10 +80,12 @@ struct Instance {
   wpi::DenseMap<CS_Source, SourcePublisher> m_publishers;
   std::shared_ptr<nt::NetworkTable> m_publishTable{
       nt::NetworkTableInstance::GetDefault().GetTable(kPublishName)};
-  cs::VideoListener m_videoListener;
+  std::vector<std::string> m_addresses;
   int m_tableListener;
   int m_nextPort{CameraServer::kBasePort};
-  std::vector<std::string> m_addresses;
+  // Listener callback will capture [this], so let's make sure the callback is
+  // removed before anything else is destroyed.
+  cs::VideoListener m_videoListener;
 };
 
 }  // namespace
