@@ -20,16 +20,14 @@ extern "C" {
 /**
  * Initialize a DutyCycle input.
  *
- * @param[in] digitalSourceHandle the digital source to use (either a
- *                                 HAL_DigitalHandle or a
- *                                 HAL_AnalogTriggerHandle)
- * @param[in] triggerType the analog trigger type of the source if it is
- *                         an analog trigger
+ * @param[in] portHandle         the port handle to create from
+ * @param[in] allocationLocation the location where the allocation is occurring
+ *                               (can be null)
  * @param[out] status Error status variable. 0 on success.
  * @return the created duty cycle handle
  */
-HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_Handle digitalSourceHandle,
-                                            HAL_AnalogTriggerType triggerType,
+HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_PortHandle portHandle,
+                                            const char* allocationLocation,
                                             int32_t* status);
 
 /**

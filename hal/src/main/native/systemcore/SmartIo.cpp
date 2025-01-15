@@ -96,6 +96,17 @@ int32_t SmartIo::GetDigitalInput(bool* value) {
   return 0;
 }
 
+int32_t SmartIo::GetPwmInputMicroseconds(uint16_t* microseconds) {
+  if (currentMode != SmartIoMode::PwmInput) {
+    return INCOMPATIBLE_STATE;
+  }
+
+  int val = getSubscriber.Get();
+  *microseconds = val;
+
+  return 0;
+}
+
 int32_t SmartIo::SetPwmOutputPeriod(PwmOutputPeriod period) {
   if (currentMode != SmartIoMode::PwmOutput) {
     return INCOMPATIBLE_STATE;
