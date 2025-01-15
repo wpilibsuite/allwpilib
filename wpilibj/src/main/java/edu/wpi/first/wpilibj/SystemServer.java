@@ -20,6 +20,6 @@ public final class SystemServer {
     return NetworkTableInstance.fromNativeHandle(SystemServerJNI.getSystemServerHandle());
   }
 
-  /** Utility Class */
+  /** Utility Class. */
   private SystemServer() {}
 }
