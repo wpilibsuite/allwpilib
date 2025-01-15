@@ -31,7 +31,7 @@ class PWMSimModel : public glass::PWMModel {
   void SetAddressableLED(int led) { m_led = led; }
   int GetAddressableLED() const override { return m_led; }
 
-  glass::DataSource* GetSpeedData() override { return &m_speed; }
+  glass::DoubleSource* GetSpeedData() override { return &m_speed; }
 
   void SetSpeed(double val) override { HALSIM_SetPWMSpeed(m_index, val); }
 

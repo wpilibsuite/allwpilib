@@ -16,6 +16,13 @@
 
 namespace wpi::uv {
 
+namespace detail {
+template <typename T>
+concept StringAssignable = requires(T a, const char* p) {
+  { a.assign(p, p) };  // NOLINT(readability/braces)
+};
+}  // namespace detail
+
 /**
  * Convert a binary structure containing an IPv4 address to a string.
  * @param addr Binary structure
@@ -23,7 +30,7 @@ namespace wpi::uv {
  * @param port Output port number
  * @return Error (same as `uv_ip4_name()`).
  */
-template <typename T>
+template <detail::StringAssignable T>
 int AddrToName(const sockaddr_in& addr, T* ip, unsigned int* port) {
   char name[128];
   int err = uv_ip4_name(&addr, name, 128);
@@ -43,7 +50,7 @@ int AddrToName(const sockaddr_in& addr, T* ip, unsigned int* port) {
  * @param port Output port number
  * @return Error (same as `uv_ip6_name()`).
  */
-template <typename T>
+template <detail::StringAssignable T>
 int AddrToName(const sockaddr_in6& addr, T* ip, unsigned int* port) {
   char name[128];
   int err = uv_ip6_name(&addr, name, 128);
@@ -63,7 +70,7 @@ int AddrToName(const sockaddr_in6& addr, T* ip, unsigned int* port) {
  * @param port Output port number
  * @return Error (same as `uv_ip6_name()`).
  */
-template <typename T>
+template <detail::StringAssignable T>
 int AddrToName(const sockaddr_storage& addr, T* ip, unsigned int* port) {
   if (addr.ss_family == AF_INET) {
     return AddrToName(reinterpret_cast<const sockaddr_in&>(addr), ip, port);
@@ -82,7 +89,7 @@ int AddrToName(const sockaddr_storage& addr, T* ip, unsigned int* port) {
  * @param ip Output string (any type that has `assign(char*, char*)`)
  * @return Error (same as `uv_inet_ntop()`).
  */
-template <typename T>
+template <detail::StringAssignable T>
 int AddrToName(const in_addr& addr, T* ip) {
   char name[128];
   int err = uv_inet_ntop(AF_INET, &addr, name, 128);
@@ -100,7 +107,7 @@ int AddrToName(const in_addr& addr, T* ip) {
  * @param ip Output string (any type that has `assign(char*, char*)`)
  * @return Error (same as `uv_inet_ntop()`).
  */
-template <typename T>
+template <detail::StringAssignable T>
 int AddrToName(const in6_addr& addr, T* ip) {
   char name[128];
   int err = uv_inet_ntop(AF_INET6, &addr, name, 128);

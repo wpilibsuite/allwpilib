@@ -30,7 +30,7 @@ class AnalogOutputSimModel : public glass::AnalogOutputModel {
 
   bool Exists() override { return HALSIM_GetAnalogOutInitialized(m_index); }
 
-  glass::DataSource* GetVoltageData() override { return &m_voltageData; }
+  glass::DoubleSource* GetVoltageData() override { return &m_voltageData; }
 
   void SetVoltage(double val) override {
     HALSIM_SetAnalogOutVoltage(m_index, val);

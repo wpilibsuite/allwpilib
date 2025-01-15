@@ -83,15 +83,8 @@ bool HALSimWeb::Initialize() {
   const char* msgFilters = std::getenv("HALSIMWS_FILTERS");
   if (msgFilters != nullptr) {
     m_useMsgFiltering = true;
-
-    std::string_view filters(msgFilters);
-    filters = wpi::trim(filters);
-    wpi::SmallVector<std::string_view, 16> filtersSplit;
-
-    wpi::split(filters, filtersSplit, ',', -1, false);
-    for (auto val : filtersSplit) {
-      m_msgFilters[wpi::trim(val)] = true;
-    }
+    wpi::split(wpi::trim(msgFilters), ',', -1, false,
+               [&](auto val) { m_msgFilters[wpi::trim(val)] = true; });
   } else {
     m_useMsgFiltering = false;
   }

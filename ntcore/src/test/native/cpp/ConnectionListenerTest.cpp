@@ -23,18 +23,16 @@ class ConnectionListenerTest : public ::testing::Test {
     nt::DestroyInstance(client_inst);
   }
 
-  void Connect(const char* address, unsigned int port3, unsigned int port4);
+  void Connect(const char* address, unsigned int port4);
 
  protected:
   NT_Inst server_inst;
   NT_Inst client_inst;
 };
 
-void ConnectionListenerTest::Connect(const char* address, unsigned int port3,
-                                     unsigned int port4) {
-  nt::StartServer(server_inst, "connectionlistenertest.ini", address, port3,
-                  port4);
-  nt::StartClient4(client_inst, "client");
+void ConnectionListenerTest::Connect(const char* address, unsigned int port4) {
+  nt::StartServer(server_inst, "connectionlistenertest.ini", address, port4);
+  nt::StartClient(client_inst, "client");
   nt::SetServer(client_inst, address, port4);
 
   // wait for client to report it's connected, then wait another 0.1 sec
@@ -57,7 +55,7 @@ TEST_F(ConnectionListenerTest, Polled) {
   ASSERT_NE(handle, 0u);
 
   // trigger a connect event
-  Connect("127.0.0.1", 0, 10020);
+  Connect("127.0.0.1", 10020);
 
   // get the event
   bool timed_out = false;
@@ -98,7 +96,7 @@ TEST_P(ConnectionListenerVariantTest, Threaded) {
                                 });
 
   // trigger a connect event
-  Connect(GetParam().first, 0, 20001 + GetParam().second);
+  Connect(GetParam().first, 20001 + GetParam().second);
 
   bool timed_out = false;
   ASSERT_TRUE(wpi::WaitForObject(handle, 1.0, &timed_out));

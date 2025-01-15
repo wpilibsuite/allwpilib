@@ -58,7 +58,7 @@ void glass::DisplayRelay(RelayModel* model, int index, bool outputsEnabled) {
                                  IM_COL32(128, 128, 128, 255)};
   int values[2] = {reverseData ? (reverse ? 2 : -2) : -3,
                    forwardData ? (forward ? 1 : -1) : -3};
-  DataSource* sources[2] = {reverseData, forwardData};
+  BooleanSource* sources[2] = {reverseData, forwardData};
   DrawLEDSources(values, sources, 2, 2, colors);
 }
 

@@ -22,7 +22,6 @@
 #include <string_view>
 
 #include "wpi/SmallString.h"
-#include "wpi/SmallVector.h"
 
 // strncasecmp() is not available on non-POSIX systems, so define an
 // alternative function here.
@@ -116,65 +115,6 @@ bool wpi::ends_with_lower(std::string_view str,
   return str.size() >= suffix.size() &&
          ascii_strncasecmp(str.data() + str.size() - suffix.size(),
                            suffix.data(), suffix.size()) == 0;
-}
-
-void wpi::split(std::string_view str, SmallVectorImpl<std::string_view>& arr,
-                std::string_view separator, int maxSplit,
-                bool keepEmpty) noexcept {
-  std::string_view s = str;
-
-  // Count down from maxSplit. When maxSplit is -1, this will just split
-  // "forever". This doesn't support splitting more than 2^31 times
-  // intentionally; if we ever want that we can make maxSplit a 64-bit integer
-  // but that seems unlikely to be useful.
-  while (maxSplit-- != 0) {
-    auto idx = s.find(separator);
-    if (idx == std::string_view::npos) {
-      break;
-    }
-
-    // Push this split.
-    if (keepEmpty || idx > 0) {
-      arr.push_back(slice(s, 0, idx));
-    }
-
-    // Jump forward.
-    s = slice(s, idx + separator.size(), std::string_view::npos);
-  }
-
-  // Push the tail.
-  if (keepEmpty || !s.empty()) {
-    arr.push_back(s);
-  }
-}
-
-void wpi::split(std::string_view str, SmallVectorImpl<std::string_view>& arr,
-                char separator, int maxSplit, bool keepEmpty) noexcept {
-  std::string_view s = str;
-
-  // Count down from maxSplit. When maxSplit is -1, this will just split
-  // "forever". This doesn't support splitting more than 2^31 times
-  // intentionally; if we ever want that we can make maxSplit a 64-bit integer
-  // but that seems unlikely to be useful.
-  while (maxSplit-- != 0) {
-    size_t idx = s.find(separator);
-    if (idx == std::string_view::npos) {
-      break;
-    }
-
-    // Push this split.
-    if (keepEmpty || idx > 0) {
-      arr.push_back(slice(s, 0, idx));
-    }
-
-    // Jump forward.
-    s = slice(s, idx + 1, std::string_view::npos);
-  }
-
-  // Push the tail.
-  if (keepEmpty || !s.empty()) {
-    arr.push_back(s);
-  }
 }
 
 static unsigned GetAutoSenseRadix(std::string_view& str) noexcept {

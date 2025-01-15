@@ -16,7 +16,6 @@
 
 #include "Log.h"
 #include "server/MessagePackWriter.h"
-#include "server/ServerClient3.h"
 #include "server/ServerClient4.h"
 #include "server/ServerClientLocal.h"
 
@@ -58,20 +57,6 @@ std::pair<std::string, int> ServerImpl::AddClient(std::string_view name,
 
   DEBUG3("AddClient('{}', '{}') -> {}", name, connInfo, index);
   return {std::move(dedupName), index};
-}
-
-int ServerImpl::AddClient3(std::string_view connInfo, bool local,
-                           net3::WireConnection3& wire,
-                           Connected3Func connected,
-                           SetPeriodicFunc setPeriodic) {
-  size_t index = GetEmptyClientSlot();
-
-  m_clients[index] = std::make_unique<ServerClient3>(
-      connInfo, local, wire, std::move(connected), std::move(setPeriodic),
-      m_storage, index, m_logger);
-
-  DEBUG3("AddClient3('{}') -> {}", connInfo, index);
-  return index;
 }
 
 std::shared_ptr<void> ServerImpl::RemoveClient(int clientId) {

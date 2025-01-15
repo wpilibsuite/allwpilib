@@ -102,14 +102,14 @@ void InstanceImpl::StopLocal() {
 
 void InstanceImpl::StartServer(std::string_view persistFilename,
                                std::string_view listenAddress,
-                               unsigned int port3, unsigned int port4) {
+                               unsigned int port) {
   std::scoped_lock lock{m_mutex};
   if (networkMode != NT_NET_MODE_NONE) {
     return;
   }
   m_networkServer = std::make_shared<NetworkServer>(
-      persistFilename, listenAddress, port3, port4, localStorage,
-      connectionList, logger, [this] {
+      persistFilename, listenAddress, port, localStorage, connectionList,
+      logger, [this] {
         std::scoped_lock lock{m_mutex};
         networkMode &= ~NT_NET_MODE_STARTING;
       });
@@ -134,20 +134,7 @@ void InstanceImpl::StopServer() {
   }
 }
 
-void InstanceImpl::StartClient3(std::string_view identity) {
-  std::scoped_lock lock{m_mutex};
-  if (networkMode != NT_NET_MODE_NONE) {
-    return;
-  }
-  m_networkClient = std::make_shared<NetworkClient3>(
-      m_inst, identity, localStorage, connectionList, logger);
-  if (!m_servers.empty()) {
-    m_networkClient->SetServers(m_servers);
-  }
-  networkMode = NT_NET_MODE_CLIENT3;
-}
-
-void InstanceImpl::StartClient4(std::string_view identity) {
+void InstanceImpl::StartClient(std::string_view identity) {
   std::scoped_lock lock{m_mutex};
   if (networkMode != NT_NET_MODE_NONE) {
     return;
@@ -169,14 +156,14 @@ void InstanceImpl::StartClient4(std::string_view identity) {
   if (!m_servers.empty()) {
     m_networkClient->SetServers(m_servers);
   }
-  networkMode = NT_NET_MODE_CLIENT4;
+  networkMode = NT_NET_MODE_CLIENT;
 }
 
 void InstanceImpl::StopClient() {
   std::shared_ptr<INetworkClient> client;
   {
     std::scoped_lock lock{m_mutex};
-    if ((networkMode & (NT_NET_MODE_CLIENT3 | NT_NET_MODE_CLIENT4)) == 0) {
+    if ((networkMode & NT_NET_MODE_CLIENT) == 0) {
       return;
     }
     client = std::move(m_networkClient);

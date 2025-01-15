@@ -44,7 +44,7 @@ class AnalogInputSimModel : public glass::AnalogInputModel {
     }
   }
 
-  glass::DataSource* GetVoltageData() override { return &m_voltageData; }
+  glass::DoubleSource* GetVoltageData() override { return &m_voltageData; }
 
   void SetVoltage(double val) override {
     HALSIM_SetAnalogInVoltage(m_index, val);

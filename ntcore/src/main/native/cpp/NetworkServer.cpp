@@ -34,7 +34,6 @@
 #include "net/WebSocketConnection.h"
 #include "net/WireDecoder.h"
 #include "net/WireEncoder.h"
-#include "net3/UvStreamConnection3.h"
 
 using namespace nt;
 namespace uv = wpi::uv;
@@ -70,16 +69,6 @@ class NetworkServer::ServerConnection {
 
  private:
   std::shared_ptr<uv::Timer> m_outgoingTimer;
-};
-
-class NetworkServer::ServerConnection3 : public ServerConnection {
- public:
-  ServerConnection3(std::shared_ptr<uv::Stream> stream, NetworkServer& server,
-                    std::string_view addr, unsigned int port,
-                    wpi::Logger& logger);
-
- private:
-  std::shared_ptr<net3::UvStreamConnection3> m_wire;
 };
 
 class NetworkServer::ServerConnection4 final
@@ -132,55 +121,6 @@ void NetworkServer::ServerConnection::ConnectionClosed() {
     m_server.RemoveConnection(this);
   }
   m_outgoingTimer->Close();
-}
-
-NetworkServer::ServerConnection3::ServerConnection3(
-    std::shared_ptr<uv::Stream> stream, NetworkServer& server,
-    std::string_view addr, unsigned int port, wpi::Logger& logger)
-    : ServerConnection{server, addr, port, logger},
-      m_wire{std::make_shared<net3::UvStreamConnection3>(*stream)} {
-  m_info.remote_ip = addr;
-  m_info.remote_port = port;
-
-  // TODO: set local flag appropriately
-  m_clientId = m_server.m_serverImpl.AddClient3(
-      m_connInfo, false, *m_wire,
-      [this](std::string_view name, uint16_t proto) {
-        m_info.remote_id = name;
-        m_info.protocol_version = proto;
-        m_server.AddConnection(this, m_info);
-        INFO("CONNECTED NT3 client '{}' (from {})", name, m_connInfo);
-      },
-      [this](uint32_t repeatMs) { UpdateOutgoingTimer(repeatMs); });
-
-  stream->error.connect([this](uv::Error err) {
-    if (!m_wire->GetDisconnectReason().empty()) {
-      return;
-    }
-    m_wire->Disconnect(fmt::format("stream error: {}", err.name()));
-    m_wire->GetStream().Shutdown([this] { m_wire->GetStream().Close(); });
-  });
-  stream->end.connect([this] {
-    if (!m_wire->GetDisconnectReason().empty()) {
-      return;
-    }
-    m_wire->Disconnect("remote end closed connection");
-    m_wire->GetStream().Shutdown([this] { m_wire->GetStream().Close(); });
-  });
-  stream->closed.connect([this] {
-    INFO("DISCONNECTED NT3 client '{}' (from {}): {}", m_info.remote_id,
-         m_connInfo, m_wire->GetDisconnectReason());
-    ConnectionClosed();
-  });
-  stream->data.connect([this](uv::Buffer& buf, size_t size) {
-    if (m_server.m_serverImpl.ProcessIncomingBinary(
-            m_clientId, {reinterpret_cast<const uint8_t*>(buf.base), size})) {
-      m_server.m_idle->Start();
-    }
-  });
-  stream->StartRead();
-
-  SetupOutgoingTimer();
 }
 
 void NetworkServer::ServerConnection4::ProcessRequest() {
@@ -311,8 +251,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
 }
 
 NetworkServer::NetworkServer(std::string_view persistentFilename,
-                             std::string_view listenAddress, unsigned int port3,
-                             unsigned int port4,
+                             std::string_view listenAddress, unsigned int port,
                              net::ILocalStorage& localStorage,
                              IConnectionList& connList, wpi::Logger& logger,
                              std::function<void()> initDone)
@@ -322,8 +261,7 @@ NetworkServer::NetworkServer(std::string_view persistentFilename,
       m_initDone{std::move(initDone)},
       m_persistentFilename{persistentFilename},
       m_listenAddress{wpi::trim(listenAddress)},
-      m_port3{port3},
-      m_port4{port4},
+      m_port{port},
       m_serverImpl{logger},
       m_localQueue{logger},
       m_loop(*m_loopRunner.GetLoop()) {
@@ -485,46 +423,14 @@ void NetworkServer::Init() {
     });
   }
 
-  INFO("Listening on NT3 port {}, NT4 port {}", m_port3, m_port4);
+  INFO("Listening on port {}", m_port);
 
-  if (m_port3 != 0) {
-    auto tcp3 = uv::Tcp::Create(m_loop);
-    tcp3->error.connect([logger = &m_logger](uv::Error err) {
-      WPI_INFO(*logger, "NT3 server socket error: {}", err.str());
-    });
-    tcp3->Bind(m_listenAddress, m_port3);
-
-    // when we get a NT3 connection, accept it and start reading
-    tcp3->connection.connect([this, srv = tcp3.get()] {
-      auto tcp = srv->Accept();
-      if (!tcp) {
-        return;
-      }
-      tcp->error.connect([logger = &m_logger](uv::Error err) {
-        WPI_INFO(*logger, "NT3 socket error: {}", err.str());
-      });
-      tcp->SetNoDelay(true);
-      std::string peerAddr;
-      unsigned int peerPort = 0;
-      if (uv::AddrToName(tcp->GetPeer(), &peerAddr, &peerPort) == 0) {
-        INFO("Got a NT3 connection from {} port {}", peerAddr, peerPort);
-      } else {
-        INFO("Got a NT3 connection from unknown");
-      }
-      auto conn = std::make_shared<ServerConnection3>(tcp, *this, peerAddr,
-                                                      peerPort, m_logger);
-      tcp->SetData(conn);
-    });
-
-    tcp3->Listen();
-  }
-
-  if (m_port4 != 0) {
+  if (m_port != 0) {
     auto tcp4 = uv::Tcp::Create(m_loop);
     tcp4->error.connect([logger = &m_logger](uv::Error err) {
       WPI_INFO(*logger, "NT4 server socket error: {}", err.str());
     });
-    tcp4->Bind(m_listenAddress, m_port4);
+    tcp4->Bind(m_listenAddress, m_port);
 
     // when we get a NT4 connection, accept it and start reading
     tcp4->connection.connect([this, srv = tcp4.get()] {

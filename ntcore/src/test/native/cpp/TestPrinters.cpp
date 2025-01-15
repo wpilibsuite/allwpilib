@@ -7,7 +7,6 @@
 #include "Handle.h"
 #include "PubSubOptions.h"
 #include "net/Message.h"
-#include "net3/Message3.h"
 #include "networktables/NetworkTableValue.h"
 #include "ntcore_cpp.h"
 
@@ -52,59 +51,6 @@ void PrintTo(const Handle& handle, std::ostream* os) {
       break;
   }
   *os << ", " << handle.GetInst() << ", " << handle.GetIndex() << '}';
-}
-
-void PrintTo(const net3::Message3& msg, std::ostream* os) {
-  *os << "Message{";
-  switch (msg.type()) {
-    case net3::Message3::kKeepAlive:
-      *os << "kKeepAlive";
-      break;
-    case net3::Message3::kClientHello:
-      *os << "kClientHello";
-      break;
-    case net3::Message3::kProtoUnsup:
-      *os << "kProtoUnsup";
-      break;
-    case net3::Message3::kServerHelloDone:
-      *os << "kServerHelloDone";
-      break;
-    case net3::Message3::kServerHello:
-      *os << "kServerHello";
-      break;
-    case net3::Message3::kClientHelloDone:
-      *os << "kClientHelloDone";
-      break;
-    case net3::Message3::kEntryAssign:
-      *os << "kEntryAssign";
-      break;
-    case net3::Message3::kEntryUpdate:
-      *os << "kEntryUpdate";
-      break;
-    case net3::Message3::kFlagsUpdate:
-      *os << "kFlagsUpdate";
-      break;
-    case net3::Message3::kEntryDelete:
-      *os << "kEntryDelete";
-      break;
-    case net3::Message3::kClearEntries:
-      *os << "kClearEntries";
-      break;
-    case net3::Message3::kExecuteRpc:
-      *os << "kExecuteRpc";
-      break;
-    case net3::Message3::kRpcResponse:
-      *os << "kRpcResponse";
-      break;
-    default:
-      *os << "UNKNOWN";
-      break;
-  }
-  *os << ": str=\"" << msg.str() << "\", id=" << msg.id()
-      << ", flags=" << msg.flags() << ", seq_num_uid=" << msg.seq_num_uid()
-      << ", value=";
-  PrintTo(msg.value(), os);
-  *os << '}';
 }
 
 void PrintTo(const Value& value, std::ostream* os) {

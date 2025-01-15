@@ -16,7 +16,7 @@ void InitializeSystemServer() {
   }
   ServerInstance = nt::NetworkTableInstance::Create();
   ServerInstance.SetServer("localhost", ROBOT_SYSTEM_SERVER_NT_PORT);
-  ServerInstance.StartClient4("RobotProgram");
+  ServerInstance.StartClient("RobotProgram");
 }
 
 void ShutdownSystemServer() {

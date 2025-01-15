@@ -19,7 +19,7 @@
 
 namespace glass {
 
-void DrawLEDSources(const int* values, DataSource** sources, int numValues,
+void DrawLEDSources(const int* values, BooleanSource** sources, int numValues,
                     int cols, const ImU32* colors, float size, float spacing,
                     const LEDConfig& config) {
   if (numValues == 0 || cols < 1) {
