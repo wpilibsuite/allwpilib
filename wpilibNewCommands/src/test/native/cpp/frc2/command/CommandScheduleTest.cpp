@@ -14,7 +14,6 @@ using namespace frc2;
 class CommandScheduleTest : public CommandTestBase {};
 
 TEST_F(CommandScheduleTest, InstantSchedule) {
-  CommandScheduler scheduler = GetScheduler();
   MockCommand command;
 
   EXPECT_CALL(command, Initialize());
@@ -29,7 +28,6 @@ TEST_F(CommandScheduleTest, InstantSchedule) {
 }
 
 TEST_F(CommandScheduleTest, SingleIterationSchedule) {
-  CommandScheduler scheduler = GetScheduler();
   MockCommand command;
 
   EXPECT_CALL(command, Initialize());
@@ -45,7 +43,6 @@ TEST_F(CommandScheduleTest, SingleIterationSchedule) {
 }
 
 TEST_F(CommandScheduleTest, MultiSchedule) {
-  CommandScheduler scheduler = GetScheduler();
   MockCommand command1;
   MockCommand command2;
   MockCommand command3;
@@ -82,7 +79,6 @@ TEST_F(CommandScheduleTest, MultiSchedule) {
 }
 
 TEST_F(CommandScheduleTest, SchedulerCancel) {
-  CommandScheduler scheduler = GetScheduler();
   MockCommand command;
 
   EXPECT_CALL(command, Initialize());
@@ -99,8 +95,6 @@ TEST_F(CommandScheduleTest, SchedulerCancel) {
 }
 
 TEST_F(CommandScheduleTest, CommandKnowsWhenItEnded) {
-  CommandScheduler scheduler = GetScheduler();
-
   frc2::FunctionalCommand* commandPtr = nullptr;
   auto command = frc2::FunctionalCommand(
       [] {}, [] {},
@@ -119,17 +113,14 @@ TEST_F(CommandScheduleTest, CommandKnowsWhenItEnded) {
 }
 
 TEST_F(CommandScheduleTest, ScheduleCommandInCommand) {
-  CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   frc2::InstantCommand commandToGetScheduled{[&counter] { counter++; }};
 
-  auto command =
-      frc2::RunCommand([&counter, &scheduler, &commandToGetScheduled] {
-        scheduler.Schedule(&commandToGetScheduled);
-        EXPECT_EQ(counter, 1)
-            << "Scheduled command's init was not run immediately "
-               "after getting scheduled";
-      });
+  auto command = frc2::RunCommand([this, &counter, &commandToGetScheduled] {
+    scheduler.Schedule(&commandToGetScheduled);
+    EXPECT_EQ(counter, 1) << "Scheduled command's init was not run immediately "
+                             "after getting scheduled";
+  });
 
   scheduler.Schedule(&command);
   scheduler.Run();
@@ -144,14 +135,12 @@ TEST_F(CommandScheduleTest, ScheduleCommandInCommand) {
 }
 
 TEST_F(CommandScheduleTest, NotScheduledCancel) {
-  CommandScheduler scheduler = GetScheduler();
   MockCommand command;
 
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&command));
 }
 
 TEST_F(CommandScheduleTest, SmartDashboardCancel) {
-  CommandScheduler scheduler = GetScheduler();
   frc::SmartDashboard::PutData("Scheduler", &scheduler);
   frc::SmartDashboard::UpdateValues();
 

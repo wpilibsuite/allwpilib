@@ -17,13 +17,13 @@ import org.junit.jupiter.api.BeforeEach;
 public class CommandTestBase {
   protected CommandTestBase() {}
 
+  @SuppressWarnings("PMD.MemberName")
+  protected CommandScheduler scheduler;
+
   @BeforeEach
   void commandSetup() {
-    CommandScheduler.getInstance().cancelAll();
-    CommandScheduler.getInstance().enable();
-    CommandScheduler.getInstance().getActiveButtonLoop().clear();
-    CommandScheduler.getInstance().clearComposedCommands();
-    CommandScheduler.getInstance().unregisterAllSubsystems();
+    CommandScheduler.resetInstance();
+    scheduler = CommandScheduler.getInstance();
 
     setDSEnabled(true);
   }
