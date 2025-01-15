@@ -13,5 +13,5 @@ extern "C" {
 NT_Inst HAL_GetSystemServerHandle(void);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

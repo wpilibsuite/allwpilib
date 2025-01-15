@@ -7,8 +7,16 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.SystemServerJNI;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-public class SystemServer {
-  public NetworkTableInstance getSystemServer() {
+/**
+ * Class to get system server NT instance.
+ */
+public final class SystemServer {
+  /**
+   * Gets the system server NT Instance.
+   *
+   * @return NT Instance
+   */
+  public static NetworkTableInstance getSystemServer() {
     return NetworkTableInstance.fromNativeHandle(SystemServerJNI.getSystemServerHandle());
   }
 
