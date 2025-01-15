@@ -13,13 +13,11 @@ public class DutyCycleJNI extends JNIWrapper {
   /**
    * Initialize a DutyCycle input.
    *
-   * @param digitalSourceHandle the digital source to use (either a Digital Handle or a
-   *     AnalogTrigger Handle)
-   * @param analogTriggerType the analog trigger type of the source if it is an analog trigger
+   * @param halPortHandle the port handle to create from
    * @return the created duty cycle handle
    * @see "HAL_InitializeDutyCycle"
    */
-  public static native int initialize(int digitalSourceHandle, int analogTriggerType);
+  public static native int initialize(int halPortHandle);
 
   /**
    * Free a DutyCycle.
