@@ -7,7 +7,7 @@
 #include <atomic>
 
 #include "HALInitializer.h"
-#include "SystemServer.h"
+#include "SystemServerInternal.h"
 
 namespace hal {
 

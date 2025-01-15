@@ -27,7 +27,7 @@
 #include "CANInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
-#include "SystemServer.h"
+#include "SystemServerInternal.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
