@@ -4,8 +4,8 @@
 
 #include "hal/DutyCycle.h"
 
-#include <memory>
 #include <cstdio>
+#include <memory>
 #include <thread>
 
 #include "HALInitializer.h"

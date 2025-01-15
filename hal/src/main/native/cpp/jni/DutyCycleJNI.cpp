@@ -24,8 +24,8 @@ Java_edu_wpi_first_hal_DutyCycleJNI_initialize
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  auto handle = HAL_InitializeDutyCycle(
-      static_cast<HAL_Handle>(portHandle), stack.c_str(), &status);
+  auto handle = HAL_InitializeDutyCycle(static_cast<HAL_Handle>(portHandle),
+                                        stack.c_str(), &status);
   CheckStatus(env, status);
   return handle;
 }
