@@ -62,6 +62,8 @@ struct SmartIo {
 
   int32_t SetPwmMicroseconds(uint16_t microseconds);
   int32_t GetPwmMicroseconds(uint16_t* microseconds);
+
+  int32_t GetAnalogInput(uint16_t* value);
 };
 
 extern DigitalHandleResource<HAL_DigitalHandle, SmartIo, kNumSmartIo>*
