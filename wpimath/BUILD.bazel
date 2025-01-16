@@ -1,6 +1,8 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 
 filegroup(
     name = "generated_java",
@@ -78,9 +80,20 @@ cc_library(
     ],
 )
 
-java_library(
+wpilib_jni_cc_library(
+    name = "wpimathjni",
+    srcs = glob(["src/main/native/cpp/jni/**"]),
+    java_dep = ":wpimath-java",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpimath.static",
+    ],
+)
+
+wpilib_jni_java_library(
     name = "wpimath-java",
     srcs = [":generated_java"] + glob(["src/main/java/**/*.java"]),
+    native_libs = [":wpimathjni"],
     visibility = ["//visibility:public"],
     deps = [
         "//wpiunits",
@@ -118,6 +131,19 @@ cc_test(
         ":test_headers",
         ":wpimath.static",
         "//thirdparty/googletest:googletest.static",
+    ],
+)
+
+wpilib_java_junit5_test(
+    name = "wpimath-java-test",
+    srcs = glob(["src/test/java/**/*.java"]),
+    deps = [
+        ":wpimath-java",
+        "//wpiunits",
+        "//wpiutil:wpiutil-java",
+        "@maven//:org_ejml_ejml_core",
+        "@maven//:org_ejml_ejml_simple",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
 
