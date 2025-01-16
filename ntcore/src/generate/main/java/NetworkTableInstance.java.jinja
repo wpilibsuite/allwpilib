@@ -135,6 +135,16 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /**
+   * Create an instance from a native handle. This instance is not owned, closing will do nothing.
+   *
+   * @param handle Native instance handle
+   * @return Instance
+   */
+  public static NetworkTableInstance fromNativeHandle(int handle) {
+    return new NetworkTableInstance(handle);
+  }
+
+  /**
    * Gets the native handle for the instance.
    *
    * @return Native handle
