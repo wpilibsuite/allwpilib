@@ -65,39 +65,6 @@ components:
             - $ref: "#/components/schemas/simdeviceData"
 
   schemas:
-    accelData:
-      type: object
-      required:
-      - type
-      - device
-      properties:
-        type:
-          type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
-          const: Accel
-        device:
-          type: string
-          description: Arbitrary device name
-        data:
-          type: object
-          description: "Accelerometer Data (type: Accelerometer, device: channel number)"
-          properties:
-            <init:
-              type: boolean
-              description: "If accelerometer is initialized in the robot program"
-            <range:
-              type: number
-              description: "Desired range in G’s"
-            ">x":
-              type: number
-              description: "Acceleration in G’s "
-            ">y":
-              type: number
-              description: "Acceleration in G’s "
-            ">z":
-              type: number
-              description: "Acceleration in G’s "
-
     addressableLEDData:
       type: object
       required:
