@@ -511,6 +511,9 @@ components:
             "<output_period":
               type: integer
               description: "Scales the PWM signal by squelching setting a 2-bit mask of outputs to squelch (ex. `1` -> squelch every other value; `3` -> squelch 3 of 4 values)"
+            "<zero_latch":
+              type: boolean
+              description: "Whether the PWM should be latched to 0"
 
     solenoidData:
       type: object
