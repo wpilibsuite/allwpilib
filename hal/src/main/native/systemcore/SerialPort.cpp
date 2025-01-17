@@ -21,7 +21,6 @@
 #include <fmt/format.h>
 
 #include "HALInternal.h"
-#include "hal/cpp/SerialHelper.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/IndexedHandleResource.h"
 
