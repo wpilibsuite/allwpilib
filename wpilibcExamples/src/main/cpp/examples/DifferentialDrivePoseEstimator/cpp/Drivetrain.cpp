@@ -124,7 +124,7 @@ void Drivetrain::SimulationPeriodic() {
   m_rightEncoderSim.SetDistance(
       m_drivetrainSimulator.GetRightPosition().value());
   m_rightEncoderSim.SetRate(m_drivetrainSimulator.GetRightVelocity().value());
-  m_gyroSim.SetAngle(-m_drivetrainSimulator.GetHeading().Degrees().value());
+  // m_gyroSim.SetAngle(-m_drivetrainSimulator.GetHeading().Degrees().value());
 }
 
 void Drivetrain::Periodic() {
