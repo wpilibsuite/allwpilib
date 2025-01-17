@@ -30,11 +30,7 @@ void glass::DisplayAnalogInput(AnalogInputModel* model, int index) {
     wpi::format_to_n_c_str(label, sizeof(label), "In[{}]###name", index);
   }
 
-  if (model->IsGyro()) {
-    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
-    ImGui::LabelText(label, "AnalogGyro[%d]", index);
-    ImGui::PopStyleColor();
-  } else if (auto simDevice = model->GetSimDevice()) {
+  if (auto simDevice = model->GetSimDevice()) {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
     ImGui::LabelText(label, "%s", simDevice);
     ImGui::PopStyleColor();

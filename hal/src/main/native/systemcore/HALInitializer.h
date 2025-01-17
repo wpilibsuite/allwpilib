@@ -19,8 +19,6 @@ inline void CheckInit() {
 extern void InitializeCTREPCM();
 extern void InitializeREVPH();
 extern void InitializeAddressableLED();
-extern void InitializeAnalogAccumulator();
-extern void InitializeAnalogGyro();
 extern void InitializeAnalogInput();
 extern void InitializeAnalogInternal();
 extern void InitializeAnalogTrigger();

@@ -49,8 +49,6 @@ void InitializeHAL() {
   InitializeCTREPCM();
   InitializeREVPH();
   InitializeAddressableLED();
-  InitializeAnalogAccumulator();
-  InitializeAnalogGyro();
   InitializeAnalogInput();
   InitializeAnalogTrigger();
   InitializeCAN();
