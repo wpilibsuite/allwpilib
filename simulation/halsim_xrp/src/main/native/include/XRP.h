@@ -54,7 +54,6 @@ class XRP {
 
   // XRP Packet Update Handlers
   void ReadGyroTag(std::span<const uint8_t> packet);
-  void ReadAccelTag(std::span<const uint8_t> packet);
   void ReadDIOTag(std::span<const uint8_t> packet);
   void ReadEncoderTag(std::span<const uint8_t> packet);
   void ReadAnalogTag(std::span<const uint8_t> packet);

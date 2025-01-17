@@ -81,9 +81,6 @@ void XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
       case XRP_TAG_GYRO:
         ReadGyroTag(tagPacket);
         break;
-      case XRP_TAG_ACCEL:
-        ReadAccelTag(tagPacket);
-        break;
       case XRP_TAG_DIO:
         ReadDIOTag(tagPacket);
         break;
