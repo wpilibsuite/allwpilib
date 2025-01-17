@@ -20,7 +20,7 @@ public final class LinearSystemId {
 
   /**
    * Create a state-space model of an elevator system. The states of the system are [position,
-   * velocity]ᵀ, inputs are [voltage], and outputs are [position].
+   * velocity]ᵀ, inputs are [voltage], and outputs are [position, velocity]ᵀ.
    *
    * @param motor The motor (or gearbox) attached to the carriage.
    * @param massKg The mass of the elevator carriage, in kilograms.
@@ -88,8 +88,8 @@ public final class LinearSystemId {
 
   /**
    * Create a state-space model of a DC motor system. The states of the system are [angular
-   * position, angular velocity], inputs are [voltage], and outputs are [angular position, angular
-   * velocity].
+   * position, angular velocity]ᵀ, inputs are [voltage], and outputs are [angular position, angular
+   * velocity]ᵀ.
    *
    * @param motor The motor (or gearbox) attached to system.
    * @param JKgMetersSquared The moment of inertia J of the DC motor.
@@ -125,7 +125,7 @@ public final class LinearSystemId {
   /**
    * Create a state-space model of a DC motor system from its kV (volts/(unit/sec)) and kA
    * (volts/(unit/sec²)). These constants can be found using SysId. the states of the system are
-   * [position, velocity], inputs are [voltage], and outputs are [position].
+   * [position, velocity]ᵀ, inputs are [voltage], and outputs are [position].
    *
    * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
    * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
@@ -211,7 +211,7 @@ public final class LinearSystemId {
 
   /**
    * Create a state-space model of a single jointed arm system. The states of the system are [angle,
-   * angular velocity], inputs are [voltage], and outputs are [angle].
+   * angular velocity]ᵀ, inputs are [voltage], and outputs are [angle, angular velocity]ᵀ.
    *
    * @param motor The motor (or gearbox) attached to the arm.
    * @param JKgSquaredMeters The moment of inertia J of the arm.
@@ -279,7 +279,7 @@ public final class LinearSystemId {
   /**
    * Create a state-space model for a 1 DOF position system from its kV (volts/(unit/sec)) and kA
    * (volts/(unit/sec²). These constants cam be found using SysId. The states of the system are
-   * [position, velocity]ᵀ, inputs are [voltage], and outputs are [position].
+   * [position, velocity]ᵀ, inputs are [voltage], and outputs are [position, velocity]ᵀ.
    *
    * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
    * {@link edu.wpi.first.math.util.Units} class for converting between unit types.

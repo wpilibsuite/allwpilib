@@ -239,6 +239,17 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
   }
 
   /**
+   * Rotates the current pose around a point in 2D space.
+   *
+   * @param point The point in 2D space to rotate around.
+   * @param rot The rotation to rotate the pose by.
+   * @return The new rotated pose.
+   */
+  public Pose2d rotateAround(Translation2d point, Rotation2d rot) {
+    return new Pose2d(m_translation.rotateAround(point, rot), m_rotation.rotateBy(rot));
+  }
+
+  /**
    * Obtain a new Pose2d from a (constant curvature) velocity.
    *
    * <p>See <a href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">Controls

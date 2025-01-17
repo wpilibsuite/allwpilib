@@ -308,8 +308,13 @@ TEST(Rotation3dTest, Inequality) {
 }
 
 TEST(Rotation3dTest, ToMatrix) {
+#if __GNUC__ <= 11
   Rotation3d before{10_deg, 20_deg, 30_deg};
   Rotation3d after{before.ToMatrix()};
+#else
+  constexpr Rotation3d before{10_deg, 20_deg, 30_deg};
+  constexpr Rotation3d after{before.ToMatrix()};
+#endif
 
   EXPECT_EQ(before, after);
 }

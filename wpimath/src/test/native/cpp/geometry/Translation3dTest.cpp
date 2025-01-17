@@ -57,6 +57,33 @@ TEST(Translation3dTest, RotateBy) {
   EXPECT_NEAR(rotated3.Z().value(), 3.0, kEpsilon);
 }
 
+TEST(Translation3dTest, RotateAround) {
+  Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
+  Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
+  Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
+
+  const Translation3d translation{1_m, 2_m, 3_m};
+  const Translation3d around{3_m, 2_m, 1_m};
+
+  const auto rotated1 =
+      translation.RotateAround(around, Rotation3d{xAxis, 90_deg});
+  EXPECT_NEAR(rotated1.X().value(), 1.0, kEpsilon);
+  EXPECT_NEAR(rotated1.Y().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(rotated1.Z().value(), 1.0, kEpsilon);
+
+  const auto rotated2 =
+      translation.RotateAround(around, Rotation3d{yAxis, 90_deg});
+  EXPECT_NEAR(rotated2.X().value(), 5.0, kEpsilon);
+  EXPECT_NEAR(rotated2.Y().value(), 2.0, kEpsilon);
+  EXPECT_NEAR(rotated2.Z().value(), 3.0, kEpsilon);
+
+  const auto rotated3 =
+      translation.RotateAround(around, Rotation3d{zAxis, 90_deg});
+  EXPECT_NEAR(rotated3.X().value(), 3.0, kEpsilon);
+  EXPECT_NEAR(rotated3.Y().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(rotated3.Z().value(), 3.0, kEpsilon);
+}
+
 TEST(Translation3dTest, ToTranslation2d) {
   Translation3d translation{1_m, 2_m, 3_m};
   Translation2d expected{1_m, 2_m};

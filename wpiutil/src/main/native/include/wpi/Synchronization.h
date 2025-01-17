@@ -407,7 +407,7 @@ class SignalObject final {
   }
   SignalObject& operator=(SignalObject&& rhs) {
     if (m_handle != 0) {
-      DestroySemaphore(m_handle);
+      DestroySignalObject(m_handle);
     }
     m_handle = rhs.m_handle;
     rhs.m_handle = 0;
