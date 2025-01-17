@@ -64,23 +64,4 @@ class AnalogInputSimTest {
       assertEquals(3504, input.getOversampleBits());
     }
   }
-
-  @Test
-  void tesInitAccumulator() {
-    HAL.initialize(500, 0);
-    try (AnalogInput input = new AnalogInput(0)) {
-      // First initialization works fine
-      assertDoesNotThrow(input::initAccumulator);
-
-      input.resetAccumulator();
-    }
-  }
-
-  @Test
-  void tesInitAccumulatorOnInvalidPort() {
-    HAL.initialize(500, 0);
-    try (AnalogInput input = new AnalogInput(5)) {
-      assertThrows(AllocationException.class, input::initAccumulator);
-    }
-  }
 }

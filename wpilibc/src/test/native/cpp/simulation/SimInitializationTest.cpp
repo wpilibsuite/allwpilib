@@ -8,7 +8,6 @@
 #include <hal/HAL.h>
 
 #include "frc/simulation/AddressableLEDSim.h"
-#include "frc/simulation/AnalogGyroSim.h"
 #include "frc/simulation/AnalogInputSim.h"
 #include "frc/simulation/AnalogOutputSim.h"
 #include "frc/simulation/AnalogTriggerSim.h"
@@ -30,7 +29,6 @@ using namespace frc::sim;
 TEST(SimInitializationTest, AllInitialize) {
   HAL_Initialize(500, 0);
   BuiltInAccelerometerSim biacsim;
-  AnalogGyroSim agsim{0};
   AnalogInputSim aisim{0};
   AnalogOutputSim aosim{0};
   EXPECT_THROW(AnalogTriggerSim::CreateForChannel(0), std::out_of_range);

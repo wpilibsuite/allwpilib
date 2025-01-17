@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.AccumulatorResult;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SPIJNI;
@@ -710,29 +709,6 @@ public class SPI implements AutoCloseable {
         return 0.0;
       }
       return ((double) m_accum.m_value) / m_accum.m_count;
-    }
-  }
-
-  /**
-   * Read the accumulated value and the number of accumulated values atomically.
-   *
-   * <p>This function reads the value and count atomically. This can be used for averaging.
-   *
-   * @param result AccumulatorResult object to store the results in.
-   */
-  public void getAccumulatorOutput(AccumulatorResult result) {
-    if (result == null) {
-      throw new IllegalArgumentException("Null parameter `result'");
-    }
-    if (m_accum == null) {
-      result.value = 0;
-      result.count = 0;
-      return;
-    }
-    synchronized (m_accum.m_mutex) {
-      m_accum.update();
-      result.value = m_accum.m_value;
-      result.count = m_accum.m_count;
     }
   }
 

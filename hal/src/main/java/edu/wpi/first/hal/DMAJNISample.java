@@ -137,29 +137,6 @@ public class DMAJNISample {
     return readValue(data.m_valueType + 2, data.m_index);
   }
 
-  public void getAnalogAccumulator(int analogInputHandle, AccumulatorResult result) {
-    BaseStore data = m_propertyMap.get(analogInputHandle);
-    if (data == null) {
-      data = addSensorInternal(analogInputHandle);
-    }
-
-    if (data.m_index == 0) {
-      int val0 = readValue(kEnable_Accumulator0, 0);
-      int val1 = readValue(kEnable_Accumulator0, 1);
-      int val2 = readValue(kEnable_Accumulator0, 2);
-      result.count = val2;
-      result.value = ((long) val1 << 32) | val0;
-    } else if (data.m_index == 1) {
-      int val0 = readValue(kEnable_Accumulator1, 0);
-      int val1 = readValue(kEnable_Accumulator1, 1);
-      int val2 = readValue(kEnable_Accumulator1, 2);
-      result.count = val2;
-      result.value = ((long) val1 << 32) | val0;
-    } else {
-      throw new RuntimeException("Resource not found in DMA capture");
-    }
-  }
-
   public int getDutyCycleOutput(int dutyCycleHandle) {
     BaseStore data = m_propertyMap.get(dutyCycleHandle);
     if (data == null) {

@@ -10,7 +10,6 @@
 #include <glass/View.h>
 #include <glass/hardware/AnalogInput.h>
 #include <hal/Ports.h>
-#include <hal/simulation/AnalogGyroData.h>
 #include <hal/simulation/AnalogInData.h>
 #include <hal/simulation/SimDeviceData.h>
 
@@ -30,11 +29,6 @@ class AnalogInputSimModel : public glass::AnalogInputModel {
   void Update() override {}
 
   bool Exists() override { return HALSIM_GetAnalogInInitialized(m_index); }
-
-  bool IsGyro() const override {
-    return m_index < HAL_GetNumAccumulators() &&
-           HALSIM_GetAnalogGyroInitialized(m_index);
-  }
 
   const char* GetSimDevice() const override {
     if (auto simDevice = HALSIM_GetAnalogInSimDevice(m_index)) {
