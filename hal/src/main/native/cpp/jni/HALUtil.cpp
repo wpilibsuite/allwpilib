@@ -55,7 +55,6 @@ static JClass accumulatorResultCls;
 static JClass canDataCls;
 static JClass canStreamMessageCls;
 static JClass halValueCls;
-static JClass baseStoreCls;
 static JClass revPHVersionCls;
 static JClass canStreamOverflowExCls;
 
@@ -69,7 +68,6 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/hal/CANData", &canDataCls},
     {"edu/wpi/first/hal/CANStreamMessage", &canStreamMessageCls},
     {"edu/wpi/first/hal/HALValue", &halValueCls},
-    {"edu/wpi/first/hal/DMAJNISample$BaseStore", &baseStoreCls},
     {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls},
     {"edu/wpi/first/hal/can/CANStreamOverflowException",
      &canStreamOverflowExCls}};
@@ -362,11 +360,6 @@ jobject CreateHALValue(JNIEnv* env, const HAL_Value& value) {
   }
   return env->CallStaticObjectMethod(
       halValueCls, fromNative, static_cast<jint>(value.type), value1, value2);
-}
-
-jobject CreateDMABaseStore(JNIEnv* env, jint valueType, jint index) {
-  static jmethodID ctor = env->GetMethodID(baseStoreCls, "<init>", "(II)V");
-  return env->NewObject(baseStoreCls, ctor, valueType, index);
 }
 
 jobject CreatePowerDistributionVersion(JNIEnv* env, uint32_t firmwareMajor,

@@ -22,7 +22,6 @@
 #include "frc/motorcontrol/MotorController.h"
 
 namespace frc {
-class DMA;
 
 WPI_IGNORE_DEPRECATED
 
@@ -34,8 +33,6 @@ class PWMMotorController : public MotorController,
                            public wpi::Sendable,
                            public wpi::SendableHelper<PWMMotorController> {
  public:
-  friend class DMA;
-
   PWMMotorController(PWMMotorController&&) = default;
   PWMMotorController& operator=(PWMMotorController&&) = default;
 
