@@ -59,7 +59,7 @@ namespace fs {
 #pragma warning(disable : 4244 4267 4146)
 #endif
 
-const file_t kInvalidFile = INVALID_HANDLE_VALUE;
+#define kInvalidFile reinterpret_cast<void*>(-1)
 
 static DWORD nativeDisposition(CreationDisposition Disp, OpenFlags Flags) {
   switch (Disp) {
