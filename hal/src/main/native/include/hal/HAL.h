@@ -10,7 +10,6 @@
 #include "hal/AnalogAccumulator.h"
 #include "hal/AnalogGyro.h"
 #include "hal/AnalogInput.h"
-#include "hal/AnalogOutput.h"
 #include "hal/AnalogTrigger.h"
 #include "hal/CAN.h"
 #include "hal/CANAPI.h"

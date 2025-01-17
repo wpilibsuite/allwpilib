@@ -54,19 +54,6 @@ Java_edu_wpi_first_hal_PortsJNI_getNumAnalogInputs
 
 /*
  * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumAnalogOutputs
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumAnalogOutputs
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumAnalogOutputs();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumCounters
  * Signature: ()I
  */
