@@ -8,8 +8,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 class Robot : public frc::TimedRobot {
-  frc::DigitalInput m_input{0};         // Input channel
-  frc::DutyCycle m_dutyCycle{m_input};  // Duty cycle input
+  frc::DutyCycle m_dutyCycle{0};  // Duty cycle input
 
  public:
   Robot() {}

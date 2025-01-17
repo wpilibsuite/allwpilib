@@ -19,7 +19,6 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 public class DutyCycleEncoder implements Sendable, AutoCloseable {
   private final DutyCycle m_dutyCycle;
   private boolean m_ownsDutyCycle;
-  private DigitalInput m_digitalInput;
   private int m_frequencyThreshold = 100;
   private double m_fullRange;
   private double m_expectedZero;
@@ -41,9 +40,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    */
   @SuppressWarnings("this-escape")
   public DutyCycleEncoder(int channel, double fullRange, double expectedZero) {
-    m_digitalInput = new DigitalInput(channel);
     m_ownsDutyCycle = true;
-    m_dutyCycle = new DutyCycle(m_digitalInput);
+    m_dutyCycle = new DutyCycle(channel);
     init(fullRange, expectedZero);
   }
 
@@ -57,20 +55,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   @SuppressWarnings("this-escape")
   public DutyCycleEncoder(DutyCycle dutyCycle, double fullRange, double expectedZero) {
     m_dutyCycle = dutyCycle;
-    init(fullRange, expectedZero);
-  }
-
-  /**
-   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   *
-   * @param source the digital source to attach to
-   * @param fullRange the value to report at maximum travel
-   * @param expectedZero the reading where you would expect a 0 from get()
-   */
-  @SuppressWarnings("this-escape")
-  public DutyCycleEncoder(DigitalSource source, double fullRange, double expectedZero) {
-    m_ownsDutyCycle = true;
-    m_dutyCycle = new DutyCycle(source);
     init(fullRange, expectedZero);
   }
 
@@ -96,18 +80,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   @SuppressWarnings("this-escape")
   public DutyCycleEncoder(DutyCycle dutyCycle) {
     this(dutyCycle, 1.0, 0.0);
-  }
-
-  /**
-   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   *
-   * <p>This has a fullRange of 1 and an expectedZero of 0.
-   *
-   * @param source the digital source to attach to
-   */
-  @SuppressWarnings("this-escape")
-  public DutyCycleEncoder(DigitalSource source) {
-    this(source, 1.0, 0.0);
   }
 
   private void init(double fullRange, double expectedZero) {
@@ -257,9 +229,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   public void close() {
     if (m_ownsDutyCycle) {
       m_dutyCycle.close();
-    }
-    if (m_digitalInput != null) {
-      m_digitalInput.close();
     }
     if (m_simDevice != null) {
       m_simDevice.close();
