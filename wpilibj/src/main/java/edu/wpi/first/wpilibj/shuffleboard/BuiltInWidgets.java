@@ -393,9 +393,6 @@ public enum BuiltInWidgets implements WidgetType {
   kGyro("Gyro"),
   /**
    * Displays a relay with toggle buttons for each supported mode (off, on, forward, reverse). <br>
-   * Supported types:
-   *
-   * <br>
    * This widget has no custom properties.
    */
   kRelay("Relay"),
