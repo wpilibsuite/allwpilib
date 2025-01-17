@@ -181,20 +181,6 @@ inline int16_t getPortHandleModule(HAL_PortHandle handle) {
   return static_cast<uint8_t>((handle >> 8) & 0xff);
 }
 
-// using a 16 bit value so we can store 0-255 and still report error
-/**
- * Gets the SPI channel of a port handle.
- *
- * @param handle the port handle
- * @return the port SPI channel
- */
-inline int16_t getPortHandleSPIEnable(HAL_PortHandle handle) {
-  if (!isHandleType(handle, HAL_HandleEnum::Port)) {
-    return InvalidHandleIndex;
-  }
-  return static_cast<uint8_t>((handle >> 16) & 0xff);
-}
-
 /**
  * Create a port handle.
  *
@@ -203,14 +189,6 @@ inline int16_t getPortHandleSPIEnable(HAL_PortHandle handle) {
  * @return port handle for the module and channel
  */
 HAL_PortHandle createPortHandle(uint8_t channel, uint8_t module);
-
-/**
- * Create a port handle for SPI.
- *
- * @param channel the SPI channel
- * @return port handle for the channel
- */
-HAL_PortHandle createPortHandleForSPI(uint8_t channel);
 
 /**
  * Create a handle for a specific index, type and version.

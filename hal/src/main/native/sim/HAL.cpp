@@ -85,8 +85,6 @@ void InitializeHAL() {
   InitializePWMData();
   InitializeRoboRioData();
   InitializeSimDeviceData();
-  InitializeSPIAccelerometerData();
-  InitializeSPIData();
   InitializeAccelerometer();
   InitializeAddressableLED();
   InitializeAnalogAccumulator();
@@ -116,7 +114,6 @@ void InitializeHAL() {
   InitializePWM();
   InitializeSerialPort();
   InitializeSimDevice();
-  InitializeSPI();
   InitializeThreads();
 }
 }  // namespace hal::init

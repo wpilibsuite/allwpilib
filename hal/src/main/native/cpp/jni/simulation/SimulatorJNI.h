@@ -15,5 +15,4 @@ JavaVM* GetJVM();
 jmethodID GetNotifyCallback();
 jmethodID GetBufferCallback();
 jmethodID GetConstBufferCallback();
-jmethodID GetSpiReadAutoReceiveBufferCallback();
 }  // namespace hal::sim

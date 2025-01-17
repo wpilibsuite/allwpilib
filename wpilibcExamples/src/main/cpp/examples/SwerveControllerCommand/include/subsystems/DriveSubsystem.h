@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <frc/ADXRS450_Gyro.h>
+#include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
 #include <frc/drive/MecanumDrive.h>
 #include <frc/geometry/Pose2d.h>
@@ -109,7 +109,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   SwerveModule m_rearRight;
 
   // The gyro sensor
-  frc::ADXRS450_Gyro m_gyro;
+  frc::AnalogGyro m_gyro{0};
 
   // Odometry class for tracking robot pose
   // 4 defines the number of modules

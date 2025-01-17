@@ -36,8 +36,6 @@ extern void InitializePowerDistributionData();
 extern void InitializePWMData();
 extern void InitializeRoboRioData();
 extern void InitializeSimDeviceData();
-extern void InitializeSPIAccelerometerData();
-extern void InitializeSPIData();
 extern void InitializeAccelerometer();
 extern void InitializeAddressableLED();
 extern void InitializeAnalogAccumulator();
@@ -67,7 +65,6 @@ extern void InitializeREVPH();
 extern void InitializePWM();
 extern void InitializeSerialPort();
 extern void InitializeSimDevice();
-extern void InitializeSPI();
 extern void InitializeThreads();
 
 }  // namespace hal::init
