@@ -8,7 +8,6 @@
 
 namespace frc {
 
-class ADXL345_SPI;
 class ADXL345_I2C;
 
 namespace sim {
@@ -24,13 +23,6 @@ class ADXL345Sim {
    * @param accel ADXL345 accel to simulate
    */
   explicit ADXL345Sim(const ADXL345_I2C& accel);
-
-  /**
-   * Constructs from a ADXL345_SPI object.
-   *
-   * @param accel ADXL345 accel to simulate
-   */
-  explicit ADXL345Sim(const ADXL345_SPI& accel);
 
   /**
    * Sets the X acceleration.

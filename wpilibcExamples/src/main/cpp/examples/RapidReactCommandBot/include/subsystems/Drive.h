@@ -6,7 +6,7 @@
 
 #include <functional>
 
-#include <frc/ADXRS450_Gyro.h>
+#include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
@@ -68,7 +68,7 @@ class Drive : public frc2::SubsystemBase {
                               DriveConstants::kRightEncoderPorts[1],
                               DriveConstants::kRightEncoderReversed};
 
-  frc::ADXRS450_Gyro m_gyro;
+  frc::AnalogGyro m_gyro{0};
 
   frc::ProfiledPIDController<units::radians> m_controller{
       DriveConstants::kTurnP,
