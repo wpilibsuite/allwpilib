@@ -19,7 +19,6 @@
 #include "AddressableLEDGui.h"
 #include "AnalogGyroSimGui.h"
 #include "AnalogInputSimGui.h"
-#include "AnalogOutputSimGui.h"
 #include "DIOSimGui.h"
 #include "DriverStationGui.h"
 #include "EncoderSimGui.h"
@@ -79,7 +78,6 @@ __declspec(dllexport)
   AddressableLEDGui::Initialize();
   AnalogGyroSimGui::Initialize();
   AnalogInputSimGui::Initialize();
-  AnalogOutputSimGui::Initialize();
   DIOSimGui::Initialize();
   NetworkTablesSimGui::Initialize();
   PCMSimGui::Initialize();

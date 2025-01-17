@@ -36,21 +36,4 @@ class HALSimWSProviderAnalogIn : public HALSimWSHalChanProvider {
   int32_t m_accumDeadbandCbKey = 0;
 };
 
-class HALSimWSProviderAnalogOut : public HALSimWSHalChanProvider {
- public:
-  static void Initialize(WSRegisterFunc webRegisterFunc);
-
-  using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
-  ~HALSimWSProviderAnalogOut() override;
-
- protected:
-  void RegisterCallbacks() override;
-  void CancelCallbacks() final;
-  void DoCancelCallbacks();
-
- private:
-  int32_t m_initCbKey = 0;
-  int32_t m_voltageCbKey = 0;
-};
-
 }  // namespace wpilibws

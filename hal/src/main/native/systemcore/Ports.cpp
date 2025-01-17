@@ -23,9 +23,6 @@ int32_t HAL_GetNumAnalogTriggers(void) {
 int32_t HAL_GetNumAnalogInputs(void) {
   return kNumAnalogInputs;
 }
-int32_t HAL_GetNumAnalogOutputs(void) {
-  return kNumAnalogOutputs;
-}
 int32_t HAL_GetNumCounters(void) {
   return kNumCounters;
 }

@@ -40,7 +40,6 @@ bool HALSimWSClient::Initialize() {
 
     HALSimWSProviderAddressableLED::Initialize(registerFunc);
     HALSimWSProviderAnalogIn::Initialize(registerFunc);
-    HALSimWSProviderAnalogOut::Initialize(registerFunc);
     HALSimWSProviderBuiltInAccelerometer::Initialize(registerFunc);
     HALSimWSProviderDIO::Initialize(registerFunc);
     HALSimWSProviderDigitalPWM::Initialize(registerFunc);

@@ -24,7 +24,6 @@ extern void InitializeAnalogAccumulator();
 extern void InitializeAnalogGyro();
 extern void InitializeAnalogInput();
 extern void InitializeAnalogInternal();
-extern void InitializeAnalogOutput();
 extern void InitializeAnalogTrigger();
 extern void InitializeCAN();
 extern void InitializeCANAPI();

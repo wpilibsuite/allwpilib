@@ -8,7 +8,6 @@ package edu.wpi.first.hal;
  * Analog Input / Output / Accumulator / Trigger JNI Functions.
  *
  * @see "hal/AnalogInput.h"
- * @see "hal/AnalogOutput.h"
  * @see "hal/AnalogAccumulator.h"
  * @see "hal/AnalogTrigger.h"
  */
@@ -49,23 +48,6 @@ public class AnalogJNI extends JNIWrapper {
   public static native void freeAnalogInputPort(int portHandle);
 
   /**
-   * Initializes the analog output port using the given port object.
-   *
-   * @param halPortHandle handle to the port
-   * @return the created analog output handle
-   * @see "HAL_InitializeAnalogOutputPort"
-   */
-  public static native int initializeAnalogOutputPort(int halPortHandle);
-
-  /**
-   * Frees an analog output port.
-   *
-   * @param portHandle the analog output handle
-   * @see "HAL_FreeAnalogOutputPort"
-   */
-  public static native void freeAnalogOutputPort(int portHandle);
-
-  /**
    * Checks that the analog module number is valid.
    *
    * @param module The analog module number.
@@ -85,18 +67,6 @@ public class AnalogJNI extends JNIWrapper {
   public static native boolean checkAnalogInputChannel(int channel);
 
   /**
-   * Checks that the analog output channel number is valid.
-   *
-   * <p>Verifies that the analog channel number is one of the legal channel numbers. Channel numbers
-   * are 0-based.
-   *
-   * @param channel The analog output channel number.
-   * @return Analog channel is valid
-   * @see "HAL_CheckAnalogOutputChannel"
-   */
-  public static native boolean checkAnalogOutputChannel(int channel);
-
-  /**
    * Indicates the analog input is used by a simulated device.
    *
    * @param handle the analog input handle
@@ -104,24 +74,6 @@ public class AnalogJNI extends JNIWrapper {
    * @see "HAL_SetAnalogInputSimDevice"
    */
   public static native void setAnalogInputSimDevice(int handle, int device);
-
-  /**
-   * Sets an analog output value.
-   *
-   * @param portHandle the analog output handle
-   * @param voltage the voltage (0-5v) to output
-   * @see "HAL_SetAnalogOutput"
-   */
-  public static native void setAnalogOutput(int portHandle, double voltage);
-
-  /**
-   * Gets the current analog output value.
-   *
-   * @param portHandle the analog output handle
-   * @return the current output voltage (0-5v)
-   * @see "HAL_GetAnalogOutput"
-   */
-  public static native double getAnalogOutput(int portHandle);
 
   /**
    * Sets the sample rate.

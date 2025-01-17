@@ -5,7 +5,6 @@
 #include "frc/SensorUtil.h"
 
 #include <hal/AnalogInput.h>
-#include <hal/AnalogOutput.h>
 #include <hal/DIO.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
@@ -32,20 +31,12 @@ bool SensorUtil::CheckAnalogInputChannel(int channel) {
   return HAL_CheckAnalogInputChannel(channel);
 }
 
-bool SensorUtil::CheckAnalogOutputChannel(int channel) {
-  return HAL_CheckAnalogOutputChannel(channel);
-}
-
 int SensorUtil::GetNumDigitalChannels() {
   return HAL_GetNumDigitalChannels();
 }
 
 int SensorUtil::GetNumAnalogInputs() {
   return HAL_GetNumAnalogInputs();
-}
-
-int SensorUtil::GetNumAnalogOuputs() {
-  return HAL_GetNumAnalogOutputs();
 }
 
 int SensorUtil::GetNumPwmChannels() {

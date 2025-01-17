@@ -35,14 +35,6 @@ public class PortsJNI extends JNIWrapper {
   public static native int getNumAnalogInputs();
 
   /**
-   * Gets the number of analog outputs in the current system.
-   *
-   * @return the number of analog outputs
-   * @see "HAL_GetNumAnalogOutputs"
-   */
-  public static native int getNumAnalogOutputs();
-
-  /**
    * Gets the number of counters in the current system.
    *
    * @return the number of counters
