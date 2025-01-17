@@ -374,7 +374,6 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.ADXRS450_Gyro}
    *   <li>{@link edu.wpi.first.wpilibj.AnalogGyro}
    *   <li>Any custom subclass of {@code GyroBase} (such as a MXP gyro)
    * </ul>
