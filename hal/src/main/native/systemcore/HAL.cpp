@@ -75,7 +75,6 @@ void InitializeHAL() {
   InitializePWM();
   InitializeSerialPort();
   InitializeSmartIo();
-  InitializeSPI();
   InitializeThreads();
 }
 }  // namespace init

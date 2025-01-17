@@ -19,8 +19,6 @@
 #include <hal/simulation/PowerDistributionData.h>
 #include <hal/simulation/REVPHData.h>
 #include <hal/simulation/RoboRioData.h>
-#include <hal/simulation/SPIAccelerometerData.h>
-#include <hal/simulation/SPIData.h>
 #include <hal/simulation/SimDeviceData.h>
 
 #include "../PortsInternal.h"
@@ -88,12 +86,4 @@ extern "C" void HALSIM_ResetAllSimData(void) {
 
   HALSIM_ResetRoboRioData();
   HALSIM_ResetSimDeviceData();
-
-  for (int32_t i = 0; i < hal::kSPIAccelerometers; i++) {
-    HALSIM_ResetSPIAccelerometerData(i);
-  }
-
-  for (int32_t i = 0; i < hal::kSPIPorts; i++) {
-    HALSIM_ResetSPIData(i);
-  }
 }

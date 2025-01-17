@@ -21,7 +21,6 @@
 #include "frc/simulation/PWMSim.h"
 #include "frc/simulation/PowerDistributionSim.h"
 #include "frc/simulation/RoboRioSim.h"
-#include "frc/simulation/SPIAccelerometerSim.h"
 
 using namespace frc::sim;
 
@@ -42,7 +41,6 @@ TEST(SimInitializationTest, AllInitialize) {
   PWMSim pwmsim{0};
   RoboRioSim rrsim;
   (void)rrsim;
-  SPIAccelerometerSim sasim{0};
   DutyCycleSim dcsim = DutyCycleSim::CreateForIndex(0);
   (void)dcsim;
   AddressableLEDSim adLED;
