@@ -4,6 +4,8 @@
 
 #include <jni.h>
 
+#include <wpi/jni_util.h>
+
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_DutyCycleJNI.h"
 #include "hal/DutyCycle.h"
@@ -14,16 +16,16 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_hal_DutyCycleJNI
  * Method:    initialize
- * Signature: (II)I
+ * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_DutyCycleJNI_initialize
-  (JNIEnv* env, jclass, jint digitalSourceHandle, jint analogTriggerType)
+  (JNIEnv* env, jclass, jint portHandle)
 {
   int32_t status = 0;
-  auto handle = HAL_InitializeDutyCycle(
-      static_cast<HAL_Handle>(digitalSourceHandle),
-      static_cast<HAL_AnalogTriggerType>(analogTriggerType), &status);
+  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto handle = HAL_InitializeDutyCycle(static_cast<HAL_Handle>(portHandle),
+                                        stack.c_str(), &status);
   CheckStatus(env, status);
   return handle;
 }

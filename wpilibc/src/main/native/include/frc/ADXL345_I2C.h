@@ -18,10 +18,6 @@ namespace frc {
  * This class allows access to a Analog Devices ADXL345 3-axis accelerometer on
  * an I2C bus. This class assumes the default (not alternate) sensor address of
  * 0x1D (7-bit address).
- *
- * The Onboard I2C port is subject to system lockups. See <a
- * href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">
- * WPILib Known Issues</a> page for details.
  */
 class ADXL345_I2C : public nt::NTSendable,
                     public wpi::SendableHelper<ADXL345_I2C> {

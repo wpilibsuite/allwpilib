@@ -23,27 +23,20 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 public class DutyCycle implements Sendable, AutoCloseable {
   // Explicitly package private
   final int m_handle;
-
-  private final DigitalSource m_source;
+  private final int m_channel;
 
   /**
-   * Constructs a DutyCycle input from a DigitalSource input.
+   * Constructs a DutyCycle input from a smartio channel.
    *
-   * <p>This class does not own the inputted source.
-   *
-   * @param digitalSource The DigitalSource to use.
+   * @param channel The channel to use.
    */
   @SuppressWarnings("this-escape")
-  public DutyCycle(DigitalSource digitalSource) {
-    m_handle =
-        DutyCycleJNI.initialize(
-            digitalSource.getPortHandleForRouting(),
-            digitalSource.getAnalogTriggerTypeForRouting());
+  public DutyCycle(int channel) {
+    m_handle = DutyCycleJNI.initialize(HAL.getPort((byte) channel));
 
-    m_source = digitalSource;
-    int index = getFPGAIndex();
-    HAL.report(tResourceType.kResourceType_DutyCycle, index + 1);
-    SendableRegistry.addLW(this, "Duty Cycle", index);
+    m_channel = channel;
+    HAL.report(tResourceType.kResourceType_DutyCycle, channel + 1);
+    SendableRegistry.addLW(this, "Duty Cycle", channel);
   }
 
   /** Close the DutyCycle and free all resources. */
@@ -109,7 +102,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
    * @return the source channel
    */
   public int getSourceChannel() {
-    return m_source.getChannel();
+    return m_channel;
   }
 
   @Override

@@ -7,7 +7,7 @@
 #include <atomic>
 
 #include "HALInitializer.h"
-#include "SystemServer.h"
+#include "SystemServerInternal.h"
 
 namespace hal {
 
@@ -96,6 +96,17 @@ int32_t SmartIo::GetDigitalInput(bool* value) {
   return 0;
 }
 
+int32_t SmartIo::GetPwmInputMicroseconds(uint16_t* microseconds) {
+  if (currentMode != SmartIoMode::PwmInput) {
+    return INCOMPATIBLE_STATE;
+  }
+
+  int val = getSubscriber.Get();
+  *microseconds = val;
+
+  return 0;
+}
+
 int32_t SmartIo::SetPwmOutputPeriod(PwmOutputPeriod period) {
   if (currentMode != SmartIoMode::PwmOutput) {
     return INCOMPATIBLE_STATE;
@@ -137,6 +148,18 @@ int32_t SmartIo::GetPwmMicroseconds(uint16_t* microseconds) {
 
   // Get to 0-2, then scale to 0-4096;
   *microseconds = val;
+
+  return 0;
+}
+
+int32_t SmartIo::GetAnalogInput(uint16_t* value) {
+  if (currentMode != SmartIoMode::AnalogInput) {
+    return INCOMPATIBLE_STATE;
+  }
+
+  int val = getSubscriber.Get();
+
+  *value = val;
 
   return 0;
 }
