@@ -16,11 +16,6 @@ class SensorUtilTest {
   }
 
   @Test
-  void checkAnalogOutputChannel() {
-    assertThrows(IllegalArgumentException.class, () -> SensorUtil.checkAnalogOutputChannel(100));
-  }
-
-  @Test
   void testInvalidDigitalChannel() {
     assertThrows(IllegalArgumentException.class, () -> SensorUtil.checkDigitalChannel(100));
   }

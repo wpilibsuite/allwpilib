@@ -70,7 +70,6 @@ void InitializeHAL() {
   InitializeAddressableLEDData();
   InitializeAnalogGyroData();
   InitializeAnalogInData();
-  InitializeAnalogOutData();
   InitializeAnalogTriggerData();
   InitializeCanData();
   InitializeCANAPI();
@@ -95,7 +94,6 @@ void InitializeHAL() {
   InitializeAnalogGyro();
   InitializeAnalogInput();
   InitializeAnalogInternal();
-  InitializeAnalogOutput();
   InitializeAnalogTrigger();
   InitializeCAN();
   InitializeConstants();

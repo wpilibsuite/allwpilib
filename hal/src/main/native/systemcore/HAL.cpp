@@ -53,7 +53,6 @@ void InitializeHAL() {
   InitializeAnalogAccumulator();
   InitializeAnalogGyro();
   InitializeAnalogInput();
-  InitializeAnalogOutput();
   InitializeAnalogTrigger();
   InitializeCAN();
   InitializeCANAPI();
