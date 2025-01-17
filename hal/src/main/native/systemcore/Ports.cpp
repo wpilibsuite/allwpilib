@@ -23,9 +23,6 @@ int32_t HAL_GetNumAnalogTriggers(void) {
 int32_t HAL_GetNumAnalogInputs(void) {
   return kNumAnalogInputs;
 }
-int32_t HAL_GetNumAnalogOutputs(void) {
-  return kNumAnalogOutputs;
-}
 int32_t HAL_GetNumCounters(void) {
   return kNumCounters;
 }
@@ -49,12 +46,6 @@ int32_t HAL_GetNumEncoders(void) {
 }
 int32_t HAL_GetNumInterrupts(void) {
   return kNumInterrupts;
-}
-int32_t HAL_GetNumRelayChannels(void) {
-  return kNumRelayChannels;
-}
-int32_t HAL_GetNumRelayHeaders(void) {
-  return kNumRelayHeaders;
 }
 int32_t HAL_GetNumCTREPCMModules(void) {
   return kNumCTREPCMModules;

@@ -6,7 +6,6 @@
 #include <hal/simulation/AddressableLEDData.h>
 #include <hal/simulation/AnalogGyroData.h>
 #include <hal/simulation/AnalogInData.h>
-#include <hal/simulation/AnalogOutData.h>
 #include <hal/simulation/AnalogTriggerData.h>
 #include <hal/simulation/CTREPCMData.h>
 #include <hal/simulation/CanData.h>
@@ -19,7 +18,6 @@
 #include <hal/simulation/PWMData.h>
 #include <hal/simulation/PowerDistributionData.h>
 #include <hal/simulation/REVPHData.h>
-#include <hal/simulation/RelayData.h>
 #include <hal/simulation/RoboRioData.h>
 #include <hal/simulation/SimDeviceData.h>
 
@@ -40,10 +38,6 @@ extern "C" void HALSIM_ResetAllSimData(void) {
 
   for (int32_t i = 0; i < hal::kNumAnalogInputs; i++) {
     HALSIM_ResetAnalogInData(i);
-  }
-
-  for (int32_t i = 0; i < hal::kNumAnalogOutputs; i++) {
-    HALSIM_ResetAnalogOutData(i);
   }
 
   for (int32_t i = 0; i < hal::kNumAnalogTriggers; i++) {
@@ -84,10 +78,6 @@ extern "C" void HALSIM_ResetAllSimData(void) {
 
   for (int32_t i = 0; i < hal::kNumPWMChannels; i++) {
     HALSIM_ResetPWMData(i);
-  }
-
-  for (int32_t i = 0; i < hal::kNumRelayHeaders; i++) {
-    HALSIM_ResetRelayData(i);
   }
 
   for (int32_t i = 0; i < hal::kNumREVPHModules; i++) {

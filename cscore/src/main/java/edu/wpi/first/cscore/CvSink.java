@@ -6,6 +6,7 @@ package edu.wpi.first.cscore;
 
 import edu.wpi.first.util.PixelFormat;
 import edu.wpi.first.util.RawFrame;
+import edu.wpi.first.util.TimestampSource;
 import java.nio.ByteBuffer;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -219,5 +220,23 @@ public class CvSink extends ImageSink {
       }
     }
     return rv;
+  }
+
+  /**
+   * Get the last time a frame was grabbed. This uses the same time base as wpi::Now().
+   *
+   * @return Time in 1 us increments.
+   */
+  public long getLastFrameTime() {
+    return m_frame.getTimestamp();
+  }
+
+  /**
+   * Get the time source for the timestamp the last frame was grabbed at.
+   *
+   * @return Time source
+   */
+  public TimestampSource getLastFrameTimeSource() {
+    return m_frame.getTimestampSource();
   }
 }

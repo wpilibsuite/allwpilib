@@ -163,8 +163,8 @@ class ct_matrix {
     if (std::is_constant_evaluated()) {
       ct_matrix<Scalar, Rows, Cols> result;
 
-      for (int row = 0; row < 3; ++row) {
-        for (int col = 0; col < 3; ++col) {
+      for (int row = 0; row < rhs.rows(); ++row) {
+        for (int col = 0; col < rhs.cols(); ++col) {
           result(row, col) = lhs(row, col) + rhs(row, col);
         }
       }
@@ -188,8 +188,8 @@ class ct_matrix {
     if (std::is_constant_evaluated()) {
       ct_matrix<Scalar, Rows, Cols> result;
 
-      for (int row = 0; row < 3; ++row) {
-        for (int col = 0; col < 3; ++col) {
+      for (int row = 0; row < rhs.rows(); ++row) {
+        for (int col = 0; col < rhs.cols(); ++col) {
           result(row, col) = lhs(row, col) - rhs(row, col);
         }
       }
@@ -282,8 +282,8 @@ class ct_matrix {
     if (std::is_constant_evaluated()) {
       Scalar sum = 0.0;
 
-      for (int row = 0; row < Rows; ++row) {
-        for (int col = 0; col < Cols; ++col) {
+      for (int row = 0; row < rows(); ++row) {
+        for (int col = 0; col < cols(); ++col) {
           sum += (*this)(row, col) * (*this)(row, col);
         }
       }

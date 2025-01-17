@@ -19,7 +19,6 @@
 #include "AddressableLEDGui.h"
 #include "AnalogGyroSimGui.h"
 #include "AnalogInputSimGui.h"
-#include "AnalogOutputSimGui.h"
 #include "DIOSimGui.h"
 #include "DriverStationGui.h"
 #include "EncoderSimGui.h"
@@ -30,7 +29,6 @@
 #include "PHSimGui.h"
 #include "PWMSimGui.h"
 #include "PowerDistributionSimGui.h"
-#include "RelaySimGui.h"
 #include "RoboRioSimGui.h"
 #include "SimDeviceGui.h"
 #include "TimingGui.h"
@@ -80,13 +78,11 @@ __declspec(dllexport)
   AddressableLEDGui::Initialize();
   AnalogGyroSimGui::Initialize();
   AnalogInputSimGui::Initialize();
-  AnalogOutputSimGui::Initialize();
   DIOSimGui::Initialize();
   NetworkTablesSimGui::Initialize();
   PCMSimGui::Initialize();
   PowerDistributionSimGui::Initialize();
   PWMSimGui::Initialize();
-  RelaySimGui::Initialize();
   PHSimGui::Initialize();
   RoboRioSimGui::Initialize();
   TimingGui::Initialize();

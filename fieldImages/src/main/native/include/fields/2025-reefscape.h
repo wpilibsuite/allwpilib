@@ -4,11 +4,9 @@
 
 #pragma once
 
-namespace halsimgui {
+#include <string_view>
 
-class RelaySimGui {
- public:
-  static void Initialize();
-};
-
-}  // namespace halsimgui
+namespace fields {
+std::string_view GetResource_2025_reefscape_json();
+std::string_view GetResource_2025_field_png();
+}  // namespace fields

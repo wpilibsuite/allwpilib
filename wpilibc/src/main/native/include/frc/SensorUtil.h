@@ -39,16 +39,6 @@ class SensorUtil final {
   static bool CheckDigitalChannel(int channel);
 
   /**
-   * Check that the relay channel number is valid.
-   *
-   * Verify that the channel number is one of the legal channel numbers. Channel
-   * numbers are 0-based.
-   *
-   * @return Relay channel is valid
-   */
-  static bool CheckRelayChannel(int channel);
-
-  /**
    * Check that the digital channel number is valid.
    *
    * Verify that the channel number is one of the legal channel numbers. Channel
@@ -68,21 +58,9 @@ class SensorUtil final {
    */
   static bool CheckAnalogInputChannel(int channel);
 
-  /**
-   * Check that the analog output number is valid.
-   *
-   * Verify that the analog output number is one of the legal channel numbers.
-   * Channel numbers are 0-based.
-   *
-   * @return Analog channel is valid
-   */
-  static bool CheckAnalogOutputChannel(int channel);
-
   static int GetNumDigitalChannels();
   static int GetNumAnalogInputs();
-  static int GetNumAnalogOuputs();
   static int GetNumPwmChannels();
-  static int GetNumRelayChannels();
 };
 
 }  // namespace frc

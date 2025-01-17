@@ -9,7 +9,6 @@ import edu.wpi.first.hal.ConstantsJNI;
 import edu.wpi.first.hal.DIOJNI;
 import edu.wpi.first.hal.PWMJNI;
 import edu.wpi.first.hal.PortsJNI;
-import edu.wpi.first.hal.RelayJNI;
 
 /**
  * Stores most recent status information as well as containing utility functions for checking
@@ -26,17 +25,11 @@ public final class SensorUtil {
   /** Number of analog input channels per roboRIO. */
   public static final int kAnalogInputChannels = PortsJNI.getNumAnalogInputs();
 
-  /** Number of analog output channels per roboRIO. */
-  public static final int kAnalogOutputChannels = PortsJNI.getNumAnalogOutputs();
-
   /** Number of solenoid channels per module. */
   public static final int kCTRESolenoidChannels = PortsJNI.getNumCTRESolenoidChannels();
 
   /** Number of PWM channels per roboRIO. */
   public static final int kPwmChannels = PortsJNI.getNumPWMChannels();
-
-  /** Number of relay channels per roboRIO. */
-  public static final int kRelayChannels = PortsJNI.getNumRelayHeaders();
 
   /** Number of power distribution channels per PDP. */
   public static final int kCTREPDPChannels = PortsJNI.getNumCTREPDPChannels();
@@ -76,23 +69,6 @@ public final class SensorUtil {
    *
    * @param channel The channel number to check.
    */
-  public static void checkRelayChannel(final int channel) {
-    if (!RelayJNI.checkRelayChannel(channel)) {
-      String buf =
-          "Requested relay channel is out of range. Minimum: 0, Maximum: "
-              + kRelayChannels
-              + ", Requested: "
-              + channel;
-      throw new IllegalArgumentException(buf);
-    }
-  }
-
-  /**
-   * Check that the digital channel number is valid. Verify that the channel number is one of the
-   * legal channel numbers. Channel numbers are 0-based.
-   *
-   * @param channel The channel number to check.
-   */
   public static void checkPWMChannel(final int channel) {
     if (!PWMJNI.checkPWMChannel(channel)) {
       String buf =
@@ -115,23 +91,6 @@ public final class SensorUtil {
       String buf =
           "Requested analog input channel is out of range. Minimum: 0, Maximum: "
               + kAnalogInputChannels
-              + ", Requested: "
-              + channel;
-      throw new IllegalArgumentException(buf);
-    }
-  }
-
-  /**
-   * Check that the analog input number is value. Verify that the analog input number is one of the
-   * legal channel numbers. Channel numbers are 0-based.
-   *
-   * @param channel The channel number to check.
-   */
-  public static void checkAnalogOutputChannel(final int channel) {
-    if (!AnalogJNI.checkAnalogOutputChannel(channel)) {
-      String buf =
-          "Requested analog output channel is out of range. Minimum: 0, Maximum: "
-              + kAnalogOutputChannels
               + ", Requested: "
               + channel;
       throw new IllegalArgumentException(buf);

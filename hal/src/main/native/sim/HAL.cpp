@@ -70,7 +70,6 @@ void InitializeHAL() {
   InitializeAddressableLEDData();
   InitializeAnalogGyroData();
   InitializeAnalogInData();
-  InitializeAnalogOutData();
   InitializeAnalogTriggerData();
   InitializeCanData();
   InitializeCANAPI();
@@ -84,7 +83,6 @@ void InitializeHAL() {
   InitializeREVPHData();
   InitializePowerDistributionData();
   InitializePWMData();
-  InitializeRelayData();
   InitializeRoboRioData();
   InitializeSimDeviceData();
   InitializeAccelerometer();
@@ -93,7 +91,6 @@ void InitializeHAL() {
   InitializeAnalogGyro();
   InitializeAnalogInput();
   InitializeAnalogInternal();
-  InitializeAnalogOutput();
   InitializeAnalogTrigger();
   InitializeCAN();
   InitializeConstants();
@@ -115,7 +112,6 @@ void InitializeHAL() {
   InitializeCTREPCM();
   InitializeREVPH();
   InitializePWM();
-  InitializeRelay();
   InitializeSerialPort();
   InitializeSimDevice();
   InitializeThreads();

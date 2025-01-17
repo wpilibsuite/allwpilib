@@ -53,7 +53,6 @@ void InitializeHAL() {
   InitializeAnalogAccumulator();
   InitializeAnalogGyro();
   InitializeAnalogInput();
-  InitializeAnalogOutput();
   InitializeAnalogTrigger();
   InitializeCAN();
   InitializeCANAPI();
@@ -74,7 +73,6 @@ void InitializeHAL() {
   InitializePorts();
   InitializePower();
   InitializePWM();
-  InitializeRelay();
   InitializeSerialPort();
   InitializeSmartIo();
   InitializeThreads();

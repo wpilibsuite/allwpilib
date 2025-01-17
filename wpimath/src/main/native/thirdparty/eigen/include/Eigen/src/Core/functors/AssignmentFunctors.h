@@ -23,7 +23,7 @@ namespace internal {
  */
 template <typename DstScalar, typename SrcScalar>
 struct assign_op {
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void assignCoeff(DstScalar& a, const SrcScalar& b) const { a = b; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void assignCoeff(DstScalar& a, const SrcScalar& b) const { a = b; }
 
   template <int Alignment, typename Packet>
   EIGEN_STRONG_INLINE void assignPacket(DstScalar* a, const Packet& b) const {

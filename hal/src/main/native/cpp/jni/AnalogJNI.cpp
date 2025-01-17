@@ -12,7 +12,6 @@
 #include "edu_wpi_first_hal_AnalogJNI.h"
 #include "hal/AnalogAccumulator.h"
 #include "hal/AnalogInput.h"
-#include "hal/AnalogOutput.h"
 #include "hal/AnalogTrigger.h"
 #include "hal/Ports.h"
 #include "hal/handles/HandlesInternal.h"
@@ -54,37 +53,6 @@ Java_edu_wpi_first_hal_AnalogJNI_freeAnalogInputPort
 
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
- * Method:    initializeAnalogOutputPort
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogOutputPort
-  (JNIEnv* env, jclass, jint id)
-{
-  int32_t status = 0;
-  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  HAL_AnalogOutputHandle analog = HAL_InitializeAnalogOutputPort(
-      (HAL_PortHandle)id, stack.c_str(), &status);
-  CheckStatusForceThrow(env, status);
-  return (jlong)analog;
-}
-
-/*
- * Class:     edu_wpi_first_hal_AnalogJNI
- * Method:    freeAnalogOutputPort
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_AnalogJNI_freeAnalogOutputPort
-  (JNIEnv* env, jclass, jint id)
-{
-  if (id != HAL_kInvalidHandle) {
-    HAL_FreeAnalogOutputPort((HAL_AnalogOutputHandle)id);
-  }
-}
-
-/*
- * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    checkAnalogModule
  * Signature: (B)Z
  */
@@ -111,19 +79,6 @@ Java_edu_wpi_first_hal_AnalogJNI_checkAnalogInputChannel
 
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
- * Method:    checkAnalogOutputChannel
- * Signature: (I)Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_AnalogJNI_checkAnalogOutputChannel
-  (JNIEnv*, jclass, jint value)
-{
-  jboolean returnValue = HAL_CheckAnalogOutputChannel(value);
-  return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAnalogInputSimDevice
  * Signature: (II)V
  */
@@ -133,35 +88,6 @@ Java_edu_wpi_first_hal_AnalogJNI_setAnalogInputSimDevice
 {
   HAL_SetAnalogInputSimDevice((HAL_AnalogInputHandle)handle,
                               (HAL_SimDeviceHandle)device);
-}
-
-/*
- * Class:     edu_wpi_first_hal_AnalogJNI
- * Method:    setAnalogOutput
- * Signature: (ID)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_AnalogJNI_setAnalogOutput
-  (JNIEnv* env, jclass, jint id, jdouble voltage)
-{
-  int32_t status = 0;
-  HAL_SetAnalogOutput((HAL_AnalogOutputHandle)id, voltage, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_first_hal_AnalogJNI
- * Method:    getAnalogOutput
- * Signature: (I)D
- */
-JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_AnalogJNI_getAnalogOutput
-  (JNIEnv* env, jclass, jint id)
-{
-  int32_t status = 0;
-  double val = HAL_GetAnalogOutput((HAL_AnalogOutputHandle)id, &status);
-  CheckStatus(env, status);
-  return val;
 }
 
 /*
