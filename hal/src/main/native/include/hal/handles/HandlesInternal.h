@@ -153,6 +153,43 @@ inline int16_t getHandleTypedIndex(HAL_Handle handle, HAL_HandleEnum enumType,
  * Bit 31:     1 if handle error, 0 if no error
  */
 
+// using a 16 bit value so we can store 0-255 and still report error
+/**
+ * Gets the port channel of a port handle.
+ *
+ * @param handle the port handle
+ * @return the port channel
+ */
+inline int16_t getPortHandleChannel(HAL_PortHandle handle) {
+  if (!isHandleType(handle, HAL_HandleEnum::Port)) {
+    return InvalidHandleIndex;
+  }
+  return static_cast<uint8_t>(handle & 0xff);
+}
+
+// using a 16 bit value so we can store 0-255 and still report error
+/**
+ * Gets the port module of a port handle.
+ *
+ * @param handle the port handle
+ * @return the port module
+ */
+inline int16_t getPortHandleModule(HAL_PortHandle handle) {
+  if (!isHandleType(handle, HAL_HandleEnum::Port)) {
+    return InvalidHandleIndex;
+  }
+  return static_cast<uint8_t>((handle >> 8) & 0xff);
+}
+
+/**
+ * Create a port handle.
+ *
+ * @param channel the channel
+ * @param module  the module
+ * @return port handle for the module and channel
+ */
+HAL_PortHandle createPortHandle(uint8_t channel, uint8_t module);
+
 /**
  * Create a handle for a specific index, type and version.
  *
