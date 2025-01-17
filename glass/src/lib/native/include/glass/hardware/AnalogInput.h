@@ -16,7 +16,6 @@ class DoubleSource;
 
 class AnalogInputModel : public Model {
  public:
-  virtual bool IsGyro() const = 0;
   virtual const char* GetSimDevice() const = 0;
 
   virtual DoubleSource* GetVoltageData() = 0;
