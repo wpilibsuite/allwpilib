@@ -115,7 +115,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * @param center Preset uncalibrated value to use as the accumulator center value.
    * @param offset Preset uncalibrated value to use as the gyro offset.
    */
-  @SuppressWarnings("this-escape")
+  @SuppressWarnings({"this-escape", "PMD.UnusedFormalParameter"})
   public AnalogGyro(AnalogInput channel, int center, double offset) {
     requireNonNullParam(channel, "channel", "AnalogGyro");
 
