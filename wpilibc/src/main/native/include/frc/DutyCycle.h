@@ -15,8 +15,6 @@
 namespace frc {
 class DigitalSource;
 class AnalogTrigger;
-class DMA;
-class DMASample;
 
 /**
  * Class to read a duty cycle PWM input.
@@ -31,8 +29,6 @@ class DMASample;
  */
 class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
   friend class AnalogTrigger;
-  friend class DMA;
-  friend class DMASample;
 
  public:
   /**

@@ -18,8 +18,6 @@ namespace frc {
 
 class DigitalSource;
 class DigitalGlitchFilter;
-class DMA;
-class DMASample;
 
 /**
  * Class to read quad encoders.
@@ -39,9 +37,6 @@ class DMASample;
 class Encoder : public CounterBase,
                 public wpi::Sendable,
                 public wpi::SendableHelper<Encoder> {
-  friend class DMA;
-  friend class DMASample;
-
  public:
   /**
    * Encoder indexing types.
