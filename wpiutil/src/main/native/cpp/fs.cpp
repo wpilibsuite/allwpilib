@@ -21,6 +21,7 @@
 #define _WIN32_WINNT 0x0601
 #define _WIN32_IE 0x0800  // MinGW at it again. FIXME: verify if still needed.
 #define WIN32_LEAN_AND_MEAN
+#define kInvalidFile reinterpret_cast<void*>(-1)
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
@@ -58,8 +59,6 @@ namespace fs {
 #pragma warning(push)
 #pragma warning(disable : 4244 4267 4146)
 #endif
-
-#define kInvalidFile reinterpret_cast<void*>(-1)
 
 static DWORD nativeDisposition(CreationDisposition Disp, OpenFlags Flags) {
   switch (Disp) {
