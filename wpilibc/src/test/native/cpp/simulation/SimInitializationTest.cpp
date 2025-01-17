@@ -21,7 +21,6 @@
 #include "frc/simulation/EncoderSim.h"
 #include "frc/simulation/PWMSim.h"
 #include "frc/simulation/PowerDistributionSim.h"
-#include "frc/simulation/RelaySim.h"
 #include "frc/simulation/RoboRioSim.h"
 #include "frc/simulation/SPIAccelerometerSim.h"
 
@@ -43,7 +42,6 @@ TEST(SimInitializationTest, AllInitialize) {
   CTREPCMSim pcmsim{0};
   PowerDistributionSim pdpsim{0};
   PWMSim pwmsim{0};
-  RelaySim rsim{0};
   RoboRioSim rrsim;
   (void)rrsim;
   SPIAccelerometerSim sasim{0};

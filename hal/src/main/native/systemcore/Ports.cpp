@@ -50,12 +50,6 @@ int32_t HAL_GetNumEncoders(void) {
 int32_t HAL_GetNumInterrupts(void) {
   return kNumInterrupts;
 }
-int32_t HAL_GetNumRelayChannels(void) {
-  return kNumRelayChannels;
-}
-int32_t HAL_GetNumRelayHeaders(void) {
-  return kNumRelayHeaders;
-}
 int32_t HAL_GetNumCTREPCMModules(void) {
   return kNumCTREPCMModules;
 }

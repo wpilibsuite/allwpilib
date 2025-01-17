@@ -90,7 +90,6 @@ The “hardware“ (which might be a full-fledged 3D simulation engine, a physic
 | [``"HAL"``][]           | HAL data                   | ``"HAL"``                 |
 | [``"Joystick"``][]      | Joystick data              | Joystick number           |
 | [``"PWM"``][]           | PWM output                 | Port index, e.g. "1", "2" |
-| [``"Relay"``][]         | Relay output               | Port index, e.g. "1", "2" |
 | [``"Solenoid"``][]      | Solenoid output            | Module +Port index, e.g. "0,1", "2,5" |
 
 #### Accelerometer ("Accel")
@@ -293,17 +292,6 @@ PWMs may be used to control either motor controllers or servos.  Typically only 
 | ``"<raw"``          | Integer | The pulse time in microseconds             |
 | ``"<period_scale"`` | Integer | Scales the PWM signal by squelching setting a 2-bit mask of outputs to squelch (ex. `1` -> squelch every other value; `3` -> squelch 3 of 4 values) |
 | ``"<zero_latch"``   | Boolean | Whether the PWM should be latched to 0     |
-
-#### Relay Output ("Relay")
-
-[``"Relay"``]:#relay-output-relay
-
-| Data Key        | Type    | Description                                                    |
-| --------------- | ------- | -------------------------------------------------------------- |
-| ``"<init_fwd"`` | Boolean | If relay forward direction is initialized in the robot program |
-| ``"<init_rev"`` | Boolean | If relay reverse direction is initialized in the robot program |
-| ``"<fwd"``      | Boolean | True if forward direction is enabled                           |
-| ``"<rev"``      | Boolean | True if reverse direction is enabled                           |
 
 #### Solenoid Output ("Solenoid")
 
