@@ -66,7 +66,6 @@ void InitializeDriverStation();
 
 namespace hal::init {
 void InitializeHAL() {
-  InitializeAccelerometerData();
   InitializeAddressableLEDData();
   InitializeAnalogInData();
   InitializeAnalogTriggerData();
@@ -84,7 +83,6 @@ void InitializeHAL() {
   InitializePWMData();
   InitializeRoboRioData();
   InitializeSimDeviceData();
-  InitializeAccelerometer();
   InitializeAddressableLED();
   InitializeAnalogInput();
   InitializeAnalogInternal();

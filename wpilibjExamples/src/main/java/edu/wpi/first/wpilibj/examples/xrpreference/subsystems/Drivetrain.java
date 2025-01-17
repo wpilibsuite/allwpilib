@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.examples.xrpreference.subsystems;
 
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.xrp.XRPGyro;
@@ -35,9 +34,6 @@ public class Drivetrain extends SubsystemBase {
 
   // Set up the XRPGyro
   private final XRPGyro m_gyro = new XRPGyro();
-
-  // Set up the BuiltInAccelerometer
-  private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
@@ -82,33 +78,6 @@ public class Drivetrain extends SubsystemBase {
 
   public double getAverageDistanceInch() {
     return (getLeftDistanceInch() + getRightDistanceInch()) / 2.0;
-  }
-
-  /**
-   * The acceleration in the X-axis.
-   *
-   * @return The acceleration of the XRP along the X-axis in Gs
-   */
-  public double getAccelX() {
-    return m_accelerometer.getX();
-  }
-
-  /**
-   * The acceleration in the Y-axis.
-   *
-   * @return The acceleration of the XRP along the Y-axis in Gs
-   */
-  public double getAccelY() {
-    return m_accelerometer.getY();
-  }
-
-  /**
-   * The acceleration in the Z-axis.
-   *
-   * @return The acceleration of the XRP along the Z-axis in Gs
-   */
-  public double getAccelZ() {
-    return m_accelerometer.getZ();
   }
 
   /**

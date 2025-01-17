@@ -81,9 +81,6 @@ void XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
       case XRP_TAG_GYRO:
         ReadGyroTag(tagPacket);
         break;
-      case XRP_TAG_ACCEL:
-        ReadAccelTag(tagPacket);
-        break;
       case XRP_TAG_DIO:
         ReadDIOTag(tagPacket);
         break;
@@ -305,28 +302,6 @@ void XRP::ReadGyroTag(std::span<const uint8_t> packet) {
 
   // Update WPILib
   m_wpilib_update_func(gyroJson);
-}
-
-void XRP::ReadAccelTag(std::span<const uint8_t> packet) {
-  if (packet.size() < 14) {
-    return;  // size(1) + tag(1) + 3x 4 byte
-  }
-
-  packet = packet.subspan(2);  // Skip past the size and tag
-  float accel_x =
-      std::bit_cast<float>(wpi::support::endian::read32be(&packet[0]));
-  float accel_y =
-      std::bit_cast<float>(wpi::support::endian::read32be(&packet[4]));
-  float accel_z =
-      std::bit_cast<float>(wpi::support::endian::read32be(&packet[8]));
-
-  wpi::json accelJson;
-  accelJson["type"] = "Accel";
-  accelJson["device"] = "BuiltInAccel";
-  accelJson["data"] = {{">x", accel_x}, {">y", accel_y}, {">z", accel_z}};
-
-  // Update WPILib
-  m_wpilib_update_func(accelJson);
 }
 
 void XRP::ReadDIOTag(std::span<const uint8_t> packet) {

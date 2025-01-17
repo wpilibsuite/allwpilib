@@ -6,7 +6,6 @@
 
 #include <stdint.h>
 
-#include "hal/Accelerometer.h"
 #include "hal/AnalogInput.h"
 #include "hal/AnalogTrigger.h"
 #include "hal/CAN.h"
