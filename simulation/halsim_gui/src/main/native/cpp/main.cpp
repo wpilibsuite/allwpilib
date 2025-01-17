@@ -17,7 +17,6 @@
 
 #include "AccelerometerSimGui.h"
 #include "AddressableLEDGui.h"
-#include "AnalogGyroSimGui.h"
 #include "AnalogInputSimGui.h"
 #include "DIOSimGui.h"
 #include "DriverStationGui.h"
@@ -76,7 +75,6 @@ __declspec(dllexport)
 
   AccelerometerSimGui::Initialize();
   AddressableLEDGui::Initialize();
-  AnalogGyroSimGui::Initialize();
   AnalogInputSimGui::Initialize();
   DIOSimGui::Initialize();
   NetworkTablesSimGui::Initialize();

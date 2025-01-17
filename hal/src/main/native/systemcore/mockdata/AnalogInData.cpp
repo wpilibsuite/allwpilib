@@ -20,11 +20,6 @@ DEFINE_CAPI(HAL_Bool, Initialized, false)
 DEFINE_CAPI(int32_t, AverageBits, 0)
 DEFINE_CAPI(int32_t, OversampleBits, 0)
 DEFINE_CAPI(double, Voltage, 0)
-DEFINE_CAPI(HAL_Bool, AccumulatorInitialized, false)
-DEFINE_CAPI(int64_t, AccumulatorValue, 0)
-DEFINE_CAPI(int64_t, AccumulatorCount, 0)
-DEFINE_CAPI(int32_t, AccumulatorCenter, 0)
-DEFINE_CAPI(int32_t, AccumulatorDeadband, 0)
 
 void HALSIM_RegisterAnalogInAllCallbacks(int32_t index,
                                          HAL_NotifyCallback callback,

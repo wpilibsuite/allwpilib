@@ -44,51 +44,6 @@ public class AnalogInDataJNI extends JNIWrapper {
 
   public static native void setVoltage(int index, double voltage);
 
-  public static native int registerAccumulatorInitializedCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelAccumulatorInitializedCallback(int index, int uid);
-
-  public static native boolean getAccumulatorInitialized(int index);
-
-  public static native void setAccumulatorInitialized(int index, boolean accumulatorInitialized);
-
-  public static native int registerAccumulatorValueCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelAccumulatorValueCallback(int index, int uid);
-
-  public static native long getAccumulatorValue(int index);
-
-  public static native void setAccumulatorValue(int index, long accumulatorValue);
-
-  public static native int registerAccumulatorCountCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelAccumulatorCountCallback(int index, int uid);
-
-  public static native long getAccumulatorCount(int index);
-
-  public static native void setAccumulatorCount(int index, long accumulatorCount);
-
-  public static native int registerAccumulatorCenterCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelAccumulatorCenterCallback(int index, int uid);
-
-  public static native int getAccumulatorCenter(int index);
-
-  public static native void setAccumulatorCenter(int index, int AccumulatorCenter);
-
-  public static native int registerAccumulatorDeadbandCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelAccumulatorDeadbandCallback(int index, int uid);
-
-  public static native int getAccumulatorDeadband(int index);
-
-  public static native void setAccumulatorDeadband(int index, int AccumulatorDeadband);
-
   public static native void resetData(int index);
 
   /** Utility class. */

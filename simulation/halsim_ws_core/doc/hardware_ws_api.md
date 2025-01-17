@@ -132,11 +132,6 @@ The basic analog input just reads a voltage. An analog input can also be configu
 | ``"<avg_bits"``        | Integer | The number of averaging bits                        |
 | ``"<oversample_bits"`` | Integer | The number of oversampling bits                     |
 | ``">voltage"``         | Float   | Input voltage, in volts                             |
-| ``"<accum_init"``      | Boolean | If the accumulator is initialized in the robot program |
-| ``">accum_value"``     | Integer | The accumulated value                               |
-| ``">accum_count"``     | Integer | The number of accumulated values                    |
-| ``"<accum_center"``    | Integer | The center value of the accumulator                 |
-| ``"<accum_deadband"``  | Integer | The accumulator's deadband                          |
 
 #### Analog Output ("AO")
 

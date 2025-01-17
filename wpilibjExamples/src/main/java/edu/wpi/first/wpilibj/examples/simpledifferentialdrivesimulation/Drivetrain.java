@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -59,7 +58,6 @@ public class Drivetrain {
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
 
   // Simulation classes help us simulate our robot
-  private final AnalogGyroSim m_gyroSim = new AnalogGyroSim(m_gyro);
   private final EncoderSim m_leftEncoderSim = new EncoderSim(m_leftEncoder);
   private final EncoderSim m_rightEncoderSim = new EncoderSim(m_rightEncoder);
   private final Field2d m_fieldSim = new Field2d();
@@ -148,7 +146,7 @@ public class Drivetrain {
     m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocityMetersPerSecond());
     m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPositionMeters());
     m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocityMetersPerSecond());
-    m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
+    // m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
   }
 
   /** Update odometry - this should be run every robot loop. */

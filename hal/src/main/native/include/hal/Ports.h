@@ -17,13 +17,6 @@ extern "C" {
 #endif
 
 /**
- * Gets the number of analog accumulators in the current system.
- *
- * @return the number of analog accumulators
- */
-int32_t HAL_GetNumAccumulators(void);
-
-/**
  * Gets the number of analog triggers in the current system.
  *
  * @return the number of analog triggers

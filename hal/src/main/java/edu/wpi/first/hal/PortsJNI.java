@@ -11,14 +11,6 @@ package edu.wpi.first.hal;
  */
 public class PortsJNI extends JNIWrapper {
   /**
-   * Gets the number of analog accumulators in the current system.
-   *
-   * @return the number of analog accumulators
-   * @see "HAL_GetNumAccumulators"
-   */
-  public static native int getNumAccumulators();
-
-  /**
    * Gets the number of analog triggers in the current system.
    *
    * @return the number of analog triggers

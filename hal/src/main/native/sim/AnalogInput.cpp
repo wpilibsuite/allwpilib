@@ -8,7 +8,6 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/AnalogAccumulator.h"
 #include "hal/handles/HandlesInternal.h"
 #include "mockdata/AnalogInDataInternal.h"
 
@@ -46,14 +45,9 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   }
 
   analog_port->channel = static_cast<uint8_t>(channel);
-  if (HAL_IsAccumulatorChannel(handle, status)) {
-    analog_port->isAccumulator = true;
-  } else {
-    analog_port->isAccumulator = false;
-  }
+  analog_port->isAccumulator = false;
 
   SimAnalogInData[channel].initialized = true;
-  SimAnalogInData[channel].accumulatorInitialized = false;
   SimAnalogInData[channel].simDevice = 0;
 
   analog_port->previousAllocation =
@@ -69,7 +63,6 @@ void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle) {
     return;
   }
   SimAnalogInData[port->channel].initialized = false;
-  SimAnalogInData[port->channel].accumulatorInitialized = false;
 }
 
 HAL_Bool HAL_CheckAnalogModule(int32_t module) {

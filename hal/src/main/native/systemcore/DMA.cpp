@@ -13,8 +13,6 @@
 #include <wpi/print.h>
 
 #include "PortsInternal.h"
-#include "hal/AnalogAccumulator.h"
-#include "hal/AnalogGyro.h"
 #include "hal/AnalogInput.h"
 #include "hal/Errors.h"
 #include "hal/HALBase.h"

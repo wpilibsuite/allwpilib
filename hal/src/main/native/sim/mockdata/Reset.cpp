@@ -4,7 +4,6 @@
 
 #include <hal/simulation/AccelerometerData.h>
 #include <hal/simulation/AddressableLEDData.h>
-#include <hal/simulation/AnalogGyroData.h>
 #include <hal/simulation/AnalogInData.h>
 #include <hal/simulation/AnalogTriggerData.h>
 #include <hal/simulation/CTREPCMData.h>
@@ -30,10 +29,6 @@ extern "C" void HALSIM_ResetAllSimData(void) {
 
   for (int32_t i = 0; i < hal::kNumAddressableLEDs; i++) {
     HALSIM_ResetAddressableLEDData(i);
-  }
-
-  for (int32_t i = 0; i < hal::kNumAccumulators; i++) {
-    HALSIM_ResetAnalogGyroData(i);
   }
 
   for (int32_t i = 0; i < hal::kNumAnalogInputs; i++) {
