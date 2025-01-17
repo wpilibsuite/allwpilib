@@ -57,7 +57,6 @@ void InitializeHAL() {
   InitializeConstants();
   InitializeCounter();
   InitializeDIO();
-  InitializeDMA();
   InitializeDutyCycle();
   InitializeEncoder();
   InitializeFRCDriverStation();

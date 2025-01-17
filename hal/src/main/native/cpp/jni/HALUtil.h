@@ -84,8 +84,6 @@ jbyteArray SetCANStreamObject(JNIEnv* env, jobject canStreamData,
 
 jobject CreateHALValue(JNIEnv* env, const HAL_Value& value);
 
-jobject CreateDMABaseStore(JNIEnv* env, jint valueType, jint index);
-
 jobject CreatePowerDistributionVersion(JNIEnv* env, uint32_t firmwareMajor,
                                        uint32_t firmwareMinor,
                                        uint32_t firmwareFix,

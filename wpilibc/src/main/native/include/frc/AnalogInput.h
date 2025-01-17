@@ -13,9 +13,6 @@
 
 namespace frc {
 
-class DMA;
-class DMASample;
-
 /**
  * Analog input class.
  *
@@ -31,8 +28,6 @@ class DMASample;
 class AnalogInput : public wpi::Sendable,
                     public wpi::SendableHelper<AnalogInput> {
   friend class AnalogTrigger;
-  friend class DMA;
-  friend class DMASample;
 
  public:
   /**
