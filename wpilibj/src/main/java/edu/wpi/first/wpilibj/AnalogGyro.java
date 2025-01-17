@@ -40,8 +40,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * are in progress, this is typically done when the robot is first turned on while it's sitting at
    * rest before the competition starts.
    */
-  public void calibrate() {
-  }
+  public void calibrate() {}
 
   /**
    * Return the heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
@@ -130,8 +129,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * <p>Resets the gyro to a heading of zero. This can be used if there is significant drift in the
    * gyro, and it needs to be recalibrated after it has been running.
    */
-  public void reset() {
-  }
+  public void reset() {}
 
   /** Delete (free) the accumulator and the analog components used for the gyro. */
   @Override
@@ -200,8 +198,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    *
    * @param voltsPerDegreePerSecond The sensitivity in Volts/degree/second.
    */
-  public void setSensitivity(double voltsPerDegreePerSecond) {
-  }
+  public void setSensitivity(double voltsPerDegreePerSecond) {}
 
   /**
    * Set the size of the neutral zone. Any voltage from the gyro less than this amount from the
@@ -210,8 +207,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    *
    * @param volts The size of the deadband in volts
    */
-  public void setDeadband(double volts) {
-  }
+  public void setDeadband(double volts) {}
 
   /**
    * Gets the analog input for the gyro.
