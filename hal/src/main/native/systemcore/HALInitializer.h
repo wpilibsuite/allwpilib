@@ -49,6 +49,6 @@ extern void InitializePorts();
 extern void InitializePower();
 extern void InitializePWM();
 extern void InitializeSerialPort();
-extern void InitializeSPI();
+extern void InitializeSmartIo();
 extern void InitializeThreads();
 }  // namespace hal::init
