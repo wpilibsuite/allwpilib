@@ -29,11 +29,6 @@ class HALSimWSProviderAnalogIn : public HALSimWSHalChanProvider {
   int32_t m_avgbitsCbKey = 0;
   int32_t m_oversampleCbKey = 0;
   int32_t m_voltageCbKey = 0;
-  int32_t m_accumInitCbKey = 0;
-  int32_t m_accumValueCbKey = 0;
-  int32_t m_accumCountCbKey = 0;
-  int32_t m_accumCenterCbKey = 0;
-  int32_t m_accumDeadbandCbKey = 0;
 };
 
 }  // namespace wpilibws

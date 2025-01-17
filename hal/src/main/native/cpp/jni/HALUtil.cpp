@@ -51,7 +51,6 @@ static JClass powerDistributionVersionCls;
 static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
 static JClass matchInfoDataCls;
-static JClass accumulatorResultCls;
 static JClass canDataCls;
 static JClass canStreamMessageCls;
 static JClass halValueCls;
@@ -65,7 +64,6 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/hal/PWMConfigDataResult", &pwmConfigDataResultCls},
     {"edu/wpi/first/hal/can/CANStatus", &canStatusCls},
     {"edu/wpi/first/hal/MatchInfoData", &matchInfoDataCls},
-    {"edu/wpi/first/hal/AccumulatorResult", &accumulatorResultCls},
     {"edu/wpi/first/hal/CANData", &canDataCls},
     {"edu/wpi/first/hal/CANStreamMessage", &canStreamMessageCls},
     {"edu/wpi/first/hal/HALValue", &halValueCls},
@@ -304,15 +302,6 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
       static_cast<jint>(matchInfo.matchNumber),
       static_cast<jint>(matchInfo.replayNumber),
       static_cast<jint>(matchInfo.matchType));
-}
-
-void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
-                                int64_t value, int64_t count) {
-  static jmethodID func =
-      env->GetMethodID(accumulatorResultCls, "set", "(JJ)V");
-
-  env->CallVoidMethod(accumulatorResult, func, static_cast<jlong>(value),
-                      static_cast<jlong>(count));
 }
 
 jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,

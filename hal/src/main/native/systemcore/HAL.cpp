@@ -50,8 +50,6 @@ void InitializeHAL() {
   InitializeREVPH();
   InitializeAddressableLED();
   InitializeAccelerometer();
-  InitializeAnalogAccumulator();
-  InitializeAnalogGyro();
   InitializeAnalogInput();
   InitializeAnalogTrigger();
   InitializeCAN();
