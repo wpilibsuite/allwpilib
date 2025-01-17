@@ -68,7 +68,7 @@ class Drive : public frc2::SubsystemBase {
                               DriveConstants::kRightEncoderPorts[1],
                               DriveConstants::kRightEncoderReversed};
 
-  frc::AnalogGyro m_gyro;
+  frc::AnalogGyro m_gyro{0};
 
   frc::ProfiledPIDController<units::radians> m_controller{
       DriveConstants::kTurnP,

@@ -165,7 +165,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::Encoder m_rearRightEncoder;
 
   // The gyro sensor
-  frc::AnalogGyro m_gyro;
+  frc::AnalogGyro m_gyro{0};
 
   // Odometry class for tracking robot pose
   frc::MecanumDriveOdometry m_odometry;
