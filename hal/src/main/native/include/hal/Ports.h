@@ -31,13 +31,6 @@ int32_t HAL_GetNumAnalogTriggers(void);
 int32_t HAL_GetNumAnalogInputs(void);
 
 /**
- * Gets the number of analog outputs in the current system.
- *
- * @return the number of analog outputs
- */
-int32_t HAL_GetNumAnalogOutputs(void);
-
-/**
  * Gets the number of counters in the current system.
  *
  * @return the number of counters
@@ -92,20 +85,6 @@ int32_t HAL_GetNumEncoders(void);
  * @return the number of interrupts
  */
 int32_t HAL_GetNumInterrupts(void);
-
-/**
- * Gets the number of relay channels in the current system.
- *
- * @return the number of relay channels
- */
-int32_t HAL_GetNumRelayChannels(void);
-
-/**
- * Gets the number of relay headers in the current system.
- *
- * @return the number of relay headers
- */
-int32_t HAL_GetNumRelayHeaders(void);
 
 /**
  * Gets the number of PCM modules in the current system.

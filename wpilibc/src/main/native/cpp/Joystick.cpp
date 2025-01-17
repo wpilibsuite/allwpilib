@@ -5,12 +5,8 @@
 #include "frc/Joystick.h"
 
 #include <cmath>
-#include <numbers>
 
 #include <hal/FRCUsageReporting.h>
-#include <units/dimensionless.h>
-#include <units/math.h>
-#include <wpi/deprecated.h>
 
 #include "frc/event/BooleanEvent.h"
 
@@ -123,6 +119,5 @@ double Joystick::GetMagnitude() const {
 }
 
 units::radian_t Joystick::GetDirection() const {
-  return units::math::atan2(units::dimensionless::scalar_t{GetX()},
-                            units::dimensionless::scalar_t{-GetY()});
+  return units::radian_t{std::atan2(GetX(), -GetY())};
 }

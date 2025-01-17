@@ -53,7 +53,8 @@ public class AddressableLEDJNI extends JNIWrapper {
   /**
    * Sets the bit timing.
    *
-   * <p>By default, the driver is set up to drive WS2812Bs, so nothing needs to be set for those.
+   * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing needs to be set for
+   * those.
    *
    * @param handle the Addressable LED handle
    * @param highTime0NanoSeconds high time for 0 bit (default 400ns)
@@ -72,7 +73,7 @@ public class AddressableLEDJNI extends JNIWrapper {
   /**
    * Sets the sync time.
    *
-   * <p>The sync time is the time to hold output so LEDs enable. Default set for WS2812B.
+   * <p>The sync time is the time to hold output so LEDs enable. Default set for WS2812B and WS2815.
    *
    * @param handle the Addressable LED handle
    * @param syncTimeMicroSeconds the sync time (default 280us)

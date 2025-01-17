@@ -42,6 +42,15 @@ void DCMotorSim::SetState(units::radian_t angularPosition,
   SetState(Vectord<2>{angularPosition, angularVelocity});
 }
 
+void DCMotorSim::SetAngle(units::radian_t angularPosition) {
+  SetState(angularPosition, GetAngularVelocity());
+}
+
+void DCMotorSim::SetAngularVelocity(
+    units::radians_per_second_t angularVelocity) {
+  SetState(GetAngularPosition(), angularVelocity);
+}
+
 units::radian_t DCMotorSim::GetAngularPosition() const {
   return units::radian_t{GetOutput(0)};
 }
@@ -75,4 +84,16 @@ units::volt_t DCMotorSim::GetInputVoltage() const {
 void DCMotorSim::SetInputVoltage(units::volt_t voltage) {
   SetInput(Vectord<1>{voltage.value()});
   ClampInput(frc::RobotController::GetBatteryVoltage().value());
+}
+
+const DCMotor& DCMotorSim::GetGearbox() const {
+  return m_gearbox;
+}
+
+double DCMotorSim::GetGearing() const {
+  return m_gearing;
+}
+
+units::kilogram_square_meter_t DCMotorSim::GetJ() const {
+  return m_j;
 }

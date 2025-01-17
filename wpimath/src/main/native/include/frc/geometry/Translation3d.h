@@ -149,6 +149,18 @@ class WPILIB_DLLEXPORT Translation3d {
   }
 
   /**
+   * Rotates this translation around another translation in 3D space.
+   *
+   * @param other The other translation to rotate around.
+   * @param rot The rotation to rotate the translation by.
+   * @return The new rotated translation.
+   */
+  constexpr Translation3d RotateAround(const Translation3d& other,
+                                       const Rotation3d& rot) const {
+    return (*this - other).RotateBy(rot) + other;
+  }
+
+  /**
    * Returns a Translation2d representing this Translation3d projected into the
    * X-Y plane.
    */

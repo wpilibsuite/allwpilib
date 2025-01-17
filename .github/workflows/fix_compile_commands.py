@@ -18,9 +18,9 @@ def main():
     for obj in data:
         out_args = []
 
-        # Filter out -isystem flags that cause false positives
         iter_args = iter(obj["arguments"])
         for arg in iter_args:
+            # Filter out -isystem flags that cause false positives
             if arg == "-isystem":
                 next_arg = next(iter_args)
 
@@ -28,6 +28,9 @@ def main():
                 # error: conflicting types for '_mm_prefetch' [clang-diagnostic-error]
                 if not next_arg.startswith("/usr/lib/gcc/"):
                     out_args += ["-isystem", next_arg]
+            # Replace GCC warning argument with one Clang recognizes
+            elif arg == "-Wno-maybe-uninitialized":
+                out_args.append("-Wno-uninitialized")
             else:
                 out_args.append(arg)
 

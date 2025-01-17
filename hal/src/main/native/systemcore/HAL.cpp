@@ -51,7 +51,6 @@ void InitializeHAL() {
   InitializeAddressableLED();
   InitializeAccelerometer();
   InitializeAnalogInput();
-  InitializeAnalogOutput();
   InitializeAnalogTrigger();
   InitializeCAN();
   InitializeCANAPI();
@@ -72,7 +71,6 @@ void InitializeHAL() {
   InitializePorts();
   InitializePower();
   InitializePWM();
-  InitializeRelay();
   InitializeSerialPort();
   InitializeSmartIo();
   InitializeSPI();

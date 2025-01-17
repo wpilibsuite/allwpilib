@@ -103,19 +103,6 @@
     "commandversion": 2
   },
   {
-    "name": "Relay",
-    "description": "Control a relay from joystick buttons.",
-    "tags": [
-      "Hardware",
-      "Relay",
-      "Joystick"
-    ],
-    "foldername": "relay",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
     "name": "Ultrasonic",
     "description": "View values from a ping-response ultrasonic sensor.",
     "tags": [

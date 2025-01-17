@@ -5,8 +5,10 @@
 #include <tagpose.h>
 
 namespace tag {
-Pose::Pose(double xpos, double ypos, double zpos, double w, double x, double y,
-           double z, double field_length_meters, double field_width_meters) {
+Pose::Pose(int tag_id, double xpos, double ypos, double zpos, double w,
+           double x, double y, double z, double field_length_meters,
+           double field_width_meters) {
+  tagId = tag_id;
   xPos = xpos;
   yPos = ypos;
   zPos = zpos;
@@ -25,5 +27,17 @@ Pose::Pose(double xpos, double ypos, double zpos, double w, double x, double y,
   rollRot = eulerAngles[0];
   pitchRot = eulerAngles[1];
   yawRot = eulerAngles[2];
+}
+
+wpi::json Pose::toJson() {
+  return {{"ID", tagId},
+          {"pose",
+           {{"translation", {{"x", xPos}, {"y", yPos}, {"z", zPos}}},
+            {"rotation",
+             {{"quaternion",
+               {{"W", quaternion.w()},
+                {"X", quaternion.x()},
+                {"Y", quaternion.y()},
+                {"Z", quaternion.z()}}}}}}}};
 }
 }  // namespace tag
