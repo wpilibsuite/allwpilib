@@ -107,22 +107,6 @@ public class PortsJNI extends JNIWrapper {
   public static native int getNumInterrupts();
 
   /**
-   * Gets the number of relay channels in the current system.
-   *
-   * @return the number of relay channels
-   * @see "HAL_GetNumRelayChannels"
-   */
-  public static native int getNumRelayChannels();
-
-  /**
-   * Gets the number of relay headers in the current system.
-   *
-   * @return the number of relay headers
-   * @see "HAL_GetNumRelayHeaders"
-   */
-  public static native int getNumRelayHeaders();
-
-  /**
    * Gets the number of PCM modules in the current system.
    *
    * @return the number of PCM modules

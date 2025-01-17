@@ -9,7 +9,6 @@
 #include <hal/DIO.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
-#include <hal/Relay.h>
 
 using namespace frc;
 
@@ -23,10 +22,6 @@ int SensorUtil::GetDefaultREVPHModule() {
 
 bool SensorUtil::CheckDigitalChannel(int channel) {
   return HAL_CheckDIOChannel(channel);
-}
-
-bool SensorUtil::CheckRelayChannel(int channel) {
-  return HAL_CheckRelayChannel(channel);
 }
 
 bool SensorUtil::CheckPWMChannel(int channel) {
@@ -55,8 +50,4 @@ int SensorUtil::GetNumAnalogOuputs() {
 
 int SensorUtil::GetNumPwmChannels() {
   return HAL_GetNumPWMChannels();
-}
-
-int SensorUtil::GetNumRelayChannels() {
-  return HAL_GetNumRelayHeaders();
 }

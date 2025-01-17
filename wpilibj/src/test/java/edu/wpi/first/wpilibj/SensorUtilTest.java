@@ -31,11 +31,6 @@ class SensorUtilTest {
   }
 
   @Test
-  void testInvalidRelayModule() {
-    assertThrows(IllegalArgumentException.class, () -> SensorUtil.checkRelayChannel(100));
-  }
-
-  @Test
   void testgetDefaultCtrePcmModule() {
     assertEquals(0, SensorUtil.getDefaultCTREPCMModule());
   }

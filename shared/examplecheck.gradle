@@ -71,7 +71,7 @@ def tagList = [
         "Simulation", "Trapezoid Profile", "Profiled PID", "Odometry", "LQR", "Pose Estimator",
 
         /* --- Hardware --- */
-        "Analog", "Ultrasonic", "Gyro", "Pneumatics", "I2C", "Duty Cycle", "PDP", "DMA", "Relay",
+        "Analog", "Ultrasonic", "Gyro", "Pneumatics", "I2C", "Duty Cycle", "PDP", "DMA",
         "AddressableLEDs", "HAL", "Encoder", "Smart Motor Controller", "Digital Input",
         "Digital Output",
 

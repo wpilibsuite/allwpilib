@@ -31,7 +31,6 @@
 #include "hal/PWM.h"
 #include "hal/Ports.h"
 #include "hal/Power.h"
-#include "hal/Relay.h"
 #include "hal/SPI.h"
 #include "hal/SerialPort.h"
 #include "hal/SimDevice.h"

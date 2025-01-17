@@ -9,7 +9,6 @@ import edu.wpi.first.hal.ConstantsJNI;
 import edu.wpi.first.hal.DIOJNI;
 import edu.wpi.first.hal.PWMJNI;
 import edu.wpi.first.hal.PortsJNI;
-import edu.wpi.first.hal.RelayJNI;
 
 /**
  * Stores most recent status information as well as containing utility functions for checking
@@ -34,9 +33,6 @@ public final class SensorUtil {
 
   /** Number of PWM channels per roboRIO. */
   public static final int kPwmChannels = PortsJNI.getNumPWMChannels();
-
-  /** Number of relay channels per roboRIO. */
-  public static final int kRelayChannels = PortsJNI.getNumRelayHeaders();
 
   /** Number of power distribution channels per PDP. */
   public static final int kCTREPDPChannels = PortsJNI.getNumCTREPDPChannels();
@@ -64,23 +60,6 @@ public final class SensorUtil {
       String buf =
           "Requested DIO channel is out of range. Minimum: 0, Maximum: "
               + kDigitalChannels
-              + ", Requested: "
-              + channel;
-      throw new IllegalArgumentException(buf);
-    }
-  }
-
-  /**
-   * Check that the digital channel number is valid. Verify that the channel number is one of the
-   * legal channel numbers. Channel numbers are 0-based.
-   *
-   * @param channel The channel number to check.
-   */
-  public static void checkRelayChannel(final int channel) {
-    if (!RelayJNI.checkRelayChannel(channel)) {
-      String buf =
-          "Requested relay channel is out of range. Minimum: 0, Maximum: "
-              + kRelayChannels
               + ", Requested: "
               + channel;
       throw new IllegalArgumentException(buf);

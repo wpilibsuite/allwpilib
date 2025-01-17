@@ -19,7 +19,6 @@
 #include <hal/simulation/PWMData.h>
 #include <hal/simulation/PowerDistributionData.h>
 #include <hal/simulation/REVPHData.h>
-#include <hal/simulation/RelayData.h>
 #include <hal/simulation/RoboRioData.h>
 #include <hal/simulation/SPIAccelerometerData.h>
 #include <hal/simulation/SPIData.h>
@@ -86,10 +85,6 @@ extern "C" void HALSIM_ResetAllSimData(void) {
 
   for (int32_t i = 0; i < hal::kNumPWMChannels; i++) {
     HALSIM_ResetPWMData(i);
-  }
-
-  for (int32_t i = 0; i < hal::kNumRelayHeaders; i++) {
-    HALSIM_ResetRelayData(i);
   }
 
   for (int32_t i = 0; i < hal::kNumREVPHModules; i++) {
