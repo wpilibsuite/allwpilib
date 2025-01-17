@@ -32,7 +32,6 @@ class AnalogInput;
 class AnalogGyro : public wpi::Sendable,
                    public wpi::SendableHelper<AnalogGyro> {
  public:
-
   /**
    * %Gyro constructor using the Analog Input channel number.
    *
