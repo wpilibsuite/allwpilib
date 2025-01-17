@@ -351,8 +351,6 @@ public enum BuiltInWidgets implements WidgetType {
    *
    * <ul>
    *   <li>{@link edu.wpi.first.wpilibj.ADXL345_I2C}
-   *   <li>{@link edu.wpi.first.wpilibj.ADXL345_SPI}
-   *   <li>{@link edu.wpi.first.wpilibj.ADXL362}
    * </ul>
    *
    * <br>
