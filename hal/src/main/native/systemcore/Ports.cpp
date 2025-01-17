@@ -13,10 +13,6 @@ void InitializePorts() {}
 }  // namespace hal::init
 
 extern "C" {
-
-int32_t HAL_GetNumAccumulators(void) {
-  return kNumAccumulators;
-}
 int32_t HAL_GetNumAnalogTriggers(void) {
   return kNumAnalogTriggers;
 }

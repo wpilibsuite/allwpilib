@@ -68,7 +68,6 @@ namespace hal::init {
 void InitializeHAL() {
   InitializeAccelerometerData();
   InitializeAddressableLEDData();
-  InitializeAnalogGyroData();
   InitializeAnalogInData();
   InitializeAnalogTriggerData();
   InitializeCanData();
@@ -87,8 +86,6 @@ void InitializeHAL() {
   InitializeSimDeviceData();
   InitializeAccelerometer();
   InitializeAddressableLED();
-  InitializeAnalogAccumulator();
-  InitializeAnalogGyro();
   InitializeAnalogInput();
   InitializeAnalogInternal();
   InitializeAnalogTrigger();

@@ -6,7 +6,6 @@
 
 #include <string>
 
-#include <hal/AnalogAccumulator.h>
 #include <hal/AnalogInput.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
@@ -109,70 +108,6 @@ int AnalogInput::GetOffset() const {
   int offset = HAL_GetAnalogOffset(m_port, &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
   return offset;
-}
-
-bool AnalogInput::IsAccumulatorChannel() const {
-  int32_t status = 0;
-  bool isAccum = HAL_IsAccumulatorChannel(m_port, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
-  return isAccum;
-}
-
-void AnalogInput::InitAccumulator() {
-  m_accumulatorOffset = 0;
-  int32_t status = 0;
-  HAL_InitAccumulator(m_port, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
-}
-
-void AnalogInput::SetAccumulatorInitialValue(int64_t initialValue) {
-  m_accumulatorOffset = initialValue;
-}
-
-void AnalogInput::ResetAccumulator() {
-  int32_t status = 0;
-  HAL_ResetAccumulator(m_port, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
-
-  // Wait until the next sample, so the next call to GetAccumulator*()
-  // won't have old values.
-  const double sampleTime = 1.0 / GetSampleRate();
-  const double overSamples = 1 << GetOversampleBits();
-  const double averageSamples = 1 << GetAverageBits();
-  Wait(units::second_t{sampleTime * overSamples * averageSamples});
-}
-
-void AnalogInput::SetAccumulatorCenter(int center) {
-  int32_t status = 0;
-  HAL_SetAccumulatorCenter(m_port, center, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
-}
-
-void AnalogInput::SetAccumulatorDeadband(int deadband) {
-  int32_t status = 0;
-  HAL_SetAccumulatorDeadband(m_port, deadband, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
-}
-
-int64_t AnalogInput::GetAccumulatorValue() const {
-  int32_t status = 0;
-  int64_t value = HAL_GetAccumulatorValue(m_port, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
-  return value + m_accumulatorOffset;
-}
-
-int64_t AnalogInput::GetAccumulatorCount() const {
-  int32_t status = 0;
-  int64_t count = HAL_GetAccumulatorCount(m_port, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
-  return count;
-}
-
-void AnalogInput::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
-  int32_t status = 0;
-  HAL_GetAccumulatorOutput(m_port, &value, &count, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
-  value += m_accumulatorOffset;
 }
 
 void AnalogInput::SetSampleRate(double samplesPerSecond) {
