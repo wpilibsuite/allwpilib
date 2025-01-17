@@ -10,7 +10,6 @@
 #include "CallbackStore.h"
 #include "ConstBufferCallbackStore.h"
 #include "SimDeviceDataJNI.h"
-#include "SpiReadAutoReceiveBufferCallbackStore.h"
 #include "edu_wpi_first_hal_simulation_SimulatorJNI.h"
 #include "hal/HAL.h"
 #include "hal/handles/HandlesInternal.h"
@@ -22,11 +21,9 @@ static JavaVM* jvm = nullptr;
 static JClass notifyCallbackCls;
 static JClass bufferCallbackCls;
 static JClass constBufferCallbackCls;
-static JClass spiReadAutoReceiveBufferCallbackCls;
 static jmethodID notifyCallbackCallback;
 static jmethodID bufferCallbackCallback;
 static jmethodID constBufferCallbackCallback;
-static jmethodID spiReadAutoReceiveBufferCallbackCallback;
 
 namespace hal::sim {
 jint SimOnLoad(JavaVM* vm, void* reserved) {
@@ -73,23 +70,9 @@ jint SimOnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
   }
 
-  spiReadAutoReceiveBufferCallbackCls = JClass(
-      env, "edu/wpi/first/hal/simulation/SpiReadAutoReceiveBufferCallback");
-  if (!spiReadAutoReceiveBufferCallbackCls) {
-    return JNI_ERR;
-  }
-
-  spiReadAutoReceiveBufferCallbackCallback =
-      env->GetMethodID(spiReadAutoReceiveBufferCallbackCls, "callback",
-                       "(Ljava/lang/String;[II)I");
-  if (!spiReadAutoReceiveBufferCallbackCallback) {
-    return JNI_ERR;
-  }
-
   InitializeStore();
   InitializeBufferStore();
   InitializeConstBufferStore();
-  InitializeSpiBufferStore();
   if (!InitializeSimDeviceDataJNI(env)) {
     return JNI_ERR;
   }
@@ -106,7 +89,6 @@ void SimOnUnload(JavaVM* vm, void* reserved) {
   notifyCallbackCls.free(env);
   bufferCallbackCls.free(env);
   constBufferCallbackCls.free(env);
-  spiReadAutoReceiveBufferCallbackCls.free(env);
   FreeSimDeviceDataJNI(env);
   jvm = nullptr;
 }
@@ -127,9 +109,6 @@ jmethodID GetConstBufferCallback() {
   return constBufferCallbackCallback;
 }
 
-jmethodID GetSpiReadAutoReceiveBufferCallback() {
-  return spiReadAutoReceiveBufferCallbackCallback;
-}
 }  // namespace hal::sim
 
 extern "C" {
