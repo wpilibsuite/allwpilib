@@ -1022,6 +1022,270 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   }
 
   /**
+   * Divides this measure by an acceleration unit and returns the result in the most appropriate
+   * unit. This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(AccelerationUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by an angle unit and returns the result in the most appropriate unit. This
+   * is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(AngleUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by an angular acceleration unit and returns the result in the most
+   * appropriate unit. This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(AngularAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by an angular momentum unit and returns the result in the most appropriate
+   * unit. This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(AngularMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by an angular velocity unit and returns the result in the most appropriate
+   * unit. This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(AngularVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a unit of electric current and returns the result in the most
+   * appropriate unit. This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(CurrentUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a distance unit and returns the result in the most appropriate unit.
+   * This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(DistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by an energy unit and returns the result in the most appropriate unit.
+   * This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(EnergyUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a force unit and returns the result in the most appropriate unit. This
+   * is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(ForceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a frequency unit and returns the result in the most appropriate unit.
+   * This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(FrequencyUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a linear acceleration unit and returns the result in the most
+   * appropriate unit. This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(LinearAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a linear momentum unit and returns the result in the most appropriate
+   * unit. This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(LinearMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a linear velocity unit and returns the result in the most appropriate
+   * unit. This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(LinearVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a mass unit and returns the result in the most appropriate unit. This
+   * is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(MassUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a moment of inertia unit and returns the result in the most appropriate
+   * unit. This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(MomentOfInertiaUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a generic compound unit and returns the result in the most appropriate
+   * unit. This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(MultUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a power unit and returns the result in the most appropriate unit. This
+   * is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(PowerUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a generic ratio unit and returns the result in the most appropriate
+   * unit. This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(PerUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a temperature unit and returns the result in the most appropriate unit.
+   * This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(TemperatureUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a time period and returns the result in the most appropriate unit. This
+   * is equivalent to {@code div(period.of(1))}.
+   *
+   * @param period the time period measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(TimeUnit period) {
+    return div(period.of(1));
+  }
+
+  /**
+   * Divides this measure by a torque unit and returns the result in the most appropriate unit. This
+   * is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(TorqueUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a velocity unit and returns the result in the most appropriate unit.
+   * This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(VelocityUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a voltage unit and returns the result in the most appropriate unit.
+   * This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(VoltageUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
+   * Divides this measure by a resistance unit and returns the result in the most appropriate unit.
+   * This is equivalent to {@code div(divisorUnit.of(1))}.
+   *
+   * @param divisorUnit the unit to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(ResistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+  /**
    * Divides this measure by a unitless scalar and returns the result.
    *
    * @param divisor the measurement to divide by.
@@ -1369,17 +1633,6 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
       Measure<? extends PerUnit<? extends U, Other>> divisor) {
     return ImmutableMeasure.ofBaseUnits(
         baseUnitMagnitude() / divisor.baseUnitMagnitude(), divisor.unit().denominator());
-  }
-
-  /**
-   * Divides this measure by a time period and returns the result in the most appropriate unit. This
-   * is equivalent to {@code div(period.of(1))}.
-   *
-   * @param period the time period measurement to divide by.
-   * @return the division result
-   */
-  default Measure<?> per(TimeUnit period) {
-    return div(period.of(1));
   }
 
   /**
