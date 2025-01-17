@@ -11,7 +11,6 @@
 #include "frc/simulation/AnalogGyroSim.h"
 #include "frc/simulation/AnalogInputSim.h"
 #include "frc/simulation/AnalogTriggerSim.h"
-#include "frc/simulation/BuiltInAccelerometerSim.h"
 #include "frc/simulation/CTREPCMSim.h"
 #include "frc/simulation/DIOSim.h"
 #include "frc/simulation/DigitalPWMSim.h"
@@ -26,7 +25,6 @@ using namespace frc::sim;
 
 TEST(SimInitializationTest, AllInitialize) {
   HAL_Initialize(500, 0);
-  BuiltInAccelerometerSim biacsim;
   AnalogGyroSim agsim{0};
   AnalogInputSim aisim{0};
   EXPECT_THROW(AnalogTriggerSim::CreateForChannel(0), std::out_of_range);

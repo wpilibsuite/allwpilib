@@ -2,7 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <hal/simulation/AccelerometerData.h>
 #include <hal/simulation/AddressableLEDData.h>
 #include <hal/simulation/AnalogGyroData.h>
 #include <hal/simulation/AnalogInData.h>
@@ -24,10 +23,6 @@
 #include "../PortsInternal.h"
 
 extern "C" void HALSIM_ResetAllSimData(void) {
-  for (int32_t i = 0; i < hal::kAccelerometers; i++) {
-    HALSIM_ResetAccelerometerData(i);
-  }
-
   for (int32_t i = 0; i < hal::kNumAddressableLEDs; i++) {
     HALSIM_ResetAddressableLEDData(i);
   }

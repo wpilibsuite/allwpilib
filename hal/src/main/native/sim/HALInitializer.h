@@ -16,7 +16,6 @@ inline void CheckInit() {
   RunInitialize();
 }
 
-extern void InitializeAccelerometerData();
 extern void InitializeAddressableLEDData();
 extern void InitializeAnalogGyroData();
 extern void InitializeAnalogInData();
@@ -36,7 +35,6 @@ extern void InitializePowerDistributionData();
 extern void InitializePWMData();
 extern void InitializeRoboRioData();
 extern void InitializeSimDeviceData();
-extern void InitializeAccelerometer();
 extern void InitializeAddressableLED();
 extern void InitializeAnalogAccumulator();
 extern void InitializeAnalogGyro();

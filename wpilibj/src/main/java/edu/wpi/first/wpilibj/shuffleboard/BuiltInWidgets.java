@@ -321,13 +321,6 @@ public enum BuiltInWidgets implements WidgetType {
   /**
    * Displays an accelerometer with a number bar displaying the magnitude of the acceleration and
    * text displaying the exact value. <br>
-   * Supported types:
-   *
-   * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.AnalogAccelerometer}
-   * </ul>
-   *
-   * <br>
    * Custom properties:
    *
    * <table>

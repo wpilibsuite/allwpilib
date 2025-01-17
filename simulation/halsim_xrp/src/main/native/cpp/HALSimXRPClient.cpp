@@ -8,7 +8,6 @@
 
 #include <WSProviderContainer.h>
 #include <WSProvider_Analog.h>
-#include <WSProvider_BuiltInAccelerometer.h>
 #include <WSProvider_DIO.h>
 #include <WSProvider_DriverStation.h>
 #include <WSProvider_Encoder.h>
@@ -35,7 +34,6 @@ bool HALSimXRPClient::Initialize() {
 
     // Minimized set of HAL providers
     HALSimWSProviderAnalogIn::Initialize(registerFunc);
-    HALSimWSProviderBuiltInAccelerometer::Initialize(registerFunc);
     HALSimWSProviderDIO::Initialize(registerFunc);
     HALSimWSProviderDriverStation::Initialize(registerFunc);
     HALSimWSProviderEncoder::Initialize(registerFunc);

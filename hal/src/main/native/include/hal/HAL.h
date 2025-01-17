@@ -6,7 +6,6 @@
 
 #include <stdint.h>
 
-#include "hal/Accelerometer.h"
 #include "hal/AnalogAccumulator.h"
 #include "hal/AnalogGyro.h"
 #include "hal/AnalogInput.h"

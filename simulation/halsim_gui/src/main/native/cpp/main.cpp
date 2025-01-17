@@ -15,7 +15,6 @@
 #include <imgui.h>
 #include <wpigui.h>
 
-#include "AccelerometerSimGui.h"
 #include "AddressableLEDGui.h"
 #include "AnalogGyroSimGui.h"
 #include "AnalogInputSimGui.h"
@@ -74,7 +73,6 @@ __declspec(dllexport)
   EncoderSimGui::Initialize();
   SimDeviceGui::Initialize();
 
-  AccelerometerSimGui::Initialize();
   AddressableLEDGui::Initialize();
   AnalogGyroSimGui::Initialize();
   AnalogInputSimGui::Initialize();

@@ -18,7 +18,6 @@ inline void CheckInit() {
 
 extern void InitializeCTREPCM();
 extern void InitializeREVPH();
-extern void InitializeAccelerometer();
 extern void InitializeAddressableLED();
 extern void InitializeAnalogAccumulator();
 extern void InitializeAnalogGyro();

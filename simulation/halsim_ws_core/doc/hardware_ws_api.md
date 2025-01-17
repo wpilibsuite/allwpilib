@@ -76,7 +76,6 @@ The “hardware“ (which might be a full-fledged 3D simulation engine, a physic
 
 | Type value              | Description                | Device value              |
 | ----------------------- | -------------------------- | ------------------------- |
-| [``"Accel"``][]         | Accelerometer              | Arbitrary device name     |
 | [``"AddressableLED"``][]| Addressable LED Strip      | Arbitrary device number   |
 | [``"AI"``][]            | Analog input               | Port index, e.g. "1", "2" |
 | [``"AO"``][]            | Analog output              | Port index, e.g. "1", "2" |
@@ -91,22 +90,6 @@ The “hardware“ (which might be a full-fledged 3D simulation engine, a physic
 | [``"Joystick"``][]      | Joystick data              | Joystick number           |
 | [``"PWM"``][]           | PWM output                 | Port index, e.g. "1", "2" |
 | [``"Solenoid"``][]      | Solenoid output            | Module +Port index, e.g. "0,1", "2,5" |
-
-#### Accelerometer ("Accel")
-
-[``"Accel"``]:#accelerometer-accel
-
-A 3-axis accelerometer.
-
-C++/Java implementation note: these are created as either BuiltInAccelerometer or SimDevice nodes where the device name is prefixed by ``"Accel:"``. For example, the device ``"Accel:ADXL362[1]"`` would have a device value of ``ADXL362[1]``.  The BuiltInAccelerometer uses a device name of ``"BuiltInAccel"``.
-
-| Data Key     | Type    | Description                                          |
-| ------------ | ------- | ---------------------------------------------------- |
-| ``"<init"``  | Boolean | If accelerometer is initialized in the robot program |
-| ``"<range"`` | Float   | Desired range in G’s                                 |
-| ``">x"``     | Float   | Acceleration in G’s                                  |
-| ``">y"``     | Float   | Acceleration in G’s                                  |
-| ``">z"``     | Float   | Acceleration in G’s                                  |
 
 #### Addressable LED Strip ("AddressableLED")
 
