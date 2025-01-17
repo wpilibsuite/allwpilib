@@ -87,11 +87,6 @@ public interface Frequency extends Measure<FrequencyUnit> {
     return (Frequency) div(divisor);
   }
 
-  @Override
-  default Velocity<FrequencyUnit> per(TimeUnit period) {
-    return div(period.of(1));
-  }
-
 
   @Override
   default Mult<FrequencyUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
@@ -113,6 +108,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
   @Override
   default Per<FrequencyUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<FrequencyUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -138,6 +138,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<FrequencyUnit, AngleUnit> per(AngleUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<FrequencyUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
@@ -159,6 +164,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
   @Override
   default Per<FrequencyUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<FrequencyUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -184,6 +194,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<FrequencyUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default AngularAcceleration times(AngularVelocity multiplier) {
@@ -207,6 +222,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<FrequencyUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<FrequencyUnit, CurrentUnit> times(Current multiplier) {
@@ -228,6 +248,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
   @Override
   default Per<FrequencyUnit, CurrentUnit> divide(Current divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<FrequencyUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
   @Override
@@ -275,6 +300,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<FrequencyUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<FrequencyUnit, EnergyUnit> times(Energy multiplier) {
@@ -296,6 +326,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
   @Override
   default Per<FrequencyUnit, EnergyUnit> divide(Energy divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<FrequencyUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -321,6 +356,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<FrequencyUnit, ForceUnit> per(ForceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<FrequencyUnit, FrequencyUnit> times(Frequency multiplier) {
@@ -342,6 +382,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
   @Override
   default Dimensionless divide(Frequency divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Dimensionless per(FrequencyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -367,6 +412,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<FrequencyUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<FrequencyUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
@@ -388,6 +438,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
   @Override
   default Per<FrequencyUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<FrequencyUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -413,6 +468,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<FrequencyUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<FrequencyUnit, MassUnit> times(Mass multiplier) {
@@ -434,6 +494,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
   @Override
   default Per<FrequencyUnit, MassUnit> divide(Mass divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<FrequencyUnit, MassUnit> per(MassUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -459,6 +524,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<FrequencyUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<FrequencyUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
@@ -480,6 +550,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
   @Override
   default Per<FrequencyUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<FrequencyUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
   }
 
 
@@ -505,6 +580,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<FrequencyUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
+  }
+
 
   @Override
   default Mult<FrequencyUnit, PowerUnit> times(Power multiplier) {
@@ -526,6 +606,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
   @Override
   default Per<FrequencyUnit, PowerUnit> divide(Power divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<FrequencyUnit, PowerUnit> per(PowerUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -551,6 +636,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<FrequencyUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<FrequencyUnit, TemperatureUnit> times(Temperature multiplier) {
@@ -572,6 +662,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
   @Override
   default Per<FrequencyUnit, TemperatureUnit> divide(Temperature divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<FrequencyUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -597,6 +692,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Velocity<FrequencyUnit> per(TimeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<FrequencyUnit, TorqueUnit> times(Torque multiplier) {
@@ -618,6 +718,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
   @Override
   default Per<FrequencyUnit, TorqueUnit> divide(Torque divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<FrequencyUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -643,6 +748,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<FrequencyUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<FrequencyUnit, VoltageUnit> times(Voltage multiplier) {
@@ -664,6 +774,11 @@ public interface Frequency extends Measure<FrequencyUnit> {
   @Override
   default Per<FrequencyUnit, VoltageUnit> divide(Voltage divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<FrequencyUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 /** Converts this frequency to the time period between cycles. */
 default Time asPeriod() { return Seconds.of(1 / baseUnitMagnitude()); }

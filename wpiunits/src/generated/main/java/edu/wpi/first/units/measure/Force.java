@@ -87,11 +87,6 @@ public interface Force extends Measure<ForceUnit> {
     return (Force) div(divisor);
   }
 
-  @Override
-  default Velocity<ForceUnit> per(TimeUnit period) {
-    return div(period.of(1));
-  }
-
 
   @Override
   default Mult<ForceUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
@@ -113,6 +108,11 @@ public interface Force extends Measure<ForceUnit> {
   @Override
   default Per<ForceUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ForceUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -138,6 +138,11 @@ public interface Force extends Measure<ForceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ForceUnit, AngleUnit> per(AngleUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ForceUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
@@ -159,6 +164,11 @@ public interface Force extends Measure<ForceUnit> {
   @Override
   default Per<ForceUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ForceUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -184,6 +194,11 @@ public interface Force extends Measure<ForceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ForceUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ForceUnit, AngularVelocityUnit> times(AngularVelocity multiplier) {
@@ -207,6 +222,11 @@ public interface Force extends Measure<ForceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ForceUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ForceUnit, CurrentUnit> times(Current multiplier) {
@@ -228,6 +248,11 @@ public interface Force extends Measure<ForceUnit> {
   @Override
   default Per<ForceUnit, CurrentUnit> divide(Current divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ForceUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
   @Override
@@ -275,6 +300,11 @@ public interface Force extends Measure<ForceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ForceUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ForceUnit, EnergyUnit> times(Energy multiplier) {
@@ -296,6 +326,11 @@ public interface Force extends Measure<ForceUnit> {
   @Override
   default Per<ForceUnit, EnergyUnit> divide(Energy divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ForceUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -321,6 +356,11 @@ public interface Force extends Measure<ForceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Dimensionless per(ForceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ForceUnit, FrequencyUnit> times(Frequency multiplier) {
@@ -342,6 +382,11 @@ public interface Force extends Measure<ForceUnit> {
   @Override
   default Per<ForceUnit, FrequencyUnit> divide(Frequency divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ForceUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -367,6 +412,11 @@ public interface Force extends Measure<ForceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Mass per(LinearAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ForceUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
@@ -388,6 +438,11 @@ public interface Force extends Measure<ForceUnit> {
   @Override
   default Per<ForceUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ForceUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -413,6 +468,11 @@ public interface Force extends Measure<ForceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ForceUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ForceUnit, MassUnit> times(Mass multiplier) {
@@ -434,6 +494,11 @@ public interface Force extends Measure<ForceUnit> {
   @SuppressWarnings({"deprecation", "removal"})
   default LinearAcceleration divide(Mass divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default LinearAcceleration per(MassUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -459,6 +524,11 @@ public interface Force extends Measure<ForceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ForceUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ForceUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
@@ -480,6 +550,11 @@ public interface Force extends Measure<ForceUnit> {
   @Override
   default Per<ForceUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ForceUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
   }
 
 
@@ -505,6 +580,11 @@ public interface Force extends Measure<ForceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ForceUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
+  }
+
 
   @Override
   default Mult<ForceUnit, PowerUnit> times(Power multiplier) {
@@ -526,6 +606,11 @@ public interface Force extends Measure<ForceUnit> {
   @Override
   default Per<ForceUnit, PowerUnit> divide(Power divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ForceUnit, PowerUnit> per(PowerUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -551,6 +636,11 @@ public interface Force extends Measure<ForceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ForceUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ForceUnit, TemperatureUnit> times(Temperature multiplier) {
@@ -572,6 +662,11 @@ public interface Force extends Measure<ForceUnit> {
   @Override
   default Per<ForceUnit, TemperatureUnit> divide(Temperature divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ForceUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -597,6 +692,11 @@ public interface Force extends Measure<ForceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Velocity<ForceUnit> per(TimeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ForceUnit, TorqueUnit> times(Torque multiplier) {
@@ -618,6 +718,11 @@ public interface Force extends Measure<ForceUnit> {
   @Override
   default Per<ForceUnit, TorqueUnit> divide(Torque divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ForceUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -643,6 +748,11 @@ public interface Force extends Measure<ForceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ForceUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ForceUnit, VoltageUnit> times(Voltage multiplier) {
@@ -664,6 +774,11 @@ public interface Force extends Measure<ForceUnit> {
   @Override
   default Per<ForceUnit, VoltageUnit> divide(Voltage divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ForceUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 }

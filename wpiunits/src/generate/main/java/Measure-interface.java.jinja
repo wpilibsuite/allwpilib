@@ -86,11 +86,6 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   default {{ helpers['type_usage'](name) }} divide(double divisor) {
     return ({{ helpers['type_usage'](name) }}) div(divisor);
   }
-
-  @Override
-  default {{ config[name]['divide']['Time'] or "Velocity<{}>".format(helpers['mtou'](name)) }} per(TimeUnit period) {
-    return div(period.of(1));
-  }
 {% for unit in math_units -%}
 {% if unit == "Dimensionless" %}
   @Override
@@ -147,6 +142,15 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   default {{ config[name]['divide'][unit] }} divide({{ unit }} divisor) {
     return div(divisor);
   }
+
+  @Override
+  default {{ config[name]['divide'][unit] }} per({{ helpers['mtou'](unit) }} divisorUnit) {
+{%- if unit == "Mult<?, ?>" or unit == "Per<?, ?>" %}
+    return div(divisorUnit.ofNative(1));
+{%- else %}
+    return div(divisorUnit.one());
+{%- endif %}
+  }
 {% elif unit == "Time" %}
   @Override
   default Velocity<{{ helpers['mtou'](name) }}> div({{ unit }} divisor) {
@@ -163,6 +167,15 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   @Override
   default Velocity<{{ helpers['mtou'](name) }}> divide({{ unit }} divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Velocity<{{ helpers['mtou'](name) }}> per({{ helpers['mtou'](unit) }} divisorUnit) {
+{%- if unit == "Mult<?, ?>" or unit == "Per<?, ?>" %}
+    return div(divisorUnit.ofNative(1));
+{%- else %}
+    return div(divisorUnit.one());
+{%- endif %}
   }
 {% elif unit == name %}
   @Override
@@ -181,6 +194,11 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   default Dimensionless divide({{ unit }} divisor) {
     return div(divisor);
   }
+
+  @Override
+  default Dimensionless per({{ helpers['mtou'](unit) }} divisorUnit) {
+    return div(divisorUnit.one());
+  }
 {% else %}
   @Override
   default Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> div({{ unit }} divisor) {
@@ -197,6 +215,15 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   @Override
   default Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> divide({{ unit }} divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> per({{ helpers['mtou'](unit) }} divisorUnit) {
+{%- if unit == "Mult<?, ?>" or unit == "Per<?, ?>" %}
+    return div(divisorUnit.ofNative(1));
+{%- else %}
+    return div(divisorUnit.one());
+{%- endif %}
   }
 {% endif -%}
 {% endif -%}
