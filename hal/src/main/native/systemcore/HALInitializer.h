@@ -32,7 +32,6 @@ extern void InitializeConstants();
 extern void InitializeCounter();
 extern void InitializeDigitalInternal();
 extern void InitializeDIO();
-extern void InitializeDMA();
 extern void InitializeDutyCycle();
 extern void InitializeEncoder();
 extern void InitializeFPGAEncoder();
