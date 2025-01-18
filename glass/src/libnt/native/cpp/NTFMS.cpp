@@ -9,8 +9,6 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/SmallVector.h>
-#include <wpi/timestamp.h>
 
 using namespace glass;
 

@@ -6,8 +6,6 @@
 
 #include <vector>
 
-#include <wpi/SmallString.h>
-
 #include "WebSocketTest.h"
 
 namespace wpi {

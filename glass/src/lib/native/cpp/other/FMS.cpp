@@ -8,7 +8,6 @@
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
-#include <wpi/SmallString.h>
 
 #include "glass/DataSource.h"
 
@@ -149,9 +148,8 @@ void glass::DisplayFMSReadOnly(FMSModel* model) {
     }
   }
   if (auto data = model->GetGameSpecificMessageData()) {
-    wpi::SmallString<64> gsmBuf;
     ImGui::Text("Game Specific: %s",
-                exists ? data->GetValue(gsmBuf).data() : "?");
+                exists ? data->GetValue().c_str() : "?");
   }
 
   if (!exists) {

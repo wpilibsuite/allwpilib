@@ -9,7 +9,6 @@
 #include <vector>
 
 #include <wpi/Base64.h>
-#include <wpi/SmallString.h>
 #include <wpi/sha1.h>
 
 #include "WebSocketTest.h"
