@@ -15,8 +15,6 @@
 namespace frc {
 class DigitalSource;
 class AnalogTrigger;
-class DMA;
-class DMASample;
 
 /**
  * Class to read a duty cycle PWM input.
@@ -31,34 +29,14 @@ class DMASample;
  */
 class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
   friend class AnalogTrigger;
-  friend class DMA;
-  friend class DMASample;
 
  public:
   /**
-   * Constructs a DutyCycle input from a DigitalSource input.
+   * Constructs a DutyCycle input from a smartio channel.
    *
-   * <p> This class does not own the inputted source.
-   *
-   * @param source The DigitalSource to use.
+   * @param source The channel to use.
    */
-  explicit DutyCycle(DigitalSource& source);
-  /**
-   * Constructs a DutyCycle input from a DigitalSource input.
-   *
-   * <p> This class does not own the inputted source.
-   *
-   * @param source The DigitalSource to use.
-   */
-  explicit DutyCycle(DigitalSource* source);
-  /**
-   * Constructs a DutyCycle input from a DigitalSource input.
-   *
-   * <p> This class does not own the inputted source.
-   *
-   * @param source The DigitalSource to use.
-   */
-  explicit DutyCycle(std::shared_ptr<DigitalSource> source);
+  explicit DutyCycle(int source);
 
   DutyCycle(DutyCycle&&) = default;
   DutyCycle& operator=(DutyCycle&&) = default;
@@ -121,7 +99,7 @@ class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
 
  private:
   void InitDutyCycle();
-  std::shared_ptr<DigitalSource> m_source;
+  int m_channel;
   hal::Handle<HAL_DutyCycleHandle, HAL_FreeDutyCycle> m_handle;
 };
 }  // namespace frc

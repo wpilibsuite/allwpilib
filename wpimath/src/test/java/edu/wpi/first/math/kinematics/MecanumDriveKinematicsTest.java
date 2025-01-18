@@ -227,8 +227,7 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testDesaturate() {
-    var wheelSpeeds = new MecanumDriveWheelSpeeds(5, 6, 4, 7);
-    wheelSpeeds.desaturate(5.5);
+    var wheelSpeeds = new MecanumDriveWheelSpeeds(5, 6, 4, 7).desaturate(5.5);
 
     double factor = 5.5 / 7.0;
 
@@ -241,8 +240,7 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testDesaturateNegativeSpeeds() {
-    var wheelSpeeds = new MecanumDriveWheelSpeeds(-5, 6, 4, -7);
-    wheelSpeeds.desaturate(5.5);
+    var wheelSpeeds = new MecanumDriveWheelSpeeds(-5, 6, 4, -7).desaturate(5.5);
 
     final double kFactor = 5.5 / 7.0;
 

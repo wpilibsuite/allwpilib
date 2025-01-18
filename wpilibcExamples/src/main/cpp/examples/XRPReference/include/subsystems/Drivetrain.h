@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <frc/BuiltInAccelerometer.h>
 #include <frc/Encoder.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/xrp/XRPGyro.h>
@@ -79,27 +78,6 @@ class Drivetrain : public frc2::SubsystemBase {
   units::meter_t GetAverageDistance();
 
   /**
-   * The acceleration in the X-axis.
-   *
-   * @return The acceleration of the XRP along the X-axis.
-   */
-  units::meters_per_second_squared_t GetAccelX();
-
-  /**
-   * The acceleration in the Y-axis.
-   *
-   * @return The acceleration of the XRP along the Y-axis.
-   */
-  units::meters_per_second_squared_t GetAccelY();
-
-  /**
-   * The acceleration in the Z-axis.
-   *
-   * @return The acceleration of the XRP along the Z-axis.
-   */
-  units::meters_per_second_squared_t GetAccelZ();
-
-  /**
    * Current angle of the XRP around the X-axis.
    *
    * @return The current angle of the XRP.
@@ -137,5 +115,4 @@ class Drivetrain : public frc2::SubsystemBase {
       [&](double output) { m_rightMotor.Set(output); }};
 
   frc::XRPGyro m_gyro;
-  frc::BuiltInAccelerometer m_accelerometer;
 };

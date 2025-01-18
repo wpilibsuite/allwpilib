@@ -39,8 +39,8 @@ class ConnectionListenerTest {
 
   /** Connect to the server. */
   private void connect(int port) {
-    m_serverInst.startServer("connectionlistenertest.json", "127.0.0.1", 0, port);
-    m_clientInst.startClient4("client");
+    m_serverInst.startServer("connectionlistenertest.json", "127.0.0.1", port);
+    m_clientInst.startClient("client");
     m_clientInst.setServer("127.0.0.1", port);
 
     // wait for client to report it's connected, then wait another 0.1 sec
@@ -113,7 +113,7 @@ class ConnectionListenerTest {
   @ParameterizedTest
   @ValueSource(strings = {"127.0.0.1", "127.0.0.1 ", " 127.0.0.1 "})
   void testThreaded(String address) {
-    m_serverInst.startServer("connectionlistenertest.json", address, 0, threadedPort);
+    m_serverInst.startServer("connectionlistenertest.json", address, threadedPort);
     List<NetworkTableEvent> events = new ArrayList<>();
     final int handle =
         m_serverInst.addConnectionListener(
@@ -125,7 +125,7 @@ class ConnectionListenerTest {
             });
 
     // trigger a connect event
-    m_clientInst.startClient4("client");
+    m_clientInst.startClient("client");
     m_clientInst.setServer(address, threadedPort);
     threadedPort++;
 

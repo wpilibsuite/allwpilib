@@ -1,4 +1,4 @@
-if (project.hasProperty('onlylinuxathena')) {
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore')) {
     return;
 }
 
@@ -32,7 +32,7 @@ model {
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':fieldImages', library: 'fieldImages', linkage: 'static'
             lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
-            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                 it.buildable = false
                 return
             }

@@ -18,8 +18,7 @@
 using namespace frc;
 
 DutyCycleEncoder::DutyCycleEncoder(int channel)
-    : m_dutyCycle{std::make_shared<DutyCycle>(
-          std::make_shared<DigitalInput>(channel))} {
+    : m_dutyCycle{std::make_shared<DutyCycle>(channel)} {
   Init(1.0, 0.0);
 }
 
@@ -38,25 +37,9 @@ DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle)
   Init(1.0, 0.0);
 }
 
-DutyCycleEncoder::DutyCycleEncoder(DigitalSource& digitalSource)
-    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
-  Init(1.0, 0.0);
-}
-
-DutyCycleEncoder::DutyCycleEncoder(DigitalSource* digitalSource)
-    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
-  Init(1.0, 0.0);
-}
-
-DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource)
-    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
-  Init(1.0, 0.0);
-}
-
 DutyCycleEncoder::DutyCycleEncoder(int channel, double fullRange,
                                    double expectedZero)
-    : m_dutyCycle{std::make_shared<DutyCycle>(
-          std::make_shared<DigitalInput>(channel))} {
+    : m_dutyCycle{std::make_shared<DutyCycle>(channel)} {
   Init(fullRange, expectedZero);
 }
 
@@ -75,24 +58,6 @@ DutyCycleEncoder::DutyCycleEncoder(DutyCycle* dutyCycle, double fullRange,
 DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle,
                                    double fullRange, double expectedZero)
     : m_dutyCycle{std::move(dutyCycle)} {
-  Init(fullRange, expectedZero);
-}
-
-DutyCycleEncoder::DutyCycleEncoder(DigitalSource& digitalSource,
-                                   double fullRange, double expectedZero)
-    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
-  Init(fullRange, expectedZero);
-}
-
-DutyCycleEncoder::DutyCycleEncoder(DigitalSource* digitalSource,
-                                   double fullRange, double expectedZero)
-    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
-  Init(fullRange, expectedZero);
-}
-
-DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource,
-                                   double fullRange, double expectedZero)
-    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
   Init(fullRange, expectedZero);
 }
 

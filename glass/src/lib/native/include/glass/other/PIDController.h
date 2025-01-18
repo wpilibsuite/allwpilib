@@ -7,16 +7,16 @@
 #include "glass/Model.h"
 
 namespace glass {
-class DataSource;
+class DoubleSource;
 class PIDControllerModel : public Model {
  public:
   virtual const char* GetName() const = 0;
 
-  virtual DataSource* GetPData() = 0;
-  virtual DataSource* GetIData() = 0;
-  virtual DataSource* GetDData() = 0;
-  virtual DataSource* GetSetpointData() = 0;
-  virtual DataSource* GetIZoneData() = 0;
+  virtual DoubleSource* GetPData() = 0;
+  virtual DoubleSource* GetIData() = 0;
+  virtual DoubleSource* GetDData() = 0;
+  virtual DoubleSource* GetSetpointData() = 0;
+  virtual DoubleSource* GetIZoneData() = 0;
 
   virtual void SetP(double value) = 0;
   virtual void SetI(double value) = 0;

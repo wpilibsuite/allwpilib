@@ -56,8 +56,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Linux (native)",  os: ubuntu-22.04,   action: "test",  config: "--config=linux",    }
-          - { name: "Linux (roborio)", os: ubuntu-22.04,   action: "build", config: "--config=roborio",  }
+          - { name: "Linux (native)",  os: ubuntu-24.04,   action: "test",  config: "--config=linux",    }
+          - { name: "Linux (systemcore)",  os: ubuntu-24.04,   action: "build",  config: "--config=systemcore",    }
     name: "${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
     steps:
@@ -75,7 +75,7 @@ jobs:
 
   buildifier:
     name: "buildifier"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Set up Go 1.15.x
         uses: actions/setup-go@v5

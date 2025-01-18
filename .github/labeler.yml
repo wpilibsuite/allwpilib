@@ -33,9 +33,6 @@
 'component: sysid':
 - changed-files:
   - any-glob-to-any-file: sysid/**
-'component: teamnumbersetter':
-- changed-files:
-  - any-glob-to-any-file: roborioteamnumbersetter/**
 'component: wpilibc':
 - changed-files:
   - any-glob-to-any-file: wpilibc/**

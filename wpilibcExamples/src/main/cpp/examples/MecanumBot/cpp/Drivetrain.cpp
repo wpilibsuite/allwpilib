@@ -4,6 +4,8 @@
 
 #include "Drivetrain.h"
 
+#include <frc/kinematics/ChassisSpeeds.h>
+
 frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
   return {units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
           units::meters_per_second_t{m_frontRightEncoder.GetRate()},
@@ -51,13 +53,12 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
                        units::meters_per_second_t ySpeed,
                        units::radians_per_second_t rot, bool fieldRelative,
                        units::second_t period) {
-  auto wheelSpeeds = m_kinematics.ToWheelSpeeds(frc::ChassisSpeeds::Discretize(
-      fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                          xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
-                    : frc::ChassisSpeeds{xSpeed, ySpeed, rot},
-      period));
-  wheelSpeeds.Desaturate(kMaxSpeed);
-  SetSpeeds(wheelSpeeds);
+  frc::ChassisSpeeds chassisSpeeds{xSpeed, ySpeed, rot};
+  if (fieldRelative) {
+    chassisSpeeds = chassisSpeeds.ToRobotRelative(m_gyro.GetRotation2d());
+  }
+  SetSpeeds(m_kinematics.ToWheelSpeeds(chassisSpeeds.Discretize(period))
+                .Desaturate(kMaxSpeed));
 }
 
 void Drivetrain::UpdateOdometry() {

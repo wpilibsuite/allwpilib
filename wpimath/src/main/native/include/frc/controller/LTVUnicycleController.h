@@ -4,15 +4,16 @@
 
 #pragma once
 
+#include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
-#include <wpi/interpolating_map.h>
 
-#include "frc/EigenCore.h"
+#include "frc/StateSpaceUtil.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/trajectory/Trajectory.h"
 #include "units/angular_velocity.h"
+#include "units/math.h"
 #include "units/time.h"
 #include "units/velocity.h"
 
@@ -22,9 +23,6 @@ namespace frc {
  * The linear time-varying unicycle controller has a similar form to the LQR,
  * but the model used to compute the controller gain is the nonlinear unicycle
  * model linearized around the drivetrain's current state.
- *
- * This controller is a roughly drop-in replacement for RamseteController with
- * more optimal feedback gains in the "least-squares error" sense.
  *
  * See section 8.9 in Controls Engineering in FRC for a derivation of the
  * control law we used shown in theorem 8.9.1.
@@ -38,12 +36,9 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    * angular velocity = 2 rad/s).
    *
    * @param dt Discretization timestep.
-   * @param maxVelocity The maximum velocity for the controller gain lookup
-   *                    table.
-   * @throws std::domain_error if maxVelocity <= 0 m/s or >= 15 m/s.
    */
-  explicit LTVUnicycleController(
-      units::second_t dt, units::meters_per_second_t maxVelocity = 9_mps);
+  explicit LTVUnicycleController(units::second_t dt)
+      : LTVUnicycleController{{0.0625, 0.125, 2.0}, {1.0, 2.0}, dt} {}
 
   /**
    * Constructs a linear time-varying unicycle controller.
@@ -57,13 +52,12 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    * @param Relems The maximum desired control effort for each input (linear
    *               velocity, angular velocity).
    * @param dt     Discretization timestep.
-   * @param maxVelocity The maximum velocity for the controller gain lookup
-   *                    table.
-   * @throws std::domain_error if maxVelocity <= 0 m/s or >= 15 m/s.
    */
   LTVUnicycleController(const wpi::array<double, 3>& Qelems,
-                        const wpi::array<double, 2>& Relems, units::second_t dt,
-                        units::meters_per_second_t maxVelocity = 9_mps);
+                        const wpi::array<double, 2>& Relems, units::second_t dt)
+      : m_Q{frc::MakeCostMatrix(Qelems)},
+        m_R{frc::MakeCostMatrix(Relems)},
+        m_dt{dt} {}
 
   /**
    * Move constructor.
@@ -78,7 +72,15 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
   /**
    * Returns true if the pose error is within tolerance of the reference.
    */
-  bool AtReference() const;
+  bool AtReference() const {
+    const auto& eTranslate = m_poseError.Translation();
+    const auto& eRotate = m_poseError.Rotation();
+    const auto& tolTranslate = m_poseTolerance.Translation();
+    const auto& tolRotate = m_poseTolerance.Rotation();
+    return units::math::abs(eTranslate.X()) < tolTranslate.X() &&
+           units::math::abs(eTranslate.Y()) < tolTranslate.Y() &&
+           units::math::abs(eRotate.Radians()) < tolRotate.Radians();
+  }
 
   /**
    * Sets the pose error which is considered tolerable for use with
@@ -86,7 +88,9 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    *
    * @param poseTolerance Pose error which is tolerable.
    */
-  void SetTolerance(const Pose2d& poseTolerance);
+  void SetTolerance(const Pose2d& poseTolerance) {
+    m_poseTolerance = poseTolerance;
+  }
 
   /**
    * Returns the linear and angular velocity outputs of the LTV controller.
@@ -114,18 +118,24 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    *                     from a trajectory.
    */
   ChassisSpeeds Calculate(const Pose2d& currentPose,
-                          const Trajectory::State& desiredState);
+                          const Trajectory::State& desiredState) {
+    return Calculate(currentPose, desiredState.pose, desiredState.velocity,
+                     desiredState.velocity * desiredState.curvature);
+  }
 
   /**
    * Enables and disables the controller for troubleshooting purposes.
    *
    * @param enabled If the controller is enabled or not.
    */
-  void SetEnabled(bool enabled);
+  void SetEnabled(bool enabled) { m_enabled = enabled; }
 
  private:
-  // LUT from drivetrain linear velocity to LQR gain
-  wpi::interpolating_map<units::meters_per_second_t, Matrixd<2, 3>> m_table;
+  // LQR cost matrices
+  Eigen::Matrix<double, 3, 3> m_Q;
+  Eigen::Matrix<double, 2, 2> m_R;
+
+  units::second_t m_dt;
 
   Pose2d m_poseError;
   Pose2d m_poseTolerance;

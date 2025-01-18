@@ -7,14 +7,13 @@ if (project.hasProperty('ciDebugOnly')) {
 }
 
 nativeUtils.addWpiNativeUtils()
-nativeUtils.withCrossRoboRIO()
 nativeUtils.withCrossLinuxArm32()
 nativeUtils.withCrossLinuxArm64()
+nativeUtils.withCrossSystemCore()
 nativeUtils {
     wpi {
         configureDependencies {
             opencvYear = "frc2025"
-            niLibVersion = "2025.2.0"
             opencvVersion = "4.10.0-3"
         }
     }

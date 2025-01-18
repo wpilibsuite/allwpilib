@@ -63,18 +63,6 @@ units::meter_t Drivetrain::GetAverageDistance() {
   return (GetLeftDistance() + GetRightDistance()) / 2.0;
 }
 
-units::meters_per_second_squared_t Drivetrain::GetAccelX() {
-  return units::meters_per_second_squared_t{m_accelerometer.GetX()};
-}
-
-units::meters_per_second_squared_t Drivetrain::GetAccelY() {
-  return units::meters_per_second_squared_t{m_accelerometer.GetY()};
-}
-
-units::meters_per_second_squared_t Drivetrain::GetAccelZ() {
-  return units::meters_per_second_squared_t{m_accelerometer.GetZ()};
-}
-
 units::radian_t Drivetrain::GetGyroAngleX() {
   return m_gyro.GetAngleX();
 }

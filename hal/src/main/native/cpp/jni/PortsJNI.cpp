@@ -15,19 +15,6 @@ using namespace hal;
 extern "C" {
 /*
  * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumAccumulators
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumAccumulators
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumAccumulators();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumAnalogTriggers
  * Signature: ()I
  */
@@ -49,19 +36,6 @@ Java_edu_wpi_first_hal_PortsJNI_getNumAnalogInputs
   (JNIEnv* env, jclass)
 {
   jint value = HAL_GetNumAnalogInputs();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumAnalogOutputs
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumAnalogOutputs
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumAnalogOutputs();
   return value;
 }
 
@@ -166,32 +140,6 @@ Java_edu_wpi_first_hal_PortsJNI_getNumInterrupts
   (JNIEnv* env, jclass)
 {
   jint value = HAL_GetNumInterrupts();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumRelayChannels
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumRelayChannels
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumRelayChannels();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumRelayHeaders
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumRelayHeaders
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumRelayHeaders();
   return value;
 }
 

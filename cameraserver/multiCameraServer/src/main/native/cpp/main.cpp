@@ -190,7 +190,7 @@ int main(int argc, char* argv[]) {
     ntinst.StartServer();
   } else {
     wpi::print("Setting up NetworkTables client for team {}\n", team);
-    ntinst.StartClient4("multicameraserver");
+    ntinst.StartClient("multicameraserver");
     ntinst.SetServerTeam(team);
   }
 

@@ -182,5 +182,18 @@
       "deadbandMin": 1.480,
       "min": 0.997
     }
+  },
+  {
+    "name": "SparkMini",
+    "Manufacturer": "REV Robotics",
+    "DisplayName": "SPARKMini",
+    "ResourceName": "RevSPARK",
+    "pulse_width_ms": {
+      "max": 2.5,
+      "deadbandMax": 1.51,
+      "center": 1.5,
+      "deadbandMin": 1.49,
+      "min": 0.5
+    }
   }
 ]

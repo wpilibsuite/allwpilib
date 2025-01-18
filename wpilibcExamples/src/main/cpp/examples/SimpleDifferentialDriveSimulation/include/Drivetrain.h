@@ -13,7 +13,6 @@
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/simulation/AnalogGyroSim.h>
 #include <frc/simulation/DifferentialDrivetrainSim.h>
 #include <frc/simulation/EncoderSim.h>
 #include <frc/smartdashboard/Field2d.h>
@@ -100,7 +99,6 @@ class Drivetrain {
   frc::SimpleMotorFeedforward<units::meters> m_feedforward{1_V, 3_V / 1_mps};
 
   // Simulation classes help us simulate our robot
-  frc::sim::AnalogGyroSim m_gyroSim{m_gyro};
   frc::sim::EncoderSim m_leftEncoderSim{m_leftEncoder};
   frc::sim::EncoderSim m_rightEncoderSim{m_rightEncoder};
   frc::Field2d m_fieldSim;

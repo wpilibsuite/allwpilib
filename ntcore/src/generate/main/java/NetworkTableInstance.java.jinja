@@ -49,11 +49,8 @@ public final class NetworkTableInstance implements AutoCloseable {
     /** Running in server mode. */
     kServer(0x01),
 
-    /** Running in NT3 client mode. */
-    kClient3(0x02),
-
-    /** Running in NT4 client mode. */
-    kClient4(0x04),
+    /** Running in client mode. */
+    kClient(0x04),
 
     /** Currently starting up (either client or server). */
     kStarting(0x08),
@@ -77,11 +74,8 @@ public final class NetworkTableInstance implements AutoCloseable {
     }
   }
 
-  /** The default port that network tables operates on for NT3. */
-  public static final int kDefaultPort3 = 1735;
-
-  /** The default port that network tables operates on for NT4. */
-  public static final int kDefaultPort4 = 5810;
+  /** The default port that network tables operates on. */
+  public static final int kDefaultPort = 5810;
 
   /**
    * Construct from native handle.
@@ -138,6 +132,16 @@ public final class NetworkTableInstance implements AutoCloseable {
     NetworkTableInstance inst = new NetworkTableInstance(NetworkTablesJNI.createInstance());
     inst.m_owned = true;
     return inst;
+  }
+
+  /**
+   * Create an instance from a native handle. This instance is not owned, closing will do nothing.
+   *
+   * @param handle Native instance handle
+   * @return Instance
+   */
+  public static NetworkTableInstance fromNativeHandle(int handle) {
+    return new NetworkTableInstance(handle);
   }
 
   /**
@@ -897,7 +901,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param listenAddress the address to listen on, or empty to listen on any address
    */
   public void startServer(String persistFilename, String listenAddress) {
-    startServer(persistFilename, listenAddress, kDefaultPort3, kDefaultPort4);
+    startServer(persistFilename, listenAddress, kDefaultPort);
   }
 
   /**
@@ -905,22 +909,10 @@ public final class NetworkTableInstance implements AutoCloseable {
    *
    * @param persistFilename the name of the persist file to use
    * @param listenAddress the address to listen on, or empty to listen on any address
-   * @param port3 port to communicate over (NT3)
+   * @param port port to communicate over
    */
-  public void startServer(String persistFilename, String listenAddress, int port3) {
-    startServer(persistFilename, listenAddress, port3, kDefaultPort4);
-  }
-
-  /**
-   * Starts a server using the specified filename, listening address, and port.
-   *
-   * @param persistFilename the name of the persist file to use
-   * @param listenAddress the address to listen on, or empty to listen on any address
-   * @param port3 port to communicate over (NT3)
-   * @param port4 port to communicate over (NT4)
-   */
-  public void startServer(String persistFilename, String listenAddress, int port3, int port4) {
-    NetworkTablesJNI.startServer(m_handle, persistFilename, listenAddress, port3, port4);
+  public void startServer(String persistFilename, String listenAddress, int port) {
+    NetworkTablesJNI.startServer(m_handle, persistFilename, listenAddress, port);
   }
 
   /** Stops the server if it is running. */
@@ -929,21 +921,12 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /**
-   * Starts a NT3 client. Use SetServer or SetServerTeam to set the server name and port.
+   * Starts a client. Use SetServer or SetServerTeam to set the server name and port.
    *
    * @param identity network identity to advertise (cannot be empty string)
    */
-  public void startClient3(String identity) {
-    NetworkTablesJNI.startClient3(m_handle, identity);
-  }
-
-  /**
-   * Starts a NT4 client. Use SetServer or SetServerTeam to set the server name and port.
-   *
-   * @param identity network identity to advertise (cannot be empty string)
-   */
-  public void startClient4(String identity) {
-    NetworkTablesJNI.startClient4(m_handle, identity);
+  public void startClient(String identity) {
+    NetworkTablesJNI.startClient(m_handle, identity);
   }
 
   /** Stops the client if it is running. */

@@ -11,29 +11,45 @@ cc_library(
     visibility = ["//hal:__subpackages__"],
 )
 
+cc_library(
+    name = "mrc_cc_headers",
+    hdrs = glob(["src/mrc/include/**"]),
+    includes = ["src/mrc/include"],
+    strip_include_prefix = "src/mrc/include",
+    visibility = ["//hal:__subpackages__"],
+)
+
+cc_library(
+    name = "generated_mrc_cc_headers",
+    hdrs = glob(["src/generated/main/native/cpp/mrc/protobuf/**"]),
+    includes = ["src/generated/main/native/cpp/mrc/protobuf"],
+    strip_include_prefix = "src/generated/main/native/cpp/mrc/protobuf",
+    visibility = ["//hal:__subpackages__"],
+)
+
 filegroup(
     name = "generated_java",
     srcs = glob(["src/generated/main/java/**/*.java"]),
     visibility = ["//hal:__subpackages__"],
 )
 
-ATHENA_SRCS = glob(["src/main/native/athena/**"])
+SYSTEMCORE_SRCS = glob(["src/main/native/systemcore/**"])
 
-ATHENA_DEPS = ["@bzlmodrio-ni//libraries/cpp/ni:shared"]
+SYSTEMCORE_DEPS = ["//ntcore:ntcore.static"]
 
 SIM_SRCS = glob(["src/main/native/sim/**"])
 
 SIM_DEPS = []
 
 HAL_DEPS = select({
-    "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ATHENA_DEPS,
+    "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": SYSTEMCORE_DEPS,
     "//conditions:default": SIM_DEPS,
 })
 
 filegroup(
     name = "platform-srcs",
     srcs = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ATHENA_SRCS,
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": SYSTEMCORE_SRCS,
         "//conditions:default": SIM_SRCS,
     }),
 )
@@ -41,7 +57,10 @@ filegroup(
 cc_library(
     name = "wpiHal.static",
     srcs = [":platform-srcs"] + glob(
-        ["src/main/native/cpp/**"],
+        [
+            "src/main/native/cpp/**",
+            "src/generated/main/native/cpp/**",
+        ],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**/*"]),
@@ -50,6 +69,10 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":generated_cc_headers",
+        ":mrc_cc_headers",
+        ":generated_mrc_cc_headers",
+        "//ntcore:ntcore.static",
+        "//wpinet:wpinet.static",
         "//wpiutil:wpiutil.static",
     ] + HAL_DEPS,
 )
@@ -70,6 +93,8 @@ wpilib_jni_java_library(
     native_libs = [":wpiHaljni"],
     visibility = ["//visibility:public"],
     deps = [
+        "//ntcore:networktables-java",
+        "//wpinet:wpinet-java",
         "//wpiutil:wpiutil-java",
     ],
 )

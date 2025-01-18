@@ -527,22 +527,18 @@ void NT_StopLocal(NT_Inst inst) {
 }
 
 void NT_StartServer(NT_Inst inst, const struct WPI_String* persist_filename,
-                    const struct WPI_String* listen_address, unsigned int port3,
-                    unsigned int port4) {
+                    const struct WPI_String* listen_address,
+                    unsigned int port) {
   nt::StartServer(inst, wpi::to_string_view(persist_filename),
-                  wpi::to_string_view(listen_address), port3, port4);
+                  wpi::to_string_view(listen_address), port);
 }
 
 void NT_StopServer(NT_Inst inst) {
   nt::StopServer(inst);
 }
 
-void NT_StartClient3(NT_Inst inst, const struct WPI_String* identity) {
-  nt::StartClient3(inst, wpi::to_string_view(identity));
-}
-
-void NT_StartClient4(NT_Inst inst, const struct WPI_String* identity) {
-  nt::StartClient4(inst, wpi::to_string_view(identity));
+void NT_StartClient(NT_Inst inst, const struct WPI_String* identity) {
+  nt::StartClient(inst, wpi::to_string_view(identity));
 }
 
 void NT_StopClient(NT_Inst inst) {

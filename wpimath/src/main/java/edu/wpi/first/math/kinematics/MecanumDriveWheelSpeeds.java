@@ -83,23 +83,27 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
    * absolute threshold, while maintaining the ratio of speeds between wheels.
    *
    * @param attainableMaxSpeedMetersPerSecond The absolute max speed that a wheel can reach.
+   * @return Desaturated MecanumDriveWheelSpeeds.
    */
-  public void desaturate(double attainableMaxSpeedMetersPerSecond) {
+  public MecanumDriveWheelSpeeds desaturate(double attainableMaxSpeedMetersPerSecond) {
     double realMaxSpeed =
         Math.max(Math.abs(frontLeftMetersPerSecond), Math.abs(frontRightMetersPerSecond));
     realMaxSpeed = Math.max(realMaxSpeed, Math.abs(rearLeftMetersPerSecond));
     realMaxSpeed = Math.max(realMaxSpeed, Math.abs(rearRightMetersPerSecond));
 
     if (realMaxSpeed > attainableMaxSpeedMetersPerSecond) {
-      frontLeftMetersPerSecond =
-          frontLeftMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond;
-      frontRightMetersPerSecond =
-          frontRightMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond;
-      rearLeftMetersPerSecond =
-          rearLeftMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond;
-      rearRightMetersPerSecond =
-          rearRightMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond;
+      return new MecanumDriveWheelSpeeds(
+          frontLeftMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond,
+          frontRightMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond,
+          rearLeftMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond,
+          rearRightMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond);
     }
+
+    return new MecanumDriveWheelSpeeds(
+        frontLeftMetersPerSecond,
+        frontRightMetersPerSecond,
+        rearLeftMetersPerSecond,
+        rearRightMetersPerSecond);
   }
 
   /**
@@ -111,9 +115,10 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
    * absolute threshold, while maintaining the ratio of speeds between wheels.
    *
    * @param attainableMaxSpeed The absolute max speed that a wheel can reach.
+   * @return Desaturated MecanumDriveWheelSpeeds.
    */
-  public void desaturate(LinearVelocity attainableMaxSpeed) {
-    desaturate(attainableMaxSpeed.in(MetersPerSecond));
+  public MecanumDriveWheelSpeeds desaturate(LinearVelocity attainableMaxSpeed) {
+    return desaturate(attainableMaxSpeed.in(MetersPerSecond));
   }
 
   /**

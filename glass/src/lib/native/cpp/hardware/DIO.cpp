@@ -75,14 +75,14 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
         dioData->LabelText(label, "unknown");
         ImGui::PopStyleColor();
       } else if (model->IsReadOnly()) {
-        dioData->LabelText(
-            label, "%s",
-            outputsEnabled ? (dioData->GetValue() != 0 ? "1 (high)" : "0 (low)")
-                           : "1 (disabled)");
+        dioData->LabelText(label, "%s",
+                           outputsEnabled
+                               ? (dioData->GetValue() ? "1 (high)" : "0 (low)")
+                               : "1 (disabled)");
 
       } else {
         static const char* options[] = {"0 (low)", "1 (high)"};
-        int val = dioData->GetValue() != 0 ? 1 : 0;
+        int val = dioData->GetValue() ? 1 : 0;
         if (dioData->Combo(label, &val, options, 2)) {
           model->SetValue(val);
         }

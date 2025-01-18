@@ -124,20 +124,6 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming continuous control.
-   *
-   * @param velocity The velocity setpoint.
-   * @param acceleration The acceleration setpoint.
-   * @return The computed feedforward.
-   * @deprecated Use {@link #calculateWithVelocities(double, double)} instead.
-   */
-  @SuppressWarnings("removal")
-  @Deprecated(forRemoval = true, since = "2025")
-  public double calculate(double velocity, double acceleration) {
-    return ks * Math.signum(velocity) + kv * velocity + ka * acceleration;
-  }
-
-  /**
    * Calculates the feedforward from the gains and velocity setpoint assuming continuous control
    * (acceleration is assumed to be zero).
    *
@@ -157,7 +143,7 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    * @param nextVelocity The next velocity setpoint.
    * @return The computed feedforward.
    */
-  public double calculateWithVelocities(double currentVelocity, double nextVelocity) {
+  public double calculate(double currentVelocity, double nextVelocity) {
     // See wpimath/algorithms.md#Simple_motor_feedforward for derivation
     if (ka == 0.0) {
       return ks * Math.signum(nextVelocity) + kv * nextVelocity;

@@ -12,7 +12,9 @@
 
 namespace glass {
 
-class DataSource;
+class BooleanSource;
+class DoubleSource;
+class IntegerSource;
 
 class EncoderModel : public Model {
  public:
@@ -23,12 +25,12 @@ class EncoderModel : public Model {
   virtual int GetChannelA() const = 0;
   virtual int GetChannelB() const = 0;
 
-  virtual DataSource* GetDistancePerPulseData() = 0;
-  virtual DataSource* GetCountData() = 0;
-  virtual DataSource* GetPeriodData() = 0;
-  virtual DataSource* GetDirectionData() = 0;
-  virtual DataSource* GetDistanceData() = 0;
-  virtual DataSource* GetRateData() = 0;
+  virtual DoubleSource* GetDistancePerPulseData() = 0;
+  virtual IntegerSource* GetCountData() = 0;
+  virtual DoubleSource* GetPeriodData() = 0;
+  virtual BooleanSource* GetDirectionData() = 0;
+  virtual DoubleSource* GetDistanceData() = 0;
+  virtual DoubleSource* GetRateData() = 0;
 
   virtual double GetMaxPeriod() = 0;
   virtual bool GetReverseDirection() = 0;
