@@ -18,6 +18,7 @@
 #include <numbers>
 #include <utility>
 
+#include <fmt/format.h>
 #include <hal/HAL.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -374,7 +375,8 @@ bool ADIS16448_IMU::SwitchToStandardSPI() {
   // Validate the product ID
   uint16_t prod_id = ReadRegister(PROD_ID);
   if (prod_id != 16448) {
-    REPORT_ERROR("Could not find ADIS16448!");
+    REPORT_ERROR(
+        fmt::format("Could not find ADIS16448; got product ID {}", prod_id));
     Close();
     return false;
   }
