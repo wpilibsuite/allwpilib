@@ -54,3 +54,12 @@
 'component: wpiutil':
 - changed-files:
   - any-glob-to-any-file: wpiutil/**
+'component: wpical':
+- changed-files:
+  - any-glob-to-any-file: wpical/**
+'component: usage reporting':
+- changed-files:
+  - any-glob-to-any-file: hal/src/generate/**
+ 'attn: NI':
+- changed-files:
+  - any-glob-to-any-file: hal/src/generate/**
