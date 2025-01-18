@@ -137,6 +137,19 @@ class Pose3dTest {
   }
 
   @Test
+  void testRotateAround() {
+    var initial = new Pose3d(new Translation3d(5, 0, 0), Rotation3d.kZero);
+    var point = Translation3d.kZero;
+
+    var rotated = initial.rotateAround(point, new Rotation3d(0, 0, Math.PI));
+
+    assertAll(
+        () -> assertEquals(-5.0, rotated.getX(), kEpsilon),
+        () -> assertEquals(0.0, rotated.getY(), kEpsilon),
+        () -> assertEquals(Math.PI, rotated.getRotation().getZ(), kEpsilon));
+  }
+
+  @Test
   void testEquality() {
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 

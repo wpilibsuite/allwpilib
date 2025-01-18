@@ -13,7 +13,6 @@
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "SmartIo.h"
-#include "hal/AnalogAccumulator.h"
 #include "hal/Errors.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/HandlesInternal.h"
@@ -172,7 +171,7 @@ double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
 
   uint16_t ret = 0;
   *status = port->GetAnalogInput(&ret);
-  return ret / 1000.0;
+  return ret / 4095.0 * 3.3;
 }
 
 double HAL_GetAnalogValueToVolts(HAL_AnalogInputHandle analogPortHandle,

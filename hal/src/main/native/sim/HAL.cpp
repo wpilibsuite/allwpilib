@@ -66,11 +66,8 @@ void InitializeDriverStation();
 
 namespace hal::init {
 void InitializeHAL() {
-  InitializeAccelerometerData();
   InitializeAddressableLEDData();
-  InitializeAnalogGyroData();
   InitializeAnalogInData();
-  InitializeAnalogOutData();
   InitializeAnalogTriggerData();
   InitializeCanData();
   InitializeCANAPI();
@@ -84,18 +81,11 @@ void InitializeHAL() {
   InitializeREVPHData();
   InitializePowerDistributionData();
   InitializePWMData();
-  InitializeRelayData();
   InitializeRoboRioData();
   InitializeSimDeviceData();
-  InitializeSPIAccelerometerData();
-  InitializeSPIData();
-  InitializeAccelerometer();
   InitializeAddressableLED();
-  InitializeAnalogAccumulator();
-  InitializeAnalogGyro();
   InitializeAnalogInput();
   InitializeAnalogInternal();
-  InitializeAnalogOutput();
   InitializeAnalogTrigger();
   InitializeCAN();
   InitializeConstants();
@@ -117,10 +107,8 @@ void InitializeHAL() {
   InitializeCTREPCM();
   InitializeREVPH();
   InitializePWM();
-  InitializeRelay();
   InitializeSerialPort();
   InitializeSimDevice();
-  InitializeSPI();
   InitializeThreads();
 }
 }  // namespace hal::init

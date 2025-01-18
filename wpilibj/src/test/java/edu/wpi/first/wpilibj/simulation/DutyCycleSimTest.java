@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
@@ -25,8 +24,7 @@ class DutyCycleSimTest {
     BooleanCallback callback = new BooleanCallback();
 
     try (CallbackStore cb = sim.registerInitializedCallback(callback, false);
-        DigitalInput di = new DigitalInput(2);
-        DutyCycle dc = new DutyCycle(di)) {
+        DutyCycle dc = new DutyCycle(2)) {
       assertTrue(sim.getInitialized());
       assertTrue(callback.wasTriggered());
       assertTrue(callback.getSetValue());
@@ -37,8 +35,7 @@ class DutyCycleSimTest {
   void setFrequencyTest() {
     HAL.initialize(500, 0);
 
-    try (DigitalInput di = new DigitalInput(2);
-        DutyCycle dc = new DutyCycle(di)) {
+    try (DutyCycle dc = new DutyCycle(2)) {
       IntCallback callback = new IntCallback();
       DutyCycleSim sim = new DutyCycleSim(dc);
       try (CallbackStore cb = sim.registerFrequencyCallback(callback, false)) {
@@ -55,8 +52,7 @@ class DutyCycleSimTest {
   void setOutputTest() {
     HAL.initialize(500, 0);
 
-    try (DigitalInput di = new DigitalInput(2);
-        DutyCycle dc = new DutyCycle(di)) {
+    try (DutyCycle dc = new DutyCycle(2)) {
       DoubleCallback callback = new DoubleCallback();
       DutyCycleSim sim = new DutyCycleSim(dc);
       try (CallbackStore cb = sim.registerOutputCallback(callback, false)) {

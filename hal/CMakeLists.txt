@@ -22,7 +22,7 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/hal>
 )
-target_link_libraries(hal PUBLIC wpiutil)
+target_link_libraries(hal PUBLIC ntcore wpiutil)
 
 set_property(TARGET hal PROPERTY FOLDER "libraries")
 

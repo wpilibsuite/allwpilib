@@ -120,6 +120,8 @@ uint64_t RawSinkImpl::GrabFrameImpl(WPI_RawFrame& rawFrame,
   rawFrame.pixelFormat = newImage->pixelFormat;
   rawFrame.size = newImage->size();
   std::copy(newImage->data(), newImage->data() + rawFrame.size, rawFrame.data);
+  rawFrame.timestamp = incomingFrame.GetTime();
+  rawFrame.timestampSrc = incomingFrame.GetTimeSource();
 
   return incomingFrame.GetTime();
 }

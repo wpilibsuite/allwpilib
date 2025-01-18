@@ -50,7 +50,7 @@ struct EigenBase {
   /** \returns a const reference to the derived object */
   EIGEN_DEVICE_FUNC constexpr const Derived& derived() const { return *static_cast<const Derived*>(this); }
 
-  EIGEN_DEVICE_FUNC inline Derived& const_cast_derived() const {
+  EIGEN_DEVICE_FUNC inline constexpr Derived& const_cast_derived() const {
     return *static_cast<Derived*>(const_cast<EigenBase*>(this));
   }
   EIGEN_DEVICE_FUNC inline const Derived& const_derived() const { return *static_cast<const Derived*>(this); }

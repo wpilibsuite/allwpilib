@@ -272,6 +272,17 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   }
 
   /**
+   * Rotates the current pose around a point in 3D space.
+   *
+   * @param point The point in 3D space to rotate around.
+   * @param rot The rotation to rotate the pose by.
+   * @return The new rotated pose.
+   */
+  public Pose3d rotateAround(Translation3d point, Rotation3d rot) {
+    return new Pose3d(m_translation.rotateAround(point, rot), m_rotation.rotateBy(rot));
+  }
+
+  /**
    * Obtain a new Pose3d from a (constant curvature) velocity.
    *
    * <p>The twist is a change in pose in the robot's coordinate frame since the previous pose

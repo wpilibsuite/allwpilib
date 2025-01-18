@@ -16,11 +16,8 @@ inline void CheckInit() {
   RunInitialize();
 }
 
-extern void InitializeAccelerometerData();
 extern void InitializeAddressableLEDData();
-extern void InitializeAnalogGyroData();
 extern void InitializeAnalogInData();
-extern void InitializeAnalogOutData();
 extern void InitializeAnalogTriggerData();
 extern void InitializeCanData();
 extern void InitializeCANAPI();
@@ -35,18 +32,11 @@ extern void InitializeCTREPCMData();
 extern void InitializeREVPHData();
 extern void InitializePowerDistributionData();
 extern void InitializePWMData();
-extern void InitializeRelayData();
 extern void InitializeRoboRioData();
 extern void InitializeSimDeviceData();
-extern void InitializeSPIAccelerometerData();
-extern void InitializeSPIData();
-extern void InitializeAccelerometer();
 extern void InitializeAddressableLED();
-extern void InitializeAnalogAccumulator();
-extern void InitializeAnalogGyro();
 extern void InitializeAnalogInput();
 extern void InitializeAnalogInternal();
-extern void InitializeAnalogOutput();
 extern void InitializeAnalogTrigger();
 extern void InitializeCAN();
 extern void InitializeConstants();
@@ -68,10 +58,8 @@ extern void InitializePower();
 extern void InitializeCTREPCM();
 extern void InitializeREVPH();
 extern void InitializePWM();
-extern void InitializeRelay();
 extern void InitializeSerialPort();
 extern void InitializeSimDevice();
-extern void InitializeSPI();
 extern void InitializeThreads();
 
 }  // namespace hal::init

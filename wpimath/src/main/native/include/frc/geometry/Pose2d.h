@@ -185,6 +185,19 @@ class WPILIB_DLLEXPORT Pose2d {
   constexpr Pose2d RelativeTo(const Pose2d& other) const;
 
   /**
+   * Rotates the current pose around a point in 2D space.
+   *
+   * @param point The point in 2D space to rotate around.
+   * @param rot The rotation to rotate the pose by.
+   *
+   * @return The new rotated pose.
+   */
+  constexpr Pose2d RotateAround(const Translation2d& point,
+                                const Rotation2d& rot) const {
+    return {m_translation.RotateAround(point, rot), m_rotation.RotateBy(rot)};
+  }
+
+  /**
    * Obtain a new Pose2d from a (constant curvature) velocity.
    *
    * See https://file.tavsys.net/control/controls-engineering-in-frc.pdf section

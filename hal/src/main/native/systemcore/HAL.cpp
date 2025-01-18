@@ -27,7 +27,7 @@
 #include "CANInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
-#include "SystemServer.h"
+#include "SystemServerInternal.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
@@ -49,18 +49,13 @@ void InitializeHAL() {
   InitializeCTREPCM();
   InitializeREVPH();
   InitializeAddressableLED();
-  InitializeAccelerometer();
-  InitializeAnalogAccumulator();
-  InitializeAnalogGyro();
   InitializeAnalogInput();
-  InitializeAnalogOutput();
   InitializeAnalogTrigger();
   InitializeCAN();
   InitializeCANAPI();
   InitializeConstants();
   InitializeCounter();
   InitializeDIO();
-  InitializeDMA();
   InitializeDutyCycle();
   InitializeEncoder();
   InitializeFRCDriverStation();
@@ -74,10 +69,8 @@ void InitializeHAL() {
   InitializePorts();
   InitializePower();
   InitializePWM();
-  InitializeRelay();
   InitializeSerialPort();
   InitializeSmartIo();
-  InitializeSPI();
   InitializeThreads();
 }
 }  // namespace init

@@ -18,8 +18,6 @@
 namespace frc {
 
 class DigitalGlitchFilter;
-class DMA;
-class DMASample;
 
 /**
  * Class for counting the number of ticks on a digital input channel.
@@ -34,9 +32,6 @@ class DMASample;
 class Counter : public CounterBase,
                 public wpi::Sendable,
                 public wpi::SendableHelper<Counter> {
-  friend class DMA;
-  friend class DMASample;
-
  public:
   enum Mode {
     kTwoPulse = 0,

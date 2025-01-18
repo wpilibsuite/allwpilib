@@ -208,6 +208,19 @@ class WPILIB_DLLEXPORT Pose3d {
   constexpr Pose3d RelativeTo(const Pose3d& other) const;
 
   /**
+   * Rotates the current pose around a point in 3D space.
+   *
+   * @param point The point in 3D space to rotate around.
+   * @param rot The rotation to rotate the pose by.
+   *
+   * @return The new rotated pose.
+   */
+  constexpr Pose3d RotateAround(const Translation3d& point,
+                                const Rotation3d& rot) const {
+    return {m_translation.RotateAround(point, rot), m_rotation.RotateBy(rot)};
+  }
+
+  /**
    * Obtain a new Pose3d from a (constant curvature) velocity.
    *
    * The twist is a change in pose in the robot's coordinate frame since the

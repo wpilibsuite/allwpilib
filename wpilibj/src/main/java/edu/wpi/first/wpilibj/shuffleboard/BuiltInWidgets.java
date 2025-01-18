@@ -321,13 +321,6 @@ public enum BuiltInWidgets implements WidgetType {
   /**
    * Displays an accelerometer with a number bar displaying the magnitude of the acceleration and
    * text displaying the exact value. <br>
-   * Supported types:
-   *
-   * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.AnalogAccelerometer}
-   * </ul>
-   *
-   * <br>
    * Custom properties:
    *
    * <table>
@@ -351,8 +344,6 @@ public enum BuiltInWidgets implements WidgetType {
    *
    * <ul>
    *   <li>{@link edu.wpi.first.wpilibj.ADXL345_I2C}
-   *   <li>{@link edu.wpi.first.wpilibj.ADXL345_SPI}
-   *   <li>{@link edu.wpi.first.wpilibj.ADXL362}
    * </ul>
    *
    * <br>
@@ -374,7 +365,6 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.ADXRS450_Gyro}
    *   <li>{@link edu.wpi.first.wpilibj.AnalogGyro}
    *   <li>Any custom subclass of {@code GyroBase} (such as a MXP gyro)
    * </ul>
@@ -393,13 +383,6 @@ public enum BuiltInWidgets implements WidgetType {
   kGyro("Gyro"),
   /**
    * Displays a relay with toggle buttons for each supported mode (off, on, forward, reverse). <br>
-   * Supported types:
-   *
-   * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.Relay}
-   * </ul>
-   *
-   * <br>
    * This widget has no custom properties.
    */
   kRelay("Relay"),

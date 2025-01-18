@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.ADXL345_I2C;
-import edu.wpi.first.wpilibj.ADXL345_SPI;
 import java.util.Objects;
 
 /** Class to control a simulated ADXL345. */
@@ -14,16 +13,6 @@ public class ADXL345Sim {
   private SimDouble m_simX;
   private SimDouble m_simY;
   private SimDouble m_simZ;
-
-  /**
-   * Constructor.
-   *
-   * @param device The device to simulate
-   */
-  public ADXL345Sim(ADXL345_SPI device) {
-    SimDeviceSim simDevice = new SimDeviceSim("Accel:ADXL345_SPI" + "[" + device.getPort() + "]");
-    initSim(simDevice);
-  }
 
   /**
    * Constructor.

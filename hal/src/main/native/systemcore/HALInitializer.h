@@ -18,13 +18,9 @@ inline void CheckInit() {
 
 extern void InitializeCTREPCM();
 extern void InitializeREVPH();
-extern void InitializeAccelerometer();
 extern void InitializeAddressableLED();
-extern void InitializeAnalogAccumulator();
-extern void InitializeAnalogGyro();
 extern void InitializeAnalogInput();
 extern void InitializeAnalogInternal();
-extern void InitializeAnalogOutput();
 extern void InitializeAnalogTrigger();
 extern void InitializeCAN();
 extern void InitializeCANAPI();
@@ -32,7 +28,6 @@ extern void InitializeConstants();
 extern void InitializeCounter();
 extern void InitializeDigitalInternal();
 extern void InitializeDIO();
-extern void InitializeDMA();
 extern void InitializeDutyCycle();
 extern void InitializeEncoder();
 extern void InitializeFPGAEncoder();
@@ -48,9 +43,7 @@ extern void InitializeREVPDH();
 extern void InitializePorts();
 extern void InitializePower();
 extern void InitializePWM();
-extern void InitializeRelay();
 extern void InitializeSerialPort();
 extern void InitializeSmartIo();
-extern void InitializeSPI();
 extern void InitializeThreads();
 }  // namespace hal::init

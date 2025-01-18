@@ -75,9 +75,6 @@ void SetCanStatusObject(JNIEnv* env, jobject canStatus,
 void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
                         const HAL_MatchInfo& matchInfo);
 
-void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
-                                int64_t value, int64_t count);
-
 jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
                             uint64_t timestamp);
 
@@ -86,8 +83,6 @@ jbyteArray SetCANStreamObject(JNIEnv* env, jobject canStreamData,
                               uint64_t timestamp);
 
 jobject CreateHALValue(JNIEnv* env, const HAL_Value& value);
-
-jobject CreateDMABaseStore(JNIEnv* env, jint valueType, jint index);
 
 jobject CreatePowerDistributionVersion(JNIEnv* env, uint32_t firmwareMajor,
                                        uint32_t firmwareMinor,

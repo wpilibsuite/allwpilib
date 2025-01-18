@@ -8,6 +8,7 @@
 #include <functional>
 
 #include <opencv2/core/mat.hpp>
+#include <wpi/RawFrame.h>
 
 #include "cscore_oo.h"
 #include "cscore_raw.h"
@@ -171,6 +172,23 @@ class CvSink : public ImageSink {
   [[nodiscard]]
   uint64_t GrabFrameDirectLastTime(cv::Mat& image, uint64_t lastFrameTime,
                                    double timeout = 0.225);
+
+  /**
+   * Get the last time a frame was grabbed. This uses the same time base as
+   * wpi::Now().
+   *
+   * @return Time in 1 us increments.
+   */
+  [[nodiscard]]
+  uint64_t LastFrameTime();
+
+  /**
+   * Get the time source for the timestamp the last frame was grabbed at.
+   *
+   * @return Time source
+   */
+  [[nodiscard]]
+  WPI_TimestampSource LastFrameTimeSource();
 
  private:
   constexpr int GetCvFormat(WPI_PixelFormat pixelFormat);
@@ -403,6 +421,14 @@ inline uint64_t CvSink::GrabFrameDirectLastTime(cv::Mat& image,
               GetCvFormat(static_cast<WPI_PixelFormat>(rawFrame.pixelFormat)),
               rawFrame.data, static_cast<size_t>(rawFrame.stride)};
   return timestamp;
+}
+
+inline uint64_t CvSink::LastFrameTime() {
+  return rawFrame.timestamp;
+}
+
+inline WPI_TimestampSource CvSink::LastFrameTimeSource() {
+  return static_cast<WPI_TimestampSource>(rawFrame.timestampSrc);
 }
 
 }  // namespace cs
