@@ -170,7 +170,7 @@ typedef enum
     kFramework_RobotBuilder = 6,
     kFramework_AdvantageKit = 7,
     kFramework_MagicBot = 8,
-    kFramework_Everybot = 10,
+    kFramework_Everybot = 11,
     kRobotDrive_ArcadeStandard = 1,
     kRobotDrive_ArcadeButtonSpin = 2,
     kRobotDrive_ArcadeRatioCurve = 3,
