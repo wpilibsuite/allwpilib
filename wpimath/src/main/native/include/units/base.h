@@ -1759,7 +1759,7 @@ namespace units
 
 	namespace traits
 	{
-#ifdef FOR_DOXYGEN_PURPOSOES_ONLY
+#ifdef FOR_DOXYGEN_PURPOSES_ONLY
 		/**
 		* @ingroup		TypeTraits
 		* @brief		Trait for accessing the publicly defined types of `units::unit_t`
