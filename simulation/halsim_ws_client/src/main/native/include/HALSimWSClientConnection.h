@@ -41,7 +41,7 @@ class HALSimWSClientConnection
   bool m_ws_connected = false;
   wpi::WebSocket* m_websocket = nullptr;
 
-  wpi::uv::SimpleBufferPool<4> m_buffers;
+  wpi::uv::SimpleBufferPool m_buffers;
   std::mutex m_buffers_mutex;
 };
 

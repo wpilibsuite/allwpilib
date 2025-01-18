@@ -44,7 +44,7 @@ class SourceImpl : public PropertyContainer {
   std::string_view GetName() const { return m_name; }
 
   void SetDescription(std::string_view description);
-  std::string_view GetDescription(wpi::SmallVectorImpl<char>& buf) const;
+  std::string GetDescription() const;
 
   void SetConnectionStrategy(CS_ConnectionStrategy strategy) {
     m_strategy = static_cast<int>(strategy);

@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <wpi/timestamp.h>
 
@@ -238,7 +239,7 @@ CS_Property CS_CreateSourcePropertyCallback(
 void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
                                      const struct WPI_String* choices,
                                      int count, CS_Status* status) {
-  wpi::SmallVector<std::string, 8> vec;
+  std::vector<std::string> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) {
     vec.emplace_back(wpi::to_string_view(&choices[i]));

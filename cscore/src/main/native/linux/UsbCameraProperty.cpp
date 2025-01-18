@@ -9,7 +9,6 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 
 #include "UsbUtil.h"
@@ -98,7 +97,7 @@ static int GetStringCtrlIoctl(int fd, int id, int maximum, std::string* value) {
 
 static int SetStringCtrlIoctl(int fd, int id, int maximum,
                               std::string_view value) {
-  wpi::SmallString<64> str{wpi::substr(value, 0, maximum)};
+  std::string str{wpi::substr(value, 0, maximum)};
 
   struct v4l2_ext_control ctrl;
   struct v4l2_ext_controls ctrls;
@@ -115,21 +114,22 @@ static int SetStringCtrlIoctl(int fd, int id, int maximum,
 
 // Removes non-alphanumeric characters and replaces spaces with underscores.
 // e.g. "Zoom, Absolute" -> "zoom_absolute", "Pan (Absolute)" -> "pan_absolute"
-static std::string_view NormalizeName(std::string_view name,
-                                      wpi::SmallVectorImpl<char>& buf) {
+static std::string NormalizeName(std::string_view name) {
+  std::string out;
+  out.reserve(name.size());
   bool newWord = false;
   for (auto ch : name) {
     if (std::isalnum(ch)) {
       if (newWord) {
-        buf.push_back('_');
+        out.push_back('_');
       }
       newWord = false;
-      buf.push_back(std::tolower(ch));
-    } else if (!buf.empty()) {
+      out.push_back(std::tolower(ch));
+    } else if (!out.empty()) {
       newWord = true;
     }
   }
-  return {buf.data(), buf.size()};
+  return out;
 }
 
 #ifdef VIDIOC_QUERY_EXT_CTRL
@@ -170,8 +170,7 @@ UsbCameraProperty::UsbCameraProperty(const struct v4l2_query_ext_ctrl& ctrl)
   while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') {
     ++len;
   }
-  wpi::SmallString<64> name_buf;
-  name = NormalizeName({ctrl.name, len}, name_buf);
+  name = NormalizeName({ctrl.name, len});
 }
 #endif
 
@@ -209,9 +208,7 @@ UsbCameraProperty::UsbCameraProperty(const struct v4l2_queryctrl& ctrl)
   while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') {
     ++len;
   }
-  wpi::SmallString<64> name_buf;
-  name =
-      NormalizeName({reinterpret_cast<const char*>(ctrl.name), len}, name_buf);
+  name = NormalizeName({reinterpret_cast<const char*>(ctrl.name), len});
 }
 
 std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
@@ -309,8 +306,7 @@ bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock, int fd) {
 bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
                                   int fd) const {
   // Make a copy of the string as we're about to release the lock
-  wpi::SmallString<128> valueStrCopy{valueStr};
-  return DeviceSet(lock, fd, value, valueStrCopy.str());
+  return DeviceSet(lock, fd, value, std::string{valueStr});
 }
 
 bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd,

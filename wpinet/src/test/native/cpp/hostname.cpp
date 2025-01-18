@@ -5,19 +5,9 @@
 #include "wpinet/hostname.h"
 
 #include <gtest/gtest.h>
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
 
 namespace wpi {
 TEST(HostNameTest, HostNameNotEmpty) {
   ASSERT_NE(GetHostname(), "");
-}
-TEST(HostNameTest, HostNameNotEmptySmallVector) {
-  SmallVector<char, 256> name;
-  ASSERT_NE(GetHostname(name), "");
-}
-TEST(HostNameTest, HostNameEq) {
-  SmallVector<char, 256> nameBuf;
-  ASSERT_EQ(GetHostname(nameBuf), GetHostname());
 }
 }  // namespace wpi

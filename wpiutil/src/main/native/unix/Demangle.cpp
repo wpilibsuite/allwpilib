@@ -9,24 +9,22 @@
 #include <cstdio>
 #include <string>
 
-#include "wpi/SmallString.h"
-
 namespace wpi {
 
 std::string Demangle(std::string_view mangledSymbol) {
-  SmallString<128> buf{mangledSymbol};
+  std::string buf{mangledSymbol};
   size_t length;
   int32_t status;
 
   char* symbol = abi::__cxa_demangle(buf.c_str(), nullptr, &length, &status);
   if (status == 0) {
-    std::string rv{symbol};
+    buf = symbol;
     std::free(symbol);
-    return rv;
+    return buf;
   }
 
   // If everything else failed, just return the mangled symbol
-  return std::string{mangledSymbol};
+  return buf;
 }
 
 }  // namespace wpi

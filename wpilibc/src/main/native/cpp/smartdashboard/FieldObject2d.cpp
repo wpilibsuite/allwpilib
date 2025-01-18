@@ -7,6 +7,8 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/SmallVector.h>
+
 #include "frc/trajectory/Trajectory.h"
 
 using namespace frc;
@@ -67,14 +69,6 @@ std::vector<Pose2d> FieldObject2d::GetPoses() const {
   std::scoped_lock lock(m_mutex);
   UpdateFromEntry();
   return std::vector<Pose2d>(m_poses.begin(), m_poses.end());
-}
-
-std::span<const Pose2d> FieldObject2d::GetPoses(
-    wpi::SmallVectorImpl<Pose2d>& out) const {
-  std::scoped_lock lock(m_mutex);
-  UpdateFromEntry();
-  out.assign(m_poses.begin(), m_poses.end());
-  return out;
 }
 
 void FieldObject2d::UpdateEntry(bool setDefault) {

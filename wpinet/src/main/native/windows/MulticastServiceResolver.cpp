@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <wpi/ConvertUTF.h>
 #include <wpi/SmallString.h>
@@ -49,10 +50,8 @@ MulticastServiceResolver::MulticastServiceResolver(
   if (wpi::ends_with_lower(serviceType, ".local")) {
     wpi::sys::windows::UTF8ToUTF16(serviceType, wideStorage);
   } else {
-    wpi::SmallString<128> storage;
-    storage.append(serviceType);
-    storage.append(".local");
-    wpi::sys::windows::UTF8ToUTF16(storage.str(), wideStorage);
+    wpi::sys::windows::UTF8ToUTF16(fmt::format("{}.local", serviceType),
+                                   wideStorage);
   }
   pImpl->serviceType = std::wstring{wideStorage.data(), wideStorage.size()};
 }
@@ -71,10 +70,10 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
   MulticastServiceResolver::Impl* impl =
       reinterpret_cast<MulticastServiceResolver::Impl*>(pQueryContext);
 
-  wpi::SmallVector<DNS_RECORDW*, 4> PtrRecords;
-  wpi::SmallVector<DNS_RECORDW*, 4> SrvRecords;
-  wpi::SmallVector<DNS_RECORDW*, 4> TxtRecords;
-  wpi::SmallVector<DNS_RECORDW*, 4> ARecords;
+  std::vector<DNS_RECORDW*> PtrRecords;
+  std::vector<DNS_RECORDW*> SrvRecords;
+  std::vector<DNS_RECORDW*> TxtRecords;
+  std::vector<DNS_RECORDW*> ARecords;
 
   {
     DNS_RECORDW* current = pQueryResults->pQueryRecords;

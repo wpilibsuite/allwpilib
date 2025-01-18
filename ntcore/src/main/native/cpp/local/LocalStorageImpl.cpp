@@ -12,7 +12,7 @@
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 #include <wpi/DataLog.h>
-#include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 
 #include "IListenerStorage.h"
@@ -589,9 +589,10 @@ void StorageImpl::AddListenerImpl(NT_Listener listenerHandle,
           .get();
 
   // if we're doing anything immediate, get the list of matching topics
-  wpi::SmallVector<LocalTopic*, 32> topics;
+  std::vector<LocalTopic*> topics;
   if ((eventMask & NT_EVENT_IMMEDIATE) != 0 &&
       (eventMask & (NT_EVENT_PUBLISH | NT_EVENT_VALUE_ALL)) != 0) {
+    topics.reserve(m_topics.size());
     for (auto&& topic : m_topics) {
       if (topic->Exists() && subscriber->Matches(topic->name, topic->special)) {
         topics.emplace_back(topic.get());
@@ -726,22 +727,17 @@ void StorageImpl::StopDataLog(NT_DataLogger logger) {
 //
 
 bool StorageImpl::HasSchema(std::string_view name) {
-  wpi::SmallString<128> fullName{"/.schema/"};
-  fullName += name;
-  auto it = m_schemas.find(fullName);
-  return it != m_schemas.end();
+  return m_schemas.contains(name);
 }
 
 void StorageImpl::AddSchema(std::string_view name, std::string_view type,
                             std::span<const uint8_t> schema) {
-  wpi::SmallString<128> fullName{"/.schema/"};
-  fullName += name;
-  auto& pubHandle = m_schemas[fullName];
+  auto& pubHandle = m_schemas[name];
   if (pubHandle != 0) {
     return;
   }
 
-  auto topic = GetOrCreateTopic(fullName);
+  auto topic = GetOrCreateTopic(fmt::format("/.schema/{}", name));
 
   if (topic->localPublishers.size() >= kMaxPublishers) {
     ERR("reached maximum number of publishers to '{}', not publishing",

@@ -5,14 +5,12 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <string_view>
 
 #include <networktables/BooleanTopic.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringTopic.h>
-#include <wpi/SmallVector.h>
 
 #include "frc/shuffleboard/ShuffleboardEventImportance.h"
 

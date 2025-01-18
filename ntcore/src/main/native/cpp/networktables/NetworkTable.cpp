@@ -11,7 +11,6 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 
@@ -42,45 +41,39 @@ std::string_view NetworkTable::BasenameKey(std::string_view key) {
 
 std::string NetworkTable::NormalizeKey(std::string_view key,
                                        bool withLeadingSlash) {
-  wpi::SmallString<128> buf;
-  return std::string{NormalizeKey(key, buf, withLeadingSlash)};
-}
-
-std::string_view NetworkTable::NormalizeKey(std::string_view key,
-                                            wpi::SmallVectorImpl<char>& buf,
-                                            bool withLeadingSlash) {
-  buf.clear();
+  std::string out;
+  out.reserve(key.size() + 1);
   if (withLeadingSlash) {
-    buf.push_back(PATH_SEPARATOR_CHAR);
+    out.push_back(PATH_SEPARATOR_CHAR);
   }
   // for each path element, add it with a slash following
   wpi::split(key, PATH_SEPARATOR_CHAR, -1, false, [&](auto part) {
-    buf.append(part.begin(), part.end());
-    buf.push_back(PATH_SEPARATOR_CHAR);
+    out.append(part.begin(), part.end());
+    out.push_back(PATH_SEPARATOR_CHAR);
   });
   // remove trailing slash if the input key didn't have one
   if (!key.empty() && key.back() != PATH_SEPARATOR_CHAR) {
-    buf.pop_back();
+    out.pop_back();
   }
-  return {buf.data(), buf.size()};
+  return out;
 }
 
 std::vector<std::string> NetworkTable::GetHierarchy(std::string_view key) {
   std::vector<std::string> hierarchy;
   hierarchy.emplace_back(1, PATH_SEPARATOR_CHAR);
   // for each path element, add it to the end of what we built previously
-  wpi::SmallString<128> path;
+  std::string path;
   bool any = false;
   wpi::split(key, PATH_SEPARATOR_CHAR, -1, false, [&](auto part) {
     any = true;
     path += PATH_SEPARATOR_CHAR;
     path += part;
-    hierarchy.emplace_back(path.str());
+    hierarchy.emplace_back(path);  // copy, don't move; we need to keep building
   });
   // handle trailing slash
   if (any && key.back() == PATH_SEPARATOR_CHAR) {
     path += PATH_SEPARATOR_CHAR;
-    hierarchy.emplace_back(path.str());
+    hierarchy.emplace_back(std::move(path));
   }
   return hierarchy;
 }

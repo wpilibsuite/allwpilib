@@ -15,113 +15,100 @@
 
 namespace wpi {
 
-std::string_view UnescapeURI(std::string_view str, SmallVectorImpl<char>& buf,
-                             bool* error) {
-  buf.clear();
+wpi::expected<std::string, size_t> UnescapeURI(std::string_view str) {
+  std::string out;
+  out.reserve(str.size());
   for (auto i = str.begin(), end = str.end(); i != end; ++i) {
     // pass non-escaped characters to output
     if (*i != '%') {
       // decode + to space
       if (*i == '+') {
-        buf.push_back(' ');
+        out.push_back(' ');
       } else {
-        buf.push_back(*i);
+        out.push_back(*i);
       }
       continue;
     }
 
     // are there enough characters left?
     if (i + 2 >= end) {
-      *error = true;
-      return {};
+      return wpi::unexpected{i - str.begin()};
     }
 
     // replace %xx with the corresponding character
     unsigned val1 = hexDigitValue(*++i);
     if (val1 == -1U) {
-      *error = true;
-      return {};
+      return wpi::unexpected{i - str.begin()};
     }
     unsigned val2 = hexDigitValue(*++i);
     if (val2 == -1U) {
-      *error = true;
-      return {};
+      return wpi::unexpected{i - str.begin()};
     }
-    buf.push_back((val1 << 4) | val2);
+    out.push_back((val1 << 4) | val2);
   }
-
-  *error = false;
-  return {buf.data(), buf.size()};
+  return out;
 }
 
-std::string_view EscapeURI(std::string_view str, SmallVectorImpl<char>& buf,
-                           bool spacePlus) {
+std::string EscapeURI(std::string_view str, bool spacePlus) {
   static const char* const hexLut = "0123456789ABCDEF";
 
-  buf.clear();
+  std::string out;
+  out.reserve(str.size() + 1);
   for (auto i = str.begin(), end = str.end(); i != end; ++i) {
     // pass unreserved characters to output
     if (std::isalnum(*i) || *i == '-' || *i == '_' || *i == '.' || *i == '~') {
-      buf.push_back(*i);
+      out.push_back(*i);
       continue;
     }
 
     // encode space to +
     if (spacePlus && *i == ' ') {
-      buf.push_back('+');
+      out.push_back('+');
       continue;
     }
 
     // convert others to %xx
-    buf.push_back('%');
-    buf.push_back(hexLut[((*i) >> 4) & 0x0f]);
-    buf.push_back(hexLut[(*i) & 0x0f]);
+    out.push_back('%');
+    out.push_back(hexLut[((*i) >> 4) & 0x0f]);
+    out.push_back(hexLut[(*i) & 0x0f]);
   }
 
-  return {buf.data(), buf.size()};
+  return out;
 }
 
-std::string_view EscapeHTML(std::string_view str, SmallVectorImpl<char>& buf) {
-  buf.clear();
+std::string EscapeHTML(std::string_view str) {
+  std::string out;
+  out.reserve(str.size() + 1);
   for (auto i = str.begin(), end = str.end(); i != end; ++i) {
     if (*i == '&') {
-      buf.append({'&', 'a', 'm', 'p', ';'});
+      out.append({'&', 'a', 'm', 'p', ';'});
     } else if (*i == '<') {
-      buf.append({'&', 'l', 't', ';'});
+      out.append({'&', 'l', 't', ';'});
     } else if (*i == '>') {
-      buf.append({'&', 'g', 't', ';'});
+      out.append({'&', 'g', 't', ';'});
     } else {
-      buf.push_back(*i);
+      out.push_back(*i);
     }
   }
-  return {buf.data(), buf.size()};
+  return out;
 }
 
 HttpQueryMap::HttpQueryMap(std::string_view query) {
   split(query, '&', 100, false, [&](auto elem) {
     auto [nameEsc, valueEsc] = split(elem, '=');
-    SmallString<64> nameBuf;
-    bool err = false;
-    auto name = wpi::UnescapeURI(nameEsc, nameBuf, &err);
     // note: ignores duplicates
-    if (!err) {
-      m_elems.try_emplace(name, valueEsc);
+    if (auto name = wpi::UnescapeURI(nameEsc)) {
+      m_elems.try_emplace(*name, valueEsc);
     }
   });
 }
 
-std::optional<std::string_view> HttpQueryMap::Get(
-    std::string_view name, wpi::SmallVectorImpl<char>& buf) const {
+std::optional<std::string> HttpQueryMap::Get(std::string_view name) const {
   auto it = m_elems.find(name);
   if (it == m_elems.end()) {
     return {};
   }
-  bool err = false;
-  auto val = wpi::UnescapeURI(it->second, buf, &err);
-  if (err) {
-    return {};
-  }
-  return val;
+  return wpi::UnescapeURI(it->second).value_or(std::string{});
 }
 
 HttpPath::HttpPath(std::string_view path) {
@@ -131,14 +118,12 @@ HttpPath::HttpPath(std::string_view path) {
     return;
   }
   split(path, '/', 100, false, [&](auto elem) {
-    SmallString<64> buf;
-    bool err = false;
-    auto val = wpi::UnescapeURI(elem, buf, &err);
-    if (err) {
+    auto val = wpi::UnescapeURI(elem);
+    if (!val) {
       m_pathEnds.clear();
       return;
     }
-    m_pathBuf += val;
+    m_pathBuf += *val;
     m_pathEnds.emplace_back(m_pathBuf.size());
   });
 }
@@ -165,8 +150,8 @@ std::string_view HttpPath::operator[](size_t n) const {
   return slice(m_pathBuf, n == 0 ? 0 : m_pathEnds[n - 1], m_pathEnds[n]);
 }
 
-bool ParseHttpHeaders(raw_istream& is, SmallVectorImpl<char>* contentType,
-                      SmallVectorImpl<char>* contentLength) {
+bool ParseHttpHeaders(raw_istream& is, std::string* contentType,
+                      std::string* contentLength) {
   if (contentType) {
     contentType->clear();
   }
@@ -176,9 +161,8 @@ bool ParseHttpHeaders(raw_istream& is, SmallVectorImpl<char>* contentType,
 
   bool inContentType = false;
   bool inContentLength = false;
-  SmallString<64> lineBuf;
   for (;;) {
-    std::string_view line = rtrim(is.getline(lineBuf, 1024));
+    auto line = rtrim(is.getline(1024));
     if (is.has_error()) {
       return false;
     }
@@ -216,7 +200,7 @@ bool ParseHttpHeaders(raw_istream& is, SmallVectorImpl<char>* contentType,
 
 bool FindMultipartBoundary(raw_istream& is, std::string_view boundary,
                            std::string* saveBuf) {
-  SmallString<64> searchBuf;
+  std::string searchBuf;
   searchBuf.resize(boundary.size() + 2);
   size_t searchPos = 0;
 
@@ -304,16 +288,17 @@ HttpLocation::HttpLocation(std::string_view url_, bool* error,
 
   if (!userpass.empty()) {
     auto [rawUser, rawPassword] = split(userpass, ':');
-    SmallString<64> userBuf, passBuf;
-    user = UnescapeURI(rawUser, userBuf, error);
-    if (*error) {
+    auto user = UnescapeURI(rawUser);
+    if (!user) {
       *errorMsg = fmt::format("could not unescape user \"{}\"", rawUser);
+      *error = true;
       return;
     }
-    password = UnescapeURI(rawPassword, passBuf, error);
-    if (*error) {
+    auto password = UnescapeURI(rawPassword);
+    if (!password) {
       *errorMsg =
           fmt::format("could not unescape password \"{}\"", rawPassword);
+      *error = true;
       return;
     }
   }
@@ -350,23 +335,22 @@ HttpLocation::HttpLocation(std::string_view url_, bool* error,
     std::tie(rawParam, rawValue) = split(rawParam, '=');
 
     // unescape param
-    *error = false;
-    SmallString<64> paramBuf;
-    std::string_view param = UnescapeURI(rawParam, paramBuf, error);
-    if (*error) {
+    auto param = UnescapeURI(rawParam);
+    if (!param) {
       *errorMsg = fmt::format("could not unescape parameter \"{}\"", rawParam);
+      *error = true;
       return;
     }
 
     // unescape value
-    SmallString<64> valueBuf;
-    std::string_view value = UnescapeURI(rawValue, valueBuf, error);
-    if (*error) {
+    auto value = UnescapeURI(rawValue);
+    if (!value) {
       *errorMsg = fmt::format("could not unescape value \"{}\"", rawValue);
+      *error = true;
       return;
     }
 
-    params.emplace_back(std::pair{param, value});
+    params.emplace_back(std::pair{*param, *value});
   }
 
   *error = false;
@@ -374,11 +358,7 @@ HttpLocation::HttpLocation(std::string_view url_, bool* error,
 
 void HttpRequest::SetAuth(const HttpLocation& loc) {
   if (!loc.user.empty()) {
-    SmallString<64> userpass;
-    userpass += loc.user;
-    userpass += ':';
-    userpass += loc.password;
-    Base64Encode(userpass.str(), &auth);
+    auth = Base64Encode(fmt::format("{}:{}", loc.user, loc.password));
   }
 }
 
@@ -394,8 +374,7 @@ bool HttpConnection::Handshake(const HttpRequest& request,
   os.flush();
 
   // read first line of response
-  SmallString<64> lineBuf;
-  std::string_view line = rtrim(is.getline(lineBuf, 1024));
+  auto line = rtrim(is.getline(1024));
   if (is.has_error()) {
     *warnMsg = "disconnected before response";
     return false;

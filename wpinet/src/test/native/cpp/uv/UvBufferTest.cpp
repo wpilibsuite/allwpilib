@@ -9,21 +9,21 @@
 namespace wpi::uv {
 
 TEST(UvSimpleBufferPoolTest, ConstructDefault) {
-  SimpleBufferPool<> pool;
+  SimpleBufferPool pool;
   auto buf1 = pool.Allocate();
   ASSERT_EQ(buf1.len, 4096u);  // NOLINT
   pool.Release({&buf1, 1});
 }
 
 TEST(UvSimpleBufferPoolTest, ConstructSize) {
-  SimpleBufferPool<4> pool{8192};
+  SimpleBufferPool pool{8192};
   auto buf1 = pool.Allocate();
   ASSERT_EQ(buf1.len, 8192u);  // NOLINT
   pool.Release({&buf1, 1});
 }
 
 TEST(UvSimpleBufferPoolTest, ReleaseReuse) {
-  SimpleBufferPool<4> pool;
+  SimpleBufferPool pool;
   auto buf1 = pool.Allocate();
   auto buf1copy = buf1;
   auto origSize = buf1.len;
@@ -37,7 +37,7 @@ TEST(UvSimpleBufferPoolTest, ReleaseReuse) {
 }
 
 TEST(UvSimpleBufferPoolTest, ClearRemaining) {
-  SimpleBufferPool<4> pool;
+  SimpleBufferPool pool;
   auto buf1 = pool.Allocate();
   pool.Release({&buf1, 1});
   ASSERT_EQ(pool.Remaining(), 1u);

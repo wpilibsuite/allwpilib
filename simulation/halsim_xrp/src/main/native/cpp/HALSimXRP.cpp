@@ -137,8 +137,8 @@ void HALSimXRP::OnSimValueChanged(const wpi::json& simData) {
   }
 }
 
-uv::SimpleBufferPool<4>& HALSimXRP::GetBufferPool() {
-  static uv::SimpleBufferPool<4> bufferPool(128);
+uv::SimpleBufferPool& HALSimXRP::GetBufferPool() {
+  static uv::SimpleBufferPool bufferPool(128);
   return bufferPool;
 }
 

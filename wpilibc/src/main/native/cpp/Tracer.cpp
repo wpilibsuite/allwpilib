@@ -4,8 +4,9 @@
 
 #include "frc/Tracer.h"
 
+#include <string>
+
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/Errors.h"
@@ -32,8 +33,8 @@ void Tracer::AddEpoch(std::string_view epochName) {
 }
 
 void Tracer::PrintEpochs() {
-  wpi::SmallString<128> buf;
-  wpi::raw_svector_ostream os(buf);
+  std::string buf;
+  wpi::raw_string_ostream os(buf);
   PrintEpochs(os);
   if (!buf.empty()) {
     FRC_ReportWarning("{}", buf.c_str());

@@ -11,7 +11,6 @@
 #include <vector>
 
 #include <wpi/MemAlloc.h>
-#include <wpi/SmallString.h>
 
 #include "c_util.h"
 #include "cscore_cpp.h"
@@ -57,8 +56,7 @@ CS_PropertyKind CS_GetPropertyKind(CS_Property property, CS_Status* status) {
 
 void CS_GetPropertyName(CS_Property property, WPI_String* name,
                         CS_Status* status) {
-  wpi::SmallString<128> buf;
-  cs::ConvertToC(name, cs::GetPropertyName(property, buf, status));
+  cs::ConvertToC(name, cs::GetPropertyName(property, status));
 }
 
 int CS_GetProperty(CS_Property property, CS_Status* status) {
@@ -87,8 +85,7 @@ int CS_GetPropertyDefault(CS_Property property, CS_Status* status) {
 
 void CS_GetStringProperty(CS_Property property, WPI_String* value,
                           CS_Status* status) {
-  wpi::SmallString<128> buf;
-  cs::ConvertToC(value, cs::GetStringProperty(property, buf, status));
+  cs::ConvertToC(value, cs::GetStringProperty(property, status));
 }
 
 void CS_SetStringProperty(CS_Property property, const struct WPI_String* value,
@@ -112,14 +109,12 @@ CS_SourceKind CS_GetSourceKind(CS_Source source, CS_Status* status) {
 }
 
 void CS_GetSourceName(CS_Source source, WPI_String* name, CS_Status* status) {
-  wpi::SmallString<128> buf;
-  cs::ConvertToC(name, cs::GetSourceName(source, buf, status));
+  cs::ConvertToC(name, cs::GetSourceName(source, status));
 }
 
 void CS_GetSourceDescription(CS_Source source, WPI_String* description,
                              CS_Status* status) {
-  wpi::SmallString<128> buf;
-  cs::ConvertToC(description, cs::GetSourceDescription(source, buf, status));
+  cs::ConvertToC(description, cs::GetSourceDescription(source, status));
 }
 
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
@@ -148,8 +143,7 @@ CS_Property CS_GetSourceProperty(CS_Source source,
 
 CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
                                           CS_Status* status) {
-  wpi::SmallVector<CS_Property, 32> buf;
-  auto vec = cs::EnumerateSourceProperties(source, buf, status);
+  auto vec = cs::EnumerateSourceProperties(source, status);
   CS_Property* out = static_cast<CS_Property*>(
       wpi::safe_malloc(vec.size() * sizeof(CS_Property)));
   *count = vec.size();
@@ -221,8 +215,7 @@ CS_VideoMode* CS_EnumerateSourceVideoModes(CS_Source source, int* count,
 
 CS_Sink* CS_EnumerateSourceSinks(CS_Source source, int* count,
                                  CS_Status* status) {
-  wpi::SmallVector<CS_Sink, 32> buf;
-  auto handles = cs::EnumerateSourceSinks(source, buf, status);
+  auto handles = cs::EnumerateSourceSinks(source, status);
   CS_Sink* sinks =
       static_cast<CS_Sink*>(wpi::safe_malloc(handles.size() * sizeof(CS_Sink)));
   *count = handles.size();
@@ -278,14 +271,12 @@ CS_SinkKind CS_GetSinkKind(CS_Sink sink, CS_Status* status) {
 }
 
 void CS_GetSinkName(CS_Sink sink, WPI_String* name, CS_Status* status) {
-  wpi::SmallString<128> buf;
-  cs::ConvertToC(name, cs::GetSinkName(sink, buf, status));
+  cs::ConvertToC(name, cs::GetSinkName(sink, status));
 }
 
 void CS_GetSinkDescription(CS_Sink sink, WPI_String* description,
                            CS_Status* status) {
-  wpi::SmallString<128> buf;
-  cs::ConvertToC(description, cs::GetSinkDescription(sink, buf, status));
+  cs::ConvertToC(description, cs::GetSinkDescription(sink, status));
 }
 
 CS_Property CS_GetSinkProperty(CS_Sink sink, const struct WPI_String* name,
@@ -295,8 +286,7 @@ CS_Property CS_GetSinkProperty(CS_Sink sink, const struct WPI_String* name,
 
 CS_Property* CS_EnumerateSinkProperties(CS_Sink sink, int* count,
                                         CS_Status* status) {
-  wpi::SmallVector<CS_Property, 32> buf;
-  auto vec = cs::EnumerateSinkProperties(sink, buf, status);
+  auto vec = cs::EnumerateSinkProperties(sink, status);
   CS_Property* out = static_cast<CS_Property*>(
       wpi::safe_malloc(vec.size() * sizeof(CS_Property)));
   *count = vec.size();
@@ -440,8 +430,7 @@ void CS_Shutdown(void) {
 }
 
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
-  wpi::SmallVector<CS_Source, 32> buf;
-  auto handles = cs::EnumerateSourceHandles(buf, status);
+  auto handles = cs::EnumerateSourceHandles(status);
   CS_Source* sources = static_cast<CS_Source*>(
       wpi::safe_malloc(handles.size() * sizeof(CS_Source)));
   *count = handles.size();
@@ -463,8 +452,7 @@ void CS_ReleaseEnumeratedSources(CS_Source* sources, int count) {
 }
 
 CS_Sink* CS_EnumerateSinks(int* count, CS_Status* status) {
-  wpi::SmallVector<CS_Sink, 32> buf;
-  auto handles = cs::EnumerateSinkHandles(buf, status);
+  auto handles = cs::EnumerateSinkHandles(status);
   CS_Sink* sinks =
       static_cast<CS_Sink*>(wpi::safe_malloc(handles.size() * sizeof(CS_Sink)));
   *count = handles.size();

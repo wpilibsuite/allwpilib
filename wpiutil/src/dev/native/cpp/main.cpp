@@ -4,9 +4,6 @@
 
 #include <wpi/print.h>
 
-#include "wpi/SmallString.h"
-
 int main() {
-  wpi::SmallString<128> v1("Hello");
-  wpi::print("{}\n", v1.str());
+  wpi::print("{}\n", "Hello");
 }

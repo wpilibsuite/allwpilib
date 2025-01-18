@@ -23,11 +23,6 @@
 #include "ntcore_c.h"
 #include "ntcore_cpp_types.h"
 
-namespace wpi {
-template <typename T>
-class SmallVectorImpl;
-}  // namespace wpi
-
 namespace wpi::log {
 class DataLog;
 }  // namespace wpi::log

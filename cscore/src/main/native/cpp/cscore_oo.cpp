@@ -23,9 +23,8 @@ wpi::json VideoSink::GetConfigJsonObject() const {
 }
 
 std::vector<VideoProperty> VideoSource::EnumerateProperties() const {
-  wpi::SmallVector<CS_Property, 32> handles_buf;
   CS_Status status = 0;
-  auto handles = EnumerateSourceProperties(m_handle, handles_buf, &status);
+  auto handles = EnumerateSourceProperties(m_handle, &status);
 
   std::vector<VideoProperty> properties;
   properties.reserve(handles.size());
@@ -36,9 +35,8 @@ std::vector<VideoProperty> VideoSource::EnumerateProperties() const {
 }
 
 std::vector<VideoSink> VideoSource::EnumerateSinks() {
-  wpi::SmallVector<CS_Sink, 16> handles_buf;
   CS_Status status = 0;
-  auto handles = EnumerateSourceSinks(m_handle, handles_buf, &status);
+  auto handles = EnumerateSourceSinks(m_handle, &status);
 
   std::vector<VideoSink> sinks;
   sinks.reserve(handles.size());
@@ -49,9 +47,8 @@ std::vector<VideoSink> VideoSource::EnumerateSinks() {
 }
 
 std::vector<VideoSource> VideoSource::EnumerateSources() {
-  wpi::SmallVector<CS_Source, 16> handles_buf;
   CS_Status status = 0;
-  auto handles = ::cs::EnumerateSourceHandles(handles_buf, &status);
+  auto handles = ::cs::EnumerateSourceHandles(&status);
 
   std::vector<VideoSource> sources;
   sources.reserve(handles.size());
@@ -62,9 +59,8 @@ std::vector<VideoSource> VideoSource::EnumerateSources() {
 }
 
 std::vector<VideoProperty> VideoSink::EnumerateProperties() const {
-  wpi::SmallVector<CS_Property, 32> handles_buf;
   CS_Status status = 0;
-  auto handles = EnumerateSinkProperties(m_handle, handles_buf, &status);
+  auto handles = EnumerateSinkProperties(m_handle, &status);
 
   std::vector<VideoProperty> properties;
   properties.reserve(handles.size());
@@ -75,9 +71,8 @@ std::vector<VideoProperty> VideoSink::EnumerateProperties() const {
 }
 
 std::vector<VideoSink> VideoSink::EnumerateSinks() {
-  wpi::SmallVector<CS_Sink, 16> handles_buf;
   CS_Status status = 0;
-  auto handles = ::cs::EnumerateSinkHandles(handles_buf, &status);
+  auto handles = ::cs::EnumerateSinkHandles(&status);
 
   std::vector<VideoSink> sinks;
   sinks.reserve(handles.size());

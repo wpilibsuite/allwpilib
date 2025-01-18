@@ -11,11 +11,6 @@
 
 #include "glass/support/EnumSetting.h"
 
-namespace wpi {
-template <typename T>
-class SmallVectorImpl;
-}  // namespace wpi
-
 namespace glass {
 
 class Storage;

@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <utility>
+#include <vector>
 
 #include <wpi/Logger.h>
 #include <wpinet/EventLoopRunner.h>
@@ -86,18 +87,16 @@ class Instance {
   void DestroySource(CS_Source handle);
   void DestroySink(CS_Sink handle);
 
-  std::span<CS_Source> EnumerateSourceHandles(
-      wpi::SmallVectorImpl<CS_Source>& vec) {
-    return m_sources.GetAll(vec);
+  std::vector<CS_Source> EnumerateSourceHandles() {
+    return m_sources.GetAll<CS_Source>();
   }
 
-  std::span<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec) {
-    return m_sinks.GetAll(vec);
+  std::vector<CS_Sink> EnumerateSinkHandles() {
+    return m_sinks.GetAll<CS_Sink>();
   }
 
-  std::span<CS_Sink> EnumerateSourceSinks(CS_Source source,
-                                          wpi::SmallVectorImpl<CS_Sink>& vec) {
-    vec.clear();
+  std::vector<CS_Sink> EnumerateSourceSinks(CS_Source source) {
+    std::vector<CS_Sink> vec;
     m_sinks.ForEach([&](CS_Sink sinkHandle, const SinkData& data) {
       if (source == data.sourceHandle.load()) {
         vec.push_back(sinkHandle);

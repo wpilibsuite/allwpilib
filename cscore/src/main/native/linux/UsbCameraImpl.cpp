@@ -27,7 +27,6 @@
 
 #include <fmt/format.h>
 #include <wpi/MemAlloc.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/raw_ostream.h>
@@ -395,7 +394,7 @@ void UsbCameraImpl::CameraThreadMain() {
   int notify_fd = inotify_init();
   if (notify_fd >= 0) {
     // need to make a copy as dirname can modify it
-    wpi::SmallString<64> pathCopy{m_path};
+    std::string pathCopy{m_path};
     pathCopy.push_back('\0');
     if (inotify_add_watch(notify_fd, dirname(pathCopy.data()),
                           IN_CREATE | IN_DELETE) < 0) {
@@ -409,9 +408,9 @@ void UsbCameraImpl::CameraThreadMain() {
   bool notified = (notify_fd < 0);  // treat as always notified if cannot notify
 
   // Get the basename for later notify use
-  wpi::SmallString<64> pathCopy{m_path};
+  std::string pathCopy{m_path};
   pathCopy.push_back('\0');
-  wpi::SmallString<64> base{basename(pathCopy.data())};
+  std::string base{basename(pathCopy.data())};
 
   // Used to restart streaming on reconnect
   bool wasStreaming = false;
@@ -486,13 +485,13 @@ void UsbCameraImpl::CameraThreadMain() {
         // Read the event structure
         notify_is->read(&event, sizeof(event));
         // Read the event name
-        wpi::SmallString<64> raw_name;
+        std::string raw_name;
         raw_name.resize(event.len);
         notify_is->read(raw_name.data(), event.len);
         // If the name is what we expect...
         std::string_view name{raw_name.c_str()};
         SDEBUG4("got event on '{}' ({}) compare to '{}' ({}) mask {}", name,
-                name.size(), base.str(), base.size(), event.mask);
+                name.size(), base, base.size(), event.mask);
         if (name == base) {
           if ((event.mask & IN_DELETE) != 0) {
             wasStreaming = m_streaming;
@@ -1453,8 +1452,7 @@ bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
 }
 
 void UsbCameraImpl::SetQuirks() {
-  wpi::SmallString<128> descbuf;
-  std::string_view desc = GetDescription(descbuf);
+  auto desc = GetDescription();
   m_lifecam_exposure = wpi::ends_with(desc, "LifeCam HD-3000") ||
                        wpi::ends_with(desc, "LifeCam Cinema (TM)");
   m_ov9281_exposure = wpi::contains(desc, "OV9281");
@@ -1668,18 +1666,15 @@ UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status) {
 
   // look through /dev/v4l/by-id and /dev/v4l/by-path for symlinks to the
   // keypath
-  wpi::SmallString<128> path;
   for (auto symlinkDir : symlinkDirs) {
     if (DIR* dp = ::opendir(symlinkDir)) {
       while (struct dirent* ep = ::readdir(dp)) {
         if (ep->d_type == DT_LNK) {
-          path = symlinkDir;
-          path += '/';
-          path += ep->d_name;
+          auto path = fmt::format("{}/{}", symlinkDir, ep->d_name);
           char* target = ::realpath(path.c_str(), nullptr);
           if (target) {
             if (keypath == target) {
-              info.otherPaths.emplace_back(path.str());
+              info.otherPaths.emplace_back(std::move(path));
             }
             std::free(target);
           }
@@ -1717,16 +1712,13 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
 
       UsbCameraInfo info;
       info.dev = dev;
+      info.path = fmt::format("/dev/{}", fname);
 
-      wpi::SmallString<32> path{"/dev/"};
-      path += fname;
-      info.path = path.str();
-
-      if (!IsVideoCaptureDevice(path.c_str())) {
+      if (!IsVideoCaptureDevice(info.path.c_str())) {
         continue;
       }
 
-      info.name = GetDescriptionImpl(path.c_str());
+      info.name = GetDescriptionImpl(info.path.c_str());
       if (info.name.empty()) {
         continue;
       }
@@ -1747,14 +1739,11 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
 
   // look through /dev/v4l/by-id and /dev/v4l/by-path for symlinks to
   // /dev/videoN
-  wpi::SmallString<128> path;
   for (auto symlinkDir : symlinkDirs) {
     if (DIR* dp = ::opendir(symlinkDir)) {
       while (struct dirent* ep = ::readdir(dp)) {
         if (ep->d_type == DT_LNK) {
-          path = symlinkDir;
-          path += '/';
-          path += ep->d_name;
+          auto path = fmt::format("{}/{}", symlinkDir, ep->d_name);
           char* target = ::realpath(path.c_str(), nullptr);
           if (target) {
             std::string fname = fs::path{target}.filename();
@@ -1763,7 +1752,7 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
                 (dev = wpi::parse_integer<unsigned int>(wpi::substr(fname, 5),
                                                         10)) &&
                 dev.value() < retval.size()) {
-              retval[dev.value()].otherPaths.emplace_back(path.str());
+              retval[dev.value()].otherPaths.emplace_back(std::move(path));
             }
             std::free(target);
           }
