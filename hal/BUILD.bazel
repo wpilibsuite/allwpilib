@@ -35,16 +35,7 @@ filegroup(
 
 SYSTEMCORE_SRCS = glob(["src/main/native/systemcore/**"])
 
-SYSTEMCORE_DEPS = ["//ntcore:ntcore.static"]
-
 SIM_SRCS = glob(["src/main/native/sim/**"])
-
-SIM_DEPS = []
-
-HAL_DEPS = select({
-    "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": SYSTEMCORE_DEPS,
-    "//conditions:default": SIM_DEPS,
-})
 
 filegroup(
     name = "platform-srcs",
@@ -74,7 +65,7 @@ cc_library(
         "//ntcore:ntcore.static",
         "//wpinet:wpinet.static",
         "//wpiutil:wpiutil.static",
-    ] + HAL_DEPS,
+    ],
 )
 
 wpilib_jni_cc_library(
