@@ -36,8 +36,6 @@ def main(argv):
     )
     args = parser.parse_args()
 
-    print(args)
-
     generate_usage_reporting(args.output_directory, args.template_root)
     generate_nanopb(
         args.nanopb_generator,
