@@ -68,7 +68,8 @@ void NetworkTablesProvider::DisplayMenu() {
   wpi::SmallString<64> name;
   for (auto&& entry : m_viewEntries) {
     path.clear();
-    wpi::split(entry->name, path, '/', -1, false);
+    wpi::split(entry->name, '/', -1, false,
+               [&](auto name) { path.emplace_back(name); });
 
     bool fullDepth = true;
     int depth = 0;

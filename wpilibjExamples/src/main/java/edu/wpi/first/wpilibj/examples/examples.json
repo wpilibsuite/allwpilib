@@ -103,19 +103,6 @@
     "commandversion": 2
   },
   {
-    "name": "Relay",
-    "description": "Control a relay from joystick buttons.",
-    "tags": [
-      "Hardware",
-      "Relay",
-      "Joystick"
-    ],
-    "foldername": "relay",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
     "name": "Ultrasonic",
     "description": "View values from a ping-response ultrasonic sensor.",
     "tags": [
@@ -515,19 +502,6 @@
       "AddressableLEDs"
     ],
     "foldername": "addressableled",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "DMA",
-    "description": "Read various sensors using DMA.",
-    "tags": [
-      "Hardware",
-      "DMA",
-      "SmartDashboard"
-    ],
-    "foldername": "dma",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2

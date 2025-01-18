@@ -26,15 +26,15 @@ class NTProfiledPIDControllerModel : public ProfiledPIDControllerModel {
 
   const char* GetName() const override { return m_nameValue.c_str(); }
 
-  DataSource* GetPData() override { return &m_pData; }
-  DataSource* GetIData() override { return &m_iData; }
-  DataSource* GetDData() override { return &m_dData; }
-  DataSource* GetIZoneData() override { return &m_iZoneData; }
-  DataSource* GetMaxVelocityData() override { return &m_maxVelocityData; }
-  DataSource* GetMaxAccelerationData() override {
+  DoubleSource* GetPData() override { return &m_pData; }
+  DoubleSource* GetIData() override { return &m_iData; }
+  DoubleSource* GetDData() override { return &m_dData; }
+  DoubleSource* GetIZoneData() override { return &m_iZoneData; }
+  DoubleSource* GetMaxVelocityData() override { return &m_maxVelocityData; }
+  DoubleSource* GetMaxAccelerationData() override {
     return &m_maxAccelerationData;
   }
-  DataSource* GetGoalData() override { return &m_goalData; }
+  DoubleSource* GetGoalData() override { return &m_goalData; }
 
   void SetP(double value) override;
   void SetI(double value) override;
@@ -60,13 +60,13 @@ class NTProfiledPIDControllerModel : public ProfiledPIDControllerModel {
   nt::DoubleEntry m_maxAcceleration;
   nt::DoubleEntry m_goal;
 
-  DataSource m_pData;
-  DataSource m_iData;
-  DataSource m_dData;
-  DataSource m_iZoneData;
-  DataSource m_maxVelocityData;
-  DataSource m_maxAccelerationData;
-  DataSource m_goalData;
+  DoubleSource m_pData;
+  DoubleSource m_iData;
+  DoubleSource m_dData;
+  DoubleSource m_iZoneData;
+  DoubleSource m_maxVelocityData;
+  DoubleSource m_maxAccelerationData;
+  DoubleSource m_goalData;
 
   std::string m_nameValue;
   bool m_controllableValue = false;

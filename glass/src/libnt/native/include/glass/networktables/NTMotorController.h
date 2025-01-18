@@ -26,7 +26,7 @@ class NTMotorControllerModel : public MotorControllerModel {
   const char* GetName() const override { return m_nameValue.c_str(); }
   const char* GetSimDevice() const override { return nullptr; }
 
-  DataSource* GetPercentData() override { return &m_valueData; }
+  DoubleSource* GetPercentData() override { return &m_valueData; }
   void SetPercent(double value) override;
 
   void Update() override;
@@ -39,7 +39,7 @@ class NTMotorControllerModel : public MotorControllerModel {
   nt::StringSubscriber m_name;
   nt::BooleanSubscriber m_controllable;
 
-  DataSource m_valueData;
+  DoubleSource m_valueData;
   std::string m_nameValue;
   bool m_controllableValue = false;
 };

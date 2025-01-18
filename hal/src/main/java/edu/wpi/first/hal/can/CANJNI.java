@@ -23,10 +23,10 @@ public class CANJNI extends JNIWrapper {
   public static final int CAN_SEND_PERIOD_STOP_REPEATING = -1;
 
   /** Mask for "is frame remote" in message ID. */
-  public static final int CAN_IS_FRAME_REMOTE = 0x80000000;
+  public static final int CAN_IS_FRAME_REMOTE = 0x40000000;
 
   /** Mask for "is frame 11 bits" in message ID. */
-  public static final int CAN_IS_FRAME_11BIT = 0x40000000;
+  public static final int CAN_IS_FRAME_11BIT = 0x80000000;
 
   /** Default constructor. */
   public CANJNI() {}

@@ -23,7 +23,7 @@ class NTCommandSelectorModel : public CommandSelectorModel {
   NTCommandSelectorModel(nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
-  DataSource* GetRunningData() override { return &m_runningData; }
+  BooleanSource* GetRunningData() override { return &m_runningData; }
   void SetRunning(bool run) override;
 
   void Update() override;
@@ -35,7 +35,7 @@ class NTCommandSelectorModel : public CommandSelectorModel {
   nt::BooleanEntry m_running;
   nt::StringSubscriber m_name;
 
-  DataSource m_runningData;
+  BooleanSource m_runningData;
   std::string m_nameValue;
 };
 }  // namespace glass

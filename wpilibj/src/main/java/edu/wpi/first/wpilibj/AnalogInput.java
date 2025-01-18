@@ -4,12 +4,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.AccumulatorResult;
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -27,11 +25,8 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * number of samples to retain the resolution, but get more stable values.
  */
 public class AnalogInput implements Sendable, AutoCloseable {
-  private static final int kAccumulatorSlot = 1;
   int m_port; // explicit no modifier, private and package accessible.
   private int m_channel;
-  private static final int[] kAccumulatorChannels = {0, 1};
-  private long m_accumulatorOffset;
 
   /**
    * Construct an analog channel.
@@ -56,7 +51,6 @@ public class AnalogInput implements Sendable, AutoCloseable {
     AnalogJNI.freeAnalogInputPort(m_port);
     m_port = 0;
     m_channel = 0;
-    m_accumulatorOffset = 0;
   }
 
   /**
@@ -179,127 +173,6 @@ public class AnalogInput implements Sendable, AutoCloseable {
    */
   public int getOversampleBits() {
     return AnalogJNI.getAnalogOversampleBits(m_port);
-  }
-
-  /** Initialize the accumulator. */
-  public void initAccumulator() {
-    if (!isAccumulatorChannel()) {
-      throw new AllocationException(
-          "Accumulators are only available on slot "
-              + kAccumulatorSlot
-              + " on channels "
-              + kAccumulatorChannels[0]
-              + ", "
-              + kAccumulatorChannels[1]);
-    }
-    m_accumulatorOffset = 0;
-    AnalogJNI.initAccumulator(m_port);
-  }
-
-  /**
-   * Set an initial value for the accumulator.
-   *
-   * <p>This will be added to all values returned to the user.
-   *
-   * @param initialValue The value that the accumulator should start from when reset.
-   */
-  public void setAccumulatorInitialValue(long initialValue) {
-    m_accumulatorOffset = initialValue;
-  }
-
-  /** Resets the accumulator to the initial value. */
-  public void resetAccumulator() {
-    AnalogJNI.resetAccumulator(m_port);
-
-    // Wait until the next sample, so the next call to getAccumulator*()
-    // won't have old values.
-    final double sampleTime = 1.0 / getGlobalSampleRate();
-    final double overSamples = 1 << getOversampleBits();
-    final double averageSamples = 1 << getAverageBits();
-    Timer.delay(sampleTime * overSamples * averageSamples);
-  }
-
-  /**
-   * Set the center value of the accumulator.
-   *
-   * <p>The center value is subtracted from each A/D value before it is added to the accumulator.
-   * This is used for the center value of devices like gyros and accelerometers to take the device
-   * offset into account when integrating.
-   *
-   * <p>This center value is based on the output of the oversampled and averaged source the
-   * accumulator channel. Because of this, any non-zero oversample bits will affect the size of the
-   * value for this field.
-   *
-   * @param center The accumulator's center value.
-   */
-  public void setAccumulatorCenter(int center) {
-    AnalogJNI.setAccumulatorCenter(m_port, center);
-  }
-
-  /**
-   * Set the accumulator's deadband.
-   *
-   * @param deadband The deadband size in ADC codes (12-bit value)
-   */
-  public void setAccumulatorDeadband(int deadband) {
-    AnalogJNI.setAccumulatorDeadband(m_port, deadband);
-  }
-
-  /**
-   * Read the accumulated value.
-   *
-   * <p>Read the value that has been accumulating. The accumulator is attached after the oversample
-   * and average engine.
-   *
-   * @return The 64-bit value accumulated since the last Reset().
-   */
-  public long getAccumulatorValue() {
-    return AnalogJNI.getAccumulatorValue(m_port) + m_accumulatorOffset;
-  }
-
-  /**
-   * Read the number of accumulated values.
-   *
-   * <p>Read the count of the accumulated values since the accumulator was last Reset().
-   *
-   * @return The number of times samples from the channel were accumulated.
-   */
-  public long getAccumulatorCount() {
-    return AnalogJNI.getAccumulatorCount(m_port);
-  }
-
-  /**
-   * Read the accumulated value and the number of accumulated values atomically.
-   *
-   * <p>This function reads the value and count from the FPGA atomically. This can be used for
-   * averaging.
-   *
-   * @param result AccumulatorResult object to store the results in.
-   */
-  public void getAccumulatorOutput(AccumulatorResult result) {
-    if (result == null) {
-      throw new IllegalArgumentException("Null parameter `result'");
-    }
-    if (!isAccumulatorChannel()) {
-      throw new IllegalArgumentException(
-          "Channel " + m_channel + " is not an accumulator channel.");
-    }
-    AnalogJNI.getAccumulatorOutput(m_port, result);
-    result.value += m_accumulatorOffset;
-  }
-
-  /**
-   * Is the channel attached to an accumulator.
-   *
-   * @return The analog channel is attached to an accumulator.
-   */
-  public boolean isAccumulatorChannel() {
-    for (int channel : kAccumulatorChannels) {
-      if (m_channel == channel) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**

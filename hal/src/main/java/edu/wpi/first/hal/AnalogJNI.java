@@ -5,11 +5,9 @@
 package edu.wpi.first.hal;
 
 /**
- * Analog Input / Output / Accumulator / Trigger JNI Functions.
+ * Analog Input / Output / Trigger JNI Functions.
  *
  * @see "hal/AnalogInput.h"
- * @see "hal/AnalogOutput.h"
- * @see "hal/AnalogAccumulator.h"
  * @see "hal/AnalogTrigger.h"
  */
 public class AnalogJNI extends JNIWrapper {
@@ -49,23 +47,6 @@ public class AnalogJNI extends JNIWrapper {
   public static native void freeAnalogInputPort(int portHandle);
 
   /**
-   * Initializes the analog output port using the given port object.
-   *
-   * @param halPortHandle handle to the port
-   * @return the created analog output handle
-   * @see "HAL_InitializeAnalogOutputPort"
-   */
-  public static native int initializeAnalogOutputPort(int halPortHandle);
-
-  /**
-   * Frees an analog output port.
-   *
-   * @param portHandle the analog output handle
-   * @see "HAL_FreeAnalogOutputPort"
-   */
-  public static native void freeAnalogOutputPort(int portHandle);
-
-  /**
    * Checks that the analog module number is valid.
    *
    * @param module The analog module number.
@@ -85,18 +66,6 @@ public class AnalogJNI extends JNIWrapper {
   public static native boolean checkAnalogInputChannel(int channel);
 
   /**
-   * Checks that the analog output channel number is valid.
-   *
-   * <p>Verifies that the analog channel number is one of the legal channel numbers. Channel numbers
-   * are 0-based.
-   *
-   * @param channel The analog output channel number.
-   * @return Analog channel is valid
-   * @see "HAL_CheckAnalogOutputChannel"
-   */
-  public static native boolean checkAnalogOutputChannel(int channel);
-
-  /**
    * Indicates the analog input is used by a simulated device.
    *
    * @param handle the analog input handle
@@ -104,24 +73,6 @@ public class AnalogJNI extends JNIWrapper {
    * @see "HAL_SetAnalogInputSimDevice"
    */
   public static native void setAnalogInputSimDevice(int handle, int device);
-
-  /**
-   * Sets an analog output value.
-   *
-   * @param portHandle the analog output handle
-   * @param voltage the voltage (0-5v) to output
-   * @see "HAL_SetAnalogOutput"
-   */
-  public static native void setAnalogOutput(int portHandle, double voltage);
-
-  /**
-   * Gets the current analog output value.
-   *
-   * @param portHandle the analog output handle
-   * @return the current output voltage (0-5v)
-   * @see "HAL_GetAnalogOutput"
-   */
-  public static native double getAnalogOutput(int portHandle);
 
   /**
    * Sets the sample rate.
@@ -296,92 +247,6 @@ public class AnalogJNI extends JNIWrapper {
    * @see "HAL_GetAnalogOffset"
    */
   public static native int getAnalogOffset(int analogPortHandle);
-
-  /**
-   * Is the channel attached to an accumulator.
-   *
-   * @param analogPortHandle Handle to the analog port.
-   * @return The analog channel is attached to an accumulator.
-   * @see "HAL_IsAccumulatorChannel"
-   */
-  public static native boolean isAccumulatorChannel(int analogPortHandle);
-
-  /**
-   * Initialize the accumulator.
-   *
-   * @param analogPortHandle Handle to the analog port.
-   * @see "HAL_InitAccumulator"
-   */
-  public static native void initAccumulator(int analogPortHandle);
-
-  /**
-   * Resets the accumulator to the initial value.
-   *
-   * @param analogPortHandle Handle to the analog port.
-   * @see "HAL_ResetAccumulator"
-   */
-  public static native void resetAccumulator(int analogPortHandle);
-
-  /**
-   * Set the center value of the accumulator.
-   *
-   * <p>The center value is subtracted from each A/D value before it is added to the accumulator.
-   * This is used for the center value of devices like gyros and accelerometers to make integration
-   * work and to take the device offset into account when integrating.
-   *
-   * <p>This center value is based on the output of the oversampled and averaged source from channel
-   * 1. Because of this, any non-zero oversample bits will affect the size of the value for this
-   * field.
-   *
-   * @param analogPortHandle Handle to the analog port.
-   * @param center The center value of the accumulator.
-   * @see "HAL_SetAccumulatorCenter"
-   */
-  public static native void setAccumulatorCenter(int analogPortHandle, int center);
-
-  /**
-   * Set the accumulator's deadband.
-   *
-   * @param analogPortHandle Handle to the analog port.
-   * @param deadband The deadband of the accumulator.
-   * @see "HAL_SetAccumulatorDeadband"
-   */
-  public static native void setAccumulatorDeadband(int analogPortHandle, int deadband);
-
-  /**
-   * Read the accumulated value.
-   *
-   * <p>Read the value that has been accumulating on channel 1. The accumulator is attached after
-   * the oversample and average engine.
-   *
-   * @param analogPortHandle Handle to the analog port.
-   * @return The 64-bit value accumulated since the last Reset().
-   * @see "HAL_GetAccumulatorValue"
-   */
-  public static native long getAccumulatorValue(int analogPortHandle);
-
-  /**
-   * Read the number of accumulated values.
-   *
-   * <p>Read the count of the accumulated values since the accumulator was last Reset().
-   *
-   * @param analogPortHandle Handle to the analog port.
-   * @return The number of times samples from the channel were accumulated.
-   * @see "HAL_GetAccumulatorCount"
-   */
-  public static native int getAccumulatorCount(int analogPortHandle);
-
-  /**
-   * Read the accumulated value and the number of accumulated values atomically.
-   *
-   * <p>This function reads the value and count from the FPGA atomically. This can be used for
-   * averaging.
-   *
-   * @param analogPortHandle Handle to the analog port.
-   * @param result Accumulator result.
-   * @see "HAL_GetAccumulatorOutput"
-   */
-  public static native void getAccumulatorOutput(int analogPortHandle, AccumulatorResult result);
 
   /**
    * Initializes an analog trigger.

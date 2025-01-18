@@ -13,13 +13,14 @@
 namespace glass {
 
 class EncoderModel;
-class DataSource;
+class BooleanSource;
+class DoubleSource;
 
 class DPWMModel : public Model {
  public:
   virtual const char* GetSimDevice() const = 0;
 
-  virtual DataSource* GetValueData() = 0;
+  virtual DoubleSource* GetValueData() = 0;
 
   virtual void SetValue(double val) = 0;
 };
@@ -28,7 +29,7 @@ class DutyCycleModel : public Model {
  public:
   virtual const char* GetSimDevice() const = 0;
 
-  virtual DataSource* GetValueData() = 0;
+  virtual DoubleSource* GetValueData() = 0;
 
   virtual void SetValue(double val) = 0;
 };
@@ -45,7 +46,7 @@ class DIOModel : public Model {
 
   virtual bool IsInput() const = 0;
 
-  virtual DataSource* GetValueData() = 0;
+  virtual BooleanSource* GetValueData() = 0;
 
   virtual void SetValue(bool val) = 0;
 };

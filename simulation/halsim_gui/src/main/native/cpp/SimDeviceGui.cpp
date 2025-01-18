@@ -22,14 +22,43 @@
 using namespace halsimgui;
 
 namespace {
-class SimValueSource : public glass::DataSource {
+#define DEFINE_SIMVALUESOURCE(Type, TYPE, v_type)                          \
+  class Sim##Type##ValueSource : public glass::Type##Source {              \
+   public:                                                                 \
+    explicit Sim##Type##ValueSource(HAL_SimValueHandle handle,             \
+                                    const char* device, const char* name)  \
+        : Type##Source(fmt::format("{}-{}", device, name)),                \
+          m_callback{HALSIM_RegisterSimValueChangedCallback(               \
+              handle, this, CallbackFunc, true)} {}                        \
+    ~Sim##Type##ValueSource() override {                                   \
+      if (m_callback != 0) {                                               \
+        HALSIM_CancelSimValueChangedCallback(m_callback);                  \
+      }                                                                    \
+    }                                                                      \
+                                                                           \
+   private:                                                                \
+    static void CallbackFunc(const char*, void* param, HAL_SimValueHandle, \
+                             int32_t, const HAL_Value* value) {            \
+      auto source = static_cast<Sim##Type##ValueSource*>(param);           \
+      if (value->type == HAL_##TYPE) {                                     \
+        source->SetValue(value->data.v_##v_type);                          \
+      }                                                                    \
+    }                                                                      \
+                                                                           \
+    int32_t m_callback;                                                    \
+  };
+
+DEFINE_SIMVALUESOURCE(Boolean, BOOLEAN, boolean)
+DEFINE_SIMVALUESOURCE(Double, DOUBLE, double)
+
+class SimIntegerValueSource : public glass::IntegerSource {
  public:
-  explicit SimValueSource(HAL_SimValueHandle handle, const char* device,
-                          const char* name)
-      : DataSource(fmt::format("{}-{}", device, name)),
+  explicit SimIntegerValueSource(HAL_SimValueHandle handle, const char* device,
+                                 const char* name)
+      : IntegerSource(fmt::format("{}-{}", device, name)),
         m_callback{HALSIM_RegisterSimValueChangedCallback(
             handle, this, CallbackFunc, true)} {}
-  ~SimValueSource() override {
+  ~SimIntegerValueSource() override {
     if (m_callback != 0) {
       HALSIM_CancelSimValueChangedCallback(m_callback);
     }
@@ -38,13 +67,13 @@ class SimValueSource : public glass::DataSource {
  private:
   static void CallbackFunc(const char*, void* param, HAL_SimValueHandle,
                            int32_t, const HAL_Value* value) {
-    auto source = static_cast<SimValueSource*>(param);
-    if (value->type == HAL_BOOLEAN) {
-      source->SetValue(value->data.v_boolean);
-      source->SetDigital(true);
-    } else if (value->type == HAL_DOUBLE) {
-      source->SetValue(value->data.v_double);
-      source->SetDigital(false);
+    auto source = static_cast<SimIntegerValueSource*>(param);
+    if (value->type == HAL_ENUM) {
+      source->SetValue(value->data.v_enum);
+    } else if (value->type == HAL_INT) {
+      source->SetValue(value->data.v_int);
+    } else if (value->type == HAL_LONG) {
+      source->SetValue(value->data.v_long);
     }
   }
 
@@ -61,7 +90,8 @@ class SimDevicesModel : public glass::Model {
   }
 
  private:
-  wpi::DenseMap<HAL_SimValueHandle, std::unique_ptr<SimValueSource>> m_sources;
+  wpi::DenseMap<HAL_SimValueHandle, std::unique_ptr<glass::DataSource>>
+      m_sources;
 };
 }  // namespace
 
@@ -81,9 +111,30 @@ void SimDevicesModel::Update() {
                int32_t direction, const HAL_Value* value) {
               auto data = static_cast<Data*>(dataV);
               auto& source = data->self->m_sources[handle];
-              if (!source) {
-                source = std::make_unique<SimValueSource>(handle, data->device,
-                                                          name);
+              switch (value->type) {
+                case HAL_BOOLEAN:
+                  if (!dynamic_cast<SimBooleanValueSource*>(source.get())) {
+                    source = std::make_unique<SimBooleanValueSource>(
+                        handle, data->device, name);
+                  }
+                  break;
+                case HAL_DOUBLE:
+                  if (!dynamic_cast<SimDoubleValueSource*>(source.get())) {
+                    source = std::make_unique<SimDoubleValueSource>(
+                        handle, data->device, name);
+                  }
+                  break;
+                case HAL_ENUM:
+                case HAL_INT:
+                case HAL_LONG:
+                  if (!dynamic_cast<SimIntegerValueSource*>(source.get())) {
+                    source = std::make_unique<SimIntegerValueSource>(
+                        handle, data->device, name);
+                  }
+                  break;
+                default:
+                  source.reset();
+                  break;
               }
             });
       });

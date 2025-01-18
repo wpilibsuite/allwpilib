@@ -51,11 +51,9 @@ static JClass powerDistributionVersionCls;
 static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
 static JClass matchInfoDataCls;
-static JClass accumulatorResultCls;
 static JClass canDataCls;
 static JClass canStreamMessageCls;
 static JClass halValueCls;
-static JClass baseStoreCls;
 static JClass revPHVersionCls;
 static JClass canStreamOverflowExCls;
 
@@ -65,11 +63,9 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/hal/PWMConfigDataResult", &pwmConfigDataResultCls},
     {"edu/wpi/first/hal/can/CANStatus", &canStatusCls},
     {"edu/wpi/first/hal/MatchInfoData", &matchInfoDataCls},
-    {"edu/wpi/first/hal/AccumulatorResult", &accumulatorResultCls},
     {"edu/wpi/first/hal/CANData", &canDataCls},
     {"edu/wpi/first/hal/CANStreamMessage", &canStreamMessageCls},
     {"edu/wpi/first/hal/HALValue", &halValueCls},
-    {"edu/wpi/first/hal/DMAJNISample$BaseStore", &baseStoreCls},
     {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls},
     {"edu/wpi/first/hal/can/CANStreamOverflowException",
      &canStreamOverflowExCls}};
@@ -306,15 +302,6 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
       static_cast<jint>(matchInfo.matchType));
 }
 
-void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
-                                int64_t value, int64_t count) {
-  static jmethodID func =
-      env->GetMethodID(accumulatorResultCls, "set", "(JJ)V");
-
-  env->CallVoidMethod(accumulatorResult, func, static_cast<jlong>(value),
-                      static_cast<jlong>(count));
-}
-
 jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
                             uint64_t timestamp) {
   static jmethodID func = env->GetMethodID(canDataCls, "setData", "(IJ)[B");
@@ -362,11 +349,6 @@ jobject CreateHALValue(JNIEnv* env, const HAL_Value& value) {
   }
   return env->CallStaticObjectMethod(
       halValueCls, fromNative, static_cast<jint>(value.type), value1, value2);
-}
-
-jobject CreateDMABaseStore(JNIEnv* env, jint valueType, jint index) {
-  static jmethodID ctor = env->GetMethodID(baseStoreCls, "<init>", "(II)V");
-  return env->NewObject(baseStoreCls, ctor, valueType, index);
 }
 
 jobject CreatePowerDistributionVersion(JNIEnv* env, uint32_t firmwareMajor,

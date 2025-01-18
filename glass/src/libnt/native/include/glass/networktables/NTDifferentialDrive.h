@@ -46,8 +46,8 @@ class NTDifferentialDriveModel : public DriveModel {
 
   std::string m_nameValue;
   bool m_controllableValue = false;
-  DataSource m_lPercentData;
-  DataSource m_rPercentData;
+  DoubleSource m_lPercentData;
+  DoubleSource m_rPercentData;
 
   std::vector<DriveModel::WheelInfo> m_wheels;
   ImVec2 m_speedVector;

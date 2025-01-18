@@ -4,13 +4,10 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
@@ -62,25 +59,6 @@ class AnalogInputSimTest {
     try (AnalogInput input = new AnalogInput(5)) {
       input.setOversampleBits(3504);
       assertEquals(3504, input.getOversampleBits());
-    }
-  }
-
-  @Test
-  void tesInitAccumulator() {
-    HAL.initialize(500, 0);
-    try (AnalogInput input = new AnalogInput(0)) {
-      // First initialization works fine
-      assertDoesNotThrow(input::initAccumulator);
-
-      input.resetAccumulator();
-    }
-  }
-
-  @Test
-  void tesInitAccumulatorOnInvalidPort() {
-    HAL.initialize(500, 0);
-    try (AnalogInput input = new AnalogInput(5)) {
-      assertThrows(AllocationException.class, input::initAccumulator);
     }
   }
 }

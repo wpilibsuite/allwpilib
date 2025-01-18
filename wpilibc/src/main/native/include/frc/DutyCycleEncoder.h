@@ -62,33 +62,6 @@ class DutyCycleEncoder : public wpi::Sendable,
   explicit DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle);
 
   /**
-   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   *
-   * <p>This has a fullRange of 1 and an expectedZero of 0.
-   *
-   * @param digitalSource the digital source to attach to
-   */
-  explicit DutyCycleEncoder(DigitalSource& digitalSource);
-
-  /**
-   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   *
-   * <p>This has a fullRange of 1 and an expectedZero of 0.
-   *
-   * @param digitalSource the digital source to attach to
-   */
-  explicit DutyCycleEncoder(DigitalSource* digitalSource);
-
-  /**
-   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   *
-   * <p>This has a fullRange of 1 and an expectedZero of 0.
-   *
-   * @param digitalSource the digital source to attach to
-   */
-  explicit DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource);
-
-  /**
    * Construct a new DutyCycleEncoder on a specific channel.
    *
    * @param channel the channel to attach to
@@ -124,36 +97,6 @@ class DutyCycleEncoder : public wpi::Sendable,
    */
   DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle, double fullRange,
                    double expectedZero);
-
-  /**
-   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   *
-   * @param digitalSource the digital source to attach to
-   * @param fullRange the value to report at maximum travel
-   * @param expectedZero the reading where you would expect a 0 from get()
-   */
-  DutyCycleEncoder(DigitalSource& digitalSource, double fullRange,
-                   double expectedZero);
-
-  /**
-   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   *
-   * @param digitalSource the digital source to attach to
-   * @param fullRange the value to report at maximum travel
-   * @param expectedZero the reading where you would expect a 0 from get()
-   */
-  DutyCycleEncoder(DigitalSource* digitalSource, double fullRange,
-                   double expectedZero);
-
-  /**
-   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   *
-   * @param digitalSource the digital source to attach to
-   * @param fullRange the value to report at maximum travel
-   * @param expectedZero the reading where you would expect a 0 from get()
-   */
-  DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource,
-                   double fullRange, double expectedZero);
 
   ~DutyCycleEncoder() override = default;
 

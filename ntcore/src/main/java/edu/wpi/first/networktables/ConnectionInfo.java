@@ -9,7 +9,7 @@ package edu.wpi.first.networktables;
 public final class ConnectionInfo {
   /**
    * The remote identifier (as set on the remote node by {@link
-   * NetworkTableInstance#startClient4(String)}).
+   * NetworkTableInstance#startClient(String)}).
    */
   public final String remote_id;
 

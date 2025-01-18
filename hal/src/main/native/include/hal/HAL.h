@@ -6,11 +6,7 @@
 
 #include <stdint.h>
 
-#include "hal/Accelerometer.h"
-#include "hal/AnalogAccumulator.h"
-#include "hal/AnalogGyro.h"
 #include "hal/AnalogInput.h"
-#include "hal/AnalogOutput.h"
 #include "hal/AnalogTrigger.h"
 #include "hal/CAN.h"
 #include "hal/CANAPI.h"
@@ -31,8 +27,6 @@
 #include "hal/PWM.h"
 #include "hal/Ports.h"
 #include "hal/Power.h"
-#include "hal/Relay.h"
-#include "hal/SPI.h"
 #include "hal/SerialPort.h"
 #include "hal/SimDevice.h"
 #include "hal/Threads.h"

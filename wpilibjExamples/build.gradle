@@ -110,14 +110,12 @@ model {
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
-                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
-                } else {
-                    def systemArch = getCurrentArch()
-                    if (binary.targetPlatform.name == systemArch) {
-                        lib project: ":simulation:halsim_gui", library: 'halsim_gui', linkage: 'shared'
-                    }
+
+                def systemArch = getCurrentArch()
+                if (binary.targetPlatform.name == systemArch) {
+                    lib project: ":simulation:halsim_gui", library: 'halsim_gui', linkage: 'shared'
                 }
+
                 nativeUtils.useRequiredLibrary(binary, 'opencv_shared')
             }
         }
@@ -197,7 +195,7 @@ model {
                                     }
                                     testTask.systemProperty 'java.library.path', filePath
 
-                                    if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
+                                    if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
                                         testTask.enabled = false
                                     }
                                     test.dependsOn(testTask)

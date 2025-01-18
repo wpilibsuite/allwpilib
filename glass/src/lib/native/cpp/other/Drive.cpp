@@ -13,7 +13,6 @@
 #include <imgui_internal.h>
 #include <numbers>
 
-#include "glass/Context.h"
 #include "glass/DataSource.h"
 
 using namespace glass;

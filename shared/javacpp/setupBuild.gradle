@@ -82,9 +82,6 @@ model {
                 lib library: nativeName, linkage: 'shared'
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                        nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
-                    }
                 }
                 if (project.hasProperty('exeSplitSetup')) {
                     exeSplitSetup(it)
@@ -133,9 +130,6 @@ model {
             if (!project.hasProperty('noWpiutil')) {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilTestLib', linkage: 'shared'
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
-                }
             }
             if (project.hasProperty('exeSplitSetup')) {
                 exeSplitSetup(it)

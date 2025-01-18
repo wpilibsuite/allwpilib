@@ -24,19 +24,20 @@ class NTFMSModel : public FMSModel {
   explicit NTFMSModel(std::string_view path);
   NTFMSModel(nt::NetworkTableInstance inst, std::string_view path);
 
-  DataSource* GetFmsAttachedData() override { return &m_fmsAttached; }
-  DataSource* GetDsAttachedData() override { return &m_dsAttached; }
-  DataSource* GetAllianceStationIdData() override {
+  BooleanSource* GetFmsAttachedData() override { return &m_fmsAttached; }
+  BooleanSource* GetDsAttachedData() override { return &m_dsAttached; }
+  IntegerSource* GetAllianceStationIdData() override {
     return &m_allianceStationId;
   }
   // NT does not provide match time
-  DataSource* GetMatchTimeData() override { return nullptr; }
-  DataSource* GetEStopData() override { return &m_estop; }
-  DataSource* GetEnabledData() override { return &m_enabled; }
-  DataSource* GetTestData() override { return &m_test; }
-  DataSource* GetAutonomousData() override { return &m_autonomous; }
-  std::string_view GetGameSpecificMessage(
-      wpi::SmallVectorImpl<char>& buf) override;
+  DoubleSource* GetMatchTimeData() override { return nullptr; }
+  BooleanSource* GetEStopData() override { return &m_estop; }
+  BooleanSource* GetEnabledData() override { return &m_enabled; }
+  BooleanSource* GetTestData() override { return &m_test; }
+  BooleanSource* GetAutonomousData() override { return &m_autonomous; }
+  StringSource* GetGameSpecificMessageData() override {
+    return &m_gameSpecificMessageData;
+  }
 
   // NT is read-only (it's continually set by robot code)
   void SetFmsAttached(bool val) override {}
@@ -60,13 +61,14 @@ class NTFMSModel : public FMSModel {
   nt::IntegerSubscriber m_station;
   nt::IntegerSubscriber m_controlWord;
 
-  DataSource m_fmsAttached;
-  DataSource m_dsAttached;
-  DataSource m_allianceStationId;
-  DataSource m_estop;
-  DataSource m_enabled;
-  DataSource m_test;
-  DataSource m_autonomous;
+  BooleanSource m_fmsAttached;
+  BooleanSource m_dsAttached;
+  IntegerSource m_allianceStationId;
+  BooleanSource m_estop;
+  BooleanSource m_enabled;
+  BooleanSource m_test;
+  BooleanSource m_autonomous;
+  StringSource m_gameSpecificMessageData;
 };
 
 }  // namespace glass

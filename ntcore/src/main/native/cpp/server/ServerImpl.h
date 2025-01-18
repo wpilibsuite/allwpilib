@@ -61,9 +61,6 @@ class ServerImpl final {
                                         std::string_view connInfo, bool local,
                                         net::WireConnection& wire,
                                         SetPeriodicFunc setPeriodic);
-  int AddClient3(std::string_view connInfo, bool local,
-                 net3::WireConnection3& wire, Connected3Func connected,
-                 SetPeriodicFunc setPeriodic);
   std::shared_ptr<void> RemoveClient(int clientId);
 
   void ConnectionsChanged(const std::vector<ConnectionInfo>& conns) {

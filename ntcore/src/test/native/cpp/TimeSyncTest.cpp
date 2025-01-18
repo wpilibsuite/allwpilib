@@ -26,7 +26,7 @@ TEST_F(TimeSyncTest, TestServer) {
   nt::NetworkTableListenerPoller poller{m_inst};
   poller.AddTimeSyncListener(false);
 
-  m_inst.StartServer("timesynctest.json", "127.0.0.1", 0, 10030);
+  m_inst.StartServer("timesynctest.json", "127.0.0.1", 10030);
   auto offset = m_inst.GetServerTimeOffset();
   ASSERT_TRUE(offset);
   ASSERT_EQ(0, *offset);
@@ -50,18 +50,8 @@ TEST_F(TimeSyncTest, TestServer) {
   ASSERT_FALSE(data->valid);
 }
 
-TEST_F(TimeSyncTest, TestClient3) {
-  m_inst.StartClient3("client");
-  auto offset = m_inst.GetServerTimeOffset();
-  ASSERT_FALSE(offset);
-
-  m_inst.StopClient();
-  offset = m_inst.GetServerTimeOffset();
-  ASSERT_FALSE(offset);
-}
-
-TEST_F(TimeSyncTest, TestClient4) {
-  m_inst.StartClient4("client");
+TEST_F(TimeSyncTest, TestClient) {
+  m_inst.StartClient("client");
   auto offset = m_inst.GetServerTimeOffset();
   ASSERT_FALSE(offset);
 

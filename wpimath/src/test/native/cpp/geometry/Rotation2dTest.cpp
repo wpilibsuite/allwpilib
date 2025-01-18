@@ -59,7 +59,7 @@ TEST(Rotation2dTest, Multiply) {
   const auto rot = Rotation2d{10_deg};
 
   EXPECT_DOUBLE_EQ(30.0, (rot * 3.0).Degrees().value());
-  EXPECT_DOUBLE_EQ(410.0, (rot * 41.0).Degrees().value());
+  EXPECT_DOUBLE_EQ(50.0, (rot * 41.0).Degrees().value());
 }
 
 TEST(Rotation2dTest, Equality) {
@@ -102,9 +102,9 @@ TEST(Rotation2dTest, Constexpr) {
   constexpr auto subtracted = cartesianCtor - degreeCtor;
 
   static_assert(defaultCtor.Radians() == 0_rad);
-  static_assert(degreeCtor.Degrees() == 270_deg);
-  static_assert(negated.Radians() == -5_rad);
-  static_assert(multiplied.Radians() == 10_rad);
+  static_assert(degreeCtor.Degrees() == -90_deg);
+  static_assert(negated.Radians() == -5_rad + 1_tr);
+  static_assert(multiplied.Radians() == 10_rad - 2_tr);
   static_assert(subtracted == rotation45);
   static_assert(radianCtor != degreeCtor);
 }
