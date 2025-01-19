@@ -87,9 +87,9 @@ class Alert::SendableAlerts : public nt::NTSendable,
     wpi::SendableRegistry::EnsureInitialized();
     static wpi::StringMap<Alert::SendableAlerts> groups;
 
-    auto [iter, exists] = groups.try_emplace(group);
+    auto [iter, inserted] = groups.try_emplace(group);
     SendableAlerts& sendable = iter->second;
-    if (!exists) {
+    if (inserted) {
       frc::SmartDashboard::PutData(group, &iter->second);
     }
     return sendable;
