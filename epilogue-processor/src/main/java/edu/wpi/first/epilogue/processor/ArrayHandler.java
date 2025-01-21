@@ -112,7 +112,7 @@ public class ArrayHandler extends ElementHandler {
               "backend\\.getNested\\(\".*\"\\)",
               "backend.getNested(\"%s/\" + i)".formatted(loggedName(element)));
       return """
-          for (int i = 0; i < %s.length; i++) {
+          for (int i = 0; i < (%s).length; i++) {
               %s;
           }
         """
