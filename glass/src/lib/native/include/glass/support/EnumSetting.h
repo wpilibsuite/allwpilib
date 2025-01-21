@@ -22,6 +22,8 @@ class EnumSetting {
   bool Combo(const char* label, int numOptions = -1,
              int popup_max_height_in_items = -1);
 
+  bool Menu(const char* label);
+
  private:
   void UpdateValue() const;
 
