@@ -60,6 +60,6 @@
 'component: usage reporting':
 - changed-files:
   - any-glob-to-any-file: hal/src/generate/**
- 'attn: NI':
+'attn: NI':
 - changed-files:
   - any-glob-to-any-file: hal/src/generate/**
