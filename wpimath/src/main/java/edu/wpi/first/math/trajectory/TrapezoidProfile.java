@@ -6,6 +6,9 @@ package edu.wpi.first.math.trajectory;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.math.trajectory.struct.TrapezoidProfileStateStruct;
+import edu.wpi.first.util.struct.StructSerializable;
+
 import java.util.Objects;
 
 /**
@@ -71,7 +74,10 @@ public class TrapezoidProfile {
   }
 
   /** Profile state. */
-  public static class State {
+  public static class State implements StructSerializable {
+    /** The struct used for serializing this class. */
+    public static final TrapezoidProfileStateStruct struct = new TrapezoidProfileStateStruct();
+    
     /** The position at this state. */
     public double position;
 
