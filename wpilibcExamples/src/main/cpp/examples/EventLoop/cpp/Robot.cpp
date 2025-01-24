@@ -17,7 +17,6 @@
 
 static const auto SHOT_VELOCITY = 200_rpm;
 static const auto TOLERANCE = 8_rpm;
-static const auto KICKER_THRESHOLD = 15_mm;
 
 class Robot : public frc::TimedRobot {
  public:
