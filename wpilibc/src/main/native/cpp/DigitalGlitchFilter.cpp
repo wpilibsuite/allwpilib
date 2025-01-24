@@ -13,7 +13,6 @@
 #include <hal/FRCUsageReporting.h>
 #include <wpi/sendable/SendableRegistry.h>
 
-#include "frc/Counter.h"
 #include "frc/Encoder.h"
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
@@ -87,11 +86,6 @@ void DigitalGlitchFilter::Add(Encoder* input) {
   Add(input->m_bSource.get());
 }
 
-void DigitalGlitchFilter::Add(Counter* input) {
-  Add(input->m_upSource.get());
-  Add(input->m_downSource.get());
-}
-
 void DigitalGlitchFilter::Remove(DigitalSource* input) {
   DoAdd(input, 0);
 }
@@ -99,11 +93,6 @@ void DigitalGlitchFilter::Remove(DigitalSource* input) {
 void DigitalGlitchFilter::Remove(Encoder* input) {
   Remove(input->m_aSource.get());
   Remove(input->m_bSource.get());
-}
-
-void DigitalGlitchFilter::Remove(Counter* input) {
-  Remove(input->m_upSource.get());
-  Remove(input->m_downSource.get());
 }
 
 void DigitalGlitchFilter::SetPeriodCycles(int fpgaCycles) {

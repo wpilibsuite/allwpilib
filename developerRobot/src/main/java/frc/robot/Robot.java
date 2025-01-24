@@ -5,8 +5,12 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.counter.EdgeConfiguration;
+import edu.wpi.first.wpilibj.counter.UpDownCounter;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
+  UpDownCounter counter = new UpDownCounter(0, EdgeConfiguration.kFallingEdge);
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -35,5 +39,7 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during all modes. */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    SmartDashboard.putNumber("Count", counter.getCount());
+  }
 }

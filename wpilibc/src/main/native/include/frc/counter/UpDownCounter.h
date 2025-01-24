@@ -28,19 +28,10 @@ class UpDownCounter : public wpi::Sendable,
   /**
    * Constructs a new UpDown Counter.
    *
-   * @param upSource The up count source (can be null).
-   * @param downSource The down count source (can be null).
+   * @param channel The DIO channel
+   * @param configuration Edge configuration
    */
-  UpDownCounter(DigitalSource& upSource, DigitalSource& downSource);
-
-  /**
-   * Constructs a new UpDown Counter.
-   *
-   * @param upSource The up count source (can be null).
-   * @param downSource The down count source (can be null).
-   */
-  UpDownCounter(std::shared_ptr<DigitalSource> upSource,
-                std::shared_ptr<DigitalSource> downSource);
+  UpDownCounter(int channel, EdgeConfiguration configuration);
 
   UpDownCounter(UpDownCounter&&) = default;
   UpDownCounter& operator=(UpDownCounter&&) = default;
@@ -54,38 +45,21 @@ class UpDownCounter : public wpi::Sendable,
    */
   int GetCount() const;
 
-  /**
-   * Sets to revert the counter direction.
-   *
-   * @param reverseDirection True to reverse counting direction.
-   */
-  void SetReverseDirection(bool reverseDirection);
-
   /** Resets the current count. */
   void Reset();
 
   /**
-   * Sets the configuration for the up source.
+   * Sets the configuration for the channel.
    *
-   * @param configuration The up source configuration.
+   * @param configuration The channel configuration.
    */
-  void SetUpEdgeConfiguration(EdgeConfiguration configuration);
-
-  /**
-   * Sets the configuration for the down source.
-   *
-   * @param configuration The down source configuration.
-   */
-  void SetDownEdgeConfiguration(EdgeConfiguration configuration);
+  void SetEdgeConfiguration(EdgeConfiguration configuration);
 
  protected:
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  void InitUpDownCounter();
-  std::shared_ptr<DigitalSource> m_upSource;
-  std::shared_ptr<DigitalSource> m_downSource;
   hal::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;
-  int32_t m_index = 0;
+  int32_t m_channel;
 };
 }  // namespace frc

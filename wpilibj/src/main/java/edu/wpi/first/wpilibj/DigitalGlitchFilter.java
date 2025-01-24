@@ -102,16 +102,6 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   }
 
   /**
-   * Assigns the Counter to this glitch filter.
-   *
-   * @param input The Counter to add.
-   */
-  public void add(Counter input) {
-    add(input.m_upSource);
-    add(input.m_downSource);
-  }
-
-  /**
    * Removes this filter from the given digital input.
    *
    * @param input The DigitalSource to stop filtering.
@@ -128,16 +118,6 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   public void remove(Encoder input) {
     remove(input.m_aSource);
     remove(input.m_bSource);
-  }
-
-  /**
-   * Removes this filter from the given Counter.
-   *
-   * @param input The Counter to stop filtering.
-   */
-  public void remove(Counter input) {
-    remove(input.m_upSource);
-    remove(input.m_downSource);
   }
 
   /**

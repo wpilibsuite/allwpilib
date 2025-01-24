@@ -8,33 +8,28 @@
 
 #include <hal/Counter.h>
 #include <hal/FRCUsageReporting.h>
-#include <wpi/NullDeleter.h>
+#include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/Errors.h"
 
 using namespace frc;
 
-Tachometer::Tachometer(DigitalSource& source)
-    : Tachometer({&source, wpi::NullDeleter<DigitalSource>()}) {}
-Tachometer::Tachometer(std::shared_ptr<DigitalSource> source) {
-  if (source == nullptr) {
-    throw FRC_MakeError(err::NullParameter, "source");
-  }
-
-  m_source = source;
-
+Tachometer::Tachometer(int channel, EdgeConfiguration configuration) : m_channel{channel} {
   int32_t status = 0;
-  HAL_SetCounterUpSource(m_handle, m_source->GetPortHandleForRouting(),
-                         static_cast<HAL_AnalogTriggerType>(
-                             m_source->GetAnalogTriggerTypeForRouting()),
-                         &status);
-  FRC_CheckErrorStatus(status, "{}", m_index);
-  HAL_SetCounterUpSourceEdge(m_handle, true, false, &status);
-  FRC_CheckErrorStatus(status, "{}", m_index);
+  std::string stackTrace = wpi::GetStackTrace(1);
+  m_handle = HAL_InitializeCounter(channel, configuration == EdgeConfiguration::kRisingEdge, stackTrace.c_str(), &status);
+  FRC_CheckErrorStatus(status, "{}", channel);
 
-  HAL_Report(HALUsageReporting::kResourceType_Counter, m_index + 1);
-  wpi::SendableRegistry::AddLW(this, "Tachometer", m_index);
+  HAL_Report(HALUsageReporting::kResourceType_Counter, channel + 1);
+  wpi::SendableRegistry::AddLW(this, "Tachometer", channel);
+}
+
+void Tachometer::SetEdgeConfiguration(EdgeConfiguration configuration) {
+  int32_t status = 0;
+  bool rising = configuration == EdgeConfiguration::kRisingEdge;
+  HAL_SetCounterEdgeConfiguration(m_handle, rising, &status);
+  FRC_CheckErrorStatus(status, "{}", m_channel);
 }
 
 units::hertz_t Tachometer::GetFrequency() const {
@@ -48,7 +43,7 @@ units::hertz_t Tachometer::GetFrequency() const {
 units::second_t Tachometer::GetPeriod() const {
   int32_t status = 0;
   double period = HAL_GetCounterPeriod(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_source->GetChannel());
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
   return units::second_t{period};
 }
 
@@ -79,33 +74,14 @@ units::revolutions_per_minute_t Tachometer::GetRevolutionsPerMinute() const {
 bool Tachometer::GetStopped() const {
   int32_t status = 0;
   bool stopped = HAL_GetCounterStopped(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_source->GetChannel());
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
   return stopped;
-}
-
-int Tachometer::GetSamplesToAverage() const {
-  int32_t status = 0;
-  int32_t samplesToAverage = HAL_GetCounterSamplesToAverage(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_source->GetChannel());
-  return samplesToAverage;
-}
-
-void Tachometer::SetSamplesToAverage(int samples) {
-  int32_t status = 0;
-  HAL_SetCounterSamplesToAverage(m_handle, samples, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_source->GetChannel());
 }
 
 void Tachometer::SetMaxPeriod(units::second_t maxPeriod) {
   int32_t status = 0;
   HAL_SetCounterMaxPeriod(m_handle, maxPeriod.value(), &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_source->GetChannel());
-}
-
-void Tachometer::SetUpdateWhenEmpty(bool updateWhenEmpty) {
-  int32_t status = 0;
-  HAL_SetCounterUpdateWhenEmpty(m_handle, updateWhenEmpty, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_source->GetChannel());
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
 void Tachometer::InitSendable(wpi::SendableBuilder& builder) {

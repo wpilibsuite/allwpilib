@@ -17,7 +17,6 @@
 namespace frc {
 
 class Encoder;
-class Counter;
 
 /**
  * Class to enable glitch filtering on a set of digital inputs.
@@ -50,13 +49,6 @@ class DigitalGlitchFilter : public wpi::Sendable,
   void Add(Encoder* input);
 
   /**
-   * Assigns the Counter to this glitch filter.
-   *
-   * @param input The Counter to add.
-   */
-  void Add(Counter* input);
-
-  /**
    * Removes a digital input from this filter.
    *
    * Removes the DigitalSource from this glitch filter and re-assigns it to
@@ -75,16 +67,6 @@ class DigitalGlitchFilter : public wpi::Sendable,
    * @param input The Encoder to remove.
    */
   void Remove(Encoder* input);
-
-  /**
-   * Removes a counter from this filter.
-   *
-   * Removes the Counter from this glitch filter and re-assigns it to
-   * the default filter.
-   *
-   * @param input The Counter to remove.
-   */
-  void Remove(Counter* input);
 
   /**
    * Sets the number of cycles that the input must not change state for.
