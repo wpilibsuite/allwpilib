@@ -28,7 +28,7 @@ public class PIDController implements Sendable, AutoCloseable {
   private double m_iZone = Double.POSITIVE_INFINITY;
 
   // The period (in seconds) of the loop that calls the controller
-  private final double m_period;
+  private double m_period;
 
   private double m_maximumIntegral = 1.0;
 
@@ -416,6 +416,21 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   public double getErrorDerivative() {
     return m_errorDerivative;
+  }
+
+  /**
+   * Returns the next output of the PID controller.
+   *
+   * @param measurement The current measurement of the process variable.
+   * @param setpoint The new setpoint of the controller.
+   * @param period The new period of the controller.
+   * @return The next controller output.
+   */
+  public double calculate(double measurement, double setpoint, double period) {
+    m_setpoint = setpoint;
+    m_haveSetpoint = true;
+    m_period = period;
+    return calculate(measurement);
   }
 
   /**

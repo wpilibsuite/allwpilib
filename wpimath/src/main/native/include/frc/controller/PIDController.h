@@ -393,6 +393,21 @@ class WPILIB_DLLEXPORT PIDController
   }
 
   /**
+   * Returns the next output of the PID controller.
+   *
+   * @param measurement The current measurement of the process variable.
+   * @param setpoint The new setpoint of the controller.
+   * @param period The new period of the controller.
+   */
+  constexpr double Calculate(double measurement, double setpoint,
+                             units::second_t period) {
+    m_setpoint = setpoint;
+    m_haveSetpoint = true;
+    m_period = period;
+    return Calculate(measurement);
+  }
+
+  /**
    * Reset the previous error, the integral term, and disable the controller.
    */
   constexpr void Reset() {
