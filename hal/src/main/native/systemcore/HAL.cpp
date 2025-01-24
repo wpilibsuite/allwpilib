@@ -60,7 +60,6 @@ void InitializeHAL() {
   InitializeEncoder();
   InitializeFRCDriverStation();
   InitializeI2C();
-  InitializeInterrupts();
   InitializeLEDs();
   InitializeMain();
   InitializeNotifier();

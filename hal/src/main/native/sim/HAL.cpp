@@ -97,7 +97,6 @@ void InitializeHAL() {
   InitializeEncoder();
   InitializeExtensions();
   InitializeI2C();
-  InitializeInterrupts();
   InitializeMain();
   InitializeMockHooks();
   InitializeNotifier();
