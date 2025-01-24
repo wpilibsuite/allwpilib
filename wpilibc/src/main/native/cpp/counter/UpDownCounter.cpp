@@ -17,11 +17,13 @@
 
 using namespace frc;
 
-UpDownCounter::UpDownCounter(int channel, EdgeConfiguration configuration) : m_channel{channel} {
-
+UpDownCounter::UpDownCounter(int channel, EdgeConfiguration configuration)
+    : m_channel{channel} {
   int32_t status = 0;
   std::string stackTrace = wpi::GetStackTrace(1);
-  m_handle = HAL_InitializeCounter(channel, configuration == EdgeConfiguration::kRisingEdge, stackTrace.c_str(), &status);
+  m_handle = HAL_InitializeCounter(
+      channel, configuration == EdgeConfiguration::kRisingEdge,
+      stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "{}", channel);
 
   Reset();

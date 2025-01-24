@@ -17,10 +17,13 @@
 
 using namespace frc;
 
-Tachometer::Tachometer(int channel, EdgeConfiguration configuration) : m_channel{channel} {
+Tachometer::Tachometer(int channel, EdgeConfiguration configuration)
+    : m_channel{channel} {
   int32_t status = 0;
   std::string stackTrace = wpi::GetStackTrace(1);
-  m_handle = HAL_InitializeCounter(channel, configuration == EdgeConfiguration::kRisingEdge, stackTrace.c_str(), &status);
+  m_handle = HAL_InitializeCounter(
+      channel, configuration == EdgeConfiguration::kRisingEdge,
+      stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "{}", channel);
 
   HAL_Report(HALUsageReporting::kResourceType_Counter, channel + 1);

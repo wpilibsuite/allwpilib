@@ -28,7 +28,8 @@ Java_edu_wpi_first_hal_CounterJNI_initializeCounter
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  auto counter = HAL_InitializeCounter(channel, risingEdge, stack.c_str(), &status);
+  auto counter =
+      HAL_InitializeCounter(channel, risingEdge, stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return (jint)counter;
 }
@@ -57,8 +58,7 @@ Java_edu_wpi_first_hal_CounterJNI_setCounterEdgeConfiguration
   (JNIEnv* env, jclass, jint id, jboolean valueRise)
 {
   int32_t status = 0;
-  HAL_SetCounterEdgeConfiguration((HAL_CounterHandle)id, valueRise,
-                             &status);
+  HAL_SetCounterEdgeConfiguration((HAL_CounterHandle)id, valueRise, &status);
   CheckStatus(env, status);
 }
 

@@ -91,8 +91,7 @@ void HAL_FreeCounter(HAL_CounterHandle counterHandle) {
 }
 
 void HAL_SetCounterEdgeConfiguration(HAL_CounterHandle counterHandle,
-                                     HAL_Bool risingEdge,
-                                     int32_t* status) {
+                                     HAL_Bool risingEdge, int32_t* status) {
   *status = HAL_HANDLE_ERROR;
   return;
 }
