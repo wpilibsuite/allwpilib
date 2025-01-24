@@ -5,6 +5,7 @@
 #include "frc/counter/UpDownCounter.h"
 
 #include <memory>
+#include <string>
 
 #include <hal/Counter.h>
 #include <hal/FRCUsageReporting.h>

@@ -4,6 +4,7 @@
 
 #include "hal/Counter.h"
 
+#include <cstdio>
 #include <limits>
 #include <memory>
 #include <thread>

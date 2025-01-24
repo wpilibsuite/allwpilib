@@ -4,6 +4,8 @@
 
 #include "frc/counter/Tachometer.h"
 
+#include <string>
+
 #include <frc/DigitalSource.h>
 
 #include <hal/Counter.h>
