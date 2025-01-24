@@ -48,7 +48,6 @@ extern void InitializeEncoder();
 extern void InitializeExtensions();
 extern void InitializeHAL();
 extern void InitializeI2C();
-extern void InitializeInterrupts();
 extern void InitializeMain();
 extern void InitializeMockHooks();
 extern void InitializeNotifier();
