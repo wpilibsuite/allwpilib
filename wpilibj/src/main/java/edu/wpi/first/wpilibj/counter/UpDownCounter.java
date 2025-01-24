@@ -24,7 +24,7 @@ public class UpDownCounter implements Sendable, AutoCloseable {
    * Constructs a new UpDown Counter.
    *
    * @param channel The up count source (can be null).
-   * @param countUp True to count up, false to count down.
+   * @param configuration The edge configuration.
    */
   @SuppressWarnings("this-escape")
   public UpDownCounter(int channel, EdgeConfiguration configuration) {

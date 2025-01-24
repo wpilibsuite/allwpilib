@@ -26,6 +26,7 @@ public class Tachometer implements Sendable, AutoCloseable {
    * Constructs a new tachometer.
    *
    * @param channel The channel of the Tachometer.
+   * @param configuration The edge configuration
    */
   @SuppressWarnings("this-escape")
   public Tachometer(int channel, EdgeConfiguration configuration) {
