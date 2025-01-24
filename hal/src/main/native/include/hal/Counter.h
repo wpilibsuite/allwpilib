@@ -22,16 +22,15 @@ extern "C" {
 /**
  * Initializes a counter.
  *
- * @param[in] portHandle          the port handle to create from
- * @param[in] countUp             true to count on rising edge, false for
+ * @param[in] channel               the dio channel
+ * @param[in] risingEdge            true to count on rising edge, false for
  * falling
- * @param[in] allocationLocation  the location where the allocation is occurring
- *                                (can be null)
+ * @param[in] allocationLocation    the location where the allocation is
+ * occurring (can be null)
  * @param[out] status     Error status variable. 0 on success.
  * @return the created handle
  */
-HAL_CounterHandle HAL_InitializeCounter(HAL_PortHandle channel,
-                                        HAL_Bool risingEdge,
+HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
                                         const char* allocationLocation,
                                         int32_t* status);
 
