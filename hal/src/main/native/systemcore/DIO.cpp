@@ -201,25 +201,4 @@ HAL_Bool HAL_IsAnyPulsing(int32_t* status) {
   return false;
 }
 
-void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
-                         int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
 }  // extern "C"
