@@ -6,8 +6,6 @@
 
 #include <string>
 
-#include <frc/DigitalSource.h>
-
 #include <hal/Counter.h>
 #include <hal/FRCUsageReporting.h>
 #include <wpi/StackTrace.h>

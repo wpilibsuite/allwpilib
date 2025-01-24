@@ -15,8 +15,8 @@
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "SmartIo.h"
-#include "hal/cpp/fpga_clock.h"
 #include "hal/HAL.h"
+#include "hal/cpp/fpga_clock.h"
 #include "hal/handles/LimitedHandleResource.h"
 
 using namespace hal;
