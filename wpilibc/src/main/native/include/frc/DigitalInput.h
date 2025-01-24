@@ -12,8 +12,6 @@
 
 namespace frc {
 
-class DigitalGlitchFilter;
-
 /**
  * Class to read a digital input.
  *
@@ -81,8 +79,6 @@ class DigitalInput : public DigitalSource,
  private:
   int m_channel;
   hal::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> m_handle;
-
-  friend class DigitalGlitchFilter;
 };
 
 }  // namespace frc
