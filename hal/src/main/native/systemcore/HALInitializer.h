@@ -30,7 +30,6 @@ extern void InitializeDigitalInternal();
 extern void InitializeDIO();
 extern void InitializeDutyCycle();
 extern void InitializeEncoder();
-extern void InitializeFPGAEncoder();
 extern void InitializeFRCDriverStation();
 extern void InitializeHAL();
 extern void InitializeI2C();
