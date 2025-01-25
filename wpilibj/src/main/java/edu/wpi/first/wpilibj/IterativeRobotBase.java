@@ -10,7 +10,6 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ConcurrentModificationException;
 
@@ -331,7 +330,6 @@ public abstract class IterativeRobotBase extends RobotBase {
         case kTest -> {
           if (m_lwEnabledInTest) {
             LiveWindow.setEnabled(false);
-            Shuffleboard.disableActuatorWidgets();
           }
           testExit();
         }
@@ -357,7 +355,6 @@ public abstract class IterativeRobotBase extends RobotBase {
         case kTest -> {
           if (m_lwEnabledInTest) {
             LiveWindow.setEnabled(true);
-            Shuffleboard.enableActuatorWidgets();
           }
           testInit();
           m_watchdog.addEpoch("testInit()");
@@ -404,8 +401,6 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_watchdog.addEpoch("SmartDashboard.updateValues()");
     LiveWindow.updateValues();
     m_watchdog.addEpoch("LiveWindow.updateValues()");
-    Shuffleboard.update();
-    m_watchdog.addEpoch("Shuffleboard.update()");
 
     if (isSimulation()) {
       HAL.simPeriodicBefore();

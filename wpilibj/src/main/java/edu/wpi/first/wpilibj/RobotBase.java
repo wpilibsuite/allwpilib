@@ -18,7 +18,6 @@ import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
 import java.io.File;
 import java.io.IOException;
@@ -227,7 +226,6 @@ public abstract class RobotBase implements AutoCloseable {
             });
 
     LiveWindow.setEnabled(false);
-    Shuffleboard.disableActuatorWidgets();
   }
 
   /**
