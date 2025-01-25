@@ -56,6 +56,6 @@ void AnalogAccelerometer::InitAccelerometer() {
   HAL_Report(HALUsageReporting::kResourceType_Accelerometer,
              m_analogInput->GetChannel() + 1);
 
-  wpi::SendableRegistry::AddLW(this, "Accelerometer",
-                               m_analogInput->GetChannel());
+  wpi::SendableRegistry::Add(this, "Accelerometer",
+                             m_analogInput->GetChannel());
 }

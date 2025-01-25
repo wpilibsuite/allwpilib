@@ -40,7 +40,7 @@ public class PWM implements Sendable, AutoCloseable {
    * <p>Checks channel value range and allocates the appropriate channel. The allocation is only
    * done to help users ensure that they don't double assign channels.
    *
-   * <p>By default, adds itself to SendableRegistry and LiveWindow.
+   * <p>By default, adds itself to SendableRegistry.
    *
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
    */
@@ -52,7 +52,7 @@ public class PWM implements Sendable, AutoCloseable {
    * Allocate a PWM given a channel.
    *
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
-   * @param registerSendable If true, adds this instance to SendableRegistry and LiveWindow
+   * @param registerSendable If true, adds this instance to SendableRegistry
    */
   @SuppressWarnings("this-escape")
   public PWM(final int channel, final boolean registerSendable) {
@@ -67,7 +67,7 @@ public class PWM implements Sendable, AutoCloseable {
 
     HAL.report(tResourceType.kResourceType_PWM, channel + 1);
     if (registerSendable) {
-      SendableRegistry.addLW(this, "PWM", channel);
+      SendableRegistry.add(this, "PWM", channel);
     }
   }
 
@@ -244,7 +244,6 @@ public class PWM implements Sendable, AutoCloseable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("PWM");
     builder.setActuator(true);
-    builder.setSafeState(this::setDisabled);
     builder.addDoubleProperty(
         "Value", this::getPulseTimeMicroseconds, value -> setPulseTimeMicroseconds((int) value));
     builder.addDoubleProperty("Speed", this::getSpeed, this::setSpeed);

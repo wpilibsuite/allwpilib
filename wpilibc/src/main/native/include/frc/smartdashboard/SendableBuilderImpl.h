@@ -74,25 +74,12 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
   void StopListeners();
 
   /**
-   * Start LiveWindow mode by hooking the setters for all properties.  Also
-   * calls the SafeState function if one was provided.
-   */
-  void StartLiveWindowMode();
-
-  /**
-   * Stop LiveWindow mode by unhooking the setters for all properties.  Also
-   * calls the SafeState function if one was provided.
-   */
-  void StopLiveWindowMode();
-
-  /**
    * Clear properties.
    */
   void ClearProperties() override;
 
   void SetSmartDashboardType(std::string_view type) override;
   void SetActuator(bool value) override;
-  void SetSafeState(std::function<void()> func) override;
   void SetUpdateTable(wpi::unique_function<void()> func) override;
   nt::Topic GetTopic(std::string_view key) override;
 
@@ -238,7 +225,6 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
   void AddSmallPropertyImpl(Topic topic, Getter getter, Setter setter);
 
   std::vector<std::unique_ptr<Property>> m_properties;
-  std::function<void()> m_safeState;
   std::vector<wpi::unique_function<void()>> m_updateTables;
   std::shared_ptr<nt::NetworkTable> m_table;
   bool m_controllable = false;

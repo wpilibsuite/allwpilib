@@ -84,7 +84,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
 
     int fpgaIndex = getFPGAIndex();
     HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex + 1, type.value + 1);
-    SendableRegistry.addLW(this, "Encoder", fpgaIndex);
+    SendableRegistry.add(this, "Encoder", fpgaIndex);
   }
 
   /**

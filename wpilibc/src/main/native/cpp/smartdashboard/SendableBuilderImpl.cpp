@@ -77,20 +77,6 @@ void SendableBuilderImpl::StopListeners() {
   }
 }
 
-void SendableBuilderImpl::StartLiveWindowMode() {
-  if (m_safeState) {
-    m_safeState();
-  }
-  StartListeners();
-}
-
-void SendableBuilderImpl::StopLiveWindowMode() {
-  StopListeners();
-  if (m_safeState) {
-    m_safeState();
-  }
-}
-
 void SendableBuilderImpl::ClearProperties() {
   m_properties.clear();
 }
@@ -109,10 +95,6 @@ void SendableBuilderImpl::SetActuator(bool value) {
   }
   m_actuatorPublisher.Set(value);
   m_actuator = value;
-}
-
-void SendableBuilderImpl::SetSafeState(std::function<void()> func) {
-  m_safeState = func;
 }
 
 void SendableBuilderImpl::SetUpdateTable(wpi::unique_function<void()> func) {

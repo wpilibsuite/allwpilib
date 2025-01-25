@@ -60,7 +60,7 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
 
     int intIndex = index.getInt();
     HAL.report(tResourceType.kResourceType_Counter, intIndex + 1);
-    SendableRegistry.addLW(this, "External Direction Counter", intIndex);
+    SendableRegistry.add(this, "External Direction Counter", intIndex);
   }
 
   /**

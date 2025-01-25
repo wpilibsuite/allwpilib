@@ -53,7 +53,7 @@ public class MotorControllerGroup implements MotorController, Sendable, AutoClos
       SendableRegistry.addChild(this, controller);
     }
     instances++;
-    SendableRegistry.addLW(this, "MotorControllerGroup", instances);
+    SendableRegistry.add(this, "MotorControllerGroup", instances);
   }
 
   @Override
@@ -111,7 +111,6 @@ public class MotorControllerGroup implements MotorController, Sendable, AutoClos
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Motor Controller");
     builder.setActuator(true);
-    builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Value", this::get, this::set);
   }
 }

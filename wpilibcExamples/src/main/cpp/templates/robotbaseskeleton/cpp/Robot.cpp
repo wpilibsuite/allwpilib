@@ -6,7 +6,6 @@
 
 #include <frc/DriverStation.h>
 #include <frc/internal/DriverStationModeThread.h>
-#include <frc/livewindow/LiveWindow.h>
 #include <hal/DriverStation.h>
 #include <networktables/NetworkTable.h>
 
@@ -45,14 +44,12 @@ void Robot::StartCompetition() {
         wpi::WaitForObject(event.GetHandle());
       }
     } else if (IsTest()) {
-      frc::LiveWindow::SetEnabled(true);
       modeThread.InTest(true);
       Test();
       modeThread.InTest(false);
       while (IsTest() && IsEnabled()) {
         wpi::WaitForObject(event.GetHandle());
       }
-      frc::LiveWindow::SetEnabled(false);
     } else {
       modeThread.InTeleop(true);
       Teleop();

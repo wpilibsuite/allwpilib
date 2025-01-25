@@ -25,7 +25,7 @@ Compressor::Compressor(int module, PneumaticsModuleType moduleType)
   m_module->EnableCompressorDigital();
 
   HAL_Report(HALUsageReporting::kResourceType_Compressor, module + 1);
-  wpi::SendableRegistry::AddLW(this, "Compressor", module);
+  wpi::SendableRegistry::Add(this, "Compressor", module);
 }
 
 Compressor::Compressor(PneumaticsModuleType moduleType)

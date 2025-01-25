@@ -36,7 +36,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
 
     m_channel = channel;
     HAL.report(tResourceType.kResourceType_DutyCycle, channel + 1);
-    SendableRegistry.addLW(this, "Duty Cycle", channel);
+    SendableRegistry.add(this, "Duty Cycle", channel);
   }
 
   /** Close the DutyCycle and free all resources. */
