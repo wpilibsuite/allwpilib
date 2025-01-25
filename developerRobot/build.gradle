@@ -202,8 +202,6 @@ model {
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
-                project(':ntcore').addNtcoreDependency(binary, 'shared')
-                project(':ntcore').addNtcoreJniDependency(binary)
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
@@ -211,6 +209,8 @@ model {
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 project(':hal').addHalDependency(binary, 'shared')
                 project(':hal').addHalJniDependency(binary)
+                project(':ntcore').addNtcoreDependency(binary, 'shared')
+                project(':ntcore').addNtcoreJniDependency(binary)
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 def systemArch = getCurrentArch()
@@ -247,9 +247,9 @@ model {
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
-                project(':ntcore').addNtcoreDependency(binary, 'static')
                 lib project: ':cscore', library: 'cscore', linkage: 'static'
                 project(':hal').addHalDependency(binary, 'static')
+                project(':ntcore').addNtcoreDependency(binary, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
             }
