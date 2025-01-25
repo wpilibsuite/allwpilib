@@ -26,6 +26,33 @@ using namespace wpi::log;
 static bool mockTimeEnabled = false;
 static uint64_t mockNow = 0;
 
+static JException illegalArgEx;
+static JException indexOobEx;
+static JException ioEx;
+static JException nullPointerEx;
+
+static const JExceptionInit exceptions[] = {
+    {"java/lang/IllegalArgumentException", &illegalArgEx},
+    {"java/lang/IndexOutOfBoundsException", &indexOobEx},
+    {"java/io/IOException", &ioEx},
+    {"java/lang/NullPointerException", &nullPointerEx}};
+
+void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
+  illegalArgEx.Throw(env, msg);
+}
+
+void wpi::ThrowIndexOobException(JNIEnv* env, std::string_view msg) {
+  indexOobEx.Throw(env, msg);
+}
+
+void wpi::ThrowIOException(JNIEnv* env, std::string_view msg) {
+  ioEx.Throw(env, msg);
+}
+
+void wpi::ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
+  nullPointerEx.Throw(env, msg);
+}
+
 namespace {
 class buf_ostream : public wpi::raw_uvector_ostream {
  private:
