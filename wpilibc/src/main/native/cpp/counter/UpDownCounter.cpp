@@ -54,7 +54,7 @@ UpDownCounter::UpDownCounter(std::shared_ptr<DigitalSource> upSource,
   Reset();
 
   HAL_Report(HALUsageReporting::kResourceType_Counter, m_index + 1);
-  wpi::SendableRegistry::AddLW(this, "UpDown Counter", m_index);
+  wpi::SendableRegistry::Add(this, "UpDown Counter", m_index);
 }
 
 int UpDownCounter::GetCount() const {

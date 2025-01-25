@@ -31,7 +31,7 @@ SharpIR SharpIR::GP2Y0A51SK0F(int channel) {
 
 SharpIR::SharpIR(int channel, double a, double b, double minCM, double maxCM)
     : m_sensor(channel), m_A(a), m_B(b), m_minCM(minCM), m_maxCM(maxCM) {
-  wpi::SendableRegistry::AddLW(this, "SharpIR", channel);
+  wpi::SendableRegistry::Add(this, "SharpIR", channel);
 
   m_simDevice = hal::SimDevice("SharpIR", m_sensor.GetChannel());
   if (m_simDevice) {

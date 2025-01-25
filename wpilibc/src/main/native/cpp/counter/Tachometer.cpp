@@ -34,7 +34,7 @@ Tachometer::Tachometer(std::shared_ptr<DigitalSource> source) {
   FRC_CheckErrorStatus(status, "{}", m_index);
 
   HAL_Report(HALUsageReporting::kResourceType_Counter, m_index + 1);
-  wpi::SendableRegistry::AddLW(this, "Tachometer", m_index);
+  wpi::SendableRegistry::Add(this, "Tachometer", m_index);
 }
 
 units::hertz_t Tachometer::GetFrequency() const {

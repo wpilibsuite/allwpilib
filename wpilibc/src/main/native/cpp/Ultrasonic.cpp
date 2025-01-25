@@ -183,7 +183,7 @@ void Ultrasonic::Initialize() {
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_Ultrasonic, instances);
-  wpi::SendableRegistry::AddLW(this, "Ultrasonic", m_echoChannel->GetChannel());
+  wpi::SendableRegistry::Add(this, "Ultrasonic", m_echoChannel->GetChannel());
 }
 
 void Ultrasonic::UltrasonicChecker() {

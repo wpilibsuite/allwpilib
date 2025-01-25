@@ -60,7 +60,7 @@ ExternalDirectionCounter::ExternalDirectionCounter(
   Reset();
 
   HAL_Report(HALUsageReporting::kResourceType_Counter, m_index + 1);
-  wpi::SendableRegistry::AddLW(this, "External Direction Counter", m_index);
+  wpi::SendableRegistry::Add(this, "External Direction Counter", m_index);
 }
 
 int ExternalDirectionCounter::GetCount() const {

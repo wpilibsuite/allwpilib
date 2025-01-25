@@ -35,7 +35,7 @@ DifferentialDrive::DifferentialDrive(std::function<void(double)> leftMotor,
     : m_leftMotor{std::move(leftMotor)}, m_rightMotor{std::move(rightMotor)} {
   static int instances = 0;
   ++instances;
-  wpi::SendableRegistry::AddLW(this, "DifferentialDrive", instances);
+  wpi::SendableRegistry::Add(this, "DifferentialDrive", instances);
 }
 
 void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
@@ -194,7 +194,6 @@ std::string DifferentialDrive::GetDescription() const {
 void DifferentialDrive::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("DifferentialDrive");
   builder.SetActuator(true);
-  builder.SetSafeState([=, this] { StopMotor(); });
   builder.AddDoubleProperty(
       "Left Motor Speed", [&] { return m_leftOutput; }, m_leftMotor);
   builder.AddDoubleProperty(

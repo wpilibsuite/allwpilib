@@ -38,7 +38,7 @@ AnalogTrigger::AnalogTrigger(std::shared_ptr<AnalogInput> input)
   int index = GetIndex();
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
-  wpi::SendableRegistry::AddLW(this, "AnalogTrigger", index);
+  wpi::SendableRegistry::Add(this, "AnalogTrigger", index);
 }
 
 AnalogTrigger::AnalogTrigger(DutyCycle& input)
@@ -55,7 +55,7 @@ AnalogTrigger::AnalogTrigger(std::shared_ptr<DutyCycle> input)
   int index = GetIndex();
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
-  wpi::SendableRegistry::AddLW(this, "AnalogTrigger", index);
+  wpi::SendableRegistry::Add(this, "AnalogTrigger", index);
 }
 
 void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {

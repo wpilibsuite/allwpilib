@@ -29,7 +29,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
   /** Initialize the gyro. Calibration is handled by calibrate(). */
   private void initGyro() {
     HAL.report(tResourceType.kResourceType_Gyro, m_analog.getChannel() + 1);
-    SendableRegistry.addLW(this, "AnalogGyro", m_analog.getChannel());
+    SendableRegistry.add(this, "AnalogGyro", m_analog.getChannel());
   }
 
   /**

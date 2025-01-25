@@ -158,7 +158,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     m_frontRightMotor = frontRightMotor;
     m_rearRightMotor = rearRightMotor;
     instances++;
-    SendableRegistry.addLW(this, "MecanumDrive", instances);
+    SendableRegistry.add(this, "MecanumDrive", instances);
   }
 
   @Override
@@ -317,7 +317,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("MecanumDrive");
     builder.setActuator(true);
-    builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Front Left Motor Speed", () -> m_frontLeftOutput, m_frontLeftMotor);
     builder.addDoubleProperty(
         "Front Right Motor Speed", () -> m_frontRightOutput, m_frontRightMotor);

@@ -127,7 +127,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
     instances++;
-    SendableRegistry.addLW(this, "DifferentialDrive", instances);
+    SendableRegistry.add(this, "DifferentialDrive", instances);
   }
 
   @Override
@@ -367,7 +367,6 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("DifferentialDrive");
     builder.setActuator(true);
-    builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Left Motor Speed", () -> m_leftOutput, m_leftMotor);
     builder.addDoubleProperty("Right Motor Speed", () -> m_rightOutput, m_rightMotor);
   }

@@ -30,7 +30,7 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
   HAL_Report(HALUsageReporting::kResourceType_ADXL345,
              HALUsageReporting::kADXL345_I2C, 0);
 
-  wpi::SendableRegistry::AddLW(this, "ADXL345_I2C", port);
+  wpi::SendableRegistry::Add(this, "ADXL345_I2C", port);
 }
 
 I2C::Port ADXL345_I2C::GetI2CPort() const {

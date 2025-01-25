@@ -52,7 +52,7 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
     int index = getIndex();
 
     HAL.report(tResourceType.kResourceType_AnalogTrigger, index + 1);
-    SendableRegistry.addLW(this, "AnalogTrigger", index);
+    SendableRegistry.add(this, "AnalogTrigger", index);
   }
 
   /**
@@ -69,7 +69,7 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
     int index = getIndex();
 
     HAL.report(tResourceType.kResourceType_AnalogTrigger, index + 1);
-    SendableRegistry.addLW(this, "AnalogTrigger", index);
+    SendableRegistry.add(this, "AnalogTrigger", index);
   }
 
   @Override

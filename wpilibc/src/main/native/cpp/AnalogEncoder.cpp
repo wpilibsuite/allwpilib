@@ -67,8 +67,8 @@ void AnalogEncoder::Init(double fullRange, double expectedZero) {
   m_fullRange = fullRange;
   m_expectedZero = expectedZero;
 
-  wpi::SendableRegistry::AddLW(this, "Analog Encoder",
-                               m_analogInput->GetChannel());
+  wpi::SendableRegistry::Add(this, "Analog Encoder",
+                             m_analogInput->GetChannel());
 }
 
 double AnalogEncoder::Get() const {

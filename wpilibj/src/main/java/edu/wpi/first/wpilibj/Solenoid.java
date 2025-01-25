@@ -57,7 +57,7 @@ public class Solenoid implements Sendable, AutoCloseable {
     }
 
     HAL.report(tResourceType.kResourceType_Solenoid, channel + 1, m_module.getModuleNumber() + 1);
-    SendableRegistry.addLW(this, "Solenoid", m_module.getModuleNumber(), channel);
+    SendableRegistry.add(this, "Solenoid", m_module.getModuleNumber(), channel);
   }
 
   @Override
@@ -148,7 +148,6 @@ public class Solenoid implements Sendable, AutoCloseable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Solenoid");
     builder.setActuator(true);
-    builder.setSafeState(() -> set(false));
     builder.addBooleanProperty("Value", this::get, this::set);
   }
 }

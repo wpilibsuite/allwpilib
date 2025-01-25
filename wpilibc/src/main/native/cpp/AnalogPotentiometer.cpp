@@ -33,8 +33,8 @@ AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
     : m_analog_input(std::move(input)),
       m_fullRange(fullRange),
       m_offset(offset) {
-  wpi::SendableRegistry::AddLW(this, "AnalogPotentiometer",
-                               m_analog_input->GetChannel());
+  wpi::SendableRegistry::Add(this, "AnalogPotentiometer",
+                             m_analog_input->GetChannel());
 }
 
 double AnalogPotentiometer::Get() const {

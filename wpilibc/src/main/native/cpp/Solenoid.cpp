@@ -30,8 +30,8 @@ Solenoid::Solenoid(int module, PneumaticsModuleType moduleType, int channel)
 
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_channel + 1,
              m_module->GetModuleNumber() + 1);
-  wpi::SendableRegistry::AddLW(this, "Solenoid", m_module->GetModuleNumber(),
-                               m_channel);
+  wpi::SendableRegistry::Add(this, "Solenoid", m_module->GetModuleNumber(),
+                             m_channel);
 }
 
 Solenoid::Solenoid(PneumaticsModuleType moduleType, int channel)
@@ -77,7 +77,6 @@ void Solenoid::StartPulse() {
 void Solenoid::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Solenoid");
   builder.SetActuator(true);
-  builder.SetSafeState([=, this] { Set(false); });
   builder.AddBooleanProperty(
       "Value", [=, this] { return Get(); },
       [=, this](bool value) { Set(value); });

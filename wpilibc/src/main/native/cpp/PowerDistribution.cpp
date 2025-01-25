@@ -47,7 +47,7 @@ PowerDistribution::PowerDistribution() {
     HAL_Report(HALUsageReporting::kResourceType_PDP,
                HALUsageReporting::kPDP_REV);
   }
-  wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
+  wpi::SendableRegistry::Add(this, "PowerDistribution", m_module);
 }
 
 PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
@@ -68,7 +68,7 @@ PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
     HAL_Report(HALUsageReporting::kResourceType_PDP,
                HALUsageReporting::kPDP_REV);
   }
-  wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
+  wpi::SendableRegistry::Add(this, "PowerDistribution", m_module);
 }
 
 int PowerDistribution::GetNumChannels() const {

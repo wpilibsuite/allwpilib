@@ -46,7 +46,7 @@ MecanumDrive::MecanumDrive(std::function<void(double)> frontLeftMotor,
       m_rearRightMotor{std::move(rearRightMotor)} {
   static int instances = 0;
   ++instances;
-  wpi::SendableRegistry::AddLW(this, "MecanumDrive", instances);
+  wpi::SendableRegistry::Add(this, "MecanumDrive", instances);
 }
 
 void MecanumDrive::DriveCartesian(double xSpeed, double ySpeed,
@@ -133,7 +133,6 @@ std::string MecanumDrive::GetDescription() const {
 void MecanumDrive::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("MecanumDrive");
   builder.SetActuator(true);
-  builder.SetSafeState([=, this] { StopMotor(); });
   builder.AddDoubleProperty(
       "Front Left Motor Speed", [&] { return m_frontLeftOutput; },
       m_frontLeftMotor);

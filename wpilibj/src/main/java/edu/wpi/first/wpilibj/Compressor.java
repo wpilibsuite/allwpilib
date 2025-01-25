@@ -45,7 +45,7 @@ public class Compressor implements Sendable, AutoCloseable {
     m_module.enableCompressorDigital();
 
     HAL.report(tResourceType.kResourceType_Compressor, module + 1);
-    SendableRegistry.addLW(this, "Compressor", module);
+    SendableRegistry.add(this, "Compressor", module);
   }
 
   /**

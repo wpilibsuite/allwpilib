@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.event.EventLoop;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -101,13 +100,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
   CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
-    SendableRegistry.addLW(this, "Scheduler");
-    LiveWindow.setEnabledListener(
-        () -> {
-          disable();
-          cancelAll();
-        });
-    LiveWindow.setDisabledListener(this::enable);
+    SendableRegistry.add(this, "Scheduler");
   }
 
   /**
@@ -123,8 +116,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   @Override
   public void close() {
     SendableRegistry.remove(this);
-    LiveWindow.setEnabledListener(null);
-    LiveWindow.setDisabledListener(null);
   }
 
   /**

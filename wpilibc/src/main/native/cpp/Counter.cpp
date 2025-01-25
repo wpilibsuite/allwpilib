@@ -27,7 +27,7 @@ Counter::Counter(Mode mode) {
   SetMaxPeriod(0.5_s);
 
   HAL_Report(HALUsageReporting::kResourceType_Counter, m_index + 1, mode + 1);
-  wpi::SendableRegistry::AddLW(this, "Counter", m_index);
+  wpi::SendableRegistry::Add(this, "Counter", m_index);
 }
 
 Counter::Counter(int channel) : Counter(kTwoPulse) {
