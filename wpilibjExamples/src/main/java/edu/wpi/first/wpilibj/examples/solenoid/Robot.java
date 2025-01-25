@@ -10,8 +10,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This is a sample program showing the use of the solenoid classes during operator control. Three
@@ -46,29 +45,28 @@ public class Robot extends TimedRobot {
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    // Publish elements to shuffleboard.
-    ShuffleboardTab tab = Shuffleboard.getTab("Pneumatics");
-    tab.add("Single Solenoid", m_solenoid);
-    tab.add("Double Solenoid", m_doubleSolenoid);
-    tab.add("Compressor", m_compressor);
-
-    // Also publish some raw data
-    // Get the pressure (in PSI) from the analog sensor connected to the PH.
-    // This function is supported only on the PH!
-    // On a PCM, this function will return 0.
-    tab.addDouble("PH Pressure [PSI]", m_compressor::getPressure);
-    // Get compressor current draw.
-    tab.addDouble("Compressor Current", m_compressor::getCurrent);
-    // Get whether the compressor is active.
-    tab.addBoolean("Compressor Active", m_compressor::isEnabled);
-    // Get the digital pressure switch connected to the PCM/PH.
-    // The switch is open when the pressure is over ~120 PSI.
-    tab.addBoolean("Pressure Switch", m_compressor::getPressureSwitchValue);
+    // Publish elements to dashboard.
+    SmartDashboard.putData("Single Solenoid", m_solenoid);
+    SmartDashboard.putData("Double Solenoid", m_doubleSolenoid);
+    SmartDashboard.putData("Compressor", m_compressor);
   }
 
   @SuppressWarnings("PMD.UnconditionalIfStatement")
   @Override
   public void teleopPeriodic() {
+    // Publish some raw data
+    // Get the pressure (in PSI) from the analog sensor connected to the PH.
+    // This function is supported only on the PH!
+    // On a PCM, this function will return 0.
+    SmartDashboard.putNumber("PH Pressure [PSI]", m_compressor.getPressure());
+    // Get compressor current draw.
+    SmartDashboard.putNumber("Compressor Current", m_compressor.getCurrent());
+    // Get whether the compressor is active.
+    SmartDashboard.putBoolean("Compressor Active", m_compressor.isEnabled());
+    // Get the digital pressure switch connected to the PCM/PH.
+    // The switch is open when the pressure is over ~120 PSI.
+    SmartDashboard.putBoolean("Pressure Switch", m_compressor.getPressureSwitchValue());
+
     /*
      * The output of GetRawButton is true/false depending on whether
      * the button is pressed; Set takes a boolean for whether

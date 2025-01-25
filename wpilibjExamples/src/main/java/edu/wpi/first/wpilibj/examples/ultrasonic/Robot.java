@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj.examples.ultrasonic;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Ultrasonic;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -21,7 +20,7 @@ public class Robot extends TimedRobot {
   public Robot() {
     // Add the ultrasonic on the "Sensors" tab of the dashboard
     // Data will update automatically
-    Shuffleboard.getTab("Sensors").add(m_rangeFinder);
+    SmartDashboard.putData("Sensors", m_rangeFinder);
   }
 
   @Override

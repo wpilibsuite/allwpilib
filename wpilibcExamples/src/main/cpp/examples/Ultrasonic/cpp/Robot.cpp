@@ -4,14 +4,13 @@
 
 #include "Robot.h"
 
-#include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <units/length.h>
 
 Robot::Robot() {
   // Add the ultrasonic on the "Sensors" tab of the dashboard
   // Data will update automatically
-  frc::Shuffleboard::GetTab("Sensors").Add(m_rangeFinder);
+  frc::SmartDashboard::PutData("Sensors", &m_rangeFinder);
 }
 
 void Robot::TeleopPeriodic() {

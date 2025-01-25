@@ -4,41 +4,35 @@
 
 #include "Robot.h"
 
-#include <frc/shuffleboard/Shuffleboard.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <units/pressure.h>
 
 Robot::Robot() {
   // Publish elements to shuffleboard.
-  frc::ShuffleboardTab& tab = frc::Shuffleboard::GetTab("Pneumatics");
-  tab.Add("Single Solenoid", m_solenoid);
-  tab.Add("Double Solenoid", m_doubleSolenoid);
-  tab.Add("Compressor", m_compressor);
-
-  // Also publish some raw data
-  tab.AddDouble("PH Pressure [PSI]", [&] {
-    // Get the pressure (in PSI) from the analog sensor connected to the PH.
-    // This function is supported only on the PH!
-    // On a PCM, this function will return 0.
-    units::pounds_per_square_inch_t pressure = m_compressor.GetPressure();
-    return pressure.value();
-  });
-  tab.AddDouble("Compressor Current", [&] {
-    // Get compressor current draw.
-    units::ampere_t compressorCurrent = m_compressor.GetCurrent();
-    return compressorCurrent.value();
-  });
-  tab.AddBoolean("Compressor Active", [&] {
-    // Get whether the compressor is active.
-    return m_compressor.IsEnabled();
-  });
-  tab.AddBoolean("Pressure Switch", [&] {
-    // Get the digital pressure switch connected to the PCM/PH.
-    // The switch is open when the pressure is over ~120 PSI.
-    return m_compressor.GetPressureSwitchValue();
-  });
+  frc::SmartDashboard::PutData("Single Solenoid", &m_solenoid);
+  frc::SmartDashboard::PutData("Double Solenoid", &m_doubleSolenoid);
+  frc::SmartDashboard::PutData("Compressor", &m_compressor);
 }
 
 void Robot::TeleopPeriodic() {
+  // Publish some raw data
+
+  // Get the pressure (in PSI) from the analog sensor connected to the PH.
+  // This function is supported only on the PH!
+  // On a PCM, this function will return 0.
+  frc::SmartDashboard::PutNumber("PH Pressure [PSI]",
+                                 m_compressor.GetPressure().value());
+  // Get compressor current draw.
+  frc::SmartDashboard::PutNumber("Compressor Current",
+                                 m_compressor.GetCurrent().value());
+  // Get whether the compressor is active.
+  frc::SmartDashboard::PutBoolean("Compressor Active",
+                                  m_compressor.IsEnabled());
+  // Get the digital pressure switch connected to the PCM/PH.
+  // The switch is open when the pressure is over ~120 PSI.
+  frc::SmartDashboard::PutBoolean("Pressure Switch",
+                                  m_compressor.GetPressureSwitchValue());
+
   /*
    * The output of GetRawButton is true/false depending on whether
    * the button is pressed; Set takes a boolean for whether

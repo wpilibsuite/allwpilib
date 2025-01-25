@@ -14,7 +14,6 @@
 #include "frc/DSControlWord.h"
 #include "frc/Errors.h"
 #include "frc/livewindow/LiveWindow.h"
-#include "frc/shuffleboard/Shuffleboard.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
 using namespace frc;
@@ -153,7 +152,6 @@ void IterativeRobotBase::LoopFunc() {
     } else if (m_lastMode == Mode::kTest) {
       if (m_lwEnabledInTest) {
         LiveWindow::SetEnabled(false);
-        Shuffleboard::DisableActuatorWidgets();
       }
       TestExit();
     }
@@ -171,7 +169,6 @@ void IterativeRobotBase::LoopFunc() {
     } else if (mode == Mode::kTest) {
       if (m_lwEnabledInTest) {
         LiveWindow::SetEnabled(true);
-        Shuffleboard::EnableActuatorWidgets();
       }
       TestInit();
       m_watchdog.AddEpoch("TestInit()");
@@ -206,8 +203,6 @@ void IterativeRobotBase::LoopFunc() {
   m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
   LiveWindow::UpdateValues();
   m_watchdog.AddEpoch("LiveWindow::UpdateValues()");
-  Shuffleboard::Update();
-  m_watchdog.AddEpoch("Shuffleboard::Update()");
 
   if constexpr (IsSimulation()) {
     HAL_SimPeriodicBefore();

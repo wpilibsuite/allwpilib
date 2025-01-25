@@ -7,7 +7,6 @@
 #include <frc/DriverStation.h>
 #include <frc/internal/DriverStationModeThread.h>
 #include <frc/livewindow/LiveWindow.h>
-#include <frc/shuffleboard/Shuffleboard.h>
 #include <hal/DriverStation.h>
 #include <networktables/NetworkTable.h>
 
@@ -47,7 +46,6 @@ void Robot::StartCompetition() {
       }
     } else if (IsTest()) {
       frc::LiveWindow::SetEnabled(true);
-      frc::Shuffleboard::EnableActuatorWidgets();
       modeThread.InTest(true);
       Test();
       modeThread.InTest(false);
@@ -55,7 +53,6 @@ void Robot::StartCompetition() {
         wpi::WaitForObject(event.GetHandle());
       }
       frc::LiveWindow::SetEnabled(false);
-      frc::Shuffleboard::DisableActuatorWidgets();
     } else {
       modeThread.InTeleop(true);
       Teleop();
