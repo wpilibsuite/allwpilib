@@ -83,7 +83,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     m_fullRange = fullRange;
     m_expectedZero = expectedZero;
 
-    SendableRegistry.addLW(this, "Analog Encoder", m_analogInput.getChannel());
+    SendableRegistry.add(this, "Analog Encoder", m_analogInput.getChannel());
   }
 
   private double mapSensorRange(double pos) {

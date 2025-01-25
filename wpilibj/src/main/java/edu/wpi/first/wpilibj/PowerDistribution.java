@@ -57,7 +57,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     } else {
       HAL.report(tResourceType.kResourceType_PDP, tInstances.kPDP_REV);
     }
-    SendableRegistry.addLW(this, "PowerDistribution", m_module);
+    SendableRegistry.add(this, "PowerDistribution", m_module);
   }
 
   /**
@@ -76,7 +76,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
       HAL.report(tResourceType.kResourceType_PDP, tInstances.kPDP_REV);
     }
 
-    SendableRegistry.addLW(this, "PowerDistribution", m_module);
+    SendableRegistry.add(this, "PowerDistribution", m_module);
   }
 
   @Override

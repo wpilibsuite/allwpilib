@@ -46,7 +46,7 @@ public class NidecBrushless extends MotorSafety
     SendableRegistry.addChild(this, m_pwm);
 
     HAL.report(tResourceType.kResourceType_NidecBrushless, pwmChannel + 1);
-    SendableRegistry.addLW(this, "Nidec Brushless", pwmChannel);
+    SendableRegistry.add(this, "Nidec Brushless", pwmChannel);
   }
 
   @Override
@@ -139,7 +139,6 @@ public class NidecBrushless extends MotorSafety
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Nidec Brushless");
     builder.setActuator(true);
-    builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Value", this::get, this::set);
   }
 }

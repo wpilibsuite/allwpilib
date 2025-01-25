@@ -34,7 +34,7 @@ void DutyCycle::InitDutyCycle() {
                                      &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   HAL_Report(HALUsageReporting::kResourceType_DutyCycle, m_channel + 1);
-  wpi::SendableRegistry::AddLW(this, "Duty Cycle", m_channel);
+  wpi::SendableRegistry::Add(this, "Duty Cycle", m_channel);
 }
 
 int DutyCycle::GetFPGAIndex() const {

@@ -5,17 +5,13 @@
 package edu.wpi.first.util.sendable;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * The SendableRegistry class is the public interface for registering sensors and actuators for use
- * on dashboards and LiveWindow.
+ * on dashboards.
  */
 @SuppressWarnings("PMD.AvoidCatchingGenericException")
 public final class SendableRegistry {
@@ -40,8 +36,6 @@ public final class SendableRegistry {
     SendableBuilder m_builder;
     String m_name;
     String m_subsystem = "Ungrouped";
-    WeakReference<Sendable> m_parent;
-    boolean m_liveWindow;
     AutoCloseable[] m_data;
 
     void setName(String moduleType, int channel) {
@@ -53,7 +47,6 @@ public final class SendableRegistry {
     }
   }
 
-  private static Supplier<SendableBuilder> liveWindowFactory;
   private static final Map<Object, Component> components = new WeakHashMap<>();
   private static int nextDataHandle;
 
@@ -72,15 +65,6 @@ public final class SendableRegistry {
 
   private SendableRegistry() {
     throw new UnsupportedOperationException("This is a utility class!");
-  }
-
-  /**
-   * Sets the factory for LiveWindow builders.
-   *
-   * @param factory factory function
-   */
-  public static synchronized void setLiveWindowBuilderFactory(Supplier<SendableBuilder> factory) {
-    liveWindowFactory = factory;
   }
 
   /**
@@ -134,100 +118,6 @@ public final class SendableRegistry {
   }
 
   /**
-   * Adds an object to the registry and LiveWindow.
-   *
-   * @param sendable object to add
-   * @param name component name
-   */
-  public static synchronized void addLW(Sendable sendable, String name) {
-    Component comp = getOrAdd(sendable);
-    if (liveWindowFactory != null) {
-      if (comp.m_builder != null) {
-        try {
-          comp.m_builder.close();
-        } catch (Exception e) {
-          // ignore
-        }
-      }
-      comp.m_builder = liveWindowFactory.get();
-    }
-    comp.m_liveWindow = true;
-    comp.m_name = name;
-  }
-
-  /**
-   * Adds an object to the registry and LiveWindow.
-   *
-   * @param sendable object to add
-   * @param moduleType A string that defines the module name in the label for the value
-   * @param channel The channel number the device is plugged into
-   */
-  public static synchronized void addLW(Sendable sendable, String moduleType, int channel) {
-    Component comp = getOrAdd(sendable);
-    if (liveWindowFactory != null) {
-      if (comp.m_builder != null) {
-        try {
-          comp.m_builder.close();
-        } catch (Exception e) {
-          // ignore
-        }
-      }
-      comp.m_builder = liveWindowFactory.get();
-    }
-    comp.m_liveWindow = true;
-    comp.setName(moduleType, channel);
-  }
-
-  /**
-   * Adds an object to the registry and LiveWindow.
-   *
-   * @param sendable object to add
-   * @param moduleType A string that defines the module name in the label for the value
-   * @param moduleNumber The number of the particular module type
-   * @param channel The channel number the device is plugged into
-   */
-  public static synchronized void addLW(
-      Sendable sendable, String moduleType, int moduleNumber, int channel) {
-    Component comp = getOrAdd(sendable);
-    if (liveWindowFactory != null) {
-      if (comp.m_builder != null) {
-        try {
-          comp.m_builder.close();
-        } catch (Exception e) {
-          // ignore
-        }
-      }
-      comp.m_builder = liveWindowFactory.get();
-    }
-    comp.m_liveWindow = true;
-    comp.setName(moduleType, moduleNumber, channel);
-  }
-
-  /**
-   * Adds an object to the registry and LiveWindow.
-   *
-   * @param sendable object to add
-   * @param subsystem subsystem name
-   * @param name component name
-   */
-  public static synchronized void addLW(Sendable sendable, String subsystem, String name) {
-    Component comp = getOrAdd(sendable);
-    if (liveWindowFactory != null) {
-      if (comp.m_builder != null) {
-        try {
-          comp.m_builder.close();
-        } catch (Exception e) {
-          // ignore
-        }
-      }
-      comp.m_builder = liveWindowFactory.get();
-    }
-    comp.m_liveWindow = true;
-    comp.m_name = name;
-    comp.m_subsystem = subsystem;
-  }
-
-  /**
    * Adds a child object to an object. Adds the child object to the registry if it's not already
    * present.
    *
@@ -240,7 +130,7 @@ public final class SendableRegistry {
       comp = new Component();
       components.put(child, comp);
     }
-    comp.m_parent = new WeakReference<>(parent);
+    // comp.m_parent = new WeakReference<>(parent);
   }
 
   /**
@@ -431,30 +321,6 @@ public final class SendableRegistry {
   }
 
   /**
-   * Enables LiveWindow for an object.
-   *
-   * @param sendable object
-   */
-  public static synchronized void enableLiveWindow(Sendable sendable) {
-    Component comp = components.get(sendable);
-    if (comp != null) {
-      comp.m_liveWindow = true;
-    }
-  }
-
-  /**
-   * Disables LiveWindow for an object.
-   *
-   * @param sendable object
-   */
-  public static synchronized void disableLiveWindow(Sendable sendable) {
-    Component comp = components.get(sendable);
-    if (comp != null) {
-      comp.m_liveWindow = false;
-    }
-  }
-
-  /**
    * Publishes an object in the registry to a builder.
    *
    * @param sendable object
@@ -484,99 +350,5 @@ public final class SendableRegistry {
     if (comp != null && comp.m_builder != null) {
       comp.m_builder.update();
     }
-  }
-
-  /** Data passed to foreachLiveWindow() callback function. */
-  @SuppressWarnings("MemberName")
-  public static class CallbackData {
-    /** Sendable object. */
-    public Sendable sendable;
-
-    /** Name. */
-    public String name;
-
-    /** Subsystem. */
-    public String subsystem;
-
-    /** Parent sendable object. */
-    public Sendable parent;
-
-    /** Data stored in object with setData(). Update this to change the data. */
-    public AutoCloseable data;
-
-    /** Sendable builder for the sendable. */
-    public SendableBuilder builder;
-
-    /** Default constructor. */
-    public CallbackData() {}
-  }
-
-  // As foreachLiveWindow is single threaded, cache the components it
-  // iterates over to avoid risk of ConcurrentModificationException
-  private static List<Component> foreachComponents = new ArrayList<>();
-
-  /**
-   * Iterates over LiveWindow-enabled objects in the registry. It is *not* safe to call other
-   * SendableRegistry functions from the callback.
-   *
-   * @param dataHandle data handle to get data object passed to callback
-   * @param callback function to call for each object
-   */
-  @SuppressWarnings("PMD.CompareObjectsWithEquals")
-  public static synchronized void foreachLiveWindow(
-      int dataHandle, Consumer<CallbackData> callback) {
-    CallbackData cbdata = new CallbackData();
-    foreachComponents.clear();
-    foreachComponents.addAll(components.values());
-    for (Component comp : foreachComponents) {
-      if (comp.m_builder == null || comp.m_sendable == null) {
-        continue;
-      }
-      cbdata.sendable = comp.m_sendable.get();
-      if (cbdata.sendable != null && comp.m_liveWindow) {
-        cbdata.name = comp.m_name;
-        cbdata.subsystem = comp.m_subsystem;
-        if (comp.m_parent != null) {
-          cbdata.parent = comp.m_parent.get();
-        } else {
-          cbdata.parent = null;
-        }
-        if (comp.m_data != null && dataHandle < comp.m_data.length) {
-          cbdata.data = comp.m_data[dataHandle];
-        } else {
-          cbdata.data = null;
-        }
-        cbdata.builder = comp.m_builder;
-        try {
-          callback.accept(cbdata);
-        } catch (Throwable throwable) {
-          Throwable cause = throwable.getCause();
-          if (cause != null) {
-            throwable = cause;
-          }
-          System.err.println("Unhandled exception calling LiveWindow for " + comp.m_name + ": ");
-          throwable.printStackTrace();
-          comp.m_liveWindow = false;
-        }
-        if (cbdata.data != null) {
-          if (comp.m_data == null) {
-            comp.m_data = new AutoCloseable[dataHandle + 1];
-          } else if (dataHandle >= comp.m_data.length) {
-            comp.m_data = Arrays.copyOf(comp.m_data, dataHandle + 1);
-          }
-          if (comp.m_data[dataHandle] != cbdata.data) {
-            if (comp.m_data[dataHandle] != null) {
-              try {
-                comp.m_data[dataHandle].close();
-              } catch (Exception e) {
-                // ignore
-              }
-            }
-            comp.m_data[dataHandle] = cbdata.data;
-          }
-        }
-      }
-    }
-    foreachComponents.clear();
   }
 }

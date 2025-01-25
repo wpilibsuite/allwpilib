@@ -37,7 +37,7 @@ public class DigitalOutput extends DigitalSource implements Sendable {
     m_handle = DIOJNI.initializeDIOPort(HAL.getPort((byte) channel), false);
 
     HAL.report(tResourceType.kResourceType_DigitalOutput, channel + 1);
-    SendableRegistry.addLW(this, "DigitalOutput", channel);
+    SendableRegistry.add(this, "DigitalOutput", channel);
   }
 
   @Override

@@ -49,7 +49,7 @@ public class Tachometer implements Sendable, AutoCloseable {
 
     int intIndex = index.getInt();
     HAL.report(tResourceType.kResourceType_Counter, intIndex + 1);
-    SendableRegistry.addLW(this, "Tachometer", intIndex);
+    SendableRegistry.add(this, "Tachometer", intIndex);
   }
 
   @Override

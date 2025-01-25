@@ -85,7 +85,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
     setMaxPeriod(0.5);
 
     HAL.report(tResourceType.kResourceType_Counter, m_index + 1, mode.value + 1);
-    SendableRegistry.addLW(this, "Counter", m_index);
+    SendableRegistry.add(this, "Counter", m_index);
   }
 
   /**

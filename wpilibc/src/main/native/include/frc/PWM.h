@@ -54,7 +54,6 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the
    *                MXP port
    * @param registerSendable If true, adds this instance to SendableRegistry
-   *                         and LiveWindow
    */
   explicit PWM(int channel, bool registerSendable = true);
 

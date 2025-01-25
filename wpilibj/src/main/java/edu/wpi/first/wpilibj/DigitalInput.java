@@ -35,7 +35,7 @@ public class DigitalInput extends DigitalSource implements Sendable {
     m_handle = DIOJNI.initializeDIOPort(HAL.getPort((byte) channel), true);
 
     HAL.report(tResourceType.kResourceType_DigitalInput, channel + 1);
-    SendableRegistry.addLW(this, "DigitalInput", channel);
+    SendableRegistry.add(this, "DigitalInput", channel);
   }
 
   @Override

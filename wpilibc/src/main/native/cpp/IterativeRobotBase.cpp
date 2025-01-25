@@ -13,7 +13,6 @@
 
 #include "frc/DSControlWord.h"
 #include "frc/Errors.h"
-#include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
 using namespace frc;
@@ -96,24 +95,6 @@ void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
   m_ntFlushEnabled = enabled;
 }
 
-void IterativeRobotBase::EnableLiveWindowInTest(bool testLW) {
-  static bool hasReported;
-  if (IsTestEnabled()) {
-    throw FRC_MakeError(err::IncompatibleMode,
-                        "Can't configure test mode while in test mode!");
-  }
-  if (!hasReported && testLW) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard,
-               HALUsageReporting::kSmartDashboard_LiveWindow);
-    hasReported = true;
-  }
-  m_lwEnabledInTest = testLW;
-}
-
-bool IterativeRobotBase::IsLiveWindowEnabledInTest() {
-  return m_lwEnabledInTest;
-}
-
 units::second_t IterativeRobotBase::GetPeriod() const {
   return m_period;
 }
@@ -150,9 +131,6 @@ void IterativeRobotBase::LoopFunc() {
     } else if (m_lastMode == Mode::kTeleop) {
       TeleopExit();
     } else if (m_lastMode == Mode::kTest) {
-      if (m_lwEnabledInTest) {
-        LiveWindow::SetEnabled(false);
-      }
       TestExit();
     }
 
@@ -167,9 +145,6 @@ void IterativeRobotBase::LoopFunc() {
       TeleopInit();
       m_watchdog.AddEpoch("TeleopInit()");
     } else if (mode == Mode::kTest) {
-      if (m_lwEnabledInTest) {
-        LiveWindow::SetEnabled(true);
-      }
       TestInit();
       m_watchdog.AddEpoch("TestInit()");
     }
@@ -201,8 +176,6 @@ void IterativeRobotBase::LoopFunc() {
 
   SmartDashboard::UpdateValues();
   m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
-  LiveWindow::UpdateValues();
-  m_watchdog.AddEpoch("LiveWindow::UpdateValues()");
 
   if constexpr (IsSimulation()) {
     HAL_SimPeriodicBefore();

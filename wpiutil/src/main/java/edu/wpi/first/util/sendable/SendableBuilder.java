@@ -43,14 +43,6 @@ public interface SendableBuilder extends AutoCloseable {
   void setActuator(boolean value);
 
   /**
-   * Set the function that should be called to set the Sendable into a safe state. This is called
-   * when entering and exiting Live Window mode.
-   *
-   * @param func function
-   */
-  void setSafeState(Runnable func);
-
-  /**
    * Add a boolean property.
    *
    * @param key property name

@@ -89,7 +89,7 @@ public class SharpIR implements Sendable, AutoCloseable {
     m_minCM = minCM;
     m_maxCM = maxCM;
 
-    SendableRegistry.addLW(this, "SharpIR", channel);
+    SendableRegistry.add(this, "SharpIR", channel);
 
     m_simDevice = SimDevice.create("SharpIR", m_sensor.getChannel());
     if (m_simDevice != null) {

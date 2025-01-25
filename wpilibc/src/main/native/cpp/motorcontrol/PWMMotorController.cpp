@@ -94,7 +94,7 @@ WPI_IGNORE_DEPRECATED
 
 PWMMotorController::PWMMotorController(std::string_view name, int channel)
     : m_pwm(channel, false) {
-  wpi::SendableRegistry::AddLW(this, name, channel);
+  wpi::SendableRegistry::Add(this, name, channel);
 }
 
 WPI_UNIGNORE_DEPRECATED
@@ -102,7 +102,6 @@ WPI_UNIGNORE_DEPRECATED
 void PWMMotorController::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);
-  builder.SetSafeState([=, this] { Disable(); });
   builder.AddDoubleProperty(
       "Value", [=, this] { return Get(); },
       [=, this](double value) { Set(value); });

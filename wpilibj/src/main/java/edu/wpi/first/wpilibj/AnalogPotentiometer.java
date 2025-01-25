@@ -56,7 +56,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
    */
   @SuppressWarnings("this-escape")
   public AnalogPotentiometer(final AnalogInput input, double fullRange, double offset) {
-    SendableRegistry.addLW(this, "AnalogPotentiometer", input.getChannel());
+    SendableRegistry.add(this, "AnalogPotentiometer", input.getChannel());
     m_analogInput = input;
     m_initAnalogInput = false;
 

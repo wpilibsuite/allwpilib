@@ -5,13 +5,9 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.util.ConcurrentModificationException;
 
 /**
  * IterativeRobotBase implements a specific type of robot program framework, extending the RobotBase
@@ -71,7 +67,6 @@ public abstract class IterativeRobotBase extends RobotBase {
   private final double m_period;
   private final Watchdog m_watchdog;
   private boolean m_ntFlushEnabled = true;
-  private boolean m_lwEnabledInTest;
   private boolean m_calledDsConnected;
 
   /**
@@ -259,34 +254,6 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_ntFlushEnabled = enabled;
   }
 
-  private boolean m_reportedLw;
-
-  /**
-   * Sets whether LiveWindow operation is enabled during test mode. Calling
-   *
-   * @param testLW True to enable, false to disable. Defaults to false.
-   * @throws ConcurrentModificationException if this is called during test mode.
-   */
-  public void enableLiveWindowInTest(boolean testLW) {
-    if (isTestEnabled()) {
-      throw new ConcurrentModificationException("Can't configure test mode while in test mode!");
-    }
-    if (!m_reportedLw && testLW) {
-      HAL.report(tResourceType.kResourceType_SmartDashboard, tInstances.kSmartDashboard_LiveWindow);
-      m_reportedLw = true;
-    }
-    m_lwEnabledInTest = testLW;
-  }
-
-  /**
-   * Whether LiveWindow operation is enabled during test mode.
-   *
-   * @return whether LiveWindow should be enabled in test mode.
-   */
-  public boolean isLiveWindowEnabledInTest() {
-    return m_lwEnabledInTest;
-  }
-
   /**
    * Gets time period between calls to Periodic() functions.
    *
@@ -327,12 +294,7 @@ public abstract class IterativeRobotBase extends RobotBase {
         case kDisabled -> disabledExit();
         case kAutonomous -> autonomousExit();
         case kTeleop -> teleopExit();
-        case kTest -> {
-          if (m_lwEnabledInTest) {
-            LiveWindow.setEnabled(false);
-          }
-          testExit();
-        }
+        case kTest -> testExit();
         default -> {
           // NOP
         }
@@ -353,9 +315,6 @@ public abstract class IterativeRobotBase extends RobotBase {
           m_watchdog.addEpoch("teleopInit()");
         }
         case kTest -> {
-          if (m_lwEnabledInTest) {
-            LiveWindow.setEnabled(true);
-          }
           testInit();
           m_watchdog.addEpoch("testInit()");
         }
@@ -399,8 +358,6 @@ public abstract class IterativeRobotBase extends RobotBase {
 
     SmartDashboard.updateValues();
     m_watchdog.addEpoch("SmartDashboard.updateValues()");
-    LiveWindow.updateValues();
-    m_watchdog.addEpoch("LiveWindow.updateValues()");
 
     if (isSimulation()) {
       HAL.simPeriodicBefore();

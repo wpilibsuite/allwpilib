@@ -135,7 +135,7 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
     setRange(range);
 
     HAL.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C);
-    SendableRegistry.addLW(this, "ADXL345_I2C", port.value);
+    SendableRegistry.add(this, "ADXL345_I2C", port.value);
   }
 
   /**

@@ -26,7 +26,6 @@
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
 #include "frc/Notifier.h"
-#include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
 static_assert(frc::RuntimeType::kRoboRIO ==
@@ -333,7 +332,4 @@ RobotBase::RobotBase() {
 
   // Call DriverStation::RefreshData() to kick things off
   DriverStation::RefreshData();
-
-  // First and one-time initialization
-  LiveWindow::SetEnabled(false);
 }

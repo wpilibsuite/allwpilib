@@ -107,7 +107,7 @@ public class Ultrasonic implements Sendable, AutoCloseable {
 
     m_instances++;
     HAL.report(tResourceType.kResourceType_Ultrasonic, m_instances);
-    SendableRegistry.addLW(this, "Ultrasonic", m_echoChannel.getChannel());
+    SendableRegistry.add(this, "Ultrasonic", m_echoChannel.getChannel());
   }
 
   /**
