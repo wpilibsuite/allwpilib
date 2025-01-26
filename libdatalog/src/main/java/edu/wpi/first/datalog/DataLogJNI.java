@@ -46,7 +46,7 @@ public class DataLogJNI {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        RuntimeLoader.loadLibrary("datalogjni");
+        RuntimeLoader.loadLibrary("libdatalogjni");
       } catch (Exception ex) {
         ex.printStackTrace();
         System.exit(1);

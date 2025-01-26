@@ -5,7 +5,7 @@ ext {
     groupId = 'edu.wpi.first.datalog'
 
     nativeName = 'libdatalog'
-    devMain = 'edu.wpi.first.math.DevMain'
+    devMain = 'edu.wpi.first.datalog.DevMain'
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
