@@ -4,12 +4,11 @@
 
 package edu.wpi.first.datalog;
 
+import edu.wpi.first.util.RuntimeLoader;
+import edu.wpi.first.util.WPIUtilJNI;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import edu.wpi.first.util.RuntimeLoader;
-import edu.wpi.first.util.WPIUtilJNI;
 
 /**
  * DataLog wpiutil JNI Functions.
@@ -353,6 +352,24 @@ public class DataLogJNI extends WPIUtilJNI {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   static native void appendStringArray(long impl, int entry, String[] value, long timestamp);
+
+  /**
+   * Create a native FileLogger. When the specified file is modified, appended data will be appended
+   * to the specified data log.
+   *
+   * @param file path to the file
+   * @param log data log implementation handle
+   * @param key log key to append data to
+   * @return The FileLogger handle.
+   */
+  public static native long createFileLogger(String file, long log, String key);
+
+  /**
+   * Free a native FileLogger. This causes the FileLogger to stop appending data to the log.
+   *
+   * @param fileTail The FileLogger handle.
+   */
+  public static native void freeFileLogger(long fileTail);
 
   /** Utility class. */
   private DataLogJNI() {}
