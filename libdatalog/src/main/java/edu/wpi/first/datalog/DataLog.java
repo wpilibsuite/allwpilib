@@ -4,6 +4,7 @@
 
 package edu.wpi.first.datalog;
 
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
@@ -145,7 +146,7 @@ public class DataLog implements AutoCloseable {
    * @param timestamp Time stamp (0 to indicate now)
    */
   public void addSchema(Protobuf<?, ?> proto, long timestamp) {
-    final long actualTimestamp = timestamp == 0 ? DataLogJNI.now() : timestamp;
+    final long actualTimestamp = timestamp == 0 ? WPIUtilJNI.now() : timestamp;
     proto.forEachDescriptor(
         this::hasSchema,
         (typeString, schema) ->
@@ -170,7 +171,7 @@ public class DataLog implements AutoCloseable {
    * @param timestamp Time stamp (0 to indicate now)
    */
   public void addSchema(Struct<?> struct, long timestamp) {
-    addSchemaImpl(struct, timestamp == 0 ? DataLogJNI.now() : timestamp, new HashSet<>());
+    addSchemaImpl(struct, timestamp == 0 ? WPIUtilJNI.now() : timestamp, new HashSet<>());
   }
 
   /**

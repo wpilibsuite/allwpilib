@@ -5,17 +5,16 @@
 package edu.wpi.first.datalog;
 
 import edu.wpi.first.util.RuntimeLoader;
-import edu.wpi.first.util.WPIUtilJNI;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * DataLog wpiutil JNI Functions.
+ * DataLog JNI Functions.
  *
  * @see "libdatalog/DataLog.h"
  */
-public class DataLogJNI extends WPIUtilJNI {
+public class DataLogJNI {
   static boolean libraryLoaded = false;
 
   /** Sets whether JNI should be loaded in the static block. */
