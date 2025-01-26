@@ -9,13 +9,14 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.wpi.first.util.RuntimeLoader;
+import edu.wpi.first.util.WPIUtilJNI;
 
 /**
  * DataLog wpiutil JNI Functions.
  *
- * @see "wpiutil/DataLog.h"
+ * @see "libdatalog/DataLog.h"
  */
-public class DataLogJNI {
+public class DataLogJNI extends WPIUtilJNI {
   static boolean libraryLoaded = false;
 
   /** Sets whether JNI should be loaded in the static block. */
