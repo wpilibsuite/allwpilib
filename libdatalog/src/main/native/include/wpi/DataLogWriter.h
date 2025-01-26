@@ -8,7 +8,7 @@
 #include <string_view>
 #include <system_error>
 
-#include "wpi/DataLog.h"
+#include <wpi/DataLog.h>
 
 namespace wpi {
 class raw_ostream;

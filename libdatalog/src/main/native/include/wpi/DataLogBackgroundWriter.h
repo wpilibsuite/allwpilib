@@ -12,9 +12,9 @@
 #include <string_view>
 #include <thread>
 
-#include "wpi/DataLog.h"
-#include "wpi/condition_variable.h"
-#include "wpi/mutex.h"
+#include <wpi/DataLog.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
 
 namespace wpi {
 class Logger;

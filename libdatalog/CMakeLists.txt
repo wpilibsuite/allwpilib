@@ -2,15 +2,9 @@ project(libdatalog)
 
 include(CompileWarnings)
 
-file(
-    GLOB libdatalog_native_src
-    src/main/native/cpp/*.cpp
-)
+file(GLOB libdatalog_native_src src/main/native/cpp/*.cpp)
 
-file(
-    GLOB libdatalog_jni_src
-    src/main/native/cpp/jni/DataLogJNI.cpp
-)
+file(GLOB libdatalog_jni_src src/main/native/cpp/jni/DataLogJNI.cpp)
 list(REMOVE_ITEM libdatalog_native_src ${libdatalog_jni_src})
 
 add_library(libdatalog ${libdatalog_native_src})
@@ -28,8 +22,7 @@ wpilib_target_warnings(libdatalog)
 
 target_include_directories(
     libdatalog
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
 )
 
 target_link_libraries(libdatalog PRIVATE wpiutil)
@@ -66,7 +59,11 @@ if(WITH_JAVA)
     set_property(TARGET libdatalog_jar PROPERTY FOLDER "java")
 
     install_jar(libdatalog_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(TARGETS libdatalog_jar FILE libdatalog_jar.cmake DESTINATION share/libdatalog)
+    install_jar_exports(
+        TARGETS libdatalog_jar
+        FILE libdatalog_jar.cmake
+        DESTINATION share/libdatalog
+    )
 
     add_library(libdatalogjni ${libdatalog_jni_src})
     wpilib_target_warnings(libdatalogjni)
@@ -113,4 +110,3 @@ if(WITH_TESTS)
         target_compile_options(libdatalog_test PRIVATE /utf-8)
     endif()
 endif()
-

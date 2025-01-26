@@ -2,23 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <jni.h>
-
 #include "DataLogJNI.h"
-#include "wpi/FileLogger.h"
 
+#include <jni.h>
 
 #include <algorithm>
 #include <string>
 #include <vector>
 
 #include <fmt/format.h>
+#include <wpi/DataLog.h>
+#include <wpi/DataLogBackgroundWriter.h>
+#include <wpi/DataLogWriter.h>
+#include <wpi/FileLogger.h>
+#include <wpi/jni_util.h>
 
 #include "edu_wpi_first_datalog_DataLogJNI.h"
-#include "wpi/DataLog.h"
-#include "wpi/DataLogBackgroundWriter.h"
-#include "wpi/DataLogWriter.h"
-#include "wpi/jni_util.h"
 
 using namespace wpi::java;
 using namespace wpi::log;
@@ -95,7 +94,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    bgCreate
  * Signature: (Ljava/lang/String;Ljava/lang/String;DLjava/lang/String;)J
  */
@@ -122,7 +121,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_bgCreate
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    bgSetFilename
  * Signature: (JLjava/lang/String;)V
  */
@@ -143,7 +142,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_bgSetFilename
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    fgCreate
  * Signature: (Ljava/lang/String;Ljava/lang/String;)J
  */
@@ -187,7 +186,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_now
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    fgCreateMemory
  * Signature: (Ljava/lang/String;)J
  */
@@ -205,7 +204,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_fgCreateMemory
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    flush
  * Signature: (J)V
  */
@@ -221,7 +220,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_flush
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    copyWriteBuffer
  * Signature: (J[BI)I
  */
@@ -248,7 +247,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_copyWriteBuffer
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    pause
  * Signature: (J)V
  */
@@ -264,7 +263,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_pause
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    resume
  * Signature: (J)V
  */
@@ -280,7 +279,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_resume
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    stop
  * Signature: (J)V
  */
@@ -296,7 +295,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_stop
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    addSchema
  * Signature: (JLjava/lang/String;Ljava/lang/String;[BJ)V
  */
@@ -315,7 +314,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_addSchema
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    addSchemaString
  * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;J)V
  */
@@ -337,7 +336,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_addSchemaString
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    start
  * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;J)I
  */
@@ -356,7 +355,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_start
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    finish
  * Signature: (JIJ)V
  */
@@ -372,7 +371,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_finish
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    setMetadata
  * Signature: (JILjava/lang/String;J)V
  */
@@ -390,7 +389,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_setMetadata
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    close
  * Signature: (J)V
  */
@@ -402,7 +401,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_close
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    appendRaw
  * Signature: (JI[BIIJ)V
  */
@@ -438,7 +437,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendRaw
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    appendRawBuffer
  * Signature: (JILjava/lang/Object;IIJ)V
  */
@@ -474,7 +473,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendRawBuffer
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    appendBoolean
  * Signature: (JIZJ)V
  */
@@ -490,7 +489,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendBoolean
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    appendInteger
  * Signature: (JIJJ)V
  */
@@ -506,7 +505,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendInteger
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    appendFloat
  * Signature: (JIFJ)V
  */
@@ -522,7 +521,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendFloat
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    appendDouble
  * Signature: (JIDJ)V
  */
@@ -538,7 +537,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendDouble
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    appendString
  * Signature: (JILjava/lang/String;J)V
  */
@@ -555,7 +554,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendString
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    appendBooleanArray
  * Signature: (JI[ZJ)V
  */
@@ -577,7 +576,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendBooleanArray
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    appendIntegerArray
  * Signature: (JI[JJ)V
  */
@@ -610,7 +609,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendIntegerArray
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    appendFloatArray
  * Signature: (JI[FJ)V
  */
@@ -632,7 +631,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendFloatArray
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    appendDoubleArray
  * Signature: (JI[DJ)V
  */
@@ -654,7 +653,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendDoubleArray
 }
 
 /*
- * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    appendStringArray
  * Signature: (JI[Ljava/lang/Object;J)V
  */

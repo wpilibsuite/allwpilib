@@ -4,12 +4,6 @@
 
 #pragma once
 
-#include <wpi/DataLogReader.h>
-#include <wpi/DenseMap.h>
-#include <wpi/Signal.h>
-#include <wpi/mutex.h>
-#include <wpi/struct/DynamicStruct.h>
-
 #include <atomic>
 #include <functional>
 #include <map>
@@ -18,6 +12,12 @@
 #include <thread>
 #include <utility>
 #include <vector>
+
+#include <wpi/DataLogReader.h>
+#include <wpi/DenseMap.h>
+#include <wpi/Signal.h>
+#include <wpi/mutex.h>
+#include <wpi/struct/DynamicStruct.h>
 
 #ifndef NO_PROTOBUF
 #include <wpi/protobuf/ProtobufMessageDatabase.h>

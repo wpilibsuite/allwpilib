@@ -19,15 +19,15 @@
 #include <vector>
 #include <version>
 
-#include "wpi/DataLog_c.h"
-#include "wpi/DenseMap.h"
-#include "wpi/SmallVector.h"
-#include "wpi/StringMap.h"
-#include "wpi/mutex.h"
-#include "wpi/protobuf/Protobuf.h"
-#include "wpi/string.h"
-#include "wpi/struct/Struct.h"
-#include "wpi/timestamp.h"
+#include <wpi/DataLog_c.h>
+#include <wpi/DenseMap.h>
+#include <wpi/SmallVector.h>
+#include <wpi/StringMap.h>
+#include <wpi/mutex.h>
+#include <wpi/protobuf/Protobuf.h>
+#include <wpi/string.h>
+#include <wpi/struct/Struct.h>
+#include <wpi/timestamp.h>
 
 namespace wpi {
 class Logger;

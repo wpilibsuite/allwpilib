@@ -8,7 +8,7 @@
 #include <string_view>
 #include <thread>
 
-#include "wpi/DataLog.h"
+#include <wpi/DataLog.h>
 
 namespace wpi {
 /**

@@ -12,7 +12,7 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/MemoryBuffer.h"
+#include <wpi/MemoryBuffer.h>
 
 namespace wpi::log {
 

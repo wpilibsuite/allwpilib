@@ -7,6 +7,7 @@
 #include <stddef.h>  // NOLINT
 
 #include <stdint.h>
+
 #include <wpi/string.h>
 
 #ifdef __cplusplus

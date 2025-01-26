@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/DataLog.h"
-
 #include <algorithm>
 #include <bit>
 #include <cstdio>
@@ -13,11 +11,12 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/Endian.h"
-#include "wpi/Logger.h"
-#include "wpi/SmallString.h"
-#include "wpi/print.h"
-#include "wpi/timestamp.h"
+#include <wpi/DataLog.h>
+#include <wpi/Endian.h>
+#include <wpi/Logger.h>
+#include <wpi/SmallString.h>
+#include <wpi/print.h>
+#include <wpi/timestamp.h>
 
 using namespace wpi::log;
 
