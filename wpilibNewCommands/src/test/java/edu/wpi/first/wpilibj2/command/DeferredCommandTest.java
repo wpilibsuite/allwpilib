@@ -47,20 +47,18 @@ class DeferredCommandTest extends CommandTestBase {
   @SuppressWarnings("unchecked")
   @Test
   void deferredSupplierOnlyCalledDuringInit() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      Supplier<Command> supplier = (Supplier<Command>) mock(Supplier.class);
-      when(supplier.get()).thenReturn(Commands.none(), Commands.none());
+    Supplier<Command> supplier = (Supplier<Command>) mock(Supplier.class);
+    when(supplier.get()).thenReturn(Commands.none(), Commands.none());
 
-      DeferredCommand command = new DeferredCommand(supplier, Set.of());
-      verify(supplier, never()).get();
+    DeferredCommand command = new DeferredCommand(supplier, Set.of());
+    verify(supplier, never()).get();
 
-      scheduler.schedule(command);
-      verify(supplier, only()).get();
-      scheduler.run();
+    scheduler.schedule(command);
+    verify(supplier, only()).get();
+    scheduler.run();
 
-      scheduler.schedule(command);
-      verify(supplier, times(2)).get();
-    }
+    scheduler.schedule(command);
+    verify(supplier, times(2)).get();
   }
 
   @Test

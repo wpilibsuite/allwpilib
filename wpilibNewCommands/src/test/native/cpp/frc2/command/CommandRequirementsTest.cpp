@@ -14,8 +14,6 @@ using namespace frc2;
 class CommandRequirementsTest : public CommandTestBase {};
 
 TEST_F(CommandRequirementsTest, RequirementInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
-
   TestSubsystem requirement;
 
   MockCommand command1({&requirement});
@@ -28,7 +26,9 @@ TEST_F(CommandRequirementsTest, RequirementInterrupt) {
 
   EXPECT_CALL(command2, Initialize());
   EXPECT_CALL(command2, Execute());
-  EXPECT_CALL(command2, End(true)).Times(0);
+  // Because we schedule command2 on the CommandScheduler singleton, the
+  // MockCommand deconstructor will cancel it at the end of the scope
+  EXPECT_CALL(command2, End(true)).Times(1);
   EXPECT_CALL(command2, End(false)).Times(0);
 
   scheduler.Schedule(&command1);
@@ -41,8 +41,6 @@ TEST_F(CommandRequirementsTest, RequirementInterrupt) {
 }
 
 TEST_F(CommandRequirementsTest, RequirementUninterruptible) {
-  CommandScheduler scheduler = GetScheduler();
-
   TestSubsystem requirement;
 
   int initCounter = 0;

@@ -18,8 +18,6 @@ using namespace frc2;
 class CommandDecoratorTest : public CommandTestBase {};
 
 TEST_F(CommandDecoratorTest, WithTimeout) {
-  CommandScheduler scheduler = GetScheduler();
-
   frc::sim::PauseTiming();
 
   auto command = cmd::Idle().WithTimeout(100_ms);
@@ -39,8 +37,6 @@ TEST_F(CommandDecoratorTest, WithTimeout) {
 }
 
 TEST_F(CommandDecoratorTest, Until) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool finish = false;
 
   auto command = cmd::Idle().Until([&finish] { return finish; });
@@ -57,8 +53,6 @@ TEST_F(CommandDecoratorTest, Until) {
 }
 
 TEST_F(CommandDecoratorTest, UntilOrder) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool firstHasRun = false;
   bool firstWasPolled = false;
 
@@ -82,8 +76,6 @@ TEST_F(CommandDecoratorTest, UntilOrder) {
 }
 
 TEST_F(CommandDecoratorTest, OnlyWhile) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool run = true;
 
   auto command = cmd::Idle().OnlyWhile([&run] { return run; });
@@ -100,8 +92,6 @@ TEST_F(CommandDecoratorTest, OnlyWhile) {
 }
 
 TEST_F(CommandDecoratorTest, OnlyWhileOrder) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool firstHasRun = false;
   bool firstWasPolled = false;
 
@@ -125,8 +115,6 @@ TEST_F(CommandDecoratorTest, OnlyWhileOrder) {
 }
 
 TEST_F(CommandDecoratorTest, IgnoringDisable) {
-  CommandScheduler scheduler = GetScheduler();
-
   auto command = cmd::Idle().IgnoringDisable(true);
 
   SetDSEnabled(false);
@@ -138,8 +126,6 @@ TEST_F(CommandDecoratorTest, IgnoringDisable) {
 }
 
 TEST_F(CommandDecoratorTest, BeforeStarting) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool finished = false;
 
   auto command = cmd::None().BeforeStarting([&finished] { finished = true; });
@@ -158,8 +144,6 @@ TEST_F(CommandDecoratorTest, BeforeStarting) {
 }
 
 TEST_F(CommandDecoratorTest, AndThenLambda) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool finished = false;
 
   auto command = cmd::None().AndThen([&finished] { finished = true; });
@@ -178,8 +162,6 @@ TEST_F(CommandDecoratorTest, AndThenLambda) {
 }
 
 TEST_F(CommandDecoratorTest, AndThen) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool finished = false;
 
   auto command1 = cmd::None();
@@ -200,8 +182,6 @@ TEST_F(CommandDecoratorTest, AndThen) {
 }
 
 TEST_F(CommandDecoratorTest, DeadlineFor) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool finish = false;
 
   auto dictator = cmd::WaitUntil([&finish] { return finish; });
@@ -221,8 +201,6 @@ TEST_F(CommandDecoratorTest, DeadlineFor) {
 }
 
 TEST_F(CommandDecoratorTest, WithDeadline) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool finish = false;
 
   auto dictator = WaitUntilCommand([&finish] { return finish; });
@@ -242,8 +220,6 @@ TEST_F(CommandDecoratorTest, WithDeadline) {
 }
 
 TEST_F(CommandDecoratorTest, AlongWith) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool finish = false;
 
   auto command1 = cmd::WaitUntil([&finish] { return finish; });
@@ -263,8 +239,6 @@ TEST_F(CommandDecoratorTest, AlongWith) {
 }
 
 TEST_F(CommandDecoratorTest, RaceWith) {
-  CommandScheduler scheduler = GetScheduler();
-
   auto command1 = cmd::Idle();
   auto command2 = cmd::None();
 
@@ -277,8 +251,6 @@ TEST_F(CommandDecoratorTest, RaceWith) {
 }
 
 TEST_F(CommandDecoratorTest, DeadlineForOrder) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool dictatorHasRun = false;
   bool dictatorWasPolled = false;
 
@@ -304,8 +276,6 @@ TEST_F(CommandDecoratorTest, DeadlineForOrder) {
 }
 
 TEST_F(CommandDecoratorTest, WithDeadlineOrder) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool dictatorHasRun = false;
   bool dictatorWasPolled = false;
 
@@ -331,8 +301,6 @@ TEST_F(CommandDecoratorTest, WithDeadlineOrder) {
 }
 
 TEST_F(CommandDecoratorTest, AlongWithOrder) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool firstHasRun = false;
   bool firstWasPolled = false;
 
@@ -357,8 +325,6 @@ TEST_F(CommandDecoratorTest, AlongWithOrder) {
 }
 
 TEST_F(CommandDecoratorTest, RaceWithOrder) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool firstHasRun = false;
   bool firstWasPolled = false;
 
@@ -383,8 +349,6 @@ TEST_F(CommandDecoratorTest, RaceWithOrder) {
 }
 
 TEST_F(CommandDecoratorTest, Unless) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool hasRun = false;
   bool unlessCondition = true;
 
@@ -404,8 +368,6 @@ TEST_F(CommandDecoratorTest, Unless) {
 }
 
 TEST_F(CommandDecoratorTest, OnlyIf) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool hasRun = false;
   bool onlyIfCondition = false;
 
@@ -425,7 +387,6 @@ TEST_F(CommandDecoratorTest, OnlyIf) {
 }
 
 TEST_F(CommandDecoratorTest, FinallyDo) {
-  CommandScheduler scheduler = GetScheduler();
   int first = 0;
   int second = 0;
   CommandPtr command = FunctionalCommand([] {}, [] {},
@@ -456,7 +417,6 @@ TEST_F(CommandDecoratorTest, FinallyDo) {
 // handleInterruptTest() implicitly tests the interrupt=true branch of
 // finallyDo()
 TEST_F(CommandDecoratorTest, HandleInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
   int first = 0;
   int second = 0;
   CommandPtr command = FunctionalCommand([] {}, [] {},
