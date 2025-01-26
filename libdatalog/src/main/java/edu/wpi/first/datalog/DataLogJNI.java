@@ -4,16 +4,71 @@
 
 package edu.wpi.first.datalog;
 
-import edu.wpi.first.util.WPIUtilJNI;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import edu.wpi.first.util.RuntimeLoader;
 
 /**
  * DataLog wpiutil JNI Functions.
  *
  * @see "wpiutil/DataLog.h"
  */
-public class DataLogJNI extends WPIUtilJNI {
+public class DataLogJNI {
+  static boolean libraryLoaded = false;
+
+  /** Sets whether JNI should be loaded in the static block. */
+  public static class Helper {
+    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
+
+    /**
+     * Returns true if the JNI should be loaded in the static block.
+     *
+     * @return True if the JNI should be loaded in the static block.
+     */
+    public static boolean getExtractOnStaticLoad() {
+      return extractOnStaticLoad.get();
+    }
+
+    /**
+     * Sets whether the JNI should be loaded in the static block.
+     *
+     * @param load Whether the JNI should be loaded in the static block.
+     */
+    public static void setExtractOnStaticLoad(boolean load) {
+      extractOnStaticLoad.set(load);
+    }
+
+    /** Utility class. */
+    private Helper() {}
+  }
+
+  static {
+    if (Helper.getExtractOnStaticLoad()) {
+      try {
+        RuntimeLoader.loadLibrary("datalogjni");
+      } catch (Exception ex) {
+        ex.printStackTrace();
+        System.exit(1);
+      }
+      libraryLoaded = true;
+    }
+  }
+
+  /**
+   * Force load the library.
+   *
+   * @throws IOException if the library failed to load
+   */
+  public static synchronized void forceLoad() throws IOException {
+    if (libraryLoaded) {
+      return;
+    }
+    RuntimeLoader.loadLibrary("datalogjni");
+    libraryLoaded = true;
+  }
+
   /**
    * Create a new Data Log background writer. The log will be initially created with a temporary
    * filename.
