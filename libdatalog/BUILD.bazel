@@ -4,8 +4,9 @@ cc_library(
     name = "libdatalog.static",
     srcs = glob(
         ["src/main/native/cpp/**"],
+        exclude = ["src/main/native/cpp/jni/**"],
     ),
-    hdrs = glob(["src/main/native/include/*"]),
+    hdrs = glob(["src/main/native/include/**"]),
     includes = [
         "src/main/native/cpp",
         "src/main/native/include",
