@@ -67,6 +67,33 @@ class buf_ostream : public wpi::raw_uvector_ostream {
 
 extern "C" {
 
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
+  JNIEnv* env;
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+    return JNI_ERR;
+  }
+
+  for (auto& c : exceptions) {
+    *c.cls = JException(env, c.name);
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
+  }
+
+  return JNI_VERSION_1_6;
+}
+
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
+  JNIEnv* env;
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+    return;
+  }
+
+  for (auto& c : exceptions) {
+    c.cls->free(env);
+  }
+}
+
 /*
  * Class:     edu_wpi_first_util_datalog_DataLogJNI
  * Method:    bgCreate

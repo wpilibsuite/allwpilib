@@ -1,10 +1,12 @@
 ext {
     addNtcoreDependency = { binary, shared->
         binary.lib project: ':ntcore', library: 'ntcore', linkage: shared
+        binary.lib project: ':libdatalog', library: 'libdatalog', linkage: shared
     }
 
     addNtcoreJniDependency = { binary->
         binary.lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
+        binary.lib project: ':libdatalog', library: 'libdatalogJNIShared', linkage: 'shared'
     }
 
     nativeName = 'ntcore'
