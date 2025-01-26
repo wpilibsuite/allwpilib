@@ -686,12 +686,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendStringArray
   reinterpret_cast<DataLog*>(impl)->AppendStringArray(entry, arr, timestamp);
 }
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    createFileLogger
  * Signature: (Ljava/lang/String;JLjava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_createFileLogger
+Java_edu_wpi_first_datalog_DataLogJNI_createFileLogger
   (JNIEnv* env, jclass, jstring file, jlong log, jstring key)
 {
   if (!file) {
@@ -712,12 +712,12 @@ Java_edu_wpi_first_util_WPIUtilJNI_createFileLogger
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_datalog_DataLogJNI
  * Method:    freeFileLogger
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_freeFileLogger
+Java_edu_wpi_first_datalog_DataLogJNI_freeFileLogger
   (JNIEnv* env, jclass, jlong fileTail)
 {
   delete reinterpret_cast<wpi::FileLogger*>(fileTail);
