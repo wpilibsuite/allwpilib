@@ -4,7 +4,7 @@
 
 #include <jni.h>
 
-#include "wpi/DataLogJNI.h"
+#include "DataLogJNI.h"
 #include "wpi/FileLogger.h"
 
 
