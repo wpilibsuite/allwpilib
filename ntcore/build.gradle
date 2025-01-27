@@ -1,12 +1,12 @@
 ext {
     addNtcoreDependency = { binary, shared->
         binary.lib project: ':ntcore', library: 'ntcore', linkage: shared
-        binary.lib project: ':libdatalog', library: 'libdatalog', linkage: shared
+        binary.lib project: ':datalog', library: 'datalog', linkage: shared
     }
 
     addNtcoreJniDependency = { binary->
         binary.lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
-        binary.lib project: ':libdatalog', library: 'libdatalogJNIShared', linkage: 'shared'
+        binary.lib project: ':datalog', library: 'datalogJNIShared', linkage: 'shared'
     }
 
     nativeName = 'ntcore'
@@ -36,11 +36,11 @@ model {
             if (it.component.name == "${nativeName}JNI") {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                lib project: ':libdatalog', library: 'libdatalog', linkage: 'static'
+                lib project: ':datalog', library: 'datalog', linkage: 'static'
             } else {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                lib project: ':libdatalog', library: 'libdatalog', linkage: 'shared'
+                lib project: ':datalog', library: 'datalog', linkage: 'shared'
             }
         }
     }
@@ -67,5 +67,5 @@ nativeUtils.exportsConfigs {
 }
 
 dependencies {
-    api project(":libdatalog")
+    api project(":datalog")
 }

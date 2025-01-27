@@ -35,7 +35,7 @@ else()
     )
 endif()
 
-target_link_libraries(wpilibc PUBLIC hal ntcore wpimath libdatalog)
+target_link_libraries(wpilibc PUBLIC hal ntcore wpimath datalog)
 
 set_property(TARGET wpilibc PROPERTY FOLDER "libraries")
 

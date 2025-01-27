@@ -99,7 +99,7 @@ model {
                 lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                lib project: ':libdatalog', library: 'libdatalog', linkage: 'static'
+                lib project: ':datalog', library: 'datalog', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
@@ -138,7 +138,7 @@ model {
                 }
                 lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
-                lib project: ':libdatalog', library: 'libdatalog', linkage: 'static'
+                lib project: ':datalog', library: 'datalog', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'

@@ -1,7 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "libdatalog.static",
+    name = "datalog.static",
     srcs = glob(
         ["src/main/native/cpp/**"],
         exclude = ["src/main/native/cpp/jni/**"],
@@ -39,7 +39,7 @@ cc_binary(
     srcs = ["examples/printlog/printlog.cpp"],
     deps = [
         "//wpiutil:wpiutil.static",
-        ":libdatalog.static"
+        ":datalog.static"
     ],
 )
 
@@ -48,7 +48,7 @@ cc_binary(
     srcs = ["examples/writelog/writelog.cpp"],
     deps = [
         "//wpiutil:wpiutil.static",
-        ":libdatalog.static"
+        ":datalog.static"
     ],
 )
 

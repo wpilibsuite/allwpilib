@@ -1,17 +1,17 @@
 ext {
     useJava = true
     useCpp = true
-    baseId = 'libdatalog'
+    baseId = 'datalog'
     groupId = 'edu.wpi.first.datalog'
 
-    nativeName = 'libdatalog'
+    nativeName = 'datalog'
     devMain = 'edu.wpi.first.datalog.DevMain'
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 nativeUtils.exportsConfigs {
-    libdatalog {
+    datalog {
     }
 }
 

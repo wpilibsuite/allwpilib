@@ -100,7 +100,7 @@ model {
                 it.cppCompiler.define("LIBSSH_STATIC")
                 lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                lib project: ':libdatalog', library: 'libdatalog', linkage: 'static'
+                lib project: ':datalog', library: 'datalog', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'libssh')

@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * DataLog JNI Functions.
  *
- * @see "libdatalog/DataLog.h"
+ * @see "datalog/DataLog.h"
  */
 public class DataLogJNI {
   static boolean libraryLoaded = false;
@@ -46,7 +46,7 @@ public class DataLogJNI {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        RuntimeLoader.loadLibrary("libdatalogjni");
+        RuntimeLoader.loadLibrary("datalogjni");
       } catch (Exception ex) {
         ex.printStackTrace();
         System.exit(1);

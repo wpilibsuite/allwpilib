@@ -59,7 +59,7 @@ include 'epilogue-runtime'
 include 'thirdparty:googletest'
 include 'thirdparty:imgui_suite'
 include 'wpical'
-include 'libdatalog'
+include 'datalog'
 
 buildCache {
     def cred = {
