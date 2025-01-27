@@ -1,10 +1,19 @@
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 
 java_library(
     name = "wpiunits",
     srcs = glob(["src/main/java/**/*.java"]) + glob(["src/generated/main/java/**/*.java"]),
     visibility = ["//visibility:public"],
     deps = [],
+)
+
+wpilib_java_junit5_test(
+    name = "wpiunits-test",
+    srcs = glob(["src/test/java/**/*.java"]),
+    deps = [
+        ":wpiunits",
+    ],
 )
 
 java_binary(

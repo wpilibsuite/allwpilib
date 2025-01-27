@@ -1,4 +1,5 @@
 load("@rules_java//java:defs.bzl", "java_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 
 java_library(
     name = "epilogue",
@@ -7,6 +8,15 @@ java_library(
     deps = [
         "//ntcore:networktables-java",
         "//wpiunits",
+        "//wpiutil:wpiutil-java",
+    ],
+)
+
+wpilib_java_junit5_test(
+    name = "epilogue-test",
+    srcs = glob(["src/test/java/**/*.java"]),
+    deps = [
+        ":epilogue",
         "//wpiutil:wpiutil-java",
     ],
 )
