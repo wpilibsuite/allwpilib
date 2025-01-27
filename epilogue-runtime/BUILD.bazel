@@ -9,6 +9,7 @@ java_library(
         "//ntcore:networktables-java",
         "//wpiunits",
         "//wpiutil:wpiutil-java",
+        "//libdatalog:datalog-java"
     ],
 )
 

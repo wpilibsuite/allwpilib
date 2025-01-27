@@ -17,3 +17,46 @@ cc_library(
         "//wpiutil:wpiutil.static",
     ],
 )
+
+java_library(
+    name = "datalog-java",
+    srcs = glob(["src/main/java/**/*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+py_binary(
+    name = "datalog",
+    srcs = ["examples/printlog/datalog.py"],
+    tags = ["manual"],
+)
+
+cc_binary(
+    name = "printlog",
+    srcs = ["examples/printlog/printlog.cpp"],
+    deps = [
+        "//wpiutil:wpiutil.static",
+        ":libdatalog.static"
+    ],
+)
+
+cc_binary(
+    name = "writelog",
+    srcs = ["examples/writelog/writelog.cpp"],
+    deps = [
+        "//wpiutil:wpiutil.static",
+        ":libdatalog.static"
+    ],
+)
+
+java_binary(
+    name = "printlog-java",
+    srcs = ["src/printlog/java/printlog/PrintLog.java"],
+    main_class = "printlog.PrintLog",
+    deps = [
+        ":datalog-java"
+    ],
+)

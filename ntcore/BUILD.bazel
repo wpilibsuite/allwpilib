@@ -49,6 +49,7 @@ cc_library(
         ":generated_cc_headers",
         "//wpinet:wpinet.static",
         "//wpiutil:wpiutil.static",
+        "//libdatalog:libdatalog.static",
     ],
 )
 
@@ -69,6 +70,7 @@ wpilib_jni_java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//wpiutil:wpiutil-java",
+        "//libdatalog:datalog-java",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )

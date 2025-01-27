@@ -305,34 +305,3 @@ java_binary(
         ":wpiutil-java",
     ],
 )
-
-py_binary(
-    name = "datalog",
-    srcs = ["examples/printlog/datalog.py"],
-    tags = ["manual"],
-)
-
-cc_binary(
-    name = "printlog",
-    srcs = ["examples/printlog/printlog.cpp"],
-    deps = [
-        ":wpiutil.static",
-    ],
-)
-
-cc_binary(
-    name = "writelog",
-    srcs = ["examples/writelog/writelog.cpp"],
-    deps = [
-        ":wpiutil.static",
-    ],
-)
-
-java_binary(
-    name = "printlog-java",
-    srcs = ["src/printlog/java/printlog/PrintLog.java"],
-    main_class = "printlog.PrintLog",
-    deps = [
-        ":wpiutil-java",
-    ],
-)
