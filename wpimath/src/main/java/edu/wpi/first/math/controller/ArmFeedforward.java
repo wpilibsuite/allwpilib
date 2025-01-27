@@ -140,6 +140,7 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    * @param velocityRadPerSec The velocity setpoint.
    * @param accelRadPerSecSquared The acceleration setpoint.
    * @return The computed feedforward.
+   * @deprecated Use {@link #calculateWithVelocities(double, double, double)} instead
    */
   @Deprecated(forRemoval = true, since = "2025")
   public double calculate(
@@ -174,6 +175,7 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    * @param nextVelocity The next velocity setpoint in radians per second.
    * @param dt Time between velocity setpoints in seconds.
    * @return The computed feedforward in volts.
+   * @deprecated Use {@link #calculateWithVelocities(double, double, double)} instead.
    */
   @SuppressWarnings("removal")
   @Deprecated(forRemoval = true, since = "2025")
