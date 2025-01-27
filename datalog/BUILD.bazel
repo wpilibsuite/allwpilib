@@ -1,4 +1,7 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_java//java:java_binary.bzl", "java_binary")
+load("@rules_java//java:java_library.bzl", "java_library")
+load("@rules_python//python:defs.bzl", "py_binary")
 
 cc_library(
     name = "datalog.static",
@@ -38,8 +41,8 @@ cc_binary(
     name = "printlog",
     srcs = ["examples/printlog/printlog.cpp"],
     deps = [
+        ":datalog.static",
         "//wpiutil:wpiutil.static",
-        ":datalog.static"
     ],
 )
 
@@ -47,8 +50,8 @@ cc_binary(
     name = "writelog",
     srcs = ["examples/writelog/writelog.cpp"],
     deps = [
+        ":datalog.static",
         "//wpiutil:wpiutil.static",
-        ":datalog.static"
     ],
 )
 
@@ -57,6 +60,6 @@ java_binary(
     srcs = ["src/printlog/java/printlog/PrintLog.java"],
     main_class = "printlog.PrintLog",
     deps = [
-        ":datalog-java"
+        ":datalog-java",
     ],
 )
