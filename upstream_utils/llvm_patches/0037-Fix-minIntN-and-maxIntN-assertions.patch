@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Mon, 23 Dec 2024 22:56:29 -0800
-Subject: [PATCH 37/37] Fix minIntN() and maxIntN() assertions
+Subject: [PATCH 37/38] Fix minIntN() and maxIntN() assertions
 
 ---
  llvm/include/llvm/Support/MathExtras.h | 4 ++--
