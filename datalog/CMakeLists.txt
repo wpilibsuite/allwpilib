@@ -59,11 +59,7 @@ if(WITH_JAVA)
     set_property(TARGET datalog_jar PROPERTY FOLDER "java")
 
     install_jar(datalog_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(
-        TARGETS datalog_jar
-        FILE datalog_jar.cmake
-        DESTINATION share/datalog
-    )
+    install_jar_exports(TARGETS datalog_jar FILE datalog_jar.cmake DESTINATION share/datalog)
 
     add_library(datalogjni ${datalog_jni_src})
     wpilib_target_warnings(datalogjni)
