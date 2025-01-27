@@ -137,6 +137,7 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    * @param velocity The velocity setpoint.
    * @param acceleration The acceleration setpoint.
    * @return The computed feedforward.
+   * @deprecated Use the current/next velocity overload instead.
    */
   @SuppressWarnings("removal")
   @Deprecated(forRemoval = true, since = "2025")
