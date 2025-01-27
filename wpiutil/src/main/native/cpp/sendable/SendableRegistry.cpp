@@ -62,9 +62,10 @@ Component& SendableRegistryInst::GetOrAdd(void* sendable,
   return *components[compUid - 1];
 }
 
-static SendableRegistryInst& GetInstance() {
-  wpi::ManagedStatic<SendableRegistryInst> inst;
-  return *inst;
+static wpi::ManagedStatic<SendableRegistryInst> gInst;
+
+static inline SendableRegistryInst& GetInstance() {
+  return *gInst;
 }
 
 void SendableRegistry::EnsureInitialized() {
