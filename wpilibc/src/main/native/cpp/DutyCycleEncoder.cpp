@@ -74,8 +74,8 @@ void DutyCycleEncoder::Init(double fullRange, double expectedZero) {
   m_fullRange = fullRange;
   m_expectedZero = expectedZero;
 
-  wpi::SendableRegistry::AddLW(this, "DutyCycle Encoder",
-                               m_dutyCycle->GetSourceChannel());
+  wpi::SendableRegistry::Add(this, "DutyCycle Encoder",
+                             m_dutyCycle->GetSourceChannel());
 }
 
 double DutyCycleEncoder::Get() const {

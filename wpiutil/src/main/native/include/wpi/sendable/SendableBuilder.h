@@ -49,14 +49,6 @@ class SendableBuilder {
   virtual void SetActuator(bool value) = 0;
 
   /**
-   * Set the function that should be called to set the Sendable into a safe
-   * state.  This is called when entering and exiting Live Window mode.
-   *
-   * @param func    function
-   */
-  virtual void SetSafeState(std::function<void()> func) = 0;
-
-  /**
    * Add a boolean property.
    *
    * @param key     property name

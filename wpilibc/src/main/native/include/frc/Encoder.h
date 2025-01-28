@@ -16,7 +16,6 @@
 namespace frc {
 
 class DigitalSource;
-class DigitalGlitchFilter;
 
 /**
  * Class to read quad encoders.
@@ -374,8 +373,6 @@ class Encoder : public CounterBase,
   std::shared_ptr<DigitalSource> m_bSource;  // The B phase of the quad encoder
   std::shared_ptr<DigitalSource> m_indexSource = nullptr;
   hal::Handle<HAL_EncoderHandle, HAL_FreeEncoder> m_encoder;
-
-  friend class DigitalGlitchFilter;
 };
 
 }  // namespace frc

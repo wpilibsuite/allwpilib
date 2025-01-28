@@ -33,7 +33,7 @@ public class Tachometer implements Sendable, AutoCloseable {
     m_handle = CounterJNI.initializeCounter(channel, configuration.rising);
 
     HAL.report(tResourceType.kResourceType_Counter, channel + 1);
-    SendableRegistry.addLW(this, "Tachometer", channel);
+    SendableRegistry.add(this, "Tachometer", channel);
   }
 
   @Override

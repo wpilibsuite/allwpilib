@@ -4,7 +4,7 @@
 
 #include "RobotContainer.h"
 
-#include <frc/shuffleboard/Shuffleboard.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/button/JoystickButton.h>
 
 #include "commands/DefaultDrive.h"
@@ -20,36 +20,10 @@ RobotContainer::RobotContainer() {
   m_chooser.AddOption("Complex Auto", &m_complexAuto);
 
   // Put the chooser on the dashboard
-  frc::Shuffleboard::GetTab("Autonomous").Add(m_chooser);
+  frc::SmartDashboard::PutData("Autonomous", &m_chooser);
   // Put subsystems to dashboard.
-  frc::Shuffleboard::GetTab("Drivetrain").Add(m_drive);
-  frc::Shuffleboard::GetTab("HatchSubsystem").Add(m_hatch);
-
-  // Log Shuffleboard events for command initialize, execute, finish, interrupt
-  frc2::CommandScheduler::GetInstance().OnCommandInitialize(
-      [](const frc2::Command& command) {
-        frc::Shuffleboard::AddEventMarker(
-            "Command initialized", command.GetName(),
-            frc::ShuffleboardEventImportance::kNormal);
-      });
-  frc2::CommandScheduler::GetInstance().OnCommandExecute(
-      [](const frc2::Command& command) {
-        frc::Shuffleboard::AddEventMarker(
-            "Command executed", command.GetName(),
-            frc::ShuffleboardEventImportance::kNormal);
-      });
-  frc2::CommandScheduler::GetInstance().OnCommandFinish(
-      [](const frc2::Command& command) {
-        frc::Shuffleboard::AddEventMarker(
-            "Command finished", command.GetName(),
-            frc::ShuffleboardEventImportance::kNormal);
-      });
-  frc2::CommandScheduler::GetInstance().OnCommandInterrupt(
-      [](const frc2::Command& command) {
-        frc::Shuffleboard::AddEventMarker(
-            "Command interrupted", command.GetName(),
-            frc::ShuffleboardEventImportance::kNormal);
-      });
+  frc::SmartDashboard::PutData("Drivetrain", &m_drive);
+  frc::SmartDashboard::PutData("HatchSubsystem", &m_hatch);
 
   // Configure the button bindings
   ConfigureButtonBindings();

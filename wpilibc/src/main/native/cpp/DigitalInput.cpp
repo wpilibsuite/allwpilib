@@ -32,7 +32,7 @@ DigitalInput::DigitalInput(int channel) {
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalInput, channel + 1);
-  wpi::SendableRegistry::AddLW(this, "DigitalInput", channel);
+  wpi::SendableRegistry::Add(this, "DigitalInput", channel);
 }
 
 bool DigitalInput::Get() const {

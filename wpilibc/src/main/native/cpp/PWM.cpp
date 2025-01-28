@@ -40,7 +40,7 @@ PWM::PWM(int channel, bool registerSendable) {
 
   HAL_Report(HALUsageReporting::kResourceType_PWM, channel + 1);
   if (registerSendable) {
-    wpi::SendableRegistry::AddLW(this, "PWM", channel);
+    wpi::SendableRegistry::Add(this, "PWM", channel);
   }
 }
 
@@ -174,7 +174,6 @@ int PWM::GetChannel() const {
 void PWM::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PWM");
   builder.SetActuator(true);
-  builder.SetSafeState([=, this] { SetDisabled(); });
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetPulseTime().value(); },
       [=, this](double value) { SetPulseTime(units::millisecond_t{value}); });

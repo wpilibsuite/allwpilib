@@ -27,7 +27,7 @@ NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
   m_dio.EnablePWM(0.5);
 
   HAL_Report(HALUsageReporting::kResourceType_NidecBrushless, pwmChannel + 1);
-  wpi::SendableRegistry::AddLW(this, "Nidec Brushless", pwmChannel);
+  wpi::SendableRegistry::Add(this, "Nidec Brushless", pwmChannel);
 }
 
 WPI_UNIGNORE_DEPRECATED
@@ -79,7 +79,6 @@ int NidecBrushless::GetChannel() const {
 void NidecBrushless::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Nidec Brushless");
   builder.SetActuator(true);
-  builder.SetSafeState([=, this] { StopMotor(); });
   builder.AddDoubleProperty(
       "Value", [=, this] { return Get(); },
       [=, this](double value) { Set(value); });

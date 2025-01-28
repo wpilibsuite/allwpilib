@@ -234,7 +234,7 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
 
   HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex() + 1,
              encodingType);
-  wpi::SendableRegistry::AddLW(this, "Encoder", m_aSource->GetChannel());
+  wpi::SendableRegistry::Add(this, "Encoder", m_aSource->GetChannel());
 }
 
 double Encoder::DecodingScaleFactor() const {

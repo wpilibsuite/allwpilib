@@ -29,7 +29,7 @@ UpDownCounter::UpDownCounter(int channel, EdgeConfiguration configuration)
   Reset();
 
   HAL_Report(HALUsageReporting::kResourceType_Counter, channel + 1);
-  wpi::SendableRegistry::AddLW(this, "UpDown Counter", channel);
+  wpi::SendableRegistry::Add(this, "UpDown Counter", channel);
 }
 
 int UpDownCounter::GetCount() const {

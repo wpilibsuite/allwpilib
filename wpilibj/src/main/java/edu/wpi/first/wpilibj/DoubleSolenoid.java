@@ -99,7 +99,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
           tResourceType.kResourceType_Solenoid, forwardChannel + 1, m_module.getModuleNumber() + 1);
       HAL.report(
           tResourceType.kResourceType_Solenoid, reverseChannel + 1, m_module.getModuleNumber() + 1);
-      SendableRegistry.addLW(this, "DoubleSolenoid", m_module.getModuleNumber(), forwardChannel);
+      SendableRegistry.add(this, "DoubleSolenoid", m_module.getModuleNumber(), forwardChannel);
       successfulCompletion = true;
     } finally {
       if (!successfulCompletion) {
@@ -210,7 +210,6 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Double Solenoid");
     builder.setActuator(true);
-    builder.setSafeState(() -> set(Value.kOff));
     builder.addStringProperty(
         "Value",
         () -> get().name().substring(1),

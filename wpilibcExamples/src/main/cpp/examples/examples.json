@@ -46,7 +46,6 @@
     "tags": [
       "Hardware",
       "Joystick",
-      "Shuffleboard",
       "Pneumatics"
     ],
     "foldername": "Solenoid",
@@ -119,8 +118,7 @@
     "tags": [
       "Hardware",
       "Ultrasonic",
-      "SmartDashboard",
-      "Shuffleboard"
+      "SmartDashboard"
     ],
     "foldername": "Ultrasonic",
     "gradlebase": "cpp",
@@ -319,21 +317,6 @@
     "commandversion": 2
   },
   {
-    "name": "Shuffleboard",
-    "description": "Present various data via the Shuffleboard API.",
-    "tags": [
-      "Basic Robot",
-      "Differential Drive",
-      "Elevator",
-      "Analog",
-      "Encoder",
-      "Shuffleboard"
-    ],
-    "foldername": "ShuffleBoard",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
     "name": "'Traditional' Hatchbot",
     "description": "A fully-functional command-based hatchbot for the 2019 game, written in the 'traditional' style, i.e. commands are given their own classes.",
     "tags": [
@@ -341,7 +324,6 @@
       "Command-based",
       "Differential Drive",
       "Encoder",
-      "Shuffleboard",
       "Sendable",
       "DataLog",
       "Pneumatics",
@@ -359,7 +341,6 @@
       "Command-based",
       "Differential Drive",
       "Encoder",
-      "Shuffleboard",
       "Sendable",
       "DataLog",
       "Pneumatics",

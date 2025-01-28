@@ -9,11 +9,9 @@ import edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.commands.Autos;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.subsystems.HatchSubsystem;
-import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 
@@ -64,28 +62,11 @@ public class RobotContainer {
     m_chooser.addOption("Complex Auto", m_complexAuto);
 
     // Put the chooser on the dashboard
-    Shuffleboard.getTab("Autonomous").add(m_chooser);
+    SmartDashboard.putData("Autonomous", m_chooser);
 
     // Put subsystems to dashboard.
-    Shuffleboard.getTab("Drivetrain").add(m_robotDrive);
-    Shuffleboard.getTab("HatchSubsystem").add(m_hatchSubsystem);
-
-    // Set the scheduler to log Shuffleboard events for command initialize, interrupt, finish
-    CommandScheduler.getInstance()
-        .onCommandInitialize(
-            command ->
-                Shuffleboard.addEventMarker(
-                    "Command initialized", command.getName(), EventImportance.kNormal));
-    CommandScheduler.getInstance()
-        .onCommandInterrupt(
-            command ->
-                Shuffleboard.addEventMarker(
-                    "Command interrupted", command.getName(), EventImportance.kNormal));
-    CommandScheduler.getInstance()
-        .onCommandFinish(
-            command ->
-                Shuffleboard.addEventMarker(
-                    "Command finished", command.getName(), EventImportance.kNormal));
+    SmartDashboard.putData("Drivetrain", m_robotDrive);
+    SmartDashboard.putData("HatchSubsystem", m_hatchSubsystem);
   }
 
   /**

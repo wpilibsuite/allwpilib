@@ -13,7 +13,6 @@
 #include <frc/RobotBase.h>
 #include <frc/RobotState.h>
 #include <frc/TimedRobot.h>
-#include <frc/livewindow/LiveWindow.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/IntegerArrayTopic.h>
@@ -72,19 +71,11 @@ CommandScheduler::CommandScheduler()
       }) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand2_Scheduler);
-  wpi::SendableRegistry::AddLW(this, "Scheduler");
-  frc::LiveWindow::SetEnabledCallback([this] {
-    this->Disable();
-    this->CancelAll();
-  });
-  frc::LiveWindow::SetDisabledCallback([this] { this->Enable(); });
+  wpi::SendableRegistry::Add(this, "Scheduler");
 }
 
 CommandScheduler::~CommandScheduler() {
   wpi::SendableRegistry::Remove(this);
-  frc::LiveWindow::SetEnabledCallback(nullptr);
-  frc::LiveWindow::SetDisabledCallback(nullptr);
-
   std::unique_ptr<Impl>().swap(m_impl);
 }
 

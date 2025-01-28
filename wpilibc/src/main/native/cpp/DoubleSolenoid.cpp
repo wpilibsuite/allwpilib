@@ -55,8 +55,8 @@ DoubleSolenoid::DoubleSolenoid(int module, PneumaticsModuleType moduleType,
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel + 1,
              m_module->GetModuleNumber() + 1);
 
-  wpi::SendableRegistry::AddLW(this, "DoubleSolenoid",
-                               m_module->GetModuleNumber(), m_forwardChannel);
+  wpi::SendableRegistry::Add(this, "DoubleSolenoid",
+                             m_module->GetModuleNumber(), m_forwardChannel);
 }
 
 DoubleSolenoid::DoubleSolenoid(PneumaticsModuleType moduleType,
@@ -129,7 +129,6 @@ bool DoubleSolenoid::IsRevSolenoidDisabled() const {
 void DoubleSolenoid::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Double Solenoid");
   builder.SetActuator(true);
-  builder.SetSafeState([=, this] { Set(kOff); });
   builder.AddSmallStringProperty(
       "Value",
       [=, this](wpi::SmallVectorImpl<char>& buf) -> std::string_view {

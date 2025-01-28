@@ -109,7 +109,7 @@ public class PIDController implements Sendable, AutoCloseable {
     m_period = period;
 
     instances++;
-    SendableRegistry.addLW(this, "PIDController", instances);
+    SendableRegistry.add(this, "PIDController", instances);
 
     MathSharedStore.reportUsage(MathUsageId.kController_PIDController2, instances);
   }

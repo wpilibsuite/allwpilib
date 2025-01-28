@@ -25,7 +25,7 @@ Tachometer::Tachometer(int channel, EdgeConfiguration configuration)
   FRC_CheckErrorStatus(status, "{}", channel);
 
   HAL_Report(HALUsageReporting::kResourceType_Counter, channel + 1);
-  wpi::SendableRegistry::AddLW(this, "Tachometer", channel);
+  wpi::SendableRegistry::Add(this, "Tachometer", channel);
 }
 
 void Tachometer::SetEdgeConfiguration(EdgeConfiguration configuration) {

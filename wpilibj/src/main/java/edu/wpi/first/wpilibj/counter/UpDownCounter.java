@@ -33,7 +33,7 @@ public class UpDownCounter implements Sendable, AutoCloseable {
     reset();
 
     HAL.report(tResourceType.kResourceType_Counter, channel);
-    SendableRegistry.addLW(this, "UpDown Counter", channel);
+    SendableRegistry.add(this, "UpDown Counter", channel);
   }
 
   @Override

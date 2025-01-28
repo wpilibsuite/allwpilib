@@ -43,7 +43,7 @@ public class BangBangController implements Sendable {
 
     setTolerance(tolerance);
 
-    SendableRegistry.addLW(this, "BangBangController", instances);
+    SendableRegistry.add(this, "BangBangController", instances);
 
     MathSharedStore.reportUsage(MathUsageId.kController_BangBangController, instances);
   }

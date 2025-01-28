@@ -32,7 +32,7 @@ public abstract class PWMMotorController extends MotorSafety
   @SuppressWarnings("this-escape")
   protected PWMMotorController(final String name, final int channel) {
     m_pwm = new PWM(channel, false);
-    SendableRegistry.addLW(this, name, channel);
+    SendableRegistry.add(this, name, channel);
   }
 
   /** Free the resource associated with the PWM channel and set the value to 0. */
@@ -161,7 +161,6 @@ public abstract class PWMMotorController extends MotorSafety
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Motor Controller");
     builder.setActuator(true);
-    builder.setSafeState(this::disable);
     builder.addDoubleProperty("Value", this::get, this::set);
   }
 }
