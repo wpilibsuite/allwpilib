@@ -9,13 +9,9 @@ namespace frc {
  * Edge configuration.
  */
 enum class EdgeConfiguration {
-  /// No edge configuration (neither rising nor falling).
-  kNone = 0,
   /// Rising edge configuration.
-  kRisingEdge = 0x1,
+  kRisingEdge = 0,
   /// Falling edge configuration.
-  kFallingEdge = 0x2,
-  /// Both rising and falling edges configuration.
-  kBoth = 0x3
+  kFallingEdge = 1,
 };
 }  // namespace frc
