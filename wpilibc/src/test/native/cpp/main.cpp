@@ -4,19 +4,12 @@
 
 #include <gtest/gtest.h>
 #include <hal/HALBase.h>
-
-#ifndef __FRC_ROBORIO__
-namespace frc::impl {
-void ResetMotorSafety();
-}
-#endif
+#include <wpi/ManagedStatic.h>
 
 int main(int argc, char** argv) {
   HAL_Initialize(500, 0);
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
-#ifndef __FRC_ROBORIO__
-  frc::impl::ResetMotorSafety();
-#endif
+  wpi::wpi_shutdown();
   return ret;
 }

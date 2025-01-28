@@ -4,10 +4,10 @@
 
 #include "frc/MotorSafety.h"
 
-#include <algorithm>
 #include <utility>
 
 #include <hal/DriverStation.h>
+#include <wpi/ManagedStatic.h>
 #include <wpi/SafeThread.h>
 #include <wpi/SmallPtrSet.h>
 
@@ -21,6 +21,8 @@ class Thread : public wpi::SafeThread {
  public:
   Thread() {}
   void Main() override;
+
+  wpi::SmallPtrSet<MotorSafety*, 32> m_instanceList;
 };
 
 void Thread::Main() {
@@ -39,7 +41,10 @@ void Thread::Main() {
         safetyCounter = 0;
       }
       if (++safetyCounter >= 4) {
-        MotorSafety::CheckMotors();
+        std::scoped_lock lock(m_mutex);
+        for (auto elem : m_instanceList) {
+          elem->Check();
+        }
         safetyCounter = 0;
       }
     } else {
@@ -51,52 +56,32 @@ void Thread::Main() {
 }
 }  // namespace
 
-static std::atomic_bool gShutdown{false};
-
 namespace {
 struct MotorSafetyManager {
-  ~MotorSafetyManager() { gShutdown = true; }
-
   wpi::SafeThreadOwner<Thread> thread;
-  wpi::SmallPtrSet<MotorSafety*, 32> instanceList;
-  wpi::mutex listMutex;
-  bool threadStarted = false;
 };
 }  // namespace
 
-static MotorSafetyManager& GetManager() {
-  static MotorSafetyManager manager;
-  return manager;
-}
+static wpi::ManagedStatic<MotorSafetyManager> gManager;
 
-#ifndef __FRC_ROBORIO__
-namespace frc::impl {
-void ResetMotorSafety() {
-  auto& manager = GetManager();
-  std::scoped_lock lock(manager.listMutex);
-  manager.instanceList.clear();
-  manager.thread.Stop();
-  manager.thread.Join();
-  manager.thread = wpi::SafeThreadOwner<Thread>{};
-  manager.threadStarted = false;
+static inline MotorSafetyManager& GetManager() {
+  return *gManager;
 }
-}  // namespace frc::impl
-#endif
 
 MotorSafety::MotorSafety() {
   auto& manager = GetManager();
-  std::scoped_lock lock(manager.listMutex);
-  manager.instanceList.insert(this);
-  if (!manager.threadStarted) {
-    manager.threadStarted = true;
+  if (!manager.thread) {
     manager.thread.Start();
+  }
+  if (auto thr = manager.thread.GetThread()) {
+    thr->m_instanceList.insert(this);
   }
 }
 
 MotorSafety::~MotorSafety() {
-  auto& manager = GetManager();
-  std::scoped_lock lock(manager.listMutex);
-  manager.instanceList.erase(this);
+  if (auto thr = GetManager().thread.GetThread()) {
+    thr->m_instanceList.erase(this);
+  }
 }
 
 MotorSafety::MotorSafety(MotorSafety&& rhs)
@@ -176,9 +161,9 @@ void MotorSafety::Check() {
 }
 
 void MotorSafety::CheckMotors() {
-  auto& manager = GetManager();
-  std::scoped_lock lock(manager.listMutex);
-  for (auto elem : manager.instanceList) {
-    elem->Check();
+  if (auto thr = GetManager().thread.GetThread()) {
+    for (auto elem : thr->m_instanceList) {
+      elem->Check();
+    }
   }
 }

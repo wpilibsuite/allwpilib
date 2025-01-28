@@ -18,6 +18,7 @@
 #include <wpi/DataLog.h>
 #include <wpi/DataLogBackgroundWriter.h>
 #include <wpi/FileLogger.h>
+#include <wpi/ManagedStatic.h>
 #include <wpi/SafeThread.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
@@ -56,7 +57,6 @@ struct Thread final : public wpi::SafeThread {
 };
 
 struct Instance {
-  Instance(std::string_view dir, std::string_view filename, double period);
   wpi::SafeThreadOwner<Thread> owner;
 };
 
@@ -325,34 +325,31 @@ void Thread::StopConsoleLog() {
   }
 }
 
-Instance::Instance(std::string_view dir, std::string_view filename,
-                   double period) {
-  // Delete all previously existing FRC_TBD_*.wpilog files. These only exist
-  // when the robot never connects to the DS, so they are very unlikely to
-  // have useful data and just clutter the filesystem.
-  auto logDir = MakeLogDir(dir);
-  std::error_code ec;
-  for (auto&& entry : fs::directory_iterator{logDir, ec}) {
-    if (wpi::starts_with(entry.path().stem().string(), "FRC_TBD_") &&
-        entry.path().extension() == ".wpilog") {
-      if (!fs::remove(entry, ec)) {
-        wpi::print(stderr, "DataLogManager: could not delete {}\n",
-                   entry.path().string());
-      }
-    }
-  }
-
-  owner.Start(logDir, filename, period);
-}
+static wpi::ManagedStatic<Instance> gInst;
 
 static Instance& GetInstance(std::string_view dir = "",
                              std::string_view filename = "",
                              double period = 0.25) {
-  static Instance instance(dir, filename, period);
-  if (!instance.owner) {
-    instance.owner.Start(MakeLogDir(dir), filename, period);
+  auto& inst = *gInst;
+  if (!inst.owner) {
+    // Delete all previously existing FRC_TBD_*.wpilog files. These only exist
+    // when the robot never connects to the DS, so they are very unlikely to
+    // have useful data and just clutter the filesystem.
+    auto logDir = MakeLogDir(dir);
+    std::error_code ec;
+    for (auto&& entry : fs::directory_iterator{logDir, ec}) {
+      if (wpi::starts_with(entry.path().stem().string(), "FRC_TBD_") &&
+          entry.path().extension() == ".wpilog") {
+        if (!fs::remove(entry, ec)) {
+          wpi::print(stderr, "DataLogManager: could not delete {}\n",
+                     entry.path().string());
+        }
+      }
+    }
+
+    inst.owner.Start(logDir, filename, period);
   }
-  return instance;
+  return inst;
 }
 
 void DataLogManager::Start(std::string_view dir, std::string_view filename,

@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <chrono>
 #include <thread>
 
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <networktables/NetworkTable.h>
+#include <wpi/ManagedStatic.h>
 #include <wpi/RuntimeCheck.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
@@ -24,10 +24,6 @@ namespace frc {
 int RunHALInitialization();
 
 namespace impl {
-#ifndef __FRC_ROBORIO__
-void ResetMotorSafety();
-#endif
-
 template <class Robot>
 void RunRobot(wpi::mutex& m, Robot** robot) {
   try {
@@ -51,7 +47,6 @@ void RunRobot(wpi::mutex& m, Robot** robot) {
     throw;
   }
 }
-
 }  // namespace impl
 
 template <class Robot>
@@ -124,9 +119,7 @@ int StartRobot() {
     impl::RunRobot<Robot>(m, &robot);
   }
 
-#ifndef __FRC_ROBORIO__
-  frc::impl::ResetMotorSafety();
-#endif
+  wpi::wpi_shutdown();
   HAL_Shutdown();
 
   return 0;
