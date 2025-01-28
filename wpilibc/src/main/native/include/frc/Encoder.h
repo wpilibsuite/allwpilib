@@ -272,7 +272,8 @@ class Encoder : public CounterBase,
    *                         value will either exactly match the spec'd count or
    *                         be double (2x) the spec'd count.
    */
-  void InitEncoder(int aChannel, int bChannel, bool reverseDirection, EncodingType encodingType);
+  void InitEncoder(int aChannel, int bChannel, bool reverseDirection,
+                   EncodingType encodingType);
 
   /**
    * The scale needed to convert a raw counter value into a number of encoder
