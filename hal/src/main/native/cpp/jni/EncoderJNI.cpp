@@ -22,13 +22,13 @@ extern "C" {
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_EncoderJNI_initializeEncoder
-  (JNIEnv* env, jclass, jint aChannel, jint bChannel,
-   jboolean reverseDirection, jint encodingType)
+  (JNIEnv* env, jclass, jint aChannel, jint bChannel, jboolean reverseDirection,
+   jint encodingType)
 {
   int32_t status = 0;
-  auto encoder = HAL_InitializeEncoder(
-      aChannel, bChannel, reverseDirection,
-      (HAL_EncoderEncodingType)encodingType, &status);
+  auto encoder =
+      HAL_InitializeEncoder(aChannel, bChannel, reverseDirection,
+                           (HAL_EncoderEncodingType)encodingType, &status);
   CheckStatusForceThrow(env, status);
   return (jint)encoder;
 }

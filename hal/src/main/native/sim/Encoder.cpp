@@ -66,10 +66,10 @@ bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
 }  // namespace hal
 
 extern "C" {
-HAL_EncoderHandle HAL_InitializeEncoder(
-    int32_t aChannel, int32_t bChannel,
-    HAL_Bool reverseDirection, HAL_EncoderEncodingType encodingType,
-    int32_t* status) {
+HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
+                                        HAL_Bool reverseDirection,
+                                        HAL_EncoderEncodingType encodingType,
+                                        int32_t* status) {
   hal::init::CheckInit();
   HAL_Handle nativeHandle = HAL_kInvalidHandle;
   if (encodingType == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
