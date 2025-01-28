@@ -20,7 +20,7 @@ using namespace frc;
 
 Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
                  EncodingType encodingType) {
-  InitEncoder(reverseDirection, encodingType);
+  InitEncoder(aChannel, bChannel, reverseDirection, encodingType);
 }
 
 int Encoder::Get() const {
@@ -164,18 +164,13 @@ void Encoder::InitSendable(wpi::SendableBuilder& builder) {
       nullptr);
 }
 
-void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
-  // int32_t status = 0;
-  // m_encoder = HAL_InitializeEncoder(
-  //     m_aSource->GetPortHandleForRouting(),
-  //     static_cast<HAL_AnalogTriggerType>(
-  //         m_aSource->GetAnalogTriggerTypeForRouting()),
-  //     m_bSource->GetPortHandleForRouting(),
-  //     static_cast<HAL_AnalogTriggerType>(
-  //         m_bSource->GetAnalogTriggerTypeForRouting()),
-  //     reverseDirection, static_cast<HAL_EncoderEncodingType>(encodingType),
-  //     &status);
-  // FRC_CheckErrorStatus(status, "InitEncoder");
+void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
+                          EncodingType encodingType) {
+  int32_t status = 0;
+  m_encoder = HAL_InitializeEncoder(
+      aChannel, bChannel, reverseDirection,
+      static_cast<HAL_EncoderEncodingType>(encodingType), &status);
+  FRC_CheckErrorStatus(status, "InitEncoder");
 
   HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex() + 1,
              encodingType);

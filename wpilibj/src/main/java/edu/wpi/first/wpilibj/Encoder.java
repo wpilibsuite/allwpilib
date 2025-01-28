@@ -38,17 +38,13 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *
    * <p>The encoder will start counting immediately.
    *
+   * @param aChannel The a channel.
+   * @param bChannel The b channel.
    * @param reverseDirection If true, counts down instead of up (this is all relative)
    */
-  private void initEncoder(boolean reverseDirection, final EncodingType type) {
-    // m_encoder =
-    //     EncoderJNI.initializeEncoder(
-    //         m_aSource.getPortHandleForRouting(),
-    //         m_aSource.getAnalogTriggerTypeForRouting(),
-    //         m_bSource.getPortHandleForRouting(),
-    //         m_bSource.getAnalogTriggerTypeForRouting(),
-    //         reverseDirection,
-    //         type.value);
+  private void initEncoder(
+      int aChannel, int bChannel, boolean reverseDirection, final EncodingType type) {
+    m_encoder = EncoderJNI.initializeEncoder(aChannel, bChannel, reverseDirection, type.value);
 
     int fpgaIndex = getFPGAIndex();
     HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex + 1, type.value + 1);
@@ -107,7 +103,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
     m_encodingType = encodingType;
     // SendableRegistry.addChild(this, m_aSource);
     // SendableRegistry.addChild(this, m_bSource);
-    initEncoder(reverseDirection, encodingType);
+    initEncoder(channelA, channelB, reverseDirection, encodingType);
   }
 
   /**
