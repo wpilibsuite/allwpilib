@@ -29,11 +29,26 @@ public class PWMTalonFXS extends PWMMotorController {
      * Supported motor arrangements.
      */
     public enum MotorArrangement {
+        /**
+         * CTR Electronics Minion motor connected over JST
+         */
         Minion_JST,
+        /**
+         * Third-party NEO motor connected over JST
+         */
         NEO_JST,
+        /**
+         * Third-party NEO 550 motor connected over JST
+         */
         NEO550_JST,
+        /**
+         * Third-party NEO Vortex motor connected over JST
+         */
         VORTEX_JST,
-        Brushed_DC,
+        /**
+         * Brushed DC motor connected to terminals A and B
+         */
+        Brushed_DC
     };
 
     /**
@@ -46,6 +61,12 @@ public class PWMTalonFXS extends PWMMotorController {
      */
     private List<Integer> _configs = new ArrayList<>();
 
+   /**
+   * Constructor for a Talon FXS connected via PWM.
+   *
+   * @param channel The PWM channel that the Talon FX is attached to. 0-9 are
+   *                on-board, 10-19 are on the MXP port
+   */
     public PWMTalonFXS(final int channel) {
         super("PWMTalonFXS", channel);
 

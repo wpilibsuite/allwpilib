@@ -42,10 +42,25 @@ class PWMTalonFXS : public PWMMotorController {
    * Supported motor arrangements.
    */
   enum class MotorArrangement {
+    /**
+     * CTR Electronics Minion motor connected over JST
+     */
     Minion_JST,
+    /**
+     * Third-party NEO motor connected over JST
+     */
     NEO_JST,
+    /**
+     * Third-party NEO 550 motor connected over JST
+     */
     NEO550_JST,
+    /**
+     * Third-party NEO Vortex motor connected over JST
+     */
     VORTEX_JST,
+    /**
+     * Brushed DC motor connected to terminals A and B
+     */
     Brushed_DC
   };
 
