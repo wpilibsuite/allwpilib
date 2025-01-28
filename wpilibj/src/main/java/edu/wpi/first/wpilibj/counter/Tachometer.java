@@ -27,14 +27,12 @@ public class Tachometer implements Sendable, AutoCloseable {
    *
    * @param channel The channel of the Tachometer.
    * @param configuration The edge configuration
-   * @param channel The channel of the Tachometer.
-   * @param configuration The edge configuration
    */
   @SuppressWarnings("this-escape")
   public Tachometer(int channel, EdgeConfiguration configuration) {
     m_handle = CounterJNI.initializeCounter(channel, configuration.rising);
 
-    HAL.reportUsage("IO", channel, "Tachometer");
+    HAL.report(tResourceType.kResourceType_Counter, channel + 1);
     SendableRegistry.add(this, "Tachometer", channel);
   }
 

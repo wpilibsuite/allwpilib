@@ -16,8 +16,6 @@
 
 #include "EdgeConfiguration.h"
 
-#include "EdgeConfiguration.h"
-
 namespace frc {
 class DigitalSource;
 
@@ -41,22 +39,11 @@ class Tachometer : public wpi::Sendable,
    * @param configuration Edge configuration
    */
   Tachometer(int channel, EdgeConfiguration configuration);
-   * @param channel The DIO Channel.
-   * @param configuration Edge configuration
-   */
-  Tachometer(int channel, EdgeConfiguration configuration);
 
   Tachometer(Tachometer&&) = default;
   Tachometer& operator=(Tachometer&&) = default;
 
   ~Tachometer() override = default;
-
-  /**
-   * Sets the configuration for the channel.
-   *
-   * @param configuration The channel configuration.
-   */
-  void SetEdgeConfiguration(EdgeConfiguration configuration);
 
   /**
    * Sets the configuration for the channel.
@@ -131,7 +118,6 @@ class Tachometer : public wpi::Sendable,
  private:
   hal::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;
   int m_edgesPerRevolution;
-  int32_t m_channel;
   int32_t m_channel;
 };
 }  // namespace frc

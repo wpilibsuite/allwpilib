@@ -24,18 +24,14 @@ public class UpDownCounter implements Sendable, AutoCloseable {
    *
    * @param channel The up count source (can be null).
    * @param configuration The edge configuration.
-   * @param channel The up count source (can be null).
-   * @param configuration The edge configuration.
    */
   @SuppressWarnings("this-escape")
-  public UpDownCounter(int channel, EdgeConfiguration configuration) {
-    m_handle = CounterJNI.initializeCounter(channel, configuration.rising);
   public UpDownCounter(int channel, EdgeConfiguration configuration) {
     m_handle = CounterJNI.initializeCounter(channel, configuration.rising);
 
     reset();
 
-    HAL.reportUsage("IO", channel, "UpDownCounter");
+    HAL.report(tResourceType.kResourceType_Counter, channel);
     SendableRegistry.add(this, "UpDown Counter", channel);
   }
 
@@ -50,8 +46,6 @@ public class UpDownCounter implements Sendable, AutoCloseable {
    *
    * @param configuration The up source configuration.
    */
-  public void setEdgeConfiguration(EdgeConfiguration configuration) {
-    CounterJNI.setCounterEdgeConfiguration(m_handle, configuration.rising);
   public void setEdgeConfiguration(EdgeConfiguration configuration) {
     CounterJNI.setCounterEdgeConfiguration(m_handle, configuration.rising);
   }
