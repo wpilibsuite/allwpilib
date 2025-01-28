@@ -102,33 +102,6 @@
     "commandversion": 2
   },
   {
-    "name": "Ultrasonic",
-    "description": "View values from a ping-response ultrasonic sensor.",
-    "tags": [
-      "Hardware",
-      "Ultrasonic",
-      "SmartDashboard"
-    ],
-    "foldername": "ultrasonic",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "Ultrasonic PID",
-    "description": "Maintain a set distance from an obstacle with an ultrasonic sensor and PID control.",
-    "tags": [
-      "Basic Robot",
-      "Ultrasonic",
-      "PID",
-      "Differential Drive"
-    ],
-    "foldername": "ultrasonicpid",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
     "name": "Potentiometer PID",
     "description": "Maintain elevator position setpoints with a potentiometer and PID control.",
     "tags": [

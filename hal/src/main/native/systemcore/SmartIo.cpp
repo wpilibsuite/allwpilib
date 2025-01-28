@@ -164,4 +164,17 @@ int32_t SmartIo::GetAnalogInput(uint16_t* value) {
   return 0;
 }
 
+int32_t SmartIo::GetCounter(int32_t* value) {
+  if (currentMode != SmartIoMode::SingleCounterFalling &&
+      currentMode != SmartIoMode::SingleCounterRising) {
+    return INCOMPATIBLE_STATE;
+  }
+
+  int32_t val = getSubscriber.Get();
+
+  *value = val;
+
+  return 0;
+}
+
 }  // namespace hal

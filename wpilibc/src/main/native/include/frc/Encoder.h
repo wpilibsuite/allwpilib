@@ -11,7 +11,6 @@
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
-#include "frc/Counter.h"
 #include "frc/CounterBase.h"
 
 namespace frc {
