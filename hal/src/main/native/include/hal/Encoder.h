@@ -41,25 +41,18 @@ extern "C" {
 /**
  * Initializes an encoder.
  *
- * @param[in] digitalSourceHandleA the A source (either a HAL_DigitalHandle or a
- *                                 HAL_AnalogTriggerHandle)
- * @param[in] analogTriggerTypeA   the analog trigger type of the A source if it
- *                                 is an analog trigger
- * @param[in] digitalSourceHandleB the B source (either a HAL_DigitalHandle or a
- *                                 HAL_AnalogTriggerHandle)
- * @param[in] analogTriggerTypeB   the analog trigger type of the B source if it
- *                                 is an analog trigger
+ * @param[in] aChannel             the A channel
+ * @param[in] bChannel             the B channel
  * @param[in] reverseDirection     true to reverse the counting direction from
  *                                 standard, otherwise false
  * @param[in] encodingType         the encoding type
  * @param[out] status              Error status variable. 0 on success.
  * @return the created encoder handle
  */
-HAL_EncoderHandle HAL_InitializeEncoder(
-    HAL_Handle digitalSourceHandleA, HAL_AnalogTriggerType analogTriggerTypeA,
-    HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
-    HAL_Bool reverseDirection, HAL_EncoderEncodingType encodingType,
-    int32_t* status);
+HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
+                                        HAL_Bool reverseDirection,
+                                        HAL_EncoderEncodingType encodingType,
+                                        int32_t* status);
 
 /**
  * Frees an encoder.
@@ -259,26 +252,6 @@ void HAL_SetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
  */
 int32_t HAL_GetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
                                        int32_t* status);
-
-/**
- * Sets the source for an index pulse on the encoder.
- *
- * The index pulse can be used to cause an encoder to reset based on an external
- * input.
- *
- * @param[in] encoderHandle       the encoder handle
- * @param[in] digitalSourceHandle the index source handle (either a
- *                                HAL_AnalogTriggerHandle or a
- *                                HAL_DigitalHandle)
- * @param[in] analogTriggerType   the analog trigger type if the source is an
- *                                analog trigger
- * @param[in] type                the index triggering type
- * @param[out] status             Error status variable. 0 on success.
- */
-void HAL_SetEncoderIndexSource(HAL_EncoderHandle encoderHandle,
-                               HAL_Handle digitalSourceHandle,
-                               HAL_AnalogTriggerType analogTriggerType,
-                               HAL_EncoderIndexingType type, int32_t* status);
 
 /**
  * Gets the FPGA index of the encoder.
