@@ -5,9 +5,10 @@
 #include "frc/counter/Tachometer.h"
 
 #include <string>
+#include <string>
 
 #include <hal/Counter.h>
-#include <hal/UsageReporting.h>
+#include <hal/FRCUsageReporting.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 
@@ -24,12 +25,15 @@ Tachometer::Tachometer(int channel, EdgeConfiguration configuration)
       stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "{}", channel);
 
-  HAL_ReportUsage("IO", channel, "Tachometer");
+  HAL_Report(HALUsageReporting::kResourceType_Counter, channel + 1);
   wpi::SendableRegistry::Add(this, "Tachometer", channel);
 }
 
 void Tachometer::SetEdgeConfiguration(EdgeConfiguration configuration) {
   int32_t status = 0;
+  bool rising = configuration == EdgeConfiguration::kRisingEdge;
+  HAL_SetCounterEdgeConfiguration(m_handle, rising, &status);
+  FRC_CheckErrorStatus(status, "{}", m_channel);
   bool rising = configuration == EdgeConfiguration::kRisingEdge;
   HAL_SetCounterEdgeConfiguration(m_handle, rising, &status);
   FRC_CheckErrorStatus(status, "{}", m_channel);
@@ -46,6 +50,7 @@ units::hertz_t Tachometer::GetFrequency() const {
 units::second_t Tachometer::GetPeriod() const {
   int32_t status = 0;
   double period = HAL_GetCounterPeriod(m_handle, &status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
   return units::second_t{period};
 }
@@ -78,12 +83,14 @@ bool Tachometer::GetStopped() const {
   int32_t status = 0;
   bool stopped = HAL_GetCounterStopped(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
   return stopped;
 }
 
 void Tachometer::SetMaxPeriod(units::second_t maxPeriod) {
   int32_t status = 0;
   HAL_SetCounterMaxPeriod(m_handle, maxPeriod.value(), &status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
