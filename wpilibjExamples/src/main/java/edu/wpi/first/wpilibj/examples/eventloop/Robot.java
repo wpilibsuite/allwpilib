@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
     m_controller.setTolerance(TOLERANCE);
 
     BooleanEvent isBallAtKicker =
-        new BooleanEvent(m_loop, () -> false); //m_kickerSensor.getRangeMM() < KICKER_THRESHOLD);
+        new BooleanEvent(m_loop, () -> false); // m_kickerSensor.getRangeMM() < KICKER_THRESHOLD);
     BooleanEvent intakeButton = new BooleanEvent(m_loop, () -> m_joystick.getRawButton(2));
 
     // if the thumb button is held

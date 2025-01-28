@@ -37,8 +37,7 @@ public class CounterJNI extends JNIWrapper {
    * @param risingEdge true to trigger on rising
    * @see "HAL_SetCounterUpSourceEdge"
    */
-  public static native void setCounterEdgeConfiguration(
-      int counterHandle, boolean risingEdge);
+  public static native void setCounterEdgeConfiguration(int counterHandle, boolean risingEdge);
 
   /**
    * Resets the Counter to zero.
