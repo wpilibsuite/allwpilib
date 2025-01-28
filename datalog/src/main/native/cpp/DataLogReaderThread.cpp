@@ -5,8 +5,8 @@
 #include <string>
 #include <utility>
 
-#include <wpi/DataLogReaderThread.h>
 #include <wpi/StringExtras.h>
+#include <wpi/datalog/DataLogReaderThread.h>
 #include <wpi/print.h>
 
 using namespace wpi::log;

@@ -9,9 +9,9 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include <wpi/DataLogReader.h>
 #include <wpi/DenseMap.h>
 #include <wpi/MemoryBuffer.h>
+#include <wpi/datalog/DataLogReader.h>
 #include <wpi/print.h>
 
 int main(int argc, const char** argv) {

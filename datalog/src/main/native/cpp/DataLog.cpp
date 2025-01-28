@@ -11,10 +11,10 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/DataLog.h>
 #include <wpi/Endian.h>
 #include <wpi/Logger.h>
 #include <wpi/SmallString.h>
+#include <wpi/datalog/DataLog.h>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
 

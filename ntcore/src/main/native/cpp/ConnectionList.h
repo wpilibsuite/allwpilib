@@ -13,7 +13,7 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/DataLog.h>
+#include <wpi/datalog/DataLog.h>
 #include <wpi/UidVector.h>
 #include <wpi/mutex.h>
 

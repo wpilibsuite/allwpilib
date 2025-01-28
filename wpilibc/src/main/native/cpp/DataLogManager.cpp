@@ -15,8 +15,8 @@
 #include <fmt/chrono.h>
 #include <hal/UsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/DataLog.h>
-#include <wpi/DataLogBackgroundWriter.h>
+#include <wpi/datalog/DataLog.h>
+#include <wpi/datalog/DataLogBackgroundWriter.h>
 #include <wpi/FileLogger.h>
 #include <wpi/SafeThread.h>
 #include <wpi/StringExtras.h>

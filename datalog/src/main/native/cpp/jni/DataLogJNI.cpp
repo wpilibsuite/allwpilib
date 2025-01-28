@@ -11,10 +11,10 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/DataLog.h>
-#include <wpi/DataLogBackgroundWriter.h>
-#include <wpi/DataLogWriter.h>
 #include <wpi/FileLogger.h>
+#include <wpi/datalog/DataLog.h>
+#include <wpi/datalog/DataLogBackgroundWriter.h>
+#include <wpi/datalog/DataLogWriter.h>
 #include <wpi/jni_util.h>
 
 #include "edu_wpi_first_datalog_DataLogJNI.h"

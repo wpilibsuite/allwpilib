@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/DataLogWriter.h>
+#include <wpi/datalog/DataLogWriter.h>
 #include <wpi/raw_ostream.h>
 
 using namespace wpi::log;

@@ -13,7 +13,7 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/DataLogBackgroundWriter.h>
+#include <wpi/datalog/DataLogBackgroundWriter.h>
 #include <wpi/FileLogger.h>
 #include <wpi/SafeThread.h>
 #include <wpi/StringExtras.h>

@@ -16,8 +16,8 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/FileLogger.h>
 #include <wpi/StringExtras.h>
+#include <wpi/datalog/FileLogger.h>
 
 namespace wpi {
 FileLogger::FileLogger(std::string_view file,

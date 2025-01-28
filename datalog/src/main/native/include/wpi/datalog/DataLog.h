@@ -19,10 +19,10 @@
 #include <vector>
 #include <version>
 
-#include <wpi/DataLog_c.h>
 #include <wpi/DenseMap.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringMap.h>
+#include <wpi/datalog/DataLog_c.h>
 #include <wpi/mutex.h>
 #include <wpi/protobuf/Protobuf.h>
 #include <wpi/string.h>
