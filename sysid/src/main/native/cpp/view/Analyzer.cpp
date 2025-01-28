@@ -24,6 +24,7 @@
 #include "sysid/analysis/AnalysisType.h"
 #include "sysid/analysis/FeedbackControllerPreset.h"
 #include "sysid/analysis/FilteringUtils.h"
+#include "sysid/view/DataSelector.h"
 #include "sysid/view/UILayout.h"
 
 using namespace sysid;
@@ -57,6 +58,9 @@ void Analyzer::UpdateFeedforwardGains() {
             ? units::math::max(0_s, m_manager->GetPositionDelay())
             : units::math::max(0_s, m_manager->GetVelocityDelay());
     PrepareGraphs();
+  } catch (const sysid::MissingTestsError& e) {
+    m_state = AnalyzerState::kMissingTestsError;
+    HandleError(e.what());
   } catch (const sysid::InvalidDataError& e) {
     m_state = AnalyzerState::kGeneralDataError;
     HandleError(e.what());
@@ -248,6 +252,13 @@ void Analyzer::Display() {
       if (!m_errorPopup) {
         m_state = AnalyzerState::kWaitingForData;
         return;
+      }
+      break;
+    }
+    case AnalyzerState::kMissingTestsError: {
+      CreateErrorPopup(m_errorPopup, m_exception);
+      if (!m_errorPopup) {
+        m_state = AnalyzerState::kWaitingForData;
       }
       break;
     }

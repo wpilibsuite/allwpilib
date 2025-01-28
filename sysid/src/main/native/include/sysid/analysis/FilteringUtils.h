@@ -18,6 +18,7 @@
 #include <wpi/StringMap.h>
 #include <wpi/array.h>
 
+#include "fmt/ranges.h"
 #include "sysid/analysis/AnalysisManager.h"
 #include "sysid/analysis/Storage.h"
 
@@ -66,6 +67,27 @@ class NoQuasistaticDataError : public std::exception {
            "your units and test data to make sure that the robot is reporting "
            "reasonable values.";
   }
+};
+
+/**
+ * Exception for not all tests being present.
+ */
+class MissingTestsError : public std::exception {
+ public:
+  explicit MissingTestsError(std::vector<std::string> MissingTests)
+      : missingTests(std::move(MissingTests)) {
+        errorString = fmt::format(
+        "The following tests were not detected: {}. Make sure to perform all "
+        "four tests as described in the SysId documentation.",
+        fmt::join(missingTests, ", "));
+      }
+  const char* what() const noexcept override {
+    return errorString.c_str();
+  }
+
+ private:
+  std::vector<std::string> missingTests;
+  std::string errorString;
 };
 
 /**

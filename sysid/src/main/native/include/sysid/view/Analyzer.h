@@ -46,6 +46,7 @@ class Analyzer : public glass::View {
     kVelocityThresholdError,
     kTestDurationError,
     kGeneralDataError,
+    kMissingTestsError,
     kFileError
   };
   /**

@@ -74,8 +74,10 @@ class DataSelector : public glass::View {
   int m_selectedAnalysis = 0;
   std::future<TestData> m_testdataFuture;
   std::vector<std::string> m_testdataStats;
+  std::vector<std::string> m_missingTests;
 
   static Tests LoadTests(const glass::DataLogReaderEntry& testStateEntry);
   TestData BuildTestData();
+  //std::vector<std::string> GetMissingTests(glass::DataLogReaderEntry testStateEntry);
 };
 }  // namespace sysid
