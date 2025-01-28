@@ -17,25 +17,15 @@
 
 using namespace hal;
 
-namespace hal {
-
-namespace init {
+namespace hal::init {
 void InitializeEncoder() {}
-}  // namespace init
-
-bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
-                          HAL_FPGAEncoderHandle* fpgaHandle,
-                          HAL_CounterHandle* counterHandle) {
-  return false;
-}
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
-HAL_EncoderHandle HAL_InitializeEncoder(
-    HAL_Handle digitalSourceHandleA, HAL_AnalogTriggerType analogTriggerTypeA,
-    HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
-    HAL_Bool reverseDirection, HAL_EncoderEncodingType encodingType,
-    int32_t* status) {
+HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
+                                        HAL_Bool reverseDirection,
+                                        HAL_EncoderEncodingType encodingType,
+                                        int32_t* status) {
   hal::init::CheckInit();
   *status = HAL_HANDLE_ERROR;
   return HAL_kInvalidHandle;
@@ -148,14 +138,6 @@ HAL_EncoderEncodingType HAL_GetEncoderEncodingType(
     HAL_EncoderHandle encoderHandle, int32_t* status) {
   *status = HAL_HANDLE_ERROR;
   return HAL_Encoder_k4X;
-}
-
-void HAL_SetEncoderIndexSource(HAL_EncoderHandle encoderHandle,
-                               HAL_Handle digitalSourceHandle,
-                               HAL_AnalogTriggerType analogTriggerType,
-                               HAL_EncoderIndexingType type, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
 }
 
 int32_t HAL_GetEncoderFPGAIndex(HAL_EncoderHandle encoderHandle,
