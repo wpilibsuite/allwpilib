@@ -165,7 +165,7 @@ void Encoder::InitSendable(wpi::SendableBuilder& builder) {
 }
 
 void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
-  int32_t status = 0;
+  // int32_t status = 0;
   // m_encoder = HAL_InitializeEncoder(
   //     m_aSource->GetPortHandleForRouting(),
   //     static_cast<HAL_AnalogTriggerType>(
