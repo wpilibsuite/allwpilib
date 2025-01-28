@@ -17,6 +17,9 @@
 #include "EdgeConfiguration.h"
 
 namespace frc {
+class DigitalSource;
+
+namespace frc {
 /**
  * Tachometer for getting rotational speed from a device.
  *

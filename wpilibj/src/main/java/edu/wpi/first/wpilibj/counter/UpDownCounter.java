@@ -31,7 +31,7 @@ public class UpDownCounter implements Sendable, AutoCloseable {
 
     reset();
 
-    HAL.reportUsage("IO", channel, "UpDownCounter");
+    HAL.report(tResourceType.kResourceType_Counter, channel);
     SendableRegistry.add(this, "UpDown Counter", channel);
   }
 

@@ -7,7 +7,7 @@
 #include <string>
 
 #include <hal/Counter.h>
-#include <hal/UsageReporting.h>
+#include <hal/FRCUsageReporting.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 
@@ -24,7 +24,7 @@ Tachometer::Tachometer(int channel, EdgeConfiguration configuration)
       stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "{}", channel);
 
-  HAL_ReportUsage("IO", channel, "Tachometer");
+  HAL_Report(HALUsageReporting::kResourceType_Counter, channel + 1);
   wpi::SendableRegistry::Add(this, "Tachometer", channel);
 }
 
