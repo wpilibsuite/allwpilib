@@ -41,6 +41,7 @@ cc_library(
         "//cameraserver:cameraserver.static",
         "//cscore:cscore.static",
         "//hal:wpiHal.static",
+        "//datalog:datalog.static",
         "//ntcore:ntcore.static",
         "//wpimath:wpimath.static",
         "//wpinet:wpinet.static",

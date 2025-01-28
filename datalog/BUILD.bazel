@@ -1,6 +1,8 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 
 cc_library(
     name = "datalog.static",
@@ -20,9 +22,20 @@ cc_library(
     ],
 )
 
-java_library(
+wpilib_jni_cc_library(
+    name = "datalogjni",
+    srcs = glob(["src/main/native/cpp/jni/**"]),
+    java_dep = ":datalog-java",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":datalog.static",
+    ],
+)
+
+wpilib_jni_java_library(
     name = "datalog-java",
     srcs = glob(["src/main/java/**/*.java"]),
+    native_libs = [":datalogjni"],
     visibility = ["//visibility:public"],
     deps = [
         "//wpiutil:wpiutil-java",
@@ -60,5 +73,34 @@ java_binary(
     main_class = "printlog.PrintLog",
     deps = [
         ":datalog-java",
+    ],
+)
+
+cc_test(
+    name = "datalog-cpp-test",
+    size = "small",
+    srcs = glob([
+        "src/test/native/**/*.cpp",
+        "src/test/native/**/*.h",
+    ]),
+    tags = [
+        "exclusive",
+        "no-asan",
+        "no-tsan",
+    ],
+    deps = [
+        ":datalog.static",
+        "//thirdparty/googletest:googletest.static",
+        "//wpiutil:wpiutil-testlib",
+    ],
+)
+
+wpilib_java_junit5_test(
+    name = "datalog-java-test",
+    srcs = glob(["src/test/java/**/*.java"]),
+    tags = ["exclusive"],
+    deps = [
+        ":datalog-java",
+        "//wpiutil:wpiutil-java",
     ],
 )
