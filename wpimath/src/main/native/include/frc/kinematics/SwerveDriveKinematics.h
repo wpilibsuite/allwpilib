@@ -335,6 +335,10 @@ class SwerveDriveKinematics
    * the absolute threshold, while maintaining the ratio of speeds between
    * modules.
    *
+   * Unfortunately, although this fixes inattainable module speeds, this will in
+   * effect cause discretization to overcompensate, leading to translational
+   * skew opposite the direction of rotation.
+   *
    * @param moduleStates Reference to array of module states. The array will be
    * mutated with the normalized speeds!
    * @param attainableMaxSpeed The absolute max speed that a module can reach.
@@ -369,6 +373,10 @@ class SwerveDriveKinematics
    * wheel speeds to make sure that all requested module speeds are at-or-below
    * the absolute threshold, while maintaining the ratio of speeds between
    * modules.
+   *
+   * Unfortunately, although this fixes inattainable module speeds, this will in
+   * effect cause discretization to overcompensate, leading to translational
+   * skew opposite the direction of rotation.
    *
    * @param moduleStates Reference to array of module states. The array will be
    * mutated with the normalized speeds!

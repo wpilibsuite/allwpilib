@@ -96,7 +96,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * along the y-axis, and omega * dt around the z-axis).
    *
    * <p>This is useful for compensating for translational skew when translating and rotating a
-   * swerve drivetrain.
+   * holonomic (swerve or mecanum) drivetrain. However, scaling down the ChassisSpeeds (e.g., when
+   * desaturating swerve module speeds) will introduce translational skew in the opposite direction
+   * of rotation.
    *
    * @param vxMetersPerSecond Forward velocity.
    * @param vyMetersPerSecond Sideways velocity.
@@ -134,7 +136,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * along the y-axis, and omega * dt around the z-axis).
    *
    * <p>This is useful for compensating for translational skew when translating and rotating a
-   * swerve drivetrain.
+   * holonomic (swerve or mecanum) drivetrain. However, scaling down the ChassisSpeeds (e.g., when
+   * desaturating swerve module speeds) will introduce translational skew in the opposite direction
+   * of rotation.
    *
    * @param vx Forward velocity.
    * @param vy Sideways velocity.
@@ -157,7 +161,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * along the y-axis, and omega * dt around the z-axis).
    *
    * <p>This is useful for compensating for translational skew when translating and rotating a
-   * swerve drivetrain.
+   * holonomic (swerve or mecanum) drivetrain. However, scaling down the ChassisSpeeds (e.g., when
+   * desaturating swerve module speeds) will introduce translational skew in the opposite direction
+   * of rotation.
    *
    * @param continuousSpeeds The continuous speeds.
    * @param dtSeconds The duration of the timestep the speeds should be applied for.

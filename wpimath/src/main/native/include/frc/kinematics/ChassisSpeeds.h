@@ -59,7 +59,9 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * y-axis, and omega * dt around the z-axis).
    *
    * This is useful for compensating for translational skew when translating and
-   * rotating a swerve drivetrain.
+   * rotating a holonomic (swerve or mecanum) drivetrain. However, scaling down
+   * the ChassisSpeeds (e.g., when desaturating swerve module speeds) will
+   * introduce translational skew in the opposite direction of rotation.
    *
    * @param vx Forward velocity.
    * @param vy Sideways velocity.
@@ -94,7 +96,9 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * y-axis, and omega * dt around the z-axis).
    *
    * This is useful for compensating for translational skew when translating and
-   * rotating a swerve drivetrain.
+   * rotating a holonomic (swerve or mecanum) drivetrain. However, scaling down
+   * the ChassisSpeeds (e.g., when desaturating swerve module speeds) will
+   * introduce translational skew in the opposite direction of rotation.
    *
    * @param continuousSpeeds The continuous speeds.
    * @param dt The duration of the timestep the speeds should be applied for.
