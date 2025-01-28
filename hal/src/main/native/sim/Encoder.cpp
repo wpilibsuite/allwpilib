@@ -67,8 +67,7 @@ bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
 
 extern "C" {
 HAL_EncoderHandle HAL_InitializeEncoder(
-    HAL_Handle digitalSourceHandleA, HAL_AnalogTriggerType analogTriggerTypeA,
-    HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
+    int32_t aChannel, int32_t bChannel,
     HAL_Bool reverseDirection, HAL_EncoderEncodingType encodingType,
     int32_t* status) {
   hal::init::CheckInit();
@@ -95,8 +94,8 @@ HAL_EncoderHandle HAL_InitializeEncoder(
     return HAL_kInvalidHandle;
   }
   int16_t index = getHandleIndex(handle);
-  SimEncoderData[index].digitalChannelA = getHandleIndex(digitalSourceHandleA);
-  SimEncoderData[index].digitalChannelB = getHandleIndex(digitalSourceHandleB);
+  SimEncoderData[index].digitalChannelA = aChannel;
+  SimEncoderData[index].digitalChannelB = bChannel;
   SimEncoderData[index].initialized = true;
   SimEncoderData[index].reverseDirection = reverseDirection;
   SimEncoderData[index].simDevice = 0;
@@ -326,13 +325,6 @@ int32_t HAL_GetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
   }
 
   return SimEncoderData[encoder->index].samplesToAverage;
-}
-
-void HAL_SetEncoderIndexSource(HAL_EncoderHandle encoderHandle,
-                               HAL_Handle digitalSourceHandle,
-                               HAL_AnalogTriggerType analogTriggerType,
-                               HAL_EncoderIndexingType type, int32_t* status) {
-  // Not implemented yet
 }
 
 int32_t HAL_GetEncoderFPGAIndex(HAL_EncoderHandle encoderHandle,

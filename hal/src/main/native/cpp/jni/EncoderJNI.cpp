@@ -18,20 +18,16 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_hal_EncoderJNI
  * Method:    initializeEncoder
- * Signature: (IIIIZI)I
+ * Signature: (IIZI)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_EncoderJNI_initializeEncoder
-  (JNIEnv* env, jclass, jint digitalSourceHandleA, jint analogTriggerTypeA,
-   jint digitalSourceHandleB, jint analogTriggerTypeB,
+  (JNIEnv* env, jclass, jint aChannel, jint bChannel,
    jboolean reverseDirection, jint encodingType)
 {
   int32_t status = 0;
   auto encoder = HAL_InitializeEncoder(
-      (HAL_Handle)digitalSourceHandleA,
-      (HAL_AnalogTriggerType)analogTriggerTypeA,
-      (HAL_Handle)digitalSourceHandleB,
-      (HAL_AnalogTriggerType)analogTriggerTypeB, reverseDirection,
+      aChannel, bChannel, reverseDirection,
       (HAL_EncoderEncodingType)encodingType, &status);
   CheckStatusForceThrow(env, status);
   return (jint)encoder;
@@ -284,24 +280,6 @@ Java_edu_wpi_first_hal_EncoderJNI_getEncoderSamplesToAverage
       HAL_GetEncoderSamplesToAverage((HAL_EncoderHandle)id, &status);
   CheckStatus(env, status);
   return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_EncoderJNI
- * Method:    setEncoderIndexSource
- * Signature: (IIII)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_EncoderJNI_setEncoderIndexSource
-  (JNIEnv* env, jclass, jint id, jint digitalSourceHandle,
-   jint analogTriggerType, jint type)
-{
-  int32_t status = 0;
-  HAL_SetEncoderIndexSource((HAL_EncoderHandle)id,
-                            (HAL_Handle)digitalSourceHandle,
-                            (HAL_AnalogTriggerType)analogTriggerType,
-                            (HAL_EncoderIndexingType)type, &status);
-  CheckStatus(env, status);
 }
 
 /*
