@@ -17,12 +17,9 @@
 
 using namespace hal;
 
-namespace hal {
-
-namespace init {
+namespace hal::init {
 void InitializeEncoder() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
