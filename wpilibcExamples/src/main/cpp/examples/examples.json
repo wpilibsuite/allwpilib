@@ -113,31 +113,6 @@
     "commandversion": 2
   },
   {
-    "name": "Ultrasonic",
-    "description": "View values from a ping-response ultrasonic sensor.",
-    "tags": [
-      "Hardware",
-      "Ultrasonic",
-      "SmartDashboard"
-    ],
-    "foldername": "Ultrasonic",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "UltrasonicPID",
-    "description": "Maintain a set distance from an obstacle with an ultrasonic sensor and PID control.",
-    "tags": [
-      "Basic Robot",
-      "Ultrasonic",
-      "PID",
-      "Differential Drive"
-    ],
-    "foldername": "UltrasonicPID",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
     "name": "Gyro",
     "description": "Drive a differential drive straight with a gyro sensor.",
     "tags": [
