@@ -83,12 +83,17 @@ target_compile_options(wpical PRIVATE ${compile_flags})
 
 find_package(OpenCV REQUIRED)
 find_package(Ceres CONFIG REQUIRED)
+find_package(CHOLMOD CONFIG REQUIRED)
+find_package(SuiteSparse_config CONFIG REQUIRED)
+
 target_link_libraries(
     wpical
     apriltag
     ${OpenCV_LIBS}
     wpigui
     wpiutil
+    SuiteSparse::CHOLMOD_static
+    SuiteSparse::SuiteSparseConfig_static
     Ceres::ceres
 )
 
@@ -124,6 +129,8 @@ if(WITH_TESTS)
         ${OpenCV_LIBS}
         wpigui
         wpiutil
+        SuiteSparse::CHOLMOD_static
+        SuiteSparse::SuiteSparseConfig_static
         Ceres::ceres
     )
 endif()
