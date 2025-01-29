@@ -58,9 +58,6 @@ void Analyzer::UpdateFeedforwardGains() {
             ? units::math::max(0_s, m_manager->GetPositionDelay())
             : units::math::max(0_s, m_manager->GetVelocityDelay());
     PrepareGraphs();
-  } catch (const sysid::MissingTestsError& e) {
-    m_state = AnalyzerState::kMissingTestsError;
-    HandleError(e.what());
   } catch (const sysid::InvalidDataError& e) {
     m_state = AnalyzerState::kGeneralDataError;
     HandleError(e.what());
@@ -280,6 +277,9 @@ void Analyzer::Display() {
 void Analyzer::PrepareData() {
   WPI_INFO(m_logger, "{}", "Preparing data");
   try {
+    if (m_missingTests.size() > 0) {
+      throw sysid::MissingTestsError{m_missingTests};
+    }
     m_manager->PrepareData();
     UpdateFeedforwardGains();
     UpdateFeedbackGains();
@@ -291,6 +291,9 @@ void Analyzer::PrepareData() {
     HandleError(e.what());
   } catch (const sysid::NoDynamicDataError& e) {
     m_state = AnalyzerState::kTestDurationError;
+    HandleError(e.what());
+  } catch (const sysid::MissingTestsError& e) {
+    m_state = AnalyzerState::kMissingTestsError;
     HandleError(e.what());
   } catch (const AnalysisManager::FileReadingError& e) {
     m_state = AnalyzerState::kFileError;

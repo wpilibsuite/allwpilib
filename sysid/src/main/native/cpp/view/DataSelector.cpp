@@ -140,7 +140,6 @@ void DataSelector::Display() {
     std::ranges::sort(executedTests);
     std::ranges::set_difference(executedTests, kValidTests,
                                 std::back_inserter(m_missingTests));
-    throw sysid::MissingTestsError{m_missingTests};
   }
 
 #if 0
