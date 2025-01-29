@@ -9,9 +9,9 @@
 #include "BufferCallbackStore.h"
 #include "CallbackStore.h"
 #include "ConstBufferCallbackStore.h"
+#include "OpModeOptionsCallbackStore.h"
 #include "SimDeviceDataJNI.h"
 #include "edu_wpi_first_hal_simulation_SimulatorJNI.h"
-#include "hal/HAL.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/simulation/MockHooks.h"
 
@@ -21,9 +21,35 @@ static JavaVM* jvm = nullptr;
 static JClass notifyCallbackCls;
 static JClass bufferCallbackCls;
 static JClass constBufferCallbackCls;
+static JClass biConsumerCls;
 static jmethodID notifyCallbackCallback;
 static jmethodID bufferCallbackCallback;
 static jmethodID constBufferCallbackCallback;
+static jmethodID biConsumerCallback;
+
+static const JClassInit classes[] = {
+    {"edu/wpi/first/hal/simulation/NotifyCallback", &notifyCallbackCls},
+    {"edu/wpi/first/hal/simulation/BufferCallback", &bufferCallbackCls},
+    {"edu/wpi/first/hal/simulation/ConstBufferCallback",
+     &constBufferCallbackCls},
+    {"java/util/function/BiConsumer", &biConsumerCls},
+};
+
+static const struct JMethodInit {
+  JClass* cls;
+  const char* name;
+  const char* sig;
+  jmethodID* method;
+} methods[] = {
+    {&notifyCallbackCls, "callbackNative", "(Ljava/lang/String;IJD)V",
+     &notifyCallbackCallback},
+    {&bufferCallbackCls, "callback", "(Ljava/lang/String;[BI)V",
+     &bufferCallbackCallback},
+    {&constBufferCallbackCls, "callback", "(Ljava/lang/String;[BI)V",
+     &constBufferCallbackCallback},
+    {&biConsumerCls, "accept", "(Ljava/lang/Object;Ljava/lang/Object;)V",
+     &biConsumerCallback},
+};
 
 namespace hal::sim {
 jint SimOnLoad(JavaVM* vm, void* reserved) {
@@ -34,45 +60,24 @@ jint SimOnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
   }
 
-  notifyCallbackCls =
-      JClass(env, "edu/wpi/first/hal/simulation/NotifyCallback");
-  if (!notifyCallbackCls) {
-    return JNI_ERR;
+  for (auto& c : classes) {
+    *c.cls = JClass(env, c.name);
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
-  notifyCallbackCallback = env->GetMethodID(notifyCallbackCls, "callbackNative",
-                                            "(Ljava/lang/String;IJD)V");
-  if (!notifyCallbackCallback) {
-    return JNI_ERR;
-  }
-
-  bufferCallbackCls =
-      JClass(env, "edu/wpi/first/hal/simulation/BufferCallback");
-  if (!bufferCallbackCls) {
-    return JNI_ERR;
-  }
-
-  bufferCallbackCallback = env->GetMethodID(bufferCallbackCls, "callback",
-                                            "(Ljava/lang/String;[BI)V");
-  if (!bufferCallbackCallback) {
-    return JNI_ERR;
-  }
-
-  constBufferCallbackCls =
-      JClass(env, "edu/wpi/first/hal/simulation/ConstBufferCallback");
-  if (!constBufferCallbackCls) {
-    return JNI_ERR;
-  }
-
-  constBufferCallbackCallback = env->GetMethodID(
-      constBufferCallbackCls, "callback", "(Ljava/lang/String;[BI)V");
-  if (!constBufferCallbackCallback) {
-    return JNI_ERR;
+  for (auto& m : methods) {
+    *m.method = env->GetMethodID(*m.cls, m.name, m.sig);
+    if (!*m.method) {
+      return JNI_ERR;
+    }
   }
 
   InitializeStore();
   InitializeBufferStore();
   InitializeConstBufferStore();
+  InitializeOpModeOptionsStore();
   if (!InitializeSimDeviceDataJNI(env)) {
     return JNI_ERR;
   }
@@ -89,6 +94,7 @@ void SimOnUnload(JavaVM* vm, void* reserved) {
   notifyCallbackCls.free(env);
   bufferCallbackCls.free(env);
   constBufferCallbackCls.free(env);
+  biConsumerCls.free(env);
   FreeSimDeviceDataJNI(env);
   jvm = nullptr;
 }
@@ -109,6 +115,9 @@ jmethodID GetConstBufferCallback() {
   return constBufferCallbackCallback;
 }
 
+jmethodID GetBiConsumerCallback() {
+  return biConsumerCallback;
+}
 }  // namespace hal::sim
 
 extern "C" {

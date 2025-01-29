@@ -9,6 +9,7 @@
 #include <networktables/BooleanTopic.h>
 #include <networktables/IntegerTopic.h>
 #include <networktables/NetworkTableInstance.h>
+#include <networktables/RawTopic.h>
 #include <networktables/StringTopic.h>
 
 #include "glass/DataSource.h"
@@ -33,8 +34,7 @@ class NTFMSModel : public FMSModel {
   DoubleSource* GetMatchTimeData() override { return nullptr; }
   BooleanSource* GetEStopData() override { return &m_estop; }
   BooleanSource* GetEnabledData() override { return &m_enabled; }
-  BooleanSource* GetTestData() override { return &m_test; }
-  BooleanSource* GetAutonomousData() override { return &m_autonomous; }
+  IntegerSource* GetRobotModeData() override { return &m_robotMode; }
   StringSource* GetGameSpecificMessageData() override {
     return &m_gameSpecificMessageData;
   }
@@ -46,8 +46,7 @@ class NTFMSModel : public FMSModel {
   void SetMatchTime(double val) override {}
   void SetEStop(bool val) override {}
   void SetEnabled(bool val) override {}
-  void SetTest(bool val) override {}
-  void SetAutonomous(bool val) override {}
+  void SetRobotMode(RobotMode val) override {}
   void SetGameSpecificMessage(std::string_view val) override {}
 
   void Update() override;
@@ -59,15 +58,14 @@ class NTFMSModel : public FMSModel {
   nt::StringSubscriber m_gameSpecificMessage;
   nt::BooleanSubscriber m_alliance;
   nt::IntegerSubscriber m_station;
-  nt::IntegerSubscriber m_controlWord;
+  nt::RawSubscriber m_controlWord;
 
   BooleanSource m_fmsAttached;
   BooleanSource m_dsAttached;
   IntegerSource m_allianceStationId;
   BooleanSource m_estop;
   BooleanSource m_enabled;
-  BooleanSource m_test;
-  BooleanSource m_autonomous;
+  IntegerSource m_robotMode;
   StringSource m_gameSpecificMessageData;
 };
 

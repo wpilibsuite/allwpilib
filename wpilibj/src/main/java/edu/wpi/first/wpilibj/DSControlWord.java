@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.ControlWord;
+import edu.wpi.first.hal.RobotMode;
 
 /** A wrapper around Driver Station control word. */
 public class DSControlWord {
@@ -52,13 +53,24 @@ public class DSControlWord {
   }
 
   /**
+   * Gets the current robot mode.
+   *
+   * <p>Note that this does not indicate whether the robot is enabled or disabled.
+   *
+   * @return robot mode
+   */
+  public RobotMode getRobotMode() {
+    return m_controlWord.getMode();
+  }
+
+  /**
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * autonomous mode.
    *
    * @return True if autonomous mode should be enabled, false otherwise.
    */
   public boolean isAutonomous() {
-    return m_controlWord.getAutonomous();
+    return m_controlWord.getMode() == RobotMode.AUTONOMOUS;
   }
 
   /**
@@ -68,7 +80,7 @@ public class DSControlWord {
    * @return True if autonomous should be set and the robot should be enabled.
    */
   public boolean isAutonomousEnabled() {
-    return m_controlWord.getAutonomous()
+    return m_controlWord.getMode() == RobotMode.AUTONOMOUS
         && m_controlWord.getEnabled()
         && m_controlWord.getDSAttached();
   }
@@ -80,7 +92,7 @@ public class DSControlWord {
    * @return True if operator-controlled mode should be enabled, false otherwise.
    */
   public boolean isTeleop() {
-    return !(isAutonomous() || isTest());
+    return m_controlWord.getMode() == RobotMode.TELEOPERATED;
   }
 
   /**
@@ -90,8 +102,7 @@ public class DSControlWord {
    * @return True if operator-controlled mode should be set and the robot should be enabled.
    */
   public boolean isTeleopEnabled() {
-    return !m_controlWord.getAutonomous()
-        && !m_controlWord.getTest()
+    return m_controlWord.getMode() == RobotMode.TELEOPERATED
         && m_controlWord.getEnabled()
         && m_controlWord.getDSAttached();
   }
@@ -103,7 +114,19 @@ public class DSControlWord {
    * @return True if test mode should be enabled, false otherwise.
    */
   public boolean isTest() {
-    return m_controlWord.getTest();
+    return m_controlWord.getMode() == RobotMode.TEST;
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in test
+   * mode and enabled.
+   *
+   * @return True if test mode should be set and the robot should be enabled.
+   */
+  public boolean isTestEnabled() {
+    return m_controlWord.getMode() == RobotMode.TEST
+        && m_controlWord.getEnabled()
+        && m_controlWord.getDSAttached();
   }
 
   /**
