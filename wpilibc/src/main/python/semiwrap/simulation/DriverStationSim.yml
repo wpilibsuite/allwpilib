@@ -1,4 +1,6 @@
 classes:
+  wpi::sim::OpModeOptions:
+    ignore: true
   wpi::sim::DriverStationSim:
     force_type_casters:
     - std::function
@@ -6,12 +8,6 @@ classes:
       RegisterEnabledCallback:
       GetEnabled:
       SetEnabled:
-      RegisterAutonomousCallback:
-      GetAutonomous:
-      SetAutonomous:
-      RegisterTestCallback:
-      GetTest:
-      SetTest:
       RegisterEStopCallback:
       GetEStop:
       SetEStop:
@@ -51,3 +47,12 @@ classes:
       SetJoystickPOVsAvailable:
       SetJoystickButtonsMaximumIndex:
       SetJoystickButtonsAvailable:
+      RegisterRobotModeCallback:
+      GetRobotMode:
+      SetRobotMode:
+      RegisterOpModeCallback:
+      GetOpMode:
+      SetOpMode:
+      RegisterOpModeOptionsCallback:
+      GetOpModeOptions:
+        ignore: true

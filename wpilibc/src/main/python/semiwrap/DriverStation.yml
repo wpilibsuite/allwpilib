@@ -1,6 +1,6 @@
 extra_includes:
-- rpy/ControlWord.h
 - wpi/datalog/DataLog.hpp
+- wpi/util/Color.hpp
 
 classes:
   wpi::DriverStation:
@@ -57,6 +57,21 @@ classes:
       GetStickPOVsAvailable:
       GetStickButtonsMaximumIndex:
       GetStickButtonsAvailable:
+      GetRobotMode:
+      AddOpMode:
+        overloads:
+          RobotMode, std::string_view, std::string_view, std::string_view, const Color&, const Color&:
+          RobotMode, std::string_view, std::string_view, std::string_view:
+      RemoveOpMode:
+      PublishOpModes:
+      ClearOpModes:
+      GetOpModeId:
+      GetOpMode:
+      IsOpMode:
+        overloads:
+          int64_t:
+          std::string_view:
+      GetControlWord:
       GetStickTouchpadFinger:
       GetStickTouchpadFingerAvailable:
     inline_code: |

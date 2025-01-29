@@ -23,6 +23,17 @@
     "commandversion": 2
   },
   {
+    "name": "OpMode Robot",
+    "description": "OpMode style, with explanatory comments and example code.",
+    "tags": [
+      "OpMode"
+    ],
+    "foldername": "opmode",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "Timed Robot",
     "description": "Timed style, with explanatory comments and example code.",
     "tags": [

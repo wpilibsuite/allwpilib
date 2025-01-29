@@ -8,16 +8,6 @@ functions:
   HALSIM_CancelDriverStationEnabledCallback:
   HALSIM_GetDriverStationEnabled:
   HALSIM_SetDriverStationEnabled:
-  HALSIM_RegisterDriverStationAutonomousCallback:
-    ignore: true
-  HALSIM_CancelDriverStationAutonomousCallback:
-  HALSIM_GetDriverStationAutonomous:
-  HALSIM_SetDriverStationAutonomous:
-  HALSIM_RegisterDriverStationTestCallback:
-    ignore: true
-  HALSIM_CancelDriverStationTestCallback:
-  HALSIM_GetDriverStationTest:
-  HALSIM_SetDriverStationTest:
   HALSIM_RegisterDriverStationEStopCallback:
     ignore: true
   HALSIM_CancelDriverStationEStopCallback:
@@ -123,3 +113,20 @@ functions:
   HALSIM_SetJoystickTouchpads:
   HALSIM_SetJoystickTouchpadCounts:
   HALSIM_SetJoystickTouchpadFinger:
+  HALSIM_RegisterDriverStationRobotModeCallback:
+    ignore: true
+  HALSIM_CancelDriverStationRobotModeCallback:
+  HALSIM_GetDriverStationRobotMode:
+  HALSIM_SetDriverStationRobotMode:
+  HALSIM_RegisterDriverStationOpModeCallback:
+    ignore: true
+  HALSIM_CancelDriverStationOpModeCallback:
+  HALSIM_GetDriverStationOpMode:
+  HALSIM_SetDriverStationOpMode:
+  HALSIM_RegisterOpModeOptionsCallback:
+    ignore: true
+  HALSIM_CancelOpModeOptionsCallback:
+  HALSIM_GetOpModeOptions:
+    ignore: true
+  HALSIM_FreeOpModeOptionsArray:
+    ignore: true

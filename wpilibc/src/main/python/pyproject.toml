@@ -94,7 +94,6 @@ MotorControllerGroup = "rpy/MotorControllerGroup.h"
 Notifier = "rpy/Notifier.h"
 
 # wpi/driverstation
-DSControlWord = "wpi/driverstation/DSControlWord.hpp"
 DriverStation = "wpi/driverstation/DriverStation.hpp"
 Gamepad = "wpi/driverstation/Gamepad.hpp"
 GenericHID = "wpi/driverstation/GenericHID.hpp"
@@ -106,8 +105,8 @@ XboxController = "wpi/driverstation/XboxController.hpp"
 
 # wpi/framework
 IterativeRobotBase = "wpi/framework/IterativeRobotBase.hpp"
+OpModeRobot = "wpi/framework/OpModeRobot.hpp"
 RobotBase = "wpi/framework/RobotBase.hpp"
-RobotState = "wpi/framework/RobotState.hpp"
 TimedRobot = "wpi/framework/TimedRobot.hpp"
 TimesliceRobot = "wpi/framework/TimesliceRobot.hpp"
 
@@ -181,6 +180,11 @@ Encoder = "wpi/hardware/rotation/Encoder.hpp"
 
 # wpi/internal
 DriverStationModeThread = "wpi/internal/DriverStationModeThread.hpp"
+
+# wpi/opmode
+LinearOpMode = "wpi/opmode/LinearOpMode.hpp"
+OpMode = "wpi/opmode/OpMode.hpp"
+PeriodicOpMode = "wpi/opmode/PeriodicOpMode.hpp"
 
 # wpi/smartdashboard
 Field2d = "wpi/smartdashboard/Field2d.hpp"
