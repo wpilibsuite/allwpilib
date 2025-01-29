@@ -1,0 +1,915 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sat, 12 Apr 2025 16:28:47 -0700
+Subject: [PATCH 8/8] Revert "Use multidimensional array subscript operator
+ (#843)"
+
+This reverts commit f9b2c450bbbf6f14b194b8b81708d032a6431ee0.
+---
+ include/sleipnir/autodiff/hessian.hpp         |   4 +-
+ include/sleipnir/autodiff/jacobian.hpp        |   4 +-
+ include/sleipnir/autodiff/variable.hpp        |  26 +----
+ include/sleipnir/autodiff/variable_block.hpp  |  70 +++++------
+ include/sleipnir/autodiff/variable_matrix.hpp | 110 ++++++------------
+ include/sleipnir/control/ocp.hpp              |  14 +--
+ include/sleipnir/optimization/problem.hpp     |   6 +-
+ src/autodiff/variable_matrix.cpp              |  66 +++++------
+ 8 files changed, 118 insertions(+), 182 deletions(-)
+
+diff --git a/include/sleipnir/autodiff/hessian.hpp b/include/sleipnir/autodiff/hessian.hpp
+index 4ad097a8117dac47566a3c6896d281004147be70..8b048ab3ba0d671397cfdadcd137ac67bef1b441 100644
+--- a/include/sleipnir/autodiff/hessian.hpp
++++ b/include/sleipnir/autodiff/hessian.hpp
+@@ -103,9 +103,9 @@ class SLEIPNIR_DLLEXPORT Hessian {
+       auto grad = m_graphs[row].generate_gradient_tree(m_wrt);
+       for (int col = 0; col < m_wrt.rows(); ++col) {
+         if (grad[col].expr != nullptr) {
+-          result[row, col] = std::move(grad[col]);
++          result(row, col) = std::move(grad[col]);
+         } else {
+-          result[row, col] = Variable{0.0};
++          result(row, col) = Variable{0.0};
+         }
+       }
+     }
+diff --git a/include/sleipnir/autodiff/jacobian.hpp b/include/sleipnir/autodiff/jacobian.hpp
+index 787fca8ccd3fd6e46c5d31ab980704e6a5e99402..7e7e1340d065d35412f43b27fac7d8a719b7e5b5 100644
+--- a/include/sleipnir/autodiff/jacobian.hpp
++++ b/include/sleipnir/autodiff/jacobian.hpp
+@@ -95,9 +95,9 @@ class SLEIPNIR_DLLEXPORT Jacobian {
+       auto grad = m_graphs[row].generate_gradient_tree(m_wrt);
+       for (int col = 0; col < m_wrt.rows(); ++col) {
+         if (grad[col].expr != nullptr) {
+-          result[row, col] = std::move(grad[col]);
++          result(row, col) = std::move(grad[col]);
+         } else {
+-          result[row, col] = Variable{0.0};
++          result(row, col) = Variable{0.0};
+         }
+       }
+     }
+diff --git a/include/sleipnir/autodiff/variable.hpp b/include/sleipnir/autodiff/variable.hpp
+index 17e7eb7cc2c7c7599eaba97d8ec80972524c1599..03b929c778c03186cc5b461a2e855da23034457a 100644
+--- a/include/sleipnir/autodiff/variable.hpp
++++ b/include/sleipnir/autodiff/variable.hpp
+@@ -505,11 +505,7 @@ gch::small_vector<Variable> make_constraints(LHS&& lhs, RHS&& rhs) {
+     for (int row = 0; row < rhs.rows(); ++row) {
+       for (int col = 0; col < rhs.cols(); ++col) {
+         // Make right-hand side zero
+-        if constexpr (EigenMatrixLike<std::decay_t<RHS>>) {
+-          constraints.emplace_back(lhs - rhs(row, col));
+-        } else {
+-          constraints.emplace_back(lhs - rhs[row, col]);
+-        }
++        constraints.emplace_back(lhs - rhs(row, col));
+       }
+     }
+   } else if constexpr (MatrixLike<LHS> && ScalarLike<RHS>) {
+@@ -518,11 +514,7 @@ gch::small_vector<Variable> make_constraints(LHS&& lhs, RHS&& rhs) {
+     for (int row = 0; row < lhs.rows(); ++row) {
+       for (int col = 0; col < lhs.cols(); ++col) {
+         // Make right-hand side zero
+-        if constexpr (EigenMatrixLike<std::decay_t<LHS>>) {
+-          constraints.emplace_back(lhs(row, col) - rhs);
+-        } else {
+-          constraints.emplace_back(lhs[row, col] - rhs);
+-        }
++        constraints.emplace_back(lhs(row, col) - rhs);
+       }
+     }
+   } else if constexpr (MatrixLike<LHS> && MatrixLike<RHS>) {
+@@ -532,19 +524,7 @@ gch::small_vector<Variable> make_constraints(LHS&& lhs, RHS&& rhs) {
+     for (int row = 0; row < lhs.rows(); ++row) {
+       for (int col = 0; col < lhs.cols(); ++col) {
+         // Make right-hand side zero
+-        if constexpr (EigenMatrixLike<std::decay_t<LHS>> &&
+-                      EigenMatrixLike<std::decay_t<RHS>>) {
+-          constraints.emplace_back(lhs(row, col) - rhs(row, col));
+-        } else if constexpr (EigenMatrixLike<std::decay_t<LHS>> &&
+-                             SleipnirMatrixLike<std::decay_t<RHS>>) {
+-          constraints.emplace_back(lhs(row, col) - rhs[row, col]);
+-        } else if constexpr (SleipnirMatrixLike<std::decay_t<LHS>> &&
+-                             EigenMatrixLike<std::decay_t<RHS>>) {
+-          constraints.emplace_back(lhs[row, col] - rhs(row, col));
+-        } else if constexpr (SleipnirMatrixLike<std::decay_t<LHS>> &&
+-                             SleipnirMatrixLike<std::decay_t<RHS>>) {
+-          constraints.emplace_back(lhs[row, col] - rhs[row, col]);
+-        }
++        constraints.emplace_back(lhs(row, col) - rhs(row, col));
+       }
+     }
+   }
+diff --git a/include/sleipnir/autodiff/variable_block.hpp b/include/sleipnir/autodiff/variable_block.hpp
+index f1c1ca0dc3fde663c3e74f6fca4b89b119cf377d..632d44beb5b3dae29b9829c52a6168fee39fe537 100644
+--- a/include/sleipnir/autodiff/variable_block.hpp
++++ b/include/sleipnir/autodiff/variable_block.hpp
+@@ -50,7 +50,7 @@ class VariableBlock {
+ 
+       for (int row = 0; row < rows(); ++row) {
+         for (int col = 0; col < cols(); ++col) {
+-          (*this)[row, col] = values[row, col];
++          (*this)(row, col) = values(row, col);
+         }
+       }
+     }
+@@ -85,7 +85,7 @@ class VariableBlock {
+ 
+       for (int row = 0; row < rows(); ++row) {
+         for (int col = 0; col < cols(); ++col) {
+-          (*this)[row, col] = values[row, col];
++          (*this)(row, col) = values(row, col);
+         }
+       }
+     }
+@@ -152,7 +152,7 @@ class VariableBlock {
+   VariableBlock<Mat>& operator=(ScalarLike auto value) {
+     slp_assert(rows() == 1 && cols() == 1);
+ 
+-    (*this)[0, 0] = value;
++    (*this)(0, 0) = value;
+ 
+     return *this;
+   }
+@@ -167,7 +167,7 @@ class VariableBlock {
+   void set_value(double value) {
+     slp_assert(rows() == 1 && cols() == 1);
+ 
+-    (*this)[0, 0].set_value(value);
++    (*this)(0, 0).set_value(value);
+   }
+ 
+   /**
+@@ -182,7 +182,7 @@ class VariableBlock {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] = values(row, col);
++        (*this)(row, col) = values(row, col);
+       }
+     }
+ 
+@@ -201,7 +201,7 @@ class VariableBlock {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col].set_value(values(row, col));
++        (*this)(row, col).set_value(values(row, col));
+       }
+     }
+   }
+@@ -217,7 +217,7 @@ class VariableBlock {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] = values[row, col];
++        (*this)(row, col) = values(row, col);
+       }
+     }
+     return *this;
+@@ -234,7 +234,7 @@ class VariableBlock {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] = std::move(values[row, col]);
++        (*this)(row, col) = std::move(values(row, col));
+       }
+     }
+     return *this;
+@@ -247,13 +247,13 @@ class VariableBlock {
+    * @param col The scalar subblock's column.
+    * @return A scalar subblock at the given row and column.
+    */
+-  Variable& operator[](int row, int col)
++  Variable& operator()(int row, int col)
+     requires(!std::is_const_v<Mat>)
+   {
+     slp_assert(row >= 0 && row < rows());
+     slp_assert(col >= 0 && col < cols());
+-    return (*m_mat)[m_row_slice.start + row * m_row_slice.step,
+-                    m_col_slice.start + col * m_col_slice.step];
++    return (*m_mat)(m_row_slice.start + row * m_row_slice.step,
++                    m_col_slice.start + col * m_col_slice.step);
+   }
+ 
+   /**
+@@ -263,11 +263,11 @@ class VariableBlock {
+    * @param col The scalar subblock's column.
+    * @return A scalar subblock at the given row and column.
+    */
+-  const Variable& operator[](int row, int col) const {
++  const Variable& operator()(int row, int col) const {
+     slp_assert(row >= 0 && row < rows());
+     slp_assert(col >= 0 && col < cols());
+-    return (*m_mat)[m_row_slice.start + row * m_row_slice.step,
+-                    m_col_slice.start + col * m_col_slice.step];
++    return (*m_mat)(m_row_slice.start + row * m_row_slice.step,
++                    m_col_slice.start + col * m_col_slice.step);
+   }
+ 
+   /**
+@@ -280,7 +280,7 @@ class VariableBlock {
+     requires(!std::is_const_v<Mat>)
+   {
+     slp_assert(row >= 0 && row < rows() * cols());
+-    return (*this)[row / cols(), row % cols()];
++    return (*this)(row / cols(), row % cols());
+   }
+ 
+   /**
+@@ -291,7 +291,7 @@ class VariableBlock {
+    */
+   const Variable& operator[](int row) const {
+     slp_assert(row >= 0 && row < rows() * cols());
+-    return (*this)[row / cols(), row % cols()];
++    return (*this)(row / cols(), row % cols());
+   }
+ 
+   /**
+@@ -309,8 +309,8 @@ class VariableBlock {
+     slp_assert(col_offset >= 0 && col_offset <= cols());
+     slp_assert(block_rows >= 0 && block_rows <= rows() - row_offset);
+     slp_assert(block_cols >= 0 && block_cols <= cols() - col_offset);
+-    return (*this)[Slice{row_offset, row_offset + block_rows, 1},
+-                   Slice{col_offset, col_offset + block_cols, 1}];
++    return (*this)({row_offset, row_offset + block_rows, 1},
++                   {col_offset, col_offset + block_cols, 1});
+   }
+ 
+   /**
+@@ -328,8 +328,8 @@ class VariableBlock {
+     slp_assert(col_offset >= 0 && col_offset <= cols());
+     slp_assert(block_rows >= 0 && block_rows <= rows() - row_offset);
+     slp_assert(block_cols >= 0 && block_cols <= cols() - col_offset);
+-    return (*this)[Slice{row_offset, row_offset + block_rows, 1},
+-                   Slice{col_offset, col_offset + block_cols, 1}];
++    return (*this)({row_offset, row_offset + block_rows, 1},
++                   {col_offset, col_offset + block_cols, 1});
+   }
+ 
+   /**
+@@ -339,7 +339,7 @@ class VariableBlock {
+    * @param col_slice The column slice.
+    * @return A slice of the variable matrix.
+    */
+-  VariableBlock<Mat> operator[](Slice row_slice, Slice col_slice) {
++  VariableBlock<Mat> operator()(Slice row_slice, Slice col_slice) {
+     int row_slice_length = row_slice.adjust(m_row_slice_length);
+     int col_slice_length = col_slice.adjust(m_col_slice_length);
+     return VariableBlock{
+@@ -359,7 +359,7 @@ class VariableBlock {
+    * @param col_slice The column slice.
+    * @return A slice of the variable matrix.
+    */
+-  const VariableBlock<const Mat> operator[](Slice row_slice,
++  const VariableBlock<const Mat> operator()(Slice row_slice,
+                                             Slice col_slice) const {
+     int row_slice_length = row_slice.adjust(m_row_slice_length);
+     int col_slice_length = col_slice.adjust(m_col_slice_length);
+@@ -385,7 +385,7 @@ class VariableBlock {
+    * @param col_slice_length The column slice length.
+    * @return A slice of the variable matrix.
+    */
+-  VariableBlock<Mat> operator[](Slice row_slice, int row_slice_length,
++  VariableBlock<Mat> operator()(Slice row_slice, int row_slice_length,
+                                 Slice col_slice, int col_slice_length) {
+     return VariableBlock{
+         *m_mat,
+@@ -409,7 +409,7 @@ class VariableBlock {
+    * @param col_slice_length The column slice length.
+    * @return A slice of the variable matrix.
+    */
+-  const VariableBlock<const Mat> operator[](Slice row_slice,
++  const VariableBlock<const Mat> operator()(Slice row_slice,
+                                             int row_slice_length,
+                                             Slice col_slice,
+                                             int col_slice_length) const {
+@@ -524,7 +524,7 @@ class VariableBlock {
+   VariableBlock<Mat>& operator*=(const ScalarLike auto& rhs) {
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] *= rhs;
++        (*this)(row, col) *= rhs;
+       }
+     }
+ 
+@@ -542,7 +542,7 @@ class VariableBlock {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] /= rhs[0, 0];
++        (*this)(row, col) /= rhs(0, 0);
+       }
+     }
+ 
+@@ -558,7 +558,7 @@ class VariableBlock {
+   VariableBlock<Mat>& operator/=(const ScalarLike auto& rhs) {
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] /= rhs;
++        (*this)(row, col) /= rhs;
+       }
+     }
+ 
+@@ -576,7 +576,7 @@ class VariableBlock {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] += rhs[row, col];
++        (*this)(row, col) += rhs(row, col);
+       }
+     }
+ 
+@@ -594,7 +594,7 @@ class VariableBlock {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] += rhs;
++        (*this)(row, col) += rhs;
+       }
+     }
+ 
+@@ -612,7 +612,7 @@ class VariableBlock {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] -= rhs[row, col];
++        (*this)(row, col) -= rhs(row, col);
+       }
+     }
+ 
+@@ -630,7 +630,7 @@ class VariableBlock {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] -= rhs;
++        (*this)(row, col) -= rhs;
+       }
+     }
+ 
+@@ -655,7 +655,7 @@ class VariableBlock {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        result[col, row] = (*this)[row, col];
++        result(col, row) = (*this)(row, col);
+       }
+     }
+ 
+@@ -686,8 +686,8 @@ class VariableBlock {
+   double value(int row, int col) {
+     slp_assert(row >= 0 && row < rows());
+     slp_assert(col >= 0 && col < cols());
+-    return (*m_mat)[m_row_slice.start + row * m_row_slice.step,
+-                    m_col_slice.start + col * m_col_slice.step]
++    return (*m_mat)(m_row_slice.start + row * m_row_slice.step,
++                    m_col_slice.start + col * m_col_slice.step)
+         .value();
+   }
+ 
+@@ -731,7 +731,7 @@ class VariableBlock {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        result[row, col] = unary_op((*this)[row, col]);
++        result(row, col) = unary_op((*this)(row, col));
+       }
+     }
+ 
+diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
+index dee43f926d304e1f4900bd57b99cd613e808f58e..4dc2cea00cb9491035a9b4795be3562186991c7a 100644
+--- a/include/sleipnir/autodiff/variable_matrix.hpp
++++ b/include/sleipnir/autodiff/variable_matrix.hpp
+@@ -211,7 +211,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < values.rows(); ++row) {
+       for (int col = 0; col < values.cols(); ++col) {
+-        (*this)[row, col] = values(row, col);
++        (*this)(row, col) = values(row, col);
+       }
+     }
+ 
+@@ -229,7 +229,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+   VariableMatrix& operator=(ScalarLike auto value) {
+     slp_assert(rows() == 1 && cols() == 1);
+ 
+-    (*this)[0, 0] = value;
++    (*this)(0, 0) = value;
+ 
+     return *this;
+   }
+@@ -246,7 +246,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < values.rows(); ++row) {
+       for (int col = 0; col < values.cols(); ++col) {
+-        (*this)[row, col].set_value(values(row, col));
++        (*this)(row, col).set_value(values(row, col));
+       }
+     }
+   }
+@@ -280,7 +280,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+     m_storage.reserve(rows() * cols());
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        m_storage.emplace_back(values[row, col]);
++        m_storage.emplace_back(values(row, col));
+       }
+     }
+   }
+@@ -295,7 +295,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+     m_storage.reserve(rows() * cols());
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        m_storage.emplace_back(values[row, col]);
++        m_storage.emplace_back(values(row, col));
+       }
+     }
+   }
+@@ -340,7 +340,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+    * @param col The block column.
+    * @return A block pointing to the given row and column.
+    */
+-  Variable& operator[](int row, int col) {
++  Variable& operator()(int row, int col) {
+     slp_assert(row >= 0 && row < rows());
+     slp_assert(col >= 0 && col < cols());
+     return m_storage[row * cols() + col];
+@@ -353,7 +353,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+    * @param col The block column.
+    * @return A block pointing to the given row and column.
+    */
+-  const Variable& operator[](int row, int col) const {
++  const Variable& operator()(int row, int col) const {
+     slp_assert(row >= 0 && row < rows());
+     slp_assert(col >= 0 && col < cols());
+     return m_storage[row * cols() + col];
+@@ -426,7 +426,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+    * @param col_slice The column slice.
+    * @return A slice of the variable matrix.
+    */
+-  VariableBlock<VariableMatrix> operator[](Slice row_slice, Slice col_slice) {
++  VariableBlock<VariableMatrix> operator()(Slice row_slice, Slice col_slice) {
+     int row_slice_length = row_slice.adjust(rows());
+     int col_slice_length = col_slice.adjust(cols());
+     return VariableBlock{*this, std::move(row_slice), row_slice_length,
+@@ -440,7 +440,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+    * @param col_slice The column slice.
+    * @return A slice of the variable matrix.
+    */
+-  const VariableBlock<const VariableMatrix> operator[](Slice row_slice,
++  const VariableBlock<const VariableMatrix> operator()(Slice row_slice,
+                                                        Slice col_slice) const {
+     int row_slice_length = row_slice.adjust(rows());
+     int col_slice_length = col_slice.adjust(cols());
+@@ -461,7 +461,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+    * @return A slice of the variable matrix.
+    *
+    */
+-  VariableBlock<VariableMatrix> operator[](Slice row_slice,
++  VariableBlock<VariableMatrix> operator()(Slice row_slice,
+                                            int row_slice_length,
+                                            Slice col_slice,
+                                            int col_slice_length) {
+@@ -481,7 +481,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+    * @param col_slice_length The column slice length.
+    * @return A slice of the variable matrix.
+    */
+-  const VariableBlock<const VariableMatrix> operator[](
++  const VariableBlock<const VariableMatrix> operator()(
+       Slice row_slice, int row_slice_length, Slice col_slice,
+       int col_slice_length) const {
+     return VariableBlock{*this, std::move(row_slice), row_slice_length,
+@@ -581,17 +581,9 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+       for (int j = 0; j < rhs.cols(); ++j) {
+         Variable sum;
+         for (int k = 0; k < lhs.cols(); ++k) {
+-          if constexpr (SleipnirMatrixLike<LHS> && SleipnirMatrixLike<RHS>) {
+-            sum += lhs[i, k] * rhs[k, j];
+-          } else if constexpr (SleipnirMatrixLike<LHS> &&
+-                               EigenMatrixLike<RHS>) {
+-            sum += lhs[i, k] * rhs(k, j);
+-          } else if constexpr (EigenMatrixLike<LHS> &&
+-                               SleipnirMatrixLike<RHS>) {
+-            sum += lhs(i, k) * rhs[k, j];
+-          }
++          sum += lhs(i, k) * rhs(k, j);
+         }
+-        result[i, j] = sum;
++        result(i, j) = sum;
+       }
+     }
+ #if __GNUC__ >= 12
+@@ -613,7 +605,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        result[row, col] = lhs[row, col] * rhs;
++        result(row, col) = lhs(row, col) * rhs;
+       }
+     }
+ 
+@@ -632,11 +624,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        if constexpr (SleipnirMatrixLike<decltype(lhs)>) {
+-          result[row, col] = lhs[row, col] * rhs;
+-        } else {
+-          result[row, col] = lhs(row, col) * rhs;
+-        }
++        result(row, col) = lhs(row, col) * rhs;
+       }
+     }
+ 
+@@ -655,7 +643,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        result[row, col] = rhs[row, col] * lhs;
++        result(row, col) = rhs(row, col) * lhs;
+       }
+     }
+ 
+@@ -674,11 +662,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        if constexpr (SleipnirMatrixLike<decltype(rhs)>) {
+-          result[row, col] = rhs[row, col] * lhs;
+-        } else {
+-          result[row, col] = rhs(row, col) * lhs;
+-        }
++        result(row, col) = rhs(row, col) * lhs;
+       }
+     }
+ 
+@@ -698,13 +682,9 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+       for (int j = 0; j < rhs.cols(); ++j) {
+         Variable sum;
+         for (int k = 0; k < cols(); ++k) {
+-          if constexpr (SleipnirMatrixLike<decltype(rhs)>) {
+-            sum += (*this)[i, k] * rhs[k, j];
+-          } else {
+-            sum += (*this)[i, k] * rhs(k, j);
+-          }
++          sum += (*this)(i, k) * rhs(k, j);
+         }
+-        (*this)[i, j] = sum;
++        (*this)(i, j) = sum;
+       }
+     }
+ 
+@@ -720,7 +700,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+   VariableMatrix& operator*=(const ScalarLike auto& rhs) {
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < rhs.cols(); ++col) {
+-        (*this)[row, col] *= rhs;
++        (*this)(row, col) *= rhs;
+       }
+     }
+ 
+@@ -740,11 +720,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        if constexpr (SleipnirMatrixLike<decltype(lhs)>) {
+-          result[row, col] = lhs[row, col] / rhs;
+-        } else {
+-          result[row, col] = lhs(row, col) / rhs;
+-        }
++        result(row, col) = lhs(row, col) / rhs;
+       }
+     }
+ 
+@@ -760,7 +736,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+   VariableMatrix& operator/=(const ScalarLike auto& rhs) {
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] /= rhs;
++        (*this)(row, col) /= rhs;
+       }
+     }
+ 
+@@ -784,13 +760,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        if constexpr (SleipnirMatrixLike<LHS> && SleipnirMatrixLike<RHS>) {
+-          result[row, col] = lhs[row, col] + rhs[row, col];
+-        } else if constexpr (SleipnirMatrixLike<LHS> && EigenMatrixLike<RHS>) {
+-          result[row, col] = lhs[row, col] + rhs(row, col);
+-        } else if constexpr (EigenMatrixLike<LHS> && SleipnirMatrixLike<RHS>) {
+-          result[row, col] = lhs(row, col) + rhs[row, col];
+-        }
++        result(row, col) = lhs(row, col) + rhs(row, col);
+       }
+     }
+ 
+@@ -808,11 +778,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        if constexpr (SleipnirMatrixLike<decltype(rhs)>) {
+-          (*this)[row, col] += rhs[row, col];
+-        } else {
+-          (*this)[row, col] += rhs(row, col);
+-        }
++        (*this)(row, col) += rhs(row, col);
+       }
+     }
+ 
+@@ -830,7 +796,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] += rhs;
++        (*this)(row, col) += rhs;
+       }
+     }
+ 
+@@ -854,13 +820,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        if constexpr (SleipnirMatrixLike<LHS> && SleipnirMatrixLike<RHS>) {
+-          result[row, col] = lhs[row, col] - rhs[row, col];
+-        } else if constexpr (SleipnirMatrixLike<LHS> && EigenMatrixLike<RHS>) {
+-          result[row, col] = lhs[row, col] - rhs(row, col);
+-        } else if constexpr (EigenMatrixLike<LHS> && SleipnirMatrixLike<RHS>) {
+-          result[row, col] = lhs(row, col) - rhs[row, col];
+-        }
++        result(row, col) = lhs(row, col) - rhs(row, col);
+       }
+     }
+ 
+@@ -878,11 +838,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        if constexpr (SleipnirMatrixLike<decltype(rhs)>) {
+-          (*this)[row, col] -= rhs[row, col];
+-        } else {
+-          (*this)[row, col] -= rhs(row, col);
+-        }
++        (*this)(row, col) -= rhs(row, col);
+       }
+     }
+ 
+@@ -900,7 +856,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        (*this)[row, col] -= rhs;
++        (*this)(row, col) -= rhs;
+       }
+     }
+ 
+@@ -918,7 +874,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < result.rows(); ++row) {
+       for (int col = 0; col < result.cols(); ++col) {
+-        result[row, col] = -lhs[row, col];
++        result(row, col) = -lhs(row, col);
+       }
+     }
+ 
+@@ -930,7 +886,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+    */
+   operator Variable() const {  // NOLINT
+     slp_assert(rows() == 1 && cols() == 1);
+-    return (*this)[0, 0];
++    return (*this)(0, 0);
+   }
+ 
+   /**
+@@ -943,7 +899,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        result[col, row] = (*this)[row, col];
++        result(col, row) = (*this)(row, col);
+       }
+     }
+ 
+@@ -1017,7 +973,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     for (int row = 0; row < rows(); ++row) {
+       for (int col = 0; col < cols(); ++col) {
+-        result[row, col] = unary_op((*this)[row, col]);
++        result(row, col) = unary_op((*this)(row, col));
+       }
+     }
+ 
+@@ -1199,7 +1155,7 @@ SLEIPNIR_DLLEXPORT inline VariableMatrix cwise_reduce(
+ 
+   for (int row = 0; row < lhs.rows(); ++row) {
+     for (int col = 0; col < lhs.cols(); ++col) {
+-      result[row, col] = binary_op(lhs[row, col], rhs[row, col]);
++      result(row, col) = binary_op(lhs(row, col), rhs(row, col));
+     }
+   }
+ 
+diff --git a/include/sleipnir/control/ocp.hpp b/include/sleipnir/control/ocp.hpp
+index 282520fb852d8588b96846eb5b4952bf47d1309f..d9174426669281e68a5c09d298cfd5bcd3be3776 100644
+--- a/include/sleipnir/control/ocp.hpp
++++ b/include/sleipnir/control/ocp.hpp
+@@ -180,7 +180,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
+     if (m_timestep_method == TimestepMethod::FIXED) {
+       m_DT = VariableMatrix{1, m_num_steps + 1};
+       for (int i = 0; i < num_steps + 1; ++i) {
+-        m_DT[0, i] = m_dt.count();
++        m_DT(0, i) = m_dt.count();
+       }
+     } else if (m_timestep_method == TimestepMethod::VARIABLE_SINGLE) {
+       Variable dt = decision_variable();
+@@ -189,12 +189,12 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
+       // Set the member variable matrix to track the decision variable
+       m_DT = VariableMatrix{1, m_num_steps + 1};
+       for (int i = 0; i < num_steps + 1; ++i) {
+-        m_DT[0, i] = dt;
++        m_DT(0, i) = dt;
+       }
+     } else if (m_timestep_method == TimestepMethod::VARIABLE) {
+       m_DT = decision_variable(1, m_num_steps + 1);
+       for (int i = 0; i < num_steps + 1; ++i) {
+-        m_DT[0, i].set_value(m_dt.count());
++        m_DT(0, i).set_value(m_dt.count());
+       }
+     }
+ 
+@@ -270,7 +270,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
+     for (int i = 0; i < m_num_steps + 1; ++i) {
+       auto x = X().col(i);
+       auto u = U().col(i);
+-      auto dt = this->dt()[0, i];
++      auto dt = this->dt()(0, i);
+       callback(time, x, u, dt);
+ 
+       time += dt;
+@@ -377,7 +377,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
+ 
+     // Derivation at https://mec560sbu.github.io/2016/09/30/direct_collocation/
+     for (int i = 0; i < m_num_steps; ++i) {
+-      Variable h = dt()[0, i];
++      Variable h = dt()(0, i);
+ 
+       auto& f = m_dynamics_function;
+ 
+@@ -412,7 +412,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
+       auto x_begin = X().col(i);
+       auto x_end = X().col(i + 1);
+       auto u = U().col(i);
+-      Variable dt = this->dt()[0, i];
++      Variable dt = this->dt()(0, i);
+ 
+       if (m_dynamics_type == DynamicsType::EXPLICIT_ODE) {
+         subject_to(x_end == rk4<const decltype(m_dynamics_function)&,
+@@ -433,7 +433,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
+       auto x_begin = X().col(i);
+       auto x_end = X().col(i + 1);
+       auto u = U().col(i);
+-      Variable dt = this->dt()[0, i];
++      Variable dt = this->dt()(0, i);
+ 
+       if (m_dynamics_type == DynamicsType::EXPLICIT_ODE) {
+         x_end = rk4<const decltype(m_dynamics_function)&, VariableMatrix,
+diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
+index b7a868657c704487049efaf6b3972b1f7b72bfb4..b484ec08d6c50bf42fbaa1d5b4c66a20cb11a922 100644
+--- a/include/sleipnir/optimization/problem.hpp
++++ b/include/sleipnir/optimization/problem.hpp
+@@ -78,7 +78,7 @@ class SLEIPNIR_DLLEXPORT Problem {
+     for (int row = 0; row < rows; ++row) {
+       for (int col = 0; col < cols; ++col) {
+         m_decision_variables.emplace_back();
+-        vars[row, col] = m_decision_variables.back();
++        vars(row, col) = m_decision_variables.back();
+       }
+     }
+ 
+@@ -113,8 +113,8 @@ class SLEIPNIR_DLLEXPORT Problem {
+     for (int row = 0; row < rows; ++row) {
+       for (int col = 0; col <= row; ++col) {
+         m_decision_variables.emplace_back();
+-        vars[row, col] = m_decision_variables.back();
+-        vars[col, row] = m_decision_variables.back();
++        vars(row, col) = m_decision_variables.back();
++        vars(col, row) = m_decision_variables.back();
+       }
+     }
+ 
+diff --git a/src/autodiff/variable_matrix.cpp b/src/autodiff/variable_matrix.cpp
+index decdc70809189d309708774ec60603fe73c50ecc..71f8153d345750d79fa41cf7af14ac766fcad2a4 100644
+--- a/src/autodiff/variable_matrix.cpp
++++ b/src/autodiff/variable_matrix.cpp
+@@ -12,17 +12,17 @@ VariableMatrix solve(const VariableMatrix& A, const VariableMatrix& B) {
+ 
+   if (A.rows() == 1 && A.cols() == 1) {
+     // Compute optimal inverse instead of using Eigen's general solver
+-    return B[0, 0] / A[0, 0];
++    return B(0, 0) / A(0, 0);
+   } else if (A.rows() == 2 && A.cols() == 2) {
+     // Compute optimal inverse instead of using Eigen's general solver
+     //
+     // [a  b]⁻¹  ___1___ [ d  −b]
+     // [c  d]  = ad − bc [−c   a]
+ 
+-    const auto& a = A[0, 0];
+-    const auto& b = A[0, 1];
+-    const auto& c = A[1, 0];
+-    const auto& d = A[1, 1];
++    const auto& a = A(0, 0);
++    const auto& b = A(0, 1);
++    const auto& c = A(1, 0);
++    const auto& d = A(1, 1);
+ 
+     slp::VariableMatrix adj_A{{d, -b}, {-c, a}};
+     auto det_A = a * d - b * c;
+@@ -39,15 +39,15 @@ VariableMatrix solve(const VariableMatrix& A, const VariableMatrix& B) {
+     //
+     // https://www.wolframalpha.com/input?i=inverse+%7B%7Ba%2C+b%2C+c%7D%2C+%7Bd%2C+e%2C+f%7D%2C+%7Bg%2C+h%2C+i%7D%7D
+ 
+-    const auto& a = A[0, 0];
+-    const auto& b = A[0, 1];
+-    const auto& c = A[0, 2];
+-    const auto& d = A[1, 0];
+-    const auto& e = A[1, 1];
+-    const auto& f = A[1, 2];
+-    const auto& g = A[2, 0];
+-    const auto& h = A[2, 1];
+-    const auto& i = A[2, 2];
++    const auto& a = A(0, 0);
++    const auto& b = A(0, 1);
++    const auto& c = A(0, 2);
++    const auto& d = A(1, 0);
++    const auto& e = A(1, 1);
++    const auto& f = A(1, 2);
++    const auto& g = A(2, 0);
++    const auto& h = A(2, 1);
++    const auto& i = A(2, 2);
+ 
+     auto ae = a * e;
+     auto af = a * f;
+@@ -87,22 +87,22 @@ VariableMatrix solve(const VariableMatrix& A, const VariableMatrix& B) {
+     //
+     // https://www.wolframalpha.com/input?i=inverse+%7B%7Ba%2C+b%2C+c%2C+d%7D%2C+%7Be%2C+f%2C+g%2C+h%7D%2C+%7Bi%2C+j%2C+k%2C+l%7D%2C+%7Bm%2C+n%2C+o%2C+p%7D%7D
+ 
+-    const auto& a = A[0, 0];
+-    const auto& b = A[0, 1];
+-    const auto& c = A[0, 2];
+-    const auto& d = A[0, 3];
+-    const auto& e = A[1, 0];
+-    const auto& f = A[1, 1];
+-    const auto& g = A[1, 2];
+-    const auto& h = A[1, 3];
+-    const auto& i = A[2, 0];
+-    const auto& j = A[2, 1];
+-    const auto& k = A[2, 2];
+-    const auto& l = A[2, 3];
+-    const auto& m = A[3, 0];
+-    const auto& n = A[3, 1];
+-    const auto& o = A[3, 2];
+-    const auto& p = A[3, 3];
++    const auto& a = A(0, 0);
++    const auto& b = A(0, 1);
++    const auto& c = A(0, 2);
++    const auto& d = A(0, 3);
++    const auto& e = A(1, 0);
++    const auto& f = A(1, 1);
++    const auto& g = A(1, 2);
++    const auto& h = A(1, 3);
++    const auto& i = A(2, 0);
++    const auto& j = A(2, 1);
++    const auto& k = A(2, 2);
++    const auto& l = A(2, 3);
++    const auto& m = A(3, 0);
++    const auto& n = A(3, 1);
++    const auto& o = A(3, 2);
++    const auto& p = A(3, 3);
+ 
+     auto afk = a * f * k;
+     auto afl = a * f * l;
+@@ -232,14 +232,14 @@ VariableMatrix solve(const VariableMatrix& A, const VariableMatrix& B) {
+     MatrixXv eigen_A{A.rows(), A.cols()};
+     for (int row = 0; row < A.rows(); ++row) {
+       for (int col = 0; col < A.cols(); ++col) {
+-        eigen_A(row, col) = A[row, col];
++        eigen_A(row, col) = A(row, col);
+       }
+     }
+ 
+     MatrixXv eigen_B{B.rows(), B.cols()};
+     for (int row = 0; row < B.rows(); ++row) {
+       for (int col = 0; col < B.cols(); ++col) {
+-        eigen_B(row, col) = B[row, col];
++        eigen_B(row, col) = B(row, col);
+       }
+     }
+ 
+@@ -248,7 +248,7 @@ VariableMatrix solve(const VariableMatrix& A, const VariableMatrix& B) {
+     VariableMatrix X{A.cols(), B.cols()};
+     for (int row = 0; row < X.rows(); ++row) {
+       for (int col = 0; col < X.cols(); ++col) {
+-        X[row, col] = eigen_X(row, col);
++        X(row, col) = eigen_X(row, col);
+       }
+     }
+ 
