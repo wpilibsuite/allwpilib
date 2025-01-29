@@ -68,7 +68,9 @@ public class AnnotationProcessor extends AbstractProcessor {
               customLoggers.putAll(processCustomLoggers(roundEnv, customLogger));
             });
 
+    // Get all root types (classes and interfaces), excluding packages and modules
     roundEnv.getRootElements().stream()
+        .filter(e -> e instanceof TypeElement)
         .filter(
             e ->
                 processingEnv
