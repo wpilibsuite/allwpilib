@@ -16,10 +16,13 @@
 
 #include <fmt/format.h>
 #include <wpi/EventVector.h>
+#include <wpi/StringMap.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/string.h>
 
 #include "HALInitializer.h"
+#include "hal/DriverStationTypes.h"
 #include "hal/Errors.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/simulation/MockHooks.h"
@@ -68,15 +71,10 @@ void JoystickDataCache::Update() {
   allianceStation = SimDriverStationData->allianceStationId;
   matchTime = SimDriverStationData->matchTime;
 
-  HAL_ControlWord tmpControlWord;
-  std::memset(&tmpControlWord, 0, sizeof(tmpControlWord));
-  tmpControlWord.enabled = SimDriverStationData->enabled;
-  tmpControlWord.autonomous = SimDriverStationData->autonomous;
-  tmpControlWord.test = SimDriverStationData->test;
-  tmpControlWord.eStop = SimDriverStationData->eStop;
-  tmpControlWord.fmsAttached = SimDriverStationData->fmsAttached;
-  tmpControlWord.dsAttached = SimDriverStationData->dsAttached;
-  this->controlWord = tmpControlWord;
+  this->controlWord = HAL_MakeControlWord(
+      SimDriverStationData->opMode, SimDriverStationData->robotMode,
+      SimDriverStationData->enabled, SimDriverStationData->eStop,
+      SimDriverStationData->fmsAttached, SimDriverStationData->dsAttached);
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
@@ -220,10 +218,23 @@ int32_t HAL_SendConsoleLine(const char* line) {
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   if (gShutdown) {
+    controlWord->value = 0;
     return INCOMPATIBLE_STATE;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
   *controlWord = newestControlWord;
+  return 0;
+}
+
+int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
+                             int32_t count) {
+  if (gShutdown) {
+    return 0;
+  }
+  if (count < 0 || count > 1000 || (count != 0 && !options)) {
+    return PARAMETER_OUT_OF_RANGE;
+  }
+  SimDriverStationData->SetOpModeOptions({options, options + count});
   return 0;
 }
 
@@ -348,19 +359,7 @@ void HAL_ObserveUserProgramStarting(void) {
   HALSIM_SetProgramStarted();
 }
 
-void HAL_ObserveUserProgramDisabled(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramAutonomous(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramTeleop(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramTest(void) {
+void HAL_ObserveUserProgram(HAL_ControlWord word) {
   // TODO
 }
 
@@ -428,7 +427,8 @@ HAL_Bool HAL_GetOutputsEnabled(void) {
     return false;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
-  return newestControlWord.enabled && newestControlWord.dsAttached;
+  return HAL_ControlWord_IsEnabled(newestControlWord) &&
+         HAL_ControlWord_IsDSAttached(newestControlWord);
 }
 
 }  // extern "C"

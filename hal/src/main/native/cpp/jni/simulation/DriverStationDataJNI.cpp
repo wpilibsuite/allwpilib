@@ -7,7 +7,10 @@
 #include <wpi/StringExtras.h>
 #include <wpi/jni_util.h>
 
+#include "../HALUtil.h"
 #include "CallbackStore.h"
+#include "OpModeOptionsCallbackStore.h"
+#include "SimulatorJNI.h"
 #include "edu_wpi_first_hal_simulation_DriverStationDataJNI.h"
 #include "hal/simulation/DriverStationData.h"
 #include "hal/simulation/MockHooks.h"
@@ -70,103 +73,53 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setEnabled
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    registerAutonomousCallback
+ * Method:    registerRobotModeCallback
  * Signature: (Ljava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerAutonomousCallback
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerRobotModeCallback
   (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallbackNoIndex(
       env, callback, initialNotify,
-      &HALSIM_RegisterDriverStationAutonomousCallback);
+      &HALSIM_RegisterDriverStationRobotModeCallback);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    cancelAutonomousCallback
+ * Method:    cancelRobotModeCallback
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelAutonomousCallback
-  (JNIEnv* env, jclass, jint handle)
-{
-  return sim::FreeCallbackNoIndex(
-      env, handle, &HALSIM_CancelDriverStationAutonomousCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    getAutonomous
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getAutonomous
-  (JNIEnv*, jclass)
-{
-  return HALSIM_GetDriverStationAutonomous();
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    setAutonomous
- * Signature: (Z)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setAutonomous
-  (JNIEnv*, jclass, jboolean value)
-{
-  HALSIM_SetDriverStationAutonomous(value);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    registerTestCallback
- * Signature: (Ljava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerTestCallback
-  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateCallbackNoIndex(
-      env, callback, initialNotify, &HALSIM_RegisterDriverStationTestCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    cancelTestCallback
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelTestCallback
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelRobotModeCallback
   (JNIEnv* env, jclass, jint handle)
 {
   return sim::FreeCallbackNoIndex(env, handle,
-                                  &HALSIM_CancelDriverStationTestCallback);
+                                  &HALSIM_CancelDriverStationRobotModeCallback);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    getTest
- * Signature: ()Z
+ * Method:    nativeGetRobotMode
+ * Signature: ()I
  */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getTest
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_nativeGetRobotMode
   (JNIEnv*, jclass)
 {
-  return HALSIM_GetDriverStationTest();
+  return HALSIM_GetDriverStationRobotMode();
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    setTest
- * Signature: (Z)V
+ * Method:    nativeSetRobotMode
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setTest
-  (JNIEnv*, jclass, jboolean value)
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_nativeSetRobotMode
+  (JNIEnv*, jclass, jint value)
 {
-  HALSIM_SetDriverStationTest(value);
+  HALSIM_SetDriverStationRobotMode(static_cast<HAL_RobotMode>(value));
 }
 
 /*
@@ -422,6 +375,99 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setMatchTime
   (JNIEnv*, jclass, jdouble value)
 {
   HALSIM_SetDriverStationMatchTime(value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    registerOpModeCallback
+ * Signature: (Ljava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerOpModeCallback
+  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateCallbackNoIndex(
+      env, callback, initialNotify,
+      &HALSIM_RegisterDriverStationOpModeCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    cancelOpModeCallback
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelOpModeCallback
+  (JNIEnv* env, jclass, jint handle)
+{
+  return sim::FreeCallbackNoIndex(env, handle,
+                                  &HALSIM_CancelDriverStationOpModeCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    getOpMode
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getOpMode
+  (JNIEnv* env, jclass)
+{
+  return HALSIM_GetDriverStationOpMode();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setOpMode
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setOpMode
+  (JNIEnv* env, jclass, jlong value)
+{
+  HALSIM_SetDriverStationOpMode(value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    registerOpModeOptionsCallback
+ * Signature: (Ljava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerOpModeOptionsCallback
+  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateOpModeOptionsCallback(
+      env, callback, initialNotify, &HALSIM_RegisterOpModeOptionsCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    cancelOpModeOptionsCallback
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelOpModeOptionsCallback
+  (JNIEnv* env, jclass, jint handle)
+{
+  sim::FreeOpModeOptionsCallback(env, handle,
+                                 &HALSIM_CancelOpModeOptionsCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    getOpModeOptions
+ * Signature: ()[Ljava/lang/Object;
+ */
+JNIEXPORT jobjectArray JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getOpModeOptions
+  (JNIEnv* env, jclass)
+{
+  int32_t count;
+  HAL_OpModeOption* options = HALSIM_GetOpModeOptions(&count);
+  auto rv = CreateOpModeOptionArray(env, {options, options + count});
+  HALSIM_FreeOpModeOptionsArray(options, count);
+  return rv;
 }
 
 /*

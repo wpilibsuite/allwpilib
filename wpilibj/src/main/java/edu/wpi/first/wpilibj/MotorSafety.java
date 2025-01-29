@@ -48,7 +48,7 @@ public abstract class MotorSafety {
       }
       if (!timedOut) {
         DriverStationJNI.getControlWord(controlWord);
-        if (!(controlWord.getEnabled() && controlWord.getDSAttached())) {
+        if (!(controlWord.isEnabled() && controlWord.isDSAttached())) {
           safetyCounter = 0;
         }
         if (++safetyCounter >= 4) {

@@ -2,9 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "hal/simulation/DriverStationData.h"
+
+#include <algorithm>
 #include <cstring>
+#include <string>
+#include <vector>
+
+#include <fmt/format.h>
 
 #include "DriverStationDataInternal.h"
+#include "hal/DriverStationTypes.h"
 
 using namespace hal;
 
@@ -21,15 +29,19 @@ DriverStationData::DriverStationData() {
   ResetData();
 }
 
+DriverStationData::~DriverStationData() {
+  HALSIM_FreeOpModeOptionsArray(m_opModeOptions.data(), m_opModeOptions.size());
+}
+
 void DriverStationData::ResetData() {
   enabled.Reset(false);
-  autonomous.Reset(false);
-  test.Reset(false);
+  robotMode.Reset(HAL_ROBOTMODE_UNKNOWN);
   eStop.Reset(false);
   fmsAttached.Reset(false);
   dsAttached.Reset(false);
   allianceStationId.Reset(static_cast<HAL_AllianceStationID>(0));
   matchTime.Reset(-1.0);
+  opMode.Reset(0);
 
   {
     std::scoped_lock lock(m_joystickDataMutex);
@@ -52,7 +64,67 @@ void DriverStationData::ResetData() {
     m_matchInfoCallbacks.Reset();
     m_matchInfo = HAL_MatchInfo{};
   }
+  {
+    std::scoped_lock lock{m_opModeMutex};
+    m_opModeOptionsCallbacks.Reset();
+    // XXX: do not clear options vector as it comes from robot code?
+  }
   m_newDataCallbacks.Reset();
+}
+
+void DriverStationData::SetOpModeOptions(
+    std::span<const HAL_OpModeOption> options) {
+  std::scoped_lock lock{m_opModeMutex};
+
+  HALSIM_FreeOpModeOptionsArray(m_opModeOptions.data(), m_opModeOptions.size());
+  m_opModeOptions.clear();
+  m_opModeOptions.reserve(options.size());
+  for (const auto& option : options) {
+    if (option.id == 0) {
+      continue;
+    }
+    m_opModeOptions.emplace_back(HAL_OpModeOption{
+        static_cast<int64_t>(option.id), wpi::copy_wpi_string(option.name),
+        wpi::copy_wpi_string(option.group),
+        wpi::copy_wpi_string(option.description), option.textColor,
+        option.backgroundColor});
+  }
+  m_opModeOptionsCallbacks.Invoke(m_opModeOptions.data(),
+                                  m_opModeOptions.size());
+}
+
+int32_t DriverStationData::RegisterOpModeOptionsCallback(
+    HAL_OpModeOptionsCallback callback, void* param, HAL_Bool initialNotify) {
+  std::scoped_lock lock(m_opModeMutex);
+  int32_t uid = m_opModeOptionsCallbacks.Register(callback, param);
+  if (initialNotify) {
+    callback(GetOpModeOptionsName(), param, m_opModeOptions.data(),
+             m_opModeOptions.size());
+  }
+  return uid;
+}
+
+void DriverStationData::CancelOpModeOptionsCallback(int32_t uid) {
+  m_opModeOptionsCallbacks.Cancel(uid);
+}
+
+HAL_OpModeOption* DriverStationData::GetOpModeOptions(int32_t* len) {
+  std::scoped_lock lock(m_opModeMutex);
+  *len = 0;
+  if (m_opModeOptions.empty()) {
+    return nullptr;
+  }
+
+  auto options = static_cast<HAL_OpModeOption*>(
+      std::malloc(sizeof(HAL_OpModeOption) * m_opModeOptions.size()));
+  std::copy(m_opModeOptions.begin(), m_opModeOptions.end(), options);
+  *len = m_opModeOptions.size();
+  for (auto&& option : std::span{options, m_opModeOptions.size()}) {
+    option.name = wpi::copy_wpi_string(option.name);
+    option.group = wpi::copy_wpi_string(option.group);
+    option.description = wpi::copy_wpi_string(option.description);
+  }
+  return options;
 }
 
 #define DEFINE_CPPAPI_CALLBACKS(name, data, data2)                             \
@@ -408,13 +480,38 @@ void HALSIM_ResetDriverStationData(void) {
                                        SimDriverStationData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Enabled, enabled)
-DEFINE_CAPI(HAL_Bool, Autonomous, autonomous)
-DEFINE_CAPI(HAL_Bool, Test, test)
+DEFINE_CAPI(HAL_RobotMode, RobotMode, robotMode)
 DEFINE_CAPI(HAL_Bool, EStop, eStop)
 DEFINE_CAPI(HAL_Bool, FmsAttached, fmsAttached)
 DEFINE_CAPI(HAL_Bool, DsAttached, dsAttached)
 DEFINE_CAPI(HAL_AllianceStationID, AllianceStationId, allianceStationId)
 DEFINE_CAPI(double, MatchTime, matchTime)
+DEFINE_CAPI(int64_t, OpMode, opMode)
+
+int32_t HALSIM_RegisterOpModeOptionsCallback(HAL_OpModeOptionsCallback callback,
+                                             void* param,
+                                             HAL_Bool initialNotify) {
+  return SimDriverStationData->RegisterOpModeOptionsCallback(callback, param,
+                                                             initialNotify);
+}
+
+void HALSIM_CancelOpModeOptionsCallback(int32_t uid) {
+  return SimDriverStationData->CancelOpModeOptionsCallback(uid);
+}
+
+struct HAL_OpModeOption* HALSIM_GetOpModeOptions(int32_t* len) {
+  return SimDriverStationData->GetOpModeOptions(len);
+}
+
+void HALSIM_FreeOpModeOptionsArray(struct HAL_OpModeOption* arr,
+                                   size_t length) {
+  for (size_t i = 0; i < length; ++i) {
+    WPI_FreeString(&arr[i].name);
+    WPI_FreeString(&arr[i].group);
+    WPI_FreeString(&arr[i].description);
+  }
+  std::free(arr);
+}
 
 #undef DEFINE_CAPI
 #define DEFINE_CAPI(name, data)                                                \
@@ -576,8 +673,7 @@ void HALSIM_RegisterDriverStationAllCallbacks(HAL_NotifyCallback callback,
                                               void* param,
                                               HAL_Bool initialNotify) {
   REGISTER(enabled);
-  REGISTER(autonomous);
-  REGISTER(test);
+  REGISTER(robotMode);
   REGISTER(eStop);
   REGISTER(fmsAttached);
   REGISTER(dsAttached);

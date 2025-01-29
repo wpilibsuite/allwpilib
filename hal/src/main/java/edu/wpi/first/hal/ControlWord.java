@@ -4,11 +4,13 @@
 
 package edu.wpi.first.hal;
 
+import edu.wpi.first.hal.struct.ControlWordStruct;
+
 /** A wrapper for the HALControlWord bitfield. */
 public class ControlWord {
+  private long m_word;
+  private RobotMode m_robotMode = RobotMode.UNKNOWN;
   private boolean m_enabled;
-  private boolean m_autonomous;
-  private boolean m_test;
   private boolean m_emergencyStop;
   private boolean m_fmsAttached;
   private boolean m_dsAttached;
@@ -16,19 +18,49 @@ public class ControlWord {
   /** Default constructor. */
   public ControlWord() {}
 
-  void update(
+  /**
+   * Updates from state values.
+   *
+   * @param opModeHash opmode hash
+   * @param robotMode robot mode
+   * @param enabled enabled
+   * @param emergencyStop emergency stopped
+   * @param fmsAttached FMS attached
+   * @param dsAttached DS attached
+   */
+  public void update(
+      long opModeHash,
+      RobotMode robotMode,
       boolean enabled,
-      boolean autonomous,
-      boolean test,
       boolean emergencyStop,
       boolean fmsAttached,
       boolean dsAttached) {
+    m_word =
+        (opModeHash & 0x00FFFFFFFFFFFFFFL)
+            | ((long) robotMode.getValue() << 56)
+            | (enabled ? 0x0400000000000000L : 0)
+            | (emergencyStop ? 0x0800000000000000L : 0)
+            | (fmsAttached ? 0x1000000000000000L : 0)
+            | (dsAttached ? 0x2000000000000000L : 0);
+    m_robotMode = robotMode;
     m_enabled = enabled;
-    m_autonomous = autonomous;
-    m_test = test;
     m_emergencyStop = emergencyStop;
     m_fmsAttached = fmsAttached;
     m_dsAttached = dsAttached;
+  }
+
+  /**
+   * Updates from the native HAL value.
+   *
+   * @param word value
+   */
+  public void update(long word) {
+    m_word = word;
+    m_robotMode = RobotMode.fromInt((int) ((word >> 56) & 3));
+    m_enabled = (word & 0x0400000000000000L) != 0;
+    m_emergencyStop = (word & 0x0800000000000000L) != 0;
+    m_fmsAttached = (word & 0x1000000000000000L) != 0;
+    m_dsAttached = (word & 0x2000000000000000L) != 0;
   }
 
   /**
@@ -37,9 +69,9 @@ public class ControlWord {
    * @param word word to update from
    */
   public void update(ControlWord word) {
+    m_word = word.m_word;
+    m_robotMode = word.m_robotMode;
     m_enabled = word.m_enabled;
-    m_autonomous = word.m_autonomous;
-    m_test = word.m_test;
     m_emergencyStop = word.m_emergencyStop;
     m_fmsAttached = word.m_fmsAttached;
     m_dsAttached = word.m_dsAttached;
@@ -50,26 +82,41 @@ public class ControlWord {
    *
    * @return the Enabled flag
    */
-  public boolean getEnabled() {
+  public boolean isEnabled() {
     return m_enabled;
   }
 
   /**
-   * Gets the Autonomous mode flag.
+   * Gets the robot mode.
    *
-   * @return the Autonomous mode flag
+   * @return the robot mode
    */
-  public boolean getAutonomous() {
-    return m_autonomous;
+  public RobotMode getRobotMode() {
+    return m_robotMode;
   }
 
   /**
-   * Gets the Test mode flag.
+   * Gets the opmode ID.
    *
-   * @return the Test mode flag
+   * @return the opmode ID
    */
-  public boolean getTest() {
-    return m_test;
+  public long getOpModeId() {
+    if ((m_word & 0x00FFFFFFFFFFFFFFL) == 0) {
+      return 0;
+    }
+    return m_word & 0x03FFFFFFFFFFFFFFL;
+  }
+
+  /**
+   * Sets the opmode ID.
+   *
+   * @param id opmode ID
+   */
+  public void setOpModeId(long id) {
+    m_word &= ~0x03FFFFFFFFFFFFFFL;
+    m_word |= id & 0x03FFFFFFFFFFFFFFL;
+    // keep robot mode in sync
+    m_robotMode = RobotMode.fromInt((int) ((m_word >> 56) & 3));
   }
 
   /**
@@ -77,7 +124,7 @@ public class ControlWord {
    *
    * @return the E-Stop flag
    */
-  public boolean getEStop() {
+  public boolean isEStopped() {
     return m_emergencyStop;
   }
 
@@ -86,7 +133,7 @@ public class ControlWord {
    *
    * @return the FMS attached flag
    */
-  public boolean getFMSAttached() {
+  public boolean isFMSAttached() {
     return m_fmsAttached;
   }
 
@@ -95,7 +142,28 @@ public class ControlWord {
    *
    * @return the DS attached flag
    */
-  public boolean getDSAttached() {
+  public boolean isDSAttached() {
     return m_dsAttached;
   }
+
+  /**
+   * Gets the native HAL control word value.
+   *
+   * @return control word value
+   */
+  public long getNative() {
+    return m_word;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof ControlWord word && m_word == word.m_word;
+  }
+
+  @Override
+  public int hashCode() {
+    return Long.hashCode(m_word);
+  }
+
+  public static final ControlWordStruct struct = new ControlWordStruct();
 }

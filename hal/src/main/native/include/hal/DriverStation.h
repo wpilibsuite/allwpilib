@@ -67,6 +67,16 @@ int32_t HAL_SendConsoleLine(const char* line);
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord);
 
 /**
+ * Sets operating mode options.
+ *
+ * @param options array of operating mode options
+ * @param count number of options in the array
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
+                             int32_t count);
+
+/**
  * Gets the current alliance station ID.
  *
  * @param[out] status the error code, or 0 for success
@@ -241,40 +251,15 @@ void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle);
 void HAL_ObserveUserProgramStarting(void);
 
 /**
- * Sets the disabled flag in the DS.
+ * Sets the control word state returned to the DS.
  *
  * This is used for the DS to ensure the robot is properly responding to its
  * state request. Ensure this gets called about every 50ms, or the robot will be
  * disabled by the DS.
- */
-void HAL_ObserveUserProgramDisabled(void);
-
-/**
- * Sets the autonomous enabled flag in the DS.
  *
- * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this gets called about every 50ms, or the robot will be
- * disabled by the DS.
+ * @param word control word returned by HAL_GetControlWord
  */
-void HAL_ObserveUserProgramAutonomous(void);
-
-/**
- * Sets the teleoperated enabled flag in the DS.
- *
- * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this gets called about every 50ms, or the robot will be
- * disabled by the DS.
- */
-void HAL_ObserveUserProgramTeleop(void);
-
-/**
- * Sets the test mode flag in the DS.
- *
- * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this gets called about every 50ms, or the robot will be
- * disabled by the DS.
- */
-void HAL_ObserveUserProgramTest(void);
+void HAL_ObserveUserProgram(HAL_ControlWord word);
 
 #ifdef __cplusplus
 }  // extern "C"

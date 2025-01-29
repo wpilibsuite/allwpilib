@@ -176,7 +176,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the Robot is currently disabled by the Driver Station.
    */
-  public boolean isDisabled() {
+  public static boolean isDisabled() {
     return DriverStation.isDisabled();
   }
 
@@ -185,7 +185,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the Robot is currently enabled by the Driver Station.
    */
-  public boolean isEnabled() {
+  public static boolean isEnabled() {
     return DriverStation.isEnabled();
   }
 
@@ -194,7 +194,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating Autonomously.
    */
-  public boolean isAutonomous() {
+  public static boolean isAutonomous() {
     return DriverStation.isAutonomous();
   }
 
@@ -204,7 +204,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating autonomously while enabled.
    */
-  public boolean isAutonomousEnabled() {
+  public static boolean isAutonomousEnabled() {
     return DriverStation.isAutonomousEnabled();
   }
 
@@ -213,7 +213,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating in Test mode.
    */
-  public boolean isTest() {
+  public static boolean isTest() {
     return DriverStation.isTest();
   }
 
@@ -222,7 +222,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating in Test mode while enabled.
    */
-  public boolean isTestEnabled() {
+  public static boolean isTestEnabled() {
     return DriverStation.isTestEnabled();
   }
 
@@ -232,7 +232,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating in Tele-Op mode.
    */
-  public boolean isTeleop() {
+  public static boolean isTeleop() {
     return DriverStation.isTeleop();
   }
 
@@ -242,8 +242,30 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating in Tele-Op mode while enabled.
    */
-  public boolean isTeleopEnabled() {
+  public static boolean isTeleopEnabled() {
     return DriverStation.isTeleopEnabled();
+  }
+
+  /**
+   * Gets the currently selected operating mode of the driver station. Note this does not mean the
+   * robot is enabled; use isEnabled() for that.
+   *
+   * @return the unique ID provided by the DriverStation.addOpMode() function; may return 0 or a
+   *     unique ID not added, so callers should be prepared to handle that case
+   */
+  public static long getOpModeId() {
+    return DriverStation.getOpModeId();
+  }
+
+  /**
+   * Gets the currently selected operating mode of the driver station. Note this does not mean the
+   * robot is enabled; use isEnabled() for that.
+   *
+   * @return Operating mode string; may return a string not in the list of options, so callers
+   *     should be prepared to handle that case
+   */
+  public static String getOpMode() {
+    return DriverStation.getOpMode();
   }
 
   /**

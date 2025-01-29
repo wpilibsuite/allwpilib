@@ -52,6 +52,7 @@ static JClass matchInfoDataCls;
 static JClass canReceiveMessageCls;
 static JClass canStreamMessageCls;
 static JClass halValueCls;
+static JClass opModeOptionCls;
 static JClass revPHVersionCls;
 static JClass canStreamOverflowExCls;
 
@@ -63,6 +64,7 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/hal/can/CANReceiveMessage", &canReceiveMessageCls},
     {"edu/wpi/first/hal/can/CANStreamMessage", &canStreamMessageCls},
     {"edu/wpi/first/hal/HALValue", &halValueCls},
+    {"edu/wpi/first/hal/OpModeOption", &opModeOptionCls},
     {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls},
     {"edu/wpi/first/hal/can/CANStreamOverflowException",
      &canStreamOverflowExCls}};
@@ -184,6 +186,71 @@ void ThrowBoundaryException(JNIEnv* env, double value, double lower,
       static_cast<jdouble>(lower), static_cast<jdouble>(upper));
   jobject ex = env->NewObject(boundaryExCls, constructor, msg);
   env->Throw(static_cast<jthrowable>(ex));
+}
+
+jobject CreateOpModeOption(JNIEnv* env, const HAL_OpModeOption& option) {
+  static jmethodID constructor = env->GetMethodID(
+      opModeOptionCls, "<init>",
+      "(JLjava/lang/String;L/java/lang/String;Ljava/lang/String;II)V");
+  JLocal<jstring> name{env,
+                       MakeJString(env, wpi::to_string_view(&option.name))};
+  JLocal<jstring> group{env,
+                        MakeJString(env, wpi::to_string_view(&option.group))};
+  JLocal<jstring> desc{
+      env, MakeJString(env, wpi::to_string_view(&option.description))};
+  return env->NewObject(opModeOptionCls, constructor,
+                        static_cast<jlong>(option.id), name.obj(), group.obj(),
+                        desc.obj(), static_cast<jint>(option.textColor),
+                        static_cast<jint>(option.backgroundColor));
+}
+
+jobjectArray CreateOpModeOptionArray(
+    JNIEnv* env, std::span<const HAL_OpModeOption> options) {
+  jobjectArray arr =
+      env->NewObjectArray(options.size(), opModeOptionCls, nullptr);
+  if (!arr) {
+    return nullptr;
+  }
+  size_t i = 0;
+  for (auto& option : options) {
+    JLocal<jobject> elem{env, CreateOpModeOption(env, option)};
+    env->SetObjectArrayElement(arr, i++, elem);
+  }
+  return arr;
+}
+
+HAL_OpModeOption CreateOpModeOptionFromJava(JNIEnv* env, jobject option) {
+  static jfieldID idField = env->GetFieldID(opModeOptionCls, "id", "J");
+  static jfieldID nameField =
+      env->GetFieldID(opModeOptionCls, "name", "Ljava/lang/String;");
+  static jfieldID groupField =
+      env->GetFieldID(opModeOptionCls, "group", "Ljava/lang/String;");
+  static jfieldID descriptionField =
+      env->GetFieldID(opModeOptionCls, "description", "Ljava/lang/String;");
+  static jfieldID textColorField =
+      env->GetFieldID(opModeOptionCls, "textColor", "I");
+  static jfieldID backgroundColorField =
+      env->GetFieldID(opModeOptionCls, "backgroundColor", "I");
+  if (!idField || !nameField || !groupField || !descriptionField ||
+      !textColorField || !backgroundColorField) {
+    ThrowIllegalArgumentException(env, "Missing field in OpModeOption");
+    return {0, {}, {}, {}, 0, 0};
+  }
+  int64_t id = env->GetLongField(option, idField);
+  JLocal<jstring> name{
+      env, static_cast<jstring>(env->GetObjectField(option, nameField))};
+  JLocal<jstring> group{
+      env, static_cast<jstring>(env->GetObjectField(option, groupField))};
+  JLocal<jstring> description{
+      env, static_cast<jstring>(env->GetObjectField(option, descriptionField))};
+  jint textColor = env->GetIntField(option, textColorField);
+  jint backgroundColor = env->GetIntField(option, backgroundColorField);
+  return {id,
+          wpi::make_string(JStringRef{env, name}),
+          wpi::make_string(JStringRef{env, group}),
+          wpi::make_string(JStringRef{env, description}),
+          textColor,
+          backgroundColor};
 }
 
 jobject CreateREVPHVersion(JNIEnv* env, uint32_t firmwareMajor,
