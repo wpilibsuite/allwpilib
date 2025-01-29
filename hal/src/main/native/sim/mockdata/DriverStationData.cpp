@@ -2,9 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "hal/simulation/DriverStationData.h"
 #include <cstring>
 
+#include <fmt/format.h>
+
 #include "DriverStationDataInternal.h"
+#include "hal/DriverStationTypes.h"
 
 using namespace hal;
 
@@ -21,15 +25,21 @@ DriverStationData::DriverStationData() {
   ResetData();
 }
 
+DriverStationData::~DriverStationData() {
+  HALSIM_FreeOpModeOptionsArray(m_autoOpModes.data(), m_autoOpModes.size());
+  HALSIM_FreeOpModeOptionsArray(m_teleopOpModes.data(), m_teleopOpModes.size());
+  HALSIM_FreeOpModeOptionsArray(m_testOpModes.data(), m_testOpModes.size());
+}
+
 void DriverStationData::ResetData() {
   enabled.Reset(false);
-  autonomous.Reset(false);
-  test.Reset(false);
+  robotMode.Reset(HAL_ROBOTMODE_UNKNOWN);
   eStop.Reset(false);
   fmsAttached.Reset(false);
   dsAttached.Reset(false);
   allianceStationId.Reset(static_cast<HAL_AllianceStationID>(0));
   matchTime.Reset(-1.0);
+  opMode.Reset(0);
 
   {
     std::scoped_lock lock(m_joystickDataMutex);
@@ -52,8 +62,219 @@ void DriverStationData::ResetData() {
     m_matchInfoCallbacks.Reset();
     m_matchInfo = HAL_MatchInfo{};
   }
+  {
+    std::scoped_lock lock{m_opModeMutex};
+    m_autoOpModesCallbacks.Reset();
+    m_teleopOpModesCallbacks.Reset();
+    m_testOpModesCallbacks.Reset();
+    // XXX: do not clear options vectors as they come from robot code?
+  }
   m_newDataCallbacks.Reset();
 }
+
+bool DriverStationData::GetOpModeMapVec(HAL_RobotMode mode,
+                                        wpi::DenseMap<int64_t, uint32_t>** map,
+                                        std::vector<HALSIM_OpModeOption>** vec,
+                                        int64_t* hashBase) {
+  switch (mode) {
+    case HAL_ROBOTMODE_AUTONOMOUS:
+      *map = &m_autoOpModesMap;
+      *vec = &m_autoOpModes;
+      *hashBase = 0x0100000000000000;
+      return true;
+    case HAL_ROBOTMODE_TELEOPERATED:
+      *map = &m_teleopOpModesMap;
+      *vec = &m_teleopOpModes;
+      *hashBase = 0;
+      return true;
+    case HAL_ROBOTMODE_TEST:
+      *map = &m_testOpModesMap;
+      *vec = &m_testOpModes;
+      *hashBase = 0x0200000000000000;
+      return true;
+    default:
+      return false;
+  }
+}
+
+void DriverStationData::CallOpModesCallbacks(HAL_RobotMode mode) {
+  switch (mode) {
+    case HAL_ROBOTMODE_AUTONOMOUS:
+      m_autoOpModesCallbacks.Invoke(m_autoOpModes.data(), m_autoOpModes.size());
+      break;
+    case HAL_ROBOTMODE_TELEOPERATED:
+      m_teleopOpModesCallbacks.Invoke(m_teleopOpModes.data(),
+                                      m_teleopOpModes.size());
+      break;
+    case HAL_ROBOTMODE_TEST:
+      m_testOpModesCallbacks.Invoke(m_testOpModes.data(), m_testOpModes.size());
+      break;
+    default:
+      break;
+  }
+}
+
+int64_t DriverStationData::AddOpMode(HAL_RobotMode mode, std::string_view name,
+                                     std::string_view group,
+                                     std::string_view description,
+                                     int32_t textColor,
+                                     int32_t backgroundColor) {
+  wpi::DenseMap<int64_t, uint32_t>* map;
+  std::vector<HALSIM_OpModeOption>* vec;
+  int64_t baseVal;
+  if (!GetOpModeMapVec(mode, &map, &vec, &baseVal)) {
+    return 0;
+  }
+
+  std::string nameCopy{name};
+  int64_t h;
+
+  std::scoped_lock lock{m_opModeMutex};
+  for (;;) {
+    h = baseVal | (std::hash<std::string_view>{}(nameCopy)&kOpModeHashMask);
+    auto [it, isNew] = map->try_emplace(h, vec->size());
+    if (isNew) {
+      break;
+    }
+    if (wpi::to_string_view(&(*vec)[it->first].name) == name) {
+      return 0;  // can't insert duplicate name
+    }
+    // try again with a space appended to name
+    nameCopy += ' ';
+  }
+  vec->emplace_back(
+      mode, wpi::alloc_wpi_string(nameCopy), wpi::alloc_wpi_string(group),
+      wpi::alloc_wpi_string(description), textColor, backgroundColor);
+  CallOpModesCallbacks(mode);
+  return h;
+}
+
+int64_t DriverStationData::RemoveOpMode(HAL_RobotMode mode,
+                                        std::string_view name) {
+  wpi::DenseMap<int64_t, uint32_t>* map;
+  std::vector<HALSIM_OpModeOption>* vec;
+  int64_t baseVal;
+  if (!GetOpModeMapVec(mode, &map, &vec, &baseVal)) {
+    return 0;
+  }
+  std::string nameCopy{name};
+  int64_t h;
+  std::scoped_lock lock{m_opModeMutex};
+  for (;;) {
+    h = baseVal | (std::hash<std::string_view>{}(nameCopy)&kOpModeHashMask);
+    auto it = map->find(h);
+    if (it == map->end()) {
+      return 0;  // no match
+    }
+    if (wpi::to_string_view(&(*vec)[it->first].name) == name) {
+      // found match; erase it
+      map->erase(it);
+      HALSIM_OpModeOption& data = (*vec)[it->first];
+      data.id = 0;
+      WPI_FreeString(&data.name);
+      data.name.str = nullptr;
+      WPI_FreeString(&data.group);
+      data.group.str = nullptr;
+      WPI_FreeString(&data.description);
+      data.description.str = nullptr;
+      CallOpModesCallbacks(mode);
+      return h;
+    }
+    // try again with a space appended to name
+    nameCopy += ' ';
+  }
+}
+
+void DriverStationData::ClearOpModes() {
+  std::scoped_lock lock{m_opModeMutex};
+
+  bool hasAutoOpModes = !m_autoOpModesMap.empty();
+  HALSIM_FreeOpModeOptionsArray(m_autoOpModes.data(), m_autoOpModes.size());
+  m_autoOpModes.clear();
+  m_autoOpModesMap.clear();
+
+  bool hasTeleopOpModes = !m_teleopOpModesMap.empty();
+  HALSIM_FreeOpModeOptionsArray(m_teleopOpModes.data(), m_teleopOpModes.size());
+  m_teleopOpModes.clear();
+  m_teleopOpModesMap.clear();
+
+  bool hasTestOpModes = !m_testOpModesMap.empty();
+  HALSIM_FreeOpModeOptionsArray(m_testOpModes.data(), m_testOpModes.size());
+  m_testOpModes.clear();
+  m_testOpModesMap.clear();
+
+  if (hasAutoOpModes) {
+    m_autoOpModesCallbacks.Invoke(m_autoOpModes.data(), m_autoOpModes.size());
+  }
+  if (hasTeleopOpModes) {
+    m_teleopOpModesCallbacks.Invoke(m_teleopOpModes.data(),
+                                    m_teleopOpModes.size());
+  }
+  if (hasTestOpModes) {
+    m_testOpModesCallbacks.Invoke(m_testOpModes.data(), m_testOpModes.size());
+  }
+}
+
+#define DEFINE_CPPAPI_CALLBACKS(Upper, lower)                               \
+  int32_t DriverStationData::Register##Upper##OpModesCallback(              \
+      HAL_OpModeOptionsCallback callback, void* param,                      \
+      HAL_Bool initialNotify) {                                             \
+    std::scoped_lock lock(m_opModeMutex);                                   \
+    int32_t uid = m_##lower##OpModesCallbacks.Register(callback, param);    \
+    if (initialNotify) {                                                    \
+      callback(Get##Upper##OpModesName(), param, m_##lower##OpModes.data(), \
+               m_##lower##OpModes.size());                                  \
+    }                                                                       \
+    return uid;                                                             \
+  }                                                                         \
+                                                                            \
+  void DriverStationData::Cancel##Upper##OpModesCallback(int32_t uid) {     \
+    m_##lower##OpModesCallbacks.Cancel(uid);                                \
+  }
+
+#define DEFINE_CPPAPI(Upper, lower)                                            \
+  DEFINE_CPPAPI_CALLBACKS(Upper, lower)                                        \
+                                                                               \
+  HALSIM_OpModeOption* DriverStationData::Get##Upper##OpModes(int32_t* len) {  \
+    std::scoped_lock lock(m_opModeMutex);                                      \
+    *len = 0;                                                                  \
+    if (m_##lower##OpModes.empty()) {                                          \
+      return nullptr;                                                          \
+    }                                                                          \
+                                                                               \
+    auto options = static_cast<HALSIM_OpModeOption*>(                          \
+        std::malloc(sizeof(HALSIM_OpModeOption) * m_##lower##OpModes.size())); \
+    auto end =                                                                 \
+        std::copy_if(m_##lower##OpModes.begin(), m_##lower##OpModes.end(),     \
+                     options, [](const auto& data) { return data.id != 0; });  \
+    *len = end - options;                                                      \
+    if (*len == 0) {                                                           \
+      std::free(options);                                                      \
+      return nullptr;                                                          \
+    }                                                                          \
+    for (auto option = options; option != end; ++option) {                     \
+      if (option->name.str) {                                                  \
+        option->name =                                                         \
+            wpi::alloc_wpi_string(wpi::to_string_view(&option->name));         \
+      }                                                                        \
+      if (option->group.str) {                                                 \
+        option->group =                                                        \
+            wpi::alloc_wpi_string(wpi::to_string_view(&option->group));        \
+      }                                                                        \
+      if (option->description.str) {                                           \
+        option->description =                                                  \
+            wpi::alloc_wpi_string(wpi::to_string_view(&option->description));  \
+      }                                                                        \
+    }                                                                          \
+    return options;                                                            \
+  }
+
+DEFINE_CPPAPI(Auto, auto)
+DEFINE_CPPAPI(Teleop, teleop)
+DEFINE_CPPAPI(Test, test)
+
+#undef DEFINE_CPPAPI_CALLBACKS
+#undef DEFINE_CPPAPI
 
 #define DEFINE_CPPAPI_CALLBACKS(name, data, data2)                             \
   int32_t DriverStationData::RegisterJoystick##name##Callback(                 \
@@ -408,13 +629,43 @@ void HALSIM_ResetDriverStationData(void) {
                                        SimDriverStationData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Enabled, enabled)
-DEFINE_CAPI(HAL_Bool, Autonomous, autonomous)
-DEFINE_CAPI(HAL_Bool, Test, test)
+DEFINE_CAPI(HAL_RobotMode, RobotMode, robotMode)
 DEFINE_CAPI(HAL_Bool, EStop, eStop)
 DEFINE_CAPI(HAL_Bool, FmsAttached, fmsAttached)
 DEFINE_CAPI(HAL_Bool, DsAttached, dsAttached)
 DEFINE_CAPI(HAL_AllianceStationID, AllianceStationId, allianceStationId)
 DEFINE_CAPI(double, MatchTime, matchTime)
+DEFINE_CAPI(int64_t, OpMode, opMode)
+
+#undef DEFINE_CAPI
+#define DEFINE_CAPI(name)                                               \
+  int32_t HALSIM_Register##name##OpModesCallback(                       \
+      HAL_OpModeOptionsCallback callback, void* param,                  \
+      HAL_Bool initialNotify) {                                         \
+    return SimDriverStationData->Register##name##OpModesCallback(       \
+        callback, param, initialNotify);                                \
+  }                                                                     \
+                                                                        \
+  void HALSIM_Cancel##name##OpModesCallback(int32_t uid) {              \
+    return SimDriverStationData->Cancel##name##OpModesCallback(uid);    \
+  }                                                                     \
+                                                                        \
+  struct HALSIM_OpModeOption* HALSIM_Get##name##OpModes(int32_t* len) { \
+    return SimDriverStationData->Get##name##OpModes(len);               \
+  }
+
+DEFINE_CAPI(Auto)
+DEFINE_CAPI(Teleop)
+DEFINE_CAPI(Test)
+
+void HALSIM_FreeOpModeOptionsArray(HALSIM_OpModeOption* arr, size_t length) {
+  for (size_t i = 0; i < length; ++i) {
+    WPI_FreeString(&arr[i].name);
+    WPI_FreeString(&arr[i].group);
+    WPI_FreeString(&arr[i].description);
+  }
+  std::free(arr);
+}
 
 #undef DEFINE_CAPI
 #define DEFINE_CAPI(name, data)                                                \
@@ -576,8 +827,7 @@ void HALSIM_RegisterDriverStationAllCallbacks(HAL_NotifyCallback callback,
                                               void* param,
                                               HAL_Bool initialNotify) {
   REGISTER(enabled);
-  REGISTER(autonomous);
-  REGISTER(test);
+  REGISTER(robotMode);
   REGISTER(eStop);
   REGISTER(fmsAttached);
   REGISTER(dsAttached);

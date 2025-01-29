@@ -13,6 +13,7 @@
 
 #include "frc/simulation/DriverStationSim.h"
 #include "frc/simulation/SimHooks.h"
+#include "hal/DriverStationTypes.h"
 
 using namespace frc;
 
@@ -161,8 +162,7 @@ TEST_F(TimedRobotTest, AutonomousMode) {
   std::thread robotThread{[&] { robot.StartCompetition(); }};
 
   frc::sim::DriverStationSim::SetEnabled(true);
-  frc::sim::DriverStationSim::SetAutonomous(true);
-  frc::sim::DriverStationSim::SetTest(false);
+  frc::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_AUTONOMOUS);
   frc::sim::DriverStationSim::NotifyNewData();
   frc::sim::StepTiming(0_ms);  // Wait for Notifiers
 
@@ -237,8 +237,7 @@ TEST_F(TimedRobotTest, TeleopMode) {
   std::thread robotThread{[&] { robot.StartCompetition(); }};
 
   frc::sim::DriverStationSim::SetEnabled(true);
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetTest(false);
+  frc::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
   frc::sim::DriverStationSim::NotifyNewData();
   frc::sim::StepTiming(0_ms);  // Wait for Notifiers
 
@@ -312,8 +311,7 @@ TEST_F(TimedRobotTest, TestMode) {
   std::thread robotThread{[&] { robot.StartCompetition(); }};
 
   frc::sim::DriverStationSim::SetEnabled(true);
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetTest(true);
+  frc::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TEST);
   frc::sim::DriverStationSim::NotifyNewData();
   frc::sim::StepTiming(0_ms);  // Wait for Notifiers
 
@@ -379,8 +377,6 @@ TEST_F(TimedRobotTest, TestMode) {
   EXPECT_EQ(0u, robot.m_testExitCount);
 
   frc::sim::DriverStationSim::SetEnabled(false);
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetTest(false);
   frc::sim::DriverStationSim::NotifyNewData();
   frc::sim::StepTiming(20_ms);  // Wait for Notifiers
 
@@ -414,8 +410,6 @@ TEST_F(TimedRobotTest, ModeChange) {
 
   // Start in disabled
   frc::sim::DriverStationSim::SetEnabled(false);
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetTest(false);
   frc::sim::DriverStationSim::NotifyNewData();
   frc::sim::StepTiming(0_ms);  // Wait for Notifiers
 
@@ -443,8 +437,7 @@ TEST_F(TimedRobotTest, ModeChange) {
 
   // Transition to autonomous
   frc::sim::DriverStationSim::SetEnabled(true);
-  frc::sim::DriverStationSim::SetAutonomous(true);
-  frc::sim::DriverStationSim::SetTest(false);
+  frc::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_AUTONOMOUS);
   frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(kPeriod);
@@ -461,8 +454,7 @@ TEST_F(TimedRobotTest, ModeChange) {
 
   // Transition to teleop
   frc::sim::DriverStationSim::SetEnabled(true);
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetTest(false);
+  frc::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
   frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(kPeriod);
@@ -479,8 +471,7 @@ TEST_F(TimedRobotTest, ModeChange) {
 
   // Transition to test
   frc::sim::DriverStationSim::SetEnabled(true);
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetTest(true);
+  frc::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TEST);
   frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(kPeriod);
@@ -497,8 +488,6 @@ TEST_F(TimedRobotTest, ModeChange) {
 
   // Transition to disabled
   frc::sim::DriverStationSim::SetEnabled(false);
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetTest(false);
   frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(kPeriod);

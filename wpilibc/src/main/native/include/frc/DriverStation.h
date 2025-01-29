@@ -8,16 +8,21 @@
 
 #include <optional>
 #include <string>
+#include <string_view>
 
 #include <hal/DriverStationTypes.h>
 #include <units/time.h>
 #include <wpi/Synchronization.h>
+
+#include "frc/DSControlWord.h"
 
 namespace wpi::log {
 class DataLog;
 }  // namespace wpi::log
 
 namespace frc {
+
+class Color;
 
 /**
  * Provide access to the network communication data to / from the Driver
@@ -254,6 +259,15 @@ class DriverStation final {
   static bool IsEStopped();
 
   /**
+   * Gets the current robot mode.
+   * 
+   * <p>Note that this does not indicate whether the robot is enabled or disabled.
+   *
+   * @return robot mode
+   */
+  static DSControlWord::RobotMode GetRobotMode();
+
+  /**
    * Check if the DS is commanding autonomous mode.
    *
    * @return True if the robot is being commanded to be in autonomous mode
@@ -298,6 +312,86 @@ class DriverStation final {
    * enabled.
    */
   static bool IsTestEnabled();
+
+  /**
+   * Adds an operating mode option.
+   *
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param group group of the operating mode
+   * @param description description of the operating mode
+   * @param textColor text color, or null for default
+   * @param backgroundColor background color, or null for default
+   * @return unique ID used to later identify the operating mode; if an empty
+   * string is passed, 0 is returned; identical names for the same robot
+   * mode result in identical unique IDs
+   */
+  static int64_t AddOpMode(DSControlWord::RobotMode mode, std::string_view name,
+                           std::string_view group, std::string_view description,
+                           const Color& textColor,
+                           const Color& backgroundColor);
+
+  /**
+   * Adds an operating mode option.
+   *
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param group group of the operating mode
+   * @param description description of the operating mode
+   * @return unique ID used to later identify the operating mode; if an empty
+   * string is passed, 0 is returned; identical names for the same robot
+   * mode result in identical unique IDs
+   */
+  static int64_t AddOpMode(DSControlWord::RobotMode mode, std::string_view name,
+                           std::string_view group = {},
+                           std::string_view description = {});
+
+  /**
+   * Removes an operating mode option.
+   *
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @return unique ID, 0 if not present
+   */
+  static int64_t RemoveOpMode(DSControlWord::RobotMode mode,
+                              std::string_view name);
+
+  /**
+   * Clears all operating mode options.
+   */
+  static void ClearOpModes();
+
+  /**
+   * Get the current operating mode.
+   *
+   * @return the unique ID provided by the AddOpMode() function, or 0 to
+   *         indicate the robot is disabled (no active operating mode)
+   */
+  static int64_t GetOpModeId();
+
+  /**
+   * Get the current operating mode.
+   *
+   * @return Operating mode string, or "" to indicate the robot is disabled (no
+   *         active operating mode).
+   */
+  static std::string GetOpMode();
+
+  /**
+   * Check to see if the current operating mode is a particular value.
+   *
+   * @param mode operating mode
+   * @return True if that mode is the current mode
+   */
+  static bool IsOpMode(int64_t id);
+
+  /**
+   * Check to see if the current operating mode is a particular value.
+   *
+   * @param mode operating mode
+   * @return True if that mode is the current mode
+   */
+  static bool IsOpMode(std::string_view mode);
 
   /**
    * Check if the DS is attached.

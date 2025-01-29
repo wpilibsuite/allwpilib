@@ -4,10 +4,14 @@
 
 #pragma once
 
+#include <span>
+
 #include "hal/Types.h"
 #include "jni.h"
 
 using SIM_JniHandle = HAL_Handle;  // NOLINT
+
+struct HALSIM_OpModeOption;
 
 namespace hal::sim {
 JavaVM* GetJVM();
@@ -15,4 +19,7 @@ JavaVM* GetJVM();
 jmethodID GetNotifyCallback();
 jmethodID GetBufferCallback();
 jmethodID GetConstBufferCallback();
+jmethodID GetBiConsumerCallback();
+jobject CreateOpModeOption(JNIEnv* env, const HALSIM_OpModeOption& option);
+jobjectArray CreateOpModeOptionArray(JNIEnv* env, std::span<const HALSIM_OpModeOption> options);
 }  // namespace hal::sim

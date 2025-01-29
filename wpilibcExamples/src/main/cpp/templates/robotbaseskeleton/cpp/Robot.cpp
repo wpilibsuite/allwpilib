@@ -8,6 +8,7 @@
 #include <frc/internal/DriverStationModeThread.h>
 #include <hal/DriverStation.h>
 #include <networktables/NetworkTable.h>
+#include "hal/DriverStationTypes.h"
 
 Robot::Robot() {}
 
@@ -22,6 +23,15 @@ void Robot::Test() {}
 void Robot::StartCompetition() {
   frc::internal::DriverStationModeThread modeThread;
 
+  // Create an opmode per robot mode
+  WPI_String name;
+  WPI_InitString(&name, "Auto");
+  HAL_AddOpMode(HAL_ROBOTMODE_AUTONOMOUS, &name, nullptr, nullptr, -1, -1);
+  WPI_InitString(&name, "Teleop");
+  HAL_AddOpMode(HAL_ROBOTMODE_TELEOPERATED, &name, nullptr, nullptr, -1, -1);
+  WPI_InitString(&name, "Test");
+  HAL_AddOpMode(HAL_ROBOTMODE_TEST, &name, nullptr, nullptr, -1, -1);
+
   wpi::Event event{false, false};
   frc::DriverStation::ProvideRefreshedDataEventHandle(event.GetHandle());
 
@@ -29,31 +39,26 @@ void Robot::StartCompetition() {
   HAL_ObserveUserProgramStarting();
 
   while (!m_exit) {
-    if (IsDisabled()) {
-      modeThread.InDisabled(true);
+    int64_t opMode = GetOpModeId();
+    bool enabled = IsEnabled();
+    modeThread.InOpMode(opMode, enabled);
+    if (!enabled) {
       Disabled();
-      modeThread.InDisabled(false);
       while (IsDisabled()) {
         wpi::WaitForObject(event.GetHandle());
       }
     } else if (IsAutonomous()) {
-      modeThread.InAutonomous(true);
       Autonomous();
-      modeThread.InAutonomous(false);
       while (IsAutonomousEnabled()) {
         wpi::WaitForObject(event.GetHandle());
       }
     } else if (IsTest()) {
-      modeThread.InTest(true);
       Test();
-      modeThread.InTest(false);
       while (IsTest() && IsEnabled()) {
         wpi::WaitForObject(event.GetHandle());
       }
     } else {
-      modeThread.InTeleop(true);
       Teleop();
-      modeThread.InTeleop(false);
       while (IsTeleopEnabled()) {
         wpi::WaitForObject(event.GetHandle());
       }

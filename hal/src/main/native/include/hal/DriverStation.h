@@ -67,6 +67,51 @@ int32_t HAL_SendConsoleLine(const char* line);
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord);
 
 /**
+ * Adds an operating mode option.
+ *
+ * @param mode robot mode (HAL_RobotMode enum)
+ * @param name name of the operating mode
+ * @param group group of the operating mode
+ * @param description description of the operating mode
+ * @param textColor text color, in 0xRRGGBB format, or -1 for default
+ * @param backgroundColor background color, in 0xRRGGBB format, or -1 for
+ *                        default
+ * @return unique ID used to later identify the operating mode; if an empty
+ *         string is passed, 0 is returned; identical names for the same robot
+ *         mode result in identical unique IDs
+ */
+int64_t HAL_AddOpMode(int32_t mode, const struct WPI_String* name,
+                      const struct WPI_String* group,
+                      const struct WPI_String* description, int32_t textColor,
+                      int32_t backgroundColor);
+
+/**
+ * Removes an operating mode option.
+ *
+ * @param mode robot mode (HAL_RobotMode enum)
+ * @param name name of the operating mode
+ * @return unique ID, 0 if not present
+ */
+int64_t HAL_RemoveOpMode(int32_t mode, const struct WPI_String* name);
+
+/**
+ * Clears all operating mode options.
+ */
+void HAL_ClearOpModes(void);
+
+/**
+ * Gets the currently selected operating mode of the driver station.
+ * Note this does not mean the robot is enabled; use the control word for that.
+ * While it's possible to use the unique ID to determine the robot mode, it's
+ * recommended the control word also be used for that purpose.
+ *
+ * @return the unique ID provided by the HAL_AddOpMode() function; may return 0
+ *         or a unique ID not added, so callers should be prepared to handle
+ *         that case
+ */
+int64_t HAL_GetOpMode(void);
+
+/**
  * Gets the current alliance station ID.
  *
  * @param[out] status the error code, or 0 for success
@@ -241,40 +286,16 @@ void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle);
 void HAL_ObserveUserProgramStarting(void);
 
 /**
- * Sets the disabled flag in the DS.
+ * Sets the opmode returned to the DS.
  *
  * This is used for the DS to ensure the robot is properly responding to its
  * state request. Ensure this gets called about every 50ms, or the robot will be
  * disabled by the DS.
- */
-void HAL_ObserveUserProgramDisabled(void);
-
-/**
- * Sets the autonomous enabled flag in the DS.
  *
- * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this gets called about every 50ms, or the robot will be
- * disabled by the DS.
+ * @param id operating mode unique id returned by HAL_AddOpMode()
+ * @param enabled true if robot is enabled, false if disabled
  */
-void HAL_ObserveUserProgramAutonomous(void);
-
-/**
- * Sets the teleoperated enabled flag in the DS.
- *
- * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this gets called about every 50ms, or the robot will be
- * disabled by the DS.
- */
-void HAL_ObserveUserProgramTeleop(void);
-
-/**
- * Sets the test mode flag in the DS.
- *
- * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this gets called about every 50ms, or the robot will be
- * disabled by the DS.
- */
-void HAL_ObserveUserProgramTest(void);
+void HAL_ObserveUserProgramOpMode(int64_t id, HAL_Bool enabled);
 
 #ifdef __cplusplus
 }  // extern "C"

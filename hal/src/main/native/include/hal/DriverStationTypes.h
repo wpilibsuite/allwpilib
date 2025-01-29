@@ -8,31 +8,19 @@
 
 #include "hal/Types.h"
 
+#ifdef __cplusplus
+#include <wpi/struct/Struct.h>
+#endif  // __cplusplus
+
 /**
  * @defgroup hal_driverstation Driver Station Functions
  * @ingroup hal_capi
  * @{
  */
 
-#define HAL_IO_CONFIG_DATA_SIZE 32
-#define HAL_SYS_STATUS_DATA_SIZE 44
-#define HAL_USER_STATUS_DATA_SIZE \
-  (984 - HAL_IO_CONFIG_DATA_SIZE - HAL_SYS_STATUS_DATA_SIZE)
-
-#define HALFRC_NetworkCommunication_DynamicType_DSEnhancedIO_Input 17
-#define HALFRC_NetworkCommunication_DynamicType_DSEnhancedIO_Output 18
-#define HALFRC_NetworkCommunication_DynamicType_Kinect_Header 19
-#define HALFRC_NetworkCommunication_DynamicType_Kinect_Extra1 20
-#define HALFRC_NetworkCommunication_DynamicType_Kinect_Vertices1 21
-#define HALFRC_NetworkCommunication_DynamicType_Kinect_Extra2 22
-#define HALFRC_NetworkCommunication_DynamicType_Kinect_Vertices2 23
-#define HALFRC_NetworkCommunication_DynamicType_Kinect_Joystick 24
-#define HALFRC_NetworkCommunication_DynamicType_Kinect_Custom 25
-
 struct HAL_ControlWord {
   uint32_t enabled : 1;
-  uint32_t autonomous : 1;
-  uint32_t test : 1;
+  uint32_t robotMode : 2;  // HAL_RobotMode enum
   uint32_t eStop : 1;
   uint32_t fmsAttached : 1;
   uint32_t dsAttached : 1;
@@ -62,6 +50,13 @@ HAL_ENUM(HAL_MatchType) {
   HAL_kMatchType_practice,
   HAL_kMatchType_qualification,
   HAL_kMatchType_elimination,
+};
+
+HAL_ENUM(HAL_RobotMode) {
+  HAL_ROBOTMODE_UNKNOWN = 0,
+  HAL_ROBOTMODE_AUTONOMOUS,
+  HAL_ROBOTMODE_TELEOPERATED,
+  HAL_ROBOTMODE_TEST,
 };
 
 /**
@@ -142,3 +137,35 @@ struct HAL_MatchInfo {
 };
 typedef struct HAL_MatchInfo HAL_MatchInfo;
 /** @} */
+
+#ifdef __cplusplus
+template <>
+struct wpi::Struct<HAL_ControlWord> {
+  static constexpr std::string_view GetTypeName() { return "ControlWord"; }
+  static constexpr size_t GetSize() { return 1; }
+  static constexpr std::string_view GetSchema() {
+    return "bool enabled:1;bool eStop:1;bool fmsAttached:1;"
+           "bool dsAttached:1;"
+           "enum{unknown=0,autonomous=1,teleoperated=2,test=3}"
+           "int8 robotMode:2";
+  }
+
+  static inline HAL_ControlWord Unpack(std::span<const uint8_t> data) {
+    uint8_t b = data[0];
+    return {.enabled = static_cast<uint32_t>(b & 0x01),
+            .robotMode = static_cast<uint32_t>(b >> 4),
+            .eStop = static_cast<uint32_t>(b >> 1),
+            .fmsAttached = static_cast<uint32_t>(b >> 2),
+            .dsAttached = static_cast<uint32_t>(b >> 3),
+            .control_reserved = 0};
+  }
+  static inline void Pack(std::span<uint8_t> data,
+                          const HAL_ControlWord& value) {
+    data[0] = (value.enabled ? 0x01u : 0u) | (value.eStop ? 0x02u : 0u) |
+              (value.fmsAttached ? 0x04u : 0u) |
+              (value.dsAttached ? 0x08u : 0u) | (value.robotMode << 4);
+  }
+};
+
+static_assert(wpi::StructSerializable<HAL_ControlWord>);
+#endif  // __cplusplus

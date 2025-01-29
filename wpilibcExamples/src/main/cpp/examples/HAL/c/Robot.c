@@ -16,35 +16,17 @@ that want even more control over what code runs on their robot.
 #include <stdio.h>
 
 #include <hal/HAL.h>
+#include "hal/DriverStationTypes.h"
 
-enum DriverStationMode {
-  DisabledMode,
-  TeleopMode,
-  TestMode,
-  AutoMode,
-};
-
-enum DriverStationMode getDSMode(void) {
+HAL_RobotMode getDSMode(void) {
   // Get Robot State
   HAL_ControlWord word;
   HAL_GetControlWord(&word);
+  int64_t opmode = HAL_GetOpMode();
 
   // We send the observes, otherwise the DS disables
-  if (!word.enabled) {
-    HAL_ObserveUserProgramDisabled();
-    return DisabledMode;
-  } else {
-    if (word.autonomous) {
-      HAL_ObserveUserProgramAutonomous();
-      return AutoMode;
-    } else if (word.test) {
-      HAL_ObserveUserProgramTest();
-      return TestMode;
-    } else {
-      HAL_ObserveUserProgramTeleop();
-      return TeleopMode;
-    }
-  }
+  HAL_ObserveUserProgramOpMode(opmode, word.enabled);
+  return word.enabled ? word.robotMode : HAL_ROBOTMODE_UNKNOWN;
 }
 
 int main(void) {
@@ -56,6 +38,15 @@ int main(void) {
   }
 
   int32_t status = 0;
+
+  // Create an opmode per robot mode
+  struct WPI_String name;
+  WPI_InitString(&name, "Auto");
+  HAL_AddOpMode(HAL_ROBOTMODE_AUTONOMOUS, &name, NULL, NULL, -1, -1);
+  WPI_InitString(&name, "Teleop");
+  HAL_AddOpMode(HAL_ROBOTMODE_TELEOPERATED, &name, NULL, NULL, -1, -1);
+  WPI_InitString(&name, "Test");
+  HAL_AddOpMode(HAL_ROBOTMODE_TEST, &name, NULL, NULL, -1, -1);
 
   // For DS to see valid robot code
   HAL_ObserveUserProgramStarting();
@@ -95,11 +86,11 @@ int main(void) {
 
     HAL_RefreshDSData();
 
-    enum DriverStationMode dsMode = getDSMode();
+    HAL_RobotMode dsMode = getDSMode();
     switch (dsMode) {
-      case DisabledMode:
+      case HAL_ROBOTMODE_UNKNOWN:
         break;
-      case TeleopMode:
+      case HAL_ROBOTMODE_TELEOPERATED:
         status = 0;
         if (HAL_GetDIO(dio, &status)) {
           HAL_SetPWMPulseTimeMicroseconds(pwmPort, 2000, &status);
@@ -107,9 +98,9 @@ int main(void) {
           HAL_SetPWMPulseTimeMicroseconds(pwmPort, 1500, &status);
         }
         break;
-      case AutoMode:
+      case HAL_ROBOTMODE_AUTONOMOUS:
         break;
-      case TestMode:
+      case HAL_ROBOTMODE_TEST:
         break;
       default:
         break;

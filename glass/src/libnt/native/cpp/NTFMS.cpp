@@ -26,15 +26,14 @@ NTFMSModel::NTFMSModel(nt::NetworkTableInstance inst, std::string_view path)
                      .Subscribe(false)},
       m_station{inst.GetIntegerTopic(fmt::format("{}/StationNumber", path))
                     .Subscribe(0)},
-      m_controlWord{inst.GetIntegerTopic(fmt::format("{}/FMSControlData", path))
-                        .Subscribe(0)},
+      m_controlWord{inst.GetRawTopic(fmt::format("{}/ControlWord", path))
+                        .Subscribe("struct:ControlWord", {})},
       m_fmsAttached{fmt::format("NT_FMS:FMSAttached:{}", path)},
       m_dsAttached{fmt::format("NT_FMS:DSAttached:{}", path)},
       m_allianceStationId{fmt::format("NT_FMS:AllianceStationID:{}", path)},
       m_estop{fmt::format("NT_FMS:EStop:{}", path)},
       m_enabled{fmt::format("NT_FMS:RobotEnabled:{}", path)},
-      m_test{fmt::format("NT_FMS:TestMode:{}", path)},
-      m_autonomous{fmt::format("NT_FMS:AutonomousMode:{}", path)},
+      m_robotMode{fmt::format("NT_FMS:RobotMode:{}", path)},
       m_gameSpecificMessageData{
           fmt::format("NT_FMS:GameSpecificMessage:{}", path)} {}
 
@@ -53,14 +52,16 @@ void NTFMSModel::Update() {
     m_allianceStationId.SetValue(v.value - 1 + 3 * (isRed ? 0 : 1), v.time);
   }
   for (auto&& v : m_controlWord.ReadQueue()) {
-    uint32_t controlWord = v.value;
-    // See HAL_ControlWord definition
+    if (v.value.size() != sizeof(uint8_t)) {
+      continue;
+    }
+    uint8_t controlWord = v.value[0];
+    // See wpi::Struct<HAL_ControlWord> definition
     m_enabled.SetValue(((controlWord & 0x01) != 0) ? 1 : 0, v.time);
-    m_autonomous.SetValue(((controlWord & 0x02) != 0) ? 1 : 0, v.time);
-    m_test.SetValue(((controlWord & 0x04) != 0) ? 1 : 0, v.time);
-    m_estop.SetValue(((controlWord & 0x08) != 0) ? 1 : 0, v.time);
-    m_fmsAttached.SetValue(((controlWord & 0x10) != 0) ? 1 : 0, v.time);
-    m_dsAttached.SetValue(((controlWord & 0x20) != 0) ? 1 : 0, v.time);
+    m_estop.SetValue(((controlWord & 0x02) != 0) ? 1 : 0, v.time);
+    m_fmsAttached.SetValue(((controlWord & 0x04) != 0) ? 1 : 0, v.time);
+    m_dsAttached.SetValue(((controlWord & 0x08) != 0) ? 1 : 0, v.time);
+    m_robotMode.SetValue(controlWord >> 4, v.time);
   }
   for (auto&& v : m_gameSpecificMessage.ReadQueue()) {
     m_gameSpecificMessageData.SetValue(std::move(v.value), v.time);

@@ -4,14 +4,46 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <memory>
 
 #include <hal/DriverStationTypes.h>
+#include <hal/simulation/DriverStationData.h>
 
 #include "frc/DriverStation.h"
 #include "frc/simulation/CallbackStore.h"
 
 namespace frc::sim {
+
+class OpModeOptions : public std::span<HALSIM_OpModeOption> {
+ public:
+  OpModeOptions() = default;
+  OpModeOptions(HALSIM_OpModeOption* options, int32_t len)
+      : span{options, options + len} {}
+  OpModeOptions(const OpModeOptions&) = delete;
+
+  OpModeOptions(OpModeOptions&& oth) : span{oth} {
+    static_cast<span&>(oth) = {};
+  }
+
+  OpModeOptions& operator=(const OpModeOptions&) = delete;
+
+  OpModeOptions& operator=(OpModeOptions&& oth) {
+    if (data()) {
+      HALSIM_FreeOpModeOptionsArray(data(), size());
+    }
+    static_cast<span&>(*this) = oth;
+    static_cast<span&>(oth) = {};
+    return *this;
+  }
+
+  ~OpModeOptions() {
+    if (data()) {
+      HALSIM_FreeOpModeOptionsArray(data(), size());
+    }
+  }
+};
 
 /**
  * Class to control a simulated driver station.
@@ -45,56 +77,29 @@ class DriverStationSim {
   static void SetEnabled(bool enabled);
 
   /**
-   * Register a callback on whether the DS is in autonomous mode.
+   * Register a callback on DS robot mode changes.
    *
-   * @param callback the callback that will be called on autonomous mode
-   *                 entrance/exit
+   * @param callback the callback that will be called when robot mode changes
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
   [[nodiscard]]
-  static std::unique_ptr<CallbackStore> RegisterAutonomousCallback(
+  static std::unique_ptr<CallbackStore> RegisterRobotModeCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
-   * Check if the DS is in autonomous.
+   * Get the robot mode set by the DS.
    *
-   * @return true if autonomous
+   * @return robot mode
    */
-  static bool GetAutonomous();
+  static HAL_RobotMode GetRobotMode();
 
   /**
-   * Change whether the DS is in autonomous.
+   * Change the robot mode set by the DS.
    *
-   * @param autonomous the new value
+   * @param robotMode the new value
    */
-  static void SetAutonomous(bool autonomous);
-
-  /**
-   * Register a callback on whether the DS is in test mode.
-   *
-   * @param callback the callback that will be called whenever the test mode
-   *                 is entered or left
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  static std::unique_ptr<CallbackStore> RegisterTestCallback(
-      NotifyCallback callback, bool initialNotify);
-
-  /**
-   * Check if the DS is in test.
-   *
-   * @return true if test
-   */
-  static bool GetTest();
-
-  /**
-   * Change whether the DS is in test.
-   *
-   * @param test the new value
-   */
-  static void SetTest(bool test);
+  static void SetRobotMode(HAL_RobotMode robotMode);
 
   /**
    * Register a callback on the eStop state.
@@ -225,6 +230,85 @@ class DriverStationSim {
    * @param matchTime the new match time
    */
   static void SetMatchTime(double matchTime);
+
+  /**
+   * Register a callback on DS opmode changes.
+   *
+   * @param callback the callback that will be called when opmode changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterOpModeCallback(
+      NotifyCallback callback, bool initialNotify);
+
+  /**
+   * Get the opmode set by the DS.
+   *
+   * @return opmode
+   */
+  static int64_t GetOpMode();
+
+  /**
+   * Change the opmode set by the DS.
+   *
+   * @param opmode the new value
+   */
+  static void SetOpMode(int64_t opmode);
+
+  /**
+   * Register a callback on autonomous opmode list changes.
+   *
+   * @param callback the callback that will be called when the list of opmodes
+   * changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback.
+   */
+  static std::unique_ptr<CallbackStore> RegisterAutoOpModesCallback(
+      OpModeOptionsCallback callback, bool initialNotify);
+
+  /**
+   * Gets the list of autonomous opmodes.
+   *
+   * @return opmodes list
+   */
+  static OpModeOptions GetAutoOpModes();
+
+  /**
+   * Register a callback on teleoperated opmode list changes.
+   *
+   * @param callback the callback that will be called when the list of opmodes
+   * changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback.
+   */
+  static std::unique_ptr<CallbackStore> RegisterTeleopOpModesCallback(
+      OpModeOptionsCallback callback, bool initialNotify);
+
+  /**
+   * Gets the list of teleoperated opmodes.
+   *
+   * @return opmodes list
+   */
+  static OpModeOptions GetTeleopOpModes();
+
+  /**
+   * Register a callback on test opmode list changes.
+   *
+   * @param callback the callback that will be called when the list of opmodes
+   * changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback.
+   */
+  static std::unique_ptr<CallbackStore> RegisterTestOpModesCallback(
+      OpModeOptionsCallback callback, bool initialNotify);
+
+  /**
+   * Gets the list of test opmodes.
+   *
+   * @return opmodes list
+   */
+  static OpModeOptions GetTestOpModes();
 
   /**
    * Updates DriverStation data so that new values are visible to the user

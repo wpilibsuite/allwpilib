@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import edu.wpi.first.hal.RobotMode;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -222,8 +223,7 @@ class TimedRobotTest {
     robotThread.start();
 
     DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(true);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS);
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(0.0); // Wait for Notifiers
 
@@ -307,8 +307,7 @@ class TimedRobotTest {
     robotThread.start();
 
     DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(0.0); // Wait for Notifiers
 
@@ -392,8 +391,7 @@ class TimedRobotTest {
     robotThread.start();
 
     DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(true);
+    DriverStationSim.setRobotMode(RobotMode.TEST);
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(0.0); // Wait for Notifiers
 
@@ -459,8 +457,6 @@ class TimedRobotTest {
     assertEquals(0, robot.m_testExitCount.get());
 
     DriverStationSim.setEnabled(false);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(0.02);
@@ -504,8 +500,6 @@ class TimedRobotTest {
 
     // Start in disabled
     DriverStationSim.setEnabled(false);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(0.0); // Wait for Notifiers
 
@@ -533,8 +527,7 @@ class TimedRobotTest {
 
     // Transition to autonomous
     DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(true);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS);
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(kPeriod);
@@ -551,8 +544,7 @@ class TimedRobotTest {
 
     // Transition to teleop
     DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(kPeriod);
@@ -569,8 +561,7 @@ class TimedRobotTest {
 
     // Transition to test
     DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(true);
+    DriverStationSim.setRobotMode(RobotMode.TEST);
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(kPeriod);
@@ -587,8 +578,6 @@ class TimedRobotTest {
 
     // Transition to disabled
     DriverStationSim.setEnabled(false);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(kPeriod);

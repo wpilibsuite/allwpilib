@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "frc/DSControlWord.h"
+
 namespace frc {
 
 /**
@@ -35,6 +37,15 @@ class RobotState {
   static bool IsEStopped();
 
   /**
+   * Gets the current robot mode.
+   * 
+   * <p>Note that this does not indicate whether the robot is enabled or disabled.
+   *
+   * @return robot mode
+   */
+  static DSControlWord::RobotMode GetRobotMode();
+
+  /**
    * Returns true if the robot is in teleop mode.
    *
    * @return True if the robot is in teleop mode.
@@ -54,6 +65,13 @@ class RobotState {
    * @return True if the robot is in test mode.
    */
   static bool IsTest();
+
+  /**
+   * Gets the current operating mode.
+   *
+   * @return opmode ID
+   */
+  static int64_t GetOpModeId();
 };
 
 }  // namespace frc

@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "hal/DriverStation.h"
+#include "hal/DriverStationTypes.h"
+#include "wpi/string.h"
 
 #ifdef __APPLE__
 #include <pthread.h>
@@ -16,6 +18,7 @@
 
 #include <fmt/format.h>
 #include <wpi/EventVector.h>
+#include <wpi/StringMap.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
@@ -45,6 +48,7 @@ struct JoystickDataCache {
   HAL_AllianceStationID allianceStation;
   double matchTime;
   HAL_ControlWord controlWord;
+  int64_t opModeId;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -71,12 +75,13 @@ void JoystickDataCache::Update() {
   HAL_ControlWord tmpControlWord;
   std::memset(&tmpControlWord, 0, sizeof(tmpControlWord));
   tmpControlWord.enabled = SimDriverStationData->enabled;
-  tmpControlWord.autonomous = SimDriverStationData->autonomous;
-  tmpControlWord.test = SimDriverStationData->test;
+  tmpControlWord.robotMode = SimDriverStationData->robotMode;
   tmpControlWord.eStop = SimDriverStationData->eStop;
   tmpControlWord.fmsAttached = SimDriverStationData->fmsAttached;
   tmpControlWord.dsAttached = SimDriverStationData->dsAttached;
   this->controlWord = tmpControlWord;
+
+  opModeId = SimDriverStationData->opMode;
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
@@ -227,6 +232,42 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   return 0;
 }
 
+int64_t HAL_AddOpMode(int32_t mode, const struct WPI_String* name,
+                      const struct WPI_String* group,
+                      const struct WPI_String* description, int32_t textColor,
+                      int32_t backgroundColor) {
+  if (gShutdown) {
+    return 0;
+  }
+  return SimDriverStationData->AddOpMode(
+      static_cast<HAL_RobotMode>(mode), wpi::to_string_view(name),
+      wpi::to_string_view(group), wpi::to_string_view(description), textColor,
+      backgroundColor);
+}
+
+int64_t HAL_RemoveOpMode(int32_t mode, const struct WPI_String* name) {
+  if (gShutdown) {
+    return 0;
+  }
+  return SimDriverStationData->RemoveOpMode(static_cast<HAL_RobotMode>(mode),
+                                            wpi::to_string_view(name));
+}
+
+void HAL_ClearOpModes(void) {
+  if (gShutdown) {
+    return;
+  }
+  SimDriverStationData->ClearOpModes();
+}
+
+int64_t HAL_GetOpMode(void) {
+  if (gShutdown) {
+    return 0;
+  }
+  std::scoped_lock lock{driverStation->cacheMutex};
+  return currentRead->opModeId;
+}
+
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
   if (gShutdown) {
     return HAL_AllianceStationID_kUnknown;
@@ -348,19 +389,7 @@ void HAL_ObserveUserProgramStarting(void) {
   HALSIM_SetProgramStarted();
 }
 
-void HAL_ObserveUserProgramDisabled(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramAutonomous(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramTeleop(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramTest(void) {
+void HAL_ObserveUserProgramOpMode(int64_t id, HAL_Bool enabled) {
   // TODO
 }
 

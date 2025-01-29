@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj2;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.RobotMode;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -31,9 +32,8 @@ public final class MockHardwareExtension implements BeforeAllCallback {
   private void initializeHardware() {
     HAL.initialize(500, 0);
     DriverStationSim.setDsAttached(true);
-    DriverStationSim.setAutonomous(false);
     DriverStationSim.setEnabled(true);
-    DriverStationSim.setTest(true);
+    DriverStationSim.setRobotMode(RobotMode.TEST);
     DriverStationSim.notifyNewData();
   }
 }

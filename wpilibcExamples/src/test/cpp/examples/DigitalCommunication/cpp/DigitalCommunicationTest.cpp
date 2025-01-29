@@ -8,6 +8,7 @@
 #include <frc/simulation/DIOSim.h>
 #include <frc/simulation/DriverStationSim.h>
 #include <frc/simulation/SimHooks.h>
+#include <hal/DriverStationTypes.h>
 #include <gtest/gtest.h>
 #include <units/time.h>
 
@@ -120,7 +121,7 @@ class AutonomousTest : public DigitalCommunicationTest<bool> {};
 
 TEST_P(AutonomousTest, Autonomous) {
   auto autonomous = GetParam();
-  frc::sim::DriverStationSim::SetAutonomous(autonomous);
+  frc::sim::DriverStationSim::SetRobotMode(autonomous ? HAL_ROBOTMODE_AUTONOMOUS : HAL_ROBOTMODE_TELEOPERATED);
   frc::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(m_autonomousOutput.GetInitialized());
