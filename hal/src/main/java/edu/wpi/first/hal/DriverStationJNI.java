@@ -22,44 +22,14 @@ public class DriverStationJNI extends JNIWrapper {
   public static native void observeUserProgramStarting();
 
   /**
-   * Sets the disabled flag in the DS.
+   * Sets the control state returned to the DS.
    *
    * <p>This is used for the DS to ensure the robot is properly responding to its state request.
    * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
    *
-   * @see "HAL_ObserveUserProgramDisabled"
+   * @param word control word returned by nativeGetControlWord()
    */
-  public static native void observeUserProgramDisabled();
-
-  /**
-   * Sets the autonomous enabled flag in the DS.
-   *
-   * <p>This is used for the DS to ensure the robot is properly responding to its state request.
-   * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
-   *
-   * @see "HAL_ObserveUserProgramAutonomous"
-   */
-  public static native void observeUserProgramAutonomous();
-
-  /**
-   * Sets the teleoperated enabled flag in the DS.
-   *
-   * <p>This is used for the DS to ensure the robot is properly responding to its state request.
-   * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
-   *
-   * @see "HAL_ObserveUserProgramTeleop"
-   */
-  public static native void observeUserProgramTeleop();
-
-  /**
-   * Sets the test mode flag in the DS.
-   *
-   * <p>This is used for the DS to ensure the robot is properly responding to its state request.
-   * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
-   *
-   * @see "HAL_ObserveUserProgramTest"
-   */
-  public static native void observeUserProgramTest();
+  public static native void observeUserProgram(long word);
 
   /**
    * Gets the current control word of the driver station.
@@ -70,7 +40,7 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_GetControlWord"
    * @see getControlWord for a version easier to parse
    */
-  public static native int nativeGetControlWord();
+  public static native long nativeGetControlWord();
 
   /**
    * Gets the current control word of the driver station.
@@ -81,15 +51,15 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_GetControlWord"
    */
   public static void getControlWord(ControlWord controlWord) {
-    int word = nativeGetControlWord();
-    controlWord.update(
-        (word & 1) != 0,
-        ((word >> 1) & 1) != 0,
-        ((word >> 2) & 1) != 0,
-        ((word >> 3) & 1) != 0,
-        ((word >> 4) & 1) != 0,
-        ((word >> 5) & 1) != 0);
+    controlWord.update(nativeGetControlWord());
   }
+
+  /**
+   * Sets operating mode options.
+   *
+   * @param options operating mode options
+   */
+  public static native void setOpModeOptions(OpModeOption[] options);
 
   /**
    * Gets the current alliance station ID.

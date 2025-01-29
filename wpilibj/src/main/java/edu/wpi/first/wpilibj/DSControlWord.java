@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.ControlWord;
+import edu.wpi.first.hal.RobotMode;
 
 /** A wrapper around Driver Station control word. */
 public class DSControlWord {
@@ -30,7 +31,7 @@ public class DSControlWord {
    * @return True if the robot is enabled, false otherwise.
    */
   public boolean isEnabled() {
-    return m_controlWord.getEnabled() && m_controlWord.getDSAttached();
+    return m_controlWord.isEnabled() && m_controlWord.isDSAttached();
   }
 
   /**
@@ -43,12 +44,32 @@ public class DSControlWord {
   }
 
   /**
+   * Gets the opmode ID.
+   *
+   * @return the opmode ID
+   */
+  public long getOpModeId() {
+    return m_controlWord.getOpModeId();
+  }
+
+  /**
    * Gets a value indicating whether the Robot is e-stopped.
    *
    * @return True if the robot is e-stopped, false otherwise.
    */
   public boolean isEStopped() {
-    return m_controlWord.getEStop();
+    return m_controlWord.isEStopped();
+  }
+
+  /**
+   * Gets the current robot mode.
+   *
+   * <p>Note that this does not indicate whether the robot is enabled or disabled.
+   *
+   * @return robot mode
+   */
+  public RobotMode getRobotMode() {
+    return m_controlWord.getRobotMode();
   }
 
   /**
@@ -58,7 +79,7 @@ public class DSControlWord {
    * @return True if autonomous mode should be enabled, false otherwise.
    */
   public boolean isAutonomous() {
-    return m_controlWord.getAutonomous();
+    return m_controlWord.getRobotMode() == RobotMode.AUTONOMOUS;
   }
 
   /**
@@ -68,9 +89,9 @@ public class DSControlWord {
    * @return True if autonomous should be set and the robot should be enabled.
    */
   public boolean isAutonomousEnabled() {
-    return m_controlWord.getAutonomous()
-        && m_controlWord.getEnabled()
-        && m_controlWord.getDSAttached();
+    return m_controlWord.getRobotMode() == RobotMode.AUTONOMOUS
+        && m_controlWord.isEnabled()
+        && m_controlWord.isDSAttached();
   }
 
   /**
@@ -80,7 +101,7 @@ public class DSControlWord {
    * @return True if operator-controlled mode should be enabled, false otherwise.
    */
   public boolean isTeleop() {
-    return !(isAutonomous() || isTest());
+    return m_controlWord.getRobotMode() == RobotMode.TELEOPERATED;
   }
 
   /**
@@ -90,10 +111,9 @@ public class DSControlWord {
    * @return True if operator-controlled mode should be set and the robot should be enabled.
    */
   public boolean isTeleopEnabled() {
-    return !m_controlWord.getAutonomous()
-        && !m_controlWord.getTest()
-        && m_controlWord.getEnabled()
-        && m_controlWord.getDSAttached();
+    return m_controlWord.getRobotMode() == RobotMode.TELEOPERATED
+        && m_controlWord.isEnabled()
+        && m_controlWord.isDSAttached();
   }
 
   /**
@@ -103,7 +123,19 @@ public class DSControlWord {
    * @return True if test mode should be enabled, false otherwise.
    */
   public boolean isTest() {
-    return m_controlWord.getTest();
+    return m_controlWord.getRobotMode() == RobotMode.TEST;
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in test
+   * mode and enabled.
+   *
+   * @return True if test mode should be set and the robot should be enabled.
+   */
+  public boolean isTestEnabled() {
+    return m_controlWord.getRobotMode() == RobotMode.TEST
+        && m_controlWord.isEnabled()
+        && m_controlWord.isDSAttached();
   }
 
   /**
@@ -112,7 +144,7 @@ public class DSControlWord {
    * @return True if Driver Station is attached, false otherwise.
    */
   public boolean isDSAttached() {
-    return m_controlWord.getDSAttached();
+    return m_controlWord.isDSAttached();
   }
 
   /**
@@ -121,6 +153,15 @@ public class DSControlWord {
    * @return true if the robot is competing on a field being controlled by a Field Management System
    */
   public boolean isFMSAttached() {
-    return m_controlWord.getFMSAttached();
+    return m_controlWord.isFMSAttached();
+  }
+
+  /**
+   * Gets a copy of the underlying control word.
+   *
+   * @param word destination for control word
+   */
+  public void getControlWord(ControlWord word) {
+    word.update(m_controlWord);
   }
 }

@@ -4,7 +4,9 @@
 
 package edu.wpi.first.wpilibj.templates.romieducational;
 
+import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.hal.RobotMode;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -34,6 +36,12 @@ public class EducationalRobot extends RobotBase {
 
   @Override
   public void startCompetition() {
+    // Create an opmode per robot mode
+    DriverStation.addOpMode(RobotMode.AUTONOMOUS, "Auto");
+    DriverStation.addOpMode(RobotMode.TELEOPERATED, "Teleop");
+    DriverStation.addOpMode(RobotMode.TEST, "Test");
+    DriverStation.publishOpModes();
+
     DriverStationModeThread modeThread = new DriverStationModeThread();
 
     int event = WPIUtilJNI.createEvent(false, false);
@@ -42,12 +50,13 @@ public class EducationalRobot extends RobotBase {
 
     // Tell the DS that the robot is ready to be enabled
     DriverStationJNI.observeUserProgramStarting();
+    final ControlWord word = new ControlWord();
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
+      DriverStation.refreshControlWordFromCache(word);
+      modeThread.inControl(word);
       if (isDisabled()) {
-        modeThread.inDisabled(true);
         disabled();
-        modeThread.inDisabled(false);
         while (isDisabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
@@ -56,9 +65,7 @@ public class EducationalRobot extends RobotBase {
           }
         }
       } else if (isAutonomous()) {
-        modeThread.inAutonomous(true);
         autonomous();
-        modeThread.inAutonomous(false);
         while (isAutonomousEnabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
@@ -67,9 +74,7 @@ public class EducationalRobot extends RobotBase {
           }
         }
       } else if (isTest()) {
-        modeThread.inTest(true);
         test();
-        modeThread.inTest(false);
         while (isTest() && isEnabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
@@ -78,9 +83,7 @@ public class EducationalRobot extends RobotBase {
           }
         }
       } else {
-        modeThread.inTeleop(true);
         teleop();
-        modeThread.inTeleop(false);
         while (isTeleopEnabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
