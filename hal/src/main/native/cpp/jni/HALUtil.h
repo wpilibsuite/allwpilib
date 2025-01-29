@@ -7,9 +7,11 @@
 #include <jni.h>
 #include <stdint.h>
 
+#include <span>
 #include <string_view>
 
 struct HAL_MatchInfo;
+struct HAL_OpModeOption;
 struct HAL_Value;
 
 namespace wpi::hal {
@@ -48,6 +50,11 @@ void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg);
 void ThrowIndexOutOfBoundsException(JNIEnv* env, std::string_view msg);
 void ThrowBoundaryException(JNIEnv* env, double value, double lower,
                             double upper);
+
+jobject CreateOpModeOption(JNIEnv* env, const HAL_OpModeOption& option);
+jobjectArray CreateOpModeOptionArray(JNIEnv* env,
+                                     std::span<const HAL_OpModeOption> options);
+HAL_OpModeOption CreateOpModeOptionFromJava(JNIEnv* env, jobject option);
 
 jobject CreateREVPHVersion(JNIEnv* env, uint32_t firmwareMajor,
                            uint32_t firmwareMinor, uint32_t firmwareFix,

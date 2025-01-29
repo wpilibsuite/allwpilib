@@ -69,6 +69,11 @@ scan_headers_ignore = [
 
     "wpi/smartdashboard/ListenerExecutor.hpp",    # internal detail
 
+    "wpi/framework/OpModeRobot.hpp", # wrapped separately
+    "wpi/opmode/LinearOpMode.hpp", # wrapped separately
+    "wpi/opmode/OpMode.hpp", # wrapped separately
+    "wpi/opmode/PeriodicOpMode.hpp", # wrapped separately
+
     # Internals
     "rpy/ControlWord.h",
     "rpy/SmartDashboardData.h",
@@ -100,7 +105,6 @@ ExpansionHubPidConstants = "wpi/ExpansionHubPidConstants.hpp"
 ExpansionHubServo = "wpi/ExpansionHubServo.hpp"
 
 # wpi/driverstation
-DSControlWord = "wpi/driverstation/DSControlWord.hpp"
 DriverStation = "wpi/driverstation/DriverStation.hpp"
 Gamepad = "wpi/driverstation/Gamepad.hpp"
 GenericHID = "wpi/driverstation/GenericHID.hpp"
@@ -113,7 +117,6 @@ XboxController = "wpi/driverstation/XboxController.hpp"
 # wpi/framework
 IterativeRobotBase = "wpi/framework/IterativeRobotBase.hpp"
 RobotBase = "wpi/framework/RobotBase.hpp"
-RobotState = "wpi/framework/RobotState.hpp"
 TimedRobot = "wpi/framework/TimedRobot.hpp"
 TimesliceRobot = "wpi/framework/TimesliceRobot.hpp"
 

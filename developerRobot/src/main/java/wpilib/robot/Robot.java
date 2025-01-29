@@ -4,36 +4,35 @@
 
 package wpilib.robot;
 
-import org.wpilib.framework.TimedRobot;
+import org.wpilib.framework.OpModeRobot;
 
-public class Robot extends TimedRobot {
+public class Robot extends OpModeRobot {
+  private int m_count;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-  public Robot() {}
+  public Robot() {
+    System.out.println("Robot constructed");
+  }
 
-  /** This function is run once each time the robot enters autonomous mode. */
+  /** This function is called exactly once when the DS first connects. */
   @Override
-  public void autonomousInit() {}
+  public void driverStationConnected() {
+    System.out.println("driver station connected");
+  }
 
-  /** This function is called periodically during autonomous. */
+  /**
+   * This function is called periodically anytime when no opmode is selected, including when the
+   * Driver Station is disconnected.
+   */
   @Override
-  public void autonomousPeriodic() {}
-
-  /** This function is called once each time the robot enters tele-operated mode. */
-  @Override
-  public void teleopInit() {}
-
-  /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() {}
-
-  /** This function is called periodically during test mode. */
-  @Override
-  public void testPeriodic() {}
-
-  /** This function is called periodically during all modes. */
-  @Override
-  public void robotPeriodic() {}
+  public void nonePeriodic() {
+    m_count++;
+    if (m_count >= 20) {
+      System.out.println("no opmode selected");
+      m_count = 0;
+    }
+  }
 }
