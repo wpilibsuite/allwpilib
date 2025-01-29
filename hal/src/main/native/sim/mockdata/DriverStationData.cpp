@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "DriverStationDataInternal.h"
+#include "hal/DriverStationTypes.h"
 
 using namespace hal;
 
@@ -23,13 +24,13 @@ DriverStationData::DriverStationData() {
 
 void DriverStationData::ResetData() {
   enabled.Reset(false);
-  autonomous.Reset(false);
-  test.Reset(false);
+  robotMode.Reset(HAL_kRobotMode_unknown);
   eStop.Reset(false);
   fmsAttached.Reset(false);
   dsAttached.Reset(false);
   allianceStationId.Reset(static_cast<HAL_AllianceStationID>(0));
   matchTime.Reset(-1.0);
+  opMode.Reset(0);
 
   {
     std::scoped_lock lock(m_joystickDataMutex);
@@ -52,8 +53,56 @@ void DriverStationData::ResetData() {
     m_matchInfoCallbacks.Reset();
     m_matchInfo = HAL_MatchInfo{};
   }
+  {
+    std::scoped_lock lock{m_opModeMutex};
+    m_autoOpModesCallbacks.Reset();
+    m_teleopOpModesCallbacks.Reset();
+    m_testOpModesCallbacks.Reset();
+    // XXX: do not clear options vectors as they come from robot code?
+  }
   m_newDataCallbacks.Reset();
 }
+
+int64_t DriverStationData::AddOpMode(HAL_RobotMode mode, std::string_view name,
+                                     std::string_view group,
+                                     std::string_view description,
+                                     int32_t textColor,
+                                     int32_t backgroundColor) {
+  wpi::DenseMap<int64_t, uint32_t>* map;
+  std::vector<OpModeOption>* vec;
+  int64_t baseVal;
+  switch (mode) {
+    case HAL_kRobotMode_autonomous:
+      map = &m_autoOpModesMap;
+      vec = &m_autoOpModes;
+      baseVal = 0x0100000000000000;
+      break;
+    case HAL_kRobotMode_teleop:
+      map = &m_teleopOpModesMap;
+      vec = &m_teleopOpModes;
+      baseVal = 0;
+      break;
+    case HAL_kRobotMode_test:
+      map = &m_testOpModesMap;
+      vec = &m_testOpModes;
+      baseVal = 0x0200000000000000;
+      break;
+    default:
+      return 0;
+  }
+
+  static constexpr int64_t HashMask = 0x00FFFFFFFFFFFFFF;
+  int64_t h = std::hash<std::string_view>{}(name) & HashMask;
+  // TODO: handle hash collisions
+  if (map->try_emplace(h, vec->size()).second) {
+    return 0;
+  }
+
+}
+
+int64_t DriverStationData::RemoveOpMode(int32_t mode, std::string_view name);
+
+void DriverStationData::ClearOpModes();
 
 #define DEFINE_CPPAPI_CALLBACKS(name, data, data2)                             \
   int32_t DriverStationData::RegisterJoystick##name##Callback(                 \
@@ -408,13 +457,21 @@ void HALSIM_ResetDriverStationData(void) {
                                        SimDriverStationData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Enabled, enabled)
-DEFINE_CAPI(HAL_Bool, Autonomous, autonomous)
-DEFINE_CAPI(HAL_Bool, Test, test)
+DEFINE_CAPI(HAL_RobotMode, RobotMode, robotMode)
 DEFINE_CAPI(HAL_Bool, EStop, eStop)
 DEFINE_CAPI(HAL_Bool, FmsAttached, fmsAttached)
 DEFINE_CAPI(HAL_Bool, DsAttached, dsAttached)
 DEFINE_CAPI(HAL_AllianceStationID, AllianceStationId, allianceStationId)
 DEFINE_CAPI(double, MatchTime, matchTime)
+DEFINE_CAPI(int64_t, OpMode, opMode)
+
+int32_t HALSIM_RegisterAutoOpModesCallback(HAL_OpModeOptionsCallback callback,
+                                           void* param,
+                                           HAL_Bool initialNotify) {}
+
+void HALSIM_CancelAutoOpModesCallback(int32_t uid) {}
+
+struct HALSIM_OpModeOption* HALSIM_GetAutoOpModes(int32_t* len) {}
 
 #undef DEFINE_CAPI
 #define DEFINE_CAPI(name, data)                                                \

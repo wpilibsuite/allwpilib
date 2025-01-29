@@ -4,6 +4,7 @@
 
 package edu.wpi.first.hal.simulation;
 
+@FunctionalInterface
 public interface ConstBufferCallback {
   void callback(String name, byte[] buffer, int count);
 }
