@@ -67,6 +67,15 @@ int32_t HAL_SendConsoleLine(const char* line);
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord);
 
 /**
+ * Gets the current operating mode of the driver station.
+ *
+ * @param buf buffer for operating mode string (out)
+ * @param len length of buffer (in), length of string (out)
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_GetOpMode(char* buf, int32_t* len);
+
+/**
  * Gets the current alliance station ID.
  *
  * @param[out] status the error code, or 0 for success
