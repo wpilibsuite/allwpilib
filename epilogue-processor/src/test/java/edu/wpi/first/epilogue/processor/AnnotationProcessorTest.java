@@ -1974,6 +1974,37 @@ class AnnotationProcessorTest {
     assertLoggerGenerates(source, expectedRootLogger);
   }
 
+  @Test
+  void doesNotBreakWithPackageInfo() {
+    String source =
+        """
+        package example;
+
+        import edu.wpi.first.epilogue.*;
+
+        @Logged
+        class Example {}
+        """;
+
+    String packageInfo = """
+        package example;
+        """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .withProcessors(new AnnotationProcessor())
+            .compile(
+                JavaFileObjects.forSourceString("example.Example", source),
+                JavaFileObjects.forSourceString("example.package-info", packageInfo));
+
+    assertThat(compilation).succeeded();
+    compilation.generatedSourceFiles().stream()
+        .filter(jfo -> jfo.getName().contains("Example"))
+        .findFirst()
+        .orElseThrow(() -> new IllegalStateException("Logger file was not generated!"));
+  }
+
   private void assertCompilationError(
       String message, long lineNumber, long col, Diagnostic<? extends JavaFileObject> diagnostic) {
     assertAll(
