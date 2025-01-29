@@ -5,7 +5,9 @@
 #include "sysid/view/DataSelector.h"
 
 #include <algorithm>
+#include <iterator>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -18,6 +20,7 @@
 
 #include "sysid/Util.h"
 #include "sysid/analysis/AnalysisType.h"
+#include "sysid/analysis/FilteringUtils.h"
 #include "sysid/analysis/Storage.h"
 
 using namespace sysid;
@@ -111,6 +114,7 @@ void DataSelector::Display() {
           continue;
         }
         WPI_INFO(m_logger, "Loaded test state {}", it2->first);
+        executedTests.push_back(it2->first);
         ++it2;
       }
       if (it->second.empty()) {
@@ -130,6 +134,13 @@ void DataSelector::Display() {
       ImGui::TextUnformatted("No tests found");
     }
     return;
+  }
+
+  if (executedTests.size() < 4) {
+    std::ranges::sort(executedTests);
+    std::ranges::set_difference(executedTests, kValidTests,
+                                std::back_inserter(m_missingTests));
+    throw sysid::MissingTestsError{m_missingTests};
   }
 
 #if 0
