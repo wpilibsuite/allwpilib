@@ -165,7 +165,7 @@ TEST_F(WebServerIntegrationTest, DriverStation) {
   // Compare results
   HAL_ControlWord cw;
   HAL_GetControlWord(&cw);
-  bool test_value = cw.enabled;
+  bool test_value = HAL_ControlWord_IsEnabled(cw);
   EXPECT_EQ(EXPECTED_VALUE, test_value);
 }
 

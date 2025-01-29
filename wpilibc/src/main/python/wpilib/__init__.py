@@ -16,7 +16,6 @@ from ._wpilib import (
     CANStatus,
     Compressor,
     CompressorConfigType,
-    DSControlWord,
     DataLogManager,
     DigitalInput,
     DigitalOutput,
@@ -37,6 +36,7 @@ from ._wpilib import (
     Joystick,
     Koors40,
     LEDPattern,
+    LinearOpMode,
     Mechanism2d,
     MechanismLigament2d,
     MechanismObject2d,
@@ -45,6 +45,9 @@ from ._wpilib import (
     MotorSafety,
     Notifier,
     OnboardIMU,
+    OpMode,
+    OpModeRobotBase,
+    PeriodicOpMode,
     PS4Controller,
     PS5Controller,
     PWM,
@@ -63,7 +66,6 @@ from ._wpilib import (
     Preferences,
     RobotBase,
     RobotController,
-    RobotState,
     RuntimeType,
     SendableBuilderImpl,
     SendableChooser,
@@ -106,7 +108,6 @@ __all__ = [
     "CANStatus",
     "Compressor",
     "CompressorConfigType",
-    "DSControlWord",
     "DataLogManager",
     "DigitalInput",
     "DigitalOutput",
@@ -127,6 +128,7 @@ __all__ = [
     "Joystick",
     "Koors40",
     "LEDPattern",
+    "LinearOpMode",
     "Mechanism2d",
     "MechanismLigament2d",
     "MechanismObject2d",
@@ -135,6 +137,9 @@ __all__ = [
     "MotorSafety",
     "Notifier",
     "OnboardIMU",
+    "OpMode",
+    "OpModeRobotBase",
+    "PeriodicOpMode",
     "PS4Controller",
     "PS5Controller",
     "PWM",
@@ -153,7 +158,6 @@ __all__ = [
     "Preferences",
     "RobotBase",
     "RobotController",
-    "RobotState",
     "RuntimeType",
     "SendableBuilderImpl",
     "SendableChooser",
@@ -190,6 +194,10 @@ from ._impl.report_error import reportError, reportWarning
 __all__ += ["reportError", "reportWarning"]
 
 del _init__wpilib
+
+from .opmoderobot import OpModeRobot
+
+__all__ += ["OpModeRobot"]
 
 from .cameraserver import CameraServer
 from .deployinfo import getDeployData

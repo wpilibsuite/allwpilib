@@ -114,12 +114,10 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":generated_mrc_cc_headers",
+        "//ntcore",
+        "//wpinet",
         "//wpiutil",
     ] + select({
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": [
-            "//ntcore",
-            "//wpinet",
-        ],
         "//conditions:default": [
             "//ntcore:ntcore_c_headers",
         ],
@@ -129,12 +127,10 @@ wpilib_cc_library(
 wpilib_cc_shared_library(
     name = "shared/wpiHal",
     dynamic_deps = [
+        "//ntcore:shared/ntcore",
+        "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
     ] + select({
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": [
-            "//ntcore:shared/ntcore",
-            "//wpinet:shared/wpinet",
-        ],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
@@ -146,12 +142,10 @@ wpilib_cc_shared_library(
 wpilib_cc_static_library(
     name = "static/wpiHal",
     static_deps = [
+        "//ntcore:static/ntcore",
+        "//wpinet:static/wpinet",
         "//wpiutil:static/wpiutil",
     ] + select({
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": [
-            "//ntcore:static/ntcore",
-            "//wpinet:static/wpinet",
-        ],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],

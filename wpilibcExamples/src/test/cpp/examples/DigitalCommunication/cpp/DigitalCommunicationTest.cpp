@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 
 #include "Robot.hpp"
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/simulation/DIOSim.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
@@ -120,7 +121,8 @@ class AutonomousTest : public DigitalCommunicationTest<bool> {};
 
 TEST_P(AutonomousTest, Autonomous) {
   auto autonomous = GetParam();
-  wpi::sim::DriverStationSim::SetAutonomous(autonomous);
+  wpi::sim::DriverStationSim::SetRobotMode(
+      autonomous ? HAL_ROBOTMODE_AUTONOMOUS : HAL_ROBOTMODE_TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(m_autonomousOutput.GetInitialized());
