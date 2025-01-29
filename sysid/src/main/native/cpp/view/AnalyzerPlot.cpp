@@ -84,7 +84,7 @@ void AnalyzerPlot::SetRawTimeData(const std::vector<PreparedData>& rawSlow,
       return;
     }
     m_sweepData.rawData.emplace_back((rawSlow[i].timestamp).value(),
-                                           rawSlow[i].velocity);
+                                     rawSlow[i].velocity);
   }
 
   // Populate Raw fast Time Series Data
@@ -93,7 +93,7 @@ void AnalyzerPlot::SetRawTimeData(const std::vector<PreparedData>& rawSlow,
       return;
     }
     m_stepData.rawData.emplace_back((rawFast[i].timestamp).value(),
-                                       rawFast[i].velocity);
+                                    rawFast[i].velocity);
   }
 }
 
@@ -179,7 +179,7 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
       }
 
       m_sweepData.filteredData.emplace_back((slow[i].timestamp).value(),
-                                                  slow[i].velocity);
+                                            slow[i].velocity);
 
       if (i > 0) {
         // If the current timestamp is not in the startTimes array, it is the
@@ -204,7 +204,7 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
       }
 
       m_stepData.filteredData.emplace_back((fast[i].timestamp).value(),
-                                              fast[i].velocity);
+                                           fast[i].velocity);
 
       if (i > 0) {
         // If the current timestamp is not in the startTimes array, it is the
@@ -417,11 +417,11 @@ bool AnalyzerPlot::DisplayPlots() {
   plotSize.y =
       (plotSize.y - textBoxHeight * 3 - ImGui::GetStyle().ItemSpacing.y) / 2.f;
 
-  m_sweepData.Plot("Sweep Velocity vs. Time", plotSize,
-                         m_velocityLabel.c_str(), m_pointSize);
+  m_sweepData.Plot("Sweep Velocity vs. Time", plotSize, m_velocityLabel.c_str(),
+                   m_pointSize);
   ImGui::SameLine();
-  m_stepData.Plot("Step Velocity vs. Time", plotSize,
-                     m_velocityLabel.c_str(), m_pointSize);
+  m_stepData.Plot("Step Velocity vs. Time", plotSize, m_velocityLabel.c_str(),
+                  m_pointSize);
 
   m_regressionData.Plot("Acceleration vs. Velocity", plotSize,
                         m_velocityLabel.c_str(), m_velPortionAccelLabel.c_str(),

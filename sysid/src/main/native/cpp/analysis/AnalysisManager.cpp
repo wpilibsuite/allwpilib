@@ -151,10 +151,9 @@ void AnalysisManager::PrepareGeneralData() {
 
   WPI_INFO(m_logger, "{}", "Storing datasets.");
   // Store the raw datasets
-  m_rawDataset = CombineDatasets(preparedData["raw-sweep-forward"],
-                                 preparedData["raw-sweep-reverse"],
-                                 preparedData["raw-step-forward"],
-                                 preparedData["raw-step-reverse"]);
+  m_rawDataset = CombineDatasets(
+      preparedData["raw-sweep-forward"], preparedData["raw-sweep-reverse"],
+      preparedData["raw-step-forward"], preparedData["raw-step-reverse"]);
 
   // Store the filtered datasets
   m_filteredDataset = CombineDatasets(
