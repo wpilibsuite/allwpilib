@@ -97,7 +97,7 @@ void DataSelector::Display() {
       m_testsFuture.wait_for(0s) == std::future_status::ready) {
     m_tests = m_testsFuture.get();
     for (auto it = m_tests.begin(); it != m_tests.end();) {
-      if (it->first != "quasistatic" && it->first != "dynamic") {
+      if (it->first != "sweep" && it->first != "step") {
         WPI_WARNING(m_logger, "Unrecognized test {}, removing", it->first);
         it = m_tests.erase(it);
         continue;

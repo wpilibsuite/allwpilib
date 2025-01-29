@@ -37,16 +37,16 @@ class SysIdRoutineTest : public ::testing::Test {
           std::nullopt, std::nullopt, std::nullopt,
           [this](frc::sysid::State state) {
             switch (state) {
-              case frc::sysid::State::kQuasistaticForward:
+              case frc::sysid::State::kSweepForward:
                 currentStateList.emplace_back(StateTest::InRecordStateQf);
                 break;
-              case frc::sysid::State::kQuasistaticReverse:
+              case frc::sysid::State::kSweepReverse:
                 currentStateList.emplace_back(StateTest::InRecordStateQr);
                 break;
-              case frc::sysid::State::kDynamicForward:
+              case frc::sysid::State::kStepForward:
                 currentStateList.emplace_back(StateTest::InRecordStateDf);
                 break;
-              case frc::sysid::State::kDynamicReverse:
+              case frc::sysid::State::kStepReverse:
                 currentStateList.emplace_back(StateTest::InRecordStateDr);
                 break;
               case frc::sysid::State::kNone:
@@ -65,14 +65,14 @@ class SysIdRoutineTest : public ::testing::Test {
           },
           &m_subsystem}};
 
-  frc2::CommandPtr m_quasistaticForward{
-      m_sysidRoutine.Quasistatic(frc2::sysid::Direction::kForward)};
-  frc2::CommandPtr m_quasistaticReverse{
-      m_sysidRoutine.Quasistatic(frc2::sysid::Direction::kReverse)};
-  frc2::CommandPtr m_dynamicForward{
-      m_sysidRoutine.Dynamic(frc2::sysid::Direction::kForward)};
-  frc2::CommandPtr m_dynamicReverse{
-      m_sysidRoutine.Dynamic(frc2::sysid::Direction::kReverse)};
+  frc2::CommandPtr m_sweepForward{
+      m_sysidRoutine.Sweep(frc2::sysid::Direction::kForward)};
+  frc2::CommandPtr m_sweepReverse{
+      m_sysidRoutine.Sweep(frc2::sysid::Direction::kReverse)};
+  frc2::CommandPtr m_stepForward{
+      m_sysidRoutine.Step(frc2::sysid::Direction::kForward)};
+  frc2::CommandPtr m_stepReverse{
+      m_sysidRoutine.Step(frc2::sysid::Direction::kReverse)};
 
   frc2::sysid::SysIdRoutine m_emptySysidRoutine{
       frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
@@ -80,7 +80,7 @@ class SysIdRoutineTest : public ::testing::Test {
                              &m_subsystem}};
 
   frc2::CommandPtr m_emptyRoutineForward{
-      m_emptySysidRoutine.Quasistatic(frc2::sysid::Direction::kForward)};
+      m_emptySysidRoutine.Sweep(frc2::sysid::Direction::kForward)};
 
   void RunCommand(frc2::CommandPtr command) {
     command.get()->Initialize();
@@ -92,21 +92,21 @@ class SysIdRoutineTest : public ::testing::Test {
 
   void SetUp() override {
     frc::sim::PauseTiming();
-    frc2::CommandPtr m_quasistaticForward{
-        m_sysidRoutine.Quasistatic(frc2::sysid::Direction::kForward)};
-    frc2::CommandPtr m_quasistaticReverse{
-        m_sysidRoutine.Quasistatic(frc2::sysid::Direction::kReverse)};
-    frc2::CommandPtr m_dynamicForward{
-        m_sysidRoutine.Dynamic(frc2::sysid::Direction::kForward)};
-    frc2::CommandPtr m_dynamicReverse{
-        m_sysidRoutine.Dynamic(frc2::sysid::Direction::kReverse)};
+    frc2::CommandPtr m_sweepForward{
+        m_sysidRoutine.Sweep(frc2::sysid::Direction::kForward)};
+    frc2::CommandPtr m_sweepReverse{
+        m_sysidRoutine.Sweep(frc2::sysid::Direction::kReverse)};
+    frc2::CommandPtr m_stepForward{
+        m_sysidRoutine.Step(frc2::sysid::Direction::kForward)};
+    frc2::CommandPtr m_stepReverse{
+        m_sysidRoutine.Step(frc2::sysid::Direction::kReverse)};
   }
 
   void TearDown() override { frc::sim::ResumeTiming(); }
 };
 
 TEST_F(SysIdRoutineTest, RecordStateBookendsMotorLogging) {
-  RunCommand(std::move(m_quasistaticForward));
+  RunCommand(std::move(m_sweepForward));
   std::vector<StateTest> expectedOrder{
       StateTest::InDrive, StateTest::InLog, StateTest::InRecordStateQf,
       StateTest::InDrive, StateTest::DoneWithRecordState};
@@ -117,32 +117,32 @@ TEST_F(SysIdRoutineTest, RecordStateBookendsMotorLogging) {
   expectedOrder = std::vector<StateTest>{
       StateTest::InDrive, StateTest::InLog, StateTest::InRecordStateDf,
       StateTest::InDrive, StateTest::DoneWithRecordState};
-  RunCommand(std::move(m_dynamicForward));
+  RunCommand(std::move(m_stepForward));
   EXPECT_TRUE(expectedOrder == currentStateList);
   currentStateList.clear();
   sentVoltages.clear();
 }
 
 TEST_F(SysIdRoutineTest, DeclareCorrectState) {
-  RunCommand(std::move(m_quasistaticForward));
+  RunCommand(std::move(m_sweepForward));
   EXPECT_TRUE(std::find(currentStateList.begin(), currentStateList.end(),
                         StateTest::InRecordStateQf) != currentStateList.end());
   currentStateList.clear();
   sentVoltages.clear();
 
-  RunCommand(std::move(m_quasistaticReverse));
+  RunCommand(std::move(m_sweepReverse));
   EXPECT_TRUE(std::find(currentStateList.begin(), currentStateList.end(),
                         StateTest::InRecordStateQr) != currentStateList.end());
   currentStateList.clear();
   sentVoltages.clear();
 
-  RunCommand(std::move(m_dynamicForward));
+  RunCommand(std::move(m_stepForward));
   EXPECT_TRUE(std::find(currentStateList.begin(), currentStateList.end(),
                         StateTest::InRecordStateDf) != currentStateList.end());
   currentStateList.clear();
   sentVoltages.clear();
 
-  RunCommand(std::move(m_dynamicReverse));
+  RunCommand(std::move(m_stepReverse));
   EXPECT_TRUE(std::find(currentStateList.begin(), currentStateList.end(),
                         StateTest::InRecordStateDr) != currentStateList.end());
   currentStateList.clear();
@@ -150,28 +150,28 @@ TEST_F(SysIdRoutineTest, DeclareCorrectState) {
 }
 
 TEST_F(SysIdRoutineTest, OutputCorrectVoltage) {
-  RunCommand(std::move(m_quasistaticForward));
+  RunCommand(std::move(m_sweepForward));
   std::vector<units::volt_t> expectedVoltages{1_V, 0_V};
   EXPECT_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
   EXPECT_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
   currentStateList.clear();
   sentVoltages.clear();
 
-  RunCommand(std::move(m_quasistaticReverse));
+  RunCommand(std::move(m_sweepReverse));
   expectedVoltages = std::vector<units::volt_t>{-1_V, 0_V};
   EXPECT_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
   EXPECT_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
   currentStateList.clear();
   sentVoltages.clear();
 
-  RunCommand(std::move(m_dynamicForward));
+  RunCommand(std::move(m_stepForward));
   expectedVoltages = std::vector<units::volt_t>{7_V, 0_V};
   EXPECT_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
   EXPECT_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
   currentStateList.clear();
   sentVoltages.clear();
 
-  RunCommand(std::move(m_dynamicReverse));
+  RunCommand(std::move(m_stepReverse));
   expectedVoltages = std::vector<units::volt_t>{-7_V, 0_V};
   EXPECT_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
   EXPECT_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);

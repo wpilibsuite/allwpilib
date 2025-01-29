@@ -32,8 +32,8 @@ namespace sysid {
  */
 class AnalysisManager {
  public:
-  // This contains data for each test (e.g. quasistatic-forward,
-  // quasistatic-backward, etc) indexed by test name
+  // This contains data for each test (e.g. sweep-forward,
+  // sweep-backward, etc) indexed by test name
   TestData m_data;
   /**
    * Represents settings for an instance of the analysis manager. This contains
@@ -58,7 +58,7 @@ class AnalysisManager {
     LQRParameters lqr{1, 1.5, 7};
 
     /**
-     * The velocity threshold (units/s) for trimming quasistatic test data.
+     * The velocity threshold (units/s) for trimming sweep test data.
      */
     double velocityThreshold = 0.2;
 
@@ -68,7 +68,7 @@ class AnalysisManager {
     int medianWindow = 1;
 
     /**
-     * The duration of the dynamic test that should be considered. A value of
+     * The duration of the step test that should be considered. A value of
      * zero indicates it needs to be set to the default.
      */
     units::second_t stepTestDuration = 0_s;
@@ -158,8 +158,8 @@ class AnalysisManager {
    * The keys (which contain sysid data) that are in the JSON to analyze.
    */
   static constexpr const char* kJsonDataKeys[] = {
-      "quasistatic-forward", "quasistatic-reverse", "dynamic-forward",
-      "dynamic-reverse"};
+      "sweep-forward", "sweep-reverse", "step-forward",
+      "step-reverse"};
 
   /**
    * Concatenates a list of vectors. The contents of the source vectors are

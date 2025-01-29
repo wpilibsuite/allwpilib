@@ -28,10 +28,10 @@ frc2::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
       .WithName("Arcade Drive");
 }
 
-frc2::CommandPtr Drive::SysIdQuasistatic(frc2::sysid::Direction direction) {
-  return m_sysIdRoutine.Quasistatic(direction);
+frc2::CommandPtr Drive::SysIdSweep(frc2::sysid::Direction direction) {
+  return m_sysIdRoutine.Sweep(direction);
 }
 
-frc2::CommandPtr Drive::SysIdDynamic(frc2::sysid::Direction direction) {
-  return m_sysIdRoutine.Dynamic(direction);
+frc2::CommandPtr Drive::SysIdStep(frc2::sysid::Direction direction) {
+  return m_sysIdRoutine.Step(direction);
 }

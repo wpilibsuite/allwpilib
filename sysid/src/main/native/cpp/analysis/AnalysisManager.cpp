@@ -133,10 +133,10 @@ void AnalysisManager::PrepareGeneralData() {
 
   // Store the original datasets
   m_originalDataset =
-      CombineDatasets(preparedData["original-raw-quasistatic-forward"],
-                      preparedData["original-raw-quasistatic-reverse"],
-                      preparedData["original-raw-dynamic-forward"],
-                      preparedData["original-raw-dynamic-reverse"]);
+      CombineDatasets(preparedData["original-raw-sweep-forward"],
+                      preparedData["original-raw-sweep-reverse"],
+                      preparedData["original-raw-step-forward"],
+                      preparedData["original-raw-step-reverse"]);
 
   WPI_INFO(m_logger, "{}", "Initial trimming and filtering.");
   sysid::InitialTrimAndFilter(&preparedData, &m_settings, m_positionDelays,
@@ -151,20 +151,20 @@ void AnalysisManager::PrepareGeneralData() {
 
   WPI_INFO(m_logger, "{}", "Storing datasets.");
   // Store the raw datasets
-  m_rawDataset = CombineDatasets(preparedData["raw-quasistatic-forward"],
-                                 preparedData["raw-quasistatic-reverse"],
-                                 preparedData["raw-dynamic-forward"],
-                                 preparedData["raw-dynamic-reverse"]);
+  m_rawDataset = CombineDatasets(preparedData["raw-sweep-forward"],
+                                 preparedData["raw-sweep-reverse"],
+                                 preparedData["raw-step-forward"],
+                                 preparedData["raw-step-reverse"]);
 
   // Store the filtered datasets
   m_filteredDataset = CombineDatasets(
-      preparedData["quasistatic-forward"], preparedData["quasistatic-reverse"],
-      preparedData["dynamic-forward"], preparedData["dynamic-reverse"]);
+      preparedData["sweep-forward"], preparedData["sweep-reverse"],
+      preparedData["step-forward"], preparedData["step-reverse"]);
 
-  m_startTimes = {preparedData["raw-quasistatic-forward"][0].timestamp,
-                  preparedData["raw-quasistatic-reverse"][0].timestamp,
-                  preparedData["raw-dynamic-forward"][0].timestamp,
-                  preparedData["raw-dynamic-reverse"][0].timestamp};
+  m_startTimes = {preparedData["raw-sweep-forward"][0].timestamp,
+                  preparedData["raw-sweep-reverse"][0].timestamp,
+                  preparedData["raw-step-forward"][0].timestamp,
+                  preparedData["raw-step-reverse"][0].timestamp};
 }
 
 AnalysisManager::AnalysisManager(Settings& settings, wpi::Logger& logger)
@@ -173,7 +173,7 @@ AnalysisManager::AnalysisManager(Settings& settings, wpi::Logger& logger)
 AnalysisManager::AnalysisManager(TestData data, Settings& settings,
                                  wpi::Logger& logger)
     : m_data{std::move(data)}, m_logger{logger}, m_settings{settings} {
-  // Reset settings for Dynamic Test Limits
+  // Reset settings for Step Test Limits
   m_settings.stepTestDuration = 0_s;
   m_settings.velocityThreshold = std::numeric_limits<double>::infinity();
 }

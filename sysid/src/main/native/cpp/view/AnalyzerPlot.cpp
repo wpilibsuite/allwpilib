@@ -83,7 +83,7 @@ void AnalyzerPlot::SetRawTimeData(const std::vector<PreparedData>& rawSlow,
     if (abort) {
       return;
     }
-    m_quasistaticData.rawData.emplace_back((rawSlow[i].timestamp).value(),
+    m_sweepData.rawData.emplace_back((rawSlow[i].timestamp).value(),
                                            rawSlow[i].velocity);
   }
 
@@ -92,14 +92,14 @@ void AnalyzerPlot::SetRawTimeData(const std::vector<PreparedData>& rawSlow,
     if (abort) {
       return;
     }
-    m_dynamicData.rawData.emplace_back((rawFast[i].timestamp).value(),
+    m_stepData.rawData.emplace_back((rawFast[i].timestamp).value(),
                                        rawFast[i].velocity);
   }
 }
 
 void AnalyzerPlot::ResetData() {
-  m_quasistaticData.Clear();
-  m_dynamicData.Clear();
+  m_sweepData.Clear();
+  m_stepData.Clear();
   m_regressionData.Clear();
   m_timestepData.Clear();
 
@@ -172,13 +172,13 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
     const auto& rawSlow = m_direction == 0 ? rawSlowForward : rawSlowBackward;
     const auto& rawFast = m_direction == 0 ? rawFastForward : rawFastBackward;
 
-    // Populate quasistatic time-domain graphs
+    // Populate sweep time-domain graphs
     for (size_t i = 0; i < slow.size(); i += slowStep) {
       if (abort) {
         return;
       }
 
-      m_quasistaticData.filteredData.emplace_back((slow[i].timestamp).value(),
+      m_sweepData.filteredData.emplace_back((slow[i].timestamp).value(),
                                                   slow[i].velocity);
 
       if (i > 0) {
@@ -197,13 +197,13 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
       }
     }
 
-    // Populate dynamic time-domain graphs
+    // Populate step time-domain graphs
     for (size_t i = 0; i < fast.size(); i += fastStep) {
       if (abort) {
         return;
       }
 
-      m_dynamicData.filteredData.emplace_back((fast[i].timestamp).value(),
+      m_stepData.filteredData.emplace_back((fast[i].timestamp).value(),
                                               fast[i].velocity);
 
       if (i > 0) {
@@ -227,26 +227,26 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
     // Populate simulated time domain data
     if (type == analysis::kElevator) {
       const auto& Kg = ffGains.Kg.gain;
-      m_quasistaticData.simData = PopulateTimeDomainSim(
+      m_sweepData.simData = PopulateTimeDomainSim(
           rawSlow, startTimes, fastStep, sysid::ElevatorSim{Ks, Kv, Ka, Kg},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
-      m_dynamicData.simData = PopulateTimeDomainSim(
+      m_stepData.simData = PopulateTimeDomainSim(
           rawFast, startTimes, fastStep, sysid::ElevatorSim{Ks, Kv, Ka, Kg},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
     } else if (type == analysis::kArm) {
       const auto& Kg = ffGains.Kg.gain;
       const auto& offset = ffGains.offset.gain;
-      m_quasistaticData.simData = PopulateTimeDomainSim(
+      m_sweepData.simData = PopulateTimeDomainSim(
           rawSlow, startTimes, fastStep, sysid::ArmSim{Ks, Kv, Ka, Kg, offset},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
-      m_dynamicData.simData = PopulateTimeDomainSim(
+      m_stepData.simData = PopulateTimeDomainSim(
           rawFast, startTimes, fastStep, sysid::ArmSim{Ks, Kv, Ka, Kg, offset},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
     } else {
-      m_quasistaticData.simData = PopulateTimeDomainSim(
+      m_sweepData.simData = PopulateTimeDomainSim(
           rawSlow, startTimes, fastStep, sysid::SimpleMotorSim{Ks, Kv, Ka},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
-      m_dynamicData.simData = PopulateTimeDomainSim(
+      m_stepData.simData = PopulateTimeDomainSim(
           rawFast, startTimes, fastStep, sysid::SimpleMotorSim{Ks, Kv, Ka},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
     }
@@ -377,8 +377,8 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
 
 void AnalyzerPlot::FitPlots() {
   // Set the "fit" flag to true.
-  m_quasistaticData.fitNextPlot = true;
-  m_dynamicData.fitNextPlot = true;
+  m_sweepData.fitNextPlot = true;
+  m_stepData.fitNextPlot = true;
   m_regressionData.fitNextPlot = true;
   m_timestepData.fitNextPlot = true;
 }
@@ -417,10 +417,10 @@ bool AnalyzerPlot::DisplayPlots() {
   plotSize.y =
       (plotSize.y - textBoxHeight * 3 - ImGui::GetStyle().ItemSpacing.y) / 2.f;
 
-  m_quasistaticData.Plot("Quasistatic Velocity vs. Time", plotSize,
+  m_sweepData.Plot("Sweep Velocity vs. Time", plotSize,
                          m_velocityLabel.c_str(), m_pointSize);
   ImGui::SameLine();
-  m_dynamicData.Plot("Dynamic Velocity vs. Time", plotSize,
+  m_stepData.Plot("Step Velocity vs. Time", plotSize,
                      m_velocityLabel.c_str(), m_pointSize);
 
   m_regressionData.Plot("Acceleration vs. Velocity", plotSize,

@@ -60,7 +60,7 @@ class DataSelector : public glass::View {
   wpi::Logger& m_logger;
   using Runs = std::vector<std::pair<int64_t, int64_t>>;
   using State = std::map<std::string, Runs, std::less<>>;   // full name
-  using Tests = std::map<std::string, State, std::less<>>;  // e.g. "dynamic"
+  using Tests = std::map<std::string, State, std::less<>>;  // e.g. "step"
   std::future<Tests> m_testsFuture;
   Tests m_tests;
   std::string m_selectedTest;

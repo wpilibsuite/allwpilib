@@ -53,14 +53,14 @@ void SysIdRoutineLog::RecordState(State state) {
 
 std::string SysIdRoutineLog::StateEnumToString(State state) {
   switch (state) {
-    case State::kQuasistaticForward:
-      return "quasistatic-forward";
-    case State::kQuasistaticReverse:
-      return "quasistatic-reverse";
-    case State::kDynamicForward:
-      return "dynamic-forward";
-    case State::kDynamicReverse:
-      return "dynamic-reverse";
+    case State::kSweepForward:
+      return "sweep-forward";
+    case State::kSweepReverse:
+      return "sweep-reverse";
+    case State::kStepForward:
+      return "step-forward";
+    case State::kStepReverse:
+      return "step-reverse";
     case State::kNone:
       return "none";
     default:

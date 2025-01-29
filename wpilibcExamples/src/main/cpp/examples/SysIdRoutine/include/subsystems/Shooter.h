@@ -21,8 +21,8 @@ class Shooter : public frc2::SubsystemBase {
   Shooter();
 
   frc2::CommandPtr RunShooterCommand(std::function<double()> shooterSpeed);
-  frc2::CommandPtr SysIdQuasistatic(frc2::sysid::Direction direction);
-  frc2::CommandPtr SysIdDynamic(frc2::sysid::Direction direction);
+  frc2::CommandPtr SysIdSweep(frc2::sysid::Direction direction);
+  frc2::CommandPtr SysIdStep(frc2::sysid::Direction direction);
 
  private:
   frc::PWMSparkMax m_shooterMotor{constants::shooter::kShooterMotorPort};

@@ -109,13 +109,13 @@ struct PreparedData {
  */
 struct Storage {
   /**
-   * Dataset for slow (aka quasistatic) test
+   * Dataset for slow (aka sweep) test
    */
   std::vector<PreparedData> slowForward;
   std::vector<PreparedData> slowBackward;
 
   /**
-   * Dataset for fast (aka dynamic) test
+   * Dataset for fast (aka step) test
    */
   std::vector<PreparedData> fastForward;
   std::vector<PreparedData> fastBackward;

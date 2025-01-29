@@ -18,25 +18,25 @@ void SysIdRoutineBot::ConfigureBindings() {
   // Using bumpers as a modifier and combining it with the buttons so that we
   // can have both sets of bindings at once
   (m_driverController.A() && m_driverController.RightBumper())
-      .WhileTrue(m_drive.SysIdQuasistatic(frc2::sysid::Direction::kForward));
+      .WhileTrue(m_drive.SysIdSweep(frc2::sysid::Direction::kForward));
   (m_driverController.B() && m_driverController.RightBumper())
-      .WhileTrue(m_drive.SysIdQuasistatic(frc2::sysid::Direction::kReverse));
+      .WhileTrue(m_drive.SysIdSweep(frc2::sysid::Direction::kReverse));
   (m_driverController.X() && m_driverController.RightBumper())
-      .WhileTrue(m_drive.SysIdDynamic(frc2::sysid::Direction::kForward));
+      .WhileTrue(m_drive.SysIdStep(frc2::sysid::Direction::kForward));
   (m_driverController.Y() && m_driverController.RightBumper())
-      .WhileTrue(m_drive.SysIdDynamic(frc2::sysid::Direction::kReverse));
+      .WhileTrue(m_drive.SysIdStep(frc2::sysid::Direction::kReverse));
 
   m_shooter.SetDefaultCommand(m_shooter.RunShooterCommand(
       [this] { return m_driverController.GetLeftTriggerAxis(); }));
 
   (m_driverController.A() && m_driverController.LeftBumper())
-      .WhileTrue(m_shooter.SysIdQuasistatic(frc2::sysid::Direction::kForward));
+      .WhileTrue(m_shooter.SysIdSweep(frc2::sysid::Direction::kForward));
   (m_driverController.B() && m_driverController.LeftBumper())
-      .WhileTrue(m_shooter.SysIdQuasistatic(frc2::sysid::Direction::kReverse));
+      .WhileTrue(m_shooter.SysIdSweep(frc2::sysid::Direction::kReverse));
   (m_driverController.X() && m_driverController.LeftBumper())
-      .WhileTrue(m_shooter.SysIdDynamic(frc2::sysid::Direction::kForward));
+      .WhileTrue(m_shooter.SysIdStep(frc2::sysid::Direction::kForward));
   (m_driverController.Y() && m_driverController.LeftBumper())
-      .WhileTrue(m_shooter.SysIdDynamic(frc2::sysid::Direction::kReverse));
+      .WhileTrue(m_shooter.SysIdStep(frc2::sysid::Direction::kReverse));
 }
 
 frc2::CommandPtr SysIdRoutineBot::GetAutonomousCommand() {

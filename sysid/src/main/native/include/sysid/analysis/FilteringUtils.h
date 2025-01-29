@@ -56,12 +56,12 @@ class InvalidDataError : public std::exception {
 };
 
 /**
- * Exception for Quasistatic Data being completely removed.
+ * Exception for Sweep Data being completely removed.
  */
-class NoQuasistaticDataError : public std::exception {
+class NoSweepDataError : public std::exception {
  public:
   const char* what() const noexcept override {
-    return "Quasistatic test trimming removed all data. Please adjust your "
+    return "Sweep test trimming removed all data. Please adjust your "
            "velocity threshold and double check "
            "your units and test data to make sure that the robot is reporting "
            "reasonable values.";
@@ -69,12 +69,12 @@ class NoQuasistaticDataError : public std::exception {
 };
 
 /**
- * Exception for Dynamic Data being completely removed.
+ * Exception for Step Data being completely removed.
  */
-class NoDynamicDataError : public std::exception {
+class NoStepDataError : public std::exception {
  public:
   const char* what() const noexcept override {
-    return "Dynamic test trimming removed all data. Please adjust your test "
+    return "Step test trimming removed all data. Please adjust your test "
            "duration and double check "
            "your units and test data to make sure that the robot is reporting "
            "reasonable values.";
@@ -181,8 +181,8 @@ frc::LinearFilter<double> CentralFiniteDifference(units::second_t period) {
 }
 
 /**
- * Trims the quasistatic tests, applies a median filter to the velocity data,
- * calculates acceleration and cosine (arm only) data, and trims the dynamic
+ * Trims the sweep tests, applies a median filter to the velocity data,
+ * calculates acceleration and cosine (arm only) data, and trims the step
  * tests.
  *
  * @param data A pointer to a data vector recently created by the
@@ -192,10 +192,10 @@ frc::LinearFilter<double> CentralFiniteDifference(units::second_t period) {
  * delays.
  * @param velocityDelays A reference to the vector of computed velocity signal
  * delays.
- * @param minStepTime A reference to the minimum dynamic test duration as one of
+ * @param minStepTime A reference to the minimum step test duration as one of
  *                    the trimming procedures will remove this amount from the
  *                    start of the test.
- * @param maxStepTime A reference to the maximum dynamic test duration
+ * @param maxStepTime A reference to the maximum step test duration
  * @param unit The angular unit that the arm test is in (only for calculating
  *             cosine data)
  */
