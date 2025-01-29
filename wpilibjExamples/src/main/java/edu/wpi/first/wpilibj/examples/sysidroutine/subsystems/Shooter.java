@@ -112,7 +112,7 @@ public class Shooter extends SubsystemBase {
    * @param direction The direction (forward or reverse) to run the test in
    */
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.quasistatic(direction);
+    return m_sysIdRoutine.sweep(direction);
   }
 
   /**
@@ -121,6 +121,6 @@ public class Shooter extends SubsystemBase {
    * @param direction The direction (forward or reverse) to run the test in
    */
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.dynamic(direction);
+    return m_sysIdRoutine.step(direction);
   }
 }

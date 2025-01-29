@@ -8,12 +8,12 @@
 
 using namespace frc2::sysid;
 
-frc2::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
+frc2::CommandPtr SysIdRoutine::Sweep(Direction direction) {
   frc::sysid::State state;
   if (direction == Direction::kForward) {
-    state = frc::sysid::State::kQuasistaticForward;
+    state = frc::sysid::State::kSweepForward;
   } else {  // if (direction == Direction::kReverse) {
-    state = frc::sysid::State::kQuasistaticReverse;
+    state = frc::sysid::State::kSweepReverse;
   }
 
   double outputSign = direction == Direction::kForward ? 1.0 : -1.0;
@@ -38,12 +38,12 @@ frc2::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
               .WithTimeout(m_config.m_timeout));
 }
 
-frc2::CommandPtr SysIdRoutine::Dynamic(Direction direction) {
+frc2::CommandPtr SysIdRoutine::Step(Direction direction) {
   frc::sysid::State state;
   if (direction == Direction::kForward) {
-    state = frc::sysid::State::kDynamicForward;
+    state = frc::sysid::State::kStepForward;
   } else {  // if (direction == Direction::kReverse) {
-    state = frc::sysid::State::kDynamicReverse;
+    state = frc::sysid::State::kStepReverse;
   }
 
   double outputSign = direction == Direction::kForward ? 1.0 : -1.0;

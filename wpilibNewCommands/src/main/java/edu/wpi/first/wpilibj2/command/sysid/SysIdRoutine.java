@@ -28,9 +28,9 @@ import java.util.function.Consumer;
  * routines. Each complete test of a mechanism should have its own SysIdRoutine instance, since the
  * log name of the recorded data is determined by the mechanism name.
  *
- * <p>The test state (e.g. "quasistatic-forward") is logged once per iteration during test
- * execution, and once with state "none" when a test ends. Motor frames are logged every iteration
- * during test execution.
+ * <p>The test state (e.g. "sweep-forward") is logged once per iteration during test execution, and
+ * once with state "none" when a test ends. Motor frames are logged every iteration during test
+ * execution.
  *
  * <p>Timestamps are not coordinated across data, so motor frames and test state tags may be
  * recorded on different log frames. Because frame alignment is not guaranteed, SysId parses the log
@@ -60,10 +60,10 @@ public class SysIdRoutine extends SysIdRoutineLog {
 
   /** Hardware-independent configuration for a SysId test routine. */
   public static class Config {
-    /** The voltage ramp rate used for quasistatic test routines. */
+    /** The voltage ramp rate used for sweep test routines. */
     public final Velocity<VoltageUnit> m_rampRate;
 
-    /** The step voltage output used for dynamic test routines. */
+    /** The voltage output used for step test routines. */
     public final Voltage m_stepVoltage;
 
     /** Safety timeout for the test routine commands. */
@@ -75,10 +75,10 @@ public class SysIdRoutine extends SysIdRoutineLog {
     /**
      * Create a new configuration for a SysId test routine.
      *
-     * @param rampRate The voltage ramp rate used for quasistatic test routines. Defaults to 1 volt
-     *     per second if left null.
-     * @param stepVoltage The step voltage output used for dynamic test routines. Defaults to 7
-     *     volts if left null.
+     * @param rampRate The voltage ramp rate used for sweep test routines. Defaults to 1 volt per
+     *     second if left null.
+     * @param stepVoltage The voltage output used for step test routines. Defaults to 7 volts if
+     *     left null.
      * @param timeout Safety timeout for the test routine commands. Defaults to 10 seconds if left
      *     null.
      * @param recordState Optional handle for recording test state in a third-party logging
@@ -99,10 +99,10 @@ public class SysIdRoutine extends SysIdRoutineLog {
     /**
      * Create a new configuration for a SysId test routine.
      *
-     * @param rampRate The voltage ramp rate used for quasistatic test routines. Defaults to 1 volt
-     *     per second if left null.
-     * @param stepVoltage The step voltage output used for dynamic test routines. Defaults to 7
-     *     volts if left null.
+     * @param rampRate The voltage ramp rate used for sweep test routines. Defaults to 1 volt per
+     *     second if left null.
+     * @param stepVoltage The step voltage output used for step test routines. Defaults to 7 volts
+     *     if left null.
      * @param timeout Safety timeout for the test routine commands. Defaults to 10 seconds if left
      *     null.
      */
@@ -198,7 +198,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
   }
 
   /**
-   * Returns a command to run a quasistatic test in the specified direction.
+   * Returns a command to run a sweep test in the specified direction.
    *
    * <p>The command will call the `drive` and `log` callbacks supplied at routine construction once
    * per iteration. Upon command end or interruption, the `drive` callback is called with a value of
@@ -207,12 +207,12 @@ public class SysIdRoutine extends SysIdRoutineLog {
    * @param direction The direction in which to run the test.
    * @return A command to run the test.
    */
-  public Command quasistatic(Direction direction) {
+  public Command sweep(Direction direction) {
     State state;
     if (direction == Direction.kForward) {
-      state = State.kQuasistaticForward;
+      state = State.kSweepForward;
     } else { // if (direction == Direction.kReverse) {
-      state = State.kQuasistaticReverse;
+      state = State.kSweepReverse;
     }
 
     double outputSign = direction == Direction.kForward ? 1.0 : -1.0;
@@ -242,7 +242,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
   }
 
   /**
-   * Returns a command to run a dynamic test in the specified direction.
+   * Returns a command to run a step test in the specified direction.
    *
    * <p>The command will call the `drive` and `log` callbacks supplied at routine construction once
    * per iteration. Upon command end or interruption, the `drive` callback is called with a value of
@@ -251,12 +251,12 @@ public class SysIdRoutine extends SysIdRoutineLog {
    * @param direction The direction in which to run the test.
    * @return A command to run the test.
    */
-  public Command dynamic(Direction direction) {
+  public Command step(Direction direction) {
     double outputSign = direction == Direction.kForward ? 1.0 : -1.0;
     State state =
         Map.ofEntries(
-                entry(Direction.kForward, State.kDynamicForward),
-                entry(Direction.kReverse, State.kDynamicReverse))
+                entry(Direction.kForward, State.kStepForward),
+                entry(Direction.kReverse, State.kStepReverse))
             .get(direction);
 
     return m_mechanism

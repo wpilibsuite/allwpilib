@@ -23,14 +23,14 @@ namespace frc::sysid {
  * Possible state of a SysId routine.
  */
 enum class State {
-  /// Quasistatic forward test.
-  kQuasistaticForward,
-  /// Quasistatic reverse test.
-  kQuasistaticReverse,
+  /// Sweep forward test.
+  kSweepForward,
+  /// Sweep reverse test.
+  kSweepReverse,
   /// Dynamic forward test.
-  kDynamicForward,
+  kStepForward,
   /// Dynamic reverse test.
-  kDynamicReverse,
+  kStepReverse,
   /// No test.
   kNone
 };

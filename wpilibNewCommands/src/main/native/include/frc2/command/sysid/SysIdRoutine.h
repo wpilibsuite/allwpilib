@@ -185,8 +185,8 @@ class SysIdRoutine : public frc::sysid::SysIdRoutineLog {
                                                this->RecordState(state);
                                              }) {}
 
-  frc2::CommandPtr Quasistatic(Direction direction);
-  frc2::CommandPtr Dynamic(Direction direction);
+  frc2::CommandPtr Sweep(Direction direction);
+  frc2::CommandPtr Step(Direction direction);
 
  private:
   Config m_config;
