@@ -10,6 +10,7 @@
 #include <numbers>
 #include <string>
 #include <thread>
+#include <vector>
 
 #include <fmt/format.h>
 #include <glass/Context.h>
@@ -24,7 +25,6 @@
 #include "sysid/analysis/AnalysisType.h"
 #include "sysid/analysis/FeedbackControllerPreset.h"
 #include "sysid/analysis/FilteringUtils.h"
-#include "sysid/view/DataSelector.h"
 #include "sysid/view/UILayout.h"
 
 using namespace sysid;
@@ -336,6 +336,10 @@ void Analyzer::HandleError(std::string_view msg) {
   m_exception = msg;
   m_errorPopup = true;
   PrepareRawGraphs();
+}
+
+void Analyzer::SetMissingTests(std::vector<std::string> missingTests) {
+  m_missingTests = missingTests;
 }
 
 void Analyzer::DisplayGraphs() {

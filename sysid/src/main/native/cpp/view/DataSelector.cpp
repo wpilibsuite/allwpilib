@@ -20,7 +20,6 @@
 
 #include "sysid/Util.h"
 #include "sysid/analysis/AnalysisType.h"
-#include "sysid/analysis/FilteringUtils.h"
 #include "sysid/analysis/Storage.h"
 
 using namespace sysid;
