@@ -43,10 +43,9 @@ static bool filter(std::vector<cv::Point2f> charuco_corners,
   return true;
 }
 
-int cameracalibration::calibrate(const std::string& input_video,
-                                 CameraModel& camera_model, float square_width,
-                                 float marker_width, int board_width,
-                                 int board_height, bool show_debug_window) {
+std::optional<cameracalibration::CameraModel> cameracalibration::calibrate(
+    const std::string& input_video, float square_width, float marker_width,
+    int board_width, int board_height, bool show_debug_window) {
   // ChArUco Board
   cv::aruco::Dictionary aruco_dict =
       cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_1000);
@@ -136,7 +135,7 @@ int cameracalibration::calibrate(const std::string& input_video,
         r_vecs, t_vecs, cv::noArray(), cv::noArray(), cv::noArray(), flags);
   } catch (...) {
     std::cout << "calibration failed" << std::endl;
-    return 1;
+    return std::nullopt;
   }
 
   std::vector<double> matrix = {camera_matrix.begin<double>(),
@@ -145,11 +144,8 @@ int cameracalibration::calibrate(const std::string& input_video,
   std::vector<double> distortion = {dist_coeffs.begin<double>(),
                                     dist_coeffs.end<double>()};
 
-  camera_model.intrinsicMatrix = Eigen::Matrix<double, 3, 3>(matrix.data());
-  camera_model.distortionCoefficients =
-      Eigen::Matrix<double, 8, 1>(distortion.data());
-  camera_model.avgReprojectionError = repError;
-  return 0;
+  return CameraModel{Eigen::Matrix<double, 3, 3>(matrix.data()),
+                     Eigen::Matrix<double, 8, 1>(distortion.data()), repError};
 }
 
 cameracalibration::CameraModel MrcalResultToCameraModel(mrcal_result& stats) {
@@ -286,12 +282,10 @@ int cameracalibration::calibrate(const std::string& input_video,
   return 0;
 }
 
-int cameracalibration::calibrate(const std::string& input_video,
-                                 CameraModel& camera_model, float square_width,
-                                 int board_width, int board_height,
-                                 double imagerWidthPixels,
-                                 double imagerHeightPixels,
-                                 bool show_debug_window) {
+std::optional<cameracalibration::CameraModel> cameracalibration::calibrate(
+    const std::string& input_video, float square_width, int board_width,
+    int board_height, double imagerWidthPixels, double imagerHeightPixels,
+    bool show_debug_window) {
   // Video capture
   cv::VideoCapture video_capture(input_video);
 
@@ -348,17 +342,60 @@ int cameracalibration::calibrate(const std::string& input_video,
 
   if (observation_boards.empty()) {
     std::cout << "calibration failed" << std::endl;
-    return 1;
+    return std::nullopt;
   } else {
     std::cout << "points detected" << std::endl;
   }
 
-  std::unique_ptr<mrcal_result> cal_result =
+  std::unique_ptr<mrcal_result> calResult =
       mrcal_main(observation_boards, frames_rt_toref, boardSize,
                  square_width * 0.0254, imagerSize, 1000);
 
-  auto& stats = *cal_result;
-  camera_model = MrcalResultToCameraModel(stats);
+  return MrcalResultToCameraModel(*calResult);
+}
 
-  return 0;
+void cameracalibration::to_json(wpi::json& json,
+                                const CameraModel& cameraModel) {
+  std::vector<double> camera_matrix(
+      cameraModel.intrinsicMatrix.data(),
+      cameraModel.intrinsicMatrix.data() + cameraModel.intrinsicMatrix.size());
+  std::vector<double> distortionCoefficients(
+      cameraModel.distortionCoefficients.data(),
+      cameraModel.distortionCoefficients.data() +
+          cameraModel.distortionCoefficients.size());
+  json = {{"camera_matrix", camera_matrix},
+          {"distortion_coefficients", distortionCoefficients},
+          {"avg_reprojection_error", cameraModel.avgReprojectionError}};
+}
+
+void cameracalibration::from_json(const wpi::json& json,
+                                  CameraModel& cameraModel) {
+  bool isCalibdb = json.contains("camera");
+  Eigen::Matrix<double, 3, 3> cameraMatrix;
+  if (isCalibdb) {
+    auto mat = json.at("camera_matrix");
+    if (mat.contains("data")) {
+      auto data = mat.at("data").get<std::vector<double>>();
+      cameraMatrix = Eigen::Matrix<double, 3, 3>{data.data()};
+    } else {
+      for (int i = 0; i < cameraMatrix.rows(); i++) {
+        for (int j = 0; j < cameraMatrix.cols(); j++) {
+          cameraMatrix(i, j) = mat[i][j];
+        }
+      }
+    }
+  } else {
+    auto mat = json.at("camera_matrix").get<std::vector<double>>();
+    cameraMatrix = Eigen::Matrix<double, 3, 3>{mat.data()};
+  }
+  auto distortionCoefficients =
+      json.at("distortion_coefficients").get<std::vector<double>>();
+  std::vector<double> vec(8, 0);
+  for (int i = 0; i < vec.size(); i++) {
+    if (i < distortionCoefficients.size()) {
+      vec[i] = distortionCoefficients[i];
+    }
+  }
+  cameraModel = {cameraMatrix, Eigen::Matrix<double, 8, 1>{vec.data()},
+                 json.at("avg_reprojection_error")};
 }
