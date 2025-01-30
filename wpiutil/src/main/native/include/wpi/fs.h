@@ -28,7 +28,7 @@ using fstream = std::fstream;
 #if defined(_WIN32)
 // A Win32 HANDLE is a typedef of void*
 using file_t = void*;
-#define WPI_kInvalidFile reinterpret_cast<file_t>(-1)
+#define WPI_kInvalidFile reinterpret_cast<fs::file_t>(-1)
 #else
 using file_t = int;
 #define WPI_kInvalidFile -1
