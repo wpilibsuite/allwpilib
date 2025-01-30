@@ -60,6 +60,11 @@ void DrawCheck() {
   ImGui::NewLine();
 }
 
+/**
+ * Processes a folder picker.
+ * @param selector The folder picker.
+ * @param selectedDirectoryPath The path to the selected folder.
+ */
 void ProcessDirectorySelector(std::unique_ptr<pfd::select_folder>& selector,
                               std::string& selectedDirectoryPath) {
   if (selector && selector->ready(0)) {
@@ -71,6 +76,15 @@ void ProcessDirectorySelector(std::unique_ptr<pfd::select_folder>& selector,
   }
 }
 
+/**
+ * Adds a button that opens a file picker for picking one file.
+ * @param text The button label.
+ * @param selectedFilePath The path to the selected file.
+ * @param selector The file selector.
+ * @param fileType The human friendly name for the file filter.
+ * @param fileExtensions The list of file extensions patterns that the selected
+ * file must match. The list of patterns must be space-separated.
+ */
 void SelectFileButton(const char* text, std::string& selectedFilePath,
                       std::unique_ptr<pfd::open_file>& selector,
                       const std::string& fileType,
@@ -89,6 +103,15 @@ void SelectFileButton(const char* text, std::string& selectedFilePath,
   }
 }
 
+/**
+ * Adds a button that opens a file picker to select multiple files.
+ * @param text The button label.
+ * @param selectedFilePaths The list of paths to the selected files.
+ * @param selector The file selector.
+ * @param fileType The human friendly name for the file filter.
+ * @param fileExtensions The list of file extensions patterns that selected
+ * files must match. The list of patterns must be space-separated.
+ */
 void SelectFilesButton(const char* text,
                        std::vector<std::string>& selectedFilePaths,
                        std::unique_ptr<pfd::open_file>& selector,
@@ -108,6 +131,12 @@ void SelectFilesButton(const char* text,
   }
 }
 
+/**
+ * Adds a button to open a folder picker to select a folder.
+ * @param text The button label.
+ * @param selector The folder picker.
+ * @param selectedDirectory The selected directory.
+ */
 void SelectDirectoryButton(const char* text,
                            std::unique_ptr<pfd::select_folder>& selector,
                            std::string& selectedDirectory) {
