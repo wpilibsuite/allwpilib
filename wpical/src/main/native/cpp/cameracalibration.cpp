@@ -152,6 +152,26 @@ int cameracalibration::calibrate(const std::string& input_video,
   return 0;
 }
 
+cameracalibration::CameraModel MrcalResultToCameraModel(mrcal_result& stats) {
+  // Camera matrix and distortion coefficients
+  std::vector<double> cameraMatrix = {
+      // fx 0 cx
+      stats.intrinsics[0], 0, stats.intrinsics[2],
+      // 0 fy cy
+      0, stats.intrinsics[1], stats.intrinsics[3],
+      // 0 0 1
+      0, 0, 1};
+
+  std::vector<double> distortionCoefficients = {
+      stats.intrinsics[4],  stats.intrinsics[5], stats.intrinsics[6],
+      stats.intrinsics[7],  stats.intrinsics[8], stats.intrinsics[9],
+      stats.intrinsics[10], stats.intrinsics[11]};
+
+  return {Eigen::Matrix<double, 3, 3>(cameraMatrix.data()),
+          Eigen::Matrix<double, 8, 1>(distortionCoefficients.data()),
+          stats.rms_error};
+}
+
 int cameracalibration::calibrate(const std::string& input_video,
                                  CameraModel& camera_model, float square_width,
                                  float marker_width, int board_width,
@@ -262,37 +282,7 @@ int cameracalibration::calibrate(const std::string& input_video,
                  square_width * 0.0254, imagerSize, 1000);
 
   auto& stats = *cal_result;
-
-  // Camera matrix and distortion coefficients
-  std::vector<double> camera_matrix = {
-      // fx 0 cx
-      stats.intrinsics[0], 0, stats.intrinsics[2],
-      // 0 fy cy
-      0, stats.intrinsics[1], stats.intrinsics[3],
-      // 0 0 1
-      0, 0, 1};
-
-  std::vector<double> distortionCoefficients = {stats.intrinsics[4],
-                                                stats.intrinsics[5],
-                                                stats.intrinsics[6],
-                                                stats.intrinsics[7],
-                                                stats.intrinsics[8],
-                                                stats.intrinsics[9],
-                                                stats.intrinsics[10],
-                                                stats.intrinsics[11],
-                                                0.0,
-                                                0.0,
-                                                0.0,
-                                                0.0,
-                                                0.0,
-                                                0.0};
-
-  camera_model.intrinsicMatrix =
-      Eigen::Matrix<double, 3, 3>(camera_matrix.data());
-  camera_model.distortionCoefficients =
-      Eigen::Matrix<double, 8, 1>(distortionCoefficients.data());
-  camera_model.avgReprojectionError = stats.rms_error;
-
+  camera_model = MrcalResultToCameraModel(stats);
   return 0;
 }
 
@@ -368,37 +358,7 @@ int cameracalibration::calibrate(const std::string& input_video,
                  square_width * 0.0254, imagerSize, 1000);
 
   auto& stats = *cal_result;
-
-  // Camera matrix and distortion coefficients
-  std::vector<double> camera_matrix = {
-      // fx 0 cx
-      stats.intrinsics[0], 0, stats.intrinsics[2],
-      // 0 fy cy
-      0, stats.intrinsics[1], stats.intrinsics[3],
-      // 0 0 1
-      0, 0, 1};
-
-  std::vector<double> distortionCoefficients = {stats.intrinsics[4],
-                                                stats.intrinsics[5],
-                                                stats.intrinsics[6],
-                                                stats.intrinsics[7],
-                                                stats.intrinsics[8],
-                                                stats.intrinsics[9],
-                                                stats.intrinsics[10],
-                                                stats.intrinsics[11],
-                                                0.0,
-                                                0.0,
-                                                0.0,
-                                                0.0,
-                                                0.0,
-                                                0.0};
-
-  // Save calibration output
-  camera_model.intrinsicMatrix =
-      Eigen::Matrix<double, 3, 3>(camera_matrix.data());
-  camera_model.distortionCoefficients =
-      Eigen::Matrix<double, 8, 1>(distortionCoefficients.data());
-  camera_model.avgReprojectionError = stats.rms_error;
+  camera_model = MrcalResultToCameraModel(stats);
 
   return 0;
 }
