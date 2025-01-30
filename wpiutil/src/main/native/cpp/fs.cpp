@@ -205,8 +205,6 @@ void CloseFile(file_t& F) {
 
 #else  // _WIN32
 
-const file_t WPI_kInvalidFile = -1;
-
 static int nativeOpenFlags(CreationDisposition Disp, OpenFlags Flags,
                            FileAccess Access) {
   int Result = 0;
