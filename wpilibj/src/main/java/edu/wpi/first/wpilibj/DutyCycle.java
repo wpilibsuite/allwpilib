@@ -54,7 +54,8 @@ public class DutyCycle implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get the frequency of the duty cycle signal.
+   * Get the frequency of the duty cycle signal. <b>Warning: This will return inaccurate values for
+   * up to 2 seconds after the duty cycle input is initialized.</b>
    *
    * @return frequency in Hertz
    */

@@ -21,6 +21,12 @@ class DigitalSource;
  * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with
  * PWM Output, the CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag
  * Encoder.
+ *
+ * @warning By default, position readings from Get() will be innacurate for up
+ * to 2 seconds after this object is initialized. Setting the frequency of the
+ * encoder's output using {@link #setAssumedFrequency(double)} can be used to
+ * mitigate this, though users should verify the true frequency of the specific
+ * encoder in use as it can vary between devices.
  */
 class DutyCycleEncoder : public wpi::Sendable,
                          public wpi::SendableHelper<DutyCycleEncoder> {
@@ -163,6 +169,9 @@ class DutyCycleEncoder : public wpi::Sendable,
   /**
    * Get the frequency in Hz of the duty cycle signal from the encoder.
    *
+   * @warning This will return inaccurate values for up to 2 seconds after this
+   * encoder is initialized.
+   *
    * @return duty cycle frequency in Hz
    */
   int GetFrequency() const;
@@ -173,6 +182,9 @@ class DutyCycleEncoder : public wpi::Sendable,
    * This uses the duty cycle frequency to determine if the sensor is connected.
    * By default, a value of 100 Hz is used as the threshold, and this value can
    * be changed with SetConnectedFrequencyThreshold.
+   *
+   * @warning This will return inaccurate values for up to 2 seconds after this
+   * encoder is initialized.
    *
    * @return true if the sensor is connected
    */
@@ -188,6 +200,9 @@ class DutyCycleEncoder : public wpi::Sendable,
 
   /**
    * Get the encoder value.
+   *
+   * @warning This will return inaccurate values for up to 2 seconds after this
+   * encoder is initialized unless SetAssumedFrequency() is used.
    *
    * @return the encoder value scaled by the full range input
    */
@@ -215,7 +230,8 @@ class DutyCycleEncoder : public wpi::Sendable,
    * input signal. This can result in both delayed readings and jumpy readings.
    * To solve this, you can pass the expected frequency of the sensor to this
    * function. This will use that frequency to compute the DutyCycle percentage,
-   * rather than the computed frequency.
+   * rather than the computed frequency. Users should verify the true frequency
+   * of the specific encoder in use as it can vary between devices.
    *
    * @param frequency the assumed frequency of the sensor
    */

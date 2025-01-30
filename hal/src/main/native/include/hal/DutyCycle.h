@@ -51,6 +51,9 @@ void HAL_SetDutyCycleSimDevice(HAL_DutyCycleHandle handle,
 /**
  * Get the frequency of the duty cycle signal.
  *
+ * @warning This will return inaccurate values for up to 2 seconds after the
+ * duty cycle input is initialized.
+ *
  * @param[in] dutyCycleHandle the duty cycle handle
  * @param[out] status Error status variable. 0 on success.
  * @return frequency in Hertz
