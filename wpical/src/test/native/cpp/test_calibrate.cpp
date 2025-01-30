@@ -12,8 +12,7 @@
 
 const std::string projectRootPath = PROJECT_ROOT_PATH;
 const std::string calSavePath =
-    projectRootPath.substr(0,
-                           projectRootPath.find("/src/main/native/resources")) +
+    projectRootPath.substr(0, projectRootPath.find("/src/main/native/assets")) +
     "/build";
 cameracalibration::CameraModel cameraModel = {
     .intrinsic_matrix = Eigen::Matrix<double, 3, 3>::Identity(),
