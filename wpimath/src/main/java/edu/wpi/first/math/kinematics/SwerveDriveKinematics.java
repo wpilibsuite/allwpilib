@@ -274,6 +274,10 @@ public class SwerveDriveKinematics
    * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
    * absolute threshold, while maintaining the ratio of speeds between modules.
    *
+   * <p>Scaling down the module speeds rotates the direction of net motion in the opposite direction
+   * of rotational velocity, which makes discretizing the chassis speeds inaccurate because the
+   * discretization did not account for this translational skew.
+   *
    * @param moduleStates Reference to array of module states. The array will be mutated with the
    *     normalized speeds!
    * @param attainableMaxSpeedMetersPerSecond The absolute max speed that a module can reach.
@@ -300,6 +304,10 @@ public class SwerveDriveKinematics
    * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
    * absolute threshold, while maintaining the ratio of speeds between modules.
    *
+   * <p>Scaling down the module speeds rotates the direction of net motion in the opposite direction
+   * of rotational velocity, which makes discretizing the chassis speeds inaccurate because the
+   * discretization did not account for this translational skew.
+   *
    * @param moduleStates Reference to array of module states. The array will be mutated with the
    *     normalized speeds!
    * @param attainableMaxSpeed The absolute max speed that a module can reach.
@@ -317,6 +325,10 @@ public class SwerveDriveKinematics
    * above the max attainable speed for the driving motor on that module. To fix this issue, one can
    * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
    * absolute threshold, while maintaining the ratio of speeds between modules.
+   *
+   * <p>Scaling down the module speeds rotates the direction of net motion in the opposite direction
+   * of rotational velocity, which makes discretizing the chassis speeds inaccurate because the
+   * discretization did not account for this translational skew.
    *
    * @param moduleStates Reference to array of module states. The array will be mutated with the
    *     normalized speeds!
@@ -364,6 +376,10 @@ public class SwerveDriveKinematics
    * above the max attainable speed for the driving motor on that module. To fix this issue, one can
    * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
    * absolute threshold, while maintaining the ratio of speeds between modules.
+   *
+   * <p>Scaling down the module speeds rotates the direction of net motion in the opposite direction
+   * of rotational velocity, which makes discretizing the chassis speeds inaccurate because the
+   * discretization did not account for this translational skew.
    *
    * @param moduleStates Reference to array of module states. The array will be mutated with the
    *     normalized speeds!
