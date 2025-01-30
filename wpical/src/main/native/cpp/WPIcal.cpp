@@ -12,6 +12,7 @@
 #include <map>
 #include <memory>
 #include <numbers>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -556,19 +557,21 @@ static void DisplayGui() {
       mrcal = false;
     }
 
-    if (mrcal) {
-      SelectFileButton("Select Camera Calibration Video", cameraIntrinsicsPath,
-                       cameraIntrinsicsSelector, "Video Files",
-                       "*.mp4 *.mov *.m4v *.mkv *.avi");
+    SelectFileButton("Select Camera Calibration Video", cameraIntrinsicsPath,
+                     cameraIntrinsicsSelector, "Video Files",
+                     "*.mp4 *.mov *.m4v *.mkv *.avi");
 
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputDouble("Square Width (in)", &squareWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputDouble("Marker Width (in)", &markerWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputInt("Board Width (squares)", &boardWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputInt("Board Height (squares)", &boardHeight);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+    ImGui::InputDouble("Square Width (in)", &squareWidth);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+    ImGui::InputDouble("Marker Width (in)", &markerWidth);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+    ImGui::InputInt("Board Width (squares)", &boardWidth);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+    ImGui::InputInt("Board Height (squares)", &boardHeight);
+    std::optional<cameracalibration::CameraModel> model;
+    bool calibrateButtonPressed = false;
+    if (mrcal) {
       ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
       ImGui::InputDouble("Image Width (pixels)", &imagerWidth);
       ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
@@ -577,78 +580,45 @@ static void DisplayGui() {
       ImGui::Separator();
       if (ImGui::Button("Calibrate") && !cameraIntrinsicsPath.empty()) {
         std::cout << "calibration button pressed" << std::endl;
-        int ret = cameracalibration::calibrate(
-            cameraIntrinsicsPath.c_str(), cameraModel, markerWidth, boardWidth,
-            boardHeight, imagerWidth, imagerHeight, showDebug);
-        if (ret == 0) {
-          size_t lastSeparatorPos = cameraIntrinsicsPath.find_last_of("/\\");
-          std::string output_file_path;
-
-          if (lastSeparatorPos != std::string::npos) {
-            output_file_path = cameraIntrinsicsPath.substr(0, lastSeparatorPos)
-                                   .append("/cameracalibration.json");
-          }
-
-          cameraIntrinsicsPath = output_file_path;
-
-          cameracalibration::dumpJson(cameraModel, output_file_path);
-          ImGui::CloseCurrentPopup();
-        } else if (ret == 1) {
-          std::cout << "calibration failed and popup ready" << std::endl;
-          ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
-          ImGui::OpenPopup("Camera Calibration Error");
-        } else {
-          ImGui::CloseCurrentPopup();
-        }
+        model = cameracalibration::calibrate(
+            cameraIntrinsicsPath, markerWidth, boardWidth, boardHeight,
+            imagerWidth, imagerHeight, showDebug);
+        calibrateButtonPressed = true;
       }
     } else {
-      SelectFileButton("Select Camera Calibration Video", cameraIntrinsicsPath,
-                       cameraIntrinsicsSelector, "Video Files",
-                       "*.mp4 *.mov *.m4v *.mkv *.avi");
-
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputDouble("Square Width (in)", &squareWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputDouble("Marker Width (in)", &markerWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputInt("Board Width (squares)", &boardWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputInt("Board Height (squares)", &boardHeight);
-
       ImGui::Separator();
       if (ImGui::Button("Calibrate") && !cameraIntrinsicsPath.empty()) {
         std::cout << "calibration button pressed" << std::endl;
-        int ret = cameracalibration::calibrate(
-            cameraIntrinsicsPath.c_str(), cameraModel, squareWidth, markerWidth,
-            boardWidth, boardHeight, showDebug);
-        if (ret == 0) {
-          size_t lastSeparatorPos = cameraIntrinsicsPath.find_last_of("/\\");
-          std::string output_file_path;
-
-          if (lastSeparatorPos != std::string::npos) {
-            output_file_path = cameraIntrinsicsPath.substr(0, lastSeparatorPos)
-                                   .append("/cameracalibration.json");
-          }
-
-          cameraIntrinsicsPath = output_file_path;
-
-          cameracalibration::dumpJson(cameraModel, output_file_path);
-          ImGui::CloseCurrentPopup();
-        } else if (ret == 1) {
-          std::cout << "calibration failed and popup ready" << std::endl;
-          ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
-          ImGui::OpenPopup("Camera Calibration Error");
-        } else {
-          ImGui::CloseCurrentPopup();
-        }
+        model = cameracalibration::calibrate(cameraIntrinsicsPath, squareWidth,
+                                             markerWidth, boardWidth,
+                                             boardHeight, showDebug);
+        calibrateButtonPressed = true;
       }
     }
+    if (calibrateButtonPressed && model) {
+      size_t lastSeparatorPos = cameraIntrinsicsPath.find_last_of("/\\");
+      std::string outputFilePath;
 
+      if (lastSeparatorPos != std::string::npos) {
+        outputFilePath = cameraIntrinsicsPath.substr(0, lastSeparatorPos)
+                             .append("/cameracalibration.json");
+      }
+      cameraIntrinsicsPath = outputFilePath;
+
+      std::ofstream output_file(outputFilePath);
+      output_file << wpi::json(cameraModel).dump(4) << std::endl;
+      output_file.close();
+      ImGui::CloseCurrentPopup();
+      calibrateButtonPressed = false;
+    } else if (calibrateButtonPressed && !model) {
+      std::cout << "calibration failed and popup ready" << std::endl;
+      ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
+      ImGui::OpenPopup("Camera Calibration Error");
+    }
     ImGui::SameLine();
     if (ImGui::Button("Close")) {
       ImGui::CloseCurrentPopup();
     }
-
     ImGui::EndPopup();
   }
 

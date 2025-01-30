@@ -8,8 +8,6 @@
 
 #include <wpi/json.h>
 
-#include "cameracalibration.h"
-
 namespace fieldcalibration {
 int calibrate(std::string inputDirPath, wpi::json& output_json,
               std::string camera_model_path, std::string ideal_map_path,

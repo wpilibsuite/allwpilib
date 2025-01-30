@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "fieldcalibration.h"
-#include "cameracalibration.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -26,6 +25,7 @@
 #include <opencv2/videoio.hpp>
 
 #include "apriltag.h"
+#include "cameracalibration.h"
 #include "tag36h11.h"
 
 struct Pose {
@@ -90,92 +90,6 @@ class PoseGraphError {
 };
 
 const double tagSizeMeters = 0.1651;
-
-inline cameracalibration::CameraModel LoadCameraModel(std::string path) {
-  Eigen::Matrix<double, 3, 3> camera_matrix;
-  Eigen::Matrix<double, 8, 1> camera_distortion;
-
-  std::ifstream file(path);
-
-  wpi::json json_data;
-
-  try {
-    json_data = wpi::json::parse(file);
-  } catch (const wpi::json::parse_error& e) {
-    std::cout << e.what() << std::endl;
-  }
-
-  bool isCalibdb = json_data.contains("camera");
-
-  if (!isCalibdb) {
-    for (int i = 0; i < camera_matrix.rows(); i++) {
-      for (int j = 0; j < camera_matrix.cols(); j++) {
-        camera_matrix(i, j) =
-            json_data["camera_matrix"][(i * camera_matrix.cols()) + j];
-      }
-    }
-
-    for (int i = 0; i < camera_distortion.rows(); i++) {
-      for (int j = 0; j < camera_distortion.cols(); j++) {
-        camera_distortion(i, j) = json_data["distortion_coefficients"]
-                                           [(i * camera_distortion.cols()) + j];
-      }
-    }
-  } else {
-    for (int i = 0; i < camera_matrix.rows(); i++) {
-      for (int j = 0; j < camera_matrix.cols(); j++) {
-        try {
-          camera_matrix(i, j) = json_data["camera_matrix"][i][j];
-        } catch (...) {
-          camera_matrix(i, j) = json_data["camera_matrix"]["data"]
-                                         [(i * camera_matrix.cols()) + j];
-        }
-      }
-    }
-
-    for (int i = 0; i < camera_distortion.rows(); i++) {
-      for (int j = 0; j < camera_distortion.cols(); j++) {
-        try {
-          camera_distortion(i, j) =
-              json_data["distortion_coefficients"]
-                       [(i * camera_distortion.cols()) + j];
-        } catch (...) {
-          camera_distortion(i, j) = 0.0;
-        }
-      }
-    }
-  }
-
-  cameracalibration::CameraModel camera_model{
-      camera_matrix, camera_distortion, json_data["avg_reprojection_error"]};
-  return camera_model;
-}
-
-inline cameracalibration::CameraModel LoadCameraModel(wpi::json json_data) {
-  // Camera matrix
-  Eigen::Matrix<double, 3, 3> camera_matrix;
-
-  for (int i = 0; i < camera_matrix.rows(); i++) {
-    for (int j = 0; j < camera_matrix.cols(); j++) {
-      camera_matrix(i, j) =
-          json_data["camera_matrix"][(i * camera_matrix.cols()) + j];
-    }
-  }
-
-  // Distortion coefficients
-  Eigen::Matrix<double, 8, 1> camera_distortion;
-
-  for (int i = 0; i < camera_distortion.rows(); i++) {
-    for (int j = 0; j < camera_distortion.cols(); j++) {
-      camera_distortion(i, j) = json_data["distortion_coefficients"]
-                                         [(i * camera_distortion.cols()) + j];
-    }
-  }
-
-  cameracalibration::CameraModel camera_model{
-      camera_matrix, camera_distortion, json_data["avg_reprojection_error"]};
-  return camera_model;
-}
 
 inline std::map<int, wpi::json> load_ideal_map(std::string path) {
   std::ifstream file(path);
@@ -444,7 +358,8 @@ int fieldcalibration::calibrate(std::string inputDirPath,
   Eigen::Matrix<double, 8, 1> cameraDistortion;
 
   try {
-    auto camera_model = LoadCameraModel(camera_model_path);
+    auto camera_model = wpi::json::parse(std::ifstream(camera_model_path))
+                            .get<cameracalibration::CameraModel>();
     cameraMatrix = camera_model.intrinsicMatrix;
     cameraDistortion = camera_model.distortionCoefficients;
   } catch (...) {
