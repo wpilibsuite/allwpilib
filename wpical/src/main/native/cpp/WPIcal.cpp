@@ -123,25 +123,6 @@ std::string getFileName(std::string path) {
   return path.substr(lastSlash + 1, lastDot - lastSlash - 1);
 }
 
-static bool EmitEntryTarget(int tagId, std::string& filePath) {
-  if (!filePath.empty()) {
-    auto text = fmt::format("{}: {}", tagId, filePath);
-    ImGui::TextUnformatted(text.c_str());
-  } else {
-    ImGui::Text("Tag ID %i: <none (DROP HERE)>", tagId);
-  }
-  bool rv = false;
-  if (ImGui::BeginDragDropTarget()) {
-    if (const ImGuiPayload* payload =
-            ImGui::AcceptDragDropPayload("FieldCalibration")) {
-      filePath = *(std::string*)payload->Data;
-      rv = true;
-    }
-    ImGui::EndDragDropTarget();
-  }
-  return rv;
-}
-
 void SaveCalibration(wpi::json& field, std::string& outputDirectory,
                      std::string outputName) {
   if (!field.empty() && !outputDirectory.empty()) {
@@ -159,6 +140,93 @@ void SaveCalibration(wpi::json& field, std::string& outputDirectory,
   }
 }
 
+void CombineCalibrations(
+    Fieldmap& currentReferenceMap, std::string& idealFieldMapPath,
+    std::unique_ptr<pfd::open_file>& idealFieldMapSelector) {
+  static std::unique_ptr<pfd::open_file> calibratedFieldMapMultiselector;
+  static std::unique_ptr<pfd::select_folder> combinedFieldMapDirSelector;
+  static std::string combinedFieldMapDir;
+  static std::vector<std::string> calibratedFieldMapPaths;
+  static std::map<int, std::string> combinerMap;
+  static int currentCombinerTagId = 0;
+  static wpi::json field_combination_json;
+  static Fieldmap currentCombinerMap;
+
+  SelectFileButton("Select Ideal Map", idealFieldMapPath, idealFieldMapSelector,
+                   "JSON", "*.json");
+  if (!idealFieldMapPath.empty()) {
+    DrawCheck();
+    std::ifstream json(idealFieldMapPath);
+    currentReferenceMap = Fieldmap(wpi::json::parse(json));
+    currentCombinerMap = currentReferenceMap;
+  }
+  SelectFilesButton("Select Field Calibrations", calibratedFieldMapPaths,
+                    calibratedFieldMapMultiselector, "JSON", "*.json");
+
+  if (!idealFieldMapPath.empty() && !calibratedFieldMapPaths.empty()) {
+    for (std::string& file : calibratedFieldMapPaths) {
+      ImGui::Selectable(getFileName(file).c_str(), false,
+                        ImGuiSelectableFlags_DontClosePopups);
+      if (ImGui::BeginDragDropSource()) {
+        ImGui::SetDragDropPayload("FieldCalibration", &file, sizeof(file));
+        ImGui::TextUnformatted(file.c_str());
+        ImGui::EndDragDropSource();
+      }
+    }
+
+    for (auto& [tagId, filePath] : combinerMap) {
+      if (!filePath.empty()) {
+        auto text = fmt::format("{}: {}", tagId, filePath);
+        ImGui::TextUnformatted(text.c_str());
+      } else {
+        ImGui::Text("Tag ID %i: <none (DROP HERE)>", tagId);
+      }
+      if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload =
+                ImGui::AcceptDragDropPayload("FieldCalibration")) {
+          filePath = *(std::string*)payload->Data;
+        }
+        ImGui::EndDragDropTarget();
+      }
+    }
+
+    ImGui::InputInt("Tag ID", &currentCombinerTagId);
+    ImGui::SameLine();
+    if (ImGui::Button("Add", ImVec2(0, 0)) &&
+        currentCombinerMap.hasTag(currentCombinerTagId)) {
+      combinerMap.emplace(currentCombinerTagId, "");
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Remove", ImVec2(0, 0))) {
+      combinerMap.erase(currentCombinerTagId);
+    }
+  }
+  ImGui::Separator();
+  if (ImGui::Button("Close", ImVec2(0, 0))) {
+    ImGui::CloseCurrentPopup();
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Download", ImVec2(0, 0))) {
+    for (auto& [key, val] : combinerMap) {
+      std::ifstream json(val);
+      Fieldmap map(wpi::json::parse(json));
+      currentCombinerMap.replaceTag(key, map.getTag(key));
+    }
+    field_combination_json = currentCombinerMap.toJson();
+  }
+
+  if (combinedFieldMapDir.empty() && !field_combination_json.empty() &&
+      !combinedFieldMapDirSelector) {
+    combinedFieldMapDirSelector =
+        std::make_unique<pfd::select_folder>("Select Download Folder", "");
+  }
+
+  ProcessDirectorySelector(combinedFieldMapDirSelector, combinedFieldMapDir);
+  SaveCalibration(field_combination_json, combinedFieldMapDir,
+                  "combined_calibration");
+
+  ImGui::EndPopup();
+}
 static void DisplayGui() {
   ImGui::GetStyle().WindowRounding = 0;
 
@@ -185,23 +253,15 @@ static void DisplayGui() {
   static std::unique_ptr<pfd::open_file> cameraIntrinsicsSelector;
   static std::unique_ptr<pfd::open_file> idealFieldMapSelector;
   static std::unique_ptr<pfd::open_file> calibratedFieldMapSelector;
-  static std::unique_ptr<pfd::open_file> calibratedFieldMapMultiselector;
 
   static std::unique_ptr<pfd::select_folder> fieldVideoDirSelector;
-  static std::unique_ptr<pfd::select_folder> combinedFieldMapDirSelector;
 
   static wpi::json field_calibration_json;
-  static wpi::json field_combination_json;
 
   static std::string cameraIntrinsicsPath;
   static std::string idealFieldMapPath;
   static std::string fieldVideoDir;
-  static std::string combinedFieldMapDir;
   static std::string calibratedFieldMapPath;
-  static std::vector<std::string> calibratedFieldMapPaths;
-
-  static std::map<int, std::string> combinerMap;
-  static int currentCombinerTagId = 0;
 
   cameracalibration::CameraModel cameraModel = {
       Eigen::Matrix<double, 3, 3>::Identity(),
@@ -224,7 +284,6 @@ static void DisplayGui() {
 
   static Fieldmap currentCalibrationMap;
   static Fieldmap currentReferenceMap;
-  static Fieldmap currentCombinerMap;
 
   // camera matrix selector button
   SelectFileButton("Select Camera Intrinsics JSON", cameraIntrinsicsPath,
@@ -581,68 +640,8 @@ static void DisplayGui() {
 
   if (ImGui::BeginPopupModal("Combine Calibrations", NULL,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
-    SelectFileButton("Select Ideal Map", idealFieldMapPath,
-                     idealFieldMapSelector, "JSON", "*.json");
-    if (!idealFieldMapPath.empty()) {
-      DrawCheck();
-      std::ifstream json(idealFieldMapPath);
-      currentReferenceMap = Fieldmap(wpi::json::parse(json));
-      currentCombinerMap = currentReferenceMap;
-    }
-    SelectFilesButton("Select Field Calibrations", calibratedFieldMapPaths,
-                      calibratedFieldMapMultiselector, "JSON", "*.json");
-
-    if (!idealFieldMapPath.empty() && !calibratedFieldMapPaths.empty()) {
-      for (std::string& file : calibratedFieldMapPaths) {
-        ImGui::Selectable(getFileName(file).c_str(), false,
-                          ImGuiSelectableFlags_DontClosePopups);
-        if (ImGui::BeginDragDropSource()) {
-          ImGui::SetDragDropPayload("FieldCalibration", &file, sizeof(file));
-          ImGui::TextUnformatted(file.c_str());
-          ImGui::EndDragDropSource();
-        }
-      }
-
-      for (auto& [key, val] : combinerMap) {
-        EmitEntryTarget(key, val);
-      }
-
-      ImGui::InputInt("Tag ID", &currentCombinerTagId);
-      ImGui::SameLine();
-      if (ImGui::Button("Add", ImVec2(0, 0)) &&
-          currentCombinerMap.hasTag(currentCombinerTagId)) {
-        combinerMap.emplace(currentCombinerTagId, "");
-      }
-      ImGui::SameLine();
-      if (ImGui::Button("Remove", ImVec2(0, 0))) {
-        combinerMap.erase(currentCombinerTagId);
-      }
-    }
-    ImGui::Separator();
-    if (ImGui::Button("Close", ImVec2(0, 0))) {
-      ImGui::CloseCurrentPopup();
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Download", ImVec2(0, 0))) {
-      for (auto& [key, val] : combinerMap) {
-        std::ifstream json(val);
-        Fieldmap map(wpi::json::parse(json));
-        currentCombinerMap.replaceTag(key, map.getTag(key));
-      }
-      field_combination_json = currentCombinerMap.toJson();
-    }
-
-    if (combinedFieldMapDir.empty() && !field_combination_json.empty() &&
-        !combinedFieldMapDirSelector) {
-      combinedFieldMapDirSelector =
-          std::make_unique<pfd::select_folder>("Select Download Folder", "");
-    }
-
-    ProcessDirectorySelector(combinedFieldMapDirSelector, combinedFieldMapDir);
-    SaveCalibration(field_combination_json, combinedFieldMapDir,
-                    "combined_calibration");
-
-    ImGui::EndPopup();
+    CombineCalibrations(currentReferenceMap, idealFieldMapPath,
+                        idealFieldMapSelector);
   }
 
   ImGui::End();
