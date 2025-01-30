@@ -96,7 +96,7 @@ class Analyzer : public glass::View {
   /**
    * Used by DataSelector to import any missing tests.
    */
-  void SetMissingTests(std::vector<std::string>);
+  void SetMissingTests(const std::vector<std::string>& missingTests);
 
  private:
   /**
