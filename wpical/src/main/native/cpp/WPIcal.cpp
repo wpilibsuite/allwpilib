@@ -251,6 +251,110 @@ void CombineCalibrations(
 
   ImGui::EndPopup();
 }
+
+void VisualizeCalibrations(
+    Fieldmap& currentReferenceMap, std::string& calibratedFieldMapPath,
+    std::unique_ptr<pfd::open_file>& calibratedFieldMapSelector,
+    std::string& idealFieldMapPath,
+    std::unique_ptr<pfd::open_file>& idealFieldMapSelector) {
+  static int focusedTag = 1;
+  static int referenceTag = 1;
+  static Fieldmap currentCalibrationMap;
+  SelectFileButton("Select Calibration JSON", calibratedFieldMapPath,
+                   calibratedFieldMapSelector, "JSON", "*.json");
+
+  if (!calibratedFieldMapPath.empty()) {
+    ImGui::SameLine();
+    DrawCheck();
+  }
+
+  SelectFileButton("Select Ideal Field Map", idealFieldMapPath,
+                   idealFieldMapSelector, "JSON", "*.json");
+
+  if (!idealFieldMapPath.empty()) {
+    ImGui::SameLine();
+    DrawCheck();
+  }
+
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+  ImGui::InputInt("Focused Tag", &focusedTag);
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+  ImGui::InputInt("Reference Tag", &referenceTag);
+
+  if (!calibratedFieldMapPath.empty() && !idealFieldMapPath.empty()) {
+    std::ifstream calJson(calibratedFieldMapPath);
+    std::ifstream refJson(idealFieldMapPath);
+
+    currentCalibrationMap = Fieldmap(wpi::json::parse(calJson));
+    currentReferenceMap = Fieldmap(wpi::json::parse(refJson));
+
+    if (currentCalibrationMap.getNumTags() !=
+        currentReferenceMap.getNumTags()) {
+      ImGui::TextWrapped(
+          "The number of tags in the calibration output and the ideal field "
+          "map "
+          "do not match. Please ensure that the calibration output and ideal "
+          "field "
+          "map have the same number of tags.");
+    } else if (currentReferenceMap.hasTag(focusedTag) &&
+               currentReferenceMap.hasTag(referenceTag)) {
+      double xDiff = currentReferenceMap.getTag(focusedTag).xPos -
+                     currentCalibrationMap.getTag(focusedTag).xPos;
+      double yDiff = currentReferenceMap.getTag(focusedTag).yPos -
+                     currentCalibrationMap.getTag(focusedTag).yPos;
+      double zDiff = currentReferenceMap.getTag(focusedTag).zPos -
+                     currentCalibrationMap.getTag(focusedTag).zPos;
+      double yawDiff = currentReferenceMap.getTag(focusedTag).yawRot -
+                       currentCalibrationMap.getTag(focusedTag).yawRot;
+      double pitchDiff = currentReferenceMap.getTag(focusedTag).pitchRot -
+                         currentCalibrationMap.getTag(focusedTag).pitchRot;
+      double rollDiff = currentReferenceMap.getTag(focusedTag).rollRot -
+                        currentCalibrationMap.getTag(focusedTag).rollRot;
+
+      double xRef = currentCalibrationMap.getTag(referenceTag).xPos -
+                    currentCalibrationMap.getTag(focusedTag).xPos;
+      double yRef = currentCalibrationMap.getTag(referenceTag).yPos -
+                    currentCalibrationMap.getTag(focusedTag).yPos;
+      double zRef = currentCalibrationMap.getTag(referenceTag).zPos -
+                    currentCalibrationMap.getTag(focusedTag).zPos;
+
+      ImGui::TextWrapped("X Difference: %s (m)", std::to_string(xDiff).c_str());
+      ImGui::TextWrapped("Y Difference: %s (m)", std::to_string(yDiff).c_str());
+      ImGui::TextWrapped("Z Difference: %s (m)", std::to_string(zDiff).c_str());
+
+      ImGui::TextWrapped(
+          "Yaw Difference %s°",
+          std::to_string(
+              Fieldmap::minimizeAngle(yawDiff * (180.0 / std::numbers::pi)))
+              .c_str());
+      ImGui::TextWrapped(
+          "Pitch Difference %s°",
+          std::to_string(
+              Fieldmap::minimizeAngle(pitchDiff * (180.0 / std::numbers::pi)))
+              .c_str());
+      ImGui::TextWrapped(
+          "Roll Difference %s°",
+          std::to_string(
+              Fieldmap::minimizeAngle(rollDiff * (180.0 / std::numbers::pi)))
+              .c_str());
+
+      ImGui::NewLine();
+
+      ImGui::TextWrapped("X Reference: %s (m)", std::to_string(xRef).c_str());
+      ImGui::TextWrapped("Y Reference: %s (m)", std::to_string(yRef).c_str());
+      ImGui::TextWrapped("Z Reference: %s (m)", std::to_string(zRef).c_str());
+    } else {
+      ImGui::TextWrapped(
+          "Please select tags that are in the ideal field map and "
+          "calibration map");
+    }
+  }
+
+  if (ImGui::Button("Close")) {
+    ImGui::CloseCurrentPopup();
+  }
+  ImGui::EndPopup();
+}
 static void DisplayGui() {
   ImGui::GetStyle().WindowRounding = 0;
 
@@ -301,12 +405,8 @@ static void DisplayGui() {
 
   static int pinnedTag = 1;
 
-  static int focusedTag = 1;
-  static int referenceTag = 1;
-
   static int maxFRCTag = 22;
 
-  static Fieldmap currentCalibrationMap;
   static Fieldmap currentReferenceMap;
 
   // camera matrix selector button
@@ -555,103 +655,9 @@ static void DisplayGui() {
   // visualize calibration popup
   if (ImGui::BeginPopupModal("Visualize Calibration", NULL,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
-    SelectFileButton("Select Calibration JSON", calibratedFieldMapPath,
-                     calibratedFieldMapSelector, "JSON", "*.json");
-
-    if (!calibratedFieldMapPath.empty()) {
-      ImGui::SameLine();
-      DrawCheck();
-    }
-
-    SelectFileButton("Select Ideal Field Map", idealFieldMapPath,
-                     idealFieldMapSelector, "JSON", "*.json");
-
-    if (!idealFieldMapPath.empty()) {
-      ImGui::SameLine();
-      DrawCheck();
-    }
-
-    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-    ImGui::InputInt("Focused Tag", &focusedTag);
-    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-    ImGui::InputInt("Reference Tag", &referenceTag);
-
-    if (!calibratedFieldMapPath.empty() && !idealFieldMapPath.empty()) {
-      std::ifstream calJson(calibratedFieldMapPath);
-      std::ifstream refJson(idealFieldMapPath);
-
-      currentCalibrationMap = Fieldmap(wpi::json::parse(calJson));
-      currentReferenceMap = Fieldmap(wpi::json::parse(refJson));
-
-      if (currentCalibrationMap.getNumTags() !=
-          currentReferenceMap.getNumTags()) {
-        ImGui::TextWrapped(
-            "The number of tags in the calibration output and the ideal field "
-            "map "
-            "do not match. Please ensure that the calibration output and ideal "
-            "field "
-            "map have the same number of tags.");
-      } else if (currentReferenceMap.hasTag(focusedTag) &&
-                 currentReferenceMap.hasTag(referenceTag)) {
-        double xDiff = currentReferenceMap.getTag(focusedTag).xPos -
-                       currentCalibrationMap.getTag(focusedTag).xPos;
-        double yDiff = currentReferenceMap.getTag(focusedTag).yPos -
-                       currentCalibrationMap.getTag(focusedTag).yPos;
-        double zDiff = currentReferenceMap.getTag(focusedTag).zPos -
-                       currentCalibrationMap.getTag(focusedTag).zPos;
-        double yawDiff = currentReferenceMap.getTag(focusedTag).yawRot -
-                         currentCalibrationMap.getTag(focusedTag).yawRot;
-        double pitchDiff = currentReferenceMap.getTag(focusedTag).pitchRot -
-                           currentCalibrationMap.getTag(focusedTag).pitchRot;
-        double rollDiff = currentReferenceMap.getTag(focusedTag).rollRot -
-                          currentCalibrationMap.getTag(focusedTag).rollRot;
-
-        double xRef = currentCalibrationMap.getTag(referenceTag).xPos -
-                      currentCalibrationMap.getTag(focusedTag).xPos;
-        double yRef = currentCalibrationMap.getTag(referenceTag).yPos -
-                      currentCalibrationMap.getTag(focusedTag).yPos;
-        double zRef = currentCalibrationMap.getTag(referenceTag).zPos -
-                      currentCalibrationMap.getTag(focusedTag).zPos;
-
-        ImGui::TextWrapped("X Difference: %s (m)",
-                           std::to_string(xDiff).c_str());
-        ImGui::TextWrapped("Y Difference: %s (m)",
-                           std::to_string(yDiff).c_str());
-        ImGui::TextWrapped("Z Difference: %s (m)",
-                           std::to_string(zDiff).c_str());
-
-        ImGui::TextWrapped(
-            "Yaw Difference %s°",
-            std::to_string(
-                Fieldmap::minimizeAngle(yawDiff * (180.0 / std::numbers::pi)))
-                .c_str());
-        ImGui::TextWrapped(
-            "Pitch Difference %s°",
-            std::to_string(
-                Fieldmap::minimizeAngle(pitchDiff * (180.0 / std::numbers::pi)))
-                .c_str());
-        ImGui::TextWrapped(
-            "Roll Difference %s°",
-            std::to_string(
-                Fieldmap::minimizeAngle(rollDiff * (180.0 / std::numbers::pi)))
-                .c_str());
-
-        ImGui::NewLine();
-
-        ImGui::TextWrapped("X Reference: %s (m)", std::to_string(xRef).c_str());
-        ImGui::TextWrapped("Y Reference: %s (m)", std::to_string(yRef).c_str());
-        ImGui::TextWrapped("Z Reference: %s (m)", std::to_string(zRef).c_str());
-      } else {
-        ImGui::TextWrapped(
-            "Please select tags that are in the ideal field map and "
-            "calibration map");
-      }
-    }
-
-    if (ImGui::Button("Close")) {
-      ImGui::CloseCurrentPopup();
-    }
-    ImGui::EndPopup();
+    VisualizeCalibrations(currentReferenceMap, calibratedFieldMapPath,
+                          calibratedFieldMapSelector, idealFieldMapPath,
+                          idealFieldMapSelector);
   }
 
   if (ImGui::BeginPopupModal("Combine Calibrations", NULL,
