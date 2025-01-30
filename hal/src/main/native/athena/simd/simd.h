@@ -46,7 +46,7 @@ SIMD_INLINE size_t AlignLo(size_t size, size_t align) {
 }
 
 SIMD_INLINE void* AlignLo(const void* ptr, size_t align) {
-  return (void*)(((size_t)ptr) & ~(align - 1));
+  return reinterpret_cast<void*>(reinterpret_cast<size_t>(ptr) & ~(align - 1));
 }
 
 SIMD_INLINE bool Aligned(size_t size, size_t align) {
