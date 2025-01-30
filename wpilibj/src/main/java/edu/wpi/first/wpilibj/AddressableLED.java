@@ -38,7 +38,7 @@ public class AddressableLED implements AutoCloseable {
     /** GRB order. This is the default order. */
     kGRB(AddressableLEDJNI.COLOR_ORDER_GRB);
 
-    /** The native value for this ColorOrder */
+    /** The native value for this ColorOrder. */
     public final int value;
 
     ColorOrder(int value) {
