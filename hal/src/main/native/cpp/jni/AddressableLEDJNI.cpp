@@ -15,6 +15,19 @@ using namespace wpi::java;
 
 static_assert(sizeof(jbyte) * 4 == sizeof(HAL_AddressableLEDData));
 
+static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_RGB ==
+              HAL_ALED_RGB);
+static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_RBG ==
+              HAL_ALED_RBG);
+static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_BGR ==
+              HAL_ALED_BGR);
+static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_BRG ==
+              HAL_ALED_BRG);
+static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_GBR ==
+              HAL_ALED_GBR);
+static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_GRB ==
+              HAL_ALED_GRB);
+
 extern "C" {
 /*
  * Class:     edu_wpi_first_hal_AddressableLEDJNI
@@ -44,6 +57,22 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_free
   if (handle != HAL_kInvalidHandle) {
     HAL_FreeAddressableLED(static_cast<HAL_AddressableLEDHandle>(handle));
   }
+}
+
+/*
+ * Class:     edu_wpi_first_hal_AddressableLEDJNI
+ * Method:    setColorOrder
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_AddressableLEDJNI_setColorOrder
+  (JNIEnv* env, jclass, jint handle, jint colorOrder)
+{
+  int32_t status = 0;
+  HAL_SetAddressableLEDColorOrder(
+      static_cast<HAL_AddressableLEDHandle>(handle),
+      static_cast<HAL_AddressableLEDColorOrder>(colorOrder), &status);
+  CheckStatus(env, status);
 }
 
 /*
