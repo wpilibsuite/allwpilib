@@ -113,7 +113,7 @@ void DataSelector::Display() {
           continue;
         }
         WPI_INFO(m_logger, "Loaded test state {}", it2->first);
-        executedTests.push_back(it2->first);
+        executedTests[it2->first] = true;
         ++it2;
       }
       if (it->second.empty()) {
@@ -134,10 +134,19 @@ void DataSelector::Display() {
     }
     return;
   }
+  
 
   if (executedTests.size() < 4) {
-    std::ranges::sort(executedTests);
-    std::ranges::set_difference(executedTests, kValidTests,
+    std::vector<std::string> executedKeys{}, validKeys{};
+
+    for (auto test : kValidTests) {
+      validKeys.push_back(test.first);
+    }
+    for (auto test : executedTests) {
+      executedKeys.push_back(test.first);
+    }
+
+    std::ranges::set_difference(executedKeys, validKeys,
                                 std::back_inserter(m_missingTests));
   }
 

@@ -75,10 +75,21 @@ class DataSelector : public glass::View {
   int m_selectedAnalysis = 0;
   std::future<TestData> m_testdataFuture;
   std::vector<std::string> m_testdataStats;
-  std::vector<std::string> kValidTests;
+  std::map<std::string, bool, std::less<std::string>> kValidTests = {
+      {"quasistatic-forward", true},
+      {"quasistatic-reverse", true},
+      {"dynamic-forward", true},
+      {"dynamic-reverse", true}
+  };
+  std::map<std::string, bool, std::less<std::string>> executedTests; //= {
+  //     {"quasistatic-forward", false},
+  //     {"quasistatic-reverse", false},
+  //     {"dynamic-forward", false},
+  //     {"dynamic-reverse", false}
+  // };
 
   static Tests LoadTests(const glass::DataLogReaderEntry& testStateEntry);
   TestData BuildTestData();
-  std::vector<std::string> executedTests{};
+  
 };
 }  // namespace sysid
