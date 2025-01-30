@@ -37,12 +37,12 @@ class AddressableLED {
    * Order that color data is sent over the wire.
    */
   enum ColorOrder {
+    kRGB = HAL_ALED_RGB,  ///< RGB order
     kRBG = HAL_ALED_RBG,  ///< RBG order
     kBGR = HAL_ALED_BGR,  ///< BGR order
     kBRG = HAL_ALED_BRG,  ///< BRG order
-    kGRB = HAL_ALED_GRB,  ///< GRB order
     kGBR = HAL_ALED_GBR,  ///< GBR order
-    kRGB = HAL_ALED_RGB   ///< RGB order
+    kGRB = HAL_ALED_GRB   ///< GRB order. This is the default order.
   };
 
   class LEDData : public HAL_AddressableLEDData {
@@ -111,7 +111,7 @@ class AddressableLED {
   AddressableLED& operator=(AddressableLED&&) = default;
 
   /**
-   * Sets the color order for this AddressableLED. The default order is RGB.
+   * Sets the color order for this AddressableLED. The default order is GRB.
    *
    * @param order the color order
    */

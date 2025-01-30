@@ -10,12 +10,12 @@ package edu.wpi.first.hal;
  * @see "hal/AddressableLED.h"
  */
 public class AddressableLEDJNI extends JNIWrapper {
-  public static final int COLOR_ORDER_RBG = 0;
-  public static final int COLOR_ORDER_BGR = 1;
-  public static final int COLOR_ORDER_BRG = 2;
-  public static final int COLOR_ORDER_GRB = 3;
+  public static final int COLOR_ORDER_RGB = 0;
+  public static final int COLOR_ORDER_RBG = 1;
+  public static final int COLOR_ORDER_BGR = 2;
+  public static final int COLOR_ORDER_BRG = 3;
   public static final int COLOR_ORDER_GBR = 4;
-  public static final int COLOR_ORDER_RGB = 5;
+  public static final int COLOR_ORDER_GRB = 5;
 
   /**
    * Initialize Addressable LED using a PWM Digital handle.
@@ -35,7 +35,7 @@ public class AddressableLEDJNI extends JNIWrapper {
   public static native void free(int handle);
 
   /**
-   * Sets the color order for the addressable LED output
+   * Sets the color order for the addressable LED output. The default order is GRB.
    *
    * @param handle the Addressable LED handle
    * @param colorOrder the color order

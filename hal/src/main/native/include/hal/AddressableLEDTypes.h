@@ -22,12 +22,12 @@ struct HAL_AddressableLEDData {
  * Order that color data is sent over the wire.
  */
 HAL_ENUM(HAL_AddressableLEDColorOrder) {
+  HAL_ALED_RGB,
   HAL_ALED_RBG,
   HAL_ALED_BGR,
   HAL_ALED_BRG,
-  HAL_ALED_GRB,
   HAL_ALED_GBR,
-  HAL_ALED_RGB
+  HAL_ALED_GRB
 };
 
 #ifdef __cplusplus

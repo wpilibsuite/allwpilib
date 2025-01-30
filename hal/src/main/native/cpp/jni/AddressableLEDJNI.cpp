@@ -15,12 +15,18 @@ using namespace wpi::java;
 
 static_assert(sizeof(jbyte) * 4 == sizeof(HAL_AddressableLEDData));
 
-static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_RBG == HAL_ALED_RBG);
-static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_BGR == HAL_ALED_BGR);
-static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_BRG == HAL_ALED_BRG);
-static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_GRB == HAL_ALED_GRB);
-static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_GBR == HAL_ALED_GBR);
-static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_RGB == HAL_ALED_RGB);
+static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_RGB ==
+              HAL_ALED_RGB);
+static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_RBG ==
+              HAL_ALED_RBG);
+static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_BGR ==
+              HAL_ALED_BGR);
+static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_BRG ==
+              HAL_ALED_BRG);
+static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_GBR ==
+              HAL_ALED_GBR);
+static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_GRB ==
+              HAL_ALED_GRB);
 
 extern "C" {
 /*

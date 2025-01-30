@@ -29,7 +29,7 @@ struct AddressableLED {
   void* ledBuffer;
   size_t ledBufferSize;
   int32_t stringLength = 1;
-  HAL_AddressableLEDColorOrder colorOrder = HAL_ALED_RGB;
+  HAL_AddressableLEDColorOrder colorOrder = HAL_ALED_GRB;
 };
 }  // namespace
 
@@ -49,33 +49,33 @@ void InitializeAddressableLED() {
 
 static constexpr const char* HmbName = "HMB_0_LED";
 
-inline void ConvertAndCopyLEDData(void* dst,
+static void ConvertAndCopyLEDData(void* dst,
                                   const struct HAL_AddressableLEDData* src,
                                   int32_t len,
                                   HAL_AddressableLEDColorOrder order) {
   switch (order) {
-    case HAL_ALED_RGB:
+    case HAL_ALED_GRB:
       std::memcpy(dst, src, len * sizeof(HAL_AddressableLEDData));
       break;
+    case HAL_ALED_RGB:
+      ConvertPixels<HAL_ALED_RGB>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
+      break;
     case HAL_ALED_RBG:
-      RGBConvert<HAL_ALED_RBG>(reinterpret_cast<const uint8_t*>(src),
-                               reinterpret_cast<uint8_t*>(dst), len);
+      ConvertPixels<HAL_ALED_RBG>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
       break;
     case HAL_ALED_BGR:
-      RGBConvert<HAL_ALED_BGR>(reinterpret_cast<const uint8_t*>(src),
-                               reinterpret_cast<uint8_t*>(dst), len);
+      ConvertPixels<HAL_ALED_BGR>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
       break;
     case HAL_ALED_BRG:
-      RGBConvert<HAL_ALED_BRG>(reinterpret_cast<const uint8_t*>(src),
-                               reinterpret_cast<uint8_t*>(dst), len);
-      break;
-    case HAL_ALED_GRB:
-      RGBConvert<HAL_ALED_GRB>(reinterpret_cast<const uint8_t*>(src),
-                               reinterpret_cast<uint8_t*>(dst), len);
+      ConvertPixels<HAL_ALED_BRG>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
       break;
     case HAL_ALED_GBR:
-      RGBConvert<HAL_ALED_GBR>(reinterpret_cast<const uint8_t*>(src),
-                               reinterpret_cast<uint8_t*>(dst), len);
+      ConvertPixels<HAL_ALED_GBR>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
       break;
   }
 }

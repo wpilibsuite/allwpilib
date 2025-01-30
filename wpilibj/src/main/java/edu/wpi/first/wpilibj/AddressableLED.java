@@ -12,8 +12,8 @@ import edu.wpi.first.hal.PWMJNI;
 /**
  * A class for driving addressable LEDs, such as WS2812B, WS2815, and NeoPixels.
  *
- * <p>By default, the timing supports WS2812B and WS2815 LEDs, but is configurable using
- * {@link #setBitTiming(int, int, int, int)}
+ * <p>By default, the timing supports WS2812B and WS2815 LEDs, but is configurable using {@link
+ * #setBitTiming(int, int, int, int)}
  *
  * <p>Some LEDs use a different color order than the default RGB. The color order is configurable
  * using {@link #setColorOrder(ColorOrder)}.
@@ -25,18 +25,18 @@ public class AddressableLED implements AutoCloseable {
 
   /** Order that color data is sent over the wire. */
   enum ColorOrder {
+    /** RGB order. */
+    kRGB(AddressableLEDJNI.COLOR_ORDER_RGB),
     /** RBG order. */
     kRBG(AddressableLEDJNI.COLOR_ORDER_RBG),
     /** BGR order. */
     kBGR(AddressableLEDJNI.COLOR_ORDER_BGR),
     /** BRG order. */
     kBRG(AddressableLEDJNI.COLOR_ORDER_BRG),
-    /** GRB order. */
-    kGRB(AddressableLEDJNI.COLOR_ORDER_GRB),
     /** GBR order. */
     kGBR(AddressableLEDJNI.COLOR_ORDER_GBR),
-    /** RGB order. */
-    kRGB(AddressableLEDJNI.COLOR_ORDER_RGB);
+    /** GRB order. This is the default order. */
+    kGRB(AddressableLEDJNI.COLOR_ORDER_GRB);
 
     /** The native value for this ColorOrder */
     public final int value;
@@ -89,7 +89,7 @@ public class AddressableLED implements AutoCloseable {
   }
 
   /**
-   * Sets the color order for this AddressableLED. The default order is RGB.
+   * Sets the color order for this AddressableLED. The default order is GRB.
    *
    * @param order the color order
    */
