@@ -120,7 +120,7 @@ nativeUtils.platformConfigs.each {
         it.cppCompiler.args.add("-fpermissive")
     }
 }
-def testResources = "\"$rootDir/wpical/src/main/native/resources\"".replace("\\", "/")
+def testResources = "\"$rootDir/wpical/src/main/native/assets\"".replace("\\", "/")
 model {
     components {
         "${nativeName}"(NativeExecutableSpec) {
