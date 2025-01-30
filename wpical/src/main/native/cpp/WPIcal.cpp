@@ -123,20 +123,26 @@ std::string getFileName(std::string path) {
   return path.substr(lastSlash + 1, lastDot - lastSlash - 1);
 }
 
-void SaveCalibration(wpi::json& field, std::string& outputDirectory,
-                     std::string outputName) {
-  if (!field.empty() && !outputDirectory.empty()) {
-    std::cout << "Saving calibration to " << outputDirectory << std::endl;
-    std::ofstream out(outputDirectory + "/" + outputName + ".json");
+void SaveCalibration(wpi::json& field, std::string outputName) {
+  static std::unique_ptr<pfd::select_folder> saveDirSelector;
+  static std::string saveDir;
+  if (saveDir.empty() && !saveDirSelector) {
+    saveDirSelector =
+        std::make_unique<pfd::select_folder>("Select Download Folder", "");
+  }
+  ProcessDirectorySelector(saveDirSelector, saveDir);
+  if (!field.empty() && !saveDir.empty()) {
+    std::cout << "Saving calibration to " << saveDir << std::endl;
+    std::ofstream out(saveDir + "/" + outputName + ".json");
     out << field.dump(4);
     out.close();
 
-    std::ofstream fmap(outputDirectory + "/" + outputName + ".fmap");
+    std::ofstream fmap(saveDir + "/" + outputName + ".fmap");
     fmap << fmap::convertfmap(field).dump(4);
     fmap.close();
 
     field.clear();
-    outputDirectory.clear();
+    saveDir.clear();
   }
 }
 
@@ -144,8 +150,6 @@ void CombineCalibrations(
     Fieldmap& currentReferenceMap, std::string& idealFieldMapPath,
     std::unique_ptr<pfd::open_file>& idealFieldMapSelector) {
   static std::unique_ptr<pfd::open_file> calibratedFieldMapMultiselector;
-  static std::unique_ptr<pfd::select_folder> combinedFieldMapDirSelector;
-  static std::string combinedFieldMapDir;
   static std::vector<std::string> calibratedFieldMapPaths;
   static std::map<int, std::string> combinerMap;
   static int currentCombinerTagId = 0;
@@ -213,17 +217,8 @@ void CombineCalibrations(
       currentCombinerMap.replaceTag(key, map.getTag(key));
     }
     field_combination_json = currentCombinerMap.toJson();
+    SaveCalibration(field_combination_json, "combined_calibration");
   }
-
-  if (combinedFieldMapDir.empty() && !field_combination_json.empty() &&
-      !combinedFieldMapDirSelector) {
-    combinedFieldMapDirSelector =
-        std::make_unique<pfd::select_folder>("Select Download Folder", "");
-  }
-
-  ProcessDirectorySelector(combinedFieldMapDirSelector, combinedFieldMapDir);
-  SaveCalibration(field_combination_json, combinedFieldMapDir,
-                  "combined_calibration");
 
   ImGui::EndPopup();
 }
@@ -333,16 +328,8 @@ static void DisplayGui() {
       ImGui::OpenPopup("Field Calibration Error");
     }
 
-    if (combinedFieldMapDir.empty() && !field_calibration_json.empty() &&
-        !combinedFieldMapDirSelector) {
-      combinedFieldMapDirSelector =
-          std::make_unique<pfd::select_folder>("Select Download Folder", "");
-    }
+    SaveCalibration(field_calibration_json, "field_calibration");
   }
-
-  ProcessDirectorySelector(combinedFieldMapDirSelector, combinedFieldMapDir);
-  SaveCalibration(field_calibration_json, combinedFieldMapDir,
-                  "field_calibration");
 
   if (ImGui::Button("Visualize")) {
     ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
