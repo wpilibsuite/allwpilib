@@ -53,7 +53,7 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
       Eigen::Matrix<double, 1, 1>{0.0}, Eigen::Matrix<double, 1, 1>{1.0},
       Eigen::Matrix<double, 1, 1>{1.0}, Eigen::Matrix<double, 1, 1>{0.0});
 
-alignas(double)
+  alignas(double)
   auto Q = frc::MakeCostMatrix(params.qv);
   alignas(double)
   auto R = frc::MakeCostMatrix(params.r);

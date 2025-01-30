@@ -338,7 +338,7 @@ void Analyzer::HandleError(std::string_view msg) {
   PrepareRawGraphs();
 }
 
-void Analyzer::SetMissingTests(std::vector<std::string> missingTests) {
+void Analyzer::SetMissingTests(const std::vector<std::string>& missingTests) {
   m_missingTests = missingTests;
 }
 
