@@ -99,7 +99,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    *
    * @param channel the channel to attach to
    * @param fullRange the value to report at maximum travel
-   * @param expectedZero the reading where you would expect a 0 from get()
+   * @param expectedZero the reading where you would expect a 0 from Get()
    */
   DutyCycleEncoder(int channel, double fullRange, double expectedZero);
 
@@ -108,7 +108,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    *
    * @param dutyCycle the duty cycle to attach to
    * @param fullRange the value to report at maximum travel
-   * @param expectedZero the reading where you would expect a 0 from get()
+   * @param expectedZero the reading where you would expect a 0 from Get()
    */
   DutyCycleEncoder(DutyCycle& dutyCycle, double fullRange, double expectedZero);
 
@@ -117,7 +117,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    *
    * @param dutyCycle the duty cycle to attach to
    * @param fullRange the value to report at maximum travel
-   * @param expectedZero the reading where you would expect a 0 from get()
+   * @param expectedZero the reading where you would expect a 0 from Get()
    */
   DutyCycleEncoder(DutyCycle* dutyCycle, double fullRange, double expectedZero);
 
@@ -126,7 +126,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    *
    * @param dutyCycle the duty cycle to attach to
    * @param fullRange the value to report at maximum travel
-   * @param expectedZero the reading where you would expect a 0 from get()
+   * @param expectedZero the reading where you would expect a 0 from Get()
    */
   DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle, double fullRange,
                    double expectedZero);
@@ -136,7 +136,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    *
    * @param digitalSource the digital source to attach to
    * @param fullRange the value to report at maximum travel
-   * @param expectedZero the reading where you would expect a 0 from get()
+   * @param expectedZero the reading where you would expect a 0 from Get()
    */
   DutyCycleEncoder(DigitalSource& digitalSource, double fullRange,
                    double expectedZero);
@@ -146,7 +146,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    *
    * @param digitalSource the digital source to attach to
    * @param fullRange the value to report at maximum travel
-   * @param expectedZero the reading where you would expect a 0 from get()
+   * @param expectedZero the reading where you would expect a 0 from Get()
    */
   DutyCycleEncoder(DigitalSource* digitalSource, double fullRange,
                    double expectedZero);
@@ -156,7 +156,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    *
    * @param digitalSource the digital source to attach to
    * @param fullRange the value to report at maximum travel
-   * @param expectedZero the reading where you would expect a 0 from get()
+   * @param expectedZero the reading where you would expect a 0 from Get()
    */
   DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource,
                    double fullRange, double expectedZero);
@@ -199,12 +199,12 @@ class DutyCycleEncoder : public wpi::Sendable,
   void SetConnectedFrequencyThreshold(int frequency);
 
   /**
-   * Get the encoder value.
+   * Get the encoder value in rotations.
    *
    * @warning This will return inaccurate values for up to 2 seconds after this
    * encoder is initialized unless SetAssumedFrequency() is used.
    *
-   * @return the encoder value scaled by the full range input
+   * @return the encoder value in rotations
    */
   double Get() const;
 
