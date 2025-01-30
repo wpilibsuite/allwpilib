@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #include "hal/AnalogInput.h"
-#include "hal/AnalogTrigger.h"
 #include "hal/CAN.h"
 #include "hal/CANAPI.h"
 #include "hal/CTREPCM.h"

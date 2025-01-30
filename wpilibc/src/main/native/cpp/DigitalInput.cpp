@@ -42,18 +42,6 @@ bool DigitalInput::Get() const {
   return value;
 }
 
-HAL_Handle DigitalInput::GetPortHandleForRouting() const {
-  return m_handle;
-}
-
-AnalogTriggerType DigitalInput::GetAnalogTriggerTypeForRouting() const {
-  return static_cast<AnalogTriggerType>(0);
-}
-
-bool DigitalInput::IsAnalogTrigger() const {
-  return false;
-}
-
 void DigitalInput::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetDIOSimDevice(m_handle, device);
 }

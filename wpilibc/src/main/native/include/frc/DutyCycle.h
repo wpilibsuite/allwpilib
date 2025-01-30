@@ -13,9 +13,6 @@
 #include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
-class DigitalSource;
-class AnalogTrigger;
-
 /**
  * Class to read a duty cycle PWM input.
  *
@@ -28,8 +25,6 @@ class AnalogTrigger;
  *
  */
 class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
-  friend class AnalogTrigger;
-
  public:
   /**
    * Constructs a DutyCycle input from a smartio channel.

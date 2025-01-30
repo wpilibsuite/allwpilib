@@ -18,7 +18,6 @@ inline void CheckInit() {
 
 extern void InitializeAddressableLEDData();
 extern void InitializeAnalogInData();
-extern void InitializeAnalogTriggerData();
 extern void InitializeCanData();
 extern void InitializeCANAPI();
 extern void InitializeDigitalPWMData();
@@ -37,7 +36,6 @@ extern void InitializeSimDeviceData();
 extern void InitializeAddressableLED();
 extern void InitializeAnalogInput();
 extern void InitializeAnalogInternal();
-extern void InitializeAnalogTrigger();
 extern void InitializeCAN();
 extern void InitializeConstants();
 extern void InitializeCounter();

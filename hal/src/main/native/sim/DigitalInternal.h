@@ -9,7 +9,6 @@
 #include <string>
 
 #include "PortsInternal.h"
-#include "hal/AnalogTrigger.h"
 #include "hal/handles/DigitalHandleResource.h"
 
 namespace hal {
@@ -57,17 +56,6 @@ struct DigitalPort {
 extern DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
                              kNumDigitalChannels + kNumPWMHeaders>*
     digitalChannelHandles;
-
-/**
- * Remap the digital source channel and set the module.
- *
- * If it's an analog trigger, determine the module from the high order routing
- * channel else do normal digital input remapping based on channel number
- * (MXP).
- */
-bool remapDigitalSource(HAL_Handle digitalSourceHandle,
-                        HAL_AnalogTriggerType analogTriggerType,
-                        uint8_t& channel, uint8_t& module, bool& analogTrigger);
 
 /**
  * Map DIO channel numbers from their physical number (10 to 26) to their

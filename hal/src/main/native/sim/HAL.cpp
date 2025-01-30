@@ -68,7 +68,6 @@ namespace hal::init {
 void InitializeHAL() {
   InitializeAddressableLEDData();
   InitializeAnalogInData();
-  InitializeAnalogTriggerData();
   InitializeCanData();
   InitializeCANAPI();
   InitializeDigitalPWMData();
@@ -86,7 +85,6 @@ void InitializeHAL() {
   InitializeAddressableLED();
   InitializeAnalogInput();
   InitializeAnalogInternal();
-  InitializeAnalogTrigger();
   InitializeCAN();
   InitializeConstants();
   InitializeCounter();
