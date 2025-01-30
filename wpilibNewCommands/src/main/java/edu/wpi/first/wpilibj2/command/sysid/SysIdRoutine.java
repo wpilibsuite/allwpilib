@@ -278,4 +278,36 @@ public class SysIdRoutine extends SysIdRoutineLog {
         .withName("sysid-" + state.toString() + "-" + m_mechanism.m_name)
         .withTimeout(m_config.m_timeout.in(Seconds));
   }
+
+  /**
+   * Returns a command to run a quasistatic test in the specified direction.
+   *
+   * <p>The command will call the `drive` and `log` callbacks supplied at routine construction once
+   * per iteration. Upon command end or interruption, the `drive` callback is called with a value of
+   * 0 volts.
+   *
+   * @param direction The direction in which to run the test.
+   * @return A command to run the test.
+   * @deprecated Use {@link SysIdRoutine#sweep(Direction)} instead
+   */
+  @Deprecated(forRemoval = true, since = "2026")
+  public Command quasistatic(Direction direction) {
+    return sweep(direction);
+  }
+
+  /**
+   * Returns a command to run a dynamic test in the specified direction.
+   *
+   * <p>The command will call the `drive` and `log` callbacks supplied at routine construction once
+   * per iteration. Upon command end or interruption, the `drive` callback is called with a value of
+   * 0 volts.
+   *
+   * @param direction The direction in which to run the test.
+   * @return A command to run the test.
+   * @deprecated Use {@link SysIdRoutine#step(Direction)} instead
+   */
+  @Deprecated(forRemoval = true, since = "2026")
+  public Command dynamic(Direction direction) {
+    return step(direction);
+  }
 }

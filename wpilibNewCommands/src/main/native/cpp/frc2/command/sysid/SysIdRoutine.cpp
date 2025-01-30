@@ -64,3 +64,11 @@ frc2::CommandPtr SysIdRoutine::Step(Direction direction) {
                 m_mechanism.m_name)
       .WithTimeout(m_config.m_timeout);
 }
+
+frc2::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
+  return Sweep(direction);
+}
+
+frc2::CommandPtr SysIdRoutine::Dynamic(Direction direction) {
+  return Step(direction);
+}

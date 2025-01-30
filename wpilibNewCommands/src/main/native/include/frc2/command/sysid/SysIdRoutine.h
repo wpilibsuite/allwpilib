@@ -188,6 +188,11 @@ class SysIdRoutine : public frc::sysid::SysIdRoutineLog {
   frc2::CommandPtr Sweep(Direction direction);
   frc2::CommandPtr Step(Direction direction);
 
+  [[deprecated("Use Sweep instead")]]
+  frc2::CommandPtr Quasistatic(Direction direction);
+  [[deprecated("Use Step instead")]]
+  frc2::CommandPtr Dynamic(Direction direction);
+
  private:
   Config m_config;
   Mechanism m_mechanism;
