@@ -144,7 +144,7 @@ static bool EmitEntryTarget(int tagId, std::string& filePath) {
 }
 
 void SaveCalibration(wpi::json& field, std::string& outputDirectory,
-                     std::string outputName, bool& isCalibrating) {
+                     std::string outputName) {
   if (!field.empty() && !outputDirectory.empty()) {
     std::cout << "Saving calibration to " << outputDirectory << std::endl;
     std::ofstream out(outputDirectory + "/" + outputName + ".json");
@@ -157,7 +157,6 @@ void SaveCalibration(wpi::json& field, std::string& outputDirectory,
 
     field.clear();
     outputDirectory.clear();
-    isCalibrating = false;
   }
 }
 
@@ -204,8 +203,6 @@ static void DisplayGui() {
 
   static std::map<int, std::string> combinerMap;
   static int currentCombinerTagId = 0;
-
-  static bool isCalibrating = false;
 
   cameracalibration::CameraModel cameraModel = {
       Eigen::Matrix<double, 3, 3>::Identity(),
@@ -287,7 +284,7 @@ static void DisplayGui() {
 
   ProcessDirectorySelector(combinedFieldMapDirSelector, combinedFieldMapDir);
   SaveCalibration(field_calibration_json, combinedFieldMapDir,
-                  "field_calibration", isCalibrating);
+                  "field_calibration");
 
   if (ImGui::Button("Visualize")) {
     ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
@@ -644,7 +641,7 @@ static void DisplayGui() {
 
     ProcessDirectorySelector(combinedFieldMapDirSelector, combinedFieldMapDir);
     SaveCalibration(field_combination_json, combinedFieldMapDir,
-                    "combined_calibration", isCalibrating);
+                    "combined_calibration");
 
     ImGui::EndPopup();
   }
