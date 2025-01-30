@@ -15,9 +15,8 @@ const std::string calSavePath =
     projectRootPath.substr(0, projectRootPath.find("/src/main/native/assets")) +
     "/build";
 cameracalibration::CameraModel cameraModel = {
-    .intrinsic_matrix = Eigen::Matrix<double, 3, 3>::Identity(),
-    .distortion_coefficients = Eigen::Matrix<double, 8, 1>::Zero(),
-    .avg_reprojection_error = 0.0};
+    Eigen::Matrix<double, 3, 3>::Identity(),
+    Eigen::Matrix<double, 8, 1>::Zero(), 0.0};
 
 wpi::json output_json;
 

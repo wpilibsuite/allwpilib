@@ -13,9 +13,9 @@
 
 namespace cameracalibration {
 struct CameraModel {
-  Eigen::Matrix<double, 3, 3> intrinsic_matrix;
-  Eigen::Matrix<double, 8, 1> distortion_coefficients;
-  double avg_reprojection_error;
+  Eigen::Matrix<double, 3, 3> intrinsicMatrix;
+  Eigen::Matrix<double, 8, 1> distortionCoefficients;
+  double avgReprojectionError;
 };
 
 int calibrate(const std::string& input_video, CameraModel& camera_model,
@@ -29,20 +29,20 @@ int calibrate(const std::string& input_video, CameraModel& camera_model,
               float square_width, int board_width, int board_height,
               double imagerWidthPixels, double imagerHeightPixels,
               bool show_debug_window);
-static void dumpJson(CameraModel& camera_model,
+static void dumpJson(CameraModel& cameraModel,
                      const std::string& output_file_path) {
-  std::vector<double> camera_matrix(camera_model.intrinsic_matrix.data(),
-                                    camera_model.intrinsic_matrix.data() +
-                                        camera_model.intrinsic_matrix.size());
-  std::vector<double> distortion_coefficients(
-      camera_model.distortion_coefficients.data(),
-      camera_model.distortion_coefficients.data() +
-          camera_model.distortion_coefficients.size());
+  std::vector<double> camera_matrix(
+      cameraModel.intrinsicMatrix.data(),
+      cameraModel.intrinsicMatrix.data() + cameraModel.intrinsicMatrix.size());
+  std::vector<double> distortionCoefficients(
+      cameraModel.distortionCoefficients.data(),
+      cameraModel.distortionCoefficients.data() +
+          cameraModel.distortionCoefficients.size());
 
   wpi::json result = {
       {"camera_matrix", camera_matrix},
-      {"distortion_coefficients", distortion_coefficients},
-      {"avg_reprojection_error", camera_model.avg_reprojection_error}};
+      {"distortion_coefficients", distortionCoefficients},
+      {"avg_reprojection_error", cameraModel.avgReprojectionError}};
 
   std::ofstream output_file(output_file_path);
   output_file << result.dump(4) << std::endl;
