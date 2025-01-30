@@ -60,10 +60,10 @@ void Analyzer::UpdateFeedforwardGains() {
   } catch (const sysid::InvalidDataError& e) {
     m_state = AnalyzerState::kGeneralDataError;
     HandleError(e.what());
-  } catch (const sysid::NoQuasistaticDataError& e) {
+  } catch (const sysid::NoSweepDataError& e) {
     m_state = AnalyzerState::kVelocityThresholdError;
     HandleError(e.what());
-  } catch (const sysid::NoDynamicDataError& e) {
+  } catch (const sysid::NoStepDataError& e) {
     m_state = AnalyzerState::kTestDurationError;
     HandleError(e.what());
   } catch (const AnalysisManager::FileReadingError& e) {
@@ -275,10 +275,10 @@ void Analyzer::PrepareData() {
   } catch (const sysid::InvalidDataError& e) {
     m_state = AnalyzerState::kGeneralDataError;
     HandleError(e.what());
-  } catch (const sysid::NoQuasistaticDataError& e) {
+  } catch (const sysid::NoSweepDataError& e) {
     m_state = AnalyzerState::kVelocityThresholdError;
     HandleError(e.what());
-  } catch (const sysid::NoDynamicDataError& e) {
+  } catch (const sysid::NoStepDataError& e) {
     m_state = AnalyzerState::kTestDurationError;
     HandleError(e.what());
   } catch (const AnalysisManager::FileReadingError& e) {

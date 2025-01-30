@@ -28,10 +28,10 @@ frc2::CommandPtr Shooter::RunShooterCommand(
       .WithName("Set Shooter Speed");
 }
 
-frc2::CommandPtr Shooter::SysIdQuasistatic(frc2::sysid::Direction direction) {
-  return m_sysIdRoutine.Quasistatic(direction);
+frc2::CommandPtr Shooter::SysIdSweep(frc2::sysid::Direction direction) {
+  return m_sysIdRoutine.Sweep(direction);
 }
 
-frc2::CommandPtr Shooter::SysIdDynamic(frc2::sysid::Direction direction) {
-  return m_sysIdRoutine.Dynamic(direction);
+frc2::CommandPtr Shooter::SysIdStep(frc2::sysid::Direction direction) {
+  return m_sysIdRoutine.Step(direction);
 }

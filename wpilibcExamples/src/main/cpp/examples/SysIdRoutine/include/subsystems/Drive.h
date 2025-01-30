@@ -21,8 +21,8 @@ class Drive : public frc2::SubsystemBase {
 
   frc2::CommandPtr ArcadeDriveCommand(std::function<double()> fwd,
                                       std::function<double()> rot);
-  frc2::CommandPtr SysIdQuasistatic(frc2::sysid::Direction direction);
-  frc2::CommandPtr SysIdDynamic(frc2::sysid::Direction direction);
+  frc2::CommandPtr SysIdSweep(frc2::sysid::Direction direction);
+  frc2::CommandPtr SysIdStep(frc2::sysid::Direction direction);
 
  private:
   frc::PWMSparkMax m_leftMotor{constants::drive::kLeftMotor1Port};
