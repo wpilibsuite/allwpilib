@@ -59,8 +59,6 @@ namespace fs {
 #pragma warning(disable : 4244 4267 4146)
 #endif
 
-const file_t kInvalidFile = INVALID_HANDLE_VALUE;
-
 static DWORD nativeDisposition(CreationDisposition Disp, OpenFlags Flags) {
   switch (Disp) {
     case CD_CreateAlways:
@@ -107,12 +105,12 @@ static file_t openFileInternal(const path& Path, std::error_code& EC,
     // This only runs if we failed to open the file, so there is probably
     // no performances issues.
     if (LastError != ERROR_ACCESS_DENIED) {
-      return kInvalidFile;
+      return WPI_kInvalidFile;
     }
     if (is_directory(Path)) {
       EC = std::make_error_code(std::errc::is_a_directory);
     }
-    return kInvalidFile;
+    return WPI_kInvalidFile;
   }
   EC = std::error_code();
   return H;
@@ -156,14 +154,14 @@ file_t OpenFile(const path& Path, std::error_code& EC, CreationDisposition Disp,
       DWORD LastError = ::GetLastError();
       ::CloseHandle(Result);
       EC = wpi::mapWindowsError(LastError);
-      return kInvalidFile;
+      return WPI_kInvalidFile;
     }
   }
 
   if (Flags & OF_Delete) {
     if ((EC = setDeleteDisposition(Result, true))) {
       ::CloseHandle(Result);
-      return kInvalidFile;
+      return WPI_kInvalidFile;
     }
   }
   return Result;
@@ -174,7 +172,7 @@ file_t OpenFileForRead(const path& Path, std::error_code& EC, OpenFlags Flags) {
 }
 
 int FileToFd(file_t& F, std::error_code& EC, OpenFlags Flags) {
-  if (F == kInvalidFile) {
+  if (F == WPI_kInvalidFile) {
     EC = wpi::mapWindowsError(ERROR_INVALID_HANDLE);
     return -1;
   }
@@ -196,18 +194,18 @@ int FileToFd(file_t& F, std::error_code& EC, OpenFlags Flags) {
   }
 
   EC = std::error_code();
-  F = kInvalidFile;
+  F = WPI_kInvalidFile;
   return ResultFD;
 }
 
 void CloseFile(file_t& F) {
   ::CloseHandle(F);
-  F = kInvalidFile;
+  F = WPI_kInvalidFile;
 }
 
 #else  // _WIN32
 
-const file_t kInvalidFile = -1;
+const file_t WPI_kInvalidFile = -1;
 
 static int nativeOpenFlags(CreationDisposition Disp, OpenFlags Flags,
                            FileAccess Access) {
@@ -248,14 +246,14 @@ static int nativeOpenFlags(CreationDisposition Disp, OpenFlags Flags,
 file_t OpenFile(const path& Path, std::error_code& EC, CreationDisposition Disp,
                 FileAccess Access, OpenFlags Flags, unsigned Mode) {
   int OpenFlags = nativeOpenFlags(Disp, Flags, Access);
-  file_t ResultFD = kInvalidFile;
+  file_t ResultFD = WPI_kInvalidFile;
 
   // Call ::open in a lambda to avoid overload resolution in RetryAfterSignal
   // when open is overloaded, such as in Bionic.
   auto Open = [&]() { return ::open(Path.c_str(), OpenFlags, Mode); };
   if ((ResultFD = wpi::sys::RetryAfterSignal(-1, Open)) < 0) {
     EC = std::error_code(errno, std::generic_category());
-    return kInvalidFile;
+    return WPI_kInvalidFile;
   }
 #ifndef O_CLOEXEC
   if (!(Flags & OF_ChildInherit)) {
@@ -274,14 +272,14 @@ file_t OpenFileForRead(const path& Path, std::error_code& EC, OpenFlags Flags) {
 
 int FileToFd(file_t& F, std::error_code& EC, OpenFlags Flags) {
   int fd = F;
-  F = kInvalidFile;
+  F = WPI_kInvalidFile;
   EC = std::error_code();
   return fd;
 }
 
 void CloseFile(file_t& F) {
   ::close(F);
-  F = kInvalidFile;
+  F = WPI_kInvalidFile;
 }
 
 #endif  // _WIN32
