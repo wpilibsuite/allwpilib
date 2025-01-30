@@ -151,20 +151,6 @@ FMT_END_NAMESPACE
 #  endif  // FMT_USE_EXCEPTIONS
 #endif    // FMT_THROW
 
-#ifdef FMT_NO_UNIQUE_ADDRESS
-// Use the provided definition.
-#elif FMT_CPLUSPLUS < 202002L
-// Not supported.
-#elif FMT_HAS_CPP_ATTRIBUTE(no_unique_address)
-#  define FMT_NO_UNIQUE_ADDRESS [[no_unique_address]]
-// VS2019 v16.10 and later except clang-cl (https://reviews.llvm.org/D110485).
-#elif FMT_MSC_VERSION >= 1929 && !FMT_CLANG_VERSION
-#  define FMT_NO_UNIQUE_ADDRESS [[msvc::no_unique_address]]
-#endif
-#ifndef FMT_NO_UNIQUE_ADDRESS
-#  define FMT_NO_UNIQUE_ADDRESS
-#endif
-
 // Defining FMT_REDUCE_INT_INSTANTIATIONS to 1, will reduce the number of
 // integer formatter template instantiations to just one by only using the
 // largest integer type. This results in a reduction in binary size but will
@@ -241,7 +227,9 @@ FMT_CONSTEXPR inline void abort_fuzzing_if(bool condition) {
 #if defined(FMT_USE_STRING_VIEW)
 template <typename Char> using std_string_view = std::basic_string_view<Char>;
 #else
-template <typename T> struct std_string_view {};
+template <typename Char> struct std_string_view {
+  operator basic_string_view<Char>() const;
+};
 #endif
 
 template <typename Char, Char... C> struct string_literal {
@@ -1217,7 +1205,7 @@ FMT_CONSTEXPR FMT_INLINE auto format_decimal(Char* out, UInt value,
 }
 
 template <typename Char, typename UInt, typename OutputIt,
-          FMT_ENABLE_IF(is_back_insert_iterator<OutputIt>::value)>
+          FMT_ENABLE_IF(!std::is_pointer<remove_cvref_t<OutputIt>>::value)>
 FMT_CONSTEXPR auto format_decimal(OutputIt out, UInt value, int num_digits)
     -> OutputIt {
   if (auto ptr = to_pointer<Char>(out, to_unsigned(num_digits))) {
@@ -1853,7 +1841,9 @@ template <typename Char> class digit_grouping {
   }
 
  public:
-  explicit digit_grouping(locale_ref loc, bool localized = true) {
+  template <typename Locale,
+            FMT_ENABLE_IF(std::is_same<Locale, locale_ref>::value)>
+  explicit digit_grouping(Locale loc, bool localized = true) {
     if (!localized) return;
     auto sep = thousands_sep<Char>(loc);
     grouping_ = sep.grouping;
@@ -3653,6 +3643,12 @@ FMT_CONSTEXPR auto native_formatter<T, Char, TYPE>::format(
   return write<Char>(ctx.out(), val, specs, ctx.locale());
 }
 
+// DEPRECATED! https://github.com/fmtlib/fmt/issues/4292.
+template <typename T, typename Enable = void>
+struct is_locale : std::false_type {};
+template <typename T>
+struct is_locale<T, void_t<decltype(T::classic())>> : std::true_type {};
+
 // DEPRECATED!
 template <typename Char = char> struct vformat_args {
   using type = basic_format_args<buffered_context<Char>>;
@@ -3974,8 +3970,7 @@ template <typename T, typename Char = char> struct nested_formatter {
     write(basic_appender<Char>(buf));
     auto specs = format_specs();
     specs.width = width_;
-    specs.set_fill(
-        basic_string_view<Char>(specs_.fill<Char>(), specs_.fill_size()));
+    specs.copy_fill_from(specs_);
     specs.set_align(specs_.align());
     return detail::write<Char>(
         ctx.out(), basic_string_view<Char>(buf.data(), buf.size()), specs);
@@ -4135,41 +4130,46 @@ FMT_API void format_system_error(detail::buffer<char>& out, int error_code,
 // Can be used to report errors from destructors.
 FMT_API void report_system_error(int error_code, const char* message) noexcept;
 
-inline auto vformat(detail::locale_ref loc, string_view fmt, format_args args)
+template <typename Locale, FMT_ENABLE_IF(detail::is_locale<Locale>::value)>
+inline auto vformat(const Locale& loc, string_view fmt, format_args args)
     -> std::string {
   auto buf = memory_buffer();
-  detail::vformat_to(buf, fmt, args, loc);
+  detail::vformat_to(buf, fmt, args, detail::locale_ref(loc));
   return {buf.data(), buf.size()};
 }
 
-template <typename... T>
-FMT_INLINE auto format(detail::locale_ref loc, format_string<T...> fmt,
-                       T&&... args) -> std::string {
+template <typename Locale, typename... T,
+          FMT_ENABLE_IF(detail::is_locale<Locale>::value)>
+FMT_INLINE auto format(const Locale& loc, format_string<T...> fmt, T&&... args)
+    -> std::string {
   return vformat(loc, fmt.str, vargs<T...>{{args...}});
 }
 
-template <typename OutputIt,
+template <typename OutputIt, typename Locale,
           FMT_ENABLE_IF(detail::is_output_iterator<OutputIt, char>::value)>
-auto vformat_to(OutputIt out, detail::locale_ref loc, string_view fmt,
+auto vformat_to(OutputIt out, const Locale& loc, string_view fmt,
                 format_args args) -> OutputIt {
   auto&& buf = detail::get_buffer<char>(out);
-  detail::vformat_to(buf, fmt, args, loc);
+  detail::vformat_to(buf, fmt, args, detail::locale_ref(loc));
   return detail::get_iterator(buf, out);
 }
 
-template <typename OutputIt, typename... T,
-          FMT_ENABLE_IF(detail::is_output_iterator<OutputIt, char>::value)>
-FMT_INLINE auto format_to(OutputIt out, detail::locale_ref loc,
+template <typename OutputIt, typename Locale, typename... T,
+          FMT_ENABLE_IF(detail::is_output_iterator<OutputIt, char>::value&&
+                            detail::is_locale<Locale>::value)>
+FMT_INLINE auto format_to(OutputIt out, const Locale& loc,
                           format_string<T...> fmt, T&&... args) -> OutputIt {
   return fmt::vformat_to(out, loc, fmt.str, vargs<T...>{{args...}});
 }
 
-template <typename... T>
-FMT_NODISCARD FMT_INLINE auto formatted_size(detail::locale_ref loc,
+template <typename Locale, typename... T,
+          FMT_ENABLE_IF(detail::is_locale<Locale>::value)>
+FMT_NODISCARD FMT_INLINE auto formatted_size(const Locale& loc,
                                              format_string<T...> fmt,
                                              T&&... args) -> size_t {
   auto buf = detail::counting_buffer<>();
-  detail::vformat_to(buf, fmt.str, vargs<T...>{{args...}}, loc);
+  detail::vformat_to(buf, fmt.str, vargs<T...>{{args...}},
+                     detail::locale_ref(loc));
   return buf.count();
 }
 
