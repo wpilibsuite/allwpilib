@@ -11,7 +11,7 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/FileLogger.h>
+#include <wpi/datalog/FileLogger.h>
 #include <wpi/datalog/DataLog.h>
 #include <wpi/datalog/DataLogBackgroundWriter.h>
 #include <wpi/datalog/DataLogWriter.h>
