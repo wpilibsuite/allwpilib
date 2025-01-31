@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.trajectory;
 
+import edu.wpi.first.math.trajectory.struct.ExponentialProfileStateStruct;
+
 import java.util.Objects;
 
 /**
@@ -129,6 +131,9 @@ public class ExponentialProfile {
 
   /** Profile state. */
   public static class State {
+    /** The struct used for serializing this class. */
+    public static final ExponentialProfileStateStruct struct = new ExponentialProfileStateStruct();
+    
     /** The position at this state. */
     public double position;
 
