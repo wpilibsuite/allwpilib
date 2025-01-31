@@ -30,8 +30,7 @@ Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogInputPort
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  auto analog =
-      HAL_InitializeAnalogInputPort(channel, stack.c_str(), &status);
+  auto analog = HAL_InitializeAnalogInputPort(channel, stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return (jint)analog;
 }

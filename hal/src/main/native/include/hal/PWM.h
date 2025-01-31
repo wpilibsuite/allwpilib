@@ -21,7 +21,7 @@ extern "C" {
 /**
  * Initializes a PWM port.
  *
- * @param[in] portHandle the port to initialize
+ * @param[in] channel the smartio channel
  * @param[in] allocationLocation  the location where the allocation is occurring
  *                                (can be null)
  * @param[out] status             Error status variable. 0 on success.

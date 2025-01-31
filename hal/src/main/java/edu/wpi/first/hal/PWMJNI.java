@@ -13,10 +13,10 @@ public class PWMJNI extends DIOJNI {
   /**
    * Initializes a PWM port.
    *
-   * @param halPortHandle the port to initialize
+   * @param channel the smartio channel
    * @return the created pwm handle
    */
-  public static native int initializePWMPort(int halPortHandle);
+  public static native int initializePWMPort(int channel);
 
   /**
    * Checks if a pwm channel is valid.

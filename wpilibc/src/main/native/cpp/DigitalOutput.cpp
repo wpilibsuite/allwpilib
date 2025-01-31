@@ -28,8 +28,7 @@ DigitalOutput::DigitalOutput(int channel) {
 
   int32_t status = 0;
   std::string stackTrace = wpi::GetStackTrace(1);
-  m_handle = HAL_InitializeDIOPort(channel, false,
-                                   stackTrace.c_str(), &status);
+  m_handle = HAL_InitializeDIOPort(channel, false, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalOutput, channel + 1);

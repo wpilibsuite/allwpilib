@@ -26,8 +26,7 @@ PWM::PWM(int channel, bool registerSendable) {
 
   auto stack = wpi::GetStackTrace(1);
   int32_t status = 0;
-  m_handle =
-      HAL_InitializePWMPort(channel, stack.c_str(), &status);
+  m_handle = HAL_InitializePWMPort(channel, stack.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   m_channel = channel;

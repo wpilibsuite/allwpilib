@@ -21,7 +21,7 @@ extern "C" {
 /**
  * Initializes the analog input port using the given port object.
  *
- * @param[in] portHandle Handle to the port to initialize.
+ * @param[in] channel the smartio channel.
  * @param[in] allocationLocation the location where the allocation is occurring
  *                               (can be null)
  * @param[out] status the error code, or 0 for success

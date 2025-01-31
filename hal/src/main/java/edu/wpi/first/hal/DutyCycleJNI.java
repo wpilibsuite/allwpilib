@@ -13,11 +13,11 @@ public class DutyCycleJNI extends JNIWrapper {
   /**
    * Initialize a DutyCycle input.
    *
-   * @param halPortHandle the port handle to create from
+   * @param channel the smartio channel
    * @return the created duty cycle handle
    * @see "HAL_InitializeDutyCycle"
    */
-  public static native int initialize(int halPortHandle);
+  public static native int initialize(int channel);
 
   /**
    * Free a DutyCycle.

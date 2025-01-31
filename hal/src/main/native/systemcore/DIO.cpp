@@ -25,8 +25,7 @@ void InitializeDIO() {}
 
 extern "C" {
 
-HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel,
-                                        HAL_Bool input,
+HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
                                         const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();

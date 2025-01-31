@@ -20,7 +20,7 @@ extern "C" {
 /**
  * Initialize a DutyCycle input.
  *
- * @param[in] portHandle         the port handle to create from
+ * @param[in] channel            the smartio channel
  * @param[in] allocationLocation the location where the allocation is occurring
  *                               (can be null)
  * @param[out] status Error status variable. 0 on success.

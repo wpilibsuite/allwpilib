@@ -19,8 +19,7 @@ void InitializeAnalogInput() {}
 
 extern "C" {
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
-    int32_t channel, const char* allocationLocation,
-    int32_t* status) {
+    int32_t channel, const char* allocationLocation, int32_t* status) {
   hal::init::CheckInit();
   if (channel < 0 || channel >= kNumAnalogInputs) {
     *status = RESOURCE_OUT_OF_RANGE;
