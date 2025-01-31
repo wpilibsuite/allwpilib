@@ -402,8 +402,8 @@ public abstract class Command implements Sendable {
   }
 
   /**
-   * Decorates this command to run repeatedly, restarting until the command runs for the given
-   * number of times. The decorated command can still be canceled.
+   * Decorates this command to run repeatedly, restarting it when it ends, until this command is run
+   * the specified number of times or is interrupted. The decorated command can still be canceled.
    *
    * <p>Note: This decorator works by adding this command to a composition. The command the
    * decorator was called on cannot be scheduled independently or be added to a different
@@ -411,7 +411,7 @@ public abstract class Command implements Sendable {
    * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
    * returned from this method can be further decorated without issue.
    *
-   * @param repetitions the count of times to run the command.
+   * @param repetitions the number of times to run the command.
    * @return the decorated command
    */
   public ParallelRaceGroup repeatedly(int repetitions) {
