@@ -72,7 +72,7 @@ public class AddressableLED implements AutoCloseable {
    * @param port the output port to use (Must be a PWM header, not on MXP)
    */
   public AddressableLED(int port) {
-    m_pwmHandle = PWMJNI.initializePWMPort(HAL.getPort((byte) port));
+    m_pwmHandle = PWMJNI.initializePWMPort(port);
     m_handle = AddressableLEDJNI.initialize(m_pwmHandle);
     HAL.report(tResourceType.kResourceType_AddressableLEDs, port + 1);
   }

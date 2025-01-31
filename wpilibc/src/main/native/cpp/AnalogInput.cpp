@@ -26,11 +26,9 @@ AnalogInput::AnalogInput(int channel) {
   }
 
   m_channel = channel;
-
-  HAL_PortHandle port = HAL_GetPort(channel);
   int32_t status = 0;
   std::string stackTrace = wpi::GetStackTrace(1);
-  m_port = HAL_InitializeAnalogInputPort(port, stackTrace.c_str(), &status);
+  m_port = HAL_InitializeAnalogInputPort(channel, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogChannel, channel + 1);

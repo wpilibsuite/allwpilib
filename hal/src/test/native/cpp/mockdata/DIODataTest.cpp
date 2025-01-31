@@ -32,13 +32,13 @@ TEST(DigitalIoSimTest, DigitalIoInitialization) {
   ASSERT_TRUE(0 != callbackId);
 
   int32_t status = 0;
-  HAL_PortHandle portHandle;
+  int32_t channel = 0;
   HAL_DigitalHandle digitalIoHandle;
 
   // Use out of range index
-  portHandle = 8000;
+  channel = 8000;
   gTestDigitalIoCallbackName = "Unset";
-  digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, nullptr, &status);
+  digitalIoHandle = HAL_InitializeDIOPort(channel, true, nullptr, &status);
   EXPECT_EQ(HAL_kInvalidHandle, digitalIoHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
@@ -47,18 +47,18 @@ TEST(DigitalIoSimTest, DigitalIoInitialization) {
 
   // Successful setup
   status = 0;
-  portHandle = HAL_GetPort(INDEX_TO_TEST);
+  channel = INDEX_TO_TEST;
   gTestDigitalIoCallbackName = "Unset";
-  digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, nullptr, &status);
+  digitalIoHandle = HAL_InitializeDIOPort(channel, true, nullptr, &status);
   EXPECT_TRUE(HAL_kInvalidHandle != digitalIoHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestDigitalIoCallbackName.c_str());
 
   // Double initialize... should fail
   status = 0;
-  portHandle = HAL_GetPort(INDEX_TO_TEST);
+  channel = INDEX_TO_TEST;
   gTestDigitalIoCallbackName = "Unset";
-  digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, nullptr, &status);
+  digitalIoHandle = HAL_InitializeDIOPort(channel, true, nullptr, &status);
   EXPECT_EQ(HAL_kInvalidHandle, digitalIoHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
@@ -73,9 +73,9 @@ TEST(DigitalIoSimTest, DigitalIoInitialization) {
       false);
 
   status = 0;
-  portHandle = HAL_GetPort(INDEX_TO_TEST);
+  channel = INDEX_TO_TEST;
   gTestDigitalIoCallbackName = "Unset";
-  digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, nullptr, &status);
+  digitalIoHandle = HAL_InitializeDIOPort(channel, true, nullptr, &status);
   EXPECT_TRUE(HAL_kInvalidHandle != digitalIoHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestDigitalIoCallbackName.c_str());

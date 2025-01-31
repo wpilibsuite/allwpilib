@@ -199,30 +199,4 @@ Java_edu_wpi_first_hal_HAL_getSystemTimeValid
   return val;
 }
 
-/*
- * Class:     edu_wpi_first_hal_HAL
- * Method:    getPortWithModule
- * Signature: (BB)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HAL_getPortWithModule
-  (JNIEnv* env, jclass, jbyte module, jbyte channel)
-{
-  HAL_PortHandle port = HAL_GetPortWithModule(module, channel);
-  return (jint)port;
-}
-
-/*
- * Class:     edu_wpi_first_hal_HAL
- * Method:    getPort
- * Signature: (B)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HAL_getPort
-  (JNIEnv* env, jclass, jbyte channel)
-{
-  HAL_PortHandle port = HAL_GetPort(channel);
-  return (jint)port;
-}
-
 }  // extern "C"

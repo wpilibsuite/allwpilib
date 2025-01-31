@@ -25,12 +25,11 @@ extern "C" {
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogInputPort
-  (JNIEnv* env, jclass, jint id)
+  (JNIEnv* env, jclass, jint channel)
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  auto analog =
-      HAL_InitializeAnalogInputPort((HAL_PortHandle)id, stack.c_str(), &status);
+  auto analog = HAL_InitializeAnalogInputPort(channel, stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return (jint)analog;
 }

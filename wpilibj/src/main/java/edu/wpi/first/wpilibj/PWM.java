@@ -59,7 +59,7 @@ public class PWM implements Sendable, AutoCloseable {
     SensorUtil.checkPWMChannel(channel);
     m_channel = channel;
 
-    m_handle = PWMJNI.initializePWMPort(HAL.getPort((byte) channel));
+    m_handle = PWMJNI.initializePWMPort(channel);
 
     setDisabled();
 
