@@ -21,13 +21,13 @@ extern "C" {
 /**
  * Initializes a PWM port.
  *
- * @param[in] portHandle the port to initialize
+ * @param[in] channel the smartio channel
  * @param[in] allocationLocation  the location where the allocation is occurring
  *                                (can be null)
  * @param[out] status             Error status variable. 0 on success.
  * @return the created pwm handle
  */
-HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
+HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
                                         const char* allocationLocation,
                                         int32_t* status);
 

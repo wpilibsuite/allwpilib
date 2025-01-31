@@ -26,12 +26,12 @@ extern "C" {
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_DIOJNI_initializeDIOPort
-  (JNIEnv* env, jclass, jint id, jboolean input)
+  (JNIEnv* env, jclass, jint channel, jboolean input)
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  auto dio = HAL_InitializeDIOPort(
-      (HAL_PortHandle)id, static_cast<uint8_t>(input), stack.c_str(), &status);
+  auto dio = HAL_InitializeDIOPort(channel, static_cast<uint8_t>(input),
+                                   stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return (jint)dio;
 }

@@ -38,8 +38,7 @@ public class AnalogInput implements Sendable, AutoCloseable {
     AnalogJNI.checkAnalogInputChannel(channel);
     m_channel = channel;
 
-    final int portHandle = HAL.getPort((byte) channel);
-    m_port = AnalogJNI.initializeAnalogInputPort(portHandle);
+    m_port = AnalogJNI.initializeAnalogInputPort(channel);
 
     HAL.report(tResourceType.kResourceType_AnalogChannel, channel + 1);
     SendableRegistry.add(this, "AnalogInput", channel);

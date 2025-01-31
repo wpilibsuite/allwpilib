@@ -21,15 +21,14 @@ extern "C" {
 /**
  * Creates a new instance of a digital port.
  *
- * @param[in] portHandle         the port handle to create from
+ * @param[in] channel            the smartio channel
  * @param[in] input              true for input, false for output
  * @param[in] allocationLocation the location where the allocation is occurring
  *                               (can be null)
  * @param[out] status            Error status variable. 0 on success.
  * @return the created digital handle
  */
-HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
-                                        HAL_Bool input,
+HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
                                         const char* allocationLocation,
                                         int32_t* status);
 

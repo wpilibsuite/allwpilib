@@ -13,19 +13,19 @@ public class AnalogJNI extends JNIWrapper {
   /**
    * Initializes the analog input port using the given port object.
    *
-   * @param halPortHandle Handle to the port to initialize.
+   * @param channel The smartio channel.
    * @return the created analog input handle
    * @see "HAL_InitializeAnalogInputPort"
    */
-  public static native int initializeAnalogInputPort(int halPortHandle);
+  public static native int initializeAnalogInputPort(int channel);
 
   /**
    * Frees an analog input port.
    *
-   * @param portHandle Handle to the analog port.
+   * @param analogPortHandle Handle to the analog port.
    * @see "HAL_FreeAnalogInputPort"
    */
-  public static native void freeAnalogInputPort(int portHandle);
+  public static native void freeAnalogInputPort(int analogPortHandle);
 
   /**
    * Checks that the analog module number is valid.

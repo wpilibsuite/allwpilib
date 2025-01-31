@@ -34,7 +34,7 @@ public class DigitalOutput implements AutoCloseable, Sendable {
     SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
 
-    m_handle = DIOJNI.initializeDIOPort(HAL.getPort((byte) channel), false);
+    m_handle = DIOJNI.initializeDIOPort(channel, false);
 
     HAL.report(tResourceType.kResourceType_DigitalOutput, channel + 1);
     SendableRegistry.add(this, "DigitalOutput", channel);

@@ -13,12 +13,12 @@ public class DIOJNI extends JNIWrapper {
   /**
    * Creates a new instance of a digital port.
    *
-   * @param halPortHandle the port handle to create from
+   * @param channel the smartio channel
    * @param input true for input, false for output
    * @return the created digital handle
    * @see "HAL_InitializeDIOPort"
    */
-  public static native int initializeDIOPort(int halPortHandle, boolean input);
+  public static native int initializeDIOPort(int channel, boolean input);
 
   /**
    * Checks if a DIO channel is valid.

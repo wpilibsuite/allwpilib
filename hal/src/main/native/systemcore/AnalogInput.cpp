@@ -26,12 +26,10 @@ using namespace hal;
 extern "C" {
 
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
-    HAL_PortHandle portHandle, const char* allocationLocation,
-    int32_t* status) {
+    int32_t channel, const char* allocationLocation, int32_t* status) {
   hal::init::CheckInit();
 
-  int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex || channel >= kNumSmartIo) {
+  if (channel < 0 || channel >= kNumSmartIo) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog", 0,
                                      kNumSmartIo, channel);
