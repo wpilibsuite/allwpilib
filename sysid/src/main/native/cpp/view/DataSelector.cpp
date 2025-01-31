@@ -112,7 +112,7 @@ void DataSelector::Display() {
           continue;
         }
         WPI_INFO(m_logger, "Loaded test state {}", it2->first);
-        executedTests.insert(it2->first);
+        m_executedTests.insert(it2->first);
         ++it2;
       }
       if (it->second.empty()) {
@@ -134,9 +134,9 @@ void DataSelector::Display() {
     return;
   }
 
-  if (executedTests.size() < 4 && !m_testCountValidated) {
+  if (m_executedTests.size() < 4 && !m_testCountValidated) {
     for (auto test : kValidTests) {
-      if (!executedTests.contains(test)) {
+      if (!m_executedTests.contains(test)) {
         m_missingTests.push_back(test);
         m_testCountValidated = true;
       }
